@@ -148,6 +148,7 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | R1: declare `prism` as a runtime dependency of Action View and Railties (Ruby 4.1 makes prism a bundled gem) | rails/rails | `thomasklemm/declare-prism-dependency` @ `00339f7e89` on main `9b116f1fed` (local; [patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)) | Correctness, not speed: on Ruby master, an app without minitest 6, irb ≥ 1.17 or rdoc in its bundle gets `LoadError` for prism from `ActionView.eager_load!`, template digests, the test runner and `bin/rails notes`; with the change it resolves prism 2.1.0 on master and 4.0.9 ([readiness](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency)) | Ready, held until Thomas has read it. L0 (+4 lines); correctness review approve, maintainability review approve-with-nits (addressed); body and explanation below. |
+| TC-1: `Time#change` keeps the UTC offset for times with a zone object | rails/rails | [`thomasklemm/time-change-zone-offset`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-change-zone-offset) @ `4580af19d4` on main `9b116f1fed` ([patch](../../bench/upstream/census_backlog/patches/tc1-time-change-zone-offset.patch)) | Correctness: on 8.1 and main, `change` raises `TZInfo::AmbiguousTime` in the repeated hour for TZInfo zones (also Active Model's precision cast) and moves Dublin/Casablanca times by an hour; differential over every tzdata transition to 2037 differs only there; +6–22% Ir per `change` on such Times, ~2× when the offset changes ([census backlog](census-backlog.md#tc-1-keep-the-utc-offset-in-timechange-for-times-with-a-zone-object)) | Reviewed (primary, adversarial, outsider); waits for the coordinator's Sol round and go. L1. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
 ### Erklärungen für Thomas: I1 und IW (2026-11-04, Bugfixes; I1 geöffnet als #59609, IW als Lead geparkt)
@@ -195,6 +196,20 @@ Aufrufe zählt.
 stmt.types.map { |t| type_map.lookup(t) }          # vorher: type_map bei jeder Spalte
 result_type_map = type_map                          # jetzt: einmal pro Ergebnis
 stmt.types.map { |t| result_type_map.lookup(t) }
+### Erklärung für Thomas: TC-1 (2026-11-04, Active Support; nicht geöffnet)
+
+**TC-1, `Time#change` in der doppelten Stunde.** Wenn die Uhr im Herbst zurückgestellt wird, gibt es eine Stunde
+zweimal; `change` baut die neue Zeit mit `Time.new(..., zone)`, und eine `TZInfo::Timezone` wirft dafür
+`AmbiguousTime`, weil sie nicht weiß, welche der beiden gemeint ist (auch Active Models Präzisions-Cast ruft
+`change(nsec:)` und wirft dann); bei Dublin wählt die Zone die falsche und die Zeit springt um eine Stunde. Jetzt
+probiert `change` zuerst den alten UTC-Offset: Stimmt die Zone zu, ist es genau die gemeinte Zeit, sonst entscheidet
+die Zone wie bisher; über alle Zeitumstellungen bis 2037 ändert sich das Ergebnis nur in diesen Fehlerfällen.
+
+```ruby
+t = Time.utc(2026, 10, 25, 0, 30).getlocal(TZInfo::Timezone.get("Europe/Berlin"))  # 02:30 +0200
+t.change(sec: 1)   # vorher: TZInfo::AmbiguousTime, jetzt: 02:30:01 +0200
+```
+
 ### Erklärung für Thomas: TH-1 (2026-11-04, Action View; geöffnet als #59606)
 
 Aufzeichnung, Belege und PR-Text: [census-backlog](census-backlog.md#th-1-restore-the-template-handler-lookup-methods).

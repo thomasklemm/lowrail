@@ -67,7 +67,7 @@ Ranked by user impact. None has a rails/rails issue from us; issues need Thomas'
 | 1 | `find_by_sql`/`count_by_sql` with array binds on PostgreSQL prepared statements: since #58427 (`8c4ed25f0a`) typed literals (`DATE :d`, `TIMESTAMP ?`, `INTERVAL`, `JSONB`), `DATE '…' + :n` and `(:x IS NULL)` fail with a syntax or type error that 8.1.4 doesn't raise; Sure's transfer matcher breaks. Not in the CHANGELOG. | Active Record (C11) | [find-by-sql-typed-literal-binds](find-by-sql-typed-literal-binds.md), [pg-census](pg-census.md) | Present (`bound_sql_literal_for`). Our open #59565 only adds a cast hint to the error |
 | 2 | **Built as TH-1.** #57874 (`cd416503e8`, unreleased) dropped `ActionView::Template.registered_template_handler`, `template_handler_extensions` and `register_default_template_handler`. maildown 3.3.1 calls `registered_template_handler(:erb)` from its handler, so on main a `.md` template raises `NoMethodError` inside `ActionView::Template::Error` the first time it compiles; census 4 saw CodeTriage's Markdown mails fail this way. SimpleCov added a `respond_to?` workaround; view_component fixed its copy (ViewComponent#2662). (Loomio's initializer also calls it, but its handler takes one argument, which 8.1 already rejects, and Loomio has no `.md` views, so it is not evidence.) | Action View (free) | [census 4](rails-main-census-4.md) | Present; open as #59606, see [TH-1](#th-1-restore-the-template-handler-lookup-methods) |
 | 3 | `Array#index_with` ignores an overridden `each` on an Array subclass since 2b88dc1995 (unreleased): `Tens[1, 2].index_with { _1 }` is `{10=>10, 20=>20}` on 8.1 and `{1=>1, 2=>2}` on main. | Active Support (C13) | [merged-audit](merged-audit.md) | Present (`enumerable.rb:315` uses `to_h`). Our open #59557 touches the same method on 4.1 |
-| 4 | Casting a Ruby `Time` in a TZInfo zone (`getlocal(tz)`) during the fall-back hour raises `TZInfo::AmbiguousTime` in `apply_seconds_precision` (`change(nsec:)`). | Active Model / Active Support `Time#change` (C13) | [common paths 2](rails-common-paths-2.md#rejected-and-not-built) | Present; rare (Rails hands out TimeWithZone) |
+| 4 | **Built as TC-1.** `Time#change` on a `Time` with a zone object raises `TZInfo::AmbiguousTime` in the hour repeated when clocks are set back (every TZInfo zone; `ActiveSupport::TimeZone` when both occurrences share a DST flag, e.g. Moscow 2014), including Active Model's precision cast (`change(nsec:)`); where the AS zone's DST occurrence is the later one (Dublin, Casablanca) it moves the time by an hour. Present on 8-1-stable and main; no rails/rails issue (closed #44226 is a different TZInfo symptom). | Active Support `Time#change` (free: a bug, not a C13 speedup) | [common paths 2](rails-common-paths-2.md#rejected-and-not-built) | Present; fixed on branch, see [TC-1](#tc-1-keep-the-utc-offset-in-timechange-for-times-with-a-zone-object) |
 | 5 | Our merged PRs' internal-only differences: #59538 frozen `payload[:binds]` with `prepared_statements: false` (a subscriber that mutates it gets `FrozenError`), #59536 `collect_warnings` overrides that `super.push`, #59562 subclasses defining `event_method_names`, #59560 non-`HashLookupTypeMap` PG type maps, #59537 external `tag_string(name, content, options)` callers, #59571 scope arity −1 → 0, #59316 `extend`-added `match`, #59535 `fetch` arity message. | AR / AS / AV / AP | [merged-audit](merged-audit.md#leads-behavior-differences-only-internals-or-introspection-can-see) | All present; nobody has reported one. Fix recipes are in the audit (e.g. #59538: pass `[]` again in `exec_main_query`) |
 | 6 | `render formats: [:html, :bogus]` raises only on the renderer path (`prepend_formats` validates, the controller path doesn't). | Action View (free) | [actionview-cpu](actionview-cpu.md#rejected-and-leads) | Present; inconsistency, not reported |
 | 7 | rails/rails#59141 (tenderlove, open) broke Lobsters boot through activerecord-typedstore 1.6.0 (`store … accessors:` plus `define_attribute_method`) at `6df1ebd`. | Active Record (open PR) | [activerecord-cpu](activerecord-cpu.md) | Not on main; not rechecked at the PR's head `e5dc0b4338` |
@@ -82,6 +82,7 @@ closed ruby/ruby#19655 case), so it is not listed.
 
 ## Leads whose disposition changed upstream
 
+* R2-4 rechecked 2026-11-04 ([`r24_capture_rest.rb`](../../bench/upstream/census_backlog/r24_capture_rest.rb)): `def b(*) = yield(*)` allocates 0 objects per call interpreted on 4.0.9 and master, but 0.97 with YJIT and ZJIT, while `(*args)` allocates 1 everywhere. With ruby/ruby#19655 closed, the change would save the Array only in the interpreter, permanently; the [common paths](rails-common-paths.md#rejected-and-not-built) rejection stands and nothing was built.
 * R2-4 (`OutputBuffer#capture(*)`) was held until ruby/ruby#19655; #19655 was closed unmerged on 2026-11-04, so
   YJIT and ZJIT keep allocating the empty rest and the interpreter-only gain is permanent. The common-paths
   rejection stands.
@@ -232,3 +233,96 @@ Title: **Restore three ActionView::Template handler methods removed in #57874**
 > This restores the three methods as delegations to `Handlers`. For the extension values 8.1 accepted, they return the same results as 8.1, and `registered_template_handler` and `register_default_template_handler` call `to_sym` on the extension once, as 8.1 did. The one change: when `unshareable_proc_action` is set, a Proc passed to `register_default_template_handler` is stored as its shareable copy, as `register_template_handler` already does, and the method returns that stored handler. Two differences introduced by #57874 are left alone, since they only matter to code that overrides one of these methods: `handler_for_extension` no longer calls `registered_template_handler`, and `register_default_template_handler` no longer calls `register_template_handler`. The removal hasn't been released, so there is no CHANGELOG entry.
 >
 > I found this while running open-source Rails apps against Rails main for my research project, [Lowrail](https://github.com/thomasklemm/lowrail).
+
+## TC-1: keep the UTC offset in `Time#change` for times with a zone object
+
+Branch [`thomasklemm/time-change-zone-offset`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-change-zone-offset)
+@ `4580af19d4` on rails/rails main `9b116f1fed`, pushed to the fork, not opened (waits for the coordinator's Sol round
+and go); patch in [`patches/tc1-time-change-zone-offset.patch`](../../bench/upstream/census_backlog/patches/tc1-time-change-zone-offset.patch).
+Lib +6/−15 in `Time#change`, two tests, a CHANGELOG entry.
+
+**Is it a real bug?** Yes, on 8-1-stable and main alike ([`tz_change.rb`](../../bench/upstream/census_backlog/tz_change.rb)):
+a `Time` from `getlocal(TZInfo::Timezone.get("Europe/Berlin"))` at 02:30 on 2026-10-25 raises `TZInfo::AmbiguousTime`
+for `change(nsec:)`, `change(hour: 2)` and `ActiveModel::Type::DateTime.new(precision: 6).cast`. Ruby's
+`Time.new(..., zone)` calls `zone.local_to_utc`, which TZInfo raises for an ambiguous local time; b191a65850 (#46251)
+only handled zones that resolve the hour. `ActiveSupport::TimeZone` raises too when both occurrences share a DST flag
+(Moscow 2014-10-26), and picks the wrong occurrence where its DST period is the later one (Europe/Dublin every year,
+Casablanca, Windhoek, 1940s transitions). Active Record's time-zone-aware attributes convert with `in_time_zone`
+first, so default models probably don't reach it (read from code, not run). Search: no open or closed rails/rails
+issue or PR on `AmbiguousTime` with `change`; #44226 (closed, stale) is a different TZInfo symptom.
+
+**Described in plain sentences (one per line of the branch):**
+
+* Build the requested local fields at this time's UTC offset and convert that instant into the zone.
+* If the zone gives that instant the same offset, return it: it has the requested fields, and in a repeated hour it
+  is the occurrence matching this time.
+* Otherwise let the zone pick the offset for the requested fields, as before.
+
+`Time.utc(fields) - utc_offset` is used instead of `Time.new(fields, utc_offset)` because the latter has Ruby's
+day-overflow bug (`Time.new(2026, 4, 31, 20, 0, 0, -14400)` is 2026-03-30; related to Bug #21301).
+
+**Exactness.** Differential [`tz_diff.rb`](../../bench/upstream/census_backlog/tz_diff.rb) with
+[`tz_compare.py`](../../bench/upstream/census_backlog/tz_compare.py): 246,924 cases (nine zones as TZInfo and
+`ActiveSupport::TimeZone`, a minimal protocol zone, 18 option sets, instants around each 2026 transition plus 1890
+and 2011 Apia): differences only where main raised `AmbiguousTime` (614) or picked the other Dublin occurrence (36);
+identical across 4.0.9 interpreter and YJIT and master interpreter and ZJIT. Primary reviewer's
+[`edge.rb`](../../bench/upstream/census_backlog/tc1_reviews/edge.rb) (LMT offsets, Apia/Kiritimati date-line skips,
+spring gaps, 48 option sets incl. overflow, huge and negative years, `:offset`, callers `beginning_of_*`, `advance`,
+the Active Model cast, subclass and frozen receivers, singleton overrides, protocol-only zones), identical under four
+system `TZ` values; exception classes and messages unchanged ([`errs.rb`](../../bench/upstream/census_backlog/tc1_reviews/errs.rb)).
+Adversarial round ([`all_transitions.rb`](../../bench/upstream/census_backlog/tc1_reviews/all_transitions.rb),
+465,528 cases per tree over every tzdata transition up to 2037; [`gap.rb`](../../bench/upstream/census_backlog/tc1_reviews/gap.rb)
+630,080 spring-gap cases identical; [`ar.rb`](../../bench/upstream/census_backlog/tc1_reviews/ar.rb) SQLite precision
+0/3/6/nil with time-zone-aware attributes on and off): every difference is main raising or main returning the other
+occurrence; the branch never raises where main didn't. Accepted: a zone object whose `utc_to_local` and
+`local_to_utc` contradict each other can give a different (no more wrong) answer
+([`odd.rb`](../../bench/upstream/census_backlog/tc1_reviews/odd.rb)); the branch now calls `zone.utc_to_local` where
+main called `local_to_utc` ([`calls.rb`](../../bench/upstream/census_backlog/tc1_reviews/calls.rb)); a numeric
+argument with a side-effecting `to_int` can be converted twice on the fallback. Checklist items 1–8 covered by
+these runs (overrides on the receiver, subclasses, conversions, calls on user zones, frozen receivers, exceptions;
+no new constants or requires). Tests: both new tests fail on main (one `AmbiguousTime` error, one wrong offset);
+`time_ext_test.rb` 178 runs, Active Support suite without cache stores identical to main (4,739 vs 4,737 runs; the
+same two `BacktraceCleanerCleanLocationsTest` failures on both), Active Model type tests and Active Record time,
+timestamp and attribute-method tests on SQLite pass.
+
+**Cost** (Callgrind, [raw](data/census-backlog/tc1-callgrind.txt), [`micro_tz.rb`](../../bench/upstream/census_backlog/micro_tz.rb)):
+
+| Case | interp 4.0.9 | YJIT 4.0.9 | interp master | ZJIT master |
+| --- | ---: | ---: | ---: | ---: |
+| `change(nsec:)`, `ActiveSupport::TimeZone` zone | +11.6% | +22.3% | +8.1% | +7.7% |
+| `change(nsec:)`, TZInfo zone | +6.2% | +16.1% | +2.4% | +2.7% |
+| `change(month: 1)` from July (offset changes) | +104% | +118% | +101% | +98% |
+| TimeWithZone precision cast | −0.01% | −0.01% | +0.01% | −0.19% |
+| local Time `change(hour: 0)` | +0.04% | +0.08% | +0.18% | −0.46% |
+
+A/A ≤ 0.29%. Objects per `change` 25 → 28–29 on zone-object Times. The primary reviewer found no equally exact
+cheaper form (`Time.new` with an Integer offset has the overflow bug; `localtime` saves 0.4%). Correctness over
+speed: the slow path is a `Time` with a zone object, not what Rails hands out (`TimeWithZone`).
+
+**Readability.** L1. Cold read (adversarial reviewer, before the message): each branch stated in one sentence; the
+candidate line took a second read, so the comment now says why equal offsets mean the fields are right. Shape: one
+branch per case, no reassignment in a condition (the old `(new_time_2 = ...)` is gone), no ternary, no single-use
+name. flog `Time#change` 79.1 → 78.2; RuboCop ABC 54.43 → 53.98, cyclomatic 17 → 16, perceived 20 → 19, method
+length 32 → 31.
+
+**Reviews.** Primary (subagent): correctness approve, maintainability approve-with-nits (comment said "DST ended",
+now "clocks were set back"; CHANGELOG added; commit message states the remaining TZInfo raise). Adversarial
+(subagent, critical because it is typecasting): approve, no regression demonstrated. Outsider read of the body:
+rewrite; done (Moscow and Casablanca added, Active Model wording narrowed, the doubled cost on the fallback stated).
+Not yet: the coordinator's Sol round.
+
+### PR body (draft, about 180 words, not opened)
+
+Title: **Keep the UTC offset in Time#change for times with a zone object**
+
+> `Time#change` raises `TZInfo::AmbiguousTime` for a `Time` with a zone object when the new local time falls in an hour that repeats because clocks were set back: at every such transition for a `TZInfo::Timezone`, and for an `ActiveSupport::TimeZone` when both occurrences have the same DST flag (Moscow in 2014). Active Model's datetime cast calls `change(nsec:)` to apply `precision:`, so it raises there too. Where an `ActiveSupport::TimeZone`'s DST occurrence is the later one (Dublin, Casablanca), `change` returns a time an hour later.
+>
+> ```ruby
+> berlin = TZInfo::Timezone.get("Europe/Berlin")
+> Time.utc(2026, 10, 25, 0, 30).getlocal(berlin).change(sec: 1) # => TZInfo::AmbiguousTime
+>
+> dublin = ActiveSupport::TimeZone["Europe/Dublin"]
+> Time.utc(2026, 10, 25, 0, 30).getlocal(dublin).change(sec: 0) # => 01:30:00 +0000, was +0100
+> ```
+>
+> #46251 meant `change` to keep the original offset in that hour. It now reads the new local time at the original offset and keeps it if the zone gives that instant the same offset; otherwise the zone picks the offset as before. Across every tzdata transition up to 2037, results differ from main only in those cases. It costs 6–22% more instructions per call on such Times, about twice as much when the offset changes; other Times are unchanged.

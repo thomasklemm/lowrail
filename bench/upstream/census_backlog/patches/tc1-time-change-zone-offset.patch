@@ -1,0 +1,126 @@
+From 4580af19d4727b728a6b1b46b4c53856fb56837a Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:43:43 +0000
+Subject: [PATCH] Keep the UTC offset in Time#change for times with a zone
+ object
+
+Time#change built the new time with Time.new(..., zone) and then moved
+it to the second occurrence of a repeated hour when that matched the
+original offset. For a TZInfo::Timezone, Time.new raises
+TZInfo::AmbiguousTime for a local time in the repeated hour, so
+change(nsec:), change(hour:) and Active Model's datetime precision cast
+raised there. Where the zone picks the other occurrence, as
+ActiveSupport::TimeZone does for Europe/Dublin (whose winter time
+counts as DST), the original offset was missed and change returned a
+time one hour later.
+
+It now tries the original UTC offset first and keeps it when the zone
+gives that offset for the new local time, which is the occurrence
+change already meant to pick, and builds the time from the zone as
+before otherwise. A TZInfo zone can still raise when the original
+offset matches neither occurrence.
+---
+ activesupport/CHANGELOG.md                    | 12 ++++++++
+ .../core_ext/time/calculations.rb             | 23 +++++---------
+ activesupport/test/core_ext/time_ext_test.rb  | 30 +++++++++++++++++++
+ 3 files changed, 50 insertions(+), 15 deletions(-)
+
+diff --git a/activesupport/CHANGELOG.md b/activesupport/CHANGELOG.md
+index edf224874d..d1835b4a48 100644
+--- a/activesupport/CHANGELOG.md
++++ b/activesupport/CHANGELOG.md
+@@ -1,3 +1,15 @@
++*   Fix `Time#change` in the hour repeated when clocks are set back, for times
++    with a zone object.
++
++    With a `TZInfo::Timezone` zone it raised `TZInfo::AmbiguousTime`, including
++    from `change(nsec:)` in Active Model's datetime precision cast. Where the
++    zone picks the other occurrence of the hour, as `ActiveSupport::TimeZone`
++    does for Europe/Dublin, whose winter time counts as DST, it moved the time
++    by an hour. It now keeps the time's UTC offset when the new local time can
++    have it.
++
++    *Thomas Klemm*
++
+ *   `ActiveSupport::MessagePack` no longer deserializes an unsafe
+     `ActiveSupport::SafeBuffer` as `html_safe`.
+ 
+diff --git a/activesupport/lib/active_support/core_ext/time/calculations.rb b/activesupport/lib/active_support/core_ext/time/calculations.rb
+index 885573ac10..291ec3861b 100644
+--- a/activesupport/lib/active_support/core_ext/time/calculations.rb
++++ b/activesupport/lib/active_support/core_ext/time/calculations.rb
+@@ -172,22 +172,15 @@ def change(options)
+     elsif utc?
+       ::Time.utc(new_year, new_month, new_day, new_hour, new_min, new_sec)
+     elsif zone.respond_to?(:utc_to_local)
+-      new_time = ::Time.new(new_year, new_month, new_day, new_hour, new_min, new_sec, zone)
+-
+-      # When there are two occurrences of a nominal time due to DST ending,
+-      # `Time.new` chooses the first chronological occurrence (the one with a
+-      # larger UTC offset). However, for `change`, we want to choose the
+-      # occurrence that matches this time's UTC offset.
+-      #
+-      # If the new time's UTC offset is larger than this time's UTC offset, the
+-      # new time might be a first chronological occurrence. So we add the offset
+-      # difference to fast-forward the new time, and check if the result has the
+-      # desired UTC offset (i.e. is the second chronological occurrence).
+-      offset_difference = new_time.utc_offset - utc_offset
+-      if offset_difference > 0 && (new_time_2 = new_time + offset_difference).utc_offset == utc_offset
+-        new_time_2
+-      else
++      # Read the new local time at this time's UTC offset. If the zone gives
++      # that instant the same offset, it is the new local time, and when a
++      # local time occurs twice because clocks were set back, it is the
++      # occurrence that matches this time.
++      new_time = (::Time.utc(new_year, new_month, new_day, new_hour, new_min, new_sec) - utc_offset).getlocal(zone)
++      if new_time.utc_offset == utc_offset
+         new_time
++      else
++        ::Time.new(new_year, new_month, new_day, new_hour, new_min, new_sec, zone)
+       end
+     elsif zone
+       ::Time.local(new_sec, new_min, new_hour, new_day, new_month, new_year, nil, nil, isdst, nil)
+diff --git a/activesupport/test/core_ext/time_ext_test.rb b/activesupport/test/core_ext/time_ext_test.rb
+index 6854cd305d..425df7494a 100644
+--- a/activesupport/test/core_ext/time_ext_test.rb
++++ b/activesupport/test/core_ext/time_ext_test.rb
+@@ -519,6 +519,36 @@ def test_change_preserves_offset_for_zoned_times_around_end_of_dst
+     end
+   end
+ 
++  def test_change_preserves_offset_for_zoned_times_around_end_of_negative_dst
++    with_tz_default "Europe/Dublin" do
++      # Irish Standard Time (+0100) ended just before 2026-10-25 2:00:00 AM,
++      # and clocks were rolled back 1 hour. Its winter time counts as DST.
++      one_am_1 = Time.utc(2026, 10, 25, 00, 00, 00).getlocal(Time.zone) # 2026-10-25 01:00:00 +0100
++      one_am_2 = Time.utc(2026, 10, 25, 01, 00, 00).getlocal(Time.zone) # 2026-10-25 01:00:00 +0000
++
++      assert_equal one_am_1, one_am_1.change(min: 0)
++      assert_equal one_am_1 + 1, one_am_1.change(sec: 1)
++      assert_equal one_am_2, one_am_2.change(min: 0)
++      assert_equal one_am_2 + 1, one_am_2.change(sec: 1)
++    end
++  end
++
++  def test_change_preserves_offset_for_times_with_a_tzinfo_zone_around_end_of_dst
++    zone = TZInfo::Timezone.get("Europe/Berlin")
++    # DST ended just before 2026-10-25 3:00:00 AM in Europe/Berlin, and clocks
++    # were rolled back 1 hour.
++    midnight   = Time.utc(2026, 10, 24, 22, 00, 00).getlocal(zone) # 2026-10-25 00:00:00 +0200
++    two_am_1   = Time.utc(2026, 10, 25, 00, 00, 00).getlocal(zone) # 2026-10-25 02:00:00 +0200
++    two_am_2   = Time.utc(2026, 10, 25, 01, 00, 00).getlocal(zone) # 2026-10-25 02:00:00 +0100
++    three_am   = Time.utc(2026, 10, 25, 02, 00, 00).getlocal(zone) # 2026-10-25 03:00:00 +0100
++
++    assert_equal two_am_1, midnight.change(hour: 2)
++    assert_equal two_am_1 + 1, two_am_1.change(sec: 1)
++    assert_equal two_am_2 + 1, two_am_2.change(sec: 1)
++    assert_equal two_am_2, three_am.change(hour: 2)
++    assert_equal zone, two_am_2.change(nsec: 0).zone
++  end
++
+   def test_change_preserves_fractional_seconds_on_zoned_time
+     with_tz_default "US/Eastern" do
+       time = Time.new(2005, 10, 30, 00, 00, 0.99r, Time.zone) + 0
+-- 
+2.39.5
+
