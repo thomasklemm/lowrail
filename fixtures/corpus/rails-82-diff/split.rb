@@ -1,5 +1,5 @@
-a = File.foreach(ARGV[0]).to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
-b = File.foreach(ARGV[1]).to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
+a = File.foreach(ARGV[0], mode: "rb").to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
+b = File.foreach(ARGV[1], mode: "rb").to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
 pre = ARGV[2]
 cnt = Hash.new { |h, k| h[k] = [] }
 a.each do |k, v|

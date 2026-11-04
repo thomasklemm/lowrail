@@ -1,6 +1,6 @@
 # usage: ruby cmp.rb A.tsv B.tsv [--errors]
-a = File.foreach(ARGV[0]).to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
-b = File.foreach(ARGV[1]).to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
+a = File.foreach(ARGV[0], mode: "rb").to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
+b = File.foreach(ARGV[1], mode: "rb").to_h { |l| k, v = l.chomp.split("\t", 2); [k, v] }
 fn = ->(k) { k.split("/")[0, 2].join("/") }
 if ARGV[2] == "--errors"
   tot = Hash.new(0); err = Hash.new(0); msg = {}
