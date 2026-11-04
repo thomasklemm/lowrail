@@ -840,9 +840,9 @@ None.
   of fix as #28991. Repro on unmodified main with PostgreSQL 18.6: the file alone gives 21
   `PG::ForeignKeyViolation` errors; PostgreSQL 15 (trigger path, no validation) and SQLite pass either way. With the
   fix it passes on 18.6, and all 46 test files that load `authors` pass alone on 18.6 with `author_addresses`
-  emptied first. Not opened; draft body:
+  emptied first. Merges cleanly onto main `e64f5a4258` (the test still has `fixtures :posts, :authors`). Not opened yet: PR creation is blocked for the account; the coordinator opens it first in the queue as soon as it works, title "Load author addresses with authors in FieldOrderedValuesTest", body in [fov-body.md](../../bench/upstream/actionpack_request_path/fov-body.md):
 
-  > `FieldOrderedValuesTest` loads the `authors` fixtures, which reference `author_addresses` through a foreign key, without loading the addresses. On PostgreSQL 18.4+ fixtures are inserted with foreign keys `NOT ENFORCED` and then set `ENFORCED` again, which validates the existing rows, so the test errors when it runs before any test that loads `author_addresses` (21 errors on Buildkite with seed 14797). This loads them too, as #28991 did for other tests.
+  > `FieldOrderedValuesTest` has loaded the `authors` fixtures since "Extract order references from the built Arel nodes" (63cf73e451), but not `author_addresses`, which `authors` reference through a foreign key. On PostgreSQL 18.4+ fixtures are inserted with foreign keys `NOT ENFORCED` and then set `ENFORCED` again, which validates the existing rows, so the test errors when it runs before any test that loads `author_addresses` (21 errors on Buildkite with seed 14797). This loads them too, as #28991 did for other tests.
   >
   > On PostgreSQL 18.6 the file run alone failed with 21 `PG::ForeignKeyViolation` errors on main and passes with this change; PostgreSQL 15 and SQLite pass either way. Every other test file that loads `authors` passes alone on 18.6 with `author_addresses` emptied first.
 
