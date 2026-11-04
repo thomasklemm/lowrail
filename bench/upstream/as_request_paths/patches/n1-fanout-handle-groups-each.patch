@@ -1,0 +1,37 @@
+From d6b71f057de157f1e6c16dfd74dc009740b149a5 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 13:30:13 +0000
+Subject: [PATCH] Build notification handle groups with each instead of
+ Hash#map
+
+Hash has no map of its own, so Fanout#build_handle went through
+Enumerable#map, which forwards each entry to the block through an
+internal callback object it creates on every call. Pushing into a local
+Array with each saves that object on every instrumented event with
+active subscribers.
+
+The groups are built in the same order, with the same constructor
+arguments, and passed to Handle the same way.
+---
+ activesupport/lib/active_support/notifications/fanout.rb | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/activesupport/lib/active_support/notifications/fanout.rb b/activesupport/lib/active_support/notifications/fanout.rb
+index daa780e6ab..46883cdee2 100644
+--- a/activesupport/lib/active_support/notifications/fanout.rb
++++ b/activesupport/lib/active_support/notifications/fanout.rb
+@@ -374,8 +374,9 @@ def build_handle(name, id, payload)
+         if groups.empty?
+           NullHandle
+         else
+-          instances = groups.map do |group_klass, grouped_listeners|
+-            group_klass.new(grouped_listeners, name, id, payload)
++          instances = []
++          groups.each do |group_klass, grouped_listeners|
++            instances << group_klass.new(grouped_listeners, name, id, payload)
+           end
+           Handle.new(name, id, instances, payload)
+         end
+-- 
+2.55.0
+
