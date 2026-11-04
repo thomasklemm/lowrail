@@ -1,0 +1,53 @@
+From 2a4e5c1ebcd364a1ba51b2fd7c969b5ef7d7fc2b Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 19:10:02 +0000
+Subject: [PATCH] Load unknown PostgreSQL types in lookup_cast_type
+
+The type map now loads OIDs on demand, but `lookup_cast_type` looked up the
+OID without loading it, so extension types such as `ltree[]` or `citext[]`
+came back as `ActiveModel::Type::Value`. Adding an array column of such a
+type with a default then raised `TypeError: can't quote Array`, which also
+breaks loading a schema that has one.
+---
+ .../connection_adapters/postgresql/quoting.rb            | 4 +++-
+ .../test/cases/adapters/postgresql/ltree_test.rb         | 9 +++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb b/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb
+index 717a78f8bf..b508d61d43 100644
+--- a/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb
++++ b/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb
+@@ -188,7 +188,9 @@ def type_cast(value) # :nodoc:
+ 
+         # TODO: Make this method private after we release 8.1.
+         def lookup_cast_type(sql_type) # :nodoc:
+-          super(query_value("SELECT #{quote(sql_type)}::regtype::oid").to_i)
++          oid = query_value("SELECT #{quote(sql_type)}::regtype::oid").to_i
++          load_additional_types([oid]) unless type_map.key?(oid)
++          super(oid)
+         end
+ 
+         def type_casted_binds(binds) # :nodoc:
+diff --git a/activerecord/test/cases/adapters/postgresql/ltree_test.rb b/activerecord/test/cases/adapters/postgresql/ltree_test.rb
+index f1639c7f43..71956d9d48 100644
+--- a/activerecord/test/cases/adapters/postgresql/ltree_test.rb
++++ b/activerecord/test/cases/adapters/postgresql/ltree_test.rb
+@@ -33,6 +33,15 @@ def test_column
+     assert_not_predicate type, :binary?
+   end
+ 
++  def test_array_column_with_default
++    @connection.add_column "ltrees", "paths", :ltree, array: true, default: ["1.2"]
++    Ltree.reset_column_information
++
++    assert_equal ["1.2"], Ltree.new.paths
++  ensure
++    Ltree.reset_column_information
++  end
++
+   def test_write
+     ltree = Ltree.new(path: "1.2.3.4")
+     assert ltree.save!
+-- 
+2.55.0
+
