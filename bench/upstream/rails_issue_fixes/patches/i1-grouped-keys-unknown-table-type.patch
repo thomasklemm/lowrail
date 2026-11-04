@@ -1,4 +1,4 @@
-From 82d7ba5d4b22a2afd6a541b6d3eb889abc09eac6 Mon Sep 17 00:00:00 2001
+From 2e9fc7c4b482553cd6dea6fb0415b4b39059e11e Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:14:29 +0000
 Subject: [PATCH] Cast grouped keys of columns unknown to the schema from the
