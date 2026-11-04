@@ -1,0 +1,69 @@
+From 2b4a97089aee9dbf54c7300b9a137ea942368848 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:06:21 +0000
+Subject: [PATCH] Generate URLs for empty arguments with default URL options as
+ before
+
+Since #59479, the optimized URL helpers also run when the default URL
+options only set reserved options such as :host. For an empty-string
+argument or a record whose to_param is empty, the optimized helper
+raises UrlGenerationError, while the general path, which these helpers
+used before, generates the URL. So with `default_url_options[:host]`
+set, as in a mailer, `post_url(post)` for a post whose `to_param` is ""
+now raises instead of returning "http://example.com/posts/".
+
+Fall back to the general path when the optimized helper can't build the
+path and default URL options apply, as it already does when options are
+passed. Without default URL options such an argument still raises.
+---
+ actionpack/lib/action_dispatch/routing/route_set.rb | 6 +++---
+ actionpack/test/dispatch/routing_test.rb            | 9 +++++++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/actionpack/lib/action_dispatch/routing/route_set.rb b/actionpack/lib/action_dispatch/routing/route_set.rb
+index 7c933559d3..23227933a1 100644
+--- a/actionpack/lib/action_dispatch/routing/route_set.rb
++++ b/actionpack/lib/action_dispatch/routing/route_set.rb
+@@ -234,9 +234,9 @@ def call(t, method_name, args, inner_options, url_strategy)
+                 format = inner_options && inner_options[:format]
+                 path = optimized_helper(args, format)
+                 if path.nil?
+-                  # With options, a missing argument raises the general path's error,
+-                  # as does any argument that fails a requirement.
+-                  return super if inner_options || @requirements
++                  # With options or default URL options, the general path handles a
++                  # missing argument, as it does any argument that fails a requirement.
++                  return super if inner_options || @requirements || default_url_options?(t)
+                   raise_generation_error(args)
+                 end
+                 merge_url_and_query_options!(options, inner_options) if inner_options && !sole_format?(inner_options)
+diff --git a/actionpack/test/dispatch/routing_test.rb b/actionpack/test/dispatch/routing_test.rb
+index 732caad89f..926b6ad2a4 100644
+--- a/actionpack/test/dispatch/routing_test.rb
++++ b/actionpack/test/dispatch/routing_test.rb
+@@ -4883,6 +4883,7 @@ def app; APP end
+       [:page_path, ["foo?bar"], {}], [:wiki_path, ["foo/bar"], {}], [:thing_path, [1], {}],
+       [:product_path, [1], {}], [:product_path, ["fr", 1], {}], [:item_path, [1], {}], [:item_path, [1, "slug"], {}],
+       [:user_status_url, ["david", 1], {}], [:user_status_path, ["da.vid", 1], {}], [:guide_path, [], { id: 1 }],
++      [:article_path, [""], {}], [:article_url, [Struct.new(:to_param).new("")], {}],
+     ]
+     [
+       { host: "example.org" },
+@@ -5440,6 +5441,14 @@ def app; APP end
+     assert_equal message, error.message
+   end
+ 
++  test "URL helpers raise a 'missing keys' error for an empty param with optimized helpers" do
++    url, missing = { action: "show", controller: "products", id: "" }, [:id]
++    message = "No route matches #{url.inspect}, missing required keys: #{missing.inspect}"
++
++    error = assert_raises(ActionController::UrlGenerationError) { product_path("") }
++    assert_equal message, error.message
++  end
++
+   test "URL helpers raise a 'constraint failure' error for a nil param with non-optimized helpers" do
+     url, missing = { action: "show", controller: "products", id: nil }, [:id]
+     message = "No route matches #{url.inspect}, possible unmatched constraints: #{missing.inspect}"
+-- 
+2.55.0
+
