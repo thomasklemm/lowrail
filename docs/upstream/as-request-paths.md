@@ -7,15 +7,16 @@ TimeWithZone and Duration, ErrorReporter and the Executor. Candidates come from 
 Rails main `1105756f42`, Ruby 4.0.9) and the [census backlog](census-backlog.md), skipping every site an open PR,
 a merged PR or an earlier round already covers.
 
-**Result.** Two candidates, both exact, reviewed and on the fork; nothing opened, nothing posted.
+**Result.** Two candidates, opened on 2026-11-04 after the full review path and the coordinator's Sol round: N1 as
+[rails/rails#59613](https://github.com/rails/rails/pull/59613), H1 as [rails/rails#59614](https://github.com/rails/rails/pull/59614).
 
 | # | Branch @ SHA | Change | Per call |
 | --- | --- | --- | --- |
-| N1 | [`thomasklemm/fanout-handle-groups-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/fanout-handle-groups-each) @ `1216ff4766` | `Fanout#build_handle` fills its group Array with `each` instead of `Hash#map` (Enumerable) | `instrument` with one subscriber: 4 → 3 objects; −5.1% / −10.8% / −11.3% instructions (interpreter / YJIT / ZJIT) |
-| H1 | [`thomasklemm/hash-extract-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-extract-each) @ `75cb1d80e3` | `Hash#extract!` iterates its keys with `each` instead of `each_with_object` | `extract!` with the asset helpers' keys: 4 → 3 objects; −18.8% / −43.8% / −23.7%; `stylesheet_link_tag` −1.6% / −5.1% / −3.5% |
+| N1 | [`thomasklemm/fanout-handle-groups-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/fanout-handle-groups-each) @ `d6b71f057d` | `Fanout#build_handle` fills its group Array with `each` instead of `Hash#map` (Enumerable) | `instrument` with one subscriber: 4 → 3 objects; −5.1% / −10.8% / −11.3% instructions (interpreter / YJIT / ZJIT) |
+| H1 | [`thomasklemm/hash-extract-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-extract-each) @ `441ee1f921` | `Hash#extract!` iterates its keys with `each` instead of `each_with_object` | `extract!` with the asset helpers' keys: 4 → 3 objects; −18.8% / −43.8% / −23.7%; `stylesheet_link_tag` −1.6% / −5.1% / −3.5% |
 
-Both are one commit on rails/rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed), authored
-and committed by Thomas Klemm; the patches are in [`patches/`](../../bench/upstream/as_request_paths/patches/).
+Both were measured on rails/rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed) and opened as one commit each on
+`9cf3693a0a` (no commits on either file in between), authored and committed by Thomas Klemm; the patches are in [`patches/`](../../bench/upstream/as_request_paths/patches/).
 
 ## Why these two
 
@@ -146,8 +147,11 @@ interpreted (−10.6%, A/A −0.9%), 1,027 → 797 ns with YJIT (−22.4%, A/A +
 | lobsters | 1,271 | interpreter | 4,263,617,377 | +0.013% | 4,263,025,315 | −0.014% |
 
 railsbench's −5.4M and shipit's −3.4M fit about 830 instructions per handle; both are about the size of the
-±0.07% noise between differing builds measured in round 2, so the body calls ruby-bench within noise. YJIT rows:
-see [below](#ruby-bench-yjit).
+±0.07% noise between differing builds measured in round 2, so the body calls ruby-bench within noise. YJIT, main1
+and candidate only (the A/A runs were stopped to free the CPUs for the quiet timing rerun, so these rows are not
+resolved): railsbench 4,375,412,322 → 4,374,185,998 (−0.03%), shipit 3,140,923,834 → 3,139,335,411 (−0.05%),
+lobsters 3,029,900,810 → 3,020,546,301 (−0.31%, more than 1,271 handles can explain; lobsters' YJIT A/A was
+−0.11% in round 2). H1's YJIT rows were stopped before the candidate run.
 
 ## H1: iterate `Hash#extract!` keys with `each`
 
@@ -155,7 +159,9 @@ see [below](#ruby-bench-yjit).
    def extract!(*keys)
 -    keys.each_with_object(self.class.new) { |key, result| result[key] = delete(key) if has_key?(key) }
 +    result = self.class.new
-+    keys.each { |key| result[key] = delete(key) if has_key?(key) }
++    keys.each do |key|
++      result[key] = delete(key) if has_key?(key)
++    end
 +    result
    end
 ```
@@ -219,7 +225,35 @@ present: 931 → 705 ns interpreted (−24.3%, A/A −0.7%), 773 → 461 ns with
 **ruby-bench** (instructions per iteration, interpreter): lobsters 4,266,033,777 / A/A +0.010% / H1 −0.008%; shipit
 5,844,250,241 / A/A −0.034% / H1 −0.012%. Within noise, as 206 and 64 calls at about 1,400 instructions each predict.
 
-## PR bodies (drafts, not opened)
+## Sol round and opening (2026-11-04)
+
+The coordinator ran Sol on both: open after body fixes, keep the code. Applied:
+
+* The bodies no longer claim exactness absolutely. Sol showed that overrides of `Array#each`/`Hash#each` (a `yield`
+  returning a different value, a two-argument `yield`) and `caller_locations`/TracePoint tell the versions apart;
+  the bodies say behavior is preserved with the standard `Hash`/`Array`/`Enumerable` implementations and that
+  diagnostic frames change.
+* Each body carries a standalone before/after script (objects and ns per call) and links the micro at an immutable
+  commit URL; the exact Ruby builds are named; no projection to 3.3/3.4.
+* Modest pitch: one internal callback object fewer per call, helper-level numbers, ruby-bench within noise, no
+  request speedup claimed. Wall times were rerun with nothing else running in the orb (15 pinned rounds, GC off):
+  `instrument` 1,907 → 1,711 ns interpreted (−10.3%, A/A −1.4%), 1,076 → 802 ns YJIT (−25.5%, A/A +2.0%);
+  `extract!` 916 → 696 ns (−24.0%, A/A −0.6%), 774 → 464 ns (−40.1%, A/A −0.0%); `stylesheet_link_tag` −2.2% / −4.5%
+  (A/A −0.1% / −0.4%).
+* N1 is scoped to the default `Fanout` notifier. H1's call list is exact (receiver `class`, `has_key?`, `delete`;
+  its class `new`; the result `[]=`), the unmeasured "costs more than the lookups" and "as usual" are gone, and the
+  object count is stated for an existing Hash (3 → 2; the micro's 4 → 3 included building the input Hash).
+* H1 takes Sol's `do … end` form (Thomas). Its bytecode is identical to the reviewed braces form (`disasm` differs only in
+  column padding), so the measurements stand; `diff_extract.rb` gave 0 differences again on the final head.
+* A second outsider read of the rewritten bodies: H1's input Hash has one entry, not two (fixed), and wording.
+* Preflight: main refreshed to `9cf3693a0a`, no commits on either file since `9b116f1fed`, `git merge-tree` clean,
+  overlap search repeated (nothing new; #58366 touches `groups_for`, not `build_handle`). Targeted suites on the
+  final heads (notifications 97 runs, Hash/HWIA 202, asset tag helpers 126; 0 failures), RuboCop clean.
+* Opened ready for review as [#59613](https://github.com/rails/rails/pull/59613) (`d6b71f057d`) and
+  [#59614](https://github.com/rails/rails/pull/59614) (`441ee1f921`), with the bodies as posted below. A
+  report-only watch checks both every 2 hours and messages the coordinator only when something is new.
+
+## PR bodies (drafts, superseded by the bodies as opened)
 
 Checked by a separate reader against this page and for an outsider's reading; its corrections are applied
 (H1's `[]=` goes to the new Hash, not the receiver; ZJIT `stylesheet_link_tag` −3.5%; the noise wording; trims).
@@ -251,6 +285,84 @@ Checked by a separate reader against this page and for an outsider's reading; it
 > | main, run again (change from the first run) | | −0.7% | −0.4% | +0.05% | +0.30% | −0.04% |
 >
 > No key present is the usual case; with one present it saves 16.3%, 39.8% and 21.7% of instructions. `stylesheet_link_tag("application")` runs 1.6% fewer instructions interpreted, 5.1% with YJIT and 3.5% with ZJIT, and takes 6.8% less time with YJIT (A/A −2.4%); ruby-bench moves within noise. Ruby 4.0.9, GC disabled, ZJIT on Ruby master 9aa0898240; times are medians of 15 pinned runs, instructions are Callgrind counts per call ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/as_request_paths/micro.rb)). In an instruction profile of 20 open-source Rails apps on Rails main, this line ran in 17 and took 0.14% of everything the interpreter executed; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/as-request-paths.md)).
+
+## PR bodies as opened
+
+### N1 (#59613): Build notification handle groups with each instead of Hash#map
+
+> With the default `Fanout` notifier, every instrumented event that has an active subscriber goes through `Fanout#build_handle`, which maps the group Hash from `groups_for` to group objects. That includes every SQL query, since Active Record's runtime registry is always subscribed. `Hash` has no `map` of its own, so this is `Enumerable#map`, which creates an internal callback object on every call to forward each entry to the block.
+>
+> This accumulates the group objects with `each` and `<<` instead, as `groups_for` does earlier in the file. For the Hash `groups_for` produces, the groups are built in the same order with the same constructor arguments, and `NullHandle` is still returned when nothing is listening. With the standard `Hash`, `Array` and `Enumerable` implementations this preserves behavior; frames seen through `caller_locations` or TracePoint inside a group's constructor change.
+>
+> | `instrument` with one monotonic subscriber and a reused payload, per call | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
+> | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+> | main | 4 | 1,907 ns | 1,076 ns | 16,136 | 7,992 | 8,881 |
+> | this PR | 3 | 1,711 ns (−10.3%) | 802 ns (−25.5%) | 15,309 (−5.1%) | 7,128 (−10.8%) | 7,874 (−11.3%) |
+> | main, run again (change from the first run) | | −1.4% | +2.0% | +0.00% | +0.07% | +0.91% |
+>
+> One subscriber is the smallest case this changes. `Post.find(1)` on in-memory SQLite runs 0.3% fewer instructions interpreted, 0.6% with YJIT and 0.7% with ZJIT. On ruby-bench (Rails 8.1 with this method patched in), railsbench, shipit and lobsters stay within noise, so I don't claim a request-level speedup.
+>
+> Interpreter and YJIT: `ruby 4.0.9 (2026-10-23 revision 3e93b23afc)`; ZJIT: Ruby master `9aa0898240`; not measured on 3.3 or 3.4. Times are medians of 15 runs pinned to one otherwise idle CPU with GC disabled; instructions are Callgrind counts per call ([micro](https://github.com/thomasklemm/lowrail/blob/860e9f4/bench/upstream/as_request_paths/micro.rb)). A standalone check, run with `ruby -I activesupport/lib`:
+>
+> ```ruby
+> # frozen_string_literal: true
+>
+> require "active_support"
+> require "active_support/notifications"
+> require "benchmark"
+>
+> fanout = ActiveSupport::Notifications::Fanout.new
+> module Runtime
+>   def self.call(name, start, finish, id, payload) = nil
+> end
+> fanout.subscribe("event", Runtime, monotonic: true)
+> instrumenter = ActiveSupport::Notifications::Instrumenter.new(fanout)
+> payload = {}
+> run = proc { instrumenter.instrument("event", payload) { } }
+>
+> 10_000.times(&run)
+> before = GC.stat(:total_allocated_objects)
+> 100_000.times(&run)
+> puts "objects per call: #{(GC.stat(:total_allocated_objects) - before) / 100_000.0}"
+> puts "ns per call: #{(Benchmark.realtime { 1_000_000.times(&run) } * 1000).round}"
+> ```
+>
+> In an instruction profile of 20 open-source Rails apps on Rails main, the `groups.map` line in `build_handle` ran in all 20 and took 0.12% of everything the interpreter executed; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/860e9f4/docs/upstream/as-request-paths.md)).
+
+### H1 (#59614): Iterate Hash#extract! keys with each instead of each_with_object
+
+> `Hash#extract!` iterates its keys with `each_with_object`, which comes from `Enumerable` and creates an internal callback object on every call to forward each key to the block. `stylesheet_link_tag` and `javascript_include_tag` call it on every call to take out their path options, and `ActionController::Parameters#extract!` delegates to it.
+>
+> This builds the result in a local Hash with `each`, as `deep_transform_keys` does since #59450. That removes one internal allocation and the Enumerable callback layer, including when none of the keys is present. With the standard `Hash`, `Array` and `Enumerable` implementations the same calls are made in the same order as before. The receiver gets `class`, `has_key?` and `delete`, its class gets `new`, and the result gets `[]=`. Frames seen through backtraces, `caller_locations` or TracePoint inside those calls change.
+>
+> | `extract!("protocol", "extname", "host", "skip_pipeline")` on `{"media" => "all"}`, per call | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
+> | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+> | main | 3 | 916 ns | 774 ns | 7,694 | 6,404 | 6,866 |
+> | this PR | 2 | 696 ns (−24.0%) | 464 ns (−40.1%) | 6,250 (−18.8%) | 3,600 (−43.8%) | 5,240 (−23.7%) |
+> | main, run again (change from the first run) | | −0.6% | −0.0% | +0.05% | +0.30% | −0.04% |
+>
+> Objects are counted on an existing Hash; the table's times and instructions include building the one-entry input Hash on each call, and the script below reuses it. With one of the keys present it saves 16.3% (interpreter), 39.8% (YJIT) and 21.7% (ZJIT) of instructions, and `stylesheet_link_tag("application")` runs 1.6% fewer instructions interpreted, 5.1% with YJIT and 3.5% with ZJIT. On ruby-bench (Rails 8.1 with this method patched in), shipit and lobsters stay within noise, so I don't claim a request-level speedup.
+>
+> Interpreter and YJIT: `ruby 4.0.9 (2026-10-23 revision 3e93b23afc)`; ZJIT: Ruby master `9aa0898240`; not measured on 3.3 or 3.4. Times are medians of 15 runs pinned to one otherwise idle CPU with GC disabled; instructions are Callgrind counts per call ([micro](https://github.com/thomasklemm/lowrail/blob/860e9f4/bench/upstream/as_request_paths/micro.rb)). A standalone check, run with `ruby -I activesupport/lib`:
+>
+> ```ruby
+> # frozen_string_literal: true
+>
+> require "active_support"
+> require "active_support/core_ext/hash/slice"
+> require "benchmark"
+>
+> options = { "media" => "all" }
+> run = proc { options.extract!("protocol", "extname", "host", "skip_pipeline") }
+>
+> 10_000.times(&run)
+> before = GC.stat(:total_allocated_objects)
+> 100_000.times(&run)
+> puts "objects per call: #{(GC.stat(:total_allocated_objects) - before) / 100_000.0}"
+> puts "ns per call: #{(Benchmark.realtime { 1_000_000.times(&run) } * 1000).round}"
+> ```
+>
+> In an instruction profile of 20 open-source Rails apps on Rails main, the `extract!` line ran in 17 and took 0.14% of everything the interpreter executed; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/860e9f4/docs/upstream/as-request-paths.md)).
 
 ## Not built, and why
 
