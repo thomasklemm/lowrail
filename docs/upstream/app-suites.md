@@ -106,6 +106,24 @@ Mastodon's extension). Main with shims: 44 failures. The 8-1 controls run one af
 Redis (an earlier 8-1 run with `REDIS_URL` set had 63 environment failures, from redis_configuration_spec and
 feed specs).
 
+**Mastodon main-only failures after the shims (44 on main; the second 8-1 control has 8, all of which also fail on
+main):** the remaining 36 are all explained.
+* 12 (b): `statuses_spec` expects `Vary: Accept, Accept-Language, Cookie` and gets `…, Sec-Fetch-Site`. Main's
+  Sec-Fetch-Site CSRF protection appends to `Vary` (f5a1915f1d, 7fcee2255b; CHANGELOG).
+* 11 (b, S2): `REST::NotificationSerializer` and `REST::NotificationGroupSerializer` include only
+  `ActionView::Helpers::UrlHelper` and call `link_to`.
+* 9 (c): view specs fail with `FrozenError` on `["", "action_view/test_case/test"]`. fd5ffed45b freezes
+  `ViewPaths._prefixes` (for Ractors), and rspec-rails prepends to `lookup_context.prefixes`. Fixed in rspec-rails
+  570b2b0a79 (#2915, 2026-09-02), after our pin and unreleased.
+* 3 (b): `precision: nil` datetime columns are now cast to microseconds in memory ("Report PostgreSQL default
+  timestamp and time precision as 6", CHANGELOG). `user_spec` (2) and `post_status_service_spec` (1) compare
+  against a nanosecond `Time`.
+* 1 (b): the enum `ArgumentError` now lists the valid values (CHANGELOG).
+* Failing on both: webfinger and outboxes `Vary` (the backported "Vary rendered responses by negotiation
+  headers", 7a955ca367 on 8-1-stable), the embed `Vary`, and the `strip_tags` HTML-entity check.
+
+No (a) in Mastodon.
+
 ## Not run yet
 
 Sure (Maybe's active fork; maybe-finance/maybe is archived), Chatwoot or Forem.
