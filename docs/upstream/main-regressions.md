@@ -118,8 +118,24 @@ instructions:
 | `create_rollback` | 1,379,649 | 1,458,165 | +5.7% |
 | `find` | 264,137 | 227,370 | −13.9% |
 
+**A/A control (2026-11-04).** Two separate worktrees each of base `1105756f42` and head `e5dc0b4338`,
+interpreter, Ruby 4.0.9, fixed heap (`RUBY_GC_HEAP_{0..4}_INIT_SLOTS` 400k/200k/100k/50k/20k), N=2000:
+
+| Case | base A | base A′ | A/A | head B | head B′ | head vs base |
+| --- | --- | --- | --- | --- | --- | --- |
+| `update` | 1,089,758 | 1,089,774 | 0.0015% | 1,151,682 | 1,151,547 | +5.7% |
+| `create_rollback` | 1,379,703 | 1,380,099 | 0.03% | 1,460,459 | 1,460,556 | +5.9% |
+| `find` | 263,409 | 263,907 | 0.19% | 227,083 | 227,316 | −13.8% |
+
+The write-path cost holds far above A/A. **It is not the a19ef01cb3 cause:** the head's `map` is
+`materialize; dup.transform_attributes!`, and `dup` keeps `@materialized`. TracePoint per `update` shows the head
+instead making many name-to-index lookups (`index_for_name` 73, `indexes` 79, `lookup` 66, `attribute_at` 45), and
+its `keys` (3 calls) still recomputes `row_keys | type_keys | cached_names` with an `initialized?` check per name on a
+materialized set. Which of these carries the instructions was not measured.
+
 So #59141 doesn't recover the a19ef01cb3 step for `update`, and adds cost of its own on the write path while
-making `find` much cheaper. That is useful for its author if Thomas wants to share it; nothing was posted.
+making `find` much cheaper. Shared with its author as one comment on #59141 (numbers, A/A, and the R1 shortcut
+as a pointer only).
 
 R1 can open on its own if #59141 closes, or once it merges, if its `keys` still recomputes after a save.
 
