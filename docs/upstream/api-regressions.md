@@ -42,7 +42,7 @@ Each branch is one commit by Thomas on rails main `8b06b0eb98`:
 - `thomasklemm/restore-find-template` @ `c814745459`
 - `thomasklemm/restore-max-password-length` @ `08be5191db`
 
-Both are pushed to the fork after Sol's "open with nits" round, and are waiting for the coordinator to open them. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
+AR-2 opened as [#59627](https://github.com/rails/rails/pull/59627) on 2026-11-04; AR-1 waits for the next slot. Both are pushed to the fork after Sol's "open with nits" round, and are waiting for the coordinator to open them. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
 
 Differentials against 8-1-stable ([`ft_diff.rb`](../../bench/upstream/api_regressions/ft_diff.rb), [`mp.rb`](../../bench/upstream/api_regressions/mp.rb), [`rs_diff.rb`](../../bench/upstream/api_regressions/rs_diff.rb)):
 
