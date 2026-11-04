@@ -1,4 +1,4 @@
-From 0cd841c0c16340b573a4b551af69f4b756c97648 Mon Sep 17 00:00:00 2001
+From c61c7ede78c913443100b9660469fb4fd390fdc2 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 12:14:29 +0000
 Subject: [PATCH] Cast grouped keys of columns unknown to the schema from the
@@ -14,10 +14,10 @@ Use the result's column type in that case. Columns of known tables,
 including joined models that share column names with the root model,
 keep their schema type.
 ---
- activerecord/CHANGELOG.md                        | 16 ++++++++++++++++
- .../lib/active_record/relation/calculations.rb   |  4 +++-
- activerecord/test/cases/calculations_test.rb     |  9 +++++++++
- 3 files changed, 28 insertions(+), 1 deletion(-)
+ activerecord/CHANGELOG.md                     | 16 +++++++++
+ .../active_record/relation/calculations.rb    |  5 ++-
+ activerecord/test/cases/calculations_test.rb  | 33 +++++++++++++++++++
+ 3 files changed, 53 insertions(+), 1 deletion(-)
 
 diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
 index 4ad8bfd285..01a59719d3 100644
@@ -44,25 +44,26 @@ index 4ad8bfd285..01a59719d3 100644
  
      A serialization failure rolls back whatever the statement was part of, so a
 diff --git a/activerecord/lib/active_record/relation/calculations.rb b/activerecord/lib/active_record/relation/calculations.rb
-index 91900066ea..688114cc2c 100644
+index 91900066ea..17bf49b992 100644
 --- a/activerecord/lib/active_record/relation/calculations.rb
 +++ b/activerecord/lib/active_record/relation/calculations.rb
-@@ -584,7 +584,9 @@ def execute_grouped_calculation(operation, column_name, distinct) # :nodoc:
+@@ -584,7 +584,10 @@ def execute_grouped_calculation(operation, column_name, distinct) # :nodoc:
              end
  
              key_types = group_columns.each_with_object({}) do |(aliaz, col_name), types|
 -              types[aliaz] = col_name.try(:type_caster) ||
 +              type = col_name.try(:type_caster)
++              # Type.default_value is the placeholder for a column unknown to the schema, so this is an identity check.
 +              type = calculated_data.column_types.fetch(aliaz, type) if type.equal?(Type.default_value)
 +              types[aliaz] = type ||
                  type_for(col_name) do
                    calculated_data.column_types.fetch(aliaz, Type.default_value)
                  end
 diff --git a/activerecord/test/cases/calculations_test.rb b/activerecord/test/cases/calculations_test.rb
-index e24cb7f88e..349a5e6e3e 100644
+index e24cb7f88e..2fabdcfbc4 100644
 --- a/activerecord/test/cases/calculations_test.rb
 +++ b/activerecord/test/cases/calculations_test.rb
-@@ -825,6 +825,15 @@ def test_should_count_field_in_joined_table_with_group_by_when_tables_share_colu
+@@ -825,6 +825,39 @@ def test_should_count_field_in_joined_table_with_group_by_when_tables_share_colu
      assert_equal({ "active" => 2, "trial" => 2, "suspended" => 1 }, counts)
    end
  
@@ -73,7 +74,31 @@ index e24cb7f88e..349a5e6e3e 100644
 +      .count
 +
 +    assert_equal({ Time.utc(2020, 1, 1)...Time.utc(2020, 1, 2) => Account.count }, counts)
++
++    counts = Account
++      .joins("JOIN (SELECT tsrange(timestamp '2020-01-01', timestamp '2020-01-02') AS status) periods ON TRUE")
++      .group("periods.status", :firm_id)
++      .count
++
++    assert_equal 1, counts[[Time.utc(2020, 1, 1)...Time.utc(2020, 1, 2), 1]]
 +  end if current_adapter?(:PostgreSQLAdapter)
++
++  def test_should_cast_group_by_keys_of_a_typed_column_selected_by_a_cte_from_the_result
++    counts = Topic
++      .with(read: Topic.select(:id, :last_read))
++      .joins("JOIN read ON read.id = topics.id")
++      .where.not(last_read: nil)
++      .group("read.last_read")
++      .count
++
++    assert_equal [Date.new(2004, 4, 15)], counts.keys
++  end if current_adapter?(:SQLite3Adapter, :PostgreSQLAdapter)
++
++  def test_should_keep_an_explicit_value_type_for_group_by_keys
++    topic = Class.new(Topic) { attribute :last_read, ActiveModel::Type::Value.new }
++
++    assert_equal ["2004-04-15"], topic.where.not(last_read: nil).group(:last_read).count.keys
++  end if current_adapter?(:SQLite3Adapter, :PostgreSQLAdapter)
 +
    def test_should_count_field_of_root_table_with_conflicting_group_by_column
      expected = { 1 => 2, 2 => 1, 4 => 5, 5 => 3, 7 => 1 }

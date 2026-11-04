@@ -13,8 +13,8 @@ fail on main and two more fail in their reporters' own tests; only one of them h
 
 | Fix | Issue | Branch @ SHA | Size | Status |
 | --- | --- | --- | --- | --- |
-| I1: grouped keys of columns unknown to the schema are cast from the result | [rails/rails#48420](https://github.com/rails/rails/issues/48420) | [`thomasklemm/grouped-keys-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/grouped-keys-unknown-table-type) @ [`0cd841c0c1`](https://github.com/thomasklemm/rails/commit/0cd841c0c16340b573a4b551af69f4b756c97648) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/i1-grouped-keys-unknown-table-type.patch)) | lib +3/−1, one test, CHANGELOG | Review path done; waiting for the coordinator's Sol review, then opens under Thomas's standing OK ([queue](contributions.md#queue)) |
-| IW: Array subclasses' `index_with` indexes what `each` yields again (census backlog finding 3) | none | [`thomasklemm/index-with-array-subclass-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-array-subclass-each) @ [`2486c9d447`](https://github.com/thomasklemm/rails/commit/2486c9d4471155ca219571efa32eac0fb7c01d4e) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/iw-index-with-array-subclass-each.patch)) | lib +5/−2, test +6 | Built, **recommended not to open**: +5.3% instructions per plain-Array call for a case Ruby's own Array methods don't honour either ([below](#census-backlog-findings-c14)) |
+| I1: grouped keys of columns unknown to the schema are cast from the result | [rails/rails#48420](https://github.com/rails/rails/issues/48420) | [`thomasklemm/grouped-keys-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/grouped-keys-unknown-table-type) @ [`0cd841c0c1`](https://github.com/thomasklemm/rails/commit/0cd841c0c16340b573a4b551af69f4b756c97648) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/i1-grouped-keys-unknown-table-type.patch)) | lib +4/−1, three tests, CHANGELOG | **Opened as [#59609](https://github.com/rails/rails/pull/59609)** 2026-11-04, head `c61c7ede78` after Sol's nits ([ledger](contributions.md#open)) |
+| IW: Array subclasses' `index_with` indexes what `each` yields again (census backlog finding 3) | none | [`thomasklemm/index-with-array-subclass-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-array-subclass-each) @ [`2486c9d447`](https://github.com/thomasklemm/rails/commit/2486c9d4471155ca219571efa32eac0fb7c01d4e) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/iw-index-with-array-subclass-each.patch)) | lib +5/−2, test +6 | Lead, not opened (coordinator agreed): +5.3% instructions per plain-Array call for a case Ruby's own Array methods don't honour either ([below](#census-backlog-findings-c14)) |
 
 ## Triage
 
@@ -145,7 +145,16 @@ or reads (needs late `register_type`; contrived). Also in the mechanism: a strin
 * No open PR for #48420 at 2026-11-04 12:15 UTC (`gh pr list --search 48420`, and the issue's cross-references show
   only the closed #58150).
 
-### PR body (draft, not opened)
+### Sol review and PR body as opened
+
+Sol (run by the coordinator): approve; it fixes #48420, keeps #46923's joined-column fix, and leaves MySQL unchanged
+(its results carry no column types). Nits applied in `c61c7ede78` (amended into the one commit, rebased on main
+`9b116f1fed`, `git merge-tree` clean): a one-line comment on the identity check; tests for a SQLite/PostgreSQL CTE
+selecting a typed column (fails on main on both), a mixed known/unknown two-column grouping, and an explicit
+`ActiveModel::Type::Value` that must stay as supplied (fails if `equal?` is replaced by `==`); body wording. A
+subquery's `created_at` with time-zone-aware attributes now groups as a UTC `Time`, while `group(:created_at)` stays
+`TimeWithZone` (checked). No competing PR at 12:40 UTC. Opened as
+[#59609](https://github.com/rails/rails/pull/59609):
 
 > Fixes #48420.
 >
@@ -158,4 +167,4 @@ or reads (needs late `register_type`; contrived). Also in the mechanism: a strin
 > # this PR: { 2020-01-01 00:00:00 UTC...2020-01-02 00:00:00 UTC => 1 }
 > ```
 >
-> Since #46923 (backported to 7.0.5 in #48091), a grouped key's type comes from the group column's Arel attribute first. When the schema cache doesn't know its table, as for a subquery alias, that type is `ActiveRecord::Type.default_value`, which casts nothing, so the type the database reports for the result is never used. This uses the result's type whenever the column's type is that placeholder (also for a column whose type Rails doesn't recognise), which also fixes CTEs and SQLite subqueries that select a typed column (booleans came back as `1`, dates as `"2020-01-01"`). Columns the schema knows keep their type, including same-named columns of joined models, the case #46923 fixed. `pluck` has the same bug on another path; I left it for a separate PR.
+> Since #46923 (backported to 7.0.5 in #48091), a grouped key's type comes from the group column's Arel attribute first. When the schema cache doesn't know its table, as for a subquery alias or a CTE, that type is the placeholder `ActiveRecord::Type.default_value`, which casts nothing, so the type the database reports for the result is never used. This uses the result's type whenever the column's type is that placeholder, which also fixes SQLite subqueries and CTEs that select a typed column (booleans came back as `1`, dates as `"2020-01-01"`). Columns with a type other than the placeholder keep it, including an explicit `ActiveModel::Type::Value` and same-named columns of joined models, the case #46923 fixed. The result's metadata supplies the database type, not the model's time zone wrapper, enum or serializer: a subquery's `created_at` becomes a UTC `Time`, not a `TimeWithZone`. `pluck` has the same bug on another path; I left it for a separate PR.
