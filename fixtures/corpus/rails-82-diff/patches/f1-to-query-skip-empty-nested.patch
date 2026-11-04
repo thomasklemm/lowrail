@@ -1,0 +1,69 @@
+From fbd3fb7b3fff6f9b0d6876ced49e35f0d79c0fdf Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:07:33 +0000
+Subject: [PATCH] Skip nested values that serialize to an empty query in
+ to_query
+
+#57677 changed Array#to_query to skip empty Hash and Array elements by
+their type, instead of skipping any element whose query string is empty,
+as #57500 did. An element that is not empty itself but only holds empty
+collections still serializes to "", so it adds an empty pair again, and
+Hash#to_query keeps such values as well:
+
+    { a: [1, [[]], 2] }.to_query  # => "a%5B%5D=1&&a%5B%5D=2"
+    { q: [[]], page: 2 }.to_query # => "&page=2"
+
+url_for passes extra options through Hash#to_query, so such a parameter
+produces URLs like "/search?&page=2".
+
+Skip values whose query string is empty in both methods.
+
+Amp-Thread-ID: https://ampcode.com/threads/T-01a1a661-18b1-7386-91ef-dbe3df228ced
+---
+ .../lib/active_support/core_ext/object/to_query.rb          | 6 ++++--
+ activesupport/test/core_ext/object/to_query_test.rb         | 5 +++++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/activesupport/lib/active_support/core_ext/object/to_query.rb b/activesupport/lib/active_support/core_ext/object/to_query.rb
+index 11f9f52f2d..35c1f00c1f 100644
+--- a/activesupport/lib/active_support/core_ext/object/to_query.rb
++++ b/activesupport/lib/active_support/core_ext/object/to_query.rb
+@@ -71,7 +71,8 @@ def to_query(key)
+     else
+       filter_map { |value|
+         next if (value.is_a?(Hash) || value.is_a?(Array)) && value.empty?
+-        value.to_query(prefix)
++        query = value.to_query(prefix)
++        query unless query.empty?
+       }.join "&"
+     end
+   end
+@@ -98,7 +99,8 @@ class Hash
+   def to_query(namespace = nil)
+     query = filter_map do |key, value|
+       next if (value.is_a?(Hash) || value.is_a?(Array)) && value.empty?
+-      value.to_query(namespace ? "#{namespace}[#{key}]" : key)
++      pair = value.to_query(namespace ? "#{namespace}[#{key}]" : key)
++      pair unless pair.empty?
+     end
+ 
+     query.sort! unless namespace.to_s.include?("[]")
+diff --git a/activesupport/test/core_ext/object/to_query_test.rb b/activesupport/test/core_ext/object/to_query_test.rb
+index e49ab44dfb..97e8eb2e15 100644
+--- a/activesupport/test/core_ext/object/to_query_test.rb
++++ b/activesupport/test/core_ext/object/to_query_test.rb
+@@ -60,6 +60,11 @@ def test_array_with_empty_array
+     assert_query_equal "a%5B%5D=1&a%5B%5D=2", a: [1, [], 2]
+   end
+ 
++  def test_nested_values_with_an_empty_query_are_skipped
++    assert_query_equal "a%5B%5D=1&a%5B%5D=2", a: [1, [[]], { b: {} }, 2]
++    assert_query_equal "c=1", a: [[]], b: { d: [{}] }, c: 1
++  end
++
+   def test_nested_empty_hash
+     assert_equal "",
+       {}.to_query
+-- 
+2.55.0
+
