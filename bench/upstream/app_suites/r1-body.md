@@ -7,3 +7,7 @@ That extension is Mastodon. Its `lib/action_dispatch/remote_ip_extensions.rb` pr
 As a small compatibility bridge, this adds `filter_proxies(ips)` back as a private `:doc:` method with 8-1's body. It returns every IP that isn't a trusted proxy, in order. It warns through `ActionDispatch.deprecator` that it will be removed in Rails 9.0, and suggests replacing `filter_proxies(ips).first` with `first_non_proxy(ips)`. The optimized `calculate_ip` path is unchanged and doesn't call it.
 
 The test checks that IPv4, IPv6 and Regexp proxies give the same results as 8-1-stable, and that each call warns.
+
+---
+
+<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md), part of my research project Lowrail).</sub>

@@ -15,3 +15,7 @@ Redmine's view hook listeners hit this, and so do Mastodon's `REST::Notification
 This adds a section to "Upgrading from Rails 8.1 to Rails 8.2". Because `NavigationHelper` includes `UrlHelper`, including `NavigationHelper` instead is all an app needs. Code that also supports earlier versions can keep `UrlHelper` and include `NavigationHelper` only where it's defined; the section shows that form too.
 
 Docs only.
+
+---
+
+<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md), part of my research project Lowrail).</sub>

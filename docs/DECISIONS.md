@@ -114,6 +114,11 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   output and a ZJIT stats diff in diff format, leaving out diffs within noise; not tables of percentages.
 * **ruby/ruby body:** about 100 words plus one micro table, with the ruby-bench headline effect or the
   correctness repro.
+* **Restore and compatibility PRs name their callers** (Thomas, 2026-11-04): when a PR brings back or bridges
+  something main removed, the body says in a sentence or a short list who uses it (gem or app, file, the call), so
+  the PR doesn't stand alone. Every bug, regression and compatibility PR ends with a one-line `<sub>` footer after
+  `---` saying how it was found, linking the matching record in the public Lowrail repo (ecosystem-tests,
+  app-suites, api-regressions, rails-82-differential).
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
 
 ## Playbook from the PR retrospective (2026-11-04)

@@ -12,3 +12,7 @@ Reading table `Widgets` (and view `WidgetsView`) by lowercase name, as in the te
 | view `columns` | id | StatementInvalid | id |
 
 The readers now match with `COLLATE NOCASE`, then give each requested name the rows of its table, so a batch that asks for two ASCII-case spellings of the same table gets both. NOCASE folds only ASCII, like SQLite identifiers, so `Ärger` and `ärger` stay two tables.
+
+---
+
+<sub>Found by running the test suites of widely used gems on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md), part of my research project Lowrail).</sub>
