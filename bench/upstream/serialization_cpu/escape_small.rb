@@ -3,12 +3,14 @@
 # Per-call cost of JSONGemCoderEncoder#escape! on small documents (rails#59584 review).
 #   ruby [--yjit] -I RAILS/activesupport/lib escape_small.rb
 # Prints ns/call (best of 3 batches) for each case. JS_OFF=1 sets
-# escape_js_separators_in_json = false (load_defaults 8.1). With IR=N the
+# escape_js_separators_in_json = false (load_defaults 8.1); HTML_OFF=1 sets
+# escape_html_entities_in_json = false (JS separators only). With IR=N the
 # script instead runs CASE (env) N times with GC off, for Callgrind deltas.
 require "active_support"
 require "active_support/json"
 
 ActiveSupport.escape_js_separators_in_json = false if ENV["JS_OFF"] == "1"
+ActiveSupport.escape_html_entities_in_json = false if ENV["HTML_OFF"] == "1"
 
 DOCS = {
   "small" => { "id" => 1, "name" => "x" },
@@ -18,6 +20,8 @@ DOCS = {
     "comments_count" => 3, "score" => "1.25", "published_at" => "2026-01-01T01:00:00.000Z",
     "slug" => "post-1", "created_at" => "2026-11-03T10:00:00.000Z", "updated_at" => "2026-11-03T10:00:00.000Z",
   },
+  # Contains every escaped character.
+  "chars" => { "id" => 1, "title" => "Ruby & Rails", "body" => "<b>bold</b> line\u2028next\u2029end" },
 }.freeze
 
 encoder = ActiveSupport::JSON::Encoding.json_encoder.new
