@@ -339,11 +339,11 @@ must). The decode-only differences are round 2's attribute order of loaded recor
 
 | Surface | Difference (8.1 → main) | Commit | Class | Action |
 | --- | --- | --- | --- | --- |
-| `MemCacheStore#write_multi` with Dalli 4.1.0–4.3.5 and the binary protocol (Dalli 4's default) | Main writes through Dalli's `set_multi`, which waits out the socket timeout once per key in those versions (values are stored). `fetch_multi` with five misses: 5.6 s on main, 0.01 s on 8.1, same Dalli 4.3.3; cached collection rendering writes the same way. Dalli fixed it in 4.3.6 (`a2599dc`). Rails CI runs Dalli 5.0.6 and cannot see it. | #58066 (`dc40ef488b`), unreleased | **Accident** (interaction with a Dalli bug) | **D1**, below |
+| `MemCacheStore#write_multi` with Dalli 4.1.0–4.3.5 and the binary protocol (Dalli 4's default) | Main writes through Dalli's `set_multi`, which waits out the socket timeout once per key in those versions (values are stored). `fetch_multi` with five misses: 5.6 s on main, 0.01 s on 8.1, same Dalli 4.3.3; cached collection rendering writes the same way. Dalli fixed it in 4.3.6 (`a2599dc`). Rails CI runs Dalli 5.0.6 and cannot see it. | #58066 (`dc40ef488b`), unreleased | **Accident** (interaction with a Dalli bug) | **D1**, below (queued) |
 | `MemCacheStore#write_multi` return value | `nil` (or Dalli's server list with 4.3.3) instead of the entries Hash | #58066 | Undocumented, harmless | None: the return value was never documented and already differed per store |
 | `ActionCable::Channel::ConnectionStub`, `ChannelStub` | Removed with the Action Cable server extraction (`879c139d57`); `stub_connection` now builds the app's connection class. Main's `Channel::TestCase` docs still say `connection` is "an ActionCable::Channel::ConnectionStub" | `879c139d57` | Intended; the stale doc line is a doc accident | Lead only (doc line), not a data-compatibility change |
 
-### D1: use Dalli's set_multi from Dalli 4.3.6
+### D1: avoid MemCacheStore bulk-write timeouts with older Dalli
 
 * **Change:** in `MemCacheStore`, define the batched `write_multi_entries` only when
   `Gem::Version.new(Dalli::VERSION) >= Gem::Version.new("4.3.6")`, in the shape of the file's existing
@@ -355,23 +355,15 @@ must). The decode-only differences are round 2's attribute order of loaded recor
   bug needs Dalli < 4.3.6; the `delete_multi` gate has no version test either.
 * **Upstream search:** no rails/rails issue or PR on `set_multi` timing; the merged `write_multi` PRs (#58066,
   #59398, #59486, #59566, #59573) don't touch the gate.
-* **Branch:** `thomasklemm:thomasklemm/memcache-set-multi-dalli-version` at `50c005b37c` on main `d7875e3fb1`
-  ([patch](../../fixtures/corpus/rails-82-diff/patches/d1-memcache-set-multi-dalli-version.patch)); for Sol.
+* **Dalli fix:** [`a2599dc`](https://github.com/petergoldstein/dalli/commit/a2599dc6027bd1743e1933fedb90b501a8654e70). In 4.3.5, binary `pipelined_set` calls
+  `storage_req(:setq, …)` without `quiet: true`, so `storage_req` waits for a reply; 4.3.6 passes `quiet: true`, which skips the flush and the reply read.
+* **Review:** Sol "open with nits" (title, comment, skip reason, body wording); applied.
+* **Branch:** `thomasklemm:thomasklemm/memcache-set-multi-dalli-version` at `ebb011880e` on main `d7875e3fb1`
+  ([patch](../../fixtures/corpus/rails-82-diff/patches/d1-memcache-set-multi-dalli-version.patch)). Queued in
+  `bench/upstream/pr-queue/queue.tsv` with [the body](../../bench/upstream/rails_82_diff/d1-body.md); opened when a slot frees up
+  under the 15-open-PR limit.
 
-> **Use Dalli's set_multi in MemCacheStore from Dalli 4.3.6**
->
-> `MemCacheStore#write_multi` sends the entries with Dalli's `set_multi` whenever Dalli defines it. Dalli added
-> `set_multi` in 4.1.0, but before 4.3.6 its binary protocol waited for a reply to every quiet set, and
-> memcached never sends one. The values are stored, but the call waits out the socket timeout once for each
-> key.
->
-> The binary protocol is Dalli 4's default, so an application that upgrades Rails and keeps Dalli 4.1 to 4.3.5
-> finds `write_multi`, `fetch_multi` with misses and cached collection rendering blocking for the socket timeout
-> on every key they write. Rails 8.1 writes the keys one by one and is not affected.
->
-> Dalli fixed `set_multi` for the binary protocol in 4.3.6. Check for that version, as the store already does
-> for `delete_multi`, so older Dalli versions keep writing each key on its own and newer ones keep the single
-> round trip. The test that expects `set_multi` skips under the same condition.
+Body: [`bench/upstream/rails_82_diff/d1-body.md`](../../bench/upstream/rails_82_diff/d1-body.md).
 
 Harness artefacts, recorded so nobody chases them: `MemCacheStore#clear` flushes the whole server and
 `SolidCache::Store#clear` deletes every entry, so a writer that cleared its namespace first wiped the other

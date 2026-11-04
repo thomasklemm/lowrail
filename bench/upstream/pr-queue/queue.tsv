@@ -3,3 +3,4 @@ bench/upstream/ecosystem/patches/e4-activesupport-minitest-floor.body.md	thomask
 bench/upstream/ecosystem/patches/e2b-sqlite-schema-readers-temp-shadowing.body.md	thomasklemm/sqlite-schema-readers-temp-shadowing	E2b
 bench/upstream/app_suites/s1-body.md	thomasklemm/upgrade-guide-rack-sendfile	S1
 bench/upstream/app_suites/s2-body.md	thomasklemm/upgrade-guide-navigation-helper	S2
+bench/upstream/rails_82_diff/d1-body.md	thomasklemm/memcache-set-multi-dalli-version	D1
