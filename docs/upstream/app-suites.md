@@ -20,6 +20,7 @@ overridden `primary_key` (#59622).
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
+| Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restore?), CW3–CW5 (b), SU4, SU5, L1 |
 
 ## Findings
 
@@ -324,3 +325,103 @@ is the private method removed in 4f594320e4 (R2-16): 3 more.
   which main turns into a plain Hash after eager loading (25f2e02c9a, 2afdfaf660), so the warmup skips it.
 * 1 (d): `comment_creator_spec` checks that a delegator responds to every `Comment.instance_methods`, which now
   includes the new protected `association_cache` (d432679e04).
+
+## Chatwoot
+
+chatwoot/chatwoot `a8364f9` (default branch `develop`,
+[`a8364f9c43`](https://github.com/chatwoot/chatwoot/tree/a8364f9c4385b12b4f217649c1dad23755459215)), Ruby 3.4.4 (its
+pin) on both trees, PostgreSQL 16.15 with pgvector, Redis 7.0. Rails main `7a78da5a55` for every run, the bisects and
+the fix branch; 8-1-stable `6e09124217`. Community edition as in its CI (`enterprise/` and `spec/enterprise` removed),
+668 spec files and 7632 examples in 8 processes with one database and Redis db each, files split round-robin, Vite
+assets built once per tree (about 4 minutes wall per run). Chatwoot's test env prints deprecations to stderr, so
+main-only ones are read from the logs.
+
+**Port to 8.x, identical on both trees.** Chatwoot locks Rails 7.2.3.1 and doesn't boot on 8.x as it is; its own
+`codex/rails-8-1-3` branch is 188 commits behind develop and conflicts with it, so the default-branch SHA got a
+minimal port instead: the 31 keyword-argument `enum` calls in 23 model files rewritten to `enum :name, {…}` (removed in
+8.0); [`resource :app, only: [:index]`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/config/routes.rb#L715)
+→ `only: []` (8.1 raises on `:index` for a singular resource; same routes); `sprockets-rails` added to the Gemfile
+(Rails 8 no longer depends on it); [`rails-i18n ~> 7.0`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L89)
+→ `~> 8.0`; [administrate-field-belongs_to_search 0.10.0](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L99),
+the latest release, vendored with its `rails < 8.0` and `administrate < 1.0` caps lifted. `bundle lock
+--conservative --update rails administrate administrate-field-belongs_to_search rails-i18n` then moved administrate
+to 1.0.0, acts-as-taggable-on 13.0.0, audited 5.8.0, devise-two-factor 6.4.1, devise_token_auth 1.3.0 and tidewave
+0.9.1. Conservative bumps on both: ruby-vips 2.1.4 → 2.3.0 (8.1's Active Storage refuses older ruby-vips),
+groupdate 6.2.1 → 6.8.0 (6.2.1 fails 33 report specs on 8.1), redis-client 0.26.4 → 0.30.1 (SU4: main's
+`RedisCacheStore`, built in [rack_attack.rb](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/config/initializers/rack_attack.rb#L19),
+needs ≥ 0.28.0 at boot) and rspec-rails 7.0.1 → `570b2b0a79` (L1: every mailer spec file fails to load with
+`FrozenError` on main, as in Forem). The two locks then differ only in the Rails gems and what main itself requires
+(globalid 1.4.0, herb, marcel 2.1.0, psych, ractor-dispatch, stringio).
+
+**Main checkout only:** [`gem 'active_record_query_trace'`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L258)
+→ `require: false` (c). Its [`CustomLogSubscriber < ActiveRecord::LogSubscriber`](https://github.com/brunofacca/active-record-query-trace/blob/5c6736460471421533d6156bcdf71d938a45ac9a/lib/active_record_query_trace.rb#L80)
+calls [`attach_to :active_record`](https://github.com/brunofacca/active-record-query-trace/blob/5c6736460471421533d6156bcdf71d938a45ac9a/lib/active_record_query_trace.rb#L101)
+(1.9, the latest release; unchanged on its default branch), and the `:nodoc:` `ActiveRecord::LogSubscriber` is now an
+`EventReporter::LogSubscriber` without `attach_to` (308594b580, part of #55900 like R2-3), so boot fails with
+`NoMethodError`. The gem's own failing test for this (its #72) was closed. Chatwoot enables it only in development,
+so the shim hides no test.
+
+Results: 8-1 63 F (50 in `super_admin` specs on administrate 1.0, plus `contact_inbox_builder`, Slack uploads'
+open-redirect check, confirmation mailer: upgrade fallout that main shares). Main 211 F, 148 of them not on 8-1, in
+19 files. Those files again: main 148 F, 8-1 3 F and 3 F (the 3 confirmation mailer ones, which fail on all runs).
+The 3 `working_hour_spec` failures passed on main's rerun (time-of-day dependent), so 145 main-only failures are
+stable; all are classified below, and CW1 is the only (a).
+
+**CW1 (a): `where("", values)` puts `(())` in the query.** Chatwoot's
+[`FilterService#query_builder`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L189)
+calls `where(@query_string, @filter_values)`, and `@query_string`
+[starts as `''`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L20);
+with no filters, `PG::SyntaxError` (4 failures in `conversations/filter_service_spec`). 8-1 drops the empty condition;
+on main `build_where_clause` [wraps it in parentheses](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/relation/query_methods.rb#L1995)
+before the fallback that leaves it unchanged. Bisected to 8c4ed25f0a (#58427, kamipo), the SU2 commit; this is a
+side effect of moving `where`'s dispatch into `bound_sql_literal_for`, not the deliberate `find_by_sql` change, and the
+fallback's parentheses are otherwise only doubled (`((a = 1))`, harmless). Not in S1–SU5, R2-x, E1–E4 or AR-1–AR-4
+(AR-4 changes `where!`'s signature, not this branch); no issue or PR found. Repro:
+[empty_where.rb](../../bench/upstream/app_suites/empty_where.rb). Fix: use an empty condition as it is
+(`if rest.empty? || opts.empty?`), which is what 8-1's `sanitize_sql` returned for it with any values; one test in
+`where_test.rb` (empty, named and positional values) that fails on main with a syntax error. Relation, finder,
+sanitize, relations and base tests 1508 runs green on SQLite, RuboCop clean; with the fix in the main tree, Chatwoot's
+`filter_service_spec` passes 52/52.
+[patch](../../bench/upstream/app_suites/cw1-where-empty-condition-binds.patch),
+[body](../../bench/upstream/app_suites/cw1-body.md). Branch `thomasklemm/where-empty-condition-binds` @ `4520f97971`
+on main `7a78da5a55` (the freshly fetched main). No review round yet.
+
+**CW2 (d), restore candidate: the private `Resolver#_find_all` is gone.** 9987431315 (#58279, "Resolve the single
+best template without sorting the whole set") inlined it; 8-1's [`find_all` called it](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/actionview/lib/action_view/template/resolver.rb#L61).
+Chatwoot's [`EmailTemplates::DbResolverService#find_all`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/email_templates/db_resolver_service.rb#L28)
+(a pattern from panoramic) calls `_find_all(name, prefix, partial, details, key, locals)`, so every mailer that
+renders through it raises `NoMethodError`: 121 failures (an app-side shim defining `_find_all` in that class, used for
+one rerun only, removes all of them). The commit says custom resolvers that override `find_all` keep working; those
+that override `_find_all` itself no longer have it called at all, by reading the code (not run):
+[godmin 2.3.0](https://github.com/varvet/godmin/blob/b270f3736dde6022b71544c1692cafea42d4b35f/lib/godmin/resolver.rb#L22)
+and [rbexy 2.0.0.rc7](https://github.com/patbenatar/rbexy/blob/681bc8813f9e8258b8c8ed4056030d0516d5d4ad/lib/rbexy/rails/component_template_resolver.rb#L13)
+(both `FileSystemResolver` subclasses), plus unreleased view_component-cache_digest and torque-admin; code search shows
+about 245 hits for `_find_all(name, prefix, partial`, mostly Chatwoot and old Redmine forks. Unreleased and private.
+A restore of the base `Resolver#_find_all` hook, with `find_all` going through it, would be small and fix
+Chatwoot's pattern; honoring overrides in `FileSystemResolver` subclasses would mean routing `find` through them too,
+which is not small. Not built: the coordinator decides whether this meets the restore rule.
+
+**CW3 (b): `precision: nil` datetime columns cast to microseconds in memory** (as in Mastodon): 2 failures, the widget
+and public `update_last_seen` specs expect `UpdateMessageStatusJob.perform_later` with a nanosecond `Time` on
+`contact_last_seen_at`.
+
+**CW4 (b): integration `get …, params:, as: :json` sends the params in the query string.** 3c99a378ad (#57140,
+CHANGELOG) removed the `X-Http-Method-Override` POST, so `companies_controller_spec`'s `page: 1` comes back as `"1"`
+(2 failures). The CHANGELOG says "`params:` retains existing behavior: GET → query string", which isn't what 8.1 did
+for GET with `as: :json`.
+
+**CW5 (b?), record only: saving re-derives a polymorphic type from the associated record.** Factories build
+`Inbox` with a `channel` and then `channel_type: 'Channel::FacebookPage'`; 8-1 saves that type, main saves the
+channel's class. Bisected to 4af9822fae ("Write association keys through routes", #59120, the R2-1 commit); repro:
+[poly_type.rb](../../bench/upstream/app_suites/poly_type.rb). 8-1 stored a type that disagrees with the saved record,
+so main's result is consistent and the test relied on the mismatch: 2 failures
+(`contact_inbox_with_contact_builder_spec`, `billing_helper_spec`). No CHANGELOG entry.
+
+**SU5 (c): activerecord-import 2.1.0 calls the removed `validation_context=`**: 14 failures in the data import
+job and Intercom importer specs.
+
+**Deprecations that only main emits** (warnings in the main run): 1817 `` `verify_authenticity_token` is deprecated
+… use `skip_forgery_protection` `` (as in Redmine and Forem); 16 `config.active_record.raise_on_assign_to_attr_readonly`
+is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
+ActiveSupport::Cache::RedisCacheStore is deprecated`, from rack_attack.rb above. Both trees print Devise 4.9.4's route
+mapper warnings and `ActiveSupport::Configurable is deprecated`.
