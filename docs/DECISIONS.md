@@ -354,11 +354,12 @@ $0.33, large 8/16 $0.66, xxlarge 16/32 $1.32). A paused orb costs nothing; an or
 finishes (20 after a human interaction), and immediately when the thread is archived. Orb Saver Mode is on, so
 opening a thread doesn't wake it.
 
-* **Between a1.medium and a1.large.** The project default is **a1.medium** (was a1.large), and a1.medium is also the
-  minimum (Thomas, 2026-11-04: small is too small). Pass `orb_size` on every create_thread: **a1.medium** for
-  watchers, coordination, reviews, ledger and docs work, gem and app suites, single Rails framework suites and
-  differential harnesses; **a1.large** only for Ruby builds from source, full Rails suite matrices or parallel
-  PG/MySQL suites, and say why in the prompt.
+* **a1.medium minimum, a1.large is fine.** The project default is **a1.medium** (was a1.large); smaller orbs are
+  too small (Thomas, 2026-11-04). Pass `orb_size` on every create_thread: **a1.medium** for watchers, coordination,
+  reviews, ledger and docs work and light suites; **a1.large** for Ruby builds, Rails framework suites, app and gem
+  suites, differential harnesses and benchmarks. **Above a1.large** (xxlarge, 3xlarge) only for a short, focused
+  burst that needs it, such as a full Rails matrix or a parallel bisect; say why in the prompt and archive the
+  thread as soon as that step is done.
 * **One central watcher** (W1) watches every open upstream PR every 30 minutes and reports only what
   matters; worker orbs keep no PR watch schedules.
 * **Let orbs pause:** no sleep loops or long polling, finish a step and stop; stop long-running services when done;
