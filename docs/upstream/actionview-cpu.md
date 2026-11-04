@@ -565,8 +565,9 @@ part without touching Rails or its `super`.
 ## C3: `prepend_formats` skips the union when the format already leads
 
 Branch [`thomasklemm/prepend-formats-leading`](https://github.com/thomasklemm/rails/tree/thomasklemm/prepend-formats-leading),
-commit [`12cf43d884`](https://github.com/thomasklemm/rails/commit/12cf43d884451c4d0dc99ef8febdc36914676650), on main
-`b084108cf3`. Not opened.
+opened as [rails/rails#59608](https://github.com/rails/rails/pull/59608) on 2026-11-04 at
+[`b7d90b7bc1`](https://github.com/thomasklemm/rails/commit/b7d90b7bc192af386189a25278a67b08abc8f17b) on main
+`9b116f1fed` (first version `12cf43d884`; the diff below is the first version, see [Sol review](#sol-review-of-c3)).
 
 ```diff
        def prepend_formats(formats) # :doc:
@@ -664,6 +665,39 @@ doesn't touch). Recently merged lookup work (#58899, #58786, #58281) does not to
 >
 > On ruby-bench's erubi-rails this runs 2.2% fewer instructions per iteration in the interpreter and 4.1% fewer with
 > YJIT (1.5% and 2.5% on Ruby master), and allocates two fewer objects per render.
+
+### Sol review of C3
+
+Sol: sound for ordinary format arrays, one correction. With empty lookup formats (`LookupContext.new([], formats:
+[])`), `prepend_formats([nil])` raised `ArgumentError: Invalid formats: nil` on main but passed on `12cf43d884`,
+because `formats[0]` and `current[0]` were both `nil` (`equal?` alone doesn't limit the shortcut to Symbols; the same
+String object matches too, which is exact). `b7d90b7bc1` adds `!current.empty?` and Sol's shorter branch:
+
+```ruby
+current = @lookup_context.formats
+# Keep normalization and validation in formats=.
+unless formats.size == 1 && !current.empty? && formats[0].equal?(current[0])
+  current = formats | current
+end
+@lookup_context.formats = current
+```
+
+A regression test in `lookup_context_test.rb` covers empty formats with `[nil]` and invalid formats already in the
+details; it fails on `12cf43d884` and passes on main and `b7d90b7bc1`. The differential grew to 117 cases (adding
+empty and nil-led formats in the details, a shared String object, `[nil]` and `[SHARED]`), identical to main. On main
+`9b116f1fed`: Action View 3,385 runs and Action Pack 4,505 runs, 0 failures, `RAILS_STRICT_WARNINGS=1`; RuboCop clean.
+Micro unchanged: 4,618 → 3,155 ns interp, 3,984 → 2,564 ns YJIT.
+
+**Accepted boundary (return value).** The private `prepend_formats` now returns the lookup context's existing Array
+when it skips the union, so duplicates already in the details come back as they are (`[:html, :html, :json]` instead
+of `[:html, :json]`). `TemplateRenderer#render`, the only caller, ignores the return value; the lookup formats after
+the call are the same as on main.
+
+**Who gains, corrected before opening.** Turbo Stream broadcasts don't: turbo-rails 2.0.23 renders with
+`ApplicationController.render(formats: [format], …)` (`broadcasts.rb:113`) and the tag builder with `formats: [:html]`,
+so the lookup context holds one format, the flat case (739 → 766 ns), and partial-only broadcasts never call
+`prepend_formats`. Measured in the erubi-rails app: `render :topics_show` reaches it with 36 formats, with
+`formats: [:html]` with one. The PR says only renders outside a request without `formats:` gain.
 
 ### Rejected with C3
 
