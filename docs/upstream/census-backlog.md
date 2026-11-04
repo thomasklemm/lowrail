@@ -326,20 +326,22 @@ Overlap search: no open PR on `AmbiguousTime` or `core_ext/time/calculations`; #
 
 ### PR body (final, ready to open)
 
+Shortened to the [short-body rule](../DECISIONS.md#short-pr-bodies-2026-11-04): 136 words before the `<details>`
+block (table included), 195 in total; was about 240.
+
 Title: **Keep the UTC offset in Time#change for times with a zone object**
 
-> When clocks are set back, an hour of local time occurs twice. In that hour, `Time#change` on a `Time` with a zone object raises `TZInfo::AmbiguousTime` for a `TZInfo::Timezone` with TZInfo's default ambiguity settings, and for an `ActiveSupport::TimeZone` when both occurrences have the same DST flag (Moscow, 2014). Active Model's datetime cast calls `change(nsec:)` when precision truncation is needed, so the cast raises too. In Europe/Dublin, `ActiveSupport::TimeZone` picks the other occurrence, and `change` returns a time one hour later.
+> `Time#change` on a `Time` with a zone object now keeps the original UTC offset when the zone gives the new local time that offset. This fixes the hour repeated when clocks are set back, where TZInfo zones raised `TZInfo::AmbiguousTime` (also in Active Model's datetime cast when precision truncation is needed) and `ActiveSupport::TimeZone` could pick the other occurrence.
 >
-> ```ruby
-> berlin = TZInfo::Timezone.get("Europe/Berlin")
-> Time.utc(2026, 10, 25, 0, 30).getlocal(berlin).change(sec: 1)
-> # main: TZInfo::AmbiguousTime; this change: 02:30:01 +0200
+> | `Time.utc(2026, 10, 25, 0, 30).getlocal(zone).change(sec: 1)` | main | this change |
+> | --- | --- | --- |
+> | `TZInfo::Timezone.get("Europe/Berlin")` | `AmbiguousTime` | 02:30:01 +0200 |
+> | `ActiveSupport::TimeZone["Europe/Dublin"]` | 01:30:01 +0000 | 01:30:01 +0100 |
 >
-> dublin = ActiveSupport::TimeZone["Europe/Dublin"]
-> Time.utc(2026, 10, 25, 0, 30).getlocal(dublin).change(sec: 0)
-> # main: 01:30:00 +0000; this change: 01:30:00 +0100
-> ```
+> Otherwise the zone picks as before: an ambiguous time still raises when neither occurrence has the original offset, and a skipped-hour time still raises `PeriodNotFound`. This assumes the zone's `utc_to_local` covers the instants near the requested one, as TZInfo and `ActiveSupport::TimeZone` do.
 >
-> `change` now reads the new local time at the original offset and keeps that instant when the zone gives it the same offset. Otherwise the zone picks as before: an ambiguous time still raises when neither occurrence has the original offset, and a time in a skipped hour still raises `PeriodNotFound`.
+> <details><summary>Testing and cost</summary>
 >
-> I compared main and this change for all TZInfo and `ActiveSupport::TimeZone` zones, at instants around every transition up to 2037, changing `nsec:`, `sec:`, `min:`, `hour:` and `day:`. Results differ only where main raised or picked the other occurrence. This holds for zones whose `utc_to_local` covers the instants near the requested one. Cost on Times with a zone object: `change(nsec:)` runs 6–12% more instructions (16–22% with YJIT), and about twice as many when the offset changes.
+> Compared with main for all TZInfo and `ActiveSupport::TimeZone` zones around every transition up to 2037, changing `nsec:`, `sec:`, `min:`, `hour:` and `day:`: results differ only where main raised or picked the other occurrence. On Times with a zone object, `change(nsec:)` runs 6–12% more instructions (16–22% with YJIT), about twice as many when the offset changes.
+>
+> </details>
