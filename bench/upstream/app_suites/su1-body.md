@@ -7,9 +7,9 @@ Class.new(ActiveSupport::Cache::MemoryStore).new
 # => NoMethodError: undefined method 'underscore' for nil
 ```
 
-On 8.1, the store could be created and used, and only `with_local_cache` raised the same error. Sure's [`TransactionsControllerTest`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/test/controllers/transactions_controller_test.rb#L1799) (main) builds such a store to record the keys written during a request.
+On 8.1, creating the store worked; entering `with_local_cache` raised the same error. Sure's [`TransactionsControllerTest`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/test/controllers/transactions_controller_test.rb#L1799) (main) builds such a store to record the keys written during a request.
 
-This uses `name.to_s`, so an anonymous store gets a key such as `:_local_cache_1234`. The key stays unique because of the object id, and named stores keep their keys. The new test covers creating the store and using the local cache, which also fixes the 8.1 `with_local_cache` error.
+This uses `name.to_s`, so an anonymous store gets a key such as `:_local_cache_1234`. The object id keeps the key unique per live store, and named stores keep their keys. The new test creates an anonymous store and uses its local cache.
 
 ---
 
