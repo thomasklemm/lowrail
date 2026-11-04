@@ -183,7 +183,9 @@ No difference in the text, sanitizing, number, time and tag helpers; in any othe
 deserialize or change detection; in UUID handling (despite the new fast path); in decimal scale rounding (despite
 two changes there); in any PostgreSQL- or MySQL-only SQL; or in recognition and generation.
 
-**Pre-existing, the same on 8.1 and main (not 8.2 regressions, recorded only):** `ActiveModel::Type::Date#cast` and
-the PG range and money types raise `ArgumentError: comparison of Rational with BigDecimal failed` for some
-BigDecimal inputs such as `NaN`; casting an integer array element `"x"` gives `0` while serializing it gives `NULL`.
+**Pre-existing, the same on 8.1 and main (not 8.2 regressions, recorded only):** `changed?` raises `ArgumentError:
+comparison of Rational with BigDecimal failed` on the types that pass values through unchanged (binary, PG range,
+money, hstore and others) when the old value is a Time or Date and the new one a BigDecimal (74 cases), because
+`Time#==` compares through `<=>`; casting an integer array element `"x"` gives `0` while serializing it gives
+`NULL`.
 
