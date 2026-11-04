@@ -1,0 +1,48 @@
+From c814745459eb5b3c6ef26b898c0991004ec8f524 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:01:58 +0000
+Subject: [PATCH] Restore ActionView::LookupContext#find_template
+
+#57783 split template lookup into a non-raising #find and a raising
+#find!, and dropped the find_template alias. Gems that call
+lookup_context.find_template, such as jpmobile, rabl-rails and thredded,
+raise NoMethodError on main.
+
+Keep find_template as an alias of find!, which raises
+ActionView::MissingTemplate as find_template did in Rails 8.1.
+---
+ actionview/lib/action_view/lookup_context.rb    | 1 +
+ actionview/test/template/lookup_context_test.rb | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/actionview/lib/action_view/lookup_context.rb b/actionview/lib/action_view/lookup_context.rb
+index 22bf88a6bc4..c40a344be73 100644
+--- a/actionview/lib/action_view/lookup_context.rb
++++ b/actionview/lib/action_view/lookup_context.rb
+@@ -158,6 +158,7 @@ def find!(name, prefixes = [], partial = false, keys = [], options = {})
+         end
+         @view_paths.find!(name, prefixes, partial, details, details_key, keys)
+       end
++      alias :find_template :find!
+ 
+       def find_all(name, prefixes = [], partial = false, keys = [], options = {})
+         if options.empty?
+diff --git a/actionview/test/template/lookup_context_test.rb b/actionview/test/template/lookup_context_test.rb
+index 40fcedc1122..40723cd7ab9 100644
+--- a/actionview/test/template/lookup_context_test.rb
++++ b/actionview/test/template/lookup_context_test.rb
+@@ -111,6 +111,11 @@ def teardown
+     assert_equal :pt, I18n.locale
+   end
+ 
++  test "find_template returns the template, or raises when there is none" do
++    assert_equal "Hello world!", @lookup_context.find_template("hello_world", %w(test)).source
++    assert_raise(ActionView::MissingTemplate) { @lookup_context.find_template("missing", %w(test)) }
++  end
++
+   test "find templates using the given view paths and configured details" do
+     template = @lookup_context.find("hello_world", %w(test))
+     assert_equal "Hello world!", template.source
+-- 
+2.55.0
+
