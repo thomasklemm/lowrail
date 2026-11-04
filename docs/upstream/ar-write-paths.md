@@ -6,6 +6,9 @@ census backlog (C6-2, `SelectManager#project`, `Arel.sql`). Same rules as [AR-1]
 readability checks of 2026-11-04 in [DECISIONS](../DECISIONS.md#readability-gate-l0l3) (cold read, shape checklist,
 flog/RuboCop numbers, the changed code described in plain sentences).
 
+**Status 2026-11-04 13:55 UTC:** W2 opened as [rails/rails#59616](https://github.com/rails/rails/pull/59616)
+(head `ef0266d0d6`); W3 ready, its PR creation refused again.
+
 **Result.** Two candidates, W2 (update timestamps) and W3 (default star projection), passed the Sol round with
 fixes (2026-11-04) and are ready to open on rails/rails main `9cf3693a0a`; **PR creation is blocked** for this account
 (GitHub refused `CreatePullRequest` after 13 PRs that day; one attempt for W2, none for W3). W1 was built, measured and dropped after the adversarial round; the other leads were rejected or
