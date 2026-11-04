@@ -1,0 +1,33 @@
+From c4f465b7b27b2bd4d93d4d89645d355fefcf3233 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:38:11 +0000
+Subject: [PATCH] Append the default star projection without a rest Array
+
+build_select called arel.project with a single node, which allocates a
+one-element Array for the splat each time a default star projection is
+built. Append the node to the manager's projections directly instead of
+going through project; project only converts Strings and Symbols, and the
+star attribute is neither.
+
+    Post.where(author_id: 1).limit(5).to_a # 132 -> 131 allocations
+    Post.all.to_a                           # 291 -> 290 allocations
+---
+ activerecord/lib/active_record/relation/query_methods.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
+index 1ab772f342..941faf447a 100644
+--- a/activerecord/lib/active_record/relation/query_methods.rb
++++ b/activerecord/lib/active_record/relation/query_methods.rb
+@@ -2249,7 +2249,7 @@ def build_select(arel)
+         elsif model.ignored_columns.any? || model.enumerate_columns_in_select_statements || model.only_columns.any?
+           arel.project(*model.column_names.map { |field| table[field] })
+         else
+-          arel.project(table[Arel.star])
++          arel.projections << table[Arel.star]
+         end
+       end
+ 
+-- 
+2.55.0
+

@@ -150,6 +150,8 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | TC-1: `Time#change` keeps the UTC offset for times with a zone object | rails/rails | [`thomasklemm/time-change-zone-offset`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-change-zone-offset) @ `d5252fae22` on main `9cf3693a0a` ([patch](../../bench/upstream/census_backlog/patches/tc1-time-change-zone-offset.patch)) | Correctness: on 8.1 and main, `change` raises `TZInfo::AmbiguousTime` in the repeated hour for TZInfo zones (also Active Model's precision cast) and moves Dublin/Casablanca times by an hour; differential over every tzdata transition to 2037 differs only there; +6–22% Ir per `change` on such Times, ~2× when the offset changes ([census backlog](census-backlog.md#tc-1-keep-the-utc-offset-in-timechange-for-times-with-a-zone-object)) | Reviewed (primary, adversarial, outsider, Sol); go given, fork pushed, body final. **Opening blocked:** GitHub refuses PR creation on rails/rails for this token (GraphQL permissions error, REST 404); waits for a working credential. L1. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| W2: `record_update_timestamps` reads the clock only before the first timestamp write, with three tests | rails/rails | [`thomasklemm/update-timestamps-time-when-written`](https://github.com/thomasklemm/rails/tree/thomasklemm/update-timestamps-time-when-written) @ `ef0266d0d6` on main `9cf3693a0a` | `post.update!` Callgrind −1.4% / −0.9% / −1.4% (interpreter / YJIT / ZJIT, A/A ≤ 0.20%); 190 → 189 allocations in the micro; Fizzy card update −82 objects (A/A floor −48); ruby-bench can't show it ([record](ar-write-paths.md)) | **Ready, PR creation blocked** (GitHub refused `CreatePullRequest` for the account on 2026-11-04; one attempt). Sol: open after fixes, applied (tests, scoped body). Body: [`w2-body.md`](../../bench/upstream/ar_write_paths/w2-body.md). Lib +2/−1, test +34. |
+| W3: `build_select` appends the default `table.*` projection instead of `project(node)` | rails/rails | [`thomasklemm/build-select-star-projection`](https://github.com/thomasklemm/rails/tree/thomasklemm/build-select-star-projection) @ `c4f465b7b2` on main `9cf3693a0a` | −1 allocation per default-star projection; `Post.all.to_a` Callgrind −0.26% / −0.38% (interpreter / YJIT, A/A ≤ 0.01%), ZJIT no measurable difference; ruby-bench shipit 1,811 and lobsters 660 per iteration; independent of open #45864, same line ([record](ar-write-paths.md)) | **Ready, PR creation blocked** (not attempted after W2's refusal). Sol: open after fixes, applied (scope, #45864, bypass stated). Body: [`w3-body.md`](../../bench/upstream/ar_write_paths/w3-body.md). Lib +1/−1. |
 
 ### Erklärungen für Thomas: N1 und H1 (2026-11-04, Active Support; geöffnet als #59613 und #59614)
 
@@ -207,6 +209,33 @@ normalen Array (also bei jeder Query) etwa 5% mehr Instruktionen, für einen Fal
 class Tens < Array; def each = super { |x| yield x * 10 }; end
 Tens[1, 2].index_with { _1 }   # 8.1: {10=>10, 20=>20}, main: {1=>1, 2=>2}
 Tens[1, 2].map { _1 }          # in beiden: [1, 2], Array-Methoden ignorieren das eigene each
+```
+
+### Erklärungen für Thomas: W2 und W3 (2026-11-04, fertig; PR-Erstellung gesperrt)
+
+Aufzeichnung und PR-Texte: [ar-write-paths](ar-write-paths.md).
+
+**W2, Zeitstempel beim Update.** Bei jedem `update` läuft die Methode, die `updated_at` setzt, zweimal: einmal vor
+und einmal nach den `before_update`-Callbacks, damit auch Änderungen aus einem Callback einen frischen Zeitstempel
+bekommen. Beim zweiten Durchlauf ist `updated_at` meist schon gesetzt, er schreibt also nichts, hat aber trotzdem
+vorher die Uhrzeit geholt (und dafür die Datenbankverbindung nach ihrer Zeitzone gefragt). Jetzt wird die Zeit erst
+geholt, wenn wirklich eine Spalte geschrieben wird; ein Update wird so etwa 1–1,5% billiger, und `updated_at` und
+`updated_on` bekommen weiter dieselbe Zeit.
+
+```ruby
+current_time = current_time_from_proper_timezone      # vorher: immer, auch wenn nichts geschrieben wird
+current_time ||= current_time_from_proper_timezone    # jetzt: erst vor dem ersten Schreiben
+```
+
+**W3, `SELECT posts.*` ohne Hilfs-Array.** Jede Abfrage, die alle Spalten lädt, baut `SELECT "posts".*` über
+`arel.project(table[Arel.star])`. Weil `project` beliebig viele Argumente nimmt (`*projections`), legt Ruby bei jedem
+Aufruf ein Array mit diesem einen Element an. Jetzt wird das Element direkt an die Liste gehängt; `project` hätte
+damit ohnehin nichts weiter gemacht, weil es nur Strings und Symbole umwandelt. Ein Objekt weniger pro geladener
+Relation, in allen 20 Apps.
+
+```ruby
+arel.project(table[Arel.star])        # vorher: [node] als Splat-Array, dann concat
+arel.projections << table[Arel.star]  # jetzt: direkt angehängt
 ```
 
 ### Erklärung für Thomas: AR-1 (2026-11-04, nicht geöffnet)
