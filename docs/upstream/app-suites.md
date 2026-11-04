@@ -541,7 +541,7 @@ Patched methods at the release tags: OpenTelemetry
 Datadog [`exec` … `sync_exec_prepared`](https://github.com/DataDog/dd-trace-rb/blob/f7009ebf10051fd6d0a034adf98050288f5517e6/lib/datadog/tracing/contrib/pg/instrumentation.rb#L23-L90) (the `exec`, `async_exec` and
 `sync_exec` families with `_params` and `_prepared`); rack-mini-profiler
 [`exec`, `async_exec`, `exec_prepared`, `send_query_prepared`, `prepare`, `exec_params`](https://github.com/MiniProfiler/rack-mini-profiler/blob/d95511f0b5fe0ae6d326c6ce7071157d829b9447/lib/patches/db/pg/alias_method.rb#L31-L39).
-None wraps `send_query` or `send_query_params`, and only rack-mini-profiler wraps `send_query_prepared`.
+None wraps `send_query` or `send_query_params`, and only rack-mini-profiler wraps `send_query_prepared`. **Heads-up posted on #57057 with Thomas's approval on 2026-11-04** ([comment](https://github.com/rails/rails/pull/57057#issuecomment-6642150088)); issues for the gems wait for matthewd's answer.
 
 **DS4 (d): `CSRFTokenVerifier` includes `RequestForgeryProtection` outside a controller.**
 [`include ActionController::RequestForgeryProtection`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L9) then
