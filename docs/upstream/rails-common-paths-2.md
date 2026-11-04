@@ -208,11 +208,15 @@ candidate's 243,074–243,805. ZJIT `where` is one run with a 0.75% A/A.
 | shipit | 21,596 | interpreter | 5,842,147,452 | −0.004% | 5,835,772,269 | −0.109% |
 | lobsters | 8,968 | interpreter | 4,266,255,137 | +0.023% | 4,263,869,815 | −0.056% (not resolved) |
 | railsbench | 0 | interpreter | 6,960,356,496 | +0.076% | 6,963,470,650 | +0.045% |
-| (YJIT rows for the final form are running; added when done) | | | | | | |
+| shipit | 21,596 | YJIT | 3,144,133,877 | +0.300% | 3,153,067,853 | +0.284% (not resolved) |
+| lobsters | 8,968 | YJIT | 3,028,434,996 | +0.055% | 3,026,856,248 | −0.052% (not resolved) |
+| railsbench | 0 | YJIT | 4,386,779,614 | −0.192% | 4,383,896,628 | −0.066% |
 
 railsbench never calls `resolve_attribute_name` during an iteration and still moves by up to 0.08% between
 builds, so only shipit resolves: its −6.4M instructions interpreted are about 300 per call, against about 670 per
-call in the micro. (The round-2 `[] ||` form had shipit −0.16% interpreted and −0.25% YJIT.)
+call in the micro. Under YJIT this run's A/As reached 0.30% (shipit) and 0.19% (railsbench), so YJIT
+ruby-bench does not resolve the change either way; the body quotes only the interpreter figure. (The round-2 `[] ||`
+form had shipit −0.16% interpreted and −0.25% YJIT, with YJIT A/As up to 0.09%.)
 
 ## CP-5: check URL components with an anchored match
 
