@@ -214,6 +214,12 @@ for lacking one).
 Readability checks added 2026-11-04 (Thomas: "always watch for readable code"), after #59608's first shape
 reassigned a variable inside an `unless`:
 
+* **Describe it out loud first** (Thomas). Before any review, the author writes the changed code as plain sentences,
+  one per line or branch, as if reading it to a colleague ("take the current formats; if the template's single
+  format already leads them, keep the list as it is, otherwise put it in front"). If a sentence comes out awkward,
+  needs "except" or "unless also", or can't be said without naming a variable twice, refactor the code until the
+  description is simple, then measure again. The fastest form isn't required: a readable form that keeps most of the
+  gain wins. The final description goes into the review record and, shortened, into the PR body.
 * **Cold read.** A reviewer who hasn't seen the change states in one sentence what each branch does and why each
   condition is there. If that takes a second try, rewrite before opening.
 * **Shape checklist.** Each case gets its own branch, with no reassignment inside a conditional modifier and no
