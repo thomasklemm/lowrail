@@ -149,7 +149,24 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | TC-1: `Time#change` keeps the UTC offset for times with a zone object | rails/rails | [`thomasklemm/time-change-zone-offset`](https://github.com/thomasklemm/rails/tree/thomasklemm/time-change-zone-offset) @ `4580af19d4` on main `9b116f1fed` ([patch](../../bench/upstream/census_backlog/patches/tc1-time-change-zone-offset.patch)) | Correctness: on 8.1 and main, `change` raises `TZInfo::AmbiguousTime` in the repeated hour for TZInfo zones (also Active Model's precision cast) and moves Dublin/Casablanca times by an hour; differential over every tzdata transition to 2037 differs only there; +6–22% Ir per `change` on such Times, ~2× when the offset changes ([census backlog](census-backlog.md#tc-1-keep-the-utc-offset-in-timechange-for-times-with-a-zone-object)) | Reviewed (primary, adversarial, outsider); waits for the coordinator's Sol round and go. L1. |
+| AS-1: `Representable#format` reads the blob filename's extension once | rails/rails | [`thomasklemm/variant-format-extension-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/variant-format-extension-once) @ [`efbf8cdbcd`](https://github.com/thomasklemm/rails/commit/efbf8cdbcd6eaa1499924b727b10557cb9023d4e) on main `9b116f1fed` ([patch](../../bench/upstream/background/patches/as1-variant-format-extension-once.patch)) | `blob.variant(...)` of a PNG: 61 → 39 objects, −33% / −40% / −37% instructions (interp / YJIT / ZJIT), −30% / −35% time; variant representation path −7.2% to −9.9% instructions in all 6 storage apps (A/A ≤ 1.5%), −8.1% to −8.7% with YJIT ([background census](background-census.md#candidate-as-1-read-the-blob-filenames-extension-once-when-choosing-a-variant-format)) | Ready, held until Thomas has read it. L0; exactness grid identical on interp, YJIT and ZJIT; one subagent review (ship); body and explanation below. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+
+### Erklärung für Thomas: AS-1 (2026-11-04, Active Storage; nicht geöffnet)
+
+Messungen, Review, PR-Text und die abgelehnten Stellen: [background-census](background-census.md).
+
+**AS-1, Dateiendung einmal lesen.** Jede `variant` eines Web-Bilds (PNG, JPEG, GIF) bestimmt ihr Standardformat in
+`Representable#format`, und das fragte bis zu dreimal `filename.extension` ab; jeder Aufruf baut ein neues
+`ActiveStorage::Filename` und bereinigt seit dem Security-Fix vom 25. Oktober den ganzen Namen neu (`encode`, `strip`,
+`tr`). Jetzt steht die Endung einmal in einer lokalen Variablen; Marcel liest sie nur und das Ergebnis ist derselbe
+String-Inhalt, deshalb kommt für jeden Dateinamen und Content-Type dasselbe heraus, nur 22 Objekte und ein Drittel der
+Instruktionen pro `variant` weniger.
+
+```ruby
+filename.extension.present? && Marcel::MimeType.for(extension: filename.extension) == content_type  # vorher: 3x bereinigen
+extension = filename.extension                                                                     # jetzt: 1x
+```
 
 ### Erklärungen für Thomas: I1 und IW (2026-11-04, Bugfixes; I1 geöffnet als #59609, IW als Lead geparkt)
 

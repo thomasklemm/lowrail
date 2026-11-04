@@ -1,0 +1,1 @@
+Census background fixture: a plain text attachment.
