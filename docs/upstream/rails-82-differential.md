@@ -118,3 +118,72 @@ surrounding code, no measurements. Sol (from the patches and this doc): both "op
 [rails/rails#59625](https://github.com/rails/rails/pull/59625) on 2026-11-04 (head `2b4a97089a`). F1 opened as a draft,
 [rails/rails#59626](https://github.com/rails/rails/pull/59626) (head `2750d65efd`), to be marked ready when a slot frees up:
 GitHub caps users without write access at 15 open PRs per repository, which is why the creates returned 404.
+
+## Round 2: view helpers, type casting, SQL on three visitors, recognition (2026-11-04)
+
+**Result.** About 1,020,000 cases per side, same pins and lockfiles as round 1. No new accidents. Every difference
+traces to a commit that is either in a CHANGELOG or a deliberate, harmless fix; nothing here needs a fix or a
+CHANGELOG note.
+
+### Method
+
+* **Harness:** [harness2.rb](../../fixtures/corpus/rails-82-diff/harness2.rb), on top of round 1's generators (same
+  seed, then the same random stream continues), still generated before Rails loads. Classifiers:
+  `formclass.rb` (which options explain a form difference) and `sqlclass.rb` (which relation ops explain a SQL
+  difference).
+* **View (177,000 cases):**
+  * the form builder on an Active Model object with generated values: text, number, hidden, password, email,
+    date, datetime-local and time fields, text area, check box, radio button, label, select, multiple select,
+    `collection_select`, `grouped_collection_select`, `collection_check_boxes`, `collection_radio_buttons`,
+    `options_for_select`, `grouped_options_for_select`, `select_tag`, `fields`, the date/time selects,
+    `time_zone_select`, submit and button. Generated attribute hashes and select options (`include_blank`,
+    `prompt`, `selected`, `disabled`, `multiple`, `include_hidden`) and choice shapes;
+  * the text helpers (`pluralize`, `truncate`, `simple_format`, `highlight`, `excerpt`, `word_wrap`), sanitizing
+    (`sanitize` with tag and attribute lists, `strip_tags`, `strip_links`, `sanitize_css`), number helpers,
+    `distance_of_time_in_words` and `time_tag` in four zones, and tag/link/mail/phone helpers, over generated HTML
+    with scripts, event handlers, `javascript:` and `data:` URLs.
+  * Every HTML result is compared exactly and after normalisation (parsed with Nokogiri's HTML5 parser,
+    attributes sorted), so attribute-order changes are reported separately.
+* **Types (765,000 cases):** 36 types (all built-in Active Model types, limit/precision/scale variants, JSON,
+  `DecimalWithoutScale`, `UnsignedInteger`, and 15 PostgreSQL OID types) × 2,000 generated input pairs (blank and
+  boolean-like strings, integer boundaries, floats with NaN/Infinity, BigDecimals, date and time strings across DST
+  edges, Dates, TimeWithZones in 10 zones, JSON, PG literals, ranges, binary): `cast`, `serialize`, `deserialize`,
+  `serializable?`, `changed?` and `changed_in_place?`, under four `Time.zone` values, plus dirty tracking on an
+  Active Model object with one attribute of each type. Targeted extras: Decimal with 9 precision/scale pairs,
+  BigInteger/Integer(limit: 8)/Float on numeric strings, 2,018 UUID spellings, Serialized with String and
+  ImmutableString subtypes, and a SQLite Active Record model (new, assign, save, reload, changes, dup, clone,
+  `serializable_hash`, `where`) with time-zone-aware attributes.
+* **SQL (2,000 relation chains):** round 1's ops plus `merge`, `or`/`and` with another relation, `from` a subquery,
+  `matches`, endless ranges, subquery `IN`, optimizer hints, `reverse_order`, `lock` and `with`. Each chain rendered
+  by SQLite, by an unconnected PostgreSQL adapter and by an unconnected Mysql2 adapter (string quoting stubbed with
+  the same pure function on both sides, server versions fixed), and its rows read from a seeded SQLite database.
+* **Recognition (59,000 cases):** a route set with concerns, shallow nesting, namespaces, a `module:`/`path:` scope,
+  constraints, an optional segment, a glob, an optional locale scope, a singular resource, `path_names` and a
+  redirect. 8,000 paths (round 1's random ones plus paths built from the route patterns with random, partly
+  percent-encoded segments and format suffixes) × five verbs: `recognize_path`, then `path_for`, `url_for` and
+  the route's named helper with the recognized params. 4,812 paths are recognized.
+
+### Differences
+
+| Surface | Difference (8.1 → main) | Commit | Class | Action |
+| --- | --- | --- | --- | --- |
+| Form builder, tag options | Same attribute changes as round 1 (nested Hash attributes dasherized, `hidden` values, `open`, blank names); 13,700 of 13,869 form differences. No attribute-order-only difference anywhere. | round 1 rows | Intended, in CHANGELOG | None |
+| `time_zone_select` | New zones in the list: `Pacific Time (Canada)`, `Alberta`, `Northwest Territories`, `Manitoba` | `38c63e2013` and the Manitoba/NWT commits | Intended, in CHANGELOG | None |
+| Multiple `select` with `form:` | The hidden companion field carries the same `form` attribute (`<input name="person[role][]" type="hidden" value="" form="f">`), so clearing every option is submitted when the select lives outside its form | `7fae0020ff` | Intended fix, undocumented | None |
+| PG integer arrays, `serialize` | The returned `Data` carries a typed element encoder; encoded text identical for every input tried | `ce948ef38f` | Intended, in CHANGELOG | None |
+| PG integer arrays, `deserialize` | An empty element (`"{1,}"`, `"{ }"`, `"{\"\"}"`) decodes to `0` instead of `nil`; `cast` unchanged | `ce948ef38f` (C decoder) | Intended; edge undocumented | None: PostgreSQL never returns empty elements for an integer array, so only hand-written literals passed to `deserialize` see it |
+| PG interval, `serialize`; dirty tracking | `"PT0.0000001S"` instead of `"PT1.0e-07S"`; an interval attribute assigned such a value no longer looks changed on reassignment | `58b8fb7050` | Intended, in CHANGELOG | None |
+| `Serialized` with an ImmutableString subtype | Mutating the deserialized String in place is now detected by `changed_in_place?` | `8e9b18a24f` | Intended fix, undocumented | None |
+| Active Record `attributes` after assigning and saving | Schema order instead of assignment order | `61480bf2d1` (main's lazy attribute set) | Intended | None |
+| `dup` of a new record | `dup.attributes == record.attributes` is false when a value is a BigDecimal `NaN`: the duplicate gets its own copy, and `NaN` never equals another `NaN`; every other value compares equal | lazy attribute set commits | Intended, harmless | None |
+| Enum, invalid value | The `ArgumentError` lists the valid values | `fcf4393f04` | Intended, in CHANGELOG | None |
+| SQL (all three visitors) and SQLite rows | Only round 1's two causes: `WHERE (1=0)` for an empty tuple `where` (8.1 sent invalid SQL) and the join order/aliases of `includes` with joins | `cf9c0879ca`, `48f3e61a41`, `b0ded066af` | Intended | None |
+
+No difference in the text, sanitizing, number, time and tag helpers; in any other type's cast, serialize,
+deserialize or change detection; in UUID handling (despite the new fast path); in decimal scale rounding (despite
+two changes there); in any PostgreSQL- or MySQL-only SQL; or in recognition and generation.
+
+**Pre-existing, the same on 8.1 and main (not 8.2 regressions, recorded only):** `ActiveModel::Type::Date#cast` and
+the PG range and money types raise `ArgumentError: comparison of Rational with BigDecimal failed` for some
+BigDecimal inputs such as `NaN`; casting an integer array element `"x"` gives `0` while serializing it gives `NULL`.
+
