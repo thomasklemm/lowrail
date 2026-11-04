@@ -116,8 +116,8 @@ F2 doesn't change it.
 Both fixes follow "Correctness fixes: readable first": one condition or one line each, in the shape of the
 surrounding code, no measurements. Sol (from the patches and this doc): both "open with nits"; the nits are applied above. F2 opened as
 [rails/rails#59625](https://github.com/rails/rails/pull/59625) on 2026-11-04 (head `2b4a97089a`). F1 opened as a draft,
-[rails/rails#59626](https://github.com/rails/rails/pull/59626) (head `2750d65efd`), to be marked ready when a slot frees up:
-GitHub caps users without write access at 15 open PRs per repository, which is why the creates returned 404.
+[rails/rails#59626](https://github.com/rails/rails/pull/59626) (head `2750d65efd`) and marked ready for review once a slot
+freed up: GitHub caps users without write access at 15 open PRs per repository, which is why the creates returned 404.
 
 ## Round 2: view helpers, type casting, SQL on three visitors, recognition (2026-11-04)
 
