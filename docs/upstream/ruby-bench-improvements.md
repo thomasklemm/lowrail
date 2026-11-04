@@ -38,6 +38,9 @@ small, well-reviewed PRs, no issue discussions we can't add much to); its eviden
 On the branch, three concurrent lobsters processes all exit 0, the cache event counts match the numbers below, and
 the per-route response sizes and story counts of all 114 lobsters requests match the file-store run.
 
+**Opened 2026-11-04** as [ruby/ruby-bench#564](https://github.com/ruby/ruby-bench/pull/564) (07:01 UTC; head
+`a920bf4259` since 08:28 UTC, one commit); state in the [ledger](contributions.md#benchmarks--rubyruby-bench).
+
 ## 1. Significance stars treat iterations of one process as independent samples
 
 **What happens.** `--pvalue` (and the stars that always print next to the ratio) run Welch's t-test over the measured
