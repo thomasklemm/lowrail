@@ -12,7 +12,7 @@ a merged PR or an earlier round already covers.
 | # | Branch @ SHA | Change | Per call |
 | --- | --- | --- | --- |
 | N1 | [`thomasklemm/fanout-handle-groups-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/fanout-handle-groups-each) @ `1216ff4766` | `Fanout#build_handle` fills its group Array with `each` instead of `Hash#map` (Enumerable) | `instrument` with one subscriber: 4 → 3 objects; −5.1% / −10.8% / −11.3% instructions (interpreter / YJIT / ZJIT) |
-| H1 | [`thomasklemm/hash-extract-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-extract-each) @ `75cb1d80e3` | `Hash#extract!` iterates its keys with `each` instead of `each_with_object` | `extract!` with the asset helpers' keys: 4 → 3 objects; −18.8% / −43.8% / −23.7%; `stylesheet_link_tag` −1.6% / −5.1% / −3.6% |
+| H1 | [`thomasklemm/hash-extract-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/hash-extract-each) @ `75cb1d80e3` | `Hash#extract!` iterates its keys with `each` instead of `each_with_object` | `extract!` with the asset helpers' keys: 4 → 3 objects; −18.8% / −43.8% / −23.7%; `stylesheet_link_tag` −1.6% / −5.1% / −3.5% |
 
 Both are one commit on rails/rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed), authored
 and committed by Thomas Klemm; the patches are in [`patches/`](../../bench/upstream/as_request_paths/patches/).
@@ -221,11 +221,14 @@ present: 931 → 705 ns interpreted (−24.3%, A/A −0.7%), 773 → 461 ns with
 
 ## PR bodies (drafts, not opened)
 
+Checked by a separate reader against this page and for an outsider's reading; its corrections are applied
+(H1's `[]=` goes to the new Hash, not the receiver; ZJIT `stylesheet_link_tag` −3.5%; the noise wording; trims).
+
 ### N1: Build notification handle groups with each instead of Hash#map
 
-> Every `ActiveSupport::Notifications.instrument` call with an active subscriber goes through `Fanout#build_handle`, which turns the subscriber groups into group objects with `groups.map`. That covers every SQL query (Active Record's runtime registry is always subscribed), and renders, cache calls and controller actions in most apps. `Hash` has no `map` of its own, so this is `Enumerable#map`, which allocates an internal block on every call and calls the Ruby block from C through it.
+> Every `ActiveSupport::Notifications.instrument` call with an active subscriber goes through `Fanout#build_handle`, which turns the subscriber groups into group objects with `groups.map`. That includes every SQL query, since Active Record's runtime registry is always subscribed. `Hash` has no `map` of its own, so this is `Enumerable#map`, which allocates an internal block on every call and calls the Ruby block from C through it.
 >
-> This fills the Array with `each` and `<<` instead, as `groups_for` does a few lines above. When no group is listening it still returns `NullHandle`; otherwise it adds one group object per group class, in the same order, and builds the handle from that Array. Only an override of the internal `groups_for` that returns a Hash subclass with its own `map` would notice.
+> This fills the Array with `each` and `<<`, as `groups_for` does earlier in this file. It still returns `NullHandle` when no group is listening, and otherwise builds the same group objects in the same order. Only an override of the internal `groups_for` returning a Hash subclass with its own `map`, or a backtrace from inside a group's `initialize`, would show a difference.
 >
 > | `instrument` with one monotonic subscriber, per call | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
 > | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -233,13 +236,13 @@ present: 931 → 705 ns interpreted (−24.3%, A/A −0.7%), 773 → 461 ns with
 > | this PR | 3 | 1,726 ns (−10.6%) | 797 ns (−22.4%) | 15,309 (−5.1%) | 7,128 (−10.8%) | 7,874 (−11.3%) |
 > | main, run again (change from the first run) | | −0.9% | +2.4% | +0.00% | +0.07% | +0.91% |
 >
-> Ruby 4.0.9, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/as_request_paths/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000. One subscriber is the smallest case this changes; with two groups it saves 3.0% of instructions interpreted and 8.3% with YJIT, and `Post.find(1)` runs 0.3%, 0.6% and 0.7% fewer. On ruby-bench (Rails 8.1 with the method patched in) it is within noise: railsbench builds about 6,000 handles per iteration and runs 0.08% fewer instructions with the interpreter, about the noise between two builds. In a CPU census of 20 open-source Rails apps on Rails main, this line ran in all 20 and took 0.12% of interpreted instructions (0.17% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/as-request-paths.md)).
+> One subscriber is the smallest case this changes. `Post.find(1)` on in-memory SQLite runs 0.3% fewer instructions interpreted, 0.6% with YJIT and 0.7% with ZJIT; ruby-bench's railsbench (Rails 8.1 with the method patched in) moves by 0.08%, within the noise between builds. Ruby 4.0.9, GC disabled, ZJIT on Ruby master 9aa0898240; times are medians of 15 pinned runs, instructions are Callgrind counts per call ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/as_request_paths/micro.rb)). In an instruction profile of 20 open-source Rails apps on Rails main, this line ran in all 20 and took 0.12% of everything the interpreter executed; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/as-request-paths.md)).
 
 ### H1: Iterate Hash#extract! keys with each instead of each_with_object
 
-> `stylesheet_link_tag` and `javascript_include_tag` take their path options out with `options.extract!("protocol", "extname", "host", "skip_pipeline")` on every call, and `ActionController::Parameters#extract!` goes through the same method. `Hash#extract!` iterates the keys with `each_with_object`, which comes from `Enumerable`: it allocates an internal block on every call and calls the Ruby block from C through it, which costs more than the lookups when, as usual, none of the keys is there.
+> `stylesheet_link_tag` and `javascript_include_tag` take their path options out with `options.extract!("protocol", "extname", "host", "skip_pipeline")` on every call, and `ActionController::Parameters#extract!` goes through the same method. `Hash#extract!` iterates the keys with `each_with_object`, which comes from `Enumerable`: it allocates an internal block on every call and calls the Ruby block from C through it.
 >
-> This starts an empty Hash of the receiver's class, moves each requested key the receiver has into it with `each`, and returns it, as `deep_transform_keys` does since #59450. The receiver sees the same `has_key?`, `delete` and `[]=` calls in the same order; only backtraces from inside those calls lose the `each_with_object` frame.
+> This starts an empty Hash of the receiver's class, moves each requested key the receiver has into it with `each`, and returns it, as `deep_transform_keys` does since #59450. The receiver sees the same `has_key?` and `delete` calls, and the new Hash the same `[]=` calls, in the same order; only backtraces and traces from inside those calls lose the `each_with_object` frame.
 >
 > | `{"media" => "all"}.extract!("protocol", "extname", "host", "skip_pipeline")`, per call | Objects | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
 > | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -247,7 +250,7 @@ present: 931 → 705 ns interpreted (−24.3%, A/A −0.7%), 773 → 461 ns with
 > | this PR | 3 | 705 ns (−24.3%) | 461 ns (−40.3%) | 6,250 (−18.8%) | 3,600 (−43.8%) | 5,240 (−23.7%) |
 > | main, run again (change from the first run) | | −0.7% | −0.4% | +0.05% | +0.30% | −0.04% |
 >
-> Ruby 4.0.9, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/as_request_paths/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000. `stylesheet_link_tag("application")` runs 1.6% fewer instructions interpreted, 5.1% with YJIT and 3.6% with ZJIT (A/A ≤ 0.2%), and takes 6.8% less time with YJIT; interpreted, its time difference is within the A/A. On ruby-bench (Rails 8.1 with the method patched in), lobsters and shipit make about 200 and 60 calls per iteration and stay within noise. In a CPU census of 20 open-source Rails apps on Rails main, this line ran in 17 and took 0.14% of interpreted instructions (0.18% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/as-request-paths.md)).
+> No key present is the usual case; with one present it saves 16.3%, 39.8% and 21.7% of instructions. `stylesheet_link_tag("application")` runs 1.6% fewer instructions interpreted, 5.1% with YJIT and 3.5% with ZJIT, and takes 6.8% less time with YJIT (A/A −2.4%); ruby-bench moves within noise. Ruby 4.0.9, GC disabled, ZJIT on Ruby master 9aa0898240; times are medians of 15 pinned runs, instructions are Callgrind counts per call ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/as_request_paths/micro.rb)). In an instruction profile of 20 open-source Rails apps on Rails main, this line ran in 17 and took 0.14% of everything the interpreter executed; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/as-request-paths.md)).
 
 ## Not built, and why
 
