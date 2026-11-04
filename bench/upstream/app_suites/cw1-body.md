@@ -8,9 +8,9 @@ Post.where(id: 1).where("", {}).to_a
 # main: ... WHERE "posts"."id" = 1 AND (()) => syntax error
 ```
 
-Chatwoot's [`FilterService#query_builder`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L189) (develop) builds the condition and its named values separately and calls `where(@query_string, @filter_values)`, with `@query_string` [starting as `''`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L20). With no filters, its conversation filter now fails.
+Chatwoot's [`FilterService#query_builder`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L189) (develop) builds the condition and its named values separately and calls `where(@query_string, @filter_values)`, with `@query_string` [starting as `''`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L20). On Rails main, an empty filter payload fails.
 
-An empty condition is now used as it is, as when no values are given, so the where clause drops it again. Non-empty conditions are unchanged. The new test passes empty, named and positional values with an empty condition.
+An empty condition is now used as it is, as when no values are given, so the where clause drops it again. Non-empty conditions are unchanged. The new test passes empty, named and positional values with an empty condition, both as arguments and in the array form `where(["", values])`.
 
 ---
 
