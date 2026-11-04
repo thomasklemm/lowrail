@@ -566,8 +566,9 @@ part without touching Rails or its `super`.
 
 Branch [`thomasklemm/prepend-formats-leading`](https://github.com/thomasklemm/rails/tree/thomasklemm/prepend-formats-leading),
 opened as [rails/rails#59608](https://github.com/rails/rails/pull/59608) on 2026-11-04 at
-[`b7d90b7bc1`](https://github.com/thomasklemm/rails/commit/b7d90b7bc192af386189a25278a67b08abc8f17b) on main
-`9b116f1fed` (first version `12cf43d884`; the diff below is the first version, see [Sol review](#sol-review-of-c3)).
+[`ce95f14b9f`](https://github.com/thomasklemm/rails/commit/ce95f14b9f66f25d044c35ca28c526bb4ba4a62e) on main
+`9b116f1fed` (earlier heads `12cf43d884` and `b7d90b7bc1`; the diff below is the first version, see
+[Sol review](#sol-review-of-c3) for the current code).
 
 ```diff
        def prepend_formats(formats) # :doc:
@@ -671,22 +672,30 @@ doesn't touch). Recently merged lookup work (#58899, #58786, #58281) does not to
 Sol: sound for ordinary format arrays, one correction. With empty lookup formats (`LookupContext.new([], formats:
 [])`), `prepend_formats([nil])` raised `ArgumentError: Invalid formats: nil` on main but passed on `12cf43d884`,
 because `formats[0]` and `current[0]` were both `nil` (`equal?` alone doesn't limit the shortcut to Symbols; the same
-String object matches too, which is exact). `b7d90b7bc1` adds `!current.empty?` and Sol's shorter branch:
+String object matches too, which is exact). `b7d90b7bc1` added `!current.empty?` in Sol's `unless` branch, which
+reassigned `current`. Thomas found that hard to read, so `ce95f14b9f` (same logic, force-pushed with a lease before any
+review) writes the two cases as explicit assignments:
 
 ```ruby
 current = @lookup_context.formats
-# Keep normalization and validation in formats=.
-unless formats.size == 1 && !current.empty? && formats[0].equal?(current[0])
-  current = formats | current
+if formats.size == 1 && !current.empty? && formats.first.equal?(current.first)
+  # The format already leads, so the union would rebuild the same list.
+  # Assign it anyway so formats= still normalizes and validates it.
+  @lookup_context.formats = current
+else
+  @lookup_context.formats = formats | current
 end
-@lookup_context.formats = current
 ```
 
+Out loud: take the current formats. If the template's single format already leads them, keep the list as it is;
+otherwise put the format in front.
+
 A regression test in `lookup_context_test.rb` covers empty formats with `[nil]` and invalid formats already in the
-details; it fails on `12cf43d884` and passes on main and `b7d90b7bc1`. The differential grew to 117 cases (adding
+details; it fails on `12cf43d884` and passes on main, `b7d90b7bc1` and `ce95f14b9f`. The differential grew to 117 cases (adding
 empty and nil-led formats in the details, a shared String object, `[nil]` and `[SHARED]`), identical to main. On main
 `9b116f1fed`: Action View 3,385 runs and Action Pack 4,505 runs, 0 failures, `RAILS_STRICT_WARNINGS=1`; RuboCop clean.
-Micro unchanged: 4,618 → 3,155 ns interp, 3,984 → 2,564 ns YJIT.
+Micro unchanged: 4,618 → 3,155 ns interp, 3,984 → 2,564 ns YJIT. Rechecked on `ce95f14b9f`: differential identical,
+the same suite counts green, RuboCop clean, micro 4,518 → 3,145 / 3,810 → 2,497 ns.
 
 **Accepted boundary (return value).** The private `prepend_formats` now returns the lookup context's existing Array
 when it skips the union, so duplicates already in the details come back as they are (`[:html, :html, :json]` instead
