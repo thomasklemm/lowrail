@@ -149,6 +149,74 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | R1: declare `prism` as a runtime dependency of Action View and Railties (Ruby 4.1 makes prism a bundled gem) | rails/rails | `thomasklemm/declare-prism-dependency` @ `00339f7e89` on main `9b116f1fed` (local; [patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)) | Correctness, not speed: on Ruby master, an app without minitest 6, irb ≥ 1.17 or rdoc in its bundle gets `LoadError` for prism from `ActionView.eager_load!`, template digests, the test runner and `bin/rails notes`; with the change it resolves prism 2.1.0 on master and 4.0.9 ([readiness](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency)) | Ready, held until Thomas has read it. L0 (+4 lines); correctness review approve, maintainability review approve-with-nits (addressed); body and explanation below. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| AP-1: join adjacent literals when building a route's path format | rails/rails | [`thomasklemm/journey-format-join-literals`](https://github.com/thomasklemm/rails/tree/thomasklemm/journey-format-join-literals) @ `bb4740730b` on main `9b116f1fed` | `post_path` −5.6% / −3.7% instructions (interp / YJIT), −4.8% / −4.1% ns, objects unchanged; ruby-bench railsbench −0.3% interp; +49 bytes per route ([record](actionpack-request-path.md#ap-1-join-adjacent-literals-when-building-a-routes-format)) | Ready, not opened: reviews, adversarial round and body review done; body below. Link in the body needs this record on Lowrail main. |
+| AP-2: no Set union of renderers on every render | rails/rails | [`thomasklemm/all-renderers-without-union`](https://github.com/thomasklemm/rails/tree/thomasklemm/all-renderers-without-union) @ `1042902003` on main `9b116f1fed` | every render −3,900 instructions (−34% / −42% for the check), −1 object; minimal JSON request −0.4% / −0.9%; ruby-bench railsbench −0.1% / −0.3% ([record](actionpack-request-path.md#ap-2-no-set-union-on-every-render)) | Ready, not opened: fixes an unreleased cost from #57830; body below. |
+
+### Erklärungen für Thomas: AP-1 und AP-2 (2026-11-04, Action Pack; nicht geöffnet)
+
+Aufzeichnung, Belege und Reviews: [actionpack-request-path](actionpack-request-path.md).
+
+**AP-1, Routen-Format.** Wenn Rails einen Pfad wie `post_path(post)` erzeugt, hängt es die Teile der Route einzeln an
+einen String an, und der Parser liefert für `/posts/:id` die Stücke `"/"`, `"posts"`, `"/"` getrennt. Jetzt werden
+benachbarte feste Stücke einmal beim Laden der Routen zu `"/posts/"` zusammengefügt, sodass jeder Aufruf weniger
+anhängen muss: etwa 5% weniger Instruktionen pro `post_path`, gleiche URLs bis aufs Byte und Encoding, dafür rund 49
+Bytes mehr Speicher pro Route.
+
+```ruby
+["/", "posts", "/", :id]   # vorher: drei Strings anhängen, dann die id
+["/posts/", :id]           # jetzt: einer, einmal beim Bauen der Route zusammengefügt
+```
+
+**AP-2, Renderer-Set.** Bei jedem `render` prüft Rails, ob eine Option wie `json:` gesetzt ist, und baut dafür auf
+main seit #57830 (noch nicht released) jedes Mal ein neues Set aus den eigenen Renderern des Controllers und den
+eingebauten. Fast jeder Controller hat keine eigenen, dann ist das neue Set nur eine Kopie der eingebauten; jetzt
+nimmt Rails in diesem Fall direkt das eingebaute, eingefrorene Set, was pro Render etwa 3.900 Instruktionen und ein
+Objekt spart.
+
+```ruby
+_renderers + Renderers.all                                     # vorher: bei jedem render ein neues Set
+_renderers.empty? ? Renderers.all : _renderers + Renderers.all # jetzt (als if/else): Kopie nur, wenn nötig
+```
+
+#### AP-1 PR-Text
+
+Title: Join adjacent literals when building a route's path format
+
+Generating a path walks the parts of the route's `Journey::Format` and appends each one to a buffer. The parser gives one part per token, so `post_path` appends `"/"`, `"posts"` and `"/"` separately on every call, and each nested resource adds three more. `Format#add_to` ranks 30th among Ruby methods by interpreted instructions in a CPU census of Rails apps on main, and runs in 19 of the 20.
+
+This joins each run of adjacent literals once, when the format is built, into one frozen, deduplicated string; formats keep about 49 more bytes per route. Generated URLs don't change: every literal is the parser's ASCII `/` or `.` or a slice of the route's path, and parameters are escaped to ASCII, so appending the joined string gives the same bytes and encoding as appending its pieces. A route that is one literal, like `root_path`, is unchanged.
+
+`post_path(post)`, per call on Ruby 4.0.9:
+
+| | main | A/A | this |
+| --- | ---: | ---: | ---: |
+| objects | 7 | | 7 |
+| interpreter ns | 4,440 | −1.4% | 4,226 (−4.8%) |
+| YJIT ns | 2,037 | +2.4% | 1,955 (−4.1%) |
+| interpreter instructions | 34,528 | 0.00% | 32,586 (−5.6%) |
+| YJIT instructions | 15,565 | +0.23% | 14,994 (−3.7%) |
+
+`posts_path` drops 3.7% interpreted and 2.7% with YJIT (instructions). In ruby-bench, railsbench drops 0.3% interpreted and 0.1% with YJIT (A/A 0.13% and 0.03%) and interpreted lobsters 0.2% (A/A 0.04%); the other runs are within noise. I found this with the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
+
+#### AP-2 PR-Text
+
+Title: Don't build a Set of renderers on every render
+
+`render_to_body` checks every renderer in `_all_renderers` on every render, template renders included, for an option such as `json:`. Since #57830 (unreleased) stopped mutating the renderers Set, `_all_renderers` returns `_renderers + Renderers.all`. In a controller that never calls `use_renderers`, `_renderers` is empty, so each render copies the built-in renderers into a new Set.
+
+When `_renderers` is empty, this returns `Renderers.all` itself, which has the same renderers in the same order. It is frozen, and `add`/`remove` replace it rather than change it, so nothing can modify the shared Set through the result. Controllers with their own renderers still get the union.
+
+Per call on Ruby 4.0.9, as template-render check / `render json:`:
+
+| | main | A/A | this |
+| --- | ---: | ---: | ---: |
+| objects | 3 / 9 | | 2 / 8 |
+| interpreter ns | 1,354 / 3,928 | +1.8% / −0.9% | 801 (−41%) / 3,274 (−17%) |
+| YJIT ns | 1,165 / 2,658 | −1.2% / −0.8% | 552 (−53%) / 2,001 (−25%) |
+| interpreter instructions | 11,497 / 26,379 | +0.18% / −0.12% | 7,568 (−34%) / 22,369 (−15%) |
+| YJIT instructions | 9,237 / 16,905 | −0.30% / −0.36% | 5,314 (−42%) / 12,914 (−24%) |
+
+Every render saves about 3,900 instructions, 0.4% (interpreter) to 0.9% (YJIT) of a minimal JSON request. ruby-bench bundles Rails 8.1, so I patched the touched method with main's and this PR's bodies: railsbench drops 0.1% interpreted and 0.3% with YJIT (A/A 0.05% and 0.16%); lobsters and shipit are within noise. The line runs in 19 of 20 apps in the CPU census of [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/actionpack-request-path.md), my research project.
 
 ### Erklärungen für Thomas: I1 und IW (2026-11-04, Bugfixes; I1 geöffnet als #59609, IW als Lead geparkt)
 

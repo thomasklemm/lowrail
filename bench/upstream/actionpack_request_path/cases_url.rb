@@ -1,0 +1,10 @@
+RS = ActionDispatch::Routing::RouteSet
+H1 = { host: "example.com" }
+CASES["odo_empty"] = -> { RS.optimizable_default_url_options?({}) }
+CASES["odo_host"] = -> { RS.optimizable_default_url_options?(H1) }
+CASES["ctl_ors"] = -> { C.send(:optimize_routes_generation?) }
+CASES["noop"] = -> { nil }
+CASES["routes"] = -> { C._routes }
+CASES["rs_ors"] = -> { ROUTES.optimize_routes_generation? }
+CASES["ctl_duo"] = -> { C.default_url_options }
+CASES["url_options"] = -> { C.url_options }
