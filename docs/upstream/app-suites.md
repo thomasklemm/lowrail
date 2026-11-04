@@ -17,7 +17,7 @@ overridden `primary_key` (#59622).
 | Redmine trunk `41cd39c` | `rails test`, 6116 runs, SQLite | clean, clean | boot fails; after workaround 1 F, 3 E | S1 (b), S2 (b) |
 | Lobsters `b6ea255` | rspec, 927 examples, SQLite | 0 F, 0 F | every feature spec fails to load; after rspec-rails pin 3 F | L1 (c), L2 (a), fixed by #59625 |
 | Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
-| Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, open question), SU3–SU5 (b/c) |
+| Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 
 ## Findings
 
@@ -143,7 +143,7 @@ RuboCop clean. [patch](../../bench/upstream/app_suites/su1-local-cache-anonymous
 [body](../../bench/upstream/app_suites/su1-body.md). Branch `thomasklemm/local-cache-anonymous-store` @ `2b02aad60c`
 on main `7a78da5a55`. With it, that Sure test gets past the cache and then hits SU2.
 
-**SU2 (b, open question): `find_by_sql`/`count_by_sql` array arguments are now bind parameters.** Bisected to
+**SU2 (b, record only): `find_by_sql`/`count_by_sql` array arguments are now bind parameters.** Bisected to
 8c4ed25f0a (#58427, kamipo, CHANGELOG; its parent passes). With prepared statements on PostgreSQL, a placeholder
 after a type name becomes `DATE $1` (`syntax error at or near "$1"`), and `date - $1` makes PostgreSQL infer the
 parameter as a date (`invalid input syntax for type date`) or the comparison as `date >= integer`. `where` behaved
@@ -153,8 +153,8 @@ this way on 8-1 already; with prepared statements off, all forms work on both. R
 [`date BETWEEN inflow_candidates.date - :date_window …`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/app/models/family/auto_transfer_matchable.rb#L320)
 (shortened), plus the 4 Financekit failures, which pass with `prepared_statements=false` (the transfer matcher's
 error rolls back the downstream transaction). Our open #59565 adds a cast hint for the `DATE $1`/`IS $1` syntax
-error, but not for the arithmetic case. Deliberate change; whether `find_by_sql` should keep interpolating is
-a maintainer question. No patch.
+error, but not for the arithmetic case. Deliberate change with a CHANGELOG entry, and `where` already binds this way on 8.1, so record only (decided
+2026-11-04): no Rails PR, no comment on #58427. The app-side fix is an explicit cast such as `CAST(:d AS date)`.
 
 **SU3 (b): `disable_referential_integrity` on PostgreSQL 18.4+ re-checks foreign keys.** 7051ca8a45 (#57378,
 CHANGELOG: restoring `ENFORCED` checks existing rows). Sure's
