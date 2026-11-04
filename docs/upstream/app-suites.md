@@ -21,6 +21,7 @@ overridden `primary_key` (#59622).
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
 | Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restore?), CW3–CW5 (b), SU4, SU5, L1 |
+| Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, held), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
 
 ## Findings
 
@@ -425,3 +426,117 @@ job and Intercom importer specs.
 is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
 ActiveSupport::Cache::RedisCacheStore is deprecated`, from rack_attack.rb above. Both trees print Devise 4.9.4's route
 mapper warnings and `ActiveSupport::Configurable is deprecated`.
+
+## Discourse
+
+discourse/discourse `f81fcb4` (default branch `main`,
+[`f81fcb4b44`](https://github.com/discourse/discourse/tree/f81fcb4b4425f4c3b8c94248771e8289daf6c376)), Ruby 4.0.9 on
+both trees (Discourse asks for `~> 4.0.0`), PostgreSQL 15.19 with pgvector 0.8.1, Redis 7, libvips 8.18.7 (built
+from source; Discourse's vips worker refuses older), jemalloc. Rails main `7a78da5a55` for every run and bisect
+(still the head of the freshly fetched main); 8-1-stable `6e09124217`. Discourse's own core backend suite as its CI
+runs it: `bin/turbo_rspec` without arguments (every `spec/**/*_spec.rb` except `spec/system`; plugin and theme specs
+are separate CI jobs and not run), 1712 files and 35771 examples, 8 workers with their own database and Redis,
+`--seed 4242`, 12–15 minutes wall per full run on 8 cores. Discourse's test env prints deprecations to stderr
+(`config.active_support.deprecation = :stderr`), so it doesn't raise on them; main-only ones are read from the logs.
+
+**Lockfiles.** Discourse names the seven Rails component gems at `~> 8.1.0` (8.1.4); both checkouts point them at a
+`path:` Rails. The only other change, on both trees: 8-1-stable's actionview needs `rails-html-sanitizer >= 1.7.2`,
+so Bundler moved rails-html-sanitizer 1.7.1 → 1.7.2, loofah 2.25.2 → 2.25.3 and nokogiri 1.19.4 → 1.19.7. The main
+lock was resolved from the 8-1 lock and differs only in the Rails gems and what main itself requires (herb 0.11.1,
+psych 5.5.0, ractor-dispatch 0.3.0, stringio 3.2.0). No main-only bump. rspec-rails stays at its locked 8.0.4.
+
+**Main checkout only, app side:**
+* [`foreign_key: %i[chatable_id chatable_type],`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/lib/chat/category_extension.rb#L17)
+  → `as: :chatable,` (DS1). Without it `db:migrate` (which loads the bundled plugins) can't seed the Uncategorized
+  category; the unshimmed main run printed 35771 `F` before it was stopped, and a single file fails every example with
+  `'allow uncategorized topics' cannot be enabled because the "Uncategorized" category no longer exists`.
+* [`Arel::Table.new(table_name)`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/json_api_kit/adapters/active_record/pagination/numbered_rows.rb#L43)
+  → `Arel::Table.new(name: table_name)`, applied after the full run, for the classification rerun only: 101 of the
+  140 main-only failures (all of `json_api_kit`). This is the positional table name of
+  [arel-table-positional](arel-table-positional.md), which already lists Discourse; covered by our open #59574.
+
+Results: 8-1 53 F (`qunit_cli`, image tools, `safe_exec`, SMTP and other environment failures, all also on main).
+Main 191 F. The 60 files with any failure, again (2240 examples): main 192 F (the extra one is `smtp_spec.rb:31`,
+flaky on 8-1 too), 8-1 52 F and 51 F (`smtp_spec.rb:31` and `api/site_spec.rb:29` flaky). 140 failures are on both
+main runs and on none of the three 8-1 runs; all are classified below.
+
+**DS1 (a), held: a two-column `foreign_key` against a one-column primary key now raises on every use.** The bundled
+chat plugin declares `has_many :category_channels` with
+[`foreign_key: %i[chatable_id chatable_type]`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/lib/chat/category_extension.rb#L17) where
+`as: :chatable` was meant. On main any read of the association raises `ArgumentError: Key mappings must have the
+same number of columns` ([key.rb#L397](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/key.rb#L397)), so with chat enabled every
+`Category` save fails in
+[`object.category_channels.exists?`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/plugin.rb#L423), the serializer that `publish_category` runs,
+and `db:migrate` can't seed. Bisected to 7249a66350 ("Resolve association reads through routes", #59120, the R2-1
+and CW5 PR; its parent 7374e8551f passes). Repro: [fk_arity.rb](../../bench/upstream/app_suites/fk_arity.rb). On 8-1
+the same declaration silently queries `chatable_id IS NULL AND chatable_type IS NULL` (so `has_chat_channels` is
+always false and `dependent: :destroy` deletes nothing), `joins` builds `"categories".""`, and only `build` works.
+Not in S1–SU5, R2-x, E1–E4 or AR-1–AR-4 (the PG census hit it as a setup note); no issue or PR found. Not built: 8-1's
+behavior is wrong, so restoring it isn't a fix; the fix is Discourse's `as: :chatable`. At most Rails could name the
+association in the error (`CompositePrimaryKeyMismatchError` is checked only for composite primary keys); the
+coordinator decides whether that is worth a PR.
+
+**DS2 (a): an attribute named `method` breaks every association read on its record.** `UserSecondFactor` has a
+[`method` column](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/models/user_second_factor.rb#L56), and main's
+[`sc.execute(owner.method(:read_attr), c, async: async)`](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/associations/association.rb#L286)
+calls the attribute reader instead of `Object#method` (`wrong number of arguments (given 1, expected 0)`): 8
+failures in `second_factor_manager_spec`. Same commit, 7249a66350 (#59120). Already covered by open
+[#59595](https://github.com/rails/rails/pull/59595) (anthonyfranco, `8f966cd64d`, a lambda instead of `method`);
+with it applied to the main tree, `second_factor_manager_spec` passes 61/61. No branch of ours, no comment.
+
+**DS3 (b)+(d): Active Record's PostgreSQL adapter no longer calls `exec`/`async_exec`/`exec_params`.** 53701519a1
+("Preserve typed PG exceptions for server-initiated disconnects", #57057, matthewd; no CHANGELOG entry) switched to
+`send_query`/`send_query_params`/`send_query_prepared` plus `get_result`. Discourse wraps the old methods:
+[`Migration::SafeMigrate`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/migration/safe_migrate.rb#L97) (`alias_method :exec_migrator_unpatched, :exec`
+and `:async_exec`), which blocks column drops and renames in migrations, now sees no SQL (5 failures in
+`safe_migrate_spec`), and [`MethodProfiler`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/method_profiler.rb#L153)
+(`%i[exec async_exec exec_prepared send_query_prepared query exec_params]`) records no SQL time (1 in
+`request_tracker_spec`). Both stop working silently in production too. Repro:
+[pg_send_query.rb](../../bench/upstream/app_suites/pg_send_query.rb): 8-1 `{async_exec: 1, exec_params: 1}`, main
+`{send_query: 1, send_query_params: 1}`. By reading the code (not run), the same goes for gems that wrap those methods:
+rack-mini-profiler 5.0.0's pg patch (`exec`, `async_exec`, `exec_params`, `exec_prepared`,
+`send_query_prepared`), and opentelemetry-instrumentation-pg 0.37.1 and datadog 2.48.0, which wrap the `exec`,
+`async_exec` and `sync_exec` families but no `send_query*`, so their pg spans miss Active Record's queries. A
+deliberate change, but a CHANGELOG or upgrade-guide note would be the S1-style follow-up; not built.
+
+**DS4 (d): `CSRFTokenVerifier` includes `RequestForgeryProtection` outside a controller.**
+[`include ActionController::RequestForgeryProtection`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L9) then
+[`verified_request?`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L22) (OmniAuth's request phase). Main's Sec-Fetch-Site check
+(f5a1915f1d) instruments the token fallback, and `instrument_csrf_event` (daa6fae399, #56355) calls `action_name`,
+which the plain class lacks: `NameError`, a 500 for a POST to `/auth/*` without `Sec-Fetch-Site` (1 failure in
+`omniauth_callbacks_controller_spec`). Browsers send the header, so this is mostly non-browser clients.
+
+**Known findings:**
+* AR-4: [`permalinks.where!("url ILIKE :url OR external_url ILIKE :url", url: …)`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/models/permalink.rb#L92)
+  leaves `:url` in the SQL, `PG::SyntaxError` at `:`: 3 failures in `admin/permalinks_controller_spec`
+  (filter by URL).
+* S1: test and development set [`x_sendfile_header = nil`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/config/environments/test.rb#L94), so main drops
+  `Rack::Sendfile` there and [`middleware_order_spec`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/spec/integrity/middleware_order_spec.rb#L14) fails (1).
+  Production sets `X-Accel-Redirect`, so the middleware stays, and
+  [`request.env["sendfile.type"] = ""`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/static_controller.rb#L353) still disables it per request,
+  as S1 says. Nothing in Discourse inserts relative to `Rack::Sendfile`.
+* 5 (c): view specs fail with `FrozenError` on `["", "action_view/test_case/test"]` (`topics/show`, `list/list`):
+  rspec-rails 8.0.4 and `_prefixes`, as in Mastodon (fixed in rspec-rails 570b2b0a79, unreleased).
+* 10 (b): `precision: nil` timestamps cast to microseconds in memory (c162370c8f, #57845; as in Mastodon): the four
+  `basic_reviewable_*_serializer_spec`s, `pending_post_serializer_spec` (2), `invite_spec` (2), `user_spec` (1),
+  and `post_spec`'s "resets the topic's bumped_at", where `reset_bumped_at` runs on a stale `Topic`: on 8-1 the
+  nanosecond `created_at` differs from the stored microseconds, so the save happens; on main the values are equal
+  and nothing is saved.
+* 2 (b): `Vary: Sec-Fetch-Site` on stylesheet and theme JavaScript responses that expect no `Vary` (as in Mastodon).
+* 3 (b): `ActiveModel::Errors#inspect` now prints `#<ActiveModel::Errors:0x… @errors=[]>` (4c0776608a, #56865,
+  `instance_variables_to_inspect`); `steps_inspector_spec` matches 8.1's `#<ActiveModel::Errors []>`.
+* Not seen: S2, SU1–SU5, R2-x, E1–E4, AR-1–AR-3, L1, L2.
+
+**Deprecations that only main emits** (warnings, counted in the full main run):
+* 1246: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` ``, from
+  [`skip_before_action :verify_authenticity_token`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/users/omniauth_callbacks_controller.rb#L13)
+  in 8 files (4f2ee07b8e, #56369).
+* 18: `` Calling `protect_from_forgery` without specifying a strategy is deprecated ``, from
+  [application_controller.rb#L23](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/application_controller.rb#L23) and
+  [uploads_controller.rb#L16](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/uploads_controller.rb#L16).
+* 10: `` `config.active_record.schema_cache_ignored_tables` is deprecated `` (use `schema_ignored_tables`), from
+  [`ActiveRecord.schema_cache_ignored_tables.push(`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/config/initializers/000-active_record.rb#L11).
+* 10: `require_dependency is deprecated`, from Discourse's
+  [compatibility wrapper](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/require_dependency_backward_compatibility.rb#L18).
+* Both trees: 5 `` `distinct` is not supported by `update_all` `` from
+  [uploads.rake#L623](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/tasks/uploads.rake#L623).
