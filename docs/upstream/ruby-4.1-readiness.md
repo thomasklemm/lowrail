@@ -7,15 +7,15 @@ already found and fixed (C-extension API removals, Bundler `---` config, `SEPARA
 temporalio).
 
 **Result.** Seven breaks happen only on master. Two are Ractor regressions in Ruby that are already reported, and
-one is a Rails test that relies on behaviour Ruby now forbids. Three are new and still unreported:
+one is a Rails test that relies on behaviour Ruby now forbids. Three are new:
 
 * **Rails:** prism is a bundled gem in 4.1, and Rails main requires it without declaring it. There is a Rails
-  candidate for this (+4 lines, reviewed, not opened).
+  fix for this (+4 lines), opened as rails/rails#59611 on 2026-11-04.
 * **Ruby:** `bundle exec ruby -rGEM` loads the globally installed version of GEM instead of the locked one.
 * **Ruby:** the default net-http 0.10.0 breaks every HTTP response read when an app locks net-protocol 0.2.2.
 
 The json 3 break in Active Support 8.0 is fixed on `8-0-stable`, but no release has the fix. Nothing fails only
-with ZJIT. Nothing was opened or posted.
+with ZJIT. Only R1 is opened (rails/rails#59611); the Ruby-side findings are not filed.
 
 ## Pins and method
 
@@ -38,7 +38,7 @@ with ZJIT. Nothing was opened or posted.
 
 | Component | Failure | Cause | Upstream status | Our proposed action |
 | --- | --- | --- | --- | --- |
-| Action View, Railties (Rails main) | `LoadError: cannot load such file -- prism` from `ActionView.eager_load!`, template digests (`RenderParser`, the default `:ruby` render tracker since `load_defaults "8.1"`), the test runner and `bin/rails notes`, in an app that doesn't otherwise get prism into its bundle ([Gemfile](../../fixtures/corpus/ruby-41-readiness/repro/prism-app.Gemfile)) | **Rails bug.** prism became a bundled gem (Bug #22379, `a1efb9ae6b`); Rails main requires it without declaring it. Apps get it today only through minitest 6, irb ≥ 1.17, rdoc, rbs or rubocop-ast. Released 8.1.x falls back to Ripper and is not affected. | No issue or PR found (searched "prism dependency", "prism bundled gem", "cannot load such file -- prism"). | **Candidate R1, ready, not opened**: `s.add_dependency "prism"` in both gemspecs ([below](#r1-declare-prism-as-a-dependency)). |
+| Action View, Railties (Rails main) | `LoadError: cannot load such file -- prism` from `ActionView.eager_load!`, template digests (`RenderParser`, the default `:ruby` render tracker since `load_defaults "8.1"`), the test runner and `bin/rails notes`, in an app that doesn't otherwise get prism into its bundle ([Gemfile](../../fixtures/corpus/ruby-41-readiness/repro/prism-app.Gemfile)) | **Rails bug.** prism became a bundled gem (Feature #22379, `a1efb9ae6b`), and #56631 removed Rails main's Ripper fallbacks because Ruby 3.3 ships prism as a default gem; Rails main requires it without declaring it. On Ruby 3.3–4.0 the default gem supplies it; on master only another gem in the bundle does (minitest 6, irb ≥ 1.17, rdoc, rbs or rubocop-ast). 8.1 keeps Ripper fallbacks for these parsing paths (8.1.4's `Template#spot` still has a conditional `require "prism"`). | No issue or PR found (searched "prism dependency", "prism bundled gem", "cannot load such file -- prism"). | **R1, opened as rails/rails#59611**: `s.add_dependency "prism"` in both gemspecs ([below](#r1-declare-prism-as-a-dependency)). |
 | Ruby (gem_prelude), seen in nokogiri | `bundle exec ruby -rGEM` activates the globally installed GEM rather than the locked version; with an older version locked it raises `Gem::LoadError: You have already activated …`. nokogiri's 4 `TestVersionInfo` errors on master come from this. | **Ruby regression.** `c3c0e280d0` and `cadf8e79a6` (Feature #21951): `gem_prelude.rb` no longer sets Bundler up early when error_highlight and friends are autoloaded, and command-line `-r` runs before RUBYOPT's `-rbundler/setup`. That loses Feature #19089's behaviour. | ruby/ruby#18400 changed the test spec instead of the behaviour. No issue found. | Repro and paragraph for Thomas ([below](#ruby-1-bundle-exec-ruby--rgem-ignores-the-lockfile)). Don't file without his OK. |
 | Ruby (default net-http), seen in importmap-rails | `NameError: uninitialized constant Net::ReadLimitExceeded` in `Net::HTTPResponse.read_line` on **every** HTTP response, when the lockfile has net-protocol 0.2.2 and doesn't lock net-http. In the census, Fizzy and Writebook lock exactly that. | **Ruby regression (default gem dependency).** Master's default net-http 0.10.0 calls `readuntil(…, limit:)` and rescues `Net::ReadLimitExceeded`, both new in net-protocol 0.3.0. Its gemspec does declare `net-protocol >= 0.3.0`, but Bundler doesn't resolve default gems the Gemfile doesn't mention, so the locked 0.2.2 wins. 0.2.2's `readuntil` raises ArgumentError on `limit:`, and the `rescue` clause then raises the NameError. On 4.0.9 the default net-http 0.9.1 works with 0.2.2. | No issue or PR found in ruby/net-http, ruby/net-protocol or ruby/ruby. | Repro and paragraph for Thomas ([below](#ruby-2-default-net-http-0100-and-a-locked-net-protocol-022)). For apps: `bundle update net-protocol`. |
 | Active Support (all versions with Regexp subscribers) | `ActiveSupport::Notifications` with a Regexp subscriber: `Ractor.make_shareable(…, copy: true)` raises when the object graph holds a shareable Proc next to a Set or Time. | **Ruby regression.** Bisected to GH-18194 (per-Ractor GC): native copy rejects T_DATA, and `dea2cdac` removed the Marshal fallback. | Bug #22267, open (reported by yahonda). | Watch. [Repro](../../fixtures/corpus/ruby-41-readiness/repro/ractor_copy_shareable_proc.rb). |
@@ -99,9 +99,9 @@ URI RFC3986 and CGI deprecation warnings also show on 4.0.9 with `-w`, so they a
 ## R1: declare prism as a dependency
 
 * **Change:** add `s.add_dependency "prism"` to `actionview/actionview.gemspec` and `railties/railties.gemspec`,
-  plus the two PATH lines in `Gemfile.lock` (+4 lines). Branch `thomasklemm/declare-prism-dependency` @
-  `00339f7e89` on main `9b116f1fed`, local only
-  ([patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)).
+  plus the two PATH lines in `Gemfile.lock` (+4 lines). Opened as [rails/rails#59611](https://github.com/rails/rails/pull/59611) from
+  `thomasklemm:thomasklemm/declare-prism-dependency` @ `4a837183ea`, rebased onto main `1ca7528bac` (first version
+  `00339f7e89` on `9b116f1fed`) ([patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)).
 * **Why both gemspecs:** railties gets prism through actionpack → actionview anyway. But railties requires prism
   itself (`test_parser.rb`, `source_annotation_extractor.rb`), and Rails declares each gem's direct requires, as it
   did for `cgi` (in actionview, actionpack and railties) and for tsort and irb.
@@ -116,23 +116,37 @@ URI RFC3986 and CGI deprecation warnings also show on 4.0.9 with `-w`, so they a
     runner work. `bundle lock` on the base reproduces the lockfile change byte for byte.
   * `dependency_tracker_test` passes 59/59 and `test_parser_test` 10/10.
   * RenderParser output is identical under prism 1.9.0 and 2.1.0.
-* **Side effect, for the body:** apps on Ruby 3.3–4.0 that don't already lock prism add it on their next
-  `bundle update rails`. Most platforms get a precompiled gem; `PLATFORMS ruby`-only lockfiles and JRuby compile
-  it, which the generated Dockerfile's build stage already supports.
+* **Loading, precisely:** `ActionView.eager_load!` always needs prism, because `RenderParser` is eager-autoloaded
+  and requires it at the top of the file. The `:ruby` dependency tracker loads it through `RenderParser`. The test
+  runner (`test_parser.rb`) and `bin/rails notes` (`source_annotation_extractor.rb`) require it when they run, not
+  on every boot.
+* **Side effect (notes only, not in the body):** apps on Ruby 3.3–4.0 that don't lock prism yet add it to their
+  lockfile on their next update. That doesn't by itself force a compile, because Bundler can use the installed
+  default gem; an online resolve may pick a newer release, and prism 2.1 has precompiled platform gems. JRuby and
+  TruffleRuby use prism's FFI backend and build libprism only on a source install.
+* **Version:** unversioned, like `cgi`, `tsort` and `base64`. Sol rates a `>= 0.19.0` floor low severity and
+  optional; offer it if a maintainer asks.
 * **Review:**
   * Readability gate: L0 (four lines in the existing pattern).
   * Correctness subagent: approve, no blockers.
   * Maintainability subagent: approve with nits about the commit message (why not `Ruby::Prism`, the render
     tracker as the main reason, a `Ref:` line). All three are addressed in the amended commit.
   * No CHANGELOG entry, following the tsort, cgi, json and securerandom precedents.
+  * Sol: open after fixes; no defect in the patch, keep both gemspecs. Its points (cite #56631, call #22379 a
+    Feature, no "only through other gems" claim, narrow the 8.1 statement, precise loading, no compile claims) are
+    in the rewritten commit message and body.
+  * Preflight before opening: main refreshed to `1ca7528bac` (no change to the three files), rebased,
+    `bundle lock --local` reproduces the lockfile byte for byte, no overlapping PR or issue.
 * **Upstream search:** nothing covers this. Related but different: #59213 and #59217 (where prism loads), #59034
   (`Ruby::Prism` in `spot`), #59465 and #47442.
 
-### R1 body: Add `prism` as a runtime dependency to Action View and Railties
+### R1 body, as opened: Declare Prism dependencies in Action View and Railties
 
-> Ruby 4.1 makes prism a bundled gem ([Bug #22379](https://bugs.ruby-lang.org/issues/22379)), so under Bundler `require "prism"` only works when prism is in the bundle. Today apps get it only through other gems such as minitest 6, irb or rdoc. Without those, `ActionView.eager_load!`, template digests (the `:ruby` render tracker, the default since `load_defaults "8.1"`), the test runner and `bin/rails notes` raise `LoadError` on Ruby master.
+> Ruby master, targeting 4.1, changes prism from a default gem to a bundled gem ([Feature #22379](https://bugs.ruby-lang.org/issues/22379)), so under Bundler `require "prism"` only works when prism is in the bundle. #56631 removed the Ripper fallbacks because Ruby 3.3 ships prism as a default gem, so Action View and Railties now require prism without declaring it.
 >
-> This adds an unversioned `prism` dependency to Action View and Railties, as Rails did for `cgi` and `tsort`. Every prism API these files call exists in prism 0.19.0, which Ruby 3.3 ships, and `Template#spot` keeps its `Ruby::Prism` branch. Apps on Ruby 3.3–4.0 that don't lock prism yet will add it to their lockfile on their next update.
+> Unless another gem brings prism into the bundle, `ActionView.eager_load!` and Ruby-based dependency tracking raise `LoadError` on Ruby master, as do the test runner and `bin/rails notes` when they run.
+>
+> This declares `prism` in both gemspecs, since each requires it directly, without a version, as Rails does for `cgi` and `tsort`. `Template#spot` keeps its `Ruby::Prism` handling.
 
 ## Ruby-side findings for Thomas
 

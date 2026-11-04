@@ -1,18 +1,19 @@
-From 00339f7e89848f941772784b2f7c96c20d8dd7fe Mon Sep 17 00:00:00 2001
+From 4a837183eafb2ac5dd3b9188ac3da3316eadcc6b Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Wed, 4 Nov 2026 12:30:34 +0000
-Subject: [PATCH] Add `prism` as a runtime dependency to Action View and
- Railties
+Date: Wed, 4 Nov 2026 13:24:07 +0000
+Subject: [PATCH] Declare Prism dependencies in Action View and Railties
 
-Ruby 4.1 makes prism a bundled gem, so under Bundler `require "prism"`
-only works when prism is in the bundle. Today apps get it only through
-other gems such as minitest 6, irb or rdoc.
+Ruby master, targeting 4.1, changes prism from a default gem to a
+bundled gem [Feature #22379], so under Bundler `require "prism"` only
+works when prism is in the bundle. #56631 removed the Ripper fallbacks
+because Ruby 3.3 ships prism as a default gem, so Action View and
+Railties now require prism without declaring it.
 
-Action View needs it for `RenderParser`, which the `:ruby` render tracker
-(the default since `load_defaults "8.1"`) uses for template digests and
-which eager loading loads. Railties needs it for the test runner and
-`bin/rails notes`. `Ruby::Prism` is only used by `Template#spot`, to match
-the nodes error_highlight reports; the other callers keep the prism gem.
+Unless another gem brings prism into the bundle, `ActionView.eager_load!`
+and Ruby-based dependency tracking raise LoadError, as do the test
+runner and `bin/rails notes` when they run. Both gems require prism
+directly, so both declare it. `Template#spot` keeps its `Ruby::Prism`
+handling.
 
 Ref: https://bugs.ruby-lang.org/issues/22379
 ---
