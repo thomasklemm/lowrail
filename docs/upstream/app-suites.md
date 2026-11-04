@@ -17,12 +17,13 @@ overridden `primary_key` (#59622).
 | Redmine trunk `41cd39c` | `rails test`, 6116 runs, SQLite | clean, clean | boot fails; after workaround 1 F, 3 E | S1 (b), S2 (b) |
 | Lobsters `b6ea255` | rspec, 927 examples, SQLite | 0 F, 0 F | every feature spec fails to load; after rspec-rails pin 3 F | L1 (c), L2 (a), fixed by #59625 |
 | Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
+| Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, open question), SU3–SU5 (b/c) |
 
 ## Findings
 
 **S1 (b): `Rack::Sendfile` only added when `x_sendfile_header` is configured.** b37aeee32f (#56915, CHANGELOG
-entry). Redmine's `config.middleware.insert_before Rack::Sendfile, Rack::ContentLength` raises `No such middleware to
-insert before: Rack::Sendfile` on boot. Redmine's `test_download_should_set_sendfile_header` stubs
+entry). Redmine's [`config.middleware.insert_before Rack::Sendfile, Rack::ContentLength`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/config/application.rb#L79) raises `No such middleware to
+insert before: Rack::Sendfile` on boot. Redmine's [`test_download_should_set_sendfile_header`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/test/integration/attachments_test.rb#L213) stubs
 `Rack::Sendfile#variation`, so it fails too. The same removal was made once before (19ac034bdc) and reverted in 2013
 (207fa5c11d, #11440). Rack has ignored the `X-Sendfile-Type` request header since 3.2.3 (CVE-2025-61780), so the
 only remaining unconfigured trigger is `env["sendfile.type"]`. Code search finds only Discourse and logster setting
@@ -36,8 +37,8 @@ only): insert before `ActionDispatch::Static`.
 
 **S2 (b): `link_to`, `button_to` and `current_page?` moved to `NavigationHelper`.** 07f4b45e29 (#55410, CHANGELOG:
 "Extract …"), requested by a maintainer, with no deprecation. A class that includes only
-`ActionView::Helpers::UrlHelper` loses `link_to`. Redmine's `Redmine::Hook::ViewListener` does, so 3
-`Redmine::Hook::ManagerTest` tests fail with `undefined method 'link_to'`, and so does every plugin hook that builds
+`ActionView::Helpers::UrlHelper` loses `link_to`. Redmine's [`Redmine::Hook::ViewListener`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/lib/redmine/hook/view_listener.rb#L32) does, so 3
+[`Redmine::Hook::ManagerTest`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/test/unit/lib/redmine/hook_test.rb#L46) tests fail with `undefined method 'link_to'`, and so does every plugin hook that builds
 links. GitHub code search shows about 2.6k hits for `include ActionView::Helpers::UrlHelper`. Swapping the include
 works on main ([check](../../bench/upstream/app_suites/navhelper.rb)), but `NavigationHelper` doesn't exist on 8-1; keeping `UrlHelper` and adding `include NavigationHelper if defined?(…)` works on both ([check](../../bench/upstream/app_suites/navhelper_compat.rb)).
 No compat code; docs-only note:
@@ -84,8 +85,8 @@ groups.
 
 **R1 (d, documented): `GetIp#filter_proxies` removed without deprecation.** 752cc3915d (#56805, fatkodima, perf)
 replaced it with `first_non_proxy`. On 8-1 it was private but marked `# :doc:`. Mastodon's
-`lib/action_dispatch/remote_ip_extensions.rb` prepends its own `calculate_ip`, which calls
-`filter_proxies([remote_addr] + ips).first`; that accounts for 2169 of the failures, in 368 spec files. Fix (Thomas's
+[`lib/action_dispatch/remote_ip_extensions.rb`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/lib/action_dispatch/remote_ip_extensions.rb#L18) prepends its own `calculate_ip`, which calls
+[`filter_proxies([remote_addr] + ips).first`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/lib/action_dispatch/remote_ip_extensions.rb#L57) (shortened); that accounts for 2169 of the failures, in 368 spec files. Fix (Thomas's
 decision): restore it as a deprecated private `:doc:` method with 8-1's body (all non-proxy IPs, in order),
 warning through `ActionDispatch.deprecator`, to be removed in Rails 9.0, pointing to `first_non_proxy`. The fast
 path is untouched. Test: IPv4, IPv6, a Regexp proxy and an all-proxy list against 8-1's results, plus
@@ -99,7 +100,7 @@ or in the 8-1 run under a shared REDIS_URL.
 `54e07d2dba` on main `d09361d7cf` (Sol: open with nits, applied: concrete migration in the message, `assert_deprecated(/filter_proxies/, …)`, neutral CHANGELOG, body wording).
 
 **M1 (d): `PredicateBuilder#build_bind_attribute` takes an Arel attribute.** 4f1ff11da3 (CHANGELOG). Mastodon's
-`Status::SafeReblogInsert` passes `attr.name`; about 220 failures. `PredicateBuilder` is `:nodoc:`; record only.
+[`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/models/concerns/status/safe_reblog_insert.rb#L64) passes `attr.name`; about 220 failures. `PredicateBuilder` is `:nodoc:`; record only.
 
 To compare the rest, the main checkout carries two app-side shims (pass `attr`; define `filter_proxies` in
 Mastodon's extension). Main with shims: 44 failures. The 8-1 controls run one after another on the default
@@ -110,8 +111,8 @@ feed specs).
 main):** the remaining 36 are all explained.
 * 12 (b): `statuses_spec` expects `Vary: Accept, Accept-Language, Cookie` and gets `…, Sec-Fetch-Site`. Main's
   Sec-Fetch-Site CSRF protection appends to `Vary` (f5a1915f1d, 7fcee2255b; CHANGELOG).
-* 11 (b, S2): `REST::NotificationSerializer` and `REST::NotificationGroupSerializer` include only
-  `ActionView::Helpers::UrlHelper` and call `link_to`.
+* 11 (b, S2): [`REST::NotificationSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_serializer.rb#L5) and [`REST::NotificationGroupSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_group_serializer.rb#L5) include only
+  `ActionView::Helpers::UrlHelper` and call [`link_to`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/concerns/notification_fallback_concern.rb#L82).
 * 9 (c): view specs fail with `FrozenError` on `["", "action_view/test_case/test"]`. fd5ffed45b freezes
   `ViewPaths._prefixes` (for Ractors), and rspec-rails prepends to `lookup_context.prefixes`. Fixed in rspec-rails
   570b2b0a79 (#2915, 2026-09-02), after our pin and unreleased.
@@ -124,9 +125,54 @@ main):** the remaining 36 are all explained.
 
 No (a) in Mastodon.
 
+## Sure
+
+we-promise/sure `e658686` (Maybe's active fork; maybe-finance/maybe is archived), Ruby 3.4.9, PostgreSQL 18.6 and
+Redis, Rails main `8b06b0eb98`. lookbook 2.3.11 pins `marcel ~> 1.0`, which conflicts with main, so both locks were
+moved to lookbook 2.3.15 (`bundle lock --conservative --update lookbook`); otherwise the locks differ only in Rails
+gems. Both 8-1 controls: 14313 runs, 0 failures. Main: 13 failures, 472 errors, all explained below.
+
+**SU1 (a): anonymous cache store subclasses can't be created.** c6127f884e (#58061, "Fix some FrozenErrors for
+ractorized application") moved the `LocalCache` key into `initialize`, built from `self.class.name.underscore`, which
+is nil for `Class.new(ActiveSupport::Cache::MemoryStore)`. Sure's
+[`TransactionsControllerTest`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/test/controllers/transactions_controller_test.rb#L1799) builds such a store
+(1 error). On 8-1 the store worked and only `with_local_cache` raised. Repro:
+[local_cache_anon.rb](../../bench/upstream/app_suites/local_cache_anon.rb). No issue or PR found. Fix: `name.to_s`,
+test in `memory_store_test.rb` that fails on main; Active Support cache tests (without Redis/Memcached) 410 runs green,
+RuboCop clean. [patch](../../bench/upstream/app_suites/su1-local-cache-anonymous-store.patch),
+[body](../../bench/upstream/app_suites/su1-body.md). Branch `thomasklemm/local-cache-anonymous-store` @ `2b02aad60c`
+on main `7a78da5a55`. With it, that Sure test gets past the cache and then hits SU2.
+
+**SU2 (b, open question): `find_by_sql`/`count_by_sql` array arguments are now bind parameters.** Bisected to
+8c4ed25f0a (#58427, kamipo, CHANGELOG; its parent passes). With prepared statements on PostgreSQL, a placeholder
+after a type name becomes `DATE $1` (`syntax error at or near "$1"`), and `date - $1` makes PostgreSQL infer the
+parameter as a date (`invalid input syntax for type date`) or the comparison as `date >= integer`. `where` behaved
+this way on 8-1 already; with prepared statements off, all forms work on both. Repro:
+[typed_literal.rb](../../bench/upstream/app_suites/typed_literal.rb) (`PS=1`/`PS=0`). About 432 of Sure's errors:
+[`generate_series(DATE :start_date, …)`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/app/models/balance/chart_series_builder.rb#L159) and
+[`date BETWEEN inflow_candidates.date - :date_window …`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/app/models/family/auto_transfer_matchable.rb#L320)
+(shortened), plus the 4 Financekit failures, which pass with `prepared_statements=false` (the transfer matcher's
+error rolls back the downstream transaction). Our open #59565 adds a cast hint for the `DATE $1`/`IS $1` syntax
+error, but not for the arithmetic case. Deliberate change; whether `find_by_sql` should keep interpolating is
+a maintainer question. No patch.
+
+**SU3 (b): `disable_referential_integrity` on PostgreSQL 18.4+ re-checks foreign keys.** 7051ca8a45 (#57378,
+CHANGELOG: restoring `ENFORCED` checks existing rows). Sure's
+[`disable_referential_integrity { User.delete_all }`](https://github.com/we-promise/sure/blob/e658686d5ba7a55734ae9f42683618aa42342b74/test/models/user_test.rb#L1091) leaves `api_keys` rows
+pointing at deleted users, so restoring raises `InvalidForeignKey` (3 errors). On PostgreSQL < 18.4 the trigger path
+is unchanged.
+
+**SU4 (b): Redis cache store needs `redis-client >= 0.28.0`.** 5843a7b7f2 (CHANGELOG); Sure locks 0.25.0
+(2 `LoadError`s).
+
+**SU5 (c): activerecord-import 2.2.0 calls the removed private `validation_context=`.** 0f9d127083 (#58220, "Remove
+unused Active Model internals"); [import.rb in 2.2.0](https://github.com/zdennis/activerecord-import/blob/6aec1e78060f15a8d39f31592225848e9e35f2b7/lib/activerecord-import/import.rb#L82) calls
+`model.send(:validation_context=, validation_context)`. Released 3.0.0 and 3.0.1 no longer call it. 18 errors plus 9
+import count failures (`Entry.count` unchanged) in `TransactionImportTest` and `TradeImportTest`.
+
 ## Not run yet
 
-Sure (Maybe's active fork; maybe-finance/maybe is archived), Chatwoot or Forem.
+Chatwoot or Forem (paused under the orb-time rule).
 
 ## once-campfire
 
