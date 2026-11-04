@@ -144,6 +144,8 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
+| CP-3: `resolve_attribute_name` looks up aliases with `[]` instead of `fetch(name, &:itself)` | rails/rails | `thomasklemm/resolve-attribute-name-lookup` @ `b2577977c3` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp3-resolve-attribute-name-lookup.patch)) | `type_for_attribute` −15% instructions interpreted, −24% YJIT, −30% ZJIT; a two-condition `where` −0.6% / −1.8% / −1.5%; ruby-bench shipit −0.16% interpreted, −0.25% YJIT instructions per iteration; in all 20 census apps ([round 2](rails-common-paths-2.md#cp-3-look-up-attribute-aliases-with-)) | Ready, held until Thomas has read it (DECISIONS). L0; two subagent reviews; body and explanation below. |
+| CP-5: `UriEncoder#escape` checks a component with an anchored match on the safe characters | rails/rails | `thomasklemm/uri-encoder-safe-match` @ `3c968c5bf6` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp5-uri-encoder-safe-match.patch)) | `escape_segment` of a slug −42% / −46% / −45% instructions; `page_path(slug)` −8% / −15% / −11%; `post_path(post)` −1.1% / −2.5% / −1.5%; ruby-bench shipit −0.13% interpreted, −0.31% YJIT instructions per iteration; 12 of 20 census apps ([round 2](rails-common-paths-2.md#cp-5-check-url-components-with-an-anchored-match)) | Ready, held until Thomas has read it. L1; escaping, so primary and adversarial subagent rounds; adds one test. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
 ### Erklärungen für Thomas: K1 und N1 (2026-11-04, Gems; geöffnet als rack/rack#2550 und sparklemotion/nokogiri#3759)
@@ -209,6 +211,65 @@ SETS[:modern].with_indifferent_access["firefox"]   # vorher: pro Request neu geb
 EXPANDED = SETS.transform_values { _1.with_indifferent_access.freeze }.freeze
 EXPANDED[:modern]["firefox"]                        # jetzt: einmal gebaut, nur gelesen
 ```
+
+### CP-3 und CP-5: PR-Texte und Erklärungen für Thomas (2026-11-04, nicht geöffnet)
+
+Beide sind fertig geprüft und warten darauf, dass Thomas sie gelesen hat; nichts ist geöffnet oder gepostet. Messungen,
+Reviews und Ablehnungen: [rails-common-paths-2](rails-common-paths-2.md).
+
+**CP-3, Alias-Lookup.** Jede `where`-Bedingung fragt `type_for_attribute` nach dem Typ der Spalte, und das prüft
+zuerst, ob der Name ein Alias ist (`alias_attribute`). Bisher mit `attribute_aliases.fetch(name, &:itself)`: im
+Normalfall ohne Alias ruft Ruby dafür einen Block über `Symbol#to_proc` auf, was mehr kostet als der Lookup selbst.
+Jetzt steht dort `attribute_aliases[name] || name`, wie an etwa 15 anderen Stellen in Rails; sicher ist das, weil
+Rails in diesen Hash nur Strings schreibt (nie `nil` oder `false`) und er keinen Default hat, also liefern beide
+Formen für jeden Namen dasselbe Objekt.
+
+```ruby
+aliases = { "headline" => "title" }.freeze
+aliases.fetch("body", &:itself)   # vorher: "body", über einen Block-Aufruf
+aliases["body"] || "body"         # jetzt: "body", nur ein Hash-Lookup
+```
+
+**CP-5, URL-Escaping.** Jeder URL-Helper (`post_path(@post)`) prüft jedes Segment, ob es escaped werden muss; meist
+nicht (IDs, Slugs). Bisher suchte Rails nach einem unsicheren Zeichen (`/[^…]/`), und die Regex-Engine setzt diese
+Suche an jeder Position neu an; jetzt prüft es in einem Durchlauf, ob der ganze String nur aus sicheren Zeichen
+besteht (`/\A[…]*\z/`, dieselben Zeichenlisten). Das ist für jeden String dieselbe Aussage, auch bei kaputten
+Bytes, und ein neuer Test prüft für jedes ASCII-Zeichen, dass die Abkürzung dasselbe liefert wie das Escaping;
+langsamer wird es erst bei Segmenten über etwa 600.000 Zeichen.
+
+```ruby
+UNSAFE = /[^a-z0-9-]/; SAFE = /\A[a-z0-9-]*\z/
+"my-post".match?(UNSAFE)   # vorher: false, also nichts zu escapen (Suche ab jeder Position)
+"my-post".match?(SAFE)     # jetzt: true, also nichts zu escapen (ein Durchlauf)
+```
+
+#### CP-3 body: Look up attribute aliases with [] in resolve_attribute_name
+
+> Active Record looks up a column's type with `type_for_attribute` several times for each condition in `where`, and on association reads, creates and updates; `Post.where(title:, published:).to_a` calls it eight times. Each lookup first resolves an alias with `attribute_aliases.fetch(name, &:itself)`. For the usual name without an alias, `fetch` then calls its block through `Symbol#to_proc`, which costs more than the lookup itself.
+>
+> This uses `attribute_aliases[name] || name`, as `read_attribute`, `Arel::Table#[]` and the timestamp helpers already do. Rails only stores Strings in that frozen Hash (from `alias_attribute` and `define_id_value`), never `nil` or `false`, and the Hash has no default, so both forms return the same object for every name. They differ only for a Hash an app assigns through `attribute_aliases=` with a default, a default proc, or a `nil` or `false` value; for such a Hash, `Arel::Table#[]` and `read_attribute` already disagree with `type_for_attribute` on main, and this change makes them agree.
+>
+> | `Post.type_for_attribute("title")`, per call | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
+> | --- | ---: | ---: | ---: | ---: | ---: |
+> | main | 640 ns | 384 ns | 5,455 | 3,768 | 3,218 |
+> | this PR | 536 ns (−16%) | 277 ns (−28%) | 4,648 (−14.8%) | 2,875 (−23.7%) | 2,253 (−30.0%) |
+> | main, run again (change from the first run) | +0.3% | +1.1% | +0.07% | +0.06% | +0.14% |
+>
+> Objects per call are unchanged. Ruby 4.0.9, SQLite in memory, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000, median of three runs. The two-condition `where` above runs 0.56% fewer instructions interpreted and 1.75% fewer with YJIT, against A/As of 0.12% and 0.54%. On ruby-bench (Rails 8.1 with the method patched in), shipit and lobsters (about 21,600 and 9,000 lookups per iteration) run 0.16% and 0.12% fewer instructions per iteration with the interpreter, and shipit 0.25% fewer with YJIT. railsbench makes no lookups and still moved by 0.07%, which is the noise between two builds. In a CPU census of 20 open-source Rails apps on Rails main, this lookup ran in all 20 and took 0.18% of interpreted instructions (0.39% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
+
+#### CP-5 body: Check URL components for unsafe characters with an anchored match
+
+> Every URL helper escapes each dynamic segment through `UriEncoder#escape`, and since #59058 it returns a segment as is when nothing in it needs escaping, which is nearly always (ids, slugs). It finds that out by searching for an unsafe character with a negated class such as `/[^...]/`, which the regexp engine tries again from every position.
+>
+> This matches the whole component against the safe characters instead, with `/\A[...]*\z/` built from the same character lists, as `xml_name_escape` does with `SAFE_XML_TAG_NAME_REGEXP`. For every valid string in an ASCII-compatible encoding, one pattern matches exactly when the other doesn't; invalid bytes and incompatible encodings raise the same errors in both, and components that need escaping go through the same `gsub` as before. Measured in wall time, only components longer than about 600,000 characters take longer than before (2–3×), so with a global `Regexp.timeout` such components time out sooner; URL components that long don't occur in practice. The new test checks every ASCII character against the escaping path, so a safe pattern that lets through a character its escaping pattern encodes fails it.
+>
+> | `page_path("my-first-post-about-rails")` (`get "/pages/:slug"`), per call | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
+> | --- | ---: | ---: | ---: | ---: | ---: |
+> | main | 4,870 ns | 2,767 ns | 37,570 | 20,624 | 26,896 |
+> | this PR | 4,777 ns (−1.9%) | 2,449 ns (−11.5%) | 34,465 (−8.3%) | 17,435 (−15.5%) | 23,936 (−11.0%) |
+> | main, run again (change from the first run) | +0.7% | +0.3% | +0.10% | −0.02% | −0.00% |
+>
+> Objects per call are unchanged. Ruby 4.0.9, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro_url.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000. `escape_segment` itself runs 42% fewer instructions for that slug and 11% fewer for `"123"` (interpreter), and `post_path(post)` with an id 1.1% fewer interpreted and 2.5% fewer with YJIT, against A/As of 0.13% and 0.26%. On ruby-bench (Rails 8.1 with the method patched in), only shipit moves clearly beyond the noise between two builds (up to 0.1% here): 0.13% fewer instructions per iteration with the interpreter and 0.31% fewer with YJIT. railsbench's 9,670 escapes per iteration are numeric ids, which save about 350 instructions each, about 0.05% of an iteration. In a CPU census of 20 open-source Rails apps on Rails main, this check ran in 12 and took 0.10% of interpreted instructions; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
 
 ## Open
 
