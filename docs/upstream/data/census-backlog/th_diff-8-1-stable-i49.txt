@@ -20,3 +20,5 @@ regdef-noext NoMethodError
 after-unreg default nil
 argc ArgumentError ArgumentError ArgumentError
 arity [1, 0, 2]
+regdef-stateful true to_sym-calls=1 registered=true default=true
+reg-to_sym-calls true calls=1

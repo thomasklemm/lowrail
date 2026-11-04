@@ -18,7 +18,7 @@ in [zjit-iseq-leads](zjit-iseq-leads.md) and [yjit-leads](yjit-leads.md) and are
 **Result.** 20 performance leads remain. Most are in areas other orbs own, so they are listed for those orbs. The
 most valuable unworked item outside those areas is a correctness finding: Rails main dropped three
 `ActionView::Template` handler methods, which breaks maildown's Markdown handler (CodeTriage's mails). It is
-built as **TH-1** (below) and queued in the [ledger](contributions.md#queue). No second performance lead outside
+built as **TH-1** (below) and opened as [rails/rails#59606](https://github.com/rails/rails/pull/59606). No second performance lead outside
 the owned areas clears the bar (see [Why only one candidate](#why-only-one-candidate)).
 
 ## Ranked performance leads
@@ -65,7 +65,7 @@ Ranked by user impact. None has a rails/rails issue from us; issues need Thomas'
 | # | Finding | Area | Source | State on main 2026-11-04 |
 | ---: | --- | --- | --- | --- |
 | 1 | `find_by_sql`/`count_by_sql` with array binds on PostgreSQL prepared statements: since #58427 (`8c4ed25f0a`) typed literals (`DATE :d`, `TIMESTAMP ?`, `INTERVAL`, `JSONB`), `DATE '…' + :n` and `(:x IS NULL)` fail with a syntax or type error that 8.1.4 doesn't raise; Sure's transfer matcher breaks. Not in the CHANGELOG. | Active Record (C11) | [find-by-sql-typed-literal-binds](find-by-sql-typed-literal-binds.md), [pg-census](pg-census.md) | Present (`bound_sql_literal_for`). Our open #59565 only adds a cast hint to the error |
-| 2 | **Built as TH-1.** #57874 (`cd416503e8`, unreleased) dropped `ActionView::Template.registered_template_handler`, `template_handler_extensions` and `register_default_template_handler`. maildown 3.3.1 calls `registered_template_handler(:erb)` from its handler, so on main a `.md` template raises `NoMethodError` inside `ActionView::Template::Error` the first time it compiles; census 4 saw CodeTriage's Markdown mails fail this way. SimpleCov added a `respond_to?` workaround; view_component fixed its copy (ViewComponent#2662). (Loomio's initializer also calls it, but its handler takes one argument, which 8.1 already rejects, and Loomio has no `.md` views, so it is not evidence.) | Action View (free) | [census 4](rails-main-census-4.md) | Present; fixed on branch, see [TH-1](#th-1-restore-the-template-handler-lookup-methods) |
+| 2 | **Built as TH-1.** #57874 (`cd416503e8`, unreleased) dropped `ActionView::Template.registered_template_handler`, `template_handler_extensions` and `register_default_template_handler`. maildown 3.3.1 calls `registered_template_handler(:erb)` from its handler, so on main a `.md` template raises `NoMethodError` inside `ActionView::Template::Error` the first time it compiles; census 4 saw CodeTriage's Markdown mails fail this way. SimpleCov added a `respond_to?` workaround; view_component fixed its copy (ViewComponent#2662). (Loomio's initializer also calls it, but its handler takes one argument, which 8.1 already rejects, and Loomio has no `.md` views, so it is not evidence.) | Action View (free) | [census 4](rails-main-census-4.md) | Present; open as #59606, see [TH-1](#th-1-restore-the-template-handler-lookup-methods) |
 | 3 | `Array#index_with` ignores an overridden `each` on an Array subclass since 2b88dc1995 (unreleased): `Tens[1, 2].index_with { _1 }` is `{10=>10, 20=>20}` on 8.1 and `{1=>1, 2=>2}` on main. | Active Support (C13) | [merged-audit](merged-audit.md) | Present (`enumerable.rb:315` uses `to_h`). Our open #59557 touches the same method on 4.1 |
 | 4 | Casting a Ruby `Time` in a TZInfo zone (`getlocal(tz)`) during the fall-back hour raises `TZInfo::AmbiguousTime` in `apply_seconds_precision` (`change(nsec:)`). | Active Model / Active Support `Time#change` (C13) | [common paths 2](rails-common-paths-2.md#rejected-and-not-built) | Present; rare (Rails hands out TimeWithZone) |
 | 5 | Our merged PRs' internal-only differences: #59538 frozen `payload[:binds]` with `prepared_statements: false` (a subscriber that mutates it gets `FrozenError`), #59536 `collect_warnings` overrides that `super.push`, #59562 subclasses defining `event_method_names`, #59560 non-`HashLookupTypeMap` PG type maps, #59537 external `tag_string(name, content, options)` callers, #59571 scope arity −1 → 0, #59316 `extend`-added `match`, #59535 `fetch` arity message. | AR / AS / AV / AP | [merged-audit](merged-audit.md#leads-behavior-differences-only-internals-or-introspection-can-see) | All present; nobody has reported one. Fix recipes are in the audit (e.g. #59538: pass `[]` again in `exec_main_query`) |
@@ -105,8 +105,9 @@ fanout subscription list (C13, unattempted) and V1-C2 (C13, a design question fo
 
 ## TH-1: restore the template handler lookup methods
 
-Branch `thomasklemm/template-handler-readers` @ `81b05aaf2d` on rails/rails main `9b116f1fed`, one commit authored
-and committed by Thomas Klemm, not pushed anywhere; the commit is in
+Opened as [rails/rails#59606](https://github.com/rails/rails/pull/59606) on 2026-11-04 from
+[`thomasklemm/template-handler-readers`](https://github.com/thomasklemm/rails/tree/thomasklemm/template-handler-readers)
+@ `5b24d5490e` on rails/rails main `9b116f1fed`, one commit authored and committed by Thomas Klemm; the commit is in
 [`patches/th1-template-handler-readers.patch`](../../bench/upstream/census_backlog/patches/th1-template-handler-readers.patch)
 (`git am` onto `9b116f1fed`). Lib +12, test +19.
 
@@ -209,12 +210,25 @@ of the two differences; and that it led with history. The body was rewritten fro
 is its own test, and the commit title names the class. Not a critical change in the DECISIONS sense (no escaping,
 connections, records, caching, thread state or VM code), so no adversarial round.
 
-### PR body (draft, not opened)
+### Second review and fix (2026-11-04)
+
+Sol, in the coordinating thread, approved the restoration with one exactness fix: `register_default_template_handler`
+passed the extension to `Handlers.register_default`, which converts it with `to_sym` twice (once to register, once
+to fetch the default), while 8.1 converted it once. The earlier checklist claim of one call was wrong for this method.
+It now passes `extension.to_sym`, and a test with a stateful `to_sym` fails without the fix. The tests also cover
+`nil`/`false` lookups, a fresh mutable Array of Strings from `template_handler_extensions`, and default registration
+with `unshareable_proc_action: :raise` (registry and default shareable, the method returns the stored default). The
+differential gained the stateful converter (one `to_sym` call for both methods) and is still identical to
+8-1-stable in all four modes; Action View `rake test` 2,950 + 251 + 177 runs, 0 failures. A separate subagent
+re-reviewed the diff and body: code approve, body approve-with-nits (name which methods take an extension, state the
+`unshareable_proc_action` copy, give the reason the two differences stay), all applied.
+
+### PR body (as opened)
 
 Title: **Restore three ActionView::Template handler methods removed in #57874**
 
 > On main, a template handler that calls `ActionView::Template.registered_template_handler(:erb)` raises `ActionView::Template::Error` (undefined method `registered_template_handler`) the first time a template using it is compiled; 8.1 renders the same template. maildown 3.3.1's Markdown handler does this. #57874 moved the template handler registry onto `ActionView::Template::Handlers` and kept `register_template_handler`, `unregister_template_handler` and `handler_for_extension` on `ActionView::Template`, but dropped `registered_template_handler`, `template_handler_extensions` and `register_default_template_handler`.
 >
-> This restores the three methods as delegations to `Handlers`, like the methods #57874 kept. For the extension values 8.1 accepted (Symbols, Strings, `nil` and objects that respond to `to_sym`), they return the same results as 8.1. Two differences introduced by #57874 are left alone: `handler_for_extension` no longer calls `registered_template_handler`, and `register_default_template_handler` no longer calls `register_template_handler`. The removal hasn't been released, so there is no CHANGELOG entry.
+> This restores the three methods as delegations to `Handlers`. For the extension values 8.1 accepted, they return the same results as 8.1, and `registered_template_handler` and `register_default_template_handler` call `to_sym` on the extension once, as 8.1 did. The one change: when `unshareable_proc_action` is set, a Proc passed to `register_default_template_handler` is stored as its shareable copy, as `register_template_handler` already does, and the method returns that stored handler. Two differences introduced by #57874 are left alone, since they only matter to code that overrides one of these methods: `handler_for_extension` no longer calls `registered_template_handler`, and `register_default_template_handler` no longer calls `register_template_handler`. The removal hasn't been released, so there is no CHANGELOG entry.
 >
 > I found this while running open-source Rails apps against Rails main for my research project, [Lowrail](https://github.com/thomasklemm/lowrail).

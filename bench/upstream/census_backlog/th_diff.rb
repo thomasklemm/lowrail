@@ -26,3 +26,10 @@ out << "after-unreg default #{r { T.handler_for_extension(:zzz) }}"
 out << "argc #{r { T.registered_template_handler }} #{r { T.register_default_template_handler(:a) }} #{r { T.template_handler_extensions(1) }}"
 out << "arity #{[:registered_template_handler, :template_handler_extensions, :register_default_template_handler].map { T.method(_1).arity }}"
 puts out
+calls = 0
+conv = Object.new
+conv.define_singleton_method(:to_sym) { (calls += 1) == 1 ? :conv1 : :conv2 }
+h2 = Class.new { def call(t, s) = s }.new
+puts "regdef-stateful #{r { T.register_default_template_handler(conv, h2).equal?(h2) }} to_sym-calls=#{calls} registered=#{r { T.registered_template_handler(:conv1).equal?(h2) }} default=#{r { T.handler_for_extension(:zzz).equal?(h2) }}"
+calls = 0
+puts "reg-to_sym-calls #{r { T.registered_template_handler(conv).equal?(h2) }} calls=#{calls}"
