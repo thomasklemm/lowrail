@@ -229,6 +229,17 @@ reassigned a variable inside an `unless`:
   cyclomatic and perceived complexity) for each touched method, before and after. A rise needs a sentence of
   justification in the review. These numbers miss shape problems, so they never replace the cold read.
 
+### Short PR bodies (2026-11-04)
+
+Thomas, after reading all of today's Rails PRs: "Beschreibungen könnten etwas kürzer sein, weniger Wall of Text".
+A human reviewer has to get the essence in a few seconds.
+
+* **Shape:** the first sentence says what changes, the second why it is safe or what it fixes. Then one small
+  table or a single line of numbers. Aim for about 120 words in total; above 150 needs a reason.
+* **Scope caveats** take one clause each, not a paragraph. Methodology, A/A values, rejected variants and
+  differential sizes stay in the Lowrail doc, or go in a `<details>` block at the end if a reviewer will want them.
+* Sol's and the outsider's wording fixes are made by shortening the text, not by adding to it.
+
 ### Primary review
 
 Before the queue, every candidate passes an independent Thermos review on both rubrics (correctness,
