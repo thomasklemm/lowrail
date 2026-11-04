@@ -19,7 +19,9 @@ parked (below).
 Both rebased onto rails/rails main `9cf3693a0a` (no commits on the touched files since `9b116f1fed`, where they were
 measured), one commit each, authored and committed by Thomas Klemm. Final bodies:
 [`w2-body.md`](../../bench/upstream/ar_write_paths/w2-body.md), [`w3-body.md`](../../bench/upstream/ar_write_paths/w3-body.md)
-(links pinned to Lowrail `d7ed9c3678`). Patches:
+(links pinned to Lowrail `d7ed9c3678`). Shortened on 2026-11-04 under DECISIONS' "Short PR bodies": W2 244 → 127 words
+above the `<details>` (157 with it), W3 210 → 116 (145); Sol's facts kept as clauses, method and noise checks moved
+into `<details>`. Patches:
 [`bench/upstream/ar_write_paths`](../../bench/upstream/ar_write_paths/).
 
 ## Pins and method
