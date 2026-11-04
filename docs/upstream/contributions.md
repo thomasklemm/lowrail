@@ -152,6 +152,25 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| E1: require `WeakSet` where `DescendantsTracker` uses it | rails/rails | [`thomasklemm/descendants-tracker-require-weak-set`](https://github.com/thomasklemm/rails/tree/thomasklemm/descendants-tracker-require-weak-set) @ `1d1fbb6410` on main `8b06b0eb98` | ransack loads on main again (32 spec files failed to load) ([record](ecosystem-tests.md#regressions-and-their-fixes)) | Ready, Sol: open with nits; the coordinator opens it (PR creation blocked for orb tokens) |
+| E2: SQLite schema readers find tables by any ASCII case | rails/rails | [`thomasklemm/sqlite-schema-readers-table-name-case`](https://github.com/thomasklemm/rails/tree/thomasklemm/sqlite-schema-readers-table-name-case) @ `8f41f1c9c3` on main `8b06b0eb98` | table `Widgets` read as `widgets` works again (columns, primary key, indexes, foreign keys, views); ransack's `context_spec.rb:80` | Ready, Sol: open with nits |
+| E2b: a temporary SQLite table hides the permanent one in the schema readers | rails/rails | [`thomasklemm/sqlite-schema-readers-temp-shadowing`](https://github.com/thomasklemm/rails/tree/thomasklemm/sqlite-schema-readers-temp-shadowing) @ `19e340c2e9` on main `8b06b0eb98` | columns, primary key and indexes no longer come back twice | With Sol |
+| E3: deprecate `ActiveSupport::LogSubscriber.colorize_logging` | rails/rails | [`thomasklemm/log-subscriber-colorize-logging-deprecation`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-colorize-logging-deprecation) @ `8672567e15` on main `8b06b0eb98` | awesome_print 1.9.2 loads again; administrate boots | Ready, Sol: open with nits |
+| E4: Active Support requires minitest 5.18 | rails/rails | [`thomasklemm/activesupport-minitest-floor`](https://github.com/thomasklemm/rails/tree/thomasklemm/activesupport-minitest-floor) @ `0a69eb6cce` on main `8b06b0eb98` | Bundler reports a conflict instead of a NameError in `active_support/test_case` | Ready, Sol: open with nits |
+
+### Erklärungen für Thomas: E1–E4 und E2b (2026-11-04, Ecosystem-Tests; nicht geöffnet)
+
+Ergebnisse aller 24 Suites, Ursachen und Leads: [ecosystem-tests](ecosystem-tests.md).
+
+**E1, fehlendes `require`.** `WeakSet` liegt seit 3c77803ec0 in einer eigenen Datei, die nur per Autoload aus `active_support.rb` kommt. Wer wie ransack zuerst einen Core-Extension-Pfad lädt, bekommt deshalb einen NameError. Die eine `require`-Zeile in `descendants_tracker.rb` stellt den Zustand von 8.1 wieder her.
+
+**E2, Groß-/Kleinschreibung bei SQLite.** Seit 2cb3daba96 liest Rails das Schema vieler Tabellen in einer Abfrage, vergleicht die Namen dabei aber exakt; SQLite selbst ignoriert bei Namen die ASCII-Schreibweise. Mit `COLLATE NOCASE` und Zeilen pro angefragtem Namen findet `widgets` wieder die Tabelle `Widgets`. `Ärger` und `ärger` bleiben zwei Tabellen, wie in SQLite.
+
+**E2b, temporäre Tabellen.** Dieselbe Abfrage listet eine temporäre Tabelle und die gleichnamige permanente, und beide Zeilen lösen auf die temporäre auf. So kommen Spalten, Primärschlüssel und Indizes doppelt zurück. Jetzt verdeckt die temporäre die permanente, wie bei SQLite selbst; der Test schlägt auf main fehl und läuft auf 8-1-stable.
+
+**E3, `colorize_logging`.** aebcb61520 hat den Klassen-Accessor von `LogSubscriber` ohne Deprecation entfernt. awesome_print 1.9.2 liest ihn beim Laden, deshalb bootet z. B. administrate nicht mehr. Er kommt als veralteter Delegator auf `ActiveSupport.colorize_logging` zurück und warnt bis zur Entfernung in Rails 9.0.
+
+**E4, minitest-Untergrenze.** 23420be739 nutzt `refute_pattern`, das es erst ab minitest 5.18 gibt, aber das Gemspec erlaubt noch 5.1. Die ehrliche Untergrenze `>= 5.18` lässt Bundler den Konflikt melden, statt dass `active_support/test_case` mit einem NameError abbricht.
 
 ### Erklärungen für Thomas: AP-1 und AP-2 (2026-11-04, Action Pack; geöffnet als #59619 und #59620)
 
