@@ -7,8 +7,9 @@ evidence from the census apps. Sources: the CPU ranking of [census 8](rails-main
 [F1](frontier-census-f1.md) and the [ZJIT gap census](zjit-gap-census.md), excluding every site census 8, round 1,
 [R6](rails-r6-leads.md) or an open PR already covers.
 
-**Result.** Two candidates, held for Thomas per [DECISIONS](../DECISIONS.md#pull-requests) (nothing opened, nothing
-posted). One more was built and rejected as not exact.
+**Result.** CP-3 opened as [rails/rails#59607](https://github.com/rails/rails/pull/59607) on 2026-11-04 after two Sol
+rounds. CP-5 was dropped after Sol's second round ([memory](#cp-5-dropped-match-stack-memory-on-long-components)). CP-4 was
+rejected as not exact.
 
 | # | Branch @ SHA | Change | Per call |
 | --- | --- | --- | --- |
@@ -113,6 +114,27 @@ called `itself` on it).
 runs, 0 failures (the same 5 orb errors as before); Action Pack with `RAILS_STRICT_WARNINGS=1` 4,510 runs, 0
 failures. RuboCop clean. Each amended diff got a separate subagent review: CP-3's one-line form "approve with
 notes" (L1), CP-5 "approve" once the commit message's newline sentence was corrected (done).
+
+## CP-5 dropped: match-stack memory on long components
+
+Sol's second round found that the anchored match needs memory proportional to the component's length; main's
+negated-class search needs none. Peak RSS growth (`VmHWM`) for one `match?` on `"a" * n`, Ruby 4.0.9:
+
+| n | main `/[^…]/` | `\A[…]*\z` | `\A[…]*+\z` | `\A(?>[…]*)\z` | `\A(?![\s\S]*[^…])` |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,000 | 0 | 0 | 0 | | |
+| 10,000 | 0 | 348 kB | 368 kB | 368 kB | 348 kB |
+| 100,000 | 0 | 4.8 MB | 4.8 MB | | |
+| 1,000,000 | 0 | 47 MB | 47 MB | 47 MB | 47 MB |
+| 10,000,000 | 0 | 469 MB | 469 MB | | |
+
+About 47 bytes per character from roughly 10,000 characters up (Onigmo's match stack for the repeat), the same for
+possessive, atomic and lookahead forms. Below about 5,000 characters no allocation was measured. Options: (a) no
+regexp form tried avoids it; `count(chars) == bytesize` avoids it but raises a different `CompatibilityError`
+message for UTF-16/UTF-32 and repeats the character lists in another syntax (not exact, L2); (b) a byte-length
+guard falling back to main's search would be exact and flat, but adds a size constant and a branch to an escaping
+boundary for a 0.1–0.3% ruby-bench effect (L2). Taken: (c), dropped. A component of 10,000+ characters is unusual
+but app-controlled, and a URL helper should not cost hundreds of MB on one.
 
 ## CP-3: resolve attribute aliases with a `fetch` default
 
@@ -319,7 +341,7 @@ Checked by a separate reviewer against this page and for an outsider's reading; 
 > | this PR | 561 ns (−12.5%) | 293 ns (−23.7%) | 4,788 (−12.2%) | 2,925 (−22.4%) | 2,305 (−28.9%) |
 > | main, run again (change from the first run) | +1.3% | +0.3% | −0.00% | −0.13% | +0.04% |
 >
-> Objects per call are unchanged. Ruby 4.0.9, SQLite in memory, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000, median of three runs. The two-condition `where` above runs 0.47% fewer instructions interpreted and about 1.4% fewer with YJIT. On ruby-bench (Rails 8.1 with the method patched in), shipit (about 21,600 lookups per iteration) runs 0.11% fewer instructions per iteration with the interpreter; railsbench makes no lookups and still moves by up to 0.08% between two builds, so lobsters' 0.06% is not resolved. In a CPU census of 20 open-source Rails apps on Rails main, this lookup ran in all 20 and took 0.18% of interpreted instructions (0.39% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
+> Objects per call are unchanged. Ruby 4.0.9, SQLite in memory, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000, median of three runs. The two-condition `where` above runs 0.47% fewer instructions interpreted and about 1.4% fewer with YJIT. On ruby-bench (Rails 8.1 with the method patched in), shipit (about 21,600 lookups per iteration) runs 0.11% fewer instructions per iteration with the interpreter; railsbench, which makes no lookups, moves by up to 0.08% between two builds, so smaller changes there are noise. In a CPU census of 20 open-source Rails apps on Rails main, this lookup ran in all 20 and took 0.18% of interpreted instructions (0.39% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
 
 ### CP-5: Check URL components for unsafe characters with an anchored match
 
