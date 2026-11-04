@@ -1,0 +1,52 @@
+From 4520f979712b5673500266889f16cb4b70a1ae15 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 20:48:50 +0000
+Subject: [PATCH] Keep dropping an empty where condition that comes with values
+
+`where("", values)` added nothing to the query before 8c4ed25f0a. Since
+then the empty condition is wrapped in parentheses before it reaches the
+fallback that leaves it unchanged, so the query gets an `(())` predicate
+and the database rejects it. Apps that build a condition string and its
+values separately, and pass an empty string when there is nothing to
+filter, now fail with a syntax error.
+
+Use an empty condition as it is, as when no values are given.
+---
+ activerecord/lib/active_record/relation/query_methods.rb | 2 +-
+ activerecord/test/cases/relation/where_test.rb           | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
+index ee4a573235..9a607d706c 100644
+--- a/activerecord/lib/active_record/relation/query_methods.rb
++++ b/activerecord/lib/active_record/relation/query_methods.rb
+@@ -1989,7 +1989,7 @@ def build_where_clause(opts, rest = FROZEN_EMPTY_ARRAY) # :nodoc:
+ 
+         case opts
+         when String
+-          if rest.empty?
++          if rest.empty? || opts.empty?
+             parts = [Arel.sql(opts)]
+           else
+             parts = [model.bound_sql_literal_for("(#{opts})", rest)]
+diff --git a/activerecord/test/cases/relation/where_test.rb b/activerecord/test/cases/relation/where_test.rb
+index c3bd8e8394..be3a827bcb 100644
+--- a/activerecord/test/cases/relation/where_test.rb
++++ b/activerecord/test/cases/relation/where_test.rb
+@@ -502,6 +502,13 @@ def test_where_with_blank_conditions
+       end
+     end
+ 
++    def test_where_with_empty_string_condition_and_values
++      edges = Edge.where(sink_id: [2, 3])
++      [{}, { sink_id: 1 }, 1].each do |values|
++        assert_equal 2, edges.where("", values).count
++      end
++    end
++
+     def test_where_with_integer_for_string_column
+       count = Post.where(title: 0).count
+       assert_equal 0, count
+-- 
+2.55.0
+
