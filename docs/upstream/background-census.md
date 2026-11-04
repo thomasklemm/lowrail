@@ -36,8 +36,8 @@ Nothing else was strong enough, and the reasons are below:
 ## Pins and apps
 
 * Rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed7b9e3557979704a0a7aaa825200317)
-  (= `origin/main` on 2026-11-04). Ruby 4.0.9 for the census. ZJIT on Ruby master `9aa0898240`, for the candidate's
-  micro and exactness check only.
+  (= `origin/main` on 2026-11-04). Ruby 4.0.9 for the census. ZJIT on Ruby master `9aa0898240`: the candidate's micro and exactness check, and an
+  allocation pass over four apps (below).
 * Apps (copies `.corpus/census-APP`): Blog, Campfire, Writebook, Fizzy (SQLite), Lobsters, Thinkroom, Mastodon,
   Discourse, Loomio, Chatwoot, Docuseal, CodeTriage. Services: PostgreSQL 15 with pgvector 0.8.1, Redis and
   Memcached, as orb services. Docuseal's pdfium is a stub library (`/usr/local/lib/libpdfium.so`); no workload
