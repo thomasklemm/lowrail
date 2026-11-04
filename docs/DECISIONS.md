@@ -147,6 +147,11 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 * **Rails:** keep the pattern (small, obvious, numbers from real apps). Drop or simplify L2 candidates and any that
   need more than two exactness rounds.
 
+* **Standing OK for the 2026-11-04 Rails round** (Thomas, 2026-11-04). The candidates and bug fixes from the census
+  backlog, C9 (CP-3, CP-5), C11, C13 and C15 may open on rails/rails without another read by Thomas, once they have
+  passed the full review path plus a Sol review run by the coordinator. Opening a PR on top of one of our open PRs
+  (stacking) stays out: such a candidate opens only if it applies to main on its own, otherwise after the first merges.
+
 ## Submission queue (2026-11-03)
 
 Every finished candidate (review gates passed, body drafted) goes into the **Queue** section of
