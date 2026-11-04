@@ -296,3 +296,85 @@ gives the same result with and without it on Ruby 4.0.9. No existing issue on bu
 > returns for a NaN into an exception. Returning the result of `<=>` unchanged makes `Date` behave like the
 > other numerics; frameworks that compare values of unknown types, such as Active Model's dirty tracking,
 > then stop raising.
+
+## Round 4: cache stores, Active Storage, Action Cable and Turbo, encryption previous schemes (2026-11-04)
+
+Closes round 3's gaps with the same method: one process per tree writes, both trees read both trees' data, and
+each reader works on its own copy of the database and storage. Pins as in round 3; both app Gemfiles also pin
+redis 5.4.1, redis-client 0.28.0, dalli 4.3.10 (4.3.3 for the D1 finding below), solid_cache 1.0.10, turbo-rails
+2.0.23, image_processing 2.0.1 and ruby-vips 2.3.0, against local Redis 7 and memcached 1.6.18. Harness:
+[`fixtures/corpus/rails-82-diff/round4/`](../../fixtures/corpus/rails-82-diff/round4/).
+
+### Method
+
+* **Cache stores (1,200 values, round 3's generator):** `RedisCacheStore` (8.1 on the redis gem, main on
+  redis-client), `MemCacheStore` and `SolidCache::Store`, each with the default coder, `marshal_7_1`,
+  `message_pack` and both compressed: `write` with `expires_in` and `version`, `write_multi`, `increment`, read back
+  with `read`, `read_multi`, `fetch_multi`, `exist?` and raw counter reads.
+* **Active Storage (200 blobs: PNG and JPEG made with vips, text, binary, PDF, SVG, HTML, awkward filenames):**
+  written and attached by one tree; the other resolves `signed_id` (plain, purpose, expiry), decodes variation
+  keys, reads metadata, locates the attachment's signed GlobalID, and serves every URL the writer generated
+  (blob redirect and proxy, `disposition: :attachment`, representation redirect and proxy, the
+  `rails_blob_representation_path` form) through the app, following redirects to the Disk service and hashing
+  the bytes. Variants (resize, fill, pad, rotate, crop, WebP, saver options) are processed by the reader.
+* **Action Cable and Turbo:** broadcasts (`ActionCable.server.broadcast`, `broadcast_to` a record, Turbo
+  `broadcast_replace_to`/`append_to`/`action_to` with attributes) captured on the Redis wire by a raw
+  subscriber, then decoded by the other tree; `broadcasting_for` names compared with the reader's own; Turbo
+  signed stream names verified; and 60 subscription identifiers decoded and subscribed through
+  `ActionCable::Channel::TestCase` (streams, params, confirmation, transmissions).
+* **Active Record encryption with previous schemes (406 values, writer → reader):** old keys → a rotated
+  primary-key list with the old deterministic key as a previous scheme; plain columns → `support_unencrypted_data`
+  with `extend_queries`; non-deterministic → deterministic with `previous: { deterministic: false }`; an
+  attribute-level `previous: { key: }`; and a rollback (new keys read with only the old ones). Each row read,
+  queried through its deterministic columns, and re-saved.
+
+### Differences
+
+**No cross-version difference.** Every reader reads the other tree's data exactly as it reads its own, in every
+store, coder and configuration: cache values, counters and multi-reads; every Active Storage lookup, URL and
+served body (including the reader-processed variants); every broadcast, broadcasting name, Turbo stream name and
+subscription; and every encryption scenario (rotation, unencrypted-to-encrypted, non-deterministic to
+deterministic and the attribute-level previous key decrypt and query; the rollback fails identically, as it
+must). The decode-only differences are round 2's attribute order of loaded records.
+
+| Surface | Difference (8.1 → main) | Commit | Class | Action |
+| --- | --- | --- | --- | --- |
+| `MemCacheStore#write_multi` with Dalli 4.1.0–4.3.5 and the binary protocol (Dalli 4's default) | Main writes through Dalli's `set_multi`, which waits out the socket timeout once per key in those versions (values are stored). `fetch_multi` with five misses: 5.6 s on main, 0.01 s on 8.1, same Dalli 4.3.3; cached collection rendering writes the same way. Dalli fixed it in 4.3.6 (`a2599dc`). Rails CI runs Dalli 5.0.6 and cannot see it. | #58066 (`dc40ef488b`), unreleased | **Accident** (interaction with a Dalli bug) | **D1**, below |
+| `MemCacheStore#write_multi` return value | `nil` (or Dalli's server list with 4.3.3) instead of the entries Hash | #58066 | Undocumented, harmless | None: the return value was never documented and already differed per store |
+| `ActionCable::Channel::ConnectionStub`, `ChannelStub` | Removed with the Action Cable server extraction (`879c139d57`); `stub_connection` now builds the app's connection class. Main's `Channel::TestCase` docs still say `connection` is "an ActionCable::Channel::ConnectionStub" | `879c139d57` | Intended; the stale doc line is a doc accident | Lead only (doc line), not a data-compatibility change |
+
+### D1: use Dalli's set_multi from Dalli 4.3.6
+
+* **Change:** in `MemCacheStore`, define the batched `write_multi_entries` only when
+  `Gem::Version.new(Dalli::VERSION) >= Gem::Version.new("4.3.6")`, in the shape of the file's existing
+  `delete_multi` gate (Dalli 5.0.6), instead of whenever `Dalli::Client` defines `set_multi`. The existing
+  `set_multi` expectation test skips under the same condition. Lib +2/−1, test +1/−1, L0.
+* **Verification:** `mem_cache_store_test.rb` on Rails' bundle (Dalli 5.0.6): 347 runs, 0 failures, 0 skips
+  with and without the patch. With the patch, `fetch_multi` with five misses takes 0.00 s on Dalli 4.3.3 (key by
+  key again); Dalli 4.3.10 and 5.0.6 keep the batched path. No test can fail on main in Rails' bundle because the
+  bug needs Dalli < 4.3.6; the `delete_multi` gate has no version test either.
+* **Upstream search:** no rails/rails issue or PR on `set_multi` timing; the merged `write_multi` PRs (#58066,
+  #59398, #59486, #59566, #59573) don't touch the gate.
+* **Branch:** `thomasklemm:thomasklemm/memcache-set-multi-dalli-version` at `50c005b37c` on main `d7875e3fb1`
+  ([patch](../../fixtures/corpus/rails-82-diff/patches/d1-memcache-set-multi-dalli-version.patch)); for Sol.
+
+> **Use Dalli's set_multi in MemCacheStore from Dalli 4.3.6**
+>
+> `MemCacheStore#write_multi` sends the entries with Dalli's `set_multi` whenever Dalli defines it. Dalli added
+> `set_multi` in 4.1.0, but before 4.3.6 its binary protocol waited for a reply to every quiet set, and
+> memcached never sends one. The values are stored, but the call waits out the socket timeout once for each
+> key.
+>
+> The binary protocol is Dalli 4's default, so an application that upgrades Rails and keeps Dalli 4.1 to 4.3.5
+> finds `write_multi`, `fetch_multi` with misses and cached collection rendering blocking for the socket timeout
+> on every key they write. Rails 8.1 writes the keys one by one and is not affected.
+>
+> Dalli fixed `set_multi` for the binary protocol in 4.3.6. Check for that version, as the store already does
+> for `delete_multi`, so older Dalli versions keep writing each key on its own and newer ones keep the single
+> round trip. The test that expects `set_multi` skips under the same condition.
+
+Harness artefacts, recorded so nobody chases them: `MemCacheStore#clear` flushes the whole server and
+`SolidCache::Store#clear` deletes every entry, so a writer that cleared its namespace first wiped the other
+tree's data (now no clear; servers flushed once per run); an `encryption.previous` entry with `primary_key:`
+raises `NoMethodError` on both versions (key rotation uses a `primary_key` list); a quarter of the generated
+"images" are random bytes, which vips refuses identically on both trees.

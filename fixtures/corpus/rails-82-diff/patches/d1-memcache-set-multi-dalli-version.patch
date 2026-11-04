@@ -1,0 +1,57 @@
+From 50c005b37c6389687e31f4d17aaa1cd320a538fa Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 16:47:05 +0000
+Subject: [PATCH] Use Dalli's set_multi in MemCacheStore from Dalli 4.3.6
+
+`MemCacheStore#write_multi` sends the entries with Dalli's `set_multi`
+whenever Dalli defines it. Dalli added `set_multi` in 4.1.0, but before
+4.3.6 its binary protocol waited for a reply to every quiet set, and
+memcached never sends one. The values are stored, but the call waits out
+the socket timeout once for each key.
+
+The binary protocol is Dalli 4's default, so an application that upgrades
+Rails and keeps Dalli 4.1 to 4.3.5 finds `write_multi`, `fetch_multi` with
+misses and cached collection rendering blocking for the socket timeout on
+every key they write. Rails 8.1 writes the keys one by one and is not
+affected.
+
+Dalli fixed `set_multi` for the binary protocol in 4.3.6. Check for that
+version, as the store already does for `delete_multi`, so older Dalli
+versions keep writing each key on its own and newer ones keep the single
+round trip. The test that expects `set_multi` skips under the same
+condition.
+---
+ activesupport/lib/active_support/cache/mem_cache_store.rb | 3 ++-
+ activesupport/test/cache/stores/mem_cache_store_test.rb   | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/activesupport/lib/active_support/cache/mem_cache_store.rb b/activesupport/lib/active_support/cache/mem_cache_store.rb
+index 05625a950b..e005615835 100644
+--- a/activesupport/lib/active_support/cache/mem_cache_store.rb
++++ b/activesupport/lib/active_support/cache/mem_cache_store.rb
+@@ -227,7 +227,8 @@ def write_serialized_entry(key, payload, **options)
+           end
+         end
+ 
+-        if Dalli::Client.method_defined?(:set_multi)
++        # Dalli's set_multi waits for a reply that never comes with the binary protocol before version 4.3.6.
++        if Gem::Version.new(Dalli::VERSION) >= Gem::Version.new("4.3.6")
+           def write_multi_entries(entries, **options)
+             return if entries.empty?
+             # Dalli has no multi counterpart to add.
+diff --git a/activesupport/test/cache/stores/mem_cache_store_test.rb b/activesupport/test/cache/stores/mem_cache_store_test.rb
+index fa107df10e..619ecdc5e6 100644
+--- a/activesupport/test/cache/stores/mem_cache_store_test.rb
++++ b/activesupport/test/cache/stores/mem_cache_store_test.rb
+@@ -314,7 +314,7 @@ def test_no_multiple_compress_on_write_multi
+   end
+ 
+   def test_write_multi_extends_expiry_for_race_condition_ttl
+-    skip "Dalli's set_multi is not available" unless Dalli::Client.method_defined?(:set_multi)
++    skip "MemCacheStore uses Dalli's set_multi from Dalli 4.3.6" if Gem::Version.new(Dalli::VERSION) < Gem::Version.new("4.3.6")
+     cache = lookup_store(namespace: nil)
+ 
+     assert_called_with client(cache), :set_multi, [Hash, 1 + 5.minutes, Hash] do
+-- 
+2.55.0
+
