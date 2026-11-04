@@ -134,7 +134,7 @@ its `keys` (3 calls) still recomputes `row_keys | type_keys | cached_names` with
 materialized set. Which of these carries the instructions was not measured.
 
 So #59141 doesn't recover the a19ef01cb3 step for `update`, and adds cost of its own on the write path while
-making `find` much cheaper. Shared with its author as one comment on #59141 (numbers, A/A, and the R1 shortcut
+making `find` much cheaper. Shared with its author as [one comment on #59141](https://github.com/rails/rails/pull/59141#issuecomment-6637143701) (numbers, A/A, and the R1 shortcut
 as a pointer only).
 
 R1 can open on its own if #59141 closes, or once it merges, if its `keys` still recomputes after a save.
