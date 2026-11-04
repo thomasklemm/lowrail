@@ -637,16 +637,22 @@ request: inertia-rails 3.23.0's prop resolver calls
 (shortened) and [`prop.try(:once?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L285)
 per prop (v3.23.0), so its allocations rise by about 200 objects
 per page on main. Repro: [try_kwargs.rb](../../bench/upstream/app_suites/try_kwargs.rb) (8-1 1 object per
-`try(:name)`, main 2, fix 1; with keywords 3 on all three). Fix: an anonymous `**`, which Ruby 3.4+ doesn't allocate
-for without keywords (3.3 measured unchanged); the block form is chosen again when there are no positional
-arguments, as in 8-1, so `try(key: 1) { }` (`TypeError` on 8-1 and main) now runs the block. Test in `try_test.rb`
-(guarded `RUBY_VERSION >= "3.4"`, as other Active Support tests are) fails on main with 2; `try_test.rb` passes on 4.0.9
-and 3.3.13; Active Support `core_ext` tests identical to main (only missing-`builder` LoadErrors in this bundle);
-RuboCop clean. Per call: 2 → 1 objects, Callgrind 3,362 → 2,835 instructions in the interpreter and 2,293 → 1,897 with
-YJIT (A/A identical). ZJIT micro on Ruby master not run (no master build on this orb).
+`try(:name)`, main 2, fix 1; with keywords 3 on all three). Fix: an anonymous `**`, which avoids materializing the keyword Hash on Ruby 3.4+ when no keywords are passed (no
+allocation improvement on 3.3); only the block form checks for keywords, through a private
+`try_keywords_empty?(**)`, so behaviour is unchanged (`try(key: 1) { }` still raises `TypeError` on `try` and
+`try!`), and the block-only form `try { }` keeps main's count. First version (`1e3539559d`) dropped that check and ran
+the block; Sol asked for identical behaviour. Tests: behaviour, not allocation counts (Sol: brittle across VMs and
+JITs): `try`/`try!` with `**{}`, a positional Hash, keywords, keywords with a block, and keywords alone with a block
+(raises). They pass on 8-1, main and the fix on Ruby 4.0.9 and 3.3.13, and fail on the first version. Edge-case
+differential (`try`/`try!` with no name, keywords only, blocks, Hash receivers): identical to main. Active Support
+`core_ext` tests identical to main (only missing-`builder` LoadErrors in this bundle); RuboCop clean. Callgrind
+instruction counts per `try(:deferred?)` call, not page speedups ([try_micro.rb](../../bench/upstream/app_suites/try_micro.rb):
+200,000 warm-up calls, then (Ir at 200,000 − Ir at 0) / 200,000, Ruby 4.0.9, `--disable-yjit` and
+`--yjit --yjit-call-threshold=1`, two runs each, identical): 3,362 → 2,835 interpreter, 2,293 → 1,894 YJIT; 2 → 1
+objects. ZJIT micro on Ruby master not run (no master build on this orb).
 [patch](../../bench/upstream/app_suites/pi3-try-without-kwargs-hash.patch),
-[body](../../bench/upstream/app_suites/pi3-body.md). Branch `thomasklemm/try-without-kwargs-hash` @ `1e3539559d`
-on main `7a78da5a55`. No review round yet.
+[body](../../bench/upstream/app_suites/pi3-body.md). Branch `thomasklemm/try-without-kwargs-hash` @ `fb8a273532`
+on main `7a78da5a55`. Sol: changes requested, applied.
 
 **inertia-rails 3.23.0 on main:** nothing breaks and it emits no deprecation; its only main-specific effect is PI3.
 

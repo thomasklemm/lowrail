@@ -1,33 +1,33 @@
-From 1e3539559d0a23c1a6b72b22b040828af8bab329 Mon Sep 17 00:00:00 2001
+From fb8a27353222a2ea6ba9533ca8c5bfc9a33de564 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 20:45:13 +0000
 Subject: [PATCH] Don't allocate a keyword Hash in Object#try without keywords
 
 2709a9f16d replaced ruby2_keywords in Object#try and #try! with a named
 **kwargs parameter. A named keyword splat builds a new Hash on every
-call, also when no keywords are passed, so each try(:name) allocates
-one object more than in Rails 8.1.
+call, also when no keywords are passed.
 
-Forward the keywords with an anonymous ** instead, which Ruby 3.4 and
-later don't allocate for when no keywords are passed. The block form is
-again chosen when there are no positional arguments, as in 8.1.
+Forward the keywords with an anonymous ** instead, which avoids
+materializing the keyword Hash on Ruby 3.4 and later when no keywords
+are passed. Only the block form checks for keywords, through a private
+predicate, so try(key: 1) { } still raises as before.
 ---
- .../lib/active_support/core_ext/object/try.rb | 12 ++++++------
- .../test/core_ext/object/try_test.rb          | 19 +++++++++++++++++++
- 2 files changed, 25 insertions(+), 6 deletions(-)
+ .../lib/active_support/core_ext/object/try.rb      | 14 ++++++++------
+ activesupport/test/core_ext/object/try_test.rb     | 12 ++++++++++++
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/activesupport/lib/active_support/core_ext/object/try.rb b/activesupport/lib/active_support/core_ext/object/try.rb
-index b56b0d10c4..084e72dc40 100644
+index b56b0d10c4..28d299110b 100644
 --- a/activesupport/lib/active_support/core_ext/object/try.rb
 +++ b/activesupport/lib/active_support/core_ext/object/try.rb
-@@ -4,27 +4,27 @@
+@@ -4,29 +4,31 @@
  
  module ActiveSupport
    module Tryable # :nodoc:
 -    def try(*args, **kwargs, &block)
 -      if args.empty? && kwargs.empty? && block_given?
 +    def try(*args, **, &block)
-+      if args.empty? && block_given?
++      if args.empty? && block_given? && try_keywords_empty?(**)
          if block.arity == 0
            instance_eval(&block)
          else
@@ -42,7 +42,7 @@ index b56b0d10c4..084e72dc40 100644
 -    def try!(*args, **kwargs, &block)
 -      if args.empty? && kwargs.empty? && block_given?
 +    def try!(*args, **, &block)
-+      if args.empty? && block_given?
++      if args.empty? && block_given? && try_keywords_empty?(**)
          if block.arity == 0
            instance_eval(&block)
          else
@@ -53,42 +53,34 @@ index b56b0d10c4..084e72dc40 100644
 +        public_send(*args, **, &block)
        end
      end
++
++    private def try_keywords_empty?(**kwargs) = kwargs.empty?
    end
+ end
+ 
 diff --git a/activesupport/test/core_ext/object/try_test.rb b/activesupport/test/core_ext/object/try_test.rb
-index 135acdd4be..235af2b8a4 100644
+index 135acdd4be..a644103f84 100644
 --- a/activesupport/test/core_ext/object/try_test.rb
 +++ b/activesupport/test/core_ext/object/try_test.rb
-@@ -36,6 +36,14 @@ def test_valid_method
+@@ -36,6 +36,18 @@ def test_valid_method
      assert_equal 5, @string.try(:size)
    end
  
-+  if RUBY_VERSION >= "3.4"
-+    def test_try_without_keywords_allocates_only_the_argument_array
-+      object = Class.new { def ping = :pong }.new
-+      assert_equal 1, allocations { object.try(:ping) }
-+      assert_equal 1, allocations { object.try!(:ping) }
++  def test_keyword_forwarding
++    object = Class.new { def echo(*args, **kwargs, &block) = [args, kwargs, block&.call] }.new
++
++    [:try, :try!].each do |method|
++      assert_equal [[], {}, nil], object.public_send(method, :echo, **{})
++      assert_equal [[{ a: 1 }], {}, nil], object.public_send(method, :echo, { a: 1 })
++      assert_equal [[], { a: 1 }, nil], object.public_send(method, :echo, a: 1)
++      assert_equal [[], { a: 1 }, :block], object.public_send(method, :echo, a: 1) { :block }
++      assert_raise(TypeError) { object.public_send(method, a: 1) { :block } }
 +    end
 +  end
 +
    def test_argument_forwarding
      assert_equal "Hey", @string.try(:sub, "llo", "y")
    end
-@@ -157,4 +165,15 @@ def private_method
-       Decorator.new(klass.new).try!(:private_method)
-     end
-   end
-+
-+  private
-+    # The second round runs on warm call sites.
-+    def allocations
-+      counts = 2.times.map do
-+        before = GC.stat(:total_allocated_objects)
-+        yield
-+        GC.stat(:total_allocated_objects) - before
-+      end
-+      counts.last
-+    end
- end
 -- 
 2.39.5
 
