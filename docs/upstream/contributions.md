@@ -145,6 +145,25 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+| AR-1: SQLite3 `perform_query` looks up the type map once per result, not once per column | rails/rails | `thomasklemm/sqlite3-result-type-map-once` @ `3fa76e25b4` on main `9b116f1fed` (not pushed; patch in [`bench/upstream/ar_request_paths`](../../bench/upstream/ar_request_paths/ar-1-sqlite3-result-type-map-once.patch)) | `Post.find` (9 columns) instructions −2.2% / −1.8% / −1.6% (interpreter / YJIT / ZJIT, A/A ≤ 0.37%); with `default_timezone` in database.yml −15% / −24% / −23%; 0 objects (51 → 51), or 60 → 52 with `default_timezone`; ruby-bench interpreter shipit −0.44%, railsbench and lobsters −0.14% (A/A ≤ 0.08%), YJIT shipit −0.25%, lobsters −0.19% (A/A ≤ 0.08%), railsbench +0.05% inside its A/A; census 8: all 8 SQLite apps, about 0.02% of instructions ([record](ar-request-paths.md)) | Ready for Thomas: exact (differential on interpreter/YJIT/ZJIT, `test:sqlite3` green), L0–L1, primary and adversarial subagent reviews clean, body reviewed ([body](ar-request-paths.md#pr-body-draft-reviewed)). Lib +1. |
+
+### Erklärung für Thomas: AR-1 (2026-11-04, nicht geöffnet)
+
+Aufzeichnung und PR-Text: [ar-request-paths](ar-request-paths.md).
+
+**AR-1, SQLite3: Type Map einmal pro Ergebnis.** Wenn der SQLite3-Adapter ein Abfrageergebnis baut, sucht er für
+jede Spalte den Typ in der Type Map; die holt er sich über die Methode `type_map`, die jedes Mal prüft, ob in der
+Datenbank-Config eine eigene `default_timezone` steht, und dann die Konstante liest (mit Zeitzone in der Config
+sogar einen Hash baut und in einem `Concurrent::Map` nachschlägt). Das passierte für jede Spalte neu, obwohl immer
+dieselbe Map herauskommt; jetzt wird sie einmal pro Ergebnis geholt. `Post.find` wird so etwa 2% billiger
+(mit Zeitzone in `database.yml` 15–24%); anders sieht es nur ein Override von `type_map`, der seine eigenen
+Aufrufe zählt.
+
+```ruby
+stmt.types.map { |t| type_map.lookup(t) }   # vorher: type_map bei jeder Spalte
+type_map = type_map()                        # jetzt: einmal pro Ergebnis
+stmt.types.map { |t| type_map.lookup(t) }
+```
 
 ### Erklärungen für Thomas: K1 und N1 (2026-11-04, Gems; geöffnet als rack/rack#2550 und sparklemotion/nokogiri#3759)
 
