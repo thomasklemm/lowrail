@@ -407,14 +407,19 @@ overrides are used through `find` and `find_all`. On main the `Resolver` subclas
 (decided 2026-11-04 under the restore rule: unreleased, several callers, small): `Resolver#find_all` calls
 `_find_all` again, its private default calls `find_templates`, and `Resolver#find` still goes through `find_all`, so
 an override of either is honored. `FileSystemResolver` is unchanged: its own optimized `find`/`find_all` never reach
-`_find_all`, so godmin's and rbexy's overrides stay uncovered, and the body says so. Two tests in
-`view_paths_test.rb`: a subclass overriding `_find_all` (fails on main with `NotImplementedError`) and one
-implementing `find_templates`, each rendering through a controller (`PathSet#find`) and `PathSet#find_all`. Action
-View suite 3370 runs green, RuboCop clean. With the restore in the main tree and without the app shim, Chatwoot's 9
+`_find_all`, so godmin's and rbexy's overrides stay uncovered; honoring them there would need a check on every
+`find`, which would undo #58279's fast path, and the body says so. Tests in `view_paths_test.rb`: a subclass
+overriding `_find_all` (fails on main with `NotImplementedError`), Chatwoot's shape (public `find_all` calling the
+inherited `_find_all`, with `find_templates`; fails on main with `NoMethodError`) and one implementing only
+`find_templates`, each rendering through a controller (`PathSet#find`) and `PathSet#find_all`; plus a resolver-level
+check that `find` and `find_all` pass all six arguments to `_find_all` unchanged (`details`, `key` and `locals` by
+identity; fails on main). Action View suite 3372 runs green, RuboCop clean. With the restore in the main tree and without the app shim, Chatwoot's 9
 affected spec files run 132 examples with 3 failures, the confirmation mailer ones that fail on 8-1 too.
 [patch](../../bench/upstream/app_suites/cw2-resolver-find-all-hook.patch),
-[body](../../bench/upstream/app_suites/cw2-body.md). Branch `thomasklemm/resolver-find-all-hook` @ `e910df6df3` on
-main `7a78da5a55`. No review round yet.
+[body](../../bench/upstream/app_suites/cw2-body.md). Branch `thomasklemm/resolver-find-all-hook` @ `0d3ef774bd` on
+main `7a78da5a55`. Sol: open with nits; applied (Chatwoot-shape and argument tests, body wording: bypassed overrides
+vs. Chatwoot's missing inherited method, methods named, the fast-path reason); amended and force-pushed with lease
+from `e910df6df3`.
 
 **CW3 (b): `precision: nil` datetime columns cast to microseconds in memory** (as in Mastodon): 2 failures, the widget
 and public `update_last_seen` specs expect `UpdateMessageStatusJob.perform_later` with a nanosecond `Time` on
