@@ -1,0 +1,83 @@
+From 0cd841c0c16340b573a4b551af69f4b756c97648 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:14:29 +0000
+Subject: [PATCH] Cast grouped keys of columns unknown to the schema from the
+ result
+
+A grouped calculation took each key's type from the group column first.
+For a column of a joined subquery, a CTE or another table the schema
+doesn't know, that type is the placeholder default type, which casts
+nothing, so the keys came back as Strings instead of with the type the
+database reports for the result.
+
+Use the result's column type in that case. Columns of known tables,
+including joined models that share column names with the root model,
+keep their schema type.
+---
+ activerecord/CHANGELOG.md                        | 16 ++++++++++++++++
+ .../lib/active_record/relation/calculations.rb   |  4 +++-
+ activerecord/test/cases/calculations_test.rb     |  9 +++++++++
+ 3 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 4ad8bfd285..01a59719d3 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,19 @@
++*   Fix grouped calculations returning uncast keys for a column unknown to the schema.
++
++    Grouping by a column of a joined subquery, a CTE or another table the
++    schema doesn't know casts the keys with the column types the database
++    reports for the result again, as before Rails 7.0.5. On PostgreSQL and
++    SQLite such keys are no longer Strings for dates, times, ranges and other
++    non-string types.
++
++    ```ruby
++    Booking.joins("JOIN (SELECT tsrange(...) AS range) ranges ON TRUE").group("ranges.range").count
++    # => { "[\"2020-01-01 00:00:00\",\"2020-01-02 00:00:00\")" => 1 } before
++    # => { 2020-01-01 00:00:00 UTC...2020-01-02 00:00:00 UTC => 1 } now (PostgreSQL)
++    ```
++
++    *Thomas Klemm*
++
+ *   Retry `ActiveRecord::SerializationFailure` on queries that opted into retries.
+ 
+     A serialization failure rolls back whatever the statement was part of, so a
+diff --git a/activerecord/lib/active_record/relation/calculations.rb b/activerecord/lib/active_record/relation/calculations.rb
+index 91900066ea..688114cc2c 100644
+--- a/activerecord/lib/active_record/relation/calculations.rb
++++ b/activerecord/lib/active_record/relation/calculations.rb
+@@ -584,7 +584,9 @@ def execute_grouped_calculation(operation, column_name, distinct) # :nodoc:
+             end
+ 
+             key_types = group_columns.each_with_object({}) do |(aliaz, col_name), types|
+-              types[aliaz] = col_name.try(:type_caster) ||
++              type = col_name.try(:type_caster)
++              type = calculated_data.column_types.fetch(aliaz, type) if type.equal?(Type.default_value)
++              types[aliaz] = type ||
+                 type_for(col_name) do
+                   calculated_data.column_types.fetch(aliaz, Type.default_value)
+                 end
+diff --git a/activerecord/test/cases/calculations_test.rb b/activerecord/test/cases/calculations_test.rb
+index e24cb7f88e..349a5e6e3e 100644
+--- a/activerecord/test/cases/calculations_test.rb
++++ b/activerecord/test/cases/calculations_test.rb
+@@ -825,6 +825,15 @@ def test_should_count_field_in_joined_table_with_group_by_when_tables_share_colu
+     assert_equal({ "active" => 2, "trial" => 2, "suspended" => 1 }, counts)
+   end
+ 
++  def test_should_cast_group_by_keys_of_a_column_unknown_to_the_schema_from_the_result
++    counts = Account
++      .joins("JOIN (SELECT tsrange(timestamp '2020-01-01', timestamp '2020-01-02') AS status) periods ON TRUE")
++      .group("periods.status")
++      .count
++
++    assert_equal({ Time.utc(2020, 1, 1)...Time.utc(2020, 1, 2) => Account.count }, counts)
++  end if current_adapter?(:PostgreSQLAdapter)
++
+   def test_should_count_field_of_root_table_with_conflicting_group_by_column
+     expected = { 1 => 2, 2 => 1, 4 => 5, 5 => 3, 7 => 1 }
+     assert_equal expected, Post.joins(:comments).group(:post_id).count
+-- 
+2.55.0
+
