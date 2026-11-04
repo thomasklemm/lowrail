@@ -144,7 +144,35 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | Candidate | Repo | Branch @ SHA | Effect | Status |
 | --- | --- | --- | --- | --- |
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
+| T1 (C10): `append_tag_option` checks for a String value first | rails/rails | [`thomasklemm/tag-option-string-first`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-option-string-first) @ `f02e21ddbb` on main `9b116f1fed` | per String attribute about −870 Ir interpreted, −200 YJIT, −150–200 ZJIT (`tag.input` with three: −6.2% / −2.2% / −2.0% Ir, −4.7% / −2.4% time; A/A ≤ 0.24% Ir, ≤ 0.5% time); non-String values +1 check (Symbol +1.2% interpreted); 90–98% of attribute values are Strings in 5 apps, about 0.1% of a Fizzy or Lobsters page; railsbench within noise ([record](actionview-render-c10.md#t1-check-for-string-attribute-values-first)) | Ready, held for Thomas. L1; primary approve / approve, adversarial approve (accepted: global `===` redefinitions, a `String` constant planted in `ActionView::Helpers`); body reviewed. Open first of the two. |
+| T2 (C10): `append_tag_option` joins Array values without `safe_join` | rails/rails | [`thomasklemm/tag-option-array-join`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-option-array-join) @ `6181372aa1` on main `9b116f1fed` | `class: [a, b]` 13 → 11 objects, −10.2% / −11.1% / −9.6% Ir, −10.4% / −13.5% time (A/A ≤ 0.13% Ir, ≤ 1.1% time); narrow in apps (Lobsters ~50 per home page, others < 1 per request); railsbench has none ([record](actionview-render-c10.md#t2-join-array-tag-attribute-values-without-a-safebuffer)) | Ready, held for Thomas. L1; primary approve / approve-with-nits (applied), adversarial approve (accepted: `safe_join` overrides and `unwrapped_html_escape` overrides no longer see Array values or the separator); body reviewed. Weaker breadth than T1. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+
+### Erklärungen für Thomas: T1 und T2 (2026-11-04, Action View; nicht geöffnet)
+
+Aufzeichnung und PR-Texte: [actionview-render-c10](actionview-render-c10.md#pr-bodies-reviewed-drafts).
+
+**T1, String-Attribute zuerst.** Jedes Attribut, das `tag.*`, `content_tag`, `link_to` oder ein Formular-Helper
+schreibt, läuft durch `append_tag_option`, und dessen `case` prüfte jeden Wert erst gegen Array, Hash, Regexp und
+Symbol, bevor ein String im `else` landete; in den Apps sind aber 90–98 % der Werte Strings. Ein `when String` ganz
+vorne mit genau dem Code aus `else` spart drei Klassenprüfungen pro String-Attribut; ein String kann keine der
+anderen Klassen sein, deshalb wird alles genau wie vorher escaped, nur Nicht-Strings zahlen eine Prüfung mehr.
+
+```ruby
+case "card"                       # vorher: Array? Hash? Regexp? Symbol? dann else
+when String then escape("card")   # jetzt: sofort hier, gleicher Code wie else
+```
+
+**T2, Array-Attribute ohne SafeBuffer.** Bei `class: ["btn", "active"]` rief Rails `safe_join` auf, das den
+zusammengefügten String in einen neuen SafeBuffer packt, und hängte ihn dann an einen normalen String an, wo das
+„html_safe" keine Rolle spielt. Jetzt werden die Werte direkt escaped und mit Leerzeichen verbunden, wie es
+`token_list` in derselben Datei schon tut; nur wer `safe_join` in seiner View überschreibt, sieht diese Werte nicht
+mehr.
+
+```ruby
+view.safe_join(["btn", "<x>"], " ")                               # vorher: SafeBuffer, sofort weggeworfen
+["btn", "<x>"].flatten.map! { ERB::Util.unwrapped_html_escape(_1) }.join(" ")  # jetzt: derselbe Text, ein String
+```
 
 ### Erklärungen für Thomas: K1 und N1 (2026-11-04, Gems; geöffnet als rack/rack#2550 und sparklemotion/nokogiri#3759)
 
@@ -497,6 +525,7 @@ None.
 
 ## Investigated, not submitted
 
+- **SafeBuffer.new lead (C10, 2026-11-04): recorded, no ruby/ruby PR or issue.** `new` on a String subclass misses `opt_new` because `String` has its own singleton `new`; `SafeBuffer.new` (every `html_safe`) costs 73–86 ns more per call than with the fast path (interpreter / YJIT 4.0.9, interpreter / ZJIT master). HTML pages make 43–698 per page in 4 of 5 apps (Campfire's cached pages none), 0.1–0.3% of an HTML page with YJIT. Avoidable SafeBuffers in Rails are small (already-safe re-wraps 0.8–4 per op; #17250 rejected returning `self`), except `append_tag_option`'s `safe_join`, which became T2 ([record](actionview-render-c10.md#lead-safebuffernew-misses-the-opt_new-fast-path)).
 - **R7-2, `Symbol#name` for `Hash#as_json` keys (2026-11-03): not opened.** On 4.0.9 a direct `as_json` with 4 Symbol keys runs −15.9% / −30.9% Ir (interpreter / YJIT), but on Ruby master `Symbol#to_s` already costs what `Symbol#name` does, so the added type check is pure overhead: +12.5% interpreter, +3.2% ZJIT (A/A ≤ 0.12%). Every exact spelling loses on the master interpreter. It would trade a 4.0 gain for a permanent 4.1 loss, and ruby-bench never reaches it. Branch `thomasklemm/hash-as-json-symbol-names` kept ([opening pass](rails-r7-queue.md#opening-pass-2026-11-03-neither-r7-2-nor-r7-1-opens)).
 - **R7-1, nested tag values without intermediate Arrays (2026-11-03): not opened.** L2 (two new helpers, one needing a comment) with no measurable app or ruby-bench effect: `build_tag_values` runs 0 times per request in railsbench and lobsters and 1.32 in shipit (~0.001% of a request). Branch `thomasklemm/tag-values-without-copies` kept.
 
