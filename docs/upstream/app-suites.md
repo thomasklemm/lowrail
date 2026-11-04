@@ -270,7 +270,7 @@ through `get_oid_type`, the same change. On main `7a78da5a55` its `quoting.rb` h
 unchanged. With it: our `ltree_test.rb` test passes (ltree, citext, hstore and enum tests 83 runs, 0 F); the repro
 creates ltree[], citext[] and hstore[] columns with defaults (`{a.b}`, `{A}`, the hstore literal); Forem's
 `db:schema:load` loads all 135 tables, with `target_geolocations` defaulting to `'{}'::ltree[]`. Our branch stays
-unopened; the body carries Sol's nits in case it is ever needed on its own. Pointed out on #57785 with Thomas's approval on 2026-11-04 ([comment](https://github.com/rails/rails/pull/57785#issuecomment-6641269976)).
+unopened; the body carries Sol's nits in case it is ever needed on its own. Pointed out on #57785 with Thomas's approval on 2026-11-04 ([comment](https://github.com/rails/rails/pull/57785#issuecomment-6641269976)). Also noted on the causing PR #57013 with a pointer to #57785, with Thomas's approval ([comment](https://github.com/rails/rails/pull/57013#issuecomment-6641636728)).
 
 **FO1 (c): flipper-active_record 1.4.2 passes the table name positionally.** [`::Arel::Table.new(@feature_class.table_name.to_sym)`](https://github.com/flippercloud/flipper/blob/50a8207ada6c93fd4c29bcee683660b7351647a7/lib/flipper/adapters/active_record.rb#L106)
 (v1.4.2) raises `wrong number of arguments` since b1650993b0 (#57829, `Arel::Table` is `:nodoc:`). 163 failures,
