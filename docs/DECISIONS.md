@@ -105,6 +105,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   sentence of ruby-bench placement ("within noise" is fine) and app breadth; one sentence on how the site was
   found, linking the census doc in the public Lowrail repo (Lowrail named as my research project; Roundhouse not
   mentioned). No per-app tables, review history or receipts.
+* **ZJIT evidence in the tools' own format** (k0kubun on ruby/ruby#19680, 2026-11-04): raw `run_benchmarks.rb`
+  output and a ZJIT stats diff in diff format, leaving out diffs within noise; not tables of percentages.
 * **ruby/ruby body:** about 100 words plus one micro table, with the ruby-bench headline effect or the
   correctness repro.
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
