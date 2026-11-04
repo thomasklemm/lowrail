@@ -1,6 +1,18 @@
 # Keyword splat after dynamic keywords (ruby/ruby#19670)
 
-Patches for review. Neither one is pushed to the PR.
+Status, 2026-11-04: Thomas pushed `9fd1f6f25d` to the PR. The PR branch
+`thomasklemm/kwsplat-fit-merge` moved from `eb01818c3d` to `9fd1f6f25d`, and
+the PR body was rewritten to match the commit message.
+
+Two items stay out of this PR:
+- **Follow-up fix:** prism zsuper with `**kwrest` still allocates one object
+  more than 4.0. The fix is one token, `id_core_hash_merge_bang_ptr` instead of
+  `id_core_hash_merge_ptr`, because the receiver is a fresh `kwrest.dup`.
+- **Lead:** `X = {**H, a: v}` under
+  `shareable_constant_value: experimental_everything` raises "undefined method
+  'core#hash_merge_ptr'" on 4.0.7 and master. The shareable `PM_ASSOC_NODE`
+  branch compiles into `ret` instead of `anchor` (prism_compile.c, around
+  line 1588).
 
 - [9fd1f6f25d.patch](9fd1f6f25d.patch) replaces the PR head `eb01818c3d`. It
   is a single commit on ruby/ruby master `6756292b31` and is also on the fork
