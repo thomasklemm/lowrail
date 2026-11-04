@@ -134,7 +134,7 @@ its `keys` (3 calls) still recomputes `row_keys | type_keys | cached_names` with
 materialized set. Which of these carries the instructions was not measured.
 
 So on the write path #59141 adds about 6% instead of recovering the a19ef01cb3 step; `find` gets 14% cheaper.
-A comment with these numbers was posted on #59141 at 17:16 UTC and deleted at 17:40 UTC, unanswered, because it was
+A comment with these numbers was posted on #59141 at 17:16 UTC and deleted unanswered shortly after, because it was
 too long.
 
 R1 can open on its own if #59141 closes, or once it merges, if its `keys` still recomputes after a save.
