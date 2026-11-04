@@ -283,7 +283,7 @@ raises where `1 <=> Float::NAN`, `Rational(1) <=> Float::NAN` and `Time.now <=> 
 special-casing the readability gate rejects, for a cause that is not in Rails. Not deliberate in ruby/date
 either: its documentation for `<=>` says it returns `nil` when the two are incomparable.
 
-**Ruby side (for Thomas; unfiled, new ruby/date issues and PRs need his OK):** call it **Ruby 3**. A one-line
+**Ruby side:** call it **Ruby 3**; opened as [ruby/date#199](https://github.com/ruby/date/pull/199) on 2026-11-04, with a test for both NaNs (the suite passes on 4.0.9 and master; the new test fails without the change). A one-line
 change in `cmp_gen` returns `ajd <=> other` as is instead of forcing it through `rb_cmpint`
 ([patch](../../fixtures/corpus/rails-82-diff/patches/ruby-date-cmp-gen-nan.diff)). With it, `Date <=> NaN` is `nil`,
 `Date == NaN` is `false`, `Date < NaN` raises `comparison of Date with NaN failed` as Comparable does for

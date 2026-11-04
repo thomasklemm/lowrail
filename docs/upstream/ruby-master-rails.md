@@ -153,4 +153,40 @@ form's CSRF token, and the digested stylesheet. Done twice per Ruby from fresh a
   master ([repro](../../fixtures/corpus/ruby-master-rails/bundle_exec_dash_r_default_gem.sh)). Rails main locks json
   3.0.1, so `bundle exec ruby -rjson …` fails in Rails' own checkout on master. This is a stronger argument for the
   issue than the rainbow example: every project that locks a default gem at a version other than the one Ruby
-  ships is affected. Not filed; Thomas decides.
+  ships is affected. The ticket text for Thomas is [below](#ticket-draft-bundle-exec-ruby--rgem-activates-the-default-gem-instead-of-the-locked-version).
+
+## Ticket draft: `bundle exec ruby -rGEM` activates the default gem instead of the locked version
+
+For Thomas to post on bugs.ruby-lang.org (tracker: Bug, project: Ruby). Not posted anywhere. Checked on master
+`5888302d4f` and 4.0.9; the cause was confirmed by switching the condition off with `--disable-*` flags (below).
+
+**Title:** `bundle exec ruby -rGEM` loads the default gem instead of the version in Gemfile.lock
+
+````markdown
+`bundle exec ruby -rjson` on master loads the default json gem even when Gemfile.lock locks another version, and then fails with `Gem::LoadError`. Ruby 4.0 loads the locked version.
+
+```sh
+mkdir repro && cd repro
+printf 'source "https://rubygems.org"\ngem "json", "3.0.1"\n' > Gemfile
+BUNDLE_PATH=b bundle install --quiet
+GEM_HOME=empty GEM_PATH=empty BUNDLE_PATH=b bundle exec ruby -rjson -e 'puts JSON::VERSION'
+```
+
+Ruby 4.0.9 (default json 2.18.0) prints `3.0.1`. Master (ruby 4.1.0dev 2026-11-04 5888302d4f, default json 3.1.0, Bundler 4.1.0.beta3) raises:
+
+```
+bundler/runtime.rb:395:in 'Bundler::Runtime#check_for_activated_spec!': You have already activated json 3.1.0, but your Gemfile requires json 3.0.1. Since json is a default gem, you can either remove your dependency on it or try updating to a newer version of bundler that supports json as a default gem. (Gem::LoadError)
+```
+
+The empty `GEM_HOME` and `GEM_PATH` only show that no other installed copy is involved. With a non-default gem, the newest installed version is activated instead of the locked one. `require "json"` inside `-e` loads 3.0.1 as expected.
+
+Since Bug #19089 (Ruby 3.3), `bundle exec` sets `BUNDLER_SETUP` and `lib/rubygems.rb` requires it at the end of loading RubyGems, so Bundler is set up before anything else is loaded. c3c0e280d0 (Bug #22123) makes `gem_prelude.rb` delete `BUNDLER_SETUP` while RubyGems loads whenever error_highlight, did_you_mean and syntax_suggest are autoloaded, which they are by default since cadf8e7933 (Feature #21951). Its comment says `RUBYOPT=-rbundler/setup` sets Bundler up after the boot sequence. But a `-r` on the command line runs before the `-r` options from `RUBYOPT`, so `-rjson` resolves without the lockfile. With `--disable-error_highlight --disable-did_you_mean --disable-syntax_suggest`, the condition is false and master prints `3.0.1` again.
+
+ruby/ruby#18400 changed the `bundle exec -r` spec to load `bundler/setup` explicitly, so the test suite no longer covers this case.
+
+Could the early setup be kept in the main box, and skipped only outside it as Bug #22123 needs? Any `bundle exec ruby -r…` is affected, for example in a project that locks json 3.0.1, as Rails main does.
+
+---
+
+Found by running the Rails framework test suites on Ruby master next to Ruby 4.0.9 ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ruby-master-rails.md#the-three-problems-found-earlier-today-on-this-build), part of my research project Lowrail).
+````

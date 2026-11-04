@@ -2,7 +2,7 @@
 # Ruby master: `bundle exec ruby -rGEM` loads GEM before bundler/setup, so it
 # activates whatever version is installed globally instead of the locked one.
 # Ruby 4.0 set Bundler up while RubyGems loaded (Feature #19089); since
-# c3c0e280d0 / cadf8e79a6 (Feature #21951) gem_prelude.rb skips that whenever
+# c3c0e280d0 / cadf8e7933 (Feature #21951) gem_prelude.rb skips that whenever
 # error_highlight & co. are autoloaded, and RUBYOPT's -rbundler/setup runs after
 # command-line -r. ruby/ruby#18400 changed the spec for this instead.
 #   usage: bundle_exec_dash_r.sh RUBY_BIN_DIR   (needs rainbow 3.x installed globally)
