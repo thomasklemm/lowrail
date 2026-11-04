@@ -315,8 +315,9 @@ session is read as noise, and the body says so.
 
 The full PR body, after a separate reviewer checked it against this doc and the raw runs (8 findings, all
 applied: the scripts link needs this branch on main, the YJIT time wording, the URL Ir explanation, the census
-scope), is [pr-body.md](data/rails-main-census-8/c8-1-pr/pr-body.md). Not posted yet: the Rails PR template asks
-contributors not to open draft PRs, and Thomas asked for a draft, so that waits for his choice.
+scope), is [pr-body.md](data/rails-main-census-8/c8-1-pr/pr-body.md). Opened unchanged on 2026-11-04, ready for review
+(the Rails PR template asks for no drafts), as [rails/rails#59598](https://github.com/rails/rails/pull/59598) from
+`8d9d843428`, after Thomas read it; main `6782df4a5e` had not touched the file and the branch merged cleanly.
 
 **Overlap search (again, 2026-11-03):** `gh search prs --repo rails/rails` for `URI_REGEXP`, `asset_path regexp`,
 `asset_url_helper` (open), `asset_path` (by update), `regexp anchor alternation`, `anchor regexp alternatives`,
