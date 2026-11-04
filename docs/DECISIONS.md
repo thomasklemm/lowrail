@@ -211,6 +211,18 @@ ruby-bench. L3: a duplicated method, a Ruby-version branch, index loops, or code
 ruby/ruby additionally needs a measurable ruby-bench effect or a correctness repro (#19488 and #19625 were closed
 for lacking one).
 
+Readability checks added 2026-11-04 (Thomas: "always watch for readable code"), after #59608's first shape
+reassigned a variable inside an `unless`:
+
+* **Cold read.** A reviewer who hasn't seen the change states in one sentence what each branch does and why each
+  condition is there. If that takes a second try, rewrite before opening.
+* **Shape checklist.** Each case gets its own branch, with no reassignment inside a conditional modifier and no
+  ternary longer than one short line. Sentinel or identity checks (`equal?`, placeholder values) get a one-line
+  comment saying why. No new name used only once. The diff reads like the surrounding code.
+* **Numbers as a signal, not a gate.** Record the change in `flog` score and RuboCop `Metrics/*` (ABC size,
+  cyclomatic and perceived complexity) for each touched method, before and after. A rise needs a sentence of
+  justification in the review. These numbers miss shape problems, so they never replace the cold read.
+
 ### Primary review
 
 Before the queue, every candidate passes an independent Thermos review on both rubrics (correctness,
