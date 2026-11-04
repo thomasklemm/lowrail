@@ -401,10 +401,9 @@ one click.
 * **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
   unreleased.
 
-## No unsolicited comments on others' PRs (Thomas, 2026-11-04)
+## No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
 
-We don't comment on other people's open PRs, especially maintainers' work in progress, with our own measurements,
-reviews or suggestions unless they ask for it or the PR breaks something real that we can show (a failing test, a
-crash, a wrong result). Performance observations about someone else's PR stay in our records. A comment on
-rails/rails#59141 with benchmark numbers was deleted for this reason. Replies on our own PRs and issues are
-unaffected.
+We don't comment on other people's PRs or issues (measurements, reviews, suggestions, thanks) unless Thomas has
+explicitly approved that specific comment. Their PR description is theirs; what we measure about their work stays in
+our records. Orbs draft at most, and ask the coordinator, who asks Thomas. A benchmark comment on rails/rails#59141
+was deleted for this reason. Replies on our own PRs and issues are unaffected.
