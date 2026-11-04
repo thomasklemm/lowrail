@@ -88,6 +88,10 @@ module RailsCensus
       Sidekiq::Job.clear_all if ENV["CENSUS_SIDEKIQ_FAKE"] == "1"
     end
 
+    # CENSUS_SET=background: the background census's workloads
+    # (background_workloads.rb) instead of the request workloads.
+    def background? = ENV["CENSUS_SET"] == "background"
+
     # Native Sidekiq jobs a block pushes, as [class, args] payloads.
     def sidekiq_jobs_from
       reset_side_effects
@@ -102,6 +106,10 @@ module RailsCensus
     end
 
     def workloads(name)
+      if background?
+        load File.join(__dir__, "background_workloads.rb")
+        return BackgroundWorkloads.public_send(copy_of(name).tr("-", "_"), self)
+      end
       load File.join(__dir__, "../census_4_workloads.rb")
       load File.join(__dir__, "pg_workloads.rb")
       load File.join(__dir__, "inertia_chatwoot_workloads.rb")

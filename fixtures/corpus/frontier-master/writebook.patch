@@ -24,7 +24,7 @@ index 220beec..9bd07fe 100644
 +
 +gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 +
-+gem "nokogiri", "= 1.19.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 diff --git a/Gemfile.lock b/Gemfile.lock
 index b1b1333..fd6dfea 100644
 --- a/Gemfile.lock
@@ -44,7 +44,8 @@ index b1b1333..fd6dfea 100644
        concurrent-ruby (~> 1.0)
      image_processing (1.13.0)
 @@ -212,16 +207,6 @@ GEM
-     nokogiri (1.19.4)
+-    nokogiri (1.19.4)
++    nokogiri (1.19.7)
        mini_portile2 (~> 2.8.2)
        racc (~> 1.4)
 -    nokogiri (1.19.4-aarch64-linux-gnu)
@@ -92,7 +93,7 @@ index b1b1333..fd6dfea 100644
    image_processing (~> 1.13)
    importmap-rails
    jbuilder
-+  nokogiri (= 1.19.4)
++  nokogiri (= 1.19.7)
    propshaft
    puma (~> 7.2, >= 7.2.1)
    rails!

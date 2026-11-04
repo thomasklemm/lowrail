@@ -29,7 +29,7 @@ index ea59330..5f783fb 100644
 +
 +gem "herb", "= 0.11.1", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 +
-+gem "nokogiri", "= 1.19.4", force_ruby_platform: true # ruby41-watch: no 4.1 binary
++gem "nokogiri", "= 1.19.7", force_ruby_platform: true # ruby41-watch: no 4.1 binary
 diff --git a/Gemfile.lock b/Gemfile.lock
 index adf4d88..8f50bcd 100644
 --- a/Gemfile.lock
@@ -93,7 +93,7 @@ index adf4d88..8f50bcd 100644
 -    nokogiri (1.19.4-x86_64-linux-gnu)
 -      racc (~> 1.4)
 -    nokogiri (1.19.4-x86_64-linux-musl)
-+    nokogiri (1.19.4)
++    nokogiri (1.19.7)
 +      mini_portile2 (~> 2.8.2)
        racc (~> 1.4)
      openssl (4.0.0)
@@ -129,7 +129,7 @@ index adf4d88..8f50bcd 100644
    mittens
    mocha
    net-http-persistent
-+  nokogiri (= 1.19.4)
++  nokogiri (= 1.19.7)
    platform_agent
    propshaft
    puma (~> 8.0)
@@ -190,7 +190,7 @@ index adf4d88..8f50bcd 100644
 -  nokogiri (1.19.4-x86_64-darwin) sha256=7fd17057d3e1f00e9954a74b3cd76595d3d4a5ef233b7ed9599047c204f70551
 -  nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
 -  nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
-+  nokogiri (1.19.4) sha256=50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5
++  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
    openssl (4.0.0) sha256=185711ed93d4e9c9a9db6efea7edb202dfe04f7d3692fbab988e3d84e498ee91
    ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
    parallel (1.27.0) sha256=4ac151e1806b755fb4e2dc2332cbf0e54f2e24ba821ff2d3dcf86bf6dc4ae130

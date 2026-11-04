@@ -1,0 +1,33 @@
+From efbf8cdbcd6eaa1499924b727b10557cb9023d4e Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 13:06:17 +0000
+Subject: [PATCH] Read the blob filename's extension once when choosing a
+ variant format
+
+Representable#format built and sanitized the blob's Filename three times
+to compare and return the same extension. It runs for every variant of a
+web image, since default_variant_transformations is merged into each
+variation.
+---
+ .../app/models/active_storage/blob/representable.rb          | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/activestorage/app/models/active_storage/blob/representable.rb b/activestorage/app/models/active_storage/blob/representable.rb
+index bdd1b243a5..e221205431 100644
+--- a/activestorage/app/models/active_storage/blob/representable.rb
++++ b/activestorage/app/models/active_storage/blob/representable.rb
+@@ -180,8 +180,9 @@ def default_variant_format
+     end
+ 
+     def format
+-      if filename.extension.present? && Marcel::MimeType.for(extension: filename.extension) == content_type
+-        filename.extension
++      extension = filename.extension
++      if extension.present? && Marcel::MimeType.for(extension: extension) == content_type
++        extension
+       else
+         Marcel::Magic.new(content_type.to_s).extensions.first
+       end
+-- 
+2.55.0
+
