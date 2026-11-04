@@ -39,11 +39,11 @@ only): insert before `ActionDispatch::Static`.
 `ActionView::Helpers::UrlHelper` loses `link_to`. Redmine's `Redmine::Hook::ViewListener` does, so 3
 `Redmine::Hook::ManagerTest` tests fail with `undefined method 'link_to'`, and so does every plugin hook that builds
 links. GitHub code search shows about 2.6k hits for `include ActionView::Helpers::UrlHelper`. Swapping the include
-works on main ([check](../../bench/upstream/app_suites/navhelper.rb)), but `NavigationHelper` doesn't exist on 8-1.
+works on main ([check](../../bench/upstream/app_suites/navhelper.rb)), but `NavigationHelper` doesn't exist on 8-1; keeping `UrlHelper` and adding `include NavigationHelper if defined?(…)` works on both ([check](../../bench/upstream/app_suites/navhelper_compat.rb)).
 No compat code; docs-only note:
 [patch](../../bench/upstream/app_suites/s2-upgrade-guide-navigation-helper.patch),
 [body](../../bench/upstream/app_suites/s2-body.md). Branch `thomasklemm/upgrade-guide-navigation-helper` @
-`fcf2a1957a` on main `8b06b0eb98`; S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
+`3db35ffc1c` on main `8b06b0eb98`; S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
 
 **L1 (c): rspec-rails 8.0.x mutates the frozen `default_url_options`.** baa1ca5f2f (#58483) freezes the
 controller-level `default_url_options` (no CHANGELOG entry). rspec-rails' `FeatureExampleGroup` does

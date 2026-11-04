@@ -12,6 +12,6 @@ LinkPresenter.new.link_to("Issues", "/issues")
 
 Redmine's view hook listeners hit this. Its plugins build links that way through `Redmine::Hook::ViewListener`.
 
-This adds a section to "Upgrading from Rails 8.1 to Rails 8.2". Because `NavigationHelper` includes `UrlHelper`, including `NavigationHelper` instead is all an app needs. The section also notes that code supporting earlier Rails versions should keep `UrlHelper` there, since `NavigationHelper` doesn't exist before 8.2.
+This adds a section to "Upgrading from Rails 8.1 to Rails 8.2". Because `NavigationHelper` includes `UrlHelper`, including `NavigationHelper` instead is all an app needs. Code that also supports earlier versions can keep `UrlHelper` and include `NavigationHelper` only where it's defined; the section shows that form too.
 
 Docs only.

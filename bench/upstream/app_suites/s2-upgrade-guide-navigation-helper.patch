@@ -1,18 +1,18 @@
-From fcf2a1957a2102bb195bbf14ea0c6769ad4573f8 Mon Sep 17 00:00:00 2001
+From 3db35ffc1cee827601dc892006c09ec8c88b56d0 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 16:07:55 +0000
 Subject: [PATCH] Note in the upgrade guide that link_to and button_to moved to
  NavigationHelper
 
 ---
- guides/source/upgrading_ruby_on_rails.md | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ guides/source/upgrading_ruby_on_rails.md | 32 ++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
-index 697bd23e7d..4378cae870 100644
+index 697bd23e7d..bd3fdf2136 100644
 --- a/guides/source/upgrading_ruby_on_rails.md
 +++ b/guides/source/upgrading_ruby_on_rails.md
-@@ -97,6 +97,30 @@ Rails.application.config.action_view.erb_implementation = :erubi
+@@ -97,6 +97,38 @@ Rails.application.config.action_view.erb_implementation = :erubi
  
  Applications with a custom ERB implementation should set it through `config.action_view.erb_implementation`, since the framework default replaces an `ActionView::Base.erb_implementation` assignment made in an initializer.
  
@@ -37,8 +37,16 @@ index 697bd23e7d..4378cae870 100644
 +end
 +```
 +
-+`NavigationHelper` doesn't exist before Rails 8.2, so code that also supports
-+earlier versions should keep including `UrlHelper` there.
++`NavigationHelper` doesn't exist before Rails 8.2. Code that also supports
++earlier versions can keep including `UrlHelper` and include `NavigationHelper`
++only where it's defined:
++
++```ruby
++class LinkPresenter
++  include ActionView::Helpers::UrlHelper
++  include ActionView::Helpers::NavigationHelper if defined?(ActionView::Helpers::NavigationHelper)
++end
++```
 +
  ### `:controller` and `:action` may no longer be used as dynamic route segments
  
