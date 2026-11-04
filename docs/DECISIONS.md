@@ -346,3 +346,23 @@ The incidents behind the rules above, kept so the rules keep their reasons:
 * S1, C7-1, I2 and C1 each needed three to five review rounds for the same classes of difference → exactness
   checklist.
 * Several limits were set and changed within one day → one cap per repo, named exceptions, recorded here.
+
+## Orb time (Thomas, 2026-11-04)
+
+Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8
+$0.33, large 8/16 $0.66, xxlarge 16/32 $1.32). A paused orb costs nothing; an orb pauses 5 minutes after its agent
+finishes (20 after a human interaction), and immediately when the thread is archived. Orb Saver Mode is on, so
+opening a thread doesn't wake it.
+
+* **Never larger than a1.large.** The project default is **a1.medium** (was a1.large). Pass `orb_size` on every
+  create_thread: **a1.small** for watchers, coordination, reviews, ledger and docs work (gh, git, jq only);
+  **a1.medium** for gem and app suites, single Rails framework suites, differential harnesses; **a1.large** only for
+  Ruby builds from source, full Rails suite matrices or parallel PG/MySQL suites, and say why in the prompt.
+* **One central watcher** on a small orb (W1) watches every open upstream PR every 30 minutes and reports only what
+  matters; worker orbs keep no PR watch schedules.
+* **Let orbs pause:** no sleep loops or long polling, finish a step and stop; stop long-running services when done;
+  batch messages to other threads, since every message wakes the receiving orb for at least 5 minutes.
+* **Archive finished orbs** instead of leaving them open; their records live in this repo.
+* Check usage with `amp orb system-metrics <thread>` (cores, memory, CPU over time) before choosing a size for a
+  similar task. Measured on 2026-11-04: all 17 active orbs were a1.large; the coordinator, the watcher, C15 and G2
+  averaged 3–10 % CPU, and the busiest workers 50–65 %.
