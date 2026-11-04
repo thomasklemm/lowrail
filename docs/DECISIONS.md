@@ -30,6 +30,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   actions, releases, visibility changes, reversing a decision he made, and before posting a reply that pushes back
   on a maintainer or answers an "is this worth it" challenge.
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
+* **Child orbs don't notify Thomas** (Thomas, 2026-11-04). They report only to the coordinating thread with
+  send_thread_message, never with notify_user, and their threads are snoozed indefinitely. The coordinator relays.
 * **At most 8 working orbs at once** (Thomas, 2026-11-03). A larger orb (`a1.xxlarge`) is fine for long parallel
   runs such as Ruby builds or a census; it doesn't reduce wall-time noise, and Callgrind stays primary.
 * **No upstream references in Lowrail commit messages.** A commit message containing `owner/repo#N` or an issue or
@@ -119,15 +121,11 @@ Every finished candidate (review gates passed, body drafted) goes into the **Que
 has room. Open the strongest first. A candidate made moot upstream leaves the queue with a note.
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
-* **ruby/ruby:** at most 20 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas; 15 earlier on
-  2026-11-03, back to 20 the same evening). At 20 or more, open nothing new until merges or closes bring the count
-  below 20, and let the maintainers merge. New PRs
-  are VM or ZJIT, at most one new PR per day. Slots above the cap are decided by the agent (Thomas, 2026-11-03), recorded here. Current ones: the 4.1 GC
-  pool-budget regression fix (Thomas approved); Shopify/ruby#1100's fix (ruby/ruby#19682), which k0kubun
-  cleared on that issue; the top free lead from Z13's ranking (this slot was lead 7's, which turned out to be taken), and lead 3, class-level methods on
-  many model classes (Shopify/ruby#1099 item 2), from the
-  [lead queue](upstream/zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03). The green-lit Shopify/ruby#1064,
-  #1065 and #1091 open as room appears under the cap; `Kernel#dup` (#1058) after them.
+* **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04;
+  20 before). We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
+  already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
+  proposed to Thomas with the reason. The previously recorded slots (GC pool-budget fix, lead 3, Z13's top lead,
+  Shopify/ruby#1064, #1065, #1091, #1058) stay in the queue and do not open.
 * **gems:** no per-gem limit (Thomas); open whatever is good.
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
