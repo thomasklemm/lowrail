@@ -1,0 +1,29 @@
+From 1d1fbb641087d9ed122ae98479f6e958862ed12e Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:11:20 +0000
+Subject: [PATCH] Require ActiveSupport::WeakSet where DescendantsTracker uses
+ it
+
+WeakSet moved out of descendants_tracker.rb into its own file, reachable
+only through the autoload in active_support.rb. Requiring a core
+extension that loads the tracker without active_support first, such as
+active_support/core_ext/class/subclasses, raised NameError.
+---
+ activesupport/lib/active_support/descendants_tracker.rb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/activesupport/lib/active_support/descendants_tracker.rb b/activesupport/lib/active_support/descendants_tracker.rb
+index b922a1068c..724f0b8a7f 100644
+--- a/activesupport/lib/active_support/descendants_tracker.rb
++++ b/activesupport/lib/active_support/descendants_tracker.rb
+@@ -1,5 +1,7 @@
+ # frozen_string_literal: true
+ 
++require "active_support/weak_set"
++
+ module ActiveSupport
+   # Active Support Descendants Tracker
+   # ==================================
+-- 
+2.55.0
+

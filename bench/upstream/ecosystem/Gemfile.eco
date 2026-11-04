@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+# Ecosystem round (docs/upstream/ecosystem-tests.md): a gem's own Gemfile with every
+# Rails component taken from one local checkout (ECO_RAILS), so main and 8-1-stable
+# differ only in Rails. Copy next to the gem's Gemfile as Gemfile.eco-LABEL; set
+# ECO_GEMFILE to use another Gemfile of the gem (e.g. gemfiles/rails_8_1.gemfile).
+RAILS_COMPONENTS = %w[rails railties activesupport activemodel activerecord actionpack actionview actionmailer
+  activejob actioncable activestorage actionmailbox actiontext].freeze
+dsl = self
+requires = {}
+define_singleton_method(:gem) do |name, *args, **opts|
+  if RAILS_COMPONENTS.include?(name) && !@eco_rails
+    requires[name] = opts[:require] if opts.key?(:require)
+    next
+  end
+  super(name, *args, **opts)
+end
+eval_gemfile File.expand_path(ENV.fetch("ECO_GEMFILE", "Gemfile"), __dir__)
+@eco_rails = true
+rails = ENV.fetch("ECO_RAILS")
+RAILS_COMPONENTS.each { |c| dsl.gem c, path: rails, **(requires.key?(c) ? { require: requires[c] } : {}) }
