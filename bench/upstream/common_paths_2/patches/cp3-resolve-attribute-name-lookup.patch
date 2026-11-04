@@ -1,30 +1,30 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 09:40:49 +0000
-Subject: [PATCH] Look up attribute aliases with [] in resolve_attribute_name
+Subject: [PATCH] Resolve attribute aliases with a fetch default instead of a
+ block
 
-`type_for_attribute` resolves an alias with
-`attribute_aliases.fetch(name, &:itself)`, so every name without an
-alias, the common case, calls the block through `Symbol#to_proc`.
-`alias_attribute` and `define_id_value` only store Strings in the
-frozen alias Hash, never `nil` or `false`, and the Hash has no default,
-so `attribute_aliases[name] || name` returns the same object, as
-`read_attribute` and the timestamp helpers already do.
+`resolve_attribute_name` looks up aliases with
+`attribute_aliases.fetch(super, &:itself)`. For every name without an
+alias, the common case, `fetch` calls its block, and `&:itself` turns
+that into a `Symbol#to_proc` call. Passing the resolved name as the
+default returns it without the block. `attribute_aliases` is still
+read before `super` converts the name, and `fetch` still ignores the
+Hash default and returns stored `nil` values, as before.
 ---
- activemodel/lib/active_model/attribute_methods.rb | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ activemodel/lib/active_model/attribute_methods.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/activemodel/lib/active_model/attribute_methods.rb b/activemodel/lib/active_model/attribute_methods.rb
-index 5d36ad5f8d..8e033a6aec 100644
+index 5d36ad5f8d..00aef7c6cc 100644
 --- a/activemodel/lib/active_model/attribute_methods.rb
 +++ b/activemodel/lib/active_model/attribute_methods.rb
-@@ -423,7 +423,8 @@ def inherited(base) # :nodoc:
+@@ -423,7 +423,7 @@ def inherited(base) # :nodoc:
          end
  
          def resolve_attribute_name(name)
 -          attribute_aliases.fetch(super, &:itself)
-+          name = super
-+          attribute_aliases[name] || name
++          attribute_aliases.fetch(name = super, name)
          end
  
          def generated_attribute_methods

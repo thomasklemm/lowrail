@@ -12,11 +12,12 @@ posted). One more was built and rejected as not exact.
 
 | # | Branch @ SHA | Change | Per call |
 | --- | --- | --- | --- |
-| CP-3 | `thomasklemm/resolve-attribute-name-lookup` @ `b2577977c3` | `resolve_attribute_name`: `attribute_aliases[name] \|\| name` instead of `fetch(name, &:itself)` | `type_for_attribute`: −15% instructions interpreted, −24% YJIT, −30% ZJIT; a two-predicate `where`: −0.6% / −1.8% / −1.5% |
-| CP-5 | `thomasklemm/uri-encoder-safe-match` @ `3c968c5bf6` | `UriEncoder#escape`: anchored match on the safe characters instead of a search for an unsafe one | `escape_segment` of a slug: −42% / −46% / −45%; `post_path(post)`: −1.1% / −2.5% / −1.5% |
+| CP-3 | `thomasklemm/resolve-attribute-name-lookup` @ `be7ab87287` | `resolve_attribute_name`: `fetch(name = super, name)` instead of `fetch(super, &:itself)` | `type_for_attribute`: −12% instructions interpreted, −22% YJIT, −29% ZJIT; a two-predicate `where`: −0.5% / −1.4% / −2.2% |
+| CP-5 | `thomasklemm/uri-encoder-safe-match` @ `273cb63132` | `UriEncoder#escape`: anchored match on the safe characters instead of a search for an unsafe one | `escape_segment` of a slug: −42% / −46% / −45%; `post_path(post)`: −1.1% / −2.5% / −1.5% |
 
 Both are one commit on rails/rails main [`9b116f1fed`](https://github.com/rails/rails/commit/9b116f1fed)
-(unchanged at the end of the round), authored and committed by Thomas Klemm, not pushed anywhere; the commits are in [`patches/`](../../bench/upstream/common_paths_2/patches/) (`git am` onto `9b116f1fed`).
+(unchanged at the end of the round), authored and committed by Thomas Klemm, revised after Sol's review
+([below](#revision-after-sols-review-2026-11-04)), not pushed anywhere; the commits are in [`patches/`](../../bench/upstream/common_paths_2/patches/) (`git am` onto `9b116f1fed`).
 
 ## Pins and method
 
@@ -57,7 +58,63 @@ Same as round 1 ([pins and method](rails-common-paths.md#pins-and-method)), with
   "ready after small edits" for both, all numbers recomputed; its edits are applied, including a wrong
   "non-empty Strings" claim in CP-3 (an empty alias value is possible and truthy, so nothing changes).
 
-## CP-3: look up attribute aliases with `[]`
+## Revision after Sol's review (2026-11-04)
+
+Sol reviewed both patches after the round was merged: CP-3 "approve with changes", CP-5 "reject as submitted".
+Each finding was checked against the real code, both worktrees side by side, on Ruby 4.0.9.
+
+**CP-3, confirmed, both findings.**
+
+1. *Evaluation order.* Main evaluates `attribute_aliases` (the receiver of `fetch`) before `super` calls
+   `name.to_s`; the `[] || name` form read it afterwards. With a name whose `to_s` calls
+   `P1.alias_attribute(:headline, :title)` and returns `"headline"`, `type_for_attribute(name).type` is `nil` on
+   main and `:string` with the old patch.
+2. *Hash defaults.* With `attribute_aliases = Hash.new("title")` or `{ "title" => nil }`, main gives `nil` and the
+   old patch `:string` (`fetch` ignores defaults and returns stored `nil`, `[] ||` doesn't). A raising default
+   proc raised on both, through other `[]` lookups in Active Record.
+
+Three exact replacements were measured with the same Callgrind and A/A setup (4.0.9, three runs each):
+
+| Form | `type_for_attribute` interpreter | YJIT | two-condition `where` interpreter | YJIT | Readability (review) |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `[] \|\| name` (round 2, not exact) | −14.8% | −23.7% | −0.56% | −1.75% | L0 |
+| `fetch(super) { \|resolved_name\| resolved_name }` (Sol) | −3.2% | −11.4% | −0.05% (A/A 0.21%) | −0.52% | L1 |
+| `aliases = attribute_aliases; name = super; aliases.fetch(name, name)` | −11.7% | −22.2% | −0.46% | −1.46% | L2: the order only shows from the local, so it reads as foldable |
+| **`attribute_aliases.fetch(name = super, name)`** | **−12.2%** | **−22.4%** | **−0.47%** | **about −1.4%** | **L1, no comment needed** |
+
+A literal block keeps the block call and only drops `Symbol#to_proc`, so Sol's form keeps a quarter of the
+interpreter gain; passing the name as `fetch`'s default removes the block. The one-line form evaluates the
+receiver first and then `super`, as main does (bytecode `send attribute_aliases`, `invokesuper`, `setlocal name`,
+`send fetch, argc:2`; checked at runtime under the interpreter, YJIT and ZJIT), and it is still `fetch`, so
+defaults and stored `nil` behave as on main. Rails already assigns inside a `fetch` argument
+(`calculations.rb:636`, `attribute_types.fetch(name = result.columns[i])`). It is the committed version.
+Remaining differences, none reachable through Rails: a Hash subclass assigned through `attribute_aliases=` whose
+`fetch` override now receives a default argument instead of a block, and a `to_s` returning a non-String (main
+called `itself` on it).
+
+**CP-5.**
+
+1. *`Regexp.timeout`:* confirmed (2–3× slower in wall time above about 600,000 characters; the body already said
+   so). The commit message no longer claims equivalence unconditionally: it names valid strings in
+   ASCII-compatible encodings and states the slowdown and its effect on a tight `Regexp.timeout`.
+2. *A component that overrides `match?`:* main makes the same single `component.match?` call, so it is affected
+   too, with the opposite polarity: for `s = +"a b"`, `def s.match?(*) = true` main escapes to `"a%20b"` and the
+   patch returns `"a b"`; with `false`, main returns `"a b"` unescaped and the patch escapes it. No code change.
+3. *Test gap:* confirmed. Narrowing `SAFE_SEGMENT` by dropping `a` passed the ASCII test (384 assertions, 0
+   failures), and a frozen UTF-8 `"abc"` would then come back from `gsub` as a new, unfrozen US-ASCII String.
+   The commit now also asserts `assert_same` for empty, frozen UTF-8 and SafeBuffer components made of every safe
+   character of each class, an explicit unsafe output (`"café 1"` → `"caf%C3%A9%201"`, US-ASCII) and an invalid
+   UTF-8 `ArgumentError`. A second review then showed `\A` → `^` and a non-ASCII widening (`é`) still survived, so
+   the per-character test now also covers `é` and a no-break space, and a new test escapes `"a b\nc"` with all
+   three escapers. Mutation matrix, each of the three classes: narrowing (drop `a`, `~`), widening (add space,
+   `é`), `\A` → `^`, `\z` → `$`, `*` → `+`: 21 of 21 mutants fail; the reviewer's own 41-mutant matrix: all fail.
+
+**Suites on the final commits** (Ruby 4.0.9): Active Model 1,250 runs and Active Record `test:sqlite3` 10,281
+runs, 0 failures (the same 5 orb errors as before); Action Pack with `RAILS_STRICT_WARNINGS=1` 4,510 runs, 0
+failures. RuboCop clean. Each amended diff got a separate subagent review: CP-3's one-line form "approve with
+notes" (L1), CP-5 "approve" once the commit message's newline sentence was corrected (done).
+
+## CP-3: resolve attribute aliases with a `fetch` default
 
 `ActiveModel::AttributeMethods::ClassMethods#resolve_attribute_name` (private) is what `type_for_attribute` calls
 first. Active Record calls `type_for_attribute` for every predicate in `where` (through `Arel::Table` and
@@ -68,77 +125,72 @@ cache and makes none).
 ```diff
          def resolve_attribute_name(name)
 -          attribute_aliases.fetch(super, &:itself)
-+          name = super
-+          attribute_aliases[name] || name
++          attribute_aliases.fetch(name = super, name)
          end
 ```
 
 For a name without an alias, the common case, `fetch` calls its block through `Symbol#to_proc`; that costs more
 than the lookup itself. ZJIT doesn't optimize the block-to-C-method call either: the
-[ZJIT gap census](zjit-gap-census.md) lists this site among its largest `complex_arg_pass` fallbacks.
-`attribute_aliases[name] || name` is the idiom `read_attribute`, `Arel::Table#[]`, the timestamp helpers,
-`dynamic_matchers` and `query_methods` already use for the same Hash (about 15 places).
+[ZJIT gap census](zjit-gap-census.md) lists this site among its largest `complex_arg_pass` fallbacks. Passing the
+resolved name as `fetch`'s default returns it without a block.
 
 **Census.** `attribute_methods.rb:426` ran in all 20 apps: interpreter line rank 39, 0.18% of all instructions,
 52% of them in C; YJIT rank 12, 0.39%.
 
-**Exactness.** `super` is `AttributeRegistration#resolve_attribute_name`, `name.to_s`. Every writer of
-`attribute_aliases` in Rails (`{}.freeze` default, `alias_attribute` and its propagation to subclasses,
-`define_id_value`) stores a frozen plain Hash, no default, mapping frozen Strings to frozen Strings
-(`-old_name.to_s`; never `nil` or `false`, and an empty String is truthy too). For such a Hash `fetch(k, &:itself)` and `self[k] || k` return the same object for every key.
-They differ only for a Hash an app assigns through the public `attribute_aliases=` itself with a default, a default
-proc, a `nil`/`false` value or overridden `[]`/`fetch`, or when an app's `attribute_aliases` returns a non-Hash
-(same `NoMethodError`, message names `[]` instead of `fetch`); the ~15 other lookups already use `[]` there.
-Differential: 134 outcomes (aliases, subclasses, late aliases, Active Model attributes, String subclasses, `to_s`
-objects, `nil`, Integer) under the interpreter, YJIT and ZJIT, 0 differences. The adversarial round ran 1,510
-probes per worktree (STI, abstract parents, late subclass aliases, alias to alias, composite keys and `id_value`,
-`enum`, `store_accessor`, `serialize`, `normalizes`, `ignored_columns`, `insert_all`/`upsert_all`, `where.not`,
-joined conditions, reloading, 8 threads racing `alias_attribute`, fibers) on 4.0.9 and master (YJIT, ZJIT): no
-difference outside the cases above. Checklist: 1–5, 7, 8 checked; 6 not applicable (frozen Hash replaced on write).
-Readability: L0 (primary review: "L0–L1, if anything easier to read").
+**Exactness.** `super` is `AttributeRegistration#resolve_attribute_name`, `name.to_s`. Both forms read
+`attribute_aliases` first, then run `super`, then call `fetch` once with the resolved name, so Hash defaults,
+default procs and stored `nil` values are treated alike and an alias added inside `to_s` is seen on the next call
+in both. Differences need a Hash subclass assigned through `attribute_aliases=` whose `fetch` override handles a
+block but not a default argument (or the reverse), or a `to_s` that returns a non-String (main also called
+`itself` on it). Differential: 135 outcomes (aliases, subclasses, late aliases, Active Model attributes, String
+subclasses, `to_s` objects, `nil`, Integer) under the interpreter, YJIT and ZJIT, 0 differences; Sol's four probes
+(the order case, `Hash.new("title")`, `{ "title" => nil }`, a raising default proc) give main's results. The
+review of the final form reran the earlier adversarial set (order case, defaults, default proc, exceptions,
+BasicObject and Symbol `to_s` results, Hash subclasses) on 4.0.9 with and without YJIT: identical except the
+unreachable cases above. The round-2 adversarial round (1,510 probes: STI, abstract parents, late subclass
+aliases, alias to alias, composite keys and `id_value`, `enum`, `store_accessor`, `serialize`, `normalizes`,
+`ignored_columns`, `insert_all`/`upsert_all`, `where.not`, joined conditions, reloading, threads, fibers) ran
+against the `[] ||` form; its findings outside the `attribute_aliases=` cases carry over, since the forms agree on
+every Hash Rails builds. Checklist: 1–5, 7, 8 checked; 6 not applicable (frozen Hash replaced on write).
+Readability: L1 (assignment inside a `fetch` argument, as `calculations.rb:636` does).
 
-**Instructions per call** (Callgrind; 4.0.9 medians of three runs, `belongs_to` and master one run):
+**Instructions per call** (Callgrind; 4.0.9 medians of three runs, master one run):
 
 | Case | Mode | main | A/A | candidate | Δ |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `Post.type_for_attribute("title")` | interpreter 4.0.9 | 5,455 | +0.07% | 4,648 | −14.8% |
-| | YJIT 4.0.9 | 3,768 | +0.06% | 2,875 | −23.7% |
-| | interpreter master | 5,742 | +0.02% | 4,877 | −15.1% |
-| | ZJIT master | 3,218 | +0.14% | 2,253 | −30.0% |
-| `Post.where(title:, published:).to_a` | interpreter 4.0.9 | 558,726 | +0.12% | 555,587 | −0.56% |
-| | YJIT 4.0.9 | 247,643 | −0.54% | 243,310 | −1.75% |
-| | interpreter master | 580,463 | +0.00% | 577,687 | −0.48% |
-| | ZJIT master | 256,957 | −0.02% | 253,134 | −1.49% |
-| `post.author` (`belongs_to`, reset each call) | interpreter 4.0.9 | 577,566 | −0.01% | 575,900 | −0.29% |
-| | YJIT 4.0.9 | 267,193 | +0.02% | 265,765 | −0.53% |
+| `Post.type_for_attribute("title")` | interpreter 4.0.9 | 5,455 | −0.00% | 4,788 | −12.2% |
+| | YJIT 4.0.9 | 3,769 | −0.13% | 2,925 | −22.4% |
+| | interpreter master | 5,743 | −0.07% | 5,016 | −12.7% |
+| | ZJIT master | 3,243 | +0.04% | 2,305 | −28.9% |
+| `Post.where(title:, published:).to_a` | interpreter 4.0.9 | 558,493 | −0.01% | 555,842 | −0.47% |
+| | YJIT 4.0.9 | 246,677 (pooled) | | 243,143 | −1.43% |
+| | interpreter master | 580,656 | +0.00% | 577,825 | −0.49% |
+| | ZJIT master | 258,978 | −0.75% | 253,320 | −2.18% |
 
-YJIT `where` runs: main 246,587–248,588 and A/A 246,141–246,699 against the candidate's 242,759–243,699. The
-`belongs_to` ZJIT A/A was 1.8%, too wide to report.
+YJIT `where` runs: main 246,500–249,441 and A/A 246,409–246,853 (median of the six 246,677) against the
+candidate's 243,074–243,805. ZJIT `where` is one run with a 0.75% A/A.
 
 **Wall time per call** (Ruby 4.0.9, medians of 15 pinned rounds):
 
 | Case | Mode | main | A/A | candidate | Δ |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `Post.type_for_attribute("title")` | interpreter | 640 ns | +0.3% | 536 ns | −16.3% |
-| | YJIT | 384 ns | +1.1% | 277 ns | −27.7% |
-| `Post.where(title:, published:).to_a` | interpreter | 159,965 ns | +0.4% | 158,437 ns | −1.0% |
-| | YJIT | 58,091 ns | −2.1% | 56,228 ns | −3.2% (not resolved: A/A 2.1%) |
+| `Post.type_for_attribute("title")` | interpreter | 641 ns | +1.3% | 561 ns | −12.5% |
+| | YJIT | 384 ns | +0.3% | 293 ns | −23.7% |
+| `Post.where(title:, published:).to_a` | interpreter | 164,298 ns | −1.5% | 162,037 ns | −1.4% (not resolved) |
+| | YJIT | 56,586 ns | +1.3% | 56,332 ns | −0.4% (not resolved) |
 
 **ruby-bench** (Callgrind instructions for one iteration; calls per iteration counted with a TracePoint):
 
 | App | Calls | Mode | main1 | main2 (A/A) | candidate | Δ |
 | --- | ---: | --- | ---: | ---: | ---: | ---: |
-| shipit | 21,596 | interpreter | 5,843,679,684 | −0.002% | 5,834,160,610 | −0.163% |
-| lobsters | 8,968 | interpreter | 4,266,931,052 | −0.029% | 4,261,905,482 | −0.118% |
-| railsbench | 0 | interpreter | 6,958,965,141 | −0.005% | 6,963,528,668 | +0.066% |
-| shipit | 21,596 | YJIT | 3,160,808,187 | +0.069% | 3,153,058,303 | −0.245% |
-| lobsters | 8,968 | YJIT | 3,031,005,335 | +0.094% | 3,028,045,087 | −0.098% (not resolved) |
-| railsbench | 0 | YJIT | 4,383,391,045 | −0.024% | 4,380,442,417 | −0.067% |
+| shipit | 21,596 | interpreter | 5,842,147,452 | −0.004% | 5,835,772,269 | −0.109% |
+| lobsters | 8,968 | interpreter | 4,266,255,137 | +0.023% | 4,263,869,815 | −0.056% (not resolved) |
+| railsbench | 0 | interpreter | 6,960,356,496 | +0.076% | 6,963,470,650 | +0.045% |
+| (YJIT rows for the final form are running; added when done) | | | | | | |
 
-railsbench never calls `resolve_attribute_name` during an iteration, yet its candidate run moved by +0.066%: the
-A/A (the same redefined method twice) understates the noise between variants whose code differs, which is about
-±0.07% here (CP-5's lobsters, with 737 calls, moved +0.072% and its own A/A +0.057%). shipit's −9.5M instructions match its 21,596 calls
-at about 440 instructions each, against about 800 per call in the micro, inside that noise.
+railsbench never calls `resolve_attribute_name` during an iteration and still moves by up to 0.08% between
+builds, so only shipit resolves: its −6.4M instructions interpreted are about 300 per call, against about 670 per
+call in the micro. (The round-2 `[] ||` form had shipit −0.16% interpreted and −0.25% YJIT.)
 
 ## CP-5: check URL components with an anchored match
 
@@ -168,11 +220,12 @@ same character lists, as `xml_name_escape` does with `SAFE_XML_TAG_NAME_REGEXP`:
 +              return component if component.match?(safe_pattern)
 ```
 
-The commit adds one test: for every ASCII character `c`, `escape_x("#{c}%")` must equal `escape_x(c) + "%25"`.
-`%` is unsafe in all three classes, so the left side always takes the `gsub` path and the right side the early
-return when `c` is safe. A safe class that lets through a character its escaping class encodes fails it; a mutation
-adding a space to `SAFE_SEGMENT` or `?` to `SAFE_PATH` failed, as intended, and a narrower safe class (only slower)
-passes.
+The commit adds tests that pass on main and on the patch: every component made only of safe characters (empty,
+frozen UTF-8, SafeBuffer) comes back as the same object; for every ASCII character plus `é` and a no-break space,
+`escape_x("#{c}%")` equals `escape_x(c) + "%25"` (`%` is unsafe in all three classes, so the left side always takes
+the `gsub` path); `"a b\nc"` is escaped by all three escapers; an unsafe component comes back as US-ASCII; invalid
+UTF-8 raises `ArgumentError`. Narrowing, widening and anchor mutations of each safe class all fail them (see the
+revision section).
 
 **Census.** `utils.rb:81`, the `match?` line, ran in 12 of 20 apps: interpreter line rank 96, 0.10% of all
 instructions, 94% of them in C (`match?`); YJIT rank 107 (8 apps, 0.09%).
@@ -254,25 +307,25 @@ below that noise.
 
 Checked by a separate reviewer against this page and for an outsider's reading; its corrections are applied.
 
-### CP-3: Look up attribute aliases with [] in resolve_attribute_name
+### CP-3: Resolve attribute aliases with a fetch default instead of a block
 
-> Active Record looks up a column's type with `type_for_attribute` several times for each condition in `where`, and on association reads, creates and updates; `Post.where(title:, published:).to_a` calls it eight times. Each lookup first resolves an alias with `attribute_aliases.fetch(name, &:itself)`. For the usual name without an alias, `fetch` then calls its block through `Symbol#to_proc`, which costs more than the lookup itself.
+> Active Record looks up a column's type with `type_for_attribute` several times for each condition in `where`, and on association reads, creates and updates; `Post.where(title:, published:).to_a` calls it eight times. Each lookup first resolves an alias with `attribute_aliases.fetch(super, &:itself)`. For the usual name without an alias, `fetch` then calls its block, and `&:itself` makes that a `Symbol#to_proc` call, which costs more than the lookup itself.
 >
-> This uses `attribute_aliases[name] || name`, as `read_attribute`, `Arel::Table#[]` and the timestamp helpers already do. Rails only stores Strings in that frozen Hash (from `alias_attribute` and `define_id_value`), never `nil` or `false`, and the Hash has no default, so both forms return the same object for every name. They differ only for a Hash an app assigns through `attribute_aliases=` with a default, a default proc, or a `nil` or `false` value; for such a Hash, `Arel::Table#[]` and `read_attribute` already disagree with `type_for_attribute` on main, and this change makes them agree.
+> This passes the resolved name as `fetch`'s default instead: `attribute_aliases.fetch(name = super, name)`. It is still `fetch`, so a Hash default or a stored `nil` is treated as before, and the receiver is still read before `super` converts the name, so even a `to_s` that defines an alias sees the same table. Rails already assigns inside a `fetch` argument this way in `calculations.rb`.
 >
 > | `Post.type_for_attribute("title")`, per call | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
 > | --- | ---: | ---: | ---: | ---: | ---: |
-> | main | 640 ns | 384 ns | 5,455 | 3,768 | 3,218 |
-> | this PR | 536 ns (−16%) | 277 ns (−28%) | 4,648 (−14.8%) | 2,875 (−23.7%) | 2,253 (−30.0%) |
-> | main, run again (change from the first run) | +0.3% | +1.1% | +0.07% | +0.06% | +0.14% |
+> | main | 641 ns | 384 ns | 5,455 | 3,769 | 3,243 |
+> | this PR | 561 ns (−12.5%) | 293 ns (−23.7%) | 4,788 (−12.2%) | 2,925 (−22.4%) | 2,305 (−28.9%) |
+> | main, run again (change from the first run) | +1.3% | +0.3% | −0.00% | −0.13% | +0.04% |
 >
-> Objects per call are unchanged. Ruby 4.0.9, SQLite in memory, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000, median of three runs. The two-condition `where` above runs 0.56% fewer instructions interpreted and 1.75% fewer with YJIT, against A/As of 0.12% and 0.54%. On ruby-bench (Rails 8.1 with the method patched in), shipit and lobsters (about 21,600 and 9,000 lookups per iteration) run 0.16% and 0.12% fewer instructions per iteration with the interpreter, and shipit 0.25% fewer with YJIT. railsbench makes no lookups and still moved by 0.07%, which is the noise between two builds. In a CPU census of 20 open-source Rails apps on Rails main, this lookup ran in all 20 and took 0.18% of interpreted instructions (0.39% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
+> Objects per call are unchanged. Ruby 4.0.9, SQLite in memory, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000, median of three runs. The two-condition `where` above runs 0.47% fewer instructions interpreted and about 1.4% fewer with YJIT. On ruby-bench (Rails 8.1 with the method patched in), shipit (about 21,600 lookups per iteration) runs 0.11% fewer instructions per iteration with the interpreter; railsbench makes no lookups and still moves by up to 0.08% between two builds, so lobsters' 0.06% is not resolved. In a CPU census of 20 open-source Rails apps on Rails main, this lookup ran in all 20 and took 0.18% of interpreted instructions (0.39% with YJIT); I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
 
 ### CP-5: Check URL components for unsafe characters with an anchored match
 
 > Every URL helper escapes each dynamic segment through `UriEncoder#escape`, and since #59058 it returns a segment as is when nothing in it needs escaping, which is nearly always (ids, slugs). It finds that out by searching for an unsafe character with a negated class such as `/[^...]/`, which the regexp engine tries again from every position.
 >
-> This matches the whole component against the safe characters instead, with `/\A[...]*\z/` built from the same character lists, as `xml_name_escape` does with `SAFE_XML_TAG_NAME_REGEXP`. For every valid string in an ASCII-compatible encoding, one pattern matches exactly when the other doesn't; invalid bytes and incompatible encodings raise the same errors in both, and components that need escaping go through the same `gsub` as before. Measured in wall time, only components longer than about 600,000 characters take longer than before (2–3×), so with a global `Regexp.timeout` such components time out sooner; URL components that long don't occur in practice. The new test checks every ASCII character against the escaping path, so a safe pattern that lets through a character its escaping pattern encodes fails it.
+> This matches the whole component against the safe characters instead, with `/\A[...]*\z/` built from the same character lists, as `xml_name_escape` does with `SAFE_XML_TAG_NAME_REGEXP`. For every valid string in an ASCII-compatible encoding, one pattern matches exactly when the other doesn't; invalid bytes and incompatible encodings raise the same errors in both, and components that need escaping go through the same `gsub` as before. Measured in wall time, only components longer than about 600,000 characters take longer than before (2–3×), so with a global `Regexp.timeout` such components time out sooner; URL components that long don't occur in practice. The new tests check that safe components come back as the same object and that every ASCII character gives the same result through the early return as through escaping, so a safe pattern narrower or wider than its escaping pattern fails them. As before, a component that overrides `match?` itself can change the result, now in the opposite direction.
 >
 > | `page_path("my-first-post-about-rails")` (`get "/pages/:slug"`), per call | Time, interpreter | Time, YJIT | Instructions, interpreter | Instructions, YJIT | Instructions, ZJIT |
 > | --- | ---: | ---: | ---: | ---: | ---: |

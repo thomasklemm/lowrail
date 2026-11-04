@@ -4,7 +4,7 @@ require_relative "../lib/harness"
 def lowrail_cp_patch(cp, cand)
   case cp
   when "ran"
-    body = cand ? "name = super\n attribute_aliases[name] || name" : "attribute_aliases.fetch(super, &:itself)"
+    body = cand ? "attribute_aliases.fetch(name = super, name)" : "attribute_aliases.fetch(super, &:itself)"
     ActiveModel::AttributeMethods::ClassMethods.module_eval <<~RUBY, __FILE__, __LINE__ + 1
       def resolve_attribute_name(name)
         #{body}
