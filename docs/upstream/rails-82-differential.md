@@ -4,7 +4,7 @@ Rails main ships as 8.2 soon. This round runs the same generated inputs through 
 output and exception, to find behaviour changes nobody meant to make before they reach users.
 
 **Result.** About 450,000 cases per side; 26 functions differ. Every difference traces to a commit. Two are
-accidents and get a fix each (F1, F2; local Rails branches, patches below, not opened). The rest are intended: most
+accidents and get a fix each (F1, F2; fork branches, patches below, not opened). The rest are intended: most
 are in a CHANGELOG, and six are undocumented but harmless (encodings, frozen strings, a valid `WHERE (1=0)` instead
 of invalid SQL, error messages). I don't think any of them needs a CHANGELOG note.
 
@@ -63,40 +63,56 @@ F2 doesn't change it.
 ## F1: to_query skips nested values that serialize to an empty query
 
 * **Change:** in `Array#to_query` and `Hash#to_query`, keep the type check and also drop an element whose query
-  string is `""` (+4/−2), plus one test with both shapes. Branch `thomasklemm/to-query-skip-empty-nested` @
-  `fbd3fb7b3f` on main `8b06b0eb98`, local
+  string is `""` (+4/−2), plus two tests. Fork branch
+  [`thomasklemm/to-query-skip-empty-nested`](https://github.com/thomasklemm/rails/tree/thomasklemm/to-query-skip-empty-nested)
+  @ `2750d65efd` on main `8b06b0eb98`
   ([patch](../../fixtures/corpus/rails-82-diff/patches/f1-to-query-skip-empty-nested.patch)).
-* **Checks:** the new test fails without the change (`["a%5B%5D=1", "", "", "a%5B%5D=2"]`). The Object, Hash and
-  Array core-extension tests (332) and the URL/routing/request tests in Action Pack (756) pass. Rerun of the query
-  and routes harness with the fix: 0 outputs with a stray `&`, against 34 on main and 205 on 8.1.
+* **Type check kept** (Sol: not redundant). An empty Array as a whole still serializes to the bare key:
+  `[].to_query("a")` is `"a%5B%5D"` on 8.1 and with the fix. (Sol's note expected `"a%5B%5D="`; the source has
+  `nil.to_query(prefix)`, which adds no `=`.) `{ a: [] }.to_query` stays `""`.
+* **Tests:** `test_nested_values_with_an_empty_query_are_skipped` fails without the change. The second,
+  `test_nil_false_and_blank_values_in_arrays_are_kept`, asserts the exact string for
+  `{ a: [nil, false, "", [[]]], b: 1 }` (`"a%5B%5D&a%5B%5D=false&a%5B%5D=&b=1"`), so a fix that drops every blank
+  value fails it (that variant returns `"b=1"`). Hash values `nil`/`false`/`""` were already covered by
+  `test_nested_empty_hash`. 18 runs pass; the Object, Hash and Array core-extension tests and the URL/routing/request
+  tests in Action Pack pass. Harness rerun: 0 outputs with a stray `&`, against 34 on main and 205 on 8.1.
 * **Upstream search:** no open PR or issue on `to_query` or empty nested values; #57500 and #57677 are merged.
 
 > **Skip nested values that serialize to an empty query in to_query**
 >
-> #57677 changed `Array#to_query` to skip empty Hash and Array elements by their type, instead of skipping any element whose query string is empty, as #57500 did. An element that is not empty itself but only holds empty collections still serializes to an empty string, so it adds an empty pair again, and `Hash#to_query` keeps such values too: `{ q: [[]], page: 2 }.to_query` returns `"&page=2"`, and `url_for` passes extra options through it, so such a parameter produces `/search?&page=2`.
+> #57677 changed `Array#to_query` to skip empty Hash and Array elements by their type, instead of skipping any element whose query string is empty, as #57500 did. An element that is not empty itself but only holds empty collections still serializes to an empty string, so it adds an empty pair again, and `Hash#to_query` keeps such values too. `{ q: [[]], page: 2 }.to_query` returns `"&page=2"`, and since `url_for` passes extra options through it, such a parameter produces `/search?&page=2`.
 >
-> This keeps the type check and also skips a value whose query string is empty, in both methods. A value that serializes to an empty string adds nothing to the query, so dropping it only removes the stray `&`. The test covers an Array and a Hash holding only empty collections.
+> This keeps the type check and also skips a value whose query string is empty, in both methods. Dropping such fragments prevents stray separators and keeps every non-empty parameter. One test covers an Array and a Hash that hold only empty collections, and another checks that `nil`, `false` and empty strings inside an Array are still kept.
 
-## F2: URL helpers keep generating blank arguments with default URL options
+## F2: URL helpers keep generating empty arguments with default URL options
 
-* **Change:** in the optimized helper's `call`, fall back to the general path when the arguments don't produce a
-  path and default URL options apply (`|| default_url_options?(t)`, +3/−3 with the comment), plus two calls in the
-  existing "same URL as the general path" test. Branch `thomasklemm/optimized-url-helpers-blank-arguments` @
-  `0bb04b6d7d` on main `8b06b0eb98`, local
+* **Change:** in the optimized helper's `call`, fall back to the general path when `optimized_helper` returns `nil`
+  and default URL options apply (`|| default_url_options?(t)`, +3/−3 with the comment), plus a boundary test and
+  two calls in the existing comparison test. Fork branch
+  [`thomasklemm/optimized-url-helpers-blank-arguments`](https://github.com/thomasklemm/rails/tree/thomasklemm/optimized-url-helpers-blank-arguments)
+  @ `2b4a97089a` on main `8b06b0eb98`
   ([patch](../../fixtures/corpus/rails-82-diff/patches/f2-url-helpers-blank-arguments.patch)).
-* **Checks:** the extended test fails without the change (`article_path("", {}) with routes.default_url_options
-  {host: "example.org"}`). `routing_test`, `url_for_test`, `controller/routing_test`, `route_set_test`,
-  `integration_test`, `url_generation_test` and `journey/router_test` pass (782 runs). The positional probe: 556
-  differences from 8.1 before, 16 after, all of them `true`/`false`/`nil` arguments as described above.
-* **Upstream search:** no open PR or issue; #59479 is merged (by amatsuda, 2026-10-31), not reopened.
+* **What `default_url_options?(t)` is** (added by #59479, `route_set.rb:312`): true when the route set's
+  `default_url_options` or the receiver's `default_url_options` is non-empty, which is "default URL options apply".
+  Two `empty?` checks and a `respond_to?`; the same call already guards the optimized path for routes whose options
+  aren't optimizable. The new use sits inside `if path.nil?`, after `optimized_helper` gave up and only before the
+  error is raised, so every URL the optimized helper builds is unchanged; only the error path differs.
+* **Tests:** the comparison test ("default URL options that do not shape the path generate the same URL as the
+  general path") gets `article_path("")` and `article_url(record)` with an empty `to_param`, and fails without the
+  change. New boundary test: without default URL options, `product_path("")` still raises with the "missing
+  required keys" message. A wrong fix that always returns `super` when the path is `nil` fails it, and fails the
+  existing `product_path(nil)` message test. routing_test 359 runs pass; with the other URL and routing files,
+  783 runs.
+* **Upstream search:** no open PR or issue; #59479 is merged (by amatsuda, 2026-10-31).
 
-> **Generate URLs for blank arguments with default URL options as before**
+> **Generate URLs for empty arguments with default URL options as before**
 >
-> Since #59479, the optimized URL helpers also run when the default URL options only set reserved options such as `:host`. When an argument is blank, the optimized helper raises `UrlGenerationError`, while the general path, which these helpers used before, generates the URL. So with `default_url_options[:host]` set, as in a mailer, `post_url(post)` for a post whose `to_param` is `""` now raises instead of returning `http://example.com/posts/`.
+> Since #59479, the optimized URL helpers also run when the default URL options only set reserved options such as `:host`. For an empty-string argument or a record whose `to_param` is empty, the optimized helper raises `UrlGenerationError`, while the general path, which these helpers used before, generates the URL. So with `default_url_options[:host]` set, as in a mailer, `post_url(post)` for a post whose `to_param` is `""` now raises instead of returning `http://example.com/posts/`.
 >
-> This falls back to the general path for such arguments when default URL options apply, as the helper already does when options are passed or when a route has requirements. Without default URL options nothing changes, since the optimized helper already raised there before #59479. The existing test that compares both paths under each set of default URL options now includes a blank argument and a record with a blank `to_param`.
+> This falls back to the general path when the optimized helper can't build the path and default URL options apply, as it already does when options are passed. The fallback runs only after the optimized helper gave up, so every URL it builds stays the same, and `true`, `false` and `nil` arguments behave as they do without default URL options. A new test checks that without default URL options an empty argument still raises.
 
 ## Review status
 
 Both fixes follow "Correctness fixes: readable first": one condition or one line each, in the shape of the
-surrounding code, no measurements. Not yet reviewed by Sol; patches sent to the coordinating thread. Not opened.
+surrounding code, no measurements. Sol (from the patches and this doc): both "open with nits"; the nits are applied above. Pushed to the fork for
+Thomas to open; not opened.

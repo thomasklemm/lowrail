@@ -1,4 +1,4 @@
-From fbd3fb7b3fff6f9b0d6876ced49e35f0d79c0fdf Mon Sep 17 00:00:00 2001
+From 2750d65efd3d67d59e26339d2dff7f35c3b85091 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:07:33 +0000
 Subject: [PATCH] Skip nested values that serialize to an empty query in
@@ -20,9 +20,9 @@ Skip values whose query string is empty in both methods.
 
 Amp-Thread-ID: https://ampcode.com/threads/T-01a1a661-18b1-7386-91ef-dbe3df228ced
 ---
- .../lib/active_support/core_ext/object/to_query.rb          | 6 ++++--
- activesupport/test/core_ext/object/to_query_test.rb         | 5 +++++
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ .../lib/active_support/core_ext/object/to_query.rb     |  6 ++++--
+ activesupport/test/core_ext/object/to_query_test.rb    | 10 ++++++++++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/activesupport/lib/active_support/core_ext/object/to_query.rb b/activesupport/lib/active_support/core_ext/object/to_query.rb
 index 11f9f52f2d..35c1f00c1f 100644
@@ -49,16 +49,21 @@ index 11f9f52f2d..35c1f00c1f 100644
  
      query.sort! unless namespace.to_s.include?("[]")
 diff --git a/activesupport/test/core_ext/object/to_query_test.rb b/activesupport/test/core_ext/object/to_query_test.rb
-index e49ab44dfb..97e8eb2e15 100644
+index e49ab44dfb..48a1177a5a 100644
 --- a/activesupport/test/core_ext/object/to_query_test.rb
 +++ b/activesupport/test/core_ext/object/to_query_test.rb
-@@ -60,6 +60,11 @@ def test_array_with_empty_array
+@@ -60,6 +60,16 @@ def test_array_with_empty_array
      assert_query_equal "a%5B%5D=1&a%5B%5D=2", a: [1, [], 2]
    end
  
 +  def test_nested_values_with_an_empty_query_are_skipped
 +    assert_query_equal "a%5B%5D=1&a%5B%5D=2", a: [1, [[]], { b: {} }, 2]
 +    assert_query_equal "c=1", a: [[]], b: { d: [{}] }, c: 1
++  end
++
++  def test_nil_false_and_blank_values_in_arrays_are_kept
++    assert_equal "a%5B%5D&a%5B%5D=false&a%5B%5D=&b=1",
++      { a: [nil, false, "", [[]]], b: 1 }.to_query
 +  end
 +
    def test_nested_empty_hash
