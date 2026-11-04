@@ -5,6 +5,15 @@ records the rule and why. Rules are grouped by topic, with a date or owner only 
 parked runtime-lowering prototype's decisions are in [decisions-prototype.md](decisions-prototype.md). Earlier
 wording of these rules is in git history (before 2026-11-03 19:00 UTC).
 
+## Bet: what our merged Rails PRs add up to (2026-11-04)
+
+Main against main with 39 of our merged perf PRs reverted (five conflict and stay in both trees), Ruby 4.0.9, fixed
+heap ([merged-sum](upstream/merged-sum.md)): census allocations −3.8% per workload in five apps (A/A ≤ 0.04%, 52/52
+workloads move), ruby-bench −1.2% to −9.7% objects per iteration, and −2.0% to −7.0% instructions on erubi-rails,
+railsbench and shipit (A/A ≤ 0.54%). Lobsters' ruby-bench instructions and every app-level YJIT row fail their A/A
+and are not claimed. Ten PR groups carry 85% of the allocations; the WhereClause and database-statement groups lead.
+For our own picture; nothing posted.
+
 ## Lowrail reoriented toward upstream fixes and advisory types (2026-11-02)
 
 Lowrail's boot facts, allocation censuses and JIT fallback counts found work maintainers accepted (seven Rails
