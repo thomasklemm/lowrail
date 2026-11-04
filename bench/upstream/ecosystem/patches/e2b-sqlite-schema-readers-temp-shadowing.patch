@@ -1,4 +1,4 @@
-From b1c0fb2098c68fdfcd5d7cafd5e387bd371e9fdf Mon Sep 17 00:00:00 2001
+From 3923e11a717c98ad0181b7a80d8e28f35d6dc9ca Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:41:07 +0000
 Subject: [PATCH] Let a temporary SQLite table or view hide a permanent one in
@@ -42,7 +42,7 @@ index 64b1bad838..592e13764d 100644
            SQL
  
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index 3dac5cca5f..663f42027b 100644
+index 3dac5cca5f..8b405bc030 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 @@ -525,9 +525,11 @@ def test_insert_logged
@@ -106,14 +106,14 @@ index 3dac5cca5f..663f42027b 100644
 +          @conn.add_index "shadowed", :number
 +          @conn.execute "CREATE TEMP TABLE index_shadowed_on_number (other integer)"
 +          @conn.execute "CREATE INDEX temp.shadowed ON index_shadowed_on_number (other)"
-+          @conn.execute "CREATE TEMP TRIGGER shadowed_trigger AFTER INSERT ON main.shadowed BEGIN SELECT 1; END"
++          @conn.execute "CREATE TEMP TRIGGER shadowed AFTER INSERT ON main.shadowed BEGIN SELECT 1; END"
 +
 +          assert_equal %w[ id number ], @conn.columns("shadowed").map(&:name)
 +          assert_equal "id", @conn.primary_key("shadowed")
 +          assert_equal [%w[ number ]], @conn.indexes("shadowed").map(&:columns)
 +        ensure
 +          @conn.execute "DROP TABLE IF EXISTS temp.index_shadowed_on_number"
-+          @conn.execute "DROP TRIGGER IF EXISTS temp.shadowed_trigger"
++          @conn.execute "DROP TRIGGER IF EXISTS temp.shadowed"
 +        end
 +      end
 +
