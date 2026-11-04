@@ -42,7 +42,7 @@ Each branch is one commit by Thomas on rails main `8b06b0eb98`:
 - `thomasklemm/restore-find-template` @ `c814745459`
 - `thomasklemm/restore-max-password-length` @ `08be5191db`
 
-Neither is pushed yet. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
+Both are pushed to the fork after Sol's "open with nits" round, and are waiting for the coordinator to open them. Each test fails without its fix. AR-1's test also fails against a mutant in which the alias points at the non-raising `find`.
 
 Differentials against 8-1-stable ([`ft_diff.rb`](../../bench/upstream/api_regressions/ft_diff.rb), [`mp.rb`](../../bench/upstream/api_regressions/mp.rb), [`rs_diff.rb`](../../bench/upstream/api_regressions/rs_diff.rb)):
 
@@ -72,7 +72,15 @@ Separate review (subagent, both rubrics): AR-1 and AR-2 pass correctness on the 
 
 Neither PR discussed these names, and none of the removing commits is in a release tag. Caveat for AR-1: `LookupContext` is `:nodoc:` in 8.1. The gem callers are the argument. props_template also calls `find_template`, as a fallback.
 
-## Held: AR-3, `ActionDispatch::Request::Session` and `Request::Utils`
+Sol round (coordinator): open with nits, no deprecation or CHANGELOG entry needed, since the removals are unreleased. Changes made:
+
+- Both bodies now say "The removal is unreleased".
+- AR-1's body no longer includes the VM comparison.
+- AR-2's body drops the code-search count and says the constant "preserves the BCrypt byte limit".
+
+Load order for AR-2 is verified with [`mp_load.rb`](../../bench/upstream/api_regressions/mp_load.rb). Touching `SecurePassword` loads the same 228 files on main and on the patch. `SecurePassword` stays autoloaded, and the bcrypt gem is not loaded.
+
+## Not opened: AR-3, `ActionDispatch::Request::Session` and `Request::Utils` (coordinator decision)
 
 This patch is built: [patch](../../bench/upstream/api_regressions/patches/request-session-utils.patch), [body](../../bench/upstream/api_regressions/bodies/request-session-utils.md), branch `thomasklemm/request-session-utils-constants` @ `e18bd83c4d`. It fixes `NameError` in json_tagged_logger and ManageIQ.
 
@@ -107,6 +115,6 @@ Known gaps compared with 8.1, the same for any `deprecate_constant`:
 
 ## Leads not built yet
 
-- **`Rails::BacktraceCleaner::APP_DIRS_PATTERN`**, removed in #56333. Foreman's `config/initializers/backtrace_silencers.rb` matches backtrace lines with this constant, and code search finds about 700 hits, many of them sentry-ruby's own constant. The class is `:nodoc:`, and the PR replaced the allow-list with an exclusion. Restoring the old regexp would satisfy Foreman, but would bring back a list of directories that Rails itself no longer uses. This is the next candidate if Sol thinks it is worth it.
+- **`Rails::BacktraceCleaner::APP_DIRS_PATTERN`**, removed in #56333. Foreman's `config/initializers/backtrace_silencers.rb` matches backtrace lines with this constant, and code search finds about 700 hits, many of them sentry-ruby's own constant. The class is `:nodoc:`, and the PR replaced the allow-list with an exclusion. Restoring the old regexp would satisfy Foreman, but would bring back a list of directories that Rails itself no longer uses. Coordinator: record only (`:nodoc:`, and the pattern's meaning changed).
 - **`ActiveModel::Validations::NumericalityValidator#validate_each`** lost its `precision:`/`scale:` keywords in #59246. Overrides in subclasses still work: money-rails takes three arguments and calls `super` without keywords. It would only break a caller that passes the keywords; none was found.
 - **`SpawnMethods#merge(other, *rest)` → `merge(other)`** (`79b6a77d3e`, "Remove unused parameter"). A second argument raised a deprecation in 7.1 and was ignored from 7.2 on. On main it raises `ArgumentError`. No caller was found.
