@@ -96,6 +96,12 @@ The `Time.now` count in the differential drops 160 → 150; nothing else differs
 so the census as a whole is inside its A/A. ruby-bench can't show W2: none of railsbench, lobsters or shipit updates
 a record in its measured iteration (0 passes counted).
 
+**App census (CPU).** `script/cpu-census`, interpreter, same four apps, base `cw2` with A/A twin `cw`, W2 as `cwts`
+(W2 is the only commit between them). Median over 41 workloads −0.01% (A/A −0.00%), |Δ| p90 0.54% (A/A 0.34%), no
+workload ≤ −1%. Campfire, Fizzy and Writebook sit inside their A/A. Blog drifts +0.54% median, but its object
+counts move on paths W2 doesn't touch (POST comment 1944 → 2296, broadcast job 804 → 1227), so that is app state
+between runs, not W2. No app-level CPU claim.
+
 **Exactness.** Primary and adversarial subagent rounds. Same rows, `lock_version`, counters and errors for: dirty
 update; explicit `updated_at`, `updated_on`, both; clean save; `before_update` dirtying a clean record, restoring or
 setting `updated_at`; `save(touch: false)`; `record_timestamps = false`; partial updates off; `touch`,
@@ -196,6 +202,6 @@ written" and "Append the default star projection without a rest Array".
 
 ## Limits
 
-* Micro cases on SQLite in memory and a four-app allocation census, not request time. The app CPU census label for W2
-  (`cwts`, interpreter, four apps) was still running when this was recorded; its row follows.
+* Micro cases on SQLite in memory and four-app allocation and CPU censuses, not request time. The CPU census shows
+  no app-level change for W2.
 * Reviews were subagents; the Sol round runs in the coordinator thread.
