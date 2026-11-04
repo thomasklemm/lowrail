@@ -454,7 +454,7 @@ None.
   Branch [`thomasklemm/route-source-location-dir`](https://github.com/thomasklemm/rails/tree/thomasklemm/route-source-location-dir)
   ([`a9c03b098e`](https://github.com/thomasklemm/rails/commit/a9c03b098e76861d8b9d4d2ed51a27fbd95570b2)), with a draft
   in [rails-boot.md](rails-boot.md#b1-1-compute-the-action-dispatch-directory-once-for-route-source-locations).
-  Held until the "is it worth it?" discussion on [#59577](https://github.com/rails/rails/pull/59577) is settled; #59577 was closed on 2026-11-04 as superseded by #59590, so B1-1 needs its own decision.
+  Held until the "is it worth it?" discussion on [#59577](https://github.com/rails/rails/pull/59577) is settled; #59577 was closed on 2026-11-04 as superseded by #59590, so B1-1 needed its own decision: parked as a lead (2026-11-04). It is exact but development-only (about 1–2% of a dev reload request), and Rails slots go to production hot paths first.
 
 ## Drafted, not opened
 
