@@ -43,7 +43,7 @@ MySQL, Trilogy and MongoDB configurations were skipped because this orb has none
 
 | ID | Cause (first bad commit) | Fix | Branch @ SHA on thomasklemm/rails | State |
 | --- | --- | --- | --- | --- |
-| E1 | `DescendantsTracker` uses `WeakSet` without requiring it (3c77803ec0); `require "active_support/core_ext/class/subclasses"` raises NameError and ransack does not load | one `require` | `thomasklemm/descendants-tracker-require-weak-set` @ `1d1fbb6410` | open as rails/rails#59623 |
+| E1 | `DescendantsTracker` uses `WeakSet` without requiring it (3c77803ec0); `require "active_support/core_ext/class/subclasses"` raises NameError and ransack does not load | one `require` | `thomasklemm/descendants-tracker-require-weak-set` @ `1d1fbb6410` | superseded: rails/rails#59623 closed by skipkayhil ("You must require active_support before cherry picking core extensions"); fixed in ransack instead, G1 `thomasklemm/require-active-support-before-core-ext` @ `4713d2d697`, open as activerecord-hackery/ransack#1792 |
 | E2 | the batched SQLite readers match table names exactly (2cb3daba96), so a table created as `Widgets` is not found as `widgets` | `COLLATE NOCASE` plus rows keyed by each requested name | `thomasklemm/sqlite-schema-readers-table-name-case` @ `8f41f1c9c3` | Sol: open with nits |
 | E2b | the same readers list a temporary table or view and the permanent table it hides, so columns and indexes are duplicated and the primary key becomes composite (2cb3daba96) | in `MASTER_CTE`, a temporary table or view hides a permanent one; temporary indexes and triggers hide nothing | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `3923e11a71` | Sol: open with nits; queued |
 | E3 | `ActiveSupport::LogSubscriber.colorize_logging` removed without a deprecation (aebcb61520); awesome_print 1.9.2 raises on load, administrate does not boot | deprecated delegators to `ActiveSupport.colorize_logging` | `thomasklemm/log-subscriber-colorize-logging-deprecation` @ `8672567e15` | Sol: open with nits |
@@ -86,6 +86,7 @@ Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](.
 
 ## Gem-side leads (not filed)
 
+- ransack requires `active_support/core_ext` without `active_support` first (E1, now G1; see above).
 - ransack calls `Arel::SelectManager.new(Class)`. Since dd25a8150f the argument must respond to `klass`.
 - view_component: `TemplateDetails::Requested#locale` (621b50a9a3, `:nodoc:`), allocation counts pinned per Rails
   version (main allocates fewer), and `with_request_url` doesn't reset the host memos added in 5edbac28ff. Its

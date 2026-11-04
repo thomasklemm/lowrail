@@ -1,0 +1,29 @@
+From 4713d2d6975e79eaf7b130aad4fc2a00b2d0c205 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 16:16:07 +0000
+Subject: [PATCH] Require active_support before its core extensions
+
+Rails expects active_support to be loaded before core extensions are
+required on their own. On Rails main, active_support/core_ext reaches
+DescendantsTracker, which uses ActiveSupport::WeakSet through the
+autoload that active_support.rb sets up, so requiring ransack raised
+NameError.
+---
+ lib/ransack.rb | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/ransack.rb b/lib/ransack.rb
+index 03bf03e..47c5877 100644
+--- a/lib/ransack.rb
++++ b/lib/ransack.rb
+@@ -2,6 +2,7 @@ require 'active_support/dependencies/autoload'
+ require 'active_support/deprecation'
+ require 'active_support/deprecator'
+ 
++require 'active_support'
+ require 'active_support/core_ext'
+ require 'ransack/errors'
+ require 'ransack/configuration'
+-- 
+2.55.0
+
