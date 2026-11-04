@@ -150,7 +150,38 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | CP-3: `resolve_attribute_name` looks up aliases with `[]` instead of `fetch(name, &:itself)` | rails/rails | `thomasklemm/resolve-attribute-name-lookup` @ `b2577977c3` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp3-resolve-attribute-name-lookup.patch)) | `type_for_attribute` −15% instructions interpreted, −24% YJIT, −30% ZJIT; a two-condition `where` −0.6% / −1.8% / −1.5%; ruby-bench shipit −0.16% interpreted, −0.25% YJIT instructions per iteration; in all 20 census apps ([round 2](rails-common-paths-2.md#cp-3-look-up-attribute-aliases-with-)) | Ready, held until Thomas has read it (DECISIONS). L0; two subagent reviews; body and explanation below. |
 | CP-5: `UriEncoder#escape` checks a component with an anchored match on the safe characters | rails/rails | `thomasklemm/uri-encoder-safe-match` @ `3c968c5bf6` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp5-uri-encoder-safe-match.patch)) | `escape_segment` of a slug −42% / −46% / −45% instructions; `page_path(slug)` −8% / −15% / −11%; `post_path(post)` −1.1% / −2.5% / −1.5%; ruby-bench shipit −0.13% interpreted, −0.31% YJIT instructions per iteration; 12 of 20 census apps ([round 2](rails-common-paths-2.md#cp-5-check-url-components-with-an-anchored-match)) | Ready, held until Thomas has read it. L1; escaping, so primary and adversarial subagent rounds; adds one test. |
 | TH-1: restore `ActionView::Template.registered_template_handler`, `template_handler_extensions` and `register_default_template_handler`, dropped unreleased by #57874 | rails/rails | `thomasklemm/template-handler-readers` @ `81b05aaf2d` on main `9b116f1fed` (local; [patch](../../bench/upstream/census_backlog/patches/th1-template-handler-readers.patch)) | Correctness/compatibility: on main, maildown 3.3.1's handler raises `NoMethodError` the first time a `.md` template compiles (CodeTriage's mails in census 4); the branch matches 8-1-stable on every input of the differential under interpreter, YJIT and ZJIT; render path within A/A in Callgrind ([census backlog](census-backlog.md#th-1-restore-the-template-handler-lookup-methods)) | Ready, held until Thomas has read it. L0; subagent primary review approve / approve-with-nits (nits applied); body rewritten after an outsider pass. |
+| I1: grouped `count` keys of a column unknown to the schema are cast from the result (bug fix, [rails/rails#48420](https://github.com/rails/rails/issues/48420)) | rails/rails | [`thomasklemm/grouped-keys-unknown-table-type`](https://github.com/thomasklemm/rails/tree/thomasklemm/grouped-keys-unknown-table-type) @ [`0cd841c0c1`](https://github.com/thomasklemm/rails/commit/0cd841c0c16340b573a4b551af69f4b756c97648) on main `9b116f1fed` ([patch](../../bench/upstream/rails_issue_fixes/patches/i1-grouped-keys-unknown-table-type.patch)) | Keys of a joined subquery or CTE column come back as Strings on PostgreSQL since 7.0.5 (`Range`, `Date`, … again), and on SQLite for typed columns (`1` → `true`); lib +3/−1, one test, CHANGELOG. The only fix left after triaging 132 open issues ([triage](rails-issue-fixes.md)) | Review path done (L1; primary review approve on both rubrics; adversarial round with two low, accepted differences; outsider read of the body; AR suite green on PostgreSQL and SQLite; no open PR for #48420 at 12:15 UTC). Waiting for the coordinator's Sol review; opens under Thomas's standing OK for bug fixes. Active Record area (C11 owns its performance work). |
+| IW: Array subclasses' `index_with` indexes what `each` yields again (unreleased regression from 2b88dc1995, census backlog finding 3) | rails/rails | [`thomasklemm/index-with-array-subclass-each`](https://github.com/thomasklemm/rails/tree/thomasklemm/index-with-array-subclass-each) @ [`2486c9d447`](https://github.com/thomasklemm/rails/commit/2486c9d4471155ca219571efa32eac0fb7c01d4e) on main `9b116f1fed` | Restores 8.1's result for subclasses overriding `each`; costs +5.3% / +2.7% instructions (interpreter / YJIT) on every plain-Array `index_with` | Built, **held, not recommended**: the cost lands on a hot path for a case core `Array` methods ignore too; conflicts with our open #59557, whose test pins main's behaviour ([record](rails-issue-fixes.md#census-backlog-findings-c14)). Active Support area (C13). |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
+
+### Erklärungen für Thomas: I1 und IW (2026-11-04, Bugfixes; I1 wartet auf Sol, IW zurückgehalten)
+
+Triage, Prüfungen und PR-Text: [rails-issue-fixes](rails-issue-fixes.md).
+
+**I1, gruppierte Zählung über eine Subquery (rails/rails#48420).** Wer nach einer Spalte aus einer gejointen Subquery
+oder CTE gruppiert, etwa `group("ranges.range").count`, bekommt seit Rails 7.0.5 die Schlüssel als rohe Strings
+statt als Range, Date oder Boolean. Rails nimmt den Typ seitdem zuerst von der Gruppenspalte, und für eine Tabelle,
+die das Schema nicht kennt, ist das nur der Platzhalter-Typ, der nichts umwandelt; jetzt nimmt Rails genau in diesem
+Fall den Typ, den die Datenbank für das Ergebnis meldet, wie vor 7.0.5, und Spalten bekannter Tabellen behalten
+ihren Typ.
+
+```ruby
+Booking.joins("JOIN (SELECT tsrange(...) AS range) ranges ON TRUE").group("ranges.range").count
+# vorher: { "[\"2020-01-01 00:00:00\",\"2020-01-02 00:00:00\")" => 1 }
+# jetzt:  { 2020-01-01 00:00:00 UTC...2020-01-02 00:00:00 UTC => 1 }
+```
+
+**IW, `index_with` auf Array-Unterklassen.** Seit byroots 2b88dc1995 (noch nicht released) baut `Array#index_with`
+den Hash mit `Array#to_h`, das die gespeicherten Elemente direkt liest; eine Unterklasse, die `each` überschreibt,
+bekommt deshalb andere Schlüssel als in 8.1. Der Fix schickt Unterklassen wieder über `each`, kostet aber bei jedem
+normalen Array (also bei jeder Query) etwa 5% mehr Instruktionen, für einen Fall, den auch Rubys eigenes `map` oder
+`to_h` nicht beachten; deshalb empfehle ich, ihn nicht zu öffnen.
+
+```ruby
+class Tens < Array; def each = super { |x| yield x * 10 }; end
+Tens[1, 2].index_with { _1 }   # 8.1: {10=>10, 20=>20}, main: {1=>1, 2=>2}
+Tens[1, 2].map { _1 }          # in beiden: [1, 2], Array-Methoden ignorieren das eigene each
+```
 
 ### Erklärung für Thomas: AR-1 (2026-11-04, nicht geöffnet)
 

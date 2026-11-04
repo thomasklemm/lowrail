@@ -1,0 +1,54 @@
+From 2486c9d4471155ca219571efa32eac0fb7c01d4e Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:25:00 +0000
+Subject: [PATCH] Index what each yields in Array subclasses' index_with again
+
+Array#index_with builds its Hash with Array#to_h, which reads the
+elements directly, so an Array subclass that overrides #each got its
+stored elements as keys instead of what #each yields, unlike in 8.1.
+
+Subclasses now use Enumerable#index_with; plain Arrays keep Array#to_h.
+---
+ activesupport/lib/active_support/core_ext/enumerable.rb | 7 +++++--
+ activesupport/test/core_ext/enumerable_test.rb          | 6 ++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/activesupport/lib/active_support/core_ext/enumerable.rb b/activesupport/lib/active_support/core_ext/enumerable.rb
+index 1903217a23..6d922ce842 100644
+--- a/activesupport/lib/active_support/core_ext/enumerable.rb
++++ b/activesupport/lib/active_support/core_ext/enumerable.rb
+@@ -311,9 +311,12 @@ def compact_blank!
+ 
+   # Array#to_h sizes the hash for the array up front, so it stays embedded up
+   # to 8 entries, where Enumerable#index_with's growing hash would move to the
+-  # C heap.
++  # C heap. Array#to_h doesn't call #each, so subclasses, which may override
++  # it, use Enumerable#index_with.
+   def index_with(default = (no_default = true))
+-    if block_given?
++    if !instance_of?(Array)
++      no_default ? super() : super(default)
++    elsif block_given?
+       to_h { |elem| [elem, yield(elem)] } # rubocop:disable Rails/IndexWith
+     elsif no_default
+       to_enum(:index_with) { size }
+diff --git a/activesupport/test/core_ext/enumerable_test.rb b/activesupport/test/core_ext/enumerable_test.rb
+index a5b1c889aa..84e0a0a587 100644
+--- a/activesupport/test/core_ext/enumerable_test.rb
++++ b/activesupport/test/core_ext/enumerable_test.rb
+@@ -286,6 +286,12 @@ def test_index_with_indexes_what_each_yields
+     point = Struct.new(:x, :y).new(3, 4)
+     assert_equal({ 3 => 6, 4 => 8 }, point.index_with { |value| value * 2 })
+     assert_equal({ [:x, 3] => 0, [:y, 4] => 0 }, point.each_pair.index_with(0))
++
++    tens = Class.new(Array) { def each = super { |value| yield value * 10 } }[1, 2]
++    assert_equal({ 10 => 20, 20 => 40 }, tens.index_with { |value| value * 2 })
++    assert_equal({ 10 => 0, 20 => 0 }, tens.index_with(0))
++    assert_equal({ 10 => nil, 20 => nil }, tens.index_with(nil))
++    assert_equal({ 10 => 10, 20 => 20 }, tens.index_with.each(&:itself))
+   end
+ 
+   def test_many
+-- 
+2.55.0
+
