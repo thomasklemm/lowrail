@@ -114,5 +114,6 @@ F2 doesn't change it.
 ## Review status
 
 Both fixes follow "Correctness fixes: readable first": one condition or one line each, in the shape of the
-surrounding code, no measurements. Sol (from the patches and this doc): both "open with nits"; the nits are applied above. Pushed to the fork for
-Thomas to open; not opened.
+surrounding code, no measurements. Sol (from the patches and this doc): both "open with nits"; the nits are applied above. F2 opened as
+[rails/rails#59625](https://github.com/rails/rails/pull/59625) on 2026-11-04 (head `2b4a97089a`). F1 waits for a free slot:
+GitHub caps users without write access at 15 open PRs per repository, which is why the creates returned 404.
