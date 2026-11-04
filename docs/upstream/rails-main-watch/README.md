@@ -20,7 +20,8 @@ baseline, it prints `WATCH: … unchanged` and writes nothing. The last line is 
 
 * **Pairs.** Each end is measured twice (`script/census run --aa`, labels `w-SHA12` and `w-SHA122`). A base measured
   in an earlier orb is read back from its trimmed receipts, so the census copies may be set up anew (`script/census
-  setup --rails <baseline>`, services as in [census.md](../census.md)).
+  setup --rails <baseline>`, services as in [census.md](../census.md)). Both ends run on the census Ruby pin
+  (`--ruby`, default 4.0.9); a stored pair measured on another Ruby is re-measured with its controls, never compared.
 * **Workloads.** The census value (median GC-enabled objects per operation). A workload moved when all four
   base×head deltas exceed its floor in the same direction, by at least one object, and the traced (GC-disabled)
   count of the same operations moves the same way in all four. The floor is the largest A/A difference of that
