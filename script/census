@@ -525,6 +525,14 @@ module Census
   # (an orb that lost them re-measures the baseline commit).
   def watch_pair(opts, sha)
     labels = watch_labels(sha)
+    # A pair (and its cached controls) measured on another Ruby is re-measured, never compared.
+    ruby = ruby_description(ruby_bin(opts[:ruby]))
+    stale = labels.map { File.join(opts[:out], _1, "meta.json") }.select { File.exist?(_1) && JSON.parse(File.read(_1))["ruby"] != ruby }
+    unless stale.empty?
+      warn "#{sha[0, 12]}: measured on #{JSON.parse(File.read(stale.first))["ruby"]}; re-measuring on #{ruby}"
+      FileUtils.rm_rf(labels.map { File.join(opts[:out], _1) })
+      FileUtils.rm_f(Dir[File.join(opts[:out], "watch-controls", "#{sha[0, 12]}-*.txt")])
+    end
     files = labels.product(opts[:modes], opts[:apps]).map { |l, m, a| File.join(opts[:out], l, "#{a}-#{m}.json") }
     run(opts.merge(label: labels.first, aa: true, rails: "rails/rails@#{sha}")) unless files.all? { File.exist?(_1) }
     meta = JSON.parse(File.read(File.join(opts[:out], labels.first, "meta.json")))
