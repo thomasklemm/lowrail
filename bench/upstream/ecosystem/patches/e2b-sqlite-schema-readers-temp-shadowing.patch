@@ -1,0 +1,92 @@
+From 611fcb450c1626a1ee50295c44eb7e64b6a69e78 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 15:41:07 +0000
+Subject: [PATCH] Let a temporary SQLite table hide a permanent one in the
+ schema readers
+
+The batched schema readers listed every row of sqlite_master and
+sqlite_temp_master. When a temporary table had the name of a permanent
+one, both rows matched, and the pragmas resolved both names to the
+temporary table, so columns, primary keys, indexes and foreign keys came
+back twice. List a permanent object only when no temporary one has its
+name, as SQLite does when it resolves a name.
+---
+ .../sqlite3/schema_statements.rb              |  8 ++++---
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 23 +++++++++++++++----
+ 2 files changed, 24 insertions(+), 7 deletions(-)
+
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+index 64b1bad838..320d32321d 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+@@ -70,12 +70,14 @@ def schema_creation # :nodoc
+ 
+         private
+           # sqlite_master lists the permanent objects in the database and
+-          # sqlite_temp_master the temporary ones.
++          # sqlite_temp_master the temporary ones. A temporary object hides a
++          # permanent one of the same name, as it does when SQLite resolves a name.
+           MASTER_CTE = <<~SQL
+             WITH master AS (
+-              SELECT name, type, sql FROM sqlite_master
+-              UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
++              UNION ALL
++              SELECT name, type, sql FROM sqlite_master
++              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
+             )
+           SQL
+ 
+diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+index 3dac5cca5f..e8d03beb09 100644
+--- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+@@ -525,9 +525,10 @@ def test_insert_logged
+           tables_query = ["SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND type IN ('table','view')", "SCHEMA", []]
+           structure_query = [<<~SQL.squish, "SCHEMA", []]
+             WITH master AS (
+-              SELECT name, type, sql FROM sqlite_master
+-              UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
++              UNION ALL
++              SELECT name, type, sql FROM sqlite_master
++              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
+             )
+             SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
+                    t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
+@@ -685,6 +686,19 @@ def test_columns_with_not_null
+         end
+       end
+ 
++      def test_schema_readers_read_a_temporary_table_that_hides_a_permanent_one
++        with_example_table "id integer PRIMARY KEY, number integer", "shadowed" do
++          @conn.execute "CREATE TEMP TABLE shadowed (temp_id integer PRIMARY KEY, temp_number integer)"
++          @conn.execute "CREATE INDEX temp.index_shadowed_on_temp_number ON shadowed (temp_number)"
++
++          assert_equal %w[ temp_id temp_number ], @conn.columns("shadowed").map(&:name)
++          assert_equal "temp_id", @conn.primary_key("shadowed")
++          assert_equal ["index_shadowed_on_temp_number"], @conn.indexes("shadowed").map(&:name)
++        ensure
++          @conn.execute "DROP TABLE IF EXISTS temp.shadowed"
++        end
++      end
++
+       def test_add_column_with_not_null
+         with_example_table "id integer PRIMARY KEY AUTOINCREMENT, number integer not null" do
+           assert_nothing_raised { @conn.add_column :ex, :name, :string, null: false }
+@@ -712,9 +726,10 @@ def test_indexes_logs
+         with_example_table do
+           index_list_query = [<<~SQL.squish, "SCHEMA", []]
+             WITH master AS (
+-              SELECT name, type, sql FROM sqlite_master
+-              UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
++              UNION ALL
++              SELECT name, type, sql FROM sqlite_master
++              WHERE name NOT IN (SELECT name FROM sqlite_temp_master)
+             )
+             SELECT m.name AS table_name, i.name, i."unique"
+             FROM master m
+-- 
+2.55.0
+
