@@ -30,11 +30,19 @@ class MenuItem < ActiveRecord::Base
 end
 
 class BugTest < ActiveSupport::TestCase
-  def test_relation_find_uses_overridden_primary_key
-    MenuItem.create!(uuid_key: "abc", name: "Soup")
+  def setup
+    MenuItem.find_or_create_by!(uuid_key: "abc", name: "Soup")
+  end
 
+  def test_class_find_uses_overridden_primary_key
     assert_equal "Soup", MenuItem.find("abc").name
+  end
+
+  def test_relation_find_uses_overridden_primary_key
     assert_equal "Soup", MenuItem.all.find("abc").name
+  end
+
+  def test_relation_find_many_uses_overridden_primary_key
     assert_equal ["Soup"], MenuItem.all.find(["abc"]).map(&:name)
   end
 end

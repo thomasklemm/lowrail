@@ -1,4 +1,6 @@
-### Relation `find` ignores an overridden `self.primary_key` on main
+### Relation find ignores an overridden self.primary_key on main
+
+Posted as rails/rails#59622.
 
 Overriding the class method documented as "can be overridden in subclasses" no longer reaches relation finders on main. `Model.find(id)` still works, but `Model.all.find(id)` and `Model.all.find([ids])` build the condition from `primary_key_definition`. That reads the schema, which has no primary key here, so the column name comes out empty:
 
@@ -8,6 +10,10 @@ main:       SELECT "menu_items".* FROM "menu_items" WHERE "menu_items"."" = ? LI
 ```
 
 On main the script below fails with `ActiveRecord::StatementInvalid: no such column: menu_items.`; on 8-1-stable (`RAILS_BRANCH=8-1-stable`) it passes. Bisecting points to 55406a9794 ("Introduce ActiveRecord::PrimaryKey value object for composite keys"), whose message says "The public `primary_key` API (String/Array/nil) is unchanged." friendly_id's test suite hits this (`UuidAsPrimaryKeyFindTest`).
+
+**Expected:** `Model.all.find` uses the overridden primary key, as on 8-1-stable.
+**Actual:** the condition uses an empty column name and the query fails.
+**System:** Rails main 8b06b0eb98, Ruby 4.0.9, sqlite3 adapter.
 
 ```ruby
 # frozen_string_literal: true
@@ -42,12 +48,21 @@ class MenuItem < ActiveRecord::Base
 end
 
 class BugTest < ActiveSupport::TestCase
-  def test_relation_find_uses_overridden_primary_key
-    MenuItem.create!(uuid_key: "abc", name: "Soup")
+  def setup
+    MenuItem.find_or_create_by!(uuid_key: "abc", name: "Soup")
+  end
 
+  def test_class_find_uses_overridden_primary_key
     assert_equal "Soup", MenuItem.find("abc").name
+  end
+
+  def test_relation_find_uses_overridden_primary_key
     assert_equal "Soup", MenuItem.all.find("abc").name
+  end
+
+  def test_relation_find_many_uses_overridden_primary_key
     assert_equal ["Soup"], MenuItem.all.find(["abc"]).map(&:name)
   end
 end
 ```
+
