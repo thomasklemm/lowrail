@@ -1,0 +1,39 @@
+# Proof round for the readiness runner: the pins of ecosystem round 2 (docs/upstream/ecosystem-round-2.md).
+# Known on this candidate: R2-2 (scenic), R2-3 and R2-4 (lograge), and in Lobsters L1 (released rspec-rails)
+# and L2 (positional URL helper with an empty to_param; fixed on main after e64f5a4258).
+ruby: 4.0.9
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1
+  candidate: e64f5a4258 # main, 2026-11-04
+seeds: [4242, 1717]     # run 1 and run 2, the same pair on both trees
+alone_runs: 5
+timeout: 2400
+
+suites:
+  lograge:
+    repo: https://github.com/roidrage/lograge
+    ref: v0.15.1
+    framework: rspec
+    test: rspec
+
+  scenic:
+    repo: https://github.com/scenic-views/scenic
+    ref: v1.9.0
+    framework: rspec
+    env: { GITHUB_ACTIONS: "1", POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    setup: ["rake dummy:db:drop dummy:db:create"]
+    test: rake spec
+
+  lobsters: &lobsters
+    repo: https://github.com/lobsters/lobsters
+    ref: b6ea255a
+    framework: rspec
+    env: { RAILS_ENV: test }
+    shims: ["cp .github/workflows/check/* config/ && cp config/database.yml.sample config/database.yml"]
+    setup: ["bin/rails db:schema:load db:migrate"]
+    test: rspec
+
+  # The same app with rspec-rails' fix for the frozen default_url_options (unreleased), as in app-suites.md.
+  lobsters-rspec-rails-main:
+    <<: *lobsters
+    bumps: { rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 9fb6f4f0a3 } }
