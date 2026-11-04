@@ -1,0 +1,36 @@
+From d4db9330caa5f36c39ebc44360c6e4a2077d99e9 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:38:11 +0000
+Subject: [PATCH] Compute the update timestamp only when a timestamp column is
+ written
+
+record_update_timestamps runs twice per update, once before and once
+after the update callbacks. The second pass usually finds updated_at
+already changing and writes nothing, but still read the current time,
+which goes through with_connection. Read it before the first write.
+
+    post.update!(views: 1) # 190 -> 189 allocations
+---
+ activerecord/lib/active_record/timestamp.rb | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/activerecord/lib/active_record/timestamp.rb b/activerecord/lib/active_record/timestamp.rb
+index 8b4626aff5..c2b9111e1c 100644
+--- a/activerecord/lib/active_record/timestamp.rb
++++ b/activerecord/lib/active_record/timestamp.rb
+@@ -131,10 +131,11 @@ def create_or_update(touch: true, **)
+ 
+     def record_update_timestamps
+       if @_touch_record && should_record_timestamps?
+-        current_time = current_time_from_proper_timezone
++        current_time = nil
+ 
+         timestamp_attributes_for_update_in_model.each do |column|
+           next if will_save_change_to_attribute?(column)
++          current_time ||= current_time_from_proper_timezone
+           _write_attribute(column, current_time)
+         end
+       end
+-- 
+2.55.0
+
