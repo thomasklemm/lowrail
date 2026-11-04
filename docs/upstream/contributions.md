@@ -146,6 +146,7 @@ Prepared candidates waiting for room or a gate (rules in [DECISIONS](../DECISION
 | GC: restore the slot-count incremental sweep pool budget (4.1 regression 2) | ruby/ruby | [`thomasklemm/gc-pool-budget`](https://github.com/thomasklemm/ruby/tree/thomasklemm/gc-pool-budget) @ `4b02fa55cb` on master `9b30fd207f` (first version `gc-pool-budget-slots` @ `a06b86d852`) | master vs master+fix, 97 workloads: major GCs 86 → 13 (interp), 98 → 26 (YJIT); GC time −15% / −23%; RSS +1.7–3.3 MB per workload window; sweep pause p99 +4% / +12%, maximum unchanged; ruby-bench shipit majors 25 → 6 / 27 → 5 ([watch](ruby-4.1-regression-watch.md#2-sparse-large-slot-heaps-force-nofree-major-gcs)) | Candidate, not opened: no new ruby/ruby PRs for now (DECISIONS, 2026-11-03). Step-size objection measured; body and explanation drafted. No reply on ruby/ruby#17251. |
 | CP-3: `resolve_attribute_name` looks up aliases with `[]` instead of `fetch(name, &:itself)` | rails/rails | `thomasklemm/resolve-attribute-name-lookup` @ `b2577977c3` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp3-resolve-attribute-name-lookup.patch)) | `type_for_attribute` −15% instructions interpreted, −24% YJIT, −30% ZJIT; a two-condition `where` −0.6% / −1.8% / −1.5%; ruby-bench shipit −0.16% interpreted, −0.25% YJIT instructions per iteration; in all 20 census apps ([round 2](rails-common-paths-2.md#cp-3-look-up-attribute-aliases-with-)) | Ready, held until Thomas has read it (DECISIONS). L0; two subagent reviews; body and explanation below. |
 | CP-5: `UriEncoder#escape` checks a component with an anchored match on the safe characters | rails/rails | `thomasklemm/uri-encoder-safe-match` @ `3c968c5bf6` on main `9b116f1fed` (local; [patch](../../bench/upstream/common_paths_2/patches/cp5-uri-encoder-safe-match.patch)) | `escape_segment` of a slug −42% / −46% / −45% instructions; `page_path(slug)` −8% / −15% / −11%; `post_path(post)` −1.1% / −2.5% / −1.5%; ruby-bench shipit −0.13% interpreted, −0.31% YJIT instructions per iteration; 12 of 20 census apps ([round 2](rails-common-paths-2.md#cp-5-check-url-components-with-an-anchored-match)) | Ready, held until Thomas has read it. L1; escaping, so primary and adversarial subagent rounds; adds one test. |
+| R1: declare `prism` as a runtime dependency of Action View and Railties (Ruby 4.1 makes prism a bundled gem) | rails/rails | `thomasklemm/declare-prism-dependency` @ `00339f7e89` on main `9b116f1fed` (local; [patch](../../fixtures/corpus/ruby-41-readiness/rails-declare-prism-dependency.patch)) | Correctness, not speed: on Ruby master, an app without minitest 6, irb ≥ 1.17 or rdoc in its bundle gets `LoadError` for prism from `ActionView.eager_load!`, template digests, the test runner and `bin/rails notes`; with the change it resolves prism 2.1.0 on master and 4.0.9 ([readiness](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency)) | Ready, held until Thomas has read it. L0 (+4 lines); correctness review approve, maintainability review approve-with-nits (addressed); body and explanation below. |
 | i18n C2, C3: Symbol defaults/links without merge; early return on a missing Symbol key | ruby-i18n/i18n | `resolve-symbols-without-merge` @ `3bef11d6e3`, `lookup-symbol-miss` @ `b82af9eeae` | −2.5 and −2.3 objects per workload, 4–5 apps | Held: small, and #763–#766 have no maintainer response yet. Revisit after the first one. |
 
 ### Erklärungen für Thomas: T1 und T2 (2026-11-04, Action View; T1 geöffnet als #59603, T2 als Lead geparkt)
@@ -296,6 +297,23 @@ UNSAFE = /[^a-z0-9-]/; SAFE = /\A[a-z0-9-]*\z/
 > | main, run again (change from the first run) | +0.7% | +0.3% | +0.10% | −0.02% | −0.00% |
 >
 > Objects per call are unchanged. Ruby 4.0.9, GC disabled; ZJIT on Ruby master 9aa0898240 ([script](https://github.com/thomasklemm/lowrail/blob/main/bench/upstream/common_paths_2/micro_url.rb)). Times are medians of 15 runs in rotating order on one CPU; instructions are Callgrind's count for 3,000 calls minus its count for none, divided by 3,000. `escape_segment` itself runs 42% fewer instructions for that slug and 11% fewer for `"123"` (interpreter), and `post_path(post)` with an id 1.1% fewer interpreted and 2.5% fewer with YJIT, against A/As of 0.13% and 0.26%. On ruby-bench (Rails 8.1 with the method patched in), only shipit moves clearly beyond the noise between two builds (up to 0.1% here): 0.13% fewer instructions per iteration with the interpreter and 0.31% fewer with YJIT. railsbench's 9,670 escapes per iteration are numeric ids, which save about 350 instructions each, about 0.05% of an iteration. In a CPU census of 20 open-source Rails apps on Rails main, this check ran in 12 and took 0.10% of interpreted instructions; I found it there with Lowrail, my research project ([notes](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails-common-paths-2.md)).
+
+### R1: Erklärung für Thomas (2026-11-04, Ruby 4.1, nicht geöffnet)
+
+Aufzeichnung, Prüfung und PR-Text: [ruby-4.1-readiness](ruby-4.1-readiness.md#r1-declare-prism-as-a-dependency).
+
+**R1, prism als Abhängigkeit.** In Ruby 4.1 ist prism kein Default-Gem mehr, sondern ein Bundled Gem: unter Bundler
+lässt es sich nur noch laden, wenn es im Bundle steht. Rails main lädt prism in Action View (Template-Digests,
+Eager Loading) und in Railties (Test-Runner, `bin/rails notes`), deklariert es aber nicht; Apps bekommen es heute nur
+zufällig über minitest 6, irb oder rdoc, und ohne die gibt es auf 4.1 einen `LoadError`. Die Änderung trägt
+`prism` ohne Version in beide Gemspecs ein, genau wie Rails es für `cgi` und `tsort` gemacht hat; alle prism-APIs,
+die Rails aufruft, gibt es schon in der Version, die Ruby 3.3 mitbringt.
+
+```ruby
+# Gemfile ohne minitest 6 / irb ≥ 1.17 / rdoc, Ruby 4.1:
+ActionView.eager_load!   # vorher: LoadError: cannot load such file -- prism
+                         # jetzt: prism kommt über actionview.gemspec ins Bundle
+```
 
 ## Open
 
