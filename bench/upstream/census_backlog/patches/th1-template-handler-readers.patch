@@ -1,0 +1,75 @@
+From 81b05aaf2d2e58ab9812e096e9535f7e4b4f89ef Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 4 Nov 2026 12:05:40 +0000
+Subject: [PATCH] Restore three ActionView::Template handler methods
+
+The Ractor-shareable handler registry (#57874, not released yet) kept
+register_template_handler, unregister_template_handler and
+handler_for_extension on ActionView::Template, but dropped
+registered_template_handler, template_handler_extensions and
+register_default_template_handler. Template handlers in gems still call
+registered_template_handler(:erb), maildown's for example, and now fail
+the first time a template using them is compiled.
+
+They now delegate to the registry like the methods that were kept.
+---
+ .../lib/action_view/template/handlers.rb      | 12 ++++++++++++
+ actionview/test/template/handlers_test.rb     | 19 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/actionview/lib/action_view/template/handlers.rb b/actionview/lib/action_view/template/handlers.rb
+index 257de0ce8a..c4601ca89f 100644
+--- a/actionview/lib/action_view/template/handlers.rb
++++ b/actionview/lib/action_view/template/handlers.rb
+@@ -57,6 +57,18 @@ def unregister_template_handler(*extensions)
+         Handlers.unregister(*extensions)
+       end
+ 
++      def template_handler_extensions
++        Handlers.extensions.map(&:to_s).sort
++      end
++
++      def registered_template_handler(extension)
++        extension && Handlers.template_handlers[extension.to_sym]
++      end
++
++      def register_default_template_handler(extension, handler)
++        Handlers.register_default(extension, handler)
++      end
++
+       def handler_for_extension(extension)
+         handler = Handlers.template_handlers[extension.to_sym] if extension
+         handler || Handlers.default_template_handler
+diff --git a/actionview/test/template/handlers_test.rb b/actionview/test/template/handlers_test.rb
+index a5f38a004e..a00de950af 100644
+--- a/actionview/test/template/handlers_test.rb
++++ b/actionview/test/template/handlers_test.rb
+@@ -33,6 +33,25 @@ def test_registering_a_proc_handler_keeps_the_registry_shareable
+     ActionView::Template.unregister_template_handler :custom
+   end
+ 
++  def test_registered_template_handler
++    assert_same ActionView::Template.handler_for_extension(:erb), ActionView::Template.registered_template_handler("erb")
++  end
++
++  def test_registered_template_handler_does_not_fall_back_to_the_default
++    assert_nil ActionView::Template.registered_template_handler(:unknown)
++  end
++
++  def test_template_handler_extensions
++    assert_equal %w(builder erb html raw ruby), ActionView::Template.template_handler_extensions
++  end
++
++  def test_register_default_template_handler
++    handler = lambda { |_, source| source }
++    ActionView::Template.register_default_template_handler :custom, handler
++
++    assert_same ActionView::Template.registered_template_handler(:custom), ActionView::Template.handler_for_extension(:unknown)
++  end
++
+   def test_compiling_with_erubi_does_not_load_herb
+     script = <<~RUBY
+       require "action_view"
+-- 
+2.39.5
+
