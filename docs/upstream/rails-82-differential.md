@@ -184,8 +184,115 @@ deserialize or change detection; in UUID handling (despite the new fast path); i
 two changes there); in any PostgreSQL- or MySQL-only SQL; or in recognition and generation.
 
 **Pre-existing, the same on 8.1 and main (not 8.2 regressions, recorded only):** `changed?` raises `ArgumentError:
-comparison of Rational with BigDecimal failed` on the types that pass values through unchanged (binary, PG range,
-money, hstore and others) when the old value is a Time or Date and the new one a BigDecimal (74 cases), because
-`Time#==` compares through `<=>`; casting an integer array element `"x"` gives `0` while serializing it gives
+comparison of Rational with BigDecimal failed` (or `… with NaN failed`) on the types that pass values through
+unchanged (binary, PG range, money, hstore and others) when the old value is a Time or Date and the new one is a
+NaN; round 3 traces it to ruby/date (see [Round 3](#changed-and-nan-a-rubydate-bug)); casting an integer array element `"x"` gives `0` while serializing it gives
 `NULL`.
 
+
+## Round 3: cross-version data, Strong Parameters, core extensions (2026-11-04)
+
+During a rolling deploy 8.1 and 8.2 processes read each other's data. Same pins as before (8-1-stable
+`6e09124217`, main `6c23cb8f2a`, Ruby 4.0.9); both trees run from a two-line app Gemfile with the shared gems pinned
+to the same versions (sqlite3 2.10.2, msgpack 1.8.0, globalid 1.4.0, rack-session 2.1.2, connection_pool 2.5.5),
+so only Rails differs. Harness and drivers: [`fixtures/corpus/rails-82-diff/round3/`](../../fixtures/corpus/rails-82-diff/round3/).
+
+### Method
+
+* **One process per tree writes, the other reads.** Each tree writes its data, then each tree reads both trees'
+  data, giving four reads per configuration: 8.1 from 8.1, 8.1 from main, main from 8.1, main from main. A
+  *cross* difference is a tree reading the other tree's data differently from its own (the rolling-deploy
+  question); a *decode* difference is the two trees reading their own data differently. Values are generated
+  from a fixed seed after Rails boots, with core Ruby calls only, so both trees build the same values.
+* **Values (2,000 per family):** nil/booleans, Integers to ±2⁷⁰, Floats with NaN/±Infinity/−0.0, BigDecimals
+  (NaN, 1e40, 39 digits), Rationals, Strings in UTF-8/binary/UTF-16/Latin-1, Symbols, SafeBuffers (safe and
+  unsafe after `gsub!`), Time (UTC, local offsets, TimeWithZone in 8 zones, DateTime, Date), Durations, Ranges,
+  TimeZones, Set/IPAddr/URI/Pathname/Regexp/Complex/Class, Active Record records (loaded, with loaded
+  associations, new, changed, partial `select`), nested Arrays, Hashes and HWIAs.
+* **Covered:** `Rails.cache` (FileStore) with the default coder and `marshal_7_0`, `marshal_7_1`, `message_pack`,
+  each compressed and uncompressed, the 7.0 legacy format and `coder: Marshal`, with `expires_in` and `version`;
+  `read_multi`. `MessageVerifier` (plain and url-safe SHA256) and `MessageEncryptor` (GCM, CBC, url-safe) with all
+  five serializers, purposes and expiry, read with the same key and through a rotation; `Rails.application`
+  message verifiers; `signed_id`, signed and plain GlobalIDs. Active Job: 2,000 argument lists with keyword
+  arguments, GlobalIDs, Times with zones, Ranges, BigDecimals, Durations, Symbols, HWIAs, plus scheduled jobs;
+  both the wire JSON and the deserialized job compared. Active Record encryption: non-deterministic,
+  deterministic, `downcase`, `ignore_case`, `compress: false`, the MessagePack message serializer and a
+  serialized JSON column, read back and queried through the deterministic columns; raw `encryptor` ciphertexts.
+  Cookies and sessions through a real controller (CSRF on): plain, signed, encrypted and permanent cookies with
+  expiry, session and flash, under cookie serializers `json`, `hybrid`, `marshal`, `message_pack`,
+  `message_pack_allow_marshal`; the cache-store session (JSON and Marshal); CBC cookies written and read as
+  GCM (`use_authenticated_cookie_encryption` flipped); `secret_key_base` rotated between writer and reader
+  (cookie rotations and message verifier rotation); and main with `load_defaults "8.2"` (`message_serializer =
+  :json`) against 8.1 with `"8.1"`. About 1.05 million reads in all.
+* **Strong Parameters (3,000 generated params × filters):** `permit` with `action_on_unpermitted_parameters` nil,
+  `:log` and `:raise` (including the logged keys), `require` (one and many), `expect`, `expect` with an array
+  filter, bare `expect`, `expect!`, `fetch`/`dig`/`slice`/`except`, `to_h`/`to_hash`/`to_query`, unsafe access
+  and transforms, `merge`, `inspect`, equality and hashing. Params hold strings, arrays, hashes, `"0"`/`"1"`
+  indexed hashes, multiparameter keys and non-String scalars; filters nest scalars, `[]`, `{}`, arrays of hashes.
+* **Core extensions:** 1,035 words (German, Turkish and random) × four locales with custom `:de`/`:tr`
+  inflections and transliteration rules: pluralize/singularize with a locale, parameterize and transliterate
+  with a locale, the same under `I18n.with_locale`; 3,000 Durations built from mixed units through every
+  operator, `in_*`, `parts`, `build`, `parse`, `iso8601` and time/date arithmetic; 3,000 nested values through
+  `as_json` (with `only`/`except`), `to_json`, `ActiveSupport::JSON.encode` and a decode round trip; 1,026
+  numeric strings and 1,015 numbers through `to_i`/`to_f`/`to_d`, the `to_fs` formats, byte and duration helpers.
+
+Not covered: Redis, Memcache and database-backed stores (the coders are shared with FileStore, the transports
+are not); `encrypts … previous:` schemes; Active Storage and Action Cable payloads.
+
+### Differences
+
+**No cross-version difference.** In every configuration, each tree reads the other tree's data exactly as it
+reads its own: every cache entry, message, signed ID, GlobalID, job, encrypted attribute, cookie, session and
+flash. Active Job's wire JSON is identical, and so are the lists of what each cache coder refused to write.
+
+| Surface | Difference (8.1 → main) | Commit | Class | Action |
+| --- | --- | --- | --- | --- |
+| Marshal'd or MessagePack'd records (cache, messages) | Loaded records list their attributes in schema order | `61480bf2d1` (round 2 row) | Intended | None |
+| A `TimeZone` serialized as JSON | The generic instance-variable dump now includes the zone's constant period for zones without transitions | `fbaf5cd9d0` | Intended (performance), harmless | None: a JSON'd TimeZone comes back as a Hash on both versions; Marshal'd and YAML'd zones load both ways (YAML goes through `initialize`) |
+| Number helpers, encoding | UTF-8 instead of US-ASCII | `2ecce1b3b9` (round 1 row) | Intended | None |
+| `Float::INFINITY.to_fs(:delimited)` | `"Infinity"` instead of `"In,fin,ity"` | `150e4c0443` (round 1 row) | Intended, in CHANGELOG | None |
+| `Parameters#to_query` | Empty nested collections no longer add `a[][]` fragments or extra `&` (29 cases, all of this kind) | #57500/#57677 (round 1 row; F1 is the follow-up) | Intended, in CHANGELOG | None |
+
+No difference in `permit`, `require`, `expect`, unpermitted-parameter logging or raising, or any other
+Parameters method; and none in inflections with locales, Duration arithmetic and parts, JSON encoding of nested
+values, or numeric and string conversions.
+
+A harness artefact, recorded so nobody chases it: with the cache-store session, the four readers first shared
+one store, and a read request consumes the flash and writes the session back. Whichever tree read first saw the
+flash and the other did not. Reversing the order reversed the result; with one copy of the store per reader
+all four reads agree.
+
+### `changed?` and NaN: a ruby/date bug
+
+The pre-existing `changed?` error from round 2 only happens with NaN (166 cases: 76 BigDecimal NaN, 90
+`Float::NAN`; every other BigDecimal and Float compares fine). Same on 8.1 and main:
+
+```ruby
+person.born_on = Float::NAN   # attribute :born_on, :date; old value a Date
+person.changed?               # ArgumentError: comparison of Rational with NaN failed
+```
+
+The chain: `Value#changed?` does `old_value != new_value`; ActiveSupport's `Time#<=>` hands a non-Time to
+`to_datetime <=> other`; `Date#<=>` with a Numeric calls `cmp_gen`, which runs `rb_cmpint` on
+`ajd <=> other`. `Rational#<=>` returns `nil` for a NaN, and `rb_cmpint` turns that `nil` into the
+`ArgumentError`. `Date#==` comes from Comparable, so it raises too. Plain Ruby, no Rails
+([`date_nan_repro.rb`](../../fixtures/corpus/rails-82-diff/round3/date_nan_repro.rb)): `Date.today <=> Float::NAN`
+raises where `1 <=> Float::NAN`, `Rational(1) <=> Float::NAN` and `Time.now <=> Float::NAN` return `nil`.
+
+**Rails side: no candidate.** A fix in `changed?` would special-case NaN in the type's comparison, the scattered
+special-casing the readability gate rejects, for a cause that is not in Rails. Not deliberate in ruby/date
+either: its documentation for `<=>` says it returns `nil` when the two are incomparable.
+
+**Ruby side (for Thomas; unfiled, new ruby/date issues and PRs need his OK):** call it **Ruby 3**. A one-line
+change in `cmp_gen` returns `ajd <=> other` as is instead of forcing it through `rb_cmpint`
+([patch](../../fixtures/corpus/rails-82-diff/patches/ruby-date-cmp-gen-nan.diff)). With it, `Date <=> NaN` is `nil`,
+`Date == NaN` is `false`, `Date < NaN` raises `comparison of Date with NaN failed` as Comparable does for
+Integers, and every other numeric comparison is unchanged; ruby/date's suite (148 tests, 162,573 assertions)
+gives the same result with and without it on Ruby 4.0.9. No existing issue on bugs.ruby-lang.org or ruby/date.
+
+> `Date#<=>` raises `ArgumentError` when the other value is a NaN (`Float::NAN` or `BigDecimal("NaN")`), where
+> `Integer`, `Rational` and `Time` return `nil`, and `Date#==` raises with it because it goes through `<=>`.
+> `cmp_gen` passes the result of `ajd <=> other` to `rb_cmpint`, which turns the `nil` that `Rational#<=>`
+> returns for a NaN into an exception. Returning the result of `<=>` unchanged makes `Date` behave like the
+> other numerics; frameworks that compare values of unknown types, such as Active Model's dirty tracking,
+> then stop raising.
