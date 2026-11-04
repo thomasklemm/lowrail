@@ -45,8 +45,8 @@ master `9aa0898240`, 8 files, +126/−42. Not a PR.
 * **ruby-bench:** railsbench, lobsters, shipit (Rails 8.1.x gems) with
   [`bench/upstream/zjit_iseq_harness.rb`](../../bench/upstream/zjit_iseq_harness.rb), 10 warmup and 10 measured
   iterations. "Per itr" means per benchmark iteration.
-* **F1's 21 master configurations** (Rails main `c042aee23a`, 18 apps) are queued in the F1 orb with this build,
-  behind F1's own passes. They aren't in this record yet; they will be added when they arrive.
+* **F1's 21 master configurations** (Rails main `c042aee23a`, 18 apps): see
+  [The leads on 21 configurations](#the-leads-on-21-configurations-f1s-2026-11-04).
 * Ranking: [`bench/upstream/zjit_iseq_rank.rb`](../../bench/upstream/zjit_iseq_rank.rb) (ISEQ × counter, by apps
   reached, then per-op cost) and [`bench/upstream/zjit_iseq_leads.rb`](../../bench/upstream/zjit_iseq_leads.rb)
   (lead totals). Raw JSONs and both rankings:
@@ -115,6 +115,58 @@ per-request breadth on Rails main (10/10 apps for 4–7) as upstreaming priority
 Lead 8 is the only one without an issue. It's small: give the block-handler guard a recompile, or specialize the
 implicit block pass through `super`. It's also in the area of k0kubun's super rows, so it needs an ownership
 question first. Leads 1–3 are #1099. Lead 10 is the general #19658/#19669 problem with `Module` as the class, so it belongs with linyiru's PRs.
+
+## The leads on 21 configurations (f1s, 2026-11-04)
+
+F1's pass `f1s` ran this build (`508f80e462`) on F1's 21 configurations: blog, campfire, writebook, fizzy,
+fizzy-mysql, codetriage, pingcrm, redprints-cfp, react-starter-kit, lobsters, casa, hackatime, thinkroom, docuseal,
+lago, lago-nops, sure, mastodon, mastodon-nops, discourse, loomio. Rails main `c042aee23a`, `--zjit-stats-iseq
+--zjit-exec-mem-size=512 --zjit-mem-size=1024`, warmup 200, then 20 ops per workload (hackatime 11 workloads here,
+12 in the allocation runs). Checks:
+
+* 0 `compile_error_out_of_memory` in all 21 runs. The largest code region is 134 MiB (sure).
+  `compile_error_iseq_version_limit_reached` is non-zero in loomio (1,740), fizzy-mysql (1,166), fizzy (960) and
+  writebook (100).
+* 0 per-ISEQ counter sums that differ from the global counter, over 21 runs and 142,625 cells.
+* Harness artifact, excluded below: `send_fallback_singleton_class_seen` in the census harness's own `stats` block
+  (`harness.rb:252`, about 3.8k per op in mastodon, mastodon-nops and loomio, 2.1k in sure). That's the harness
+  dispatching workloads, not app code.
+* F1-f reproduces exactly: `exit_patchpoint_no_singleton_class` per op is mastodon 13,909, mastodon-nops 16,086,
+  loomio 9,215 (F1's `f1u1`: 13,915 / 16,105 / 9,213).
+
+The ten leads, 21 configurations against the 10 census apps above. "Apps" counts configurations with a non-zero
+count; "per op" is the mean over those.
+
+| # | lead (counter, site) | 10 census apps: apps, per op | 21 configs: apps, per op | change |
+|---|---|---|---|---|
+| 1 | yield in `Array#each` (`invokeblock_*`) | 10, 924 | 21, 1,373 (+ `map` 561, `find` 203) | broader and larger |
+| 2 | `BasicObject#!=` (`send_polymorphic_fallback`) | 10, 282 | 21, 595 (sure 5,148) | larger |
+| 3 | `_reflections` (`send_polymorphic_fallback`) | 10, 120 | 20, 166; `attribute_aliases` megamorphic 15, 162 | similar |
+| 4 | protected calls: `OrderedOptions` block / all | 10, 114 / 188 | 21, 107 / 222 | same |
+| 5 | `Kernel#send` in Arel `Visitor#visit` / all | 10, 102 / 186 | 20, 239 / 397 | larger |
+| 6 | `WhereClause#empty?` sendforward / all | 10, 92 / 331 | 21, 166 / 708 | larger |
+| 7 | `&block` forwarding: all / `mon_synchronize` | 10, 334 / – | 21, 598 / 89 | larger |
+| 8 | `super` from a method with a block (`exit_unhandled_block_arg`): all / `fetch_or_store` | 10, 23 / 21 | 21, 68 / 62 | larger (thinkroom 381) |
+| 9 | invalidated constant exits (`exit_patchpoint_stable_constant_names`) | 10, 230 | 11, 395; `WhereClause.empty` 6 apps, 303 (sure 712) | concentrated |
+| 10 | `singleton_class_seen` in `IndexedRow#fetch` | 6, 431 | 13, 792 (sure 5,107) | broader and larger |
+
+Ownership is unchanged from the queue below; nothing in f1s changes the free ranking (10, 3, 1, 2). Lead 10 gains the
+most breadth (13 of 21), which supports its rank.
+
+Sites that the 21 configurations surface beyond the ten, all inside #1099's polymorphism classes (no new mechanism):
+
+* `getivar_fallback_no_profile_missing_ic` in Arel `Collectors::Composite#<<` (composite.rb:21): 16 apps, 612 per op
+  over all 21, the second-largest (counter, ISEQ) pair after `Array#each`. `SubstituteBinds#<<` adds 213 (11 apps).
+* `getivar_fallback_no_side_exits` in `_read_attribute!` (read.rb:58, 18 apps, 326), `association_cache`
+  (17 apps, 304) and `LazyAttributeSet#fetch_value!` (11 apps, 272).
+* `send_fallback_send_polymorphic` in the `tag_options` block (tag_helper.rb:1548): 10 apps, 317.
+* `send_fallback_send_polymorphic_fallback` in `association` (associations.rb:56): 17 apps, 273.
+
+Reasons over all 21 (mean per op over all 21): `send_polymorphic_fallback` 6,328, `getivar no_profile_missing_ic`
+5,962, `getivar no_side_exits` 4,276, `send_megamorphic` 3,585, `invokeblock_polymorphic_miss` 1,975,
+`invokeblock_not_specialized` 946. The order is the same as on the 10 apps; the per-op values are about 2.4× higher,
+mostly from mastodon, loomio, sure and discourse. Raw JSONs, ranking and lead totals: `f1s/`, `f1s-rank/` and
+`f1s-rank.md` in the private data.
 
 ## Queue: which leads are free (2026-11-03)
 
