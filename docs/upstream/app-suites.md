@@ -21,6 +21,7 @@ overridden `primary_key` (#59622).
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
 | Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restore?), CW3–CW5 (b), SU4, SU5, L1 |
+| Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, lead), PI3 (a, perf, built) |
 
 ## Findings
 
@@ -425,3 +426,74 @@ job and Intercom importer specs.
 is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
 ActiveSupport::Cache::RedisCacheStore is deprecated`, from rack_attack.rb above. Both trees print Devise 4.9.4's route
 mapper warnings and `ActiveSupport::Configurable is deprecated`.
+
+## Private Rails app with Inertia Rails
+
+The private app from [the anonymized M0 study](../m0/private-inertia-app.md): authenticated Inertia (React) pages,
+dashboards, background jobs, PostgreSQL. No application source, names or test counts are recorded here, per that
+study's privacy rules; the app was not changed upstream (no commits, branches or PRs). Ruby 4.0.9 on both trees,
+its locked inertia-rails 3.23.0, PostgreSQL 18.6, the app's own `rails test` with 8 workers and a fixed seed.
+Rails 8-1-stable `6e09124217` and main `7a78da5a55`, both as `path:` gems.
+
+**Bundles.** The two locks differ only in Rails and what main itself requires (herb, marcel 2.1, psych,
+ractor-dispatch, stringio), plus one gem whose latest release caps marcel below 2; it was moved to its unreleased
+upstream fix commit in both trees. The app's test env prints deprecations to stderr (not raising), so main-only ones
+were read from the logs. Environment fixes identical on both trees: the `zip` CLI installed, and
+`max_locks_per_transaction = 256` on the test cluster (PI2; with the default 64, one of two main runs failed most
+tests with `out of shared memory`; the 8-1 runs never did).
+
+**Results.** 8-1 twice: every test passes. Main twice: the same failures both times, all in one area of the app and all
+from PI1. With a one-line app-side shim for PI1 (main checkout only), main passes every test, with the same assertion
+count as 8-1.
+
+**PI1 (c), covered by our open #59574: `Arel::Table.new(name)` with a positional name.** The app calls `Arel::Table.new` with a
+positional name and gets `ArgumentError (given 1, expected 0)` (b1650993b0, #57829; see
+[arel-table-positional](arel-table-positional.md)). With #59574's branch in the main tree and no app shim, the failing
+files pass, and each call prints the new deprecation. Nothing new to build.
+
+**PI2 (a), lead, not built: `disable_referential_integrity` on PostgreSQL 18.4+ holds about 16 times as many locks.**
+7051ca8a45 (#57378, CHANGELOG) toggles every foreign key with `ALTER TABLE … ALTER CONSTRAINT … NOT ENFORCED` and back,
+in one transaction. Each toggle locks the table, the referenced table, their indexes and the constraint until commit;
+8-1 used `DISABLE TRIGGER ALL`. `truncate_tables` (at each parallel worker's start) and `insert_fixtures_set` both go
+through it, and fixture loading keeps the locks until its transaction commits. PostgreSQL's shared lock table holds
+about `max_locks_per_transaction` × connections (64 × about 100 by default), so parallel test workers that load
+fixtures at the same time can run out: `PG::OutOfMemory: out of shared memory`. In the app suite this hit one of the
+two main runs and neither 8-1 run. Repro without app code:
+[fk_locks.rb](../../bench/upstream/app_suites/fk_locks.rb), default PostgreSQL 18.6 settings, 151 tables with 300
+foreign keys: one call holds 161 locks on 8-1 and 2,558 on main. 24 processes resetting their databases at once, each
+holding the locks for half a second as a fixture load would: 8-1 24/24 ok twice; main 10 and 13 of 24 fail with
+`out of shared memory`. With 8 or 16 processes the repro passes on main most of the time, so how often a suite hits
+it depends on the database size and on whatever else holds locks at that moment. The CHANGELOG entry doesn't mention
+locks. No issue or PR found. A fix isn't small: the toggle is the point of the change (it needs table ownership
+instead of superuser), and the locks are what `ALTER CONSTRAINT` takes. Options for the coordinator: an upgrade-guide
+or CHANGELOG note (raise `max_locks_per_transaction` for parallel tests), or asking upstream whether `truncate_tables`
+needs the toggle at all, since PostgreSQL truncates all tables in one statement. App-side workaround: raise
+`max_locks_per_transaction`.
+
+**PI3 (a, performance), built: `Object#try` allocates an empty keyword Hash per call.** 2709a9f16d (kamipo, "Remove
+`ruby2_keywords` usage", no CHANGELOG) turned `try(*args, &block)` with `ruby2_keywords` into
+`try(*args, **kwargs, &block)`; a named keyword splat builds a Hash on every call. Found by allocation sites per
+request: inertia-rails 3.23.0's prop resolver calls
+[`prop.try(:rescue?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L120),
+[`prop.try(:deferred?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L279)
+(shortened) and [`prop.try(:once?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L285)
+per prop (v3.23.0), so its allocations rise by about 200 objects
+per page on main. Repro: [try_kwargs.rb](../../bench/upstream/app_suites/try_kwargs.rb) (8-1 1 object per
+`try(:name)`, main 2, fix 1; with keywords 3 on all three). Fix: an anonymous `**`, which Ruby 3.4+ doesn't allocate
+for without keywords (3.3 measured unchanged); the block form is chosen again when there are no positional
+arguments, as in 8-1, so `try(key: 1) { }` (`TypeError` on 8-1 and main) now runs the block. Test in `try_test.rb`
+(guarded `RUBY_VERSION >= "3.4"`, as other Active Support tests are) fails on main with 2; `try_test.rb` passes on 4.0.9
+and 3.3.13; Active Support `core_ext` tests identical to main (only missing-`builder` LoadErrors in this bundle);
+RuboCop clean. Per call: 2 → 1 objects, Callgrind 3,362 → 2,835 instructions in the interpreter and 2,293 → 1,897 with
+YJIT (A/A identical). ZJIT micro on Ruby master not run (no master build on this orb).
+[patch](../../bench/upstream/app_suites/pi3-try-without-kwargs-hash.patch),
+[body](../../bench/upstream/app_suites/pi3-body.md). Branch `thomasklemm/try-without-kwargs-hash` @ `1e3539559d`
+on main `7a78da5a55`. No review round yet.
+
+**inertia-rails 3.23.0 on main:** nothing breaks and it emits no deprecation; its only main-specific effect is PI3.
+
+**Deprecations that only main emits** (all from app code): `exec_insert`/`exec_update` (deprecated, to be removed in
+9.0), `ActionController::InvalidAuthenticityToken` (renamed to `InvalidCrossOriginRequest`), and
+`ActiveRecord::SchemaDumper.ignore_tables` (use `config.active_record.schema_ignored_tables`).
+
+**Impact on four requests:** [private-inertia-app-82](../m0/private-inertia-app-82.md).
