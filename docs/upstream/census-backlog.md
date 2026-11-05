@@ -131,15 +131,24 @@ retains its previous metrics and branch count; both nil methods have no branches
 
 Independent skeptical passes are recorded on the exact heads in the queue metadata: CB1 **changes required**
 (coercion blocker verified independently); CB2 **approve with nits**, no correctness blockers, including an
-additional 201 differential cases. Its wording nits (medians, external harness links, marginal block result)
-are applied in the body. CB2 still needs coordinator Sol; no Sol or Astra was run here.
+additional 201 differential cases. Its wording nits were applied. Under Thomas's later "Bodies for humans,
+short" rule, both item bodies now contain two paragraphs and one table; methodology, pins, controls, test
+totals and the nodoc override boundary stay in the item notes and this record, not in the prospective PR body.
+CB2 still needs coordinator Sol; no Sol or Astra was run here.
 
 Use `main`, `main-aa`, `nil-try`, `callbacks` for independent worktrees at the exact heads above. Ruby 4.0.9
 and the patched Valgrind from `script/bench-valgrind` are required. The heap is fixed by `percall.sh` to size-pool
 initial slots `1000000/250000/100000/20000/10000`; all four trees use the same Gemfile.lock (SHA-256
 `98694d889aa7c4d367faed3d3034dfb17aec063a126aac9545b3c1dc69c26154`).
+Benchmark source is pinned at Lowrail
+[`5b9c878577970eaeb02b69d614b7e4a6bd7eea87`](https://github.com/thomasklemm/lowrail/tree/5b9c878577970eaeb02b69d614b7e4a6bd7eea87/bench/upstream/census_backlog),
+using [`percall.sh`](https://github.com/thomasklemm/lowrail/blob/5b9c878577970eaeb02b69d614b7e4a6bd7eea87/bench/upstream/perf_round/percall.sh).
 
 ```sh
+RUBY=path/to/ruby-4.0.9/bin/ruby WARMUP=2000 OUT=/tmp/cb2 \
+  bash bench/upstream/perf_round/percall.sh bench/upstream/census_backlog/refresh_cases.rb symbol 3000 3 path/to/main path/to/main-aa path/to/callbacks
+WORKLOADS=1 RUBY=path/to/ruby-4.0.9/bin/ruby WARMUP=500 OUT=/tmp/cb2-workload \
+  bash bench/upstream/perf_round/percall.sh bench/upstream/census_backlog/refresh_cases.rb action 1000 3 path/to/main path/to/main-aa path/to/callbacks
 RUBY=path/to/ruby-4.0.9/bin/ruby WARMUP=2000 OUT=/tmp/cb1 \
   bash bench/upstream/perf_round/percall.sh bench/upstream/census_backlog/refresh_cases.rb nil_try 3000 3 path/to/main path/to/main-aa path/to/nil-try
 # Likewise nil_kwargs, symbol/block/object/plain with the appropriate candidate tree.
