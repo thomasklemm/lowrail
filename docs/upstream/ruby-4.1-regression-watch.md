@@ -419,6 +419,83 @@ the 99th percentile, while the longest pauses stay the same.
 >
 > </details>
 
+### Against ruby/ruby#17251 (2026-11-05)
+
+Question: does Matt Valentine-House's open ruby/ruby#17251 ("Trigger nofree majors on a per-heap basis") make the
+pool-budget candidate unnecessary? I built four variants on one base, master `9aa0898240`: master, master + #17251
+(`f5e41985e9` cherry-picked), master + pool budget, and master + both. They are two instrumented binaries
+([`gcstep.patch`](../../fixtures/corpus/ruby-41-watch/gcstep/gcstep.patch) on master and on master + #17251, both with
+`--enable-yjit`), and `RUBY_GC_POOL_MODE=slots` switches on the pool budget at run time. #17251 does not touch
+`gc_sweep_step`, where the override sits. The override matches the real commit on the repro: 3 `nofree` majors in
+three runs, as `4b02fa55cb` gave.
+
+Census windows as in the sections above (Rails `b5be03636e`, ten apps, 97 workloads, `CENSUS_GC_OPS=1000`,
+`CENSUS_GC_MAJOR_BY=1`). Each cell ran twice (A / B). YJIT uses 96 workloads: one Fizzy job failed in three cells and
+I left it out of all eight. The columns are sums over the windows. The sweep pause is the continuation an allocation
+waits for, pooled over all workloads.
+
+| Interpreter, A / B | master | + #17251 | + pool budget | + both |
+| --- | ---: | ---: | ---: | ---: |
+| Major GCs | 110 / 84 | 5 / 4 | 10 / 18 | **4 / 2** |
+| of which `nofree` | 109 / 83 | 3 / 1 | 9 / 17 | 2 / 0 |
+| Heaps that forced them | 768 B 83/61, 1024 B 45/22, 640 B 35/23, 96 B 15/14 | 32 B 3/1 | 96 B 7/15, 128 B 4/0, 768 B 2/2 | 32 B 1/0, 160 B 1/0 |
+| All GCs | 1,188 / 1,182 | 1,189 / 1,244 | 1,173 / 1,182 | 1,183 / 1,203 |
+| GC time | 28.6 / 27.1 s | 21.5 / 21.6 s | 21.7 / 21.7 s | 21.7 / 21.7 s |
+| RSS growth, summed | −97 / −120 MB | +89 / +91 MB | +92 / +87 MB | +99 / +91 MB |
+| Sweep pause p99 | 1.93 / 1.98 ms | 2.11 / 1.79 ms | 2.07 / 1.94 ms | 1.64 / 1.87 ms |
+| Sweep pause max | 18.5 / 31.1 ms | 19.3 / 19.5 ms | 19.2 / 21.5 ms | 22.1 / 19.0 ms |
+
+| YJIT, A / B | master | + #17251 | + pool budget | + both |
+| --- | ---: | ---: | ---: | ---: |
+| Major GCs | 87 / 89 | 7 / 6 | 15 / 25 | **1 / 2** |
+| of which `nofree` | 87 / 88 | 7 / 5 | 14 / 23 | 0 / 0 |
+| Heaps that forced them | 768 B 49/60, 1024 B 23/33, 640 B 26/23, 96 B 15/17 | 32 B 8/5 | 96 B 10/15, 768 B 4/8 | none |
+| All GCs | 1,202 / 1,205 | 1,208 / 1,258 | 1,211 / 1,195 | 1,283 / 1,284 |
+| GC time | 28.5 / 29.1 s | 22.9 / 21.9 s | 22.6 / 22.9 s | 22.0 / 22.0 s |
+| RSS growth, summed | +34 / +57 MB | +285 / +256 MB | +255 / +244 MB | +243 / +258 MB |
+| Sweep pause p99 | 1.59 / 1.59 ms | 1.61 / 1.60 ms | 1.56 / 1.53 ms | 1.44 / 1.50 ms |
+| Sweep pause max | 18.8 / 18.3 ms | 19.3 / 18.8 ms | 19.7 / 18.6 ms | 19.6 / 19.2 ms |
+
+ruby-bench shipit (`73918b2`, 15 warm-up and 40 measured iterations, one build at a time, A / B):
+
+| shipit | master | + #17251 | + pool budget | + both |
+| --- | ---: | ---: | ---: | ---: |
+| Majors, interpreter | 23 / 28 | 4 / 4 | 5 / 6 | 2 / 1 |
+| Majors, YJIT | 25 / 28 | 4 / 4 | 5 / 5 | 2 / 2 |
+| GC time, interpreter | 2.89 / 3.10 s | 2.03 / 2.06 s | 2.18 / 2.47 s | 1.85 / 1.99 s |
+| GC time, YJIT | 3.49 / 3.60 s | 2.22 / 1.86 s | 2.37 / 2.01 s | 1.86 / 1.81 s |
+| Peak RSS, interpreter | 146 / 144 MB | 165 / 163 MB | 159 / 159 MB | 183 / 195 MB |
+| Peak RSS, YJIT | 193 / 190 MB | 210 / 211 MB | 208 / 206 MB | 233 / 229 MB |
+
+Sweep pauses in shipit stay between 0.5 and 0.8 ms at p99 and below 1.4 ms at the maximum in every cell.
+
+Repro (`RING=200 BIG=70 N=40000`), same binaries: master 21, 26, 31 `nofree` majors; + pool budget 3, 3, 3;
++ #17251 1, 5, 1; + both 1, 1, 1. The 640 B heap ends at 4–7 pages on master and with #17251, 22–31 with the pool
+budget, and 8–43 with both.
+
+**What this shows.**
+
+* #17251 removes regression 2 in these apps, and it does more than the pool budget does. Majors fall 97 → 4.5
+  (interpreter) and 88 → 6.5 (YJIT), averaged over A and B. GC time falls 22% and 22%, the same as with the pool
+  budget, at the same RSS. The few majors it leaves are forced by the 32 B heap.
+* The pool budget alone leaves 14 and 20 majors, most of them forced by the 96 B heap, a small heap the 1,024-slot
+  pool barely changes. It is no better than #17251 on any row.
+* On top of #17251, the pool budget removes the remaining `nofree` majors (4.5 → 3 interpreter, 6.5 → 1.5 YJIT). Census
+  GC time does not change (21.6 → 21.7 s, 22.4 → 22.0 s), and the gap is smaller than the A/A spread. In shipit it
+  saves 0.1–0.2 s of GC time and 2–3 majors, but adds 18–32 MB of peak RSS over #17251 alone.
+
+**Verdict: drop the candidate.** #17251 fixes the regression this candidate was written for, in the census and in
+shipit, with no measurable cost in GC count, pause or RSS against the candidate. Stacked on #17251, the pool budget does
+not move census GC time and buys a few shipit majors for 20–30 MB of RSS. I would not propose that. Fallback: if #17251
+does not land before 4.1, `thomasklemm/gc-pool-budget` @ `4b02fa55cb` is still the smaller fix, and these numbers
+stand for it.
+
+Method: codetriage and PingCRM lost their signed-in sessions (HTTP 302) when the eight cells ran in parallel, so they
+ran one cell at a time, like Writebook (fresh database per run), the React starter kit and Fizzy on MySQL (MySQL
+Community 8.4.10 tarball on port 3307). The sqlite3 exit deadlock was reaped 20 s after the JSON was written. Scripts:
+[`gcstep/vs17251-*`](../../fixtures/corpus/ruby-41-watch/gcstep/). The orb had 8 CPUs and 15 GB, which was enough for
+all ten apps.
+
 ## 3. No 320 B slot: objects of 257–320 B now take 512 B
 
 ```ruby
