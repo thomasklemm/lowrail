@@ -1,0 +1,60 @@
+From 4fe014a8a7c68f02a81c465ae67c453b29f933d9 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:39:38 +0000
+Subject: [PATCH] Note in the upgrade guide that default_url_options is frozen
+ unless configured
+
+#58483 froze the default_url_options Hash that every class including the
+URL helpers starts with, so changing it in place raises FrozenError
+unless the application configured the options. Show the replacements.
+---
+ guides/source/upgrading_ruby_on_rails.md | 33 ++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 697bd23e7d..f9772ce683 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -147,6 +147,39 @@ warning naming each route whose controller does not exist. Such routes used to
+ go unnoticed until a request matched them. Check the boot log for
+ `references a missing controller` and fix or remove the routes it lists.
+ 
++### `default_url_options` is frozen unless configured
++
++Unless the application configures them, `default_url_options` is now a frozen
++empty Hash in controllers, mailers, integration tests, and any class that
++includes `Rails.application.routes.url_helpers`. Code that changes it in place
++raises:
++
++```ruby
++ActionMailer::Base.default_url_options[:host] = "example.com"
++# => FrozenError: can't modify frozen Hash: {}
++```
++
++Configure the options, assign a new Hash, or override the
++`default_url_options` method instead:
++
++```ruby
++# config/environments/production.rb
++config.action_mailer.default_url_options = { host: "example.com" }
++config.action_controller.default_url_options = { host: "example.com" }
++
++# or at runtime
++ActionMailer::Base.default_url_options = { host: "example.com" }
++
++# app/mailers/application_mailer.rb
++class ApplicationMailer < ActionMailer::Base
++  def default_url_options
++    { host: "example.com" }
++  end
++end
++```
++
++`Rails.application.routes.default_url_options` is not affected.
++
+ ### The old Active Record 6.1 marshalling format was removed.
+ 
+ If your application still sets `active_record.marshalling_format_version = 6.1`, which may
+-- 
+2.39.5
+

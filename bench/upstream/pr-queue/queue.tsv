@@ -4,3 +4,4 @@ bench/upstream/ecosystem/patches/e2b-sqlite-schema-readers-temp-shadowing.body.m
 bench/upstream/ecosystem/patches/e4-activesupport-minitest-floor.body.md	thomasklemm/activesupport-minitest-floor	E4
 bench/upstream/app_suites/s1-body.md	thomasklemm/upgrade-guide-rack-sendfile	S1
 bench/upstream/app_suites/s2-body.md	thomasklemm/upgrade-guide-navigation-helper	S2
+bench/upstream/app_suites/sp1-body.md	thomasklemm/upgrade-guide-frozen-default-url-options	SP1
