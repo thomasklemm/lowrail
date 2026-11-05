@@ -1731,7 +1731,7 @@ autoloading (invariant 7) and time-zone conversion; `ActiveSupport::Ractors.shar
 `Ractor` is undefined (JRuby, TruffleRuby); the rescue also hid errors from `dup`, `freeze` and `changed_in_place?`;
 and the nested test also passed through the dirty clause because of its non-round-tripping `""` default.
 
-The fix is now type-level, with no cast: an attribute is not freezable when its type, or the type a delegating
+A fifth form (`8b817f9f36`) was type-level, with no cast: an attribute is not freezable when its type, or the type a delegating
 decorator such as `normalizes` or `TimeZoneConverter` wraps, includes `Type::Helpers::Mutable` (serialized, JSON and
 jsonb, PG arrays, hstore, points, encrypted). Those models keep 8.1's writable defaults: nothing is cast at schema
 load and each record casts its own value. Every other model keeps the frozen defaults and main's dup path. The
@@ -1740,7 +1740,7 @@ shared, coder loads 0/2 in both models), and the jsonb repro saves `"{}"`. Over-
 shallow dup of the struct doesn't leak) and encrypted strings. Not covered: custom types that return containers without
 the helper still freeze, as on main.
 
-| Callgrind Ir vs main, median of 5 per tree | A/A | probe (`79b9bc0520`) | type-level (final) |
+| Callgrind Ir vs main, median of 5 per tree | A/A | probe (`79b9bc0520`) | type-level (`8b817f9f36`) |
 |---|---|---|---|
 | `Model.new` + first read, int/bool/string defaults, Ruby 4.0.9 | −0.01% | +0.02% | −0.03% |
 | ruby-bench activerecord workload (100 posts with comments), 4.0.9 | +0.00% | +0.00% | −0.07% |
@@ -1750,7 +1750,7 @@ the helper still freeze, as on main.
 
 Models with a mutable-typed attribute pay the per-record cast again (+18–22%), i.e. they lose #59083's gain and are
 back on 8.1's path; models without one stay within A/A on both Rubies. The probe kept flat containers frozen and
-cheap, but only by casting application values at schema load, so the type-level form is the exact one. Method as
+cheap, but only by casting application values at schema load, so the type-level form was the exact one. Method as
 before: `valgrind --tool=callgrind --toggle-collect=rb_ary_initialize` around `Array.new(N) { work }` with GC
 disabled, A/A control a second checkout of main, ruby-bench workload re-implemented from ruby-bench `00f0f8beab`
 (#59083's 199 → 170 ms not re-measured); spread ≤0.83% per tree. The table was measured on the type-level form before
@@ -1758,20 +1758,63 @@ the decorator unwrap, which only runs at schema load, outside the measured loop.
 table: +0.23% / +0.06% / +21.50% on 4.0.9. Scripts and raw results:
 [op8-bench](../../bench/upstream/app_suites/op8-bench/) (`matrix3.sh`, `summary3.rb`, `results-*f6.tsv`).
 
-Tests: activemodel, a mutable type and a mutable type behind a `DelegateClass` are not freezable (fail on main and
-without the unwrap), a plain type is, and a frozen identity-type copy stays mutable (a guard: it passes on main and
-fails on `5a4a9596c0`). AR: an untouched serialized default is unchanged and saves `""`, and reading it first keeps
-8.1's dirty-and-save-NULL; a round-tripping nested JSON default in its own table is not shared, with and without
-`normalizes` (fails on main by sharing, not by dirtiness; without the unwrap it fails for the normalized model).
-activemodel 1,253 runs green; AR serialized_attribute, base, dirty, attributes, defaults, store, normalized_attribute
-on SQLite and PostgreSQL, PG json/array/hstore/geometric and encryptable_record green; railties ractors_test green;
-RuboCop clean. Skeptical review (subagent): request changes (`normalizes` hid the mutable type behind
-`NormalizedValueType`, a `DelegateClass`, so both regressions remained), fixed with the unwrap; re-review: open with
-nits, the delegator unit test applied; a delegator cycle (only custom code can build one) would loop at schema load,
-left as is. Follow-up, not in this fix: scalar time-zone-aware datetime defaults stay frozen and, per the earlier
-review, are cast once in the boot zone on main (`Time.use_zone("Tokyo") { k.new.dt }` gives UTC on main, JST on 8.1);
-not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `8b817f9f36` on main `bdb3d96012` (rails/rails
-main has moved one unrelated commit since),
+The type-level form's review: request changes (`normalizes` hid the mutable type behind `NormalizedValueType`, a
+`DelegateClass`, so both regressions remained), fixed with an unwrap loop; re-review open with nits.
+
+**Final form (nil defaults).** Sol's next question was the reach of the fallback, since `Type::Helpers::Mutable` covers
+every json/jsonb, hstore, PG array and `serialize` column, even with a NULL default. Counted with
+[op8_count_models.rb](../../bench/upstream/app_suites/op8_count_models.rb) after `eager_load!` (raw output in
+[op8-bench/counts](../../bench/upstream/app_suites/op8-bench/counts/); "frozen on main" is "no proc/user default",
+which matched the real `ReadOnlyAttributeSet` count, 305, on OpenProject booted on Rails main):
+
+| App (models frozen on main) | type-level form falls back | nil-default form falls back |
+|---|---|---|
+| OpenProject `9ae6b5cc50` (305 of 361) | 81 | 51 |
+| Mastodon `38d6fac750` (117 of 124) | 21 | 6 |
+| ruby-bench shipit (26) | 10 | 9 (serialized `Shipit::*` columns) |
+| ruby-bench lobsters (24) | 1 (`User`, typed_store) | 1 |
+| ruby-bench railsbench (1), activerecord (2) | 0 | 0 |
+
+ruby-bench is at `00f0f8beab` (Rails 8.1.x; the count needs no Rails main). Discourse isn't checked out in this orb,
+so it isn't counted. So the ruby-bench apps are not unaffected: shipit's `Stack`, `Deploy` and `Task` and lobsters'
+`User` fall back in both forms. Their benchmarks were not run on Rails main. Most of the remaining fallbacks are empty-container
+defaults (`'{}'` jsonb, `'{}'` arrays: 5 of Mastodon's 6). Freezing those as well would need a cast at schema load,
+so it is not attempted.
+
+The nil-default form moves the counts, so it is the fix. A nodoc `Type::Value#freezable_default?(value)` (`true`),
+following the `mutable?` precedent (`Attribute#dup_or_share` already calls the nodoc `@type.mutable?`), is overridden
+by `Helpers::Mutable` (`value.nil?`: JSON, jsonb, arrays, hstore and points cast nil to nil), by `Type::Serialized`
+(`false`: the coder loads even nil, possibly as a container) and by `EncryptedAttributeType` (defers to the type it
+encrypts). `Attribute#freezable?` asks the type. Decorators (`normalizes`, `TimeZoneConverter`) forward the method, so
+the unwrap loop and its delegator-cycle hazard are gone. Not covered, as on main: custom types that return containers
+without being mutable, and subclasses of a mutable type that load NULL as a container.
+
+| Callgrind Ir vs main, median of 5 per tree, 4.0.9 / master | A/A | type-level (`8b817f9f36`) | nil-default (final) |
+|---|---|---|---|
+| `Model.new` + first read, int/bool/string defaults | +0.06 / +0.03% | −0.03 / −0.02% | +0.04 / +0.19% |
+| `Model.new` + first read, NULL json next to int/string defaults | +0.11 / +0.06% | +10.85 / +10.32% | +0.22 / +0.22% |
+| `Model.new` + first read, `'{}'` serialized and `json {}` defaults | −0.05 / −0.12% | +18.50 / +18.32% | +18.21 / +18.62% |
+| ruby-bench activerecord workload | −0.01 / +0.00% | −0.07 / −0.03% | −0.02 / +0.04% |
+
+Per-tree spread ≤0.55%. The type-level column comes from the previous matrix (its own main and A/A) except the NULL
+json row (`results-*f6null.tsv`, same matrix as the final column). Scripts: `driver.rb` (adds the `newnull` workload),
+`matrix4.sh`, `summary4.rb`, `results-*f7.tsv`.
+
+Tests: activemodel, a mutable type is freezable only with a nil default, also behind a `DelegateClass`; a plain type is
+freezable; a frozen identity-type copy stays mutable (a guard that passes on main and fails on `5a4a9596c0`). AR, an
+untouched serialized default is unchanged and saves `""`, and reading it first keeps 8.1's dirty-and-save-NULL; in its
+own table, a round-tripping nested JSON default is not shared, with and without `normalizes` (fails on main by sharing),
+a NULL json column stays frozen, a non-null default on a json attribute falls back, and a NULL serialized column falls
+back, also when encrypted. Each override removed fails a test (Mutable → `false` or `true`, no Serialized or Encrypted
+override). activemodel 1,253 runs; AR serialized_attribute, base, dirty, attributes, defaults, store,
+normalized_attribute, json_serialization, primary_keys and every encryption test on SQLite and PostgreSQL; PG
+json/array/hstore/geometric; RuboCop: all green. The jsonb repro and `op8_probe2.rb` match 8.1. Skeptical review
+(subagent): open with nits, applied (the json non-null test case via `attribute :settings, :json`, since MySQL allows
+no json column default; the redundant nil guard on encrypted types dropped; the commit message's limits); its
+encrypted probes (string, serialized and json, nil and non-nil defaults) match 8.1 or main as intended. Follow-up, not
+in this fix: scalar time-zone-aware datetime defaults stay frozen and, per an earlier review, are cast once in the
+boot zone on main; not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `f95cc1b6df` on main
+`bdb3d96012` (rails/rails main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).
 
@@ -1845,10 +1888,10 @@ calls it to put the test adapter back: 117 F in the job specs tagged `with_good_
 * `Mime::SET`: 5 (mime_types.rb).
 * `protect_from_forgery` without a strategy: 5 (application_controller.rb).
 
-**Readability gate.** All three fixes are correctness fixes; OP8 states its cost (table above): affected models are back on 8.1's per-record cast. Described out loud:
+**Readability gate.** All three fixes are correctness fixes; OP8 states its cost and reach (tables above): affected models are back on 8.1's per-record cast. Described out loud:
 * OP1: "parsers stay a plain hash while the app boots and are frozen when it ractorizes."
 * OP3: "put back the three-line private setter that gems still call."
-* OP8: "a model with a mutable-typed default keeps writable defaults."
+* OP8: "each type says whether its default can be frozen; a mutable one only when it is NULL."
 
 Each is a few lines in the method that owns the behavior, with no new names.
 
