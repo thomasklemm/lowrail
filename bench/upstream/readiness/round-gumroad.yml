@@ -1,0 +1,48 @@
+# Gumroad for the readiness runner (docs/upstream/app-suites.md#gumroad). Unchecked: the round ran by hand with
+# round-gumroad/gumroad-run.rb (8 workers, each with its own MySQL database, Elasticsearch index suffix
+# TEST_ENV_NUMBER and DynamoDB table prefix; Redis blocks are leased by Gumroad's own config/test_redis_isolation.rb),
+# about 25 minutes wall per tree on a1.large. Ruby 3.4.12 as Gumroad pins it, not the round's usual 4.0.9.
+# Services: the runner's Services know only postgres, MariaDB, redis and memcached. Gumroad needs MySQL 8.4 (CI's
+# mysql_native_password flags), Valkey with 64 databases, Elasticsearch 7.9.3, DynamoDB Local on 8002 and MinIO with
+# the spec fixtures, so start them with round-gumroad/services.sh up CHECKOUT before the round and stop them with
+# round-gumroad/services.sh down after. Until Services grows docker-backed entries, this manifest lists none.
+# System packages (both trees): bin/ci-test-packages' list (ffmpeg, imagemagick, pdftk, qpdf, fonts, libtag1-dev),
+# default-libmysqlclient-dev, libvips42 and wkhtmltopdf 0.12.4; Node 22.23.4 for npm ci and the Vite test build.
+# Assets are built once with `rake js:export db:setup pages_tailwind:build vite:build_all vite:build_widget` and
+# can be copied to the other tree. sidekiq-pro (gems.contribsys.com) needs a license and is removed from the Gemfile;
+# Gumroad treats it as optional.
+ruby: 3.4.12
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1 (Gumroad locks 8.1.3.1)
+  candidate: bdb3d96012 # main, as in the record
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 7200
+
+suites:
+  gumroad: &gumroad
+    repo: https://github.com/antiwork/gumroad
+    ref: 74e3046196e1e0b490eb042335faafd580c4b2fe
+    framework: rspec
+    env: { RAILS_ENV: test, NODE_ENV: test, LANG: C.UTF-8, TZ: UTC, CI: "true", DISABLE_SPRING: "1" }
+    # mini_magick: 8.1.4.1's Active Storage ImageMagick policy refuses mini_magick < 5.1 at boot (image_processing
+    # moves 1.13.0 -> 1.14.0 with it). sidekiq: 7.3.4's adapter calls remove_const behind `defined?(:SidekiqAdapter)`,
+    # always true, so boot raises NameError once Rails no longer defines the constant (fixed in 7.3.6). rspec-rails:
+    # 6.1.3 fails every mailer spec file on main with FrozenError (L1); 570b2b0a79 is unreleased.
+    bumps: { mini_magick: "5.4.0", sidekiq: "7.3.9",
+             rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 570b2b0a79 } }
+    shims:
+      - "ruby -i -0pe 'sub(/install_if -> \\{ ENV\\[\"BUNDLE_GEMS__CONTRIBSYS__COM\"\\] \\} do.*?\\nend\\n/m, \"\")' Gemfile"
+      - "sed -i 's/model.index_name(\"#{model.name.parameterize}-test\")/model.index_name(\"#{model.name.parameterize}-test#{ENV[\"TEST_ENV_NUMBER\"]}\")/' spec/support/elasticsearch.rb"
+      - "npm ci"
+    setup: ["bundle exec rake js:export db:setup pages_tailwind:build vite:build_all vite:build_widget"]
+    test: bundle exec rspec --tag ~js --tag ~mobile_view --tag ~billy --tag ~tablet_view --tag ~skip
+  # GR1 fails about 40% of main's examples (fixture rows leak between examples) and active_record_query_trace 1.8.3
+  # stops main from booting; the record compared the rest with these two main-only shims.
+  gumroad-shimmed:
+    <<: *gumroad
+    shims:
+      - "ruby -i -0pe 'sub(/install_if -> \\{ ENV\\[\"BUNDLE_GEMS__CONTRIBSYS__COM\"\\] \\} do.*?\\nend\\n/m, \"\")' Gemfile"
+      - "sed -i 's/model.index_name(\"#{model.name.parameterize}-test\")/model.index_name(\"#{model.name.parameterize}-test#{ENV[\"TEST_ENV_NUMBER\"]}\")/' spec/support/elasticsearch.rb"
+      - "npm ci"
+      - { tree: cand, patch: round-gumroad/main-shims.patch }
