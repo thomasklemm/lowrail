@@ -55,6 +55,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   belong in the docs, where they create no entry.
 * **Commit identity.** Commits are authored and committed by Thomas Klemm `<github@tklemm.eu>` via `/usr/bin/git`,
   with no Amp or co-author trailer (`/opt/git` adds one). Upstream: one commit per fix on a freshly fetched base.
+  Before every push to a fork branch or upstream, check `git log --format='%(trailers:only)' base..HEAD` is empty
+  (Thomas, 2026-11-05: in Lowrail a stray trailer is tolerable and stays; in public repos it must not land).
 
 ## Upstream etiquette
 
