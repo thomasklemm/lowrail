@@ -1,0 +1,44 @@
+base: ruby 4.1.0dev (2026-11-05T16:52:56Z HEAD aed61e36b3) +ZJIT +PRISM [x86_64-linux]
+base2: ruby 4.1.0dev (2026-11-05T16:52:56Z HEAD aed61e36b3) +ZJIT +PRISM [x86_64-linux]
+patch: ruby 4.1.0dev (2026-11-05T17:45:14Z zr-dedup-local 3372d2a9b8) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 00f0f8beab27edb11c0253cc630f91f17d1f1891
+
+----------  -------------  -------------  --------------  -------------  -------------  ----------  ----------
+bench           base (ms)     base2 (ms)      patch (ms)  base2 1st itr  patch 1st itr  base/base2  base/patch
+lobsters     787.3 ± 3.3%   853.5 ± 6.7%    787.7 ± 4.3%          0.940          0.955       0.922       0.999
+railsbench  1575.2 ± 2.2%  1578.2 ± 1.4%   1578.7 ± 4.4%          0.983          0.992       0.998       0.998
+shipit      1274.0 ± 4.0%  1292.7 ± 4.1%  1430.8 ± 13.0%          0.999          0.993       0.986       0.890
+----------  -------------  -------------  --------------  -------------  -------------  ----------  ----------
+
+GC time ratios:
+----------  ----------  -------  -----  ---------  ----------  -------  --------
+bench       comparison  gc/iter  gc/GC  mark/iter  sweep/iter  mark/GC  sweep/GC
+lobsters         base2    0.953  0.991      1.206       0.865    1.255     0.899
+lobsters         patch    0.998  1.038      1.060       0.967    1.103     1.006
+railsbench       base2    0.962  0.996      0.959       0.963    0.993     0.997
+railsbench       patch    1.023  0.979      1.919       0.993    1.838     0.951
+shipit           base2    0.970  0.994      0.946       1.000    0.969     1.025
+shipit           patch    0.943  0.958      0.973       0.908    0.989     0.923
+----------  ----------  -------  -----  ---------  ----------  -------  --------
+
+GC counts:
+----------  ----------  -------------  -------------  -------------  -------------
+bench       comparison       GCs/iter     major/iter     minor/iter     minor GC %
+lobsters         base2   0.8  →   0.9   0.0  →   0.0   0.8  →   0.9   96%  →  100%
+lobsters         patch   0.8  →   0.9   0.0  →   0.0   0.8  →   0.8   96%  →   96%
+railsbench       base2   9.4  →   9.8   0.0  →   0.0   9.4  →   9.8  100%  →  100%
+railsbench       patch   9.4  →   9.0   0.0  →   0.0   9.4  →   9.0  100%  →  100%
+shipit           base2   4.1  →   4.2   0.3  →   0.4   3.7  →   3.8   92%  →   91%
+shipit           patch   4.1  →   4.1   0.3  →   0.3   3.7  →   3.8   92%  →   92%
+----------  ----------  -------------  -------------  -------------  -------------
+Hidden columns (zero or N/A in every row): global/iter
+
+Legend:
+- base2 1st itr: ratio of base/base2 time for the first iteration.
+- base/base2: ratio of base/base2 time. Higher is better for base2. Above 1 represents a speedup.
+- patch 1st itr: ratio of base/patch time for the first iteration.
+- base/patch: ratio of base/patch time. Higher is better for patch. Above 1 represents a speedup.
+- GC time ratios are base/comparison; above 1 means the comparison spent less GC time.
+- gc/iter, mark/iter, and sweep/iter compare total GC (or phase) time per benchmark iteration, so they include both per-GC cost and GC frequency changes.
+- gc/GC, mark/GC, and sweep/GC divide average GC (or phase) time by the same run's GCs/iter count; they are not complete per-cycle attribution of process-wide GC.
+- GC counts show base → comparison values, not ratios. Rows with no GC activity are omitted.
