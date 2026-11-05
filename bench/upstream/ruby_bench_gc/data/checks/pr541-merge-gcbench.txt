@@ -1,0 +1,16 @@
+GC per ruby:
+-------  -----  ----------  ------------  -------------  --------  ----------  -------------
+bench     ruby  GC ms/iter  mark ms/iter  sweep ms/iter  GCs/iter  minor/iter  mark ms/minor
+gcbench   base      75.466        12.250         63.000      51.8        51.8          0.240
+gcbench  patch      79.985        12.750         67.250      51.8        51.8          0.248
+-------  -----  ----------  ------------  -------------  --------  ----------  -------------
+Hidden columns (zero or N/A in every row): major/iter, mark ms/major, global/iter
+- GC per ruby shows the mean GC values per benchmark iteration for each ruby. These values are not ratios. Benchmarks with no GC activity on any ruby are omitted.
+- GC time ratios are base/comparison; above 1 means the comparison spent less GC time.
+- gc/iter, mark/iter, and sweep/iter compare total GC (or phase) time per benchmark iteration, so they include both per-GC cost and GC frequency changes.
+- gc/GC, mark/GC, and sweep/GC divide average GC (or phase) time by the same run's GCs/iter count; they are not complete per-cycle attribution of process-wide GC.
+- mark/minor and mark/major compare the marking time of one minor or one major collection (GC::Profiler records, Ruby 4.1+), averaged per iteration. A change to root marking shows here even when a major GC lands in a different iteration; changes in how many objects are young or remembered move them too, so read them with GC counts.
+- GC counts show base → comparison values, not ratios. In GC time ratios and GC counts, a row is omitted when neither base nor the comparison has GC activity.
+
+Output:
+/home/user/w/m541/data/output_002.json

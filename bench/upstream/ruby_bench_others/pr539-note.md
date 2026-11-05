@@ -16,3 +16,5 @@ Heads-up in case it's useful: gc_balloon fails on Ruby 4.0 and TruffleRuby with 
 -  LOCAL_MAJOR_ONLY = true
 +  LOCAL_MAJOR_ONLY = GC.method(:start).parameters.include?([:key, :global])
 ```
+
+With #569 and #570, the gc harness on Ruby master also reports gc_balloon's marking time per collection: about 9.2–9.3 ms per minor GC and 1.6 ms per major GC. The majors are the four `GC.start(global: false)` calls per iteration, which run at the low-water mark and so mark little (two runs of 10 iterations; the per-collection lists record exactly four majors in every iteration). On 4.0.9 there are no per-collection columns, and the printed average marking time is 148.3 ms, where main prints a truncated 148.0 ms.

@@ -1,0 +1,58 @@
+Running benchmark "gc_balloon" (1/1)
++ setarch x86_64 -R /home/user/rubies/base/bin/ruby -r /home/user/w/bal/harness/gc /home/user/w/bal/benchmarks/gc_balloon.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +PRISM [x86_64-linux]
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1:  776ms   134.0ms    27.0ms        42         8        34         0     0.24
+ #2:  757ms   143.0ms    33.0ms        20         8        12         0     0.67
+ #3:  738ms   116.0ms    33.0ms        17         5        12         0     0.42
+ #4:  728ms   108.0ms    33.0ms        16         4        12         0     0.33
+ #5:  758ms   123.0ms    41.0ms        16         4        12         0     0.33
+ #6:  703ms    96.0ms    30.0ms        15         4        11         0     0.36
+ #7:  753ms   113.0ms    40.0ms        15         4        11         0     0.36
+ #8:  759ms   115.0ms    42.0ms        15         4        11         0     0.36
+ #9:  752ms   113.0ms    40.0ms        15         4        11         0     0.36
+#10:  716ms    87.0ms    36.0ms        13         4         9         0     0.44
+#11:  685ms    72.0ms    31.0ms        12         4         8         0     0.50
+#12:  741ms    87.0ms    43.0ms        12         4         8         0     0.50
+#13:  723ms    85.0ms    43.0ms        12         4         8         0     0.50
+RSS: 66.1MiB
+MAXRSS: 66.2MiB
+RSS sampled (n=10): median 62.2MiB ± 0.6MiB (MAD), range [60.3, 66.1]MiB
+Average of last 10, non-warmup iters: 732ms
+Average marking time: 99.9ms
+Average sweeping time: 37.9ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32        6141        2287        3854            3     37.2%    192.0
+   1         40       24562       11404       13158           15     46.4%    960.0
+   2         64       12276        3521        8755           12     28.7%    768.0
+   3         80        7364         433        6931            9      5.9%    576.0
+   4         96        2045         143        1902            3      7.0%    192.0
+   5        128        1022         119         903            2     11.6%    128.0
+   6        160        2451         853        1598            6     34.8%    384.0
+   7        256         255           4         251            1      1.6%     64.0
+   8        512         381         129         252            3     33.9%    192.0
+   9        640         102           5          97            1      4.9%     64.0
+  10        768          85           0          85            1      0.0%     64.0
+  11       1024          63           1          62            1      1.6%     64.0
+Total time spent benchmarking: 9s
+
+r: ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +PRISM [x86_64-linux]
+ruby-bench: ca1287ea669c48c1cb226d5408650f2063b84f99
+
+----------  ------------
+bench             r (ms)
+gc_balloon  732.1 ± 3.3%
+----------  ------------
+
+GC summary:
+----------  ----------  ------------  -------------  --------  ----------  ----------  -------------  -------------
+bench       GC ms/iter  mark ms/iter  sweep ms/iter  GCs/iter  major/iter  minor/iter  mark ms/minor  mark ms/major
+gc_balloon     137.857        99.900         37.900      14.1         4.0        10.1          9.261          1.620
+----------  ----------  ------------  -------------  --------  ----------  ----------  -------------  -------------
+Hidden columns (zero or N/A in every row): global/iter
+
+
+Output:
+/home/user/w/bal/data/output_003.json
