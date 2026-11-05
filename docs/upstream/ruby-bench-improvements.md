@@ -9,7 +9,8 @@ value to the maintainers. It is an evaluation only. Nothing was built upstream, 
 [Round 2](#round-2-five-topics-checked-and-the-prs-opened-2026-11-05) (2026-11-05, at the end) checks five more topics
 and records the PRs that opened from them. [Round 3](#round-3-rails-benchmarks-on-windows-2026-11-05) prepares a PR that runs
 erubi-rails, lobsters and railsbench in the Windows CI job. [Round 4](#round-4-analyze-for-the-other-database-benchmarks-2026-11-05)
-finds that no other database benchmark needs #565's `ANALYZE`.
+finds that no other database benchmark needs #565's `ANALYZE`. [Round 4: determinism](#round-4-determinism-2026-11-05)
+finds one benchmark whose work changes from run to run (lobsters, with the date) and prepares two alternative fixes.
 
 **Pins.** Ruby master [`a8b095a07e`](https://github.com/ruby/ruby/commit/a8b095a07e55adf429839d4642027e832e30d3a7),
 release build (`-O3 -ggdb3`, `--enable-zjit --enable-yjit`), the same build as [zjit-yjit-gap](zjit-yjit-gap.md).
@@ -756,3 +757,87 @@ Sequel, response hashes, row identity), `plans-*.txt`/`.json`, [`ir.rb`](../../b
 and `ir-summary.md` (cachegrind, fixed heap from [bench.md](../bench.md), (4 − 1 iterations) / 3 after 2 warmups),
 [`wall.sh`](../../bench/upstream/ruby_bench_round4/wall.sh) with `wall-results.txt` and `wall-summary.txt`, and the
 body before and after.
+
+# Round 4: determinism (2026-11-05)
+
+**Question (Thomas).** Does ruby-bench measure only Ruby execution, or also work that changes from process to process
+or from run to run? Out of scope: ASLR, CPU pinning and turbo (already handled by the runner), `ANALYZE` (the
+section above), warmup and JIT compilation (decided against), and the lobsters `/reply` countdown (output only).
+
+**Method.** [`audit.rb`](../../bench/upstream/ruby_bench_round4/audit.rb) runs the default harness under Cachegrind
+on Ruby 4.0.9 with the fixed heap from [bench.md](../bench.md), with
+[`cg_harness.rb`](../../bench/upstream/ruby_bench_round4/cg_harness.rb) dumping Ir and `GC.stat` per iteration. Two
+processes per benchmark, each in its own `git worktree` copy (so they share no `tmp/`, logs or databases), 5 warmup
+and 5 measured iterations. Process A/A is the difference between the two processes' mean Ir per measured iteration;
+max-itr is the largest single-iteration difference within a process. A deterministic benchmark gives a small A/A.
+
+## Process A/A (ruby-bench `00f0f8b`, interpreter)
+
+34 benchmarks finished, including every headline and Rails benchmark; the rest of the sweep (the remaining
+`other` and micro benchmarks) was still running when this round closed, so no claim is made for them.
+
+| A/A | benchmarks |
+|---|---|
+| ≤ 0.01% | addressable-merge, addressable-parse, addressable-setters, addressable-join, binarytrees, blurhash, chunky-png, fannkuchredux, gcbench, graphql, liquid-c, matmul, railsbench |
+| 0.01–0.08% | activerecord 0.023, addressable-* 0.016–0.070, erubi 0.058, erubi-rails 0.076, hexapdf 0.027, liquid-compile/il/render 0.028–0.036, lobsters 0.048, mail 0.022, rubocop 0.024, ruby-lsp 0.023, sequel 0.080, shipit 0.031 |
+| > 0.1% | **etanni 0.199%**, **psych-load 0.188%**, grape 0.103% |
+
+Allocation and GC counts are identical across processes in all three outliers. etanni with
+[`fixrand`](../../bench/upstream/ruby_bench_round4/fixrand/fixrand.c) (an `LD_PRELOAD` that returns a fixed
+`getrandom` seed, so the hash seed and `Random::DEFAULT` seed are the same in each process) has A/A 0.0000% (Ir
+3.876e9), so its spread is the per-process hash seed changing Hash/String-hash probe lengths. psych-load and grape
+look the same (equal allocations and GC counts, sub-0.2% Ir) and are recorded, not fixed: seeding Ruby's hash per
+process is a property of Ruby, and fixing it in the benchmark would hide a real cost.
+
+**In-process iteration spread** (max-itr): erubi 3.7%, sequel 2.5%, hexapdf 0.96%, lobsters 0.57%. Their A/A is
+≤ 0.08%, so iterations differ the same way in every process (GC timing over a fixed heap). Record-only.
+
+## Leads checked
+
+- **Unseeded randomness (ruled out).** `lib/harness.rb:16` already runs `Random.srand(1337)` before every benchmark,
+  so `rand`, `sample`, `shuffle` and `Random.alphanumeric` in activerecord, json_parse_float, fluentd, sequel,
+  rubykon, optcarrot and lobsters give the same sequence in every process. Control: rubykon with an extra
+  [`seed.rb`](../../bench/upstream/ruby_bench_round4/seed.rb) preload, A/A 0.0086% → 0.0075%, allocations
+  identical. `SecureRandom` (lobsters session ids and CSRF tokens) stays random; it changes bytes, not work.
+- **Wall-clock date (one real problem: lobsters).** With libfaketime at five dates (2026-11-05, 2026-12-25,
+  2027-06-28, 2027-11-05, 2031-11-05), activerecord, erubi-rails, railsbench, shipit, sequel, mail and fluentd
+  allocate exactly the same per iteration. lobsters does not: 648,912–657,811 objects per iteration across four
+  dates, a 1.37% spread. Cause, measured with [`dst_probe.rb`](../../bench/upstream/ruby_bench_round4/dst_probe.rb):
+  lobsters runs in US Central time, and when a lookback such as `70.days.ago` crosses a DST change,
+  `TimeWithZone` refetches the tzinfo period (1,476 refetches per pass on 2026-11-05, 285 on 2027-01-20, 0 in
+  July). On Dec 25 and Jun 28 a holiday logo also renders. Callgrind: main 3.775e9 Ir on 2026-11-05 vs 3.759e9 on
+  2027-06-28.
+- **Per-process hash seed.** See etanni above; recorded, not fixed.
+- **GC state across iterations, files written during iterations, ENV/locale/TZ.** Not traced one by one: the
+  Rails benchmarks log to STDOUT at `:error`, the caches are `:memory_store` since #564, lobsters and shipit use
+  `:memory:` databases (railsbench a file database, A/A 0.0035%), and the A/A table shows no outlier beyond the
+  three above, and those three allocate and collect identically in every process.
+
+## The PRs (two alternatives for lobsters)
+
+Both fix `Time.now` during boot and inside the benchmark block (the harness keeps the real clock, including
+`HARNESS=chain`), release it in `ensure`, and move `TRACK_AR_TIME` to the monotonic clock. `travel_to` was rejected:
+its stubs add about 7.3K objects per pass.
+
+- [ruby/ruby-bench#571](https://github.com/ruby/ruby-bench/pull/571), branch `thomasklemm/lobsters-fixed-clock`,
+  head `33e9aa45be` on main `ad63bf8`: clock at 2026-07-01 12:00 UTC. Allocations across the four dates
+  648,872–648,916 (spread 0.007%, main 1.37%); responses byte-identical after blanking random fields; 0 refetches.
+  Callgrind Ir per iteration with the real clock: 3.638e9 vs main 3.658e9 (−0.55%, both A/A ≤ 0.008%). History
+  step: up to −1.35% objects. [Body](../../bench/upstream/ruby_bench_round4/lobsters-fixed-clock-body.md).
+- [ruby/ruby-bench#572](https://github.com/ruby/ruby-bench/pull/572), branch `thomasklemm/lobsters-clock-near-fixture`,
+  head `f94d3a10df`: clock at 2023-07-19 01:00 UTC, next to the 2023 fixture, so the 16 time-filtered requests
+  render 25 stories each; `/top` binds `Time.current` and uses `-N DAY` (on main `'- 1 DAY'` is NULL, so `/top`
+  was always empty). Date spread 0.003%. Deliberate workload change: +44% objects against main.
+  [Body](../../bench/upstream/ruby_bench_round4/lobsters-clock-near-fixture-body.md).
+
+Both bodies say lobsters' rubybench history takes a step. Reviews: four skeptic passes and four Sol passes (the
+coordinator's) across heads `300f401d18` → `1e5933cc08` → `b63e9d89b1` → `33e9aa45be` / `f94d3a10df`; findings
+fixed on the way: `travel_to` overhead, broken `TRACK_AR_TIME`, frozen file names under `HARNESS=chain`, a boot
+exception leaving the clock frozen, and body overclaims. Final passes: Sol approve on both heads, skeptic nits only
+(body length and rounding, not applied). Fork CI was dropped for this round (Lowrail `184a6f5`); upstream CI is the
+gate. Pass records: [RB571](../../bench/upstream/pr-queue/items/RB571.md),
+[RB572](../../bench/upstream/pr-queue/items/RB572.md).
+
+**Receipts** in [`bench/upstream/ruby_bench_round4/`](../../bench/upstream/ruby_bench_round4/): `audit.rb`,
+`cg_harness.rb`, `seed.rb`, `freeze.rb`, `fixrand/`, `dst_probe.rb`, `raw_dump.rb`/`raw_cmp.rb` (response
+comparison), `route_dump.rb`/`route_table.rb` (per-request counts), and the two bodies.
