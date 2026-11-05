@@ -414,3 +414,8 @@ Approved comments follow the style Thomas liked on rails/rails#57013 (2026-11-04
 it's useful:", state the effect in one sentence, give the minimal repro, name an existing fix or PR if there is
 one, and stop. No thanks, no judgement of the work, no proposals beyond what was asked, no numbers that weren't
 asked for.
+
+**Exception: answers that were asked for** (Thomas, 2026-11-05). When someone asks us for an answer, a re-test or a
+data point, post it directly and promptly, without asking Thomas first, as long as it is reviewed and measured
+properly and helps constructively. Example: eightbitraptor's re-test request on ruby/ruby#17251. Everything
+unsolicited still needs Thomas's approval.
