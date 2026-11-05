@@ -1,0 +1,87 @@
+## lobsters
+### base (3 runs, 90 measured iterations)
+iter ms      mean    814.16  run means    787.32..   865.39  per-iter sd    59.46
+mark ms      mean     12.08  run means      9.93..    13.57  per-iter sd    19.65
+sweep ms     mean     21.61  run means     20.43..    23.27  per-iter sd    10.36
+GC total ms  mean     33.70  run means     30.40..    36.83  per-iter sd    25.48
+GCs          mean      0.86  run means      0.83..     0.87  per-iter sd     0.41
+minor        mean      0.80  run means      0.80..     0.80  per-iter sd     0.40
+major        mean      0.06  run means      0.03..     0.07  per-iter sd     0.23
+mark/minor     9.014 ms per minor GC over 70 minor GCs in 70 minor-only iterations; per-run 9.304 8.826 8.917
+### base2 (3 runs, 90 measured iterations)
+iter ms      mean    839.12  run means    810.38..   853.51  per-iter sd    63.95  vs base  +3.07%
+mark ms      mean     13.03  run means      8.23..    16.43  per-iter sd    21.89  vs base  +7.91%
+sweep ms     mean     22.76  run means     22.10..    23.63  per-iter sd    10.24  vs base  +5.30%
+GC total ms  mean     35.80  run means     31.91..    38.52  per-iter sd    27.75  vs base  +6.23%
+GCs          mean      0.88  run means      0.87..     0.90  per-iter sd     0.42  vs base  +2.60%
+minor        mean      0.82  run means      0.80..     0.87  per-iter sd     0.38  vs base  +2.78%
+major        mean      0.06  run means      0.00..     0.10  per-iter sd     0.23  vs base  +0.00%
+mark/minor     9.296 ms per minor GC over 71 minor GCs in 71 minor-only iterations; per-run 8.955 9.391 9.500
+### patch (3 runs, 90 measured iterations)
+iter ms      mean    803.14  run means    787.73..   819.97  per-iter sd    42.00  vs base  -1.35%
+mark ms      mean     10.54  run means      7.07..    15.20  per-iter sd    16.55  vs base -12.70%
+sweep ms     mean     21.61  run means     21.13..    21.90  per-iter sd     7.96  vs base  +0.00%
+GC total ms  mean     32.15  run means     28.88..    37.12  per-iter sd    19.10  vs base  -4.60%
+GCs          mean      0.88  run means      0.87..     0.90  per-iter sd     0.36  vs base  +2.60%
+minor        mean      0.83  run means      0.80..     0.87  per-iter sd     0.37  vs base  +4.17%
+major        mean      0.04  run means      0.00..     0.10  per-iter sd     0.21  vs base -20.00%
+mark/minor     8.041 ms per minor GC over 74 minor GCs in 74 minor-only iterations; per-run 8.154 7.957 8.000
+
+## railsbench
+### base (3 runs, 90 measured iterations)
+iter ms      mean   1575.46  run means   1546.37..  1604.84  per-iter sd    48.40
+mark ms      mean      4.62  run means      4.47..     4.73  per-iter sd     0.66
+sweep ms     mean     70.73  run means     66.90..    73.57  per-iter sd     4.79
+GC total ms  mean     75.33  run means     71.34..    78.20  per-iter sd     5.16
+GCs          mean      9.24  run means      9.10..     9.43  per-iter sd     0.83
+minor        mean      9.24  run means      9.10..     9.43  per-iter sd     0.83
+major        mean      0.00  run means      0.00..     0.00  per-iter sd     0.00
+mark/minor     0.500 ms per minor GC over 832 minor GCs in 90 minor-only iterations; per-run 0.507 0.491 0.502
+### base2 (3 runs, 90 measured iterations)
+iter ms      mean   1587.29  run means   1562.09..  1621.56  per-iter sd    62.99  vs base  +0.75%
+mark ms      mean      4.79  run means      4.67..     4.93  per-iter sd     0.68  vs base  +3.61%
+sweep ms     mean     72.92  run means     69.37..    74.90  per-iter sd     5.10  vs base  +3.09%
+GC total ms  mean     77.71  run means     74.05..    79.65  per-iter sd     5.37  vs base  +3.17%
+GCs          mean      9.54  run means      9.27..     9.77  per-iter sd     0.84  vs base  +3.25%
+minor        mean      9.54  run means      9.27..     9.77  per-iter sd     0.84  vs base  +3.25%
+major        mean      0.00  run means      0.00..     0.00  per-iter sd     0.00
+mark/minor     0.502 ms per minor GC over 859 minor GCs in 90 minor-only iterations; per-run 0.514 0.486 0.505
+### patch (3 runs, 90 measured iterations)
+iter ms      mean   1587.21  run means   1575.50..  1607.43  per-iter sd    53.45  vs base  +0.75%
+mark ms      mean      2.58  run means      2.47..     2.73  per-iter sd     0.50  vs base -44.23%
+sweep ms     mean     72.04  run means     71.00..    72.87  per-iter sd     4.86  vs base  +1.85%
+GC total ms  mean     74.64  run means     73.53..    75.63  per-iter sd     5.08  vs base  -0.91%
+GCs          mean      9.26  run means      9.03..     9.63  per-iter sd     0.95  vs base  +0.12%
+minor        mean      9.26  run means      9.03..     9.63  per-iter sd     0.95  vs base  +0.12%
+major        mean      0.00  run means      0.00..     0.00  per-iter sd     0.00
+mark/minor     0.279 ms per minor GC over 833 minor GCs in 90 minor-only iterations; per-run 0.278 0.284 0.273
+
+## shipit
+### base (3 runs, 90 measured iterations)
+iter ms      mean   1296.94  run means   1274.01..  1319.64  per-iter sd    53.44
+mark ms      mean     46.37  run means     42.73..    51.07  per-iter sd    37.05
+sweep ms     mean     35.19  run means     34.83..    35.67  per-iter sd     4.46
+GC total ms  mean     81.56  run means     77.58..    86.72  per-iter sd    39.58
+GCs          mean      4.32  run means      4.07..     4.53  per-iter sd     0.65
+minor        mean      3.94  run means      3.73..     4.10  per-iter sd     0.59
+major        mean      0.38  run means      0.33..     0.43  per-iter sd     0.49
+mark/minor     4.373 ms per minor GC over 228 minor GCs in 56 minor-only iterations; per-run 4.292 4.312 4.506
+### base2 (3 runs, 90 measured iterations)
+iter ms      mean   1301.30  run means   1292.71..  1309.37  per-iter sd    56.97  vs base  +0.34%
+mark ms      mean     45.21  run means     43.83..    46.63  per-iter sd    36.45  vs base  -2.49%
+sweep ms     mean     35.23  run means     34.83..    35.83  per-iter sd     4.60  vs base  +0.13%
+GC total ms  mean     80.45  run means     78.85..    82.51  per-iter sd    39.46  vs base  -1.36%
+GCs          mean      4.34  run means      4.17..     4.47  per-iter sd     0.67  vs base  +0.51%
+minor        mean      3.98  run means      3.80..     4.10  per-iter sd     0.60  vs base  +0.85%
+major        mean      0.37  run means      0.37..     0.37  per-iter sd     0.48  vs base  -2.94%
+mark/minor     4.352 ms per minor GC over 233 minor GCs in 57 minor-only iterations; per-run 4.325 4.273 4.461
+### patch (3 runs, 90 measured iterations)
+iter ms      mean   1339.86  run means   1283.34..  1430.80  per-iter sd   132.97  vs base  +3.31%
+mark ms      mean     44.70  run means     43.43..    46.77  per-iter sd    37.72  vs base  -3.59%
+sweep ms     mean     35.59  run means     33.97..    38.37  per-iter sd     6.18  vs base  +1.14%
+GC total ms  mean     80.29  run means     77.39..    82.28  per-iter sd    40.12  vs base  -1.56%
+GCs          mean      4.22  run means      4.13..     4.27  per-iter sd     0.60  vs base  -2.31%
+minor        mean      3.83  run means      3.80..     3.87  per-iter sd     0.66  vs base  -2.82%
+major        mean      0.39  run means      0.33..     0.43  per-iter sd     0.49  vs base  +2.94%
+mark/minor     3.724 ms per minor GC over 225 minor GCs in 55 minor-only iterations; per-run 3.514 3.527 4.086
+
