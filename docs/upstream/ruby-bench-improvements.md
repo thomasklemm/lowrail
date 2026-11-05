@@ -554,11 +554,11 @@ once the PR opened before #567.
 >
 > lobsters was also excluded because stackprof fails to build. stackprof 0.2.28, the latest release, uses POSIX signals and timers that MinGW doesn't have. lobsters lists it only in its development group, which the benchmark doesn't load, so it now gets `platforms: :mri`, as in railsbench's Gemfile. Gemfile.lock doesn't change.
 >
-> graphql-native stays excluded: graphql-c_parser names tokens FLOAT, INT and INPUT, which the Windows headers already define, and 1.1.4, the latest release, still does.
+> graphql-native stays excluded: graphql-c_parser uses FLOAT, INT, INPUT, INTERFACE and TokenType as C names, which the Windows headers already define, and 1.1.4, the latest release, still does. rmosolgo/graphql-ruby#5877 fixes that.
 >
 > In this run on my fork, both `benchmark-default-windows` jobs pass and run all three benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42018186964
 
-## graphql-c_parser on Windows (rmosolgo/graphql-ruby, prepared)
+## graphql-c_parser on Windows (rmosolgo/graphql-ruby#5877)
 
 graphql-native stays excluded from the Windows job because graphql-c_parser doesn't compile with RubyInstaller
 (MinGW). `ruby.h` → `ruby/win32.h` → `winsock2.h` → `windows.h` brings in five names the extension also uses: `FLOAT`
@@ -611,11 +611,14 @@ suggested dropping the Lowrail footer as promotional; kept, as DECISIONS asks fo
 graphql-ruby's contributing guide has no rule against it. No CHANGELOG entry: the maintainer writes
 `graphql-c_parser/CHANGELOG.md` at release time, contributor PRs (#5856, #5864, #5870) don't touch it.
 
-**Status.** Not opened; waiting for the coordinator's go. **Follow-up:** once a graphql-c_parser release contains the
-fix, ruby-bench can drop `graphql-native` from the Windows `EXCLUDES` (and #568 can link the graphql-ruby PR in its
-graphql-native sentence once it opens).
+**Status.** Opened 2026-11-05 as [rmosolgo/graphql-ruby#5877](https://github.com/rmosolgo/graphql-ruby/pull/5877)
+(head `115a3c84e5`) after the coordinator's go, with the footer link pinned to Lowrail `de05fe1376`. #568's
+graphql-native sentence was edited once to name all five clashing names and link #5877. The Amp GitHub App can't
+access rmosolgo/graphql-ruby or ruby/ruby-bench, so neither PR has a comment subscription; the coordinator watches
+them. **Follow-up:** once a graphql-c_parser release contains the
+fix, ruby-bench can drop `graphql-native` from the Windows `EXCLUDES` (#568 already links #5877).
 
-**Body (prepared; [file](../../bench/upstream/ruby_bench_round3/graphql-c-parser-body.md)):**
+**Body (as opened; [file](../../bench/upstream/ruby_bench_round3/graphql-c-parser-body.md)):**
 
 > graphql-c_parser doesn't compile on Windows with RubyInstaller (MinGW). There, `ruby.h` includes `windows.h`, which declares `FLOAT`, `INT` and `INPUT` as types, defines `INTERFACE` as a macro and declares `TokenType` as an enumerator. The extension uses these names for its token constants, so 1.1.4 fails with errors such as `lexer.rl:161:2: error: 'FLOAT' redeclared as different kind of symbol`.
 >
@@ -627,4 +630,4 @@ graphql-native sentence once it opens).
 >
 > ---
 >
-> <sub>Found while enabling more benchmarks on Windows in ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ruby-bench-improvements.md#round-3-rails-benchmarks-on-windows-2026-11-05), my research project.</sub>
+> <sub>Found while enabling more benchmarks on Windows in ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/de05fe1376e714a2f1f30bc3c6de47fdd69b181c/docs/upstream/ruby-bench-improvements.md#round-3-rails-benchmarks-on-windows-2026-11-05), my research project.</sub>

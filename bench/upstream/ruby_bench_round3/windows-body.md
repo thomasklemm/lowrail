@@ -6,6 +6,6 @@ They were excluded because nokogiri 1.18.9 builds from source on Windows and its
 
 lobsters was also excluded because stackprof fails to build. stackprof 0.2.28, the latest release, uses POSIX signals and timers that MinGW doesn't have. lobsters lists it only in its development group, which the benchmark doesn't load, so it now gets `platforms: :mri`, as in railsbench's Gemfile. Gemfile.lock doesn't change.
 
-graphql-native stays excluded: graphql-c_parser names tokens FLOAT, INT and INPUT, which the Windows headers already define, and 1.1.4, the latest release, still does.
+graphql-native stays excluded: graphql-c_parser uses FLOAT, INT, INPUT, INTERFACE and TokenType as C names, which the Windows headers already define, and 1.1.4, the latest release, still does. rmosolgo/graphql-ruby#5877 fixes that.
 
 In this run on my fork, both `benchmark-default-windows` jobs pass and run all three benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42018186964
