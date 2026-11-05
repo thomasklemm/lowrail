@@ -30,8 +30,22 @@ cache, but stop the service as soon as `summary.md` is written, so the orb can p
 
 Options: `--only a,b` runs some suites, `--fresh a` drops a suite's cached state, `--report` rewrites the report
 from what is cached, `--work DIR` (default `~/src/readiness/<manifest name>`) and `--out DIR` (default
-`WORK/out`). The databases a suite needs (PostgreSQL, MySQL, Redis) are started by hand before the round. A
-suite's runs go one after another, so its two trees can share a database name.
+`WORK/out`), `--services-down` stops every database service (teardown after a crash).
+
+Databases: a suite lists the services it needs (`services: [postgres, mysql, redis, memcached]`).
+[`services.rb`](../../bench/upstream/readiness/services.rb) starts the ones not already listening as orb services
+`readiness-<name>`, with data under `WORK/services` created on first use, and the round stops what it started when
+it ends, also on failure:
+
+| Service | Where | Accounts |
+| --- | --- | --- |
+| `postgres` | PostgreSQL 15 on 127.0.0.1:5432 and `/var/run/postgresql` | trust; superusers `postgres` (password `postgres`) and `user` |
+| `mysql` | MariaDB on 127.0.0.1:3306 and `/run/mysqld/mysqld.sock` | `root` and `user` without password, timezone tables loaded |
+| `redis`, `memcached` | 6379, 11211 | no persistence |
+
+The packages (`postgresql`, `mariadb-server`, `redis-server`, `memcached`) must be installed, with their system
+services disabled. Suites that share a service run one at a time, because variants of a gem share database names;
+each suite creates its databases in `setup`.
 
 ## Manifest
 
@@ -42,13 +56,16 @@ invalidates the cached runs whenever it moves), the Ruby, the two seeds and the 
 | Key | Meaning |
 | --- | --- |
 | `repo`, `ref` | the suite's repository and its pinned tag or SHA |
-| `framework` | `rspec` or `minitest`, which decides how results are read |
+| `framework` | `rspec`, `minitest`, `test-unit` (random order seeded through `SEED`, [`test_unit_seed.rb`](../../bench/upstream/readiness/test_unit_seed.rb)) or `cucumber` (pretty output, `CUCUMBER_OPTS` carries the seed), which decides how results are read |
 | `test` | the suite's command, run through `bundle exec bash -c` |
 | `setup` | commands run once per tree after bundling (database creation, schema load) |
 | `env` | environment for setup and runs (database credentials, `RAILS_ENV`) |
 | `gemfile`, `lock` | another Gemfile of the suite (e.g. `gemfiles/rails_8_1.gemfile`), another lock to start from |
-| `shims` | shell commands or `{patch: file}` applied to both checkouts before bundling (config copies, relaxed gemspec bounds) |
+| `shims` | shell commands, `{run: cmd}` or `{patch: file}` (relative to the manifest), applied before bundling (config copies, relaxed gemspec bounds); `tree: cand` applies one to the candidate only |
 | `bumps` | gems replaced or added on both trees, `{name: "version"}` or `{name: {git: …, ref: …}}` (e.g. an unreleased rspec-rails fix) |
+| `services` | databases to start for the suite (above) |
+| `exclusive` | a name; suites with the same name never run at the same time (e.g. ones that share a fixed `/tmp` path) |
+| `ruby`, `rails` | a suite's own Ruby, or its own `base` and `candidate` Rails refs |
 | `single` | how to run one test alone, with `{id}` (default `rspec {id}`, or the test command with `-n /^Class#test$/` in `TESTOPTS`) |
 
 Each suite gets one checkout per tree (`WORK/suites/NAME/{base,cand}`), so a schema dump or a generated file on
@@ -105,12 +122,12 @@ as the ledger.
 
 ## Rounds
 
-| Manifest | Round | Smoke-tested suite |
+| Manifest | Round | Run |
 | --- | --- | --- |
-| [`proof-e64f5a4258.yml`](../../bench/upstream/readiness/proof-e64f5a4258.yml) | the proof round below | all four |
-| [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook | `lobsters-rspec-rails-main`: 927 examples; L2 3 `confirmed` as `known:L2`, as in the record |
-| [`round-ecosystem-1.yml`](../../bench/upstream/readiness/round-ecosystem-1.yml) | [ecosystem-tests](ecosystem-tests.md), 24 gems | `pundit`: 184 examples, 0 failures ×4, as in the record |
-| [`round-ecosystem-2.yml`](../../bench/upstream/readiness/round-ecosystem-2.yml) | [ecosystem round 2](ecosystem-round-2.md), 26 gems | `bullet`: 286 examples, 0 failures ×4, as in the record |
+| [`proof-e64f5a4258.yml`](../../bench/upstream/readiness/proof-e64f5a4258.yml) | the proof round below | in full |
+| [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook | smoke test only: `lobsters-rspec-rails-main`, 927 examples; L2 3 `confirmed` as `known:L2`, as in the record |
+| [`round-ecosystem-1.yml`](../../bench/upstream/readiness/round-ecosystem-1.yml) | [ecosystem-tests](ecosystem-tests.md), 24 gems in 29 suites | in full against main `7a78da5a55`, below |
+| [`round-ecosystem-2.yml`](../../bench/upstream/readiness/round-ecosystem-2.yml) | [ecosystem round 2](ecosystem-round-2.md), 26 gems in 49 suites | in full against main `7a78da5a55`, below |
 
 `--check` validates a manifest without running anything: keys and shapes, patch files, `known.yml`, installed
 Rubies (a warning), and that every Rails and suite ref resolves (`--no-resolve` skips the fetch). All four pass.
@@ -155,6 +172,45 @@ suites (RSpec and minitest, not kept) covered the classes the proof doesn't reac
 `flaky-candidate` (2/5 alone on the candidate, 0/5 on base), `test-count-mismatch`, and the minitest
 `--name` rerun.
 
+## Full run of the gem rounds (2026-11-04)
+
+Both ecosystem manifests, 8-1-stable `6e09124217` against main `7a78da5a5576d7ab7549b10fb13156788478ba35` (pinned
+in both manifests), Ruby 4.0.9, seeds 4242 and 1717, `--jobs 3`, databases from `services.rb`. Output in
+[`round-ecosystem-1/`](../../bench/upstream/readiness/round-ecosystem-1/summary.md) and
+[`round-ecosystem-2/`](../../bench/upstream/readiness/round-ecosystem-2/summary.md). Every suite loads on base;
+every candidate `suite-did-not-load` is a recorded finding.
+
+| Round | Candidate flags | Matched | New |
+| --- | --- | --- | --- |
+| 1 | 58: 53 `confirmed`, 2 `signature-changed`, 2 `suite-did-not-load` (AMS E4, administrate L1), 1 `test-count-mismatch` (draper) | E2, E4, I1, L1 and the unnamed eco1 entries (draper, dynamic `:controller` routes, ransack select manager, view_component) | 0 |
+| 2 | 172: 162 `confirmed`, 4 `order-dependent` (strong_migrations, R2-7), 2 `signature-changed` (lograge R2-4), 2 `suite-did-not-load` (paranoia R2-6, store_model R2-9), 2 `flaky-candidate` | R2-1 to R2-11, R2-13 to R2-17 | 2: will_paginate, below |
+
+New: `will_paginate-mysql` and `will_paginate-postgres`, `./spec/finders/active_record_spec.rb[1:11:1]`,
+`expected 2 queries, got 4`, `flaky-candidate`: it fails under seed 1717 only, and alone 5/5 on the candidate and
+0/5 on base (sqlite3 passes). Not triaged.
+
+Not produced by this run, so still unchecked: E1 (ransack `WeakSet`) and E3 (administrate `colorize_logging`;
+administrate's candidate stops at L1). R2-12 shares R2-11's signature. Base-only noise that the records don't
+list, because they ran one default-order run, is now in `known.yml` as `noise`: acts-as-taggable-on (3 tests under
+seed 4242) and counter_culture's `fix_counts_by_scope_spec` (seed 1717), both on both trees.
+
+Setup fixes this run needed, now in the manifests: closure_tree, counter_culture (`fail_fast` off; a utf8mb4
+database on MariaDB), scenic (`spec:acceptance` too; its 2 acceptance failures are R2-2), ransack-postgresql,
+administrate, good_job, paper_trail (the appraisal guard accepts `Gemfile.eco-*`), sidekiq, kaminari (test-unit),
+factory_bot_rails (rails_template and a clean bundler environment for the cucumber apps,
+[`factory_bot_rails-eco-rails.patch`](../../bench/upstream/readiness/round-ecosystem-2/factory_bot_rails-eco-rails.patch)),
+and shoulda-matchers (test projects take Rails from `ECO_RAILS`, acceptance projects bundle their own Gemfile,
+and the runner's `SPEC_OPTS` stay out of them,
+[`shoulda-matchers-eco-rails.patch`](../../bench/upstream/readiness/round-ecosystem-2/shoulda-matchers-eco-rails.patch)).
+With them, factory_bot_rails runs all 26 cucumber scenarios, and shoulda-matchers matches the record exactly: 3097
+and 3159 unit examples with 0 failures on base and R2-15's 2 on the candidate, 10 acceptance examples with 0 on base
+and R2-1's 1 on the candidate. kaminari is pinned to v1.3.2, the commit its default branch pointed to in round 1, so its
+results don't change (555 tests, 0 failures ×4).
+
+Time: the four runs per suite add up to 82 minutes in round 1 (good_job 29, solid_queue 15 per database) and
+70 in round 2 (shoulda-matchers 13 per variant, factory_bot_rails' cucumber 11), before bundling and the reruns
+alone; `--jobs 3` overlaps them, except for suites that share a service or an `exclusive` name.
+
 ## Limits
 
 * **Suites only.** The cross-version data differential ([rails-82-differential](rails-82-differential.md),
@@ -173,11 +229,18 @@ suites (RSpec and minitest, not kept) covered the classes the proof doesn't reac
   tree only shifts the ids after it; `test-count-mismatch` points at that case.
 * **Minitest output is read as text** (the default reporter and the Rails runner). A suite with another reporter
   reads as `suite-did-not-load`, never as 0 failures.
-* **No service management.** Databases are started by hand; two suites that use the same database name must not
-  run in parallel (`--jobs`). Prepare failures are cached like runs; rerun them with `--fresh NAME`.
+* **Services are this orb's packages.** PostgreSQL 15 and the Debian MariaDB, not the versions a gem's CI uses;
+  MariaDB started with `--no-defaults` creates latin1 databases, so a suite that writes UTF-8 creates its database
+  with `character set utf8mb4` (counter_culture). Prepare failures are cached like runs; rerun them with
+  `--fresh NAME`.
 * **Known findings are regexes.** A new failure with the same signature as a known one in the same suite reads
-  as known; most entries outside the proof round are still unchecked against a real run.
-* **Round manifests are smoke-tested, not rerun.** Three suites ran (above); the others come from the rounds'
-  notes and may need a setup fix on their first run.
-* **One bundle per suite** under `WORK/bundle/NAME`. A shared gem directory let one suite's RubyGems plugins
-  (rdoc 8.1 loading json 3.1) break another suite's boot.
+  as known. The ecosystem entries are checked against the full run below; the app-suite entries (S, SU, M, R,
+  AR, WB) are still unchecked, because the app-suite manifest was only smoke-tested.
+* **Locks hold a worker.** A suite waiting for a shared service or an `exclusive` name keeps its `--jobs` slot,
+  so three shoulda-matchers variants in a row leave one worker for everything else. Order `--only` lists, or run a
+  slow exclusive group in its own process.
+* **One bundle per repository** under `WORK/bundle/REPO`, shared by its variants, so the variants' locks must agree
+  on the gems they share.
+* **`Gemfile.eco` must not load a gem.** It runs inside Bundler's resolution; a `require "json"` there activated
+  the default json 2.18.0 and every suite that locks another json (active_model_serializers, json 2.9.1) failed
+  to boot. Bumps therefore travel in `ECO_BUMPS` as a Ruby hash literal, not JSON.

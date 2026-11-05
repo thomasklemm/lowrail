@@ -1,44 +1,77 @@
 # Ecosystem round 2 (docs/upstream/ecosystem-round-2.md), as a readiness manifest. Tags and SHAs from the round's
-# checkout output. Only bullet was rerun through the runner (smoke test); the other suites are unchecked. Where the
-# round's reports abbreviated a DB variable, the value here follows the gem's own CI and may need a fix on the first
-# run (it then shows as suite-did-not-load, never as 0 failures). Services: PostgreSQL 15 on 127.0.0.1:5432 (postgres
-# / postgres, role `user`), MariaDB 10.11 on 127.0.0.1:3306 (root, no password), Redis 6379, Memcached 11211.
+# checkout output. Databases come from the runner's services (services.rb): PostgreSQL 15 on 127.0.0.1:5432
+# (postgres/postgres and role `user`, trust), MariaDB on 127.0.0.1:3306 and /run/mysqld/mysqld.sock (root and user,
+# no password), Redis 6379, Memcached 11211. Each suite creates the databases it needs in `setup`.
+# factory_bot_rails and shoulda-matchers generate apps against Rails; round 2 edited their templates by hand, here
+# they are patches in round-ecosystem-2/ that point the generated apps at ECO_RAILS.
 ruby: 4.0.9
 rails:
   base: 6e09124217      # 8-1-stable, v8.1.4.1
-  candidate: e64f5a4258 # main, 2026-11-04
+  candidate: 7a78da5a5576d7ab7549b10fb13156788478ba35 # main, 2026-11-04 16:53 UTC (round 2 ran e64f5a4258)
 seeds: [4242, 1717]
 alone_runs: 5
 timeout: 3600
 
+
 suites:
   acts_as_list-sqlite: &acts_as_list
     { repo: https://github.com/brendon/acts_as_list, ref: v1.2.6, framework: minitest, env: { RAILS_VERSION: "8.1", DB: sqlite }, test: rake test }
-  acts_as_list-postgresql: { <<: *acts_as_list, env: { RAILS_VERSION: "8.1", DB: postgresql } }
-  acts_as_list-mysql: { <<: *acts_as_list, env: { RAILS_VERSION: "8.1", DB: mysql } }
-  # The round ran 16 configs; sqlite3 and pg with the default format are listed, the rest follow the same pattern.
+  acts_as_list-postgresql:
+    <<: *acts_as_list
+    env: { RAILS_VERSION: "8.1", DB: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres acts_as_list || true"]
+  acts_as_list-mysql:
+    <<: *acts_as_list
+    env: { RAILS_VERSION: "8.1", DB: mysql }
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists acts_as_list'"]
+  # The round ran 16 configs; sqlite3, pg and mysql2 with the default format are listed, the rest follow the pattern.
   ancestry-sqlite3: &ancestry
     repo: https://github.com/stefankroes/ancestry
     ref: v5.1.0
     framework: minitest
     gemfile: gemfiles/gemfile_81.gemfile
     env: { CI: "1", DB: sqlite3, FORMAT: materialized_path }
+    shims: ["printf 'pg:\\n  adapter: postgresql\\n  host: 127.0.0.1\\n  username: postgres\\n  password: postgres\\n  database: ancestry_test\\nmysql2:\\n  adapter: mysql2\\n  host: 127.0.0.1\\n  username: root\\n  database: ancestry_test\\nsqlite3:\\n  adapter: sqlite3\\n  database: \":memory:\"\\n' > test/database.yml"]
     test: rake test
-  ancestry-pg: { <<: *ancestry, env: { CI: "1", DB: pg, FORMAT: materialized_path } }
-  ancestry-mysql2: { <<: *ancestry, env: { CI: "1", DB: mysql2, FORMAT: materialized_path } }
+  ancestry-pg:
+    <<: *ancestry
+    env: { CI: "1", DB: pg, FORMAT: materialized_path }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres ancestry_test || true"]
+  ancestry-mysql2:
+    <<: *ancestry
+    env: { CI: "1", DB: mysql2, FORMAT: materialized_path }
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists ancestry_test'"]
   closure_tree:
     repo: https://github.com/ClosureTree/closure_tree
     ref: v9.8.0
     framework: minitest
     env: { RAILS_VERSION: "8.1", RAILS_ENV: test, DATABASE_URL_PG: "postgres://postgres:postgres@127.0.0.1:5432/closure_tree_test",
            DATABASE_URL_MYSQL: "mysql2://root@127.0.0.1:3306/closure_tree_test", DATABASE_URL_SQLITE3: "sqlite3::memory:" }
-    setup: ["cd test/dummy && rake db:setup_all"]
-    test: rake test
+    services: [postgres, mysql]
+    # Both trees share the databases; each run recreates them, so neither tree runs on the other's schema.
+    test: >-
+      dropdb -h 127.0.0.1 -U postgres --if-exists closure_tree_test && createdb -h 127.0.0.1 -U postgres closure_tree_test &&
+      mariadb -h 127.0.0.1 -uroot -e 'drop database if exists closure_tree_test; create database closure_tree_test' &&
+      (cd test/dummy && rake db:setup_all) && rake test
   counter_culture-sqlite3: &counter_culture
     { repo: https://github.com/magnusvk/counter_culture, ref: v3.14.0, framework: rspec, gemfile: gemfiles/rails_8.1.gemfile,
-      env: { DB: sqlite3 }, shims: ["mkdir -p db"], test: rspec spec }
-  counter_culture-postgresql: { <<: *counter_culture, env: { DB: postgresql } }
-  counter_culture-mysql2: { <<: *counter_culture, env: { DB: mysql2 } }
+      env: { DB: sqlite3 }, test: rspec spec,
+      shims: ["mkdir -p db", "sed -i 's/config.fail_fast = true unless CI_TEST_RUN/config.fail_fast = false/' spec/spec_helper.rb"] }
+  counter_culture-postgresql:
+    <<: *counter_culture
+    env: { DB: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres counter_culture_test || true"]
+  counter_culture-mysql2:
+    <<: *counter_culture
+    env: { DB: mysql2 }
+    services: [mysql]
+    # MariaDB started with --no-defaults creates latin1 databases; the specs write UTF-8 titles.
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'drop database if exists counter_culture_test; create database counter_culture_test character set utf8mb4'"]
   # paranoia 3.1.0 has no tag; the arity check lets it load on 8-1-stable's set_options_for_callbacks! as well.
   paranoia:
     repo: https://github.com/rubysherpas/paranoia
@@ -54,35 +87,65 @@ suites:
     repo: https://github.com/zdennis/activerecord-import
     ref: v3.0.1
     framework: minitest
-    env: { AR_VERSION: "8.1", RUBYOPT: --enable-frozen-string-literal, MYSQL_PORT: 3306, PG_PORT: 5432 }
+    env: { AR_VERSION: "8.1", RUBYOPT: --enable-frozen-string-literal, MYSQL_PORT: 3306, PG_PORT: 5432, PGHOST: 127.0.0.1, PGUSER: postgres }
     bumps: { ostruct: ">= 0" }
     test: rake test:sqlite3
-  activerecord-import-postgresql: { <<: *ar_import, test: rake test:postgresql }
-  activerecord-import-mysql2: { <<: *ar_import, test: rake test:mysql2 }
-  activerecord-import-trilogy: { <<: *ar_import, test: rake test:trilogy }
+  activerecord-import-postgresql:
+    <<: *ar_import
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres activerecord_import_test || true",
+            "psql -h 127.0.0.1 -U postgres activerecord_import_test -c 'create extension if not exists hstore; create extension if not exists \"uuid-ossp\"'"]
+    test: rake test:postgresql
+  activerecord-import-mysql2: &ar_import_mysql
+    <<: *ar_import
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists activerecord_import_test'"]
+    test: rake test:mysql2
+  activerecord-import-trilogy: { <<: *ar_import_mysql, test: rake test:trilogy }
   pg_search:
     { repo: https://github.com/Casecommons/pg_search, ref: v2.4.0, framework: rspec, env: { PGHOST: 127.0.0.1, PGUSER: postgres },
+      services: [postgres], setup: ["createdb -h 127.0.0.1 -U postgres pg_search_test || true"],
       shims: ["sed -i 's/, cooldown: 7//' Gemfile"], test: rspec }
   scenic:
     repo: https://github.com/scenic-views/scenic
     ref: v1.9.0
     framework: rspec
     env: { GITHUB_ACTIONS: "1", POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    services: [postgres]
     setup: ["rake dummy:db:drop dummy:db:create"]
-    test: rake spec && rake spec:acceptance
+    test: rake spec; rake spec:acceptance
   strong_migrations-postgresql: &strong_migrations
     { repo: https://github.com/ankane/strong_migrations, ref: v2.8.0, framework: minitest,
-      env: { ADAPTER: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }, test: rake test }
-  strong_migrations-mysql2: { <<: *strong_migrations, env: { ADAPTER: mysql2 } }
-  strong_migrations-trilogy: { <<: *strong_migrations, env: { ADAPTER: trilogy } }
+      env: { ADAPTER: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }, services: [postgres],
+      setup: ["createdb -h 127.0.0.1 -U postgres strong_migrations_test || true"], test: rake test }
+  strong_migrations-mysql2: &strong_migrations_mysql
+    <<: *strong_migrations
+    env: { ADAPTER: mysql2 }
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists strong_migrations_test'"]
+  strong_migrations-trilogy: { <<: *strong_migrations_mysql, env: { ADAPTER: trilogy } }
   groupdate:
-    { repo: https://github.com/ankane/groupdate, ref: v6.8.0, framework: minitest,
-      test: "rake test:postgresql test:mysql test:trilogy test:sqlite test:enumerable" }
+    repo: https://github.com/ankane/groupdate
+    ref: v6.8.0
+    framework: minitest
+    env: { PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres, mysql]
+    setup: ["createdb -h 127.0.0.1 -U postgres groupdate_test || true",
+            "mariadb -h 127.0.0.1 -uroot -e 'create database if not exists groupdate_test'"]
+    test: "rake test:postgresql test:mysql test:trilogy test:sqlite test:enumerable"
   delayed_job_active_record-sqlite3: &djar
     { repo: https://github.com/collectiveidea/delayed_job_active_record, ref: v4.1.11, framework: rspec, env: { ADAPTER: sqlite3 }, test: rspec }
-  delayed_job_active_record-postgresql: { <<: *djar, env: { ADAPTER: postgresql } }
-  delayed_job_active_record-mysql2: { <<: *djar, env: { ADAPTER: mysql2 } }
-  delayed_job_active_record-trilogy: { <<: *djar, env: { ADAPTER: trilogy } }
+  delayed_job_active_record-postgresql:
+    <<: *djar
+    env: { ADAPTER: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres delayed_job_test || true"]
+  delayed_job_active_record-mysql2: &djar_mysql
+    <<: *djar
+    env: { ADAPTER: mysql2 }
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists delayed_job_test'"]
+  delayed_job_active_record-trilogy: { <<: *djar_mysql, env: { ADAPTER: trilogy } }
   audited:
     repo: https://github.com/collectiveidea/audited
     ref: v5.8.0
@@ -92,8 +155,16 @@ suites:
   mobility-sqlite3: &mobility
     { repo: https://github.com/shioyama/mobility, ref: v1.3.2, framework: rspec,
       env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: sqlite3 }, bumps: { ostruct: ">= 0" }, test: rspec -f p }
-  mobility-postgres: { <<: *mobility, env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: postgres }, setup: ["rake db:drop db:create db:up"] }
-  mobility-mysql: { <<: *mobility, env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: mysql }, setup: ["rake db:drop db:create db:up"] }
+  mobility-postgres:
+    <<: *mobility
+    env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: postgres, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["rake db:drop db:create db:up"]
+  mobility-mysql:
+    <<: *mobility
+    env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: mysql }
+    services: [mysql]
+    setup: ["rake db:drop db:create db:up"]
   # R2-9 makes the suite fail to load on main unless RAILS_ENV=test; the second suite shows R2-10 to R2-12.
   store_model: &store_model
     { repo: https://github.com/DmitryTsepelev/store_model, ref: v4.6.1, framework: rspec, gemfile: gemfiles/rails_8_1.gemfile, test: rspec }
@@ -104,34 +175,66 @@ suites:
   will_paginate-sqlite3: &will_paginate
     { repo: https://github.com/mislav/will_paginate, ref: v4.0.1, framework: rspec, env: { DB: sqlite3 },
       shims: ["sed -i \"s/'sqlite3', '~> 1.5.0'/'sqlite3', '>= 2.1'/\" Gemfile"], test: rspec spec }
-  will_paginate-postgres: { <<: *will_paginate, env: { DB: postgres, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres } }
-  will_paginate-mysql: { <<: *will_paginate, env: { DB: mysql, MYSQL_USER: root, MYSQL_HOST: 127.0.0.1 } }
+  will_paginate-postgres:
+    <<: *will_paginate
+    env: { DB: postgres, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, PGHOST: 127.0.0.1 }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres will_paginate || true"]
+  will_paginate-mysql:
+    <<: *will_paginate
+    env: { DB: mysql, MYSQL_USER: root, MYSQL_HOST: 127.0.0.1 }
+    services: [mysql]
+    setup: ["mariadb -h 127.0.0.1 -uroot -e 'create database if not exists will_paginate'"]
   bullet:
     { repo: https://github.com/flyerhzm/bullet, ref: 8.3.1, framework: rspec, gemfile: Gemfile.rails-8.1, test: rspec }
-  carrierwave:
+  carrierwave: &carrierwave
     { repo: https://github.com/carrierwaveuploader/carrierwave, ref: v3.1.4, framework: rspec, gemfile: gemfiles/rails-8-0.gemfile, test: rspec }
+  carrierwave-cucumber: { <<: *carrierwave, framework: cucumber, test: cucumber $CUCUMBER_OPTS features }
   shrine:
     { repo: https://github.com/shrinerb/shrine, ref: v3.10.2, framework: minitest, env: { CI: "true", RACK_ENV: development }, test: rake test }
   lograge:
     { repo: https://github.com/roidrage/lograge, ref: v0.15.1, framework: rspec, gemfile: gemfiles/rails_8.1.gemfile, test: rspec }
-  # factory_bot_rails' cucumber features and shoulda-matchers' acceptance specs generate apps against Rails; the
-  # round rewrote those templates to ECO_RAILS. Not reproduced here: these two suites run their unit specs only.
-  factory_bot_rails:
-    { repo: https://github.com/thoughtbot/factory_bot_rails, ref: v6.5.1, framework: rspec, gemfile: gemfiles/rails8.0.gemfile,
-      bumps: { aruba: "< 3" }, test: rspec }
-  shoulda-matchers:
+  factory_bot_rails: &factory_bot_rails
+    repo: https://github.com/thoughtbot/factory_bot_rails
+    ref: v6.5.1
+    framework: rspec
+    gemfile: gemfiles/rails8.0.gemfile
+    bumps: { aruba: "< 3" }
+    shims: [{ patch: round-ecosystem-2/factory_bot_rails-eco-rails.patch }]
+    test: rspec
+  factory_bot_rails-minitest: { <<: *factory_bot_rails, framework: minitest, test: rake test }
+  # The features run `rails new` and bundle the generated app against ECO_RAILS (the patch); allow 5 minutes each.
+  factory_bot_rails-cucumber:
+    <<: *factory_bot_rails
+    framework: cucumber
+    env: { ARUBA_TIMEOUT: 300 }
+    test: cucumber $CUCUMBER_OPTS features
+  shoulda-matchers-sqlite3: &shoulda
     repo: https://github.com/thoughtbot/shoulda-matchers
     ref: v8.0.1
     framework: rspec
     gemfile: gemfiles/rails_8_1.gemfile
-    bumps: { appraisal: { require: false } }
-    shims: ["sed -i \"s/'bundler', '~> 2.0'/'bundler', '>= 2.0'/\" shoulda-matchers.gemspec"]
-    test: rspec spec/unit
+    env: { DATABASE_ADAPTER: sqlite3 }
+    exclusive: shoulda-matchers-tmp # every variant builds its test apps under /tmp/shoulda-matchers-*
+    bumps: { appraisal: { require: false }, bundler: ">= 2.0" }
+    # The lock says BUNDLED WITH 2.4.13; round 2 ran Bundler 4.0.20, which test projects need as `bundle _4.0.20_`.
+    shims: [{ patch: round-ecosystem-2/shoulda-matchers-eco-rails.patch }, "sed -i '/^BUNDLED WITH/,+1d' gemfiles/Gemfile.eco-*.lock"]
+    test: ruby -w -r ./spec/report_warnings -S rspec spec/unit
+  shoulda-matchers-postgresql:
+    <<: *shoulda
+    env: { DATABASE_ADAPTER: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+  # Acceptance specs create projects in /tmp/shoulda-matchers-acceptance and bundle them against ECO_RAILS.
+  shoulda-matchers-acceptance:
+    <<: *shoulda
+    test: ruby -w -r ./spec/report_warnings -S rspec spec/acceptance
   solid_cache:
     repo: https://github.com/rails/solid_cache
     ref: v1.0.10
     framework: minitest
     gemfile: gemfiles/rails_8_1.gemfile
+    env: { PGHOST: 127.0.0.1 }
+    services: [postgres, mysql]
     bumps: { appraisal: { require: false }, minitest-mock: ">= 0" }
     shims: ["sed -i 's/33060/3306/; s/55432/5432/' test/dummy/config/database.yml"]
     setup: ["bin/rails db:setup"]
@@ -141,6 +244,8 @@ suites:
     ref: v4.1.0
     framework: minitest
     gemfile: gemfiles/rails_8_1.gemfile
+    env: { PGHOST: 127.0.0.1 }
+    services: [postgres, mysql]
     shims: ["sed -i 's/33060/3306/; s/55432/5432/' test/dummy/config/database.yml"]
     setup: ["bin/rails db:setup"]
     test: bin/test

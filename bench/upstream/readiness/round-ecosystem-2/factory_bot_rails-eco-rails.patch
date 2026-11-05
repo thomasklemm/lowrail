@@ -1,0 +1,31 @@
+diff --git a/features/step_definitions/appraisal.rb b/features/step_definitions/appraisal.rb
+index 76fe529..288d964 100644
+--- a/features/step_definitions/appraisal.rb
++++ b/features/step_definitions/appraisal.rb
+@@ -1,11 +1,11 @@
+ When(/^I run `([^"]+)` with a clean environment$/) do |command|
+   step <<~STEP
+-    I successfully run `ruby -e 'system({"BUNDLE_GEMFILE" => nil, "DISABLE_SPRING" => "true"}, "#{command}")'`
++    I successfully run `ruby -e 'system({"BUNDLE_GEMFILE" => nil, "BUNDLE_LOCKFILE" => nil, "RUBYOPT" => nil, "BUNDLER_SETUP" => nil, "BUNDLE_BIN_PATH" => nil, "DISABLE_SPRING" => "true"}, "#{command}")'`
+   STEP
+ end
+ 
+ When(/^I run `([^"]+)` with Spring enabled$/) do |command|
+   step <<~STEP
+-    I successfully run `ruby -e 'system({"BUNDLE_GEMFILE" => nil}, "#{command}")'`
++    I successfully run `ruby -e 'system({"BUNDLE_GEMFILE" => nil, "BUNDLE_LOCKFILE" => nil, "RUBYOPT" => nil, "BUNDLER_SETUP" => nil, "BUNDLE_BIN_PATH" => nil}, "#{command}")'`
+   STEP
+ end
+diff --git a/features/support/rails_template b/features/support/rails_template
+index 215a007..12e2910 100644
+--- a/features/support/rails_template
++++ b/features/support/rails_template
+@@ -18,3 +18,8 @@ if Rails.gem_version >= Gem::Version.new('7.1')
+ 
+   gsub_file "config/routes.rb",  /^  get/, '  # get'
+ end
++
++# Lowrail readiness: the generated app takes Rails from the same checkout as the suite.
++if ENV["ECO_RAILS"]
++  gsub_file "Gemfile", /^gem ["']rails["'].*$/, %(gem "rails", path: #{ENV["ECO_RAILS"].inspect})
++end

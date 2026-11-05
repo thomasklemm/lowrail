@@ -1,0 +1,4485 @@
+{
+  "rails": {
+    "base": {
+      "ref": "6e09124217",
+      "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+      "version": "8.1.4.1"
+    },
+    "cand": {
+      "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+      "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+      "version": "8.2.0.alpha"
+    }
+  },
+  "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+  "seeds": [
+    4242,
+    1717
+  ],
+  "generated": "2026-11-05T00:00:41Z",
+  "suites": [
+    {
+      "suite": "kaminari",
+      "repo": "https://github.com/kaminari/kaminari",
+      "ref": "v1.3.2",
+      "commit": "adb89b8f2681975d67bc3df6c13fd2a30cfd10e0",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 555,
+          "status": 0,
+          "secs": 24,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 555,
+          "status": 0,
+          "secs": 29,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 555,
+          "status": 0,
+          "secs": 25,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 555,
+          "status": 0,
+          "secs": 29,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "devise",
+      "repo": "https://github.com/heartcombo/devise",
+      "ref": "05811fb8366edd08874111d0f6fb44543e1c91ef",
+      "commit": "05811fb8366edd08874111d0f6fb44543e1c91ef",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "globalid: 1.3.0 -> 1.4.0",
+        "herb: - -> 0.11.1",
+        "marcel: 1.1.0 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 878,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 878,
+          "status": 0,
+          "secs": 14,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 878,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 878,
+          "status": 0,
+          "secs": 14,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "rspec-rails",
+      "repo": "https://github.com/rspec/rspec-rails",
+      "ref": "5072befe5d1b01348a14fa02b6e5a8448874fb53",
+      "commit": "5072befe5d1b01348a14fa02b6e5a8448874fb53",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 9,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 993,
+          "status": 1,
+          "secs": 8,
+          "failed": 50
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 993,
+          "status": 1,
+          "secs": 8,
+          "failed": 41
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 993,
+          "status": 1,
+          "secs": 8,
+          "failed": 50
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 993,
+          "status": 1,
+          "secs": 8,
+          "failed": 41
+        }
+      ]
+    },
+    {
+      "suite": "pundit",
+      "repo": "https://github.com/varvet/pundit",
+      "ref": "ea9e31a2d7993f038ee52b94ccc9c7411637ba89",
+      "commit": "ea9e31a2d7993f038ee52b94ccc9c7411637ba89",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 184,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 184,
+          "status": 0,
+          "secs": 1,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 184,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 184,
+          "status": 0,
+          "secs": 1,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "cancancan-sqlite",
+      "repo": "https://github.com/CanCanCommunity/cancancan",
+      "ref": "4362b39b04e6840c8edbd2cb4de16b2d77b19c3c",
+      "commit": "4362b39b04e6840c8edbd2cb4de16b2d77b19c3c",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {
+        "ostruct": ">= 0"
+      },
+      "shims": [
+        {
+          "run": "sed -i \"s/'bundler', '~> 2.0'/'bundler', '>= 2.0'/\" cancancan.gemspec"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 7,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 7,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "cancancan-postgres",
+      "repo": "https://github.com/CanCanCommunity/cancancan",
+      "ref": "4362b39b04e6840c8edbd2cb4de16b2d77b19c3c",
+      "commit": "4362b39b04e6840c8edbd2cb4de16b2d77b19c3c",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {
+        "ostruct": ">= 0"
+      },
+      "shims": [
+        {
+          "run": "sed -i \"s/'bundler', '~> 2.0'/'bundler', '>= 2.0'/\" cancancan.gemspec"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 41,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 38,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 40,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 712,
+          "status": 0,
+          "secs": 38,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "friendly_id-sqlite",
+      "repo": "https://github.com/norman/friendly_id",
+      "ref": "4699c9791db955dfa9929af0f38a4059af550026",
+      "commit": "4699c9791db955dfa9929af0f38a4059af550026",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 530,
+          "status": 0,
+          "secs": 4,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 530,
+          "status": 1,
+          "secs": 4,
+          "failed": 1
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 530,
+          "status": 0,
+          "secs": 4,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 530,
+          "status": 1,
+          "secs": 4,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "suite": "friendly_id-postgresql",
+      "repo": "https://github.com/norman/friendly_id",
+      "ref": "4699c9791db955dfa9929af0f38a4059af550026",
+      "commit": "4699c9791db955dfa9929af0f38a4059af550026",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 530,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 530,
+          "status": 1,
+          "secs": 6,
+          "failed": 1
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 530,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 530,
+          "status": 1,
+          "secs": 6,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "suite": "view_component",
+      "repo": "https://github.com/ViewComponent/view_component",
+      "ref": "b1fd129eaeedf4a33986c4ed342f041c2d4a5b0a",
+      "commit": "b1fd129eaeedf4a33986c4ed342f041c2d4a5b0a",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i 's/gem \"nokogiri\", \"1.19.4\"/gem \"nokogiri\", \">= 1.19.5\"/' Gemfile"
+        }
+      ],
+      "lock_diff": [
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 892,
+          "status": 0,
+          "secs": 59,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 892,
+          "status": 1,
+          "secs": 52,
+          "failed": 14
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 892,
+          "status": 0,
+          "secs": 53,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 892,
+          "status": 1,
+          "secs": 51,
+          "failed": 14
+        }
+      ]
+    },
+    {
+      "suite": "simple_form",
+      "repo": "https://github.com/heartcombo/simple_form",
+      "ref": "18f38aad0bdeca2ba1815043b94d96fdbbe6a325",
+      "commit": "18f38aad0bdeca2ba1815043b94d96fdbbe6a325",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 806,
+          "status": 1,
+          "secs": 3,
+          "failed": 3
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 806,
+          "status": 1,
+          "secs": 3,
+          "failed": 3
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 806,
+          "status": 1,
+          "secs": 3,
+          "failed": 3
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 806,
+          "status": 1,
+          "secs": 3,
+          "failed": 3
+        }
+      ]
+    },
+    {
+      "suite": "ransack-sqlite",
+      "repo": "https://github.com/activerecord-hackery/ransack",
+      "ref": "fbc3baf164da2a80435d5678a77924c66472f694",
+      "commit": "fbc3baf164da2a80435d5678a77924c66472f694",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i \"0,/^require 'active_support\\/core_ext/s//require 'active_support'\\n&/\" lib/ransack.rb"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1145,
+          "status": 1,
+          "secs": 7,
+          "failed": 22
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1145,
+          "status": 1,
+          "secs": 7,
+          "failed": 24
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1145,
+          "status": 1,
+          "secs": 7,
+          "failed": 15
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1145,
+          "status": 1,
+          "secs": 7,
+          "failed": 17
+        }
+      ]
+    },
+    {
+      "suite": "ransack-postgresql",
+      "repo": "https://github.com/activerecord-hackery/ransack",
+      "ref": "fbc3baf164da2a80435d5678a77924c66472f694",
+      "commit": "fbc3baf164da2a80435d5678a77924c66472f694",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i \"0,/^require 'active_support\\/core_ext/s//require 'active_support'\\n&/\" lib/ransack.rb"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1146,
+          "status": 1,
+          "secs": 8,
+          "failed": 23
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1146,
+          "status": 1,
+          "secs": 9,
+          "failed": 24
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1146,
+          "status": 1,
+          "secs": 8,
+          "failed": 15
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1146,
+          "status": 1,
+          "secs": 9,
+          "failed": 16
+        }
+      ]
+    },
+    {
+      "suite": "administrate",
+      "repo": "https://github.com/thoughtbot/administrate",
+      "ref": "6cb9cbbbc8032b5802ade02169881e61caf08193",
+      "commit": "6cb9cbbbc8032b5802ade02169881e61caf08193",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {
+        "appraisal": {
+          "require": false
+        },
+        "awesome_print": {
+          "require": false
+        }
+      },
+      "shims": [
+        {
+          "run": "cp .sample.env .env && cp spec/example_app/config/database.yml.sample spec/example_app/config/database.yml && yarn install"
+        }
+      ],
+      "lock_diff": [
+        "globalid: 1.3.0 -> 1.4.0",
+        "herb: - -> 0.11.1",
+        "marcel: 1.0.4 -> 2.1.0",
+        "ractor-dispatch: - -> 0.3.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 642,
+          "status": 0,
+          "secs": 33,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 7,
+          "load_errors": 26,
+          "failed": 26
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 642,
+          "status": 0,
+          "secs": 31,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 7,
+          "load_errors": 26,
+          "failed": 26
+        }
+      ]
+    },
+    {
+      "suite": "jbuilder",
+      "repo": "https://github.com/rails/jbuilder",
+      "ref": "f141f5ede81bf534d62c6ba228975d5ccb90b63d",
+      "commit": "f141f5ede81bf534d62c6ba228975d5ccb90b63d",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 138,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 138,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 138,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 138,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "good_job",
+      "repo": "https://github.com/bensheldon/good_job",
+      "ref": "e15ee79627",
+      "commit": "e15ee796276a7856ff106b1764d40370d5d9f920",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1265,
+          "status": 1,
+          "secs": 451,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1265,
+          "status": 1,
+          "secs": 414,
+          "failed": 2
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1265,
+          "status": 1,
+          "secs": 433,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1265,
+          "status": 1,
+          "secs": 439,
+          "failed": 2
+        }
+      ]
+    },
+    {
+      "suite": "solid_queue-sqlite",
+      "repo": "https://github.com/rails/solid_queue",
+      "ref": "b9c646a848",
+      "commit": "b9c646a8486ef3e76f70919568cac070276da0e1",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i 's/55432/5432/' test/dummy/config/database.yml"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 222,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 217,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 213,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 218,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "solid_queue-postgres",
+      "repo": "https://github.com/rails/solid_queue",
+      "ref": "b9c646a848",
+      "commit": "b9c646a8486ef3e76f70919568cac070276da0e1",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i 's/55432/5432/' test/dummy/config/database.yml"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 233,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 232,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 228,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 402,
+          "status": 0,
+          "secs": 226,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "sidekiq-rails",
+      "repo": "https://github.com/sidekiq/sidekiq",
+      "ref": "75982898ff",
+      "commit": "75982898ff6dc984988da8b9ecf5371eba68e120",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 177,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 177,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 177,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 177,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "paper_trail-sqlite",
+      "repo": "https://github.com/paper-trail-gem/paper_trail",
+      "ref": "86ce1b8307",
+      "commit": "86ce1b83078ef8594cad8f62877ac37f3cb011cc",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i 's#\\.gemfile/)#.gemfile|Gemfile\\\\.eco-/)#' spec/spec_helper.rb"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 444,
+          "status": 0,
+          "secs": 11,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 444,
+          "status": 0,
+          "secs": 11,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 444,
+          "status": 0,
+          "secs": 10,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 444,
+          "status": 0,
+          "secs": 11,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "paper_trail-postgres",
+      "repo": "https://github.com/paper-trail-gem/paper_trail",
+      "ref": "86ce1b8307",
+      "commit": "86ce1b83078ef8594cad8f62877ac37f3cb011cc",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [
+        {
+          "run": "sed -i 's#\\.gemfile/)#.gemfile|Gemfile\\\\.eco-/)#' spec/spec_helper.rb"
+        }
+      ],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 510,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 510,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 510,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 510,
+          "status": 0,
+          "secs": 13,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "active_model_serializers",
+      "repo": "https://github.com/rails-api/active_model_serializers",
+      "ref": "6934c8bd31",
+      "commit": "6934c8bd31f4025fe7548a07d50a82f18df8e689",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 576,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 576,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": false,
+          "total": 0,
+          "status": 1,
+          "secs": 2,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "pagy",
+      "repo": "https://github.com/ddnexus/pagy",
+      "ref": "b48c906e31847cc2564b1e8da2995e2b1b8e3e9a",
+      "commit": "b48c906e31847cc2564b1e8da2995e2b1b8e3e9a",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1205,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 1205,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1205,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 1205,
+          "status": 0,
+          "secs": 5,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "turbo-rails",
+      "repo": "https://github.com/hotwired/turbo-rails",
+      "ref": "37530c08780fa6f6dbb56a633de4b81169bdd174",
+      "commit": "37530c08780fa6f6dbb56a633de4b81169bdd174",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 247,
+          "status": 0,
+          "secs": 38,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 247,
+          "status": 0,
+          "secs": 30,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 247,
+          "status": 0,
+          "secs": 48,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 247,
+          "status": 0,
+          "secs": 33,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "importmap-rails",
+      "repo": "https://github.com/rails/importmap-rails",
+      "ref": "f255e55482d9173d8f64db3bfa4317b64445eeb4",
+      "commit": "f255e55482d9173d8f64db3bfa4317b64445eeb4",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 104,
+          "status": 0,
+          "secs": 19,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 104,
+          "status": 0,
+          "secs": 19,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 104,
+          "status": 0,
+          "secs": 30,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 104,
+          "status": 0,
+          "secs": 19,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "propshaft",
+      "repo": "https://github.com/rails/propshaft",
+      "ref": "e7530a0490c8e1cd4e15dfa9a98717167fa6dccf",
+      "commit": "e7530a0490c8e1cd4e15dfa9a98717167fa6dccf",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 170,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 170,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 170,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 170,
+          "status": 0,
+          "secs": 2,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "responders",
+      "repo": "https://github.com/heartcombo/responders",
+      "ref": "eb9b9baac1f8e2d44265e20120bdec45c0890a28",
+      "commit": "eb9b9baac1f8e2d44265e20120bdec45c0890a28",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 116,
+          "status": 0,
+          "secs": 3,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 116,
+          "status": 0,
+          "secs": 3,
+          "failed": 0
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 116,
+          "status": 0,
+          "secs": 3,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 116,
+          "status": 0,
+          "secs": 3,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "suite": "rails-controller-testing",
+      "repo": "https://github.com/rails/rails-controller-testing",
+      "ref": "c203673f8011a7cdc2a8edf995ae6b3eec3417ca",
+      "commit": "c203673f8011a7cdc2a8edf995ae6b3eec3417ca",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 46,
+          "status": 1,
+          "secs": 3,
+          "failed": 4
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 46,
+          "status": 1,
+          "secs": 4,
+          "failed": 37
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 46,
+          "status": 1,
+          "secs": 3,
+          "failed": 4
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 46,
+          "status": 1,
+          "secs": 4,
+          "failed": 37
+        }
+      ]
+    },
+    {
+      "suite": "draper",
+      "repo": "https://github.com/drapergem/draper",
+      "ref": "7fc015f80ccb1f0aa7b8ffaa7a50db76d0cc946c",
+      "commit": "7fc015f80ccb1f0aa7b8ffaa7a50db76d0cc946c",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 2,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 425,
+          "status": 1,
+          "secs": 86,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 322,
+          "status": 1,
+          "secs": 2,
+          "failed": 1
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 425,
+          "status": 1,
+          "secs": 86,
+          "failed": 2
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 322,
+          "status": 1,
+          "secs": 2,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "suite": "acts-as-taggable-on",
+      "repo": "https://github.com/mbleigh/acts-as-taggable-on",
+      "ref": "719734149d4f4295f497dc9a02884b08051325a3",
+      "commit": "719734149d4f4295f497dc9a02884b08051325a3",
+      "rails": {
+        "base": {
+          "ref": "6e09124217",
+          "sha": "6e091242176c322edc5a8907583c01b08b8a60bc",
+          "version": "8.1.4.1"
+        },
+        "cand": {
+          "ref": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "sha": "7a78da5a5576d7ab7549b10fb13156788478ba35",
+          "version": "8.2.0.alpha"
+        }
+      },
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "seeds": [
+        4242,
+        1717
+      ],
+      "bumps": {},
+      "shims": [],
+      "lock_diff": [
+        "herb: - -> 0.11.1",
+        "marcel: 1.2.1 -> 2.1.0",
+        "psych: - -> 5.5.0",
+        "ractor-dispatch: - -> 0.3.0",
+        "stringio: - -> 3.2.0"
+      ],
+      "base_only": 0,
+      "runs": [
+        {
+          "tree": "base",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 312,
+          "status": 1,
+          "secs": 6,
+          "failed": 3
+        },
+        {
+          "tree": "cand",
+          "n": 1,
+          "seed": 4242,
+          "loaded": true,
+          "total": 312,
+          "status": 1,
+          "secs": 6,
+          "failed": 3
+        },
+        {
+          "tree": "base",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 312,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        },
+        {
+          "tree": "cand",
+          "n": 2,
+          "seed": 1717,
+          "loaded": true,
+          "total": 312,
+          "status": 0,
+          "secs": 6,
+          "failed": 0
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "class": "confirmed",
+      "signature": "ActiveRecord::StatementInvalid: Could not find table 'widgets'",
+      "count": 1,
+      "suites": [
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:E2"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/context_spec.rb[1:3:2:1]",
+          "desc": "Ransack::ActiveRecord::Context#type_for on a table the schema cache does not list a table whose name differs only in case can be searched like Active Record que",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "ransack-sqlite",
+          "match": "known:E2"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR: zero-length delimited identifier at or near \"\"\"\"",
+      "count": 1,
+      "suites": [
+        "friendly_id-postgresql"
+      ],
+      "match": [
+        "known:I1"
+      ],
+      "tests": [
+        {
+          "test": "UuidAsPrimaryKeyFindTest#test_should_be_findable_by_the_UUID_primary_key",
+          "desc": "UuidAsPrimaryKeyFindTest#test_should_be_findable_by_the_UUID_primary_key",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "friendly_id-postgresql",
+          "match": "known:I1"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: menu_items.:",
+      "count": 1,
+      "suites": [
+        "friendly_id-sqlite"
+      ],
+      "match": [
+        "known:I1"
+      ],
+      "tests": [
+        {
+          "test": "UuidAsPrimaryKeyFindTest#test_should_be_findable_by_the_UUID_primary_key",
+          "desc": "UuidAsPrimaryKeyFindTest#test_should_be_findable_by_the_UUID_primary_key",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "friendly_id-sqlite",
+          "match": "known:I1"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "ArgumentError: Cannot proxy frozen objects, rspec-mocks relies on proxies for method stubbing and expectations.",
+      "count": 1,
+      "suites": [
+        "draper"
+      ],
+      "match": [
+        "known:eco1-draper"
+      ],
+      "tests": [
+        {
+          "test": "./spec/draper/query_methods/load_strategy_spec.rb[2:1:1]",
+          "desc": "Draper::QueryMethods::LoadStrategy::ActiveRecord#allowed? checks whether or not ActiveRecord::Relation::VALUE_METHODS has the given method",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "draper",
+          "match": "known:eco1-draper"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "ArgumentError: Using a dynamic :controller segment in a route is not supported: /:controller(/:action)(.:format). Specify the controller and action explicitly, e.g. `get \"/photos/:id\", to: \"photos#sho",
+      "count": 25,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "AssignsControllerTest#test_assigns",
+          "desc": "AssignsControllerTest#test_assigns",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "AssignsControllerTest#test_view_assigns",
+          "desc": "AssignsControllerTest#test_view_assigns",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_expecting_no_layout",
+          "desc": "TemplateAssertionsControllerTest#test_fails_expecting_no_layout",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_expecting_not_known_layout",
+          "desc": "TemplateAssertionsControllerTest#test_fails_expecting_not_known_layout",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_incorrect_string",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_incorrect_string",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_incorrect_string_that_matches",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_incorrect_string_that_matches",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_incorrect_symbol",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_incorrect_symbol",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_incorrect_symbol_that_matches",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_incorrect_symbol_that_matches",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_repeated_name_in_path",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_repeated_name_in_path",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_fails_with_wrong_layout",
+          "desc": "TemplateAssertionsControllerTest#test_fails_with_wrong_layout",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_locals_option_to_assert_template_is_not_supported",
+          "desc": "TemplateAssertionsControllerTest#test_locals_option_to_assert_template_is_not_supported",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passed_with_no_layout",
+          "desc": "TemplateAssertionsControllerTest#test_passed_with_no_layout",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passed_with_no_layout_false",
+          "desc": "TemplateAssertionsControllerTest#test_passed_with_no_layout_false",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_correct_layout",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_correct_layout",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_correct_layout_symbol",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_correct_layout_symbol",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_correct_layout_without_layouts_prefix",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_correct_layout_without_layouts_prefix",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_correct_string",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_correct_string",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_correct_symbol",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_correct_symbol",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_passes_with_layout_and_partial",
+          "desc": "TemplateAssertionsControllerTest#test_passes_with_layout_and_partial",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_empty_string_fails_when_no_template_rendered",
+          "desc": "TemplateAssertionsControllerTest#test_with_empty_string_fails_when_no_template_rendered",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_empty_string_fails_when_template_rendered",
+          "desc": "TemplateAssertionsControllerTest#test_with_empty_string_fails_when_template_rendered",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_file_failure",
+          "desc": "TemplateAssertionsControllerTest#test_with_file_failure",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_nil_fails_when_template_rendered",
+          "desc": "TemplateAssertionsControllerTest#test_with_nil_fails_when_template_rendered",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_nil_passes_when_no_template_rendered",
+          "desc": "TemplateAssertionsControllerTest#test_with_nil_passes_when_no_template_rendered",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_with_partial",
+          "desc": "TemplateAssertionsControllerTest#test_with_partial",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "FrozenError: can't modify frozen Hash: {#<ActionView::Template::Handlers::ERB:0xX> => ActionView::DependencyTracker::ERBTracker}",
+      "count": 1,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-dependency-tracker"
+      ],
+      "tests": [
+        {
+          "test": "CacheableTest#test_existing_dynamic_partial_dependencies_are_kept",
+          "desc": "CacheableTest#test_existing_dynamic_partial_dependencies_are_kept",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "FrozenError: can't modify frozen Hash: {#<ActionView::Template::Handlers::ERB:0xX> => ActionView::DependencyTracker::RubyTracker}",
+      "count": 7,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-dependency-tracker"
+      ],
+      "tests": [
+        {
+          "test": "CacheableTest#test_explicit_dependencies_are_kept_alongside_dynamic_renders",
+          "desc": "CacheableTest#test_explicit_dependencies_are_kept_alongside_dynamic_renders",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_literal_wildcard_dependencies_are_kept_alongside_dynamic_renders",
+          "desc": "CacheableTest#test_literal_wildcard_dependencies_are_kept_alongside_dynamic_renders",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_missing_literal_dependencies_are_kept_alongside_dynamic_renders",
+          "desc": "CacheableTest#test_missing_literal_dependencies_are_kept_alongside_dynamic_renders",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_partials_inferred_from_component_renders_are_discarded",
+          "desc": "CacheableTest#test_partials_inferred_from_component_renders_are_discarded",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_partials_named_like_inferred_component_partials_are_kept",
+          "desc": "CacheableTest#test_partials_named_like_inferred_component_partials_are_kept",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_unresolvable_interpolated_partial_dependencies_are_discarded",
+          "desc": "CacheableTest#test_unresolvable_interpolated_partial_dependencies_are_discarded",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        },
+        {
+          "test": "CacheableTest#test_unresolved_dynamic_partial_dependencies_are_discarded",
+          "desc": "CacheableTest#test_unresolved_dynamic_partial_dependencies_are_discarded",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-dependency-tracker"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: --- expected",
+      "count": 2,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-request-url"
+      ],
+      "tests": [
+        {
+          "test": "TestHelperTest#test_with_request_url_restores_nondefault_ports_after_nested_blocks_and_errors",
+          "desc": "TestHelperTest#test_with_request_url_restores_nondefault_ports_after_nested_blocks_and_errors",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-request-url"
+        },
+        {
+          "test": "TestHelperTest#test_with_request_url_restores_urls_first_read_inside_the_block",
+          "desc": "TestHelperTest#test_with_request_url_restores_urls_first_read_inside_the_block",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-request-url"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: Expected exactly 51 total allocations, got 33",
+      "count": 1,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-allocations"
+      ],
+      "tests": [
+        {
+          "test": "RenderingAllocationsTest#test_render_inline_allocations",
+          "desc": "RenderingAllocationsTest#test_render_inline_allocations",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-allocations"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: Expected exactly 71 total allocations, got 53",
+      "count": 1,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-allocations"
+      ],
+      "tests": [
+        {
+          "test": "RenderingAllocationsTest#test_render_collection_inline_allocations",
+          "desc": "RenderingAllocationsTest#test_render_collection_inline_allocations",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-allocations"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: Expected: \"http://test.host/\"",
+      "count": 1,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-request-url"
+      ],
+      "tests": [
+        {
+          "test": "TestHelperTest#test_with_request_url_refreshes_memoized_request_and_controller_urls",
+          "desc": "TestHelperTest#test_with_request_url_refreshes_memoized_request_and_controller_urls",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-request-url"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: [ViewComponent::MissingTemplateError] exception expected, not",
+      "count": 1,
+      "suites": [
+        "view_component"
+      ],
+      "match": [
+        "known:eco1-view_component-locale"
+      ],
+      "tests": [
+        {
+          "test": "RenderingTest#test_with_format_missing",
+          "desc": "RenderingTest#test_with_format_missing",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "view_component",
+          "match": "known:eco1-view_component-locale"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: expecting <\"test/hello_world\"> but rendering with <[\"rescues/_copy_button\", \"rescues/_message_and_suggestions\", \"rescues/_actions\", \"rescues/_source\", \"rescues/_trace\", \"rescues/_",
+      "count": 2,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_template_reset_between_requests",
+          "desc": "TemplateAssertionsIntegrationTest#test_template_reset_between_requests",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_template_reset_between_requests_when_opening_a_session",
+          "desc": "TemplateAssertionsIntegrationTest#test_template_reset_between_requests_when_opening_a_session",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: expecting layout <layouts/standard> but action rendered <[\"rescues/layout\"]>.",
+      "count": 3,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_cookies_do_not_reset_template_assertion",
+          "desc": "TemplateAssertionsIntegrationTest#test_cookies_do_not_reset_template_assertion",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_layout_reset_between_requests",
+          "desc": "TemplateAssertionsIntegrationTest#test_layout_reset_between_requests",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_layout_reset_between_requests_when_opening_a_session",
+          "desc": "TemplateAssertionsIntegrationTest#test_layout_reset_between_requests_when_opening_a_session",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "Minitest::Assertion: expecting partial <test/_partial> but action rendered <[\"rescues/_copy_button\", \"_copy_button\", \"rescues/_message_and_suggestions\", \"_message_and_suggestions\", \"rescues/_actions\",",
+      "count": 2,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_partial_reset_between_requests",
+          "desc": "TemplateAssertionsIntegrationTest#test_partial_reset_between_requests",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_partial_reset_between_requests_when_opening_a_session",
+          "desc": "TemplateAssertionsIntegrationTest#test_partial_reset_between_requests_when_opening_a_session",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "NoMethodError: undefined method 'klass' for class Article",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:eco1-ransack-select-manager"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/negative_collection_spec.rb[2:1:1]",
+          "desc": "Ransack::ActiveRecord::Context#evaluate keeps the subquery buildable after an evaluation",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "ransack-postgresql",
+          "match": "known:eco1-ransack-select-manager"
+        },
+        {
+          "test": "./spec/ransack/active_record/negative_collection_spec.rb[2:1:1]",
+          "desc": "Ransack::ActiveRecord::Context#evaluate keeps the subquery buildable after an evaluation",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "ransack-sqlite",
+          "match": "known:eco1-ransack-select-manager"
+        }
+      ]
+    },
+    {
+      "class": "confirmed",
+      "signature": "NoMethodError: undefined method 'view_assigns' for nil",
+      "count": 1,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_assigns_do_not_reset_template_assertion",
+          "desc": "TemplateAssertionsIntegrationTest#test_assigns_do_not_reset_template_assertion",
+          "candidate": "2/2",
+          "base": "0/2",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "suite-did-not-load",
+      "signature": "FrozenError: can't modify frozen Hash: {}",
+      "count": 1,
+      "suites": [
+        "administrate"
+      ],
+      "match": [
+        "known:L1"
+      ],
+      "tests": [
+        {
+          "test": "(suite)",
+          "tree": "cand",
+          "detail": "cand runs 1,2 did not load, 26 load errors",
+          "suite": "administrate",
+          "match": "known:L1"
+        }
+      ]
+    },
+    {
+      "class": "suite-did-not-load",
+      "signature": "NameError: RAILS/activesupport/lib/active_support/test_case.rb:in '<class:TestCase>': undefined method 'refute_pattern' for class 'ActiveSupport::TestCase'",
+      "count": 1,
+      "suites": [
+        "active_model_serializers"
+      ],
+      "match": [
+        "known:E4"
+      ],
+      "tests": [
+        {
+          "test": "(suite)",
+          "tree": "cand",
+          "detail": "cand runs 1,2 did not load",
+          "suite": "active_model_serializers",
+          "match": "known:E4"
+        }
+      ]
+    },
+    {
+      "class": "signature-changed",
+      "signature": "ArgumentError: Using a dynamic :controller segment in a route is not supported: /:controller(/:action)(.:format). Specify the controller and action explicitly, e.g. `get \"/photos/:id\", to: \"photos#sho",
+      "count": 2,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:eco1-dynamic-controller-routes"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsControllerTest#test_assert_template_reset_between_requests",
+          "desc": "TemplateAssertionsControllerTest#test_assert_template_reset_between_requests",
+          "candidate": "2/2",
+          "base": "2/2",
+          "detail": "base: ArgumentError: File /test/dummy/README.rdoc does not exist",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        },
+        {
+          "test": "TemplateAssertionsControllerTest#test_file_with_relative_path_success",
+          "desc": "TemplateAssertionsControllerTest#test_file_with_relative_path_success",
+          "candidate": "2/2",
+          "base": "2/2",
+          "detail": "base: ArgumentError: File /test/dummy/README.rdoc does not exist",
+          "suite": "rails-controller-testing",
+          "match": "known:eco1-dynamic-controller-routes"
+        }
+      ]
+    },
+    {
+      "class": "test-count-mismatch",
+      "signature": "test count differs",
+      "count": 1,
+      "suites": [
+        "draper"
+      ],
+      "match": [
+        "known:eco1-draper"
+      ],
+      "tests": [
+        {
+          "test": "(suite)",
+          "detail": "base1=425 cand1=322 base2=425 cand2=322",
+          "suite": "draper",
+          "match": "known:eco1-draper"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Minitest::Assertion: Expected [] to include \"README.rdoc\".",
+      "count": 2,
+      "suites": [
+        "rails-controller-testing"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_file_reset_between_requests",
+          "desc": "TemplateAssertionsIntegrationTest#test_file_reset_between_requests",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rails-controller-testing",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "TemplateAssertionsIntegrationTest#test_file_reset_between_requests_when_opening_a_session",
+          "desc": "TemplateAssertionsIntegrationTest#test_file_reset_between_requests_when_opening_a_session",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rails-controller-testing",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Minitest::Assertion: Expected at least 1 element matching \"input:match('pattern', /\\\\\\\\d+/)\", found 0.",
+      "count": 2,
+      "suites": [
+        "simple_form"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "InputFieldTest#test_builder_input_field_accepts_custom_pattern",
+          "desc": "InputFieldTest#test_builder_input_field_accepts_custom_pattern",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "simple_form",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "StringInputTest#test_input_uses_given_pattern_from_attributes",
+          "desc": "StringInputTest#test_input_uses_given_pattern_from_attributes",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "simple_form",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Nokogiri::XML::XPath::SyntaxError: ERROR: Char out of XML range: .//*[nokogiri:match(.,'class','(?-mix:^(?!.*¼hosen .*¼hosen ).*¼hosen .*$)')] | self::*[nokogiri:match(.,'class','(?-mix:^(?!.*¼hosen .",
+      "count": 1,
+      "suites": [
+        "simple_form"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "DiscoveryTest#test_does_not_duplicate_the_html_classes_giving_a_extra_class",
+          "desc": "DiscoveryTest#test_does_not_duplicate_the_html_classes_giving_a_extra_class",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "simple_form",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"<a controller=\\\"people\\\" class=\\\"sort_link \\\" href=\\\"/people?q%5Bs%5D=id+asc\\\">id&nbsp;defaultarrow</a>\" to match /id<\\/a>/",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/helpers/form_builder_spec.rb[1:3:2]",
+          "desc": "Ransack::Helpers::FormBuilder#sort_link sort_link for common attribute",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/helpers/form_builder_spec.rb[1:3:2]",
+          "desc": "Ransack::Helpers::FormBuilder#sort_link sort_link for common attribute",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"<a controller=\\\"people\\\" class=\\\"sort_link \\\" href=\\\"/people?q%5Bs%5D=name+asc\\\">Full Name&nbsp;defaultarrow</a>\" to match /Full Name<\\/a>/",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/helpers/form_builder_spec.rb[1:3:1]",
+          "desc": "Ransack::Helpers::FormBuilder#sort_link sort_link for ransack attribute",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/helpers/form_builder_spec.rb[1:3:1]",
+          "desc": "Ransack::Helpers::FormBuilder#sort_link sort_link for ransack attribute",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"SELECT \\\"issue_343_people\\\".* FROM \\\"issue_343_people\\\" ORDER BY \\\"issue_343_people\\\".\\\"id\\\" DESC\" to include \"\\\"issue_343_people\\\".\\\"name\\\" = \"",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:12:1]",
+          "desc": "behaviour reported in closed issues a model backed by a database view searches and sorts its columns",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:12:1]",
+          "desc": "behaviour reported in closed issues a model backed by a database view searches and sorts its columns",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected \"bundler: failed to load command: tmp/fail_sanity_check (tmpRUBYLIB/bundler/source/git/git_proxy.rb:461:in 'Bundler::Source::Git::GitProxy#allowed",
+      "count": 1,
+      "suites": [
+        "rspec-rails"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/sanity_check_spec.rb[1:1]",
+          "desc": "Verify required rspec dependencies fails when libraries are not required",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected RuntimeError with message matching /Ransack needs Article associations explicitly allowlisted/ but nothing was raised",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:11:4:1]",
+          "desc": "Ransack::ActiveRecord::Base#ransackable_associations when not defined in model, nor in ApplicationRecord raises a helpful error",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:11:4:1]",
+          "desc": "Ransack::ActiveRecord::Base#ransackable_associations when not defined in model, nor in ApplicationRecord raises a helpful error",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected RuntimeError with message matching /Ransack needs Article attributes explicitly allowlisted/ but nothing was raised",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:9:3:1]",
+          "desc": "Ransack::ActiveRecord::Base#ransackable_attributes when not defined in model, nor in ApplicationRecord raises a helpful error",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:9:3:1]",
+          "desc": "Ransack::ActiveRecord::Base#ransackable_attributes when not defined in model, nor in ApplicationRecord raises a helpful error",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected [\"=> Booting Puma\\n\", \"=> Rails RAILS_VERSION application starting in development \\n\", \"=> Run `bin/rails server --help` for more startup options\\",
+      "count": 1,
+      "suites": [
+        "good_job"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/integration/server_spec.rb[1:1:1]",
+          "desc": "Server modes when development async successfully runs in the server",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "good_job",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected [\"=> Booting Puma\\n\", \"=> Rails RAILS_VERSION application starting in production \\n\", \"=> Run `bin/rails server --help` for more startup options\\n",
+      "count": 1,
+      "suites": [
+        "good_job"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/integration/server_spec.rb[1:2:1]",
+          "desc": "Server modes when production async successfully runs in the server",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "good_job",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected `\"bundler: failed to load command: tmp/pass_sanity_check (tmpRUBYLIB/bundler/source/git/git_proxy.rb:461:in 'Bundler::Source::Git::GitProxy#allowe",
+      "count": 1,
+      "suites": [
+        "rspec-rails"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/sanity_check_spec.rb[1:2]",
+          "desc": "Verify required rspec dependencies passes when libraries are required",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected no Exception, got #<Ransack::InvalidSearchError: Invalid combinator unknown> with backtrace:",
+      "count": 4,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:26:3:1]",
+          "desc": "Ransack::Search#build with an invalid combinator when ignore_unknown_conditions search parameter is absent is expected not to raise Exception",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:26:5:1]",
+          "desc": "Ransack::Search#build with an invalid combinator when ignore_unknown_conditions search parameter is true is expected not to raise Exception",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:26:3:1]",
+          "desc": "Ransack::Search#build with an invalid combinator when ignore_unknown_conditions search parameter is absent is expected not to raise Exception",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:26:5:1]",
+          "desc": "Ransack::Search#build with an invalid combinator when ignore_unknown_conditions search parameter is true is expected not to raise Exception",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected no Exception, got #<Ransack::InvalidSearchError: Invalid search term unknown_attr_eq> with backtrace:",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:18:5:1]",
+          "desc": "Ransack::Search#build with an invalid condition when ignore_unknown_conditions search parameter is true is expected not to raise Exception",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:18:5:1]",
+          "desc": "Ransack::Search#build with an invalid condition when ignore_unknown_conditions search parameter is true is expected not to raise Exception",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: #<ActsAsTaggableOn::Tag id: 1, name: \"awesome\", taggings_count: 0, type: nil>",
+      "count": 1,
+      "suites": [
+        "acts-as-taggable-on"
+      ],
+      "match": [
+        "known:noise-eco1-taggable-order"
+      ],
+      "tests": [
+        {
+          "test": "./spec/acts_as_taggable_on/tag_spec.rb[1:5:2]",
+          "desc": "ActsAsTaggableOn::Tag find or create by name should find by name case insensitive",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "acts-as-taggable-on",
+          "match": "known:noise-eco1-taggable-order"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: 1",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:4]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not break #count if using InfixOperations",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:4]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not break #count if using InfixOperations",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [\"c\", \"b\", \"a\"]",
+      "count": 1,
+      "suites": [
+        "acts-as-taggable-on"
+      ],
+      "match": [
+        "known:noise-eco1-taggable-order"
+      ],
+      "tests": [
+        {
+          "test": "./spec/acts_as_taggable_on/stale_tag_list_spec.rb[1:3:1]",
+          "desc": "Stale tag lists with preserve_tag_order persists a reorder",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "acts-as-taggable-on",
+          "match": "known:noise-eco1-taggable-order"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [\"call-50%off\"]",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:23]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker escapes every term of a cont_all search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:23]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker escapes every term of a cont_all search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [\"tag2\", \"tag1\"]",
+      "count": 1,
+      "suites": [
+        "acts-as-taggable-on"
+      ],
+      "match": [
+        "known:noise-eco1-taggable-order"
+      ],
+      "tests": [
+        {
+          "test": "./spec/acts_as_taggable_on/tagger_spec.rb[1:12]",
+          "desc": "Tagger should change tags order in ordered taggable",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "acts-as-taggable-on",
+          "match": "known:noise-eco1-taggable-order"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [#<Person id: 30, parent_id: nil, name: \"a_c\", email: nil, only_search: nil, only_sort: nil, only_adm...eated_at: \"2026-11-04 21:47:37.398570000 ",
+      "count": 1,
+      "suites": [
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:21]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker treats an underscore in the search term literally",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [#<Person id: 30, parent_id: nil, name: \"a_c\", email: nil, only_search: nil, only_sort: nil, only_adm...eated_at: \"2026-11-04 22:13:15.592262000 ",
+      "count": 1,
+      "suites": [
+        "ransack-postgresql"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:21]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker treats an underscore in the search term literally",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: [#<Person id: 56, parent_id: nil, name: \"name_with_underscore\", email: nil, only_search: nil, only_so...eated_at: \"2026-11-04 22:13:15.732703000 ",
+      "count": 1,
+      "suites": [
+        "ransack-postgresql"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:28:1]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker searching by underscores should search correctly if matches exist",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected: []",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:9:6]",
+          "desc": "behaviour reported in closed issues searching a relation that already has joins searches a relation that has a string join",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:9:6]",
+          "desc": "behaviour reported in closed issues searching a relation that already has joins searches a relation that has a string join",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid combinator 1",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:24:2]",
+          "desc": "Ransack::Search#build combinator validation in permissive mode does not raise for a non-string combinator",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:24:2]",
+          "desc": "Ransack::Search#build combinator validation in permissive mode does not raise for a non-string combinator",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid combinator nand",
+      "count": 4,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/ransack_alias_spec.rb[1:9:5]",
+          "desc": "ransack_alias named in advanced-search params drops the condition for an unknown combinator, like any multi-attribute condition",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:24:1]",
+          "desc": "Ransack::Search#build combinator validation in permissive mode falls back to and for an unknown combinator",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/ransack_alias_spec.rb[1:9:5]",
+          "desc": "ransack_alias named in advanced-search params drops the condition for an unknown combinator, like any multi-attribute condition",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:24:1]",
+          "desc": "Ransack::Search#build combinator validation in permissive mode falls back to and for an unknown combinator",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term context",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/context_spec.rb[1:1:1]",
+          "desc": "Ransack::ActiveRecord::Context#type_for reads column metadata without leasing a connection",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/context_spec.rb[1:1:1]",
+          "desc": "Ransack::ActiveRecord::Context#type_for reads column metadata without leasing a connection",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term name_eq",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:3]",
+          "desc": "a search key with a newline in it is an unknown search key at the top level",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:3]",
+          "desc": "a search key with a newline in it is an unknown search key at the top level",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term nick_eq",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/ransack_alias_spec.rb[1:7:1]",
+          "desc": "ransack_alias an alias pointing at a missing attribute is dropped under a permissive search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/ransack_alias_spec.rb[1:7:1]",
+          "desc": "ransack_alias an alias pointing at a missing attribute is dropped under a permissive search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term notable_name_cont",
+      "count": 4,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:7:2]",
+          "desc": "behaviour reported in closed issues polymorphic associations ignores a condition that names no type",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:7:4]",
+          "desc": "behaviour reported in closed issues polymorphic associations keeps a type scope on the relation and adds no join",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:7:2]",
+          "desc": "behaviour reported in closed issues polymorphic associations ignores a condition that names no type",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:7:4]",
+          "desc": "behaviour reported in closed issues polymorphic associations keeps a type scope on the relation and adds no join",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term notable_of_Person_type",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:4]",
+          "desc": "a search key with a newline in it does not read a polymorphic type from one line of the key",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:4]",
+          "desc": "a search key with a newline in it does not read a polymorphic type from one line of the key",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term only_admin_eq",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:43]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker cannot be searched by `only_admin`, if auth_object: nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:43]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker cannot be searched by `only_admin`, if auth_object: nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term quick_cont",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:5:2]",
+          "desc": "behaviour reported in closed issues ransack_alias keeps same-named aliases on different models apart",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/reported_issues_spec.rb[1:5:2]",
+          "desc": "behaviour reported in closed issues ransack_alias keeps same-named aliases on different models apart",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid search term restricted",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:2:4:5]",
+          "desc": "Ransack::ActiveRecord::Base#search with scopes ignores unlisted scopes",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:2:4:5]",
+          "desc": "Ransack::ActiveRecord::Base#search with scopes ignores unlisted scopes",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid sort term",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:2]",
+          "desc": "a search key with a newline in it is ignored inside a sort, which a strict search then rejects",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/newline_keys_spec.rb[1:2]",
+          "desc": "a search key with a newline in it is ignored inside a sort, which a strict search then rejects",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid sort term only_admin",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:41]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not sort by `only_admin` field, if auth_object: nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:41]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not sort by `only_admin` field, if auth_object: nil",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid sort term only_search",
+      "count": 4,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:37]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not sort by `only_search` field",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:9:2]",
+          "desc": "Ransack::Search#sorts= drops an unknown sort under a permissive search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:37]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker does not sort by `only_search` field",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:9:2]",
+          "desc": "Ransack::Search#sorts= drops an unknown sort under a permissive search",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Invalid sort term persons_salarydesc",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:35]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker sorts with different join variants",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:35]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker sorts with different join variants",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: No valid predicate for full_name",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/nodes/condition_spec.rb[1:9:1:1]",
+          "desc": "Ransack::Nodes::Condition with an empty predicate when default_predicate = nil ",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/nodes/condition_spec.rb[1:9:1:1]",
+          "desc": "Ransack::Nodes::Condition with an empty predicate when default_predicate = nil ",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Predicate eq takes a single value, 2 given for array_where_people_ids",
+      "count": 2,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:49:2]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker ransacker with array formatters handles array_where_people_ids formatter correctly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/active_record/base_spec.rb[1:8:49:2]",
+          "desc": "Ransack::ActiveRecord::Base#ransacker ransacker with array formatters handles array_where_people_ids formatter correctly",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "Ransack::InvalidSearchError: Predicate eq takes a single value, 2 given for name",
+      "count": 4,
+      "suites": [
+        "ransack-postgresql",
+        "ransack-sqlite"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:21:1]",
+          "desc": "Ransack::Search#build a single-value predicate given an Array in the short form drops the condition in the default lenient mode",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:22:2]",
+          "desc": "Ransack::Search#build an Array inside one value envelope is dropped for a single-value predicate in the default lenient mode",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-postgresql",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:21:1]",
+          "desc": "Ransack::Search#build a single-value predicate given an Array in the short form drops the condition in the default lenient mode",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/ransack/search_spec.rb[1:2:22:2]",
+          "desc": "Ransack::Search#build an Array inside one value envelope is dropped for a single-value predicate in the default lenient mode",
+          "candidate": "1/2",
+          "base": "1/2",
+          "suite": "ransack-sqlite",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    },
+    {
+      "class": "base-failing",
+      "signature": "RuntimeError: Warnings were generated: RAILS/railties/lib/rails/generators/model_helpers.rb: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more infor",
+      "count": 39,
+      "suites": [
+        "rspec-rails"
+      ],
+      "match": [
+        "known:noise-eco1-both-trees"
+      ],
+      "tests": [
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:1:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard request specs with no options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:1:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard request specs with --no-request_specs is skipped",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:1:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard request specs with --api includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:1:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard request specs in an engine generates files with Engine url_helpers",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:2:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard controller spec with --controller_specs includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:2:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard controller spec with no options skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:2:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator standard controller spec with --api includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:3:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator namespaced request spec with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:3:3:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator namespaced request spec with --api with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:4:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator namespaced controller spec with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:4:3:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator namespaced controller spec with --api with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:1:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with no options edit includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:1:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with no options index includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:1:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with no options new includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:1:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with no options show includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with multiple integer attributes index includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with multiple float attributes index includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:4:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with reference attribute edit includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:4:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with reference attribute new includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:5:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with namespace edit includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:5:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with namespace index includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:5:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with namespace new includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:5:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with namespace show includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:7:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-template-engine edit skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:7:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-template-engine index skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:7:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-template-engine new skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:7:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-template-engine show skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:8:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --api edit skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:8:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --api index skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:8:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --api new skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:8:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --api show skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:9:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-view-specs edit skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:9:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-view-specs index skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:9:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-view-specs new skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:5:9:4:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator view specs with --no-view-specs show skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:6:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator routing spec with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:6:2:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator routing spec with --no-routing-specs skips the file",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:6:3:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator routing spec with --api skips the right content",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        },
+        {
+          "test": "./spec/generators/rspec/scaffold/scaffold_generator_spec.rb[1:6:4:1:1]",
+          "desc": "Rspec::Generators::ScaffoldGenerator routing spec with a namespaced name with default options includes the standard boilerplate",
+          "candidate": "2/2",
+          "base": "2/2",
+          "suite": "rspec-rails",
+          "match": "known:noise-eco1-both-trees"
+        }
+      ]
+    }
+  ]
+}

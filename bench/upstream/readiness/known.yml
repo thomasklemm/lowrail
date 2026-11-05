@@ -3,7 +3,8 @@
 # optional `test` and `class` match. Status as of 2026-11-04, from docs/upstream/contributions.md:
 #   open-pr, merged, prepared (fix branch ready, not opened), issue (reported, no fix), record-only,
 #   gem-side (the fix belongs in the gem or app), noise (environmental or order-dependent on both trees).
-# Entries marked "unchecked" take their regex from the record's wording; no run has produced the signature yet.
+# `checked` names the run (manifest and candidate SHA) that produced the entry's signature; entries without it
+# are still "unchecked": their regexes come from the record's wording, and no run has produced the signature yet.
 # Narrow them after the first run that does. IDs with a dash and a name (M-vary, eco1-…) are unnamed in the record.
 findings:
   # App suites (docs/upstream/app-suites.md)
@@ -27,11 +28,12 @@ findings:
     record: docs/upstream/app-suites.md
     note: UrlHelper-only includes lose link_to; upgrade-guide branch; unchecked
   - id: L1
-    suite: (lobsters|mastodon).*
+    suite: (lobsters|mastodon|administrate).*
     signature: "FrozenError: can't modify frozen Hash: \\{\\}"
     status: gem-side
     record: docs/upstream/app-suites.md
-    note: rspec-rails 8.0.x mutates the frozen default_url_options; fixed on rspec-rails main, unreleased
+    checked: round-ecosystem-1 7a78da5a55
+    note: rspec-rails 8.0.x mutates the frozen default_url_options; fixed on rspec-rails main, unreleased. administrate's feature specs hit it too (ecosystem-tests, deliberate changes); with awesome_print require false, as in that record, E3 doesn't fire at load
   - id: L2
     suite: lobsters.*
     signature: 'UrlGenerationError: No route matches .*id: ""'
@@ -132,153 +134,276 @@ findings:
     signature: "uninitialized constant .*WeakSet|WeakSet"
     status: gem-side
     record: docs/upstream/ecosystem-tests.md
-    note: rails/rails#59623 closed; fixed in ransack instead (activerecord-hackery/ransack#1792, open); unchecked
+    note: rails/rails#59623 closed; fixed in ransack instead (activerecord-hackery/ransack#1792, open); unchecked, not produced by round-ecosystem-1 on 7a78da5a55
   - id: E2
     suite: ransack.*
-    signature: "(?i)no such table|could not find table"
+    signature: "StatementInvalid: Could not find table 'widgets'"
     status: prepared
     record: docs/upstream/ecosystem-tests.md
-    note: SQLite schema readers match table names exactly; queued; unchecked
+    checked: round-ecosystem-1 7a78da5a55
+    note: SQLite schema readers match table names exactly; queued
   - id: E3
     suite: administrate.*
     signature: colorize_logging
     status: open-pr
     record: docs/upstream/ecosystem-tests.md
-    note: rails/rails#59628; unchecked
+    note: "rails/rails#59628; unchecked, not produced by round-ecosystem-1 on 7a78da5a55 (awesome_print is require: false, as in the record)"
   - id: E4
     suite: active_model_serializers.*
-    signature: "refute_pattern|assert_not_pattern"
+    class: suite-did-not-load
+    signature: "NameError: .*undefined method 'refute_pattern' for class 'ActiveSupport::TestCase'"
     status: prepared
     record: docs/upstream/ecosystem-tests.md
-    note: minitest floor 5.18; queued; unchecked
+    checked: round-ecosystem-1 7a78da5a55
+    note: minitest floor 5.18; queued; AMS locks minitest 5.10.3
   - id: I1
     suite: friendly_id.*
-    signature: "RecordNotFound"
+    test: "\\AUuidAsPrimaryKeyFindTest#test_should_be_findable_by_the_UUID_primary_key\\z"
+    signature: "zero-length delimited identifier|no such column: menu_items\\.:"
     status: issue
     record: docs/upstream/ecosystem-tests.md
-    note: Model.all.find(id) ignores an overridden primary_key; rails/rails#59622; unchecked
+    checked: round-ecosystem-1 7a78da5a55
+    note: Model.all.find(id) ignores an overridden primary_key (the query quotes an empty column name); rails/rails#59622
   - id: eco1-ransack-select-manager
     suite: ransack.*
-    signature: "SelectManager|klass"
+    signature: "undefined method 'klass' for class Article"
     status: gem-side
     record: docs/upstream/ecosystem-tests.md
-    note: Arel::SelectManager.new(Class) needs an argument responding to klass; unchecked
-  - id: eco1-view_component
+    checked: round-ecosystem-1 7a78da5a55
+    note: Arel::SelectManager.new(Class) needs an argument responding to klass
+  - id: eco1-view_component-dependency-tracker
     suite: view_component.*
-    signature: "."
+    test: "\\ACacheableTest#"
+    signature: "FrozenError: can't modify frozen Hash: \\{#<ActionView::Template::Handlers::ERB:0xX> => ActionView::DependencyTracker::"
     status: record-only
     record: docs/upstream/ecosystem-tests.md
-    note: suite-wide, unchecked; 6F 8E on main, all deliberate or gem-side (locale, allocation counts, host memos, frozen dependency tracker); compare any flag with that list
+    checked: round-ecosystem-1 7a78da5a55
+    note: frozen dependency-tracker registry (73bdeced4f, CHANGELOG); the tests write the private ivar
+  - id: eco1-view_component-allocations
+    suite: view_component.*
+    test: "\\ARenderingAllocationsTest#"
+    signature: "Expected exactly \\d+ total allocations, got \\d+"
+    status: gem-side
+    record: docs/upstream/ecosystem-tests.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: allocation counts pinned per Rails version; main allocates fewer
+  - id: eco1-view_component-request-url
+    suite: view_component.*
+    test: "\\ATestHelperTest#test_with_request_url_"
+    signature: "Minitest::Assertion"
+    status: gem-side
+    record: docs/upstream/ecosystem-tests.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: with_request_url doesn't reset the host memos added in 5edbac28ff
+  - id: eco1-view_component-locale
+    suite: view_component.*
+    test: "\\ARenderingTest#test_with_format_missing\\z"
+    signature: "MissingTemplateError\\] exception expected"
+    status: gem-side
+    record: docs/upstream/ecosystem-tests.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: TemplateDetails::Requested (621b50a9a3, nodoc)
   - id: eco1-draper
     suite: draper.*
-    signature: FrozenError
+    test: "load_strategy_spec"
+    signature: "Cannot proxy frozen objects"
     status: record-only
     record: docs/upstream/ecosystem-tests.md
-    note: frozen default_url_options and Relation::VALUE_METHODS; unchecked
+    checked: round-ecosystem-1 7a78da5a55
+    note: a spec stubs the frozen Relation::VALUE_METHODS (c10c3c5bf4)
+  - id: eco1-draper
+    suite: draper.*
+    class: test-count-mismatch
+    signature: "test count differs"
+    status: record-only
+    record: docs/upstream/ecosystem-tests.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: on main the dummy app's specs fail to load (frozen default_url_options, baa1ca5f2f), so rake runs fewer examples
   - id: eco1-dynamic-controller-routes
-    suite: (rails-controller-testing|active_model_serializers).*
-    signature: "."
+    suite: rails-controller-testing
+    class: [confirmed, signature-changed]
+    signature: "dynamic :controller segment in a route is not supported|rescues/|view_assigns' for nil"
     status: record-only
     record: docs/upstream/ecosystem-tests.md
-    note: suite-wide, unchecked; dynamic :controller routes removed (92d809905b)
+    checked: round-ecosystem-1 7a78da5a55
+    note: dynamic :controller routes removed (92d809905b); the dummy app's routes raise, so its tests render the rescue page
+  - id: noise-eco1-taggable-order
+    suite: acts-as-taggable-on
+    class: base-failing
+    signature: "ExpectationNotMetError: expected"
+    status: noise
+    record: docs/upstream/readiness.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: first seen in the readiness run, not in the record (one default-order run); order-dependent on both trees, 3 tests fail under seed 4242 only (tag_spec, stale_tag_list_spec, tagger_spec)
+  - id: noise-eco1-both-trees
+    suite: (rails-controller-testing|rspec-rails|simple_form|ransack.*|good_job)
+    class: base-failing
+    signature: "."
+    status: noise
+    record: docs/upstream/ecosystem-tests.md
+    checked: round-ecosystem-1 7a78da5a55
+    note: the record's failures on both trees (good_job's 2F, the server_spec boot banners; rspec-rails' generator warnings and bundle-exec sanity specs, simple_form's 2F 1E, rails-controller-testing's 2F 2E); ransack's are order-dependent config toggles that differ between the two seeds
 
-  # Ecosystem round 2 (docs/upstream/ecosystem-round-2.md)
+  # Ecosystem round 2 (docs/upstream/ecosystem-round-2.md). Entries with `checked` were produced by the run named there.
   - id: R2-1
-    suite: shoulda-matchers.*
-    signature: UnknownPrimaryKey
+    suite: shoulda-matchers-acceptance
+    test: "active_record_integration_spec\\.rb\\[1:1:1\\]"
+    signature: "ExpectationNotMetError: Expected command to have output, but did not\\."
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: held; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: held; the test project's rspec run (spec :80) fails with "ActiveRecord::UnknownPrimaryKey - Unknown primary key for table users in model User", which the signature, the outer expectation, doesn't show
   - id: R2-2
     suite: scenic.*
     signature: "wrong number of arguments \\(given 2, expected 3\\)"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
     note: CommandRecorder args and kwargs split; reported as scenic-views/scenic#466
-  - id: R2-3
-    suite: lograge.*
-    signature: "attach_to|notification_listeners_for\\('render_template"
+  - id: R2-2
+    suite: scenic
+    test: "spec/acceptance/"
+    signature: "'rake db:rollback' was unsuccessful"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: the acceptance specs (not in the record, which ran the 111 unit and integration examples) roll back a view migration; rake aborts with the same "wrong number of arguments (given 2, expected 3)"
+  - id: R2-3
+    suite: lograge.*
+    signature: "undefined method 'attach_to' for class ActionController::LogSubscriber|notification_listeners_for\\('render_template\\.action_view'\\).? to have changed to \\[\\]"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
     note: structured-event log subscribers; reported as roidrage/lograge#407
   - id: R2-4
     suite: lograge.*
-    signature: "FrozenError: can't modify frozen Hash: \\{\"ActionController::RoutingError\""
+    signature: "FrozenError: can't modify frozen Hash: \\{\"ActionController::RoutingError\" => :not_found"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
     note: spec writes ExceptionWrapper.rescue_responses
   - id: R2-5
     suite: ancestry.*
-    signature: "validation_context="
+    signature: "NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: stefankroes/ancestry#766, fixes in #769/#770; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: stefankroes/ancestry#766, fixes in #769/#770
+  - id: R2-5
+    suite: ancestry.*
+    test: "\\AMaterializedPathTest#test_ancestry_validation_exclude_self\\z"
+    signature: "\\[ActiveRecord::RecordInvalid\\] exception expected, not"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: the record's \"1F\" per ancestry config; the exclude_self validation runs through validation_context=
   - id: R2-6
     suite: paranoia.*
-    signature: "FrozenError: can't modify frozen Array"
+    class: suite-did-not-load
+    signature: "FrozenError: can't modify frozen Array: \\[:create, :destroy, :update\\]"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: Transactions::ACTIONS << :restore; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: Transactions::ACTIONS << :restore at load
   - id: R2-7
     suite: strong_migrations.*
-    signature: sort_by
+    test: "\\AAlphabetizeSchemaTest#"
+    signature: "NoMethodError: undefined method 'name' for an instance of Array"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: columns(tables) returns a Hash; fixed in the gem (d52e4ac); unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: columns(tables) returns a Hash; fixed in the gem (d52e4ac)
+  - id: R2-7
+    suite: strong_migrations-(mysql2|trilogy)
+    signature: "Duplicate column name 'nice'"
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: cascade of the AlphabetizeSchemaTest failure, which leaves the column behind; with that test excluded the candidate has none (checked by hand)
   - id: R2-8
-    suite: strong_migrations.*
-    signature: "(?i)time ?zone|Etc/UTC"
+    suite: strong_migrations-postgresql
+    test: "\\AChangeColumnTest#test_timestamps\\z"
+    signature: "StrongMigrations::UnsafeMigration"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: session timezone Etc/UTC; fixed in the gem (eb88bcf); unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: session timezone stays Etc/UTC, the gem treats only UTC as safe; fixed in the gem (eb88bcf)
   - id: R2-9
     suite: store_model.*
-    signature: "(?i)development\\.rb|environment"
+    class: suite-did-not-load
+    signature: "Rails environment has been set to development but config/environments/development\\.rb does not exist"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: environment config file existence check; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: environment config file existence check
   - id: R2-10
     suite: store_model.*
-    signature: "undefined method 'query'"
+    signature: "undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: connection.query removed (nodoc); unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: connection.query removed (nodoc)
   - id: R2-11
     suite: store_model.*
-    signature: "."
+    signature: "ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration:"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: suite-wide, unchecked; parent not set on read (R2-11) or write (R2-12), generated accessors no longer call the overridden _read_attribute/_write_attribute
+    checked: round-ecosystem-2 7a78da5a55
+    note: parent not set on read (R2-11) or write (R2-12); generated accessors no longer call the overridden _read_attribute/_write_attribute; the two can't be told apart by signature
   - id: R2-13
     suite: will_paginate.*
-    signature: "FrozenError: can't modify frozen Hash"
+    signature: "FrozenError: can't modify frozen Hash: \\{\\}"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: frozen default_url_options in a spec; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: frozen default_url_options in a spec
   - id: R2-14
     suite: shrine.*
-    signature: "."
+    signature: "Expected Shrine::Plugins::Column::JsonSerializer to be nil"
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: suite-wide, unchecked; spec stubs @columns_hash, main reads schema_context
+    checked: round-ecosystem-2 7a78da5a55
+    note: spec stubs @columns_hash, main reads schema_context
   - id: R2-15
     suite: shoulda-matchers.*
-    signature: FrozenError
+    test: "have_attached_matcher_spec"
+    signature: "FrozenError: can't modify frozen Hash: \\{avatars?_attachments?: #<ActiveRecord::Reflection::Has(One|Many)Reflection"
+    class: [confirmed, signature-changed]
     status: record-only
     record: docs/upstream/ecosystem-round-2.md
-    note: _reflections.delete in a spec; unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: _reflections.delete in a spec; the record's 2F, on sqlite and postgresql
   - id: R2-16
     suite: solid_cache.*
-    signature: bypass_local_cache
+    signature: "undefined method 'bypass_local_cache' for an instance of SolidCache::Store"
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: fixed in the gem (679c457); unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: fixed in the gem (679c457)
   - id: R2-17
     suite: solid_cache.*
-    signature: ":rails|rails:"
+    test: "\\ASolidCache::ExecutionTest#test_async_errors_are_reported\\z"
+    signature: "."
     status: gem-side
     record: docs/upstream/ecosystem-round-2.md
-    note: error reporter context gains a :rails key; fixed in the gem (6ab8bdb); unchecked
+    checked: round-ecosystem-2 7a78da5a55
+    note: the error reporter context gains a :rails key (the assertion diff shows it); fixed in the gem (6ab8bdb)
+  - id: noise-r2-ruby34-inspect
+    suite: (audited|mobility).*
+    class: base-failing
+    signature: "\\{:foo=>"
+    status: noise
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: Ruby 3.4 Hash#inspect in the spec's expectation; fails on both trees
+  - id: noise-r2-both-trees
+    suite: (money-rails|carrierwave|strong_migrations.*)
+    class: base-failing
+    signature: "."
+    status: noise
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: the record's failures on both trees (a test expectation for 8.1.4, a carrierwave Active Record spec, strong_migrations' 8-1 failure and MariaDB-vs-MySQL varchar limits)
 
   # API regression audit (docs/upstream/api-regressions.md); no suite in our rounds hits these yet.
   - id: AR-1
@@ -307,6 +432,15 @@ findings:
     note: bind values for where!/having!; queued
 
   # Noise recorded in the proof round (docs/upstream/readiness.md)
+  - id: noise-r2-counter_culture-order
+    suite: counter_culture.*
+    class: base-failing
+    test: "fix_counts_by_scope_spec"
+    signature: "ExpectationNotMetError: expected: 1"
+    status: noise
+    record: docs/upstream/readiness.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: first seen in the readiness run, not in the record (default order); fails under seed 1717 on both trees in all three databases
   - id: noise-lograge-order
     suite: lograge.*
     class: base-failing
