@@ -1,54 +1,44 @@
-From 9fabafcf8b4e019fbc402fe133232a1a076b3f81 Mon Sep 17 00:00:00 2001
+From 8e7de36dbc67dd7980d6ec87c7c43998329a9908 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 10:07:51 +0000
-Subject: [PATCH] Keep QueryIntent's background session, mutex and lock wait
- together
+Subject: [PATCH] Keep QueryIntent's background session and mutex together
 
-A query intent preset three fields that only an intent scheduled to run
-in the background uses: its session, mutex and lock wait. With them an
-intent had 30 instance variables after initialize and 31 once its
-result was cast, and Ruby master, which no longer has a 320-byte heap,
-puts such an object in a 512-byte slot.
+A query intent preset two fields that only an intent scheduled to run in
+the background uses: its session and its mutex. With them an intent had
+30 instance variables after initialize and 31 once its result was cast,
+and Ruby master, which no longer has a 320-byte heap, puts such an
+object in a 512-byte slot.
 
-Keep the three in an AsyncState that async_schedule! creates. An intent
-now has 28 instance variables after initialize and at most 29 later,
+Keep the two in an AsyncState that async_schedule! creates. An intent
+now has 29 instance variables after initialize and at most 30 later,
 background ones included, so it fits a 256-byte slot. The unused session
-reader and writer go away; lock_wait reads through to the async state.
+reader and writer go away.
 ---
- .../connection_adapters/query_intent.rb       | 40 ++++++++++---------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ .../connection_adapters/query_intent.rb       | 28 +++++++++----------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/query_intent.rb b/activerecord/lib/active_record/connection_adapters/query_intent.rb
-index 37adf81297..28cc3fb543 100644
+index 37adf81297..d657a73538 100644
 --- a/activerecord/lib/active_record/connection_adapters/query_intent.rb
 +++ b/activerecord/lib/active_record/connection_adapters/query_intent.rb
-@@ -61,14 +61,22 @@ def payload
+@@ -61,11 +61,14 @@ def payload
          end
        end
  
-+      # The session, mutex and lock wait of an intent scheduled to run in the
-+      # background. async_schedule! creates it, so that a foreground intent
-+      # doesn't carry these fields.
-+      AsyncState = Struct.new(:session, :mutex, :lock_wait) # :nodoc:
++      # Allocated only when scheduling an asynchronous query.
++      AsyncState = Struct.new(:session, :mutex) # :nodoc:
 +
        attr_reader :arel, :name, :prepare, :allow_retry, :allow_async,
 -                  :materialize_transactions, :batch, :pool, :session, :lock_wait,
--                  :event_buffer, :error, :finalized
-+                  :materialize_transactions, :batch, :pool, :event_buffer, :error, :finalized
++                  :materialize_transactions, :batch, :pool, :lock_wait,
+                   :event_buffer, :error, :finalized
        alias_method :finalized?, :finalized
 -      attr_writer :raw_sql, :session
 +      attr_writer :raw_sql
        attr_accessor :adapter, :binds, :ran_async, :notification_payload, :log_handle,
                      :retry_budget
  
-+      def lock_wait
-+        @async&.lock_wait
-+      end
-+
-       def initialize(adapter:, arel: nil, raw_sql: nil, processed_sql: nil, name: "SQL", binds: [], prepare: false, allow_async: false,
-                      allow_retry: false, materialize_transactions: true, batch: false)
-         if arel.nil? && raw_sql.nil? && processed_sql.nil?
-@@ -99,10 +107,8 @@ def initialize(adapter:, arel: nil, raw_sql: nil, processed_sql: nil, name: "SQL
+@@ -99,8 +102,7 @@ def initialize(adapter:, arel: nil, raw_sql: nil, processed_sql: nil, name: "SQL
  
          # Deferred execution state
          @pool = adapter.pool
@@ -56,11 +46,9 @@ index 37adf81297..28cc3fb543 100644
 -        @mutex = ActiveSupport::Concurrency::NullLock
 +        @async = nil
          @error = nil
--        @lock_wait = nil
+         @lock_wait = nil
          @event_buffer = nil
-         @log_handle = nil
-         @finalized = false
-@@ -147,11 +153,11 @@ def inspect
+@@ -147,11 +149,11 @@ def inspect
        def execute_or_skip
          return unless pending?
  
@@ -74,7 +62,7 @@ index 37adf81297..28cc3fb543 100644
              previous_instrumenter = ActiveSupport::IsolatedExecutionState[:active_record_instrumenter]
              begin
                if pending?
-@@ -169,7 +175,7 @@ def execute_or_skip
+@@ -169,7 +171,7 @@ def execute_or_skip
                @error = error
              ensure
                ActiveSupport::IsolatedExecutionState[:active_record_instrumenter] = previous_instrumenter
@@ -83,7 +71,7 @@ index 37adf81297..28cc3fb543 100644
              end
            end
          end
-@@ -177,12 +183,12 @@ def execute_or_skip
+@@ -177,12 +179,12 @@ def execute_or_skip
  
        # Is this intent still pending (result not yet available)?
        def pending?
@@ -98,7 +86,7 @@ index 37adf81297..28cc3fb543 100644
        end
  
        def cancel
-@@ -302,7 +308,7 @@ def ensure_result
+@@ -302,7 +304,7 @@ def ensure_result
            return
          end
  
@@ -107,7 +95,7 @@ index 37adf81297..28cc3fb543 100644
            # Async was scheduled: wait for result (sets lock_wait)
            execute_or_wait
          end
-@@ -392,9 +398,7 @@ def async_schedule!(session)
+@@ -392,9 +394,7 @@ def async_schedule!(session)
              raise AsynchronousQueryInsideTransactionError, "Asynchronous queries are not allowed inside transactions"
            end
  
@@ -118,12 +106,8 @@ index 37adf81297..28cc3fb543 100644
  
            # Force preprocessing on original thread before queuing
            processed_sql
-@@ -447,10 +451,10 @@ def compile_arel!
- 
-         # Block until result is available, or execute as foreground fallback
-         def execute_or_wait
--          return (@lock_wait = 0.0) if @raw_result_available
-+          return (@async.lock_wait = 0.0) if @raw_result_available
+@@ -450,7 +450,7 @@ def execute_or_wait
+           return (@lock_wait = 0.0) if @raw_result_available
  
            start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
 -          @mutex.synchronize do
@@ -131,15 +115,6 @@ index 37adf81297..28cc3fb543 100644
              if pending?
                @pool.with_connection do |connection|
                  @adapter = connection
-@@ -460,7 +464,7 @@ def execute_or_wait
-               end
-             else
-               # Result was computed by background thread while we waited for mutex
--              @lock_wait = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start
-+              @async.lock_wait = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start
-             end
-           rescue => error
-             @error = error
 -- 
 2.55.0
 
