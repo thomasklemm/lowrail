@@ -4,7 +4,8 @@
 # main with our merged perf PRs reverted ("without") to individual PRs, for
 # docs/upstream/merged-sum.md.
 #   ruby attribute.rb CENSUS_OUT MAIN_TREE REVERTED_TREE PRS_TSV
-# PRS_TSV: "NUMBER<TAB>MERGE_SHA" per reverted PR. Per allocation site
+# PRS_TSV: "NUMBER<TAB>MERGE_SHA" per reverted PR. LABELS=with,with2,without,without2
+# names the census labels (default sum-with,sum-with2,sum-without,sum-without2). Per allocation site
 # (RAILS/file:line), the change is the mean over each A/A pair (with, with2;
 # without, without2), summed over all workloads of a mode. A site is assigned
 # by `git blame` of its line: in the reverted tree a line from a revert commit
@@ -68,15 +69,17 @@ sites = ->(label, file) do
   end
 end
 
+labels = ENV.fetch("LABELS", "sum-with,sum-with2,sum-without,sum-without2").split(",")
 result = {}
 %w[interpreter yjit].each do |mode|
-  files = Dir[File.join(out, "sum-with", "*-#{mode}.json")].map { File.basename(_1) }
+  files = Dir[File.join(out, labels[0], "*-#{mode}.json")].map { File.basename(_1) }
   per_pr = Hash.new(0.0)
   per_app_total = Hash.new(0.0)
   per_app_pr = Hash.new { |h, k| h[k] = Hash.new(0.0) }
   files.each do |f|
     app = f.delete_suffix("-#{mode}.json")
-    w1, w2, o1, o2 = %w[sum-with sum-with2 sum-without sum-without2].map { sites.(_1, f) }
+    next unless labels.all? { File.exist?(File.join(out, _1, f)) }
+    w1, w2, o1, o2 = labels.map { sites.(_1, f) }
     keys = (w1.keys | w2.keys | o1.keys | o2.keys)
     keys.each do |k|
       d = (w1[k] + w2[k]) / 2 - (o1[k] + o2[k]) / 2

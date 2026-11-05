@@ -55,7 +55,11 @@ when "run"
         env["DATABASE_URL"] = "sqlite3:#{File.join(out, "#{name}.sqlite3")}" if bench == "railsbench"
         vg = [opts.fetch(:valgrind), "--tool=cachegrind", "--cache-sim=no", "--branch-sim=no",
               "--cachegrind-out-file=/dev/null"]
-        vg << "--smc-check=all-non-file" if mode == "yjit"
+        if mode == "yjit"
+          vg << "--smc-check=all-non-file"
+          env["RUBYOPT"] = "-r#{File.expand_path("jit_counts.rb", __dir__)}"
+          env["JIT_COUNTS_PATH"] = File.join(out, "#{name}.jit")
+        end
         cmdline = [*vg, opts.fetch(:ruby), *("--yjit" if mode == "yjit"), File.join("benchmarks", bench, "benchmark.rb")]
         log, status = Open3.capture2e(env, *cmdline, chdir: RUBY_BENCH)
         File.write(File.join(out, "#{name}.log"), log)
@@ -77,17 +81,26 @@ when "summary"
     long, short = ir[[*k, long_itrs]], ir[[*k, SHORT]]
     [k, (long - short) / (long_itrs - SHORT).to_f] if long && short && long_itrs > SHORT
   end.to_h
+  # YJIT runs: flat when the long run's counters (jit_counts.rb) did not change
+  # over the iterations the difference measures.
+  flat = per.keys.to_h do |k|
+    long_itrs = ir.keys.select { _1[0, 4] == k }.map(&:last).max
+    counts = File.read(File.join(out, "#{k.join("-")}-#{long_itrs}.jit")) rescue nil
+    before, after = counts && counts[/before: (\{.*?\})/, 1], counts && counts[/after: (\{.*?\})/, 1]
+    [k, k[2] != "yjit" || (before && before == after)]
+  end
   rows = per.filter_map do |(tag, bench, mode, variant), v|
     base = per[[tag, bench, mode, opts[:base]]]
     next unless base && variant != opts[:base]
-    { tag: tag, bench: bench, mode: mode, variant: variant, base: base, ir: v, delta: (v / base - 1) * 100 }
+    jit = mode != "yjit" ? "" : flat[[tag, bench, mode, variant]] && flat[[tag, bench, mode, opts[:base]]] ? "flat" : "NOT-FLAT"
+    { tag: tag, bench: bench, mode: mode, variant: variant, base: base, ir: v, delta: (v / base - 1) * 100, jit: jit }
   end.sort_by { _1.values_at(:tag, :bench, :mode, :variant) }
   if opts[:markdown]
-    puts "| Ruby | Benchmark | Mode | Variant | #{opts[:base]} Ir/iteration | Variant Ir/iteration | Δ |"
-    puts "| --- | --- | --- | --- | ---: | ---: | ---: |"
-    rows.each { |r| puts format("| %s | %s | %s | %s | %.4g | %.4g | %+.2f%% |", *r.values_at(:tag, :bench, :mode, :variant, :base, :ir, :delta)) }
+    puts "| Ruby | Benchmark | Mode | Variant | #{opts[:base]} Ir/iteration | Variant Ir/iteration | Δ | YJIT |"
+    puts "| --- | --- | --- | --- | ---: | ---: | ---: | --- |"
+    rows.each { |r| puts format("| %s | %s | %s | %s | %.4g | %.4g | %+.2f%% | %s |", *r.values_at(:tag, :bench, :mode, :variant, :base, :ir, :delta, :jit)) }
   else
-    rows.each { |r| puts format("%-4s %-12s %-11s %-10s base %.5g  Ir %.5g  %+.3f%%", *r.values_at(:tag, :bench, :mode, :variant, :base, :ir, :delta)) }
+    rows.each { |r| puts format("%-4s %-12s %-11s %-10s base %.5g  Ir %.5g  %+.3f%%  %s", *r.values_at(:tag, :bench, :mode, :variant, :base, :ir, :delta, :jit)) }
   end
 else
   abort "usage: ruby_bench_ir.rb run|summary ..."
