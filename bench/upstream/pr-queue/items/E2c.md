@@ -14,9 +14,9 @@ alternative_of:
 impact: "a permanent SQLite index whose name a temporary index shares reads its own columns and statement again, not the temporary index's columns twice"
 rank: 9
 risky: true
-state: draft
+state: held
 pr: 59672
-note: "reviewed on 6c80a5583b; stacked on E2; opened as draft #59672 (Thomas, 2026-11-05 night); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, MASTER_CTE and sort-order detail; in docs/upstream/ecosystem-tests.md"
+note: "parked idea: #59672 closed 2026-11-05 by the coordinator on Thomas's request to cut maintainer noise; shared temporary/permanent index names are rare. Branch kept"
 passes:
   - {reviewer: skeptic, head: "cd90c26ce8", date: 2026-11-05, verdict: nits, open: "commit message reworded in 6ffd1872fe (same tree); no test for the pragma_index_list schema argument, declined: redundant once E2 hides case-differing tables"}
   - {reviewer: skeptic, head: "6ffd1872fe", date: 2026-11-05, verdict: approve, open: "message-only amend of cd90c26ce8, identical tree"}
