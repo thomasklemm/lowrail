@@ -44,9 +44,9 @@ MySQL, Trilogy and MongoDB configurations were skipped because this orb has none
 | ID | Cause (first bad commit) | Fix | Branch @ SHA on thomasklemm/rails | State |
 | --- | --- | --- | --- | --- |
 | E1 | `DescendantsTracker` uses `WeakSet` without requiring it (3c77803ec0); `require "active_support/core_ext/class/subclasses"` raises NameError and ransack does not load | one `require` | `thomasklemm/descendants-tracker-require-weak-set` @ `1d1fbb6410` | superseded: rails/rails#59623 closed by skipkayhil ("You must require active_support before cherry picking core extensions"); fixed in ransack instead, G1 `thomasklemm/require-active-support-before-core-ext` @ `4713d2d697`, open as activerecord-hackery/ransack#1792 |
-| E2 | the batched SQLite readers match table names exactly (2cb3daba96), so a table created as `Widgets` is not found as `widgets` | `COLLATE NOCASE` plus rows keyed by each requested name, and E2b's hiding check `COLLATE NOCASE` too; stacked on E2b | `thomasklemm/sqlite-schema-readers-table-name-case-stacked` @ `d9e614dcab` (unstacked `bf905ad4f6` before) | in review on the fixed E2b; Sol and Astra approved `c04df40d80` ([item](../../bench/upstream/pr-queue/items/E2.md)) |
-| E2b | the same readers list a temporary table or view and the permanent table it hides, so columns and indexes are duplicated and the primary key becomes composite (2cb3daba96) | in `MASTER_CTE`, a temporary table or view hides a permanent one; temporary indexes and triggers hide nothing; `sqlite_master` stays first | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `52c21b2fa4` (`472c680d15` before) | draft rails/rails#59668; skeptic must-fix on `472c680d15` fixed, in review ([item](../../bench/upstream/pr-queue/items/E2b.md)) |
-| E2c | the same readers read index columns with an unqualified `pragma_index_info(name)` and match CREATE INDEX statements by name, so a permanent index with a temporary namesake reads the temporary index's columns twice (2cb3daba96; 8-1-stable read them once, also from the temporary index) | `MASTER_CTE` rows carry their schema, passed to `pragma_index_list` and `pragma_index_info`; index statements keyed by schema and name; stacked on E2b | `thomasklemm/sqlite-index-details-schema` @ `4d1fa492ce` | in review ([item](../../bench/upstream/pr-queue/items/E2c.md)) |
+| E2 | the batched SQLite readers match table names exactly (2cb3daba96), so a table created as `Widgets` is not found as `widgets` | `COLLATE NOCASE` plus rows keyed by each requested name, and E2b's hiding check `COLLATE NOCASE` too; stacked on E2b | `thomasklemm/sqlite-schema-readers-table-name-case-stacked` @ `63d1880397` (unstacked `bf905ad4f6` before) | in review on the fixed E2b; Sol and Astra approved `c04df40d80` ([item](../../bench/upstream/pr-queue/items/E2.md)) |
+| E2b | the same readers list a temporary table or view and the permanent table it hides, so columns and indexes are duplicated and the primary key becomes composite (2cb3daba96) | in `MASTER_CTE`, a temporary table or view hides a permanent one; temporary indexes and triggers hide nothing; `sqlite_master` stays first | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `bc90b487f2` (`472c680d15` before) | draft rails/rails#59668; skeptic must-fix on `472c680d15` fixed, in review ([item](../../bench/upstream/pr-queue/items/E2b.md)) |
+| E2c | the same readers read index columns with an unqualified `pragma_index_info(name)` and match CREATE INDEX statements by name, so a permanent index with a temporary namesake reads the temporary index's columns twice (2cb3daba96; 8-1-stable read them once, also from the temporary index) | `MASTER_CTE` rows carry their schema, passed to `pragma_index_list` and `pragma_index_info`; index statements keyed by schema and name; stacked on E2b | `thomasklemm/sqlite-index-details-schema` @ `6c80a5583b`, stacked on E2 | in review ([item](../../bench/upstream/pr-queue/items/E2c.md)) |
 | E3 | `ActiveSupport::LogSubscriber.colorize_logging` removed without a deprecation (aebcb61520); awesome_print 1.9.2 raises on load, administrate does not boot | deprecated delegators to `ActiveSupport.colorize_logging` | `thomasklemm/log-subscriber-colorize-logging-deprecation` @ `8672567e15` | open as rails/rails#59628 |
 | E4 | `alias :assert_not_pattern :refute_pattern` (23420be739) needs minitest 5.18; the gemspec allows 5.1 | gemspec floor `>= 5.18` | `thomasklemm/activesupport-minitest-floor` @ `0a69eb6cce` | Sol: open with nits |
 | I1 | `Model.all.find(id)` ignores an overridden `self.primary_key` (55406a9794) | issue with a repro, since the code is under active rework | — | posted as rails/rails#59622; fix proposed by MIbtehajNasar in #59631. Reviewed with Thomas's approval on 2026-11-04 ([review](https://github.com/rails/rails/pull/59631#pullrequestreview-5775467814)): the cached override result doubles a `super`-based key (`"foo_#{super}"` → `foo_foo_id`, 8-1: `foo_id`), runtime-dynamic overrides go stale, and the test doesn't cover the issue's `id: false` table; checked by script against 8-1-stable |
@@ -87,12 +87,39 @@ Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](.
   schema passed but statements keyed by name, and with statements keyed by schema but `pragma_index_info`
   unqualified, and passes with the CTE's UNION order reversed. Merged with E2 `d9e614dcab`, the sqlite3 adapter tests
   pass (237 runs). Full `test:sqlite3` on `201397231e` (tree of `4d1fa492ce`): 10,288 runs, 0 failures, 0 errors.
+- **Round 3 (Sol, Astra on `52c21b2fa4` / `d9e614dcab` / `4d1fa492ce`):** all three rebuilt on main `1e235cee11`.
+  E2b `bc90b487f2` drops the tie-order `where` assertion (E2c asserts it deterministically), adds a permanent view
+  hidden by a temporary table and by a temporary view (the mutant `type != 'table'` fails it; main returns the
+  columns twice), and asserts that check constraints come from the temporary CREATE statement. E2 `63d1880397` is
+  rebased; E2c `6c80a5583b` is now stacked on E2, because with schema-qualified index pragmas but E2b's case-sensitive
+  hiding, a permanent `Gizmos` beside a temporary `gizmos` read the permanent table's indexes (main reads the
+  temporary one's); its new test fails without E2's NOCASE hiding. Full `test:sqlite3`: 10,293 / 10,297 / 10,299 runs,
+  0 failures, 0 errors. Buildkite build 136240 on `52c21b2fa4`: the failed "activerecord postgresql (4.0)" job had 21
+  `FieldOrderedValuesTest` FK errors, fixed on main by a712a0a9bc, which `8b06b0eb98` lacked; the stack now includes it.
+  Skeptic on the three heads: no must-fix. Dropping the schema from `pragma_index_list` is an equivalent mutant: the
+  hiding already makes the unqualified name resolve to the row's table, and SQLite allows no temp index on a permanent
+  table; the argument stays for symmetry, guarded by `test_indexes_logs`.
 - **E4 evidence:** minitest 5.15.0 through 5.17.0 define neither `assert_pattern` nor `refute_pattern`; 5.18.0 adds both.
   Main without the alias loads with minitest 5.10.3. With the floor, AMS gets a Bundler conflict instead of a
   NameError. Its suite still runs 0 tests on main because of the deliberate route removal below.
 - **Full `test:sqlite3`** on E2 and on E2b: 10,286 and 10,285 runs, 0 failures. The 5 errors are environmental:
   4 need the `sqlite3` CLI, 1 needs `pg`. On stacked E2 `c04df40d80` with the CLI installed: 10,291 runs, 0 failures,
   0 errors, 52 skips.
+
+## SQLite schema readers: follow-up candidates, not in E2/E2b/E2c
+
+Found by Sol and Astra on the E2 stack (2026-11-05). All are on rails/rails main already; the stack doesn't make
+them worse.
+
+- **Attached databases:** `MASTER_CTE` reads `sqlite_master` (= `main`) and `sqlite_temp_master` only, so a table
+  that exists only in an attached schema is invisible to the batched readers (`columns`, `indexes` give nothing).
+- **`build_index` regex:** `ON\b\s*"?(\w+?)"?\s*\(` matches only `\w+` table names, so the `where` and expression
+  columns of partial and expression indexes on quoted names with other characters are lost.
+- **`table_structure_sql`** (`sqlite3_adapter.rb`, used by `table_structure` in the alter/copy paths) looks up the
+  CREATE statement with its own exact-name, main-first `UNION ALL`. Through the public API: `change_column_default`
+  on table `Widgets` named as `widgets` raises `Could not find table 'widgets'` on main; with E2 it succeeds and keeps
+  the collation, auto-increment and check constraint (8-1-stable drops all three). On 8-1 and with E2 the copied table
+  comes back named `widgets`, not `Widgets` (pre-existing rename in `alter_table`).
 
 ## Deliberate changes, recorded without a Rails PR
 

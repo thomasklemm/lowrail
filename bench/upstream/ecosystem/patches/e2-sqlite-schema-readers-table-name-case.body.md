@@ -1,4 +1,4 @@
-Stacked on #59668, which should merge first; only the last commit (`d9e614dcab`) is new here.
+Stacked on #59668, which should merge first; only the last commit (`63d1880397`) is new here.
 
 ### Find SQLite tables by any ASCII case of their name in the schema readers
 
@@ -19,7 +19,7 @@ Reading table `Widgets` (and view `WidgetsView`) by lowercase name, as in the te
 
 The readers now match with `COLLATE NOCASE`, then give each requested name the rows of its table, so a batch that asks for two ASCII-case spellings of the same table gets both. NOCASE folds only ASCII, like SQLite identifiers, so `Ärger` and `ärger` stay two tables. Such a table's collations and auto-increment are read too; 8-1-stable lost them, because it looked up the CREATE statement by exact name.
 
-#59668's check that lets a temporary table or view hide a permanent one is now `COLLATE NOCASE` too. Without it, a permanent `Widgets` and a temporary `widgets` would both match, the pragmas would resolve both to the temporary table, and its columns, indexes and primary key would come back twice, with columns and foreign keys parsed from the CREATE statement of the permanent table. The new test requests both spellings, with the permanent table in either case, and checks that only the temporary table's columns, primary key, index and foreign key come back, including a collation that only its CREATE statement names, and that a temporary `ärger` doesn't hide a permanent `Ärger`.
+#59668's check that lets a temporary table or view hide a permanent one is now `COLLATE NOCASE` too. Without it, a permanent `Widgets` and a temporary `widgets` would both match, the pragmas would resolve both to the temporary table, and its columns, indexes and primary key would come back twice, and the pragma rows could be combined with the wrong CREATE statement (which one depends on how the stored names sort). The new tests request both spellings, with the permanent table in either case, and checks that only the temporary table's columns, primary key, index and foreign key come back, including a collation that only its CREATE statement names, and that a temporary `ärger` doesn't hide a permanent `Ärger`.
 
 ---
 
