@@ -361,6 +361,10 @@ Thomas before posting.
   still change, and then we decide what to fix in Rails and what outside. Until then such findings go into an
   inventory with callers and proposed fixes. The ones already open stay (blind_index#62 and scimitar#172 say they wait
   for the beta).
+* **Only PRs with large relevance open** (Thomas, 2026-11-05 night). A candidate opens only if its effect reaches
+  many apps or a widely used gem, or a whole request, test run or ruby-bench benchmark moves measurably. Small
+  per-call wins in niche gems or rare paths, and fixes for niche gems (scimitar#172 was the example), are recorded,
+  not opened. Every item states its reach in `impact` (who runs it, how often, how much of a request) before review.
 * **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs.
 
 ## Bets
