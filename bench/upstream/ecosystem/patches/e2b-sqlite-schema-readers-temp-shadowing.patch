@@ -1,4 +1,4 @@
-From 3923e11a717c98ad0181b7a80d8e28f35d6dc9ca Mon Sep 17 00:00:00 2001
+From 472c680d15e6525152432db4549b23a69058aaaf Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:41:07 +0000
 Subject: [PATCH] Let a temporary SQLite table or view hide a permanent one in
@@ -13,22 +13,16 @@ temporary table or view has its name, as SQLite does when it resolves a
 name. Temporary indexes and triggers take no part in that, so they hide
 nothing.
 ---
- .../sqlite3/schema_statements.rb              | 10 ++--
+ .../sqlite3/schema_statements.rb              |  6 ++-
  .../adapters/sqlite3/sqlite3_adapter_test.rb  | 52 +++++++++++++++++--
- 2 files changed, 55 insertions(+), 7 deletions(-)
+ 2 files changed, 52 insertions(+), 6 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 64b1bad838..592e13764d 100644
+index 64b1bad838..04e603f0f3 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -70,12 +70,16 @@ def schema_creation # :nodoc
- 
-         private
-           # sqlite_master lists the permanent objects in the database and
--          # sqlite_temp_master the temporary ones.
-+          # sqlite_temp_master the temporary ones. A temporary table or view hides
-+          # a permanent table or view of the same name, as it does when SQLite
-+          # resolves a name.
+@@ -73,9 +73,11 @@ def schema_creation # :nodoc
+           # sqlite_temp_master the temporary ones.
            MASTER_CTE = <<~SQL
              WITH master AS (
 -              SELECT name, type, sql FROM sqlite_master
@@ -121,5 +115,5 @@ index 3dac5cca5f..8b405bc030 100644
        end
  
 -- 
-2.55.0
+2.39.5
 
