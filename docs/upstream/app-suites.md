@@ -816,6 +816,9 @@ locks; parallel workers can run out; raise the setting". Branch
 [body](../../bench/upstream/app_suites/pi2-body.md). Bundled on 2026-11-05 with S1, S2 and GR7 into one docs PR
 ([contributions](contributions.md#queue)).
 
+**PI3 is held (2026-11-05):** the [fresh skeptical review](#queue-skeptic-refresh-2026-11-05) disproved the
+equivalence claim below. The historical measurements and initial checks are retained, not an approval to open.
+
 **PI3 (a, performance), built: `Object#try` allocates an empty keyword Hash per call.** 2709a9f16d (kamipo, "Remove
 `ruby2_keywords` usage", no CHANGELOG) turned `try(*args, &block)` with `ruby2_keywords` into
 `try(*args, **kwargs, &block)`; a named keyword splat builds a Hash on every call. Found by allocation sites per
@@ -2045,3 +2048,136 @@ Each is a few lines in the method that owns the behavior, with no new names.
 * The DC3 and `_prefixes` rspec-rails groups: fixed on rspec-rails main.
 * S2: already queued.
 * The (b) rows: CHANGELOG entries or deliberate fixes.
+
+## Queue skeptic refresh (2026-11-05)
+
+Rails main was fetched explicitly at `1e235cee11b0a7aecb189d8837534807626287aa`. Fork heads matched the queue;
+`git merge-tree --write-tree` returned success for UG82, PI3 and E4. SP1 was not changed. No upstream PR or issue
+was opened, readied or commented on. Sol and Astra are the coordinator's next stages, not passes run here.
+
+### UG82: four upgrade-guide notes
+
+Original head `2b4acdc0fcf73e0fd0308f264862c501acd3da83`; amended head
+`bdaa6d4ce167914615a961a6187ab64dca595ed9`, still four commits, one per note. The last commit now says to require
+Sidekiq before initialization, including a Gemfile entry with `require: false`. The first skeptic requested this
+qualification; a fresh skeptic on the amended exact head found no must-fix. Optional nit left alone: the
+PostgreSQL paragraph could explicitly qualify the current schemas with ownership-role access.
+
+All four described commits remain ancestors of main, and their relevant behavior remains present:
+
+| Note | Commit checked against main | Fresh check |
+| --- | --- | --- |
+| NavigationHelper | `07f4b45e294e016675ec500a800f359cde839aa4` | All six named methods are in NavigationHelper, which includes UrlHelper; FormHelper lacks NavigationHelper. `navhelper.rb` raises for UrlHelper alone and renders the link with NavigationHelper; `navhelper_compat.rb` works. A FormHelper-only class loses `link_to`, adding NavigationHelper restores it. A view's `link_to` escapes a plain String block result. |
+| Rack::Sendfile | `b37aeee32f29b879f7bc6e1d91fda7e5f845160b` | A minimal current-main application with a nil header and `insert_before Rack::Sendfile, Rack::ContentLength` raises `No such middleware to insert before: Rack::Sendfile`. Setting `X-Sendfile` boots with ContentLength, Sendfile, Static, Executor in that order; anchoring on Executor boots with Static, ContentLength, Executor. |
+| PostgreSQL fixture locks | `7051ca8a45e4757fbf05431e0dae1077e3c418b4` | Main still gates on `>= 18_00_04`, toggles enforced foreign keys accessible by table ownership in current schemas within one transaction, and reaches this through fixture insertion and truncation. The later helper extraction preserves that mechanism. PostgreSQL source and lock documentation were checked by the skeptic; 256 remains an example, not a guaranteed limit. This orb has PostgreSQL 15 only; the historical 18.6 exhaustion experiment was not rerun. |
+| Sidekiq adapter | `10c24f2481c55a8f215f7a0dcfa4126a702f5b82` | Current main no longer ships or autoloads its SidekiqAdapter. With Rails loaded first, requiring Sidekiq 7.3.10 or 8.0.2 before initialization fails with the missing-adapter NameError; 8.0.3 loads the adapter. Merely activating 8.0.3 without requiring it still fails. The released 8.0.3 source and fix `b065bfb4873a95d84b815f574f0daf6b8742e39c` require the adapter at file load, unlike 8.0.2's hook. |
+
+These Ruby 4.0.9 checks used the actual main component load paths, not replacement implementations. The two
+Redmine caller permalinks in the shortened body were fetched and checked. A control with Rails 8.1.4.1 and
+Sidekiq 8.0.3 activated but unrequired fails differently (`Sidekiq::Job`), so the added loading advice is **not**
+presented as a previously-working 8.1 configuration or a newly demonstrated regression in that configuration.
+
+Cold read: add NavigationHelper for standalone includers; configure Sendfile or deliberately choose another
+anchor; size PostgreSQL's shared lock table for concurrent fixture loading; upgrade Sidekiq and load it early.
+Docs only: no touched runtime methods or method-complexity delta. The amended branch is 116 inserted lines,
+below the queue's thermos threshold, and merges cleanly with the fetched main.
+
+### PI3: held after a demonstrated exactness failure
+
+Head `fb8a27353222a2ea6ba9533ca8c5bfc9a33de564` is unchanged and the fork branch is kept. The skeptic returned
+`changes` on this exact head. The author independently reproduced both findings on main, the exact head, and
+a clean merge of the patch into the same fetched main. These are public API calls, not private-method overrides
+or global core redefinitions:
+
+```ruby
+class Target
+  def echo(**keywords) = keywords
+end
+
+class MethodName
+  def initialize(keywords)
+    @keywords = keywords
+  end
+
+  def to_str
+    @keywords[:value] = :after
+    "echo"
+  end
+end
+
+keywords = { value: :before }
+Target.new.try(MethodName.new(keywords), **keywords)
+```
+
+Main returns `{value: :before}`; the candidate returns `{value: :after}`. Main captures the keywords before
+the `respond_to?` conversion callback; anonymous forwarding does not preserve that snapshot. A direct `.try`
+call matters: an intervening `public_send(:try, ...)` wrapper can copy keywords and conceal this failure.
+
+```ruby
+class RaisingKeywords < Hash
+  def empty?
+    raise RangeError, "empty? called"
+  end
+end
+
+Object.new.try(**RaisingKeywords[a: 1])
+
+class ClearingKeywords < Hash
+  def empty?
+    clear
+    false
+  end
+end
+
+Object.new.try!(**ClearingKeywords[a: 1]) { :block }
+```
+
+The first call raises `RangeError: empty? called` on main but `TypeError: nil is not a symbol nor a string`
+on the candidate. The second raises `ArgumentError: no method name given` on main but
+`TypeError: {a: 1} is not a symbol nor a string` on the candidate. The new condition skips a public `empty?`
+call without a block, and with a block the helper checks and mutates a different keyword copy from the one
+forwarded. These exception differences matter even though the no-method-name calls are invalid.
+
+The reviewer's broader differential reported 4,320 cases: 4,128 identical, 120 keyword-snapshot differences,
+24 keyword-subclass check-order differences, and 48 unsupported bare-BasicObject differences not treated as
+blockers. The author reran the discriminating cases above. The candidate's ordinary tests still pass against
+main, main+patch and the exact head: `24 runs, 38 assertions, 0 failures, 0 errors, 0 skips`, Ruby 4.0.9 with a
+minimal Active Support bundle and Rails' actual test helpers. Passing them did not establish exactness.
+
+Fresh per-call micro, Ruby 4.0.9 revision `3e93b23afc`, JITs off, Valgrind 3.19 Callgrind, **not elapsed time or
+an application speed claim**:
+
+| Tree | Objects/call | Ir at N=0 | Ir at N=200,000 | Net Ir/call |
+| --- | ---: | ---: | ---: | ---: |
+| main `1e235cee11` | 2 | 3,045 | 639,827,873 | 3,199.124140 |
+| same main A/A | 2 | 3,045 | 639,827,202 | 3,199.120785 |
+| same main + PI3 | 1 | 3,045 | 558,831,548 | 2,794.142515 |
+| exact PI3 head | 1 | 3,045 | 558,831,548 | 2,794.142515 |
+
+Allocation totals at N=0 / N=200,000 were 5 / 400,005 on both main runs and 5 / 200,005 on both candidate
+trees. Net instructions are `(Ir200000 - Ir0) / 200000`: −12.6591%, A/A −0.0001049%; allocation A/A is zero.
+The initial environment-only heap preparation did not retain its target capacities and is rejected; its
+instruction values are not used. The accepted experiment reused `HeapWindows.prepare_heap` and its page
+anchors with floors 1,000,000 / 250,000 / 100,000 / 20,000 / 10,000, 200,000 warmup calls before preparation,
+200,000 more after, and three full GCs before the window. All eight starting capacities met their floors
+and matched within one page: main 1,000,452 / 250,430 / 100,558 / 20,184 / 10,178; candidate
+1,000,453 / 250,429 / 100,563 / 20,177 / 10,180. GC remained enabled; measured collections were two on main,
+zero on the candidate. Counts include those collections.
+
+The disposable runner required the actual tree's `active_support` and `core_ext/object/try`, compiled
+`bench/callgrind.c` through `mkmf`, then ran a `workload(prop, n)` method containing
+`n.times { prop.try(:deferred?) }`, where `deferred?` returns false. It bracketed only that method with
+`LowrailCallgrindBench.start` / `finish`, and read the client dump's trailing `totals:`, not the process total:
+
+```
+RAILS=<tree> valgrind --quiet --tool=callgrind --instr-atstart=no \
+  --callgrind-out-file=<output> ruby --disable-yjit <runner> 0
+RAILS=<same-tree> valgrind --quiet --tool=callgrind --instr-atstart=no \
+  --callgrind-out-file=<output> ruby --disable-yjit <runner> 200000
+```
+
+No fresh YJIT or master/ZJIT claim is made for this held candidate. Readability: Flog 4.9.4 reports try
+21.9 → 21.9 and try! 18.9 → 18.9, but a new private helper is additional complexity, not a simplification.
+The coordinator agreed to hold under the two-round rule: the gain is real, but the candidate is not exact;
+no further design investigation, no approving skeptic pass, and no Sol request for PI3. Its old proposed
+body remains in the item as a rejected draft, explicitly labeled by the hold note.

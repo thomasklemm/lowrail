@@ -5,20 +5,21 @@ kind: perf
 area: "Active Support core_ext (Object#try)"
 reviewer: "kamipo (author of 2709a9f16d, #58238)"
 branch: thomasklemm/try-without-kwargs-hash
-head: "fb8a273532"
+head: "fb8a27353222a2ea6ba9533ca8c5bfc9a33de564"
 base: main
 built_on: "7a78da5a55"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Object#try without keywords allocates one object less per call, as on 8.1 (inertia-rails: about 200 per page); 3,362 -> 2,835 Ir per call"
+impact: "Object#try without keywords: 2 -> 1 objects, 3,199 -> 2,794 interpreter Ir/call; blocked by public-API differences"
 rank: 7
 risky: false
-state: in-review
+state: held
 pr:
-note: first version 1e3539559d
+note: "Coordinator agreed to hold under the two-round rule; keep fork branch, no further design investigation. Fresh main comparison: 2 -> 1 objects, 3,199 -> 2,794 Ir/call, A/A about 0.0001%. Anonymous forwarding loses the keyword snapshot during to_str/respond_to? and changes Hash-subclass empty? effects; the proposed body below is rejected, not ready to post. Evidence: docs/upstream/app-suites.md, Queue skeptic refresh."
 passes:
   - {reviewer: sol, head: "1e3539559d", date: 2026-11-05, verdict: changes, open: identical behaviour with keywords and a block; applied in fb8a273532}
+  - {reviewer: skeptic, head: "fb8a27353222a2ea6ba9533ca8c5bfc9a33de564", date: 2026-11-05, verdict: changes, open: "Reproduced on main+patch: method-name to_str mutates caller keywords, target sees before on main but after on head; Hash-subclass empty? raising gives RangeError on main but TypeError on head, clearing itself gives ArgumentError on main but TypeError on head. Held under two-round rule. Fixed-heap/A/A gain is real but not exact."}
 ---
 
 # Don't allocate a keyword Hash in `Object#try` without keywords

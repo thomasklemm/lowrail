@@ -250,3 +250,65 @@ responsibility if any of these leads is reconsidered.
   paper_trail caps Active Record below 8.2.
 - Harness: `Appraisal::Gemfile` has no `eval_gemfile`, so gems that require appraisal at runtime need `require: false`
   or `CI=1`.
+
+## Queue skeptic refresh (2026-11-05)
+
+**E4: skeptic approved exact head `0a69eb6cce5fa6a7956d2ceddaa207e14fbdc459`; ready for the coordinator's Sol
+pass, not yet fully reviewed.** The fork branch is unchanged. Against fetched Rails main
+`1e235cee11b0a7aecb189d8837534807626287aa`, the two-line patch still applies and merges cleanly: the gemspec
+and PATH lockfile dependency both become `minitest >= 5.18`; the locked minitest stays 6.0.6. Original commit
+`23420be739d255f51b00f3c8eb54248e0d21d06d` introduced the unconditional alias, and
+`07ac43aaefa1451c3076c317034880561b3c8e23` is the cited dependency-floor precedent. No runtime method changes,
+new comments or method-complexity delta.
+
+Fresh public loading checks on **Ruby 3.3.13** (minitest 5.18.0 declares Ruby < 4.0):
+
+| Active Support source | minitest 5.10.3 | minitest 5.17.0 | minitest 5.18.0 |
+| --- | --- | --- | --- |
+| released 8.1.4.1 | loads | not rerun | loads |
+| fetched main | NameError | NameError | loads |
+| exact E4 head | NameError when bypassing resolution | NameError when bypassing resolution | loads |
+| same main + E4 | NameError when bypassing resolution | NameError when bypassing resolution | loads |
+| main with only the alias removed in memory | loads | not rerun | loads |
+
+The negative case is `undefined method 'refute_pattern' for class 'ActiveSupport::TestCase' (NameError)` at
+`active_support/test_case.rb:372`. The alias-removal control clears the `ActiveSupport::TestCase` autoload
+before evaluating the file without that one alias; otherwise evaluating the class can autoload the original
+file and invalidate the control. Checks load the real component through `-I <tree>/activesupport/lib`:
+
+```ruby
+gem "minitest", "5.10.3"
+require "active_support"
+require "active_support/test_case"
+```
+
+Minimal resolver reproduction, **Bundler 2.5.22 on Ruby 3.3.13**, using the actual source gemspec:
+
+```ruby
+source "https://rubygems.org"
+gem "activesupport", path: "#{ENV.fetch('RAILS')}/activesupport"
+gem "minitest", ENV.fetch("MT", "5.10.3")
+```
+
+`RAILS=<main> bundle lock --local` exits 0, then `bundle exec ruby` with the public loading code above raises
+the NameError. With `RAILS=<E4>` or `<main+E4>`, the same `bundle lock --local` exits **6**:
+
+```
+Because every version of activesupport depends on minitest >= 5.18
+  and E4.Gemfile depends on activesupport >= 0,
+  minitest >= 5.18 is required.
+So, because E4.Gemfile depends on minitest = 5.10.3,
+  version solving has failed.
+```
+
+With `MT=5.18.0`, main+E4 resolves and loads. A fresh lockfile under **Bundler 4.0.20, Ruby 4.0.9** and
+`MT='>= 5.18'` selects installed minitest **6.0.6** and loads exact E4. The floor is an API floor, not a claim
+that minitest 5.18.0 installs on every supported Ruby.
+
+The skeptical reviewer independently checked minitest's release history/API, the original Rails commits,
+the lockfile consistency, and the exact AMS 0.10.16 caller permalink at line 42 (also the current
+`0-10-stable` SHA). Its two wording nits were applied: label the load-only table and Ruby pin; do not present a
+path-source-specific solver quotation as a universal statement about Active Support history. The revised body
+received `approve` on the same exact head. Cold read: declare the version already required by the unconditional
+alias, so incompatible combinations fail at resolution rather than test-case loading. This does **not** fix AMS's
+separate deliberate dynamic-route removal. No upstream PR or issue action; no Sol/Astra run here.
