@@ -1,0 +1,25 @@
+== master round 1
+      validate - introspection       1.117k (±15.4%) i/s  (894.86 μs/i) -      5.616k in   5.025535s
+  validate - abstract fragments      1.707k (±16.6%) i/s  (585.84 μs/i) -      8.554k in   5.011260s
+validate - abstract fragments 2      1.211k (±14.4%) i/s  (825.53 μs/i) -      6.125k in   5.056357s
+           validate - big query    137.086 (±11.7%) i/s    (7.29 ms/i) -    696.000 in   5.077120s
+   validate - fields will merge     36.237 (± 8.3%) i/s   (27.60 ms/i) -    183.000 in   5.050032s
+== c3 round 1
+      validate - introspection       1.342k (±11.6%) i/s  (745.30 μs/i) -      6.710k in   5.000958s
+  validate - abstract fragments      2.023k (±14.4%) i/s  (494.31 μs/i) -     10.296k in   5.089435s
+validate - abstract fragments 2      1.350k (±13.0%) i/s  (740.58 μs/i) -      6.837k in   5.063320s
+           validate - big query    160.652 (± 9.3%) i/s    (6.22 ms/i) -    816.000 in   5.079287s
+   validate - fields will merge     71.933 (± 5.6%) i/s   (13.90 ms/i) -    364.000 in   5.060282s
+== master round 2
+      validate - introspection       1.128k (±13.8%) i/s  (886.29 μs/i) -      5.720k in   5.069585s
+  validate - abstract fragments      1.780k (±14.2%) i/s  (561.73 μs/i) -      8.964k in   5.035378s
+validate - abstract fragments 2      1.255k (±14.1%) i/s  (796.52 μs/i) -      6.372k in   5.075447s
+           validate - big query    136.155 (±12.5%) i/s    (7.34 ms/i) -    686.000 in   5.038365s
+   validate - fields will merge     37.284 (± 5.4%) i/s   (26.82 ms/i) -    189.000 in   5.069212s
+== c3 round 2
+      validate - introspection       1.340k (±12.2%) i/s  (746.07 μs/i) -      6.710k in   5.006156s
+  validate - abstract fragments      2.036k (±14.2%) i/s  (491.24 μs/i) -     10.266k in   5.043079s
+validate - abstract fragments 2      1.304k (±16.3%) i/s  (766.79 μs/i) -      6.572k in   5.039337s
+           validate - big query    156.189 (± 9.6%) i/s    (6.40 ms/i) -    784.000 in   5.019566s
+   validate - fields will merge     69.768 (± 5.7%) i/s   (14.33 ms/i) -    350.000 in   5.016660s
+WDONE

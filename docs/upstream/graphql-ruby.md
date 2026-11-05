@@ -152,3 +152,203 @@ Unrelated, already on master: `CParser.tokenize_with_c` (`graphql-c_parser/lib/g
 Neither PR is open; both wait for a go. Bodies:
 [ruby-lexer-body.md](../../bench/upstream/graphql_ruby/ruby-lexer-body.md),
 [c-lexer-bom-body.md](../../bench/upstream/graphql_ruby/c-lexer-bom-body.md).
+
+# graphql-ruby execution and validation (2026-11-05, round 2)
+
+After #5880 and #5881 merged (master `2e8473ea7d`), I profiled what graphql-ruby does beyond parsing: static
+validation, schema and type lookup, and execution with both engines (the classic `Execution::Interpreter` and
+`Execution::Next`), plus a realistic app workload (Zammad). Outcome: one candidate, GQ1, which is **held**. It is a
+behaviour change, not an exact speedup. Nothing else cleared the bar. Scripts and raw outputs are in
+[bench/upstream/graphql_ruby/exec](../../bench/upstream/graphql_ruby/exec) and
+[apps](../../bench/upstream/graphql_ruby/apps).
+
+Setup: the same as round 1. Ruby 4.0.9 interpreter, Cachegrind `--cache-sim=no`, fixed heap, two process counts
+subtracted, every revision in two processes (A/A).
+
+Workloads:
+- `exec/ex.rb` runs the scenarios graphql-ruby tracks on every master push (`benchmark/track.rb`: validate abstract
+  fragments, big query and fields-will-merge; `execute_next` introspection, small query on the large schema and
+  large result), the same documents with the legacy interpreter, and `rake bench:validate`'s documents.
+- `exec/ver.rb` runs version-portable workloads on graphql-ruby's benchmark schemas plus a small 500-object schema.
+  It loads any `lib` directory (2.5.11 … master).
+- The Zammad replay is described below.
+
+## Profile (master)
+
+Inclusive Ir per iteration, with self time from callgrind and stackprof wall mode:
+
+| scenario | Ir / iteration | where |
+| --- | ---: | --- |
+| validate - fields will merge (5000 × `hello`) | 227.3M | `Warden#get_field` 51% incl., `FieldsWillMerge#collect_fields_inner`, `Schema.use_visibility_profile?`, `Module#ancestors`, `respond_to?` |
+| validate - big query | 35.1M | `on_field` 63% incl.; `Warden#read_through` blocks 39%, `ObjectMethods#get_field`, `visible_and_reachable_type?`, `FieldsWillMerge` |
+| validate - abstract fragments (1/2) | 2.3M / 3.5M | the same Warden lookups; `Schema.default_logger` builds a `Logger.new($stdout)` per query (3% wall) |
+| execute_next - introspection | 52.0M | spread over the steps (Execution::Next, ydah's open #5696 works here) |
+| execute_next - small query on large schema | 0.82M | query setup, validation pipeline, `default_logger` (10% of wall on this orb, `File.exist?` in `Logger::LogDevice`) |
+| execute_next - large result | 286M | `FieldResolveStep`, result hashes; no single hot spot |
+| interpreter - large result | 1,136M | `continue_field`, `after_lazy`, `Lazy#initialize` (the benchmark's `lazy_resolve Proc`) |
+| Zammad replay, 8 desktop queries | 374M / round | ActiveRecord 27%, graphql 24%, Psych 4% (Zammad's YAML); graphql's share is `evaluate_selection*`, `Field#resolve`, extensions; `Warden#get_field` 3% |
+
+The finding: `Warden#get_type` and the inner hash of `Warden#get_field` cache by name with
+`compare_by_identity` (since 1c51c36031, 2023, which made every `read_through` identity-keyed). Each AST node
+carries its own name String, so these caches miss on every node, and every field node repeats
+`Schema.get_field` plus the visibility checks. `exec/probe_cache.rb`: `{ hello hello hello }` calls
+`Schema.get_field` 3 times, and once with GQ1. `Visibility::Profile` (profile.rb L120–153) already caches names
+by value.
+
+## 2.5.11 → master, validation and execution
+
+`exec/versions.txt`, per-iteration Ir, change against 2.5.11:
+
+| | v2.6.0 | v2.6.14 | master |
+| --- | ---: | ---: | ---: |
+| validate big query | −30.5% | −26.8% | −27.5% |
+| validate introspection | −16.2% | −15.6% | −17.8% |
+| validate abstract fragments (1/2) | −6.9% / −6.0% | −5.4% / −4.3% | −6.7% / −5.3% |
+| execute, big schema introspection (interpreter) | +1.52% | +1.14% | +1.15% |
+| execute, 500-object result (interpreter) | +0.57% | +1.03% | +0.95% |
+| execute, small query (interpreter) | −6.2% | −6.3% | −7.8% |
+
+Validation got much cheaper. The only increases are about 1% in execution. I bisected the big-schema
+introspection along the 82 first-parent commits that touch `lib` between 2.5.11 and 2.6.0 (`exec/bisect-execution.txt`,
+one process each; the noise between neighbours is about ±0.3%):
+
+- **#5509 (12f70632df, "New Execution Module"), +2.41%.** It gives the built-in introspection fields `resolve_each:`
+  class methods for Execution::Next, and the instance methods now delegate to them (`def kind =
+  self.class.resolve_kind(object, context)`). The extra call per introspection field is the cost on the legacy
+  interpreter. Undoing it means duplicating each method body (L3). Not pursued.
+- #5491 (215e7fa464), −2.20%, a speedup.
+- #5425 (gmac, cardinal runtime shim), +0.68%. Everything else is ±0.5%.
+
+## GQ1: Warden name caches compare by value (held)
+
+Branch [`thomasklemm/warden-name-caches`](https://github.com/thomasklemm/graphql-ruby/tree/thomasklemm/warden-name-caches)
+@ `4337055468`, one commit on master `2e8473ea7d` (measured as `6a147b445e`, which differs only in the helper's comment). The `@visible_types` cache and the inner per-type hash of
+`@visible_parent_fields` use a `read_through_by_name` helper, the same Hash without `compare_by_identity`. Described
+out loud: "look up a type by its name; look up a field by its owner type, then by its name; a name is compared by
+its characters, as in Visibility::Profile; owner types are still compared by identity."
+
+Ir per iteration, master → GQ1 (each revision A/A ≤ 1.7%, `exec/candidate-tracked.txt`, `candidate-ver.txt`):
+
+| tracked scenario | master | GQ1 | |
+| --- | ---: | ---: | ---: |
+| validate - fields will merge | 227,437,348 | 129,124,527 | **−43.2%** |
+| validate - big query | 35,072,813 | 32,434,907 | **−7.5%** |
+| validate - abstract fragments | 2,355,532 | 2,149,616 | **−8.7%** |
+| execute - introspection (Next) | 52,073,540 | 51,455,744 | −1.2% |
+| execute - small query on large schema | 812,372 | 810,841 | −0.2% (A/A 1.7%) |
+| execute - large result | 285,771,223 | 285,995,762 | +0.08% |
+
+- Legacy interpreter: Jazz introspection +0.11% (A/A 0.08%). Big-schema introspection (`ver.rb`) is **+0.56%**
+  (A/A 0.13%): during execution the identity cache already hit for repeated nodes, and hashing the String costs more.
+- Zammad replay: 374.2M → 371.8M Ir per round, **−0.64%** (master A/A 0.32%, GQ1 0.05%).
+- Rejected variant c2: a value cache behind an identity cache (`read_through { |name| by_value[name] }`). It removes
+  the +0.56%, but keeps only −40.6% / −5.7% / −5.4% on validation and costs +1.7% on the small query (two more
+  Hashes per Warden), and it is harder to read.
+
+**Why held.** The skeptic pass found a real difference. Overriding `.get_field` on a type is a documented hook
+(guides/schema/dynamic_types.md), and the Warden is the default. With GQ1, `.get_field` and `Schema.get_type`
+overrides run once per name per query instead of once per AST node. When a resolver changes the context that such an
+override reads, a field selected through an interface in two places resolves differently (`exec/exprobe2.rb`):
+master `{"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"alt"}}`, GQ1 `… "b":{"staffName":"staff"}`.
+`exec/hookprobe.rb`: three `thing { name }` aliases call `Thing.get_field` 3 times on master and once on GQ1.
+Everything else is identical: the probe `exec/wprobe.rb` (7 documents × 4 visibility contexts: results, validation
+errors, 52 deprecation warnings, `visible?` hook counts) is byte-identical on master and GQ1 with both parsers, because
+`@visibility_cache` stays identity-keyed. Encodings, Symbols, frozen and mutated keys behave as on master (the
+skeptic checked each). The guide's statement "GraphQL-Ruby caches schema elements for the duration of the operation"
+and Visibility::Profile's caches have GQ1's semantics, so rmosolgo may well want it, but it needs his call as a
+behaviour change, not an exact performance PR.
+
+Tests: `rake test` 2,715 tests, 4 failures, all dataloader timing asserts (`async_dataloader_spec.rb:300` twice,
+`nonblocking_dataloader_spec.rb:174/209`) under a loaded orb; `SERIAL=1 GRAPHQL_CPARSER=1 rake test` 2,705 tests,
+1 failure (`async_dataloader_spec.rb:300`). rubocop and `srb tc` clean.
+
+## Rejected
+
+- **`Schema.default_logger` memoization.** Without Rails, every query builds `Logger.new($stdout)`, and the
+  `File.exist?` syscall in `LogDevice` takes 10% of small-query wall time on this orb. Memoizing it saves only 1.4%
+  Ir on the small query and 0.5% on validation, and it changes behaviour: one shared, mutable logger, and a later
+  `$stdout` reassignment is ignored. Rails apps get `Rails.logger` and never pay this.
+- **#5509's introspection delegation (+2.4% on the legacy interpreter).** Inherent to Execution::Next sharing the
+  resolvers; undoing it duplicates methods.
+- **Execution::Next step overhead.** Open work by ydah (#5696, "Reduce Execution::Next lookup and step overhead",
+  plus #5805, #5727); not touched.
+- **`FieldsWillMerge`** (`legacy_mutually_exclusive?` `Array#&`, `field_selection_signature`): already cached per
+  type pair; what remains after GQ1 is the 5000-field benchmark's own quadratic shape.
+- **Legacy interpreter `Lazy`** (`Lazy#initialize`, `after_lazy` in the large result): the benchmark's
+  `lazy_resolve Proc`; no exact change found.
+
+## Zammad replay
+
+`apps/zammad-replay.rb` replays eight GraphQL queries that Zammad's new desktop UI sends: `session`, `currentUser`,
+`applicationConfig`, `userCurrentTicketOverviews`, `ticketsCachedByOverview`, `ticket`, `ticketArticles` and
+`userCurrentTaskbarItemList`. It runs them in-process through `Gql::ZammadSchema.execute`, as an agent, with the
+context `GraphqlController` builds. Query texts come from `app/frontend/**/*.graphql`, with the fragments each one
+spreads.
+
+Setup (Zammad `64e70ff`, with the readiness runner's setup from
+[app-suites.md#zammad](app-suites.md#zammad): Ruby line, `database.yml`, readline, jemalloc,
+PostgreSQL/Redis/memcached as `readiness-*` orb services):
+
+```
+bundle exec rake zammad:db:init                       # RAILS_ENV=test, env from apps/zenv.sh
+createdb -h 127.0.0.1 -U postgres -T zammad_test zammad_replay
+DATABASE_URL=postgres://postgres@127.0.0.1/zammad_replay bundle exec rails runner zammad-replay.rb seed
+... zammad-replay.rb dump      # DUMP=out.json: results, to compare revisions
+... zammad-replay.rb wall 20   # ms per round
+... zammad-replay.rb stackprof 30 [STACKPROF_LIB=..., STACKPROF_METHOD=...]
+apps/zcg.sh GEMFILE TAG N      # Cachegrind of N rounds: fresh DB copy, own memcached (11212) and Redis db 3
+```
+
+The seed adds an Admin+Agent user and 20 tickets with 5 notes each. Point graphql at a checkout with a copy of the
+Gemfile (`gem 'graphql', path: …`) and of the lock. Two pitfalls broke my first two Cachegrind pairs:
+
+- `ticketsCachedByOverview` needs `cacheTtl` long enough to outlive Valgrind's slowdown (the script uses 3600).
+- The replay must not share memcached or Redis with a running Zammad spec suite, which flushes them.
+
+Per-round Ir then has an A/A of 0.05–0.32%. The results (`dump`) are identical on 2.6.14, master and GQ1.
+
+## Zammad and Decidim GraphQL specs, master vs 2.6.14
+
+The aim was to catch regressions from #5880/#5881 or anything else on master before the release. graphql master
+`2e8473ea7d` against the released 2.6.14, each with the Ruby parser and with the C parser
+(graphql-c_parser 1.2.0 from rubygems for 2.6.14, the master checkout's `graphql-c_parser` built for master), seed
+4242. The apps are the readiness runner's checkouts and bundles (Rails 8.1.4.1, as locked).
+
+- **Zammad** `spec/graphql` (278 files, 2,007 examples, `-t ~searchindex -t ~integration -t ~required_envs`).
+  Zammad has no C parser, so the C runs add `gem 'graphql-c_parser', require: 'graphql/c_parser'`, checked with
+  `GraphQL.default_parser == GraphQL::CParser`. Results: 2,007 passed, 0 failed in all four runs (2.6.14 and master,
+  Ruby and C parser), with the same example IDs. 7–9 minutes each.
+- **Decidim**, 152 files: every module's `spec/types`, all of `decidim-api` except system specs, the
+  `query_extensions` specs and `decidim-core/spec/lib/api`, run from each module directory as its CI does, 2,389 examples (the C runs used parallel-test databases 2 and 3).
+  Ruby parser: 2,387 passed, 2 pending on both. C parser: 11 failed on both, the same example IDs. Master versus
+  2.6.14 differs in 0 examples with either parser.
+  - **All 11 C failures have one cause, present before master.** `meeting_mutation_type_spec.rb` (3) and
+    `withdraw_proposal_type_spec.rb` (8) send `mutation() { … }`, and the C parser rejects the empty variable
+    definitions: `syntax error, unexpected RPAREN (")"), expecting VAR_SIGN at [1, 10]`.
+  - **The Ruby parser accepts `()`** (`exec/emptyvars.rb`; the same on graphql 2.5.11 and master, and with
+    c_parser 1.2.0 and master). The GraphQL spec requires at least one variable inside the parentheses, so the C
+    parser is the strict one.
+  - Not reported upstream: no matching issue found, and it is not a regression.
+
+**No failure on master that 2.6.14 doesn't also have**, in either app or parser.
+
+**GitLab** (graphql 2.6.10, Rails 7.2.4) has 954 spec files in `spec/graphql` and 549 in
+`spec/requests/api/graphql` (gitlabhq FOSS mirror; EE adds its own). It isn't cheap. `spec/graphql` mostly needs only PostgreSQL and
+Redis, but the bundle (Ruby 3.3, about 500 gems) and DB setup take an estimated 2–3 hours on an a1.large, and
+then about 30–45 minutes per graphql revision and parser. The request specs need Gitaly as well. Not built.
+
+## Wall time
+
+graphql-ruby's `rake bench:validate` (benchmark-ips), master and GQ1 alternating, two rounds each, pinned to one CPU
+with nothing else running (`exec/wall-validate.txt`). i/s, master → GQ1:
+
+| | round 1 | round 2 |
+| --- | ---: | ---: |
+| validate - introspection | 1.117k → 1.342k | 1.128k → 1.340k |
+| validate - abstract fragments | 1.707k → 2.023k | 1.780k → 2.036k |
+| validate - abstract fragments 2 | 1.211k → 1.350k | 1.255k → 1.304k |
+| validate - big query | 137.1 → 160.7 | 136.2 → 156.2 |
+| validate - fields will merge | 36.2 → 71.9 | 37.3 → 69.8 |
+
+The direction is the same in every pair. The wall gain is larger than the Ir gain because most of the skipped work
+is method calls and Hash lookups with many cache misses.
