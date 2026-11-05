@@ -823,7 +823,7 @@ its stubs add about 7.3K objects per pass.
   head `33e9aa45be` on main `ad63bf8`: clock at 2026-07-01 12:00 UTC. Allocations across the four dates
   648,872–648,916 (spread 0.007%, main 1.37%); responses byte-identical after blanking random fields; 0 refetches.
   Callgrind Ir per iteration with the real clock: 3.638e9 vs main 3.658e9 (−0.55%, both A/A ≤ 0.008%). History
-  step: up to −1.35% objects. Marked ready 2026-11-05 21:09 UTC with upstream CI green (15/15) on that head. [Body](../../bench/upstream/ruby_bench_round4/lobsters-fixed-clock-body.md).
+  step: up to −1.35% objects. Marked ready 2026-11-05 21:08 UTC with upstream CI green (15/15) on that head. [Body](../../bench/upstream/ruby_bench_round4/lobsters-fixed-clock-body.md).
 - [ruby/ruby-bench#572](https://github.com/ruby/ruby-bench/pull/572), branch `thomasklemm/lobsters-clock-near-fixture`,
   head `f94d3a10df`: clock at 2023-07-19 01:00 UTC, next to the 2023 fixture, so the 16 time-filtered requests
   render 25 stories each; `/top` binds `Time.current` and uses `-N DAY` (on main `'- 1 DAY'` is NULL, so `/top`
