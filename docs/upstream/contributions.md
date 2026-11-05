@@ -768,6 +768,12 @@ Both from the [graphql-ruby parser cost round](graphql-ruby.md), opened 2026-11-
 - [#5880](https://github.com/rmosolgo/graphql-ruby/pull/5880), the Ruby lexer skips comments with `while` and a `"#"` String check instead of `loop`/`break` (cost from 2a8d95680b, 2.6.1, +22.74%). Same tokens, positions, errors and `max_tokens` counting. **−16.45%** instructions over four documents (Cachegrind, Ruby 4.0.9, A/A ≤0.01%); `rake bench:parse` introspection 4.35–4.42k → 5.39–5.45k i/s, big query 726–736 → 923. Head `dd6632b412`. `COMMENT_REGEXP` is renamed `COMMENT_BODY_REGEXP` (no outside users found); if asked, a one-line alias.
 - [#5881](https://github.com/rmosolgo/graphql-ruby/pull/5881), the C lexer matches byte order marks with their own rule instead of inside `BLANK` (cost from #5849's a679c9dff8, +1.66%). Same tokens, columns and errors. **−1.33%** instructions on graphql-native's `negotiate.gql` (A/A 0.03%). `lexer.c` regenerated as in #5877. Head `097c2461d0`.
 
+### Benchmarks — ruby/ruby-bench
+
+- [#569](https://github.com/ruby/ruby-bench/pull/569) (**draft**, owner G2), harness-gc records the marking time of each minor and major GC. Opened 2026-11-05 19:46 UTC, head `081b17e3ae`.
+- [#570](https://github.com/ruby/ruby-bench/pull/570) (**draft**, owner G2), the GC harness prints its averages without truncating them. Opened 2026-11-05 19:46 UTC, head `2c2c695e69`. Once #569 and #570 are ready, the #539 heads-up gets posted (fork runs: fix 42081299470 green, control 42079221738 fails on `gc_balloon`).
+- [#571](https://github.com/ruby/ruby-bench/pull/571) (**draft**, owner V3), lobsters runs with a fixed clock. Opened 2026-11-05 19:53 UTC, head `1e5933cc08`. V3's "near-fixture clock" PR will follow as the alternative, so the maintainers can choose.
+
 ### Rails — rails/rails
 
 Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #59569, #59570, #59574, #59584), plus #59605 opened later that day; #59577 closed at 09:32 UTC. #59596, #59597, #59598 and #59603 merged on 2026-11-04 and moved to [Merged](#merged). Later: #59605 merged 13:29 UTC; #59616 opened 13:53 UTC and merged 14:58 UTC; #59617 opened 14:01 UTC; #59618 opened 14:11 UTC. Moved to [Merged](#merged) on 2026-11-04 by the central watch, all merged by amatsuda: #59606 (13:49), #59608 (14:09), #59613 (14:16), #59618 (15:41), #59614 (15:42), #59625 (16:30), #59626 (16:36 UTC). #59630 opened 16:38 UTC from the PR queue.
