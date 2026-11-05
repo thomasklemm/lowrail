@@ -56,6 +56,9 @@ No compat code; docs-only note:
 [patch](../../bench/upstream/app_suites/s2-upgrade-guide-navigation-helper.patch),
 [body](../../bench/upstream/app_suites/s2-body.md). Branch `thomasklemm/upgrade-guide-navigation-helper` @
 `b5d8b978d5` on main `8b06b0eb98` (silent case added after Decidim, [below](#decidim)); S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
+**2026-11-05: S1, S2 and PI2 are bundled with GR7 into one docs PR**, [`thomasklemm/upgrade-guide-8-2-notes`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-8-2-notes) @ `cdc9141b44` on main `3ba9e53d7e`
+(one queue slot instead of three; the old branches stay on the fork). Record:
+[contributions](contributions.md#queue).
 
 **L1 (c): rspec-rails 8.0.x mutates the frozen `default_url_options`.** baa1ca5f2f (#58483) freezes the
 controller-level `default_url_options` (no CHANGELOG entry). rspec-rails' `FeatureExampleGroup` does
@@ -782,7 +785,8 @@ locks; parallel workers can run out; raise the setting". Branch
 [`thomasklemm/upgrade-guide-postgresql-fk-locks`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-postgresql-fk-locks)
 @ `7e1817e6f2` on main `bdb3d96012`, merges cleanly with S1 and S2:
 [patch](../../bench/upstream/app_suites/pi2-upgrade-guide-postgresql-fk-locks.patch),
-[body](../../bench/upstream/app_suites/pi2-body.md).
+[body](../../bench/upstream/app_suites/pi2-body.md). Bundled on 2026-11-05 with S1, S2 and GR7 into one docs PR
+([contributions](contributions.md#queue)).
 
 **PI3 (a, performance), built: `Object#try` allocates an empty keyword Hash per call.** 2709a9f16d (kamipo, "Remove
 `ruby2_keywords` usage", no CHANGELOG) turned `try(*args, &block)` with `ruby2_keywords` into
@@ -1418,14 +1422,14 @@ orb in some orders); 9 more are that Chrome failure on the 8-1 rerun and S2 on m
 | Group | Failures | Class | Commit | Status |
 |---|---|---|---|---|
 | GR1 fixture transaction moved out of `pin_connection!` | ≈40% of main (1599 F in the 5447 examples run before it was stopped) | (d) | 9e8fe3955b (#58306) | record only; main shim |
-| S2 `link_to` moved to `NavigationHelper` | 296 | (b) | 07f4b45e29 (#55410) | our S2 note, queued |
+| S2 `link_to` moved to `NavigationHelper` | 296 | (b) | 07f4b45e29 (#55410) | our S2 note, queued (upgrade-guide bundle) |
 | GR2 inertia_rails 3.15.0's `DebugExceptions` patch | 58 | (c) | 6f731298fb (#56180) | fixed in inertia_rails 3.16.0 |
 | GR3 `connected_to(role: :reading, prevent_writes: false)` raises | 20 | (b) | 3fc6750061 (#55134) | CHANGELOG; Gumroad-side |
 | GR5 migration spec stubs `connection` with a bare double | 12 | (d) | fad3693c5f (#56204) | record only |
 | bullet 8.2.0 refuses Active Record 8.2 (development boot) | 6 | (c) | — | fixed in bullet 8.3.1 |
-| GR4 `raw_execute` override never called | 4 | (d) | 082a7c2374 (#56129) | record only; silent in production |
+| GR4 `raw_execute` override never called | 4 | (d) | 082a7c2374 (#56129) | record only; silent in production; no replacement hook (code search below) |
 | GR6 scoped `has_many :through` preload reloads loaded through records | 1 | (b) | 2ab7290a08 (#59444) | CHANGELOG |
-| GR7 Sidekiq 7's adapter missing at boot | 0 in tests (test env uses `:test`) | (b)+(c) | 10c24f2481 (#56518) | Sidekiq ≥ 8.0 |
+| GR7 Sidekiq 7's adapter missing at boot | 0 in tests (test env uses `:test`) | (b)+(c) | 10c24f2481 (#56518) | Sidekiq ≥ 8.0.3; note in the upgrade-guide bundle, queued |
 
 Each commit was checked against its parent with the repro named below: the parent behaves like 8-1, the commit
 like main. No rails/rails PR, open or merged, covers any of them, and none of ours does
@@ -1493,6 +1497,31 @@ QueryIntent refactor has no single replacement call (`perform_query` changed fro
 to `(raw_connection, intent)` too), so a restore isn't small (restore rule, point 3). Gumroad needs a hook per
 Rails version.
 
+*GR4 follow-up (2026-11-05): code search, no upgrade-guide note.* GitHub code search for `"def raw_execute"
+language:Ruby` (578 files reported; 595 fetched over 6 pages, 249 repositories) finds, after dropping Selenium's
+unrelated `Bridge#raw_execute`, vendored gems and copies of Rails, **10 repositories that wrap Active Record's
+`raw_execute` and call `super`**: Gumroad and 9 libraries, 7 of them released gems
+([semian](https://github.com/Shopify/semian/blob/ddeab8c829b67d4e2a8c3401fa6599e1ad25263e/lib/semian/activerecord_adapter.rb#L84),
+[janus-ar](https://github.com/OLIOEX/janus-ar/blob/3975820892d3eac8629e1e5bb9a5321d323b3d99/lib/janus-ar/adapter_extensions.rb#L39),
+[resilient_reads](https://github.com/chronicaust/resilient_reads/blob/702500391cde00d64958059c19c4d7cf06c39cb4/lib/resilient_reads/adapter_patch.rb#L20),
+[activerecord-retry-reads](https://github.com/planningcenter/activerecord-retry-reads/blob/a45cd8782bb4fc8a245da45fb05ad65e1a1ef0ce/lib/activerecord/connection_adapters/auto_retry_all_reads.rb#L5),
+[arfi](https://github.com/unurgunite/arfi/blob/ba165d353143ff4d400a9207f6f565cb434e5f23/lib/arfi/extensions/active_record/connection_adapters/postgresql/database_statements.rb#L62),
+[active_record_mysql_xverify](https://github.com/winebarrel/active_record_mysql_xverify/blob/d31324ff720fe86883cb2ab0384104feda77c1cc/lib/active_record_mysql_xverify/error_handler.rb#L12),
+planningcenter's copy of [activerecord-mysql-reconnect](https://github.com/planningcenter/activerecord-mysql-reconnect/blob/463e1863a8c61c57ade885e5c27d85929255614e/lib/activerecord/mysql/reconnect/abstract_mysql_adapter_ext.rb#L2)),
+and two unreleased ones ([rowstile](https://github.com/rowstile/rowstile/blob/ad9576bd451931d42f40d0bf350970d9fd542ff9/sdk/ruby/lib/rowstile/active_record.rb#L98),
+[web-ascender/audit-log](https://github.com/web-ascender/audit-log/blob/4e61f27b4d811d2635c32174d8fedb2e5adb886c/lib/audit_log/transaction_stamp.rb#L31)),
+all at their default branches' heads. Another 13 are third-party adapters that implement `raw_execute` themselves
+(ibm_db, activerecord-jdbc-adapter, yugabytedb, clickhouse, duckdb, …); on main they implement `perform_query`
+instead, which is the adapter contract, not a hook. Only semian already handles main: it overrides
+`execute_intent` for Active Record ≥ 8.2.a and re-raises `intent.error` itself. That is the closest thing to a
+replacement, and it isn't a reasonable one to recommend: [`execute_intent`](https://github.com/rails/rails/blob/3ba9e53d7e7e85a11b3b88ed68b7d9293c0d2169/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb#L736) and `QueryIntent` are both
+`:nodoc:`, and a failed query doesn't raise out of it, because
+[`perform_sync_attempt`](https://github.com/rails/rails/blob/3ba9e53d7e7e85a11b3b88ed68b7d9293c0d2169/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb#L783) stores the error on the intent, which raises it later to the caller. Probe on
+main `3ba9e53d7e` (prepended `execute_intent` with a `rescue`, SQLite): 2 calls for 2 statements, the failing one
+reaches the caller as `StatementInvalid`, the `rescue` never runs, and `intent.error` is set. So a retry or
+reconnect wrapper like Gumroad's can't be ported by renaming it. No upgrade-guide note (decision rule for this
+round: no reasonable public or semi-public replacement); GR4 stays record only.
+
 **GR5 (d), record only: a bare double as the migration's connection.**
 [`let(:connection) { double }`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/migrations/add_recurring_payment_method_context_to_credit_cards_spec.rb#L9)
 stubs `migration.connection`; fad3693c5f (#56204, CHANGELOG "configuring migration strategy on a per-adapter basis")
@@ -1516,15 +1545,25 @@ raises "Bullet does not support active_record 8.2.0.alpha yet"; bullet 8.3.1 sup
 the development boot then stops at the `active_record_query_trace` shim's initializer and, past that, at GR7.
 
 **GR7 (b)+(c), found through that boot: Sidekiq 7 with `queue_adapter = :sidekiq` doesn't boot on main.**
-10c24f2481 (#56518, after #53058 deprecated it in 8.1) removed Rails' own `SidekiqAdapter`. Sidekiq 7.x, up to the
-latest 7.3.10 and its `7-x` branch, defines its adapter only in an `on_load(:active_job)` hook that runs after Active
-Job's own hook has resolved the configured adapter, so loading `ActiveJob::Base` raises `NameError: uninitialized
-constant ActiveJob::QueueAdapters::SidekiqAdapter`. Gumroad sets
+10c24f2481 (#56518, after #53058 deprecated it in 8.1) removed Rails' own `SidekiqAdapter`. Sidekiq 7.3.3 to 8.0.2,
+including the latest 7.3.10 (the head of its `7-x` branch), define their adapter only in an
+[`on_load(:active_job)` hook](https://github.com/sidekiq/sidekiq/blob/3c752c9cafe96231c0f18cbeb78b3b940ac8d48b/lib/sidekiq/rails.rb#L52)
+that runs after Active Job's own `active_job.set_configs` hook has resolved the configured adapter, so loading
+`ActiveJob::Base` raises `NameError: uninitialized constant ActiveJob::QueueAdapters::SidekiqAdapter`. Before 7.3.3
+Sidekiq ships no adapter (same error); 7.3.4 and 7.3.5 raise from `remove_const` on main even with another adapter
+(7.3.4 when `sidekiq/rails` is required, 7.3.5 when `ActiveJob::Base` loads). Gumroad sets
 [`config.active_job.queue_adapter = :sidekiq`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/application.rb#L146)
 for every environment and test overrides it with `:test`, so the suite doesn't see it; development and production
-would. Sidekiq 8.0 requires the adapter eagerly (sidekiq/sidekiq 61b3fca7); Gumroad is on sidekiq 7.3 and
-sidekiq-pro 7.x. Repro: [sidekiq7_adapter_boot.rb](../../bench/upstream/app_suites/sidekiq7_adapter_boot.rb)
-(8-1 boots with 7.3.10 and 8.1.7; main boots only with 8.1.7).
+would. Sidekiq 8.0.3 requires the adapter
+[when `sidekiq/rails` loads](https://github.com/sidekiq/sidekiq/blob/205df02327a2402f4c844df07324d8ac3da80ffb/lib/sidekiq/rails.rb#L4)
+([b065bfb487](https://github.com/sidekiq/sidekiq/commit/b065bfb4873a95d84b815f574f0daf6b8742e39c), sidekiq/sidekiq#6669,
+"Rework Rails integration"); 8.0.0's 61b3fca7, which the first version of this record named, only switched the
+require to `require_relative` inside the hook. Gumroad is on sidekiq 7.3 and sidekiq-pro 7.x. Repro:
+[sidekiq7_adapter_boot.rb](../../bench/upstream/app_suites/sidekiq7_adapter_boot.rb) (8-1 boots with 7.3.10, 8.0.2,
+8.0.3 and 8.1.7; main `3ba9e53d7e` fails with 7.3.2, 7.3.10 and 8.0.2 and boots with 8.0.3 and 8.1.7; with
+`queue_adapter = :async`, main fails with 7.3.4 and 7.3.5 and boots with 7.3.6). The Rails 8.1 deprecation asks for
+Sidekiq 7.3.3 or later, which isn't enough on main, so this became the fourth section of the upgrade-guide bundle
+(see [contributions](contributions.md#queue)).
 
 **Deprecations that only main emits** (warnings in the shimmed main run with seed 4242; the 8-1 runs print only the
 Devise `resource` hash-argument ones, `escape_json_responses` and `ActiveSupport::Configurable`, which both trees share):
@@ -1551,10 +1590,12 @@ Devise `resource` hash-argument ones, `escape_json_responses` and `ActiveSupport
   [active_storage_jobs_spec.rb#L20](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/config/initializers/active_storage_jobs_spec.rb#L20).
 
 **Not pursued** (nothing was built in this round, and nothing goes into the queue):
-* GR1 and GR4: private API overridden by one app; GR4's restore would not be small. GR4 is the one with real
+* GR1 and GR4: private API overridden by one app (GR4: and by 9 libraries, per the code search above); GR4's
+  restore would not be small and it has no replacement hook to document. GR4 is the one with real
   production impact (a silent loss of the failover retry); the coordinator may want it noted somewhere public, but
   reporting it to Gumroad is out of scope for this round.
-* GR3, GR6, GR7: deliberate changes with CHANGELOG entries or a prior deprecation; GR7 is fixed by Sidekiq 8.
+* GR3, GR6: deliberate changes with CHANGELOG entries. GR7 had a prior deprecation and is fixed by Sidekiq 8.0.3,
+  but that deprecation names 7.3.3, so it got an upgrade-guide note after all (in the bundle, 2026-11-05).
 * GR2 and bullet: fixed in released gem versions. GR5: a test double.
 * A second S2 note: Gumroad's six classes are more callers for the queued S2 note, not a new finding.
 
