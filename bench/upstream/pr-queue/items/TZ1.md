@@ -15,7 +15,7 @@ alternative_of:
 impact: "comparing equal periods 11,446 -> 3,440 instructions; same-period beginning_of_day/change/70.days.ago in Active Support 12-19% fewer instructions"
 rank:
 risky: false
-state: draft
+state: ready
 pr: 175
 note: "our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
 passes:
