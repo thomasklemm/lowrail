@@ -25,7 +25,7 @@ overridden `primary_key` (#59622).
 | Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, fix built, PR blocked on CLA), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
 | Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, docs note queued), PI3 (a, perf, built) |
 | Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
-| Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, cells-rails, silent), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
+| Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, silent; cells-rails part opened as trailblazer/cells-rails#75), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
 | Zammad `64e70ff` | rspec without system specs, 20323 examples, PostgreSQL 18.6, Redis, memcached (no Elasticsearch) | 7 F, 10 F (environment, also on main); failing files twice more: 7 F, 8 F | no shim needed; 2520 F, 2524 F; 2498 from one call (ZM1), 15 main-only otherwise | ZM1 (d, restore built, queued), ZM2 (c, rspec-rails), ZM3 (d), ZM4 (b), ZM5 (d), CW4 (b) |
 
 ## Findings
@@ -53,7 +53,7 @@ works on main ([check](../../bench/upstream/app_suites/navhelper.rb)), but `Navi
 No compat code; docs-only note:
 [patch](../../bench/upstream/app_suites/s2-upgrade-guide-navigation-helper.patch),
 [body](../../bench/upstream/app_suites/s2-body.md). Branch `thomasklemm/upgrade-guide-navigation-helper` @
-`3db35ffc1c` on main `8b06b0eb98`; S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
+`b5d8b978d5` on main `8b06b0eb98` (silent case added after Decidim, [below](#decidim)); S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
 
 **L1 (c): rspec-rails 8.0.x mutates the frozen `default_url_options`.** baa1ca5f2f (#58483) freezes the
 controller-level `default_url_options` (no CHANGELOG entry). rspec-rails' `FeatureExampleGroup` does
@@ -1054,6 +1054,57 @@ callers raised `NoMethodError`; with cells-rails the same move silently changes 
 reconsidering under the restore rule (`link_to` in `UrlHelper` was public API). A shim inside Rails can't simply make
 `UrlHelper` include `NavigationHelper`, because `NavigationHelper` includes `UrlHelper` (a cyclic include).
 
+**DC2 follow-up (2026-11-05): cells-rails PR, S2 note, deprecation prototype.** Thomas decided DC2 and S2 after the round:
+* **cells-rails, opened as [trailblazer/cells-rails#75](https://github.com/trailblazer/cells-rails/pull/75)** (head
+  `6ba587cce6` on master `77ff22a`, v0.1.6, 1 line + an 8-line test,
+  [patch](../../bench/upstream/app_suites/dc2-cells-rails-navigation-helper.patch),
+  [body](../../bench/upstream/app_suites/dc2-cells-rails-body.md)): `Cell::ViewModel` also includes
+  `ActionView::Helpers::NavigationHelper if defined?(…)`, right after the `FormHelper` include. CHANGES.md is written at
+  release time and the repo has no CI workflow for PRs, so neither was touched. Suite on Ruby 4.0.9 (`rake` doesn't run
+  on Ruby 4.0, so the dummy tests are required directly with `ostruct` added to the Gemfile): 8.1 78 runs, 4 F; main
+  `bdb3d96012` 4 F, 0 E (without the change 4 F + 5 E: `token_tag`/`method_tag` ×4, `link_to`); main + DC1 4 F. The 4 F
+  are the same utf8-input attribute-order expectations on master on every tree. Skeptical reviewer: ship with nits (lookup
+  order unchanged, since HelpersAreShit, AssetHelper and Cell::Erb still win; `defined?` is nil on 8.1 and loads nothing
+  early on main; block `link_to`, `button_to … method: :delete` and `link_to_unless_current` render byte-identically on
+  8.1, main and main + fix); comment wording and one commit-message sentence applied. **Decidim's DC2 group with this
+  branch** on main + #59574 + DC1 (cherry-picked), rspec-rails `5072befe5d`, no other shim: 110 of the 167 pass,
+  every cell example among them. The 57 left (core 6, proposals 45, meetings 6; participatory_processes 0) are exactly
+  the 57 failures that raise `undefined method 'link_to'` on a UrlHelper-only class: `UserPresenter`,
+  `PublishProposalEvent`, `ProposalPresenter`, `MeetingPresenter` and `MentionResourceRenderer`, so Decidim still needs
+  `NavigationHelper` in those includes (recorded, not reported). No new failures against the shimmed run. The Amp GitHub
+  App can't read trailblazer/cells-rails, so the PR's comments aren't subscribed; check them by hand.
+* **S2 stays an upgrade-guide note** (Thomas). Branch
+  [`thomasklemm/upgrade-guide-navigation-helper`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-navigation-helper)
+  @ `b5d8b978d5` on main `8b06b0eb98` (was `3db35ffc1c`; merges cleanly with `bdb3d96012`): the note now says a class
+  that includes `UrlHelper` or `FormHelper` without `NavigationHelper` no longer defines the methods, and that with
+  `delegate_missing_to :view_context` it doesn't raise but runs the view's `link_to`, whose `capture` can escape the
+  block's markup; the fix is `include ActionView::Helpers::NavigationHelper`. mdl clean. Skeptical reviewer: open with
+  nits; "responds to" → "defines" (`respond_to?` stays true through `delegate_missing_to`), the fix's lead-in split into
+  its own paragraph, and the body links Decidim's `card_g` example. All applied; the queue rank is unchanged.
+* **Prototype C, deprecation stand-ins in `UrlHelper` (record only, not queued).** Branch `proto-bind` @ `ef33136e20` on
+  DC1 `ab0a99e41a`, local only,
+  [patch](../../bench/upstream/app_suites/s2c-url-helper-navigation-deprecations-prototype.patch): 2 files, +128 / −115.
+  `UrlHelper` defines `link_to`, `button_to`, `current_page?`, `link_to_if`, `link_to_unless` and
+  `link_to_unless_current` with `define_method(name) { |*args, **kwargs, &block| … }`; each warns through
+  `ActionView.deprecator` and calls `NavigationHelper.instance_method(name).bind_call(self, *args, **kwargs, &block)`
+  (binding works because `NavigationHelper` includes `UrlHelper`, so every includer of `UrlHelper` is a valid receiver).
+  Checks: `ActionView::Base` still resolves the six methods to `NavigationHelper` (it's included later), so views warn
+  nothing; Action View suite green (2956 + 251 + 177 runs, no deprecation warning in the log), RuboCop clean;
+  UrlHelper-only includers warn on each call; a FormHelper cell's block `link_to` renders unescaped; subclass overrides
+  calling `super` work. With stock cells-rails 0.1.6 on main + #59574 + this branch, Decidim's DC2 group passes:
+  all 167 pass (core 19, participatory_processes 18, proposals 79, meetings 51; 0 F), with 996 deprecation warnings
+  in those examples (624 `link_to_if`, 372 `link_to`) and nothing else new. Snags: (1) the bound bodies call NavigationHelper's
+  private helpers (`convert_options_to_data_attributes`, `url_target`, `method_not_get_method?`, `to_form_params` and the
+  rest) on a receiver that may only include `UrlHelper`, so all of them move back into `UrlHelper`. That move is most of
+  the diff and undoes #55410's "define where they're called" layout. (2) `button_to` reads the
+  `button_to_generates_button_tag` accessor, so `UrlHelper` needs a private delegator for it. (3) The signatures
+  (`button_to(name = nil, options = nil, html_options = nil, &block)`, `current_page?(options = nil, check_parameters: false, **options_as_kwargs)`)
+  are passed through untouched with `*args, **kwargs`, so `ruby2_keywords` doesn't apply and method introspection
+  (`parameters`, `arity`) differs from 8.1's. (4) A first, 10-line shape that `extend`ed the receiver with
+  `NavigationHelper` was dropped: it changes the singleton, raises `FrozenError` on frozen receivers, and skips a
+  subclass override after the first call. As an alternative to S2 it works, but it's about 240 changed lines against a
+  few lines of guide text, and it brings back the layout #55410 removed. Not pursued.
+
 **DC3 (c): rspec-rails 8.0.4 no longer blanks templates in controller specs.** 9987431315 (#58279, the CW2 commit)
 makes [`PathSet#find`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/path_set.rb#L43-L46)
 ask each resolver for one template with `find`. rspec-rails 8.0.4's `ResolverDecorator`
@@ -1116,8 +1167,9 @@ positional `Arel::Table.new` (above). Not seen: S1, SP1, L1, L2, R1, M1, DS1–D
   fixed on devise main (heartcombo/devise#5856), unreleased.
 
 **Not pursued:**
-* A cells-rails or Decidim PR for DC2, a Decidim change for DC5, an rspec-rails release request for DC3: findings
-  in gems and apps are recorded, not reported.
+* A Decidim PR for DC2's UrlHelper-only presenters, a Decidim change for DC5, an rspec-rails release request for DC3:
+  findings in gems and apps are recorded, not reported. (The cells-rails part of DC2 was opened afterwards with Thomas's
+  approval, above.)
 * An upgrade-guide note for DC4 and the rspec-mocks pattern: deliberate, test-only, not built (one concern per PR).
 * System specs (they need Chrome and the validator service) and the other 19 modules.
 
