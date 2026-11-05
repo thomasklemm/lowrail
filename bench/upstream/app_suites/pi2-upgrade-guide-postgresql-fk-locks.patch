@@ -1,41 +1,38 @@
-From 7e1817e6f2222adecb5db8f4973b3e2e3e1b8e94 Mon Sep 17 00:00:00 2001
+From cb255bf1c58e6c8e777e9a667107e472bad87182 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 10:25:59 +0000
 Subject: [PATCH] Note in the upgrade guide that PostgreSQL 18.4+ fixture
- loading takes more locks
+ loading acquires more locks
 
-On PostgreSQL 18.4+, disable_referential_integrity switches every
-foreign key to NOT ENFORCED and back, which takes about eight locks per
-foreign key until commit. Parallel test workers that load fixtures at
-the same time can fill the shared lock table with the default
-max_locks_per_transaction.
 ---
- guides/source/upgrading_ruby_on_rails.md | 28 ++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ guides/source/upgrading_ruby_on_rails.md | 33 ++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
-index 697bd23e7d..f0411fbfc7 100644
+index 697bd23..52200eb 100644
 --- a/guides/source/upgrading_ruby_on_rails.md
 +++ b/guides/source/upgrading_ruby_on_rails.md
-@@ -176,6 +176,34 @@ Book.not_published # => [book2]
+@@ -176,6 +176,39 @@ Book.not_published # => [book2]
  Book.not_published # => [book2, book3]
  ```
  
-+### Loading fixtures on PostgreSQL 18.4+ takes more locks
++### Loading fixtures on PostgreSQL 18.4+ acquires more locks
 +
 +On PostgreSQL 18.4 and later, Active Record turns off foreign key checks while it
-+loads fixtures or empties the test database by switching every foreign key to
-+`NOT ENFORCED` and back, instead of disabling triggers. This no longer requires a
-+superuser, but each switch locks the constraint, its triggers, the referencing
-+and referenced tables and their indexes until the transaction commits. In a
-+typical schema that is about eight locks per foreign key in the database, where
-+disabling triggers took about one per table.
++loads fixtures or empties tables through `truncate_tables` by switching the
++enforced foreign keys in the current schemas to `NOT ENFORCED` and back, instead
++of disabling triggers. This no longer requires a superuser, but switching off
++drops the constraint triggers and switching back recreates them, and the locks
++this takes on the constraints, tables and indexes are held until the
++transaction ends. That can be substantially more locks than disabling triggers
++took.
 +
-+PostgreSQL keeps all locks in one shared table, sized from
-+`max_locks_per_transaction` (64 by default) times the number of server
-+processes, mostly `max_connections`. When parallel test workers load fixtures
-+at the same time into databases with a few hundred foreign keys, they can fill
-+it, intermittently and more often with more workers, and fail with:
++PostgreSQL keeps object locks in one server-wide shared table. Its capacity
++depends on `max_locks_per_transaction` (64 by default), the configured number of
++server processes (mostly `max_connections`) and prepared transactions. When
++parallel test workers load fixtures at the same time into databases with a few
++hundred foreign keys, they can exhaust it, intermittently and more often with
++more workers, and fail with:
 +
 +```
 +PG::OutOfMemory: ERROR:  out of shared memory
@@ -49,9 +46,12 @@ index 697bd23e7d..f0411fbfc7 100644
 +max_locks_per_transaction = 256
 +```
 +
++The value you need depends on your schema and the number of concurrent workers;
++larger test suites may need more.
++
  Upgrading from Rails 8.0 to Rails 8.1
  -------------------------------------
  
 -- 
-2.39.5
+2.55.0
 
