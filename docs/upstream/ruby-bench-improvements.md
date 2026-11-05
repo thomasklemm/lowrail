@@ -785,9 +785,9 @@ max-itr is the largest single-iteration difference within a process. A determini
 Allocation and GC counts are identical across processes in all three outliers. etanni with
 [`fixrand`](../../bench/upstream/ruby_bench_round4/fixrand/fixrand.c) (an `LD_PRELOAD` that returns a fixed
 `getrandom` seed, so the hash seed and `Random::DEFAULT` seed are the same in each process) has A/A 0.0000% (Ir
-3.876e9), so its spread is the per-process hash seed changing Hash/String-hash probe lengths. psych-load and grape
-look the same (equal allocations and GC counts, sub-0.2% Ir) and are recorded, not fixed: seeding Ruby's hash per
-process is a property of Ruby, and fixing it in the benchmark would hide a real cost.
+3.876e9), and so has psych-load (Ir 1.741e10), so their spread is the per-process hash seed changing hash-table
+probe lengths. grape (0.103%, at the threshold) looks the same but was not rerun. Recorded, not fixed: a per-process
+hash seed is a property of Ruby, and fixing it in the benchmark would hide a real cost.
 
 **In-process iteration spread** (max-itr): erubi 3.7%, sequel 2.5%, hexapdf 0.96%, lobsters 0.57%. Their A/A is
 ≤ 0.08%, so iterations differ the same way in every process (GC timing over a fixed heap). Record-only.
@@ -823,11 +823,17 @@ its stubs add about 7.3K objects per pass.
   head `33e9aa45be` on main `ad63bf8`: clock at 2026-07-01 12:00 UTC. Allocations across the four dates
   648,872–648,916 (spread 0.007%, main 1.37%); responses byte-identical after blanking random fields; 0 refetches.
   Callgrind Ir per iteration with the real clock: 3.638e9 vs main 3.658e9 (−0.55%, both A/A ≤ 0.008%). History
-  step: up to −1.35% objects. [Body](../../bench/upstream/ruby_bench_round4/lobsters-fixed-clock-body.md).
+  step: up to −1.35% objects. Marked ready 2026-11-05 21:09 UTC with upstream CI green (15/15) on that head. [Body](../../bench/upstream/ruby_bench_round4/lobsters-fixed-clock-body.md).
 - [ruby/ruby-bench#572](https://github.com/ruby/ruby-bench/pull/572), branch `thomasklemm/lobsters-clock-near-fixture`,
   head `f94d3a10df`: clock at 2023-07-19 01:00 UTC, next to the 2023 fixture, so the 16 time-filtered requests
   render 25 stories each; `/top` binds `Time.current` and uses `-N DAY` (on main `'- 1 DAY'` is NULL, so `/top`
-  was always empty). Date spread 0.003%. Deliberate workload change: +44% objects against main.
+  was always empty). Date spread 0.003%. Deliberate workload change: +44% objects against main; Callgrind with the
+  real clock 5.989e9 Ir per iteration (+64% against main, A/A 0.008%). Marked ready 2026-11-05 21:04 UTC with
+  upstream CI green (15/15) on that head.
+
+Callgrind under libfaketime can't show the date effect: libfaketime adds its own Ir and noise (A/A 0.06–0.41%), and
+main and #571 both spread about 0.4–0.5% in Ir across 2026-11-05, 2026-12-25 and 2027-06-28 (main 3.759–3.778e9,
+#571 3.768–3.783e9). Allocation counts are the date evidence; the real-clock Callgrind runs are the cost evidence.
   [Body](../../bench/upstream/ruby_bench_round4/lobsters-clock-near-fixture-body.md).
 
 Both bodies say lobsters' rubybench history takes a step. Reviews: four skeptic passes and four Sol passes (the
