@@ -1,4 +1,3 @@
-bench/upstream/api_regressions/bodies/where-bang-binds.md	thomasklemm/where-bang-binds	AR-4
 bench/upstream/rails_82_diff/d1-body.md	thomasklemm/memcache-set-multi-dalli-version	D1
 bench/upstream/app_suites/su1-body.md	thomasklemm/local-cache-anonymous-store	SU1
 bench/upstream/app_suites/cw1-body.md	thomasklemm/where-empty-condition-binds	CW1
