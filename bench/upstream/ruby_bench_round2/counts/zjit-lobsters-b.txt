@@ -1,0 +1,80 @@
+ruby 4.1.0dev (2026-11-05T08:21:42Z master 7f9638f41e) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+/home/user/rubies/master/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+itr:   time compiled_iseq_count compiled_side_exit_count compile_time_ns code_region_bytes
+ #1: 4046ms               3,195                  102,649   2,898,282,337        13,877,248
+ #2: 1209ms                 325                   14,775     435,273,065         2,088,960
+ #3:  934ms                 160                    8,693     255,196,754         1,236,992
+ #4:  733ms                  86                    3,115      89,754,117           425,984
+ #5:  727ms                  97                    4,686     126,886,977           626,688
+ #6:  742ms                  69                    3,510     100,096,833           450,560
+ #7:  706ms                  17                      621      39,573,554            90,112
+ #8:  710ms                  33                    1,337      42,878,697           180,224
+ #9:  623ms                  16                    2,252      54,424,157           327,680
+#10:  657ms                  66                    2,609      62,383,219           315,392
+#11:  604ms                   9                      341      11,753,701            49,152
+#12:  611ms                   4                       49       2,777,082             8,192
+#13:  629ms                   4                       77       3,427,066            12,288
+#14:  578ms                   4                      171       6,022,009            24,576
+#15:  626ms                  31                    1,457      44,272,286           184,320
+#16:  589ms                   3                       38       1,719,007             4,096
+#17:  573ms                   3                       31       1,691,910             4,096
+#18:  582ms                   0                        0               0                 0
+#19:  590ms                   2                      104       2,898,328            16,384
+#20:  586ms                   3                       58       2,570,563             8,192
+#21:  562ms                   2                      214       4,835,008            32,768
+#22:  631ms                  10                      100       4,042,244            16,384
+#23:  633ms                   1                       20         518,894                 0
+#24:  614ms                   1                        7         279,856                 0
+#25:  626ms                   1                        3         294,330             4,096
+#26:  598ms                   0                        0               0                 0
+#27:  594ms                   3                       96       4,053,535            12,288
+#28:  596ms                   1                        9         473,709                 0
+#29:  615ms                   1                        4         236,858                 0
+#30:  664ms                   6                      156       4,808,182            20,480
+#31:  638ms                   1                       55       1,208,254             8,192
+#32:  618ms                   3                      166       4,454,586            16,384
+#33:  608ms                   9                      176       9,503,727            24,576
+#34:  599ms                   0                        0               0                 0
+#35:  620ms                   0                        0               0                 0
+#36:  618ms                   1                       10       1,711,066             4,096
+#37:  596ms                   0                        0               0                 0
+#38:  605ms                   0                        0               0                 0
+#39:  614ms                   0                        0               0                 0
+#40:  612ms                   0                        0               0                 0
+#41:  591ms                   0                        0               0                 0
+#42:  600ms                   0                        0               0                 0
+#43:  608ms                   1                       34       3,076,699             4,096
+#44:  627ms                   8                    1,500      36,899,030           192,512
+#45:  594ms                   0                        0               0                 0
+#46:  628ms                   0                        0               0                 0
+#47:  592ms                   0                        0               0                 0
+#48:  578ms                   0                        0               0                 0
+#49:  609ms                   3                      166       4,636,803            20,480
+#50:  599ms                   0                        0               0                 0
+#51:  582ms                   0                        0               0                 0
+#52:  583ms                   0                        0               0                 0
+#53:  648ms                   0                        0               0                 0
+#54:  594ms                   0                        0               0                 0
+#55:  577ms                   0                        0               0                 0
+#56:  557ms                   0                        0               0                 0
+#57:  591ms                   0                        0               0                 0
+#58:  601ms                   0                        0               0                 0
+#59:  648ms                   0                        0               0                 0
+#60:  581ms                   0                        0               0                 0
+ZJIT stats:
+compiled_iseq_count:            6,243
+compiled_side_exit_count:     200,743
+compile_time                5362.30ms
+code_region_bytes:         27,074,560
+zjit_alloc_bytes:          19,951,660
+profile_time                  71.75ms
+gc_time                       66.55ms
+invalidation_time             10.93ms
+RSS: 323.2MiB
+MAXRSS: 336.7MiB
+RSS sampled (n=60): median 326.5MiB ± 0.3MiB (MAD), range [311.9, 336.6]MiB
+Writing file /home/user/rb/copies/zjit-lobsters-b/data/results-ruby-4.1.0-2026-11-05-085545.json
+Average of last 60, non-warmup iters: 688ms

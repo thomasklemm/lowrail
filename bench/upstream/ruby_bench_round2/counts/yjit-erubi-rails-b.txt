@@ -1,0 +1,79 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+Failed to activate fiddle, please install it with 'gem install fiddle'
+Failed to get max RSS: cannot load such file -- fiddle
+itr:   time compiled_block_count compiled_iseq_count invalidation_count compile_time_ns
+ #1:  779ms                3,651                 266                 22      65,861,893
+ #2:  674ms                    0                   0                  0               0
+ #3:  646ms                    0                   0                  0               0
+ #4:  627ms                    0                   0                  0               0
+ #5:  661ms                    0                   0                  0               0
+ #6:  632ms                    0                   0                  0               0
+ #7:  586ms                    0                   1                  0         212,128
+ #8:  579ms                    9                   1                  0       1,483,121
+ #9:  565ms                   60                   2                  0               0
+#10:  606ms                    0                   0                  0               0
+#11:  569ms                    0                   0                  0               0
+#12:  573ms                    0                   0                  0               0
+#13:  584ms                    0                   0                  0               0
+#14:  558ms                    0                   0                  0               0
+#15:  572ms                    0                   0                  0               0
+#16:  560ms                    3                   1                  0         128,302
+#17:  618ms                    0                   0                  0               0
+#18:  613ms                    6                   0                  0         224,019
+#19:  603ms                    0                   0                  0               0
+#20:  561ms                    0                   0                  0               0
+#21:  534ms                    0                   0                  0               0
+#22:  530ms                    0                   0                  0               0
+#23:  589ms                    0                   0                  0               0
+#24:  571ms                    0                   0                  0               0
+#25:  560ms                    0                   0                  0               0
+#26:  551ms                    0                   0                  0               0
+#27:  582ms                    0                   0                  0               0
+#28:  524ms                    1                   0                  0         103,545
+#29:  525ms                    0                   0                  0               0
+#30:  550ms                   40                   2                  0       1,093,531
+#31:  551ms                   32                   1                  0         609,719
+#32:  573ms                    0                   0                  0               0
+#33:  554ms                    0                   0                  0               0
+#34:  524ms                    0                   0                  0               0
+#35:  535ms                    0                   0                  0               0
+#36:  548ms                    0                   0                  0               0
+#37:  532ms                    0                   0                  0               0
+#38:  559ms                    0                   0                  0               0
+#39:  509ms                    0                   0                  0               0
+#40:  520ms                    0                   0                  0               0
+#41:  516ms                    0                   0                  0               0
+#42:  520ms                    0                   0                  0               0
+#43:  531ms                    0                   0                  0               0
+#44:  583ms                   19                   0                  0         666,589
+#45:  586ms                    0                   0                  0               0
+#46:  543ms                    0                   0                  0               0
+#47:  551ms                    0                   0                  0               0
+#48:  534ms                    0                   0                  0               0
+#49:  545ms                    0                   0                  0               0
+#50:  532ms                    0                   0                  0               0
+#51:  542ms                   12                   0                  0         424,643
+#52:  580ms                    0                   0                  0               0
+#53:  575ms                    0                   0                  0               0
+#54:  559ms                    0                   0                  0               0
+#55:  548ms                    0                   0                  0               0
+#56:  559ms                    0                   0                  0               0
+#57:  541ms                    0                   0                  0               0
+#58:  534ms                    0                   0                  0               0
+#59:  593ms                    0                   0                  0               0
+#60:  540ms                    0                   0                  0               0
+YJIT stats:
+compiled_block_count:       3,839
+compiled_iseq_count:          274
+invalidation_count:            22
+compile_time              71.05ms
+inline_code_size:         833,830
+outlined_code_size:       839,335
+code_region_size:       2,387,968
+yjit_alloc_size:        5,619,205
+RSS: 133.5MiB
+RSS sampled (n=60): median 129.8MiB ± 3.7MiB (MAD), range [106.1, 133.6]MiB
+Writing file /home/user/rb/copies/yjit-erubi-rails-b/data/results-ruby-4.0.9-2026-11-05-085523.json
+Average of last 60, non-warmup iters: 568ms
