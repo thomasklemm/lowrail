@@ -24,6 +24,7 @@ overridden `primary_key` (#59622).
 | Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restored), CW3–CW5 (b), SU4, SU5, L1 |
 | Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, held), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
 | Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, lead), PI3 (a, perf, built) |
+| Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
 
 ## Findings
 
@@ -753,3 +754,123 @@ on main `7a78da5a55`. Sol: changes requested, applied.
 `ActiveRecord::SchemaDumper.ignore_tables` (use `config.active_record.schema_ignored_tables`).
 
 **Impact on four requests:** [private-inertia-app-82](../m0/private-inertia-app-82.md).
+
+## Spree
+
+spree/spree `b16f633` (default branch `main`,
+[`b16f63338b`](https://github.com/spree/spree/tree/b16f63338bf0229794afeaa19db84cd7579972a0)), Ruby 4.0.9 on both
+trees (Spree's CI uses `4.0`), PostgreSQL 16.15 (its CI uses `postgres:16`), libvips 8.14. Rails main `bdb3d96012`
+(2026-11-05) for every run and bisect; 8-1-stable `6e09124217`. Spree main has no Ruby `admin` or `storefront` engine
+any more (both are TypeScript packages under `packages/`), so the suites are the ones its backend CI runs: core (712
+files), api (553), emails, dashboard, mcp, opentelemetry and the four providers (easypost, meilisearch, paypal,
+stripe). None of them drives a browser. Each runs as in CI (`rake test_app`, then `parallel_rspec --group-by
+filesize`), core and api with 4 processes per tree, the others with one, `--seed 4242`, both trees at the same time
+against their own PostgreSQL cluster (core about 7 minutes wall, api about 3.5). No Meilisearch server ran, so
+spree_meilisearch's integration spec skips itself, as in Spree's MySQL job. The dummy app comes from each tree's own
+`rails new`, so main's calls `load_defaults 8.2`. Spree's test env raises only on Spree's own deprecations and prints
+the rest to stderr, so main-only Rails deprecations are read from the logs.
+
+**Bundles.** Spree commits no lockfile. Each of its 11 Gemfiles was resolved for 8-1 with
+[`gem 'rails'`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/common_spree_dependencies.rb#L7)
+pointed at a `path:` checkout; the main locks came from the 8-1 locks with `bundle lock --conservative --update` over
+the Rails gems and differ only in Rails and what main itself requires (herb 0.11.1, marcel 1.2.1 → 2.1.0,
+ractor-dispatch 0.3.0). [`spree_core.gemspec`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/spree_core.gemspec#L33)
+caps `rails` at `< 8.2`; both checkouts have `< 8.3`. No gem bump in either tree. rspec-rails stays at 8.0.4: L1 doesn't
+apply, since there are no feature specs and the mailer example group copies nothing when no
+`config.action_mailer.default_url_options` is set.
+
+**Main checkout only, app side** (each one otherwise stops boot or `db:migrate`, so every example):
+* [`default: ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/lib/spree/core/configuration.rb#L187)
+  (shortened) → `72`. a18d246600 (#56041) moved the constant into `BCryptPassword`; covered by our open #59627, whose
+  body already cites this line.
+* 15 calls such as [`Arel::Table.new(:spree_policies)`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/db/migrate/20250902143122_fix_policies_store_association.rb#L5)
+  and [`Arel::Table.new(translatable_class::Translation.table_name)`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/app/models/concerns/spree/translatable_resource_scopes.rb#L20)
+  in 7 files (migrations, the translation scopes, the preferences JSON conversion) → `name:`. b1650993b0 (#57829);
+  covered by our open #59574.
+
+Both PRs together cover Spree: with #59574 (`79b81aa0bf`) and #59627 (`08be5191db`) cherry-picked onto main
+`bdb3d96012` (both apply cleanly) and no Spree shim, the test app migrates all 210 tables and core gives the same 49
+failures as main (all SP1), with 69 positional-name deprecation warnings.
+
+Results (examples; failures in run 1 / run 2):
+
+| Suite | Examples | 8-1-stable | main |
+|---|---|---|---|
+| core | 11236 | 0 / 0 | 49 / 49 |
+| api | 6320 | 0 / 0 | 4 / 4 |
+| emails, dashboard, mcp, opentelemetry | 202, 16, 62, 26 | 0 / 0 | 0 / 0 |
+| easypost, meilisearch, paypal, stripe | 93, 100, 216, 315 | 0 / 0 | 0 / 0 |
+
+The 13 files with a failure, again: 8-1 0 F, main the same 53 F, so nothing is flaky. With the SP1 shim below (main
+checkout only) those files give 0 F in core and 3 F in api (SP2, SP3), so the freeze hides nothing else. Every
+main-only failure is classified below; none is (a).
+
+**SP1 (b), docs note built: `default_url_options` is a frozen `{}` unless configured.** Spree's
+[`ActionMailer::Base.default_url_options[:host] = host_url`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/app/mailers/spree/base_mailer.rb#L182),
+which [`mail` calls](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/app/mailers/spree/base_mailer.rb#L65)
+for every email of a store with a storefront URL, raises `FrozenError: can't modify frozen Hash: {}`: 47 core mailer
+failures, 2 subscriber specs (where the `FrozenError` inside `perform_enqueued_jobs` surfaces as a `NameError` for
+`tagged_logger`, which RSpec example groups lack; that code is the same on 8-1) and 1 api test-email request.
+Bisected to baa1ca5f2f (#58483, "Freeze the Controller `default_url_options`", no CHANGELOG entry; its parent
+ef8d9606d9 passes), the L1 commit. The freeze sits in `ActionDispatch::Routing::UrlFor`'s `included` hook, so it covers
+mailers, integration sessions and every class that includes the URL helpers, not only controllers. It hits only
+the unconfigured default: options set through `config.action_mailer.default_url_options` or
+`config.action_controller.default_url_options` stay mutable, and `routes.default_url_options` is untouched. The PR
+says "it's possible but unlikely that applications where doing that in the wild"; its deprecating predecessor #58481
+was closed as opened in the wrong repository, not rejected. Code search finds about 1,080 hits for
+`ActionMailer::Base.default_url_options[:host] =`, among them
+[rails_admin's spec_helper](https://github.com/railsadminteam/rails_admin/blob/2dfd05f15f983792c6b981c67a2d53e6b9419b85/spec/spec_helper.rb#L47)
+(its dummy app sets no options), and rspec-rails 8.0.4 is L1. Repro:
+[mailer_url_options.rb](../../bench/upstream/app_suites/mailer_url_options.rb) (8-1: the mail has the host; main:
+`FrozenError`; assigning a new Hash works on both). Deliberate and merged by gmcgibbon, so no revert or deprecation
+shim (the proxy in #58481 would be L2); the upgrade guide gets a note like S1 and S2.
+[patch](../../bench/upstream/app_suites/sp1-upgrade-guide-frozen-default-url-options.patch),
+[body](../../bench/upstream/app_suites/sp1-body.md). Branch `thomasklemm/upgrade-guide-frozen-default-url-options` @
+`4fe014a8a7` on main `bdb3d96012`, docs only; each example in it was run on main. Separate reviewer: two should-fixes
+(the scope is every URL-helper includer, not just controllers and mailers; show `config.action_controller` too) and
+three nits (file labels, heading wording; the literal-Hash override was kept to match the controller guide), all but
+the last applied. No Sol pass: `/tmp/sol` isn't available on this orb. Queued last, after S2 (docs, not correctness).
+App-side fix: reassign (`default_url_options = default_url_options.merge(host: host_url)`), which is the main
+checkout's classification shim.
+
+**SP2 (b): new Canadian time zones.** [`Spree::Api::EnumTypes`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/api/lib/spree/api/enum_types.rb#L15)
+compares the committed `enums.generated.ts` with a fresh render, which on main also lists `America/Edmonton` and
+`America/Inuvik` (1 failure). 38c63e2013 (`Pacific Time (Canada)`, `Alberta`), 05bfe6e33c (`Manitoba`) and 4755ce99ea
+(#59221, `Northwest Territories`) add `TimeZone::MAPPING` entries, each with a CHANGELOG entry.
+
+**SP3 (c), known: mobility 1.3.2's `where!` override no longer sees `where`.** Spree's store API looks up translated
+slugs with [`scope.i18n.find_by!(permalink: id)`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/api/app/controllers/spree/api/v3/store/categories_controller.rb#L31)
+(and `slug` for products). On main the query reads `"spree_categories"."permalink"` instead of joining
+`spree_category_translations` for the locale, so a French slug gives a 404 with no error (2 failures). Bisected to
+c8490688d7 (kamipo's commit in #59634, AR-4: `where` now calls `_where!`); its parent e4852e04bb still joins. This is
+the case already reported as [shioyama/mobility#692](https://github.com/shioyama/mobility/issues/692) (open, no reply);
+kamipo called overriding private APIs "at the gem's own risk". Spree adds a large caller where it is silently wrong
+rather than an error. With a `_where!` hook in mobility's `QueryExtension`
+([mobility_where_shim.rb](../../bench/upstream/app_suites/mobility_where_shim.rb), the fix shape from #692), Spree's
+two controller specs pass 85/85 on main. Record only.
+
+**Deprecations that only main emits** (warnings, all suites, run 1):
+* 192: `` The :preprocessed option is deprecated … Use the :process option `` (3d105fc346, #51951, "Active Storage
+  immediate variants"), from `Spree::Media`'s
+  [`preprocessed: true`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/app/models/spree/media.rb#L129) variants (and
+  [#L151](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/app/models/spree/media.rb#L151)).
+* 56: `exec_insert`/`exec_update`/`exec_delete is deprecated`, from Spree's
+  [`connection.exec_insert(`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/db/migrate/20260809120001_consolidate_metadata_columns.rb#L24)
+  migration, [`consolidate_metadata.rake`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/lib/tasks/consolidate_metadata.rake#L59)
+  and two task specs.
+* 32: `` :active_job was loaded before application initialization `` and the same for `:action_mailer`, the new load
+  hook guard (e7b0236064, #56201; logged by default, `config.action_on_early_load_hook = :log`, no CHANGELOG entry).
+  It comes from Spree's dummy-app template,
+  [`ActionMailer::Base.default from: "spree@example.com"`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/core/lib/generators/spree/dummy/templates/rails/test.rb#L39)
+  in `config/environments/test.rb`, so every Spree extension's test app logs it on each boot. Not on 8-1.
+* With #59574: 69 positional `Arel::Table.new` warnings (above).
+
+**Not pursued:**
+* Spree pins [`json < 3`](https://github.com/spree/spree/blob/b16f63338bf0229794afeaa19db84cd7579972a0/spree/common_spree_dependencies.rb#L13)
+  because "Active Support 8.1 still passes them positionally"; 8-1-stable and main both call `::JSON.parse(json,
+  **options)` in `ActiveSupport::JSON.decode`, so this isn't main-only and wasn't chased.
+* Main's "Missing host to link to!" error still says "set default_url_options[:host]"
+  ([url.rb#L162](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/http/url.rb#L162)),
+  which now reads as advice to do what SP1 makes raise. A possible one-line follow-up; not built (one concern per PR,
+  and it is wording, not breakage).
+* The Meilisearch integration spec (needs a server; Spree's MySQL job skips it too).
