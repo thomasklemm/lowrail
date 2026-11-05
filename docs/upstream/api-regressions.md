@@ -81,7 +81,10 @@ Sol round (coordinator): open with nits, no deprecation or CHANGELOG entry neede
 
 Load order for AR-2 is verified with [`mp_load.rb`](../../bench/upstream/api_regressions/mp_load.rb). Touching `SecurePassword` loads the same 228 files on main and on the patch. `SecurePassword` stays autoloaded, and the bcrypt gem is not loaded.
 
-## AR-4: `where!` and `having!` with bind values (built 2026-11-04, not opened)
+## AR-4: `where!` and `having!` with bind values (merged as rails/rails#59634, 2026-11-05)
+
+**Outcome.** Opened as #59634; kamipo pushed c8490688d7 on top (`where!`/`having!` become splat wrappers around `_where!`/`_having!`, which `where`, `having` and internal callers use directly) and merged it at 03:25 UTC as 06eae38e6e. Direct calls with bind values (Discourse, Canvas, crono_trigger) work again. `where` no longer reaches an overridden `where!`: checked on SQLite, a mobility/acts_as-shaped override rewriting `title` to `title_en` gives `["Hello"]` on 8-1-stable and `no such column: posts.title` on the merged head. kamipo: "overriding private APIs is at the gem's own risk." So mobility's `QueryExtension#where!` and active_record-acts_as's `QueryMethods#where!` must move to `_where!` (or override `where`) before 8.2; not reported to them yet.
+
 
 Branch `thomasklemm/where-bang-binds` @ `e4852e04bb` on rails main `d7875e3fb1` (merges cleanly onto `7a78da5a55`), one commit by Thomas. The change it fixes landed the day before the audit and is in no release.
 
