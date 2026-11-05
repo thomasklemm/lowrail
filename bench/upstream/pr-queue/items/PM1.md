@@ -54,4 +54,4 @@ Instructions do not move: Callgrind, Ruby 4.0.9 interpreter, 2,000 `Post.find` c
 </details>
 
 ---
-<sub>Found while checking which Rails objects lost the 320-byte slot on Ruby master ([record](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/docs/upstream/perf-round-main.md), part of my research project Lowrail).</sub>
+<sub>Found while checking which Rails objects lost the 320-byte slot on Ruby master ([record](https://github.com/thomasklemm/lowrail/blob/9874d3f115aa081699a9e6ec3611e40cc4b3658c/docs/upstream/perf-round-main.md#refresh-on-main-1e235cee11-2026-11-05-evening), part of my research project Lowrail).</sub>
