@@ -1,8 +1,0 @@
-bench/upstream/app_suites/upgrade-guide-8-2-body.md	thomasklemm/upgrade-guide-8-2-notes	UG82
-bench/upstream/app_suites/pi3-body.md	thomasklemm/try-without-kwargs-hash	PI3
-bench/upstream/ecosystem/patches/e2-sqlite-schema-readers-table-name-case.body.md	thomasklemm/sqlite-schema-readers-table-name-case	E2
-bench/upstream/ecosystem/patches/e4-activesupport-minitest-floor.body.md	thomasklemm/activesupport-minitest-floor	E4
-bench/upstream/app_suites/sp1-body.md	thomasklemm/upgrade-guide-frozen-default-url-options	SP1
-bench/upstream/perf_round/a-query-intent-async-state-body.md	thomasklemm/query-intent-async-state	PM1
-bench/upstream/perf_round/b-tag-options-blank-once-body.md	thomasklemm/tag-options-blank-once	PM2
-bench/upstream/perf_round/c-log-subscriber-logger-once-body.md	thomasklemm/log-subscriber-logger-once	PM3
