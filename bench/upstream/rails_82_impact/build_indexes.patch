@@ -1,0 +1,21 @@
+diff --git a/activemodel/lib/active_model/indexed_row.rb b/activemodel/lib/active_model/indexed_row.rb
+index c33d8d92a1..f25806e4da 100644
+--- a/activemodel/lib/active_model/indexed_row.rb
++++ b/activemodel/lib/active_model/indexed_row.rb
+@@ -12,8 +12,14 @@ def [](hash)
+       end
+ 
+       def build_indexes(columns)
+-        index = -1
+-        columns.index_with { index += 1 }
++        indexes = {}
++        index = 0
++        length = columns.length
++        while index < length
++          indexes[columns[index]] = index
++          index += 1
++        end
++        indexes
+       end
+     end
+ 
