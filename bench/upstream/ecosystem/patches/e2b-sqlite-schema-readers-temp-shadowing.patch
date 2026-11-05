@@ -1,4 +1,4 @@
-From 472c680d15e6525152432db4549b23a69058aaaf Mon Sep 17 00:00:00 2001
+From 52c21b2fa4f4b8a13a5b7f041d4ea83b553f21f7 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:41:07 +0000
 Subject: [PATCH] Let a temporary SQLite table or view hide a permanent one in
@@ -13,61 +13,52 @@ temporary table or view has its name, as SQLite does when it resolves a
 name. Temporary indexes and triggers take no part in that, so they hide
 nothing.
 ---
- .../sqlite3/schema_statements.rb              |  6 ++-
- .../adapters/sqlite3/sqlite3_adapter_test.rb  | 52 +++++++++++++++++--
- 2 files changed, 52 insertions(+), 6 deletions(-)
+ .../sqlite3/schema_statements.rb              |  5 +-
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 48 +++++++++++++++++++
+ 2 files changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 64b1bad838..04e603f0f3 100644
+index 64b1bad838..31f932bc30 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -73,9 +73,11 @@ def schema_creation # :nodoc
-           # sqlite_temp_master the temporary ones.
+@@ -70,10 +70,13 @@ def schema_creation # :nodoc
+ 
+         private
+           # sqlite_master lists the permanent objects in the database and
+-          # sqlite_temp_master the temporary ones.
++          # sqlite_temp_master the temporary ones. sqlite_master stays first, as on main,
++          # because index_details takes the first statement it reads for an index name.
            MASTER_CTE = <<~SQL
              WITH master AS (
--              SELECT name, type, sql FROM sqlite_master
--              UNION ALL
-               SELECT name, type, sql FROM sqlite_temp_master
-+              UNION ALL
-+              SELECT name, type, sql FROM sqlite_master
+               SELECT name, type, sql FROM sqlite_master
 +              WHERE type NOT IN ('table', 'view')
 +                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
              )
-           SQL
- 
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index 3dac5cca5f..8b405bc030 100644
+index 3dac5cca5f..c36d00af60 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-@@ -525,9 +525,11 @@ def test_insert_logged
-           tables_query = ["SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND type IN ('table','view')", "SCHEMA", []]
+@@ -526,6 +526,8 @@ def test_insert_logged
            structure_query = [<<~SQL.squish, "SCHEMA", []]
              WITH master AS (
--              SELECT name, type, sql FROM sqlite_master
--              UNION ALL
-               SELECT name, type, sql FROM sqlite_temp_master
-+              UNION ALL
-+              SELECT name, type, sql FROM sqlite_master
+               SELECT name, type, sql FROM sqlite_master
 +              WHERE type NOT IN ('table', 'view')
 +                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
              )
-             SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
-                    t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
-@@ -712,9 +714,11 @@ def test_indexes_logs
-         with_example_table do
+@@ -713,6 +715,8 @@ def test_indexes_logs
            index_list_query = [<<~SQL.squish, "SCHEMA", []]
              WITH master AS (
--              SELECT name, type, sql FROM sqlite_master
--              UNION ALL
-               SELECT name, type, sql FROM sqlite_temp_master
-+              UNION ALL
-+              SELECT name, type, sql FROM sqlite_master
+               SELECT name, type, sql FROM sqlite_master
 +              WHERE type NOT IN ('table', 'view')
 +                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_temp_master
              )
-             SELECT m.name AS table_name, i.name, i."unique"
-             FROM master m
-@@ -892,6 +896,46 @@ def test_no_primary_key
+@@ -892,6 +896,50 @@ def test_no_primary_key
          end
        end
  
@@ -98,13 +89,17 @@ index 3dac5cca5f..8b405bc030 100644
 +      def test_schema_readers_are_not_hidden_by_temporary_indexes_triggers_or_tables_of_other_names
 +        with_example_table "id integer PRIMARY KEY, number integer", "shadowed" do
 +          @conn.add_index "shadowed", :number
++          @conn.add_index "shadowed", :id, name: "partial_index", where: "number > 0"
 +          @conn.execute "CREATE TEMP TABLE index_shadowed_on_number (other integer)"
 +          @conn.execute "CREATE INDEX temp.shadowed ON index_shadowed_on_number (other)"
++          @conn.execute "CREATE INDEX temp.partial_index ON index_shadowed_on_number (other)"
 +          @conn.execute "CREATE TEMP TRIGGER shadowed AFTER INSERT ON main.shadowed BEGIN SELECT 1; END"
 +
 +          assert_equal %w[ id number ], @conn.columns("shadowed").map(&:name)
 +          assert_equal "id", @conn.primary_key("shadowed")
-+          assert_equal [%w[ number ]], @conn.indexes("shadowed").map(&:columns)
++          indexes = @conn.indexes("shadowed").index_by(&:name)
++          assert_equal %w[ number ], indexes["index_shadowed_on_number"].columns
++          assert_equal "number > 0", indexes["partial_index"].where
 +        ensure
 +          @conn.execute "DROP TABLE IF EXISTS temp.index_shadowed_on_number"
 +          @conn.execute "DROP TRIGGER IF EXISTS temp.shadowed"
@@ -115,5 +110,5 @@ index 3dac5cca5f..8b405bc030 100644
        end
  
 -- 
-2.39.5
+2.55.0
 
