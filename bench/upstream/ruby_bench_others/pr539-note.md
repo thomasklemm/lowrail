@@ -1,4 +1,4 @@
-Draft note for ruby/ruby-bench#539 (luke-gruber, approved by eightbitraptor). Not posted; needs Thomas's OK.
+Draft note for ruby/ruby-bench#539 (luke-gruber, approved by eightbitraptor). Thomas OK (2026-11-05): post once our own ruby-bench PRs are ready; recheck the fix on the then-current main first.
 Diagnosis and verification: [README](README.md#539-gc_balloon).
 
 ---
