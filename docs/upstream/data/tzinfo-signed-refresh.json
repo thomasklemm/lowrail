@@ -1,0 +1,967 @@
+{
+  "head": "57056ddd7f46f9c292e46687821636e812102c85",
+  "base": "1207d6098d7f4a9f294a40801154990850f09bf1",
+  "tests_workflow": "https://github.com/thomasklemm/tzinfo/actions/runs/42121909175",
+  "differential_workflow": "https://github.com/thomasklemm/tzinfo/actions/runs/42122136308",
+  "verified_x86_workflow": "https://github.com/thomasklemm/tzinfo/actions/runs/42122881130",
+  "matrix": [
+    {
+      "configuration": "2.3 on ubuntu-24.04",
+      "ruby": "ruby 2.3.8p459 (2018-10-18 revision 65136) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "2.3 on windows-2022",
+      "ruby": "ruby 2.3.3p222 (2016-11-21 revision 56859) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "2.4 on ubuntu-24.04",
+      "ruby": "ruby 2.4.10p364 (2020-03-31 revision 67879) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "2.4 on windows-2022",
+      "ruby": "ruby 2.4.10p364 (2020-03-31 revision 67879) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "2.5 on ubuntu-24.04",
+      "ruby": "ruby 2.5.9p229 (2021-04-05 revision 67939) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "2.5 on windows-2022",
+      "ruby": "ruby 2.5.9p229 (2021-04-05 revision 67939) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "2.6 on ubuntu-24.04",
+      "ruby": "ruby 2.6.10p210 (2022-04-12 revision 67958) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "2.6 on windows-2022",
+      "ruby": "ruby 2.6.10p210 (2022-04-12 revision 67958) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "2.7 on ubuntu-24.04",
+      "ruby": "ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "2.7 on windows-2022",
+      "ruby": "ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "3.0 on ubuntu-24.04",
+      "ruby": "ruby 3.0.7p220 (2024-04-23 revision 724a071175) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "3.0 on windows-2022",
+      "ruby": "ruby 3.0.7p220 (2024-04-23 revision 724a071175) [x64-mingw32]",
+      "identical": true
+    },
+    {
+      "configuration": "3.1 on ubuntu-24.04",
+      "ruby": "ruby 3.1.7p261 (2025-03-26 revision 0a3704f218) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "3.1 on windows-2022",
+      "ruby": "ruby 3.1.7p261 (2025-03-26 revision 0a3704f218) [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "3.2 on ubuntu-24.04",
+      "ruby": "ruby 3.2.11 (2026-03-27 revision 5483bfc1ae) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "3.2 on windows-2022",
+      "ruby": "ruby 3.2.11 (2026-03-27 revision 5483bfc1ae) [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "3.3 on ubuntu-24.04",
+      "ruby": "ruby 3.3.13 (2026-10-23 revision af48f08f21) [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "3.3 on windows-2022",
+      "ruby": "ruby 3.3.13 (2026-10-23 revision af48f08f21) [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "3.4 on ubuntu-24.04",
+      "ruby": "ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "3.4 on windows-2022",
+      "ruby": "ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "4.0 on ubuntu-24.04",
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "4.0 on windows-2022",
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "head on ubuntu-24.04 (experimental)",
+      "ruby": "ruby 4.1.0dev (2026-11-05T19:05:47Z HEAD cd4f33f0bb) +PRISM [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "head on windows-2022 (experimental)",
+      "ruby": "ruby 4.1.0dev (2026-10-30 master 64ae80dd36) +PRISM [x64-mingw-ucrt]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-10.0 on ubuntu-24.04",
+      "ruby": "jruby 10.0.7.0 (3.4.5) 2026-09-21 06989ab73b OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-10.0 on windows-2022",
+      "ruby": "jruby 10.0.7.0 (3.4.5) 2026-09-21 06989ab73b OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-mswin32]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-10.1 on ubuntu-24.04",
+      "ruby": "jruby 10.1.2.0 (4.0.0) 2026-09-21 36cf8bbe87 OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-10.1 on windows-2022",
+      "ruby": "jruby 10.1.2.0 (4.0.0) 2026-09-21 36cf8bbe87 OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-mswin32]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.1 on ubuntu-24.04",
+      "ruby": "jruby 9.1.17.0 (2.3.3) 2018-04-20 d8b1ff9 OpenJDK 64-Bit Server VM 11.0.32.1+1 on 11.0.32.1+1 +jit [linux-x86_64]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.1 on windows-2022",
+      "ruby": "jruby 9.1.17.0 (2.3.3) 2018-04-20 d8b1ff9 OpenJDK 64-Bit Server VM 25.504-b01 on 1.8.0_504-b01 +jit [mswin32-x86_64]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.2 on ubuntu-24.04",
+      "ruby": "jruby 9.2.21.0 (2.5.8) 2022-06-27 49e5080a7c OpenJDK 64-Bit Server VM 11.0.32.1+1 on 11.0.32.1+1 +jit [linux-x86_64]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.2 on windows-2022",
+      "ruby": "jruby 9.2.21.0 (2.5.8) 2022-06-27 49e5080a7c OpenJDK 64-Bit Server VM 25.504-b01 on 1.8.0_504-b01 +jit [mswin32-x86_64]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.3 on ubuntu-24.04",
+      "ruby": "jruby 9.3.15.0 (2.6.8) 2024-06-26 28bea01242 OpenJDK 64-Bit Server VM 17.0.21+9 on 17.0.21+9 +jit [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.3 on windows-2022",
+      "ruby": "jruby 9.3.15.0 (2.6.8) 2024-06-26 28bea01242 OpenJDK 64-Bit Server VM 25.504-b01 on 1.8.0_504-b01 +jit [x86_64-mswin32]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.4 on ubuntu-24.04",
+      "ruby": "jruby 9.4.15.0 (3.1.7) 2026-06-08 6114208a31 OpenJDK 64-Bit Server VM 17.0.21+9 on 17.0.21+9 +jit [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-9.4 on windows-2022",
+      "ruby": "jruby 9.4.15.0 (3.1.7) 2026-06-08 6114208a31 OpenJDK 64-Bit Server VM 25.504-b01 on 1.8.0_504-b01 +jit [x86_64-mswin32]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-head on ubuntu-24.04 (experimental)",
+      "ruby": "jruby 10.1.4.0-SNAPSHOT (4.0.9) 2026-11-05 33a37609f3 OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-linux]",
+      "identical": true
+    },
+    {
+      "configuration": "jruby-head on windows-2022 (experimental)",
+      "ruby": "jruby 10.1.4.0-SNAPSHOT (4.0.9) 2026-11-05 33a37609f3 OpenJDK 64-Bit Server VM 21.0.13+9-LTS on 21.0.13+9-LTS +indy +jit [x86_64-mswin32]",
+      "identical": true
+    },
+    {
+      "configuration": "truffleruby-40 on ubuntu-24.04 (experimental)",
+      "ruby": "truffleruby 40.0.0 (2026-09-17), like ruby 4.0.2, Oracle GraalVM Native [x86_64-linux]",
+      "identical": true
+    }
+  ],
+  "local_suite": {
+    "runs": [
+      1867,
+      1865,
+      1865
+    ],
+    "assertions": [
+      13260,
+      13258,
+      13258
+    ],
+    "failures": 0,
+    "errors": 0,
+    "skips_per_suite": 22,
+    "named_outcomes_match": true,
+    "outcomes_sha256": "bfb34c178655ca70984642bd6efafeddf99b80ac0afc77b32713ffb285685da9"
+  },
+  "allocations": {
+    "base": {
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "tzinfo": "2.0.6",
+      "source_sha256": "a818fbbf1085edb82db7687546dfc853602be803e1901a84a3c9765d225a1f30",
+      "yjit": false,
+      "zjit": false,
+      "scope": "allocations only; whole TZif read; synthetic public fixtures",
+      "measurements": [
+        {
+          "case": "format1_control",
+          "operations": 2000,
+          "objects_per_read": 37.0005
+        },
+        {
+          "case": "positive_32",
+          "operations": 2000,
+          "objects_per_read": 160.0
+        },
+        {
+          "case": "negative_32",
+          "operations": 2000,
+          "objects_per_read": 288.0
+        },
+        {
+          "case": "signed_boundaries",
+          "operations": 2000,
+          "objects_per_read": 72.0
+        },
+        {
+          "case": "empty_control",
+          "operations": 2000,
+          "objects_per_read": 30.0
+        }
+      ]
+    },
+    "base-aa": {
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "tzinfo": "2.0.6",
+      "source_sha256": "a818fbbf1085edb82db7687546dfc853602be803e1901a84a3c9765d225a1f30",
+      "yjit": false,
+      "zjit": false,
+      "scope": "allocations only; whole TZif read; synthetic public fixtures",
+      "measurements": [
+        {
+          "case": "format1_control",
+          "operations": 2000,
+          "objects_per_read": 37.0005
+        },
+        {
+          "case": "positive_32",
+          "operations": 2000,
+          "objects_per_read": 160.0
+        },
+        {
+          "case": "negative_32",
+          "operations": 2000,
+          "objects_per_read": 288.0
+        },
+        {
+          "case": "signed_boundaries",
+          "operations": 2000,
+          "objects_per_read": 72.0
+        },
+        {
+          "case": "empty_control",
+          "operations": 2000,
+          "objects_per_read": 30.0
+        }
+      ]
+    },
+    "tzinfo": {
+      "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "tzinfo": "2.0.6",
+      "source_sha256": "665dc7295335d8cb84c7445891b314c45a6a0466a3f2b88d5c9f6f53b9474589",
+      "yjit": false,
+      "zjit": false,
+      "scope": "allocations only; whole TZif read; synthetic public fixtures",
+      "measurements": [
+        {
+          "case": "format1_control",
+          "operations": 2000,
+          "objects_per_read": 37.0005
+        },
+        {
+          "case": "positive_32",
+          "operations": 2000,
+          "objects_per_read": 160.0
+        },
+        {
+          "case": "negative_32",
+          "operations": 2000,
+          "objects_per_read": 160.0
+        },
+        {
+          "case": "signed_boundaries",
+          "operations": 2000,
+          "objects_per_read": 60.0
+        },
+        {
+          "case": "empty_control",
+          "operations": 2000,
+          "objects_per_read": 30.0
+        }
+      ]
+    }
+  },
+  "instructions": {
+    "accepted": false,
+    "aa_tolerance_percent": 0.1,
+    "speed_claim": false,
+    "scope": "synthetic whole-file reads, interpreter, GC disabled",
+    "heap_floors": [
+      1000000,
+      250000,
+      100000,
+      20000,
+      10000
+    ],
+    "warmup_reads": 3000,
+    "heap_growth": false,
+    "gc_count_delta": 0,
+    "brk_overflow": false,
+    "tool": {
+      "version": "3.19.0",
+      "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+      "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+      "brk_reservation_mib": 512,
+      "tool": "libexec/valgrind/callgrind-amd64-linux",
+      "tool_sha256": "e02fd73961ef931df125180ffbe5d51a468393b22212841843317c815d3be67c",
+      "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+      "libc": "glibc 2.36"
+    },
+    "samples": [
+      {
+        "case": "format1_control",
+        "repeat": 1,
+        "ir_per_read": {
+          "base": 77278.502,
+          "base-aa": 77193.884,
+          "tzinfo": 77194.884
+        },
+        "aa_percent": -0.10949746412007855,
+        "aa_pass": false,
+        "workers": {
+          "base-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            77283001
+          ],
+          "base-aa-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            77198383
+          ],
+          "tzinfo-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            77199383
+          ]
+        }
+      },
+      {
+        "case": "format1_control",
+        "repeat": 2,
+        "ir_per_read": {
+          "base": 77280.502,
+          "base-aa": 77189.569,
+          "tzinfo": 77275.884
+        },
+        "aa_percent": -0.11766616112300898,
+        "aa_pass": false,
+        "workers": {
+          "base-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            77285001
+          ],
+          "base-aa-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            77194068
+          ],
+          "tzinfo-0": {
+            "case": "format1_control",
+            "operations": 0,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "format1_control",
+            "operations": 1000,
+            "heap_pages": 165,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            77280383
+          ]
+        }
+      },
+      {
+        "case": "positive_32",
+        "repeat": 1,
+        "ir_per_read": {
+          "base": 436918.575,
+          "base-aa": 436949.733,
+          "tzinfo": 396639.073
+        },
+        "aa_percent": 0.007131305873175897,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4384,
+            436922959
+          ],
+          "base-aa-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4497,
+            436954230
+          ],
+          "tzinfo-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4384,
+            396643457
+          ]
+        }
+      },
+      {
+        "case": "positive_32",
+        "repeat": 2,
+        "ir_per_read": {
+          "base": 436933.286,
+          "base-aa": 436261.759,
+          "tzinfo": 396639.073
+        },
+        "aa_percent": -0.1536909687397947,
+        "aa_pass": false,
+        "workers": {
+          "base-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4384,
+            436937670
+          ],
+          "base-aa-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4471,
+            436266230
+          ],
+          "tzinfo-0": {
+            "case": "positive_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "positive_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4384,
+            396643457
+          ]
+        }
+      },
+      {
+        "case": "negative_32",
+        "repeat": 1,
+        "ir_per_read": {
+          "base": 498351.307,
+          "base-aa": 498368.358,
+          "tzinfo": 397184.311
+        },
+        "aa_percent": 0.003421481946674909,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 710,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 710,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4384,
+            498355691
+          ],
+          "base-aa-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 709,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 709,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4422,
+            498372780
+          ],
+          "tzinfo-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4422,
+            397188733
+          ]
+        }
+      },
+      {
+        "case": "negative_32",
+        "repeat": 2,
+        "ir_per_read": {
+          "base": 497664.445,
+          "base-aa": 497690.441,
+          "tzinfo": 397184.311
+        },
+        "aa_percent": 0.005223600010251239,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 710,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 710,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4384,
+            497668829
+          ],
+          "base-aa-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 709,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 709,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4422,
+            497694863
+          ],
+          "tzinfo-0": {
+            "case": "negative_32",
+            "operations": 0,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "negative_32",
+            "operations": 1000,
+            "heap_pages": 503,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4422,
+            397188733
+          ]
+        }
+      },
+      {
+        "case": "signed_boundaries",
+        "repeat": 1,
+        "ir_per_read": {
+          "base": 141936.87,
+          "base-aa": 141951.827,
+          "tzinfo": 128229.86
+        },
+        "aa_percent": 0.010537783452591043,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            141941369
+          ],
+          "base-aa-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            141956326
+          ],
+          "tzinfo-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 227,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 227,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            128234359
+          ]
+        }
+      },
+      {
+        "case": "signed_boundaries",
+        "repeat": 2,
+        "ir_per_read": {
+          "base": 141792.87,
+          "base-aa": 141805.827,
+          "tzinfo": 128323.309
+        },
+        "aa_percent": 0.009137977107021023,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            141797369
+          ],
+          "base-aa-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 249,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            141810326
+          ],
+          "tzinfo-0": {
+            "case": "signed_boundaries",
+            "operations": 0,
+            "heap_pages": 227,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "signed_boundaries",
+            "operations": 1000,
+            "heap_pages": 227,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            128327808
+          ]
+        }
+      },
+      {
+        "case": "empty_control",
+        "repeat": 1,
+        "ir_per_read": {
+          "base": 59065.956,
+          "base-aa": 59131.451,
+          "tzinfo": 59137.848
+        },
+        "aa_percent": 0.11088451696270596,
+        "aa_pass": false,
+        "workers": {
+          "base-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            59070455
+          ],
+          "base-aa-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            59135950
+          ],
+          "tzinfo-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            59142347
+          ]
+        }
+      },
+      {
+        "case": "empty_control",
+        "repeat": 2,
+        "ir_per_read": {
+          "base": 59083.956,
+          "base-aa": 59110.389,
+          "tzinfo": 59137.848
+        },
+        "aa_percent": 0.04473803345192984,
+        "aa_pass": true,
+        "workers": {
+          "base-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-raw-Ir": [
+            4499,
+            59088455
+          ],
+          "base-aa-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-aa-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "base-aa-raw-Ir": [
+            4499,
+            59114888
+          ],
+          "tzinfo-0": {
+            "case": "empty_control",
+            "operations": 0,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "tzinfo-1000": {
+            "case": "empty_control",
+            "operations": 1000,
+            "heap_pages": 131,
+            "gc_count_delta": 0
+          },
+          "tzinfo-raw-Ir": [
+            4499,
+            59142347
+          ]
+        }
+      }
+    ]
+  }
+}
