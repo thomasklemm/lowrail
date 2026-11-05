@@ -14,9 +14,9 @@ alternative_of:
 impact: LogSubscriber#consumes? −17% and EventReporter#emitting? −13% instructions per call; Action Controller asks emitting? twice per action
 rank: 13
 risky: false
-state: draft
+state: held
 pr: 59674
-note: "reviewed: skeptic and Sol approve on defa5dc860 under the contract, carried to 793a635e4b (same tree, Amp trailer removed) (logger snapshot disclosed, private helper arity stated); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: private log_level_satisfied? arity change, test description, A/A within 0.12%, 81d95a3f74 and the Method section; in docs/upstream/perf-round-main.md (Refresh on main 1e235cee11 and Second round)"
+note: "parked idea: #59674 closed 2026-11-05 (Thomas), exact and reviewed but too small to move a whole request; not to be reopened as is. Branch kept"
 passes:
   - {reviewer: sol, head: "cec8010a8b", date: 2026-11-05, verdict: changes, open: "first review: disclosure, arity, numbers, links; applied in the body"}
   - {reviewer: skeptic, head: "cec8010a8b", date: 2026-11-05, verdict: approve, open: ""}

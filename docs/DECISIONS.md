@@ -365,6 +365,8 @@ Thomas before posting.
   many apps or a widely used gem, or a whole request, test run or ruby-bench benchmark moves measurably. Small
   per-call wins in niche gems or rare paths, and fixes for niche gems (scimitar#172 was the example), are recorded,
   not opened. Every item states its reach in `impact` (who runs it, how often, how much of a request) before review.
+  Such ideas stay with us as `held` queue items ("parked idea" in the note) and are not opened later as they are;
+  #59673 PM1, #59674 PM3 and #59677 CB2 were closed on 11-05 for this reason.
 * **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs.
 
 ## Bets

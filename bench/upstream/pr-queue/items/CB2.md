@@ -14,9 +14,9 @@ alternative_of:
 impact: one Array fewer per symbol around callback; 1.2% fewer interpreter instructions per callback run on Ruby 4.0.9
 rank: 14
 risky: false
-state: draft
+state: held
 pr: 59677
-note: "Queue only; coordinator Sol pending. Nodoc call-template tuple changes, so internal overrides must adapt. Block interpreter result is marginal versus A/A; object interpreter Ir is +0.10%. JIT controls, test totals, pins and reproduction: docs/upstream/census-backlog.md, 2026-11-05 night refresh. Body shortened under the new rule; no upstream action."
+note: "parked idea: #59677 closed 2026-11-05 (Thomas), exact and reviewed but too small to move a whole request; not to be reopened as is. Branch kept"
 passes:
   - {reviewer: skeptic, head: "ced306c8a8b827f538b4b6f0fbeefc1264e94f8f", date: 2026-11-05, verdict: nits, open: "No correctness blockers; medians, harness links and marginal block row wording applied. Additional 201 public-API differential cases identical."}
   - {reviewer: sol, head: "ced306c8a8", date: 2026-11-05, verdict: nits, open: "no public behaviour difference (83 + 58 probes); table scope and headings clarified in the body, applied"}
