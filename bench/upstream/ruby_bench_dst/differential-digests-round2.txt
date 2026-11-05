@@ -1,0 +1,16 @@
+main-0.txt 8673290 3acdc07c1e87eca33eac080f54d0f01935a1280db2abb5549a051abeb86b641f {"periods_1" => 8299209, refetch: 4693907, "periods_0" => 113131, "periods_2" => 260070}
+main-1.txt 9830474 5e3446235e69492c4538bf11e81ce5ef604076977f4beaec098f10a2347acae0 {"periods_1" => 9418089, refetch: 5394976, "periods_0" => 116616, "periods_2" => 294889}
+main-2.txt 9716822 2c9feea4fb20129ee8aab71e45085586445ef641db110076097194e35bc8fb85 {"periods_1" => 9298430, refetch: 5285667, "periods_0" => 123984, "periods_2" => 293528}
+main-3.txt 10956662 322bb65d89e33623960cc27c48d93fb2f79fccea962fca418330219bfbce2fdc {"periods_1" => 10482847, refetch: 6017834, "periods_0" => 134390, "periods_2" => 338545}
+main-4.txt 8223848 7b0a76cc02c75e7fb41c6134288cc1901400b9677ff5002c5f20d4029867480e {"periods_1" => 7872646, refetch: 4469496, "periods_0" => 101407, "periods_2" => 248915}
+main-5.txt 8709452 648883c5c319504eba1d11b3aefd3aa4ec4d7eaffc1e6a09dd89f1c9b53d3d67 {"periods_1" => 8343624, refetch: 4794872, "periods_0" => 109856, "periods_2" => 255092}
+main-6.txt 11312196 a7541616cfda0f360745b4bc42045de903b1d16d76a0b0c85141f20c835d23b4 {"periods_1" => 10832974, refetch: 6178080, "periods_0" => 136047, "periods_2" => 342335}
+main-7.txt 9746898 6c8c11a70e58833197b735d58ba3078787e267a1dec258241a5e0137ef05f6b5 {"periods_1" => 9328661, refetch: 5312933, "periods_0" => 121636, "periods_2" => 295761}
+mainfix-0.txt 8673290 3acdc07c1e87eca33eac080f54d0f01935a1280db2abb5549a051abeb86b641f {"periods_1" => 8299209, refetch: 2662881, "periods_0" => 113131, "periods_2" => 260070}
+mainfix-1.txt 9830474 5e3446235e69492c4538bf11e81ce5ef604076977f4beaec098f10a2347acae0 {"periods_1" => 9418089, refetch: 3055393, "periods_0" => 116616, "periods_2" => 294889}
+mainfix-2.txt 9716822 2c9feea4fb20129ee8aab71e45085586445ef641db110076097194e35bc8fb85 {"periods_1" => 9298430, refetch: 3001747, "periods_0" => 123984, "periods_2" => 293528}
+mainfix-3.txt 10956662 322bb65d89e33623960cc27c48d93fb2f79fccea962fca418330219bfbce2fdc {"periods_1" => 10482847, refetch: 3415173, "periods_0" => 134390, "periods_2" => 338545}
+mainfix-4.txt 8223848 7b0a76cc02c75e7fb41c6134288cc1901400b9677ff5002c5f20d4029867480e {"periods_1" => 7872646, refetch: 2535754, "periods_0" => 101407, "periods_2" => 248915}
+mainfix-5.txt 8709452 648883c5c319504eba1d11b3aefd3aa4ec4d7eaffc1e6a09dd89f1c9b53d3d67 {"periods_1" => 8343624, refetch: 2718703, "periods_0" => 109856, "periods_2" => 255092}
+mainfix-6.txt 11312196 a7541616cfda0f360745b4bc42045de903b1d16d76a0b0c85141f20c835d23b4 {"periods_1" => 10832974, refetch: 3504023, "periods_0" => 136047, "periods_2" => 342335}
+mainfix-7.txt 9746898 6c8c11a70e58833197b735d58ba3078787e267a1dec258241a5e0137ef05f6b5 {"periods_1" => 9328661, refetch: 3016176, "periods_0" => 121636, "periods_2" => 295761}

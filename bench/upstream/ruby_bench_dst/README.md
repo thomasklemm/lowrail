@@ -14,3 +14,7 @@
 Which file holds which column: `ir-micro-final.txt` main vs the final head (`v2`), `ir-micro-81.txt` 8-1-stable vs
 8-1 + fix (`s81fix`, the final `time_with_zone.rb` lines), `ir-micro-round1.txt` the first, rejected shape
 (`periods.one?` checked first), `ir-tzinfo-shortcut.txt` tzinfo master vs `2b2f4b45`.
+
+Round 2 (head `6993c9b20b`): `ir-micro-round2.txt` main vs the head, `differential-digests-round2.txt` the
+differential with real `DateTime` receivers (Julian and ITALY start) and `change(offset:)` into DST zones,
+`as_s81new.rb` the head's methods for lobsters on 8-1-stable, `pr-body.md` the PR body draft.

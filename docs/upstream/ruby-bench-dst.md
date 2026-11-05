@@ -13,9 +13,10 @@ different period than its receiver, which is what crossing a DST change means. l
 uses 7- to 90-day lookbacks, so on dates where those lookbacks cross a change it does 1,476 extra tzinfo lookups per
 pass, about 6 objects and 24K instructions each.
 
-A two-line fix in Active Support removes the second lookup and gives identical results:
+A small fix in Active Support removes the second lookup for `Time` results and gives identical results:
 branch [`thomasklemm/twz-reuse-local-period`](https://github.com/thomasklemm/rails/tree/thomasklemm/twz-reuse-local-period)
-at `4779066d80` on rails/rails main `1e235cee11`. With it, lobsters on 2026-11-05 allocates the same as on a date
+at `6993c9b20b` on rails/rails main `1e235cee11` (the first head, `4779066d80`, was wrong for Julian-calendar
+`DateTime`s; see [round 2](#round-2-sol-and-astra-julian-datetimes)). With it, lobsters on 2026-11-05 allocates the same as on a date
 without crossings (648.9K), and a lookback across a DST change costs 29–39% fewer instructions in micro-benchmarks.
 Nothing is opened upstream.
 
@@ -131,11 +132,16 @@ expensive per operation overall.
 ```diff
      def change(options)
 -      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : nil)
-+      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : (periods.first if periods.one?))
++      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : single_period(periods, new_time))
  ...
++      # TZInfo reads a DateTime by its Julian day, which needn't match the civil fields the constructor looks up.
++      def single_period(periods, time)
++        periods.first if periods.one? && time.is_a?(::Time)
++      end
++
        def wrap_with_time_zone(time)
 -          self.class.new(nil, time_zone, time, periods.include?(period) ? period : nil)
-+          self.class.new(nil, time_zone, time, periods.include?(period) ? period : (periods.first if periods.one?))
++          self.class.new(nil, time_zone, time, periods.include?(period) ? period : single_period(periods, time))
  ...
      def periods_for_local(time) # :nodoc:
 -      tzinfo.periods_for_local(time)
@@ -143,10 +149,12 @@ expensive per operation overall.
      end
 ```
 
-When the receiver's period doesn't apply and the local time has exactly one period, that period is passed on; it
-equals what the constructor would find, since both lookups see the same wall-clock second
-(`Timestamp.for(t, :ignore)` and `transfer_time_values_to_utc_constructor` read the same fields, and sub-seconds
-can't cross a whole-second transition). Gaps (no period: the constructor's +1 hour retry) and overlaps (two
+When the receiver's period doesn't apply, the result is a `Time` and its local time has exactly one period, that
+period is passed on; it is equal (not identical) to what the constructor would find, since for a `Time` both lookups
+see the same wall-clock second (`Timestamp.for(t, :ignore)` uses `to_i + utc_offset`,
+`transfer_time_values_to_utc_constructor` the civil fields of the same instant, and sub-seconds can't cross a
+whole-second transition). A `DateTime` keeps the old path: tzinfo reads it by its Julian day, while the constructor
+converts a non-UTC one by its civil fields, and the two differ for a Julian-calendar `DateTime`. Gaps (no period: the constructor's +1 hour retry) and overlaps (two
 periods: `period_for_local`'s DST preference and `periods.last`) keep the old path. The `periods_for_local` shortcut
 makes zones without transitions return their memoized period, as `period_for_utc` and `period_for_local` already
 do on main, so results in UTC keep sharing one frozen period object instead of a new one per result.
@@ -158,16 +166,18 @@ do on main, so results in UTC keep sharing one frozen period object instead of a
   Kiritimati, Gaza, Godthab, Lisbon, Tehran, Chatham, Havana), every transition from 1900 to 2045, 57 offsets around
   each (both sides of each boundary, ±1 s, ±0.5–26 h) with a 1/3-second fraction, 30 operations (day/week/month/year
   arithmetic, `beginning_of_*`, `change(hour: 0..3, min:, sec:, usec:)`, `change(zone:)` into five zones,
-  `change(offset:)`, chains, ranges), `Time`- and `DateTime`-backed receivers. Each line records inspect, utc,
-  local fields, offset, `dst?`, abbreviation, zone and the period's transitions, or the exception. **Main vs fix:
-  identical SHA-256 in all 8 shards, 30,589,164 results; 8-1-stable vs 8-1 + fix: identical in all 8 shards,
-  29,126,088 results**; with tzinfo-data 1.2026.6's Ruby data source instead of the system zoneinfo, identical in
-  shards 0 and 3 (7,253,820 results). The fix removes 1.19M of 1.33M second lookups in shard 0; what remains are gaps and overlaps.
+  `change(offset:)`, chains, ranges). Each line records inspect, utc, local fields, offset, `dst?`, abbreviation,
+  zone and the period's transitions, or the exception. Round 1 (head `4779066d80`): main vs fix identical SHA-256
+  in all 8 shards, 30,589,164 results; 8-1-stable vs 8-1 + fix identical in all 8 shards, 29,126,088 results; with
+  tzinfo-data 1.2026.6's Ruby data source instead of the system zoneinfo, identical in shards 0 and 3 (7,253,820
+  results). **Those runs had no `DateTime` receivers**: `TimeWithZone.new(datetime, zone)` turns a `DateTime` into a
+  `Time` (`transfer_time_values_to_utc_constructor`), so the "DateTime" receivers were `Time`s. Round 2's script and
+  results are below.
 * Active Support's time tests (`time_with_zone_test.rb`, `time_ext_test.rb`, `date_time_ext_test.rb`,
   `date_ext_test.rb`, `time_zone_test.rb`, `duration_test.rb`, `date_and_time_compatibility_test.rb`): 1,281 runs,
   0 failures; RuboCop clean. Two wrong variants fail existing tests (`test_change_at_dst_boundary`,
   `test_round_at_dst_boundary`): always taking `periods.first`, and dropping the reuse of the receiver's period.
-  No new test: the change gives the same values, which these tests and the differential cover.
+  Round 2 adds a regression test for the Julian case.
 
 **Reviews.** Skeptical subagent, three passes:
 
@@ -183,8 +193,55 @@ do on main, so results in UTC keep sharing one frozen period object instead of a
    in constant zones `periods_for_local(nil)` (`:nodoc:`, never called so by Rails) returns the period instead of
    raising `ArgumentError`.
 
-Sol (`codex exec -m gpt-6.1-sol`) and Astra (`-m gpt-6-astra`) have **not** run: this orb has no Codex CLI and no
-OpenAI credentials. Per DECISIONS they are the coordinator's passes on head `4779066d80`.
+Sol (`codex exec -m gpt-6.1-sol`) and Astra (`-m gpt-6-astra`) ran in the coordinator's orb (this orb has no Codex
+CLI); see round 2.
+
+### Round 2: Sol and Astra, Julian DateTimes
+
+On `4779066d80` both returned "changes" with the same must-fix, found independently: for a `DateTime` whose
+calendar is Julian, `periods.first` is not the period the constructor picks. tzinfo's `Timestamp.for_datetime`
+(`timestamp.rb:231`) counts from the Julian day, while the constructor converts a non-UTC `DateTime` with
+`Time.utc(year, month, …)` from its civil fields, which are 13 days behind in 2026. Such a `DateTime` with a nonzero
+offset only comes from `change(offset:)` or `change(zone:)`; with offset 0 the constructor keeps the `DateTime` and
+both read the Julian day. Reproduced on Ruby 4.0.9:
+
+```ruby
+t = ActiveSupport::TimeWithZone.new(nil, ActiveSupport::TimeZone["America/New_York"], DateTime.new(2026, 10, 20, 12, 0, 0, 0, Date::JULIAN))
+t.change(offset: Rational(1, 24))  # main: 12:00 CEST +02:00 (10:00 UTC); 4779066d80: 12:00 CET +01:00 (11:00 UTC)
+t = ActiveSupport::TimeWithZone.new(nil, ActiveSupport::TimeZone["UTC"], DateTime.new(2026, 10, 25, 12, 0, 0, 0, Date::JULIAN))
+t.change(offset: "-07:00")         # main: MDT -06:00 (18:00 UTC); 4779066d80: MST -07:00 (19:00 UTC)
+```
+
+Fix: pass the single period on only for a `Time` result (`single_period`); `DateTime` results keep main's nil path
+exactly. Other findings: should-fix, disclose in the body that `TimeZone#periods_for_local` (`:nodoc:`) returns the
+shared cached period for constant zones and skips tzinfo's argument check (`periods_for_local(nil)` raises on main,
+returns an array on the head); nits, the commit message now says "equal to", and speed claims are scoped to
+Callgrind instructions of the measured operations. Astra found no other difference over 252 ordinary cases.
+
+Head after round 2: `6993c9b20b`.
+
+* **Regression test** `test_change_offset_of_julian_datetime_across_dst_boundary` asserts main's offset, zone
+  abbreviation, `dst?` and UTC for the first case; it fails on `4779066d80` (`Expected: 7200, Actual: 3600`) and
+  passes on main and the new head. Time tests: 1,282 runs, 0 failures; RuboCop clean.
+* **Differential with real `DateTime` receivers.** `dst_compare.rb` now builds them through the local path
+  (`new(nil, zone, datetime)`, asserting `time.is_a?(DateTime)`), as ITALY-start (Gregorian after 1582) and Julian
+  `DateTime`s at 33 of the offsets around each transition, adds `change(offset:)` into ten offsets whose zones have
+  DST, and adds ITALY-start receivers from 1400 to 1582-10-15 (Julian before the reform) with jumps of 400–444 years
+  into the transition era. On New York, Berlin and UTC it finds 15,231 differences between main and `4779066d80`,
+  all Julian receivers with `change(offset:)`, and none between main and the new head (2,105,322 results). The ITALY
+  receivers before 1582 never differ: the earliest tzdata transition is 1834 (Europe/Amsterdam), so all such dates lie in one period.
+  Full run, main vs `6993c9b20b`: identical SHA-256 in all 8 shards, 77,169,642 results; the head skips 18.2M of
+  main's 42.1M second lookups (the rest are `DateTime` results, gaps and overlaps).
+* **Instructions** (same micro-benchmarks as above, main vs `6993c9b20b`): crossing a DST change, `70.days.ago` 83,469/83,550 → 60,140 (−28%), `1.day.ago` 85,821/85,740 →
+  61,194/61,275 (−29%), `beginning_of_day` 63,620 → 39,126 (−38%), `change(month:)` 62,082/62,121 → 38,696/38,734
+  (−38%); UTC `70.days.ago` 45,446 → 36,486/36,567 (−20%); in the same period, `70.days.ago` 66,554 →
+  66,617/66,698, `beginning_of_day` 43,723/43,750 → 43,786, a fresh receiver's `beginning_of_day` 67,669/67,696 →
+  67,732/67,759, Tokyo 58,024/58,105 → 58,168 (within about 100 instructions; repeats differ by up to 81). With
+  the helper called on every wrap (`6b667cb848`) the same-period cases were 150–310 instructions above main, so the
+  `include?` check stays inline.
+* **lobsters** (8-1-stable with the new `time_with_zone.rb` methods redefined after boot, one pass after two
+  warmups): 657,778 → 648,805 objects per pass on 2026-11-05 with 0 second lookups; 648,888 → 648,893 on
+  2027-06-28.
 
 ## tzinfo: comparing equal periods is slow
 
@@ -212,12 +269,12 @@ covers the DST cost that started this.
 
 ## Recommendation
 
-* **Open the Active Support fix** as a rails/rails PR (draft, when Thomas asks), from head `4779066d80`, after the
-  Sol and Astra passes. Body: the mechanism above in three paragraphs, the micro table (main and 8-1-stable), the
-  lobsters allocation numbers (657.9K → 648.9K on 2026-11-05, unchanged on 2027-06-28), and the differential. It
-  qualifies as L1 (one unusual but clear ternary; per-call CPU gain far outside the A/A).
-* **tzinfo**: keep as a lead; propose only if a Rails maintainer or tzinfo shows interest, since tzinfo releases
-  rarely.
+* **Queue the Active Support fix** as a rails/rails draft from head `6993c9b20b` once Sol and Astra approve it
+  (rails/rails is at the 20-open cap; drafts may open overnight, only Thomas marks them ready). Body: two short
+  paragraphs (what is wasted and why; what changes and that results are the same, including the
+  `periods_for_local` note for constant zones) and one table in Callgrind instructions; no lobsters speed claim. Readability L1 (one small private helper). Body draft, written to DECISIONS'
+  "Bodies for humans, short": [`pr-body.md`](../../bench/upstream/ruby_bench_dst/pr-body.md).
+* **tzinfo**: the `==` shortcut is now owned by T2 (its own orb); not part of this change.
 * **ruby-bench**: the fixed-clock PR from round 4 still makes sense on its own: it removes date dependence that has
   other sources too (expired windows), and the DST part would otherwise only disappear once ruby-bench pins a Rails
   release with the fix.
