@@ -1,3 +1,5 @@
+This builds on #567 and includes its commit until #567 merges; I'll rebase then.
+
 This runs erubi-rails, lobsters and railsbench in the `benchmark-default-windows` job, so only graphql-native stays excluded there.
 
 They were excluded because nokogiri 1.18.9 builds from source on Windows and its bundled libiconv fails to compile. #567 moved lobsters and railsbench to nokogiri 1.19.7, which installs on Windows with Ruby 4.0 (the precompiled x64-mingw-ucrt gem) and with head (built from source). erubi-rails gets the same bump here.
