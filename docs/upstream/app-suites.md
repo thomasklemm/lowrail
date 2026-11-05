@@ -1722,35 +1722,56 @@ patch and body). Checked against the code, all three points held: a copy of a fr
 frozen (`Attribute.from_database(:foo, +"abc", Type::Value.new).freeze.dup.value`), every default type was cast again
 on first read, and it reached every frozen attribute, not only defaults. A second form (a cast-again flag set in
 `freeze`, never pushed) lost in-place edits of frozen user-assigned attributes and cost +21.5% Ir on `Model.new` with
-container defaults. A third (`deep_dup` in `initialize_dup`) broke the YAML safe-load tests. The fix now sits in
-`Attribute#freezable?`: false when a read copy's cast value, shallow-dupped and frozen, is not shareable, when it
-already reads as changed, or when casting raises. Those models keep the writable defaults they had before #59083 and
-cast per record, as on 8.1; every other model keeps the frozen defaults and main's dup path.
+container defaults. A third (`deep_dup` in `initialize_dup`) broke the YAML safe-load tests. A fourth (`79b9bc0520`) probed each default
+in `freezable?` (cast a copy, check `shareable?` and `changed_in_place?`, `rescue StandardError`). Sol's third review
+held it, and each point checked out: it runs coders at schema load and twice as often ([op8_probe2.rb](../../bench/upstream/app_suites/op8_probe2.rb):
+coder loads before the first read 0 on 8.1, 2 on main, 2 with the probe and 4 after; a model with a later proc
+default, never frozen on main, 0 on 8.1 and main and 2 with the probe), which can mean coder side effects, queries,
+autoloading (invariant 7) and time-zone conversion; `ActiveSupport::Ractors.shareable?` is `true` for everything when
+`Ractor` is undefined (JRuby, TruffleRuby); the rescue also hid errors from `dup`, `freeze` and `changed_in_place?`;
+and the nested test also passed through the dirty clause because of its non-round-tripping `""` default.
 
-| Callgrind Ir vs main, median of 5 | A/A (main vs main) | first fix | final |
+The fix is now type-level, with no cast: an attribute is not freezable when its type, or the type a delegating
+decorator such as `normalizes` or `TimeZoneConverter` wraps, includes `Type::Helpers::Mutable` (serialized, JSON and
+jsonb, PG arrays, hstore, points, encrypted). Those models keep 8.1's writable defaults: nothing is cast at schema
+load and each record casts its own value. Every other model keeps the frozen defaults and main's dup path. The
+probe gives the 8.1 output on every line (unread `[]` and saved `""`, read first `["prefs"]` and saved `nil`, nothing
+shared, coder loads 0/2 in both models), and the jsonb repro saves `"{}"`. Over-inclusions cost only: points (a
+shallow dup of the struct doesn't leak) and encrypted strings. Not covered: custom types that return containers without
+the helper still freeze, as on main.
+
+| Callgrind Ir vs main, median of 5 per tree | A/A | probe (`79b9bc0520`) | type-level (final) |
 |---|---|---|---|
-| `Model.new` + first read, int/bool/string defaults, Ruby 4.0.9 | −0.01% | +0.23% | +0.02% |
-| `Model.new` + first read, `'{}'` JSON-serialized and `json {}` defaults, 4.0.9 | +0.01% | +21.50% | +0.01% |
-| ruby-bench activerecord workload (100 posts with comments), 4.0.9 | +0.01% | +0.06% | +0.00% |
-| same three on Ruby master `336946c045` | +0.37%, +0.27%, −0.00% | +0.47%, +22.08%, +0.06% | +0.01%, +0.15%, +0.01% |
+| `Model.new` + first read, int/bool/string defaults, Ruby 4.0.9 | −0.01% | +0.02% | −0.03% |
+| ruby-bench activerecord workload (100 posts with comments), 4.0.9 | +0.00% | +0.00% | −0.07% |
+| `Model.new` + first read, `'{}'` JSON-serialized and `json {}` defaults, 4.0.9 | −0.03% | +0.01% | +18.50% |
+| `Model.new` + first read, nested `'{"a":{"b":1}}'` JSON-serialized default, 4.0.9 | −0.09% | +22% | +21.63% |
+| the same four on Ruby master `336946c045` | −0.27, −0.00, −0.07, +0.13% | +0.01, +0.01, +0.15%, nested not run | −0.02, −0.03, +18.32, +21.49% |
 
-Method: `valgrind --tool=callgrind --toggle-collect=rb_ary_initialize` around `Array.new(N) { work }` with GC
-disabled, 5 runs per tree, the A/A control a second checkout of main; the ruby-bench workload is re-implemented in the
-driver from ruby-bench `00f0f8beab`, not run through its harness (#59083's 199 → 170 ms was not re-measured).
-Final-tree spread was ≤0.13% except the container workload (≤2.8%). A model with a nested default (`'{"a":{"b":1}}'`) pays
-+22% (44.0M → 53.6M Ir per 1,000), the 8.1 cost. The final review's nits only changed code that runs at schema load,
-so the table was not rerun. Scripts and raw results:
-[op8-bench](../../bench/upstream/app_suites/op8-bench/).
+Models with a mutable-typed attribute pay the per-record cast again (+18–22%), i.e. they lose #59083's gain and are
+back on 8.1's path; models without one stay within A/A on both Rubies. The probe kept flat containers frozen and
+cheap, but only by casting application values at schema load, so the type-level form is the exact one. Method as
+before: `valgrind --tool=callgrind --toggle-collect=rb_ary_initialize` around `Array.new(N) { work }` with GC
+disabled, A/A control a second checkout of main, ruby-bench workload re-implemented from ruby-bench `00f0f8beab`
+(#59083's 199 → 170 ms not re-measured); spread ≤0.83% per tree. The table was measured on the type-level form before
+the decorator unwrap, which only runs at schema load, outside the measured loop. The first-fix column of the earlier
+table: +0.23% / +0.06% / +21.50% on 4.0.9. Scripts and raw results:
+[op8-bench](../../bench/upstream/app_suites/op8-bench/) (`matrix3.sh`, `summary3.rb`, `results-*f6.tsv`).
 
-Tests: `freezable?` refuses a nested, a changed and a raising cast (each clause removed fails it); a frozen
-identity-type copy stays mutable (fails on `5a4a9596c0`); in AR, an untouched serialized default is unchanged, can be
-read, mutated and saved, and isn't shared with the next record (fail on main). activemodel 1,252 runs green; AR
-serialized_attribute, base, dirty, attributes and defaults on SQLite and PostgreSQL plus PG json/array/hstore green;
-RuboCop clean. Re-review: open with nits, applied (tests for each clause, read the value before `changed_in_place?`,
-comments on the copy and the rescue, a softer commit message). It also found that datetime/time defaults with
-time-zone-aware attributes are cast once in the boot zone on main and now leave the frozen path (TimeWithZone is not
-shareable), which is 8.1's behaviour; tsrange too. Branch `thomasklemm/frozen-default-attribute-unread` @ `79b9bc0520`
-on main `bdb3d96012`,
+Tests: activemodel, a mutable type and a mutable type behind a `DelegateClass` are not freezable (fail on main and
+without the unwrap), a plain type is, and a frozen identity-type copy stays mutable (a guard: it passes on main and
+fails on `5a4a9596c0`). AR: an untouched serialized default is unchanged and saves `""`, and reading it first keeps
+8.1's dirty-and-save-NULL; a round-tripping nested JSON default in its own table is not shared, with and without
+`normalizes` (fails on main by sharing, not by dirtiness; without the unwrap it fails for the normalized model).
+activemodel 1,253 runs green; AR serialized_attribute, base, dirty, attributes, defaults, store, normalized_attribute
+on SQLite and PostgreSQL, PG json/array/hstore/geometric and encryptable_record green; railties ractors_test green;
+RuboCop clean. Skeptical review (subagent): request changes (`normalizes` hid the mutable type behind
+`NormalizedValueType`, a `DelegateClass`, so both regressions remained), fixed with the unwrap; re-review: open with
+nits, the delegator unit test applied; a delegator cycle (only custom code can build one) would loop at schema load,
+left as is. Follow-up, not in this fix: scalar time-zone-aware datetime defaults stay frozen and, per the earlier
+review, are cast once in the boot zone on main (`Time.use_zone("Tokyo") { k.new.dt }` gives UTC on main, JST on 8.1);
+not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `8b817f9f36` on main `bdb3d96012` (rails/rails
+main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).
 
@@ -1824,10 +1845,10 @@ calls it to put the test adapter back: 117 F in the job specs tagged `with_good_
 * `Mime::SET`: 5 (mime_types.rb).
 * `protect_from_forgery` without a strategy: 5 (application_controller.rb).
 
-**Readability gate.** All three fixes are correctness fixes; OP8 claims only no cost (table above). Described out loud:
+**Readability gate.** All three fixes are correctness fixes; OP8 states its cost (table above): affected models are back on 8.1's per-record cast. Described out loud:
 * OP1: "parsers stay a plain hash while the app boots and are frozen when it ractorizes."
 * OP3: "put back the three-line private setter that gems still call."
-* OP8: "a default that records would share or save is not frozen."
+* OP8: "a model with a mutable-typed default keeps writable defaults."
 
 Each is a few lines in the method that owns the behavior, with no new names.
 

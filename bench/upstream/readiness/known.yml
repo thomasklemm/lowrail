@@ -144,7 +144,7 @@ findings:
     signature: "null value in column \"results\" of relation \"health_reports\""
     status: prepared
     record: docs/upstream/app-suites.md
-    note: frozen defaults make an untouched serialized default dirty and share nested defaults; fix keeps those models off the frozen defaults; unchecked
+    note: frozen defaults make an untouched serialized default dirty and share nested defaults; fix keeps models with mutable-typed attributes off the frozen defaults; unchecked
   - id: OP2
     suite: openproject.*
     signature: "relation \"days\" does not exist|relation \"[a-z_]+\" does not exist"
