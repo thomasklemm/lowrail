@@ -241,12 +241,167 @@ up only because ignoring revert commits maps its lines back. A/A for every row b
 | 10 | `abstract_adapter.rb build_retry_budget` | b41b990ce6 (connection retry accounting) | +109 | — |
 | | `cookies.rb encryptor` | #59483 (linyiru: lazy cookie verifier) | +96 | — |
 
-**Unattributed instruction costs.** The residual costs **+4.1% instructions on shipit** and **+2.1% on blog's GET
+**Instruction costs** (attributed in [the callgrind follow-up](#the-residuals-instruction-cost-attributed-callgrind-follow-up-2026-11-05)). The residual costs **+4.1% instructions on shipit** and **+2.1% on blog's GET
 pages**, while both allocate fewer objects (shipit −14.6%, blog −20.6%). So the cost is CPU, not allocation, and
 this run doesn't attribute instructions. Candidates for a follow-up callgrind diff, not established: shipit's 8.2
 defaults on ruby-bench (`strict_accept_header`, `default_headers`, the `header_only` CSRF strategy, the JSON
 message serializer), the new CSRF Vary header path (cost row 2), and query-intent logging (cost row 4). Blog runs
 `load_defaults 8.1` on both trees, so its cost is not the defaults.
+
+## The residual's instruction cost, attributed (callgrind follow-up, 2026-11-05)
+
+The residual above costs instructions on shipit (+4.1%) and on blog's GET pages (+2.1%) while allocating fewer
+objects. Here it is attributed with Callgrind, on the same pins and fixed heap as above (Ruby 4.0.9, interpreter).
+
+**Result.**
+* **Shipit's +4.1% is real per-request CPU, and most of it is an interaction with our own work.** By far the biggest
+  part, **+363M Ir per iteration (+6.1%)**, is Active Record's schema context: since #58437, #58578 and #58767
+  every `attribute_types` / `columns_hash` / `attributes_builder` read goes through `schema_context`, and models
+  whose default attributes are not shareable take a Ractor-local lookup each time. Our own **#59585** (reverted in
+  minus-ours) moves shipit's models to the fast path. On main this group costs +102M. Next come connection-pool lease
+  and used-pool tracking (#59071, #59018, #58306; +65M), association routes (#59120 series; +20M), and execution
+  state lookups (+17M). These are deliberate costs of Ractor support and the per-context connection/query-cache
+  work. Savings elsewhere (routing −70M, relation building −68M) offset them.
+* **One accidental cost has a small exact fix.** byroot's #58663 (2b88dc1995) builds `Result#column_indexes`
+  through `IndexedRow.build_indexes` → `Array#index_with` → `to_h { [elem, yield] }`. That costs **about 2× per call**
+  what 8.1's `while` loop cost, at every column count (8, 16, 40 columns). Restoring the loop inside
+  `build_indexes` gives **−0.90% instructions on shipit against main** (A/A +0.08%), with the same hash
+  (last index wins for duplicate columns, same key order). See *Fix candidate* below. Nothing was opened or posted.
+* **Blog's +2.1% is not a per-request cost.** It is the tail of a major GC that started before the measured
+  rounds. Its incremental marking falls inside the 32-round run but not the 2-round run, so the subtraction charges
+  it to the rounds, and only minus-ours and main carry such a tail. With GC included over a 150-round window,
+  minus-ours is **−7.8%** and main **−9.7%** against 8-1-stable (A/A ≤ 0.09%). The census row "blog total
+  +0.23%, rejected" has the same artifact.
+* **On main, which is what users get:** shipit is −2.4% against 8.1 in this window (cachegrind above: −2.65%). The
+  schema-context indirection (+102M), the connection-pool work (+64M), association routes (+13M) and
+  `build_indexes` (+43M of the attribute-storage group) are all still there, under savings elsewhere.
+
+### Method
+
+* **Trees:** as above. minus-ours was rebuilt in this orb from [`reverted.tsv`](../../bench/upstream/rails_82_impact/reverted.tsv)
+  on `7a78da5a55` (the same 44 reverts, local commit `5a3333de6b`, a new SHA because the commit dates differ).
+  Its cachegrind shipit row reproduces: +3.98% against 8-1-stable here (+4.11% above).
+* **ruby-bench** `73918b2`, shipit with shipit-engine 0.45.0 vendored and `review_stack` patched as before. Locks
+  are copied from `Gemfile.sum-main.lock` with the path rewritten; the trees differ from each other only in the
+  Rails gems and their own dependencies (Herb, marcel 2, ractor-dispatch on main).
+* **Sampled window:** [`harness-cgsample.rb`](../../bench/upstream/rails_82_impact/harness-cgsample.rb) (ruby-bench
+  harness) and [`census_cg.rb`](../../bench/upstream/rails_82_impact/census_cg.rb) (census GET pages) both call
+  [`cg_profile.rb`](../../bench/upstream/rails_82_impact/cg_profile.rb). It runs census 8's instruction sampler
+  ([cpu_sampler.c](../../bench/upstream/census8/cpu_sampler.c) under the patched Callgrind from `script/cpu-census
+  build`) over one window: 2 shipit iterations after 2 warmup, or 16 blog rounds after 30 warmup. It reports the
+  window's exact Ir and Ruby stacks every 4,096–12,288 Ir; a sample's cost goes to its nearest Ruby method (self)
+  and to every method on its stack (inclusive). A `GC.start` precedes the window, so GC inside it is counted apart.
+  The window's exact Ir matches the impact run's cachegrind deltas to within 0.5 points.
+* **C functions:** the same window, unsampled (`CG_PLAIN`, [`bench/callgrind.c`](../../bench/callgrind.c)), diffed
+  with `callgrind_annotate` per function. **Call counts:** one native iteration under a TracePoint
+  ([`harness-callcount.rb`](../../bench/upstream/rails_82_impact/harness-callcount.rb)).
+* **Diffs:** [`cg_diff.rb`](../../bench/upstream/rails_82_impact/cg_diff.rb) (`methods`, `lines`, `files`,
+  `cfuncs`) and [`cg_groups.rb`](../../bench/upstream/rails_82_impact/cg_groups.rb), which groups self Ir by file;
+  self Ir partitions the window. Commits come from `git blame` on main and `git log -L` on the changed methods, mapped
+  to the first-parent merge that brought them in. A bisection curve over 15 first-parent points was tried and
+  dropped: 6 of the 15 points don't boot shipit (a frozen `rescue_responses` from c7 to c10, a template error at
+  c12, `erb_implementation` before Herb).
+
+### Shipit, per iteration
+
+| Tree | Window Ir (exact) | GC Ir in window (sampled) | Objects |
+| --- | ---: | ---: | ---: |
+| 8-1-stable (A/A pair) | 5.9900e9 / 5.9915e9 | 1.59e8 | 1,157,970 |
+| minus-ours (A/A pair) | 6.2581e9 / 6.2561e9 (**+4.45%**) | 1.46e8 | 989,084 |
+| main | 5.8497e9 (−2.35%) | 1.28e8 | 889,850 |
+
+GC goes *down* in minus-ours, so shipit's extra cost is in the mutator. Self Ir per iteration by subsystem
+(`cg_groups.rb`; sampled, so the sums are within about 5% of the exact totals):
+
+| Group | minus-ours − 8.1 | main − 8.1 | A/A (8.1) |
+| --- | ---: | ---: | ---: |
+| Schema context, Ractor-local lookups (`model_schema*.rb`, `attributes.rb`, `ractors.rb`, `Ractor#[]`) | **+362.9M** | +101.9M | +0.2M |
+| Connection-pool lease, used pools, `WeakKeyMap`, connection handler | +65.4M | +64.3M | +1.0M |
+| Association routes, reflections, keys | +20.0M | +12.6M | +0.6M |
+| Notifications, instrumentation, `IsolatedExecutionState` | +17.2M | +9.5M | −0.1M |
+| Query intents, database statements, adapter, query cache | +15.8M | −16.8M | +0.7M |
+| Attribute storage (`IndexedRow`, `LazyAttributeSet`, `Result`, `index_with`) | +7.6M | +6.5M | −2.0M |
+| Action Pack (rest) | −5.7M | −5.8M | −0.2M |
+| Other (Ruby stdlib, app, rest of Rails) | −64.6M | −98.2M | +1.8M |
+| Relation building (query methods, where, merger, predicate builder, Arel) | −67.7M | −99.1M | −2.3M |
+| Routing and URL generation | −70.3M | −84.4M | −0.2M |
+| **Sum (sampled)** | **+280.1M** | **−109.3M** | +0.5M |
+
+Top methods by self Ir per iteration, with call counts per iteration (8.1 / minus-ours / main) where they explain
+the cost:
+
+| Method | minus-ours − 8.1 | main − 8.1 | Calls 8.1 / −ours / main | Commit (merge) | Kind |
+| --- | ---: | ---: | --- | --- | --- |
+| `Ractor#[]` + `Ractor.current` + `ActiveSupport::Ractors.[]` | +118.3M | ≤ +12M (inclusive) | `Ractor.current` 0 / 273,712 / 28,230 | slow path of `SchemaContext#attributes`: #58437 ([`a757a27584`](https://github.com/rails/rails/commit/a757a27584)), #58578 ([`0dd408e2d3`](https://github.com/rails/rails/commit/0dd408e2d3)); fixed for these models by our #59585 | deliberate feature, accidental slow path (fixed on main) |
+| `SchemaContext#attributes`, `#schema_loaded?` (×2), `schema_context`, `current_schema_context`, `Attributes#attribute_types` | +219.9M | +52.0M | `schema_context` 0 / 156,653 / 45,251 | ae739c3854 (#58437), 51a2a815a2 (#58578: `attribute_types` → `schema_context.attributes.types`), 3cf248de5b (#58767: `schema_loaded?` via `@schema_context`) | deliberate (Ractor-shareable schema) |
+| `Array#index_with` + `IndexedRow.build_indexes` − `Result#column_indexes` | +43.4M | +43.2M | 3,615 / 3,709 / 3,709 | 2b88dc1995 (#58663, [`d34ea2709f`](https://github.com/rails/rails/commit/d34ea2709f)) | **accidental; fix below** |
+| `LazyAttributeSet#fetch_value!`, `IndexedRow::Mutable#fetch`/`#[]=`/`#initialize`, `IndexedRow#fetch` `LazyAttributeSet#initialize` vs 8.1's builder `fetch_value`, `default_attribute`, `key?`, `Result::IndexedRow#fetch`, `Result#initialize` | +17.6M | +18.3M | `fetch_value!` 0 / 71,653 / 71,653 | 3a2639a1d9, 3be318dff8, 1fbedade58 (#58663) | deliberate (casted values in a mutable indexed row; −14.6% objects) |
+| `WeakKeyMap#fetch_or_store` (lease 38,523 + association-route cache 19,596 calls) − 8.1's `LeaseRegistry#[]` | +22.7M | +22.7M | 0 / 58,119 / 58,119 | 5e8b610d3e (#59071, [`2983197a8f`](https://github.com/rails/rails/commit/2983197a8f)) | deliberate |
+| Rest of the connection-pool group: `ConnectionPool.used_pools!`, `UsedPoolSet#add`, `LeaseRegistry#lease`, pool helpers | +42.7M | +41.6M | `used_pools!` 0 / 24,151 / 24,151 | b6a1fc977b (#59018, [`2ead88ba28`](https://github.com/rails/rails/commit/2ead88ba28)) | deliberate (query caches per execution context) |
+| `Base.connection_handler` → `ractor_connection_handler` → `Ractors.main?`; `IsolatedExecutionState.[]` | — | +12.9M (inclusive) + 15.2M | `Ractors.main?` 0 / 28,088 / 28,088 | 9e8fe3955b (#58306, [`25da17457b`](https://github.com/rails/rails/commit/25da17457b)) | deliberate (Ractor connection handler) |
+| `AssociationReflection#association_route`, `current_default_association_route?`, `class_name`, `_klass`, `Key#==`, `Key::Single#map_value`, `AssociationRoute::Cache#fetch_or_store` (gross) | +99.3M | +100.8M | `class_name` 0 / 62,260 / 62,260 | 7249a66350 and the #59120 series ([`24b77398ce`](https://github.com/rails/rails/commit/24b77398ce)), matthewd | deliberate refactor (group net +20.0M / +12.6M after the reflection methods it replaces) |
+
+At the C level (unsampled, shipit, 8.1 → minus-ours / → main): `vm_exec_core` +340M / +137M, more small method
+calls (`vm_call_iseq_setup_normal_0start_0params_0locals` +42M / +10M, `vm_call_ivar` +25M / +19M), constant
+lookups (`rb_vm_opt_getconstant_path` +25M / +11M: `ActiveSupport::Ractors`, `IsolatedExecutionState`), and new
+`class_search_ancestor` (+10M on both) and `rb_shape_object_id` (+4.5M: `WeakKeyMap` keys). Allocation goes down:
+`rb_wb_protected_newobj_of` −13M / −20M, `gc_sweep_step` −6M / −14M. More Ruby-level indirection, fewer objects.
+
+**Ours vs others.** The schema-context row is why the residual looks bad and "ours" looks large on shipit (−6.5%):
+#59585 removes 261M of the 363M that #58437/#58578 added. That is an interaction between our PRs and theirs, not
+cost added by others alone. Without it, shipit's residual is about +0.1% (+266M − 261M).
+
+### Fix candidate: `IndexedRow.build_indexes` (accidental, small, exact)
+
+[`build_indexes.patch`](../../bench/upstream/rails_82_impact/build_indexes.patch) on main `7a78da5a55`
+(activemodel/lib/active_model/indexed_row.rb):
+
+```ruby
+def build_indexes(columns)
+  indexes = {}
+  index = 0
+  length = columns.length
+  while index < length
+    indexes[columns[index]] = index
+    index += 1
+  end
+  indexes
+end
+```
+
+* **Per call** ([`build_indexes_micro.rb`](../../bench/upstream/rails_82_impact/build_indexes_micro.rb),
+  cachegrind, 20,000 calls minus 0; Ir per call, so GC is included):
+
+  | Columns | 8.1 loop / this fix | main (`index_with`, `to_h` pairs) | `each_with_index` | `each_with_index.to_h` |
+  | ---: | ---: | ---: | ---: | ---: |
+  | 8 | 8,287 | 17,603 | 13,653 | 16,747 |
+  | 16 | 17,523 | 33,566 | 27,312 | 31,448 |
+  | 40 | 40,992 | 78,588 | 63,765 | 70,262 |
+
+* **Shipit, cachegrind as in the impact run** (`ruby_bench_ir.rb`, 4 − 1 iterations): main 5.920e9 / A/A twin
+  5.925e9 (+0.08%), fix 5.872e9 / 5.866e9: **−0.90%** (claimed, > 2 × A/A).
+* **Same result:** checked against main's version for `[]`, `%w[id]`, duplicate columns (`%w[id name id]`,
+  `%w[a b a b c]`: the last index wins, as 7d2f63b1e4 expects) and mixed keys. Equal hashes, same key order,
+  neither frozen. The Rails test suite was not run.
+* **Not measured:** Ruby 4.1, where #59203 makes `to_h`'s presized hash stay embedded up to 8 entries. A loop
+  growing the hash may lose that there. `Hash.new(capacity:)` needs Ruby 3.4, and Rails main supports ≥ 3.3.5.
+* **Rejected candidate:** `LeaseRegistry#lease` as `self[context] || (self[context] = Lease.new)` instead of
+  `fetch_or_store`: −0.13% (A/A 0.08%), not claimed.
+
+### Blog GET pages, per round
+
+| Window | 8-1-stable | minus-ours | main | Verdict |
+| --- | ---: | ---: | ---: | --- |
+| 16 rounds after `GC.start`, mutator only (sampled; A/A 8.1 0.02%, −ours 0.08%) | 29.12M | 25.74M (−11.6%) | 25.15M (−13.6%) | claimed |
+| 30 rounds, GC included | 31.45M | 32.84M (+4.4%) | — | GC tail, see below |
+| 150 rounds, GC included (A/A 0.00%, 0.05%, 0.09%) | 31.18M | 28.76M (**−7.8%**) | 28.15M (**−9.7%**) | claimed |
+
+In the 30-round window, the extra 1.4M per round in minus-ours is all GC marking: `rb_gc_mark_and_move` +0.94M,
+`rb_gc_mark_children` +0.70M, `gc_aging` +0.43M, `gc_mark_internal` +0.43M, `gc_grey` +0.39M, `gc_continue`
++0.25M, `gc_marks_rest` +0.17M. 118 GC segments ran against 52, though `GC.count` didn't change between the 2-round
+and the 32-round run (4 in both). So the window finishes a GC that began earlier. Its share per round shrinks with
+the window, and over 150 rounds (one GC each) minus-ours and main are cheaper. Blog runs `load_defaults 8.1` on
+all trees, so none of this comes from the defaults.
 
 ## Rejected rows
 
@@ -266,3 +421,8 @@ Scripts are in `bench/upstream/rails_82_impact/` (`ir_table.rb`, `census_table.r
 plus `actionview_cpu/ruby_bench_ir.rb`, which now preloads `jit_counts.rb` under YJIT and prints a flat column.
 `merged_sum/attribute.rb` and `alloc_table.rb` now take label arguments. Results are under `.lowrail/private/imp`
 and `.lowrail/private/census/imp-*`.
+
+The callgrind follow-up adds `cg_profile.rb`, `census_cg.rb`, `harness-cgsample.rb` and `harness-callcount.rb`
+(copy the harnesses into ruby-bench's `harness/` as `cgsample.rb` and `callcount.rb`), `cg_shipit.sh` and
+`cg_blog.sh` (one window per tree), `cg_diff.rb`, `cg_groups.rb`, `build_indexes_micro.rb` and
+`build_indexes.patch`. Results are under `.lowrail/private/imp2` (`cg/`, `cc/`, `ir/`).
