@@ -8,4 +8,4 @@ On Linux the test suite passes with and without `GRAPHQL_CPARSER=1`. On Windows,
 
 ---
 
-<sub>Found while enabling more benchmarks on Windows in ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ruby-bench-improvements.md#round-3-rails-benchmarks-on-windows-2026-11-05), my research project.</sub>
+<sub>Found while enabling more benchmarks on Windows in ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/de05fe1376e714a2f1f30bc3c6de47fdd69b181c/docs/upstream/ruby-bench-improvements.md#round-3-rails-benchmarks-on-windows-2026-11-05), my research project.</sub>
