@@ -40,7 +40,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   on a maintainer or answers an "is this worth it" challenge.
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
 * **Always thank maintainers and reviewers** (Thomas, 2026-11-04) in every reply and closing comment, in one plain
-  sentence.
+  sentence. **No standalone thank-you comment after a plain merge** (Thomas, 2026-11-05, on rails/rails#59640): only
+  now and then, for example when a maintainer added work of their own or explained a decision. Not on every PR.
 * **Child orbs don't notify Thomas** (Thomas, 2026-11-04). They report only to the coordinating thread with
   send_thread_message, never with notify_user, and their threads are snoozed indefinitely. The coordinator relays.
 * **At most 8 working orbs at once** (Thomas, 2026-11-03). A larger orb (`a1.xxlarge`) is fine for long parallel
