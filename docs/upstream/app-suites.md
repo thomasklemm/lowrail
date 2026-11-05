@@ -1919,8 +1919,10 @@ Skeptical reviewer: one blocker, applied (the combined test's DDL failed under `
 `main_ractor_connection`), plus two nits (the save-as-NULL half of the until-read test pinned main's behaviour, removed;
 a test name). activemodel 1253 runs; AR serialized, attributes, dirty, defaults, normalized, encryption 458 (SQLite) and
 462 (PostgreSQL) runs, PostgreSQL json/array/hstore 154 runs, `serialized_attribute_test` on `sqlite3_ractor`, all green;
-RuboCop clean. Branch `thomasklemm/frozen-default-attribute-unread` @ `3b35e79cb5` (earlier `f95cc1b6df`, `de7aff270c`,
-`c52724804d`) on main
+RuboCop clean. Astra round 2 on `3b35e79cb5`: approve, two nits applied: the encrypted and normalized wrappers around
+`Type::Json` must accept `nil` and reject `"{}"` (a `cast_type.freezable_default?(nil)` mutant passed before), and the body
+says which microbenchmarks the 18–22% are. Branch `thomasklemm/frozen-default-attribute-unread` @ `9b2a64d040` (earlier
+`f95cc1b6df`, `de7aff270c`, `c52724804d`, `3b35e79cb5`) on main
 `bdb3d96012` (rails/rails main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).

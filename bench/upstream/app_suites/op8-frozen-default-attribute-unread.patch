@@ -1,4 +1,4 @@
-From 3b35e79cb5697194aaabebf10f02f27339322d39 Mon Sep 17 00:00:00 2001
+From 9b2a64d040bbf2e655fbd03f6000ac9110148f4b Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 15:57:54 +0000
 Subject: [PATCH] Keep models with mutable defaults off the frozen defaults
@@ -29,11 +29,11 @@ otherwise they still freeze, as on main.
  .../active_model/attributes/normalization.rb  |  4 +
  .../lib/active_model/type/helpers/mutable.rb  |  4 +
  activemodel/lib/active_model/type/value.rb    |  4 +
- activemodel/test/cases/attribute_test.rb      | 19 +++++
+ activemodel/test/cases/attribute_test.rb      | 19 ++++
  .../encryption/encrypted_attribute_type.rb    |  4 +
  .../lib/active_record/type/serialized.rb      |  5 ++
- .../test/cases/serialized_attribute_test.rb   | 80 +++++++++++++++++++
- 8 files changed, 121 insertions(+), 1 deletion(-)
+ .../test/cases/serialized_attribute_test.rb   | 89 +++++++++++++++++++
+ 8 files changed, 130 insertions(+), 1 deletion(-)
 
 diff --git a/activemodel/lib/active_model/attribute.rb b/activemodel/lib/active_model/attribute.rb
 index e358a34021..4916d546e2 100644
@@ -155,10 +155,10 @@ index a0fcc21288..9e7e003f56 100644
          # Prevent Ruby 4.0 "delegator does not forward private method" warning.
          # Kernel#inspect calls instance_variables_to_inspect which, without this,
 diff --git a/activerecord/test/cases/serialized_attribute_test.rb b/activerecord/test/cases/serialized_attribute_test.rb
-index c386d0ab46..ca7f9924dc 100644
+index c386d0ab46..a4b3f69a79 100644
 --- a/activerecord/test/cases/serialized_attribute_test.rb
 +++ b/activerecord/test/cases/serialized_attribute_test.rb
-@@ -75,6 +75,86 @@ def test_serialized_attribute_with_default
+@@ -75,6 +75,95 @@ def test_serialized_attribute_with_default
      assert_equal({ key: "value" }, t.content)
    end
  
@@ -209,6 +209,15 @@ index c386d0ab46..ca7f9924dc 100644
 +    assert_not_predicate Class.new(with_null_serialized) { encrypts :options }._default_attributes, :frozen?
 +    assert_predicate Class.new(with_null_json) { encrypts :settings, :options }._default_attributes, :frozen?
 +    assert_predicate Class.new(with_null_json) { normalizes :data, with: ->(data) { data } }._default_attributes, :frozen?
++
++    json = ActiveRecord::Type::Json.new
++    [
++      ActiveRecord::Encryption::EncryptedAttributeType.new(scheme: ActiveRecord::Encryption::Scheme.new, cast_type: json),
++      ActiveModel::Attributes::Normalization::NormalizedValueType.new(cast_type: json, normalizer: ->(value) { value }, normalize_nil: false),
++    ].each do |type|
++      assert type.freezable_default?(nil)
++      assert_not type.freezable_default?("{}")
++    end
 +
 +    duck_type = Object.new
 +    def duck_type.deserialize(value) = value
