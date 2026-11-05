@@ -16,7 +16,7 @@
     4242,
     1717
   ],
-  "generated": "2026-11-05T00:00:41Z",
+  "generated": "2026-11-05T00:10:50Z",
   "suites": [
     {
       "suite": "acts_as_list-sqlite",
@@ -3840,38 +3840,6 @@
   ],
   "groups": [
     {
-      "class": "flaky-candidate",
-      "signature": "RSpec::Expectations::ExpectationNotMetError: expected 2 queries, got 4",
-      "count": 2,
-      "suites": [
-        "will_paginate-mysql",
-        "will_paginate-postgres"
-      ],
-      "match": [
-        "new"
-      ],
-      "tests": [
-        {
-          "test": "./spec/finders/active_record_spec.rb[1:11:1]",
-          "desc": "WillPaginate::ActiveRecord associations should paginate",
-          "candidate": "1/2",
-          "base": "0/2",
-          "detail": "failed under seed 1717 only; alone: cand 5/5 failed, base 0/5 failed",
-          "suite": "will_paginate-mysql",
-          "match": "new"
-        },
-        {
-          "test": "./spec/finders/active_record_spec.rb[1:11:1]",
-          "desc": "WillPaginate::ActiveRecord associations should paginate",
-          "candidate": "1/2",
-          "base": "0/2",
-          "detail": "failed under seed 1717 only; alone: cand 5/5 failed, base 0/5 failed",
-          "suite": "will_paginate-postgres",
-          "match": "new"
-        }
-      ]
-    },
-    {
       "class": "confirmed",
       "signature": "ActiveRecord::StatementInvalid: Mysql2::Error: Duplicate column name 'nice'",
       "count": 7,
@@ -5964,6 +5932,38 @@
           "detail": "base: RSpec::Expectations::ExpectationNotMetError: expected \"status=404 action=index\" to match /error='ActiveRecord::RecordNotFound: Record not found' /",
           "suite": "lograge",
           "match": "known:R2-4"
+        }
+      ]
+    },
+    {
+      "class": "flaky-candidate",
+      "signature": "RSpec::Expectations::ExpectationNotMetError: expected 2 queries, got 4",
+      "count": 2,
+      "suites": [
+        "will_paginate-mysql",
+        "will_paginate-postgres"
+      ],
+      "match": [
+        "known:R2-18"
+      ],
+      "tests": [
+        {
+          "test": "./spec/finders/active_record_spec.rb[1:11:1]",
+          "desc": "WillPaginate::ActiveRecord associations should paginate",
+          "candidate": "1/2",
+          "base": "0/2",
+          "detail": "failed under seed 1717 only; alone: cand 5/5 failed, base 0/5 failed",
+          "suite": "will_paginate-mysql",
+          "match": "known:R2-18"
+        },
+        {
+          "test": "./spec/finders/active_record_spec.rb[1:11:1]",
+          "desc": "WillPaginate::ActiveRecord associations should paginate",
+          "candidate": "1/2",
+          "base": "0/2",
+          "detail": "failed under seed 1717 only; alone: cand 5/5 failed, base 0/5 failed",
+          "suite": "will_paginate-postgres",
+          "match": "known:R2-18"
         }
       ]
     },

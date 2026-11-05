@@ -49,7 +49,7 @@ seven widely used gems with deep Active Record or Action Pack integration.
 | store_model | 4.6.1 | sqlite | 504 ex 0F | fails to load; with `RAILS_ENV=test` 11F / 5F | R2-9 to R2-12 |
 | money-rails | 3.0.0 | sqlite | 268 ex 1F | same | – |
 | aasm | 6.0.0 | sqlite | 617 ex 5F | same | – |
-| will_paginate | 4.0.1 | sqlite, pg, mysql | 144 ex 0F | 144 ex 2F | R2-13 |
+| will_paginate | 4.0.1 | sqlite, pg, mysql | 144 ex 0F | 144 ex 2F | R2-13, R2-18 (found later, by the readiness runner) |
 | bullet | 8.3.1 | sqlite | 286 ex 0F | same | – |
 | carrierwave | 3.1.4 | sqlite | 1788 ex 1F, 42 scenarios | same | – |
 | shrine | 3.10.2 | sqlite | 1537 runs 0F | 2F | R2-14 |
@@ -94,6 +94,7 @@ Classes: (a) Rails regression, (b) deliberate change, (c) private or nodoc API, 
 | R2-15 | shoulda-matchers (spec only) | `_reflections.delete` raises `FrozenError` | a791f84224 "Introduce CoW when adding Active Record reflections" (rails/rails#58668) | (c) (`Reflection # :nodoc:`) |
 | R2-16 | solid_cache (spec only) | private `bypass_local_cache` removed | 4f594320e4 (rails/rails#57932) | (c) + (d) (fixed in 679c457) |
 | R2-17 | solid_cache (spec only) | error reporter context gains a `:rails` key | a82c877c95 "Add Rails.app.revision" (rails/rails#56490) | (b) + (d) (fixed in 6ab8bdb) |
+| R2-18 | will_paginate (spec only), pg and mysql | `associations should paginate` counts 4 queries instead of 2: two `SCHEMA` queries its SQL-text filter no longer recognizes | 23bb4cdd4b "Read the columns of many tables in one query" (rails/rails#58494), then ae739c3854 "Extract model schema state into a schema context" (rails/rails#58437) | (b), test-side |
 
 ### R2-1: belongs_to to a table without a primary key (held)
 
@@ -119,6 +120,48 @@ association that cannot load anything on either tree, that is more change than t
 matthewd would need Thomas's OK. Repro:
 `~/src/eco/agentD/no_pk_variants.rb` in the round-2 orb; the shoulda-matchers spec is
 `spec/acceptance/active_record_integration_spec.rb:80`.
+
+### R2-18: will_paginate's query count sees schema queries (found 2026-11-05)
+
+Found by the [readiness runner](readiness.md) on main `7a78da5a55`, after this round: it fails
+`./spec/finders/active_record_spec.rb:290` (`associations should paginate`, `execute(2).queries`) with
+`expected 2 queries, got 4`.
+
+| Run of that spec | 8-1-stable `6e09124217` | main `7a78da5a55` |
+| --- | --- | --- |
+| alone, seed 4242 or 1717, postgres or mysql | passes | fails (4 queries) |
+| alone, either seed, sqlite3 | passes | passes |
+| full suite, seed 4242 | passes | passes |
+| full suite, seed 1717, postgres or mysql | passes | fails |
+
+So order hides it. When an earlier example has already loaded the schema of the `developers_projects` join table
+(seed 4242), the block runs only its two data queries on both trees. The round's single default-order run did
+not see it either.
+
+The block's data queries are the same on both trees: the `projects` join and the `topics` preload. The extra
+two are `SCHEMA` queries for the join table, which will_paginate's counter drops only by SQL text
+(`FROM pg_attribute`, `SHOW FULL FIELDS`, `PRAGMA`, …), not by the payload name:
+
+| | 8-1-stable | main |
+| --- | --- | --- |
+| columns, postgres | `SELECT a.attname … FROM pg_attribute a …` (filtered) | `… FROM (SELECT DISTINCT ON (cls.relname) …) r JOIN pg_attribute a …` (counted) |
+| columns, mysql | `SHOW FULL FIELDS FROM developers_projects` (filtered) | `SELECT … FROM information_schema.columns …` (counted) |
+| primary key | not read in the block | `WITH tables AS (…) … pg_constraint … contype = 'p'`, or `information_schema.statistics … 'PRIMARY'` on mysql (counted) |
+
+Bisected with the spec alone on postgres between the merge-base `8ae3d84277` and `7a78da5a55`, in two steps:
+
+* 2 → 3: 23bb4cdd4b "Read the columns of many tables in one query" (rails/rails#58494, also R2-7). It changes
+  the column query's shape for a list of tables; SQLite still reads `PRAGMA`, which is why sqlite3 passes.
+* 3 → 4: ae739c3854 "Extract model schema state into a schema context" (rails/rails#58437, also R2-14).
+  `SchemaContext::Attributes` builds the attribute builder at schema load, and that reads
+  `primary_key_definition`, so the join model's primary key is now read when its schema loads, not when a
+  record is first built. The commit says so ("Schema loading now populates most of the context").
+
+Both are intended. The schema is read once per model and process, as before, and a schema cache dump still
+covers it. The only cost an app could see is one primary-key query at schema load for a model whose primary key
+it never used, such as a `has_and_belongs_to_many` join table. The fix belongs in will_paginate's spec:
+filter on `payload[:name] == "SCHEMA"`. Open rails/rails PRs don't change it: #59530 ("Split SchemaContext and
+SchemaContext::MappedTable") at `eabd9f003f` still counts 4. Not reported.
 
 ### Breadth notes for the coordinator
 

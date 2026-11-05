@@ -388,6 +388,15 @@ findings:
     record: docs/upstream/ecosystem-round-2.md
     checked: round-ecosystem-2 7a78da5a55
     note: the error reporter context gains a :rails key (the assertion diff shows it); fixed in the gem (6ab8bdb)
+  - id: R2-18
+    suite: will_paginate-(postgres|mysql)
+    test: "active_record_spec\\.rb\\[1:11:1\\]"
+    signature: "ExpectationNotMetError: expected 2 queries, got [34]"
+    class: [flaky-candidate, confirmed, order-dependent]
+    status: gem-side
+    record: docs/upstream/ecosystem-round-2.md
+    checked: round-ecosystem-2 7a78da5a55
+    note: two SCHEMA queries for the habtm join table that the spec's SQL-text filter misses (23bb4cdd4b column query shape, ae739c3854 primary key read at schema load); intended; hidden when an earlier example loaded the join table (seed 4242)
   - id: noise-r2-ruby34-inspect
     suite: (audited|mobility).*
     class: base-failing
