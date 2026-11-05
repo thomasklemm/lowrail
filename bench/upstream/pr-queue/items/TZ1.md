@@ -15,8 +15,8 @@ alternative_of:
 impact: "comparing equal periods 11,446 -> 3,440 instructions; same-period beginning_of_day/change/70.days.ago in Active Support 12-19% fewer instructions"
 rank:
 risky: false
-state: reviewed
-pr:
+state: draft
+pr: 175
 note: "our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
 passes:
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: changes, open: "code approved as is; body must-fix: tzinfo-data copies were identical objects, linked files unpushed; should-fix: scope of TimeWithZone callers, run spread, NaN/raising fields; all applied"}
