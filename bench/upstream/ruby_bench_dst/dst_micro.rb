@@ -18,11 +18,14 @@ FRESH_U = Time.utc(2026, 11, 5, 18)
 P1 = TZ.periods_for_local(LOCAL).first
 P2 = TZ.periods_for_local(LOCAL).first
 PA = [P2]
-if ENV["TZEQ"]
-  [TZInfo::TimezoneTransition, TZInfo::TimezoneOffset].each { |k| k.prepend(Module.new { def ==(o) = equal?(o) || super }) }
-end
+P_WINTER = TZ.periods_for_local(Time.utc(2026, 12, 1, 12)).first
+PW = [P_WINTER]
+T1 = P1.start_transition
 CASES = {
   "tz_period_eq" => -> { PA.include?(P1) },
+  "tz_period_ne" => -> { PW.include?(P1) },
+  "tz_transition_eq" => -> { T1 == T1 },
+  "change_same" => -> { JUN.change(hour: 3) },
   "fresh_bod" => -> { ActiveSupport::TimeWithZone.new(FRESH_U, CHI).beginning_of_day },
   "fresh_ago" => -> { 70.days.ago(ActiveSupport::TimeWithZone.new(FRESH_U, CHI)) },
   "fresh_new" => -> { ActiveSupport::TimeWithZone.new(FRESH_U, CHI) },

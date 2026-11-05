@@ -13,4 +13,6 @@
 
 Which file holds which column: `ir-micro-final.txt` main vs the final head (`v2`), `ir-micro-81.txt` 8-1-stable vs
 8-1 + fix (`s81fix`, the final `time_with_zone.rb` lines), `ir-micro-round1.txt` the first, rejected shape
-(`periods.one?` checked first), `ir-tzinfo-shortcut.txt` tzinfo master vs `2b2f4b45`.
+(`periods.one?` checked first), `ir-tzinfo-shortcut.txt` tzinfo master vs `2b2f4b45` (first round), `ir-tzinfo-eq.txt` the TZ1 round with an A/A
+checkout and the offset-level alternative. `tz_eq_compare.rb`: `TimezoneTransition#==`/`eql?`/`hash` differential over
+every zone of the active data source; compare the printed SHA-256 between tzinfo checkouts.

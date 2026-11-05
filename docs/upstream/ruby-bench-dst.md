@@ -207,8 +207,43 @@ same-period wrap in every DST zone, independent of the Rails fix. Not reviewed b
 | `70.days.ago`, same period | 66,485 / 66,566 | 58,480 (−12%) |
 | `70.days.ago`, crosses DST | 83,376 | 83,587 (no `include?` hit) |
 
-Pushed to the fork only, nothing opened: tzinfo's last release is 2.0.6 (2023-01-28), and the Active Support fix
-covers the DST cost that started this.
+Pushed to the fork only, nothing opened. Queued as [TZ1](../../bench/upstream/pr-queue/items/TZ1.md) (2026-11-05).
+
+### TZ1: the shortcut, re-measured and placed
+
+Re-measured on the branch itself (the table above had the shortcut prepended to both `TimezoneTransition` and
+`TimezoneOffset`), with a second master checkout as A/A control (`ir-tzinfo-eq.txt`, Rails main `1e235cee11`, Ruby
+4.0.9, America/Chicago, system zoneinfo; A/A ≤ 81 instructions per call):
+
+| instructions per call | master | `TimezoneOffset#==` shortcut | `TimezoneTransition#==` shortcut (TZ1) | both |
+| --- | ---: | ---: | ---: | ---: |
+| `[period].include?(equal_period)` | 11,446 | 7,489 | 3,440 | 3,440 |
+| `transition == transition` (same object) | 5,280 | 3,302 | 1,277 | 1,277 |
+| `beginning_of_day`, same period | 43,701 | 39,744 | 35,695 | 35,695 |
+| `change(hour: 3)`, same period | 42,439 | 38,483 | 34,434 | 34,434 |
+| `70.days.ago`, same period | 66,626 | 62,588 | 58,621 | 58,621 |
+| `70.days.ago`, crosses DST | 83,464 | 83,674 | 83,594 | 83,808 |
+| `beginning_of_day` on the day clocks went back | 63,560 | 63,798 | 63,798 | 64,008 |
+| `[period].include?(different_period)` | 4,333 | 4,543 | 4,543 | 4,753 |
+
+With tzinfo-data 1.2026.6: `include?` 11,290 → 3,440, `beginning_of_day` 44,275 → 36,399, `70.days.ago` same
+period 65,677 → 57,827.
+
+* **Placement.** The transition is the smallest place that catches the whole saving: Active Support's periods are
+  never the same object (a `TransitionsTimezonePeriod#==` shortcut never fires there), but their transitions always
+  are, in both data sources (they come from the zone's cached transitions array, also beyond the last defined
+  transition). An offset-level shortcut saves half as much and adds the same ~210 instructions to unequal
+  comparisons; adding it on top of TZ1 gains nothing.
+* **Callers.** tzinfo itself never compares transitions or periods; the only caller found is Active Support's
+  `periods.include?(period)` in `TimeWithZone#change` and `#wrap_with_time_zone` (Rails main and 8-1-stable).
+* **Exactness.** `tz_eq_compare.rb`: `==`, `eql?` and `hash` agree with master's expression, and the per-comparison
+  digest is identical between master and TZ1, for every transition of every zone against itself, its neighbours,
+  equal copies built with `TimezoneTransition.new` (one with a fresh offset) and other types, up to 2100 (zoneinfo: 597 zones, 651,122 comparisons;
+  tzinfo-data: 598 zones, 314,438). The only input whose result changes is a transition built with a value that is
+  not equal to itself (e.g. `Float::NAN` as `timestamp_value`), outside the documented types. `eql?` is an alias
+  bound after the new body. tzinfo `rake test` on Ruby 4.0.9: 1,867/1,865/1,865 runs, 0 failures; the fork's full
+  Tests matrix (39 jobs, MRI 2.3–4.0, JRuby 9.1–10.1, Linux and Windows) passes on `2b2f4b45`. Active Support's
+  seven time test files: 1,281 runs, 0 failures with master and with TZ1.
 
 ## Recommendation
 
@@ -216,8 +251,7 @@ covers the DST cost that started this.
   Sol and Astra passes. Body: the mechanism above in three paragraphs, the micro table (main and 8-1-stable), the
   lobsters allocation numbers (657.9K → 648.9K on 2026-11-05, unchanged on 2027-06-28), and the differential. It
   qualifies as L1 (one unusual but clear ternary; per-call CPU gain far outside the A/A).
-* **tzinfo**: keep as a lead; propose only if a Rails maintainer or tzinfo shows interest, since tzinfo releases
-  rarely.
+* **tzinfo**: TZ1 is prepared as a draft candidate (see above); it is independent of the Active Support fix.
 * **ruby-bench**: the fixed-clock PR from round 4 still makes sense on its own: it removes date dependence that has
   other sources too (expired windows), and the DST part would otherwise only disappear once ruby-bench pins a Rails
   release with the fix.
