@@ -20,6 +20,9 @@ overridden `primary_key` (#59622).
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
+| Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restored), CW3–CW5 (b), SU4, SU5, L1 |
+| Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, held), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
+| Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, lead), PI3 (a, perf, built) |
 
 ## Findings
 
@@ -324,3 +327,337 @@ is the private method removed in 4f594320e4 (R2-16): 3 more.
   which main turns into a plain Hash after eager loading (25f2e02c9a, 2afdfaf660), so the warmup skips it.
 * 1 (d): `comment_creator_spec` checks that a delegator responds to every `Comment.instance_methods`, which now
   includes the new protected `association_cache` (d432679e04).
+
+## Chatwoot
+
+chatwoot/chatwoot `a8364f9` (default branch `develop`,
+[`a8364f9c43`](https://github.com/chatwoot/chatwoot/tree/a8364f9c4385b12b4f217649c1dad23755459215)), Ruby 3.4.4 (its
+pin) on both trees, PostgreSQL 16.15 with pgvector, Redis 7.0. Rails main `7a78da5a55` for every run, the bisects and
+the fix branch; 8-1-stable `6e09124217`. Community edition as in its CI (`enterprise/` and `spec/enterprise` removed),
+668 spec files and 7632 examples in 8 processes with one database and Redis db each, files split round-robin, Vite
+assets built once per tree (about 4 minutes wall per run). Chatwoot's test env prints deprecations to stderr, so
+main-only ones are read from the logs.
+
+**Port to 8.x, identical on both trees.** Chatwoot locks Rails 7.2.3.1 and doesn't boot on 8.x as it is; its own
+`codex/rails-8-1-3` branch is 188 commits behind develop and conflicts with it, so the default-branch SHA got a
+minimal port instead: the 31 keyword-argument `enum` calls in 23 model files rewritten to `enum :name, {…}` (removed in
+8.0); [`resource :app, only: [:index]`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/config/routes.rb#L715)
+→ `only: []` (8.1 raises on `:index` for a singular resource; same routes); `sprockets-rails` added to the Gemfile
+(Rails 8 no longer depends on it); [`rails-i18n ~> 7.0`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L89)
+→ `~> 8.0`; [administrate-field-belongs_to_search 0.10.0](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L99),
+the latest release, vendored with its `rails < 8.0` and `administrate < 1.0` caps lifted. `bundle lock
+--conservative --update rails administrate administrate-field-belongs_to_search rails-i18n` then moved administrate
+to 1.0.0, acts-as-taggable-on 13.0.0, audited 5.8.0, devise-two-factor 6.4.1, devise_token_auth 1.3.0 and tidewave
+0.9.1. Conservative bumps on both: ruby-vips 2.1.4 → 2.3.0 (8.1's Active Storage refuses older ruby-vips),
+groupdate 6.2.1 → 6.8.0 (6.2.1 fails 33 report specs on 8.1), redis-client 0.26.4 → 0.30.1 (SU4: main's
+`RedisCacheStore`, built in [rack_attack.rb](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/config/initializers/rack_attack.rb#L19),
+needs ≥ 0.28.0 at boot) and rspec-rails 7.0.1 → `570b2b0a79` (L1: every mailer spec file fails to load with
+`FrozenError` on main, as in Forem). The two locks then differ only in the Rails gems and what main itself requires
+(globalid 1.4.0, herb, marcel 2.1.0, psych, ractor-dispatch, stringio).
+
+**Main checkout only:** [`gem 'active_record_query_trace'`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/Gemfile#L258)
+→ `require: false` (c). Its [`CustomLogSubscriber < ActiveRecord::LogSubscriber`](https://github.com/brunofacca/active-record-query-trace/blob/5c6736460471421533d6156bcdf71d938a45ac9a/lib/active_record_query_trace.rb#L80)
+calls [`attach_to :active_record`](https://github.com/brunofacca/active-record-query-trace/blob/5c6736460471421533d6156bcdf71d938a45ac9a/lib/active_record_query_trace.rb#L101)
+(1.9, the latest release; unchanged on its default branch), and the `:nodoc:` `ActiveRecord::LogSubscriber` is now an
+`EventReporter::LogSubscriber` without `attach_to` (308594b580, part of #55900 like R2-3), so boot fails with
+`NoMethodError`. The gem's own failing test for this (its #72) was closed. Chatwoot enables it only in development,
+so the shim hides no test.
+
+Results: 8-1 63 F (50 in `super_admin` specs on administrate 1.0, plus `contact_inbox_builder`, Slack uploads'
+open-redirect check, confirmation mailer: upgrade fallout that main shares). Main 211 F, 148 of them not on 8-1, in
+19 files. Those files again: main 148 F, 8-1 3 F and 3 F (the 3 confirmation mailer ones, which fail on all runs).
+The 3 `working_hour_spec` failures passed on main's rerun (time-of-day dependent), so 145 main-only failures are
+stable; all are classified below, and CW1 is the only (a).
+
+**CW1 (a): `where("", values)` puts `(())` in the query.** Chatwoot's
+[`FilterService#query_builder`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L189)
+calls `where(@query_string, @filter_values)`, and `@query_string`
+[starts as `''`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L20);
+with no filters, `PG::SyntaxError` (4 failures in `conversations/filter_service_spec`). 8-1 drops the empty condition;
+on main `build_where_clause` [wraps it in parentheses](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/relation/query_methods.rb#L1995)
+before the fallback that leaves it unchanged. Bisected to 8c4ed25f0a (#58427, kamipo), the SU2 commit; this is a
+side effect of moving `where`'s dispatch into `bound_sql_literal_for`, not the deliberate `find_by_sql` change, and the
+fallback's parentheses are otherwise only doubled (`((a = 1))`, harmless). Not in S1–SU5, R2-x, E1–E4 or AR-1–AR-4
+(AR-4 changes `where!`'s signature, not this branch); no issue or PR found. Repro:
+[empty_where.rb](../../bench/upstream/app_suites/empty_where.rb). Fix: use an empty condition as it is
+(`if rest.empty? || opts.empty?`), which is what 8-1's `sanitize_sql` returned for it with any values; one test in
+`where_test.rb` (empty, named and positional values, as arguments and in the array form) that fails on main with a
+syntax error. `opts.empty?` rather than `blank?`: a whitespace-only condition gave invalid SQL on 8-1 too. Repro runs
+each relation (8-1 and the fix: rows; main: syntax error). Relation, finder,
+sanitize, relations and base tests 1508 runs green on SQLite, RuboCop clean; with the fix in the main tree, Chatwoot's
+`filter_service_spec` passes 52/52.
+[patch](../../bench/upstream/app_suites/cw1-where-empty-condition-binds.patch),
+[body](../../bench/upstream/app_suites/cw1-body.md). Branch `thomasklemm/where-empty-condition-binds` @ `58a6ff8355`
+on main `7a78da5a55`. Sol: open with nits; applied (array form in the test, "values" not binds, "on Rails main" in
+the body, the repro executes the query); amended and force-pushed with lease from `4520f97971`.
+
+**CW2 (d), restored: the private `Resolver#_find_all` hook is gone.** 9987431315 (#58279, "Resolve the single
+best template without sorting the whole set") made [`Resolver#find_all`](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/actionview/lib/action_view/template/resolver.rb#L68-L70)
+call `find_templates` directly; 8-1's [`find_all` called `_find_all`](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/actionview/lib/action_view/template/resolver.rb#L61).
+Chatwoot's [`EmailTemplates::DbResolverService`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/email_templates/db_resolver_service.rb#L28)
+(a `Resolver` subclass, a pattern from panoramic) overrides `find_all` and calls `_find_all(name, prefix, partial,
+details, key, locals)`, so every mailer that renders through it raises `NoMethodError`: 121 failures. Other callers:
+[view_component-cache_digest](https://github.com/tildeio/view_component-cache_digest/blob/82da53b3b092a256841858ed6a482ae0bd80b385/lib/view_component/cache_digest/resolver.rb#L10)
+(a `Resolver` subclass overriding `_find_all`, unreleased); [godmin 2.3.0](https://github.com/varvet/godmin/blob/b270f3736dde6022b71544c1692cafea42d4b35f/lib/godmin/resolver.rb#L22)
+and [rbexy 2.0.0.rc7](https://github.com/patbenatar/rbexy/blob/681bc8813f9e8258b8c8ed4056030d0516d5d4ad/lib/rbexy/rails/component_template_resolver.rb#L13)
+override it in `FileSystemResolver` subclasses; code search shows about 245 hits for `_find_all(name, prefix, partial`.
+Repro: [resolver_find_all_hook.rb](../../bench/upstream/app_suites/resolver_find_all_hook.rb). On 8-1 both
+overrides are used through `find` and `find_all`. On main the `Resolver` subclass raises `NotImplementedError` from
+`find_templates`, and the `FileSystemResolver` subclass (the godmin/rbexy shape) silently finds nothing. Restore
+(decided 2026-11-04 under the restore rule: unreleased, several callers, small): `Resolver#find_all` calls
+`_find_all` again, its private default calls `find_templates`, and `Resolver#find` still goes through `find_all`, so
+an override of either is honored. `FileSystemResolver` is unchanged: its own optimized `find`/`find_all` never reach
+`_find_all`, so godmin's and rbexy's overrides stay uncovered; honoring them there would need a check on every
+`find`, which would undo #58279's fast path, and the body says so. Tests in `view_paths_test.rb`: a subclass
+overriding `_find_all` (fails on main with `NotImplementedError`), Chatwoot's shape (public `find_all` calling the
+inherited `_find_all`, with `find_templates`; fails on main with `NoMethodError`) and one implementing only
+`find_templates`, each rendering through a controller (`PathSet#find`) and `PathSet#find_all`; plus a resolver-level
+check that `find` and `find_all` pass all six arguments to `_find_all` unchanged (`details`, `key` and `locals` by
+identity; fails on main). Action View suite 3372 runs green, RuboCop clean. With the restore in the main tree and without the app shim, Chatwoot's 9
+affected spec files run 132 examples with 3 failures, the confirmation mailer ones that fail on 8-1 too.
+[patch](../../bench/upstream/app_suites/cw2-resolver-find-all-hook.patch),
+[body](../../bench/upstream/app_suites/cw2-body.md). Branch `thomasklemm/resolver-find-all-hook` @ `0d3ef774bd` on
+main `7a78da5a55`. Sol: open with nits; applied (Chatwoot-shape and argument tests, body wording: bypassed overrides
+vs. Chatwoot's missing inherited method, methods named, the fast-path reason); amended and force-pushed with lease
+from `e910df6df3`.
+
+**CW3 (b): `precision: nil` datetime columns cast to microseconds in memory** (as in Mastodon): 2 failures, the widget
+and public `update_last_seen` specs expect `UpdateMessageStatusJob.perform_later` with a nanosecond `Time` on
+`contact_last_seen_at`.
+
+**CW4 (b): integration `get …, params:, as: :json` sends the params in the query string.** 3c99a378ad (#57140,
+CHANGELOG) removed the `X-Http-Method-Override` POST, so `companies_controller_spec`'s `page: 1` comes back as `"1"`
+(2 failures). The CHANGELOG says "`params:` retains existing behavior: GET → query string", which isn't what 8.1 did
+for GET with `as: :json`.
+
+**CW5 (b?), record only: saving re-derives a polymorphic type from the associated record.** Factories build
+`Inbox` with a `channel` and then `channel_type: 'Channel::FacebookPage'`; 8-1 saves that type, main saves the
+channel's class. Bisected to 4af9822fae ("Write association keys through routes", #59120, the R2-1 commit); repro:
+[poly_type.rb](../../bench/upstream/app_suites/poly_type.rb). 8-1 stored a type that disagrees with the saved record,
+so main's result is consistent and the test relied on the mismatch: 2 failures
+(`contact_inbox_with_contact_builder_spec`, `billing_helper_spec`). No CHANGELOG entry.
+
+**SU5 (c): activerecord-import 2.1.0 calls the removed `validation_context=`**: 14 failures in the data import
+job and Intercom importer specs.
+
+**Deprecations that only main emits** (warnings in the main run): 1817 `` `verify_authenticity_token` is deprecated
+… use `skip_forgery_protection` `` (as in Redmine and Forem); 16 `config.active_record.raise_on_assign_to_attr_readonly`
+is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
+ActiveSupport::Cache::RedisCacheStore is deprecated`, from rack_attack.rb above. Both trees print Devise 4.9.4's route
+mapper warnings and `ActiveSupport::Configurable is deprecated`.
+
+## Discourse
+
+discourse/discourse `f81fcb4` (default branch `main`,
+[`f81fcb4b44`](https://github.com/discourse/discourse/tree/f81fcb4b4425f4c3b8c94248771e8289daf6c376)), Ruby 4.0.9 on
+both trees (Discourse asks for `~> 4.0.0`), PostgreSQL 15.19 with pgvector 0.8.1, Redis 7, libvips 8.18.7 (built
+from source; Discourse's vips worker refuses older), jemalloc. Rails main `7a78da5a55` for every run and bisect
+(still the head of the freshly fetched main); 8-1-stable `6e09124217`. Discourse's own core backend suite as its CI
+runs it: `bin/turbo_rspec` without arguments (every `spec/**/*_spec.rb` except `spec/system`; plugin and theme specs
+are separate CI jobs and not run), 1712 files and 35771 examples, 8 workers with their own database and Redis,
+`--seed 4242`, 12–15 minutes wall per full run on 8 cores. Discourse's test env prints deprecations to stderr
+(`config.active_support.deprecation = :stderr`), so it doesn't raise on them; main-only ones are read from the logs.
+
+**Lockfiles.** Discourse names the seven Rails component gems at `~> 8.1.0` (8.1.4); both checkouts point them at a
+`path:` Rails. The only other change, on both trees: 8-1-stable's actionview needs `rails-html-sanitizer >= 1.7.2`,
+so Bundler moved rails-html-sanitizer 1.7.1 → 1.7.2, loofah 2.25.2 → 2.25.3 and nokogiri 1.19.4 → 1.19.7. The main
+lock was resolved from the 8-1 lock and differs only in the Rails gems and what main itself requires (herb 0.11.1,
+psych 5.5.0, ractor-dispatch 0.3.0, stringio 3.2.0). No main-only bump. rspec-rails stays at its locked 8.0.4.
+
+**Main checkout only, app side:**
+* [`foreign_key: %i[chatable_id chatable_type],`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/lib/chat/category_extension.rb#L17)
+  → `as: :chatable,` (DS1). Without it `db:migrate` (which loads the bundled plugins) can't seed the Uncategorized
+  category; the unshimmed main run printed 35771 `F` before it was stopped, and a single file fails every example with
+  `'allow uncategorized topics' cannot be enabled because the "Uncategorized" category no longer exists`.
+* [`Arel::Table.new(table_name)`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/json_api_kit/adapters/active_record/pagination/numbered_rows.rb#L43)
+  → `Arel::Table.new(name: table_name)`, applied after the full run, for the classification rerun only: 101 of the
+  140 main-only failures (all of `json_api_kit`). This is the positional table name of
+  [arel-table-positional](arel-table-positional.md), which already lists Discourse; covered by our open #59574.
+
+Results: 8-1 53 F (`qunit_cli`, image tools, `safe_exec`, SMTP and other environment failures, all also on main).
+Main 191 F. The 60 files with any failure, again (2240 examples): main 192 F (the extra one is `smtp_spec.rb:31`,
+flaky on 8-1 too), 8-1 52 F and 51 F (`smtp_spec.rb:31` and `api/site_spec.rb:29` flaky). 140 failures are on both
+main runs and on none of the three 8-1 runs; all are classified below.
+
+**DS1 (a), held: a two-column `foreign_key` against a one-column primary key now raises on every use.** The bundled
+chat plugin declares `has_many :category_channels` with
+[`foreign_key: %i[chatable_id chatable_type]`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/lib/chat/category_extension.rb#L17) where
+`as: :chatable` was meant. On main any read of the association raises `ArgumentError: Key mappings must have the
+same number of columns` ([key.rb#L397](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/key.rb#L397)), so with chat enabled every
+`Category` save fails in
+[`object.category_channels.exists?`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/plugins/chat/plugin.rb#L423), the serializer that `publish_category` runs,
+and `db:migrate` can't seed. Bisected to 7249a66350 ("Resolve association reads through routes", #59120, the R2-1
+and CW5 PR; its parent 7374e8551f passes). Repro: [fk_arity.rb](../../bench/upstream/app_suites/fk_arity.rb). On 8-1
+the same declaration silently queries `chatable_id IS NULL AND chatable_type IS NULL` (so `has_chat_channels` is
+always false and `dependent: :destroy` deletes nothing), `joins` builds `"categories".""`, and only `build` works.
+Not in S1–SU5, R2-x, E1–E4 or AR-1–AR-4 (the PG census hit it as a setup note); no issue or PR found. Not built: 8-1's
+behavior is wrong, so restoring it isn't a fix; the fix is Discourse's `as: :chatable`. At most Rails could name the
+association in the error (`CompositePrimaryKeyMismatchError` is checked only for composite primary keys); the
+coordinator decides whether that is worth a PR.
+
+**DS2 (a): an attribute named `method` breaks every association read on its record.** `UserSecondFactor` has a
+[`method` column](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/models/user_second_factor.rb#L56), and main's
+[`sc.execute(owner.method(:read_attr), c, async: async)`](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/associations/association.rb#L286)
+calls the attribute reader instead of `Object#method` (`wrong number of arguments (given 1, expected 0)`): 8
+failures in `second_factor_manager_spec`. Same commit, 7249a66350 (#59120). Already covered by open
+[#59595](https://github.com/rails/rails/pull/59595) (anthonyfranco, `8f966cd64d`, a lambda instead of `method`);
+with it applied to the main tree, `second_factor_manager_spec` passes 61/61. No branch of ours, no comment.
+
+**DS3 (b)+(d): Active Record's PostgreSQL adapter no longer calls `exec`/`async_exec`/`exec_params`.** 53701519a1
+("Preserve typed PG exceptions for server-initiated disconnects", #57057, matthewd; no CHANGELOG entry) switched to
+`send_query`/`send_query_params`/`send_query_prepared` plus `get_result`. Discourse wraps the old methods:
+[`Migration::SafeMigrate`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/migration/safe_migrate.rb#L97) (`alias_method :exec_migrator_unpatched, :exec`
+and `:async_exec`), which blocks column drops and renames in migrations, now sees no SQL (5 failures in
+`safe_migrate_spec`), and [`MethodProfiler`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/method_profiler.rb#L153)
+(`%i[exec async_exec exec_prepared send_query_prepared query exec_params]`) records no SQL time (1 in
+`request_tracker_spec`). Both stop working silently in production too. Repro:
+[pg_send_query.rb](../../bench/upstream/app_suites/pg_send_query.rb): 8-1 `{async_exec: 1, exec_params: 1}`, main
+`{send_query: 1, send_query_params: 1}` (main calls them at [database_statements.rb#L189–L213](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb#L189-L213)).
+A deliberate change, but a CHANGELOG or upgrade-guide note would be the S1-style follow-up; not built.
+
+*APM gems, checked at runtime* with [apm_pg_spans.rb](../../bench/upstream/app_suites/apm_pg_spans.rb) on both trees
+(PostgreSQL 15, `prepared_statements: true`, warmed up, then four queries: `where` without binds, `create!`, a
+prepared `find`, and `where` with binds inside `unprepared_statement`; 6 SQL statements in all, `create!` being
+BEGIN, INSERT, COMMIT). Each gem at its latest release:
+
+| Gem, integration | 8-1-stable | main |
+|---|---|---|
+| opentelemetry-instrumentation-pg 0.37.1 (sdk 1.13.1, in-memory exporter) | 6 SQL spans with `db.statement` | **0** |
+| opentelemetry-instrumentation-active_record 0.13.0 | 5 model spans (`ApmPost query`, `ApmPost.create!`, `ApmPost#save!`), no attributes | the same 5, still no SQL |
+| datadog 2.48.0, `pg` (`pg.exec.params`, `pg.async.exec`, `pg.exec.prepared`; test mode, traces dropped in `before_flush`) | 6 | **0** |
+| datadog 2.48.0, `active_record` (`postgres.query`, from `sql.active_record`) | 6 | 6 |
+| rack-mini-profiler 5.0.0, pg patch (`should_measure?` forced, `record_sql` counted) | 6, with SQL | **1**, the prepared `find`, recorded as the statement name `a1` instead of its SQL |
+
+So OpenTelemetry users lose every SQL span on 8.2: the pg integration sees nothing and the Active Record integration
+never had the SQL. Datadog users keep SQL spans if the `active_record` integration is on (it is under
+`instrument :rails`), and lose only the pg-level spans (`pg.*`, with their own peer and timing tags).
+rack-mini-profiler in a Rails app loses all of its SQL timings: when it patches pg it [turns its `sql.active_record`
+subscription off](https://github.com/MiniProfiler/rack-mini-profiler/blob/d95511f0b5fe0ae6d326c6ce7071157d829b9447/lib/patches/sql_patches.rb#L34-L41). None of the three raises or warns.
+
+Patched methods at the release tags: OpenTelemetry
+[`EXEC_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L70-L78) (`exec`, `query`, `sync_exec`, `async_exec`, `exec_params`,
+`async_exec_params`, `sync_exec_params`), [`PREPARE_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L83-L87) and
+[`EXEC_PREPARED_ISH_METHODS`](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/constants.rb#L92-L96), wrapped in [patches/connection.rb](https://github.com/open-telemetry/opentelemetry-ruby-contrib/blob/7f5283c99271aa4b9acd625b39429ba5d90ee285/instrumentation/pg/lib/opentelemetry/instrumentation/pg/patches/connection.rb#L81-L82);
+Datadog [`exec` … `sync_exec_prepared`](https://github.com/DataDog/dd-trace-rb/blob/f7009ebf10051fd6d0a034adf98050288f5517e6/lib/datadog/tracing/contrib/pg/instrumentation.rb#L23-L90) (the `exec`, `async_exec` and
+`sync_exec` families with `_params` and `_prepared`); rack-mini-profiler
+[`exec`, `async_exec`, `exec_prepared`, `send_query_prepared`, `prepare`, `exec_params`](https://github.com/MiniProfiler/rack-mini-profiler/blob/d95511f0b5fe0ae6d326c6ce7071157d829b9447/lib/patches/db/pg/alias_method.rb#L31-L39).
+None wraps `send_query` or `send_query_params`, and only rack-mini-profiler wraps `send_query_prepared`. **Heads-up posted on #57057 with Thomas's approval on 2026-11-04** ([comment](https://github.com/rails/rails/pull/57057#issuecomment-6642150088)); issues for the gems wait for matthewd's answer.
+
+**DS4 (d): `CSRFTokenVerifier` includes `RequestForgeryProtection` outside a controller.**
+[`include ActionController::RequestForgeryProtection`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L9) then
+[`verified_request?`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/csrf_token_verifier.rb#L22) (OmniAuth's request phase). Main's Sec-Fetch-Site check
+(f5a1915f1d) instruments the token fallback, and `instrument_csrf_event` (daa6fae399, #56355) calls `action_name`,
+which the plain class lacks: `NameError`, a 500 for a POST to `/auth/*` without `Sec-Fetch-Site` (1 failure in
+`omniauth_callbacks_controller_spec`). Browsers send the header, so this is mostly non-browser clients.
+
+**Known findings:**
+* AR-4: [`permalinks.where!("url ILIKE :url OR external_url ILIKE :url", url: …)`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/models/permalink.rb#L92)
+  leaves `:url` in the SQL, `PG::SyntaxError` at `:`: 3 failures in `admin/permalinks_controller_spec`
+  (filter by URL).
+* S1: test and development set [`x_sendfile_header = nil`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/config/environments/test.rb#L94), so main drops
+  `Rack::Sendfile` there and [`middleware_order_spec`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/spec/integrity/middleware_order_spec.rb#L14) fails (1).
+  Production sets `X-Accel-Redirect`, so the middleware stays, and
+  [`request.env["sendfile.type"] = ""`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/static_controller.rb#L353) still disables it per request,
+  as S1 says. Nothing in Discourse inserts relative to `Rack::Sendfile`.
+* 5 (c): view specs fail with `FrozenError` on `["", "action_view/test_case/test"]` (`topics/show`, `list/list`):
+  rspec-rails 8.0.4 and `_prefixes`, as in Mastodon (fixed in rspec-rails 570b2b0a79, unreleased).
+* 10 (b): `precision: nil` timestamps cast to microseconds in memory (c162370c8f, #57845; as in Mastodon): the four
+  `basic_reviewable_*_serializer_spec`s, `pending_post_serializer_spec` (2), `invite_spec` (2), `user_spec` (1),
+  and `post_spec`'s "resets the topic's bumped_at", where `reset_bumped_at` runs on a stale `Topic`: on 8-1 the
+  nanosecond `created_at` differs from the stored microseconds, so the save happens; on main the values are equal
+  and nothing is saved.
+* 2 (b): `Vary: Sec-Fetch-Site` on stylesheet and theme JavaScript responses that expect no `Vary` (as in Mastodon).
+* 3 (b): `ActiveModel::Errors#inspect` now prints `#<ActiveModel::Errors:0x… @errors=[]>` (4c0776608a, #56865,
+  `instance_variables_to_inspect`); `steps_inspector_spec` matches 8.1's `#<ActiveModel::Errors []>`.
+* Not seen: S2, SU1–SU5, R2-x, E1–E4, AR-1–AR-3, L1, L2.
+
+**Deprecations that only main emits** (warnings, counted in the full main run):
+* 1246: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` ``, from
+  [`skip_before_action :verify_authenticity_token`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/users/omniauth_callbacks_controller.rb#L13)
+  in 8 files (4f2ee07b8e, #56369).
+* 18: `` Calling `protect_from_forgery` without specifying a strategy is deprecated ``, from
+  [application_controller.rb#L23](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/application_controller.rb#L23) and
+  [uploads_controller.rb#L16](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/controllers/uploads_controller.rb#L16).
+* 10: `` `config.active_record.schema_cache_ignored_tables` is deprecated `` (use `schema_ignored_tables`), from
+  [`ActiveRecord.schema_cache_ignored_tables.push(`](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/config/initializers/000-active_record.rb#L11).
+* 10: `require_dependency is deprecated`, from Discourse's
+  [compatibility wrapper](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/require_dependency_backward_compatibility.rb#L18).
+* Both trees: 5 `` `distinct` is not supported by `update_all` `` from
+  [uploads.rake#L623](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/lib/tasks/uploads.rake#L623).
+
+## Private Rails app with Inertia Rails
+
+The private app from [the anonymized M0 study](../m0/private-inertia-app.md): authenticated Inertia (React) pages,
+dashboards, background jobs, PostgreSQL. No application source, names or test counts are recorded here, per that
+study's privacy rules; the app was not changed upstream (no commits, branches or PRs). Ruby 4.0.9 on both trees,
+its locked inertia-rails 3.23.0, PostgreSQL 18.6, the app's own `rails test` with 8 workers and a fixed seed.
+Rails 8-1-stable `6e09124217` and main `7a78da5a55`, both as `path:` gems.
+
+**Bundles.** The two locks differ only in Rails and what main itself requires (herb, marcel 2.1, psych,
+ractor-dispatch, stringio), plus one gem whose latest release caps marcel below 2; it was moved to its unreleased
+upstream fix commit in both trees. The app's test env prints deprecations to stderr (not raising), so main-only ones
+were read from the logs. Environment fixes identical on both trees: the `zip` CLI installed, and
+`max_locks_per_transaction = 256` on the test cluster (PI2; with the default 64, one of two main runs failed most
+tests with `out of shared memory`; the 8-1 runs never did).
+
+**Results.** 8-1 twice: every test passes. Main twice: the same failures both times, all in one area of the app and all
+from PI1. With a one-line app-side shim for PI1 (main checkout only), main passes every test, with the same assertion
+count as 8-1.
+
+**PI1 (c), covered by our open #59574: `Arel::Table.new(name)` with a positional name.** The app calls `Arel::Table.new` with a
+positional name and gets `ArgumentError (given 1, expected 0)` (b1650993b0, #57829; see
+[arel-table-positional](arel-table-positional.md)). With #59574's branch in the main tree and no app shim, the failing
+files pass, and each call prints the new deprecation. Nothing new to build.
+
+**PI2 (a), lead, not built: `disable_referential_integrity` on PostgreSQL 18.4+ holds about 16 times as many locks.**
+7051ca8a45 (#57378, CHANGELOG) toggles every foreign key with `ALTER TABLE … ALTER CONSTRAINT … NOT ENFORCED` and back,
+in one transaction. Each toggle locks the table, the referenced table, their indexes and the constraint until commit;
+8-1 used `DISABLE TRIGGER ALL`. `truncate_tables` (at each parallel worker's start) and `insert_fixtures_set` both go
+through it, and fixture loading keeps the locks until its transaction commits. PostgreSQL's shared lock table holds
+about `max_locks_per_transaction` × connections (64 × about 100 by default), so parallel test workers that load
+fixtures at the same time can run out: `PG::OutOfMemory: out of shared memory`. In the app suite this hit one of the
+two main runs and neither 8-1 run. Repro without app code:
+[fk_locks.rb](../../bench/upstream/app_suites/fk_locks.rb), default PostgreSQL 18.6 settings, 151 tables with 300
+foreign keys: one call holds 161 locks on 8-1 and 2,558 on main. 24 processes resetting their databases at once, each
+holding the locks for half a second as a fixture load would: 8-1 24/24 ok twice; main 10 and 13 of 24 fail with
+`out of shared memory`. With 8 or 16 processes the repro passes on main most of the time, so how often a suite hits
+it depends on the database size and on whatever else holds locks at that moment. The CHANGELOG entry doesn't mention
+locks. No issue or PR found. A fix isn't small: the toggle is the point of the change (it needs table ownership
+instead of superuser), and the locks are what `ALTER CONSTRAINT` takes. Options for the coordinator: an upgrade-guide
+or CHANGELOG note (raise `max_locks_per_transaction` for parallel tests), or asking upstream whether `truncate_tables`
+needs the toggle at all, since PostgreSQL truncates all tables in one statement. App-side workaround: raise
+`max_locks_per_transaction`.
+
+**PI3 (a, performance), built: `Object#try` allocates an empty keyword Hash per call.** 2709a9f16d (kamipo, "Remove
+`ruby2_keywords` usage", no CHANGELOG) turned `try(*args, &block)` with `ruby2_keywords` into
+`try(*args, **kwargs, &block)`; a named keyword splat builds a Hash on every call. Found by allocation sites per
+request: inertia-rails 3.23.0's prop resolver calls
+[`prop.try(:rescue?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L120),
+[`prop.try(:deferred?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L279)
+(shortened) and [`prop.try(:once?)`](https://github.com/inertiajs/inertia-rails/blob/3ffd1f4c4f66cef89c481423af1fc25beb859de6/lib/inertia_rails/props_resolver.rb#L285)
+per prop (v3.23.0), so its allocations rise by about 200 objects
+per page on main. Repro: [try_kwargs.rb](../../bench/upstream/app_suites/try_kwargs.rb) (8-1 1 object per
+`try(:name)`, main 2, fix 1; with keywords 3 on all three). Fix: an anonymous `**`, which avoids materializing the keyword Hash on Ruby 3.4+ when no keywords are passed (no
+allocation improvement on 3.3); only the block form checks for keywords, through a private
+`try_keywords_empty?(**)`, so behaviour is unchanged (`try(key: 1) { }` still raises `TypeError` on `try` and
+`try!`), and the block-only form `try { }` keeps main's count. First version (`1e3539559d`) dropped that check and ran
+the block; Sol asked for identical behaviour. Tests: behaviour, not allocation counts (Sol: brittle across VMs and
+JITs): `try`/`try!` with `**{}`, a positional Hash, keywords, keywords with a block, and keywords alone with a block
+(raises). They pass on 8-1, main and the fix on Ruby 4.0.9 and 3.3.13, and fail on the first version. Edge-case
+differential (`try`/`try!` with no name, keywords only, blocks, Hash receivers): identical to main. Active Support
+`core_ext` tests identical to main (only missing-`builder` LoadErrors in this bundle); RuboCop clean. Callgrind
+instruction counts per `try(:deferred?)` call, not page speedups ([try_micro.rb](../../bench/upstream/app_suites/try_micro.rb):
+200,000 warm-up calls, then (Ir at 200,000 − Ir at 0) / 200,000, Ruby 4.0.9, `--disable-yjit` and
+`--yjit --yjit-call-threshold=1`, two runs each, identical): 3,362 → 2,835 interpreter, 2,293 → 1,894 YJIT; 2 → 1
+objects. ZJIT micro on Ruby master not run (no master build on this orb).
+[patch](../../bench/upstream/app_suites/pi3-try-without-kwargs-hash.patch),
+[body](../../bench/upstream/app_suites/pi3-body.md). Branch `thomasklemm/try-without-kwargs-hash` @ `fb8a273532`
+on main `7a78da5a55`. Sol: changes requested, applied.
+
+**inertia-rails 3.23.0 on main:** nothing breaks and it emits no deprecation; its only main-specific effect is PI3.
+
+**Deprecations that only main emits** (all from app code): `exec_insert`/`exec_update` (deprecated, to be removed in
+9.0), `ActionController::InvalidAuthenticityToken` (renamed to `InvalidCrossOriginRequest`), and
+`ActiveRecord::SchemaDumper.ignore_tables` (use `config.active_record.schema_ignored_tables`).
+
+**Impact on four requests:** [private-inertia-app-82](../m0/private-inertia-app-82.md).
