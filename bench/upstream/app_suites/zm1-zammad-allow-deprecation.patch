@@ -1,0 +1,10 @@
+--- a/spec/support/deprecation_toolkit.rb
++++ b/spec/support/deprecation_toolkit.rb
+@@ -10,6 +10,7 @@ DeprecationToolkit::Configuration.warnings_treated_as_deprecation = [ %r{deprecat}i ]
+ 
+ # Ignore deprecation warnings from dependencies.
+ DeprecationToolkit::Configuration.allowed_deprecations = [
++  %r{Passing a column name to `ActiveRecord::PredicateBuilder#build_bind_attribute`},
+   lambda do |_message, stack|
+     path = stack.reject { |s| s.absolute_path.nil? }.first.absolute_path.to_s
+     path.include?('/ruby/') || path.include?('/gems/')
