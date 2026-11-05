@@ -2181,3 +2181,19 @@ No fresh YJIT or master/ZJIT claim is made for this held candidate. Readability:
 The coordinator agreed to hold under the two-round rule: the gain is real, but the candidate is not exact;
 no further design investigation, no approving skeptic pass, and no Sol request for PI3. Its old proposed
 body remains in the item as a rejected draft, explicitly labeled by the hold note.
+
+## Queue Sol follow-up (2026-11-05)
+
+The coordinator reported Sol `nits` on UG82 `bdaa6d4ce167914615a961a6187ab64dca595ed9`, with no must-fix or
+should-fix and agreement on all four notes. Applied the shared skeptic/Sol ownership-filter nit by amending
+the PostgreSQL commit to `c0607ce4c1511513d413ac5e50ad18a234a2832e` and replaying Sidekiq. New head
+**`f6bc1907dced83f50533ab18e32facef5517d1d0`** still has four commits. The only content delta names enforced
+foreign keys on tables whose owner the connection can use, in the current schemas. This matches
+`pg_has_role(t.relowner, 'USAGE')` and `current_schemas(false)` on fetched main
+`1e235cee11b0a7aecb189d8837534807626287aa`.
+
+A fresh skeptic delta confirmation on that exact head returned **approve, no remaining nits**, checking the
+source filters, unchanged boundaries of all four notes and current body. `git diff --check` passes;
+`git merge-tree --write-tree <main> <head>` succeeds. The runtime evidence above is unchanged; no new
+PostgreSQL exhaustion run is claimed. Both old-head Sol and new-head skeptic passes are recorded in UG82's
+item; only coordinator Sol confirmation remains. PI3 stays held with its branch intact; SP1 is untouched.

@@ -312,3 +312,39 @@ path-source-specific solver quotation as a universal statement about Active Supp
 received `approve` on the same exact head. Cold read: declare the version already required by the unconditional
 alias, so incompatible combinations fail at resolution rather than test-case loading. This does **not** fix AMS's
 separate deliberate dynamic-route removal. No upstream PR or issue action; no Sol/Astra run here.
+
+## Queue Sol follow-up (2026-11-05)
+
+The coordinator reported Sol `changes` on `0a69eb6cce5fa6a7956d2ceddaa207e14fbdc459`. Added an attributed
+entry at the top of Active Support's changelog: "Active Support now requires minitest 5.18 or newer."
+New head **`3386b8e5bf002a930dca960f6a4ecd49659dc9df`** changes only those four lines from the previous
+head; the gemspec and lockfile patch is unchanged. The body now scopes the conflict to incompatible pins
+such as AMS's `< 5.11`, says Ruby 4 resolution must select a later Ruby-compatible release, identifies the
+tested main SHA in the load-only table and removes the precedent discussion and excess footer wording.
+
+Fresh resolver controls on the exact new head, against the same fetched main
+`1e235cee11b0a7aecb189d8837534807626287aa`, use separate Gemfiles/lockfiles and the actual source gemspec:
+
+```ruby
+source "https://rubygems.org"
+gem "activesupport", path: "#{ENV.fetch('RAILS')}/activesupport"
+gem "minitest", *ENV.fetch("MT", ">= 0").split(",")
+```
+
+With `BUNDLE_GEMFILE=<case> RAILS=<tree> MT='<constraints>'` set for both commands, run `bundle lock --local`,
+then on success `bundle exec ruby -e 'require "active_support"; require "active_support/test_case"; puts "loads minitest #{Gem.loaded_specs.fetch("minitest").version}"'`.
+The explicit Active Support prelude matches the earlier loading checks; omitting it on Ruby 4 instead fails
+on the unrelated `DescendantsTracker::WeakSet` dependency before reaching the alias.
+
+| Ruby / Bundler | Tree and minitest constraint | Resolve exit | Public load |
+| --- | --- | ---: | --- |
+| 3.3.13 / 2.5.22 | main, `~> 5.0,< 5.11` | 0 | NameError: `refute_pattern`, exit 1 |
+| 3.3.13 / 2.5.22 | exact E4, `~> 5.0,< 5.11` | 6 | not run: incompatible `>= 5.18` and `< 5.11` |
+| 3.3.13 / 2.5.22 | exact E4, `5.18.0` | 0 | loads minitest 5.18.0 |
+| 3.3.13 / 2.5.22 | exact E4, `>= 0` | 0 | loads minitest 5.20.0 |
+| 4.0.9 / 4.0.20 | exact E4, `>= 0` | 0 | loads minitest 6.0.6 |
+
+A fresh skeptic reviewed the complete new-head patch and revised body: **approve, no remaining nits**;
+every Sol finding is addressed. `git diff --check` passes and `git merge-tree --write-tree <main> <head>`
+succeeds. No runtime change or new full-suite claim; only coordinator Sol confirmation remains. No upstream
+PR/issue action, and no Sol/Astra execution by this orb.
