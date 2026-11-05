@@ -14,9 +14,9 @@ alternative_of:
 impact: LogSubscriber#consumes? −17% and EventReporter#emitting? −13% instructions per call; Action Controller asks emitting? twice per action
 rank: 13
 risky: false
-state: in-review
+state: reviewed
 pr:
-note: "Sol on defa5dc860: fix first; coordinator accepted the disclosed logger snapshot and the private-helper arity change; body now pins SHAs. Waits for Sol again on defa5dc860 with that contract"
+note: "reviewed: skeptic and Sol approve on defa5dc860 under the contract (logger snapshot disclosed, private helper arity stated)"
 passes:
   - {reviewer: sol, head: "cec8010a8b", date: 2026-11-05, verdict: changes, open: "first review: disclosure, arity, numbers, links; applied in the body"}
   - {reviewer: skeptic, head: "cec8010a8b", date: 2026-11-05, verdict: approve, open: ""}
@@ -24,6 +24,7 @@ passes:
   - {reviewer: skeptic, head: "b6bbf99a51", date: 2026-11-05, verdict: nits, open: "add an info-then-nil case, list both commands; applied in defa5dc860"}
   - {reviewer: skeptic, head: "defa5dc860", date: 2026-11-05, verdict: approve, open: ""}
   - {reviewer: sol, head: "defa5dc860", date: 2026-11-05, verdict: changes, open: "logger snapshot not exact; private helper arity breaks one-argument overrides; pin SHAs. Coordinator: snapshot accepted (disclosed), helper is private so the arity change stays and is stated; SHAs pinned (body only)"}
+  - {reviewer: sol, head: "defa5dc860", date: 2026-11-05, verdict: approve, open: "optional: WARMUP and RUBY explicit in the commands; applied (body)"}
 ---
 
 # Read the logger once in EventReporter::LogSubscriber#emit and #consumes?
@@ -44,8 +45,8 @@ Callgrind instructions per call, Ruby 4.0.9 interpreter (main against itself wit
 Rails main [`1e235cee11`](https://github.com/rails/rails/commit/1e235cee11b0a7aecb189d8837534807626287aa) against this branch at [`defa5dc860`](https://github.com/thomasklemm/rails/commit/defa5dc8602281d03db9d65770e9f749fd1931e5) and a second checkout of main; Ruby 4.0.9 ([`3e93b23afc`](https://github.com/ruby/ruby/commit/3e93b23afcec3433f6aecc34b5d832799d754238)) interpreter. Lowrail [`a06703e89d`](https://github.com/thomasklemm/lowrail/tree/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round): [`percall.sh`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/percall.sh) with [`cases/er_none.rb`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/cases/er_none.rb), which loads Action Controller with an info-level `ActiveSupport::Logger` as `ActionController::Base.logger` and checks `action_controller.request_started`. Callgrind counts only the timed loop: 2,000 calls after 2,000 warmups, GC disabled, fixed heap. Ir per call is inclusive (the method, everything it calls and the loop's block call, the same on both sides). Three runs per tree; the table shows the first, and all runs of main agree within 19 Ir.
 
 ```
-percall.sh cases/er_none.rb consumes 2000 3 path/to/main path/to/main-2 path/to/branch
-percall.sh cases/er_none.rb emitting 2000 3 path/to/main path/to/main-2 path/to/branch
+WARMUP=2000 RUBY=path/to/ruby-4.0.9/bin/ruby percall.sh cases/er_none.rb consumes 2000 3 path/to/main path/to/main-2 path/to/branch
+WARMUP=2000 RUBY=path/to/ruby-4.0.9/bin/ruby percall.sh cases/er_none.rb emitting 2000 3 path/to/main path/to/main-2 path/to/branch
 ```
 
 </details>
