@@ -1,0 +1,90 @@
+diff --git a/spec/support/acceptance/helpers/step_helpers.rb b/spec/support/acceptance/helpers/step_helpers.rb
+index ca73d1b..6583da9 100644
+--- a/spec/support/acceptance/helpers/step_helpers.rb
++++ b/spec/support/acceptance/helpers/step_helpers.rb
+@@ -114,7 +114,8 @@ module AcceptanceTests
+ 
+     def add_rspec_rails_to_project!
+       add_gem 'rspec-rails', rspec_rails_version
+-      run_command_within_bundle!('bundle install --local --binstubs')
++      run_command_within_bundle!('bundle install --local')
++      run_command_within_bundle!('bundle binstubs --all')
+       run_command_within_bundle!('rails g rspec:install')
+       remove_from_file '.rspec', '--warnings'
+     end
+diff --git a/spec/support/tests/bundle.rb b/spec/support/tests/bundle.rb
+index 7bde94c..a02dca6 100644
+--- a/spec/support/tests/bundle.rb
++++ b/spec/support/tests/bundle.rb
+@@ -39,7 +39,12 @@ module Tests
+       end
+     end
+ 
++    RAILS_COMPONENTS = %w[rails railties activesupport activemodel activerecord actionpack actionview
++      actionmailer activejob actioncable activestorage actionmailbox actiontext].freeze
++
+     def install_gems
++      use_eco_rails if ENV['ECO_RAILS']
++      return install_eco_project if ENV['ECO_RAILS'] && defined?(AcceptanceTests)
+       CommandRunner.run!('bundle install --local') do |runner|
+         runner.retries = 5
+       end
+@@ -65,6 +70,32 @@ module Tests
+ 
+     private
+ 
++    # Lowrail readiness: test projects take every Rails gem from the suite's checkout (ECO_RAILS).
++    def use_eco_rails
++      path = ENV.fetch('ECO_RAILS')
++      gemfile = fs.find_in_project('Gemfile')
++      lines = File.read(gemfile).lines.map do |line|
++        name = line[/^\s*gem\s+['"]([\w-]+)['"]/, 1]
++        RAILS_COMPONENTS.include?(name) ? %(gem '#{name}', path: #{path.inspect}\n) : line
++      end
++      # Every test project depends on shoulda-matchers, and so on activesupport, also a plain Ruby one.
++      if lines.none? { |l| l.start_with?("gem 'activesupport'") }
++        lines << %(gem 'activesupport', path: #{path.inspect}\n)
++      end
++      File.write(gemfile, lines.join)
++    end
++
++    # Acceptance projects run with their own Gemfile (`bundle exec` with BUNDLE_GEMFILE), so bundle that one,
++    # outside the suite's bundle; `rails new` adds gems (debug, brakeman, ...) the suite's bundle lacks.
++    def install_eco_project
++      gemfile = fs.find_in_project('Gemfile').to_s
++      CommandRunner.run!('bundle install', env: { 'BUNDLE_GEMFILE' => gemfile }) do |runner|
++        runner.directory = fs.project_directory
++        runner.retries = 5
++        runner.around_command { |run| Bundler.with_original_env(&run) }
++      end
++    end
++
+     def already_updating?
+       @already_updating
+     end
+diff --git a/spec/support/tests/command_runner.rb b/spec/support/tests/command_runner.rb
+index 2b826cf..328a5aa 100644
+--- a/spec/support/tests/command_runner.rb
++++ b/spec/support/tests/command_runner.rb
+@@ -147,7 +147,8 @@ Output:
+     end
+ 
+     def run
+-      pid = spawn(env, *command, options)
++      # Lowrail readiness: the runner's SPEC_OPTS (seed, JSON formatter) must not reach the test projects.
++      pid = spawn({ 'SPEC_OPTS' => nil }.merge(env), *command, options)
+       t = Thread.new do
+         loop do
+           @command_output += reader.read_nonblock(4096)
+diff --git a/spec/support/tests/current_bundle.rb b/spec/support/tests/current_bundle.rb
+index 427ef60..047ff55 100644
+--- a/spec/support/tests/current_bundle.rb
++++ b/spec/support/tests/current_bundle.rb
+@@ -1,5 +1,6 @@
+ require 'bundler'
+-require 'appraisal'
++require 'singleton'
++require 'appraisal/appraisal_file'
+ 
+ module Tests
+   class CurrentBundle

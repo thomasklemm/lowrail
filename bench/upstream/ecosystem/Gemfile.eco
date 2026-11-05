@@ -4,14 +4,15 @@
 # Rails component taken from one local checkout (ECO_RAILS), so main and 8-1-stable
 # differ only in Rails. Copy next to the gem's Gemfile as Gemfile.eco-LABEL; set
 # ECO_GEMFILE to use another Gemfile of the gem (e.g. gemfiles/rails_8_1.gemfile).
-# ECO_BUMPS (JSON, {"gem": "version" | {"git": …, "ref": …}}) replaces or adds those
-# gems' declarations on both trees, so a bump is an explicit, recorded input.
-require "json"
+# ECO_BUMPS (a Ruby hash literal, {"gem" => "version" | {"git" => …, "ref" => …}}) replaces or
+# adds those gems' declarations on both trees, so a bump is an explicit, recorded input. Not JSON:
+# requiring json here activates the default json before Bundler resolves, which breaks every
+# suite that locks another json version.
 RAILS_COMPONENTS = %w[rails railties activesupport activemodel activerecord actionpack actionview actionmailer
   activejob actioncable activestorage actionmailbox actiontext].freeze
 dsl = self
 requires = {}
-bumps = JSON.parse(ENV.fetch("ECO_BUMPS", "{}"))
+bumps = eval(ENV.fetch("ECO_BUMPS", "{}")).transform_keys(&:to_s)
 bump_args = ->(spec) { spec.is_a?(Hash) ? [[], spec.transform_keys(&:to_sym)] : [Array(spec), {}] }
 define_singleton_method(:gem) do |name, *args, **opts|
   if RAILS_COMPONENTS.include?(name) && !@eco_rails

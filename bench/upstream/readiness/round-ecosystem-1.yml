@@ -1,20 +1,21 @@
 # Ecosystem round 1 (docs/upstream/ecosystem-tests.md), as a readiness manifest. The round ran default-branch SHAs
-# (no tags), which are pinned here; kaminari's SHA was not recorded, so it is master on 2026-10-30. Only pundit was
-# rerun through the runner (smoke test); the other suites are unchecked. Services: PostgreSQL on 5432 (role `user`,
-# trust), Redis on 6379, Chrome for turbo-rails, good_job and view_component (BROWSER_PATH). MySQL was not run.
+# (no tags), which are pinned here. kaminari's SHA was not recorded; it is pinned to its latest tag v1.3.2, which is
+# the commit its default branch pointed to on the round's day (adb89b8f26, no later commits). Databases come from
+# the runner's services (services.rb); Chrome for turbo-rails, good_job and view_component via BROWSER_PATH.
+# MySQL was not run in round 1.
 # Edits the record only describes (rails-controller-testing's route rewrite, AMS's temporary minitest relaxation)
 # are left out: the record's counts come from the unmodified suites.
 ruby: 4.0.9
 rails:
   base: 6e09124217      # 8-1-stable, v8.1.4.1
-  candidate: 6c23cb8f2a # main, 2026-11-04
+  candidate: 7a78da5a5576d7ab7549b10fb13156788478ba35 # main, 2026-11-04 16:53 UTC (round 1 ran 6c23cb8f2a)
 seeds: [4242, 1717]
 alone_runs: 5
 timeout: 3600
 
 suites:
   kaminari:
-    { repo: https://github.com/kaminari/kaminari, ref: adb89b8f2681975d67bc3df6c13fd2a30cfd10e0, framework: minitest, test: rake test }
+    { repo: https://github.com/kaminari/kaminari, ref: v1.3.2, framework: test-unit, test: rake test }
   devise:
     { repo: https://github.com/heartcombo/devise, ref: 05811fb8366edd08874111d0f6fb44543e1c91ef, framework: minitest,
       env: { DEVISE_ORM: active_record }, test: rake test }
@@ -35,6 +36,7 @@ suites:
   cancancan-postgres:
     <<: *cancancan
     env: { DB: postgres }
+    services: [postgres]
   friendly_id-sqlite: &friendly_id
     repo: https://github.com/norman/friendly_id
     ref: 4699c9791db955dfa9929af0f38a4059af550026
@@ -44,12 +46,13 @@ suites:
     test: rake db:drop db:create db:up test
   friendly_id-postgresql:
     <<: *friendly_id
-    env: { CI: "true", DB: postgresql, PGUSER: postgres }
+    env: { CI: "true", DB: postgresql, PGUSER: postgres, PGHOST: 127.0.0.1 }
+    services: [postgres]
   view_component:
     repo: https://github.com/ViewComponent/view_component
     ref: b1fd129eaeedf4a33986c4ed342f041c2d4a5b0a
     framework: minitest
-    env: { CI: "1", RAILS_ENV: test }
+    env: { CI: "1", RAILS_ENV: test, BROWSER_PATH: /home/user/.agent-browser/browsers/chrome-156.0.8078.73/chrome }
     shims: ["sed -i 's/gem \"nokogiri\", \"1.19.4\"/gem \"nokogiri\", \">= 1.19.5\"/' Gemfile"]
     test: rake test
   simple_form:
@@ -64,15 +67,18 @@ suites:
     test: rspec
   ransack-postgresql:
     <<: *ransack
-    env: { DB: postgresql, DATABASE_USERNAME: user }
+    env: { DB: postgresql, DATABASE_USERNAME: user, DATABASE_HOST: 127.0.0.1 }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U user ransack || true"]
   administrate:
     repo: https://github.com/thoughtbot/administrate
     ref: 6cb9cbbbc8032b5802ade02169881e61caf08193
     framework: rspec
-    env: { CI: "1" }
+    env: { CI: "1", PGHOST: 127.0.0.1 }
+    services: [postgres]
     bumps: { appraisal: { require: false }, awesome_print: { require: false } }
-    shims: ["yarn install"]
-    setup: ["rake db:setup"]
+    shims: ["cp .sample.env .env && cp spec/example_app/config/database.yml.sample spec/example_app/config/database.yml && yarn install"]
+    setup: ["rake db:setup", "yarn run build && yarn run build:css"]
     test: rspec
   jbuilder:
     { repo: https://github.com/rails/jbuilder, ref: f141f5ede81bf534d62c6ba228975d5ccb90b63d, framework: minitest, env: { CI: "1" }, test: rake test }
@@ -81,7 +87,10 @@ suites:
     ref: e15ee79627
     framework: rspec
     gemfile: gemfiles/rails_8.1.gemfile
-    env: { BUNDLE_WITHOUT: "debug:lint:demo:production", RAILS_ENV: test }
+    env: { BUNDLE_WITHOUT: "debug:lint:demo:production", RAILS_ENV: test, PGHOST: 127.0.0.1,
+           BROWSER_PATH: /home/user/.agent-browser/browsers/chrome-156.0.8078.73/chrome }
+    services: [postgres]
+    setup: ["demo/bin/rails db:test:prepare"] # the database is good_job_test_<worktree>, one per tree
     test: rspec
   solid_queue-sqlite: &solid_queue
     repo: https://github.com/rails/solid_queue
@@ -94,25 +103,30 @@ suites:
     test: bin/rails test
   solid_queue-postgres:
     <<: *solid_queue
-    env: { TARGET_DB: postgres, RAILS_ENV: test }
+    env: { TARGET_DB: postgres, RAILS_ENV: test, PGHOST: 127.0.0.1 }
+    services: [postgres]
   sidekiq-rails:
     repo: https://github.com/sidekiq/sidekiq
     ref: 75982898ff
     framework: minitest
     env: { RAILS_VERSION: "8.1", REDIS_URL: "redis://localhost:6379/14" }
-    test: ruby -w -Ilib -Itest -e 'ARGV.dup.each { require "./test/#{_1}_test" }; ARGV.clear' active_job_adapter actors api client current_attributes job_generator rails transaction_aware_client -- $TESTOPTS
-  # The record also let spec_helper's Gemfile guard accept Gemfile.eco-*; check that on the first run.
+    services: [redis]
+    test: ruby -w -Ilib -Itest -e 'files, opts = ARGV.slice_after("--").to_a; files[0...-1].each { require "./test/#{_1}_test" }; ARGV.replace(opts.to_a)' active_job_adapter actors api client current_attributes job_generator rails transaction_aware_client -- $TESTOPTS
+  # As in the record, spec_helper's appraisal guard also accepts the harness's Gemfile.eco-*.
   paper_trail-sqlite: &paper_trail
     repo: https://github.com/paper-trail-gem/paper_trail
     ref: 86ce1b8307
     framework: rspec
     gemfile: gemfiles/rails_8.1.gemfile
     env: { DB: sqlite }
+    shims: ['sed -i ''s#\.gemfile/)#.gemfile|Gemfile\\.eco-/)#'' spec/spec_helper.rb']
     setup: ["rake install_database_yml"]
     test: rspec
   paper_trail-postgres:
     <<: *paper_trail
     env: { DB: postgres, PT_CI_DATABASE: eco_paper_trail, PT_CI_DB_USER: user, PT_CI_DB_HOST: 127.0.0.1 }
+    services: [postgres]
+    setup: ["rake install_database_yml", "createdb -h 127.0.0.1 -U user eco_paper_trail_test || true"]
   active_model_serializers:
     { repo: https://github.com/rails-api/active_model_serializers, ref: 6934c8bd31, framework: minitest, env: { RAILS_VERSION: "8.1" }, test: rake test }
   pagy:
@@ -121,7 +135,7 @@ suites:
     repo: https://github.com/hotwired/turbo-rails
     ref: 37530c08780fa6f6dbb56a633de4b81169bdd174
     framework: minitest
-    env: { CI: "true", RAILS_VERSION: "8.1" }
+    env: { CI: "true", RAILS_VERSION: "8.1", BROWSER_PATH: /home/user/.agent-browser/browsers/chrome-156.0.8078.73/chrome }
     test: (cd test/dummy && RAILS_ENV=test bin/rails db:test:prepare) && rake test
   importmap-rails:
     { repo: https://github.com/rails/importmap-rails, ref: f255e55482d9173d8f64db3bfa4317b64445eeb4, framework: minitest,

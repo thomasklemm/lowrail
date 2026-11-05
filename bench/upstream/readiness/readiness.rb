@@ -6,6 +6,7 @@
 # matched against known.yml.
 #
 #   ruby readiness.rb MANIFEST.yml [--work DIR] [--out DIR] [--only a,b] [--jobs N] [--fresh a,b] [--report] [--check]
+#                                  [--services-down]
 require "digest"
 require "fileutils"
 require "time"
@@ -14,6 +15,7 @@ require "open3"
 require "optparse"
 require "shellwords"
 require "yaml"
+require_relative "services"
 
 module Readiness
   HERE = __dir__
@@ -23,6 +25,8 @@ module Readiness
   TREES = %w[base cand].freeze
   LOCK = Mutex.new
   PREP = Mutex.new
+  # Suites that use the same database service, or name the same `exclusive` (a fixed tmp path, say), run one at a time.
+  SERVICE_LOCKS = Hash.new { |h, k| h[k] = Mutex.new }.tap { |h| Services::NAMES.each { h[_1] } }
 
   module_function
 
@@ -105,7 +109,10 @@ module Readiness
       names = only || suites.keys
       fresh.each { |n| FileUtils.rm_rf(File.join(work, "state", n)) }
       rails
-      names.each { |n| s = suite(n); s.rails; ruby_v(s.ruby) }
+      names.each { |n| s = suite(n); s.rails; ruby_v(s.ruby); s.locks }
+      needed = names.flat_map { suites[_1].fetch("services", []) }.uniq
+      running = needed.select { Services.listening?(Services::PORTS.fetch(_1)) }
+      Services.up(needed, work)
       queue = Queue.new
       names.each { queue << _1 }
       queue.close
@@ -116,15 +123,19 @@ module Readiness
               suite(name).call
             rescue => e
               Readiness.log "#{name}: runner error #{e.class}: #{e.message}"
+              suite(name).write_error(e)
             end
           end
         end
       end.each(&:join)
       report
+    ensure
+      Services.down(needed - running) if needed
     end
 
     def report
       results = suites.keys.filter_map { |n| f = File.join(work, "state", n, "suite.json"); JSON.parse(File.read(f)) if File.exist?(f) }
+        .select { |r| r["rails"].transform_values { _1["sha"] } == rails.transform_values { _1["sha"] } || suites.dig(r["suite"], "rails") }
       Report.new(self, results, Known.load(self)).write
     end
 
@@ -165,8 +176,8 @@ module Readiness
     end
 
     def env(t, extra = {})
-      { "ECO_ROOT" => eco_root, "ECO_RUBY" => ruby, "ECO_GEMFILE" => gemfile, "BUNDLE_PATH" => File.join(@r.work, "bundle", @name),
-        "ECO_BUMPS" => JSON.generate(@cfg.fetch("bumps", {})) }.merge(@cfg.fetch("env", {}).transform_values(&:to_s)).merge(extra)
+      { "ECO_ROOT" => eco_root, "ECO_RUBY" => ruby, "ECO_GEMFILE" => gemfile, "BUNDLE_PATH" => File.join(@r.work, "bundle", File.basename(@cfg.fetch("repo"), ".git")),
+        "ECO_BUMPS" => @cfg.fetch("bumps", {}).inspect }.merge(@cfg.fetch("env", {}).transform_values(&:to_s)).merge(extra)
     end
 
     def eco(t, cmd) = "#{File.join(ECO, "eco.sh").shellescape} #{dir(t).shellescape} #{t} bash -c #{cmd.shellescape}"
@@ -182,7 +193,14 @@ module Readiness
     end
 
     def call
+      locks.reverse.inject(-> { call_locked }) { |inner, l| -> { l.synchronize(&inner) } }.call
+    end
+
+    def locks = (@cfg.fetch("services", []) + Array(@cfg["exclusive"])).uniq.sort.map { SERVICE_LOCKS[_1] }
+
+    def call_locked
       t0 = Time.now
+      FileUtils.rm_f(File.join(@state, "suite.json"))
       @commit = Readiness.fetch(clone, @cfg.fetch("repo"), @cfg.fetch("ref"))
       prep = TREES.to_h { |t| [t, PREP.synchronize { prepare(t) }] }
       runs = []
@@ -192,6 +210,15 @@ module Readiness
       result = Classify.new(self, prep, runs).call
       File.write(File.join(@state, "suite.json"), JSON.pretty_generate(result))
       Readiness.log "#{@name}: done in #{(Time.now - t0).round}s, #{result["flags"].size} flags"
+    end
+
+    # A suite the runner itself failed on still appears in the report, as not loaded.
+    def write_error(e)
+      flag = { "class" => "suite-did-not-load", "test" => "(suite)", "signature" => "runner error: #{e.class}: #{e.message}"[0, 200], "detail" => "runner error" }
+      File.write(File.join(@state, "suite.json"), JSON.pretty_generate(
+        "suite" => @name, "repo" => @cfg["repo"], "ref" => @cfg["ref"], "commit" => @commit.to_s, "rails" => rails.transform_values { _1.except("dir") },
+        "ruby" => ruby_v, "seeds" => @r.seeds, "bumps" => @cfg.fetch("bumps", {}), "shims" => inputs["shims"], "lock_diff" => nil,
+        "runs" => [], "base_only" => 0, "flags" => [flag]))
     end
 
     def prep_key(t)
@@ -259,6 +286,11 @@ module Readiness
       if framework == "rspec"
         e["READINESS_RSPEC_DIR"] = json
         e["SPEC_OPTS"] = "--seed #{seed} --require #{File.join(HERE, "rspec_json.rb")} --format progress --format LowrailReadinessJSON"
+      elsif framework == "cucumber"
+        e["CUCUMBER_OPTS"] = "--order random:#{seed} --format pretty --no-color"
+      elsif framework == "test-unit"
+        e["TESTOPTS"] = "--order=random #{extra_testopts}".strip
+        e["RUBYOPT"] = "-r#{File.join(HERE, "test_unit_seed.rb")} #{e["RUBYOPT"]}".strip
       end
       timeout = @r.m.fetch("timeout", 3600)
       t0 = Time.now
@@ -279,6 +311,8 @@ module Readiness
         stem = f.sub(/\.json\z/, "-#{i}")
         res = if framework == "rspec"
           execute(t, (@cfg["single"] || "rspec {id}").gsub("{id}", test.shellescape), seed, stem)
+        elsif framework == "cucumber"
+          execute(t, (@cfg["single"] || "cucumber $CUCUMBER_OPTS {id}").gsub("{id}", test.shellescape), seed, stem)
         else
           re = "/^#{Regexp.escape(test)}$/"
           @cfg["single"] ? execute(t, @cfg["single"].gsub("{id}", test.shellescape).gsub("{name_re}", re.shellescape), seed, stem)
@@ -331,14 +365,21 @@ module Readiness
 
     def call(framework, log, json_dir, suite)
       text = File.exist?(log) ? File.binread(log).force_encoding("UTF-8").scrub : ""
-      res = framework == "rspec" ? rspec(json_dir, suite) : minitest(text, suite)
+      res = case framework
+            when "rspec" then rspec(json_dir, suite)
+            when "cucumber" then cucumber(text, suite)
+            else minitest(text, suite) # minitest and test-unit
+            end
       res["signature"] ||= crash_signature(text, suite) || "no test totals in output" unless res["loaded"]
       res
     end
 
-    # One JSON file per RSpec process (rspec_json.rb); examples, counts and load errors are summed.
+    # One JSON file per RSpec process (rspec_json.rb); examples, counts and load errors are summed. A process can
+    # write several (rspec-rails' sandboxed configurations attach the formatter again); its largest one counts.
     def rspec(json_dir, suite)
-      files = Dir[File.join(json_dir, "*.json")].filter_map { JSON.parse(File.read(_1)) rescue nil }
+      files = Dir[File.join(json_dir, "*.json")].group_by { File.basename(_1)[/\A\d+/] }.filter_map do |_pid, fs|
+        fs.filter_map { JSON.parse(File.read(_1)) rescue nil }.max_by { _1.dig("summary", "example_count").to_i }
+      end
       return { "loaded" => false, "total" => 0, "failures" => {} } if files.empty?
       examples = files.flat_map { _1["examples"].to_a }
       fails = examples.select { _1["status"] == "failed" }.to_h do |ex|
@@ -371,6 +412,11 @@ module Readiness
       totals = lines.grep(/^\d+ (?:runs|tests), \d+ assertions/)
       return { "loaded" => false, "total" => 0, "failures" => {} } if totals.empty?
       fails = {}
+      lines.each do |l|
+        next unless l =~ /^(Failure|Error): (test\S*)\(([\w:]+)\)(?: \[[^\]]*\])?:?\s*(.*)$/ # test-unit
+        msg = $4.empty? ? "Test::Unit::AssertionFailedError" : $4
+        fails["#{$3}##{$2}"] ||= { "signature" => norm($1 == "Error" ? msg : "Test::Unit::AssertionFailedError: #{msg}", suite), "desc" => "#{$3}##{$2}" }
+      end
       lines.each_with_index do |l, i|
         next unless l =~ /^\s*(?:\d+\) )?(Failure|Error):\s*$/
         kind = $1
@@ -378,6 +424,23 @@ module Readiness
         msg = lines[(i + 2)..].to_a.find { !_1.strip.empty? }.to_s.strip
         sig = kind == "Error" ? msg : "Minitest::Assertion: #{msg}"
         fails[id] ||= { "signature" => norm(sig, suite), "desc" => id }
+      end
+      { "loaded" => true, "total" => totals.sum { _1[/\d+/].to_i }, "failures" => fails }
+    end
+
+    # Cucumber's pretty output (CUCUMBER_OPTS): totals from "N scenarios (…)", failures from the "Failing
+    # Scenarios" list, each signed with the first "message (Class)" line inside its scenario.
+    def cucumber(text, suite)
+      lines = text.lines
+      totals = lines.grep(/^\d+ scenarios? \(/)
+      return { "loaded" => false, "total" => 0, "failures" => {} } if totals.empty?
+      fails = lines.filter_map { _1[/^cucumber (?:-p \S+ )?(\S+:\d+) #/, 1] }.uniq.to_h do |loc|
+        start = lines.index { _1 =~ /^\s*(?:Scenario|Example|Scenario Outline):.*# #{Regexp.escape(loc)}\s*$/ }
+        block = start ? lines[(start + 1)..].take_while { _1 !~ /^\s*(?:Scenario|Example|Scenario Outline|Feature|Background|Rule):/ } : []
+        line = block.find { _1 =~ /\(([A-Z]\w*(?:::\w+)*)\)\s*$/ }
+        msg = line.to_s.sub(/\s*\([A-Z]\w*(?:::\w+)*\)\s*$/, "").strip.delete_prefix("+").sub(/\A\S*:\d+:in [^:]*: /, "")
+        sig = line ? "#{line[/\(([A-Z]\w*(?:::\w+)*)\)\s*$/, 1]}: #{msg}" : "failed (no message found)"
+        [loc, { "signature" => norm(sig, suite), "desc" => lines[start].to_s.strip.sub(/\s*#.*\z/, "")[0, 160] }]
       end
       { "loaded" => true, "total" => totals.sum { _1[/\d+/].to_i }, "failures" => fails }
     end
@@ -390,6 +453,9 @@ module Readiness
         msg = l.sub(/\A.*?:in [^:]*: /, "").sub(/ \(#{Regexp.escape(cls)}\)\s*\z/, "")
         return norm("#{cls}: #{msg}", suite)
       end
+      if (l = text.lines.reverse.find { _1 =~ /\A([A-Z]\w*(?:::\w+)*): .+ \(\1\)$/ })
+        return norm(l.sub(/ \([A-Z]\w*(?:::\w+)*\)\s*\z/, ""), suite)
+      end
       l = text.lines.find { _1 =~ /Could not find|could not find compatible|Bundler could not|Gem::MissingSpec|LoadError|NameError/ }
       l && norm(l, suite)
     end
@@ -399,7 +465,7 @@ module Readiness
   class Classify
     # Assertion messages embed the values under test, so two assertion failures count as the same error;
     # RSpec wraps an assertion plus later hook errors in MultipleExceptionError.
-    ASSERTION = /\A(?:RSpec::Expectations::ExpectationNotMetError|RSpec::Core::MultipleExceptionError|Minitest::Assertion):/
+    ASSERTION = /\A(?:RSpec::Expectations::ExpectationNotMetError|RSpec::Core::MultipleExceptionError|Minitest::Assertion|Test::Unit::AssertionFailedError):/
 
     def self.kind(sig) = sig.to_s.match?(ASSERTION) ? "assertion" : sig
 
@@ -476,7 +542,7 @@ module Readiness
   # patterns match it.
   class Known
     STATUSES = %w[open-pr merged prepared issue record-only gem-side noise].freeze
-    KEYS = %w[id suite signature test class status record note].freeze
+    KEYS = %w[id suite signature test class status record note checked].freeze
 
     def self.load(round)
       path = File.expand_path(round.m.fetch("known", File.join(HERE, "known.yml")), File.dirname(round.path))
@@ -604,7 +670,7 @@ module Readiness
   # Rails and suite ref resolves.
   class Check
     TOP = %w[ruby rails seeds alone_runs timeout suites known].freeze
-    SUITE = %w[repo ref framework test setup env gemfile lock shims bumps single ruby rails].freeze
+    SUITE = %w[repo ref framework test setup env gemfile lock shims bumps single ruby rails services exclusive].freeze
 
     def initialize(round)
       @r = round
@@ -639,7 +705,8 @@ module Readiness
       return ["not a mapping"] unless cfg.is_a?(Hash)
       p << "unknown keys #{(cfg.keys - SUITE).join(", ")}" if (cfg.keys - SUITE).any?
       %w[repo ref framework test].each { |k| p << "#{k} required" unless cfg[k] }
-      p << "framework must be rspec or minitest" unless %w[rspec minitest].include?(cfg["framework"])
+      p << "framework must be rspec, minitest, test-unit or cucumber" unless %w[rspec minitest test-unit cucumber].include?(cfg["framework"])
+      Array(cfg["services"]).each { |n| p << "unknown service #{n} (#{Services::NAMES.join(", ")})" unless Services::NAMES.include?(n) }
       p << "setup must be a list of commands" unless cfg.fetch("setup", []).is_a?(Array)
       p << "env must be a mapping" unless cfg.fetch("env", {}).is_a?(Hash)
       Array(cfg["shims"]).each do |s|
@@ -666,7 +733,12 @@ if $PROGRAM_NAME == __FILE__
     o.on("--report", "only rewrite the report from cached state") { opts[:report] = true }
     o.on("--check", "validate the manifest and known.yml and resolve every ref; runs nothing") { opts[:check] = true }
     o.on("--no-resolve", "with --check: skip resolving refs") { opts[:no_resolve] = true }
+    o.on("--services-down", "stop every readiness database service (teardown after a crash)") { opts[:down] = true }
   end.parse!
+  if opts[:down]
+    Readiness::Services.down
+    exit
+  end
   round = Readiness::Round.new(ARGV.fetch(0), work: opts[:work], out: opts[:out])
   if opts[:check]
     problems = round.check(resolve: !opts[:no_resolve])
