@@ -1,8 +1,8 @@
-This fixes `Time.now` in lobsters at 2026-07-01 12:00 UTC, during boot and in the benchmark block, so its allocations per iteration stop changing with the date it runs. #572 is an alternative with the clock near the fixture's dates; merge one of the two.
+This fixes `Time.now` in lobsters at 2026-07-01 12:00 UTC, during boot and in the benchmark block, to keep its work per iteration from depending on the date it runs. #572 is an alternative that fixes the clock at a different instant; merge one of the two.
 
-lobsters runs in US Central time. On main, when a lookback such as `70.days.ago` crosses a DST change, ActiveSupport looks up the zone period again: 1,476 extra lookups per pass on 2026-11-05, none in July. On Dec 25 and Jun 28 the logo changes too. With the clock fixed, the lookups come out the same on every run.
+On main, in lobsters' US Central time zone, when a lookback such as `70.days.ago` crosses a DST change, ActiveSupport looks up the zone period again: 1,476 extra lookups per pass on 2026-11-05, none in July. On Dec 25 and Jun 28 the logo changes too. With the clock fixed, the tzinfo lookup counts were the same on every tested date.
 
-Objects per iteration on Ruby 4.0.9, with the system clock set to each date:
+Across the four tested dates, allocations per iteration varied by 0.01%, against 1.37% on main (Ruby 4.0.9, system clock set to each date):
 
 | | 2026-11-05 | 2026-12-25 | 2027-03-20 | 2027-06-28 | spread |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -11,7 +11,7 @@ Objects per iteration on Ruby 4.0.9, with the system clock set to each date:
 
 Response bodies are byte-identical between runs on 2026-11-05 and 2027-01-20, apart from CSRF tokens. The harness keeps the real clock. `Date.today`, `DateTime.now`, `Time.new` without arguments and SQLite's `'now'` stay live. Cache entries and the session no longer age. `TRACK_AR_TIME` uses the monotonic clock.
 
-For lobsters' history this is a one-time step of about −1.35% objects against runs whose lookbacks cross a DST change (roughly November to January and mid-March to mid-June).
+For lobsters' history this is a one-time step of up to −1.35% objects against runs whose lookbacks cross a DST change (roughly November to January and mid-March to mid-June).
 
 <details><summary>How this was measured</summary>
 
