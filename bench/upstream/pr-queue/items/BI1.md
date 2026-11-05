@@ -31,5 +31,7 @@ On Rails main with Ruby 4.0, Active Record makes its table metadata Ractor-share
 
 This keeps the memo where it can, and skips storing it only when the metadata is frozen. Released Rails behaves as before.
 
+I'll keep this as a draft until the Rails 8.2 beta, since the freezing on main may still change, and update it then.
+
 ---
 <sub>Found while running Lowrail's [Rails-main gem census](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/gem-side-candidates.md#bi1-blind_index-frozen-table-metadata).</sub>

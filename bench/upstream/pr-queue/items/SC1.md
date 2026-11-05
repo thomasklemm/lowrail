@@ -30,5 +30,7 @@ On Rails main, `ActionDispatch::Request.parameter_parsers` is frozen, so adding 
 
 When the registry is frozen, this adds the parser to a copy and sets it with `parameter_parsers=`, as the Rails docs suggest. On released Rails the registry isn't frozen, and the parser is added in place as before.
 
+I'll keep this as a draft until the Rails 8.2 beta, since Rails may still keep this registry writable, and update it then.
+
 ---
 <sub>Found through Lowrail's [Rails-main gem census](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/gem-side-candidates.md#sc1-scimitar-parser-registration).</sub>
