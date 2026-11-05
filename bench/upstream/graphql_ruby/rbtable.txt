@@ -1,0 +1,40 @@
+v2.5.11 649745893 - 2.5.11
+4f0c24b0bb 649810310 +0.01% Don't modify cached array from types.interfaces
+8cd47d40d1 649703637 -0.02% Conditionally add fiber-storage dependency for Ruby < 3.2
+6deb2d9c2c 649812660 +0.02% Lazily define engine routes using routes do ... end
+00b72d20de 649829431 +0.00% Fix errors when a non-null field fails auth check
+e2eff74a91 649779780 -0.01% Migrate to RuntimeError for error checks, add Finalizers API
+2a8d95680b 797611358 +22.75% Increment max tokens when encountering a comment
+e326fff0a9 797608675 -0.00% Fix debug string in ParseError message
+702509b8fb 797653570 +0.01% Use a dedicated end-of-file error message
+a94226e0da 797623247 -0.00% Reduce allocations in BlockString#trim_whitespace
+cbdf47ef39 797618224 -0.00% Fix lexer positions for multibyte input
+1a1bdf94b1 797568229 -0.01% Fix lexer columns after newlines
+c2cf37bb2a 797599509 +0.00% Intern SDL description strings at AST node construction
+6d5c2e7491 797757986 +0.02% Harden parser cache serialization
+9b523ab324 797729933 -0.00% Allow disabling parser cache signing
+ea40c1ddc5 797776215 +0.01% Handle out-of-range Unicode escapes as parse errors
+1dba7a8db7 796496390 -0.16% Reraise unexpected lexer argument errors
+76d24488ba 797741256 +0.16% Support short braced Unicode escapes
+93be7f6a5b 797608923 -0.02% Reject non-finite Float values
+ffd3623ad3 796426796 -0.15% Typecheck one file
+b4688c143a 796382920 -0.01% Convert API comments and guides to RDoc
+c64bdfe56e 796410131 +0.00% Fix parser source locations after multibyte input
+64d56fea2b 796366737 -0.01% Add Sorbet sigils to every file in lib/
+141fb55626 796412902 +0.01% Write out Language::Nodes methods instead of generating them
+3e4976fe95 796421869 +0.00% Add RBS types and reader docs to Language::Nodes
+0e731d1fa5 796403409 -0.00% Fix lexer not raising a friendly error when comments alone e
+20b9d38787 796398716 -0.00% Set @pos before raise_parse_error in comment token-limit che
+7725693204 796336738 -0.01% Move 36 files from typed: false to typed: true
+4558c7ac05 796404544 +0.01% Sorbet: annotate mixin host requirements with @requires_ance
+e5bb9e9b58 796377603 -0.00% Sorbet: move 17 more lib files to typed: true
+715401750a 796454117 +0.01% Move 9 more files to typed: true
+a679c9dff8 804492560 +1.01% Ignore byte order marks and clarify document parse errors
+d0410c693e 805181101 +0.09% Reject variables in default values in both parsers
+0aea1c2f11 796431935 -1.09% Fix source locations in documents with CR line endings
+12d69c16b2 796425012 -0.00% Avoid string substitution when counting lexer line numbers
+ba827bb272 804480820 +1.01% Terminate Ruby lexer comments at carriage returns
+d3d3139f98 804476847 -0.00% Preserve query strings in parser stack overflow errors
+fa4a459f92 804882156 +0.05% Reject invalid numeric token boundaries
+ed081fb0e8 805542596 +0.08% Sorbet: add RBS signatures to small files and move 10 to typ
+origin_master 805555115 +0.00% 

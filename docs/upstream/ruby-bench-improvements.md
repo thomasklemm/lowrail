@@ -697,3 +697,9 @@ not #5877's renames.
 > This also changes graphql-native on Linux. It returns the same tokens and AST for `negotiate.gql`, but runs about 2% more instructions per iteration (Cachegrind, Ruby 4.0.9 interpreter, fixed heap, two runs each; two runs of 1.1.3 differ by 0.3%). The extra instructions are in the C lexer and parser that 1.1.4 and 1.2.0 regenerated for their number, BOM and parser-stack changes, not in #5877's renames.
 >
 > In this run on my fork, both `benchmark-default-windows` jobs pass and run all four benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42063514767
+
+## Follow-up: where graphql-native's 2% went
+
+The +2.1% from graphql-c_parser 1.1.3 to 1.2.0 is almost all a679c9dff8 (BOM support, +1.66%). The pure-Ruby parser
+got +24% more expensive between graphql 2.5.11 and master, almost all from one commit (2a8d95680b, +22.74%). Per-commit
+tables, two exact candidate fixes and the rejected variants are in [graphql-ruby.md](graphql-ruby.md).
