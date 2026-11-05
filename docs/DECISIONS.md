@@ -263,6 +263,22 @@ A human reviewer has to get the essence in a few seconds.
   happens and what was tested. Cost measurements stay in the Lowrail doc and come up only if a maintainer asks,
   unless the fix measurably slows a common path.
 
+### Code comments in upstream patches (byroot on #59555, 2026-11-05)
+
+byroot, on the comment above our `Array#index_with`: "This isn't something that should be surfaced in Rails docs.
+it's an implementation detail. If anything that specialized version could be `:nodoc:`. I don't mind AI PRs, but
+please read them and curb their tendency to spew tons of comments." Fixed by a one-line follow-up PR.
+
+* **No comment directly above a public or documented method** unless it is meant as API docs. RDoc publishes it.
+  Internal specializations and helpers get `# :nodoc:` on the `def` line instead, as Rails does for
+  `Array#compact_blank`.
+* **Comments are the exception.** Add one only when a reader would otherwise undo the code. Then it is one line,
+  and it says why, not what. Explanations of cost, Ruby internals or the regression belong in the PR body or the
+  Lowrail record.
+* Reviewers asking for "a comment so nobody deletes this" doesn't override this: prefer a test that fails
+  when the line is removed.
+* Before a queued branch opens, check its added comment lines against these rules.
+
 ### Correctness fixes: readable first (2026-11-04)
 
 Thomas: for bug and correctness fixes, no code golf. The fix is written as readable and idiomatic as possible,
