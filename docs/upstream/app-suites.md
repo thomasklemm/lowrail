@@ -25,6 +25,7 @@ overridden `primary_key` (#59622).
 | Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, fix built, PR blocked on CLA), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
 | Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, docs note queued), PI3 (a, perf, built) |
 | Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
+| Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, cells-rails, silent), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
 
 ## Findings
 
@@ -932,3 +933,188 @@ two controller specs pass 85/85 on main. Record only.
   which now reads as advice to do what SP1 makes raise. A possible one-line follow-up; not built (one concern per PR,
   and it is wording, not breakage).
 * The Meilisearch integration spec (needs a server; Spree's MySQL job skips it too).
+
+## Decidim
+
+decidim/decidim `80149bb` (default branch `develop`,
+[`80149bbba8`](https://github.com/decidim/decidim/tree/80149bbba83a3c477172d113d21e22115c901e54), 2026-11-05), Ruby 4.0.9
+on both trees (Decidim's CI uses 3.4.7), PostgreSQL 15.19 with `ltree` and `pg_trgm` (its CI uses `postgres:14`), one
+cluster per tree (the dummy apps of both trees use the same database names), libvips 8.14, Node 26.12.1 (CI 24.18.0).
+Rails main `bdb3d96012` (2026-11-05, still the head of main at the end of the round) for every run and bisect;
+8-1-stable `6e09124217` (v8.1.4.1). Decidim is a monorepo of engines; its CI generates one dummy app
+(`bundle exec rake test_app`, a `rails new` through Decidim's generator, so main's calls `load_defaults 8.2`) and runs
+each module's specs from the module directory. This round ran the non-system jobs of six modules as CI does
+(`bundle exec parallel_test --type rspec --pattern spec/ --exclude-pattern spec/system`, core also without
+`spec/tasks/decidim_tasks_shakapacker_spec.rb`, which CI runs alone because it rebuilds the packs), 4 processes per tree,
+CI's environment (`CI=true`, the Bullet settings, `DECIDIM_BULLET_UNUSED_EAGER=true` for api), both trees at the same
+time, seeds 4242 and 1717. Decidim's spec helper retries a failing example up to three times (rspec-retry), as in CI, so
+an `F` failed three times. No other service: the HTML validator in CI serves only system specs. Decidim's test env prints
+deprecations to stderr.
+
+**Bundles.** Decidim locks Rails 8.1.4. Both checkouts point `rails` at a `path:` gem, and both need the same changes:
+* every gemspec's [`required_ruby_version = "~> 3.4.0"`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/decidim-core.gemspec#L22) → `">= 3.4"` (28 gemspecs), and
+  [`add_dependency "rails", "~> 8.1.0"`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/decidim-core.gemspec#L76) → `">= 8.1.0", "< 8.3"`;
+* google-protobuf 4.33.5 → 4.36.2 (sass-embedded's dependency; 4.33.5 has no x86_64-linux build for Ruby 4.0, so
+  Bundler finds no installable version);
+* `gem "readline"` in the Gemfile's development/test group: readline is a bundled gem on Ruby 4.0, and without it
+  [`require "readline"`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/spec/tasks/upgrade/decidim_tasks_sidekiq_spec.rb#L4)
+  fails to load, which aborts that file's whole parallel group (a quarter of core on both trees; the first attempt
+  was stopped and rerun with the gem).
+
+The main lock was resolved from the 8-1 lock with `bundle lock --conservative --update` over the Rails gems and
+differs only in Rails and what main itself requires (herb 0.11.1, marcel 1.2.1 → 2.1.0, psych 5.5.0,
+ractor-dispatch 0.3.0, stringio 3.2.0). rspec-rails stays at its locked 8.0.4 for the runs (see DC3).
+
+**Main checkout only, app side:** three positional `Arel::Table.new` calls → `name:`
+([migration](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb#L15),
+[attachment presenter](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb#L65),
+[`ForceAuthentication`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/controllers/concerns/decidim/force_authentication.rb#L44);
+[patch](../../bench/upstream/readiness/round-app-suites/decidim-main-arel-shim.patch)). Without the first,
+`db:migrate` stops in `RenameDoorkeeperScopes` and the test app can't be generated. b1650993b0 (#57829), covered by
+our open #59574, as in Spree. Recipe for the readiness runner:
+[round-app-suites-decidim.yml](../../bench/upstream/readiness/round-app-suites-decidim.yml).
+
+Results (examples; failures in run 1 / run 2; core includes one passing scratch example of mine):
+
+| Module | Examples | 8-1-stable | main |
+|---|---|---|---|
+| core | 5141 | 0 / 0 | 38 / 34 |
+| admin | 997 | 0 / 0 | 11 / 11 |
+| api | 73 | 0 / 0 | 0 / 0 |
+| participatory_processes | 942 | 1 / 1 | 34 / 34 |
+| proposals | 1897 | 2 / 2 | 122 / 105 |
+| meetings | 1739 | 0 / 0 | 78 / 78 |
+
+Every file with a failure, a third time, one process per tree and one tree at a time: 8-1 the same 3 failures, main
+the same 262 as run 2. Run 1's 21 extra main failures (`global_engines_spec`, proposals' `component_spec`) are
+`Address already in use` for Capybara's server on port 5100, which both trees' processes used at the same time, so
+they are environment. The 3 failures on both trees are the searchable-resource specs of processes and proposals, whose
+Faker text has an apostrophe that is stored as `&#39;`. That leaves 259 main-only failures, all classified below.
+Two classification reruns of the failing files (main tree, run 1's file list): with rspec-rails main
+`5072befe5d` (DC3) 196 still fail; with that, the `NavigationHelper` shim below and the DC1 fix, 29 do (26 main-only).
+
+| Group | Failures (run 2) | Class | Commit | Status |
+|---|---|---|---|---|
+| DC2 `link_to` gone from cells and presenters (S2) | 167 | (b) + (c) cells-rails | 07f4b45e29 (#55410) | record; our S2 note queued |
+| DC3 rspec-rails 8.0.4: controller specs render real templates; view specs' frozen `_prefixes` | 66 | (c) | 9987431315 (#58279) and the known `_prefixes` freeze | fixed on rspec-rails main, unreleased |
+| DC4 `ActiveSupport::TimeZone` frozen, `allow(Time.zone).to receive(:now)` raises | 15 | (b) | 26e78a20db (#58067) | record |
+| CW5 polymorphic type re-derived on save (factory) | 4 | (b?) | 4af9822fae (#59120) | known |
+| CW3 `precision: nil` timestamps as microseconds | 4 | (b) | c162370c8f (#57845) | known |
+| DC6 `message_serializer = :json` under `load_defaults 8.2` | 2 | (b) | bbb427c241 | record |
+| DC5 `pluck` on a new owner's association reads the target | 1 | (b) | cdbac993d5 (#58372) | record |
+| DC1 `FormTagHelper` can't reach `token_tag`/`method_tag` | 2 (inside DC3's 66) | **(a)** | 07f4b45e29 (#55410) | fix built, queued first |
+
+**DC1 (a), fix built: `FormTagHelper` calls `token_tag` and `method_tag`, which 07f4b45e29 moved into
+`NavigationHelper`.** [`extra_tags_for_form`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/helpers/form_tag_helper.rb#L1129-L1145)
+renders the hidden `_method` and authenticity-token inputs with them, and `FormTagHelper`
+[includes `UrlHelper`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/helpers/form_tag_helper.rb#L21)
+but not `NavigationHelper`. Views include everything, but a class that includes only `FormTagHelper` or `FormHelper`
+raises `NoMethodError` for every form that isn't a GET. cells-rails 0.1.6's `Cell::ViewModel`
+[includes `FormHelper`](https://github.com/trailblazer/cells-rails/blob/77ff22ae8f94472cf477672ca2f0c86757d627d8/lib/cell/railtie.rb#L49),
+so Decidim's report-user modal, [`decidim_form_for … method: :post`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/cells/decidim/report_user_button/flag_modal.erb#L2)
+in a cell, raises `undefined method 'token_tag'`, so a visitor opening a user's profile page gets an error. In the runs it shows in
+2 controller specs (`profiles_controller_spec`, `user_activities_controller_spec`) only because DC3 renders their
+templates; scratch specs ([request](../../bench/upstream/app_suites/decidim_profile_request_spec.rb),
+[cell](../../bench/upstream/app_suites/decidim_report_user_button_cell_spec.rb)) pass on 8-1 and fail on main. Bisected
+with the Decidim spec and with [form_tag_token.rb](../../bench/upstream/app_suites/form_tag_token.rb): 07f4b45e29
+fails, its parent passes. No issue or PR covers it; seanpdoyle's open #50312 ("Implement `button_to` in terms of
+`form_tag`", last updated 2026-07-15) would move both methods into `FormTagHelper` as part of a larger change. Fix:
+move the two private methods, unchanged, back into `UrlHelper`, which both helpers include and where they lived on
+8.1. Described out loud: "`token_tag` and `method_tag` live in `UrlHelper`, which both `FormTagHelper` and
+`NavigationHelper` include." Readability: L0 (a move, no method body changes, so flog and RuboCop metrics are
+unchanged). Test: a class that includes only `FormTagHelper` renders a PATCH form with both hidden inputs; it fails on
+main with `undefined method 'method_tag'`. Action View suite green (2956 + 251 + 177 runs), RuboCop clean. With the fix
+both Decidim scratch specs pass on main. Skeptical reviewer (subagent): ship; it checked method resolution in
+`ActionView::Base` and in standalone includers of each of the four helpers, `button_to` from `NavigationHelper` alone,
+that the moved bodies are main's, not 8.1's, and that no other private method moved by 07f4b45e29 is called from
+outside `NavigationHelper`; one wording nit in the commit message, applied. No Sol pass on this orb.
+[patch](../../bench/upstream/app_suites/dc1-form-tag-helper-token-tag.patch), [body](../../bench/upstream/app_suites/dc1-body.md).
+Branch [`thomasklemm/form-tag-helper-token-tag`](https://github.com/thomasklemm/rails/tree/thomasklemm/form-tag-helper-token-tag)
+@ `ab0a99e41a` on main `bdb3d96012`, pushed to the fork, not opened; first in `bench/upstream/pr-queue`.
+
+**DC2 (b)+(c): cells lose `link_to`, and Decidim's fallback escapes the cell's HTML instead of raising.** S2 again
+(07f4b45e29 moved `link_to`, `button_to` and `current_page?` into `NavigationHelper`, no deprecation), but with a
+silent failure. cells-rails includes `FormHelper` into every cell (above), which brought `link_to` on 8.1 and doesn't on
+main ([form_helper_link_to.rb](../../bench/upstream/app_suites/form_helper_link_to.rb)). Decidim's `ViewModel` has
+[`delegate_missing_to :view_context`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/view_model.rb#L21),
+so a cell's `link_to … do` block such as [`card_g/show.erb`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/cells/decidim/card_g/show.erb#L1)
+now runs the controller's `link_to`, whose `capture` escapes the plain String that cells-erb's `capture` returns: every
+card renders its whole inner HTML as text (`&lt;div class="card__grid-img"&gt;…`), with no error. Twelve presenters,
+events and renderers include only `UrlHelper` and raise `undefined method 'link_to'`, for example
+[`UserPresenter`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/presenters/decidim/user_presenter.rb#L8)
+(every mention) and [`PublishProposalEvent`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-proposals/app/events/decidim/proposals/publish_proposal_event.rb#L18).
+With `include ActionView::Helpers::NavigationHelper` next to those twelve includes and in `Cell::ViewModel` (main
+checkout only, [patch](../../bench/upstream/readiness/round-app-suites/decidim-main-navigation-helper-shim.patch),
+[initializer](../../bench/upstream/readiness/round-app-suites/decidim-cells-navigation-helper-initializer.rb)) all 167
+pass. The fix belongs in cells-rails (include `NavigationHelper` where it is defined; last release 0.1.6, 2024-11-13)
+and in Decidim's includes; recorded, not reported. For the coordinator: S2 was decided as a docs-only note when its
+callers raised `NoMethodError`; with cells-rails the same move silently changes rendered HTML, which may be worth
+reconsidering under the restore rule (`link_to` in `UrlHelper` was public API). A shim inside Rails can't simply make
+`UrlHelper` include `NavigationHelper`, because `NavigationHelper` includes `UrlHelper` (a cyclic include).
+
+**DC3 (c): rspec-rails 8.0.4 no longer blanks templates in controller specs.** 9987431315 (#58279, the CW2 commit)
+makes [`PathSet#find`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/path_set.rb#L43-L46)
+ask each resolver for one template with `find`. rspec-rails 8.0.4's `ResolverDecorator`
+[forwards every call](https://github.com/rspec/rspec-rails/blob/222fb5518a7c9c1b9a0a06d950c2dfa2d3fa69e9/lib/rspec/rails/view_rendering.rb#L87)
+and blanks only Arrays of templates, so the single template comes back unblanked and controller specs without
+`render_views` render the real views. 56 controller-spec failures follow (missing route helpers, `nil` versions, view-only
+settings; bisected with `errors_controller_spec` and `amendments_controller_spec`: 9987431315 fails, its parent 91e626db50
+passes). rspec-rails fixed it on main in 2d5985ea6e ("Handle templates returned directly by resolvers", 2026-10-16),
+unreleased; Mastodon's pinned ref `570b2b0a79` predates it. The other 10 are admin view specs with
+`FrozenError` on `["", "action_view/test_case/test"]` (the known `_prefixes` case from Mastodon and Discourse). All 66
+pass with rspec-rails main `5072befe5d`; that also hides DC1's two examples, so the plain runs keep 8.0.4. The case is
+new to this record but is rspec-rails' release gap again (L1); nothing to report.
+
+**DC4 (b): every `ActiveSupport::TimeZone` is frozen at creation.** 26e78a20db ("Make AS::TimeZone shareable",
+#58067, merged by gmcgibbon on 2026-07-29; no CHANGELOG entry) calls `ActiveSupport::Ractors.make_shareable(self)` in
+`TimeZone#initialize` unconditionally, not through the `try_make_shareable` variant that the Ractor option gates.
+rspec-mocks can't stub a frozen object, so
+[`allow(Time.zone).to receive(:now)`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-participatory_processes/spec/jobs/decidim/participatory_processes/change_active_step_job_spec.rb#L29)
+raises `ArgumentError: Cannot proxy frozen objects` (15 failures in `change_active_step_job_spec`; 26e78a20db fails,
+its parent passes). GitHub code search counts 206 files with `"allow(Time.zone).to receive"` (GitLab among them) and 32
+with `expect(…)`. Rails' own test needed a `.dup` in the same commit. Repro:
+[time_zone_frozen.rb](../../bench/upstream/app_suites/time_zone_frozen.rb). Deliberate; a CHANGELOG or upgrade-guide line
+("stub `Time.now` or use `travel_to`") would be the S1-style follow-up; not built.
+
+**DC5 (b): `pluck` on a new owner's association reads the built records.** cdbac993d5 (#58372, CHANGELOG "Fix `pluck`
+ignoring records assigned to a new record's association"; its message says "we have swapped one breaking change for
+another"). Decidim's [`Coauthorable#authors`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/coauthorable.rb#L72)
+plucks the coauthorships, and [`add_coauthor`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/coauthorable.rb#L155)
+on an unsaved record builds a coauthorship and then appends the author to `authors`. On 8.1 the pluck saw nothing,
+so the author was listed once; on main it is listed twice (`proposal_creator_spec`, 1 failure; the commit fails, its
+parent passes). Repro: [pluck_new_owner.rb](../../bench/upstream/app_suites/pluck_new_owner.rb) (8-1 `[]`, main
+`["built"]`). The Decidim side would stop appending when the pluck already sees the author; recorded.
+
+**DC6 (b): `load_defaults 8.2` sets `active_support.message_serializer = :json`.** bbb427c241. Decidim's
+`AttributeEncryptor` spec decrypts a [fixed value](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/spec/lib/attribute_encryptor_spec.rb#L74)
+that was encrypted with Marshal, and main's dummy app rejects it with `Unsupported serialization format` (2 failures;
+bbb427c241 fails, its parent passes). Apps that move to 8.2 defaults with Marshal-encrypted data hit the same; the new
+framework defaults cover it.
+
+**Known findings:** CW5 (factory `searchable_resource` assigns [`resource`, then `resource_type`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/core/test/factories.rb#L926-L928);
+main saves the base class `Decidim::UserBaseEntity` for a user, so `search_spec` finds no users; 4 failures; 4af9822fae
+fails, its parent passes; Decidim's own indexing writes `resource_type` without assigning the record, so production
+is unaffected). CW3 (proposals' `answered_at` is `precision: nil` in 8-1's schema dump and reported as precision 6 on
+main, so `update!(answered_at: Time.current)` keeps microseconds; the two serializer specs, 4 failures). #59574's
+positional `Arel::Table.new` (above). Not seen: S1, SP1, L1, L2, R1, M1, DS1–DS4, AR-4, CW1, CW2, SU1–SU5, E1–E4.
+
+**Deprecations that only main emits** (warnings, all six modules, run 1):
+* 144: `require_dependency is deprecated` (57a5577169), from Decidim's engines loading mailer previews
+  ([core engine.rb#L718](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/core/engine.rb#L718),
+  [initiatives engine.rb#L181](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-initiatives/lib/decidim/initiatives/engine.rb#L181)) on every boot.
+* 48: `ActionController::InvalidAuthenticityToken has been deprecated … Use ActionController::InvalidCrossOriginRequest`
+  (46eecbfd1a), from `rescue_from ActionController::InvalidAuthenticityToken` in the
+  [Devise sessions controller](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/controllers/decidim/devise/sessions_controller.rb#L12)
+  and its [system twin](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-system/app/controllers/decidim/system/devise/sessions_controller.rb#L13).
+* 43: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` `` (4f2ee07b8e, as in Redmine,
+  Forem and Discourse), from `skip_before_action :verify_authenticity_token` in four controllers, such as
+  [`ErrorsController`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/controllers/decidim/errors_controller.rb#L5).
+* 3: `Mime::EXTENSION_LOOKUP is deprecated` (f6c709e747), from devise 5.0.4's
+  [`navigational_formats`](https://github.com/heartcombo/devise/blob/9ea459de9aec5f1217ad738c58e0d23fb9f5beaa/app/controllers/devise_controller.rb#L99);
+  fixed on devise main (heartcombo/devise#5856), unreleased.
+
+**Not pursued:**
+* A cells-rails or Decidim PR for DC2, a Decidim change for DC5, an rspec-rails release request for DC3: findings
+  in gems and apps are recorded, not reported.
+* An upgrade-guide note for DC4 and the rspec-mocks pattern: deliberate, test-only, not built (one concern per PR).
+* System specs (they need Chrome and the validator service) and the other 19 modules.

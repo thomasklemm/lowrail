@@ -1,0 +1,39 @@
+diff --git a/decidim-core/app/controllers/concerns/decidim/force_authentication.rb b/decidim-core/app/controllers/concerns/decidim/force_authentication.rb
+index 1907250278..a5dd70fd74 100644
+--- a/decidim-core/app/controllers/concerns/decidim/force_authentication.rb
++++ b/decidim-core/app/controllers/concerns/decidim/force_authentication.rb
+@@ -41,7 +41,7 @@ module Decidim
+       ).pluck(
+         Arel::Nodes::Concat.new(
+           Arel::Nodes.build_quoted("/#{current_locale}/pages/"),
+-          Arel::Table.new(Decidim::StaticPage.table_name)[:slug]
++          Arel::Table.new(name: Decidim::StaticPage.table_name)[:slug]
+         )
+       )
+     end
+diff --git a/decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb b/decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb
+index e1398dd466..6990f05a70 100644
+--- a/decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb
++++ b/decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb
+@@ -62,7 +62,7 @@ module Decidim
+     private
+ 
+     def resource_join
+-      resource_table = Arel::Table.new(resource_table_name)
++      resource_table = Arel::Table.new(name: resource_table_name)
+       attachments_table = Decidim::Attachment.arel_table
+       attachments_table.join(resource_table).on(
+         resource_table[:id].eq(attachments_table[:attached_to_id]),
+diff --git a/decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb b/decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb
+index 2226f30938..554ad35764 100644
+--- a/decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb
++++ b/decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb
+@@ -12,7 +12,7 @@ class RenameDoorkeeperScopes < ActiveRecord::Migration[7.0]
+   private
+ 
+   def update_scopes(table, new_value, old_value)
+-    tbl = Arel::Table.new(table)
++    tbl = Arel::Table.new(name: table)
+     um = Arel::UpdateManager.new(tbl)
+     um.set([[tbl[:scopes], new_value]])
+     um.where(tbl[:scopes].eq(old_value))
