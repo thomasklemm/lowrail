@@ -9,7 +9,7 @@ The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of 
 | `indexes` | 1 | 2 (the same index twice) | 1 |
 | `temp_name` collation | nil | nil | NOCASE |
 
-The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves names. Temporary indexes and triggers don't take part, so they hide nothing. The collation row goes beyond 8-1-stable: it read columns from the temporary table but the CREATE statement of the permanent one.
+The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Temporary indexes and triggers don't take part, so they hide nothing. The collation row goes beyond 8-1-stable: it read columns from the temporary table but the CREATE statement of the permanent one.
 
 ---
 

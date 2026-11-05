@@ -8,3 +8,5 @@ OP3	thomasklemm/validation-context-writer	59660	0ba3dad80bdd63dc4f769fd192dc550c
 OP1	thomasklemm/parameter-parsers-register-in-place	59661	49b835ba58
 OP8	thomasklemm/frozen-default-attribute-unread	59662	9b2a64d040
 ZM1	thomasklemm/bind-attribute-column-name	59663	0db82ad5cc
+DC1	thomasklemm/form-tag-helper-token-tag	59667	ab0a99e41a
+E2b	thomasklemm/sqlite-schema-readers-temp-shadowing	59668	472c680d15
