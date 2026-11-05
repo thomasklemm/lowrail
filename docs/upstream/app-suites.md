@@ -17,6 +17,7 @@ overridden `primary_key` (#59622).
 | Redmine trunk `41cd39c` | `rails test`, 6116 runs, SQLite | clean, clean | boot fails; after workaround 1 F, 3 E | S1 (b), S2 (b) |
 | Lobsters `b6ea255` | rspec, 927 examples, SQLite | 0 F, 0 F | every feature spec fails to load; after rspec-rails pin 3 F | L1 (c), L2 (a), fixed by #59625 |
 | Solidus `ed00fc8` | core rspec, 4487 examples; api rspec, 684 examples; SQLite | clean ×2 (core and api) | core clean; api 1 F ×2 | SO1 (b) |
+| Mastodon `ca2f092` | rspec (flatware, 8 workers), 8002 examples, PostgreSQL 17 + Redis | 0 F, 0 F | 2427 F ×2; with 2 app shims 34 F ×2, all main-only | R1 (d, our #59630), M1 (d, record only), `Vary` (b, open #59500), S2 and 3 more (b), L1 |
 | Sure `e658686` | `rails test`, 14313 runs, PostgreSQL 18.6 + Redis | 0 F, 0 F | 13 F, 472 E | SU1 (a), SU2 (b, record only), SU3–SU5 (b/c) |
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
@@ -85,50 +86,141 @@ groups.
 
 ## Mastodon
 
-`a255155`, PostgreSQL 17 and Redis, flatware. L1 hit the mailer specs as well (rspec-rails 9fb6f4f0a3 also fixes
-`MailerExampleGroup`), so both bundles pin that rspec-rails ref. First main run: 2462 failures in 7984 examples.
+mastodon/mastodon `ca2f092` (default branch `main`,
+[`ca2f092f4f`](https://github.com/mastodon/mastodon/tree/ca2f092f4f580b1993bae3ac4f4742b748f18ad1), 2026-11-04),
+Ruby 4.0.9 (its `.ruby-version`), PostgreSQL 17.11, Redis 7.0.15. Rails main `bdb3d96012` (2026-11-05) for every run,
+bisect and check; 8-1-stable `6e09124217` (v8.1.4.1). The suite as its CI test job runs it: `bin/flatware rspec`
+with 8 workers, one database each (`bin/flatware fan bin/rails db:test:prepare`), all of `spec/` except the `js`,
+`search` and `streaming` tags that `rails_helper.rb` excludes; 8002 examples, 2 pending. Seeds 4242 and 1717 on both
+trees, about 90 seconds wall per run. CI's OIDC, SAML and CAS settings are on; the `pam_authentication` group isn't
+bundled (`ALLOW_NOPAM=true`), the same on both trees. Assets were built once with `bin/rails assets:precompile` on the
+8-1 tree and copied to the main tree. Mastodon's test env prints deprecations to stderr, so main-only ones are read
+from the logs.
 
-**R1 (d, documented): `GetIp#filter_proxies` removed without deprecation.** 752cc3915d (#56805, fatkodima, perf)
-replaced it with `first_non_proxy`. On 8-1 it was private but marked `# :doc:`. Mastodon's
-[`lib/action_dispatch/remote_ip_extensions.rb`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/lib/action_dispatch/remote_ip_extensions.rb#L18) prepends its own `calculate_ip`, which calls
-[`filter_proxies([remote_addr] + ips).first`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/lib/action_dispatch/remote_ip_extensions.rb#L57) (shortened); that accounts for 2169 of the failures, in 368 spec files. Fix (Thomas's
-decision): restore it as a deprecated private `:doc:` method with 8-1's body (all non-proxy IPs, in order),
-warning through `ActionDispatch.deprecator`, to be removed in Rails 9.0, pointing to `first_non_proxy`. The fast
-path is untouched. Test: IPv4, IPv6, a Regexp proxy and an all-proxy list against 8-1's results, plus
-`assert_deprecated`; it fails on main with `NoMethodError`. A differential script gives identical output on
-8-1-stable and on the branch, including an identical `IPAddr::InvalidAddressError` for a non-IP entry.
-`request_test.rb` 200 runs green; RuboCop clean. Mastodon with the branch and without the app shim: the 368 files
-run 2232 examples, 0 of them `filter_proxies` failures. The 25 that remain also fail either in the shimmed main run
-or in the 8-1 run under a shared REDIS_URL.
+**Lockfiles.** Mastodon locks Rails 8.1.4.1, so the 8-1 lock differs from Mastodon's own only in the `path:` Rails
+and the rspec-rails bump below. The main lock was resolved from the 8-1 lock (`bundle lock --conservative --update`
+over the Rails gems) and differs only in the Rails gems and what main itself requires: herb 0.11.1, marcel
+1.2.1 → 2.1.0, psych 5.5.0, ractor-dispatch 0.3.0, stringio 3.2.0 (globalid is already 1.4.0). One bump, on both
+trees: rspec-rails 8.0.4 → `570b2b0a79` (git), because on main with 8.0.4 `user_mailer_spec.rb` fails to load with
+`FrozenError: can't modify frozen Hash: {}` (L1) and all 9 view specs fail with `FrozenError` on `_prefixes` (both
+fixed in that ref; 8.0.4 is still the latest release). 8-1 passes with either.
+
+Results: 8-1 0 F and 0 F. Main 2427 F and 2427 F, the same examples both times, in 416 files; those 416 files again
+on 8-1 (3268 examples): 0 F. Main with two app-side shims (main checkout only: define `filter_proxies` in
+Mastodon's extension with 8-1's body, and pass `attr` to `build_bind_attribute`;
+[patch](../../bench/upstream/readiness/round-app-suites/mastodon-main-shims.patch)): 34 F and 34 F, the same examples, in 9
+files; those files a third time: the same 34. No flaky failure on either tree, so every main failure is main-only.
+All of it is classified below, and none of it is a new (a).
+
+| Group | Failures | Class | Commit | Status |
+|---|---|---|---|---|
+| R1 `GetIp#filter_proxies` removed | 2187 | (d), restore | 752cc3915d (#56805) | our open #59630 |
+| M1 `build_bind_attribute` takes an Arel attribute | 225 | (d) | 4f1ff11da3 (#58479) | record only |
+| `Vary: Sec-Fetch-Site` on GET responses | 19 (behind R1) | (b) | f5a1915f1d (#56350) | open #59500 |
+| S2 `link_to` moved to `NavigationHelper` | 11 | (b) | 07f4b45e29 (#55410) | our S2 note, queued |
+| `precision: nil` timestamps as microseconds | 3 | (b) | c162370c8f (#57845) | CHANGELOG |
+| enum `ArgumentError` lists the valid values | 1 | (b) | fcf4393f04 (#57446) | CHANGELOG |
+
+Each commit was bisected over 8ae3d84277 (the 8-1-stable branch point) to main with one spec file per group, then
+checked against its parent: the parent has no failure of the group, the commit has the group's failures. Harness
+notes for the bisects: Mastodon's
+[`check_ip(client_ips, forwarded_ips) if @check_ip`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/lib/action_dispatch/remote_ip_extensions.rb#L38)
+(since its 8.1.4.1 update,
+[599d816f6e](https://github.com/mastodon/mastodon/commit/599d816f6e4dd444766155cbce05ffea8568d2f8)) calls the private
+`GetIp#check_ip` that 8.1.4.1's security fix added (475118e113 on main, 2026-11-03), so older main commits fail every
+request spec; the bisect copies call it only when it exists. The bisect copies' M1 shim picks the argument by the
+method's parameter name, so it works on both sides of 4f1ff11da3.
+
+**R1 (d), restore, our open [#59630](https://github.com/rails/rails/pull/59630).** Mastodon's
+[`filter_proxies([remote_addr] + ips).first || ips.last || remote_addr`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/lib/action_dispatch/remote_ip_extensions.rb#L57)
+calls the `:doc:` private method that 752cc3915d (#56805, fatkodima, perf) replaced with `first_non_proxy`, so every
+request raises `NoMethodError`: 2187 failures, which also hide the 19 `Vary` failures. With #59630's head
+`54e07d2dba` cherry-picked onto main `bdb3d96012` (applies cleanly) and no `filter_proxies` shim, two full runs give
+the same 34 failures as the shimmed runs, none of them from `filter_proxies`, and 2877 warnings that point to
+`first_non_proxy`. First found in the earlier round below; nothing new to build.
+
+**M1 (d), record only: `PredicateBuilder#build_bind_attribute` takes an Arel attribute.** 4f1ff11da3 (#58479,
+matthewd, "Query predicate expressions for Active Record types, take 2"; CHANGELOG "Add query predicate expressions
+for Active Record types") changed it from `(column_name, value)` to
+[`(attribute, value)`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/relation/predicate_builder.rb#L128-L131).
+Mastodon's [`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/status/safe_reblog_insert.rb#L64)
+calls `predicate_builder.build_bind_attribute(attr.name, attribute.value)` in its override of `_insert_record`, so
+every reblog insert raises `NoMethodError: undefined method 'name' for an instance of String` (225 failures, 28 of
+them in `feed_manager_spec`).
+Repro: [bind_attribute_name.rb](../../bench/upstream/app_suites/bind_attribute_name.rb): on 8-1 the column name
+works (and an Arel attribute gives a bind named by the struct); on main the column name raises. `PredicateBuilder` is
+`:nodoc:` and this is one app, so under the restore rule it stays a Mastodon-side fix (pass the attribute on 8.2),
+not reported.
+
+**`Vary: Sec-Fetch-Site` (b), covered by open [#59500](https://github.com/rails/rails/pull/59500).** f5a1915f1d
+(#56350, "Use a modern approach for cross-site request forgery protection") adds
+[`append_after_action :append_sec_fetch_site_to_vary_header`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_controller/metal/request_forgery_protection.rb#L310)
+to every protected action; the CHANGELOG entry doesn't mention `Vary`. `statuses_spec` (12, which expects
+[`vary_by`'s `Accept, Accept-Language, Cookie`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/statuses_controller.rb#L9)),
+`webfinger_spec` (5, `"Sec-Fetch-Site, Origin"` instead of `"Origin"`), `outboxes_spec` and `embed_spec` (1 each)
+fail, all on GET requests. The bisect lands on 4f2ee07b8e (#56369), because between the two commits main had no
+`verify_authenticity_token` callback and Mastodon's
+[`skip_before_action :verify_authenticity_token, only: :raise_not_found`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/application_controller.rb#L34)
+raised at class load; with that line changed to `skip_forgery_protection`, f5a1915f1d's parent passes and
+f5a1915f1d fails the same 17 webfinger and statuses examples. #59500 (czj, head `d255d0649e`, last updated
+2026-11-01) stops adding the header for GET, HEAD and QUERY requests, which pass verification on their method alone;
+cherry-picked onto main, the four files pass 66/66. Nothing of ours; no comment.
+
+**The rest (b), all with CHANGELOG entries:** 11 S2 failures,
+[`REST::NotificationSerializer`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/serializers/rest/notification_serializer.rb#L5) and
+[`REST::NotificationGroupSerializer`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/serializers/rest/notification_group_serializer.rb#L5)
+include only `UrlHelper` and call
+[`link_to`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/serializers/concerns/notification_fallback_concern.rb#L82)
+(our upgrade-guide note S2 is in the queue); 3 `precision: nil` failures, `user_spec` (2) and
+`post_status_service_spec` (1) compare against a nanosecond `Time`; 1 in `notification_policy_spec`, which matches
+the whole enum error message. The webfinger, outboxes and embed `Vary` failures that the earlier round saw on both trees
+pass on 8-1 now.
+
+**Deprecations that only main emits** (warnings in the shimmed main run; the 8-1 runs print none):
+* 332: `` Passing `pk` as a positional argument to `insert` is deprecated `` (6669725a14, #58297, CHANGELOG), from
+  [`connection.insert(im, "#{self} Create", primary_key || false, primary_key_value, returning: returning)`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/status/safe_reblog_insert.rb#L39)
+  (shortened), in the same reblog override, which is kept close to Active Record's own
+  `_insert_record`. Main still turns `pk` into `returning:`, so behavior is unchanged.
+* 33 (c): `Mime::EXTENSION_LOOKUP is deprecated`, from Devise 5.0.4's
+  [`Mime::EXTENSION_LOOKUP[format.to_s]`](https://github.com/heartcombo/devise/blob/9ea459de9aec5f1217ad738c58e0d23fb9f5beaa/app/controllers/devise_controller.rb#L99)
+  through the sessions and confirmations controllers' `super`; fixed on Devise main in
+  [6200069398](https://github.com/heartcombo/devise/commit/6200069398ff3c88a56fbaa8fa2fdec1ae53a20b), unreleased
+  (5.0.4 is the latest release).
+* 27: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` `` (4f2ee07b8e, #56369), from
+  [application_controller.rb#L34](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/application_controller.rb#L34)
+  and [omniauth_callbacks_controller.rb#L5](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/auth/omniauth_callbacks_controller.rb#L5).
+* 24 `exec_update is deprecated`, from [ranked_trend.rb#L18](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/ranked_trend.rb#L18);
+  5 `exec_insert is deprecated`, from [account_summary.rb#L40](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/account_summary.rb#L40)
+  and [cli/statuses.rb#L55](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/lib/mastodon/cli/statuses.rb#L55) and
+  [#L140](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/lib/mastodon/cli/statuses.rb#L140).
+* 12 `ActionController::InvalidAuthenticityToken has been deprecated`, from
+  [error_responses.rb#L7](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/concerns/error_responses.rb#L7)
+  and [api/web/base_controller.rb#L6](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/controllers/api/web/base_controller.rb#L6).
+* 8 (one per process) `` `ActiveRecord::SchemaDumper.ignore_tables=` is deprecated ``, from
+  [config/environment.rb#L9](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/config/environment.rb#L9).
+
+Not seen: S1, SU1–SU5, R2-x, E1–E4, AR-1–AR-4, CW1, CW2, L2. No branch, patch or queue entry from this round.
+
+### Earlier round (2026-11-04)
+
+`a255155`, PostgreSQL 17 and Redis, flatware, rspec-rails pinned to 9fb6f4f0a3 (it also fixes `MailerExampleGroup`
+for L1), Rails main `8b06b0eb98`. First main run: 2462 failures in 7984 examples. It found R1 and M1 and the same
+(b) groups.
+
+**R1 fix.** Restore `filter_proxies` as a deprecated private `:doc:` method with 8-1's body (all non-proxy IPs, in
+order), warning through `ActionDispatch.deprecator`, to be removed in Rails 9.0, pointing to `first_non_proxy`
+(Thomas's decision). The fast path is untouched. Test: IPv4, IPv6, a Regexp proxy and an all-proxy list against
+8-1's results, plus `assert_deprecated`; it fails on main with `NoMethodError`. A differential script gives identical
+output on 8-1-stable and on the branch, including an identical `IPAddr::InvalidAddressError` for a non-IP entry.
+`request_test.rb` 200 runs green; RuboCop clean.
 [patch](../../bench/upstream/app_suites/r1-remote-ip-filter-proxies-deprecation.patch),
 [body](../../bench/upstream/app_suites/r1-body.md). Branch `thomasklemm/remote-ip-filter-proxies-deprecation` @
-`54e07d2dba` on main `d09361d7cf` (Sol: open with nits, applied: concrete migration in the message, `assert_deprecated(/filter_proxies/, …)`, neutral CHANGELOG, body wording).
+`54e07d2dba` on main `d09361d7cf` (Sol: open with nits, applied: concrete migration in the message,
+`assert_deprecated(/filter_proxies/, …)`, neutral CHANGELOG, body wording); opened as #59630.
 
-**M1 (d): `PredicateBuilder#build_bind_attribute` takes an Arel attribute.** 4f1ff11da3 (CHANGELOG). Mastodon's
-[`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/models/concerns/status/safe_reblog_insert.rb#L64) passes `attr.name`; about 220 failures. `PredicateBuilder` is `:nodoc:`; record only.
-
-To compare the rest, the main checkout carries two app-side shims (pass `attr`; define `filter_proxies` in
-Mastodon's extension). Main with shims: 44 failures. The 8-1 controls run one after another on the default
-Redis (an earlier 8-1 run with `REDIS_URL` set had 63 environment failures, from redis_configuration_spec and
-feed specs).
-
-**Mastodon main-only failures after the shims (44 on main; the second 8-1 control has 8, all of which also fail on
-main):** the remaining 36 are all explained.
-* 12 (b): `statuses_spec` expects `Vary: Accept, Accept-Language, Cookie` and gets `…, Sec-Fetch-Site`. Main's
-  Sec-Fetch-Site CSRF protection appends to `Vary` (f5a1915f1d, 7fcee2255b; CHANGELOG).
-* 11 (b, S2): [`REST::NotificationSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_serializer.rb#L5) and [`REST::NotificationGroupSerializer`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/rest/notification_group_serializer.rb#L5) include only
-  `ActionView::Helpers::UrlHelper` and call [`link_to`](https://github.com/mastodon/mastodon/blob/599d816f6e4dd444766155cbce05ffea8568d2f8/app/serializers/concerns/notification_fallback_concern.rb#L82).
-* 9 (c): view specs fail with `FrozenError` on `["", "action_view/test_case/test"]`. fd5ffed45b freezes
-  `ViewPaths._prefixes` (for Ractors), and rspec-rails prepends to `lookup_context.prefixes`. Fixed in rspec-rails
-  570b2b0a79 (#2915, 2026-09-02), after our pin and unreleased.
-* 3 (b): `precision: nil` datetime columns are now cast to microseconds in memory ("Report PostgreSQL default
-  timestamp and time precision as 6", CHANGELOG). `user_spec` (2) and `post_status_service_spec` (1) compare
-  against a nanosecond `Time`.
-* 1 (b): the enum `ArgumentError` now lists the valid values (CHANGELOG).
-* Failing on both: webfinger and outboxes `Vary` (the backported "Vary rendered responses by negotiation
-  headers", 7a955ca367 on 8-1-stable), the embed `Vary`, and the `strip_tags` HTML-entity check.
-
-No (a) in Mastodon.
+That round's 8-1 controls ran one after another on the default Redis (an earlier 8-1 run with `REDIS_URL` set had 63
+environment failures, from redis_configuration_spec and feed specs), and its 9 view-spec `FrozenError`s came from the
+older rspec-rails pin (fd5ffed45b freezes `ViewPaths._prefixes`; fixed in rspec-rails 570b2b0a79, #2915).
 
 ## Sure
 
