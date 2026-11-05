@@ -1885,7 +1885,7 @@ json/array/hstore/geometric; RuboCop: all green. The jsonb repro and `op8_probe2
 no json column default; the redundant nil guard on encrypted types dropped; the commit message's limits); its
 encrypted probes (string, serialized and json, nil and non-nil defaults) match 8.1 or main as intended. Follow-up, not
 in this fix: scalar time-zone-aware datetime defaults stay frozen and, per an earlier review, are cast once in the
-boot zone on main; not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `f95cc1b6df` on main
+boot zone on main; not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `de7aff270c` on main
 `bdb3d96012` (rails/rails main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).

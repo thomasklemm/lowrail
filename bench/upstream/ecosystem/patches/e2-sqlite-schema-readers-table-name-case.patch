@@ -1,4 +1,4 @@
-From 8f41f1c9c34cc61954a2fdffada94f005d222f8c Mon Sep 17 00:00:00 2001
+From bf905ad4f607907bad2bdce96114787cfb398b71 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 15:22:17 +0000
 Subject: [PATCH] Find SQLite tables by any ASCII case of their name in the
@@ -11,22 +11,19 @@ from the CREATE TABLE statement could no longer read its columns,
 primary key or indexes. Match with COLLATE NOCASE and key the rows by
 the name that was asked for.
 ---
- .../sqlite3/schema_statements.rb              | 12 +++++--
+ .../sqlite3/schema_statements.rb              |  9 +++--
  .../connection_adapters/sqlite3_adapter.rb    |  8 ++---
  .../adapters/sqlite3/sqlite3_adapter_test.rb  | 34 +++++++++++++++++--
- 3 files changed, 46 insertions(+), 8 deletions(-)
+ 3 files changed, 43 insertions(+), 8 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 64b1bad838..efc4e6b643 100644
+index 64b1bad838..bb40b27aad 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -79,16 +79,24 @@ def schema_creation # :nodoc
+@@ -79,16 +79,21 @@ def schema_creation # :nodoc
              )
            SQL
  
-+          # SQLite matches table names without regard to ASCII case, so a table is
-+          # found by any ASCII-case variant of its name, and its rows are keyed by
-+          # each name that was asked for.
 +          def group_by_table(rows, tables)
 +            rows = rows.group_by { |row| row["table_name"].downcase(:ascii) }
 +            tables.index_with { |table| rows[table.downcase(:ascii)] }.compact
@@ -144,5 +141,5 @@ index 3dac5cca5f..788ec3dd55 100644
            SQL
  
 -- 
-2.55.0
+2.39.5
 
