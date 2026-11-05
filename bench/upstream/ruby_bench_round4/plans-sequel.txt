@@ -1,0 +1,6 @@
+sqlite_stat1 before ANALYZE: no; after: 1 rows, ANALYZE 0.2 ms
+statements per pass: 1000 distinct strings, 1 distinct shapes (literals as N), 1000 executions, 1000 distinct SELECTs
+  x1000   SELECT * FROM `posts` WHERE `id` = N
+plans changed: 0 distinct, 0 executions per pass
+SQLite time per pass (median of 5 x 200 reps, times executions): all SELECTs 2.388 -> 2.601 ms; changed 0.000 -> 0.000 ms
+rows identical before/after ANALYZE: all 1000

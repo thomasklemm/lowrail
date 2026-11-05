@@ -1,0 +1,14 @@
+[
+  {
+    "sql": "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"id\" = ? LIMIT ?",
+    "n": 1970,
+    "before": "SEARCH posts USING INTEGER PRIMARY KEY (rowid=?)",
+    "after": "SEARCH posts USING INTEGER PRIMARY KEY (rowid=?)"
+  },
+  {
+    "sql": "SELECT \"posts\".* FROM \"posts\"",
+    "n": 30,
+    "before": "SCAN posts",
+    "after": "SCAN posts"
+  }
+]

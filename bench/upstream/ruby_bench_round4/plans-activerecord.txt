@@ -1,0 +1,7 @@
+sqlite_stat1 before ANALYZE: no; after: 3 rows, ANALYZE 0.17 ms
+statements per pass: 2 distinct strings, 2 distinct shapes (literals as N), 20 executions, 2 distinct SELECTs
+  x10     SELECT "posts".* FROM "posts" ORDER BY "posts"."id" ASC LIMIT ?
+  x10     SELECT "comments".* FROM "comments" WHERE "comments"."post_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+plans changed: 0 distinct, 0 executions per pass
+SQLite time per pass (median of 5 x 200 reps, times executions): all SELECTs 25.536 -> 27.597 ms; changed 0.000 -> 0.000 ms
+rows identical before/after ANALYZE: all 2
