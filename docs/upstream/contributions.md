@@ -807,6 +807,7 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 ### Time zones — tzinfo/tzinfo
 
 - [#171](https://github.com/tzinfo/tzinfo/pull/171), directly decode signed 64-bit TZif transitions — complete synthetic-file reads **288 → 160 objects** for 32 negative transitions and **72 → 60** for six signed boundaries; positive/empty/format-1 controls unchanged. Allocation-only, not speed; oldest MRI/JRuby engine checks ran, but Windows/32-bit/rest of CI matrix did not.
+- [#175](https://github.com/tzinfo/tzinfo/pull/175) (TZ1), `TimezoneTransition#==` returns early for the same object. **Draft**, opened 2026-11-05 22:17 UTC, head `2b2f4b458d`. With #171 still unanswered, tzinfo is at the 2-unanswered cap.
 
 
 ### Lint safety — rubocop/rubocop-performance
