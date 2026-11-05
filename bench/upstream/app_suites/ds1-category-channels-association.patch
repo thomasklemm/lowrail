@@ -1,0 +1,74 @@
+From e7ee7a18fbda706422eb967b886f0aff6486af67 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:15:28 +0000
+Subject: [PATCH] FIX: Scope Category#category_channels to the category's
+ channels
+
+`has_many :category_channels` was declared with
+`foreign_key: %i[chatable_id chatable_type]`, which maps the category's
+single-column primary key onto two columns. On Rails 8.1 the association
+silently queries `chatable_id IS NULL AND chatable_type IS NULL`, so
+`has_chat_channels` in the category serializer is always false. On Rails
+main the same declaration raises "Key mappings must have the same number
+of columns" on every read, so with chat enabled every category save fails.
+
+Declare it as the polymorphic side of `Chat::Channel#chatable`, like
+`has_one :category_channel` above it. `dependent: :destroy` is dropped so
+that deleting a category keeps destroying only what `has_one
+:category_channel` already destroys.
+---
+ plugins/chat/lib/chat/category_extension.rb |  3 +--
+ plugins/chat/spec/plugin_spec.rb            | 22 +++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/chat/lib/chat/category_extension.rb b/plugins/chat/lib/chat/category_extension.rb
+index b5b31b869e..3e129f3220 100644
+--- a/plugins/chat/lib/chat/category_extension.rb
++++ b/plugins/chat/lib/chat/category_extension.rb
+@@ -12,9 +12,8 @@ module Chat
+               class_name: "Chat::CategoryChannel",
+               dependent: :destroy
+       has_many :category_channels,
++               as: :chatable,
+                class_name: "Chat::CategoryChannel",
+-               dependent: :destroy,
+-               foreign_key: %i[chatable_id chatable_type],
+                inverse_of: :chatable
+     end
+ 
+diff --git a/plugins/chat/spec/plugin_spec.rb b/plugins/chat/spec/plugin_spec.rb
+index 6ef38463b0..d321a31a78 100644
+--- a/plugins/chat/spec/plugin_spec.rb
++++ b/plugins/chat/spec/plugin_spec.rb
+@@ -343,6 +343,28 @@ describe Chat do
+     end
+   end
+ 
++  describe "category_serializer#has_chat_channels" do
++    fab!(:category)
++    fab!(:admin)
++    let(:serializer) { CategorySerializer.new(category, scope: Guardian.new(admin), root: false) }
++
++    context "when only another category has a channel" do
++      before { Fabricate(:category_channel) }
++
++      it "returns false" do
++        expect(serializer.as_json[:has_chat_channels]).to eq(false)
++      end
++    end
++
++    context "when the category has a channel" do
++      before { Fabricate(:category_channel, chatable: category) }
++
++      it "returns true" do
++        expect(serializer.as_json[:has_chat_channels]).to eq(true)
++      end
++    end
++  end
++
+   describe "Deleting posts while deleting a user" do
+     fab!(:user)
+ 
+-- 
+2.39.5
+
