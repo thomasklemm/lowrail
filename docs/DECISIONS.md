@@ -287,7 +287,8 @@ a few seconds, without having seen our notes. If it reads like a report, it is t
 * **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
   by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
   big or not yet clear; split or simplify the change instead.
-* **Examples:** ankane/blind_index#62 and activerecord-hackery/ransack#1795 after the 11-05 rewrite.
+* **Examples:** ankane/blind_index#62 and activerecord-hackery/ransack#1795 after the 11-05 rewrite, and the rails/rails
+  drafts #59661–#59677 as posted on 11-05 (Thomas: "sehen alles sehr gut aus … in dem Stil können wir weitermachen").
 
 ### Code comments in upstream patches (byroot on #59555, 2026-11-05)
 
