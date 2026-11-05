@@ -91,19 +91,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 
 ## Pull requests
 
-* **Plain language upstream** (Thomas, 2026-11-03, after tekknolagi on
-  [Shopify/ruby#1058](https://github.com/Shopify/ruby/issues/1058#issuecomment-6613994853): "This LLM shorthand
-  output may be readable to you … but it is not for us … Please don't make meat proxies out of us both."). Every
-  comment, PR body and issue is written for a maintainer who has not seen our notes:
-  * full sentences, no shorthand, arrows, internal labels (B, R, P, C1, "patch points¹") or undefined terms;
-  * every number says what was measured, on what, with what, and against which baseline (for example "27% more
-    Callgrind instructions per call for a three-entry Hash, JITs off"), and instructions are never called time;
-  * lead with the answer to the question asked; prefer three short paragraphs to a dense table with footnotes;
-  * before posting, a separate Sol pass checks the facts against our doc and reads it as an outsider would. A text
-    that fails is rewritten, not trimmed.
-    Rewrites of already posted bodies that add no new claims may use any separate reviewer (2026-11-03: no codex
-    in the rewrite orb); edit a body only when the old one is hard to read.
-  We don't add an AI disclaimer to every PR; where it matters (as on #1058) we say so plainly.
+* **PR descriptions:** see [PR descriptions](#pr-descriptions-thomas-2026-11-03-to-11-05) below.
 * **Thomas can explain it first** (Thomas, 2026-11-03). Before a ruby/ruby PR or any issue opens, Thomas can say
   in two or three sentences of his own what is wrong, what changes and why that is safe. I give him a short
   explanation with a minimal example; the PR opens only when he can retell it. The agentic work (builds, numbers,
@@ -119,29 +107,12 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Cross-link interlocking changes in the body** (Thomas): one sentence with owner/repo (e.g. rails/rails#59557 ↔
   ruby/ruby#19662), updated when the other side moves, never as an extra comment. Every cross-repo reference
   carries owner/repo; link branches instead of naming them.
-* **rails/rails body,** about 180 words, no headings, no template checklist. Paragraph 1: what is wasted and where
-  it runs. Paragraph 2: what changes and the one boundary a reviewer would ask about. Then one per-call
-  before/after table: objects, and CPU in ns and Ir for interpreter and YJIT on the Ruby pin, with its A/A. One
-  sentence of ruby-bench placement ("within noise" is fine) and app breadth; one sentence on how the site was
-  found, linking the census doc in the public Lowrail repo (Lowrail named as my research project; Roundhouse not
-  mentioned). No per-app tables, review history or receipts.
 * **ZJIT evidence in the tools' own format** (k0kubun on ruby/ruby#19680, 2026-11-04): raw `run_benchmarks.rb`
   output and a ZJIT stats diff in diff format, leaving out diffs within noise; not tables of percentages.
-* **ruby/ruby body:** about 100 words plus one micro table, with the ruby-bench headline effect or the
-  correctness repro.
 * **Restore and compatibility PRs name their callers** (Thomas, 2026-11-04): when a PR brings back or bridges
-  something main removed, the body says in a sentence or a short list who uses it (gem or app, file, the call), so
-  the PR doesn't stand alone. Every bug, regression and compatibility PR ends with a one-line `<sub>` footer after
-  `---` saying how it was found, linking the matching record in the public Lowrail repo (ecosystem-tests,
-  app-suites, api-regressions, rails-82-differential).
+  something main removed, the body says in a sentence or a short list who uses it (gem or app, with a line permalink),
+  so the PR doesn't stand alone.
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
-* **Bodies for humans, short** (Thomas, 2026-11-05, on ankane/blind_index#62: "geht viel besser und kürzer und für
-  Menschen geschrieben. Das Test-Zeugs etc. braucht keiner"). Two short paragraphs: what breaks or is wasted, and
-  why; what the change does and that released versions behave as before. No test-run counts, commands, SHAs,
-  suite totals or review boundaries for private overrides; that evidence stays in the queue item notes and the
-  Lowrail record. A perf PR keeps only its one before/after table. Example: blind_index#62, scimitar#172,
-  ransack#1795 after the rewrite.
-
 ## Playbook from the PR retrospective (2026-11-04)
 
 Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. The first
@@ -286,19 +257,37 @@ reassigned a variable inside an `unless`:
   cyclomatic and perceived complexity) for each touched method, before and after. A rise needs a sentence of
   justification in the review. These numbers miss shape problems, so they never replace the cold read.
 
-### Short PR bodies (2026-11-04)
+### PR descriptions (Thomas, 2026-11-03 to 11-05)
 
-Thomas, after reading all of today's Rails PRs: "Beschreibungen könnten etwas kürzer sein, weniger Wall of Text".
-A human reviewer has to get the essence in a few seconds.
+Thomas: "Beschreibungen könnten etwas kürzer sein, weniger Wall of Text" (11-04), and on ankane/blind_index#62:
+"geht viel besser und kürzer und für Menschen geschrieben. Das Test-Zeugs etc. braucht keiner" (11-05). Before
+that, tekknolagi on [Shopify/ruby#1058](https://github.com/Shopify/ruby/issues/1058#issuecomment-6613994853):
+"This LLM shorthand output may be readable to you … but it is not for us." A maintainer should get the point in
+a few seconds, without having seen our notes. If it reads like a report, it is too long.
 
-* **Shape:** the first sentence says what changes, the second why it is safe or what it fixes. Then one small
-  table or a single line of numbers. Aim for about 180 words in total, table and code names included (Thomas, on #59617); well above that needs a reason.
-* **Scope caveats** take one clause each, not a paragraph. Methodology, A/A values, rejected variants and
-  differential sizes stay in the Lowrail doc, or go in a `<details>` block at the end if a reviewer will want them.
-* Sol's and the outsider's wording fixes are made by shortening the text, not by adding to it.
-* **Correctness PRs carry no performance numbers** (Thomas, on #59617). The body says what was broken, what now
-  happens and what was tested. Cost measurements stay in the Lowrail doc and come up only if a maintainer asks,
-  unless the fix measurably slows a common path.
+* **Shape.** The title says what changes. The body has two or three short paragraphs, usually 50–120 words:
+  1. What breaks or is wasted, where, and why, with one concrete example (the call, the error).
+  2. What the change does and why it is safe: released versions and existing callers behave as before. Add the
+     one boundary a reviewer would ask about only if users can hit it, in one clause.
+  3. Only for compatibility and restore PRs: who is affected, with line permalinks.
+* **Numbers.** A perf PR gets one small before/after table, whose heading says what was measured (for example
+  "Objects and Callgrind instructions per call, Ruby 4.0, no JIT"). Instructions are never called time. A/A
+  values, methodology, ruby-bench placement and other Rubies stay in the record. A correctness PR has no numbers.
+* **Leave out:** test-run and suite counts, commands, SHAs and pins, which Rubies or databases were tried, review
+  history, rejected variants, differential sizes, private or `:nodoc:` override boundaries, "this is not a speed
+  claim". The diff shows the tests and the footer links the record. If a maintainer asks, the answer goes in a
+  reply.
+* **Language.** Full sentences and plain words. No internal labels (B, R, C1), arrows, shorthand, stacked
+  qualifiers, headings, checklists or bold. Say it as you would to a colleague at the next desk.
+* **Fixed parts.** A stacked PR starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is
+  new here." Interlocking changes get one cross-link sentence with owner/repo. Bugs, regressions and compatibility
+  PRs end with a one-line `<sub>` footer after `---` saying how it was found and linking the public Lowrail
+  record (Lowrail named as my research project). ZJIT evidence uses the tools' own format (see above). No AI
+  disclaimer, except where it matters, as on #1058.
+* **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
+  by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
+  big or not yet clear; split or simplify the change instead.
+* **Examples:** ankane/blind_index#62 and activerecord-hackery/ransack#1795 after the 11-05 rewrite.
 
 ### Code comments in upstream patches (byroot on #59555, 2026-11-05)
 
