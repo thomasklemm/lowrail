@@ -8,4 +8,4 @@ That takes back about 90%: 16.4% fewer instructions over four documents (two run
 
 ---
 
-<sub>Found while measuring graphql-ruby's parsers for ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/LOWRAIL_SHA/docs/upstream/graphql-ruby.md#a-ruby-lexer-loop-in-advance), my research project.</sub>
+<sub>Found while measuring graphql-ruby's parsers for ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/4ed0d1fb97ff4cd4e7ecc49a7481cb6270c14cb5/docs/upstream/graphql-ruby.md#a-ruby-lexer-loop-in-advance), my research project.</sub>

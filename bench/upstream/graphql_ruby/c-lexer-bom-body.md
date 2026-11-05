@@ -8,4 +8,4 @@ Instructions drop 1.33% (Cachegrind, Ruby 4.0.9, two runs each, within 0.03%). `
 
 ---
 
-<sub>Found while measuring graphql-c_parser 1.2.0 for ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/LOWRAIL_SHA/docs/upstream/graphql-ruby.md#b-c-lexer-byte-order-marks-in-blank), my research project.</sub>
+<sub>Found while measuring graphql-c_parser 1.2.0 for ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/4ed0d1fb97ff4cd4e7ecc49a7481cb6270c14cb5/docs/upstream/graphql-ruby.md#b-c-lexer-byte-order-marks-in-blank), my research project.</sub>
