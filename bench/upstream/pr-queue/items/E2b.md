@@ -16,7 +16,7 @@ rank: 5
 risky: false
 state: draft
 pr: 59668
-note: "opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2"
+note: "opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
@@ -32,16 +32,9 @@ passes:
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers
 
-The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of `sqlite_master` and `sqlite_temp_master` rows. When a temporary table has the same name as a permanent one, both rows match, and the pragmas resolve both to the temporary table, as SQLite does. So columns and indexes are duplicated, and the primary key becomes composite:
+The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of `sqlite_master` and `sqlite_temp_master` rows. When a temporary table has the same name as a permanent one, both rows match, and the pragmas resolve both to the temporary table, as SQLite does. So columns and indexes are duplicated, and the primary key becomes composite.
 
-| `shadowed`: permanent `(id, number)`, temporary `(temp_id, temp_name COLLATE NOCASE)` | 8-1-stable | main | this PR |
-|---|---|---|---|
-| `columns` | temp_id, temp_name | temp_id, temp_id, temp_name, temp_name | temp_id, temp_name |
-| `primary_key` | temp_id | ["temp_id", "temp_id"] | temp_id |
-| `indexes` | 1 | 2 (the same index twice) | 1 |
-| `temp_name` collation | nil | nil | NOCASE |
-
-The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Temporary indexes and triggers don't take part, so they hide no table or view. A temporary index that shares a permanent index's name still gives its columns, twice, to the permanent one, as on main; that is a separate fix. The collation row goes beyond 8-1-stable, which read the columns from the temporary table but the CREATE statement of the permanent one. Check constraints are read from that statement too, so they now come from the temporary table as well.
+The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Collations and check constraints now come from the temporary table's CREATE statement too; 8-1-stable read the columns from the temporary table but the statement of the permanent one.
 
 #59671 (table names in any ASCII case) and #59672 (each index from its own schema) are stacked on this one.
 

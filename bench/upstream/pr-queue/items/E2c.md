@@ -16,7 +16,7 @@ rank: 9
 risky: true
 state: draft
 pr: 59672
-note: "reviewed on 6c80a5583b; stacked on E2; opened as draft #59672 (Thomas, 2026-11-05 night)"
+note: "reviewed on 6c80a5583b; stacked on E2; opened as draft #59672 (Thomas, 2026-11-05 night); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, MASTER_CTE and sort-order detail; in docs/upstream/ecosystem-tests.md"
 passes:
   - {reviewer: skeptic, head: "cd90c26ce8", date: 2026-11-05, verdict: nits, open: "commit message reworded in 6ffd1872fe (same tree); no test for the pragma_index_list schema argument, declined: redundant once E2 hides case-differing tables"}
   - {reviewer: skeptic, head: "6ffd1872fe", date: 2026-11-05, verdict: approve, open: "message-only amend of cd90c26ce8, identical tree"}
@@ -35,16 +35,9 @@ waived:
 
 Stacked on #59671, which should merge first; only the last commit (`6c80a5583b`) is new here.
 
-A temporary index may have the name of a permanent one, since the two live in different schemas. The batched SQLite schema readers from 2cb3daba96 look up the columns of each index with an unqualified `pragma_index_info(name)`, which resolves the name to the temporary index, and match the CREATE INDEX statements by name alone, so both rows match. Both tables' indexes then read the temporary index's columns twice, and the temporary one takes the permanent one's CREATE INDEX statement:
+A temporary index may have the name of a permanent one, since the two live in different schemas. The batched SQLite schema readers from 2cb3daba96 look up an index's columns with an unqualified `pragma_index_info(name)`, which resolves to the temporary index, and match CREATE INDEX statements by name alone. So both tables' indexes read the temporary index's columns twice, and the temporary index takes the permanent one's statement, including its `where`. 8-1-stable was wrong too, one index at a time.
 
-| `shared_index`: permanent on `permanent_items (number) WHERE number > 0`, temporary on `temporary_items (label)` | 8-1-stable | main | this PR |
-|---|---|---|---|
-| `indexes("permanent_items")` columns | label | label, label | number |
-| `indexes("permanent_items")` `where` | number > 0 | number > 0 | number > 0 |
-| `indexes("temporary_items")` columns | label | label, label | label |
-| `indexes("temporary_items")` `where` | number > 0 | number > 0 | nil |
-
-8-1-stable was wrong too, one index at a time: it read the columns from the temporary index and the statement from the permanent one. The rows of `MASTER_CTE` now carry their schema, `'main'` or `'temp'`, which goes to `pragma_index_list` and `pragma_index_info`, and the index statements are keyed by schema and name, so they no longer depend on which row the sort returns first for a shared name. This builds on #59671, whose case-insensitive hiding leaves one row per table: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well as the temporary one's, where SQLite and main read only the temporary one's.
+The readers now pass each index's schema, `main` or `temp`, to the pragmas and key the statements by schema and name. This needs #59671's case-insensitive hiding: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well.
 
 ---
 

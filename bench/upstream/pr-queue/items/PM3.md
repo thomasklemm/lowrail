@@ -16,7 +16,7 @@ rank: 13
 risky: false
 state: draft
 pr: 59674
-note: "reviewed: skeptic and Sol approve on defa5dc860 under the contract, carried to 793a635e4b (same tree, Amp trailer removed) (logger snapshot disclosed, private helper arity stated)"
+note: "reviewed: skeptic and Sol approve on defa5dc860 under the contract, carried to 793a635e4b (same tree, Amp trailer removed) (logger snapshot disclosed, private helper arity stated); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: private log_level_satisfied? arity change, test description, A/A within 0.12%, 81d95a3f74 and the Method section; in docs/upstream/perf-round-main.md (Refresh on main 1e235cee11 and Second round)"
 passes:
   - {reviewer: sol, head: "cec8010a8b", date: 2026-11-05, verdict: changes, open: "first review: disclosure, arity, numbers, links; applied in the body"}
   - {reviewer: skeptic, head: "cec8010a8b", date: 2026-11-05, verdict: approve, open: ""}
@@ -31,27 +31,16 @@ passes:
 
 # Read the logger once in EventReporter::LogSubscriber#emit and #consumes?
 
-[`emit` and `consumes?`](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/activesupport/lib/active_support/event_reporter/log_subscriber.rb#L56-L88) look up `logger` for the nil check and then again in `log_level_satisfied?`. Each lookup goes from `self.class.logger` to `@logger || default_logger`, such as `ActionController::Base.logger`. This passes the logger they already have to `log_level_satisfied?`, so the level check uses the logger from the nil check, even if a `logger` override would return another one on a second call; the new tests cover that, including lookups that return nil. The private `log_level_satisfied?` now takes the logger as its first argument, so a subclass overriding it would need the new arity; the framework's subscribers choose their logger through `default_logger` and override none of these methods.
+[`emit` and `consumes?`](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/activesupport/lib/active_support/event_reporter/log_subscriber.rb#L56-L88) look up `logger` for the nil check and then again in `log_level_satisfied?`, and each lookup goes through `self.class.logger` to `@logger || default_logger`. `EventReporter#emitting?` asks `consumes?` before an event is built, and Action Controller's structured event subscriber asks it [twice per action](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/actionpack/lib/action_controller/structured_event_subscriber.rb#L10-L30).
 
-`EventReporter#emitting?` asks `consumes?` before an event is built ([81d95a3f74](https://github.com/rails/rails/commit/81d95a3f744ee504ecb9835293bda0a808cc56cf)); Action Controller's structured event subscriber asks it [twice per action](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/actionpack/lib/action_controller/structured_event_subscriber.rb#L10-L30).
+This passes the logger they already have to `log_level_satisfied?`, so the level check uses the logger from the nil check, even if a `logger` override would return another one on a second call.
 
-Callgrind instructions per call, Ruby 4.0.9 interpreter (main against itself within 0.12%):
+Callgrind instructions per call, Ruby 4.0, no JIT:
 
 | | main | this PR |
 | --- | ---: | ---: |
 | `ActionController::LogSubscriber#consumes?` | 12,805 | 10,591 (−17.3%) |
 | `EventReporter#emitting?` | 16,878 | 14,662 (−13.1%) |
-
-<details><summary>Method</summary>
-
-Rails main [`1e235cee11`](https://github.com/rails/rails/commit/1e235cee11b0a7aecb189d8837534807626287aa) against this branch at [`793a635e4b`](https://github.com/thomasklemm/rails/commit/793a635e4bb28c47910e74644b4846c5dbf1ef2b) and a second checkout of main; Ruby 4.0.9 ([`3e93b23afc`](https://github.com/ruby/ruby/commit/3e93b23afcec3433f6aecc34b5d832799d754238)) interpreter. Lowrail [`a06703e89d`](https://github.com/thomasklemm/lowrail/tree/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round): [`percall.sh`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/percall.sh) with [`cases/er_none.rb`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/cases/er_none.rb), which loads Action Controller with an info-level `ActiveSupport::Logger` as `ActionController::Base.logger` and checks `action_controller.request_started`. Callgrind counts only the timed loop: 2,000 calls after 2,000 warmups, GC disabled, fixed heap. Ir per call is inclusive (the method, everything it calls and the loop's block call, the same on both sides). Three runs per tree; the table shows the first, and all runs of main agree within 19 Ir.
-
-```
-WARMUP=2000 RUBY=path/to/ruby-4.0.9/bin/ruby percall.sh cases/er_none.rb consumes 2000 3 path/to/main path/to/main-2 path/to/branch
-WARMUP=2000 RUBY=path/to/ruby-4.0.9/bin/ruby percall.sh cases/er_none.rb emitting 2000 3 path/to/main path/to/main-2 path/to/branch
-```
-
-</details>
 
 ---
 <sub>Found by comparing Rails main with 8-1-stable on ruby-bench with Callgrind ([record](https://github.com/thomasklemm/lowrail/blob/9874d3f115aa081699a9e6ec3611e40cc4b3658c/docs/upstream/perf-round-main.md#refresh-on-main-1e235cee11-2026-11-05-evening), part of my research project Lowrail).</sub>
