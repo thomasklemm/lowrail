@@ -1,0 +1,319 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Upstream PR queue: one Markdown file per PR in bench/upstream/pr-queue/items, format and states in
+# bench/upstream/pr-queue/README.md. Rules: docs/DECISIONS.md, "Submission queue" and "Review gates".
+#
+#   script/pr-queue status         every item by state and rank, with fork head, passes and mergeability
+#   script/pr-queue next           the highest-ranked reviewed item whose repo has room
+#   script/pr-queue open ID [--draft]
+#   script/pr-queue ready ID       mark a draft ready for review (rails/rails: at most 15 non-draft)
+#   script/pr-queue sync           pull draft/ready/merged/closed states from GitHub
+
+require "date"
+require "json"
+require "open3"
+require "tempfile"
+require "yaml"
+
+module PrQueue
+  ROOT = File.expand_path("..", __dir__)
+  ITEMS = File.join(ROOT, "bench/upstream/pr-queue/items")
+  CACHE = File.join(ROOT, ".lowrail/pr-queue")
+  AUTHOR = "thomasklemm"
+  STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
+  KINDS = %w[fix perf docs restore].freeze
+  REVIEWERS = %w[skeptic sol astra thermos].freeze
+  VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
+  THERMOS_LINES = 200
+  # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
+  # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt.
+  CAPS = { "rails/rails" => { open: 20, ready: 15 }, "ruby/ruby" => { open: 0 }, "ruby/ruby-bench" => {} }.freeze
+  GEM_CAP = 2
+
+  Item = Struct.new(:path, :meta, :title, :body) do
+    def id = meta["id"]
+    def [](key) = meta[key]
+    def fork = meta["fork"] || "#{AUTHOR}/#{meta['repo'].split('/').last}"
+  end
+
+  module_function
+
+  def parse(path, text = File.read(path))
+    _, front, rest = text.split(/^---\n/, 3)
+    meta = YAML.safe_load(front, permitted_classes: [Date])
+    rest = rest.to_s.sub(/\A\n+/, "")
+    title, body = rest.split("\n", 2)
+    Item.new(path, meta, title.to_s.delete_prefix("# "), body.to_s.sub(/\A\n/, "").chomp)
+  end
+
+  def items = Dir[File.join(ITEMS, "*.md")].map { parse(_1) }
+
+  def sha?(value) = value.is_a?(String) && value.match?(/\A\h{7,40}\z/)
+
+  def same_sha?(a, b) = sha?(a) && sha?(b) && (a.start_with?(b) || b.start_with?(a))
+
+  def problems(item)
+    m = item.meta
+    list = []
+    list << "id #{m['id'].inspect} doesn't match the file name" unless File.basename(item.path, ".md") == m["id"]
+    list << "unknown state #{m['state'].inspect}" unless STATES.include?(m["state"])
+    list << "unknown kind #{m['kind'].inspect}" unless KINDS.include?(m["kind"])
+    list << "head must be a quoted SHA" unless m["head"].nil? || sha?(m["head"])
+    list << "pr must be a number" unless m["pr"].nil? || m["pr"].is_a?(Integer)
+    list << "#{m['state']} needs pr" if %w[draft ready merged].include?(m["state"]) && !m["pr"]
+    list << "no title" if item.title.empty?
+    Array(m["passes"]).each do |pass|
+      list << "pass reviewer #{pass['reviewer'].inspect}" unless REVIEWERS.include?(pass["reviewer"])
+      list << "pass verdict #{pass['verdict'].inspect}" unless VERDICTS.include?(pass["verdict"])
+      list << "pass head must be a quoted SHA" unless sha?(pass["head"])
+    end
+    list
+  end
+
+  # Unknown diff size (nil) requires thermos, so an unchecked item never looks reviewed.
+  def required(meta, lines)
+    list = %w[skeptic sol]
+    list << "astra" if meta["risky"]
+    list << "thermos" if lines.nil? || lines > THERMOS_LINES
+    list
+  end
+
+  # Reviewers whose latest pass on the current head is missing or doesn't approve. Passes are listed oldest first.
+  def missing(meta, lines)
+    passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }
+    required(meta, lines).reject do |who|
+      VERDICTS.first(2).include?(passes.reverse.find { _1["reviewer"] == who }&.fetch("verdict", nil))
+    end
+  end
+
+  def set(item, key, value)
+    text = File.read(item.path)
+    raise "#{item.id}: no #{key}: line" unless text.match?(/^#{key}:/)
+    File.write(item.path, text.sub(/^#{key}:.*$/, "#{key}: #{value}"))
+    item.meta[key] = value
+  end
+
+  def run(*cmd)
+    out, err, status = Open3.capture3(*cmd)
+    [out, status.success? ? nil : err.strip]
+  end
+
+  def gh(*args)
+    out, err = run("gh", "api", *args)
+    raise "gh api #{args.first}: #{err}" if err
+    JSON.parse(out)
+  end
+
+  def our_open_prs(repo)
+    query = <<~GRAPHQL
+      query($q: String!) { search(query: $q, type: ISSUE, first: 100) { nodes { ... on PullRequest {
+        number isDraft
+        comments(first: 50) { nodes { author { login } } }
+        reviews(first: 50) { nodes { author { login } } } } } } }
+    GRAPHQL
+    nodes = gh("graphql", "-f", "query=#{query}", "-f", "q=repo:#{repo} author:#{AUTHOR} is:pr is:open")
+            .dig("data", "search", "nodes")
+    nodes.map do |pr|
+      others = (pr["comments"]["nodes"] + pr["reviews"]["nodes"]).map { _1.dig("author", "login") }
+      { number: pr["number"], draft: pr["isDraft"],
+        answered: others.any? { _1 && _1 != AUTHOR && !_1.end_with?("[bot]") } }
+    end
+  end
+
+  # Nil when the repo has room for another PR (ready: for marking one more draft ready), else the reason.
+  # Drafts count toward the open cap.
+  def room(repo, prs, ready: false)
+    cap = CAPS.fetch(repo, { unanswered: GEM_CAP })
+    if ready
+      n = prs.count { !_1[:draft] }
+      "#{n}/#{cap[:ready]} non-draft" if cap[:ready] && n >= cap[:ready]
+    elsif cap[:open] && prs.size >= cap[:open] then "#{prs.size}/#{cap[:open]} open"
+    elsif cap[:unanswered] && (n = prs.count { !_1[:answered] }) >= cap[:unanswered]
+      "#{n}/#{cap[:unanswered]} without a maintainer response"
+    end
+  end
+
+  # Live facts per item from a blobless bare clone of the upstream repo under .lowrail/pr-queue:
+  # fork head, diff size against the base, and whether it merges cleanly into the current base.
+  def facts(list)
+    list.select { _1["branch"] }.group_by { _1["repo"] }.flat_map do |repo, group|
+      dir = File.join(CACHE, "#{repo.tr('/', '-')}.git")
+      unless Dir.exist?(dir)
+        _, err = run("git", "clone", "--quiet", "--bare", "--filter=blob:none", "https://github.com/#{repo}", dir)
+        next group.map { [_1.id, { error: "clone: #{err}" }] } if err
+      end
+      git = ->(*args) { run("git", "-C", dir, *args) }
+      bases = group.map { _1["base"] || "main" }.uniq
+      _, err = git.(*%w[fetch --quiet origin], *bases.map { "+refs/heads/#{_1}:refs/heads/#{_1}" })
+      next group.map { [_1.id, { error: "fetch: #{err}" }] } if err
+      group.group_by(&:fork).flat_map do |fork, items|
+        heads = git.("ls-remote", "--heads", "https://github.com/#{fork}").first.lines.to_h { _1.split.reverse }
+        present = items.select { heads["refs/heads/#{_1['branch']}"] }
+        unless present.empty?
+          git.("fetch", "--quiet", "https://github.com/#{fork}",
+               *present.map { "+refs/heads/#{_1['branch']}:refs/queue/#{_1.id}" })
+        end
+        items.map do |item|
+          fork_head = heads["refs/heads/#{item['branch']}"]
+          next [item.id, { fork_head: nil }] unless fork_head
+          base = "refs/heads/#{item['base'] || 'main'}"
+          stat, = git.("diff", "--shortstat", "#{base}...#{fork_head}")
+          lines = stat.scan(/(\d+) (?:insertion|deletion)/).flatten.sum(&:to_i)
+          _, conflict = git.("merge-tree", "--write-tree", "--quiet", base, fork_head)
+          [item.id, { fork_head:, lines:, clean: conflict.nil? }]
+        end
+      end
+    end.to_h
+  end
+
+  def deps_problem(item, by_id)
+    Array(item["depends_on"]).each do |dep|
+      return "depends on #{dep}, not merged" unless by_id[dep]&.[]("state") == "merged"
+    end
+    if (parent = item["stacked_on"]) && !by_id[parent]&.[]("pr")
+      return "stacked on #{parent}, not opened"
+    end
+    nil
+  end
+
+  # Why this item can't open now, or nil.
+  def open_blocker(item, fact, by_id)
+    return "state is #{item['state']}, not reviewed" unless item["state"] == "reviewed"
+    return "no fork branch #{item.fork}:#{item['branch']}" unless fact&.[](:fork_head)
+    return "fork head #{fact[:fork_head][0, 10]} isn't head #{item['head']}" unless same_sha?(fact[:fork_head], item["head"])
+    gaps = missing(item.meta, fact[:lines])
+    return "no approving pass on this head from #{gaps.join(', ')}" unless gaps.empty?
+    return "conflicts with #{item['base'] || 'main'}" unless fact[:clean]
+    return "no body" if item.body.empty?
+    deps_problem(item, by_id)
+  end
+
+  def next_step(item, fact, by_id)
+    lines = fact&.[](:lines)
+    gaps = item["head"] ? missing(item.meta, lines) : []
+    moved = fact&.[](:fork_head) && item["head"] && !same_sha?(fact[:fork_head], item["head"])
+    case item["state"]
+    when "merged", "closed", "superseded" then "-"
+    when "held" then "held: #{item['note']}"
+    when "ready" then "awaiting maintainers"
+    else
+      return "fork moved to #{fact[:fork_head][0, 10]}: update head, review again" if moved
+      return "rebase: conflicts with #{item['base'] || 'main'}" if fact && fact[:clean] == false
+      return "review: #{gaps.join(', ')} on this head" unless gaps.empty?
+      return "push the branch to #{item.fork}" if fact && !fact[:fork_head]
+      { "built" => "review", "in-review" => "set state: reviewed", "reviewed" => deps_problem(item, by_id) || "open",
+        "draft" => "ready when a slot frees" }.fetch(item["state"])
+    end
+  end
+
+  def status
+    list = items
+    list.each { |item| (p = problems(item)).empty? || warn("#{item.id}: #{p.join('; ')}") }
+    by_id = list.to_h { [_1.id, _1] }
+    live = facts(list.reject { %w[merged closed superseded].include?(_1["state"]) })
+    list.map { _1["repo"] }.uniq.sort.each do |repo|
+      prs = our_open_prs(repo)
+      puts "#{repo}: #{prs.size} open, #{prs.count { !_1[:draft] }} non-draft; " \
+           "room: #{room(repo, prs) || 'yes'}#{", ready: #{room(repo, prs, ready: true) || 'yes'}" if repo == 'rails/rails'}"
+    end
+    puts
+    rows = list.sort_by { [STATES.index(_1["state"]) || 99, _1["rank"] || 999, _1.id] }.map do |item|
+      fact = live[item.id]
+      head = item["head"].to_s[0, 10]
+      fork = if !fact || !item["branch"] then "" elsif fact[:error] then "?" elsif !fact[:fork_head] then "missing"
+             elsif same_sha?(fact[:fork_head], item["head"]) then "=" else fact[:fork_head][0, 10] end
+      on_head = Array(item["passes"]).select { same_sha?(_1["head"], item["head"]) }
+      passes = on_head.map { "#{_1['reviewer']}:#{_1['verdict']}" }.uniq.join(" ")
+      merge = fact&.key?(:clean) ? (fact[:clean] ? "clean" : "CONFLICT") : ""
+      [item["state"], item["rank"].to_s, item.id, item["repo"], item["pr"].to_s, head, fork,
+       fact&.[](:lines).to_s, merge, passes, next_step(item, fact, by_id)]
+    end
+    header = %w[STATE RANK ID REPO PR HEAD FORK LINES MERGE PASSES-ON-HEAD NEXT]
+    widths = header.each_index.map { |i| ([header] + rows).map { _1[i].size }.max }
+    ([header] + rows).each { |row| puts row.each_with_index.map { |cell, i| cell.ljust(widths[i]) }.join("  ").rstrip }
+  end
+
+  def candidates
+    list = items
+    by_id = list.to_h { [_1.id, _1] }
+    reviewed = list.select { _1["state"] == "reviewed" }
+    live = facts(reviewed)
+    [reviewed.sort_by { [_1["rank"] || 999, _1.id] }, live, by_id]
+  end
+
+  def next_item
+    list, live, by_id = candidates
+    rooms = Hash.new { |h, repo| h[repo] = room(repo, our_open_prs(repo)) }
+    list.each do |item|
+      blocker = open_blocker(item, live[item.id], by_id) || rooms[item["repo"]]
+      next puts("skip #{item.id}: #{blocker}") if blocker
+      draft = item["repo"] == "rails/rails" ? " --draft" : ""
+      return puts("#{item.id} (rank #{item['rank']}): #{item.title}\n  script/pr-queue open #{item.id}#{draft}")
+    end
+    puts "nothing to open"
+  end
+
+  def find(id) = items.find { _1.id == id } || abort("no item #{id}")
+
+  def open_pr(id, draft:)
+    _, live, by_id = candidates
+    item = find(id)
+    abort "#{id}: rails/rails opens as draft (DECISIONS); pass --draft" if item["repo"] == "rails/rails" && !draft
+    if (blocker = open_blocker(item, live[id], by_id) || room(item["repo"], our_open_prs(item["repo"])))
+      abort "#{id}: #{blocker}"
+    end
+    Tempfile.create("pr-body") do |f|
+      f.write(item.body)
+      f.close
+      pr = gh("repos/#{item['repo']}/pulls", "-f", "title=#{item.title}", "-f", "head=#{item.fork.split('/').first}:#{item['branch']}",
+              "-f", "base=#{item['base'] || 'main'}", "-F", "body=@#{f.path}", "-F", "draft=#{draft}")
+      set(item, "pr", pr["number"])
+      set(item, "state", pr["draft"] ? "draft" : "ready")
+      puts "opened #{item['repo']}##{pr['number']} at #{pr.dig('head', 'sha')[0, 10]} (#{item['state']}); commit #{item.path}"
+    end
+  end
+
+  def mark_ready(id)
+    item = find(id)
+    abort "#{id}: state is #{item['state']}, not draft" unless item["state"] == "draft"
+    pr = gh("repos/#{item['repo']}/pulls/#{item['pr']}")
+    abort "#{id}: ##{item['pr']} is not an open draft" unless pr["state"] == "open" && pr["draft"]
+    head = pr.dig("head", "sha")
+    abort "#{id}: PR head #{head[0, 10]} isn't head #{item['head']}" unless same_sha?(head, item["head"])
+    lines = pr["additions"] + pr["deletions"]
+    gaps = missing(item.meta, lines)
+    abort "#{id}: no approving pass on this head from #{gaps.join(', ')}" unless gaps.empty?
+    if (full = room(item["repo"], our_open_prs(item["repo"]), ready: true))
+      abort "#{id}: no room, #{full}"
+    end
+    mutation = "mutation($id: ID!) { markPullRequestReadyForReview(input: {pullRequestId: $id}) { pullRequest { isDraft } } }"
+    gh("graphql", "-f", "query=#{mutation}", "-f", "id=#{pr['node_id']}")
+    set(item, "state", "ready")
+    puts "#{item['repo']}##{item['pr']} is ready for review; commit #{item.path}"
+  end
+
+  def sync
+    items.select { _1["pr"] && !%w[merged closed superseded].include?(_1["state"]) }.each do |item|
+      pr = gh("repos/#{item['repo']}/pulls/#{item['pr']}")
+      state = if pr["merged"] then "merged" elsif pr["state"] == "closed" then "closed" elsif pr["draft"] then "draft"
+              else "ready" end
+      moved = same_sha?(pr.dig("head", "sha"), item["head"]) ? "" : " (PR head #{pr.dig('head', 'sha')[0, 10]} isn't head)"
+      next puts("#{item.id} ##{item['pr']}: #{state}#{moved}") if state == item["state"]
+      puts "#{item.id} ##{item['pr']}: #{item['state']} -> #{state}#{moved}"
+      set(item, "state", state)
+    end
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  command, id, *rest = ARGV
+  case command
+  when "status" then PrQueue.status
+  when "next" then PrQueue.next_item
+  when "open" then PrQueue.open_pr(id || abort("open ID [--draft]"), draft: rest == ["--draft"])
+  when "ready" then PrQueue.mark_ready(id || abort("ready ID"))
+  when "sync" then PrQueue.sync
+  else abort File.read(__FILE__)[/^#   script.*?(?=\n\n)/m].gsub(/^# ?/, "")
+  end
+end
