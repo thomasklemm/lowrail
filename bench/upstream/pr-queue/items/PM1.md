@@ -14,8 +14,8 @@ alternative_of:
 impact: on Ruby master an intent in the measured query shapes fits a 256-byte slot instead of 512, 256 B less per query; on Ruby 4.0 the same shapes stay at 320 B
 rank: 11
 risky: true
-state: reviewed
-pr:
+state: draft
+pr: 59673
 note: "reviewed: skeptic, Sol and Astra approve on 68c907bbeb under the contract (public API and Rails' callers identical, claims scoped)"
 passes:
   - {reviewer: skeptic, head: "9fabafcf8b", date: 2026-11-05, verdict: approve, open: ""}

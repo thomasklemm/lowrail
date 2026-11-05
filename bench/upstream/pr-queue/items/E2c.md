@@ -14,9 +14,9 @@ alternative_of:
 impact: "a permanent SQLite index whose name a temporary index shares reads its own columns and statement again, not the temporary index's columns twice"
 rank: 9
 risky: true
-state: reviewed
-pr:
-note: "reviewed on 6c80a5583b; stacked on E2 (body says #E2PR, replace with E2's PR number at open); opens as a draft only when Thomas asks"
+state: draft
+pr: 59672
+note: "reviewed on 6c80a5583b; stacked on E2; opened as draft #59672 (Thomas, 2026-11-05 night)"
 passes:
   - {reviewer: skeptic, head: "cd90c26ce8", date: 2026-11-05, verdict: nits, open: "commit message reworded in 6ffd1872fe (same tree); no test for the pragma_index_list schema argument, declined: redundant once E2 hides case-differing tables"}
   - {reviewer: skeptic, head: "6ffd1872fe", date: 2026-11-05, verdict: approve, open: "message-only amend of cd90c26ce8, identical tree"}
@@ -33,7 +33,7 @@ waived:
 
 # Read each SQLite index from its own schema in the schema readers
 
-Stacked on #E2PR, which should merge first; only the last commit (`6c80a5583b`) is new here.
+Stacked on #59671, which should merge first; only the last commit (`6c80a5583b`) is new here.
 
 A temporary index may have the name of a permanent one, since the two live in different schemas. The batched SQLite schema readers from 2cb3daba96 look up the columns of each index with an unqualified `pragma_index_info(name)`, which resolves the name to the temporary index, and match the CREATE INDEX statements by name alone, so both rows match. Both tables' indexes then read the temporary index's columns twice, and the temporary one takes the permanent one's CREATE INDEX statement:
 
@@ -44,7 +44,7 @@ A temporary index may have the name of a permanent one, since the two live in di
 | `indexes("temporary_items")` columns | label | label, label | label |
 | `indexes("temporary_items")` `where` | number > 0 | number > 0 | nil |
 
-8-1-stable was wrong too, one index at a time: it read the columns from the temporary index and the statement from the permanent one. The rows of `MASTER_CTE` now carry their schema, `'main'` or `'temp'`, which goes to `pragma_index_list` and `pragma_index_info`, and the index statements are keyed by schema and name, so they no longer depend on which row the sort returns first for a shared name. This builds on #E2PR, whose case-insensitive hiding leaves one row per table: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well as the temporary one's, where SQLite and main read only the temporary one's.
+8-1-stable was wrong too, one index at a time: it read the columns from the temporary index and the statement from the permanent one. The rows of `MASTER_CTE` now carry their schema, `'main'` or `'temp'`, which goes to `pragma_index_list` and `pragma_index_info`, and the index statements are keyed by schema and name, so they no longer depend on which row the sort returns first for a shared name. This builds on #59671, whose case-insensitive hiding leaves one row per table: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well as the temporary one's, where SQLite and main read only the temporary one's.
 
 ---
 

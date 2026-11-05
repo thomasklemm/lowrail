@@ -43,6 +43,8 @@ The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of 
 
 The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Temporary indexes and triggers don't take part, so they hide no table or view. A temporary index that shares a permanent index's name still gives its columns, twice, to the permanent one, as on main; that is a separate fix. The collation row goes beyond 8-1-stable, which read the columns from the temporary table but the CREATE statement of the permanent one. Check constraints are read from that statement too, so they now come from the temporary table as well.
 
+#59671 (table names in any ASCII case) and #59672 (each index from its own schema) are stacked on this one.
+
 ---
 
 <sub>Found while fixing the table-name case lookup in the same readers, which [ransack's suite](https://github.com/activerecord-hackery/ransack/blob/fbc3baf164da2a80435d5678a77924c66472f694/spec/ransack/active_record/context_spec.rb#L73-L81) hit on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md), part of my research project Lowrail).</sub>

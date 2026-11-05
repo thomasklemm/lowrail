@@ -183,7 +183,8 @@ body exactly as posted, impact, rank by effect and breadth, and every review pas
 only when its repo has room, strongest first, through `script/pr-queue open`, which refuses unless the gates below
 pass on the current head. A candidate made moot upstream moves to `superseded` or `closed` with a note.
 
-* **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
+* **rails/rails:** at most 25 of our PRs open, drafts included (Thomas; 20 before, raised 2026-11-05 night when he asked
+  to open the reviewed E2, E2c, PM1, PM3 and the DST fix as drafts). Keep each PR small.
 * **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
   preferably grouped by theme and likely reviewer. The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
 * **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
