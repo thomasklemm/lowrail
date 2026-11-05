@@ -3,7 +3,8 @@
 Three small **correctness** fixes are prepared on Thomas's forks, not submitted upstream. They repair observed
 Rails-main failures rather than claiming speedups. Queue items: [BI1](../../bench/upstream/pr-queue/items/BI1.md),
 [SC1](../../bench/upstream/pr-queue/items/SC1.md), [RA1](../../bench/upstream/pr-queue/items/RA1.md). Sol and Astra
-belong to the coordinator; these items remain `in-review` until those exact-head passes exist.
+belong to the coordinator; these items remain `in-review` until those exact-head passes exist. The Rails freezes behind
+BI1 and SC1, their other callers and the source fixes are inventoried in [ractor-freezes](ractor-freezes.md).
 
 ## Selection and current capacity
 

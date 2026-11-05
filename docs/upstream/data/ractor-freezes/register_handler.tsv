@@ -1,0 +1,4 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/cata-m/pg_tags_on/blob/72f6c291a46f8aa38c28a963a3bf90848b3aaf77/lib/pg_tags_on/active_record/base.rb	predicate_builder.register_handler(PgTagsOn.query_class, PgTagsOn::PredicateHandler.new(predicate_builder))
+https://github.com/katalyst/tables/blob/dd4c6f6b1779cd0b2fdedbd1e1d9d17d4c922ac4/lib/katalyst/tables/collection/type/string.rb	model.predicate_builder.register_handler(Match, MatchHandler.new)
+https://github.com/kbrock/activerecord-hash_options/blob/194dab605e00647ce65c0a36bee254ec842039a7/lib/active_record/hash_options.rb	mod.predicate_builder.register_handler(GT, GT.arel_proc)

@@ -1,0 +1,6 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/googleapis/ruby-spanner-activerecord/blob/b4a63df03e1090baacd75f3eccde986897e97a72/examples/snippets/query-logs/application.rb	ActiveRecord.query_transformers << ActiveRecord::QueryLogs
+https://github.com/pgstack-io/bemi-rails/blob/7c116bc71e39ee2ebf47d30ac9dc6cdf44c67f83/lib/bemi/context.rb	ActiveRecord.query_transformers << Bemi.append_context
+https://github.com/rmosolgo/graphql-ruby/blob/2e8473ea7d0d348d2afa866c511e4d1a67a84b66/spec/integration/rails/query_logs_spec.rb	ActiveRecord.query_transformers << ActiveRecord::QueryLogs
+https://github.com/rubylab-app/iron_admin/blob/0c52c3681e0be88d955c968a8d9f62fe7bc9dd28/script/host_app_gate/checks.rb	ActiveRecord.query_transformers.delete(ActiveRecord::QueryLogs)
+https://github.com/trusted/iron_trail/blob/cfbb85d86db4815eb32d55c3b0b244b892229dae/lib/iron_trail/query_transformer.rb	ActiveRecord.query_transformers << @transformer_proc

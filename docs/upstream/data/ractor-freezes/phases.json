@@ -1,0 +1,166 @@
+{
+ "main": {
+  "rails": "8.2.0.alpha",
+  "results": {
+   "ExceptionWrapper.rescue_responses[]=": {
+    "1 require time": "FrozenError",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "ExceptionWrapper.rescue_responses.merge!": {
+    "1 require time": "FrozenError",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "Response.default_headers[]=": {
+    "1 require time": "NoMethodError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "Request.parameter_parsers[]=": {
+    "1 require time": "FrozenError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "ActiveRecord.query_transformers << (shareable lambda)": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "AR::Base.time_zone_aware_types <<": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "ERB.escape_ignore_list <<": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "model.predicate_builder.register_handler": {
+    "1 require time": "FrozenError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "TableMetadata ivar memo": {
+    "1 require time": "FrozenError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "model_name.instance_variable_set(:@route_key)": {
+    "1 require time": "FrozenError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   },
+   "Time.zone singleton stub": {
+    "1 require time": "FrozenError",
+    "2 initializer": "FrozenError",
+    "3a after_initialize, registered at require": "FrozenError",
+    "3b after_initialize, registered in initializer": "FrozenError",
+    "4 after boot": "FrozenError"
+   }
+  }
+ },
+ "8-1-stable": {
+  "rails": "8.1.4.1",
+  "results": {
+   "ExceptionWrapper.rescue_responses[]=": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "ExceptionWrapper.rescue_responses.merge!": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "Response.default_headers[]=": {
+    "1 require time": "NoMethodError",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "Request.parameter_parsers[]=": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "ActiveRecord.query_transformers << (shareable lambda)": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "AR::Base.time_zone_aware_types <<": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "ERB.escape_ignore_list <<": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "model.predicate_builder.register_handler": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "TableMetadata ivar memo": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "model_name.instance_variable_set(:@route_key)": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   },
+   "Time.zone singleton stub": {
+    "1 require time": "ok",
+    "2 initializer": "ok",
+    "3a after_initialize, registered at require": "ok",
+    "3b after_initialize, registered in initializer": "ok",
+    "4 after boot": "ok"
+   }
+  }
+ }
+}

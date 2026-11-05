@@ -1,0 +1,2 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/barrosblucas/chatwootnext/blob/c058826eb20b85501fa0d52a16b8fa43e008ecdc/config/initializers/csv_erb_escaping.rb	ignore_list << csv_type unless ignore_list.include?(csv_type)

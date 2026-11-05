@@ -1,0 +1,6 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/Lu1sDV/skillsmd/blob/f1b2a61f439767406933b80cf6e30fd75ce3ecae/vuln-research/rules/ruby/semgrep/secure-config/ruby-secure-config-x-frame-options-allowall.rb	response.default_headers["X-Frame-Options"] = "ALLOWALL"
+https://github.com/Paarroo/Final_Project_THP_Fullstack_Ruby0nRails_CineRoom/blob/1aaa1b430995addfc9a9d70f2ea6467be2a8ca2d/config/initializers/security_headers.rb	ActionDispatch::Response.default_headers['X-Frame-Options'] = 'DENY'
+https://github.com/chrismgala/reserve_in-store/blob/4228baf77f2c9f49dd2e8b876a9750bc0dcc8538/app/controllers/concerns/bananastand/allows_embedding.rb	response.default_headers.delete('X-Frame-Options')
+https://github.com/coolJenny/shopifyapps/blob/f31848a75847fbd5f4ad146940a2aaa831e35201/lib/shopify_app/controller_concerns/embedded_app.rb	response.default_headers.delete('X-Frame-Options')
+https://github.com/tavimxlseven/NimbusLauncher/blob/40f1912c51c7e411ec03fa7f6f7ac820791839ca/config/initializers/security_headers.rb	ActionDispatch::Response.default_headers.merge!(

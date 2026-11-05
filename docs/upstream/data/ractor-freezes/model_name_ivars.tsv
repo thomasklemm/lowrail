@@ -1,0 +1,29 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/KaykeS8/instaDIn/blob/66482399ff69541048fe2cbeb885794448e161ce/app/models/profile.rb	model_name.instance_variable_set(:@route_key, 'profile')
+https://github.com/LoganDSPrice/nba-over-under/blob/a0dc5bc01104d666d76aaeeb7ba129a64477483b/app/models/lock.rb	model_name.instance_variable_set(:@route_key, 'lock')
+https://github.com/PEM-Humboldt/biomodelos-website/blob/c8b7fa01b8f7c2720ab7c6ad91142858791da62a/app/models/groups_species.rb	model_name.instance_variable_set(:@route_key, 'groups_species')
+https://github.com/StartupInstituteBerlin/Fall2014AlanVenegas/blob/cc833db5a058b2e73996607f7946f64ae1a65c16/app/models/star.rb	model_name.instance_variable_set(:@route_key, 'star')
+https://github.com/binitkumar/e9_base_pub/blob/cab1262933ffd3474684cafc94bd3b42694fb316/engines/e9_polls/lib/e9_polls/model.rb	self.model_name.instance_variable_set('@partial_path', File.join('e9_polls', self.model_name.partial_path).freeze)
+https://github.com/e9digital/e9_polls/blob/177177e0d696ee8d1771de3d5ca85bca7711127f/lib/e9_polls/model.rb	self.model_name.instance_variable_set('@partial_path', File.join('e9_polls', self.model_name.partial_path).freeze)
+https://github.com/enroute-mobi/chouette-core/blob/047322202a53420679b8b91a0742dc9c2da13663/app/models/export/base.rb	model_name.instance_variable_set(:@i18n_key, name.underscore) unless self == ::Export::Base
+https://github.com/enroute-mobi/chouette-core/blob/047322202a53420679b8b91a0742dc9c2da13663/app/models/import/base.rb	model_name.instance_variable_set(:@i18n_key, name.underscore) unless self == ::Import::Base
+https://github.com/enroute-mobi/chouette-core/blob/047322202a53420679b8b91a0742dc9c2da13663/app/models/referential_code.rb	model_name.instance_variable_set(:@i18n_key, 'code')
+https://github.com/fizz/junket/blob/d0fa17efa1c6aa22f7e2292afadab37b4d9877cc/app/models/profile.rb	model_name.instance_variable_set(:@route_key, 'profile')
+https://github.com/foneandrew/nonogram-rails/blob/6fcbe81ad14a57fe3af57933544ac87e61363e4d/app/models/nonogram.rb	model_name.instance_variable_set :@route_key, 'nonogram'
+https://github.com/greenriver/boston-cas/blob/b9e36947740bab905e1814aa6e4f9a6d61117942/app/models/concerns/contact_join_model.rb	model_name.instance_variable_set(:@route_key, 'contacts')
+https://github.com/ilpoldo/user_plane/blob/a7cb5b6cc81bf2e346ced1ea825782bb99c5922b/app/models/user/sign_in.rb	model_name.instance_variable_set(:@route_key, 'user_sign_in')
+https://github.com/ilpoldo/user_plane/blob/a7cb5b6cc81bf2e346ced1ea825782bb99c5922b/app/models/user/update_details.rb	# model_name.instance_variable_set(:@singular_route_key, 'update_details')
+https://github.com/makandra/active_type/blob/55eaa1dc9ba9647d9d7933f28caa77a57a114bf0/lib/active_type/record_extension/inheritance.rb	dup_model_name.instance_variable_set(:@i18n_key, key)
+https://github.com/prototypefund/crabgrass/blob/093d3f2ad116b1f34cbe0db5fb20068925b712ac/app/models/avatar.rb	model_name.instance_variable_set(:@route_key, 'avatar')
+https://github.com/prototypefund/crabgrass/blob/093d3f2ad116b1f34cbe0db5fb20068925b712ac/app/models/poll/possible.rb	model_name.instance_variable_set(:@i18n_key, 'possible')
+https://github.com/retsef/solidus_adminland/blob/1656be3329abf32cca521b9fd696f9d9803ee77b/app/overrides/spree/payment_method_override.rb	model_name.instance_variable_set(:@route_key, parent_model_name.route_key)
+https://github.com/retsef/solidus_adminland/blob/1656be3329abf32cca521b9fd696f9d9803ee77b/app/overrides/spree/promotion_action_override.rb	model_name.instance_variable_set(:@route_key, 'actions')
+https://github.com/retsef/solidus_adminland/blob/1656be3329abf32cca521b9fd696f9d9803ee77b/app/overrides/spree/promotion_rule_override.rb	model_name.instance_variable_set(:@route_key, 'rules')
+https://github.com/retsef/solidus_adminland/blob/1656be3329abf32cca521b9fd696f9d9803ee77b/app/overrides/spree/reimbursement_type_override.rb	model_name.instance_variable_set(:@route_key, parent_model_name.route_key)
+https://github.com/riseuplabs/crabgrass-core/blob/6113d789af049464ab0b33f763cb4ec03915ca4c/app/models/avatar.rb	model_name.instance_variable_set(:@route_key, 'avatar')
+https://github.com/riseuplabs/crabgrass-core/blob/6113d789af049464ab0b33f763cb4ec03915ca4c/app/models/poll/possible.rb	model_name.instance_variable_set(:@i18n_key, 'possible')
+https://github.com/rodrigovcortezi/plataforma/blob/334ab8801ba424b889439fc23da2413b2d3e170b/app/models/finance.rb	model_name.instance_variable_set :@route_key, 'finance'
+https://github.com/vitrcosta/intra_v7_update/blob/736aaae565054bee452630bbfdabdbf5a3034944/app/models/interesse.rb	model_name.instance_variable_set(:@route_key, 'interesse')
+https://github.com/xanderflood/lotto-ticket/blob/6b4c750e78c7220be1d4a8058bee5bd62d265884/app/models/ballot.rb	model_name.instance_variable_set(:@route_key, 'ballot')
+https://github.com/xanderflood/lotto-ticket/blob/6b4c750e78c7220be1d4a8058bee5bd62d265884/app/models/registree.rb	model_name.instance_variable_set(:@route_key, 'registree')
+https://github.com/xanderflood/lotto-ticket/blob/6b4c750e78c7220be1d4a8058bee5bd62d265884/app/models/special_registree.rb	model_name.instance_variable_set(:@route_key, 'special_registree')

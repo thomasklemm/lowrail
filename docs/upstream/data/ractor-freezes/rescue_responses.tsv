@@ -1,0 +1,30 @@
+# Search hits from `gh search code` (legacy API, default branches, at most 100 results per query), 2026-11-05. Columns: permalink, matched line.
+https://github.com/DFE-Digital/npq-registration/blob/100df2af48b30a7fc9a4b3879c9ee31dbe0db33c/config/initializers/exceptions.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/Data-Science-Center-UI/fundus-frontend/blob/cf0e4a85c36254173c951c31f314fd3fbc872451/lib/error.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/JunichiIto/act_as_fire_record_beta/blob/21d002aed879649b1f56ce06cae91030a4ae8f39/lib/act_as_fire_record_beta/railtie.rb	ActionDispatch::ExceptionWrapper.rescue_responses["ActAsFireRecordBeta::RecordNotFound"] = :not_found
+https://github.com/Meso-Health/meso-backend/blob/d53f008a1fd5e89b1ed0dd91368df48a11e9f433/config/application.rb	ExceptionsApp.rescue_responses.reverse_merge!(config.action_dispatch.rescue_responses)
+https://github.com/NEU-Libraries/cerberus/blob/a85a4faf71f33fec5145a16003735b503ad707fa/config/initializers/outages.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/Shopify/shipit-engine/blob/2f629b62e8bd2d86006f45865f1c6bccaf67176a/lib/shipit/engine.rb	ActionDispatch::ExceptionWrapper.rescue_responses[Shipit::TaskDefinition::NotFound.name] = :not_found
+https://github.com/anyone-oslo/pages/blob/090a866c61cb88131fedb158122b0a98106f7667/lib/pages_core/engine.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/apaleslimghost/almanac/blob/ce5187520625571053adf2cfc4fc7c8af5e7667a/app/errors/http_exception.rb	ActionDispatch::ExceptionWrapper.rescue_responses[klass.name] = name
+https://github.com/bhserna/md_record/blob/4954f0d668bbc09e4046dbe5510d1329609959ae/lib/md_record/railtie.rb	ActionDispatch::ExceptionWrapper.rescue_responses["MdRecord::RecordNotFound"] = :not_found
+https://github.com/bmorrall/halitosis/blob/1687a7bbdd45438a8023755e913d8ee6d3cb385a/lib/halitosis/railtie.rb	ActionDispatch::ExceptionWrapper.rescue_responses.reverse_merge!(
+https://github.com/elektronaut/dynamic_image/blob/df01885a44137b38f942c9fd3b93ce2ab6e61996/lib/dynamic_image/engine.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/fknflx/Shopify-repo-shipit-engine/blob/0b0cd8a317461c4d7dddcde7c6fb4a594b4b1458/lib/shipit/engine.rb	ActionDispatch::ExceptionWrapper.rescue_responses[Shipit::TaskDefinition::NotFound.name] = :not_found
+https://github.com/getsentry/sentry-ruby/blob/862a0ff6d27e043c2f8d54c9f69ba2c593beaae7/sentry-rails/spec/sentry/rails/tracing_spec.rb	ActionDispatch::ExceptionWrapper.rescue_responses['ActiveRecord::RecordNotFound'] = :not_found
+https://github.com/kuboon/restful_error/blob/ea630794e45efe5a98a702e8f1e3a5ee0205e472/lib/restful_error.rb	ActionDispatch::ExceptionWrapper.rescue_responses[klass.name] = status.code
+https://github.com/mirego/gaffe/blob/92336cb68bc2f0e57fcb4718cbb15e4781ba52ff/spec/gaffe/errors_spec.rb	before { ActionDispatch::ExceptionWrapper.rescue_responses.merge! exception_class.name => 'my_custom_error' }
+https://github.com/psu-libraries/scholarsphere/blob/7b2a702ab59ac3cc22022a7fc9d95181587c550e/app/controllers/application_controller.rb	ActionDispatch::ExceptionWrapper.rescue_responses['Pundit::NotAuthorizedError'] = :not_found
+https://github.com/roidrage/lograge/blob/106e8333d65d35d013f728af81e9a938cafd9f7b/spec/log_subscribers/action_cable_spec.rb	ActionDispatch::ExceptionWrapper.rescue_responses[exception] = :not_found
+https://github.com/roidrage/lograge/blob/106e8333d65d35d013f728af81e9a938cafd9f7b/spec/log_subscribers/action_controller_spec.rb	ActionDispatch::ExceptionWrapper.rescue_responses[exception] = :not_found
+https://github.com/tchak/grape-middleware-lograge/blob/3daaa11d71140a41f044d6a5cea58454239faded/lib/grape/middleware/lograge.rb	ActionDispatch::ExceptionWrapper.rescue_responses[class_name] = STATUS_CODE_TO_SYMBOL[status]
+https://github.com/to-omer/params_schema/blob/4ebd3ba410023342ddfc5f6813033a2c23b10c88/lib/params_schema.rb	ActionDispatch::ExceptionWrapper.rescue_responses["ParamsSchema::InvalidParameters"] = :bad_request
+https://github.com/trade-tariff/trade-tariff-admin/blob/16f6ae9b2f0311f5436f90cee509f754fa452735/config/initializers/exceptions.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/trade-tariff/trade-tariff-backend/blob/d13734249092548d85369e465728ddf9288c6b6d/config/initializers/exceptions.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/trade-tariff/trade-tariff-frontend/blob/6b6736e44032d9fb09b31a671778c0e29a77a95d/config/initializers/exceptions.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/unboxed/bops/blob/f1d6ccb60b33ede46ae96f9310513509900946b2/engines/bops_core/lib/bops_core/engine.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge! \
+https://github.com/vizvamitra/fintech_api_demo/blob/ba7b7e573a451e786fe0f69dfcded1a1c3ca6a5a/lib/http_errors.rb	ActionDispatch::ExceptionWrapper.rescue_responses[error_class.name] = error_class.error_type
+https://github.com/wandernb/steroids/blob/d05acba22d606ab17b842a23c28e65a84e82996f/spec/spec_helper.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+https://github.com/yshmarov/moneygun/blob/bbf01ba2debd0fc252576175c727d40149aa35d5/config/initializers/active_storage.rb	ActionDispatch::ExceptionWrapper.rescue_responses["ActiveStorage::FileNotFoundError"] = :not_found
+https://github.com/yuki24/rambulance/blob/0124f814acefdf57e2a9e0ff3d1ef1731a57a931/lib/rambulance.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(rescue_responses)
+https://github.com/zenizh/rexception/blob/ee7a791de7770ccc50c42342c0b11c9562bd26e6/lib/rexception.rb	ActionDispatch::ExceptionWrapper.rescue_responses.merge!(rescue_responses)
