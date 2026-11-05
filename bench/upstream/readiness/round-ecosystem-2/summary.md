@@ -1,6 +1,6 @@
 # Rails readiness: 7a78da5a5576d7ab7549b10fb13156788478ba35 against 6e09124217
 
-Base `6e09124217` (8.1.4.1), candidate `7a78da5a55` (8.2.0.alpha), ruby 4.0.9, seeds 4242 and 1717 (run 1 and run 2 on both trees). Generated 2026-11-05T00:00:41Z.
+Base `6e09124217` (8.1.4.1), candidate `7a78da5a55` (8.2.0.alpha), ruby 4.0.9, seeds 4242 and 1717 (run 1 and run 2 on both trees). Generated 2026-11-05T00:10:50Z.
 
 | Suite | Ref | Base runs | Candidate runs | Flags | Lock difference besides Rails |
 | --- | --- | --- | --- | --- | --- |
@@ -56,15 +56,11 @@ Base `6e09124217` (8.1.4.1), candidate `7a78da5a55` (8.2.0.alpha), ruby 4.0.9, s
 
 Runs read as tests / failed tests. Classes: `confirmed` fails 2/2 on the candidate and passes 2/2 on base; `flaky-candidate` and `order-dependent` fail under one seed only (then run alone 5 times per tree); `base-failing` fails on base too; `signature-changed` fails on both with different errors. Flags are matched against the known findings in `bench/upstream/readiness/known.yml`.
 
-## New (2)
+## New (0)
 
-### flaky-candidate (2)
+None: every candidate flag matches a known finding.
 
-| Signature | Count | Suites | Example |
-| --- | --- | --- | --- |
-| `RSpec::Expectations::ExpectationNotMetError: expected 2 queries, got 4` | 2 | will_paginate-mysql, will_paginate-postgres | ./spec/finders/active_record_spec.rb[1:11:1]; failed under seed 1717 only; alone: cand 5/5 failed, base 0/5 failed |
-
-## Known (170)
+## Known (172)
 
 | Finding | Status | Classes | Count | Suites | Record |
 | --- | --- | --- | --- | --- | --- |
@@ -84,6 +80,7 @@ Runs read as tests / failed tests. Classes: `confirmed` fails 2/2 on the candida
 | R2-6 | gem-side | 1 suite-did-not-load | 1 | paranoia | [ecosystem-round-2.md](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-round-2.md) |
 | R2-9 | record-only | 1 suite-did-not-load | 1 | store_model | [ecosystem-round-2.md](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-round-2.md) |
 | R2-4 | record-only | 2 signature-changed | 2 | lograge | [ecosystem-round-2.md](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-round-2.md) |
+| R2-18 | gem-side | 2 flaky-candidate | 2 | will_paginate-mysql, will_paginate-postgres | [ecosystem-round-2.md](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-round-2.md) |
 
 ## Fails on base too (49)
 

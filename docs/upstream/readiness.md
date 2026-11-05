@@ -183,11 +183,14 @@ every candidate `suite-did-not-load` is a recorded finding.
 | Round | Candidate flags | Matched | New |
 | --- | --- | --- | --- |
 | 1 | 58: 53 `confirmed`, 2 `signature-changed`, 2 `suite-did-not-load` (AMS E4, administrate L1), 1 `test-count-mismatch` (draper) | E2, E4, I1, L1 and the unnamed eco1 entries (draper, dynamic `:controller` routes, ransack select manager, view_component) | 0 |
-| 2 | 172: 162 `confirmed`, 4 `order-dependent` (strong_migrations, R2-7), 2 `signature-changed` (lograge R2-4), 2 `suite-did-not-load` (paranoia R2-6, store_model R2-9), 2 `flaky-candidate` | R2-1 to R2-11, R2-13 to R2-17 | 2: will_paginate, below |
+| 2 | 172: 162 `confirmed`, 4 `order-dependent` (strong_migrations, R2-7), 2 `signature-changed` (lograge R2-4), 2 `suite-did-not-load` (paranoia R2-6, store_model R2-9), 2 `flaky-candidate` | R2-1 to R2-11, R2-13 to R2-18 | 2 at the run (will_paginate), since recorded as R2-18 |
 
-New: `will_paginate-mysql` and `will_paginate-postgres`, `./spec/finders/active_record_spec.rb[1:11:1]`,
-`expected 2 queries, got 4`, `flaky-candidate`: it fails under seed 1717 only, and alone 5/5 on the candidate and
-0/5 on base (sqlite3 passes). Not triaged.
+The run's only new flag: `will_paginate-mysql` and `will_paginate-postgres`, `./spec/finders/active_record_spec.rb[1:11:1]`,
+`expected 2 queries, got 4`, `flaky-candidate`. It failed under seed 1717 only, and alone 5/5 on the candidate and
+0/5 on base (sqlite3 passes). Triaged since as R2-18 in [ecosystem round 2](ecosystem-round-2.md): two schema
+queries the spec's SQL-text filter no longer recognizes, from two intended changes (23bb4cdd4b, ae739c3854), and
+an earlier example hides them under seed 4242. `flaky-candidate` was right about the runs and wrong about the
+cause: a test that fails 5/5 alone and passes in one full-suite order is order-hidden, not flaky.
 
 Not produced by this run, so still unchecked: E1 (ransack `WeakSet`) and E3 (administrate `colorize_logging`;
 administrate's candidate stops at L1). R2-12 shares R2-11's signature. Base-only noise that the records don't
