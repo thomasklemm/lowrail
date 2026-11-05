@@ -28,7 +28,7 @@ module PrQueue
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
   # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt.
-  CAPS = { "rails/rails" => { open: 30, ready: 15 }, "ruby/ruby" => { open: 0 }, "ruby/ruby-bench" => {} }.freeze
+  CAPS = { "rails/rails" => { open: 22, ready: 15 }, "ruby/ruby" => { open: 0 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
 
   Item = Struct.new(:path, :meta, :title, :body) do
