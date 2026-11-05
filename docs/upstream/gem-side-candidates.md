@@ -33,7 +33,10 @@ specialist gems, but both failures are concrete and the patches are tiny.
 | pond/scimitar | `a7edc24d208ef4d2316c982c48bd2a5fe4fdcb5d`, main | Existing single-quoted engine style and lambda preserved. CI uses PostgreSQL and `bundle exec rspec`; last release March 6, external PRs 167/168 merged February 15. No CONTRIBUTING or PR template. |
 | activerecord-hackery/ransack | `9bbadf13fc165ee5f195cd5b210e61ca37ffceed`, main | CONTRIBUTING asks for idiomatic two-space Ruby and passing specs; default SQLite plus PostgreSQL/MySQL adapters. Sean Carroll merged our one-line require fix today; external feature 1789 merged October 25. CHANGELOG now explicitly directs new entries to release notes, so historical entries are not edited. |
 
-Re-fetched all three upstreams after tests; bases were unchanged. Before building, searched **all states**, not
+Re-fetched all three upstreams after the initial tests; bases were unchanged. During the review revision,
+Ransack advanced to `1a4ad324fd5f9484caadcd5628a998d9211b9fea` (LIKE-predicate PR 1794); its subquery patch
+is still built on the recorded base and checked for a clean merge. blind_index and Scimitar bases are unchanged.
+Before building, searched **all states**, not
 only open PRs, for `SelectManager`/`arel_table`, frozen metadata/Rails 8.2, and `parameter_parsers`/frozen. No
 existing fix found. Search used `gh api -X GET search/issues -f q='repo:OWNER/REPO TERM'` (includes issues and PRs).
 
@@ -66,25 +69,34 @@ RAILS=/absolute/path/to/rails-8.1.4 bundle exec rake spec
 
 ## BI1: blind_index frozen table metadata
 
-Head **`e296933106ce3619b26af46f936aea95b087c0ec`**, branch
+Head **`b7d3502ea98aee5b8f1d9153828df88728d5b6fe`**, branch
 [`thomasklemm/frozen-table-metadata`](https://github.com/thomasklemm/blind_index/tree/thomasklemm/frozen-table-metadata).
-One method simplified, +1/−5. Rails freezes the model predicate builder's `TableMetadata`; the first ordinary
-`User.find_by(id: 1)` and indexed lookup both try to memoize on it and raise `FrozenError`.
+Library +5/−5, two focused tests and their table fixture added. On Ruby 4.0.9 with the pinned Rails main,
+the model predicate builder's `TableMetadata` is frozen; the first ordinary `User.find_by(id: 1)` and indexed
+lookup both try to memoize on it and raise `FrozenError` on base.
 
-Read aloud: **Ask the model whether it supports blind indexes; do not write to its table metadata.** No new
-helper, cache, version branch or eager model load. Index derivation, normalization, predicate handling and
-uniqueness validation are unchanged. The helper is an extension on Rails' internal `TableMetadata`, not a
-documented blind_index API. Its capability check is now live rather than memoized: a stateful override of the
-model's `respond_to?`, or changing whether the class responds to `blind_indexes` between queries, can observe
-that difference. Do not describe arbitrary class monkey-patching as proven equivalent.
+Read aloud: **Keep an existing capability memo; only skip creating it on frozen metadata.** No new helper,
+cache, version branch or eager model load. Index derivation, normalization, predicate handling after the
+capability check and uniqueness validation are unchanged. Mutable metadata keeps cached false across a late
+`blind_index` declaration, including when a subclass is warmed before its parent declares. Freezing an already
+warmed object retains its memo too. The helper extends Rails' internal `TableMetadata`: private `klass` and
+model `respond_to?` overrides see more calls only when metadata is frozen without a cached value.
 
 | Stack | Base | Head |
 | --- | --- | --- |
-| Rails main, SQLite, entire gem suite | 50 runs, 46 assertions, **28 errors**, 1 skip | 50 runs, 89 assertions, **0F/0E**, 1 skip |
-| AR 8.1.4.1, SQLite, entire gem suite | 50 runs, 89 assertions, 0F/0E, 1 skip | same |
+| Rails main, SQLite, entire gem suite | original 50 runs, 46 assertions, **28 errors**, 1 skip | **52 runs, 92 assertions, 0F/0E, 2 skips** |
+| AR 8.1.4.1, SQLite, entire gem suite | original 50 runs, 89 assertions, 0F/0E, 1 skip | **52 runs, 98 assertions, 0F/0E, 1 skip** |
 
-The skip is the existing dynamic-finder test on AR ≥ 8.1. No new test framework or implementation-mocking
-tests: existing public query tests fail before the fix on main. The separate
+The existing dynamic-finder test skips on AR ≥ 8.1; the mutable-metadata-only regression additionally skips
+on main, where metadata starts frozen. The new query regression seeds plain-text row **7** and indexed row
+**19**: a warmed query must still return `[7]`, not `[19]`, after declaring the index and after freezing its
+metadata. Both direct-model and warmed-subclass/late-parent cases pass on base and the revised head; the
+original candidate fails with `[19]`. The initially frozen test seeds **31** with a blind index for `frozen`
+but different plaintext, and **47** with plaintext `frozen` but a different blind index. It raises `FrozenError`
+on base, passes on head, and rejects an in-memory mutant returning false on frozen metadata (`[47]` versus
+expected `[31]`). The final change from the preceding head only strengthens this test; library code and the
+cost-control workload are unchanged.
+Tests assert query results, not helper calls. The separate
 [`blind_index_probe.rb`](../../bench/upstream/gem_side/blind_index_probe.rb) uses record IDs **7, 19, 31** and
 distinct email values, matching/missing ordinary and indexed queries, a frozen hash with a frozen mixed
 matching/nonmatching array, negation, NULL and string keys. Expected IDs are literal, independently derived
@@ -100,17 +112,19 @@ For the base control, extract the exact base `lib/blind_index/extensions.rb` wit
 
 ### Cost control, not a speed claim
 
-Removing a memo is on the query path, so checked `GemSideUser.where(id: 7).to_sql` on **AR 8.1.4.1**, where both
+Changing the memo guard is on the query path, so checked `GemSideUser.where(id: 7).to_sql` on **AR 8.1.4.1**, where both
 base and head run. Ruby 4.0.9 interpreter, existing `gem_request_census/ir_region.sh`, 500 warm calls and 2,000
 measured calls; `(Ir(N) − Ir(0)) / N`, GC disabled after warmup, fixed heap floors **1,000,000 / 250,000 /
 100,000 / 20,000 / 10,000** for pools 0–4 in all processes. One base / A/A / head cohort:
 
 | Base Ir/call | A/A Ir/call | Head Ir/call | A/A | Head/base |
 | ---: | ---: | ---: | ---: | ---: |
-| 213,092 | 213,375 | 212,923 | +0.133% | −0.079% |
+| 212,807 | 212,870 | 212,734 | +0.030% | −0.034% |
 
-The head delta is smaller than A/A. **No speed claim**; this cohort would not pass a ±0.1% speed-claim A/A gate
-and was not rerun until green. No YJIT/ZJIT or application-level claim. Numbers stay out of the correctness PR.
+This is a cost control on the revised head, **not a speed claim**: a 0.034% delta on this micro is negligible.
+The original candidate's separate cohort was 213,092 / 213,375 / 212,923 Ir/call (+0.133% A/A, −0.079% head),
+rejected as speed evidence and not rerun until green. It does not price the revised code. No YJIT/ZJIT or
+application-level claim. Numbers stay out of the correctness PR.
 
 ```
 export RUBY_BIN="$HOME/.local/share/mise/installs/ruby/4.0.9/bin"
@@ -124,21 +138,25 @@ bash bench/upstream/gem_request_census/ir_region.sh "$PWD/bench/upstream/gem_sid
 
 ## SC1: Scimitar parser registration
 
-Head **`e81365a6e0f09c13d8c20996bf78f98c4bf5faa2`**, branch
+Head **`a302bc09b8555d6da525adb51f64df26eb9651da`**, branch
 [`thomasklemm/register-parser-with-writer`](https://github.com/thomasklemm/scimitar/tree/thomasklemm/register-parser-with-writer).
-Engine registration +5/−3. Rails main returns a frozen parameter-parser registry; Scimitar mutates it during
-require, so boot fails before a request. Read aloud: **Merge the SCIM parser with the current parsers, then give
-the replacement registry to Rails' writer.** This is Rails' documented registration pattern. Lambda input,
-`JSON.parse`, MIME lookup and registration order are unchanged. Retained references to the old registry no
-longer see a mutation; this is deliberate use of the supported replacement API, not a claim of Hash identity.
+Engine registration +4/−1, two subprocess request regressions added. The pinned Rails main returns a frozen
+parameter-parser registry; Scimitar mutates it during require, so boot fails before a request. Read aloud:
+**Keep in-place registration on mutable registries; copy and use Rails' writer only for frozen registries.**
+Lambda input, `JSON.parse`, MIME lookup and registration order are unchanged. On Rails 8.1.4.1 a registry
+reference retained before loading Scimitar still configures the active parser afterward, just as on base.
 
 | Stack, PostgreSQL, entire gem suite | Base | Head |
 | --- | --- | --- |
-| Rails main | require-time `FrozenError`, no examples load | **530 examples, 0 failures** |
-| Rails 8.1.4.1 | 530 examples, 0 failures | same |
+| Rails main | require-time `FrozenError`, no examples load | **532 examples, 0 failures, 1 pending** |
+| Rails 8.1.4.1 | original 530 examples, 0 failures | **532 examples, 0 failures** |
 
 The existing request specs decode plain/nested/case-insensitive SCIM JSON and fail to load without the fix on
-main. [`scimitar_probe.rb`](../../bench/upstream/gem_side/scimitar_probe.rb) additionally registers a custom
+main. The new mutable-registry example is pending only on main, where the public registry is already frozen.
+On released Rails, it returns `configured` on base and revised head, versus `original` on the first candidate.
+The new frozen-registry example fails on base even on released Rails and passes on revised head. Both use a
+fresh Ruby process and `ActionDispatch::Request#request_parameters`, without reloading an engine in place.
+[`scimitar_probe.rb`](../../bench/upstream/gem_side/scimitar_probe.rb) additionally registers a custom
 MIME parser **before** loading Scimitar, freezes the registry (also on released Rails), then sends requests
 through `ActionDispatch::Request#request_parameters`. Checks: existing parser Proc identities preserved,
 original registry not mutated, standard JSON still parses, custom MIME parser still runs, SCIM false/zero/
@@ -156,7 +174,8 @@ method. Read aloud: **Give the subquery manager the association model's Arel tab
 The existing `from(join_root.left)` still controls aliases and FROM. No query results are changed intentionally;
 normal `Search#result` already uses a connection supplied through `subquery_sql` and was not generally broken.
 An override of the internal join association's `base_klass` returning something other than a model now also
-needs `arel_table`. No direct argument conversions or collection operations are changed.
+needs `arel_table`; model overrides of that undocumented hook affect this path too. No direct argument
+conversions or collection operations are changed.
 
 | Stack | Base | Head |
 | --- | --- | --- |
@@ -165,36 +184,51 @@ needs `arel_table`. No direct argument conversions or collection operations are 
 | Rails 8.1.4, SQLite, whole suite | baseline covered by the ecosystem census | **1,145 examples, 0 failures** |
 | Rails main, SQLite, negative collection specs | existing direct-render example fails | **76 examples, 0 failures** |
 
-The remaining SQLite failure is `context_spec.rb:80`, the uppercase/lowercase table-name schema-cache case
+The remaining SQLite failure is `context_spec.rb:80`, `a table whose name differs only in case / can be searched
+like Active Record queries it`, the uppercase/lowercase `Widgets`/`widgets` schema-cache case
 already covered by queued Rails item E2. It fails on unchanged gem main, so was neither suppressed nor repaired
 in this patch. Existing negative/correlated collection specs cover STI, polymorphic associations, aliases,
 through joins, default scopes, empty collections, repeated evaluation and asymmetric matching rows. The
-existing regression calls `.to_sql` directly before and after evaluation. Targeted RuboCop: **1 file, 0 offenses**.
+existing regression, `keeps the subquery buildable after an evaluation` in `negative_collection_spec.rb:578`,
+calls `.to_sql` directly before and after evaluation. Targeted RuboCop: **1 file, 0 offenses**.
 
 ## Readability and reviews
 
-All patches are L0 candidates. Each changes one expression or removes a memo; no new mechanism or code comment.
+These remain small correctness patches, with no new helper or code comment. BI1 now preserves the memo, and
+SC1 branches only on registry mutability. Correctness fixes are judged by readability, not the performance
+L0–L3 bars. The original reviewer called all three L0; the revised heads have fresh skeptical approval.
 Measured with flog 4.9.4 and RuboCop 1.92.2 (`Metrics/AbcSize`, `CyclomaticComplexity`, `PerceivedComplexity`,
 zero thresholds to expose the numeric values, not a claimed lint pass):
 
 | Site | flog | ABC | Cyclomatic / perceived |
 | --- | --- | --- | --- |
-| BI1 `has_blind_indexes?` | 2.8 → 2.2 | 2.45 → 2.00 | 2/2 → 1/1 |
+| BI1 `has_blind_indexes?` | 2.8 → 4.3 | 2.45 → 4.12 | 2/2 → 3/3 |
 | RA1 `correlated_subquery` | 28.5 → 30.0 | 23.75 → 24.68 | 5/5 → 5/5 |
-| SC1 class-body registration (`Engine#none` in flog) | 11.6 → 13.6 | not a method | not a method |
+| SC1 class-body registration (`Engine#none` in flog) | 11.6 → 16.1 | not a method | not a method |
 
 RA1's one extra `arel_table` send explains its score rise; it replaces an invalid Arel input with the same
-model's table. SC1 adds a merge and assignment through the documented writer rather than a frozen-Hash write.
-The skeptical subagent approved all three exact heads and their PR bodies unchanged, with no required code or
-test changes. It reread the pinned diffs, boundaries and evidence, reran both retained probes on released Rails
-and main, and checked blind_index's released-base probe with the exact base implementation. Its optional
-Scimitar probe nit was applied: the malformed-JSON check now asserts the exception cause, not just records it.
-The deliberately frozen Scimitar registry is a negative control on base even on released Rails; only its head
-probe is expected to pass on both stacks. Sol and Astra are not run here and remain required on these heads.
+model's table. BI1 adds a frozen guard to the memo write; SC1 conditionally copies and uses the documented
+writer. No runtime request branch is added in SC1.
 
-GitHub reported **no hosted CI checks** on the three pushed fork heads. Local tests above are the evidence;
-absence of hosted checks is not a CI pass. Queue status confirms the fork heads match, merge cleanly with their
-upstream bases and still need Sol/Astra. No upstream submission was attempted.
+The first skeptical pass approved the original heads and bodies, but coordinator-run Sol and Astra both
+requested changes for BI1 and SC1. Their public-API counterexamples were reproduced, not accepted merely as
+private override boundaries: the first BI1 candidate changed a warmed query from plain to indexed results,
+and the first SC1 candidate detached a mutable registry reference that apps can configure later. Both fixes
+now preserve those released-Rails behaviors; the new tests fail on the original candidates and pass on the
+revised heads. Old passes and findings remain in the queue history and do not count on the new heads.
+
+Both reviewers gave RA1 nits, not code findings. Its body now pins Rails main, discloses the `arel_table`
+override boundary, gives commands, and names the unchanged SQLite failure and existing direct-render test.
+Its code/head is unchanged. The fresh skeptic approved SC1 and RA1 and gave BI1 only a nonblocking test-strength
+nit, now addressed by the asymmetric frozen fixture above. It approved the final BI1 exact head and unchanged
+body with no remaining nits. It reran BI's targeted tests/probe and additional exception/cached-value cases,
+SC's engine specs/probe, and RA's direct-render file (76/0) plus its disclosed SQLite failure; it read, rather
+than reran, the retained full-suite logs and Callgrind evidence. The coordinator will rerun Sol and Astra.
+The deliberately frozen Scimitar probe is a negative control on base
+even on released Rails, not a claim that base passed it.
+
+GitHub reported **no hosted CI checks** on the original three pushed fork heads or the revised BI1/SC1 heads.
+Local tests above are the evidence; absence of hosted checks is not a CI pass. No upstream submission was attempted.
 
 ## Rejected, covered or deferred leads
 
