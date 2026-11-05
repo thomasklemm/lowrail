@@ -222,6 +222,20 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
 
 ## Review gates
 
+### Review rounds before anything opens (Thomas, 2026-11-05)
+
+Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
+
+1. The orb's own skeptical reviewer subagent, rerun after every rewrite (most orbs have no Codex CLI).
+2. Sol (`codex exec -m gpt-6.1-sol`, read-only), run by the coordinator on the patch and body.
+3. Astra (`codex exec -m gpt-6-astra`) in addition for correctness changes on hot paths, Ractor/thread or
+   frozen-object semantics, and anything a maintainer has pushed back on before.
+4. `thermos` for larger diffs (several files or a new mechanism).
+
+Every confirmed finding is fixed and the changed part reviewed again; the round ends when a pass has no must-fix.
+A head change after the last pass means another pass. W1 opens a queued item only if its contributions.md entry
+names the passes on that exact head; otherwise it sends it to the coordinator first.
+
 ### Readability gate (L0–L3)
 
 Thomas, 2026-11-03; rated as part of the primary review's maintainability rubric. L0: no harder to read; opens if
