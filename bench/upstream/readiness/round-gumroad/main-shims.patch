@@ -1,0 +1,29 @@
+diff --git a/Gemfile b/Gemfile
+index 426fb017d..8326050e9 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -21,7 +21,7 @@ group :development, :test do
+   gem "rubocop-performance", "~> 1.25", require: false
+   gem "rubocop-rspec", "~> 3.6", require: false
+   gem "rubocop-rake", "~> 0.7", require: false
+-  gem "active_record_query_trace", "~> 1.8"
++  gem "active_record_query_trace", "~> 1.8", require: false
+   gem "shoulda-matchers", "~> 6.0"
+   gem "spring", "~> 4.0"
+   gem "spring-commands-rspec", "~> 1.0"
+diff --git a/spec/spec_helper.rb b/spec/spec_helper.rb
+index 962094481..554d69f60 100644
+--- a/spec/spec_helper.rb
++++ b/spec/spec_helper.rb
+@@ -213,7 +213,11 @@ module ResilientFixtureTeardown
+       ActiveSupport::Notifications.unsubscribe(@connection_subscriber) if @connection_subscriber
+       pools = @fixture_connection_pools || []
+       clean = pools.map do |pool|
++        connection = pool.lease_connection
++        open = connection.transaction_open?
++        open ? connection.rollback_transaction : connection.reset!
+         pool.unpin_connection!
++        open
+       rescue StandardError => e
+         Rails.logger.warn("[RSpec] fixture unpin failed: #{e.message}")
+         discard_pinned_connections(pool)

@@ -27,6 +27,7 @@ overridden `primary_key` (#59622).
 | Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
 | Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, silent; cells-rails part opened as trailblazer/cells-rails#75), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
 | Zammad `64e70ff` | rspec without system specs, 20323 examples, PostgreSQL 18.6, Redis, memcached (no Elasticsearch) | 7 F, 10 F (environment, also on main); failing files twice more: 7 F, 8 F | no shim needed; 2520 F, 2524 F; 2498 from one call (ZM1), 15 main-only otherwise | ZM1 (d, restore built, queued), ZM2 (c, rspec-rails), ZM3 (d), ZM4 (b), ZM5 (d), CW4 (b) |
+| Gumroad `74e3046` | rspec without browser specs, 36408 examples, Ruby 3.4.12, MySQL 8.4 + Valkey, Elasticsearch, DynamoDB Local, MinIO, memcached | 10 F, 7 F (environment, also on main); failing files a third time: 15 F | 1 gem shim and 1 spec_helper shim (GR1, ≈40% of examples without it); then 418 F, 417 F; 397 main-only and stable | S2 (b), GR1 (d), GR2 (c), GR3 (b), GR4 (d), GR5 (d), GR6 (b), GR7 (b)+(c), bullet (c); no new (a) |
 
 ## Findings
 
@@ -1355,3 +1356,203 @@ in a migration (3fc2ca0725, deprecated for 9.0); Zammad's deprecation toolkit fa
   to Zammad, or the `auto_populated?` call to activerecord-import: findings are recorded, not reported.
 * A narrower ZM1 restore (Symbol only, or only in `QueryPredicates`-free tables): every caller found passes a String or
   a Symbol, and the type lookup is the same either way.
+
+## Gumroad
+
+antiwork/gumroad `74e3046` (default branch `main`,
+[`74e3046196`](https://github.com/antiwork/gumroad/tree/74e3046196e1e0b490eb042335faafd580c4b2fe), 2026-11-05, MIT).
+**Ruby 3.4.12, Gumroad's own pin, on both trees, not the round's usual 4.0.9**, so no Ruby difference mixes in.
+Rails 8-1-stable `6e09124217` (v8.1.4.1) and main `bdb3d96012` (2026-11-05), both still the heads when the round
+ended, both as `path:` gems. The suite as its CI runs it, without browsers: every `spec/**/*_spec.rb` with
+`--tag ~js --tag ~mobile_view --tag ~billy --tag ~tablet_view --tag ~skip` (CI passes `--tag ~skip`). That is 36408 of
+39326 examples: 2914 browser examples and 4 `skip` ones are left out, 10 are pending. Services as in
+[docker-compose-test-and-ci.yml](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/docker/docker-compose-test-and-ci.yml),
+with the same images and flags, run as orb services through Docker: MySQL 8.4.11, Valkey 8.1.10 (64 databases),
+Elasticsearch 7.9.3, DynamoDB Local 3.3.1, memcached and MinIO with the spec fixtures copied in. Every service CI
+uses ran, so no spec is skipped for a missing service. 8 workers with their own MySQL database, Elasticsearch index
+suffix and DynamoDB table prefix; Gumroad's `config/test_redis_isolation.rb` leases each a Redis block. About 25
+minutes wall per run on a1.large (8 cores, 16 GB). `CI=true` as on CI, which also prepends Gumroad's
+`ResilientFixtureTeardown` (GR1). The test env prints deprecations, so main-only ones are read from the logs.
+
+Recipe for the readiness runner: [round-gumroad.yml](../../bench/upstream/readiness/round-gumroad.yml) (unchecked by
+the runner, because its Services don't cover MySQL 8.4, Elasticsearch, DynamoDB or MinIO yet), with
+[services.sh](../../bench/upstream/readiness/round-gumroad/services.sh) (services and MinIO fixtures),
+[gumroad-run.rb](../../bench/upstream/readiness/round-gumroad/gumroad-run.rb) (the parallel runner, one JSON per
+worker), [both-trees.patch](../../bench/upstream/readiness/round-gumroad/both-trees.patch) and
+[main-shims.patch](../../bench/upstream/readiness/round-gumroad/main-shims.patch). System packages: CI's
+`bin/ci-test-packages` list, `default-libmysqlclient-dev`, `libvips42`, wkhtmltopdf 0.12.4 and Node 22.23.4. Assets
+were built once on the 8-1 tree (`rake js:export db:setup pages_tailwind:build vite:build_all vite:build_widget`) and
+copied to the main tree.
+
+**Pins and bumps, the same on both trees.** Gumroad locks Rails 8.1.3.1; both trees raise it to a `path:` Rails
+(8-1-stable is 8.1.4.1). With it Bundler moves rails-html-sanitizer 1.6.2 → 1.7.2, loofah 2.25.1 → 2.25.3 and
+nokogiri 1.19.3 → 1.19.7 (8.1.4.1's actionview). Three bumps:
+* mini_magick 4.13.2 → 5.4.0 (image_processing 1.13.0 → 1.14.0 with it): 8.1.4.1's Active Storage refuses to boot with
+  mini_magick below 5.1 ("ImageMagick security policy requires mini_magick 5.1 or later"); Gumroad has
+  [`gem "mini_magick", "~> 4.12"`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/Gemfile#L125).
+* sidekiq 7.3.4 → 7.3.9: on main, 7.3.4's adapter runs `remove_const(:SidekiqAdapter) if defined?(:SidekiqAdapter)`
+  (always true; 7.3.5's `defined?("::…::SidekiqAdapter")` too) and raises `NameError` at boot once Rails no longer
+  defines the constant (10c24f2481, #56518); 7.3.6 and later use `const_defined?`.
+* rspec-rails 6.1.3 → `570b2b0a79` (git, unreleased): on main all 28 mailer spec files fail to load with
+  `FrozenError: can't modify frozen Hash: {}` (L1).
+
+sidekiq-pro is removed from the Gemfile (it needs a contribsys license; Gumroad treats it as optional, "sidekiq-pro is
+not installed"). One harness shim on both trees: Elasticsearch test index names get `TEST_ENV_NUMBER` appended
+([elasticsearch.rb#L77](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/support/elasticsearch.rb#L77)),
+so parallel workers don't share indices. The main lock differs from the 8-1 lock only in the Rails gems and what main
+itself requires: globalid 1.3.0 → 1.4.0, herb 0.11.1, marcel 1.2.1 → 2.1.0, ractor-dispatch 0.3.0.
+
+**Main checkout only:** [`gem "active_record_query_trace", "~> 1.8"`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/Gemfile#L29)
+→ `require: false` (1.8.3; its `attach_to` fails at boot on main, as in Chatwoot; Gumroad enables it only in
+development), and the GR1 teardown shim below.
+
+Results: 8-1 10 F (seed 4242) and 7 F (seed 1717). Main, shimmed, 418 F and 417 F. The 64 files with any failure,
+once more on each tree (3386 examples): 8-1 15 F, main 417 F. 397 failures are on all three main runs and on none of
+the three 8-1 runs; all are classified below, and none is a new (a). The rest: 11 fail on both trees (invoice PDF
+text, HTML-escaped apostrophes and quotes in three expectations, an Elasticsearch reindex count, and headless Chrome,
+which `DisputeEvidence::GenerateReceiptImageService` starts even in untagged specs and which fails to start on this
+orb in some orders); 9 more are that Chrome failure on the 8-1 rerun and S2 on main; 1
+(`newsletter_retirement_account_change_race_spec`, a thread race) failed in one main run only.
+
+| Group | Failures | Class | Commit | Status |
+|---|---|---|---|---|
+| GR1 fixture transaction moved out of `pin_connection!` | ≈40% of main (1599 F in the 5447 examples run before it was stopped) | (d) | 9e8fe3955b (#58306) | record only; main shim |
+| S2 `link_to` moved to `NavigationHelper` | 296 | (b) | 07f4b45e29 (#55410) | our S2 note, queued |
+| GR2 inertia_rails 3.15.0's `DebugExceptions` patch | 58 | (c) | 6f731298fb (#56180) | fixed in inertia_rails 3.16.0 |
+| GR3 `connected_to(role: :reading, prevent_writes: false)` raises | 20 | (b) | 3fc6750061 (#55134) | CHANGELOG; Gumroad-side |
+| GR5 migration spec stubs `connection` with a bare double | 12 | (d) | fad3693c5f (#56204) | record only |
+| bullet 8.2.0 refuses Active Record 8.2 (development boot) | 6 | (c) | — | fixed in bullet 8.3.1 |
+| GR4 `raw_execute` override never called | 4 | (d) | 082a7c2374 (#56129) | record only; silent in production |
+| GR6 scoped `has_many :through` preload reloads loaded through records | 1 | (b) | 2ab7290a08 (#59444) | CHANGELOG |
+| GR7 Sidekiq 7's adapter missing at boot | 0 in tests (test env uses `:test`) | (b)+(c) | 10c24f2481 (#56518) | Sidekiq ≥ 8.0 |
+
+Each commit was checked against its parent with the repro named below: the parent behaves like 8-1, the commit
+like main. No rails/rails PR, open or merged, covers any of them, and none of ours does
+(`gh search prs --repo rails/rails --author thomasklemm`).
+
+**GR1 (d), record only: transactional fixtures now begin and roll back the transaction themselves.** 9e8fe3955b
+(#58306, "Introduce Ractor connection handler, pool, and proxy") moved `begin_transaction` and the rollback out of
+`ConnectionPool#pin_connection!`/`unpin_connection!` (both `:nodoc:`; on 8-1
+[connection_pool.rb#L381](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L381)
+and [#L394](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L394))
+into `TestFixtures` ([test_fixtures.rb#L210](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/test_fixtures.rb#L210)
+and [#L242](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/test_fixtures.rb#L242)).
+Gumroad's [`ResilientFixtureTeardown`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/spec_helper.rb#L210)
+replaces `teardown_fixtures` with a version modeled on 7.2's that only calls
+[`pool.unpin_connection!`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/spec_helper.rb#L216),
+prepended [when `CI` is set](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/spec_helper.rb#L252).
+On main nothing rolls back, so every example's rows stay and later examples fail on uniqueness (`Username has already
+been taken`): 1599 F in the first 5447 examples of the unshimmed main run, which was stopped there. Repro:
+[fixture_unpin_rollback.rb](../../bench/upstream/app_suites/fixture_unpin_rollback.rb) (8-1: 0 rows after
+`unpin_connection!`; main: 1). Private API overridden by one app, so a Gumroad-side fix (roll back before unpinning,
+as main's `teardown_fixtures` does). The main-only shim for the classification runs does exactly that; with it
+`profile_presenter_spec` and `user/posts_spec` pass 46/46.
+
+**S2 (b), the queued upgrade-guide note:** 296 failures in 32 files. Six Gumroad classes include only `UrlHelper` and
+call `link_to`: [`ReceiptPresenter::PaymentInfo`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/presenters/receipt_presenter/payment_info.rb#L4)
+([`link_to("Generate invoice", …)`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/presenters/receipt_presenter/payment_info.rb#L278)),
+`ItemInfo`, `FooterInfo`, `ChargeInfo`, `GifteeManageSubscription` and
+[`ContactingCreatorMailer`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/mailers/contacting_creator_mailer.rb#L6),
+so receipts and seller notices fail to render (in `create_missing_dispute_evidence_job_spec` the failure is swallowed
+by the SMTP rescue, and the seller notice is never recorded). With `include ActionView::Helpers::NavigationHelper` added
+to those six classes in the main tree (check only, reverted), the 32 files run 1655 examples with 4 failures, all GR3.
+
+**GR2 (c): inertia_rails 3.15.0 overrides `render_for_browser_request(request, wrapper)`.** 6f731298fb (#56180,
+"Support text/markdown format in DebugExceptions middleware") added a `content_type` argument
+([debug_exceptions.rb#L78](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/middleware/debug_exceptions.rb#L78)).
+[inertia_rails 3.15.0's patch](https://github.com/inertiajs/inertia-rails/blob/b1f09d987d303aa398d9bbc166e3a5f5ed3951f5/lib/patches/debug_exceptions.rb#L15)
+takes two, so every error page in a request spec becomes `ArgumentError (given 3, expected 2)`: 58 failures in 15
+request spec files. Fixed in inertia_rails 3.16.0 ([732d20b4e1](https://github.com/inertiajs/inertia-rails/commit/732d20b4e1976eb01b0c5b3970e17d80dd9a2372),
+"Fix Rails 8.2 (edge) compatibility for debug_exceptions patch"); with the latest release 3.23.0 in the main tree
+(check only), the 7 affected request spec files pass 131/131. Repro:
+[debug_exceptions_arity.rb](../../bench/upstream/app_suites/debug_exceptions_arity.rb). Gumroad locks 3.15.0
+([Gemfile.lock#L466](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/Gemfile.lock#L466)).
+
+**GR3 (b): `prevent_writes: false` with the reading role raises.** 3fc6750061 (#55134, CHANGELOG "raise an
+`ArgumentError` if `prevent_writes: false` is provided with the `reading` role") makes
+[`connected_to` raise](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/connection_handling.rb#L173);
+on 8-1 the reading role silently forced `prevent_writes = true`. Gumroad's `Mysql2ProxyRouting::ScopedRoles` routes
+reads through
+[`connection_class.connected_to(role:, prevent_writes: connection_class.current_preventing_writes, &block)`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/lib/mysql2_proxy_routing.rb#L27),
+which passes `false` outside a reading block: 20 failures in 8 `config/mysql2_proxy_*` spec files, and the same
+wherever the `mysql2_proxy` primary/replica pair is configured (the deployed environments, per `database.yml`). Repro: [reading_prevent_writes.rb](../../bench/upstream/app_suites/reading_prevent_writes.rb)
+(8-1: writes still prevented in the block; main: `ArgumentError`). Gumroad-side: pass `prevent_writes:` only for
+the writing role.
+
+**GR4 (d), record only: Gumroad's read-only-primary retry is never called on main.** 082a7c2374 (#56129, matthewd,
+"QueryIntent#execute!") replaced the private `raw_execute`
+([8-1 database_statements.rb#L567](https://github.com/rails/rails/blob/6e091242176c322edc5a8907583c01b08b8a60bc/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb#L567))
+with `execute_intent`. Gumroad's [`MysqlReadOnlyPrimaryRetry#raw_execute`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/initializers/mysql_read_only_primary_retry.rb#L19),
+prepended on the Mysql2 adapter, reconnects and retries a write once after an RDS failover leaves pooled
+connections on the old, read-only primary. On main it is dead code: its own spec fails 4 times, and in production the
+first write after a failover would raise instead of being retried, without any warning. Repro:
+[raw_execute_hook.rb](../../bench/upstream/app_suites/raw_execute_hook.rb) (8-1: the override runs once per INSERT;
+main: never). No gem in Gumroad's bundle overrides `raw_execute`. Not restored: the method is private and the
+QueryIntent refactor has no single replacement call (`perform_query` changed from `(raw_connection, sql, binds, …)`
+to `(raw_connection, intent)` too), so a restore isn't small (restore rule, point 3). Gumroad needs a hook per
+Rails version.
+
+**GR5 (d), record only: a bare double as the migration's connection.**
+[`let(:connection) { double }`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/migrations/add_recurring_payment_method_context_to_credit_cards_spec.rb#L9)
+stubs `migration.connection`; fad3693c5f (#56204, CHANGELOG "configuring migration strategy on a per-adapter basis")
+makes [`execution_strategy`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/migration.rb#L838)
+ask `connection.migration_strategy`, which `respond_to_missing?` reaches: 12 failures in two migration specs. Every
+real adapter answers it. Repro: [migration_connection_double.rb](../../bench/upstream/app_suites/migration_connection_double.rb).
+
+**GR6 (b): a scoped `has_many :through` preload no longer reuses loaded through records.** 2ab7290a08 (#59444,
+kamipo, CHANGELOG) ignores loaded through records when the reflection scope filters the source.
+[`has_many :global_checkout_custom_fields, -> { global.not_is_post_purchase }, through: :user`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/models/link.rb#L209)
+on products whose `user` is loaded: 8-1 queries `custom_fields` for the loaded user, main reloads `users LEFT OUTER
+JOIN custom_fields`. Same records, same number of queries; only
+[the spec's count of `FROM \`custom_fields\`` queries](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/controllers/api/v2/links_controller_spec.rb#L241)
+changes (1 failure). Repro: [through_scoped_preload.rb](../../bench/upstream/app_suites/through_scoped_preload.rb),
+bisected with it over 8ae3d84277..bdb3d96012.
+
+**bullet (c):** the development-env specs `domain_spec` and `secure_headers_spec` (6 failures) boot `bin/rails runner`
+in development, where bullet 8.2.0
+([Gemfile.lock#L207](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/Gemfile.lock#L207))
+raises "Bullet does not support active_record 8.2.0.alpha yet"; bullet 8.3.1 supports it. With 8.3.1 (check only)
+the development boot then stops at the `active_record_query_trace` shim's initializer and, past that, at GR7.
+
+**GR7 (b)+(c), found through that boot: Sidekiq 7 with `queue_adapter = :sidekiq` doesn't boot on main.**
+10c24f2481 (#56518, after #53058 deprecated it in 8.1) removed Rails' own `SidekiqAdapter`. Sidekiq 7.x, up to the
+latest 7.3.10 and its `7-x` branch, defines its adapter only in an `on_load(:active_job)` hook that runs after Active
+Job's own hook has resolved the configured adapter, so loading `ActiveJob::Base` raises `NameError: uninitialized
+constant ActiveJob::QueueAdapters::SidekiqAdapter`. Gumroad sets
+[`config.active_job.queue_adapter = :sidekiq`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/application.rb#L146)
+for every environment and test overrides it with `:test`, so the suite doesn't see it; development and production
+would. Sidekiq 8.0 requires the adapter eagerly (sidekiq/sidekiq 61b3fca7); Gumroad is on sidekiq 7.3 and
+sidekiq-pro 7.x. Repro: [sidekiq7_adapter_boot.rb](../../bench/upstream/app_suites/sidekiq7_adapter_boot.rb)
+(8-1 boots with 7.3.10 and 8.1.7; main boots only with 8.1.7).
+
+**Deprecations that only main emits** (warnings in the shimmed main run with seed 4242; the 8-1 runs print only the
+Devise `resource` hash-argument ones, `escape_json_responses` and `ActiveSupport::Configurable`, which both trees share):
+* 2626: `` Passing `binds` to `to_sql` is deprecated `` (31e8e9e9da, #58310), from
+  [`proxy.send(:appropriate_connection, to_sql(arel, binds))`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/lib/mysql2_proxy_routing.rb#L36)
+  (shortened).
+* 1855: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` `` (4f2ee07b8e, #56369), emitted
+  per request in the actions of Gumroad's 13 `skip_before_action :verify_authenticity_token` lines.
+* 177: `exec_update is deprecated`, from [feature_announcement_subscription.rb#L31](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/models/feature_announcement_subscription.rb#L31).
+* 32 (8 per process, 4 lines): `Time::DATE_FORMATS is deprecated` (2b9946256d, #57405), from
+  [time_formats.rb#L3–L6](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/initializers/time_formats.rb#L3-L6).
+* 24 (c): `Mime::EXTENSION_LOOKUP is deprecated` (f6c709e747, #57826), from Devise 4.9.4's
+  `devise_controller.rb:99`, as in Mastodon.
+* 16: `` `config.active_record.raise_on_assign_to_attr_readonly` is deprecated ``, from
+  [test.rb#L49](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/environments/test.rb#L49).
+* 16: `` Calling `protect_from_forgery` without specifying a strategy is deprecated ``, from
+  [application_controller.rb#L4](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/controllers/application_controller.rb#L4)
+  and [oauth/applications_controller.rb#L7](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/controllers/oauth/applications_controller.rb#L7).
+* 8: `The :preprocessed option is deprecated` (3d105fc346, #51951), from
+  [has_thumbnail.rb#L11](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/app/models/concerns/video_file/has_thumbnail.rb#L11).
+* 8 (c): `ActionController::InvalidAuthenticityToken has been deprecated`, from sentry-ruby 6.5.0's
+  `configuration.rb:833`.
+* 1: `ActiveStorage::PreviewImageJob is no longer used`, from
+  [active_storage_jobs_spec.rb#L20](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/spec/config/initializers/active_storage_jobs_spec.rb#L20).
+
+**Not pursued** (nothing was built in this round, and nothing goes into the queue):
+* GR1 and GR4: private API overridden by one app; GR4's restore would not be small. GR4 is the one with real
+  production impact (a silent loss of the failover retry); the coordinator may want it noted somewhere public, but
+  reporting it to Gumroad is out of scope for this round.
+* GR3, GR6, GR7: deliberate changes with CHANGELOG entries or a prior deprecation; GR7 is fixed by Sidekiq 8.
+* GR2 and bullet: fixed in released gem versions. GR5: a test double.
+* A second S2 note: Gumroad's six classes are more callers for the queued S2 note, not a new finding.
