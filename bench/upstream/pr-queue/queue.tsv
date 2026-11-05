@@ -6,3 +6,6 @@ bench/upstream/ecosystem/patches/e4-activesupport-minitest-floor.body.md	thomask
 bench/upstream/app_suites/s1-body.md	thomasklemm/upgrade-guide-rack-sendfile	S1
 bench/upstream/app_suites/s2-body.md	thomasklemm/upgrade-guide-navigation-helper	S2
 bench/upstream/app_suites/sp1-body.md	thomasklemm/upgrade-guide-frozen-default-url-options	SP1
+bench/upstream/perf_round/a-query-intent-async-state-body.md	thomasklemm/query-intent-async-state	PM1
+bench/upstream/perf_round/b-tag-options-blank-once-body.md	thomasklemm/tag-options-blank-once	PM2
+bench/upstream/perf_round/c-log-subscriber-logger-once-body.md	thomasklemm/log-subscriber-logger-once	PM3
