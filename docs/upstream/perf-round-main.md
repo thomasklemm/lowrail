@@ -12,17 +12,15 @@ below with their numbers.
 
 | rank | candidate | branch @ commit | effect | readability | review |
 | ---: | --- | --- | --- | --- | --- |
-| A | QueryIntent keeps its background session and mutex in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`8e7de36dbc`](https://github.com/thomasklemm/rails/commit/8e7de36dbc67dd7980d6ec87c7c43998329a9908) | Ruby master: every intent goes from a 512-byte to a 256-byte slot; ruby-bench slot bytes −0.81% to −0.96% per iteration, objects approximately unchanged | L1 | ship (after Sol) |
-| B | `tag_options` skips the second blank check when the name is the key | [`thomasklemm/tag-options-blank-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-options-blank-once) [`2dc1231b26`](https://github.com/thomasklemm/rails/commit/2dc1231b26be2d636c16fa1ea1f3302db756efb1) | String keys −2.2% per tag call (Symbol keys −0.2%, within noise); railsbench `tag_options` −6.4M Ir per iteration | L1 | ship (after Sol) |
-| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`cec8010a8b`](https://github.com/thomasklemm/rails/commit/cec8010a8b9cc9616e7ba84c5a139beae95b59ca) | `consumes?` −15.7%, `emitting?` −7.8% per call; railsbench −8.3M Ir per iteration (sampled window) | L0 | ship; Sol: open with nits (body only) |
+| A | QueryIntent keeps its background session and mutex in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`5e26a026f1`](https://github.com/thomasklemm/rails/commit/5e26a026f1180469fca5172c7382da7d02602277) on main `1e235cee11` | Ruby master: every intent goes from a 512-byte to a 256-byte slot, −256 B per query; objects unchanged | L1 | skeptic: approve; Sol and Astra pending on this head |
+| B (not opened) | `tag_options` skips the second blank check when the name is the key | [`thomasklemm/tag-options-blank-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-options-blank-once) `ddd44b197e` (rebase of `2dc1231b26`) | the shortcut saves −2.0% per String-key tag call but is not exact; the exact form is main's code | – | closed: [below](#refresh-on-main-1e235cee11-2026-11-05-evening) |
+| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`defa5dc860`](https://github.com/thomasklemm/rails/commit/defa5dc8602281d03db9d65770e9f749fd1931e5) on main `1e235cee11` | `consumes?` −17.3%, `emitting?` −13.1% per call (app-free case) | L0 | skeptic: approve; Sol pending on this head |
 | D (rejected) | `connection_handler` checks for the main Ractor first | not pushed; [patch](../../bench/upstream/perf_round/patches/rejected/connection-handler-main-ractor.patch) | −188 Ir per call (−6%), ≈0.055% of shipit | – | don't ship: breaks the `sqlite3_ractor` test hook |
 
-Bodies: [A](../../bench/upstream/perf_round/a-query-intent-async-state-body.md),
-[B](../../bench/upstream/perf_round/b-tag-options-blank-once-body.md),
-[C](../../bench/upstream/perf_round/c-log-subscriber-logger-once-body.md). Patches are in
-[`bench/upstream/perf_round/patches`](../../bench/upstream/perf_round/patches). Queue ranks 9–11, in the order A, B,
-C. B is also worth a backport to 8-1-stable, which has the same double check since 8.1.4.1
-([below](#rails-811--8141-in-ruby-bench-attributed)).
+Queue items (metadata, passes and the body as posted): [PM1](../../bench/upstream/pr-queue/items/PM1.md),
+[PM2](../../bench/upstream/pr-queue/items/PM2.md), [PM3](../../bench/upstream/pr-queue/items/PM3.md). Patches are in
+[`bench/upstream/perf_round/patches`](../../bench/upstream/perf_round/patches). Queue ranks: A 11, C 13; B is closed
+(not exact, and the exact form saves nothing), so there is no 8-1-stable backport either.
 
 ## Pins and method
 
@@ -286,6 +284,50 @@ Sol (codex gpt-6.1-sol, read-only, on the patches and bodies) reviewed the queue
 | PM3-4 | full-SHA links; "customize logger selection through `default_logger`" | applied | |
 
 Rejected: none. A third skeptical-reviewer pass on the final PM1 and PM2 said ship for both.
+
+## Refresh on main 1e235cee11 (2026-11-05, evening)
+
+Rails main moved to [`1e235cee11`](https://github.com/rails/rails/commit/1e235cee11b0a7aecb189d8837534807626287aa)
+(inflector `match?`, `Array#index_with` docs; no overlap). All three branches rebased cleanly, and the numbers were
+taken again on it, with Lowrail [`a06703e89d`](https://github.com/thomasklemm/lowrail/commit/a06703e89dd41af36cf7a923103be3e7ec7be9a5):
+[`percall.sh`](../../bench/upstream/perf_round/percall.sh) (Callgrind on the timed loop only, 2,000 calls after
+2,000 warmups, GC disabled, fixed heap, pinned Valgrind from `script/bench-valgrind`, inclusive Ir per call, 3
+repetitions per tree, a second main checkout as A/A) with the app-free cases
+[`tg_none.rb`](../../bench/upstream/perf_round/cases/tg_none.rb), [`er_none.rb`](../../bench/upstream/perf_round/cases/er_none.rb)
+and [`qi.rb`](../../bench/upstream/perf_round/cases/qi.rb); slot bytes per query from
+[`qi_bytes.rb`](../../bench/upstream/perf_round/qi_bytes.rb). Ruby 4.0.9, and Ruby master
+[`2a3b7678ff`](https://github.com/ruby/ruby/commit/2a3b7678ff31dbe70f2131314aa34879559367db) for slot sizes.
+
+* **PM1**, head `5e26a026f1`. Ruby master, bytes per query: `find` 4,088 → 3,832, `where.to_a` 5,592 → 5,336,
+  `update_all` 5,120 → 4,864, `insert` 5,776 → 5,520, `exec_query` 2,176 → 1,920; A/A identical; objects unchanged.
+  After a `load_async`, fresh and async intents stay at 256 B (main 512). Ruby 4.0.9: unchanged (320 B slot).
+  `Post.find` Ir per call 316,608 / 316,759 / 316,580 (main), 316,581 / 316,786 (A/A), 316,412 / 316,384 (PM1): no
+  CPU claim. Tests: AR sqlite3 suite with `RAILS_STRICT_WARNINGS`, 10,289 runs, 0 failures, 5 errors from the orb
+  (no `sqlite3` CLI, no `pg`). Skeptic: nits (an internal corner — an async intent whose foreground fallback hits a
+  bind `RangeError` and is read via `affected_rows` — reaches 31 ivars, main 32, so "29 or 30" became "one fewer at
+  every point"; calling the private `execute_or_wait` with `send` on a foreground intent raises, unreachable). The
+  ruby-bench slot-byte table above is from `bdb3d96012` and was not rerun; the body now uses the per-query table.
+  `risky: true` (concurrency), so Astra as well as Sol. Skeptic on `5e26a026f1`: approve (link nit applied).
+* **PM2: closed, not opened.** Main calls `key.blank?`, `key.to_s` and `name.blank?`, and a frozen String key keeps
+  singleton overrides of each. [`pm2_exact.rb`](../../bench/upstream/perf_round/pm2_exact.rb) renders `<img />` on
+  main and `<img ="x" />` on the branch for a `blank?` that answers false then true (also with `to_s` returning
+  self, and for a converted blank String whose `equal?` always returns true). Skipping any of the three calls is
+  observable, and reordering them is too, so the exact form is main's code. What the shortcut saved: `content_tag`
+  with String keys 58,550 → 57,406 Ir per call (−2.0%, mean of 3; A/A 0.02%), `tag.a` with Symbol keys 56,728 →
+  56,654 (noise). Reopen only if Rails decides `blank?` on attribute keys may be assumed pure.
+* **PM3**, head `defa5dc860`. `ActionController::LogSubscriber#consumes?` 12,805 → 10,591 (−17.3%),
+  `EventReporter#emitting?` 16,878 → 14,662 (−13.1%); main runs agree within 19 Ir (0.12%). The app-free case uses an
+  info-level `ActiveSupport::Logger`, so the absolute numbers are lower than the railsbench-app ones above. Tests
+  added for both methods with a `logger` that returns different loggers on successive calls (info then error, error
+  then info, info then nil, nil then info), asserting one lookup and the predicate or dispatch result; the first three
+  fail on main, nil-first documents the same behaviour. "On every request" is now "twice per action" (Action
+  Controller's structured event subscriber, L10 and L30). activesupport suite without the Redis/memcache stores: 5,154
+  runs, 0 failures (the two backtrace-cleaner failures come from loading all files through `-e` and pass on their
+  own on both trees); Action Pack, Action View, Active Record, Active Job and Action Mailer log subscriber tests
+  green. Skeptic: nits (add the info-then-nil case, list both commands), applied; approve on `defa5dc860` (the new
+  cases raise `NoMethodError` on main).
+* **Readability.** PM1 L1 (unchanged code; comment now "Background-only state, kept apart so that every intent stays
+  small."). PM3 L0, no comments added. RuboCop clean on both.
 
 ## D (rejected). `connection_handler` asks `Ractors.main?` first
 

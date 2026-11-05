@@ -2,41 +2,44 @@
 id: PM2
 repo: rails/rails
 kind: perf
-area: Action View tag helper
-reviewer: unknown
+area: Action View, tag helper
+reviewer: flavorjones (author of 99a3247ebc)
 branch: thomasklemm/tag-options-blank-once
-head: "2dc1231b26"
+head: "ddd44b197e"
 base: main
-built_on: "bdb3d96012"
+built_on: "1e235cee11"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "-2.2% Ir per tag call with String keys; railsbench tag_options -6.4M Ir per iteration"
-rank: 12
+impact: none left in an exact form; the inexact shortcut saved 2.0% per tag call with String keys
+rank:
 risky: false
-state: held
+state: closed
 pr:
-note: "fix first (Sol 20:09): not exact for a frozen String with singleton blank?, to_s or equal?; smallest exact fix drops the shortcut; perf method not reproducible from the body; P2 is on it"
+note: "not opened: every exact form makes main's three calls (key.blank?, key.to_s, name.blank?), so there is nothing to save; the shortcut is observable with a stateful singleton blank? (pm2_exact.rb)"
 passes:
-  - {reviewer: sol, head: "02f567ab81", date: 2026-11-05, verdict: changes, open: "skipped key.blank? and Symbol#blank?; rewritten"}
-  - {reviewer: skeptic, head: "2dc1231b26", date: 2026-11-05, verdict: approve, open: "third pass on the final version: ship"}
-  - {reviewer: sol, head: "2dc1231b26", date: 2026-11-05, verdict: changes, open: "20:09: not exact; don't open in this form"}
+  - {reviewer: skeptic, head: "02f567ab81", date: 2026-11-05, verdict: approve, open: ""}
+  - {reviewer: sol, head: "02f567ab81", date: 2026-11-05, verdict: changes, open: "skipped key.blank? on Strings and Symbols"}
+  - {reviewer: skeptic, head: "2dc1231b26", date: 2026-11-05, verdict: approve, open: "disclose the purity assumption"}
+  - {reviewer: sol, head: "2dc1231b26", date: 2026-11-05, verdict: changes, open: "20:09: not exact (stateful blank?, to_s returning self, overridden equal?); the smallest exact fix drops the shortcut"}
 ---
 
 # Skip the second blank check when a tag attribute's name is its key
 
-Since [99a3247ebc](https://github.com/rails/rails/commit/99a3247ebc02de86c5fdc9a5fd7c1ce0143c5d14), `tag_options` checks [the raw key with `blank?` and then the name it converts the key to](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/helpers/tag_helper.rb#L1548-L1551). A plain String's `to_s` returns the String itself, so for String keys the second check asks the same object the same question.
+Not opened. On main 1e235cee11, `tag_options` calls `key.blank?`, then `key.to_s`, then `blank?` on the result,
+and a String key can override each of them: a frozen String with singleton methods survives as a Hash key. A
+shortcut that skips the second `blank?` when `to_s` returned the key changes what such a key renders
+([`pm2_exact.rb`](../../perf_round/pm2_exact.rb), Lowrail a06703e89d, Ruby 4.0.9):
 
-This keeps both checks in the same order and skips the second only when `to_s` returned the key itself. Symbol keys, keys with a singleton `to_s`, String subclasses and nested `data`/`aria` keys are checked as before. The new tests cover whitespace String keys and String keys whose `blank?` or `to_s` differs from a plain String's. A comparison of 48 kinds of keys, each with 9 values, renders the same markup and raises the same errors as main.
+| key | main | branch ddd44b197e |
+| --- | --- | --- |
+| `"title"` with a counting `blank?` | `<img title="x" />`, `blank?` ×3 | same, `blank?` ×2 |
+| `blank?` false, then true | `<img />` | `<img ="x" />` |
+| `to_s` returns self, `blank?` false then true | `<img />` | `<img ="x" />` |
+| `to_s` returns a blank String whose `equal?` is always true | `<img />` | `<img ="x" />` |
 
-Callgrind instructions per call, Ruby 4.0.9 interpreter, in the railsbench app (main against itself within 0.1%):
-
-| | main | this PR |
-| --- | ---: | ---: |
-| `content_tag` with String keys | 59,411 | 58,104 (−2.2%) |
-| `tag.a` with Symbol keys | 57,596 | 57,484 (−0.2%) |
-
-`link_to` stringifies its html options, so in railsbench `tag_options` runs 6.4M fewer instructions per iteration (A/A 0.38M). 8-1-stable has the same double check ([9190210606](https://github.com/rails/rails/commit/9190210606ffe52f92fdc75637f8ff69404f22c8)).
-
----
-<sub>Found by comparing Rails 8.1.1 and 8.1.4.1 on ruby-bench with Callgrind ([record](https://github.com/thomasklemm/lowrail/blob/d08c2967ba89b663180133ebbe97e873f3746c8a/docs/upstream/perf-round-main.md), part of my research project Lowrail).</sub>
+An exact version has to make the same three calls in the same order, which is main's code, so there is no gain left
+to claim. The shortcut measured −2.0% per `content_tag` call with String keys (58,550 → 57,406 Ir, mean of three
+runs; A/A within 0.03%) and nothing with Symbol keys (56,728 → 56,654, within run-to-run spread), from
+`percall.sh cases/tg_none.rb tag_str|tag_sym 2000 3`. Reopen only if Rails decides that `blank?` on attribute keys
+may be assumed pure.
