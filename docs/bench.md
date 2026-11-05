@@ -2027,6 +2027,13 @@ or add the duplicate ISeq-wrapper category, to claim retained bytes.
 This is modest genuine retention, not evidence that it explains the much
 larger collection-count differences. No retention/runtime GC fix was made.
 
+### GC-only changes
+
+A change whose effect is GC work (roots, retention, write barriers) vanishes from GC-excluded counts, and total
+counts follow where collections land. Claim it with marking time per minor and per major collection (Ruby 4.1+
+`GC::Profiler`), at least 3 processes per build with an A/A, and counts per iteration next to it. Wall time and GC
+time per iteration don't resolve such changes on orbs. Evidence and method: [ruby-bench-gc](upstream/ruby-bench-gc.md).
+
 ## Profiles and safe reductions
 
 The production manifests are held fixed across runtime changes (11 default

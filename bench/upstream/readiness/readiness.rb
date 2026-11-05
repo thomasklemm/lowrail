@@ -69,6 +69,38 @@ module Readiness
     git("-C", clone, "rev-parse", "--verify", "-q", "FETCH_HEAD^{commit}")
   end
 
+  # ONTO with pull requests cherry-picked in order (`picks`: PR number => full head SHA), with a fixed committer,
+  # so the same picks always give the same commit. CHANGELOG conflicts between picks resolve as a union; any other
+  # conflict stops the round. The result is kept as refs/readiness/picks-*, so a restart reuses it.
+  def pick(clone, onto, picks, work)
+    ref = "refs/readiness/picks-#{sha([onto, picks.to_a])[0, 16]}"
+    begin
+      return git("-C", clone, "rev-parse", "--verify", "-q", "#{ref}^{commit}")
+    rescue RuntimeError
+      nil
+    end
+    File.write(File.join(git("-C", clone, "rev-parse", "--absolute-git-dir"), "info", "attributes"), "*CHANGELOG.md merge=union\n")
+    tmp = File.join(work, "rails-picking")
+    FileUtils.rm_rf(tmp)
+    sh!("git -C #{clone.shellescape} worktree prune && git -C #{clone.shellescape} worktree add -q --detach #{tmp.shellescape} #{onto}")
+    who = { "GIT_COMMITTER_NAME" => "Lowrail readiness", "GIT_COMMITTER_EMAIL" => "readiness@invalid", "GIT_COMMITTER_DATE" => "2000-01-01T00:00:00Z" }
+    picks.each do |pr, head|
+      system("git", "-C", clone, "fetch", "-q", "origin", "pull/#{pr}/head", err: File::NULL)
+      system("git", "-C", clone, "fetch", "-q", "origin", head.to_s, err: File::NULL) unless system("git", "-C", clone, "cat-file", "-e", "#{head}^{commit}", err: File::NULL)
+      base = git("-C", clone, "merge-base", onto, head.to_s)
+      next if system(who, "git", "-C", tmp, "cherry-pick", "--allow-empty", "#{base}..#{head}", out: File::NULL, err: File::NULL)
+      raise "rails picks: ##{pr} (#{head.to_s[0, 10]}) does not apply onto #{onto[0, 10]} after the picks before it"
+    end
+    commit = git("-C", tmp, "rev-parse", "HEAD")
+    sh!("git -C #{clone.shellescape} update-ref #{ref} #{commit}")
+    commit
+  ensure
+    if tmp
+      FileUtils.rm_rf(tmp)
+      system("git", "-C", clone, "worktree", "prune")
+    end
+  end
+
   class Round
     attr_reader :m, :work, :out, :seeds, :path
 
@@ -90,14 +122,18 @@ module Readiness
     def rails_ref(t) = m.dig("rails", t == "base" ? "base" : "candidate")
 
     # The round's default trees live in WORK/rails-base and WORK/rails-cand; a suite that pins other Rails refs
-    # gets WORK/rails-<sha>.
-    def tree(ref, default = nil)
-      @trees[[ref, default]] ||= begin
+    # gets WORK/rails-<sha>. A ref is a SHA, tag or branch, or `{ref:, picks: {PR => head SHA}}` for that ref with
+    # those pull requests cherry-picked (Readiness.pick).
+    def tree(spec, default = nil)
+      spec = { "ref" => spec } unless spec.is_a?(Hash)
+      @trees[[spec, default]] ||= begin
         clone = File.join(work, "rails.git")
-        commit = Readiness.fetch(clone, repo, ref)
+        commit = Readiness.fetch(clone, repo, spec.fetch("ref").to_s)
+        commit = Readiness.pick(clone, commit, spec["picks"], work) if spec["picks"]
         dir = File.join(work, "rails-#{default || commit[0, 12]}")
         Readiness.checkout(clone, repo, commit, dir)
-        { "ref" => ref, "sha" => commit, "version" => File.read(File.join(dir, "RAILS_VERSION")).strip, "dir" => dir }
+        { "ref" => spec["ref"], "sha" => commit, "version" => File.read(File.join(dir, "RAILS_VERSION")).strip, "dir" => dir,
+          "picks" => spec["picks"]&.keys&.map(&:to_s) }.compact
       end
     end
 
@@ -152,6 +188,19 @@ module Readiness
     end
 
     def framework = @cfg.fetch("framework")
+    def state = @state
+    def commit = @commit ||= Readiness.fetch(clone, @cfg.fetch("repo"), @cfg.fetch("ref"))
+    def timeout = @cfg.fetch("timeout", @r.m.fetch("timeout", 3600))
+
+    # `share_base: OTHER`: this suite's base tree is OTHER's (same checkout, bundle, setup and base runs), so a
+    # variant that differs only on the candidate (its Rails, candidate-only shims) doesn't rerun the base side.
+    def shared? = @cfg.key?("share_base")
+    def base_owner = @base_owner ||= shared? ? @r.suite(@cfg["share_base"]) : self
+
+    # What decides the base side; a suite that shares another's base must agree with it here (--check).
+    def base_view
+      @cfg.except("share_base", "rails", "shims").merge("rails_base" => @cfg.dig("rails", "base"), "shims" => shims.reject { _1["tree"] == "cand" })
+    end
     def ruby = @cfg.fetch("ruby", @r.ruby).to_s
     def ruby_v = @r.ruby_v(ruby)
     def clone = File.join(@r.work, "suites", "#{@name}.git")
@@ -177,7 +226,8 @@ module Readiness
 
     def env(t, extra = {})
       { "ECO_ROOT" => eco_root, "ECO_RUBY" => ruby, "ECO_GEMFILE" => gemfile, "BUNDLE_PATH" => File.join(@r.work, "bundle", File.basename(@cfg.fetch("repo"), ".git")),
-        "ECO_BUMPS" => @cfg.fetch("bumps", {}).inspect }.merge(@cfg.fetch("env", {}).transform_values(&:to_s)).merge(extra)
+        "ECO_BUMPS" => @cfg.fetch("bumps", {}).inspect, "READINESS_TREE" => t,
+        "READINESS_MANIFEST_DIR" => File.dirname(@r.path) }.merge(@cfg.fetch("env", {}).transform_values(&:to_s)).merge(extra)
     end
 
     def eco(t, cmd) = "#{File.join(ECO, "eco.sh").shellescape} #{dir(t).shellescape} #{t} bash -c #{cmd.shellescape}"
@@ -190,18 +240,20 @@ module Readiness
     def inputs
       sh = shims.map { |s| s["patch"] ? s.merge("sha" => Readiness.sha(File.read(patch_path(s)))) : s }
       @cfg.slice("repo", "framework", "gemfile", "lock", "env", "bumps", "setup", "test", "single").merge("shims" => sh)
+        .merge(@cfg["timeout"] ? { "timeout" => @cfg["timeout"] } : {})
     end
 
     def call
       locks.reverse.inject(-> { call_locked }) { |inner, l| -> { l.synchronize(&inner) } }.call
     end
 
-    def locks = (@cfg.fetch("services", []) + Array(@cfg["exclusive"])).uniq.sort.map { SERVICE_LOCKS[_1] }
+    # A suite and the variants that share its base tree run one at a time, since they use the same base checkout.
+    def locks = (@cfg.fetch("services", []) + Array(@cfg["exclusive"]) + ["base:#{base_owner.name}"]).uniq.sort.map { SERVICE_LOCKS[_1] }
 
     def call_locked
       t0 = Time.now
       FileUtils.rm_f(File.join(@state, "suite.json"))
-      @commit = Readiness.fetch(clone, @cfg.fetch("repo"), @cfg.fetch("ref"))
+      commit
       prep = TREES.to_h { |t| [t, PREP.synchronize { prepare(t) }] }
       runs = []
       @r.seeds.each_with_index do |seed, i|
@@ -222,8 +274,8 @@ module Readiness
     end
 
     def prep_key(t)
-      base_lock = t == "cand" ? JSON.parse(File.read(File.join(@state, "prepare-base.json")))["lock_sha"] : nil
-      Readiness.sha([@name, @commit, rails[t]["sha"], ruby_v, inputs, base_lock])
+      base_lock = t == "cand" ? JSON.parse(File.read(File.join(base_owner.state, "prepare-base.json")))["lock_sha"] : nil
+      Readiness.sha([@name, commit, rails[t]["sha"], ruby_v, inputs, base_lock])
     end
 
     def prepared?(t)
@@ -235,11 +287,12 @@ module Readiness
 
     # Checkout, shims, lock seeding, bundle and setup for one tree. Cached by prep_key.
     def prepare(t)
+      return base_owner.prepare(t) if t == "base" && shared?
       f = File.join(@state, "prepare-#{t}.json")
       key = prep_key(t)
       return JSON.parse(File.read(f)) if prepared?(t)
       Readiness.log "#{@name}: preparing #{t} (Rails #{rails[t]["sha"][0, 10]})"
-      commit = Readiness.checkout(clone, @cfg.fetch("repo"), @commit, dir(t))
+      commit = Readiness.checkout(clone, @cfg.fetch("repo"), self.commit, dir(t))
       log = File.join(@state, "prepare-#{t}.log")
       File.write(log, "")
       seed_lock(t)
@@ -260,7 +313,7 @@ module Readiness
     # The base lock starts from the suite's own lock (if it has one), the candidate lock from the base lock, so
     # only Rails and what Rails itself requires differ.
     def seed_lock(t)
-      src = t == "base" ? File.join(dir(t), @cfg.fetch("lock", "#{gemfile}.lock")) : eco_lock("base")
+      src = t == "base" ? File.join(dir(t), @cfg.fetch("lock", "#{gemfile}.lock")) : base_owner.eco_lock("base")
       FileUtils.cp(src, eco_lock(t)) if File.exist?(src)
     end
 
@@ -269,6 +322,7 @@ module Readiness
     end
 
     def run(t, n, seed, prep)
+      return base_owner.run(t, n, seed, prep) if t == "base" && shared?
       key = Readiness.sha([@name, prep["commit"], rails[t]["sha"], prep["lock_sha"], ruby_v, seed, inputs])
       f = File.join(@state, "run-#{t}-#{n}-#{key[0, 12]}.json")
       return JSON.parse(File.read(f)) if File.exist?(f)
@@ -285,17 +339,19 @@ module Readiness
       e = env(t, seed_env(seed, extra_testopts))
       if framework == "rspec"
         e["READINESS_RSPEC_DIR"] = json
-        e["SPEC_OPTS"] = "--seed #{seed} --require #{File.join(HERE, "rspec_json.rb")} --format progress --format LowrailReadinessJSON"
+        e["SPEC_OPTS"] = "--seed #{seed} --require #{File.join(HERE, "rspec_json.rb")}"
       elsif framework == "cucumber"
         e["CUCUMBER_OPTS"] = "--order random:#{seed} --format pretty --no-color"
       elsif framework == "test-unit"
         e["TESTOPTS"] = "--order=random #{extra_testopts}".strip
         e["RUBYOPT"] = "-r#{File.join(HERE, "test_unit_seed.rb")} #{e["RUBYOPT"]}".strip
       end
-      timeout = @r.m.fetch("timeout", 3600)
       t0 = Time.now
       system(e, "timeout --kill-after=30 #{timeout} #{eco(t, cmd)}", chdir: dir(t), out: log, err: [:child, :out])
       status = $?.exitstatus
+      # No exit status: `timeout` itself was signaled, so the round is being stopped. Caching this partial run would
+      # make the resumed round read it as the result.
+      raise "#{stem}: stopped by signal #{$?.termsig}, not cached" if status.nil?
       res = Parse.call(framework, log, json, self).merge("status" => status, "secs" => (Time.now - t0).round, "log" => log)
       res.merge!("loaded" => false, "signature" => "timed out after #{timeout}s") if [124, 137].include?(status)
       res
@@ -303,6 +359,7 @@ module Readiness
 
     # One test alone on tree t, `times` times; returns how often it failed and how often it did not run.
     def alone(t, test, times)
+      return base_owner.alone(t, test, times) if t == "base" && shared?
       seed = @r.seeds.first
       f = File.join(@state, "alone-#{t}-#{Readiness.sha([test, run_key_base(t)])[0, 12]}.json")
       return JSON.parse(File.read(f)) if File.exist?(f)
@@ -334,9 +391,10 @@ module Readiness
     end
 
     def lock_diff
-      return nil unless File.exist?(eco_lock("base")) && File.exist?(eco_lock("cand"))
+      base = base_owner.eco_lock("base")
+      return nil unless File.exist?(base) && File.exist?(eco_lock("cand"))
       o, = Open3.capture2({ "BUNDLE_GEMFILE" => eco_lock("cand").delete_suffix(".lock") }, "mise", "exec", "ruby@#{ruby}", "--", "ruby",
-        File.join(ECO, "eco-locks.rb"), eco_lock("base"), eco_lock("cand"), chdir: dir("cand"))
+        File.join(ECO, "eco-locks.rb"), base, eco_lock("cand"), chdir: dir("cand"))
       o.lines.map(&:strip)
     end
   end
@@ -448,9 +506,15 @@ module Readiness
     # The exception that stopped a process before any test ran: Ruby's "file:line:in 'm': msg (Class)",
     # a Bundler resolution error, or nil.
     def crash_signature(text, suite)
+      lines = text.lines
+      # Rake: "bin/rails aborted!" and the message (with its class unless it is a RuntimeError) on the next line.
+      if (i = lines.rindex { _1 =~ /\A\S+ aborted!$/ }) && (msg = lines[(i + 1)..].find { !_1.strip.empty? })
+        msg = msg.strip
+        return norm(msg.match?(/\A[A-Z]\w*(?:::\w+)*: /) ? msg : "RuntimeError: #{msg}", suite)
+      end
       if (l = text.lines.reverse.find { _1 =~ /:in .*: .+ \(([A-Z]\w*(?:::\w+)*)\)$/ })
         cls = l[/\(([A-Z]\w*(?:::\w+)*)\)$/, 1]
-        msg = l.sub(/\A.*?:in [^:]*: /, "").sub(/ \(#{Regexp.escape(cls)}\)\s*\z/, "")
+        msg = l.sub(/\A.*?:in (?:'[^']*'|`[^']*'|[^:]*): /, "").sub(/ \(#{Regexp.escape(cls)}\)\s*\z/, "")
         return norm("#{cls}: #{msg}", suite)
       end
       if (l = text.lines.reverse.find { _1 =~ /\A([A-Z]\w*(?:::\w+)*): .+ \(\1\)$/ })
@@ -508,6 +572,9 @@ module Readiness
     def tests
       b, c = fails("base"), fails("cand")
       alone_n = @s.r.m.fetch("alone_runs", 5)
+      # Tests rerun alone, at most alone_max per suite (an order-dependent group can be hundreds); the rest read
+      # as one-seed.
+      alone_left = @s.cfg.fetch("alone_max", @s.r.m.fetch("alone_max", 1_000_000))
       c.flat_map(&:keys).uniq.sort.filter_map do |id|
         cf = c.count { _1.key?(id) }
         bf = b.count { _1.key?(id) }
@@ -523,7 +590,11 @@ module Readiness
           end
         elsif cf == 2
           row.merge("class" => "confirmed")
+        elsif alone_left <= 0
+          seed = by("cand").find { fails_in(_1, id) }["seed"]
+          row.merge("class" => "one-seed", "detail" => "failed under seed #{seed} only; not run alone (more than #{@s.cfg.fetch("alone_max", @s.r.m["alone_max"])} such tests)")
         else
+          alone_left -= 1
           seed = by("cand").find { fails_in(_1, id) }["seed"]
           Readiness.log "#{@s.name}: #{id} failed under seed #{seed} only; #{alone_n} runs alone per tree"
           ac, ab = @s.alone("cand", id, alone_n), @s.alone("base", id, alone_n)
@@ -581,7 +652,7 @@ module Readiness
   end
 
   class Report
-    CLASSES = %w[confirmed suite-did-not-load signature-changed flaky-candidate order-dependent test-count-mismatch base-failing].freeze
+    CLASSES = %w[confirmed suite-did-not-load signature-changed flaky-candidate order-dependent one-seed test-count-mismatch base-failing].freeze
 
     def initialize(round, results, known)
       @r, @results, @known = round, results, known
@@ -635,7 +706,8 @@ module Readiness
       @results.each do |s|
         fmt = ->(t) { s["runs"].select { _1["tree"] == t }.map { |x| x["loaded"] ? "#{x["total"]} / #{x["failed"]}F" : "did not load" }.join(", ") }
         counts = s["flags"].map { _1["class"] }.tally.sort_by { CLASSES.index(_1[0]) }.map { "#{_2} #{_1}" }.join(", ")
-        own = [("Rails #{s["rails"]["base"]["sha"][0, 10]} → #{s["rails"]["cand"]["sha"][0, 10]}" if s["rails"] != head["rails"]),
+        picks = s["rails"]["cand"]["picks"]&.then { " (#{s["rails"]["cand"]["ref"].to_s[0, 10]} + ##{_1.join(", #")})" }
+        own = [("Rails #{s["rails"]["base"]["sha"][0, 10]} → #{s["rails"]["cand"]["sha"][0, 10]}#{picks}" if s["rails"] != head["rails"]),
                (s["ruby"].split(" (").first if s["ruby"] != head["ruby"])].compact
         extra = own + [("bumps: " + s["bumps"].map { |k, v| "#{k} #{v.is_a?(Hash) ? v.values.join(" ") : v}" }.join(", ") if s["bumps"].any?),
                        ("shims: #{s["shims"].size}" if s["shims"].any?)].compact
@@ -643,7 +715,8 @@ module Readiness
               "#{counts.empty? ? "–" : counts} | #{Array(s["lock_diff"]).join(", ")} |\n"
       end
       md << "\nRuns read as tests / failed tests. Classes: `confirmed` fails 2/2 on the candidate and passes 2/2 on base; " \
-            "`flaky-candidate` and `order-dependent` fail under one seed only (then run alone #{@r.m.fetch("alone_runs", 5)} times per tree); " \
+            "`flaky-candidate` and `order-dependent` fail under one seed only (then run alone #{@r.m.fetch("alone_runs", 5)} times per tree), " \
+            "`one-seed` too but past the suite's cap on alone reruns; " \
             "`base-failing` fails on base too; `signature-changed` fails on both with different errors. " \
             "Flags are matched against the known findings in `bench/upstream/readiness/known.yml`.\n"
       fresh = rows.select { _1["match"] == "new" && _1["class"] != "base-failing" }
@@ -669,8 +742,8 @@ module Readiness
   # --check: the manifest's keys and shapes, its patch files, the known findings, and (with refs) that every
   # Rails and suite ref resolves.
   class Check
-    TOP = %w[ruby rails seeds alone_runs timeout suites known].freeze
-    SUITE = %w[repo ref framework test setup env gemfile lock shims bumps single ruby rails services exclusive].freeze
+    TOP = %w[ruby rails seeds alone_runs alone_max timeout suites known].freeze
+    SUITE = %w[repo ref framework test setup env gemfile lock shims bumps single ruby rails services exclusive share_base timeout alone_max].freeze
 
     def initialize(round)
       @r = round
@@ -679,17 +752,30 @@ module Readiness
     def call(resolve:)
       m = @r.m
       p = []
-      p << "unknown top-level keys #{(m.keys - TOP).join(", ")}" if (m.keys - TOP).any?
+      extra = m.keys - TOP - m.keys.grep(/\Ax-/) # x-… keys hold YAML anchors
+      p << "unknown top-level keys #{extra.join(", ")}" if extra.any?
       p << "seeds: give two (A for run 1, B for run 2)" unless m["seeds"].is_a?(Array) && m["seeds"].size == 2 && m["seeds"].all? { _1.is_a?(Integer) && _1 < 0xFFFF }
       p << "rails: base and candidate required" unless m.dig("rails", "base") && m.dig("rails", "candidate")
       p << "ruby required" unless m["ruby"]
       m.fetch("suites", {}).each { |name, cfg| p.concat(suite(name, cfg).map { "#{name}: #{_1}" }) }
+      m.fetch("suites", {}).each do |name, cfg|
+        next unless cfg.is_a?(Hash) && (other = cfg["share_base"])
+        next p << "#{name}: share_base #{other} is not a suite" unless m["suites"][other].is_a?(Hash)
+        next p << "#{name}: share_base #{other} shares another base itself" if m["suites"][other]["share_base"]
+        a, b = @r.suite(name).base_view, @r.suite(other).base_view
+        p << "#{name}: base side differs from #{other} in #{(a.keys | b.keys).reject { a[_1] == b[_1] }.join(", ")}" if a != b
+      end
       p.concat(Known.load(@r).problems.map { "known: #{_1}" })
       rubies = ([m["ruby"]] + m.fetch("suites", {}).values.filter_map { _1["ruby"] }).compact.map(&:to_s).uniq
       rubies.each { |v| warn "#{@r.path}: warning: ruby #{v} is not installed (mise install ruby@#{v})" unless system("mise", "where", "ruby@#{v}", out: File::NULL, err: File::NULL) }
       if resolve && p.empty?
-        refs = [@r.rails_ref("base"), @r.rails_ref("cand")] + m["suites"].values.flat_map { [_1.dig("rails", "base"), _1.dig("rails", "candidate")] }.compact
-        refs.uniq.each { |ref| Readiness.fetch(File.join(@r.work, "rails.git"), @r.repo, ref.to_s) rescue p << "rails ref #{ref} does not resolve" }
+        specs = [@r.rails_ref("base"), @r.rails_ref("cand")] + m["suites"].values.flat_map { [_1.dig("rails", "base"), _1.dig("rails", "candidate")] }.compact
+        rails_clone = File.join(@r.work, "rails.git")
+        specs.map { _1.is_a?(Hash) ? _1["ref"] : _1 }.uniq.each { |ref| Readiness.fetch(rails_clone, @r.repo, ref.to_s) rescue p << "rails ref #{ref} does not resolve" }
+        specs.grep(Hash).flat_map { _1["picks"].to_a }.uniq.each do |pr, head|
+          system("git", "-C", rails_clone, "fetch", "-q", "origin", "pull/#{pr}/head", err: File::NULL)
+          p << "rails pick ##{pr}: #{head} not found" unless system("git", "-C", rails_clone, "cat-file", "-e", "#{head}^{commit}", err: File::NULL)
+        end
         m["suites"].each do |name, cfg|
           s = @r.suite(name)
           Readiness.fetch(s.clone, cfg["repo"], cfg["ref"].to_s)
@@ -716,6 +802,12 @@ module Readiness
         p << "patch #{s["patch"]} not found" if s.is_a?(Hash) && s["patch"] && !File.exist?(File.expand_path(s["patch"], File.dirname(@r.path)))
       end
       cfg.fetch("bumps", {}).each { |g, v| p << "bump #{g}: give a version string or {git:, ref:}" unless v.is_a?(String) || (v.is_a?(Hash) && v.any?) }
+      %w[base candidate].each do |k|
+        spec = cfg.dig("rails", k)
+        next unless spec.is_a?(Hash)
+        p << "rails #{k}: give ref and picks" unless spec["ref"] && spec["picks"].is_a?(Hash) && (spec.keys - %w[ref picks]).empty?
+        spec["picks"].to_h.each { |pr, head| p << "rails #{k} pick #{pr}: give the full 40-character head SHA" unless head.to_s.match?(/\A\h{40}\z/) }
+      end
       p
     end
   end

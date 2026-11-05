@@ -1,0 +1,6 @@
+railsbench   interp main 3555,3578,3597,3492,3504 (min-max 3492-3597, med 3555)  ANALYZE 3777,3548,3616,3556,3518 (min-max 3518-3777, med 3556)  med +0.0%
+railsbench   yjit   main 1734,1763,1727,1776,1728 (min-max 1727-1776, med 1734)  ANALYZE 1744,1796,1797,1709,1705 (min-max 1705-1797, med 1744)  med +0.6%
+activerecord interp main 257,251,248,259,247 (min-max 247-259, med 251)  ANALYZE 249,248,259,245,247 (min-max 245-259, med 248)  med -1.2%
+activerecord yjit   main 89,88,89,88,86 (min-max 86-89, med 88)  ANALYZE 93,90,92,88,93 (min-max 88-93, med 92)  med +4.5%
+sequel       interp main 58,57,62,59,59 (min-max 57-62, med 59)  ANALYZE 58,55,58,55,61 (min-max 55-61, med 58)  med -1.7%
+sequel       yjit   main 39,38,38,37,39 (min-max 37-39, med 38)  ANALYZE 38,38,40,38,38 (min-max 38-40, med 38)  med +0.0%

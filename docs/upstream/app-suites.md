@@ -542,6 +542,22 @@ so main's result is consistent and the test relied on the mismatch: 2 failures
 **SU5 (c): activerecord-import 2.1.0 calls the removed `validation_context=`**: 14 failures in the data import
 job and Intercom importer specs.
 
+*Readiness runner (2026-11-05), Chatwoot develop [`17b246068c`](https://github.com/chatwoot/chatwoot/tree/17b246068c1e141ba0dc8488ca7f4c83f466e8ce),
+main `bdb3d96012`* ([readiness](readiness.md#full-run-of-the-app-round-2026-11-05)): the same port and bumps, 7682
+examples. CW1–CW5, SU5 and the mail fallout as above, plus one new group:
+
+**CW6 (c), covered by our open #59574: a positional `Arel::Table.new` in Chatwoot's new conversation summary.**
+[`Arel::Table.new(:message_candidates)`](https://github.com/chatwoot/chatwoot/blob/17b246068c1e141ba0dc8488ca7f4c83f466e8ce/app/models/concerns/conversation_message_summary_queries.rb#L29),
+added on 2026-11-05 (chatwoot#16135, simplified in #16563), raises `ArgumentError: wrong number of arguments (given 1,
+expected 0)` on main: 54 failures (12 direct, 42 as 500s or a `pluck` on nil in the conversation list controllers).
+The cause is b1650993b0 (#57829), the positional table name of [arel-table-positional](arel-table-positional.md), as
+in PI1; with #59574 cherry-picked (`chatwoot-prs`) all 54 pass and CW1/CW2 are gone too (#59642, #59644). No new
+patch; Chatwoot's side would be `name:`.
+
+*Noise, candidate only:* 16 examples of `bulk_actions_controller_spec` (`Validation failed: User has already been
+taken` from the `inbox_member` factory) and `remove_stale_redis_keys_job_spec` fail under seed 4242 in one worker on
+both main variants, and pass 5/5 alone on both trees; the cause (an earlier file in that worker's order) wasn't traced.
+
 **Deprecations that only main emits** (warnings in the main run): 1817 `` `verify_authenticity_token` is deprecated
 … use `skip_forgery_protection` `` (as in Redmine and Forem); 16 `config.active_record.raise_on_assign_to_attr_readonly`
 is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
@@ -699,6 +715,17 @@ which the plain class lacks: `NameError`, a 500 for a POST to `/auth/*` without 
 * 3 (b): `ActiveModel::Errors#inspect` now prints `#<ActiveModel::Errors:0x… @errors=[]>` (4c0776608a, #56865,
   `instance_variables_to_inspect`); `steps_inspector_spec` matches 8.1's `#<ActiveModel::Errors []>`.
 * Not seen: S2, SU1–SU5, R2-x, E1–E4, AR-1–AR-3, L1, L2.
+
+*Readiness runner (2026-11-05), Discourse main [`f2eb5d605b`](https://github.com/discourse/discourse/tree/f2eb5d605b577bb62715c5df54ef390f133a9e81),
+Rails main `bdb3d96012`* ([readiness](readiness.md#full-run-of-the-app-round-2026-11-05)): 35822 examples, the same
+setup. 8-1: 28 F and 33 F, all environment as above. Plain main stops at DS1 in `db:migrate`. With the DS1 shim
+(`discourse-shimmed`), 158 candidate flags, all known: #59574's json_api_kit case 101, DS3 6, DS4 1, S1 1, the
+rspec-rails `_prefixes` 5, `precision: nil` 10, `Errors#inspect` 3, `Vary` 3, and 28 environment failures on both
+trees. DS2 and AR-4 are gone: #59595 (376d2d97db) and our #59634 (06eae38e6e) are on main now. One `Vary` failure is
+new because Discourse changed the spec: discourse#45549 (2026-11-05, "Update Rails components to 8.1.4.1") made
+`application_controller_spec`'s vary test expect 8.1.4.1's `Accept, X-Requested-With`, so main's added
+`Sec-Fetch-Site` fails it as well (open #59500, not ours). With our open PRs cherry-picked (`discourse-prs`) the
+json_api_kit failures are gone and the rest stays.
 
 **Deprecations that only main emits** (warnings, counted in the full main run):
 * 1246: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` ``, from
@@ -1300,8 +1327,22 @@ shows in the same files; the first version's 43 on seed 1717 included the 22-fai
 patch, Zammad's deprecation toolkit fails 448 examples on the new warning, which is the intended signal. [patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
 [body](../../bench/upstream/app_suites/zm1-body.md). Branch
 [`thomasklemm/bind-attribute-column-name`](https://github.com/thomasklemm/rails/tree/thomasklemm/bind-attribute-column-name)
-@ `53a0183864` on main `bdb3d96012` (earlier `a2a89ee17b`, then `72d0b21869`; force-pushed with lease). App-side fix
-for Zammad: pass `table[:login]`.
+@ `0db82ad5cc` on main `bdb3d96012` (earlier `a2a89ee17b`, `72d0b21869`, `53a0183864`, then `ebbb6c49be`; force-pushed with lease).
+App-side fix for Zammad: pass `table[:login]`.
+
+Astra review (2026-11-05). The Ractor point is moot: after `ractorize!`, `ActiveRecord.deprecator` is shareable
+(it is in `Rails.application.deprecators`, made shareable with the app), and a probe calling
+`ActiveRecord.deprecator.warn` in `on_ractor` with `deprecation = :raise` got the `DeprecationException`, as main's own
+test does for `ActiveJob.deprecator`. Applied: the body's cost wording ("about 300 Callgrind instructions per
+`PredicateBuilder#build` call (+1.2%, Ruby 4.0.9 interpreter)", committed with the OP1 update), the comparison-type
+test asserts `name` and `value_for_database`, the comment says "one extra `is_a?`". Skeptical reviewer: no blocker;
+applied that on 8.1 an Arel attribute gets the default type (`type_for_attribute` → `resolve_attribute_name` →
+`to_s`), so the message and CHANGELOG now say 8.1 needs the column name, and a test for a table without a model (a
+`table.model.type_for_attribute` mutant passed every other test). Predicate builder tests 64 runs, Active Record on
+SQLite 10,293 runs, 0 failures; RuboCop clean. Astra round 2: approve, three nits applied (`0db82ad5cc`): the model-less test also asserts the
+bind's name and type (a mutant renaming the bind only without a model failed nothing before), a duck-typed attribute
+double with `name` and `type_caster` must not warn (fails on `unless attribute.is_a?(Arel::Attributes::Attribute)`),
+and the body's 8.1 and Zammad wording. Predicate builder tests 65 runs, RuboCop clean.
 
 **ZM2 (c): rspec-rails 8.0.4's channel example group can't find the connection class.** `graphql_channel_spec`'s
 `stub_connection` raises `Described class is not a connection class` (4): rspec-rails 8.0.4 reads
@@ -1722,8 +1763,18 @@ freeze), and after `ractorize!` the setter stored a mutable hash that another Ra
 fixed: the setter freezes its argument once the registry is frozen; `ractors_test` reassigns after `ractorize!` and
 reads from a Ractor). Body at 173 words, "the registry and every parser value must be shareable". Re-review: open; the
 optional nit (`make_shareable` in the hook, so a plain-lambda parser fails at `ractorize!` instead of in the Ractor)
-is left out, because #57952 deliberately leaves shareability of the parsers to the app. Branch
-`thomasklemm/parameter-parsers-register-in-place` @ `c5df553fa3` on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+is left out, because #57952 deliberately leaves shareability of the parsers to the app. Astra review (2026-11-05), both
+confirmed: the setter's `@parameter_parsers.frozen?` check froze the replacement after a manual `freeze` (8.1: mutable)
+and the first assignment on a fresh `Class.new(ActionDispatch::Request)` (`nil.frozen?`). Fixed with a
+`Parameters.parameter_parsers_frozen` flag that the `before_ractorize` hook sets; the Ractor test now calls the XML and
+reassigned JSON parsers. Skeptical reviewer: no blocker; applied a test that registers in place on the untouched
+defaults (only the gated railties test caught a revert of `DEFAULT_PARSERS.dup`) and freezing `Request` subclasses in the
+hook, as main's setter did. actionpack 4520 runs and `ractors_test` (RACK=head) 19 runs green, RuboCop clean. Branch
+Astra round 2: includers of `Parameters` outside `Request`'s hierarchy escaped the hook, and includers after the hook got a
+mutable `DEFAULT_PARSERS.dup` (Ractor::IsolationError from another Ractor); both confirmed. Fixed: the included block goes
+through the setter, and the hook freezes every class extended with `Parameters::ClassMethods` (one `ObjectSpace` pass).
+The new railties test fails on a `subclasses` mutant (grandchild), a `Request.descendants` mutant (unrelated includer)
+and the old `.dup` (Ractor read). actionpack 4520 runs, `ractors_test` 20 runs green, RuboCop clean. `thomasklemm/parameter-parsers-register-in-place` @ `49b835ba58` (earlier `c5df553fa3`, `860a2c7220`, then `6331f39542`; Astra round 3 on `6331f39542`: approve, its nit applied: the Ractor test calls the later-included JSON parser) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
 [body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
 
 **OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)
@@ -1858,7 +1909,20 @@ json/array/hstore/geometric; RuboCop: all green. The jsonb repro and `op8_probe2
 no json column default; the redundant nil guard on encrypted types dropped; the commit message's limits); its
 encrypted probes (string, serialized and json, nil and non-nil defaults) match 8.1 or main as intended. Follow-up, not
 in this fix: scalar time-zone-aware datetime defaults stay frozen and, per an earlier review, are cast once in the
-boot zone on main; not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `f95cc1b6df` on main
+boot zone on main; not verified here. Astra review (2026-11-05), all four points confirmed and applied: a duck-typed type without the hook raised
+`NoMethodError` at schema load, so `Attribute`, `EncryptedAttributeType` and `NormalizedValueType` now treat a type
+without `freezable_default?` as freezable, as on main; new tests pin encrypted NULL and non-NULL string defaults and a
+normalized NULL json staying frozen, a counting coder that schema load and `new` never call, and a nested NULL default
+not shared; the frozen-copy test (green on main) is dropped and the combined test renamed; the body narrows to
+`Helpers::Mutable` and `serialize` and states the Callgrind basis. Each new assertion fails on its wrong implementation.
+Skeptical reviewer: one blocker, applied (the combined test's DDL failed under `sqlite3_ractor`; now through
+`main_ractor_connection`), plus two nits (the save-as-NULL half of the until-read test pinned main's behaviour, removed;
+a test name). activemodel 1253 runs; AR serialized, attributes, dirty, defaults, normalized, encryption 458 (SQLite) and
+462 (PostgreSQL) runs, PostgreSQL json/array/hstore 154 runs, `serialized_attribute_test` on `sqlite3_ractor`, all green;
+RuboCop clean. Astra round 2 on `3b35e79cb5`: approve, two nits applied: the encrypted and normalized wrappers around
+`Type::Json` must accept `nil` and reject `"{}"` (a `cast_type.freezable_default?(nil)` mutant passed before), and the body
+says which microbenchmarks the 18–22% are. Branch `thomasklemm/frozen-default-attribute-unread` @ `9b2a64d040` (earlier
+`f95cc1b6df`, `de7aff270c`, `c52724804d`, `3b35e79cb5`) on main
 `bdb3d96012` (rails/rails main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).

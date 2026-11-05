@@ -1,0 +1,60 @@
+diff --git a/spree/common_spree_dependencies.rb b/spree/common_spree_dependencies.rb
+index 5bba8ba610..9e4ac3bf2e 100644
+--- a/spree/common_spree_dependencies.rb
++++ b/spree/common_spree_dependencies.rb
+@@ -4,7 +4,7 @@
+ source 'https://rubygems.org'
+ 
+ gem 'tzinfo-data', platforms: [:windows]
+-gem 'rails', ENV.fetch('RAILS_VERSION', '~> 8.1.0'), require: false
++gem 'rails', path: ENV.fetch('ECO_RAILS'), require: false # readiness: the tree under test, for the root bundle
+ 
+ # Held below 3.0: json 3.0 made JSON.parse's options keyword-only, and Active
+ # Support 8.1 still passes them positionally, so reading any JSON column raises
+diff --git a/spree/core/lib/generators/spree/dummy/templates/rails/boot.rb b/spree/core/lib/generators/spree/dummy/templates/rails/boot.rb
+index 7c8a8d2d33..c2856c17a1 100644
+--- a/spree/core/lib/generators/spree/dummy/templates/rails/boot.rb
++++ b/spree/core/lib/generators/spree/dummy/templates/rails/boot.rb
+@@ -1,6 +1,6 @@
+ require 'rubygems'
+ gemfile = File.expand_path("<%= gemfile_path %>", __FILE__)
+ 
+-ENV['BUNDLE_GEMFILE'] = gemfile
++ENV['BUNDLE_GEMFILE'] ||= gemfile # readiness: keep the eco Gemfile
+ require 'bundler'
+ Bundler.setup
+diff --git a/spree/core/lib/generators/spree/dummy/templates/rails/database.yml b/spree/core/lib/generators/spree/dummy/templates/rails/database.yml
+index e6a98019ca..87cd1fc8d0 100644
+--- a/spree/core/lib/generators/spree/dummy/templates/rails/database.yml
++++ b/spree/core/lib/generators/spree/dummy/templates/rails/database.yml
+@@ -37,7 +37,7 @@ development:
+   database: <%= lib_name %>_spree_development
+ test:
+   <<: *mysql
+-  database: <%= lib_name %>_spree_test<%%= ENV['TEST_ENV_NUMBER'] %>
++  database: <%= lib_name %>_spree_test_<%= ENV['READINESS_TREE'] %><%%= ENV['TEST_ENV_NUMBER'] %>
+ production:
+   <<: *mysql
+   database: <%= lib_name %>_spree_production
+@@ -61,7 +61,7 @@ development:
+   database: <%= lib_name %>_spree_development
+ test:
+   <<: *postgres
+-  database: <%= lib_name %>_spree_test<%%= ENV['TEST_ENV_NUMBER'] %>
++  database: <%= lib_name %>_spree_test_<%= ENV['READINESS_TREE'] %><%%= ENV['TEST_ENV_NUMBER'] %>
+ production:
+   <<: *postgres
+   database: <%= lib_name %>_spree_production
+diff --git a/spree/core/spree_core.gemspec b/spree/core/spree_core.gemspec
+index 5578bd1edf..f7364b2e10 100644
+--- a/spree/core/spree_core.gemspec
++++ b/spree/core/spree_core.gemspec
+@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
+   # if any code it produced stops resolving through Spree::IsoData.
+   s.add_development_dependency 'i18n-tasks'
+ 
+-  s.add_dependency 'rails', '>= 8.1', '< 8.2'
++  s.add_dependency 'rails', '>= 8.1', '< 8.3'
+ 
+ 
+   s.add_dependency 'acts_as_list', '>= 0.8'

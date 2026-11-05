@@ -1,4 +1,4 @@
-From 53a018386436ffb596500e075a36038497e44a2f Mon Sep 17 00:00:00 2001
+From 0db82ad5cc56fb019054ba799b3c60bce91402f0 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 12:59:29 +0000
 Subject: [PATCH] Accept a column name in build_bind_attribute again,
@@ -9,19 +9,19 @@ takes an Arel attribute, and callers that pass a column name, as on 8.1, raise
 NoMethodError. Build the bind as 8.1 did, from the name and the table's type for
 it, and warn.
 ---
- activerecord/CHANGELOG.md                     |  6 ++++
- .../relation/predicate_builder.rb             | 10 ++++++
- .../cases/relation/predicate_builder_test.rb  | 34 +++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ activerecord/CHANGELOG.md                     |  6 ++
+ .../relation/predicate_builder.rb             | 11 ++++
+ .../cases/relation/predicate_builder_test.rb  | 58 +++++++++++++++++++
+ 3 files changed, 75 insertions(+)
 
 diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
-index 4ad8bfd285..ad18ac95f5 100644
+index 4ad8bfd285..00a7bebb59 100644
 --- a/activerecord/CHANGELOG.md
 +++ b/activerecord/CHANGELOG.md
 @@ -1,3 +1,9 @@
 +*   Deprecate passing a column name to `ActiveRecord::PredicateBuilder#build_bind_attribute`.
 +
-+    Pass the column's Arel attribute instead, such as `arel_table[:login]`.
++    Pass the column's Arel attribute instead, such as `arel_table[:login]`. Rails 8.1 needs the column name.
 +
 +    *Thomas Klemm*
 +
@@ -29,19 +29,20 @@ index 4ad8bfd285..ad18ac95f5 100644
  
      A serialization failure rolls back whatever the statement was part of, so a
 diff --git a/activerecord/lib/active_record/relation/predicate_builder.rb b/activerecord/lib/active_record/relation/predicate_builder.rb
-index ec7c878395..7ef7abaf56 100644
+index ec7c878395..a54bcebef8 100644
 --- a/activerecord/lib/active_record/relation/predicate_builder.rb
 +++ b/activerecord/lib/active_record/relation/predicate_builder.rb
-@@ -126,6 +126,16 @@ def predicate_value(attribute, value)
+@@ -126,6 +126,17 @@ def predicate_value(attribute, value)
      end
  
      def build_bind_attribute(attribute, value)
-+      # Checked first so the common Arel attribute path pays a single is_a?.
++      # Checked first so the common Arel attribute path pays one extra is_a?.
 +      if !attribute.is_a?(Arel::Attributes::Attribute) && (attribute.is_a?(String) || attribute.is_a?(Symbol))
 +        ActiveRecord.deprecator.warn(<<~MSG.squish)
 +          Passing a column name to `ActiveRecord::PredicateBuilder#build_bind_attribute`
 +          is deprecated and will be removed in Rails 9.0. Pass the column's Arel
-+          attribute instead, such as `arel_table[#{attribute.to_sym.inspect}]`.
++          attribute instead, such as `arel_table[#{attribute.to_sym.inspect}]`;
++          Rails 8.1 needs the column name.
 +        MSG
 +        return Relation::QueryAttribute.new(attribute, value, table.arel_table.type_for_attribute(attribute))
 +      end
@@ -50,10 +51,10 @@ index ec7c878395..7ef7abaf56 100644
        attribute.is_a?(ComparisonAttribute) ? ComparisonValue.new(bind) : bind
      end
 diff --git a/activerecord/test/cases/relation/predicate_builder_test.rb b/activerecord/test/cases/relation/predicate_builder_test.rb
-index 82d7b2569f..3d109aa949 100644
+index 82d7b2569f..8dab80b10c 100644
 --- a/activerecord/test/cases/relation/predicate_builder_test.rb
 +++ b/activerecord/test/cases/relation/predicate_builder_test.rb
-@@ -244,6 +244,40 @@ def test_build_from_hash_with_dot_notation_matches_nested_hash
+@@ -244,6 +244,64 @@ def test_build_from_hash_with_dot_notation_matches_nested_hash
        assert_equal hash_predicates.map(&:to_sql), dot_predicates.map(&:to_sql)
      end
  
@@ -72,6 +73,28 @@ index 82d7b2569f..3d109aa949 100644
 +      end
 +    end
 +
++    def test_build_bind_attribute_with_a_column_name_on_a_table_without_a_model
++      arel_table = Arel::Table.new(name: "topics", type_caster: ActiveRecord::TypeCaster::Connection.new(Topic, "topics"))
++      builder = PredicateBuilder.new(TableMetadata.new(nil, arel_table))
++      bind = assert_deprecated(/Pass the column's Arel attribute/, ActiveRecord.deprecator) do
++        builder.build_bind_attribute("id", "1")
++      end
++
++      assert_equal "id", bind.name
++      assert_instance_of Topic.type_for_attribute("id").class, bind.type
++      assert_equal 1, bind.value_for_database
++    end
++
++    def test_build_bind_attribute_with_an_attribute_like_object_is_not_deprecated
++      attribute = Struct.new(:name, :type_caster).new("title", Topic.type_for_attribute("title"))
++      bind = assert_not_deprecated(ActiveRecord.deprecator) do
++        Topic.predicate_builder.build_bind_attribute(attribute, "Rails")
++      end
++
++      assert_equal "title", bind.name
++      assert_equal "Rails", bind.value_for_database
++    end
++
 +    def test_build_bind_attribute_with_an_attribute_alias_keeps_the_alias_name
 +      bind = assert_deprecated(/Pass the column's Arel attribute/, ActiveRecord.deprecator) do
 +        Topic.predicate_builder.build_bind_attribute("heading", "Rails")
@@ -88,7 +111,9 @@ index 82d7b2569f..3d109aa949 100644
 +      end
 +
 +      assert_instance_of Relation::QueryAttribute, bind
++      assert_equal "title", bind.name
 +      assert_same type, bind.type
++      assert_equal "Rails", bind.value_for_database
 +    end
 +
      def test_does_not_mutate

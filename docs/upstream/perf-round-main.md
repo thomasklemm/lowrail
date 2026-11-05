@@ -4,7 +4,7 @@ This round looked for rails/rails performance PRs where main still costs more th
 [`6e09124217`](https://github.com/rails/rails/commit/6e091242176c322edc5a8907583c01b08b8a60bc). Three follow-up
 topics were added during the round: QueryIntent's slot size on Ruby master, a search for #18345-class hash spills,
 and the cost of the Rails 8.1.1 → 8.1.4.1 bump in ruby-bench. The candidates are built, reviewed and measured, but
-not opened: the rails/rails queue is full, so they go into [`queue.tsv`](../../bench/upstream/pr-queue/queue.tsv)
+not opened: the rails/rails queue is full, so they go into the [PR queue](../../bench/upstream/pr-queue/items)
 behind the correctness PRs already waiting there.
 
 **Result: three candidates, A–C.** One more was built and rejected (D), and the other starting points are recorded

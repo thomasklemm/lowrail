@@ -1,0 +1,5 @@
+These columns show changes to the marking cost of one collection, which iteration time and GC time per iteration miss. ruby/ruby#19685 marks each ZJIT JITFrame ISEQ once per GC. With ZJIT, over three rounds with one process per build, it lowered the mean marking time of one minor GC by 49–59% on railsbench, 8–10% on lobsters and 23–33% on shipit, compared with master in the same round. Two master processes differed by at most 9%, and iteration time and GC time per iteration didn't separate the patch from them. I measured this with a script that reads the same `GC::Profiler` records.
+
+On Ruby 4.1, `GC::Profiler` records each collection's marking time (ruby/ruby#17431). `--harness=gc` now keeps it per iteration for minor and major collections, as `mark ms/minor` and `mark ms/major` and their ratios, with one `--pvalue` sample per iteration. Ruby 4.0 and TruffleRuby output doesn't change.
+
+This complements XrXr's #562, which removes GC time from the timings. Once eightbitraptor's #541 lands, its GC per ruby table shows these columns too. Both change `lib/benchmark_runner.rb`; if #541 lands first, I'll rebase this onto it.

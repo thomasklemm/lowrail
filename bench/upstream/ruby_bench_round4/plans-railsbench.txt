@@ -1,0 +1,8 @@
+sqlite_stat1 before ANALYZE: no; after: 3 rows, ANALYZE 11.67 ms
+statements per pass: 2 distinct strings, 2 distinct shapes (literals as N), 2000 executions, 2 distinct SELECTs
+  x1970   SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT ?
+  x30     SELECT "posts".* FROM "posts"
+plans changed: 0 distinct, 0 executions per pass
+SQLite time per pass (median of 5 x 200 reps, times executions): all SELECTs 19.512 -> 14.464 ms; changed 0.000 -> 0.000 ms
+rows identical before/after ANALYZE: all 2
+responses identical before/after ANALYZE: all 102 (statuses {200 => 102})

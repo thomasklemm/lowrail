@@ -1,12 +1,15 @@
 # ruby-bench: what is worth contributing upstream (2026-11-03)
 
+Overview of all our ruby-bench work: [ruby-bench.md](ruby-bench.md).
+
 [ruby/ruby-bench](https://github.com/ruby/ruby-bench) gives the Ruby and ZJIT teams their headline numbers, and it
 is our source of truth for ZJIT speed claims ([DECISIONS](../DECISIONS.md#evidence-and-measurement)). This page
 checks the pain points recorded in our docs, looks for gaps in the suite, and ranks candidate improvements by their
 value to the maintainers. It is an evaluation only. Nothing was built upstream, and nothing was opened or posted.
 [Round 2](#round-2-five-topics-checked-and-the-prs-opened-2026-11-05) (2026-11-05, at the end) checks five more topics
 and records the PRs that opened from them. [Round 3](#round-3-rails-benchmarks-on-windows-2026-11-05) prepares a PR that runs
-erubi-rails, lobsters and railsbench in the Windows CI job.
+erubi-rails, lobsters and railsbench in the Windows CI job. [Round 4](#round-4-analyze-for-the-other-database-benchmarks-2026-11-05)
+finds that no other database benchmark needs #565's `ANALYZE`.
 
 **Pins.** Ruby master [`a8b095a07e`](https://github.com/ruby/ruby/commit/a8b095a07e55adf429839d4642027e832e30d3a7),
 release build (`-O3 -ggdb3`, `--enable-zjit --enable-yjit`), the same build as [zjit-yjit-gap](zjit-yjit-gap.md).
@@ -680,7 +683,7 @@ benchmarks don't run in that job anyway), a separate paragraph saying Linux resu
 not #5877's renames.
 
 **PR state.** [ruby/ruby-bench#568](https://github.com/ruby/ruby-bench/pull/568), head `41c21df1ac`, two commits on
-#567's. The #567 rebase plan is unchanged. With this, ruby-bench's Windows job excludes nothing.
+#567's. k0kubun merged #567 (`20cd3483c7`, 18:48 UTC) and then #568 (`0897d76aa2`, 18:49 UTC) on 2026-11-05, so no rebase was needed. With this, ruby-bench's Windows job excludes nothing.
 
 **Body (as edited; [file](../../bench/upstream/ruby_bench_round3/windows-body.md)):**
 
@@ -697,3 +700,59 @@ not #5877's renames.
 > This also changes graphql-native on Linux. It returns the same tokens and AST for `negotiate.gql`, but runs about 2% more instructions per iteration (Cachegrind, Ruby 4.0.9 interpreter, fixed heap, two runs each; two runs of 1.1.3 differ by 0.3%). The extra instructions are in the C lexer and parser that 1.1.4 and 1.2.0 regenerated for their number, BOM and parser-stack changes, not in #5877's renames.
 >
 > In this run on my fork, both `benchmark-default-windows` jobs pass and run all four benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42063514767
+
+## Follow-up: where graphql-native's 2% went
+
+The +2.1% from graphql-c_parser 1.1.3 to 1.2.0 is almost all a679c9dff8 (BOM support, +1.66%). The pure-Ruby parser
+got +24% more expensive between graphql 2.5.11 and master, almost all from one commit (2a8d95680b, +22.74%). Per-commit
+tables, two exact candidate fixes and the rejected variants are in [graphql-ruby.md](graphql-ruby.md).
+
+# Round 4: ANALYZE for the other database benchmarks (2026-11-05)
+
+Thomas asked whether #565 should also run `ANALYZE` in the other benchmarks that use a database, as further commits in the
+same PR. `ANALYZE` changes no query, only plans, and every benchmark it touches loses comparability with its
+rubybench history, so each one needs its own gain. Rule: add it only if the plan change saves about 1% of an iteration
+(time or Ir) beyond the A/A, or measurably narrows the run-to-run spread.
+
+**Pins.** ruby-bench main `00f0f8b`, unchanged since round 2, so shipit was not re-run. Ruby 4.0.9 (mise build);
+sqlite3 gem 2.7.3 (railsbench, activerecord) and 1.7.3 (sequel). Variants are `cp -a` copies of main (`base-a`, `base-b`)
+and of main plus one `ANALYZE` line right after the data exists (`anlz-a`, `anlz-b`): railsbench after
+`config/environment` (its `db:seed` runs in `use_gemfile`), activerecord after the inserts, sequel after the 10,000
+creates.
+
+| benchmark | `sqlite_stat1` after setup | statements per pass | plans changed | SQLite time per pass, before → after | Ir per iteration (A/A; ANALYZE a, b) | wall median, interp / YJIT (main → ANALYZE) | output |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| railsbench | no | 2 (1,970 `id = ?` lookups, 30 full scans) | 0 | 19.5 → 14.5 ms (other run 15.4 → 14.2) | 7.350 G (+0.13%; −0.15%, −0.01%) | 3,555 → 3,556 ms / 1,734 → 1,744 ms | 102 routes, all 200, bodies identical |
+| activerecord | no | 2 (posts `ORDER BY id LIMIT`, comments `post_id IN (100 binds)`), 10 each | 0 | 25.5 → 27.6 ms (20.5 → 20.6) | 2.065 G (+0.26%; +0.12%, +0.07%) | 251 → 248 ms / 88 → 92 ms | rows identical |
+| sequel | no | 1 shape (`id = N`, literals inlined), 1,000 | 0 | 2.39 → 2.60 ms (2.41 → 2.43) | 394 M (−1.28%; +1.87%, −1.00%) | 59 → 58 ms / 38 → 38 ms | rows identical |
+| erubi-rails | – | no database: Active Record not loaded (`active_record/railtie` commented out, no `database.yml`), no SQLite file open | – | – | – | – | – |
+| shipit (round 2) | no | 23 SELECTs, 4,275 | 6 (275 executions) | 1.13 → 0.99 ms for the six | – | – | identical |
+
+Wall ranges over five interleaved rounds (5 warmup + 20 iterations, `setarch -R taskset -c 1`, one process at a time):
+railsbench interpreter 3,492–3,597 vs 3,518–3,777 ms, YJIT 1,727–1,776 vs 1,705–1,797 ms; activerecord 247–259 vs
+245–259 ms, YJIT 86–89 vs 88–93 ms; sequel 57–62 vs 55–61 ms, YJIT 37–39 vs 38–40 ms. No spread narrows; the only
+outside-range moves (railsbench's 3,777 ms, activerecord YJIT +4.5%) go the wrong way and have no plan change behind
+them.
+
+**Why nothing changes.** railsbench, activerecord and sequel have no index besides the primary key
+(activerecord's `comments.post_id` is unindexed), so SQLite has only rowid lookups and full scans to choose from.
+The SQLite time differences come from timing repeated statements in one process (the two harness runs disagree in
+sign), not from plans. railsbench's 5 ms would be 0.14% of an iteration even if real, and Ir doesn't show it.
+
+**Verdict: no commits.** No benchmark meets the rule; #565 stays at `41985a9f3b`, one commit, and fork CI was not
+needed. Its body got one paragraph (PATCH via REST, 18:29 UTC, no comment) so maintainers see why only lobsters
+changes:
+
+> The other database benchmarks don't get `ANALYZE`. In railsbench, activerecord and sequel it changes no query plan, since their tables have no index besides the primary key. In shipit it changes 6 of 23 plans, but saves under 0.02% of an iteration. erubi-rails doesn't load Active Record.
+
+**Review.** A skeptical subagent checked every claim against code and data (no index, no plan change, erubi-rails,
+shipit's 0.02%, harness coverage of Sequel's logger and IN-list binds, no other DB benchmark in the suite; rubocop
+only mentions SQLite in fixture text) and found them true. Applied: its wording ("changes no query plan", split
+sentences, "doesn't load Active Record").
+
+**Receipts** in [`bench/upstream/ruby_bench_round4/`](../../bench/upstream/ruby_bench_round4/):
+[`db_plans_harness.rb`](../../bench/upstream/ruby_bench_round4/db_plans_harness.rb) (round 2's plans harness plus
+Sequel, response hashes, row identity), `plans-*.txt`/`.json`, [`ir.rb`](../../bench/upstream/ruby_bench_round4/ir.rb)
+and `ir-summary.md` (cachegrind, fixed heap from [bench.md](../bench.md), (4 − 1 iterations) / 3 after 2 warmups),
+[`wall.sh`](../../bench/upstream/ruby_bench_round4/wall.sh) with `wall-results.txt` and `wall-summary.txt`, and the
+body before and after.

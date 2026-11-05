@@ -175,11 +175,16 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 
 ## Submission queue (2026-11-03)
 
-Every finished candidate (review gates passed, body drafted) goes into the **Queue** section of
-[upstream/contributions.md](upstream/contributions.md), ranked by effect and breadth, and opens only when its repo
-has room. Open the strongest first. A candidate made moot upstream leaves the queue with a note.
+Every candidate gets one file in [bench/upstream/pr-queue/items](../bench/upstream/pr-queue/items) once its branch
+and body exist (format and states in its [README](../bench/upstream/pr-queue/README.md), 2026-11-05): title, the
+body exactly as posted, impact, rank by effect and breadth, and every review pass with the head it reviewed. It opens
+only when its repo has room, strongest first, through `script/pr-queue open`, which refuses unless the gates below
+pass on the current head. A candidate made moot upstream moves to `superseded` or `closed` with a note.
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
+* **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
+  preferably grouped by theme and likely reviewer. The coordinator marks them ready when a slot under GitHub's 15
+  frees (Thomas, 2026-11-05; first order: #59662 OP8, #59663 ZM1, #59661 OP1, #59667 DC1, #59668 E2b). The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
 * **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04;
   20 before). We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
@@ -188,6 +193,11 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
   **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
   for a response to an earlier one.
+* **Stacked PRs open right away** (Thomas, 2026-11-05): a PR that builds on another of ours opens without waiting.
+  Its body starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is new here.", and
+  #N's body links back to it. Once #N merges, rebase the stacked PR so its diff shrinks to its own change. GitHub's
+  native stacked PRs need both branches in the base repository, so they don't work from our fork. Reason:
+  ruby-bench #567 carried #566's commit, #567 merged first, and #566 became an empty squash commit.
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
   failure of ours, because each push notifies reviewers and reruns CI.
@@ -221,6 +231,21 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
   changed allocation. Rails changes made only for ZJIT need a win of their own on the Ruby pin.
 
 ## Review gates
+
+### Review rounds before anything opens (Thomas, 2026-11-05)
+
+Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
+
+1. The orb's own skeptical reviewer subagent, rerun after every rewrite (most orbs have no Codex CLI).
+2. Sol (`codex exec -m gpt-6.1-sol`, read-only), run by the coordinator on the patch and body.
+3. Astra (`codex exec -m gpt-6-astra`) in addition for correctness changes on hot paths, Ractor/thread or
+   frozen-object semantics, and anything a maintainer has pushed back on before.
+4. `thermos` for larger diffs (several files or a new mechanism).
+
+Every confirmed finding is fixed and the changed part reviewed again; the round ends when a pass has no must-fix.
+A head change after the last pass means another pass. An item is `reviewed` only when skeptic and Sol, Astra when
+`risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current `head`;
+`script/pr-queue open` and `ready` check this and refuse otherwise.
 
 ### Readability gate (L0–L3)
 
@@ -262,6 +287,24 @@ A human reviewer has to get the essence in a few seconds.
 * **Correctness PRs carry no performance numbers** (Thomas, on #59617). The body says what was broken, what now
   happens and what was tested. Cost measurements stay in the Lowrail doc and come up only if a maintainer asks,
   unless the fix measurably slows a common path.
+
+### Code comments in upstream patches (byroot on #59555, 2026-11-05)
+
+byroot, on the comment above our `Array#index_with`: "This isn't something that should be surfaced in Rails docs.
+it's an implementation detail. If anything that specialized version could be `:nodoc:`. I don't mind AI PRs, but
+please read them and curb their tendency to spew tons of comments." Fixed in #59659 by deleting the comment.
+(`class Array` is already `# :nodoc:` in that file, so the comment never reached the API docs. The volume was the
+real problem.)
+
+* **No comment directly above a public or documented method** unless it is meant as API docs. RDoc publishes it.
+  Internal specializations and helpers get `# :nodoc:` on the `def` line instead (as Rails does for
+  `Hash#compact_blank`), unless the enclosing class or module is already `# :nodoc:`.
+* **Comments are the exception.** Add one only when a reader would otherwise undo the code. Then it is one line,
+  and it says why, not what. Explanations of cost, Ruby internals or the regression belong in the PR body or the
+  Lowrail record.
+* Reviewers asking for "a comment so nobody deletes this" doesn't override this: prefer a test that fails
+  when the line is removed.
+* Before a queued branch opens, check its added comment lines against these rules.
 
 ### Correctness fixes: readable first (2026-11-04)
 

@@ -23,4 +23,15 @@ class LowrailReadinessJSON < RSpec::Core::Formatters::JsonFormatter
     super
     output.close unless output.closed?
   end
+
+  # Added here instead of with `--format` in SPEC_OPTS: RSpec takes SPEC_OPTS' formatters in place of the command
+  # line's, which dropped Discourse's turbo_rspec worker formatter (its FIFO was never opened, so the parent waited
+  # forever). This runs after the command line's formatters and RSpec's default (progress, when there are none).
+  module Add
+    def setup_default(output_stream, deprecation_stream)
+      super
+      add(LowrailReadinessJSON, output_stream) unless @formatters.any?(LowrailReadinessJSON)
+    end
+  end
+  RSpec::Core::Formatters::Loader.prepend(Add)
 end
