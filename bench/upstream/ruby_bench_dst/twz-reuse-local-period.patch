@@ -1,0 +1,56 @@
+commit 4779066d803b5f405a2be40eddf126bf3ed20151
+Author: Thomas Klemm <github@tklemm.eu>
+Date:   Thu Nov 5 21:03:54 2026 +0000
+
+    Reuse the only local period when wrapping a TimeWithZone
+    
+    wrap_with_time_zone and change kept the current period only when it was
+    among the periods for the new local time, and otherwise passed nil, so
+    the constructor looked the same local time up in TZInfo again. That
+    happens whenever the result is in another period than the receiver: on
+    the other side of a DST change (70.days.ago, beginning_of_day on the day
+    clocks change) or in another zone (change(zone:)).
+    
+    When the current period doesn't apply and the local time has exactly one
+    period, pass that one on; it equals the one the constructor would find.
+    Gaps and overlaps keep the existing path.
+    
+    Zones without transitions now return their memoized period from
+    periods_for_local as well, as period_for_utc and period_for_local
+    already do, so the passed-on period is that shared one.
+
+diff --git a/activesupport/lib/active_support/time_with_zone.rb b/activesupport/lib/active_support/time_with_zone.rb
+index cf5ab63eae..1d3db60f59 100644
+--- a/activesupport/lib/active_support/time_with_zone.rb
++++ b/activesupport/lib/active_support/time_with_zone.rb
+@@ -452,7 +452,7 @@ def change(options)
+       new_zone ||= time_zone
+       periods = new_zone.periods_for_local(new_time)
+ 
+-      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : nil)
++      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : (periods.first if periods.one?))
+     end
+ 
+     # Uses Date to provide precise Time calculations for years, months, and days
+@@ -661,7 +661,7 @@ def duration_of_variable_length?(obj)
+       def wrap_with_time_zone(time)
+         if time.acts_like?(:time)
+           periods = time_zone.periods_for_local(time)
+-          self.class.new(nil, time_zone, time, periods.include?(period) ? period : nil)
++          self.class.new(nil, time_zone, time, periods.include?(period) ? period : (periods.first if periods.one?))
+         elsif time.is_a?(Range)
+           wrap_with_time_zone(time.begin)..wrap_with_time_zone(time.end)
+         else
+diff --git a/activesupport/lib/active_support/values/time_zone.rb b/activesupport/lib/active_support/values/time_zone.rb
+index 42cd39defe..721e5b6056 100644
+--- a/activesupport/lib/active_support/values/time_zone.rb
++++ b/activesupport/lib/active_support/values/time_zone.rb
+@@ -642,7 +642,7 @@ def period_for_local(time, dst = true) # :nodoc:
+     end
+ 
+     def periods_for_local(time) # :nodoc:
+-      tzinfo.periods_for_local(time)
++      @constant_period ? [@constant_period] : tzinfo.periods_for_local(time)
+     end
+ 
+     def abbr(time) # :nodoc:
