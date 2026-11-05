@@ -35,7 +35,7 @@ Since #58479, the internal [`PredicateBuilder#build_bind_attribute`](https://git
 - authlogic 6.6.1's [`FindWithCase#sensitive_comparison`](https://github.com/binarylogic/authlogic/blob/9b8cfe8b14b9cc172d45c570f2823298b0bdf0ed/lib/authlogic/acts_as_authentic/queries/find_with_case.rb#L54) passes a String.
 - Mastodon's [`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/status/safe_reblog_insert.rb#L64) passes a String.
 
-For a String or Symbol, this warns through `ActiveRecord.deprecator` and returns the same bind as 8.1: the name as given and the table's type for it, also for alias names and comparison-expression types. Arel attributes pay one extra `is_a?`, about 300 Callgrind instructions per `PredicateBuilder#build` call (+1.2%, Ruby 4.0.9 interpreter). The tests check name, type and value against what 8.1 builds, also for a table without a model. On 8.1 an Arel attribute falls back to the default value type, so the message says 8.1 needs the column name.
+For a String or Symbol, this warns through `ActiveRecord.deprecator` and returns the same bind as 8.1: the name as given and the table's type for it, also for alias names and comparison-expression types. Arel attributes pay one extra `is_a?`, about 300 Callgrind instructions per `PredicateBuilder#build` call (+1.2%, Ruby 4.0.9 interpreter). The tests check name, type and value against what 8.1 builds, also for a table without a model. On 8.1 an Arel attribute falls back to the default value type, so the message tells code that supports Rails 8.1 and earlier to keep passing the column name there.
 
 ---
 
