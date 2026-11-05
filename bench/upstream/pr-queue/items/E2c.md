@@ -14,9 +14,9 @@ alternative_of:
 impact: "a permanent SQLite index whose name a temporary index shares reads its own columns and statement again, not the temporary index's columns twice"
 rank: 9
 risky: true
-state: in-review
+state: reviewed
 pr:
-note: "stacked on E2 (not yet opened; body says #E2PR, replace with E2's PR number at open); moved from E2b because qualified index pragmas need E2's NOCASE hiding"
+note: "reviewed on 6c80a5583b; stacked on E2 (body says #E2PR, replace with E2's PR number at open); opens as a draft only when Thomas asks"
 passes:
   - {reviewer: skeptic, head: "cd90c26ce8", date: 2026-11-05, verdict: nits, open: "commit message reworded in 6ffd1872fe (same tree); no test for the pragma_index_list schema argument, declined: redundant once E2 hides case-differing tables"}
   - {reviewer: skeptic, head: "6ffd1872fe", date: 2026-11-05, verdict: approve, open: "message-only amend of cd90c26ce8, identical tree"}
@@ -25,6 +25,10 @@ passes:
   - {reviewer: sol, head: "4d1fa492ce", date: 2026-11-05, verdict: changes, open: "standalone on E2b: permanent Foo + temp foo reads the permanent indexes (main reads temp); stack on E2"}
   - {reviewer: astra, head: "4d1fa492ce", date: 2026-11-05, verdict: changes, open: "same regression; mutant dropping the schema from pragma_index_list survives behavioral tests"}
   - {reviewer: skeptic, head: "6c80a5583b", date: 2026-11-05, verdict: nits, open: "body Gizmos sentence reworded (both indexes, not the permanent one), applied; pragma_index_list schema argument is an equivalent mutant (hiding already resolves it), kept for symmetry, guarded by test_indexes_logs; comment wording kept as the coordinator set it"}
+  - {reviewer: sol, head: "6c80a5583b", date: 2026-11-05, verdict: approve, open: "round 4, scope stated"}
+  - {reviewer: astra, head: "6c80a5583b", date: 2026-11-05, verdict: approve, open: "schema-qualified lookups; composite keys hold regardless of tie order"}
+waived:
+  - {reviewer: thermos, head: "6c80a5583b", by: coordinator, date: 2026-11-05, reason: "own commit is about 100 lines; the rest of the 216-line diff against main is E2 and E2b, which have their own passes"}
 ---
 
 # Read each SQLite index from its own schema in the schema readers

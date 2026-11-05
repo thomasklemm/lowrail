@@ -16,7 +16,7 @@ rank: 5
 risky: false
 state: draft
 pr: 59668
-note: "opened as draft 2026-11-05; round 3 on main 1e235cee11: tie-order where assertion dropped, permanent-view hiding test, check-constraint assertion; body via REST; E2 stacked on it, E2c on E2"
+note: "opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
@@ -26,6 +26,8 @@ passes:
   - {reviewer: sol, head: "52c21b2fa4", date: 2026-11-05, verdict: changes, open: "partial-index where assertion depends on sort tie order; comment claims a guarantee; check constraints sentence untested"}
   - {reviewer: astra, head: "52c21b2fa4", date: 2026-11-05, verdict: changes, open: "type != 'table' mutant passes (permanent views not hidden); fixed in bc90b487f2"}
   - {reviewer: skeptic, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "no tie-order assertion left; type != 'table' mutant and permanent-wins mutant fail; posted body checked"}
+  - {reviewer: sol, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "round 4, scope stated"}
+  - {reviewer: astra, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "all four table/view shadowing combinations; no order-dependent assertions"}
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers

@@ -54,6 +54,9 @@ head it reviewed. When a fix changes the branch, update `head` to the new commit
 and stop counting. A body-only change keeps the head, so it needs no new code pass, but its text was reviewed by
 whichever pass is listed.
 
+A thermos pass can be waived on one head: `waived: [{reviewer: thermos, head: "…", by: coordinator, reason: …}]`.
+It counts like an approving pass on that head only; skeptic, Sol and Astra can't be waived.
+
 Items that are already open and ready may have no body.
 
 Migrated passes whose head the old ledger didn't record have `head: unrecorded`; they never count.

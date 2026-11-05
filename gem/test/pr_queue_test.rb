@@ -27,4 +27,13 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes), 201)
     assert_equal %w[thermos], PrQueue.missing(item(passes), nil)
   end
+
+  def test_a_thermos_waiver_counts_only_on_the_current_head_with_a_reason
+    passes = [pass("skeptic", "bbbbbbbbbb"), pass("sol", "bbbbbbbbbb")]
+    waiver = { "reviewer" => "thermos", "head" => "bbbbbbb", "by" => "coordinator", "reason" => "own commit is small" }
+    assert_empty PrQueue.missing(item(passes).merge("waived" => [waiver]), 216)
+    assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("head" => "aaaaaaaaaa")]), 216)
+    assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("reason" => "")]), 216)
+    assert_equal %w[sol], PrQueue.missing(item(passes.first(1)).merge("waived" => [waiver.merge("reviewer" => "sol")]), 40)
+  end
 end
