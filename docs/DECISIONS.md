@@ -185,8 +185,11 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
 * **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
-  preferably grouped by theme and likely reviewer. The coordinator marks them ready when a slot under GitHub's 15
-  frees (Thomas, 2026-11-05; first order: #59662 OP8, #59663 ZM1, #59661 OP1, #59667 DC1, #59668 E2b). The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
+  preferably grouped by theme and likely reviewer. The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
+* **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
+  coordinator marking Rails drafts ready). Agents may open reviewed items as drafts in any repo with room, with every
+  pass on the exact head; neither the coordinator nor W1 runs `script/pr-queue ready`. Ready order he was given:
+  #59662 OP8, #59663 ZM1, #59661 OP1, #59667 DC1, #59668 E2b.
 * **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04;
   20 before). We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
