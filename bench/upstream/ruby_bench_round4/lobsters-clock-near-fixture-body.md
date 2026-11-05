@@ -1,0 +1,17 @@
+Alternative to #571: also fixes the clock, but near the fixture's dates, so the 16 time-filtered requests render stories. Merge one of the two.
+
+The fixture's stories are from 2023-07-18, so on main /active, /recent and /top?length=1d|1w|1y (16 of 114 requests per iteration) render empty lists. This fixes `Time.now` at 2023-07-19 01:00 UTC, about 15 hours after the stories. As in #571, the work then no longer depends on the date the benchmark runs.
+
+/top never listed a story, whatever the date. Its `DATETIME('now', '- 1 DAY')` is NULL, because SQLite rejects `- 1` and has no WEEK. The modifier is now `-1 DAY`, with weeks as 7 days, the same arithmetic upstream lobsters' IntervalHelper uses. The deliberate change is that the query binds `Time.current` where upstream uses SQLite's `'now'`, so /top follows the fixed clock.
+
+Per pass after warmup, as I measured them on Ruby 4.0.9:
+
+| | stories in lists | KB | objects |
+| --- | ---: | ---: | ---: |
+| main | 145 | 3,709 | 658,492 |
+| #571 | 145 | 3,709 | 649,706 |
+| this PR | 545 | 4,771 | 950,426 |
+
+The 16 requests now render 25 stories each. Because stories and comments are hours old, pages also take the branches for recent content: reply and flag links, delete instead of disown, scores of comments under 36 hours shown as `~`, and one user marked as new. This is a deliberate workload change, about +44% objects per iteration against main (+46% against #571).
+
+All 114 response bodies are byte-identical between processes run on 2026-11-05 and 2027-01-20, apart from CSRF tokens. As in #571, only `Time.now` is fixed, during boot and the benchmark block, and cache entries and the session don't age.
