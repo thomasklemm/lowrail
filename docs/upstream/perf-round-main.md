@@ -12,9 +12,9 @@ below with their numbers.
 
 | rank | candidate | branch @ commit | effect | readability | review |
 | ---: | --- | --- | --- | --- | --- |
-| A | QueryIntent keeps its background session and mutex in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`5e26a026f1`](https://github.com/thomasklemm/rails/commit/5e26a026f1180469fca5172c7382da7d02602277) on main `1e235cee11` | Ruby master: every intent goes from a 512-byte to a 256-byte slot, −256 B per query; objects unchanged | L1 | skeptic: approve; Sol and Astra pending on this head |
+| A | QueryIntent keeps its background session and mutex in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`68c907bbeb`](https://github.com/thomasklemm/rails/commit/68c907bbeb6f03af43d15ddbcfe6137487c4ee36) on main `1e235cee11` | Ruby master: intents in the measured query shapes go from a 512-byte to a 256-byte slot, −256 B per query; foreground objects unchanged | L1 | Sol/Astra fix first on `5e26a026f1`, applied; skeptic approve on `68c907bbeb`; Sol and Astra again |
 | B (not opened) | `tag_options` skips the second blank check when the name is the key | [`thomasklemm/tag-options-blank-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-options-blank-once) `ddd44b197e` (rebase of `2dc1231b26`) | the shortcut saves −2.0% per String-key tag call but is not exact; the exact form is main's code | – | closed: [below](#refresh-on-main-1e235cee11-2026-11-05-evening) |
-| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`defa5dc860`](https://github.com/thomasklemm/rails/commit/defa5dc8602281d03db9d65770e9f749fd1931e5) on main `1e235cee11` | `consumes?` −17.3%, `emitting?` −13.1% per call (app-free case) | L0 | skeptic: approve; Sol pending on this head |
+| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`defa5dc860`](https://github.com/thomasklemm/rails/commit/defa5dc8602281d03db9d65770e9f749fd1931e5) on main `1e235cee11` | `consumes?` −17.3%, `emitting?` −13.1% per call (app-free case) | L0 | Sol fix first on `defa5dc860`; coordinator accepted the snapshot and the private-helper arity; body pins SHAs; Sol again |
 | D (rejected) | `connection_handler` checks for the main Ractor first | not pushed; [patch](../../bench/upstream/perf_round/patches/rejected/connection-handler-main-ractor.patch) | −188 Ir per call (−6%), ≈0.055% of shipit | – | don't ship: breaks the `sqlite3_ractor` test hook |
 
 Queue items (metadata, passes and the body as posted): [PM1](../../bench/upstream/pr-queue/items/PM1.md),
@@ -328,6 +328,28 @@ and [`qi.rb`](../../bench/upstream/perf_round/cases/qi.rb); slot bytes per query
   cases raise `NoMethodError` on main).
 * **Readability.** PM1 L1 (unchanged code; comment now "Background-only state, kept apart so that every intent stays
   small."). PM3 L0, no comments added. RuboCop clean on both.
+
+### Second round: Sol and Astra on 5e26a026f1 and defa5dc860
+
+The coordinator set the contract: what is reachable through public API or Rails' own callers must be identical to
+main; overrides of private and `:nodoc:` internals are out of scope; claims are scoped to what was measured.
+
+* **PM1 → [`68c907bbeb`](https://github.com/thomasklemm/rails/commit/68c907bbeb6f03af43d15ddbcfe6137487c4ee36).**
+  Claims scoped to the measured shapes, with the background → foreground fallback → bind `RangeError` →
+  `affected_rows` path named (31 ivars, main 32); objects "unchanged in these foreground queries, scheduling
+  allocates one struct". No Rails code calls `session`/`session=`, and the one scheduler
+  (`query_intent.rb:224`) passes `ActiveRecord::Base.asynchronous_queries_session`, whose `current_session`
+  returns a `Session` or raises, so no nil session reaches `pending?`/`canceled?`/`ensure_result`; no forwarding
+  accessors added. New test "copies and frozen intents keep their own lock wait": passes on main, and a mutant with
+  `lock_wait` in the struct fails it in each half separately (`Expected 0.0 to be nil.`). Comment: "Keep background
+  state separate to reduce the intent's instance variable count."; the struct's own `:nodoc:` removed. Bytes
+  re-measured on the head (same table); `Post.find` Ir 316,644 / 316,720 (A/A) / 316,530 mean of three: negligible.
+  Skeptic: approve.
+* **PM3, head unchanged `defa5dc860`.** The saving is exactly the second `logger` read, so no exact form exists; the
+  coordinator accepts the disclosed snapshot. `log_level_satisfied?` is private and referenced only in its own file;
+  `EventReporter::LogSubscriber` is meant to be subclassed (activesupport CHANGELOG on main; unreleased, no tag
+  contains aebcb61520), but a private helper isn't an extension point, so the arity change stays and the body says
+  so. Body pins full base, candidate and Ruby SHAs.
 
 ## D (rejected). `connection_handler` asks `Ractors.main?` first
 
