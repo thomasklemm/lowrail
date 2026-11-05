@@ -4,3 +4,4 @@ D1	thomasklemm/memcache-set-multi-dalli-version	59637	ebb011880eaac3212257e2288d
 SU1	thomasklemm/local-cache-anonymous-store	59640	2b02aad60c4e2db83a9d7e950c540252ece23ee9
 CW1	thomasklemm/where-empty-condition-binds	59642	58a6ff8355ff6b905c6aeae2ea939466f464b4fa
 CW2	thomasklemm/resolver-find-all-hook	59644	0d3ef774bd115ede07048bd0194a27c2bafc03de
+OP3	thomasklemm/validation-context-writer	59660	0ba3dad80bdd63dc4f769fd192dc550c05f39aea
