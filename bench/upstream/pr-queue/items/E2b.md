@@ -5,7 +5,7 @@ kind: fix
 area: Active Record SQLite schema readers
 reviewer: "ngan (author of 2cb3daba96, #58498), byroot (merged it)"
 branch: thomasklemm/sqlite-schema-readers-temp-shadowing
-head: "472c680d15"
+head: "52c21b2fa4"
 base: main
 built_on: "8b06b0eb98"
 depends_on: []
@@ -16,11 +16,13 @@ rank: 5
 risky: false
 state: draft
 pr: 59668
-note: "opened as draft 2026-11-05; must land before E2; skeptic must-fix on 472c680d15 (same-named temp index), awaiting the coordinator before any change"
+note: "opened as draft 2026-11-05; skeptic must-fix fixed in 3029db3847 (sqlite_master first again), comment reworded in 52c21b2fa4; body narrowed via REST; E2 and E2c are stacked on it"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
   - {reviewer: skeptic, head: "472c680d15", date: 2026-11-05, verdict: changes, open: "must-fix: sqlite_temp_master first makes index_details read a same-named temp index CREATE, so the permanent index loses where: (main keeps it); fix: keep sqlite_master first. Follow-up: pragma_index_info still resolves temp first (columns doubled, from 2cb3daba96). Nit: check constraints etc. also come from the temp CREATE, not only collation"}
+  - {reviewer: skeptic, head: "3029db3847", date: 2026-11-05, verdict: nits, open: "no must-fix; comment overstated the sort order (ties unordered with PRAGMA threads > 0, main equally exposed), reworded in 52c21b2fa4; check constraints, auto-increment and generated columns from the temp CREATE confirmed and named in the body"}
+  - {reviewer: skeptic, head: "52c21b2fa4", date: 2026-11-05, verdict: approve, open: "confirm pass: comment-only delta accurate; posted body checked (temp index sentence, check constraints, auto-increment, generated columns)"}
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers
@@ -34,7 +36,7 @@ The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of 
 | `indexes` | 1 | 2 (the same index twice) | 1 |
 | `temp_name` collation | nil | nil | NOCASE |
 
-The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Temporary indexes and triggers don't take part, so they hide nothing. The collation row goes beyond 8-1-stable: it read columns from the temporary table but the CREATE statement of the permanent one.
+The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Temporary indexes and triggers don't take part, so they hide no table or view. A temporary index that shares a permanent index's name still gives its columns, twice, to the permanent one, as on main; that is a separate fix. The collation row goes beyond 8-1-stable, which read the columns from the temporary table but the CREATE statement of the permanent one. Check constraints, auto-increment and generated columns are read from that statement too, so they now come from the temporary table as well.
 
 ---
 
