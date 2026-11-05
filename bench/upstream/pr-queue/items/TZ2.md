@@ -17,9 +17,10 @@ rank: 2
 risky: false
 state: ready
 pr: 171
-note: "prepared refresh only; live PR stays at 57c9c3ad35; Tests run 42121909175 passes 39/39 jobs, differential 42122136308 passes the current matrix, verified Windows x86 42122881130 passes; local 5597 named outcomes match; Ir cohort rejected at maximum A/A 0.1537%, no speed claim; Sol pending; coordinator applies the update"
+note: "posted 2026-11-05: PR branch moved 57c9c3ad35 -> 57056ddd7f (rebase onto master 1207d6098d, same patch) and body replaced; Thomas allowed the update"
 passes:
   - {reviewer: skeptic, head: "57056ddd7f46f9c292e46687821636e812102c85", date: 2026-11-05, verdict: approve, open: "exact code and shortened body approved; no must-fix or body nit; recommends one update as a simpler file-load decoder, not an app-speed claim; record's skip wording corrected"}
+  - {reviewer: sol, head: "57056ddd7f", date: 2026-11-05, verdict: approve, open: "body checked against the record; patch identical to 57c9c3ad35"}
 ---
 
 # Decode signed 64-bit zoneinfo transition times directly
