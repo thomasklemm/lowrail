@@ -1,4 +1,4 @@
-From d9e614dcab2f79b96e3b51b4c709fda3f2da1d8a Mon Sep 17 00:00:00 2001
+From 63d1880397fdb2dc6a563e385ed2c2137dcb5eb9 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 20:26:40 +0000
 Subject: [PATCH] Find SQLite tables by any ASCII case of their name in the
@@ -22,10 +22,10 @@ of the permanent one.
  3 files changed, 85 insertions(+), 11 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 31f932bc30..a8e32c3dba 100644
+index 80d1fedec0..ac8676c4fd 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -76,22 +76,27 @@ def schema_creation # :nodoc
+@@ -75,22 +75,27 @@ def schema_creation # :nodoc
              WITH master AS (
                SELECT name, type, sql FROM sqlite_master
                WHERE type NOT IN ('table', 'view')
@@ -94,7 +94,7 @@ index 0da5ffeadb..4106de9b59 100644
            SQL
              .transform_values do |group|
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index c36d00af60..9484b8e8b1 100644
+index 66a3ff912b..1ce1049bcd 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 @@ -527,7 +527,7 @@ def test_insert_logged

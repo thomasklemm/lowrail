@@ -1,4 +1,4 @@
-Stacked on #59668, which should merge first; only the last commit (`4d1fa492ce`) is new here.
+Stacked on #E2PR, which should merge first; only the last commit (`6c80a5583b`) is new here.
 
 ### Read each SQLite index from its own schema in the schema readers
 
@@ -11,7 +11,7 @@ A temporary index may have the name of a permanent one, since the two live in di
 | `indexes("temporary_items")` columns | label | label, label | label |
 | `indexes("temporary_items")` `where` | number > 0 | number > 0 | nil |
 
-8-1-stable was wrong too, one index at a time: it read the columns from the temporary index and the statement from the permanent one. The rows of `MASTER_CTE` now carry their schema, `'main'` or `'temp'`, which goes to `pragma_index_list` and `pragma_index_info`, and the index statements are keyed by schema and name, so they no longer depend on which row the sort returns first for a shared name.
+8-1-stable was wrong too, one index at a time: it read the columns from the temporary index and the statement from the permanent one. The rows of `MASTER_CTE` now carry their schema, `'main'` or `'temp'`, which goes to `pragma_index_list` and `pragma_index_info`, and the index statements are keyed by schema and name, so they no longer depend on which row the sort returns first for a shared name. This builds on #E2PR, whose case-insensitive hiding leaves one row per table: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well as the temporary one's, where SQLite and main read only the temporary one's.
 
 ---
 

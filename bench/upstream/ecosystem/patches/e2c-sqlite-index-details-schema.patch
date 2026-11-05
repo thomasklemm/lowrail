@@ -1,4 +1,4 @@
-From 4d1fa492ce56450cfccc30a6944a263ea0e67dd1 Mon Sep 17 00:00:00 2001
+From 6c80a5583bcaf5f0f869eb8efa6ec7e210f3b51f Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 20:44:19 +0000
 Subject: [PATCH] Read each SQLite index from its own schema in the schema
@@ -13,37 +13,34 @@ twice, and could take the other index's CREATE INDEX statement. Carry
 the schema of each master row and pass it to the pragmas, and key the
 index statements by schema and name.
 ---
- .../sqlite3/schema_statements.rb              | 20 ++++++-------
- .../adapters/sqlite3/sqlite3_adapter_test.rb  | 29 +++++++++++++++----
- 2 files changed, 33 insertions(+), 16 deletions(-)
+ .../sqlite3/schema_statements.rb              | 17 ++++----
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 42 ++++++++++++++++---
+ 2 files changed, 45 insertions(+), 14 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 31f932bc30..3bc9a7d112 100644
+index ac8676c4fd..47336e3fd1 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -70,15 +70,15 @@ def schema_creation # :nodoc
- 
+@@ -71,13 +71,14 @@ def schema_creation # :nodoc
          private
            # sqlite_master lists the permanent objects in the database and
--          # sqlite_temp_master the temporary ones. sqlite_master stays first, as on main,
--          # because index_details takes the first statement it reads for an index name.
-+          # sqlite_temp_master the temporary ones. Unqualified, a pragma reads the
-+          # temporary object of a name, so each row carries its schema for the pragmas.
+           # sqlite_temp_master the temporary ones.
++          # Qualify index pragmas because index names can repeat across schemas.
            MASTER_CTE = <<~SQL
              WITH master AS (
 -              SELECT name, type, sql FROM sqlite_master
 +              SELECT 'main' AS schema, name, type, sql FROM sqlite_master
                WHERE type NOT IN ('table', 'view')
-                 OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+                 OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
                UNION ALL
 -              SELECT name, type, sql FROM sqlite_temp_master
 +              SELECT 'temp', name, type, sql FROM sqlite_temp_master
              )
            SQL
  
-@@ -87,9 +87,9 @@ def fetch_indexes(tables)
+@@ -91,9 +92,9 @@ def fetch_indexes(tables)
  
-             rows = query_all(<<~SQL).group_by { |row| row["table_name"] }
+             rows = group_by_table(query_all(<<~SQL), tables)
                #{MASTER_CTE}
 -              SELECT m.name AS table_name, i.name, i."unique"
 +              SELECT m.name AS table_name, m.schema, i.name, i."unique"
@@ -51,9 +48,9 @@ index 31f932bc30..3bc9a7d112 100644
 -              JOIN pragma_index_list(m.name) i
 +              JOIN pragma_index_list(m.name, m.schema) i
                WHERE m.type = 'table'
-                 AND m.name IN (#{quoted_table_names(tables)})
+                 AND m.name COLLATE NOCASE IN (#{quoted_table_names(tables)})
                  AND i.name NOT GLOB 'sqlite_*'
-@@ -99,7 +99,7 @@ def fetch_indexes(tables)
+@@ -103,7 +104,7 @@ def fetch_indexes(tables)
  
              tables.index_with do |table_name|
                rows.fetch(table_name, []).map do |row|
@@ -62,7 +59,7 @@ index 31f932bc30..3bc9a7d112 100644
  
                  build_index(table_name, row, index_sql, columns)
                end
-@@ -111,11 +111,11 @@ def fetch_indexes(tables)
+@@ -115,11 +116,11 @@ def fetch_indexes(tables)
            def index_details(names)
              return {} if names.empty?
  
@@ -78,7 +75,7 @@ index 31f932bc30..3bc9a7d112 100644
                  AND m.name IN (#{names.map { |name| quote(name) }.join(", ")})
                ORDER BY m.name, i.seqno
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index c36d00af60..036d2f3ece 100644
+index 1ce1049bcd..432acf7998 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 @@ -525,11 +525,11 @@ def test_insert_logged
@@ -88,21 +85,21 @@ index c36d00af60..036d2f3ece 100644
 -              SELECT name, type, sql FROM sqlite_master
 +              SELECT 'main' AS schema, name, type, sql FROM sqlite_master
                WHERE type NOT IN ('table', 'view')
-                 OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+                 OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
                UNION ALL
 -              SELECT name, type, sql FROM sqlite_temp_master
 +              SELECT 'temp', name, type, sql FROM sqlite_temp_master
              )
              SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
                     t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
-@@ -714,15 +714,15 @@ def test_indexes_logs
+@@ -783,15 +783,15 @@ def test_indexes_logs
          with_example_table do
            index_list_query = [<<~SQL.squish, "SCHEMA", []]
              WITH master AS (
 -              SELECT name, type, sql FROM sqlite_master
 +              SELECT 'main' AS schema, name, type, sql FROM sqlite_master
                WHERE type NOT IN ('table', 'view')
-                 OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+                 OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
                UNION ALL
 -              SELECT name, type, sql FROM sqlite_temp_master
 +              SELECT 'temp', name, type, sql FROM sqlite_temp_master
@@ -113,10 +110,10 @@ index c36d00af60..036d2f3ece 100644
 -            JOIN pragma_index_list(m.name) i
 +            JOIN pragma_index_list(m.name, m.schema) i
              WHERE m.type = 'table'
-               AND m.name IN ('ex')
+               AND m.name COLLATE NOCASE IN ('ex')
                AND i.name NOT GLOB 'sqlite_*'
-@@ -920,6 +920,23 @@ def test_schema_readers_read_a_temporary_view_that_hides_a_permanent_table
-         end
+@@ -1010,6 +1010,36 @@ def test_schema_readers_read_a_temporary_table_or_view_that_hides_a_permanent_vi
+         @conn.execute "DROP VIEW IF EXISTS main.shadowed"
        end
  
 +      def test_indexes_read_a_permanent_and_a_temporary_index_of_the_same_name_each_from_its_own_table
@@ -133,6 +130,19 @@ index c36d00af60..036d2f3ece 100644
 +            indexes["temporary_items"].map { |index| [index.name, index.columns, index.where] }
 +        ensure
 +          @conn.execute "DROP TABLE IF EXISTS temp.temporary_items"
++        end
++      end
++
++      def test_indexes_read_a_temporary_table_that_hides_a_permanent_one_of_another_ascii_case
++        with_example_table "id integer PRIMARY KEY, number integer", "Gizmos" do
++          @conn.add_index "Gizmos", :number, name: "permanent_index"
++          @conn.execute "CREATE TEMP TABLE gizmos (id integer PRIMARY KEY, label text)"
++          @conn.execute "CREATE INDEX temp.temporary_index ON gizmos (label)"
++
++          assert_equal({ "Gizmos" => %w[ temporary_index ], "gizmos" => %w[ temporary_index ] },
++            @conn.indexes(["Gizmos", "gizmos"]).transform_values { |indexes| indexes.map(&:name) })
++        ensure
++          @conn.execute "DROP TABLE IF EXISTS temp.gizmos"
 +        end
 +      end
 +
