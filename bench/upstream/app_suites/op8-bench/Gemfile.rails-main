@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+%w[activesupport activemodel activerecord].each { |g| gem g, path: File.join(ENV.fetch("RAILS_PATH"), g) }
+gem "sqlite3"
+gem "json"
+gem "bigdecimal"

@@ -1,44 +1,85 @@
-From 5a4a9596c05cdf426ae1295cd8315ee37779c716 Mon Sep 17 00:00:00 2001
+From 79b9bc05205c2143f4f0e8191586d40809c86382 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Thu, 5 Nov 2026 14:29:33 +0000
-Subject: [PATCH] Keep a new record's copy of a frozen default attribute unread
+Date: Thu, 5 Nov 2026 15:33:23 +0000
+Subject: [PATCH] Keep defaults that records would share or save off the frozen
+ defaults
 
-Since the model's default attributes are frozen at schema load, freezing
-casts each default once, and a new record's copy inherited that value.
-Dirty tracking then compared it with the raw default, so a serialized
-column whose coder does not round-trip its column default reported a
-change the record never made, and saved it: OpenProject's HealthReport
-inserts NULL into its NOT NULL jsonb results column.
+Since a model's default attributes are frozen when every one is
+freezable, freezing casts each default once and every new record dups
+that cast value. Two kinds of default break:
 
-The copy of a frozen attribute now starts unread, as defaults were before.
+* a serialized default whose coder does not round-trip the column
+  default reads as changed in a record that never touched it, so it is
+  saved: a NOT NULL jsonb column with default '{}' and a coder that
+  loads it as [] is inserted as NULL;
+* a default with nested objects is shared, so a change made through one
+  new record shows up in the next.
+
+Attribute#freezable? now returns false when a copy's cast value is not
+shareable or already reads as changed, or when casting it raises. Such a
+model keeps the writable defaults it had before, and each record casts
+its own value.
 ---
- activemodel/lib/active_model/attribute.rb        |  7 ++++++-
- .../test/cases/serialized_attribute_test.rb      | 16 ++++++++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ activemodel/lib/active_model/attribute.rb     |  9 ++++-
+ activemodel/test/cases/attribute_test.rb      | 19 ++++++++++
+ .../test/cases/serialized_attribute_test.rb   | 35 +++++++++++++++++++
+ 3 files changed, 62 insertions(+), 1 deletion(-)
 
 diff --git a/activemodel/lib/active_model/attribute.rb b/activemodel/lib/active_model/attribute.rb
-index e358a34021..7d1bfef893 100644
+index e358a34021..6d81aebc75 100644
 --- a/activemodel/lib/active_model/attribute.rb
 +++ b/activemodel/lib/active_model/attribute.rb
-@@ -178,7 +178,12 @@ def original_value_for_database
-       alias :assigned? :original_attribute
+@@ -40,7 +40,14 @@ def initialize(name, value_before_type_cast, type, original_attribute = nil, val
+     end
  
-       def initialize_dup(other)
--        if @value&.duplicable?
-+        # Frozen attributes are a model's schema defaults, cast only to be
-+        # frozen. A record's copy starts unread, so dirty tracking does not
-+        # compare a value the record never read.
-+        if other.frozen?
-+          remove_instance_variable(:@value) if defined?(@value)
-+        elsif @value&.duplicable?
-           @value = @value.dup
-         end
+     def freezable?
+-      true
++      # Each record copies the value cast when freezing, so it would share any
++      # mutable object inside it, and save a value that already reads as changed.
++      # Checked on a read copy, so an attribute that can't be frozen stays unread.
++      copy = dup
++      value = copy.value
++      ActiveSupport::Ractors.shareable?(value.dup.freeze) && !copy.changed_in_place?
++    rescue StandardError
++      false # A value that can't be cast or serialized raises when read, as before.
+     end
+ 
+     def freeze
+diff --git a/activemodel/test/cases/attribute_test.rb b/activemodel/test/cases/attribute_test.rb
+index ff7e6aa291..1beefb57d4 100644
+--- a/activemodel/test/cases/attribute_test.rb
++++ b/activemodel/test/cases/attribute_test.rb
+@@ -339,6 +339,25 @@ def initialize_dup(*)
        end
+     end
+ 
++    test "a copy of a frozen attribute has a mutable value" do
++      attribute = Attribute.from_database(:foo, +"abc", Type::Value.new).freeze
++      copy = attribute.dup
++
++      assert_equal "abc", copy.value
++      assert_not_predicate copy.value, :frozen?
++    end
++
++    test "an attribute is freezable unless its copies would share or save its value" do
++      nested = Class.new(Type::Value) { def cast_value(value) = { "a" => +value } }
++      changed = Class.new(Type::Value) { def changed_in_place?(*) = true }
++      failing = Class.new(Type::Value) { def cast_value(*) = raise(TypeError) }
++
++      assert_predicate Attribute.from_database(:foo, "b", Type::Value.new), :freezable?
++      assert_not_predicate Attribute.from_database(:foo, "b", nested.new), :freezable?
++      assert_not_predicate Attribute.from_database(:foo, "b", changed.new), :freezable?
++      assert_not_predicate Attribute.from_database(:foo, "b", failing.new), :freezable?
++    end
++
+     test "with_type preserves mutations" do
+       attribute = Attribute.from_database(:foo, +"", Type::Value.new)
+       attribute.value << "1"
 diff --git a/activerecord/test/cases/serialized_attribute_test.rb b/activerecord/test/cases/serialized_attribute_test.rb
-index c386d0ab46..c40a24929f 100644
+index c386d0ab46..fe3dedb42a 100644
 --- a/activerecord/test/cases/serialized_attribute_test.rb
 +++ b/activerecord/test/cases/serialized_attribute_test.rb
-@@ -75,6 +75,22 @@ def test_serialized_attribute_with_default
+@@ -75,6 +75,41 @@ def test_serialized_attribute_with_default
      assert_equal({ key: "value" }, t.content)
    end
  
@@ -56,6 +97,25 @@ index c386d0ab46..c40a24929f 100644
 +    assert_not_predicate user, :changed?
 +    user.save!(validate: false)
 +    assert_equal "", user.reload.preferences_before_type_cast
++
++    user = klass.new
++    user.preferences << "dark"
++    user.save!(validate: false)
++    assert_equal ["dark"], user.reload.preferences
++  end
++
++  def test_new_records_do_not_share_a_serialized_column_default
++    coder = Class.new do
++      def self.load(value) = value.blank? ? { "theme" => { "mode" => "light" } } : JSON.parse(value)
++      def self.dump(value) = JSON.dump(value)
++    end
++    klass = Class.new(ActiveRecord::Base) do
++      self.table_name = "admin_users"
++      serialize :preferences, coder: coder
++    end
++
++    klass.new.preferences["theme"]["mode"] = "dark"
++    assert_equal "light", klass.new.preferences["theme"]["mode"]
 +  end
 +
    def test_serialized_attribute_on_custom_attribute_with_default

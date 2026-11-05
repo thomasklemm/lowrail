@@ -1647,7 +1647,7 @@ runner). `openproject` is the plain suite, `openproject-shimmed` adds the main-o
 | `restrict_with_error` details carry `association_name` | 1 | (b) | 55c4e31168 (#59461) | CHANGELOG |
 | enum invalid-value message lists the valid values | 2 | (b) | fcf4393f04 (#57446) | CHANGELOG |
 | `ActionDispatch::Request::Session` is now `Http::Session` (nodoc) | 3 | (d) | 7105d5af0e (#57856) | spec-side |
-| OP8 frozen defaults make an untouched serialized default dirty | 2 | (a), fix built | 1d2c3f61b8 (#59083) | branch, queued |
+| OP8 frozen defaults make an untouched serialized default dirty | 2 | (a), fix built | 1d2c3f61b8 (#59083) | branch, revised and measured, queued 5th |
 | OP1 `parameter_parsers` frozen: in-place registration raises at boot | boot (shimmed) | (a), fix built | ac98c112f4 (#57952) | branch, queued |
 
 Cause commits come from bisecting with the repro named below or, where a method or constant was removed or renamed,
@@ -1670,15 +1670,21 @@ ractorized app gets the frozen hash, which is what #57952 needed. Tests: `webser
 `ractors_test` reads a registered parser from a Ractor. Both fail on main. actionpack 4,517 runs green (main 4,516);
 `ractors_test` 19 runs green with `RACK=head`; RuboCop clean. Skeptical review (subagent): open with nits, applied
 (body wording, the commit message's cause sentence, a sentence that pre-empts "why copy the default again", and the
-Ractor read in the railties test). Branch `thomasklemm/parameter-parsers-register-in-place` @ `ee0a66402f` on main
-`bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+Ractor read in the railties test). Second review (Sol, from patch and body; each point checked against the code):
+the tests still passed with the setter's `.freeze` restored (confirmed: `webservice_test` now assigns
+`{ Mime[:json] => … }` through the setter and then registers `:xml` in place, which fails with the unconditional
+freeze), and after `ractorize!` the setter stored a mutable hash that another Ractor could not read (confirmed and
+fixed: the setter freezes its argument once the registry is frozen; `ractors_test` reassigns after `ractorize!` and
+reads from a Ractor). Body at 173 words, "the registry and every parser value must be shareable". Re-review: open; the
+optional nit (`make_shareable` in the hook, so a plain-lambda parser fails at `ractorize!` instead of in the Ractor)
+is left out, because #57952 deliberately leaves shareability of the parsers to the app. Branch
+`thomasklemm/parameter-parsers-register-in-place` @ `c5df553fa3` on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
 [body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
 
 **OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)
 removed it as unused inside Rails. Callers:
 * [OpenProject's `ModelContract#contract_valid?`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/contracts/model_contract.rb#L100),
-  which copies `valid?` without its `errors.clear`; it is the base of every contract, so most create and update
-  services fail. This is most of main's failures.
+  which copies `valid?` without its `errors.clear`; it is the base of every contract.
 * ancestry 5.1.0's [`sane_ancestor_ids?`](https://github.com/stefankroes/ancestry/blob/c03bc1a9b0339236f4e817ebd9730cc62d46c453/lib/ancestry/instance_methods.rb#L146),
   run whenever a saved node's parent changes, so any reparent raises. ancestry has open PRs (#769, #770), but its
   maintainer [says the context is still needed](https://github.com/stefankroes/ancestry/pull/770#issuecomment-5752596602).
@@ -1688,7 +1694,11 @@ removed it as unused inside Rails. Callers:
 errors, so the restore is the three lines unchanged (restore rule). The test runs validations in a context set through
 the writer and fails on main. activemodel 1,251 runs and the AR validations/autosave tests (370 runs, SQLite) green;
 RuboCop clean. Review: open with nits, applied (lead with ancestry, the leaf-move case, the ancestry PRs, the
-activerecord-import versions, a stronger test). Branch `thomasklemm/validation-context-writer` @ `992a77da89`,
+activerecord-import versions, a stronger test). Second review (Sol): the code stays as it is (identical to 8-1-stable,
+private, no cost to ordinary validation); the body's "so most of its create and update services fail" was not backed
+by a count and is dropped; ancestry #769/#770 are still open and kbrock's linked comment still says "this concept is
+necessary in general"; the test now also asserts the writer stays private. Re-review: open. Branch
+`thomasklemm/validation-context-writer` @ `0ba3dad80b`,
 [patch](../../bench/upstream/app_suites/op3-validation-context-writer.patch),
 [body](../../bench/upstream/app_suites/op3-body.md), repro
 [validation_context_writer.rb](../../bench/upstream/app_suites/validation_context_writer.rb).
@@ -1704,14 +1714,43 @@ has `results jsonb DEFAULT '{}' NOT NULL` with a coder that loads `{}` as `[]`. 
 changed, and since serialized types write the coder's empty value as NULL, `save!` raises `PG::NotNullViolation`
 (storages health status controller specs, 2 F). On 8.1 that happens only if the app reads the attribute first. Bisected
 with [serialized_jsonb_default_insert.rb](../../bench/upstream/app_suites/serialized_jsonb_default_insert.rb)
-(`git bisect run`, 8ae3d84277..bdb3d96012). The fix makes a dup of a frozen attribute start unread, as defaults did
-before. Its test (SQLite, `admin_users.preferences` with default `""` and a JSON-ish coder) fails on main. activemodel
-1,250 runs green. activerecord SQLite 10,291 runs: the 8 failures (structure dump without a `sqlite3` CLI, protected
-environment checks with `DISABLE_DATABASE_ENVIRONMENT_CHECK` set) are the same on unpatched main. RuboCop clean.
-Skeptical review (subagent): open with nits. It confirmed that every dup of a frozen attribute is a default copy and
-that `Thing.new.name` allocations are unchanged. It also found that the fix stops new records from sharing a
-serialized default's nested objects, which they do on main (applied: the comment wording, and that point in the body).
-Branch `thomasklemm/frozen-default-attribute-unread` @ `5a4a9596c0` on main `bdb3d96012`,
+(`git bisect run`, 8ae3d84277..bdb3d96012). On main a default with nested objects is also shared between new records
+once it is read (with a coder that loads a fresh object; PG arrays, hstore, nested jsonb).
+
+The first fix (`5a4a9596c0`: a dup of a frozen attribute starts unread) was held after a second review (Sol, from
+patch and body). Checked against the code, all three points held: a copy of a frozen identity-type attribute came back
+frozen (`Attribute.from_database(:foo, +"abc", Type::Value.new).freeze.dup.value`), every default type was cast again
+on first read, and it reached every frozen attribute, not only defaults. A second form (a cast-again flag set in
+`freeze`, never pushed) lost in-place edits of frozen user-assigned attributes and cost +21.5% Ir on `Model.new` with
+container defaults. A third (`deep_dup` in `initialize_dup`) broke the YAML safe-load tests. The fix now sits in
+`Attribute#freezable?`: false when a read copy's cast value, shallow-dupped and frozen, is not shareable, when it
+already reads as changed, or when casting raises. Those models keep the writable defaults they had before #59083 and
+cast per record, as on 8.1; every other model keeps the frozen defaults and main's dup path.
+
+| Callgrind Ir vs main, median of 5 | A/A (main vs main) | first fix | final |
+|---|---|---|---|
+| `Model.new` + first read, int/bool/string defaults, Ruby 4.0.9 | −0.01% | +0.23% | +0.02% |
+| `Model.new` + first read, `'{}'` JSON-serialized and `json {}` defaults, 4.0.9 | +0.01% | +21.50% | +0.01% |
+| ruby-bench activerecord workload (100 posts with comments), 4.0.9 | +0.01% | +0.06% | +0.00% |
+| same three on Ruby master `336946c045` | +0.37%, +0.27%, −0.00% | +0.47%, +22.08%, +0.06% | +0.01%, +0.15%, +0.01% |
+
+Method: `valgrind --tool=callgrind --toggle-collect=rb_ary_initialize` around `Array.new(N) { work }` with GC
+disabled, 5 runs per tree, the A/A control a second checkout of main; the ruby-bench workload is re-implemented in the
+driver from ruby-bench `00f0f8beab`, not run through its harness (#59083's 199 → 170 ms was not re-measured).
+Final-tree spread was ≤0.13% except the container workload (≤2.8%). A model with a nested default (`'{"a":{"b":1}}'`) pays
++22% (44.0M → 53.6M Ir per 1,000), the 8.1 cost. The final review's nits only changed code that runs at schema load,
+so the table was not rerun. Scripts and raw results:
+[op8-bench](../../bench/upstream/app_suites/op8-bench/).
+
+Tests: `freezable?` refuses a nested, a changed and a raising cast (each clause removed fails it); a frozen
+identity-type copy stays mutable (fails on `5a4a9596c0`); in AR, an untouched serialized default is unchanged, can be
+read, mutated and saved, and isn't shared with the next record (fail on main). activemodel 1,252 runs green; AR
+serialized_attribute, base, dirty, attributes and defaults on SQLite and PostgreSQL plus PG json/array/hstore green;
+RuboCop clean. Re-review: open with nits, applied (tests for each clause, read the value before `changed_in_place?`,
+comments on the copy and the rescue, a softer commit message). It also found that datetime/time defaults with
+time-zone-aware attributes are cast once in the boot zone on main and now leave the frozen path (TimeWithZone is not
+shareable), which is 8.1's behaviour; tsrange too. Branch `thomasklemm/frozen-default-attribute-unread` @ `79b9bc0520`
+on main `bdb3d96012`,
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).
 
@@ -1785,10 +1824,10 @@ calls it to put the test adapter back: 117 F in the job specs tagged `with_good_
 * `Mime::SET`: 5 (mime_types.rb).
 * `protect_from_forgery` without a strategy: 5 (application_controller.rb).
 
-**Readability gate.** All three fixes are correctness fixes with no performance claim. Described out loud:
+**Readability gate.** All three fixes are correctness fixes; OP8 claims only no cost (table above). Described out loud:
 * OP1: "parsers stay a plain hash while the app boots and are frozen when it ractorizes."
 * OP3: "put back the three-line private setter that gems still call."
-* OP8: "a new record's copy of a frozen default hasn't been read yet."
+* OP8: "a default that records would share or save is not frozen."
 
 Each is a few lines in the method that owns the behavior, with no new names.
 
