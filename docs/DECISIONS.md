@@ -352,6 +352,16 @@ thread or fiber state, VM/JIT code. A critical candidate is ready only after bot
 A reply to "is this worth it" or any other pushback is drafted, checked once for facts and tone, and shown to
 Thomas before posting.
 
+## Performance across the stack, compatibility as inventory (Thomas, 2026-11-05 night)
+
+* **Main topic again: performance across the whole stack** (Ruby runtime and GC, C extensions and drivers, Rack
+  and Puma, Rails, the gems apps use). YJIT is the production reference; interpreter numbers alone don't carry a claim.
+* **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta. The Rails-internal design can
+  still change, and then we decide what to fix in Rails and what outside. Until then such findings go into an
+  inventory with callers and proposed fixes. The ones already open stay (blind_index#62 and scimitar#172 say they wait
+  for the beta).
+* **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs.
+
 ## Bets
 
 Priorities (Thomas, 2026-11-03): Rails and ZJIT first, then gems. Parked: types/MCP, YJIT, ruby/uri, the Campfire
@@ -370,6 +380,9 @@ lead. States change often; each bet's doc is the source of truth.
 | R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
 | E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees. 11 of 13 install; Chatwoot and Flow are blocked | [gems-on-master](upstream/gems-on-master.md) |
 | Z13 | where ZJIT spends more Ir than YJIT on railsbench, lobsters and shipit, classified into buckets that become leads | zjit-yjit-gap (planned) |
+| P-MAP | full-request stack map under YJIT by layer (Puma/Rack to drivers, GC, YJIT), leads outside Rails (2026-11-05) | stack-map (planned) |
+| P-TEST | per-test framework overhead in real Rails test suites: fixtures, transactions, setup, reporters (2026-11-05) | test-overhead (planned) |
+| P-DRV | database driver result path: sqlite3, pg, trilogy, per row and per query (2026-11-05) | driver-cpu (planned) |
 
 Chosen 2026-11-03 for reach. E2 unblocks ZJIT measurement on Mastodon, Discourse, Chatwoot, Lobsters and Loomio, and
 the gem fixes are needed for 4.1 anyway. Z13 measures the gap to YJIT directly instead of inferring it from fallback
