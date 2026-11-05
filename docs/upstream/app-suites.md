@@ -56,8 +56,9 @@ No compat code; docs-only note:
 [patch](../../bench/upstream/app_suites/s2-upgrade-guide-navigation-helper.patch),
 [body](../../bench/upstream/app_suites/s2-body.md). Branch `thomasklemm/upgrade-guide-navigation-helper` @
 `b5d8b978d5` on main `8b06b0eb98` (silent case added after Decidim, [below](#decidim)); S1 and S2 merge with each other and with main `fa03095c6f` cleanly.
-**2026-11-05: S1, S2 and PI2 are bundled with GR7 into one docs PR**, [`thomasklemm/upgrade-guide-8-2-notes`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-8-2-notes) @ `cdc9141b44` on main `3ba9e53d7e`
-(one queue slot instead of three; the old branches stay on the fork). Record:
+**2026-11-05: S1, S2 and PI2 are bundled with GR7 into one docs PR**, [`thomasklemm/upgrade-guide-8-2-notes`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-8-2-notes) @ `2b4acdc0fc` on main `3ba9e53d7e`
+(four commits, one per note; first version `cdc9141b44`, one commit; one queue slot instead of three; the old branches
+stay on the fork). Record:
 [contributions](contributions.md#queue).
 
 **L1 (c): rspec-rails 8.0.x mutates the frozen `default_url_options`.** baa1ca5f2f (#58483) freezes the
@@ -1545,13 +1546,16 @@ raises "Bullet does not support active_record 8.2.0.alpha yet"; bullet 8.3.1 sup
 the development boot then stops at the `active_record_query_trace` shim's initializer and, past that, at GR7.
 
 **GR7 (b)+(c), found through that boot: Sidekiq 7 with `queue_adapter = :sidekiq` doesn't boot on main.**
-10c24f2481 (#56518, after #53058 deprecated it in 8.1) removed Rails' own `SidekiqAdapter`. Sidekiq 7.3.3 to 8.0.2,
+10c24f2481 (#56518, after #53058 deprecated it in 8.1) removed Rails' own `SidekiqAdapter`. Sidekiq 7.3.6 to 8.0.2,
 including the latest 7.3.10 (the head of its `7-x` branch), define their adapter only in an
 [`on_load(:active_job)` hook](https://github.com/sidekiq/sidekiq/blob/3c752c9cafe96231c0f18cbeb78b3b940ac8d48b/lib/sidekiq/rails.rb#L52)
 that runs after Active Job's own `active_job.set_configs` hook has resolved the configured adapter, so loading
 `ActiveJob::Base` raises `NameError: uninitialized constant ActiveJob::QueueAdapters::SidekiqAdapter`. Before 7.3.3
-Sidekiq ships no adapter (same error); 7.3.4 and 7.3.5 raise from `remove_const` on main even with another adapter
-(7.3.4 when `sidekiq/rails` is required, 7.3.5 when `ActiveJob::Base` loads). Gumroad sets
+Sidekiq ships no adapter (same error). 7.3.3 to 7.3.5 raise from `remove_const` on main even with another adapter:
+7.3.3 and 7.3.4 require the adapter when `sidekiq/rails` loads, and its `remove_const(:SidekiqAdapter) if
+defined?(:SidekiqAdapter)` checks a symbol literal, which is always truthy (Sol found 7.3.3; the first version of this
+record said only 7.3.4 and 7.3.5); 7.3.5's string `defined?` is always truthy too and raises when `ActiveJob::Base`
+loads. Gumroad sets
 [`config.active_job.queue_adapter = :sidekiq`](https://github.com/antiwork/gumroad/blob/74e3046196e1e0b490eb042335faafd580c4b2fe/config/application.rb#L146)
 for every environment and test overrides it with `:test`, so the suite doesn't see it; development and production
 would. Sidekiq 8.0.3 requires the adapter
@@ -1560,7 +1564,7 @@ would. Sidekiq 8.0.3 requires the adapter
 "Rework Rails integration"); 8.0.0's 61b3fca7, which the first version of this record named, only switched the
 require to `require_relative` inside the hook. Gumroad is on sidekiq 7.3 and sidekiq-pro 7.x. Repro:
 [sidekiq7_adapter_boot.rb](../../bench/upstream/app_suites/sidekiq7_adapter_boot.rb) (8-1 boots with 7.3.10, 8.0.2,
-8.0.3 and 8.1.7; main `3ba9e53d7e` fails with 7.3.2, 7.3.10 and 8.0.2 and boots with 8.0.3 and 8.1.7; with
+8.0.3 and 8.1.7; main `3ba9e53d7e` fails with 7.3.2, 7.3.3 (`remove_const`), 7.3.10 and 8.0.2 and boots with 8.0.3 and 8.1.7; with
 `queue_adapter = :async`, main fails with 7.3.4 and 7.3.5 and boots with 7.3.6). The Rails 8.1 deprecation asks for
 Sidekiq 7.3.3 or later, which isn't enough on main, so this became the fourth section of the upgrade-guide bundle
 (see [contributions](contributions.md#queue)).
