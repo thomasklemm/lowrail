@@ -78,11 +78,9 @@ static void mark(void *unused) {
 
 static const rb_data_type_t root_type = { "CensusCpuFrames", { mark, NULL, NULL } };
 
-/* CensusCpu.measure(seed, interval) { work } -> sampled client Ir. interval
- * is a power of two; samples fall every interval/2 .. 3*interval/2 Ir.
- * interval 0 only yields (a JIT warmup window through the same call). */
-static VALUE measure(VALUE self, VALUE seed, VALUE interval) {
-    if (NUM2ULONG(interval) == 0) return rb_yield(Qnil);
+static VALUE start(VALUE self, VALUE seed, VALUE interval) {
+    unsigned long every = NUM2ULONG(interval);
+    if (!every || (every & (every - 1))) rb_raise(rb_eArgError, "positive power-of-two interval required");
     memset(buckets, 0, BUCKETS * sizeof(uint32_t));
     used = 0;
     gc = empty = truncated = dropped = signals = hooks = lag_sum = lag_max = 0;
@@ -90,18 +88,30 @@ static VALUE measure(VALUE self, VALUE seed, VALUE interval) {
     CALLGRIND_ZERO_STATS;
     active = 1;
     if (!REQUEST(101, NUM2ULONG(seed), NUM2ULONG(interval))) rb_raise(rb_eRuntimeError, "patched Callgrind required");
-    int state = 0;
-    rb_protect(rb_yield, Qnil, &state);
+    return Qnil;
+}
+
+static VALUE finish(VALUE self) {
     uint64_t work = REQUEST(102, 0, 0);
     uint64_t issued = REQUEST(105, 0, 0);
     active = 0;
     CALLGRIND_STOP_INSTRUMENTATION;
-    if (state) rb_jump_tag(state);
     VALUE row = rb_hash_new();
 #define FIELD(name, value) rb_hash_aset(row, ID2SYM(rb_intern(name)), ULL2NUM(value))
     FIELD("work_ir", work); FIELD("issued", issued); FIELD("signals", signals); FIELD("gc", gc);
     FIELD("empty", empty); FIELD("truncated", truncated); FIELD("dropped", dropped);
     FIELD("handler_ir", hooks); FIELD("lag_sum_ir", lag_sum); FIELD("lag_max_ir", lag_max);
+    return row;
+}
+
+/* interval 0 warms the exact measured block without instrumentation. */
+static VALUE measure(VALUE self, VALUE seed, VALUE interval) {
+    if (NUM2ULONG(interval) == 0) return rb_yield(Qnil);
+    start(self, seed, interval);
+    int state = 0;
+    rb_protect(rb_yield, Qnil, &state);
+    VALUE row = finish(self);
+    if (state) rb_jump_tag(state);
     return row;
 }
 
@@ -148,5 +158,7 @@ void Init_census_cpu_sampler(void) {
     sigaction(SIGPROF, &action, NULL);
     VALUE mod = rb_define_module("CensusCpu");
     rb_define_singleton_method(mod, "measure", measure, 2);
+    rb_define_singleton_method(mod, "start", start, 2);
+    rb_define_singleton_method(mod, "finish", finish, 0);
     rb_define_singleton_method(mod, "stacks", stacks, 0);
 }

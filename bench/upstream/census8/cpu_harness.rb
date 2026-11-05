@@ -30,8 +30,8 @@ module RailsCensus
       RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count, :code_gc_count)
     end
 
-    def cpu_measure(op)
-      run = -> { op.call.call; reset_side_effects }
+    def cpu_measure(op, reset: true)
+      run = -> { op.call.call; reset_side_effects if reset }
       warmup = Integer(ENV.fetch("CENSUS_WARMUP", "200"))
       warmup.times { run.call }
       count = Integer(ENV.fetch("CENSUS_REQUESTS", "10"))
@@ -73,6 +73,9 @@ module RailsCensus
       gc_runs = GC.count - gc_before
       jit_delta = jit_counters.to_h { |k, v| [k, v - jit_before.fetch(k)] }
       frames, stacks = CensusCpu.stacks
+      if ENV["CENSUS_CPU_STACKS"]
+        File.write(ENV.fetch("CENSUS_CPU_STACKS"), JSON.generate(frames: frames, stacks: stacks, window: window) + "\n")
+      end
       keys = frames.map { |path, label, first| [site_key(path), label.to_s, first] }
       weight = window[:work_ir].fdiv(window[:signals].nonzero? || 1) / count
       lines = Hash.new { |h, k| h[k] = [0, 0] }
