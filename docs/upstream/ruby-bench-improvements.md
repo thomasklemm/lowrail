@@ -4,6 +4,8 @@
 is our source of truth for ZJIT speed claims ([DECISIONS](../DECISIONS.md#evidence-and-measurement)). This page
 checks the pain points recorded in our docs, looks for gaps in the suite, and ranks candidate improvements by their
 value to the maintainers. It is an evaluation only. Nothing was built upstream, and nothing was opened or posted.
+[Round 2](#round-2-five-topics-checked-and-the-prs-opened-2026-11-05) (2026-11-05, at the end) checks five more topics
+and records the PRs that opened from them.
 
 **Pins.** Ruby master [`a8b095a07e`](https://github.com/ruby/ruby/commit/a8b095a07e55adf429839d4642027e832e30d3a7),
 release build (`-O3 -ggdb3`, `--enable-zjit --enable-yjit`), the same build as [zjit-yjit-gap](zjit-yjit-gap.md).
@@ -195,7 +197,7 @@ operation on Rails main but is worth only 0 / 0.2 / 0.1 M Ir of the ZJIT−YJIT 
 ([zjit-iseq-leads](zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03)). It will appear when 8.2 ships and
 ruby-bench bumps. Lowrail's census already measures Rails main; a variant upstream would add upkeep the
 maintainers chose to drop. A patch bump to 8.1.4 is also not worth a PR: Rails performance changes land on main,
-not in 8.1.x; erubi-rails' move to 8.1 is the same routine bump the maintainers did for the others.
+not in 8.1.x (Thomas asked for the 8.1.4.1 bump on 2026-11-05; see round 2); erubi-rails' move to 8.1 is the same routine bump the maintainers did for the others.
 
 ## 7. Coverage against real apps
 
@@ -246,3 +248,243 @@ stays here unless he asks again.
   YJIT `--yjit --yjit-stats=quiet` with the YJIT equivalents; three benchmarks in parallel (counts only).
 * Fixture dates: `SELECT min(created_at), max(created_at)` on `benchmarks/lobsters/db/production.sqlite3`
   (stories, comments, users) and shipit's `production.committed.sqlite3` (2025-07-02).
+
+# Round 2: five topics checked and the PRs opened (2026-11-05)
+
+The coordinator assigned five topics: the Rails 8.1.4.1 bump, JIT compiles in the measured window, planner
+statistics for shipit, the nondeterministic lobsters `/reply` pages and, added later because ruby-bench main CI was
+red, shipit's nokogiri. Every topic that passed our checks and a skeptical subagent review opened as its own PR on
+ruby/ruby-bench, next to #565 (DECISIONS, 2026-11-05: ruby-bench PRs may open side by side). The other topics are
+recorded below with their data. Nothing else was posted.
+
+**Pins.** ruby-bench main [`00f0f8b`](https://github.com/ruby/ruby-bench/commit/00f0f8beab27edb11c0253cc630f91f17d1f1891)
+(#564 merged). Ruby 4.0.9 (mise build). Ruby master
+[`7f9638f41e`](https://github.com/ruby/ruby/commit/7f9638f41e250d4f3b43daabaa645516994dd7e5), built with `--enable-yjit
+--enable-zjit optflags=-O3 debugflags=-ggdb3`. JRuby 10.1.2.0 on Temurin 21, used only for lockfile checks. The orb
+has 8 vCPUs, so wall times are noisy and instruction counts are not.
+
+| # | topic | verdict | PR / record | head |
+| --- | --- | --- | --- | --- |
+| 0 | shipit's nokogiri 1.19.1 doesn't build on Ruby head on Windows | **PR** | [ruby/ruby-bench#566](https://github.com/ruby/ruby-bench/pull/566) | `8f5b27211c` |
+| 1 | Rails 8.1.4.1 for lobsters, railsbench, shipit (and activerecord) | **PR** | [ruby/ruby-bench#567](https://github.com/ruby/ruby-bench/pull/567) | `971006363a` |
+| 2 | YJIT and ZJIT still compile in the measured window | **issue draft**, back to the coordinator | [below](#2-yjit-and-zjit-still-compile-in-the-measured-window) | – |
+| 3 | `ANALYZE` for shipit's fixture | **no PR**: 6 of 23 plans change, ≈0.14 ms per pass | [below](#3-planner-statistics-for-shipit) | – |
+| 4 | lobsters `/reply` pages differ between runs | **no PR**: a minutes counter from `Time.now`, same work | [below](#4-the-lobsters-reply-pages) | – |
+
+## 0. shipit's nokogiri on Ruby head (ruby/ruby-bench#566)
+
+**Cause.** Every run of ruby-bench's `Test benchmarks` workflow on main since 2026-10-30 failed; the last green run
+was 2026-10-29 (40899297599). In each one, only `benchmark-default-windows (head)` and the `all-tests` summary fail.
+In run 41944045400 shipit's `bundle install` stops compiling nokogiri 1.19.1: `xml_node_set.c:382:33: error: passing
+argument 2 of 'rb_range_beg_len' from incompatible pointer type [-Wincompatible-pointer-types]`, expected
+`rb_len_t *` (`long long int *`). ruby/ruby@cc3ba11012 (2026-10-09) changed `rb_range_beg_len`, `rb_str_subpos`,
+`rb_arithmetic_sequence_beg_len_step` and `ruby_enc_find_basename`/`extname` to take `rb_len_t *`. `rb_len_t` is
+`long` everywhere except 64-bit mswin (ruby/ruby@4e746b14fd) and, since
+[oneclick/rubyinstaller2-packages@0f441be052](https://github.com/oneclick/rubyinstaller2-packages/commit/0f441be052)
+(2026-10-29 21:04 UTC, "Enable 64 bit rb_len_t in ruby-head … to early raise issues with that change in gems"),
+RubyInstaller's ruby-head (MinGW), which the job uses. That commit, not ruby/ruby@4b95d69fc4 (mswin warning flags,
+which MinGW doesn't use), is why 10-29 passed and 10-30 failed; the coordinator's brief named 4b95d69fc4, and the
+reviewer caught it. The job's GCC reports the mismatch as an error (`-Wincompatible-pointer-types` is an error by default since GCC 14).
+
+**Scope.** Of the benchmarks the Windows job runs, only shipit locks a nokogiri older than 1.19.5. lobsters,
+railsbench and erubi-rails lock 1.18.9 but are excluded there (`EXCLUDES: erubi-rails,graphql-native,lobsters,railsbench`).
+The other native gems shipit compiled on head in that run (json, bigdecimal, erb, stringio, date, io-console, nio4r,
+psych, puma, websocket-driver, sqlite3, msgpack) built; none of their sources calls the five changed functions.
+nokogiri 1.19.5 switched to `rb_len_t` (sparklemotion/nokogiri#3711) and 1.19.7 also builds on 4.1.0-preview1
+(#3755); the bundled libxml2, libxslt, zlib and libiconv versions are the same as in 1.19.1.
+
+**Change.** `bundle lock --update nokogiri --conservative` in `benchmarks/shipit`: four lines (both platform
+entries and their checksums). Local checks on Linux: shipit installs and runs on Ruby 4.0.9 and on master, and all
+57 requests of one pass return 200 with bodies identical to 1.19.1 (CSRF tokens stripped).
+
+**CI.** The fork never ran Actions (forks need a click in the UI), so on the coordinator's instruction the PR opened
+directly and its own CI was the proof. Run 42000663489 on `8f5b27211c`: all 15 checks pass. In `benchmark-default-windows (head)` nokogiri 1.19.7 compiled with native extensions and shipit ran (benchmark 66 of 75), and `all-tests` is green for the first time on this base.
+
+**Body (as opened; [file](../../bench/upstream/ruby_bench_round2/nokogiri-body.md), edited once after #567 opened to name it):**
+
+> This bumps nokogiri in shipit's Gemfile.lock from 1.19.1 to 1.19.7 to fix the `benchmark-default-windows (head)` job, which has failed on every run on main since 2026-10-30 (the last passing run was on 2026-10-29).
+>
+> In that job, shipit's `bundle install` fails compiling nokogiri 1.19.1 (run 41944045400): `xml_node_set.c:382:33: error: passing argument 2 of 'rb_range_beg_len' from incompatible pointer type [-Wincompatible-pointer-types]`. ruby/ruby@cc3ba11012 changed `rb_range_beg_len` to take `rb_len_t *`, and on 2026-10-29 RubyInstaller's ruby-head build made `rb_len_t` 64 bits (oneclick/rubyinstaller2-packages@0f441be052), so it no longer matches nokogiri's `long`. Elsewhere `rb_len_t` is still `long`, which is why the Linux head job passes. nokogiri switched to `rb_len_t` in 1.19.5 (sparklemotion/nokogiri#3711), and 1.19.7 also compiles against Ruby 4.1.0-preview1 (sparklemotion/nokogiri#3755).
+>
+> Of the benchmarks the Windows job runs, only shipit is affected: lobsters, railsbench and erubi-rails lock nokogiri 1.18.9, but that job already excludes them. #567, the Rails 8.1.4.1 bump, makes the same nokogiri change in shipit's Gemfile.lock; the two PRs merge cleanly in either order.
+>
+> On Linux, with Ruby 4.0.9 and with Ruby master 7f9638f41e, shipit installs and runs. All 57 requests of one benchmark pass return 200 and the same bodies as with 1.19.1, apart from CSRF tokens.
+
+## 1. Rails 8.1.4.1
+
+**How the maintainers bump.** Patch bumps are one PR across every Rails benchmark with lockfile changes only:
+#411 (k0kubun, 8.0.2.1 → 8.0.3, five lockfiles, "to fix the following warning"), #456 (byroot, 8.1 for all but
+shipit, which followed in 5806cbd). So this is one PR, and it includes `benchmarks/activerecord` (activerecord 8.1.1,
+as #411 and #456 did). erubi-rails stays on 8.0.3: moving it to 8.1 is a minor upgrade, outside this brief. The
+2026-11-03 evaluation (section 6) called a patch bump not worth a PR; Thomas asked for it, and it now also carries
+the 8.1.4.1 security fixes and rails-html-sanitizer 1.7.2.
+
+**Change.** `bundle lock --update <the Rails gems in each Gemfile> --conservative` for lobsters and shipit. Both
+locks also move loofah 2.24/2.25.0 → 2.25.3, rails-html-sanitizer → 1.7.2 and nokogiri → 1.19.7, because Action
+View 8.1.4.1 requires `rails-html-sanitizer >= 1.7.2`, which requires `nokogiri >= 1.19.5`. For lobsters the resolver
+added a `nokogiri (1.19.7-x86_64-linux-gnu)` entry the lock never had (its `PLATFORMS` lists `x86_64-linux`); it was
+removed again so the lock keeps building nokogiri from source as on main.
+
+railsbench and activerecord don't resolve with any Bundler (4.0.12, 4.0.20) on CRuby: their `GIT` source for
+k0kubun's activerecord-jdbc-adapter fork (#530) has empty specs, and `bundle lock` fails with "jdbc-sqlite3 >= 3.8,
+< 4.A could not be found". Under JRuby the resolve succeeds but drops the `ruby` and `x86_64-linux` platforms.
+Their locks were therefore edited with [`relock_railsbench.py`](../../bench/upstream/ruby_bench_round2/relock_railsbench.py),
+which copies the spec blocks and checksums Bundler produced for lobsters (same Rails gems, same sanitizer chain) and
+moves nokogiri's ruby, `-java` and `-x86_64-linux-gnu` entries to 1.19.7 with checksums from rubygems.org. Checks:
+`bundle install` on Ruby 4.0.9 leaves both locks byte-identical; JRuby 10.1.2.0 installs main's lock and the new one
+the same way (both rewrite the lock identically apart from the bumped versions, activerecord 8.1.4.1 with arjdbc
+80.0.pre1 loads).
+
+**Responses.** With [`dump_harness.rb`](../../bench/upstream/ruby_bench_round2/dump_harness.rb) and
+[`cmp_dumps.rb`](../../bench/upstream/ruby_bench_round2/cmp_dumps.rb), one warmup pass, then every request of the
+next pass, Ruby 4.0.9: lobsters 114 of 114 return 200 and are identical to main except the five `/reply` pages,
+which differ in the minutes counter (topic 4); shipit 57 of 57 return 200, identical; railsbench 2,000 of 2,000
+return 200, identical after normalizing timestamps (`db:seed` recreates its 100 posts with the current time).
+
+**Timing.** Ruby 4.0.9, base then bump, two rounds ([`bump_bench.sh`](../../bench/upstream/ruby_bench_round2/bump_bench.sh)); mean of the 10 iterations after 10 warmups, ms:
+
+| | interpreter main | interpreter bump | YJIT main | YJIT bump |
+| --- | ---: | ---: | ---: | ---: |
+| railsbench | 2,649 / 2,609 | 2,670 / 2,673 | 1,197 / 1,249 | 1,226 / 1,254 |
+| lobsters | 924 / 980 | 946 / 959 | 552 / 562 | 580 / 562 |
+| shipit | 1,731 / 1,685 | 1,685 / 1,663 | 781 / 826 | 826 / 811 |
+
+Only railsbench interpreted is consistently slower (+1.6%, both bump runs above both main runs); the rest moves
+within the run-to-run spread. Callgrind instructions per iteration, interpreter, fixed heap
+(`RUBY_GC_HEAP_0..4_INIT_SLOTS` from [bench.md](../bench.md)), `ruby_bench_ir.rb` with two Gemfile copies per tree,
+against `base-a`:
+
+| | main A/A (`base-b`) | bump-a | bump-b |
+| --- | ---: | ---: | ---: |
+| railsbench | −0.081% | +1.522% | +1.408% |
+| lobsters | +0.034% | +0.806% | +1.012% |
+| shipit | +0.030% | +1.059% | +1.148% |
+
+**Claimed:** Rails 8.1.4.1 costs 0.8–1.5% interpreter instructions per iteration over 8.1.1/8.1.2. Not attributed
+(Rails gems and the sanitizer chain move together); it matches the impact run's +0.85% for the 8.1 backports on
+railsbench ([rails-82-impact](rails-82-impact.md#ruby-bench-instructions-per-iteration)), so the 8.1.x patch line is
+the likely source. A lead for a later Callgrind diff, not posted. A first Callgrind run without the fixed heap failed
+its A/A (railsbench +3.6%, shipit −2.9%) and is not used. YJIT instruction counts were not run.
+
+**Reviewer findings applied.** The dependency chain is loofah 2.25.3 → nokogiri ≥ 1.19.5 (not rails-html-sanitizer);
+the first draft's "wall time within the spread" was wrong for railsbench interpreted; the body says erubi-rails stays
+on 8.0 as in #456. nobu's open #461 touches the same lockfiles but already conflicts with main in all of them; not
+mentioned (DECISIONS: collaborative, not credit-seeking). TruffleRuby and Windows coverage of railsbench and lobsters
+with nokogiri 1.19.7 come only from the PR's CI.
+
+**Body (as opened; [file](../../bench/upstream/ruby_bench_round2/rails-bump-body.md)):**
+
+> This bumps lobsters, railsbench, shipit and activerecord from Rails 8.1.1 (shipit 8.1.2) to 8.1.4.1, the latest 8.1 release. Only Gemfile.lock files change. Action View 8.1.4.1 requires rails-html-sanitizer 1.7.2, which needs loofah 2.25.3, which needs nokogiri 1.19.5 or later, so those move too. erubi-rails stays on Rails 8.0, as in #456. #566 makes the same nokogiri change in shipit; the two PRs merge cleanly in either order.
+>
+> `bundle lock --update` fails for railsbench and activerecord on CRuby because of the JRuby-only git source from #530, so I copied versions and checksums from the new lobsters lock (nokogiri -java from rubygems.org). `bundle install` on Ruby 4.0.9 leaves both unchanged, and JRuby 10.1.2.0 rewrites them the same way it rewrites main's.
+>
+> All 2,000 railsbench, 114 lobsters and 57 shipit requests return 200 with the same bodies as on main, apart from CSRF tokens and timestamps.
+>
+> Rails 8.1.4.1 runs about 1–1.5% more instructions per iteration (Callgrind, Ruby 4.0.9 interpreter, fixed heap, two processes per tree; main vs main within 0.1%): railsbench +1.4–1.5%, shipit +1.1%, lobsters +0.8–1.0%. Wall time from two runs is too noisy to confirm this.
+
+## 2. YJIT and ZJIT still compile in the measured window
+
+**Measured.** [`jit_counts.sh`](../../bench/upstream/ruby_bench_round2/jit_counts.sh): the stock default harness with
+`WARMUP_ITRS=0 MIN_BENCH_ITRS=60 MIN_BENCH_TIME=0`, per-iteration deltas via `YJIT_BENCH_STATS=compiled_block_count,compiled_iseq_count,invalidation_count,compile_time_ns`
+(4.0.9 `--yjit`) and `ZJIT_BENCH_STATS=compiled_iseq_count,compiled_side_exit_count,compile_time_ns,code_region_bytes`
+(master `--zjit`), two processes per cell, eight at a time, each in its own copy of ruby-bench. Summaries with
+[`counts_table.rb`](../../bench/upstream/ruby_bench_round2/counts_table.rb); raw output in
+[`counts/`](../../bench/upstream/ruby_bench_round2/counts/).
+
+| | last iteration with a compile | window 16–25 (default) | 31–40 (`--warmup=30`) | 51–60 (`--warmup=50`) |
+| --- | ---: | ---: | ---: | ---: |
+| YJIT railsbench | 59 | 7–74 blocks, 0.01–0.02% | 38–52 blocks, 0.01% | 18–19 blocks, 0.01% |
+| YJIT lobsters | never stops (60) | ≈2,010 blocks, 112 ISEQs, 0.88–0.93% | ≈1,700 blocks, 76 ISEQs, 0.65% | ≈300 blocks, 28 ISEQs, 0.16% |
+| YJIT shipit | never stops (60) | ≈1,267 blocks, 52 ISEQs, 0.32% | 134–203 blocks, 0.05% | 346–394 blocks, 0.10% |
+| YJIT erubi-rails | 51–56 | 3–9 blocks, 0.00–0.01% | 32 blocks, 0.01% | 6–12 blocks, 0.01% |
+| ZJIT railsbench | 39–42 | 2 ISEQs, 0.01% | 1–2 ISEQs, 0.01% | 0 |
+| ZJIT lobsters | 49 | 26 ISEQs, 0.31–0.34% | 14 ISEQs, 0.27% | 0 |
+| ZJIT shipit | 49 | 4–5 ISEQs, 0.05–0.07% | 6–7 ISEQs, 0.06% | 0 |
+| ZJIT erubi-rails | 31 | 2 ISEQs, 0.02% | 1 ISEQ, 0.02% | 0 |
+
+Percentages are `compile_time_ns` over the wall time of the same ten iterations. Mean iteration times do not trend
+after iteration 16 beyond run-to-run noise (YJIT lobsters 617/579 ms in 16–25, 593/604 ms in 26–40, 634/594 ms in
+41–60). This matches the impact run: lobsters' window gained about 3,400 YJIT blocks there.
+
+**How ruby-bench chooses warmup.** `harness/default.rb` runs `WARMUP_ITRS` (default 15), then at least
+`MIN_BENCH_ITRS` (10) and `MIN_BENCH_TIME` (10 s). `run_benchmarks.rb --warmup=N` sets `WARMUP_ITRS` for every
+benchmark; `benchmarks.yml` has `desc`, `category`, `ractor`, `single_file`, `default_harness` and pinning keys but no
+warmup key. `harness/warmup.rb` (MAD threshold) is the opt-in alternative. Downstream,
+[rubybench](https://github.com/rubybench/rubybench/blob/bd5a8e6a84165006a8b365541ddfbec374774bd9/lib/ruby_bench.rb#L10-L12)
+passes `--warmup=30` for YJIT and ZJIT runs since rubybench/rubybench#30 (eightbitraptor, merged 2026-11-04; its body
+says speed.ruby-lang.org uses 50); ruby/ruby's `tool/zjit_diff.rb` calls `run_benchmarks.rb` with the default 15.
+
+**Verdict: no PR.** A per-benchmark warmup would need a new `benchmarks.yml` key and harness plumbing, and it would
+not make YJIT flat on lobsters or shipit even at 50. The compile time left in the window is under 1% (YJIT
+lobsters) and under 0.1% elsewhere with 30 warmup iterations, the published runs already use 30, and YJIT is in
+maintenance mode. The issue draft below is for the coordinator and Thomas; it is not opened (new issues need
+Thomas's OK).
+
+**For Lowrail's JIT-flat gate.** ZJIT on master is flat after 50 warmup iterations on all four; YJIT 4.0.9 never is on
+lobsters and shipit within 60. A YJIT row on those two can only pass with a much longer warmup, or with a gate that
+allows a stated compile-time share.
+
+**Issue draft (not opened; [file](../../bench/upstream/ruby_bench_round2/warmup-issue-draft.md)):**
+
+> **Title:** The default 15 warmup iterations leave YJIT and ZJIT compiling in the measured window of the Rails benchmarks
+>
+> With the default harness (15 warmup iterations, then at least 10 measured iterations and 10 seconds), YJIT and ZJIT still compile new code during the measured iterations of railsbench, lobsters, shipit and erubi-rails. I counted compiles per iteration with `YJIT_BENCH_STATS=compiled_block_count,compiled_iseq_count,compile_time_ns` (Ruby 4.0.9, `--yjit`) and `ZJIT_BENCH_STATS=compiled_iseq_count,compile_time_ns` (Ruby master 7f9638f41e, `--zjit`), `WARMUP_ITRS=0 MIN_BENCH_ITRS=60`, on ruby-bench 00f0f8b, two processes each:
+>
+> | | last iteration with a compile | compile time in iterations 16–25 | 31–40 | 51–60 |
+> | --- | ---: | ---: | ---: | ---: |
+> | YJIT railsbench | 59 | 0.01–0.02% | 0.01% | 0.01% |
+> | YJIT lobsters | 60 (never stops) | 0.88–0.93% | 0.65% | 0.16% |
+> | YJIT shipit | 60 (never stops) | 0.32% | 0.05% | 0.10% |
+> | YJIT erubi-rails | 51–56 | 0.01% | 0.01% | 0.01% |
+> | ZJIT railsbench | 39–42 | 0.01% | 0.01% | 0 |
+> | ZJIT lobsters | 49 | 0.31–0.34% | 0.27% | 0 |
+> | ZJIT shipit | 49 | 0.05–0.07% | 0.06% | 0 |
+> | ZJIT erubi-rails | 31 | 0.02% | 0.02% | 0 |
+>
+> The percentages are compile time over the wall time of those 10 iterations. In iterations 16–25, YJIT compiles about 2,000 blocks per lobsters process and 1,270 per shipit process.
+>
+> rubybench already passes `--warmup=30` for JIT runs (rubybench/rubybench#30), and with 50 warmup iterations ZJIT compiles nothing in the window on any of the four. The remaining cost is small; the question is whether `run_benchmarks.rb` should default to a longer JIT warmup for these benchmarks, so local runs and `tool/zjit_diff.rb` measure the same steady state as the published numbers. `benchmarks.yml` has no per-benchmark warmup setting today.
+
+## 3. Planner statistics for shipit
+
+`db/production.committed.sqlite3` has no `sqlite_stat1`; its largest tables are `commits` (150 rows), `statuses`
+(141), `tasks` and `schema_migrations` (78). [`plans_harness.rb`](../../bench/upstream/ruby_bench_round2/plans_harness.rb)
+records every SELECT of one pass after one warmup pass (Ruby 4.0.9, SQLite 3.50.3, sqlite3 gem 2.7.3), prints
+`EXPLAIN QUERY PLAN` before and after `ANALYZE` on the same in-memory connection, and times each statement with its
+recorded binds (median of 5 × 2,000 executions):
+
+* 23 distinct SELECTs, 4,275 executions per pass. `ANALYZE` takes 0.3–0.5 ms and writes 38 rows.
+* 6 plans change (275 executions per pass): the `commits` range queries use the primary key instead of
+  `index_commits_on_stack_id` (240 executions), the three-row `users` and `repositories` lookups and the `stacks`
+  list switch to a scan, and the `tasks` `LIMIT` query reads the primary key in order instead of sorting.
+* SQLite time per pass for those six: 1.13 → 0.99 ms; for all 23: 49.9 → 49.5 ms, within the timing's spread. A shipit
+  iteration takes about 1,700 ms interpreted and 800 ms with YJIT, so the gain is below 0.02%.
+
+**Verdict: no PR.** Unlike lobsters (#565, 10.8 → 0.08 ms on the hottest query), shipit's tables are too small for a
+plan to matter.
+
+## 4. The lobsters `/reply` pages
+
+`/comments/:id/reply` renders `comments/_commentbox.html.erb`, which says "This story is almost 90 days old and will
+stop accepting comments in N minutes" with N = `((comment.story.created_at - Story::COMMENTABLE_DAYS.days.ago) / 60).floor`.
+`days.ago` reads `Time.now`, so N falls by one per minute: two runs 28 minutes apart rendered `-1606878` and
+`-1606906`, and that is the only difference after stripping CSRF tokens (runs within the same minute are
+byte-identical). The guard `(story.created_at - 1.hour).before?(90.days.ago)` has been true for every story since the
+fixture's stories (all created 2023-07-18) passed 90 days in October 2023, so the same branch renders every time,
+and N keeps seven digits until about 2042 (10,000,000 minutes is 19 years after the window closed in October 2023). Same queries, same template, same
+length (2,572 bytes).
+
+**Verdict: no PR.** The work per iteration does not vary; at most the text, by one digit in about 2042. #565's body already
+calls these pages run-dependent.
+
+## Method and receipts (round 2)
+
+* Scripts in [`bench/upstream/ruby_bench_round2/`](../../bench/upstream/ruby_bench_round2/); each benchmark ran in
+  its own checkout or `cp -a` copy, so no two processes shared `tmp/` or railsbench's database.
+* Wall time: [`bump_bench.sh`](../../bench/upstream/ruby_bench_round2/bump_bench.sh), `WARMUP_ITRS=10
+  MIN_BENCH_ITRS=10 MIN_BENCH_TIME=0`, `setarch -R taskset -c 1`, one process at a time, base then bump, two rounds.
+* Instructions: `actionview_cpu/ruby_bench_ir.rb run --benches railsbench,lobsters,shipit --modes interpreter`
+  with variants `base-a`, `base-b`, `bump-a`, `bump-b` (Gemfile copies with main's and the branch's locks), cachegrind,
+  4-iteration minus 1-iteration run after 2 warmups.
+* Reviews: a skeptical subagent per PR (facts against the logs and commits, outsider read of the body); its findings
+  are in each section.
