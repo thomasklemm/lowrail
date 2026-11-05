@@ -108,18 +108,122 @@ Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](.
 
 ## SQLite schema readers: follow-up candidates, not in E2/E2b/E2c
 
-Found by Sol and Astra on the E2 stack (2026-11-05). All are on rails/rails main already; the stack doesn't make
-them worse.
+Found by Sol and Astra on the E2 stack; investigated through public APIs on 2026-11-05. **None merits a new PR
+in this round.** The attached-only table failure is a real regression in an incompletely supported configuration;
+the index parser limitation was explicitly declined upstream; the old CREATE lookup is bypassed by production
+schema readers on main. E2b, E2 and E2c remain unchanged. No new topic branch or queue item, and no upstream post.
 
-- **Attached databases:** `MASTER_CTE` reads `sqlite_master` (= `main`) and `sqlite_temp_master` only, so a table
-  that exists only in an attached schema is invisible to the batched readers (`columns`, `indexes` give nothing).
-- **`build_index` regex:** `ON\b\s*"?(\w+?)"?\s*\(` matches only `\w+` table names, so the `where` and expression
-  columns of partial and expression indexes on quoted names with other characters are lost.
-- **`table_structure_sql`** (`sqlite3_adapter.rb`, used by `table_structure` in the alter/copy paths) looks up the
-  CREATE statement with its own exact-name, main-first `UNION ALL`. Through the public API: `change_column_default`
-  on table `Widgets` named as `widgets` raises `Could not find table 'widgets'` on main; with E2 it succeeds and keeps
-  the collation, auto-increment and check constraint (8-1-stable drops all three). On 8-1 and with E2 the copied table
-  comes back named `widgets`, not `Widgets` (pre-existing rename in `alter_table`).
+Pins: Rails main `1e235cee11b0a7aecb189d8837534807626287aa`, 8-1-stable
+`6e091242176c322edc5a8907583c01b08b8a60bc`, and the complete E2b → E2 → E2c stack
+`6c80a5583bcaf5f0f869eb8efa6ec7e210f3b51f`. The same probes also ran immediately before and after the batching
+change: `c8d223147de1907b4bd3779b5733a55ab9ba9858` and `2cb3daba96decf29d1009621a244677630aad9a4`.
+All used Ruby 4.0.9 (`3e93b23afc`) and sqlite3 gem 2.10.2, SQLite 3.54.1, with independent in-memory connections.
+
+### Attached databases: regression, but not a support expansion
+
+With `ATTACH DATABASE ':memory:' AS extra`, a table created as `extra.attached_items` is usable as unqualified
+`attached_items` in SQL. Both `tables` and `SELECT * FROM attached_items` see it on every tested tree, but:
+
+| Public reader of unqualified `attached_items` | 8-1-stable / parent of batching | batching commit / main / complete stack |
+| --- | --- | --- |
+| `columns` | id, number | StatementInvalid: Could not find table |
+| `primary_key` | id | StatementInvalid: Could not find table |
+| `indexes` | attached_number, columns [number], **where nil** | [] |
+| `check_constraints` | [] | [] |
+
+Reproducer setup (then call the readers above):
+
+```ruby
+connection.execute("ATTACH DATABASE ':memory:' AS extra")
+connection.execute('CREATE TABLE extra.attached_items ("id" integer PRIMARY KEY, "number" integer, CONSTRAINT positive CHECK (number > 0))')
+connection.execute('CREATE INDEX extra.attached_number ON attached_items (number) WHERE number > 1')
+```
+
+This isolates the regression to `2cb3daba96`: `MASTER_CTE` cannot supply the table row for the joined pragma.
+It does **not** establish that attached schemas were supported before: 8-1-stable already loses the partial
+predicate and check constraint, and `columns("extra.attached_items")` raises a SQLite syntax error (main raises
+Could not find table). Conversely, ordinary model CRUD really did work: with an attached-only `(id, number)` table,
+`AttachedItem.create!(number: 4)` followed by `AttachedItem.find(item.id).number` returns 4 on stable and the parent
+of batching; batching/main/the stack raise Could not find table. Incomplete schema introspection did not prevent
+that useful behavior.
+
+The [earlier investigation by the author of an attached-schema patch](https://github.com/rails/rails/pull/35339#issuecomment-466265426)
+describes discovering that support had not actually worked as claimed; this is not a formal maintainer support
+ruling. The [separate open proposal](https://github.com/rails/rails/pull/57337) would add automatic attachment and
+cross-database model joins, not fix this reader alone.
+
+**Decision:** park this real regression pending an affected production caller. Searches found raw-SQL/SQLite
+ATTACH users, not a confirmed app or released gem relying on these Active Record readers. Blindly appending every
+attached schema to the CTE would need schema identity, attachment order and shadowing handled correctly. A narrow
+fallback to the old pragmas for missing column/primary-key results is plausible, but has not been established as
+an exact fix for all affected readers. Do not claim that a narrow restoration is impossible, or that the older
+metadata limitations made model CRUD unusable. No support expansion or speculative fallback is built this round.
+
+### Quoted table names: long-standing, explicitly declined
+
+For each of `assessments/quizzes`, `line items` and `quote"items`, public `create_table` and `add_index` succeed.
+After `add_index(name, :number, name: "partial", where: "number > 0")`, `indexes(name)` reports columns `["number"]`
+but `where: nil`. Add `add_index(name, "number % 10", name: "expression", where: "number > 1")` and `indexes(name)`
+raises `NoMethodError: undefined method 'size' for nil`; `change_column_default(name, :number, 2)` then raises the
+same error while copying indexes. The ordinary-name control `ordinary_items` preserves both predicates and the
+expression, and changing its default succeeds. These results are identical on all five pinned trees above.
+
+The `ON\b\s*"?(\w+?)"?\s*\(` regex predates batching; `build_index` merely inherited it. This is not a new E2-stack
+regression. A real user already reported the slash-name partial-index loss in
+[rails/rails#55627](https://github.com/rails/rails/issues/55627); fatkodima
+[identified this exact regex and said it was not worth fixing](https://github.com/rails/rails/issues/55627#issuecomment-3262902799),
+recommending underscores instead. The issue is closed as not planned.
+
+**Decision:** no regex PR. A broader identifier matcher might repair these examples, but would reopen a known
+maintainer decision without new real-application evidence. The expression-index exception is recorded, not hidden
+as merely a missing `where`. No patch, passing-fix claim or mutation-test claim is made for this declined lead.
+
+### `table_structure_sql`: old limitation, not a separate public regression on main
+
+The helper still has an exact-name, main-first lookup. However, since batching, public `columns` uses
+`fetch_column_definitions` → `table_structures`, and public primary/foreign-key readers use `table_structures` too.
+`copy_table` calls those public readers. The surviving `table_structure` / `column_definitions` alias goes through
+the old helper, but main overrides the generic `fetch_column_definitions` that would call it. The only direct
+Rails caller found outside that helper chain is the test-only `column_names` helper in
+[`copy_table_test.rb`](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/activerecord/test/cases/adapters/sqlite3/copy_table_test.rb#L100-L102),
+which sends the private `table_structure` method to get column names.
+
+Public repro: create `Widgets` with an auto-increment id, `label COLLATE NOCASE`, `number`, and named check
+`positive` (`number > 0`), then `change_column_default("widgets", :number, 2)`:
+
+| | 8-1-stable / parent of batching | batching commit / main | complete stack |
+| --- | --- | --- | --- |
+| Result | succeeds | StatementInvalid: Could not find table 'widgets' | succeeds |
+| label collation / named check after copy | nil / absent | no copy | NOCASE / positive |
+| id auto-increment after copy | true (re-created) | no copy | true |
+| stored table name after copy | widgets | Widgets (unchanged) | widgets |
+
+`TracePoint(:call)` around that public operation records **zero** `table_structure_sql` calls on main and the
+stack (3 and 8 `table_structures` calls respectively); 8-1-stable calls the old helper 7 times. An ordinary
+`change_column_default("items", :number, 7)` control succeeds on every tree: main/stack call `table_structures`
+8 times and the old helper zero times; stable calls the old helper 7 times. The lowercase-name failure belongs
+to E2 and is already fixed by it, not by changing `table_structure_sql`. The earlier note that stable drops
+auto-increment after this copy was too broad: the copied id is re-created with auto-increment.
+
+As a sensitivity control, replacing `table_structure_sql` with a method that always raises leaves every public
+probe's JSON result identical on main and the stack; the ordinary stable default-change control then raises.
+This is a reachability check, not a passing mutation-tested fix.
+
+**Decision:** no independent PR, and no stack dependency to add. Changing an unused private lookup would not fix
+an additional demonstrated public bug. Keep the helper and existing private-API tests untouched rather than mix
+cleanup or new compatibility promises into the E2 stack.
+
+### Follow-up verification
+
+Full `activerecord` `rake test:sqlite3`, Ruby 4.0.9, sqlite3 2.10.2 / SQLite 3.54.1, with
+`PARALLEL_WORKERS=2 MT_CPU=2`, each checkout's component `lib` directories on `RUBYLIB`, and the same installed
+gem environment (unbundled): main **10,289 runs, 36,772 assertions, 0 failures, 0 errors, 52 skips** (seed 42172);
+8-1-stable **9,454 runs, 32,213 assertions, 0 failures, 0 errors, 45 skips** (seed 62823). Main's SQLite adapter file
+alone: 110 runs, 269 assertions, 0 failures, 0 errors. These are clean-baseline suites, not tests of a new fix.
+No new Rails patch means no new fix-versus-main or fix-mutant claims. A skeptical subagent independently reproduced
+the five-tree probes and identified the attached-table model CRUD regression above; that evidence is included in
+the decision to park it rather than dismiss it as unusable before batching. Sol and Astra remain the coordinator's
+responsibility if any of these leads is reconsidered.
 
 ## Deliberate changes, recorded without a Rails PR
 
