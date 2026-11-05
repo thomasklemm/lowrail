@@ -1,3 +1,4 @@
+bench/upstream/pr-queue/nodoc-index-with-body.md	thomasklemm/array-index-with-nodoc	NODOC1
 bench/upstream/app_suites/op3-body.md	thomasklemm/validation-context-writer	OP3
 bench/upstream/app_suites/op1-body.md	thomasklemm/parameter-parsers-register-in-place	OP1
 bench/upstream/app_suites/dc1-body.md	thomasklemm/form-tag-helper-token-tag	DC1
