@@ -1,0 +1,15 @@
+diff --git a/activemodel/lib/active_model/indexed_row.rb b/activemodel/lib/active_model/indexed_row.rb
+--- a/activemodel/lib/active_model/indexed_row.rb
++++ b/activemodel/lib/active_model/indexed_row.rb
+@@ -12,8 +12,10 @@ def [](hash)
+       end
+ 
+       def build_indexes(columns)
++        indexes = {}
+         index = -1
+-        columns.index_with { index += 1 }
++        columns.each { |column| indexes[column] = index += 1 }
++        indexes
+       end
+     end
+ 

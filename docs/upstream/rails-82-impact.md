@@ -262,11 +262,13 @@ objects. Here it is attributed with Callgrind, on the same pins and fixed heap a
   and used-pool tracking (#59071, #59018, #58306; +65M), association routes (#59120 series; +20M), and execution
   state lookups (+17M). These are deliberate costs of Ractor support and the per-context connection/query-cache
   work. Savings elsewhere (routing −70M, relation building −68M) offset them.
-* **One accidental cost has a small exact fix.** byroot's #58663 (2b88dc1995) builds `Result#column_indexes`
-  through `IndexedRow.build_indexes` → `Array#index_with` → `to_h { [elem, yield] }`. That costs **about 2× per call**
-  what 8.1's `while` loop cost, at every column count (8, 16, 40 columns). Restoring the loop inside
-  `build_indexes` gives **−0.90% instructions on shipit against main** (A/A +0.08%), with the same hash
-  (last index wins for duplicate columns, same key order). See *Fix candidate* below. Nothing was opened or posted.
+* **`build_indexes` costs CPU on Ruby 4.0 by design, so no fix is queued** (corrected in the follow-up below; this
+  bullet first called it accidental). byroot's #58663 (1fbedade58, 2b88dc1995) builds `Result#column_indexes`
+  through `IndexedRow.build_indexes` → `Array#index_with` → `to_h { [elem, yield] }`. That costs **about 2× per
+  call** what 8.1's `while` loop cost. Restoring the loop gives **−0.90% instructions on shipit against main** (A/A
+  +0.08%). But byroot chose `to_h` on purpose: on Ruby 4.1, a hash grown from `{}` moves its table to the C heap
+  at the third key (ruby/ruby#18345), and on rails/rails#59108 he asked that `IndexedRow` keep `to_h` (#59203
+  reverted the general change). Nothing was opened or posted.
 * **Blog's +2.1% is not a per-request cost.** It is the tail of a major GC that started before the measured
   rounds. Its incremental marking falls inside the 32-round run but not the 2-round run, so the subtraction charges
   it to the rounds, and only minus-ours and main carry such a tail. With GC included over a 150-round window,
@@ -334,7 +336,7 @@ the cost:
 | --- | ---: | ---: | --- | --- | --- |
 | `Ractor#[]` + `Ractor.current` + `ActiveSupport::Ractors.[]` | +118.3M | ≤ +12M (inclusive) | `Ractor.current` 0 / 273,712 / 28,230 | slow path of `SchemaContext#attributes`: #58437 ([`a757a27584`](https://github.com/rails/rails/commit/a757a27584)), #58578 ([`0dd408e2d3`](https://github.com/rails/rails/commit/0dd408e2d3)); fixed for these models by our #59585 | deliberate feature, accidental slow path (fixed on main) |
 | `SchemaContext#attributes`, `#schema_loaded?` (×2), `schema_context`, `current_schema_context`, `Attributes#attribute_types` | +219.9M | +52.0M | `schema_context` 0 / 156,653 / 45,251 | ae739c3854 (#58437), 51a2a815a2 (#58578: `attribute_types` → `schema_context.attributes.types`), 3cf248de5b (#58767: `schema_loaded?` via `@schema_context`) | deliberate (Ractor-shareable schema) |
-| `Array#index_with` + `IndexedRow.build_indexes` − `Result#column_indexes` | +43.4M | +43.2M | 3,615 / 3,709 / 3,709 | 2b88dc1995 (#58663, [`d34ea2709f`](https://github.com/rails/rails/commit/d34ea2709f)) | **accidental; fix below** |
+| `Array#index_with` + `IndexedRow.build_indexes` − `Result#column_indexes` | +43.4M | +43.2M | 3,615 / 3,709 / 3,709 | 1fbedade58, 2b88dc1995 (#58663, [`d34ea2709f`](https://github.com/rails/rails/commit/d34ea2709f)) | **deliberate (Ruby 4.1 hash memory); not fixed, see below** |
 | `LazyAttributeSet#fetch_value!`, `IndexedRow::Mutable#fetch`/`#[]=`/`#initialize`, `IndexedRow#fetch` `LazyAttributeSet#initialize` vs 8.1's builder `fetch_value`, `default_attribute`, `key?`, `Result::IndexedRow#fetch`, `Result#initialize` | +17.6M | +18.3M | `fetch_value!` 0 / 71,653 / 71,653 | 3a2639a1d9, 3be318dff8, 1fbedade58 (#58663) | deliberate (casted values in a mutable indexed row; −14.6% objects) |
 | `WeakKeyMap#fetch_or_store` (lease 38,523 + association-route cache 19,596 calls) − 8.1's `LeaseRegistry#[]` | +22.7M | +22.7M | 0 / 58,119 / 58,119 | 5e8b610d3e (#59071, [`2983197a8f`](https://github.com/rails/rails/commit/2983197a8f)) | deliberate |
 | Rest of the connection-pool group: `ConnectionPool.used_pools!`, `UsedPoolSet#add`, `LeaseRegistry#lease`, pool helpers | +42.7M | +41.6M | `used_pools!` 0 / 24,151 / 24,151 | b6a1fc977b (#59018, [`2ead88ba28`](https://github.com/rails/rails/commit/2ead88ba28)) | deliberate (query caches per execution context) |
@@ -351,42 +353,114 @@ lookups (`rb_vm_opt_getconstant_path` +25M / +11M: `ActiveSupport::Ractors`, `Is
 #59585 removes 261M of the 363M that #58437/#58578 added. That is an interaction between our PRs and theirs, not
 cost added by others alone. Without it, shipit's residual is about +0.1% (+266M − 261M).
 
-### Fix candidate: `IndexedRow.build_indexes` (accidental, small, exact)
+### `IndexedRow.build_indexes`: a deliberate cost on 4.0, no PR (follow-up, 2026-11-05)
 
-[`build_indexes.patch`](../../bench/upstream/rails_82_impact/build_indexes.patch) on main `7a78da5a55`
-(activemodel/lib/active_model/indexed_row.rb):
+**Result.** On Ruby 4.0, `build_indexes` costs about twice what 8.1's loop did. A readable fix gives −0.52% Ir
+on shipit against main. Still, **nothing is queued and no branch is pushed.** The search before building found
+that byroot made this trade on purpose, for Ruby 4.1. Undoing it would reverse a maintainer's stated decision.
+Thomas's "yes" assumed the regression was accidental, so the decision goes back to him. No PR body was written and
+no Sol review was run, since nothing was built. The recommendation is to drop it: the cost on 4.0 is the price of
+byroot's 4.1 choice, and a fix for 4.0 alone would need a Ruby-version branch.
+
+**Why it is deliberate.** byroot replaced 8.1's `while` loop with `columns.to_h { |c| [c, index += 1] }` in
+[`1fbedade58`](https://github.com/rails/rails/commit/1fbedade58), then moved it into `IndexedRow.build_indexes` via
+`index_with` in [`2b88dc1995`](https://github.com/rails/rails/commit/2b88dc1995) (both #58663). On
+[rails/rails#59108](https://github.com/rails/rails/pull/59108) (amatsuda, an `each` loop for `index_with`) he wrote:
+"I specifically changed it to use `to_h` because incrementally building a hash like this isn't performing well in
+4.1". Since ruby/ruby#18345, `{}` has room for two keys and moves its table to the C heap at the third, while
+`Array#to_h` presizes and stays embedded up to 8. He measured spilled hashes on shipit and lobsters with a heap
+harness, and asked that `IndexedRow` keep `to_h`. #59108 was reverted in #59203. Our own
+[census 4](rails-main-census-4.md) had already rejected `index_with`'s pairs for this reason (lead 2). The
+callgrind follow-up missed that and called the cost accidental. The fix brings back exactly that incremental build:
+
+| `ObjectSpace.memsize_of(build_indexes(n columns))` | 3 | 6 | 8 | 12 | 16 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 4.0.9, main | 160 | 160 | 160 | 464 | 912 |
+| 4.0.9, fix (`each` or loop) | 160 | 160 | 160 | 544 | 544 |
+| master a041273a4c, main | 80 | 128 | 160 | 448 | 896 |
+| master a041273a4c, fix | 160 | 256 | 256 | 448 | 448 |
+
+On 4.0 the fix costs no memory at the common sizes. On 4.1 it doubles the hash at 3–8 columns, which is the cost
+byroot chose to avoid. Getting both would need a Ruby-version branch, and the readability gate rates that L3.
+
+**The readable form.** The readability gate rates the restored `while` loop
+([`build_indexes.patch`](../../bench/upstream/rails_82_impact/build_indexes.patch)) L3, because it is an index loop.
+The form that passes is [`build_indexes_each.patch`](../../bench/upstream/rails_82_impact/build_indexes_each.patch):
 
 ```ruby
 def build_indexes(columns)
   indexes = {}
-  index = 0
-  length = columns.length
-  while index < length
-    indexes[columns[index]] = index
-    index += 1
-  end
+  index = -1
+  columns.each { |column| indexes[column] = index += 1 }
   indexes
 end
 ```
 
-* **Per call** ([`build_indexes_micro.rb`](../../bench/upstream/rails_82_impact/build_indexes_micro.rb),
-  cachegrind, 20,000 calls minus 0; Ir per call, so GC is included):
+Out loud: "start with an empty hash and a counter before zero; for each column, advance the counter and store it
+under the column's name; return the hash." It uses the same counter idiom as `IndexedRow.[]` just above. Rated L1,
+since `indexes[column] = index += 1` chains two assignments. flog for `build_indexes`: 5.3 on main, 7.8 for
+`each`, 11.3 for the loop. RuboCop on the file: no offenses before or after; Metrics stay under the thresholds.
+`each_with_index { |column, index| indexes[column] = index }` would read better, but it gains nothing (12,897 vs
+12,734 Ir on 4.0.9, 15,068 vs 13,821 on master).
 
-  | Columns | 8.1 loop / this fix | main (`index_with`, `to_h` pairs) | `each_with_index` | `each_with_index.to_h` |
-  | ---: | ---: | ---: | ---: | ---: |
-  | 8 | 8,287 | 17,603 | 13,653 | 16,747 |
-  | 16 | 17,523 | 33,566 | 27,312 | 31,448 |
-  | 40 | 40,992 | 78,588 | 63,765 | 70,262 |
+**Per call, cachegrind, fixed heap** ([`build_indexes_ir.sh`](../../bench/upstream/rails_82_impact/build_indexes_ir.sh),
+the real Active Support and Active Model from each tree, 20,000 calls − 0;
+[raw](../../bench/upstream/rails_82_impact/build_indexes_ir.txt)). Ruby master is a041273a4c (4.1.0dev).
+"#59557" is our open rails/rails#59557 at 9aafb10814 (`Array#index_with` via `Hash.new(capacity:)` on 4.1).
 
-* **Shipit, cachegrind as in the impact run** (`ruby_bench_ir.rb`, 4 − 1 iterations): main 5.920e9 / A/A twin
-  5.925e9 (+0.08%), fix 5.872e9 / 5.866e9: **−0.90%** (claimed, > 2 × A/A).
-* **Same result:** checked against main's version for `[]`, `%w[id]`, duplicate columns (`%w[id name id]`,
-  `%w[a b a b c]`: the last index wins, as 7d2f63b1e4 expects) and mixed keys. Equal hashes, same key order,
-  neither frozen. The Rails test suite was not run.
-* **Not measured:** Ruby 4.1, where #59203 makes `to_h`'s presized hash stay embedded up to 8 entries. A loop
-  growing the hash may lose that there. `Hash.new(capacity:)` needs Ruby 3.4, and Rails main supports ≥ 3.3.5.
-* **Rejected candidate:** `LeaseRegistry#lease` as `self[context] || (self[context] = Lease.new)` instead of
-  `fetch_or_store`: −0.13% (A/A 0.08%), not claimed.
+| Ir per call | Columns | main | main A/A | + #59557 | + fix (`each`) | + both | + loop |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4.0.9 interpreter | 3 | 6,512 | 6,508 | 6,510 | 4,378 (−33%) | 4,381 | 3,121 |
+| | 8 | 14,921 | 14,909 | 14,910 | 10,071 (−33%) | 10,072 | 6,962 |
+| | 16 | 31,590 | 31,639 | 31,665 | 22,065 (−30%) | 22,052 | 15,985 |
+| master interpreter | 3 | 7,189 | 7,186 | 7,586 (+5.5%) | 5,687 (−21%) | 5,682 | 4,392 |
+| | 8 | 16,107 | 16,102 | 15,225 (−5.5%) | 12,182 (−24%) | 12,191 | 8,955 |
+| | 16 | 32,090 | 32,023 | 27,891 (−13%) | 22,623 (−30%) | 22,636 | 16,284 |
+| master ZJIT | 3 | 5,773 | 5,772 | 7,371 (+28%) | 3,726 (−35%) | 3,727 | 3,453 |
+| | 8 | 13,790 | 13,608 | 12,663 (−8%) | 7,731 (−44%) | 7,729 | 7,122 |
+| | 16 | 27,817 | 27,921 | 21,870 (−21%) | 14,141 (−49%) | 14,166 | 13,023 |
+
+Best of 7 × 200,000 calls at 8 columns, after 2,000 warmup calls: 4.0.9 interpreter 1,399 / 1,406 (A/A) → 854 ns;
+YJIT 1,038 / 1,036 → 430 ns; master interpreter 1,291 / 1,336 → 1,184 ns (#59557 1,267); ZJIT 1,038 / 999 → 717 ns
+(#59557 1,058). Objects per call: 11 → 3 everywhere (#59557 alone: 3 on the master interpreter, 5 under ZJIT, 11 on 4.0.9).
+
+* **#59557 does not remove this cost on 4.1.** It saves 5.5% at 8 columns on the master interpreter and costs
+  more at 3 (+5.5% interpreter, +28% ZJIT). The fix doesn't go through `index_with`, so "+ both" equals "+ fix" in
+  every cell. The two changes don't overlap.
+* **No ZJIT loss** for the fix (−35% to −49%, A/A 1.3%).
+
+**Shipit, cachegrind as in the impact run** (`ruby_bench_ir.rb`, interpreter, 4 − 1 iterations; base main):
+
+| Ruby | main A/A | + #59557 | + fix (`each`) | + both | + loop |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 4.0.9 | +0.08% | +0.05% | **−0.52%** | −0.47% | −0.82% / −0.92% |
+| master a041273a4c, round 1 | −0.99% | −1.31% | −1.40% | −1.34% | — |
+| master a041273a4c, round 2 | +0.04% | −1.10% | −0.31% | −0.43% | — |
+
+On 4.0.9 the `each` form is outside the A/A (−0.52% against +0.08%). On master, shipit can't separate any of the
+variants: the A/A twin moved by 1% between rounds, because the one-iteration window flips between two values.
+
+**Behaviour** (4.0.9 and master, main / fix / both): `[]` → `{}` (not frozen); duplicates `%w[id name id]` →
+`{"id"=>2, "name"=>1}` and `%w[b a b c a]` → `b 2, a 4, c 3` (last index wins, key at its first position, as
+7d2f63b1e4 expects); mixed keys `[:a, "a", 1]` keep their order; neither result is frozen; same as main
+everywhere. The callers on main: `Result#column_indexes` (memoized, not frozen on main either) feeds
+`indexed_rows`, `hash_rows` (`transform_values`) and `JoinDependency#instantiate` (`fetch`, `Remapper.new`).
+`Remapper#initialize` calls `build_indexes` after deduplicating its columns. `IndexedRow.[]` builds its own frozen
+indexes. The adapters' `build_indexes` in the MySQL and PostgreSQL schema statements are unrelated methods with
+the same name.
+
+**Test suites, main 7a78da5a55 vs main + `each` fix, Ruby 4.0.9, identical outcomes:**
+* Active Model: 1,250 runs, 0 failures, 0 errors.
+* Active Record sqlite3: 10,284 runs, 0 failures, 4 errors, 52 skips. The same four `SqliteStructureDump/LoadTest`
+  errors on both: no `sqlite3` command-line tool in the orb.
+* Active Record postgresql (PostgreSQL 15.19): 11,205 runs, 0 failures, 0 errors, 31 skips.
+* Active Record mysql2 (MariaDB 10.11.19): 10,395 runs, 0 failures, 1 error, 63 skips. The same
+  `CheckConstraintTest#test_check_constraints` error on both: MariaDB rejects `json_schema_valid` in a CHECK.
+
+**Also checked before building:** tenderlove's open rails/rails#59141 reworks `IndexedRow` (the same file and its
+callers). It keeps `build_indexes` as it is, but it is a second reason to wait.
+
+Rejected earlier: inlining `LeaseRegistry#lease` (−0.13%, A/A 0.08%).
 
 ### Blog GET pages, per round
 
