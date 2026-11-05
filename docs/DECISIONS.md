@@ -186,6 +186,8 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
   proposed to Thomas with the reason. The previously recorded slots (GC pool-budget fix, lead 3, Z13's top lead,
   Shopify/ruby#1064, #1065, #1091, #1058) stay in the queue and do not open.
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
+  **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
+  for a response to an earlier one.
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
   failure of ours, because each push notifies reviewers and reruns CI.
