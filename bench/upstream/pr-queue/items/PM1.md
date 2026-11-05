@@ -14,9 +14,9 @@ alternative_of:
 impact: on Ruby master an intent in the measured query shapes fits a 256-byte slot instead of 512, 256 B less per query; on Ruby 4.0 the same shapes stay at 320 B
 rank: 11
 risky: true
-state: draft
+state: held
 pr: 59673
-note: "reviewed: skeptic, Sol and Astra approve on 68c907bbeb under the contract (public API and Rails' callers identical, claims scoped); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: AsyncState name, the RangeError/affected_rows corner (31 ivars, main 32), removal of the nodoc session reader and writer, the unreachable nil-session and NullLock changes, the lock_wait test, A/A, Ruby 4.0 320 B result, Ir per call and the Method section; in docs/upstream/perf-round-main.md (Refresh on main 1e235cee11 and Second round)"
+note: "held: #59673 closed 2026-11-05 (Thomas) for low impact: no change on Ruby 4.0, 256 B per query only on Ruby master, no per-request evidence. Revisit after Ruby 4.1 is released and measure GC per request; branch kept"
 passes:
   - {reviewer: skeptic, head: "9fabafcf8b", date: 2026-11-05, verdict: approve, open: ""}
   - {reviewer: sol, head: "9fabafcf8b", date: 2026-11-05, verdict: changes, open: "lock_wait in the struct changed dup/freeze; applied in 8e7de36dbc"}
