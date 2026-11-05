@@ -542,6 +542,22 @@ so main's result is consistent and the test relied on the mismatch: 2 failures
 **SU5 (c): activerecord-import 2.1.0 calls the removed `validation_context=`**: 14 failures in the data import
 job and Intercom importer specs.
 
+*Readiness runner (2026-11-05), Chatwoot develop [`17b246068c`](https://github.com/chatwoot/chatwoot/tree/17b246068c1e141ba0dc8488ca7f4c83f466e8ce),
+main `bdb3d96012`* ([readiness](readiness.md#full-run-of-the-app-round-2026-11-05)): the same port and bumps, 7682
+examples. CW1–CW5, SU5 and the mail fallout as above, plus one new group:
+
+**CW6 (c), covered by our open #59574: a positional `Arel::Table.new` in Chatwoot's new conversation summary.**
+[`Arel::Table.new(:message_candidates)`](https://github.com/chatwoot/chatwoot/blob/17b246068c1e141ba0dc8488ca7f4c83f466e8ce/app/models/concerns/conversation_message_summary_queries.rb#L29),
+added on 2026-11-05 (chatwoot#16135, simplified in #16563), raises `ArgumentError: wrong number of arguments (given 1,
+expected 0)` on main: 54 failures (12 direct, 42 as 500s or a `pluck` on nil in the conversation list controllers).
+The cause is b1650993b0 (#57829), the positional table name of [arel-table-positional](arel-table-positional.md), as
+in PI1; with #59574 cherry-picked (`chatwoot-prs`) all 54 pass and CW1/CW2 are gone too (#59642, #59644). No new
+patch; Chatwoot's side would be `name:`.
+
+*Noise, candidate only:* 16 examples of `bulk_actions_controller_spec` (`Validation failed: User has already been
+taken` from the `inbox_member` factory) and `remove_stale_redis_keys_job_spec` fail under seed 4242 in one worker on
+both main variants, and pass 5/5 alone on both trees; the cause (an earlier file in that worker's order) wasn't traced.
+
 **Deprecations that only main emits** (warnings in the main run): 1817 `` `verify_authenticity_token` is deprecated
 … use `skip_forgery_protection` `` (as in Redmine and Forem); 16 `config.active_record.raise_on_assign_to_attr_readonly`
 is deprecated; 8 `Passing a Redis or ConnectionPool instance via the :redis configuration to
@@ -699,6 +715,17 @@ which the plain class lacks: `NameError`, a 500 for a POST to `/auth/*` without 
 * 3 (b): `ActiveModel::Errors#inspect` now prints `#<ActiveModel::Errors:0x… @errors=[]>` (4c0776608a, #56865,
   `instance_variables_to_inspect`); `steps_inspector_spec` matches 8.1's `#<ActiveModel::Errors []>`.
 * Not seen: S2, SU1–SU5, R2-x, E1–E4, AR-1–AR-3, L1, L2.
+
+*Readiness runner (2026-11-05), Discourse main [`f2eb5d605b`](https://github.com/discourse/discourse/tree/f2eb5d605b577bb62715c5df54ef390f133a9e81),
+Rails main `bdb3d96012`* ([readiness](readiness.md#full-run-of-the-app-round-2026-11-05)): 35822 examples, the same
+setup. 8-1: 28 F and 33 F, all environment as above. Plain main stops at DS1 in `db:migrate`. With the DS1 shim
+(`discourse-shimmed`), 158 candidate flags, all known: #59574's json_api_kit case 101, DS3 6, DS4 1, S1 1, the
+rspec-rails `_prefixes` 5, `precision: nil` 10, `Errors#inspect` 3, `Vary` 3, and 28 environment failures on both
+trees. DS2 and AR-4 are gone: #59595 (376d2d97db) and our #59634 (06eae38e6e) are on main now. One `Vary` failure is
+new because Discourse changed the spec: discourse#45549 (2026-11-05, "Update Rails components to 8.1.4.1") made
+`application_controller_spec`'s vary test expect 8.1.4.1's `Accept, X-Requested-With`, so main's added
+`Sec-Fetch-Site` fails it as well (open #59500, not ours). With our open PRs cherry-picked (`discourse-prs`) the
+json_api_kit failures are gone and the rest stays.
 
 **Deprecations that only main emits** (warnings, counted in the full main run):
 * 1246: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` ``, from

@@ -1,21 +1,51 @@
-# The app-suite round (docs/upstream/app-suites.md), as a readiness manifest. Pins, bumps, shims and setup are
-# taken from the round's threads; only lobsters was rerun through the runner (smoke test, docs/upstream/readiness.md).
-# The other suites are unchecked: their first run may need a setup fix, which shows as suite-did-not-load.
-# Services, started by hand: PostgreSQL on 5432 (user postgres, no password) for Mastodon and Sure, Redis on 6379,
-# Chrome for writebook-system. Main-only workarounds from the record are separate `-shimmed` suites, so the plain
-# suite still shows the finding they hide.
+# The app-suite round (docs/upstream/app-suites.md) as a readiness manifest: every public app of the record, each at
+# its default branch's head on 2026-11-05, with the record's bumps, shims and setup. The private Inertia app is not
+# part of this public repo.
+#
+# Variants per app:
+#   NAME          main as it is, so a boot failure from a finding reads as suite-did-not-load
+#   NAME-shimmed  main with the record's app-side shims for findings no PR of ours covers (candidate only)
+#   NAME-prs      main with our open rails/rails PRs cherry-picked (&prs below) instead of the app shims those PRs
+#                 make unnecessary
+# Variants share their base side with NAME (share_base), so 8-1-stable runs twice per app, not once per variant.
+#
+# Services from services.rb: PostgreSQL 15 with pgvector on 5432, PostgreSQL 18 on 5418 (Sure, for SU3), Redis on
+# 6379. Suites that use a service run one at a time, so trees and variants of one app can reuse database names;
+# each run loads its schema. System packages and the libvips 8.18.7 that Discourse needs: docs/upstream/readiness.md.
 ruby: 4.0.9
 rails:
-  base: 6e09124217      # 8-1-stable, v8.1.4.1
-  candidate: 8b06b0eb98 # main, as in the record
+  base: 6e091242176c322edc5a8907583c01b08b8a60bc      # 8-1-stable, v8.1.4.1
+  candidate: bdb3d960121e7eb73a61c04099d1eef3c821e397 # main, 2026-11-05
 seeds: [4242, 1717]
 alone_runs: 5
-timeout: 5400
+alone_max: 20
+timeout: 3600
+
+# Our open rails/rails PRs on 2026-11-05 with their heads, in an order that applies onto main bdb3d96012 (CHANGELOG
+# conflicts resolve as a union). Update the heads when a PR is pushed to, and drop a PR when it merges or closes.
+x-prs: &prs
+  ref: bdb3d960121e7eb73a61c04099d1eef3c821e397
+  picks:
+    59574: 79b81aa0bf85cc57232ba085d5b638b9e92bad91 # Arel::Table.new positional name (PI1, FO1, Discourse, Spree)
+    59627: 08be5191dbb02d95f50dc8fea61114d78a2ef82d # MAX_PASSWORD_LENGTH_ALLOWED (AR-2, Spree)
+    59630: 54e07d2dba321be3c2d7bcf16d3fefaa7cef5716 # GetIp#filter_proxies (R1, Mastodon)
+    59642: 58a6ff8355ff6b905c6aeae2ea939466f464b4fa # where("", values) (CW1)
+    59644: 0d3ef774bd115ede07048bd0194a27c2bafc03de # Resolver#_find_all (CW2)
+    59629: c814745459eb5b3c6ef26b898c0991004ec8f524 # LookupContext#find_template (AR-1)
+    59628: 8672567e1518efbb707dc520782dffd8a40a8fae # LogSubscriber.colorize_logging (E3)
+    59621: 8d29f4b6f02bcba1cf1ae446db4dc7839d3c1ae2
+    59617: 553f9267ee74910a8c5b93af52121422c569d83e
+    59611: 4a837183eafb2ac5dd3b9188ac3da3316eadcc6b
+    59609: 2e9fc7c4b482553cd6dea6fb0415b4b39059e11e
+    59569: fcfadc0ee84f1b53534a6407e10cf966d00c0d0d
+    59565: ab69e1b5e7ec7fbcb60592cc5b400143cce18a49
+    59564: 2fb737482fa9d03e3bbb35586edda131b42e6bdf
+    59557: 9aafb108143ff388b452c331d8f6ce4765de73e7
 
 suites:
   redmine: &redmine
     repo: https://github.com/redmine/redmine
-    ref: 41cd39c24a9f913a69c8a9ec4cbc128a6600fbce
+    ref: d9f5f18b65dc7f27509a8eb5ea18fe4a8dab0335 # master
     framework: minitest
     env: { RAILS_ENV: test, BUNDLE_WITHOUT: development }
     shims:
@@ -25,26 +55,27 @@ suites:
   # S1 stops main from booting; the record ran the rest of the suite with this candidate-only workaround.
   redmine-shimmed:
     <<: *redmine
+    share_base: redmine
     shims:
       - "printf 'test:\\n  adapter: sqlite3\\n  database: db/redmine_test.sqlite3\\ndevelopment:\\n  adapter: sqlite3\\n  database: db/redmine_dev.sqlite3\\n' > config/database.yml"
       - { tree: cand, run: "sed -i 's/insert_before Rack::Sendfile, Rack::ContentLength/insert_before ActionDispatch::Static, Rack::ContentLength/' config/application.rb" }
 
   lobsters: &lobsters
     repo: https://github.com/lobsters/lobsters
-    ref: b6ea255ad79e86a85b9c587d461d81545ca8f0a4
+    ref: 6f6e48f652ff10b8efb84c4882108f07a238340b # main
     framework: rspec
     env: { RAILS_ENV: test }
     shims: ["cp .github/workflows/check/* config/ && cp config/database.yml.sample config/database.yml"]
     setup: ["bin/rails db:schema:load db:migrate"]
     test: rspec
-  # L1 keeps every feature spec from loading with rspec-rails 8.0.x; the record pinned rspec-rails' fix.
+  # L1 keeps every feature spec from loading with released rspec-rails; the record pinned rspec-rails' fix.
   lobsters-rspec-rails-main:
     <<: *lobsters
     bumps: { rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 9fb6f4f0a3 } }
 
   solidus-core: &solidus
     repo: https://github.com/solidusio/solidus
-    ref: ed00fc8
+    ref: ed00fc881c88d62af152e550b68e859715cf9bf3 # main
     framework: rspec
     env: { DB: sqlite, BUNDLE_WITHOUT: "lint:release" }
     shims: ["sed -i 's/\"< 8.2\"/\"< 8.3\"/' core/solidus_core.gemspec"]
@@ -53,46 +84,229 @@ suites:
     <<: *solidus
     test: cd api && rspec
 
-  # The record used flatware with 6 workers; rspec_json.rb keeps every worker's results. Each run loads its own
-  # schema, because both trees share the database names.
-  mastodon: &mastodon
-    repo: https://github.com/mastodon/mastodon
-    ref: a255155
-    framework: rspec
-    env: { RAILS_ENV: test, DB_HOST: 127.0.0.1, DB_PORT: 5432, DB_USER: postgres, DB_PASS: "", ALLOW_NOPAM: "true",
-           BUNDLE_WITH: test, BUNDLE_WITHOUT: "development:pam_authentication" }
-    bumps: { rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 9fb6f4f0a3 } }
-    shims: ["corepack yarn install --immutable"]
-    setup: ["bin/rails assets:precompile"]
-    test: bin/rails db:drop db:create db:schema:load && flatware fan -w 6 bin/rails db:test:prepare && flatware rspec -w 6
-  # R1 and M1 cover about 2400 of the main failures; the record compared the rest with these app shims on main.
-  mastodon-shimmed:
-    <<: *mastodon
-    shims:
-      - "corepack yarn install --immutable"
-      - { tree: cand, patch: round-app-suites/mastodon-main-shims.patch }
-
-  sure:
-    repo: https://github.com/we-promise/sure
-    ref: e658686d5ba7a55734ae9f42683618aa42342b74
-    ruby: 3.4.9
-    framework: minitest
-    env: { RAILS_ENV: test, PARALLEL_WORKERS: 2, PLAID_CLIENT_ID: foo, PLAID_SECRET: bar,
-           DATABASE_URL: "postgres://postgres@127.0.0.1:5432", REDIS_URL: "redis://127.0.0.1:6379" }
-    bumps: { lookbook: "2.3.15" } # Rails main needs marcel ~> 2.0; lookbook < 2.3.15 pins marcel ~> 1.0
-    test: bin/rails db:drop db:create db:schema:load && bin/rails test
-
   # Writebook tracks main: its base is its own locked Rails, not 8-1-stable.
   writebook: &writebook
     repo: https://github.com/basecamp/writebook
-    ref: d57c62bc19edac3930d3860a2584757f1d45d07c
+    ref: d57c62bc19edac3930d3860a2584757f1d45d07c # main
     ruby: 3.4.12
-    rails: { base: 3a4961048ad251b50991ae83135d760a8a9e8ae3, candidate: 7a78da5a5576d7ab7549b10fb13156788478ba35 }
+    rails: { base: 3a4961048ad251b50991ae83135d760a8a9e8ae3, candidate: bdb3d960121e7eb73a61c04099d1eef3c821e397 }
     framework: minitest
     env: { RAILS_ENV: test }
     bumps: { globalid: "1.4.0" } # main's activejob needs globalid >= 1.4.0; it fits the locked Rails too
     setup: ["bin/rails db:prepare"]
     test: bin/rails test
+  # Headless Chrome from /usr/bin/google-chrome (docs/upstream/readiness.md); Writebook's locked Rails doesn't take
+  # the browser path from Selenium Manager yet.
   writebook-system:
     <<: *writebook
     test: bin/rails test:system
+
+  # Mastodon as its CI runs it: flatware with 8 workers, one database each.
+  mastodon: &mastodon
+    repo: https://github.com/mastodon/mastodon
+    ref: da4edd9b8003f54a5815165b5c8193604fbe679d # main
+    framework: rspec
+    services: [postgres, redis]
+    env: { RAILS_ENV: test, DB_HOST: 127.0.0.1, DB_PORT: 5432, DB_USER: postgres, DB_PASS: "", DB_NAME: mastodon,
+           ALLOW_NOPAM: "true", OIDC_ENABLED: "true", OIDC_SCOPE: read, SAML_ENABLED: "true", CAS_ENABLED: "true",
+           BUNDLE_WITH: test, BUNDLE_WITHOUT: "development:pam_authentication", DISABLE_DATABASE_ENVIRONMENT_CHECK: "1" }
+    bumps: { rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 570b2b0a79 } } # L1 and frozen _prefixes
+    shims: ["COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack yarn install --immutable"]
+    setup: ["bin/rails assets:precompile"]
+    test: bin/rails db:drop db:create db:schema:load && flatware fan -w 8 bin/rails db:test:prepare && flatware rspec -w 8
+    single: bin/rails db:test:prepare && rspec {id}
+  # #59630 restores filter_proxies (R1); M1 is Mastodon's own call of a private method, so it keeps its app shim.
+  mastodon-prs:
+    <<: *mastodon
+    share_base: mastodon
+    rails: { candidate: *prs }
+    shims:
+      - "COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack yarn install --immutable"
+      - { tree: cand, patch: round-app-suites/mastodon-m1-shim.patch }
+
+  # Forem as the record ran it: Ruby 3.3.13 (Forem pins 3.3.0, main needs >= 3.3.5), 4 processes split by file size,
+  # one database and Redis db each, headless Chrome for the system specs. Forem's test env raises on deprecations;
+  # both trees keep that and only log Devise 4.9's route mapper warning (forem-test-deprecations.patch).
+  forem: &forem
+    repo: https://github.com/forem/forem
+    ref: 310cb3f37b0a9eb351828218d7bbd5d8c15840f1 # main
+    ruby: 3.3.13
+    framework: rspec
+    services: [postgres, redis]
+    timeout: 5400
+    alone_max: 10
+    env: { RAILS_ENV: test, RUBY_DEBUG_ENABLE: "0", SKIP_JS_BUILD: "1", MISE_DISABLE_TOOLS: "postgres,redis,node,yarn", ZONEBIE_TZ: "Central Time (US & Canada)",
+           BROWSER_PATH: /usr/bin/google-chrome, DISABLE_DATABASE_ENVIRONMENT_CHECK: "1",
+           DATABASE_URL_TEST: "postgres://postgres@127.0.0.1:5432/forem_1", REDIS_URL: "redis://127.0.0.1:6379/1",
+           WORKER_ENV: "DATABASE_URL_TEST=postgres://postgres@127.0.0.1:5432/forem_%n REDIS_URL=redis://127.0.0.1:6379/%n",
+           WORKER_SETUP: 'redis-cli -n $TEST_ENV_NUMBER flushdb >/dev/null; dropdb -h 127.0.0.1 -U postgres --if-exists forem_$TEST_ENV_NUMBER && createdb -h 127.0.0.1 -U postgres -T $(cat .readiness-template 2>/dev/null || echo forem_template_$READINESS_TREE) forem_$TEST_ENV_NUMBER' }
+    # Each bump only main needs (c), applied to both trees as in the record.
+    bumps:
+      amazing_print: "3.0.0" # 2.0.0 reads LogSubscriber.colorize_logging at load (E3)
+      bullet: "8.3.0"        # 8.1.3 refuses active_record 8.2
+      carrierwave: "3.1.4"   # 3.1.3 pins marcel ~> 1.0
+      rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 570b2b0a79 } # L1 and frozen _prefixes
+    shims: &forem_shims
+      - "echo 3.3.13 > .ruby-version && cp .env_sample .env"
+      - { patch: round-app-suites/forem-test-deprecations.patch }
+      - bash $READINESS_MANIFEST_DIR/round-app-suites/forem-js.sh
+    # The template database: forem_template_TREE from this tree's schema, unless a shim names another one.
+    setup:
+      - "[ -f .readiness-template ] || DATABASE_URL_TEST=postgres://postgres@127.0.0.1:5432/forem_template_$READINESS_TREE bin/rails db:drop db:create db:schema:load"
+      - "PATH=$PWD/tmp/readiness-bin:$(mise where node@22)/bin:$PATH SKIP_YARN_INSTALL=true env -u SKIP_JS_BUILD bin/rails assets:precompile && ls app/assets/builds/admin.js"
+    test: bash $READINESS_MANIFEST_DIR/round-app-suites/parallel-rspec.sh 4 size
+    single: "createdb -h 127.0.0.1 -U postgres -T $(cat .readiness-template 2>/dev/null || echo forem_template_$READINESS_TREE) forem_1 2>/dev/null; rspec {id}"
+  # The record's three boot shims (require_dependency, InvalidAuthenticityToken, FO2), candidate only. F1 still
+  # stops db:schema:load, so this variant's candidate reads as suite-did-not-load at F1.
+  forem-shimmed:
+    <<: *forem
+    share_base: forem
+    shims:
+      - "echo 3.3.13 > .ruby-version && cp .env_sample .env"
+      - { patch: round-app-suites/forem-test-deprecations.patch }
+      - bash $READINESS_MANIFEST_DIR/round-app-suites/forem-js.sh
+      - { tree: cand, patch: round-app-suites/forem-main-shims.patch }
+  # As in the record: the boot shims, and the candidate's databases copied from 8-1's schema, because of F1.
+  forem-f1-schema:
+    <<: *forem
+    share_base: forem
+    shims:
+      - "echo 3.3.13 > .ruby-version && cp .env_sample .env"
+      - { patch: round-app-suites/forem-test-deprecations.patch }
+      - bash $READINESS_MANIFEST_DIR/round-app-suites/forem-js.sh
+      - { tree: cand, patch: round-app-suites/forem-main-shims.patch }
+      - { tree: cand, run: "echo forem_template_base > .readiness-template" }
+
+  # Chatwoot community edition, ported to 8.x on both trees as in the record (chatwoot-port.sh and the bumps), 8
+  # processes round-robin with one database and Redis db each. Ruby 3.4.4, its pin.
+  chatwoot: &chatwoot
+    repo: https://github.com/chatwoot/chatwoot
+    ref: 17b246068c1e141ba0dc8488ca7f4c83f466e8ce # develop
+    ruby: 3.4.4
+    framework: rspec
+    services: [postgres, redis]
+    alone_max: 10
+    env: { RAILS_ENV: test, POSTGRES_HOST: 127.0.0.1, POSTGRES_PORT: 5432, POSTGRES_USERNAME: postgres, POSTGRES_PASSWORD: "",
+           POSTGRES_DATABASE: chatwoot_1, REDIS_URL: "redis://127.0.0.1:6379/1", NODE_OPTIONS: "--openssl-legacy-provider",
+           DISABLE_DATABASE_ENVIRONMENT_CHECK: "1",
+           WORKER_ENV: "POSTGRES_DATABASE=chatwoot_%n REDIS_URL=redis://127.0.0.1:6379/%n",
+           WORKER_SETUP: "redis-cli -n $TEST_ENV_NUMBER flushdb >/dev/null; bin/rails db:drop db:create db:schema:load" }
+    bumps:
+      rails-i18n: "~> 8.0"
+      sprockets-rails: ">= 0" # Rails 8 no longer depends on it
+      administrate-field-belongs_to_search: { path: vendor-gems/administrate-field-belongs_to_search-0.10.0 }
+      ruby-vips: "2.3.0"      # 8.1's Active Storage refuses older ruby-vips
+      groupdate: "6.8.0"      # 6.2.1 fails 33 report specs on 8.1
+      redis-client: "0.30.1"  # SU4: main's RedisCacheStore needs >= 0.28.0 at boot
+      rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 570b2b0a79 } # L1
+    shims:
+      - bash $READINESS_MANIFEST_DIR/round-app-suites/chatwoot-port.sh
+      - COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack pnpm install --frozen-lockfile
+    setup: ["bin/vite build"]
+    test: bash $READINESS_MANIFEST_DIR/round-app-suites/parallel-rspec.sh 8 rr
+  # active_record_query_trace 1.9 calls attach_to on ActiveRecord::LogSubscriber at boot (c); Chatwoot loads it only
+  # in development, so the shim hides no test.
+  chatwoot-shimmed:
+    <<: *chatwoot
+    share_base: chatwoot
+    shims: &chatwoot_shimmed
+      - bash $READINESS_MANIFEST_DIR/round-app-suites/chatwoot-port.sh
+      - COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack pnpm install --frozen-lockfile
+      - { tree: cand, run: "sed -i \"s/^  gem 'active_record_query_trace'$/  gem 'active_record_query_trace', require: false/\" Gemfile" }
+  # #59642 (CW1) and #59644 (CW2) are ours.
+  chatwoot-prs:
+    <<: *chatwoot
+    share_base: chatwoot
+    rails: { candidate: *prs }
+    shims: *chatwoot_shimmed
+
+  # Discourse's core backend suite as its CI runs it: bin/turbo_rspec with 8 workers (every spec/**/*_spec.rb except
+  # spec/system), libvips 8.18.7 and pgvector. Both trees use the same database names, so each run rebuilds them
+  # (db:migrate loads the bundled plugins, then parallel:clone). Discourse starts a Redis per worker itself.
+  discourse: &discourse
+    repo: https://github.com/discourse/discourse
+    ref: f2eb5d605b577bb62715c5df54ef390f133a9e81 # main
+    framework: rspec
+    services: [postgres]
+    timeout: 5400
+    alone_max: 6
+    env: { RAILS_ENV: test, BUNDLE_WITHOUT: development, LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2,
+           PGHOST: 127.0.0.1, PGUSER: postgres, DISCOURSE_DEV_DB_USERNAME: postgres }
+    shims: ["pnpm install --frozen-lockfile"]
+    # The asset tasks boot the app, so setup builds the databases first; each run builds them again for its tree.
+  # db:migrate reports a failed seed and still exits 0, so discourse-seeded.sh checks that the categories exist.
+    setup:
+      - >-
+        for db in discourse_test discourse_test_multisite discourse_test_{1..8}; do dropdb --if-exists $db; done &&
+        createdb discourse_test && bin/rake db:migrate && $READINESS_MANIFEST_DIR/round-app-suites/discourse-seeded.sh && bin/rake parallel:clone
+      - bin/rake assets:precompile:asset_processor assets:precompile:pretty_text
+    test: >-
+      for db in discourse_test discourse_test_multisite discourse_test_{1..8}; do dropdb --if-exists $db; done &&
+      createdb discourse_test && bin/rake db:migrate && $READINESS_MANIFEST_DIR/round-app-suites/discourse-seeded.sh && bin/rake parallel:clone &&
+      bin/turbo_rspec --seed $SEED --format progress
+    single: "bin/rspec {id}"
+  # DS1 (a): the chat plugin's two-column foreign_key now raises on every use, so db:migrate can't seed; the fix is
+  # Discourse's (as: :chatable).
+  discourse-shimmed:
+    <<: *discourse
+    share_base: discourse
+    shims: &discourse_shimmed
+      - pnpm install --frozen-lockfile
+      - { tree: cand, run: "sed -i 's/foreign_key: %i\\[chatable_id chatable_type\\],/as: :chatable,/' plugins/chat/lib/chat/category_extension.rb" }
+  # #59574 covers json_api_kit's positional Arel::Table.new.
+  discourse-prs:
+    <<: *discourse
+    share_base: discourse
+    rails: { candidate: *prs }
+    shims: *discourse_shimmed
+
+  # Spree's backend CI: rake test_app, then parallel_rspec with 4 processes. Both of main's boot breaks are covered
+  # by our #59627 and #59574, so the -prs variant needs no app shim. spree-readiness.patch (both trees) raises the
+  # gemspec's rails cap, keeps the eco Gemfile in the dummy app, gives each tree its own databases, and points the
+  # root Gemfile's rails at the tree under test: test_app runs Spree's install generator in the root bundle (as CI
+  # does), so setup installs that bundle first, into the suite's bundle path (with_unbundled_env drops BUNDLE_PATH,
+  # and the generator's `bundle exec --gemfile` looks there). test_app hides migration errors, so setup checks the table count
+  # and shows the migration's error.
+  spree-core: &spree
+    repo: https://github.com/spree/spree
+    ref: 0eb13214ed61c48c0cebdb356e0235c0b40e61d7 # main
+    framework: rspec
+    services: [postgres]
+    gemfile: spree/core/Gemfile
+    alone_max: 10
+    env: { DB: postgres, DB_HOST: 127.0.0.1, DB_USERNAME: postgres, PGHOST: 127.0.0.1, PGUSER: postgres, LIB: core }
+    shims: [{ patch: round-app-suites/spree-readiness.patch }]
+    setup:
+      - >-
+        ruby -rbundler -e 'p = ENV["BUNDLE_PATH"]; Bundler.with_unbundled_env { exit system({ "BUNDLE_PATH" => p }, "bundle", "install", "--quiet", "--gemfile", "spree/Gemfile") }' &&
+        cd spree/$LIB && db=spree_${LIB}_spree_test_$READINESS_TREE && for i in "" 2 3 4; do dropdb --if-exists $db$i; done &&
+        rake test_app && n=$(psql -Atc "select count(*) from information_schema.tables where table_schema='public'" $db) &&
+        { [ "$n" -ge 200 ] || { echo "test_app: $n tables in $db"; cd spec/dummy && RAILS_ENV=test bin/rails db:migrate; exit 1; }; } &&
+        for i in 2 3 4; do createdb -T $db $db$i; done
+    test: cd spree/$LIB && parallel_rspec -n 4 --group-by filesize spec
+    single: cd spree/$LIB && rspec {id}
+  spree-core-prs:
+    <<: *spree
+    share_base: spree-core
+    rails: { candidate: *prs }
+  spree-api: &spree_api
+    <<: *spree
+    gemfile: spree/api/Gemfile
+    env: { DB: postgres, DB_HOST: 127.0.0.1, DB_USERNAME: postgres, PGHOST: 127.0.0.1, PGUSER: postgres, LIB: api }
+  spree-api-prs:
+    <<: *spree_api
+    share_base: spree-api
+    rails: { candidate: *prs }
+
+  # Last in the queue: Sure uses PostgreSQL 18 and Redis, so it runs alongside the PostgreSQL 15-only suites before it.
+  sure:
+    repo: https://github.com/we-promise/sure
+    ref: 529d7de76f07ba0557e8a442dd7c53cdd401169a # main
+    ruby: 3.4.9
+    framework: minitest
+    services: [postgres18, redis]
+    env: { RAILS_ENV: test, PARALLEL_WORKERS: 2, PLAID_CLIENT_ID: foo, PLAID_SECRET: bar,
+           DATABASE_URL: "postgres://postgres@127.0.0.1:5418", REDIS_URL: "redis://127.0.0.1:6379",
+           DISABLE_DATABASE_ENVIRONMENT_CHECK: "1" }
+    bumps: { lookbook: "2.3.15" } # Rails main needs marcel ~> 2.0; lookbook < 2.3.15 pins marcel ~> 1.0
+    test: bin/rails db:drop db:create db:schema:load && bin/rails test

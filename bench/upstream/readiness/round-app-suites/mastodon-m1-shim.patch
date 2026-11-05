@@ -1,0 +1,13 @@
+diff --git a/app/models/concerns/status/safe_reblog_insert.rb b/app/models/concerns/status/safe_reblog_insert.rb
+index 94bed5b39..6cd483822 100644
+--- a/app/models/concerns/status/safe_reblog_insert.rb
++++ b/app/models/concerns/status/safe_reblog_insert.rb
+@@ -61,7 +61,7 @@ module Status::SafeReblogInsert
+       reblog_bind = nil
+       values.each do |name, attribute|
+         attr = arel_table[name]
+-        bind = predicate_builder.build_bind_attribute(attr.name, attribute.value)
++        bind = predicate_builder.build_bind_attribute(attr, attribute.value)
+ 
+         im.columns << attr
+         binds << bind

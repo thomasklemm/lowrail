@@ -32,19 +32,21 @@ Options: `--only a,b` runs some suites, `--fresh a` drops a suite's cached state
 from what is cached, `--work DIR` (default `~/src/readiness/<manifest name>`) and `--out DIR` (default
 `WORK/out`), `--services-down` stops every database service (teardown after a crash).
 
-Databases: a suite lists the services it needs (`services: [postgres, mysql, redis, memcached]`).
+Databases: a suite lists the services it needs (`services: [postgres, postgres18, mysql, redis, memcached]`).
 [`services.rb`](../../bench/upstream/readiness/services.rb) starts the ones not already listening as orb services
 `readiness-<name>`, with data under `WORK/services` created on first use, and the round stops what it started when
 it ends, also on failure:
 
 | Service | Where | Accounts |
 | --- | --- | --- |
-| `postgres` | PostgreSQL 15 on 127.0.0.1:5432 and `/var/run/postgresql` | trust; superusers `postgres` (password `postgres`) and `user` |
+| `postgres` | PostgreSQL 15 on 127.0.0.1:5432 and `/var/run/postgresql`, 300 connections, pgvector if installed | trust; superusers `postgres` (password `postgres`) and `user` |
+| `postgres18` | PostgreSQL 18 on 127.0.0.1:5418 (socket in `/tmp`), for findings that need 18.4+ (Sure's SU3) | the same |
 | `mysql` | MariaDB on 127.0.0.1:3306 and `/run/mysqld/mysqld.sock` | `root` and `user` without password, timezone tables loaded |
 | `redis`, `memcached` | 6379, 11211 | no persistence |
 
 The packages (`postgresql`, `mariadb-server`, `redis-server`, `memcached`) must be installed, with their system
-services disabled. Suites that share a service run one at a time, because variants of a gem share database names;
+services disabled; for the app round, [`app-prereqs.sh`](../../bench/upstream/readiness/app-prereqs.sh) installs
+them and the rest that round needs (below). Suites that share a service run one at a time, because variants of a gem share database names;
 each suite creates its databases in `setup`.
 
 ## Manifest
@@ -65,8 +67,13 @@ invalidates the cached runs whenever it moves), the Ruby, the two seeds and the 
 | `bumps` | gems replaced or added on both trees, `{name: "version"}` or `{name: {git: …, ref: …}}` (e.g. an unreleased rspec-rails fix) |
 | `services` | databases to start for the suite (above) |
 | `exclusive` | a name; suites with the same name never run at the same time (e.g. ones that share a fixed `/tmp` path) |
-| `ruby`, `rails` | a suite's own Ruby, or its own `base` and `candidate` Rails refs |
+| `ruby`, `rails` | a suite's own Ruby, or its own `base` and `candidate` Rails refs; a ref can be `{ref: SHA, picks: {PR: head SHA}}`, that commit with those rails/rails pull requests cherry-picked in order (CHANGELOG conflicts merge as a union, anything else stops the round), kept as `refs/readiness/picks-*` in `WORK/rails.git` |
+| `share_base` | another suite whose base side this one reuses (checkout, bundle, setup and base runs); for variants that differ only on the candidate, which `--check` verifies |
+| `timeout`, `alone_max` | per suite (or for the round): seconds per run (default 3600), and how many one-seed tests are rerun alone (the rest read `one-seed`) |
 | `single` | how to run one test alone, with `{id}` (default `rspec {id}`, or the test command with `-n /^Class#test$/` in `TESTOPTS`) |
+
+Commands see `READINESS_TREE` (`base` or `cand`), so a suite can give each tree its own database names, and
+`READINESS_MANIFEST_DIR`, for scripts next to the manifest. Top-level keys starting with `x-` hold YAML anchors.
 
 Each suite gets one checkout per tree (`WORK/suites/NAME/{base,cand}`), so a schema dump or a generated file on
 one tree never leaks into the other. The base lock starts from the suite's own lock if it has one, the candidate
@@ -76,11 +83,15 @@ inputs like the refs: they apply to both trees, they are part of the cache key, 
 ## What it does
 
 Per suite: prepare both trees (checkout, shims, lock, bundle, setup), then run base and candidate under seed A
-and again under seed B (`SEED`, `TESTOPTS=--seed=…`, and `SPEC_OPTS=--seed … --format json`, so a suite's own
-command needs no seed flag). Each run is cached under `WORK/state/NAME/` with a key over the suite, its commit,
+and again under seed B (`SEED`, `TESTOPTS=--seed=…`, and `SPEC_OPTS=--seed … --require rspec_json.rb`, so a
+suite's own command needs no seed flag). `rspec_json.rb` adds its JSON formatter after the command line's
+formatters instead of passing `--format` in `SPEC_OPTS`: RSpec takes `SPEC_OPTS`' formatters in place of the
+command line's, which dropped the formatter Discourse's `turbo_rspec` workers report through, so the parent waited
+forever. Each run is cached under `WORK/state/NAME/` with a key over the suite, its commit,
 that tree's Rails SHA, the lock digest, `ruby -v`, the seed and the explicit inputs. A crashed round resumes at the
 first missing run; when only the candidate moves (the next beta), the base runs are reused. A run killed by
-`timeout` (manifest key, default 3600 s) counts as not loaded.
+`timeout` (manifest key, default 3600 s) counts as not loaded; a run cut off because the round was stopped (no exit
+status) is not cached, so the resumed round runs it again.
 
 Every test that fails in a candidate run gets one class:
 
@@ -89,6 +100,7 @@ Every test that fails in a candidate run gets one class:
 | `confirmed` | fails 2/2 on the candidate, passes 2/2 on base |
 | `flaky-candidate` | fails 1/2 on the candidate, 0/2 on base, and fails at least once in 5 runs alone; the counts for both trees are in `detail` |
 | `order-dependent` | fails 1/2 on the candidate, 0/2 on base, and passes all 5 runs alone |
+| `one-seed` | fails 1/2 on the candidate, 0/2 on base, but the suite's `alone_max` tests were already rerun alone |
 | `base-failing` | fails on base too, with the same kind of error |
 | `signature-changed` | fails on both trees with different errors |
 | `suite-did-not-load` | a tree did not bundle, did not boot, or ran no test (RSpec load errors, a crash, a timeout); such a suite never reads as 0 failures, and its tests are not compared |
@@ -125,7 +137,7 @@ as the ledger.
 | Manifest | Round | Run |
 | --- | --- | --- |
 | [`proof-e64f5a4258.yml`](../../bench/upstream/readiness/proof-e64f5a4258.yml) | the proof round below | in full |
-| [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook | smoke test only: `lobsters-rspec-rails-main`, 927 examples; L2 3 `confirmed` as `known:L2`, as in the record |
+| [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook, Forem, Chatwoot, Discourse, Spree (core, api), 24 suites with their variants | in full against main `bdb3d96012`, below |
 | [`round-ecosystem-1.yml`](../../bench/upstream/readiness/round-ecosystem-1.yml) | [ecosystem-tests](ecosystem-tests.md), 24 gems in 29 suites | in full against main `7a78da5a55`, below |
 | [`round-ecosystem-2.yml`](../../bench/upstream/readiness/round-ecosystem-2.yml) | [ecosystem round 2](ecosystem-round-2.md), 26 gems in 49 suites | in full against main `7a78da5a55`, below |
 
@@ -214,6 +226,56 @@ Time: the four runs per suite add up to 82 minutes in round 1 (good_job 29, soli
 70 in round 2 (shoulda-matchers 13 per variant, factory_bot_rails' cucumber 11), before bundling and the reruns
 alone; `--jobs 3` overlaps them, except for suites that share a service or an `exclusive` name.
 
+## Full run of the app round (2026-11-05)
+
+[`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml): 8-1-stable `6e09124217` against main
+`bdb3d960121e7eb73a61c04099d1eef3c821e397`, Ruby 4.0.9 unless noted, seeds 4242 and 1717, `--jobs 3`, on one
+a1.large orb (8 cores, 16 GB) with PostgreSQL 15 and 18 and Redis from `services.rb`. Output in
+[`round-app-suites/`](../../bench/upstream/readiness/round-app-suites/summary.md). Each app runs as itself (`NAME`),
+with the app shims for findings no PR of ours covers (`-shimmed`), and with our 15 open rails/rails PRs cherry-picked
+onto main (`-prs`, `cc1ff7b867`) in place of the shims they make unnecessary; the variants share the base runs.
+Every app runs unattended; none is left manual.
+
+| App, pin (default branch, 2026-11-05) | Tests | Per run | Round time | Candidate result |
+| --- | --- | --- | --- | --- |
+| Redmine [`d9f5f18b65`](https://github.com/redmine/redmine/tree/d9f5f18b65dc7f27509a8eb5ea18fe4a8dab0335) | 6117 | 6–8 min | 30 min | plain: S1 at boot; shimmed: S1 1, S2 3 |
+| Lobsters [`6f6e48f652`](https://github.com/lobsters/lobsters/tree/6f6e48f652ff10b8efb84c4882108f07a238340b) | 936 | 1 min | 5 min | plain: L1 at load; with rspec-rails main: clean (L2 is merged) |
+| Solidus [`ed00fc881c`](https://github.com/solidusio/solidus/tree/ed00fc881c88d62af152e550b68e859715cf9bf3) | core 4487, api 684 | 4–6 min, 1 min | 25 min | core clean; api SO1 1 |
+| Writebook [`d57c62bc19`](https://github.com/basecamp/writebook/tree/d57c62bc19edac3930d3860a2584757f1d45d07c), Ruby 3.4.12, base its locked main `3a4961048a` | 313, system 3 | under 1 min | 5 min | clean (2 libvips failures on both trees) |
+| Mastodon [`da4edd9b80`](https://github.com/mastodon/mastodon/tree/da4edd9b8003f54a5815165b5c8193604fbe679d) | 8010 | 2–3 min | 15 min | plain: R1 2195, M1 225, S2 11, precision 3, enum 1; prs (with the M1 app shim): S2 11, `Vary` 19, precision 3, enum 1 |
+| Sure [`529d7de76f`](https://github.com/we-promise/sure/tree/529d7de76f07ba0557e8a442dd7c53cdd401169a), Ruby 3.4.9, PostgreSQL 18 | 14661 | 8–12 min | 40 min | SU2 455, SU5 27, SU3 3, SU4 2; SU1 is merged (#59640) |
+| Forem [`310cb3f37b`](https://github.com/forem/forem/tree/310cb3f37b0a9eb351828218d7bbd5d8c15840f1), Ruby 3.3.13 | 16487 | 9–10 min | 80 min | plain: deprecation at boot; shimmed: F1 at schema load; with 8-1's schema: 1741, all the record's groups (FO1, FO3, deprecations) |
+| Chatwoot [`17b246068c`](https://github.com/chatwoot/chatwoot/tree/17b246068c1e141ba0dc8488ca7f4c83f466e8ce), Ruby 3.4.4 | 7682 | 3–4 min | 50 min | plain: `attach_to` at boot; shimmed: CW2 125, CW6 54 (new), SU5 14, CW1, CW3–CW5; prs: CW1, CW2 and CW6 gone |
+| Discourse [`f2eb5d605b`](https://github.com/discourse/discourse/tree/f2eb5d605b577bb62715c5df54ef390f133a9e81) | 35822 | 11–15 min | 90 min | plain: DS1 in `db:migrate`; shimmed: 130, among them #59574's json_api_kit 101; prs: 30; DS2 and AR-4 are merged |
+| Spree [`0eb13214ed`](https://github.com/spree/spree/tree/0eb13214ed61c48c0cebdb356e0235c0b40e61d7) | core 11236, api 6320 | 8 min, 4–5 min | 55 min | plain: AR-2 at boot; prs: SP1 50, SP3 2, SP2 1 |
+
+Round time is the four runs per variant plus reruns alone and prepares, measured on this run; with bundles cached a
+full rerun takes about 7 hours, most of it one suite at a time, since nearly every suite needs PostgreSQL.
+
+Result: 5181 candidate flags, every one known (5378 rows with the 197 that fail on base too), so **0 new**. The new
+groups the run turned up are recorded and matched: CW6 (Chatwoot's new positional `Arel::Table.new`, covered by our
+#59574) and a fourth Discourse `Vary` failure from a Discourse spec change (open #59500), both in
+[app-suites](app-suites.md); noise that passes alone on both trees (Chatwoot's `bulk_actions` order dependency,
+Discourse's `user_stat_spec` and the network-bound `smtp_spec`). Two Sure groups were checked by a rerun: the 9 files
+behind its aborted-transaction, Financekit and `assert_raises` rows fail 27 times with prepared statements and 0
+times without (266 tests), so they are SU2. Findings fixed on main since the record no longer show: L2 (#59625), SU1
+(#59640), DS2 (#59595), AR-4 (#59634).
+
+Runner fixes this run needed: RSpec's JSON formatter is added after the command line's formatters (Discourse's
+`turbo_rspec` hung on the first run, see above), a run cut off by stopping the round is not cached, and Spree's root
+bundle installs into the suite's bundle path.
+
+**Rerun when main moves.** Set `rails.candidate` and `x-prs.ref` to the new main, drop merged or closed PRs from
+`x-prs.picks` and update the pushed heads (`--check` resolves them), then:
+
+```sh
+bench/upstream/readiness/app-prereqs.sh && amp orb service start readiness --command 'cd ~/workspace/repo && exec mise exec ruby@4.0.9 -- ruby bench/upstream/readiness/readiness.rb bench/upstream/readiness/round-app-suites.yml --jobs 3'
+```
+
+The base runs are reused, so only the candidate side runs (about 4 hours). `summary.md` lists only what matches no
+entry in `known.yml` under **New**. Stop the service when it is written (`amp orb service stop readiness`, from the
+repository); `--services-down` cleans up after a crash.
+
 ## Limits
 
 * **Suites only.** The cross-version data differential ([rails-82-differential](rails-82-differential.md),
@@ -237,8 +299,12 @@ alone; `--jobs 3` overlaps them, except for suites that share a service or an `e
   with `character set utf8mb4` (counter_culture). Prepare failures are cached like runs; rerun them with
   `--fresh NAME`.
 * **Known findings are regexes.** A new failure with the same signature as a known one in the same suite reads
-  as known. The ecosystem entries are checked against the full run below; the app-suite entries (S, SU, M, R,
-  AR, WB) are still unchecked, because the app-suite manifest was only smoke-tested.
+  as known. The ecosystem and app-suite entries are checked against their full runs above; app entries name the
+  variants they show in and, where the signature is a bare assertion, the test files, so a new failure in another
+  file still reads as new.
+* **One round at a time on a1.large.** Discourse's 8 workers, Forem's 4 processes and Chatwoot's 8 fill the 16 GB;
+  scratch runs alongside the app round got processes OOM-killed. The app round's suites share PostgreSQL, so they
+  run one after another anyway.
 * **Locks hold a worker.** A suite waiting for a shared service or an `exclusive` name keeps its `--jobs` slot,
   so three shoulda-matchers variants in a row leave one worker for everything else. Order `--only` lists, or run a
   slow exclusive group in its own process.
