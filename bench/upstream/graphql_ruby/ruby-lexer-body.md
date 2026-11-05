@@ -1,10 +1,13 @@
-Title: Skip comments in the Ruby lexer without `loop`
+Parsing with the Ruby lexer takes about 24% more instructions on master than on 2.5.11 (Cachegrind, Ruby 4.0.9). Almost all of it comes from 2.6.1's change that counts comments toward `max_tokens`: `Lexer#advance` now skips comments in a `loop do … break end` block, and leaving that block with `break` goes through the VM's exception handler on every token. Every token also tries `COMMENT_REGEXP`, even when the next character isn't `#`.
 
-Since 2.6.1, `Lexer#advance` skips comments in a `loop do … next … break end` block so they count toward `max_tokens`. `break` leaves `loop`'s block through the VM's exception handler, once per token, and every token also tries `COMMENT_REGEXP`. In Cachegrind on Ruby 4.0.9, that commit adds 22.7% instructions to parsing, nearly all of the 24% between 2.5.11 and master.
+This uses a `while` loop that first checks for `"#"` with a String pattern, then skips the comment body. Comments are counted the same way, and the overflow error has the same position.
 
-This keeps the counting, but uses `while` and checks for `"#"` with a String pattern before matching the comment body. A failed `skip` clears the match state either way. On 34 inputs (comments, byte order marks, CR line endings, end of input, the benchmark queries) with `max_tokens` nil, 3, 5, 12 and 40, tokens, positions and errors match master. Tests pass with and without `GRAPHQL_CPARSER=1`.
+| | master | this PR |
+| --- | ---: | ---: |
+| `rake bench:parse`, introspection | 4.3–4.4k i/s | 5.4k i/s |
+| `rake bench:parse`, big query | 726–736 i/s | 923 i/s |
 
-That takes back about 90%: 16.4% fewer instructions over four documents (two runs, within 0.01%). In `rake bench:parse`, introspection goes from 4.3–4.4k to 5.4k i/s, the big query from 726–736 to 923.
+On 34 inputs (comments, BOMs, CR line endings, end of input) with five `max_tokens` values, tokens, positions and errors match master. Tests pass with and without `GRAPHQL_CPARSER=1`.
 
 ---
 
