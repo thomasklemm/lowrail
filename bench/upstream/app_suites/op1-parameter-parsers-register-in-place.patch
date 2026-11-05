@@ -1,4 +1,4 @@
-From 6331f395420aefccd78f24a399b81a8b72a9c143 Mon Sep 17 00:00:00 2001
+From 49b835ba58a49e91268c8296fa2d351dd8e36efe Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 12:05:18 +0000
 Subject: [PATCH] Allow registering parameter parsers in place during boot
@@ -16,9 +16,9 @@ a `before_ractorize` hook instead. The default is a copy of
 ---
  .../lib/action_dispatch/http/parameters.rb    |  9 +++-
  actionpack/lib/action_dispatch/railtie.rb     |  7 +++
- actionpack/test/controller/webservice_test.rb | 46 ++++++++++++++++++
- railties/test/application/ractors_test.rb     | 48 +++++++++++++++++++
- 4 files changed, 108 insertions(+), 2 deletions(-)
+ actionpack/test/controller/webservice_test.rb | 46 +++++++++++++++++
+ railties/test/application/ractors_test.rb     | 49 +++++++++++++++++++
+ 4 files changed, 109 insertions(+), 2 deletions(-)
 
 diff --git a/actionpack/lib/action_dispatch/http/parameters.rb b/actionpack/lib/action_dispatch/http/parameters.rb
 index 10b0e96fd7..437064f8fb 100644
@@ -122,10 +122,10 @@ index 23a46df5cd..8c90276074 100644
      with_test_route_set do
        assert_nothing_raised { post "/", headers: { "CONTENT_TYPE" => "application/json" } }
 diff --git a/railties/test/application/ractors_test.rb b/railties/test/application/ractors_test.rb
-index 89bb3d7faa..7a44ececc3 100644
+index 89bb3d7faa..354b7ff259 100644
 --- a/railties/test/application/ractors_test.rb
 +++ b/railties/test/application/ractors_test.rb
-@@ -83,6 +83,54 @@ class PostsController < ApplicationController
+@@ -83,6 +83,55 @@ class PostsController < ApplicationController
          assert_equal "post", on_ractor { PostsController._wrapper_options.name }
        end
  
@@ -175,6 +175,7 @@ index 89bb3d7faa..7a44ececc3 100644
 +
 +        Object.const_set(:LateParameters, Class.new { include ActionDispatch::Http::Parameters })
 +        assert_equal [:json], on_ractor { LateParameters.parameter_parsers.keys }
++        assert_equal({ "a" => 1 }, on_ractor { LateParameters.parameter_parsers[:json].call('{"a":1}') })
 +      end
 +
        test "ractorize! makes Rails.logger shareable" do

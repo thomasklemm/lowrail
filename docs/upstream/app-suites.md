@@ -1774,7 +1774,7 @@ Astra round 2: includers of `Parameters` outside `Request`'s hierarchy escaped t
 mutable `DEFAULT_PARSERS.dup` (Ractor::IsolationError from another Ractor); both confirmed. Fixed: the included block goes
 through the setter, and the hook freezes every class extended with `Parameters::ClassMethods` (one `ObjectSpace` pass).
 The new railties test fails on a `subclasses` mutant (grandchild), a `Request.descendants` mutant (unrelated includer)
-and the old `.dup` (Ractor read). actionpack 4520 runs, `ractors_test` 20 runs green, RuboCop clean. `thomasklemm/parameter-parsers-register-in-place` @ `6331f39542` (earlier `c5df553fa3`, then `860a2c7220`) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+and the old `.dup` (Ractor read). actionpack 4520 runs, `ractors_test` 20 runs green, RuboCop clean. `thomasklemm/parameter-parsers-register-in-place` @ `49b835ba58` (earlier `c5df553fa3`, `860a2c7220`, then `6331f39542`; Astra round 3 on `6331f39542`: approve, its nit applied: the Ractor test calls the later-included JSON parser) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
 [body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
 
 **OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)
