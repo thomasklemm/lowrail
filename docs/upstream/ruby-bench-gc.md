@@ -7,7 +7,7 @@ railsbench iteration, which is −0.64% of the iteration. On the closed PR tekkn
 benchmarks because it *does* matter at scale". Today, a change that cuts GC work without touching mutator work is
 invisible in ruby-bench. This page asks what ruby-bench should add so that such a change can be measured and compared.
 
-**Recommendation.** Two small draft branches on our fork, both unopened:
+**Recommendation.** Two small ruby-bench PRs, opened as #569 and #570 (below):
 
 1. [`thomasklemm/gc-time-by-collection-type`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/gc-time-by-collection-type).
    On Ruby 4.1+, `--harness=gc` records the marking time of each minor and each major GC from `GC::Profiler`.
@@ -37,15 +37,52 @@ on Ruby 4.0 its output stays as it is.
 
 ## Branches and state
 
-| branch | head | fork PR (CI only) | CI |
+| PR | branch | head | review |
 |---|---|---|---|
-| `thomasklemm/gc-time-by-collection-type` | `c18af102db` | thomasklemm/ruby-bench#12 | queued at the time of writing, behind 42 queued runs on thomasklemm/ruby |
-| `thomasklemm/gc-harness-average-precision` | `23f47c96b3` | thomasklemm/ruby-bench#13 | same |
+| [ruby/ruby-bench#569](https://github.com/ruby/ruby-bench/pull/569) "Record the marking time of each minor and major GC in harness-gc" | `thomasklemm/gc-time-by-collection-type` | `081b17e3ae` | skeptic, then Sol × 2 |
+| [ruby/ruby-bench#570](https://github.com/ruby/ruby-bench/pull/570) "Print GC harness averages without truncating them" | `thomasklemm/gc-harness-average-precision` | `2c2c695e69` | Sol × 2 |
 
-Both branches are one commit on ruby-bench main `00f0f8b`. Locally, the full test suite passes on master 9b30fd2
-(353 runs; the only error is the rmagick graph test, which also fails on main here). Draft bodies:
-[collection type](../../bench/upstream/ruby_bench_gc/collection-type-body.md),
-[average precision](../../bench/upstream/ruby_bench_gc/average-precision-body.md). Nothing is opened upstream.
+Both are one commit on ruby-bench main `ad63bf8`. They are independent and merge cleanly together, so they aren't
+stacked. Both were opened as drafts on 2026-11-05 with Thomas's approval, and were marked ready at 20:20–20:21 UTC, once
+upstream CI was green on the exact heads (15/15 checks each; [ledger](contributions.md)).
+
+Fork CI was abandoned: the runs queued behind thomasklemm/ruby's workflows. Fork PRs #12 and #13 were closed
+without comments, and upstream CI now runs our PRs without approval.
+
+**#541 check** (coordinator's request). I merged #541's head `0dbdc384af` with #569 and resolved the two conflicts
+the obvious way: #541's README paragraph plus #569's bullet, and #569's legend block plus #541's GC-counts line.
+A two-ruby gcbench run then shows `mark ms/minor` in #541's "GC per ruby" table with no extra code
+([output](../../bench/upstream/ruby_bench_gc/data/checks/pr541-merge-gcbench.txt)). The body's sentence
+("Once … #541 lands, its GC per ruby table shows these columns too"), with the added rebase note, is accurate.
+
+One of #569's tests would need a change on that rebase: it takes the first GC table as the ratios table, and with
+#541 the first table is "GC per ruby".
+
+**gc_balloon (#539) check.** main plus the #539 fix (`1348887947`), then #569 and #570, on Ruby master:
+* `mark ms/minor` 9.16 / 9.26 ms and `mark ms/major` 1.58 / 1.62 ms in two runs.
+* Exactly four majors per iteration: the benchmark's `GC.start(global: false)` calls.
+* The per-collection sum (4 × 1.6 + 10.1 × 9.2 ≈ 99 ms) matches `mark ms/iter` 99.1.
+
+On 4.0.9 there are no per-collection columns, and the printed average marking time is 148.3 ms instead of a
+truncated 148.0 ms ([outputs](../../bench/upstream/ruby_bench_gc/data/checks/)). The resulting note sentence is in
+[pr539-note](../../bench/upstream/ruby_bench_others/pr539-note.md).
+
+**Sol pass 1** (on the rebased heads):
+
+* Code must-fix: the real-GC test failed when the file ran alone, because a pending `need_major_by` turned its minor
+  GC into a major. Fixed with a full GC first.
+* Code nits fixed: the GC state is read both before and after `raw_data`, and a disabled profiler now gives N/A.
+* Body 1: four over-claims fixed.
+  * A `mark/iter` claim that the matrix never measured.
+  * "majors dominate lobsters": lobsters has about one major in 90 iterations.
+  * It didn't say the numbers came from a separate script that reads the same records.
+  * #541 now reads "once it lands".
+* Body 2: its railsbench example mixed per-GC and per-iteration time.
+
+**Sol pass 2:** no must-fix left; body 1 was cut to 168 words.
+
+Bodies as opened: [#569](../../bench/upstream/ruby_bench_gc/collection-type-body.md),
+[#570](../../bench/upstream/ruby_bench_gc/average-precision-body.md).
 
 ## What exists upstream
 
