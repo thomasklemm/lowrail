@@ -24,6 +24,8 @@ passes:
   - {reviewer: astra, head: "860a2c7220", date: 2026-11-05, verdict: changes, open: "round 2: non-Request includers, applied"}
   - {reviewer: astra, head: "6331f39542", date: 2026-11-05, verdict: nits, open: "round 3: approve; one test/body nit applied in 49b835ba58"}
   - {reviewer: sol, head: "49b835ba58", date: 2026-11-05, verdict: approve, open: production code unchanged since Astra round 3}
+  - {reviewer: astra, head: "49b835ba58", date: 2026-11-05, verdict: nits, open: "module/singleton-class includer fixtures, a lazy-load assertion, ancestors filter hardening, after replacing a manually frozen table; not applied"}
+  - {reviewer: skeptic, head: "49b835ba58", date: 2026-11-05, verdict: nits, open: "optional: before_ractorize hook walks ObjectSpace (others use .descendants); flag name parameter_parsers_frozen; one garbled body sentence; railties ractors_test not run (needs RACK=head)"}
 ---
 
 # Allow registering parameter parsers in place during boot

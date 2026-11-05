@@ -22,6 +22,8 @@ passes:
   - {reviewer: skeptic, head: "02443a3b04", date: 2026-11-05, verdict: changes, open: "blocker: DDL under sqlite3_ractor, applied, plus two nits"}
   - {reviewer: astra, head: "3b35e79cb5", date: 2026-11-05, verdict: nits, open: "round 2: approve; wrapper tests over Type::Json and the benchmark wording, applied in 9b2a64d040"}
   - {reviewer: sol, head: "9b2a64d040", date: 2026-11-05, verdict: approve, open: production code identical to the Astra-approved head}
+  - {reviewer: astra, head: "9b2a64d040", date: 2026-11-05, verdict: nits, open: "production code verified identical to 3b35e79cb5; nits: native-JSON nested-isolation test; CHANGELOG entry declined (fixed change unreleased)"}
+  - {reviewer: skeptic, head: "9b2a64d040", date: 2026-11-05, verdict: nits, open: "optional: body says override or forward the hook, but freezable_default? is nodoc; split test_freezing_eligibility_of_column_defaults; activerecord none-claim unverifiable"}
 ---
 
 # Keep models with mutable defaults off the frozen defaults
