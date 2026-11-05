@@ -1749,8 +1749,14 @@ freeze), and after `ractorize!` the setter stored a mutable hash that another Ra
 fixed: the setter freezes its argument once the registry is frozen; `ractors_test` reassigns after `ractorize!` and
 reads from a Ractor). Body at 173 words, "the registry and every parser value must be shareable". Re-review: open; the
 optional nit (`make_shareable` in the hook, so a plain-lambda parser fails at `ractorize!` instead of in the Ractor)
-is left out, because #57952 deliberately leaves shareability of the parsers to the app. Branch
-`thomasklemm/parameter-parsers-register-in-place` @ `c5df553fa3` on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+is left out, because #57952 deliberately leaves shareability of the parsers to the app. Astra review (2026-11-05), both
+confirmed: the setter's `@parameter_parsers.frozen?` check froze the replacement after a manual `freeze` (8.1: mutable)
+and the first assignment on a fresh `Class.new(ActionDispatch::Request)` (`nil.frozen?`). Fixed with a
+`Parameters.parameter_parsers_frozen` flag that the `before_ractorize` hook sets; the Ractor test now calls the XML and
+reassigned JSON parsers. Skeptical reviewer: no blocker; applied a test that registers in place on the untouched
+defaults (only the gated railties test caught a revert of `DEFAULT_PARSERS.dup`) and freezing `Request` subclasses in the
+hook, as main's setter did. actionpack 4520 runs and `ractors_test` (RACK=head) 19 runs green, RuboCop clean. Branch
+`thomasklemm/parameter-parsers-register-in-place` @ `860a2c7220` (earlier `c5df553fa3`) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
 [body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
 
 **OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)
