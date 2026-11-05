@@ -1,0 +1,75 @@
+# OpenProject for the readiness runner (docs/upstream/app-suites.md#openproject). Unchecked as a runner suite: the
+# round ran by hand with turbo_tests (5 workers, one database per worker, ~/w/run_suite.sh in the record). The test
+# command below does the same against the runner's PostgreSQL on 5432. One run takes 16-20 minutes on a1.large; 8
+# workers hit the orb's 16 GB limit (about 1.8 GB RSS each). The LDAP specs need Java 17 (default-jre-headless) and
+# the attachment specs ImageMagick on the host. OpenProject needs PostgreSQL >= 10; the round used 17.11 with CI's
+# docker/ci/postgresql.conf, the runner's 15 should do. The record's classification runs (fixes OP1/OP3/OP8 as main
+# plus round-app-suites/openproject-main-classify.patch and patched carrierwave/statesman) are not here: the runner
+# can't take a fork commit as candidate.
+ruby: 4.0.9
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1
+  candidate: bdb3d96012 # main, as in the record
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 3600
+
+suites:
+  openproject: &openproject
+    repo: https://github.com/opf/openproject
+    ref: 9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3
+    framework: rspec
+    services: [postgres]
+    env: { RAILS_ENV: test, CI: "true", BUNDLE_WITHOUT: "development:production:docker", BUNDLE_COOLDOWN: 0,
+           OPENPROJECT_DISABLE_DEV_ASSET_PROXY: 1, DISABLE_DATABASE_ENVIRONMENT_CHECK: 1, PARALLEL_TEST_FIRST_IS_1: "true",
+           OPENPROJECT_COLLABORATIVE__EDITING__HOCUSPOCUS__SECRET: secret12345, MALLOC_ARENA_MAX: 2,
+           PGHOST: 127.0.0.1, PGPORT: 5432, PGUSER: postgres }
+    # Rails 8-1-stable needs rails-html-sanitizer >= 1.7.2 (OpenProject locks 1.7.1); Rails main needs marcel ~> 2.0,
+    # which ruby_llm 1.16.0 and carrierwave 2.2.7 cap (vendored below with the cap lifted, on both trees).
+    bumps: { rails-html-sanitizer: "1.7.2", loofah: "2.25.3", nokogiri: "1.19.7",
+             ruby_llm: { path: vendor/lowrail/ruby_llm-1.16.0 }, carrierwave: { path: vendor/lowrail/carrierwave-2.2.7 } }
+    shims:
+      - |
+        set -e; mkdir -p vendor/lowrail; cd vendor/lowrail
+        for g in ruby_llm-1.16.0 carrierwave-2.2.7; do
+          mise exec ruby@4.0.9 -- gem fetch ${g%-*} -v ${g##*-} >/dev/null
+          mise exec ruby@4.0.9 -- gem unpack $g.gem >/dev/null
+          mise exec ruby@4.0.9 -- gem spec $g.gem --ruby > $g/${g%-*}.gemspec
+        done
+        sed -i 's/\["~> 1".freeze\]/[">= 1.0".freeze, "< 3".freeze]/' ruby_llm-1.16.0/ruby_llm.gemspec
+        sed -i 's/\["~> 1.0.0".freeze\]/[">= 1.0".freeze, "< 3".freeze]/' carrierwave-2.2.7/carrierwave.gemspec
+      - "printf 'test:\\n  adapter: postgresql\\n  encoding: unicode\\n  host: 127.0.0.1\\n  port: 5432\\n  username: postgres\\n  database: op_test<%%= ENV[\"TEST_ENV_NUMBER\"] %%>\\n  pool: 10\\n' > config/database.yml"
+      - { patch: round-app-suites/openproject-both-trees.patch } # deprecations to stderr; LOWRAIL_PORT_OFFSET
+    test: >-
+      p="psql -v ON_ERROR_STOP=1 -q -d postgres";
+      echo "drop database if exists op_test; create database op_test" | $p &&
+      psql -q -d op_test -f db/structure.sql >/dev/null &&
+      for i in 1 2 3 4 5; do echo "drop database if exists op_test$i; create database op_test$i template op_test" | $p; done &&
+      shopt -s extglob globstar nullglob &&
+      turbo_tests -n 5 {,modules/*/}spec/{!(features)/**/,}*_spec.rb
+  # On main, the Arel::Table name: keyword (PI1, rails#59574) and frozen default_url_options (SP1) stop boot or
+  # break whole modules, and scimitar 2.15.0 cannot register its parser (OP1); the round ran main with these.
+  openproject-shimmed:
+    <<: *openproject
+    shims:
+      - |
+        set -e; mkdir -p vendor/lowrail; cd vendor/lowrail
+        for g in ruby_llm-1.16.0 carrierwave-2.2.7; do
+          mise exec ruby@4.0.9 -- gem fetch ${g%-*} -v ${g##*-} >/dev/null
+          mise exec ruby@4.0.9 -- gem unpack $g.gem >/dev/null
+          mise exec ruby@4.0.9 -- gem spec $g.gem --ruby > $g/${g%-*}.gemspec
+        done
+        sed -i 's/\["~> 1".freeze\]/[">= 1.0".freeze, "< 3".freeze]/' ruby_llm-1.16.0/ruby_llm.gemspec
+        sed -i 's/\["~> 1.0.0".freeze\]/[">= 1.0".freeze, "< 3".freeze]/' carrierwave-2.2.7/carrierwave.gemspec
+      - "printf 'test:\\n  adapter: postgresql\\n  encoding: unicode\\n  host: 127.0.0.1\\n  port: 5432\\n  username: postgres\\n  database: op_test<%%= ENV[\"TEST_ENV_NUMBER\"] %%>\\n  pool: 10\\n' > config/database.yml"
+      - { patch: round-app-suites/openproject-both-trees.patch }
+      - { tree: cand, patch: round-app-suites/openproject-main-shims.patch }
+      - tree: cand
+        run: |
+          set -e; cd vendor/lowrail
+          mise exec ruby@4.0.9 -- gem fetch scimitar -v 2.15.0 >/dev/null
+          mise exec ruby@4.0.9 -- gem unpack scimitar-2.15.0.gem >/dev/null
+          mise exec ruby@4.0.9 -- gem spec scimitar-2.15.0.gem --ruby > scimitar-2.15.0/scimitar.gemspec
+          sed -i -e '14s/parameter_parsers\[\(.*\)\] = lambda do |body|/parameter_parsers = ActionDispatch::Request.parameter_parsers.merge(\1 => lambda do |body|/' \
+            -e '16s/end$/end)/' scimitar-2.15.0/lib/scimitar/engine.rb
+          cd ../..; sed -i 's|^gem "scimitar".*|gem "scimitar", path: "vendor/lowrail/scimitar-2.15.0"|' Gemfile

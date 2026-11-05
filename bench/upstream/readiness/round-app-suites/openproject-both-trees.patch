@@ -1,0 +1,30 @@
+diff --git a/config/environments/test.rb b/config/environments/test.rb
+index ff2b6b58..6c4b3b07 100644
+--- a/config/environments/test.rb
++++ b/config/environments/test.rb
+@@ -77,11 +77,11 @@ Rails.application.configure do
+   config.action_mailer.delivery_method = :test
+ 
+   # Silence deprecations early on for testing on CI
+-  deprecators.silenced = ENV["CI"].present?
++  deprecators.silenced = false # lowrail: report deprecations
+ 
+   # Print deprecation notices to the stderr.
+   config.active_support.deprecation =
+-    if ENV["CI"]
++    if false # lowrail: report deprecations
+       :silence
+     else
+       :stderr
+diff --git a/spec/support/parallel_helper.rb b/spec/support/parallel_helper.rb
+index aac9e089..8f3ed21d 100644
+--- a/spec/support/parallel_helper.rb
++++ b/spec/support/parallel_helper.rb
+@@ -35,6 +35,6 @@ module ParallelHelper
+   end
+ 
+   def port_for_app
+-    ENV.fetch("TEST_ENV_NUMBER", "1").to_i + 3000
++    ENV.fetch("TEST_ENV_NUMBER", "1").to_i + 3000 + ENV.fetch("LOWRAIL_PORT_OFFSET", "0").to_i # lowrail: two trees at once
+   end
+ end

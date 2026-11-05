@@ -28,6 +28,7 @@ overridden `primary_key` (#59622).
 | Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, silent; cells-rails part opened as trailblazer/cells-rails#75), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
 | Zammad `64e70ff` | rspec without system specs, 20323 examples, PostgreSQL 18.6, Redis, memcached (no Elasticsearch) | 7 F, 10 F (environment, also on main); failing files twice more: 7 F, 8 F | no shim needed; 2520 F, 2524 F; 2498 from one call (ZM1), 15 main-only otherwise | ZM1 (d, restore built, queued), ZM2 (c, rspec-rails), ZM3 (d), ZM4 (b), ZM5 (d), CW4 (b) |
 | Gumroad `74e3046` | rspec without browser specs, 36408 examples, Ruby 3.4.12, MySQL 8.4 + Valkey, Elasticsearch, DynamoDB Local, MinIO, memcached | 10 F, 7 F (environment, also on main); failing files a third time: 15 F | 1 gem shim and 1 spec_helper shim (GR1, ≈40% of examples without it); then 418 F, 417 F; 397 main-only and stable | S2 (b), GR1 (d), GR2 (c), GR3 (b), GR4 (d), GR5 (d), GR6 (b), GR7 (b)+(c), bullet (c); no new (a) |
+| OpenProject `9ae6b5c` | CI's units step (rspec, every spec directory but `features`, core and 32 modules), 61109 examples, turbo_tests ×5, PostgreSQL 17 | 13 F, 13 F (environment and parallel ports); failing files alone: 2 F | 3 boot shims (scimitar, PI1, SP1); 27418 F, 25633 F; with OP1/OP3/OP8 and classification shims, the 2404 failing files: 531 F, 533 F, all classified | OP1 (a, built), OP3 (d, restore built), OP8 (a, built), OP2/OP5 (d), OP4/OP6/OP7 (c), S2, DC3, L1, (b) |
 
 ## Findings
 
@@ -1556,3 +1557,245 @@ Devise `resource` hash-argument ones, `escape_json_responses` and `ActiveSupport
 * GR3, GR6, GR7: deliberate changes with CHANGELOG entries or a prior deprecation; GR7 is fixed by Sidekiq 8.
 * GR2 and bullet: fixed in released gem versions. GR5: a test double.
 * A second S2 note: Gumroad's six classes are more callers for the queued S2 note, not a new finding.
+
+## OpenProject
+
+opf/openproject `9ae6b5c` (default branch `dev`,
+[`9ae6b5cc50`](https://github.com/opf/openproject/tree/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3), 2026-11-05, GPLv3).
+Ruby 4.0.9 on both trees: OpenProject's `.ruby-version` pins exactly 4.0.9. Rails 8-1-stable `6e09124217` (v8.1.4.1)
+and main `bdb3d96012` (2026-11-05), both still the heads when the round ended, both as `path:` gems, for every run,
+bisect and fix. PostgreSQL 17.11 with CI's
+[docker/ci/postgresql.conf](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/docker/ci/postgresql.conf)
+(the CI image installs `postgresql-17`), Java 17 for the LDAP specs (ApacheDS through ladle; CI installs
+`default-jre-headless`), and ImageMagick. CI starts no Redis or memcached for these specs; Hocuspocus runs only for
+feature specs.
+
+**How CI splits the suite.** One job,
+[test-core.yml](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/.github/workflows/test-core.yml)
+"Units + Features", on a 32-vCPU runner (`m8a.8xlarge`) with a 40-minute timeout. It runs two steps in the CI
+container ([docker/ci/entrypoint.sh](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/docker/ci/entrypoint.sh)):
+* `run-units` is `turbo_tests -n $(nproc)` over `{,modules/*/}spec/{!(features)/**/,}*_spec.rb`. That is every spec
+  directory of core and the 32 modules except `features`: 3,820 files, 61,109 examples.
+* `run-features` runs the 796 feature files with Chrome, Firefox and Hocuspocus.
+
+No spec outside `features` is tagged `js:` or `type: :system`, so the units step is exactly the non-browser suite, and
+this round ran all of it. **No subset:** one run takes 18–20 minutes on a1.large with 5 turbo_tests workers, one
+database each (`reset_dbs` from entrypoint.sh, per tree). 8 workers hit the orb's 16 GB limit at about 1.8 GB RSS
+each. Both trees run at once with `LOWRAIL_PORT_OFFSET`, so their Capybara app ports don't collide.
+
+Recipe for the readiness runner:
+[round-app-suites-openproject.yml](../../bench/upstream/readiness/round-app-suites-openproject.yml) (unchecked by the
+runner). `openproject` is the plain suite, `openproject-shimmed` adds the main-only boot shims. Patches:
+[openproject-both-trees.patch](../../bench/upstream/readiness/round-app-suites/openproject-both-trees.patch),
+[openproject-main-shims.patch](../../bench/upstream/readiness/round-app-suites/openproject-main-shims.patch),
+[openproject-main-classify.patch](../../bench/upstream/readiness/round-app-suites/openproject-main-classify.patch).
+
+**Pins and bumps, the same on both trees.**
+* Rails `~> 8.1.3, >= 8.1.3.1` → `path:`. With it Bundler moves rails-html-sanitizer 1.7.1 → 1.7.2, loofah 2.25.2 →
+  2.25.3 and nokogiri 1.19.4 → 1.19.7 (8.1.4.1's actionview needs sanitizer >= 1.7.2). OpenProject's Gemfile sets
+  `source "https://rubygems.org", cooldown: 7`, so the lock needs `bundle lock --cooldown 0`.
+* Rails main needs marcel `~> 2.0`. ruby_llm 1.16.0 (`marcel ~> 1`) and carrierwave 2.2.7 (`marcel ~> 1.0.0`) cap it,
+  so both are vendored with the cap lifted to `>= 1.0, < 3` on both trees. Nothing else changes.
+* The main lock differs from the 8-1 lock only in Rails and what main itself requires: herb 0.11.1, marcel 2.1.0,
+  psych 5.5.0, ractor-dispatch 0.3.0, stringio 3.2.0.
+* Harness, both trees: `config/environments/test.rb` prints deprecations instead of silencing them under `CI`, and
+  `spec/support/parallel_helper.rb` adds `LOWRAIL_PORT_OFFSET` to the app port.
+
+**Main-only boot shims** (without them main doesn't boot, or whole modules fail):
+* scimitar 2.15.0 vendored, registering its parser with `parameter_parsers = parameter_parsers.merge(…)` (OP1).
+* 6 `Arel::Table.new(x)` → `Arel::Table.new(name: x)` (PI1, our open #59574).
+* `lib_static/open_project/static_routing.rb`: `default_url_options.clone` → `.dup` (SP1, frozen
+  `default_url_options`).
+
+**Results.**
+
+| Run | Examples | Failures |
+|---|---|---|
+| 8-1, seed 4242 / 1717 | 61,109 | 13 / 13, the same examples |
+| main (with the boot shims), seed 4242 / 1717 | 61,109 | 27,418 / 25,633; 16,083 fail in both |
+| fix tree, every file that failed in a main run (2,404 files), seed 4242 / 1717 | 41,888 | 531 / 533 |
+
+* **8-1 controls:** both runs fail the same 13 examples (gitlab `git_snippets` 7, bim `single_representer` 2, the PDF
+  attachments ImageMagick policy, markdown images, `create_ical_service`, the SAML provider seeder). The 6 files rerun
+  alone: 2 F. The ImageMagick policy path and the ical field order are environment; the other 11 depend on the
+  parallel run (the app port with the offset, in URLs).
+* **Main:** the count varies a lot between runs because whole files fail on OP3, and OP4 cascades in an
+  order-dependent way. In both main runs turbo_tests hung while printing tens of thousands of failures after its
+  workers had finished, so it was stopped, and the per-example status came from `tmp/spec_examples.txt`.
+* **Fix tree:** Rails main plus the three fixes below (OP1, OP3, OP8; no scimitar shim) and the classification shims
+  ([openproject-main-classify.patch](../../bench/upstream/readiness/round-app-suites/openproject-main-classify.patch),
+  plus carrierwave without `mb_chars` and statesman with a `foreign_key` fallback). It ran every main-failing file
+  twice. Every remaining failure is classified below. The two runs differ in 2 examples only: `layout_lock_concurrency`
+  (OP7, timing) and one `ical_controller` example (u2 only, passes alone).
+
+| Group | Failures | Class | Commit | Status |
+|---|---|---|---|---|
+| OP3 private `validation_context=` removed | most of main's failures (contracts, services, ancestry) | (d), restore built | 0f9d127083 (#58220) | branch, queued |
+| OP4 carrierwave 2.2.7 calls `mb_chars` | ≈1000 in a 127-file sample (attachments and cascade) | (c) | 76f770fd05 (#56777, deprecated in 8.1) | carrierwave ≥ 3.1.4 |
+| S2 `link_to` moved to `NavigationHelper` | 246 | (b) | 07f4b45e29 (#55410) | our S2 note, queued |
+| OP-test-adapter `enable_test_adapter` removed | 117 | (d) | 77b6966720 (#57477) | record only |
+| OP6 statesman 13.4.0 `join_primary_key`/`join_keys` | 93 in the sample (Jira import) | (c) | 4af9822fae (#59120) | record only, gem-side |
+| M-prefixes / L1 rspec-rails 8.0.4 view specs, frozen `_prefixes` | 89 | (c) | known | rspec-rails 570b2b0a79, unreleased |
+| DC3 rspec-rails 8.0.4 renders real templates in controller specs | 37 | (c) | 9987431315 (#58279) | rspec-rails 2d5985ea6e, unreleased |
+| OP5 `TabularFormBuilder` mutates a frozen `model_name` string | 27 in the sample (costlog) | (d) | c4dcf552cf (#58298) | record only |
+| OP2 Tableless `load_schema!` override ignored | `Day`/`NonWorkingDay` queries | (d) | ae739c3854 (#58437) | record only |
+| OP7 with_advisory_lock 7.6.0 transaction try-locks don't lock | 6 | (c) | 01e33f82f8 (#56129) | record only, gem-side |
+| OP-AJ-1 specs read the enqueued job hash after performing it | 2 | (b) | f5097cf946 (#58975) | — |
+| OP-AJ-2 specs stub `Repository.find` for job arguments | 6 | (b) | 52306a97cf (#57742) | — |
+| uniqueness errors carry `existing_id` | 3 | (b) | 03a3ed8397 (#55826) | CHANGELOG |
+| PostgreSQL timestamps cast to precision 6 | 5 | (b) | c162370c8f (#57845) | CHANGELOG |
+| `restrict_with_error` details carry `association_name` | 1 | (b) | 55c4e31168 (#59461) | CHANGELOG |
+| enum invalid-value message lists the valid values | 2 | (b) | fcf4393f04 (#57446) | CHANGELOG |
+| `ActionDispatch::Request::Session` is now `Http::Session` (nodoc) | 3 | (d) | 7105d5af0e (#57856) | spec-side |
+| OP8 frozen defaults make an untouched serialized default dirty | 2 | (a), fix built | 1d2c3f61b8 (#59083) | branch, queued |
+| OP1 `parameter_parsers` frozen: in-place registration raises at boot | boot (shimmed) | (a), fix built | ac98c112f4 (#57952) | branch, queued |
+
+Cause commits come from bisecting with the repro named below or, where a method or constant was removed or renamed,
+from the commit that did it; the (b) rows also from their CHANGELOG entries. OP7 and OP8 were checked against the
+parent commit too: the parent behaves like 8-1, the commit like main. No rails/rails PR, open or merged, covers OP1,
+OP3, OP7 or OP8, and none of ours does (`gh search prs --repo rails/rails --author thomasklemm`). #55911 (open) would
+make `validation_context=` public.
+
+**OP1 (a), fix built: registering a parameter parser in place raises at boot.** ac98c112f4 (#57952, Andrew
+Novoselac, merged by byroot) made the default parsers the frozen `DEFAULT_PARSERS` constant
+and freezes whatever is assigned. Gems that add a parser with `parameter_parsers[:x] = …` from a railtie or engine now
+raise `FrozenError` at boot:
+* [scimitar 2.15.0](https://github.com/pond/scimitar/blob/a7edc24d20cd54b38d5ba9cf26c0cf7547f2faa5/lib/scimitar/engine.rb#L14), which OpenProject uses for SCIM;
+* [graphiti 2.2.3](https://github.com/graphiti-api/graphiti/blob/1b11959b32e40eb4a2316afd6d81e2fc3c43df18/lib/graphiti/railtie.rb#L84),
+  [graphiti-rails 0.4.2](https://github.com/graphiti-api/graphiti-rails/blob/f8031d1f96e9a0c16fe6f2e8b43c7eeae3fa5a52/lib/graphiti/rails/railtie.rb#L75)
+  and [jsonapi-rails 0.4.1](https://github.com/jsonapi-rb/jsonapi-rails/blob/75314ad974d7f9fb39ac1e1a4c4ffab5a0fdacb0/lib/jsonapi/rails/railtie.rb#L43).
+
+The fix keeps the parsers a mutable copy during boot and freezes them in a `before_ractorize` hook, so only a
+ractorized app gets the frozen hash, which is what #57952 needed. Tests: `webservice_test` registers in place, and
+`ractors_test` reads a registered parser from a Ractor. Both fail on main. actionpack 4,517 runs green (main 4,516);
+`ractors_test` 19 runs green with `RACK=head`; RuboCop clean. Skeptical review (subagent): open with nits, applied
+(body wording, the commit message's cause sentence, a sentence that pre-empts "why copy the default again", and the
+Ractor read in the railties test). Branch `thomasklemm/parameter-parsers-register-in-place` @ `ee0a66402f` on main
+`bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+[body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
+
+**OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)
+removed it as unused inside Rails. Callers:
+* [OpenProject's `ModelContract#contract_valid?`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/contracts/model_contract.rb#L100),
+  which copies `valid?` without its `errors.clear`; it is the base of every contract, so most create and update
+  services fail. This is most of main's failures.
+* ancestry 5.1.0's [`sane_ancestor_ids?`](https://github.com/stefankroes/ancestry/blob/c03bc1a9b0339236f4e817ebd9730cc62d46c453/lib/ancestry/instance_methods.rb#L146),
+  run whenever a saved node's parent changes, so any reparent raises. ancestry has open PRs (#769, #770), but its
+  maintainer [says the context is still needed](https://github.com/stefankroes/ancestry/pull/770#issuecomment-5752596602).
+* activerecord-import 2.2.0 (SU5); 2.3.0 and 3.x work around it with `send(:context_for_validation).context =`.
+
+(d) because the method is private, but there is no public way to run validations in a context without clearing the
+errors, so the restore is the three lines unchanged (restore rule). The test runs validations in a context set through
+the writer and fails on main. activemodel 1,251 runs and the AR validations/autosave tests (370 runs, SQLite) green;
+RuboCop clean. Review: open with nits, applied (lead with ancestry, the leaf-move case, the ancestry PRs, the
+activerecord-import versions, a stronger test). Branch `thomasklemm/validation-context-writer` @ `992a77da89`,
+[patch](../../bench/upstream/app_suites/op3-validation-context-writer.patch),
+[body](../../bench/upstream/app_suites/op3-body.md), repro
+[validation_context_writer.rb](../../bench/upstream/app_suites/validation_context_writer.rb).
+
+**OP8 (a), fix built: a new record's untouched serialized default is dirty and saved as NULL.** 1d2c3f61b8 (#59083,
+"Wire ReadOnlyAttributeSet into SchemaContext defaults") freezes a model's default attributes at schema load
+([schema_context.rb#L119-L121](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/model_schema/schema_context.rb#L119-L121)).
+[`Attribute#freeze`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activemodel/lib/active_model/attribute.rb#L46-L47)
+casts the value to freeze it, and a new record's dup of a mutable default inherits the cast value, so dirty tracking
+compares it with the raw default. OpenProject's
+[`HealthReport`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/models/health_report.rb#L33)
+has `results jsonb DEFAULT '{}' NOT NULL` with a coder that loads `{}` as `[]`. A fresh report reports `results` as
+changed, and since serialized types write the coder's empty value as NULL, `save!` raises `PG::NotNullViolation`
+(storages health status controller specs, 2 F). On 8.1 that happens only if the app reads the attribute first. Bisected
+with [serialized_jsonb_default_insert.rb](../../bench/upstream/app_suites/serialized_jsonb_default_insert.rb)
+(`git bisect run`, 8ae3d84277..bdb3d96012). The fix makes a dup of a frozen attribute start unread, as defaults did
+before. Its test (SQLite, `admin_users.preferences` with default `""` and a JSON-ish coder) fails on main. activemodel
+1,250 runs green. activerecord SQLite 10,291 runs: the 8 failures (structure dump without a `sqlite3` CLI, protected
+environment checks with `DISABLE_DATABASE_ENVIRONMENT_CHECK` set) are the same on unpatched main. RuboCop clean.
+Skeptical review (subagent): open with nits. It confirmed that every dup of a frozen attribute is a default copy and
+that `Thing.new.name` allocations are unchanged. It also found that the fix stops new records from sharing a
+serialized default's nested objects, which they do on main (applied: the comment wording, and that point in the body).
+Branch `thomasklemm/frozen-default-attribute-unread` @ `5a4a9596c0` on main `bdb3d96012`,
+[patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
+[body](../../bench/upstream/app_suites/op8-body.md).
+
+**OP2 (d), record only: a `load_schema!` override is ignored.** ae739c3854 (#58437, Adrianna Chang, SchemaContext)
+builds the schema from the schema cache and no longer calls the model's private `load_schema!`. OpenProject's
+[`Tableless`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/models/concerns/tableless.rb#L42)
+overrides it to give `Day` (built from a `generate_series` subquery) an empty schema, so `Day.from(…)` raises
+`relation "days" does not exist`. ManageIQ's acts_as_ar_model and arel_toolkit override it too. Private API, and
+SchemaContext has no replacement hook yet, so it isn't a small restore. Repro:
+[tableless_load_schema.rb](../../bench/upstream/app_suites/tableless_load_schema.rb). The classification shim answers
+an empty `columns_hash` for Tableless models.
+
+**OP4 (c): carrierwave 2.2.7 calls `String#mb_chars`.**
+`ActiveSupport::Multibyte::Chars` was deprecated in 8.1 and removed in 76f770fd05 (#56777). carrierwave 2.2.7's
+`SanitizedFile#sanitize` calls `name.mb_chars.to_s`, so uploads fail, and attachment failures cascade into many
+specs (the size of the cascade is from a 127-file sample, not counted on the full run).
+carrierwave 3.1.4 dropped the call. OpenProject pins `~> 2.2.7`. On 8-1 the same call prints 5,586 deprecations per
+run.
+
+**OP5 (d), record only: OpenProject mutates a frozen `model_name` string.** c4dcf552cf (#58298, Edouard Chin, Ractor)
+freezes `model_name`'s strings. [`TabularFormBuilder#date_picker`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/lib/tabular_form_builder.rb#L99)
+calls `@object_name.to_s.sub!`, which raises `FrozenError` when `@object_name` is a `param_key` (costlog). Repro:
+[model_name_frozen.rb](../../bench/upstream/app_suites/model_name_frozen.rb). OpenProject-side (`sub` instead of `sub!`).
+
+**OP6 (c), record only: statesman 13.4.0's ActiveRecord adapter.** 4af9822fae (#59120) removed
+`AssociationReflection#join_primary_key`/`join_foreign_key`. statesman's
+`association_join_primary_key` checks `respond_to?(:join_primary_key)` and then falls back to the Rails 5.x
+`join_keys`, removed too, so every transition query raises `NoMethodError` (Jira import state machine). statesman
+master (`72aa3d3`) has the same code, and there's no issue or PR. Repro:
+[statesman_transition.rb](../../bench/upstream/app_suites/statesman_transition.rb). This corrects
+[api-regressions.md](api-regressions.md), which said statesman guards with `respond_to?`.
+
+**OP7 (c), record only: with_advisory_lock 7.6.0's transaction-level try-lock is not held.** 01e33f82f8 (#56129,
+matthewd, "Internal query_* methods are mostly used for schema queries") changed the internal
+[`query_all`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb#L140)
+default to `materialize_transactions: false`. with_advisory_lock takes non-blocking locks with
+[`query_value(sql)`](https://github.com/ClosureTree/with_advisory_lock/blob/58718b42d78cb2a0d5460da261986687d5a852f8/lib/with_advisory_lock/postgresql_advisory.rb#L165),
+so inside a lazily opened transaction `pg_try_advisory_xact_lock` runs outside it and the lock ends with that
+autocommitted statement. A second writer gets the lock while the first still holds it. Its blocking path already passes
+`materialize_transactions: true` for "Rails 8.2+". OpenProject's `OpenProject::Mutex.with_advisory_lock_transaction`
+uses `transaction: true`, so its concurrency specs fail (layout lock, backlogs batch update, work package delete):
+6 F. In production two writers can interleave. Repro:
+[advisory_xact_try_lock.rb](../../bench/upstream/app_suites/advisory_xact_try_lock.rb) (8-1: the second writer gets
+`false`; main: it gets the lock; 01e33f82f8's parent: `false`). With `materialize_transactions: true` on the try-lock
+`query_value`, the layout lock spec passes. Gem-side; not reported (no issue or PR in ClosureTree/with_advisory_lock).
+
+**OP-test-adapter (d), record only.** 77b6966720 (#57477, byroot) rewrote `ActiveJob::TestHelper::TestQueueAdapter`
+(`:nodoc:`) without `enable_test_adapter`. OpenProject's
+[`with_good_job` support](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/spec/support/shared/with_good_job.rb#L49)
+calls it to put the test adapter back: 117 F in the job specs tagged `with_good_job`.
+
+**The rest (b) and spec-side:**
+* `Mails::MailerJob` and `AutomaticallyManagedStorageSyncJob` retry specs read `exception_executions` from the job hash
+  they enqueued. f5097cf946 (#58975, "Don't modify the job data a job was deserialized from when it's retried") stops
+  mutating it.
+* The SCM countable-repository specs stub
+  [`Repository.find`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/spec/support/scm/countable_repository.rb#L35)
+  to hand the job their instance. 52306a97cf (#57742) deserializes job arguments with `GlobalID::Locator.fetch`
+  (`locate_many`), so the stub is bypassed and the job updates another instance (git and subversion, 6 F).
+* Uniqueness error details gain `existing_id` (03a3ed8397), `restrict_with_error` details gain `association_name`
+  (55c4e31168), and enum errors list the valid values (fcf4393f04).
+* PostgreSQL timestamps are cast to precision 6 on assignment (c162370c8f), so specs that compare with a
+  nanosecond `Time` fail.
+* A spec names `ActionDispatch::Request::Session`, moved to `Http::Session` (7105d5af0e, nodoc).
+
+**Main-only deprecations** (main r1 stderr; deprecations are printed, not raised):
+* `exec_update`: 1,202 ([hierarchical_item_service.rb#L284](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/services/custom_fields/hierarchy/hierarchical_item_service.rb#L284)).
+* `verify_authenticity_token`: 60 (sys, scim_v2, omni_auth_login, webhooks controllers).
+* `config.active_record.raise_on_assign_to_attr_readonly`: 10 (application.rb, new_framework_defaults_7_1.rb).
+* `Date::DATE_FORMATS`: 6 (spec seeders, days shared examples).
+* `Mime::SET`: 5 (mime_types.rb).
+* `protect_from_forgery` without a strategy: 5 (application_controller.rb).
+
+**Readability gate.** All three fixes are correctness fixes with no performance claim. Described out loud:
+* OP1: "parsers stay a plain hash while the app boots and are frozen when it ractorizes."
+* OP3: "put back the three-line private setter that gems still call."
+* OP8: "a new record's copy of a frozen default hasn't been read yet."
+
+Each is a few lines in the method that owns the behavior, with no new names.
+
+**Not pursued:**
+* OP2: no small exact restore; SchemaContext would need a hook.
+* OP5 and OP-test-adapter: OpenProject's own code.
+* OP4, OP6 and OP7: gem-side, recorded with repros, not reported.
+* The DC3 and `_prefixes` rspec-rails groups: fixed on rspec-rails main.
+* S2: already queued.
+* The (b) rows: CHANGELOG entries or deliberate fixes.

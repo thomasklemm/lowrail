@@ -1,0 +1,66 @@
+From 5a4a9596c05cdf426ae1295cd8315ee37779c716 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 14:29:33 +0000
+Subject: [PATCH] Keep a new record's copy of a frozen default attribute unread
+
+Since the model's default attributes are frozen at schema load, freezing
+casts each default once, and a new record's copy inherited that value.
+Dirty tracking then compared it with the raw default, so a serialized
+column whose coder does not round-trip its column default reported a
+change the record never made, and saved it: OpenProject's HealthReport
+inserts NULL into its NOT NULL jsonb results column.
+
+The copy of a frozen attribute now starts unread, as defaults were before.
+---
+ activemodel/lib/active_model/attribute.rb        |  7 ++++++-
+ .../test/cases/serialized_attribute_test.rb      | 16 ++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/activemodel/lib/active_model/attribute.rb b/activemodel/lib/active_model/attribute.rb
+index e358a34021..7d1bfef893 100644
+--- a/activemodel/lib/active_model/attribute.rb
++++ b/activemodel/lib/active_model/attribute.rb
+@@ -178,7 +178,12 @@ def original_value_for_database
+       alias :assigned? :original_attribute
+ 
+       def initialize_dup(other)
+-        if @value&.duplicable?
++        # Frozen attributes are a model's schema defaults, cast only to be
++        # frozen. A record's copy starts unread, so dirty tracking does not
++        # compare a value the record never read.
++        if other.frozen?
++          remove_instance_variable(:@value) if defined?(@value)
++        elsif @value&.duplicable?
+           @value = @value.dup
+         end
+       end
+diff --git a/activerecord/test/cases/serialized_attribute_test.rb b/activerecord/test/cases/serialized_attribute_test.rb
+index c386d0ab46..c40a24929f 100644
+--- a/activerecord/test/cases/serialized_attribute_test.rb
++++ b/activerecord/test/cases/serialized_attribute_test.rb
+@@ -75,6 +75,22 @@ def test_serialized_attribute_with_default
+     assert_equal({ key: "value" }, t.content)
+   end
+ 
++  def test_serialized_column_default_is_unchanged_on_a_new_record
++    coder = Class.new do
++      def self.load(value) = value.blank? ? [] : JSON.parse(value)
++      def self.dump(value) = JSON.dump(value)
++    end
++    klass = Class.new(ActiveRecord::Base) do
++      self.table_name = "admin_users"
++      serialize :preferences, coder: coder
++    end
++
++    user = klass.new
++    assert_not_predicate user, :changed?
++    user.save!(validate: false)
++    assert_equal "", user.reload.preferences_before_type_cast
++  end
++
+   def test_serialized_attribute_on_custom_attribute_with_default
+     klass = Class.new(ActiveRecord::Base) do
+       self.table_name = Topic.table_name
+-- 
+2.39.5
+
