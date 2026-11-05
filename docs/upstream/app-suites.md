@@ -1285,10 +1285,12 @@ Checks on the final version: predicate builder tests 63 runs, 0 failures; Active
 0 failures, 4 errors (`SqliteStructureDumpTest` and `SqliteStructureLoadTest` need the `sqlite3` CLI, which the orb
 lacks); RuboCop clean. flog for the method 5.7 → 24.1 (the deprecation branch). Skeptical reviewer, second round: open
 with nits (CHANGELOG "Deprecate …" wording, applied; the comment, applied; a test for a table without a model, not
-added: the Arel table's `type_for_attribute` is what 8.1 called). Zammad's 219 failing files were rerun with the first
-version only (15 main-only failures left, once the new warning is allowed; otherwise Zammad's deprecation toolkit fails
-448 examples on it, which is the intended signal); the final version returns 8.1's bind, which those specs pass with
-on 8.1. [patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
+added: the Arel table's `type_for_attribute` is what 8.1 called). Zammad's 219 failing files, rerun with the final head
+`53a0183864` applied to main and no other Rails change, Zammad with only the deprecation-allow patch as before, one tree
+at a time: 22 F (seed 4242) and 22 F (1717). Seed 4242 gives exactly the first version's 22 example IDs; on both seeds
+the 15 main-only ones are the same examples as the first version's (the rest are the environment failures that 8-1
+shows in the same files; the first version's 43 on seed 1717 included the 22-failure port clash). Without the allow
+patch, Zammad's deprecation toolkit fails 448 examples on the new warning, which is the intended signal. [patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
 [body](../../bench/upstream/app_suites/zm1-body.md). Branch
 [`thomasklemm/bind-attribute-column-name`](https://github.com/thomasklemm/rails/tree/thomasklemm/bind-attribute-column-name)
 @ `53a0183864` on main `bdb3d96012` (earlier `a2a89ee17b`, then `72d0b21869`; force-pushed with lease). App-side fix
