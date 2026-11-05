@@ -1,0 +1,16 @@
+== master
+parse - introspection      4.548k (± 2.9%) i/s  (219.87 μs/i) -     23.154k in   5.090869s
+    parse - fragments      6.095k (± 4.1%) i/s  (164.07 μs/i) -     30.576k in   5.016746s
+    parse - big query    743.495 (± 6.5%) i/s    (1.34 ms/i) -      3.750k in   5.043747s
+== thomasklemm/lexer-advance-without-loop
+parse - introspection      5.143k (± 2.1%) i/s  (194.43 μs/i) -     26.250k in   5.103797s
+    parse - fragments      6.670k (± 6.5%) i/s  (149.93 μs/i) -     34.006k in   5.098566s
+    parse - big query    822.419 (± 4.0%) i/s    (1.22 ms/i) -      4.182k in   5.085001s
+== master
+parse - introspection      4.433k (± 3.9%) i/s  (225.59 μs/i) -     22.450k in   5.064418s
+    parse - fragments      5.698k (± 9.1%) i/s  (175.51 μs/i) -     29.040k in   5.096875s
+    parse - big query    728.767 (± 4.3%) i/s    (1.37 ms/i) -      3.700k in   5.077067s
+== thomasklemm/lexer-advance-without-loop
+parse - introspection      5.136k (± 1.7%) i/s  (194.69 μs/i) -     26.070k in   5.075635s
+    parse - fragments      6.842k (± 2.6%) i/s  (146.15 μs/i) -     34.338k in   5.018535s
+    parse - big query    832.622 (± 3.1%) i/s    (1.20 ms/i) -      4.233k in   5.083939s
