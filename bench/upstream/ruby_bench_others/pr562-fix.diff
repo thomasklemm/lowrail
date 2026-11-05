@@ -1,0 +1,39 @@
+diff --git a/harness/gc.rb b/harness/gc.rb
+index 7d68d5d..9a6103a 100644
+--- a/harness/gc.rb
++++ b/harness/gc.rb
+@@ -32,6 +32,7 @@ def run_benchmark(_num_itrs_hint, **, &block)
+   has_marking = GC.stat.key?(:marking_time)
+   has_sweeping = GC.stat.key?(:sweeping_time)
+   has_global_gc = GCStats.stat_available?(:global_gc_invocation_count)
++  last_side_exit_count = RubyVM::ZJIT.stats(:side_exit_count) if defined?(RubyVM::ZJIT.enabled?) && RubyVM::ZJIT.enabled?
+ 
+   header = "itr:   time"
+   header << "   marking" if has_marking
+@@ -82,8 +83,11 @@ def run_benchmark(_num_itrs_hint, **, &block)
+     gc_total_time_ns << sample["gc_total_time_ns"]
+     total_time += time
+ 
+-    last_side_exit_count = side_exit_counts.last || 0
+-    side_exit_counts << RubyVM::ZJIT.stats(:side_exit_count) - last_side_exit_count
++    if last_side_exit_count
++      side_exit_count = RubyVM::ZJIT.stats(:side_exit_count)
++      side_exit_counts << side_exit_count - last_side_exit_count
++      last_side_exit_count = side_exit_count
++    end
+   end until num_itrs >= WARMUP_ITRS + MIN_BENCH_ITRS and total_time >= MIN_BENCH_TIME
+ 
+   warmup_range = 0...WARMUP_ITRS
+@@ -112,8 +116,10 @@ def run_benchmark(_num_itrs_hint, **, &block)
+     extra["gc_total_time_warmup"] = gc_total_time_ms[warmup_range]
+     extra["gc_total_time_bench"] = gc_total_time_ms[bench_range]
+   end
+-  extra["side_exit_count_warmup"] = side_exit_counts[warmup_range]
+-  extra["side_exit_count_bench"] = side_exit_counts[bench_range]
++  unless side_exit_counts.empty?
++    extra["side_exit_count_warmup"] = side_exit_counts[warmup_range]
++    extra["side_exit_count_bench"] = side_exit_counts[bench_range]
++  end
+ 
+   # Snapshot heap utilisation after benchmark
+   if GC.respond_to?(:stat_heap)

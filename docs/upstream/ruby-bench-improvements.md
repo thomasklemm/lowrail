@@ -1,5 +1,7 @@
 # ruby-bench: what is worth contributing upstream (2026-11-03)
 
+Overview of all our ruby-bench work: [ruby-bench.md](ruby-bench.md).
+
 [ruby/ruby-bench](https://github.com/ruby/ruby-bench) gives the Ruby and ZJIT teams their headline numbers, and it
 is our source of truth for ZJIT speed claims ([DECISIONS](../DECISIONS.md#evidence-and-measurement)). This page
 checks the pain points recorded in our docs, looks for gaps in the suite, and ranks candidate improvements by their
