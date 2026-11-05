@@ -1,4 +1,3 @@
-bench/upstream/app_suites/su1-body.md	thomasklemm/local-cache-anonymous-store	SU1
 bench/upstream/app_suites/cw1-body.md	thomasklemm/where-empty-condition-binds	CW1
 bench/upstream/app_suites/cw2-body.md	thomasklemm/resolver-find-all-hook	CW2
 bench/upstream/app_suites/pi3-body.md	thomasklemm/try-without-kwargs-hash	PI3
