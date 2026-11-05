@@ -16,3 +16,7 @@ Which file holds which column: `ir-micro-final.txt` main vs the final head (`v2`
 (`periods.one?` checked first), `ir-tzinfo-shortcut.txt` tzinfo master vs `2b2f4b45` (first round), `ir-tzinfo-eq.txt` the TZ1 round with an A/A
 checkout and the offset-level alternative. `tz_eq_compare.rb`: `TimezoneTransition#==`/`eql?`/`hash` differential over
 every zone of the active data source; compare the printed SHA-256 between tzinfo checkouts.
+
+Round 2 (head `6993c9b20b`): `ir-micro-round2.txt` main vs the head, `differential-digests-round2.txt` the
+differential with real `DateTime` receivers (Julian and ITALY start) and `change(offset:)` into DST zones,
+`as_s81new.rb` the head's methods for lobsters on 8-1-stable, `pr-body.md` the PR body draft.

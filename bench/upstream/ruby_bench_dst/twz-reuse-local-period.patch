@@ -1,4 +1,4 @@
-commit 4779066d803b5f405a2be40eddf126bf3ed20151
+commit 6993c9b20ba48876b9021cbee99449afbd734fee
 Author: Thomas Klemm <github@tklemm.eu>
 Date:   Thu Nov 5 21:03:54 2026 +0000
 
@@ -11,16 +11,21 @@ Date:   Thu Nov 5 21:03:54 2026 +0000
     the other side of a DST change (70.days.ago, beginning_of_day on the day
     clocks change) or in another zone (change(zone:)).
     
-    When the current period doesn't apply and the local time has exactly one
-    period, pass that one on; it equals the one the constructor would find.
-    Gaps and overlaps keep the existing path.
+    When the current period doesn't apply, the result is a Time and its
+    local time has exactly one period, pass that one on; it is equal to the
+    period the constructor would find. A DateTime keeps the old path: TZInfo
+    reads it by its Julian day, while the constructor converts a non-UTC one
+    by its civil fields, which differ for a Julian-calendar DateTime. Gaps
+    and overlaps keep the old path too.
     
     Zones without transitions now return their memoized period from
     periods_for_local as well, as period_for_utc and period_for_local
     already do, so the passed-on period is that shared one.
+    
+    Amp-Thread-ID: https://ampcode.com/threads/T-01a1ad41-645d-74f5-88c5-8400ddbfb076
 
 diff --git a/activesupport/lib/active_support/time_with_zone.rb b/activesupport/lib/active_support/time_with_zone.rb
-index cf5ab63eae..1d3db60f59 100644
+index cf5ab63eae..a251fa8bfd 100644
 --- a/activesupport/lib/active_support/time_with_zone.rb
 +++ b/activesupport/lib/active_support/time_with_zone.rb
 @@ -452,7 +452,7 @@ def change(options)
@@ -28,16 +33,24 @@ index cf5ab63eae..1d3db60f59 100644
        periods = new_zone.periods_for_local(new_time)
  
 -      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : nil)
-+      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : (periods.first if periods.one?))
++      self.class.new(nil, new_zone, new_time, periods.include?(period) ? period : single_period(periods, new_time))
      end
  
      # Uses Date to provide precise Time calculations for years, months, and days
-@@ -661,7 +661,7 @@ def duration_of_variable_length?(obj)
+@@ -658,10 +658,15 @@ def duration_of_variable_length?(obj)
+         ActiveSupport::Duration === obj && obj.variable?
+       end
+ 
++      # TZInfo reads a DateTime by its Julian day, which needn't match the civil fields the constructor looks up.
++      def single_period(periods, time)
++        periods.first if periods.one? && time.is_a?(::Time)
++      end
++
        def wrap_with_time_zone(time)
          if time.acts_like?(:time)
            periods = time_zone.periods_for_local(time)
 -          self.class.new(nil, time_zone, time, periods.include?(period) ? period : nil)
-+          self.class.new(nil, time_zone, time, periods.include?(period) ? period : (periods.first if periods.one?))
++          self.class.new(nil, time_zone, time, periods.include?(period) ? period : single_period(periods, time))
          elsif time.is_a?(Range)
            wrap_with_time_zone(time.begin)..wrap_with_time_zone(time.end)
          else
@@ -54,3 +67,24 @@ index 42cd39defe..721e5b6056 100644
      end
  
      def abbr(time) # :nodoc:
+diff --git a/activesupport/test/core_ext/time_with_zone_test.rb b/activesupport/test/core_ext/time_with_zone_test.rb
+index af2e5b68eb..0380460828 100644
+--- a/activesupport/test/core_ext/time_with_zone_test.rb
++++ b/activesupport/test/core_ext/time_with_zone_test.rb
+@@ -794,6 +794,16 @@ def test_change_at_dst_boundary
+     assert_equal twz, twz.change(min: 0)
+   end
+ 
++  def test_change_offset_of_julian_datetime_across_dst_boundary
++    julian = DateTime.new(2026, 10, 20, 12, 0, 0, 0, Date::JULIAN)
++    twz = ActiveSupport::TimeWithZone.new(nil, ActiveSupport::TimeZone["America/New_York"], julian)
++    changed = twz.change(offset: "+01:00")
++    assert_equal 7200, changed.utc_offset
++    assert_equal "CEST", changed.zone
++    assert_predicate changed, :dst?
++    assert_equal Time.utc(2026, 10, 20, 10), changed.utc
++  end
++
+   def test_round_at_dst_boundary
+     twz = ActiveSupport::TimeWithZone.new(Time.at(1319936400).getutc, ActiveSupport::TimeZone["Madrid"])
+     assert_equal twz, twz.round
