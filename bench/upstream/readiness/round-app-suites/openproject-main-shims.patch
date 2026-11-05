@@ -1,0 +1,87 @@
+diff --git a/app/models/journable/historic_active_record_relation.rb b/app/models/journable/historic_active_record_relation.rb
+index a97c58cb..99477837 100644
+--- a/app/models/journable/historic_active_record_relation.rb
++++ b/app/models/journable/historic_active_record_relation.rb
+@@ -111,7 +111,7 @@ class Journable::HistoricActiveRecordRelation < ActiveRecord::Relation
+   private
+ 
+   def add_historic_model_cte(arel)
+-    historic_models_cte = Arel::Nodes::As.new(Arel::Table.new(model.table_name),
++    historic_models_cte = Arel::Nodes::As.new(Arel::Table.new(name: model.table_name),
+                                               historic_models_statement.arel)
+ 
+     if arel.ast.with
+diff --git a/app/models/queries/projects/orders/project_phase_order.rb b/app/models/queries/projects/orders/project_phase_order.rb
+index 6044045c..15d5ef59 100644
+--- a/app/models/queries/projects/orders/project_phase_order.rb
++++ b/app/models/queries/projects/orders/project_phase_order.rb
+@@ -89,7 +89,7 @@ class Queries::Projects::Orders::ProjectPhaseOrder < Queries::Orders::Base
+   def order_condition
+     # To avoid SQL injection warnings, we use Arel to build the condition.
+     # Note that this SQL query uses the subquery defined in `joins`.
+-    steps_table = Arel::Table.new(subquery_table_name.to_s)
++    steps_table = Arel::Table.new(name: subquery_table_name.to_s)
+ 
+     # WHERE subquery_table_name.def_id = project_phase_definition.id OR subquery_table_name.def_id IS NULL
+     steps_table[:def_id]
+@@ -98,7 +98,7 @@ class Queries::Projects::Orders::ProjectPhaseOrder < Queries::Orders::Base
+   end
+ 
+   def order_by_start_and_finish_date
+-    steps_table = Arel::Table.new(subquery_table_name.to_s)
++    steps_table = Arel::Table.new(name: subquery_table_name.to_s)
+ 
+     # Even though a gate does not define an finish_date, this code still works.
+     [
+diff --git a/db/migrate/migration_utils/migration_squasher.rb b/db/migrate/migration_utils/migration_squasher.rb
+index 4456f6bd..1336c33b 100644
+--- a/db/migrate/migration_utils/migration_squasher.rb
++++ b/db/migrate/migration_utils/migration_squasher.rb
+@@ -81,7 +81,7 @@ module Migration
+       private
+ 
+       def all_versions
+-        table = Arel::Table.new(schema_migrations_table_name)
++        table = Arel::Table.new(name: schema_migrations_table_name)
+         ActiveRecord::Base.connection.select_values(table.project(table["version"]))
+       end
+ 
+diff --git a/lib_static/open_project/static_routing.rb b/lib_static/open_project/static_routing.rb
+index fae567b9..55b474b9 100644
+--- a/lib_static/open_project/static_routing.rb
++++ b/lib_static/open_project/static_routing.rb
+@@ -39,7 +39,7 @@ module OpenProject
+     module UrlHelpers
+       module DefaultUrlOptions
+         def default_url_options
+-          options = ActionMailer::Base.default_url_options.clone
++          options = ActionMailer::Base.default_url_options.dup # lowrail main-only shim (SP1)
+ 
+           reverse_merge = lambda { |opt, value|
+             unless options[opt] || value.blank?
+diff --git a/modules/costs/app/models/work_packages/scopes/include_spent_time.rb b/modules/costs/app/models/work_packages/scopes/include_spent_time.rb
+index 8dcc95d7..d641b7b0 100644
+--- a/modules/costs/app/models/work_packages/scopes/include_spent_time.rb
++++ b/modules/costs/app/models/work_packages/scopes/include_spent_time.rb
+@@ -74,7 +74,7 @@ module WorkPackages::Scopes::IncludeSpentTime
+     end
+ 
+     def visible_time_entries_cte
+-      @visible_time_entries_cte ||= Arel::Table.new("visible_time_entries")
++      @visible_time_entries_cte ||= Arel::Table.new(name: "visible_time_entries")
+     end
+   end
+ end
+diff --git a/modules/resource_management/app/models/work_packages/resource_allocations.rb b/modules/resource_management/app/models/work_packages/resource_allocations.rb
+index 73c80757..ce1bf0a7 100644
+--- a/modules/resource_management/app/models/work_packages/resource_allocations.rb
++++ b/modules/resource_management/app/models/work_packages/resource_allocations.rb
+@@ -46,7 +46,7 @@ module WorkPackages::ResourceAllocations
+ 
+   class_methods do
+     def include_allocated_time(work_package_scope)
+-      sums_table = Arel::Table.new(:allocated_time_sums)
++      sums_table = Arel::Table.new(name: :allocated_time_sums)
+       join = arel_table
+                .outer_join(allocated_time_sums(work_package_scope).arel.as(sums_table.name))
+                .on(arel_table[:id].eq(sums_table[:entity_id]))
