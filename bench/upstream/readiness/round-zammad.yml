@@ -1,0 +1,36 @@
+# Zammad for the readiness runner (docs/upstream/app-suites.md#zammad). Unchecked: the round ran by hand, in 5
+# slices with one database, Redis db and memcached each (CI_NODE_TOTAL/CI_NODE_INDEX, spec/rspec_extensions.rb).
+# Here it is one process: about 70 CPU minutes and up to about 3 GB RSS with jemalloc (glibc malloc grew past 3 GB in
+# 800 examples, and 12 processes at once hit the orb's 16 GB limit). Without CI_SKIP_DB_RESET the suite truncates and
+# reseeds the database at start, so both trees can share zammad_test. Needs libimlib2-dev (rszr) and libjemalloc2.
+# Use a --work path that contains "/gems/": Zammad's spec/support/deprecation_toolkit.rb ignores a deprecation only
+# when its first stack frame is under "/ruby/" or "/gems/", and with Rails at /home/user/w/rails-main 213 main examples
+# failed on `verify_authenticity_token`'s deprecation that pass with Rails under /home/user/w/gems/.
+# Main-only failures without a shim: about 2,520, nearly all ZM1. The record's classification runs used ZM1's Rails
+# branch as main plus bench/upstream/app_suites/zm1-zammad-allow-deprecation.patch in Zammad; the runner can't take a
+# fork commit as candidate, so that variant is not here.
+ruby: 4.0.9
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1
+  candidate: bdb3d96012 # main, as in the record
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 7200
+
+suites:
+  zammad: &zammad
+    repo: https://github.com/zammad/zammad
+    ref: 64e70ff1590358310c463637018497413cc4aabf
+    framework: rspec
+    services: [postgres, redis, memcached]
+    env: { RAILS_ENV: test, Z_LOCALES: "en-us:de-de", TZ: Europe/London, RAILS_SERVE_STATIC_FILES: "true",
+           CI_SKIP_ASSETS_PRECOMPILE: "true", REDIS_URL: "redis://127.0.0.1:6379/1", MEMCACHE_SERVERS: "127.0.0.1:11211",
+           MAILNAME: mail.test.dc.zammad.com, MAIL_SERVER: mail, MAIL_ADDRESS: zammad@mail.test.dc.zammad.com,
+           MAIL_PASS: zammad, LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2 }
+    # Ruby 4.0 no longer ships readline, which pry-remote requires at boot; the same on both trees.
+    bumps: { readline: "0.0.4" }
+    shims:
+      - "sed -i \"s/^ruby '3.4.12'/ruby '4.0.9'/\" Gemfile"
+      - "printf 'test:\\n  adapter: postgresql\\n  encoding: utf8\\n  pool: 50\\n  host: 127.0.0.1\\n  username: postgres\\n  database: zammad_test\\n' > config/database.yml"
+    setup: ["bundle exec rake zammad:db:init"]
+    test: bundle exec rspec --exclude-pattern "spec/system/**/*_spec.rb" -t ~searchindex -t ~integration -t ~required_envs

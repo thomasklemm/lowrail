@@ -26,6 +26,7 @@ overridden `primary_key` (#59622).
 | Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, docs note queued), PI3 (a, perf, built) |
 | Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
 | Decidim `80149bb` | rspec without system specs: core 5141, admin 997, api 73, participatory_processes 942, proposals 1897, meetings 1739 examples; PostgreSQL 15 | 3 F ×2 (Faker data, also on main); failing files a third time: same | 1 boot shim (our #59574); then 262 F (run 2; run 1 +21 from a port clash), same a third time, 259 main-only | DC1 (a, fix built, queued first), DC2 (b+c, cells-rails, silent), DC3 (c, rspec-rails 8.0.4), DC4–DC6 (b), CW3, CW5 |
+| Zammad `64e70ff` | rspec without system specs, 20323 examples, PostgreSQL 18.6, Redis, memcached (no Elasticsearch) | 7 F, 10 F (environment, also on main); failing files twice more: 7 F, 8 F | no shim needed; 2520 F, 2524 F; 2498 from one call (ZM1), 15 main-only otherwise | ZM1 (d, restore built, queued), ZM2 (c, rspec-rails), ZM3 (d), ZM4 (b), ZM5 (d), CW4 (b) |
 
 ## Findings
 
@@ -117,7 +118,7 @@ All of it is classified below, and none of it is a new (a).
 | Group | Failures | Class | Commit | Status |
 |---|---|---|---|---|
 | R1 `GetIp#filter_proxies` removed | 2187 | (d), restore | 752cc3915d (#56805) | our open #59630 |
-| M1 `build_bind_attribute` takes an Arel attribute | 225 | (d) | 4f1ff11da3 (#58479) | record only |
+| M1 `build_bind_attribute` takes an Arel attribute | 225 | (d) | 4f1ff11da3 (#58479) | record only; restore built as ZM1 |
 | `Vary: Sec-Fetch-Site` on GET responses | 19 (behind R1) | (b) | f5a1915f1d (#56350) | open #59500 |
 | S2 `link_to` moved to `NavigationHelper` | 11 | (b) | 07f4b45e29 (#55410) | our S2 note, queued |
 | `precision: nil` timestamps as microseconds | 3 | (b) | c162370c8f (#57845) | CHANGELOG |
@@ -152,7 +153,8 @@ them in `feed_manager_spec`).
 Repro: [bind_attribute_name.rb](../../bench/upstream/app_suites/bind_attribute_name.rb): on 8-1 the column name
 works (and an Arel attribute gives a bind named by the struct); on main the column name raises. `PredicateBuilder` is
 `:nodoc:` and this is one app, so under the restore rule it stays a Mastodon-side fix (pass the attribute on 8.2),
-not reported.
+not reported. *Update (2026-11-05):* Zammad, authlogic 6.6.1 and DocuSeal call it with a column name too, so
+it is now a restore under that rule, built as [ZM1](#zammad).
 
 **`Vary: Sec-Fetch-Site` (b), covered by open [#59500](https://github.com/rails/rails/pull/59500).** f5a1915f1d
 (#56350, "Use a modern approach for cross-site request forgery protection") adds
@@ -1118,3 +1120,157 @@ positional `Arel::Table.new` (above). Not seen: S1, SP1, L1, L2, R1, M1, DS1–D
   in gems and apps are recorded, not reported.
 * An upgrade-guide note for DC4 and the rspec-mocks pattern: deliberate, test-only, not built (one concern per PR).
 * System specs (they need Chrome and the validator service) and the other 19 modules.
+
+## Zammad
+
+zammad/zammad `64e70ff` (default branch `develop`,
+[`64e70ff159`](https://github.com/zammad/zammad/tree/64e70ff1590358310c463637018497413cc4aabf), 2026-11-05), Ruby 4.0.9
+on both trees (Zammad pins 3.4.12; the Gemfile's `ruby` line is changed in both), PostgreSQL 18.6 (its GitHub CI uses
+`postgres:18`), Redis 7.0.15, memcached 1.6.18, jemalloc. Rails main `bdb3d96012` (2026-11-05, still the head of main
+at the end of the round) for every run, bisect and the fix; 8-1-stable `6e09124217` (v8.1.4.1). Zammad's backend CI
+job as it runs it: `bundle exec rspec --exclude-pattern "spec/system/**/*_spec.rb" -t ~searchindex -t ~integration`,
+plus `-t ~required_envs` as in its GitHub CI (live services), 20,323 examples in 1,641 files, `CI_SKIP_ASSETS_PRECOMPILE`
+and `CI_SKIP_DB_RESET` as in CI, `REDIS_URL` and `MEMCACHE_SERVERS` set (CI picks each at random). There is no
+minitest suite left (`test/` only holds data). **Elasticsearch skipped:** the 45 `searchindex` files are excluded by
+CI's own rspec job too and run in separate Elasticsearch jobs. Seeds 4242 and 1717.
+
+**Runs.** Zammad's CI slicing (`--require ./spec/rspec_extensions.rb` with `CI_NODE_TOTAL=5`, `CI_NODE_INDEX`), 5
+processes per tree, each with its own copy of the seeded test database, Redis database and memcached, one tree at a
+time: about 13 minutes wall per run on 8 cores. Each rspec process grows to 2–3 GB (with glibc malloc past 3 GB in 800
+examples), so the first attempt, 12 processes at once, hit the orb's 16 GB limit; jemalloc and 5 slices fixed that.
+Running both trees at the same time also breaks `user_agent_spec` (22 failures, Puma on fixed ports 3010/3011), so the
+recorded runs don't. Zammad's test env prints deprecations, and
+[`deprecation_toolkit.rb`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/spec/support/deprecation_toolkit.rb#L11-L16)
+fails an example on any deprecation whose first stack frame isn't under `/ruby/` or `/gems/`; with Rails checked out
+at `/home/user/w/rails-main` that made 213 main examples fail on `verify_authenticity_token`'s deprecation, so both
+Rails trees live under `/home/user/w/gems/` (the first main run was discarded and rerun).
+
+**Bundles.** Zammad names `gem 'rails', '~> 8.1.0'` (8.1.4.1); both checkouts point it at a `path:` Rails, and both
+add `gem 'readline'` (0.0.4): Ruby 4.0 no longer ships readline, and pry-remote requires it at boot. Otherwise the 8-1
+lock has Zammad's locked versions. The main lock was resolved from the 8-1 lock with `bundle lock --conservative
+--update` over the Rails gems and differs only in Rails and what main itself requires (herb 0.11.1, marcel 1.2.1 →
+2.1.0, psych 5.5.0, ractor-dispatch 0.3.0). rspec-rails stays at its locked 8.0.4. No app shim: main boots, migrates
+and seeds as it is. Setup per tree: `bundle exec rake zammad:db:init`, then one `createdb -T` copy per slice. Recipe for
+the readiness runner (unchecked, one process): [round-zammad.yml](../../bench/upstream/readiness/round-zammad.yml).
+
+Results: 8-1 7 F (seed 4242) and 10 F (1717); main 2,520 F and 2,524 F (2,518 the same), in 219 files. Those files
+twice more, 3 processes per tree: 8-1 7 F and 8 F; main with ZM1's fix branch and its deprecation allowed in Zammad
+([patch](../../bench/upstream/app_suites/zm1-zammad-allow-deprecation.patch)) 22 F and 43 F, of which 22 are the port
+clash above (that rerun ran both trees at once). The failures on both trees are environment or order: three knowledge
+base sort specs (the cluster's C collation), `user_agent_spec`'s pinned-IP check (`TCPSocket.open` with
+`open_timeout:`), `twilio_spec` (`Twilio` not loaded), `migration_helper_spec`, `collection_update_job_spec`, a
+knowledge base notification example and `store/provider/file_spec`, each on some 8-1 run. 2,498 failures in 202 files
+are ZM1 on both main runs; the 15 left are main-only on both seeds and classified below. Without the fix, Zammad's own
+one-line shim ([patch](../../bench/upstream/app_suites/zm1-zammad-shim.patch), `table[:login]`) gives the same 15 plus
+the environment ones (20 in 216 files).
+
+| Group | Failures | Class | Commit | Status |
+|---|---|---|---|---|
+| ZM1 `build_bind_attribute` rejects a column name | 2,498 | (d), restore | 4f1ff11da3 (#58479) | fix built, queued |
+| ZM2 rspec-rails 8.0.4 channel specs: no connection class | 4 | (c) | Action Cable server adapterization (#50979) | fixed on rspec-rails main, unreleased |
+| ZM3 `allow_request_origin?` moved to the server | 4 | (d) | 1f73f78b3a (#50979) | record only |
+| CW4 GET `as: :json` sends params in the query string | 4 | (b) | 3c99a378ad (#57140) | CHANGELOG |
+| ZM4 retries no longer mutate the deserialized job data | 1 | (b) | f5097cf946 (#58975) | CHANGELOG |
+| ZM5 Active Job log subscriber hooks renamed | 1 | (d) | dbc3a5d6d5 (#55900) | record only |
+| `exec_update` deprecated, raised by Zammad's toolkit | 1 | (b) | 3fc2ca0725 (#55897) | CHANGELOG |
+
+**ZM1 (d), restore built: `PredicateBuilder#build_bind_attribute` no longer takes a column name.** 4f1ff11da3
+(#58479, matthewd, the M1 commit) changed it from `(column_name, value)` to
+[`(attribute, value)`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/relation/predicate_builder.rb#L128-L131).
+Zammad's [`User.by_login_case_sensitive`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/app/models/user.rb#L88)
+(added on 2026-10-21 in f0d1ecd36, "Lookups of users by login scan the users table instead of using its index") passes
+`:login` and wraps the bind in `LOWER()`. It is reached by `User.identify`, so every authenticated request, email
+import and login lookup raises `NoMethodError: undefined method 'type_caster' for an instance of Symbol`, and Zammad's
+error handler turns them into 500s: 2,498 failures. M1 was record-only because Mastodon was the one caller found;
+there are more now: [authlogic 6.6.1's `FindWithCase#sensitive_comparison`](https://github.com/binarylogic/authlogic/blob/9b8cfe8b14b9cc172d45c570f2823298b0bdf0ed/lib/authlogic/acts_as_authentic/queries/find_with_case.rb#L54)
+(a released gem; the case-sensitive login lookup), Mastodon's
+[`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/status/safe_reblog_insert.rb#L64)
+and DocuSeal's [`Api::SubmittersController`](https://github.com/docusealco/docuseal/blob/6c416dd76e10a44a6440a77d144819199687a06b/app/controllers/api/submitters_controller.rb#L195)
+(master). Under the restore rule (unreleased, several real callers, small) this is now a restore, decided here: accept a
+String or Symbol again, warn through `ActiveRecord.deprecator` (to be removed in 9.0, pointing at
+`arel_table[:name]`), and build the bind from `table.arel_table[name]`. Said out loud: "if the caller passed a column
+name, warn and build the bind from the table's Arel attribute for that column; otherwise build it from the attribute as
+main does." The bind is a plain `QueryAttribute` even for a type with query predicate expressions, because these
+callers build the left-hand side themselves; a `ComparisonValue` would give asymmetric SQL such as `email = LOWER(?)`.
+The only difference from 8-1 is the bind's name: the resolved column name as a String (also for an `alias_attribute`),
+which is what `where` gives. No issue or PR found (`build_bind_attribute` in rails/rails PRs and issues, authlogic
+issues). Repro: [bind_attribute_column_name.rb](../../bench/upstream/app_suites/bind_attribute_column_name.rb), the
+three call shapes: 8-1 finds the row with each, main raises `NoMethodError` in each, the fix finds the row with each
+and warns 3 times. Test in `predicate_builder_test.rb`: a Symbol and a String give a typed bind that finds the row and
+warn; a `LowerString` column still gets a plain bind. It fails on main with the `NoMethodError`. Predicate builder
+tests 61 runs green; Active Record on SQLite 10,290 runs, 0 failures, 4 errors (`SqliteStructureDumpTest` and
+`SqliteStructureLoadTest` need the `sqlite3` CLI, which the orb lacks); RuboCop clean. Cost on the common path,
+Callgrind instructions per `PredicateBuilder#build` call with an Arel attribute (100,000 warm calls, Ruby 4.0.9):
+interpreter 25,426 → 26,008 (A/A under 10 Ir); YJIT 12,917–14,060 (three base runs) → 14,301–14,901, within twice the
+base spread. A guard clause into a private helper wasn't cheaper (YJIT 15,182) and `unless is_a?(Arel::Attributes::Attribute)`
+saved about 300 interpreter Ir but would treat any other duck-typed attribute as a column name, so the exact
+String/Symbol check stays. flog for the method 5.7 → 18.0, ABC 5.2 → 14.4, cyclomatic 2 → 4: the deprecation branch.
+Skeptical reviewer (subagent): open with nits; applied (CHANGELOG says "Deprecate passing a column name" instead of
+"again", the message example is valid Ruby for any name, the plain-bind assertion). Sol not available on this orb.
+With the fix in the main tree and no Zammad shim, Zammad's 219 failing files fail only on the 15 below, once the new
+warning is allowed (otherwise Zammad's deprecation toolkit fails 448 examples on it, which is the intended signal).
+[patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
+[body](../../bench/upstream/app_suites/zm1-body.md). Branch
+[`thomasklemm/bind-attribute-column-name`](https://github.com/thomasklemm/rails/tree/thomasklemm/bind-attribute-column-name)
+@ `72d0b21869` on main `bdb3d96012` (first version `a2a89ee17b`, before the review nits). App-side fix for Zammad:
+pass `table[:login]`.
+
+**ZM2 (c): rspec-rails 8.0.4's channel example group can't find the connection class.** `graphql_channel_spec`'s
+`stub_connection` raises `Described class is not a connection class` (4): rspec-rails 8.0.4 reads
+`_connection_class || described_class`, and since the Action Cable server adapterization (#50979, merged in ad9c346c99)
+the default comes through `connection_class`. Fixed on rspec-rails main in
+[29cad6c9f5](https://github.com/rspec/rspec-rails/commit/29cad6c9f508affc84ef70a464bb425e84922e37) ("Handle
+connection_class changes in Rails 8.2", 2026-08-19, unreleased); with rspec-rails `570b2b0a79` (the L1 ref, which has
+it) the spec passes. Another reason rspec-rails needs a release before 8.2 (L1, DC3).
+
+**ZM3 (d), record only: `connection_origin_configuration_spec` calls the connection's private
+`allow_request_origin?`.** [`connection.send(:allow_request_origin?)`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/spec/channels/application_cable/connection_origin_configuration_spec.rb#L6)
+(4); 1f73f78b3a ("Move #allow_request_origin? to Server::Base", #50979) moved it to `ActionCable::Server::Base`. The
+spec tests Zammad's allowed-origins initializer through a private method; whether the origins still apply in a real
+WebSocket handshake on main was not checked.
+
+**CW4 (b), as in Chatwoot: `get …, params: { data: {} }, as: :json` sends the params in the query string.**
+`long_polling_spec` (4): the empty `data` Hash disappears from the query string, so
+[`params['data'].permit!`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/app/controllers/long_polling_controller.rb#L18)
+raises on nil. 8-1's integration session sent such a GET as a JSON POST with `X-Http-Method-Override`.
+
+**ZM4 (b): retries no longer change the job data a job was deserialized from.** f5097cf946 (#58975, CHANGELOG)
+dups `exception_executions` in `deserialize`.
+[`trigger_ai_agent_job_spec`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/spec/jobs/trigger_ai_agent_job_spec.rb#L92-L103)
+passes the same `job.serialize` Hash to `ActiveJob::Base.execute` five times and expects the fifth to give up; it relied
+on the retries counting up in that shared Hash. With the `.dup` reverted in the main tree the spec passes (1). The
+spec's assumption, not Zammad's retry handling, is what changed: real retries go through a fresh serialization.
+
+**ZM5 (d), record only: Zammad's `ActiveJob::LogSubscriber` override no longer runs.** Zammad
+[prepends `enqueue`/`enqueue_at`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/config/initializers/active_job_log_subscriber.rb#L26-L32)
+to the `:nodoc:` subscriber to log "Won't enqueue …" when its `HasActiveJobLock` drops a job. dbc3a5d6d5 ("Convert log
+subscriber in Active Job to consume structured events", #55900, like 308594b580 in Chatwoot's record) renamed the
+handlers to `enqueued`/`enqueued_at` and passes a payload without the job object, so the override is silently
+skipped and the line is gone (1, `application_job_spec`). Its `info` → `debug` override still works (the info-level
+specs pass). A Zammad-side change; the job's lock key isn't in the new payload.
+
+**`exec_update` (b):** [`connection.exec_update(`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/db/migrate/20260206133553_issue5254_user_organization_uniqueness.rb#L38)
+in a migration (3fc2ca0725, deprecated for 9.0); Zammad's deprecation toolkit fails its spec (1).
+
+**Deprecations that only main emits** (warnings, main run 1; 8-1 prints none):
+* 752: `` `verify_authenticity_token` is deprecated … use `skip_forgery_protection` `` (4f2ee07b8e), from
+  [`skip_before_action :verify_authenticity_token, raise: false`](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/app/controllers/application_controller/prevents_csrf.rb#L11).
+* 70 (c): `auto_populated? is deprecated … (use auto_populated_on_insert? instead)` (de7b8c8eed), from
+  activerecord-import 3.0.1's
+  [`column.respond_to?(:auto_populated?) ? column.auto_populated? : column.default_function`](https://github.com/zdennis/activerecord-import/blob/ed0cdadf80c84d73314a4788cc4db3bd14e27127/lib/activerecord-import/import.rb#L1173);
+  unchanged on its default branch.
+* 55: `require_dependency is deprecated`, from 10 rake files such as
+  [max_connections.rake#L3](https://github.com/zammad/zammad/blob/64e70ff1590358310c463637018497413cc4aabf/lib/tasks/zammad/db/max_connections.rake#L3),
+  once per boot.
+* 9 (c): `The built-in delayed_job adapter is deprecated … upgrade delayed_job gem to version 4.2.0` (8f8964c1e2):
+  Zammad locks its fork [zammad-deps/delayed_job](https://github.com/zammad-deps/delayed_job/tree/0f1644ccc6911f7fc0950aec6a63440b333a5074)
+  at 4.1.13 (branch `threadsafe`).
+* 2: `exec_update` (above).
+
+**Not pursued:**
+* Elasticsearch specs (45 files) and `integration`/`required_envs` specs (live services), as CI's main rspec job.
+* An rspec-rails release request for ZM2: the DECISIONS rule waits for a Rails 8.2 beta.
+* Reporting ZM3, ZM5, the `require_dependency` and `verify_authenticity_token` calls or the `exec_update` migration
+  to Zammad, or the `auto_populated?` call to activerecord-import: findings are recorded, not reported.
+* A narrower ZM1 restore (Symbol only, or only in `QueryPredicates`-free tables): every caller found passes a String or
+  a Symbol, and the type lookup is the same either way.
