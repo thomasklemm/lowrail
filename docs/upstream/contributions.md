@@ -916,6 +916,21 @@ None.
 
 ## Drafted, not opened
 
+- **Gem-side refresh (2026-11-05):** three Rails-main correctness fixes on fork branches, with exact-head
+  skeptic approval and complete PR bodies in the queue; **Sol and Astra pending with the coordinator**.
+  [Evidence, commands, compatibility boundaries and rejected leads](gem-side-candidates.md).
+  - [BI1](../../bench/upstream/pr-queue/items/BI1.md), blind_index stops memoizing on frozen table metadata,
+    head [`e296933106ce3619b26af46f936aea95b087c0ec`](https://github.com/thomasklemm/blind_index/commit/e296933106ce3619b26af46f936aea95b087c0ec):
+    main SQLite suite 28 errors → none (50 runs, 89 assertions, one existing skip); stable base/head pass.
+    Fixed-heap Ruby 4.0.9 Callgrind cost control −0.079%, A/A +0.133%: **no speed claim**.
+  - [SC1](../../bench/upstream/pr-queue/items/SC1.md), Scimitar uses Rails' parameter-parser replacement writer,
+    head [`e81365a6e0f09c13d8c20996bf78f98c4bf5faa2`](https://github.com/thomasklemm/scimitar/commit/e81365a6e0f09c13d8c20996bf78f98c4bf5faa2):
+    main require-time FrozenError → 530 examples, zero failures; released Rails also 530/0.
+  - [RA1](../../bench/upstream/pr-queue/items/RA1.md), Ransack gives the correlated subquery manager an Arel table,
+    head [`1290b01fcb9a78717365968c791e75fa28a1016d`](https://github.com/thomasklemm/ransack/commit/1290b01fcb9a78717365968c791e75fa28a1016d):
+    main PostgreSQL 1,146/0; main SQLite 2 → 1 unchanged schema-case failure (Rails item E2); stable SQLite 1,145/0.
+    This repairs direct rendering of the returned manager, not normal search execution generally.
+  All three are L0. No upstream PR, issue or comment was created; fork heads have no hosted CI checks.
 - **Gem census (2026-11-03):** two i18n candidates and one connection_pool candidate on `thomasklemm` forks, with
   drafts, in [gem-census.md](gem-census.md#candidates): I1 −0.40% and I2 −0.32% of all census allocations (exact
   versions after Sol review), C1 −4 objects per `ConnectionPool#with`. C1 is open as
