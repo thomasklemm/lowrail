@@ -881,7 +881,7 @@ was closed as opened in the wrong repository, not rejected. Code search finds ab
 (its dummy app sets no options), and rspec-rails 8.0.4 is L1. Repro:
 [mailer_url_options.rb](../../bench/upstream/app_suites/mailer_url_options.rb) (8-1: the mail has the host; main:
 `FrozenError`; assigning a new Hash works on both). Deliberate and merged by gmcgibbon, so no revert or deprecation
-shim (the proxy in #58481 would be L2); the upgrade guide gets a note like S1 and S2.
+shim (the proxy in #58481 would be L2); the upgrade guide gets a note like S1 and S2. Heads-up with these numbers posted on #58483 with Thomas's OK (2026-11-05, [comment](https://github.com/rails/rails/pull/58483#issuecomment-6656481078)), so its author can choose a deprecation over the note; SP1 stays last in the queue until he answers.
 [patch](../../bench/upstream/app_suites/sp1-upgrade-guide-frozen-default-url-options.patch),
 [body](../../bench/upstream/app_suites/sp1-body.md). Branch `thomasklemm/upgrade-guide-frozen-default-url-options` @
 `4fe014a8a7` on main `bdb3d96012`, docs only; each example in it was run on main. Separate reviewer: two should-fixes
