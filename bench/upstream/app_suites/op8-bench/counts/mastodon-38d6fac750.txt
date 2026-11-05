@@ -1,0 +1,31 @@
+models=124 frozen_on_main=117 proc_default=7 errors=0
+type-level form falls back: 21 of 124 (21 of 117 frozen on main)
+nil-default form falls back: 6 of 124 (6 of 117 frozen on main)
+  fallback Account also_known_as:Array attribution_domains:Array="{}" fields:Jsonb
+  fallback AccountConversation participant_account_ids:Array="{}" status_ids:Array="{}"
+  fallback AccountReachFilter bloom_filter:Serialized
+  nil_only AccountWarning status_ids:Array
+  nil_only Admin::ActionLog recorded_changes:Jsonb
+  nil_only Admin::ServerCheck data:Jsonb
+  nil_only Announcement status_ids:Array
+  nil_only BulkImportRow data:Jsonb
+  fallback CustomFilter context:Array="{}"
+  nil_only Fasp::Provider privacy_policy:Jsonb
+  proc_default Follow 
+  nil_only FollowRecommendation reason:Array
+  proc_default FollowRequest 
+  nil_only GeneratedAnnualReport data:Jsonb
+  nil_only Keypair private_key:EncryptedAttributeType
+  nil_only MediaAttachment file_meta:Json
+  fallback Poll cached_tallies:Array="{}" options:Array="{}"
+  proc_default Report 
+  nil_only ScheduledStatus params:Jsonb
+  nil_only SeveredRelationship languages:Array
+  nil_only SiteUpload meta:Json
+  proc_default Status 
+  proc_default StatusEdit 
+  proc_default TagFollow 
+  proc_default User 
+  nil_only Web::PushSubscription data:Json
+  nil_only Web::Setting data:Json
+  fallback Webhook events:Array="{}"
