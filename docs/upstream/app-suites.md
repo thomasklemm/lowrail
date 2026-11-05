@@ -1767,7 +1767,11 @@ and the first assignment on a fresh `Class.new(ActionDispatch::Request)` (`nil.f
 reassigned JSON parsers. Skeptical reviewer: no blocker; applied a test that registers in place on the untouched
 defaults (only the gated railties test caught a revert of `DEFAULT_PARSERS.dup`) and freezing `Request` subclasses in the
 hook, as main's setter did. actionpack 4520 runs and `ractors_test` (RACK=head) 19 runs green, RuboCop clean. Branch
-`thomasklemm/parameter-parsers-register-in-place` @ `860a2c7220` (earlier `c5df553fa3`) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
+Astra round 2: includers of `Parameters` outside `Request`'s hierarchy escaped the hook, and includers after the hook got a
+mutable `DEFAULT_PARSERS.dup` (Ractor::IsolationError from another Ractor); both confirmed. Fixed: the included block goes
+through the setter, and the hook freezes every class extended with `Parameters::ClassMethods` (one `ObjectSpace` pass).
+The new railties test fails on a `subclasses` mutant (grandchild), a `Request.descendants` mutant (unrelated includer)
+and the old `.dup` (Ractor read). actionpack 4520 runs, `ractors_test` 20 runs green, RuboCop clean. `thomasklemm/parameter-parsers-register-in-place` @ `6331f39542` (earlier `c5df553fa3`, then `860a2c7220`) on main `bdb3d96012`, [patch](../../bench/upstream/app_suites/op1-parameter-parsers-register-in-place.patch),
 [body](../../bench/upstream/app_suites/op1-body.md), repro [param_parsers.rb](../../bench/upstream/app_suites/param_parsers.rb).
 
 **OP3 (d), restore built: the private `validation_context=` writer is gone.** 0f9d127083 (#58220, merged by byroot)

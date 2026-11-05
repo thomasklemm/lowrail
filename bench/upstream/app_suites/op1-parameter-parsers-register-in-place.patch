@@ -1,4 +1,4 @@
-From 860a2c72202e8cbeeb51320cf754dee728ee01b8 Mon Sep 17 00:00:00 2001
+From 6331f395420aefccd78f24a399b81a8b72a9c143 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 12:05:18 +0000
 Subject: [PATCH] Allow registering parameter parsers in place during boot
@@ -16,12 +16,12 @@ a `before_ractorize` hook instead. The default is a copy of
 ---
  .../lib/action_dispatch/http/parameters.rb    |  9 +++-
  actionpack/lib/action_dispatch/railtie.rb     |  7 +++
- actionpack/test/controller/webservice_test.rb | 46 +++++++++++++++++++
- railties/test/application/ractors_test.rb     | 24 ++++++++++
- 4 files changed, 84 insertions(+), 2 deletions(-)
+ actionpack/test/controller/webservice_test.rb | 46 ++++++++++++++++++
+ railties/test/application/ractors_test.rb     | 48 +++++++++++++++++++
+ 4 files changed, 108 insertions(+), 2 deletions(-)
 
 diff --git a/actionpack/lib/action_dispatch/http/parameters.rb b/actionpack/lib/action_dispatch/http/parameters.rb
-index 10b0e96fd7..69dd7e6ea2 100644
+index 10b0e96fd7..437064f8fb 100644
 --- a/actionpack/lib/action_dispatch/http/parameters.rb
 +++ b/actionpack/lib/action_dispatch/http/parameters.rb
 @@ -28,7 +28,11 @@ class << self
@@ -29,7 +29,7 @@ index 10b0e96fd7..69dd7e6ea2 100644
          end
  
 -        @parameter_parsers = DEFAULT_PARSERS
-+        @parameter_parsers = DEFAULT_PARSERS.dup
++        self.parameter_parsers = DEFAULT_PARSERS
 +      end
 +
 +      class << self
@@ -48,7 +48,7 @@ index 10b0e96fd7..69dd7e6ea2 100644
        end
  
 diff --git a/actionpack/lib/action_dispatch/railtie.rb b/actionpack/lib/action_dispatch/railtie.rb
-index 0605880396..84a3c3080e 100644
+index 0605880396..c1fa58dff3 100644
 --- a/actionpack/lib/action_dispatch/railtie.rb
 +++ b/actionpack/lib/action_dispatch/railtie.rb
 @@ -111,5 +111,12 @@ class Railtie < Rails::Railtie # :nodoc:
@@ -59,7 +59,7 @@ index 0605880396..84a3c3080e 100644
 +    initializer "action_dispatch.ractorize" do
 +      ActiveSupport.on_load(:before_ractorize) do
 +        ActionDispatch::Http::Parameters.parameter_parsers_frozen = true
-+        [ActionDispatch::Request, *ActionDispatch::Request.descendants].each { |request| request.parameter_parsers&.freeze }
++        ObjectSpace.each_object(ActionDispatch::Http::Parameters::ClassMethods) { |klass| klass.parameter_parsers&.freeze }
 +      end
 +    end
    end
@@ -122,10 +122,10 @@ index 23a46df5cd..8c90276074 100644
      with_test_route_set do
        assert_nothing_raised { post "/", headers: { "CONTENT_TYPE" => "application/json" } }
 diff --git a/railties/test/application/ractors_test.rb b/railties/test/application/ractors_test.rb
-index 89bb3d7faa..ecfe61df2b 100644
+index 89bb3d7faa..7a44ececc3 100644
 --- a/railties/test/application/ractors_test.rb
 +++ b/railties/test/application/ractors_test.rb
-@@ -83,6 +83,30 @@ class PostsController < ApplicationController
+@@ -83,6 +83,54 @@ class PostsController < ApplicationController
          assert_equal "post", on_ractor { PostsController._wrapper_options.name }
        end
  
@@ -151,6 +151,30 @@ index 89bb3d7faa..ecfe61df2b 100644
 +        assert_predicate ActionDispatch::Request.parameter_parsers, :frozen?
 +        assert_equal [:json], on_ractor { ActionDispatch::Request.parameter_parsers.keys }
 +        assert_equal({ "json" => "{}" }, on_ractor { ActionDispatch::Request.parameter_parsers[:json].call("{}") })
++      end
++
++      test "ractorize! freezes the parameter parsers of every class that includes Parameters" do
++        app_file "config/initializers/parameter_parsers.rb", <<~RUBY
++          $includer = Class.new { include ActionDispatch::Http::Parameters }
++          $grandchild = Class.new(Class.new(ActionDispatch::Request)) { self.parameter_parsers = ActionDispatch::Request.parameter_parsers }
++        RUBY
++
++        app "production"
++
++        assert_not_predicate $includer.parameter_parsers, :frozen?
++        assert_not_predicate $grandchild.parameter_parsers, :frozen?
++
++        ractorize!
++
++        assert_predicate $grandchild.parameter_parsers, :frozen?
++        assert_predicate $includer.parameter_parsers, :frozen?
++
++        subclass = Class.new(ActionDispatch::Request)
++        subclass.parameter_parsers = ActionDispatch::Request.parameter_parsers
++        assert_predicate subclass.parameter_parsers, :frozen?
++
++        Object.const_set(:LateParameters, Class.new { include ActionDispatch::Http::Parameters })
++        assert_equal [:json], on_ractor { LateParameters.parameter_parsers.keys }
 +      end
 +
        test "ractorize! makes Rails.logger shareable" do
