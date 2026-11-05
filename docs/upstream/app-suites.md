@@ -1218,7 +1218,7 @@ the environment ones (20 in 216 files).
 
 | Group | Failures | Class | Commit | Status |
 |---|---|---|---|---|
-| ZM1 `build_bind_attribute` rejects a column name | 2,498 | (d), restore | 4f1ff11da3 (#58479) | fix built, queued |
+| ZM1 `build_bind_attribute` rejects a column name | 2,498 | (d), restore | 4f1ff11da3 (#58479) | fix built (Sol's review applied), queued |
 | ZM2 rspec-rails 8.0.4 channel specs: no connection class | 4 | (c) | Action Cable server adapterization (#50979) | fixed on rspec-rails main, unreleased |
 | ZM3 `allow_request_origin?` moved to the server | 4 | (d) | 1f73f78b3a (#50979) | record only |
 | CW4 GET `as: :json` sends params in the query string | 4 | (b) | 3c99a378ad (#57140) | CHANGELOG |
@@ -1238,34 +1238,61 @@ there are more now: [authlogic 6.6.1's `FindWithCase#sensitive_comparison`](http
 (a released gem; the case-sensitive login lookup), Mastodon's
 [`Status::SafeReblogInsert`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/models/concerns/status/safe_reblog_insert.rb#L64)
 and DocuSeal's [`Api::SubmittersController`](https://github.com/docusealco/docuseal/blob/6c416dd76e10a44a6440a77d144819199687a06b/app/controllers/api/submitters_controller.rb#L195)
-(master). Under the restore rule (unreleased, several real callers, small) this is now a restore, decided here: accept a
-String or Symbol again, warn through `ActiveRecord.deprecator` (to be removed in 9.0, pointing at
-`arel_table[:name]`), and build the bind from `table.arel_table[name]`. Said out loud: "if the caller passed a column
-name, warn and build the bind from the table's Arel attribute for that column; otherwise build it from the attribute as
-main does." The bind is a plain `QueryAttribute` even for a type with query predicate expressions, because these
-callers build the left-hand side themselves; a `ComparisonValue` would give asymmetric SQL such as `email = LOWER(?)`.
-The only difference from 8-1 is the bind's name: the resolved column name as a String (also for an `alias_attribute`),
-which is what `where` gives. No issue or PR found (`build_bind_attribute` in rails/rails PRs and issues, authlogic
-issues). Repro: [bind_attribute_column_name.rb](../../bench/upstream/app_suites/bind_attribute_column_name.rb), the
-three call shapes: 8-1 finds the row with each, main raises `NoMethodError` in each, the fix finds the row with each
-and warns 3 times. Test in `predicate_builder_test.rb`: a Symbol and a String give a typed bind that finds the row and
-warn; a `LowerString` column still gets a plain bind. It fails on main with the `NoMethodError`. Predicate builder
-tests 61 runs green; Active Record on SQLite 10,290 runs, 0 failures, 4 errors (`SqliteStructureDumpTest` and
-`SqliteStructureLoadTest` need the `sqlite3` CLI, which the orb lacks); RuboCop clean. Cost on the common path,
-Callgrind instructions per `PredicateBuilder#build` call with an Arel attribute (100,000 warm calls, Ruby 4.0.9):
-interpreter 25,426 → 26,008 (A/A under 10 Ir); YJIT 12,917–14,060 (three base runs) → 14,301–14,901, within twice the
-base spread. A guard clause into a private helper wasn't cheaper (YJIT 15,182) and `unless is_a?(Arel::Attributes::Attribute)`
-saved about 300 interpreter Ir but would treat any other duck-typed attribute as a column name, so the exact
-String/Symbol check stays. flog for the method 5.7 → 18.0, ABC 5.2 → 14.4, cyclomatic 2 → 4: the deprecation branch.
-Skeptical reviewer (subagent): open with nits; applied (CHANGELOG says "Deprecate passing a column name" instead of
-"again", the message example is valid Ruby for any name, the plain-bind assertion). Sol not available on this orb.
-With the fix in the main tree and no Zammad shim, Zammad's 219 failing files fail only on the 15 below, once the new
-warning is allowed (otherwise Zammad's deprecation toolkit fails 448 examples on it, which is the intended signal).
-[patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
+(master). Under the restore rule (unreleased, several real callers, small) this is now a restore, decided here: for a
+String or Symbol, warn through `ActiveRecord.deprecator` (to be removed in 9.0, pointing at `arel_table[:name]`) and
+return 8.1's bind, `Relation::QueryAttribute.new(name, value, table.arel_table.type_for_attribute(name))`. Said out
+loud: "if the caller passed a column name instead of an Arel attribute, warn and build the bind as 8.1 did; otherwise
+build it from the attribute as main does." The bind is a plain `QueryAttribute` even for a type with query predicate
+expressions, as on 8.1, because these callers build the left-hand side themselves; a `ComparisonValue` would give
+asymmetric SQL such as `email = LOWER(?)`. No issue or PR found (`build_bind_attribute` in rails/rails PRs and issues,
+authlogic issues). Repro: [bind_attribute_column_name.rb](../../bench/upstream/app_suites/bind_attribute_column_name.rb),
+the three call shapes: 8-1 finds the row with each, main raises `NoMethodError` in each, the fix finds the row with each
+and warns 3 times.
+
+*Sol's review (2026-11-05, of `72d0b21869`, from the patch and body), checked against the code:*
+1. *The fallback wasn't 8.1's bind:* confirmed for the name, not for the type. The first version recursed through
+   `table.arel_table[name]`, so `:visits` became `"visits"` and an alias name `nickname` became `"login"`. The type and
+   `value_for_database` were already 8.1's: on 8-1-stable `type_for_attribute` resolves the alias too (a probe with
+   `alias_attribute :nickname, :login` on an integer column gives the SQLite integer type and `12` on 8.1, the first
+   version and the fix; Sol's `Value`/`"12"` didn't reproduce). Applied Sol's construction; a probe over a Symbol, a
+   String, an alias name as String and Symbol, a `QueryPredicates` type, an associated table and a table alias now
+   prints the same class, name, type and value on 8-1 and the branch. The reviewer's wider probe (serialized, enum,
+   unknown columns, `Arel.sql`, `"users.visits"`, SQL and rows through `eq`, `LOWER()` and `case_sensitive_comparison`)
+   found no difference either.
+2. *Hot path:* applied. Normal attributes now pay one check: `!attribute.is_a?(Arel::Attributes::Attribute) &&
+   (String or Symbol)`, so other objects fall through to main's path unchanged. Callgrind instructions per
+   `PredicateBuilder#build` call with an Arel attribute (100,000 warm calls, GC off, Ruby 4.0.9): interpreter main
+   25,421, main A/A 25,423, `is_a?` form 25,724 (+302, +1.2%), `===` form 25,768 (+346), first version 26,008 (+580).
+   No form gets into A/A noise, so the `is_a?` form stays and the body states the cost. YJIT
+   (`--yjit-call-threshold=1`): main 12,956 and 13,442, the branch 14,265; main's runs across the round span
+   12,917–14,060, so YJIT can't separate it. A one-line comment says why the Arel check comes first (the reviewer: a
+   reader would otherwise delete it).
+3. *Rails 9.0:* no change.
+4. *Public method on a `:nodoc:` class:* confirmed; the body says "internal".
+5. *Tests:* applied. Three tests: a Symbol and a String keep their name (`assert_equal column_name, bind.name`) and
+   get the model's type object (`assert_same`), find the row and warn; an alias name equals 8.1's construction; a
+   `LowerString` column gives a plain `QueryAttribute` with that type instance. They fail on main (`NoMethodError`) and
+   two of them on the first version (name).
+6. *CHANGELOG:* the blank line is applied; Sol's wording "Restore support for …" is not: both skeptical reviewers
+   pointed out that no released version lost this, so for 8.1 users it's a new deprecation, and the repo's entries
+   for that say "Deprecate …". The entry reads "Deprecate passing a column name to
+   `ActiveRecord::PredicateBuilder#build_bind_attribute`." plus the `arel_table[:login]` paragraph.
+7. *Body:* 146 words without URLs (was 189); the "about 2,500 specs pass" claim is gone (it says 2,498 fail on main,
+   shown above); "the only difference is the bind's name" is gone, since there is none; the footer links the record
+   at Lowrail `e69e4ff`.
+
+Checks on the final version: predicate builder tests 63 runs, 0 failures; Active Record on SQLite 10,292 runs,
+0 failures, 4 errors (`SqliteStructureDumpTest` and `SqliteStructureLoadTest` need the `sqlite3` CLI, which the orb
+lacks); RuboCop clean. flog for the method 5.7 → 24.1 (the deprecation branch). Skeptical reviewer, second round: open
+with nits (CHANGELOG "Deprecate …" wording, applied; the comment, applied; a test for a table without a model, not
+added: the Arel table's `type_for_attribute` is what 8.1 called). Zammad's 219 failing files were rerun with the first
+version only (15 main-only failures left, once the new warning is allowed; otherwise Zammad's deprecation toolkit fails
+448 examples on it, which is the intended signal); the final version returns 8.1's bind, which those specs pass with
+on 8.1. [patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
 [body](../../bench/upstream/app_suites/zm1-body.md). Branch
 [`thomasklemm/bind-attribute-column-name`](https://github.com/thomasklemm/rails/tree/thomasklemm/bind-attribute-column-name)
-@ `72d0b21869` on main `bdb3d96012` (first version `a2a89ee17b`, before the review nits). App-side fix for Zammad:
-pass `table[:login]`.
+@ `53a0183864` on main `bdb3d96012` (earlier `a2a89ee17b`, then `72d0b21869`; force-pushed with lease). App-side fix
+for Zammad: pass `table[:login]`.
 
 **ZM2 (c): rspec-rails 8.0.4's channel example group can't find the connection class.** `graphql_channel_spec`'s
 `stub_connection` raises `Described class is not a connection class` (4): rspec-rails 8.0.4 reads
