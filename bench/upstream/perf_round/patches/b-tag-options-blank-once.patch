@@ -1,47 +1,48 @@
-From 02f567ab818dc85efc6aed3da3418167295bf2da Mon Sep 17 00:00:00 2001
+From 2dc1231b26be2d636c16fa1ea1f3302db756efb1 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 10:58:17 +0000
-Subject: [PATCH] Test each tag attribute name for blankness once
+Subject: [PATCH] Skip the second blank check when a tag attribute's name is
+ its key
 
-tag_options tested the raw key with blank? and then the name it converts
-the key to. For a plain String key the name is normally the key itself,
-so the same String#blank? ran twice for every String-keyed attribute,
-and an empty Symbol has an empty name, which the name check already
-skips.
+tag_options tests the raw key with blank? and then the name it converts
+the key to. A plain String's to_s returns the String itself, so for
+String keys the second check asked the same object the same question.
 
-Check only the name (after to_s) for Symbols and plain Strings, and keep
-both checks for anything else, including String subclasses, whose to_s
-or blank? can differ from a plain String's. Nested data and aria keys
-keep both checks; they are rarer. The tests add whitespace String keys
-and String keys that are blank only once converted.
+Keep both checks in the same order, and skip the second only when to_s
+returned the key itself. Symbol keys, keys whose to_s returns another
+object (a singleton to_s, a String subclass) and nested data and aria
+keys are checked as before. This assumes blank? answers the same for
+the same object; a String key now gets one blank? call fewer. The tests
+add whitespace String keys and String keys whose blank? or to_s differs
+from a plain String's.
 ---
- .../lib/action_view/helpers/tag_helper.rb     | 10 ++++---
- actionview/test/template/tag_helper_test.rb   | 27 +++++++++++++++++++
- 2 files changed, 34 insertions(+), 3 deletions(-)
+ .../lib/action_view/helpers/tag_helper.rb     | 10 ++++-
+ actionview/test/template/tag_helper_test.rb   | 37 +++++++++++++++++++
+ 2 files changed, 45 insertions(+), 2 deletions(-)
 
 diff --git a/actionview/lib/action_view/helpers/tag_helper.rb b/actionview/lib/action_view/helpers/tag_helper.rb
-index 0c617a729b..c2139b2816 100644
+index 0c617a729b..a44b9d4e26 100644
 --- a/actionview/lib/action_view/helpers/tag_helper.rb
 +++ b/actionview/lib/action_view/helpers/tag_helper.rb
-@@ -1545,9 +1545,13 @@ def tag_options(options, escape = true) # :nodoc:
-           output = +""
-           sep    = " "
+@@ -1547,8 +1547,14 @@ def tag_options(options, escape = true) # :nodoc:
            options.each_pair do |key, value|
--            next if key.blank?
--
+             next if key.blank?
+ 
 -            name = Symbol === key ? key.name : key.to_s
+-            next if name.blank?
 +            if Symbol === key
 +              name = key.name
++              next if name.blank?
 +            else
-+              # For a plain String, blank? on the name below is the same check.
-+              next if !key.instance_of?(String) && key.blank?
 +              name = key.to_s
++              # When to_s returns the key itself, its blank? was just checked.
++              next if !name.equal?(key) && name.blank?
 +            end
-             next if name.blank?
  
              type = TAG_TYPES[key]
+             if type != :aria && type != :class && value.is_a?(Hash)
 diff --git a/actionview/test/template/tag_helper_test.rb b/actionview/test/template/tag_helper_test.rb
-index 86a655e616..7cb9b7d114 100644
+index 86a655e616..754c48c9b3 100644
 --- a/actionview/test/template/tag_helper_test.rb
 +++ b/actionview/test/template/tag_helper_test.rb
 @@ -21,6 +21,18 @@ def to_s
@@ -63,10 +64,22 @@ index 86a655e616..7cb9b7d114 100644
    def test_tag
      assert_equal "<br />", tag("br")
      assert_equal "<br clear=\"left\" />", tag(:br, clear: "left")
-@@ -286,6 +298,21 @@ def test_tag_with_attribute_name_that_is_blank_before_conversion_is_skipped
+@@ -284,6 +296,31 @@ def test_tag_with_attribute_name_that_is_blank_before_conversion_is_skipped
+     assert_equal "<img />", tag("img", { [] => "/onerror=alert(1)//" })
+     assert_equal "<img />", tag("img", { data: { false => "x" } })
      assert_equal "<img />", tag("img", { aria: { false => "x" } })
-   end
- 
++
++    name = +" "
++    def name.to_s = "title"
++    name.freeze
++    assert_equal "<img />", tag("img", name => "/onerror=alert(1)//")
++
++    name = +"title"
++    def name.blank? = true
++    name.freeze
++    assert_equal "<img />", tag("img", name => "/onerror=alert(1)//")
++  end
++
 +  def test_tag_with_whitespace_string_attribute_name_is_skipped
 +    assert_equal "<img />", tag("img", " " => "/onerror=alert(1)//")
 +    assert_equal "<img />", tag("img", "\t\n" => "/onerror=alert(1)//")
@@ -80,11 +93,9 @@ index 86a655e616..7cb9b7d114 100644
 +    assert_equal "<img />", tag("img", name => "/onerror=alert(1)//")
 +    assert_equal "<img />", tag("img", BlankWhenConverted.new("a") => "/onerror=alert(1)//")
 +    assert_equal "<img />", tag("img", NeverBlank.new(" ") => "/onerror=alert(1)//")
-+  end
-+
+   end
+ 
    def test_tag_with_attribute_name_that_changes_when_converted_generates_valid_markup
-     html = tag("img", "src" => "/nonexistent.png", NameThatChangesWhenConverted.new => "/onerror=alert(1)//")
-     fragment = Nokogiri::HTML5::DocumentFragment.parse(html)
 -- 
 2.55.0
 

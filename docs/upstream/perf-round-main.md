@@ -12,9 +12,9 @@ below with their numbers.
 
 | rank | candidate | branch @ commit | effect | readability | review |
 | ---: | --- | --- | --- | --- | --- |
-| A | QueryIntent keeps its background session, mutex and lock wait in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`9fabafcf8b`](https://github.com/thomasklemm/rails/commit/9fabafcf8b4e019fbc402fe133232a1a076b3f81) | Ruby master: every intent goes from a 512-byte to a 256-byte slot; ruby-bench slot bytes −0.81% to −0.97% per iteration, objects unchanged | L1 | ship (second pass) |
-| B | `tag_options` tests each attribute name for blankness once | [`thomasklemm/tag-options-blank-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-options-blank-once) [`02f567ab81`](https://github.com/thomasklemm/rails/commit/02f567ab818dc85efc6aed3da3418167295bf2da) | −1.5% (Symbol keys) and −1.7% (String keys) per tag call; railsbench `String#blank?` −9.3M Ir per iteration | L1 | ship (third pass) |
-| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`cec8010a8b`](https://github.com/thomasklemm/rails/commit/cec8010a8b9cc9616e7ba84c5a139beae95b59ca) | `consumes?` −15.7%, `emitting?` −7.8% per call; railsbench −8.3M Ir per iteration | L0 | ship |
+| A | QueryIntent keeps its background session and mutex in one `AsyncState` | [`thomasklemm/query-intent-async-state`](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-async-state) [`8e7de36dbc`](https://github.com/thomasklemm/rails/commit/8e7de36dbc67dd7980d6ec87c7c43998329a9908) | Ruby master: every intent goes from a 512-byte to a 256-byte slot; ruby-bench slot bytes −0.81% to −0.96% per iteration, objects approximately unchanged | L1 | ship (after Sol) |
+| B | `tag_options` skips the second blank check when the name is the key | [`thomasklemm/tag-options-blank-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/tag-options-blank-once) [`2dc1231b26`](https://github.com/thomasklemm/rails/commit/2dc1231b26be2d636c16fa1ea1f3302db756efb1) | String keys −2.2% per tag call (Symbol keys −0.2%, within noise); railsbench `tag_options` −6.4M Ir per iteration | L1 | ship (after Sol) |
+| C | `EventReporter::LogSubscriber#emit`/`#consumes?` read the logger once | [`thomasklemm/log-subscriber-logger-once`](https://github.com/thomasklemm/rails/tree/thomasklemm/log-subscriber-logger-once) [`cec8010a8b`](https://github.com/thomasklemm/rails/commit/cec8010a8b9cc9616e7ba84c5a139beae95b59ca) | `consumes?` −15.7%, `emitting?` −7.8% per call; railsbench −8.3M Ir per iteration (sampled window) | L0 | ship; Sol: open with nits (body only) |
 | D (rejected) | `connection_handler` checks for the main Ractor first | not pushed; [patch](../../bench/upstream/perf_round/patches/rejected/connection-handler-main-ractor.patch) | −188 Ir per call (−6%), ≈0.055% of shipit | – | don't ship: breaks the `sqlite3_ractor` test hook |
 
 Bodies: [A](../../bench/upstream/perf_round/a-query-intent-async-state-body.md),
@@ -65,21 +65,22 @@ C. B is also worth a backport to 8-1-stable, which has the same double check sin
 
 ## A. QueryIntent: background state in one object
 
-**What it changes.** `QueryIntent#initialize` preset `@session = nil`, `@mutex = NullLock` and `@lock_wait = nil`
-([L102–L105](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/connection_adapters/query_intent.rb#L102-L105)),
-which only an intent scheduled by `async_schedule!` uses. They move into `AsyncState = Struct.new(:session, :mutex,
-:lock_wait)`, which `async_schedule!` creates; `initialize` presets `@async = nil`. `lock_wait` becomes
-`@async&.lock_wait`; the unused `session` reader and `session=` writer (added in 9051bc4332, unreleased) go away.
-`@event_buffer` stays a plain preset ivar, since it is read on every foreground query.
+**What it changes.** `QueryIntent#initialize` preset `@session = nil` and `@mutex = NullLock`
+([L102–L103](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/connection_adapters/query_intent.rb#L102-L103)),
+which only an intent scheduled by `async_schedule!` uses. They move into `AsyncState = Struct.new(:session, :mutex)`
+(comment: "Allocated only when scheduling an asynchronous query."), which `async_schedule!` creates; `initialize`
+presets `@async = nil`. `@lock_wait` and `@event_buffer` stay plain preset ivars with their readers. The unused
+`session` reader and `session=` writer (`:nodoc:`, added in 9051bc4332, unreleased) go away; that is the one API
+difference.
 
 **Instance variables per query shape** at the end of the query ([`qi_count.rb`](../../bench/upstream/perf_round/qi_count.rb),
 Ruby master): on main `find`, `find_by`, `where.to_a`, `first`, `count`, `pluck`, `update_all`, `delete`,
 `exec_query`, `select_all`, the three queries of a `transaction` and `load_async` all end with 31 (512 B), `execute`
-with 30 (512 B); `initialize` sets 30. A plain Fizzy `Card.find` sets 31 (census 4). With A: 29 and 28, all 256 B,
-`load_async` included (`AsyncState` adds one ivar and three are gone). A 256-byte slot holds up to 30 on master, so there is one
-ivar of headroom; the doc comment says the struct exists to keep these fields off foreground intents.
+with 30 (512 B); `initialize` sets 30. A plain Fizzy `Card.find` sets 31 (census 4). With A: 30 and 29, all 256 B,
+`load_async` included (`AsyncState` adds one ivar and two are gone). A 256-byte slot holds up to 30 on master, so there is
+no headroom left: the next eagerly set ivar brings back 512 B.
 
-**Shapes.** All intents now share one 28-ivar prefix in the same order, then `@cast_result` or `@affected_rows`: three
+**Shapes** (measured on the lock_wait-in-struct version; the final one has one more ivar in the shared prefix). All intents share one 28-ivar prefix in the same order, then `@cast_result` or `@affected_rows`: three
 layouts in load_async_test, asynchronous_queries_test, query_intent_test, log_subscriber_test and
 ractor_connection_handling_test, no `-W:performance` shape warnings, nothing too complex. Main has the same three.
 
@@ -93,20 +94,22 @@ intent and bytes per `Post.find`:
 | --- | --- | --- |
 | main | 512 B; 4,088 B/find | 512 B; 4,104 B/find |
 | v1 (drop presets) | 256 B; 3,832 B/find | **512 B** (async intents had 31 ivars) |
-| A (`AsyncState`) | 256 B; 3,832 B/find | 256 B; 3,848 B/find (async intents 29) |
+| A, lock wait in the struct (`9fabafcf8b`) | 256 B; 3,832 B/find | 256 B; 3,848 B/find (async intents 29) |
+| A, final (`8e7de36dbc`) | 256 B; 3,832 B/find | 256 B; 3,848 B/find (async intents 30) |
 
 On 4.0.9 every tree stays at 320 B; objects per find are the same in every tree (61.0 on master, 60.0 on 4.0.9). A
 second rewrite kept `@event_buffer` out of the struct so that `ensure_result` and `execute_or_skip` are unchanged
 apart from `@async` (`ensure_result` flog 27.2 in that version → 20.9, the same as main).
 
-**Memory, ruby-bench per iteration, Ruby master** (fixed heap, 10 iterations; A/A within 0.005%):
+**Memory, ruby-bench per iteration, Ruby master**: heap slot bytes allocated (Σ slot size × objects allocated, from
+`GC.stat_heap`), 3 warmups and 10 iterations, fixed heap; allocated bytes, not RSS. A/A within 0.005%; final tree:
 
 | | main | main (A/A) | A | Δ |
 | --- | ---: | ---: | ---: | ---: |
-| railsbench slot bytes | 59,087,612 | 59,087,625 | 58,575,612 | −512,000 (−0.87%) |
-| shipit slot bytes | 52,044,134 | 52,042,557 | 51,541,077 | −503,057 (−0.97%) |
-| lobsters slot bytes | 33,485,554 | 33,484,234 | 33,214,774 | −270,780 (−0.81%) |
-| objects (all three) | 946,167 / 870,310 / 528,848 | ±0.02% | 946,167 / 870,311 / 528,640 | ±0.04% |
+| railsbench slot bytes | 59,087,612 | 59,087,625 | 58,575,608 | −512,004 (−0.87%) |
+| shipit slot bytes | 52,044,134 | 52,042,557 | 51,542,168 | −501,966 (−0.96%) |
+| lobsters slot bytes | 33,485,554 | 33,484,234 | 33,214,610 | −270,944 (−0.81%) |
+| objects (all three) | 946,167 / 870,310 / 528,848 | ±0.02% | 946,167 / 870,316 / 528,640 | approximately unchanged (lobsters −0.04%; each scheduled async intent allocates one struct) |
 
 railsbench creates 2,000 intents per iteration, so −512,000 B is exactly 256 B each. On Ruby 4.0.9 slot bytes are
 unchanged (railsbench 74,812,892 in both trees).
@@ -119,16 +122,19 @@ windows: [below](#instructions-per-iteration-final-trees).
 `rake test_sqlite3_ractor`: 9,554 runs, 0 failures. No test added: the change is a refactor and a slot-size assertion
 would be brittle across Rubies.
 
-**Readability (L1).** Out loud: "An intent keeps its background session, mutex and lock wait in one AsyncState,
-created when it is scheduled. Without one it is a foreground intent: not pending, not canceled, no lock wait."
+**Readability (L1).** Out loud: "An intent keeps its background session and mutex in one AsyncState, created when it
+is scheduled. Without one it is a foreground intent: not pending, not canceled." (Metrics below are from the
+lock-wait-in-struct version; the final one assigns `@lock_wait` as main does.)
 Cold read by the reviewer: clear. Metrics, main → A: `initialize` flog 30.7 → 28.7, ABC 30.56 → 28.6; `execute_or_skip`
 25.5 → 29.1, ABC 18.49 → 21 (two `@async.` reads); `pending?` 2.4 → 3.6; `canceled?` 2.6 → 4.0; `ensure_result`
-unchanged; new `lock_wait` 1.0. The rise in `execute_or_skip` is the `@async.session`/`@async.mutex` reads, the cost
+unchanged. The rise in `execute_or_skip` is the `@async.session`/`@async.mutex` reads, the cost
 of grouping the fields. Rails' RuboCop flagged `@async&.session.active?` (Lint/SafeNavigationChain); it is now
 `@async && @async.session.active?`, like `canceled?`.
 
 **Review.** First pass: ship with changes (v1's memory claim fails after one async query; stale comment; inaccurate
-ivar counts in the message). Second pass on the `AsyncState` version: ship, with a note that the headroom is one ivar.
+ivar counts in the message). Second pass on the `AsyncState` version: ship. Sol (gpt-6.1-sol, on patch and body):
+request changes, [below](#sol-review-of-pm1pm3-2026-11-05). Third pass on the final version: ship (no path to 31 ivars;
+`dup` shares the struct as main shared `@session` and `@mutex`, and nothing writes to it after creation).
 
 **Overlap.** matthewd's draft #57089 (PostgreSQL pipelining) adds QueryIntent state; it conflicts with main in
 several files already, and A adds no new conflict. #58801 touches `write_query?` only.
@@ -138,22 +144,29 @@ several files already, and A adds no new conflict. #58801 touches `write_query?`
 **What it changes.** Since the security fix 99a3247ebc (GHSA-68p9-83h6-5wpj, flavorjones; backported as 9190210606
 in 8.1.4.1), `TagBuilder#tag_options` checks `key.blank?` and then `name.blank?` on the converted name
 ([L1548–L1551](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/helpers/tag_helper.rb#L1548-L1551)).
-For a plain String key the name is normally the key itself, so `String#blank?` ran twice. Now:
+For a plain String key `to_s` returns the key itself, so `String#blank?` ran twice on the same object. Final version
+(after Sol's review; the earlier shapes are below):
 
 ```ruby
+next if key.blank?
+
 if Symbol === key
   name = key.name
+  next if name.blank?
 else
-  # For a plain String, blank? on the name below is the same check.
-  next if !key.instance_of?(String) && key.blank?
   name = key.to_s
+  # When to_s returns the key itself, its blank? was just checked.
+  next if !name.equal?(key) && name.blank?
 end
-next if name.blank?
 ```
 
 Nested `data`/`aria` keys keep both checks.
 
-**Exactness.** Symbols: `Symbol#blank?` is `empty?`, and an empty Symbol's name is `""`. Plain Strings still go
+**Exactness of the final version.** Main's calls happen in main's order; the only call skipped is `name.blank?`
+where `name` is the very object whose `blank?` just returned false. It differs from main only if `blank?` is impure
+(answers differently for the same object; a String key now gets one `blank?` call fewer) or `equal?` is overridden,
+which Ruby's docs forbid; the commit message says so. `tg_eq.rb` (432 lines) and Sol's repros render the same as
+main. **The analysis below is of the previous version (`02f567ab81`).** Symbols: `Symbol#blank?` is `empty?`, and an empty Symbol's name is `""`. Plain Strings still go
 through `to_s`, so a singleton or `extend`ed `to_s` is checked as converted. Every other key, String subclasses and
 SafeBuffer included, gets both checks in the old order. [`tg_eq.rb`](../../bench/upstream/perf_round/tg_eq.rb) renders
 48 kinds of keys × 9 values (Symbols, Strings with whitespace, `"\t\n"`, NBSP, binary `"\xff"`, UTF-16LE; SafeBuffer;
@@ -167,37 +180,42 @@ frozen String with two singleton methods as a Hash key.
 **Two rejected shapes.** The first version (`case key when String then key`) took a String subclass as its own name,
 so a subclass that is blank only once converted produced `<img ="…" />`, the markup the GHSA fixed; the second
 (`elsif key.instance_of?(String) then name = key`) did the same for a plain String with a singleton `to_s`. Both were
-found by the reviewer; the tests now cover both (`test_tag_with_whitespace_string_attribute_name_is_skipped`,
+found by the reviewer. Sol then showed the third shape (`02f567ab81`) still wasn't exact: it skipped `key.blank?` for
+plain Strings and Symbols, so a frozen `" "` with a singleton `to_s` returning `"title"` rendered `title="hello"`
+(main: `<img />`), a nonblank String with a singleton `blank?` returning true was emitted, a blank String whose `to_s`
+raises now raised, and an overridden `Symbol#blank?` was ignored. All reproduced. The tests now cover these too (`test_tag_with_whitespace_string_attribute_name_is_skipped`,
 `test_tag_with_string_attribute_name_that_converts_to_blank_is_skipped`), pass on main and fail on the second version.
 The singleton case has to use a frozen String: a Hash copies an unfrozen String key and drops its singleton methods.
 
 **Numbers.** Per call, Ruby 4.0.9 interpreter, railsbench app ([`cases/tg.rb`](../../bench/upstream/perf_round/cases/tg.rb)):
 
-| | main | main (A/A) | B |
-| --- | ---: | ---: | ---: |
-| `tag.a("x", href:, class:, data: { id: })` | 57,534 | 57,525 | 56,671 (−1.5%) |
-| `content_tag(:a, "x", "href" =>, "class" =>, "data" => { "id" => })` | 59,387 | 59,391 | 58,354 (−1.7%) |
-| `link_to("x", "/posts", class: "c")` | 42,446 | 42,088 | 41,549 (−2.1%; A/A 0.8%) |
+| | main | main (A/A) | final B | previous B (`02f567ab81`) |
+| --- | ---: | ---: | ---: | ---: |
+| `tag.a("x", href:, class:, data: { id: })` | 57,596 | 57,556 | 57,484 (−0.2%) | 56,671 (−1.5%) |
+| `content_tag(:a, "x", "href" =>, "class" =>, "data" => { "id" => })` | 59,411 | 59,393 | 58,104 (−2.2%) | 58,354 (−1.7%) |
+| `link_to("x", "/posts", class: "c")` | 42,422 | 42,082 | 41,413 (−2.4%; A/A 0.8%) | 41,549 |
 
-Ruby master a041273a4c: Symbol keys 54,605 → 54,088 (−0.9%, A/A 0.18%), String keys 57,032 → 56,070 (−1.7%, A/A
-0.24%). Objects are unchanged. Per railsbench iteration (9,057 `tag_options` calls; sampled
-window, A/A from a second main process): `String#blank?` −9.3M Ir (A/A 0.41M), `tag_options` inclusive −5.2M (A/A
-0.38M), `link_to` −5.3M (A/A 0.35M).
+Ruby master a041273a4c, final B: Symbol keys 54,651 → 54,483 (−0.3%, A/A 0.12%), String keys 57,039 → 55,924
+(−2.0%, A/A 0.14%). The Symbol-key gain is gone (it came from skipping `key.blank?`); String keys keep theirs, and
+`link_to` stringifies its html options, so its keys are Strings. Objects are unchanged. Per railsbench iteration
+(9,057 `tag_options` calls; sampled window, A/A from a second main process), final B: `tag_options` inclusive −6.4M Ir
+(A/A 0.38M), of which `String#blank?` self −8.7M (A/A 0.41M; the inclusive total is smaller because of sampling
+noise across the window).
 
 **Backport.** 8-1-stable has the same code (9190210606), and its `String#blank?` has no ASCII fast path, so the double
 check costs more there: in railsbench, 8.1.1 → 8.1.4.1 added +51.8M Ir in `String#blank?` and +18.4M in
 `tag_options` self per iteration. Worth proposing for 8-1-stable once it lands on main.
 
-**Tests.** Action View suite: 2,957 + 251 + 177 runs, 0 failures; `tag_helper_test.rb` 110 runs, 283 assertions.
+**Tests.** Action View suite on the final version: 2,957 + 251 + 177 runs, 0 failures; `tag_helper_test.rb` 110 runs,
+285 assertions, which pass on main and fail on `02f567ab81`.
 
-**Readability (L1).** Out loud: "For a Symbol key, take its name. For any other key, skip it if it is blank, unless
-it is a plain String, whose name is checked next anyway; then convert it. Skip a blank name." The guard has a
-one-line comment, as the shape checklist asks for identity-like checks. Metrics, main → B: flog 98.0 → 102.3, ABC
-60.61 → 63.6, cyclomatic 32 → 33, perceived 34 → 36. The rise is the one `if`/`else` that separates Symbols; the
-method was already the most complex in the file. Rails' RuboCop: clean.
+**Readability (L1).** Out loud: "Skip a blank key. Take a Symbol's name and skip it if blank. Otherwise convert the
+key, and check the result unless it is the key itself, which was just checked." The identity check has its one-line
+comment. The two lines become eight, with the name check written twice. Rails' RuboCop: clean.
 
-**Review.** Three passes: don't ship (String subclasses bypass the converted check), ship with changes (singleton
-`to_s` on a plain String bypasses it), ship (wording nits applied).
+**Review.** Three passes on earlier shapes: don't ship (String subclasses bypass the converted check), ship with
+changes (singleton `to_s` on a plain String bypasses it), ship. Sol: request changes (the third shape still skipped
+main's calls). Fourth pass on the final version: ship, disclose the purity assumption (done in the commit message).
 
 **Overlap.** #59499 (popover), #56596 (boolean attribute values) and #47163 (`tag.attributes`) touch tag_helper.rb
 elsewhere; no new conflicts. Our earlier
@@ -213,7 +231,8 @@ read `logger` for the nil check and again in `log_level_satisfied?`; each read g
 `log_level_satisfied?(logger, event_method)`. The class and `consumes?` are new on main (aebcb61520, 81d95a3f74);
 none of the seven framework subclasses overrides these methods, and `log_level_satisfied?` is private and unreleased.
 
-**Exactness.** Identical when `logger` returns the same object on both reads. The reviewer measured the only
+**Exactness.** Identical when `logger` returns the same object on both reads; otherwise the level check now uses the
+logger from the nil check (disclosed in the body). The reviewer measured the only
 difference: a logger that turns nil between the two reads used to raise `NoMethodError` (rescued and reported by the
 event reporter), and now uses the logger already checked.
 
@@ -244,6 +263,29 @@ it is the filter's argument, so it can't be shared without changing what filters
 
 **Overlap.** linyiru's #58957 calls `emitting?` from structured event subscribers; it doesn't touch this file and
 gets cheaper with C.
+
+## Sol review of PM1–PM3 (2026-11-05)
+
+Sol (codex gpt-6.1-sol, read-only, on the patches and bodies) reviewed the queued heads `9fabafcf8b`, `02f567ab81` and
+`cec8010a8b`. Each finding was checked against the code; repros: [`sol_pm1.rb`](../../bench/upstream/perf_round/sol_pm1.rb),
+[`sol_pm2.rb`](../../bench/upstream/perf_round/sol_pm2.rb).
+
+| # | finding | verdict | action |
+| --- | --- | --- | --- |
+| PM1-1 | `lock_wait` in the struct changes `dup` and `freeze`: after `dup`, `execute_or_wait` on the copy sets the original to 0.0 (main: stays 17); on a frozen intent it returns 0.0 instead of raising `FrozenError` | **confirmed** on master and 4.0.9 | `@lock_wait` stays a plain ivar; `AsyncState = Struct.new(:session, :mutex)`. 30 ivars still fit 256 B (measured); slot bytes unchanged within 0.002% |
+| PM1-2 | removing `session`/`session=` is an API difference | confirmed (`:nodoc:`, unreleased) | the body says so |
+| PM1-3 | objects not exactly unchanged; method for slot bytes | confirmed (lobsters −0.04%, one struct per scheduled intent) | "approximately unchanged", method described |
+| PM1-4 | shorter struct comment, permalinks | applied | |
+| PM2-1 | a frozen `" "` with singleton `to_s` → `"title"` renders `title="hello"`; singleton `blank?` → true is emitted; a blank key whose `to_s` raises now raises; tests don't cover blank → nonblank or raw `blank?` | **confirmed**, plus an overridden `Symbol#blank?` (ignored by `02f567ab81`) | rewritten to Sol's suggested exact form (main's order, skip only when `to_s` returned the key); two tests added |
+| PM2-2 | `instance_of?` call main never makes; Symbol `blank?` dropped | confirmed for `02f567ab81` | gone in the final form |
+| PM2-3 | body: "identical" claim, SHA links, the 9.3M sentence | applied | body states what the comparison showed; −6.4M `tag_options` inclusive replaces the `String#blank?` attribution |
+| PM2 result | measure what is left | String keys −2.2% (4.0.9) / −2.0% (master); Symbol keys −0.2% / −0.3%, within noise | kept in the queue on the String-key gain and railsbench's −6.4M per iteration |
+| PM3-1 | disclose that the level check uses the logger from the nil check | confirmed (a `logger` override returning different loggers) | in the body |
+| PM3-2 | private helper arity changed; qualify the compatibility claim | confirmed | "the framework's subscribers … don't call the private helper" |
+| PM3-3 | (27,813 − 25,640) × 4,000 = 8.69M, not 8.3M | confirmed (8.69M from per-call numbers, 8.3M from the sampled window) | the body attributes 8.3M to the sampled window, A/A 0.29M |
+| PM3-4 | full-SHA links; "customize logger selection through `default_logger`" | applied | |
+
+Rejected: none. A third skeptical-reviewer pass on the final PM1 and PM2 said ship for both.
 
 ## D (rejected). `connection_handler` asks `Ractors.main?` first
 
