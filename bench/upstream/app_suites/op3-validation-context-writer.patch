@@ -1,4 +1,4 @@
-From 992a77da89e6fc21df7781df2874ccd0d4c32c2e Mon Sep 17 00:00:00 2001
+From 0ba3dad80bdd63dc4f769fd192dc550c05f39aea Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Thu, 5 Nov 2026 12:23:58 +0000
 Subject: [PATCH] Restore the private validation_context= writer
@@ -8,9 +8,9 @@ or clear the context around validations it runs itself: ancestry 5.1.0
 whenever a saved node's parent changes, and OpenProject's contracts. On
 Rails main these now raise NoMethodError.
 ---
- activemodel/lib/active_model/validations.rb      |  4 ++++
- .../validations/validations_context_test.rb      | 16 ++++++++++++++++
- 2 files changed, 20 insertions(+)
+ activemodel/lib/active_model/validations.rb     |  4 ++++
+ .../validations/validations_context_test.rb     | 17 +++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
 diff --git a/activemodel/lib/active_model/validations.rb b/activemodel/lib/active_model/validations.rb
 index 8fc7f2bfd0..05ab9910b5 100644
@@ -28,10 +28,10 @@ index 8fc7f2bfd0..05ab9910b5 100644
        @context_for_validation ||= ValidationContext.new
      end
 diff --git a/activemodel/test/cases/validations/validations_context_test.rb b/activemodel/test/cases/validations/validations_context_test.rb
-index 615a0a71d3..9912f77ddb 100644
+index 615a0a71d3..542778667a 100644
 --- a/activemodel/test/cases/validations/validations_context_test.rb
 +++ b/activemodel/test/cases/validations/validations_context_test.rb
-@@ -67,4 +67,20 @@ def validate(record)
+@@ -67,4 +67,21 @@ def validate(record)
      assert_includes topic.errors[:base], ERROR_MESSAGE
      assert_includes topic.errors[:base], ANOTHER_ERROR_MESSAGE
    end
@@ -39,6 +39,7 @@ index 615a0a71d3..9912f77ddb 100644
 +  test "the private validation_context= writer sets the context for run_validations!" do
 +    Topic.validates_with(ValidatorThatAddsErrors, on: :custom)
 +    topic = Topic.new
++    assert_not_respond_to topic, :validation_context=
 +
 +    topic.send(:validation_context=, :custom)
 +    topic.send(:run_validations!)

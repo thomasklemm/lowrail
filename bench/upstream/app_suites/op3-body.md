@@ -3,7 +3,7 @@
 #58220 removed the private `ActiveModel::Validations#validation_context=` as unused inside Rails. Released code calls it to set or clear the context around validations it runs itself, and now raises `NoMethodError` on main:
 
 * [ancestry 5.1.0's `sane_ancestor_ids?`](https://github.com/stefankroes/ancestry/blob/c03bc1a9b0339236f4e817ebd9730cc62d46c453/lib/ancestry/instance_methods.rb#L146), which [runs whenever a saved node's parent changes](https://github.com/stefankroes/ancestry/blob/c03bc1a9b0339236f4e817ebd9730cc62d46c453/lib/ancestry/instance_methods.rb#L40) and in `check_ancestry_integrity!`;
-* [OpenProject's `ModelContract#contract_valid?`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/contracts/model_contract.rb#L100), the base of its contracts, so most of its create and update services fail.
+* [OpenProject's `ModelContract#contract_valid?`](https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/app/contracts/model_contract.rb#L100), the base of all its contracts.
 
 ```ruby
 node.update!(parent: other) # ancestry 5.1.0
@@ -16,4 +16,4 @@ This brings back the three-line private method unchanged, with a test that runs 
 
 ---
 
-<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md#openproject), part of my research project Lowrail).</sub>
+<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/cb32d8e9ab8940671cf707304bbfea0a4258e4b4/docs/upstream/app-suites.md#openproject), part of my research project Lowrail).</sub>
