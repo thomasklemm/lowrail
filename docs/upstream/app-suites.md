@@ -1639,7 +1639,7 @@ runner). `openproject` is the plain suite, `openproject-shimmed` adds the main-o
 | DC3 rspec-rails 8.0.4 renders real templates in controller specs | 37 | (c) | 9987431315 (#58279) | rspec-rails 2d5985ea6e, unreleased |
 | OP5 `TabularFormBuilder` mutates a frozen `model_name` string | 27 in the sample (costlog) | (d) | c4dcf552cf (#58298) | record only |
 | OP2 Tableless `load_schema!` override ignored | `Day`/`NonWorkingDay` queries | (d) | ae739c3854 (#58437) | record only |
-| OP7 with_advisory_lock 7.6.0 transaction try-locks don't lock | 6 | (c) | 01e33f82f8 (#56129) | record only, gem-side |
+| OP7 with_advisory_lock 7.6.0 transaction try-locks don't lock | 6 | (c) | 01e33f82f8 (#56129) | gem-side, issue drafted |
 | OP-AJ-1 specs read the enqueued job hash after performing it | 2 | (b) | f5097cf946 (#58975) | — |
 | OP-AJ-2 specs stub `Repository.find` for job arguments | 6 | (b) | 52306a97cf (#57742) | — |
 | uniqueness errors carry `existing_id` | 3 | (b) | 03a3ed8397 (#55826) | CHANGELOG |
@@ -1804,19 +1804,37 @@ master (`72aa3d3`) has the same code, and there's no issue or PR. Repro:
 [statesman_transition.rb](../../bench/upstream/app_suites/statesman_transition.rb). This corrects
 [api-regressions.md](api-regressions.md), which said statesman guards with `respond_to?`.
 
-**OP7 (c), record only: with_advisory_lock 7.6.0's transaction-level try-lock is not held.** 01e33f82f8 (#56129,
-matthewd, "Internal query_* methods are mostly used for schema queries") changed the internal
-[`query_all`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb#L140)
-default to `materialize_transactions: false`. with_advisory_lock takes non-blocking locks with
+**OP7 (c), issue drafted: with_advisory_lock 7.6.0's transaction-level try-lock is not held.** 01e33f82f8 (#56129,
+matthewd, "Internal query_* methods are mostly used for schema queries") changed the internal `query_*` defaults to
+`materialize_transactions: false` (on PostgreSQL
+[`query_rows`](https://github.com/rails/rails/blob/3ba9e53d7e7e85a11b3b88ed68b7d9293c0d2169/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb#L15),
+which `query_value` uses). with_advisory_lock takes non-blocking locks with
 [`query_value(sql)`](https://github.com/ClosureTree/with_advisory_lock/blob/58718b42d78cb2a0d5460da261986687d5a852f8/lib/with_advisory_lock/postgresql_advisory.rb#L165),
-so inside a lazily opened transaction `pg_try_advisory_xact_lock` runs outside it and the lock ends with that
-autocommitted statement. A second writer gets the lock while the first still holds it. Its blocking path already passes
-`materialize_transactions: true` for "Rails 8.2+". OpenProject's `OpenProject::Mutex.with_advisory_lock_transaction`
-uses `transaction: true`, so its concurrency specs fail (layout lock, backlogs batch update, work package delete):
-6 F. In production two writers can interleave. Repro:
-[advisory_xact_try_lock.rb](../../bench/upstream/app_suites/advisory_xact_try_lock.rb) (8-1: the second writer gets
-`false`; main: it gets the lock; 01e33f82f8's parent: `false`). With `materialize_transactions: true` on the try-lock
-`query_value`, the layout lock spec passes. Gem-side; not reported (no issue or PR in ClosureTree/with_advisory_lock).
+so when the lock is the first statement of a lazily opened transaction, `pg_try_advisory_xact_lock` runs before the
+`BEGIN` and the lock ends with that statement. A second writer gets the lock while the first still holds it
+(exclusive and shared; a query before the lock, session locks and `blocking: true` are unaffected). Its blocking path
+already passes `materialize_transactions: true` for "Rails 8.2+". OpenProject's
+`OpenProject::Mutex.with_advisory_lock_transaction` uses `transaction: true`, so its concurrency specs fail (layout
+lock, backlogs batch update, work package delete): 6 F. In production two writers can interleave. Repro:
+[advisory_xact_try_lock.rb](../../bench/upstream/app_suites/advisory_xact_try_lock.rb), Ruby 4.0.9, PostgreSQL 15
+(main `3ba9e53d7e` and 01e33f82f8: the second writer gets the lock; 8-1-stable `6e09124217` and 01e33f82f8's parent:
+`false`).
+
+Where the fix belongs: the gem. Public `select_value`/`select_all` still materialize the transaction on main
+(`select_value("SELECT pg_try_advisory_xact_lock(…)")` gives `false` to the second taker on every tree), so only
+callers of the `:nodoc:` `query_*` methods are hit. Those are with_advisory_lock and
+[umbrellio/table_sync](https://github.com/umbrellio/table_sync/blob/97ed98fcb3a146974aa0b1a80368c6e4b2da3124/lib/table_sync/receiving/model/active_record.rb#L134)
+(GitHub code search; the 66 Ruby files that pair `select_value` with `pg_advisory_xact_lock` take the unaffected path). Rails moved its
+own lock calls (PostgreSQL `pg_try_advisory_lock`/`pg_advisory_unlock`, MySQL `GET_LOCK`/`RELEASE_LOCK`) to
+`materialize_transactions: true` in the same commit, so restoring the old default would revert the commit's purpose;
+the restore rule's third condition fails. #56129's discussion doesn't mention locks. No rails/rails issue or PR and no
+with_advisory_lock issue or PR covers it. MySQL: the gem raises on `transaction: true` and `GET_LOCK` is
+session-level, so not affected (from the code, not run). Passing `materialize_transactions: true` on the try path
+(behind the gem's existing `internal_exec_query` check) gives `false` on main, `true` uncontended, and keeps 8.1's
+results for shared, session and query-cache cases; with it, the layout lock spec passes. Skeptical review
+(subagent): send with changes, applied (PostgreSQL's `query_rows`, not the abstract `query_all`; the first-statement
+condition; shared locks; a runnable repro, checked on main and 8-1). Draft, not posted:
+[op7-with-advisory-lock-issue.md](../../bench/upstream/app_suites/op7-with-advisory-lock-issue.md).
 
 **OP-test-adapter (d), record only.** 77b6966720 (#57477, byroot) rewrote `ActiveJob::TestHelper::TestQueueAdapter`
 (`:nodoc:`) without `enable_test_adapter`. OpenProject's
@@ -1855,7 +1873,8 @@ Each is a few lines in the method that owns the behavior, with no new names.
 **Not pursued:**
 * OP2: no small exact restore; SchemaContext would need a hook.
 * OP5 and OP-test-adapter: OpenProject's own code.
-* OP4, OP6 and OP7: gem-side, recorded with repros, not reported.
+* OP4 and OP6: gem-side, recorded with repros, not reported.
+* OP7: gem-side; the with_advisory_lock issue is drafted, awaiting Thomas.
 * The DC3 and `_prefixes` rspec-rails groups: fixed on rspec-rails main.
 * S2: already queued.
 * The (b) rows: CHANGELOG entries or deliberate fixes.
