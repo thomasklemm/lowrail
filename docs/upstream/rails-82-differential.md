@@ -360,7 +360,7 @@ must). The decode-only differences are round 2's attribute order of loaded recor
 * **Review:** Sol "open with nits" (title, comment, skip reason, body wording); applied.
 * **Branch:** `thomasklemm:thomasklemm/memcache-set-multi-dalli-version` at `ebb011880e` on main `d7875e3fb1`
   ([patch](../../fixtures/corpus/rails-82-diff/patches/d1-memcache-set-multi-dalli-version.patch)). Queued in
-  `bench/upstream/pr-queue/queue.tsv` with [the body](../../bench/upstream/rails_82_diff/d1-body.md); opened when a slot frees up
+  the PR queue with [the body](../../bench/upstream/rails_82_diff/d1-body.md); opened when a slot frees up
   under the 15-open-PR limit.
 
 Body: [`bench/upstream/rails_82_diff/d1-body.md`](../../bench/upstream/rails_82_diff/d1-body.md).

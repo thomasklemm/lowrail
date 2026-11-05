@@ -175,9 +175,11 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 
 ## Submission queue (2026-11-03)
 
-Every finished candidate (review gates passed, body drafted) goes into the **Queue** section of
-[upstream/contributions.md](upstream/contributions.md), ranked by effect and breadth, and opens only when its repo
-has room. Open the strongest first. A candidate made moot upstream leaves the queue with a note.
+Every candidate gets one file in [bench/upstream/pr-queue/items](../bench/upstream/pr-queue/items) once its branch
+and body exist (format and states in its [README](../bench/upstream/pr-queue/README.md), 2026-11-05): title, the
+body exactly as posted, impact, rank by effect and breadth, and every review pass with the head it reviewed. It opens
+only when its repo has room, strongest first, through `script/pr-queue open`, which refuses unless the gates below
+pass on the current head. A candidate made moot upstream moves to `superseded` or `closed` with a note.
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
 * **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
@@ -241,8 +243,9 @@ Every upstream PR, issue or comment draft goes through as many review rounds as 
 4. `thermos` for larger diffs (several files or a new mechanism).
 
 Every confirmed finding is fixed and the changed part reviewed again; the round ends when a pass has no must-fix.
-A head change after the last pass means another pass. W1 opens a queued item only if its contributions.md entry
-names the passes on that exact head; otherwise it sends it to the coordinator first.
+A head change after the last pass means another pass. An item is `reviewed` only when skeptic and Sol, Astra when
+`risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current `head`;
+`script/pr-queue open` and `ready` check this and refuse otherwise.
 
 ### Readability gate (L0–L3)
 

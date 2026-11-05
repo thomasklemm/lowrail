@@ -56,6 +56,8 @@ whichever pass is listed.
 
 Items that are already open and ready may have no body.
 
+Migrated passes whose head the old ledger didn't record have `head: unrecorded`; they never count.
+
 ## States
 
 ```

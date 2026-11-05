@@ -66,7 +66,7 @@ module PrQueue
     Array(m["passes"]).each do |pass|
       list << "pass reviewer #{pass['reviewer'].inspect}" unless REVIEWERS.include?(pass["reviewer"])
       list << "pass verdict #{pass['verdict'].inspect}" unless VERDICTS.include?(pass["verdict"])
-      list << "pass head must be a quoted SHA" unless sha?(pass["head"])
+      list << "pass head must be a quoted SHA or unrecorded" unless sha?(pass["head"]) || pass["head"] == "unrecorded"
     end
     list
   end
@@ -218,7 +218,7 @@ module PrQueue
            "room: #{room(repo, prs) || 'yes'}#{", ready: #{room(repo, prs, ready: true) || 'yes'}" if repo == 'rails/rails'}"
     end
     puts
-    rows = list.sort_by { [STATES.index(_1["state"]) || 99, _1["rank"] || 999, _1.id] }.map do |item|
+    rows = list.sort_by { [STATES.index(_1["state"]) || 99, _1["repo"], _1["rank"] || 999, _1.id] }.map do |item|
       fact = live[item.id]
       head = item["head"].to_s[0, 10]
       fork = if !fact || !item["branch"] then "" elsif fact[:error] then "?" elsif !fact[:fork_head] then "missing"
