@@ -12,9 +12,9 @@ depends_on: []
 impact: Restore queries on Rails main when Active Record freezes table metadata
 rank: 14
 risky: true
-state: closed
+state: merged
 pr: 62
-note: "closed by ankane 2026-11-05 22:54 UTC; he fixed it himself on master in ac61e54cf4 (\"Fixed FrozenError with Active Record 8.2 - resolves #62\"); reacted 👍"
+note: "merged 2026-11-05 22:52 UTC as ankane's ac61e54cf4 (our change verbatim, Co-authored-by Thomas, plus an Active Record 8.2 CI gemfile); the push closed #62"
 passes:
   - {reviewer: skeptic, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: approve, open: "L0; live capability-check boundary disclosed; no speed claim"}
   - {reviewer: sol, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: changes, open: "P2; preserve cached false across late blind_index declarations on mutable metadata"}
