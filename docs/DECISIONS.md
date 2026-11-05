@@ -191,6 +191,11 @@ has room. Open the strongest first. A candidate made moot upstream leaves the qu
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
   **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
   for a response to an earlier one.
+* **Stacked PRs open right away** (Thomas, 2026-11-05): a PR that builds on another of ours opens without waiting.
+  Its body starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is new here.", and
+  #N's body links back to it. Once #N merges, rebase the stacked PR so its diff shrinks to its own change. GitHub's
+  native stacked PRs need both branches in the base repository, so they don't work from our fork. Reason:
+  ruby-bench #567 carried #566's commit, #567 merged first, and #566 became an empty squash commit.
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
   failure of ours, because each push notifies reviewers and reruns CI.
