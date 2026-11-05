@@ -16,18 +16,19 @@ rank: 13
 risky: false
 state: in-review
 pr:
-note: rebased from cec8010a8b (bdb3d96012) onto 1e235cee11; tests for a logger that changes between calls added (Sol 20:09); numbers refreshed; waits for Sol on defa5dc860
+note: "Sol on defa5dc860: fix first; coordinator accepted the disclosed logger snapshot and the private-helper arity change; body now pins SHAs. Waits for Sol again on defa5dc860 with that contract"
 passes:
   - {reviewer: sol, head: "cec8010a8b", date: 2026-11-05, verdict: changes, open: "first review: disclosure, arity, numbers, links; applied in the body"}
   - {reviewer: skeptic, head: "cec8010a8b", date: 2026-11-05, verdict: approve, open: ""}
   - {reviewer: sol, head: "cec8010a8b", date: 2026-11-05, verdict: changes, open: "20:09: snapshot untested, perf method not reproducible, 'on every request' overstated"}
   - {reviewer: skeptic, head: "b6bbf99a51", date: 2026-11-05, verdict: nits, open: "add an info-then-nil case, list both commands; applied in defa5dc860"}
   - {reviewer: skeptic, head: "defa5dc860", date: 2026-11-05, verdict: approve, open: ""}
+  - {reviewer: sol, head: "defa5dc860", date: 2026-11-05, verdict: changes, open: "logger snapshot not exact; private helper arity breaks one-argument overrides; pin SHAs. Coordinator: snapshot accepted (disclosed), helper is private so the arity change stays and is stated; SHAs pinned (body only)"}
 ---
 
 # Read the logger once in EventReporter::LogSubscriber#emit and #consumes?
 
-[`emit` and `consumes?`](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/activesupport/lib/active_support/event_reporter/log_subscriber.rb#L56-L88) look up `logger` for the nil check and then again in `log_level_satisfied?`. Each lookup goes from `self.class.logger` to `@logger || default_logger`, such as `ActionController::Base.logger`. This passes the logger they already have to `log_level_satisfied?`, so the level check uses the logger from the nil check, even if a `logger` override would return another one on a second call; the new tests cover that, including lookups that return nil. The framework's subscribers choose their logger through `default_logger` and don't override these methods or call the private helper, whose arity changes.
+[`emit` and `consumes?`](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/activesupport/lib/active_support/event_reporter/log_subscriber.rb#L56-L88) look up `logger` for the nil check and then again in `log_level_satisfied?`. Each lookup goes from `self.class.logger` to `@logger || default_logger`, such as `ActionController::Base.logger`. This passes the logger they already have to `log_level_satisfied?`, so the level check uses the logger from the nil check, even if a `logger` override would return another one on a second call; the new tests cover that, including lookups that return nil. The private `log_level_satisfied?` now takes the logger as its first argument, so a subclass overriding it would need the new arity; the framework's subscribers choose their logger through `default_logger` and override none of these methods.
 
 `EventReporter#emitting?` asks `consumes?` before an event is built ([81d95a3f74](https://github.com/rails/rails/commit/81d95a3f744ee504ecb9835293bda0a808cc56cf)); Action Controller's structured event subscriber asks it [twice per action](https://github.com/rails/rails/blob/1e235cee11b0a7aecb189d8837534807626287aa/actionpack/lib/action_controller/structured_event_subscriber.rb#L10-L30).
 
@@ -40,7 +41,7 @@ Callgrind instructions per call, Ruby 4.0.9 interpreter (main against itself wit
 
 <details><summary>Method</summary>
 
-Lowrail a06703e89d, [`percall.sh`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/percall.sh) with [`cases/er_none.rb`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/cases/er_none.rb): Action Controller loaded, `ActionController::Base.logger` an info-level `ActiveSupport::Logger`, `action_controller.request_started`. Callgrind counts only the timed loop: 2,000 calls after 2,000 warmups, GC disabled, fixed heap; Ir per call is inclusive (the method, everything it calls and the loop's block call, the same on both sides). Three runs each of main 1e235cee11, a second main checkout and this branch; the table shows the first; all runs of main agree within 19 Ir.
+Rails main [`1e235cee11`](https://github.com/rails/rails/commit/1e235cee11b0a7aecb189d8837534807626287aa) against this branch at [`defa5dc860`](https://github.com/thomasklemm/rails/commit/defa5dc8602281d03db9d65770e9f749fd1931e5) and a second checkout of main; Ruby 4.0.9 ([`3e93b23afc`](https://github.com/ruby/ruby/commit/3e93b23afcec3433f6aecc34b5d832799d754238)) interpreter. Lowrail [`a06703e89d`](https://github.com/thomasklemm/lowrail/tree/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round): [`percall.sh`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/percall.sh) with [`cases/er_none.rb`](https://github.com/thomasklemm/lowrail/blob/a06703e89dd41af36cf7a923103be3e7ec7be9a5/bench/upstream/perf_round/cases/er_none.rb), which loads Action Controller with an info-level `ActiveSupport::Logger` as `ActionController::Base.logger` and checks `action_controller.request_started`. Callgrind counts only the timed loop: 2,000 calls after 2,000 warmups, GC disabled, fixed heap. Ir per call is inclusive (the method, everything it calls and the loop's block call, the same on both sides). Three runs per tree; the table shows the first, and all runs of main agree within 19 Ir.
 
 ```
 percall.sh cases/er_none.rb consumes 2000 3 path/to/main path/to/main-2 path/to/branch
