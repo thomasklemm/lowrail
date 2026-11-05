@@ -721,6 +721,7 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 
 ### Benchmarks — ruby/ruby-bench
 
+- [#565](https://github.com/ruby/ruby-bench/pull/565), lobsters runs `ANALYZE` on the in-memory DB after the backup restore (fixes [#527](https://github.com/ruby/ruby-bench/issues/527) by rubys; alanwu asked for `ANALYZE` instead of a fixture with statistics, and no PR had come since 2026-09-02). Hottest-stories query 10.8 → 0.08 ms; lobsters on Ruby 4.0.7 after warmup, interpreter median 1,479 → 1,359 ms (5 interleaved runs each), YJIT 896/910 → 809/831 ms; same 11,198 queries per pass, all responses byte-identical except the five `/reply` pages, which vary between runs anyway. Head `41985a9f3b`. Opened 2026-11-05 at Thomas's request. The Amp GitHub app can't subscribe to ruby/ruby-bench, so W1 watches it.
 
 ### Rails — rails/rails
 
