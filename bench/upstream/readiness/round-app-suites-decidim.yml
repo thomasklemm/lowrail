@@ -1,0 +1,66 @@
+# The Decidim app-suite round (docs/upstream/app-suites.md#decidim), as a readiness manifest. Pins, bumps, shims and
+# commands are the ones the round used by hand; the runner has not run this file yet, so the first run may need a
+# setup fix (it shows as suite-did-not-load).
+# Services: PostgreSQL (15.19 in the round; Decidim's CI uses postgres:14) with the contrib extensions ltree and
+# pg_trgm, user postgres without a password, on 127.0.0.1:5432. Nothing else: the HTML validator in Decidim's CI is
+# only used by system specs, which aren't run. Both trees use the same database names (decidim_test_app_test*), so
+# the trees must not run at the same time against one server (the round used one cluster per tree, 5432 and 5433).
+# libvips and Node with npm on the PATH (the round: libvips 8.14.1, Node 26.12.1; Decidim's CI: Node 24.18.0).
+ruby: 4.0.9
+rails:
+  base: 6e09124217      # 8-1-stable, v8.1.4.1
+  candidate: bdb3d96012 # main, 2026-11-05
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 5400
+
+suites:
+  decidim-core: &decidim
+    repo: https://github.com/decidim/decidim
+    ref: 80149bbba83a3c477172d113d21e22115c901e54 # develop, 2026-11-05
+    framework: rspec
+    services: [postgres]
+    env: { DATABASE_USERNAME: postgres, DATABASE_PASSWORD: "", DATABASE_HOST: 127.0.0.1, DATABASE_PORT: 5432,
+           DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE: memory, DECIDIM_SPAM_DETECTION_BACKEND_USER: memory,
+           CI: "true", SHAKAPACKER_RUNTIME_COMPILE: "false", NODE_ENV: test, DISABLE_SPRING: "1",
+           DECIDIM_BULLET_ENABLED: "true", DECIDIM_BULLET_N_PLUS_ONE: "true", DECIDIM_BULLET_COUNTER_CACHE: "false",
+           DECIDIM_BULLET_UNUSED_EAGER: "false", PARALLEL_TEST_PROCESSORS: 4 }
+    # google-protobuf 4.33.5 has no x86_64-linux build for Ruby 4.0; 4.36.2 has (both trees).
+    bumps: { google-protobuf: "4.36.2" }
+    shims:
+      # Decidim asks for Ruby ~> 3.4.0 and Rails ~> 8.1.0 (both trees).
+      - "grep -rl 's.required_ruby_version = \"~> 3.4.0\"' --include=*.gemspec . | xargs sed -i 's/s.required_ruby_version = \"~> 3.4.0\"/s.required_ruby_version = \">= 3.4\"/'"
+      - "sed -i 's/s.add_dependency \"rails\", \"~> 8.1.0\"/s.add_dependency \"rails\", \">= 8.1.0\", \"< 8.3\"/' decidim-core/decidim-core.gemspec"
+      # readline is a bundled gem on Ruby 4.0; without it spec/tasks/upgrade/decidim_tasks_sidekiq_spec.rb fails to
+      # load and takes its whole parallel group down (both trees).
+      - "sed -i 's|^  gem \"parallel_tests\", \"~> 5.9\"|  gem \"parallel_tests\", \"~> 5.9\"\\n  gem \"readline\"|' Gemfile"
+      # Positional Arel::Table.new raises on main (our open rails/rails#59574 makes it a deprecation); the
+      # migration stops db:migrate, so the test app can't be generated.
+      - { tree: cand, run: "sed -i 's/Arel::Table.new(table)/Arel::Table.new(name: table)/' decidim-core/db/migrate/20250416130426_rename_doorkeeper_scopes.rb && sed -i 's/Arel::Table.new(resource_table_name)/Arel::Table.new(name: resource_table_name)/' decidim-core/app/presenters/decidim/component_attachment_collection_presenter.rb && sed -i 's/Arel::Table.new(Decidim::StaticPage.table_name)/Arel::Table.new(name: Decidim::StaticPage.table_name)/' decidim-core/app/controllers/concerns/decidim/force_authentication.rb" }
+      - "npm ci --no-audit --no-fund"
+    # The dummy app comes from each tree's own `rails new`, so main's has load_defaults 8.2.
+    setup:
+      - "bundle exec rake test_app"
+      - "cd spec/decidim_dummy_app && bundle exec rake parallel:create parallel:load_schema"
+    test: "cd decidim-core && bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern 'spec/(system|tasks/decidim_tasks_shakapacker_spec.rb)'"
+  decidim-admin:
+    <<: *decidim
+    test: "cd decidim-admin && bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern spec/system"
+  decidim-api:
+    <<: *decidim
+    test: "cd decidim-api && DECIDIM_BULLET_UNUSED_EAGER=true bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern spec/system"
+  decidim-participatory_processes:
+    <<: *decidim
+    test: "cd decidim-participatory_processes && bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern spec/system"
+  decidim-proposals:
+    <<: *decidim
+    test: "cd decidim-proposals && bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern spec/system"
+  decidim-meetings:
+    <<: *decidim
+    test: "cd decidim-meetings && bundle exec parallel_test --type rspec -n 4 --pattern spec/ --exclude-pattern spec/system"
+  # rspec-rails 8.0.4 (the latest release) hides and adds main failures: controller specs render real templates
+  # (9987431315 vs. its ResolverDecorator, fixed in rspec-rails 2d5985ea6e) and view specs hit the frozen _prefixes.
+  # The round's classification reran the failing files with rspec-rails main in both trees.
+  decidim-core-rspec-rails-main:
+    <<: *decidim
+    bumps: { google-protobuf: "4.36.2", rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 5072befe5d1b01348a14fa02b6e5a8448874fb53 } }
