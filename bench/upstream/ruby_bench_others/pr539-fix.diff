@@ -1,0 +1,35 @@
+diff --git a/benchmarks.yml b/benchmarks.yml
+index d460635..fbe0124 100644
+--- a/benchmarks.yml
++++ b/benchmarks.yml
+@@ -81,7 +81,7 @@ gc_balloon:
+   desc: Each Ractor inflates a large retained object graph spanning most size pools, ages it into the old generation, drops it and collects at the low-water mark, to exercise major GC over old-generation garbage, sweeping and heap shrinkage.
+   category: gc
+   single_file: true
+-  default_harness: harness-gc
++  default_harness: gc
+   no_pinning: true
+ gcbench:
+   desc: Ellis-Kovac-Boehm GCBench builds binary trees of various depths to exercise GC marking, sweeping, and write barriers.
+diff --git a/benchmarks/gc_balloon.rb b/benchmarks/gc_balloon.rb
+index 3de61b6..7fb389b 100644
+--- a/benchmarks/gc_balloon.rb
++++ b/benchmarks/gc_balloon.rb
+@@ -18,7 +18,7 @@
+ # Work per Ractor is fixed and independent of the Ractor count, so GC totals
+ # scale with the number of workers and per-Ractor degradation is the signal.
+ 
+-require_relative '../harness/loader'
++require_relative '../lib/harness/loader'
+ 
+ class GCBalloon
+   Record = Struct.new(:id, :head, :tail, :link)
+@@ -55,7 +55,7 @@ class GCBalloon
+ 
+   COLLECT_AT_LOW_WATER = ENV.fetch("RUBY_BENCH_BALLOON_COLLECT", "1") == "1"
+ 
+-  LOCAL_MAJOR_ONLY = true
++  LOCAL_MAJOR_ONLY = GC.method(:start).parameters.include?([:key, :global])
+ 
+   # One retained chunk. The strings and the blob are allocated before the
+   # arrays that reference them, so marking has a graph to walk rather than a
