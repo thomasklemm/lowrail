@@ -12,13 +12,16 @@ depends_on: []
 impact: Allow Scimitar to boot with Rails main's frozen parameter-parser registry
 rank: 15
 risky: true
-state: in-review
+state: draft
+pr: 172
 note: Prepared only; coordinator runs Sol and Astra; no upstream submission authorized in this worker
 passes:
   - {reviewer: skeptic, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: approve, open: "L0; registry replacement boundary disclosed; no required changes"}
   - {reviewer: sol, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: changes, open: "P2; preserve earlier references to mutable parameter_parsers"}
   - {reviewer: astra, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: changes, open: "P2; later app configuration through retained registry stops taking effect"}
   - {reviewer: skeptic, head: "a302bc09b8555d6da525adb51f64df26eb9651da", date: 2026-11-05, verdict: approve, open: "Mutable references and frozen registration verified through request parsing; revised body approved"}
+  - {reviewer: sol, head: "a302bc09b8", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed, no new finding"}
+  - {reviewer: astra, head: "a302bc09b8", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed; optional title nit: 'Register the SCIM parser with frozen parameter registries'; not applied"}
 ---
 
 # Register the SCIM parser through the parameter parser writer

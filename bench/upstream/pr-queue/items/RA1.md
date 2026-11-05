@@ -12,13 +12,16 @@ depends_on: []
 impact: Keep Context#build_correlated_subquery(...).to_sql working on Rails main
 rank: 16
 risky: true
-state: in-review
+state: draft
+pr: 1795
 note: Prepared only; coordinator runs Sol and Astra; one unchanged Rails-main SQLite schema-case failure
 passes:
   - {reviewer: skeptic, head: "1290b01fcb9a78717365968c791e75fa28a1016d", date: 2026-11-05, verdict: approve, open: "L0; direct-render scope and internal override boundary disclosed"}
   - {reviewer: sol, head: "1290b01fcb9a78717365968c791e75fa28a1016d", date: 2026-11-05, verdict: nits, open: "Body needs Rails pin, arel_table override boundary, commands and exact regression/failure names"}
   - {reviewer: astra, head: "1290b01fcb9a78717365968c791e75fa28a1016d", date: 2026-11-05, verdict: nits, open: "Same body clarifications; code unchanged"}
   - {reviewer: skeptic, head: "1290b01fcb9a78717365968c791e75fa28a1016d", date: 2026-11-05, verdict: approve, open: "Revised body approved; direct-render regression rerun 76/0 and disclosed case failure reproduced"}
+  - {reviewer: sol, head: "1290b01fcb", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed, no new finding"}
+  - {reviewer: astra, head: "1290b01fcb", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed"}
 ---
 
 # Build correlated subqueries with the model's Arel table
@@ -29,7 +32,7 @@ FROM, joins, projections and conditions stay unchanged. This fixes direct render
 
 `RAILS=/path/to/rails-main bundle exec rake spec` with `DB=pg DATABASE_USERNAME=user DATABASE_HOST=/var/run/postgresql` passes 1,146 examples; SQLite with Rails 8.1.4 passes 1,145. On main, `bundle exec rspec spec/ransack/active_record/negative_collection_spec.rb` with the same `RAILS` pin passes 76 examples, including `keeps the subquery buildable after an evaluation`, which directly calls `to_sql`.
 
-The full main SQLite suite retains one unchanged failure: `context_spec.rb:80`, `a table whose name differs only in case / can be searched like Active Record queries it` (the `Widgets`/`widgets` schema-cache case).
+The full main SQLite suite retains one unchanged failure: `context_spec.rb:80`, `a table whose name differs only in case / can be searched like Active Record queries it` (the `Widgets`/`widgets` table-name case, which rails/rails#59671 fixes).
 
 ---
 <sub>Found in Lowrail's [Rails-main ecosystem tests](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md#gem-side-leads-not-filed).</sub>

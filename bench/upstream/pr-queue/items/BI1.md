@@ -12,7 +12,8 @@ depends_on: []
 impact: Restore queries on Rails main when Active Record freezes table metadata
 rank: 14
 risky: true
-state: in-review
+state: draft
+pr: 62
 note: Prepared only; coordinator runs Sol and Astra; no upstream submission authorized in this worker
 passes:
   - {reviewer: skeptic, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: approve, open: "L0; live capability-check boundary disclosed; no speed claim"}
@@ -20,6 +21,8 @@ passes:
   - {reviewer: astra, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: changes, open: "P2; subclass warmed before parent declaration changes query results"}
   - {reviewer: skeptic, head: "45d5ff0a720a684e8cab6def932705f360c4cb06", date: 2026-11-05, verdict: nits, open: "No correctness blocker; strengthen frozen-query fixture with different plaintext/index targets"}
   - {reviewer: skeptic, head: "b7d3502ea98aee5b8f1d9153828df88728d5b6fe", date: 2026-11-05, verdict: approve, open: "Asymmetric frozen fixture rejects always-false mutant; revised body approved; no remaining nits"}
+  - {reviewer: sol, head: "b7d3502ea9", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed, no new finding"}
+  - {reviewer: astra, head: "b7d3502ea9", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed"}
 ---
 
 # Avoid memoizing on frozen Active Record table metadata

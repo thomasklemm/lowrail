@@ -268,6 +268,8 @@ module PrQueue
     _, live, by_id = candidates
     item = find(id)
     abort "#{id}: rails/rails opens as draft (DECISIONS); pass --draft" if item["repo"] == "rails/rails" && !draft
+    # Checked before the PR exists, so a missing line can't leave an opened PR unrecorded.
+    abort "#{id}: item needs pr: and state: lines" unless %w[pr state].all? { File.read(item.path).match?(/^#{_1}:/) }
     if (blocker = open_blocker(item, live[id], by_id) || room(item["repo"], our_open_prs(item["repo"])))
       abort "#{id}: #{blocker}"
     end
