@@ -1,26 +1,38 @@
-From bf905ad4f607907bad2bdce96114787cfb398b71 Mon Sep 17 00:00:00 2001
+From c04df40d80d99e78997cf5a14c466d08fa7c58c0 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Wed, 4 Nov 2026 15:22:17 +0000
+Date: Thu, 5 Nov 2026 20:26:40 +0000
 Subject: [PATCH] Find SQLite tables by any ASCII case of their name in the
  schema readers
 
-The batched schema readers filtered sqlite_master with an exact IN match
-and keyed the rows by the stored name, while SQLite matches table names
-without regard to ASCII case. A model whose table_name differs in case
-from the CREATE TABLE statement could no longer read its columns,
-primary key or indexes. Match with COLLATE NOCASE and key the rows by
-the name that was asked for.
+The batched schema readers filtered sqlite_master and sqlite_temp_master
+with an exact IN match and keyed the rows by the stored name, while
+SQLite matches table names without regard to ASCII case. A model whose
+table_name differs in case from the CREATE TABLE statement could no
+longer read its columns, primary key or indexes. Match with COLLATE
+NOCASE and key the rows by the name that was asked for.
+
+A temporary table now also hides a permanent one whose name differs only
+in ASCII case. Otherwise both rows match, the pragmas resolve both to the
+temporary table, and its columns could be read with the CREATE statement
+of the permanent one.
+
+Amp-Thread-ID: https://ampcode.com/threads/T-01a1ad5d-fe69-7106-be8c-bf04f5e915f8
 ---
- .../sqlite3/schema_statements.rb              |  9 +++--
- .../connection_adapters/sqlite3_adapter.rb    |  8 ++---
- .../adapters/sqlite3/sqlite3_adapter_test.rb  | 34 +++++++++++++++++--
- 3 files changed, 43 insertions(+), 8 deletions(-)
+ .../sqlite3/schema_statements.rb              | 11 ++-
+ .../connection_adapters/sqlite3_adapter.rb    |  8 +-
+ .../adapters/sqlite3/sqlite3_adapter_test.rb  | 75 ++++++++++++++++++-
+ 3 files changed, 83 insertions(+), 11 deletions(-)
 
 diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-index 64b1bad838..bb40b27aad 100644
+index 04e603f0f3..e9f6a93d11 100644
 --- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
 +++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
-@@ -79,16 +79,21 @@ def schema_creation # :nodoc
+@@ -77,20 +77,25 @@ def schema_creation # :nodoc
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_master
+               WHERE type NOT IN ('table', 'view')
+-                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
++                OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
              )
            SQL
  
@@ -82,10 +94,18 @@ index 0da5ffeadb..4106de9b59 100644
            SQL
              .transform_values do |group|
 diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-index 3dac5cca5f..788ec3dd55 100644
+index 8b405bc030..f55461fc70 100644
 --- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
 +++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
-@@ -534,7 +534,7 @@ def test_insert_logged
+@@ -529,14 +529,14 @@ def test_insert_logged
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_master
+               WHERE type NOT IN ('table', 'view')
+-                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
++                OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+             )
+             SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
+                    t."name", t."type", t."notnull", t."dflt_value", t."pk", t."hidden"
              FROM master m
              JOIN pragma_table_xinfo(m.name) t
              WHERE m.type IN ('table', 'view')
@@ -94,7 +114,7 @@ index 3dac5cca5f..788ec3dd55 100644
              ORDER BY m.name, t.cid
            SQL
            modified_insert_query = [(sql + ' RETURNING "id"'), name, []]
-@@ -685,6 +685,36 @@ def test_columns_with_not_null
+@@ -687,6 +687,73 @@ def test_columns_with_not_null
          end
        end
  
@@ -128,10 +148,54 @@ index 3dac5cca5f..788ec3dd55 100644
 +        end
 +      end
 +
++      def test_schema_readers_do_not_let_a_temporary_table_hide_one_whose_name_differs_in_non_ascii_case
++        with_example_table "id integer PRIMARY KEY, upper integer", "Ärger" do
++          @conn.execute "CREATE TEMP TABLE ärger (id integer PRIMARY KEY, lower integer)"
++
++          assert_equal({ "Ärger" => %w[ id upper ], "ärger" => %w[ id lower ] },
++            @conn.columns(["Ärger", "ärger"]).transform_values { |columns| columns.map(&:name) })
++        ensure
++          @conn.execute "DROP TABLE IF EXISTS temp.ärger"
++        end
++      end
++
++      def test_schema_readers_read_a_temporary_table_that_hides_a_permanent_one_of_another_ascii_case
++        with_example_table 'id integer PRIMARY KEY, permanent integer, CONSTRAINT "permanent_fk" FOREIGN KEY ("permanent") REFERENCES "Widgets" ("id")', "Widgets" do
++          @conn.add_index "Widgets", :permanent
++          @conn.execute 'CREATE TEMP TABLE widgets ("temp_id" integer PRIMARY KEY, "temporary" text COLLATE "NOCASE", CONSTRAINT "temporary_fk" FOREIGN KEY ("temporary") REFERENCES "targets" ("id"))'
++          @conn.execute "CREATE INDEX temp.temp_idx ON widgets (temporary)"
++
++          names = ["Widgets", "widgets"]
++          columns = @conn.columns(names)
++          primary_keys = @conn.primary_keys(names)
++          indexes = @conn.indexes(names)
++          foreign_keys = @conn.foreign_keys(names)
++
++          names.each do |name|
++            assert_equal %w[ temp_id temporary ], columns[name].map(&:name)
++            # Check that metadata comes from the temporary CREATE statement.
++            assert_equal "NOCASE", columns[name].last.collation
++            assert_equal %w[ temp_id ], primary_keys[name]
++            assert_equal %w[ temp_idx ], indexes[name].map(&:name)
++            assert_equal [["temporary", "targets", "temporary_fk"]],
++              foreign_keys[name].map { |fk| [fk.column, fk.to_table, fk.name] }
++          end
++        ensure
++          @conn.execute "DROP TABLE IF EXISTS temp.widgets"
++        end
++      end
++
        def test_add_column_with_not_null
          with_example_table "id integer PRIMARY KEY AUTOINCREMENT, number integer not null" do
            assert_nothing_raised { @conn.add_column :ex, :name, :string, null: false }
-@@ -720,7 +750,7 @@ def test_indexes_logs
+@@ -718,13 +785,13 @@ def test_indexes_logs
+               UNION ALL
+               SELECT name, type, sql FROM sqlite_master
+               WHERE type NOT IN ('table', 'view')
+-                OR name NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
++                OR name COLLATE NOCASE NOT IN (SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view'))
+             )
+             SELECT m.name AS table_name, i.name, i."unique"
              FROM master m
              JOIN pragma_index_list(m.name) i
              WHERE m.type = 'table'
@@ -141,5 +205,5 @@ index 3dac5cca5f..788ec3dd55 100644
            SQL
  
 -- 
-2.39.5
+2.55.0
 
