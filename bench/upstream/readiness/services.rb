@@ -4,6 +4,7 @@
 # (`services: [postgres, mysql, redis, memcached]`); the runner starts the union before a round and stops it after,
 # also when the round fails. Data lives in WORK/services and is created on first use:
 #   postgres  PostgreSQL 15 on 5432, trust auth, superusers postgres (password postgres) and user
+#   postgres18 PostgreSQL 18 on 5418 (socket in /tmp), the same accounts; for suites whose findings need 18.4+
 #   mysql     MariaDB on 3306 and /run/mysqld/mysqld.sock, root and user without password from anywhere
 #   redis     Redis on 6379, memcached on 11211, no persistence
 require "fileutils"
@@ -13,8 +14,8 @@ module Readiness
   module Services
     module_function
 
-    NAMES = %w[postgres mysql redis memcached].freeze
-    PORTS = { "postgres" => 5432, "mysql" => 3306, "redis" => 6379, "memcached" => 11211 }.freeze
+    NAMES = %w[postgres postgres18 mysql redis memcached].freeze
+    PORTS = { "postgres" => 5432, "postgres18" => 5418, "mysql" => 3306, "redis" => 6379, "memcached" => 11211 }.freeze
 
     def sh(cmd) = system(cmd, out: File::NULL, err: File::NULL)
     def svc(name) = "readiness-#{name}"
@@ -46,7 +47,8 @@ module Readiness
 
     def command(n, dir)
       case n
-      when "postgres" then "exec /usr/lib/postgresql/15/bin/postgres -D #{dir} -p 5432 -k /var/run/postgresql -c listen_addresses=127.0.0.1 -c fsync=off"
+      when "postgres" then "exec /usr/lib/postgresql/15/bin/postgres -D #{dir} -p 5432 -k /var/run/postgresql -c listen_addresses=127.0.0.1 -c fsync=off -c max_connections=300"
+      when "postgres18" then "exec /usr/lib/postgresql/18/bin/postgres -D #{dir} -p 5418 -k /tmp -c listen_addresses=127.0.0.1 -c fsync=off -c max_connections=300"
       when "mysql" then "exec /usr/sbin/mariadbd --no-defaults --datadir=#{dir} --port=3306 --bind-address=127.0.0.1 --socket=/run/mysqld/mysqld.sock --innodb-flush-log-at-trx-commit=2"
       when "redis" then "exec redis-server --port 6379 --save '' --appendonly no"
       when "memcached" then "exec memcached -p 11211 -l 127.0.0.1"
@@ -62,11 +64,19 @@ module Readiness
       sh("/usr/lib/postgresql/15/bin/initdb -D #{dir} -U postgres --auth=trust") or raise "initdb failed"
     end
 
-    def ready_postgres(_dir)
-      30.times { break if sh("psql -h 127.0.0.1 -U postgres -c 'select 1'"); sleep 1 }
-      sh(%(psql -h 127.0.0.1 -U postgres -c 'create role "user" superuser login'))
-      sh(%(psql -h 127.0.0.1 -U postgres -c "alter role postgres password 'postgres'"))
+    def ready_postgres(_dir, port = 5432)
+      30.times { break if sh("psql -h 127.0.0.1 -p #{port} -U postgres -c 'select 1'"); sleep 1 }
+      sh(%(psql -h 127.0.0.1 -p #{port} -U postgres -c 'create role "user" superuser login'))
+      sh(%(psql -h 127.0.0.1 -p #{port} -U postgres -c "alter role postgres password 'postgres'"))
     end
+
+    def init_postgres18(dir)
+      return if File.exist?(File.join(dir, "PG_VERSION"))
+      FileUtils.mkdir_p(File.dirname(dir))
+      sh("/usr/lib/postgresql/18/bin/initdb -D #{dir} -U postgres --auth=trust") or raise "initdb failed"
+    end
+
+    def ready_postgres18(dir) = ready_postgres(dir, 5418)
 
     def init_mysql(dir)
       owned_run_dir("/run/mysqld")

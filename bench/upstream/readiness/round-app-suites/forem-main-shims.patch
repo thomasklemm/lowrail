@@ -1,0 +1,134 @@
+diff --git a/app/controllers/application_controller.rb b/app/controllers/application_controller.rb
+index ce0436af7..b5f2c7e37 100644
+--- a/app/controllers/application_controller.rb
++++ b/app/controllers/application_controller.rb
+@@ -47,7 +47,7 @@ def initialize(url, status: :moved_permanently, allow_other_host: true)
+     error_too_many_requests(exc)
+   end
+ 
+-  rescue_from ActionController::InvalidAuthenticityToken do
++  rescue_from ActionController::InvalidCrossOriginRequest do
+     ForemStatsClient.increment(
+       "users.invalid_authenticity_token",
+       tags: ["controller_name:#{controller_name}", "path:#{request.fullpath}"],
+diff --git a/app/services/authentication/providers.rb b/app/services/authentication/providers.rb
+index 38a43b47e..970035fa4 100644
+--- a/app/services/authentication/providers.rb
++++ b/app/services/authentication/providers.rb
+@@ -1,10 +1,10 @@
+ # We require all authentication modules to make sure providers
+ # are correctly preloaded and ready to be used at this point as the loading
+ # order is important
+-require_dependency Rails.root.join("app/services/authentication/providers/provider.rb")
++require Rails.root.join("app/services/authentication/providers/provider.rb")
+ 
+ Dir[Rails.root.join("app/services/authentication/**/*.rb")].each do |f|
+-  require_dependency(f)
++  require(f)
+ end
+ 
+ module Authentication
+diff --git a/config/initializers/00_lowrail_jsonapi_has_one.rb b/config/initializers/00_lowrail_jsonapi_has_one.rb
+new file mode 100644
+index 000000000..bcd75d424
+--- /dev/null
++++ b/config/initializers/00_lowrail_jsonapi_has_one.rb
+@@ -0,0 +1,19 @@
++# Lowrail app-suites round, main checkout only: jsonapi-serializer 2.2.0 overrides
++# HasOne.define_accessors with the two-argument signature that Rails main changed (FO2).
++# Same effect as on 8-1: `#{name}_id` is defined on the model.
++ActiveSupport.on_load(:active_record) do
++  require "extensions/has_one"
++
++  ActiveRecord::Associations::Builder::HasOne.class_eval do
++    def self.define_accessors(model, reflection, mixin)
++      super
++      name = reflection.name
++      model.class_eval <<-CODE, __FILE__, __LINE__ + 1
++        def #{name}_id
++          return read_attribute(__method__) if has_attribute?(__method__)
++          association(:#{name}).reader.try(:id)
++        end
++      CODE
++    end
++  end
++end
+diff --git a/config/initializers/cypress_rails.rb b/config/initializers/cypress_rails.rb
+index 5ba46498e..853f55a8f 100644
+--- a/config/initializers/cypress_rails.rb
++++ b/config/initializers/cypress_rails.rb
+@@ -4,7 +4,7 @@
+ 
+ # Explicitly requiring lib/cypress-rails to load monkey-patch
+ Rails.root.glob("lib/cypress-rails/*.rb").each do |filename|
+-  require_dependency filename
++  require filename
+ end
+ 
+ # rubocop:disable Rails/Output
+diff --git a/config/initializers/devise.rb b/config/initializers/devise.rb
+index 90870cb80..79b660ada 100644
+--- a/config/initializers/devise.rb
++++ b/config/initializers/devise.rb
+@@ -1,5 +1,5 @@
+ Rails.root.glob("lib/omni_auth/strategies/*.rb").each do |filename|
+-  require_dependency filename
++  require filename
+ end
+ 
+ FOREM_OMNIAUTH_SETUP = lambda do |env|
+diff --git a/config/initializers/iso3166.rb b/config/initializers/iso3166.rb
+index ea137a0e8..fafc8dd41 100644
+--- a/config/initializers/iso3166.rb
++++ b/config/initializers/iso3166.rb
+@@ -1,6 +1,6 @@
+ Rails.application.config.to_prepare do
+   # Explicitly load extensions on the `countries` gem so they are always available
+   Rails.root.glob("lib/ISO3166/*.rb").each do |filename|
+-    require_dependency filename
++    require filename
+   end
+ end
+diff --git a/config/initializers/liquid.rb b/config/initializers/liquid.rb
+index 04f4ead3d..952e7f9e7 100644
+--- a/config/initializers/liquid.rb
++++ b/config/initializers/liquid.rb
+@@ -2,13 +2,13 @@
+   # Explicitly requiring lib/liquid to make sure that our patches are loaded
+   # before liquid tags are loaded
+   Rails.root.glob("lib/liquid/*.rb").each do |filename|
+-    require_dependency filename
++    require filename
+   end
+ 
+   # Our custom Liquid tags are registered to Liquid::Template at the bottom of
+   # each files. Each Liquid tags will need to be loaded/required before the main
+   # Liquid gem is evoked, hence the need to pre-require them in order
+   Rails.root.glob("app/liquid_tags/*.rb").each do |filename|
+-    require_dependency filename
++    require filename
+   end
+ end
+diff --git a/config/initializers/reverse_markdown.rb b/config/initializers/reverse_markdown.rb
+index 11a412bf9..aae678430 100644
+--- a/config/initializers/reverse_markdown.rb
++++ b/config/initializers/reverse_markdown.rb
+@@ -1,5 +1,5 @@
+ Rails.application.reloader.to_prepare do
+   Rails.root.glob("app/lib/reverse_markdown/converters/*.rb").each do |filename|
+-    require_dependency filename
++    require filename
+   end
+ end
+diff --git a/config/initializers/slack_notifier.rb b/config/initializers/slack_notifier.rb
+index 6eac3dbb2..cced26244 100644
+--- a/config/initializers/slack_notifier.rb
++++ b/config/initializers/slack_notifier.rb
+@@ -1,6 +1,6 @@
+ Rails.application.config.to_prepare do
+   Rails.root.glob("lib/slack/notifier/util/*.rb").each do |filename|
+-    require_dependency filename
++    require filename
+   end
+ end
+ 
