@@ -1,0 +1,22 @@
+diff --git a/activesupport/lib/active_support/core_ext/object/try.rb b/activesupport/lib/active_support/core_ext/object/try.rb
+index b56b0d10c4..0718dd1c7d 100644
+--- a/activesupport/lib/active_support/core_ext/object/try.rb
++++ b/activesupport/lib/active_support/core_ext/object/try.rb
+@@ -173,7 +173,7 @@ class NilClass
+   # ```ruby
+   # @person.try(:children).try(:first).try(:name)
+   # ```
+-  def try(*, &)
++  def try(...)
+     nil
+   end
+ 
+@@ -182,7 +182,7 @@ def try(*, &)
+   # ```ruby
+   # nil.try!(:name) # => nil
+   # ```
+-  def try!(*, &)
++  def try!(...)
+     nil
+   end
+ end

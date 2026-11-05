@@ -1,0 +1,21 @@
+==49322== Callgrind, a call-graph generating cache profiler
+==49322== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==49322== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==49322== Command: /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -rbundler/setup /home/user/workspace/repo/bench/upstream/perf_round/irm.rb /home/user/workspace/repo/bench/upstream/census_backlog/refresh_cases.rb object 3000
+==49322== 
+==49322== For interactive control, run 'callgrind_control -h'.
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/definition.rb:703:in 'Bundler::Definition#materialize': Could not find rbtree-0.4.7 in locally installed gems (Bundler::GemNotFound)
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/definition.rb:240:in 'Bundler::Definition#specs'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/definition.rb:313:in 'Bundler::Definition#specs_for'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/runtime.rb:18:in 'Bundler::Runtime#setup'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler.rb:166:in 'Bundler.setup'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/setup.rb:32:in 'block in <top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/ui/shell.rb:177:in 'Bundler::UI::Shell#with_level'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/ui/shell.rb:122:in 'Bundler::UI::Shell#silence'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/setup.rb:32:in '<top (required)>'
+	from <internal:/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/rubygems/core_ext/kernel_require.rb>:139:in 'Kernel#require'
+==49322== 
+==49322== Events    : Ir
+==49322== Collected : 0
+==49322== 
+==49322== I   refs:      0

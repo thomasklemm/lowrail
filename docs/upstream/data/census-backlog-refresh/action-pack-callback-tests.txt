@@ -1,0 +1,22 @@
+
+=== main ===
+
+Run options: --seed 36241
+
+# Running:
+
+..............................................................................
+
+Finished in 0.261519s, 298.2580 runs/s, 615.6352 assertions/s.
+78 runs, 161 assertions, 0 failures, 0 errors, 0 skips
+
+=== head ===
+
+Run options: --seed 15209
+
+# Running:
+
+..............................................................................
+
+Finished in 0.248504s, 313.8787 runs/s, 647.8777 assertions/s.
+78 runs, 161 assertions, 0 failures, 0 errors, 0 skips

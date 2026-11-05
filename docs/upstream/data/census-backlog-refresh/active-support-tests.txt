@@ -1,0 +1,21 @@
+
+=== main ===
+
+Finished in 81.736015s, 84.4303 runs/s, 366.6193 assertions/s.
+6901 runs, 29966 assertions, 0 failures, 0 errors, 60 skips
+
+You have skipped tests. Run with --verbose for details.
+
+=== nil ===
+
+Finished in 80.776144s, 85.4336 runs/s, 370.9759 assertions/s.
+6901 runs, 29966 assertions, 0 failures, 0 errors, 60 skips
+
+You have skipped tests. Run with --verbose for details.
+
+=== callbacks ===
+
+Finished in 80.122296s, 86.1308 runs/s, 374.0033 assertions/s.
+6901 runs, 29966 assertions, 0 failures, 0 errors, 60 skips
+
+You have skipped tests. Run with --verbose for details.

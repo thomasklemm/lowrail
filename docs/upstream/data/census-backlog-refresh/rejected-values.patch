@@ -1,0 +1,13 @@
+diff --git a/activerecord/lib/active_record/relation.rb b/activerecord/lib/active_record/relation.rb
+index 3c7f9499d4..85b40cf1c1 100644
+--- a/activerecord/lib/active_record/relation.rb
++++ b/activerecord/lib/active_record/relation.rb
+@@ -1365,7 +1365,7 @@ def inspect
+     end
+ 
+     def empty_scope? # :nodoc:
+-      @values == model.unscoped.values
++      @values == model.unscoped.values_for_merge
+     end
+ 
+     def has_limit_or_offset? # :nodoc:
