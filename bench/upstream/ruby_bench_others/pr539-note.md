@@ -1,4 +1,4 @@
-Draft note for ruby/ruby-bench#539 (luke-gruber, approved by eightbitraptor). Thomas OK (2026-11-05): the coordinator reviews and posts it without showing it again, once #569/#570 are ready; recheck the fix on the then-current main first.
+Posted on ruby/ruby-bench#539 on 2026-11-05: https://github.com/ruby/ruby-bench/pull/539#issuecomment-6668466562 (last paragraph shortened to one sentence before posting).
 Diagnosis and verification: [README](README.md#539-gc_balloon).
 
 ---

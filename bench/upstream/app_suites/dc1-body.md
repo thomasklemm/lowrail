@@ -14,6 +14,8 @@ Renderer.new.form_tag("/posts", method: :patch) { "" }
 
 cells-rails' `Cell::ViewModel` [includes `FormHelper`](https://github.com/trailblazer/cells-rails/blob/77ff22ae8f94472cf477672ca2f0c86757d627d8/lib/cell/railtie.rb#L49) (0.1.6), so Decidim's report-user modal, a cell with a [`decidim_form_for … method: :post`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/cells/decidim/report_user_button/flag_modal.erb#L2) (develop), raises `undefined method 'token_tag'`, so a visitor opening a user's profile page gets an error.
 
+Unlike `link_to`, these are private helpers of `FormTagHelper` itself, so its includers have no reason to know about them, and while they support 8.1, which has no `NavigationHelper`, they could only add it behind `defined?`.
+
 Both modules include `UrlHelper`, where the two private methods lived on 8.1, so this moves them back there unchanged. The new test renders a PATCH form from a class that includes only `FormTagHelper`.
 
 ---
