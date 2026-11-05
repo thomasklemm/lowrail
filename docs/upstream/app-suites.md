@@ -1909,7 +1909,18 @@ json/array/hstore/geometric; RuboCop: all green. The jsonb repro and `op8_probe2
 no json column default; the redundant nil guard on encrypted types dropped; the commit message's limits); its
 encrypted probes (string, serialized and json, nil and non-nil defaults) match 8.1 or main as intended. Follow-up, not
 in this fix: scalar time-zone-aware datetime defaults stay frozen and, per an earlier review, are cast once in the
-boot zone on main; not verified here. Branch `thomasklemm/frozen-default-attribute-unread` @ `c52724804d` on main
+boot zone on main; not verified here. Astra review (2026-11-05), all four points confirmed and applied: a duck-typed type without the hook raised
+`NoMethodError` at schema load, so `Attribute`, `EncryptedAttributeType` and `NormalizedValueType` now treat a type
+without `freezable_default?` as freezable, as on main; new tests pin encrypted NULL and non-NULL string defaults and a
+normalized NULL json staying frozen, a counting coder that schema load and `new` never call, and a nested NULL default
+not shared; the frozen-copy test (green on main) is dropped and the combined test renamed; the body narrows to
+`Helpers::Mutable` and `serialize` and states the Callgrind basis. Each new assertion fails on its wrong implementation.
+Skeptical reviewer: one blocker, applied (the combined test's DDL failed under `sqlite3_ractor`; now through
+`main_ractor_connection`), plus two nits (the save-as-NULL half of the until-read test pinned main's behaviour, removed;
+a test name). activemodel 1253 runs; AR serialized, attributes, dirty, defaults, normalized, encryption 458 (SQLite) and
+462 (PostgreSQL) runs, PostgreSQL json/array/hstore 154 runs, `serialized_attribute_test` on `sqlite3_ractor`, all green;
+RuboCop clean. Branch `thomasklemm/frozen-default-attribute-unread` @ `3b35e79cb5` (earlier `f95cc1b6df`, `de7aff270c`,
+`c52724804d`) on main
 `bdb3d96012` (rails/rails main has moved one unrelated commit since),
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).
