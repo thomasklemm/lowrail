@@ -1,7 +1,7 @@
 # RAILS=path SIDEKIQ=7.3.10 ruby sidekiq7_adapter_boot.rb -> boots a minimal app with
 # config.active_job.queue_adapter = :sidekiq and loads ActiveJob::Base, as Gumroad's development and production do.
 # 8-1: Rails' own SidekiqAdapter, boots. Main (adapter removed): Sidekiq 7.x defines its adapter in an
-# on_load(:active_job) hook that runs after Active Job's own, so NameError (7.3.10, 8.0.2; 7.3.2 has none). 8.0.3 (#6669)
+# on_load(:active_job) hook that runs after Active Job's own, so NameError (7.3.10, 8.0.2; 7.3.2 has none; 7.3.3-7.3.5 fail in remove_const). 8.0.3 (#6669)
 # and 8.1.7 require the adapter when sidekiq/rails loads and boot on both.
 require "bundler/inline"
 gemfile(true, quiet: true) do
