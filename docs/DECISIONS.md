@@ -135,6 +135,12 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   `---` saying how it was found, linking the matching record in the public Lowrail repo (ecosystem-tests,
   app-suites, api-regressions, rails-82-differential).
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
+* **Bodies for humans, short** (Thomas, 2026-11-05, on ankane/blind_index#62: "geht viel besser und kürzer und für
+  Menschen geschrieben. Das Test-Zeugs etc. braucht keiner"). Two short paragraphs: what breaks or is wasted, and
+  why; what the change does and that released versions behave as before. No test-run counts, commands, SHAs,
+  suite totals or review boundaries for private overrides; that evidence stays in the queue item notes and the
+  Lowrail record. A perf PR keeps only its one before/after table. Example: blind_index#62, scimitar#172,
+  ransack#1795 after the rewrite.
 
 ## Playbook from the PR retrospective (2026-11-04)
 

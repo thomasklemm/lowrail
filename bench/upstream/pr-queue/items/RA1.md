@@ -26,13 +26,9 @@ passes:
 
 # Build correlated subqueries with the model's Arel table
 
-Pass the model's Arel table to `Arel::SelectManager.new` when building a correlated subquery. On Ruby 4.0.9 with Rails main at `1e235cee11b0a7aecb189d8837534807626287aa`, direct `to_sql` resolves the connection through the table's `klass`; passing the model class raises `NoMethodError`.
+`build_correlated_subquery` passes the model class to `Arel::SelectManager.new`, which expects a table. On Rails main, calling `to_sql` on that manager raises `NoMethodError`. This passes `arel_table` instead.
 
-FROM, joins, projections and conditions stay unchanged. This fixes direct rendering of `Context#build_correlated_subquery`'s manager, not normal searches, which already render through `subquery_sql`. An override of the undocumented association `base_klass` must now return an object with `arel_table`; overriding the model's `arel_table` also affects this path.
-
-`RAILS=/path/to/rails-main bundle exec rake spec` with `DB=pg DATABASE_USERNAME=user DATABASE_HOST=/var/run/postgresql` passes 1,146 examples; SQLite with Rails 8.1.4 passes 1,145. On main, `bundle exec rspec spec/ransack/active_record/negative_collection_spec.rb` with the same `RAILS` pin passes 76 examples, including `keeps the subquery buildable after an evaluation`, which directly calls `to_sql`.
-
-The full main SQLite suite retains one unchanged failure: `context_spec.rb:80`, `a table whose name differs only in case / can be searched like Active Record queries it` (the `Widgets`/`widgets` table-name case, which rails/rails#59671 fixes).
+Normal searches aren't affected, since they render the subquery through `subquery_sql`.
 
 ---
 <sub>Found in Lowrail's [Rails-main ecosystem tests](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md#gem-side-leads-not-filed).</sub>

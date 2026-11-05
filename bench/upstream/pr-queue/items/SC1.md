@@ -26,11 +26,9 @@ passes:
 
 # Register the SCIM parser through the parameter parser writer
 
-Use `ActionDispatch::Request.parameter_parsers=` only when the registry is frozen; keep the existing in-place registration for a mutable registry. On Ruby 4.0.9 with Rails main at `1e235cee11b0a7aecb189d8837534807626287aa`, loading Scimitar currently raises `FrozenError` before the application boots.
+On Rails main, `ActionDispatch::Request.parameter_parsers` is frozen, so adding the SCIM parser to it raises `FrozenError` and an app using Scimitar doesn't boot.
 
-For a frozen registry, copy its entries, add the SCIM parser and pass the copy to Rails' writer. Existing parser Procs are preserved. On Rails 8.1.4.1, the mutable registry keeps its identity, so an application that retains it before loading Scimitar can still configure a custom SCIM parser through that reference. JSON decoding is unchanged.
-
-With Ruby 4.0.9 and PostgreSQL, `bundle exec rspec` passes 532 examples on Rails 8.1.4.1; the pinned Rails-main bundle passes 532 examples with one pending (the mutable-registry-only example). Two added examples exercise registration in fresh processes and parse requests through `ActionDispatch::Request`: a retained mutable reference configured after loading, and an initially frozen registry. Without the fix, the latter raises `FrozenError` even on released Rails.
+When the registry is frozen, this adds the parser to a copy and sets it with `parameter_parsers=`, as the Rails docs suggest. On released Rails the registry isn't frozen, and the parser is added in place as before.
 
 ---
 <sub>Found through Lowrail's [Rails-main gem census](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/gem-side-candidates.md#sc1-scimitar-parser-registration).</sub>

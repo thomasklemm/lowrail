@@ -27,11 +27,9 @@ passes:
 
 # Avoid memoizing on frozen Active Record table metadata
 
-Keep the capability memo on mutable table metadata, and skip its assignment only when the metadata is frozen. With Ruby 4.0.9 and Rails main at `1e235cee11b0a7aecb189d8837534807626287aa`, the model's predicate-builder metadata is frozen, so even `User.find_by(id: 1)` raises `FrozenError` with blind_index loaded.
+On Rails main with Ruby 4.0, Active Record makes its table metadata Ractor-shareable, which freezes it, so `has_blind_indexes?` can no longer memoize on it. With blind_index loaded, even `User.find_by(id: 1)` raises `FrozenError`.
 
-Existing cached values, including false, are reused even after freezing. Queries warmed before a late `blind_index` declaration therefore keep their released-Rails behavior. Index generation and predicate transformation after the capability check are unchanged. Overrides of private `TableMetadata#klass` or the model's `respond_to?` see repeated checks only on uncached frozen metadata.
-
-`bundle exec rake test` passes on Active Record 8.1.4.1: 52 runs, 98 assertions, one existing skip. With the same dependencies switched to the pinned Rails main: 52 runs, 92 assertions, two skips (dynamic finder and mutable-metadata-only case). The two new tests cover late declarations, including on a subclass's parent, cached values retained after freezing, and initially frozen metadata. The original main suite had 28 errors.
+This keeps the memo where it can, and skips storing it only when the metadata is frozen. Released Rails behaves as before.
 
 ---
 <sub>Found while running Lowrail's [Rails-main gem census](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/gem-side-candidates.md#bi1-blind_index-frozen-table-metadata).</sub>
