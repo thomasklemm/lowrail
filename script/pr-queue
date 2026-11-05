@@ -68,6 +68,11 @@ module PrQueue
       list << "pass verdict #{pass['verdict'].inspect}" unless VERDICTS.include?(pass["verdict"])
       list << "pass head must be a quoted SHA or unrecorded" unless sha?(pass["head"]) || pass["head"] == "unrecorded"
     end
+    Array(m["waived"]).each do |waiver|
+      list << "only thermos can be waived" unless waiver["reviewer"] == "thermos"
+      list << "waiver head must be a quoted SHA" unless sha?(waiver["head"])
+      list << "waiver needs by and reason" if waiver["by"].to_s.empty? || waiver["reason"].to_s.empty?
+    end
     list
   end
 
@@ -79,10 +84,13 @@ module PrQueue
     list
   end
 
-  # Reviewers whose latest pass on the current head is missing or doesn't approve. Passes are listed oldest first.
+  # Reviewers whose latest pass on the current head is missing or doesn't approve, unless waived on that head.
+  # Passes are listed oldest first.
   def missing(meta, lines)
     passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }
+    waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
     required(meta, lines).reject do |who|
+      next true if waived.any? { _1["reviewer"] == who }
       VERDICTS.first(2).include?(passes.reverse.find { _1["reviewer"] == who }&.fetch("verdict", nil))
     end
   end
