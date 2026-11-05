@@ -1,0 +1,90 @@
+From 02f567ab818dc85efc6aed3da3418167295bf2da Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:58:17 +0000
+Subject: [PATCH] Test each tag attribute name for blankness once
+
+tag_options tested the raw key with blank? and then the name it converts
+the key to. For a plain String key the name is normally the key itself,
+so the same String#blank? ran twice for every String-keyed attribute,
+and an empty Symbol has an empty name, which the name check already
+skips.
+
+Check only the name (after to_s) for Symbols and plain Strings, and keep
+both checks for anything else, including String subclasses, whose to_s
+or blank? can differ from a plain String's. Nested data and aria keys
+keep both checks; they are rarer. The tests add whitespace String keys
+and String keys that are blank only once converted.
+---
+ .../lib/action_view/helpers/tag_helper.rb     | 10 ++++---
+ actionview/test/template/tag_helper_test.rb   | 27 +++++++++++++++++++
+ 2 files changed, 34 insertions(+), 3 deletions(-)
+
+diff --git a/actionview/lib/action_view/helpers/tag_helper.rb b/actionview/lib/action_view/helpers/tag_helper.rb
+index 0c617a729b..c2139b2816 100644
+--- a/actionview/lib/action_view/helpers/tag_helper.rb
++++ b/actionview/lib/action_view/helpers/tag_helper.rb
+@@ -1545,9 +1545,13 @@ def tag_options(options, escape = true) # :nodoc:
+           output = +""
+           sep    = " "
+           options.each_pair do |key, value|
+-            next if key.blank?
+-
+-            name = Symbol === key ? key.name : key.to_s
++            if Symbol === key
++              name = key.name
++            else
++              # For a plain String, blank? on the name below is the same check.
++              next if !key.instance_of?(String) && key.blank?
++              name = key.to_s
++            end
+             next if name.blank?
+ 
+             type = TAG_TYPES[key]
+diff --git a/actionview/test/template/tag_helper_test.rb b/actionview/test/template/tag_helper_test.rb
+index 86a655e616..7cb9b7d114 100644
+--- a/actionview/test/template/tag_helper_test.rb
++++ b/actionview/test/template/tag_helper_test.rb
+@@ -21,6 +21,18 @@ def to_s
+     end
+   end
+ 
++  class BlankWhenConverted < String
++    def to_s
++      " "
++    end
++  end
++
++  class NeverBlank < String
++    def blank?
++      false
++    end
++  end
++
+   def test_tag
+     assert_equal "<br />", tag("br")
+     assert_equal "<br clear=\"left\" />", tag(:br, clear: "left")
+@@ -286,6 +298,21 @@ def test_tag_with_attribute_name_that_is_blank_before_conversion_is_skipped
+     assert_equal "<img />", tag("img", { aria: { false => "x" } })
+   end
+ 
++  def test_tag_with_whitespace_string_attribute_name_is_skipped
++    assert_equal "<img />", tag("img", " " => "/onerror=alert(1)//")
++    assert_equal "<img />", tag("img", "\t\n" => "/onerror=alert(1)//")
++  end
++
++  def test_tag_with_string_attribute_name_that_converts_to_blank_is_skipped
++    name = +"a"
++    def name.to_s = " "
++    name.freeze
++
++    assert_equal "<img />", tag("img", name => "/onerror=alert(1)//")
++    assert_equal "<img />", tag("img", BlankWhenConverted.new("a") => "/onerror=alert(1)//")
++    assert_equal "<img />", tag("img", NeverBlank.new(" ") => "/onerror=alert(1)//")
++  end
++
+   def test_tag_with_attribute_name_that_changes_when_converted_generates_valid_markup
+     html = tag("img", "src" => "/nonexistent.png", NameThatChangesWhenConverted.new => "/onerror=alert(1)//")
+     fragment = Nokogiri::HTML5::DocumentFragment.parse(html)
+-- 
+2.55.0
+
