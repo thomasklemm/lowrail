@@ -7,126 +7,488 @@
 # are still "unchecked": their regexes come from the record's wording, and no run has produced the signature yet.
 # Narrow them after the first run that does. IDs with a dash and a name (M-vary, eco1-…) are unnamed in the record.
 findings:
-  # App suites (docs/upstream/app-suites.md)
+  # App suites (docs/upstream/app-suites.md), checked against the full run of round-app-suites.yml on main
+  # bdb3d96012 (docs/upstream/readiness.md). Suite regexes name the variants a finding shows in.
   - id: S1
-    suite: redmine.*
-    signature: "No such middleware to insert before: Rack::Sendfile"
+    suite: redmine
+    class: suite-did-not-load
+    signature: "\\ARuntimeError: No such middleware to insert before: Rack::Sendfile \\(prepare\\)\\z"
     status: prepared
     record: docs/upstream/app-suites.md
-    note: boot failure; upgrade-guide branch thomasklemm/upgrade-guide-rack-sendfile; unchecked
+    checked: round-app-suites bdb3d96012
+    note: boot failure; upgrade-guide branch thomasklemm/upgrade-guide-rack-sendfile
   - id: S1
-    suite: redmine.*
-    test: test_download_should_set_sendfile_header
-    signature: "."
+    suite: redmine-shimmed
+    test: "\\AAttachmentsTest#test_download_should_set_sendfile_header\\z"
+    signature: "\\AMinitest::Assertion: Expected nil to not be nil\\.\\z"
     status: prepared
     record: docs/upstream/app-suites.md
-    note: the Redmine test that stubs Rack::Sendfile#variation; unchecked
+    checked: round-app-suites bdb3d96012
+    note: the Redmine test that stubs Rack::Sendfile#variation
   - id: S2
-    suite: (redmine|mastodon).*
-    signature: "undefined method 'link_to'"
+    suite: redmine-shimmed|mastodon.*
+    signature: "\\ANoMethodError: undefined method 'link_to' for (an instance of Redmine::Hook::ManagerTest::TestLinkToHook|#<REST::Notification(Group)?Serializer:0xX>)\\z"
     status: prepared
     record: docs/upstream/app-suites.md
-    note: UrlHelper-only includes lose link_to; upgrade-guide branch; unchecked
+    checked: round-app-suites bdb3d96012
+    note: UrlHelper-only includes lose link_to (Redmine's hook listener, Mastodon's notification serializers); upgrade-guide branch
   - id: L1
-    suite: (lobsters|mastodon|administrate).*
-    signature: "FrozenError: can't modify frozen Hash: \\{\\}"
+    suite: lobsters|administrate.*
+    class: suite-did-not-load
+    signature: "\\AFrozenError: can't modify frozen Hash: \\{\\}\\z"
     status: gem-side
     record: docs/upstream/app-suites.md
-    checked: round-ecosystem-1 7a78da5a55
+    checked: round-app-suites bdb3d96012
     note: rspec-rails 8.0.x mutates the frozen default_url_options; fixed on rspec-rails main, unreleased. administrate's feature specs hit it too (ecosystem-tests, deliberate changes); with awesome_print require false, as in that record, E3 doesn't fire at load
   - id: L2
     suite: lobsters.*
     signature: 'UrlGenerationError: No route matches .*id: ""'
     status: merged
     record: docs/upstream/app-suites.md
-    note: positional URL helper with an empty to_param; fixed by rails/rails#59625 (c9fc37095f)
+    note: positional URL helper with an empty to_param; fixed by rails/rails#59625 (c9fc37095f), so current main no longer shows it (round-app-suites bdb3d96012)
+  - id: noise-lobsters-submit-story
+    suite: lobsters.*
+    test: "\\A\\./spec/features/submit_story_spec\\.rb\\[1:10\\]\\z"
+    class: base-failing
+    signature: "\\AActiveRecord::RecordInvalid: Validation failed: Domain has already been taken\\z"
+    status: noise
+    record: docs/upstream/readiness.md
+    checked: round-app-suites bdb3d96012
+    note: fails under seed 1717 on both trees
   - id: SO1
-    suite: solidus.*
-    test: images_spec
-    signature: "."
+    suite: solidus-api
+    test: "\\A\\./spec/requests/spree/api/images_spec\\.rb\\[1:1:2:7\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: nil\\z"
     status: record-only
     record: docs/upstream/app-suites.md
-    note: attachments analyzed before validation under 8.2 defaults; unchecked
+    checked: round-app-suites bdb3d96012
+    note: attachments analyzed before validation under 8.2 defaults (images_spec.rb:79)
+  - id: WB-vips
+    suite: writebook
+    test: "\\AVipsLoaderPolicyTest#test_(loads_(AVIF|HEIC)|denies_\\w+_through_\\w+)\\z"
+    class: base-failing
+    signature: "\\AMinitest::Assertion: Expected"
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: environment; with the round's libvips 8.18.7 (no HEIF codec) the AVIF and HEIC loads fail, with Debian's 8.14 the ICO, PSD, BMP and SVG denials did
+  - id: WB1
+    suite: writebook.*
+    signature: "Mime::EXTENSION_LOOKUP is deprecated"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: a deprecation only, not seen as a failure (Writebook doesn't raise on deprecations); flags only if an app raises on it (propshaft <= 1.3.2)
   - id: R1
-    suite: mastodon.*
-    signature: filter_proxies
+    suite: mastodon
+    signature: "undefined method 'filter_proxies' for an instance of ActionDispatch::RemoteIp::GetIp\\z"
     status: open-pr
     record: docs/upstream/app-suites.md
-    note: rails/rails#59630 restores GetIp#filter_proxies; unchecked
+    checked: round-app-suites bdb3d96012
+    note: rails/rails#59630 restores GetIp#filter_proxies; mastodon-prs runs with it
   - id: M1
     suite: mastodon.*
-    signature: "build_bind_attribute|for an instance of String"
+    signature: "NoMethodError: undefined method 'name' for an instance of String"
     status: record-only
     record: docs/upstream/app-suites.md
-    note: PredicateBuilder#build_bind_attribute takes an Arel attribute; unchecked
-  - id: M-vary
+    checked: round-app-suites bdb3d96012
+    note: Status::SafeReblogInsert passes a column name to PredicateBuilder#build_bind_attribute, which takes an Arel attribute; also wrapped in an expectation or Minitest::UnexpectedError
+  - id: M-precision
     suite: mastodon.*
-    signature: Sec-Fetch-Site
+    test: "\\A\\./spec/(models/user_spec\\.rb\\[1:10:1:[12]:1\\]|services/post_status_service_spec\\.rb\\[1:3:1\\])\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected (`User#last_sign_in_at` to have changed to|#<ScheduledStatus )"
     status: record-only
     record: docs/upstream/app-suites.md
-    note: Sec-Fetch-Site CSRF protection appends to Vary; unchecked
+    checked: round-app-suites bdb3d96012
+    note: precision nil timestamps cast to microseconds in memory (c162370c8f, CHANGELOG)
+  - id: M-enum
+    suite: mastodon.*
+    test: "\\A\\./spec/models/notification_policy_spec\\.rb\\[1:2:5\\]\\z"
+    signature: "expected ArgumentError with \"'block' is not a valid for_bots\""
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the enum ArgumentError lists the valid values (fcf4393f04, CHANGELOG)
+  - id: M-vary
+    suite: mastodon-prs
+    test: "\\A\\./spec/requests/(statuses_spec|statuses/embed_spec|well_known/webfinger_spec|activitypub/outboxes_spec)\\.rb\\["
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected( \\{\"cache-control\" => |: \"Origin\"\\z|: nil\\z)"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: Sec-Fetch-Site CSRF protection appends to Vary (open #59500, not ours), 19 as in the record; the first line shows only the expected headers (statuses, embed), "Origin" (webfinger) or nil (outboxes), and the log has the Sec-Fetch-Site; behind R1 on plain main
   - id: M-prefixes
     suite: mastodon.*
     signature: "FrozenError: can't modify frozen Array: \\[\"\", \"action_view/test_case/test\"\\]"
     status: gem-side
     record: docs/upstream/app-suites.md
-    note: frozen ViewPaths._prefixes; rspec-rails 570b2b0a79, unreleased; unchecked
-  - id: M-enum
-    suite: mastodon.*
-    signature: "ArgumentError: .*is not a valid"
+    note: frozen ViewPaths._prefixes with released rspec-rails (Mastodon, Discourse); the round bumps Mastodon to rspec-rails 570b2b0a79, so it shows only in Discourse
+  - id: FO-boot
+    suite: forem
+    class: suite-did-not-load
+    signature: "\\AActiveSupport::DeprecationException: DEPRECATION WARNING: require_dependency is deprecated"
     status: record-only
     record: docs/upstream/app-suites.md
-    note: the enum ArgumentError lists the valid values; unchecked
-  - id: SU1
-    suite: sure.*
-    signature: "undefined method 'underscore' for nil"
-    status: prepared
+    checked: round-app-suites bdb3d96012
+    note: Forem raises on deprecations, so main's require_dependency deprecation stops boot; forem-shimmed has the record's boot shims
+  - id: F1
+    suite: forem-shimmed
+    class: suite-did-not-load
+    signature: "TypeError: can't quote Array"
+    status: open-pr
     record: docs/upstream/app-suites.md
-    note: anonymous cache store subclasses; branch thomasklemm/local-cache-anonymous-store; unchecked
-  - id: SU2
-    suite: sure.*
-    signature: 'syntax error at or near "\$1"|invalid input syntax for type date|operator does not exist: date'
-    status: record-only
-    record: docs/upstream/app-suites.md
-    note: find_by_sql array arguments become binds; unchecked
-  - id: SU3
-    suite: sure.*
-    signature: InvalidForeignKey
-    status: record-only
-    record: docs/upstream/app-suites.md
-    note: disable_referential_integrity re-checks foreign keys on PostgreSQL 18.4+; unchecked
-  - id: SU4
-    suite: sure.*
-    signature: "LoadError: .*redis-client|redis_client"
+    checked: round-app-suites bdb3d96012
+    note: array columns of extension types with a default stop db:schema:load; covered by open rails/rails#57785 (not ours); forem-f1-schema loads 8-1's schema instead
+  - id: FO1
+    suite: forem.*
+    signature: "ArgumentError: wrong number of arguments \\(given 1, expected 0\\)"
     status: gem-side
     record: docs/upstream/app-suites.md
-    note: Redis cache store needs redis-client >= 0.28.0, Sure locks 0.25.0; unchecked
-  - id: SU5
-    suite: sure.*
-    signature: "validation_context="
+    checked: round-app-suites bdb3d96012
+    note: flipper-active_record 1.4.2 passes the table name to Arel::Table.new positionally (covered by our #59574); order-dependent, so also one-seed and order-dependent rows, and wrapped in Pundit/RecordNotFound expectations
+  - id: FO3
+    suite: forem.*
+    signature: "private method `eval' called for an instance of RedisClient::Pipeline|undefined method `bypass_local_cache' for an instance of ActiveSupport::Cache::LocalRedisCacheStore"
     status: gem-side
     record: docs/upstream/app-suites.md
-    note: activerecord-import 2.2.0 calls the removed private writer; unchecked
-  - id: SU5
-    suite: sure.*
-    test: "TransactionImportTest|TradeImportTest"
+    checked: round-app-suites bdb3d96012
+    note: Forem's LocalRedisCacheStore uses redis-rb's API and the removed bypass_local_cache (R2-16)
+  - id: FO3
+    suite: forem.*
+    test: "\\A\\./spec/lib/active_support/cache/local_redis_cache_store_spec\\.rb\\[1:(24|30|41)\\]\\z"
+    signature: "\\ARSpec::(Mocks::MockExpectationError: #<InstanceDouble\\(Logger\\)|Expectations::ExpectationNotMetError: expected ArgumentError with message matching /one URL/)"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the store's specs that expect redis-rb's logging and a raise where main deprecates the :redis instance option
+  - id: FO-deprecations
+    suite: forem.*
+    signature: "DeprecationException: DEPRECATION WARNING: (`verify_authenticity_token` is deprecated|Calling `protect_from_forgery` without specifying a strategy|exec_(update|delete) is deprecated|ActionController::InvalidAuthenticityToken has been deprecated|Mime::EXTENSION_LOOKUP is deprecated)|got #<ActiveSupport::DeprecationException: DEPRECATION W"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: main-only deprecations that Forem's test env raises (b); Mime::EXTENSION_LOOKUP from Devise 4.9.4 (c)
+  - id: FO-deprecations
+    suite: forem.*
+    test: "\\A\\./spec/(requests/api/v1/(docs/)?user_roles_spec|workers/organizations/delete_worker_spec)\\.rb"
     signature: "."
-    status: gem-side
+    status: record-only
     record: docs/upstream/app-suites.md
-    note: the import count failures behind SU5; unchecked
-  - id: WB1
-    suite: writebook.*
-    signature: "Mime::EXTENSION_LOOKUP"
-    status: gem-side
+    checked: round-app-suites bdb3d96012
+    note: the same deprecations seen through their effects, a 422 from the raising CSRF callback in user_roles_spec, Organizations::DeleteWorker rescuing exec_delete's
+  - id: FO-rest
+    suite: forem.*
+    test: "\\A\\./spec/(models/(broadcast|user)_spec|services/(exporter/service|reaction_handler)_spec)\\.rb"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: \\d{4}-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d{9} "
+    status: record-only
     record: docs/upstream/app-suites.md
-    note: a deprecation only; flags only if an app raises on it (propshaft <= 1.3.2)
-  - id: WB-vips
-    suite: writebook.*
-    test: VipsLoaderPolicyTest
+    checked: round-app-suites bdb3d96012
+    note: (b) precision nil timestamps cast to microseconds in memory
+  - id: FO-rest
+    suite: forem.*
+    signature: "\\AActiveRecord::NullByteError: ArgumentError: string contains null byte\\z|expected ArgumentError with \"'banana_split' is not a valid ai_disclosure_level\"|undefined method `button_to_generates_button_tag' for module ActionView::Helpers::UrlHelper"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: (b) null bytes raise NullByteError, the enum error lists the values, button_to_generates_button_tag moved to NavigationHelper (S2)
+  - id: FO-rest
+    suite: forem.*
+    test: "\\A\\./spec/(initializers/framework_defaults_spec\\.rb\\[1:4\\]|lib/local_redis/connection_spec\\.rb\\[1:1\\]|lib/server_warmup_spec\\.rb\\[1:4:[123]\\]|services/comment_creator_spec\\.rb\\[1:1\\])\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: "
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: (b) raise_on_assign_to_attr_readonly deprecated; E1 WeakSet in a spec that boots descendants_tracker alone; (d) ServerWarmup reads the resolver's @unbound_templates; (d) comment_creator_spec sees the new protected association_cache
+  - id: noise-forem-both-trees
+    suite: forem.*
+    class: base-failing
+    test: "\\A\\./spec/(lib/(local_redis/web_launcher|forem_native|server_warmup)|helpers/profile_helper|models/billboard_event|badges/award_thumbs_up|lib/local_redis/sync)_spec\\.rb"
     signature: "."
     status: noise
     record: docs/upstream/app-suites.md
-    note: the orb's libvips 8.14 allows ICO, PSD, BMP and SVG loads
+    checked: round-app-suites bdb3d96012
+    note: the record's 8-1 failures (forem_native, billboard_event, server_warmup) and flakes, plus web_launcher, which expects JSON from Puma
+  - id: noise-forem-both-trees
+    suite: forem.*
+    class: signature-changed
+    test: "\\A\\./spec/lib/forem_native_spec\\.rb\\[1:43:5:1\\]\\z"
+    signature: "ActionController::InvalidAuthenticityToken has been deprecated"
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: fails on 8-1 with a NameError on a private constant; on main the deprecation raises first
+  - id: CW-boot
+    suite: chatwoot
+    class: suite-did-not-load
+    signature: "\\ANoMethodError: undefined method 'attach_to' for class ActiveRecordQueryTrace::CustomLogSubscriber\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: active_record_query_trace 1.9 calls attach_to on the EventReporter-based ActiveRecord::LogSubscriber at boot (c); chatwoot-shimmed loads it with require false
+  - id: CW1
+    suite: chatwoot-shimmed
+    test: "\\A\\./spec/services/conversations/filter_service_spec\\.rb"
+    signature: "\\AActiveRecord::StatementInvalid: PG::SyntaxError: ERROR: syntax error at or near \"\\)\""
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: where("", values) puts (()) in the query; our rails/rails#59642, with which chatwoot-prs passes
+  - id: CW2
+    suite: chatwoot-shimmed
+    signature: "undefined method '_find_all' for an instance of EmailTemplates::DbResolverService"
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the private Resolver#_find_all hook is gone; our rails/rails#59644; also signature-changed on the 3 confirmation mailer specs that fail on 8-1 too
+  - id: CW2
+    suite: chatwoot-shimmed
+    test: "\\A\\./spec/(services/email/send_on_email_service_spec\\.rb\\[1:1:[12]\\]|requests/api_bearer_authentication_spec\\.rb\\[1:6\\])\\z"
+    signature: "undefined method 'html_part' for nil|ActionMailer::Base\\.deliveries\\.count` to have changed by 1|status code :ok \\(200\\) but it was :internal_server_error"
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: mails that go through the DB resolver; they pass in chatwoot-prs
+  - id: CW3
+    suite: chatwoot.*
+    test: "\\A\\./spec/controllers/(api/v1/widget|public/api/v1/inbox)/conversations_controller_spec\\.rb"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected the response to have a success status code \\(2xx\\) but it was 500\\z"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: precision nil timestamps cast to microseconds; update_last_seen's UpdateMessageStatusJob expectation fails inside the action, so the spec sees a 500
+  - id: CW4
+    suite: chatwoot.*
+    test: "\\A\\./spec/controllers/api/v1/accounts/companies_controller_spec\\.rb\\[1:1:2:[23]\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: [12]\\z"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: integration get with params and as json sends the params in the query string (3c99a378ad)
+  - id: CW5
+    suite: chatwoot.*
+    test: "\\A\\./spec/(helpers/billing_helper_spec\\.rb\\[1:1:2\\]|builders/contact_inbox_with_contact_builder_spec\\.rb\\[1:1:8\\])\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: (1|151)\\z"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: saving re-derives a polymorphic type from the associated record (4af9822fae)
+  - id: CW6
+    suite: chatwoot-shimmed
+    signature: "ArgumentError: wrong number of arguments \\(given 1, expected 0\\)"
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: Chatwoot's ConversationMessageSummaryQueries (added 2026-11-05) calls Arel::Table.new with a positional name; covered by our rails/rails#59574, with which chatwoot-prs passes
+  - id: CW6
+    suite: chatwoot-shimmed
+    test: "\\A\\./spec/controllers/api/(base_controller_spec|v1/accounts/(contacts/)?conversations_controller_spec)\\.rb"
+    signature: "success status code \\(2xx\\) but it was 500|undefined method 'pluck' for nil"
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the conversation list's message summary raising as a 500
+  - id: SU5
+    suite: chatwoot.*
+    signature: "\\ANoMethodError: undefined method 'validation_context=' for an instance of Contact\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: activerecord-import 2.1.0 calls the removed validation_context= (data import job, Intercom importer)
+  - id: noise-chatwoot-order
+    suite: chatwoot-(shimmed|prs)
+    class: [order-dependent, one-seed, flaky-candidate]
+    test: "\\A\\./spec/(controllers/api/v1/accounts/bulk_actions_controller_spec|jobs/internal/remove_stale_redis_keys_job_spec)\\.rb"
+    signature: "Validation failed: User has already been taken|ProcessStaleRedisKeysJob \\(class\\)> received :perform_later with unexpected arguments"
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: see the Chatwoot section's readiness note
+  - id: noise-chatwoot-both-trees
+    suite: chatwoot.*
+    class: base-failing
+    signature: "."
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the record's 8-1 failures from the port (super_admin on administrate 1.0, contact_inbox_builder, Slack uploads, confirmation mailer, sassc) and time-of-day ones
+  - id: DS1
+    suite: discourse
+    class: suite-did-not-load
+    signature: "\\AArgumentError: Key mappings must have the same number of columns \\(prepare\\)\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: "the chat plugin's two-column foreign_key stops db:migrate's seeding (discourse-seeded.sh fails the prepare); the fix is Discourse's as: :chatable, open as discourse/discourse#45658; discourse-shimmed and discourse-prs apply it"
+  - id: AR-2
+    suite: spree-(core|api)
+    class: suite-did-not-load
+    signature: "\\ANameError: uninitialized constant ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED \\(NameError\\) \\(prepare\\)\\z"
+    status: open-pr
+    record: docs/upstream/api-regressions.md
+    checked: round-app-suites bdb3d96012
+    note: Spree's configuration default reads the moved constant at boot; covered by our rails/rails#59627 (with #59574 for the Arel calls behind it), so spree-*-prs runs without an app shim
+  - id: DS-arel
+    suite: discourse-shimmed
+    test: "\\A\\./spec/(integration|lib)/json_api_kit/"
+    signature: "\\A(ArgumentError: wrong number of arguments \\(given 1, expected 0\\)|KeyError: key not found: \"(included|data)\"|NoMethodError: undefined method '(first|include\\?)' for nil|RSpec::Core::MultipleExceptionError: expected the response to have status code :\\w+ \\(\\d+\\) but it was :internal_server_error \\(500\\)|RSpec::Expectations::MultipleExpectationsNotMetError: Got 2 failures (and 1 other error )?from failure aggregation block:)\\z"
+    status: open-pr
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: json_api_kit's Arel::Table.new(table_name) (numbered_rows.rb) and what its ArgumentError breaks downstream, 101 as in the record; covered by our rails/rails#59574, with which discourse-prs has none
+  - id: DS3
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/lib/(migration/safe_migrate_spec\\.rb\\[1:[1-47]\\]|middleware/request_tracker_spec\\.rb\\[1:6:2\\])\\z"
+    signature: "\\A(RSpec::Expectations::ExpectationNotMetError: expected (StandardError but nothing was raised|\"PG::InFailedSqlTransaction: )|NoMethodError: undefined method '\\[\\]' for nil\\z)"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the PostgreSQL adapter calls send_query*, so SafeMigrate's exec/async_exec wrappers and MethodProfiler see no SQL (heads-up on rails/rails#57057)
+  - id: DS4
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/requests/omniauth_callbacks_controller_spec\\.rb\\[1:2:2:5:1\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: 302\\z"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: CSRFTokenVerifier includes RequestForgeryProtection outside a controller; instrument_csrf_event calls action_name (a 500)
+  - id: S1
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/integrity/middleware_order_spec\\.rb\\[1:1\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: \\[MarkdownEndpoint::VaryMiddleware, "
+    status: prepared
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: test and development set x_sendfile_header = nil, so main drops Rack::Sendfile from the stack
+  - id: M-prefixes
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/views/(list/list\\.erb|topics/show\\.html\\.erb)_spec\\.rb\\["
+    signature: "\\AFrozenError: can't modify frozen Array: \\[\"\", \"action_view/test_case/test\"\\]\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: rspec-rails 8.0.4 and the frozen ViewPaths._prefixes (fixed in rspec-rails 570b2b0a79, unreleased; Discourse keeps its locked rspec-rails)
+  - id: DS-precision
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/(serializers/(basic_reviewable(_flagged_post|_queued_post|_user)?|pending_post)_serializer_spec|models/(invite|user|post)_spec)\\.rb\\["
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: (expected: \\d{4}-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d{9} \\+0000\\z|expected \\{avatar_template: |expected `invite\\.invalidated_at` to have changed to |expected: \\[#<User id: |\\d{4}-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d UTC is not within 1 millisecond of )"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: precision nil timestamps cast to microseconds in memory (c162370c8f), 10 as in the record (as in Mastodon's M-precision)
+  - id: DS-vary
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/requests/(stylesheets_controller_spec\\.rb\\[1:6\\]|theme_javascripts_controller_spec\\.rb\\[1:1:4\\]|application_controller_spec\\.rb\\[1:25:1\\])\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: (nil|\"Accept, X-Requested-With\")\\z"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: Vary gains Sec-Fetch-Site (open rails/rails#59500, not ours); application_controller_spec's is new since discourse#45549 (2026-11-05) changed its expectation to 8.1.4.1's "Accept, X-Requested-With"
+    checked: round-app-suites bdb3d96012
+  - id: DS-errors-inspect
+    suite: discourse-(shimmed|prs)
+    test: "\\A\\./spec/lib/service/steps_inspector_spec\\.rb\\["
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected(:)? \"(#<ActiveModel::Errors:0xX @errors=|Inspecting DummyService result object:)"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: ActiveModel::Errors#inspect now lists instance variables (4c0776608a); steps_inspector_spec matches 8.1's form
+  - id: SP1
+    suite: spree-(core|api)-prs
+    signature: "\\A((Minitest::UnexpectedError: )?FrozenError: can't modify frozen Hash: \\{\\}|NameError: undefined local variable or method 'tagged_logger' for #<RSpec::ExampleGroups::\\w+(::\\w+)*:0xX>)\\z"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: "Spree::BaseMailer writes ActionMailer::Base.default_url_options[:host] into the frozen default {} (baa1ca5f2f); in subscriber specs it surfaces as RSpec's missing tagged_logger; upgrade-guide branch thomasklemm/upgrade-guide-frozen-default-url-options"
+  - id: SP2
+    suite: spree-api-prs
+    test: "\\A\\./spec/lib/spree/api/enum_types_spec\\.rb\\[1:1\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: \"// This file is auto-generated from the API serializers by `rake typelizer:generate`"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: new Canadian TimeZone::MAPPING entries change the generated enums.generated.ts
+  - id: SP3
+    suite: spree-api-prs
+    test: "\\A\\./spec/controllers/spree/api/v3/store/(categories|products)_controller_spec\\.rb\\["
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected the response to have status code :ok \\(200\\) but it was :not_found \\(404\\)\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: mobility 1.3.2's where! override is skipped since where calls _where! (rails/rails#59634); shioyama/mobility#692
+  - id: SU1
+    suite: sure
+    signature: "\\ANoMethodError: undefined method 'underscore' for nil"
+    status: merged
+    record: docs/upstream/app-suites.md
+    note: anonymous cache store subclasses; fixed by our rails/rails#59640 (merged 2026-11-05), so main bdb3d96012 no longer shows it (round-app-suites); unchecked
+  - id: SU2
+    suite: sure
+    signature: "\\A(ActiveRecord::StatementInvalid: |DRb::DRbRemoteError: |RuntimeError: Neutered Exception ActionView::Template::Error: )PG::(SyntaxError: ERROR: syntax error at or near \"\\$1\"|UndefinedFunction: ERROR: operator does not exist: date >= integer|InFailedSqlTransaction: ERROR: current transaction is aborted, commands ignored until end of transaction block)"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: find_by_sql/count_by_sql array arguments are bind parameters, so DATE $1 and date - $1 break with prepared statements; the aborted-transaction rows are the statements after one of those in the same transaction; DRb and Neutered Exception wrap it in parallel workers and views
+  - id: SU2
+    suite: sure
+    test: "\\A(Financekit::(Inbox|Diagnostics)Test#|Api::V\\d+::Financekit::\\w+Test#|Transfer::MatcherTest#|Balance::ChartSeriesBuilderTest#|Family::AutoTransferMatchableTest#)"
+    signature: "\\A(Minitest::Assertion: Expected nil to not be nil\\.|ActiveRecord::RecordNotFound: Couldn't find DebugLogEntry |DRb::DRbRemoteError: \\[(Transfer::Matcher::Error|Money::ConversionError|ActiveRecord::RecordInvalid)\\] exception expected, not)"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the same error seen through its effects, the transfer matcher's rollback of Financekit's downstream work and assert_raises that get the PG error instead
+  - id: SU3
+    suite: sure
+    signature: "\\AActiveRecord::InvalidForeignKey: PG::ForeignKeyViolation: ERROR: insert or update on table \"api_keys\" violates foreign key constraint"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: disable_referential_integrity re-checks foreign keys on PostgreSQL 18.4+ (postgres18 service)
+  - id: SU4
+    suite: sure
+    signature: "\\ALoadError: The Redis cache store requires the redis-client gem version 0\\.28\\.0 or later\\.\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: Sure locks redis-client 0.25.0
+  - id: SU5
+    suite: sure
+    signature: "\\ANoMethodError: undefined method 'validation_context=' for an instance of (Transaction|Trade)\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: activerecord-import 2.2.0 calls the removed private writer (3.0.x no longer does)
+  - id: SU5
+    suite: sure
+    test: "\\A(TransactionImportTest|TradeImportTest)#"
+    signature: "\\AMinitest::Assertion: `(Entry|Trade)\\.count` didn't change by \\d+, but by 0\\.\\z"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the import count failures behind SU5
+  - id: noise-discourse-order
+    suite: discourse-prs
+    class: order-dependent
+    test: "\\A\\./spec/models/user_stat_spec\\.rb\\[1:2:2\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected: \\[\\[1, 0\\], \\[0, 1\\]\\]\\z"
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: recalculate_likes! against the directory refresh; failed under seed 4242 only, passes 5/5 alone on both trees
+  - id: noise-discourse-smtp
+    suite: discourse.*
+    test: "\\A\\./spec/integration/smtp_spec\\.rb\\[1:3\\]\\z"
+    signature: "\\ARSpec::Expectations::ExpectationNotMetError: expected #<EOFError: end of file reached> to be a kind of Net::OpenTimeout\\z"
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: connects to the blackholed 192.0.2.1 with a 10 µs open timeout, so it depends on the orb's network; flaky on 8-1 in the record, failed in both discourse-prs runs here and passes 5/5 alone on both trees
+  - id: noise-discourse-env
+    suite: discourse.*
+    class: base-failing
+    test: "\\A\\./spec/(lib/(upload_creator|file_helper|discourse/safe_exec|final_destination/http|image_magick|topic_og_image_generator|acl/target)_spec|models/(optimized_image|upload)_spec|requests/user_avatars_controller_spec)\\.rb\\["
+    signature: "."
+    status: noise
+    record: docs/upstream/app-suites.md
+    checked: round-app-suites bdb3d96012
+    note: the record's environment failures on both trees (ImageMagick, safe_exec, file permissions, a blackholed address), plus acl/target_spec under seed 1717
 
   # Ecosystem round 1 (docs/upstream/ecosystem-tests.md)
   - id: E1
@@ -436,9 +798,9 @@ findings:
   - id: AR-4
     suite: .*
     signature: "where!|having!"
-    status: prepared
+    status: merged
     record: docs/upstream/api-regressions.md
-    note: bind values for where!/having!; queued
+    note: bind values for where!/having!; fixed by our rails/rails#59634 (06eae38e6e), so Discourse's permalinks filter no longer fails on main bdb3d96012 (round-app-suites); unchecked
 
   # Noise recorded in the proof round (docs/upstream/readiness.md)
   - id: noise-r2-counter_culture-order
