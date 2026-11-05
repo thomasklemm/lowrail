@@ -1,0 +1,3 @@
+`harness/gc.rb` prints "Average marking time" and "Average sweeping time" using Integer division. `GC.stat(:marking_time)` and `GC.stat(:sweeping_time)` are whole milliseconds, so the per-iteration deltas are Integers and the printed averages are truncated. For example, railsbench's minor GCs mark in about 0.3 ms with ZJIT, and three iterations marking 1, 0 and 0 ms print `0.0ms` instead of `0.3ms`. The JSON results and the summary tables already use the unrounded values, so only these two lines change.
+
+I found this while measuring ruby/ruby#19685's GC time next to #562 (timings without GC time) and #541 (GC per ruby). The new test runs the harness with stubbed GC samples. It fails on main.

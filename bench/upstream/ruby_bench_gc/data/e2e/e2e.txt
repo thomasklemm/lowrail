@@ -1,0 +1,608 @@
+[1mWARNING: 'base' and 'base2' appear identical (same revision, same flags). This is likely a mistake.[0m
+Running benchmark "lobsters" (1/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/lobsters/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4070ms    42.0ms    20.0ms         2         0         2         0     0.00
+ #2: 1193ms    64.0ms    19.0ms         1         1         0         0        -
+ #3:  962ms    15.0ms    20.0ms         1         0         1         0     0.00
+ #4:  750ms     9.0ms    27.0ms         1         0         1         0     0.00
+ #5:  718ms     0.0ms     0.0ms         0         0         0         0        -
+ #6:  707ms     8.0ms    25.0ms         1         0         1         0     0.00
+ #7:  613ms     6.0ms    22.0ms         1         0         1         0     0.00
+ #8:  630ms     8.0ms    23.0ms         1         0         1         0     0.00
+ #9:  659ms     8.0ms    24.0ms         1         0         1         0     0.00
+#10:  694ms     0.0ms     0.0ms         0         0         0         0        -
+#11:  642ms     7.0ms    24.0ms         1         0         1         0     0.00
+#12:  627ms     8.0ms    23.0ms         1         0         1         0     0.00
+#13:  590ms     7.0ms    22.0ms         1         0         1         0     0.00
+#14:  602ms     7.0ms    23.0ms         1         0         1         0     0.00
+#15:  617ms     0.0ms     0.0ms         0         0         0         0        -
+#16:  635ms     8.0ms    22.0ms         1         0         1         0     0.00
+#17:  663ms    11.0ms    25.0ms         1         0         1         0     0.00
+#18:  642ms     7.0ms    23.0ms         1         0         1         0     0.00
+#19:  640ms     8.0ms    23.0ms         1         0         1         0     0.00
+#20:  604ms     6.0ms    21.0ms         1         0         1         0     0.00
+#21:  577ms     0.0ms     0.0ms         0         0         0         0        -
+#22:  592ms     7.0ms    22.0ms         1         0         1         0     0.00
+#23:  603ms     7.0ms    20.0ms         1         0         1         0     0.00
+#24:  607ms     7.0ms    22.0ms         1         0         1         0     0.00
+#25:  617ms     8.0ms    23.0ms         1         0         1         0     0.00
+ZJIT stats:
+code_region_bytes:     26,726,400
+zjit_alloc_bytes:      19,844,952
+compile_time            5638.94ms
+profile_time              62.83ms
+gc_time                   47.32ms
+invalidation_time         11.07ms
+RSS: 323.5MiB
+MAXRSS: 333.6MiB
+RSS sampled (n=10): median 333.6MiB ± 0.0MiB (MAD), range [333.5, 333.6]MiB
+Average of last 10, non-warmup iters: 618ms
+Average marking time: 6.0ms
+Average sweeping time: 20.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32      141243       65043       76200           69     46.1%   4416.0
+   1         40      571458      212310      359148          349     37.2%  22336.0
+   2         64      228129       75304      152825          223     33.0%  14272.0
+   3         80       58090       14934       43156           71     25.7%   4544.0
+   4         96       32724        8226       24498           48     25.1%   3072.0
+   5        128       18396        6351       12045           36     34.5%   2304.0
+   6        160       34727       18804       15923           85     54.1%   5440.0
+   7        256       11730        4535        7195           46     38.7%   2944.0
+   8        512        8763        4021        4742           69     45.9%   4416.0
+   9        640        2230         353        1877           22     15.8%   1408.0
+  10        768         253          33         220            3     13.0%    192.0
+  11       1024         189          32         157            3     16.9%    192.0
+Running benchmark "railsbench" (2/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/railsbench/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+Command: ruby bin/rails db:migrate db:seed
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Deleted all 0 posts
+Creating 100 posts....................................................................................................
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Failed to get max RSS: cannot load such file -- fiddle
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 2347ms   155.0ms    43.0ms        15         4        11         0     0.36
+ #2: 1491ms   108.0ms    45.0ms        13         3        10         0     0.30
+ #3: 1508ms   109.0ms    47.0ms        12         3         9         0     0.33
+ #4: 1441ms   106.0ms    39.0ms        12         3         9         0     0.33
+ #5: 1475ms   105.0ms    38.0ms        11         3         8         0     0.38
+ #6: 1473ms    39.0ms    50.0ms        10         1         9         0     0.11
+ #7: 1423ms    39.0ms    46.0ms        10         1         9         0     0.11
+ #8: 1373ms    41.0ms    42.0ms        10         1         9         0     0.11
+ #9: 1418ms     4.0ms    39.0ms         9         0         9         0     0.00
+#10: 1401ms     3.0ms    45.0ms        10         0        10         0     0.00
+#11: 1363ms     3.0ms    41.0ms         9         0         9         0     0.00
+#12: 1368ms     4.0ms    44.0ms        10         0        10         0     0.00
+#13: 1457ms     4.0ms    63.0ms         9         0         9         0     0.00
+#14: 1479ms     3.0ms    61.0ms         9         0         9         0     0.00
+#15: 1467ms     4.0ms    61.0ms         9         0         9         0     0.00
+#16: 1532ms     4.0ms    67.0ms         9         0         9         0     0.00
+#17: 1412ms     4.0ms    62.0ms         9         0         9         0     0.00
+#18: 1440ms     3.0ms    62.0ms         9         0         9         0     0.00
+#19: 1431ms     4.0ms    58.0ms         9         0         9         0     0.00
+#20: 1417ms     3.0ms    62.0ms         8         0         8         0     0.00
+#21: 1408ms     4.0ms    62.0ms         9         0         9         0     0.00
+#22: 1383ms     3.0ms    55.0ms         8         0         8         0     0.00
+#23: 1425ms     3.0ms    59.0ms         8         0         8         0     0.00
+#24: 1465ms     4.0ms    65.0ms         9         0         9         0     0.00
+#25: 1450ms     4.0ms    66.0ms         8         0         8         0     0.00
+ZJIT stats:
+code_region_bytes:      7,827,456
+zjit_alloc_bytes:       7,388,856
+compile_time            1421.89ms
+profile_time              14.20ms
+gc_time                   77.38ms
+invalidation_time          5.71ms
+RSS: 122.4MiB
+RSS sampled (n=10): median 121.3MiB ± 0.7MiB (MAD), range [120.2, 122.4]MiB
+Average of last 10, non-warmup iters: 1436ms
+Average marking time: 3.0ms
+Average sweeping time: 61.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       57316       42594       14722           28     74.3%   1792.0
+   1         40      196492      135616       60876          120     69.0%   7680.0
+   2         64       61380       36771       24609           60     59.9%   3840.0
+   3         80       12274        5983        6291           15     48.7%    960.0
+   4         96        6818        1575        5243           10     23.1%    640.0
+   5        128        5110        2864        2246           10     56.0%    640.0
+   6        160       14708       12259        2449           36     83.3%   2304.0
+   7        256        1020         266         754            4     26.1%    256.0
+   8        512        1905        1733         172           15     91.0%    960.0
+   9        640         305          35         270            3     11.5%    192.0
+  10        768          85           7          78            1      8.2%     64.0
+  11       1024         126          21         105            2     16.7%    128.0
+Running benchmark "shipit" (3/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/shipit/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4449ms   165.0ms    36.0ms         9         2         7         0     0.29
+ #2: 1361ms    75.0ms    30.0ms         6         1         5         0     0.20
+ #3: 1197ms    77.0ms    31.0ms         6         1         5         0     0.20
+ #4: 1096ms    16.0ms    29.0ms         5         0         5         0     0.00
+ #5: 1211ms    81.0ms    41.0ms         7         1         6         0     0.17
+ #6: 1146ms    76.0ms    32.0ms         5         1         4         0     0.25
+ #7: 1086ms    18.0ms    34.0ms         5         0         5         0     0.00
+ #8: 1065ms    18.0ms    34.0ms         6         0         6         0     0.00
+ #9: 1211ms    81.0ms    35.0ms         5         1         4         0     0.25
+#10: 1086ms    17.0ms    34.0ms         5         0         5         0     0.00
+#11: 1080ms    74.0ms    36.0ms         6         1         5         0     0.20
+#12: 1104ms    78.0ms    30.0ms         4         1         3         0     0.33
+#13: 1039ms    15.0ms    29.0ms         4         0         4         0     0.00
+#14: 1020ms    17.0ms    34.0ms         5         0         5         0     0.00
+#15: 1142ms    78.0ms    35.0ms         5         1         4         0     0.25
+#16: 1050ms    14.0ms    30.0ms         4         0         4         0     0.00
+#17: 1027ms    17.0ms    35.0ms         5         0         5         0     0.00
+#18: 1100ms    77.0ms    36.0ms         5         1         4         0     0.25
+#19: 1023ms    15.0ms    28.0ms         4         0         4         0     0.00
+#20: 1105ms    75.0ms    41.0ms         6         1         5         0     0.20
+#21:  993ms    11.0ms    23.0ms         3         0         3         0     0.00
+#22: 1024ms    18.0ms    35.0ms         5         0         5         0     0.00
+#23: 1083ms    77.0ms    34.0ms         5         1         4         0     0.25
+#24:  988ms    14.0ms    29.0ms         4         0         4         0     0.00
+#25: 1049ms    13.0ms    28.0ms         4         0         4         0     0.00
+ZJIT stats:
+code_region_bytes:     21,630,976
+zjit_alloc_bytes:      16,181,668
+compile_time            4695.82ms
+profile_time              45.05ms
+gc_time                  153.03ms
+invalidation_time          9.07ms
+RSS: 178.9MiB
+MAXRSS: 181.5MiB
+RSS sampled (n=10): median 178.5MiB ± 0.4MiB (MAD), range [177.6, 178.9]MiB
+Average of last 10, non-warmup iters: 1044ms
+Average marking time: 33.0ms
+Average sweeping time: 31.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       90068       59715       30353           44     66.3%   2816.0
+   1         40      373336      205616      167720          228     55.1%  14592.0
+   2         64      122760       60486       62274          120     49.3%   7680.0
+   3         80       28638       14812       13826           35     51.7%   2240.0
+   4         96       11591        4125        7466           17     35.6%   1088.0
+   5        128       15330        8143        7187           30     53.1%   1920.0
+   6        160       25739       18465        7274           63     71.7%   4032.0
+   7        256        6630        1590        5040           26     24.0%   1664.0
+   8        512        3175        2040        1135           25     64.3%   1600.0
+   9        640         203          26         177            2     12.8%    128.0
+  10        768          85           3          82            1      3.5%     64.0
+  11       1024         630          75         555           10     11.9%    640.0
+Running benchmark "lobsters" (1/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/lobsters/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4313ms    44.0ms    20.0ms         2         0         2         0     0.00
+ #2: 1233ms    68.0ms    20.0ms         1         1         0         0        -
+ #3:  979ms    15.0ms    20.0ms         1         0         1         0     0.00
+ #4:  750ms    10.0ms    27.0ms         1         0         1         0     0.00
+ #5:  716ms     0.0ms     0.0ms         0         0         0         0        -
+ #6:  727ms     7.0ms    26.0ms         1         0         1         0     0.00
+ #7:  645ms     8.0ms    25.0ms         1         0         1         0     0.00
+ #8:  667ms     8.0ms    24.0ms         1         0         1         0     0.00
+ #9:  666ms     7.0ms    23.0ms         1         0         1         0     0.00
+#10:  674ms     0.0ms     0.0ms         0         0         0         0        -
+#11:  645ms     8.0ms    24.0ms         1         0         1         0     0.00
+#12:  636ms     8.0ms    23.0ms         1         0         1         0     0.00
+#13:  633ms     8.0ms    24.0ms         1         0         1         0     0.00
+#14:  637ms     7.0ms    23.0ms         1         0         1         0     0.00
+#15:  670ms     0.0ms     0.0ms         0         0         0         0        -
+#16:  686ms     8.0ms    24.0ms         1         0         1         0     0.00
+#17:  664ms     8.0ms    24.0ms         1         0         1         0     0.00
+#18:  641ms     8.0ms    23.0ms         1         0         1         0     0.00
+#19:  627ms     8.0ms    24.0ms         1         0         1         0     0.00
+#20:  618ms     7.0ms    22.0ms         1         0         1         0     0.00
+#21:  604ms     0.0ms     0.0ms         0         0         0         0        -
+#22:  633ms     7.0ms    23.0ms         1         0         1         0     0.00
+#23:  629ms     9.0ms    25.0ms         1         0         1         0     0.00
+#24:  640ms     7.0ms    24.0ms         1         0         1         0     0.00
+#25:  662ms     9.0ms    24.0ms         1         0         1         0     0.00
+ZJIT stats:
+code_region_bytes:     26,726,400
+zjit_alloc_bytes:      19,845,368
+compile_time            5893.15ms
+profile_time              68.39ms
+gc_time                   52.03ms
+invalidation_time         11.86ms
+RSS: 324.6MiB
+MAXRSS: 334.8MiB
+RSS sampled (n=10): median 334.8MiB ± 0.0MiB (MAD), range [334.8, 334.9]MiB
+Average of last 10, non-warmup iters: 640ms
+Average marking time: 7.0ms
+Average sweeping time: 21.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32      143290       65043       78247           70     45.4%   4480.0
+   1         40      541981      212308      329673          331     39.2%  21184.0
+   2         64      221991       75304      146687          217     33.9%  13888.0
+   3         80       58089       14934       43155           71     25.7%   4544.0
+   4         96       32722        8225       24497           48     25.1%   3072.0
+   5        128       17374        6352       11022           34     36.6%   2176.0
+   6        160       33911       18804       15107           83     55.5%   5312.0
+   7        256       12495        4535        7960           49     36.3%   3136.0
+   8        512        8763        4021        4742           69     45.9%   4416.0
+   9        640        2231         350        1881           22     15.7%   1408.0
+  10        768         253          36         217            3     14.2%    192.0
+  11       1024         189          32         157            3     16.9%    192.0
+Running benchmark "railsbench" (2/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/railsbench/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+Command: ruby bin/rails db:migrate db:seed
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Using 100 posts in the database
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Failed to get max RSS: cannot load such file -- fiddle
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 2522ms   147.0ms    67.0ms        13         3        10         0     0.30
+ #2: 1701ms   124.0ms    73.0ms        12         3         9         0     0.33
+ #3: 1630ms    45.0ms    73.0ms        11         1        10         0     0.10
+ #4: 1596ms    82.0ms    69.0ms        11         2         9         0     0.22
+ #5: 1457ms     4.0ms    62.0ms        10         0        10         0     0.00
+ #6: 1596ms    52.0ms    71.0ms        10         1         9         0     0.11
+ #7: 1528ms    42.0ms    65.0ms        10         1         9         0     0.11
+ #8: 1469ms    40.0ms    60.0ms        10         1         9         0     0.11
+ #9: 1427ms     4.0ms    56.0ms         9         0         9         0     0.00
+#10: 1473ms    41.0ms    64.0ms        10         1         9         0     0.11
+#11: 1498ms    42.0ms    63.0ms        10         1         9         0     0.11
+#12: 1570ms     3.0ms    67.0ms         9         0         9         0     0.00
+#13: 1514ms     4.0ms    65.0ms         9         0         9         0     0.00
+#14: 1487ms     4.0ms    64.0ms         9         0         9         0     0.00
+#15: 1426ms     4.0ms    59.0ms         9         0         9         0     0.00
+#16: 1429ms     4.0ms    63.0ms         9         0         9         0     0.00
+#17: 1420ms     3.0ms    60.0ms         9         0         9         0     0.00
+#18: 1548ms     4.0ms    63.0ms         8         0         8         0     0.00
+#19: 1500ms     3.0ms    68.0ms         9         0         9         0     0.00
+#20: 1426ms     4.0ms    63.0ms         9         0         9         0     0.00
+#21: 1384ms     3.0ms    46.0ms         9         0         9         0     0.00
+#22: 1417ms     3.0ms    42.0ms         8         0         8         0     0.00
+#23: 1458ms     4.0ms    52.0ms         9         0         9         0     0.00
+#24: 1488ms     3.0ms    57.0ms         8         0         8         0     0.00
+#25: 1378ms     3.0ms    48.0ms         9         0         9         0     0.00
+ZJIT stats:
+code_region_bytes:      7,827,456
+zjit_alloc_bytes:       7,389,112
+compile_time            1604.04ms
+profile_time              16.85ms
+gc_time                   71.29ms
+invalidation_time          6.88ms
+RSS: 121.8MiB
+RSS sampled (n=10): median 121.1MiB ± 0.1MiB (MAD), range [120.4, 121.8]MiB
+Average of last 10, non-warmup iters: 1445ms
+Average marking time: 3.0ms
+Average sweeping time: 56.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       57316       42594       14722           28     74.3%   1792.0
+   1         40      198129      135616       62513          121     68.4%   7744.0
+   2         64       61380       36770       24610           60     59.9%   3840.0
+   3         80       13092        5981        7111           16     45.7%   1024.0
+   4         96        8179        1578        6601           12     19.3%    768.0
+   5        128        4599        2863        1736            9     62.3%    576.0
+   6        160       14300       12259        2041           35     85.7%   2240.0
+   7        256        1020         266         754            4     26.1%    256.0
+   8        512        1905        1733         172           15     91.0%    960.0
+   9        640         305          35         270            3     11.5%    192.0
+  10        768          85           7          78            1      8.2%     64.0
+  11       1024         126          21         105            2     16.7%    128.0
+Running benchmark "shipit" (3/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/base/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/shipit/benchmark.rb
+ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4405ms   165.0ms    36.0ms        10         2         8         0     0.25
+ #2: 1345ms    71.0ms    26.0ms         6         1         5         0     0.20
+ #3: 1197ms   132.0ms    32.0ms         7         2         5         0     0.40
+ #4: 1045ms    70.0ms    26.0ms         6         1         5         0     0.20
+ #5: 1109ms    72.0ms    28.0ms         5         1         4         0     0.25
+ #6: 1052ms    15.0ms    30.0ms         5         0         5         0     0.00
+ #7: 1089ms    79.0ms    34.0ms         6         1         5         0     0.20
+ #8: 1021ms    19.0ms    34.0ms         6         0         6         0     0.00
+ #9: 1131ms    83.0ms    32.0ms         5         1         4         0     0.25
+#10: 1031ms    21.0ms    37.0ms         6         0         6         0     0.00
+#11: 1175ms   140.0ms    33.0ms         5         2         3         0     0.67
+#12: 1008ms    17.0ms    32.0ms         5         0         5         0     0.00
+#13: 1074ms    74.0ms    34.0ms         6         1         5         0     0.20
+#14:  987ms    11.0ms    25.0ms         4         0         4         0     0.00
+#15: 1085ms    74.0ms    34.0ms         6         1         5         0     0.20
+#16:  984ms    16.0ms    26.0ms         5         0         5         0     0.00
+#17: 1000ms    14.0ms    35.0ms         5         0         5         0     0.00
+#18: 1059ms    77.0ms    29.0ms         6         1         5         0     0.20
+#19:  973ms    12.0ms    32.0ms         4         0         4         0     0.00
+#20:  982ms    17.0ms    29.0ms         5         0         5         0     0.00
+#21: 1022ms    71.0ms    29.0ms         5         1         4         0     0.25
+#22:  946ms    12.0ms    24.0ms         4         0         4         0     0.00
+#23:  989ms    18.0ms    33.0ms         6         0         6         0     0.00
+#24: 1055ms    75.0ms    27.0ms         4         1         3         0     0.33
+#25: 1002ms    15.0ms    31.0ms         5         0         5         0     0.00
+ZJIT stats:
+code_region_bytes:     21,630,976
+zjit_alloc_bytes:      16,181,600
+compile_time            4663.81ms
+profile_time              43.97ms
+gc_time                  176.21ms
+invalidation_time          8.62ms
+RSS: 177.7MiB
+MAXRSS: 180.1MiB
+RSS sampled (n=10): median 176.7MiB ± 0.6MiB (MAD), range [174.6, 177.7]MiB
+Average of last 10, non-warmup iters: 1001ms
+Average marking time: 32.0ms
+Average sweeping time: 29.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       88021       59715       28306           43     67.8%   2752.0
+   1         40      365146      205615      159531          223     56.3%  14272.0
+   2         64      118668       60486       58182          116     51.0%   7424.0
+   3         80       26183       14812       11371           32     56.6%   2048.0
+   4         96       11587        4125        7462           17     35.6%   1088.0
+   5        128       15330        8143        7187           30     53.1%   1920.0
+   6        160       25329       18465        6864           62     72.9%   3968.0
+   7        256        6885        1590        5295           27     23.1%   1728.0
+   8        512        3048        2040        1008           24     66.9%   1536.0
+   9        640         203          26         177            2     12.8%    128.0
+  10        768          85           3          82            1      3.5%     64.0
+  11       1024         315          75         240            5     23.8%    320.0
+Running benchmark "lobsters" (1/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/patch/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/lobsters/benchmark.rb
+ruby 4.1.0dev (2026-11-03T20:15:35Z HEAD aa82ba85e1) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4248ms    45.0ms    21.0ms         2         0         2         0     0.00
+ #2: 1209ms    68.0ms    21.0ms         1         1         0         0        -
+ #3:  899ms    12.0ms    20.0ms         1         0         1         0     0.00
+ #4:  712ms     7.0ms    25.0ms         1         0         1         0     0.00
+ #5:  714ms     0.0ms     0.0ms         0         0         0         0        -
+ #6:  685ms     6.0ms    26.0ms         1         0         1         0     0.00
+ #7:  584ms     6.0ms    22.0ms         1         0         1         0     0.00
+ #8:  615ms     6.0ms    21.0ms         1         0         1         0     0.00
+ #9:  627ms     0.0ms     0.0ms         0         0         0         0        -
+#10:  639ms     6.0ms    21.0ms         1         0         1         0     0.00
+#11:  599ms     6.0ms    21.0ms         1         0         1         0     0.00
+#12:  652ms     7.0ms    23.0ms         1         0         1         0     0.00
+#13:  623ms     6.0ms    23.0ms         1         0         1         0     0.00
+#14:  598ms     6.0ms    20.0ms         1         0         1         0     0.00
+#15:  599ms     0.0ms     0.0ms         0         0         0         0        -
+#16:  602ms     7.0ms    21.0ms         1         0         1         0     0.00
+#17:  637ms     7.0ms    23.0ms         1         0         1         0     0.00
+#18:  635ms     7.0ms    22.0ms         1         0         1         0     0.00
+#19:  622ms     6.0ms    23.0ms         1         0         1         0     0.00
+#20:  628ms     7.0ms    23.0ms         1         0         1         0     0.00
+#21:  607ms     0.0ms     0.0ms         0         0         0         0        -
+#22:  636ms     7.0ms    22.0ms         1         0         1         0     0.00
+#23:  638ms     7.0ms    23.0ms         1         0         1         0     0.00
+#24:  630ms     7.0ms    23.0ms         1         0         1         0     0.00
+#25:  608ms     7.0ms    22.0ms         1         0         1         0     0.00
+ZJIT stats:
+code_region_bytes:     26,730,496
+zjit_alloc_bytes:      19,919,268
+compile_time            5700.10ms
+profile_time              62.72ms
+gc_time                   47.72ms
+invalidation_time         11.14ms
+RSS: 325.8MiB
+MAXRSS: 339.1MiB
+RSS sampled (n=10): median 339.1MiB ± 0.0MiB (MAD), range [339.1, 339.2]MiB
+Average of last 10, non-warmup iters: 624ms
+Average marking time: 6.0ms
+Average sweeping time: 20.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32      139196       65042       74154           68     46.7%   4352.0
+   1         40      584556      212308      372248          357     36.3%  22848.0
+   2         64      224037       75300      148737          219     33.6%  14016.0
+   3         80       57272       14934       42338           70     26.1%   4480.0
+   4         96       32046        8230       23816           47     25.7%   3008.0
+   5        128       18396        6357       12039           36     34.6%   2304.0
+   6        160       33508       18797       14711           82     56.1%   5248.0
+   7        256       11985        4542        7443           47     37.9%   3008.0
+   8        512        8509        4021        4488           67     47.3%   4288.0
+   9        640        2331         356        1975           23     15.3%   1472.0
+  10        768         253          30         223            3     11.9%    192.0
+  11       1024         189          32         157            3     16.9%    192.0
+Running benchmark "railsbench" (2/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/patch/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/railsbench/benchmark.rb
+ruby 4.1.0dev (2026-11-03T20:15:35Z HEAD aa82ba85e1) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+Command: ruby bin/rails db:migrate db:seed
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Using 100 posts in the database
+/home/user/rubies/base/lib/ruby/gems/4.1.0+6/gems/railties-8.1.1/lib/rails/test_unit/test_parser.rb:4: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Failed to get max RSS: cannot load such file -- fiddle
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 2264ms    88.0ms    51.0ms        16         2        14         0     0.14
+ #2: 1344ms     3.0ms    53.0ms        15         0        15         0     0.00
+ #3: 1363ms     3.0ms    48.0ms        13         0        13         0     0.00
+ #4: 1371ms     3.0ms    56.0ms        14         0        14         0     0.00
+ #5: 1372ms     2.0ms    57.0ms        13         0        13         0     0.00
+ #6: 1365ms     3.0ms    45.0ms        12         0        12         0     0.00
+ #7: 1364ms     2.0ms    48.0ms        13         0        13         0     0.00
+ #8: 1324ms     2.0ms    39.0ms        12         0        12         0     0.00
+ #9: 1262ms     2.0ms    39.0ms        12         0        12         0     0.00
+#10: 1321ms     2.0ms    46.0ms        12         0        12         0     0.00
+#11: 1336ms     2.0ms    39.0ms        12         0        12         0     0.00
+#12: 1519ms     2.0ms    53.0ms        11         0        11         0     0.00
+#13: 1364ms     2.0ms    58.0ms        12         0        12         0     0.00
+#14: 1373ms     2.0ms    50.0ms        11         0        11         0     0.00
+#15: 1383ms     2.0ms    41.0ms        11         0        11         0     0.00
+#16: 1366ms     2.0ms    40.0ms        11         0        11         0     0.00
+#17: 1361ms     1.0ms    41.0ms        11         0        11         0     0.00
+#18: 1388ms     2.0ms    43.0ms        10         0        10         0     0.00
+#19: 1328ms     2.0ms    41.0ms        11         0        11         0     0.00
+#20: 1364ms     2.0ms    41.0ms        11         0        11         0     0.00
+#21: 1340ms     2.0ms    41.0ms        10         0        10         0     0.00
+#22: 1341ms     1.0ms    41.0ms        11         0        11         0     0.00
+#23: 1326ms     2.0ms    39.0ms        10         0        10         0     0.00
+#24: 1414ms     2.0ms    48.0ms        10         0        10         0     0.00
+#25: 1323ms     1.0ms    40.0ms        10         0        10         0     0.00
+ZJIT stats:
+code_region_bytes:      7,827,456
+zjit_alloc_bytes:       7,425,736
+compile_time            1463.15ms
+profile_time              14.82ms
+gc_time                   20.97ms
+invalidation_time          5.97ms
+RSS: 118.5MiB
+RSS sampled (n=10): median 118.1MiB ± 0.2MiB (MAD), range [117.5, 118.5]MiB
+Average of last 10, non-warmup iters: 1355ms
+Average marking time: 1.0ms
+Average sweeping time: 41.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       59363       42594       16769           29     71.8%   1856.0
+   1         40      194854      135617       59237          119     69.6%   7616.0
+   2         64       63426       36768       26658           62     58.0%   3968.0
+   3         80       13094        5975        7119           16     45.6%   1024.0
+   4         96        7497        1569        5928           11     20.9%    704.0
+   5        128        7154        2887        4267           14     40.4%    896.0
+   6        160       15934       12259        3675           39     76.9%   2496.0
+   7        256        1020         267         753            4     26.2%    256.0
+   8        512        2794        1733        1061           22     62.0%   1408.0
+   9        640         305          35         270            3     11.5%    192.0
+  10        768          85           7          78            1      8.2%     64.0
+  11       1024         567          21         546            9      3.7%    576.0
+Running benchmark "shipit" (3/3)
++ setarch x86_64 -R taskset -c 0 /home/user/rubies/patch/bin/ruby --zjit --zjit-exec-mem-size\=512 --zjit-mem-size\=1024 -r /home/user/w/b1/harness/gc /home/user/w/b1/benchmarks/shipit/benchmark.rb
+ruby 4.1.0dev (2026-11-03T20:15:35Z HEAD aa82ba85e1) +ZJIT +PRISM [x86_64-linux]
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+itr:   time   marking  sweeping  gc_count     major     minor    global  maj/min
+ #1: 4120ms   144.0ms    29.0ms         9         2         7         0     0.29
+ #2: 1317ms    66.0ms    25.0ms         6         1         5         0     0.20
+ #3: 1035ms    11.0ms    27.0ms         6         0         6         0     0.00
+ #4: 1095ms    79.0ms    32.0ms         7         1         6         0     0.17
+ #5: 1033ms    12.0ms    30.0ms         6         0         6         0     0.00
+ #6: 1102ms    68.0ms    36.0ms         7         1         6         0     0.17
+ #7: 1031ms    15.0ms    34.0ms         6         0         6         0     0.00
+ #8: 1067ms    70.0ms    30.0ms         6         1         5         0     0.20
+ #9: 1006ms    14.0ms    30.0ms         6         0         6         0     0.00
+#10: 1055ms    70.0ms    33.0ms         6         1         5         0     0.20
+#11:  999ms    12.0ms    31.0ms         5         0         5         0     0.00
+#12:  993ms    13.0ms    31.0ms         6         0         6         0     0.00
+#13: 1036ms    70.0ms    31.0ms         6         1         5         0     0.20
+#14: 1583ms    10.0ms    28.0ms         5         0         5         0     0.00
+#15: 2176ms    73.0ms    34.0ms         7         1         6         0     0.17
+#16: 2012ms    10.0ms    27.0ms         4         0         4         0     0.00
+#17: 2043ms    14.0ms    36.0ms         6         0         6         0     0.00
+#18: 1931ms    71.0ms    32.0ms         6         1         5         0     0.20
+#19: 1000ms    13.0ms    26.0ms         5         0         5         0     0.00
+#20:  982ms     9.0ms    28.0ms         5         0         5         0     0.00
+#21: 1006ms    63.0ms    28.0ms         5         1         4         0     0.25
+#22: 1008ms    14.0ms    33.0ms         5         0         5         0     0.00
+#23: 1066ms    69.0ms    34.0ms         6         1         5         0     0.20
+#24: 1008ms    11.0ms    29.0ms         4         0         4         0     0.00
+#25: 1026ms    14.0ms    35.0ms         5         0         5         0     0.00
+ZJIT stats:
+code_region_bytes:     21,635,072
+zjit_alloc_bytes:      16,255,252
+compile_time            4482.50ms
+profile_time              38.87ms
+gc_time                  140.67ms
+invalidation_time          8.60ms
+RSS: 176.7MiB
+MAXRSS: 179.7MiB
+RSS sampled (n=10): median 175.9MiB ± 0.4MiB (MAD), range [175.2, 176.7]MiB
+Average of last 10, non-warmup iters: 1308ms
+Average marking time: 28.0ms
+Average sweeping time: 30.0ms
+
+Heap utilisation (after full GC):
+heap  slot_size  eden_slots  live_slots  free_slots  eden_pages  live_pct  mem_KiB
+   0         32       88021       59714       28307           43     67.8%   2752.0
+   1         40      363497      205617      157880          222     56.6%  14208.0
+   2         64      121737       60480       61257          119     49.7%   7616.0
+   3         80       27820       14812       13008           34     53.2%   2176.0
+   4         96       11590        4130        7460           17     35.6%   1088.0
+   5        128       15330        8148        7182           30     53.2%   1920.0
+   6        160       25331       18467        6864           62     72.9%   3968.0
+   7        256        6885        1588        5297           27     23.1%   1728.0
+   8        512        3048        2040        1008           24     66.9%   1536.0
+   9        640         203          27         176            2     13.3%    128.0
+  10        768          85           3          82            1      3.5%     64.0
+  11       1024         252          75         177            4     29.8%    256.0
+Total time spent benchmarking: 302s
+
+base: ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+base2: ruby 4.1.0dev (2026-11-03T19:18:29Z HEAD 9b30fd207f) +ZJIT +PRISM [x86_64-linux]
+patch: ruby 4.1.0dev (2026-11-03T20:15:35Z HEAD aa82ba85e1) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 00f0f8beab27edb11c0253cc630f91f17d1f1891-dirty
+
+----------  -------------  -------------  --------------  -------------  -------------  ----------  -------  --------  -----------  -------  ---------
+bench           base (ms)     base2 (ms)      patch (ms)  base2 1st itr  patch 1st itr  base/base2  p-value       sig   base/patch  p-value        sig
+lobsters     618.4 ± 4.1%   640.8 ± 3.6%    624.7 ± 2.1%          0.944          0.958       0.965    0.065                  0.990    0.514
+railsbench  1436.8 ± 2.7%  1445.1 ± 3.5%   1355.6 ± 2.1%          0.931          1.037       0.994    0.701            1.060 (***)  9.8e-05  p < 0.001
+shipit      1044.7 ± 3.7%  1001.6 ± 3.3%  1308.7 ± 34.5%          1.010          1.080   1.043 (*)    0.022  p < 0.05        0.798    0.114
+----------  -------------  -------------  --------------  -------------  -------------  ----------  -------  --------  -----------  -------  ---------
+
+GC time ratios:
+----------  ----------  -----------  -----  -----------  -----------  -------  --------  -----------  ----------
+bench       comparison      gc/iter  gc/GC    mark/iter   sweep/iter  mark/GC  sweep/GC   mark/minor  mark/major
+lobsters         base2        0.945  0.945        0.972        0.944    0.972     0.944        0.953         N/A
+lobsters         patch        1.022  1.022        1.113        0.995    1.113     0.995        1.110         N/A
+railsbench       base2        1.093  1.106        1.059        1.100    1.071     1.112    1.047 (*)         N/A
+railsbench       patch  1.510 (***)  1.844  2.118 (***)  1.489 (***)    2.585     1.818  2.489 (***)         N/A
+shipit           base2        1.045  1.138        1.012        1.081    1.102     1.177  1.131 (***)       0.996
+shipit           patch        1.094  1.239        1.149        1.036    1.303     1.174        0.956       0.796
+----------  ----------  -----------  -----  -----------  -----------  -------  --------  -----------  ----------
+
+GC counts:
+----------  ----------  -------------  -------------  -------------  -------------
+bench       comparison       GCs/iter     major/iter     minor/iter     minor GC %
+lobsters         base2   0.9  →   0.9   0.0  →   0.0   0.9  →   0.9  100%  →  100%
+lobsters         patch   0.9  →   0.9   0.0  →   0.0   0.9  →   0.9  100%  →  100%
+railsbench       base2   8.6  →   8.7   0.0  →   0.0   8.6  →   8.7  100%  →  100%
+railsbench       patch   8.6  →  10.5   0.0  →   0.0   8.6  →  10.5  100%  →  100%
+shipit           base2   4.5  →   4.9   0.3  →   0.3   4.2  →   4.6   93%  →   94%
+shipit           patch   4.5  →   5.1   0.3  →   0.3   4.2  →   4.8   93%  →   94%
+----------  ----------  -------------  -------------  -------------  -------------
+Hidden columns (zero or N/A in every row): global/iter
+
+Legend:
+- base2 1st itr: ratio of base/base2 time for the first iteration.
+- base/base2: ratio of base/base2 time. Higher is better for base2. Above 1 represents a speedup.
+- patch 1st itr: ratio of base/patch time for the first iteration.
+- base/patch: ratio of base/patch time. Higher is better for patch. Above 1 represents a speedup.
+- GC time ratios are base/comparison; above 1 means the comparison spent less GC time.
+- gc/iter, mark/iter, and sweep/iter compare total GC (or phase) time per benchmark iteration, so they include both per-GC cost and GC frequency changes.
+- gc/GC, mark/GC, and sweep/GC divide average GC (or phase) time by the same run's GCs/iter count; they are not complete per-cycle attribution of process-wide GC.
+- mark/minor and mark/major compare the average marking time of one minor or one major collection, from GC::Profiler records, so they don't depend on how many collections of each kind ran.
+- GC counts show base → comparison values, not ratios. Rows with no GC activity are omitted.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+
+Output:
+/home/user/w/b1/data/output_003.json
