@@ -267,11 +267,13 @@ A human reviewer has to get the essence in a few seconds.
 
 byroot, on the comment above our `Array#index_with`: "This isn't something that should be surfaced in Rails docs.
 it's an implementation detail. If anything that specialized version could be `:nodoc:`. I don't mind AI PRs, but
-please read them and curb their tendency to spew tons of comments." Fixed by a one-line follow-up PR.
+please read them and curb their tendency to spew tons of comments." Fixed in #59659 by deleting the comment.
+(`class Array` is already `# :nodoc:` in that file, so the comment never reached the API docs. The volume was the
+real problem.)
 
 * **No comment directly above a public or documented method** unless it is meant as API docs. RDoc publishes it.
-  Internal specializations and helpers get `# :nodoc:` on the `def` line instead, as Rails does for
-  `Array#compact_blank`.
+  Internal specializations and helpers get `# :nodoc:` on the `def` line instead (as Rails does for
+  `Hash#compact_blank`), unless the enclosing class or module is already `# :nodoc:`.
 * **Comments are the exception.** Add one only when a reader would otherwise undo the code. Then it is one line,
   and it says why, not what. Explanations of cost, Ruby internals or the regression belong in the PR body or the
   Lowrail record.
