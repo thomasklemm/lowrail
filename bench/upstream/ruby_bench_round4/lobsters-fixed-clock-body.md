@@ -7,7 +7,7 @@ Across the four tested dates, allocations per iteration varied by 0.01%, against
 | | 2026-11-05 | 2026-12-25 | 2027-03-20 | 2027-06-28 | spread |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | main | 657,758 | 657,025 | 657,811 | 648,912 | 1.37% |
-| this PR | 648,831 | 648,883 | 648,864 | 648,871 | 0.01% |
+| this PR | 648,889 | 648,916 | 648,913 | 648,872 | 0.01% |
 
 Response bodies are byte-identical between runs on 2026-11-05 and 2027-01-20, apart from CSRF tokens. The harness keeps the real clock. `Date.today`, `DateTime.now`, `Time.new` without arguments and SQLite's `'now'` stay live. Cache entries and the session no longer age. `TRACK_AR_TIME` uses the monotonic clock.
 

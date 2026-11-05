@@ -1,6 +1,6 @@
 Alternative to #571: also fixes the clock, but near the fixture's dates, so the 16 time-filtered requests render stories. Merge one of the two.
 
-The fixture's stories are from 2023-07-18, so on main /active, /recent and /top?length=1d|1w|1y (16 of 114 requests per iteration) render empty lists. This fixes `Time.now` at 2023-07-19 01:00 UTC, about 15 hours after the stories, during boot and in the benchmark block. Across the four tested dates (2026-11-05, 2026-12-25, 2027-03-20, 2027-06-28), allocations per iteration varied by 0.005%, against 1.37% on main.
+The fixture's stories are from 2023-07-18, so on main /active, /recent and /top?length=1d|1w|1y (16 of 114 requests per iteration) render empty lists. This fixes `Time.now` at 2023-07-19 01:00 UTC, about 15 hours after the stories, during boot and in the benchmark block. Across the four tested dates (2026-11-05, 2026-12-25, 2027-03-20, 2027-06-28), allocations per iteration varied by 0.003%, against 1.37% on main.
 
 /top never listed a story on main: `DATETIME('now', '- 1 DAY')` is NULL, because SQLite rejects `- 1` and has no WEEK. The modifier is now `-1 DAY`, with weeks as 7 days, as in upstream lobsters. The deliberate departure from upstream is that the query binds `Time.current` instead of SQLite's `'now'`, so /top follows the fixed clock.
 
