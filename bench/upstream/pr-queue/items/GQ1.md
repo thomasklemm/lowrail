@@ -45,4 +45,4 @@ Ruby 4.0.9 without JIT, fixed heap, two processes per revision (they differ by a
 
 ---
 
-<sub>Found while profiling graphql-ruby for ruby/ruby-bench, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/LOWRAIL_SHA/docs/upstream/graphql-ruby.md#gq1-warden-name-caches-compare-by-value-held), my research project.</sub>
+<sub>Found while profiling graphql-ruby for ruby/ruby-bench, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/8e699a82a8888c0ab0480402fca100a70438d4b6/docs/upstream/graphql-ruby.md#gq1-warden-name-caches-compare-by-value-held), my research project.</sub>
