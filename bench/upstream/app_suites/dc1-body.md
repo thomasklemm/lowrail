@@ -18,4 +18,4 @@ Both modules include `UrlHelper`, where the two private methods lived on 8.1, so
 
 ---
 
-<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md), part of my research project Lowrail).</sub>
+<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/c96c47539d8b49f7455fe03f66a498aa123d6e30/docs/upstream/app-suites.md), part of my research project Lowrail).</sub>
