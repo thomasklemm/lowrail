@@ -50,8 +50,10 @@ to it instead of repeating it. Status as of 2026-11-05.
   maintainers' design call).
 * ruby/ruby-bench PRs may open side by side (Thomas, 2026-11-05), unlike other gems' two-PR cap. #568 opened
   before #567 merged and says so in its first sentence; it is rebased once #567 lands.
-* Fork CI on [thomasklemm/ruby-bench](https://github.com/thomasklemm/ruby-bench) proves a change before it opens:
-  fork-internal PRs against `ci-base/*` copies, closed without comments.
+* No fork CI for ruby-bench any more (Thomas, 2026-11-05): ruby/ruby-bench runs our PRs' workflows without approval
+  since our first merges, so a PR opens upstream as a **draft** once local measurements and the first review are done,
+  and is marked ready after the last review pass and green CI there. Earlier fork-internal PRs against `ci-base/*`
+  were closed without comments.
 * No comments on others' PRs without Thomas's OK; nobu's #461 overlaps our lockfiles and is not mentioned in our
   bodies.
 
