@@ -22,8 +22,8 @@ overridden `primary_key` (#59622).
 | Writebook `d57c62b` | `rails test`, 313 runs, plus 3 system tests; SQLite | its lock (main `3a49610`): 4 F ×2 (libvips, environment) | same 4 F ×2; system clean | no main-only failure; WB1 (c, deprecation) |
 | Forem `5f0276d` | rspec, 16542 examples, PostgreSQL 15 + Redis | 5 F, 5 F (1 flake each) | boot needs 4 bumps and 3 app shims; then 1690 main-only F | F1 (a), FO1–FO3 (c/d), deprecations (b) |
 | Chatwoot `a8364f9` (CE) | rspec, 7632 examples, PostgreSQL 16 + pgvector, Redis | 63 F (port fallout, also on main); failing files twice more: same | 1 gem shim (boot); 148 main-only F, 145 stable | CW1 (a), CW2 (d, restored), CW3–CW5 (b), SU4, SU5, L1 |
-| Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, held), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
-| Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, lead), PI3 (a, perf, built) |
+| Discourse `f81fcb4` | core rspec without system specs, 35771 examples, PostgreSQL 15 + pgvector, Redis | 53 F (environment); failing files twice more: 52 F, 51 F | seeding fails (DS1), so every example fails; with 2 app shims 191 F, 140 main-only and stable | DS1 (a, fix built, PR blocked on CLA), DS2 (a, open #59595), DS3 (b+d), DS4 (d), #59574's Arel case, AR-4, S1, (b)/(c) |
+| Private Rails app with Inertia Rails (anonymized) | `rails test`, PostgreSQL 18.6, 8 workers | clean, clean | all main-only failures from one call (PI1); otherwise clean | PI1 (c, our #59574), PI2 (a, docs note queued), PI3 (a, perf, built) |
 | Spree `b16f633` | rspec: core 11236, api 6320, emails, dashboard, mcp, opentelemetry and 4 providers 1030 examples; PostgreSQL 16 | clean ×2 (every suite) | 2 boot shims (our #59627, #59574); then 53 F ×2, all main-only (core 49, api 4) | SP1 (b, docs note built), SP2 (b), SP3 (c, mobility#692) |
 
 ## Findings
@@ -588,6 +588,33 @@ behavior is wrong, so restoring it isn't a fix; the fix is Discourse's `as: :cha
 association in the error (`CompositePrimaryKeyMismatchError` is checked only for composite primary keys); the
 coordinator decides whether that is worth a PR.
 
+*DS1 outcome (2026-11-05): fix built for Discourse, PR not opened because it needs Thomas's CLA.* Still on
+discourse/discourse main [`de34d8ac4f`](https://github.com/discourse/discourse/blob/de34d8ac4f9d31eea2d4c3e2de397f60e239ee88/plugins/chat/lib/chat/category_extension.rb#L14-L18);
+no open PR (the repository has issues disabled; bug reports go to meta, code to PRs). The only caller is the category
+serializer's `has_chat_channels` ([plugin.rb#L419–L423](https://github.com/discourse/discourse/blob/de34d8ac4f9d31eea2d4c3e2de397f60e239ee88/plugins/chat/plugin.rb#L419-L423)),
+added with the association in e768f0c3cd ("Chat channel list in category UI"); nothing in the frontend reads it any
+more (the chat tab's condition is `chat_enabled && category.id`), and other `category_channels` hits in the repo are
+unrelated names. A category can have several channels (unique by name), so the fix is `as: :chatable`, matching
+`has_one :category_channel`. Real results change nothing for callers on 8.1 except the value: the same two
+`chat_channels` queries per serialized category, now `chatable_id = ? AND chatable_type = 'Category'` (indexed).
+`dependent: :destroy` is dropped from the `has_many`: destroying a category with two channels, one with a message,
+leaves one channel before and after the fix, but none if it were kept, so keeping it would newly hard-delete
+channels with messages. (Pre-existing, not in this fix: `deletable_for_chat?` checks only the `has_one`'s channel, and
+the other channels stay orphaned after a category delete.) Spec: `category_serializer#has_chat_channels` in
+`plugins/chat/spec/plugin_spec.rb`, true for a category with a channel, false when only another category has one;
+it fails without the fix on 8.1 (`expected true, got false`) and on main (`Key mappings …`). Results, chat plugin
+specs without system specs (227 files, 3,220 examples, `--seed 4242`, LOAD_PLUGINS=1): fix 0 F on Rails 8.1.4.1 and
+on main `bdb3d96012`; without the fix 1 F on 8.1 (the new spec) and 2,718 F on main. Core `*categor*_spec.rb` (48
+files, 759 examples) with LOAD_PLUGINS=1: the same 25 failures with and without the fix on both Rails versions (they
+fail only because plugins are loaded into core specs); main without the fix 696 F. With the fix, `db:migrate` on main
+seeds a fresh database. stree and RuboCop clean. Skeptical reviewer: open with nits (applied: context name, who sees
+the change, what the delete keeps); Sol not available on this orb. Commit
+`e7ee7a18fb` on branch `thomasklemm/category-channels-association` (local only, not pushed; no fork created) on
+main `de34d8ac4f`: [patch](../../bench/upstream/app_suites/ds1-category-channels-association.patch),
+[body](../../bench/upstream/app_suites/ds1-body.md). Discourse's CONTRIBUTING requires the Discourse CLA
+(cla-assistant checks every PR); thomasklemm has no earlier Discourse PR, so it is almost certainly unsigned. Next
+step: Thomas signs at discourse.org/cla, then the branch is pushed to a fork and the PR opened with the body as is.
+
 **DS2 (a): an attribute named `method` breaks every association read on its record.** `UserSecondFactor` has a
 [`method` column](https://github.com/discourse/discourse/blob/f81fcb4b4425f4c3b8c94248771e8289daf6c376/app/models/user_second_factor.rb#L56), and main's
 [`sc.execute(owner.method(:read_attr), c, async: async)`](https://github.com/rails/rails/blob/7a78da5a5576d7ab7549b10fb13156788478ba35/activerecord/lib/active_record/associations/association.rb#L286)
@@ -702,7 +729,7 @@ positional name and gets `ArgumentError (given 1, expected 0)` (b1650993b0, #578
 [arel-table-positional](arel-table-positional.md)). With #59574's branch in the main tree and no app shim, the failing
 files pass, and each call prints the new deprecation. Nothing new to build.
 
-**PI2 (a), lead, not built: `disable_referential_integrity` on PostgreSQL 18.4+ holds about 16 times as many locks.**
+**PI2 (a), docs note queued: `disable_referential_integrity` on PostgreSQL 18.4+ holds about 16 times as many locks.**
 7051ca8a45 (#57378, CHANGELOG) toggles every foreign key with `ALTER TABLE … ALTER CONSTRAINT … NOT ENFORCED` and back,
 in one transaction. Each toggle locks the table, the referenced table, their indexes and the constraint until commit;
 8-1 used `DISABLE TRIGGER ALL`. `truncate_tables` (at each parallel worker's start) and `insert_fixtures_set` both go
@@ -720,6 +747,37 @@ instead of superuser), and the locks are what `ALTER CONSTRAINT` takes. Options 
 or CHANGELOG note (raise `max_locks_per_transaction` for parallel tests), or asking upstream whether `truncate_tables`
 needs the toggle at all, since PostgreSQL truncates all tables in one statement. App-side workaround: raise
 `max_locks_per_transaction`.
+
+*PI2 outcome (2026-11-05): an upgrade-guide note, queued first in the rails/rails queue as a correctness item.*
+Code fixes considered first, in order, on main `bdb3d96012`, PostgreSQL 18.6, 151 tables, 300 foreign keys:
+1. `truncate_tables` doesn't need the toggle on 18.4+: PostgreSQL's TRUNCATE checks foreign keys from `pg_constraint`
+   without looking at enforcement (`heap_truncate_find_FKs`, REL_18_STABLE), and truncating only the referenced table
+   raises the same `cannot truncate a table referenced in a foreign key constraint` with and without the toggle. It
+   would cut `truncate_tables` from 3,760 locks to 1,356 (8-1: 1,514). But it doesn't fix PI2: one
+   `insert_fixtures_set` for every table holds 3,310 locks on main (8-1: 927), and in
+   [fk_fixture_locks.rb](../../bench/upstream/app_suites/fk_fixture_locks.rb) (8 processes, each empties its own
+   database and loads five rows per table, 3 rounds) main fails 20, 23 and 24 of 24 times, 8-1 never, and main with
+   the truncate change still 20 of 24 (the reviewer, removing truncation entirely: 13 of 24). Not built; recorded as
+   a possible small exact cleanup.
+2. Toggling only the constraints of the fixture tables: they must include every foreign key that references a table
+   the fixtures delete from, which with the default `fixtures :all` is nearly all of them; no gain for the common
+   case, more code. Not built.
+3. Built: a section in "Upgrading from Rails 8.1 to Rails 8.2" (lock use, the error and HINT, raise
+   `max_locks_per_transaction`, restart). With `max_locks_per_transaction` 128, 256 or 512, the repro passes 24/24
+   and 48/48 with 8 and 16 workers. Where the locks come from, per `pg_locks`: 1,200 trigger-object locks (drop and
+   recreate), 300 constraint locks, 3 per table and 1 per index. Side note: `check_all_foreign_keys_valid!` after
+   fixture loading toggles every foreign key again in its own transaction (2,571 locks), which doesn't raise the
+   peak. Also stale but not touched: the testing guide's TIP that only superusers can disable triggers.
+No open rails/rails PR touches this code except #56764 (the < 18.4 trigger path; no overlap); #57378 has no review
+discussion; the toggle's reasons are no superuser and revalidation on restore (#57377). Skeptical reviewer: open with
+nits (applied: lock-table wording, "in a typical schema", intermittent, body leads with the change, links the
+repro, says why no code change); Sol not available on this orb (/tmp/sol missing). Readability: docs only, mdl
+clean; described out loud as "on 18.4+ fixture loading switches every foreign key off and on, which holds many
+locks; parallel workers can run out; raise the setting". Branch
+[`thomasklemm/upgrade-guide-postgresql-fk-locks`](https://github.com/thomasklemm/rails/tree/thomasklemm/upgrade-guide-postgresql-fk-locks)
+@ `7e1817e6f2` on main `bdb3d96012`, merges cleanly with S1 and S2:
+[patch](../../bench/upstream/app_suites/pi2-upgrade-guide-postgresql-fk-locks.patch),
+[body](../../bench/upstream/app_suites/pi2-body.md).
 
 **PI3 (a, performance), built: `Object#try` allocates an empty keyword Hash per call.** 2709a9f16d (kamipo, "Remove
 `ruby2_keywords` usage", no CHANGELOG) turned `try(*args, &block)` with `ruby2_keywords` into
