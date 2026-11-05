@@ -775,6 +775,7 @@ Both from the [graphql-ruby parser cost round](graphql-ruby.md), opened 2026-11-
 - [#569](https://github.com/ruby/ruby-bench/pull/569) (**draft**, owner G2), harness-gc records the marking time of each minor and major GC. Opened 2026-11-05 19:46 UTC, head `081b17e3ae`.
 - [#570](https://github.com/ruby/ruby-bench/pull/570) (**draft**, owner G2), the GC harness prints its averages without truncating them. Opened 2026-11-05 19:46 UTC, head `2c2c695e69`. Once #569 and #570 are ready, the #539 heads-up gets posted (fork runs: fix 42081299470 green, control 42079221738 fails on `gc_balloon`).
 - [#571](https://github.com/ruby/ruby-bench/pull/571) (**draft**, owner V3), lobsters runs with a fixed clock. Opened 2026-11-05 19:53 UTC, head `1e5933cc08`. V3's "near-fixture clock" PR will follow as the alternative, so the maintainers can choose.
+- [#572](https://github.com/ruby/ruby-bench/pull/572) (**draft**, owner V3), lobsters runs with a fixed clock next to its fixture: the near-fixture alternative to #571, so the maintainers can choose. Opened 2026-11-05 19:55 UTC, head `1486f3ee86`.
 
 ### Rails — rails/rails
 
