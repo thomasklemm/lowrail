@@ -14,7 +14,7 @@ rank: 15
 risky: true
 state: draft
 pr: 172
-note: Prepared only; coordinator runs Sol and Astra; no upstream submission authorized in this worker
+note: "stays a draft (Thomas, 2026-11-05): the fix belongs at the source, Rails main freezing parameter_parsers; F1 investigates. Evidence in docs/upstream/gem-side-candidates.md"
 passes:
   - {reviewer: skeptic, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: approve, open: "L0; registry replacement boundary disclosed; no required changes"}
   - {reviewer: sol, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: changes, open: "P2; preserve earlier references to mutable parameter_parsers"}
