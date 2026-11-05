@@ -14,9 +14,9 @@ alternative_of:
 impact: on Ruby master an intent in the measured query shapes fits a 256-byte slot instead of 512, 256 B less per query; on Ruby 4.0 the same shapes stay at 320 B
 rank: 11
 risky: true
-state: in-review
+state: reviewed
 pr:
-note: "round 2 under the contract (public API and Rails' callers identical, claims scoped): code accepted; body disclosures applied; waits for Sol/Astra confirm on the body"
+note: "reviewed: skeptic, Sol and Astra approve on 68c907bbeb under the contract (public API and Rails' callers identical, claims scoped)"
 passes:
   - {reviewer: skeptic, head: "9fabafcf8b", date: 2026-11-05, verdict: approve, open: ""}
   - {reviewer: sol, head: "9fabafcf8b", date: 2026-11-05, verdict: changes, open: "lock_wait in the struct changed dup/freeze; applied in 8e7de36dbc"}
@@ -28,6 +28,8 @@ passes:
   - {reviewer: skeptic, head: "68c907bbeb", date: 2026-11-05, verdict: approve, open: "test stable over 20 runs incl. under load; no Rails caller of session/session= or nil session"}
   - {reviewer: sol, head: "68c907bbeb", date: 2026-11-05, verdict: changes, open: "body only: disclose nil-session pending?/canceled?/ensure_result and execute_or_wait NullLock changes as unreachable; scope Ruby 4.0 claims; applied (body). Optional: split test, assert ran_async (skipped, keeps head)"}
   - {reviewer: astra, head: "68c907bbeb", date: 2026-11-05, verdict: changes, open: "body only, same as Sol; applied (body)"}
+  - {reviewer: sol, head: "68c907bbeb", date: 2026-11-05, verdict: approve, open: "body confirm pass: disclosures accurate, Ruby 4.0 claims scoped"}
+  - {reviewer: astra, head: "68c907bbeb", date: 2026-11-05, verdict: approve, open: "body confirm pass"}
 ---
 
 # Keep QueryIntent's background session and mutex together
