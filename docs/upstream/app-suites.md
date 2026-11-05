@@ -1327,8 +1327,19 @@ shows in the same files; the first version's 43 on seed 1717 included the 22-fai
 patch, Zammad's deprecation toolkit fails 448 examples on the new warning, which is the intended signal. [patch](../../bench/upstream/app_suites/zm1-bind-attribute-column-name.patch),
 [body](../../bench/upstream/app_suites/zm1-body.md). Branch
 [`thomasklemm/bind-attribute-column-name`](https://github.com/thomasklemm/rails/tree/thomasklemm/bind-attribute-column-name)
-@ `53a0183864` on main `bdb3d96012` (earlier `a2a89ee17b`, then `72d0b21869`; force-pushed with lease). App-side fix
-for Zammad: pass `table[:login]`.
+@ `ebbb6c49be` on main `bdb3d96012` (earlier `a2a89ee17b`, `72d0b21869`, then `53a0183864`; force-pushed with lease).
+App-side fix for Zammad: pass `table[:login]`.
+
+Astra review (2026-11-05). The Ractor point is moot: after `ractorize!`, `ActiveRecord.deprecator` is shareable
+(it is in `Rails.application.deprecators`, made shareable with the app), and a probe calling
+`ActiveRecord.deprecator.warn` in `on_ractor` with `deprecation = :raise` got the `DeprecationException`, as main's own
+test does for `ActiveJob.deprecator`. Applied: the body's cost wording ("about 300 Callgrind instructions per
+`PredicateBuilder#build` call (+1.2%, Ruby 4.0.9 interpreter)", committed with the OP1 update), the comparison-type
+test asserts `name` and `value_for_database`, the comment says "one extra `is_a?`". Skeptical reviewer: no blocker;
+applied that on 8.1 an Arel attribute gets the default type (`type_for_attribute` → `resolve_attribute_name` →
+`to_s`), so the message and CHANGELOG now say 8.1 needs the column name, and a test for a table without a model (a
+`table.model.type_for_attribute` mutant passed every other test). Predicate builder tests 64 runs, Active Record on
+SQLite 10,293 runs, 0 failures; RuboCop clean.
 
 **ZM2 (c): rspec-rails 8.0.4's channel example group can't find the connection class.** `graphql_channel_spec`'s
 `stub_connection` raises `Described class is not a connection class` (4): rspec-rails 8.0.4 reads
