@@ -1,12 +1,11 @@
-From 79b9bc05205c2143f4f0e8191586d40809c86382 Mon Sep 17 00:00:00 2001
+From 8b817f9f3642b0d4655d4abbd705d0eb539c1aa1 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Thu, 5 Nov 2026 15:33:23 +0000
-Subject: [PATCH] Keep defaults that records would share or save off the frozen
- defaults
+Date: Thu, 5 Nov 2026 15:57:54 +0000
+Subject: [PATCH] Keep models with mutable defaults off the frozen defaults
 
 Since a model's default attributes are frozen when every one is
 freezable, freezing casts each default once and every new record dups
-that cast value. Two kinds of default break:
+that cast value. Defaults whose type is mutable break:
 
 * a serialized default whose coder does not round-trip the column
   default reads as changed in a record that never touched it, so it is
@@ -15,38 +14,40 @@ that cast value. Two kinds of default break:
 * a default with nested objects is shared, so a change made through one
   new record shows up in the next.
 
-Attribute#freezable? now returns false when a copy's cast value is not
-shareable or already reads as changed, or when casting it raises. Such a
-model keeps the writable defaults it had before, and each record casts
-its own value.
+An attribute whose type, or the type a decorator such as normalizes
+wraps, includes Type::Helpers::Mutable (serialized, JSON, PostgreSQL
+arrays, hstore, points, encrypted) is no longer freezable. Its model
+keeps the writable defaults it had before, so no default is cast at
+schema load and each record casts its own value. Custom types that
+return containers without including the helper still freeze, as on
+main.
 ---
- activemodel/lib/active_model/attribute.rb     |  9 ++++-
- activemodel/test/cases/attribute_test.rb      | 19 ++++++++++
- .../test/cases/serialized_attribute_test.rb   | 35 +++++++++++++++++++
- 3 files changed, 62 insertions(+), 1 deletion(-)
+ activemodel/lib/active_model/attribute.rb     |  8 +++-
+ activemodel/test/cases/attribute_test.rb      | 19 +++++++++
+ .../test/cases/serialized_attribute_test.rb   | 41 +++++++++++++++++++
+ 3 files changed, 67 insertions(+), 1 deletion(-)
 
 diff --git a/activemodel/lib/active_model/attribute.rb b/activemodel/lib/active_model/attribute.rb
-index e358a34021..6d81aebc75 100644
+index e358a34021..dcad5d10e7 100644
 --- a/activemodel/lib/active_model/attribute.rb
 +++ b/activemodel/lib/active_model/attribute.rb
-@@ -40,7 +40,14 @@ def initialize(name, value_before_type_cast, type, original_attribute = nil, val
+@@ -40,7 +40,13 @@ def initialize(name, value_before_type_cast, type, original_attribute = nil, val
      end
  
      def freezable?
 -      true
-+      # Each record copies the value cast when freezing, so it would share any
-+      # mutable object inside it, and save a value that already reads as changed.
-+      # Checked on a read copy, so an attribute that can't be frozen stays unread.
-+      copy = dup
-+      value = copy.value
-+      ActiveSupport::Ractors.shareable?(value.dup.freeze) && !copy.changed_in_place?
-+    rescue StandardError
-+      false # A value that can't be cast or serialized raises when read, as before.
++      # A mutable type's cast value can hold objects that records would share
++      # through a shallow dup, and may not round-trip its raw default, so such
++      # defaults are left uncast and cast per record. Decorators such as
++      # normalizes delegate to the type they wrap.
++      cast_type = type
++      cast_type = cast_type.__getobj__ while cast_type.is_a?(::Delegator) && !cast_type.is_a?(Type::Helpers::Mutable)
++      !cast_type.is_a?(Type::Helpers::Mutable)
      end
  
      def freeze
 diff --git a/activemodel/test/cases/attribute_test.rb b/activemodel/test/cases/attribute_test.rb
-index ff7e6aa291..1beefb57d4 100644
+index ff7e6aa291..7227501be5 100644
 --- a/activemodel/test/cases/attribute_test.rb
 +++ b/activemodel/test/cases/attribute_test.rb
 @@ -339,6 +339,25 @@ def initialize_dup(*)
@@ -61,29 +62,29 @@ index ff7e6aa291..1beefb57d4 100644
 +      assert_not_predicate copy.value, :frozen?
 +    end
 +
-+    test "an attribute is freezable unless its copies would share or save its value" do
-+      nested = Class.new(Type::Value) { def cast_value(value) = { "a" => +value } }
-+      changed = Class.new(Type::Value) { def changed_in_place?(*) = true }
-+      failing = Class.new(Type::Value) { def cast_value(*) = raise(TypeError) }
-+
++    test "an attribute is freezable" do
 +      assert_predicate Attribute.from_database(:foo, "b", Type::Value.new), :freezable?
-+      assert_not_predicate Attribute.from_database(:foo, "b", nested.new), :freezable?
-+      assert_not_predicate Attribute.from_database(:foo, "b", changed.new), :freezable?
-+      assert_not_predicate Attribute.from_database(:foo, "b", failing.new), :freezable?
++    end
++
++    test "an attribute with a mutable type is not freezable" do
++      type = Class.new(Type::Value) { include Type::Helpers::Mutable }
++
++      assert_not_predicate Attribute.from_database(:foo, "b", type.new), :freezable?
++      assert_not_predicate Attribute.from_database(:foo, "b", DelegateClass(Type::Value).new(type.new)), :freezable?
 +    end
 +
      test "with_type preserves mutations" do
        attribute = Attribute.from_database(:foo, +"", Type::Value.new)
        attribute.value << "1"
 diff --git a/activerecord/test/cases/serialized_attribute_test.rb b/activerecord/test/cases/serialized_attribute_test.rb
-index c386d0ab46..fe3dedb42a 100644
+index c386d0ab46..54a5451a80 100644
 --- a/activerecord/test/cases/serialized_attribute_test.rb
 +++ b/activerecord/test/cases/serialized_attribute_test.rb
-@@ -75,6 +75,41 @@ def test_serialized_attribute_with_default
+@@ -75,6 +75,47 @@ def test_serialized_attribute_with_default
      assert_equal({ key: "value" }, t.content)
    end
  
-+  def test_serialized_column_default_is_unchanged_on_a_new_record
++  def test_serialized_column_default_is_unchanged_on_a_new_record_until_read
 +    coder = Class.new do
 +      def self.load(value) = value.blank? ? [] : JSON.parse(value)
 +      def self.dump(value) = JSON.dump(value)
@@ -99,23 +100,29 @@ index c386d0ab46..fe3dedb42a 100644
 +    assert_equal "", user.reload.preferences_before_type_cast
 +
 +    user = klass.new
-+    user.preferences << "dark"
++    assert_equal [], user.preferences
++    assert_predicate user, :changed?
 +    user.save!(validate: false)
-+    assert_equal ["dark"], user.reload.preferences
++    assert_nil user.reload.preferences_before_type_cast
 +  end
 +
 +  def test_new_records_do_not_share_a_serialized_column_default
-+    coder = Class.new do
-+      def self.load(value) = value.blank? ? { "theme" => { "mode" => "light" } } : JSON.parse(value)
-+      def self.dump(value) = JSON.dump(value)
++    ActiveRecord::Base.lease_connection.create_table(:serialized_defaults, force: true) do |t|
++      t.string :settings, default: '{"theme":{"mode":"light"}}'
 +    end
-+    klass = Class.new(ActiveRecord::Base) do
-+      self.table_name = "admin_users"
-+      serialize :preferences, coder: coder
++    plain = Class.new(ActiveRecord::Base) do
++      self.table_name = "serialized_defaults"
++      serialize :settings, coder: JSON
 +    end
++    normalized = Class.new(plain) { normalizes :settings, with: ->(settings) { settings } }
 +
-+    klass.new.preferences["theme"]["mode"] = "dark"
-+    assert_equal "light", klass.new.preferences["theme"]["mode"]
++    [plain, normalized].each do |klass|
++      klass.new.settings["theme"]["mode"] = "dark"
++      assert_equal "light", klass.new.settings["theme"]["mode"]
++      assert_not_predicate klass.new, :changed?
++    end
++  ensure
++    ActiveRecord::Base.lease_connection.drop_table(:serialized_defaults, if_exists: true)
 +  end
 +
    def test_serialized_attribute_on_custom_attribute_with_default
