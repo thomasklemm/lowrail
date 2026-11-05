@@ -683,7 +683,7 @@ benchmarks don't run in that job anyway), a separate paragraph saying Linux resu
 not #5877's renames.
 
 **PR state.** [ruby/ruby-bench#568](https://github.com/ruby/ruby-bench/pull/568), head `41c21df1ac`, two commits on
-#567's. The #567 rebase plan is unchanged. With this, ruby-bench's Windows job excludes nothing.
+#567's. k0kubun merged #567 (`20cd3483c7`, 18:48 UTC) and then #568 (`0897d76aa2`, 18:49 UTC) on 2026-11-05, so no rebase was needed. With this, ruby-bench's Windows job excludes nothing.
 
 **Body (as edited; [file](../../bench/upstream/ruby_bench_round3/windows-body.md)):**
 
