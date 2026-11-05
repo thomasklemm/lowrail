@@ -16,10 +16,11 @@ rank: 5
 risky: false
 state: draft
 pr: 59668
-note: opened as draft 2026-11-05; must land before E2
+note: "opened as draft 2026-11-05; must land before E2; skeptic must-fix on 472c680d15 (same-named temp index), awaiting the coordinator before any change"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
+  - {reviewer: skeptic, head: "472c680d15", date: 2026-11-05, verdict: changes, open: "must-fix: sqlite_temp_master first makes index_details read a same-named temp index CREATE, so the permanent index loses where: (main keeps it); fix: keep sqlite_master first. Follow-up: pragma_index_info still resolves temp first (columns doubled, from 2cb3daba96). Nit: check constraints etc. also come from the temp CREATE, not only collation"}
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers

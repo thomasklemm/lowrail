@@ -23,6 +23,8 @@ passes:
   - {reviewer: skeptic, head: unrecorded, date: 2026-11-05, verdict: nits, open: "second round, applied"}
   - {reviewer: astra, head: "ebbb6c49be", date: 2026-11-05, verdict: nits, open: "round 2: approve, no must-fix; three test/body nits applied in 0db82ad5cc"}
   - {reviewer: sol, head: "0db82ad5cc", date: 2026-11-05, verdict: approve, open: ""}
+  - {reviewer: astra, head: "0db82ad5cc", date: 2026-11-05, verdict: nits, open: "production code and CHANGELOG verified unchanged; nits: assert_equal on the full type in the model-less test, assert_same type_caster in the duck-typed test"}
+  - {reviewer: skeptic, head: "0db82ad5cc", date: 2026-11-05, verdict: nits, open: "optional: the is_a? ordering comment; clearer Rails 8.1 and earlier wording in message and CHANGELOG; alias test restates main; 300 Ir figure not rechecked"}
 ---
 
 # Accept a column name in build_bind_attribute again, deprecated
