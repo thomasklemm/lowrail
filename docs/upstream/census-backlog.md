@@ -21,6 +21,149 @@ most valuable unworked item outside those areas is a correctness finding: Rails 
 built as **TH-1** (below) and opened as [rails/rails#59606](https://github.com/rails/rails/pull/59606). No second performance lead outside
 the owned areas clears the bar (see [Why only one candidate](#why-only-one-candidate)).
 
+## Refresh on main 1e235cee11 (2026-11-05 night)
+
+The ranking and dispositions below this section describe the original 2026-11-04 check, not the current queue.
+Rechecked all 20 performance leads against rails/rails main
+[`1e235cee11b0a7aecb189d8837534807626287aa`](https://github.com/rails/rails/commit/1e235cee11b0a7aecb189d8837534807626287aa)
+and open and closed PRs on 2026-11-05. Two small variants were built independently on that main, not on another
+open PR. **Only CB2 survived exact-head skeptical review.** CB1 is rejected, not awaiting a waiver. Nothing opens
+in this task: CB2 needs the coordinator's Sol pass and queue release. Its workload CPU effect is tiny or
+within A/A; it does not claim an app speedup. The result is one viable candidate, not two padded with a known
+behavior change or a previously rejected design. This keeps the lesson from fatkodima on
+[rails/rails#59577](https://github.com/rails/rails/pull/59577): CPU evidence and a small, readable change, not
+extra helpers or cached state to improve allocation counts. The open-PR check paginated all 1,282 open PRs,
+including other authors' work; name searches also included closed PRs.
+
+| Original rank | Current disposition and reason |
+| ---: | --- |
+| 1 | Already in open [rails/rails#59564](https://github.com/rails/rails/pull/59564), head `2fb737482fa9d03e3bbb35586edda131b42e6bdf`: the body and branch include `immediate_future_classes` and `target_classes`. Do not build a duplicate follow-up. |
+| 2 | Retain rejection: [request-path study](as-request-paths.md) already rejected caching the unsilenced list. `silenced?` is live subscriber behavior, and an extra cache is L2. Open #58957 concerns structured events, not permission to cache the list. |
+| 3 | Retain rejection: `super` is the deliberate extension point added by #46573, not gratuitous dispatch. A direct `ERB::Escape` call reverses that design. |
+| 4 | Fixed: [rails/rails#59618](https://github.com/rails/rails/pull/59618), merged as `088a9ad445105e705e972e899b85463b96d11109`, appends the default star without a rest Array. |
+| 5 | Retain rejection: `Arel.sql` is public and accepts positional and named binds. The private `where!`/`having!` signature precedent does not transfer. |
+| 6 | Park: after merged #59294 the `update(*other_hashes)` rest remains. Avoiding it cheaply needs either a signature/forwarding contract change or special-case dispatch; not a small obvious change with CPU evidence. |
+| 7 | Retain [common-paths rejection](rails-common-paths.md#rejected-and-not-built): removing inheritable config copies changes when the mutable inherited config is read. A design question, not a local allocation fix. Census 8's 0.23% is **self** instructions, not inclusive cost of its callers. |
+| 8 | Park: `tr!` is the Ruby 4.1 path, so it cannot produce a Ruby 4.0.9 candidate. The earlier ≤4.0 JSON work is now merged; no follow-up to its rejected multi-scan variants. |
+| 9 | Retain rejection: `URL.path_for` receives public, potentially retained/frozen buffers; ownership transfer is not established. |
+| 10 | Retain hold: a JSON generator option is a feature requiring ruby/json maintainer interest, not a Rails patch. |
+| 11 | Retain rejection: changing delegation through `scoping` affects overridable calls, block forwarding and VM behavior. The exact lambda-only part already merged in #59571. |
+| 12 | **New exactness rejection:** `.values` is a snapshot. Replacing either remaining call with `.values_for_merge` changes public `structurally_compatible?` / `empty_scope?` results if a value's `==` mutates the other relation. Reproducer and outputs below; no candidate. |
+| 13 | **CB2**, [queue item](../../bench/upstream/pr-queue/items/CB2.md): avoid collecting empty around-callback arguments; six changed code/doc lines, one less Array per symbol callback. No overlapping optimization found; open #58749 changes callback ordering, #58582 duplicate removal, not this dispatch tuple. The earlier request-path rejection concerns the required `Environment`/thunk, not the rest assignment here. |
+| 14 | **CB1 rejected**, [held record](../../bench/upstream/pr-queue/items/CB1.md): `NilClass#try`/`try!` with `(...)` skips direct keyword-splat conversion. `nil.try(:upload, **unpermitted_params)` raises on main but returns nil on the candidate. Open #58646 and merged #55278 concern different behavior and do not authorize this change. |
+| 15 | Retain rejection: global column-alias caches are a Ractor/ownership design change. |
+| 16 | Fixed: [rails/rails#59608](https://github.com/rails/rails/pull/59608), merged as `98f3793369779f3027a08c73615f08f24f4cd931`. |
+| 17 | Retain rejection: changing the PostgreSQL prepared-statement key/pool is a cache redesign, not a String removal. |
+| 18 | Retain the actionpack study's inactivity hold; not a Rails-main code change or a reason to send another unanswered gem PR. |
+| 19 | Retain [R7 dispositions](rails-r7-queue.md#ranking-and-dispositions): required copies and narrow sites do not justify another complex allocation-only patch. |
+| 20 | Drop for this round: roughly two Action Text `reverse_merge` calls per operation, no independent CPU evidence. The lookup-context copy is required. |
+
+### Measurements, including the rejected CB1 variant
+
+Ruby 4.0.9 revision `3e93b23afcec3433f6aecc34b5d832799d754238`; Rails base and independent A/A worktree both
+`1e235cee11b0a7aecb189d8837534807626287aa`. Medians of three per-tree runs with the existing PM1/PM3
+[`percall.sh`](../../bench/upstream/perf_round/percall.sh), GC disabled, identical fixed heap. Ir is **inclusive**
+method/workload instructions plus equal loop overhead, not the self-instruction ranking of census 8. Fractions
+of an object are the loop's three objects divided by the call count; the table rounds that common overhead away.
+
+| Case | Main Ir | A/A Ir | Candidate Ir | Objects, main → candidate | Interpretation |
+| --- | ---: | ---: | ---: | ---: | --- |
+| CB1 `nil.try(:upload)` | 1,398.7 | 1,398.7 | 956.5 | 1 → 0 | −31.6%; interpreter only |
+| CB1 positional + keyword arguments + block | 2,011.3 | 2,014.3 | 1,030.5 | 2 → 0 | −48.8%; A/A ≤0.15% |
+| CB1 SQLite Active Storage dirty update | 923,112.0 | 923,619.1 | 923,207.2 | 194 → 193 | No workload CPU claim; A/A ≤0.09% |
+| CB2 symbol around callback | 14,399.8 | 14,398.4 | 14,233.3 | 7 → 6 | −1.16%; A/A ≤0.024% |
+| CB2 two-argument block | 15,370.9 | 15,374.5 | 15,348.0 | 8 → 8 | −0.15%, close to max A/A 0.13%; not a headline |
+| CB2 object around callback | 14,671.5 | 14,669.9 | 14,686.3 | 7 → 7 | **+0.10%** retained; moving the argument Array into the Ruby tuple is not free |
+| CB2 SQLite model save | 216,695.0 | 216,637.5 | 216,517.4 | 56 → 55 | −0.082%; A/A ≤0.027%, tiny synthetic workload effect |
+| CB2 controller action | 547,189.1 | 546,820.4 | 546,897.4 | 133 → 132 | Within A/A ≤0.114%; no request CPU claim |
+
+The callback-free control is unchanged (about 3,260 Ir, zero objects); `nil.try` is unchanged on the callbacks
+branch. An initial object-callback cohort had a failed base setup during dependency installation; the **whole
+cohort is rejected**, not treated as zero instructions or pooled with the valid replacement cohort. Raw values,
+rejected data, test tails, JIT windows and rejected native timing samples are in
+[`data/census-backlog-refresh/`](data/census-backlog-refresh/).
+
+Supplemental Callgrind: Ruby 4.0.9 YJIT and master ZJIT
+[`ec4f61e68936cf3544e9507acdfdcf0501f90116`](https://github.com/ruby/ruby/commit/ec4f61e68936cf3544e9507acdfdcf0501f90116).
+All 54 measured windows are JIT-flat (compiled ISEQ/block or side-exit counters unchanged; ZJIT OOM counter zero).
+`nil.try` already allocates zero objects and has no measurable instruction gain on either JIT. Symbol callback
+median Ir: YJIT 12,446.6 → 11,838.9 (−4.9%, max paired A/A 0.115%); ZJIT 11,985.5 → 11,884.6 (−0.84%, A/A 0.137%).
+Two-argument block: YJIT 13,315.7 → 12,816.4 (−3.75%, A/A 0.130%); ZJIT 13,057.8 → 12,808.7 (−1.91%, A/A 0.278%).
+The remaining changed object-callback form was then measured separately with the same protocol: all 18 windows
+flat, objects unchanged at seven. YJIT 12,602.5 → 12,176.1 Ir (−3.38%, A/A ≤0.119%); ZJIT
+12,178.9 → 12,047.6 (−1.08%, A/A ≤0.044%). Its +0.10% interpreter loss is not a JIT loss.
+These are microbenchmarks, not app timings. Native master CPU timings have noisy A/A (nil +29%, symbol −17% by
+medians); **that timing cohort is rejected, not rerun until green**. Its apparent block slowdown is not used as a
+speed claim in either direction; the separately specified fixed-heap Ir cohort above reduces block instructions.
+
+### Exactness, tests and reproduction
+
+Before review, CB1's intended change read: accept the same arguments and block; discard them without collecting
+them; return nil. Review disproved the first sentence for direct keyword conversion (below). CB2: read the
+argument list from the fourth tuple entry; splat it at the existing
+`send` in the caller. Templates with arguments put their list in that entry; templates without arguments leave
+it absent. No new branches, cached state, callback wrappers or user-code frames.
+
+CB1 head `22a3d41d8db5ba1aad8b86de5229336148080bca`; CB2 head `ced306c8a8b827f538b4b6f0fbeefc1264e94f8f`.
+CB2 preserves public dispatch and return values. Its nodoc call-template tuple changes, so an override of that
+internal representation must follow it. CB1's `Method#parameters` change (forwarding keyword rest, arity still
+−1) is disclosed but **not** its blocker: skipping `to_hash` side effects, exceptions and invalid return-type
+checks is observable public behavior. A leading optional parameter restores coercion but still allocates the
+rest Array on Ruby 4.0.9, so it is not a cheap rescue. The held item cannot be opened.
+
+[`refresh_exact.rb`](../../bench/upstream/census_backlog/refresh_exact.rb) gives 83 byte-identical callback
+outcomes on Ruby 4.0.9 interpreter/YJIT and master ZJIT. Callback cases include subclass `send`/`instance_exec`,
+`method_missing`, symbols, callable objects, all block arities, conditions, aborts, exceptions, frozen receivers
+and fiber suspension. CB1 initially matched 95 cases passing actual Hashes through `public_send`; that missed
+direct non-Hash keyword splats. The revised harness adds successful, raising, invalid and missing `to_hash`,
+plus real `ActionController::Parameters`: **all ten new outcomes differ** on interpreter and YJIT. Both outputs
+are retained in the raw data. Existing Active Support full suite, **on main and both exact heads**:
+`PARALLEL_WORKERS=1 bundle exec rake test` from `activesupport`, **6,901 runs, 29,966 assertions, 0 failures,
+0 errors, 60 skips** each. The changed files pass Rails RuboCop. No permanent behavior test is added for the
+representation-only refactor; existing callback and try public-API tests pass unchanged.
+Action Pack on main and CB2 also passes `PARALLEL_WORKERS=1 bundle exec bin/test
+test/controller/filters_test.rb test/abstract/callbacks_test.rb`: **78 runs, 161 assertions, no failures, errors
+or skips** on each tree.
+
+Complexity is unchanged: Flog `run_callbacks` 82.6; methods-only (`flog -a -m`) total of both files 657.3 on all trees.
+RuboCop metrics for `run_callbacks`: ABC 45.09, cyclomatic 14, perceived 17 before/after. Each touched `expand`
+retains its previous metrics and branch count; both nil methods have no branches.
+
+Independent skeptical passes are recorded on the exact heads in the queue metadata: CB1 **changes required**
+(coercion blocker verified independently); CB2 **approve with nits**, no correctness blockers, including an
+additional 201 differential cases. Its wording nits (medians, external harness links, marginal block result)
+are applied in the body. CB2 still needs coordinator Sol; no Sol or Astra was run here.
+
+Use `main`, `main-aa`, `nil-try`, `callbacks` for independent worktrees at the exact heads above. Ruby 4.0.9
+and the patched Valgrind from `script/bench-valgrind` are required. The heap is fixed by `percall.sh` to size-pool
+initial slots `1000000/250000/100000/20000/10000`; all four trees use the same Gemfile.lock (SHA-256
+`98694d889aa7c4d367faed3d3034dfb17aec063a126aac9545b3c1dc69c26154`).
+
+```sh
+RUBY=path/to/ruby-4.0.9/bin/ruby WARMUP=2000 OUT=/tmp/cb1 \
+  bash bench/upstream/perf_round/percall.sh bench/upstream/census_backlog/refresh_cases.rb nil_try 3000 3 path/to/main path/to/main-aa path/to/nil-try
+# Likewise nil_kwargs, symbol/block/object/plain with the appropriate candidate tree.
+WORKLOADS=1 RUBY=path/to/ruby-4.0.9/bin/ruby WARMUP=500 OUT=/tmp/cb1-workload \
+  bash bench/upstream/perf_round/percall.sh bench/upstream/census_backlog/refresh_cases.rb attachment_update 1000 3 path/to/main path/to/main-aa path/to/nil-try
+# Likewise save/action on the callbacks tree.
+RAILS_PATH=path/to/main BUNDLE_GEMFILE=path/to/main/Gemfile path/to/ruby-4.0.9/bin/ruby -rbundler/setup bench/upstream/census_backlog/refresh_exact.rb nil
+# Run the same on the candidate and compare; use callbacks instead of nil for CB2.
+```
+
+Supplemental JIT windows use [`refresh_window.rb`](../../bench/upstream/census_backlog/refresh_window.rb),
+with `bench/callgrind.c` built as `lowrail_callgrind.so` against each Ruby's headers. Set `CG_EXT` to that extension,
+use the same heap variables above, and run Valgrind with `--tool=callgrind --instr-atstart=no`; the extension
+starts and stops counting around the measured window only. Arguments are the case name and `3000`. Flags were
+`--yjit --yjit-stats=quiet --yjit-call-threshold=1` on 4.0.9 and
+`--zjit --zjit-stats=quiet --zjit-call-threshold=1` on master. Warmup requires three consecutive flat windows
+before measurement, and the recorded measured counters must also remain flat; no non-flat sample is discarded.
+
+The Relation rejection is executable through public APIs in
+[`refresh_values_repro.rb`](../../bench/upstream/census_backlog/refresh_values_repro.rb). A `readonly` value's
+`==` changes the other relation's `offset!`; the main snapshot yields `compatible: true` and `empty scope: true`.
+Replacing each `.values` call with `.values_for_merge` yields false for both, despite the same final offset.
+That snapshot cannot be removed just because the Hash is not explicitly mutated by the comparing method.
+
 ## Ranked performance leads
 
 Score = effect × breadth ÷ review risk. Effect is on a 1–5 scale: 5 means ≥ 0.5% of an operation's instructions or
