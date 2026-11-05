@@ -1,0 +1,12 @@
+2026-11-05-s81-a.txt DST allocs/pass=657952.0 gc=1 now=2026-11-05 12:13:07 UTC tz=nil ==34380== Collected : 7226985733 
+2026-11-05-s81-b.txt DST allocs/pass=657921.5 gc=1 now=2026-11-05 12:13:28 UTC tz=nil ==34383== Collected : 7226916332 
+2026-11-05-s81fix-a.txt DST allocs/pass=649117.0 gc=1 now=2026-11-05 12:13:22 UTC tz=nil ==34385== Collected : 7156345321 
+2026-11-05-s81fix-b.txt DST allocs/pass=649161.5 gc=1 now=2026-11-05 12:19:58 UTC tz=nil ==39497== Collected : 7085899203 
+2027-06-28-s81-a.txt DST allocs/pass=649174.0 gc=1 now=2027-06-28 12:19:43 UTC tz=nil ==39464== Collected : 7173600285 
+2027-06-28-s81fix-a.txt DST allocs/pass=649144.5 gc=1 now=2027-06-28 12:19:28 UTC tz=nil ==39489== Collected : 7173216812 
+real-s81-a.txt DST allocs/pass=657900.5 gc=1 now=2026-11-05 21:18:23 UTC tz=nil ==41739== Collected : 7156830505 
+real-s81-b.txt DST allocs/pass=657937.5 gc=1 now=2026-11-05 21:35:29 UTC tz=nil ==45284== Collected : 7225641692 
+real-s81fix-a.txt DST allocs/pass=648942.5 gc=1 now=2026-11-05 21:18:07 UTC tz=nil ==41749== Collected : 7085654769 
+real-s81fix-b.txt DST allocs/pass=649074.5 gc=1 now=2026-11-05 21:35:49 UTC tz=nil ==45393== Collected : 7087008096 
+real-s81v2-a.txt DST allocs/pass=648943.0 gc=1 now=2026-11-05 21:18:19 UTC tz=nil ==41744== Collected : 7072771186 
+real-s81v2-b.txt DST allocs/pass=649082.0 gc=1 now=2026-11-05 21:35:44 UTC tz=nil ==45379== Collected : 7077827818 
