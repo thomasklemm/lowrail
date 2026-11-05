@@ -165,7 +165,7 @@ fail, all on GET requests. The bisect lands on 4f2ee07b8e (#56369), because betw
 raised at class load; with that line changed to `skip_forgery_protection`, f5a1915f1d's parent passes and
 f5a1915f1d fails the same 17 webfinger and statuses examples. #59500 (czj, head `d255d0649e`, last updated
 2026-11-01) stops adding the header for GET, HEAD and QUERY requests, which pass verification on their method alone;
-cherry-picked onto main, the four files pass 66/66. Nothing of ours; no comment.
+cherry-picked onto main, the four files pass 66/66. Nothing of ours. Heads-up with this data posted on #59500 with Thomas's OK (2026-11-05, [comment](https://github.com/rails/rails/pull/59500#issuecomment-6656106193)).
 
 **The rest (b), all with CHANGELOG entries:** 11 S2 failures,
 [`REST::NotificationSerializer`](https://github.com/mastodon/mastodon/blob/ca2f092f4f580b1993bae3ac4f4742b748f18ad1/app/serializers/rest/notification_serializer.rb#L5) and
