@@ -37,7 +37,7 @@ Stacked on #59671, which should merge first; only the last commit (`6c80a5583b`)
 
 A temporary index may have the name of a permanent one, since the two live in different schemas. The batched SQLite schema readers from 2cb3daba96 look up an index's columns with an unqualified `pragma_index_info(name)`, which resolves to the temporary index, and match CREATE INDEX statements by name alone. So both tables' indexes read the temporary index's columns twice, and the temporary index takes the permanent one's statement, including its `where`. 8-1-stable was wrong too, one index at a time.
 
-The readers now pass each index's schema, `main` or `temp`, to the pragmas and key the statements by schema and name. This needs #59671's case-insensitive hiding: without it, a permanent `Gizmos` beside a temporary `gizmos` would read the permanent table's index as well.
+The readers now pass each index's schema, `main` or `temp`, to the pragmas and key the statements by schema and name. This needs #59671's case-insensitive hiding. Without it, reading a temporary `gizmos` beside a permanent `Gizmos` would also return the permanent table's index.
 
 ---
 

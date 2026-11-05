@@ -36,7 +36,7 @@ The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of 
 
 The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Collations and check constraints now come from the temporary table's CREATE statement too; 8-1-stable read the columns from the temporary table but the statement of the permanent one.
 
-#59671 (table names in any ASCII case) and #59672 (each index from its own schema) are stacked on this one.
+Shared index names remain a separate issue, fixed by #59672. That PR and #59671 (table names in any ASCII case) are stacked on this one.
 
 ---
 
