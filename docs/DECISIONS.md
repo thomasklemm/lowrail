@@ -180,6 +180,9 @@ Every finished candidate (review gates passed, body drafted) goes into the **Que
 has room. Open the strongest first. A candidate made moot upstream leaves the queue with a note.
 
 * **rails/rails:** at most 20 of our PRs open (Thomas). Keep each PR small.
+* **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
+  preferably grouped by theme and likely reviewer; Thomas reads them and marks them ready himself. The queue no longer
+  opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
 * **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04;
   20 before). We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
