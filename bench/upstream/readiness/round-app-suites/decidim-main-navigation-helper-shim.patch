@@ -1,0 +1,144 @@
+diff --git a/decidim-accountability/app/presenters/decidim/accountability/result_presenter.rb b/decidim-accountability/app/presenters/decidim/accountability/result_presenter.rb
+index e8087e1c25..db56c9af3a 100644
+--- a/decidim-accountability/app/presenters/decidim/accountability/result_presenter.rb
++++ b/decidim-accountability/app/presenters/decidim/accountability/result_presenter.rb
+@@ -8,6 +8,7 @@ module Decidim
+     class ResultPresenter < Decidim::ResourcePresenter
+       include Rails.application.routes.mounted_helpers
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       def result
+         __getobj__
+diff --git a/decidim-blogs/app/presenters/decidim/blogs/post_presenter.rb b/decidim-blogs/app/presenters/decidim/blogs/post_presenter.rb
+index ca7b9b9ffe..628d3901af 100644
+--- a/decidim-blogs/app/presenters/decidim/blogs/post_presenter.rb
++++ b/decidim-blogs/app/presenters/decidim/blogs/post_presenter.rb
+@@ -8,6 +8,7 @@ module Decidim
+     class PostPresenter < Decidim::ResourcePresenter
+       include Decidim::ResourceHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       def author
+         @author ||= if official?
+diff --git a/decidim-blogs/lib/decidim/blogs/schema_org_blog_posting_post_serializer.rb b/decidim-blogs/lib/decidim/blogs/schema_org_blog_posting_post_serializer.rb
+index 4f0cfc51d2..0c2c51eff7 100644
+--- a/decidim-blogs/lib/decidim/blogs/schema_org_blog_posting_post_serializer.rb
++++ b/decidim-blogs/lib/decidim/blogs/schema_org_blog_posting_post_serializer.rb
+@@ -6,6 +6,7 @@ module Decidim
+       include Decidim::TranslationsHelper
+       include Decidim::SanitizeHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       # Public: Initializes the serializer with a post.
+       def initialize(post)
+diff --git a/decidim-core/app/presenters/decidim/user_presenter.rb b/decidim-core/app/presenters/decidim/user_presenter.rb
+index 4f132a1349..2aa3164a62 100644
+--- a/decidim-core/app/presenters/decidim/user_presenter.rb
++++ b/decidim-core/app/presenters/decidim/user_presenter.rb
+@@ -6,6 +6,7 @@ module Decidim
+   #
+   class UserPresenter < SimpleDelegator
+     include ActionView::Helpers::UrlHelper
++    include ActionView::Helpers::NavigationHelper
+     include Decidim::SanitizeHelper
+ 
+     # name sanitized
+diff --git a/decidim-core/app/services/decidim/send_push_notification.rb b/decidim-core/app/services/decidim/send_push_notification.rb
+index 8dcc37b73f..5afc3636bc 100644
+--- a/decidim-core/app/services/decidim/send_push_notification.rb
++++ b/decidim-core/app/services/decidim/send_push_notification.rb
+@@ -10,6 +10,7 @@ module Decidim
+ 
+   class SendPushNotification
+     include ActionView::Helpers::UrlHelper
++    include ActionView::Helpers::NavigationHelper
+     include PushSubscriptionEndpointValidator
+ 
+     # Send the push notification. Returns `nil` if the user did not allowed push notifications
+diff --git a/decidim-core/lib/decidim/content_renderers/mention_resource_renderer.rb b/decidim-core/lib/decidim/content_renderers/mention_resource_renderer.rb
+index d3d732020e..8318f958c6 100644
+--- a/decidim-core/lib/decidim/content_renderers/mention_resource_renderer.rb
++++ b/decidim-core/lib/decidim/content_renderers/mention_resource_renderer.rb
+@@ -11,6 +11,7 @@ module Decidim
+     class MentionResourceRenderer < BaseRenderer
+       include Rails.application.routes.mounted_helpers
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+       include Decidim::SanitizeHelper
+ 
+       # Matches a global id representing a Decidim::Proposals::Proposal
+diff --git a/decidim-elections/app/presenters/decidim/elections/election_presenter.rb b/decidim-elections/app/presenters/decidim/elections/election_presenter.rb
+index 1e129078b5..c0ca2f09d5 100644
+--- a/decidim-elections/app/presenters/decidim/elections/election_presenter.rb
++++ b/decidim-elections/app/presenters/decidim/elections/election_presenter.rb
+@@ -5,6 +5,7 @@ module Decidim
+     class ElectionPresenter < Decidim::ResourcePresenter
+       include Decidim::ResourceHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       def election
+         __getobj__
+diff --git a/decidim-meetings/app/presenters/decidim/meetings/meeting_presenter.rb b/decidim-meetings/app/presenters/decidim/meetings/meeting_presenter.rb
+index aeac4e25b2..a80a67402f 100644
+--- a/decidim-meetings/app/presenters/decidim/meetings/meeting_presenter.rb
++++ b/decidim-meetings/app/presenters/decidim/meetings/meeting_presenter.rb
+@@ -8,6 +8,7 @@ module Decidim
+     class MeetingPresenter < Decidim::ResourcePresenter
+       include Decidim::ResourceHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       alias super_title title
+ 
+diff --git a/decidim-meetings/lib/decidim/meetings/schema_org_event_meeting_serializer.rb b/decidim-meetings/lib/decidim/meetings/schema_org_event_meeting_serializer.rb
+index e07b90d650..031d2132dc 100644
+--- a/decidim-meetings/lib/decidim/meetings/schema_org_event_meeting_serializer.rb
++++ b/decidim-meetings/lib/decidim/meetings/schema_org_event_meeting_serializer.rb
+@@ -6,6 +6,7 @@ module Decidim
+       include Decidim::TranslationsHelper
+       include Decidim::SanitizeHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       # Public: Initializes the serializer with a meeting.
+       def initialize(meeting)
+diff --git a/decidim-participatory_processes/app/presenters/decidim/participatory_processes/participatory_process_presenter.rb b/decidim-participatory_processes/app/presenters/decidim/participatory_processes/participatory_process_presenter.rb
+index 2792f89c7a..4b44d80b9f 100644
+--- a/decidim-participatory_processes/app/presenters/decidim/participatory_processes/participatory_process_presenter.rb
++++ b/decidim-participatory_processes/app/presenters/decidim/participatory_processes/participatory_process_presenter.rb
+@@ -5,6 +5,7 @@ module Decidim
+     class ParticipatoryProcessPresenter < ResourcePresenter
+       include Decidim::ResourceHelper
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       def hero_image_url
+         process.attached_uploader(:hero_image).url
+diff --git a/decidim-proposals/app/events/decidim/proposals/publish_proposal_event.rb b/decidim-proposals/app/events/decidim/proposals/publish_proposal_event.rb
+index b64e9f3330..d8cb40bf08 100644
+--- a/decidim-proposals/app/events/decidim/proposals/publish_proposal_event.rb
++++ b/decidim-proposals/app/events/decidim/proposals/publish_proposal_event.rb
+@@ -6,6 +6,7 @@ module Decidim
+       include Decidim::Events::CoauthorEvent
+       include Decidim::Core::Engine.routes.url_helpers
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+       include Decidim::Events::MachineTranslatedEvent
+ 
+       def resource_text
+diff --git a/decidim-proposals/app/presenters/decidim/proposals/proposal_presenter.rb b/decidim-proposals/app/presenters/decidim/proposals/proposal_presenter.rb
+index a6bfa896e8..241c2608b0 100644
+--- a/decidim-proposals/app/presenters/decidim/proposals/proposal_presenter.rb
++++ b/decidim-proposals/app/presenters/decidim/proposals/proposal_presenter.rb
+@@ -8,6 +8,7 @@ module Decidim
+     class ProposalPresenter < Decidim::ResourcePresenter
+       include Rails.application.routes.mounted_helpers
+       include ActionView::Helpers::UrlHelper
++      include ActionView::Helpers::NavigationHelper
+ 
+       def author
+         @author ||= if official?

@@ -1,0 +1,55 @@
+From cec8010a8b9cc9616e7ba84c5a139beae95b59ca Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:27:48 +0000
+Subject: [PATCH] Read the logger once per EventReporter::LogSubscriber#emit
+ and #consumes?
+
+The logger resolves through the class's @logger and the framework's
+default logger. emit and consumes? each looked it up twice: once for the
+nil check and once in log_level_satisfied?. Pass the logger they already
+have instead.
+---
+ .../lib/active_support/event_reporter/log_subscriber.rb   | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/activesupport/lib/active_support/event_reporter/log_subscriber.rb b/activesupport/lib/active_support/event_reporter/log_subscriber.rb
+index af09a1149b..6baf2d7cd6 100644
+--- a/activesupport/lib/active_support/event_reporter/log_subscriber.rb
++++ b/activesupport/lib/active_support/event_reporter/log_subscriber.rb
+@@ -54,10 +54,11 @@ def subscription_filter
+       class_attribute :log_levels, default: {}.freeze # :nodoc:
+ 
+       def emit(event)
++        logger = self.logger
+         return unless logger
+         event_method = self.class.event_method_for(event[:name])
+ 
+-        public_send(event_method, event) if log_level_satisfied?(event_method)
++        public_send(event_method, event) if log_level_satisfied?(logger, event_method)
+       end
+ 
+       # Whether an event with this name would currently be logged, so that
+@@ -65,9 +66,10 @@ def emit(event)
+       # discard. Deliberately not memoized: the answer changes with the
+       # logger's level.
+       def consumes?(name)
++        logger = self.logger
+         return false unless logger
+ 
+-        log_level_satisfied?(self.class.event_method_for(name))
++        log_level_satisfied?(logger, self.class.event_method_for(name))
+       end
+ 
+       def logger
+@@ -79,7 +81,7 @@ def namespace
+           self.class.namespace
+         end
+ 
+-        def log_level_satisfied?(event_method)
++        def log_level_satisfied?(logger, event_method)
+           predicate = LOG_LEVEL_PREDICATES[log_levels[event_method]]
+           return false unless predicate
+ 
+-- 
+2.55.0
+

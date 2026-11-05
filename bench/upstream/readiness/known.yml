@@ -489,6 +489,61 @@ findings:
     record: docs/upstream/app-suites.md
     checked: round-app-suites bdb3d96012
     note: the record's environment failures on both trees (ImageMagick, safe_exec, file permissions, a blackholed address), plus acl/target_spec under seed 1717
+  - id: OP1
+    suite: openproject.*
+    signature: "FrozenError: can't modify frozen Hash"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: scimitar registers a parameter parser in place; boot fails (openproject-shimmed works around it); unchecked
+  - id: OP3
+    suite: openproject.*
+    signature: "undefined method 'validation_context='"
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: base of every OpenProject contract (ModelContract#contract_valid?); unchecked
+  - id: OP8
+    suite: openproject.*
+    signature: "null value in column \"results\" of relation \"health_reports\""
+    status: prepared
+    record: docs/upstream/app-suites.md
+    note: frozen defaults make an untouched serialized default dirty and share nested defaults; fix keeps models with a non-NULL mutable or any serialized default off the frozen defaults; unchecked
+  - id: OP2
+    suite: openproject.*
+    signature: "relation \"days\" does not exist|relation \"[a-z_]+\" does not exist"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: Tableless overrides the private load_schema!; unchecked
+  - id: OP4
+    suite: openproject.*
+    signature: "undefined method 'mb_chars'"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: carrierwave 2.2.7; fixed in carrierwave 3.1.4; unchecked
+  - id: OP5
+    suite: openproject.*
+    signature: "FrozenError: can't modify frozen String"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: TabularFormBuilder mutates a model_name string with sub!; unchecked
+  - id: OP6
+    suite: openproject.*
+    signature: "undefined method 'join_keys'|undefined method 'join_primary_key'"
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: statesman 13.4.0; unchecked
+  - id: OP7
+    suite: openproject.*
+    test: "layout_lock_concurrency_spec|batch_update_service_concurrency_spec|delete_service_advisory_lock_spec"
+    signature: "."
+    status: gem-side
+    record: docs/upstream/app-suites.md
+    note: with_advisory_lock 7.6.0 transaction try-locks no longer materialize the transaction; unchecked
+  - id: OP-test-adapter
+    suite: openproject.*
+    signature: "undefined method 'enable_test_adapter'"
+    status: record-only
+    record: docs/upstream/app-suites.md
+    note: OpenProject's with_good_job support calls the removed nodoc helper; unchecked
 
   # Ecosystem round 1 (docs/upstream/ecosystem-tests.md)
   - id: E1

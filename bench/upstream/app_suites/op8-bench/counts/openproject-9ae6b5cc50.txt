@@ -1,0 +1,141 @@
+models=361 frozen_on_main=305 proc_default=56 errors=0
+type-level form falls back: 81 of 361 (81 of 305 frozen on main)
+nil-default form falls back: 51 of 361 (51 of 305 frozen on main)
+ReadOnlyAttributeSet on this tree: 305
+  proc_default AI::TextTransformAction 
+  proc_default AI::TextTransformRun 
+  fallback AI::TextTransformRunEvent payload:Jsonb="{}"
+  proc_default AuthProvider 
+  proc_default Automations::Actions::AssignedTo 
+  proc_default Automations::Actions::Base 
+  proc_default Automations::Actions::CustomField 
+  proc_default Automations::Actions::CustomField::ForAssociated 
+  proc_default Automations::Actions::CustomField::ForBoolean 
+  proc_default Automations::Actions::CustomField::ForDate 
+  proc_default Automations::Actions::CustomField::ForFloat 
+  proc_default Automations::Actions::CustomField::ForInteger 
+  proc_default Automations::Actions::CustomField::ForLink 
+  proc_default Automations::Actions::CustomField::ForString 
+  proc_default Automations::Actions::CustomField::ForText 
+  proc_default Automations::Actions::CustomField::ForUser 
+  proc_default Automations::Actions::Date 
+  proc_default Automations::Actions::DoneRatio 
+  proc_default Automations::Actions::DueDate 
+  proc_default Automations::Actions::EstimatedHours 
+  proc_default Automations::Actions::Inexistent 
+  proc_default Automations::Actions::Notify 
+  proc_default Automations::Actions::Priority 
+  proc_default Automations::Actions::Project 
+  proc_default Automations::Actions::Responsible 
+  proc_default Automations::Actions::StartDate 
+  proc_default Automations::Actions::Status 
+  proc_default Automations::Actions::Type 
+  fallback Automations::Triggers::Base options:Jsonb="{}"
+  proc_default Automations::Triggers::Button 
+  fallback Bim::Bcf::Issue labels:Array="{}"
+  nil_only Bim::Bcf::NonExistentViewpoint json_viewpoint:Jsonb
+  nil_only Bim::Bcf::Viewpoint json_viewpoint:Jsonb
+  fallback Boards::Grid options:Serialized
+  fallback CalculatedValueError missing_custom_field_ids:Array="{}"
+  proc_default CostReport 
+  fallback CostReportQuery filters:Serialized="[]" selects:Serialized="[]" orders:Serialized="[]" group_bys:Serialized="[]"
+  nil_only CustomField formula:Jsonb
+  proc_default CustomFieldSection 
+  fallback DeployTarget options:Jsonb="{}"
+  fallback ExportSetting settings:Jsonb="{}"
+  nil_only GithubPullRequest labels:Json
+  nil_only GitlabIssue labels:Json
+  nil_only GitlabMergeRequest labels:Json
+  nil_only GitlabPipeline ci_details:Json
+  proc_default GoodJob::BatchRecord 
+  nil_only GoodJob::DiscreteExecution serialized_params:Jsonb error_backtrace:Array
+  nil_only GoodJob::Execution serialized_params:Jsonb error_backtrace:Array
+  nil_only GoodJob::Job serialized_params:Jsonb labels:Array
+  nil_only GoodJob::Process state:Jsonb
+  nil_only GoodJob::Setting value:Jsonb
+  fallback Grids::Grid options:Serialized
+  fallback Grids::MyPage options:Serialized
+  fallback Grids::Overview options:Serialized
+  fallback Grids::Widget options:Serialized
+  nil_only GroupCustomField formula:Jsonb
+  fallback HealthReport results:Serialized="{}"
+  fallback ITSM::EmailMessage referenced_message_ids:Array="{}" to_addresses:Array="{}" cc_addresses:Array="{}"
+  fallback ITSM::EmailThread recipients:Array="{}"
+  fallback ITSM::IncomingMailbox aliases:Array="{}"
+  proc_default Import::Jira 
+  nil_only Import::JiraAttachment payload:Jsonb
+  nil_only Import::JiraField payload:Jsonb issue_values:Jsonb
+  fallback Import::JiraImport projects:Jsonb="[]" selected:Jsonb="{}" available:Jsonb="{}" system_field_custom_fields:Jsonb="{}"
+  nil_only Import::JiraImportJobCursor arguments:Jsonb cursor:Jsonb
+  fallback Import::JiraImportTransition metadata:Jsonb="{}"
+  nil_only Import::JiraIssue payload:Jsonb
+  nil_only Import::JiraIssueType payload:Jsonb
+  nil_only Import::JiraPriority payload:Jsonb
+  nil_only Import::JiraProject payload:Jsonb
+  nil_only Import::JiraStatus payload:Jsonb
+  nil_only Import::JiraUser payload:Jsonb
+  nil_only Import::JiraVersion payload:Jsonb
+  nil_only JobStatus::Status payload:Jsonb
+  fallback Journal cause:Jsonb="{}"
+  proc_default LdapAuthSource 
+  fallback LlmCapabilityVerdict detail:Jsonb="{}"
+  proc_default LlmConnection 
+  fallback LlmModel raw_metadata:Jsonb="{}"
+  proc_default MeetingOutcome 
+  fallback MenuItem options:Serialized
+  fallback MenuItems::WikiMenuItem options:Serialized
+  proc_default OpenIDConnect::Provider 
+  fallback OpenIDConnect::UserToken audiences:Jsonb="[]"
+  nil_only PaperTrailAudit object:Jsonb object_changes:Jsonb
+  fallback PersistedQuery filters:Jsonb="[]" selects:Jsonb="[]" orders:Jsonb="[]" group_bys:Jsonb="[]"
+  fallback PersistedView options:Jsonb="{}"
+  fallback PlaceholderUserDetail user_filter:Serialized="[]"
+  proc_default PluginAuthProvider 
+  proc_default Project 
+  nil_only ProjectCustomField formula:Jsonb
+  proc_default ProjectCustomFieldSection 
+  fallback ProjectQuery filters:Serialized="[]" selects:Serialized="[]" orders:Serialized="[]"
+  fallback Query filters:Serialized column_names:Serialized sort_criteria:Serialized timeline_labels:Serialized highlighted_attributes:Serialized timestamps:Serialized
+  proc_default RecurringMeeting 
+  proc_default RecurringMeetings::HistoricSchedule 
+  proc_default ResourcePlanner 
+  proc_default ResourceUserCard 
+  fallback ResourceUserTimeline options:Jsonb="{}"
+  fallback ResourceWorkPackageList options:Jsonb="{}"
+  fallback ResourceWorkPackageTimeline options:Jsonb="{}"
+  proc_default Saml::Provider 
+  proc_default Sprint 
+  proc_default Storages::NextcloudStorage 
+  proc_default Storages::OneDriveStorage 
+  proc_default Storages::SharepointStorage 
+  proc_default Storages::Storage 
+  proc_default Storages::Storage::InexistentStorage 
+  nil_only TimeEntryCustomField formula:Jsonb
+  proc_default Token::API 
+  fallback Token::AutoLogin data:Serialized
+  fallback Token::Backup data:Serialized
+  fallback Token::Base data:Serialized
+  fallback Token::EnterpriseTrialKey data:Serialized
+  fallback Token::HashedToken data:Serialized
+  fallback Token::ICal data:Serialized
+  proc_default Token::ICalMeeting 
+  fallback Token::Invitation data:Serialized
+  proc_default Token::Named 
+  fallback Token::RSS data:Serialized
+  fallback Token::Recovery data:Serialized
+  fallback TwoFactorAuthentication::BackupCode data:Serialized
+  fallback TwoFactorAuthentication::LoginToken data:Serialized
+  fallback TwoFactorAuthentication::RememberedAuthToken data:Serialized
+  proc_default TypeVariant 
+  nil_only UserCustomField formula:Jsonb
+  proc_default UserCustomFieldSection 
+  fallback UserPreference settings:Serialized="{}" dismissed_enterprise_banners:Jsonb="{}" whats_new_read_items:Jsonb="{}"
+  fallback UserQuery filters:Serialized="[]" selects:Serialized="[]" orders:Serialized="[]" group_bys:Serialized="[]"
+  nil_only VersionCustomField formula:Jsonb
+  fallback View options:Jsonb="{}"
+  fallback Webhooks::Log request_headers:Serialized response_headers:Serialized
+  fallback Wikis::InexistentProvider options:Jsonb="{}"
+  fallback Wikis::InternalProvider options:Jsonb="{}"
+  fallback Wikis::Provider options:Jsonb="{}"
+  proc_default Wikis::XWikiProvider 
+  nil_only WorkPackageCustomField formula:Jsonb

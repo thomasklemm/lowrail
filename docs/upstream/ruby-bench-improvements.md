@@ -5,7 +5,8 @@ is our source of truth for ZJIT speed claims ([DECISIONS](../DECISIONS.md#eviden
 checks the pain points recorded in our docs, looks for gaps in the suite, and ranks candidate improvements by their
 value to the maintainers. It is an evaluation only. Nothing was built upstream, and nothing was opened or posted.
 [Round 2](#round-2-five-topics-checked-and-the-prs-opened-2026-11-05) (2026-11-05, at the end) checks five more topics
-and records the PRs that opened from them.
+and records the PRs that opened from them. [Round 3](#round-3-rails-benchmarks-on-windows-2026-11-05) prepares a PR that runs
+erubi-rails, lobsters and railsbench in the Windows CI job.
 
 **Pins.** Ruby master [`a8b095a07e`](https://github.com/ruby/ruby/commit/a8b095a07e55adf429839d4642027e832e30d3a7),
 release build (`-O3 -ggdb3`, `--enable-zjit --enable-yjit`), the same build as [zjit-yjit-gap](zjit-yjit-gap.md).
@@ -488,3 +489,211 @@ calls these pages run-dependent.
   4-iteration minus 1-iteration run after 2 warmups.
 * Reviews: a skeptical subagent per PR (facts against the logs and commits, outsider read of the body); its findings
   are in each section.
+
+# Round 3: Rails benchmarks on Windows (2026-11-05)
+
+ruby-bench's `benchmark-default-windows` job sets `EXCLUDES: erubi-rails,graphql-native,lobsters,railsbench`, because
+nokogiri 1.18.9 builds from source there and its bundled libiconv fails to compile (erubi-rails, lobsters,
+railsbench), graphql-c_parser's token names clash with Windows headers (graphql-native) and stackprof fails to build
+(lobsters). #567 moves lobsters and railsbench to nokogiri 1.19.7. Tested on our fork
+([thomasklemm/ruby-bench](https://github.com/thomasklemm/ruby-bench)) after Actions were enabled there (the workflow
+itself also had to be switched from `disabled_fork` to active), with fork-internal PRs against a copy of #567's
+branch (`ci-base/rails-8.1.4.1` = `971006363a`). All of them were closed without a comment.
+
+| benchmark | on #567 alone | what it needs | Ruby 4.0.9 | head |
+| --- | --- | --- | --- | --- |
+| railsbench | runs | nothing (nokogiri 1.19.7 from #567) | precompiled `x64-mingw-ucrt` gem | built from source |
+| erubi-rails | fails: nokogiri 1.18.9, `loop_wchar.h: conflicting types for 'mbrtowc'` | its own nokogiri 1.19.7 bump (#567 leaves it on Rails 8.0.3 and nokogiri 1.18.9) | runs | runs |
+| lobsters | fails: stackprof 0.2.28 (`unknown type name 'siginfo_t'`, `sigaction`, `setitimer`) | `gem 'stackprof', platforms: :mri`, as in railsbench | runs | runs |
+| graphql-native | fails: graphql-c_parser 1.1.3, `'FLOAT'`, `'INPUT'`, `'INT'` redeclared | not fixable by a bump: 1.1.4 (latest, 2026-08-03) keeps the same enum names | stays excluded | stays excluded |
+
+**stackprof.** 0.2.28 (2026-02-13) is the latest release and has no Windows support (POSIX signals, `setitimer`,
+pthreads, no `_WIN32` guard). lobsters lists it only in its `development` group; the benchmark runs with
+`RAILS_ENV=production` and `Bundler.require(*Rails.groups)` and never requires it. Bundler's `mri?` is
+`!windows? && RUBY_ENGINE == "ruby"`, so the platform filter drops it on Windows (and TruffleRuby, whose job already
+excludes lobsters). `bundle lock` leaves lobsters' Gemfile.lock unchanged.
+
+**erubi-rails.** `bundle _4.0.12_ lock --update nokogiri --conservative` on Ruby 4.0.9: four lines, the two nokogiri
+entries and their checksums (Bundler 4.0.20 would also rewrite `BUNDLED WITH` and drop the bundler checksum, so the
+lock's own Bundler was used).
+
+**Fork runs.**
+
+* [42012865642](https://github.com/thomasklemm/ruby-bench/actions/runs/42012865642): #567 with EXCLUDES emptied.
+  Both Windows entries fail with erubi-rails, graphql-native and lobsters; railsbench runs.
+* [42012872942](https://github.com/thomasklemm/ruby-bench/actions/runs/42012872942): plus the erubi-rails bump.
+  erubi-rails runs; graphql-native and lobsters (stackprof) fail.
+* [42013201457](https://github.com/thomasklemm/ruby-bench/actions/runs/42013201457): plus the stackprof change. Only
+  graphql-native fails.
+* [42018186964](https://github.com/thomasklemm/ruby-bench/actions/runs/42018186964): the final commit with
+  `EXCLUDES: graphql-native`. All 15 checks pass; both `benchmark-default-windows` entries run erubi-rails, lobsters,
+  railsbench and shipit. The run was on `2695979940`; the branch head `dd76311099` differs only in the commit message
+  (reviewer: "installs", not "builds").
+
+**Dependency.** lobsters and railsbench need #567's nokogiri, so the PR depends on #567. Branch
+[`thomasklemm/windows-rails-benchmarks`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/windows-rails-benchmarks)
+@ `dd76311099`, one commit on `971006363a`. **Opened 2026-11-05 as
+[ruby/ruby-bench#568](https://github.com/ruby/ruby-bench/pull/568)** before #567 merged (Thomas: enable the Windows
+benchmarks now), with one sentence at the top saying it includes #567's commit until then. When #567 merges: rebase
+onto upstream main, push with `--force-with-lease`, check that the diff is down to the three files, and the PR's
+own CI repeats the check on the merged base.
+
+**Review.** A skeptical subagent checked every claim against the job logs and code and found the change minimal and
+correct (one concern: removing the Rails exclusions from the Windows job). Applied: name the graphql-c_parser cause
+and that 1.1.4 doesn't fix it, "both `benchmark-default-windows` jobs" instead of "both Windows jobs", and wait for
+the final run before linking it. Its point that the body should say it depends on #567 became the opening sentence
+once the PR opened before #567.
+
+**Body (as opened; [file](../../bench/upstream/ruby_bench_round3/windows-body.md)):**
+
+> This builds on #567 and includes its commit until #567 merges; I'll rebase then.
+>
+> This runs erubi-rails, lobsters and railsbench in the `benchmark-default-windows` job, so only graphql-native stays excluded there.
+>
+> They were excluded because nokogiri 1.18.9 builds from source on Windows and its bundled libiconv fails to compile. #567 moved lobsters and railsbench to nokogiri 1.19.7, which installs on Windows with Ruby 4.0 (the precompiled x64-mingw-ucrt gem) and with head (built from source). erubi-rails gets the same bump here.
+>
+> lobsters was also excluded because stackprof fails to build. stackprof 0.2.28, the latest release, uses POSIX signals and timers that MinGW doesn't have. lobsters lists it only in its development group, which the benchmark doesn't load, so it now gets `platforms: :mri`, as in railsbench's Gemfile. Gemfile.lock doesn't change.
+>
+> graphql-native stays excluded: graphql-c_parser uses FLOAT, INT, INPUT, INTERFACE and TokenType as C names, which the Windows headers already define, and 1.1.4, the latest release, still does. rmosolgo/graphql-ruby#5877 fixes that.
+>
+> In this run on my fork, both `benchmark-default-windows` jobs pass and run all three benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42018186964
+
+## graphql-c_parser on Windows (rmosolgo/graphql-ruby#5877)
+
+graphql-native stays excluded from the Windows job because graphql-c_parser doesn't compile with RubyInstaller
+(MinGW). `ruby.h` → `ruby/win32.h` → `winsock2.h` → `windows.h` brings in five names the extension also uses: `FLOAT`
+and `INT` (`minwindef.h` typedefs), `INPUT` (`winuser.h` struct), `INTERFACE` (a `commdlg.h` macro that expands to
+`IPrintDialogServices`) and `TokenType` (an enumerator in `winnt.h`). The brief and the first patch covered only the
+first three; the reviewer found the other two in the same CI log, and fork run
+[42026599629](https://github.com/thomasklemm/ruby-bench/actions/runs/42026599629) on that first patch confirmed them
+(`lexer.rl:168:2` and `lexer.rl:194:3`, cancelled after the Ruby 4.0.9 job failed). No issue or PR in graphql-ruby
+mentions Windows; its CI is Ubuntu-only. Latest release 1.1.4 (2026-08-03) has the same names.
+
+**Change.** Branch
+[`thomasklemm/c-parser-windows-token-names`](https://github.com/thomasklemm/graphql-ruby/tree/thomasklemm/c-parser-windows-token-names)
+@ `115a3c84e5`, one commit on graphql-ruby master `6b4bef2522`, four files (+235 −223, almost all generated):
+`%define api.token.prefix {GRAPHQL_}` in `parser.y` (replacing a blank line, so no `#line` shifts) and `return
+GRAPHQL_YYEOF`; in `lexer.rl` the enumerators `FLOAT`, `INT`, `INPUT`, `INTERFACE` become `*_LITERAL` (as
+`TYPE_LITERAL` already is), with explicit cases keeping the symbols `:INPUT` and `:INTERFACE`, and `enum TokenType`
+becomes `GraphQLTokenType`. Token numbers (`200 + tt` against the `%token` values) and Bison's `yytname` are
+unchanged, so error messages stay the same (`query_spec.rb:722` asserts `unexpected INT ("1")`). Alternatives: renaming
+in `parser.y` changes messages; `#undef` can't remove typedefs or enumerators; `WIN32_LEAN_AND_MEAN` leaves
+`minwindef.h`, `winuser.h` and `winnt.h`.
+
+**Generated files.** Bison 3.8.2 (Debian) reproduces master's `parser.c` byte for byte, so `parser.c` is regenerated.
+Ragel 7.0.4 (built from source with colm 0.14.7, the Rakefile's version) does not reproduce master's `lexer.c`
+(indentation and `#line` self-references differ), so
+[`apply_lexer_step1.py`](../../bench/upstream/ruby_bench_round3/apply_lexer_step1.py) and
+[`apply_lexer_step2.py`](../../bench/upstream/ruby_bench_round3/apply_lexer_step2.py) apply to the committed file
+exactly the content lines Ragel changes, copy Ragel's `lexer.rl` `#line` numbers and renumber self-references as
+line + 1 (the committed file's rule). Checked: content equals Ragel's output ignoring whitespace, `lexer.rl` `#line`
+sequence identical, 0 self-references off.
+
+**Linux, Ruby 4.0.9.** `GRAPHQL_CPARSER=1 rake test`: 2,754 tests, 0 failures, 0 errors, 4 skips. `rake test`: 2,712
+tests, 0 failures, 13 skips. Runs in parallel with other suites hit the timing assertions in
+`async_dataloader_spec.rb:300` / `nonblocking_dataloader_spec.rb:209` on master and branch alike; solo runs pass. A probe
+(tokens of `interface`, `input`, `extend`, ints, floats; five parse errors; printed AST) is byte-identical to master.
+A MinGW-w64 12.2 syntax check with a Ruby-header shim reproduces CI's errors on master; the first patch's `lexer.c`
+still had 2 (`INTERFACE`, `TokenType`), the final branch has none in any extension file.
+
+**Windows.** Fork run [42034420178](https://github.com/thomasklemm/ruby-bench/actions/runs/42034420178): graphql-native
+from the branch (Gemfile `git:` source, `EXCLUDES` without graphql-native), all 15 checks green; it compiled and ran on
+Ruby 4.0.9 (300.3 ms) and head 4.1.0dev `64ae80dd36` (238.0 ms). It ran on #566's commit, because on main the head job
+also fails on shipit's nokogiri 1.19.1 (run [42029534044](https://github.com/thomasklemm/ruby-bench/actions/runs/42029534044):
+graphql-native ran on both, only shipit failed). Fork PRs #6 and #7 are closed; Actions stay off on
+thomasklemm/graphql-ruby (0 runs).
+
+**Review.** A skeptical subagent found the `INTERFACE` and `TokenType` blocker (fixed), confirmed token numbers,
+`yytname`, `#line` numbers and that nothing else uses the names, scanned the MinGW headers for further collisions (none;
+`TRUE`/`FALSE` only in strings, `GRAPHQL_` unused), and asked for solo test runs as evidence, "MinGW" instead of
+"Windows" and a shorter body (applied). Not verified: mswin/MSVC (the Windows SDK has the same two definitions). It
+suggested dropping the Lowrail footer as promotional; kept, as DECISIONS asks for it on bug and compatibility PRs and
+graphql-ruby's contributing guide has no rule against it. No CHANGELOG entry: the maintainer writes
+`graphql-c_parser/CHANGELOG.md` at release time, contributor PRs (#5856, #5864, #5870) don't touch it.
+
+**Status.** Opened 2026-11-05 as [rmosolgo/graphql-ruby#5877](https://github.com/rmosolgo/graphql-ruby/pull/5877)
+(head `115a3c84e5`) after the coordinator's go, with the footer link pinned to Lowrail `de05fe1376`. #568's
+graphql-native sentence was edited once to name all five clashing names and link #5877. The Amp GitHub App can't
+access rmosolgo/graphql-ruby or ruby/ruby-bench, so neither PR has a comment subscription; the coordinator watches
+them. **Follow-up:** once a graphql-c_parser release contains the
+fix, ruby-bench can drop `graphql-native` from the Windows `EXCLUDES` (#568 already links #5877).
+
+**Body (as opened; [file](../../bench/upstream/ruby_bench_round3/graphql-c-parser-body.md)):**
+
+> graphql-c_parser doesn't compile on Windows with RubyInstaller (MinGW). There, `ruby.h` includes `windows.h`, which declares `FLOAT`, `INT` and `INPUT` as types, defines `INTERFACE` as a macro and declares `TokenType` as an enumerator. The extension uses these names for its token constants, so 1.1.4 fails with errors such as `lexer.rl:161:2: error: 'FLOAT' redeclared as different kind of symbol`.
+>
+> This adds `%define api.token.prefix {GRAPHQL_}` to `parser.y`, which renames only the generated C constants, so error messages such as `unexpected INT ("2")` stay the same. In the lexer, the four enumerators become `*_LITERAL`, like `TYPE_LITERAL`, and the enum becomes `GraphQLTokenType`. The emitted token symbols and numbers don't change.
+>
+> `parser.c` is regenerated with Bison 3.8.2. My Ragel 7.0.4 build formats `lexer.c` differently from the committed file, so I applied only the lines Ragel changes, with `#line` numbers updated.
+>
+> On Linux the test suite passes with and without `GRAPHQL_CPARSER=1`. On Windows, ruby-bench's graphql-native benchmark built from this branch compiles and runs on Ruby 4.0 and head: https://github.com/thomasklemm/ruby-bench/actions/runs/42034420178
+>
+> ---
+>
+> <sub>Found while enabling more benchmarks on Windows in ruby/ruby-bench#568, recorded in [Lowrail](https://github.com/thomasklemm/lowrail/blob/de05fe1376e714a2f1f30bc3c6de47fdd69b181c/docs/upstream/ruby-bench-improvements.md#round-3-rails-benchmarks-on-windows-2026-11-05), my research project.</sub>
+
+## graphql-native on Windows: graphql-c_parser 1.2.0 in #568
+
+rmosolgo merged rmosolgo/graphql-ruby#5877 (`aaae57a1eb`) and released graphql-c_parser 1.2.0 on 2026-11-05 15:56 UTC
+("I just shipped this change in graphql-c_parser 1.2.0"); the coordinator reacted with 👍, no comment. Because #568 had
+no review yet, the last exclusion went into #568 itself as a second commit rather than a new PR (coordinator's call).
+
+**Change.** Commit `41c21df1ac` on `dd76311099`. In graphql-native's Gemfile.lock, `bundle _4.0.12_ lock --update
+graphql-c_parser --conservative` moves graphql-c_parser from 1.1.3 to 1.2.0 (two lines; checksum `8120ef0a…` matches
+rubygems.org). graphql stays at 2.5.11: 1.2.0 needs `graphql >= 2.2.10`, its `lib/graphql/c_parser.rb` is
+byte-identical to 1.1.3's, and everything the extension looks up in graphql (`Lexer::VALID_STRING`, `BlockString`,
+`ParseError`, the 35 node classes) exists in 2.5.11 with matching arities (reviewer). In the workflow,
+`benchmark-default-windows` goes back to the plain `ruby run_benchmarks.rb` it had before k0kubun's 13e09f7
+introduced `EXCLUDES`; nothing else reads `EXCLUDES`. Pushed without a rewrite (no force).
+
+**Linux output.** For `negotiate.gql` (81 KB), 1.1.3 and 1.2.0 give identical token streams (5,262 tokens) and
+identical AST dumps with positions (2,939 nodes, compared with object addresses stripped) and the same printed query.
+
+**Cost** ([scripts and numbers](../../bench/upstream/ruby_bench_round3/graphql_c_parser_cost/)). Cachegrind, Ruby 4.0.9
+interpreter, `RUBY_GC_HEAP_0..4_INIT_SLOTS` from [bench.md](../bench.md), 3 warmup iterations of 100 parses, then
+(6 iterations − 1 iteration) / 5, two processes per version:
+
+| | per iteration (Ir) | against 1.1.3 a |
+| --- | ---: | ---: |
+| 1.1.3 a | 2,604,134,169 | – |
+| 1.1.3 b | 2,597,373,050 | −0.26% (A/A) |
+| 1.2.0 a | 2,656,381,153 | +2.01% |
+| 1.2.0 b | 2,656,375,983 | +2.01% |
+
+**Claimed:** graphql-c_parser 1.2.0 runs 2.0–2.3% more interpreter instructions per graphql-native iteration than
+1.1.3, outside the 0.26% A/A. Per function (cg_diff): `lexer.c:tokenize` +36.3M, `yyparse` +9.4M, lexer.rl/emit
+lines +10M, `memcpy` −6.3M of +52M. The deltas are exact multiples of 100 parses, so they are deterministic. The cost comes
+from the regenerated lexer and parser between 1.1.3 and 1.2.0: the Ragel character table widened for BOM handling,
+`emit` checks number boundaries on every number token (ydah), Bison has 191 rules instead of 185, and 1.1.4 adds
+`YYSTACK_USE_ALLOCA`. It does not come from #5877's renames, which keep every token number. The A/A gap is almost all
+one `memcpy` item and GC timing (reviewer). It is not attributed to individual commits and not posted beyond the body
+sentence; graphql-native's results shift by this on every platform. YJIT was not measured.
+
+**Fork run** [42063514767](https://github.com/thomasklemm/ruby-bench/actions/runs/42063514767) on `41c21df1ac`
+against the #567 copy (fork PR #8, closed without a comment): all 15 checks green. Both Windows jobs build
+graphql-c_parser 1.2.0 from source and run graphql-native (288.9 ms on 4.0.9, 325.5 ms on head 4.1.0dev `64ae80dd36`)
+next to erubi-rails, lobsters, railsbench and shipit. #568's own upstream run 42063486254 on the same head is green too.
+
+**Review.** A skeptical subagent confirmed the lock and workflow changes and the measurement. Applied: the title
+"Stop excluding benchmarks from the Windows CI job" instead of "Run all benchmarks on Windows" (ractor-harness
+benchmarks don't run in that job anyway), a separate paragraph saying Linux results shift too, and that the cost is
+not #5877's renames.
+
+**PR state.** [ruby/ruby-bench#568](https://github.com/ruby/ruby-bench/pull/568), head `41c21df1ac`, two commits on
+#567's. The #567 rebase plan is unchanged. With this, ruby-bench's Windows job excludes nothing.
+
+**Body (as edited; [file](../../bench/upstream/ruby_bench_round3/windows-body.md)):**
+
+> This builds on #567 and includes its commit until #567 merges; I'll rebase then.
+>
+> This runs erubi-rails, graphql-native, lobsters and railsbench in the `benchmark-default-windows` job, so it no longer excludes any benchmark.
+>
+> They were excluded because nokogiri 1.18.9 builds from source on Windows and its bundled libiconv fails to compile. #567 moved lobsters and railsbench to nokogiri 1.19.7, which installs on Windows with Ruby 4.0 (the precompiled x64-mingw-ucrt gem) and with head (built from source). erubi-rails gets the same bump here.
+>
+> lobsters was also excluded because stackprof fails to build. stackprof 0.2.28, the latest release, uses POSIX signals and timers that MinGW doesn't have. lobsters lists it only in its development group, which the benchmark doesn't load, so it now gets `platforms: :mri`, as in railsbench's Gemfile. Gemfile.lock doesn't change.
+>
+> graphql-native moves from graphql-c_parser 1.1.3 to 1.2.0 (released 2026-11-05), which includes rmosolgo/graphql-ruby#5877: it renames the C token names that clashed with Windows headers. graphql stays at 2.5.11.
+>
+> This also changes graphql-native on Linux. It returns the same tokens and AST for `negotiate.gql`, but runs about 2% more instructions per iteration (Cachegrind, Ruby 4.0.9 interpreter, fixed heap, two runs each; two runs of 1.1.3 differ by 0.3%). The extra instructions are in the C lexer and parser that 1.1.4 and 1.2.0 regenerated for their number, BOM and parser-stack changes, not in #5877's renames.
+>
+> In this run on my fork, both `benchmark-default-windows` jobs pass and run all four benchmarks: https://github.com/thomasklemm/ruby-bench/actions/runs/42063514767

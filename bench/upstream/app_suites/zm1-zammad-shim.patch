@@ -1,0 +1,13 @@
+diff --git a/app/models/user.rb b/app/models/user.rb
+index 64cd9ba01..54891f12b 100644
+--- a/app/models/user.rb
++++ b/app/models/user.rb
+@@ -85,7 +85,7 @@ class User < ApplicationModel
+ 
+     # Built from the relation's table and a bind: the predicate follows a table
+     # alias under joins, and all logins share one prepared statement.
+-    lower_value = Arel::Nodes::NamedFunction.new('LOWER', [predicate_builder.build_bind_attribute(:login, login)])
++    lower_value = Arel::Nodes::NamedFunction.new('LOWER', [predicate_builder.build_bind_attribute(table[:login], login)])
+     where(login:).where(table[:login].lower.eq(lower_value))
+   }
+ 

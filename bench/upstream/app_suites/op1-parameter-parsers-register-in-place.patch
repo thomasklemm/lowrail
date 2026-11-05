@@ -1,0 +1,125 @@
+From c5df553fa32908cf7b5eb4d02eb27bdf2d785769 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 12:05:18 +0000
+Subject: [PATCH] Allow registering parameter parsers in place during boot
+
+Since the parameter parsers were made Ractor safe, the default parsers
+are the frozen `DEFAULT_PARSERS` constant and assigned parsers are
+frozen, so code that registers a parser with
+`ActionDispatch::Request.parameter_parsers[:jsonapi] = parser`, as
+graphiti, jsonapi-rails and scimitar do, raises a FrozenError at boot.
+
+Keep the parsers mutable while the application boots and freeze them in
+a `before_ractorize` hook instead. The default is a copy of
+`DEFAULT_PARSERS` so it can be extended, and parsers assigned after
+`ractorize!` are still frozen.
+---
+ .../lib/action_dispatch/http/parameters.rb    |  6 ++++--
+ actionpack/lib/action_dispatch/railtie.rb     |  6 ++++++
+ actionpack/test/controller/webservice_test.rb | 18 +++++++++++++++++
+ railties/test/application/ractors_test.rb     | 20 +++++++++++++++++++
+ 4 files changed, 48 insertions(+), 2 deletions(-)
+
+diff --git a/actionpack/lib/action_dispatch/http/parameters.rb b/actionpack/lib/action_dispatch/http/parameters.rb
+index 10b0e96fd7..c92748f0dc 100644
+--- a/actionpack/lib/action_dispatch/http/parameters.rb
++++ b/actionpack/lib/action_dispatch/http/parameters.rb
+@@ -28,7 +28,7 @@ class << self
+           attr_reader :parameter_parsers
+         end
+ 
+-        @parameter_parsers = DEFAULT_PARSERS
++        @parameter_parsers = DEFAULT_PARSERS.dup
+       end
+ 
+       module ClassMethods
+@@ -42,7 +42,9 @@ module ClassMethods
+         #     new_parsers = original_parsers.merge(xml: xml_parser)
+         #     ActionDispatch::Request.parameter_parsers = new_parsers
+         def parameter_parsers=(parsers)
+-          @parameter_parsers = parsers.transform_keys { |key| key.respond_to?(:symbol) ? key.symbol : key }.freeze
++          parsers = parsers.transform_keys { |key| key.respond_to?(:symbol) ? key.symbol : key }
++          # Once ractorize! has frozen the parsers, keep their replacement frozen too.
++          @parameter_parsers = @parameter_parsers.frozen? ? parsers.freeze : parsers
+         end
+       end
+ 
+diff --git a/actionpack/lib/action_dispatch/railtie.rb b/actionpack/lib/action_dispatch/railtie.rb
+index 0605880396..cff51e0e1d 100644
+--- a/actionpack/lib/action_dispatch/railtie.rb
++++ b/actionpack/lib/action_dispatch/railtie.rb
+@@ -111,5 +111,11 @@ class Railtie < Rails::Railtie # :nodoc:
+         ActiveSupport::Ractors.make_shareable(ActionDispatch::ExceptionWrapper.silent_exceptions)
+       end
+     end
++
++    initializer "action_dispatch.ractorize" do
++      ActiveSupport.on_load(:before_ractorize) do
++        ActionDispatch::Request.parameter_parsers.freeze
++      end
++    end
+   end
+ end
+diff --git a/actionpack/test/controller/webservice_test.rb b/actionpack/test/controller/webservice_test.rb
+index 23a46df5cd..60790ed885 100644
+--- a/actionpack/test/controller/webservice_test.rb
++++ b/actionpack/test/controller/webservice_test.rb
+@@ -81,6 +81,24 @@ def test_register_and_use_json_simple
+     end
+   end
+ 
++  def test_register_parser_in_place
++    original_parsers = ActionDispatch::Request.parameter_parsers.dup
++    ActionDispatch::Request.parameter_parsers = { Mime[:json] => original_parsers[:json] }
++    ActionDispatch::Request.parameter_parsers[:xml] = Proc.new { |data| { "summary" => data } }
++
++    with_test_route_set do
++      post "/", params: "<summary/>", headers: { "CONTENT_TYPE" => "application/xml" }
++
++      assert_equal "summary", @controller.response.body
++      assert_equal "<summary/>", @controller.params["summary"]
++
++      post "/", params: '{"summary":"json"}', headers: { "CONTENT_TYPE" => "application/json" }
++      assert_equal "json", @controller.params["summary"]
++    end
++  ensure
++    ActionDispatch::Request.parameter_parsers = original_parsers
++  end
++
+   def test_use_json_with_empty_request
+     with_test_route_set do
+       assert_nothing_raised { post "/", headers: { "CONTENT_TYPE" => "application/json" } }
+diff --git a/railties/test/application/ractors_test.rb b/railties/test/application/ractors_test.rb
+index 89bb3d7faa..41414f3908 100644
+--- a/railties/test/application/ractors_test.rb
++++ b/railties/test/application/ractors_test.rb
+@@ -83,6 +83,26 @@ class PostsController < ApplicationController
+         assert_equal "post", on_ractor { PostsController._wrapper_options.name }
+       end
+ 
++      test "ractorize! freezes the parameter parsers registered during boot" do
++        app_file "config/initializers/parameter_parsers.rb", <<~RUBY
++          ActionDispatch::Request.parameter_parsers[:xml] = Ractor.shareable_lambda { |raw_post| { "raw" => raw_post } }
++        RUBY
++
++        app "production"
++
++        assert_not_predicate ActionDispatch::Request.parameter_parsers, :frozen?
++
++        ractorize!
++
++        assert_predicate ActionDispatch::Request.parameter_parsers, :frozen?
++        assert_equal [:json, :xml], on_ractor { ActionDispatch::Request.parameter_parsers.keys }
++
++        ActionDispatch::Request.parameter_parsers = { Mime[:json] => Ractor.shareable_lambda { |raw_post| { "raw" => raw_post } } }
++
++        assert_predicate ActionDispatch::Request.parameter_parsers, :frozen?
++        assert_equal [:json], on_ractor { ActionDispatch::Request.parameter_parsers.keys }
++      end
++
+       test "ractorize! makes Rails.logger shareable" do
+         app "production"
+ 
+-- 
+2.39.5
+

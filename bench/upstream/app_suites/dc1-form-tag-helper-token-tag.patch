@@ -1,0 +1,121 @@
+From ab0a99e41a875c0640816df29949ec78086f2cc2 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 11:51:50 +0000
+Subject: [PATCH] Keep token_tag and method_tag where FormTagHelper can reach
+ them
+
+Introducing NavigationHelper moved `token_tag` and `method_tag` into it, but
+`FormTagHelper#extra_tags_for_form` calls them too, and FormTagHelper includes
+UrlHelper but not NavigationHelper. A class that includes FormTagHelper or
+FormHelper without NavigationHelper, such as a cell or a presenter, raised
+NoMethodError for every form that isn't a GET.
+
+Both modules include UrlHelper, where the two methods lived before, so put
+them back there.
+---
+ .../action_view/helpers/navigation_helper.rb  | 18 -----------
+ .../lib/action_view/helpers/url_helper.rb     | 19 ++++++++++++
+ .../test/template/form_tag_helper_test.rb     | 31 +++++++++++++++++++
+ 3 files changed, 50 insertions(+), 18 deletions(-)
+
+diff --git a/actionview/lib/action_view/helpers/navigation_helper.rb b/actionview/lib/action_view/helpers/navigation_helper.rb
+index a7f5483b82..fbcd85abe8 100644
+--- a/actionview/lib/action_view/helpers/navigation_helper.rb
++++ b/actionview/lib/action_view/helpers/navigation_helper.rb
+@@ -644,24 +644,6 @@ def method_not_get_method?(method)
+           (STRINGIFIED_COMMON_METHODS[method] || method.to_s.downcase) != "get"
+         end
+ 
+-        def token_tag(token = nil, form_options: {})
+-          if token != false && defined?(protect_against_forgery?) && protect_against_forgery? &&
+-              (token || !defined?(embed_authenticity_token?) || embed_authenticity_token?)
+-            token = form_authenticity_token(form_options: form_options) if token == true || token.nil?
+-            options = { type: "hidden", name: request_forgery_protection_token.to_s, value: token }
+-            options[:autocomplete] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
+-            tag(:input, options)
+-          else
+-            ""
+-          end
+-        end
+-
+-        def method_tag(method)
+-          options = { type: "hidden", name: "_method", value: method.to_s }
+-          options[:autocomplete] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
+-          tag("input", options)
+-        end
+-
+         # Returns an array of hashes each containing :name and :value keys
+         # suitable for use as the names and values of form input fields:
+         #
+diff --git a/actionview/lib/action_view/helpers/url_helper.rb b/actionview/lib/action_view/helpers/url_helper.rb
+index db3f5b7dc4..e2da106799 100644
+--- a/actionview/lib/action_view/helpers/url_helper.rb
++++ b/actionview/lib/action_view/helpers/url_helper.rb
+@@ -227,6 +227,25 @@ def phone_to(phone_number, name = nil, html_options = {}, &block)
+ 
+         content_tag("a", name || phone_number, html_options, &block)
+       end
++
++      private
++        def token_tag(token = nil, form_options: {})
++          if token != false && defined?(protect_against_forgery?) && protect_against_forgery? &&
++              (token || !defined?(embed_authenticity_token?) || embed_authenticity_token?)
++            token = form_authenticity_token(form_options: form_options) if token == true || token.nil?
++            options = { type: "hidden", name: request_forgery_protection_token.to_s, value: token }
++            options[:autocomplete] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
++            tag(:input, options)
++          else
++            ""
++          end
++        end
++
++        def method_tag(method)
++          options = { type: "hidden", name: "_method", value: method.to_s }
++          options[:autocomplete] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
++          tag("input", options)
++        end
+     end
+   end
+ end
+diff --git a/actionview/test/template/form_tag_helper_test.rb b/actionview/test/template/form_tag_helper_test.rb
+index 9fb016f662..8254095b54 100644
+--- a/actionview/test/template/form_tag_helper_test.rb
++++ b/actionview/test/template/form_tag_helper_test.rb
+@@ -1227,3 +1227,34 @@ def with_prepend_content_exfiltration_prevention(value)
+       ActionView::Helpers::ContentExfiltrationPreventionHelper.prepend_content_exfiltration_prevention = old_value
+     end
+ end
++
++class FormTagHelperIncludedAloneTest < ActiveSupport::TestCase
++  include ActionView::Helpers::FormTagHelper
++  include Rails::Dom::Testing::Assertions::DomAssertions
++
++  attr_accessor :output_buffer
++
++  def protect_against_forgery?
++    true
++  end
++
++  def form_authenticity_token(**)
++    "secret"
++  end
++
++  def request_forgery_protection_token
++    :authenticity_token
++  end
++
++  def test_form_tag_with_a_method_other_than_get
++    expected = <<~HTML.delete("\n")
++      <form action="/posts" accept-charset="UTF-8" method="post">
++      <input type="hidden" name="utf8" value="&#x2713;" autocomplete="off" />
++      <input type="hidden" name="_method" value="patch" autocomplete="off" />
++      <input type="hidden" name="authenticity_token" value="secret" autocomplete="off" />
++      </form>
++    HTML
++
++    assert_dom_equal expected, form_tag("/posts", method: :patch) { "" }
++  end
++end
+-- 
+2.39.5
+

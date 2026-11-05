@@ -1,0 +1,120 @@
+From 8e7de36dbc67dd7980d6ec87c7c43998329a9908 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:07:51 +0000
+Subject: [PATCH] Keep QueryIntent's background session and mutex together
+
+A query intent preset two fields that only an intent scheduled to run in
+the background uses: its session and its mutex. With them an intent had
+30 instance variables after initialize and 31 once its result was cast,
+and Ruby master, which no longer has a 320-byte heap, puts such an
+object in a 512-byte slot.
+
+Keep the two in an AsyncState that async_schedule! creates. An intent
+now has 29 instance variables after initialize and at most 30 later,
+background ones included, so it fits a 256-byte slot. The unused session
+reader and writer go away.
+---
+ .../connection_adapters/query_intent.rb       | 28 +++++++++----------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/activerecord/lib/active_record/connection_adapters/query_intent.rb b/activerecord/lib/active_record/connection_adapters/query_intent.rb
+index 37adf81297..d657a73538 100644
+--- a/activerecord/lib/active_record/connection_adapters/query_intent.rb
++++ b/activerecord/lib/active_record/connection_adapters/query_intent.rb
+@@ -61,11 +61,14 @@ def payload
+         end
+       end
+ 
++      # Allocated only when scheduling an asynchronous query.
++      AsyncState = Struct.new(:session, :mutex) # :nodoc:
++
+       attr_reader :arel, :name, :prepare, :allow_retry, :allow_async,
+-                  :materialize_transactions, :batch, :pool, :session, :lock_wait,
++                  :materialize_transactions, :batch, :pool, :lock_wait,
+                   :event_buffer, :error, :finalized
+       alias_method :finalized?, :finalized
+-      attr_writer :raw_sql, :session
++      attr_writer :raw_sql
+       attr_accessor :adapter, :binds, :ran_async, :notification_payload, :log_handle,
+                     :retry_budget
+ 
+@@ -99,8 +102,7 @@ def initialize(adapter:, arel: nil, raw_sql: nil, processed_sql: nil, name: "SQL
+ 
+         # Deferred execution state
+         @pool = adapter.pool
+-        @session = nil
+-        @mutex = ActiveSupport::Concurrency::NullLock
++        @async = nil
+         @error = nil
+         @lock_wait = nil
+         @event_buffer = nil
+@@ -147,11 +149,11 @@ def inspect
+       def execute_or_skip
+         return unless pending?
+ 
+-        @session.synchronize do
++        @async.session.synchronize do
+           return unless pending?
+ 
+           @pool.with_connection do |connection|
+-            return unless @mutex.try_lock
++            return unless @async.mutex.try_lock
+             previous_instrumenter = ActiveSupport::IsolatedExecutionState[:active_record_instrumenter]
+             begin
+               if pending?
+@@ -169,7 +171,7 @@ def execute_or_skip
+               @error = error
+             ensure
+               ActiveSupport::IsolatedExecutionState[:active_record_instrumenter] = previous_instrumenter
+-              @mutex.unlock
++              @async.mutex.unlock
+             end
+           end
+         end
+@@ -177,12 +179,12 @@ def execute_or_skip
+ 
+       # Is this intent still pending (result not yet available)?
+       def pending?
+-        !@raw_result_available && @session&.active?
++        !@raw_result_available && @async && @async.session.active?
+       end
+ 
+       # Was this intent canceled?
+       def canceled?
+-        @session && !@session.active?
++        @async && !@async.session.active?
+       end
+ 
+       def cancel
+@@ -302,7 +304,7 @@ def ensure_result
+           return
+         end
+ 
+-        if @session
++        if @async
+           # Async was scheduled: wait for result (sets lock_wait)
+           execute_or_wait
+         end
+@@ -392,9 +394,7 @@ def async_schedule!(session)
+             raise AsynchronousQueryInsideTransactionError, "Asynchronous queries are not allowed inside transactions"
+           end
+ 
+-          # Upgrade to real mutex now that we'll have concurrent access
+-          @mutex = Mutex.new
+-          @session = session
++          @async = AsyncState.new(session, Mutex.new)
+ 
+           # Force preprocessing on original thread before queuing
+           processed_sql
+@@ -450,7 +450,7 @@ def execute_or_wait
+           return (@lock_wait = 0.0) if @raw_result_available
+ 
+           start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
+-          @mutex.synchronize do
++          @async.mutex.synchronize do
+             if pending?
+               @pool.with_connection do |connection|
+                 @adapter = connection
+-- 
+2.55.0
+

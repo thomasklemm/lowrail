@@ -1,0 +1,40 @@
+diff --git a/app/models/concerns/tableless.rb b/app/models/concerns/tableless.rb
+index 6f5822d7..d62b3f1f 100644
+--- a/app/models/concerns/tableless.rb
++++ b/app/models/concerns/tableless.rb
+@@ -30,6 +30,21 @@
+ module Tableless
+   extend ActiveSupport::Concern
+ 
++  # lowrail classification shim (Rails main, OP2): the schema context reads the
++  # schema cache directly and ignores the load_schema! override below.
++  MODELS = []
++  ActiveRecord::ConnectionAdapters::BoundSchemaReflection.prepend(Module.new do
++    def columns_hash(table_name)
++      return {} if Tableless::MODELS.any? { |model| model.respond_to?(:table_name) && model.table_name == table_name }
++
++      super
++    end
++  end)
++
++  included do
++    Tableless::MODELS << self
++  end
++
+   def persisted?
+     false
+   end
+diff --git a/lib/tabular_form_builder.rb b/lib/tabular_form_builder.rb
+index a785664e..480bca80 100644
+--- a/lib/tabular_form_builder.rb
++++ b/lib/tabular_form_builder.rb
+@@ -96,7 +96,8 @@ class TabularFormBuilder < ActionView::Helpers::FormBuilder
+       add_error_class(input_options)
+     end
+ 
+-    @object_name.to_s.sub!(/\[\]$/, "") || @object_name.to_s.sub!(/\[\]\]$/, "]")
++    @object_name = @object_name.to_s.dup # lowrail classification shim (frozen model_name strings)
++    @object_name.sub!(/\[\]$/, "") || @object_name.sub!(/\[\]\]$/, "]")
+ 
+     inputs = {
+       value: @object.public_send(field),

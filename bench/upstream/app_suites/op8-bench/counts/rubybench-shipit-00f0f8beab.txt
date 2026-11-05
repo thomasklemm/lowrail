@@ -1,0 +1,13 @@
+models=26 frozen_on_main=26 proc_default=0 errors=0
+type-level form falls back: 10 of 26 (10 of 26 frozen on main)
+nil-default form falls back: 9 of 26 (9 of 26 frozen on main)
+  fallback Shipit::ApiClient permissions:Serialized
+  fallback Shipit::Delivery response_headers:Serialized
+  fallback Shipit::Deploy definition:Serialized env:Serialized
+  fallback Shipit::Hook events:Serialized=""
+  fallback Shipit::PullRequest labels:Serialized
+  fallback Shipit::ReviewStack cached_deploy_spec:Serialized
+  fallback Shipit::Rollback definition:Serialized env:Serialized
+  fallback Shipit::Stack cached_deploy_spec:Serialized
+  fallback Shipit::Task definition:Serialized env:Serialized
+  nil_only Shipit::User encrypted_github_access_token:EncryptedAttributeType

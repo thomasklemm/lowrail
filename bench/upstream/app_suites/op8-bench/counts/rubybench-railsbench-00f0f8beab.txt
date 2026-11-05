@@ -1,0 +1,3 @@
+models=1 frozen_on_main=1 proc_default=0 errors=0
+type-level form falls back: 0 of 1 (0 of 1 frozen on main)
+nil-default form falls back: 0 of 1 (0 of 1 frozen on main)

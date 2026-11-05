@@ -1,0 +1,211 @@
+From d702c5eadf5ff99bd6026d65a176600b5680a39b Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 16:52:36 +0000
+Subject: [PATCH 1/4] Note in the upgrade guide that link_to and button_to
+ moved to NavigationHelper
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 38 ++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 697bd23e7d..0485dbdb0b 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -97,6 +97,44 @@ Rails.application.config.action_view.erb_implementation = :erubi
+ 
+ Applications with a custom ERB implementation should set it through `config.action_view.erb_implementation`, since the framework default replaces an `ActionView::Base.erb_implementation` assignment made in an initializer.
+ 
++### `link_to`, `button_to` and `current_page?` moved to `ActionView::Helpers::NavigationHelper`
++
++`link_to`, `button_to`, `current_page?`, `link_to_if`, `link_to_unless` and
++`link_to_unless_current` are now defined in `ActionView::Helpers::NavigationHelper`
++instead of `ActionView::Helpers::UrlHelper`. Views and helpers are unaffected,
++but a class that includes `UrlHelper` or `FormHelper` without `NavigationHelper`
++no longer defines them. A class that also forwards missing methods to a view,
++for example with `delegate_missing_to :view_context`, doesn't raise but runs the
++view's `link_to`, which can render a block's markup as escaped HTML.
++
++Include `NavigationHelper`, which includes `UrlHelper`:
++
++```ruby
++# Before
++class LinkPresenter
++  include ActionView::Helpers::UrlHelper
++end
++
++# After
++class LinkPresenter
++  include ActionView::Helpers::NavigationHelper
++end
++```
++
++Classes that include `FormHelper` should keep that include and also include
++`NavigationHelper`.
++
++`NavigationHelper` doesn't exist before Rails 8.2. Code that also supports
++earlier versions can keep including `UrlHelper` and include `NavigationHelper`
++only where it's defined:
++
++```ruby
++class LinkPresenter
++  include ActionView::Helpers::UrlHelper
++  include ActionView::Helpers::NavigationHelper if defined?(ActionView::Helpers::NavigationHelper)
++end
++```
++
+ ### `:controller` and `:action` may no longer be used as dynamic route segments
+ 
+ Routes such as the "default route" that older applications still carry in
+-- 
+2.55.0
+
+
+From 7fb3092c5ca31b05b6689b31ec4374c4cea4ea2b Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 16:52:36 +0000
+Subject: [PATCH 2/4] Note in the upgrade guide that Rack::Sendfile is omitted
+ when x_sendfile_header is unset
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 25 ++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 0485dbdb0b..9f18535615 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -185,6 +185,31 @@ warning naming each route whose controller does not exist. Such routes used to
+ go unnoticed until a request matched them. Check the boot log for
+ `references a missing controller` and fix or remove the routes it lists.
+ 
++### `Rack::Sendfile` is omitted when `x_sendfile_header` is unset
++
++The default middleware stack now includes `Rack::Sendfile` only when
++`config.action_dispatch.x_sendfile_header` is configured. When it is unset, code
++that positions middleware relative to `Rack::Sendfile`, such as
++`config.middleware.insert_before Rack::Sendfile, Rack::ContentLength`, raises
++`No such middleware to insert before: Rack::Sendfile` on boot.
++
++To keep sending files through the web server, configure the header your server
++expects:
++
++```ruby
++config.action_dispatch.x_sendfile_header = "X-Sendfile" # or "X-Accel-Redirect" for NGINX
++```
++
++If your middleware doesn't depend on `Rack::Sendfile`, insert it relative to
++another middleware, for example `ActionDispatch::Executor`, which is always in
++the default stack. Choose the insertion point by which requests your middleware
++needs to see: `ActionDispatch::Executor` comes after `ActionDispatch::Static`,
++so a middleware inserted before it no longer wraps static file responses.
++
++```ruby
++config.middleware.insert_before ActionDispatch::Executor, Rack::ContentLength
++```
++
+ ### The old Active Record 6.1 marshalling format was removed.
+ 
+ If your application still sets `active_record.marshalling_format_version = 6.1`, which may
+-- 
+2.55.0
+
+
+From cba45f2f04b9a21702dcd9bcefdb60c96b66c37f Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 16:52:36 +0000
+Subject: [PATCH 3/4] Note in the upgrade guide that PostgreSQL 18.4+ fixture
+ loading acquires more locks
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 33 ++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 9f18535615..53ecd1af37 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -217,6 +217,39 @@ be done by not calling `config.load_defaults` or calling it with a version older
+ you MUST opt-in to the newer `7.1` marshal format before upgrading, and ensure all caches were
+ either flushed or upgraded.
+ 
++### Loading fixtures on PostgreSQL 18.4+ acquires more locks
++
++On PostgreSQL 18.4 and later, Active Record turns off foreign key checks while it
++loads fixtures or empties tables through `truncate_tables` by switching the
++enforced foreign keys in the current schemas to `NOT ENFORCED` and back, instead
++of disabling triggers. This no longer requires a superuser, but switching off
++drops the constraint triggers and switching back recreates them, and the locks
++this takes on the constraints, tables and indexes are held until the
++transaction ends. That can be substantially more locks than disabling triggers
++took.
++
++PostgreSQL keeps object locks in one server-wide shared table. Its capacity
++depends on `max_locks_per_transaction` (64 by default), the configured number of
++server processes (mostly `max_connections`) and prepared transactions. Parallel
++test workers that load fixtures at the same time can exhaust it, intermittently
++and more often with more workers, and fail with:
++
++```
++PG::OutOfMemory: ERROR:  out of shared memory
++HINT:  You might need to increase "max_locks_per_transaction".
++```
++
++If fixture loading fails with this error, increase the setting on the
++PostgreSQL server that runs the tests, for example in `postgresql.conf`, and
++restart the server:
++
++```
++max_locks_per_transaction = 256
++```
++
++The value you need depends on your schema and the number of concurrent workers;
++larger test suites may need more.
++
+ ### The negative scopes for enums now include records with `nil` values.
+ 
+ Active Record negative scopes for enums now include records with `nil` values.
+-- 
+2.55.0
+
+
+From 2b4acdc0fcf73e0fd0308f264862c501acd3da83 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 16:52:36 +0000
+Subject: [PATCH 4/4] Note in the upgrade guide that Sidekiq 8.0.3 or later is
+ required
+
+---
+ guides/source/upgrading_ruby_on_rails.md | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 53ecd1af37..8cbb06e095 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -272,6 +272,22 @@ Book.not_published # => [book2]
+ Book.not_published # => [book2, book3]
+ ```
+ 
++### Upgrade Sidekiq to 8.0.3 or later
++
++The `sidekiq` adapter that Rails 8.1 deprecated has been removed, so the adapter
++now comes from the `sidekiq` gem. Older Sidekiq releases can fail to load it, and
++an application that sets
++
++```ruby
++config.active_job.queue_adapter = :sidekiq
++```
++
++then raises a `NameError` for `ActiveJob::QueueAdapters::SidekiqAdapter` during
++boot or when `ActiveJob::Base` loads. Tests configured to use `:test` can miss
++this failure. Some of these releases raise it even when another adapter is
++configured. The Sidekiq 7.3.3 or later that the Rails 8.1 deprecation message
++recommends isn't enough; Sidekiq 8.0.3 and later load the adapter correctly.
++
+ Upgrading from Rails 8.0 to Rails 8.1
+ -------------------------------------
+ 
+-- 
+2.55.0
+

@@ -1,0 +1,4 @@
+models=24 frozen_on_main=24 proc_default=0 errors=0
+type-level form falls back: 1 of 24 (1 of 24 frozen on main)
+nil-default form falls back: 1 of 24 (1 of 24 frozen on main)
+  fallback User settings:Type

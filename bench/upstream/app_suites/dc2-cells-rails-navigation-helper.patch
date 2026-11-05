@@ -1,0 +1,60 @@
+From 6ba587cce668bb823022cd1416ee9a9c48152e68 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 13:35:50 +0000
+Subject: [PATCH] Include NavigationHelper in cells on Rails 8.2
+
+Rails main moved link_to, button_to, current_page? and the link_to_if
+family from ActionView::Helpers::UrlHelper into the new NavigationHelper,
+which FormHelper doesn't include, so cells lost those helpers. Until
+Rails also moves token_tag and method_tag back into UrlHelper, cells on
+main can't render form_tag or form_for with a POST either; including
+NavigationHelper brings those back too.
+
+Include the module where it is defined, so earlier Rails versions are
+unchanged.
+---
+ lib/cell/railtie.rb                            | 1 +
+ test/dummy/test/integration/url_helper_test.rb | 8 ++++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/lib/cell/railtie.rb b/lib/cell/railtie.rb
+index 3c67e8d..5cbd49b 100644
+--- a/lib/cell/railtie.rb
++++ b/lib/cell/railtie.rb
+@@ -47,6 +47,7 @@ module Cell
+       # include asset helpers (image_path, font_path, ect)
+       ViewModel.class_eval do
+         include ActionView::Helpers::FormHelper # includes ActionView::Helpers::UrlHelper, ActionView::Helpers::FormTagHelper
++        include ActionView::Helpers::NavigationHelper if defined?(ActionView::Helpers::NavigationHelper) # link_to, button_to, current_page? (Rails 8.2+)
+         include ::Cell::RailsExtensions::HelpersAreShit
+ 
+         require "cell/helper/asset_helper"
+diff --git a/test/dummy/test/integration/url_helper_test.rb b/test/dummy/test/integration/url_helper_test.rb
+index 30ac16e..7b68070 100644
+--- a/test/dummy/test/integration/url_helper_test.rb
++++ b/test/dummy/test/integration/url_helper_test.rb
+@@ -16,6 +16,12 @@ class UrlCell < Cell::ViewModel
+   end
+ end
+ 
++class LinkCell < Cell::ViewModel
++  def show
++    link_to("Songs", songs_path)
++  end
++end
++
+ class UrlHelperTest < Minitest::Spec
+   include Cell::Testing
+   controller MusiciansController
+@@ -25,6 +31,8 @@ class UrlHelperTest < Minitest::Spec
+   # path helpers work in cell instance.
+   it { _(song_cell.songs_path).must_equal "/songs" }
+   it { _(song_cell.()).must_equal "http://test.host/songs/1" }
++
++  it { _(LinkCell.new(nil, context: { controller: controller }).()).must_equal %{<a href="/songs">Songs</a>} }
+ end
+ 
+ 
+-- 
+2.39.5
+

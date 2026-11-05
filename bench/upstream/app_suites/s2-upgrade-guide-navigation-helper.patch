@@ -1,18 +1,18 @@
-From 3db35ffc1cee827601dc892006c09ec8c88b56d0 Mon Sep 17 00:00:00 2001
+From b5d8b978d5b2327ff4f1d65756618782bd15a709 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Wed, 4 Nov 2026 16:07:55 +0000
 Subject: [PATCH] Note in the upgrade guide that link_to and button_to moved to
  NavigationHelper
 
 ---
- guides/source/upgrading_ruby_on_rails.md | 32 ++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ guides/source/upgrading_ruby_on_rails.md | 36 ++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
-index 697bd23e7d..bd3fdf2136 100644
+index 697bd23e7d..157c4d115a 100644
 --- a/guides/source/upgrading_ruby_on_rails.md
 +++ b/guides/source/upgrading_ruby_on_rails.md
-@@ -97,6 +97,38 @@ Rails.application.config.action_view.erb_implementation = :erubi
+@@ -97,6 +97,42 @@ Rails.application.config.action_view.erb_implementation = :erubi
  
  Applications with a custom ERB implementation should set it through `config.action_view.erb_implementation`, since the framework default replaces an `ActionView::Base.erb_implementation` assignment made in an initializer.
  
@@ -21,9 +21,13 @@ index 697bd23e7d..bd3fdf2136 100644
 +`link_to`, `button_to`, `current_page?`, `link_to_if`, `link_to_unless` and
 +`link_to_unless_current` are now defined in `ActionView::Helpers::NavigationHelper`
 +instead of `ActionView::Helpers::UrlHelper`. Views and helpers are unaffected,
-+but a class that includes only `ActionView::Helpers::UrlHelper` no longer
-+responds to them. `NavigationHelper` includes `UrlHelper`, so including it
-+instead is enough:
++but a class that includes `UrlHelper` or `FormHelper` without `NavigationHelper`
++no longer defines them. If the class also forwards missing methods to a
++view, for example with `delegate_missing_to :view_context`, it doesn't raise:
++`link_to` runs in the view instead, without the class's own `capture`, so a
++block's markup can come out as escaped HTML.
++
++Include `NavigationHelper`, which includes `UrlHelper`:
 +
 +```ruby
 +# Before
@@ -52,5 +56,5 @@ index 697bd23e7d..bd3fdf2136 100644
  
  Routes such as the "default route" that older applications still carry in
 -- 
-2.55.0
+2.39.5
 

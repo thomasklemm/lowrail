@@ -1,0 +1,34 @@
+From 7d0ec59dadfafa2f3abaa8a552b8dce3b33f2f7d Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Thu, 5 Nov 2026 10:58:28 +0000
+Subject: [PATCH] Check for the main Ractor before the Ractor connection
+ handler
+
+connection_handler asked ractor_connection_handler first, which checks
+whether this is the main Ractor and returns nil there, and then fell
+back to default_connection_handler. On the main Ractor, where nearly
+every call happens, that is one method call that only says no.
+
+Check for the main Ractor in connection_handler itself and call
+ractor_connection_handler only in other Ractors.
+---
+ activerecord/lib/active_record/core.rb | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/activerecord/lib/active_record/core.rb b/activerecord/lib/active_record/core.rb
+index 8f4a1b5378..961f722436 100644
+--- a/activerecord/lib/active_record/core.rb
++++ b/activerecord/lib/active_record/core.rb
+@@ -143,8 +143,7 @@ def self.application_record_class? # :nodoc:
+ 
+       def self.connection_handler
+         ActiveSupport::IsolatedExecutionState[:active_record_connection_handler] ||
+-          ractor_connection_handler ||
+-          default_connection_handler
++          (ActiveSupport::Ractors.main? ? default_connection_handler : ractor_connection_handler)
+       end
+ 
+       def self.connection_handler=(handler)
+-- 
+2.55.0
+
