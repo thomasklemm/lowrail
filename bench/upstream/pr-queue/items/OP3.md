@@ -14,7 +14,7 @@ alternative_of:
 impact: see docs/upstream/contributions.md
 rank:
 risky: false
-state: ready
+state: closed
 pr: 59660
 note: "recommend closing (2026-11-06): neither caller needs the writer, see docs/upstream/validation-context.md; Thomas decides"
 passes:
