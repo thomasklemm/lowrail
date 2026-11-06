@@ -113,6 +113,12 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   something main removed, the body says in a sentence or a short list who uses it (gem or app, with a line permalink),
   so the PR doesn't stand alone.
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
+* **Tests check behaviour, never implementation details** (Thomas, 2026-11-06). No allocation counts
+  (`GC.stat`), instruction counts, call counts or other internal-state assertions in upstream suites. A perf
+  change is shown by a benchmark beside the suite: the numbers go in the PR body or a linked Lowrail record, and
+  the commit message explains why the change is correct and why it has its shape. Add a test only when the change
+  touches behaviour a plausible regression would break. Example: our allocation test in sqlite3-ruby#758 was the
+  first of its kind in that suite.
 ## Playbook from the PR retrospective (2026-11-04)
 
 Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. The first
@@ -308,7 +314,7 @@ real problem.)
   and it says why, not what. Explanations of cost, Ruby internals or the regression belong in the PR body or the
   Lowrail record.
 * Reviewers asking for "a comment so nobody deletes this" doesn't override this: prefer a test that fails
-  when the line is removed.
+  when the line is removed, if it is a behaviour test; for a perf-only line the commit message carries the reason.
 * Before a queued branch opens, check its added comment lines against these rules.
 
 ### Correctness fixes: readable first (2026-11-04)
