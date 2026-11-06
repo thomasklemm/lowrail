@@ -13,7 +13,8 @@ depends_on: []
 impact: "Every multi-column SQLite result row, including default Rails record loads. A complete 1,000-row seven-column model load (to_a, lazy attributes) uses 2.69% fewer YJIT instructions and 1.27% fewer interpreter instructions, with passing A/A and unchanged objects. Native row memory matches main on Ruby 3.2/3.3/3.4; no whole-request saving is established."
 rank: 23
 risky: true
-state: in-review
+state: draft
+pr: 770
 note: "TruffleRuby initializer guard applied; documented macro confirmed from its public headers. CRuby preprocessed source is byte-identical to the measured head, so accepted whole-model prices stand. Skeptic approves exact new head/body; coordinator Astra confirm pending. Single-column YJIT pluck has +0.0367% instruction overhead."
 passes:
   - {reviewer: skeptic, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
@@ -23,6 +24,8 @@ passes:
   - {reviewer: sol, head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e", date: 2026-11-06, verdict: nits, open: "Body said 20 rows; now 1,000 rows/7,000 stores. Keep the two branches."}
   - {reviewer: astra, head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e", date: 2026-11-06, verdict: changes, open: "TruffleRuby ignores rb_ary_new_capa capacity and its RARRAY_ASET calls rb_ary_store, so pre-sizing adds a store per row there; guard the init with #ifndef TRUFFLERUBY."}
   - {reviewer: skeptic, head: "61fd4988d615a292e566caa3f042d0f263802dfe", date: 2026-11-06, verdict: approve, open: "Guard restores TruffleRuby's original stores by source inspection; CRuby preprocessing independently byte-identical, measured prices/body unchanged. Both own suites pass; no TruffleRuby runtime executed."}
+  - {reviewer: sol, head: "61fd4988d615a292e566caa3f042d0f263802dfe", date: 2026-11-06, verdict: approve, open: "TruffleRuby guard and body confirmed; no fixes."}
+  - {reviewer: astra, head: "61fd4988d615a292e566caa3f042d0f263802dfe", date: 2026-11-06, verdict: approve, open: "TruffleRuby guard and body confirmed; no fixes."}
 ---
 
 # Fill multi-column statement rows at their known size
