@@ -470,3 +470,192 @@ claims therefore rest on the per-call counts, the sampled method windows and the
 
 Scripts and cases are in [`bench/upstream/perf_round`](../../bench/upstream/perf_round). Raw Callgrind, cachegrind,
 byte and hash-scan outputs stay under `.lowrail/private/perf` (not committed).
+
+## PM1b: QueryRequest holds query data (2026-11-06)
+
+**Decision: held, no PR.** This is a prototype of matthewd's architectural suggestion, not a faster version of
+PM1. The separation is useful; the snapshot lifecycle is not yet a convincing implementation to propose. It
+allocates more objects and executes more interpreter instructions in the ordinary query paths. A smaller intent
+alone is not a performance result. The final independent Claude Code review will be arranged by the coordinator;
+it has not happened and the item must not be opened on the strength of the skeptical pass alone.
+
+### Reading the suggestion
+
+On the closed [rails/rails#59673](https://github.com/rails/rails/pull/59673#issuecomment-6681165414), matthewd wrote:
+"we should address it by consolidating the ractor proxy's immutable QueryRequest as the holder of those details,
+and the QI as the mutable/stateful wrapper." This does **not** mean putting the background session and mutex
+inside an immutable request. It means moving the query description out of the object that executes it.
+
+That reading agrees with the earlier discussions:
+
+* [rails/rails#55897](https://github.com/rails/rails/pull/55897), introducing QueryIntent, already anticipated
+  [a deeply frozen driver-input object](https://github.com/rails/rails/pull/55897#discussion_r2427982884), distinct
+  from a particular execution. The history goes from an immutable parameter object to an execution controller.
+* [rails/rails#56129](https://github.com/rails/rails/pull/56129) put preprocessing and execution on the intent;
+  [rails/rails#56267](https://github.com/rails/rails/pull/56267) made the async queue hold intents, leaving
+  FutureResult as the caller-facing wrapper. These establish the lazy compilation/scheduling boundary.
+* [rails/rails#58049](https://github.com/rails/rails/pull/58049) made result/failure delivery, retries, logging and
+  warning observation stateful responsibilities of the intent.
+* [rails/rails#58306](https://github.com/rails/rails/pull/58306), introducing Ractor connections, was explicit
+  about [the awkward duplicate data bags on each side](https://github.com/rails/rails/pull/58306#discussion_r3946374427).
+  Its nested QueryRequest serializes binds and then reconstructs another intent's keyword arguments.
+* [rails/rails#58296](https://github.com/rails/rails/pull/58296) applies RETURNING to the Arel/raw-SQL intent before
+  preprocessing. Freezing/preprocessing too early would change this ordering and async RangeError behavior.
+
+Read both classes' complete Git histories, the introducing/follow-up PR bodies and conversations/reviews/inline
+discussions, and all in-tree constructors/readers: database statements and RETURNING, AbstractAdapter's execution,
+retry/log/warning code, SQLite/PostgreSQL/MySQL/Trilogy drivers, FutureResult, the async queue/session, and both
+Ractor transport directions. Searches for QueryRequest, QueryIntent, query-request consolidation and recent/open
+matthewd PRs found no duplicate consolidation. His open [rails/rails#57089](https://github.com/rails/rails/pull/57089)
+at `de51bc2895` changes execution/pipelining state, not this split; there is likely integration overlap. Last
+upstream-main check still returned `cadf0fc8d6`; no upstream comments or PR were created.
+
+| Owner | Details |
+| --- | --- |
+| Frozen QueryRequest snapshot | processed SQL, query name, binds or their marshaled transport payload, prepare, batch, allow_retry, materialize_transactions |
+| QueryIntent preparation/execution | source Arel/raw SQL, local allow_async policy, selected adapter/pool, compiled/decoded binds cache and adapter-specific type-cast binds |
+| QueryIntent mutable outcome/lifetime | raw/cast result, affected rows, result availability, error, warnings and warning-observation state, finalized/executed/retry budget, write-query cache, async session/mutex/ran_async/lock_wait, notification payload/event buffer/log handle |
+
+`allow_async` is immutable caller policy, but stays execution-local: the physical-side intent must not schedule
+another background query. Neither adapter/pool identity nor timing and notification payload are reusable request
+data. Binds' **description** belongs in the request; their memoizing QueryAttribute instances and driver-cast values
+still have an execution/ownership lifecycle. "Immutable" does not authorize deep-freezing caller-owned objects.
+
+### Prototype and limits
+
+Fork [thomasklemm/query-intent-request](https://github.com/thomasklemm/rails/tree/thomasklemm/query-intent-request),
+head [`3510f6e151`](https://github.com/thomasklemm/rails/commit/3510f6e1513ce9315795d5fda0b70c7ca6042583), one commit on
+[`cadf0fc8d6`](https://github.com/rails/rails/commit/cadf0fc8d6d48cefaa07e4bd6cc5dcd8347821b2), **5 files, +80/−79**.
+Author and committer are Thomas Klemm `<github@tklemm.eu>`, with reasoning in the message and no trailers.
+
+Promote QueryRequest from the proxy's namespace to ConnectionAdapters. An intent always owns a frozen snapshot.
+Compilation replaces it with updated binds/prepare/retryability; preprocessing replaces it with processed SQL.
+At the proxy boundary it is replaced with a deeply shareable, marshaled-binds snapshot. The proxy passes that
+**same object** to a physical-side QueryIntent, instead of copying its fields into constructor keywords. Result,
+warning, retry and notification handling remain on the execution wrappers. No deprecation shims or public API
+changes; the removed nested constant and `binds=` writer are internal and have no in-tree consumers.
+
+This is deliberately a **compiled-request** split, not a fully immutable source-query abstraction: early snapshots
+have `sql: nil`, Arel/raw SQL remain on the intent until RETURNING and lazy preprocessing finish, and ordinary
+snapshots are shallow-frozen. Their bind arrays and attributes retain existing identity/memoization. Only transport
+snapshots are deeply shareable. Keeping that timing costs up to three 80-byte request objects per ordinary Arel
+query; the two superseded snapshots are transient but still allocated. This is the main reason to keep it held
+rather than presenting the class separation as a free improvement.
+
+### Measurements
+
+**Pins/method.** Ruby 4.0.9 `3e93b23afc`, and Ruby master
+[`0236df43c2`](https://github.com/ruby/ruby/commit/0236df43c2b32671d7bac1f33d5ebfd50ea23f02) (4.1.0dev, built here),
+SQLite 2.5.0, identical dependency bundle per arm. A three-row file-backed database, no query cache or Lowrail
+runtime. Three fresh-process rounds rotate base / independent base-control / candidate order; 500 warmups and
+N=0/500 GC-disabled Callgrind client windows for each shape. Lowrail's existing `HeapWindows` sets all pool floors;
+objects and slot bytes are per-pool allocation-counter differences. The
+[runner, worker and protocol](../../bench/upstream/query_request) retain the loaded gems and raw observations.
+
+**Diagnostics, not an admitted CPU/GC price.** These are three-round GC-disabled micros, not Lowrail's full
+six-round total/no-GC request protocol. Both interpreter cohorts finish all nine workers with no within-window heap
+growth and matching page counts. Lowrail's existing **one-page rounding** capacity rule passes. This runner also
+imposed a stricter **exact-slot-equality** check, which fails: on 4.0.9, for example, pool 3 has 99 pages throughout
+but 20,172–20,179 slots. Keep that extra failure separate; it is not a failure of Lowrail's published heap rule.
+No failed attempt was rerun or reclassified into an accepted price.
+
+The data uses `RequestPairs.estimate` (paired-round median bootstrap) for descriptive intervals. Applying the
+published ±0.1% band as an **additional no-GC-only check**, 4.0.9 fails on `find`, `where`, async and proxy, while
+master fails on proxy. That partial check is not full admission: there are only three rounds and no total/GC
+windows. Base/control allocation counts and allocated slot bytes match in every final interpreter pair.
+
+Raw median **Ir per completed query**; percentage is the median paired change, not a ratio of displayed medians.
+The A/A column is the largest absolute base-control difference across the three pairs:
+
+| Ruby | Shape | Main → prototype Ir | Paired Δ | Max A/A | Objects/query, main → prototype | Allocated slot B/query, main → prototype |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 4.0.9 | `Post.find(1)` | 286,666 → 304,780 | +6.327% | 0.194% | 54.986 → 57.986 | 4,559.44 → 4,799.44 |
+| 4.0.9 | `where.to_a` | 431,283 → 449,337 | +4.201% | 0.150% | 90.002 → 93.002 | 7,360.08 → 7,600.08 |
+| 4.0.9 | `update_all` | 429,062 → 447,473 | +4.316% | 0.057% | 88.000 → 91.000 | 6,520.00 → 6,760.00 |
+| 4.0.9 | actual `load_async` | 550,912 → 569,207 | +3.338% | 0.124% | 103.002 → 106.002 | 7,840.08 → 8,080.08 |
+| 4.0.9 | proxy `exec_query` | 324,326 → 338,119 | +4.268% | 0.311% | 97.008 → 99.008 | 7,680.56 → 7,720.56 |
+| master | `Post.find(1)` | 295,014 → 314,115 | +6.451% | 0.066% | 55.984 → 58.984 | 3,687.39 → 3,671.39 |
+| master | `where.to_a` | 445,232 → 464,343 | +4.256% | 0.074% | 91.000 → 94.000 | 5,792.00 → 5,776.00 |
+| master | `update_all` | 442,076 → 461,008 | +4.283% | 0.058% | 88.000 → 91.000 | 5,160.00 → 5,144.00 |
+| master | actual `load_async` | 565,506 → 584,738 | +3.401% | 0.074% | 104.000 → 107.000 | 6,272.00 → 6,256.00 |
+| master | proxy `exec_query` | 327,592 → 342,747 | +4.628% | 0.163% | 97.004 → 99.004 | 7,784.27 → 7,408.27 |
+
+**Interpretation.** Ordinary queries allocate **three extra objects**: +240 slot B on 4.0.9, only −16 slot B on
+master after counting the intent's −256 B and all three 80-byte snapshots. The proxy adds two objects, +40 B on
+4.0.9 / −376 B on master. Every raw instruction row rises; the ordinary synchronous rows are about +4.2–6.5%,
+well beyond the observed A/A drift, but these micro diagnostics are not admitted request-level CPU prices.
+This is no basis for a performance PR, even though the object split has design value.
+
+**Async/transport limits and rejected attempts.** The final worker observes `ran_async: true`, waits for the
+future with bounded one-millisecond sleeps and then consumes the two-row result. Its Ir includes waiting and
+scheduler work; it is **not** a pure async query CPU cost. The proxy row exercises request marshalling and
+physical-side execution through the real proxy adapter in the main Ractor, **not worker/main messaging latency**.
+The initial counter-wait cohort's async A/A was −23.09%; its next control stalled at completed/scheduled 548/549,
+empty queue, idle workers, and was stopped. A busy-polling per-future attempt also stalled in an uninformative async
+window; debugger inspection preceded a clock syscall error. Both remain rejected/incomplete, separate from the
+final sleep-wait protocol; neither is attributed to a Rails regression or pooled into the table. No async CPU
+improvement is claimed and no winning workload was selected.
+
+The additional master/ZJIT diagnostic cohort finished all nine workers, with zero reported compiler OOMs.
+It is **rejected for JIT claims**: `invalidation_count` is missing in every worker, and even the partial gate
+using the available counters finds non-flat measured windows in every worker. Published heap rounding passes;
+the extra exact-slot check fails again. Raw paired Ir changes / largest absolute A/A are `find` +6.366% / 0.122%,
+`where` +4.297% / 0.114%, `update_all` +4.397% / 0.094%, async +3.711% / 0.808%, and proxy +3.835% / 0.135%.
+Async base/control allocations also differ in this cohort. These are rejected diagnostics, not quiescent-ZJIT
+costs or native latency; they are not pooled with the interpreter observations.
+
+The [numeric export](../../bench/upstream/query_request/results.json) retains 27 final workers, every N=0/500
+window, pins, descriptive bootstrap intervals, heap checks, JIT controls, layout probes, client-dump hashes and
+the rejected attempts. The 4.0.9 aggregate was reconstructed from its nine raw workers and client dumps after
+the original driver exited before saving; no worker was rerun. Subsequent drivers retain results before raising
+the extra exact-slot rejection. Full client dumps and test/build logs remain under `.lowrail/query-request`.
+
+**Object layout, after warming the class with a cast result:**
+
+| Ruby | Main intent, init / result | Prototype intent, init / result | Request |
+| --- | --- | --- | --- |
+| 4.0.9 | 30 / 31 ivars; 320 B slot | 25 / 26 ivars; 320 B slot | 8 ivars; 80 B, frozen |
+| master `0236df43c2` | 30 / 31 ivars; 512 B slot | 25 / 26 ivars; 256 B slot | 8 ivars; 80 B, frozen |
+
+The initialized intent sizes are measured **after** priming the class, not inferred by adding field sizes. Class
+high-water sizing matters here. Each completed ordinary query keeps one request but allocates three snapshots;
+the allocation total, not just the last request and the smaller intent, is what the per-query byte table counts.
+No RSS, request-level GC, production throughput or JIT speed benefit is claimed.
+
+### Tests and reviews
+
+Exact final head `3510f6e151`, `PARALLEL_WORKERS=1`, `RAILS_STRICT_WARNINGS=1`, sqlite3 2.5.0 and pg 1.7.0:
+
+| Ruby | Check | Runs | Assertions | Failures/errors | Skips |
+| --- | --- | ---: | ---: | --- | ---: |
+| 4.0.9 | `rake test:sqlite3` (full Active Record) | 10,296 | 36,792 | 0 / 0 | 52 |
+| 4.0.9 | `rake test_sqlite3_ractor` (full Active Record) | 9,561 | 34,291 | 0 / 0 | 24 |
+| 4.0.9 | PostgreSQL adapter directory + intent/async/load_async/Ractor-handler selections | 1,079 | 3,336 | 0 / 0 | 14 |
+| master | SQLite adapter directory + intent/async/load_async/Ractor-handler selections | 362 | 1,141 | 0 / 0 | 0 |
+| master | `sqlite3_ractor` intent/async/load_async/Ractor-handler selections | 133 | 538 | 0 / 0 | 0 |
+
+The selections are `test/cases/query_intent_test.rb`, `asynchronous_queries_test.rb`,
+`relation/load_async_test.rb`, `connection_adapters/ractor_connection_handling_test.rb`, plus
+`adapters/{sqlite3,postgresql}/**/*_test.rb` where indicated. PostgreSQL 15 ran locally with the two standard
+Active Record test databases; it emitted an unknown-OID-194 warning while recognizing `tgqual` as a
+String. RuboCop: **4 changed Ruby files, no offenses** (an obsolete plugin-setting warning is advisory). Full
+master/PostgreSQL and MySQL/Trilogy suites were not run. No new Rails tests were kept: this preserves behavior,
+and the existing suites plus disposable probes cover the refactor without encoding allocations or ivar layout.
+
+Fork CI on the exact head: [Devcontainer smoke test](https://github.com/thomasklemm/rails/actions/runs/42197805319)
+and [rails-new-docker](https://github.com/thomasklemm/rails/actions/runs/42197805341) both succeeded. These are smoke
+checks, not hosted coverage of the full adapter matrix above.
+
+Independent skeptical review read every changed consumer and exercised bound RETURNING/transformers, bind
+identity and once-only type serialization, synchronous/asynchronous RangeError behavior, proxy retries, warnings,
+and a real worker Ractor. The worker probe confirmed shared request **identity**, shareability, stable decoded and
+cast-bind arrays across two physical attempts, one transformation, the result `[[42]]`, and once-only warning
+observation. It found one P3: copying an already transported request dropped its binds. Fixed by defaulting `with`
+to the logical `binds` reader, not the storage ivar. The follow-up approves exact head `3510f6e151`, with no remaining
+findings. No current public path copies after transport, so only a disposable scratch probe was used for that case;
+no allocation/ivar/helper-composition tests were added.
+
+The reviewer also compared fourteen direct/proxy RangeError/retry outcomes against main. An unprepared async Arel
+SELECT with an overflowing projected QueryAttribute raises during scheduling while its synchronous counterpart
+returns empty, **on both trees**. That inherited behavior is not changed or claimed fixed here. MySQL/Trilogy
+execution and worker-Ractor messaging performance remain unmeasured. Claude Code's final review is **pending**.
