@@ -112,6 +112,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Restore and compatibility PRs name their callers** (Thomas, 2026-11-04): when a PR brings back or bridges
   something main removed, the body says in a sentence or a short list who uses it (gem or app, with a line permalink),
   so the PR doesn't stand alone.
+* **Maintainers can edit our PR branches** (Thomas, 2026-11-06): every PR from a fork opens with "Allow edits by
+  maintainers" on; `script/pr-queue open` sets `maintainer_can_modify=true`. Our forks hold no Actions secrets.
 * **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
 * **Tests check behaviour, never implementation details** (Thomas, 2026-11-06). No allocation counts
   (`GC.stat`), instruction counts, call counts or other internal-state assertions in upstream suites. A perf

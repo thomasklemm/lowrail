@@ -277,7 +277,8 @@ module PrQueue
       f.write(item.body)
       f.close
       pr = gh("repos/#{item['repo']}/pulls", "-f", "title=#{item.title}", "-f", "head=#{item.fork.split('/').first}:#{item['branch']}",
-              "-f", "base=#{item['base'] || 'main'}", "-F", "body=@#{f.path}", "-F", "draft=#{draft}")
+              "-f", "base=#{item['base'] || 'main'}", "-F", "body=@#{f.path}", "-F", "draft=#{draft}",
+              "-F", "maintainer_can_modify=true")
       set(item, "pr", pr["number"])
       set(item, "state", pr["draft"] ? "draft" : "ready")
       puts "opened #{item['repo']}##{pr['number']} at #{pr.dig('head', 'sha')[0, 10]} (#{item['state']}); commit #{item.path}"
