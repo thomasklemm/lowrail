@@ -475,6 +475,9 @@ one click.
   (`filter_proxies`) and AR-4 (`where!`/`having!` binds) meet all three and stay open or queued. Private
   breakage that fails any of them (build_bind_attribute, `_prefixes`, Vary changes) is record-only, or goes to the
   gem or app when the fix there is small and the maintainers are active.
+* **No deprecation shims for internal API** (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
+  APIs. That's what internal means."). Private or `:nodoc:` breakage gets fixed in the gem or app that relies on
+  it. Rails gets a fix only when Rails itself is wrong, not a deprecated restore.
 * **Open gem PRs** (inertia-rails, i18n, rubocop-performance, others): no pings. One short, friendly ping only after
   four weeks without any maintainer reaction; closing only at a maintainer's request or when superseded.
 * **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
