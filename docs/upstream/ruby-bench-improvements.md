@@ -880,7 +880,7 @@ processes. "--runs 5": Welch over per-process means, 200 random 5-against-5 spli
 ## The fix
 
 [`thomasklemm/pvalue-across-processes`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/pvalue-across-processes),
-head `aed07e8d8f` on main `ad63bf8`, one commit (+255/−25, of which tests +136). `--runs N` runs each benchmark in N
+head `b633985a3d` on main `ad63bf8`, one commit (+297/−26, of which tests +171). `--runs N` runs each benchmark in N
 processes per Ruby through the existing `--interleave` loop, flipping the Ruby order every round;
 `BenchmarkRunner.merge_runs` concatenates the per-iteration series and records `warmup_itrs_per_run` and
 `bench_itrs_per_run`; the table splits them back and runs the existing `Stats.welch_p_value` on the N process
@@ -901,7 +901,7 @@ p < 0.05 (fib A–C 0.018, lobsters B–D 0.026); main's test on the same 100 pr
 
 **Real differences (A/B, `--runs 5`, against YJIT).** Interpreter `***` on railsbench (p 7e-9), fib, str_concat. A
 preloaded spin loop ([`slow.rb`](../../bench/upstream/ruby_bench_pvalue/slow.rb), nominal 2% and 5%) measured
-fib 1.8% / 6.2% (p 0.12 / 4e-5 `***`), str_concat 6.8% / 10.3% (`*` / `**`), railsbench 1.6% / 1.8% (p 0.44 /
+extra time per iteration fib 1.9% / 6.6% (p 0.12 / 4e-5 `***`), str_concat 7.1% / 11.4% (`*` / `**`), railsbench 1.6% / 1.9% (p 0.44 /
 0.31, not detected: railsbench processes vary ~3% here).
 
 **Wall time.** Linear in N: the branch A/A ran 100 processes in 2,156 s, against ~430 s for one process each; the
@@ -913,6 +913,16 @@ approve. Kept: the displayed ratio is the pooled mean while the test uses unweig
 odd N lets one Ruby go first once more per benchmark. Fork CI: `test.yml` runs only on `main` and PRs, so the same
 tree was pushed with a one-line trigger as `ci/pvalue-across-processes` (`5e7f158`): all 15 jobs green, run 42242520205; the branch was deleted after. Item:
 [RB-PV](../../bench/upstream/pr-queue/items/RB-PV.md), state reviewed, not opened.
+
+**Final independent pass (Claude Code Thermos, correctness + maintainability, on `aed07e8d8f`): nits, fixed as
+`b633985a3d`.** With `--runs`, every benchmark got a GC row, because the run sizes counted as GC activity; now left
+out. The tests let a p-value over raw iterations, dropped GC run sizes and an even split pass; a new asymmetric test
+(process means checked against scipy) catches all three, and the Ractor refusal test checks its message. The body's
+slowdowns now state extra time (they were 1 − ratio). Checked and correct: Welch on N = 2 and unequal N (matches
+scipy), zero variance, missing run data (N/A), a failed run (the whole Ruby is dropped), N = 1 output and order
+unchanged, 1st itr, Ractor refusal (`bench_by_ractors` would keep process 1 only), every number in the commit
+message (103 = 49 + 54 per mode). Kept: pooled ratio vs process-mean test; odd N balanced across the suite only;
+scalars from process 1. Fork CI on the same tree (`f961b53`, run 42249192428): 15/15 green, branch deleted.
 
 **Receipts** in [`bench/upstream/ruby_bench_pvalue/`](../../bench/upstream/ruby_bench_pvalue/): `collect.sh`
 (main A/A), `collect2.sh` (branch A/B and A/A), `analyze.rb` (`RUBY_BENCH=<checkout> ruby analyze.rb 5 <(zcat
