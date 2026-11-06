@@ -382,7 +382,15 @@ Thomas before posting.
   not opened. Every item states its reach in `impact` (who runs it, how often, how much of a request) before review.
   Such ideas stay with us as `held` queue items ("parked idea" in the note) and are not opened later as they are;
   #59673 PM1, #59674 PM3 and #59677 CB2 were closed on 11-05 for this reason.
-* **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs.
+* **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs. Superseded
+  2026-11-06: Claude Code orbs, see [Review gates](#review-gates).
+* **Focus on Rails, central gems and Ruby; no ecosystem fixing** (Thomas, 2026-11-06). Fixing the Rails ecosystem
+  for 8.2 isn't our job. We don't open fixes in individual apps or niche gems for Rails-main breakage (Zammad,
+  authlogic, Mastodon: recorded in [contributions](upstream/contributions.md), not submitted). Upstream work goes
+  where it reaches every Rails app: Rails, the central gems (Rack, drivers, Puma and the like), Ruby, ruby-bench.
+* **Projects with restrictive AI policies get no upstream reports or fixes** (Thomas, 2026-11-06), for example
+  Mastodon (Assisted-by trailer, human-written descriptions, no agent-opened PRs). We still use them as
+  measurement corpus and record what we find.
 
 ## Bets
 
