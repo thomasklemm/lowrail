@@ -23,16 +23,16 @@ when it constructs a bound literal. Pass original fallback text to `sanitize_sql
 This restores the old SQL and node representation without parsing SQL, changing
 explicit Arel nodes, or undoing the bind-parameter change for full statements.
 
-Fork head: [`41b234e19c7c2690b70098e054d21b39896fba82`](https://github.com/thomasklemm/rails/commit/41b234e19c7c2690b70098e054d21b39896fba82),
-force-pushed with an explicit lease on the previous head
-`7819d582f4a9f90297a428cd7162509a0ed9acf5`; this follow-up only strengthens a
-test fixture and adds the commit-message body. Earlier candidates were
+Fork head: [`805ab062624df73231d665c0fcf0131ec36d9ee0`](https://github.com/thomasklemm/rails/commit/805ab062624df73231d665c0fcf0131ec36d9ee0),
+force-pushed with an explicit lease on `41b234e19c7c2690b70098e054d21b39896fba82`.
+It drops the CHANGELOG entry (#58427 is unreleased, on main only) and rewraps
+and retitles the commit; runtime and test sources are byte-identical to
+`41b234e19c`. Earlier candidates were `7819d582f4a9f90297a428cd7162509a0ed9acf5`,
 `0bf8c93b00e15fe03b60ed6cc6e9b1cd5e070f94` and
 `58a6ff8355ff6b905c6aeae2ea939466f464b4fa`. Author and committer are both
-Thomas Klemm <github@tklemm.eu>; no trailers. The PR's title/body were not edited.
-The existing body describes the earlier empty-only patch; a replacement body is
-prepared in the [CW1 queue item](../../bench/upstream/pr-queue/items/CW1.md), not
-posted. The reply draft below is unchanged.
+Thomas Klemm <github@tklemm.eu>; no trailers. The PR's title/body were not edited:
+the replacement title and body are in the [CW1 queue item](../../bench/upstream/pr-queue/items/CW1.md),
+and the final reply is below. Nothing has been posted.
 
 ## Archaeology and sources
 
@@ -309,38 +309,58 @@ this new test/message-only head. Its production sources are unchanged. The new
 two-paragraph PR body, with the original footer and Chatwoot permalinks, is only
 in the CW1 queue item; no GitHub body edit or comment was made.
 
-## Draft reply to matthewd (not posted)
+### Final review (Claude Code, 2026-11-06)
 
-I traced this back to [2a35baa](https://github.com/rails/rails/commit/2a35baa0bb4312d95e1340074cce731afedecde0)
-in 2005: prevent an OR condition escaping the association constraint.
-[328ef3f](https://github.com/rails/rails/commit/328ef3feaad4c110a7277e3432e9203c7fbbb9e2)
-generalized that to STI/scopes. The wrapping went through `merge_conditions`,
-then relation construction in 2010, AST `Grouping`, and
-[`WhereClause` in 2015](https://github.com/rails/rails/commit/a5fcdae0a04d97dbd8fd05af6f352d3e09b2815f).
-[#51139](https://github.com/rails/rails/pull/51139) added textual parens for the
-new bound literals; #58427 moved them before dispatch, also wrapping the
-sanitizer fallback. [Full timeline and reproducer](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/where-parens-history.md).
+Verdict: **nits**, fixed in `805ab06262`. Code and tests unchanged.
 
-Some grouping should remain, but not twice: `WhereClause` groups `SqlLiteral`,
-not `BoundSqlLiteral`. The latter still needs its existing parens. #58427's
-find/count-by-SQL change needs bound values, not extra grouping of fallback
-conditions; its tests check the binds, and I found no discussion requesting
-that grouping change.
+* **History.** Every reply claim was checked against the commits in a full
+  `rails/rails` clone. The parent of `2a35baa` wraps no user `:conditions`; the
+  only earlier parentheses are around the generated `type_condition`. The
+  movement order `0ff0319` → `1fb78e3` → `da142cd` → `dec3a75` → `0069320` →
+  `a5fcdae` → `213796f` → #51139 (`8e6a5de`) → #58427 (`8c4ed25`) is correct, and
+  PR/commit mappings were confirmed with `gh`.
+* **Differential.** The runner above (same SHA-256) on Ruby 4.0.7/SQLite 3.54.1:
+  head vs 8-1-stable 0 / 1,408; head merged into today's main (`cadf0fc8d6`,
+  which now has `_where!`) vs 8-1-stable 0 / 1,408; base and main vs 8-1-stable
+  683 / 1,408. A second, ad hoc runner added `rewhere`, `invert_where`,
+  `where.not` with OR, STI, association scopes (lazy, eager, preload),
+  association `where`, `?` inside quotes, named values without placeholders or
+  with a quoted `:n`, named arrays and relations, having with bound/sprintf OR,
+  direct Arel bound nodes merged with equivalent strings, `Grouping`, `where!`,
+  and sync/async `find_by_sql`/`count_by_sql` with captured SQL and binds. Head
+  removes the extra parentheses and `(())` failures in every case that differs
+  from the base. Against 8.1 the only differences are #58427's intended binds
+  (and quoting in one error message), plus `where!` with values, which is broken
+  on the base and fixed on main by `e4852e04bb`; merged with main it matches 8.1.
+* **Shape.** A `wrap:` keyword on the nodoc helper is the smallest option: a
+  `BoundSqlLiteral` cannot be re-wrapped after construction without changing
+  node equality, and dispatching in `build_where_clause` would undo #58427's
+  consolidation.
+* **Tests.** Both new tests fail on the base (1 failure, 1 error) and pass on
+  head (2 runs, 18 assertions). Comparing `to_sql` against the equivalent plain
+  string is the right assertion here: the regression is in SQL shape and
+  deduplication, which results alone don't show, and the comparison stays
+  adapter-neutral.
+  With `RAILS_STRICT_WARNINGS=1`, seed 1729: SQLite relation, relation(s),
+  sanitize, finder, associations, scoping, base and inheritance tests: head
+  3,544 runs, 11,190 assertions, 0 failures/errors, 5 skips; merged into main
+  3,550 runs, 11,209 assertions, 0 failures/errors, 5 skips. PostgreSQL 15.19
+  relation, relation(s), sanitize, finder: head 1,363 runs, 3,908 assertions;
+  merged 1,367 runs, 3,923 assertions; 0 failures/errors, 1 skip each.
+* **Fixed.** Removed the CHANGELOG entry: #58427 is in no tag and not in
+  8-1-stable, so no released user saw the regression (`e4852e04bb`, the
+  `where!` regression fix, likewise had none). Rewrapped the commit body to 72
+  columns and retitled the commit and PR from the old empty-only title.
 
-Empty string was just the failure I noticed. The differential also found extra
-parens for ordinary/sprintf conditions, changed merge/OR deduplication, and unused
-value conversion for whitespace strings. Whitespace/comment-only SQL already
-failed on 8.1. I also overstated my earlier reply: an empty condition alone can
-already produce a dangling `WHERE`; the working case was chaining it with another
-condition.
+## Reply to matthewd (final, not posted)
 
-I've revised this to pass the original text to the shared helper and add parens
-only when it builds a bound literal. That keeps #58427's shared dispatch and binds,
-without special-casing empty string or changing caller-supplied Arel nodes.
-Moving all grouping to `WhereClause` is another option, but would change those
-nodes and their equality/deduplication; dropping empty predicates outright would
-also change historical OR/NOT behavior. The revised head matches 8.1 in all
-1,408 cases; relation/where, sanitize and finder tests pass on SQLite.
+As far as I can tell, they were first added in [2a35baa](https://github.com/rails/rails/commit/2a35baa0bb4312d95e1340074cce731afedecde0) (2005), to stop an OR in `:conditions` escaping an association constraint. [328ef3f](https://github.com/rails/rails/commit/328ef3feaad4c110a7277e3432e9203c7fbbb9e2) extended that to STI and scope conditions. The wrapping then moved through `merge_conditions`, `build_where`, `build_arel`, AST `Grouping` and `collapse_wheres`, and [into `WhereClause` in 2015](https://github.com/rails/rails/commit/a5fcdae0a04d97dbd8fd05af6f352d3e09b2815f). [A 2017 refactor](https://github.com/rails/rails/commit/213796fb4936dce1da2f0c097a054e1af5c25c2c) limited it to String/`SqlLiteral`. [#51139](https://github.com/rails/rails/pull/51139) added textual parentheses to the bound literals it builds from strings, and [#58427](https://github.com/rails/rails/pull/58427) moved them ahead of dispatch, so the sanitizer fallback got wrapped too. [Full timeline and reproducer](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/where-parens-history.md).
+
+The grouping should stay, for AND/OR precedence, but only once: `WhereClause` groups `SqlLiteral`s, while string-built `BoundSqlLiteral`s carry their own parentheses. The fallback doesn't need a second pair.
+
+Empty string was the failure I noticed, not the only change. Comparing with 8.1 also showed extra parentheses for ordinary and sprintf conditions with values, identical conditions no longer deduplicating on `merge` or `or`, and whitespace-only strings converting values they used to ignore. My earlier reply was also too broad: on 8.1 an empty condition with values already produced a dangling `WHERE` on its own; what worked was combining it with another condition.
+
+I've revised the patch to pass the original text to the shared helper and add parentheses only to bound literals built for `where`/`having`. That keeps #58427's shared dispatch and its find/count-by-SQL binds. Moving all grouping into `WhereClause` would also work, but would change explicitly passed bound nodes and their equality/deduplication. Dropping empty predicates earlier would change OR/NOT behaviour. The revised head matches 8.1 in every case I compared on SQLite.
 
 ## Reproducer and exact differing outputs
 
