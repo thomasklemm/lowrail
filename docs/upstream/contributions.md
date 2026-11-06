@@ -816,8 +816,8 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 
 ### SQLite — sparklemotion/sqlite3-ruby
 
-
 - [#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769), binding UTF-8 text skips a redundant String copy. **Draft**, opened 2026-11-06 00:36 UTC, head `c55ce350e3`.
+
 ### Time zones — tzinfo/tzinfo
 
 - [#171](https://github.com/tzinfo/tzinfo/pull/171) (TZ2), directly decode signed 64-bit TZif transitions — [refresh prepared](tzinfo-signed-refresh.md) on master `1207d6098d`, head `57056ddd7f46f9c292e46687821636e812102c85` on the separate fork branch `thomasklemm/signed-zoneinfo-transitions-refresh`; the live PR moved to that head on 2026-11-05 22:50 UTC (was `57c9c3ad35`). Ruby 4.0.9 repeats **288 → 160 objects/read** for 32 negative transitions and **72 → 60** for six signed boundaries; positive/empty/format-1 and allocation A/A unchanged. Full fork Tests **39/39 pass**, original 272-value differential matches across the current MRI/JRuby/TruffleRuby matrix and separately on verified 32-bit Windows MRI 2.3. Allocation-only, not speed; worthwhile as a simpler decoder for file loads, not a measured app benefit. Proposed shorter body in TZ2; Sol and applying the update belong to the coordinator.
