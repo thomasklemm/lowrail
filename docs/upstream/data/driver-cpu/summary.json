@@ -24589,7 +24589,7 @@
           "delta_percent": -0.002236256605836484,
           "ci": [
             -0.0064768609586929315,
-            0.00005205956268294898
+            5.205956268294898e-05
           ],
           "jit_flat": true,
           "heap_unchanged": true,
@@ -26900,7 +26900,7 @@
           ],
           "ir": 89495.66666666667,
           "objects": 47.0,
-          "delta_percent": -0.00007449144688864706,
+          "delta_percent": -7.449144688864706e-05,
           "ci": [
             -0.0027934146924701864,
             0.0005959284677281573
@@ -27767,7 +27767,7 @@
           ],
           "ir": 3616298.1,
           "objects": 2007.0,
-          "delta_percent": -0.0000027652586886972585,
+          "delta_percent": -2.7652586886972585e-06,
           "ci": [
             -0.00012351527267639995,
             0.00028574421906402137
@@ -32974,7 +32974,7 @@
           "delta_percent": -0.00012154218694826469,
           "ci": [
             -0.00041434646458338165,
-            -0.00007734476739074125
+            -7.734476739074125e-05
           ],
           "jit_flat": true,
           "heap_unchanged": true,
@@ -48071,7 +48071,7 @@
           ],
           "ir": 3620139.2,
           "objects": 2007.0,
-          "delta_percent": 0.0000994438162704725,
+          "delta_percent": 9.94438162704725e-05,
           "ci": [
             -0.0006519043839636751,
             0.0005524654017152741
@@ -52783,7 +52783,7 @@
           ],
           "ir": 3620140.2,
           "objects": 2007.0,
-          "delta_percent": 0.00009944376131443278,
+          "delta_percent": 9.944376131443278e-05,
           "ci": [
             -0.00010496822915317949,
             0.0005193173915563065
@@ -63680,6 +63680,8410 @@
             "2": 100563,
             "3": 20177,
             "4": 10181
+          }
+        }
+      ]
+    }
+  },
+  "candidate-interpreter-sqlite-fill-store": {
+    "select20_load": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 838955.0,
+          "objects": 226.0,
+          "delta_percent": -0.024742023802015733,
+          "ci": [
+            -0.036365360826107196,
+            0.18555259329451346
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 837498.4,
+          "objects": 226.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 836678.0,
+          "objects": 226.0,
+          "delta_percent": -0.13131965386441458,
+          "ci": [
+            -0.30767573632110023,
+            -0.0906809501701411
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 838955.0,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 837234.4,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 839052.4,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 839260.2,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 837441.6,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 837498.4,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 836678.0,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 836682.2,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 836398.6,
+          "objects": 226.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    },
+    "select1000_load": {
+      "accepted": false,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 22630268.8,
+          "objects": 8066.0,
+          "delta_percent": -0.0010605152633624826,
+          "ci": [
+            -0.001339784744491812,
+            -0.0010384197361990033
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": false
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 22630508.8,
+          "objects": 8066.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 22607321.2,
+          "objects": 8066.0,
+          "delta_percent": -0.10245637959320764,
+          "ci": [
+            -0.10373680600455071,
+            -0.10242725072679981
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630197.8,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630268.8,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630305.6,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630501.0,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630508.8,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22630540.6,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22607321.2,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22607322.4,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 22607064.4,
+          "objects": 8066.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    },
+    "wide20_load": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 943866.8,
+          "objects": 297.0,
+          "delta_percent": -0.011991779486852927,
+          "ci": [
+            -0.17400438755046377,
+            0.004596694108416344
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 944156.8,
+          "objects": 297.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 936796.6,
+          "objects": 297.0,
+          "delta_percent": -0.7799529651051906,
+          "ci": [
+            -0.8578378230879258,
+            -0.7795527183620421
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 943848.2,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 944200.2,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 943866.8,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 945493.4,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 944156.8,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 943980.0,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 937382.6,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 936796.6,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 936617.4,
+          "objects": 297.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    },
+    "wide1000_load": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 27190499.8,
+          "objects": 11567.0,
+          "delta_percent": 0.0002339023837505394,
+          "ci": [
+            -0.010018672224965108,
+            0.03899944926155641
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 27190830.2,
+          "objects": 11567.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 26834750.0,
+          "objects": 11567.0,
+          "delta_percent": -1.272482860569868,
+          "ci": [
+            -1.318248242148501,
+            -1.2716264911984965
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27190499.8,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27190893.8,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27190471.0,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27193224.2,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27190830.2,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 27179871.0,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 26834750.0,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 26845064.4,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 26834011.8,
+          "objects": 11567.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    },
+    "wide1000_adapter": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8398604.6,
+          "objects": 5537.0,
+          "delta_percent": -0.0018621794333761876,
+          "ci": [
+            -0.024978900542693694,
+            0.12683322701507738
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8398761.0,
+          "objects": 5537.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8042188.4,
+          "objects": 5537.0,
+          "delta_percent": -4.12511277389469,
+          "ci": [
+            -4.267525643726877,
+            -4.116823898191657
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8398591.6,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8398604.6,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8398661.6,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8400690.0,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8398761.0,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8388022.8,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8042188.4,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8052998.8,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 8042007.4,
+          "objects": 5537.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    },
+    "pluck_model": {
+      "accepted": false,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 4256038.8,
+          "objects": 1068.0,
+          "delta_percent": -0.008565917412817203,
+          "ci": [
+            -0.023842891553127465,
+            -0.004825807384112313
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": false
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 4256403.4,
+          "objects": 1068.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 4256652.8,
+          "objects": 1068.0,
+          "delta_percent": 0.002584414860051787,
+          "ci": [
+            -0.008137120821694044,
+            0.005859407028929731
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256019.0,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256038.8,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256077.2,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4257034.0,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          },
+          "heap_after": {
+            "0": 1000442,
+            "1": 250436,
+            "2": 100561,
+            "3": 20180,
+            "4": 10179
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256403.4,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256282.6,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250432,
+            "2": 100558,
+            "3": 20173,
+            "4": 10183
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256687.6,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256652.8,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+          "ir": 4256392.6,
+          "objects": 1068.0,
+          "flat": true,
+          "jit_before": [],
+          "jit_after": [],
+          "warmup": [
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ],
+            [
+              [],
+              []
+            ]
+          ],
+          "warmup_count": 50,
+          "heap_before": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          },
+          "heap_after": {
+            "0": 1000445,
+            "1": 250431,
+            "2": 100562,
+            "3": 20182,
+            "4": 10177
+          }
+        }
+      ]
+    }
+  },
+  "candidate-yjit-sqlite-fill-store": {
+    "select20_load": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 355102.8,
+          "objects": 227.0,
+          "delta_percent": 0.06548869671856306,
+          "ci": [
+            -0.008000288461107452,
+            0.06714324097947255
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 354987.2,
+          "objects": 227.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 354330.8,
+          "objects": 227.0,
+          "delta_percent": -0.19743041915519788,
+          "ci": [
+            -0.20017623170639487,
+            -0.15205551096965086
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 355300.2,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12140,
+            266
+          ],
+          "jit_after": [
+            854,
+            12140,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11026,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354958.8,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12140,
+            266
+          ],
+          "jit_after": [
+            854,
+            12140,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11026,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12137,
+                266
+              ],
+              [
+                854,
+                12137,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 355102.8,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12125,
+            266
+          ],
+          "jit_after": [
+            854,
+            12125,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11011,
+                266
+              ],
+              [
+                854,
+                12122,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12122,
+                266
+              ],
+              [
+                854,
+                12122,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12122,
+                266
+              ],
+              [
+                854,
+                12122,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12122,
+                266
+              ],
+              [
+                854,
+                12122,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 355061.8,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12121,
+            266
+          ],
+          "jit_after": [
+            854,
+            12121,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11007,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354987.2,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12139,
+            266
+          ],
+          "jit_after": [
+            854,
+            12139,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11025,
+                266
+              ],
+              [
+                854,
+                12136,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12136,
+                266
+              ],
+              [
+                854,
+                12136,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12136,
+                266
+              ],
+              [
+                854,
+                12136,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12136,
+                266
+              ],
+              [
+                854,
+                12136,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354870.4,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            854,
+            12121,
+            266
+          ],
+          "jit_after": [
+            854,
+            12121,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                747,
+                11007,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12118,
+                266
+              ],
+              [
+                854,
+                12118,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354360.8,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            1017,
+            15211,
+            376
+          ],
+          "jit_after": [
+            1017,
+            15211,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                910,
+                14097,
+                376
+              ],
+              [
+                1017,
+                15208,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15208,
+                376
+              ],
+              [
+                1017,
+                15208,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15208,
+                376
+              ],
+              [
+                1017,
+                15208,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15208,
+                376
+              ],
+              [
+                1017,
+                15208,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354276.6,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            1016,
+            15205,
+            376
+          ],
+          "jit_after": [
+            1016,
+            15205,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                909,
+                14091,
+                376
+              ],
+              [
+                1016,
+                15202,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15202,
+                376
+              ],
+              [
+                1016,
+                15202,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15202,
+                376
+              ],
+              [
+                1016,
+                15202,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15202,
+                376
+              ],
+              [
+                1016,
+                15202,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "select20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 354330.8,
+          "objects": 227.0,
+          "flat": true,
+          "jit_before": [
+            1016,
+            15209,
+            376
+          ],
+          "jit_after": [
+            1016,
+            15209,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                909,
+                14095,
+                376
+              ],
+              [
+                1016,
+                15206,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15206,
+                376
+              ],
+              [
+                1016,
+                15206,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15206,
+                376
+              ],
+              [
+                1016,
+                15206,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15206,
+                376
+              ],
+              [
+                1016,
+                15206,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          }
+        }
+      ]
+    },
+    "select1000_load": {
+      "accepted": false,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8457700.6,
+          "objects": 8067.0,
+          "delta_percent": 0.00954724129660356,
+          "ci": [
+            -7.459854881989713,
+            1.920095276468703
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": false
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8456893.2,
+          "objects": 8067.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8436747.0,
+          "objects": 8067.0,
+          "delta_percent": -0.2363748682913891,
+          "ci": [
+            -7.697126144297117,
+            -0.23447144868756764
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8457157.8,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            855,
+            12170,
+            266
+          ],
+          "jit_after": [
+            855,
+            12170,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                854,
+                12140,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                854,
+                12140,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                855,
+                12170,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12170,
+                266
+              ],
+              [
+                855,
+                12170,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12170,
+                266
+              ],
+              [
+                855,
+                12170,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12170,
+                266
+              ],
+              [
+                855,
+                12170,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8457700.6,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            855,
+            12149,
+            266
+          ],
+          "jit_after": [
+            855,
+            12149,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                854,
+                12140,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                854,
+                12140,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12140,
+                266
+              ],
+              [
+                855,
+                12149,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12149,
+                266
+              ],
+              [
+                855,
+                12149,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12149,
+                266
+              ],
+              [
+                855,
+                12149,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12149,
+                266
+              ],
+              [
+                855,
+                12149,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8619114.0,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            855,
+            12148,
+            266
+          ],
+          "jit_after": [
+            855,
+            12148,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12125,
+                266
+              ],
+              [
+                854,
+                12125,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12125,
+                266
+              ],
+              [
+                854,
+                12125,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12125,
+                266
+              ],
+              [
+                855,
+                12148,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12148,
+                266
+              ],
+              [
+                855,
+                12148,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12148,
+                266
+              ],
+              [
+                855,
+                12148,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12148,
+                266
+              ],
+              [
+                855,
+                12148,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 9138907.0,
+          "objects": 8067.0,
+          "flat": false,
+          "jit_before": [
+            855,
+            12172,
+            266
+          ],
+          "jit_after": [
+            858,
+            12192,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                854,
+                12121,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                854,
+                12121,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                855,
+                12146,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12146,
+                266
+              ],
+              [
+                855,
+                12146,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12146,
+                266
+              ],
+              [
+                855,
+                12146,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12146,
+                266
+              ],
+              [
+                855,
+                12172,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12172,
+                266
+              ],
+              [
+                855,
+                12172,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12172,
+                266
+              ],
+              [
+                855,
+                12172,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12172,
+                266
+              ],
+              [
+                855,
+                12172,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8456893.2,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            855,
+            12158,
+            266
+          ],
+          "jit_after": [
+            855,
+            12158,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12139,
+                266
+              ],
+              [
+                854,
+                12139,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12139,
+                266
+              ],
+              [
+                854,
+                12139,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12139,
+                266
+              ],
+              [
+                855,
+                12158,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12158,
+                266
+              ],
+              [
+                855,
+                12158,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12158,
+                266
+              ],
+              [
+                855,
+                12158,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12158,
+                266
+              ],
+              [
+                855,
+                12158,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8456736.6,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            855,
+            12144,
+            266
+          ],
+          "jit_after": [
+            855,
+            12144,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                854,
+                12121,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                854,
+                12121,
+                266
+              ]
+            ],
+            [
+              [
+                854,
+                12121,
+                266
+              ],
+              [
+                855,
+                12144,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12144,
+                266
+              ],
+              [
+                855,
+                12144,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12144,
+                266
+              ],
+              [
+                855,
+                12144,
+                266
+              ]
+            ],
+            [
+              [
+                855,
+                12144,
+                266
+              ],
+              [
+                855,
+                12144,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8435473.8,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            1017,
+            15227,
+            376
+          ],
+          "jit_after": [
+            1017,
+            15227,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1017,
+                15211,
+                376
+              ],
+              [
+                1017,
+                15211,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15211,
+                376
+              ],
+              [
+                1017,
+                15211,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15211,
+                376
+              ],
+              [
+                1017,
+                15227,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15227,
+                376
+              ],
+              [
+                1017,
+                15227,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15227,
+                376
+              ],
+              [
+                1017,
+                15227,
+                376
+              ]
+            ],
+            [
+              [
+                1017,
+                15227,
+                376
+              ],
+              [
+                1017,
+                15227,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8437064.2,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            1016,
+            15216,
+            376
+          ],
+          "jit_after": [
+            1016,
+            15216,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1016,
+                15205,
+                376
+              ],
+              [
+                1016,
+                15205,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15205,
+                376
+              ],
+              [
+                1016,
+                15205,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15205,
+                376
+              ],
+              [
+                1016,
+                15216,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15216,
+                376
+              ],
+              [
+                1016,
+                15216,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15216,
+                376
+              ],
+              [
+                1016,
+                15216,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15216,
+                376
+              ],
+              [
+                1016,
+                15216,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "select1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8436747.0,
+          "objects": 8067.0,
+          "flat": true,
+          "jit_before": [
+            1016,
+            15229,
+            376
+          ],
+          "jit_after": [
+            1016,
+            15229,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1016,
+                15209,
+                376
+              ],
+              [
+                1016,
+                15209,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15209,
+                376
+              ],
+              [
+                1016,
+                15209,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15209,
+                376
+              ],
+              [
+                1016,
+                15229,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15229,
+                376
+              ],
+              [
+                1016,
+                15229,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15229,
+                376
+              ],
+              [
+                1016,
+                15229,
+                376
+              ]
+            ],
+            [
+              [
+                1016,
+                15229,
+                376
+              ],
+              [
+                1016,
+                15229,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          }
+        }
+      ]
+    },
+    "wide20_load": {
+      "accepted": false,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 683515.4,
+          "objects": 298.0,
+          "delta_percent": 0.25513625716986343,
+          "ci": [
+            -0.32127437469582354,
+            29.88327300753859
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true,
+          "pass": false
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 682929.2,
+          "objects": 298.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 676520.8,
+          "objects": 298.0,
+          "delta_percent": -1.0071064908368843,
+          "ci": [
+            -1.3388982042118136,
+            -0.8409656520763753
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": false,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 683515.4,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            865,
+            12270,
+            266
+          ],
+          "jit_after": [
+            865,
+            12278,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                855,
+                12170,
+                266
+              ],
+              [
+                860,
+                12230,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12230,
+                266
+              ],
+              [
+                860,
+                12230,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12230,
+                266
+              ],
+              [
+                863,
+                12250,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12260,
+                266
+              ],
+              [
+                863,
+                12260,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12260,
+                266
+              ],
+              [
+                863,
+                12260,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12261,
+                266
+              ],
+              [
+                864,
+                12261,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 684671.6,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            865,
+            12249,
+            266
+          ],
+          "jit_after": [
+            865,
+            12257,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                855,
+                12149,
+                266
+              ],
+              [
+                860,
+                12209,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12209,
+                266
+              ],
+              [
+                860,
+                12209,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12209,
+                266
+              ],
+              [
+                863,
+                12229,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12239,
+                266
+              ],
+              [
+                863,
+                12239,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12239,
+                266
+              ],
+              [
+                863,
+                12239,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12240,
+                266
+              ],
+              [
+                864,
+                12240,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 681207.8,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            865,
+            12248,
+            266
+          ],
+          "jit_after": [
+            865,
+            12256,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                855,
+                12148,
+                266
+              ],
+              [
+                860,
+                12208,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12208,
+                266
+              ],
+              [
+                860,
+                12208,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12208,
+                266
+              ],
+              [
+                863,
+                12228,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12238,
+                266
+              ],
+              [
+                863,
+                12238,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12238,
+                266
+              ],
+              [
+                863,
+                12238,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12239,
+                266
+              ],
+              [
+                864,
+                12239,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 526253.6,
+          "objects": 298.0,
+          "flat": true,
+          "jit_before": [
+            865,
+            12287,
+            266
+          ],
+          "jit_after": [
+            865,
+            12287,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                858,
+                12202,
+                266
+              ],
+              [
+                863,
+                12262,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12262,
+                266
+              ],
+              [
+                863,
+                12269,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12270,
+                266
+              ],
+              [
+                864,
+                12270,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12270,
+                266
+              ],
+              [
+                865,
+                12287,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12287,
+                266
+              ],
+              [
+                865,
+                12287,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12287,
+                266
+              ],
+              [
+                865,
+                12287,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12287,
+                266
+              ],
+              [
+                865,
+                12287,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10282
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10282
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 682929.2,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            865,
+            12258,
+            266
+          ],
+          "jit_after": [
+            865,
+            12266,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                855,
+                12158,
+                266
+              ],
+              [
+                860,
+                12218,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12218,
+                266
+              ],
+              [
+                860,
+                12218,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12218,
+                266
+              ],
+              [
+                863,
+                12238,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12248,
+                266
+              ],
+              [
+                863,
+                12248,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12248,
+                266
+              ],
+              [
+                863,
+                12248,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12249,
+                266
+              ],
+              [
+                864,
+                12249,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 683403.4,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            865,
+            12285,
+            266
+          ],
+          "jit_after": [
+            865,
+            12293,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                855,
+                12144,
+                266
+              ],
+              [
+                860,
+                12245,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12245,
+                266
+              ],
+              [
+                860,
+                12245,
+                266
+              ]
+            ],
+            [
+              [
+                860,
+                12245,
+                266
+              ],
+              [
+                863,
+                12265,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12275,
+                266
+              ],
+              [
+                863,
+                12275,
+                266
+              ]
+            ],
+            [
+              [
+                863,
+                12275,
+                266
+              ],
+              [
+                863,
+                12275,
+                266
+              ]
+            ],
+            [
+              [
+                864,
+                12276,
+                266
+              ],
+              [
+                864,
+                12276,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 519207.6,
+          "objects": 298.0,
+          "flat": true,
+          "jit_before": [
+            1027,
+            15336,
+            376
+          ],
+          "jit_after": [
+            1027,
+            15336,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1017,
+                15227,
+                376
+              ],
+              [
+                1022,
+                15287,
+                376
+              ]
+            ],
+            [
+              [
+                1022,
+                15287,
+                376
+              ],
+              [
+                1022,
+                15287,
+                376
+              ]
+            ],
+            [
+              [
+                1022,
+                15287,
+                376
+              ],
+              [
+                1025,
+                15307,
+                376
+              ]
+            ],
+            [
+              [
+                1025,
+                15317,
+                376
+              ],
+              [
+                1025,
+                15317,
+                376
+              ]
+            ],
+            [
+              [
+                1025,
+                15317,
+                376
+              ],
+              [
+                1025,
+                15318,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15319,
+                376
+              ],
+              [
+                1026,
+                15319,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15319,
+                376
+              ],
+              [
+                1027,
+                15336,
+                376
+              ]
+            ],
+            [
+              [
+                1027,
+                15336,
+                376
+              ],
+              [
+                1027,
+                15336,
+                376
+              ]
+            ],
+            [
+              [
+                1027,
+                15336,
+                376
+              ],
+              [
+                1027,
+                15336,
+                376
+              ]
+            ],
+            [
+              [
+                1027,
+                15336,
+                376
+              ],
+              [
+                1027,
+                15336,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10282
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10282
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 677186.0,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            1026,
+            15317,
+            376
+          ],
+          "jit_after": [
+            1026,
+            15325,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1016,
+                15216,
+                376
+              ],
+              [
+                1021,
+                15277,
+                376
+              ]
+            ],
+            [
+              [
+                1021,
+                15277,
+                376
+              ],
+              [
+                1021,
+                15277,
+                376
+              ]
+            ],
+            [
+              [
+                1021,
+                15277,
+                376
+              ],
+              [
+                1024,
+                15297,
+                376
+              ]
+            ],
+            [
+              [
+                1024,
+                15307,
+                376
+              ],
+              [
+                1024,
+                15307,
+                376
+              ]
+            ],
+            [
+              [
+                1024,
+                15307,
+                376
+              ],
+              [
+                1024,
+                15307,
+                376
+              ]
+            ],
+            [
+              [
+                1025,
+                15308,
+                376
+              ],
+              [
+                1025,
+                15308,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide20_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 676520.8,
+          "objects": 298.0,
+          "flat": false,
+          "jit_before": [
+            1026,
+            15329,
+            376
+          ],
+          "jit_after": [
+            1026,
+            15337,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1016,
+                15229,
+                376
+              ],
+              [
+                1021,
+                15289,
+                376
+              ]
+            ],
+            [
+              [
+                1021,
+                15289,
+                376
+              ],
+              [
+                1021,
+                15289,
+                376
+              ]
+            ],
+            [
+              [
+                1021,
+                15289,
+                376
+              ],
+              [
+                1024,
+                15309,
+                376
+              ]
+            ],
+            [
+              [
+                1024,
+                15319,
+                376
+              ],
+              [
+                1024,
+                15319,
+                376
+              ]
+            ],
+            [
+              [
+                1024,
+                15319,
+                376
+              ],
+              [
+                1024,
+                15319,
+                376
+              ]
+            ],
+            [
+              [
+                1025,
+                15320,
+                376
+              ],
+              [
+                1025,
+                15320,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          }
+        }
+      ]
+    },
+    "wide1000_load": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 13012061.8,
+          "objects": 11568.0,
+          "delta_percent": -0.058578940264897295,
+          "ci": [
+            -0.06496974944443235,
+            0.011424433448259386
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 13019464.0,
+          "objects": 11568.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 12667676.6,
+          "objects": 11568.0,
+          "delta_percent": -2.690987064131034,
+          "ci": [
+            -2.724250393294547,
+            -2.6263769384054503
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13012061.8,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            865,
+            12278,
+            266
+          ],
+          "jit_after": [
+            865,
+            12278,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                865,
+                12278,
+                266
+              ],
+              [
+                865,
+                12278,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12278,
+                266
+              ],
+              [
+                865,
+                12278,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12278,
+                266
+              ],
+              [
+                865,
+                12278,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13010363.2,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            865,
+            12257,
+            266
+          ],
+          "jit_after": [
+            865,
+            12257,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                865,
+                12257,
+                266
+              ],
+              [
+                865,
+                12257,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12257,
+                266
+              ],
+              [
+                865,
+                12257,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12257,
+                266
+              ],
+              [
+                865,
+                12257,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13020951.4,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            865,
+            12256,
+            266
+          ],
+          "jit_after": [
+            865,
+            12256,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                865,
+                12256,
+                266
+              ],
+              [
+                865,
+                12256,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12256,
+                266
+              ],
+              [
+                865,
+                12256,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12256,
+                266
+              ],
+              [
+                865,
+                12256,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13020521.2,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            869,
+            12306,
+            266
+          ],
+          "jit_after": [
+            869,
+            12306,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                866,
+                12290,
+                266
+              ],
+              [
+                866,
+                12290,
+                266
+              ]
+            ],
+            [
+              [
+                866,
+                12290,
+                266
+              ],
+              [
+                868,
+                12305,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12305,
+                266
+              ],
+              [
+                868,
+                12305,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12305,
+                266
+              ],
+              [
+                868,
+                12305,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12305,
+                266
+              ],
+              [
+                868,
+                12305,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13017989.0,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            865,
+            12266,
+            266
+          ],
+          "jit_after": [
+            865,
+            12266,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                865,
+                12266,
+                266
+              ],
+              [
+                865,
+                12266,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12266,
+                266
+              ],
+              [
+                865,
+                12266,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12266,
+                266
+              ],
+              [
+                865,
+                12266,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 13019464.0,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            873,
+            12415,
+            266
+          ],
+          "jit_after": [
+            873,
+            12415,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                865,
+                12293,
+                266
+              ],
+              [
+                865,
+                12293,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12293,
+                266
+              ],
+              [
+                865,
+                12293,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12293,
+                266
+              ],
+              [
+                865,
+                12297,
+                266
+              ]
+            ],
+            [
+              [
+                865,
+                12297,
+                266
+              ],
+              [
+                865,
+                12297,
+                266
+              ]
+            ],
+            [
+              [
+                866,
+                12300,
+                266
+              ],
+              [
+                868,
+                12310,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12310,
+                266
+              ],
+              [
+                868,
+                12310,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12310,
+                266
+              ],
+              [
+                868,
+                12310,
+                266
+              ]
+            ],
+            [
+              [
+                868,
+                12310,
+                266
+              ],
+              [
+                869,
+                12311,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12311,
+                266
+              ],
+              [
+                869,
+                12311,
+                266
+              ]
+            ],
+            [
+              [
+                870,
+                12312,
+                266
+              ],
+              [
+                870,
+                12316,
+                266
+              ]
+            ],
+            [
+              [
+                871,
+                12318,
+                266
+              ],
+              [
+                872,
+                12365,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12380,
+                266
+              ],
+              [
+                872,
+                12380,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12380,
+                266
+              ],
+              [
+                872,
+                12380,
+                266
+              ]
+            ],
+            [
+              [
+                873,
+                12396,
+                266
+              ],
+              [
+                873,
+                12396,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 12665809.6,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            1028,
+            15339,
+            376
+          ],
+          "jit_after": [
+            1028,
+            15339,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1028,
+                15339,
+                376
+              ]
+            ],
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1028,
+                15339,
+                376
+              ]
+            ],
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1028,
+                15339,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 12667676.6,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            1026,
+            15325,
+            376
+          ],
+          "jit_after": [
+            1026,
+            15325,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1026,
+                15325,
+                376
+              ],
+              [
+                1026,
+                15325,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15325,
+                376
+              ],
+              [
+                1026,
+                15325,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15325,
+                376
+              ],
+              [
+                1026,
+                15325,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide1000_load",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 12677523.8,
+          "objects": 11568.0,
+          "flat": true,
+          "jit_before": [
+            1029,
+            15351,
+            376
+          ],
+          "jit_after": [
+            1029,
+            15351,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1026,
+                15337,
+                376
+              ],
+              [
+                1026,
+                15337,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15337,
+                376
+              ],
+              [
+                1026,
+                15337,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15337,
+                376
+              ],
+              [
+                1026,
+                15338,
+                376
+              ]
+            ],
+            [
+              [
+                1026,
+                15338,
+                376
+              ],
+              [
+                1026,
+                15338,
+                376
+              ]
+            ],
+            [
+              [
+                1027,
+                15341,
+                376
+              ],
+              [
+                1029,
+                15351,
+                376
+              ]
+            ],
+            [
+              [
+                1029,
+                15351,
+                376
+              ],
+              [
+                1029,
+                15351,
+                376
+              ]
+            ],
+            [
+              [
+                1029,
+                15351,
+                376
+              ],
+              [
+                1029,
+                15351,
+                376
+              ]
+            ],
+            [
+              [
+                1029,
+                15351,
+                376
+              ],
+              [
+                1029,
+                15351,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          }
+        }
+      ]
+    },
+    "wide1000_adapter": {
+      "accepted": false,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 8968669.0,
+          "objects": 5538.0,
+          "delta_percent": 18.63635146672693,
+          "ci": [
+            -0.013843320629569611,
+            18.723497679236047
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true,
+          "pass": false
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 7559798.4,
+          "objects": 5538.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 7215051.6,
+          "objects": 5538.0,
+          "delta_percent": -4.564574321760562,
+          "ci": [
+            -4.714509318132087,
+            14.393329055837324
+          ],
+          "jit_flat": false,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8968669.0,
+          "objects": 5538.0,
+          "flat": false,
+          "jit_before": [
+            871,
+            12305,
+            266
+          ],
+          "jit_after": [
+            872,
+            12352,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                866,
+                12281,
+                266
+              ],
+              [
+                867,
+                12292,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12292,
+                266
+              ],
+              [
+                867,
+                12292,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12292,
+                266
+              ],
+              [
+                869,
+                12302,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12302,
+                266
+              ],
+              [
+                869,
+                12302,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12302,
+                266
+              ],
+              [
+                869,
+                12302,
+                266
+              ]
+            ],
+            [
+              [
+                870,
+                12303,
+                266
+              ],
+              [
+                870,
+                12303,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7549166.4,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            872,
+            12346,
+            266
+          ],
+          "jit_after": [
+            872,
+            12346,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                866,
+                12260,
+                266
+              ],
+              [
+                867,
+                12271,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12271,
+                266
+              ],
+              [
+                867,
+                12271,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12271,
+                266
+              ],
+              [
+                867,
+                12271,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12271,
+                266
+              ],
+              [
+                869,
+                12281,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12281,
+                266
+              ],
+              [
+                869,
+                12281,
+                266
+              ]
+            ],
+            [
+              [
+                870,
+                12282,
+                266
+              ],
+              [
+                870,
+                12282,
+                266
+              ]
+            ],
+            [
+              [
+                871,
+                12284,
+                266
+              ],
+              [
+                872,
+                12331,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12346,
+                266
+              ],
+              [
+                872,
+                12346,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12346,
+                266
+              ],
+              [
+                872,
+                12346,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12346,
+                266
+              ],
+              [
+                872,
+                12346,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8975662.4,
+          "objects": 5538.0,
+          "flat": false,
+          "jit_before": [
+            871,
+            12283,
+            266
+          ],
+          "jit_after": [
+            872,
+            12330,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                866,
+                12259,
+                266
+              ],
+              [
+                867,
+                12270,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12270,
+                266
+              ],
+              [
+                867,
+                12270,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12270,
+                266
+              ],
+              [
+                869,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12280,
+                266
+              ],
+              [
+                869,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12280,
+                266
+              ],
+              [
+                869,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                870,
+                12281,
+                266
+              ],
+              [
+                870,
+                12281,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7559798.4,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            872,
+            12381,
+            266
+          ],
+          "jit_after": [
+            872,
+            12381,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                870,
+                12308,
+                266
+              ],
+              [
+                872,
+                12366,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12381,
+                266
+              ],
+              [
+                872,
+                12381,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12381,
+                266
+              ],
+              [
+                872,
+                12381,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12381,
+                266
+              ],
+              [
+                872,
+                12381,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7550211.6,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            872,
+            12355,
+            266
+          ],
+          "jit_after": [
+            872,
+            12355,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                866,
+                12269,
+                266
+              ],
+              [
+                867,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12280,
+                266
+              ],
+              [
+                867,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12280,
+                266
+              ],
+              [
+                867,
+                12280,
+                266
+              ]
+            ],
+            [
+              [
+                867,
+                12280,
+                266
+              ],
+              [
+                869,
+                12290,
+                266
+              ]
+            ],
+            [
+              [
+                869,
+                12290,
+                266
+              ],
+              [
+                869,
+                12290,
+                266
+              ]
+            ],
+            [
+              [
+                870,
+                12291,
+                266
+              ],
+              [
+                870,
+                12291,
+                266
+              ]
+            ],
+            [
+              [
+                871,
+                12293,
+                266
+              ],
+              [
+                872,
+                12340,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12355,
+                266
+              ],
+              [
+                872,
+                12355,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12355,
+                266
+              ],
+              [
+                872,
+                12355,
+                266
+              ]
+            ],
+            [
+              [
+                872,
+                12355,
+                266
+              ],
+              [
+                872,
+                12355,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7560139.8,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            874,
+            12428,
+            266
+          ],
+          "jit_after": [
+            874,
+            12428,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                873,
+                12415,
+                266
+              ],
+              [
+                874,
+                12426,
+                266
+              ]
+            ],
+            [
+              [
+                874,
+                12428,
+                266
+              ],
+              [
+                874,
+                12428,
+                266
+              ]
+            ],
+            [
+              [
+                874,
+                12428,
+                266
+              ],
+              [
+                874,
+                12428,
+                266
+              ]
+            ],
+            [
+              [
+                874,
+                12428,
+                266
+              ],
+              [
+                874,
+                12428,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7203391.0,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            1034,
+            15425,
+            376
+          ],
+          "jit_after": [
+            1034,
+            15425,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1029,
+                15350,
+                376
+              ]
+            ],
+            [
+              [
+                1030,
+                15351,
+                376
+              ],
+              [
+                1030,
+                15351,
+                376
+              ]
+            ],
+            [
+              [
+                1031,
+                15353,
+                376
+              ],
+              [
+                1034,
+                15410,
+                376
+              ]
+            ],
+            [
+              [
+                1034,
+                15425,
+                376
+              ],
+              [
+                1034,
+                15425,
+                376
+              ]
+            ],
+            [
+              [
+                1034,
+                15425,
+                376
+              ],
+              [
+                1034,
+                15425,
+                376
+              ]
+            ],
+            [
+              [
+                1034,
+                15425,
+                376
+              ],
+              [
+                1034,
+                15425,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 8636938.4,
+          "objects": 5538.0,
+          "flat": false,
+          "jit_before": [
+            1032,
+            15352,
+            376
+          ],
+          "jit_after": [
+            1033,
+            15399,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1027,
+                15328,
+                376
+              ],
+              [
+                1028,
+                15339,
+                376
+              ]
+            ],
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1028,
+                15339,
+                376
+              ]
+            ],
+            [
+              [
+                1028,
+                15339,
+                376
+              ],
+              [
+                1030,
+                15349,
+                376
+              ]
+            ],
+            [
+              [
+                1030,
+                15349,
+                376
+              ],
+              [
+                1030,
+                15349,
+                376
+              ]
+            ],
+            [
+              [
+                1030,
+                15349,
+                376
+              ],
+              [
+                1030,
+                15349,
+                376
+              ]
+            ],
+            [
+              [
+                1031,
+                15350,
+                376
+              ],
+              [
+                1031,
+                15350,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "wide1000_adapter",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 7215051.6,
+          "objects": 5538.0,
+          "flat": true,
+          "jit_before": [
+            1033,
+            15427,
+            376
+          ],
+          "jit_after": [
+            1033,
+            15427,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1030,
+                15352,
+                376
+              ],
+              [
+                1031,
+                15363,
+                376
+              ]
+            ],
+            [
+              [
+                1032,
+                15365,
+                376
+              ],
+              [
+                1033,
+                15412,
+                376
+              ]
+            ],
+            [
+              [
+                1033,
+                15427,
+                376
+              ],
+              [
+                1033,
+                15427,
+                376
+              ]
+            ],
+            [
+              [
+                1033,
+                15427,
+                376
+              ],
+              [
+                1033,
+                15427,
+                376
+              ]
+            ],
+            [
+              [
+                1033,
+                15427,
+                376
+              ],
+              [
+                1033,
+                15427,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          }
+        }
+      ]
+    },
+    "pluck_model": {
+      "accepted": true,
+      "complete": true,
+      "same_protocol": true,
+      "arms": {
+        "aa": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 2456609.4,
+          "objects": 1069.0,
+          "delta_percent": -0.01365110034218242,
+          "ci": [
+            -0.03596479552858689,
+            0.023178667224188487
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true,
+          "pass": true
+        },
+        "base": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 2456847.0,
+          "objects": 1069.0,
+          "delta_percent": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        },
+        "sqlite-fill-store-head": {
+          "repetitions": [
+            1,
+            2,
+            3
+          ],
+          "ir": 2457644.8,
+          "objects": 1069.0,
+          "delta_percent": 0.036712261504612265,
+          "ci": [
+            0.03092581670733896,
+            0.043784640790889284
+          ],
+          "jit_flat": true,
+          "heap_unchanged": true
+        }
+      },
+      "heaps_matched": true,
+      "rows": [
+        {
+          "arm": "aa",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2457138.6,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            893,
+            12618,
+            266
+          ],
+          "jit_after": [
+            893,
+            12618,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                872,
+                12367,
+                266
+              ],
+              [
+                892,
+                12615,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12615,
+                266
+              ],
+              [
+                892,
+                12615,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12615,
+                266
+              ],
+              [
+                892,
+                12615,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12615,
+                266
+              ],
+              [
+                892,
+                12615,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2455963.4,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            894,
+            12634,
+            266
+          ],
+          "jit_after": [
+            894,
+            12634,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                873,
+                12362,
+                266
+              ],
+              [
+                893,
+                12610,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12627,
+                266
+              ],
+              [
+                893,
+                12627,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12630,
+                266
+              ],
+              [
+                893,
+                12630,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12630,
+                266
+              ],
+              [
+                893,
+                12630,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "aa",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2456609.4,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            893,
+            12596,
+            266
+          ],
+          "jit_after": [
+            893,
+            12596,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                872,
+                12345,
+                266
+              ],
+              [
+                892,
+                12593,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12593,
+                266
+              ],
+              [
+                892,
+                12593,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12593,
+                266
+              ],
+              [
+                892,
+                12593,
+                266
+              ]
+            ],
+            [
+              [
+                892,
+                12593,
+                266
+              ],
+              [
+                892,
+                12593,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2456569.2,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            894,
+            12669,
+            266
+          ],
+          "jit_after": [
+            894,
+            12669,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                873,
+                12397,
+                266
+              ],
+              [
+                893,
+                12645,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12662,
+                266
+              ],
+              [
+                893,
+                12662,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12665,
+                266
+              ],
+              [
+                893,
+                12665,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12665,
+                266
+              ],
+              [
+                893,
+                12665,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2456847.0,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            894,
+            12643,
+            266
+          ],
+          "jit_after": [
+            894,
+            12643,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                873,
+                12371,
+                266
+              ],
+              [
+                893,
+                12619,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12636,
+                266
+              ],
+              [
+                893,
+                12636,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12639,
+                266
+              ],
+              [
+                893,
+                12639,
+                266
+              ]
+            ],
+            [
+              [
+                893,
+                12639,
+                266
+              ],
+              [
+                893,
+                12639,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "base",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2456944.8,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            895,
+            12678,
+            266
+          ],
+          "jit_after": [
+            895,
+            12678,
+            266
+          ],
+          "warmup": [
+            [
+              [
+                874,
+                12428,
+                266
+              ],
+              [
+                894,
+                12675,
+                266
+              ]
+            ],
+            [
+              [
+                894,
+                12675,
+                266
+              ],
+              [
+                894,
+                12675,
+                266
+              ]
+            ],
+            [
+              [
+                894,
+                12675,
+                266
+              ],
+              [
+                894,
+                12675,
+                266
+              ]
+            ],
+            [
+              [
+                894,
+                12675,
+                266
+              ],
+              [
+                894,
+                12675,
+                266
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000447,
+            "1": 250431,
+            "2": 100572,
+            "3": 20175,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 1,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2457644.8,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            1056,
+            15712,
+            376
+          ],
+          "jit_after": [
+            1056,
+            15712,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1035,
+                15441,
+                376
+              ],
+              [
+                1055,
+                15688,
+                376
+              ]
+            ],
+            [
+              [
+                1055,
+                15705,
+                376
+              ],
+              [
+                1055,
+                15705,
+                376
+              ]
+            ],
+            [
+              [
+                1055,
+                15708,
+                376
+              ],
+              [
+                1055,
+                15708,
+                376
+              ]
+            ],
+            [
+              [
+                1055,
+                15708,
+                376
+              ],
+              [
+                1055,
+                15708,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 2,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2457606.8,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            1054,
+            15664,
+            376
+          ],
+          "jit_after": [
+            1054,
+            15664,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1033,
+                15414,
+                376
+              ],
+              [
+                1053,
+                15661,
+                376
+              ]
+            ],
+            [
+              [
+                1053,
+                15661,
+                376
+              ],
+              [
+                1053,
+                15661,
+                376
+              ]
+            ],
+            [
+              [
+                1053,
+                15661,
+                376
+              ],
+              [
+                1053,
+                15661,
+                376
+              ]
+            ],
+            [
+              [
+                1053,
+                15661,
+                376
+              ],
+              [
+                1053,
+                15661,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          },
+          "heap_after": {
+            "0": 1000454,
+            "1": 250432,
+            "2": 100564,
+            "3": 20179,
+            "4": 10180
+          }
+        },
+        {
+          "arm": "sqlite-fill-store-head",
+          "repetition": 3,
+          "case": "pluck_model",
+          "count": 5,
+          "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]",
+          "ir": 2457846.8,
+          "objects": 1069.0,
+          "flat": true,
+          "jit_before": [
+            1055,
+            15714,
+            376
+          ],
+          "jit_after": [
+            1055,
+            15714,
+            376
+          ],
+          "warmup": [
+            [
+              [
+                1034,
+                15443,
+                376
+              ],
+              [
+                1054,
+                15690,
+                376
+              ]
+            ],
+            [
+              [
+                1054,
+                15707,
+                376
+              ],
+              [
+                1054,
+                15707,
+                376
+              ]
+            ],
+            [
+              [
+                1054,
+                15710,
+                376
+              ],
+              [
+                1054,
+                15710,
+                376
+              ]
+            ],
+            [
+              [
+                1054,
+                15710,
+                376
+              ],
+              [
+                1054,
+                15710,
+                376
+              ]
+            ]
+          ],
+          "warmup_count": 667,
+          "heap_before": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
+          },
+          "heap_after": {
+            "0": 1000455,
+            "1": 250428,
+            "2": 100563,
+            "3": 20179,
+            "4": 10178
           }
         }
       ]

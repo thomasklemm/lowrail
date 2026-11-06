@@ -72,6 +72,12 @@ DRIVER=sqlite3 PREPARED=1 MODE=yjit \
   bash bench/upstream/driver_cpu/measure.sh /tmp/pdrv/example-yjit \
   /tmp/pdrv/base /tmp/pdrv/aa /tmp/pdrv/sqlite-head
 
+CASES="$PWD/bench/upstream/driver_cpu/sqlite_load_cases.rb" \
+NAMES=select20_load,select1000_load,wide20_load,wide1000_load,wide1000_adapter,pluck_model \
+DRIVER=sqlite3 PREPARED=1 MODE=yjit \
+  bash bench/upstream/driver_cpu/measure.sh /tmp/pdrv/example-load-yjit \
+  /tmp/pdrv/base /tmp/pdrv/aa /tmp/pdrv/sqlite-fill-store-head
+
 ruby bench/upstream/driver_cpu/summarize.rb \
   /tmp/pdrv/example-interpreter /tmp/pdrv/example-yjit > /tmp/pdrv/example.json
 ```
@@ -87,6 +93,12 @@ For the census, omit the candidate arm and use `DRIVER=postgresql|mysql2|trilogy
 and `PREPARED=0|1`; Trilogy only supports zero. Large YJIT model-load warmups
 are expensive under Valgrind. Do not mistake ongoing compilation warmup for a
 hung benchmark. Boot/warmup are outside the counted region.
+
+`sqlite_load_cases.rb` adds ordinary `relation.spawn.to_a` loads without
+forcing every lazy attribute cast. Its corrected-row-head cohorts are named
+`candidate-{interpreter,yjit}-sqlite-fill-store`, distinct from the historical
+resize-head and fully cast census cohorts. The `sqlite-fill-store-head`
+bundle points at that corrected checkout, not the old resize extension.
 
 The independent original-tool cross-check was:
 

@@ -18,7 +18,8 @@ census is still running; it is not silently treated as complete here.
   flags and benchmark-source hashes. Versioned and unversioned SQLite native
   binaries match within each tree. The two candidate heads are independent.
   Original measured heads/hashes stay unchanged; `followups` identifies the
-  test-only DRV1 head and the corrected, relevance-held DRV2 head.
+  test-only DRV1 head and the corrected DRV2 head, whose completed ordinary
+  model-load cohorts pass the relevance gate in interpreter and YJIT.
 * `native-memory.json`: base/resize/replacement results for 18 widths on
   Ruby 3.2.9, 3.3.10 and 3.4.8, plus runtime archive/native binary hashes.
   Retained Array/native-buffer memory and embedding are compared exactly;
@@ -27,6 +28,8 @@ census is still running; it is not silently treated as complete here.
   for the selected two candidates' interpreter/YJIT cohorts, three native
   driver-attribution profiles, native YJIT allocation runs, original-tool
   percall runs, suite logs, exactness receipts and resolved bundle locks.
+  Both corrected-head `candidate-*-sqlite-fill-store` cohorts include all
+  108 window profiles and the workload source used for `relation.spawn.to_a`.
   Review-follow-up suite logs, the standalone older-Ruby memory probe and
   its raw/build receipts are included too. That probe uses ordinary
   compaction; its initial repeated-double-heap draft exhausted memory on base
@@ -41,6 +44,8 @@ census is still running; it is not silently treated as complete here.
 The end-to-end Active Record validation script and its twelve digest receipts
 are inside the archive. It retains results through compaction and repeats 24
 API operations. It is a validation probe, not another benchmark framework.
+Four further corrected-row-head receipts cover both prepared settings and
+interpreter/YJIT, matching the same 24-operation digest.
 It uses the orb's `/home/user/workspace/repo` path; run it from that checkout
 or adjust the one `load` path when reproducing elsewhere.
 

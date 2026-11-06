@@ -7,7 +7,9 @@ Two SQLite changes survive the first screen: avoid transcoding text which is
 already UTF-8, and fill multi-column row Arrays at their known size. Neither
 changes Rails. PostgreSQL's tempting length-before-NULL shortcut loses badly
 on NULL and empty fields and is rejected. Trilogy and mysql2 already have the
-obvious encoding/name caches. No upstream PR, comment or issue was opened.
+obvious encoding/name caches. The coordinator opened DRV1 as draft
+[#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769); this measurement
+thread has taken no upstream action.
 
 **Checkpoint:** candidate interpreter/YJIT cohorts and the complete interpreter
 census are published below. The broad YJIT baseline census is still running;
@@ -15,11 +17,13 @@ large fully cast model warmups take several minutes per fresh process under
 Valgrind. No incomplete baseline is described as accepted. The two candidate
 YJIT prices come from separate completed, controlled cohorts.
 
-**Review follow-up:** DRV1's test-only follow-up is confirmed by its skeptic.
-DRV2's original head is not opening-ready: Astra found extra native-buffer
-growth on supported Ruby 3.2/3.3. Its replacement is being checked on Ruby
-3.2/3.3/3.4 and remeasured. It must demonstrate a whole-model-load or
-benchmark effect, not only `select_all`, or remain a held idea.
+**Review follow-up:** DRV1's test-only head has exact-head skeptic, Sol and
+Astra passes. DRV2's original resize head grows native buffers on Ruby 3.2/3.3
+and is superseded. The corrected head matches main's row memory on Ruby
+3.2/3.3/3.4 and passes the revised whole-model-load gate: **−2.6910% YJIT Ir**
+for 1,000 seven-column records through normal `to_a`. The skeptic confirmed
+its final measurements and body; coordinator Sol/Astra confirmations remain.
+The original `select_all` result alone was not sufficient.
 
 ## Sources and overlap checked first
 
@@ -130,10 +134,17 @@ commands are in [`driver_cpu/README.md`](../../bench/upstream/driver_cpu/README.
   `HeapWindows.prepare_heap` prepares all five size pools with slot floors
   1,000,000 / 250,000 / 100,000 / 20,000 / 10,000. Before/after capacities and
   cross-arm matching must stay within one page per pool.
+  Allocation figures count Ruby objects, not every native allocator call in
+  SQLite/libpq/the MySQL clients; retained row-buffer memory is checked
+  separately in the supported-Ruby correction below.
 * Callgrind uses start/stop client requests and a 512-MB-brk build of Valgrind.
   Instructions come from each dump's **`totals:`**, not its incremental
   `summary:` header. Counts include Ruby allocation/conversion runtime work
   reached by the measured operation; they exclude boot and external servers.
+  The same counter/JIT-observer framing is included in every window, not
+  subtracted as an estimated overhead.
+  That framing is mode-dependent and proportionally larger for tiny queries;
+  absolute cross-mode totals are not a standalone YJIT speed comparison.
 * The three paired process ratios have a deterministic paired bootstrap
   interval. The prospective micro A/A rule is zero containment and the whole
   interval inside ±0.5%. Three processes provide a coarse control, not a
@@ -141,7 +152,7 @@ commands are in [`driver_cpu/README.md`](../../bench/upstream/driver_cpu/README.
 * Native YJIT uses the same worker without the Callgrind extension for the
   UTF-8 query's allocation check. No wall-time improvement is claimed.
 
-All **36 accepted candidate YJIT window profiles** were also inspected for
+All **63 accepted selected-candidate YJIT window profiles** were also inspected for
 actual compiler-entry/code-generation work: none contains it. Rejected
 wide20/`pluck` profiles do contain `gen_single_block` and compiler-entry work,
 which confirms the negative control; a tiny `yjit_compile` threshold check or
@@ -382,8 +393,30 @@ finite cohort measures normal `relation.spawn.to_a` model loads at 20/1,000
 narrow/wide rows, without the census's forced `attributes` casts, plus adapter
 and single-column controls. It is an explicit new workload and changed-head
 measurement, not another attempt to turn an unchanged rejected cell green.
-Unless a whole model load or external benchmark moves beyond A/A, DRV2 stays
-held; `select_all` alone is no longer enough for opening.
+
+The revised **whole-model-load gate passes** in both interpreter and YJIT:
+
+| Accepted replacement operation | Before Ir | After Ir | Paired change | Objects |
+|---|---:|---:|---:|---:|
+| Interpreter, 20 narrow models | 837,498 | 836,678 | −0.1313% | 226 |
+| Interpreter, 20 wide models | 944,157 | 936,797 | −0.7800% | 297 |
+| Interpreter, 1,000 wide models | 27,190,830 | 26,834,750 | **−1.2725%** | 11,567 |
+| Interpreter, 1,000-wide `select_all` | 8,398,761 | 8,042,188 | −4.1251% | 5,537 |
+| YJIT, 20 narrow models | 354,987 | 354,331 | −0.1974% | 227 |
+| YJIT, 1,000 wide models | 13,019,464 | 12,667,677 | **−2.6910%** | 11,568 |
+| YJIT, single-column `pluck` | 2,456,847 | 2,457,645 | **+0.0367%** | 1,069 |
+
+For 1,000 wide models, interpreter A/A is [−0.01002%, +0.03900%], candidate
+[−1.31825%, −1.27163%]; YJIT A/A is [−0.06497%, +0.01142%], candidate
+[−2.72425%, −2.62638%]. All heaps match and measured windows are JIT-flat;
+accepted YJIT call graphs contain no compiler-entry/code-generation work.
+These are complete default lazy-attribute model loads, **not** the larger
+fully cast loads in the census and not whole-request or elapsed-time savings.
+
+Keep the small `pluck` overhead visible. Narrow 1,000-model loads reject A/A
+in both modes (and compile under YJIT). YJIT 20-wide model loads reject A/A,
+JIT-flatness and heap matching; YJIT wide `select_all` rejects A/A/JIT-flatness.
+Interpreter `pluck` rejects A/A. Those cells stay rejected, not remeasured.
 
 ## Exactness and own suites
 
@@ -434,11 +467,19 @@ compaction and four threads with separate connections.
   was added.
 
 DRV1's new-head skeptic approves the code and short body; the footer resolves
-publicly. Coordinator Sol/Astra reported nits on its predecessor, addressed in
-the test-only follow-up; a coordinator confirm remains pending. DRV1 is L0.
+publicly. Sol confirmed with no fixes and Astra approved the exact follow-up
+head; the coordinator opened draft #769. DRV1 is L0.
 DRV2's initial L1 approval is superseded by Astra's supported-Ruby finding;
-its corrected code and relevance are being rechecked. Ruby Flog/RuboCop
-metrics do not apply to these C changes. Neither item is marked `reviewed`.
+the corrected head's skeptic independently reproduced the memory fix and
+matched **152 adversarial observations** across Ruby 3.2/3.3/3.4/4.0.9, digest
+`289e058d7dcbbd5977b485bf400f43576f6641801e88fca40a3ec307068a5dea`.
+It checked 110 widths, retained rows before/after compaction and GC stress
+during cell creation, with no correctness/native-memory blocker, L1. It then
+independently recomputed the final model-load results from JSONL/Callgrind
+totals, checked all 108 measurement windows and 27 accepted YJIT call graphs,
+and approved the relevance gate and public body on the corrected head.
+The requested supporting exports are included; coordinator Sol/Astra
+confirmations remain. Ruby Flog/RuboCop metrics do not apply to these C changes.
 The pushed fork heads report **no CI checks**, not green CI. These Linux runs
 do not certify every SQLite/Ruby/platform combination or include sanitizers. As in DECISIONS'
 exactness boundary, reaching unfinished internal Arrays through ObjectSpace

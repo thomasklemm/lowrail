@@ -57,7 +57,9 @@
     "candidate-interpreter-sqlite-row",
     "candidate-yjit-sqlite-bind",
     "candidate-yjit-sqlite-bind20",
-    "candidate-yjit-sqlite-fill-wide"
+    "candidate-yjit-sqlite-fill-wide",
+    "candidate-interpreter-sqlite-fill-store",
+    "candidate-yjit-sqlite-fill-store"
   ],
   "followups": {
     "DRV1": {
@@ -68,8 +70,14 @@
     "DRV2": {
       "head": "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e",
       "native_sha256": "4a89c9bcf1690c9f76246731d5932a6f0cb91f837a57890954f686326bf130ea",
-      "status": "held pending whole-model-load relevance measurement",
-      "older_ruby_memory": "native-memory.json"
+      "status": "whole-model-load relevance gate passed in interpreter and YJIT; skeptic approved; coordinator Sol/Astra pending",
+      "older_ruby_memory": "native-memory.json",
+      "cohorts": [
+        "candidate-interpreter-sqlite-fill-store",
+        "candidate-yjit-sqlite-fill-store"
+      ],
+      "workload": "bench/upstream/driver_cpu/sqlite_load_cases.rb",
+      "workload_sha256": "3606c2ccbddb773e12f2222d3adeb675081a83b3bddf854e32a50dbb48e4144e"
     }
   },
   "driver_heads_independent": true,
