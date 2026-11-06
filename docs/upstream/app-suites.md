@@ -1077,7 +1077,7 @@ silent failure. cells-rails includes `FormHelper` into every cell (above), which
 main ([form_helper_link_to.rb](../../bench/upstream/app_suites/form_helper_link_to.rb)). Decidim's `ViewModel` has
 [`delegate_missing_to :view_context`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/lib/decidim/view_model.rb#L21),
 so a cell's `link_to … do` block such as [`card_g/show.erb`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/cells/decidim/card_g/show.erb#L1)
-now runs the controller's `link_to`, whose `capture` escapes the plain String that cells-erb's `capture` returns: every
+now runs the controller's `link_to`, whose `capture` escapes the plain String that the cell's template block returns (cells' engine, not a cells-erb `capture`): every
 card renders its whole inner HTML as text (`&lt;div class="card__grid-img"&gt;…`), with no error. Twelve presenters,
 events and renderers include only `UrlHelper` and raise `undefined method 'link_to'`, for example
 [`UserPresenter`](https://github.com/decidim/decidim/blob/80149bbba83a3c477172d113d21e22115c901e54/decidim-core/app/presenters/decidim/user_presenter.rb#L8)
@@ -1141,6 +1141,58 @@ reconsidering under the restore rule (`link_to` in `UrlHelper` was public API). 
   `NavigationHelper` was dropped: it changes the singleton, raises `FrozenError` on frozen receivers, and skips a
   subclass override after the first call. As an alternative to S2 it works, but it's about 240 changed lines against a
   few lines of guide text, and it brings back the layout #55410 removed. Not pursued.
+
+**S2 rethink after seanpdoyle's review (2026-11-06, UG82, nothing posted).** seanpdoyle asked on #59675
+([r4495179094](https://github.com/rails/rails/pull/59675#discussion_r4495179094)) whether the guide should
+discourage depending on helper-module structure, quoting rafaelfranca on #50312 ("I don't expect people to be cherry
+picking view helpers from Action View", [r2220564548](https://github.com/rails/rails/pull/50312#discussion_r2220564548)).
+A skeptical reviewer read #50312, #55410, #59667, #59663 and these records from scratch. Findings:
+* The 8.1 `UrlHelper` API docs said "This helper may be included in any class that includes the URL helpers of a
+  routes" (added `ab8bf9e152`, removed by 07f4b45e29); `UrlHelper`, `FormHelper` and `NavigationHelper` aren't
+  `:nodoc:`, and `layouts_and_rendering.md` includes `TagHelper` in a plain class. So "internal" (matthewd, #59663)
+  doesn't fit; the move is acceptable on rafaelfranca's judgement, not because the modules are private.
+* The public route `ActionController::Base.helpers` documents "may cause incorrect behavior with capture methods",
+  is the fallback Decidim's cells used, and `helpers.button_to(..., method: :delete)` raises
+  `undefined method 'protect_against_forgery?'` outside a request on main. Not a clean "do this instead".
+* The note's escaped-HTML sentence overstates it: a plain class with `delegate_missing_to :view_context` renders a
+  String block as `&lt;b&gt;` on both 8.1.1 and main (checked on Action View 8.1.1 and main `8e8a9bb38b`); the change in output
+  needs cells. `FormTagHelper` includers also lose `link_to`, which the note omitted.
+* Precedent: `52ff1e34c7` (7.1, `ActiveStorage::BaseController` no longer includes `ActiveStorage::Streaming`) is a
+  one-sentence module-structure note; no guide version documented a move between Action View helper modules.
+* #50312 (open, head `bf7ded7671`) by diff still leaves `FormHelper`/`FormTagHelper` without `NavigationHelper`;
+  Thomas's "it resolves DC1" on #59667 was run on `c23e1ecbd5`, before two force-pushes, so it needs a rerun.
+Recommendation: shorten the note (no policy sentence, no escaped-HTML sentence, add `FormTagHelper`); fall back to
+dropping it if seanpdoyle or rafaelfranca still object. Rejected: (a) a "don't include individual helper modules"
+sentence, because it contradicts the fix it then gives and the 8.1 docs, and `helpers` isn't a full substitute;
+leaving it to #50312 or its CHANGELOG, because #50312 doesn't change the includer story. Proposed section, checked on
+8.1.1 and main (six owners in `NavigationHelper`, `UrlHelper`/`FormTagHelper`/`FormHelper` alone lose `link_to`,
+`+ NavigationHelper` and the `defined?` include render it) and `mdl`-clean with the guides' `.mdlrc`:
+
+`````markdown
+### `link_to`, `button_to` and `current_page?` moved to `ActionView::Helpers::NavigationHelper`
+
+`link_to`, `button_to`, `current_page?`, `link_to_if`, `link_to_unless` and
+`link_to_unless_current` are now defined in `ActionView::Helpers::NavigationHelper`
+instead of `ActionView::Helpers::UrlHelper`. Views and helpers are unaffected,
+but a class that includes `UrlHelper`, `FormTagHelper` or `FormHelper` itself no
+longer defines these methods and must also include `NavigationHelper`:
+
+```ruby
+class LinkPresenter
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::NavigationHelper
+end
+```
+
+`NavigationHelper` doesn't exist before Rails 8.2, so code that also runs on
+earlier versions can add `if defined?(ActionView::Helpers::NavigationHelper)`
+to that include.
+`````
+
+Draft reply to seanpdoyle (Thomas to approve): "The 8.1 `UrlHelper` docs said it may be included in any class with
+the routes' URL helpers, so some apps and gems do (Redmine's hook listeners, for example); I've trimmed the note to
+what changed and the one-line include, and dropped the `delegate_missing_to` part, which turned out to be specific to
+cells. Happy to add a sentence against including individual helper modules if you'd prefer that."
 
 **DC3 (c): rspec-rails 8.0.4 no longer blanks templates in controller specs.** 9987431315 (#58279, the CW2 commit)
 makes [`PathSet#find`](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionview/lib/action_view/path_set.rb#L43-L46)
