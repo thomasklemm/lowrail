@@ -1,0 +1,64 @@
+{
+  "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+  "ruby_revision": "3e93b23afcec3433f6aecc34b5d832799d754238",
+  "compiler": [
+    "cc",
+    "-std=gnu99 -fstack-protector-strong -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -O3 -fno-fast-math -ggdb3 -Wall -Wextra -Wdeprecated-declarations -Wdiv-by-zero -Wimplicit-function-declaration -Wimplicit-int -Wpointer-arith -Wwrite-strings -Wold-style-definition -Wmissing-noreturn -Wno-cast-function-type -Wno-constant-logical-operand -Wno-long-long -Wno-missing-field-initializers -Wno-overlength-strings -Wno-packed-bitfield-compat -Wno-parentheses-equality -Wno-self-assign -Wno-tautological-compare -Wno-unused-parameter -Wno-unused-value -Wsuggest-attribute=format -Wsuggest-attribute=noreturn -Wunused-variable -Wundef",
+    "-O3 -fno-fast-math",
+    "-ggdb3"
+  ],
+  "sources": {
+    "rails": "1e235cee11b0a7aecb189d8837534807626287aa",
+    "sqlite": "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0",
+    "sqlite-bind": "b2735e1a77898954b21d1cd4f2f8b0dc518200bb",
+    "sqlite-fill-wide": "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b",
+    "pg": "9754680861354eaa5799878d3e4f2cacb892a3e4",
+    "trilogy": "518b2d51d5b4dd7571e3bd95fb7322fb7653f283",
+    "mysql2": "42e6eeb1c1b5aa1cc5e7396977c5c576b40ccc91"
+  },
+  "native": {
+    "sqlite/lib/sqlite3/sqlite3_native.so": "0b8ec0805482bb57870edd09868d6a8df9dc892e7eb926362f5f6151a514896a",
+    "sqlite/lib/sqlite3/4.0/sqlite3_native.so": "0b8ec0805482bb57870edd09868d6a8df9dc892e7eb926362f5f6151a514896a",
+    "sqlite-bind/lib/sqlite3/sqlite3_native.so": "b861045216a139c66fc75735d5be3305d0691dc8e25032b037a5af371573670a",
+    "sqlite-bind/lib/sqlite3/4.0/sqlite3_native.so": "b861045216a139c66fc75735d5be3305d0691dc8e25032b037a5af371573670a",
+    "sqlite-fill-wide/lib/sqlite3/sqlite3_native.so": "818c3f49e23ad32811495d3aa9db0d958d6d41c277fc16f56940276f9502ea3e",
+    "sqlite-fill-wide/lib/sqlite3/4.0/sqlite3_native.so": "818c3f49e23ad32811495d3aa9db0d958d6d41c277fc16f56940276f9502ea3e",
+    "pg/lib/4.0/pg_ext.so": "d4560415bdebdaf01d3305b6007eb6a93614cb4321b1a9bc23023b48aac8f625",
+    "trilogy/contrib/ruby/lib/trilogy/cext.so": "1459e8856dd23553f5f9014a4a62ad276ef44343648b9562ac15130a0ba46433",
+    "mysql2/lib/mysql2/mysql2.so": "8c9c6ec47e107c06b7333c4b3eede95418b6db88ea74c0e00909afe65ef28061"
+  },
+  "bench": {
+    "bench/upstream/driver_cpu/README.md": "4dd953f1ffa207e121293a6ab44004ccd2cbc81a34a494eed3fb8e72ff87123f",
+    "bench/upstream/driver_cpu/cases.rb": "355eb49670ef03f70fa78ae44b3c84ce5a6ffe16e2325937e2a14ff65be3d75f",
+    "bench/upstream/driver_cpu/measure.sh": "a5ec702b84400dc5622a0b2d60de183ec064a60423c66cdab7a3fa22b79fcf0c",
+    "bench/upstream/driver_cpu/pg_exact.rb": "d6128f871a8f8d6a1949f905d6df56ce21c8ea60040bc1abb79964b22889df98",
+    "bench/upstream/driver_cpu/pg_null_cases.rb": "948eec8a64e87c7c345e8ab4ff3698c5896400caa33433229bd607e83e4f005b",
+    "bench/upstream/driver_cpu/sqlite_bind_cases.rb": "590ba69c2506930f89e57d9efb5dd2cc16f460c9e54f71555536ca3bb8b6d3e0",
+    "bench/upstream/driver_cpu/sqlite_exact.rb": "e38d2120ae592c7bbf8ca89bdafc05360b2b9f413de5ba23542be1e825ee249e",
+    "bench/upstream/driver_cpu/summarize.rb": "8a1d5e1c3003388d8aa2af2ef1cfe81aa3d52e3e51b3a4b52a3213808688a935",
+    "bench/upstream/census_backlog/refresh_window.rb": "0572ac353afd485e0d0c521079b8a1b0a8fe0e64a5dfe555728d70864e32598c",
+    "bench/heap_windows.rb": "161051b3b918ee096f1e6f60f7d79bdd980d371e1eef5ee7739726b0ca587782",
+    "bench/callgrind.c": "b6d7ddf7667884c32b6c363f4e3a718e5ac5a8b75ce550e4d236fe6b4baec2a1"
+  },
+  "cohorts": [
+    "matrix-interpreter-mysql2-0",
+    "matrix-interpreter-mysql2-1",
+    "matrix-interpreter-postgresql-0",
+    "matrix-interpreter-postgresql-1",
+    "matrix-interpreter-sqlite3-0",
+    "matrix-interpreter-sqlite3-1",
+    "matrix-interpreter-sqlite3-1-v2",
+    "matrix-interpreter-trilogy-0",
+    "candidate-interpreter-pg",
+    "candidate-interpreter-sqlite-bind",
+    "candidate-interpreter-sqlite-bind20",
+    "candidate-interpreter-sqlite-fill",
+    "candidate-interpreter-sqlite-fill-wide",
+    "candidate-interpreter-sqlite-row",
+    "candidate-yjit-sqlite-bind",
+    "candidate-yjit-sqlite-bind20",
+    "candidate-yjit-sqlite-fill-wide"
+  ],
+  "driver_heads_independent": true,
+  "hosted_ci": "No CI checks found on either fork head"
+}
