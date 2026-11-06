@@ -48,7 +48,7 @@ MySQL, Trilogy and MongoDB configurations were skipped because this orb has none
 | E2b | the same readers list a temporary table or view and the permanent table it hides, so columns and indexes are duplicated and the primary key becomes composite (2cb3daba96) | in `MASTER_CTE`, a temporary table or view hides a permanent one; temporary indexes and triggers hide nothing; `sqlite_master` stays first | `thomasklemm/sqlite-schema-readers-temp-shadowing` @ `bc90b487f2` (`472c680d15` before) | draft rails/rails#59668; reviewed on `bc90b487f2` (skeptic, Sol, Astra), ready when a slot frees ([item](../../bench/upstream/pr-queue/items/E2b.md)) |
 | E2c | the same readers read index columns with an unqualified `pragma_index_info(name)` and match CREATE INDEX statements by name, so a permanent index with a temporary namesake reads the temporary index's columns twice (2cb3daba96; 8-1-stable read them once, also from the temporary index) | `MASTER_CTE` rows carry their schema, passed to `pragma_index_list` and `pragma_index_info`; index statements keyed by schema and name; stacked on E2b | `thomasklemm/sqlite-index-details-schema` @ `6c80a5583b`, stacked on E2 | reviewed (skeptic, Sol, Astra; thermos waived by the coordinator); opens when Thomas asks ([item](../../bench/upstream/pr-queue/items/E2c.md)) |
 | E3 | `ActiveSupport::LogSubscriber.colorize_logging` removed without a deprecation (aebcb61520); awesome_print 1.9.2 raises on load, administrate does not boot | deprecated delegators to `ActiveSupport.colorize_logging` | `thomasklemm/log-subscriber-colorize-logging-deprecation` @ `8672567e15` | open as rails/rails#59628 |
-| E4 | `alias :assert_not_pattern :refute_pattern` (23420be739) needs minitest 5.18; the gemspec allows 5.1 | gemspec floor `>= 5.18` | `thomasklemm/activesupport-minitest-floor` @ `0a69eb6cce` | Sol: open with nits |
+| E4 | `alias :assert_not_pattern :refute_pattern` (23420be739) needs minitest 5.18; the gemspec allows 5.1 | define the alias only if `refute_pattern` exists; no dependency bump | `thomasklemm/activesupport-minitest-floor` @ `b36c144182` | draft rails/rails#59676; conditional requested by matthewd; exact head/body approved by skeptic and pushed, awaiting coordinator Sol/Astra |
 | I1 | `Model.all.find(id)` ignores an overridden `self.primary_key` (55406a9794) | issue with a repro, since the code is under active rework | — | posted as rails/rails#59622; fix proposed by MIbtehajNasar in #59631. Reviewed with Thomas's approval on 2026-11-04 ([review](https://github.com/rails/rails/pull/59631#pullrequestreview-5775467814)): the cached override result doubles a `super`-based key (`"foo_#{super}"` → `foo_foo_id`, 8-1: `foo_id`), runtime-dynamic overrides go stale, and the test doesn't cover the issue's `id: false` table; checked by script against 8-1-stable |
 
 Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](../../bench/upstream/ecosystem/patches) and
@@ -99,9 +99,10 @@ Patches, bodies and the issue text are in [`bench/upstream/ecosystem/patches`](.
   Skeptic on the three heads: no must-fix. Dropping the schema from `pragma_index_list` is an equivalent mutant: the
   hiding already makes the unqualified name resolve to the row's table, and SQLite allows no temp index on a permanent
   table; the argument stays for symmetry, guarded by `test_indexes_logs`.
-- **E4 evidence:** minitest 5.15.0 through 5.17.0 define neither `assert_pattern` nor `refute_pattern`; 5.18.0 adds both.
-  Main without the alias loads with minitest 5.10.3. With the floor, AMS gets a Bundler conflict instead of a
-  NameError. Its suite still runs 0 tests on main because of the deliberate route removal below.
+- **E4 evidence (original floor proposal, superseded by the conditional below):** minitest 5.15.0 through 5.17.0
+  define neither `assert_pattern` nor `refute_pattern`; 5.18.0 adds both. Main without the alias loads with minitest
+  5.10.3. The floor changed AMS's NameError into a Bundler conflict; the conditional restores loading instead.
+  AMS's full suite has a separate deliberate route-removal blocker below; no full-suite pass is claimed.
 - **Full `test:sqlite3`** on E2 and on E2b: 10,286 and 10,285 runs, 0 failures. The 5 errors are environmental:
   4 need the `sqlite3` CLI, 1 needs `pg`. On stacked E2 `c04df40d80` with the CLI installed: 10,291 runs, 0 failures,
   0 errors, 52 skips.
@@ -348,3 +349,93 @@ A fresh skeptic reviewed the complete new-head patch and revised body: **approve
 every Sol finding is addressed. `git diff --check` passes and `git merge-tree --write-tree <main> <head>`
 succeeds. No runtime change or new full-suite claim; only coordinator Sol confirmation remains. No upstream
 PR/issue action, and no Sol/Astra execution by this orb.
+
+## E4 conditional follow-up (2026-11-06)
+
+After [matthewd reopened the draft and requested a conditional](https://github.com/rails/rails/pull/59676#issuecomment-6681047216),
+replaced the floor proposal with one clean commit, `b36c144182e41dcc676da3c6a51344d6f66da97a`, on current Rails
+main `cadf0fc8d6d48cefaa07e4bd6cc5dcd8347821b2`. The gemspec and lockfile are identical to main: minitest remains
+`>= 5.1`. `assert_not_pattern` is aliased only if `method_defined?(:refute_pattern)`, matching Rails' existing
+capability checks for minitest API differences (`run_order`, `load`, `run_one_method`). The existing pattern test
+skips only when `assert_pattern` is unavailable and now also checks rejection of a matching pattern. No tests of
+method ownership, alias identity, or other internals were added. A top-of-file, attributed Active Support changelog
+entry is warranted: the fix restores loading with declared-supported dependencies rather than requiring an upgrade.
+
+### Public loading and assertion behaviour
+
+On Ruby 3.3.13, activate the exact minitest version, add the checkout's `activesupport/lib` to the load path, then:
+
+```ruby
+gem "minitest", ENV.fetch("MT")
+require "active_support"
+require "active_support/test_case"
+```
+
+| minitest | Unmodified current main | Conditional fix | `assert_not_pattern` with fix |
+| --- | --- | --- | --- |
+| 5.1.0 | `refute_pattern` NameError | loads | absent |
+| 5.10.3 | same NameError | loads | absent |
+| 5.17.0 | same NameError | loads | absent |
+| 5.18.0 | loads | loads | mismatch passes; matching pattern raises `Minitest::Assertion` |
+| 6.0.6 | loads | loads | same passing and failing behaviour |
+
+Checked all `refute_*` alias targets against a representative release of every minor from minitest 5.1 through
+5.17. Only `refute_pattern` is absent; the original `23420be739` introduced no other aliases. For 5.13.0 and 5.14.0,
+whose gem metadata restricts Ruby to 2.x, this was a source/API inspection, not an installed-gem loading claim.
+The minitest 5.18.0 `History.rdoc` confirms that both pattern assertions were added in that release. Inspection of
+the recent helper conditionals and execution of the notification and event reporter assertion tests found no
+additional version-dependent loading failure to include in this patch.
+
+### Active Support tests
+
+Ran the real `test/test_case_test.rb`, `test/testing/notification_assertions_test.rb`,
+`test/testing/event_reporter_assertions_test.rb` and `test/testing/after_teardown_test.rb` together, with
+`PARALLEL_WORKERS=1`. A temporary minimal `BUNDLE_GEMFILE` uses the actual Active Support path gemspec, the exact
+minitest version, rake and (for minitest 6) minitest-mock. Both `activesupport/lib` and `railties/lib` are on the
+load path, so the real Rails minitest plugin runs; no framework methods or reporters are stubbed.
+
+| Ruby | minitest | Runs | Assertions | Failures / errors / skips |
+| --- | --- | ---: | ---: | --- |
+| 3.3.13 | 5.1.0 | 93 | 378 | 2 / 0 / 1 |
+| 3.3.13 | 5.10.3 | 93 | 378 | 2 / 0 / 1 |
+| 3.3.13 | 5.17.0 | 93 | 385 | 0 / 0 / 1 |
+| 3.3.13 | 5.18.0 | 93 | 389 | 0 / 0 / 0 |
+| 3.3.13 | 6.0.6 | 93 | 390 | 0 / 0 / 0 |
+| 4.0.9 | 6.0.6 | 93 | 390 | 0 / 0 / 0 |
+
+The single skip is the unavailable pattern assertion. The two failures on 5.1.0 and 5.10.3 are
+`ExceptionsInsideAssertionsTest#test_warning_is_logged_if_caught_internally` and
+`#test_fails_and_warning_is_logged_if_wrong_error_caught`. Old minitest defines `UnexpectedError#exception`, so
+Ruby's `raise` unwraps the original `ArgumentError`. Public probes reproduce both outcomes unchanged on Rails
+v8.1.4.1: `assert_nothing_raised { raise ArgumentError }` raises `ArgumentError`, and an outer
+`assert_raises(ArgumentError)` around `assert_no_changes` passes. Those tests date to `4b42beb3b8` (2021), not the
+pattern-alias regression; they are not suppressed or changed here. The three other helper files alone on minitest
+5.10.3 pass: **26 runs, 119 assertions, no failures, errors or skips**.
+
+### AMS caller and review scope
+
+Checked active_model_serializers **v0.10.16**, exact source
+`6934c8bd31f4025fe7548a07d50a82f18df8e689`, with its actual runtime dependencies, current Rails path gems and
+minitest **5.10.3**, which satisfies its development pin. The test helper's require chain is:
+
+```ruby
+require "rails"
+require "action_controller"
+require "action_controller/test_case"
+require "action_controller/railtie"
+require "active_model_serializers"
+```
+
+On unmodified current main this raises the `refute_pattern` NameError from `ActionController::TestCase` loading
+`ActiveSupport::TestCase`. On the fix it loads AMS 0.10.16 / Rails 8.2.0.alpha / minitest 5.10.3, and an inherited
+`assert_not_equal` passes. This checks the failing load path, **not the full AMS suite**; no dummy routes or gem
+source were patched. The earlier deliberate dynamic-route-removal blocker remains outside this fix.
+
+The proposed title/body is two short prose paragraphs plus the unchanged research footer, retaining the exact
+AMS dependency permalink. The live draft title/body matched the old queue item byte-for-byte before replacement;
+they matched again immediately before the GitHub update. The fork branch is force-pushed with an exact old-head
+lease and the live title/body updated; the PR remains an open draft, with no comment posted. Independent skeptic:
+**approve on the exact head and body, no must-fixes, should-fixes or nits**. The reviewer independently ran the
+cross-version alias API audit and inspected source and execution logs, but did not rerun the suites or AMS probe.
+Old queue passes stay as history, not coverage of this new patch. Sol and Astra remain the coordinator's next
+step. No hosted CI pass is claimed; this thread subscribes to completion for the exact pushed fork head.
