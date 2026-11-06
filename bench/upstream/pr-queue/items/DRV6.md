@@ -18,6 +18,7 @@ pr:
 note: "Bundles DRV3, DRV4 and DRV5 (Thomas, 2026-11-06, to stay within the per-repo cap) as three commits cherry-picked unchanged onto 48091f4694 (patch-identical to 3966a52d0f, bfdb863448, ccd8267678). Fork CI with all three: 134/134 green, run 42213230921."
 passes:
   - {reviewer: sol, head: "cfd14a42c755ee6e218811916ba8adc68b2230d3", date: 2026-11-06, verdict: nits, open: "Opening line, MSVCRT sentence, shorter busy-timeout paragraph; applied."}
+  - {reviewer: claude-code, head: "cfd14a42c755ee6e218811916ba8adc68b2230d3", date: 2026-11-06, verdict: approve, open: "Reviewed body after Sol nits (a190280); no change. Each commit patch- and message-identical to 3966a52d0f/bfdb863448/ccd8267678, all on 48091f4694 (still upstream main); Thomas as author and committer, no trailers. Fork run 42213230921 (134/134) ran on c9701eac, whose first three commits have this head's tree; probe commit only adds a push trigger."}
   - {reviewer: claude-code, head: "3966a52d0fd6ce1130f190b1d18dfcbab2eb1fa8", date: 2026-11-06, verdict: approve, open: "DRV3 commit, reviewed separately."}
   - {reviewer: claude-code, head: "bfdb86344843c59eb041823fdff3e8c39c33ced8", date: 2026-11-06, verdict: approve, open: "DRV4 commit, reviewed separately."}
   - {reviewer: claude-code, head: "ccd8267678d524c7ea72e4a7a988dc8a5a0d80d3", date: 2026-11-06, verdict: approve, open: "DRV5 commit, reviewed separately."}
