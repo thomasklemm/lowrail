@@ -1,0 +1,245 @@
+From 3be0ea49aeffec6706bac956b69a752d2f865300 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 6 Nov 2026 21:01:14 +0000
+Subject: [PATCH 1/2] Engine: Trim a statement line after an ERB comment line
+ in a block
+
+Inside a block, a `<%# comment %>` line followed by a statement line
+left the statement's indentation and newline in the output, unlike
+Erubi:
+
+    <% if a %>
+      <%# a comment %>
+      <% b = 1 %>
+      hi
+    <% end %>
+
+rendered "  \n  hi\n" instead of "  hi\n".
+
+Trimming the comment empties the indentation token before it, so
+`at_line_start?` no longer saw a newline before the statement's
+indentation. It now also accepts a newline that the previous trim
+consumed, as `leading_space_follows_newline?` already does.
+---
+ lib/herb/engine/compiler.rb                                  | 2 +-
+ test/engine/engine_erubi_compat_test.rb                      | 4 ++++
+ ...ement_inside_a_block_4f69dc4a81a006d8375cca0e3e17c496.txt | 5 +++++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+ create mode 100644 test/snapshots/engine/engine_erubi_compat_test/test_0057_trims_an_erb_comment_line_followed_by_a_statement_inside_a_block_4f69dc4a81a006d8375cca0e3e17c496.txt
+
+diff --git a/lib/herb/engine/compiler.rb b/lib/herb/engine/compiler.rb
+index 75240e64..831bc8da 100644
+--- a/lib/herb/engine/compiler.rb
++++ b/lib/herb/engine/compiler.rb
+@@ -752,7 +752,7 @@ module Herb
+         last_value = @tokens.last[1]
+ 
+         if last_type == :text
+-          last_value.empty? || last_value.end_with?("\n") || (whitespace_only?(last_value) && preceding_token_ends_with_newline?) || trailing_indentation?(last_value)
++          last_value.empty? || last_value.end_with?("\n") || (whitespace_only?(last_value) && (preceding_token_ends_with_newline? || @last_trim_consumed_newline)) || trailing_indentation?(last_value)
+         elsif EXPRESSION_TOKEN_TYPES.include?(last_type)
+           @last_trim_consumed_newline
+         else
+diff --git a/test/engine/engine_erubi_compat_test.rb b/test/engine/engine_erubi_compat_test.rb
+index 54e02c44..d765e25e 100644
+--- a/test/engine/engine_erubi_compat_test.rb
++++ b/test/engine/engine_erubi_compat_test.rb
+@@ -468,5 +468,9 @@ module Engine
+       assert_compiled_snapshot(template)
+       assert_evaluated_snapshot(template, { a: true }, enforce_erubi_equality: true)
+     end
++
++    test "trims an erb comment line followed by a statement inside a block" do
++      assert_evaluated_snapshot("<% if a %>\n  <%# a comment %>\n  <% b = 1 %>\n  hi\n<% end %>\n", { a: true }, enforce_erubi_equality: true)
++    end
+   end
+ end
+diff --git a/test/snapshots/engine/engine_erubi_compat_test/test_0057_trims_an_erb_comment_line_followed_by_a_statement_inside_a_block_4f69dc4a81a006d8375cca0e3e17c496.txt b/test/snapshots/engine/engine_erubi_compat_test/test_0057_trims_an_erb_comment_line_followed_by_a_statement_inside_a_block_4f69dc4a81a006d8375cca0e3e17c496.txt
+new file mode 100644
+index 00000000..0053da19
+--- /dev/null
++++ b/test/snapshots/engine/engine_erubi_compat_test/test_0057_trims_an_erb_comment_line_followed_by_a_statement_inside_a_block_4f69dc4a81a006d8375cca0e3e17c496.txt
+@@ -0,0 +1,5 @@
++---
++source: "Engine::EngineErubiCompatTest#test_0057_trims an erb comment line followed by a statement inside a block"
++input: "{source: \"<% if a %>\\n  <%# a comment %>\\n  <% b = 1 %>\\n  hi\\n<% end %>\\n\", locals: {a: true}, options: {}}"
++---
++  hi
+-- 
+2.55.0
+
+
+From b0bc44dabf93470d2fda9b9ed6ce5021022c26cf Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 6 Nov 2026 21:02:54 +0000
+Subject: [PATCH 2/2] Engine: Trim a line that only holds a Ruby comment like
+ Erubi
+
+Erubi treats `<% # comment %>` as a statement and, with trim, drops a
+line that only holds it. Herb skipped the tag entirely, so its line's
+indentation and newline stayed in the output:
+
+    <p>
+      <% # a comment %>
+      hi
+    </p>
+
+rendered "<p>\n  \n  hi\n</p>\n" instead of "<p>\n  hi\n</p>\n".
+
+Such a tag that ends its line now goes through the `<%#` comment path,
+which trims the line and keeps the line count. A Ruby comment that is
+followed by more on its line, or that follows a statement on the same
+line, still emits nothing, so line numbers stay where they were. Erubi
+can't compile those cases, because the comment hides the rest of the
+line.
+---
+ lib/herb/engine/compiler.rb                   | 25 ++++++++++++++++---
+ sig/herb/engine/compiler.rbs                  |  7 +++++-
+ test/engine/engine_erubi_compat_test.rb       |  4 +++
+ ...mment_944d46086deefbf0c508ed508ce06786.txt |  7 ++++++
+ ...ntent_fe61d9bee5fc47e3ae2a25deab93660c.txt |  1 -
+ ...ation_2b3c4e3c244db77468813a7472298e82.txt |  4 +--
+ 6 files changed, 41 insertions(+), 7 deletions(-)
+ create mode 100644 test/snapshots/engine/engine_erubi_compat_test/test_0058_trims_a_line_that_only_holds_a_ruby_comment_944d46086deefbf0c508ed508ce06786.txt
+
+diff --git a/lib/herb/engine/compiler.rb b/lib/herb/engine/compiler.rb
+index 831bc8da..ca7f447d 100644
+--- a/lib/herb/engine/compiler.rb
++++ b/lib/herb/engine/compiler.rb
+@@ -228,8 +228,19 @@ module Herb
+         add_text(node.tag_closing.value)
+       end
+ 
++      def visit_all(nodes)
++        nodes.each_with_index do |node, index|
++          @next_sibling = [node, nodes[index + 1]]
++          node&.accept(self)
++        end
++      end
++
+       def visit_erb_content_node(node)
+-        return if inline_ruby_comment?(node)
++        if inline_ruby_comment?(node)
++          process_erb_tag(node, omitted: true) if comment_line?(node)
++
++          return
++        end
+ 
+         process_erb_tag(node)
+       end
+@@ -476,12 +487,12 @@ module Herb
+         @current_element_source = previous_element_source
+       end
+ 
+-      def process_erb_tag(node, skip_comment_check: false)
++      def process_erb_tag(node, skip_comment_check: false, omitted: false)
+         opening = node.tag_opening.value
+ 
+         return add_escaped_erb_tag(node) if erb_escaped?(opening)
+ 
+-        if !skip_comment_check && erb_omitted?(opening)
++        if omitted || (!skip_comment_check && erb_omitted?(opening))
+           unless @trim
+             keep_span_line_count(node)
+ 
+@@ -771,6 +782,14 @@ module Herb
+         preceding[1].end_with?("\n")
+       end
+ 
++      # A `<% # comment %>` that ends its line trims like `<%#`, as in Erubi; elsewhere it still emits nothing.
++      def comment_line?(node)
++        return false if erb_output?(node.tag_opening.value) || follows_trimmed_statement_tag?(node)
++
++        current, following = @next_sibling
++        current.equal?(node) && following.is_a?(Herb::AST::HTMLTextNode) && following.content.match?(/\A[ \t]*\r?\n/)
++      end
++
+       def left_trim?(node)
+         node.tag_opening&.value == "<%-"
+       end
+diff --git a/sig/herb/engine/compiler.rbs b/sig/herb/engine/compiler.rbs
+index 5e54e9db..b93d20a5 100644
+--- a/sig/herb/engine/compiler.rbs
++++ b/sig/herb/engine/compiler.rbs
+@@ -61,6 +61,8 @@ module Herb
+ 
+       def visit_cdata_node: (untyped node) -> untyped
+ 
++      def visit_all: (untyped nodes) -> untyped
++
+       def visit_erb_content_node: (untyped node) -> untyped
+ 
+       def visit_erb_comment_node: (untyped node) -> untyped
+@@ -126,7 +128,7 @@ module Herb
+       # : (untyped node) { (String?) -> untyped } -> untyped
+       def with_element_context: (untyped node) { (String?) -> untyped } -> untyped
+ 
+-      def process_erb_tag: (untyped node, ?skip_comment_check: untyped) -> untyped
++      def process_erb_tag: (untyped node, ?skip_comment_check: untyped, ?omitted: untyped) -> untyped
+ 
+       # : (untyped, ?extra: Integer) -> void
+       def keep_span_line_count: (untyped, ?extra: Integer) -> void
+@@ -176,6 +178,9 @@ module Herb
+ 
+       def preceding_token_ends_with_newline?: () -> untyped
+ 
++      # A `<% # comment %>` that ends its line trims like `<%#`, as in Erubi; elsewhere it still emits nothing.
++      def comment_line?: (untyped node) -> untyped
++
+       def left_trim?: (untyped node) -> untyped
+ 
+       def right_trim?: (untyped node) -> untyped
+diff --git a/test/engine/engine_erubi_compat_test.rb b/test/engine/engine_erubi_compat_test.rb
+index d765e25e..b0cfc7c3 100644
+--- a/test/engine/engine_erubi_compat_test.rb
++++ b/test/engine/engine_erubi_compat_test.rb
+@@ -472,5 +472,9 @@ module Engine
+     test "trims an erb comment line followed by a statement inside a block" do
+       assert_evaluated_snapshot("<% if a %>\n  <%# a comment %>\n  <% b = 1 %>\n  hi\n<% end %>\n", { a: true }, enforce_erubi_equality: true)
+     end
++
++    test "trims a line that only holds a ruby comment" do
++      assert_evaluated_snapshot("<p>\n  <% # a comment %>\n  hi\n</p>\n", enforce_erubi_equality: true)
++    end
+   end
+ end
+diff --git a/test/snapshots/engine/engine_erubi_compat_test/test_0058_trims_a_line_that_only_holds_a_ruby_comment_944d46086deefbf0c508ed508ce06786.txt b/test/snapshots/engine/engine_erubi_compat_test/test_0058_trims_a_line_that_only_holds_a_ruby_comment_944d46086deefbf0c508ed508ce06786.txt
+new file mode 100644
+index 00000000..ea8b4396
+--- /dev/null
++++ b/test/snapshots/engine/engine_erubi_compat_test/test_0058_trims_a_line_that_only_holds_a_ruby_comment_944d46086deefbf0c508ed508ce06786.txt
+@@ -0,0 +1,7 @@
++---
++source: "Engine::EngineErubiCompatTest#test_0058_trims a line that only holds a ruby comment"
++input: "{source: \"<p>\\n  <% # a comment %>\\n  hi\\n</p>\\n\", locals: {}, options: {}}"
++---
++<p>
++  hi
++</p>
+diff --git a/test/snapshots/engine/evaluation_test/test_0024_comment_before_content_fe61d9bee5fc47e3ae2a25deab93660c.txt b/test/snapshots/engine/evaluation_test/test_0024_comment_before_content_fe61d9bee5fc47e3ae2a25deab93660c.txt
+index d1eda102..8f99a82f 100644
+--- a/test/snapshots/engine/evaluation_test/test_0024_comment_before_content_fe61d9bee5fc47e3ae2a25deab93660c.txt
++++ b/test/snapshots/engine/evaluation_test/test_0024_comment_before_content_fe61d9bee5fc47e3ae2a25deab93660c.txt
+@@ -2,5 +2,4 @@
+ source: "Engine::EvaluationTest#test_0024_comment before content"
+ input: "{source: \"<% # This file contains a comment before other content %>\\n<div>Hey there</div>\\n\", locals: {}, options: {escape: false}}"
+ ---
+-
+ <div>Hey there</div>
+diff --git a/test/snapshots/engine/examples_compilation_test/test_0010_comment_before_content_compilation_2b3c4e3c244db77468813a7472298e82.txt b/test/snapshots/engine/examples_compilation_test/test_0010_comment_before_content_compilation_2b3c4e3c244db77468813a7472298e82.txt
+index 76d5c784..0bdd7007 100644
+--- a/test/snapshots/engine/examples_compilation_test/test_0010_comment_before_content_compilation_2b3c4e3c244db77468813a7472298e82.txt
++++ b/test/snapshots/engine/examples_compilation_test/test_0010_comment_before_content_compilation_2b3c4e3c244db77468813a7472298e82.txt
+@@ -2,7 +2,7 @@
+ source: "Engine::ExamplesCompilationTest#test_0010_comment before content compilation"
+ input: "{source: \"<% # This file contains a comment before other content %>\\n<div>Hey there</div>\\n\", options: {escape: false}}"
+ ---
+-_buf = ::String.new; _buf << '
+-<div>Hey there</div>
++_buf = ::String.new;
++ _buf << '<div>Hey there</div>
+ '.freeze;
+ _buf.to_s
+-- 
+2.55.0
+
