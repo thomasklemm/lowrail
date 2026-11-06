@@ -391,6 +391,11 @@ Thomas before posting.
 * **Projects with restrictive AI policies get no upstream reports or fixes** (Thomas, 2026-11-06), for example
   Mastodon (Assisted-by trailer, human-written descriptions, no agent-opened PRs). We still use them as
   measurement corpus and record what we find.
+* **Current versions only; no fixes for old pins** (Thomas, 2026-11-06). A break that only shows up with an old,
+  long-superseded dependency version (an ancient minitest pin in a gem's dev dependencies, for example) is not
+  worth a PR, even if the old version is inside a declared range. Evidence and fixes target what apps actually run:
+  current releases of Rails, Ruby and gems. rails/rails#59676 (minitest 5.1–5.17, found via
+  active_model_serializers' old dev pin) stays open, but no more of this kind.
 
 ## Bets
 
