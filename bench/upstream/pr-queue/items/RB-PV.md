@@ -22,6 +22,7 @@ passes:
   - {reviewer: claude-code, head: "cca922aa81", date: 2026-11-06, verdict: nits, open: "--runs=1 interleave test, warmup_itrs_per_run assertion, table label; applied"}
   - {reviewer: claude-code, head: "aed07e8d8f", date: 2026-11-06, verdict: approve, open: "ratio is the pooled mean while the test uses unweighted process means; odd N ordering; kept"}
   - {reviewer: claude-code, head: "aed07e8d8f", date: 2026-11-06, verdict: nits, open: "independent Claude Code Thermos pass (correctness + maintainability), final head b633985a3d. Fixed: with --runs every benchmark got a GC row because run sizes counted as GC activity; tests did not catch a p-value over raw iterations, dropped GC run sizes or an even split (new asymmetric test, checked against scipy); Ractor refusal test asserts its message; body slowdowns as extra time (6.6%/11%/1.9%, were 1 − ratio). Kept: pooled ratio vs process-mean test; odd N balanced across the suite only; scalars (rss without samples, JIT stats) from process 1, as the commit message says; --pvalue alone now N/A, stated in the body"}
+  - {reviewer: claude-code, head: "69767b3206", date: 2026-11-06, verdict: approve, open: "confirm pass on the delta from b633985a3d (signal-killed run: exitstatus nil made dig miss the failure; both sites use key?) and the body wording; new SIGKILL test fails on b633985a3d, passes on 69767b3206; full suite 360 runs green; fork CI 15/15 on 69767b3206 via draft PR #17 (run 42255909337), PR closed, branch kept"}
 ---
 
 # Test significance across processes with --runs
