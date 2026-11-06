@@ -818,6 +818,7 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 
 - [#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769), binding UTF-8 text skips a redundant String copy. **Draft**, opened 2026-11-06 00:36 UTC, head `c55ce350e3`.
 - [#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770), multi-column statement rows are filled at their known size. **Draft**, opened 2026-11-06 01:09 UTC, head `61fd4988d6`.
+- [#773](https://github.com/sparklemotion/sqlite3-ruby/pull/773) (DRV6), fix three CI failures on main (bundles our CI fixes; #769 and #770 need a rebase onto main once it merges). **Ready**, opened 2026-11-06 12:47 UTC over the per-repo cap by Thomas's choice, head `cfd14a42c7`.
 
 ### Time zones — tzinfo/tzinfo
 
