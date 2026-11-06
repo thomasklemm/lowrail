@@ -21,6 +21,7 @@ passes:
   - {reviewer: skeptic, head: "ab0a99e41a", date: 2026-11-05, verdict: approve, open: wording nit applied}
   - {reviewer: sol, head: "ab0a99e41a", date: 2026-11-05, verdict: approve, open: body link pinned (13:13)}
   - {reviewer: sol, head: "ab0a99e41a", date: 2026-11-05, verdict: nits, open: "20:09, optional: assert method ownership, narrow the profile-page claim"}
+  - {reviewer: claude-code, head: "ab0a99e41a", date: 2026-11-06, verdict: approve, open: "none; rebases cleanly on main 8e8a9bb3 (actionview unchanged since bdb3d960), so no push; both methods private and owned only by UrlHelper for NavigationHelper, UrlHelper, FormTagHelper, FormHelper and ActionView::Base; button_to fine; new test fails on main with NoMethodError; actionview test:template 2956 runs and actionpack request_forgery_protection green, RuboCop clean; links verified; no CHANGELOG (unreleased, entry names no private methods); left Sol's optional nits as is"}
 ---
 
 # Keep token_tag and method_tag where FormTagHelper can reach them
