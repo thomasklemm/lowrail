@@ -1,0 +1,40 @@
+blog iterations kept [3, 4, 5, 6, 7]
+  r81      4.31004e+09  A/A 0.0257%  vs r81 +0.000%
+  main     3.95635e+09  A/A 0.0146%  vs r81 -8.206%
+railsbench iterations kept [3, 4, 5, 6, 7]
+  r81      7.41274e+09  A/A 0.0093%  vs r81 +0.000%
+  main     6.49265e+09  A/A 0.0089%  vs r81 -12.412%
+lobsters iterations kept [3, 4, 5, 6, 7]
+  r81      3.67814e+09  A/A 0.0260%  vs r81 +0.000%
+  main     3.38987e+09  A/A 0.0125%  vs r81 -7.837%
+blog iterations kept [3, 4, 5, 6, 7]
+  main     3.95635e+09  A/A 0.0146%  vs main +0.000%
+  pm1b     3.98160e+09  A/A 0.0384%  vs main +0.638%
+railsbench iterations kept [3, 4, 5, 6, 7]
+  main     6.49265e+09  A/A 0.0089%  vs main +0.000%
+  pm1b     6.53953e+09  A/A 0.0161%  vs main +0.722%
+lobsters iterations kept [4, 5, 6, 7]
+  main     3.40058e+09  A/A 0.0830%  vs main +0.000%
+  pm1b     3.39886e+09  A/A 1.2002%  vs main -0.050%
+blog iterations kept [3, 4, 5, 6, 7]
+  sqbase   4.30641e+09  A/A 0.0132%  vs sqbase +0.000%
+  sq769    4.30697e+09  A/A 0.0069%  vs sqbase +0.013%
+  sq770    4.30591e+09  A/A 0.0132%  vs sqbase -0.012%
+railsbench iterations kept [3, 4, 5, 6, 7]
+  sqbase   7.37376e+09  A/A 0.0689%  vs sqbase +0.000%
+  sq769    7.37157e+09  A/A 0.0852%  vs sqbase -0.030%
+  sq770    7.36910e+09  A/A 0.0017%  vs sqbase -0.063%
+lobsters iterations kept [3, 4, 5, 6]
+  sqbase   3.64505e+09  A/A 0.0146%  vs sqbase +0.000%
+  sq769    3.64500e+09  A/A 0.0246%  vs sqbase -0.001%
+  sq770    3.64163e+09  A/A 0.0199%  vs sqbase -0.094%
+blog iterations kept [3, 4, 5, 6, 7]
+  r81      4.31004e+09  A/A 0.0257%  vs r81 +0.000%
+  slow400  4.32778e+09  A/A 0.0079%  vs r81 +0.412%
+  slow2000 4.40960e+09  A/A 0.0000%  vs r81 +2.310%
+railsbench iterations kept [3, 4, 5, 6, 7]
+  r81      7.41274e+09  A/A 0.0093%  vs r81 +0.000%
+  slow2000 7.41831e+09  A/A 0.0000%  vs r81 +0.075%
+lobsters iterations kept [3, 5, 6, 7]
+  r81      3.67465e+09  A/A 0.0396%  vs r81 +0.000%
+  slow2000 3.71413e+09  A/A 0.0000%  vs r81 +1.075%

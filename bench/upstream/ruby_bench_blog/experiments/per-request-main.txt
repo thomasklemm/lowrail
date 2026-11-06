@@ -1,0 +1,14 @@
+iteration Ir 3801509416, in requests 3777204727 (417 requests)
+requests with a GC: 0
+GET /articles/:id 200                     193 req  40.3%    7930543 Ir/req  no-GC  193 req   7930543 Ir/req
+GET /articles 200                          33 req  14.4%   16644679 Ir/req  no-GC   33 req  16644679 Ir/req
+POST /articles/:id/comments 302            44 req  14.0%   12058100 Ir/req  no-GC   44 req  12058100 Ir/req
+POST /articles 422                         15 req   6.1%   15582416 Ir/req  no-GC   15 req  15582416 Ir/req
+GET /articles/new 200                      39 req   5.8%    5628373 Ir/req  no-GC   39 req   5628373 Ir/req
+POST /articles 302                         24 req   5.5%    8741127 Ir/req  no-GC   24 req   8741127 Ir/req
+DELETE /articles/:id 303                   15 req   4.2%   10643161 Ir/req  no-GC   15 req  10643161 Ir/req
+PATCH /articles/:id 303                    14 req   3.4%    9236413 Ir/req  no-GC   14 req   9236413 Ir/req
+GET /articles/:id/edit 200                 14 req   2.3%    6223549 Ir/req  no-GC   14 req   6223549 Ir/req
+GET /articles.json 200                      8 req   1.6%    7576790 Ir/req  no-GC    8 req   7576790 Ir/req
+GET /articles/:id.json 200                 14 req   0.9%    2478683 Ir/req  no-GC   14 req   2478683 Ir/req
+DELETE /articles/:id/comments/:id 302       4 req   0.9%    8086577 Ir/req  no-GC    4 req   8086577 Ir/req

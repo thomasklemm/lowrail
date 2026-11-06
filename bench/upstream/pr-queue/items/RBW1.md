@@ -16,7 +16,7 @@ rank: 3
 risky: false
 state: reviewed
 pr:
-note: "Thomas opens it as a draft after his final review. The claude-code pass (with thermos) changed the head to 65151273f6; skeptic passes are on 950a2bc27d and Sol has not run, so per the review gates skeptic and Sol still need a pass on 65151273f6"
+note: "Thomas opens it as a draft after his final review. The claude-code pass (with thermos) changed the head to 65151273f6; skeptic passes are on 950a2bc27d and Sol has not run, so per the review gates skeptic and Sol still need a pass on 65151273f6. Held while Thomas tries it out (docs/upstream/ruby-bench-blog-findings.md). Before opening: on Rails main pin_connection! no longer opens a transaction (rails 9e8fe3955b), so 65151273f6 does not roll back on Rails 8.2; begin and roll back the transaction in benchmark.rb when pin_connection! leaves none open (experiment fix in that record)"
 passes:
   - {reviewer: skeptic, head: "7277a4bced", date: 2026-11-06, verdict: changes, open: "commit message overclaims about lobsters; image_processing loads libvips at boot; dead code; README gaps; all applied"}
   - {reviewer: skeptic, head: "950a2bc27d", date: 2026-11-06, verdict: nits, open: "body: fsync wording, lobsters A/A caveat, savepoint wording, 'timed iteration'; applied to the body. Commit message keeps 'None of them submits a form' (lobsters' login POST is setup, not timed)"}

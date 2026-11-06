@@ -1,0 +1,83 @@
+diff --git a/benchmarks/blog/benchmark.rb b/benchmarks/blog/benchmark.rb
+index d9a8717..882380d 100644
+--- a/benchmarks/blog/benchmark.rb
++++ b/benchmarks/blog/benchmark.rb
+@@ -139,7 +139,16 @@ run_benchmark(10) do
+   # Roll back every write at the end of the iteration, as Rails tests do,
+   # so each iteration starts from the same databases.
+   pinned = []
+-  pools.each { |pool| pool.pin_connection!(false); pinned << pool }
++  began = []
++  pools.each do |pool|
++    pool.pin_connection!(false); pinned << pool
++    # Rails 8.2 (rails/rails 9e8fe3955b) no longer opens the transaction in pin_connection!.
++    connection = pool.lease_connection
++    unless connection.transaction_open?
++      connection.begin_transaction(joinable: false, _lazy: false)
++      began << pool
++    end
++  end
+   browser.cookie = nil
+   visits.each_with_index do |(kind, id, *args, count, comments), index|
+     $now = START_TIME + index
+@@ -198,7 +207,11 @@ run_benchmark(10) do
+       "got #{SolidCable::Message.count} and #{SolidQueue::Job.count}"
+   end
+ ensure
+-  clean = pinned.map(&:unpin_connection!).all?
++  clean = began.map do |pool|
++    connection = pool.lease_connection
++    connection.transaction_open?.tap { connection.rollback_transaction if _1 }
++  end.all?
++  clean = pinned.map { |pool| pool.unpin_connection!.then { began.include?(pool) || _1 } }.all? && clean
+   $now = nil
+   raise "A request ended the iteration's transaction" unless clean || $!
+ end
+diff --git a/benchmarks/lobsters/config/application.rb b/benchmarks/lobsters/config/application.rb
+index d29e908..e0dc08f 100644
+--- a/benchmarks/lobsters/config/application.rb
++++ b/benchmarks/lobsters/config/application.rb
+@@ -21,7 +21,7 @@ Bundler.require(*Rails.groups)
+ module Lobsters
+   class Application < Rails::Application
+     # Initialize configuration defaults for originally generated Rails version.
+-    config.load_defaults "#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}"
++    config.load_defaults "8.1"
+ 
+     # Please, add to the `ignore` list any other `lib` subdirectories that do
+     # not contain `.rb` files, or that should not be reloaded or eager loaded.
+diff --git a/benchmarks/lobsters/route_generator.rb b/benchmarks/lobsters/route_generator.rb
+index d2fc98c..3a14254 100644
+--- a/benchmarks/lobsters/route_generator.rb
++++ b/benchmarks/lobsters/route_generator.rb
+@@ -64,7 +64,8 @@ class RouteGenerator
+     login_get_env = Rack::MockRequest::env_for("https://localhost/login")
+     login_get_resp = @app.call(login_get_env)
+     auth_token_line = login_get_resp[2].join.lines.detect { |line| line.include?("authenticity_token") && line.include?("value") }
+-    @auth_token = auth_token_line.scan(/value="([^"]+)"/)[0][0]
++    # Rails 8.2 defaults to Sec-Fetch-Site CSRF checks and renders no token.
++    @auth_token = auth_token_line ? auth_token_line.scan(/value="([^"]+)"/)[0][0] : ""
+     @resp_cookie_header = login_get_resp[1]["Set-Cookie"] #+ "; tag_filters=NOCACHE" # turn off the file cache
+ 
+     @auth_token
+@@ -81,6 +82,7 @@ class RouteGenerator
+     # With the srand seed given in lib/tasks/fake_data.rake, we use the fake data for one of the users
+     login_post_env = Rack::MockRequest::env_for("https://localhost/login", method: "POST", params: { email: @user.email, password: "ji3W36xR", authenticity_token: @auth_token })
+     login_post_env["HTTP_COOKIE"] = @resp_cookie_header
++    login_post_env["HTTP_SEC_FETCH_SITE"] = "same-origin"
+     login_post_resp = @app.call(login_post_env)
+     raise("Can't log in as fake user wiegand.michell: #{login_post_resp.inspect}") unless login_post_resp[0] == 302
+     @resp_cookie_header = login_post_resp[1]["Set-Cookie"] #+ "; tag_filters=NOCACHE" # turn off the file cache
+diff --git a/benchmarks/railsbench/config/application.rb b/benchmarks/railsbench/config/application.rb
+index d1c1013..a53ec34 100644
+--- a/benchmarks/railsbench/config/application.rb
++++ b/benchmarks/railsbench/config/application.rb
+@@ -21,7 +21,7 @@ Bundler.require(*Rails.groups)
+ module Railsbench
+   class Application < Rails::Application
+     # Initialize configuration defaults for originally generated Rails version.
+-    config.load_defaults "#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}"
++    config.load_defaults "8.1"
+ 
+     # Please, add to the `ignore` list any other `lib` subdirectories that do
+     # not contain `.rb` files, or that should not be reloaded or eager loaded.

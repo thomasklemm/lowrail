@@ -1,0 +1,23 @@
+i409: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+y409: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+im: ruby 4.1.0dev (2026-11-06T08:56:06Z master 0236df43c2) +PRISM [x86_64-linux]
+ym: ruby 4.1.0dev (2026-11-06T08:56:06Z master 0236df43c2) +YJIT +PRISM [x86_64-linux]
+zm: ruby 4.1.0dev (2026-11-06T08:56:06Z master 0236df43c2) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 2950871be0e98929a6fbd912a14c23fb6476daa4
+
+----------  -------------  -------------  -------------  -------------  -------------  ------------  ----------  ----------  ----------  ---------  -------  -------  -------
+bench           i409 (ms)      y409 (ms)        im (ms)        ym (ms)        zm (ms)  y409 1st itr  im 1st itr  ym 1st itr  zm 1st itr  i409/y409  i409/im  i409/ym  i409/zm
+lobsters    1184.2 ± 4.4%   695.7 ± 5.0%  1175.8 ± 3.5%   642.7 ± 4.9%   686.9 ± 3.3%         0.593       0.960       0.646       0.290      1.702    1.007    1.843    1.724
+railsbench  2870.8 ± 1.5%  1619.8 ± 3.8%  2830.1 ± 2.8%  1556.4 ± 3.6%  1584.4 ± 2.8%         1.306       1.099       1.385       1.050      1.772    1.014    1.845    1.812
+blog        1794.4 ± 9.7%   967.4 ± 4.4%  1578.2 ± 3.8%   912.0 ± 3.8%   938.6 ± 2.2%         0.703       1.130       0.734       0.406      1.855    1.137    1.968    1.912
+----------  -------------  -------------  -------------  -------------  -------------  ------------  ----------  ----------  ----------  ---------  -------  -------  -------
+
+Legend:
+- y409 1st itr: ratio of i409/y409 time for the first iteration.
+- i409/y409: ratio of i409/y409 time. Higher is better for y409. Above 1 represents a speedup.
+- im 1st itr: ratio of i409/im time for the first iteration.
+- i409/im: ratio of i409/im time. Higher is better for im. Above 1 represents a speedup.
+- ym 1st itr: ratio of i409/ym time for the first iteration.
+- i409/ym: ratio of i409/ym time. Higher is better for ym. Above 1 represents a speedup.
+- zm 1st itr: ratio of i409/zm time for the first iteration.
+- i409/zm: ratio of i409/zm time. Higher is better for zm. Above 1 represents a speedup.

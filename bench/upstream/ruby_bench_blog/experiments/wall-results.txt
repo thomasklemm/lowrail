@@ -1,0 +1,36 @@
+ms/iteration (n procs)       i409 (2)      y409 (2)      im (2)        ym (2)        zm (2)        
+reads (GET)                  1086          602           1094          589           617           
+writes (POST/PATCH/DELETE)   609           326           603           331           328           
+  POST comment               268           140           266           144           143           
+  POST article 302           102           54            101           56            57            
+  POST article 422           75            45            74            42            44            
+  PATCH article              64            33            63            34            33            
+  DELETE article             82            44            81            45            43            
+  GET show                   704           386           709           383           399           
+  GET index                  202           112           212           109           117           
+total                        1705          936           1707          929           954           
+JIT speedup (interp / JIT): 
+reads (GET)                  y409 1.81x   ym 1.86x   zm 1.77x   master/4.0.9 interp 1.007
+writes (POST/PATCH/DELETE)   y409 1.87x   ym 1.82x   zm 1.84x   master/4.0.9 interp 0.990
+  POST comment               y409 1.92x   ym 1.85x   zm 1.86x   master/4.0.9 interp 0.991
+  POST article 302           y409 1.87x   ym 1.80x   zm 1.78x   master/4.0.9 interp 0.992
+  POST article 422           y409 1.66x   ym 1.75x   zm 1.68x   master/4.0.9 interp 0.980
+  PATCH article              y409 1.92x   ym 1.86x   zm 1.91x   master/4.0.9 interp 0.980
+  DELETE article             y409 1.85x   ym 1.79x   zm 1.87x   master/4.0.9 interp 0.989
+  GET show                   y409 1.82x   ym 1.85x   zm 1.78x   master/4.0.9 interp 1.007
+  GET index                  y409 1.80x   ym 1.94x   zm 1.80x   master/4.0.9 interp 1.048
+process spread (total): i409 [1817, 1594]  y409 [944, 928]  im [1715, 1698]  ym [905, 953]  zm [977, 931]
+
+blog       r81  1763.2 ms (sd 1.5%) [1785, 1770, 1734]  main  1602.3 ms (sd 3.8%) [1672, 1565, 1570]  main/r81 0.909  t 4.2
+railsbench r81  2962.7 ms (sd 1.7%) [2980, 3003, 2905]  main  2656.2 ms (sd 0.9%) [2681, 2654, 2633]  main/r81 0.897  t 9.3
+
+blog        ctl    n=5 mean  1744.4  sd 2.4%  procs [1773, 1770, 1764, 1742, 1673]
+blog        slow1  n=5 mean  1697.9  sd 3.9%  procs [1639, 1684, 1679, 1811, 1676]
+blog        slow2  n=5 mean  1741.3  sd 4.8%  procs [1688, 1825, 1631, 1744, 1818]
+blog   1744.4 ± 7.8%  1697.9 ± 6.4%  1741.3 ± 6.8%          1.009          1.083      1.027    0.225           1.002    0.943
+railsbench  ctl    n=5 mean  2911.1  sd 1.2%  procs [2938, 2862, 2949, 2916, 2891]
+railsbench  slow2  n=5 mean  2911.4  sd 1.8%  procs [2885, 2979, 2901, 2950, 2843]
+railsbench  2911.1 ± 2.9%  2911.4 ± 3.2%          0.999      1.000    0.992
+lobsters    ctl    n=5 mean  1234.2  sd 5.8%  procs [1173, 1264, 1159, 1333, 1241]
+lobsters    slow2  n=5 mean  1217.6  sd 5.0%  procs [1132, 1209, 1267, 1286, 1193]
+lobsters  1234.2 ± 8.5%  1217.6 ± 7.1%          0.944      1.014    0.703

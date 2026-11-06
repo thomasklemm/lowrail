@@ -1023,3 +1023,13 @@ cut, the clock sentence updated. Rechecked on `65151273f6`, Ruby 4.0.9: 15 itera
 databases, the four files are byte-identical after the run, allocations 1.063M per iteration within 0.05%. The
 table's times are from `950a2bc27d`. Skeptic and Sol have not run on `65151273f6`.
 Body: [blog-body.md](../../bench/upstream/ruby_bench_blog/blog-body.md).
+
+# Round 7: what `blog` finds that railsbench and lobsters miss (2026-11-06)
+
+Measured on `65151273f6` plus three experiment-only commits; tables and caveats in
+[ruby-bench-blog-findings.md](ruby-bench-blog-findings.md). In short: blog's totals move like the others', but its
+per-request split shows Rails main's 8–12% gain is a read gain (create paths flat, +11% Active Record calls per
+write); a 2% save-path slowdown is +2.3% Ir in blog and invisible to railsbench and lobsters (no saves in their timed
+iterations); per-query and driver changes (PM1b, sqlite3 #769/#770) show the same size or smaller in blog; no JIT gap
+on writes. Rails main's `pin_connection!` no longer opens a transaction (9e8fe3955b), so blog at `65151273f6` does
+not roll back on Rails 8.2.

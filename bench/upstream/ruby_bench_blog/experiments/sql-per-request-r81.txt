@@ -1,0 +1,67 @@
+## DELETE /articles/:id (15 req, 165 statements, 11.0/req)
+  4.33  INSERT INTO "solid_cable_messages" ("created_at","channel","payload","channel_hash") VALUES ('S', x'S', x'S', 
+  1.67  DELETE FROM "comments" WHERE "comments"."id" = ?
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+  1.00  SAVEPOINT active_record_N
+  1.00  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" = ?
+  1.00  DELETE FROM "articles" WHERE "articles"."id" = ?
+  1.00  RELEASE SAVEPOINT active_record_N
+## DELETE /articles/:id/comments/:id (4 req, 32 statements, 8.0/req)
+  2.00  INSERT INTO "solid_cable_messages" ("created_at","channel","payload","channel_hash") VALUES ('S', x'S', x'S', 
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+  1.00  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" = ? AND "comments"."id" = ? LIMIT ?
+  1.00  SAVEPOINT active_record_N
+  1.00  DELETE FROM "comments" WHERE "comments"."id" = ?
+  1.00  RELEASE SAVEPOINT active_record_N
+  1.00  SELECT COUNT(*) FROM "comments" WHERE "comments"."article_id" = ?
+## GET /articles (33 req, 99 statements, 3.0/req)
+  1.00  SELECT N AS one FROM "articles" LIMIT ?
+  1.00  SELECT "articles".* FROM "articles" ORDER BY "articles"."created_at" DESC
+  0.24  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.18  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  0.15  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?)
+  0.09  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.09  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.09  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.06  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.03  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?)
+  0.03  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" = ?
+  0.03  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?)
+## GET /articles.json (8 req, 16 statements, 2.0/req)
+  1.00  SELECT "articles".* FROM "articles" ORDER BY "articles"."created_at" DESC
+  0.38  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.12  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?)
+  0.12  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?)
+  0.12  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  0.12  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  0.12  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+## GET /articles/:id (193 req, 386 statements, 2.0/req)
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+  1.00  SELECT "comments".* FROM "comments" WHERE "comments"."article_id" = ?
+## GET /articles/:id.json (14 req, 14 statements, 1.0/req)
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+## GET /articles/:id/edit (14 req, 14 statements, 1.0/req)
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+## PATCH /articles/:id (14 req, 140 statements, 10.0/req)
+  3.00  SAVEPOINT active_record_N
+  3.00  RELEASE SAVEPOINT active_record_N
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+  1.00  INSERT INTO "solid_queue_jobs" ("queue_name", "class_name", "arguments", "priority", "active_job_id", "schedul
+  1.00  INSERT INTO "solid_queue_ready_executions" ("job_id", "queue_name", "priority", "created_at") VALUES (?, ?, ?,
+  0.79  UPDATE "articles" SET "title" = ?, "body" = ?, "updated_at" = ? WHERE "articles"."id" = ?
+  0.21  UPDATE "articles" SET "title" = ?, "updated_at" = ? WHERE "articles"."id" = ?
+## POST /articles (39 req, 216 statements, 5.54/req)
+  1.85  SAVEPOINT active_record_N
+  1.85  RELEASE SAVEPOINT active_record_N
+  0.62  INSERT INTO "articles" ("title", "body", "created_at", "updated_at") VALUES (?, ?, ?, ?) RETURNING "id"
+  0.62  INSERT INTO "solid_queue_jobs" ("queue_name", "class_name", "arguments", "priority", "active_job_id", "schedul
+  0.62  INSERT INTO "solid_queue_ready_executions" ("job_id", "queue_name", "priority", "created_at") VALUES (?, ?, ?,
+## POST /articles/:id/comments (44 req, 528 statements, 12.0/req)
+  3.00  SAVEPOINT active_record_N
+  3.00  RELEASE SAVEPOINT active_record_N
+  1.00  SELECT "articles".* FROM "articles" WHERE "articles"."id" = ? LIMIT ?
+  1.00  INSERT INTO "comments" ("article_id", "commenter", "body", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?) 
+  1.00  INSERT INTO "solid_queue_jobs" ("queue_name", "class_name", "arguments", "priority", "active_job_id", "schedul
+  1.00  INSERT INTO "solid_queue_ready_executions" ("job_id", "queue_name", "priority", "created_at") VALUES (?, ?, ?,
+  1.00  SELECT COUNT(*) FROM "comments" WHERE "comments"."article_id" = ?
+  1.00  INSERT INTO "solid_cable_messages" ("created_at","channel","payload","channel_hash") VALUES ('S', x'S', x'S', 
