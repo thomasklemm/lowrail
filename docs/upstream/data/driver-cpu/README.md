@@ -1,9 +1,11 @@
 # P-DRV receipts
 
 Ruby 4.0.9, sources and protocol in [driver-cpu.md](../../driver-cpu.md).
-This checkpoint contains the complete interpreter census and the completed
-candidate cohorts, including rejected observations. The broad YJIT baseline
-census is still running; it is not silently treated as complete here.
+The complete four-driver census has 126 cells in each mode: 78 interpreter
+and 63 YJIT cells pass every control. All completed candidate cohorts and
+rejected observations remain included. There are 27 historical/final cohorts
+and 2,142 per-window profile totals; the initial 30-operation SQLite cohort
+is diagnostic, not an extra accepted setting.
 
 * `summary.json`: per-case gates, three paired process observations,
   instructions/objects, compilation counters, warmup history and five-pool
@@ -14,12 +16,25 @@ census is still running; it is not silently treated as complete here.
 * `profile-totals.json`: every completed cohort's per-window Callgrind total
   and original file SHA256. These totals are the raw counter input to the
   summary, not the dump's incremental `summary:` field.
+* `jit-profile-audit.json`: all 756 broad YJIT census profiles, their case and
+  query-control verdict, and actual compiler-entry/code-generation symbols.
+  All 378 accepted profiles have none; 50 rejected profiles have such work.
+* `profile-attribution.json`: three accepted SQLite YJIT base windows for
+  adapter materialization, ordinary model loading and loading plus forced
+  casts. Profile hashes, counts, totals and inclusive native-step/SQLite-engine
+  counters identify the within-profile shares. These are not additive
+  component prices or separately controlled component benchmarks.
 * `provenance.json`: full source heads, native-extension hashes, Ruby build
   flags and benchmark-source hashes. Versioned and unversioned SQLite native
   binaries match within each tree. The two candidate heads are independent.
   Original measured heads/hashes stay unchanged; `followups` identifies the
   test-only DRV1 head and the corrected DRV2 head, whose completed ordinary
   model-load cohorts pass the relevance gate in interpreter and YJIT.
+  The measured predecessor hashes stay intact; the coordinator has opened
+  both reviewed candidates as drafts. The Valgrind toolchain/client hashes
+  and the completed broad YJIT census counts are recorded too. The README
+  hash under `bench` preserves the initial recipe; `yjit_census` records the
+  updated recipe hash. The measured worker/case sources are unchanged.
 * `native-memory.json`: base/resize/replacement results for 18 widths on
   Ruby 3.2.9, 3.3.10 and 3.4.8, plus runtime archive/native binary hashes.
   Retained Array/native-buffer memory and embedding are compared exactly;
@@ -36,8 +51,15 @@ census is still running; it is not silently treated as complete here.
   its raw/build receipts are included too. That probe uses ordinary
   compaction; its initial repeated-double-heap draft exhausted memory on base
   and produced no accepted observation.
-  Other exploratory/baseline full call graphs are not duplicated in this
-  archive; their totals and hashes remain in `profile-totals.json`.
+  The rejected unconditional-resize YJIT experiment includes its complete
+  profiles, original patch and bundle locks; it remains rejected, not a new
+  candidate. Other interpreter exploratory/baseline full call graphs are not
+  duplicated in this archive; their totals and hashes remain in
+  `profile-totals.json`.
+* `yjit-receipts.tar.gz`: all seven broad YJIT baseline settings, including
+  all 756 full window call graphs and their 42 worker JSONL/log pairs.
+  Complete/rejected windows are retained alike. The two archives have
+  disjoint members and keep each individual export below 50 MiB.
 * `sqlite-exact.json.gz`: the common, expanded 651-observation output from
   the corrected multi-column/thread-local differential probe. All six
   base/head/mode runs produce byte-identical files. The result digest is of
@@ -53,5 +75,7 @@ or adjust the one `load` path when reproducing elsewhere.
 
 All fixture data is synthetic. CPU-time fields in raw worker receipts are
 retained for transparency; no elapsed-time or request-speed claim is made.
-Neither fork has hosted CI checks, and the pg experimental suite's unrelated
-local-service failures are not presented as passing tests.
+The measurement branch pushes reported no hosted CI checks, not green CI;
+that does not describe the coordinator's later upstream PR checks. The pg
+experimental suite's unrelated local-service failures are not presented as
+passing tests.

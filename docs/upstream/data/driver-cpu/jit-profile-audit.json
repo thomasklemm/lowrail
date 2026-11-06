@@ -1,0 +1,6070 @@
+[
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12958) rb_yjit_compile_iseq",
+      "cfn=(13256) yjit::codegen::gen_single_block",
+      "cfn=(12992) yjit::codegen::gen_entry_prologue",
+      "fn=(13022) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13436) yjit::codegen::gen_branchunless",
+      "fn=(13930) yjit::codegen::gen_pop",
+      "fn=(14358) yjit::codegen::gen_send_cfunc",
+      "cfn=(14200) yjit::codegen::gen_check_ints",
+      "cfn=(14134) yjit::codegen::gen_push_frame",
+      "cfn=(13334) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13398) yjit::codegen::gen_exit",
+      "fn=(13296) yjit::codegen::gen_putnil",
+      "fn=(14270) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14274) yjit::codegen::gen_setlocal_generic",
+      "fn=(13324) yjit::codegen::gen_defined",
+      "fn=(14310) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14314) yjit::codegen::gen_getlocal_generic",
+      "fn=(13918) yjit::codegen::gen_swap",
+      "fn=(14346) yjit::codegen::gen_opt_div",
+      "cfn=(13984) yjit::codegen::gen_opt_send_without_block",
+      "fn=(14416) yjit::codegen::gen_putobject",
+      "fn=(13828) yjit::codegen::gen_counted_exit",
+      "fn=(13794) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14392) yjit::codegen::gen_branchif",
+      "fn=(14492) yjit::codegen::gen_newarray",
+      "cfn=(13988) yjit::codegen::gen_send_general",
+      "fn=(14184) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14198) yjit::codegen::gen_leave",
+      "cfn=(13392) yjit::codegen::gen_outlined_exit",
+      "cfn=(14082) yjit::codegen::gen_send_iseq",
+      "fn=(12960) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13258) yjit::codegen::gen_single_block",
+      "cfn=(12994) yjit::codegen::gen_entry_prologue",
+      "cfn=(13394) yjit::codegen::gen_outlined_exit",
+      "cfn=(13830) yjit::codegen::gen_counted_exit",
+      "cfn=(12960) rb_yjit_compile_iseq",
+      "fn=(12962) rb_yjit_iseq_gen_entry_point",
+      "fn=(13298) yjit::codegen::gen_putnil",
+      "fn=(14334) yjit::codegen::gen_getlocal_generic",
+      "fn=(14518) yjit::codegen::gen_newarray",
+      "cfn=(13336) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13326) yjit::codegen::gen_defined",
+      "fn=(14210) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14224) yjit::codegen::gen_leave",
+      "cfn=(14226) yjit::codegen::gen_check_ints",
+      "fn=(14108) yjit::codegen::gen_send_iseq",
+      "cfn=(14160) yjit::codegen::gen_push_frame",
+      "fn=(14290) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14294) yjit::codegen::gen_setlocal_generic",
+      "fn=(14378) yjit::codegen::gen_send_cfunc",
+      "cfn=(13024) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13438) yjit::codegen::gen_branchunless",
+      "fn=(13932) yjit::codegen::gen_pop",
+      "fn=(14436) yjit::codegen::gen_putobject",
+      "fn=(14010) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14014) yjit::codegen::gen_send_general",
+      "fn=(14330) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14412) yjit::codegen::gen_branchif",
+      "cfn=(14366) yjit::codegen::gen_opt_div",
+      "cfn=(13920) yjit::codegen::gen_swap",
+      "cfn=(13796) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13400) yjit::codegen::gen_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12968) rb_yjit_compile_iseq",
+      "cfn=(12970) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13266) yjit::codegen::gen_single_block",
+      "cfn=(13002) yjit::codegen::gen_entry_prologue",
+      "fn=(13032) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(13402) yjit::codegen::gen_outlined_exit",
+      "cfn=(14498) yjit::codegen::gen_newarray",
+      "cfn=(14424) yjit::codegen::gen_putobject",
+      "cfn=(14400) yjit::codegen::gen_branchif",
+      "cfn=(14354) yjit::codegen::gen_opt_div",
+      "cfn=(14318) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14278) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14206) yjit::codegen::gen_leave",
+      "cfn=(14192) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13992) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13940) yjit::codegen::gen_pop",
+      "cfn=(13928) yjit::codegen::gen_swap",
+      "cfn=(13804) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13446) yjit::codegen::gen_branchunless",
+      "cfn=(13334) yjit::codegen::gen_defined",
+      "cfn=(13306) yjit::codegen::gen_putnil",
+      "cfn=(13408) yjit::codegen::gen_exit",
+      "fn=(14208) yjit::codegen::gen_check_ints",
+      "fn=(14322) yjit::codegen::gen_getlocal_generic",
+      "fn=(14142) yjit::codegen::gen_push_frame",
+      "fn=(13838) yjit::codegen::gen_counted_exit",
+      "cfn=(14282) yjit::codegen::gen_setlocal_generic",
+      "fn=(14366) yjit::codegen::gen_send_cfunc",
+      "cfn=(13344) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(13996) yjit::codegen::gen_send_general",
+      "cfn=(14090) yjit::codegen::gen_send_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13264) yjit::codegen::gen_single_block",
+      "cfn=(13000) yjit::codegen::gen_entry_prologue",
+      "cfn=(12966) rb_yjit_compile_iseq",
+      "fn=(12968) rb_yjit_iseq_gen_entry_point",
+      "fn=(13836) yjit::codegen::gen_counted_exit",
+      "fn=(13030) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13304) yjit::codegen::gen_putnil",
+      "fn=(13444) yjit::codegen::gen_branchunless",
+      "fn=(13332) yjit::codegen::gen_defined",
+      "cfn=(13342) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14140) yjit::codegen::gen_push_frame",
+      "fn=(14312) yjit::codegen::gen_getlocal_generic",
+      "fn=(13938) yjit::codegen::gen_pop",
+      "fn=(13990) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13994) yjit::codegen::gen_send_general",
+      "fn=(14268) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14272) yjit::codegen::gen_setlocal_generic",
+      "fn=(14356) yjit::codegen::gen_send_cfunc",
+      "cfn=(14206) yjit::codegen::gen_check_ints",
+      "fn=(13802) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14190) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14204) yjit::codegen::gen_leave",
+      "cfn=(14088) yjit::codegen::gen_send_iseq",
+      "fn=(14490) yjit::codegen::gen_newarray",
+      "cfn=(13400) yjit::codegen::gen_outlined_exit",
+      "cfn=(14414) yjit::codegen::gen_putobject",
+      "cfn=(14390) yjit::codegen::gen_branchif",
+      "cfn=(14344) yjit::codegen::gen_opt_div",
+      "cfn=(14308) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13926) yjit::codegen::gen_swap",
+      "cfn=(13406) yjit::codegen::gen_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12996) yjit::codegen::gen_entry_prologue",
+      "cfn=(13260) yjit::codegen::gen_single_block",
+      "cfn=(13396) yjit::codegen::gen_outlined_exit",
+      "cfn=(13834) yjit::codegen::gen_counted_exit",
+      "fn=(12964) rb_yjit_iseq_gen_entry_point",
+      "fn=(13338) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13992) yjit::codegen::gen_send_general",
+      "cfn=(14086) yjit::codegen::gen_send_iseq",
+      "cfn=(14354) yjit::codegen::gen_send_cfunc",
+      "cfn=(14138) yjit::codegen::gen_push_frame",
+      "fn=(14388) yjit::codegen::gen_branchif",
+      "fn=(13800) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14310) yjit::codegen::gen_getlocal_generic",
+      "fn=(14188) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14202) yjit::codegen::gen_leave",
+      "cfn=(14204) yjit::codegen::gen_check_ints",
+      "fn=(14412) yjit::codegen::gen_putobject",
+      "cfn=(14496) yjit::codegen::gen_newarray",
+      "cfn=(14342) yjit::codegen::gen_opt_div",
+      "cfn=(14306) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14266) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13988) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13936) yjit::codegen::gen_pop",
+      "cfn=(13924) yjit::codegen::gen_swap",
+      "cfn=(13440) yjit::codegen::gen_branchunless",
+      "cfn=(13328) yjit::codegen::gen_defined",
+      "cfn=(13300) yjit::codegen::gen_putnil",
+      "cfn=(13402) yjit::codegen::gen_exit",
+      "cfn=(14270) yjit::codegen::gen_setlocal_generic",
+      "fn=(13026) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(12962) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13392) yjit::codegen::gen_outlined_exit",
+      "cfn=(13828) yjit::codegen::gen_counted_exit",
+      "cfn=(12958) rb_yjit_compile_iseq",
+      "cfn=(12960) rb_yjit_iseq_gen_entry_point",
+      "fn=(13296) yjit::codegen::gen_putnil",
+      "fn=(13918) yjit::codegen::gen_swap",
+      "fn=(14182) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13334) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14196) yjit::codegen::gen_leave",
+      "cfn=(14198) yjit::codegen::gen_check_ints",
+      "fn=(14344) yjit::codegen::gen_opt_div",
+      "cfn=(13982) yjit::codegen::gen_opt_send_without_block",
+      "fn=(13324) yjit::codegen::gen_defined",
+      "fn=(13986) yjit::codegen::gen_send_general",
+      "cfn=(14080) yjit::codegen::gen_send_iseq",
+      "cfn=(14356) yjit::codegen::gen_send_cfunc",
+      "cfn=(14132) yjit::codegen::gen_push_frame",
+      "fn=(13436) yjit::codegen::gen_branchunless",
+      "fn=(14312) yjit::codegen::gen_getlocal_generic",
+      "fn=(14490) yjit::codegen::gen_newarray",
+      "fn=(12992) yjit::codegen::gen_entry_prologue",
+      "cfn=(13022) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13930) yjit::codegen::gen_pop",
+      "fn=(14268) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14272) yjit::codegen::gen_setlocal_generic",
+      "fn=(14414) yjit::codegen::gen_putobject",
+      "fn=(13256) yjit::codegen::gen_single_block",
+      "cfn=(14390) yjit::codegen::gen_branchif",
+      "cfn=(14308) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13794) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13398) yjit::codegen::gen_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13834) yjit::codegen::gen_counted_exit",
+      "fn=(14188) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13338) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14202) yjit::codegen::gen_leave",
+      "cfn=(14204) yjit::codegen::gen_check_ints",
+      "fn=(14412) yjit::codegen::gen_putobject",
+      "fn=(13260) yjit::codegen::gen_single_block",
+      "cfn=(13396) yjit::codegen::gen_outlined_exit",
+      "cfn=(18620) yjit::codegen::gen_setlocal_wc1",
+      "cfn=(18614) yjit::codegen::gen_dup",
+      "cfn=(18516) yjit::codegen::gen_send",
+      "cfn=(18506) yjit::codegen::gen_getlocal",
+      "cfn=(13936) yjit::codegen::gen_pop",
+      "cfn=(13300) yjit::codegen::gen_putnil",
+      "cfn=(14388) yjit::codegen::gen_branchif",
+      "cfn=(13988) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14306) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(18332) yjit::codegen::gen_jump",
+      "cfn=(13440) yjit::codegen::gen_branchunless",
+      "cfn=(18278) yjit::codegen::gen_getinstancevariable",
+      "cfn=(14266) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13402) yjit::codegen::gen_exit",
+      "cfn=(14270) yjit::codegen::gen_setlocal_generic",
+      "fn=(14354) yjit::codegen::gen_send_cfunc",
+      "cfn=(14138) yjit::codegen::gen_push_frame",
+      "cfn=(14310) yjit::codegen::gen_getlocal_generic",
+      "cfn=(13992) yjit::codegen::gen_send_general",
+      "cfn=(18298) yjit::codegen::gen_get_ivar",
+      "cfn=(14086) yjit::codegen::gen_send_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12964) rb_yjit_iseq_gen_entry_point",
+      "fn=(14310) yjit::codegen::gen_getlocal_generic",
+      "fn=(13834) yjit::codegen::gen_counted_exit",
+      "fn=(13260) yjit::codegen::gen_single_block",
+      "cfn=(18516) yjit::codegen::gen_send",
+      "cfn=(14306) yjit::codegen::gen_getlocal_wc0",
+      "fn=(13396) yjit::codegen::gen_outlined_exit",
+      "cfn=(13402) yjit::codegen::gen_exit",
+      "fn=(13026) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14138) yjit::codegen::gen_push_frame",
+      "fn=(12996) yjit::codegen::gen_entry_prologue",
+      "cfn=(13992) yjit::codegen::gen_send_general",
+      "cfn=(14086) yjit::codegen::gen_send_iseq",
+      "cfn=(12962) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-1/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(14302) rb_yjit_compile_iseq",
+      "cfn=(14304) rb_yjit_iseq_gen_entry_point",
+      "cfn=(14336) yjit::codegen::gen_entry_prologue",
+      "cfn=(14600) yjit::codegen::gen_single_block",
+      "fn=(15658) yjit::codegen::gen_getlocal_generic",
+      "fn=(15138) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15274) yjit::codegen::gen_pop",
+      "fn=(15328) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(15332) yjit::codegen::gen_send_general",
+      "fn=(15478) yjit::codegen::gen_push_frame",
+      "fn=(15736) yjit::codegen::gen_branchif",
+      "fn=(15760) yjit::codegen::gen_putobject",
+      "fn=(14678) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15528) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(15614) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15618) yjit::codegen::gen_setlocal_generic",
+      "cfn=(15426) yjit::codegen::gen_send_iseq",
+      "cfn=(15702) yjit::codegen::gen_send_cfunc",
+      "fn=(15542) yjit::codegen::gen_leave",
+      "cfn=(15544) yjit::codegen::gen_check_ints",
+      "fn=(14366) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14736) yjit::codegen::gen_outlined_exit",
+      "cfn=(15840) yjit::codegen::gen_newarray",
+      "cfn=(15690) yjit::codegen::gen_opt_div",
+      "cfn=(15654) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(15262) yjit::codegen::gen_swap",
+      "cfn=(14780) yjit::codegen::gen_branchunless",
+      "cfn=(14668) yjit::codegen::gen_defined",
+      "cfn=(14640) yjit::codegen::gen_putnil",
+      "cfn=(14742) yjit::codegen::gen_exit",
+      "fn=(15172) yjit::codegen::gen_counted_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(15660) yjit::codegen::gen_getlocal_generic",
+      "fn=(14740) yjit::codegen::gen_exit",
+      "fn=(14638) yjit::codegen::gen_putnil",
+      "fn=(15272) yjit::codegen::gen_pop",
+      "fn=(15616) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15620) yjit::codegen::gen_setlocal_generic",
+      "fn=(14666) yjit::codegen::gen_defined",
+      "cfn=(14676) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14778) yjit::codegen::gen_branchunless",
+      "fn=(15524) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(15136) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15538) yjit::codegen::gen_leave",
+      "cfn=(15540) yjit::codegen::gen_check_ints",
+      "fn=(15324) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(15328) yjit::codegen::gen_send_general",
+      "fn=(15474) yjit::codegen::gen_push_frame",
+      "fn=(15704) yjit::codegen::gen_send_cfunc",
+      "fn=(15656) yjit::codegen::gen_getlocal_wc0",
+      "fn=(15260) yjit::codegen::gen_swap",
+      "cfn=(15422) yjit::codegen::gen_send_iseq",
+      "fn=(15762) yjit::codegen::gen_putobject",
+      "fn=(15840) yjit::codegen::gen_newarray",
+      "fn=(14364) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14598) yjit::codegen::gen_single_block",
+      "cfn=(14734) yjit::codegen::gen_outlined_exit",
+      "cfn=(15738) yjit::codegen::gen_branchif",
+      "cfn=(15692) yjit::codegen::gen_opt_div",
+      "fn=(14334) yjit::codegen::gen_entry_prologue",
+      "fn=(15170) yjit::codegen::gen_counted_exit",
+      "fn=(14300) rb_yjit_compile_iseq",
+      "cfn=(14302) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14292) rb_yjit_compile_iseq",
+      "cfn=(14590) yjit::codegen::gen_single_block",
+      "cfn=(14326) yjit::codegen::gen_entry_prologue",
+      "cfn=(14356) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(15530) yjit::codegen::gen_leave",
+      "cfn=(15532) yjit::codegen::gen_check_ints",
+      "fn=(14668) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15264) yjit::codegen::gen_pop",
+      "fn=(14770) yjit::codegen::gen_branchunless",
+      "fn=(15676) yjit::codegen::gen_opt_div",
+      "cfn=(15316) yjit::codegen::gen_opt_send_without_block",
+      "fn=(15822) yjit::codegen::gen_newarray",
+      "fn=(15638) yjit::codegen::gen_getlocal_generic",
+      "fn=(15128) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15414) yjit::codegen::gen_send_iseq",
+      "cfn=(15466) yjit::codegen::gen_push_frame",
+      "fn=(15722) yjit::codegen::gen_branchif",
+      "fn=(15746) yjit::codegen::gen_putobject",
+      "cfn=(14726) yjit::codegen::gen_outlined_exit",
+      "cfn=(15634) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(15594) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15516) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(15252) yjit::codegen::gen_swap",
+      "cfn=(14658) yjit::codegen::gen_defined",
+      "cfn=(14630) yjit::codegen::gen_putnil",
+      "cfn=(14732) yjit::codegen::gen_exit",
+      "cfn=(15598) yjit::codegen::gen_setlocal_generic",
+      "cfn=(15320) yjit::codegen::gen_send_general",
+      "fn=(15688) yjit::codegen::gen_send_cfunc",
+      "fn=(15162) yjit::codegen::gen_counted_exit",
+      "fn=(14294) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14732) yjit::codegen::gen_outlined_exit",
+      "cfn=(15168) yjit::codegen::gen_counted_exit",
+      "fn=(14300) rb_yjit_iseq_gen_entry_point",
+      "cfn=(14298) rb_yjit_compile_iseq",
+      "cfn=(14596) yjit::codegen::gen_single_block",
+      "cfn=(14332) yjit::codegen::gen_entry_prologue",
+      "fn=(14674) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15690) yjit::codegen::gen_opt_div",
+      "cfn=(15322) yjit::codegen::gen_opt_send_without_block",
+      "fn=(15760) yjit::codegen::gen_putobject",
+      "fn=(15258) yjit::codegen::gen_swap",
+      "fn=(15472) yjit::codegen::gen_push_frame",
+      "fn=(15736) yjit::codegen::gen_branchif",
+      "cfn=(15326) yjit::codegen::gen_send_general",
+      "fn=(15658) yjit::codegen::gen_getlocal_generic",
+      "fn=(14362) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(15838) yjit::codegen::gen_newarray",
+      "cfn=(15654) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(15614) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15542) yjit::codegen::gen_leave",
+      "cfn=(15522) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(15270) yjit::codegen::gen_pop",
+      "cfn=(15134) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(14776) yjit::codegen::gen_branchunless",
+      "cfn=(14664) yjit::codegen::gen_defined",
+      "cfn=(14636) yjit::codegen::gen_putnil",
+      "cfn=(14738) yjit::codegen::gen_exit",
+      "cfn=(15420) yjit::codegen::gen_send_iseq",
+      "cfn=(15702) yjit::codegen::gen_send_cfunc",
+      "cfn=(15618) yjit::codegen::gen_setlocal_generic",
+      "cfn=(15544) yjit::codegen::gen_check_ints"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14298) rb_yjit_compile_iseq",
+      "cfn=(14732) yjit::codegen::gen_outlined_exit",
+      "cfn=(15168) yjit::codegen::gen_counted_exit",
+      "fn=(14300) rb_yjit_iseq_gen_entry_point",
+      "cfn=(14596) yjit::codegen::gen_single_block",
+      "cfn=(14332) yjit::codegen::gen_entry_prologue",
+      "cfn=(14362) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(15270) yjit::codegen::gen_pop",
+      "fn=(14674) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15650) yjit::codegen::gen_getlocal_generic",
+      "fn=(14776) yjit::codegen::gen_branchunless",
+      "fn=(15134) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15420) yjit::codegen::gen_send_iseq",
+      "cfn=(15472) yjit::codegen::gen_push_frame",
+      "fn=(15752) yjit::codegen::gen_putobject",
+      "fn=(15826) yjit::codegen::gen_newarray",
+      "fn=(15522) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(15606) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15610) yjit::codegen::gen_setlocal_generic",
+      "cfn=(15728) yjit::codegen::gen_branchif",
+      "cfn=(15682) yjit::codegen::gen_opt_div",
+      "cfn=(15646) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(15536) yjit::codegen::gen_leave",
+      "cfn=(15322) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(15258) yjit::codegen::gen_swap",
+      "cfn=(14664) yjit::codegen::gen_defined",
+      "cfn=(14636) yjit::codegen::gen_putnil",
+      "cfn=(14738) yjit::codegen::gen_exit",
+      "fn=(15694) yjit::codegen::gen_send_cfunc",
+      "cfn=(15538) yjit::codegen::gen_check_ints",
+      "cfn=(15326) yjit::codegen::gen_send_general"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14296) rb_yjit_compile_iseq",
+      "fn=(15526) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14672) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15268) yjit::codegen::gen_pop",
+      "fn=(15418) yjit::codegen::gen_send_iseq",
+      "cfn=(15470) yjit::codegen::gen_push_frame",
+      "fn=(15540) yjit::codegen::gen_leave",
+      "cfn=(15542) yjit::codegen::gen_check_ints",
+      "fn=(15688) yjit::codegen::gen_opt_div",
+      "cfn=(15320) yjit::codegen::gen_opt_send_without_block",
+      "fn=(15758) yjit::codegen::gen_putobject",
+      "fn=(15832) yjit::codegen::gen_newarray",
+      "fn=(15656) yjit::codegen::gen_getlocal_generic",
+      "fn=(14774) yjit::codegen::gen_branchunless",
+      "fn=(15734) yjit::codegen::gen_branchif",
+      "fn=(15132) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15612) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(15616) yjit::codegen::gen_setlocal_generic",
+      "fn=(14360) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14594) yjit::codegen::gen_single_block",
+      "cfn=(14730) yjit::codegen::gen_outlined_exit",
+      "cfn=(15652) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(15256) yjit::codegen::gen_swap",
+      "cfn=(14662) yjit::codegen::gen_defined",
+      "cfn=(14634) yjit::codegen::gen_putnil",
+      "cfn=(14736) yjit::codegen::gen_exit",
+      "fn=(14330) yjit::codegen::gen_entry_prologue",
+      "cfn=(15324) yjit::codegen::gen_send_general",
+      "fn=(15700) yjit::codegen::gen_send_cfunc",
+      "fn=(15166) yjit::codegen::gen_counted_exit",
+      "fn=(14298) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14296) rb_yjit_compile_iseq",
+      "fn=(15734) yjit::codegen::gen_branchif",
+      "fn=(15542) yjit::codegen::gen_check_ints",
+      "fn=(14360) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14594) yjit::codegen::gen_single_block",
+      "cfn=(14730) yjit::codegen::gen_outlined_exit",
+      "cfn=(20576) yjit::codegen::gen_send",
+      "cfn=(20556) yjit::codegen::gen_getblockparamproxy",
+      "cfn=(20516) yjit::codegen::gen_getinstancevariable",
+      "cfn=(20000) yjit::codegen::gen_opt_aref",
+      "cfn=(15540) yjit::codegen::gen_leave",
+      "cfn=(19972) yjit::codegen::gen_dup",
+      "cfn=(15320) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(19930) yjit::codegen::gen_putself",
+      "cfn=(19918) yjit::codegen::gen_getclassvariable",
+      "cfn=(14736) yjit::codegen::gen_exit",
+      "cfn=(20522) yjit::codegen::gen_get_ivar",
+      "fn=(14330) yjit::codegen::gen_entry_prologue",
+      "cfn=(15324) yjit::codegen::gen_send_general",
+      "fn=(15470) yjit::codegen::gen_push_frame",
+      "fn=(15700) yjit::codegen::gen_send_cfunc",
+      "cfn=(14672) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(15166) yjit::codegen::gen_counted_exit",
+      "fn=(14298) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-sqlite3-0/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13648) rb_yjit_iseq_gen_entry_point",
+      "fn=(13984) yjit::codegen::gen_putnil",
+      "fn=(14482) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(15034) yjit::codegen::gen_opt_div",
+      "cfn=(14670) yjit::codegen::gen_opt_send_without_block",
+      "fn=(15080) yjit::codegen::gen_branchif",
+      "fn=(14012) yjit::codegen::gen_defined",
+      "cfn=(14022) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(14674) yjit::codegen::gen_send_general",
+      "fn=(13710) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14606) yjit::codegen::gen_swap",
+      "fn=(14870) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14884) yjit::codegen::gen_leave",
+      "cfn=(14886) yjit::codegen::gen_check_ints",
+      "cfn=(14768) yjit::codegen::gen_send_iseq",
+      "cfn=(15046) yjit::codegen::gen_send_cfunc",
+      "cfn=(14820) yjit::codegen::gen_push_frame",
+      "fn=(15002) yjit::codegen::gen_getlocal_generic",
+      "fn=(15182) yjit::codegen::gen_newarray",
+      "fn=(14124) yjit::codegen::gen_branchunless",
+      "fn=(13680) yjit::codegen::gen_entry_prologue",
+      "fn=(14516) yjit::codegen::gen_counted_exit",
+      "fn=(14958) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14962) yjit::codegen::gen_setlocal_generic",
+      "fn=(13944) yjit::codegen::gen_single_block",
+      "cfn=(14080) yjit::codegen::gen_outlined_exit",
+      "cfn=(15104) yjit::codegen::gen_putobject",
+      "cfn=(14998) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14618) yjit::codegen::gen_pop",
+      "cfn=(14086) yjit::codegen::gen_exit",
+      "cfn=(13646) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14080) yjit::codegen::gen_outlined_exit",
+      "cfn=(14516) yjit::codegen::gen_counted_exit",
+      "fn=(13680) yjit::codegen::gen_entry_prologue",
+      "cfn=(13710) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14820) yjit::codegen::gen_push_frame",
+      "fn=(14988) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14992) yjit::codegen::gen_getlocal_generic",
+      "fn=(14022) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14606) yjit::codegen::gen_swap",
+      "fn=(15024) yjit::codegen::gen_opt_div",
+      "cfn=(14670) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14674) yjit::codegen::gen_send_general",
+      "fn=(14124) yjit::codegen::gen_branchunless",
+      "fn=(14870) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14884) yjit::codegen::gen_leave",
+      "cfn=(14886) yjit::codegen::gen_check_ints",
+      "fn=(13944) yjit::codegen::gen_single_block",
+      "cfn=(15178) yjit::codegen::gen_newarray",
+      "cfn=(15094) yjit::codegen::gen_putobject",
+      "cfn=(15070) yjit::codegen::gen_branchif",
+      "cfn=(14948) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14618) yjit::codegen::gen_pop",
+      "cfn=(14482) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(14012) yjit::codegen::gen_defined",
+      "cfn=(13984) yjit::codegen::gen_putnil",
+      "cfn=(14086) yjit::codegen::gen_exit",
+      "cfn=(14768) yjit::codegen::gen_send_iseq",
+      "cfn=(15036) yjit::codegen::gen_send_cfunc",
+      "cfn=(14952) yjit::codegen::gen_setlocal_generic",
+      "fn=(13646) rb_yjit_compile_iseq",
+      "cfn=(13648) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(14076) yjit::codegen::gen_outlined_exit",
+      "cfn=(14512) yjit::codegen::gen_counted_exit",
+      "fn=(14842) yjit::codegen::gen_push_frame",
+      "fn=(15094) yjit::codegen::gen_branchif",
+      "fn=(14082) yjit::codegen::gen_exit",
+      "fn=(14614) yjit::codegen::gen_pop",
+      "fn=(13980) yjit::codegen::gen_putnil",
+      "fn=(14692) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14696) yjit::codegen::gen_send_general",
+      "fn=(15016) yjit::codegen::gen_getlocal_generic",
+      "fn=(13676) yjit::codegen::gen_entry_prologue",
+      "cfn=(13706) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14008) yjit::codegen::gen_defined",
+      "cfn=(14018) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14478) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14892) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14906) yjit::codegen::gen_leave",
+      "cfn=(14908) yjit::codegen::gen_check_ints",
+      "fn=(15200) yjit::codegen::gen_newarray",
+      "cfn=(14790) yjit::codegen::gen_send_iseq",
+      "cfn=(15060) yjit::codegen::gen_send_cfunc",
+      "fn=(15118) yjit::codegen::gen_putobject",
+      "fn=(14602) yjit::codegen::gen_swap",
+      "fn=(14972) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14976) yjit::codegen::gen_setlocal_generic",
+      "fn=(14120) yjit::codegen::gen_branchunless",
+      "fn=(15012) yjit::codegen::gen_getlocal_wc0",
+      "fn=(13940) yjit::codegen::gen_single_block",
+      "cfn=(15048) yjit::codegen::gen_opt_div",
+      "fn=(13642) rb_yjit_compile_iseq",
+      "cfn=(13644) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13646) rb_yjit_iseq_gen_entry_point",
+      "cfn=(14078) yjit::codegen::gen_outlined_exit",
+      "cfn=(14514) yjit::codegen::gen_counted_exit",
+      "fn=(13644) rb_yjit_compile_iseq",
+      "fn=(14694) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14698) yjit::codegen::gen_send_general",
+      "fn=(15060) yjit::codegen::gen_send_cfunc",
+      "cfn=(14910) yjit::codegen::gen_check_ints",
+      "cfn=(14844) yjit::codegen::gen_push_frame",
+      "cfn=(14020) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13678) yjit::codegen::gen_entry_prologue",
+      "cfn=(13708) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14894) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14908) yjit::codegen::gen_leave",
+      "fn=(14616) yjit::codegen::gen_pop",
+      "cfn=(14792) yjit::codegen::gen_send_iseq",
+      "fn=(14122) yjit::codegen::gen_branchunless",
+      "fn=(14972) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14976) yjit::codegen::gen_setlocal_generic",
+      "fn=(13942) yjit::codegen::gen_single_block",
+      "cfn=(15200) yjit::codegen::gen_newarray",
+      "cfn=(15118) yjit::codegen::gen_putobject",
+      "cfn=(15094) yjit::codegen::gen_branchif",
+      "cfn=(15048) yjit::codegen::gen_opt_div",
+      "cfn=(15012) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14604) yjit::codegen::gen_swap",
+      "cfn=(14480) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(14010) yjit::codegen::gen_defined",
+      "cfn=(13982) yjit::codegen::gen_putnil",
+      "cfn=(14084) yjit::codegen::gen_exit",
+      "cfn=(15016) yjit::codegen::gen_getlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13678) yjit::codegen::gen_entry_prologue",
+      "cfn=(13942) yjit::codegen::gen_single_block",
+      "fn=(13646) rb_yjit_iseq_gen_entry_point",
+      "cfn=(14078) yjit::codegen::gen_outlined_exit",
+      "cfn=(14514) yjit::codegen::gen_counted_exit",
+      "fn=(14820) yjit::codegen::gen_push_frame",
+      "fn=(14886) yjit::codegen::gen_check_ints",
+      "fn=(14994) yjit::codegen::gen_getlocal_generic",
+      "fn=(15178) yjit::codegen::gen_newarray",
+      "cfn=(14020) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14606) yjit::codegen::gen_swap",
+      "fn=(14670) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14674) yjit::codegen::gen_send_general",
+      "fn=(14950) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14954) yjit::codegen::gen_setlocal_generic",
+      "fn=(15038) yjit::codegen::gen_send_cfunc",
+      "fn=(14122) yjit::codegen::gen_branchunless",
+      "cfn=(13708) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(15096) yjit::codegen::gen_putobject",
+      "cfn=(15072) yjit::codegen::gen_branchif",
+      "cfn=(15026) yjit::codegen::gen_opt_div",
+      "cfn=(14990) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14884) yjit::codegen::gen_leave",
+      "cfn=(14870) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14618) yjit::codegen::gen_pop",
+      "cfn=(14480) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(14010) yjit::codegen::gen_defined",
+      "cfn=(13982) yjit::codegen::gen_putnil",
+      "cfn=(14084) yjit::codegen::gen_exit",
+      "cfn=(14768) yjit::codegen::gen_send_iseq",
+      "fn=(13644) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13644) rb_yjit_compile_iseq",
+      "cfn=(13646) rb_yjit_iseq_gen_entry_point",
+      "fn=(14514) yjit::codegen::gen_counted_exit",
+      "fn=(14884) yjit::codegen::gen_check_ints",
+      "fn=(15030) yjit::codegen::gen_opt_div",
+      "cfn=(14668) yjit::codegen::gen_opt_send_without_block",
+      "fn=(15100) yjit::codegen::gen_putobject",
+      "fn=(14084) yjit::codegen::gen_exit",
+      "fn=(13982) yjit::codegen::gen_putnil",
+      "fn=(14010) yjit::codegen::gen_defined",
+      "cfn=(14020) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14818) yjit::codegen::gen_push_frame",
+      "fn=(14998) yjit::codegen::gen_getlocal_generic",
+      "fn=(14480) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14616) yjit::codegen::gen_pop",
+      "fn=(13708) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14672) yjit::codegen::gen_send_general",
+      "fn=(14954) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14958) yjit::codegen::gen_setlocal_generic",
+      "fn=(15042) yjit::codegen::gen_send_cfunc",
+      "fn=(13678) yjit::codegen::gen_entry_prologue",
+      "fn=(14868) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14882) yjit::codegen::gen_leave",
+      "fn=(15174) yjit::codegen::gen_newarray",
+      "fn=(14122) yjit::codegen::gen_branchunless",
+      "cfn=(14766) yjit::codegen::gen_send_iseq",
+      "fn=(13942) yjit::codegen::gen_single_block",
+      "cfn=(14078) yjit::codegen::gen_outlined_exit",
+      "cfn=(15076) yjit::codegen::gen_branchif",
+      "cfn=(14994) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14604) yjit::codegen::gen_swap"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-1/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13614) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14266) yjit::codegen::gen_send_general",
+      "cfn=(14360) yjit::codegen::gen_send_iseq",
+      "cfn=(14628) yjit::codegen::gen_send_cfunc",
+      "fn=(14412) yjit::codegen::gen_push_frame",
+      "fn=(14584) yjit::codegen::gen_getlocal_generic",
+      "cfn=(14478) yjit::codegen::gen_check_ints",
+      "fn=(14764) yjit::codegen::gen_newarray",
+      "fn=(14198) yjit::codegen::gen_swap",
+      "fn=(13272) yjit::codegen::gen_entry_prologue",
+      "cfn=(13302) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13716) yjit::codegen::gen_branchunless",
+      "fn=(14108) yjit::codegen::gen_counted_exit",
+      "fn=(13536) yjit::codegen::gen_single_block",
+      "cfn=(13672) yjit::codegen::gen_outlined_exit",
+      "cfn=(14686) yjit::codegen::gen_putobject",
+      "cfn=(14662) yjit::codegen::gen_branchif",
+      "cfn=(14616) yjit::codegen::gen_opt_div",
+      "cfn=(14580) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14540) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14476) yjit::codegen::gen_leave",
+      "cfn=(14462) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14262) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14210) yjit::codegen::gen_pop",
+      "cfn=(14074) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13604) yjit::codegen::gen_defined",
+      "cfn=(13576) yjit::codegen::gen_putnil",
+      "cfn=(13678) yjit::codegen::gen_exit",
+      "cfn=(14544) yjit::codegen::gen_setlocal_generic",
+      "fn=(13240) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13238) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13232) rb_yjit_compile_iseq",
+      "fn=(13234) rb_yjit_iseq_gen_entry_point",
+      "fn=(13266) yjit::codegen::gen_entry_prologue",
+      "cfn=(13296) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13710) yjit::codegen::gen_branchunless",
+      "fn=(14102) yjit::codegen::gen_counted_exit",
+      "fn=(14434) yjit::codegen::gen_push_frame",
+      "fn=(14686) yjit::codegen::gen_branchif",
+      "fn=(14794) yjit::codegen::gen_newarray",
+      "cfn=(13608) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13666) yjit::codegen::gen_outlined_exit",
+      "cfn=(13672) yjit::codegen::gen_exit",
+      "fn=(14284) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14288) yjit::codegen::gen_send_general",
+      "fn=(14608) yjit::codegen::gen_getlocal_generic",
+      "fn=(14192) yjit::codegen::gen_swap",
+      "fn=(14484) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14498) yjit::codegen::gen_leave",
+      "cfn=(14500) yjit::codegen::gen_check_ints",
+      "fn=(13530) yjit::codegen::gen_single_block",
+      "cfn=(14710) yjit::codegen::gen_putobject",
+      "cfn=(14640) yjit::codegen::gen_opt_div",
+      "cfn=(14604) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14564) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14204) yjit::codegen::gen_pop",
+      "cfn=(14068) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13598) yjit::codegen::gen_defined",
+      "cfn=(13570) yjit::codegen::gen_putnil",
+      "cfn=(14382) yjit::codegen::gen_send_iseq",
+      "cfn=(14652) yjit::codegen::gen_send_cfunc",
+      "cfn=(14568) yjit::codegen::gen_setlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13246) rb_yjit_compile_iseq",
+      "cfn=(13544) yjit::codegen::gen_single_block",
+      "cfn=(13280) yjit::codegen::gen_entry_prologue",
+      "fn=(14218) yjit::codegen::gen_pop",
+      "fn=(14670) yjit::codegen::gen_branchif",
+      "fn=(13686) yjit::codegen::gen_exit",
+      "fn=(14082) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14420) yjit::codegen::gen_push_frame",
+      "fn=(13584) yjit::codegen::gen_putnil",
+      "fn=(14592) yjit::codegen::gen_getlocal_generic",
+      "fn=(13612) yjit::codegen::gen_defined",
+      "cfn=(13622) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14270) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14274) yjit::codegen::gen_send_general",
+      "fn=(13310) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(14548) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14552) yjit::codegen::gen_setlocal_generic",
+      "fn=(14636) yjit::codegen::gen_send_cfunc",
+      "cfn=(14486) yjit::codegen::gen_check_ints",
+      "fn=(14206) yjit::codegen::gen_swap",
+      "cfn=(14368) yjit::codegen::gen_send_iseq",
+      "fn=(14470) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14484) yjit::codegen::gen_leave",
+      "fn=(14116) yjit::codegen::gen_counted_exit",
+      "fn=(14768) yjit::codegen::gen_newarray",
+      "fn=(13724) yjit::codegen::gen_branchunless",
+      "fn=(14588) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13680) yjit::codegen::gen_outlined_exit",
+      "cfn=(14694) yjit::codegen::gen_putobject",
+      "cfn=(14624) yjit::codegen::gen_opt_div",
+      "cfn=(13248) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13240) rb_yjit_compile_iseq",
+      "cfn=(13242) rb_yjit_iseq_gen_entry_point",
+      "fn=(13304) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13606) yjit::codegen::gen_defined",
+      "cfn=(13616) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14364) yjit::codegen::gen_send_iseq",
+      "cfn=(14416) yjit::codegen::gen_push_frame",
+      "fn=(14544) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14548) yjit::codegen::gen_setlocal_generic",
+      "fn=(14632) yjit::codegen::gen_send_cfunc",
+      "cfn=(14482) yjit::codegen::gen_check_ints",
+      "fn=(14212) yjit::codegen::gen_pop",
+      "fn=(13274) yjit::codegen::gen_entry_prologue",
+      "fn=(14266) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14270) yjit::codegen::gen_send_general",
+      "fn=(14584) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14588) yjit::codegen::gen_getlocal_generic",
+      "fn=(13718) yjit::codegen::gen_branchunless",
+      "fn=(14110) yjit::codegen::gen_counted_exit",
+      "fn=(14620) yjit::codegen::gen_opt_div",
+      "fn=(14200) yjit::codegen::gen_swap",
+      "fn=(13538) yjit::codegen::gen_single_block",
+      "cfn=(13674) yjit::codegen::gen_outlined_exit",
+      "cfn=(14764) yjit::codegen::gen_newarray",
+      "cfn=(14690) yjit::codegen::gen_putobject",
+      "cfn=(14666) yjit::codegen::gen_branchif",
+      "cfn=(14480) yjit::codegen::gen_leave",
+      "cfn=(14466) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14076) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13578) yjit::codegen::gen_putnil",
+      "cfn=(13680) yjit::codegen::gen_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13666) yjit::codegen::gen_outlined_exit",
+      "cfn=(14102) yjit::codegen::gen_counted_exit",
+      "cfn=(13530) yjit::codegen::gen_single_block",
+      "cfn=(13266) yjit::codegen::gen_entry_prologue",
+      "cfn=(13232) rb_yjit_compile_iseq",
+      "fn=(13234) rb_yjit_iseq_gen_entry_point",
+      "fn=(14192) yjit::codegen::gen_swap",
+      "cfn=(13296) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13608) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14434) yjit::codegen::gen_push_frame",
+      "fn=(14562) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14566) yjit::codegen::gen_setlocal_generic",
+      "fn=(14606) yjit::codegen::gen_getlocal_generic",
+      "fn=(14500) yjit::codegen::gen_check_ints",
+      "fn=(14708) yjit::codegen::gen_putobject",
+      "fn=(13710) yjit::codegen::gen_branchunless",
+      "fn=(14284) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14288) yjit::codegen::gen_send_general",
+      "fn=(14650) yjit::codegen::gen_send_cfunc",
+      "fn=(14684) yjit::codegen::gen_branchif",
+      "cfn=(14782) yjit::codegen::gen_newarray",
+      "cfn=(14638) yjit::codegen::gen_opt_div",
+      "cfn=(14602) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14498) yjit::codegen::gen_leave",
+      "cfn=(14484) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14204) yjit::codegen::gen_pop",
+      "cfn=(14068) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13598) yjit::codegen::gen_defined",
+      "cfn=(13570) yjit::codegen::gen_putnil",
+      "cfn=(13672) yjit::codegen::gen_exit",
+      "cfn=(14382) yjit::codegen::gen_send_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(14114) yjit::codegen::gen_counted_exit",
+      "fn=(14626) yjit::codegen::gen_getlocal_generic",
+      "fn=(13722) yjit::codegen::gen_branchunless",
+      "fn=(14484) yjit::codegen::gen_check_ints",
+      "fn=(13278) yjit::codegen::gen_entry_prologue",
+      "cfn=(13308) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13542) yjit::codegen::gen_single_block",
+      "cfn=(13678) yjit::codegen::gen_outlined_exit",
+      "cfn=(14804) yjit::codegen::gen_newarray",
+      "cfn=(14728) yjit::codegen::gen_putobject",
+      "cfn=(14704) yjit::codegen::gen_branchif",
+      "cfn=(14658) yjit::codegen::gen_opt_div",
+      "cfn=(14622) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14582) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14482) yjit::codegen::gen_leave",
+      "cfn=(14468) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14268) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14216) yjit::codegen::gen_pop",
+      "cfn=(14204) yjit::codegen::gen_swap",
+      "cfn=(14080) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13610) yjit::codegen::gen_defined",
+      "cfn=(13582) yjit::codegen::gen_putnil",
+      "cfn=(13684) yjit::codegen::gen_exit",
+      "cfn=(14586) yjit::codegen::gen_setlocal_generic",
+      "fn=(14670) yjit::codegen::gen_send_cfunc",
+      "cfn=(14418) yjit::codegen::gen_push_frame",
+      "cfn=(13620) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(14272) yjit::codegen::gen_send_general",
+      "cfn=(14366) yjit::codegen::gen_send_iseq",
+      "cfn=(13244) rb_yjit_compile_iseq",
+      "fn=(13246) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-postgresql-0/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13212) rb_yjit_iseq_gen_entry_point",
+      "fn=(13576) yjit::codegen::gen_defined",
+      "cfn=(13586) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14046) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14238) yjit::codegen::gen_send_general",
+      "cfn=(14332) yjit::codegen::gen_send_iseq",
+      "cfn=(14608) yjit::codegen::gen_send_cfunc",
+      "fn=(14384) yjit::codegen::gen_push_frame",
+      "fn=(14434) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14448) yjit::codegen::gen_leave",
+      "cfn=(14450) yjit::codegen::gen_check_ints",
+      "fn=(14520) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14524) yjit::codegen::gen_setlocal_generic",
+      "fn=(14564) yjit::codegen::gen_getlocal_generic",
+      "fn=(14170) yjit::codegen::gen_swap",
+      "fn=(14666) yjit::codegen::gen_putobject",
+      "fn=(14740) yjit::codegen::gen_newarray",
+      "fn=(13508) yjit::codegen::gen_single_block",
+      "cfn=(13644) yjit::codegen::gen_outlined_exit",
+      "cfn=(14642) yjit::codegen::gen_branchif",
+      "cfn=(14596) yjit::codegen::gen_opt_div",
+      "cfn=(14560) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14234) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14182) yjit::codegen::gen_pop",
+      "cfn=(13688) yjit::codegen::gen_branchunless",
+      "cfn=(13548) yjit::codegen::gen_putnil",
+      "fn=(13274) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(13650) yjit::codegen::gen_exit",
+      "fn=(14080) yjit::codegen::gen_counted_exit",
+      "fn=(13244) yjit::codegen::gen_entry_prologue",
+      "fn=(13210) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13518) yjit::codegen::gen_single_block",
+      "cfn=(13254) yjit::codegen::gen_entry_prologue",
+      "cfn=(13220) rb_yjit_compile_iseq",
+      "cfn=(13222) rb_yjit_iseq_gen_entry_point",
+      "fn=(14248) yjit::codegen::gen_send_general",
+      "cfn=(14342) yjit::codegen::gen_send_iseq",
+      "cfn=(14618) yjit::codegen::gen_send_cfunc",
+      "fn=(14394) yjit::codegen::gen_push_frame",
+      "fn=(14606) yjit::codegen::gen_opt_div",
+      "cfn=(14244) yjit::codegen::gen_opt_send_without_block",
+      "fn=(13698) yjit::codegen::gen_branchunless",
+      "cfn=(13654) yjit::codegen::gen_outlined_exit",
+      "cfn=(14752) yjit::codegen::gen_newarray",
+      "cfn=(14676) yjit::codegen::gen_putobject",
+      "cfn=(14652) yjit::codegen::gen_branchif",
+      "cfn=(14570) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14530) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14458) yjit::codegen::gen_leave",
+      "cfn=(14444) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14192) yjit::codegen::gen_pop",
+      "cfn=(14180) yjit::codegen::gen_swap",
+      "cfn=(14056) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13586) yjit::codegen::gen_defined",
+      "cfn=(13558) yjit::codegen::gen_putnil",
+      "cfn=(13660) yjit::codegen::gen_exit",
+      "fn=(14090) yjit::codegen::gen_counted_exit",
+      "cfn=(13596) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(14460) yjit::codegen::gen_check_ints",
+      "fn=(14574) yjit::codegen::gen_getlocal_generic",
+      "cfn=(13284) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14534) yjit::codegen::gen_setlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13652) yjit::codegen::gen_outlined_exit",
+      "cfn=(14088) yjit::codegen::gen_counted_exit",
+      "fn=(13220) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13218) rb_yjit_compile_iseq",
+      "cfn=(13252) yjit::codegen::gen_entry_prologue",
+      "cfn=(13516) yjit::codegen::gen_single_block",
+      "fn=(14054) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14458) yjit::codegen::gen_check_ints",
+      "cfn=(14744) yjit::codegen::gen_newarray",
+      "cfn=(14668) yjit::codegen::gen_putobject",
+      "cfn=(14644) yjit::codegen::gen_branchif",
+      "cfn=(14598) yjit::codegen::gen_opt_div",
+      "cfn=(14562) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14522) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14456) yjit::codegen::gen_leave",
+      "cfn=(14442) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14242) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14190) yjit::codegen::gen_pop",
+      "cfn=(14178) yjit::codegen::gen_swap",
+      "cfn=(13696) yjit::codegen::gen_branchunless",
+      "cfn=(13584) yjit::codegen::gen_defined",
+      "cfn=(13556) yjit::codegen::gen_putnil",
+      "cfn=(13658) yjit::codegen::gen_exit",
+      "cfn=(14246) yjit::codegen::gen_send_general",
+      "fn=(14566) yjit::codegen::gen_getlocal_generic",
+      "cfn=(14340) yjit::codegen::gen_send_iseq",
+      "cfn=(14610) yjit::codegen::gen_send_cfunc",
+      "fn=(14392) yjit::codegen::gen_push_frame",
+      "cfn=(13594) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13282) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14526) yjit::codegen::gen_setlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13216) rb_yjit_compile_iseq",
+      "cfn=(13218) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13650) yjit::codegen::gen_outlined_exit",
+      "cfn=(14086) yjit::codegen::gen_counted_exit",
+      "fn=(13656) yjit::codegen::gen_exit",
+      "fn=(14566) yjit::codegen::gen_getlocal_generic",
+      "fn=(14668) yjit::codegen::gen_putobject",
+      "fn=(13554) yjit::codegen::gen_putnil",
+      "fn=(14456) yjit::codegen::gen_check_ints",
+      "fn=(14520) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14524) yjit::codegen::gen_setlocal_generic",
+      "fn=(13582) yjit::codegen::gen_defined",
+      "cfn=(13592) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14052) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14240) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14244) yjit::codegen::gen_send_general",
+      "fn=(14610) yjit::codegen::gen_send_cfunc",
+      "cfn=(14390) yjit::codegen::gen_push_frame",
+      "fn=(13514) yjit::codegen::gen_single_block",
+      "cfn=(14776) yjit::codegen::gen_newarray",
+      "cfn=(14644) yjit::codegen::gen_branchif",
+      "cfn=(14598) yjit::codegen::gen_opt_div",
+      "cfn=(14562) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14454) yjit::codegen::gen_leave",
+      "cfn=(14440) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14188) yjit::codegen::gen_pop",
+      "cfn=(14176) yjit::codegen::gen_swap",
+      "cfn=(13694) yjit::codegen::gen_branchunless",
+      "fn=(13280) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14338) yjit::codegen::gen_send_iseq",
+      "fn=(13250) yjit::codegen::gen_entry_prologue"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13650) yjit::codegen::gen_outlined_exit",
+      "cfn=(14086) yjit::codegen::gen_counted_exit",
+      "fn=(13514) yjit::codegen::gen_single_block",
+      "cfn=(14776) yjit::codegen::gen_newarray",
+      "cfn=(14666) yjit::codegen::gen_putobject",
+      "cfn=(14642) yjit::codegen::gen_branchif",
+      "cfn=(14596) yjit::codegen::gen_opt_div",
+      "cfn=(14560) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14518) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14454) yjit::codegen::gen_leave",
+      "cfn=(14440) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(14240) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14188) yjit::codegen::gen_pop",
+      "cfn=(14176) yjit::codegen::gen_swap",
+      "cfn=(14052) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13694) yjit::codegen::gen_branchunless",
+      "cfn=(13582) yjit::codegen::gen_defined",
+      "cfn=(13554) yjit::codegen::gen_putnil",
+      "fn=(13250) yjit::codegen::gen_entry_prologue",
+      "cfn=(13280) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(14564) yjit::codegen::gen_getlocal_generic",
+      "cfn=(13592) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(14456) yjit::codegen::gen_check_ints",
+      "fn=(14338) yjit::codegen::gen_send_iseq",
+      "cfn=(14390) yjit::codegen::gen_push_frame",
+      "cfn=(14522) yjit::codegen::gen_setlocal_generic",
+      "cfn=(13656) yjit::codegen::gen_exit",
+      "cfn=(14244) yjit::codegen::gen_send_general",
+      "fn=(14608) yjit::codegen::gen_send_cfunc",
+      "cfn=(13216) rb_yjit_compile_iseq",
+      "fn=(13218) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13594) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14088) yjit::codegen::gen_counted_exit",
+      "fn=(14246) yjit::codegen::gen_send_general",
+      "cfn=(14340) yjit::codegen::gen_send_iseq",
+      "cfn=(14610) yjit::codegen::gen_send_cfunc",
+      "fn=(14392) yjit::codegen::gen_push_frame",
+      "fn=(13282) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13696) yjit::codegen::gen_branchunless",
+      "fn=(14190) yjit::codegen::gen_pop",
+      "fn=(14566) yjit::codegen::gen_getlocal_generic",
+      "cfn=(14458) yjit::codegen::gen_check_ints",
+      "fn=(14668) yjit::codegen::gen_putobject",
+      "fn=(13252) yjit::codegen::gen_entry_prologue",
+      "fn=(13652) yjit::codegen::gen_outlined_exit",
+      "cfn=(13658) yjit::codegen::gen_exit",
+      "fn=(14442) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(14456) yjit::codegen::gen_leave",
+      "fn=(14644) yjit::codegen::gen_branchif",
+      "fn=(14522) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(14526) yjit::codegen::gen_setlocal_generic",
+      "fn=(13556) yjit::codegen::gen_putnil",
+      "fn=(14178) yjit::codegen::gen_swap",
+      "fn=(14752) yjit::codegen::gen_newarray",
+      "fn=(13584) yjit::codegen::gen_defined",
+      "fn=(14054) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14242) yjit::codegen::gen_opt_send_without_block",
+      "fn=(14562) yjit::codegen::gen_getlocal_wc0",
+      "fn=(13516) yjit::codegen::gen_single_block",
+      "cfn=(14598) yjit::codegen::gen_opt_div",
+      "fn=(13220) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13218) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13222) rb_yjit_iseq_gen_entry_point",
+      "fn=(13284) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13518) yjit::codegen::gen_single_block",
+      "cfn=(14458) yjit::codegen::gen_leave",
+      "cfn=(14676) yjit::codegen::gen_putobject",
+      "fn=(13654) yjit::codegen::gen_outlined_exit",
+      "cfn=(13660) yjit::codegen::gen_exit",
+      "fn=(14090) yjit::codegen::gen_counted_exit",
+      "cfn=(14460) yjit::codegen::gen_check_ints",
+      "fn=(13254) yjit::codegen::gen_entry_prologue",
+      "cfn=(13220) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(13650) yjit::codegen::gen_outlined_exit",
+      "cfn=(14086) yjit::codegen::gen_counted_exit",
+      "fn=(14338) yjit::codegen::gen_send_iseq",
+      "cfn=(14390) yjit::codegen::gen_push_frame",
+      "fn=(13656) yjit::codegen::gen_exit",
+      "fn=(14566) yjit::codegen::gen_getlocal_generic",
+      "fn=(14668) yjit::codegen::gen_putobject",
+      "fn=(18740) yjit::codegen::gen_send",
+      "cfn=(14244) yjit::codegen::gen_send_general",
+      "cfn=(13592) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13554) yjit::codegen::gen_putnil",
+      "fn=(14456) yjit::codegen::gen_check_ints",
+      "fn=(18730) yjit::codegen::gen_getlocal",
+      "fn=(14610) yjit::codegen::gen_send_cfunc",
+      "fn=(18820) yjit::codegen::gen_setlocal_wc1",
+      "cfn=(14524) yjit::codegen::gen_setlocal_generic",
+      "fn=(13514) yjit::codegen::gen_single_block",
+      "cfn=(18814) yjit::codegen::gen_dup",
+      "cfn=(14454) yjit::codegen::gen_leave",
+      "cfn=(14188) yjit::codegen::gen_pop",
+      "cfn=(14644) yjit::codegen::gen_branchif",
+      "cfn=(14440) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13694) yjit::codegen::gen_branchunless",
+      "cfn=(18550) yjit::codegen::gen_invokeblock",
+      "cfn=(14562) yjit::codegen::gen_getlocal_wc0"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(13218) rb_yjit_compile_iseq",
+      "cfn=(13220) rb_yjit_iseq_gen_entry_point",
+      "cfn=(13516) yjit::codegen::gen_single_block",
+      "cfn=(13252) yjit::codegen::gen_entry_prologue",
+      "fn=(13658) yjit::codegen::gen_exit",
+      "fn=(17936) yjit::codegen::gen_entry_chain_guard",
+      "fn=(13556) yjit::codegen::gen_putnil",
+      "fn=(14178) yjit::codegen::gen_swap",
+      "fn=(14458) yjit::codegen::gen_check_ints",
+      "fn=(14054) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(14242) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(14246) yjit::codegen::gen_send_general",
+      "fn=(14562) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(14566) yjit::codegen::gen_getlocal_generic",
+      "cfn=(14456) yjit::codegen::gen_leave",
+      "cfn=(14190) yjit::codegen::gen_pop",
+      "cfn=(18118) yjit::codegen::gen_jump",
+      "cfn=(18048) yjit::codegen::gen_opt_new",
+      "cfn=(13594) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(14088) yjit::codegen::gen_counted_exit",
+      "cfn=(13652) yjit::codegen::gen_outlined_exit",
+      "cfn=(14340) yjit::codegen::gen_send_iseq",
+      "fn=(14392) yjit::codegen::gen_push_frame",
+      "fn=(13282) yjit::codegen::gen_entry_reg_mapping"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-1/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12428) rb_yjit_compile_iseq",
+      "cfn=(12430) rb_yjit_iseq_gen_entry_point",
+      "fn=(12462) yjit::codegen::gen_entry_prologue",
+      "cfn=(12492) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13388) yjit::codegen::gen_swap",
+      "fn=(13652) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(12804) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13666) yjit::codegen::gen_leave",
+      "cfn=(13668) yjit::codegen::gen_check_ints",
+      "fn=(13810) yjit::codegen::gen_opt_div",
+      "cfn=(13452) yjit::codegen::gen_opt_send_without_block",
+      "fn=(13822) yjit::codegen::gen_send_cfunc",
+      "cfn=(13602) yjit::codegen::gen_push_frame",
+      "fn=(13264) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(13550) yjit::codegen::gen_send_iseq",
+      "fn=(13778) yjit::codegen::gen_getlocal_generic",
+      "fn=(12906) yjit::codegen::gen_branchunless",
+      "fn=(13962) yjit::codegen::gen_newarray",
+      "fn=(12726) yjit::codegen::gen_single_block",
+      "cfn=(12862) yjit::codegen::gen_outlined_exit",
+      "cfn=(13880) yjit::codegen::gen_putobject",
+      "cfn=(13856) yjit::codegen::gen_branchif",
+      "cfn=(13774) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13734) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13400) yjit::codegen::gen_pop",
+      "cfn=(12794) yjit::codegen::gen_defined",
+      "cfn=(12766) yjit::codegen::gen_putnil",
+      "cfn=(12868) yjit::codegen::gen_exit",
+      "cfn=(13456) yjit::codegen::gen_send_general",
+      "cfn=(13738) yjit::codegen::gen_setlocal_generic",
+      "fn=(13298) yjit::codegen::gen_counted_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12426) rb_yjit_compile_iseq",
+      "cfn=(12428) rb_yjit_iseq_gen_entry_point",
+      "fn=(12460) yjit::codegen::gen_entry_prologue",
+      "cfn=(12490) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12724) yjit::codegen::gen_single_block",
+      "cfn=(12860) yjit::codegen::gen_outlined_exit",
+      "cfn=(13952) yjit::codegen::gen_newarray",
+      "cfn=(13876) yjit::codegen::gen_putobject",
+      "cfn=(13852) yjit::codegen::gen_branchif",
+      "cfn=(13806) yjit::codegen::gen_opt_div",
+      "cfn=(13770) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13730) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13664) yjit::codegen::gen_leave",
+      "cfn=(13650) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13450) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13398) yjit::codegen::gen_pop",
+      "cfn=(13386) yjit::codegen::gen_swap",
+      "cfn=(13262) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12904) yjit::codegen::gen_branchunless",
+      "cfn=(12792) yjit::codegen::gen_defined",
+      "cfn=(12764) yjit::codegen::gen_putnil",
+      "cfn=(12866) yjit::codegen::gen_exit",
+      "fn=(13774) yjit::codegen::gen_getlocal_generic",
+      "cfn=(12802) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(13666) yjit::codegen::gen_check_ints",
+      "cfn=(13734) yjit::codegen::gen_setlocal_generic",
+      "fn=(13818) yjit::codegen::gen_send_cfunc",
+      "cfn=(13600) yjit::codegen::gen_push_frame",
+      "fn=(13296) yjit::codegen::gen_counted_exit",
+      "fn=(13548) yjit::codegen::gen_send_iseq",
+      "cfn=(13454) yjit::codegen::gen_send_general"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12494) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12768) yjit::codegen::gen_putnil",
+      "fn=(13402) yjit::codegen::gen_pop",
+      "fn=(13774) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13778) yjit::codegen::gen_getlocal_generic",
+      "fn=(12796) yjit::codegen::gen_defined",
+      "cfn=(12806) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13300) yjit::codegen::gen_counted_exit",
+      "fn=(13810) yjit::codegen::gen_opt_div",
+      "cfn=(13454) yjit::codegen::gen_opt_send_without_block",
+      "fn=(13552) yjit::codegen::gen_send_iseq",
+      "cfn=(13604) yjit::codegen::gen_push_frame",
+      "fn=(13962) yjit::codegen::gen_newarray",
+      "fn=(12464) yjit::codegen::gen_entry_prologue",
+      "fn=(12908) yjit::codegen::gen_branchunless",
+      "fn=(13390) yjit::codegen::gen_swap",
+      "fn=(13654) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(13668) yjit::codegen::gen_leave",
+      "cfn=(13670) yjit::codegen::gen_check_ints",
+      "fn=(13732) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13736) yjit::codegen::gen_setlocal_generic",
+      "fn=(13880) yjit::codegen::gen_putobject",
+      "fn=(13266) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(13458) yjit::codegen::gen_send_general",
+      "fn=(12728) yjit::codegen::gen_single_block",
+      "cfn=(12864) yjit::codegen::gen_outlined_exit",
+      "cfn=(13856) yjit::codegen::gen_branchif",
+      "cfn=(12870) yjit::codegen::gen_exit",
+      "fn=(13822) yjit::codegen::gen_send_cfunc",
+      "fn=(12432) rb_yjit_iseq_gen_entry_point",
+      "cfn=(12430) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12494) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12806) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13736) yjit::codegen::gen_setlocal_generic",
+      "fn=(13402) yjit::codegen::gen_pop",
+      "fn=(13654) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(13668) yjit::codegen::gen_leave",
+      "cfn=(13670) yjit::codegen::gen_check_ints",
+      "fn=(13772) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13776) yjit::codegen::gen_getlocal_generic",
+      "fn=(12464) yjit::codegen::gen_entry_prologue",
+      "fn=(13300) yjit::codegen::gen_counted_exit",
+      "fn=(13552) yjit::codegen::gen_send_iseq",
+      "cfn=(13604) yjit::codegen::gen_push_frame",
+      "fn=(13808) yjit::codegen::gen_opt_div",
+      "cfn=(13454) yjit::codegen::gen_opt_send_without_block",
+      "fn=(13960) yjit::codegen::gen_newarray",
+      "fn=(12728) yjit::codegen::gen_single_block",
+      "cfn=(12864) yjit::codegen::gen_outlined_exit",
+      "cfn=(13878) yjit::codegen::gen_putobject",
+      "cfn=(13854) yjit::codegen::gen_branchif",
+      "cfn=(13732) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13390) yjit::codegen::gen_swap",
+      "cfn=(13266) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12908) yjit::codegen::gen_branchunless",
+      "cfn=(12796) yjit::codegen::gen_defined",
+      "cfn=(12768) yjit::codegen::gen_putnil",
+      "cfn=(12870) yjit::codegen::gen_exit",
+      "cfn=(13458) yjit::codegen::gen_send_general",
+      "cfn=(13820) yjit::codegen::gen_send_cfunc",
+      "fn=(12430) rb_yjit_compile_iseq",
+      "cfn=(12432) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12464) yjit::codegen::gen_entry_prologue",
+      "cfn=(12728) yjit::codegen::gen_single_block",
+      "fn=(12430) rb_yjit_compile_iseq",
+      "cfn=(12432) rb_yjit_iseq_gen_entry_point",
+      "fn=(13460) yjit::codegen::gen_send_general",
+      "cfn=(13554) yjit::codegen::gen_send_iseq",
+      "cfn=(13830) yjit::codegen::gen_send_cfunc",
+      "fn=(13606) yjit::codegen::gen_push_frame",
+      "fn=(13786) yjit::codegen::gen_getlocal_generic",
+      "fn=(13402) yjit::codegen::gen_pop",
+      "cfn=(12494) yjit::codegen::gen_entry_reg_mapping",
+      "cfn=(12864) yjit::codegen::gen_outlined_exit",
+      "cfn=(13966) yjit::codegen::gen_newarray",
+      "cfn=(13888) yjit::codegen::gen_putobject",
+      "cfn=(13864) yjit::codegen::gen_branchif",
+      "cfn=(13818) yjit::codegen::gen_opt_div",
+      "cfn=(13782) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13742) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13670) yjit::codegen::gen_leave",
+      "cfn=(13656) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13456) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13390) yjit::codegen::gen_swap",
+      "cfn=(13266) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12908) yjit::codegen::gen_branchunless",
+      "cfn=(12796) yjit::codegen::gen_defined",
+      "cfn=(12768) yjit::codegen::gen_putnil",
+      "cfn=(12870) yjit::codegen::gen_exit",
+      "cfn=(13746) yjit::codegen::gen_setlocal_generic",
+      "cfn=(13672) yjit::codegen::gen_check_ints",
+      "cfn=(12806) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13300) yjit::codegen::gen_counted_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12432) rb_yjit_compile_iseq",
+      "cfn=(12434) rb_yjit_iseq_gen_entry_point",
+      "fn=(12496) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12808) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13830) yjit::codegen::gen_send_cfunc",
+      "cfn=(13672) yjit::codegen::gen_check_ints",
+      "cfn=(13606) yjit::codegen::gen_push_frame",
+      "fn=(12910) yjit::codegen::gen_branchunless",
+      "fn=(13456) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13460) yjit::codegen::gen_send_general",
+      "fn=(12466) yjit::codegen::gen_entry_prologue",
+      "fn=(13404) yjit::codegen::gen_pop",
+      "fn=(13742) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13746) yjit::codegen::gen_setlocal_generic",
+      "fn=(12730) yjit::codegen::gen_single_block",
+      "cfn=(12866) yjit::codegen::gen_outlined_exit",
+      "cfn=(13968) yjit::codegen::gen_newarray",
+      "cfn=(13888) yjit::codegen::gen_putobject",
+      "cfn=(13864) yjit::codegen::gen_branchif",
+      "cfn=(13818) yjit::codegen::gen_opt_div",
+      "cfn=(13782) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13670) yjit::codegen::gen_leave",
+      "cfn=(13656) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(13392) yjit::codegen::gen_swap",
+      "cfn=(13268) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12798) yjit::codegen::gen_defined",
+      "cfn=(12770) yjit::codegen::gen_putnil",
+      "cfn=(12872) yjit::codegen::gen_exit",
+      "fn=(13302) yjit::codegen::gen_counted_exit",
+      "cfn=(13554) yjit::codegen::gen_send_iseq",
+      "cfn=(13786) yjit::codegen::gen_getlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12426) rb_yjit_compile_iseq",
+      "cfn=(12428) rb_yjit_iseq_gen_entry_point",
+      "fn=(13734) yjit::codegen::gen_setlocal_generic",
+      "fn=(13876) yjit::codegen::gen_putobject",
+      "fn=(12490) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(13770) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13774) yjit::codegen::gen_getlocal_generic",
+      "fn=(16962) yjit::codegen::gen_putself",
+      "fn=(12802) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13386) yjit::codegen::gen_swap",
+      "fn=(13450) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(13454) yjit::codegen::gen_send_general",
+      "fn=(16860) yjit::codegen::gen_entry_chain_guard",
+      "fn=(17302) yjit::codegen::gen_block_given",
+      "fn=(13262) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(16972) yjit::codegen::gen_get_ivar",
+      "fn=(17094) yjit::codegen::gen_set_ivar",
+      "cfn=(17122) yjit::codegen::gen_write_iv",
+      "cfn=(13818) yjit::codegen::gen_send_cfunc",
+      "fn=(12460) yjit::codegen::gen_entry_prologue",
+      "fn=(12724) yjit::codegen::gen_single_block",
+      "cfn=(12860) yjit::codegen::gen_outlined_exit",
+      "cfn=(17258) yjit::codegen::gen_getinstancevariable",
+      "cfn=(17084) yjit::codegen::gen_setinstancevariable",
+      "cfn=(13730) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(17044) yjit::codegen::gen_newhash",
+      "cfn=(12764) yjit::codegen::gen_putnil",
+      "cfn=(12866) yjit::codegen::gen_exit",
+      "fn=(13296) yjit::codegen::gen_counted_exit"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-mysql2-0/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.1",
+    "case": "find_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.2",
+    "case": "find_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(11800) rb_yjit_compile_iseq",
+      "cfn=(11802) rb_yjit_iseq_gen_entry_point",
+      "fn=(12234) yjit::codegen::gen_outlined_exit",
+      "cfn=(12240) yjit::codegen::gen_exit",
+      "fn=(13112) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13116) yjit::codegen::gen_setlocal_generic",
+      "fn=(13200) yjit::codegen::gen_send_cfunc",
+      "cfn=(13040) yjit::codegen::gen_check_ints",
+      "cfn=(12974) yjit::codegen::gen_push_frame",
+      "cfn=(12176) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(11834) yjit::codegen::gen_entry_prologue",
+      "cfn=(11864) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12828) yjit::codegen::gen_send_general",
+      "cfn=(12922) yjit::codegen::gen_send_iseq",
+      "fn=(13024) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(13038) yjit::codegen::gen_leave",
+      "fn=(12098) yjit::codegen::gen_single_block",
+      "cfn=(13358) yjit::codegen::gen_newarray",
+      "cfn=(13280) yjit::codegen::gen_putobject",
+      "cfn=(13234) yjit::codegen::gen_branchif",
+      "cfn=(13188) yjit::codegen::gen_opt_div",
+      "cfn=(13152) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(12824) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(12772) yjit::codegen::gen_pop",
+      "cfn=(12760) yjit::codegen::gen_swap",
+      "cfn=(12636) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12278) yjit::codegen::gen_branchunless",
+      "cfn=(12166) yjit::codegen::gen_defined",
+      "cfn=(12138) yjit::codegen::gen_putnil",
+      "fn=(12670) yjit::codegen::gen_counted_exit",
+      "cfn=(13156) yjit::codegen::gen_getlocal_generic"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12232) yjit::codegen::gen_outlined_exit",
+      "cfn=(12668) yjit::codegen::gen_counted_exit",
+      "fn=(11800) rb_yjit_iseq_gen_entry_point",
+      "cfn=(11798) rb_yjit_compile_iseq",
+      "cfn=(12096) yjit::codegen::gen_single_block",
+      "cfn=(11832) yjit::codegen::gen_entry_prologue",
+      "fn=(12174) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13144) yjit::codegen::gen_getlocal_generic",
+      "fn=(12770) yjit::codegen::gen_pop",
+      "fn=(12972) yjit::codegen::gen_push_frame",
+      "cfn=(11862) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12822) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(12826) yjit::codegen::gen_send_general",
+      "fn=(13100) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13104) yjit::codegen::gen_setlocal_generic",
+      "fn=(13188) yjit::codegen::gen_send_cfunc",
+      "cfn=(13038) yjit::codegen::gen_check_ints",
+      "fn=(13356) yjit::codegen::gen_newarray",
+      "cfn=(13272) yjit::codegen::gen_putobject",
+      "cfn=(13222) yjit::codegen::gen_branchif",
+      "cfn=(13176) yjit::codegen::gen_opt_div",
+      "cfn=(13140) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13036) yjit::codegen::gen_leave",
+      "cfn=(13022) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(12758) yjit::codegen::gen_swap",
+      "cfn=(12634) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12276) yjit::codegen::gen_branchunless",
+      "cfn=(12164) yjit::codegen::gen_defined",
+      "cfn=(12136) yjit::codegen::gen_putnil",
+      "cfn=(12238) yjit::codegen::gen_exit",
+      "cfn=(12920) yjit::codegen::gen_send_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(11862) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12136) yjit::codegen::gen_putnil",
+      "fn=(12770) yjit::codegen::gen_pop",
+      "fn=(12972) yjit::codegen::gen_push_frame",
+      "fn=(13184) yjit::codegen::gen_opt_div",
+      "cfn=(12822) yjit::codegen::gen_opt_send_without_block",
+      "fn=(12164) yjit::codegen::gen_defined",
+      "cfn=(12174) yjit::codegen::gen_save_sp_with_offset",
+      "cfn=(12826) yjit::codegen::gen_send_general",
+      "fn=(13230) yjit::codegen::gen_branchif",
+      "fn=(12634) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(13358) yjit::codegen::gen_newarray",
+      "cfn=(12920) yjit::codegen::gen_send_iseq",
+      "cfn=(13196) yjit::codegen::gen_send_cfunc",
+      "fn=(13152) yjit::codegen::gen_getlocal_generic",
+      "fn=(13280) yjit::codegen::gen_putobject",
+      "fn=(12276) yjit::codegen::gen_branchunless",
+      "fn=(12758) yjit::codegen::gen_swap",
+      "fn=(13022) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(13036) yjit::codegen::gen_leave",
+      "cfn=(13038) yjit::codegen::gen_check_ints",
+      "fn=(13108) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13112) yjit::codegen::gen_setlocal_generic",
+      "fn=(12232) yjit::codegen::gen_outlined_exit",
+      "cfn=(12238) yjit::codegen::gen_exit",
+      "fn=(11832) yjit::codegen::gen_entry_prologue",
+      "fn=(12668) yjit::codegen::gen_counted_exit",
+      "fn=(12096) yjit::codegen::gen_single_block",
+      "cfn=(13148) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(11798) rb_yjit_compile_iseq",
+      "cfn=(11800) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(11718) rb_yjit_compile_iseq",
+      "cfn=(12016) yjit::codegen::gen_single_block",
+      "cfn=(11752) yjit::codegen::gen_entry_prologue",
+      "fn=(13062) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13066) yjit::codegen::gen_getlocal_generic",
+      "fn=(12196) yjit::codegen::gen_branchunless",
+      "fn=(12840) yjit::codegen::gen_send_iseq",
+      "cfn=(12892) yjit::codegen::gen_push_frame",
+      "fn=(12678) yjit::codegen::gen_swap",
+      "fn=(12746) yjit::codegen::gen_send_general",
+      "cfn=(13110) yjit::codegen::gen_send_cfunc",
+      "fn=(12152) yjit::codegen::gen_outlined_exit",
+      "cfn=(12158) yjit::codegen::gen_exit",
+      "fn=(12942) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(12094) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(12956) yjit::codegen::gen_leave",
+      "cfn=(12958) yjit::codegen::gen_check_ints",
+      "cfn=(13268) yjit::codegen::gen_newarray",
+      "cfn=(13194) yjit::codegen::gen_putobject",
+      "cfn=(13144) yjit::codegen::gen_branchif",
+      "cfn=(13098) yjit::codegen::gen_opt_div",
+      "cfn=(13020) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(12742) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(12690) yjit::codegen::gen_pop",
+      "cfn=(12554) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12084) yjit::codegen::gen_defined",
+      "cfn=(12056) yjit::codegen::gen_putnil",
+      "fn=(12588) yjit::codegen::gen_counted_exit",
+      "cfn=(13024) yjit::codegen::gen_setlocal_generic",
+      "cfn=(11782) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(11720) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12178) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(12638) yjit::codegen::gen_opt_getconstant_path",
+      "fn=(12976) yjit::codegen::gen_push_frame",
+      "fn=(13288) yjit::codegen::gen_putobject",
+      "fn=(12280) yjit::codegen::gen_branchunless",
+      "fn=(12826) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(12830) yjit::codegen::gen_send_general",
+      "fn=(13160) yjit::codegen::gen_getlocal_generic",
+      "fn=(12762) yjit::codegen::gen_swap",
+      "fn=(13362) yjit::codegen::gen_newarray",
+      "fn=(12236) yjit::codegen::gen_outlined_exit",
+      "cfn=(12242) yjit::codegen::gen_exit",
+      "cfn=(12924) yjit::codegen::gen_send_iseq",
+      "cfn=(13204) yjit::codegen::gen_send_cfunc",
+      "fn=(13116) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13120) yjit::codegen::gen_setlocal_generic",
+      "cfn=(13042) yjit::codegen::gen_check_ints",
+      "fn=(13026) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "fn=(13040) yjit::codegen::gen_leave",
+      "fn=(13238) yjit::codegen::gen_branchif",
+      "fn=(11836) yjit::codegen::gen_entry_prologue",
+      "cfn=(11866) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12100) yjit::codegen::gen_single_block",
+      "cfn=(13192) yjit::codegen::gen_opt_div",
+      "cfn=(13156) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(12774) yjit::codegen::gen_pop",
+      "cfn=(12168) yjit::codegen::gen_defined",
+      "cfn=(12140) yjit::codegen::gen_putnil",
+      "fn=(12672) yjit::codegen::gen_counted_exit",
+      "fn=(11804) rb_yjit_iseq_gen_entry_point",
+      "cfn=(11802) rb_yjit_compile_iseq"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.3",
+    "case": "find_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "fn=(12274) yjit::codegen::gen_branchunless",
+      "fn=(12756) yjit::codegen::gen_swap",
+      "fn=(13152) yjit::codegen::gen_getlocal_generic",
+      "fn=(12230) yjit::codegen::gen_outlined_exit",
+      "cfn=(12236) yjit::codegen::gen_exit",
+      "fn=(13036) yjit::codegen::gen_check_ints",
+      "fn=(12666) yjit::codegen::gen_counted_exit",
+      "fn=(12918) yjit::codegen::gen_send_iseq",
+      "cfn=(12970) yjit::codegen::gen_push_frame",
+      "fn=(13108) yjit::codegen::gen_setlocal_wc0",
+      "cfn=(13112) yjit::codegen::gen_setlocal_generic",
+      "fn=(13196) yjit::codegen::gen_send_cfunc",
+      "cfn=(12172) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(13356) yjit::codegen::gen_newarray",
+      "fn=(12094) yjit::codegen::gen_single_block",
+      "cfn=(13280) yjit::codegen::gen_putobject",
+      "cfn=(13230) yjit::codegen::gen_branchif",
+      "cfn=(13184) yjit::codegen::gen_opt_div",
+      "cfn=(13148) yjit::codegen::gen_getlocal_wc0",
+      "cfn=(13034) yjit::codegen::gen_leave",
+      "cfn=(13020) yjit::codegen::gen_opt_invokebuiltin_delegate",
+      "cfn=(12820) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(12768) yjit::codegen::gen_pop",
+      "cfn=(12632) yjit::codegen::gen_opt_getconstant_path",
+      "cfn=(12162) yjit::codegen::gen_defined",
+      "cfn=(12134) yjit::codegen::gen_putnil",
+      "cfn=(12824) yjit::codegen::gen_send_general",
+      "fn=(11830) yjit::codegen::gen_entry_prologue",
+      "cfn=(11860) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(11796) rb_yjit_compile_iseq",
+      "cfn=(11798) rb_yjit_iseq_gen_entry_point"
+    ]
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.4",
+    "case": "select20_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.5",
+    "case": "select20_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.6",
+    "case": "select20_model",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.7",
+    "case": "select1000_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.8",
+    "case": "select1000_adapter",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.9",
+    "case": "select1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.10",
+    "case": "wide20_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.11",
+    "case": "wide20_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.12",
+    "case": "wide20_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.13",
+    "case": "wide1000_driver",
+    "accepted_query_control": true,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.14",
+    "case": "wide1000_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.15",
+    "case": "wide1000_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.16",
+    "case": "pluck_driver",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.17",
+    "case": "pluck_adapter",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/aa-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-1.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-2.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": []
+  },
+  {
+    "profile": "matrix-yjit-trilogy-0/base-3.cg.18",
+    "case": "pluck_model",
+    "accepted_query_control": false,
+    "compiler_entries": [
+      "cfn=(12230) yjit::codegen::gen_outlined_exit",
+      "cfn=(12666) yjit::codegen::gen_counted_exit",
+      "fn=(11798) rb_yjit_iseq_gen_entry_point",
+      "cfn=(11796) rb_yjit_compile_iseq",
+      "cfn=(11830) yjit::codegen::gen_entry_prologue",
+      "cfn=(12094) yjit::codegen::gen_single_block",
+      "fn=(18336) yjit::codegen::gen_getblockparamproxy",
+      "cfn=(11860) yjit::codegen::gen_entry_reg_mapping",
+      "fn=(12172) yjit::codegen::gen_save_sp_with_offset",
+      "fn=(12824) yjit::codegen::gen_send_general",
+      "cfn=(13196) yjit::codegen::gen_send_cfunc",
+      "fn=(12970) yjit::codegen::gen_push_frame",
+      "fn=(13034) yjit::codegen::gen_leave",
+      "cfn=(13036) yjit::codegen::gen_check_ints",
+      "fn=(18036) yjit::codegen::gen_dup",
+      "cfn=(12236) yjit::codegen::gen_exit",
+      "fn=(17994) yjit::codegen::gen_putself",
+      "cfn=(18356) yjit::codegen::gen_send",
+      "cfn=(18296) yjit::codegen::gen_getinstancevariable",
+      "cfn=(18064) yjit::codegen::gen_opt_aref",
+      "cfn=(13230) yjit::codegen::gen_branchif",
+      "cfn=(12820) yjit::codegen::gen_opt_send_without_block",
+      "cfn=(17982) yjit::codegen::gen_getclassvariable",
+      "cfn=(18302) yjit::codegen::gen_get_ivar"
+    ]
+  }
+]

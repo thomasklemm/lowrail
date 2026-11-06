@@ -3,27 +3,29 @@
 Bet P-DRV, 2026-11-05–06. Ruby **4.0.9**, interpreter and YJIT. This is a
 client-side query study, not database-server latency or a request benchmark.
 
-Two SQLite changes survive the first screen: avoid transcoding text which is
-already UTF-8, and fill multi-column row Arrays at their known size. Neither
-changes Rails. PostgreSQL's tempting length-before-NULL shortcut loses badly
+Two SQLite changes survive the controls and relevance gates: avoid transcoding
+text which is already UTF-8, and fill multi-column row Arrays at their known
+size. Neither changes Rails. PostgreSQL's tempting length-before-NULL shortcut loses badly
 on NULL and empty fields and is rejected. Trilogy and mysql2 already have the
-obvious encoding/name caches. The coordinator opened DRV1 as draft
-[#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769); this measurement
-thread has taken no upstream action.
+obvious encoding/name caches. The coordinator opened drafts
+[#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769) and
+[#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770); this measurement
+thread has taken no upstream action. No further candidate cleared the
+whole-workload gate.
 
-**Checkpoint:** candidate interpreter/YJIT cohorts and the complete interpreter
-census are published below. The broad YJIT baseline census is still running;
-large fully cast model warmups take several minutes per fresh process under
-Valgrind. No incomplete baseline is described as accepted. The two candidate
-YJIT prices come from separate completed, controlled cohorts.
+**Complete census:** all four drivers, seven supported prepared/unprepared
+settings and six shapes at three API boundaries: **126 cells per mode**.
+Interpreter admits **78**; YJIT admits **63**. Every rejection is retained,
+not rerun until green. The candidate prices come from separate completed,
+controlled cohorts; the census is not a cross-engine or latency ranking.
 
 **Review follow-up:** DRV1's test-only head has exact-head skeptic, Sol and
 Astra passes. DRV2's original resize head grows native buffers on Ruby 3.2/3.3
 and is superseded. The corrected head matches main's row memory on Ruby
 3.2/3.3/3.4 and passes the revised whole-model-load gate: **−2.6910% YJIT Ir**
 for 1,000 seven-column records through normal `to_a`. The skeptic confirmed
-its final measurements, body and TruffleRuby guard; coordinator Astra confirm
-remains on the guarded head.
+its final measurements, body and TruffleRuby guard; the coordinator reports
+Sol and Astra approval on the exact guarded head, now draft #770.
 The original `select_all` result alone was not sufficient.
 
 ## Sources and overlap checked first
@@ -115,6 +117,25 @@ inclusive call-tree samples, not additive percentages or cross-driver speed
 claims. The SQLite sample uses the original 30-operation diagnostic cohort;
 the other two use five operations. Allocation/heap admission is separate.
 
+The boundary matters even more in the accepted **YJIT** SQLite windows.
+For 1,000 seven-column rows, native `Statement#step` is over half the ordinary
+lazy-attribute model load, but only about a tenth after forcing all casts:
+
+| Query boundary | Ir / query, one window | Native `step` share | Contained SQLite engine `sqlite3_step` share |
+|---|---:|---:|---:|
+| `select_all` | 7,547,562 | 93.57% | 22.23% |
+| Ordinary `relation.spawn.to_a` | 13,020,521 | 54.33% | 12.97% |
+| Load plus every record's `attributes` | 65,932,863 | 10.73% | 2.56% |
+
+These are inclusive shares inside individual accepted query profiles, not
+component-level A/A prices or additive percentages. `step` includes its Ruby
+allocation runtime and the contained SQLite engine work; the engine column
+is a subset, not an extra cost. The ordinary-load profile is from the
+corrected-head cohort's **base**, not from a rejected raw-driver cell. The
+[attribution export](data/driver-cpu/profile-attribution.json) identifies the
+three profiles and exact counters. This is why a fully cast census alone
+understates the driver opportunity in normal lazy model loading.
+
 ## Measurement and controls
 
 The worker extends the existing
@@ -159,6 +180,13 @@ wide20/`pluck` profiles do contain `gen_single_block` and compiler-entry work,
 which confirms the negative control; a tiny `yjit_compile` threshold check or
 the generated-code runtime `is_proc` helper is not compilation.
 
+The completed broad YJIT census adds **756 window profiles**. All **378**
+profiles belonging to accepted query controls contain no compiler-entry or
+code-generation work; **50** rejected profiles contain it. The
+[profile audit](data/driver-cpu/jit-profile-audit.json) records every window,
+its query-control verdict and matching compiler symbols. This supplements,
+not replaces, the measured-counter and heap gates.
+
 The first SQLite prepared census used 30 operations and grew heaps in some
 large model loads. It is diagnostic only. Five operations are the recorded
 protocol revision, not pooled with it. PostgreSQL's wide model still grows
@@ -167,11 +195,16 @@ A/A or JIT-flatness; their raw counts remain observations, not accepted prices.
 Two completed early command wrappers exited on a trailing shell typo *after*
 writing all samples; their data completeness is checked independently, and
 those shell commands are not described as successful runs.
+The SQLite YJIT wrapper later stopped at an already-owned PostgreSQL output
+directory after finishing its two SQLite cohorts; the separate PostgreSQL
+worker completed those cohorts. All seven YJIT census settings have complete
+base/A/A receipts with three repetitions, not inferred success from wrappers.
 
 Receipts: [summary and raw-data index](data/driver-cpu/README.md),
 [per-process summary](data/driver-cpu/summary.json),
 [source/binary provenance](data/driver-cpu/provenance.json),
-[raw receipts](data/driver-cpu/receipts.tar.gz) and
+[candidate/raw receipts](data/driver-cpu/receipts.tar.gz),
+[YJIT census receipts](data/driver-cpu/yjit-receipts.tar.gz) and
 [expanded exactness observations](data/driver-cpu/sqlite-exact.json.gz).
 
 ## Baseline: query cost and row cost
@@ -270,6 +303,113 @@ mysql2. These are this warmed fixture's observed totals, including wrappers
 and metadata, not a promise for arbitrary types or result modes. pg's
 one-row result uses a different type-map path. Adapter materialization adds
 roughly 20–31 objects per query, rather than another object for every cell.
+
+### Complete YJIT census
+
+The same six shapes and three API boundaries yield **63 accepted cells out
+of 126**. As above, the AR column forces every record's `attributes`; it is
+not the ordinary lazy-attribute `to_a` workload used for DRV2's relevance gate.
+Each prepared setting has its own base/A/A control. These are endpoint
+prices, not a separately paired prepared-versus-unprepared speed claim.
+
+| Driver / prepared | Accepted / measured cells |
+|---|---:|
+| SQLite / 1 | 8 / 18 |
+| SQLite / 0 | 12 / 18 |
+| pg / 1 | 10 / 18 |
+| pg / 0 | 11 / 18 |
+| mysql2 / 1 | 9 / 18 |
+| mysql2 / 0 | 7 / 18 |
+| Trilogy / 0 | 6 / 18 |
+
+All 63 rejected cells fail A/A: **44** fail A/A alone, **14** fail A/A plus
+JIT-flatness only, **4** fail A/A plus heap matching only, and **1** fails all three.
+No cell is incomplete. A **†** still means diagnostic only, including its
+allocation observation; it is not an accepted instruction price.
+
+<details>
+<summary>All YJIT shapes: instructions / objects per query</summary>
+
+| Driver / prepared | Shape | Driver Ir / objects | Adapter Ir / objects | AR Ir / objects |
+|---|---|---:|---:|---:|
+| sqlite3 / 1 | find | 55,683 / 12 | 192,248 / 42 | 962,630 / 86† |
+| sqlite3 / 1 | narrow 20 | 121,493 / 47† | 238,650 / 78† | 1,103,146 / 547† |
+| sqlite3 / 1 | narrow 1,000 | 2,939,945 / 2,007 | 3,034,251 / 2,038 | 46,220,324 / 24,067† |
+| sqlite3 / 1 | wide 20 | 200,310 / 117 | 297,081 / 148 | 1,513,201 / 768† |
+| sqlite3 / 1 | wide 1,000 | 7,468,740 / 5,507† | 7,548,149 / 5,538 | 65,878,031 / 35,068 |
+| sqlite3 / 1 | pluck 1,000 | 2,063,878 / 1,007† | 2,168,145 / 1,038† | 2,487,383 / 1,069† |
+| sqlite3 / 0 | find | 146,624 / 18 | 270,648 / 38 | 1,068,357 / 88† |
+| sqlite3 / 0 | narrow 20 | 196,681 / 53† | 292,003 / 74 | 1,144,307 / 543 |
+| sqlite3 / 0 | narrow 1,000 | 2,997,072 / 2,013 | 3,077,378 / 2,034 | 46,239,110 / 24,063 |
+| sqlite3 / 0 | wide 20 | 308,781 / 123 | 387,484 / 144† | 1,604,783 / 764 |
+| sqlite3 / 0 | wide 1,000 | 7,576,141 / 5,513† | 7,641,240 / 5,534† | 65,970,683 / 35,064 |
+| sqlite3 / 0 | pluck 1,000 | 2,109,684 / 1,013 | 2,188,507 / 1,034† | 2,514,275 / 1,065 |
+| pg / 1 | find | 57,128 / 8 | 220,849 / 39 | 984,120 / 85† |
+| pg / 1 | narrow 20 | 103,308 / 44 | 239,627 / 76 | 1,021,623 / 545† |
+| pg / 1 | narrow 1,000 | 1,496,606 / 2,004 | 1,609,364 / 2,036† | 41,603,896 / 24,065† |
+| pg / 1 | wide 20 | 160,730 / 114 | 287,630 / 146 | 1,505,917 / 806† |
+| pg / 1 | wide 1,000 | 5,275,352 / 5,504 | 5,395,586 / 5,536 | 62,015,590 / 37,066† |
+| pg / 1 | pluck 1,000 | 964,228 / 1,004† | 1,078,964 / 1,036† | 1,414,277 / 1,067 |
+| pg / 0 | find | 57,132 / 8† | 209,244 / 32 | 981,866 / 84† |
+| pg / 0 | narrow 20 | 103,535 / 44 | 226,274 / 69 | 1,007,532 / 538 |
+| pg / 0 | narrow 1,000 | 1,496,410 / 2,004 | 1,594,902 / 2,029 | 41,592,620 / 24,058† |
+| pg / 0 | wide 20 | 159,828 / 114† | 273,894 / 139† | 1,492,907 / 799 |
+| pg / 0 | wide 1,000 | 5,275,389 / 5,504 | 5,381,123 / 5,529 | 62,012,248 / 37,059† |
+| pg / 0 | pluck 1,000 | 963,797 / 1,004 | 1,065,196 / 1,029 | 1,399,862 / 1,060† |
+| mysql2 / 1 | find | 73,874 / 23 | 229,898 / 53† | 973,855 / 95† |
+| mysql2 / 1 | narrow 20 | 146,149 / 53 | 263,190 / 84† | 1,075,560 / 551† |
+| mysql2 / 1 | narrow 1,000 | 2,011,032 / 2,013 | 2,117,120 / 2,044 | 44,413,182 / 24,071† |
+| mysql2 / 1 | wide 20 | 202,852 / 128 | 293,790 / 159 | 1,434,954 / 777† |
+| mysql2 / 1 | wide 1,000 | 6,341,820 / 5,518 | 6,428,915 / 5,549† | 60,451,058 / 35,077† |
+| mysql2 / 1 | pluck 1,000 | 1,456,627 / 1,012† | 1,553,917 / 1,043 | 1,882,175 / 1,074 |
+| mysql2 / 0 | find | 86,467 / 22† | 218,449 / 46† | 1,003,202 / 94† |
+| mysql2 / 0 | narrow 20 | 154,799 / 52† | 262,834 / 77 | 1,065,166 / 544† |
+| mysql2 / 0 | narrow 1,000 | 1,892,210 / 2,012 | 1,977,113 / 2,037 | 44,228,486 / 24,064† |
+| mysql2 / 0 | wide 20 | 176,063 / 127 | 256,282 / 152† | 1,396,559 / 770† |
+| mysql2 / 0 | wide 1,000 | 4,334,719 / 5,517 | 4,410,648 / 5,542† | 58,381,201 / 35,070† |
+| mysql2 / 0 | pluck 1,000 | 1,522,112 / 1,011† | 1,605,357 / 1,036 | 1,925,817 / 1,067 |
+| trilogy / 0 | find | 57,104 / 11 | 286,143 / 40† | 1,045,527 / 87† |
+| trilogy / 0 | narrow 20 | 107,197 / 46† | 307,116 / 76 | 1,039,986 / 542 |
+| trilogy / 0 | narrow 1,000 | 1,090,119 / 2,006† | 1,215,697 / 2,036 | 43,431,416 / 24,062† |
+| trilogy / 0 | wide 20 | 116,908 / 116 | 230,061 / 146† | 1,351,539 / 763† |
+| trilogy / 0 | wide 1,000 | 2,899,544 / 5,506 | 3,002,632 / 5,545.6† | 56,925,389 / 35,063† |
+| trilogy / 0 | pluck 1,000 | 844,374 / 1,006† | 999,240 / 1,036† | 1,353,544 / 1,067† |
+
+</details>
+
+Only slopes with both 20-row and 1,000-row controls accepted are priced:
+
+| Accepted YJIT path | Extra Ir / row | Extra objects / row |
+|---|---:|---:|
+| sqlite3 prepared, wide adapter | 7,399.0 | 5.5 |
+| sqlite3 unprepared, narrow adapter | 2,842.2 | 2 |
+| sqlite3 unprepared, narrow fully cast model | 46,015.1 | 24 |
+| sqlite3 unprepared, wide fully cast model | 65,679.5 | 35 |
+| pg prepared, narrow driver | 1,421.7 | 2 |
+| pg prepared, wide driver | 5,219.0 | 5.5 |
+| pg prepared, wide adapter | 5,212.2 | 5.5 |
+| pg unprepared, narrow driver | 1,421.3 | 2 |
+| pg unprepared, narrow adapter | 1,396.6 | 2 |
+| mysql2 prepared, narrow driver | 1,902.9 | 2 |
+| mysql2 prepared, wide driver | 6,264.3 | 5.5 |
+| mysql2 unprepared, narrow adapter | 1,749.3 | 2 |
+| mysql2 unprepared, wide driver | 4,243.5 | 5.5 |
+| trilogy unprepared, narrow adapter | 927.1 | 2 |
+| trilogy unprepared, wide driver | 2,839.4 | 5.5 |
+
+Only one YJIT 1,000-row census shape has all three boundary controls accepted:
+SQLite unprepared, narrow rows. It records **2,997,072 / 3,077,378 /
+46,239,110 Ir** for driver / adapter / fully cast model: approximately
+**6.48%** raw boundary, **0.17%** additional adapter work and **93.34%**
+remaining relation/model work. Other triples cannot be decomposed from
+rejected endpoint prices. The within-profile attribution above explains why
+normal lazy model loads expose much more driver work than this forced-cast
+boundary does.
+
+The census adds no new exact whole-workload winner. Repeated encoding/name
+work is already cached in pg/Trilogy/mysql2 or has observable semantics;
+the measured pg alternative remains rejected on NULL/empty workloads.
+DRV1 and DRV2 stay the only built candidates handed to the coordinator.
 
 ## DRV1: bind UTF-8 text without making a Ruby copy
 
@@ -445,7 +585,9 @@ therefore carry forward without a new cohort, as requested by the coordinator.
 Both rebuilt own suites again pass **428/873**, zero failures/errors, 12 skips.
 The skeptic approves the exact new head and body, L1. No TruffleRuby runtime
 was executed; its storage equivalence is source-derived, not a measured
-TruffleRuby speed or compatibility claim. Coordinator Astra confirm remains.
+TruffleRuby speed or compatibility claim. The coordinator reports Sol and
+Astra approval on this exact head and opened draft #770; no further driver
+code or queue-item change is part of the completed census.
 
 ## Exactness and own suites
 
@@ -508,9 +650,9 @@ independently recomputed the final model-load results from JSONL/Callgrind
 totals, checked all 108 measurement windows and 27 accepted YJIT call graphs,
 and approved the relevance gate and public body on the corrected head.
 Sol confirmed that head with a wording nit; Astra requested the TruffleRuby
-guard above. Its new-head skeptic pass is complete; coordinator Astra confirm
-remains. Supporting exports include both follow-ups. Ruby Flog/RuboCop
-metrics do not apply to these C changes.
+guard above. The new-head skeptic, Sol and Astra passes are complete, and
+the coordinator opened draft #770. Supporting exports include both follow-ups.
+Ruby Flog/RuboCop metrics do not apply to these C changes.
 The pushed fork heads report **no CI checks**, not green CI. These Linux runs
 do not certify every SQLite/Ruby/platform combination or include sanitizers. As in DECISIONS'
 exactness boundary, reaching unfinished internal Arrays through ObjectSpace

@@ -59,7 +59,15 @@
     "candidate-yjit-sqlite-bind20",
     "candidate-yjit-sqlite-fill-wide",
     "candidate-interpreter-sqlite-fill-store",
-    "candidate-yjit-sqlite-fill-store"
+    "candidate-yjit-sqlite-fill-store",
+    "matrix-yjit-sqlite3-1",
+    "matrix-yjit-sqlite3-0",
+    "matrix-yjit-postgresql-1",
+    "matrix-yjit-postgresql-0",
+    "matrix-yjit-mysql2-1",
+    "matrix-yjit-mysql2-0",
+    "matrix-yjit-trilogy-0",
+    "candidate-yjit-sqlite-fill"
   ],
   "followups": {
     "DRV1": {
@@ -70,7 +78,7 @@
     "DRV2": {
       "head": "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e",
       "native_sha256": "4a89c9bcf1690c9f76246731d5932a6f0cb91f837a57890954f686326bf130ea",
-      "status": "whole-model gate passed; TruffleRuby initializer guard applied with unchanged CRuby preprocessing; new-head skeptic approves, coordinator Astra confirm pending",
+      "status": "Coordinator confirms Sol/Astra approval on guarded head; opened as draft sparklemotion/sqlite3-ruby#770.",
       "older_ruby_memory": "native-memory.json",
       "cohorts": [
         "candidate-interpreter-sqlite-fill-store",
@@ -92,5 +100,31 @@
     }
   },
   "driver_heads_independent": true,
-  "hosted_ci": "No CI checks found on either fork head"
+  "hosted_ci": "No CI checks found on either fork head",
+  "valgrind": {
+    "version": "3.19.0",
+    "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+    "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+    "brk_reservation_mib": 512,
+    "tool": "libexec/valgrind/callgrind-amd64-linux",
+    "tool_sha256": "f145a09f53d6ad1818d1552d2bc46601fb4e896ca8d8a9036795962654ec48f7",
+    "compiler": "cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+    "libc": "glibc 2.36"
+  },
+  "callgrind_client_sha256": "c03279f472c88639b9389141c4af935ced3ee72697b389e1630b7a3c8026884d",
+  "yjit_census": {
+    "cells": 126,
+    "accepted": 63,
+    "window_profiles": 756,
+    "accepted_profiles_without_compiler_entries": 378,
+    "rejected_profiles_with_compiler_entries": 50,
+    "benchmark_readme_sha256": "1962f9b2bd83452aa6a13acb124263ee44437ff0eeb5a4dd2ef59715983690c0",
+    "raw_profiles": "yjit-receipts.tar.gz"
+  },
+  "rejected_unconditional_resize": {
+    "source_commit": "d3bdb31db57f8830bbc127cb8d614efb00079563",
+    "patch_receipt": "unconditional-row-fill.patch",
+    "native_sha256": "78163af81f326c7d0d6abb670513f751cf1f04c18a4ef6f9439bd5ded2295bbf",
+    "decision": "Rejected; interpreter single-column regression, YJIT pluck rejects A/A/JIT. Not a new candidate."
+  }
 }

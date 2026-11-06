@@ -1,0 +1,41 @@
+[
+  {
+    "cohort": "candidate-yjit-sqlite-fill-store",
+    "case": "wide1000_load",
+    "profile": "base-1.cg.4",
+    "sha256": "93c34392a48c796f760fd26100ad2dfc377190527ebaae5f9985d2e198c32aab",
+    "count": 5,
+    "total_ir": 65102606,
+    "inclusive_functions": {
+      "/tmp/pdrv/sqlite/ext/sqlite3/statement.c:step [/tmp/pdrv/sqlite/lib/sqlite3/4.0/sqlite3_native.so]": 35368922,
+      "???:sqlite3_step [/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6]": 8441511
+    },
+    "scope": "One accepted base window; inclusive step includes sqlite3_step. Not additive prices or a separate component A/A."
+  },
+  {
+    "cohort": "matrix-yjit-sqlite3-1",
+    "case": "wide1000_adapter",
+    "profile": "base-1.cg.14",
+    "sha256": "ee419dde674cf56a9a3f3b823fa315ef9cccd7f2b19fba0f698e21761e5f2446",
+    "count": 5,
+    "total_ir": 37737809,
+    "inclusive_functions": {
+      "/tmp/pdrv/sqlite/ext/sqlite3/statement.c:step [/tmp/pdrv/sqlite/lib/sqlite3/4.0/sqlite3_native.so]": 35311172,
+      "???:sqlite3_step [/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6]": 8387359
+    },
+    "scope": "One accepted base window; inclusive step includes sqlite3_step. Not additive prices or a separate component A/A."
+  },
+  {
+    "cohort": "matrix-yjit-sqlite3-1",
+    "case": "wide1000_model",
+    "profile": "base-1.cg.15",
+    "sha256": "30d40dab2c29716c176357dce24a25abb9e303e2496cedf6f71bce18727508c4",
+    "count": 5,
+    "total_ir": 329664316,
+    "inclusive_functions": {
+      "/tmp/pdrv/sqlite/ext/sqlite3/statement.c:step [/tmp/pdrv/sqlite/lib/sqlite3/4.0/sqlite3_native.so]": 35365332,
+      "???:sqlite3_step [/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6]": 8441217
+    },
+    "scope": "One accepted base window; inclusive step includes sqlite3_step. Not additive prices or a separate component A/A."
+  }
+]
