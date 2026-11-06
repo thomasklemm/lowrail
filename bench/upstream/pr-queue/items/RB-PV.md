@@ -14,8 +14,8 @@ alternative_of:
 impact: identical builds no longer get significance stars; --runs N tests across processes
 rank:
 risky: false
-state: reviewed
-pr:
+state: ready
+pr: 574
 note: "prepared 2026-11-06, held for Thomas's final review; claude-code passes are a skeptic subagent in the preparing orb, as asked; fork CI green 15/15 on same-tree 5e7f158 for aed07e8d8f and on f961b53 (run 42249192428) for b633985a3d (branch ci/pvalue-across-processes, deleted after; test.yml runs only on main and PRs)"
 passes:
   - {reviewer: claude-code, head: "b1da15b", date: 2026-11-06, verdict: changes, open: "body overstated the railsbench slowdown (measured 1.8%, not 5%); new behaviour untested; 1st itr from first process only; Ractor reason; all fixed"}
@@ -23,6 +23,10 @@ passes:
   - {reviewer: claude-code, head: "aed07e8d8f", date: 2026-11-06, verdict: approve, open: "ratio is the pooled mean while the test uses unweighted process means; odd N ordering; kept"}
   - {reviewer: claude-code, head: "aed07e8d8f", date: 2026-11-06, verdict: nits, open: "independent Claude Code Thermos pass (correctness + maintainability), final head b633985a3d. Fixed: with --runs every benchmark got a GC row because run sizes counted as GC activity; tests did not catch a p-value over raw iterations, dropped GC run sizes or an even split (new asymmetric test, checked against scipy); Ractor refusal test asserts its message; body slowdowns as extra time (6.6%/11%/1.9%, were 1 − ratio). Kept: pooled ratio vs process-mean test; odd N balanced across the suite only; scalars (rss without samples, JIT stats) from process 1, as the commit message says; --pvalue alone now N/A, stated in the body"}
   - {reviewer: claude-code, head: "69767b3206", date: 2026-11-06, verdict: approve, open: "confirm pass on the delta from b633985a3d (signal-killed run: exitstatus nil made dig miss the failure; both sites use key?) and the body wording; new SIGKILL test fails on b633985a3d, passes on 69767b3206; full suite 360 runs green; fork CI 15/15 on 69767b3206 via draft PR #17 (run 42255909337), PR closed, branch kept"}
+  - {reviewer: sol, head: "b633985a3d", date: 2026-11-06, verdict: changes, open: "P2 signal-killed run (exitstatus nil) admitted partial results via bench_failures.dig; fixed in 69767b3206 with a SIGKILL CLI test. Body: 'can't resolve 2%' became 'did not detect this 2% difference'. 103 of 2,000 is per mode (49 + 54), as the details say"}
+  - {reviewer: sol, head: "69767b3206", date: 2026-11-06, verdict: approve, open: "confirm pass on the failure fix and body wording; none"}
+waived:
+  - {reviewer: thermos, head: "69767b3206", by: coordinator, reason: "Thermos ran as the independent claude-code pass on aed07e8d8f (fixes to b633985a3d); the delta to 69767b3206 is the 2-line failure-key fix plus its test, approved by claude-code and Sol on this head"}
 ---
 
 # Test significance across processes with --runs
