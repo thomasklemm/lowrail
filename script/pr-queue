@@ -23,7 +23,7 @@ module PrQueue
   AUTHOR = "thomasklemm"
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
   KINDS = %w[fix perf docs restore].freeze
-  REVIEWERS = %w[skeptic sol astra thermos].freeze
+  REVIEWERS = %w[skeptic claude-code sol astra thermos].freeze
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
@@ -77,8 +77,9 @@ module PrQueue
   end
 
   # Unknown diff size (nil) requires thermos, so an unchecked item never looks reviewed.
+  # The final review is a separate Claude Code orb's (DECISIONS 4b6ec99); orbs' own skeptic passes stay as records.
   def required(meta, lines)
-    list = %w[skeptic sol]
+    list = %w[claude-code sol]
     list << "astra" if meta["risky"]
     list << "thermos" if lines.nil? || lines > THERMOS_LINES
     list
