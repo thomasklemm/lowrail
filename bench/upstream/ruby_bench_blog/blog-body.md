@@ -6,7 +6,7 @@ What it finds and what it doesn't is below. Would a write workload like this be 
 
 ### What it finds, and what it doesn't
 
-It catches changes the other Rails benchmarks never run. A small busy loop injected into `save` and `destroy` adds 2.3% to blog's instructions per iteration, and that code doesn't run at all in railsbench's or lobsters' iterations. Its per-request split also shows where a Rails change lands: on Rails main, reads get 9–14% cheaper while creates stay flat. It adds nothing for per-query or database-driver changes, which move all three benchmarks alike, and its total alone says little, since about two thirds of it is reads much like railsbench's.
+It catches changes the other Rails benchmarks never run. A small busy loop injected into `save` and `destroy` adds 2.3% to blog's instructions per iteration, and that code doesn't run at all in railsbench's or lobsters' timed iterations. Its per-request split also shows where a Rails change lands: from Rails 8.1.4.1 to main, reads take 9–14% fewer instructions while creates stay flat. It overlaps with railsbench and lobsters on per-query and database-driver overhead, and in our A/B runs it didn't separate those changes better. Its total alone says little, since about two thirds of it is reads much like railsbench's. The measurements are in [this record](https://github.com/thomasklemm/lowrail/blob/bfe17841b1529509f60f09554b5468681517eaf0/docs/upstream/ruby-bench-blog-findings.md).
 
 ### Details
 
@@ -21,4 +21,4 @@ It catches changes the other Rails benchmarks never run. A small busy loop injec
 | blog | 1,537 | 920 | 995 |
 | lobsters | 1,127 | 662 | 750 |
 
-Allocations per iteration varied by less than 0.1% between iterations, with no growth. Times are Ruby master with `./run_benchmarks.rb --interleave` on one 4-vCPU VM, so they are rough.
+Allocations per iteration varied by less than 0.1% after two warmups, with no growth over 28 iterations. Times are Ruby master with `./run_benchmarks.rb --interleave` on one 4-vCPU VM, so they are rough.
