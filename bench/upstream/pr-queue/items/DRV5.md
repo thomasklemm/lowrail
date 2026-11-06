@@ -13,7 +13,7 @@ depends_on: []
 impact: "Fixes the intermittent Linux failure of IntegrationPendingTestCase#test_busy_timeout (Expected 0.99... >= 1.0), seen on main and on #769/#770 musl jobs; unblocks green CI for DRV1/DRV2."
 rank: 22
 risky: false
-state: reviewed
+state: superseded
 pr:
 note: "Test-only: in_a_forked_process now waits for its child. Cause: SQLite's busy handler counts sleeps and unixSleep's nanosleep(&sp, NULL) doesn't resume after EINTR; the unreaped discard-test child's SIGCHLD lands in a later busy wait. Evidence: shim-attributed failing run on the fork (job 127873273475, SIGCHLD from the test_close_does_not_discard_readonly_connections child); replay of main run 40111817141 (seed 28717, CI file order, e80ff06, Ruby 3.2.11) failed 5/5 before and passed 5/5 after (reviewer: 9/10 and 10/10). Tolerance unchanged; another handled signal could still shorten the wait, none found in the suite."
 passes:

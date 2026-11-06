@@ -13,7 +13,7 @@ depends_on: []
 impact: "Fixes the intermittent Windows failure of test_replacing_a_collation_releases_the_previous_comparator (Expected 1, Actual 2), seen on main and on #769; unblocks green CI for DRV1/DRV2."
 rank: 21
 risky: false
-state: reviewed
+state: superseded
 pr:
 note: "Test-only: registrations wrapped in Thread.new { ... }.join like the neighbouring tests, in this test (from #723) and its case-insensitive sibling (#764/70c3baf). Windows probe (fork branch probe/collation-flake): full suite 1/30 failures on main vs 0/30 fixed (Ruby 3.3); loop of the body 5/92,000 survivors on the test thread vs 0/92,000 on another thread. Both tests still fail with an append-only snapshot mutant. Open for a separate change: the ReleasableComparator comment ('used by one test only') is stale since #764 subclasses it."
 passes:

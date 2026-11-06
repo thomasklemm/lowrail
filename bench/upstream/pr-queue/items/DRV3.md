@@ -13,7 +13,7 @@ depends_on: []
 impact: "Fixes the sqlcipher (windows, mingw) job, red on main and on every PR since MSYS2 dropped mingw-w64-x86_64-sqlcipher (msys2/MINGW-packages#32999); unblocks green CI for DRV1/DRV2."
 rank: 20
 risky: false
-state: reviewed
+state: superseded
 pr:
 note: "One-line ci.yml change: the sqlcipher job's extra Windows entry uses ruby: ucrt (as the test job does) instead of ruby: mingw. sqlcipher (windows, ucrt) passed on the fork (run 42211717892, job 127872342777: mingw-w64-ucrt-x86_64-sqlcipher 4.19.0-1, :sqlcipher: true, 428 runs 0 failures). First failure on main is the 2026-11-04 schedule; the 2026-11-01 push still got 4.6.1 from the mirror."
 passes:
