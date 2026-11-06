@@ -585,7 +585,7 @@ Keep **805ab06262** as the fallback: exact 8.1 compatibility, scoped to the
 #58427 regression only. If matthewd prefers not to change explicit-node SQL in a
 regression fix, ship it and propose B separately as the precedence fix.
 
-### Reply to matthewd (final, not posted)
+### Reply to matthewd (final, posted 2026-11-06 as discussion_r4492126885)
 
 Replaces the revised draft. Checked claim by claim in the final review above.
 

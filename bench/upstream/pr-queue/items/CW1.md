@@ -16,7 +16,7 @@ rank:
 risky: false
 state: ready
 pr: 59642
-note: "Final Claude Code review 2026-11-06: nits fixed in 805ab06262 (dropped the CHANGELOG entry because #58427 is unreleased on main only; rewrapped and retitled the commit). Code and tests unchanged from 41b234e19c. Title/body below and the matthewd reply in docs/upstream/where-parens-history.md are ready; nothing posted on GitHub yet."
+note: "2026-11-06: reply to matthewd posted (discussion_r4492126885) offering option B (thomasklemm/where-group-bound-literals 10346a258e, explicit bound-node grouping fix since 7.1) with this exact-8.1 head as fallback; title/body updated to this head."
 passes: []
 ---
 
