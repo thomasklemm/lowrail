@@ -1189,7 +1189,7 @@ earlier versions can add `if defined?(ActionView::Helpers::NavigationHelper)`
 to that include.
 `````
 
-Draft reply to seanpdoyle (Thomas to approve): "The 8.1 `UrlHelper` docs said it may be included in any class with
+Reply to seanpdoyle (approved, posted as [r4497282455](https://github.com/rails/rails/pull/59675#discussion_r4497282455)): "The 8.1 `UrlHelper` docs said it may be included in any class with
 the routes' URL helpers, so some apps and gems do (Redmine's hook listeners, for example); I've trimmed the note to
 what changed and the one-line include, and dropped the `delegate_missing_to` part, which turned out to be specific to
 cells. Happy to add a sentence against including individual helper modules if you'd prefer that."
