@@ -1,0 +1,31 @@
+Test significance across processes with --runs
+
+--pvalue ran Welch's t-test over the measured iterations of one process
+per executable. Iterations of one process share its heap layout, GC
+timing, hash seed and JIT decisions, so they are not independent
+samples: the test sees only the noise inside a process, while two
+processes of the same Ruby differ by more than that. On an A/A run of
+ten identical processes per benchmark (YJIT and the interpreter,
+railsbench, lobsters, fib, respond_to, str_concat), 214 of 450 pairs of
+identical builds were marked significant at p < 0.05, where 5% is
+expected.
+
+--runs N now runs each benchmark in N processes per executable,
+interleaved, alternating the executable order every round, and the
+t-test compares the N per-process means. On the same processes, 5
+against 5 gave 103 significant results out of 2,000 random groupings
+(5%). End to end, four identical Rubies with --runs 5 gave 2 of 30
+significant comparisons, while the single-process test called 566 of
+the 950 pairs among those same 100 processes significant.
+
+The default stays at one process, so runs that don't ask for p-values
+take no longer. With one process the p-value is N/A and --pvalue warns,
+rather than showing stars it can't support. The timing columns report
+all measured iterations of the N processes, so their stddev includes
+the variation between processes, and the 1st itr ratio averages the
+first iteration of each process. The JSON keeps the concatenated
+series and records the iterations of each process in
+warmup_itrs_per_run and bench_itrs_per_run; other values, such as JIT
+stats, come from the first process. --runs refuses the Ractor harness
+for now, because its per-Ractor-count results are not merged across
+processes.

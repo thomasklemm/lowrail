@@ -1,0 +1,23 @@
+A: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+B: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+C: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+D: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby-bench: ad63bf8cac618032adefdd1c5219636a52b47e5e-dirty
+
+----------  -------------  -------------  -------------  -------------  ---------  ---------  ---------  -----  -------  ---  ---------  -------  --------  -----  -------  ---
+bench              A (ms)         B (ms)         C (ms)         D (ms)  B 1st itr  C 1st itr  D 1st itr    A/B  p-value  sig        A/C  p-value       sig    A/D  p-value  sig
+lobsters     789.6 ± 9.1%   789.4 ± 6.4%   767.4 ± 5.3%   746.8 ± 6.1%      1.136      1.089      1.150  1.000    0.995           1.029    0.494            1.057    0.209
+railsbench  1683.1 ± 3.3%  1674.1 ± 7.1%  1670.7 ± 4.5%  1685.0 ± 4.3%      1.174      1.105      1.197  1.005    0.799           1.007    0.652            0.999    0.938
+fib          32.2 ± 11.9%   31.9 ± 11.2%   31.5 ± 11.5%   31.8 ± 13.6%      1.037      1.061      1.066  1.009    0.680       1.021 (*)    0.018  p < 0.05  1.011    0.619
+respond_to    8.3 ± 17.3%    8.3 ± 16.8%    8.3 ± 18.4%    8.4 ± 19.1%      0.979      1.008      1.011  1.002    0.878           0.998    0.926            0.986    0.452
+str_concat    25.8 ± 9.7%   26.1 ± 10.9%    25.8 ± 7.6%   27.3 ± 15.3%      0.984      1.075      1.072  0.987    0.331           0.997    0.835            0.944    0.056
+----------  -------------  -------------  -------------  -------------  ---------  ---------  ---------  -----  -------  ---  ---------  -------  --------  -----  -------  ---
+
+Legend:
+- B 1st itr: ratio of A/B time for the first iteration.
+- A/B: ratio of A/B time. Higher is better for B. Above 1 represents a speedup.
+- C 1st itr: ratio of A/C time for the first iteration.
+- A/C: ratio of A/C time. Higher is better for C. Above 1 represents a speedup.
+- D 1st itr: ratio of A/D time for the first iteration.
+- A/D: ratio of A/D time. Higher is better for D. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test over the per-process means of --runs; N/A with a single process)

@@ -1,0 +1,41 @@
+yjit01: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit02: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit03: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit04: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit05: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit06: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit07: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit08: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit09: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+yjit10: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby-bench: ad63bf8cac618032adefdd1c5219636a52b47e5e
+
+----------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  --------  -------------  -------  ---------  -------------  -------  ---------
+bench         yjit01 (ms)    yjit02 (ms)    yjit03 (ms)    yjit04 (ms)    yjit05 (ms)    yjit06 (ms)    yjit07 (ms)    yjit08 (ms)    yjit09 (ms)    yjit10 (ms)  yjit02 1st itr  yjit03 1st itr  yjit04 1st itr  yjit05 1st itr  yjit06 1st itr  yjit07 1st itr  yjit08 1st itr  yjit09 1st itr  yjit10 1st itr  yjit01/yjit02  p-value        sig  yjit01/yjit03  p-value        sig  yjit01/yjit04  p-value        sig  yjit01/yjit05  p-value        sig  yjit01/yjit06  p-value        sig  yjit01/yjit07  p-value        sig  yjit01/yjit08  p-value       sig  yjit01/yjit09  p-value        sig  yjit01/yjit10  p-value        sig
+lobsters     741.1 ± 6.3%   711.0 ± 4.7%   737.1 ± 4.7%   793.5 ± 5.9%   742.2 ± 3.4%   716.7 ± 4.2%   784.5 ± 6.5%  867.1 ± 19.1%  824.2 ± 10.8%   771.9 ± 2.5%           1.072           1.062           1.057           0.958           1.010           1.003           1.038           0.960           0.983          1.042    0.136                     1.005    0.839                 0.934 (*)    0.029   p < 0.05          0.998    0.951                     1.034    0.208                     0.945    0.077                     0.855    0.052                0.899 (*)    0.027   p < 0.05          0.960    0.095
+railsbench  1712.5 ± 3.6%  1606.3 ± 1.4%  1606.7 ± 3.2%  1669.9 ± 4.0%  1675.3 ± 2.2%  1586.1 ± 1.4%  1663.2 ± 4.8%  1749.7 ± 5.0%  1646.9 ± 4.2%  1664.8 ± 3.4%           0.920           0.945           0.954           0.951           0.875           0.980           0.982           0.884           0.981    1.066 (***)  4.5e-04  p < 0.001    1.066 (***)  9.8e-04  p < 0.001          1.025    0.176                     1.022    0.141               1.080 (***)  1.0e-04  p < 0.001          1.030    0.158                     0.979    0.308                1.040 (*)    0.047   p < 0.05          1.029    0.103
+fib           30.6 ± 5.0%    31.0 ± 9.7%   31.3 ± 28.4%    30.4 ± 4.3%   31.8 ± 12.0%   31.2 ± 20.8%    30.5 ± 5.3%    30.5 ± 5.3%   31.9 ± 26.2%    30.4 ± 3.2%           0.931           0.935           1.017           0.995           0.922           1.013           1.016           1.021           1.015      0.985 (*)    0.019   p < 0.05          0.978    0.182                     1.006    0.125               0.960 (***)  1.8e-07  p < 0.001          0.979    0.092                     1.004    0.368                     1.004    0.333               0.959 (**)    0.009   p < 0.01          1.006    0.062
+respond_to    8.4 ± 19.6%    8.5 ± 21.8%    8.2 ± 17.0%    8.4 ± 18.2%    8.3 ± 16.2%    8.4 ± 16.8%    8.2 ± 17.6%    8.2 ± 21.3%    8.2 ± 15.9%    8.1 ± 15.8%           0.993           1.000           1.017           1.007           0.993           1.012           0.995           0.989           1.007          0.988    0.172                 1.018 (*)    0.020   p < 0.05          1.001    0.861                     1.005    0.496                     0.997    0.712                 1.017 (*)    0.033   p < 0.05          1.016    0.059              1.025 (***)  8.5e-04  p < 0.001    1.027 (***)  2.9e-04  p < 0.001
+str_concat    26.3 ± 8.7%    25.7 ± 8.9%    25.5 ± 6.8%    25.1 ± 5.6%    25.9 ± 7.4%    25.5 ± 4.6%    25.3 ± 6.2%    26.8 ± 8.9%    25.8 ± 5.8%    25.9 ± 7.8%           1.330           1.314           1.480           1.456           1.461           1.356           1.471           1.345           1.397    1.024 (***)  3.0e-04  p < 0.001    1.031 (***)  1.8e-07  p < 0.001    1.051 (***)  1.7e-18  p < 0.001     1.016 (**)    0.007   p < 0.01    1.033 (***)  5.7e-10  p < 0.001    1.040 (***)  7.0e-12  p < 0.001     0.981 (**)    0.004  p < 0.01    1.019 (***)  4.8e-04  p < 0.001     1.019 (**)    0.002   p < 0.01
+----------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  --------------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  ---------  -------------  -------  --------  -------------  -------  ---------  -------------  -------  ---------
+
+Legend:
+- yjit02 1st itr: ratio of yjit01/yjit02 time for the first iteration.
+- yjit01/yjit02: ratio of yjit01/yjit02 time. Higher is better for yjit02. Above 1 represents a speedup.
+- yjit03 1st itr: ratio of yjit01/yjit03 time for the first iteration.
+- yjit01/yjit03: ratio of yjit01/yjit03 time. Higher is better for yjit03. Above 1 represents a speedup.
+- yjit04 1st itr: ratio of yjit01/yjit04 time for the first iteration.
+- yjit01/yjit04: ratio of yjit01/yjit04 time. Higher is better for yjit04. Above 1 represents a speedup.
+- yjit05 1st itr: ratio of yjit01/yjit05 time for the first iteration.
+- yjit01/yjit05: ratio of yjit01/yjit05 time. Higher is better for yjit05. Above 1 represents a speedup.
+- yjit06 1st itr: ratio of yjit01/yjit06 time for the first iteration.
+- yjit01/yjit06: ratio of yjit01/yjit06 time. Higher is better for yjit06. Above 1 represents a speedup.
+- yjit07 1st itr: ratio of yjit01/yjit07 time for the first iteration.
+- yjit01/yjit07: ratio of yjit01/yjit07 time. Higher is better for yjit07. Above 1 represents a speedup.
+- yjit08 1st itr: ratio of yjit01/yjit08 time for the first iteration.
+- yjit01/yjit08: ratio of yjit01/yjit08 time. Higher is better for yjit08. Above 1 represents a speedup.
+- yjit09 1st itr: ratio of yjit01/yjit09 time for the first iteration.
+- yjit01/yjit09: ratio of yjit01/yjit09 time. Higher is better for yjit09. Above 1 represents a speedup.
+- yjit10 1st itr: ratio of yjit01/yjit10 time for the first iteration.
+- yjit01/yjit10: ratio of yjit01/yjit10 time. Higher is better for yjit10. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)

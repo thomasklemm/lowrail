@@ -100,6 +100,8 @@ a bug report about a wrong statistical claim, not a data comment; it would offer
 place where the etiquette's "PR is the claim" rule points to an issue instead. Not opened: Thomas decided on
 2026-11-03 to stay with small, well-reviewed PRs, so this stays here as evidence.
 
+**2026-11-06:** prepared as a PR, not opened: [Round 5](#round-5-significance-across-processes-2026-11-06).
+
 ## 2. lobsters and shipit keep their Rails cache on disk in `tmp/cache`
 
 **What happens.** lobsters sets `config.cache_store = :file_store, "#{config.root}/tmp/cache/"`
@@ -847,3 +849,71 @@ gate. Pass records: [RB571](../../bench/upstream/pr-queue/items/RB571.md),
 **Receipts** in [`bench/upstream/ruby_bench_round4/`](../../bench/upstream/ruby_bench_round4/): `audit.rb`,
 `cg_harness.rb`, `seed.rb`, `freeze.rb`, `fixrand/`, `dst_probe.rb`, `raw_dump.rb`/`raw_cmp.rb` (response
 comparison), `route_dump.rb`/`route_table.rb` (per-request counts), and the two bodies.
+
+# Round 5: significance across processes (2026-11-06)
+
+**Question (Thomas).** Fix [rank 1](#1-significance-stars-treat-iterations-of-one-process-as-independent-samples) as a small PR:
+`--pvalue` and its stars test the iterations of one process per Ruby, so identical builds get `*`–`***`.
+
+**Upstream state, rechecked.** #479 (eightbitraptor) added Welch's t-test; in its discussion k0kubun asked to keep the
+table narrow, and jhawthorn called significance "one of the most important numbers"; #492 gated the stars behind
+`--pvalue`. No issue or PR raises per-process variance or repeated processes. Open PRs don't overlap: #562 (XrXr,
+GC time in zjit_diff), #354 and #533 (rwstauner, machine tuning), #541 (eightbitraptor, GC tables), #573
+(tekknolagi, side exits). Nothing since #479 changes how runs or stats work. No rejection, nobody working on it.
+
+## A/A on main `ad63bf8`
+
+Ruby 4.0.9 (YJIT and interpreter; this orb has no ZJIT build), 4-vCPU VM, `--no-sudo --interleave --pvalue`, ten
+identical executables per invocation, default iterations. "All pairs": main's single-process test on every pair of
+processes. "--runs 5": Welch over per-process means, 200 random 5-against-5 splits of the same ten processes
+(correlated resamples).
+
+| bench | process-mean CV | median in-process stddev | main: all pairs starred | per-process means, 5 v 5 |
+|---|---:|---:|---:|---:|
+| fib interp / yjit | 2.80% / 1.88% | 2.2% / 9.7% | 60% / 44% | 7% / 5% |
+| lobsters interp / yjit | 4.87% / 6.45% | 4.3% / 5.9% | 47% / 49% | 4% / 2% |
+| railsbench interp / yjit | 3.52% / 3.02% | 4.8% / 3.6% | 18% / 51% | 2% / 8% |
+| respond_to interp / yjit | 2.21% / 1.28% | 5.1% / 17.6% | 36% / 47% | 5% / 9% |
+| str_concat interp / yjit | 1.53% / 1.96% | 6.6% / 7.4% | 49% / 76% | 4% / 1% |
+| all | | | 214 / 450 (48%) | 92–103 / 2,000 (≈5%) |
+
+## The fix
+
+[`thomasklemm/pvalue-across-processes`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/pvalue-across-processes),
+head `aed07e8d8f` on main `ad63bf8`, one commit (+255/−25, of which tests +136). `--runs N` runs each benchmark in N
+processes per Ruby through the existing `--interleave` loop, flipping the Ruby order every round;
+`BenchmarkRunner.merge_runs` concatenates the per-iteration series and records `warmup_itrs_per_run` and
+`bench_itrs_per_run`; the table splits them back and runs the existing `Stats.welch_p_value` on the N process
+means (timing and GC ratio columns). With one process the p-value is N/A and `--pvalue` warns. 1st itr averages
+each process's first iteration. `--runs` refuses the Ractor harness (its per-count Hashes aren't merged).
+
+**Why this shape.** Process means are the independent unit; Welch on them reuses the existing stats code and needs
+no dependency. A nested model would add little at N = 3–10 and more code. The Roundhouse paired protocol (median
+pairwise ratio, Tukey trimming, bootstrap interval, tolerance verdict) is sounder for gating but is a new statistic
+and a new output, far beyond a fix to an existing column; the interleaved, order-flipped rounds are the part of it
+that fits and are kept. **Default unchanged** (one process): `--runs N` costs N× wall time, and rubybench and
+`tool/zjit_diff.rb` would get slower without asking. Instead the single-process stars go away, because 48–60%
+false positives on identical builds are not a usable signal; zjit_diff users get N/A plus a warning until they pass
+`--bench-args --runs=N`.
+
+**After, end to end on the branch.** Four identical YJIT Rubies, `--runs 5`, five benchmarks: 2 of 30 comparisons at
+p < 0.05 (fib A–C 0.018, lobsters B–D 0.026); main's test on the same 100 processes: 566 of 950 pairs (60%).
+
+**Real differences (A/B, `--runs 5`, against YJIT).** Interpreter `***` on railsbench (p 7e-9), fib, str_concat. A
+preloaded spin loop ([`slow.rb`](../../bench/upstream/ruby_bench_pvalue/slow.rb), nominal 2% and 5%) measured
+fib 1.8% / 6.2% (p 0.12 / 4e-5 `***`), str_concat 6.8% / 10.3% (`*` / `**`), railsbench 1.6% / 1.8% (p 0.44 /
+0.31, not detected: railsbench processes vary ~3% here).
+
+**Wall time.** Linear in N: the branch A/A ran 100 processes in 2,156 s, against ~430 s for one process each; the
+A/B (3 benchmarks × 4 Rubies × 5) took 1,531 s.
+
+**Review.** Claude Code skeptic subagent, three passes: `b1da15b` changes (body overstated the railsbench slowdown;
+new behaviour untested; 1st itr from the first process only; Ractor reason), `cca922aa81` nits, `aed07e8d8f`
+approve. Kept: the displayed ratio is the pooled mean while the test uses unweighted process means (≤0.1% here);
+odd N lets one Ruby go first once more per benchmark. Fork CI: `test.yml` runs only on `main` and PRs, so the same
+tree was pushed with a one-line trigger as `ci/pvalue-across-processes` (`5e7f158`). Item:
+[RB-PV](../../bench/upstream/pr-queue/items/RB-PV.md), state reviewed, not opened.
+
+**Receipts** in [`bench/upstream/ruby_bench_pvalue/`](../../bench/upstream/ruby_bench_pvalue/): `collect.sh`
+(main A/A), `collect2.sh` (branch A/B and A/A), `analyze.rb` (`RUBY_BENCH=<checkout> ruby analyze.rb 5 <(zcat
+data/aa_yjit_rep1.json.gz)`), `slow.rb`, `data/` (JSON gzipped, tables), `commit-message.txt`, `pr-body.md`.
