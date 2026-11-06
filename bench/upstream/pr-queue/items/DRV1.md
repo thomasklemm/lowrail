@@ -24,6 +24,8 @@ passes:
   - {reviewer: sol, head: "c55ce350e32f4cf05ff7f7680120d011e84eba59", date: 2026-11-06, verdict: nits, open: "No code or body fixes; asked that new tests pass on main and HEAD, which the skeptic already ran."}
   - {reviewer: astra, head: "c55ce350e32f4cf05ff7f7680120d011e84eba59", date: 2026-11-06, verdict: approve, open: "No source/body fixes."}
   - {reviewer: claude-code, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Reviewed 16c9550b68; message-only fix applied. Bind matrix (33 kinds of string incl. broken/frozen/shared/subclass UTF-8, US-ASCII, Latin-1, SJIS, UTF-16/32, UTF8-MAC, CESU-8, binary, Blob; with and without default_internal ISO-8859-1; positional and named) identical to main on Ruby 3.2.11/3.3.13/3.4.12/4.0.9 (system SQLite 3.40.1): bytes, types, errors, caller string unchanged. New tests pass on main and kill 4 mutants (&& !USASCII_P, scrub, raise on broken, blob for broken). Suite 430/880 green on 4.0.9. Exact-head CI 133 pass, 2 fail: sqlcipher mingw (target not found) and Windows 3.3 collation, both failing on upstream main schedule run 41797589777; earlier busy_timeout flake fails on main in 5+ runs. Nothing open."}
+  - {reviewer: sol, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
+  - {reviewer: astra, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
 ---
 
 # Avoid a redundant String when binding UTF-8 text
