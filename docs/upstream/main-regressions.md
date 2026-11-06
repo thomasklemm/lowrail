@@ -139,6 +139,35 @@ don't comment on others' PRs without Thomas's approval.
 
 R1 can open on its own if #59141 closes, or once it merges, if its `keys` still recomputes after a save.
 
+## W1: create paths don't share main's gain (candidate, 2026-11-06, no fix)
+
+**Finding.** In ruby-bench's `blog` benchmark (Rails 8.1.4.1 vs main `cadf0fc8d6`, Ruby 4.0.9 interpreter, Callgrind
+per request, process A/A within 0.1%), main makes reads 9–14% cheaper, but create paths stay flat: POST comment
+12.25M → 12.06M Ir (−1.6%), POST article +0.5%, PATCH −0.3%. The SQL each request runs is identical. A POST comment
+makes 12,151 → 12,727 Ruby calls; Active Record, Active Model and Arel go from 6,301 to 7,006 (+705, +11%), and
+the savings elsewhere (Action Pack, Action View) offset them.
+
+| Calls per POST comment that are new or grew on main | + per request | Cause, verdict so far |
+| --- | ---: | --- |
+| `ModelSchema#schema_context`, `SchemaContext#schema_loaded?` | +94 each | ae739c3854 (2026-07-29) schema context; not yet judged |
+| `LazyAttributeSet#fetch_value!`, `Attribute#value!` | +71, +58 | a19ef01cb3 family; overlaps **R1** above |
+| `ConnectionPool.used_pools!`, `UsedPoolSet#add`, `#query_cache_for` | +37, +37, +32 | f58211f6f1 (2026-10-09) lazy query cache per unit of work; not yet judged |
+| `LeaseRegistry#lease`, `ConnectionPool#discarded?` | +31, +28 | connection-lease work; not yet judged |
+| `QueryIntent#processed_sql`, `#compile_arel!`, `#type_casted_binds` | +37, +29, +29 | QueryIntent; intended (table above) |
+| `ActiveSupport::Ractors.main?` / `Ractor.main?` | +45 each | Ractor safety; intended, and rejected **D** in perf-round-main.md shows the check order is constrained |
+
+**Reach.** Every Active Record write on main: a create with savepoints, callbacks and after-commit work. The cost
+is per call, so it scales with saves per request (blog: 305 `save`/`destroy` calls per iteration, 32% of its Ir in writes). railsbench
+and lobsters can't see it: their timed iterations never save.
+
+**Next.** Bisect POST comment between 8.1.4.1 and `cadf0fc8d6` with per-request Callgrind, as for `update` above, and
+judge each unjudged row (accidental step or intended feature cost). No fix built.
+
+**Evidence.** [ruby-bench-blog-findings.md §1](ruby-bench-blog-findings.md#1-rails-8141-vs-rails-main-cadf0fc8d6),
+[call diff](../../bench/upstream/ruby_bench_blog/experiments/calls-post-comment-r81-vs-main.txt),
+[per-request Ir](../../bench/upstream/ruby_bench_blog/experiments/per-request-r81.txt) and
+[main](../../bench/upstream/ruby_bench_blog/experiments/per-request-main.txt).
+
 ## Rejected
 
 - x3, `map` returning a plain `AttributeSet`: it undoes a19ef01cb3's purpose.

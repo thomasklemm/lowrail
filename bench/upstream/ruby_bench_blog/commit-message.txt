@@ -22,7 +22,10 @@ with 422). Writes submit the CSRF token from the page's form, as a
 browser does, and every response's status is checked, along with a
 body marker or the redirect target. The iteration runs in one
 transaction per database that is rolled back at the end, as in Rails
-tests, so every iteration sees the same rows and IDs. Time.now starts
+tests, so every iteration sees the same rows and IDs. Rails 8.1 opens
+that transaction in pin_connection!; Rails main no longer does
+(rails/rails 9e8fe3955b), so benchmark.rb opens it itself when none is
+open, and works on both. Time.now starts
 at a fixed date and advances one second per visit, so the work doesn't
 depend on the date and updates still write updated_at. Bootsnap is
 disabled, so Ruby builds that share a RUBY_DESCRIPTION don't load each
@@ -34,3 +37,4 @@ tests. Solid Cable inserts each broadcast in the request rather than
 on its batching writer thread, so it lands in the transaction; the
 later broadcasts are enqueued into Solid Queue. Since nothing commits,
 a real COMMIT is not measured.
+

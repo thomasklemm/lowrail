@@ -16,7 +16,7 @@ ZJIT speed blog's writes up as much as its reads.
 `v-exp`, `2950871`), which the numbers below all come from:
 - blog opens and rolls back its own transaction when `pin_connection!` doesn't. Rails main removed the transaction
   from `pin_connection!` in 9e8fe3955b ("Introduce Ractor connection handler, pool, and proxy", 2026-07-10); without
-  this, blog's writes accumulate on Rails main. **The benchmark at 65151273f6 doesn't roll back on Rails 8.2**;
+  this, blog's writes accumulate on Rails main. **The benchmark at 65151273f6 doesn't roll back on Rails 8.2** (fixed in a233212fad, verified on both);
   this must be fixed before or soon after it goes upstream.
 - lobsters' route generator logs in without a rendered CSRF token and sends `Sec-Fetch-Site: same-origin` (8.2
   defaults to header-only CSRF).
@@ -57,7 +57,7 @@ other −313. The new calls are main's query-intent and connection-lease machine
 `LeaseRegistry#lease` (+31), `schema_loaded?`/`schema_context` (+94 each), lazy attribute sets
 (`LazyAttributeSet#fetch_value!` +71, `Attribute#value!` +58) and `Ractor.main?` (+45). On reads the routing,
 rendering and CSRF-token savings outweigh them; on the create paths they cancel the savings. railsbench and
-lobsters cannot show this: their totals move by the read gains only.
+lobsters cannot show this: their totals move by the read gains only. Ledger: [main-regressions.md W1](main-regressions.md#w1-create-paths-dont-share-mains-gain-candidate-2026-11-06-no-fix).
 
 Wall time agrees (`run_benchmarks.rb`, default harness, 3 alternated process pairs, 4.0.9 interpreter, fixed heap):
 
