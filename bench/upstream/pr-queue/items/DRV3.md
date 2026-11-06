@@ -19,6 +19,7 @@ note: "One-line ci.yml change: the sqlcipher job's extra Windows entry uses ruby
 passes:
   - {reviewer: claude-code, head: "f73b295adaabc5c275ac6cc8247aeb020c3ed00c", date: 2026-11-06, verdict: nits, open: "Body date wrong (job passed on 2026-11-01); 'current Ruby head' overstated; both applied."}
   - {reviewer: claude-code, head: "3966a52d0fd6ce1130f190b1d18dfcbab2eb1fa8", date: 2026-11-06, verdict: approve, open: "Separate Claude Code subagent review of head and body; tree identical to f73b295, message and body fixes confirmed, no trailers."}
+  - {reviewer: sol, head: "3966a52d0fd6ce1130f190b1d18dfcbab2eb1fa8", date: 2026-11-06, verdict: approve, open: "No findings."}
 ---
 
 # ci: test sqlcipher on the ucrt Ruby head instead of mingw

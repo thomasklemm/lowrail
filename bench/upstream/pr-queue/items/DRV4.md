@@ -19,6 +19,7 @@ note: "Test-only: registrations wrapped in Thread.new { ... }.join like the neig
 passes:
   - {reviewer: claude-code, head: "68817f09a31a85c21bfe6ca5e44d11a1793fde8b", date: 2026-11-06, verdict: nits, open: "Commit message claimed a later GC always frees it (probe data mixed); body wording; both applied."}
   - {reviewer: claude-code, head: "bfdb86344843c59eb041823fdff3e8c39c33ced8", date: 2026-11-06, verdict: approve, open: "Separate Claude Code subagent review of head and body; tree identical to 68817f09a3, mutant, rubocop and links confirmed, no trailers."}
+  - {reviewer: sol, head: "bfdb86344843c59eb041823fdff3e8c39c33ced8", date: 2026-11-06, verdict: approve, open: "No findings."}
 ---
 
 # test: register the released comparators on another thread
