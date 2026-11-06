@@ -940,9 +940,9 @@ current `rails new` app. What it found:
   sent an HTML `Accept`.
 
 **The benchmark.** Branch [`thomasklemm/blog-benchmark`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/blog-benchmark),
-head `950a2bc27d`, one commit on ruby-bench main `ad63bf8`. The app is Sam Ruby's
+head `65151273f6` (after the claude-code pass; `950a2bc27d` before), one commit on ruby-bench main `ad63bf8`. The app is Sam Ruby's
 [create-blog](https://github.com/roundhouse-rb/roundhouse/blob/aa60799f53b36084c6311ffcda8f14e746eebf79/scripts/create-blog)
-(MIT, license kept), generated once with `RAILS_NEW_VERSION=8.1.4.1`. Changes to the generated tree, all listed in
+(MIT or Apache-2.0, used under MIT, license kept), generated once with `RAILS_NEW_VERSION=8.1.4.1`. Changes to the generated tree, all listed in
 its README: credentials, `.github`, `.ruby-version` and `image_processing` removed (libvips loaded at boot on hosts that
 have it, 5 `VIPS-WARNING` lines on Windows CI), `config.yjit = false`, built `tailwind.css` checked in (no Tailwind
 binary needed, so Windows works), lockfile platforms `ruby` and `x86_64-linux`.
@@ -990,8 +990,10 @@ Turbo stream rendering, Solid Cable and Solid Queue inserts, flash and redirects
 importmap, `allow_browser`). Their reads overlap; a maintainer could see blog's GETs as railsbench-like.
 
 **What it leaves out.** No real COMMIT/WAL write; no job runs (the queue only fills); Solid Cache is unused by the
-app; generator leftovers (kamal, dev and test gems) are kept as generated, which costs about 70 s of gem builds per
-CI job.
+app; generator leftovers (kamal, thruster, dev and test gems) are kept as generated. Fresh `bundle install` on Ruby
+4.0.9 (4 vCPU): 34.3 s as generated, 28.6 s without them (38 fewer gems, 4 fewer small C extensions:
+`bcrypt_pbkdf`, `ed25519`, `bindex`, `debug`). The earlier "about 70 s" was Ruby head compiling `sqlite3` (85 s) and
+`nokogiri` (70 s), which production needs; trimming would not remove it.
 
 **Reviews.** Skeptic pass 1 on `7277a4bced`: changes (commit message said lobsters never writes, gave a reason for
 skipping POSTs it doesn't give, and said lobsters has a fixed clock on main; `image_processing` host-dependence; dead
@@ -1000,4 +1002,14 @@ than fsync, lobsters' own A/A next to the table, savepoint wording), applied; it
 against the result files. Not applied: "in the timed iteration" in the commit message (lobsters' login POST runs at
 setup). The evidence runs used the tree before `image_processing` was dropped; the timed work is unchanged, boot RSS
 fell from 157 to 127 MiB. Queue item: [RBW1](../../bench/upstream/pr-queue/items/RBW1.md).
+Claude Code pass on `950a2bc27d` (thermos: correctness and maintainability subagents plus own probes): two
+should-fixes confirmed and fixed in `65151273f6`. The fixed clock made 13 of 14 article UPDATEs skip `updated_at`
+(same timestamp); it now advances one second per visit (14/14 write it, allocations +0.1%). Bootsnap's iseq cache in
+`tmp/` is keyed on `RUBY_DESCRIPTION`, so two builds of one revision would share bytecode; `benchmark.rb` sets
+`DISABLE_BOOTSNAP` (railsbench also has bootsnap off). Commit message now says "in their timed iterations"; README
+notes the dual license, the clock, bootsnap and non-precompiled assets (Propshaft resolver, about 0.7% of
+allocations). Body: the A/A clause ("within 1%" for blog, record 1.28%) and the Callgrind and four-date sentence are
+cut, the clock sentence updated. Rechecked on `65151273f6`, Ruby 4.0.9: 15 iterations restore every table in all four
+databases, the four files are byte-identical after the run, allocations 1.063M per iteration within 0.05%. The
+table's times are from `950a2bc27d`. Skeptic and Sol have not run on `65151273f6`.
 Body: [blog-body.md](../../bench/upstream/ruby_bench_blog/blog-body.md).
