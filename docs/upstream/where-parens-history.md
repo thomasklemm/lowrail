@@ -23,13 +23,16 @@ when it constructs a bound literal. Pass original fallback text to `sanitize_sql
 This restores the old SQL and node representation without parsing SQL, changing
 explicit Arel nodes, or undoing the bind-parameter change for full statements.
 
-Fork head: [`7819d582f4a9f90297a428cd7162509a0ed9acf5`](https://github.com/thomasklemm/rails/commit/7819d582f4a9f90297a428cd7162509a0ed9acf5),
+Fork head: [`41b234e19c7c2690b70098e054d21b39896fba82`](https://github.com/thomasklemm/rails/commit/41b234e19c7c2690b70098e054d21b39896fba82),
 force-pushed with an explicit lease on the previous head
-`0bf8c93b00e15fe03b60ed6cc6e9b1cd5e070f94` (which had replaced
-`58a6ff8355ff6b905c6aeae2ea939466f464b4fa`). Author and committer are both
+`7819d582f4a9f90297a428cd7162509a0ed9acf5`; this follow-up only strengthens a
+test fixture and adds the commit-message body. Earlier candidates were
+`0bf8c93b00e15fe03b60ed6cc6e9b1cd5e070f94` and
+`58a6ff8355ff6b905c6aeae2ea939466f464b4fa`. Author and committer are both
 Thomas Klemm <github@tklemm.eu>; no trailers. The PR's title/body were not edited.
-The existing body describes the earlier empty-only patch, so it now needs a
-maintainer-reviewed wording update; a suggested reply is below.
+The existing body describes the earlier empty-only patch; a replacement body is
+prepared in the [CW1 queue item](../../bench/upstream/pr-queue/items/CW1.md), not
+posted. The reply draft below is unchanged.
 
 ## Archaeology and sources
 
@@ -280,6 +283,31 @@ The pushed head is not merged. [Final-head Buildkite build 136274](https://build
 was still running when this section was prepared. An automatic exact-head CI subscription was created for the fork;
 the Amp GitHub App cannot subscribe to `rails/rails`, so upstream checks are read
 with the authenticated GitHub CLI. No workflow was manually triggered.
+
+### Follow-up review nits
+
+Sol and Astra's nits on `7819d582f4` were applied in
+`41b234e19c7c2690b70098e054d21b39896fba82`, with no production-code change.
+The sanitized-condition test's OR alternative is now `sink_id = 4`, not
+`sink_id = 1`: fixtures have sink IDs 2–5, so the former exposes a missing
+grouping. An executed negative control returned `[2, 4]` without grouping and
+`[2]` with the corrected condition. The commit body now explains #58427's
+fallback regression and preservation of full-statement binds.
+
+On SQLite with `RAILS_STRICT_WARNINGS=1` and seed 1729:
+
+* The two regression tests: **2 runs, 18 assertions, no failures/errors/skips**.
+* `relation/where_test.rb`: **75 runs, 146 assertions, no failures/errors, 1 skip**.
+* The entire relation directory: **617 runs, 1,522 assertions, no failures/errors,
+  4 skips**.
+* The same updated tests using the pinned main production sources: **2 runs,
+  1 assertion, 1 failure, 1 error**; the SQL-shape assertion detects doubled
+  parentheses and the chained empty condition raises a SQLite syntax error.
+
+The earlier differential and independent reviews above cover `7819d582f4`, not
+this new test/message-only head. Its production sources are unchanged. The new
+two-paragraph PR body, with the original footer and Chatwoot permalinks, is only
+in the CW1 queue item; no GitHub body edit or comment was made.
 
 ## Draft reply to matthewd (not posted)
 
