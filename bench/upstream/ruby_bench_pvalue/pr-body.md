@@ -8,7 +8,7 @@
 
 This adds `--runs N`: each benchmark runs in N processes per Ruby, interleaved, with the order of the Rubies flipped every round, and the t-test compares the N per-process means. With one process, still the default, the p-value is N/A and `--pvalue` prints a warning, rather than showing stars it can't support. The default stays at one process because `--runs N` takes N times as long. The timing columns report all measured iterations of the N processes, the 1st itr ratio averages each process's first iteration, and the JSON records each process's iteration counts in `warmup_itrs_per_run` and `bench_itrs_per_run`.
 
-The test still finds differences that are larger than the variation between processes. With `--runs 5` against YJIT, the interpreter got `***` on railsbench, fib and str_concat. An added spin loop made fib 6.6% slower (`***`, p = 4e-5) and str_concat 11% slower (`**`), but railsbench only 1.9%, where it was not detected (p = 0.31): railsbench processes vary by about 3% on the 4-vCPU VM used here, so five runs can't resolve 2%.
+The test still finds differences that are larger than the variation between processes. With `--runs 5` against YJIT, the interpreter got `***` on railsbench, fib and str_concat. An added spin loop made fib 6.6% slower (`***`, p = 4e-5) and str_concat 11% slower (`**`), but railsbench only 1.9%, where it was not detected (p = 0.31): railsbench processes vary by about 3% on the 4-vCPU VM used here, so five runs did not detect this 2% difference.
 
 <details><summary>How this was measured</summary>
 
