@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/tmp/vc/rails-main/activesupport"
+gem "activemodel", path: "/tmp/vc/rails-main/activemodel"
+gem "activerecord", path: "/tmp/vc/rails-main/activerecord"
+gem "sqlite3"
+gem "ancestry", "5.1.0"

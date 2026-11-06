@@ -1802,6 +1802,12 @@ necessary in general"; the test now also asserts the writer stays private. Re-re
 [body](../../bench/upstream/app_suites/op3-body.md), repro
 [validation_context_writer.rb](../../bench/upstream/app_suites/validation_context_writer.rb).
 
+**OP3 update (2026-11-06): recommend closing.** After seanpdoyle asked for a public API instead, the callers were
+probed: ancestry's context lines are dead (context nil on every path, suite green without them; kbrock on #766: "probably
+not necessary anymore") and no OpenProject contract reads its own context. Both work on main once they drop the lines;
+a bare public writer would also skip strict loading and autosave every loaded child. Record:
+[validation-context](validation-context.md).
+
 **OP8 (a), fix built: a new record's untouched serialized default is dirty and saved as NULL.** 1d2c3f61b8 (#59083,
 "Wire ReadOnlyAttributeSet into SchemaContext defaults") freezes a model's default attributes at schema load
 ([schema_context.rb#L119-L121](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/activerecord/lib/active_record/model_schema/schema_context.rb#L119-L121)).
