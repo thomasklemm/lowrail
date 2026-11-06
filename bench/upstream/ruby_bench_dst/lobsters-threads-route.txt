@@ -1,0 +1,14 @@
+route/ctl-none-c.txt DST route=/threads requests=15 allocs/request=19183.5 gc=10 now=2027-06-28 12:06:35 UTC ==62035== Collected : 1564709969 
+route/ctl-s81new-c.txt DST route=/threads requests=15 allocs/request=19185.3 gc=10 now=2027-06-28 12:06:32 UTC ==62037== Collected : 1563642905 
+route/none-a.txt DST route=/threads requests=15 allocs/request=19970.5 gc=10 now=2026-11-05 23:21:27 UTC ==61156== Collected : 1598535388 
+route/none-b.txt DST route=/threads requests=15 allocs/request=19971.9 gc=9 now=2026-11-05 23:21:31 UTC ==61178== Collected : 1598515113 
+route/s81new-a.txt DST route=/threads requests=15 allocs/request=19185.3 gc=9 now=2026-11-05 23:21:17 UTC ==61176== Collected : 1552165635 
+route/s81new-b.txt DST route=/threads requests=15 allocs/request=19189.2 gc=9 now=2026-11-05 23:21:21 UTC ==61181== Collected : 1552505287 
+route3/none-a.txt DST route=/threads requests=15 allocs/request=19973.7 gc=10 now=2026-11-05 23:46:00 UTC ==63393== Collected : 1597703540 
+route3/none-b.txt DST route=/threads requests=15 allocs/request=19972.9 gc=10 now=2026-11-05 23:45:56 UTC ==63404== Collected : 1597705498 
+route3/s81new-a.txt DST route=/threads requests=15 allocs/request=19188.8 gc=11 now=2026-11-05 23:45:57 UTC ==63397== Collected : 1552531202 
+route3/s81new-b.txt DST route=/threads requests=15 allocs/request=19188.0 gc=11 now=2026-11-05 23:45:58 UTC ==63402== Collected : 1551778780 
+route5/none-a.txt DST route=/threads requests=15 allocs/request=19971.0 gc=10 now=2026-11-06 00:36:35 UTC ==70213== Collected : 1598816207 
+route5/none-b.txt DST route=/threads requests=15 allocs/request=19971.4 gc=10 now=2026-11-06 00:36:34 UTC ==70217== Collected : 1597772854 
+route5/s81new-a.txt DST route=/threads requests=15 allocs/request=19186.1 gc=9 now=2026-11-06 00:36:20 UTC ==70215== Collected : 1552685829 
+route5/s81new-b.txt DST route=/threads requests=15 allocs/request=19183.5 gc=9 now=2026-11-06 00:36:20 UTC ==70219== Collected : 1552670139 

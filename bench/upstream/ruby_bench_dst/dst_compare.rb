@@ -16,6 +16,11 @@ zones = ENV["ZONES"] ? ENV["ZONES"].split(",") : (ActiveSupport::TimeZone.all.ma
 OTHER = %w[UTC Europe/Berlin America/New_York Australia/Lord_Howe Europe/Dublin].map { ActiveSupport::TimeZone[_1] }
 FROM, TO = Time.utc(1900), Time.utc(2045)
 OFFSETS = [-26, -25, -24, -23, -3, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 3, 23, 24, 25, 26].flat_map { [_1 * 3600, _1 * 3600 - 1, _1 * 3600 + 1] }.uniq
+# A Time method returning a Time with a fractional offset reaches wrap_with_time_zone through method_missing.
+class Time; def frac_shift = Time.at(to_r, in: utc_offset + Rational(1, 2)); end
+class DateTime; def frac_shift = self; end
+class Time; def twz_julian = ActiveSupport::TimeWithZone.new(nil, ActiveSupport::TimeZone["Etc/GMT-1"], DateTime.new(year, month, day, hour, min, sec, 0, Date::JULIAN)); end
+class DateTime; def twz_julian = self; end
 DT_OFFSETS = [-25, -24, -23, -2, -1, 0, 1, 2, 23, 24, 25].flat_map { [_1 * 3600, _1 * 3600 - 1, _1 * 3600 + 1] }
 OPS = {
   "ago1" => -> t { 1.day.ago(t) }, "since1" => -> t { t + 1.day }, "minus7" => -> t { t - 7.days },
@@ -30,6 +35,9 @@ OPS = {
   **OTHER.to_h { |z| ["zone_#{z.name}", -> t { t.change(zone: z) }] },
   "offset" => -> t { t.change(offset: "+05:30") },
   **%w[+01:00 +02:00 +03:00 +10:00 -03:00 -04:00 -05:00 -06:00 -07:00 -08:00].to_h { |o| ["off#{o}", -> t { t.change(offset: o) }] },
+  **[3600.5, 7199.75, 3599.5, -18000.25, -14399.5, -21600.5, 37800.5, 39600.25, 0.5, -0.5].to_h { |o| ["offf#{o}", -> t { t.change(offset: o) }] },
+  "frac_wrap" => -> t { t.frac_shift },
+  "twz_julian" => -> t { t.twz_julian },
 }
 
 def show(r)

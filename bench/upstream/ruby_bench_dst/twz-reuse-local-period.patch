@@ -1,4 +1,4 @@
-commit 6993c9b20ba48876b9021cbee99449afbd734fee
+commit ba1f3642141a85d94a926487ab359b455292013e
 Author: Thomas Klemm <github@tklemm.eu>
 Date:   Thu Nov 5 21:03:54 2026 +0000
 
@@ -11,21 +11,20 @@ Date:   Thu Nov 5 21:03:54 2026 +0000
     the other side of a DST change (70.days.ago, beginning_of_day on the day
     clocks change) or in another zone (change(zone:)).
     
-    When the current period doesn't apply, the result is a Time and its
-    local time has exactly one period, pass that one on; it is equal to the
-    period the constructor would find. A DateTime keeps the old path: TZInfo
-    reads it by its Julian day, while the constructor converts a non-UTC one
-    by its civil fields, which differ for a Julian-calendar DateTime. Gaps
-    and overlaps keep the old path too.
-    
-    Zones without transitions now return their memoized period from
-    periods_for_local as well, as period_for_utc and period_for_local
-    already do, so the passed-on period is that shared one.
-    
-    Amp-Thread-ID: https://ampcode.com/threads/T-01a1ad41-645d-74f5-88c5-8400ddbfb076
+    If the current period doesn't apply, the result is a plain UTC Time and
+    its local time has exactly one period, pass that one on. The constructor
+    uses such a Time unchanged and would look the same object up in the same
+    zone, so it would find an equal, equally new period. Other values keep
+    the old path, because there the constructor converts the time and can
+    read a different wall clock than TZInfo did: a DateTime (also inside a
+    TimeWithZone) is read by its Julian day, a fractional offset is
+    truncated, and a local Time in a leap-second zone counts leap seconds (a
+    UTC Time does too, but the constructor looks up that same object).
+    Gaps, overlaps and zones without transitions keep the old path too; the
+    latter so that results keep sharing the zone's memoized period.
 
 diff --git a/activesupport/lib/active_support/time_with_zone.rb b/activesupport/lib/active_support/time_with_zone.rb
-index cf5ab63eae..a251fa8bfd 100644
+index cf5ab63eae..b30d11f75d 100644
 --- a/activesupport/lib/active_support/time_with_zone.rb
 +++ b/activesupport/lib/active_support/time_with_zone.rb
 @@ -452,7 +452,7 @@ def change(options)
@@ -37,13 +36,15 @@ index cf5ab63eae..a251fa8bfd 100644
      end
  
      # Uses Date to provide precise Time calculations for years, months, and days
-@@ -658,10 +658,15 @@ def duration_of_variable_length?(obj)
+@@ -658,10 +658,17 @@ def duration_of_variable_length?(obj)
          ActiveSupport::Duration === obj && obj.variable?
        end
  
-+      # TZInfo reads a DateTime by its Julian day, which needn't match the civil fields the constructor looks up.
++      # The constructor would look this UTC Time up unchanged; zones without transitions keep their shared period.
 +      def single_period(periods, time)
-+        periods.first if periods.one? && time.is_a?(::Time)
++        if periods.one? && time.instance_of?(::Time) && time.utc? && periods.first.instance_of?(::TZInfo::TransitionsTimezonePeriod)
++          periods.first
++        end
 +      end
 +
        def wrap_with_time_zone(time)
@@ -54,24 +55,11 @@ index cf5ab63eae..a251fa8bfd 100644
          elsif time.is_a?(Range)
            wrap_with_time_zone(time.begin)..wrap_with_time_zone(time.end)
          else
-diff --git a/activesupport/lib/active_support/values/time_zone.rb b/activesupport/lib/active_support/values/time_zone.rb
-index 42cd39defe..721e5b6056 100644
---- a/activesupport/lib/active_support/values/time_zone.rb
-+++ b/activesupport/lib/active_support/values/time_zone.rb
-@@ -642,7 +642,7 @@ def period_for_local(time, dst = true) # :nodoc:
-     end
- 
-     def periods_for_local(time) # :nodoc:
--      tzinfo.periods_for_local(time)
-+      @constant_period ? [@constant_period] : tzinfo.periods_for_local(time)
-     end
- 
-     def abbr(time) # :nodoc:
 diff --git a/activesupport/test/core_ext/time_with_zone_test.rb b/activesupport/test/core_ext/time_with_zone_test.rb
-index af2e5b68eb..0380460828 100644
+index af2e5b68eb..babd79bb97 100644
 --- a/activesupport/test/core_ext/time_with_zone_test.rb
 +++ b/activesupport/test/core_ext/time_with_zone_test.rb
-@@ -794,6 +794,16 @@ def test_change_at_dst_boundary
+@@ -794,6 +794,31 @@ def test_change_at_dst_boundary
      assert_equal twz, twz.change(min: 0)
    end
  
@@ -83,6 +71,21 @@ index af2e5b68eb..0380460828 100644
 +    assert_equal "CEST", changed.zone
 +    assert_predicate changed, :dst?
 +    assert_equal Time.utc(2026, 10, 20, 10), changed.utc
++  end
++
++  def test_change_into_dst_gap_with_fractional_offset
++    twz = ActiveSupport::TimeWithZone.new(Time.utc(2026, 7, 1, 10), ActiveSupport::TimeZone["Amsterdam"])
++    changed = twz.change(month: 3, day: 29, hour: 2, offset: 3600.5)
++    assert_equal 7200, changed.utc_offset
++    assert_equal "CEST", changed.zone
++    assert_predicate changed, :dst?
++    assert_equal Time.utc(2026, 3, 29, 1, 0, 0.5), changed.utc
++  end
++
++  def test_change_zone_to_utc_keeps_the_shared_period
++    twz = ActiveSupport::TimeWithZone.new(Time.utc(2026, 7, 1, 10), ActiveSupport::TimeZone["Amsterdam"])
++    utc = ActiveSupport::TimeZone["UTC"]
++    assert_same utc.period_for_utc(Time.utc(2000)), twz.change(zone: utc).period
 +  end
 +
    def test_round_at_dst_boundary
