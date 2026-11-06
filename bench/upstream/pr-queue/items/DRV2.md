@@ -6,7 +6,7 @@ kind: perf
 area: Multi-column result rows
 reviewer: tenderlove
 branch: thomasklemm/fill-multicolumn-rows
-head: "61fd4988d615a292e566caa3f042d0f263802dfe"
+head: "09e416bb44b78e1bccf218dc9a8a4a774dd7ec9d"
 base: main
 built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
 depends_on: []
@@ -15,7 +15,7 @@ rank: 23
 risky: true
 state: draft
 pr: 770
-note: "TruffleRuby initializer guard applied; documented macro confirmed from its public headers. CRuby preprocessed source is byte-identical to the measured head, so accepted whole-model prices stand. Skeptic approves exact new head/body; coordinator Astra confirm pending. Single-column YJIT pluck has +0.0367% instruction overhead."
+note: "Restacked 2026-11-06 into one commit, 09e416bb44, on 48091f4694; force-pushed. Only source change versus 61fd4988d6 is a two-line C comment on why not rb_ary_resize; comment-stripped source identical, so measurements stand. No test added (DECISIONS e7dccb6). Reasoning (resize growth on 3.2/3.3, TruffleRuby guard, single-column rb_ary_store) and measurements now in the commit message. Skeptic nits on the restack applied. Body unchanged. Single-column YJIT pluck +0.0367%, within A/A. Earlier passes name old heads."
 passes:
   - {reviewer: skeptic, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-06, verdict: nits, open: "Clarify seven-column query wording, SQLite version and the measured single-column scope."}

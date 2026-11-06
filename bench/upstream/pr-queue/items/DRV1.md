@@ -6,7 +6,7 @@ kind: perf
 area: UTF-8 text parameter binding
 reviewer: flavorjones
 branch: thomasklemm/skip-utf8-bind-transcode
-head: "d98bae330bd0cad5a3769aa955582c515c073f19"
+head: "16c9550b683893412213406b0db19ef4f8848f23"
 base: main
 built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
 depends_on: []
@@ -15,7 +15,7 @@ rank: 22
 risky: true
 state: draft
 pr: 769
-note: "Opened as draft #769 at c55ce350e3 after skeptic/Sol/Astra. d98bae330b is a test-only follow-up for the red rubocop check (Minitest/SkipEnsure): the allocation test closes its statement without ensure. RuboCop clean and test_statement.rb 66 runs/0 failures locally; Sol/Astra passes on c55ce350e3 cover the same C change."
+note: "Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads."
 passes:
   - {reviewer: skeptic, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-06, verdict: nits, open: "Add engine-independent invalid-UTF-8 and retained-binding tests; clarify String allocation and measurement scope."}
