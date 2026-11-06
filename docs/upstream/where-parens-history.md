@@ -370,8 +370,9 @@ this section tests that structure against the minimal fix (`805ab06262`).
 ### Explicit bound nodes escape AND on 8.1 and main
 
 Yes. `WhereClause` groups only String/`SqlLiteral`, so an explicitly passed
-`BoundSqlLiteral` with a top-level `OR` is emitted bare. Released 7.2–8.1 already
-have this bug; it is not a #58427 regression. Data: ids 1–5 =
+`BoundSqlLiteral` with a top-level `OR` is emitted bare. Every release since
+`Arel.sql` accepted binds ([`6444ec0d30`](https://github.com/rails/rails/commit/6444ec0d30), 7.1.0) has this bug; it is not a
+#58427 regression (re-verified on 7-1-stable, 7-2-stable and 8-0-stable). Data: ids 1–5 =
 `(n, owner, type)` `(1,b,-)`, `(2,a,-)`, `(3,a,Special)`, `(3,b,-)`, `(1,b,Special)`;
 `node = Arel.sql("n = ? OR n = ?", 1, 3)`. Output is identical on 8-1-stable
 `6e09124217` and main `cadf0fc8d6`:
@@ -398,9 +399,11 @@ Every other composition leaks rows.
 ### Prototype
 
 Branch [`thomasklemm/where-group-bound-literals`](https://github.com/thomasklemm/rails/tree/thomasklemm/where-group-bound-literals),
-head [`f6a0268e9c17c65db2fda0dd81737a8d06126d05`](https://github.com/thomasklemm/rails/commit/f6a0268e9c17c65db2fda0dd81737a8d06126d05)
+head [`10346a258e1fd105de7561437ad7917ff3cb9b47`](https://github.com/thomasklemm/rails/commit/10346a258e1fd105de7561437ad7917ff3cb9b47)
 on rails main `cadf0fc8d6`. One commit, author and committer Thomas Klemm
-<github@tklemm.eu>, no trailers. **4 files, +35/−3; runtime 2 lines changed:**
+<github@tklemm.eu>, no trailers. **5 files, +48/−3; runtime 2 lines changed:**
+(Replaces `f6a0268e9c`, which had an `Amp-Thread-ID` trailer added by Amp's
+commit wrapper; same tree plus the CHANGELOG entry. See Review.)
 
 ```diff
 --- a/activerecord/lib/active_record/relation/query_methods.rb
@@ -417,7 +420,8 @@ The new test asserts an explicit node gives the same SQL as the string form and
 returns `[4]`, not `[2, 4]`, after `where` and `merge`. `relation_test.rb`'s
 "merging a hash interpolates conditions" expectation changes from
 `Arel.sql("(foo = ?)", "bar")` to `Arel.sql("foo = ?", "bar")` (the node no
-longer carries textual parens). No CHANGELOG entry yet; see recommendation.
+longer carries textual parens). CHANGELOG entry for the explicit-node fix, added in
+the final review.
 
 Blank bound literals: string-built empty/blank conditions with values never
 become `BoundSqlLiteral` (no placeholder → sanitizer fallback → `SqlLiteral`), so
@@ -491,45 +495,109 @@ find/count-by-SQL (also on the minimal fix).
   all three fail (strict-warning error for the empty case, SQL-shape failure for
   the sanitized case, `[2, 4]` vs `[4]` for the bound-node case).
 
-Fork CI for `f6a0268e9c` is subscribed; not yet reported here.
+These runs were on `f6a0268e9c`; `10346a258e` differs only by the CHANGELOG entry.
+Fork CI for `10346a258e` is subscribed; not yet reported here.
 
 ### Review
 
-The requested separate Claude Code review **did not run**: the subagent failed
-immediately with the account's weekly rate limit (resets 2026-11-11 11:00 UTC).
-The checks above (paths, blank nodes, equality, tests failing on main) are the
-primary investigator's own skeptical pass, not an independent review. Rerun the
-review before the PR switches to B.
+The first separate Claude Code review did not run (rate limit). It ran later
+the same day:
+
+### Final review of option B (Claude Code, 2026-11-06)
+
+Verdict: **correct; one real problem fixed (commit hygiene), CHANGELOG added.**
+New head [`10346a258e`](https://github.com/thomasklemm/rails/commit/10346a258e1fd105de7561437ad7917ff3cb9b47),
+force-pushed with a lease on `f6a0268e9c`. Same tree plus the CHANGELOG entry.
+
+* **Fixed: trailer.** `f6a0268e9c` carried an `Amp-Thread-ID` trailer. Amp's
+  commit wrapper adds it to `git commit`, so the new commit was built with
+  `git commit-tree` and has no trailers. Author and committer are both Thomas Klemm.
+* **Added: CHANGELOG.** The explicit-node fix changes released behaviour, so it
+  needs an entry. Its example SQL was executed on 8.1 (bare) and on B (grouped).
+  The #58427 part needs none: it is unreleased.
+* **Commit message.** Rewritten slightly. It now states that the string path was
+  only safe because of #51139's textual parens, and it names the SQL-text costs
+  (`where.not`/`or` lose a pair; string and explicit node now compare equal).
+  Wrapped at 72 columns, no trailers.
+* **Latent bug: confirmed, and older than claimed.** Independent runner
+  (`latent.rb`, 5 rows, owners a/b, STI `Special`), node
+  `Arel.sql("n = ? OR n = ?", 1, 3)`. Identical bare output on **7-1-stable,
+  7-2-stable, 8-0-stable, 8-1-stable `6e09124217`, main `cadf0fc8d6`** and the
+  minimal fix merged into main. `where(node).where(n: [2, 3])` emits
+  `WHERE n = 1 OR n = 3 AND "items"."n" IN (2, 3)` → ids [1, 3, 4, 5] (string
+  form [3, 4]). It is not limited to 7.2+: `Arel.sql` binds landed in
+  `6444ec0d30` (7.1.0), and 7.1 leaks too. Leaks reproduced through `where`
+  before/after, `merge`, association scope, association `where`, STI, `having`,
+  `joins`+`merge`, `eager_load` join ON, `invert_where`, `update_all` (4 rows vs
+  2), `delete_all` (4 vs 2), `exists?` (true vs false), `count` (4 vs 2).
+  `where.not` and `or` are safe on every version.
+* **Consumers on B.** All of the above are grouped and return the string-form
+  rows. `ast` is the only place the grouping is applied; predicates stay
+  unwrapped in storage, so `or` (unwraps the outer `Grouping`), `invert`
+  (single predicate → `node.invert` → `Not`), `merge`/`except`/`-`/`|`,
+  `==`/`hash`, `contradiction?` and `to_h` see the same nodes as before. Only
+  node equality changes, because string-built nodes no longer carry `(…)`.
+  `find_by_sql`/`count_by_sql` stay unwrapped and bound (`WHERE n = ?`).
+  An explicit `Grouping` node is not re-wrapped (the visitor collapses nested
+  groupings anyway): `WHERE (n = 1 OR n = 3) AND …` on all versions. Blank
+  explicit bound node: `WHERE  AND …` → `WHERE () AND …`, an SQL error either way.
+  Leaving it as an error is right.
+* **Not covered, all versions:** `Arel::Nodes::Fragments` (`Arel.sql("n = 1") +
+  Arel.sql(" OR n = 3")`) is still bare on 7.1–B. It can hold arbitrary nodes,
+  so grouping it is a separate decision. Not a B regression. Worth a follow-up
+  mention, not part of this PR.
+* **SQL-text and dedup changes: acceptable.** Placeholder strings under
+  `NOT`/`OR` go back to exactly the 7.1 SQL in 140 of 144 differential cases.
+  The other 4 are `or_literal_equivalent` with OR placeholders: 7.1 interpolated
+  eagerly and deduplicated against the literal string. No string-built
+  condition changes rows. String vs explicit-node dedup now works
+  (`where("n = ?", 1).merge(where(Arel.sql("n = ?", 1)))` → one predicate).
+  Only an explicit node with its own outer parens gains a pair: `((n = 1))`.
+* **Differential rerun** (runner SHA-256 `6d4bd527…` extracted from this record,
+  Ruby 4.0.7, sqlite3 2.10.1): 8.1 vs main 683; 8.1 vs minimal merged into main 0;
+  8.1 vs B 204; minimal vs B 204; main vs B 887; overlap with the 683 = 0.
+  Result changes 8.1 → B: exactly the 12 `arel_bound`/`arel_bound_extra` ×
+  `and_after`/`merge_reverse`/`having_and` cases. Matches the record.
+* **Tests** (SQLite, `RAILS_STRICT_WARNINGS=1 PARALLEL_WORKERS=1`, seed 1729,
+  B tree): `relation/`, `relation_test`, `relations_test`, `sanitize_test`,
+  `finder_test`, `associations/`, `associations_test`, `scoping/`,
+  `inheritance_test`, `base_test`, `bind_parameter_test`, `arel/`:
+  **4,517 runs, 13,226 assertions, 0 failures, 0 errors, 5 skips.** The three
+  new where tests: 3 runs, 21 assertions on B. On unmodified main: 2 failures,
+  1 error (strict-warning error, SQL-shape failure, `[2, 4]` vs `[4]`).
+  PostgreSQL was not rerun in this review.
 
 ### Recommendation
 
 Offer **B** as the answer to matthewd and the proposed PR shape, pending his
-agreement and the independent review. It is the structural fix he asked about:
-one grouping layer in `WhereClause` for every SQL literal, no textual parentheses,
-2 runtime lines, and it fixes a real row-leaking precedence bug for explicit bound
-nodes in 7.2–8.1 that the textual-parens design never covered. Its costs are
-SQL-text changes only (no string-built condition changes rows): one pair fewer
-inside `NOT`/`OR` for placeholder strings, one pair more for explicit nodes,
-and string-built and explicit bound literals now compare equal. Apps asserting
-exact `to_sql` or query-log text with `where.not`/`or` and placeholders, or with
-explicit `Arel.sql(…, binds)` predicates, will see diffs. Because the
-explicit-node change is user-visible in released versions, B should add a short
-CHANGELOG entry ("`where`/`having` now parenthesize bound SQL literals passed as
-Arel nodes"); the #58427 part needs none.
+agreement. It is the structural fix he asked about: one grouping layer in
+`WhereClause` for every SQL literal, no textual parentheses, 2 runtime lines.
+It also fixes a real row-leaking precedence bug for explicit bound nodes,
+present since 7.1, that the textual-parens design never covered. Its costs
+are SQL-text changes only (no string-built condition changes rows): one pair
+fewer inside `NOT`/`OR` for placeholder strings (back to 7.1's SQL), one pair
+more for explicit nodes with their own parens, and string-built and explicit
+bound literals now compare equal. Apps asserting exact `to_sql` or query-log
+text will see diffs in those cases. The branch has a CHANGELOG entry for the
+explicit-node fix; the #58427 part needs none.
 
 Keep **805ab06262** as the fallback: exact 8.1 compatibility, scoped to the
 #58427 regression only. If matthewd prefers not to change explicit-node SQL in a
 regression fix, ship it and propose B separately as the precedence fix.
 
-### Reply to matthewd (revised, not posted)
+### Reply to matthewd (final, not posted)
 
-As far as I can tell, they were first added in [2a35baa](https://github.com/rails/rails/commit/2a35baa0bb4312d95e1340074cce731afedecde0) (2005), to stop an OR in `:conditions` escaping an association constraint, and [328ef3f](https://github.com/rails/rails/commit/328ef3feaad4c110a7277e3432e9203c7fbbb9e2) extended that to STI and scopes. The wrapping later became an AST `Grouping` and moved [into `WhereClause`](https://github.com/rails/rails/commit/a5fcdae0a04d97dbd8fd05af6f352d3e09b2815f) in 2015; [a 2017 refactor](https://github.com/rails/rails/commit/213796fb4936dce1da2f0c097a054e1af5c25c2c) limited it to String/`SqlLiteral`. [#51139](https://github.com/rails/rails/pull/51139) then added textual parens to the bound literals it builds from strings, and [#58427](https://github.com/rails/rails/pull/58427) moved them ahead of dispatch, so the sanitizer fallback got a second pair. [Timeline and reproducer](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/where-parens-history.md).
+Replaces the revised draft. Checked claim by claim in the final review above.
 
-The grouping should exist, but once, and the textual parens shouldn't. They never covered explicit bound nodes: on 8.1, `Item.where(Arel.sql("n = ? OR n = ?", 1, 3)).where(n: [2, 3])` emits `WHERE n = 1 OR n = 3 AND "items"."n" IN (2, 3)` and returns n = 1 rows. The same happens through merge, association scopes, STI and `having`.
+They were first added in [2a35baa](https://github.com/rails/rails/commit/2a35baa0bb4312d95e1340074cce731afedecde0) (2005), to stop an OR in `:conditions` escaping an association constraint. [328ef3f](https://github.com/rails/rails/commit/328ef3feaad4c110a7277e3432e9203c7fbbb9e2) extended that to all `:conditions`, so they could be combined with STI and scope constraints.
 
-Empty string isn't the only change. Against 8.1, sanitized conditions with values also get doubled parens, identical conditions stop deduplicating on `merge`/`or`, and blank strings start converting unused values. (My earlier reply was too broad: `where("", {})` on its own already produced a dangling `WHERE` on 8.1; only combining it with another condition worked.)
+From there they moved through `merge_conditions` (2008), the relation's `build_where` and `build_arel` (2010, where they became an AST `Grouping`) and `collapse_wheres`, and landed [in `WhereClause`](https://github.com/rails/rails/commit/a5fcdae0a04d97dbd8fd05af6f352d3e09b2815f) in 2015. [A 2017 refactor](https://github.com/rails/rails/commit/213796fb4936dce1da2f0c097a054e1af5c25c2c) limited that grouping to String/`SqlLiteral`. Through 7.1, placeholder values were interpolated into a plain string, so every string condition was grouped there. [#51139](https://github.com/rails/rails/pull/51139) started building `BoundSqlLiteral`s, which `WhereClause` doesn't group, so it gave them textual parens. [#58427](https://github.com/rails/rails/pull/58427) moved those parens ahead of dispatch, so the sanitizer fallback got them too, on top of `WhereClause`'s. [Timeline and reproducer](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/where-parens-history.md).
 
-So the alternative I'd suggest is [this branch](https://github.com/thomasklemm/rails/commit/f6a0268e9c17c65db2fda0dd81737a8d06126d05): `WhereClause` groups `BoundSqlLiteral` like `SqlLiteral`, and the `"(#{opts})"` goes away. That's two lines; find/count-by-SQL stay unwrapped. It fixes both the #58427 regression and the explicit-node case. Rows only change for explicit bound nodes; SQL text also changes: placeholder strings lose a redundant pair inside `NOT`/`OR`, explicit bound nodes gain one, and the two now compare equal for dedup. If you'd rather keep this PR to exact 8.1 output, the current head does that, and I can send the grouping change separately.
+Should they exist? The grouping, yes. The textual parens, no: they never covered bound nodes passed in directly. Since 7.1, `Item.where(Arel.sql("n = ? OR n = ?", 1, 3)).where(n: [2, 3])` emits `WHERE n = 1 OR n = 3 AND "items"."n" IN (2, 3)` and returns `n = 1` rows. The same happens through `merge`, association scopes, STI, `having`, `eager_load` join conditions, `invert_where`, `update_all` and `delete_all`.
+
+Empty string isn't the only change. Against 8.1, sanitized conditions with values also get doubled parens, identical conditions stop deduplicating on `merge`/`or`, and blank strings start converting values they used to ignore. (My earlier reply was too broad: on 8.1, `where("", {})` on its own already produced a dangling `WHERE`. Only combining it with another condition worked.)
+
+The alternative I'd suggest is [this branch](https://github.com/thomasklemm/rails/commit/10346a258e1fd105de7561437ad7917ff3cb9b47): `WhereClause` groups `BoundSqlLiteral` like `SqlLiteral`, and the `"(#{opts})"` goes away. That's two lines, and find/count-by-SQL stay unwrapped. It fixes both the #58427 regression and the explicit-node case. Results change only for explicit bound nodes, but the SQL text changes too: placeholder strings lose a redundant pair inside `NOT`/`OR` (back to 7.1's output), explicit bound nodes gain one, and a string condition now equals the same explicit node for dedup. If you'd rather keep this PR to exact 8.1 output, the current head does that, and I can send the grouping change separately.
 
 ## Reproducer and exact differing outputs
 
