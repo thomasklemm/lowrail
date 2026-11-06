@@ -6,7 +6,7 @@ kind: perf
 area: UTF-8 text parameter binding
 reviewer: flavorjones
 branch: thomasklemm/skip-utf8-bind-transcode
-head: "c55ce350e32f4cf05ff7f7680120d011e84eba59"
+head: "d98bae330bd0cad5a3769aa955582c515c073f19"
 base: main
 built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
 depends_on: []
@@ -15,7 +15,7 @@ rank: 22
 risky: true
 state: draft
 pr: 769
-note: "Test-only follow-up pushed; skeptic confirms the new head and body. Sol confirm is coordinator-owned; prior Sol/Astra nits are addressed. The public footer resolves. Fork has no CI checks; interpreter/YJIT suites pass."
+note: "Opened as draft #769 at c55ce350e3 after skeptic/Sol/Astra. d98bae330b is a test-only follow-up for the red rubocop check (Minitest/SkipEnsure): the allocation test closes its statement without ensure. RuboCop clean and test_statement.rb 66 runs/0 failures locally; Sol/Astra passes on c55ce350e3 cover the same C change."
 passes:
   - {reviewer: skeptic, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-06, verdict: nits, open: "Add engine-independent invalid-UTF-8 and retained-binding tests; clarify String allocation and measurement scope."}
