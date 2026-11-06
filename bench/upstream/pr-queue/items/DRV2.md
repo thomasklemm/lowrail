@@ -30,6 +30,8 @@ passes:
   - {reviewer: sol, head: "c69e94955e44c8b86a75cd6119a4566dcef90570", date: 2026-11-06, verdict: changes, open: "The no-numbers point came from the coordinator prompt, not a rule; shape-justifying versions and bytes kept. No code finding."}
   - {reviewer: astra, head: "c69e94955e44c8b86a75cd6119a4566dcef90570", date: 2026-11-06, verdict: changes, open: 'Same prompt-induced numbers point; no new test needed (existing suite covers multi-column rows). GC wording fixed in 6c212edd9c.'}
   - {reviewer: claude-code, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Message-only change: tree 6488869689 identical to c69e94955e, same parent 48091f4694. GC sentence accurate (rb_ary_store pre-fills nil; cells 0..i-1 written when cell i converts); all lines <= 72, author/committer Thomas Klemm <github@tklemm.eu>, no trailers. PR body and title match DRV2.md; still draft at this head. Nothing open."}
+  - {reviewer: sol, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
+  - {reviewer: astra, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
 ---
 
 # Fill multi-column statement rows at their known size
