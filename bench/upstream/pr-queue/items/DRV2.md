@@ -6,7 +6,7 @@ kind: perf
 area: Multi-column result rows
 reviewer: tenderlove
 branch: thomasklemm/fill-multicolumn-rows
-head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e"
+head: "61fd4988d615a292e566caa3f042d0f263802dfe"
 base: main
 built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
 depends_on: []
@@ -14,7 +14,7 @@ impact: "Every multi-column SQLite result row, including default Rails record lo
 rank: 23
 risky: true
 state: in-review
-note: "Corrected fork head passes the whole-model-load relevance gate in interpreter and YJIT. Skeptic confirmed native memory, correctness, final numbers and body; coordinator Sol/Astra pending. Single-column YJIT pluck has +0.0367% instruction overhead."
+note: "TruffleRuby initializer guard applied; documented macro confirmed from its public headers. CRuby preprocessed source is byte-identical to the measured head, so accepted whole-model prices stand. Skeptic approves exact new head/body; coordinator Astra confirm pending. Single-column YJIT pluck has +0.0367% instruction overhead."
 passes:
   - {reviewer: skeptic, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-06, verdict: nits, open: "Clarify seven-column query wording, SQLite version and the measured single-column scope."}
@@ -22,6 +22,7 @@ passes:
   - {reviewer: skeptic, head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e", date: 2026-11-06, verdict: approve, open: "Correctness/native memory and final whole-model measurements/body confirmed; supporting evidence exported before handoff."}
   - {reviewer: sol, head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e", date: 2026-11-06, verdict: nits, open: "Body said 20 rows; now 1,000 rows/7,000 stores. Keep the two branches."}
   - {reviewer: astra, head: "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e", date: 2026-11-06, verdict: changes, open: "TruffleRuby ignores rb_ary_new_capa capacity and its RARRAY_ASET calls rb_ary_store, so pre-sizing adds a store per row there; guard the init with #ifndef TRUFFLERUBY."}
+  - {reviewer: skeptic, head: "61fd4988d615a292e566caa3f042d0f263802dfe", date: 2026-11-06, verdict: approve, open: "Guard restores TruffleRuby's original stores by source inspection; CRuby preprocessing independently byte-identical, measured prices/body unchanged. Both own suites pass; no TruffleRuby runtime executed."}
 ---
 
 # Fill multi-column statement rows at their known size

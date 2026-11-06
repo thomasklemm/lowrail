@@ -70,14 +70,25 @@
     "DRV2": {
       "head": "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e",
       "native_sha256": "4a89c9bcf1690c9f76246731d5932a6f0cb91f837a57890954f686326bf130ea",
-      "status": "whole-model-load relevance gate passed in interpreter and YJIT; skeptic approved; coordinator Sol/Astra pending",
+      "status": "whole-model gate passed; TruffleRuby initializer guard applied with unchanged CRuby preprocessing; new-head skeptic approves, coordinator Astra confirm pending",
       "older_ruby_memory": "native-memory.json",
       "cohorts": [
         "candidate-interpreter-sqlite-fill-store",
         "candidate-yjit-sqlite-fill-store"
       ],
       "workload": "bench/upstream/driver_cpu/sqlite_load_cases.rb",
-      "workload_sha256": "3606c2ccbddb773e12f2222d3adeb675081a83b3bddf854e32a50dbb48e4144e"
+      "workload_sha256": "3606c2ccbddb773e12f2222d3adeb675081a83b3bddf854e32a50dbb48e4144e",
+      "truffleruby_guard": {
+        "head": "61fd4988d615a292e566caa3f042d0f263802dfe",
+        "measured_predecessor": "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e",
+        "native_sha256": "469a4ad4e0c8f0ead5a878310791b37028c97df3eff3ac79cc79052e4aeae078",
+        "truffleruby_source": "979bbdfbcc8894133b3452197bc8e2e188ad6360",
+        "preprocessed_before_after_sha256": "6b6a2bd3f29b7caf2636bdcb9f062506db1a619ccf7b5ccefd0e0a9b9b963cd3",
+        "preprocess_command": "cc -E -P -I. -I$RUBY/include/ruby-4.0.0/x86_64-linux -I$RUBY/include/ruby-4.0.0 -DHAVE_RB_ENC_INTERNED_STR_CSTR -DHAVE_RB_ENC_INTERNED_STR statement.c",
+        "own_suites": "interpreter and YJIT: 428 runs, 873 assertions, 0 failures, 0 errors, 12 skips",
+        "truffleruby_execution": false,
+        "remeasured": false
+      }
     }
   },
   "driver_heads_independent": true,

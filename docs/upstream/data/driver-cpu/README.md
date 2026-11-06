@@ -30,6 +30,8 @@ census is still running; it is not silently treated as complete here.
   percall runs, suite logs, exactness receipts and resolved bundle locks.
   Both corrected-head `candidate-*-sqlite-fill-store` cohorts include all
   108 window profiles and the workload source used for `relation.spawn.to_a`.
+  The TruffleRuby-guard follow-up adds its build/suite logs and byte-identical
+  before/after CRuby preprocessing receipts; measured-head hashes stay intact.
   Review-follow-up suite logs, the standalone older-Ruby memory probe and
   its raw/build receipts are included too. That probe uses ordinary
   compaction; its initial repeated-double-heap draft exhausted memory on base

@@ -22,7 +22,8 @@ Astra passes. DRV2's original resize head grows native buffers on Ruby 3.2/3.3
 and is superseded. The corrected head matches main's row memory on Ruby
 3.2/3.3/3.4 and passes the revised whole-model-load gate: **−2.6910% YJIT Ir**
 for 1,000 seven-column records through normal `to_a`. The skeptic confirmed
-its final measurements and body; coordinator Sol/Astra confirmations remain.
+its final measurements, body and TruffleRuby guard; coordinator Astra confirm
+remains on the guarded head.
 The original `select_all` result alone was not sufficient.
 
 ## Sources and overlap checked first
@@ -418,6 +419,34 @@ in both modes (and compile under YJIT). YJIT 20-wide model loads reject A/A,
 JIT-flatness and heap matching; YJIT wide `select_all` rejects A/A/JIT-flatness.
 Interpreter `pluck` rejects A/A. Those cells stay rejected, not remeasured.
 
+### TruffleRuby initializer guard
+
+Current fork head:
+[`61fd4988d615a292e566caa3f042d0f263802dfe`](https://github.com/thomasklemm/sqlite3-ruby/commit/61fd4988d615a292e566caa3f042d0f263802dfe).
+Astra found that TruffleRuby ignores requested Array capacity and implements
+`RARRAY_ASET` through `rb_ary_store`. Its preliminary length store would add
+one storage operation per row without removing any. Guard only that
+initializer with `#ifndef TRUFFLERUBY`; both fill branches remain intact.
+
+The macro is reliable, not an extconf heuristic: TruffleRuby revision
+[`979bbdfbcc8894133b3452197bc8e2e188ad6360`](https://github.com/truffleruby/truffleruby/commit/979bbdfbcc8894133b3452197bc8e2e188ad6360)
+[defines it unconditionally in public headers](https://github.com/truffleruby/truffleruby/blob/979bbdfbcc8894133b3452197bc8e2e188ad6360/lib/cext/include/ruby/internal/config.h#L159-L161),
+which `<ruby.h>` includes, and
+[documents it for C extensions](https://github.com/truffleruby/truffleruby/blob/979bbdfbcc8894133b3452197bc8e2e188ad6360/doc/user/compatibility.md#L28).
+pg already uses `defined(TRUFFLERUBY)` in `ext/gvl_wrappers.h`.
+TruffleRuby's [capacity implementation](https://github.com/truffleruby/truffleruby/blob/979bbdfbcc8894133b3452197bc8e2e188ad6360/lib/truffle/truffle/cext.rb#L1173-L1178)
+and [cell-store implementation](https://github.com/truffleruby/truffleruby/blob/979bbdfbcc8894133b3452197bc8e2e188ad6360/lib/cext/include/ruby/internal/core/rarray.h#L403-L412)
+confirm the original storage operations are retained there.
+
+CRuby 4.0.9 preprocessed source is byte-identical before/after the two-line
+guard (SHA256 `6b6a2bd3f29b7caf2636bdcb9f062506db1a619ccf7b5ccefd0e0a9b9b963cd3`),
+independently reproduced by the skeptic. The accepted CRuby measurements
+therefore carry forward without a new cohort, as requested by the coordinator.
+Both rebuilt own suites again pass **428/873**, zero failures/errors, 12 skips.
+The skeptic approves the exact new head and body, L1. No TruffleRuby runtime
+was executed; its storage equivalence is source-derived, not a measured
+TruffleRuby speed or compatibility claim. Coordinator Astra confirm remains.
+
 ## Exactness and own suites
 
 The driver changes are built independently against the same SQLite main, not
@@ -478,8 +507,10 @@ during cell creation, with no correctness/native-memory blocker, L1. It then
 independently recomputed the final model-load results from JSONL/Callgrind
 totals, checked all 108 measurement windows and 27 accepted YJIT call graphs,
 and approved the relevance gate and public body on the corrected head.
-The requested supporting exports are included; coordinator Sol/Astra
-confirmations remain. Ruby Flog/RuboCop metrics do not apply to these C changes.
+Sol confirmed that head with a wording nit; Astra requested the TruffleRuby
+guard above. Its new-head skeptic pass is complete; coordinator Astra confirm
+remains. Supporting exports include both follow-ups. Ruby Flog/RuboCop
+metrics do not apply to these C changes.
 The pushed fork heads report **no CI checks**, not green CI. These Linux runs
 do not certify every SQLite/Ruby/platform combination or include sanitizers. As in DECISIONS'
 exactness boundary, reaching unfinished internal Arrays through ObjectSpace
