@@ -917,3 +917,87 @@ tree was pushed with a one-line trigger as `ci/pvalue-across-processes` (`5e7f15
 **Receipts** in [`bench/upstream/ruby_bench_pvalue/`](../../bench/upstream/ruby_bench_pvalue/): `collect.sh`
 (main A/A), `collect2.sh` (branch A/B and A/A), `analyze.rb` (`RUBY_BENCH=<checkout> ruby analyze.rb 5 <(zcat
 data/aa_yjit_rep1.json.gz)`), `slow.rb`, `data/` (JSON gzipped, tables), `commit-message.txt`, `pr-body.md`.
+
+# Round 6: a write benchmark, `blog` (2026-11-06)
+
+**Question (Thomas, via the coordinator).** Section 7 found that every Rails benchmark in ruby-bench only reads. Build
+a write workload as a new benchmark, so existing histories don't move, and prepare it as a draft PR. Upstream
+search first: no issue or PR in ruby/ruby-bench proposes or rejects a write benchmark; the nearest are lobsters'
+route-generator comment ("POSTs are harder here … For now, skip it") and noahgibbs in #245 ("If we ever *do* expand to
+more of the full life cycle (add more POSTs, create and delete stories and comments, etc.)…").
+
+**Why not lobsters.** The first prototype reused lobsters' app, fixture and login; Thomas stopped it in favour of a
+current `rails new` app. What it found:
+- Its writes depend on the date twice: lobsters needs #571's fixed clock, and the 2023 fixture is older than the
+  time windows (`Story#accepting_comments?` is 90 days, the comment rate limit is 5 minutes per parent).
+- Short IDs come from `OpenSSL::Random` (`extras/utils.rb`), unseeded, so `ShortId` collision checks and the
+  generated URLs differ per run.
+- `Rails.cache` (MemoryStore since #564) survives a rollback and would need clearing per iteration. `Keystore`
+  counters, which were suspected too, are a database table (`keystores`), so a rollback covers them.
+- Per-form CSRF tokens are on, so the login form's token (the one `RouteGenerator` keeps) fails on other forms.
+- Mentions and replies send mail over SMTP (`delivery_method :smtp`), which the benchmark would have to switch to
+  `:test`; and the XHR comment create rendered a 500 (missing `_postedreply` for the form's format) until the request
+  sent an HTML `Accept`.
+
+**The benchmark.** Branch [`thomasklemm/blog-benchmark`](https://github.com/thomasklemm/ruby-bench/tree/thomasklemm/blog-benchmark),
+head `950a2bc27d`, one commit on ruby-bench main `ad63bf8`. The app is Sam Ruby's
+[create-blog](https://github.com/roundhouse-rb/roundhouse/blob/aa60799f53b36084c6311ffcda8f14e746eebf79/scripts/create-blog)
+(MIT, license kept), generated once with `RAILS_NEW_VERSION=8.1.4.1`. Changes to the generated tree, all listed in
+its README: credentials, `.github`, `.ruby-version` and `image_processing` removed (libvips loaded at boot on hosts that
+have it, 5 `VIPS-WARNING` lines on Windows CI), `config.yjit = false`, built `tailwind.css` checked in (no Tailwind
+binary needed, so Windows works), lockfile platforms `ruby` and `x86_64-linux`.
+- 200 seeded visits per iteration, about 417 Rack requests: GET html 279, POST 83, DELETE 19, PATCH 14, GET json 22.
+  Time share: 61% GET html, 35% form submissions. Writes take the CSRF token from the page's form; a create with an
+  empty title returns 422; every response's status and a body marker or `Location` are checked.
+- Rollback: `pin_connection!(false)` on all four writing pools (primary, cable, queue, cache), `unpin_connection!` at
+  the end. Saves are savepoints, after-commit callbacks run on RELEASE (the outer transaction is not joinable), as in
+  Rails tests.
+- Broadcasts: real Turbo rendering. Solid Cable's batching writer thread is replaced with the gem's own synchronous
+  `SolidCable::Message.broadcast`, so the insert lands in the transaction and doesn't depend on thread timing. The
+  `*_later` broadcasts are Solid Queue inserts. Every iteration asserts 117 Cable messages and 82 new jobs.
+- Clock: `Time.now` fixed at 2026-07-01 12:00 UTC during boot and the iteration, as in #571.
+
+**Evidence** (Ruby 4.0.9 unless noted; scripts in [`bench/upstream/ruby_bench_blog/`](../../bench/upstream/ruby_bench_blog/)):
+- **Rollback:** [`rollback_check.rb`](../../bench/upstream/ruby_bench_blog/rollback_check.rb), 30 iterations (25 on
+  the final head): row counts, max id and `sqlite_sequence` of every table in all four databases equal before and
+  after every iteration and equal to the start; inside each iteration, before the rollback, 14 values had changed
+  (articles 3→12 rows, max id 27; comments 3→18, max id 47; 117 Cable messages; Solid Queue jobs 6→88).
+- **Determinism:** allocations per iteration over 30 measured iterations, fixed heap
+  ([`alloc_summary.rb`](../../bench/upstream/ruby_bench_blog/alloc_summary.rb)): means 1,061,042–1,061,084 at four
+  libfaketime dates (2026-11-06, 2026-12-25, 2027-03-20, 2027-06-28; 0.004% apart), spread within a run
+  0.048–0.076%, first ten vs last ten iterations equal within 0.01% (no growth). With every random byte fixed
+  ([`fixed_bytes.rb`](../../bench/upstream/ruby_bench_blog/fixed_bytes.rb)) the spread stays (1,057,237–1,057,478),
+  so it is not session or token bytes; cause not traced. Callgrind (round 4's `audit.rb`, 3 warmup, 25 measured,
+  2 processes): 4.299e9 Ir per iteration, process A/A 0.035%, within-process spread 2.9% (lobsters, same method, 10
+  iterations: 3.673e9, A/A 0.005%, within 4.5%).
+- **Stability:** `./run_benchmarks.rb --interleave` with two copies of each of interp, YJIT and ZJIT (Ruby master
+  `0236df4`), two rounds. A/A: blog 1.28/0.03/0.95% and 5.72/4.88/3.67%, lobsters 5.15/3.52/11.48% and
+  3.79/6.91/0.75% (round 2 ran alongside the reviewer's runs). Iteration means, round 1: blog 1,537 / 920 / 995 ms,
+  lobsters 1,127 / 662 / 750 ms; railsbench 2,963 ms and shipit 2,300 ms on the interpreter.
+- **Distinctness:** StackProf, 5 iterations after 3 warmup ([`prof.rb`](../../bench/upstream/ruby_bench_blog/prof.rb),
+  [`prof_report.rb`](../../bench/upstream/ruby_bench_blog/prof_report.rb), inclusive): blog 18.4% in
+  save/destroy/transaction frames, 17.4% commit/save callbacks, 13.6% Turbo broadcasts, 7.8% Solid Queue enqueue,
+  6.5% INSERT/UPDATE/DELETE; lobsters 0.2% and railsbench 0.0% in any write path. View rendering: 41 / 46 / 26%.
+- **Harnesses:** default, once, gc, stats, perf, chain (gc,once), stackprof and vernier finish for blog as for
+  lobsters; warmup, continuous and mplr run until stopped, like lobsters; bips fails for every benchmark
+  (`benchmark-ips` not installed). Fork CI: [thomasklemm/ruby-bench#16](https://github.com/thomasklemm/ruby-bench/pull/16)
+  (fork-internal, CI only): 15/15 green on `950a2bc27d` (run 42239521787), including both Windows jobs and TruffleRuby; on `7277a4bced` Windows ruby took 1,627 ms per iteration and TruffleRuby 7.7 s.
+
+**Overlap with railsbench.** Both are SQLite scaffold apps rendering HTML and JSON, but railsbench is GET-only on an
+older Sprockets tree without Turbo or Solid. blog adds what railsbench never runs: forms with CSRF, strong
+parameters, validations including a 422 re-render, savepoints and after-commit callbacks, `dependent: :destroy`,
+Turbo stream rendering, Solid Cable and Solid Queue inserts, flash and redirects, and the 8.1 defaults (Propshaft,
+importmap, `allow_browser`). Their reads overlap; a maintainer could see blog's GETs as railsbench-like.
+
+**What it leaves out.** No real COMMIT/WAL write; no job runs (the queue only fills); Solid Cache is unused by the
+app; generator leftovers (kamal, dev and test gems) are kept as generated, which costs about 70 s of gem builds per
+CI job.
+
+**Reviews.** Skeptic pass 1 on `7277a4bced`: changes (commit message said lobsters never writes, gave a reason for
+skipping POSTs it doesn't give, and said lobsters has a fixed clock on main; `image_processing` host-dependence; dead
+code; README gaps). All applied in `950a2bc27d`. Skeptic pass 2 on `950a2bc27d`: nits, all on the body (WAL write rather
+than fsync, lobsters' own A/A next to the table, savepoint wording), applied; it rechecked every number in the body
+against the result files. Not applied: "in the timed iteration" in the commit message (lobsters' login POST runs at
+setup). The evidence runs used the tree before `image_processing` was dropped; the timed work is unchanged, boot RSS
+fell from 157 to 127 MiB. Queue item: [RBW1](../../bench/upstream/pr-queue/items/RBW1.md).
+Body: [blog-body.md](../../bench/upstream/ruby_bench_blog/blog-body.md).

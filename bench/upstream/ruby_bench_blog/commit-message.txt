@@ -1,0 +1,28 @@
+Add a blog benchmark that writes
+
+All Rails benchmarks here only read. Real apps also spend time in
+validations, callbacks, transactions, INSERT/UPDATE/DELETE and
+after-commit hooks, and none of that runs in ruby-bench. lobsters skips
+POSTs on purpose because writes pile up across iterations.
+
+The app is Sam Ruby's create-blog from roundhouse-rb/roundhouse (MIT):
+rails new --css tailwind on Rails 8.1.4.1, with Article and Comment
+scaffolds, validations and Turbo broadcasts. It keeps the production
+defaults of rails new: SQLite, Solid Cache, Solid Queue, Solid Cable,
+Propshaft and importmap, no external services. The built Tailwind CSS
+is checked in, so no CSS build runs. benchmarks/blog/README.md lists
+the few changes to the generated tree.
+
+Each iteration runs 200 seeded visits in-process, like railsbench:
+reads (index, show, JSON) and writes (create, update and delete
+articles, add and delete comments, a create that fails validation
+with 422). Writes submit the CSRF token from the page's form, as a
+browser does, and every response is checked for its status and a body
+marker. The iteration runs in one transaction per database that is
+rolled back at the end, as in Rails tests, so every iteration sees the
+same rows and IDs. The clock is fixed the same way as in lobsters.
+
+Turbo renders the broadcasts and Solid Cable inserts them in the
+request rather than on its batching writer thread, so they land in the
+transaction; the later broadcasts are enqueued into Solid Queue. Since
+nothing commits, a real COMMIT is not measured.
