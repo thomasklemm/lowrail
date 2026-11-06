@@ -911,7 +911,7 @@ A/B (3 benchmarks × 4 Rubies × 5) took 1,531 s.
 new behaviour untested; 1st itr from the first process only; Ractor reason), `cca922aa81` nits, `aed07e8d8f`
 approve. Kept: the displayed ratio is the pooled mean while the test uses unweighted process means (≤0.1% here);
 odd N lets one Ruby go first once more per benchmark. Fork CI: `test.yml` runs only on `main` and PRs, so the same
-tree was pushed with a one-line trigger as `ci/pvalue-across-processes` (`5e7f158`). Item:
+tree was pushed with a one-line trigger as `ci/pvalue-across-processes` (`5e7f158`): all 15 jobs green, run 42242520205; the branch was deleted after. Item:
 [RB-PV](../../bench/upstream/pr-queue/items/RB-PV.md), state reviewed, not opened.
 
 **Receipts** in [`bench/upstream/ruby_bench_pvalue/`](../../bench/upstream/ruby_bench_pvalue/): `collect.sh`

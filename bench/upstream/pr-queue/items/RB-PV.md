@@ -16,7 +16,7 @@ rank:
 risky: false
 state: reviewed
 pr:
-note: "prepared 2026-11-06, held for Thomas's final review; claude-code passes are a skeptic subagent in the preparing orb, as asked; fork CI on same-tree branch ci/pvalue-across-processes (test.yml runs only on main and PRs)"
+note: "prepared 2026-11-06, held for Thomas's final review; claude-code passes are a skeptic subagent in the preparing orb, as asked; fork CI green 15/15 on same-tree 5e7f158 (branch ci/pvalue-across-processes, deleted after; test.yml runs only on main and PRs)"
 passes:
   - {reviewer: claude-code, head: "b1da15b", date: 2026-11-06, verdict: changes, open: "body overstated the railsbench slowdown (measured 1.8%, not 5%); new behaviour untested; 1st itr from first process only; Ractor reason; all fixed"}
   - {reviewer: claude-code, head: "cca922aa81", date: 2026-11-06, verdict: nits, open: "--runs=1 interleave test, warmup_itrs_per_run assertion, table label; applied"}
