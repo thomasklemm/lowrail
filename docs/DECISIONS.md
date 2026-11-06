@@ -224,6 +224,10 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 
 ## Review gates
 
+### Claude Code orbs and a final Claude Code review (Thomas, 2026-11-06)
+
+New work orbs run as Claude Code (`external-agent:claude-code`). Orbs that are already running may finish, but before anything goes upstream (PR, push to an open PR, body edit or reply), a separate Claude Code orb does a thorough final review. That review covers the exact head, the commit messages and the text. Its pass is recorded as `reviewer: claude-code`. Sol/Astra stay as additional gates. Commits are few and clean, and the reasoning goes in their messages.
+
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
 Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
