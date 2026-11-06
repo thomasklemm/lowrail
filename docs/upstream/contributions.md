@@ -959,6 +959,29 @@ None.
 
 ## Investigated, not submitted
 
+- **Consumers of internal APIs changed on Rails main (2026-11-06): stopped, nothing pushed or opened.** After matthewd
+  closed our #59663 ("We don't deprecate internal APIs. That's what internal means."), and we closed #59630 for the same
+  reason, the plan was to fix the callers instead. Thomas stopped the effort the same day: fixing the ecosystem for
+  Rails 8.2 is not our job. Call sites, still present on each default branch on 2026-11-06:
+  Zammad develop `44fc7db12`, `User.by_login_case_sensitive` (app/models/user.rb L88, Zammad's own f0d1ecd36 for
+  #6452 from 2026-10-21), passes `:login` to `predicate_builder.build_bind_attribute`; authlogic master `9b8cfe8`
+  (6.6.1), `FindWithCase#sensitive_comparison` passes a String (its gemspec caps Active Record below 8.2, so it does not
+  install on main yet); Mastodon main `9ee8e0f9b`, `Status::SafeReblogInsert#_compile_reblog_insert` passes a String,
+  and `lib/action_dispatch/remote_ip_extensions.rb` calls `filter_proxies`, which #56805 replaced on main with
+  `first_non_proxy`. Proposed replacements, none of them run against tests: Rails has no public API that builds a
+  typed bind (Arel and `QueryAttribute` are both `:nodoc:`), so for Zammad and authlogic the closest is
+  `ActiveRecord::Relation::QueryAttribute.new(name, value, model.type_for_attribute(name))`, which is exactly what
+  `build_bind_attribute` returned on 7.0–8.1. That class is still internal, with the same constructor from 7.0 through main.
+  Mastodon's reblog insert can bind the `ActiveModel::Attribute` objects it already gets in `values`, as stock
+  `_insert_record` does on 8.1 and main (`im.insert(values.transform_keys { … })`). Its call to
+  `connection.insert(im, name, pk, id_value, …)` also hits main's deprecation of the positional `pk`. In the remote_ip
+  extension, 8.1's filter inlined, `([remote_addr] + ips).find { |ip| @proxies.none? { |proxy| proxy === ip } }`,
+  avoids the main-only `first_non_proxy`. Mastodon was skipped anyway, before the stop, because its
+  [AI Contribution Policy](https://github.com/mastodon/.github/blob/main/AI_POLICY.md) requires an `Assisted-by:`
+  commit trailer and a human-written PR description, and agents may not open PRs there. Thomas would rather Mastodon
+  fixes these itself once Rails 8.2 is out. Zammad's CONTRIBUTING accepts bug-fix PRs against develop, and authlogic has
+  no special process. The search for other gems and apps that pass a column name was not done.
+
 - **Active Record read path beyond C11 and #59141 (2026-11-04): no candidate.** In association loading, scoping and record instantiation, every census 8 line above 0.06% is covered by an open or merged PR (#59568, #59554, #59583, #59564, #59612, #59530, #59141), deliberate (`has_default_scope?`'s `method().owner`, #59234), or a single read or guard. One lead was parked: `ThroughReflection#options` goes through `delegate` (96 → 40 ns interpreted, 70 → 30 ns YJIT, at most about 0.07%), but hand-defining only `options` next to the bulk `delegate` needs a comment (L2–L3) in a file with 12 commits since October ([record](ar-read-paths.md)).
 - **Active Model per-request paths (2026-11-04): no candidate.** The large lines (`LazyAttributeSet#keys`, `IndexedRow`, `AttributeSet#[]`, `Attribute#hash`/`Type::Value#hash`) are covered by open #58002, #59141 and #59518. The rest are below 0.04% of census 8's interpreted instructions, recently reworked (mutation tracker), or not exact (`sanitize_for_mass_assignment` Hash fast path). CS-1, `Type::String#cast_value` with `dup` instead of `String.new`, was built and rejected: it is 3× faster for unfrozen sources, but for frozen ones, which is how sqlite3 returns values, `String.new` shares the buffer (40 B, 179 ns at any length) where `dup` copies it (640 B, 309 ns at 300 chars). `dup` also copies instance variables ([record](activemodel-request-paths.md)).
 - **C12, Action View rendering pipeline beyond tag helpers (2026-11-04): no candidate.** Template lookup, partial and collection rendering, compiled-method dispatch, `OutputBuffer`, form builders, `t`, and Active Model validations and serialization: every site is below 0.03% of census 8's interpreted instructions, reworked on main since September, or already ruled out. `safe_join` (0.08% / 0.11%) has no exact rewrite, and its main caller is parked T2. Two leads were measured and not built: `OutputBuffer.new` without `String.new("")` (−90 ns per call, about 0.015%, needs an identity-check sentinel, L2) and `field_id` skipping `gsub` for plain names (−2 objects, −200 ns, form pages only, about 0.01%) ([record](actionview-render-c12.md)).
