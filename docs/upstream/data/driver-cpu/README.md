@@ -17,10 +17,20 @@ census is still running; it is not silently treated as complete here.
 * `provenance.json`: full source heads, native-extension hashes, Ruby build
   flags and benchmark-source hashes. Versioned and unversioned SQLite native
   binaries match within each tree. The two candidate heads are independent.
+  Original measured heads/hashes stay unchanged; `followups` identifies the
+  test-only DRV1 head and the corrected, relevance-held DRV2 head.
+* `native-memory.json`: base/resize/replacement results for 18 widths on
+  Ruby 3.2.9, 3.3.10 and 3.4.8, plus runtime archive/native binary hashes.
+  Retained Array/native-buffer memory and embedding are compared exactly;
+  `malloc_increase` is only an allocator-sensitive diagnostic.
 * `receipts.tar.gz`: raw worker JSONL/logs, complete Callgrind window profiles
   for the selected two candidates' interpreter/YJIT cohorts, three native
   driver-attribution profiles, native YJIT allocation runs, original-tool
   percall runs, suite logs, exactness receipts and resolved bundle locks.
+  Review-follow-up suite logs, the standalone older-Ruby memory probe and
+  its raw/build receipts are included too. That probe uses ordinary
+  compaction; its initial repeated-double-heap draft exhausted memory on base
+  and produced no accepted observation.
   Other exploratory/baseline full call graphs are not duplicated in this
   archive; their totals and hashes remain in `profile-totals.json`.
 * `sqlite-exact.json.gz`: the common, expanded 651-observation output from

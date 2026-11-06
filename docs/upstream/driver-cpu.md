@@ -15,6 +15,12 @@ large fully cast model warmups take several minutes per fresh process under
 Valgrind. No incomplete baseline is described as accepted. The two candidate
 YJIT prices come from separate completed, controlled cohorts.
 
+**Review follow-up:** DRV1's test-only follow-up is confirmed by its skeptic.
+DRV2's original head is not opening-ready: Astra found extra native-buffer
+growth on supported Ruby 3.2/3.3. Its replacement is being checked on Ruby
+3.2/3.3/3.4 and remeasured. It must demonstrate a whole-model-load or
+benchmark effect, not only `select_all`, or remain a held idea.
+
 ## Sources and overlap checked first
 
 All drivers were built from the maintainers' current default branch, not a
@@ -283,10 +289,20 @@ approximately 1,081,088 → 1,071,816 Ir per query; it is a separate, corroborat
 protocol, not pooled with the fixed-heap worker.
 
 Branch: [`thomasklemm/skip-utf8-bind-transcode`](https://github.com/thomasklemm/sqlite3-ruby/tree/thomasklemm/skip-utf8-bind-transcode),
-head [`b2735e1a77898954b21d1cd4f2f8b0dc518200bb`](https://github.com/thomasklemm/sqlite3-ruby/commit/b2735e1a77898954b21d1cd4f2f8b0dc518200bb).
+head [`c55ce350e32f4cf05ff7f7680120d011e84eba59`](https://github.com/thomasklemm/sqlite3-ruby/commit/c55ce350e32f4cf05ff7f7680120d011e84eba59).
 Queue body: [DRV1](../../bench/upstream/pr-queue/items/DRV1.md).
+The measurements used predecessor `b2735e1a77`; the follow-up changes only
+tests, with identical C source and native binary. Its engine-independent tests
+cover malformed UTF-8 (`ff`, truncated `e2 82`), frozen inputs, TEXT type and
+exact returned bytes, plus mutation after binding. The skeptic independently
+ran both new tests on base/head with literal freezing both enabled and
+disabled (2 runs / 13 assertions in each). No alternate Ruby engine was run.
 
 ## DRV2: fill a multi-column row at its final length
+
+The tables below price the **original resize head**, not the replacement.
+That head is held after Astra's supported-Ruby finding. No new-head speed
+claim or opening decision is derived from these tables.
 
 `Statement#step` already allocates capacity for the known column count, but
 `rb_ary_store` updates the row length for each value. Resize a multi-column row
@@ -322,8 +338,52 @@ not repeated until green. There is no full-model YJIT gain claim.
 
 Branch: [`thomasklemm/fill-multicolumn-rows`](https://github.com/thomasklemm/sqlite3-ruby/tree/thomasklemm/fill-multicolumn-rows),
 head [`36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b`](https://github.com/thomasklemm/sqlite3-ruby/commit/36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b).
-Queue body: [DRV2](../../bench/upstream/pr-queue/items/DRV2.md). The exact-head
-skeptic approves the code and final body; coordinator review is still pending.
+Queue body: [DRV2](../../bench/upstream/pr-queue/items/DRV2.md). The initial
+skeptic approved, but Astra's later finding supersedes that opening decision.
+
+### Supported-Ruby correction and relevance gate
+
+On Ruby 3.2.9 and 3.3.10, `rb_ary_resize` grows storage when the requested
+length equals capacity. This affects exactly-full embedded Arrays as well as
+heap-backed rows. Ruby 3.4.8 avoids that growth. Initialize the last slot with
+`rb_ary_store(list, length - 1, Qnil)` instead, inside the existing `length > 1`
+guard, then retain write-barrier-aware `RARRAY_ASET` for the actual values.
+
+Replacement head:
+[`10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e`](https://github.com/thomasklemm/sqlite3-ruby/commit/10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e).
+The [native-memory export](data/driver-cpu/native-memory.json) retains all
+widths, runtime/archive hashes and binary hashes; its probe is in the receipts.
+
+Independent builds of main, the original resize head and the replacement
+were run on each Ruby. Eighteen widths from 1 through 2,000 cover embedded and
+heap boundaries; values, frozen state and results retained through compaction
+are checked. All **54 main/replacement width pairs** have identical retained
+row memory and embedding. Example total Array/native-buffer bytes:
+
+| Ruby | Width | Main | Resize head | Replacement |
+|---|---:|---:|---:|---:|
+| 3.2.9 / 3.3.10 | 3 | 40 | 192 | 40 |
+| 3.2.9 / 3.3.10 | 8 | 80 | 272 | 80 |
+| 3.2.9 / 3.3.10 | 80 | 680 | 1,000 | 680 |
+| 3.2.9 / 3.3.10 | 2,000 | 16,040 | 24,040 | 16,040 |
+| 3.4.8 | 80 | 680 | 680 | 680 |
+| 3.4.8 | 2,000 | 16,040 | 16,040 | 16,040 |
+
+`GC.stat(:malloc_increase_bytes)` is retained as a diagnostic, not an exact
+allocation-count oracle: allocator rounding differs even at the same retained
+size. The first probe draft repeatedly doubled the heap at every width and
+exhausted memory on **main** before producing observations. The corrected
+probe uses ordinary compaction; no driver or benchmark gate was changed.
+The running benchmark processes were checked and remained alive.
+
+The replacement's Ruby 4.0.9 interpreter/YJIT suites each pass **428/873**, and
+both compaction differentials match all **651** baseline observations. A fresh
+finite cohort measures normal `relation.spawn.to_a` model loads at 20/1,000
+narrow/wide rows, without the census's forced `attributes` casts, plus adapter
+and single-column controls. It is an explicit new workload and changed-head
+measurement, not another attempt to turn an unchanged rejected cell green.
+Unless a whole model load or external benchmark moves beyond A/A, DRV2 stays
+held; `select_all` alone is no longer enough for opening.
 
 ## Exactness and own suites
 
@@ -364,21 +424,23 @@ compaction and four threads with separate connections.
   Those include 28 widths, float bit patterns and limits, callback/error
   boundaries, internal-encoding mutation, retained rows during GC stress and
   compaction, plus multi-column threads with separate and shared connections.
-* DRV1 own suite, compaction verification: **430 runs, 878 assertions, zero
-  failures/errors, 12 skips**. Its allocation regression fails against base
-  (one temporary object) and passes against head (none).
+* DRV1 follow-up own suites, interpreter and YJIT with compaction verification:
+  **432 runs, 891 assertions, zero failures/errors, 12 skips** in each mode.
+  Its allocation regression fails against base (one temporary object) and
+  passes against head (none). The measured predecessor passed 430/878.
 * DRV2 own suite, compaction verification: **428 runs, 873 assertions, zero
   failures/errors, 12 skips**. Existing result tests plus the independent
   differential cover the row-fill refactor; no incidental private-helper test
   was added.
 
-Both skeptics approve their exact heads and short public bodies, with the
-linked report's publication as a prerequisite. DRV1 is L0; DRV2 is L1 because
-its single-column exception is a measured tradeoff. Ruby Flog/RuboCop metrics
-do not apply to these C changes. Sol and Astra are coordinator-owned and still
-required; neither item is marked `reviewed`. Both fork heads report **no CI
-checks**, not green CI. This Linux/system-SQLite run does not certify every
-SQLite/Ruby/platform combination or include sanitizers. As in DECISIONS'
+DRV1's new-head skeptic approves the code and short body; the footer resolves
+publicly. Coordinator Sol/Astra reported nits on its predecessor, addressed in
+the test-only follow-up; a coordinator confirm remains pending. DRV1 is L0.
+DRV2's initial L1 approval is superseded by Astra's supported-Ruby finding;
+its corrected code and relevance are being rechecked. Ruby Flog/RuboCop
+metrics do not apply to these C changes. Neither item is marked `reviewed`.
+The pushed fork heads report **no CI checks**, not green CI. These Linux runs
+do not certify every SQLite/Ruby/platform combination or include sanitizers. As in DECISIONS'
 exactness boundary, reaching unfinished internal Arrays through ObjectSpace
 is not a supported observer.
 

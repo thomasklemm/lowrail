@@ -59,6 +59,19 @@
     "candidate-yjit-sqlite-bind20",
     "candidate-yjit-sqlite-fill-wide"
   ],
+  "followups": {
+    "DRV1": {
+      "head": "c55ce350e32f4cf05ff7f7680120d011e84eba59",
+      "test_only": true,
+      "native_sha256": "b861045216a139c66fc75735d5be3305d0691dc8e25032b037a5af371573670a"
+    },
+    "DRV2": {
+      "head": "10b25aa99e9c1778a6bfc35f661d5ab6f28ec42e",
+      "native_sha256": "4a89c9bcf1690c9f76246731d5932a6f0cb91f837a57890954f686326bf130ea",
+      "status": "held pending whole-model-load relevance measurement",
+      "older_ruby_memory": "native-memory.json"
+    }
+  },
   "driver_heads_independent": true,
   "hosted_ci": "No CI checks found on either fork head"
 }
