@@ -13,7 +13,7 @@ depends_on: []
 impact: "Every multi-column SQLite result row, including default Rails record loads. A complete 1,000-row seven-column model load (to_a, lazy attributes) uses 2.69% fewer YJIT instructions and 1.27% fewer interpreter instructions, with passing A/A and unchanged objects. Native row memory matches main on Ruby 3.2/3.3/3.4; no whole-request saving is established."
 rank: 23
 risky: true
-state: draft
+state: ready
 pr: 770
 note: "Restacked to one commit; claude-code approved c69e94955e. 6c212edd9c only rewords the GC sentence in the commit message (Astra), tree identical to c69e94955e."
 passes:

@@ -13,7 +13,7 @@ depends_on: []
 impact: "Every UTF-8 SQLite text bind in Rails and direct-driver apps avoids a temporary String; a common 20-name lookup drops 162 to 142 objects and 0.82% interpreter query instructions. YJIT select_all drops 1.27% with passing A/A; the pluck instruction window rejects for compilation."
 rank: 22
 risky: true
-state: draft
+state: ready
 pr: 769
 note: "Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads. Claude Code final review 2026-11-06: f1709a4f53 = 16c9550b68 with an identical tree; the commit message drops its measurement paragraph (numbers stay in the body and driver-cpu.md) and rewords the tests paragraph (\"a change to this branch\" read as a git branch). Body unchanged; no CHANGELOG entry (flavorjones adds them at merge, as on #758)."
 passes:
