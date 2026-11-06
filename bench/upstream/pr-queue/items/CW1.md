@@ -5,7 +5,7 @@ kind: fix
 area:
 reviewer:
 branch: thomasklemm/where-empty-condition-binds
-head: "805ab062624df73231d665c0fcf0131ec36d9ee0"
+head: "10346a258e1fd105de7561437ad7917ff3cb9b47"
 base: main
 built_on:
 depends_on: []
@@ -16,18 +16,18 @@ rank:
 risky: false
 state: ready
 pr: 59642
-note: "2026-11-06: reply to matthewd posted (discussion_r4492126885) offering option B (thomasklemm/where-group-bound-literals 10346a258e, explicit bound-node grouping fix since 7.1) with this exact-8.1 head as fallback; title/body updated to this head."
+note: "2026-11-06: reply to matthewd posted (discussion_r4492126885) offering option B (thomasklemm/where-group-bound-literals 10346a258e, explicit bound-node grouping fix since 7.1) with this exact-8.1 head as fallback; title/body updated to this head. 2026-11-06 16:44 UTC matthewd (4495087542): \"I think that alternative branch is the better fix.\" PR switched to option B 10346a258e (force-push with lease on 805ab06262), retitled, body rewritten, replied \"Switched the PR to it.\" (discussion_r4495214214). 805ab06262 remains the exact-8.1 fallback commit."
 passes: []
 ---
 
-# Parenthesize only bound string conditions in `where` and `having`
+# Group bound SQL literals in `WhereClause` like other SQL literals
 
-#58427 moved the parentheses ahead of placeholder dispatch when it shared bind handling between `where` and `find_by_sql`/`count_by_sql`. That also wrapped string conditions without placeholders, which are sanitized into plain SQL and already grouped by `WhereClause`. They now get a second pair, which changes their SQL and stops identical conditions from being deduplicated on merge. An empty condition with values is no longer dropped when chained onto another condition: `Post.where(author_id: 1).where("", {})` produces `AND (())`.
+`WhereClause` groups String and `SqlLiteral` predicates so that a top-level `OR` can't escape a neighbouring `AND`, but it doesn't group `BoundSqlLiteral`. Placeholder conditions were only safe because #51139 gave the bound literals it builds textual parentheses. An explicitly passed bound node has been emitted bare since 7.1: `Item.where(Arel.sql("n = ? OR n = ?", 1, 3)).where(n: [2, 3])` produces `WHERE n = 1 OR n = 3 AND "items"."n" IN (2, 3)` and returns extra rows. The same happens through `merge`, association scopes, STI, `having`, `eager_load` join conditions, `invert_where`, `update_all` and `delete_all`.
 
-This passes the original condition to `bound_sql_literal_for` and has `where`/`having` ask it to wrap only the bound literals it builds, so those conditions generate the same SQL as on 8.1. `find_by_sql`/`count_by_sql` keep their binds.
+#58427 moved those parentheses ahead of placeholder dispatch, so string conditions that are sanitized into plain SQL got them too, on top of `WhereClause`'s grouping. Their SQL changed, identical conditions stopped deduplicating on merge, and `Post.where(author_id: 1).where("", {})` produced `AND (())`.
 
-Chatwoot's [`FilterService#query_builder`](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L189) is one caller: it builds the SQL string and its values separately, then passes both to `where`. The string [starts empty](https://github.com/chatwoot/chatwoot/blob/a8364f9c4385b12b4f217649c1dad23755459215/app/services/filter_service.rb#L20), so an empty filter payload reaches this path on an already-scoped relation.
+This groups `BoundSqlLiteral` in `WhereClause` like `SqlLiteral` and drops the textual parentheses, so `where` and `having` group both in one place. Results change only for explicit bound nodes. SQL text also changes in two places: placeholder conditions under `where.not` and `or` lose a redundant pair, which is 7.1's output again, and an explicit bound node that carries its own parentheses gains one. A string condition and the same explicit bound node now compare equal. `find_by_sql` and `count_by_sql` stay unwrapped.
 
 ---
 
-<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md), part of my research project Lowrail).</sub>
+<sub>Found by running the test suites of open-source Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/where-parens-history.md), part of my research project Lowrail).</sub>
