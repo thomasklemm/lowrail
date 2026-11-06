@@ -13,10 +13,11 @@ different period than its receiver, which is what crossing a DST change means. l
 uses 7- to 90-day lookbacks, so on dates where those lookbacks cross a change it does 1,476 extra tzinfo lookups per
 pass, about 6 objects and 24K instructions each.
 
-A small fix in Active Support removes the second lookup for `Time` results and gives identical results:
+A small fix in Active Support removes the second lookup for UTC `Time` results and gives identical results:
 branch [`thomasklemm/twz-reuse-local-period`](https://github.com/thomasklemm/rails/tree/thomasklemm/twz-reuse-local-period)
-at `6993c9b20b` on rails/rails main `1e235cee11` (the first head, `4779066d80`, was wrong for Julian-calendar
-`DateTime`s; see [round 2](#round-2-sol-and-astra-julian-datetimes)). With it, lobsters on 2026-11-05 allocates the same as on a date
+at `ba1f364214` on rails/rails main `1e235cee11` (earlier heads were wrong for Julian-calendar `DateTime`s,
+fractional offsets and leap-second zones; see rounds 2–4 below). It is **held** in the queue (item TWZ1): exact and
+reviewed, but rails/rails is at its open-PR cap and the effect shows only on dates whose lookbacks cross a change. With it, lobsters on 2026-11-05 allocates the same as on a date
 without crossings (648.9K), and a lookback across a DST change costs 29–39% fewer instructions in micro-benchmarks.
 Nothing is opened upstream.
 
@@ -243,6 +244,102 @@ Head after round 2: `6993c9b20b`.
   warmups): 657,778 → 648,805 objects per pass on 2026-11-05 with 0 second lookups; 648,888 → 648,893 on
   2027-06-28.
 
+### Round 3: fractional offsets and wrapped DateTimes
+
+The skeptical subagent, rerun on `6993c9b20b`, found two more inputs where tzinfo's key and the constructor's civil
+fields disagree:
+
+1. **Must-fix: a `Time` with a fractional `utc_offset`.** `Timestamp.for_time(t, :ignore)` computes
+   `t.to_i + t.utc_offset`, truncating the instant before adding the fraction, and `periods_for_local` ignores
+   sub-seconds; so the key can be one second before the wall clock. On a transition second, tzinfo sees the period
+   before a gap while the constructor sees the gap. `ActiveSupport::TimeZone["Amsterdam"].local(2026, 7, 1, 12)
+   .change(month: 3, day: 29, hour: 2, offset: 3600.5)`: main `03:00:00.5 CEST +02:00` (`PeriodNotFound`, moved
+   forward an hour); `6993c9b20b` `02:00:00.5 CET +01:00`, a local time that doesn't exist. Fixed with
+   `time.utc_offset.integer?`; with a whole-second offset `to_i + utc_offset` is the floor of the wall clock, which
+   is the constructor's key.
+2. **Should-fix: a `TimeWithZone` wrapping a Julian `DateTime`**, returned by a user-defined `Time` method through
+   `method_missing`. `TimeWithZone#is_a?(::Time)` is true and tzinfo keys it by `DateTime#to_i` (Julian day).
+   Main `12:00 EDT` (16:00 UTC), `6993c9b20b` `12:00 EST` (17:00 UTC). Fixed with `instance_of?(::Time)`, which
+   also sends `Time` subclasses down main's path (exact, one lookup more, as on main).
+
+Nit kept: in zones without transitions `periods_for_local` no longer calls tzinfo, so an acts-like-time object
+tzinfo rejects (`ArgumentError: … values are not supported`) is accepted there; Rails passes only `Time`/`DateTime`.
+Fourth pass on `33226e90c8`: approve (45 probe lines, 44 identical, the other the nit).
+
+Head after round 3: `33226e90c8` (superseded in round 4).
+
+* **Tests:** a second regression test, `test_change_into_dst_gap_with_fractional_offset`, asserts main's offset,
+  abbreviation, `dst?` and UTC for case 1; it fails on `6993c9b20b` and passes on main and the head. No test for
+  case 2 (it needs a method added to `Time`, or a call to the private `wrap_with_time_zone`). Time tests: 1,283
+  runs, 0 failures; RuboCop clean.
+* **Differential:** adds ten fractional `change(offset:)` values, a `Time` method returning a fractional-offset
+  `Time` through `method_missing`, and one returning a `TimeWithZone` around a Julian `DateTime`. On Amsterdam, New
+  York, Lord_Howe, UTC and Dublin, 5,305,647 results: 545 differences on `6993c9b20b`, none on the head. On New York
+  and Amsterdam with the wrapped op, 2,938,084 results: 12,376 differences on `6993c9b20b`, none on the head.
+* **Instructions** (micro-benchmarks, main vs `33226e90c8`): crossing a DST change, `70.days.ago` 83,468/83,469 → 60,540/60,459 (−27.5%), `1.day.ago`
+  85,821 → 61,675/61,593 (−28%), `beginning_of_day` 63,620 → 39,498/39,525 (−38%), `change(month:)`
+  62,082/62,121 → 39,134/39,095 (−37%); UTC `70.days.ago` 45,446/45,365 → 36,567 (−20%); same period,
+  `70.days.ago` 66,554 → 66,617/66,698, `beginning_of_day` 43,723 → 43,813/43,786 (within about 100; repeats differ
+  by up to 82). The two extra checks cost about 400 instructions on the crossing path, against round 2's head.
+* **Per request in lobsters** (the new bar for opening, DECISIONS 6c1439e). `dst_route_harness.rb` replays only
+  the `/threads` requests of a pass (3 in the route list, 5 times each, 15 requests) after three full warmup passes,
+  with Rails 8.1.4.1 and the head's three methods redefined after boot, Ruby 4.0.9 interpreter, fixed heap, real
+  clock (2026-11-05, where `/threads`' lookbacks cross the US change of 2026-11-01). 
+
+  | per `/threads` request | Rails 8.1.4.1 (A / A) | with the fix (A / A) |
+  | --- | ---: | ---: |
+  | Callgrind instructions | 106,513,569 / 106,513,700 | 103,502,080 / 103,451,919 (−2.85%) |
+  | allocated objects | 19,973.7 / 19,972.9 | 19,188.8 / 19,188.0 (−785, 131 lookups × 6) |
+  | 2027-06-28 control (libfaketime, `c689eafb86`), instructions | 104,313,998 | 104,242,860 (−0.07%) |
+
+  The A/A spread is 0.0001% before and 0.05% with the fix, far below the effect; the earlier full-pass bimodality
+  doesn't appear when only `/threads` is replayed. Round 3's first measurement on `c689eafb86` gave the same
+  (106.57M → 103.48M, A/A 0.001% and 0.02%). On dates where `/threads`' lookbacks cross no change the fix does
+  nothing, as the control shows. This is a per-request effect on one page of an app with a DST zone; other pages
+  of lobsters gain less (`/newest` and `/comments` repeat fewer lookups, per the audit's per-route allocations).
+
+### Round 4: leap-second zones, final head `ba1f364214`
+
+Sol and Astra on `33226e90c8` (coordinator's orb), both "changes", the same two findings:
+
+1. **High: a local `Time` from a leap-second zone.** `ENV["TZ"] = "right/UTC"; t = Time.local(2026, 3, 29, 2, 59, 50)`,
+   then wrapped in Amsterdam (receiver in January): tzinfo's key `to_i + utc_offset` includes the 27 leap seconds
+   and lands outside the gap. Main `03:59:50 CEST` (01:59:50 UTC); `33226e90c8` `02:59:50 CEST` (00:59:50 UTC), a
+   nonexistent local time. Reproduced here.
+2. **Medium:** drop the `TimeZone#periods_for_local` shortcut for zones without transitions (argument check and
+   identity of the returned elements differ from main).
+
+Fix: the single period is passed on only for `time.instance_of?(::Time) && time.utc?`, where the constructor uses
+the time unchanged and looks the same object up in the same zone (so tzinfo sees the same key on both paths, even
+under `right/` zones, where `to_i` of a UTC Time also counts leap seconds). `values/time_zone.rb` is back to main.
+The skeptical subagent then found that `change(zone: "UTC")` from a DST zone would now pass tzinfo's fresh
+`OffsetTimezonePeriod` instead of the zone's memoized frozen one, so `single_period` also requires a
+`TransitionsTimezonePeriod`; zones without transitions take main's path. Third regression test
+`test_change_zone_to_utc_keeps_the_shared_period` (`assert_same`), failing on `9fc271b86d`.
+
+* **Reviews:** skeptic on `9fc271b86d`: should-fix (the identity above), fixed; skeptic on `2fab681937`: approve
+  (315 UTC/leap-second constructions × 5 zones identical; a sweep of every zone, 1900–2100, 92,197 UTC times
+  identical; tzinfo 2.0.6 builds only `TransitionsTimezonePeriod` for zones with transitions); two wording nits
+  applied in `ba1f364214` (message only, same tree). Sol and Astra not rerun by decision of the coordinator.
+* **Coverage argument for the differential:** the final head passes a period on for a strict subset of the inputs
+  `6993c9b20b` did (UTC Times with one transitions period), and takes main's path for the rest. The full 77,169,642-
+  result differential found `6993c9b20b` identical to main, and the targeted runs' differences on later heads were
+  all outside that subset. Tests: 1,284 runs, 0 failures; RuboCop clean.
+* **Instructions** (micro, main vs `ba1f364214`, two runs each): across DST `70.days.ago` 83,549 → 60,583/60,664
+  (−27.5%), `beginning_of_day` 63,647 → 39,622/39,649 (−38%), `change(month:)` 62,082 → 39,219 (−37%); same
+  period `70.days.ago` 66,635 → 66,635, `beginning_of_day` 43,723 → 43,750/43,723; UTC `70.days.ago` unchanged
+  (45,365/45,446 → 45,365), since constant zones now take main's path.
+* **Per request** (`/threads`, same harness as round 3, real clock 2026-11-05):
+
+  | per `/threads` request | Rails 8.1.4.1 (A / A) | with `ba1f364214` (A / A) |
+  | --- | ---: | ---: |
+  | Callgrind instructions | 106,587,747 / 106,518,190 | 103,512,389 / 103,511,343 (−2.85%) |
+  | allocated objects | 19,971.0 / 19,971.4 | 19,186.1 / 19,183.5 (−786) |
+
+  A/A spread 0.065% before, 0.001% after; the effect stays −2.85% with the narrowed guard, because lobsters'
+  lookbacks wrap UTC `Time`s (`TimeWithZone#time` keeps the UTC flag). No effect on dates without a crossing
+  (round 3's 2027-06-28 control, −0.07%).
+
 ## tzinfo: comparing equal periods is slow
 
 `periods.include?(period)` compares two `TransitionsTimezonePeriod`s that are never the same object (tzinfo builds
@@ -304,12 +401,11 @@ period 65,677 → 57,827.
 
 ## Recommendation
 
-* **Queue the Active Support fix** as a rails/rails draft from head `6993c9b20b` once Sol and Astra approve it
-  (rails/rails is at the 20-open cap; drafts may open overnight, only Thomas marks them ready). Body: two short
-  paragraphs (what is wasted and why; what changes and that results are the same, including the
-  `periods_for_local` note for constant zones) and one table in Callgrind instructions; no lobsters speed claim.
-  Readability L1 (one small private helper). Body draft, written to DECISIONS' "Bodies for humans, short":
-  [`pr-body.md`](../../bench/upstream/ruby_bench_dst/pr-body.md).
+* **Active Support fix: held** (coordinator, 2026-11-06, under DECISIONS 6c1439e). Queue item
+  [TWZ1](../../bench/upstream/pr-queue/items/TWZ1.md), head `ba1f364214`, no PR. Exact after four rounds and
+  measurable per request (`/threads` −2.85%, A/A 0.07%/0.001%) on DST-crossing dates only; three exactness rounds
+  and the open-PR cap argue for waiting. Thomas can pick it up after the 8.2 beta; it then needs a Sol pass on
+  `ba1f364214`. Body: [`pr-body.md`](../../bench/upstream/ruby_bench_dst/pr-body.md).
 * **tzinfo**: TZ1 is prepared as a draft candidate (see above); it is independent of the Active Support fix.
 * **ruby-bench**: the fixed-clock PR from round 4 still makes sense on its own: it removes date dependence that has
   other sources too (expired windows), and the DST part would otherwise only disappear once ruby-bench pins a Rails
