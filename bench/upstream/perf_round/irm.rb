@@ -22,11 +22,42 @@ if app != "none"
 end
 load cases_file
 work = MICRO.fetch(name).call
-(ENV.fetch("WARMUP", "2000").to_i).times { work.call }
+require ENV.fetch("BENCH_CALLGRIND_EXTENSION") if ENV["PERFCALL_CLIENT"] == "1"
+calls = ->(count) { count.times { work.call } }
+calls.call(ENV.fetch("WARMUP", "2000").to_i)
+jit_proof = nil
+if ENV["PERFCALL_STATE"] == "1"
+  require_relative "../../jit_stability"
+  require "json"
+  JitStability.assert_mode!
+  heap_anchors = HeapWindows.prepare_heap
+  200.times do
+    GC.stat_heap.transform_values { _1.slice(:heap_eden_pages, :heap_eden_slots) }
+    JitStability.snapshot if JitStability.enabled?
+  end
+  if JitStability.enabled?
+    jit_proof = JitStability.observe_batches(200, 100, 0, 10) { |count| calls.call(count) }
+  end
+end
 GC.start
 GC.disable
+if ENV["PERFCALL_STATE"] == "1"
+  heap_before = GC.stat_heap.transform_values { _1.slice(:heap_eden_pages, :heap_eden_slots) }
+  jit_before = JitStability.snapshot if JitStability.enabled?
+end
 alloc0 = GC.stat(:total_allocated_objects)
-[nil].cycle(1) { iters.times { work.call } }
+LowrailCallgrindBench.start if ENV["PERFCALL_CLIENT"] == "1"
+[nil].cycle(1) { calls.call(iters) }
 alloc = GC.stat(:total_allocated_objects) - alloc0
+LowrailCallgrindBench.finish if ENV["PERFCALL_CLIENT"] == "1"
+if ENV["PERFCALL_STATE"] == "1"
+  jit_after = JitStability.snapshot if JitStability.enabled?
+  heap_after = GC.stat_heap.transform_values { _1.slice(:heap_eden_pages, :heap_eden_slots) }
+  jit_flat = !JitStability.enabled? || (jit_proof[:consecutive_flat_windows] >= 10 &&
+    jit_before.values.all? { _1.is_a?(Integer) } && jit_before == jit_after)
+  warn "PERFCALL_STATE #{JSON.generate(jit: JitStability.state, warmup: jit_proof, jit_before: jit_before,
+    jit_after: jit_after, jit_flat: jit_flat, heap_before: heap_before, heap_after: heap_after)}"
+  raise "measurement state changed" unless jit_flat && heap_before == heap_after
+end
 GC.enable
 $stderr.puts "OBJECTS_PER_CALL #{alloc / iters.to_f}"
