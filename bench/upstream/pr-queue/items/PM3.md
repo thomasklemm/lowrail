@@ -14,7 +14,7 @@ alternative_of:
 impact: LogSubscriber#consumes? −17% and EventReporter#emitting? −13% instructions per call; Action Controller asks emitting? twice per action
 rank: 13
 risky: false
-state: held
+state: closed
 pr: 59674
 note: "parked idea: #59674 closed 2026-11-05 (Thomas), exact and reviewed but too small to move a whole request; not to be reopened as is. Branch kept"
 passes:

@@ -14,7 +14,7 @@ alternative_of:
 impact: on Ruby master an intent in the measured query shapes fits a 256-byte slot instead of 512, 256 B less per query; on Ruby 4.0 the same shapes stay at 320 B
 rank: 11
 risky: true
-state: held
+state: closed
 pr: 59673
 note: "held: #59673 closed 2026-11-05 (Thomas) for low impact: no change on Ruby 4.0, 256 B per query only on Ruby master, no per-request evidence. Revisit after Ruby 4.1 is released and measure GC per request; branch kept"
 passes:

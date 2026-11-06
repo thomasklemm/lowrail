@@ -14,7 +14,7 @@ alternative_of:
 impact: "Zammad's login lookups (2,498 specs), authlogic 6.6.1, Mastodon's reblog insert and DocuSeal stop raising NoMethodError; fixes unreleased #58479"
 rank: 2
 risky: true
-state: draft
+state: closed
 pr: 59663
 note: "opened as draft 2026-11-05; supersedes M1's record-only; earlier heads 72d0b21869, ebbb6c49be; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: Zammad's 2,498 failing specs, the 300 Ir (+1.2%) is_a? cost, alias and comparison-expression types and the model-less test, in docs/upstream/app-suites.md#zammad"
 passes:

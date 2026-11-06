@@ -14,7 +14,7 @@ alternative_of:
 impact: "a permanent SQLite index whose name a temporary index shares reads its own columns and statement again, not the temporary index's columns twice"
 rank: 9
 risky: true
-state: held
+state: closed
 pr: 59672
 note: "parked idea: #59672 closed 2026-11-05 by the coordinator on Thomas's request to cut maintainer noise; shared temporary/permanent index names are rare. Branch kept"
 passes:

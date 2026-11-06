@@ -14,7 +14,7 @@ alternative_of:
 impact: one Array fewer per symbol around callback; 1.2% fewer interpreter instructions per callback run on Ruby 4.0.9
 rank: 14
 risky: false
-state: held
+state: closed
 pr: 59677
 note: "parked idea: #59677 closed 2026-11-05 (Thomas), exact and reviewed but too small to move a whole request; not to be reopened as is. Branch kept"
 passes:
