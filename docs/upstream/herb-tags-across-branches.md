@@ -10,7 +10,7 @@ undersells that **valid, runtime-balanced** templates are rejected too; that's t
 
 Separately, the guide's "Valid templates render the same output as before" is not quite true today: Herb leaves
 blank lines where Erubi trims a `<% # comment %>` line, and after a `<%# %>` line followed by a statement inside
-a block. A draft Herb fix exists but regresses other shapes, so it isn't pushed (below). No upstream posts, issues or PRs; Thomas decides.
+a block. A draft Herb fix exists but regresses other shapes, so it isn't pushed (below). Follow-up below: the docs note and a Herb issue.
 
 ## Repro
 
@@ -154,7 +154,22 @@ What the review broke (inputs outside the fuzz grammar):
 So the Herb fix needs a rework of statement-line trimming (multi-tag lines included), with line-number probes
 in the differential. That's larger than a small patch and belongs with whoever owns Herb's trim logic.
 
+## Follow-up (2026-11-06, Thomas approved both recommendations)
+
+* **Docs:** fifth note "HTML elements must close in the branch that opens them" added to the 8.1 → 8.2 upgrade
+  guide in draft [rails/rails#59675](https://github.com/rails/rails/pull/59675) (UG82), commit `3428a0ee53`, a
+  fast-forward on `28e73a9396`. It quotes the minimal repro, the two Herb errors, `bin/rails herb:check`, and the
+  two ways out (pair tags per branch, e.g. a recursive partial; or `erb_implementation = :erubi`). Verified on main
+  `8e8a9bb`; mdl clean. PR body: one bullet (lobsters, Discourse, Redmine pinned), "four" → "five" in intro and
+  title. Still draft, no comment.
+* **Herb issue:** [marcoroth/herb#2892](https://github.com/marcoroth/herb/issues/2892), "Engine: whitespace-only
+  line kept next to a comment tag where Erubi trims it". Herb's CONTRIBUTING welcomes bug reports and has no AI
+  policy; no bug template exists. Two skeptic passes: the first split the repros into smaller ones, corrected a
+  false "without the `if` it matches" claim (the trigger is indentation on both lines), and added the link to
+  the engine docs' known `<% # c %>` difference (L96, same-line case only). Body states herb 0.11.0 and 0.11.2,
+  erubi 1.13.1, Ruby 4.0.9 and the Action View check on main `8e8a9bb`; no fix or patch mentioned.
+
 ## Not done
 
-No issue, PR or comment upstream. Rails-side code change not recommended: the handler is correct, and a
+No PR to Herb; the draft patch stays local. Rails-side code change not recommended: the handler is correct, and a
 fallback to Erubi on parse errors would hide the markup bugs that are Herb's point (66 of 94 above).
