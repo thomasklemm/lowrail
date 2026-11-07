@@ -5,9 +5,9 @@ kind: fix
 area: Active Record / Active Model attributes
 reviewer: "tenderlove (author of #59083)"
 branch: thomasklemm/frozen-default-attribute-unread
-head: "9b2a64d040"
+head: "490fdf855b"
 base: main
-built_on: "bdb3d96012"
+built_on: "9ba8b1edee"
 depends_on: []
 stacked_on:
 alternative_of:
@@ -16,7 +16,7 @@ rank: 1
 risky: true
 state: draft
 pr: 59662
-note: "opened as draft 2026-11-05; earlier heads f95cc1b6df, de7aff270c, c52724804d, 02443a3b04, 3b35e79cb5; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the freezable_default? hook for custom types; affected-model counts (OpenProject 51/305, Mastodon 6/117, shipit 9/26, lobsters 1/24) and the 18-22% Model.new microbenchmark, in docs/upstream/app-suites.md#openproject and bench/upstream/app_suites/op8-bench"
+note: "opened as draft 2026-11-05; earlier heads f95cc1b6df, de7aff270c, c52724804d, 02443a3b04, 3b35e79cb5, 9b2a64d040; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the freezable_default? hook for custom types; affected-model counts (OpenProject 51/305, Mastodon 6/117, shipit 9/26, lobsters 1/24) and the 18-22% Model.new microbenchmark, in docs/upstream/app-suites.md#openproject and bench/upstream/app_suites/op8-bench"
 passes:
   - {reviewer: astra, head: "c52724804d", date: 2026-11-05, verdict: changes, open: "duck-typed types, sharper tests, body scope; applied"}
   - {reviewer: skeptic, head: "02443a3b04", date: 2026-11-05, verdict: changes, open: "blocker: DDL under sqlite3_ractor, applied, plus two nits"}
@@ -24,6 +24,8 @@ passes:
   - {reviewer: sol, head: "9b2a64d040", date: 2026-11-05, verdict: approve, open: production code identical to the Astra-approved head}
   - {reviewer: astra, head: "9b2a64d040", date: 2026-11-05, verdict: nits, open: "production code verified identical to 3b35e79cb5; nits: native-JSON nested-isolation test; CHANGELOG entry declined (fixed change unreleased)"}
   - {reviewer: skeptic, head: "9b2a64d040", date: 2026-11-05, verdict: nits, open: "optional: body says override or forward the hook, but freezable_default? is nodoc; split test_freezing_eligibility_of_column_defaults; activerecord none-claim unverifiable"}
+  - {reviewer: claude-code, head: "9b2a64d040", date: 2026-11-07, verdict: changes, open: "applied in 490fdf855b (rebased onto 9ba8b1edee, no conflicts, #59083 code unmoved): tests rewritten to public-API behaviour per the 11-06 rule (dropped the coder call-count test, _default_attributes.frozen? asserts, direct freezable_default? calls and the AM Attribute#freezable? tests); removed Value#freezable_default? and the NormalizedValueType override, dead because ActiveSupport DelegateClass is a ::Delegator and forwards dynamically; commit message updated"}
+  - {reviewer: claude-code, head: "490fdf855b", date: 2026-11-07, verdict: changes, open: "code and commit message approved; body only, not posted: the structure.sql link 404s, use https://github.com/opf/openproject/blob/9ae6b5cc50ba3b675661f751d2ca9f361cb1f0b3/db/migrate/20260428133700_create_health_reports.rb#L34; cut the nodoc hook clause to: `normalizes` and `encrypts` defer to the wrapped type, and other types keep main's behaviour. Verified: new tests fail on main, every remaining production line fails the suite when reverted, AR SQLite 9829 and PostgreSQL 11254 runs green, AM 1256, sqlite3_ractor file green, RuboCop clean; PG probe of jsonb/serialized/array/hstore/STI/proc defaults matches 8-1-stable and safe models stay frozen; store_model and attr_json unchanged vs main. Residual: no test for an encrypted Type::Json with a non-NULL default (needs support_unencrypted_data). Sol/Astra need a pass on the new head"}
 ---
 
 # Keep models with mutable defaults off the frozen defaults

@@ -1982,9 +1982,9 @@ a test name). activemodel 1253 runs; AR serialized, attributes, dirty, defaults,
 462 (PostgreSQL) runs, PostgreSQL json/array/hstore 154 runs, `serialized_attribute_test` on `sqlite3_ractor`, all green;
 RuboCop clean. Astra round 2 on `3b35e79cb5`: approve, two nits applied: the encrypted and normalized wrappers around
 `Type::Json` must accept `nil` and reject `"{}"` (a `cast_type.freezable_default?(nil)` mutant passed before), and the body
-says which microbenchmarks the 18–22% are. Branch `thomasklemm/frozen-default-attribute-unread` @ `9b2a64d040` (earlier
-`f95cc1b6df`, `de7aff270c`, `c52724804d`, `3b35e79cb5`) on main
-`bdb3d96012` (rails/rails main has moved one unrelated commit since),
+says which microbenchmarks the 18–22% are. Branch `thomasklemm/frozen-default-attribute-unread` @ `490fdf855b` (earlier
+`f95cc1b6df`, `de7aff270c`, `c52724804d`, `3b35e79cb5`, `9b2a64d040`) on main
+`9ba8b1edee`; the final Claude Code pass made the tests behaviour-only and dropped two dead hook methods,
 [patch](../../bench/upstream/app_suites/op8-frozen-default-attribute-unread.patch),
 [body](../../bench/upstream/app_suites/op8-body.md).
 
