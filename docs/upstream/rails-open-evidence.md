@@ -91,3 +91,146 @@ Loaded `comment.post_author`: objects 3 → 1; Ir i40 15,447 → 12,076 (−22%,
 | #59570 | L2 | Keep; the per-append gain is well outside the A/A and the ruby-bench effect exists. ZJIT gains ~1%. |
 | #59564 | L1 | Close, or replace with the simple variant. Its gain is at most 0.5% of a preload, within the A/A in the interpreter for a has_many. |
 | #59557 | L3 | Kept open by decision; body states the master costs and the ruby/ruby#19662 dependency. No simple variant keeps the gain. |
+
+## Ownership-safe rework (2026-11-08) — close recommended
+
+Revisited [the preloader PR](https://github.com/rails/rails/pull/59564) after
+[tenderlove's inline review](https://github.com/rails/rails/pull/59564#discussion_r4507386824).
+GitHub dates the COMMENTED review to **2026-11-08 18:58:37 UTC**, not November 7.
+The objection is valid: the published code adopts `immediate_future_classes` as an accumulator and mutates
+`likely_reflections` results. A callee's present implementation does not establish ownership in its caller.
+
+**Outcome: recommend closing, not updating.** The ownership-safe rewrite passes the focused behavior checks,
+but both interpreter instruction changes are smaller than A/A movement. The YJIT measurements compile during
+the counted windows, so they cannot establish a qualifying win. No Rails force-push, body edit, reply or closure
+was performed; the PR remains at
+[`2fb737482f`](https://github.com/thomasklemm/rails/commit/2fb737482fa9d03e3bbb35586edda131b42e6bdf).
+The [queue item](../../bench/upstream/pr-queue/items/PR59564.md) preserves the live body, not a proposed replacement.
+
+### Rework considered
+
+The PR was rebased locally onto Rails main
+[`bc0ce44b23`](https://github.com/rails/rails/commit/bc0ce44b239b5a45e8add556f92bbc210abb3597).
+The measured rewrite is uncommitted and unpublished. Its complete `git diff upstream/main --binary` SHA-256 is
+`42eefa14216571a1f81d6055c7270d845612c6c10adf0892b7e36f3613283fb8` (+8/−5 across the two preloader files).
+
+Cold read, one responsibility per line:
+
+* Concatenate immediate and child classes into a new Array, deduplicate it in place, and return the Array.
+* Keep `likely_reflections.reject` in both callers; map target classes in the fresh rejected Array.
+* Flatten runnable loaders, then delete already-run loaders from that fresh Array.
+* Collect future classes for the batch, then map and deduplicate the collected Array in place.
+* Partition branches, then append finished branches' children to the newly built in-progress group.
+
+In particular, `future_classes` becomes:
+
+```ruby
+def future_classes
+  classes = immediate_future_classes + children.flat_map(&:future_classes)
+  classes.uniq!
+  classes
+end
+```
+
+The final return is necessary because `uniq!` returns nil when nothing is removed. Neither helper results nor
+loader/child Arrays are adopted as mutation receivers. No new upstream test was added for allocations or other
+implementation details.
+
+### Measurement
+
+Ruby **4.0.9**, revision `3e93b23afc`, interpreter and `--yjit`, on the same build and dependencies in both trees.
+The unchanged [`cpu_open.rb`](../../bench/upstream/rails-open/cpu_open.rb) creates three authors, three posts and
+two comments per post; each workload warms for 3,000 calls. Objects are `GC.stat(:total_allocated_objects)` over
+2,000 calls. Instructions are Callgrind's **5,000-call count minus its 0-call count, divided by 5,000**, with
+`--collect-atstart=no --toggle-collect=rb_ary_cycle --callgrind-out-file=/dev/null`, plus `--smc-check=all` for YJIT.
+This is a fresh comparison, not a comparison with the historical Ruby 4.0.7 table above. No ZJIT remeasurement
+was needed after the update criterion failed.
+
+Initial-slot settings alone did not retain a fixed heap: the first direct interpreter main window
+grew eden pages from `459/72/177/10/7` to `695/473/947/272/7`. That preliminary attempt was **rejected**, not pooled.
+For one replacement finite cohort, an Array#cycle wrapper calls the existing `HeapWindows.prepare_heap` before
+entering the measured C method, keeps its anchors alive, disables GC again, and snapshots pools/GC/JIT before and
+after `super`. Preparation and snapshot work are outside the collected region. The workload and its warmup are
+unchanged. Heap floors, identical in all arms, are `3000000/1000000/1000000/300000/20000` slots for pools 0–4;
+every window starts with `1833/1223/2451/1478/199` eden pages. Data limit is unlimited.
+
+All **24 replacement windows** have zero measured GC-count change, unchanged per-pool eden/total-allocated-page
+counters, and no brk overflow. Main, one repeat of main, and the rewrite each run once at N=0 and N=5,000 for both
+workloads and both modes. Worker concurrency was raised from two to four within this finite batch after checking
+memory; no workers were retried or selected. No wall-time result is claimed.
+
+Valgrind was built with `script/bench-valgrind`: 3.19.0, the pinned 512 MiB brk patch, source SHA-256
+`dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02`, patch SHA-256
+`ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1`, Callgrind binary SHA-256
+`58fff2840b00bc424c88114678fedc1651507aa4543c12c81b989394c5d92c04`, GCC 14.2.0, glibc 2.41.
+
+| Workload | Mode | Main instructions/call | Rework instructions/call | Rework Δ | Repeat main Δ | Objects main → rework |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `Post.preload(:comments).to_a` | Interpreter | 1,627,780.9132 | 1,627,578.9042 | −0.012410% | +0.013097% | 362 → 356 |
+| `Post.preload(:commenters).to_a` | Interpreter | 3,137,222.5054 | 3,136,720.6056 | −0.015998% | +0.028607% | 724 → 706 |
+| `Post.preload(:comments).to_a` | YJIT, **not flat** | 713,569.8462 | 712,659.3510 | −0.127597% | −0.106408% | 368 → 362 |
+| `Post.preload(:commenters).to_a` | YJIT, **not flat** | 1,467,964.9248 | 1,464,542.7420 | −0.233124% | +0.104645% | 741 → 723 |
+
+The interpreter savings are **202.0090** and **501.8998** instructions/call, against A/A movements of **213.1884**
+and **897.4592**. Object savings are real, but do not establish the CPU gain required to pursue the update.
+The YJIT rows are raw observations, **not admissible speed evidence**: all six 5,000-call windows compile blocks.
+The through YJIT delta is larger than its A/A, but its compilation differs materially between arms (79/103/10 new
+blocks for main/repeat/rework), so it does not rescue the result. No warmup adjustment or rerun was made to seek a
+passing JIT gate.
+
+<details><summary>Raw Callgrind counts and JIT compilation</summary>
+
+Every interpreter N=0 count is 2,302; every YJIT N=0 count is 2,677. All N=0 JIT compilation deltas are zero.
+Objects on the A/A arm equal main in every row.
+
+| Workload | Mode | Arm | N=5,000 count | New compiled blocks in counted window |
+| --- | --- | --- | ---: | ---: |
+| Direct | Interpreter | Main | 8,138,906,868 | — |
+| Direct | Interpreter | Repeat main | 8,139,972,810 | — |
+| Direct | Interpreter | Rework | 8,137,896,823 | — |
+| Through | Interpreter | Main | 15,686,114,829 | — |
+| Through | Interpreter | Repeat main | 15,690,602,125 | — |
+| Through | Interpreter | Rework | 15,683,605,330 | — |
+| Direct | YJIT | Main | 3,567,851,908 | 21 |
+| Direct | YJIT | Repeat main | 3,564,055,414 | 9 |
+| Direct | YJIT | Rework | 3,563,299,432 | 32 |
+| Through | YJIT | Main | 7,339,827,301 | 79 |
+| Through | YJIT | Repeat main | 7,347,508,044 | 103 |
+| Through | YJIT | Rework | 7,322,716,387 | 10 |
+
+</details>
+
+### Behavior and review
+
+Commands run from the rewritten tree's `activerecord` directory with an external component-only bundle and
+SQLite in-memory (same dependency versions and Ruby for the main control):
+
+* `bundle exec ruby -w -Itest bin/test test/cases/associations_test.rb --seed 1729`:
+  **141 tests, 557 assertions, 0 failures/errors/skips**.
+* `bundle exec ruby -w -Itest bin/test test/cases/associations/eager_test.rb test/cases/associations/nested_through_associations_test.rb test/cases/associations/cascaded_eager_loading_test.rb --seed 1729`:
+  **304 tests, 1,147 assertions, 0 failures/errors/skips**.
+* `bundle exec ruby -w -Itest bin/test test/cases/associations_test.rb test/cases/associations --seed 1729`:
+  **1,822 tests, 6,407 assertions, 1 failure, 0 errors/skips**, identically on main and rework. The sole failure is
+  `HasManyThroughAssociationsTest#test_create_new_owner_with_counter_cache_and_partial_inserts_disabled`, line 97:
+  expected counter cache 1, actual 2. This is not a green whole-associations result; the failure is unchanged on base.
+* RuboCop 1.90.0 on `branch.rb` and `batch.rb`: **2 files inspected, no offenses**.
+* A temporary public preload probe with frozen `immediate_future_classes` and `likely_reflections` results checks
+  direct, through and nested record contents/order. Main and the rewrite pass; the old PR raises `FrozenError`
+  from `future_classes`'s `uniq!`. No allocation-count assertion was added to the upstream suite.
+
+Readability is L1 at most. Flog / RuboCop ABC / cyclomatic / perceived complexity, main → rework:
+
+| Method | Flog | ABC | Cyclomatic | Perceived |
+| --- | ---: | ---: | ---: | ---: |
+| `Branch#future_classes` | 8.2 → 7.3 | 5.1 → 5.2 | 2 → 2 | 2 → 2 |
+| `Branch#target_classes` | 24.1 → 24.1 | 14.76 → 14.76 | 7 → 7 | 8 → 8 |
+| `Branch#runnable_loaders` | 6.2 → 6.2 | 3.61 → 3.61 | 3 → 3 | 3 → 3 |
+| `Batch#call` | 51.1 → 48.7 | 30.25 → 30.25 | 14 → 14 | 14 → 14 |
+
+The 0.1 ABC increase is the local assignment needed to return the Array rather than `uniq!`'s nullable result.
+A skeptical Medium subagent reviewed the exact uncommitted diff, current PR body, behavior logs and complete
+interpreter results: **no must-fix code finding; recommend closure**. It independently recalculated both
+interpreter effects and rejected the available YJIT baseline for compilation. The remaining raw YJIT rows were
+then checked by the author; they fail the same gate. The current body describes the old implementation and its
+old Ruby 4.0.7 evidence, and its ownership claim would need replacing if the PR were pursued. No Sol, Astra or
+Claude Code approval is claimed for a new upstream head; no new upstream head or text was published.
