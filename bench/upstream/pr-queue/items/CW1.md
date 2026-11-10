@@ -5,9 +5,9 @@ kind: fix
 area:
 reviewer:
 branch: thomasklemm/where-empty-condition-binds
-head: "10346a258e1fd105de7561437ad7917ff3cb9b47"
+head: "971ebc0e9b10706bbf16c27b6c1f1c6eedaf644f"
 base: main
-built_on:
+built_on: "224f5b1563cc9a7da0fe69ff1ce92bb0c1c74a48"
 depends_on: []
 stacked_on:
 alternative_of:
@@ -16,7 +16,7 @@ rank:
 risky: false
 state: ready
 pr: 59642
-note: "2026-11-06: reply to matthewd posted (discussion_r4492126885) offering option B (thomasklemm/where-group-bound-literals 10346a258e, explicit bound-node grouping fix since 7.1) with this exact-8.1 head as fallback; title/body updated to this head. 2026-11-06 16:44 UTC matthewd (4495087542): \"I think that alternative branch is the better fix.\" PR switched to option B 10346a258e (force-push with lease on 805ab06262), retitled, body rewritten, replied \"Switched the PR to it.\" (discussion_r4495214214). 805ab06262 remains the exact-8.1 fallback commit."
+note: "2026-11-06: reply to matthewd posted (discussion_r4492126885) offering option B (thomasklemm/where-group-bound-literals 10346a258e, explicit bound-node grouping fix since 7.1) with this exact-8.1 head as fallback; title/body updated to this head. 2026-11-06 16:44 UTC matthewd (4495087542): \"I think that alternative branch is the better fix.\" PR switched to option B 10346a258e (force-push with lease on 805ab06262), retitled, body rewritten, replied \"Switched the PR to it.\" (discussion_r4495214214). 805ab06262 remains the exact-8.1 fallback commit. 2026-11-10: rebased onto main 224f5b1563, head 971ebc0e9b, force-pushed with lease on 10346a258e. Only CHANGELOG conflicted; CW1 entry first, main entries unchanged. SQLite PR tests: 3 runs, 21 assertions; focused relation/where-clause, sanitize and bind tests: 1,094 runs, 3,197 assertions, 0 failures/errors, 1 existing SQLite skip. RuboCop 1.90.0: 4 files, no offenses. Thomas author/committer, no trailers. PR remains ready and mergeable; title/body unchanged, no comment posted."
 passes: []
 ---
 
