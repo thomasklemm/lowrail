@@ -15,6 +15,7 @@ impact: "apps with queue_adapter = :sidekiq on Sidekiq 7.3.x or 8.0.0-8.0.2, inc
 rank: 12
 risky: false
 state: built
+pr:
 note: "split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from 28e73a9396 unchanged (patch-id equal). Strength check passed (docs/upstream/app-suites.md, UG82 split): (a) on main 224f5b1563 a minimal app with queue_adapter = :sidekiq fails with Sidekiq 7.3.2-7.3.10 and 8.0.0-8.0.2 and boots with 8.0.3 and 8.1.7, all boot on 8-1-stable; (b) 8.1's deprecation says to upgrade to 7.3.3 or later. Open point for review: the require sentence is stricter than needed (an initializer require works on main from Sidekiq 8.0.5; only 8.0.3-8.0.4 need application.rb), and require: false with no require already fails on 8.1. Waits for a free slot after UG82H and UG82P."
 passes:
   - {reviewer: claude-code, head: "f526d29c5025178a57b10a2270492949406259d4", date: 2026-11-10, verdict: approve, open: "Reran on main 224f5b1563, Ruby 4.0.9, load_defaults 8.1: required before the app class, 7.3.10 and 8.0.2 raise NameError for SidekiqAdapter, 7.3.3 raises it at require even with :async, 8.0.3/8.0.4/8.0.5 boot; require: false without a require fails on all; initializer require works only from 8.0.5, application.rb from 8.0.3, so the require advice is stricter than needed for 8.0.5+ but correct, keep it. #6669 is in Sidekiq 8.0.3 Changes.md. No changes."}
