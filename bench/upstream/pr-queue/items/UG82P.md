@@ -16,7 +16,8 @@ rank: 6
 risky: false
 state: built
 note: "split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from cbcac181b3 unchanged (patch-id equal). Planned to open as a draft first, with UG82H, after a Claude Code pass."
-passes: []
+passes:
+  - {reviewer: claude-code, head: "91280311612ae0a1f864e7498824f9de4559b72b", date: 2026-11-10, verdict: approve, open: "Reran bench/upstream/app_suites/fk_fixture_locks.rb on main 224f5b1563, PostgreSQL 18.6: one insert_fixtures_set holds 3,310 locks; 8 workers x 3 rounds at default 64: 16 of 24 out of shared memory (server logs the quoted ERROR and HINT; PG::OutOfMemory is SQLSTATE 53200); max_locks_per_transaction = 256 plus restart: 24/24 ok. Ownership/current-schemas wording matches enforced_foreign_keys; truncate_tables and insert_fixtures_set both go through it. Placement in the Active Record group fine. No changes."}
 ---
 
 # Note in the upgrade guide that PostgreSQL 18.4+ fixture loading acquires more locks

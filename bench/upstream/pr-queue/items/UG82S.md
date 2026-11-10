@@ -16,7 +16,8 @@ rank: 12
 risky: false
 state: built
 note: "split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from c90a929275 unchanged (patch-id equal). Waits for a free rails/rails slot after UG82H and UG82P."
-passes: []
+passes:
+  - {reviewer: claude-code, head: "2422669c945eef9679da2c9e1bb33266700e24e9", date: 2026-11-10, verdict: approve, open: "On main 224f5b1563: without x_sendfile_header the stack has no Rack::Sendfile and insert_before Rack::Sendfile raises exactly the quoted RuntimeError; with the header it boots; Executor is unconditional and follows Static, and insert_before Executor boots. Redmine config/application.rb L79 checked. No changes."}
 ---
 
 # Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset

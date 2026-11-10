@@ -5,7 +5,7 @@ kind: docs
 area: "Guides: Rails 8.2 upgrade guide, Herb"
 reviewer: "marcoroth (Herb), #58721"
 branch: thomasklemm/upgrade-guide-herb-tag-branches
-head: "3be82b17cb2b2928a20ab91e4bb3c99877706ecb"
+head: "e2bd1d953fb51d6a0b570553738d1f2b0ba63c40"
 base: main
 built_on: "224f5b1563"
 depends_on: []
@@ -15,8 +15,9 @@ impact: "templates that open an element in one branch or loop iteration and clos
 rank: 6
 risky: false
 state: built
-note: "split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from 3428a0ee53 with its context resolved by hand (same added lines, inserted after the Herb section, before the :controller/:action section). Planned to open as a draft first, with UG82P, after a Claude Code pass."
-passes: []
+note: "2026-11-10: Claude Code pass amended the error block to the one-line summary that SyntaxErrorInTemplate and herb:check show; head 3be82b17cb -> e2bd1d953f (force-with-lease). Earlier: split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from 3428a0ee53 with its context resolved by hand (same added lines, inserted after the Herb section, before the :controller/:action section). Planned to open as a draft first, with UG82P, after a Claude Code pass."
+passes:
+  - {reviewer: claude-code, head: "e2bd1d953fb51d6a0b570553738d1f2b0ba63c40", date: 2026-11-10, verdict: approve, open: "Changes found on 3be82b17cb, fixed in this head by the reviewer; approve on this head. Snippet, loop-iteration failure and recursive-partial fix verified on main 224f5b1563 with herb 0.11.0 (Erubi renders all). One fix, applied: the quoted two ✘ lines are Herb::Engine::ParseError#detailed_message, which only prints for an uncaught cause; SyntaxErrorInTemplate, test output, the error page, logs and herb:check all show the one-line summary, so the block now quotes that (\"caused by:\"). Amended to e2bd1d953f, force-with-lease on 3be82b17cb, mdl clean, no trailers. Body and links (lobsters, Discourse, Redmine) accurate."}
 ---
 
 # Note in the upgrade guide that HTML elements must close in the branch that opens them
