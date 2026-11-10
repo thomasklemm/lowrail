@@ -2140,6 +2140,43 @@ anchor; size PostgreSQL's shared lock table for concurrent fixture loading; upgr
 Docs only: no touched runtime methods or method-complexity delta. The amended branch is 116 inserted lines,
 below the queue's thermos threshold, and merges cleanly with the fetched main.
 
+### UG82 split (2026-11-10)
+
+Thomas approved splitting #59675. It keeps only the NavigationHelper note: `thomasklemm/upgrade-guide-8-2-notes`
+was force-pushed to `acf72a659e` itself (lease on `3428a0ee53`, no rebase, so seanpdoyle's review comments stay
+attached), title and body trimmed to that note via REST PATCH, still a draft, no comment posted. Per Thomas the body
+keeps only Redmine's hook listeners and the avo hint; Decidim and cells-rails were dropped as too specific.
+`acf72a659e` merges cleanly with main `224f5b1563`; fork CI green.
+
+The other notes moved to one-commit branches on main `224f5b1563` (Thomas Klemm as author and committer, no
+trailers; `mdl` with `.mdlrc` and `rubocop` on the guide clean; surrounding text read in place; none of the code
+they describe changed since `3ba9e53d7e`):
+
+| Note | From | Item | Branch | Head |
+| --- | --- | --- | --- | --- |
+| HTML elements must close in the branch that opens them | `3428a0ee53` | UG82H | `thomasklemm/upgrade-guide-herb-tag-branches` | `3be82b17cb` (context resolved by hand, same added lines) |
+| PostgreSQL 18.4+ fixture locks | `cbcac181b3` | UG82P | `thomasklemm/upgrade-guide-pg-fixture-locks` | `9128031161` (patch-id equal) |
+| `Rack::Sendfile` omitted when unset | `c90a929275` | UG82S | `thomasklemm/upgrade-guide-sendfile-unset` | `2422669c94` (patch-id equal) |
+| Sidekiq 8.0.3 or later | `28e73a9396` | UG82K | `thomasklemm/upgrade-guide-sidekiq-8-0-3` | `f526d29c50` (patch-id equal) |
+
+**Sidekiq strength check (Thomas: no weak PRs).** Minimal app (railties + activejob from the tree, `load_defaults
+8.1`, `queue_adapter = :sidekiq`, Gemfile `require: false`), `App.initialize!` then `ActiveJob::Base`, Ruby 4.0.7:
+* (a) Sidekiq required before the application class: 8-1-stable `a87a7e331c` boots with 7.3.2, 7.3.3, 7.3.5, 7.3.6,
+  7.3.10, 8.0.0, 8.0.2, 8.0.3 and 8.1.7. Main `224f5b1563` raises `NameError` for
+  `ActiveJob::QueueAdapters::SidekiqAdapter` with 7.3.2, 7.3.5, 7.3.6, 7.3.10, 8.0.0 and 8.0.2 (7.3.3 already in
+  `remove_const` at require), and boots with 8.0.3, 8.0.10, 8.1.0 and 8.1.7. Holds.
+* (b) 8-1-stable's `SidekiqAdapter#check_adapter`: "Please upgrade `sidekiq` gem to version 7.3.3 or later to use the
+  `sidekiq` gem's adapter." (activejob CHANGELOG says the same). Holds: Rails steers users into 7.3.x.
+* (c) `require: false` without any require fails on both trees, differently (8.1: `Sidekiq::Job`; main: the adapter).
+  Requiring it in `config/application.rb` works on main from 8.0.3. Requiring it in an initializer works on main
+  only from 8.0.5 (8.0.3 and 8.0.4 fail), and on 8.1 from 7.3.10/8.1.7 but not 8.0.3. So the note's advice holds, is
+  stricter than needed for 8.0.5+, and `require: false` alone isn't a new 8.2 break. Open point for review, not a
+  reason to drop: every app on `:sidekiq` with Sidekiq below 8.0.3 is affected, not an edge case.
+
+Sol was not run: this orb has no Codex CLI credentials (DECISIONS: the coordinator runs Sol). Claude Code passes
+come next, started by the coordinator; planned order Herb and PostgreSQL as drafts first, Sendfile and Sidekiq when
+slots free.
+
 ### PI3: held after a demonstrated exactness failure
 
 Head `fb8a27353222a2ea6ba9533ca8c5bfc9a33de564` is unchanged and the fork branch is kept. The skeptic returned
