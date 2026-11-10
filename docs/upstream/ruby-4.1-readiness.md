@@ -181,4 +181,4 @@ net-protocol is locked. Many apps lock net-protocol through mail, net-smtp, net-
 lockfiles, 5 lock 0.2.2, and 2 of them (Fizzy, Writebook) don't lock net-http either. So every outgoing HTTP
 request in those apps fails on 4.1 until they run `bundle update net-protocol`. The narrowest fix is in net-http:
 fall back to the old unlimited read when `Net::BufferedIO#readuntil` doesn't take `limit:`. Alternatively, Ruby's
-NEWS could tell users to update net-protocol. I'd propose it to ruby/net-http as an issue first. **Filed 2026-11-04 as [ruby/net-http#362](https://github.com/ruby/net-http/issues/362).**
+NEWS could tell users to update net-protocol. I'd propose it to ruby/net-http as an issue first. **Filed 2026-11-04 as [ruby/net-http#362](https://github.com/ruby/net-http/issues/362).** **Closed as completed 2026-11-10 22:08 UTC** by hsbt, without a net-http change: rhenium (2026-11-05) declined a workaround because downgrading below a default gem cannot be guaranteed to work, and his merged rubygems#10026 makes `bundle install` warn about downgrading default gems.
