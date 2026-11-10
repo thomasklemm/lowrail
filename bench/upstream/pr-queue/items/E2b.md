@@ -14,7 +14,7 @@ alternative_of:
 impact: "a temporary SQLite table or view hides the permanent one again: columns and indexes no longer duplicated, primary key no longer composite"
 rank: 5
 risky: false
-state: draft
+state: ready
 pr: 59668
 note: "opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
 passes:

@@ -14,7 +14,7 @@ alternative_of:
 impact: "templates that open an element in one branch or loop iteration and close it in another no longer compile through Herb (lobsters, Discourse, Redmine); the guide doesn't say so"
 rank: 6
 risky: false
-state: draft
+state: ready
 pr: 59734
 note: "2026-11-10 (Sol): two precision fixes applied, amended e2bd1d953f -> 70b06c625a (force-with-lease), mdl clean, no trailers. 2026-11-10: Claude Code pass amended the error block to the one-line summary that SyntaxErrorInTemplate and herb:check show; head 3be82b17cb -> e2bd1d953f (force-with-lease). Earlier: split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from 3428a0ee53 with its context resolved by hand (same added lines, inserted after the Herb section, before the :controller/:action section). Planned to open as a draft first, with UG82P, after a Claude Code pass."
 passes:
