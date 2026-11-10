@@ -14,7 +14,7 @@ alternative_of:
 impact: classes that include FormTagHelper or FormHelper without NavigationHelper (cells-rails' cells, Decidim's profile pages) render non-GET forms again; fixes unreleased #55410
 rank: 4
 risky: false
-state: ready
+state: closed
 pr: 59667
 note: "opened as draft 2026-11-05; the body paragraph on why includers can't fix it themselves came after the recorded passes (f2149ee); body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test sentence, cells-rails and Decidim versions, the defined? workaround clause; in docs/upstream/app-suites.md"
 passes:

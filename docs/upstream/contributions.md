@@ -1,5 +1,7 @@
 # Upstream contributions
 
+Current overview and priorities: [inventory](inventory.md).
+
 These are scoped upstream changes, not extra Lowrail request prices or whole-application speed claims.
 
 **Checked on 2026-10-22:** every merged/open label below was verified with

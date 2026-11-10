@@ -12,7 +12,7 @@ depends_on: []
 impact: Keep Context#build_correlated_subquery(...).to_sql working on Rails main
 rank: 16
 risky: true
-state: ready
+state: merged
 pr: 1795
 note: Prepared only; coordinator runs Sol and Astra; one unchanged Rails-main SQLite schema-case failure
 passes:
