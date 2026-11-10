@@ -473,6 +473,19 @@ both on 2026-11-09. What went wrong in our process, and the rule each one now ad
   → **Before patching a failing piece, ask whether it can go.** If the value it contributes isn't observable or
   relied on, propose removing it, and name the smaller option in the body when we keep the conservative one.
 
+## No unnecessary code comments in upstream PRs (Thomas, 2026-11-10)
+
+Superfluous comments read as AI slop (byroot on #59555, see [Code comments in upstream
+patches](#code-comments-in-upstream-patches-byroot-on-59555-2026-11-05)). A standing rule for every upstream PR:
+
+* **A code comment stays only when a reader would otherwise undo or misread the code.** Then it is one short line
+  that says why, not what, and the diff keeps the comment density of the surrounding upstream code.
+* **No comments that** restate the code, narrate the change, mention the PR, the benchmark or the measurement, or
+  explain what was removed. Those belong in the commit message, the PR body or the Lowrail record.
+* **Tests and benchmark files count too.**
+* **Reviewers check it on every pass.** claude-code and Sol look at every added comment line; a superfluous comment
+  is a required change (`changes`), not a nit.
+
 ## Orb time (Thomas, 2026-11-04)
 
 Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8

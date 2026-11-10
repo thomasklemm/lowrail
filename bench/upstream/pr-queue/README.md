@@ -49,7 +49,9 @@ The body, verbatim, as it is posted.
 ```
 
 `reviewer` in a pass: `skeptic` (the orb's skeptical reviewer subagent), `sol`, `astra`, `thermos`. `verdict`:
-`approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Record a pass on the
+`approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
+added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
+a superfluous comment means `changes`. Record a pass on the
 head it reviewed. When a fix changes the branch, update `head` to the new commit; the old passes stay in the list
 and stop counting. A body-only change keeps the head, so it needs no new code pass, but its text was reviewed by
 whichever pass is listed.
