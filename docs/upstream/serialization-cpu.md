@@ -88,6 +88,8 @@ Instructions per call (interpreter, 100 calls after warmup, GC off; A/A within 0
 20 records `as_json` 2.30 M, `to_json` 4.07 M; `render json:` 20 records 2.85 M; jbuilder 5.14 M.
 `time.as_json` is 5,627, of which `Time#xmlschema` is 1,494.
 
+**Reverted 2026-11-09** by byroot in [#59713](https://github.com/rails/rails/pull/59713): measured only on inputs up to 4 KB, while the guard adds up to three full scans that cost more than main's single regexp once the document exceeds the CPU caches; and the path only runs before Ruby 4.1. Lessons in [DECISIONS](../DECISIONS.md#learnings-from-byroots-follow-ups-2026-11-10).
+
 **Opened as [rails/rails#59584](https://github.com/rails/rails/pull/59584) (2026-11-03, head `8f77e334e9`): the minimal variant.** After fatkodima's objection to #59577 and the readability
 gate in [DECISIONS](../DECISIONS.md#readability-gate-l0l3), S1 goes out as the coder-only variant:
 [`thomasklemm/json-escape-coder-only`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-coder-only)

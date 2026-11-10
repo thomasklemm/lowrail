@@ -445,6 +445,34 @@ The incidents behind the rules above, kept so the rules keep their reasons:
   checklist.
 * Several limits were set and changed within one day → one cap per repo, named exceptions, recorded here.
 
+## Learnings from byroot's follow-ups (2026-11-10)
+
+byroot reverted [#59584](https://github.com/rails/rails/pull/59584) in [#59713](https://github.com/rails/rails/pull/59713)
+and simplified [#59640](https://github.com/rails/rails/pull/59640) in [#59714](https://github.com/rails/rails/pull/59714),
+both on 2026-11-09. What went wrong in our process, and the rule each one now adds:
+
+* **#59584 was measured only where it wins.** Every variant (five `include?`, amatsuda's direct checks, the final
+  guard) was priced on a 19-byte object, an 11-column record and a short document; the largest input in the record
+  was 4 KB. The change adds up to three extra full scans before main's single `gsub!`, so its cost grows with
+  document size and memory bandwidth, and that case was never in the matrix. Three reviewer-driven reshapes reused
+  the same small inputs, and none of our review passes asked for a larger one.
+  → **Size sweep for any change to work proportional to input length** (string scans, escaping, parsing,
+  encoding, copying): small, typical, and one input well past the last-level cache (≥ 1 MB), each with the
+  character or match absent, early and late. Report the worst row in the body, not only the common one. A change
+  that adds passes over the input must show the large row.
+* **#59584's path is gone on the next Ruby.** Our own record said Ruby 4.1 takes `tr!` and "makes it moot", and
+  escaping was 0.4–0.6% of samples in the census apps. A small gain on a path that disappears on the next release,
+  owned by a maintainer who just rewrote it, was not worth a PR.
+  → **Lifetime and reach in `impact`:** say whether the path still runs on Ruby master and Rails main; if it
+  doesn't, open only with a large measured win on current releases.
+* **Review prompts asked whether the change was right, not where it loses.** → Every perf review prompt asks the
+  reviewer to construct the input that makes the change slowest (size, position, content) and to measure it.
+* **#59640 patched a part of the key that wasn't needed.** We made `self.class.name` nil-safe; byroot asked why the
+  class name was in the key at all, since `object_id` is unique, and deleted it. Our minimal fix kept existing
+  behaviour (named stores' keys) without asking whether that behaviour mattered.
+  → **Before patching a failing piece, ask whether it can go.** If the value it contributes isn't observable or
+  relied on, propose removing it, and name the smaller option in the body when we keep the conservative one.
+
 ## Orb time (Thomas, 2026-11-04)
 
 Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8
