@@ -14,13 +14,14 @@ alternative_of:
 impact: "parallel test workers loading fixtures on PostgreSQL 18.4+ can fail with out of shared memory; the guide doesn't say so or how to size max_locks_per_transaction"
 rank: 6
 risky: false
-state: built
-pr:
+state: draft
+pr: 59735
 note: "2026-11-10 (Sol): precision fix plus the optional sentence applied, amended 9128031161 -> 3036f925aa (force-with-lease), mdl clean, no trailers. split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from cbcac181b3 unchanged (patch-id equal). Planned to open as a draft first, with UG82H, after a Claude Code pass."
 passes:
   - {reviewer: claude-code, head: "91280311612ae0a1f864e7498824f9de4559b72b", date: 2026-11-10, verdict: approve, open: "Reran bench/upstream/app_suites/fk_fixture_locks.rb on main 224f5b1563, PostgreSQL 18.6: one insert_fixtures_set holds 3,310 locks; 8 workers x 3 rounds at default 64: 16 of 24 out of shared memory (server logs the quoted ERROR and HINT; PG::OutOfMemory is SQLSTATE 53200); max_locks_per_transaction = 256 plus restart: 24/24 ok. Ownership/current-schemas wording matches enforced_foreign_keys; truncate_tables and insert_fixtures_set both go through it. Placement in the Active Record group fine. No changes."}
   - {reviewer: sol, head: "91280311612ae0a1f864e7498824f9de4559b72b", date: 2026-11-10, verdict: changes, open: "Wording only, no factual errors. Applied in 3036f925aa: the final sentence says the value depends on the schema, mostly its number of foreign keys, and on the number of workers loading fixtures at once, not suite size (matches fk_fixture_locks.rb and the pg_locks breakdown: trigger and constraint locks per foreign key); the exhaustion sentence reworded as Sol's optional suggestion. Stylistic rewrites skipped; no further round (Thomas)."}
   - {reviewer: claude-code, head: "3036f925aadb66b1c4bcd98a0d34f09a545478da", date: 2026-11-10, verdict: approve, open: "Confirm pass: range-diff against 9128031161 is wording only. The new \"mostly its number of foreign keys\" claim is backed by the recorded pg_locks breakdown (1,200 trigger and 300 constraint locks of about 2,558 for 300 foreign keys), so no rerun; \"intermittent failures such as\" matches the 16/24 run. Body unchanged and accurate. Author/committer Thomas, no trailers, still on 224f5b1563."}
+  - {reviewer: sol, head: "3036f925aadb66b1c4bcd98a0d34f09a545478da", date: 2026-11-10, verdict: approve, open: "Confirm on the range-diff: the amend correctly ties intermittent failures to concurrent fixture loading and sizing needs to schema foreign keys and concurrent workers; the revised wording reads clearly and introduces no new unsupported claim."}
 ---
 
 # Note in the upgrade guide that PostgreSQL 18.4+ fixture loading acquires more locks
