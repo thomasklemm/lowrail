@@ -14,9 +14,9 @@ alternative_of:
 impact: "OpenProject's HealthReport.new(...).save! stops raising PG::NotNullViolation; nested JSON defaults no longer shared between new records; fixes unreleased #59083"
 rank: 1
 risky: true
-state: draft
+state: ready
 pr: 59662
-note: "2026-11-07: body fixed per claude-code pass (OpenProject migration link, hook clause) and Sol/Astra nits. opened as draft 2026-11-05; earlier heads f95cc1b6df, de7aff270c, c52724804d, 02443a3b04, 3b35e79cb5, 9b2a64d040; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the freezable_default? hook for custom types; affected-model counts (OpenProject 51/305, Mastodon 6/117, shipit 9/26, lobsters 1/24) and the 18-22% Model.new microbenchmark, in docs/upstream/app-suites.md#openproject and bench/upstream/app_suites/op8-bench"
+note: "2026-11-10: marked ready for review by script/pr-queue ready OP8 on Thomas's decision (head 490fdf855b, merge state clean, no comment); 15/15 non-draft rails/rails PRs after it. 2026-11-07: body fixed per claude-code pass (OpenProject migration link, hook clause) and Sol/Astra nits. opened as draft 2026-11-05; earlier heads f95cc1b6df, de7aff270c, c52724804d, 02443a3b04, 3b35e79cb5, 9b2a64d040; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the freezable_default? hook for custom types; affected-model counts (OpenProject 51/305, Mastodon 6/117, shipit 9/26, lobsters 1/24) and the 18-22% Model.new microbenchmark, in docs/upstream/app-suites.md#openproject and bench/upstream/app_suites/op8-bench"
 passes:
   - {reviewer: astra, head: "c52724804d", date: 2026-11-05, verdict: changes, open: "duck-typed types, sharper tests, body scope; applied"}
   - {reviewer: skeptic, head: "02443a3b04", date: 2026-11-05, verdict: changes, open: "blocker: DDL under sqlite3_ractor, applied, plus two nits"}
