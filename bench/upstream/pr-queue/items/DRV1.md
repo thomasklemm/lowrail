@@ -6,16 +6,16 @@ kind: perf
 area: UTF-8 text parameter binding
 reviewer: flavorjones
 branch: thomasklemm/skip-utf8-bind-transcode
-head: "f1709a4f539ddec0363b18daab0e0b057c0959b9"
+head: "64b0190a0a5df7abc35368535aa791f192bc65b4"
 base: main
-built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
+built_on: "d1d82840f35507066cf7b0c885d2e78fcc274aa4"
 depends_on: []
 impact: "Every UTF-8 SQLite text bind in Rails and direct-driver apps avoids a temporary String; a common 20-name lookup drops 162 to 142 objects and 0.82% interpreter query instructions. YJIT select_all drops 1.27% with passing A/A; the pluck instruction window rejects for compilation."
 rank: 22
 risky: true
 state: ready
 pr: 769
-note: "Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads. Claude Code final review 2026-11-06: f1709a4f53 = 16c9550b68 with an identical tree; the commit message drops its measurement paragraph (numbers stay in the body and driver-cpu.md) and rewords the tests paragraph (\"a change to this branch\" read as a git branch). Body unchanged; no CHANGELOG entry (flavorjones adds them at merge, as on #758)."
+note: "Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads. Claude Code final review 2026-11-06: f1709a4f53 = 16c9550b68 with an identical tree; the commit message drops its measurement paragraph (numbers stay in the body and driver-cpu.md) and rewords the tests paragraph (\"a change to this branch\" read as a git branch). Body unchanged; no CHANGELOG entry (flavorjones adds them at merge, as on #758). 2026-11-13: rebased onto main d1d82840f3 (#773 merged) and force-pushed with a lease on f1709a4f53; range-diff identical, message unchanged, Thomas author/committer, no trailers. Suite 430 runs, 0 failures, 1 skip on Ruby 4.0.7. Exact-head CI 135/135 green (runs 43384286134, 43384285997), incl. test source (windows, 3.3, enable); sqlcipher (windows, mingw) is now sqlcipher (windows, ucrt) after #773 and passes. Title/body unchanged, no comment; mergeable, clean."
 passes:
   - {reviewer: skeptic, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-06, verdict: nits, open: "Add engine-independent invalid-UTF-8 and retained-binding tests; clarify String allocation and measurement scope."}
