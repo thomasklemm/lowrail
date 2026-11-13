@@ -6,16 +6,16 @@ kind: perf
 area: Multi-column result rows
 reviewer: tenderlove
 branch: thomasklemm/fill-multicolumn-rows
-head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b"
+head: "1c803f55c7df87ecad4ac70f731438cc0b9e082b"
 base: main
-built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
+built_on: "d1d82840f35507066cf7b0c885d2e78fcc274aa4"
 depends_on: []
 impact: "Every multi-column SQLite result row, including default Rails record loads. A complete 1,000-row seven-column model load (to_a, lazy attributes) uses 2.69% fewer YJIT instructions and 1.27% fewer interpreter instructions, with passing A/A and unchanged objects. Native row memory matches main on Ruby 3.2/3.3/3.4; no whole-request saving is established."
 rank: 23
 risky: true
 state: ready
 pr: 770
-note: "Restacked to one commit; claude-code approved c69e94955e. 6c212edd9c only rewords the GC sentence in the commit message (Astra), tree identical to c69e94955e."
+note: "Restacked to one commit; claude-code approved c69e94955e. 6c212edd9c only rewords the GC sentence in the commit message (Astra), tree identical to c69e94955e. 2026-11-12 16:03 UTC: flavorjones rebased it onto main d1d82840f3 after merging #773 (force-push from 6c212edd9c; committer Mike Dalessio, author Thomas); range-diff identical, message unchanged. Exact-head CI 135/135 green (run 43254550410); mergeable, clean."
 passes:
   - {reviewer: skeptic, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-06, verdict: nits, open: "Clarify seven-column query wording, SQLite version and the measured single-column scope."}

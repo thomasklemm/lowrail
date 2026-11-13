@@ -858,7 +858,7 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 ### SQLite — sparklemotion/sqlite3-ruby
 
 - [#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769), binding UTF-8 text skips a redundant String copy. **Ready** (marked by Thomas 2026-11-06 12:54 UTC), opened 2026-11-06 00:36 UTC. Head [`64b0190a0a`](https://github.com/thomasklemm/sqlite3-ruby/commit/64b0190a0a5df7abc35368535aa791f192bc65b4), rebased onto main `d1d82840f3` (#773) on 2026-11-13 and force-pushed with a lease on `f1709a4f53` (range-diff identical; title/body unchanged, no comment). Suite 430 runs, 0 failures on Ruby 4.0.7; exact-head CI **135/135 green**, so the Windows 3.3 collation and sqlcipher mingw failures are gone ([queue item](../../bench/upstream/pr-queue/items/DRV1.md)).
-- [#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770), multi-column statement rows are filled at their known size. **Ready** (marked by Thomas 2026-11-06 12:54 UTC), opened 2026-11-06 01:09 UTC, head `61fd4988d6`.
+- [#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770), multi-column statement rows are filled at their known size. **Ready** (marked by Thomas 2026-11-06 12:54 UTC), opened 2026-11-06 01:09 UTC. Head [`1c803f55c7`](https://github.com/thomasklemm/sqlite3-ruby/commit/1c803f55c7df87ecad4ac70f731438cc0b9e082b), rebased by flavorjones onto main `d1d82840f3` on 2026-11-12 after merging #773 (force-push from `6c212edd9c`; range-diff identical, Thomas still author). Exact-head CI **135/135 green** ([queue item](../../bench/upstream/pr-queue/items/DRV2.md)).
 
 ### Time zones — tzinfo/tzinfo
 
