@@ -329,7 +329,9 @@ kept in the receipts, not used, not rerun.
   its 259k polymorphic fallbacks and adds 25k megamorphic sends. No `run_benchmarks.rb` timing was taken, which
   DECISIONS asks of a ZJIT performance PR.
 
-### Draft answer on Shopify/ruby#776 (not posted)
+### Answer on Shopify/ruby#776 (posted 2026-11-14, Thomas's OK)
+
+Posted as https://github.com/Shopify/ruby/issues/776#issuecomment-6882850216 with paragraphs unwrapped and "(#1039)" added after zjit-lobsters7.
 
 > Not for receiver classes that first show up after compilation, I think. The arms cover the classes from the
 > profiled calls, and any other class takes the `send_polymorphic_fallback` send for good:

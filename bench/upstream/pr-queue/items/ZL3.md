@@ -16,7 +16,7 @@ rank: 9
 risky: true
 state: held
 pr:
-note: "Lead 3 PR attempt stopped at a design question (docs/upstream/zjit-leads.md, 2026-11-14 evening): k0kubun ruled out side exits at polymorphic misses for invokeblock (#18211) and his zjit-lobsters7 rows 24/27 make this fallback cheaper instead. Ask first with the drafted answer on Shopify/ruby#776 (Thomas); open only if the team wants the recompile. No review passes were run; before opening: claude-code and fable passes, test-all and btest at --zjit-call-threshold=1/2, run_benchmarks.rb output and a ZJIT stats diff."
+note: "Lead 3 PR attempt stopped at a design question (docs/upstream/zjit-leads.md, 2026-11-14 evening): k0kubun ruled out side exits at polymorphic misses for invokeblock (#18211) and his zjit-lobsters7 rows 24/27 make this fallback cheaper instead. Ask first with the drafted answer on Shopify/ruby#776 (Thomas); open only if the team wants the recompile. No review passes were run; before opening: claude-code and fable passes, test-all and btest at --zjit-call-threshold=1/2, run_benchmarks.rb output and a ZJIT stats diff. Answer posted on Shopify/ruby#776 (2026-11-14, Thomas): https://github.com/Shopify/ruby/issues/776#issuecomment-6882850216; the ZJIT team decides the direction."
 passes: []
 ---
 

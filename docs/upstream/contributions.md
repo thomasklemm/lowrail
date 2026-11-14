@@ -1173,3 +1173,5 @@ Move entries when state changes, refresh the checked-on date, and preserve
 each measurement's scope and unfavorable controls. Search limits are not a
 completeness guarantee; paginate if the result reaches the limit. Do not
 promote branch measurements to main support or infer missing speed numbers.
+
+- 2026-11-14: answered tekknolagi's "might be handled now?" on [Shopify/ruby#776](https://github.com/Shopify/ruby/issues/776#issuecomment-6882850216) (Thomas's OK): not for receiver classes that first appear after compilation, with a 5-line repro, the cost and gain of a first-version recompile exit (fork commit fc8d729709) and the question whether a miss should recompile or the fallback get cheaper. ZL3 stays held until the team answers.
