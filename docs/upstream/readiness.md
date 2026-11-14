@@ -140,6 +140,7 @@ as the ledger.
 | [`round-app-suites.yml`](../../bench/upstream/readiness/round-app-suites.yml) | [app-suites](app-suites.md): Redmine, Lobsters, Solidus (core, api), Mastodon, Sure, Writebook, Forem, Chatwoot, Discourse, Spree (core, api), 24 suites with their variants | in full against main `bdb3d96012`, below |
 | [`round-ecosystem-1.yml`](../../bench/upstream/readiness/round-ecosystem-1.yml) | [ecosystem-tests](ecosystem-tests.md), 24 gems in 29 suites | in full against main `7a78da5a55`, below |
 | [`round-ecosystem-2.yml`](../../bench/upstream/readiness/round-ecosystem-2.yml) | [ecosystem round 2](ecosystem-round-2.md), 26 gems in 49 suites | in full against main `7a78da5a55`, below |
+| [`round-59141.yml`](../../bench/upstream/readiness/round-59141.yml) | [AR gems after #59141](ar-gems-after-59141.md), 22 gems in 33 suites, base #59141's parent `c48c154e3f` | in full against main `50c54eed06` |
 
 `--check` validates a manifest without running anything: keys and shapes, patch files, `known.yml`, installed
 Rubies (a warning), and that every Rails and suite ref resolves (`--no-resolve` skips the fetch). All four pass.

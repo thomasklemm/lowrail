@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+rails = ENV.fetch("RAILS_DIR")
+%w[activesupport activemodel activerecord].each { |c| gem c, path: rails }
+gem "sqlite3"
+gem "pg"

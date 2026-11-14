@@ -1,0 +1,834 @@
+match	class	suite	test	signature	candidate	base	detail
+new	base-failing	mobility-postgres	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.locale does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:2:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.locale does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.locale does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:7:4:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:8:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:8:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/table_spec.rb[1:8:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/plugins/active_record/query_spec.rb[1:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/plugins/active_record/query_spec.rb[1:7:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column articles.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/integration/active_record_compatibility_spec.rb[1:9:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record_spec.rb[1:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column comments.content does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:5:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:5:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:5:4:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:3:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column hstore_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:4:2:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_container_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/json_spec.rb[1:3:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column json_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:3]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:4]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:5]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:6]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:3:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:1:4:1]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:1:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:5:2:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:5:3:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:5:4:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column jsonb_posts.title does not exist	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:2]	ActiveRecord::StatementInvalid: PG::UndefinedColumn: ERROR: column serialized_posts.subtitle does not exist	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.locale:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:2:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.locale:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/plugins/active_record/column_fallback_spec.rb[1:4:3:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.locale:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:10:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:5:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:1:6:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:5]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:6]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:2:7:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:3:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:3:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:1:4:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/key_value_spec.rb[1:2:9:4:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:5:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:1:6:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:5]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:6]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:2:7:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:3:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:3:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:1:4:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:5:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:1:6:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:5]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:6]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:2:7:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:3:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:3:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:1:4:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:3:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:7:4:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:8:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:8:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/table_spec.rb[1:8:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/plugins/active_record/query_spec.rb[1:7:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/plugins/active_record/query_spec.rb[1:7:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: articles.title:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/integration/active_record_compatibility_spec.rb[1:9:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:5:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:1:6:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:3]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:4]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:5]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:6]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:2:7:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:3:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:3:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:1:4:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/column_spec.rb[1:4:1:2:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record_spec.rb[1:1:1:1:1]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: comments.content:	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:2]	ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: serialized_posts.subtitle:	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:1]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:2]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:3]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:4:1]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:5:1]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	attr_json	./spec/model_spec.rb[1:13:5:2:1]	ArgumentError: Invalid Timezone: US/Pacific	2/2	2/2	
+new	base-failing	ancestry-pr770	DepthConstraintsTest#test_leaves_with_depth_constraints	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	LeavesTest#test_class_leaves_returns_only_childless	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	LeavesTest#test_class_leaves_scope	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	LeavesTest#test_instance_leaves	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	LeavesTest#test_leaves_on_single_node	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	LeavesTest#test_leaves_scope_is_chainable	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	ancestry-pr770	ScopesTest#test_leaves_of	ArgumentError: wrong number of arguments (given 1, expected 0)	2/2	2/2	
+new	base-failing	attr_json	./spec/integration/form_mega_spec.rb[1:1:2:1]	Capybara::ElementNotFound: Unable to find field "Title" that is not disabled	2/2	2/2	
+new	base-failing	attr_json	./spec/integration/form_mega_spec.rb[1:1:1:1]	Capybara::ElementNotFound: Unable to find link or button "add Person role"	2/2	2/2	
+new	base-failing	attr_encrypted	AttrEncryptedTest#test_should_not_by_default_generate_key_when_attribute_is_empty	NoMethodError: undefined method 'stub' for an instance of User	2/2	2/2	
+new	base-failing	typedstore	./spec/active_record/typed_store_spec.rb[1:1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::MissingAttributeError, got #<ActiveRecord::ActiveRecordError: cannot update a new record> with backtrace:	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:4]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "You cannot query on mobility attributes translated with the Serialized backend (content).", got #<ArgumentError: Attribute is 	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:4]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "You cannot query on mobility attributes translated with the Serialized backend (content).", got #<ArgumentError: Attribute is 	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:1]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "You cannot query on mobility attributes translated with the Serialized backend (title)." but nothing was raised	2/2	2/2	
+new	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:3:1:1]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "You cannot query on mobility attributes translated with the Serialized backend (title)." but nothing was raised	2/2	2/2	
+new	base-failing	typedstore-main	./spec/active_record/typed_store_spec.rb[2:2:4:1]	RSpec::Expectations::ExpectationNotMetError: expected: {"apps" => [123]}	1/2	1/2	
+new	base-failing	typedstore-main	./spec/active_record/typed_store_spec.rb[3:2:4:1]	RSpec::Expectations::ExpectationNotMetError: expected: {"apps" => [123]}	1/2	1/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/container_spec.rb[1:3:3]	RSpec::Expectations::MultipleExpectationsNotMetError: Got 2 failures from failure aggregation block:	2/2	2/2	
+new	base-failing	mobility-postgres	./spec/mobility/backends/active_record/jsonb_spec.rb[1:3:3]	RSpec::Expectations::MultipleExpectationsNotMetError: Got 2 failures from failure aggregation block:	2/2	2/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[6:1]	ArgumentError: DirtyTrackingModel has no attribute `active` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[6:2]	ArgumentError: DirtyTrackingModel has no attribute `active` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[6:3]	ArgumentError: DirtyTrackingModel has no attribute `active` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:10:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:11:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:12:9]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:13:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:14:1:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:14:1:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:14:1:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:1:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:1:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:1:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:15:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:1:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:2:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:3:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:4:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:10]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:5:9]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:7:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:7:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:7:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:8:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:10]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:11]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:12]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:13]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:14]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:15]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:16]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:17]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:18]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:19]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:20]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:21]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:22]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:23]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:24]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:25]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:26]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:9:9]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:10:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:10:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:10:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:11:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:11:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:11:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:12:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:12:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:12:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:13:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:13:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:13:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:13:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:13:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:2:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:2:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:2:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:5:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:5:2:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:5:2:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:5:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:6:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:6:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:6:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:6:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:6:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:7:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:7:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:7:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:7:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:7:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:8:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:8:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:9:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:9:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:9:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:2]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:3]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:4]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:5]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:6]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:7]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:8]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:3:9]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:10:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:11:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:12:9]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:13:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:14:1:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:14:1:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:14:1:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:1:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:1:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:1:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:15:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:1:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:2:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:3:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:4:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:10]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:5:9]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:7:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:7:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:7:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:8:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:10]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:11]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:12]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:13]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:14]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:15]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:16]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:17]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:18]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:19]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:20]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:21]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:22]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:23]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:24]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:25]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:26]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:9:9]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:10:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:10:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:10:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:11:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:11:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:11:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:12:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:12:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:12:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:13:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:13:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:13:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:13:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:13:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:2:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:2:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:2:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:5:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:5:2:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:5:2:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:5:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:6:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:6:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:6:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:6:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:6:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:7:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:7:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:7:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:7:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:7:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:8:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:8:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:9:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:9:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:9:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:1]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:2]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:3]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:4]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:5]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:6]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:7]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:8]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:3:9]	ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:10:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:11:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:12:9]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:13:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:14:1:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:14:1:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:14:1:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:1:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:1:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:1:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:15:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:1:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:2:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:3:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:4:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:10]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:5:9]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:7:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:7:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:7:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:8:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:10]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:11]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:12]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:13]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:14]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:15]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:16]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:17]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:18]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:19]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:20]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:21]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:22]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:23]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:24]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:25]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:26]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:9:9]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:10:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:10:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:10:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:11:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:11:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:11:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:12:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:12:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:12:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:13:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:13:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:13:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:13:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:13:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:2:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:2:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:2:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:5:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:5:2:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:5:2:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:5:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:6:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:6:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:6:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:6:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:6:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:7:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:7:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:7:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:7:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:7:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:8:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:8:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:9:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:9:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:9:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:3]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:5]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:6]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:7]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:8]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:3:9]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:4]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[5:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[5:2]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:6:1]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::UnknownAttributeError, got #<ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:6:1]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::UnknownAttributeError, got #<ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for> with backtra	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:6:1]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::UnknownAttributeError, got #<ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:5]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "ActiveRecord::TypedStore expects a hash as a column value, String received", got #<ArgumentError: JsonTypedStoreModel has no a	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:2:4:5]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "ActiveRecord::TypedStore expects a hash as a column value, String received", got #<ArgumentError: MarshalTypedStoreModel has n	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:5]	RSpec::Expectations::ExpectationNotMetError: expected ArgumentError with "ActiveRecord::TypedStore expects a hash as a column value, String received", got #<ArgumentError: YamlTypedStoreModel has no a	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[3:1:6:2]	RSpec::Expectations::ExpectationNotMetError: expected NoMethodError, got #<ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[4:1:6:2]	RSpec::Expectations::ExpectationNotMetError: expected NoMethodError, got #<ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	0/2	
+known:A59-1	confirmed	typedstore	./spec/active_record/typed_store_spec.rb[2:1:6:2]	RSpec::Expectations::ExpectationNotMetError: expected NoMethodError, got #<ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	0/2	
+known:A59-qt	suite-did-not-load	active_record_query_trace	(suite)	no test totals in output			base runs 1,2 did not load, 0 load errors
+known:A59-qt	suite-did-not-load	active_record_query_trace	(suite)	no test totals in output			cand runs 1,2 did not load, 0 load errors
+known:A59-1	signature-changed	typedstore	./spec/active_record/typed_store_spec.rb[3:2:4:1]	ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected: {"apps" => [123]}
+known:A59-1	signature-changed	typedstore	./spec/active_record/typed_store_spec.rb[2:2:4:1]	ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for	2/2	1/2	base: RSpec::Expectations::ExpectationNotMetError: expected: {"apps" => [123]}
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_validation_exclude_self	Minitest::Assertion: [ActiveRecord::RecordInvalid] exception expected, not	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_validation_exclude_self	Minitest::Assertion: [ActiveRecord::RecordInvalid] exception expected, not	2/2	2/2	
+known:R2-10	base-failing	store_model	./spec/store_model/nested_attributes_spec.rb[1:2:2:1]	NoMethodError: undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::SQLite3Adapter	2/2	2/2	
+known:R2-10	base-failing	store_model	./spec/store_model/nested_attributes_spec.rb[1:2:2:2]	NoMethodError: undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::SQLite3Adapter	2/2	2/2	
+known:R2-10	base-failing	store_model	./spec/store_model/nested_attributes_spec.rb[1:2:2:3:1]	NoMethodError: undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::SQLite3Adapter	2/2	2/2	
+known:R2-10	base-failing	store_model	./spec/store_model/nested_attributes_spec.rb[1:2:2:4:1]	NoMethodError: undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::SQLite3Adapter	2/2	2/2	
+known:R2-10	base-failing	store_model	./spec/store_model/nested_attributes_spec.rb[1:2:2:4:2]	NoMethodError: undefined method 'query' for an instance of ActiveRecord::ConnectionAdapters::SQLite3Adapter	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_column_validation_fails	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationFailsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_column_validation_fails	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationFailsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_column_validation_string_key_fails	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationStringKeyFailsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_column_validation_string_key_fails	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationStringKeyFailsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_column_validation_string_key	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationStringKeyTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_column_validation_string_key	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationStringKeyTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_column_validation	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_column_validation	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValidationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	MaterializedPathTest#test_ancestry_column_values	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValuesTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	MaterializedPathTest#test_ancestry_column_values	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestAncestryColumnValuesTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	BuildAncestryTest#test_build_ancestry_from_other_ids	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestBuildAncestryFromOtherIdsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	BuildAncestryTest#test_build_ancestry_from_other_ids	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestBuildAncestryFromOtherIdsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	BuildAncestryTest#test_build_ancestry_from_parent_ids	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestBuildAncestryFromParentIdsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	BuildAncestryTest#test_build_ancestry_from_parent_ids	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestBuildAncestryFromParentIdsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	CounterCacheTest#test_counter_cache_when_updating_parent_and_current_is_nil	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentAndCurrentIsNilTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	CounterCacheTest#test_counter_cache_when_updating_parent_and_current_is_nil	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentAndCurrentIsNilTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	CounterCacheTest#test_counter_cache_when_updating_parent_and_previous_is_nil	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentAndPreviousIsNilTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	CounterCacheTest#test_counter_cache_when_updating_parent_and_previous_is_nil	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentAndPreviousIsNilTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	CounterCacheTest#test_counter_cache_when_updating_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	CounterCacheTest#test_counter_cache_when_updating_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestCounterCacheWhenUpdatingParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	DepthCachingTest#test_depth_caching_after_subtree_movement	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestDepthCachingAfterSubtreeMovementTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	DepthVirtualTest#test_depth_caching_after_subtree_movement	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestDepthCachingAfterSubtreeMovementTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	DepthCachingTest#test_depth_caching_after_subtree_movement	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestDepthCachingAfterSubtreeMovementTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	HasAncestryTreeTest#test_descendants_move_with_node	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestDescendantsMoveWithNodeTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	HasAncestryTreeTest#test_descendants_move_with_node	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestDescendantsMoveWithNodeTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	ArrangementTest#test_has_ancestry_detects_changes_in_after_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestHasAncestryDetectsChangesInAfterSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	ArrangementTest#test_has_ancestry_detects_changes_in_after_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestHasAncestryDetectsChangesInAfterSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	ArrangementTest#test_has_ancestry_detects_changes_in_before_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestHasAncestryDetectsChangesInBeforeSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	ArrangementTest#test_has_ancestry_detects_changes_in_before_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestHasAncestryDetectsChangesInBeforeSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	IntegrityCheckingAndRestaurationTest#test_integrity_checking	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestIntegrityCheckingTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	IntegrityCheckingAndRestaurationTest#test_integrity_checking	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestIntegrityCheckingTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	IntegrityCheckingAndRestaurationTest#test_integrity_restoration	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestIntegrityRestorationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	IntegrityCheckingAndRestaurationTest#test_integrity_restoration	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestIntegrityRestorationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	HasAncestryTreeTest#test_modified_parents_set_ancestry_properly	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestModifiedParentsSetAncestryProperlyTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	HasAncestryTreeTest#test_modified_parents_set_ancestry_properly	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestModifiedParentsSetAncestryProperlyTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	TreeNavigationTest#test_node_before_last_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeBeforeLastSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	TreeNavigationTest#test_node_before_last_save	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeBeforeLastSaveTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	DefaultScopesTest#test_node_excluded_by_default_scope_should_still_move_with_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeExcludedByDefaultScopeShouldStillMoveWithParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	DefaultScopesTest#test_node_excluded_by_default_scope_should_still_move_with_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeExcludedByDefaultScopeShouldStillMoveWithParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	TreeNavigationTest#test_node_in_database_children	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeInDatabaseChildrenTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	TreeNavigationTest#test_node_in_database_children	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeInDatabaseChildrenTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	TreeNavigationTest#test_node_in_db_first_node	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeInDbFirstNodeTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	TreeNavigationTest#test_node_in_db_first_node	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestNodeInDbFirstNodeTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	RelationsTest#test_parent_not_found	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestParentNotFoundTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	RelationsTest#test_parent_not_found	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestParentNotFoundTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	RelationsTest#test_root_not_found	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestRootNotFoundTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	RelationsTest#test_root_not_found	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestRootNotFoundTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	HasAncestryTreeTest#test_set_parent_id	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentIdTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	IntegrityCheckingAndRestaurationTest#test_set_parent_id	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentIdTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	HasAncestryTreeTest#test_set_parent_id	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentIdTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	IntegrityCheckingAndRestaurationTest#test_set_parent_id	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentIdTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	IntegrityCheckingAndRestaurationTest#test_set_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	IntegrityCheckingAndRestaurationTest#test_set_parent	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestSetParentTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	TouchingTest#test_touch_option_enabled_propagates_with_modification	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestTouchOptionEnabledPropagatesWithModificationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	TouchingTest#test_touch_option_enabled_propagates_with_modification	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestTouchOptionEnabledPropagatesWithModificationTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	TouchingTest#test_touch_propogates_multiple_levels	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestTouchPropogatesMultipleLevelsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	TouchingTest#test_touch_propogates_multiple_levels	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestTouchPropogatesMultipleLevelsTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	ArrangementTest#test_update_descendants_with_changed_parent_value	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestUpdateDescendantsWithChangedParentValueTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	ArrangementTest#test_update_descendants_with_changed_parent_value	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestUpdateDescendantsWithChangedParentValueTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-pg	HasAncestryTreeTest#test_validate_descendants_depth	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestValidateDescendantsDepthTestNode	2/2	2/2	
+known:R2-5	base-failing	ancestry-sqlite3	HasAncestryTreeTest#test_validate_descendants_depth	NoMethodError: undefined method 'validation_context=' for an instance of AncestryTestDatabase::TestValidateDescendantsDepthTestNode	2/2	2/2	
+known:A59-1	base-failing	typedstore	./spec/active_record/typed_store_spec.rb[3:1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::MissingAttributeError, got #<ArgumentError: JsonTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	2/2	
+known:A59-1	base-failing	typedstore	./spec/active_record/typed_store_spec.rb[4:1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::MissingAttributeError, got #<ArgumentError: MarshalTypedStoreModel has no attribute `no_default` to define a reader for> with backtra	2/2	2/2	
+known:A59-1	base-failing	typedstore	./spec/active_record/typed_store_spec.rb[2:1:7:4]	RSpec::Expectations::ExpectationNotMetError: expected ActiveModel::MissingAttributeError, got #<ArgumentError: YamlTypedStoreModel has no attribute `no_default` to define a reader for> with backtrace:	2/2	2/2	
+known:noise-r2-ruby34-inspect	base-failing	mobility-postgres	./spec/mobility/backends/active_record/hstore_spec.rb[1:2:6:1]	RSpec::Expectations::ExpectationNotMetError: expected {"en" => "{foo: :bar}"} to match hash {en: "{:foo=>:bar}"}	2/2	2/2	
+known:noise-r2-ruby34-inspect	base-failing	mobility-postgres	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:1:1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected {en: "{foo: :bar}"} to match hash {en: "{:foo=>:bar}"}	2/2	2/2	
+known:noise-r2-ruby34-inspect	base-failing	mobility-sqlite3	./spec/mobility/backends/active_record/serialized_spec.rb[1:2:1:1:5:1]	RSpec::Expectations::ExpectationNotMetError: expected {en: "{foo: :bar}"} to match hash {en: "{:foo=>:bar}"}	2/2	2/2	
+known:noise-r2-both-trees	base-failing	money-rails	./spec/helpers/action_view_extension_spec.rb[1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected: "money-rails/helpers/action_view_extension"	1/2	1/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:1:1:1]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: #<Configuration color...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:1:1:2]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: #<Configuration color...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:2:1:1]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: [#<Configuration colo...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:2:1:2]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: [#<Configuration colo...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:3:1:2]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: {"foo" => #<Configura...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:R2-11	base-failing	store_model	./spec/store_model/model_spec.rb[1:8:3:1:1]	RSpec::Expectations::ExpectationNotMetError: expected: #<#<Class:0xX> id: nil, name: nil, store_id: nil, configuration: {foo: #<Configuration...liers: nil>, union_test: nil, validation_hooks_configura	2/2	2/2	
+known:noise-r2-ruby34-inspect	base-failing	audited	./spec/audited/audit_spec.rb[1:2:2]	RSpec::Expectations::ExpectationNotMetError: expected: #<Encoding:UTF-8> "{:foo=>\"bar\"}"	2/2	2/2	
+known:noise-r2-counter_culture-order	base-failing	counter_culture-postgresql	./spec/counter_culture/fix_counts_by_scope_spec.rb[1:3:1]	RSpec::Expectations::ExpectationNotMetError: expected: 1	1/2	1/2	
+known:noise-r2-counter_culture-order	base-failing	counter_culture-sqlite3	./spec/counter_culture/fix_counts_by_scope_spec.rb[1:3:1]	RSpec::Expectations::ExpectationNotMetError: expected: 1	1/2	1/2	

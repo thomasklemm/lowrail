@@ -890,3 +890,26 @@ findings:
     status: noise
     record: docs/upstream/readiness.md
     note: fails under seed 1717 on both trees
+  # Active Record extension gems after rails/rails#59141 (docs/upstream/ar-gems-after-59141.md).
+  - id: A59-1
+    suite: typedstore.*
+    signature: "has no attribute `[^`]+` to define a reader for"
+    status: gem-side
+    record: docs/upstream/ar-gems-after-59141.md
+    checked: round-59141 50c54eed06
+    note: 1.6.0 calls define_attribute_method for store accessors; fixed on master by byroot/activerecord-typedstore#114 (263050a196), unreleased
+  - id: A59-1
+    suite: typedstore.*
+    signature: "got #<ArgumentError: \\w+TypedStoreModel has n"
+    status: gem-side
+    record: docs/upstream/ar-gems-after-59141.md
+    checked: round-59141 50c54eed06
+    note: the same, with the expectation message cut before the attribute name
+  - id: A59-qt
+    suite: active_record_query_trace
+    class: suite-did-not-load
+    signature: "\\Ano test totals in output\\z"
+    status: gem-side
+    record: docs/upstream/ar-gems-after-59141.md
+    checked: round-59141 50c54eed06
+    note: lib calls LogSubscriber.attach_to (rails#55900); loads on neither tree, brunofacca/active-record-query-trace#72 closed

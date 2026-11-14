@@ -1,0 +1,180 @@
+# Active Record extension gems after rails/rails#59141 ("Use an Array for storing Active Record attributes", merged
+# 2026-11-11 as 1f32b09101). Record: docs/upstream/ar-gems-after-59141.md. Base is the merge's first parent, the
+# candidate main three days later; a candidate flag is then checked against the merge itself to separate #59141 from
+# the 26 later commits. Suites and settings follow round-ecosystem-1.yml and round-ecosystem-2.yml where the gem ran
+# there. PostgreSQL 17 (not 15) on 127.0.0.1:5432, started as readiness-postgres before the round; MariaDB from
+# services.rb.
+ruby: 4.0.9
+rails:
+  base: c48c154e3f5285cb2fe4cf03b2e3a62cfd34ffc8      # main, first parent of 1f32b09101 (#59141)
+  candidate: 50c54eed065b8bfb1b0bbb5fa770c859baa98f9b # main, 2026-11-14
+seeds: [4242, 1717]
+alone_runs: 5
+timeout: 3600
+
+x-pg: &pg { PGHOST: 127.0.0.1, PGUSER: postgres }
+
+suites:
+  activerecord-import-sqlite3: &ar_import
+    repo: https://github.com/zdennis/activerecord-import
+    ref: v3.0.1
+    framework: minitest
+    env: { AR_VERSION: "8.1", RUBYOPT: --enable-frozen-string-literal, MYSQL_PORT: 3306, PG_PORT: 5432, PGHOST: 127.0.0.1, PGUSER: postgres }
+    bumps: { ostruct: ">= 0" }
+    test: rake test:sqlite3
+  activerecord-import-postgresql:
+    <<: *ar_import
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres activerecord_import_test || true",
+            "psql -h 127.0.0.1 -U postgres activerecord_import_test -c 'create extension if not exists hstore; create extension if not exists \"uuid-ossp\"'"]
+    test: rake test:postgresql
+  paper_trail-sqlite: &paper_trail
+    repo: https://github.com/paper-trail-gem/paper_trail
+    ref: 86ce1b8307
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env: { DB: sqlite }
+    shims: ['sed -i ''s#\.gemfile/)#.gemfile|Gemfile\\.eco-/)#'' spec/spec_helper.rb']
+    setup: ["rake install_database_yml"]
+    test: rspec
+  paper_trail-postgres:
+    <<: *paper_trail
+    env: { DB: postgres, PT_CI_DATABASE: eco_paper_trail, PT_CI_DB_USER: user, PT_CI_DB_HOST: 127.0.0.1 }
+    services: [postgres]
+    setup: ["rake install_database_yml", "createdb -h 127.0.0.1 -U user eco_paper_trail_test || true"]
+  audited:
+    repo: https://github.com/collectiveidea/audited
+    ref: v5.8.0
+    framework: rspec
+    shims: ["sed -i 's/\"< 8.2\"/\"< 8.3\"/g' audited.gemspec"]
+    test: rspec
+  store_model:
+    { repo: https://github.com/DmitryTsepelev/store_model, ref: v4.6.2, framework: rspec, gemfile: gemfiles/rails_8_1.gemfile,
+      env: { RAILS_ENV: test }, test: rspec }
+  attr_json:
+    repo: https://github.com/jrochkind/attr_json
+    ref: v2.6.0
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, RAILS_ENV: test }
+    services: [postgres]
+    bumps: { rspec-rails: { git: https://github.com/rspec/rspec-rails, ref: 570b2b0a79 } } # L1, frozen default_url_options
+    test: rspec
+  mobility-sqlite3: &mobility
+    { repo: https://github.com/shioyama/mobility, ref: v1.3.2, framework: rspec,
+      env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: sqlite3 }, bumps: { ostruct: ">= 0" }, test: rspec -f p }
+  mobility-postgres:
+    <<: *mobility
+    env: { ORM: active_record, ORM_VERSION: "8.0", FEATURE: unit, DB: postgres, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["rake db:drop db:create db:up"]
+  globalize-sqlite3: &globalize
+    repo: https://github.com/globalize/globalize
+    ref: v7.1.3
+    framework: minitest
+    gemfile: gemfiles/rails_8.1.0.gemfile
+    env: { DB: sqlite3 }
+    # Rails main (before #59141) removed LogSubscriber.attach_to; the test helper only uses it for SQL logging.
+    shims: ["sed -i '/LogSubscriber.attach_to/d' test/support/database.rb"]
+    test: rake db:create db:migrate && rake test
+  globalize-postgresql:
+    <<: *globalize
+    env: { DB: postgresql, PGHOST: 127.0.0.1, PGPASSWORD: postgres }
+    services: [postgres]
+  enumerize-sqlite3: &enumerize
+    { repo: https://github.com/brainspec/enumerize, ref: v3.0.0, framework: minitest, gemfile: Gemfile.rails81,
+      env: { DB: sqlite3 }, test: rake,
+      shims: ["rm test/mongoid_test.rb test/mongo_mapper_test.rb"] } # no MongoDB here; each test waits 30 s for one
+  enumerize-postgresql:
+    <<: *enumerize
+    env: { DB: postgresql, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, PGHOST: 127.0.0.1 }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres enumerize_test || true"]
+    # Its postgresql config names no database, so the tests run in template1 (as in its CI) and leave tables
+    # there that every later createdb copies.
+    test: "rake; s=$?; psql -h 127.0.0.1 -U postgres template1 -c 'drop table if exists users, documents'; exit $s"
+  typedstore: &typedstore
+    { repo: https://github.com/byroot/activerecord-typedstore, ref: v1.6.0, framework: rspec, gemfile: gemfiles/Gemfile.ar-edge,
+      exclusive: typedstore-tmp, test: rspec,
+      shims: ["sed -i \"s/'sqlite3', '~> 1'/'sqlite3', '>= 2.1'/\" activerecord-typedstore.gemspec"] } # Rails needs sqlite3 2.1+
+  # Default branch with tenderlove's #114 (unreleased).
+  typedstore-main: { <<: *typedstore, ref: 263050a196 }
+  ar_lazy_preload:
+    { repo: https://github.com/DmitryTsepelev/ar_lazy_preload, ref: v2.1.3, framework: rspec, gemfile: gemfiles/rails_8_1.gemfile, test: rspec }
+  active_record_query_trace:
+    { repo: https://github.com/brunofacca/active-record-query-trace, ref: v1.9, framework: rspec, gemfile: gemfiles/rails_8.1.gemfile, test: rspec }
+  annotaterb:
+    { repo: https://github.com/drwl/annotaterb, ref: v4.26.0, framework: rspec, test: rspec spec/lib }
+  closure_tree:
+    repo: https://github.com/ClosureTree/closure_tree
+    ref: v9.8.0
+    framework: minitest
+    env: { RAILS_VERSION: "8.1", RAILS_ENV: test, DATABASE_URL_PG: "postgres://postgres:postgres@127.0.0.1:5432/closure_tree_test",
+           DATABASE_URL_MYSQL: "mysql2://root@127.0.0.1:3306/closure_tree_test", DATABASE_URL_SQLITE3: "sqlite3::memory:" }
+    services: [postgres, mysql]
+    test: >-
+      dropdb -h 127.0.0.1 -U postgres --if-exists closure_tree_test && createdb -h 127.0.0.1 -U postgres closure_tree_test &&
+      mariadb -h 127.0.0.1 -uroot -e 'drop database if exists closure_tree_test; create database closure_tree_test' &&
+      (cd test/dummy && rake db:setup_all) && rake test
+  ancestry-sqlite3: &ancestry
+    repo: https://github.com/stefankroes/ancestry
+    ref: v5.1.0
+    framework: minitest
+    gemfile: gemfiles/gemfile_81.gemfile
+    env: { CI: "1", DB: sqlite3, FORMAT: materialized_path }
+    shims: ["printf 'pg:\\n  adapter: postgresql\\n  host: 127.0.0.1\\n  username: postgres\\n  password: postgres\\n  database: ancestry_test\\nsqlite3:\\n  adapter: sqlite3\\n  database: \":memory:\"\\n' > test/database.yml"]
+    test: rake test
+  # 5.1.0 fails 31 tests on both trees (R2-5, validation_context=); the open fix stefankroes/ancestry#770 unmasks them.
+  ancestry-pr770: { <<: *ancestry, repo: https://github.com/hikmetba-bit/ancestry, ref: 68789a1903 }
+  ancestry-pg:
+    <<: *ancestry
+    env: { CI: "1", DB: pg, FORMAT: materialized_path }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres ancestry_test || true"]
+  acts_as_list-sqlite: &acts_as_list
+    { repo: https://github.com/brendon/acts_as_list, ref: v1.2.6, framework: minitest, env: { RAILS_VERSION: "8.1", DB: sqlite }, test: rake test }
+  acts_as_list-postgresql:
+    <<: *acts_as_list
+    env: { RAILS_VERSION: "8.1", DB: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres acts_as_list || true"]
+  discard:
+    { repo: https://github.com/jhawthorn/discard, ref: v2.0.0, framework: rspec, env: { RAILS_VERSION: "~> 8.1.0" }, test: rspec }
+  # paranoia 3.1.0 (no tag; a950fe4981 is also its default branch) loads on neither tree as released: R2-6 froze
+  # Transactions::ACTIONS and set_options_for_callbacks! takes a leading position. Same shims on both trees.
+  paranoia:
+    repo: https://github.com/rubysherpas/paranoia
+    ref: a950fe4981
+    framework: minitest
+    env: { RAILS: "~> 8.1.0" }
+    shims: ["sed -i 's/set_options_for_callbacks!(args, on: :restore)/set_options_for_callbacks!(:after, args, on: :restore)/' lib/paranoia.rb",
+            "sed -i 's/base::ACTIONS << :restore unless base::ACTIONS.include?(:restore)/unless base::ACTIONS.include?(:restore); a = base::ACTIONS + [:restore]; base.send(:remove_const, :ACTIONS); base.const_set(:ACTIONS, a.freeze); end/' lib/paranoia.rb"]
+    test: rake test
+  money-rails:
+    { repo: https://github.com/RubyMoney/money-rails, ref: v3.0.0, framework: rspec, gemfile: gemfiles/rails8.1.gemfile,
+      setup: ["rake prepare_test_env"], test: rspec }
+  friendly_id-sqlite: &friendly_id
+    repo: https://github.com/norman/friendly_id
+    ref: 4699c9791db955dfa9929af0f38a4059af550026
+    framework: minitest
+    gemfile: gemfiles/Gemfile.rails-8.1.rb
+    env: { CI: "true", DB: sqlite3 }
+    test: rake db:drop db:create db:up test
+  friendly_id-postgresql:
+    <<: *friendly_id
+    env: { CI: "true", DB: postgresql, PGUSER: postgres, PGHOST: 127.0.0.1 }
+    services: [postgres]
+  counter_culture-sqlite3: &counter_culture
+    { repo: https://github.com/magnusvk/counter_culture, ref: v3.14.0, framework: rspec, gemfile: gemfiles/rails_8.1.gemfile,
+      env: { DB: sqlite3 }, test: rspec spec,
+      shims: ["mkdir -p db", "sed -i 's/config.fail_fast = true unless CI_TEST_RUN/config.fail_fast = false/' spec/spec_helper.rb"] }
+  counter_culture-postgresql:
+    <<: *counter_culture
+    env: { DB: postgresql, PGHOST: 127.0.0.1, PGUSER: postgres }
+    services: [postgres]
+    setup: ["createdb -h 127.0.0.1 -U postgres counter_culture_test || true"]
+  activerecord-session_store:
+    { repo: https://github.com/rails/activerecord-session_store, ref: v2.3.0, framework: minitest, gemfile: gemfiles/rails_8.1.gemfile, test: rake }
+  attr_encrypted:
+    { repo: https://github.com/attr-encrypted/attr_encrypted, ref: v4.2.0, framework: minitest, test: rake test,
+      shims: ["sed -i \"s/'sqlite3', '= 1.5.4'/'sqlite3', '>= 2.1'/\" attr_encrypted.gemspec"] } # Rails needs sqlite3 2.1+

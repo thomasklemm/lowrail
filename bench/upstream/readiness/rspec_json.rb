@@ -34,4 +34,8 @@ class LowrailReadinessJSON < RSpec::Core::Formatters::JsonFormatter
     end
   end
   RSpec::Core::Formatters::Loader.prepend(Add)
+  # A spec_helper required before this file (from .rspec) can set the formatters up already, e.g. by emitting an
+  # RSpec deprecation (paper_trail's fixture_path), so setup_default has run and Add never fires.
+  loader = RSpec.configuration.formatter_loader
+  loader.add(LowrailReadinessJSON, RSpec.configuration.output_stream) if loader.formatters.any? && loader.formatters.none?(LowrailReadinessJSON)
 end
