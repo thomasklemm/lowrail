@@ -1,0 +1,172 @@
+# bench/upstream/census9/marshal_compat.rb, Ruby 4.0.9, SQLite. Trees: s81=71e963ed1b (8.1.4.1), main=50c54eed06,
+# p58663=3fcedd35b7, m58663=d34ea2709f (#58663), p59141=c48c154e3f, m59141=1f32b09101 (#59141).
+
+## dumped on s81 format 6.1, loaded on s81
+8.1.4.1 format 6.1 -> 8.1.4.1
+new              load ok | state same | save saved, row matches
+new_sti          load ok | state same | save saved, row matches
+new_built_assoc  load ok | state same | save saved, row matches
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state same | save saved, row matches
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save saved, row matches
+includes_sti     load ok | state same | save saved, row matches
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state same | save saved, row matches
+
+## dumped on s81 format 6.1, loaded on main
+8.1.4.1 format 6.1 -> 8.2.0.alpha
+new              load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+new_sti          load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+new_built_assoc  load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+created          load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+loaded           load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_read      load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_dirty     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_sti       load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes         load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes_sti     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+author_loaded    load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+partial_select   load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+
+## dumped on s81 format 7.1, loaded on s81
+8.1.4.1 format 7.1 -> 8.1.4.1
+new              load ok | state DIFF changed: ["meta", "secret", "title", "views"] -> [] | save saved, ROW DIFF ["meta", "views"]
+new_sti          load ok | state DIFF changed: ["meta", "secret", "title", "type"] -> [] | save ActiveRecord::RecordNotFound: Couldn't find SpecialPost with 'id'=10 [WHERE "posts"."type" = ?]
+new_built_assoc  load ok | state DIFF changed: ["title"] -> []; assoc.comments: [false, [["b", nil]]] -> [true, [["b", nil]]] | save saved, row matches
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state DIFF changed: ["meta", "title"] -> [] | save saved, ROW DIFF ["meta"]
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save saved, row matches
+includes_sti     load ok | state same | save saved, row matches
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state DIFF attrs: {"id" => 6, "title" => "post 5", "type" => "SpecialPost"} -> {"id" => 6, "title" => "post 5", "type" => "SpecialPost", "author_id" => nil, "meta" => nil, "secret" => nil, "views" => nil, "created_at" => nil, "updated_at" => nil} | save saved, ROW DIFF ["author_id", "meta", "secret", "views", "created_at"]
+
+## dumped on s81 format 7.1, loaded on main
+8.1.4.1 format 7.1 -> 8.2.0.alpha
+new              load ok | state DIFF changed: ["meta", "secret", "title", "views"] -> [] | save saved, ROW DIFF ["meta", "views"]
+new_sti          load ok | state DIFF changed: ["meta", "secret", "title", "type"] -> [] | save ActiveRecord::RecordNotFound: Couldn't find SpecialPost with 'id'=10 [WHERE "posts"."type" = ?]
+new_built_assoc  load ok | state DIFF changed: ["title"] -> []; assoc.comments: [false, [["b", nil]]] -> [true, [["b", nil]]] | save saved, row matches
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state DIFF changed: ["meta", "title"] -> [] | save saved, ROW DIFF ["meta"]
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save saved, row matches
+includes_sti     load ok | state same | save saved, row matches
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state DIFF attrs: {"id" => 6, "title" => "post 5", "type" => "SpecialPost"} -> {"id" => 6, "author_id" => nil, "type" => "SpecialPost", "title" => "post 5", "meta" => nil, "secret" => nil, "views" => nil, "created_at" => nil, "updated_at" => nil} | save saved, ROW DIFF ["author_id", "meta", "secret", "views", "created_at"]
+
+## dumped on main format 7.1, loaded on s81
+8.2.0.alpha format 7.1 -> 8.1.4.1
+new              load ok | state DIFF changed: ["meta", "secret", "title", "views"] -> [] | save saved, ROW DIFF ["meta", "views"]
+new_sti          load ok | state DIFF changed: ["meta", "secret", "title", "type"] -> [] | save ActiveRecord::RecordNotFound: Couldn't find SpecialPost with 'id'=10 [WHERE "posts"."type" = ?]
+new_built_assoc  load ok | state DIFF changed: ["title"] -> []; assoc.comments: [false, [["b", nil]]] -> [true, [["b", nil]]] | save saved, row matches
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state DIFF changed: ["meta", "title"] -> [] | save saved, ROW DIFF ["meta"]
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save saved, row matches
+includes_sti     load ok | state same | save saved, row matches
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state DIFF attrs: {"id" => 6, "type" => "SpecialPost", "title" => "post 5"} -> {"id" => 6, "author_id" => nil, "type" => "SpecialPost", "title" => "post 5", "meta" => nil, "secret" => nil, "views" => nil, "created_at" => nil, "updated_at" => nil} | save saved, ROW DIFF ["author_id", "meta", "secret", "views", "created_at"]
+
+## dumped on main format 7.1, loaded on main
+8.2.0.alpha format 7.1 -> 8.2.0.alpha
+new              load ok | state DIFF changed: ["meta", "secret", "title", "views"] -> [] | save saved, ROW DIFF ["meta", "views"]
+new_sti          load ok | state DIFF changed: ["meta", "secret", "title", "type"] -> [] | save ActiveRecord::RecordNotFound: Couldn't find SpecialPost with 'id'=10 [WHERE "posts"."type" = ?]
+new_built_assoc  load ok | state DIFF changed: ["title"] -> []; assoc.comments: [false, [["b", nil]]] -> [true, [["b", nil]]] | save saved, row matches
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state DIFF changed: ["meta", "title"] -> [] | save saved, ROW DIFF ["meta"]
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save saved, row matches
+includes_sti     load ok | state same | save saved, row matches
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state DIFF attrs: {"id" => 6, "type" => "SpecialPost", "title" => "post 5"} -> {"id" => 6, "author_id" => nil, "type" => "SpecialPost", "title" => "post 5", "meta" => nil, "secret" => nil, "views" => nil, "created_at" => nil, "updated_at" => nil} | save saved, ROW DIFF ["author_id", "meta", "secret", "views", "created_at"]
+
+## dumped on s81 format 6.1, loaded on p58663
+8.1.4.1 format 6.1 -> 8.2.0.alpha
+new              load ok | state same | save saved, row matches
+new_sti          load ok | state same | save saved, row matches
+new_built_assoc  load ok | state same | save NoMethodError: undefined method 'map' for nil
+created          load ok | state same | save saved, row matches
+loaded           load ok | state same | save saved, row matches
+loaded_read      load ok | state same | save saved, row matches
+loaded_dirty     load ok | state same | save saved, row matches
+loaded_sti       load ok | state same | save saved, row matches
+includes         load ok | state same | save NoMethodError: undefined method 'map' for nil
+includes_sti     load ok | state same | save NoMethodError: undefined method 'map' for nil
+author_loaded    load ok | state same | save saved, row matches
+partial_select   load ok | state same | save saved, row matches
+
+## dumped on s81 format 6.1, loaded on m58663
+8.1.4.1 format 6.1 -> 8.2.0.alpha
+new              load ok | state same | save saved, row matches
+new_sti          load ok | state same | save saved, row matches
+new_built_assoc  load ok | state same | save NoMethodError: undefined method 'map' for nil
+created          load ok | state same | save saved, row matches
+loaded           load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_read      load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_dirty     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_sti       load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes         load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes_sti     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+author_loaded    load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+partial_select   load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+
+## dumped on s81 format 6.1, loaded on p59141
+8.1.4.1 format 6.1 -> 8.2.0.alpha
+new              load ok | state same | save saved, row matches
+new_sti          load ok | state same | save saved, row matches
+new_built_assoc  load ok | state same | save NoMethodError: undefined method 'map_value' for nil
+created          load ok | state same | save saved, row matches
+loaded           load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_read      load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_dirty     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_sti       load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes         load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes_sti     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+author_loaded    load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+partial_select   load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+
+## dumped on s81 format 6.1, loaded on m59141
+8.1.4.1 format 6.1 -> 8.2.0.alpha
+new              load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+new_sti          load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+new_built_assoc  load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+created          load ok | state same | save NoMethodError: undefined method 'transform_row' for an instance of Hash
+loaded           load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_read      load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_dirty     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+loaded_sti       load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes         load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+includes_sti     load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+author_loaded    load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+partial_select   load ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow
+
+## new_built_assoc bisect, first-parent 8ae3d84277..3fcedd35b7 (good = row matches)
+8196221aa4 new_built_assoc  load ok | state same | save saved, row matches
+d30eb2413c new_built_assoc  load ok | state same | save saved, row matches
+0e086c1042 new_built_assoc  load ok | state same | save NoMethodError: undefined method 'map' for nil
+61d2e7634f new_built_assoc  load ok | state same | save saved, row matches
+355903611c new_built_assoc  load ok | state same | save saved, row matches
+5da5e3b1a0 new_built_assoc  load ok | state same | save NoMethodError: undefined method 'map' for nil
+ec6024f0af new_built_assoc  load ok | state same | save ActiveModel::MissingAttributeError: can't write unknown attribute ``
+83451a6428 new_built_assoc  load ok | state same | save saved, row matches
+be96a01be4 new_built_assoc  load ok | state same | save ActiveModel::MissingAttributeError: can't write unknown attribute ``
+f5ae04bef6 new_built_assoc  load ok | state same | save ActiveModel::MissingAttributeError: can't write unknown attribute ``
+6fe06defa4 new_built_assoc  load ok | state same | save saved, row matches
+
+## marshal_fixture_new.rb: main's own fixture rails_6_1_new_topic.dump (SQLite) on main and 8.1: define_attribute_methods? reader before save?
+main defined read_first: saved: Renamed
+main defined: NoMethodError: undefined method 'transform_row' for an instance of Hash
+main undefined read_first: NoMethodError: undefined method 'transform_row' for an instance of Hash
+8.1 (71e963ed1b) undefined: saved: Renamed
+8.1 (71e963ed1b) defined: saved: Renamed

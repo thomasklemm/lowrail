@@ -50,6 +50,9 @@ Not leads (released, or deliberate and already judged):
   GHSA-68p9-83h6-5wpj) are security fixes released in 8.1.4.1.
 * `QueryIntent`, `WeakKeyMap` leases, `association_route`, `EventReporter` and the schema context are judged in
   [rails-82-impact](rails-82-impact.md) and [main-regressions](main-regressions.md).
+* Records Marshal-dumped by 8.1 in the 6.1 format fail on main. This is intended and documented: the 8.2 upgrade guide
+  requires switching to 7.1 and flushing caches first, and #59249 removes 6.1 loading
+  ([below](#records-in-the-61-marshal-format-from-81-not-a-lead)).
 
 ## K1: `LazyIndexedAttributeSet#keys`
 
@@ -247,14 +250,110 @@ MessagePack payloads dumped by 8.1 and by main. Fix against main, interpreter, 6
 0.26%). That recovers 60–70% of the dump regression against 8.1; the rest is the Ruby walk over the indexes that
 replaced 8.1's C `Hash#transform_values`. YJIT: in the record.
 
-Found along the way, not part of L3: records Marshal-dumped by 8.1.4.1 in the 6.1 format fail on main (a loaded record
-raises `ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow` on load; a new one raises
-`NoMethodError` on `save`). Main's 6.1 test fixtures were dumped by Rails 6.1 and pass. tenderlove's open #59249
-removes 6.1 loading. Repro: [marshal_6_1_repro.rb](../../bench/upstream/l3/marshal_6_1_repro.rb).
+Found along the way, not part of L3: records Marshal-dumped by 8.1.4.1 in the 6.1 format fail on main. This is
+intended and documented, so it was not built; see [below](#records-in-the-61-marshal-format-from-81-not-a-lead).
 
 Reach: `Rails.cache` entries holding records (Marshal), the MessagePack cache coder, and anything that calls
 `attributes_before_type_cast`. None of the 71 census workloads dump a record, so the census cannot rank it. The
 loss is per cached record.
+
+### Records in the 6.1 Marshal format from 8.1 (not a lead)
+
+The L3 orb reported that records Marshal-dumped by 8.1.4.1 in the 6.1 format fail on main. The 6.1 format is
+8.1's default for apps without `load_defaults "7.1"`. Since a cache (`Rails.cache`, Solid Cache, sessions) outlives a
+deploy, upgrading such an app could break on load. **The failure is real, but it is intended and documented, so
+nothing was built (no M61).**
+
+**Repro** ([marshal_compat.rb](../../bench/upstream/census9/marshal_compat.rb), output
+[marshal-compat.txt](data/rails-main-census-9/marshal-compat.txt)). Twelve records are dumped on one tree and loaded
+on the other. Each loaded copy is compared with the original, then saved and reloaded. The cases are: new, new STI,
+new with a built `has_many`, created, loaded, loaded after reads, loaded and dirty, loaded STI, `includes` (plain
+and STI), a parent with `includes(:posts)`, and a partial `select`. The models have a JSON-serialized column, a
+non-deterministic encrypted attribute and a deterministic one. SQLite, Ruby 4.0.9.
+
+| Dumped on → loaded on | Loaded records (8) | New and created records (4) |
+| --- | --- | --- |
+| 8.1, 6.1 format → 8.1 | all load, save and match | all load, save and match |
+| **8.1, 6.1 format → main** | **all raise `ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow` on `Marshal.load`** | **all load and read correctly; `save` raises `NoMethodError: undefined method 'transform_row' for an instance of Hash`** |
+| 8.1, 7.1 format → main | same as 8.1 → 8.1 | same as 8.1 → 8.1 |
+| main, 7.1 format → 8.1 (rolling deploy) | same as 8.1 → 8.1 | same as 8.1 → 8.1 |
+
+Main can't dump the 6.1 format at all (`format_version = 6.1` raises `ArgumentError`), so the only reverse direction
+is 7.1. The 7.1 format drops the dirty state of new and dirty records and loads the unselected columns of a partial
+`select` as `nil`. It does that the same way on 8.1 and main, so it is not a cross-version difference.
+
+**Cause.** In the 6.1 format, Ruby dumps a record's instance variables as they are, so the payload names 8.1's
+private classes and their instance variables. Main changes those classes, so these payloads have broken one way after
+another since August. The two failures the L3 orb saw come from two PRs (checked on each PR's parent and merge;
+trees in the output file):
+
+* byroot's [#58663](https://github.com/rails/rails/pull/58663) (`1fbedade58` "Extract IndexedRow into ActiveModel",
+  merged 2026-09-15) breaks **loaded** records. It moved `ActiveRecord::Result::IndexedRow` to
+  `ActiveModel::IndexedRow` and renamed its `@column_indexes` to `@indexes`. All eight loaded records in the matrix
+  hold one, so all eight fail to load. On its parent `3fcedd35b7` all eight load, and six save. The two with
+  `includes` already failed on `save` (`NoMethodError: undefined method 'map' for nil`).
+* tenderlove's [#59141](https://github.com/rails/rails/pull/59141) (merged 2026-11-11) breaks **new** records. They
+  load as an `AttributeSet` holding a Hash. `b33a68e1de` (in #59141) makes them lay themselves out only when a
+  generated reader reads by slot. A `save` before that reaches `AttributeSet#map`, which calls
+  `transform_row` on the Hash. The INSERT first fails on `ActiveModel::Attribute::FromUser` values, then the rollback
+  raises the `NoMethodError`. Its parent `c48c154e3f` saves new, new STI and created records. Main's own Rails 6.1
+  fixture `rails_6_1_new_topic.dump` behaves the same way
+  ([marshal_fixture_new.rb](../../bench/upstream/census9/marshal_fixture_new.rb)). It saves only when
+  `define_attribute_methods` ran before the load and a reader runs before the save. Main's test does both. 8.1
+  saves it either way.
+* Earlier breaks, found while bisecting: a new record with a built `has_many` child fails on `save` from kamipo's
+  [#58354](https://github.com/rails/rails/pull/58354) (merged 2026-08-03; first-parent bisect, first bad
+  `f5ae04bef6`). #58354 caches `@foreign_key` in `BelongsToAssociation#initialize`, and the child's marshaled
+  association has no such variable. The error is `MissingAttributeError: can't write unknown attribute ''`, and a
+  `NoMethodError` on later commits. On the same August commits, the `includes` records already raised
+  `ArgumentError: wrong number of arguments` when read. That was not bisected.
+
+So the L3 note "very likely #59141" is half right: #59141 breaks new records, and #58663 broke loaded records two
+months earlier. This is the outcome #57382 predicted: 6.1 loading breaks whenever the private classes change.
+
+**Status of the format on main.**
+
+* byroot's [#57382](https://github.com/rails/rails/pull/57382) "Remove support for Rails 6.1 Active Record Marshal
+  format" was merged 2026-05-18. It removed 6.1 dumping and the `load_defaults "7.1"` line, made 7.1 the only
+  format, and added to the 8.2 upgrade guide: "you MUST opt-in to the newer `7.1` marshal format before upgrading,
+  and ensure all caches were either flushed or upgraded." The PR says: "For now loading 6.1 record will still work
+  ... but we might break it at any point when evolving the various `Attribute` / `AttributeSet` private APIs." It
+  also says no realistic deprecation warning was possible. It has no CHANGELOG or 8.2 release-notes entry, only the
+  upgrade-guide section.
+* tenderlove's [#59249](https://github.com/rails/rails/pull/59249) "Remove marshal loading support for Rails 6.1"
+  is **open, not draft**, and byroot approved it on 2026-10-22. It deletes the 6.1 fixtures and tests and the
+  `Builder`/`Association` `marshal_dump` compat. It adds a CHANGELOG entry and a guide paragraph: records with cached
+  associations raise `TypeError`, others "can break at any time", and caches must be flushed before upgrading.
+* In #59141, tenderlove restored 6.1 loading (`6cba4864a5`) only "to get this landed" because "we have some tests
+  that care about Marshal". byroot answered "I honestly didn't mind it being removed :)", and earlier suggested
+  splitting 6.1 support out.
+* The 8.1 upgrade guide doesn't mention the Marshal format. Its configuring guide still says old-format messages "can
+  still be read", which holds on 8.1.
+
+**Precedent.** The 7.1 format came with a `load_defaults "7.1"` switch, and from 7.1 on Rails read both formats, so
+an app switched after its upgrade without a flush. Only Rails < 7.1 can't read 7.1 dumps. The Active Support
+cache's 6.1 format went through a deprecation in 7.1 before its removal in 7.2 (7.2 release notes: "Remove deprecated
+support for `config.active_support.cache_format_version = 6.1`"). The Active Record 6.1 format gets no
+deprecation, by #57382's choice. No guide promises that 6.1-format dumps of Active Record objects survive an upgrade.
+The private classes they name are `:nodoc:`, and the 8.2 upgrade guide explicitly requires a flush.
+
+**Existing reports.** GitHub search of rails/rails issues and PRs for `IndexedRow marshal`, `marshal 6.1`,
+`marshalling_format_version`, `transform_row` and the error message finds nothing about this. The only matches are
+closed issues #49827, #49871, #50219 and #53667 (2023–2024) and the merged doc PR #49876, none about 8.2. #59141's
+thread mentions Marshal only for restoring and removing 6.1 support and for whether `UNSET` leaks into dumps.
+
+**Why no fix.** Making 8.1's 6.1 payloads load on main would mean a `ActiveRecord::Result::IndexedRow` constant with
+`marshal_load` for the old instance variables, a laid-out path for Hash-backed sets in `map` and the save path, and
+fallbacks for the association internals. That is compat code the maintainers have said they don't want, while
+#59249, which deletes the rest of it, is open and approved. The documented upgrade path works, as the table shows:
+switch to 7.1 on 8.1 (8.1 reads both formats), let the 6.1 entries expire or flush them, then deploy 8.2. Mixed
+8.1/main fleets on 7.1 read each other's dumps.
+
+Optional for Thomas, nothing posted. #59249's CHANGELOG says records other than those with cached associations "may
+still load". For payloads written by 8.1, the only ones a real upgrade meets, none work on main today: loaded ones
+fail on load and new ones fail on save. A one-line comment on #59249 with this table would sharpen its wording.
+Separately, 8.1.x could warn once at boot when `marshalling_format_version` is still 6.1. That fires for every
+such app, cached records or not, which is presumably why #57382 rejected it.
 
 ### Per-row load
 

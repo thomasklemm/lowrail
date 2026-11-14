@@ -107,7 +107,8 @@ Unrelated finding, same on main and the fix: records dumped by 8.1.4.1 in the **
 record raises `ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow` on `Marshal.load`; a new
 record loads, but `save` raises `NoMethodError: undefined method 'transform_row' for an instance of Hash`
 ([repro](marshal_6_1_repro.rb); 8.1 loads and saves both). Main's 6.1 fixtures were dumped by Rails 6.1 and pass.
-tenderlove's open #59249 removes 6.1 loading. Not part of this change; offered as a separate suggestion.
+tenderlove's open #59249 removes 6.1 loading. Not part of this change. Investigated afterwards: intended and
+documented, not built ([census 9](../../../docs/upstream/rails-main-census-9.md#records-in-the-61-marshal-format-from-81-not-a-lead)).
 
 ## Tests on the fix
 
