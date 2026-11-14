@@ -178,7 +178,7 @@ Below the top 10: Time/TZ in Lobsters (4.1%, the app's `Time#advance` per story)
 ## Prototypes
 
 Both are on [thomasklemm/rails](https://github.com/thomasklemm/rails), built on 50c54eed06, with queue items AB1
-(`built`) and MK1 (`held`). No third prototype: nothing else in the top 10 is both a Rails or central-gem cost and
+(`in-review`) and MK1 (`held`). No third prototype: nothing else in the top 10 is both a Rails or central-gem cost and
 not already in flight.
 
 **AB1, [`thomasklemm/allow-browser-verdict-cache`](https://github.com/thomasklemm/rails/tree/thomasklemm/allow-browser-verdict-cache).**
@@ -187,6 +187,10 @@ request for the whole check under YJIT). The verdict depends only on the user ag
 set, so it is kept per user agent for Symbol sets (`:modern`), at most 1,000 user agents of at most 512 bytes per
 set, and cleared when full. A Hash of versions and long user agents take the uncached path. Blocked requests still
 instrument and run the block.
+
+The reviewed head is `8dc5af2127`. It fixes the text of `207a7827a7` after two reviews: the code comment is one line
+now, and the commit message drops an unbacked hit-rate claim. The code and the test are unchanged. The body now
+uses the review's wall-time numbers (below).
 
 benchmark-ips on a bare controller request with `allow_browser versions: :modern` (the body's script), core 3,
 best of 5, interleaved with an A/A ([raw](data/p-map/ab1-ips.txt)):
