@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Wall time of the CE2 heavier pages on one or more Rails trees, no Valgrind.
+#   bench/upstream/ce2/walltime --trees NAME=SPEC,NAME=SPEC[,...] [--apps blog,lobsters,fizzy]
+#     [--modes interp,yjit] [--rounds 10] [--out DIR] [--corpus censusce2] [--ruby 4.0.9] [--cpu N|none]
+# SPEC as script/census: REF, OWNER/REPO@REF or /path/to/rails@REF. Copies come from
+# `CENSUS_SET=ce2 script/census setup --corpus censusce2 ...` (README.md).
+# Each round runs every app and mode as two processes per tree, in a palindromic
+# order rotated by round (for trees a, b: a b b a, then b b a a, ...),
+# so drift favours no tree; each tree's two processes are its A/A pair. Every
+# process is pinned to one core (taskset; default the last CPU). Run it on an
+# otherwise idle orb.
+# Summary: bench/upstream/ce2/walltime_summary.rb DIR.
+require "etc"
+require "optparse"
+load File.expand_path("../../../script/census", __dir__)
+
+opts = { apps: %w[blog lobsters fizzy], modes: %w[interpreter yjit], rounds: 10, corpus: "censusce2", ruby: "4.0.9",
+  cpu: (Etc.nprocessors - 1).to_s,
+  out: File.join(Census::ROOT, ".lowrail/private/ce2-walltime") }
+OptionParser.new do |o|
+  o.on("--trees LIST") { |v| opts[:trees] = v.split(",").to_h { _1.split("=", 2) } }
+  o.on("--apps LIST") { |v| opts[:apps] = v.split(",") }
+  o.on("--modes LIST") { |v| opts[:modes] = v.split(",").map { Census::MODES.fetch(_1) } }
+  o.on("--rounds N", Integer) { |v| opts[:rounds] = v }
+  o.on("--out DIR") { |v| opts[:out] = File.expand_path(v) }
+  o.on("--corpus NAME") { |v| opts[:corpus] = v }
+  o.on("--ruby R") { |v| opts[:ruby] = v }
+  o.on("--cpu N", "pin each process to this CPU (taskset; none: no pinning)") { |v| opts[:cpu] = v == "none" ? nil : v }
+end.parse!
+abort "--trees NAME=SPEC,... required" unless opts[:trees]&.any?
+
+ENV["CENSUS_SET"] = "ce2"
+bin = Census.ruby_bin(opts[:ruby])
+harness = File.join(__dir__, "walltime_harness.rb")
+trees = opts[:trees].transform_values { Census.resolve_rails(_1) }
+gemfiles = trees.to_h { |name, rails| [name, opts[:apps].to_h { [_1, Census.variant(opts[:corpus], _1, rails, bin)] }] }
+FileUtils.mkdir_p(opts[:out])
+File.write(File.join(opts[:out], "meta.json"), JSON.pretty_generate(trees: trees, ruby: Census.ruby_description(bin),
+  apps: opts[:apps], modes: opts[:modes], rounds: opts[:rounds], cpu: opts[:cpu], warmup: ENV.fetch("CE2_WARMUP", "100"),
+  windows: ENV.fetch("CE2_WINDOWS", "7"), ops: ENV.fetch("CE2_OPS", "20")) + "\n")
+names = trees.keys
+order = names + names.reverse
+(1..opts[:rounds]).each do |round|
+  rotated = order.rotate(round - 1)
+  opts[:apps].each do |app|
+    opts[:modes].each do |mode|
+      seen = Hash.new(0)
+      rotated.each do |tree|
+        run = (seen[tree] += 1) == 1 ? "A" : "B"
+        json = File.join(opts[:out], "#{app}-#{mode}-#{tree}-#{run}-r#{round}.json")
+        next if File.exist?(json)
+        env = Census.env_for(app, bin, trees[tree], gemfiles[tree][app]).merge("CENSUS_MODE" => mode)
+        cmd = ["bundle", "exec", "ruby", *Census::FLAGS.fetch(mode), harness, app, json]
+        cmd = ["taskset", "-c", opts[:cpu], *cmd] if opts[:cpu]
+        Census.sh(env, *cmd, chdir: Census.app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
+        puts "#{Time.now.utc.strftime("%T")} #{File.basename(json)}"
+      end
+    end
+  end
+end

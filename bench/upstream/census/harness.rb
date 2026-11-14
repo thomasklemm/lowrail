@@ -105,10 +105,18 @@ module RailsCensus
       Op.new(name, :job, -> { payload["class"].constantize.new.perform(*payload["args"].deep_dup) })
     end
 
+    # CENSUS_SET=ce2: the heavier pages in ../ce2 (README.md), in copies set up
+    # with ../ce2/overlays.
+    def ce2? = ENV["CENSUS_SET"] == "ce2"
+
     def workloads(name)
       if background?
         load File.join(__dir__, "background_workloads.rb")
         return BackgroundWorkloads.public_send(copy_of(name).tr("-", "_"), self)
+      end
+      if ce2?
+        load File.join(__dir__, "../ce2/workloads.rb")
+        return Ce2Workloads.public_send(copy_of(name).tr("-", "_"), self)
       end
       load File.join(__dir__, "../census_4_workloads.rb")
       load File.join(__dir__, "pg_workloads.rb")
@@ -175,6 +183,10 @@ module RailsCensus
         load File.join(ROOT, "fixtures/corpus/inertia-chatwoot-census/seeds/#{name}.rb")
       else
         raise "no preparation known for #{name}"
+      end
+      if ce2?
+        load File.join(__dir__, "../ce2/seed.rb")
+        Ce2Seed.public_send(name.tr("-", "_"))
       end
       FileUtils.mkdir_p("tmp")
       File.write(marker, JSON.generate(name: name, rails: rails_sha, lock: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest))

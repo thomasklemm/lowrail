@@ -1,0 +1,38 @@
+diff -ruN l2-a/app/controllers/home_controller.rb l2-b/app/controllers/home_controller.rb
+--- l2-a/app/controllers/home_controller.rb
++++ l2-b/app/controllers/home_controller.rb
+@@ -363,7 +363,9 @@
+   end
+ 
+   def paginate(scope)
+-    StoriesPaginator.new(scope, page, @user).get
++    paginator = StoriesPaginator.new(scope, page, @user)
++    paginator.per_page = params[:per_page].to_i.clamp(1, 100) if params[:per_page]
++    paginator.get
+   end
+ 
+   def get_from_cache(opts = {}, &)
+@@ -371,7 +373,7 @@
+     if Rails.env.development? || @user || filtered_tags.any?
+       yield
+     else
+-      key = opts.merge(page: page).sort.map { |k, v| "#{k}=#{v.to_param}" }.join(" ")
++      key = opts.merge(page: page, per_page: params[:per_page]).sort.map { |k, v| "#{k}=#{v.to_param}" }.join(" ")
+       begin
+         Rails.cache.fetch("stories #{key}", expires_in: 45, &)
+       rescue Errno::ENOENT => e
+diff -ruN l2-a/config/initializers/census_typedstore_rails_main.rb l2-b/config/initializers/census_typedstore_rails_main.rb
+--- l2-a/config/initializers/census_typedstore_rails_main.rb
++++ l2-b/config/initializers/census_typedstore_rails_main.rb
+@@ -0,0 +1,11 @@
++# Census copy only: activerecord-typedstore 1.6.0 defines attribute methods for store keys, and Rails main
++# (rails/rails#59141) raises when a reader has no slot. The store accessor already shadows that reader.
++ActiveSupport.on_load(:active_record) do
++  next unless ActiveModel::AttributeSet::Builder.method_defined?(:indexes)
++  ActiveRecord::Base.singleton_class.prepend(Module.new do
++    private def define_method_attribute(name, owner:, as: name)
++      return if respond_to?(:store_accessors) && store_accessors&.include?(name) && !attributes_builder.indexes.key?(name)
++      super
++    end
++  end)
++end

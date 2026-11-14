@@ -1,0 +1,242 @@
+diff -ruN blog-a/app/controllers/api/articles_controller.rb blog-b/app/controllers/api/articles_controller.rb
+--- blog-a/app/controllers/api/articles_controller.rb
++++ blog-b/app/controllers/api/articles_controller.rb
+@@ -0,0 +1,7 @@
++class Api::ArticlesController < ApplicationController
++  def index
++    articles = Article.includes(:comments).order(created_at: :desc).limit(params.fetch(:per_page, 25).to_i.clamp(1, 100))
++    render json: articles.as_json(only: %i[id title body created_at updated_at],
++      include: { comments: { only: %i[id commenter body created_at] } })
++  end
++end
+diff -ruN blog-a/app/controllers/articles_controller.rb blog-b/app/controllers/articles_controller.rb
+--- blog-a/app/controllers/articles_controller.rb
++++ blog-b/app/controllers/articles_controller.rb
+@@ -3,7 +3,7 @@
+ 
+   # GET /articles or /articles.json
+   def index
+-    @articles = Article.includes(:comments).order(created_at: :desc)
++    @articles = Article.includes(:comments).order(created_at: :desc).limit(per_page)
+   end
+ 
+   # GET /articles/1 or /articles/1.json
+@@ -58,6 +58,10 @@
+   end
+ 
+   private
++    def per_page
++      params.fetch(:per_page, 25).to_i.clamp(1, 100)
++    end
++
+     # Use callbacks to share common setup or constraints between actions.
+     def set_article
+       @article = Article.find(params.expect(:id))
+diff -ruN blog-a/app/controllers/customers_controller.rb blog-b/app/controllers/customers_controller.rb
+--- blog-a/app/controllers/customers_controller.rb
++++ blog-b/app/controllers/customers_controller.rb
+@@ -0,0 +1,39 @@
++class CustomersController < ApplicationController
++  before_action :set_customer
++
++  def edit
++  end
++
++  def update
++    if @customer.update(customer_params)
++      redirect_to edit_customer_path(@customer), notice: "Customer was successfully updated.", status: :see_other
++    else
++      render :edit, status: :unprocessable_content
++    end
++  end
++
++  def archive
++    @customer.update!(status: "archived", archived_at: Time.current)
++    redirect_to edit_customer_path(@customer), status: :see_other
++  end
++
++  def invite
++    redirect_to edit_customer_path(@customer), notice: "Invitation sent.", status: :see_other
++  end
++
++  def destroy
++    @customer.destroy!
++    redirect_to articles_path, status: :see_other
++  end
++
++  private
++    def set_customer
++      @customer = Customer.find(params.expect(:id))
++    end
++
++    def customer_params
++      params.expect(customer: [ :first_name, :last_name, :email, :phone, :company, :job_title, :website,
++        :address_line1, :address_line2, :city, :state, :postal_code, :country, :time_zone, :locale, :currency,
++        :plan, :credit_limit, :tax_exempt, :newsletter, :birthday, :notes ])
++    end
++end
+diff -ruN blog-a/app/models/customer.rb blog-b/app/models/customer.rb
+--- blog-a/app/models/customer.rb
++++ blog-b/app/models/customer.rb
+@@ -0,0 +1,22 @@
++class Customer < ApplicationRecord
++  STATUSES = %w[active trial past_due archived].freeze
++  PLANS = %w[basic team business enterprise].freeze
++  COUNTRIES = { "United States" => "US", "Canada" => "CA", "Germany" => "DE", "France" => "FR", "United Kingdom" => "GB", "Japan" => "JP" }.freeze
++  LOCALES = %w[en de fr ja].freeze
++  CURRENCIES = %w[USD CAD EUR GBP JPY].freeze
++  TIME_ZONES = ["UTC", "Eastern Time (US & Canada)", "Pacific Time (US & Canada)", "Berlin", "London", "Tokyo"].freeze
++
++  normalizes :email, with: ->(email) { email.strip.downcase }
++
++  validates :account_number, :first_name, :last_name, presence: true
++  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: true
++  validates :status, inclusion: { in: STATUSES }
++  validates :plan, inclusion: { in: PLANS }
++  validates :country, inclusion: { in: COUNTRIES.values }
++  validates :locale, inclusion: { in: LOCALES }
++  validates :currency, inclusion: { in: CURRENCIES }
++  validates :credit_limit, numericality: { greater_than_or_equal_to: 0 }
++  validates :website, format: { with: %r{\Ahttps?://}, allow_blank: true }
++
++  def name = "#{first_name} #{last_name}"
++end
+diff -ruN blog-a/app/views/customers/edit.html.erb blog-b/app/views/customers/edit.html.erb
+--- blog-a/app/views/customers/edit.html.erb
++++ blog-b/app/views/customers/edit.html.erb
+@@ -0,0 +1,72 @@
++<% content_for :title, "Edit #{@customer.name}" %>
++
++<div class="md:w-2/3 w-full">
++  <% if notice.present? %>
++    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
++  <% end %>
++
++  <div class="flex justify-between items-center">
++    <h1 class="font-bold text-4xl"><%= @customer.name %></h1>
++    <div class="flex space-x-2">
++      <%= button_to "Send invite", invite_customer_path(@customer), class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 font-medium" %>
++      <%= button_to "Archive", archive_customer_path(@customer), class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 font-medium", data: { turbo_confirm: "Archive this customer?" } %>
++      <%= button_to "Delete", customer_path(@customer), method: :delete, class: "rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium", data: { turbo_confirm: "Are you sure?" } %>
++    </div>
++  </div>
++  <p class="text-gray-500">Account <%= @customer.account_number %> · <%= @customer.status.humanize %> · balance <%= number_to_currency(@customer.balance, unit: @customer.currency) %></p>
++
++  <%= form_with(model: @customer, class: "contents") do |form| %>
++    <% if @customer.errors.any? %>
++      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
++        <h2><%= pluralize(@customer.errors.count, "error") %> prohibited this customer from being saved:</h2>
++        <ul class="list-disc ml-6">
++          <% @customer.errors.each do |error| %>
++            <li><%= error.full_message %></li>
++          <% end %>
++        </ul>
++      </div>
++    <% end %>
++
++    <fieldset class="my-5 grid grid-cols-2 gap-4">
++      <legend class="font-bold">Contact</legend>
++      <div><%= form.label :first_name %><%= form.text_field :first_name, required: true, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :last_name %><%= form.text_field :last_name, required: true, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :email %><%= form.email_field :email, required: true, autocomplete: "email", class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :phone %><%= form.telephone_field :phone, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :company %><%= form.text_field :company, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :job_title %><%= form.text_field :job_title, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :website %><%= form.url_field :website, placeholder: "https://", class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :birthday %><%= form.date_field :birthday, class: "block border rounded-md px-3 py-2 w-full" %></div>
++    </fieldset>
++
++    <fieldset class="my-5 grid grid-cols-2 gap-4">
++      <legend class="font-bold">Address</legend>
++      <div><%= form.label :address_line1, "Address" %><%= form.text_field :address_line1, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :address_line2, "Address (line 2)" %><%= form.text_field :address_line2, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :city %><%= form.text_field :city, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :state %><%= form.text_field :state, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :postal_code %><%= form.text_field :postal_code, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :country %><%= form.select :country, Customer::COUNTRIES, {}, class: "block border rounded-md px-3 py-2 w-full" %></div>
++    </fieldset>
++
++    <fieldset class="my-5 grid grid-cols-2 gap-4">
++      <legend class="font-bold">Account</legend>
++      <div><%= form.label :plan %><%= form.select :plan, Customer::PLANS.map { [_1.humanize, _1] }, {}, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :credit_limit %><%= form.number_field :credit_limit, step: 0.01, min: 0, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :currency %><%= form.select :currency, Customer::CURRENCIES, {}, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :locale %><%= form.select :locale, Customer::LOCALES, {}, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div><%= form.label :time_zone %><%= form.select :time_zone, Customer::TIME_ZONES, {}, class: "block border rounded-md px-3 py-2 w-full" %></div>
++      <div class="flex items-center gap-2"><%= form.check_box :tax_exempt %><%= form.label :tax_exempt %></div>
++      <div class="flex items-center gap-2"><%= form.check_box :newsletter %><%= form.label :newsletter, "Subscribed to the newsletter" %></div>
++    </fieldset>
++
++    <div class="my-5">
++      <%= form.label :notes %>
++      <%= form.textarea :notes, rows: 4, class: "block border rounded-md px-3 py-2 w-full" %>
++    </div>
++
++    <div class="inline">
++      <%= form.submit class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
++    </div>
++  <% end %>
++</div>
+diff -ruN blog-a/config/routes.rb blog-b/config/routes.rb
+--- blog-a/config/routes.rb
++++ blog-b/config/routes.rb
+@@ -4,4 +4,15 @@
+   resources :articles do
+     resources :comments, only: [:create, :destroy]
+   end
++
++  resources :customers, only: [:edit, :update, :destroy] do
++    member do
++      post :archive
++      post :invite
++    end
++  end
++
++  namespace :api do
++    resources :articles, only: :index
++  end
+ end
+diff -ruN blog-a/db/schema.rb blog-b/db/schema.rb
+--- blog-a/db/schema.rb
++++ blog-b/db/schema.rb
+@@ -27,5 +27,40 @@
+     t.index ["article_id"], name: "index_comments_on_article_id"
+   end
+ 
++  create_table "customers", force: :cascade do |t|
++    t.string "account_number", null: false
++    t.string "first_name", null: false
++    t.string "last_name", null: false
++    t.string "email", null: false
++    t.string "phone"
++    t.string "company"
++    t.string "job_title"
++    t.string "website"
++    t.string "address_line1"
++    t.string "address_line2"
++    t.string "city"
++    t.string "state"
++    t.string "postal_code"
++    t.string "country", default: "US", null: false
++    t.string "time_zone", default: "UTC", null: false
++    t.string "locale", default: "en", null: false
++    t.string "currency", default: "USD", null: false
++    t.string "status", default: "active", null: false
++    t.string "plan", default: "basic", null: false
++    t.decimal "credit_limit", precision: 10, scale: 2, default: "0.0", null: false
++    t.decimal "balance", precision: 10, scale: 2, default: "0.0", null: false
++    t.boolean "tax_exempt", default: false, null: false
++    t.boolean "newsletter", default: true, null: false
++    t.date "birthday"
++    t.text "notes"
++    t.string "tags"
++    t.datetime "last_contacted_at"
++    t.datetime "archived_at"
++    t.datetime "created_at", null: false
++    t.datetime "updated_at", null: false
++    t.index ["account_number"], name: "index_customers_on_account_number", unique: true
++    t.index ["email"], name: "index_customers_on_email", unique: true
++  end
++
+   add_foreign_key "comments", "articles"
+ end

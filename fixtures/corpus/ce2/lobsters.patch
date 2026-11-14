@@ -1,0 +1,15 @@
+diff -ruN lob-a/config/initializers/census_typedstore_rails_main.rb lob-b/config/initializers/census_typedstore_rails_main.rb
+--- lob-a/config/initializers/census_typedstore_rails_main.rb
++++ lob-b/config/initializers/census_typedstore_rails_main.rb
+@@ -0,0 +1,11 @@
++# Census copy only: activerecord-typedstore 1.6.0 defines attribute methods for store keys, and Rails main
++# (rails/rails#59141) raises when a reader has no slot. The store accessor already shadows that reader.
++ActiveSupport.on_load(:active_record) do
++  next unless ActiveModel::AttributeSet::Builder.method_defined?(:indexes)
++  ActiveRecord::Base.singleton_class.prepend(Module.new do
++    private def define_method_attribute(name, owner:, as: name)
++      return if respond_to?(:store_accessors) && store_accessors&.include?(name) && !attributes_builder.indexes.key?(name)
++      super
++    end
++  end)
++end

@@ -1,0 +1,26 @@
+diff --git a/config/initializers/uuid_primary_keys.rb b/config/initializers/uuid_primary_keys.rb
+index 4b4bc8f..0c590cf 100644
+--- a/config/initializers/uuid_primary_keys.rb
++++ b/config/initializers/uuid_primary_keys.rb
+@@ -11,15 +11,17 @@ module UuidPrimaryKeyDefault
+ 
+   private
+     def define_uuid_primary_key_pending_default
+-      if uuid_primary_key?
+-        pending_attribute_modifications << PendingUuidDefault.new(primary_key)
++      if (pk = uuid_primary_key)
++        pending_attribute_modifications << PendingUuidDefault.new(pk)
+       end
+     rescue ActiveRecord::StatementInvalid
+       # Table doesn't exist yet
+     end
+ 
+-    def uuid_primary_key?
+-      table_name && primary_key && schema_cache.columns_hash(table_name)[primary_key]&.type == :uuid
++    # Rails main's primary_key reads the schema context this hook builds, so ask the schema cache.
++    def uuid_primary_key
++      pk = table_name && schema_cache.primary_keys(table_name)
++      pk if pk.is_a?(String) && schema_cache.columns_hash(table_name)[pk]&.type == :uuid
+     end
+ 
+     PendingUuidDefault = Struct.new(:name) do
