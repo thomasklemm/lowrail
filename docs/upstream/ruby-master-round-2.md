@@ -25,7 +25,7 @@ instructions with the pinned Valgrind ([method](#method-and-pins)).
 | 1 | **Small-Hash lookups and inserts cost more** (`h[:k]` on ≤ 8 keys, literals, `[]=`) | interp, YJIT, ZJIT (same C functions) | every app and request; railsbench Hash functions **+50.5 M Ir per iteration (interp), +48.9 M (YJIT), +7.5%**, about +0.7% of an iteration | `h[:b]` 288 → 334 Ir (+16%), wall time 2.9 → 6.4 ns; 3-pair literal 1,084 → 1,232 Ir (+14%); 12-key lookup unchanged (control); whole iteration without GC +0.35% interp, −0.16% YJIT (offset by other gains) | [`7da70f1773`](https://github.com/ruby/ruby/commit/7da70f1773) (ruby/ruby#18222, byroot, SWAR `ar_find_entry_hint`) +23 Ir and [`0b2edb5b9a`](https://github.com/ruby/ruby/commit/0b2edb5b9a) (ruby/ruby#18476, Peter Zhu, AR identity hashes) +14 Ir | none found | Show both authors the x86-64 count and the 3-line repro; try keeping the identity check and the SWAR search off the plain lookup path, then measure on railsbench. Highest reach of anything here |
 | 2 | **`nofree` major GCs in sparse large-slot heaps** (round 1 #2) | interp, YJIT | 35 census workloads; shipit | YJIT census: majors **−82.5%**, GC time **−27.4%** with the fix (two A/A rounds); shipit YJIT 24–26 → 5–9 majors, −29% GC time; bigslot 1–2 / 24–31 / 3 (4.0.9 / master / fix). Cost: +1.2–1.8 MB RSS per workload, large-slot sweep step p99 ≈ 3× | [`16da5f23c2`](https://github.com/ruby/ruby/commit/16da5f23c2) (ruby/ruby#16632), round 1 | ruby/ruby#17251 (eightbitraptor, open draft): **its current head `41c689571a` fixes it too**. Census majors −95%, shipit 4–5 majors, bigslot 1–5 at 4–5 pages; app RSS cost the same as ours | Can our piece go? Probably: keep [item GC](../../bench/upstream/pr-queue/items/GC.md) (`7bc813e025`, rebased, pushed, body refreshed) held as the fallback, and give #17251 the numbers if Thomas wants it to land before 4.1 |
 | 3 | **Copying a 3–8-key Hash grown by insertion** (`h.dup`, `m(**h)`) | interp, YJIT, ZJIT | apps that `dup` or splat small option Hashes built with `[]=` | `m(**h)` +47 / +75 / +113% at 3 / 5 / 8 keys, `h.dup` +32 / +51 / +82%; A/A ≤ 0.2% below 8 keys, ≤ 1.9% above; very large inputs: `h.dup` of 100k +14%, `m(**h, a: v)` +6.5% | ruby/ruby#18345 (byroot, deliberate: insertion-grown Hashes become st_tables at the 3rd key) | byroot's #18345 notes the st_table churn; KW2 (ours, parked) covers the merge side | Low priority: ask byroot whether `rb_hash_dup` of a ≤ 8-entry st_table should make an AR table |
-| 4 | **rails/rails#59141 shared readers forward `&block` generically** (Rails, not Ruby) | ZJIT, YJIT | every AR attribute read on Rails main; largest on Lobsters | ZJIT: +208 `send_block_arg_not_nil` and +51 `send_polymorphic_fallback` per Lobsters request; railsbench +22.5k per iteration; YJIT dynamic sends +5.4% (railsbench), +4.1% (Lobsters). Price on railsbench: **ZJIT −1.1%, YJIT −1.5%, a net win** (all gates pass) | `1f32b09101` (merge of #59141) against its parent `c48c154e3f` | none | Section 6 |
+| 4 | **rails/rails#59141 shared readers pass `&:value!` generically** (Rails, not Ruby; corrected in [zjit-leads](zjit-leads.md#correction-railsrails59141s-site-is-value-not-block)) | ZJIT, YJIT | every AR attribute read on Rails main; largest on Lobsters | ZJIT: +208 `send_block_arg_not_nil` and +51 `send_polymorphic_fallback` per Lobsters request; railsbench +22.5k per iteration; YJIT dynamic sends +5.4% (railsbench), +4.1% (Lobsters). Price on railsbench: **ZJIT −1.1%, YJIT −1.5%, a net win** (all gates pass) | `1f32b09101` (merge of #59141) against its parent `c48c154e3f` | none | Section 6 |
 | 5 | **No 320 B slot** (round 1 #3) | all | every query: `QueryIntent` (31 ivars) 320 → 512 B | census `database_statements` site +2,444 B per workload | [`c9b7088364`](https://github.com/ruby/ruby/commit/c9b7088364) (ruby/ruby#16282, deliberate) | none | Unchanged: no Ruby fix proposed; Rails could keep `QueryIntent` ≤ 30 ivars |
 | 6 | **ZJIT copies a caller-built splat into a rest parameter** (round 1 #4) | ZJIT | `URI.parse`; top ZJIT-only allocation site in the census | +1 Array per call | predates #18267 (not a 4.0 → 4.1 regression) | Shopify/ruby#1095 (ours, open, unassigned) | Unchanged |
 | — | Round 1 #1, kwsplat second Hash | — | — | **fixed**: 4.0.9's counts in every shape | — | — | Drop `thomasklemm/kwsplat-fit-merge` |
@@ -273,8 +273,9 @@ Ruby master.
 **What this means.** The shared readers are not a new kind of polymorphism: before #59141 every model already read
 `@attributes` in the shared `_read_attribute!`. ZJIT compiles `_read_attribute_at!` to a final version and then reads
 `@attributes` with `rb_ivar_get` (`no_side_exits`, lead 15) because it sees one shape per model class; on Lobsters
-the 395 new fallbacks replace 371 in `_read_attribute!`, net +24. What is new is that the reader now forwards its block
-(`fetch_value_at!(N, &block)` → `send_block_arg_not_nil`, lead 7: +208 per Lobsters request) and that the slot ISEQ's
+the 395 new fallbacks replace 371 in `_read_attribute!`, net +24. What is new is that each first read now passes a Symbol block argument
+(`cast_value(…, &:value!)` in `fetch_value_at!` → `send_block_arg_not_nil`, +208 per Lobsters request; generic in YJIT too,
+see [zjit-leads](zjit-leads.md#correction-railsrails59141s-site-is-value-not-block)) and that the slot ISEQ's
 call to `_read_attribute_at!` is class-polymorphic (`send_polymorphic_fallback`, lead 3: +51). Fizzy (148 model
 files, 70 tables) barely moves and improves overall. YJIT sees a few more megamorphic ivar reads and, on Lobsters,
 +4% dynamic sends.
@@ -296,10 +297,10 @@ models, where the counters move most) could not be priced because ruby-bench lob
 own read after the window; the gate now reads its counters right next to the window) and was rerun once with the
 corrected bracketing; the rejected pair is kept.
 
-**Can the broken piece go?** The fallback is `fetch_value_at!(N, &block)` forwarding a block that is nil on every
-plain attribute read. Rails could skip the `&block` when there is none, but #59141 is already a net win, so the
-cleaner fix is ZJIT's lead 7 (specialize a send with a non-nil or nil block argument), which also covers
-`_read_attribute(name, &block)` and `mon_synchronize`.
+**Can the broken piece go?** Corrected 2026-11-14 ([zjit-leads](zjit-leads.md#rails-side-option-a-block-literal-in-fetch_value_at)):
+the fallback is `cast_value(@ctx.name_at(index), index, &:value!)`, a Symbol block argument that YJIT does not
+specialize either. A block literal there removes it in both JITs and is cheaper in all three modes (Active Record
+micro: −1.5% interpreter, −9.9% YJIT, −12.8% ZJIT), so the Rails change is the better fix.
 
 **Candidate bucket.** It is a small sub-bucket of existing leads, not a bucket of its own: its cost sits in leads 7 (block
 argument), 3 (class-polymorphic send) and 15 (ivar read in a final version), whose owners are listed in the
@@ -359,9 +360,9 @@ per ivar read). Owners checked on 2026-11-14 against open ruby/ruby ZJIT PRs and
 
 | bucket (lead) | railsbench | lobsters | shipit | owner |
 | --- | ---: | ---: | ---: | --- |
-| class-polymorphic sends, `send_polymorphic_fallback` (3) | 30k (8.5) | 171k (48.8) | 574k (193.8) | **free.** Shopify/ruby#776 open, unassigned (tekknolagi on 11-06: "might be handled now?"; the counts say no, +10–15% since 11-03). Top sites: `block in _load_from_sql` (`attribute_types` on the model class), `Type::Value#hash`, `association`, `Core.current_shard`/`current_role` |
+| class-polymorphic sends, `send_polymorphic_fallback` (3) | 30k (8.5) | 171k (48.8) | 574k (193.8) | **free.** Shopify/ruby#776 open, unassigned (tekknolagi on 11-06: "might be handled now?"; the counts say no, +10–15% since 11-03). Repro and issue draft: [zjit-leads](zjit-leads.md#lead-3-classes-missing-from-a-polymorphic-sends-profile). Top sites: `block in _load_from_sql` (`attribute_types` on the model class), `Type::Value#hash`, `association`, `Core.current_shard`/`current_role` |
 | yields in `Array#each`/`#map`, `invokeblock_not_specialized` + `polymorphic_miss` (1) | 265k (73.6) | 95k (27.1) | 187k (63.1) | taken: k0kubun, Shopify/ruby#1093 (open). The mix shifted from `polymorphic_miss` to `not_specialized`, probably through `7041d9e65e` ("End blockparamproxy and block profiling experiments"); not bisected |
-| `&block` forwarding, `send_block_arg_not_nil` (7) | 108k (30.0) | 88k (25.1) | 196k (66.1) | **free.** Shopify/ruby#1014 open, unassigned; ruby/ruby#18180 (dak2, merged 09-23) covered Proc block args only. Top sites `_read_attribute(name, &block)`, `mon_synchronize`. #59141 adds `fetch_value_at!(N, &block)` here (section 6) |
+| `&block` forwarding, `send_block_arg_not_nil` (7) | 108k (30.0) | 88k (25.1) | 196k (66.1) | **taken** (corrected 2026-11-14): Shopify/ruby#1014 open, unassigned, but Shopify/ruby#1039 row 7 is assigned to k0kubun ([zjit-leads](zjit-leads.md#lead-7-block-arguments-other-than-nil-or-a-proc)); ruby/ruby#18180 (dak2, merged 09-23) covered Proc block args only. Top sites `_read_attribute(name, &block)`, `mon_synchronize`. #59141 adds `cast_value(…, &:value!)` here, which YJIT also leaves generic (section 6) |
 | shape-polymorphic ivar reads without a profile, `no_profile_missing_ic` (11) | 195k (7.9) | 193k (15.1) | 478k (48.5) | taken: tekknolagi. ruby/ruby#19443 merged 11-06 (−11% / −35% / −29% fallbacks since 11-03); #18616 open draft for the rest |
 | megamorphic sends, `send_megamorphic` (new) | 2k (0.6) | 43k (12.2) | 96k (32.5) | **free, new.** Up +89% on shipit since 11-03 at sites that had none then (`BasicObject#!=` 30k, `stale_state`, `where_clause=`, `Logger#level`); YJIT is megamorphic at some of them too. Cause not traced |
 | `&block` to a C method and other `complex_arg_pass` (14) | 72k (19.9) | 21k (6.1) | 38k (12.8) | in part free (`**rest` callees, Shopify/ruby#1039 rows 36/43 unassigned) |
@@ -374,7 +375,7 @@ per ivar read). Owners checked on 2026-11-14 against open ruby/ruby ZJIT PRs and
 | rails/rails#59141 shared readers (candidate) | — | +208 `block_arg_not_nil`, +51 `polymorphic_fallback`, +24 net `no_side_exits` per request (census) | — | **no bucket of its own**; inside leads 7, 3 and 15 (section 6) |
 
 **Unowned, largest first:** lead 3 (class-polymorphic sends; the largest on lobsters and shipit), lead 7 (`&block`
-forwarding; the largest free one on railsbench, and #59141 adds to it), the new megamorphic-send growth, protected
+forwarding; taken after all, see [zjit-leads](zjit-leads.md)), the new megamorphic-send growth, protected
 calls (lead 4, free since our PR closed), and the `**rest` part of lead 14.
 
 ## Method and pins
