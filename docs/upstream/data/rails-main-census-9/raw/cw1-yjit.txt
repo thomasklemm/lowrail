@@ -1,0 +1,18 @@
+== cw1a
+where_str_bind                    20281.8    12.01
+where_str_bind_to_sql             69346.7    52.00
+where_two_str_to_sql             100817.7    83.00
+where_hash_and_str_to_a          213471.9   112.00
+where_named_to_sql                87444.1    71.00
+== cw1b
+where_str_bind                    19443.1    11.01
+where_str_bind_to_sql             64623.2    44.00
+where_two_str_to_sql              91535.5    67.00
+where_hash_and_str_to_a          209720.4   104.00
+where_named_to_sql                81931.3    62.00
+== cw1a
+where_str_bind                    20299.9    12.01
+where_str_bind_to_sql             69417.2    52.00
+where_two_str_to_sql             100850.4    83.00
+where_hash_and_str_to_a          213702.3   112.00
+where_named_to_sql                87492.3    71.00

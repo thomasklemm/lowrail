@@ -1,0 +1,42 @@
+# file, interpreter: c9s -> c9m; 71 workloads in all four labels; floor = max(A/A, 1000 Ir)
+# apps wl  mean d Ir/op  mean%  max%   %all | apps wl  mean d   %all | key
+ 8  70      +486563  1.54  6.89 +1.441 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb
+ 8  68      +128989  0.51  1.00 +0.371 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/query_intent.rb (new)
+ 8  62      +123708  0.28  0.88 +0.325 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb
+ 8  67       +86349  0.23  0.61 +0.245 |  0   0        +0 +0.000 | activesupport/lib/active_support/weak_key_map.rb (new)
+ 8  59       +96208  0.26  1.56 +0.240 |  0   0        +0 +0.000 | activemodel/lib/active_model/indexed_row.rb (new)
+ 8  37      +121002  0.17  0.87 +0.189 |  0   0        +0 +0.000 | activerecord/lib/active_record/key.rb (new)
+ 8  47       +86151  0.13  0.62 +0.171 |  0   0        +0 +0.000 | activerecord/lib/active_record/association_route.rb (new)
+ 8  69       +54802  0.34  1.62 +0.160 |  0   0        +0 +0.000 | activesupport/lib/active_support/event_reporter.rb
+ 8  48       +71582  0.41  1.17 +0.145 |  4   7    -47261 -0.014 | actionpack/lib/action_controller/metal/request_forgery_protection.rb
+ 8  66       +49155  0.29  0.64 +0.137 |  0   0        +0 +0.000 | actionpack/lib/action_dispatch/http/session.rb (new)
+ 8  69       +37090  0.26  1.14 +0.108 |  0   0        +0 +0.000 | activesupport/lib/active_support/event_reporter/log_subscriber.rb (new)
+ 8  48       +52668  0.21  0.60 +0.107 |  1   1    -80101 -0.003 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb
+ 8  19      +106845  0.42  0.83 +0.086 |  7  36    -51963 -0.079 | activesupport/lib/active_support/notifications/fanout.rb
+ 8  35       +56131  0.16  0.42 +0.083 |  1   1   -378510 -0.016 | activerecord/lib/active_record/relation/merger.rb
+ 8  53       +36985  0.09  0.26 +0.083 |  1   1     -2445 -0.000 | activerecord/lib/active_record/scoping/default.rb
+ 8  38       +47779  0.10  0.28 +0.077 |  1   1     -2856 -0.000 | activerecord/lib/arel/table.rb
+ 8  56       +31791  0.18  0.89 +0.075 |  2   2   -115525 -0.010 | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb
+ 8  61       +28357  0.15  0.64 +0.073 |  0   0        +0 +0.000 | activesupport/lib/active_support/structured_event_subscriber.rb
+ 8  63       +26386  0.09  0.22 +0.070 |  0   0        +0 +0.000 | activesupport/lib/active_support/ractors.rb (new)
+ 8  32       +40817  0.14  0.34 +0.055 |  4   6   -326436 -0.083 | activerecord/lib/active_record/core.rb
+ 8  24       +50555  0.07  0.31 +0.051 |  6   8    -18108 -0.006 | activerecord/lib/active_record/associations.rb
+ 8  44       +25881  0.06  0.16 +0.048 |  0   0        +0 +0.000 | activerecord/lib/active_record/type/query_predicates.rb (new)
+ 8  40       +22715  0.05  0.10 +0.038 |  0   0        +0 +0.000 | activerecord/lib/active_record/attributes.rb
+ 8  38       +22783  0.07  0.26 +0.037 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema/schema_context.rb (new)
+ 8  18       +39551  0.16  0.42 +0.030 |  6  10   -189990 -0.080 | activesupport/lib/active_support/isolated_execution_state.rb
+ 8  32       +22226  0.20  0.59 +0.030 |  6  17    -32233 -0.023 | activesupport/lib/active_support/notifications/instrumenter.rb
+ 8  62       +10557  0.08  0.39 +0.028 |  0   0        +0 +0.000 | actionpack/lib/action_dispatch/http/utils.rb (new)
+ 8  32       +18240  0.05  0.10 +0.025 |  1   1     -1640 -0.000 | actionpack/lib/action_dispatch/routing/url_for.rb
+ 8  34       +15157  0.06  0.20 +0.022 |  5   7     -6613 -0.002 | activesupport/lib/active_support/notifications.rb
+ 8  35       +10817  0.03  0.11 +0.016 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/retry_budget.rb (new)
+ 8  14       +13584  0.05  0.12 +0.008 |  4   6    -12895 -0.003 | actionview/lib/action_view/helpers/controller_helper.rb
+ 8  25        +7191  0.05  0.13 +0.008 |  4   4     -2971 -0.001 | actionpack/lib/action_controller/metal.rb
+ 8  14        +8227  0.05  0.14 +0.005 |  5   5    -26331 -0.006 | activerecord/lib/active_record/connection_adapters/abstract/connection_pool/queue.rb
+ 8  16        +6717  0.08  0.27 +0.005 |  7  12   -121032 -0.061 | activesupport/lib/active_support/core_ext/hash/keys.rb
+ 8  26        +4128  0.03  0.07 +0.005 |  2   2     -2049 -0.000 | actionpack/lib/action_dispatch/middleware/executor.rb
+ 8  15        +6892  0.03  0.07 +0.004 |  2   2     -2456 -0.000 | activesupport/lib/active_support/concurrency/null_lock.rb
+ 8  34        +2964  0.02  0.10 +0.004 |  0   0        +0 +0.000 | activesupport/lib/active_support/weak_set.rb (new)
+ 8  17        +5470  0.05  0.14 +0.004 |  5   5     -3840 -0.001 | actionpack/lib/action_dispatch/http/headers.rb
+ 8  19        +4851  0.03  0.08 +0.004 |  3   5     -7055 -0.001 | actionpack/lib/abstract_controller/callbacks.rb
+ 8  15        +5980  0.05  0.22 +0.004 |  5  10     -5043 -0.002 | activesupport/lib/active_support/json/encoding.rb

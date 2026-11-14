@@ -1,0 +1,6 @@
+w5 s81 marshal_dump                      72644.7    13.04 0|load1_marshal_dump               193175.9    32.00 0|attributes_for_database           15824.0     1.00 0|
+w5 s81b marshal_dump                      72658.2    13.04 0|load1_marshal_dump               193636.5    32.00 0|attributes_for_database           15824.0     1.00 0|
+w30 s81 marshal_dump                     264290.4    25.04 0|load1_marshal_dump               762119.4    80.00 0|attributes_for_database           73357.3     1.00 0|
+w30 s81b marshal_dump                     264618.3    25.04 0|load1_marshal_dump               762921.4    80.00 0|attributes_for_database           73404.6     1.00 0|
+w100 s81 marshal_dump                     804235.6    61.04 0|load1_marshal_dump              2412883.5   221.00 0|attributes_for_database          237387.5     1.77 0|
+w100 s81b marshal_dump                     804488.7    61.04 0|load1_marshal_dump              2413121.6   221.00 0|attributes_for_database          237366.2     1.00 0|

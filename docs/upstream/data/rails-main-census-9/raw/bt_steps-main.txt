@@ -1,0 +1,9 @@
+stringify_keys                             6929.8   1.02
+html_options_for_form                     11850.7   1.00
+url_for(String)                            1342.5   0.00
+extra_tags_for_form                       63615.9   9.00
+safe_join                                 12276.9   5.00
+content_tag form 4 attrs                  56203.6   3.00
+content_tag form w/o accept-charset       45417.5   4.00
+form_tag_with_body                       132355.8  17.00
+capture                                    7199.2   3.00

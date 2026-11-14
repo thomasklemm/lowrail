@@ -1,0 +1,34 @@
+From 3fe452e1d0d55a2ac78c06c90eeb27ce5b62ff9b Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sat, 14 Nov 2026 11:39:24 +0000
+Subject: [PATCH] Look up the attributes builder once per result when loading
+ records
+
+_load_from_sql laid out a homogeneous result with the model's builder
+indexes and then looked the builder up again for every row, through
+schema_attributes and the loaded mapped table. Use the builder the
+layout came from for each row instead.
+
+---
+ activerecord/lib/active_record/querying.rb | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/activerecord/lib/active_record/querying.rb b/activerecord/lib/active_record/querying.rb
+index 1f7069719b..ee76ee1fce 100644
+--- a/activerecord/lib/active_record/querying.rb
++++ b/activerecord/lib/active_record/querying.rb
+@@ -114,8 +114,9 @@ def _load_from_sql(result_set, &block) # :nodoc:
+           }
+         else
+           # Instantiate a homogeneous set
+-          result_set.map_rows(attributes_builder.indexes) { |row, indexes|
+-            instantiate_instance_of(self, row, indexes, &block)
++          builder = attributes_builder
++          result_set.map_rows(builder.indexes) { |row, indexes|
++            allocate.init_with_attributes(builder.build_from_row(row, indexes), &block)
+           }
+         end
+       end
+-- 
+2.55.0
+

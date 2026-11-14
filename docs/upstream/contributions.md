@@ -1059,6 +1059,15 @@ on main.
   Rejected after measuring: C8-2, a constant default for the generated `where_clause`/`having_clause` readers (interpreter
   −195 Ir per call, but YJIT +121 and ZJIT +57), and ivar reads in `Arel::Collectors::Composite#<<` (YJIT −3 Ir).
 
+- **Rails-main census 9 (2026-11-14, main `50c54eed06` against 8-1-stable `71e963ed1b` and census 8):** main is
+  −6.5% of interpreted instructions and −601 objects per workload against 8.1 (8 apps, 71 workloads); #59141 is net
+  faster, but its by-name and row-rebuilding paths are unreleased regressions
+  ([rails-main-census-9](rails-main-census-9.md)). Leads, none opened: K1 (`LazyIndexedAttributeSet#keys`, built in
+  its own orb), `button_to` K6/K7 (params through `tag(:input)` again, −28% to −31% with params, exact on 5,760
+  inputs), `values_for_database`/`values_before_type_cast` rebuilding the row (Marshal and MessagePack, `Marshal.dump`
+  +33–36% against 8.1). Rejected: AT-1, one builder per `_load_from_sql` (skips the overridable
+  `instantiate_instance_of`).
+
 - **Census gems on Ruby master (2026-11-03, bet E2):** 11 of the 13 configurations that did not bundle on master
   `9aa0898240` now install and pass `list` through dependency-only master overlays, so 21 of 23 can run on master.
   Released bumps (redcarpet 3.6.1, commonmarker 2.10.1, stackprof 0.2.28, numo-narray-alt 0.10.7, datadog 2.45.0,

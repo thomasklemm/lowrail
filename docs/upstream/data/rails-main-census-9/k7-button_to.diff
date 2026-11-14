@@ -1,0 +1,19 @@
+diff --git a/actionview/lib/action_view/helpers/navigation_helper.rb b/actionview/lib/action_view/helpers/navigation_helper.rb
+index acf4637898..2eaf4acd8f 100644
+--- a/actionview/lib/action_view/helpers/navigation_helper.rb
++++ b/actionview/lib/action_view/helpers/navigation_helper.rb
+@@ -456,10 +456,12 @@ def button_to(name = nil, options = nil, html_options = nil, &block)
+         inner_tags = button
+         if params
+           to_form_params(params).each do |param|
+-            inner_tags.safe_concat hidden_field_tag(param[:name], param[:value], id: nil)
++            input_options = { type: "hidden", name: param[:name], value: param[:value] }
++            input_options[:autocomplete] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
++            inner_tags.safe_concat tag(:input, **input_options)
+           end
+         end
+-        form_tag(url || false, form_options) { inner_tags }
++        form_tag_with_body(html_options_for_form(url || false, form_options), inner_tags)
+       end
+ 
+       # Creates a link tag of the given `name` using a URL created by the set of

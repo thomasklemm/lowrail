@@ -1,0 +1,12 @@
+w5 s81 marshal_dump 227630.4 13.09 | load1_marshal_dump 264173.8 23.07 | attributes_for_database 15785.3 1.00 | 
+w5 pre141 marshal_dump 74101.1 13.02 | load1_marshal_dump 192250.9 30.00 | attributes_for_database 14299.7 1.00 | 
+w5 main marshal_dump 95770.3 16.02 | load1_marshal_dump 221338.5 34.00 | attributes_for_database 35937.0 4.00 | 
+w5 main2 marshal_dump 95803.1 16.02 | load1_marshal_dump 221405.2 34.00 | attributes_for_database 35954.0 4.00 | 
+w30 s81 marshal_dump 423964.9 17.12 | load1_marshal_dump 521179.1 27.10 | attributes_for_database 72737.6 1.00 | 
+w30 pre141 marshal_dump 255838.9 25.02 | load1_marshal_dump 733477.6 78.00 | attributes_for_database 65505.7 1.00 | 
+w30 main marshal_dump 353077.9 28.02 | load1_marshal_dump 860208.3 82.00 | attributes_for_database 162985.1 4.00 | 
+w30 main2 marshal_dump 352881.5 28.02 | load1_marshal_dump 860137.0 82.00 | attributes_for_database 162956.2 4.00 | 
+w100 s81 marshal_dump 880622.3 17.12 | load1_marshal_dump 1153306.3 27.10 | attributes_for_database 235779.7 1.00 | 
+w100 pre141 marshal_dump 777367.9 61.02 | load1_marshal_dump 2303355.8 219.00 | attributes_for_database 212108.9 1.00 | 
+w100 main marshal_dump 1092026.4 64.02 | load1_marshal_dump 2714763.2 223.42 | attributes_for_database 527095.3 4.00 | 
+w100 main2 marshal_dump 1092037.6 64.02 | load1_marshal_dump 2714387.0 223.00 | attributes_for_database 527038.2 4.00 | 

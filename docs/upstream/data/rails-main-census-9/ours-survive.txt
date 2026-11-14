@@ -1,0 +1,88 @@
+#59642 2026-11-12 kept 2/2 lib lines
+#59629 2026-11-09 kept 1/1 lib lines
+#59676 2026-11-07 kept 1/1 lib lines
+#59570 2026-11-05 kept 1/1 lib lines
+#59640 2026-11-05 kept 0/1 lib lines  <-- changed
+    later on these files: 15110dfcbb Jean Boussier Further simplify LocalCache#local_cache_key
+#59634 2026-11-05 kept 25/26 lib lines  <-- changed
+    later on these files: 50c54eed06 Ryuta Kamizono Merge pull request #59780 from kehra/fix-unscope-merge-array
+    later on these files: eabb5b9553 Ryuta Kamizono Move the Symbol/String check into `qualify_attribute_with_table_name`
+    later on these files: 0e655babbc Hartley McGuire Merge pull request #59642 from thomasklemm/thomasklemm/where-empty-condition-binds
+    later on these files: 070e040357 kehra Fix merge of unscope values that include a Hash or Arel attribute in an array
+    later on these files: 937ad29217 Jean Boussier Merge pull request #59692 from kehra/cursor/fix-increment-bang-stale-lock-version-da2f
+    later on these files: 8d6b63b0cd Thomas Klemm Group bound SQL literals in `WhereClause` like other SQL literals
+#59584 2026-11-05 kept 0/1 lib lines  <-- changed
+    later on these files: ebfaed3969 Jean Boussier Revert "Skip the HTML entity gsub! in JSON::Coder output with nothing to escape"
+#59626 2026-11-05 kept 4/4 lib lines
+#59625 2026-11-05 kept 1/1 lib lines
+#59620 2026-11-05 kept 3/3 lib lines
+#59619 2026-11-05 kept 9/9 lib lines
+#59614 2026-11-05 kept 4/4 lib lines
+#59618 2026-11-05 kept 1/1 lib lines
+#59616 2026-11-04 kept 2/2 lib lines
+#59613 2026-11-04 kept 3/3 lib lines
+#59608 2026-11-04 kept 4/4 lib lines
+#59607 2026-11-04 kept 1/1 lib lines
+#59606 2026-11-04 kept 6/6 lib lines
+#59605 2026-11-04 kept 2/2 lib lines
+#59603 2026-11-04 kept 2/2 lib lines
+#59598 2026-11-04 kept 1/1 lib lines
+#59597 2026-11-04 kept 3/3 lib lines
+#59596 2026-11-04 kept 1/1 lib lines
+#59585 2026-11-04 kept 5/5 lib lines
+#59583 2026-11-04 kept 7/7 lib lines
+#59562 2026-11-04 kept 6/6 lib lines
+#59576 2026-11-03 kept 9/10 lib lines  <-- changed
+    later on these files: 8d6b63b0cd Thomas Klemm Group bound SQL literals in `WhereClause` like other SQL literals
+#59571 2026-11-03 kept 9/9 lib lines
+#59568 2026-11-03 kept 0/1 lib lines  <-- changed
+    later on these files: 8276bb63aa Aaron Patterson Add types and make callers homogeneous
+    later on these files: 4e68df7061 Aaron Patterson Additional types hash isn't necessary anymore
+    later on these files: f547f565e4 Aaron Patterson Change attribute set's internals to only use array indexes
+    later on these files: 2687564f84 Aaron Patterson Make attribute layouts arrays
+    later on these files: 4433aa9cd5 Aaron Patterson Add an index (ord) method to each column object
+    later on these files: ef429f4bcc Lawrence Lin Look up only the types of unknown columns when loading records
+#59563 2026-11-03 kept 3/3 lib lines
+#59561 2026-11-03 kept 5/5 lib lines
+#59560 2026-11-03 kept 14/14 lib lines
+#59558 2026-11-03 kept 5/5 lib lines
+#59556 2026-11-03 kept 4/5 lib lines  <-- changed
+    later on these files: db5fd36f80 Ryuta Kamizono Resolve CTE joins merged from a relation of another model
+    later on these files: b2a1d01a4d Helmi Pradita Fix #48227: Qualify unscope values when merging relations
+    later on these files: cb2b09ab6f kehra Reference the merged order's tables in includes after merge
+    later on these files: e4852e04bb Thomas Klemm Accept bind values in `where!` and `having!` again
+    later on these files: 873d897d42 Ryuta Kamizono Avoid reprocessing `with` values when merging relations
+    later on these files: 8f71c51c51 Ryuta Kamizono Avoid reprocessing order values when merging relations
+#59552 2026-11-03 kept 2/2 lib lines
+#59555 2026-11-03 kept 12/12 lib lines
+#59551 2026-11-03 kept 1/1 lib lines
+#59554 2026-11-03 kept 3/3 lib lines
+#59553 2026-11-03 kept 2/2 lib lines
+#59544 2026-11-03 kept 2/2 lib lines
+#59543 2026-11-03 kept 2/2 lib lines
+#59542 2026-11-03 kept 1/1 lib lines
+#59541 2026-11-03 kept 4/4 lib lines
+#59534 2026-11-03 kept 4/4 lib lines
+#59539 2026-11-03 kept 1/1 lib lines
+#59538 2026-11-03 kept 2/2 lib lines
+#59537 2026-11-03 kept 4/4 lib lines
+#59536 2026-11-03 kept 5/5 lib lines
+#59535 2026-11-03 kept 4/4 lib lines
+#59533 2026-11-03 kept 4/5 lib lines  <-- changed
+    later on these files: 8d6b63b0cd Thomas Klemm Group bound SQL literals in `WhereClause` like other SQL literals
+    later on these files: f903005e49 Thomas Klemm Compile a single-predicate WhereClause without a nodes Array
+    later on these files: ae7f1c190e Thomas Klemm Skip unneeded Arrays when merging into an empty WhereClause
+#59329 2026-10-24 kept 5/5 lib lines
+#59278 2026-10-23 kept 1/1 lib lines
+#59274 2026-10-23 kept 2/2 lib lines
+#59270 2026-10-23 kept 3/3 lib lines
+#59252 2026-10-22 kept 4/4 lib lines
+#59244 2026-10-22 kept 1/1 lib lines
+#59236 2026-10-21 kept 0/3 lib lines  <-- changed
+    later on these files: e20db55ab1 Xavier Noria Remove Markdown directives in Active Support
+    later on these files: 84048ad477 Ryuta Kamizono Don't store a sentinel in `CurrentAttributes.defaults`
+    later on these files: f9c986edf2 Sampo Kuokkanen Skip copying the current attributes instances when there are none
+#59235 2026-10-21 kept 2/4 lib lines  <-- changed
+    later on these files: d6b71f057d Thomas Klemm Build notification handle groups with each instead of Hash#map
+    later on these files: 58030897e4 Xavier Noria Remove Markdown directives in Active Support
+    later on these files: e3dd00a4bb Sampo Kuokkanen Don't copy the payload when building an event for event object subscribers

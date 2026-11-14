@@ -1,0 +1,64 @@
+# c9c8 -> c9m: 71 workloads; per app: median whole-workload change, median |A/A| (c9m vs c9m2)
+blog                  10 wl  median  -0.96%  min  -3.61%  max  +0.42%  A/A 0.09%
+casa                  10 wl  median  -2.94%  min -23.01%  max  -0.06%  A/A 0.03%
+codetriage             7 wl  median  -1.78%  min  -2.83%  max  -0.88%  A/A 0.07%
+hackatime             12 wl  median  -2.13%  min  -4.39%  max  +0.30%  A/A 0.10%
+pingcrm                8 wl  median  -4.51%  min  -6.48%  max  -3.99%  A/A 0.10%
+react-starter-kit      8 wl  median  -0.88%  min  -2.31%  max  -0.25%  A/A 0.07%
+redprints-cfp          8 wl  median  -0.17%  min  -2.42%  max  +1.19%  A/A 0.47%
+writebook              8 wl  median  -1.36%  min  -4.59%  max  +0.26%  A/A 0.05%
+ALL 71 workloads: median -1.78%, slower 1, faster 49 (beyond 1%)
+
+# net self Ir by file, % of all c9c8 instructions (grew)
+ +0.581% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb
+ +0.166% 8 apps  RAILS/activesupport/lib/active_support/core_ext/object/blank.rb
+ +0.049% 8 apps  RAILS/actionpack/lib/action_controller/metal/rendering.rb
+ +0.048% 8 apps  RAILS/actionview/lib/action_view/buffers.rb
+ +0.045% 8 apps  RAILS/activemodel/lib/active_model/attribute_set/builder.rb
+ +0.023% 6 apps  RAILS/actionpack/lib/action_dispatch/middleware/static.rb
+ +0.016% 4 apps  RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb
+ +0.015% 8 apps  RAILS/railties/lib/rails/engine.rb
+ +0.009% 8 apps  RAILS/activerecord/lib/arel/table.rb
+ +0.008% 7 apps  RAILS/actionview/lib/action_view/helpers/output_safety_helper.rb
+ +0.006% 7 apps  rack-test
+ +0.006% 6 apps  RAILS/activerecord/lib/active_record/model_schema/schema_context/mapped_table.rb
+ +0.006% 8 apps  RAILS/actionpack/lib/action_dispatch/middleware/cookies.rb
+ +0.005% 6 apps  RAILS/actionview/lib/action_view/helpers/capture_helper.rb
+ +0.004% 8 apps  RAILS/activerecord/lib/active_record/relation/merger.rb
+ +0.004% 8 apps  uri
+ +0.004% 1 apps  redis-client
+ +0.004% 7 apps  RAILS/activemodel/lib/active_model/forbidden_attributes_protection.rb
+ +0.004% 7 apps  RAILS/activesupport/lib/active_support/notifications/instrumenter.rb
+ +0.004% 8 apps  RAILS/actionpack/lib/action_dispatch/http/parameters.rb
+ +0.004% 5 apps  tzinfo
+ +0.003% 8 apps  base64
+ +0.003% 5 apps  RAILS/actionview/lib/action_view/helpers/rendering_helper.rb
+ +0.003% 4 apps  <internal:array>
+ +0.003% 3 apps  RAILS/activesupport/lib/active_support/cache.rb
+
+# net self Ir by file (shrank)
+ -0.917%  RAILS/activemodel/lib/active_model/indexed_row.rb
+ -0.462%  RAILS/activerecord/lib/active_record/querying.rb
+ -0.392%  RAILS/activesupport/lib/active_support/core_ext/enumerable.rb
+ -0.115%  RAILS/activerecord/lib/active_record/model_schema.rb
+ -0.114%  RAILS/activerecord/lib/active_record/result.rb
+ -0.100%  RAILS/activesupport/lib/active_support/core_ext/erb/util.rb
+ -0.100%  RAILS/activesupport/lib/active_support/inflector/methods.rb
+ -0.097%  RAILS/activerecord/lib/active_record/model_schema/schema_context.rb
+ -0.097%  <internal:ractor>
+ -0.089%  RAILS/actionpack/lib/action_dispatch/journey/visitors.rb
+ -0.082%  RAILS/activemodel/lib/active_model/attribute_methods.rb
+ -0.081%  RAILS/activesupport/lib/active_support/notifications/fanout.rb
+ -0.074%  RAILS/activerecord/lib/active_record/associations/preloader/association.rb
+ -0.064%  RAILS/activerecord/lib/active_record/relation/query_methods.rb
+ -0.052%  RAILS/actionview/lib/action_view/helpers/asset_url_helper.rb
+ -0.049%  RAILS/activesupport/lib/active_support/ractors.rb
+ -0.044%  RAILS/activesupport/lib/active_support/ordered_options.rb
+ -0.039%  RAILS/activesupport/lib/active_support/core_ext/hash/slice.rb
+ -0.038%  RAILS/activesupport/lib/active_support/isolated_execution_state.rb
+ -0.037%  RAILS/activerecord/lib/active_record/reflection.rb
+ -0.037%  RAILS/activemodel/lib/active_model/attribute.rb
+ -0.033%  RAILS/activerecord/lib/arel/select_manager.rb
+ -0.032%  RAILS/activerecord/lib/arel/visitors/to_sql.rb
+ -0.030%  RAILS/activerecord/lib/active_record/associations/preloader/branch.rb
+ -0.027%  bugsnag

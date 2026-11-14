@@ -1,0 +1,54 @@
+From 5e34cc61f813a664592bde90ca618c1850407f2a Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sat, 14 Nov 2026 11:25:38 +0000
+Subject: [PATCH] List a LazyIndexedAttributeSet's keys from its indexes alone
+
+The indexes hold every name the set can hold, so the model's type keys
+and the names of built attributes are already among them, in the same
+order. Merging them in again only cost two Arrays and a walk over the
+indexes on every call to #keys, which dirty tracking, #attribute_names
+and serialization make per record. Materializing walked the type keys a
+second time for the same reason.
+
+---
+ activemodel/lib/active_model/attribute_set.rb | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..b31d77e143 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -341,7 +341,7 @@ def key?(name)
+ 
+     #: () -> Array[String]
+     def keys
+-      keys = row_keys | @ctx.type_keys | cached_names
++      keys = row_keys
+       keys.keep_if do |name|
+         index = index_for_name(name)
+         if attribute = lookup(index)
+@@ -484,7 +484,6 @@ def transform_attributes!
+       def materialize
+         unless @materialized
+           row_keys.each { |key| self[key] }
+-          @ctx.type_keys.each { |key| self[key] }
+           @materialized = true
+         end
+       end
+@@ -582,13 +581,6 @@ def row_keys
+         indexes.keys
+       end
+ 
+-      #: () -> Array[String]
+-      def cached_names
+-        names = []
+-        indexes.each_key { |name| names << name if lookup(index_for_name(name)) }
+-        names
+-      end
+-
+       #: () -> void
+       def freeze_attributes
+         materialize
+-- 
+2.55.0
+

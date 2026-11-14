@@ -1,0 +1,422 @@
+# Rails-main census 9: what costs more on main than on 8-1-stable, and what moved since census 8
+
+Census 9 compares Rails main [`50c54eed06`](https://github.com/rails/rails/commit/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b)
+(2026-11-14) with 8-1-stable [`71e963ed1b`](https://github.com/rails/rails/commit/71e963ed1b0c8e5d1ff6e9124236cf7c4d4a24b9)
+and with census 8's pin [`1105756f42`](https://github.com/rails/rails/commit/1105756f426ee42834af5c87b4549ef709d631e5)
+on Ruby 4.0.9, ahead of the 8.2 beta. It ranks by self Callgrind instructions first and allocations second. The
+focus is tenderlove's [#59141](https://github.com/rails/rails/pull/59141) (attributes in an indexed row, merged
+2026-11-11), plus a root cause for `button_to` after seanpdoyle's [#50312](https://github.com/rails/rails/pull/50312)
+(merged 2026-11-07).
+
+**Result.** Main is faster than 8.1 in 70 of 71 workloads: the median is −6.5% of interpreted instructions and −601
+objects per workload. The one slower workload is codetriage's debug-logged job (+4.0%), which is already known and
+deliberate. #59141 makes loading, generated readers, `#attributes`, `new` and `becomes` much cheaper. Every path
+that still goes **by name**, or that rebuilds a Hash from the row, got slower. None of that is released. The largest
+of these are:
+
+* `update!` on wide tables: +71% vs 8.1 at 300 columns. Most of it is `LazyIndexedAttributeSet#keys` (K1, being
+  built in another orb).
+* `attributes_for_database` ×2.2 and `attributes_before_type_cast` ×5. These are what Marshal and MessagePack
+  record caching use; `Marshal.dump` of a record is +33–36% vs 8.1.
+* By-name reads and writes: `read_attribute`/`self[]` +16%, `id`/`_read_attribute` +40% vs before #59141,
+  `write_attribute` and writers +33–37%.
+
+`button_to` is +24–35% with no params and +42–45% with params since #50312. The params half has an exact fix (K6/K7)
+that recovers 28–31% and returns large param sets to their pre-#50312 cost.
+
+Nothing was opened or posted upstream. Every number is interpreter Ir per call under census 8's patched Callgrind,
+with a fixed heap and an A/A pair. YJIT numbers appear only where every measured window compiled nothing.
+
+## Ranked leads
+
+Reach is measured in the CPU census (8 apps, 71 workloads, interpreter). Net "% all" is the lead's summed
+self-instruction change over all workloads, as a share of all 8.1 instructions. The A/A is main against its own
+twin (`main2`, or `c9m2` in the census).
+
+| # | Lead | Main file:line | Reach | Magnitude (A/A) | Released? | Existing PR / issue | Proposed next step |
+| ---: | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **K1** `LazyIndexedAttributeSet#keys` builds `row_keys \| type_keys \| cached_names`, which always equals `row_keys` | AM `attribute_set.rb:343` | 8/8 apps, 25 workloads grew; +0.134% net; CPU rank 55 (0.145%) | Built: `update!` −18% / −29% / −36% at 30/100/300 cols; `serializable_hash` −30%; `changed?` −17%; YJIT `update!` −29% (A/A ≤ 0.34%) | No (#59141) | ikraamg's #58002 targets the old `keys` (stale); kamipo's #58380 doesn't touch it | **Built and reviewed by the K1 orb** ([proof](../../bench/upstream/k1/README.md)); Thomas decides on opening |
+| 2 | **`button_to` params via `hidden_field_tag`** (K6), and `form_tag { }` with a block (K5) | AV `navigation_helper.rb:459`, `:462` | 4/8 apps call `button_to` (43 call sites, 3 with `params:`); `button_to` ≈ 85k Ir inclusive per op | Params: +42–45% since #50312; **K7 −28% to −31%**, back to pre-#50312. No params: +24–35% since #50312, K7 −2.7% to −4.8% (A/A ≤ 0.1%). YJIT (flat): params K7 −30% to −33%, no params −1.7% to −3.5% | No (#50312, 2026-11-07) | None; #50312's discussion has no performance comments | Offer K6 (L0) as a follow-up to #50312; K5 is optional. Thomas decides |
+| 3 | **`attributes_for_database` / `attributes_before_type_cast` rebuild an `IndexedRow::Mutable` per call** (`materialize`, then a Hash via `transform_values`) | AR `before_type_cast.rb:108/113` → AM `attribute_set.rb:115/119` → `:457` | Marshal (`marshalling.rb:23`) and MessagePack (`message_pack.rb:89`) record caching; 0 of the 71 census workloads | `attributes_for_database` ×2.2 at 6–300 cols (1 → 4 objects); `before_type_cast` ×5–6; `Marshal.dump` +33% / +34% / +36% / +36% vs 8.1 at 6/30/100/300 cols (A/A ≤ 0.04%) | No (#59141) | None (#59249 and #59684 touch other parts of Marshal and MessagePack) | Build a row-reading `values_for_database`/`values_before_type_cast` like czj's `to_hash` (19022a4aa4), then sweep |
+| 4 | **By-name access after #59141**: `index_for_name` → `indexes` → `lookup`, a second `index_for_name` in `write`, eager cast in `write_from_user` | AM `attribute_set.rb:495`, `:374/382`, `:422`; AR `read.rb:40/56`, `write.rb:32/52`, `primary_key.rb:19` | 8/8 apps: `index_for_name` +0.298% net (59 workloads), `value_at!` +0.272%, `fetch_value!` +0.102% | vs before #59141: `read_attribute`/`self[]` +16%, `id`/`_read_attribute` +39–41%, `write_attribute` +37%, writer +33%, `changed?` +32%, `dup` +22% (YJIT read +2%, write +43%) (A/A ≤ 0.95%) | No (#59141) | None. tenderlove plans index-based generated writers and the like | Reads by name (`id`, `_read_attribute`): regression from #59141. Writers and dirty: not yet converted. Give tenderlove the numbers before the beta |
+| 5 | **Partial-select reads** go through `ExtendedIndexes`/`Remapper` | AM `indexed_row.rb:206/267` | 2/8 apps in the census (`Remapper#initialize` +0.041%) | `partial_load1_read` +14–15% vs before #59141 and +17% vs 8.1 at every width; YJIT +26–31% | No (#59141) | None | Measure `select(:id, :name)` loads with 1–10,000 rows; low priority |
+| 6 | **`update!` grows with width before #59141** | AR save path (not yet attributed) | Every app that saves wide records | 8.1 → before #59141: +10% / +19% / +31% / +39% at 6/30/100/300 cols; with K1 still +10% vs 8.1 at 300 cols | No | None | A line-level Callgrind diff of `update1` at 300 cols, 8.1 against the parent of #59141 |
+| 7 | **Per-row load on large results** | AR `querying.rb:93`, `result.rb:263`, `model_schema.rb:227/235` | Any query that loads thousands of rows; the census's small pages are faster | 10,000 rows, Ir per row vs 8.1: +13% / +14% / +22% at 6/30/300 cols. Census 8 was +32% / +33% / +41%; #59141 recovered 12% (A/A ≤ 0.04%) ([below](#per-row-load)) | No (before census 8) | None. AT-1 (reuse the builder per row) rejected: it skips the overridable `instantiate_instance_of` | Attribute the census 8 per-row growth (`loaded_mapped_table` ×2, `schema_attributes`, the strict-loading class attributes) |
+| 8 | **`table_name_qualified_unscope_values` on every merge** | AR `query_methods.rb:1066` via `merger.rb:66`, `association_scope.rb:147` | 8/8 apps, 57 workloads: +13 objects; +0.025% Ir | Small; `merge` itself is −36% vs census 8 | No (#59709, 2026-11-10, fixes #48227) | None | Return early when `unscope_values` is empty; not built, below the bar alone |
+
+Not leads (released, or deliberate and already judged):
+
+* The `_set_vary_header` growth (e38dd281d3, GHSA-r9jg-fmfx-2gv6) and the `tag_options` blank checks (99a3247ebc,
+  GHSA-68p9-83h6-5wpj) are security fixes released in 8.1.4.1.
+* `QueryIntent`, `WeakKeyMap` leases, `association_route`, `EventReporter` and the schema context are judged in
+  [rails-82-impact](rails-82-impact.md) and [main-regressions](main-regressions.md).
+
+## K1: `LazyIndexedAttributeSet#keys`
+
+Recorded here only. Another orb proved and built it: [bench/upstream/k1](../../bench/upstream/k1/README.md), queue item
+[K1](../../bench/upstream/pr-queue/items/K1.md), branch `thomasklemm/lazy-indexed-keys` at `bbdd9945d3`. `keys` unions `row_keys`, `@ctx.type_keys` and
+`cached_names`, then filters each name through `index_for_name`. For a set built by `build_from_row`, every type
+key and cached name is already a row key, so the union is `row_keys`. Commit `5e34cc61f8` ([patch](data/rails-main-census-9/K1.patch),
++1/−9) lists the keys from the indexes alone and drops the second `type_keys` pass in `materialize`.
+
+Evidence:
+
+* Equality: 67 attribute sets checked, including store attributes on #58380's head.
+* Tests: Active Model 1,269 runs and focused Active Record 1,867 runs, 0 failures.
+* Interpreted gains: `update!` −18% / −29% / −36% at 30/100/300 columns, `serializable_hash` −30%, `changed?` −17%
+  to −18%, `as_json` −14%.
+* YJIT at 30 columns: `changed?` −24%, `update!` −29%.
+
+With K1, `update!` at 300 columns is 5.09M Ir against 8.1's 4.63M; it is 7.91M on main.
+
+## `button_to` since #50312
+
+| Case (interpreter, Ir per call) | 8.1 | before #50312 | #50312 | main | K5 | K6 | **K7** | K8 (attribution) | K7 vs main | Objects before #50312 / main / K7 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `button_to(..., method: :delete)` | 190,430 | 178,382 | 227,182 | 226,472 | 218,627 | 226,480 | 218,426 | 208,904 | −3.6% | 24 / 36 / 33 |
+| CSRF on, POST | 182,553 | 172,647 | 215,369 | 215,464 | 207,620 | 215,436 | 207,484 | 195,568 | −3.7% | 24 / 34 / 31 |
+| CSRF, `method: :get` | 128,479 | 122,261 | 165,425 | 165,408 | 157,512 | 165,398 | 157,488 | 145,572 | −4.8% | 19 / 29 / 26 |
+| CSRF, `method: :delete` | 244,348 | 228,073 | 276,887 | 277,004 | 269,180 | 276,956 | 268,936 | 257,020 | −2.9% | 30 / 42 / 39 |
+| CSRF, block, `method: :patch` | 248,467 | 233,032 | 281,593 | 281,731 | 274,247 | 281,645 | 274,015 | 262,104 | −2.7% | 33 / 46 / 42 |
+| CSRF, `form:` options and `form_class` | 212,154 | 200,732 | 251,080 | 251,190 | 243,279 | 251,183 | 243,237 | 231,485 | −3.2% | 24 / 34 / 31 |
+| CSRF, `remote: true` | 197,570 | 187,900 | 233,215 | 233,304 | 225,474 | 233,270 | 225,322 | 213,901 | −3.4% | 24 / 34 / 31 |
+| 20 params | 1,424,130 | 1,315,344 | 1,896,191 | 1,895,179 | 1,888,897 | 1,360,406 | **1,351,315** | 1,339,518 | **−28.7%** | 263 / 373 / 270 |
+| 200 params | 13,120,438 | 12,069,631 | 17,512,917 | 17,506,297 | 17,515,820 | 12,146,990 | **12,122,540** | 12,110,863 | **−30.8%** | 2,424 / 3,434 / 2,431 |
+| CSRF, 2,000 params | 130,539,662 | 120,220,534 | 174,341,778 | 174,230,148 | 174,384,354 | 120,589,872 | **120,455,983** | 120,457,138 | **−30.9%** | 24,029 / 34,045 / 24,036 |
+| 1 MB label | 28,113,133 | 26,523,035 | 25,298,740 | 25,298,546 | 25,290,482 | 25,298,545 | 25,290,671 | 25,278,273 | −0.0% | 26 / 38 / 35 |
+| `form_tag(...) { }` (control) | 236,119 | 223,754 | 222,215 | 223,668 | 222,255 | 223,694 | 223,230 | 211,812 | −0.2% | 34 / 34 / 34 |
+| `link_to` (control) | 76,812 | 72,311 | 72,317 | 72,235 | 72,250 | 72,286 | 72,238 | 72,252 | +0.0% | 11 / 11 / 11 |
+
+**A/A:** 8.1 against its twin is ≤ 0.4% (`form_tag` control) and ≤ 0.08% elsewhere; main against `main2` is ≤ 0.05%.
+**YJIT:** [below](#button_to-under-yjit).
+
+**Root cause.** #50312 implements `button_to` on top of `form_tag`. Two parts cost the time.
+
+1. **Params (+42–45%).** Each param now goes through `hidden_field_tag(name, value, id: nil)`, which calls
+   `text_field_tag`, `sanitize_to_id` (on a nil id), and `merge`/`update`/`stringify_keys` per field. Before #50312,
+   and in #50312's own `method_tag` and `token_tag`, a hidden field is
+   `tag(:input, type: "hidden", name:, value:, autocomplete:)`. K6 emits params that way again. From the 20- and
+   200-param cases, each param costs about 87k Ir and 17 objects on main, against 60k and 12 before #50312 and on K6.
+2. **No params (+24–35%, about 43k Ir).** The parts, measured one at a time on main
+   ([`bt_steps.rb`](../../bench/upstream/census9/bt_steps.rb), [output](data/rails-main-census-9/raw/bt_steps-main.txt)):
+   * the `capture` of the `form_tag` block: 7.2k Ir, 3 objects. K5 calls `form_tag_with_body` directly.
+   * the `accept-charset` attribute: 11.9k Ir (K8 against K7). This is #50312's stated, deliberate output change.
+   * `html_options_for_form`'s `stringify_keys` and second `url_for` (11.9k), the `safe_join` in
+     `form_tag_with_body` (12.3k), and `extra_tags_for_form`'s downcase and `case` instead of a direct
+     `method_tag`/`token_tag`.
+
+   These are shared `form_tag` code that 8.1 already ships for every `form_tag`, so making them cheaper is a
+   `form_tag` change, not a `button_to` one.
+
+**Deliberate?** The refactor is deliberate: "Implement `button_to` in terms of `form_tag`" (87f14c57fd), approved by
+skipkayhil. Its stated output changes are the field order, `accept-charset`, and a case-insensitive `method:`.
+Nothing in the PR or its review discusses performance, and the per-param `hidden_field_tag` is incidental: the same
+PR adds `method_tag`/`token_tag` with `tag(:input, …)`.
+
+**K6/K7 are exact.** [`button_to_diff.rb`](../../bench/upstream/census9/button_to_diff.rb) prints `button_to`'s
+output for 5,760 inputs: names, URLs (String, Hash, `false`), methods in any case, flat and nested params, Arrays,
+HTML characters, `form`/`form_class`, `remote`, `authenticity_token`, blocks, `data`/`disabled`, both
+`button_to_generates_button_tag` settings, `remove_hidden_field_autocomplete`, and forgery protection on and off,
+including `html_safe?`. Main, K5, K6 and K7 print identical output. The Action View template tests pass on K7:
+2,967 runs, 0 failures (rerun after renaming K6's local variable to `input_options` so it no longer shadows the
+`options` argument).
+
+K6 is L0: three lines that mirror `token_tag`. K5 is L1: it bypasses the public `form_tag`, so an app that
+overrides `form_tag` would no longer see `button_to` calls. That is a contract question, and the reason to offer K6
+alone. Diffs: [K5](data/rails-main-census-9/k5-button_to.diff), [K6](data/rails-main-census-9/k6-button_to.diff),
+[K7](data/rails-main-census-9/k7-button_to.diff), [K8](data/rails-main-census-9/k8-button_to.diff).
+
+**Lifetime and reach.** The change was merged 2026-11-07, is unreleased, and would ship in the 8.2 beta.
+`button_to` has 43 call sites in 4 of the 8 apps (blog 3, writebook 14, codetriage 1, casa 25); 3 pass `params:`
+(writebook 2, casa 1). In the CPU census, `button_to` runs about 85k Ir per operation in 4 apps, about 0.03% of a
+request. The lead is worth a follow-up because it is unreleased and exact, not because of its share.
+
+### `button_to` under YJIT
+
+Ir per call with `--yjit`. A cell counts only when main, `main2` and K7 all compiled nothing in their measured
+windows. The before/after-#50312 column counts only when both of those trees were flat too; otherwise it says
+"not flat".
+
+| Case | before #50312 | main | K7 | #50312 effect | K7 vs main | A/A |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| CSRF on, POST | 91,691 | 112,934 | 109,915 | +23.3% | −2.7% | 0.08% |
+| CSRF, `method: :get` | 59,718 | 82,278 | 79,413 | +38.0% | −3.5% | 0.01% |
+| CSRF, `method: :delete` | 119,853 | 145,180 | 141,470 | +21.0% | −2.6% | 0.03% |
+| CSRF, block, `method: :patch` | 123,013 | 146,792 | 144,342 | +19.5% | −1.7% | 0.12% |
+| `method: :patch` with options | 111,128 | 137,224 | 134,483 | +23.6% | −2.0% | 0.06% |
+| 20 params | 773,067 | 1,146,180 | **790,149** | +48.3% | **−31.1%** | 0.03% |
+| CSRF, 20 params | 809,771 | 1,175,794 | **823,883** | +45.2% | **−29.9%** | 0.08% |
+| 200 params | not flat | 10,732,451 | **7,192,203** | not flat | **−33.0%** | 0.04% |
+| 1 MB label | 26,434,625 | 25,184,893 | 25,182,308 | −4.6% | −0.0% | 0.00% |
+| `form_tag(...) { }` (control) | 112,938 | 111,717 | 112,731 | −1.0% | +0.9% | 0.12% |
+
+`button_to(..., method: :delete)` without CSRF and `link_to` compiled in every tree's window, and CSRF with 2,000
+params compiled in main's, so they are not claimed. The interpreter's picture holds under YJIT: K6's params change
+recovers 30–33%, back to within 2% of before #50312. K5's `form_tag` bypass recovers 2–3.5%. The `form_tag` control
+moves +0.9% with K7, against an A/A of 0.12%; K7 does not change `form_tag`, so that is the limit of this YJIT
+control, and it is why the no-params gain is not claimed as more than about 2–3%.
+
+## #59141: attributes in an indexed row
+
+Per call, interpreter. The trees are 8.1 (`s81`, A/A `s81b`), main before #59141 (`pre141` = `c48c154e3f`),
+#59141's merge (`m141` = `1f32b09101`) and main (A/A `main2`). The table has an `id`, a `type` column, timestamps,
+and data columns cycling string, integer, boolean, datetime, float and text. Every width is in
+[attr-interp.md](data/rails-main-census-9/attr-interp.md) and [attr-yjit.md](data/rails-main-census-9/attr-yjit.md).
+The model `ApiItem` declares one virtual and one type-overriding `attribute`; a partial select reads 3 columns.
+
+| Case | 30 cols: #59141 effect | 30 cols: main vs 8.1 | 300 cols: #59141 effect | 300 cols: main vs 8.1 | YJIT 30 cols: #59141 | Class |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `find` | −13.2% | −30.7% | −21.4% | −49.1% | −19.4% | faster |
+| load 20 rows (`_load_from_sql`) | −10.3% | +0.8% | −2.2% | −28.9% | −16.8% | faster |
+| warm reader | −16.5% | −20.7% | −16.3% | −20.7% | −15.1% | faster |
+| all readers, warm | −18.7% | −24.8% | −20.0% | −26.0% | −24.2% | faster |
+| `#attributes`, warm (czj's `to_hash` landed in #59141 as 19022a4aa4) | −23.5% | −31.6% | −23.1% | −31.0% | −56.2% | faster |
+| `new(2 attrs)` | ~ | −51.2% | +2.3% | −92.3% | −5.6% | faster |
+| `becomes` | −72.1% | −37.5% | −81.2% | −50.8% | not flat | faster |
+| partial select, `#attributes` | −18.6% | −16.6% | −22.5% | −19.1% | −27.6% | faster |
+| `read_attribute` / `self[]` | +15.7% / +15.0% | +17.1% / +16.2% | +15.6% / +14.9% | +17.2% / +16.4% | +2.2% / +2.6% | **regression** (by name) |
+| `id` / `_read_attribute` | +41.2% / +39.3% (300 cols) | −9.5% / −9.2% | +41.2% / +39.3% | −9.5% / −9.2% | +20.5% / +16.6% (100 cols) | **regression** vs before #59141, still below 8.1 |
+| partial select, read | +14.0% | +16.6% | +14.8% | +16.6% | +31.3% | **regression** |
+| `attributes_before_type_cast` | +471% | +468% | +477% | +477% | +337% | **regression** (rebuilds the row) |
+| `attributes_for_database` | +149% (30 cols, Marshal run) | +122% | +143% | +118% | — | **regression** (rebuilds the row) |
+| `Marshal.dump` (7.1 format; before #59141 → main) | +38% | +34% | +40% | +36% | — | **regression** |
+| `write_attribute` / writer | +37.4% / +33.1% | +23.6% / +25.0% | +37.2% / +31.6% | +23.8% / +23.1% | +43.5% / +26.7% | not yet converted |
+| assign, then `changes` | +16.3% | +9.2% | +16.8% | +8.4% | +8.8% | not yet converted, plus K1 |
+| `changed?` | +31.5% | +8.7% | +33.3% | +8.0% | +32.4% | K1 + by name |
+| `dup` | +22.2% | +26.2% | +23.7% | +26.7% | +15.9% | by name |
+| `serializable_hash` / `as_json` | +31.1% / +13.3% | +10.9% / −11.6% | +30.9% / +13.8% | +10.7% / −13.0% | not flat / +11.8% | K1 (−30%) + by-name reads |
+| `slice` / `values_at` | +2.4% / +5.5% | −8.5% / −15.6% | +2.7% / +6.1% | −8.3% / −15.2% | −1.8% / −3.5% | by name, small |
+| `update!` (1 column, SQL) | +11.7% | +32.7% | +22.8% | +70.9% | not flat | K1 + by name; half predates #59141 (lead 6) |
+| STI load | +10.3% | −27.5% | +8.0% | −45.1% | +17.2% | by name (`type`) |
+
+**A/A:** ≤ 0.4% interpreted in all cells but `sti_load1` at 6 columns (0.66%) and `writer` (up to 0.95%), where
+the change is 30–40%. YJIT cells marked "not flat" compiled in a measured window and do not count.
+
+**Regression, or not yet converted.** tenderlove [wrote on #59141](https://github.com/rails/rails/pull/59141#issuecomment-6546441624)
+that the PR "only tackles the reader methods" and that he expects "to give the same 'index based' treatment to the
+other methods we generate". These are **not yet converted**: generated writers, `write_attribute`, and the
+dirty-tracking paths that write. They are slower because the name lookup grew a layer
+(`write_from_user` → `index_for_name` → `write` → `index_for_name` again → `attribute_at` → `store`), and because
+`write_from_user` now casts eagerly. The comment there makes the eager cast deliberate: it keeps the first read on
+the fast path.
+
+These are **regressions from #59141** that conversion of the generated methods would not fix:
+
+* Reads that Rails and apps make by name, not through a generated method: `id`, `_read_attribute`,
+  `read_attribute`, `self[]`, partial-select reads, `read_attribute_for_serialization`. Each now pays
+  `index_for_name` → `indexes` → `value_at!` with the `UNCAST` check, where before #59141 it paid one `Hash#[]` on
+  the attribute set. In the CPU census, `index_for_name` alone is +0.298% of all instructions in all 8 apps, and the
+  15th-largest method by self instructions on main.
+* Whole-record Hashes that still materialize: `values_before_type_cast` and `values_for_database` (lead 3), and
+  `keys` (K1).
+
+**Net in the apps.** Counting the attribute stack (`attribute_set.rb` +1.43%, `indexed_row.rb` +0.24% against
+`attribute_set/builder.rb` −1.22%, `_load_from_sql` −0.46%, `result.rb` −0.74%, `attribute.rb` −0.26%, `read.rb`
+−0.24% of all 8.1 instructions), main spends less than 8.1 on attributes. The by-name and Hash-rebuilding paths
+above are what is left to recover.
+
+### Marshal and MessagePack (lead 3)
+
+`Marshal.dump(record)` in the 7.1 format, which main always uses, Ir per call. 8.1's default is the 6.1 format, so
+the micro sets 7.1 on 8.1 too. On 8.1 with the 6.1 format the dump costs 227,630 / 423,965 / 880,622 at 6/30/100
+columns, so apps still on the 6.1 format get faster on main.
+
+| Columns | 8.1 (7.1 format, A/A) | before #59141 | main (A/A) | main vs 8.1 | `attributes_for_database` 8.1 → main | objects |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 6 | 72,645 / 72,658 | 74,101 | 95,770 / 95,803 | +31.8% | 15,824 → 35,937 (×2.27) | 1 → 4 |
+| 30 | 264,290 / 264,618 | 255,839 | 353,078 / 352,882 | +33.6% | 73,357 → 162,985 (×2.22) | 1 → 4 |
+| 100 | 804,236 / 804,489 | 777,368 | 1,092,026 / 1,092,038 | +35.8% | 237,388 → 527,095 (×2.22) | 1 → 4 |
+| 300 | 2,364,096 | 2,284,076 | 3,204,606 / 3,205,270 | +35.6% | 718,348 → 1,562,600 (×2.18) | 1 → 4 |
+
+The cost is in `LazyIndexedAttributeSet#attributes` (`attribute_set.rb:457`). It calls `materialize`, which builds
+an `Attribute` for every row key and type key, then copies them into a new `IndexedRow::Mutable` on every call, and
+`AttributeSet#values_for_database` (`:119`) then runs `transform_values` over that. `to_hash` had the same shape
+until czj's row-reading `to_hash` went into #59141. The same treatment for `values_for_database` and
+`values_before_type_cast` is the proposed next step. One question it needs answered: whether a value cast from the
+row and never written serializes to the same database value as the row's raw value (it must, for Marshal round
+trips).
+
+Reach: `Rails.cache` entries holding records (Marshal), the MessagePack cache coder, and anything that calls
+`attributes_before_type_cast`. None of the 71 census workloads dump a record, so the census cannot rank it. The
+loss is per cached record.
+
+### Per-row load
+
+`_load_from_sql` on a cached result, Ir per row (objects per row), interpreter. Single-row and 20-row loads are faster
+on main than on 8.1 at every width; the cost per row of a large result is not.
+
+| Rows × columns | 8.1 | census 8 | before #59141 | #59141 | main (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 × 30 | 100,536 (10) | — | — | — | 68,625 / 68,512 (7) |
+| 20 × 300 | 53,148 (5.25) | 51,259 (5.15) | 38,737 | 37,871 | 37,888 / 37,887 (3.2) |
+| 10,000 × 6 | 13,088 (5) | 17,326 (5) | 17,001 | 14,831 | 14,831 / 14,831 (3) |
+| 10,000 × 30 | 13,112 (5) | 17,400 (5) | 17,067 | 15,001 | 14,903 / 14,898 (3) |
+| 10,000 × 300 | 13,164 (5) | 18,621 (5.01) | 18,266 | 16,103 | 16,109 / 16,103 (3) |
+
+The per-row growth predates census 8. #59141 removed two objects per row and about 2,200 Ir. What is left is call
+overhead per record: `loaded_mapped_table` twice, `schema_attributes`, the builder, `_primary_key`, the
+strict-loading class attributes, `RowLayout#build`, and the `Array.new` for cast values. AT-1 hoisted the builder
+out of the loop (−9% at 20 rows). It is not exact, because it skips the overridable private `instantiate_instance_of`
+(`RelationTest#test_relation_with_private_kernel_method` fails). [AT-1 patch](data/rails-main-census-9/AT1-rejected.patch).
+Under YJIT, main's 1,000- and 10,000-row windows compile 1 block each, so no YJIT per-row claim is made.
+
+## Main vs 8-1-stable in the census
+
+**CPU** (`script/cpu-census`, labels `c9s` and `c9m`/`c9m2`, interpreter, 71 workloads, all JIT-flat):
+
+| App | Workloads | Median main vs 8.1 | Range | A/A median \|Δ\| |
+| --- | ---: | ---: | --- | ---: |
+| blog | 10 | −12.20% | −25.00% … −5.39% | 0.09% |
+| casa | 10 | −8.95% | −24.49% … −0.14% | 0.03% |
+| codetriage | 7 | −4.01% | −12.65% … +4.03% | 0.07% |
+| hackatime | 12 | −5.69% | −19.10% … −2.02% | 0.10% |
+| pingcrm | 8 | −5.59% | −6.35% … −4.80% | 0.10% |
+| react-starter-kit | 8 | −7.06% | −8.63% … −4.96% | 0.07% |
+| redprints-cfp | 8 | −6.67% | −9.06% … −2.36% | 0.47% |
+| writebook | 8 | −6.90% | −9.80% … −3.24% | 0.05% |
+
+All 71 workloads: median −6.48%; 68 faster and 1 slower beyond 1%. The slower one is codetriage
+`perform SendSingleTriageEmailJob` (+4.03%), the `log_level = :debug` event-reporter case that
+[main-regressions](main-regressions.md) already judged deliberate. The 8.1 twin (`c9s2`) was stopped after 3 apps to
+save orb time, so `cpu_regress.rb` uses main's A/A for both sides of every cell.
+
+Methods that grew in every app ([full list](data/rails-main-census-9/cpu-81-main-method.txt),
+[lines](data/rails-main-census-9/cpu-81-main-line.txt)). New code is mostly #59141's attribute set, then features
+already judged deliberate:
+
+| Method (8 apps each) | Net % of all 8.1 Ir | Disposition |
+| --- | ---: | --- |
+| `TagBuilder#append_tag_option` (new, 49580d1d04) | +0.634% | Extracted from `tag_options`; `tag_helper.rb` as a whole is −0.192% |
+| `LazyIndexedAttributeSet#index_for_name` | +0.298% | **Lead 4** |
+| `Result::RowLayout#initialize` | +0.296% | #59141's row layout; `result.rb` as a whole is −0.735% |
+| `LazyIndexedAttributeSet#value_at!`, `fetch_value_at!`, `initialize`, `cast_value`, `IndexedRow.key_at?` | +0.135% to +0.272% each | #59141's new readers; replace `LazyAttributeSet#fetch_value` (−0.794%) |
+| `OptimizedUrlHelper#call` | +0.257% | `route_set.rb` as a whole is −0.761% |
+| `WeakKeyMap#fetch_or_store`, `association_route`, `current_default_association_route?` | +0.145% to +0.245% | Deliberate ([rails-82-impact](rails-82-impact.md)) |
+| `LazyIndexedAttributeSet#keys` | +0.134% | **K1** |
+| `QueryIntent`, `start_intent_log`, `execute_intent` | +0.055% to +0.124% | Deliberate (new feature) |
+| `csrf_token_hmac` | +0.152% | Keyed HMAC reuse: native digest work is now charged to this frame; deliberate |
+| `schema_context`, `current_schema_context`, `schema_attributes`, `loaded_mapped_table` | +0.067% to +0.084% each | Deliberate (#58437, #59530); part of lead 7's per-row cost |
+| `table_name_qualified_unscope_values` | +0.025% | **Lead 8** |
+
+By file, net: `attribute_set.rb` +1.434% and `query_intent.rb` +0.369% grew most. `attribute_set/builder.rb`
+−1.216%, `journey/formatter.rb` −0.917% and `route_set.rb` −0.761% shrank most
+([by file](data/rails-main-census-9/cpu-net-81-main-file.txt)).
+
+**Allocations** (`script/census`, labels `a9s`/`a9s2` and `a9m`/`a9m2`): A/A median 0.0 / 0.0 objects per workload
+(interpreter / YJIT). Main against 8.1 is a median of **−601 / −633 objects**, with all 71 workloads lower and 12
+SQL digests changed ([compare](data/rails-main-census-9/alloc-compare-81-main.txt)). The broad allocation growth is
+#59141's attribute-set classes, `table_name_qualified_unscope_values` (+13 objects, 57 workloads), and the retry
+budget, intent log and default scope. All of it is outweighed by what went away.
+
+## Changes since census 8
+
+### Census
+
+**CPU** (`c9c8` against `c9m`/`c9m2`, interpreter, 71 workloads; [by file](data/rails-main-census-9/cpu-net-c8-main-file.txt),
+[by method](data/rails-main-census-9/cpu-net-c8-main-method.txt), [per cell](data/rails-main-census-9/cpu-c8-main-method.txt)):
+main is a median **−1.78%** faster than census 8's pin, with 49 workloads faster and 1 slower beyond 1%. By app the
+median runs from −0.17% (redprints-cfp) to −4.51% (pingcrm). The one slower workload is redprints-cfp `GET home`
+(+1.19%, against an A/A median of 0.47% for that app). It is the static-file probe and the `tag_options` checks below.
+
+| Since census 8, net % of all census 8 Ir | Grew | Shrank | Cause |
+| --- | ---: | ---: | --- |
+| #59141's attribute set (`attribute_set.rb`, `indexed_row.rb`, `builder.rb`, `result.rb`, `querying.rb`) | +0.626% | −1.493% | Net **−0.87%**; the growth is leads 1, 3, 4 and 5 |
+| `index_with` (our merged #59557) | | −0.392% | Ours |
+| `String#blank?` and `tag_options` (99a3247ebc, GHSA-68p9-83h6-5wpj) | +0.166% / +0.150% | `append_tag_option` −0.160% | Security fix, released in 8.1.4.1; not a lead |
+| `_set_vary_header` (e38dd281d3, GHSA-r9jg-fmfx-2gv6) | +0.049% | | Security fix, released in 8.1.4.1; not a lead |
+| `static.rb` precompressed probes (#59725) | +0.023% (6 apps) | | Deliberate, still cheaper than 8.1 |
+| `form_tag_helper.rb`, `capture_helper.rb`, `output_safety_helper.rb` (#50312) | +0.029% (4–7 apps) | | Lead 2 |
+| `model_schema.rb`, `schema_context.rb` | | −0.212% | #59530 (matthewd) |
+
+So the biggest new hot spot since census 8 is the by-name and rebuild cost inside #59141's attribute set, which
+#59141's gains outweigh in every app.
+
+**Allocations** (`a9c8` against `a9m`, [compare](data/rails-main-census-9/alloc-compare-c8-main.txt)): median
+**−76 / −75 objects** per workload, 68 lower and 3 higher, 2 SQL digests changed. The three higher (interpreter)
+are redprints-cfp `GET home` +16.7, blog `POST comment (redirect)` +15.7 and blog `GET article` +2.1. New since
+census 8:
+
+* `ActionDispatch::FileHandler` probes precompressed copies for top-level misses: +12 objects per request in 6
+  apps (b63dddb7e3, #59725). It is deliberate, and still fewer probes than 8.1 (6 against 9 for `/posts`).
+* `button_to` (lead 2).
+* `table_name_qualified_unscope_values` (lead 8).
+
+### Commits merged since 2026-11-04 that matter here
+
+108 first-parent commits ([list](data/rails-main-census-9/main-since-c8.txt)). In order of effect:
+
+* **#59141** (tenderlove, 2026-11-11): this document's focus. Net faster in every app, with the regressions above.
+* **#50312** (seanpdoyle, 2026-11-07): `button_to` on `form_tag`, lead 2.
+* **#59709** (b2a1d01a4d, 2026-11-10), qualify unscope values when merging (fixes #48227): lead 8. #59780 (kehra,
+  2026-11-14) fixes its Array case, and #59767 (kamipo) deprecates unqualified unscope of other tables.
+* **#59725** (b63dddb7e3): static precompressed probes, above.
+* **#59727** (salasebas), `JoinDependency` key aliases, and #59739 (ilianah), JSON schema cache allocations: both
+  are allocation reductions. They were not attributed per workload.
+* **#59530** (matthewd), schema context primary keys: part of `schema_*` above.
+
+### Our merged changes
+
+* **CW1, [#59642](https://github.com/rails/rails/pull/59642)** (merged 2026-11-12, `0e655babbc`):
+  `where("x = ?", v).to_sql` −1.6% interpreted and −6.8% YJIT, 52 → 44 objects; `where_named_to_sql` −6.3% YJIT,
+  71 → 62 objects (A/A ≤ 0.1%, [raw](data/rails-main-census-9/raw/cw1-yjit.txt)). Both lib lines survive on main.
+* **AR-1, [#59629](https://github.com/rails/rails/pull/59629)** (merged 2026-11-09, `e39506b600`): restores
+  `find_template` as a compatibility alias (`lookup_context.rb:161`). It is a correctness fix with no hot-path
+  effect, and survives.
+* **Reverted or rewritten upstream** ([`ours_survive.rb`](../../bench/upstream/census9/ours_survive.rb) against main,
+  [output](data/rails-main-census-9/ours-survive.txt)):
+  * #59584 (JSON::Coder escape skip) was **reverted** by byroot in #59713 (`ebfaed3969`).
+  * #59640 (`local_cache_key`): byroot rewrote the line in #59714 (`15110dfcbb`, "Further simplify").
+  * #59568 (attribute-set lookups) was **superseded** by #59141.
+  * #59634, #59576 and #59533 (`WhereClause`/`where!`): lines rewritten by our own later merges and kamipo's
+    `eabb5b9553`.
+  * #59556 (Merger dup) was replaced by an early return; kamipo's later merges changed the file.
+  * #59236 and #59235 were changed before census 8 (84048ad477, e3dd00a4bb).
+
+  The other merged PRs keep every lib line.
+
+## Method and pins
+
+* **Rails:** main [`50c54eed06`](https://github.com/rails/rails/commit/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b)
+  (merge of #59780, fetched 2026-11-14). 8-1-stable [`71e963ed1b`](https://github.com/rails/rails/commit/71e963ed1b0c8e5d1ff6e9124236cf7c4d4a24b9)
+  (#59781). Census 8 [`1105756f42`](https://github.com/rails/rails/commit/1105756f426ee42834af5c87b4549ef709d631e5).
+  #59141: parent `c48c154e3f`, merge `1f32b09101`. #50312: parent `9ba8b1edee`, merge `22898dbd82`. CW1 `0e655babbc`,
+  AR-1 `e39506b600`.
+* **Ruby** 4.0.9 (`3e93b23afc`), interpreter and `--yjit`. ZJIT was not run.
+* **Corpus:** the 8 census apps that run on 8.1 and need no MySQL: blog, writebook, codetriage, pingcrm,
+  redprints-cfp, react-starter-kit, casa and hackatime (71 workloads), with census 7's overlays (`script/census
+  setup`). This answers "8.1 against main" at the same reach as [main-regressions](main-regressions.md), at a third
+  of census 8's 251 workloads.
+* **Census runs:**
+  * [`run_census.sh`](data/rails-main-census-9/run_census.sh) (with [`heap.sh`](data/rails-main-census-9/heap.sh)): allocations `a9m`/`a9m2`, `a9s`/`a9s2`, `a9c8`; CPU
+    `c9m`/`c9m2`, `c9s`, `c9c8`, interpreter, `--jobs 3`.
+  * Comparison: [`cpu_regress.rb`](../../bench/upstream/census9/cpu_regress.rb), per cell, and
+    [`cpu_net.rb`](../../bench/upstream/census9/cpu_net.rb), the net per key.
+  * The YJIT CPU census was not run; YJIT claims come from the micros and their per-window gate.
+* **Micros:** [`attr_micro.rb`](../../bench/upstream/census9/attr_micro.rb),
+  [`req_micro.rb`](../../bench/upstream/census9/req_micro.rb) and
+  [`rows_micro.rb`](../../bench/upstream/census9/rows_micro.rb), with sweep scripts next to them.
+  * Each case: N calls (100–200) after a 100–300-call warmup.
+  * `IrCount` ([`ir_count.c`](../../bench/upstream/census9/ir_count.c)) reads the thread's exact Ir under census
+    8's patched Callgrind (`--instr-atstart=no`). Objects come from `GC.stat`, with GC disabled in the window.
+  * Under YJIT, warmup runs until three windows in a row compile nothing (at most 30), and the measured window's
+    block count is printed. Any nonzero count makes the cell "not flat", and it does not count.
+  * Each tree runs in its own process; one tree under two names is the A/A.
+* **Fixed heap:** `RUBY_GC_HEAP_{0..4}_INIT_SLOTS=1000000/250000/100000/20000/10000`, the same for every run.
+* **Sweeps, including very large inputs:**
+  * table width 6/30/100/300 columns;
+  * rows per load 1/20/1,000/10,000;
+  * `button_to` with 0/20/200/2,000 params and a 1 MB label;
+  * `Marshal.dump` at 6/30/100/300 columns.
+* **Exactness:** `button_to_diff.rb` (5,760 inputs) and `keys_equiv.rb` (K1).
+* **Repeats:** the per-row sweep for census 8, before #59141 and #59141 ran up to four times, because its orb service
+  restarted on exit. All runs are in `raw/rows.txt` and agree within 0.6%; the table uses the first.
+* **Receipts:** [data/rails-main-census-9](data/rails-main-census-9/). Restore notes and orb scripts are in
+  `.amp/in/orb-backup/` (NOTES.md).
+
+## Limits
+
+* YJIT numbers come from micros only. Per-row loads on main compile 1 block per window at 1,000 and 10,000 rows,
+  so no YJIT row result is claimed.
+* Lead 3 has no census reach because no workload caches records. Its size is per cached record.
+* Lead 6 (`update!` width before #59141) is not attributed to a commit yet.
+* The 8 apps include no MySQL app, and no app on `load_defaults "8.2"`.

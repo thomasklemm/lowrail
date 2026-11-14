@@ -1,0 +1,74 @@
+# c9c8 -> c9m: 71 workloads; per app: median whole-workload change, median |A/A| (c9m vs c9m2)
+blog                  10 wl  median  -0.96%  min  -3.61%  max  +0.42%  A/A 0.09%
+casa                  10 wl  median  -2.94%  min -23.01%  max  -0.06%  A/A 0.03%
+codetriage             7 wl  median  -1.78%  min  -2.83%  max  -0.88%  A/A 0.07%
+hackatime             12 wl  median  -2.13%  min  -4.39%  max  +0.30%  A/A 0.10%
+pingcrm                8 wl  median  -4.51%  min  -6.48%  max  -3.99%  A/A 0.10%
+react-starter-kit      8 wl  median  -0.88%  min  -2.31%  max  -0.25%  A/A 0.07%
+redprints-cfp          8 wl  median  -0.17%  min  -2.42%  max  +1.19%  A/A 0.47%
+writebook              8 wl  median  -1.36%  min  -4.59%  max  +0.26%  A/A 0.05%
+ALL 71 workloads: median -1.78%, slower 1, faster 49 (beyond 1%)
+
+# net self Ir by method, % of all c9c8 instructions (grew)
+ +0.312% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#index_for_name
+ +0.311% 8 apps  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#initialize
+ +0.285% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#value_at!
+ +0.178% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value_at!
+ +0.171% 8 apps  RAILS/activesupport/lib/active_support/core_ext/object/blank.rb String#blank?
+ +0.157% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#initialize
+ +0.154% 8 apps  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow.key_at?
+ +0.150% 8 apps  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_options
+ +0.141% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#keys
+ +0.140% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cast_value
+ +0.123% 7 apps  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#build
+ +0.107% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value!
+ +0.084% 8 apps  RAILS/activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_attributes
+ +0.076% 8 apps  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#map_rows
+ +0.073% 8 apps  RAILS/activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#loaded_mapped_table
+ +0.064% 8 apps  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder::Context#type_at
+ +0.054% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#type_for
+ +0.051% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cached_names
+ +0.050% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#lookup
+ +0.049% 1 apps  APP/app/views/layouts/casa_app.html.erb #<Class:0x00000000471494d8>#_app_views_layouts_casa_app_html_erb___255687231133905343_40336
+ +0.048% 7 apps  RAILS/actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#<<
+ +0.048% 8 apps  RAILS/actionpack/lib/action_controller/metal/rendering.rb ActionController::Rendering#_set_vary_header
+ +0.047% 7 apps  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder#build_from_row
+ +0.046% 8 apps  RAILS/activerecord/lib/active_record/attribute_methods/read.rb ActiveRecord::AttributeMethods::Read#_read_attribute_at!
+ +0.045% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#default_attribute
+ +0.036% 3 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#to_hash
+ +0.036% 8 apps  RAILS/activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_where!
+ +0.035% 1 apps  APP/app/views/case_contacts/_case_contact.html.erb #<Class:0x00000000471494d8>#_app_views_case_contacts__case_contact_html_erb__2171627977430820836_269392
+ +0.033% 5 apps  RAILS/activerecord/lib/active_record/model_schema/schema_context.rb ActiveRecord::ModelSchema::SchemaContext#ractor_attributes
+ +0.033% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#store
+
+# net self Ir by method (shrank)
+ -0.556%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyAttributeSet#fetch_value!
+ -0.536%  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow::Mutable#fetch
+ -0.528%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#column_types
+ -0.458%  RAILS/activerecord/lib/active_record/querying.rb ActiveRecord::Querying#_load_from_sql
+ -0.394%  RAILS/activesupport/lib/active_support/core_ext/enumerable.rb Array#index_with
+ -0.196%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyAttributeSet#keys
+ -0.160%  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_tag_option
+ -0.132%  RAILS/activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_loaded?
+ -0.128%  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow#fetch
+ -0.126%  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow::Mutable#[]=
+ -0.125%  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow::Mutable#initialize
+ -0.115%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyAttributeSet#initialize
+ -0.108%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyAttributeSet#default_attribute
+ -0.101%  RAILS/activesupport/lib/active_support/core_ext/erb/util.rb ActiveSupport::CoreExt::ERBUtil#html_escape
+ -0.094%  RAILS/activesupport/lib/active_support/inflector/methods.rb ActiveSupport::Inflector#apply_inflections
+ -0.089%  RAILS/actionpack/lib/action_dispatch/journey/visitors.rb ActionDispatch::Journey::Format#add_to
+ -0.088%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#indexed_rows
+ -0.087%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#[]
+ -0.087%  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder#build_from_database
+ -0.087%  RAILS/activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods::ClassMethods#resolve_attribute_name
+ -0.086%  RAILS/activerecord/lib/active_record/model_schema/schema_context.rb ActiveRecord::ModelSchema::SchemaContext#attributes
+ -0.083%  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow#new_empty_mutable_row
+ -0.069%  <internal:ractor> Ractor#[]
+ -0.066%  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout#build_handle
+ -0.064%  RAILS/activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_context
+ -0.054%  RAILS/actionview/lib/action_view/helpers/asset_url_helper.rb ActionView::Helpers::AssetUrlHelper#asset_path
+ -0.052%  APP/app/views/layouts/casa_app.html.erb #<Class:0x00000000470a41b8>#_app_views_layouts_casa_app_html_erb___4369092952768959371_40304
+ -0.048%  RAILS/activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#column_references
+ -0.048%  RAILS/activerecord/lib/active_record/model_schema/schema_context.rb ActiveRecord::ModelSchema::SchemaContext#schema_loaded?
+ -0.045%  RAILS/activesupport/lib/active_support/ordered_options.rb ActiveSupport::OrderedOptions#method_missing
