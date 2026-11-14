@@ -150,7 +150,7 @@ Interpreter, fix against main (A/A = largest |main2 − main| of these rows at t
 
 Objects: 3 fewer per call (4 → 1 for each Hash; 28 → 25 per `Marshal.dump` at 30 columns).
 
-Against 8.1, the fix recovers 60–70% of main's regression on a warm record, not all of it:
+Against 8.1, the fix recovers 60–70% of main's `Marshal.dump` regression on a warm record, not all of it:
 `Marshal.dump` main +29.6% / +33.3% / +34.0% / +33.9% vs 8.1 at 6/30/100/300 columns, fix +9.1% / +12.8% / +13.7% /
 +13.5%; MessagePack dump main +52% to +87%, fix +14% to +35%. What remains is the walk itself: 8.1 runs one C
 `Hash#transform_values`, main (with or without the fix) a Ruby loop over the indexes. `find` then `Marshal.dump` is
