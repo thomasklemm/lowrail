@@ -246,6 +246,8 @@ Every confirmed finding is fixed and the changed part reviewed again; the round 
 A head change after the last pass means another pass. An item is `reviewed` only when skeptic and Sol, Astra when
 `risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current `head`;
 `script/pr-queue open` and `ready` check this and refuse otherwise.
+Superseded 2026-11-06: claude-code replaces skeptic as a required pass (see [Claude Code orbs and a final Claude Code
+review](#claude-code-orbs-and-a-final-claude-code-review-thomas-2026-11-06)).
 
 ### Readability gate (L0–L3)
 
