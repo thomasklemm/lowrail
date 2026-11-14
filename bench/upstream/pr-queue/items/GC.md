@@ -16,7 +16,7 @@ rank: 1
 risky: true
 state: held
 pr:
-note: "fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers posted on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6882169535"
+note: "fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers for master and #17251 (not ours) added to our comment on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6652543942"
 passes: []
 ---
 
