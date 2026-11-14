@@ -48,7 +48,8 @@ passes:                       # oldest first
 The body, verbatim, as it is posted.
 ```
 
-`reviewer` in a pass: `skeptic` (the orb's skeptical reviewer subagent), `sol`, `astra`, `thermos`. `verdict`:
+`reviewer` in a pass: `claude-code` (the separate final review orb), `skeptic` (the orb's skeptical reviewer
+subagent, kept as a record), `sol`, `astra`, `thermos`. `verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
 a superfluous comment means `changes`. Record a pass on the
@@ -57,7 +58,7 @@ and stop counting. A body-only change keeps the head, so it needs no new code pa
 whichever pass is listed.
 
 A thermos pass can be waived on one head: `waived: [{reviewer: thermos, head: "…", by: coordinator, reason: …}]`.
-It counts like an approving pass on that head only; skeptic, Sol and Astra can't be waived.
+It counts like an approving pass on that head only; claude-code, Sol and Astra can't be waived.
 
 Items that are already open and ready may have no body.
 
@@ -74,7 +75,7 @@ any state -> held | superseded
 * **built:** branch pushed, body drafted, no pass yet on this head.
 * **in-review:** passes are being run on this head.
 * **reviewed:** every required pass approves on the current `head` (latest pass per reviewer counts), no
-  must-fix. Required: skeptic and Sol always, Astra when `risky`, thermos when the diff against the base has
+  must-fix. Required: claude-code and Sol always, Astra when `risky`, thermos when the diff against the base has
   more than 200 changed lines. `open` refuses otherwise.
 * **draft**, **ready**, **merged**, **closed:** the PR's state on GitHub; `sync` keeps them current.
 * **held:** not to open now; `note` says why and what unblocks it. **superseded:** replaced by another item or PR.
