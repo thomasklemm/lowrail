@@ -59,8 +59,6 @@ before: request with allow_browser     10.598k (± 5.6%) i/s   (94.35 μs/i) -  
 after:  request with allow_browser     20.799k (± 8.5%) i/s   (48.08 μs/i) -    106.032k in   5.097817s
 ```
 
-With ZJIT on Ruby master 9aa0898240, it goes from 82.6 to 42.9 µs per request.
-
 In a small blog app's full request (`GET /articles/:id.json`), it is 161 fewer objects and 9 to 12 percent fewer
 instructions.
 
