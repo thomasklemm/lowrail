@@ -1,0 +1,110 @@
+Warming up --------------------------------------
+          miss_empty    11.828M i/s -     11.943M times in 1.009745s (84.55ns/i, 219clocks/i)
+           hit_first     7.016M i/s -      7.210M times in 1.027740s (142.53ns/i, 370clocks/i)
+           hit_third     6.840M i/s -      6.859M times in 1.002756s (146.19ns/i, 380clocks/i)
+          hit_fourth     6.942M i/s -      7.080M times in 1.019967s (144.06ns/i, 374clocks/i)
+            hit_last     6.905M i/s -      7.144M times in 1.034604s (144.82ns/i, 376clocks/i)
+                miss     6.994M i/s -      7.317M times in 1.046132s (142.98ns/i, 371clocks/i)
+           h3_aref_b    45.139M i/s -     45.176M times in 1.000811s (22.15ns/i, 57clocks/i)
+          h3_fetch_b    32.138M i/s -     32.551M times in 1.012855s (31.12ns/i, 80clocks/i)
+   h3_aref_str_equal    32.304M i/s -     32.637M times in 1.010312s (30.96ns/i, 80clocks/i)
+       ident3_aref_c    48.389M i/s -     48.577M times in 1.003866s (20.67ns/i, 53clocks/i)
+            big_aref    41.829M i/s -     42.074M times in 1.005875s (23.91ns/i, 62clocks/i)
+            literal1    80.327M i/s -     80.569M times in 1.003017s (12.45ns/i, 32clocks/i)
+            literal3    81.533M i/s -     81.615M times in 1.001013s (12.26ns/i, 31clocks/i)
+            literal8    83.843M i/s -     83.948M times in 1.001258s (11.93ns/i, 31clocks/i)
+           aset_new3     5.203M i/s -      5.411M times in 1.040032s (192.21ns/i, 499clocks/i)
+Calculating -------------------------------------
+                           base         fix       4.0.9 
+          miss_empty    15.573M     15.142M     14.412M i/s -     35.484M times in 2.278562s 2.343466s 2.462039s
+           hit_first     8.003M     10.583M     10.308M i/s -     21.048M times in 2.630023s 1.988773s 2.041771s
+           hit_third     8.014M     10.479M      8.129M i/s -     20.521M times in 2.560666s 1.958331s 2.524430s
+          hit_fourth     7.931M     10.467M      7.866M i/s -     20.825M times in 2.625850s 1.989662s 2.647574s
+            hit_last     7.942M     10.589M      7.580M i/s -     20.715M times in 2.608331s 1.956323s 2.732732s
+                miss     8.656M      8.959M      6.815M i/s -     20.982M times in 2.423988s 2.341903s 3.078581s
+           h3_aref_b    79.606M    102.351M    101.221M i/s -    135.417M times in 1.701090s 1.323070s 1.337846s
+          h3_fetch_b    48.547M     53.772M     54.441M i/s -     96.414M times in 1.985977s 1.793020s 1.770990s
+   h3_aref_str_equal    46.530M     46.141M     46.037M i/s -     96.912M times in 2.082802s 2.100363s 2.105068s
+       ident3_aref_c   107.592M    135.503M    100.959M i/s -    145.168M times in 1.349244s 1.071327s 1.437889s
+            big_aref    74.899M     76.624M     86.873M i/s -    125.486M times in 1.675390s 1.637683s 1.444467s
+            literal1    23.297G     38.901G     38.179G i/s -    240.980M times in 0.010344s 0.006195s 0.006312s
+            literal3    15.095G     17.994G     15.671G i/s -    244.598M times in 0.016204s 0.013593s 0.015608s
+            literal8   190.709G     48.365G    208.104G i/s -    251.529M times in 0.001319s 0.005201s 0.001209s
+           aset_new3     5.920M      6.053M     11.274M i/s -     15.608M times in 2.636633s 2.578694s 1.384475s
+
+Comparison:
+                       miss_empty
+                base:  15572823.2 i/s 
+                 fix:  15141524.2 i/s - 1.03x  slower
+               4.0.9:  14412301.6 i/s - 1.08x  slower
+
+                        hit_first
+                 fix:  10583165.3 i/s 
+               4.0.9:  10308458.0 i/s - 1.03x  slower
+                base:   8002785.7 i/s - 1.32x  slower
+
+                        hit_third
+                 fix:  10478710.6 i/s 
+               4.0.9:   8128877.9 i/s - 1.29x  slower
+                base:   8013846.4 i/s - 1.31x  slower
+
+                       hit_fourth
+                 fix:  10466596.7 i/s 
+                base:   7930760.8 i/s - 1.32x  slower
+               4.0.9:   7865687.4 i/s - 1.33x  slower
+
+                         hit_last
+                 fix:  10588882.6 i/s 
+                base:   7941966.5 i/s - 1.33x  slower
+               4.0.9:   7580427.2 i/s - 1.40x  slower
+
+                             miss
+                 fix:   8959242.1 i/s 
+                base:   8655851.4 i/s - 1.04x  slower
+               4.0.9:   6815373.5 i/s - 1.31x  slower
+
+                        h3_aref_b
+                 fix: 102350973.5 i/s 
+               4.0.9: 101220516.5 i/s - 1.01x  slower
+                base:  79606299.6 i/s - 1.29x  slower
+
+                       h3_fetch_b
+               4.0.9:  54440513.1 i/s 
+                 fix:  53771615.0 i/s - 1.01x  slower
+                base:  48547168.5 i/s - 1.12x  slower
+
+                h3_aref_str_equal
+                base:  46529548.0 i/s 
+                 fix:  46140519.5 i/s - 1.01x  slower
+               4.0.9:  46037402.6 i/s - 1.01x  slower
+
+                    ident3_aref_c
+                 fix: 135503365.8 i/s 
+                base: 107592384.2 i/s - 1.26x  slower
+               4.0.9: 100959372.4 i/s - 1.34x  slower
+
+                         big_aref
+               4.0.9:  86873457.5 i/s 
+                 fix:  76623991.1 i/s - 1.13x  slower
+                base:  74899475.1 i/s - 1.16x  slower
+
+                         literal1
+                 fix: 38900887157.9 i/s 
+               4.0.9: 38178555337.1 i/s - 1.02x  slower
+                base: 23297361571.7 i/s - 1.67x  slower
+
+                         literal3
+                 fix: 17994165175.3 i/s 
+               4.0.9: 15671183724.2 i/s - 1.15x  slower
+                base: 15094679216.3 i/s - 1.19x  slower
+
+                         literal8
+               4.0.9: 208103860385.9 i/s 
+                base: 190709093243.6 i/s - 1.09x  slower
+                 fix: 48364541960.1 i/s - 4.30x  slower
+
+                        aset_new3
+               4.0.9:  11273749.7 i/s 
+                 fix:   6052763.0 i/s - 1.86x  slower
+                base:   5919754.9 i/s - 1.90x  slower
+

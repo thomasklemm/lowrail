@@ -1,0 +1,22 @@
+Warming up --------------------------------------
+          miss_empty    12.181M i/s -     12.646M times in 1.038112s (82.09ns/i, 213clocks/i)
+           hit_first     6.775M i/s -      7.016M times in 1.035572s (147.61ns/i, 383clocks/i)
+           hit_third     6.674M i/s -      6.802M times in 1.019110s (149.83ns/i, 389clocks/i)
+          hit_fourth     6.695M i/s -      6.948M times in 1.037913s (149.38ns/i, 388clocks/i)
+            hit_last     6.753M i/s -      6.901M times in 1.022042s (148.09ns/i, 385clocks/i)
+                miss     7.005M i/s -      7.392M times in 1.055297s (142.75ns/i, 371clocks/i)
+           h3_aref_b    44.221M i/s -     44.820M times in 1.013537s (22.61ns/i, 58clocks/i)
+   h3_aref_str_equal    31.456M i/s -     31.682M times in 1.007186s (31.79ns/i, 82clocks/i)
+       ident3_aref_c    48.275M i/s -     49.037M times in 1.015785s (20.71ns/i, 53clocks/i)
+            big_aref    41.844M i/s -     42.328M times in 1.011572s (23.90ns/i, 62clocks/i)
+            literal3    13.414M i/s -     13.440M times in 1.001927s (74.55ns/i, 193clocks/i)
+            literal8     5.835M i/s -      5.939M times in 1.017807s (171.38ns/i, 445clocks/i)
+            literal9     4.082M i/s -      4.190M times in 1.026436s (244.99ns/i, 636clocks/i)
+Calculating -------------------------------------
+                         master      branch   master-AA       4.0.9 
+          miss_empty    14.781M     14.771M     14.833M     12.755M i/s -     36.544M times in 2.472304s 2.474070s 2.463602s 2.865015s
+           hit_first     7.180M     10.480M      7.822M      9.962M i/s -     20.324M times in 2.830864s 1.939380s 2.598338s 2.040135s
+           hit_third     7.988M      9.166M      7.844M      8.039M i/s -     20.023M times in 2.506658s 2.184473s 2.552514s 2.490877s
+          hit_fourth     7.846M     10.577M      7.811M      7.787M i/s -     20.084M times in 2.559831s 1.898749s 2.571312s 2.579112s
+            hit_last     8.105M     10.492M      7.952M      7.513M i/s -     20.258M times in 2.499418s 1.930783s 2.547522s 2.696236s
+                miss

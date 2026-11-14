@@ -1,0 +1,25 @@
+Warming up --------------------------------------
+          miss_empty    12.509M i/s -     12.593M times in 1.006682s (79.94ns/i, 207clocks/i)
+           hit_first     6.557M i/s -      6.824M times in 1.040663s (152.50ns/i, 396clocks/i)
+           hit_third     6.719M i/s -      6.911M times in 1.028476s (148.83ns/i, 386clocks/i)
+          hit_fourth     6.833M i/s -      6.833M times in 0.999919s (146.35ns/i, 380clocks/i)
+            hit_last     6.745M i/s -      6.780M times in 1.005093s (148.25ns/i, 385clocks/i)
+                miss     7.049M i/s -      7.267M times in 1.030922s (141.86ns/i, 368clocks/i)
+           h3_aref_b    45.026M i/s -     45.603M times in 1.012807s (22.21ns/i, 57clocks/i)
+          h3_fetch_b    32.206M i/s -     32.832M times in 1.019419s (31.05ns/i, 80clocks/i)
+   h3_aref_str_equal    31.525M i/s -     32.061M times in 1.016993s (31.72ns/i, 82clocks/i)
+       ident3_aref_c    47.951M i/s -     47.988M times in 1.000769s (20.85ns/i, 54clocks/i)
+            big_aref    43.316M i/s -     43.434M times in 1.002728s (23.09ns/i, 60clocks/i)
+            literal1    81.446M i/s -     81.979M times in 1.006538s (12.28ns/i, 31clocks/i)
+            literal3    81.349M i/s -     81.568M times in 1.002691s (12.29ns/i, 31clocks/i)
+            literal8    82.167M i/s -     82.302M times in 1.001642s (12.17ns/i, 31clocks/i)
+           aset_new3     4.901M i/s -      5.183M times in 1.057607s (204.04ns/i, 530clocks/i)
+Calculating -------------------------------------
+                      base-yjit    fix-yjit   base-zjit    fix-zjit 
+          miss_empty    14.927M     14.795M     14.913M     15.074M i/s -     37.528M times in 2.514190s 2.536530s 2.516418s 2.489523s
+           hit_first     7.984M     10.477M      8.168M     10.679M i/s -     19.672M times in 2.464048s 1.877711s 2.408355s 1.842121s
+           hit_third     7.974M     10.428M      7.983M     10.663M i/s -     20.158M times in 2.527781s 1.933052s 2.525019s 1.890449s
+          hit_fourth     7.816M     10.497M      7.909M     10.388M i/s -     20.499M times in 2.622585s 1.952932s 2.591826s 1.973422s
+            hit_last     8.140M     10.500M      7.905M     10.297M i/s -     20.236M times in 2.485974s 1.927231s 2.559832s 1.965248s
+                miss     8.134M      8.901M      8.081M      8.919M i/s -     21.147M times in 2.600011s 2.375831s 2.616948s 2.371116s
+           h3_aref_b    82.936M    100.124M 
