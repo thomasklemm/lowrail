@@ -1,0 +1,962 @@
+loaded[0] reader id => 1
+loaded[0] reader id again => 1
+loaded[0] reader type => nil
+loaded[0] reader type again => nil
+loaded[0] reader title => "a"
+loaded[0] reader title again => "a"
+loaded[0] reader body => "x"
+loaded[0] reader body again => "x"
+loaded[0] reader score => 1
+loaded[0] reader score again => 1
+loaded[0] reader published => true
+loaded[0] reader published again => true
+loaded[0] reader traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] reader traced again => "t1"
+loaded[0] reader fragile => nil
+  log: boom deserialize(nil)
+loaded[0] reader fragile again => nil
+loaded[0] reader virtual => "v"
+loaded[0] reader virtual again => "v"
+loaded[0] reader virtual_proc => "computed"
+  log: default proc
+loaded[0] reader virtual_proc again => "computed"
+loaded[0] reader virtual_nil => nil
+loaded[0] reader virtual_nil again => nil
+loaded[0] reader virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] reader virtual_traced again => "vt"
+loaded[0] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] reader id => 2
+loaded[1] reader id again => 2
+loaded[1] reader type => nil
+loaded[1] reader type again => nil
+loaded[1] reader title => "b"
+loaded[1] reader title again => "b"
+loaded[1] reader body => nil
+loaded[1] reader body again => nil
+loaded[1] reader score => nil
+loaded[1] reader score again => nil
+loaded[1] reader published => false
+loaded[1] reader published again => false
+loaded[1] reader traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] reader traced again => nil
+loaded[1] reader fragile !! ArgumentError: boom f
+  backtrace(17): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] reader fragile again !! ArgumentError: boom f
+  backtrace(17): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] reader virtual => "v"
+loaded[1] reader virtual again => "v"
+loaded[1] reader virtual_proc => "computed"
+  log: default proc
+loaded[1] reader virtual_proc again => "computed"
+loaded[1] reader virtual_nil => nil
+loaded[1] reader virtual_nil again => nil
+loaded[1] reader virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] reader virtual_traced again => "vt"
+loaded[1] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] reader id => 3
+loaded[2] reader id again => 3
+loaded[2] reader type => "SpecialPost"
+loaded[2] reader type again => "SpecialPost"
+loaded[2] reader title => "s"
+loaded[2] reader title again => "s"
+loaded[2] reader body => "y"
+loaded[2] reader body again => "y"
+loaded[2] reader score => 3
+loaded[2] reader score again => 3
+loaded[2] reader published => nil
+loaded[2] reader published again => nil
+loaded[2] reader traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] reader traced again => "t3"
+loaded[2] reader fragile => nil
+  log: boom deserialize(nil)
+loaded[2] reader fragile again => nil
+loaded[2] reader virtual => "v"
+loaded[2] reader virtual again => "v"
+loaded[2] reader virtual_proc => "computed"
+  log: default proc
+loaded[2] reader virtual_proc again => "computed"
+loaded[2] reader virtual_nil => nil
+loaded[2] reader virtual_nil again => nil
+loaded[2] reader virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] reader virtual_traced again => "vt"
+loaded[2] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] read_attribute id => 1
+loaded[0] read_attribute type => nil
+loaded[0] read_attribute title => "a"
+loaded[0] read_attribute body => "x"
+loaded[0] read_attribute score => 1
+loaded[0] read_attribute published => true
+loaded[0] read_attribute traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] read_attribute fragile => nil
+  log: boom deserialize(nil)
+loaded[0] read_attribute virtual => "v"
+loaded[0] read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[0] read_attribute virtual_nil => nil
+loaded[0] read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | probe.rb:98 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] read_attribute id => 2
+loaded[1] read_attribute type => nil
+loaded[1] read_attribute title => "b"
+loaded[1] read_attribute body => nil
+loaded[1] read_attribute score => nil
+loaded[1] read_attribute published => false
+loaded[1] read_attribute traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] read_attribute fragile !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | probe.rb:98 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] read_attribute virtual => "v"
+loaded[1] read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[1] read_attribute virtual_nil => nil
+loaded[1] read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | probe.rb:98 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] read_attribute id => 3
+loaded[2] read_attribute type => "SpecialPost"
+loaded[2] read_attribute title => "s"
+loaded[2] read_attribute body => "y"
+loaded[2] read_attribute score => 3
+loaded[2] read_attribute published => nil
+loaded[2] read_attribute traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] read_attribute fragile => nil
+  log: boom deserialize(nil)
+loaded[2] read_attribute virtual => "v"
+loaded[2] read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[2] read_attribute virtual_nil => nil
+loaded[2] read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | probe.rb:98 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] bracket id => 1
+loaded[0] bracket type => nil
+loaded[0] bracket title => "a"
+loaded[0] bracket body => "x"
+loaded[0] bracket score => 1
+loaded[0] bracket published => true
+loaded[0] bracket traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] bracket fragile => nil
+  log: boom deserialize(nil)
+loaded[0] bracket virtual => "v"
+loaded[0] bracket virtual_proc => "computed"
+  log: default proc
+loaded[0] bracket virtual_nil => nil
+loaded[0] bracket virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] bracket virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | activerecord/lib/active_record/attribute_methods.rb:526 [] | probe.rb:99 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] bracket id => 2
+loaded[1] bracket type => nil
+loaded[1] bracket title => "b"
+loaded[1] bracket body => nil
+loaded[1] bracket score => nil
+loaded[1] bracket published => false
+loaded[1] bracket traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] bracket fragile !! ArgumentError: boom f
+  backtrace(17): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | activerecord/lib/active_record/attribute_methods.rb:526 [] | probe.rb:99 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] bracket virtual => "v"
+loaded[1] bracket virtual_proc => "computed"
+  log: default proc
+loaded[1] bracket virtual_nil => nil
+loaded[1] bracket virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] bracket virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | activerecord/lib/active_record/attribute_methods.rb:526 [] | probe.rb:99 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] bracket id => 3
+loaded[2] bracket type => "SpecialPost"
+loaded[2] bracket title => "s"
+loaded[2] bracket body => "y"
+loaded[2] bracket score => 3
+loaded[2] bracket published => nil
+loaded[2] bracket traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] bracket fragile => nil
+  log: boom deserialize(nil)
+loaded[2] bracket virtual => "v"
+loaded[2] bracket virtual_proc => "computed"
+  log: default proc
+loaded[2] bracket virtual_nil => nil
+loaded[2] bracket virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] bracket virtual_fragile !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/attribute_methods/read.rb:43 read_attribute | activerecord/lib/active_record/attribute_methods.rb:526 [] | probe.rb:99 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] _read_attribute id => 1
+loaded[0] _read_attribute type => nil
+loaded[0] _read_attribute title => "a"
+loaded[0] _read_attribute body => "x"
+loaded[0] _read_attribute score => 1
+loaded[0] _read_attribute published => true
+loaded[0] _read_attribute traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] _read_attribute fragile => nil
+  log: boom deserialize(nil)
+loaded[0] _read_attribute virtual => "v"
+loaded[0] _read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[0] _read_attribute virtual_nil => nil
+loaded[0] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] _read_attribute id => 2
+loaded[1] _read_attribute type => nil
+loaded[1] _read_attribute title => "b"
+loaded[1] _read_attribute body => nil
+loaded[1] _read_attribute score => nil
+loaded[1] _read_attribute published => false
+loaded[1] _read_attribute traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] _read_attribute fragile !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] _read_attribute virtual => "v"
+loaded[1] _read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[1] _read_attribute virtual_nil => nil
+loaded[1] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] _read_attribute id => 3
+loaded[2] _read_attribute type => "SpecialPost"
+loaded[2] _read_attribute title => "s"
+loaded[2] _read_attribute body => "y"
+loaded[2] _read_attribute score => 3
+loaded[2] _read_attribute published => nil
+loaded[2] _read_attribute traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] _read_attribute fragile => nil
+  log: boom deserialize(nil)
+loaded[2] _read_attribute virtual => "v"
+loaded[2] _read_attribute virtual_proc => "computed"
+  log: default proc
+loaded[2] _read_attribute virtual_nil => nil
+loaded[2] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] read_attr id => 1
+loaded[0] read_attr type => nil
+loaded[0] read_attr title => "a"
+loaded[0] read_attr body => "x"
+loaded[0] read_attr score => 1
+loaded[0] read_attr published => true
+loaded[0] read_attr traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] read_attr fragile => nil
+  log: boom deserialize(nil)
+loaded[0] read_attr virtual => "v"
+loaded[0] read_attr virtual_proc => "computed"
+  log: default proc
+loaded[0] read_attr virtual_nil => nil
+loaded[0] read_attr virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] read_attr virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:50 read_attr | probe.rb:101 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] read_attr id => 2
+loaded[1] read_attr type => nil
+loaded[1] read_attr title => "b"
+loaded[1] read_attr body => nil
+loaded[1] read_attr score => nil
+loaded[1] read_attr published => false
+loaded[1] read_attr traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] read_attr fragile !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:50 read_attr | probe.rb:101 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] read_attr virtual => "v"
+loaded[1] read_attr virtual_proc => "computed"
+  log: default proc
+loaded[1] read_attr virtual_nil => nil
+loaded[1] read_attr virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] read_attr virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:50 read_attr | probe.rb:101 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] read_attr id => 3
+loaded[2] read_attr type => "SpecialPost"
+loaded[2] read_attr title => "s"
+loaded[2] read_attr body => "y"
+loaded[2] read_attr score => 3
+loaded[2] read_attr published => nil
+loaded[2] read_attr traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] read_attr fragile => nil
+  log: boom deserialize(nil)
+loaded[2] read_attr virtual => "v"
+loaded[2] read_attr virtual_proc => "computed"
+  log: default proc
+loaded[2] read_attr virtual_nil => nil
+loaded[2] read_attr virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] read_attr virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:50 read_attr | probe.rb:101 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] _read_attribute! id => 1
+loaded[0] _read_attribute! type => nil
+loaded[0] _read_attribute! title => "a"
+loaded[0] _read_attribute! body => "x"
+loaded[0] _read_attribute! score => 1
+loaded[0] _read_attribute! published => true
+loaded[0] _read_attribute! traced => "t1"
+  log: deserialize("t1"), cast("t1")
+loaded[0] _read_attribute! fragile => nil
+  log: boom deserialize(nil)
+loaded[0] _read_attribute! virtual => "v"
+loaded[0] _read_attribute! virtual_proc => "computed"
+  log: default proc
+loaded[0] _read_attribute! virtual_nil => nil
+loaded[0] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+loaded[0] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[0] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] _read_attribute! id => 2
+loaded[1] _read_attribute! type => nil
+loaded[1] _read_attribute! title => "b"
+loaded[1] _read_attribute! body => nil
+loaded[1] _read_attribute! score => nil
+loaded[1] _read_attribute! published => false
+loaded[1] _read_attribute! traced => nil
+  log: deserialize(nil), cast(nil)
+loaded[1] _read_attribute! fragile !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[1] _read_attribute! virtual => "v"
+loaded[1] _read_attribute! virtual_proc => "computed"
+  log: default proc
+loaded[1] _read_attribute! virtual_nil => nil
+loaded[1] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+loaded[1] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[1] attributes !! ArgumentError: boom f
+  backtrace(16): probe.rb:31 deserialize | activemodel/lib/active_model/attribute_set.rb:568 cast_value | activemodel/lib/active_model/attribute_set.rb:522 value_at | activemodel/lib/active_model/attribute_set.rb:363 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom deserialize("f")
+loaded[2] _read_attribute! id => 3
+loaded[2] _read_attribute! type => "SpecialPost"
+loaded[2] _read_attribute! title => "s"
+loaded[2] _read_attribute! body => "y"
+loaded[2] _read_attribute! score => 3
+loaded[2] _read_attribute! published => nil
+loaded[2] _read_attribute! traced => "t3"
+  log: deserialize("t3"), cast("t3")
+loaded[2] _read_attribute! fragile => nil
+  log: boom deserialize(nil)
+loaded[2] _read_attribute! virtual => "v"
+loaded[2] _read_attribute! virtual_proc => "computed"
+  log: default proc
+loaded[2] _read_attribute! virtual_nil => nil
+loaded[2] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+loaded[2] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(19): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+loaded[2] attributes !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:113 <main> | probe.rb:113 each | probe.rb:113 each_with_index | probe.rb:113 <main> | probe.rb:112 each | probe.rb:112 <main>
+  log: boom cast("vf")
+partial[0] reader id => 1
+partial[0] reader id again => 1
+partial[0] reader type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader type again !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader title => "a"
+partial[0] reader title again => "a"
+partial[0] reader body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader body again !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader score again !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader published again !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader traced again !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader fragile again !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] reader virtual => "v"
+partial[0] reader virtual again => "v"
+partial[0] reader virtual_proc => "computed"
+  log: default proc
+partial[0] reader virtual_proc again => "computed"
+partial[0] reader virtual_nil => nil
+partial[0] reader virtual_nil again => nil
+partial[0] reader virtual_traced => "vt"
+  log: cast("vt")
+partial[0] reader virtual_traced again => "vt"
+partial[0] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] _read_attribute! id => 1
+partial[0] _read_attribute! type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! title !! ActiveModel::MissingAttributeError: missing attribute 'title' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[0] _read_attribute! virtual => "v"
+partial[0] _read_attribute! virtual_proc => "computed"
+  log: default proc
+partial[0] _read_attribute! virtual_nil => nil
+partial[0] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+partial[0] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] _read_attribute id => 1
+partial[0] _read_attribute type => nil
+partial[0] _read_attribute title => nil
+partial[0] _read_attribute body => nil
+partial[0] _read_attribute score => nil
+partial[0] _read_attribute published => nil
+partial[0] _read_attribute traced => nil
+partial[0] _read_attribute fragile => nil
+partial[0] _read_attribute virtual => "v"
+partial[0] _read_attribute virtual_proc => "computed"
+  log: default proc
+partial[0] _read_attribute virtual_nil => nil
+partial[0] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+partial[0] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[0] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] reader id => 2
+partial[1] reader id again => 2
+partial[1] reader type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader type again !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader title => "b"
+partial[1] reader title again => "b"
+partial[1] reader body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader body again !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader score again !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader published again !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader traced again !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader fragile again !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] reader virtual => "v"
+partial[1] reader virtual again => "v"
+partial[1] reader virtual_proc => "computed"
+  log: default proc
+partial[1] reader virtual_proc again => "computed"
+partial[1] reader virtual_nil => nil
+partial[1] reader virtual_nil again => nil
+partial[1] reader virtual_traced => "vt"
+  log: cast("vt")
+partial[1] reader virtual_traced again => "vt"
+partial[1] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] _read_attribute! id => 2
+partial[1] _read_attribute! type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! title !! ActiveModel::MissingAttributeError: missing attribute 'title' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[1] _read_attribute! virtual => "v"
+partial[1] _read_attribute! virtual_proc => "computed"
+  log: default proc
+partial[1] _read_attribute! virtual_nil => nil
+partial[1] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+partial[1] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] _read_attribute id => 2
+partial[1] _read_attribute type => nil
+partial[1] _read_attribute title => nil
+partial[1] _read_attribute body => nil
+partial[1] _read_attribute score => nil
+partial[1] _read_attribute published => nil
+partial[1] _read_attribute traced => nil
+partial[1] _read_attribute fragile => nil
+partial[1] _read_attribute virtual => "v"
+partial[1] _read_attribute virtual_proc => "computed"
+  log: default proc
+partial[1] _read_attribute virtual_nil => nil
+partial[1] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+partial[1] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[1] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] reader id => 3
+partial[2] reader id again => 3
+partial[2] reader type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader type again !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_1 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader title => "s"
+partial[2] reader title again => "s"
+partial[2] reader body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader body again !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_3 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader score again !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_4 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader published again !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_5 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader traced again !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_6 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader fragile again !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(12): activerecord/lib/active_record/attribute_methods/read.rb:74 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_7 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] reader virtual => "v"
+partial[2] reader virtual again => "v"
+partial[2] reader virtual_proc => "computed"
+  log: default proc
+partial[2] reader virtual_proc again => "computed"
+partial[2] reader virtual_nil => nil
+partial[2] reader virtual_nil again => nil
+partial[2] reader virtual_traced => "vt"
+  log: cast("vt")
+partial[2] reader virtual_traced again => "vt"
+partial[2] reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(18): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:117 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] _read_attribute! id => 3
+partial[2] _read_attribute! type !! ActiveModel::MissingAttributeError: missing attribute 'type' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! title !! ActiveModel::MissingAttributeError: missing attribute 'title' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! body !! ActiveModel::MissingAttributeError: missing attribute 'body' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! score !! ActiveModel::MissingAttributeError: missing attribute 'score' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! published !! ActiveModel::MissingAttributeError: missing attribute 'published' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! traced !! ActiveModel::MissingAttributeError: missing attribute 'traced' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! fragile !! ActiveModel::MissingAttributeError: missing attribute 'fragile' for Post
+  backtrace(10): activerecord/lib/active_record/attribute_methods/read.rb:63 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+partial[2] _read_attribute! virtual => "v"
+partial[2] _read_attribute! virtual_proc => "computed"
+  log: default proc
+partial[2] _read_attribute! virtual_nil => nil
+partial[2] _read_attribute! virtual_traced => "vt"
+  log: cast("vt")
+partial[2] _read_attribute! virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:64 _read_attribute! | probe.rb:102 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:118 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] _read_attribute id => 3
+partial[2] _read_attribute type => nil
+partial[2] _read_attribute title => nil
+partial[2] _read_attribute body => nil
+partial[2] _read_attribute score => nil
+partial[2] _read_attribute published => nil
+partial[2] _read_attribute traced => nil
+partial[2] _read_attribute fragile => nil
+partial[2] _read_attribute virtual => "v"
+partial[2] _read_attribute virtual_proc => "computed"
+  log: default proc
+partial[2] _read_attribute virtual_nil => nil
+partial[2] _read_attribute virtual_traced => "vt"
+  log: cast("vt")
+partial[2] _read_attribute virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:534 value_at! | activemodel/lib/active_model/attribute_set.rb:386 fetch_value! | activerecord/lib/active_record/attribute_methods/read.rb:57 _read_attribute | probe.rb:100 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+partial[2] attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:119 <main> | probe.rb:116 each | probe.rb:116 each_with_index | probe.rb:116 <main>
+  log: boom cast("vf")
+select_extra reader id => 1
+select_extra reader id again => 1
+select_extra reader type => nil
+select_extra reader type again => nil
+select_extra reader title => "a"
+select_extra reader title again => "a"
+select_extra reader body => "x"
+select_extra reader body again => "x"
+select_extra reader score => 1
+select_extra reader score again => 1
+select_extra reader published => true
+select_extra reader published again => true
+select_extra reader traced => "t1"
+  log: deserialize("t1"), cast("t1")
+select_extra reader traced again => "t1"
+select_extra reader fragile => nil
+  log: boom deserialize(nil)
+select_extra reader fragile again => nil
+select_extra reader virtual => "v"
+select_extra reader virtual again => "v"
+select_extra reader virtual_proc => "computed"
+  log: default proc
+select_extra reader virtual_proc again => "computed"
+select_extra reader virtual_nil => nil
+select_extra reader virtual_nil again => nil
+select_extra reader virtual_traced => "vt"
+  log: cast("vt")
+select_extra reader virtual_traced again => "vt"
+select_extra reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(15): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:121 <main>
+  log: boom cast("vf")
+select_extra reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(13): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:121 <main>
+  log: boom cast("vf")
+select_extra attributes !! ArgumentError: boom vf
+  backtrace(12): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/indexed_row.rb:319 each_key | activemodel/lib/active_model/indexed_row.rb:319 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:121 <main>
+  log: boom cast("vf")
+select_extra extra_col => "x"
+new build !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:124 to_hash | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activesupport/lib/active_support/core_ext/enumerable.rb:331 to_h | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activemodel/lib/active_model/attribute_set.rb:124 to_hash | activerecord/lib/active_record/model_schema/schema_context/attributes.rb:31 column_defaults | activerecord/lib/active_record/model_schema.rb:558 column_defaults | activerecord/lib/active_record/inheritance.rb:73 new | probe.rb:130 <main> | probe.rb:126 built | probe.rb:82 show | probe.rb:126 built | probe.rb:130 <main>
+  log: deserialize(nil), cast(nil), boom deserialize(nil), default proc, cast("vt"), boom cast("vf")
+new_blank build !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:124 to_hash | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activesupport/lib/active_support/core_ext/enumerable.rb:331 to_h | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activemodel/lib/active_model/attribute_set.rb:124 to_hash | activerecord/lib/active_record/model_schema/schema_context/attributes.rb:31 column_defaults | activerecord/lib/active_record/model_schema.rb:558 column_defaults | activerecord/lib/active_record/inheritance.rb:73 new | probe.rb:131 <main> | probe.rb:126 built | probe.rb:82 show | probe.rb:126 built | probe.rb:131 <main>
+  log: deserialize(nil), cast(nil), boom deserialize(nil), default proc, cast("vt"), boom cast("vf")
+sti build => :ok
+sti reader id => 3
+sti reader id again => 3
+sti reader type => "SpecialPost"
+sti reader type again => "SpecialPost"
+sti reader title => "s"
+sti reader title again => "s"
+sti reader body => "y"
+sti reader body again => "y"
+sti reader score => 3
+sti reader score again => 3
+sti reader published => nil
+sti reader published again => nil
+sti reader traced => "t3"
+  log: deserialize("t3"), cast("t3")
+sti reader traced again => "t3"
+sti reader fragile => nil
+  log: boom deserialize(nil)
+sti reader fragile again => nil
+sti reader virtual => "v"
+sti reader virtual again => "v"
+sti reader virtual_proc => "computed"
+  log: default proc
+sti reader virtual_proc again => "computed"
+sti reader virtual_nil => nil
+sti reader virtual_nil again => nil
+sti reader virtual_traced => "vt"
+  log: cast("vt")
+sti reader virtual_traced again => "vt"
+sti reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:132 <main>
+  log: boom cast("vf")
+sti reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:132 <main>
+  log: boom cast("vf")
+sti attributes !! ArgumentError: boom vf
+  backtrace(12): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:127 built | probe.rb:132 <main>
+  log: boom cast("vf")
+sti extra => "e"
+becomes build => :ok
+becomes reader id => 1
+becomes reader id again => 1
+becomes reader type => nil
+becomes reader type again => nil
+becomes reader title => "a"
+becomes reader title again => "a"
+becomes reader body => "x"
+becomes reader body again => "x"
+becomes reader score => 1
+becomes reader score again => 1
+becomes reader published => true
+becomes reader published again => true
+becomes reader traced => "t1"
+  log: deserialize("t1"), cast("t1")
+becomes reader traced again => "t1"
+becomes reader fragile => nil
+  log: boom deserialize(nil)
+becomes reader fragile again => nil
+becomes reader virtual => "v"
+becomes reader virtual again => "v"
+becomes reader virtual_proc => "computed"
+  log: default proc
+becomes reader virtual_proc again => "computed"
+becomes reader virtual_nil => nil
+becomes reader virtual_nil again => nil
+becomes reader virtual_traced => "vt"
+  log: cast("vt")
+becomes reader virtual_traced again => "vt"
+becomes reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(17): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:746 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:134 <main>
+  log: boom cast("vf")
+becomes reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(15): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:746 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:134 <main>
+  log: boom cast("vf")
+becomes attributes !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:780 to_hash | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activesupport/lib/active_support/core_ext/enumerable.rb:331 to_h | activesupport/lib/active_support/core_ext/enumerable.rb:331 index_with | activemodel/lib/active_model/attribute_set.rb:780 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:127 built | probe.rb:134 <main>
+  log: boom deserialize(nil), boom cast("vf")
+becomes extra => "e"
+frozen build => :ok
+frozen reader id => 1
+frozen reader id again => 1
+frozen reader type => nil
+frozen reader type again => nil
+frozen reader title => "a"
+frozen reader title again => "a"
+frozen reader body => "x"
+frozen reader body again => "x"
+frozen reader score => 1
+frozen reader score again => 1
+frozen reader published => true
+frozen reader published again => true
+frozen reader traced => "t1"
+  log: deserialize("t1"), cast("t1")
+frozen reader traced again => "t1"
+frozen reader fragile => nil
+  log: boom deserialize(nil)
+frozen reader fragile again => nil
+frozen reader virtual => "v"
+frozen reader virtual again => "v"
+frozen reader virtual_proc => "computed"
+  log: default proc
+frozen reader virtual_proc again => "computed"
+frozen reader virtual_nil => nil
+frozen reader virtual_nil again => nil
+frozen reader virtual_traced => "vt"
+  log: cast("vt")
+frozen reader virtual_traced again => "vt"
+frozen reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:136 <main>
+  log: boom cast("vf")
+frozen reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:136 <main>
+  log: boom cast("vf")
+frozen attributes !! ArgumentError: boom vf
+  backtrace(12): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:127 built | probe.rb:136 <main>
+  log: boom cast("vf")
+dup build !! ArgumentError: boom vf
+  backtrace(20): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:520 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activemodel/lib/active_model/dirty.rb:298 init_attributes | activemodel/lib/active_model/dirty.rb:297 each | activemodel/lib/active_model/dirty.rb:297 init_attributes | activerecord/lib/active_record/core.rb:610 initialize_dup | activerecord/lib/active_record/inheritance.rb:404 initialize_dup | activemodel/lib/active_model/dirty.rb:286 initialize_dup | activerecord/lib/active_record/locking/optimistic.rb:107 initialize_dup | activerecord/lib/active_record/timestamp.rb:65 initialize_dup | activerecord/lib/active_record/associations.rb:75 initialize_dup | probe.rb:137 dup | probe.rb:137 <main> | probe.rb:126 built | probe.rb:82 show | probe.rb:126 built | probe.rb:137 <main>
+  log: deserialize("t1"), cast("t1"), boom deserialize(nil), default proc, cast("vt"), boom cast("vf")
+written build => :ok
+written reader id => 1
+written reader id again => 1
+written reader type => nil
+written reader type again => nil
+written reader title => "w"
+written reader title again => "w"
+written reader body => "x"
+written reader body again => "x"
+written reader score => 1
+written reader score again => 1
+written reader published => true
+written reader published again => true
+written reader traced => "t1"
+  log: deserialize("t1"), cast("t1")
+written reader traced again => "t1"
+written reader fragile => nil
+  log: boom deserialize(nil)
+written reader fragile again => nil
+written reader virtual => "vw"
+written reader virtual again => "vw"
+written reader virtual_proc => "computed"
+  log: default proc
+written reader virtual_proc again => "computed"
+written reader virtual_nil => nil
+written reader virtual_nil again => nil
+written reader virtual_traced => "vt"
+  log: cast("vt")
+written reader virtual_traced again => "vt"
+written reader virtual_fragile !! ArgumentError: boom vf
+  backtrace(16): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activemodel/lib/active_model/attribute_set.rb:570 cast_value | activemodel/lib/active_model/attribute_set.rb:412 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:97 public_send | probe.rb:97 every_read | probe.rb:82 show | probe.rb:95 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:138 <main>
+  log: boom cast("vf")
+written reader virtual_fragile again !! ArgumentError: boom vf
+  backtrace(14): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:60 value! | activemodel/lib/active_model/attribute_set.rb:410 fetch_value_at! | activerecord/lib/active_record/attribute_methods/read.rb:75 _read_attribute_at! | activemodel/lib/active_model/attribute_methods.rb:300 _read_attribute_12 | probe.rb:105 public_send | probe.rb:105 every_read | probe.rb:82 show | probe.rb:105 every_read | probe.rb:94 each | probe.rb:94 every_read | probe.rb:127 built | probe.rb:138 <main>
+  log: boom cast("vf")
+written attributes !! ArgumentError: boom vf
+  backtrace(12): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:107 every_read | probe.rb:82 show | probe.rb:107 every_read | probe.rb:127 built | probe.rb:138 <main>
+  log: boom cast("vf")
+lazy proc default calls after loads => 35
+lazy: one read => "a"
+lazy: changed => false
+lazy: second read => "t1"
+  log: deserialize("t1"), cast("t1")
+lazy: virtual_traced => "vt"
+  log: cast("vt")
+lazy: virtual_traced again => "vt"
+lazy: attributes !! ArgumentError: boom vf
+  backtrace(10): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:366 to_hash | activemodel/lib/active_model/attribute_set.rb:360 each_key | activemodel/lib/active_model/attribute_set.rb:360 to_hash | activerecord/lib/active_record/attribute_methods.rb:451 attributes | probe.rb:147 <main> | probe.rb:82 show | probe.rb:147 <main>
+  log: boom deserialize(nil), default proc, boom cast("vf")
+lazy: save !! ArgumentError: boom vf
+  backtrace(36): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:520 value_at | activemodel/lib/active_model/attribute_set.rb:378 fetch_value | activerecord/lib/active_record/transactions.rb:543 restore_transaction_record_state | activemodel/lib/active_model/attribute_set.rb:476 transform_attributes! | activemodel/lib/active_model/attribute_set.rb:473 each | activemodel/lib/active_model/attribute_set.rb:473 each_with_index | activemodel/lib/active_model/attribute_set.rb:473 transform_attributes! | activemodel/lib/active_model/attribute_set.rb:450 map | activerecord/lib/active_record/transactions.rb:530 restore_transaction_record_state | activerecord/lib/active_record/transactions.rb:449 rolledback! | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:286 rollback_records | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:368 run_action_on_records | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:285 rollback_records | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:663 rollback_transaction | activesupport/lib/active_support/concurrency/null_lock.rb:9 synchronize | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:656 rollback_transaction | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:674 within_new_transaction | activesupport/lib/active_support/concurrency/null_lock.rb:9 synchronize | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:669 within_new_transaction | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:552 within_new_transaction | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:542 transaction | activerecord/lib/active_record/transactions.rb:627 implicit_persistence_transaction | activerecord/lib/active_record/transactions.rb:466 with_transaction_returning_status | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:505 with_pool_transaction_isolation_level | activerecord/lib/active_record/transactions.rb:462 with_transaction_returning_status | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:477 with_connection | activerecord/lib/active_record/connection_handling.rb:361 with_connection | activerecord/lib/active_record/transactions.rb:461 with_transaction_returning_status | activerecord/lib/active_record/transactions.rb:417 save! | activerecord/lib/active_record/suppressor.rb:61 save! | probe.rb:148 <main> | probe.rb:82 show | probe.rb:148 <main>
+  log: cast("vt"), cast("vt"), cast("vt"), boom cast("vf"), boom cast("vf")
+lazy: save after fragile reset !! ArgumentError: boom vf
+  backtrace(41): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:68 original_value | activemodel/lib/active_model/attribute.rb:66 original_value | activemodel/lib/active_model/attribute.rb:187 changed_from_assignment? | activemodel/lib/active_model/attribute.rb:84 changed? | activemodel/lib/active_model/attribute_mutation_tracker.rb:79 attribute_changed? | activemodel/lib/active_model/attribute_mutation_tracker.rb:45 changed? | activemodel/lib/active_model/attribute_mutation_tracker.rb:41 any_changes? | activemodel/lib/active_model/attribute_mutation_tracker.rb:41 any? | activemodel/lib/active_model/attribute_mutation_tracker.rb:41 any_changes? | activerecord/lib/active_record/attribute_methods/dirty.rb:186 has_changes_to_save? | activerecord/lib/active_record/timestamp.rb:147 should_record_timestamps? | activerecord/lib/active_record/timestamp.rb:133 record_update_timestamps | activerecord/lib/active_record/timestamp.rb:122 _update_record | activerecord/lib/active_record/persistence.rb:998 create_or_update | activerecord/lib/active_record/callbacks.rb:478 create_or_update | activesupport/lib/active_support/callbacks.rb:982 _run_save_callbacks | activerecord/lib/active_record/callbacks.rb:478 create_or_update | activerecord/lib/active_record/timestamp.rb:129 create_or_update | activerecord/lib/active_record/persistence.rb:431 save! | activerecord/lib/active_record/validations.rb:65 save! | activerecord/lib/active_record/transactions.rb:417 save! | activerecord/lib/active_record/transactions.rb:470 with_transaction_returning_status | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:672 within_new_transaction | activesupport/lib/active_support/concurrency/null_lock.rb:9 synchronize | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:669 within_new_transaction | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:552 within_new_transaction | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:542 transaction | activerecord/lib/active_record/transactions.rb:627 implicit_persistence_transaction | activerecord/lib/active_record/transactions.rb:466 with_transaction_returning_status | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:505 with_pool_transaction_isolation_level | activerecord/lib/active_record/transactions.rb:462 with_transaction_returning_status | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:477 with_connection | activerecord/lib/active_record/connection_handling.rb:361 with_connection | activerecord/lib/active_record/transactions.rb:461 with_transaction_returning_status | activerecord/lib/active_record/transactions.rb:417 save! | activerecord/lib/active_record/suppressor.rb:61 save! | probe.rb:149 <main> | probe.rb:82 show | probe.rb:149 <main>
+  log: cast("vt"), boom cast("vf"), boom cast(nil)
+lazy: reload title => "a"
+dup: undupable unread => {"id" => nil, "type" => nil, "title" => "a", "body" => "x", "score" => 1, "published" => true, "traced" => "t1", "fragile" => nil, "undupable" => nil}
+dup: undupable cast => #<Undupable>
+dup: undupable dup !! TypeError: no dup
+  backtrace(25): probe.rb:153 initialize_copy | activemodel/lib/active_model/attribute.rb:182 initialize_dup | activemodel/lib/active_model/attribute.rb:182 dup | activemodel/lib/active_model/attribute.rb:182 initialize_dup | activesupport/lib/active_support/core_ext/object/deep_dup.rb:18 dup | activesupport/lib/active_support/core_ext/object/deep_dup.rb:18 deep_dup | activemodel/lib/active_model/attribute_set.rb:444 deep_dup | activemodel/lib/active_model/attribute_set.rb:476 transform_attributes! | activemodel/lib/active_model/attribute_set.rb:473 each | activemodel/lib/active_model/attribute_set.rb:473 each_with_index | activemodel/lib/active_model/attribute_set.rb:473 transform_attributes! | activemodel/lib/active_model/attribute_set.rb:450 map | activemodel/lib/active_model/attribute_set.rb:444 deep_dup | activerecord/lib/active_record/core.rb:623 init_attributes | activemodel/lib/active_model/dirty.rb:291 init_attributes | activerecord/lib/active_record/core.rb:610 initialize_dup | activerecord/lib/active_record/inheritance.rb:404 initialize_dup | activemodel/lib/active_model/dirty.rb:286 initialize_dup | activerecord/lib/active_record/locking/optimistic.rb:107 initialize_dup | activerecord/lib/active_record/timestamp.rb:65 initialize_dup | activerecord/lib/active_record/associations.rb:75 initialize_dup | probe.rb:168 dup | probe.rb:168 <main> | probe.rb:82 show | probe.rb:168 <main>
+dup: deep_dup identity => ["b", false, true, {"title" => [nil, "b"], "score" => [7, nil], "published" => [nil, false], "fragile" => [nil, "f"]}, true, nil]
+dup: frozen => {"id" => nil, "type" => nil, "title" => "a", "body" => "x", "score" => 1, "published" => true, "traced" => "t1", "fragile" => nil, "undupable" => nil}
+dup: partial => {"id" => nil, "type" => nil, "title" => "a", "body" => nil, "score" => nil, "published" => nil, "traced" => nil, "fragile" => nil, "undupable" => nil}
+am name => "w"
+am fragile !! ArgumentError: boom x
+  backtrace(9): probe.rb:32 cast | activemodel/lib/active_model/attribute.rb:224 type_cast | activemodel/lib/active_model/attribute.rb:53 value | activemodel/lib/active_model/attribute_set.rb:138 fetch_value | activemodel/lib/active_model/attributes.rb:180 attribute | activemodel/lib/active_model/attribute_methods.rb:341 fragile | probe.rb:184 <main> | probe.rb:82 show | probe.rb:184 <main>
+  log: boom cast("x")
+end

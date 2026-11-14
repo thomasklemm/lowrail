@@ -1,0 +1,2 @@
+{"case":"_empty","n":200,"objects":0.09,"gc":0,"gate":"pass","jit_delta":[0,0,0],"index_requests":3,"probe_sha":"df15674e5043a0f8","ir":0,"tree":"fixb","mode":"yjit"}
+{"case":"requests","n":200,"objects":372.46,"gc":0,"gate":"pass","jit_delta":[0,0,0],"index_requests":3,"probe_sha":"df15674e5043a0f8","ir":1040907,"tree":"fixb","mode":"yjit"}

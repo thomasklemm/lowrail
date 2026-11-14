@@ -278,8 +278,15 @@ about −7.3 M under YJIT (≈0.26%) and −3.3 M in the interpreter; Lobsters a
 mode. Its Rails PR would be ours. The root fix (Symbol block args in ZJIT, and in YJIT, which is in maintenance
 mode) belongs to #1014 and would not change the interpreter. No Rails PR was opened.
 
+**Built as VB1** (2026-11-14, [record](../../bench/upstream/vb1/README.md), queue item
+[VB1](../../bench/upstream/pr-queue/items/VB1.md), not opened): both `&:value!` lines plus `map(&:deep_dup)` in
+`LazyIndexedAttributeSet#deep_dup`, the third Symbol block on that class, which every record `dup` runs. At 30
+columns, 10 records each read once: interpreter −2.5%, YJIT −7.5%, ZJIT −20.6%; `dup` −1.9% / −5.7% / −12.3%;
+railsbench-like request mix under ZJIT −0.58%. The `value_at!` line is in the measured reads (`id`).
+
 ## Not done
 
 * The megamorphic-send growth on shipit and lead 4 (protected calls).
-* Pricing the Rails change on ruby-bench railsbench with Rails main (estimate above only).
+* Pricing the Rails change on ruby-bench railsbench with Rails main (estimate above only; VB1 measured a
+  railsbench-like request mix instead).
 * Tracing the ruby-bench lead 3 sites one by one against the repro mechanism.

@@ -1,0 +1,13 @@
+{"case":"_empty","width":100,"n":200,"objects":0.1,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":0,"tree":"fixb","mode":"yjit"}
+{"case":"load1","width":100,"n":200,"objects":103.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":401750,"tree":"fixb","mode":"yjit"}
+{"case":"load1_read_all","width":100,"n":200,"objects":152.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":557947,"tree":"fixb","mode":"yjit"}
+{"case":"load1_id","width":100,"n":200,"objects":103.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":402806,"tree":"fixb","mode":"yjit"}
+{"case":"rows10","width":100,"n":200,"objects":42.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":154352,"tree":"fixb","mode":"yjit"}
+{"case":"rows10_read_all","width":100,"n":200,"objects":532.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":1718592,"tree":"fixb","mode":"yjit"}
+{"case":"reader_warm","width":100,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":206,"tree":"fixb","mode":"yjit"}
+{"case":"read_all_warm","width":100,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":27879,"tree":"fixb","mode":"yjit"}
+{"case":"load1_attributes","width":100,"n":200,"objects":153.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":715354,"tree":"fixb","mode":"yjit"}
+{"case":"load1_serializable_hash","width":100,"n":200,"objects":260.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":1394225,"tree":"fixb","mode":"yjit"}
+{"case":"load1_dup","width":100,"n":200,"objects":464.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":1566049,"tree":"fixb","mode":"yjit"}
+{"case":"dup_warm","width":100,"n":200,"objects":257.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":671909,"tree":"fixb","mode":"yjit"}
+{"case":"new","width":100,"n":200,"objects":9.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":22916,"tree":"fixb","mode":"yjit"}

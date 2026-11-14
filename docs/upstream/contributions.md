@@ -253,6 +253,20 @@ Rückstands gegenüber 8.1 auf, nicht alles. Kein offener PR berührt die Stelle
 6.1-Format gedumpt hat, lassen sich auf main nicht laden oder speichern (eigener Vorschlag, nicht Teil von L3).
 Empfehlung: wie K1 als kleiner PR oder Hinweis an tenderlove, sobald Thomas ihn freigibt.
 
+### Erklärung für Thomas: VB1 (2026-11-14, ZJIT-Lead 7c; gebaut, nicht geöffnet)
+
+Belege und Messungen: [bench/upstream/vb1](../../bench/upstream/vb1/README.md); Queue-Eintrag
+[VB1](../../bench/upstream/pr-queue/items/VB1.md).
+
+**VB1, Symbol-Blöcke in `LazyIndexedAttributeSet`.** Seit #59141 übergibt der erste Lesezugriff auf jedes Attribut
+eines geladenen Records `&:value!` an `cast_value`, und jedes `dup` eines Records läuft `map(&:deep_dup)`. YJIT und
+ZJIT können einen Aufruf mit einem Symbol als Block-Argument nicht spezialisieren und machen daraus einen generischen
+Send. VB1 schreibt die drei Stellen als Block-Literale (`{ |attribute| attribute.value! }`), +3/−3, gleiche Methoden zur
+gleichen Zeit; eine Probe main gegen VB1 (SQLite und PostgreSQL) ist bis auf einen zusätzlichen Block-Frame in
+Backtraces aus dem Block gleich. Bei 30 Spalten, 10 Records je einmal gelesen: Interpreter −2,5 %, YJIT −7,5 %, ZJIT
+−20,6 %; `dup` −1,9 / −5,7 / −12,3 %; Request-Mix nach railsbench unter ZJIT −0,6 %. Passt konfliktfrei zu K1 und L3.
+Empfehlung: wie K1 als kleiner PR für tenderlove, sobald Thomas ihn freigibt.
+
 ### Erklärung für Thomas: K6 (2026-11-14, Census 9; gebaut, nicht geöffnet)
 
 Belege und Messungen: [bench/upstream/k6](../../bench/upstream/k6/README.md); Queue-Eintrag

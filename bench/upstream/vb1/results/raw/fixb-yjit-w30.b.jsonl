@@ -1,0 +1,8 @@
+{"case":"_empty","width":30,"n":200,"objects":0.1,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":0,"tree":"fixb","mode":"yjit"}
+{"case":"rows10_read_all","width":30,"n":200,"objects":182.47,"gc":0,"gate":"fail","jit_delta":[0,7,0],"ir":697154,"tree":"fixb","mode":"yjit"}
+{"case":"load1_read_all","width":30,"n":200,"objects":82.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":261315,"tree":"fixb","mode":"yjit"}
+{"case":"load1_serializable_hash","width":30,"n":200,"objects":120.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":505770,"tree":"fixb","mode":"yjit"}
+{"case":"dup_warm","width":30,"n":200,"objects":82.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":243344,"tree":"fixb","mode":"yjit"}
+{"case":"load1_dup","width":30,"n":200,"objects":182.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":579457,"tree":"fixb","mode":"yjit"}
+{"case":"load1","width":30,"n":200,"objects":68.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":200386,"tree":"fixb","mode":"yjit"}
+{"case":"load1_attributes","width":30,"n":200,"objects":83.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":309406,"tree":"fixb","mode":"yjit"}

@@ -1,0 +1,5 @@
+{"case":"_empty","width":30,"n":200,"objects":0.1,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":0,"tree":"main","mode":"yjit"}
+{"case":"rows10_read_all","width":30,"n":200,"objects":182.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":747920,"tree":"main","mode":"yjit"}
+{"case":"dup_warm","width":30,"n":200,"objects":82.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":256032,"tree":"main","mode":"yjit"}
+{"case":"load1_dup","width":30,"n":200,"objects":182.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":591731,"tree":"main","mode":"yjit"}
+{"case":"load1","width":30,"n":200,"objects":68.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":200973,"tree":"main","mode":"yjit"}

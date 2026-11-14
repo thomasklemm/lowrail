@@ -1,0 +1,8 @@
+{"case":"_empty","width":30,"n":200,"objects":0.1,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":0,"tree":"main","mode":"yjit"}
+{"case":"read_all_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":8661,"tree":"main","mode":"yjit"}
+{"case":"reader_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":254,"tree":"main","mode":"yjit"}
+{"case":"id_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":551,"tree":"main","mode":"yjit"}
+{"case":"type_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":254,"tree":"main","mode":"yjit"}
+{"case":"c2_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":208,"tree":"main","mode":"yjit"}
+{"case":"c28_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":208,"tree":"main","mode":"yjit"}
+{"case":"id10_warm","width":30,"n":200,"objects":0.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":5700,"tree":"main","mode":"yjit"}

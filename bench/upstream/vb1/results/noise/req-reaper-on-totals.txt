@@ -1,0 +1,5 @@
+# Window totals (Ir) of the 200-request window, reaper on, one process each: the noise that led to reaping_frequency=0.
+main 1 totals: 215269030
+fixb 1 totals: 208687179
+main 2 totals: 210121117
+fixb 2 totals: 211941388

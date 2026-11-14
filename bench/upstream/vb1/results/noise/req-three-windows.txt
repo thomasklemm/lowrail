@@ -1,0 +1,6 @@
+# Window totals (Ir) of three consecutive identical 200-request windows in one process, main, Ruby 4.0.9 interpreter.
+# inproc1/2: pool reaper thread on (the harness before the fix); inproc3/4: reaping_frequency=0.
+inproc1 totals: 210913461 totals: 208181626 totals: 210937442 
+inproc2 totals: 208032124 totals: 212137992 totals: 208411198 
+inproc3 totals: 207432875 totals: 208183713 totals: 208185765 
+inproc4 totals: 207609419 totals: 208359785 totals: 208360062 

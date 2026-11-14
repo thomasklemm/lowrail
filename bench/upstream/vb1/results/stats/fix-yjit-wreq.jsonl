@@ -1,0 +1,2 @@
+{"case":"_empty","n":200,"objects":0.19,"gc":0,"gate":"fail","jit_delta":[-2394,-32121,-499],"index_requests":3,"stats":{"send_iseq_block_arg_type":0.0,"num_send_dynamic":0.0,"yjit_insns_count":0.08,"side_exit_count":0.0},"probe_sha":"df15674e5043a0f8","tree":"fix","mode":"yjit"}
+{"case":"requests","n":200,"objects":372.51,"gc":0,"gate":"pass","jit_delta":[0,0,0],"index_requests":3,"stats":{"send_iseq_block_arg_type":4.99,"num_send_dynamic":97.99,"yjit_insns_count":34860.75,"side_exit_count":3.49},"probe_sha":"df15674e5043a0f8","tree":"fix","mode":"yjit"}

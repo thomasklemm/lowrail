@@ -1,0 +1,3 @@
+{"case":"_empty","width":6,"n":200,"objects":0.1,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":0,"tree":"main","mode":"zjit"}
+{"case":"new","width":6,"n":200,"objects":9.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":18507,"tree":"main","mode":"zjit"}
+{"case":"load1_attributes","width":6,"n":200,"objects":57.05,"gc":0,"gate":"pass","jit_delta":[0,0,0],"ir":148402,"tree":"main","mode":"zjit"}

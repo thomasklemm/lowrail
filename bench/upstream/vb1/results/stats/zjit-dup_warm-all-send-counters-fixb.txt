@@ -1,0 +1,17 @@
+"stats":{"send_fallback_send_not_optimized_need_permission":1.0
+"send_fallback_super_complex_args_pass":1.0
+"send_fallback_invokeblock_polymorphic_miss":30.0
+"dynamic_send_count":32.0
+"iseq_optimized_send_count":272.0
+"inline_cfunc_optimized_send_count":626.0
+"inline_iseq_optimized_send_count":288.0
+"non_variadic_cfunc_optimized_send_count":38.0
+"variadic_cfunc_optimized_send_count":75.0
+"block_iseq_direct_optimized_send_count":31.0
+"optimized_send_count":1330.0
+"send_count":1362.0
+"getivar_fallback_no_profile_missing_ic":152.0
+"getivar_fallback_no_side_exits":30.0
+"ccall_rb_vm_invokeblock":30.0
+"ccall_rb_vm_yield_with_cfunc":30.0
+"ccall_rb_vm_send":1.0}}

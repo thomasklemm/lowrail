@@ -1,0 +1,5 @@
+{"case":"_empty","width":30,"n":200,"objects":0.08,"gc":0,"gate":"n/a","jit_delta":[],"ir":0,"tree":"main","mode":"interp"}
+{"case":"rows10_read_all","width":30,"n":200,"objects":182.02,"gc":0,"gate":"n/a","jit_delta":[],"ir":1709934,"tree":"main","mode":"interp"}
+{"case":"dup_warm","width":30,"n":200,"objects":82.02,"gc":0,"gate":"n/a","jit_delta":[],"ir":465787,"tree":"main","mode":"interp"}
+{"case":"load1_dup","width":30,"n":200,"objects":182.02,"gc":0,"gate":"n/a","jit_delta":[],"ir":1115287,"tree":"main","mode":"interp"}
+{"case":"load1","width":30,"n":200,"objects":68.02,"gc":0,"gate":"n/a","jit_delta":[],"ir":401839,"tree":"main","mode":"interp"}
