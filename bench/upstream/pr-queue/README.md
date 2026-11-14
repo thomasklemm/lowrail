@@ -51,7 +51,10 @@ The body, verbatim, as it is posted.
 ```
 
 `reviewer` in a pass: `claude-code` (the separate final review orb), `skeptic` (the orb's skeptical reviewer
-subagent, kept as a record), `sol`, `astra`, `thermos`. `verdict`:
+subagent, kept as a record), `sol`, `astra`, `thermos`, and for now `opus` and `fable`, which stand in for Sol or
+Astra when their `orb` (the orb's thread ID) differs from the claude-code pass's `orb` on that head and from the other
+stand-in's ([DECISIONS](../../../docs/DECISIONS.md#opus-and-fable-stand-in-for-sol-and-astra-thomas-2026-11-14-temporary-pending-thomas)).
+`verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
 a superfluous comment means `changes`. Every factual claim in the body or a comment is backed by a command the
@@ -80,7 +83,7 @@ any state -> held | superseded
 * **built:** branch pushed, body drafted, no pass yet on this head.
 * **in-review:** passes are being run on this head.
 * **reviewed:** every required pass approves on the current `head` (latest pass per reviewer counts), no
-  must-fix. Required: claude-code and Sol always, Astra when `risky`, thermos when the diff against the base has
+  must-fix. Required: claude-code and Sol (or a stand-in) always, Astra (or a stand-in) when `risky`, thermos when the diff against the base has
   more than 200 changed lines. `open` refuses otherwise.
 * **draft**, **ready**, **merged**, **closed:** the PR's state on GitHub; `sync` keeps them current.
 * **held:** not to open now; `note` says why and what unblocks it. **superseded:** replaced by another item or PR.

@@ -23,7 +23,8 @@ module PrQueue
   AUTHOR = "thomasklemm"
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
   KINDS = %w[fix perf docs restore].freeze
-  REVIEWERS = %w[skeptic claude-code sol astra thermos].freeze
+  REVIEWERS = %w[skeptic claude-code sol astra thermos opus fable].freeze
+  STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
@@ -67,6 +68,7 @@ module PrQueue
       list << "pass reviewer #{pass['reviewer'].inspect}" unless REVIEWERS.include?(pass["reviewer"])
       list << "pass verdict #{pass['verdict'].inspect}" unless VERDICTS.include?(pass["verdict"])
       list << "pass head must be a quoted SHA or unrecorded" unless sha?(pass["head"]) || pass["head"] == "unrecorded"
+      list << "#{pass['reviewer']} pass needs orb" if %w[opus fable].include?(pass["reviewer"]) && pass["orb"].to_s.empty?
     end
     Array(m["waived"]).each do |waiver|
       list << "only thermos can be waived" unless waiver["reviewer"] == "thermos"
@@ -86,13 +88,24 @@ module PrQueue
   end
 
   # Reviewers whose latest pass on the current head is missing or doesn't approve, unless waived on that head.
-  # Passes are listed oldest first.
+  # Passes are listed oldest first. A stand-in fills one slot, from an orb other than the claude-code pass's and
+  # the other stand-ins'.
   def missing(meta, lines)
-    passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }
+    passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }.reverse
     waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
+    approves = ->(pass) { VERDICTS.first(2).include?(pass&.fetch("verdict", nil)) }
+    latest_per_orb = passes.uniq { [_1["reviewer"], _1["orb"]] }
+    claude_orb = passes.find { _1["reviewer"] == "claude-code" }&.[]("orb").to_s
+    used = ["", claude_orb]
     required(meta, lines).reject do |who|
       next true if waived.any? { _1["reviewer"] == who }
-      VERDICTS.first(2).include?(passes.reverse.find { _1["reviewer"] == who }&.fetch("verdict", nil))
+      next true if approves.(passes.find { _1["reviewer"] == who })
+      next false if claude_orb.empty?
+      stand_in = latest_per_orb.find do
+        STAND_INS.fetch(who, []).include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)
+      end
+      next false unless stand_in
+      used << stand_in["orb"].to_s
     end
   end
 

@@ -33,6 +33,27 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes), nil)
   end
 
+  def test_opus_or_fable_from_another_orb_stands_in_for_sol_and_astra
+    claude = pass("claude-code", "bbbbbbbbbb").merge("orb" => "T-a")
+    opus = ->(orb, verdict = "approve", head = "bbbbbbbbbb") { pass("opus", head, verdict).merge("orb" => orb) }
+    fable = pass("fable", "bbbbbbbbbb").merge("orb" => "T-c")
+
+    assert_empty PrQueue.missing(item([claude, opus.("T-b")]), 40)
+    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-a")]), 40)
+    assert_equal %w[sol], PrQueue.missing(item([claude, opus.(nil)]), 40)
+    assert_equal %w[sol], PrQueue.missing(item([claude.except("orb"), opus.("T-b")]), 40)
+    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-b", "approve", "aaaaaaaaaa")]), 40)
+    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-b"), opus.("T-b", "changes")]), 40)
+    assert_empty PrQueue.missing(item([claude, opus.("T-b", "changes"), opus.("T-b", "nits")]), 40)
+    assert_equal %w[thermos], PrQueue.missing(item([claude, opus.("T-b"), fable]), 201)
+
+    assert_equal %w[astra], PrQueue.missing(item([claude, opus.("T-b")], risky: true), 40)
+    assert_equal %w[astra], PrQueue.missing(item([claude, opus.("T-b"), fable.merge("orb" => "T-b")], risky: true), 40)
+    assert_empty PrQueue.missing(item([claude, opus.("T-b"), fable], risky: true), 40)
+    assert_empty PrQueue.missing(item([claude, pass("sol", "bbbbbbbbbb"), fable.merge("orb" => "T-b")], risky: true), 40)
+    assert_empty PrQueue.missing(item([claude.except("orb"), pass("sol", "bbbbbbbbbb"), pass("astra", "bbbbbbbbbb")], risky: true), 40)
+  end
+
   def test_a_thermos_waiver_counts_only_on_the_current_head_with_a_reason
     passes = [pass("claude-code", "bbbbbbbbbb"), pass("sol", "bbbbbbbbbb")]
     waiver = { "reviewer" => "thermos", "head" => "bbbbbbb", "by" => "coordinator", "reason" => "own commit is small" }

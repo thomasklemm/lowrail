@@ -232,6 +232,14 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 
 New work orbs run as Claude Code (`external-agent:claude-code`). Orbs that are already running may finish, but before anything goes upstream (PR, push to an open PR, body edit or reply), a separate Claude Code orb does a thorough final review. That review covers the exact head, the commit messages and the text. Its pass is recorded as `reviewer: claude-code`. Sol/Astra stay as additional gates. Commits are few and clean, and the reasoning goes in their messages.
 
+### Opus and Fable stand in for Sol and Astra (Thomas, 2026-11-14; temporary, pending Thomas)
+
+Until Thomas says otherwise, reviews run on Claude Opus 5.5 in independent Claude Code orbs instead of Sol, because
+Opus has more rate limit free; specific risky items get Claude Fable 5.2. A pass recorded as `reviewer: opus` or
+`reviewer: fable` fills the slot Sol fills, and Astra's on a `risky` item. It counts only with its orb's thread ID in
+`orb`, which must differ from the `orb` of the claude-code pass on the same head and from any other stand-in counted
+with it, so every slot keeps its own reviewer. Sol and Astra passes count as before.
+
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
 Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
