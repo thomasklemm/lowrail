@@ -575,6 +575,14 @@ one click.
 * **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
   unreleased.
 
+## Realistic sizes upstream (Thomas, 2026-11-14)
+
+Bodies and comments cite only sizes an app plausibly has: a few to about 20 params, tens to about 100 columns,
+values of ordinary size. The size sweep that DECISIONS asks for (up to ≥ 1 MB, thousands of entries, 300 columns)
+proves no blow-up and stays in the record; the body may say in one clause that larger inputs were checked, but it
+puts no unrealistic row in a table and claims no number for one. Example: rails/rails#59804 first showed 2,000
+params and a 1 MB value; both rows were cut the same day.
+
 ## Nothing internal upstream (Thomas, 2026-11-14)
 
 What we post upstream (PR bodies, comments, issues, review replies) contains only what helps the people there decide
