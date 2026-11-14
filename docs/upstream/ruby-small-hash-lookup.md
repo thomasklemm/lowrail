@@ -1,33 +1,15 @@
 # F1: small-Hash lookups on Ruby master, the fix (2026-11-14)
 
-Finding 1 of [Ruby master round 2](ruby-master-round-2.md#1-small-hash-lookups-and-inserts-cost-more): a lookup in a
-small Hash (`h[:b]` on three Symbol keys) runs 333 instructions on master against 287 on 4.0.9, bisected to
-ruby/ruby#18222 (byroot, SWAR `ar_find_entry_hint`) and ruby/ruby#18476 (Peter Zhu, AR-table identity hashes).
-Thomas allowed this one as a ruby/ruby PR (DECISIONS, exception of 2026-11-14), after the "Thomas can explain it
-first" step. **Nothing is opened.** Queue item [F1](../../bench/upstream/pr-queue/items/F1.md).
+A lookup in a small Hash (`h[:b]` on three Symbol keys) runs 333 instructions on master against 287 on 4.0.9,
+bisected to ruby/ruby#18222 (byroot, SWAR `ar_find_entry_hint`) and ruby/ruby#18476 (Peter Zhu, AR-table identity
+hashes).
 
 **Short answer.** One function split in `hash.c` recovers almost all of it and keeps both PRs' gains: `h[:b]` 333 →
 294 instructions (4.0.9: 287), 1.29× the lookups per second on #18222's own benchmark at every hit position, Symbol
 literals of 1–8 pairs 4–9% fewer instructions, railsbench −0.39% and lobsters −0.22% instructions per iteration
-(interpreter). Tables of 9 keys and more are unchanged. The one slower case is a hint match on a different but
-equal key (a String built at runtime): +13 instructions (+2.4%).
-
-## Für Thomas (zum Nacherzählen)
-
-Ein kleiner Hash (bis 8 Schlüssel) findet einen Schlüssel über ein Hinweis-Byte und prüft dann, ob der Schlüssel an
-dieser Stelle wirklich gleich ist. Auf master macht diese Prüfung seit #18222 und #18476 drei Funktionsaufrufe, obwohl
-bei Symbolen dort fast immer genau dasselbe Objekt liegt; deshalb kostet `h[:b]` 333 statt 287 Instruktionen. Die
-Änderung schaut zuerst nur, ob an der gefundenen Stelle exakt dasselbe Objekt liegt, und gibt die Stelle dann sofort
-zurück, sonst läuft der bisherige Code. Das ist sicher, weil ein Objekt immer gleich sich selbst ist (normale Hashes
-prüfen `a == b` als Erstes, `compare_by_identity` prüft nur das) und dabei kein Ruby-Code läuft, der den Hash ändern
-könnte.
-
-```ruby
-h = {a: 1, b: 2, c: 3}
-h[:b]                 # :b ist dasselbe Objekt wie der gespeicherte Schlüssel: neuer kurzer Weg, 333 → 294
-s = {"b" => 1}
-s[+"b"]               # gleicher Inhalt, anderes Objekt: alter Weg wie bisher (+13 Instruktionen)
-```
+(interpreter). Tables of 9 keys and more are unchanged. Slower: every lookup whose first hint match holds a
+different object, +11 to +21 instructions, e.g. an equal String built at runtime +13 (+2.4%); worst in percent is a
+miss behind a hint collision, +3.4% to +4.6% depending on the loop (see "Where it loses"). Wall time on those is within noise.
 
 ## What is wrong
 
@@ -129,7 +111,54 @@ the whole search inlined into `rb_hash_aref`, including the hash function).
 
 **#18476's own claim** (an identity Hash as an AR table instead of an st_table): `ObjectSpace.memsize_of({}.compare_by_identity)`
 is 256 on 4.0.9 and 64 on master and on the branch (the 160 in #18476's description predates later right-sizing);
-`ObjectSpace.dump` shows a 64-byte slot on both. Identity lookups get 10% cheaper with the branch.
+`ObjectSpace.dump` shows a 64-byte slot on both. Identity lookups get cheaper with the branch: Symbol keys 308 → 277
+(−10%), an `Object.new` key in a 2-key identity Hash 298 → 268 (top-level loop as in `repro_ir.sh`). One review
+measured an identity Hash with heap-object keys as unchanged (322 → 322) in its own loop; not reproduced here.
+
+**Under YJIT and ZJIT** the same micros (same script, `--yjit` / `--zjit`, every case warmed before any window, JIT-flat
+gate between the empty and the measured window: passed in all 74 cases on all four runs;
+[`results/ir-yjit.txt`](../../bench/upstream/f1/results/ir-yjit.txt),
+[`results/ir-zjit.txt`](../../bench/upstream/f1/results/ir-zjit.txt)). Both JITs call the same `rb_hash_aref` and
+`rb_hash_bulk_insert`, so the saving is the same in absolute terms and larger in percent:
+
+| case | master YJIT | branch YJIT | master ZJIT | branch ZJIT |
+| --- | ---: | ---: | ---: | ---: |
+| loop alone | 28 | 28 | 24 | 24 |
+| `h[:b]`, 3 keys | 188 | 149 (−20.7%) | 185 | 146 (−21.1%) |
+| `hash_ar_aref` any hit / miss | 187 / 180 | 148 / 167 | 185 / 178 | 146 / 165 |
+| String key, equal but another object | 404 | 417 (+3.2%) | 401 | 414 (+3.2%) |
+| identity Hash, hit | 163 | 132 | 169 | 138 |
+| literal, 1 / 3 / 8 pairs | 481 / 979 / 2,234 | 453 / 895 / 2,011 | 414 / 901 / 2,156 | 386 / 817 / 1,933 |
+
+Every st_table row (9 to 1,000 keys, lookups, literals, `[]=`) is identical under YJIT; under ZJIT all are identical
+except the 9-pair literal (2,718 → 2,654, −2.3%), which takes the unchanged st_table path; not investigated.
+
+## Where it loses
+
+Every lookup whose first hint match holds a different object runs `ar_equal` as before, after the inline check,
+and pays +11 to +21 instructions (master → branch, Ir per iteration, measured in the two reviews, consistent with
+the String rows above). First review, top-level loop: a Symbol miss behind a hint collision 385 → 398 (+3.4%, the worst in
+percent), the same Symbol behind a colliding slot 376 → 387 (+2.9%), an equal String 536 → 549 (+2.4%; a chilled
+`h["b"]` literal 928 → 942), a String collision miss 565 → 578, an equal Bignum 1,034 → 1,047, an equal Float
+862 → 875, a user-defined `eql?` 3,816 → 3,833 (+0.4%), `key?`/`fetch` with an equal String +3/+8. Hint collisions
+Second review, its own loop: a miss whose hint matches one other key 372 → 389 (+17, +4.6%, the worst), a hit on
+the second key sharing a hint +11 (Symbol 384 → 395, String 523 → 534), a miss past 3 colliding keys +11, `aset`
+with an equal String +13, a Struct key with a user `eql?` +21 (+0.5%). Hint collisions between two keys happen about
+once in 255 pairs (1–3% of misses at 3–8 keys); Symbols and same-object keys, the common case, take the fast path.
+
+## The PR body's loops as written
+
+The body's table uses the loops it shows, run at top level as written: whole process under Callgrind, (Ir at
+N = 2,000,000 − Ir at N = 0) / N, fixed salt, fixed heap ([`repro_ir.sh`](../../bench/upstream/f1/repro_ir.sh)).
+They come out 13 below the `x = expr`-in-a-method form above; the differences are the same.
+
+| loop | 4.0.9 | master | branch |
+| --- | ---: | ---: | ---: |
+| `h = {a: 1, b: 2, c: 3}`, `h[:b]` | 274 | 320 | 281 |
+| 8 Symbol keys, hit at the first / last key | 266 / 352 | 320 / 320 | 281 / 281 |
+| 8 Symbol keys, miss | 333 | 313 | 300 |
+| 3 String keys, `h[k]` with `k = +"b"` | 502 | 539 | 552 |
+| loop alone | 126 | 128 | 128 |
 
 ## Wall time
 
@@ -181,14 +210,17 @@ builds). Runs a and b are two runs of the same build (A/A).
 | --- | ---: | ---: | ---: | ---: | --- |
 | railsbench, interpreter | 7,404.5 / 7,402.8 | 7,376.6 / 7,373.2 | **−28.8 (−0.39%)**, A/A ≤ 0.05% | 686.6 → 658.9 | n/a |
 | railsbench, YJIT | 4,742.6 / 4,735.7 | 4,716.2 / 4,705.4 | **−28.3 (−0.60%)**, A/A ≤ 0.23% | 680.5 → 651.6 | pass (all four) |
-| railsbench, ZJIT | 4,902.9 | 4,877.3 | −25.6 (−0.52%), single runs | 678.7 → 649.3 | pass |
+| railsbench, ZJIT | 4,902.9 / 4,902.2 | 4,877.3 / 4,874.7 | **−26.6 (−0.54%)**, A/A ≤ 0.05% | 679.1 → 650.2 | pass (all four) |
 | lobsters, interpreter | 3,619.0 / 3,619.0 | 3,611.1 / 3,610.9 | **−8.0 (−0.22%)**, A/A ≤ 0.004% | 235.8 → 225.8 | n/a |
 | lobsters, ZJIT | 2,496.7 | 2,488.3 | −8.4 (−0.34%), single runs | 232.8 → 223.2 | pass |
 | lobsters, YJIT | 2,334.0 | 2,325.5 | rejected | | **fail** (both) |
 
 The lobsters YJIT pair failed the gate (YJIT compiled blocks in the measured window, as in round 2) and is rejected,
-not rerun; its numbers are diagnostic only. The ZJIT railsbench A/A pair (run b) was queued; see the commit history
-of this page for whether it completed. The branch takes back about 28 M of round 2's +50.5 M Ir per railsbench
+not rerun; its numbers are diagnostic only. Per-run numbers:
+[`results/ruby-bench-callgrind.json`](../../bench/upstream/f1/results/ruby-bench-callgrind.json), the
+[`cg_report.rb` output](../../bench/upstream/f1/results/ruby-bench-cg-report.txt) and each run's ruby-bench metadata
+([`results/ruby-bench-runs/`](../../bench/upstream/f1/results/ruby-bench-runs/)); the Callgrind dumps (200 MB) are
+not committed. The branch takes back about 28 M of round 2's +50.5 M Ir per railsbench
 iteration in Hash functions; the rest is in literal building and allocation (above), which this change does not
 target.
 
@@ -205,8 +237,14 @@ target.
 * Warnings: with Ruby's own flags (`-Wall -Wextra` and the rest of configure's list), GCC 14.2 and Clang 19.1 build
   `hash.c` without a warning on master and on the branch. With extra `-Wall -Wextra` on Clang, both give the same one
   warning (`-Wtautological-pointer-compare`, `if (RHASH_AR_TABLE(hash) != NULL)`, unchanged code) and none in the
-  changed code. GCC and Clang both keep `ar_find_entry_hint_slow` out of line and inline the
-  fast part.
+  changed code. GCC and Clang both keep `ar_find_entry_hint_slow` out of line. GCC 14 inlines
+  `ar_find_entry_hint` into `ar_lookup`, `rb_hash_has_key`, `rb_hash_slice`, `rb_hash_stlike_delete`,
+  `rb_hash_except`, `env_except` and `ar_insert_direct`, and keeps it out of line for `rb_hash_aref`, `rb_hash_aset`,
+  `rb_hash_fetch`, `rb_hash_dig`, `rb_hash_lookup`/`lookup2`, `hash_foreach_call` and others, now as a leaf without
+  register saves that tail-jumps to `_slow`; hash.o text grows 79,994 → 80,226 bytes here (a review build measured
+  +632). The `inline` keyword matters for the inlined callers: without it `h[:b]` is the same, but in review
+  `fetch` cost +10, `key?` +14 and the 3- / 8-pair literals +44 / +120. `NOINLINE` on `_slow` changes nothing with GCC 14 `-O3` (hash.o byte-identical without it, per review);
+  it keeps other compilers from inlining the loop, and its register saves, back into the hit path, as on `ar_equal`.
 * Differential probe ([`diff_probe.rb`](../../bench/upstream/f1/diff_probe.rb), 127 lines of results: self-unequal
   `eql?`, NaN, `eql?` call counts, an `eql?` that converts the table to an st_table mid-lookup, String keys,
   identity hashes, delete/reinsert, a Hash subclass, default procs, duplicate literal keys, sizes 1–10, 100 random
@@ -233,3 +271,28 @@ target.
   40 with; 3 measured iterations; GC included. Each run pinned to one core.
 * Wall time: benchmark-driver 0.17 on one pinned core, best of 10 per executable, with the fixed-seed shim;
   hyperfine 1.19.0.
+
+## Internal
+
+Finding 1 of [Ruby master round 2](ruby-master-round-2.md#1-small-hash-lookups-and-inserts-cost-more). Thomas
+allowed this one as a ruby/ruby PR (DECISIONS, exception of 2026-11-14), after the "Thomas can explain it first"
+step. **Nothing is opened.** Queue item [F1](../../bench/upstream/pr-queue/items/F1.md). A review noticed, outside
+this change and not investigated: a heap Float key (`h[1e300*1]`, 2 keys) costs 376 Ir on 4.0.9, 820 on master and
+833 on the branch.
+
+### Für Thomas (zum Nacherzählen)
+
+Ein kleiner Hash (bis 8 Schlüssel) findet einen Schlüssel über ein Hinweis-Byte und prüft dann, ob der Schlüssel an
+dieser Stelle wirklich gleich ist. Auf master macht diese Prüfung seit #18222 und #18476 drei Funktionsaufrufe, obwohl
+bei Symbolen dort fast immer genau dasselbe Objekt liegt; deshalb kostet `h[:b]` 333 statt 287 Instruktionen. Die
+Änderung schaut zuerst nur, ob an der gefundenen Stelle exakt dasselbe Objekt liegt, und gibt die Stelle dann sofort
+zurück, sonst läuft der bisherige Code. Das ist sicher, weil ein Objekt immer gleich sich selbst ist (normale Hashes
+prüfen `a == b` als Erstes, `compare_by_identity` prüft nur das) und dabei kein Ruby-Code läuft, der den Hash ändern
+könnte.
+
+```ruby
+h = {a: 1, b: 2, c: 3}
+h[:b]                 # :b ist dasselbe Objekt wie der gespeicherte Schlüssel: neuer kurzer Weg, 333 → 294
+s = {"b" => 1}
+s[+"b"]               # gleicher Inhalt, anderes Objekt: alter Weg wie bisher (+13 Instruktionen, +2,4 %)
+```

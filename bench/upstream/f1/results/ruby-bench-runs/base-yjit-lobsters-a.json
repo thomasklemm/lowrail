@@ -1,0 +1,130 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-14T18:00:28Z HEAD 88ea6fd282) +YJIT +PRISM [x86_64-linux]",
+  "jit": "yjit",
+  "itrs": 3,
+  "gc_segments": 137,
+  "gc": {
+    "count": 0.6666666666666666,
+    "minor_gc_count": 0.6666666666666666,
+    "major_gc_count": 0.0,
+    "total_allocated_objects": 649097.6666666666,
+    "total_freed_objects": 368111.3333333333
+  },
+  "jit_flat": {
+    "gate": "fail",
+    "warm_windows": [
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85763,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85764,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85765,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85794,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85808,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4843,
+        "compiled_block_count": 85825,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4871,
+        "compiled_block_count": 86076,
+        "invalidation_count": 809
+      },
+      {
+        "compiled_iseq_count": 4871,
+        "compiled_block_count": 86076,
+        "invalidation_count": 809
+      }
+    ],
+    "measured_before": {
+      "compiled_iseq_count": 4871,
+      "compiled_block_count": 86076,
+      "invalidation_count": 809
+    },
+    "measured_after": {
+      "compiled_iseq_count": 4871,
+      "compiled_block_count": 86076,
+      "invalidation_count": 809
+    }
+  },
+  "heap_before": {
+    "0": {
+      "slot_size": 32,
+      "heap_eden_pages": 98,
+      "heap_eden_slots": 200606
+    },
+    "1": {
+      "slot_size": 40,
+      "heap_eden_pages": 385,
+      "heap_eden_slots": 630403
+    },
+    "2": {
+      "slot_size": 64,
+      "heap_eden_pages": 248,
+      "heap_eden_slots": 253704
+    },
+    "3": {
+      "slot_size": 80,
+      "heap_eden_pages": 105,
+      "heap_eden_slots": 85911
+    },
+    "4": {
+      "slot_size": 96,
+      "heap_eden_pages": 74,
+      "heap_eden_slots": 50443
+    },
+    "5": {
+      "slot_size": 128,
+      "heap_eden_pages": 59,
+      "heap_eden_slots": 30149
+    },
+    "6": {
+      "slot_size": 160,
+      "heap_eden_pages": 133,
+      "heap_eden_slots": 54341
+    },
+    "7": {
+      "slot_size": 256,
+      "heap_eden_pages": 53,
+      "heap_eden_slots": 13515
+    },
+    "8": {
+      "slot_size": 512,
+      "heap_eden_pages": 93,
+      "heap_eden_slots": 11811
+    },
+    "9": {
+      "slot_size": 640,
+      "heap_eden_pages": 32,
+      "heap_eden_slots": 3251
+    },
+    "10": {
+      "slot_size": 768,
+      "heap_eden_pages": 3,
+      "heap_eden_slots": 253
+    },
+    "11": {
+      "slot_size": 1024,
+      "heap_eden_pages": 4,
+      "heap_eden_slots": 252
+    }
+  }
+}

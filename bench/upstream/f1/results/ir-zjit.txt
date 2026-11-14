@@ -1,0 +1,75 @@
+case                         master-zjit branch-zjit branch-zjit %
+empty                             24.0      24.0      +0.0%
+aref sym n=1 first               191.0     152.0     -20.4%
+aref sym n=1 last                191.0     152.0     -20.4%
+aref sym n=1 miss                185.0     172.0      -7.0%
+aref sym n=2 first               191.0     152.0     -20.4%
+aref sym n=2 last                191.0     152.0     -20.4%
+aref sym n=2 miss                185.0     172.0      -7.0%
+aref sym n=3 first               191.0     152.0     -20.4%
+aref sym n=3 last                191.0     152.0     -20.4%
+aref sym n=3 miss                185.0     172.0      -7.0%
+aref sym n=4 first               191.0     152.0     -20.4%
+aref sym n=4 last                191.0     152.0     -20.4%
+aref sym n=4 miss                185.0     172.0      -7.0%
+aref sym n=5 first               191.0     152.0     -20.4%
+aref sym n=5 last                191.0     152.0     -20.4%
+aref sym n=5 miss                185.0     172.0      -7.0%
+aref sym n=6 first               191.0     152.0     -20.4%
+aref sym n=6 last                191.0     152.0     -20.4%
+aref sym n=6 miss                185.0     172.0      -7.0%
+aref sym n=7 first               191.0     152.0     -20.4%
+aref sym n=7 last                191.0     152.0     -20.4%
+aref sym n=7 miss                185.0     172.0      -7.0%
+aref sym n=8 first               191.0     152.0     -20.4%
+aref sym n=8 last                191.0     152.0     -20.4%
+aref sym n=8 miss                185.0     172.0      -7.0%
+aref sym n=3 :b                  185.0     146.0     -21.1%
+aref sym n=9 hit                 185.0     185.0      +0.0%
+aref sym n=9 miss                226.0     226.0      +0.0%
+aref sym n=16 hit                200.0     200.0      +0.0%
+aref sym n=16 miss               214.0     214.0      +0.0%
+aref sym n=64 hit                201.0     201.0      +0.0%
+aref sym n=64 miss               214.0     214.0      +0.0%
+aref sym n=1000 hit              204.1     204.1      -0.0%
+aref sym n=1000 miss             325.1     325.1      +0.0%
+aref str n=3 same                208.0     169.0     -18.7%
+aref str n=3 equal               401.0     414.0      +3.2%
+aref str n=3 miss                301.0     288.0      -4.3%
+aref int n=3                     185.0     146.0     -21.1%
+aref sym n=3 fetch               272.0     223.0     -18.0%
+aref sym n=3 key?                199.0     146.0     -26.6%
+aref sym n=0 miss                 92.0      92.0      +0.0%
+ar_aref hit_first                185.0     146.0     -21.1%
+ar_aref hit_third                185.0     146.0     -21.1%
+ar_aref hit_fourth               185.0     146.0     -21.1%
+ar_aref hit_last                 185.0     146.0     -21.1%
+ar_aref miss                     178.0     165.0      -7.3%
+ar_aref miss_empty                92.0      92.0      +0.0%
+ident sym n=1 last               169.0     138.0     -18.3%
+ident sym n=1 miss               168.0     155.0      -7.7%
+ident sym n=3 last               169.0     138.0     -18.3%
+ident sym n=3 miss               168.0     155.0      -7.7%
+ident sym n=8 last               169.0     138.0     -18.3%
+ident sym n=8 miss               168.0     155.0      -7.7%
+ident obj n=3 hit                159.8     159.8      -0.0%
+ident str n=3 hit                157.0     157.0      +0.0%
+ident new n=3                   2114.5    2088.3      -1.2%
+literal n=1                      414.1     386.1      -6.8%
+literal n=2                      648.8     592.8      -8.6%
+literal n=3                      901.2     817.2      -9.3%
+literal n=4                     1152.2    1040.2      -9.7%
+literal n=5                     1417.1    1277.1      -9.9%
+literal n=6                     1652.1    1484.1     -10.2%
+literal n=7                     1920.2    1783.9      -7.1%
+literal n=8                     2156.2    1932.6     -10.4%
+literal n=9                     2717.5    2653.9      -2.3%
+literal n=16                    3851.3    3851.2      -0.0%
+literal str n=3                 1094.2    1010.2      -7.7%
+aset new n=2                     696.7     683.7      -1.9%
+aset new n=3                    1793.2    1767.1      -1.5%
+aset existing n=3                295.0     256.0     -13.2%
+aset existing n=1000             285.9     285.9      -0.0%
+merge n=3                       1440.9    1314.9      -8.7%
+dup n=3 literal                 1316.6    1316.6      -0.0%
+kwargs n=3                       666.0     666.0      +0.0%

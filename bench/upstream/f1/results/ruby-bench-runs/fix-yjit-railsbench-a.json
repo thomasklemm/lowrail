@@ -1,0 +1,100 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-14T18:00:28Z thomasklemm/ar-small-lookup 88ea6fd282) +YJIT +PRISM [x86_64-linux]",
+  "jit": "yjit",
+  "itrs": 3,
+  "gc_segments": 100,
+  "gc": {
+    "count": 1.0,
+    "minor_gc_count": 1.0,
+    "major_gc_count": 0.0,
+    "total_allocated_objects": 1750511.3333333333,
+    "total_freed_objects": 1498905.0
+  },
+  "jit_flat": {
+    "gate": "pass",
+    "warm_windows": [
+      {
+        "compiled_iseq_count": 2713,
+        "compiled_block_count": 39514,
+        "invalidation_count": 721
+      },
+      {
+        "compiled_iseq_count": 2713,
+        "compiled_block_count": 39514,
+        "invalidation_count": 721
+      }
+    ],
+    "measured_before": {
+      "compiled_iseq_count": 2713,
+      "compiled_block_count": 39514,
+      "invalidation_count": 721
+    },
+    "measured_after": {
+      "compiled_iseq_count": 2713,
+      "compiled_block_count": 39514,
+      "invalidation_count": 721
+    }
+  },
+  "heap_before": {
+    "0": {
+      "slot_size": 32,
+      "heap_eden_pages": 30,
+      "heap_eden_slots": 61410
+    },
+    "1": {
+      "slot_size": 40,
+      "heap_eden_pages": 168,
+      "heap_eden_slots": 275092
+    },
+    "2": {
+      "slot_size": 64,
+      "heap_eden_pages": 72,
+      "heap_eden_slots": 73656
+    },
+    "3": {
+      "slot_size": 80,
+      "heap_eden_pages": 20,
+      "heap_eden_slots": 16368
+    },
+    "4": {
+      "slot_size": 96,
+      "heap_eden_pages": 9,
+      "heap_eden_slots": 6133
+    },
+    "5": {
+      "slot_size": 128,
+      "heap_eden_pages": 15,
+      "heap_eden_slots": 7665
+    },
+    "6": {
+      "slot_size": 160,
+      "heap_eden_pages": 53,
+      "heap_eden_slots": 21660
+    },
+    "7": {
+      "slot_size": 256,
+      "heap_eden_pages": 6,
+      "heap_eden_slots": 1530
+    },
+    "8": {
+      "slot_size": 512,
+      "heap_eden_pages": 17,
+      "heap_eden_slots": 2159
+    },
+    "9": {
+      "slot_size": 640,
+      "heap_eden_pages": 3,
+      "heap_eden_slots": 305
+    },
+    "10": {
+      "slot_size": 768,
+      "heap_eden_pages": 2,
+      "heap_eden_slots": 168
+    },
+    "11": {
+      "slot_size": 1024,
+      "heap_eden_pages": 2,
+      "heap_eden_slots": 126
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-14T18:00:28Z HEAD 88ea6fd282) +PRISM [x86_64-linux]",
+  "jit": "interp",
+  "itrs": 3,
+  "gc_segments": 134,
+  "gc": {
+    "count": 0.6666666666666666,
+    "minor_gc_count": 0.6666666666666666,
+    "major_gc_count": 0.0,
+    "total_allocated_objects": 643290.3333333334,
+    "total_freed_objects": 365270.6666666667
+  },
+  "jit_flat": {
+    "gate": "n/a",
+    "warm_windows": [],
+    "measured_before": null,
+    "measured_after": null
+  },
+  "heap_before": {
+    "0": {
+      "slot_size": 32,
+      "heap_eden_pages": 97,
+      "heap_eden_slots": 198559
+    },
+    "1": {
+      "slot_size": 40,
+      "heap_eden_pages": 391,
+      "heap_eden_slots": 640235
+    },
+    "2": {
+      "slot_size": 64,
+      "heap_eden_pages": 230,
+      "heap_eden_slots": 235290
+    },
+    "3": {
+      "slot_size": 80,
+      "heap_eden_pages": 105,
+      "heap_eden_slots": 85911
+    },
+    "4": {
+      "slot_size": 96,
+      "heap_eden_pages": 60,
+      "heap_eden_slots": 40899
+    },
+    "5": {
+      "slot_size": 128,
+      "heap_eden_pages": 56,
+      "heap_eden_slots": 28616
+    },
+    "6": {
+      "slot_size": 160,
+      "heap_eden_pages": 115,
+      "heap_eden_slots": 46986
+    },
+    "7": {
+      "slot_size": 256,
+      "heap_eden_pages": 54,
+      "heap_eden_slots": 13770
+    },
+    "8": {
+      "slot_size": 512,
+      "heap_eden_pages": 97,
+      "heap_eden_slots": 12319
+    },
+    "9": {
+      "slot_size": 640,
+      "heap_eden_pages": 35,
+      "heap_eden_slots": 3550
+    },
+    "10": {
+      "slot_size": 768,
+      "heap_eden_pages": 3,
+      "heap_eden_slots": 252
+    },
+    "11": {
+      "slot_size": 1024,
+      "heap_eden_pages": 4,
+      "heap_eden_slots": 252
+    }
+  }
+}

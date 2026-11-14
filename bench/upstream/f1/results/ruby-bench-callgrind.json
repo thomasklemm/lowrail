@@ -1,0 +1,162 @@
+[
+  {
+    "run": "base-interp/lobsters-a",
+    "m_ir": 3619.0427443333333,
+    "hash_m_ir": 235.830263,
+    "gcs": 0.6666666666666666,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "base-interp/lobsters-b",
+    "m_ir": 3618.9989283333334,
+    "hash_m_ir": 235.77107533333336,
+    "gcs": 0.6666666666666666,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "base-interp/railsbench-a",
+    "m_ir": 7404.483629,
+    "hash_m_ir": 687.7051066666667,
+    "gcs": 1.0,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "base-interp/railsbench-b",
+    "m_ir": 7402.836527333333,
+    "hash_m_ir": 685.5577183333334,
+    "gcs": 1.0,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "base-yjit/lobsters-a",
+    "m_ir": 2334.0135343333336,
+    "hash_m_ir": 234.73525333333333,
+    "gcs": 0.6666666666666666,
+    "gate": "fail",
+    "brk": false
+  },
+  {
+    "run": "base-yjit/railsbench-a",
+    "m_ir": 4742.628819666667,
+    "hash_m_ir": 679.5989566666666,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "base-yjit/railsbench-b",
+    "m_ir": 4735.691974,
+    "hash_m_ir": 681.357908,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "base-zjit/lobsters-a",
+    "m_ir": 2496.685839,
+    "hash_m_ir": 232.78903866666667,
+    "gcs": 0.3333333333333333,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "base-zjit/railsbench-a",
+    "m_ir": 4902.871455333333,
+    "hash_m_ir": 678.7073326666666,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "base-zjit/railsbench-b",
+    "m_ir": 4902.242481666667,
+    "hash_m_ir": 679.50576,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "fix-interp/lobsters-a",
+    "m_ir": 3611.0571256666667,
+    "hash_m_ir": 225.45801,
+    "gcs": 0.6666666666666666,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "fix-interp/lobsters-b",
+    "m_ir": 3610.926059,
+    "hash_m_ir": 226.16029633333335,
+    "gcs": 0.6666666666666666,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "fix-interp/railsbench-a",
+    "m_ir": 7376.615059333333,
+    "hash_m_ir": 659.8845336666666,
+    "gcs": 1.0,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "fix-interp/railsbench-b",
+    "m_ir": 7373.155261666667,
+    "hash_m_ir": 657.836905,
+    "gcs": 1.0,
+    "gate": "n/a",
+    "brk": false
+  },
+  {
+    "run": "fix-yjit/lobsters-a",
+    "m_ir": 2325.527591,
+    "hash_m_ir": 224.3297,
+    "gcs": 0.6666666666666666,
+    "gate": "fail",
+    "brk": false
+  },
+  {
+    "run": "fix-yjit/railsbench-a",
+    "m_ir": 4716.209738333333,
+    "hash_m_ir": 653.68157,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "fix-yjit/railsbench-b",
+    "m_ir": 4705.420782333333,
+    "hash_m_ir": 649.53832,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "fix-zjit/lobsters-a",
+    "m_ir": 2488.2857316666664,
+    "hash_m_ir": 223.15655533333333,
+    "gcs": 0.3333333333333333,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "fix-zjit/railsbench-a",
+    "m_ir": 4877.267938333333,
+    "hash_m_ir": 649.3090106666666,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  },
+  {
+    "run": "fix-zjit/railsbench-b",
+    "m_ir": 4874.685294333333,
+    "hash_m_ir": 651.1142533333334,
+    "gcs": 1.0,
+    "gate": "pass",
+    "brk": false
+  }
+]
