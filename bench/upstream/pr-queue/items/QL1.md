@@ -14,7 +14,7 @@ alternative_of:
 impact: "Every request of every app with Active Record at the default info log level runs \"query\".pluralize(count) for its Completed line when the count isn't 1 (43k interpreter instructions, 6 objects a call). Whole request, Callgrind interpreter: new app's JSON bare request -3.84% (A/A -0.03%), JSON show with 2 queries -1.03%, HTML bare page -1.77% (A/A -0.59%), HTML show -0.92%; 6 fewer objects. Vernier YJIT: the pluralize is about 2% of a new API app's bare JSON request. benchmark-ips on log_process_action 245.1k -> 792.6k i/s (3.2x, YJIT, best of 5, A/A -2.5%). Lifetime: Rails main and 8.x; runs on every Ruby."
 rank: 14
 risky: false
-state: built
+state: in-review
 pr:
 note: "DEF8 (docs/upstream/rails8-defaults.md). Unchanged for counts 0..2000 under default inflections; differs only for an app with its own English inflection for \"query\" (log text). Not yet run: the micro on Ruby master x ZJIT (no master build in the DEF8 orb). Suites: actionview test:integration:active_record 177 runs 0 failures; controller_runtime_test 5 runs."
 passes: []
@@ -51,4 +51,4 @@ In a new app's full request without queries, that is 6 fewer objects and 2 to 4 
 
 ---
 
-<sub>Found while measuring the request path of a new Rails app ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/rails8-defaults.md)).</sub>
+<sub>Found while measuring the request path of a new Rails app ([record](https://github.com/thomasklemm/lowrail/blob/7b7f24bf8985eed81bcb20aca6157384cde2dab6/docs/upstream/rails8-defaults.md)).</sub>
