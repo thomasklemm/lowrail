@@ -186,6 +186,9 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
   proposed to Thomas with the reason. The previously recorded slots (GC pool-budget fix, lead 3, Z13's top lead,
   Shopify/ruby#1064, #1065, #1091, #1058) stay in the queue and do not open.
+  Exception (Thomas, 2026-11-14): the small-Hash regression on master (F1, round 2) and ZJIT lead 3 (receiver classes
+  missing from a polymorphic send's profile) go upstream as PRs once built and reviewed, after the "Thomas can explain
+  it first" step. The script's ruby/ruby cap is the 10 above; the moratorium holds for every other item.
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
   **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
   for a response to an earlier one.
