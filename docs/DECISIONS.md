@@ -575,6 +575,19 @@ one click.
 * **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
   unreleased.
 
+## Benchmark tables in the project's own format (Thomas, 2026-11-14)
+
+Thomas liked ruby/ruby#19899's table: the project's own benchmark, run with the project's own tool, in the format its
+maintainers use. Bodies lead with that where one exists. For ruby/ruby that means an existing `benchmark/*.yml` (or a
+new small one) through `make benchmark ITEM=… COMPARE_RUBY=… OPTS="--repeat-count 10"`, with the compare-ruby and
+built-ruby version lines and benchmark-driver's table, and the older release on the same machine in one sentence when
+it shows the regression closing. For Rails and gems, a short benchmark-ips (or benchmark-driver) script in the body
+with its before/after output, as Rails PRs usually show. Runs are on one pinned core, best of N, and the record keeps
+the raw output and an A/A of the same setup. Callgrind stays the tool that finds and attributes a change; in the body
+it is one supporting line or a small table only when it shows something the wall-time table can't (objects, a
+JIT-only path). Wall time is measured on orbs; Thomas's Mac was tried as a quieter machine on 2026-11-14 and gave
+±4.5% A/A while in use, so it isn't used.
+
 ## Realistic sizes upstream (Thomas, 2026-11-14)
 
 Bodies and comments cite only sizes an app plausibly has: a few to about 20 params, tens to about 100 columns,
