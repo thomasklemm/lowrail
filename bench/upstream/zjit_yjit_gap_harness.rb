@@ -9,6 +9,7 @@ require_relative "../lib/harness"
 WARMUP_ITRS = Integer(ENV.fetch("WARMUP_ITRS", 15))
 MEASURE_ITRS = Integer(ENV.fetch("MEASURE_ITRS", 3))
 MIN_BENCH_ITRS = Integer(ENV.fetch("MIN_BENCH_ITRS", 10))
+FLAT_WINDOWS = Integer(ENV.fetch("FLAT_WINDOWS", 2))
 GAP_KEYS = %i[count minor_gc_count major_gc_count total_allocated_objects total_freed_objects].freeze
 
 puts RUBY_DESCRIPTION
@@ -17,24 +18,56 @@ def gap_gc = GC.stat.slice(*GAP_KEYS)
 
 def gap_write(data)
   require "json" # after Bundler.setup: the benchmark may pin another json
-  File.write(ENV.fetch("GAP_JSON"), JSON.pretty_generate({ruby: RUBY_DESCRIPTION, jit: (RubyVM::ZJIT.enabled? ? "zjit" : defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled? ? "yjit" : "interp")}.merge(data)) + "\n")
+  File.write(ENV.fetch("GAP_JSON"), JSON.pretty_generate({ruby: RUBY_DESCRIPTION, jit: (defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled? ? "zjit" : defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled? ? "yjit" : "interp")}.merge(data)) + "\n")
 end
+
+# JIT-flat gate (docs/bench.md): compile and invalidation counters unchanged over FLAT_WINDOWS consecutive warm
+# windows of MEASURE_ITRS iterations before measuring, and over the measured window. ZJIT has no invalidation count;
+# every invalidation runs inside its invalidation_time_ns timer (zjit/src/invariants.rs), so that timer stands in.
+def gap_jit_counters
+  if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+    RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns)
+  elsif defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
+    RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count)
+  end
+end
+
+def gap_heap = GC.stat_heap.to_h { |i, h| [i, h.slice(:slot_size, :heap_eden_pages, :heap_eden_slots)] }
 
 def run_benchmark(_num_itrs_hint, **, &block)
   WARMUP_ITRS.times { block.call }
   if ENV["GAP_MODE"] == "callgrind"
     require "lowrail_callgrind"
     no_gc = ENV["CG_NO_GC"] == "1"
+    flat_history = []
+    flat = 0
+    if (last = gap_jit_counters)
+      Integer(ENV.fetch("FLAT_MAX_WINDOWS", 8)).times do
+        MEASURE_ITRS.times { block.call }
+        now = gap_jit_counters
+        flat = now == last ? flat + 1 : 0
+        flat_history << now
+        last = now
+        break if flat == FLAT_WINDOWS
+      end
+    end
     3.times { GC.start }
     LowrailCallgrindBench.start(no_gc)
     LowrailCallgrindBench.finish
     3.times { GC.start }
+    heap_before = gap_heap
     before = gap_gc
+    # Read right next to the window: the harness's own GC.stat calls can compile code.
+    jit_before = gap_jit_counters
     LowrailCallgrindBench.start(no_gc)
     MEASURE_ITRS.times { block.call }
     segments = LowrailCallgrindBench.finish
+    jit_after = gap_jit_counters
     after = gap_gc
-    gap_write(itrs: MEASURE_ITRS, gc_segments: segments, gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(MEASURE_ITRS)] })
+    gate = jit_before.nil? ? "n/a" : (flat == FLAT_WINDOWS && jit_before == jit_after ? "pass" : "fail")
+    gap_write(itrs: MEASURE_ITRS, gc_segments: segments, gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(MEASURE_ITRS)] },
+      jit_flat: { gate:, warm_windows: flat_history, measured_before: jit_before, measured_after: jit_after },
+      heap_before:)
   else
     jit = RubyVM::ZJIT.enabled? ? RubyVM::ZJIT : (RubyVM::YJIT if defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?)
     ii = RubyVM.respond_to?(:lowrail_ii=) && ENV["GAP_II"] == "1"

@@ -1,5 +1,7 @@
 # Ruby 4.1 regression watch: census 4 apps on Ruby 4.0.7 and master
 
+> **Round 2 (2026-11-14):** [ruby-master-round-2.md](ruby-master-round-2.md) repeats this on a newer master and Rails main; #1 is fixed there, #2–#4 are still present, and it adds two new Hash regressions.
+
 The census 4 workloads (nine Rails apps, 97 request, job and mailer workloads, same Rails main commit) ran on Ruby
 4.0.7 and on a fresh build of ruby/ruby master, interpreter and YJIT on both, ZJIT on master. The aim was to catch
 4.1 regressions that hurt Rails apps before 4.1 ships, the way `{}` spilling at the third insert after ruby/ruby#18345

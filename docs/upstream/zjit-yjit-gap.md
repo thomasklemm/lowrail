@@ -1,5 +1,7 @@
 # Where ZJIT spends more instructions than YJIT on Rails
 
+> **Refreshed 2026-11-14:** [ruby-master-round-2.md](ruby-master-round-2.md#zjit--yjit-buckets) has the gap buckets and owners on a newer master and Rails main.
+
 Which work makes ZJIT slower than YJIT on Rails, and how big is each part? The [ZJIT lead
 queue](zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03) ranks leads by fallback counts. Fallback counts don't
 say how many instructions each one costs, or whether YJIT does the same generic work at that site. This page

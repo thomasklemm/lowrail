@@ -234,6 +234,16 @@ module RailsMainCensus4
     GC.enable
   end
 
+  # Compile and invalidation counters for the JIT-flat gate (docs/bench.md); ZJIT has no invalidation count, and
+  # every invalidation runs inside its invalidation_time_ns timer.
+  def jit_counters
+    if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+      RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns)
+    elsif defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
+      RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count)
+    end
+  end
+
   # Under valgrind --tool=callgrind --instr-atstart=no with CENSUS_CALLGRIND_EXT
   # (bench/callgrind.c): one dump per window, numbered in order. The empty
   # window measures the start/finish seam; no_gc toggles collection off
@@ -243,10 +253,12 @@ module RailsMainCensus4
     [["seam", 0, false], ["total", ops, false], ["no_gc", ops, true]].map do |kind, n, exclude|
       GC.start
       gcs = GC.count
+      jit_before = jit_counters
       LowrailCallgrindBench.start(exclude)
       n.times { run.call }
       segments = LowrailCallgrindBench.finish
-      { kind: kind, ops: n, gc_count: GC.count - gcs, gc_segments: segments, dump: (@dumps = (@dumps || 0) + 1) }
+      { kind: kind, ops: n, gc_count: GC.count - gcs, gc_segments: segments, dump: (@dumps = (@dumps || 0) + 1),
+        jit_flat: jit_before == jit_counters, jit_counters: jit_before }
     end
   end
 
