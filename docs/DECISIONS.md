@@ -436,6 +436,7 @@ lead. States change often; each bet's doc is the source of truth.
 | P-MAP | full-request stack map under YJIT by layer (Puma/Rack to drivers, GC, YJIT), leads outside Rails (2026-11-05). Done 11-14: flat below the layers; allow_browser (AB1) built, MK1 held below noise | [p-map](upstream/p-map.md) |
 | P-TEST | per-test framework overhead in real Rails test suites: fixtures, transactions, setup, reporters (2026-11-05) | test-overhead (planned) |
 | P-DRV | database driver result path: sqlite3, pg, trilogy, per row and per query (2026-11-05) | driver-cpu (planned) |
+| DEF8 | what every new app pays per request: each default piece of `rails new` from main switched off in turn and priced (default, `--api`, Tailwind; 20-field scaffold), ranked by cost × reach (2026-11-14). Done 11-14: importmap tags 18%, allow_browser 13% (AB1), info logging 10%, `:app` stylesheet 9% of a bare page under YJIT; IM1 (importmap-rails) and QL1 (Rails) built | [rails8-defaults](upstream/rails8-defaults.md) |
 
 Chosen 2026-11-03 for reach. E2 unblocks ZJIT measurement on Mastodon, Discourse, Chatwoot, Lobsters and Loomio, and
 the gem fixes are needed for 4.1 anyway. Z13 measures the gap to YJIT directly instead of inferring it from fallback
