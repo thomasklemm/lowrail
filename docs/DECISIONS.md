@@ -486,6 +486,20 @@ patches](#code-comments-in-upstream-patches-byroot-on-59555-2026-11-05)). A stan
 * **Reviewers check it on every pass.** claude-code and Sol look at every added comment line; a superfluous comment
   is a required change (`changes`), not a nit.
 
+## Claims are checked, behaviour changes are probed (Thomas, 2026-11-14)
+
+Three false claims were written in one week. The [ruby/date#199](https://github.com/ruby/date/pull/199) body said
+`Date < NaN` raises `ArgumentError` "as for Integer", but `1 < Float::NAN` returns false (jeremyevans). The
+ruby/bigdecimal#562 body said no caller of the Integer conversion modifies its result; two do, for nonzero values.
+The rails/rails#59628 draft comment named ridgepole as broken, but ridgepole 3.2.8 guards on the Rails version.
+
+* **Every factual claim in a PR body or comment is backed by a command the reviewer ran or a link the reviewer
+  opened**, recorded in the pass. A claim nobody checked is cut, not softened.
+* **A pass on a behaviour change includes a differential probe of old against new** across input types, including
+  subclasses and duck-typed objects, and checks the documented return contract (`<=>` returns -1, 0, 1 or nil).
+  date#199 is the example: a probe of `<` with NaN shows that Integer, Float and BigDecimal define their own `<` and
+  return false, while Comparable-based classes such as Time and Rational raise.
+
 ## Orb time (Thomas, 2026-11-04)
 
 Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8

@@ -54,7 +54,10 @@ The body, verbatim, as it is posted.
 subagent, kept as a record), `sol`, `astra`, `thermos`. `verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
-a superfluous comment means `changes`. Record a pass on the
+a superfluous comment means `changes`. Every factual claim in the body or a comment is backed by a command the
+reviewer ran or a link it opened, and a pass on a behaviour change includes a differential probe of old against new
+across input types (subclasses and duck-typed objects too) and checks the documented return contract
+([DECISIONS](../../../docs/DECISIONS.md#claims-are-checked-behaviour-changes-are-probed-thomas-2026-11-14)). Record a pass on the
 head it reviewed. When a fix changes the branch, update `head` to the new commit; the old passes stay in the list
 and stop counting. A body-only change keeps the head, so it needs no new code pass, but its text was reviewed by
 whichever pass is listed.
