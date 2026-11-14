@@ -12,7 +12,7 @@ depends_on: []
 stacked_on:
 alternative_of:
 impact: "Unreleased since #59141: every first read of an attribute (generated readers via fetch_value_at!, id/read_attr/_read_attribute via value_at!) passes &:value! to cast_value, and every record dup maps &:deep_dup; YJIT and ZJIT make each such call a generic send. Block literals remove them (300 -> 0 generic calls for 10 records x 30 reads in both JITs). Callgrind, 30 columns, 10 records each read once: interpreter -2.5%, YJIT -7.5% (4.0.9), ZJIT -20.6% (master 674c477295); dup of a loaded record -1.9% / -5.7% / -12.3%; A/A <= 0.09% in those cells. railsbench-like request mix: ZJIT -0.58% (A/A 0.08%), interpreter within A/A, YJIT cell rejected. Load, #attributes and warm reads unchanged within 0.3%, apart from YJIT compiled-state variance. Lifetime: Rails main only (8.1 has no LazyIndexedAttributeSet); runs on every Ruby."
-rank: 6
+rank: 7
 risky: false
 state: reviewed
 pr:
@@ -29,7 +29,7 @@ Since #59141, the first read of an attribute of a loaded record through its read
 
 This passes block literals that call the same methods. They run at the same moments on the same attributes, so values and exceptions are the same; an exception raised inside the block has one more frame in its backtrace.
 
-Callgrind instructions per call against main, 30-column records, Ruby 4.0 without JIT and with YJIT, ZJIT on Ruby master:
+Callgrind instructions per call against main, 30-column records, Ruby 4.0.9 without JIT and with YJIT, ZJIT on Ruby master 674c477295:
 
 | | no JIT | YJIT | ZJIT |
 |---|---:|---:|---:|
