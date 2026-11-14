@@ -1,0 +1,21 @@
+# K1 invariant check on main 50c54eed06 (invariant-check.patch): violations logged and calls counted per process
+## am
+no violation logged
+## ar-sqlite
+no violation logged
+## ar-pg
+no violation logged
+## counts (Active Record SQLite, then PostgreSQL)
+pid=15400 keys_calls=2921 inits=5013
+pid=15396 keys_calls=2921 inits=5013
+pid=15416 keys_calls=2921 inits=5013
+pid=15433 keys_calls=2921 inits=5013
+pid=15429 keys_calls=2921 inits=5013
+pid=15336 keys_calls=16602 inits=98159
+pid=18614 keys_calls=12783 inits=22561
+pid=18610 keys_calls=12783 inits=22561
+pid=18751 keys_calls=12783 inits=22561
+pid=17233 keys_calls=17532 inits=98973
+## positive control: keys_probe.rb on the instrumented tree (only the after_find case that declares an attribute mid-result fires)
+      2 INIT_MISSING ["mid_late"] 
+     16 KEYS_DIFF ["mid_late"] order=false 

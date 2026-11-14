@@ -218,6 +218,23 @@ rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)). `script/pr-q
 state and rank; `script/pr-queue next` the next one to open. The table that stood here until 2026-11-05 is in git
 history (d25db64).
 
+### Erklärung für Thomas: K1 (2026-11-14, Census 9; gebaut, nicht geöffnet)
+
+Nicht zu verwechseln mit dem Rack-K1 vom 2026-11-04 weiter unten. Belege, Messungen und Überschneidungen:
+[bench/upstream/k1](../../bench/upstream/k1/README.md); Queue-Eintrag [K1](../../bench/upstream/pr-queue/items/K1.md).
+
+**K1, `LazyIndexedAttributeSet#keys`.** Seit #59141 (tenderlove, gemergt 2026-11-11, unveröffentlicht) liefert
+`row_keys` alle Namen der Indexes eines Attribut-Sets, und die enthalten schon jedes typisierte Attribut des Models.
+`#keys` vereinigt trotzdem noch mit den Typ-Schlüsseln und den gebauten Namen, was immer dasselbe Ergebnis gibt, aber
+zwei Arrays und einen zweiten Durchlauf kostet; `materialize` läuft die Typ-Schlüssel ein zweites Mal ab. Beides
+fällt weg (+2/−15). `#keys` läuft bei jedem `changed?`, `inspect`, `serializable_hash` und dreimal pro `save`.
+Bewiesen über alle Stellen, die Indexes bauen, 54 Probe-Fälle main gegen Fix und ein instrumentiertes main, das in
+den vollen AM-, AR-SQLite- und AR-PostgreSQL-Suiten keine Abweichung fand. Einziger Unterschied: deklariert ein
+`after_find` mitten im Ergebnis ein Attribut, wirft main einen `TypeError`, der Fix nicht. Bei 30 Spalten
+(Interpreter): `changed?` −37 %, `serializable_hash` −35 %, `update!` −18 %, `find`+`save` −19 %, `dup` −5 %; Laden,
+Reader und `#attributes` unverändert innerhalb des A/A. Kein offener PR deckt es ab. Empfehlung: kleiner Draft-PR für
+tenderlove, sobald Thomas ihn freigibt; ein Kommentar im gemergten #59141 bräuchte ebenfalls Thomas' OK.
+
 ### Erklärung für Thomas: ZM1 (2026-11-05, App-Suite-Runde Zammad; fertig, nicht geöffnet)
 
 Ergebnisse und alle anderen Befunde: [app-suites](app-suites.md#zammad).

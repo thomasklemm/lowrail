@@ -1,0 +1,132 @@
+6738c6738,6746
+<     :keys: 'NoMethodError: undefined method ''<'' for nil'
+---
+>     :keys:
+>     - id
+>     - author_id
+>     - title
+>     - body
+>     - score
+>     - data
+>     - legacy
+>     - title_upper
+6774d6781
+<       'NoMethodError: undefined method ''<'' for nil': false
+6775a6783
+>       author_id: true
+6777,6778c6785
+<       note: false
+<       tags_count: false
+---
+>       body: true
+6779a6787
+>       data: true
+6781a6790,6791
+>       note: false
+>       tags_count: false
+6790a6801,6803
+>     :consistent:
+>     - true
+>     - true
+6800c6813,6821
+<   :attribute_names: 'TypeError: no implicit conversion from nil to integer'
+---
+>   :attribute_names:
+>   - id
+>   - author_id
+>   - title
+>   - body
+>   - score
+>   - data
+>   - legacy
+>   - title_upper
+6810,6815c6831,6846
+<   :changed?: 'TypeError: no implicit conversion from nil to integer'
+<   :changes: 'TypeError: no implicit conversion from nil to integer'
+<   :changed_attributes: 'TypeError: no implicit conversion from nil to integer'
+<   :serializable_hash: 'TypeError: no implicit conversion from nil to integer'
+<   :as_json: 'TypeError: no implicit conversion from nil to integer'
+<   :inspect: 'TypeError: no implicit conversion from nil to integer'
+---
+>   :changed?: false
+>   :changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+>   :changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+>   :serializable_hash:
+>     id: '2'
+>     author_id: nil
+>     title: '"two"'
+>     body: nil
+>     score: nil
+>     data: nil
+>     legacy: nil
+>     title_upper: '"TWO"'
+>   :as_json: '{"id" => 2, "author_id" => nil, "title" => "two", "body" => nil, "score"
+>     => nil, "data" => nil, "legacy" => nil, "title_upper" => "TWO"}'
+>   :inspect: '#<Mid id: 2, author_id: nil, title: "two", body: nil, score: nil, data:
+>     nil, legacy: nil, title_upper: "TWO">'
+6818c6849,6857
+<     :keys: 'NoMethodError: undefined method ''<'' for nil'
+---
+>     :keys:
+>     - id
+>     - author_id
+>     - title
+>     - body
+>     - score
+>     - data
+>     - legacy
+>     - title_upper
+6854d6892
+<       'NoMethodError: undefined method ''<'' for nil': false
+6855a6894
+>       author_id: true
+6857,6858c6896
+<       note: false
+<       tags_count: false
+---
+>       body: true
+6859a6898
+>       data: true
+6861a6901,6902
+>       note: false
+>       tags_count: false
+6871a6913,6915
+>     :consistent:
+>     - true
+>     - true
+6881c6925,6933
+<   :attribute_names: 'TypeError: no implicit conversion from nil to integer'
+---
+>   :attribute_names:
+>   - id
+>   - author_id
+>   - title
+>   - body
+>   - score
+>   - data
+>   - legacy
+>   - title_upper
+6891,6896c6943,6958
+<   :changed?: 'TypeError: no implicit conversion from nil to integer'
+<   :changes: 'TypeError: no implicit conversion from nil to integer'
+<   :changed_attributes: 'TypeError: no implicit conversion from nil to integer'
+<   :serializable_hash: 'TypeError: no implicit conversion from nil to integer'
+<   :as_json: 'TypeError: no implicit conversion from nil to integer'
+<   :inspect: 'TypeError: no implicit conversion from nil to integer'
+---
+>   :changed?: false
+>   :changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+>   :changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+>   :serializable_hash:
+>     id: '3'
+>     author_id: nil
+>     title: '"new"'
+>     body: nil
+>     score: '7'
+>     data: nil
+>     legacy: nil
+>     title_upper: '"NEW"'
+>   :as_json: '{"id" => 3, "author_id" => nil, "title" => "new", "body" => nil, "score"
+>     => 7, "data" => nil, "legacy" => nil, "title_upper" => "NEW"}'
+>   :inspect: '#<Mid id: 3, author_id: nil, title: "new", body: nil, score: 7, data:
+>     nil, legacy: nil, title_upper: "NEW">'

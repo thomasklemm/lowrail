@@ -1,0 +1,35 @@
+load: none
+reader: none
+#attributes: none
+#attribute_names: 
+  1x keys <- activerecord/lib/active_record/attribute_methods.rb:437 ActiveRecord::AttributeMethods#attribute_names
+assign: none
+changed?: 
+  1x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+changes: 
+  1x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+save (no change): 
+  3x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+  1x materialize <- activemodel/lib/active_model/dirty.rb:453 ActiveModel::Dirty#forget_attribute_assignments
+update: 
+  3x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+  1x materialize <- activemodel/lib/active_model/dirty.rb:453 ActiveModel::Dirty#forget_attribute_assignments
+create: 
+  1x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+  1x materialize <- activemodel/lib/active_model/dirty.rb:453 ActiveModel::Dirty#forget_attribute_assignments
+new: none
+dup: 
+  1x materialize <- activerecord/lib/active_record/core.rb:623 ActiveRecord::Core#init_attributes
+serializable_hash: 
+  1x keys <- activerecord/lib/active_record/attribute_methods.rb:437 ActiveRecord::AttributeMethods#attribute_names
+as_json: 
+  1x keys <- activerecord/lib/active_record/attribute_methods.rb:437 ActiveRecord::AttributeMethods#attribute_names
+inspect: 
+  1x keys <- activerecord/lib/active_record/attribute_methods.rb:437 ActiveRecord::AttributeMethods#attribute_names
+partial select: none
+STI load: none
+reload: none
+destroy: 
+  1x keys <- activemodel/lib/active_model/attribute_mutation_tracker.rb:75 ActiveModel::AttributeMutationTracker#attr_names
+  1x materialize <- activemodel/lib/active_model/dirty.rb:453 ActiveModel::Dirty#forget_attribute_assignments
+  1x materialize <- activerecord/lib/active_record/core.rb:724 ActiveRecord::Core#freeze

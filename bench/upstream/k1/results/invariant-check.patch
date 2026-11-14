@@ -1,0 +1,49 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..cbeb93a81b 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -283,6 +283,28 @@ def raise_unless_laid_out
+   # extra columns (such as aliases) the row was loaded with.
+   # Methods that take a name look its index up once and work by index from
+   # there.
++  module K1Inv
++    LOG = ENV["K1_LOG"] || "/tmp/k1inv.log"
++    def self.log(kind, msg)
++      File.open(LOG, "a") { |f| f.puts("#{kind} #{msg} @ #{caller(2, 6).join(' | ')}") }
++    end
++    def self.check_init(set, indexes, ctx)
++      @inits += 1
++      missing = ctx.type_keys.reject { |k| indexes.key?(k) }
++      log("INIT_MISSING", missing.inspect) unless missing.empty?
++      ks = indexes.keys
++      log("DUP_INDEX_KEYS", ks.inspect) unless ks.uniq.size == ks.size
++    end
++    def self.check_keys(set, union, row_keys)
++      log("KEYS_DIFF", (union - row_keys).inspect + " order=" + (union == row_keys).inspect) unless union == row_keys
++      @keys_calls += 1
++    end
++    @keys_calls = 0
++    @inits = 0
++    class << self; attr_accessor :keys_calls, :inits; end
++    at_exit { File.open(LOG + ".count", "a") { |f| f.puts("pid=#{Process.pid} keys_calls=#{@keys_calls} inits=#{@inits}") } }
++  end
++
+   class LazyIndexedAttributeSet < AttributeSet # :nodoc:
+     # Marks the slots in +@casted_values+ that haven't been cast yet, since
+     # a value can be cast to +nil+.
+@@ -308,6 +330,7 @@ def initialize(row, indexes, ctx)
+       @casted_values = Array.new(row.size, UNCAST)
+       @materialized = false
+       @indexes = indexes
++      K1Inv.check_init(self, indexes, ctx)
+     end
+ 
+     #: (ActiveModel::LazyIndexedAttributeSet) -> void
+@@ -342,6 +365,7 @@ def key?(name)
+     #: () -> Array[String]
+     def keys
+       keys = row_keys | @ctx.type_keys | cached_names
++      K1Inv.check_keys(self, keys, row_keys)
+       keys.keep_if do |name|
+         index = index_for_name(name)
+         if attribute = lookup(index)
