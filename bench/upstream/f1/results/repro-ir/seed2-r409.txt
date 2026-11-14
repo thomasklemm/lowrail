@@ -1,0 +1,6 @@
+ar_first 266
+ar_last 322
+ar_miss 333
+empty 126
+h_b 274
+str_equal 502

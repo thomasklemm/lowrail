@@ -5,7 +5,7 @@ bisected to ruby/ruby#18222 (byroot, SWAR `ar_find_entry_hint`) and ruby/ruby#18
 hashes).
 
 **Short answer.** One function split in `hash.c` recovers almost all of it and keeps both PRs' gains: `h[:b]` 333 →
-294 instructions (4.0.9: 287), 1.29× the lookups per second on #18222's own benchmark at every hit position, Symbol
+294 instructions (4.0.9: 287), 1.31–1.33× the lookups per second on #18222's own benchmark at every hit position (1.29× for `h[:b]`), Symbol
 literals of 1–8 pairs 4–9% fewer instructions, railsbench −0.39% and lobsters −0.22% instructions per iteration
 (interpreter). Tables of 9 keys and more are unchanged. Slower: every lookup whose first hint match holds a
 different object, +11 to +21 instructions, e.g. an equal String built at runtime +13 (+2.4%); worst in percent is a
@@ -113,7 +113,8 @@ the whole search inlined into `rb_hash_aref`, including the hash function).
 is 256 on 4.0.9 and 64 on master and on the branch (the 160 in #18476's description predates later right-sizing);
 `ObjectSpace.dump` shows a 64-byte slot on both. Identity lookups get cheaper with the branch: Symbol keys 308 → 277
 (−10%), an `Object.new` key in a 2-key identity Hash 298 → 268 (top-level loop as in `repro_ir.sh`). One review
-measured an identity Hash with heap-object keys as unchanged (322 → 322) in its own loop; not reproduced here.
+measured an identity Hash with heap-object keys as unchanged (322 → 322): it filled 3 keys by `[]=`, which makes an
+st_table on master (round 2's finding 3), as does the "ident obj n=3" case in `ir-interp.txt` (298 / 298).
 
 **Under YJIT and ZJIT** the same micros (same script, `--yjit` / `--zjit`, every case warmed before any window, JIT-flat
 gate between the empty and the measured window: passed in all 74 cases on all four runs;
@@ -138,9 +139,9 @@ except the 9-pair literal (2,718 → 2,654, −2.3%), which takes the unchanged 
 Every lookup whose first hint match holds a different object runs `ar_equal` as before, after the inline check,
 and pays +11 to +21 instructions (master → branch, Ir per iteration, measured in the two reviews, consistent with
 the String rows above). First review, top-level loop: a Symbol miss behind a hint collision 385 → 398 (+3.4%, the worst in
-percent), the same Symbol behind a colliding slot 376 → 387 (+2.9%), an equal String 536 → 549 (+2.4%; a chilled
+that review), the same Symbol behind a colliding slot 376 → 387 (+2.9%), an equal String 536 → 549 (+2.4%; a chilled
 `h["b"]` literal 928 → 942), a String collision miss 565 → 578, an equal Bignum 1,034 → 1,047, an equal Float
-862 → 875, a user-defined `eql?` 3,816 → 3,833 (+0.4%), `key?`/`fetch` with an equal String +3/+8. Hint collisions
+862 → 875, a user-defined `eql?` 3,816 → 3,833 (+0.4%), `key?`/`fetch` with an equal String +3/+8.
 Second review, its own loop: a miss whose hint matches one other key 372 → 389 (+17, +4.6%, the worst), a hit on
 the second key sharing a hint +11 (Symbol 384 → 395, String 523 → 534), a miss past 3 colliding keys +11, `aset`
 with an equal String +13, a Struct key with a user `eql?` +21 (+0.5%). Hint collisions between two keys happen about
@@ -149,13 +150,18 @@ once in 255 pairs (1–3% of misses at 3–8 keys); Symbols and same-object keys
 ## The PR body's loops as written
 
 The body's table uses the loops it shows, run at top level as written: whole process under Callgrind, (Ir at
-N = 2,000,000 − Ir at N = 0) / N, fixed salt, fixed heap ([`repro_ir.sh`](../../bench/upstream/f1/repro_ir.sh)).
-They come out 13 below the `x = expr`-in-a-method form above; the differences are the same.
+N = 2,000,000 − Ir at N = 0) / N, fixed salt, fixed heap ([`repro_ir.sh`](../../bench/upstream/f1/repro_ir.sh)),
+seeds 1 and 2 identical ([`results/repro-ir/`](../../bench/upstream/f1/results/repro-ir/)). They come out 13 below
+the `x = expr`-in-a-method form above; the differences are the same. The 8-key rows use `:k1`…`:k8`: with
+`hash_ar_aref.yml`'s `:a`…`:h`, `:g` and `:h` share a hint in the installed 4.0.9 process, so its last-key lookup
+calls `ar_equal` twice and measures 352 instead of the linear scan's 322 (found in review). Master and the branch
+give the same numbers with either key set under seed 1; under seed 2, `:a`…`:h` collide on master as well
+(last key 411).
 
 | loop | 4.0.9 | master | branch |
 | --- | ---: | ---: | ---: |
 | `h = {a: 1, b: 2, c: 3}`, `h[:b]` | 274 | 320 | 281 |
-| 8 Symbol keys, hit at the first / last key | 266 / 352 | 320 / 320 | 281 / 281 |
+| 8 Symbol keys, hit at the first / last key | 266 / 322 | 320 / 320 | 281 / 281 |
 | 8 Symbol keys, miss | 333 | 313 | 300 |
 | 3 String keys, `h[k]` with `k = +"b"` | 502 | 539 | 552 |
 | loop alone | 126 | 128 | 128 |

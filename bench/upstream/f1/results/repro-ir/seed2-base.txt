@@ -1,0 +1,6 @@
+ar_first 320
+ar_last 320
+ar_miss 313
+empty 128
+h_b 320
+str_equal 539
