@@ -56,7 +56,9 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Commit identity.** Commits are authored and committed by Thomas Klemm `<github@tklemm.eu>` via `/usr/bin/git`,
   with no Amp or co-author trailer (`/opt/git` adds one). Upstream: one commit per fix on a freshly fetched base.
   Before every push to a fork branch or upstream, check `git log --format='%(trailers:only)' base..HEAD` is empty
-  (Thomas, 2026-11-05: in Lowrail a stray trailer is tolerable and stays; in public repos it must not land).
+  (Thomas, 2026-11-05: in public repos it must not land). In Lowrail the ones already on main stay, and since
+  2026-11-14 `script/hooks/pre-push`, which `.agents/setup` installs, refuses to push a commit whose message has an
+  `Amp-Thread-ID:` or `Co-authored-by:` trailer.
 
 ## Upstream etiquette
 

@@ -2,6 +2,9 @@
 # Tooling and retained local gate prerequisites; service-backed apps stay opt-in.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
+hook=$(git -C "$root" rev-parse --path-format=absolute --git-path hooks/pre-push)
+mkdir -p "$(dirname "$hook")"
+[ -e "$hook" ] || ln -s "$root/script/hooks/pre-push" "$hook"
 packages=(build-essential libclang-dev libyaml-dev libssl-dev libreadline-dev
   zlib1g-dev libffi-dev libsqlite3-dev libpq-dev postgresql libvips-dev valgrind)
 missing=()

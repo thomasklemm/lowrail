@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+refused=0
+while read -r _ local_sha _ remote_sha; do
+  [[ $local_sha =~ ^0+$ ]] && continue
+  exclude=(--not --remotes)
+  git cat-file -e "$remote_sha^{commit}" 2>/dev/null && exclude+=("$remote_sha")
+  for commit in $(git rev-list "$local_sha" "${exclude[@]}"); do
+    if git log -1 --format=%B "$commit" | grep -qiE '^(Amp-Thread-ID|Co-authored-by):'; then
+      echo "pre-push: $(git log -1 --format='%h %s' "$commit") has a trailer; rebuild it without one (git commit-tree)" >&2
+      refused=1
+    fi
+  done
+done
+exit "$refused"
