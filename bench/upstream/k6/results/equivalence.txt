@@ -1,0 +1,21 @@
+# K6 equivalence, 2026-11-14
+rails main 50c54eed06 vs K6 aba0855fcf (lib identical to 00846b70bd), Ruby 4.0.9
+9952d60dc76f8e85  5760 results  diff-main.txt
+9952d60dc76f8e85  5760 results  diff-k6.txt
+1f0e3af8ff7ce537  1447 results  widen-main.txt
+1f0e3af8ff7ce537  1447 results  widen-main2.txt
+0c883442d832bdf2  1447 results  widen-k6.txt
+d523ee5b06f54752  1447 results  widen-pre.txt
+
+census9 button_to_diff.rb: main == k6: identical (5760 cases)
+widen.rb main vs main2:
+0
+widen.rb main vs k6 (only the hidden_field_tag and text_field_tag overrides):
+4529c4529
+<   "<form class=\"button_to\" action=\"/p\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"tok-post-/p\" autocomplete=\"off\" /><button type=\"submit\">Go</button>[hidden_field_tag]<inpu
+---
+>   "<form class=\"button_to\" action=\"/p\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"tok-post-/p\" autocomplete=\"off\" /><button type=\"submit\">Go</button><input type=\"hidden\" 
+4532c4532
+<   "<form class=\"button_to\" action=\"/p\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"tok-post-/p\" autocomplete=\"off\" /><button type=\"submit\">Go</button>[text_field_tag]<input 
+---
+>   "<form class=\"button_to\" action=\"/p\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"tok-post-/p\" autocomplete=\"off\" /><button type=\"submit\">Go</button><input type=\"hidden\" 
