@@ -14,7 +14,7 @@ alternative_of:
 impact: "allow_browser is 0.5-3% of a request in the 3 of 5 profiled apps that use it (Rails 8 default); benchmark-ips 1.96x on a bare controller request (YJIT 94.35 -> 48.08 us, best of 5, A/A +1.9%; ZJIT master 82.6 -> 42.9 us); Callgrind -9.5%/-12.1% Ir on a small JSON request, -2.7%/-3.6% on an HTML page"
 rank: 13
 risky: false
-state: in-review
+state: reviewed
 pr:
 note: "8dc5af2127: review fixes on 207a7827a7 (one-line comment, unbacked hit-rate sentence cut from the commit message; test kept by coordinator decision, DECISIONS tests check behaviour). P-MAP top candidate (docs/upstream/p-map.md). ips raw: docs/upstream/data/p-map/ab1-ips.txt (core 3, best of 5; interp best 4,836 -> 7,646 i/s, A/A -3.4%). Callgrind A/A within 0.21%; Fizzy card -0.35% interp; Fizzy YJIT cohort rejected (not JIT-flat)"
 passes:
