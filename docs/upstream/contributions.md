@@ -235,6 +235,22 @@ den vollen AM-, AR-SQLite- und AR-PostgreSQL-Suiten keine Abweichung fand. Einzi
 Reader und `#attributes` unverändert innerhalb des A/A. Kein offener PR deckt es ab. Empfehlung: kleiner Draft-PR für
 tenderlove, sobald Thomas ihn freigibt; ein Kommentar im gemergten #59141 bräuchte ebenfalls Thomas' OK.
 
+### Erklärung für Thomas: K6 (2026-11-14, Census 9; gebaut, nicht geöffnet)
+
+Belege und Messungen: [bench/upstream/k6](../../bench/upstream/k6/README.md); Queue-Eintrag
+[K6](../../bench/upstream/pr-queue/items/K6.md).
+
+**K6, `button_to` mit `params:`.** Seit #50312 (seanpdoyle, gemergt 2026-11-07, unveröffentlicht) baut `button_to`
+auf `form_tag` auf und rendert jeden Eintrag aus `params:` mit `hidden_field_tag`. Das geht über `text_field_tag`,
+berechnet mit `sanitize_to_id` eine `id`, die `id: nil` gleich wieder streicht, und baut die Optionen pro Feld
+zweimal um. K6 schreibt jedes Feld wieder direkt mit `tag`, genau wie #50312s eigene `token_tag` und `method_tag`
+und wie `button_to` in 8.1 (+3/−1 und ein Test). Die Ausgabe ist gleich: 5.760 Fälle aus Census 9 und 1.544 neue
+(seltsame Schlüssel und Werte, Verschachtelung, Escaping, `html_safe?`, Templates) liefern byte-gleiche Ausgabe wie
+main. Einziger Unterschied: Wer `hidden_field_tag` in seiner App überschreibt, sieht die Felder von `button_to` nicht
+mehr, wie in 8.1. Interpreter: 20 Params −29 % (fast wieder auf dem Stand vor #50312), 200 bis 5.000 Params −31 %;
+1-MB-Werte unverändert. Der neue Test deckt `remove_hidden_field_autocomplete` ab, das `button_to` jetzt selbst
+liest und das bisher kein Test prüfte. Empfehlung: kleiner PR als Follow-up zu #50312, sobald Thomas ihn freigibt.
+
 ### Erklärung für Thomas: ZM1 (2026-11-05, App-Suite-Runde Zammad; fertig, nicht geöffnet)
 
 Ergebnisse und alle anderen Befunde: [app-suites](app-suites.md#zammad).
