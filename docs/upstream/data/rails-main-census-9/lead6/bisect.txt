@@ -1,0 +1,29 @@
+# Lead 6 bisect: update1 Ir per call (interpreter, fixed heap, N=200 after 300 warmup), first-parent
+# 8ae3d84277 (merge base of 8-1-stable 71e963ed1b and c48c154e3f) .. c48c154e3f. Ir/col = (Ir@300 - Ir@30) / 270.
+index  commit              w30       w300   Ir/col  subject
+8.1    71e963ed1b      1189479    4613118    12680  2026-11-12 Merge pull request #59781 from skipkayhil/hm-vynypvmnwyttutqt
+8.1 A/A 71e963ed1b      1188245    4616166    12696  2026-11-12 Merge pull request #59781 from skipkayhil/hm-vynypvmnwyttutqt
+mb     8ae3d84277      1182597    4608361    12688  2025-10-14 Merge pull request #55885 from seanpdoyle/action-text-generalize-js
+299    f96883f056      1195614    4629394    12718  2025-12-13 Merge pull request #56359 from afurm/time-with-zone-yaml-todo-cleanup
+599    f3d132e04a      1198959    4632452    12717  2026-03-21 Merge pull request #57022 from byroot/sobrinho-main
+899    32b9bfaf58      1219539    4657357    12733  2026-05-28 Merge pull request #57344 from thatch-health/aj-attributes-docs
+1199   8954ad3bee      1250890    4864901    13385  2026-06-30 Merge pull request #57874 from Shopify/actionview-template-handlers-r
+1499   c1273e0136      1248753    4816640    13214  2026-08-06 Merge pull request #58391 from Shopify/actionview-view-context-contai
+1799   7bd8ca4a75      1272149    4658103    12541  2026-09-25 Rewrite the debugging guide (#58263)
+1899   833ecf9c0e      1268648    4652450    12533  2026-10-14 Merge pull request #59020 from matthewd/light
+1932   e02ee20575      1258599    4644770    12541  2026-10-15 Merge pull request #59091 from amatsuda/ordered-options-method-missin
+1943   a468a170e9      1255563    4643692    12549  2026-10-16 Merge pull request #59105 from amatsuda/controller-config-lazy-copy
+1954   22d4796d4a      1256881    4644129    12545  2026-10-16 Merge pull request #59074 from matthewd/through-key-matching
+1955   7a257b680b      1257484    4643038    12539  2026-10-16 Merge pull request #59077 from matthewd/key-map-value
+1956   ffe977efbc      1257349    4643144    12540  2026-10-16 Merge pull request #59111 from amatsuda/lazy-association-cache
+#59083 7d77c91fff      1256577    4642056    12539  2024-10-16 Move LazyAttributeSet to attribute_set.rb
+#59083 33e6064ac9      1255327    4641065    12540  2024-10-16 remove `send`
+#59083 a19ef01cb3      1496340    6733752    19398  2024-10-16 fix `deep_dup` and `map` return type
+#59083 dfe995aacb      1498538    6731096    19380  2025-01-10 Ensure `@attributes` is always a LazyAttributeSet
+1957   da27ee26de      1464350    6443596    18442  2026-10-15 Merge pull request #59083 from tenderlove/fbuilder
+1961   e7dac070ef      1464584    6442787    18438  2026-10-16 Merge pull request #59117 from amatsuda/tag-building-allocations
+1965   60e2d29a59      1462353    6451059    18477  2026-10-16 Merge pull request #59118 from amatsuda/collection-render-shared-buff
+1999   0d022e0bcd      1460541    6437209    18432  2026-10-19 Merge pull request #59184 from yahonda/mysql-yml-template-minimum-ver
+2099   10eee71222      1463668    6598546    19018  2026-10-24 Reduce allocations when building HTTP URLs (#59316)
+2399   b565fe22b2      1420335    6420762    18520  2026-11-10 Merge pull request #59709 from helmipradita/fix/unscope-table-qualifi
+pre141 c48c154e3f      1425842    6432392    18543  2026-11-11 Merge pull request #59489 from linyiru/freeze-ar-config-on-load

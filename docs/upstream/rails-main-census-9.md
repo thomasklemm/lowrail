@@ -40,7 +40,7 @@ twin (`main2`, or `c9m2` in the census).
 | 3 | **`attributes_for_database` / `attributes_before_type_cast` rebuild an `IndexedRow::Mutable` per call** (`materialize`, then a Hash via `transform_values`) | AR `before_type_cast.rb:108/113` → AM `attribute_set.rb:115/119` → `:457` | Marshal (`marshalling.rb:23`) and MessagePack (`message_pack.rb:89`) record caching; 0 of the 71 census workloads | `attributes_for_database` ×2.2 at 6–300 cols (1 → 4 objects); `before_type_cast` ×5–6; `Marshal.dump` +33% / +34% / +36% / +36% vs 8.1 at 6/30/100/300 cols (A/A ≤ 0.04%) | No (#59141) | None (#59249 and #59684 touch other parts of Marshal and MessagePack) | **L3 built** ([record](../../bench/upstream/l3/README.md), queue item [L3](../../bench/upstream/pr-queue/items/L3.md)): drops the per-call row copy, keeps `materialize` (a row read is not exact). `Marshal.dump` −15%, MessagePack −25% to −28%, `attributes_for_database` −33% to −42%, `before_type_cast` −43% to −53% at 6–300 cols (A/A ≤ 0.26%) |
 | 4 | **By-name access after #59141**: `index_for_name` → `indexes` → `lookup`, a second `index_for_name` in `write`, eager cast in `write_from_user` | AM `attribute_set.rb:495`, `:374/382`, `:422`; AR `read.rb:40/56`, `write.rb:32/52`, `primary_key.rb:19` | 8/8 apps: `index_for_name` +0.298% net (59 workloads), `value_at!` +0.272%, `fetch_value!` +0.102% | vs before #59141: `read_attribute`/`self[]` +16%, `id`/`_read_attribute` +39–41%, `write_attribute` +37%, writer +33%, `changed?` +32%, `dup` +22% (YJIT read +2%, write +43%) (A/A ≤ 0.95%) | No (#59141) | None. tenderlove plans index-based generated writers and the like | Reads by name (`id`, `_read_attribute`): regression from #59141. Writers and dirty: not yet converted. Give tenderlove the numbers before the beta |
 | 5 | **Partial-select reads** go through `ExtendedIndexes`/`Remapper` | AM `indexed_row.rb:206/267` | 2/8 apps in the census (`Remapper#initialize` +0.041%) | `partial_load1_read` +14–15% vs before #59141 and +17% vs 8.1 at every width; YJIT +26–31% | No (#59141) | None | Measure `select(:id, :name)` loads with 1–10,000 rows; low priority |
-| 6 | **`update!` grows with width before #59141** | AR save path (not yet attributed) | Every app that saves wide records | 8.1 → before #59141: +10% / +19% / +31% / +39% at 6/30/100/300 cols; with K1 still +10% vs 8.1 at 300 cols | No | None | A line-level Callgrind diff of `update1` at 300 cols, 8.1 against the parent of #59141 |
+| 6 | **`update!` grows with width before #59141** | Before #59141: `LazyAttributeSet#keys`'s union, which a19ef01cb3 (#59083) keeps on saved records. On K1: by-name helpers in AM `attribute_set.rb:320` (`#[]`), `:346–347` (`#keys`), `:469` (`transform_attributes!`) | Every app that saves wide records | 8.1 → before #59141: +12% / +20% / +32% / +39% at 6/30/100/300 cols; K1 +10% at 300 cols; K1 + L6 −1.8% at 300 cols | No (#59083, #59141) | None | **Attributed** ([below](#lead-6-update-and-table-width)). K1 removes #59083's part; L6 (`641c84c43a`, +4/−4) is built. Thomas decides |
 | 7 | **Per-row load on large results** | AR `querying.rb:93`, `result.rb:263`, `model_schema.rb:227/235` | Any query that loads thousands of rows; the census's small pages are faster | 10,000 rows, Ir per row vs 8.1: +13% / +14% / +22% at 6/30/300 cols. Census 8 was +32% / +33% / +41%; #59141 recovered 12% (A/A ≤ 0.04%) ([below](#per-row-load)) | No (before census 8) | None. AT-1 (reuse the builder per row) rejected: it skips the overridable `instantiate_instance_of` | Attribute the census 8 per-row growth (`loaded_mapped_table` ×2, `schema_attributes`, the strict-loading class attributes) |
 | 8 | **`table_name_qualified_unscope_values` on every merge** | AR `query_methods.rb:1066` via `merger.rb:66`, `association_scope.rb:147` | 8/8 apps, 57 workloads: +13 objects; +0.025% Ir | Small; `merge` itself is −36% vs census 8 | No (#59709, 2026-11-10, fixes #48227) | None | Return early when `unscope_values` is empty; not built, below the bar alone |
 
@@ -71,6 +71,163 @@ Evidence:
 * YJIT at 30 columns: `changed?` −24%, `update!` −29%.
 
 With K1, `update!` at 300 columns is 5.09M Ir against 8.1's 4.63M; it is 7.91M on main.
+
+## Lead 6: `update!` and table width
+
+**Result.** Before #59141, the width-dependent growth comes from one commit, a19ef01cb3 "fix `deep_dup` and `map`
+return type". It is tenderlove's, and it went in with #59083 (merged 2026-10-15 as `da27ee26de`). K1 already removes
+it. What K1 leaves is #59141's by-name helpers, which a save calls once per column in three loops. L6 inlines the
+helpers in two of those loops. It is built on the fork as `thomasklemm/indexed-set-inline-lookups` at
+[`641c84c43a`](https://github.com/thomasklemm/rails/commit/641c84c43a558947c3cf54ce11a910edb183b992), +4/−4, and
+queued as [L6](../../bench/upstream/pr-queue/items/L6.md). With K1 and L6 together, `update!` costs less than on
+8.1 at 300 columns. A part that does not depend on width remains and is not attributed here: +4.6% at 30 columns
+and +8.2% at 6.
+
+`update!` of one column (`update1` in [`attr_micro.rb`](../../bench/upstream/census9/attr_micro.rb)), Ir per call,
+interpreter, measured in this orb:
+
+| Columns | 8.1 (A/A) | before #59141 | main | K1 | K1 + L6 (A/A) | K1 + L6 vs 8.1 |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 6 | 876,439 / 876,423 | 977,857 (+11.6%) | 1,027,368 (+17.2%) | 969,145 (+10.6%) | 948,073 / 948,052 | +8.2% |
+| 30 | 1,189,479 / 1,188,245 | 1,425,842 (+19.9%) | 1,595,210 (+34.1%) | 1,308,854 (+10.0%) | 1,244,175 / 1,245,085 | +4.6% |
+| 100 | 2,064,800 / 2,064,214 | 2,719,412 (+31.7%) | 3,223,183 (+56.1%) | 2,278,478 (+10.3%) | 2,090,222 / 2,090,118 | +1.2% |
+| 300 | 4,613,118 / 4,616,166 | 6,432,392 (+39.4%) | 7,899,487 (+71.2%) | 5,082,557 (+10.2%) | 4,532,201 / 4,532,610 | **−1.8%** |
+| Ir per column | 12,680 | 18,543 | 23,349 | 13,977 | 12,178 | |
+
+### Bisect
+
+Every 8-1-stable commit since the merge base `8ae3d84277` is a backport, and the merge base costs the same as 8.1
+(12,689 Ir per column against 12,680). So the bisect runs over the 2,411 first-parent commits from `8ae3d84277` to
+`c48c154e3f`. It measures Ir per column, (Ir at 300 − Ir at 30) / 270, and samples every 300th commit before trisecting
+([`bisect.rb`](../../bench/upstream/census9/lead6/bisect.rb), [all points](data/rails-main-census-9/lead6/bisect.txt)):
+
+| First-parent commit | Ir at 30 | Ir at 300 | Ir per column |
+| --- | ---: | ---: | ---: |
+| `8ae3d84277` (merge base) | 1,182,597 | 4,608,361 | 12,688 |
+| `ffe977efbc` (#59111, parent of #59083's merge) | 1,257,349 | 4,643,144 | 12,540 |
+| ↳ #59083 `33e6064ac9` "remove `send`" | 1,255,327 | 4,641,065 | 12,540 |
+| ↳ #59083 **`a19ef01cb3`** "fix `deep_dup` and `map` return type" | 1,496,340 | 6,733,752 | **19,398** |
+| `da27ee26de` (#59083's merge) | 1,464,350 | 6,443,596 | 18,442 |
+| `c48c154e3f` (before #59141) | 1,425,842 | 6,432,392 | 18,543 |
+
+#59083 was rebased onto `ffe977efbc`, so its own commits measure on the same base. Two smaller moves are not
+chased: +68k Ir at 30 columns that builds up before `ffe977efbc` without changing the per-column cost, and +650 Ir
+per column that appears between the 900th and the 1,200th commit and is gone by the 1,800th.
+
+**Mechanism.** Until a19ef01cb3, `LazyAttributeSet#map` was `AttributeSet#map` and returned a plain, Hash-backed
+`AttributeSet`. So after the first save (`changes_applied` → `forget_attribute_assignments` →
+`@attributes.map(&:forgetting_assignment)`), a record's `keys` was `attributes.each_key.select { ... }`, as on 8.1.
+a19ef01cb3 makes `map` and `deep_dup` return a `LazyAttributeSet`. A saved record therefore keeps the lazy set, whose
+`keys` builds `values.keys | types.keys | @attributes.keys` and then filters it. `AttributeMutationTracker#attr_names`
+calls `keys` three times per `update!`, and each call hashes every column name into the two temporary Hashes that
+the two `Array#|` build.
+
+The Callgrind self Ir per column ([`fn_slope.rb`](../../bench/upstream/census9/lead6/fn_slope.rb),
+[table](data/rails-main-census-9/lead6/callgrind-functions-per-column.txt)) shows that most of the growth is
+hashing. The `callgrind_annotate` dumps cover only the measured window
+([`cg_window.rb`](../../bench/upstream/census9/lead6/cg_window.rb)). The instance-variable shape lookups also grew,
+but they are gone again before #59141.
+
+| C function, Ir per column | 8.1 | a19ef01cb3's parent | a19ef01cb3 | before #59141 | K1 | K1 + L6 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| total | 12,679 | 12,529 | 19,372 | 18,519 | 13,967 | 12,155 |
+| `ruby_sip_hash13` | 450 | 450 | 1,708 | 2,068 | 450 | 450 |
+| `rb_st_update` | 94 | 94 | 1,116 | 1,555 | 94 | 94 |
+| `find_table_bin_ind` | 45 | 45 | 601 | 844 | 45 | 46 |
+| `rb_str_hash`, `rb_any_hash` (2), `ar_force_convert_table`, `rb_hash_add_new_element`, `rb_hash_stlike_update`, `rb_st_keys` | 254 | 253 | 1,339 | 1,677 | 288 | 287 |
+| `rb_shape_get_iv_index_with_hint` (shape.c, shape.h) | 66 | 66 | 912 | 0 | 0 | 0 |
+| `vm_exec_core` (vm.inc, insns.def, vm_insnhelper.c) | 3,661 | 3,661 | 4,243 | 3,397 | 5,023 | 3,922 |
+
+At the Ruby level, a19ef01cb3 adds only 2 calls and 4 lines per column: 21 → 23 Ruby calls, 29 → 33 lines
+([`lines.rb`](../../bench/upstream/census9/lead6/lines.rb),
+[per column](data/rails-main-census-9/lead6/ruby-lines-per-column.txt)). The cost is in the C work of the unions.
+
+**Deliberate?** The type change is deliberate. It comes from tenderlove's 2024 refactoring
+[#53344](https://github.com/rails/rails/pull/53344) (still open), rebased into #59083, "Add read-only attributes and
+use it instead of building a cache". #59083's next commit, dfe995aacb "Ensure `@attributes` is always a
+LazyAttributeSet", relies on it, and #59141's indexed set needs it. #59083 has no review comments. Its description
+says "I'm not thrilled with some of the code in here, but I like the performance gain". Nobody discussed the cost of
+the union in `keys`. That union is the piece that can go: #59141 carried it into `LazyIndexedAttributeSet#keys` as
+`row_keys | @ctx.type_keys | cached_names`, which always equals `row_keys`. **K1 is its exact fix.** On K1, every
+hashing function above is back at 8.1's count per column.
+
+### What K1 leaves, and L6
+
+K1 costs 13,967 Ir per column against 8.1's 12,679 (+1,288, about +10%). None of it is hashing: the whole difference
+is in the VM, from 26 Ruby calls and 25 C calls per column against 8.1's 21 and 15. The calls come from three loops,
+all from #59141 ([call sites](data/rails-main-census-9/lead6/ruby-call-sites-per-column.txt),
+[`sites.rb`](../../bench/upstream/census9/lead6/sites.rb)):
+
+1. **`LazyIndexedAttributeSet#keys`** (AM `attribute_set.rb:346–347` on main): each name costs `index_for_name`
+   (→ `indexes` → `Hash#[]`) and `lookup` (→ `Array#[]`), two Ruby calls where 8.1 makes one (`self[name]`).
+   `keys` runs three times per `update!`.
+2. **`AttributeMutationTracker#attribute_changed?`** (`attribute_mutation_tracker.rb:79`), once per column, calls
+   `LazyIndexedAttributeSet#[]` (`attribute_set.rb:320`) → `index_for_name` and `attribute_at` → `lookup`. That is
+   four Ruby calls where 8.1 makes two.
+3. **`transform_attributes!`** (`attribute_set.rb:469–480`), from `forget_attribute_assignments`: an
+   `each_with_index` block with two Array stores per slot, where 8.1 runs `Hash#transform_values`.
+
+**Deliberate?** The helpers are deliberate structure ("Methods that take a name look its index up once and work by
+index from there"). The same file already inlines them where it is hot: `fetch_value_at` is "Same as #value_at,
+inlined since generated readers call this", `value_at` "check[s] the caches directly", and `type_for` reads
+`@indexes`. tenderlove [plans](https://github.com/rails/rails/pull/59141#issuecomment-6546441624) to give "the
+same 'index based' treatment to the other methods we generate". That would rework loop 2's callers, but not
+`#keys` or `#[]` themselves.
+
+**L6** (+4/−4, [patch](data/rails-main-census-9/lead6/L6.patch)) inlines `index_for_name`, `lookup` and
+`attribute_at` in `#[]` and in `#keys`' loop. It is exact: `index_for_name` is `indexes[name]`; `indexes` is the
+`attr_reader` of `@indexes`, which only `initialize` assigns; `lookup` is `@attributes&.[](index)`; and
+`attribute_at` is `lookup(index) || default_attribute(name, index)`. The inlined code reads the same instance
+variables at the same points, including after a `default_attribute` in the loop creates `@attributes`. Nothing in
+Rails subclasses `LazyIndexedAttributeSet`.
+
+Evidence:
+
+* K1's [`keys_probe.rb`](../../bench/upstream/k1/keys_probe.rb) prints identical output for main and L6 (54 cases,
+  6,897 lines) and for K1 and K1 + L6 (6,959 lines).
+* Active Model passes on L6 (1,269 runs, 0 failures). Active Record SQLite has 10,375 runs, 0 failures and 5
+  errors, all from this orb's environment: four from the missing `sqlite3` CLI and one from `pg` outside the bundle.
+  Once both are installed, those two files pass (`sqlite_rake_test` 15/15, `connection_handlers_multi_db_test`
+  21/21).
+* K1 + L6 passes Active Model (1,269 runs, 0 failures) and 26 focused Active Record files (dirty, attributes,
+  persistence, serialization, STI, store, Marshal, timestamps, locking, enum, dup/clone, autosave, transactions;
+  2,173 runs, 0 failures).
+* RuboCop: no offenses.
+
+Loop 3 is not built. `@attributes.map! { |attr| attr && yield(attr) }` with `@casted_values.fill(UNCAST)` saves 3.8%
+at 300 columns on K1. But it is exact only if every slot with a cast value also has a built attribute after
+`materialize`, which needs its own proof.
+
+L6 is based on main `50c54eed06`, as asked. Its `#keys` hunk changes the two lines after K1's, so the two branches
+conflict textually. The resolution keeps K1's `row_keys.keep_if` with L6's two lines
+([K1 + L6 diff](data/rails-main-census-9/lead6/L6-on-K1.diff)); every K1 + L6 number here uses it. Either branch
+can rebase onto the other, or K1 can take L6's two `#keys` lines.
+
+L6 per call, interpreter, against its base. A/A is L6 against a second checkout of itself, and objects per call
+are unchanged in every case ([all 40 cases](data/rails-main-census-9/lead6/l6-interp.md)):
+
+| Case | L6 vs main, 30 cols | 300 cols | K1 + L6 vs K1, 30 cols | 300 cols | largest A/A |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `update!` of one column | −3.8% | −7.0% | −4.8% | −10.9% | 0.09% |
+| load, then `update!` | −4.9% | −8.3% | −5.0% | −9.2% | 0.07% |
+| load, then `changed?` | −6.3% | −6.8% | −7.8% | −8.4% | 0.15% |
+| load, assign, then `changes` | −5.9% | −6.6% | −7.1% | −8.0% | 0.15% |
+| `serializable_hash` | −4.4% | −4.7% | −6.6% | −6.8% | 0.25% |
+| load, then `as_json` | −2.1% | −2.3% | −2.6% | −2.7% | 0.14% |
+| load, then `dup` | −4.0% | −4.5% | −2.3% | −2.4% | 0.05% |
+| load, then `Marshal.dump` | −4.1% | −4.4% | −2.2% | −2.4% | 0.05% |
+
+On main, `update!` drops by 1.8% / 3.8% / 5.8% / 7.0% at 6/30/100/300 columns. Some by-name cases of a few thousand
+Ir (`read_attribute`, `_read_attribute`, `write_attribute`, the writer, `new`, the warm reader) move by +0.2% to
++1.0% on either base (9 to 142 Ir). No move is more than 0.1 points above that case's A/A. Readers, loads,
+`#attributes`, `marshal_dump` of a warm record and `attributes_for_database` are unchanged.
+
+YJIT, load then `changed?`: L6 against main is −3.3% / −3.2% at 30/300 columns (A/A 0.73% / 0.04%), and K1 + L6
+against K1 is −4.4% / −4.3% (A/A 0.06% / 0.01%). `update!`, assignment then `changes`, and `serializable_hash`
+compiled blocks in some measured windows ([raw](data/rails-main-census-9/lead6/l6-yjit.txt)), so they are not
+claimed.
+Ruby master × ZJIT was not measured. [DECISIONS](../DECISIONS.md#evidence-and-measurement) requires it before L6
+opens.
 
 ## `button_to` since #50312
 
@@ -533,5 +690,6 @@ census 8:
 * YJIT numbers come from micros only. Per-row loads on main compile 1 block per window at 1,000 and 10,000 rows,
   so no YJIT row result is claimed.
 * Lead 3 has no census reach because no workload caches records. Its size is per cached record.
-* Lead 6 (`update!` width before #59141) is not attributed to a commit yet.
+* Lead 6: the part of `update!`'s growth that does not depend on width (+4.6% at 30 and +8.2% at 6 columns with
+  K1 + L6) is not attributed. L6 has no Ruby master × ZJIT numbers yet.
 * The 8 apps include no MySQL app, and no app on `load_defaults "8.2"`.

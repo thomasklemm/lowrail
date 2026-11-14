@@ -1,0 +1,64 @@
+per column                                                                                                                s81            k1         k1fix
+R #<Class:ActiveModel::Attribute>#from_database <- activemodel/lib/active_model/attribute.rb:101 ActiveModel::            0.0           1.0           1.0
+R #<Class:ActiveModel::Attribute>#from_database <- activemodel/lib/active_model/attribute.rb:84 ActiveModel::A            1.0           0.0           0.0
+R ActiveModel::Attribute#changed? <- activemodel/lib/active_model/attribute_mutation_tracker.rb:79 ActiveModel            1.0           1.0           1.0
+R ActiveModel::Attribute#changed_from_assignment? <- activemodel/lib/active_model/attribute.rb:67 ActiveModel:            1.0           0.0           0.0
+R ActiveModel::Attribute#changed_from_assignment? <- activemodel/lib/active_model/attribute.rb:84 ActiveModel:            0.0           1.0           1.0
+R ActiveModel::Attribute#changed_in_place? <- activemodel/lib/active_model/attribute.rb:192 ActiveModel::Attri            1.0           0.0           0.0
+R ActiveModel::Attribute#changed_in_place? <- activemodel/lib/active_model/attribute.rb:209 ActiveModel::Attri            0.0           1.0           1.0
+R ActiveModel::Attribute#changed_in_place? <- activemodel/lib/active_model/attribute.rb:67 ActiveModel::Attrib            1.0           0.0           0.0
+R ActiveModel::Attribute#changed_in_place? <- activemodel/lib/active_model/attribute.rb:84 ActiveModel::Attrib            0.0           1.0           1.0
+R ActiveModel::Attribute#has_been_read? <- activemodel/lib/active_model/attribute.rb:71 ActiveModel::Attribute            2.0           0.0           0.0
+R ActiveModel::Attribute#has_been_read? <- activemodel/lib/active_model/attribute.rb:88 ActiveModel::Attribute            0.0           2.0           2.0
+R ActiveModel::Attribute#initialize <- activemodel/lib/active_model/attribute.rb:10 ActiveModel::Attribute.fro            0.0           1.0           1.0
+R ActiveModel::Attribute#initialize <- activemodel/lib/active_model/attribute.rb:9 ActiveModel::Attribute.from            1.0           0.0           0.0
+R ActiveModel::Attribute#initialized? <- activemodel/lib/active_model/attribute_set.rb:347 block in ActiveMode            0.0           3.0           3.0
+R ActiveModel::Attribute#initialized? <- activemodel/lib/active_model/attribute_set.rb:47 block in ActiveModel            3.0           0.0           0.0
+R ActiveModel::Attribute#with_value_from_database <- activemodel/lib/active_model/attribute.rb:193 ActiveModel            1.0           0.0           0.0
+R ActiveModel::Attribute#with_value_from_database <- activemodel/lib/active_model/attribute.rb:210 ActiveModel            0.0           1.0           1.0
+R ActiveModel::Attribute::FromDatabase#forgetting_assignment <- activemodel/lib/active_model/attribute_set.rb:            0.0           1.0           1.0
+R ActiveModel::Attribute::FromDatabase#forgetting_assignment <- activemodel/lib/active_model/attribute_set.rb:            1.0           0.0           0.0
+R ActiveModel::AttributeMutationTracker#attribute_changed? <- activemodel/lib/active_model/attribute_mutation_            1.0           1.0           1.0
+R ActiveModel::AttributeMutationTracker#changed? <- activemodel/lib/active_model/attribute_mutation_tracker.rb            1.0           1.0           1.0
+R ActiveModel::AttributeMutationTracker#forced_changes <- activemodel/lib/active_model/attribute_mutation_trac            1.0           0.0           0.0
+R ActiveModel::AttributeSet#[] <- activemodel/lib/active_model/attribute_mutation_tracker.rb:79 ActiveModel::A            1.0           0.0           0.0
+R ActiveModel::AttributeSet#[] <- activemodel/lib/active_model/attribute_set.rb:47 block in ActiveModel::Attri            3.0           0.0           0.0
+R ActiveModel::LazyIndexedAttributeSet#[] <- activemodel/lib/active_model/attribute_mutation_tracker.rb:79 Act            0.0           1.0           1.0
+R ActiveModel::LazyIndexedAttributeSet#attribute_at <- activemodel/lib/active_model/attribute_set.rb:322 Activ            0.0           1.0           0.0
+R ActiveModel::LazyIndexedAttributeSet#index_for_name <- activemodel/lib/active_model/attribute_set.rb:321 Act            0.0           1.0           0.0
+R ActiveModel::LazyIndexedAttributeSet#index_for_name <- activemodel/lib/active_model/attribute_set.rb:345 blo            0.0           3.0           0.0
+R ActiveModel::LazyIndexedAttributeSet#lookup <- activemodel/lib/active_model/attribute_set.rb:346 block in Ac            0.0           3.0           0.0
+R ActiveModel::LazyIndexedAttributeSet#lookup <- activemodel/lib/active_model/attribute_set.rb:548 ActiveModel            0.0           1.0           0.0
+R Kernel#class <- activemodel/lib/active_model/attribute.rb:101 ActiveModel::Attribute#with_value_from_databas            0.0           1.0           1.0
+R Kernel#class <- activemodel/lib/active_model/attribute.rb:84 ActiveModel::Attribute#with_value_from_database            1.0           0.0           0.0
+C ActiveModel::Attribute#name <- activemodel/lib/active_model/attribute.rb:193 ActiveModel::Attribute::FromDat            1.0           0.0           0.0
+C ActiveModel::Attribute#name <- activemodel/lib/active_model/attribute.rb:210 ActiveModel::Attribute::FromDat            0.0           1.0           1.0
+C ActiveModel::Attribute#original_attribute <- activemodel/lib/active_model/attribute.rb:67 ActiveModel::Attri            1.0           0.0           0.0
+C ActiveModel::Attribute#original_attribute <- activemodel/lib/active_model/attribute.rb:84 ActiveModel::Attri            0.0           1.0           1.0
+C ActiveModel::Attribute#type <- activemodel/lib/active_model/attribute.rb:193 ActiveModel::Attribute::FromDat            1.0           0.0           0.0
+C ActiveModel::Attribute#type <- activemodel/lib/active_model/attribute.rb:210 ActiveModel::Attribute::FromDat            0.0           1.0           1.0
+C ActiveModel::Attribute#value_before_type_cast <- activemodel/lib/active_model/attribute_set.rb:475 block in             0.0           1.0           1.0
+C ActiveModel::Attribute#value_before_type_cast <- activemodel/lib/active_model/attribute_set.rb:98 Hash#trans            1.0           0.0           0.0
+C ActiveModel::AttributeMutationTracker#attributes <- activemodel/lib/active_model/attribute_mutation_tracker.            1.0           1.0           1.0
+C ActiveModel::LazyIndexedAttributeSet#indexes <- activemodel/lib/active_model/attribute_set.rb:321 ActiveMode            0.0           1.0           0.0
+C ActiveModel::LazyIndexedAttributeSet#indexes <- activemodel/lib/active_model/attribute_set.rb:345 block in A            0.0           3.0           0.0
+C Array#[] <- activemodel/lib/active_model/attribute_mutation_tracker.rb:79 ActiveModel::AttributeMutationTrac            0.0           0.0           1.0
+C Array#[] <- activemodel/lib/active_model/attribute_set.rb:344 Array#keep_if                                             0.0           0.0           3.0
+C Array#[] <- activemodel/lib/active_model/attribute_set.rb:346 block in ActiveModel::LazyIndexedAttributeSet#            0.0           3.0           0.0
+C Array#[] <- activemodel/lib/active_model/attribute_set.rb:548 ActiveModel::LazyIndexedAttributeSet#attribute            0.0           1.0           0.0
+C Array#[]= <- activemodel/lib/active_model/attribute_set.rb:472 Array#each                                               0.0           2.0           2.0
+C BasicObject#! <- activemodel/lib/active_model/attribute_mutation_tracker.rb:45 ActiveModel::AttributeMutatio            2.0           2.0           2.0
+C BasicObject#! <- activemodel/lib/active_model/attribute_set.rb:475 block in ActiveModel::LazyIndexedAttribut            0.0           2.0           2.0
+C BasicObject#! <- activemodel/lib/active_model/attribute_set.rb:98 Hash#transform_values                                 2.0           0.0           0.0
+C Hash#[] <- activemodel/lib/active_model/attribute_mutation_tracker.rb:79 ActiveModel::AttributeMutationTrack            1.0           0.0           1.0
+C Hash#[] <- activemodel/lib/active_model/attribute_set.rb:321 ActiveModel::LazyIndexedAttributeSet#[]                    0.0           1.0           0.0
+C Hash#[] <- activemodel/lib/active_model/attribute_set.rb:344 Array#keep_if                                              0.0           0.0           3.0
+C Hash#[] <- activemodel/lib/active_model/attribute_set.rb:345 block in ActiveModel::LazyIndexedAttributeSet#k            0.0           3.0           0.0
+C Hash#[] <- activemodel/lib/active_model/attribute_set.rb:47 block in ActiveModel::AttributeSet#keys                     3.0           0.0           0.0
+C Hash#include? <- activemodel/lib/active_model/attribute_mutation_tracker.rb:45 ActiveModel::AttributeMutatio            1.0           0.0           0.0
+C Integer#< <- activemodel/lib/active_model/attribute_set.rb:472 Array#each                                               0.0           1.0           1.0
+C NilClass#nil? <- activemodel/lib/active_model/attribute.rb:10 ActiveModel::Attribute.from_database                      0.0           1.0           1.0
+C NilClass#nil? <- activemodel/lib/active_model/attribute.rb:9 ActiveModel::Attribute.from_database                       1.0           0.0           0.0
+total R                                                                                                                  21.0          26.0          17.0
+total C                                                                                                                  15.0          25.0          21.0
+total L                                                                                                                   0.0           0.0           0.0

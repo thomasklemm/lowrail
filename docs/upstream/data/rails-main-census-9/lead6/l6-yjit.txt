@@ -1,0 +1,61 @@
+# Lead 6 / L6 under --yjit (yjit.sh), Ir per call, objects per call, compiled blocks in the measured window (0 = JIT-flat).
+main w30
+update1                          839114.8   188.02 3
+load1_changed?                   267553.0    45.00 0
+serializable_hash_warm           249679.4    37.00 0
+load1_assign_changes             302948.9    53.00 17
+fix w30
+update1                          823252.8   187.96 3
+load1_changed?                   258725.9    45.00 0
+serializable_hash_warm           248668.2    37.00 0
+load1_assign_changes             294019.2    53.00 17
+fixb w30
+update1                          829996.6   188.02 3
+load1_changed?                   260610.9    45.00 0
+serializable_hash_warm           249178.5    37.00 0
+load1_assign_changes             287681.3    53.00 0
+k1 w30
+update1                          603140.6   173.02 3
+load1_changed?                   202814.8    40.00 0
+serializable_hash_warm           186884.4    32.00 10
+load1_assign_changes             237455.8    48.00 17
+k1fix w30
+update1                          587636.9   173.02 3
+load1_changed?                   193913.8    40.00 0
+serializable_hash_warm           184133.3    32.00 10
+load1_assign_changes             228432.7    48.00 17
+k1fixb w30
+update1                          587815.5   173.02 3
+load1_changed?                   194020.8    40.00 0
+serializable_hash_warm           182765.3    32.00 0
+load1_assign_changes             228539.5    48.00 17
+main w300
+update1                         4903176.8   458.32 3
+load1_changed?                  2547807.2   315.00 0
+serializable_hash_warm          2610448.4   307.00 0
+load1_assign_changes            2678267.5   323.30 26
+fix w300
+update1                         4768617.7   458.32 9
+load1_changed?                  2465042.2   315.30 0
+serializable_hash_warm          2567901.1   307.00 0
+load1_assign_changes            2594875.1   323.30 45
+fixb w300
+update1                         4767058.2   458.32 9
+load1_changed?                  2464038.5   315.00 0
+serializable_hash_warm          2573686.8   307.00 10
+load1_assign_changes            2594031.1   323.00 0
+k1 w300
+update1                         2543332.2   443.02 3
+load1_changed?                  1914334.1   310.30 0
+serializable_hash_warm          1980574.3   302.00 10
+load1_assign_changes            2041691.4   318.00 17
+k1fix w300
+update1                         2410308.2   443.02 3
+load1_changed?                  1831218.4   310.00 0
+serializable_hash_warm          1943745.4   302.00 0
+load1_assign_changes            1950420.2   318.00 0
+k1fixb w300
+update1                         2409529.4   443.02 3
+load1_changed?                  1831437.5   310.00 0
+serializable_hash_warm          1940336.4   302.00 10
+load1_assign_changes            1950474.6   318.00 0

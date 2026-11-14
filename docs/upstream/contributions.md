@@ -269,6 +269,23 @@ mehr, wie in 8.1. Interpreter: 20 Params −29 % (fast wieder auf dem Stand vor 
 1-MB-Werte unverändert. Der neue Test deckt `remove_hidden_field_autocomplete` ab, das `button_to` jetzt selbst
 liest und das bisher kein Test prüfte. Empfehlung: kleiner PR als Follow-up zu #50312, sobald Thomas ihn freigibt.
 
+### Erklärung für Thomas: L6 (2026-11-14, Census 9, Lead 6; gebaut, nicht geöffnet)
+
+Belege: [Census 9, Lead 6](rails-main-census-9.md#lead-6-update-and-table-width); Queue-Eintrag
+[L6](../../bench/upstream/pr-queue/items/L6.md).
+
+**Zuordnung.** Dass `update!` schon vor #59141 mit der Tabellenbreite teurer wird, geht auf einen einzigen Commit
+zurück: a19ef01cb3 aus tenderloves #59083 (gemergt 2026-10-15). Seitdem bleibt ein gespeicherter Record im
+`LazyAttributeSet`. Dessen `keys` vereinigt bei jedem Aufruf drei Arrays per `|` und hasht dabei jeden Spaltennamen;
+ein `save` ruft `keys` dreimal auf. K1 entfernt genau diese Vereinigung. Was nach K1 bleibt, sind etwa +10 % bei
+jeder Breite: die By-Name-Helfer aus #59141 (`index_for_name`, `lookup`) in `#keys` und `#[]`.
+
+**L6** (+4/−4) schreibt diese Helfer in den beiden Methoden direkt aus. Es liest dieselben Instanzvariablen an
+denselben Stellen und ist damit exakt. Auf main gemessen: `update!` −1,8 % / −3,8 % / −5,8 % / −7,0 % bei
+6/30/100/300 Spalten. Zusammen mit K1 liegt `update!` bei 300 Spalten 1,8 % unter 8.1; bei 30 Spalten bleiben +4,6 %,
+die nicht von der Breite abhängen. L6 kollidiert mit K1 nur textuell in `#keys`. Es fehlen noch ZJIT auf Ruby master
+und die Reviews.
+
 ### Erklärung für Thomas: ZM1 (2026-11-05, App-Suite-Runde Zammad; fertig, nicht geöffnet)
 
 Ergebnisse und alle anderen Befunde: [app-suites](app-suites.md#zammad).

@@ -1,0 +1,25 @@
+# Lead 6: self Ir per column of update1 by C function, (Ir/call at 300 - at 30) / 270, from callgrind_annotate --inclusive=no
+# of cg.sh window dumps (200 calls). Trees: 8.1, a19ef01cb3^ (33e6064ac9), a19ef01cb3, before #59141, K1, K1 + L6.
+Ir per column, by function                                            s81  b-33e6064ac9  b-a19ef01cb3        pre141            k1         k1fix
+PROGRAM TOTALS                                                    12678.5       12529.1       19372.3       18519.2       13966.9       12154.6
+siphash.c:ruby_sip_hash13                                           449.5         449.5        1708.0        2067.5         449.5         449.5
+st.c:rb_st_update                                                    94.1          94.0        1116.3        1554.8          94.2          94.3
+st.c:find_table_bin_ind                                              45.2          44.5         601.1         844.0          45.3          45.7
+shape.c:rb_shape_get_iv_index_with_hint                              54.0          54.0         708.0           0.0           0.0           0.0
+vm_insnhelper.c:vm_exec_core                                       1620.0        1620.0        1918.0        1421.0        2095.0        1538.0
+vm.inc:vm_exec_core                                                1444.0        1444.0        1644.0        1440.0        2114.0        1771.0
+vm.c:invoke_block_from_c_bh                                         222.0         222.0         582.0         489.0         407.0         407.0
+string.c:rb_str_hash                                                100.0         100.0         380.0         460.0         100.0         100.0
+gc.c:rb_gc_writebarrier                                             161.5         161.5         333.7         447.9         123.5         123.5
+vm.c:invoke_block_from_c_bh'2                                       279.0         279.0           0.0           0.0          93.0          93.0
+insns.def:vm_exec_core                                              597.0         597.0         681.0         536.0         814.0         613.0
+vm_insnhelper.c:vm_yield_with_cfunc                                 240.0         240.0           0.0           0.0          80.0          80.0
+vm_insnhelper.c:vm_call_iseq_setup_normal_0start_1params_1locals          174.0         174.0         232.0          87.0         290.0          58.0
+hash.c:rb_any_hash                                                   59.7          59.0         226.1         276.9          60.9          60.3
+shape.h:rb_shape_get_iv_index_with_hint                              12.0          12.0         204.0           0.0           0.0           0.0
+hash.c:ar_force_convert_table.constprop.0                            25.0          25.0         175.0         225.0          25.0          25.0
+hash.c:rb_hash_add_new_element                                       24.0          24.0         168.0         216.0          24.0          24.0
+include/ruby/internal/value_type.h:rb_any_hash                       45.0          45.0         171.0         207.0          45.0          45.0
+hash.c:rb_hash_stlike_update                                          0.0           0.0         120.0         160.0           0.0           0.0
+vm_insnhelper.c:vm_call_ivar                                        187.0         187.0         187.0         175.0         315.0         175.0
+st.c:rb_st_keys                                                       0.0           0.0          99.0         132.0          33.0          33.0
