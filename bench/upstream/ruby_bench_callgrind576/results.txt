@@ -1,0 +1,42 @@
+# A/A outputs (run1.sh via aa.sh), Ruby 4.0.9, ruby-bench 0e67be03ef, Valgrind 3.24.0; tags: s/t stock, p patched brk512, f fixed heap, y YJIT
+## railsbench (t1 run alone before the matrix)
+t1 exit=0 135.58 s 210840 KB brk=1 totals=7755671686
+s2 exit=0 150.59 s 210124 KB brk=1 totals=7874731113
+s3 exit=0 145.04 s 210300 KB brk=1 totals=7869522033
+s4 exit=0 182.62 s 210876 KB brk=1 totals=7867105927
+p1 exit=0 155.73 s 211308 KB brk=0 totals=7759675421
+p2 exit=0 133.15 s 211596 KB brk=0 totals=7748579834
+p3 exit=0 124.94 s 211356 KB brk=0 totals=7767376431
+f1 exit=0 116.71 s 273396 KB brk=1 totals=7398781320
+f2 exit=0 126.59 s 273028 KB brk=1 totals=7398191144
+f3 exit=0 120.43 s 273144 KB brk=1 totals=7401335739
+y1 exit=0 211.19 s 351272 KB brk=1 totals=4782765104
+y2 exit=0 213.10 s 351960 KB brk=1 totals=4827896646
+y3 exit=0 221.45 s 351428 KB brk=1 totals=4939063218
+done
+## fib, lobsters
+s1 exit=0 12.47 s 77532 KB brk=0 totals=1959670074
+s2 exit=0 11.73 s 77528 KB brk=0 totals=1959670074
+s3 exit=0 11.37 s 77528 KB brk=0 totals=1959670074
+s4 exit=0 11.83 s 77528 KB brk=0 totals=1959670074
+s1 exit=0 108.16 s 432988 KB brk=1 totals=3660994752
+s2 exit=0 88.99 s 432804 KB brk=1 totals=3662587796
+s3 exit=0 106.36 s 431816 KB brk=1 totals=3664534267
+s4 exit=0 113.18 s 433092 KB brk=1 totals=3665083628
+p1 exit=0 106.45 s 433800 KB brk=0 totals=3663581680
+p2 exit=0 83.13 s 433936 KB brk=0 totals=3664340855
+p3 exit=0 82.00 s 433804 KB brk=0 totals=3663074871
+## gcshare (railsbench)
+f1.55980.1 total=7398781320 gc=445241704 mutator=6953539616 gc%=6.02
+f2.57611.1 total=7398191144 gc=446201520 mutator=6951989624 gc%=6.03
+f3.59925.1 total=7401335739 gc=446118651 mutator=6955217088 gc%=6.03
+p1.54886.1 total=7759675421 gc=689497022 mutator=7070178399 gc%=8.89
+p2.55289.1 total=7748579834 gc=678612074 mutator=7069967760 gc%=8.76
+p3.55573.1 total=7767376431 gc=693617963 mutator=7073758468 gc%=8.93
+s2.51637.1 total=7874731113 gc=764651750 mutator=7110079363 gc%=9.71
+s3.53183.1 total=7869522033 gc=764050962 mutator=7105471071 gc%=9.71
+s4.54538.1 total=7867105927 gc=760300919 mutator=7106805008 gc%=9.66
+t1.35545.1 total=7755671686 gc=682485098 mutator=7073186588 gc%=8.80
+y1.61311.1 total=4782765104 gc=443324781 mutator=4339440323 gc%=9.27
+y2.62533.1 total=4827896646 gc=470652179 mutator=4357244467 gc%=9.75
+y3.63074.1 total=4939063218 gc=544569406 mutator=4394493812 gc%=11.03

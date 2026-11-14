@@ -5,9 +5,9 @@ kind: perf
 area: new benchmark (writes)
 reviewer: claude-code
 branch: thomasklemm/blog-benchmark
-head: "537f5752f5"
+head: "d761531b83"
 base: main
-built_on: "ad63bf8"
+built_on: "0e67be03ef"
 depends_on: []
 stacked_on:
 alternative_of:
@@ -16,7 +16,7 @@ rank: 3
 risky: false
 state: draft
 pr: 575
-note: "Thomas approved preparing it as a draft; the coordinator runs Sol and opens it. a233212fad (amended from 65151273f6) opens and rolls back the iteration transaction itself when pin_connection! does not (Rails main after rails 9e8fe3955b); all four databases restored after each of 25 iterations on 8.1.4.1 and on main cadf0fc8d6, and 65151273f6 on main fails to restore (control). Body gained a what-it-finds paragraph from docs/upstream/ruby-bench-blog-findings.md and moved the rest under Details. Fork CI run 42289316995 on a233212fad: 15/15 green, including Windows ruby and head; fork PR #16 closed. Sol on a233212fad: changes, applied in 537f5752f5 (README JRuby note; body driver-overlap wording, record link, iteration count). 537f5752f5 differs from a233212fad only by two README lines; fork CI did not run on it (PR #16 closed, test.yml runs on PRs and main), so run 42289316995 covers the code. Skeptic has not run on a233212fad or later; Sol confirm pending on 537f5752f5"
+note: "upstream CI 15/15 green on the 2026-11-14 head; Thomas approved preparing it as a draft; the coordinator runs Sol and opens it. a233212fad (amended from 65151273f6) opens and rolls back the iteration transaction itself when pin_connection! does not (Rails main after rails 9e8fe3955b); all four databases restored after each of 25 iterations on 8.1.4.1 and on main cadf0fc8d6, and 65151273f6 on main fails to restore (control). Body gained a what-it-finds paragraph from docs/upstream/ruby-bench-blog-findings.md and moved the rest under Details. Fork CI run 42289316995 on a233212fad: 15/15 green, including Windows ruby and head; fork PR #16 closed. Sol on a233212fad: changes, applied in 537f5752f5 (README JRuby note; body driver-overlap wording, record link, iteration count). 537f5752f5 differs from a233212fad only by two README lines; fork CI did not run on it (PR #16 closed, test.yml runs on PRs and main), so run 42289316995 covers the code. Skeptic has not run on a233212fad or later; Sol confirm pending on 537f5752f5; 2026-11-14: rebased onto 0e67be03ef without changes (range-diff identical to 537f5752f5) and force-pushed with a lease; the passes below are on 537f5752f5, the same patch"
 passes:
   - {reviewer: skeptic, head: "7277a4bced", date: 2026-11-06, verdict: changes, open: "commit message overclaims about lobsters; image_processing loads libvips at boot; dead code; README gaps; all applied"}
   - {reviewer: skeptic, head: "950a2bc27d", date: 2026-11-06, verdict: nits, open: "body: fsync wording, lobsters A/A caveat, savepoint wording, 'timed iteration'; applied to the body. Commit message keeps 'None of them submits a form' (lobsters' login POST is setup, not timed)"}
