@@ -203,4 +203,5 @@ N=200 WARM=100 bench/upstream/l3/run.sh OUT TREE WIDTH interp|yjit [CASE...]
 FIX=fixA ruby bench/upstream/l3/table.rb OUT interp|yjit
 RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/probe.rb dump DIR
 RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/probe.rb probe DIR...
+RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/review_probe.rb > TREE.txt
 ```
