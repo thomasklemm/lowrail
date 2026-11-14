@@ -6,7 +6,7 @@ kind: perf
 area: Multi-column result rows
 reviewer: tenderlove
 branch: thomasklemm/fill-multicolumn-rows
-head: "1c803f55c7df87ecad4ac70f731438cc0b9e082b"
+head: "16cc8f7b7ac6fc9bb4272df07693437dad41aaec"
 base: main
 built_on: "d1d82840f35507066cf7b0c885d2e78fcc274aa4"
 depends_on: []
@@ -15,7 +15,7 @@ rank: 23
 risky: true
 state: ready
 pr: 770
-note: "Restacked to one commit; claude-code approved c69e94955e. 6c212edd9c only rewords the GC sentence in the commit message (Astra), tree identical to c69e94955e. 2026-11-12 16:03 UTC: flavorjones rebased it onto main d1d82840f3 after merging #773 (force-push from 6c212edd9c; committer Mike Dalessio, author Thomas); range-diff identical, message unchanged. Exact-head CI 135/135 green (run 43254550410); mergeable, clean."
+note: "Restacked to one commit; claude-code approved c69e94955e. 6c212edd9c only rewords the GC sentence in the commit message (Astra), tree identical to c69e94955e. 2026-11-12 16:03 UTC: flavorjones rebased it onto main d1d82840f3 after merging #773 (force-push from 6c212edd9c; committer Mike Dalessio, author Thomas); range-diff identical, message unchanged. Exact-head CI 135/135 green (run 43254550410); mergeable, clean. 2026-11-14 07:59 UTC: removed the `rb_ary_resize` code comment (DECISIONS: no unnecessary code comments; the commit message already gives the reason) and force-pushed 16cc8f7b7a with a lease on 1c803f55c7. Range-diff shows only that line; message byte-identical; Thomas author and committer, no trailers. TruffleRuby still gets a correctly sized row: `list` is `rb_ary_new2(length)`, TruffleRuby's `rb_ary_new_capa` returns `[]`, and its `RARRAY_ASET` is `rb_ary_store`, so filling i = 0..length-1 in order appends each cell. Suite 428 runs, 0 failures, 1 skip on Ruby 4.0.7. Exact-head CI 134/135 (runs 43573776201, 43573776313): x86_64-linux-musl 3.4 segfaulted in TracePoint#enable inside a Ractor (test_trace_point_that_blocks_in_ractor_callbacks); the build is the same as 1c803f55c7, which passed, and musl Ractor tests failed on main before (x86-linux-musl 4.0, run 41797589777). Needs a maintainer rerun (we have no write access). Title/body unchanged, no comment."
 passes:
   - {reviewer: skeptic, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "36d6e1a3bf8142b267cd1c1e405313ab4bbb8c0b", date: 2026-11-06, verdict: nits, open: "Clarify seven-column query wording, SQLite version and the measured single-column scope."}
