@@ -171,6 +171,47 @@ single cells move between executables here.
 
 
 
+## ruby-bench railsbench and lobsters
+
+Callgrind, M Ir per iteration (3 measured iterations, GC included, about one minor GC per window in every run), the
+Hash functions' self Ir alongside ([`cg_report.rb`](../../bench/upstream/f1/cg_report.rb); same regex for both
+builds). Runs a and b are two runs of the same build (A/A).
+
+| benchmark, mode | master a / b | branch a / b | branch − master | Hash functions master → branch | JIT-flat gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| railsbench, interpreter | 7,404.5 / 7,402.8 | 7,376.6 / 7,373.2 | **−28.8 (−0.39%)**, A/A ≤ 0.05% | 686.6 → 658.9 | n/a |
+| railsbench, YJIT | 4,742.6 / 4,735.7 | 4,716.2 / 4,705.4 | **−28.3 (−0.60%)**, A/A ≤ 0.23% | 680.5 → 651.6 | pass (all four) |
+| railsbench, ZJIT | 4,902.9 | 4,877.3 | −25.6 (−0.52%), single runs | 678.7 → 649.3 | pass |
+| lobsters, interpreter | 3,619.0 / 3,619.0 | 3,611.1 / 3,610.9 | **−8.0 (−0.22%)**, A/A ≤ 0.004% | 235.8 → 225.8 | n/a |
+| lobsters, ZJIT | 2,496.7 | 2,488.3 | −8.4 (−0.34%), single runs | 232.8 → 223.2 | pass |
+| lobsters, YJIT | 2,334.0 | 2,325.5 | rejected | | **fail** (both) |
+
+The lobsters YJIT pair failed the gate (YJIT compiled blocks in the measured window, as in round 2) and is rejected,
+not rerun; its numbers are diagnostic only. The ZJIT railsbench A/A pair (run b) was queued; see the commit history
+of this page for whether it completed. The branch takes back about 28 M of round 2's +50.5 M Ir per railsbench
+iteration in Hash functions; the rest is in literal building and allocation (above), which this change does not
+target.
+
+## Tests and warnings
+
+* `make check` on the branch: btest 2,148/2,148 pass; test-spec 33,747 examples, 0 failures, 2 errors; test-all
+  38,997 tests, 1 failure, 2 errors; test-tool 1 failure. All four are environmental and fail identically on
+  unpatched master in this orb: the two spec errors are `CLOCK_REALTIME_ALARM` / `CLOCK_BOOTTIME_ALARM` (EINVAL in
+  the sandbox), the two test-all errors are `TestIO#test_seek*` (tmpfile vanished under the parallel runner; both
+  fail on master alone too), `TestThread#test_handle_interrupt_masks_sigint` failed once under `-j2` load and passes
+  5/5 alone on both builds, and `TestCommitEmail#test_sendmail_encoding` fails because the orb sets `GIT_AUTHOR_*`.
+* Targeted: `test_hash`, `test_optimization`, `test_keyword`, `test_set`, `test_object`, `test_object_id`,
+  `test_literal`, `test_marshal`: 1,055 tests, 0 failures; mspec `core/hash core/set`: 738 examples, 0 failures.
+* Warnings: with Ruby's own flags (`-Wall -Wextra` and the rest of configure's list), GCC 14.2 and Clang 19.1 build
+  `hash.c` without a warning on master and on the branch. With extra `-Wall -Wextra` on Clang, both give the same one
+  warning (`-Wtautological-pointer-compare`, `if (RHASH_AR_TABLE(hash) != NULL)`, unchanged code) and none in the
+  changed code. GCC and Clang both keep `ar_find_entry_hint_slow` out of line and inline the
+  fast part.
+* Differential probe ([`diff_probe.rb`](../../bench/upstream/f1/diff_probe.rb), 127 lines of results: self-unequal
+  `eql?`, NaN, `eql?` call counts, an `eql?` that converts the table to an st_table mid-lookup, String keys,
+  identity hashes, delete/reinsert, a Hash subclass, default procs, duplicate literal keys, sizes 1–10, 100 random
+  mixed tables): identical output on master and the branch with the system seed and with fixed seeds 1, 2, 3.
+
 ## Method and pins
 
 * Ruby master [`88ea6fd282`](https://github.com/ruby/ruby/commit/88ea6fd282) (2026-11-14 18:00 UTC) and the branch
