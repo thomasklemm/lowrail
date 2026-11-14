@@ -6,7 +6,9 @@
 # --instr-atstart=no, N calls after WARM warmup calls, fixed heap from the
 # caller, GC off in the window. Under YJIT, warmup continues until three
 # windows in a row compile nothing (at most 30); jit is the blocks compiled in
-# the measured window (0 = JIT-flat). Prints: case Ir/call objects/call jit calls.
+# the measured window (0 = JIT-flat). Under ZJIT (Ruby master, no invalidation
+# count) jit is compiled ISEQs plus side exits and a fifth column the
+# invalidation time in ns, both observations. Prints: case Ir/call objects/call jit calls [inval_ns].
 rails = ENV.fetch("RAILS")
 %w[activesupport actionview actionpack].each { |c| $LOAD_PATH.unshift(File.join(rails, c, "lib")) }
 require "active_support"
@@ -71,17 +73,28 @@ LARGE = /2000|5000|mb/
 n = Integer(ENV.fetch("N", "100"))
 warm = Integer(ENV.fetch("WARM", "100"))
 yjit = defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
-blocks = -> { yjit ? RubyVM::YJIT.runtime_stats[:compiled_block_count] : 0 }
+zjit = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+blocks = -> do
+  if yjit then RubyVM::YJIT.runtime_stats[:compiled_block_count]
+  elsif zjit then RubyVM::ZJIT.stats.then { _1[:compiled_iseq_count] + _1[:compiled_side_exit_count] }
+  else 0
+  end
+end
+inval = -> { zjit ? RubyVM::ZJIT.stats[:invalidation_time_ns] : 0 }
+# Warmup and window share one loop, and under a JIT the harness's own calls run
+# past the compile threshold first, so the gate counts only the case's code.
+run = ->(f, k) { k.times { f.() } }
+100.times { blocks.(); inval.(); GC.stat(:total_allocated_objects); run.(-> {}, 1) } if yjit || zjit
 IrCount.start if IrCount.running?
 (ARGV.empty? ? CASES.keys : ARGV).each do |name|
   fn = CASES.fetch(name)
   calls = name.match?(LARGE) ? [n / 20, 5].max : n
-  [warm, calls].min.times { fn.() }
-  if yjit
+  run.(fn, [warm, calls].min)
+  if yjit || zjit
     streak = 0
     30.times do
       b = blocks.()
-      calls.times { fn.() }
+      run.(fn, calls)
       streak = blocks.() == b ? streak + 1 : 0
       break if streak == 3
     end
@@ -89,13 +102,17 @@ IrCount.start if IrCount.running?
   GC.start
   GC.disable
   b0 = blocks.()
+  v0 = inval.()
   o0 = GC.stat(:total_allocated_objects)
   i0 = IrCount.now
-  calls.times { fn.() }
+  run.(fn, calls)
   i1 = IrCount.now
   o1 = GC.stat(:total_allocated_objects)
   jit = blocks.() - b0
+  v1 = inval.()
   GC.enable
-  puts format("%-22s %14.1f %10.2f %d %d", name, (i1 - i0).fdiv(calls), (o1 - o0).fdiv(calls), jit, calls)
+  line = format("%-22s %14.1f %10.2f %d %d", name, (i1 - i0).fdiv(calls), (o1 - o0).fdiv(calls), jit, calls)
+  line << " #{v1 - v0}" if zjit
+  puts line
   $stdout.flush
 end

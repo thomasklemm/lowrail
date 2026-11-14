@@ -186,7 +186,77 @@ The interpreter's picture holds: −14% with one param, −32.5% with 20, −34.
 before #50312 at 20 params and 1.7–2.0% below it from 200 on; 1 MB and 4 MB values within 0.2%; 1 MB names −68.5% to
 −70.5%.
 
+### Ruby master × ZJIT (opus review, 2026-11-14)
+
+Measured in the second review ([thread T-01a1da54](https://ampcode.com/threads/T-01a1da54-3c5b-7501-9df9-2bbd2ad96920))
+on Ruby master `9aa0898240` (`--enable-yjit --enable-zjit`, `-O3`), the pin K1 and the other Rails candidates use;
+`sweep.sh` with `RUBY` set to it, census 8's Valgrind rebuilt from the patch, fixed heap, N=100 (5 for the large
+cases), trees main, main2 (A/A) and K6. Three runs; medians, raw in [results/master](results/master) (`.`, `rep1`,
+`rep2`; table from [`master_table.rb`](master_table.rb)). Master has no invalidation count, so the JIT columns are
+observations, not a gate: every measured window on all three trees and in every run compiled 0 ISEQs, took 0 side
+exits and spent 0 ns invalidating. No pre-#50312 column on master.
+
+| Ir per call | ZJIT main | A/A | K6 | interp main | A/A | K6 | objects main → K6 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `params1` | 130,140 | −0.42% | **−14.6%** | 227,107 | +0.02% | **−11.8%** | 45 → 39 |
+| `params20` | 1,169,227 | −0.29% | **−32.7%** | 1,859,538 | −0.20% | **−29.5%** | 368 → 248 |
+| `params2000` | 111,074,893 | −0.15% | **−34.7%** | 174,010,871 | +0.00% | **−31.7%** | 34,028 → 22,028 |
+| `value_1mb_late` | 5,666,065 | −0.02% | −0.41% | 5,782,801 | −0.04% | −0.67% | 47 → 41 |
+| `name_1mb_absent` | 28,849,393 | −0.04% | **−84.4%** | 28,154,398 | −0.02% | **−86.5%** | 46 → 39 |
+| `no_params` | 71,958 | −0.41% | −0.06% | 135,364 | +0.05% | +0.12% | 23 → 23 |
+| `hidden_field_tag` | 46,193 | −0.59% | +1.63% | 76,875 | +0.03% | +0.14% | 11 → 11 |
+| `link_to` | 21,451 | −0.03% | −0.13% | 40,288 | +0.06% | +0.01% | 5 → 5 |
+
+No ZJIT loss: every params row saves at least as much under ZJIT as in the master interpreter, and the ZJIT picture
+matches YJIT's on 4.0.9 (−14%, −33%, −35%). The 1 MB name row saves more than on 4.0.9 (−84% against −70%) because
+master escapes a 1 MB string in about half the instructions, so `sanitize_to_id`'s two copies weigh more; the 1 MB
+value row is −0.4% to −0.7% (one param's fixed saving).
+
+The controls, which run no code K6 changes, are position effects, checked by running each case alone:
+
+* `hidden_field_tag` under ZJIT, +1.63% after the params cases: alone (3 runs each) main 42,162, main2 42,227, K6
+  42,189 (+0.06%, A/A +0.15%) ([results/master/solo](results/master/solo)). Right after `params1` K6 is 5.6% *lower*
+  (43,265 against 45,848) ([after_params1](results/master/after_params1)). On main, `hidden_field_tag` and
+  `text_field_tag` were already profiled and compiled from inside `button_to`; on K6 they first run in the control,
+  so the control measures a different JIT history, not K6's path.
+* `no_params` and `hidden_field_tag` in the interpreter, +0.12% and +0.14%: alone, main 135,367, main2 135,420, K6
+  135,392 ([solo_no_params](results/master/solo_no_params)) and main 76,928, main2 76,943, K6 76,865 (one run each,
+  [solo](results/master/solo)). 4.0.9's `no_params` showed the same +0.1% in the full run.
+* ZJIT A/A of −0.4% on `no_params` and `params1` is systematic (main2 lower in all three runs); the effects are 35×
+  that.
+
+Harness fix in this pass: `k6_micro.rb`'s JIT gate counted blocks compiled for the harness's own code (`blocks`,
+`GC.stat`, the `times` block), which reach the compile threshold during the first cases; that is why `no_params`
+showed 3 blocks and `value_1mb_late` 1 under YJIT above. Warming those first and sharing one loop between warmup and
+window makes every case flat under ZJIT on master, and under YJIT on 4.0.9 (checked on main, not rerun for the
+table). The YJIT table above was measured before the fix and is unchanged.
+
+```
+Ruby master 9aa0898240 in ~/k6/ruby-master; bundle ~/k6/gm (the 4.0.9 Gemfile's gems, BUNDLE_PATH=~/k6/gm/vendor);
+ir_count.so built from census9/ir_count.c for it in ~/k6/extM.
+RUBY=~/k6/ruby-master/bin/ruby PATH=~/k6/ruby-master/bin:$PATH BUNDLE_GEMFILE=~/k6/gm/Gemfile \
+  BUNDLE_PATH=~/k6/gm/vendor IR_COUNT_SO=~/k6/extM/ir_count.so \
+  CASES="no_params params1 params20 params2000 value_1mb_late name_1mb_absent hidden_field_tag link_to" \
+  bench/upstream/k6/sweep.sh bench/upstream/k6/results/master[/repN] zjit|interp main main2 k6
+ruby bench/upstream/k6/master_table.rb bench/upstream/k6/results/master
+```
+
+### Edge probe (opus review)
+
+[`edge_probe.rb`](edge_probe.rb), 440 inputs on Ruby 4.0.9: html_safe keys (top-level and nested) and values,
+`to_param` returning a SafeBuffer or an unsafe String, keys with `"`, `]`, `[`, `<`, `&`, invalid UTF-8 and binary keys
+and values, keys named `hidden`, `data`, `class`, `aria`, `type` and `id`, `nil`/`false` in Arrays, each with plain,
+`method: :delete`, `PATCH` plus a `form:` Hash with Turbo data, Turbo (`data-turbo-method`, `data-turbo-confirm`,
+`form: { data: { turbo: false } }`), Rails UJS (`remote: true`, `data-confirm`, `data-disable-with`), a given and a
+`false` authenticity token, `get`, a `form: { method: }` override and `form_class`, under both
+`remove_hidden_field_autocomplete` and both `button_to_generates_button_tag` settings, forgery protection on with a
+token that needs escaping. main, main2 and K6 are byte-identical over all 1,240 lines, including the 80 inputs that
+raise `ArgumentError` (invalid byte sequence in UTF-8) for an invalid UTF-8 key or value; for a key it comes from
+`sanitize_to_id`'s `String#delete` on main and from escaping on K6, with the same class and message in UTF-8. Fields keep their order: `_method`, then the token, then the button, then the params
+sorted by name. `tag` escapes exactly what `hidden_field_tag` escaped, since `hidden_field_tag` ended in the same
+`tag :input` and `tag_options`: html_safe top-level keys and SafeBuffer `to_param` values are written unescaped on
+main and K6 alike (with `"` still replaced), nested keys are escaped because the name is interpolated.
+
 ## Not done
 
-* Ruby master × ZJIT (DECISIONS asks for it before a Rails candidate opens).
-* Reviews: no claude-code or Sol/stand-in pass yet.
+* Sol/Astra: the opus pass stands in for Sol (DECISIONS); `risky: false`, so no Astra.

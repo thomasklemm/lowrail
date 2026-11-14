@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # table.rb DIR MODE: Markdown table from sweep.sh output (DIR/TREE-MODE.txt for
-# pre, main, main2, k6). Under yjit a cell counts only when main, main2 and k6
+# pre, main, main2, k6). Under yjit or zjit a cell counts only when main, main2 and k6
 # compiled nothing in their measured windows; pre counts only when it was flat too.
 dir, mode = ARGV
 read = ->(tree) do
@@ -18,11 +18,11 @@ main.each do |c, m|
   k = k6[c] or next
   p = pre[c]
   flat = [m, m2, k].all? { _1[:jit].zero? }
-  if mode == "yjit" && !flat
+  if mode != "interp" && !flat
     puts "| `#{c}` | | not flat | not flat | | | | |"
     next
   end
-  pre_ok = p && (mode != "yjit" || p[:jit].zero?)
+  pre_ok = p && (mode == "interp" || p[:jit].zero?)
   aa = format("%.2f%%", ((m2[:ir] / m[:ir]) - 1).abs * 100)
   objs = [p && fmt.(p[:obj]), fmt.(m[:obj]), fmt.(k[:obj])].map { _1 || "—" }.join(" / ")
   puts "| `#{c}` | #{pre_ok ? fmt.(p[:ir]) : (p ? "not flat" : "—")} | #{fmt.(m[:ir])} | #{fmt.(k[:ir])} | #{pct.(k[:ir], m[:ir])} | " \
