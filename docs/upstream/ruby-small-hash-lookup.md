@@ -147,9 +147,9 @@ the second key sharing a hint +11 (Symbol 384 → 395, String 523 → 534), a mi
 with an equal String +13, a Struct key with a user `eql?` +21 (+0.5%). Hint collisions between two keys happen about
 once in 255 pairs (1–3% of misses at 3–8 keys); Symbols and same-object keys, the common case, take the fast path.
 
-## The PR body's loops as written
+## Top-level loops
 
-The body's table uses the loops it shows, run at top level as written: whole process under Callgrind, (Ir at
+The first body (opened as ruby/ruby#19899) showed a 3-line loop and this table, run at top level as written: whole process under Callgrind, (Ir at
 N = 2,000,000 − Ir at N = 0) / N, fixed salt, fixed heap ([`repro_ir.sh`](../../bench/upstream/f1/repro_ir.sh)),
 seeds 1 and 2 identical ([`results/repro-ir/`](../../bench/upstream/f1/results/repro-ir/)). They come out 13 below
 the `x = expr`-in-a-method form above; the differences are the same. The 8-key rows use `:k1`…`:k8`: with
@@ -165,6 +165,36 @@ give the same numbers with either key set under seed 1; under seed 2, `:a`…`:h
 | 8 Symbol keys, miss | 333 | 313 | 300 |
 | 3 String keys, `h[k]` with `k = +"b"` | 502 | 539 | 552 |
 | loop alone | 126 | 128 | 128 |
+
+## The PR body's benchmark
+
+The body now shows #18222's own `benchmark/hash_ar_aref.yml`, as its body did. `make benchmark ITEM=hash_ar_aref
+COMPARE_RUBY=~/w/inst/base/bin/ruby OPTS="--repeat-count 10"` in the branch build directory, `taskset -c 2`, without
+the fixed-seed shim, benchmark-driver v0.16.3 from `make update-benchmark-driver`
+([`results/bd-make-benchmark.md`](../../bench/upstream/f1/results/bd-make-benchmark.md)):
+
+| case | master | branch | branch / master |
+| --- | ---: | ---: | ---: |
+| miss_empty | 14.856M | 14.833M | 1.00 |
+| hit_first | 8.108M | 10.657M | 1.31 |
+| hit_third | 7.930M | 10.648M | 1.34 |
+| hit_fourth | 7.942M | 10.695M | 1.35 |
+| hit_last | 8.028M | 10.733M | 1.34 |
+| miss | 9.338M | 9.952M | 1.07 |
+
+The 4.0.9 numbers in the body come from a separate three-way benchmark-driver 0.17 run of the same file on the same
+core, best of 10, no shim ([`results/bd-3way.md`](../../bench/upstream/f1/results/bd-3way.md)): 4.0.9 / master /
+branch hit_first 10.300M / 7.924M / 10.896M, hit_third 9.441M / 7.992M / 11.066M, hit_fourth 7.951M / 8.097M /
+10.894M, hit_last 7.601M / 8.152M / 10.692M, miss 6.819M / 9.081M / 9.977M, miss_empty 14.338M / 14.847M / 14.804M.
+Master and branch agree with the `make benchmark` run within 4%; 4.0.9's hit_third moves between runs (8.1M with the
+shim, 9.4M without), as its linear scan depends on which keys share a hint in that process.
+
+Before these runs the branch was reinstalled from its build directory: the installed `ruby` predated the final
+`hash.c` timestamp and still printed the base revision. Its `ar_find_entry_hint`, `ar_find_entry_hint_slow`,
+`rb_hash_aref` and `ar_equal` disassemble identically to the reinstalled binary, so the earlier measurements stand;
+the reinstalled one prints `696e3f5f0c`. The "+13 instructions (+2.4%)" for an equal String is the in-method
+(552 → 565) and top-level (539 → 552) Callgrind rows above; its wall time (46.5M vs 46.1M i/s) is in the
+benchmark-driver table below.
 
 ## Wall time
 
