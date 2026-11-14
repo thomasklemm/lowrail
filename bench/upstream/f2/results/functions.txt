@@ -1,0 +1,55 @@
+== 409 heap2_equal (self Ir per iteration, N = 200,000, seed 1)
+  178.0 vm_exec_core
+   91.0 rb_hash_aref
+   47.0 rb_eql_opt
+   24.0 rb_eql
+   23.0 ar_equal
+    6.0 rb_vm_check_ints
+    6.0 rb_float_value
+    3.0 rb_hash_start
+== 409 eq_heap (self Ir per iteration, N = 200,000, seed 1)
+  172.0 vm_exec_core
+   51.0 opt_equality_specialized
+    6.0 rb_vm_check_ints
+== master heap2_equal (self Ir per iteration, N = 200,000, seed 1)
+  180.0 vm_exec_core
+  105.0 vm_call0_body
+  102.0 rb_funcallv_scope.constprop.0
+   84.0 rb_eql_opt
+   57.0 vm_call0_cc
+   51.0 ar_find_entry_hint
+   41.0 vm_push_frame
+   41.0 rb_hash_aref
+   37.0 any_hash
+   29.0 rb_any_cmp
+   28.0 rb_float_eql
+   20.0 rb_ec_stack_check
+   13.0 ar_equal
+   12.0 rb_vm_check_ints
+   10.0 rb_current_box
+    6.0 rb_float_value
+    4.0 rb_current_ec
+    3.0 rb_hash_start
+    2.0 ractor_safe_call_cfunc_1
+== master eq_heap (self Ir per iteration, N = 200,000, seed 1)
+  249.0 vm_exec_core
+   90.0 vm_call_cfunc_with_frame_
+   37.0 rb_float_equal
+   14.0 vm_search_method
+    8.0 vm_call_cfunc_with_frame
+    6.0 rb_vm_check_ints
+    2.0 ractor_safe_call_cfunc_1
+== restore heap2_equal (self Ir per iteration, N = 200,000, seed 1)
+  178.0 vm_exec_core
+   51.0 ar_find_entry_hint
+   50.0 rb_any_cmp
+   41.0 rb_hash_aref
+   37.0 any_hash
+   18.0 rb_float_value
+   13.0 ar_equal
+    6.0 rb_vm_check_ints
+    3.0 rb_hash_start
+== restore eq_heap (self Ir per iteration, N = 200,000, seed 1)
+  204.0 vm_exec_core
+   12.0 rb_float_value
+    6.0 rb_vm_check_ints

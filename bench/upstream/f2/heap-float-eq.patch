@@ -1,0 +1,16 @@
+diff --git a/internal/object.h b/internal/object.h
+index aaf119a3db..0cce22355a 100644
+--- a/internal/object.h
++++ b/internal/object.h
+@@ -116,6 +116,11 @@ opt_equality_specialized_miss(VALUE recv, VALUE obj)
+         else if (klass == rb_cSymbol) {
+             return Qfalse;
+         }
++        else if (klass == rb_cFloat) {
++            if (RB_FLOAT_TYPE_P(obj)) {
++                return RBOOL(RFLOAT_VALUE(recv) == RFLOAT_VALUE(obj));
++            }
++        }
+     }
+     return Qundef;
+ }

@@ -1,0 +1,30 @@
+# bad: [88ea6fd282d6443a8197949a96f24373a2601136] [ruby/date] Add tests for untested Date and DateTime behavior
+# good: [d375bcc965d4a0c661785fa94150f6202e99c1ce] [DOC] Escape capitalized word "data" not to be linked unexpectedly
+git bisect start '88ea6fd282' 'd375bcc965'
+# good: [d5f27aea78a7d07cea773a155f28167f0413ee4c] [ruby/stringio] Skip chompped record separator
+git bisect good d5f27aea78a7d07cea773a155f28167f0413ee4c
+# good: [6bae4d8e5f7601935f2ae47568b677a3fc9e1062] Forbid Procs with ivars from being isolated
+git bisect good 6bae4d8e5f7601935f2ae47568b677a3fc9e1062
+# good: [6d68304c388d72e7770d8c4919207ea0241afd31] Keep autoload registrations in the constant entries
+git bisect good 6d68304c388d72e7770d8c4919207ea0241afd31
+# good: [a51b4139145a1260b5a737f22da944180758c6f4] ZJIT: Speculate on nil bounds for NewRangeFixnum
+git bisect good a51b4139145a1260b5a737f22da944180758c6f4
+# bad: [16d12f213ec8ae1e020efddc4bd6446a6fb45f8d] Keep the capacity in rb_str_update_1 when the insertion fits
+git bisect bad 16d12f213ec8ae1e020efddc4bd6446a6fb45f8d
+# bad: [5b13ca9c3d6f655fbabdc921ee3e2179c18e3f15] [ruby/rubygems] Delegate contains_requirable_file? to the stub in Bundler::StubSpecification
+git bisect bad 5b13ca9c3d6f655fbabdc921ee3e2179c18e3f15
+# bad: [13c3f56bb85f7e3f7e07b945c829117b48ee43f5] ZJIT: Allow Proc block arguments for explicit block parameters (GH-19484)
+git bisect bad 13c3f56bb85f7e3f7e07b945c829117b48ee43f5
+# bad: [73397ad0272987c32588286f3f1041041a22555c] Use rb_bug in rb_iseq_node_id
+git bisect bad 73397ad0272987c32588286f3f1041041a22555c
+# bad: [99fb833467cf58ff37c07499f9eddecbdf417bea] Reject unexportable process argument strings
+git bisect bad 99fb833467cf58ff37c07499f9eddecbdf417bea
+# good: [5263a42ccff5828bed95eb92fb791dcd33f3d487] Add ANY_REDEFINED_OP_FLAG
+git bisect good 5263a42ccff5828bed95eb92fb791dcd33f3d487
+# good: [3249ea75caf5501565ab11d2d77cedd8e9631595] Register `==` as an optimized method on `nil/true/false`
+git bisect good 3249ea75caf5501565ab11d2d77cedd8e9631595
+# bad: [f62a6346c2021834ff71675305f009fa4e3a4c17] rb_equal_opt: assume args are not identical
+git bisect bad f62a6346c2021834ff71675305f009fa4e3a4c17
+# bad: [652cf512535acee456a56b4781c8100dcfb276ef] Refactor opt_equality_specialized to handle nil/true/false
+git bisect bad 652cf512535acee456a56b4781c8100dcfb276ef
+# first 'bad' commit: [652cf512535acee456a56b4781c8100dcfb276ef] Refactor opt_equality_specialized to handle nil/true/false

@@ -308,13 +308,150 @@ target.
 * Wall time: benchmark-driver 0.17 on one pinned core, best of 10 per executable, with the fixed-seed shim;
   hyperfine 1.19.0.
 
+## Side finding: equal heap Float keys (2026-11-14, not pursued)
+
+**Short answer.** The review's number is real. Looking up a heap Float key with an equal Float that is another
+object costs 378 instructions on 4.0.9 and 825 on master (×2.2). The cause is ruby/ruby#19410, which dropped the
+heap-Float branch from `opt_equality_specialized`: `rb_eql` on two heap Floats now makes a full `Float#eql?` method
+call. Hashing and same-object lookups did not change. Reach is negligible: no Hash key in Rails, the central gems or
+the census apps is a heap Float, so there is no branch, no review and no F2.
+
+A heap Float is a Float that is not a flonum: on x86-64, a magnitude outside about 1.7e-77 to 1.2e77, `-0.0`,
+±Infinity or NaN (`0.0` is a flonum).
+
+**Instructions per iteration** (interpreter, top-level loop, whole process, (Ir at N = 1,000,000 − Ir at 0) / N,
+seed 1; seed 2 within ±2 everywhere; master A/A identical in all 26 cases;
+[`float_ir.sh`](../../bench/upstream/f2/float_ir.sh), [`results/`](../../bench/upstream/f2/results/)). The last
+column is the local restore below, measured but not pursued.
+
+| case | 4.0.9 | master | master − 4.0.9 | restore |
+| --- | ---: | ---: | ---: | ---: |
+| loop alone | 126 | 128 | +2 | 126 |
+| `h = {1e300 => 1, 2e300 => 2}`, `k = 1e300 * 1`, `h[k]` | 378 | 825 | **+447** | 397 |
+| same, `k = h.keys[0]` (same object) | 288 | 341 | +53 (F1) | 339 |
+| same, miss (`k = 3e300 * 1`) | 305 | 332 | +27 (F1) | 330 |
+| 100 heap Float keys (st_table), equal / same object / miss | 456 / 349 / 359 | 852 / 350 / 361 | **+396** / +1 / +2 | 424 / 348 / 359 |
+| `{Float::INFINITY => 1, 0.5 => 2}[1.0 / 0]` | 376 | 823 | +447 | 395 |
+| `{0.0 => 1, 0.5 => 2}[-0.0]` | 374 | 816 | +442 | 390 |
+| the review's form, `h[1e300 * 1]` (allocates a Float per lookup) | 888 | 1,206 | +318 | 778 |
+| flonum keys, 2 keys hit / 100 keys hit / 100 keys miss | 299 / 360 / 370 | 352 / 361 / 372 | +53 (F1) / +1 / +2 | 350 / 359 / 370 |
+| `a == b`, two heap Floats | 229 | 406 | +177 | 222 |
+| `a == Float::INFINITY`, `a` is that object | 265 | 437 | +172 | 436 |
+| `[1e299, 2e299, 3e299].include?(3e299 * 1)` | 582 | 1,815 | +1,233 | 452 |
+| `include?` miss in 3 Integers / Symbols / flonums (#19410's gain) | 492 / 525 / 513 | 417 / 408 / 423 | −75 / −117 / −90 | 415 / 406 / 421 |
+| `h[:b]`, 3 Symbols / equal String key | 274 / 502 | 320 / 539 | F1 | 318 / 537 |
+
+The review's 376 / 820 matches the first data row (376 / 823 with seed 2). Its 833 on the F1 branch is the +13 that
+F1 costs every hint match on another object ("Where it loses"). Written literally as `h[1e300 * 1]`, each lookup
+also multiplies and allocates, and the difference is +318, not +447, because `1e300 * 1` alone got cheaper on
+master (654 → 527 per iteration).
+
+**Lookup or hashing?** Neither got slower. Self instructions per `h[k]` (2 heap keys, equal Float;
+[`results/functions.txt`](../../bench/upstream/f2/results/functions.txt)): 4.0.9 spends 378 in `vm_exec_core` 178,
+`rb_hash_aref` 91 (hash and search inlined), `rb_eql_opt` 47, `rb_eql` 24, `ar_equal` 23 and small change. Master
+spends 825: 180 in `vm_exec_core`, 180 in the Hash functions (`ar_find_entry_hint` 51, `rb_hash_aref` 41,
+`any_hash` 37, `rb_any_cmp` 29, `ar_equal` 13 and the rest; F1's layout), and 459 in calling `Float#eql?`:
+`vm_call0_body` 105, `rb_funcallv_scope` 102, `rb_eql_opt` 84 (the method search), `vm_call0_cc` 57,
+`vm_push_frame` 41, `rb_float_eql` 28, `rb_ec_stack_check` 20, `rb_current_box` 10 and small change.
+`rb_dbl_long_hash` runs inside `any_hash`; the same-object and miss rows, which hash the same key, are flat, so
+hashing did not change.
+
+**Bisect.** `git bisect run` over 7,594 commits from the merge base of `v4.0.9` and master (`d375bcc965`) to
+master `88ea6fd282`, miniruby built per step, (equal-key lookup − loop alone) Ir per iteration, bad above 450
+([`bisect_step.sh`](../../bench/upstream/f2/bisect_step.sh),
+[`results/bisect-steps.txt`](../../bench/upstream/f2/results/bisect-steps.txt)): 248 at the merge base, 256 on
+2026-07-10, 304 from 2026-09-16 (F1's two PRs, merged 08-14 and 08-26) to `3249ea75ca`, then 705 at the first bad
+commit [`652cf51253`](https://github.com/ruby/ruby/commit/652cf512535acee456a56b4781c8100dcfb276ef) "Refactor
+opt_equality_specialized to handle nil/true/false" (Jean Boussier), 702 at `f62a6346c2`, and 670 on master after
+[`b0b1dbe04b`](https://github.com/ruby/ruby/commit/b0b1dbe04b8bf9c48a5c26a89273954469a33a33) made `rb_eql`
+inlinable. All four commits are [ruby/ruby#19410](https://github.com/ruby/ruby/pull/19410) "Refactor
+`opt_equality_specialized` and allow inlining of most of `rb_equal` and `rb_eql`" (byroot, opened 10-17, merged
+2026-10-30).
+
+`652cf51253` replaced the type checks of `opt_equality_specialized` with an identity check first and a
+`String`/`Symbol` class check, and dropped this branch, which on 4.0.9 answered `==` and `eql?` for two Floats
+when the receiver is a heap Float:
+
+```c
+else if (RBASIC_CLASS(recv) == rb_cFloat && RB_FLOAT_TYPE_P(obj) && EQ_UNREDEFINED_P(FLOAT)) {
+    double a = RFLOAT_VALUE(recv);
+    double b = RFLOAT_VALUE(obj);
+    return RBOOL(a == b);
+}
+```
+
+Since then two heap Floats fall through to `opt_equality_by_mid` and from there to `rb_funcall(recv, :eql?, obj)`
+(C callers such as `rb_any_cmp`, `rb_equal` in `Array#include?`), or to a method call from `opt_eq` (`a == b` in Ruby
+code). An identical heap Float in `opt_eq` (`Float::INFINITY == Float::INFINITY`) also lost its fast path, because
+the identity check returns `Qundef` for heap objects to keep NaN unequal to itself.
+
+**Deliberate?** Nothing says so. The PR body lists six changes (one redefinition flag, nil/true/false, identity
+first with the NaN exception, shared code, inlining) and does not mention heap Floats; its benchmarks (taken from
+#19308) are `Array#include?` misses with Integers, Symbols and flonum Floats, which this table confirms
+(−75 to −117). The PR has no reviews and one comment, byroot's benchmark. It reads as an incidental drop. There
+is one semantic side effect: master now honours a redefined `Float#eql?` for heap Floats in Hash lookups (4.0.9
+ignores it; all three builds ignore it for flonums). So restoring the branch is exact against 4.0.9, not against
+master in that case.
+
+**Reach.** Grep for heap-Float sources (`Float::INFINITY`, `NAN`, `MAX`, `MIN`, `-0.0`, literals beyond 1e±77,
+`x / 0.0`) in non-test Ruby code:
+
+* Rails main [`50c54eed06`](https://github.com/rails/rails/commit/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b): 37
+  lines (comments among them), none a Hash key. Type casts (`"Infinity"` → `Float::INFINITY`),
+  `when ::Float::INFINITY` (calls `===`, not affected), sentinels, and two `==` compares that can see two heap
+  Floats: PostgreSQL infinite range bounds (`from == -::Float::INFINITY`) and the length validator
+  (`value == Float::INFINITY`, where `value` is usually an Integer).
+* The 21 census apps at their `script/corpus` pins: 58 lines in 12 apps (some are IP addresses or test data),
+  none a Hash key. Infinity as a `sort_by`/`min_by` fallback (`<=>`, not affected), `clamp` bounds, and a few
+  compares such as Discourse's `max != Float::INFINITY` in theme settings.
+* The 133 gems (outside Rails) that at least 10 of the 19 app lockfiles share, latest releases: 86 lines in 22
+  gems (most in rubocop and brakeman), none a Hash key. Compares such as aws-sdk-core
+  `input == ::Float::INFINITY` when serialising an infinite Float and regexp_parser `max_rep == Float::INFINITY`;
+  constants in json and puma.
+* No Float literal is a Hash key anywhere in the three sets (`{1.5 =>`-style keys: 0 lines).
+
+Grep cannot see keys that come from data; values of ordinary magnitude are flonums, so a heap Float key would
+need a value beyond 1e77 or below 1e-77, a negated zero or an infinity, and a lookup with an equal but different
+object; only that combination pays. `==` between two heap Floats is the wider case (Ruby code, `Array#include?`,
+`Array#==`), and the sites above are edge paths: infinite range bounds, serialising an infinite Float, validating
+theme settings. By DECISIONS ("Only PRs with large relevance open"), this is recorded, not built: no branch on
+thomasklemm/ruby, no reviews, no queue item.
+
+**What a fix would take** (measured locally, not pushed): the 4.0.9 branch back in `opt_equality_specialized_miss`
+in `internal/object.h`, which covers `rb_eql`, `rb_equal` and `opt_eq` at once
+([`heap-float-eq.patch`](../../bench/upstream/f2/heap-float-eq.patch)):
+
+```c
+        else if (klass == rb_cFloat) {
+            if (RB_FLOAT_TYPE_P(obj)) {
+                return RBOOL(RFLOAT_VALUE(recv) == RFLOAT_VALUE(obj));
+            }
+        }
+```
+
+It takes the equal-key lookup from 825 to 397, the 100-key table from 852 to 424, `a == b` from 406 to 222 and
+heap `include?` from 1,815 to 452, and leaves every other row within 2 of master (the loop alone is 2 lower). It
+does not cover the identical heap Float in `opt_eq` (437 → 436), and in files that do not include
+`internal/numeric.h` before `internal/object.h` (hash.c, vm.c) `RFLOAT_VALUE` calls the exported
+`rb_float_value` (+12 Ir per compare). It also ignores a redefined `Float#eql?` again (see above), so anyone
+taking it up should decide on that first.
+
+**Method and pins.** Ruby 4.0.9 (`v4.0.9`, `--enable-yjit`) and master `88ea6fd282` (`--enable-yjit
+--enable-zjit`), GCC 14.2.0 `-O3`; the restore built from master with the patch above. Pinned Valgrind 3.19.0 with
+the 512 MiB brk reservation (`script/bench-valgrind`; this orb's Callgrind tool SHA-256 `a65c0d6b…dda`, built
+here), no `brk segment overflow` in any log; fixed heap as in `repro_ir.sh`, no ASLR, hash salt fixed by
+`fixseed.so` (seeds 1 and 2). Per-function numbers are (Callgrind file at N = 200,000 − at 0) / N
+([`fndiff.sh`](../../bench/upstream/f2/fndiff.sh)). Grep sets: Rails main at the commit above, the apps cloned at
+their pins, and the gems fetched from rubygems.org on 2026-11-14 (`gem fetch`, latest version, `ruby` platform).
+
 ## Internal
 
 Finding 1 of [Ruby master round 2](ruby-master-round-2.md#1-small-hash-lookups-and-inserts-cost-more). Thomas
 allowed this one as a ruby/ruby PR (DECISIONS, exception of 2026-11-14), after the "Thomas can explain it first"
 step. **Nothing is opened.** Queue item [F1](../../bench/upstream/pr-queue/items/F1.md). A review noticed, outside
-this change and not investigated: a heap Float key (`h[1e300*1]`, 2 keys) costs 376 Ir on 4.0.9, 820 on master and
-833 on the branch.
+this change: a heap Float key (`h[1e300*1]`, 2 keys) costs 376 Ir on 4.0.9, 820 on master and 833 on the branch;
+investigated in [Side finding: equal heap Float keys](#side-finding-equal-heap-float-keys-2026-11-14-not-pursued)
+(ruby/ruby#19410, negligible reach, not pursued).
 
 ### Für Thomas (zum Nacherzählen)
 
