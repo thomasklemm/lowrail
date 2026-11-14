@@ -92,7 +92,7 @@ byte-identical to the head `59db98e25c`). Rubies: 4.0.9 (interpreter, YJIT) and 
 [`674c477295`](https://github.com/ruby/ruby/commit/674c477295) (ZJIT; the lead's pin), GCC 14.2.0, rustc 1.100.0.
 
 Cases: `rows10_read_all` instantiates 10 records from a cached result and calls every reader once (`id` through
-`fetch_value!`/`value_at!`, the 31 others through the generated slot readers, so every read is a first read);
+`fetch_value!`/`value_at!`, the 29 others through the generated slot readers, so every read is a first read);
 `load1_read_all` the same for `find(1)`; `dup_warm` dups a loaded record; `load1_dup`, `load1`,
 `load1_attributes`, `load1_serializable_hash`, `rows10` (no reads), `new` and the warm readers are controls. Table of
 `id`, `type` and width−2 string/integer columns. The request mix copies ruby-bench's railsbench: production mode,
@@ -134,11 +134,11 @@ rows the branch against main2 is the fair reading (`find` −0.03%, `#attributes
 Widths ([tables-c](results/tables-c.md)): 10 records read once, interpreter −1.81% / −2.51% / −2.69% at 6 / 30 / 100
 columns, YJIT −11.87% / −7.53% / −16.92%, ZJIT −15.38% / −20.61% / −21.81%; `dup` of a loaded record interpreter
 −1.67% / −1.93% / −1.96%, YJIT −5.98% / −5.72% / −5.61%, ZJIT −10.59% / −12.32% / −12.44%. The controls, which
-don't run the changed lines (load without reads, `id` after `find`, `#attributes`, warm reads, `new`), move by at
+don't run the changed lines (load without reads, `#attributes`, warm reads, `new`), move by at
 most 0.10% in the interpreter at every width. Under ZJIT they move by at most 0.17%, except `new` at 6 columns
 (+0.63%, A/A +0.12%). Three repeats of that cell (run g) give medians of 18,507 / 18,555 / 18,534 Ir for main, main2
 and the branch (+0.15%, A/A +0.26%), and `#attributes` +0.08% (A/A +0.08%). Under YJIT they move with the
-compiled-state flips described below. Objects per call are identical on both trees in every cell.
+compiled-state flips described below. `id` after `find` does run the changed `value_at!` line (one first read): interpreter −0.06%, ZJIT −0.17% at 30 columns. Objects per call are identical on both trees in every cell.
 
 Split by line (run e, 30 columns, main, `fixv` and `fixb` in one cohort, every JIT window gated): the `&:value!`
 lines carry all of the read gain (10 records read once: `fixv` −2.49% / −7.52% / −20.42% interpreter / YJIT / ZJIT,
