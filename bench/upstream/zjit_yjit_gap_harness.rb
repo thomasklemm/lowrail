@@ -72,7 +72,7 @@ def run_benchmark(_num_itrs_hint, **, &block)
     jit = RubyVM::ZJIT.enabled? ? RubyVM::ZJIT : (RubyVM::YJIT if defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?)
     ii = RubyVM.respond_to?(:lowrail_ii=) && ENV["GAP_II"] == "1"
     # Whole-process ZJIT memory counters, read before the reset (--zjit-stats counts OOM only).
-    pre = jit == RubyVM::ZJIT ? jit.stats.slice(:compile_error_out_of_memory, :failed_iseq_count, :code_region_bytes, :total_mem_bytes) : {}
+    pre = jit == RubyVM::ZJIT ? jit.stats.slice(:compile_error_out_of_memory, :failed_iseq_count, :code_region_bytes, :total_mem_bytes, :zjit_alloc_bytes, :compiled_iseq_count, :compile_time_ns, :side_exit_count, :exit_polymorphic_send_miss, :send_fallback_send_polymorphic_fallback) : {}
     jit&.reset_stats!
     RubyVM.lowrail_ii = true if ii
     before = gap_gc
@@ -83,8 +83,8 @@ def run_benchmark(_num_itrs_hint, **, &block)
     stats = jit ? (jit == RubyVM::YJIT ? jit.runtime_stats : jit.stats) : {}
     n = MIN_BENCH_ITRS
     per_itr = stats.filter_map { |k, v| [k, v.fdiv(n)] if v.is_a?(Numeric) && v != 0 }.to_h
-    post = jit == RubyVM::ZJIT ? jit.stats.slice(:compile_error_out_of_memory, :failed_iseq_count, :code_region_bytes, :total_mem_bytes) : {}
-    data = {itrs: n, before_reset: pre, window_end: post, per_itr:, gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(n)] }}
+    post = jit == RubyVM::ZJIT ? jit.stats.slice(:compile_error_out_of_memory, :failed_iseq_count, :code_region_bytes, :total_mem_bytes, :zjit_alloc_bytes, :compiled_iseq_count, :compile_time_ns, :side_exit_count, :exit_polymorphic_send_miss, :send_fallback_send_polymorphic_fallback) : {}
+    data = {itrs: n, before_reset: pre, window_end: post, vm_hwm_kb: File.read("/proc/self/status")[/VmHWM:\s+(\d+)/, 1].to_i, per_itr:, gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(n)] }}
     if dump
       data[:interp_iseqs] = dump[0].map { |name, u, c| [name, u.fdiv(n), c.fdiv(n)] }.sort_by { |_, u, c| -(u + c) }
       data[:interp_insns] = dump[1].map { |name, u, c| [name, u.fdiv(n), c.fdiv(n)] }.sort_by { |_, u, c| -(u + c) }

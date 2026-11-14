@@ -15,7 +15,10 @@ The megamorphic-send growth and lead 4 were not started.
   path on half the calls, YJIT on none: 352.6 against 100.8 Ir per call (3.5×). On Rails main with 4 models, ZJIT
   runs +18% Ir per op against YJIT, +43% when 2 models ran before compile.
   [Shopify/ruby#776](https://github.com/Shopify/ruby/issues/776) is the generic tracker and is close to being closed
-  as handled, so an [issue draft](#issue-draft-lead-3-shopifyruby-not-filed) follows.
+  as handled, so an [issue draft](#issue-draft-lead-3-shopifyruby-not-filed) follows. **Update (evening): the PR
+  attempt stopped at a design question** ([section](#lead-3-pr-attempt-2026-11-14-evening-stopped-at-a-design-question)).
+  Recompiling on the miss fixes the repro and the Rails case but barely moves ruby-bench, and the ZJIT team leans
+  towards a cheaper fallback instead; a short answer on #776 with one question replaces the issue draft.
 * **Lead 7 is covered; stopped.** Forwarding a block param (`def m(&b) = n(&b)`) and forwarding sites that see both
   nil and a block fall back only in ZJIT (+266 / +271 Ir per call over YJIT). That is
   [Shopify/ruby#1014](https://github.com/Shopify/ruby/issues/1014) and [Shopify/ruby#1039](https://github.com/Shopify/ruby/issues/1039)
@@ -31,7 +34,7 @@ The megamorphic-send growth and lead 4 were not started.
 
 | lead | repro (Ir per call: interp / YJIT / ZJIT) | ZJIT − YJIT | existing coverage | next step |
 | --- | --- | ---: | --- | --- |
-| 3: polymorphic send, class missing from the profile | 4 classes, 2 profiled: 632.0 / 100.8 / **352.6** (all 4 profiled: ZJIT 126.9) | **+251.8** (+250%) | [Shopify/ruby#776](https://github.com/Shopify/ruby/issues/776) (generic, open, unassigned; "might be handled now?"), [#1031](https://github.com/Shopify/ruby/issues/1031) (recompile triggers, design), #1039 rows 24/25/27 (megamorphic only, unassigned) | [Issue draft](#issue-draft-lead-3-shopifyruby-not-filed) for Thomas |
+| 3: polymorphic send, class missing from the profile | 4 classes, 2 profiled: 632.0 / 100.8 / **352.6** (all 4 profiled: ZJIT 126.9) | **+251.8** (+250%) | [Shopify/ruby#776](https://github.com/Shopify/ruby/issues/776) (generic, open, unassigned; "might be handled now?"), [#1031](https://github.com/Shopify/ruby/issues/1031) (recompile triggers, design), #1039 rows 24/25/27 (megamorphic only, unassigned) | PR attempt stopped; [answer on #776](#draft-answer-on-shopifyruby776-not-posted) for Thomas |
 | 7a: forward a block param (`&b` → proxy) | 978.3 / 158.2 / **424.4** | **+266.2** | [Shopify/ruby#1014](https://github.com/Shopify/ruby/issues/1014) + #1039 row 7 (k0kubun) | stop (covered) |
 | 7b: forwarding site sees nil and a block | 1,071.8 / 178.2 / **448.9** | **+270.7** | same (row 7's `split_nil_block_arg`) | stop (covered) |
 | 7c: `&:sym` (rails/rails#59141's `fetch_value_at!`) | 796.3 / 538.2 / 537.4 | −0.8 (both JITs generic) | Shopify/ruby#1014 (dak2 lists `&:foo` as a later step); YJIT has no Symbol case either | [Rails-side change](#rails-side-option-a-block-literal-in-fetch_value_at) |
@@ -191,6 +194,183 @@ belongs in ZJIT.
 >
 > Related: #776 (this case isn't handled yet), #1031.
 
+## Lead 3: PR attempt (2026-11-14 evening): stopped at a design question
+
+Thomas asked for a ruby/ruby PR instead of the issue (DECISIONS exception, 2026-11-14), if a small fix fits the
+ZJIT team's design. **No PR.** The fix that fits ZJIT's recompile machinery fixes the repro and the 4-model Rails
+case. On ruby-bench, limited to an ISEQ's first version, it gains 1.0% on shipit and 0.16% on railsbench but 0.06% on
+lobsters, and it makes sites with more than 8 receiver classes slower; without the limit it makes lobsters and
+shipit worse in other ways. The team has also chosen the other direction for this kind of site:
+in merged code for polymorphic `yield`, and on k0kubun's lobsters branch for exactly this fallback. Which way lead 3
+goes is their decision, so this ends in [one question for #776](#draft-answer-on-shopifyruby776-not-posted), for
+Thomas. Prototype, pushed, not opened: thomasklemm/ruby
+[`thomasklemm/zjit-poly-miss-recompile`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-poly-miss-recompile)
+@ `fc8d729709`, one commit on master [`88ea6fd282`](https://github.com/ruby/ruby/commit/88ea6fd282) (2026-11-14 18:00 UTC).
+
+### How ZJIT handles misses today (master `88ea6fd282`)
+
+* **Recompile exits.** A guard or `SideExit` with `recompile: Some(Recompile)` calls `exit_recompile`. After
+  `--zjit-num-exits-until-invalidate` (5) such exits, `invalidate_iseq_version` drops the version and resets the
+  ISEQ's call counter, so it profiles again in the interpreter and compiles the next version. Each compile of a
+  non-final version re-enables the profiling instructions (`reset_profiles_remaining`), so the exits themselves
+  profile. Profiles accumulate across versions in an 8-bucket `Distribution`; a ninth class (or a singleton class
+  of a non-module object) makes the site megamorphic, which compiles to a generic send with no arms.
+* **Version budget.** `--zjit-max-versions` is 4 per ISEQ. Once a version was invalidated, the last one compiles
+  with `no_side_exits` (`CompilePolicy`): getivar/setivar call `rb_ivar_get`/`rb_ivar_set`, caller splats and other
+  speculation are skipped. `convert_no_profile_sends` already keeps sends generic in the final version.
+* **Who uses recompile exits.** No-profile sends (ruby/ruby#16525, k0kubun, the pattern this prototype copies),
+  shape guards (#16589, #16881), Float operands (#17776), `getblockparamproxy` (#17326), `coerce_to` (#19603),
+  caller-splat lengths (#18267, `76d4288406`).
+* **Who chose not to.** Polymorphic `invokeblock` (#18211, k0kubun, `9c2c8caf28`): "Unlike the monomorphic path
+  above, a miss must not side-exit: the site is known to see multiple blocks, so a guard would keep failing and
+  recompiling." On `k0kubun/zjit-lobsters7` ([Shopify/ruby#1039](https://github.com/Shopify/ruby/issues/1039)), the
+  fallthrough of a class guard chain stays a send and gets cheaper instead: row 24 `46061d1cc6` builds the chain for
+  megamorphic sites "with the dynamic send as the fallthrough arm rather than a side exit", row 25 `9ce1c0bff0`
+  calls a shared method behind one ancestor guard, row 27 `4e25f5dbac` looks targets up in a per-call-shape class
+  table and explicitly accepts `SendPolymorphicFallback`, row 35 `b7dd4346e3` calls such targets JIT-to-JIT. Rows
+  24, 25 and 27 have no assignee. [Shopify/ruby#1031](https://github.com/Shopify/ruby/issues/1031) (k0kubun,
+  assigned) asks which events should trigger recompilation; on ruby/ruby#19617 tekknolagi wrote "we are in great
+  need of a more general solution" for recompile tuning.
+
+### What was tried
+
+* **V1, every version:** `convert_no_profile_sends` also turns a `Send` with reason `SendPolymorphicFallback` into
+  `SideExit PolymorphicSendMiss recompile` (new counter `exit_polymorphic_send_miss`), except in the final version.
+  Nine added lines plus test updates.
+* **V2, first version only** (the prototype): the same, but only while the ISEQ has no earlier version, so these
+  misses spend at most one of its versions. Ten added lines. `make zjit-test` 1992 of 1993; the one failure is
+  `test_profile_frames_during_direct_jit_to_jit_entry` (no SIGPROF sample in 1M iterations), which also failed alone
+  3 times while four Valgrind runs held all cores, then passed 3 of 3 alone on a quieter orb and failed again in the
+  next full parallel run. It calls no polymorphic site; the 11-03 lead 3 build saw the same. Not run: test-all and
+  btest, because no PR follows.
+* **Not retried:** our method-entry build `23273fd8ec` (11-03, on master `9b30fd207f`: railsbench +0.15%, lobsters
+  −0.30%, shipit −1.20%; a new HIR instruction and about 350 lines, so it needs the tracker first under DECISIONS).
+  It is the polymorphic counterpart of row 25.
+
+### Numbers
+
+Same method as above (pinned Valgrind 3.19.0 with the 512 MiB brk reservation, tool SHA-256 `6ad7588e…` built on
+this orb, fixed heap, JIT-flat gate, A/A; every reported Callgrind cell passes the gate, no log has `brk segment
+overflow`). YJIT and ZJIT columns are master `88ea6fd282`. Scripts in
+[fixtures/corpus/zjit-leads/zl3](../../fixtures/corpus/zjit-leads/zl3) (the stats runs use the gap harness, which
+now also records compiles, `zjit_alloc_bytes` and peak RSS); receipts (logs, per-run JSON, the V1 patch; no Callgrind
+dumps) in [`data/zjit-leads/zl3-receipts.tar.gz`](data/zjit-leads/zl3-receipts.tar.gz).
+
+**Micro, Ir per call** (`micro.rb`; K classes, P of them before compile; A/A identical to 0.1 Ir):
+
+| case | YJIT | ZJIT master | V1 | V2 | compiled ISEQs master → V1 / V2 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| class method, 4 classes, 2 profiled | 100.8 | 352.6 | 134.0 | 137.3 | 2 → 3 / 3 |
+| class method, 4 classes, all profiled | | 126.9 | 126.6 | 126.6 | 2 → 2 / 2 |
+| #59141 shape, 4 classes, 2 profiled | 211.7 | 629.6 | 211.0 | 214.3 | 3 → 5 / 5 |
+| class method, 8 classes | 268.3 | 305.4 | 152.7 | 152.8 | 2 → 3 / 3 |
+| #59141 shape, 8 classes | 466.2 | 546.4 | 268.7 | 269.0 | 3 → 5 / 5 |
+| **class method, 12 classes** | 354.9 | 402.0 | **577.8** | **577.8** | 2 → 3 / 3 |
+| **#59141 shape, 12 classes** | 588.1 | 725.3 | **1,036.8** | **1,036.8** | 3 → 5 / 5 |
+| class method, 12 classes, 2 profiled | 354.9 | 502.9 | 576.8 | 347.1 | 2 → 4 / 3 |
+| #59141 shape, 12 classes, 2 profiled | | 907.9 | 1,035.8 | 591.6 | 3 → 7 / 5 |
+| 1 class (control) | | 109.4 / 162.4 | same | same | unchanged |
+
+With 12 classes the recompiled profile overflows its 8 buckets, the site turns megamorphic and loses the arms the
+first version had: +44% in both variants.
+
+**Rails main, 4 models** (`ar_poly.rb`, Ir per op, mean of a/b; A/A ≤ 0.04%):
+
+| | YJIT | ZJIT master | V1 | V2 |
+| --- | ---: | ---: | ---: | ---: |
+| all 4 models before compile | 92,594.8 | 109,467.7 (+18.2%) | 97,139.5 (+4.9%) | 98,731.2 (+6.6%) |
+| 2 models before compile | 93,088.6 | 133,218.5 (+43.1%) | 97,123.3 (+4.3%) | 99,193.8 (+6.6%) |
+| compiled ISEQs at the end | 851 | 715 / 714 | 751 / 755 | 739 / 742 |
+
+Percentages are against YJIT. `send_polymorphic_fallback` per op: 50 / 103 on master, 0 / 0 with either variant.
+
+**ruby-bench main `0e67be03ef`, ZJIT counters per iteration** (one stats run per cell: 40 warmup, then 10
+iterations; compiles and memory are whole-process at the end of warmup; `--zjit-exec-mem-size=512
+--zjit-mem-size=1024`, no `compile_error_out_of_memory` anywhere):
+
+| | railsbench master → V1 → V2 | lobsters master → V1 → V2 | shipit master → V1 → V2 |
+| --- | --- | --- | --- |
+| `send_fallback_send_polymorphic_fallback` | 30,483 → 0 → 9,057 | 259,460 → 34,697 → 194,867 | 788,029 → 109,141 → 589,383 |
+| `send_fallback_send_megamorphic` | 189,766 → 189,766 → 189,766 | 118,320 → **373,919** → 143,690 | 120,896 → **685,995** → 207,609 |
+| `getivar_fallback_no_side_exits` | 0 → 0 → 0 | 144,770 → **231,121** → 149,147 | 335,358 → **895,635** → 340,749 |
+| `dynamic_send_count` | 1,083,889 → 1,053,406 → 1,062,463 | 783,747 → **841,654** → 746,529 | 1,877,795 → 1,773,924 → 1,771,904 |
+| compiled ISEQs | 2,605 → 2,688 → 2,655 | 6,367 → 7,014 → 6,641 | 5,943 → 6,614 → 6,219 |
+| code region (MB) | 10.30 → 10.66 → 10.53 | 31.25 → 34.59 → 32.56 | 25.92 → 29.33 → 27.16 |
+| `zjit_alloc_bytes` (MB) | 7.48 → 7.57 → 7.55 | 18.57 → 19.38 → 18.92 | 16.19 → 17.00 → 16.51 |
+
+V1 sends ISEQs into their no-side-exit final version (getivar falls back to `rb_ivar_get` 86k and 560k more times
+per iteration) and turns sites with many classes megamorphic; lobsters ends with more dynamic sends than master.
+V2 avoids most of the final-version cost but keeps part of the megamorphic shift. Railsbench's
+`inline_iseq_optimized_send_count` drops by 18,041 in both variants (`iseq_optimized_send_count` +32,037): some
+recompiled callers stop inlining a callee. Not traced.
+
+**ruby-bench Callgrind, V2 only** (Ir per iteration, 3-iteration window after 40 warmup iterations and the flat
+windows; GC counted, fixed heap):
+
+| | master a / b | V2 a / b | V2 − master | compiled ISEQs at the window's end |
+| --- | --- | --- | ---: | --- |
+| railsbench | 4,904.1 / 4,902.4 M (A/A 0.03%) | 4,895.9 / 4,895.1 M | **−0.16%** | 2,562 → 2,610 |
+| lobsters | 2,498.9 / 2,498.6 M (A/A 0.01%) | 2,497.3 M / rejected | −0.06% | 6,339 → 6,615 |
+| shipit | 3,761.0 / 3,762.0 M (A/A 0.03%) | 3,727.7 / 3,721.6 M | **−0.98%** | 5,902 → 6,170 |
+
+Rejected: lobsters V2 run b compiled one ISEQ and 8 side exits inside the measured window (gate fail, 2,496.6 M);
+kept in the receipts, not used, not rerun.
+
+### Why this stops here
+
+* **The design choice is open and the team leans the other way.** Recompiling on a polymorphic miss is what
+  k0kubun ruled out for polymorphic `yield`, and his lobsters branch makes this same fallback cheaper instead
+  (rows 24/27). A PR that recompiles would answer #1031's open question by itself.
+* **Its value depends on megamorphic handling.** Sites with more than 8 classes lose their arms after the
+  recompile (+44% in the micro, +25k / +87k megamorphic sends per iteration on lobsters / shipit with V2). Row 24
+  would turn exactly those sites back into guard chains, so the two would have to be weighed together.
+* **The app effect is uneven.** Shipit gains 1.0% and railsbench 0.16%, both outside the A/A, but lobsters, where
+  round 2 counted the most lead 3 fallbacks against YJIT (171k per iteration), moves 0.06%: V2 removes only 64k of
+  its 259k polymorphic fallbacks and adds 25k megamorphic sends. No `run_benchmarks.rb` timing was taken, which
+  DECISIONS asks of a ZJIT performance PR.
+
+### Draft answer on Shopify/ruby#776 (not posted)
+
+> Not for receiver classes that first show up after compilation, I think. The arms cover the classes from the
+> profiled calls, and any other class takes the `send_polymorphic_fallback` send for good:
+>
+> ```ruby
+> class Model; def self.types = 1; end
+> MODELS = Array.new(4) { Class.new(Model) }
+> def read(m) = m.types
+> 100.times { read(MODELS[0]); read(MODELS[1]) } # compiled with arms for 2 classes
+> 100.times { MODELS.each { read(_1) } }         # 200 of these 400 calls take the fallback
+> ```
+>
+> I tried turning that fallback into a recompile exit in an ISEQ's first version, as for `NoProfileSend`
+> ([branch](https://github.com/thomasklemm/ruby/commit/fc8d729709)). That removes the fallbacks above and cuts a
+> 4-model Active Record loop by 10–26%. On ruby-bench (Callgrind) it is −1.0% on shipit, −0.16% on railsbench and
+> −0.06% on lobsters. Sites with more than 8 classes turn megamorphic after the recompile and lose their arms (+44%
+> in a 12-class micro), and without the first-version limit lobsters and shipit reach their no-side-exit final
+> versions much more often.
+>
+> Should a miss here recompile, or should the fallback get cheaper instead, like the guard chain and class table
+> on zjit-lobsters7?
+
+### For Thomas (German)
+
+ZJIT übersetzt einen Aufruf wie `model.types` mit je einem schnellen Zweig für die Klassen, die es in den fünf
+Aufrufen vor dem Kompilieren gesehen hat; jede später auftauchende Klasse nimmt für immer den langsamen generischen
+Aufruf, während YJIT sie einfach an seine Kette anhängt. Die Änderung springt bei fremden Empfängern zurück in den
+Interpreter, der sie profiliert, und kompiliert die Methode einmal neu; das ist sicher, weil der Interpreter den Aufruf genau
+wie bisher ausführt und danach nur Zweige dazukommen, und der Minimalfall braucht so 2,6-mal weniger Instruktionen
+pro Aufruf, shipit 1 % weniger. Einen PR öffnen wir trotzdem nicht, weil railsbench und lobsters kaum gewinnen, Aufrufstellen mit mehr als
+acht Klassen dabei ihre Zweige verlieren und k0kubun für denselben Fall bei `yield` bewusst gegen das Zurückspringen
+entschieden hat; welche Richtung gilt, soll das ZJIT-Team in #776 sagen.
+
+```ruby
+class Model; def self.types = 1; end
+MODELS = Array.new(4) { Class.new(Model) }
+def read(m) = m.types
+100.times { read(MODELS[0]); read(MODELS[1]) } # ZJIT kompiliert read mit Zweigen für die ersten zwei Klassen
+10_000.times { MODELS.each { read(_1) } }      # die anderen zwei: 20.000 von 40.000 Aufrufen generisch
+```
+
 ## Lead 7: block arguments other than nil or a Proc
 
 **Mechanism** (`zjit/src/hir.rs`, `type_specialize`, `BlockHandler::BlockArg` to an ISEQ callee): ZJIT
@@ -290,3 +470,5 @@ railsbench-like request mix under ZJIT −0.58%. The `value_at!` line is in the 
 * Pricing the Rails change on ruby-bench railsbench with Rails main (estimate above only; VB1 measured a
   railsbench-like request mix instead).
 * Tracing the ruby-bench lead 3 sites one by one against the repro mechanism.
+* Lead 3 prototype: test-all and btest at `--zjit-call-threshold=1`/`2`, `run_benchmarks.rb` timings, and why
+  railsbench recompiles inline 18k fewer sends per iteration. Only if the ZJIT team wants the recompile.
