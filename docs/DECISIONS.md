@@ -238,7 +238,8 @@ New work orbs run as Claude Code (`external-agent:claude-code`). Orbs that are a
 ### Opus and Fable stand in for Sol and Astra (Thomas, 2026-11-14; temporary, pending Thomas)
 
 Until Thomas says otherwise, reviews run on Claude Opus 5.5 in independent Claude Code orbs instead of Sol, because
-Opus has more rate limit free; specific risky items get Claude Fable 5.2. A pass recorded as `reviewer: opus` or
+Opus has more rate limit free; specific risky items get Claude Fable 5.2, and the coordinator may also commission a focused Fable review of one
+question (for example security or exactness) whenever it helps (Thomas, 2026-11-14). A pass recorded as `reviewer: opus` or
 `reviewer: fable` fills the slot Sol fills, and Astra's on a `risky` item. It counts only with its orb's thread ID in
 `orb`, which must differ from the `orb` of the claude-code pass on the same head and from any other stand-in counted
 with it, so every slot keeps its own reviewer. Sol and Astra passes count as before.
