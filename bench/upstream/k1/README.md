@@ -120,7 +120,36 @@ repeats of the 5-column controls ([results/repeats](results/repeats)) give media
 YJIT ([sweep-yjit.md](results/sweep-yjit.md)): cells where main, main2 or the fix compiled in the measured window are
 marked `rej` and not counted. JIT-flat cells: `changed?` −54%, `attribute_names` −66%, `serializable_hash` −28% to
 −40%, `update!` −8% (5 cols) to −48% (300), `dup` −2.5% (5) and −6% (100, 300); load, readers, `#attributes`, STI
-`#attributes` and `new` within the A/A (≤ 0.78% at 5 columns, 0.18% at 300). Not measured on Ruby master × ZJIT yet.
+`#attributes` and `new` within the A/A (≤ 0.78% at 5 columns, 0.18% at 300). Ruby master × ZJIT: next section.
+
+### Ruby master × ZJIT (opus review, 2026-11-14)
+
+Measured in the second review ([thread T-01a1da1c](https://ampcode.com/threads/T-01a1da1c-7c8f-75af-9394-a6cb9d83d777))
+on Ruby master `9aa0898240` (`--enable-yjit --enable-zjit`, `-O3`), the pin the other Rails candidates use; same
+harness, census heap variables, N=200, width 30, trees main, main2 (A/A) and the fix. Under ZJIT the warmup waits for
+three windows in a row with no new compiled ISEQ or side exit. Master has no invalidation count, so these are
+observations, not gated claims: every measured window below compiled 0 ISEQs and 0 side exits and spent 0 ns
+invalidating, on all three trees. Raw: [results/master](results/master) (one run, then `rep1`/`rep2` of the controls).
+
+| Ir per call, 30 cols | ZJIT main | A/A | fix | interp main | A/A | fix | objects main → fix (interp) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `changed?` | 142,486 | +0.15% | **−50.7%** | 262,983 | −0.44% | **−34.1%** | 6 → 1 |
+| `serializable_hash` | 195,653 | +0.19% | **−36.9%** | 269,640 | −0.44% | **−33.4%** | 38 → 33 |
+| `update!` of one column | 834,866 | +0.15% | **−26.1%** | 1,608,653 | −0.19% | **−16.7%** | 205 → 190 |
+| `find` then `save` | 851,672 | +0.19% | **−27.2%** | 1,745,098 | −0.23% | **−17.8%** | 180 → 165 |
+| `find` (3 runs, median) | 202,332 | −0.10% | −0.02% | 407,123 | −0.17% | +0.01% | 69 → 69 |
+| `#attributes` (3 runs) | 292,453 | −0.27% | −0.15% | 628,359 | −0.03% | −0.01% | 84 → 84 |
+| `new` (3 runs) | 18,942 | −0.58% | −0.48% | 55,772 | +0.06% | +0.43% | 9 → 9 |
+
+The larger ZJIT percentages come from a smaller base: `changed?` saves 72k Ir per call under ZJIT against 90k in
+the interpreter. No ZJIT loss. One master-interpreter cell is outside its A/A: `new`
+at +0.43% (all three fix runs 56,010–56,126 against main 55,752–55,899), although `new` calls neither `#keys` nor
+`materialize` ([reach](results/reach-main.txt)). Per-function self Ir of one `new` window puts the whole +274 Ir per
+call in `rb_managed_id_table_lookup` (+288) and `st.c:find_table_entry_ind` (+48), offset by `rb_concurrent_set_find`
+(−48); no `vm_exec_core` or `insns.def` line differs, so the Ruby code run is the same. That points at hash-table
+probe lengths shifted by the IDs the fix no longer interns (`type_keys`, `@type_keys`, `cached_names`), not at the
+change's code path (a hypothesis; not traced to the table). It does not show on 4.0.9 (`new` −0.1% at 30 columns) or
+under ZJIT.
 
 Against 8-1-stable ([vs-8-1.md](results/vs-8-1.md)), the fix recovers part of main's regression on these paths, not
 all: at 30 columns `changed?` goes from main +28% to −19% against 8.1, `serializable_hash` from +7% to −31%, find +
@@ -157,4 +186,9 @@ pointed at the tree, plus argon2); irwin.so built from irwin.c into ~/k1/ext.
 N=200 WARM=100 bench/upstream/k1/run.sh OUT TREE WIDTH interp|yjit [CASE...]
 ruby bench/upstream/k1/table.rb OUT; ruby bench/upstream/k1/sweep.rb OUT interp
 BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/keys_probe.rb > TREE.txt
+BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/edge_probe.rb > edge-TREE.txt
+Master: Ruby 9aa0898240 in ~/w/ruby-master, bundles in ~/k1/suiteM-TREE (activesupport, activemodel, activerecord,
+sqlite3; BUNDLE_PATH=~/k1/gemsM), irwin.so built for it in ~/k1/extM:
+PATH=~/w/ruby-master/bin:$PATH RUBY_BIN=~/w/ruby-master/bin SUITE=suiteM BUNDLE_PATH=~/k1/gemsM IRWIN_DIR=~/k1/extM \
+  N=200 WARM=100 bench/upstream/k1/run.sh OUT TREE 30 zjit|interp [CASE...]
 ```

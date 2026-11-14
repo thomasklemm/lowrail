@@ -1,0 +1,4 @@
+{"case":"_empty","width":30,"n":200,"objects":0.07,"jit_blocks":0,"inval_ns":0,"ir":0,"tree":"main","mode":"zjit"}
+{"case":"new","width":30,"n":200,"objects":9.02,"jit_blocks":0,"inval_ns":0,"ir":18830,"tree":"main","mode":"zjit"}
+{"case":"load1","width":30,"n":200,"objects":69.02,"jit_blocks":0,"inval_ns":0,"ir":202332,"tree":"main","mode":"zjit"}
+{"case":"load1_attributes","width":30,"n":200,"objects":84.02,"jit_blocks":0,"inval_ns":0,"ir":292147,"tree":"main","mode":"zjit"}
