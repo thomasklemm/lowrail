@@ -1,0 +1,22 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index e6bffa3b7a..daa5020de1 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -375,7 +375,7 @@ def values_before_type_cast
+       materialize
+       hash = {}
+       indexes.each_key do |name|
+-        if attribute = lookup(index_for_name(name))
++        if attribute = @attributes[indexes[name]]
+           hash[name] = attribute.value_before_type_cast
+         end
+       end
+@@ -387,7 +387,7 @@ def values_for_database
+       materialize
+       hash = {}
+       indexes.each_key do |name|
+-        if attribute = lookup(index_for_name(name))
++        if attribute = @attributes[indexes[name]]
+           hash[name] = attribute.value_for_database
+         end
+       end

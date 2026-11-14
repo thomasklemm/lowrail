@@ -37,7 +37,7 @@ twin (`main2`, or `c9m2` in the census).
 | ---: | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **K1** `LazyIndexedAttributeSet#keys` builds `row_keys \| type_keys \| cached_names`, which always equals `row_keys` | AM `attribute_set.rb:343` | 8/8 apps, 25 workloads grew; +0.134% net; CPU rank 55 (0.145%) | Built: `update!` −18% / −29% / −36% at 30/100/300 cols; `serializable_hash` −30%; `changed?` −17%; YJIT `update!` −29% (A/A ≤ 0.34%) | No (#59141) | ikraamg's #58002 targets the old `keys` (stale); kamipo's #58380 doesn't touch it | **Built and reviewed by the K1 orb** ([proof](../../bench/upstream/k1/README.md)); Thomas decides on opening |
 | 2 | **`button_to` params via `hidden_field_tag`** (K6), and `form_tag { }` with a block (K5) | AV `navigation_helper.rb:459`, `:462` | 4/8 apps call `button_to` (43 call sites, 3 with `params:`); `button_to` ≈ 85k Ir inclusive per op | Params: +42–45% since #50312; **K7 −28% to −31%**, back to pre-#50312. No params: +24–35% since #50312, K7 −2.7% to −4.8% (A/A ≤ 0.1%). YJIT (flat): params K7 −30% to −33%, no params −1.7% to −3.5% | No (#50312, 2026-11-07) | None; #50312's discussion has no performance comments | **K6 built** ([record](../../bench/upstream/k6/README.md), queue item [K6](../../bench/upstream/pr-queue/items/K6.md)); K5 is optional. Thomas decides on opening |
-| 3 | **`attributes_for_database` / `attributes_before_type_cast` rebuild an `IndexedRow::Mutable` per call** (`materialize`, then a Hash via `transform_values`) | AR `before_type_cast.rb:108/113` → AM `attribute_set.rb:115/119` → `:457` | Marshal (`marshalling.rb:23`) and MessagePack (`message_pack.rb:89`) record caching; 0 of the 71 census workloads | `attributes_for_database` ×2.2 at 6–300 cols (1 → 4 objects); `before_type_cast` ×5–6; `Marshal.dump` +33% / +34% / +36% / +36% vs 8.1 at 6/30/100/300 cols (A/A ≤ 0.04%) | No (#59141) | None (#59249 and #59684 touch other parts of Marshal and MessagePack) | Build a row-reading `values_for_database`/`values_before_type_cast` like czj's `to_hash` (19022a4aa4), then sweep |
+| 3 | **`attributes_for_database` / `attributes_before_type_cast` rebuild an `IndexedRow::Mutable` per call** (`materialize`, then a Hash via `transform_values`) | AR `before_type_cast.rb:108/113` → AM `attribute_set.rb:115/119` → `:457` | Marshal (`marshalling.rb:23`) and MessagePack (`message_pack.rb:89`) record caching; 0 of the 71 census workloads | `attributes_for_database` ×2.2 at 6–300 cols (1 → 4 objects); `before_type_cast` ×5–6; `Marshal.dump` +33% / +34% / +36% / +36% vs 8.1 at 6/30/100/300 cols (A/A ≤ 0.04%) | No (#59141) | None (#59249 and #59684 touch other parts of Marshal and MessagePack) | **L3 built** ([record](../../bench/upstream/l3/README.md), queue item [L3](../../bench/upstream/pr-queue/items/L3.md)): drops the per-call row copy, keeps `materialize` (a row read is not exact). `Marshal.dump` −15%, MessagePack −25% to −28%, `attributes_for_database` −33% to −42%, `before_type_cast` −43% to −53% at 6–300 cols (A/A ≤ 0.26%) |
 | 4 | **By-name access after #59141**: `index_for_name` → `indexes` → `lookup`, a second `index_for_name` in `write`, eager cast in `write_from_user` | AM `attribute_set.rb:495`, `:374/382`, `:422`; AR `read.rb:40/56`, `write.rb:32/52`, `primary_key.rb:19` | 8/8 apps: `index_for_name` +0.298% net (59 workloads), `value_at!` +0.272%, `fetch_value!` +0.102% | vs before #59141: `read_attribute`/`self[]` +16%, `id`/`_read_attribute` +39–41%, `write_attribute` +37%, writer +33%, `changed?` +32%, `dup` +22% (YJIT read +2%, write +43%) (A/A ≤ 0.95%) | No (#59141) | None. tenderlove plans index-based generated writers and the like | Reads by name (`id`, `_read_attribute`): regression from #59141. Writers and dirty: not yet converted. Give tenderlove the numbers before the beta |
 | 5 | **Partial-select reads** go through `ExtendedIndexes`/`Remapper` | AM `indexed_row.rb:206/267` | 2/8 apps in the census (`Remapper#initialize` +0.041%) | `partial_load1_read` +14–15% vs before #59141 and +17% vs 8.1 at every width; YJIT +26–31% | No (#59141) | None | Measure `select(:id, :name)` loads with 1–10,000 rows; low priority |
 | 6 | **`update!` grows with width before #59141** | AR save path (not yet attributed) | Every app that saves wide records | 8.1 → before #59141: +10% / +19% / +31% / +39% at 6/30/100/300 cols; with K1 still +10% vs 8.1 at 300 cols | No | None | A line-level Callgrind diff of `update1` at 300 cols, 8.1 against the parent of #59141 |
@@ -232,9 +232,25 @@ The cost is in `LazyIndexedAttributeSet#attributes` (`attribute_set.rb:457`). It
 an `Attribute` for every row key and type key, then copies them into a new `IndexedRow::Mutable` on every call, and
 `AttributeSet#values_for_database` (`:119`) then runs `transform_values` over that. `to_hash` had the same shape
 until czj's row-reading `to_hash` went into #59141. The same treatment for `values_for_database` and
-`values_before_type_cast` is the proposed next step. One question it needs answered: whether a value cast from the
+`values_before_type_cast` was the proposed next step. One question it needed answered: whether a value cast from the
 row and never written serializes to the same database value as the row's raw value (it must, for Marshal round
 trips).
+
+**Built as L3, without the row read** ([record](../../bench/upstream/l3/README.md)). The question's answer is no:
+`Attribute#value_for_database` keeps what it returns, so main dumps the same ciphertext for a non-deterministically
+encrypted attribute on every call, and serializing the row's value again re-encrypts it each time. Skipping
+`materialize` also changes `accessed_fields`. So L3 keeps `materialize` and drops only the row copy: the copy alone is
+32,820 Ir and 3 objects per call at 30 columns (794 on 8.1). The branch `thomasklemm/attrs-for-database-row`
+(`52587b6f5d`, +24) prints byte-identical probe output to main on SQLite and PostgreSQL, including Marshal and
+MessagePack payloads dumped by 8.1 and by main. Fix against main, interpreter, 6/30/100/300 columns: `Marshal.dump`
+−15.9% / −15.4% / −15.2% / −15.3%, MessagePack dump −25.1% / −27.1% / −27.7% / −28.1%, 3 fewer objects (A/A ≤
+0.26%). That recovers 60–70% of the dump regression against 8.1; the rest is the Ruby walk over the indexes that
+replaced 8.1's C `Hash#transform_values`. YJIT: in the record.
+
+Found along the way, not part of L3: records Marshal-dumped by 8.1.4.1 in the 6.1 format fail on main (a loaded record
+raises `ArgumentError: undefined class/module ActiveRecord::Result::IndexedRow` on load; a new one raises
+`NoMethodError` on `save`). Main's 6.1 test fixtures were dumped by Rails 6.1 and pass. tenderlove's open #59249
+removes 6.1 loading. Repro: [marshal_6_1_repro.rb](../../bench/upstream/l3/marshal_6_1_repro.rb).
 
 Reach: `Rails.cache` entries holding records (Marshal), the MessagePack cache coder, and anything that calls
 `attributes_before_type_cast`. None of the 71 census workloads dump a record, so the census cannot rank it. The

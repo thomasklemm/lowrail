@@ -235,6 +235,24 @@ den vollen AM-, AR-SQLite- und AR-PostgreSQL-Suiten keine Abweichung fand. Einzi
 Reader und `#attributes` unverändert innerhalb des A/A. Kein offener PR deckt es ab. Empfehlung: kleiner Draft-PR für
 tenderlove, sobald Thomas ihn freigibt; ein Kommentar im gemergten #59141 bräuchte ebenfalls Thomas' OK.
 
+### Erklärung für Thomas: L3 (2026-11-14, Census 9; gebaut, nicht geöffnet)
+
+Belege und Messungen: [bench/upstream/l3](../../bench/upstream/l3/README.md); Queue-Eintrag
+[L3](../../bench/upstream/pr-queue/items/L3.md).
+
+**L3, `attributes_for_database` und `attributes_before_type_cast`.** Seit #59141 (tenderlove, gemergt 2026-11-11,
+unveröffentlicht) kopiert ein geladenes Attribut-Set bei jedem dieser Aufrufe alle Attribute in eine neue Zeile
+(`IndexedRow::Mutable`) und macht erst daraus den Hash. `Marshal.dump` eines Records und der MessagePack-Cache-Coder
+rufen `attributes_for_database` einmal pro Record auf. L3 baut beide Hashes direkt aus den Attributen, die das Set
+ohnehin baut (+24, nur `attribute_set.rb`). Die naheliegende Variante, die Werte wie czjs `to_hash` direkt aus der
+Rohzeile zu lesen, ist nicht exakt: verschlüsselte Attribute bekämen bei jedem Dump ein neues Chiffrat, und
+`accessed_fields` ändert sich. Eine Differential-Probe (17 Szenarien × 12 Abläufe, Marshal- und MessagePack-Payloads
+von 8.1 und main, SQLite und PostgreSQL) gibt byte-gleiche Ausgabe wie main. Interpreter: `Marshal.dump` −15 %,
+MessagePack −25 bis −28 %, `attributes_before_type_cast` −43 bis −53 %, über 6 bis 300 Spalten. Das holt 60–70 % des
+Rückstands gegenüber 8.1 auf, nicht alles. Kein offener PR berührt die Stelle. Nebenbei gefunden: Records, die 8.1 im
+6.1-Format gedumpt hat, lassen sich auf main nicht laden oder speichern (eigener Vorschlag, nicht Teil von L3).
+Empfehlung: wie K1 als kleiner PR oder Hinweis an tenderlove, sobald Thomas ihn freigibt.
+
 ### Erklärung für Thomas: K6 (2026-11-14, Census 9; gebaut, nicht geöffnet)
 
 Belege und Messungen: [bench/upstream/k6](../../bench/upstream/k6/README.md); Queue-Eintrag

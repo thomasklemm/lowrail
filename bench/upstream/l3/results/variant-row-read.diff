@@ -1,0 +1,43 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..be390cff6a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -370,6 +370,38 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      hash = {}
++      indexes.each_key do |name|
++        index = index_for_name(name)
++        if attribute = lookup(index)
++          hash[name] = attribute.value_before_type_cast
++        elsif IndexedRow.key_at?(@row, index)
++          hash[name] = @row[index]
++        elsif @ctx.type_key_at?(index)
++          hash[name] = default_attribute(name, index).value_before_type_cast
++        end
++      end
++      hash
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      hash = {}
++      indexes.each_key do |name|
++        index = index_for_name(name)
++        if attribute = lookup(index)
++          hash[name] = attribute.value_for_database
++        elsif IndexedRow.key_at?(@row, index)
++          hash[name] = type_for(index).serialize(value_at(index, name))
++        elsif @ctx.type_key_at?(index)
++          hash[name] = default_attribute(name, index).value_for_database
++        end
++      end
++      hash
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)

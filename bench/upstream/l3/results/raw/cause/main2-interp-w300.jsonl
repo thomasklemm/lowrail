@@ -1,0 +1,4 @@
+{"case":"_empty","width":300,"n":200,"objects":0.04,"jit_blocks":0,"ir":0,"tree":"main2","mode":"interp"}
+{"case":"set_attributes","width":300,"n":200,"objects":3.0,"jit_blocks":0,"ir":281504,"tree":"main2","mode":"interp"}
+{"case":"attributes_for_database","width":300,"n":200,"objects":4.0,"jit_blocks":0,"ir":1564907,"tree":"main2","mode":"interp"}
+{"case":"attributes_before_type_cast","width":300,"n":200,"objects":4.42,"jit_blocks":0,"ir":1183721,"tree":"main2","mode":"interp"}

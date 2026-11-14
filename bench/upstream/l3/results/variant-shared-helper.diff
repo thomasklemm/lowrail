@@ -1,0 +1,40 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..258e8ae67a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -370,6 +370,16 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      transform_attributes(&:value_before_type_cast)
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      transform_attributes(&:value_for_database)
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)
+@@ -489,6 +499,18 @@ def materialize
+         end
+       end
+ 
++      #: () { (ActiveModel::Attribute) -> untyped } -> Hash[String, untyped]
++      def transform_attributes
++        materialize
++        hash = {}
++        indexes.each_key do |name|
++          if attribute = lookup(index_for_name(name))
++            hash[name] = yield attribute
++          end
++        end
++        hash
++      end
++
+       # +indexes+ has every name the set can hold, so a name without an
+       # index isn't an attribute.
+       #: (String) -> Integer?

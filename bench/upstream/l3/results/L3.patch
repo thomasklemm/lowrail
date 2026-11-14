@@ -1,0 +1,62 @@
+From 52587b6f5dde95937fbec43a76a25d161214b764 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sat, 14 Nov 2026 13:35:20 +0000
+Subject: [PATCH] Build attribute Hashes without copying the lazy row
+
+LazyIndexedAttributeSet#attributes copies the set's attributes into a new
+IndexedRow::Mutable on every call. AttributeSet#values_for_database and
+#values_before_type_cast, which back attributes_for_database (used by
+Marshal and the MessagePack coder) and attributes_before_type_cast, only
+turn that row into a Hash.
+
+They now read the attributes materialize built straight from the set, by
+name in the order of its indexes, as IndexedRow#transform_values does.
+They build the same attributes and call the same method on each, so the
+Hashes and the record's state afterwards are unchanged.
+
+Reading values from the row instead, as #to_hash does, would also skip
+materialize, but wouldn't be the same: Attribute#value_for_database keeps
+the value it returns, so an encrypted attribute dumps the same ciphertext
+each time, and accessed_fields would leave out attributes read as nil.
+---
+ activemodel/lib/active_model/attribute_set.rb | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..e6bffa3b7a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -370,6 +370,30 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      materialize
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = lookup(index_for_name(name))
++          hash[name] = attribute.value_before_type_cast
++        end
++      end
++      hash
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      materialize
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = lookup(index_for_name(name))
++          hash[name] = attribute.value_for_database
++        end
++      end
++      hash
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)
+-- 
+2.55.0
+
