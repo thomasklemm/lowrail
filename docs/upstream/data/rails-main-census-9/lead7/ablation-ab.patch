@@ -1,0 +1,13 @@
+diff --git a/activerecord/lib/active_record/model_schema.rb b/activerecord/lib/active_record/model_schema.rb
+index 3a4556104a..95f755e881 100644
+--- a/activerecord/lib/active_record/model_schema.rb
++++ b/activerecord/lib/active_record/model_schema.rb
+@@ -511,7 +511,7 @@ def table_exists?
+       end
+ 
+       def attributes_builder # :nodoc:
+-        schema_attributes.builder
++        @l7_attributes_builder ||= schema_attributes.builder
+       end
+ 
+       def columns_hash # :nodoc:

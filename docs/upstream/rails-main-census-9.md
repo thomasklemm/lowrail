@@ -41,7 +41,7 @@ twin (`main2`, or `c9m2` in the census).
 | 4 | **By-name access after #59141**: `index_for_name` → `indexes` → `lookup`, a second `index_for_name` in `write`, eager cast in `write_from_user` | AM `attribute_set.rb:495`, `:374/382`, `:422`; AR `read.rb:40/56`, `write.rb:32/52`, `primary_key.rb:19` | 8/8 apps: `index_for_name` +0.298% net (59 workloads), `value_at!` +0.272%, `fetch_value!` +0.102% | vs before #59141: `read_attribute`/`self[]` +16%, `id`/`_read_attribute` +39–41%, `write_attribute` +37%, writer +33%, `changed?` +32%, `dup` +22% (YJIT read +2%, write +43%) (A/A ≤ 0.95%) | No (#59141) | None. tenderlove plans index-based generated writers and the like | Reads by name (`id`, `_read_attribute`): regression from #59141. Writers and dirty: not yet converted. Give tenderlove the numbers before the beta |
 | 5 | **Partial-select reads** go through `ExtendedIndexes`/`Remapper` | AM `indexed_row.rb:206/267` | 2/8 apps in the census (`Remapper#initialize` +0.041%) | `partial_load1_read` +14–15% vs before #59141 and +17% vs 8.1 at every width; YJIT +26–31% | No (#59141) | None | Measure `select(:id, :name)` loads with 1–10,000 rows; low priority |
 | 6 | **`update!` grows with width before #59141** | Before #59141: `LazyAttributeSet#keys`'s union, which a19ef01cb3 (#59083) keeps on saved records. On K1: by-name helpers in AM `attribute_set.rb:320` (`#[]`), `:346–347` (`#keys`), `:469` (`transform_attributes!`) | Every app that saves wide records | 8.1 → before #59141: +12% / +20% / +32% / +39% at 6/30/100/300 cols; K1 +10% at 300 cols; K1 + L6 −1.8% at 300 cols | No (#59083, #59141) | None | **Attributed** ([below](#lead-6-update-and-table-width)). K1 removes #59083's part; L6 (`641c84c43a`, +4/−4) is built. Thomas decides |
-| 7 | **Per-row load on large results** | AR `querying.rb:93`, `result.rb:263`, `model_schema.rb:227/235` | Any query that loads thousands of rows; the census's small pages are faster | 10,000 rows, Ir per row vs 8.1: +13% / +14% / +22% at 6/30/300 cols. Census 8 was +32% / +33% / +41%; #59141 recovered 12% (A/A ≤ 0.04%) ([below](#per-row-load)) | No (before census 8) | None. AT-1 (reuse the builder per row) rejected: it skips the overridable `instantiate_instance_of` | Attribute the census 8 per-row growth (`loaded_mapped_table` ×2, `schema_attributes`, the strict-loading class attributes) |
+| 7 | **Per-row load** (closed: no regression at realistic sizes) | AM `attribute_set.rb:308`; AR `model_schema.rb:513/235/227` via `persistence.rb:298`; `core.rb:932–933` | Every index page and association load | 1–100 rows, 6–30 cols, SQLite and PG: `to_a` −28% to +1.7%, every attribute read −6% to −26%, `includes` −14% to +4.8% vs 8.1 (A/A ≤ 0.3%). The +13/+14/+22% came from a cached `Result`, where 8.1 reuses memoized `IndexedRow`s; on a new `Result` the large-result gap is +2.8% / +2.8% / +5.6% ([below](#lead-7-loading-rows-at-realistic-sizes)) | No | None. AT-1 rejected (skips `instantiate_instance_of`) | **Attributed, nothing built**: `Array.new` for cast values (#59141), the schema-context builder chain, Ractor-safe `class_attribute`; deliberate or in code #59141 is still changing. `Array.new`'s generic `initialize` dispatch is a Ruby lead |
 | 8 | **`table_name_qualified_unscope_values` on every merge** | AR `query_methods.rb:1066` via `merger.rb:66`, `association_scope.rb:147` | 8/8 apps, 57 workloads: +13 objects; +0.025% Ir | Small; `merge` itself is −36% vs census 8 | No (#59709, 2026-11-10, fixes #48227) | None | Return early when `unscope_values` is empty; not built, below the bar alone |
 
 Not leads (released, or deliberate and already judged):
@@ -515,7 +515,10 @@ such app, cached records or not, which is presumably why #57382 rejected it.
 ### Per-row load
 
 `_load_from_sql` on a cached result, Ir per row (objects per row), interpreter. Single-row and 20-row loads are faster
-on main than on 8.1 at every width; the cost per row of a large result is not.
+on main than on 8.1 at every width; the cost per row of a large result is not. **Superseded by
+[lead 7 at realistic sizes](#lead-7-loading-rows-at-realistic-sizes):** on a cached `Result`, 8.1 reuses the
+`IndexedRow`s it memoized on the first load, which a real query never does, so this table overstates main's per-row
+cost by about 10 points.
 
 | Rows × columns | 8.1 | census 8 | before #59141 | #59141 | main (A/A) |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -531,6 +534,119 @@ strict-loading class attributes, `RowLayout#build`, and the `Array.new` for cast
 out of the loop (−9% at 20 rows). It is not exact, because it skips the overridable private `instantiate_instance_of`
 (`RelationTest#test_relation_with_private_kernel_method` fails). [AT-1 patch](data/rails-main-census-9/AT1-rejected.patch).
 Under YJIT, main's 1,000- and 10,000-row windows compile 1 block each, so no YJIT per-row claim is made.
+
+### Lead 7: loading rows at realistic sizes
+
+**Result: no regression to fix at realistic sizes, so nothing was built.** At 1–100 rows and 6–30 columns, main
+loads and reads records with fewer instructions than 8.1 in every case but `includes` at 50–100 rows (+0.9% to
++4.8%). The +13% / +14% / +22% above was an artifact of loading the same cached `Result` again. What is left per row
+is three deliberate costs, attributed below.
+
+**Setup** ([`load_micro.rb`](../../bench/upstream/l7/load_micro.rb), [`sweep.sh`](../../bench/upstream/l7/sweep.sh)).
+An `items` table with `author_id`, data columns cycling string, integer, boolean, datetime, float and text, and
+timestamps (6, 15 and 30 columns), 100 items and 20 authors. Cases: `fresh` is `_load_from_sql` on a new `Result` of
+the same rows (no SQL); `query` is `Item.limit(n).to_a`; `read` also calls every generated reader of every record
+once; `includes` is `Item.limit(n).includes(:author).to_a`; `inc_read` adds the readers and `item.author.name`. Trees:
+8.1, main, `main2` (A/A), K1 (`bbdd9945d3`) and VB1 (`59db98e25c`). Ruby 4.0.9, fixed heap, 30 calls measured after
+60, one process per tree, width, adapter and mode. `ActiveSupport.event_reporter.debug_mode` is false, as Rails sets
+it in production; without Rails it defaults to true, which adds about 45 calls per query on main (the first sweep had
+that and was discarded).
+
+Main against 8.1, Callgrind instructions per call, interpreter ([raw](data/rails-main-census-9/lead7/raw/),
+[`table.rb`](../../bench/upstream/l7/table.rb) prints objects too):
+
+| Case | Rows | SQLite 6 | SQLite 15 | SQLite 30 | PG 6 | PG 15 | PG 30 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `fresh` | 1 | −43.2% | −59.4% | −67.1% | −44.0% | −59.4% | −67.1% |
+| `fresh` | 10 | −11.9% | −26.9% | −40.3% | −12.4% | −26.9% | −40.3% |
+| `fresh` | 50 | 0.0% | −5.3% | −12.4% | −0.1% | −5.4% | −12.4% |
+| `fresh` | 100 | +2.0% | −0.9% | −5.0% | +1.9% | −0.9% | −5.0% |
+| `query` | 1 | −7.8% | −18.7% | −28.1% | −5.0% | −12.3% | −17.2% |
+| `query` | 10 | −3.5% | −10.5% | −16.4% | −2.1% | −7.1% | −10.6% |
+| `query` | 50 | +0.4% | −2.5% | −5.0% | +0.9% | −1.7% | −3.5% |
+| `query` | 100 | +1.5% | −0.5% | −2.1% | +1.7% | −0.1% | −1.3% |
+| `read` | 1 | −8.8% | −19.0% | −26.0% | −6.2% | −13.9% | −18.3% |
+| `read` | 10 | −8.9% | −16.5% | −19.5% | −7.7% | −15.0% | −17.8% |
+| `read` | 50 | −9.2% | −15.9% | −18.0% | −8.8% | −15.7% | −17.9% |
+| `read` | 100 | −9.2% | −15.8% | −17.7% | −9.0% | −15.8% | −17.9% |
+| `includes` | 1 | −4.0% | −8.5% | −14.0% | −2.4% | −5.8% | −9.5% |
+| `includes` | 10 | −2.4% | −4.5% | −7.3% | −2.1% | −3.8% | −5.8% |
+| `includes` | 50 | +2.0% | +0.9% | −0.6% | +1.9% | +0.9% | −0.2% |
+| `includes` | 100 | +4.8% | +3.8% | +2.4% | +4.8% | +3.8% | +2.5% |
+| `inc_read` | 1 | −4.3% | −9.4% | −15.0% | −2.8% | −7.0% | −11.0% |
+| `inc_read` | 10 | −4.4% | −9.6% | −13.5% | −4.1% | −9.1% | −12.7% |
+| `inc_read` | 50 | −3.0% | −9.7% | −13.5% | −3.0% | −9.7% | −13.5% |
+| `inc_read` | 100 | −2.2% | −9.7% | −13.6% | −2.2% | −9.7% | −13.7% |
+
+Objects drop in every cell (100 rows × 15 columns, SQLite: `query` 1,465 → 1,147, `includes` 2,251 → 1,842). A/A
+≤ 0.26% in every cell. **K1 changes nothing here** (−0.12% to +0.10%): loading and reading never call `#keys`.
+**VB1** is 0.0% on loads and −0.9% to −1.8% on `read` and `inc_read`, its first reads. So neither already covers
+what is left.
+
+**YJIT** (8.1, main and `main2`; SQLite at 6/15/30 columns, PostgreSQL at 15): main is lower than 8.1 in every
+JIT-flat cell, `query` −1.1% to −43%, `read` −18% to −41%, `includes` −6.5% to −28% (−7.1% / −6.5% / −7.9% at 100
+rows). 10 of 96 cells compiled in a measured window and don't count, among them `query` at 50 rows everywhere; A/A ≤
+0.62% in the flat ones. So the interpreter's +1% to +5% for `includes` at 50–100 rows does not appear under YJIT.
+
+**Why the old numbers were higher.** The table above loads one cached `Result` over and over. 8.1 memoizes
+`Result#indexed_rows` (`result.rb:241`) on the first load and reuses those `IndexedRow`s on every later one, which
+saves 8.1 about 1,900 instructions and 1 object per row; main builds nothing to memoize. No real load reuses a
+`Result`: each query gets a new one, and a query-cache hit gets a `dup` whose `@indexed_rows` is nil on both trees
+(checked with a prepended `initialize_copy`). On a new `Result` of 2,000 rows
+([rows-2000.txt](data/rails-main-census-9/lead7/rows-2000.txt)), per row:
+
+| Columns | 8.1 | main | main vs 8.1 | objects |
+| ---: | ---: | ---: | ---: | --- |
+| 6 | 14,433 | 14,839 | +2.8% | 6.0 → 3.0 |
+| 30 | 14,508 | 14,912 | +2.8% | 6.0 → 3.0 |
+| 300 | 15,359 | 16,223 | +5.6% | 6.0 → 3.0 |
+
+**Where the per-row cost goes.** Each part was taken out of main on its own, 15 columns, `fresh`, 100 rows
+([ablation.txt](data/rails-main-census-9/lead7/ablation.txt), patches beside it; these are measurements, not
+fixes):
+
+| Removed from main | Ir per row | Origin | Disposition |
+| --- | ---: | --- | --- |
+| `@casted_values = Array.new(row.size, UNCAST)`, AM `attribute_set.rb:308` (ablated with a shared frozen Array, which only loads survive) | −1,125, −1 object | cd84ce43d9 "Pass an array down to LazyAttributeSet" (tenderlove), in #59141 | Deliberate: each record's cast cache |
+| `attributes_builder` → `schema_attributes` → `loaded_mapped_table` → `MappedTable#attributes` → `Attributes#builder`, AR `model_schema.rb:513/235/227`, from `instantiate_instance_of` (`persistence.rb:298`) | −408 | e1caec4954 (#57642) dropped the class memo; #58437, #58578, #59097 and #59530 moved the builder into the Ractor-shareable schema context | Deliberate (Ractors); AT-1 is not exact |
+| `strict_loading_by_default` and `strict_loading_mode`, AR `core.rb:932–933`, now an owner method plus `attr_reader` each | −357 | 9d4f4fa60c "Ractor-safe class attribute implementation" (jhawthorn, 2026-05-07; its message: "a tiny bit slower, but within 10%") | Deliberate (Ractors) |
+| All three | −1,980 (−13.0%) | | |
+
+Main costs 15,201 per row there against 8.1's 15,519, and would cost 13,221 without the three. It saves the per-row
+`IndexedRow` (8.1's `IndexedRow.new`, 762 instructions and 1 object against `RowLayout#build`'s 234) and two
+objects in the attribute set. Per call, after an empty lambda ([steps-s81](data/rails-main-census-9/lead7/steps-s81.txt),
+[steps-main](data/rails-main-census-9/lead7/steps-main.txt)): `attributes_builder` 377 → 865, each strict-loading
+reader 457 → 592, `primary_key` 736 → 570, `instantiate_instance_of` 13,286 → 14,139. `callgrind_annotate` of the
+same load ([function diff](data/rails-main-census-9/lead7/annotate-fn-diff.txt)): main spends more per row in
+`vm_call_ivar` (+180, the `attr_reader`s of that chain), `rb_ary_initialize`, `ary_new` and `rb_obj_call_init_kw`
+(+123, +39, +32: `Array.new`), and `vm_call0_body`/`rb_call0` (+98/+97); less in `rb_wb_protected_newobj_of` (−231),
+`invoke_block_from_c_bh` (−210) and `rb_gc_writebarrier` (−140), for the objects it no longer makes.
+
+**How census 8 got to +32%** (first-parent bisect, `fresh`, 100 × 15, SQLite, Ir per row;
+[bisect](data/rails-main-census-9/lead7/bisect-firstparent.txt), [per-step at each merge](data/rails-main-census-9/lead7/stepsat/)):
+8.1 15,612; merge base 15,788. 9d4f4fa60c +620 ([bisect](data/rails-main-census-9/lead7/bisect-9d4f4fa60c.txt)).
+#57642 (`e1caec4954`, merged 2026-06-22) rebuilt the builder on every row: 16,223 → 43,850, `attributes_builder` alone
+26,984 per call. #58437 and #58578 brought it to 36,324; byroot's #58663 (`d34ea2709f`) added 2,512 and 1.15 objects
+([bisect](data/rails-main-census-9/lead7/bisect-58663.txt)). amatsuda's #59097 ("Memoize the attribute builder per
+schema context", 2026-10-15) fell to 20,385; census 8's pin 19,744; #59141 15,205. So census 8's per-row growth was
+mostly #57642's lost memo, which #59097 recovered; #59141 removed the rest.
+
+**`includes` at 50–100 rows.** The extra +1% to +5% is in the preloader, not in loading: `association_route` and its
+key objects (matthewd's #59120, judged deliberate in [rails-82-impact](rails-82-impact.md)), and the owner's foreign
+key read by name through `_read_attribute` → `fetch_value!` → `index_for_name` (lead 4), each once per owner
+([calls](data/rails-main-census-9/lead7/calls-inc-main.txt) against [8.1](data/rails-main-census-9/lead7/calls-inc-s81.txt)).
+
+**Why no fix.** Nothing here is broken, and no part has a small exact fix that keeps the hooks:
+
+* The cast cache Array is #59141's design: first reads store their cast value per record. `[].fill(UNCAST, 0,
+  row.size)` builds the same Array about 150 instructions cheaper (1% of a row), below the bar and in code tenderlove
+  is still converting. Allocating it on the first read only moves the cost, because pages read the records they load.
+  Most of the cost is Ruby's: `Array.new(n, x)` is about 1,180 instructions against 147 for `[]`, because
+  `rb_ary_s_new` always dispatches `#initialize` through `rb_obj_call_init_kw`. Recorded as a Ruby lead only (no
+  ruby/ruby PRs open; jhawthorn declined the `opt_new` route for Array subclasses on ruby#19667).
+* The builder chain and the class attributes are the Ractor-safe schema context and `class_attribute`. Taking the
+  builder once per result (AT-1) skips the overridable private `instantiate_instance_of`, which Rails' own
+  `SubAccount` overrides (`test/models/account.rb:41`); a class-level memo restores what #57642 removed for Ractors.
 
 ## Main vs 8-1-stable in the census
 
@@ -688,7 +804,7 @@ census 8:
 ## Limits
 
 * YJIT numbers come from micros only. Per-row loads on main compile 1 block per window at 1,000 and 10,000 rows,
-  so no YJIT row result is claimed.
+  so no YJIT result is claimed there; at 1–100 rows (lead 7) 86 of 96 cells are flat.
 * Lead 3 has no census reach because no workload caches records. Its size is per cached record.
 * Lead 6: the part of `update!`'s growth that does not depend on width (+4.6% at 30 and +8.2% at 6 columns with
   K1 + L6) is not attributed. L6 has no Ruby master × ZJIT numbers yet.

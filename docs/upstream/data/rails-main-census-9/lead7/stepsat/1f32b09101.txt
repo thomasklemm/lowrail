@@ -1,0 +1,14 @@
+empty                                                             730.0  0.00
+row (8.1 IndexedRow.new, main RowLayout#build)                    233.8  0.00
+attributes_builder                                                865.1  0.00
+build attributes (8.1 build_from_database, main build_from_row)   2997.4  2.00
+allocate                                                          388.0  1.00
+primary_key                                                       569.9  0.00
+strict_loading_by_default                                         591.9  0.00
+strict_loading_mode                                               591.9  0.00
+define_attribute_methods                                          359.7  0.00
+init_internals                                                   6802.6  0.00
+_run_find_callbacks                                               375.9  0.00
+_run_initialize_callbacks                                         375.9  0.00
+init_with_attributes                                             9312.4  1.00
+instantiate_instance_of                                         14138.6  3.00

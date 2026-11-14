@@ -1,0 +1,21 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..b57f12c6d2 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -288,6 +288,7 @@ class LazyIndexedAttributeSet < AttributeSet # :nodoc:
+     # a value can be cast to +nil+.
+     UNCAST = Object.new.freeze
+     private_constant :UNCAST
++    L7_CASTED = Array.new(400, UNCAST).freeze
+ 
+     attr_reader :indexes
+ 
+@@ -305,7 +306,7 @@ def initialize(row, indexes, ctx)
+       # Values cast from +row+, by the same index. Only values in the row
+       # are cast, so this is never longer than the row. Slots with a built
+       # attribute are UNCAST here, so reads check this first.
+-      @casted_values = Array.new(row.size, UNCAST)
++      @casted_values = L7_CASTED
+       @materialized = false
+       @indexes = indexes
+     end

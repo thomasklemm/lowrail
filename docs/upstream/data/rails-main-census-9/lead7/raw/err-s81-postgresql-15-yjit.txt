@@ -1,0 +1,11 @@
+==68280== Callgrind, a call-graph generating cache profiler
+==68280== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==68280== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==68280== Command: /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --yjit /home/user/workspace/repo/bench/upstream/l7/load_micro.rb
+==68280== 
+==68280== For interactive control, run 'callgrind_control -h'.
+==68280== 
+==68280== Events    : Ir
+==68280== Collected : 11855179160
+==68280== 
+==68280== I   refs:      11,855,179,160

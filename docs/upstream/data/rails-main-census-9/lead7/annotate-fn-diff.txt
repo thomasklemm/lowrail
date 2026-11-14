@@ -1,0 +1,36 @@
+# callgrind_annotate (function, self Ir) of _load_from_sql on a fresh 100-row, 15-column SQLite result, 40 calls,
+# Ruby 4.0.9 interpreter, fixed heap; per loaded row (Ir / 4000). 8.1 = 71e963ed1b, main = 50c54eed06. |delta| >= 30 Ir per row.
+# delta     8.1    main  function
+   -231     468     238  rb_wb_protected_newobj_of
+   -210     396     186  invoke_block_from_c_bh
+   -160     246      86  vm_call_iseq_setup_normal_opt_start
+   -140     342     202  rb_gc_writebarrier
+    -69     130      61  rb_vm_exec
+    -52      99      47  vm_callee_setup_block_arg
+    -48      96      48  vm_push_frame
+    -44      88      44  ary_ensure_room_for_push
+    -44      88      45  rb_obj_alloc
+    -39      39       0  rb_hash_new
+    -39     530     491  vm_call_cfunc_with_frame_
+    -38      38       0  rb_st_update
+    -38      76      38  rb_yield
+    -38      77      38  rb_ary_collect
+    -33      44      11  ruby_sip_hash13
+    +32       0      32  rb_obj_call_init_kw
+    +33       0      33  rb_ary_s_new
+    +35       0      35  vm_invokeblock_i
+    +37       0      37  vm_call_iseq_setup_normal_0start_3params_3locals
+    +39       1      41  ary_new
+    +40       1      41  vm_call_iseq_setup_normal_0start_1params_2locals
+    +41       0      41  vm_call_iseq_setup_normal_0start_0params_2locals
+    +41       6      47  rb_method_call_status.constprop.0
+    +49      10      59  vm_call0_cc
+    +64     532     596  vm_call_iseq_setup_normal_0start_0params_0locals
+    +71       1      71  rb_shape_get_iv_index_with_hint
+    +72    8313    8385  vm_exec_core
+    +92       3      95  vm_invoke_iseq_block
+    +97      22     119  rb_call0
+    +98      20     118  vm_call0_body
+   +123       0     123  rb_ary_initialize
+   +180     121     301  vm_call_ivar
+# totals per row: 8.1 15682, main 15370

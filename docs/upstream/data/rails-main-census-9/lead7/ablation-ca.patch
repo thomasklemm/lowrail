@@ -1,0 +1,108 @@
+ablation: revert 9d4f4fa60c
+
+diff --git a/activesupport/lib/active_support/class_attribute.rb b/activesupport/lib/active_support/class_attribute.rb
+index 6934daf755..8aac26e338 100644
+--- a/activesupport/lib/active_support/class_attribute.rb
++++ b/activesupport/lib/active_support/class_attribute.rb
+@@ -3,24 +3,24 @@
+ module ActiveSupport
+   module ClassAttribute # :nodoc:
+     class << self
+-      def redefine(owner, name, owner_method, reader_method, value, instance_reader)
+-        ivar_name = :"@#{reader_method}"
+-        owner.instance_variable_set(ivar_name, value)
+-
+-        owner_proc =
+-          if defined?(Ractor.shareable_proc)
+-            Ractor.shareable_proc { owner }
++      def redefine(owner, name, namespaced_name, value)
++        if owner.singleton_class?
++          if owner.attached_object.is_a?(Module)
++            redefine_method(owner, namespaced_name, private: true) { value }
+           else
+-            -> { owner }
++            redefine_method(owner, name) { value }
+           end
+-
+-        # If redefining on a singleton class, and including instance_reader, we
+-        # need to update it to use self.singleton_class instead of self.class
+-        if owner.singleton_class? && !owner.attached_object.is_a?(Module) && instance_reader
+-          owner.class_eval("def #{name}; self.singleton_class.#{reader_method}; end", __FILE__, __LINE__)
+         end
+ 
+-        redefine_method(owner.singleton_class, owner_method, private: true, &owner_proc)
++        redefine_method(owner.singleton_class, namespaced_name, private: true) { value }
++
++        redefine_method(owner.singleton_class, "#{namespaced_name}=", private: true) do |new_value|
++          if owner.equal?(self)
++            value = new_value
++          else
++            ::ActiveSupport::ClassAttribute.redefine(self, name, namespaced_name, new_value)
++          end
++        end
+       end
+ 
+       def redefine_method(owner, name, private: false, &block)
+diff --git a/activesupport/lib/active_support/core_ext/class/attribute.rb b/activesupport/lib/active_support/core_ext/class/attribute.rb
+index 1dd854b6ab..88adfaffcd 100644
+--- a/activesupport/lib/active_support/core_ext/class/attribute.rb
++++ b/activesupport/lib/active_support/core_ext/class/attribute.rb
+@@ -107,22 +107,11 @@ def class_attribute(*attrs, instance_accessor: true,
+       end
+ 
+       name = name.to_sym
+-      reader_method = :"__class_attr_#{name}"
+-      owner_method = :"__class_attr_#{name}_owner"
+-      ::ActiveSupport::ClassAttribute.redefine(self, name, owner_method, reader_method, default, instance_reader)
++      namespaced_name = :"__class_attr_#{name}"
++      ::ActiveSupport::ClassAttribute.redefine(self, name, namespaced_name, default)
+ 
+-      singleton_class.attr_reader(reader_method)
+-
+-      class_methods << "def #{name}; #{owner_method}.#{reader_method}; end"
+-      class_methods << <<~RUBY
+-        def #{name}=(value)
+-          if #{owner_method}.equal?(self)
+-            @#{reader_method} = value
+-          else
+-            ::ActiveSupport::ClassAttribute.redefine(self, :#{name}, :#{owner_method}, :#{reader_method}, value, #{!!instance_reader})
+-          end
+-        end
+-      RUBY
++      class_methods << "def #{name}; #{namespaced_name}; end"
++      class_methods << "def #{name}=(value); self.#{namespaced_name} = value; end"
+ 
+       if singleton_class?
+         methods << <<~RUBY if instance_reader
+diff --git a/activesupport/test/core_ext/class/attribute_test.rb b/activesupport/test/core_ext/class/attribute_test.rb
+index 5e66947258..dc881c0e36 100644
+--- a/activesupport/test/core_ext/class/attribute_test.rb
++++ b/activesupport/test/core_ext/class/attribute_test.rb
+@@ -83,16 +83,6 @@ def setup
+     assert_not_respond_to object, :setting?
+   end
+ 
+-  test "disabling instance reader is not bypassed by assigning on the singleton class" do
+-    klass = Class.new { class_attribute :setting, instance_reader: false }
+-    object = klass.new
+-
+-    object.singleton_class.setting = "foo"
+-
+-    assert_raise(NoMethodError) { object.setting }
+-    assert_not_respond_to object, :setting
+-  end
+-
+   test "disabling both instance writer and reader" do
+     object = Class.new { class_attribute :setting, instance_accessor: false }.new
+     assert_raise(NoMethodError) { object.setting }
+@@ -231,8 +221,8 @@ def setting=(value)
+   test "can check if value is set on a sub class" do
+     # Note: this isn't a public API test and it's OK to break it.
+     # However if it's broken make sure to update ActiveSupport::Callbacks::ClassMethods#set_callbacks
+-    assert_equal false, @sub.singleton_class.private_method_defined?(:__class_attr_setting_owner, false)
++    assert_equal false, @sub.singleton_class.private_method_defined?(:__class_attr_setting, false)
+     @sub.setting = true
+-    assert_equal true, @sub.singleton_class.private_method_defined?(:__class_attr_setting_owner, false)
++    assert_equal true, @sub.singleton_class.private_method_defined?(:__class_attr_setting, false)
+   end
+ end
