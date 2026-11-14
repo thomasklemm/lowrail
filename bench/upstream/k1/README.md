@@ -41,10 +41,13 @@ plus the then-unused `type_keys` reader and ivar in `Builder::TypeTable` and `Bu
   them: `Result::RowLayout` (pending columns), `IndexedRow::Remapper` (with `column_map` = the builder's indexes),
   `ExtendedIndexes.add`, `Builder#row_from_hash`, `#relayout`, `#typed_indexes`. `with_types` only overrides names
   already in `@indexes`. So every `type_keys` name is in `indexes`, and the union equals `row_keys`.
-* The one way to break it is a builder that changes between laying out a result and building a set from it (an
+* One way to break it is a builder that changes between laying out a result and building a set from it (an
   `after_find` that declares an `attribute` mid-result). Then a type key has no index, reaches `keep_if` with `nil`
   and main raises (`TypeError` from `Array#[](nil)` or `NoMethodError` from `nil < size`) in `attribute_names`,
-  `changed?`, `inspect` and serialization; the fix returns `keys == to_hash.keys`. No case returns a different list.
+  `changed?`, `inspect` and serialization; the fix returns `keys == to_hash.keys`. The other is `instantiate` with an
+  `IndexedRow` not laid out for the class (`ActiveModel::IndexedRow[...]` or `Result#indexed_rows`, both nodoc): main
+  raises `NoMethodError` from `keys` and the fix returns the row's names, but that record is already broken on main
+  (`#attributes` reads the wrong slots, `dup` raises `KeyError`). No working case returns a different list.
 * `materialize`'s second pass called `self[key]` on names the first pass already built (idempotent) or on names with
   no index (`Attribute.null`, nothing stored).
 
