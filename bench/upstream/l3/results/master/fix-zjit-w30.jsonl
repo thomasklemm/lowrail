@@ -1,0 +1,8 @@
+{"case":"_empty","width":30,"n":200,"objects":0.07,"jit_blocks":0,"inval_ns":0,"ir":0,"tree":"fix","mode":"zjit"}
+{"case":"marshal_dump","width":30,"n":200,"objects":25.02,"jit_blocks":0,"inval_ns":0,"ir":261802,"tree":"fix","mode":"zjit"}
+{"case":"msgpack_dump","width":30,"n":200,"objects":20.02,"jit_blocks":0,"inval_ns":0,"ir":92269,"tree":"fix","mode":"zjit"}
+{"case":"attributes_for_database","width":30,"n":200,"objects":1.02,"jit_blocks":0,"inval_ns":0,"ir":60121,"tree":"fix","mode":"zjit"}
+{"case":"attributes_before_type_cast","width":30,"n":200,"objects":1.02,"jit_blocks":0,"inval_ns":0,"ir":47808,"tree":"fix","mode":"zjit"}
+{"case":"load1_marshal_dump","width":30,"n":200,"objects":142.02,"jit_blocks":0,"inval_ns":0,"ir":676221,"tree":"fix","mode":"zjit"}
+{"case":"load1","width":30,"n":200,"objects":70.02,"jit_blocks":0,"inval_ns":0,"ir":203601,"tree":"fix","mode":"zjit"}
+{"case":"marshal_load","width":30,"n":200,"objects":80.02,"jit_blocks":0,"inval_ns":0,"ir":200112,"tree":"fix","mode":"zjit"}

@@ -1,0 +1,8 @@
+{"case":"_empty","width":30,"n":200,"objects":0.06,"jit_blocks":0,"inval_ns":0,"ir":0,"tree":"k1","mode":"interp"}
+{"case":"changed?_warm","width":30,"n":200,"objects":1.0,"jit_blocks":0,"inval_ns":0,"ir":164703,"tree":"k1","mode":"interp"}
+{"case":"serializable_hash_warm","width":30,"n":200,"objects":33.0,"jit_blocks":0,"inval_ns":0,"ir":178254,"tree":"k1","mode":"interp"}
+{"case":"update1","width":30,"n":200,"objects":183.0,"jit_blocks":0,"inval_ns":0,"ir":1300130,"tree":"k1","mode":"interp"}
+{"case":"load1_save","width":30,"n":200,"objects":163.0,"jit_blocks":0,"inval_ns":0,"ir":1403377,"tree":"k1","mode":"interp"}
+{"case":"load1_dup","width":30,"n":200,"objects":182.0,"jit_blocks":0,"inval_ns":0,"ir":1064951,"tree":"k1","mode":"interp"}
+{"case":"load1","width":30,"n":200,"objects":68.0,"jit_blocks":0,"inval_ns":0,"ir":402229,"tree":"k1","mode":"interp"}
+{"case":"new","width":30,"n":200,"objects":9.0,"jit_blocks":0,"inval_ns":0,"ir":55120,"tree":"k1","mode":"interp"}

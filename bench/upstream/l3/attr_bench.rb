@@ -3,7 +3,7 @@
 # L3 per-call micro: Marshal, MessagePack, attributes_for_database and attributes_before_type_cast at a given
 # table width, every case in one process. Same windows as bench/upstream/k1/attr_bench.rb (IrWin client requests,
 # GC.start then GC.disable around N calls after WARM warmup calls; under YJIT warm windows repeat until three in a
-# row compile nothing). Table as census 9's attr_micro.rb: id, type, data columns cycling string, integer,
+# row compile nothing; under ZJIT, until three in a row compile no ISEQ and take no new side exit). Table as census 9's attr_micro.rb: id, type, data columns cycling string, integer,
 # boolean, datetime, float and text, and timestamps.
 require "bundler/setup"
 require "json"
@@ -22,6 +22,9 @@ WIDTH = Integer(ENV.fetch("WIDTH", "30"))
 N = Integer(ENV.fetch("N", "200"))
 WARM = Integer(ENV.fetch("WARM", "100"))
 YJIT = defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
+# ZJIT (Ruby master) has no invalidation count: jit_blocks counts compiled ISEQs and side exits, and inval_ns the
+# invalidation time, both observations only.
+ZJIT = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 ActiveRecord::Base.logger = nil
@@ -86,14 +89,25 @@ def run(fn, n)
   end
 end
 
-def jit_blocks = YJIT ? RubyVM::YJIT.runtime_stats[:compiled_block_count] : 0
+def jit_blocks
+  if YJIT
+    RubyVM::YJIT.runtime_stats[:compiled_block_count]
+  elsif ZJIT
+    stats = RubyVM::ZJIT.stats
+    stats[:compiled_iseq_count] + stats[:compiled_side_exit_count]
+  else
+    0
+  end
+end
+
+def inval_ns = ZJIT ? RubyVM::ZJIT.stats[:invalidation_time_ns] : 0
 
 IrWin.instr_on
 names = ARGV.empty? ? CASES.keys : ["_empty", *ARGV]
 names.each do |name|
   fn = CASES.fetch(name)
   run(fn, WARM)
-  if YJIT
+  if YJIT || ZJIT
     flat = 0
     30.times do
       before = jit_blocks
@@ -106,11 +120,13 @@ names.each do |name|
   GC.disable
   allocs = GC.stat(:total_allocated_objects)
   jit = jit_blocks
+  inval = inval_ns
   IrWin.zero
   run(fn, N)
   IrWin.dump(name)
   jit = jit_blocks - jit
+  inval = inval_ns - inval
   allocs = GC.stat(:total_allocated_objects) - allocs
   GC.enable
-  puts JSON.generate(case: name, width: WIDTH, n: N, objects: allocs.fdiv(N).round(2), jit_blocks: jit)
+  puts JSON.generate(case: name, width: WIDTH, n: N, objects: allocs.fdiv(N).round(2), jit_blocks: jit, inval_ns: inval)
 end

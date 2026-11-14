@@ -1,7 +1,7 @@
 #!/bin/bash
 # run.sh OUT TREE WIDTH MODE [CASE...]: one bench/upstream/l3/attr_bench.rb process under Callgrind, with the census fixed heap.
-# TREE is a Rails checkout under ~/l3 with a bundle in ~/l3/suite-TREE (BUNDLE_PATH ~/l3/gems). MODE is interp or yjit
-# (attr_bench.rb has no ZJIT gate). Writes OUT/TREE-MODE-wWIDTH.jsonl with
+# TREE is a Rails checkout under ~/l3 with a bundle in ~/l3/suite-TREE (BUNDLE_PATH ~/l3/gems). MODE is interp, yjit, or
+# zjit (with RUBY_BIN set to a Ruby master bin, SUITE=suiteM, BUNDLE_PATH and IRWIN_DIR built for it). Writes OUT/TREE-MODE-wWIDTH.jsonl with
 # Ir per call (window Ir / N, minus the _empty window's per-call Ir), objects per call and JIT blocks.
 set -euo pipefail
 out=$1; tree=$2; width=$3; mode=$4; shift 4
@@ -16,7 +16,7 @@ export RUBY_GC_HEAP_0_INIT_SLOTS=1000000 RUBY_GC_HEAP_1_INIT_SLOTS=250000 RUBY_G
   RUBY_GC_HEAP_3_INIT_SLOTS=20000 RUBY_GC_HEAP_4_INIT_SLOTS=10000
 dir=$(mktemp -d)
 mkdir -p "$out"
-RAILS=$HOME/l3/$tree BUNDLE_GEMFILE=$HOME/l3/$suite-$tree/Gemfile BUNDLE_PATH=$HOME/l3/gems WIDTH=$width PATH=$bin:$PATH \
+RAILS=$HOME/l3/$tree BUNDLE_GEMFILE=$HOME/l3/$suite-$tree/Gemfile BUNDLE_PATH=${BUNDLE_PATH:-$HOME/l3/gems} WIDTH=$width PATH=$bin:$PATH \
   valgrind --tool=callgrind --instr-atstart=no $smc --callgrind-out-file="$dir/cg.%p" \
   ruby $flag "$here/attr_bench.rb" "$@" > "$dir/stdout" 2> "$dir/stderr" || { tail -5 "$dir/stderr"; exit 1; }
 ruby -rjson -e '

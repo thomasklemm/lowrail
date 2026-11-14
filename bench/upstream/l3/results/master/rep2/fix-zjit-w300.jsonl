@@ -1,0 +1,2 @@
+{"case":"_empty","width":300,"n":200,"objects":0.07,"jit_blocks":0,"inval_ns":0,"ir":0,"tree":"fix","mode":"zjit"}
+{"case":"load1","width":300,"n":200,"objects":205.02,"jit_blocks":0,"inval_ns":0,"ir":1045355,"tree":"fix","mode":"zjit"}

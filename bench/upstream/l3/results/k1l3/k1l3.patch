@@ -1,0 +1,103 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..3565ef5893 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -341,8 +341,7 @@ def key?(name)
+ 
+     #: () -> Array[String]
+     def keys
+-      keys = row_keys | @ctx.type_keys | cached_names
+-      keys.keep_if do |name|
++      row_keys.keep_if do |name|
+         index = index_for_name(name)
+         if attribute = lookup(index)
+           attribute.initialized?
+@@ -370,6 +369,30 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      materialize
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = lookup(index_for_name(name))
++          hash[name] = attribute.value_before_type_cast
++        end
++      end
++      hash
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      materialize
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = lookup(index_for_name(name))
++          hash[name] = attribute.value_for_database
++        end
++      end
++      hash
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)
+@@ -484,7 +507,6 @@ def transform_attributes!
+       def materialize
+         unless @materialized
+           row_keys.each { |key| self[key] }
+-          @ctx.type_keys.each { |key| self[key] }
+           @materialized = true
+         end
+       end
+@@ -582,13 +604,6 @@ def row_keys
+         indexes.keys
+       end
+ 
+-      #: () -> Array[String]
+-      def cached_names
+-        names = []
+-        indexes.each_key { |name| names << name if lookup(index_for_name(name)) }
+-        names
+-      end
+-
+       #: () -> void
+       def freeze_attributes
+         materialize
+diff --git a/activemodel/lib/active_model/attribute_set/builder.rb b/activemodel/lib/active_model/attribute_set/builder.rb
+index 294b00a2f1..44c31e783e 100644
+--- a/activemodel/lib/active_model/attribute_set/builder.rb
++++ b/activemodel/lib/active_model/attribute_set/builder.rb
+@@ -6,13 +6,12 @@ module ActiveModel
+   class AttributeSet # :nodoc:
+     class Builder # :nodoc:
+       class TypeTable # :nodoc:
+-        attr_reader :types, :type_keys_lut, :type_keys
++        attr_reader :types, :type_keys_lut
+ 
+         #: (Array[String], Hash[String, Type::Value]) -> void
+         def initialize(names, types)
+           @types = names.map { |name| types[name] }.freeze
+           @type_keys_lut = names.map { |name| types.key?(name) }.freeze
+-          @type_keys = types.keys.freeze
+           freeze
+         end
+       end
+@@ -20,8 +19,6 @@ def initialize(names, types)
+       # What a LazyIndexedAttributeSet looks up about the model's attributes, by
+       # their index in the builder's #indexes.
+       class Context # :nodoc:
+-        attr_reader :type_keys
+-
+         # +names+ are the attribute names by index, +type_table+ their
+         # TypeTable, and +defaults+ the default attributes by index that
+         # attributes a row doesn't have fall back to.
+@@ -30,7 +27,6 @@ def initialize(names, type_table, defaults)
+           @names = names
+           @types = type_table.types
+           @type_keys_lut = type_table.type_keys_lut
+-          @type_keys = type_table.type_keys
+           @defaults = defaults
+           freeze
+         end

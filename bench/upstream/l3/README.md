@@ -172,8 +172,92 @@ YJIT, fix against main, only cells where main, main2 and the fix all compiled no
 
 At 6 columns the A/A reaches 1.67% (`find` then MessagePack dump); the warm-record rows are far outside it.
 
-Not measured: Ruby master × ZJIT (DECISIONS asks for it before opening; the review pass should run it, as K1's
-did).
+### Ruby master × ZJIT (opus review, 2026-11-14)
+
+Measured in the second review ([thread T-01a1da62](https://ampcode.com/threads/T-01a1da62-b789-701f-bfba-2a80985ad208))
+on Ruby master `9aa0898240` (`--enable-yjit --enable-zjit`, `-O3`), the pin K1's pass used; same harness (now with
+K1's ZJIT gate: warmup until three windows in a row compile no ISEQ and take no new side exit), census heap, N=200,
+trees main, main2 (A/A) and the fix. Master has no invalidation count, so this is an observation: the JIT column is
+compiled ISEQs + side exits in the measured window for main / main2 / fix; every window spent 0 ns invalidating.
+Raw: [results/master](results/master) (one run; `rep1`–`rep3` repeat `find` at 300 columns).
+
+| Ir per call | ZJIT main | A/A | fix | JIT | interp main | A/A | fix | objects main → fix |
+|---|---:|---:|---:|---|---:|---:|---:|---:|
+| **30 cols** `Marshal.dump(record)` | 312,716 | −0.06% | **−16.3%** | 0/0/0 | 374,901 | +0.10% | **−15.0%** | 28 → 25 |
+| MessagePack dump | 143,034 | +0.20% | **−35.5%** | 0/0/0 | 211,181 | +0.02% | **−26.8%** | 23 → 20 |
+| `attributes_for_database` | 110,874 | +0.11% | **−45.8%** | 0/0/0 | 169,063 | +0.12% | **−33.4%** | 4 → 1 |
+| `attributes_before_type_cast` | 96,108 | +0.12% | **−50.3%** | 0/0/0 | 125,582 | +0.16% | **−44.3%** | 4 → 1 |
+| `find` then `Marshal.dump` | 698,461 | rej | −3.2% | 0/26/0 | 1,224,073 | +0.03% | −4.6% | 145 → 142 |
+| `find` | 203,786 | −0.01% | −0.09% | 0/0/0 | 408,585 | −0.01% | +0.04% | 70 → 70 |
+| `Marshal.load` | 200,478 | +0.28% | −0.18% | 0/0/0 | 233,597 | −0.09% | −0.04% | 80 → 80 |
+| **300 cols** `Marshal.dump(record)` | 3,196,493 | rej | **−12.3%** | 0/32/0 | 3,498,234 | −0.02% | **−14.9%** | 163 → 160 |
+| MessagePack dump | 1,529,907 | +0.01% | **−26.7%** | 0/0/0 | 1,903,344 | −0.04% | **−27.4%** | 68 → 65 |
+| `attributes_for_database` | 1,320,120 | −0.12% | (−31.2%) | 6/0/0 | 1,644,376 | −0.04% | **−31.8%** | 4 → 1 |
+| `attributes_before_type_cast` | 935,988 | +0.09% | **−49.1%** | 0/0/0 | 1,204,954 | −0.05% | **−42.8%** | 4 → 1 |
+| `find` then `Marshal.dump` | 5,541,481 | −0.03% | −8.8% | 0/0/0 | 9,589,421 | −0.01% | −5.4% | 820 → 817 |
+| `find` (3 repeats, median) | 1,044,568 | +0.01% | +0.02% | 0/0/0 | 1,761,308 | −0.06% | −0.06% | 205 → 205 |
+| `Marshal.load` | 1,820,013 | −0.06% | −0.07% | 0/0/0 | 2,001,294 | −0.04% | −0.04% | 665 → 665 |
+
+No ZJIT loss. `rej` marks an A/A cell where main2 compiled in the window; the parenthesized 300-column
+`attributes_for_database` cell is main's window compiling 6, so it is not a flat comparison. The first 300-column
+`find` run read fix +0.62% with all three windows flat; three fresh repeats give fix −0.01% / +0.08% / +0.01% against
+main (one main2 repeat compiled 26 and is left out of the A/A), so that run was process noise, not the change, which
+`find` does not reach. A/A over flat cells: ≤ 0.28% at 30 columns (`Marshal.load`), ≤ 0.12% at 300.
+
+## K1 and L3 together (opus review, 2026-11-14)
+
+K1 (`thomasklemm/lazy-indexed-keys`, `bbdd9945d3`) and the fix merge without conflict (`675c0fb913`,
+[patch](results/k1l3/k1l3.patch)). K1 drops `materialize`'s second walk over the type keys; L3 keeps `materialize`
+and only reads what it built, so neither changes what the other relies on.
+
+* **Exact.** [probe.rb](probe.rb) with payloads dumped by main, the fix and K1+L3, on SQLite (7,544 lines) and
+  PostgreSQL 17 (7,565): main, main2, fix, K1 and K1+L3 print byte-identical output
+  ([sha256](results/k1l3/probe-sha256.txt)). Control: K1+L3 without `materialize` in `values_for_database` changes
+  6,151 lines.
+* **Additive, no overclaim.** Ruby 4.0.9 interpreter ([raw](results/k1l3/interp-4.0.9)): the warm-record rows are
+  L3's alone (K1 alone ±0.16%), and L3 saves the same share on top of K1 as on main. `find` then dump is where both
+  act, since `find` leaves the set unmaterialized; there the two savings add up.
+
+| interp 4.0.9, fix vs main | 30 cols: L3 | K1 | K1+L3 | L3 on top of K1 | 300 cols: L3 | K1 | K1+L3 | L3 on top of K1 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `Marshal.dump(record)` | −15.2% | −0.2% | −15.4% | −15.3% | −15.2% | −0.1% | −15.2% | −15.2% |
+| MessagePack dump | −26.9% | +0.1% | −27.1% | −27.2% | −28.0% | +0.1% | −28.0% | −28.1% |
+| `attributes_for_database` | −34.1% | +0.1% | −34.3% | −34.3% | −32.6% | +0.2% | −32.6% | −32.7% |
+| `attributes_before_type_cast` | −44.1% | −0.0% | −44.4% | −44.4% | −42.6% | +0.1% | −42.7% | −42.8% |
+| `find` then `Marshal.dump` | −4.6% | −4.6% | −9.2% | −4.8% | −5.5% | −5.9% | −11.3% | −5.7% |
+| `find` then MessagePack dump | −5.3% | −5.3% | −10.5% | −5.5% | −6.5% | −7.0% | −13.4% | −6.9% |
+| `find`, dump, `save` | −2.1% | −13.7% | −16.0% | −2.6% | −2.5% | −16.3% | −18.7% | −2.9% |
+| `find`, `#attributes`, `Marshal.load` | ≤ 0.18% | ≤ 0.23% | ≤ 0.30% | | ≤ 0.04% | ≤ 0.04% | ≤ 0.08% | |
+| A/A (main2) | ≤ 0.13% | | | | ≤ 0.06% | | | |
+
+K1's own cases at 30 columns with L3 merged ([raw](results/k1l3/k1-cases), K1's harness): `changed?` −37.0% (K1)
+→ −37.0% (K1+L3), `serializable_hash` −35.2% → −35.0%, `update!` −18.3% → −18.3%, `find` then `save` −19.0% →
+−19.0%, `find` then `dup` −4.8% → −4.8%, `find` −0.2% → −0.3%, `new` +0.0% → −0.0%. L3 changes none of K1's claims.
+
+Ruby master, 30 columns ([raw](results/master)): ZJIT, K1+L3 against main `Marshal.dump` −16.0%, MessagePack dump
+−35.6%, `attributes_for_database` −45.8%, `attributes_before_type_cast` −50.3%, `find` then `Marshal.dump` −11.0%
+(L3 −3.2%, K1 −7.0%), every window of main, the fix and K1+L3 flat. Master interpreter: −14.8%, −26.5%, −33.1%,
+−44.2%, `find` then `Marshal.dump` −9.1% (L3 −4.6%, K1 −4.3%). On master's interpreter K1 alone reads +0.3% to
++0.5% on the four warm-record rows, which call neither `keys` nor `materialize` (A/A ≤ 0.16%); this is the shift
+K1's own pass saw in `new` on master and traced to ID-table lookups, it is K1's, and it does not show on 4.0.9 or
+under ZJIT.
+
+## Concurrency, frozen records and Ractors (opus review, 2026-11-14)
+
+[concurrency_probe.rb](concurrency_probe.rb), Ruby 4.0.9, main and the fix: 200 freshly loaded records, each hit by
+8 threads at once, half calling `attributes_for_database` and half `attributes_before_type_cast`, with a type whose
+cast and serialize yield the GVL. Neither tree locks `materialize`, so a thread that finds `@materialized` false runs
+it too; with a yield injected between finding a slot empty and storing its attribute, both trees build the same
+30,800 slots twice. Every result equals a single-threaded call on both trees, in content and key order; 0 errors.
+The fix adds no new window: main read each slot of `@attributes` once to copy it, the fix reads each slot once in its
+walk, and a slot never goes back to `nil`, so a thread past its own `materialize` sees every slot built. What is
+racy (a concurrent build replacing a slot whose `value_for_database` another thread already memoized, so an
+encrypted attribute can dump a second ciphertext) is in `materialize` and the same on main.
+
+Frozen records: `freeze` materializes before freezing the Array, so both calls only read; frozen clean and frozen
+dirty records return the same Hashes on both trees. Ractors: a set made shareable after one `attributes_for_database`
+call returns both Hashes inside a Ractor (22 keys); a cold one raises `FrozenError` from `Attribute`'s memoization on
+main and the fix alike.
 
 ## Overlap (2026-11-14)
 
@@ -204,4 +288,11 @@ FIX=fixA ruby bench/upstream/l3/table.rb OUT interp|yjit
 RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/probe.rb dump DIR
 RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/probe.rb probe DIR...
 RAILS=~/l3/TREE BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile [ADAPTER=postgresql] ruby bench/upstream/l3/review_probe.rb > TREE.txt
+Master: Ruby 9aa0898240 in ~/w/ruby-master, bundles ~/l3/suiteM-TREE (activesupport, activemodel, activerecord, sqlite3,
+msgpack; BUNDLE_PATH=~/l3/gemsM), irwin.so built for it in ~/l3/extM:
+RUBY_BIN=~/w/ruby-master/bin SUITE=suiteM BUNDLE_PATH=~/l3/gemsM IRWIN_DIR=~/l3/extM \
+  N=200 WARM=100 bench/upstream/l3/run.sh OUT TREE WIDTH zjit|interp [CASE...]
+K1+L3: git merge of the two branches into ~/l3/k1l3; K1's cases with bench/upstream/k1/run.sh, its tree paths
+pointed at ~/l3. BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile ruby bench/upstream/l3/concurrency_probe.rb
+(YIELD_IN_STORE=1 or 2 injects yields into store or before default_attribute).
 ```
