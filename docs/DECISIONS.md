@@ -226,7 +226,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   ([bench.md](bench.md)). App pages find sites but can't price them (A/A up to ±7%). ZJIT speed claims come from
   ruby-bench with A/A.
 * **Every Rails candidate also reports its micro on master × ZJIT** (pinned build, A/A), or says its path doesn't
-  run on 4.1. A ZJIT loss blocks it until explained; #59557's `index_with` lost under ZJIT although it only
+  run on 4.1. The report goes in the record; the body names no other Ruby (see Leave out under PR descriptions;
+  2026-11-14, after AB1's reviews disagreed). A ZJIT loss blocks it until explained; #59557's `index_with` lost under ZJIT although it only
   changed allocation. Rails changes made only for ZJIT need a win of their own on the Ruby pin.
 
 ## Review gates
