@@ -1,0 +1,135 @@
+=== base --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     30.793k (±16.7%) i/s   (32.47 μs/i) -     93.044k in   3.021580s
+               top20     27.958k (±11.2%) i/s   (35.77 μs/i) -     85.887k in   3.072051s
+     top20+20%unique     29.584k (±17.8%) i/s   (33.80 μs/i) -     89.400k in   3.021950s
+            zipf5000     26.084k (±18.4%) i/s   (38.34 μs/i) -     79.776k in   3.058447s
+              unique     29.623k (±14.4%) i/s   (33.76 μs/i) -     90.706k in   3.062031s
+=== candidate --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one      3.069M (± 8.5%) i/s  (325.83 ns/i) -      9.470M in   3.085523s
+               top20      2.898M (± 8.2%) i/s  (345.04 ns/i) -      8.765M in   3.024124s
+     top20+20%unique    405.265k (± 6.9%) i/s    (2.47 μs/i) -      1.216M in   3.000755s
+            zipf5000    161.212k (±17.2%) i/s    (6.20 μs/i) -    498.186k in   3.090246s
+              unique     25.716k (±15.0%) i/s   (38.89 μs/i) -     78.312k in   3.045257s
+=== base2 --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     33.314k (± 9.6%) i/s   (30.02 μs/i) -    101.040k in   3.032992s
+               top20     28.901k (± 7.8%) i/s   (34.60 μs/i) -     88.424k in   3.059503s
+     top20+20%unique     33.419k (± 9.4%) i/s   (29.92 μs/i) -    102.060k in   3.053944s
+            zipf5000     28.751k (±14.3%) i/s   (34.78 μs/i) -     87.696k in   3.050186s
+              unique     30.917k (± 9.8%) i/s   (32.34 μs/i) -     93.467k in   3.023115s
+=== base --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     32.834k (±11.5%) i/s   (30.46 μs/i) -    100.660k in   3.065684s
+               top20     29.952k (± 7.2%) i/s   (33.39 μs/i) -     91.047k in   3.039728s
+     top20+20%unique     29.610k (±20.2%) i/s   (33.77 μs/i) -     90.575k in   3.058905s
+            zipf5000     28.537k (±12.4%) i/s   (35.04 μs/i) -     86.320k in   3.024828s
+              unique     32.583k (± 7.1%) i/s   (30.69 μs/i) -    100.448k in   3.082836s
+=== candidate --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one      3.106M (± 6.4%) i/s  (321.99 ns/i) -      9.486M in   3.054337s
+               top20      2.900M (± 6.0%) i/s  (344.82 ns/i) -      8.726M in   3.008946s
+     top20+20%unique    409.201k (± 5.3%) i/s    (2.44 μs/i) -      1.232M in   3.010673s
+            zipf5000    175.180k (±13.5%) i/s    (5.71 μs/i) -    527.184k in   3.009390s
+              unique     30.595k (± 5.8%) i/s   (32.69 μs/i) -     94.230k in   3.079912s
+=== base2 --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     31.333k (±14.8%) i/s   (31.92 μs/i) -     97.034k in   3.096883s
+               top20     28.885k (± 9.5%) i/s   (34.62 μs/i) -     87.534k in   3.030387s
+     top20+20%unique     32.219k (±13.0%) i/s   (31.04 μs/i) -     99.499k in   3.088227s
+            zipf5000     29.677k (± 7.3%) i/s   (33.70 μs/i) -     91.495k in   3.082997s
+              unique     31.673k (± 5.2%) i/s   (31.57 μs/i) -     96.240k in   3.038597s
+=== base --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     32.610k (±12.5%) i/s   (30.67 μs/i) -     99.708k in   3.057576s
+               top20     27.733k (±11.6%) i/s   (36.06 μs/i) -     84.320k in   3.040422s
+     top20+20%unique     34.020k (±10.3%) i/s   (29.39 μs/i) -    104.545k in   3.073088s
+            zipf5000     32.135k (± 4.3%) i/s   (31.12 μs/i) -     97.650k in   3.038757s
+              unique     30.601k (±11.5%) i/s   (32.68 μs/i) -     93.501k in   3.055447s
+=== candidate --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one      3.099M (± 7.6%) i/s  (322.64 ns/i) -      9.419M in   3.038779s
+               top20      2.932M (± 5.1%) i/s  (341.07 ns/i) -      9.041M in   3.083692s
+     top20+20%unique    384.666k (± 9.3%) i/s    (2.60 μs/i) -      1.173M in   3.049928s
+            zipf5000    166.552k (±17.9%) i/s    (6.00 μs/i) -    499.785k in   3.000777s
+              unique     29.735k (±10.1%) i/s   (33.63 μs/i) -     89.964k in   3.025480s
+=== base2 --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     31.499k (±14.7%) i/s   (31.75 μs/i) -     95.236k in   3.023508s
+               top20     29.905k (± 8.8%) i/s   (33.44 μs/i) -     92.800k in   3.103186s
+     top20+20%unique     33.066k (±10.9%) i/s   (30.24 μs/i) -    101.724k in   3.076376s
+            zipf5000     30.168k (±10.0%) i/s   (33.15 μs/i) -     91.118k in   3.020333s
+              unique     32.465k (± 5.8%) i/s   (30.80 μs/i) -     99.851k in   3.075604s
+=== base --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     27.843k (±18.0%) i/s   (35.92 μs/i) -     84.734k in   3.043284s
+               top20     30.802k (± 4.5%) i/s   (32.47 μs/i) -     93.682k in   3.041459s
+     top20+20%unique     34.577k (±12.0%) i/s   (28.92 μs/i) -    106.096k in   3.068360s
+            zipf5000     30.690k (± 9.5%) i/s   (32.58 μs/i) -     93.389k in   3.042982s
+              unique     31.654k (± 8.8%) i/s   (31.59 μs/i) -     96.775k in   3.057323s
+=== candidate --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one      3.226M (± 6.9%) i/s  (310.00 ns/i) -      9.687M in   3.003051s
+               top20      2.903M (± 6.5%) i/s  (344.44 ns/i) -      8.916M in   3.070833s
+     top20+20%unique    415.423k (± 6.1%) i/s    (2.41 μs/i) -      1.260M in   3.033919s
+            zipf5000    171.325k (±12.4%) i/s    (5.84 μs/i) -    532.440k in   3.107787s
+              unique     28.182k (±12.0%) i/s   (35.48 μs/i) -     87.345k in   3.099322s
+=== base2 --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     30.467k (±15.3%) i/s   (32.82 μs/i) -     94.041k in   3.086680s
+               top20     30.551k (± 5.5%) i/s   (32.73 μs/i) -     93.300k in   3.053896s
+     top20+20%unique     33.777k (±11.0%) i/s   (29.61 μs/i) -    102.390k in   3.031364s
+            zipf5000     30.760k (± 6.7%) i/s   (32.51 μs/i) -     92.568k in   3.009378s
+              unique     30.136k (±12.5%) i/s   (33.18 μs/i) -     91.320k in   3.030245s
+=== base --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     34.339k (±10.0%) i/s   (29.12 μs/i) -    103.428k in   3.011951s
+               top20     30.097k (± 4.1%) i/s   (33.23 μs/i) -     91.611k in   3.043890s
+     top20+20%unique     33.955k (±10.7%) i/s   (29.45 μs/i) -    103.488k in   3.047762s
+            zipf5000     31.748k (± 2.7%) i/s   (31.50 μs/i) -     97.805k in   3.080691s
+              unique     32.761k (± 6.2%) i/s   (30.52 μs/i) -     99.480k in   3.036535s
+=== candidate --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one      3.090M (± 9.2%) i/s  (323.65 ns/i) -      9.283M in   3.004340s
+               top20      2.852M (± 5.5%) i/s  (350.61 ns/i) -      8.833M in   3.096778s
+     top20+20%unique    385.150k (±11.0%) i/s    (2.60 μs/i) -      1.186M in   3.080280s
+            zipf5000    167.547k (±13.9%) i/s    (5.97 μs/i) -    515.676k in   3.077803s
+              unique     29.296k (± 7.5%) i/s   (34.13 μs/i) -     90.024k in   3.072859s
+=== base2 --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+                 one     32.509k (±12.0%) i/s   (30.76 μs/i) -     98.424k in   3.027629s
+               top20     30.216k (± 5.9%) i/s   (33.10 μs/i) -     92.070k in   3.047100s
+     top20+20%unique     32.387k (±13.2%) i/s   (30.88 μs/i) -     98.194k in   3.031942s
+            zipf5000     27.709k (±13.3%) i/s   (36.09 μs/i) -     85.764k in   3.095213s
+              unique     31.059k (± 6.5%) i/s   (32.20 μs/i) -     95.790k in   3.084112s

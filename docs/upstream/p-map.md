@@ -209,6 +209,72 @@ Callgrind instructions and objects per request through the full Rack stack of th
 Objects per request drop by 161–170 (643 → 482 on the JSON request). Fizzy's card page under YJIT is rejected, not
 rerun: its base and A/A windows compiled 19 and 25 blocks, so they aren't JIT-flat.
 
+**AB1 review numbers (opus pass on `207a7827a7`, 2026-11-14).** Rails main 50c54eed06 against the branch, useragent
+0.16.11, Ruby 4.0.9 (`3e93b23afc`) for the interpreter and YJIT, Ruby master `9aa0898240` (built `--enable-zjit
+--enable-yjit`) for ZJIT. Wall time is benchmark-ips on core 1 of the 2-core orb, five interleaved rounds of base,
+branch and base again (A/A), best of 5. Scripts: `ab1_uas.rb`, `ab1_mix.rb`, `ab1_mem.rb`, `ab1_miss.rb`,
+`ab1_miss_ir.rb`, `ab1_zjit_stats.rb`, `ab1_probe.rb`, run by `ab1_review.sh` and summarized by `ab1_best.rb` in
+[`bench/upstream/p_map/`](../../bench/upstream/p_map/). Raw output: `data/p-map/ab1-review-*.txt`.
+
+The body's micro (one controller request with `allow_browser versions: :modern`, one Chrome 131 user agent):
+
+| Ruby | base | A/A | AB1 | change |
+|---|---:|---:|---:|---:|
+| 4.0.9 YJIT | 94.36 µs | 96.18 µs (+1.9%) | 48.08 µs | 1.96× |
+| master ZJIT | 82.60 µs | 82.41 µs (−0.2%) | 42.93 µs | 1.92× |
+
+ZJIT stats for 20,000 of those requests (fixed count, `--zjit-stats-quiet`; no OOM, no failed ISEQs):
+
+```diff
+-compiled_iseq_count          630
++compiled_iseq_count          603
+-side_exit_count              21596
++side_exit_count              1635
+-compiled_side_exit_count     14326
++compiled_side_exit_count     13439
+-zjit_alloc_bytes             2077950
++zjit_alloc_bytes             1934655
+-  exit_exception_handler     19947
+```
+
+The A/A run matches base exactly. The removed exits are one per request: `UserAgent::Browsers.extend` returns from
+inside `all.each`, which ZJIT handles as a throw ([lead 17](zjit-iseq-leads.md#17-throw-unwinding-and-frame-materialization-taken),
+already taken upstream). Every other exit counter is unchanged within ±10.
+
+User agent mixes, 20,000 checks each, steady state (second pass). "unique" is a crawler flood, 20% unique is
+in-app browsers and scripts mixed into 20 common browsers, and Zipf draws from 5,000 user agents. The verdicts on
+the branch match main's uncached check for every request in every mix.
+
+| Mix | distinct | hit rate | YJIT main → AB1, per check | ZJIT main → AB1, per check |
+|---|---:|---:|---:|---:|
+| one user agent | 1 | 100% | 35.6 → 0.26 µs | 29.1 → 0.31 µs |
+| 20 browsers | 20 | 100% | 43.4 → 0.27 µs | 32.5 → 0.34 µs |
+| 20 browsers + 20% unique | 4,020 | 79.6% | 40.2 → 2.6 µs | 28.9 → 2.4 µs |
+| Zipf over 5,000 | 1,307 | 85.0% | 39.5 → 5.9 µs | 31.1 → 5.7 µs |
+| all unique | 20,000 | 0% | 37.8 → 37.6 µs | 30.5 → 32.7 µs; rerun 34.2 → 35.0 µs (A/A −5.2%) |
+
+A miss, measured exactly (Callgrind, 1,000 misses after 3,000 warm ones, GC off, one map clear in the window):
+
+| Mode | main's check | A/A | AB1 | change |
+|---|---:|---:|---:|---:|
+| interpreter | 287,034 Ir | −0.01% | 296,777 Ir | +3.4% |
+| YJIT | 220,315 Ir | +0.06% | 225,637 Ir | +2.4% |
+
+Objects per miss (wall-time script, GC off): 176.0 → 177.0 under YJIT, 173.2 → 174.2 under ZJIT. The extra object is the frozen copy of the key that the map's Hash stores. Memory held at the bound (1,000 entries,
+4.0.9, `ObjectSpace.memsize_of_all` delta): 232 KB with the long-tail user agents (mean 149 bytes), 652 KB with
+user agents near 512 bytes, which is the worst case.
+
+What that makes of the per-request shares (share × hit rate, minus share × miss rate × 3.4%):
+
+| App (share of a request) | one or 20 browsers | 20% unique | Zipf 5,000 | all unique |
+|---|---:|---:|---:|---:|
+| Blog (3.0%) | −3.0% | −2.4% | −2.5% | +0.10% |
+| Campfire (1.3%) | −1.3% | −1.0% | −1.1% | +0.04% |
+| Fizzy (0.5%) | −0.5% | −0.4% | −0.4% | +0.02% |
+
+The shares come from Vernier under YJIT with one Firefox 140 user agent, and the miss penalty is the interpreter's
+Callgrind ratio, the larger of the two. So a crawler flood costs at most a tenth of a percent of a request.
+
 **MK1, [`thomasklemm/message-encryptor-key-len`](https://github.com/thomasklemm/rails/tree/thomasklemm/message-encryptor-key-len).**
 `MessageEncryptor.key_len` builds an `OpenSSL::Cipher` each time it is called, and the encrypted cookie jar calls
 it once per request that reads or writes an encrypted cookie. The length depends only on the cipher name, so it is

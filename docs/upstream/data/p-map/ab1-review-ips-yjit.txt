@@ -1,0 +1,60 @@
+=== base --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser      9.491k (±13.8%) i/s  (105.37 μs/i) -     47.700k in   5.025978s
+=== candidate --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     19.950k (±10.4%) i/s   (50.13 μs/i) -    100.500k in   5.037623s
+=== base2 --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.397k (± 5.2%) i/s   (96.19 μs/i) -     52.500k in   5.049761s
+=== base --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.408k (± 9.7%) i/s   (96.08 μs/i) -     52.773k in   5.070570s
+=== candidate --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     19.936k (± 9.8%) i/s   (50.16 μs/i) -    101.661k in   5.099450s
+=== base2 --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser      9.284k (± 7.8%) i/s  (107.71 μs/i) -     47.164k in   5.080244s
+=== base --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.598k (± 5.6%) i/s   (94.35 μs/i) -     54.048k in   5.099630s
+=== candidate --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     20.799k (± 8.5%) i/s   (48.08 μs/i) -    106.032k in   5.097817s
+=== base2 --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.231k (± 5.3%) i/s   (97.74 μs/i) -     51.842k in   5.066983s
+=== base --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.150k (± 7.4%) i/s   (98.52 μs/i) -     51.018k in   5.026327s
+=== candidate --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     19.366k (±10.2%) i/s   (51.64 μs/i) -     97.698k in   5.044709s
+=== base2 --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     10.159k (± 8.4%) i/s   (98.44 μs/i) -     50.850k in   5.005428s
+=== base --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser      9.474k (± 9.1%) i/s  (105.55 μs/i) -     47.794k in   5.044683s
+=== candidate --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser     19.821k (± 8.8%) i/s   (50.45 μs/i) -    100.705k in   5.080813s
+=== base2 --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+request with allow_browser      9.588k (± 9.1%) i/s  (104.30 μs/i) -     48.654k in   5.074535s

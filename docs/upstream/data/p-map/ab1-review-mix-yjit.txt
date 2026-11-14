@@ -1,0 +1,135 @@
+=== base --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     27.498k (± 6.5%) i/s   (36.37 μs/i) -     84.504k in   3.073118s
+               top20     22.781k (± 7.0%) i/s   (43.90 μs/i) -     70.497k in   3.094615s
+     top20+20%unique     23.617k (±18.2%) i/s   (42.34 μs/i) -     72.450k in   3.067740s
+            zipf5000     25.193k (± 6.6%) i/s   (39.69 μs/i) -     77.024k in   3.057382s
+              unique     24.722k (±12.0%) i/s   (40.45 μs/i) -     77.084k in   3.118048s
+=== candidate --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one      3.684M (± 7.1%) i/s  (271.47 ns/i) -     11.109M in   3.015705s
+               top20      3.268M (± 3.9%) i/s  (306.00 ns/i) -     10.049M in   3.074986s
+     top20+20%unique    378.589k (± 7.2%) i/s    (2.64 μs/i) -      1.158M in   3.057617s
+            zipf5000    163.469k (±16.9%) i/s    (6.12 μs/i) -    491.850k in   3.008819s
+              unique     25.959k (± 9.3%) i/s   (38.52 μs/i) -     78.146k in   3.010405s
+=== base2 --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     26.979k (± 6.6%) i/s   (37.07 μs/i) -     81.995k in   3.039231s
+               top20     19.387k (±17.9%) i/s   (51.58 μs/i) -     58.560k in   3.020577s
+     top20+20%unique     25.506k (±14.1%) i/s   (39.21 μs/i) -     77.706k in   3.046579s
+            zipf5000     23.842k (± 9.7%) i/s   (41.94 μs/i) -     72.240k in   3.029898s
+              unique     24.302k (± 6.0%) i/s   (41.15 μs/i) -     74.550k in   3.067624s
+=== base --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     28.131k (± 8.6%) i/s   (35.55 μs/i) -     84.672k in   3.009960s
+               top20     21.824k (±10.9%) i/s   (45.82 μs/i) -     66.638k in   3.053457s
+     top20+20%unique     24.516k (±17.4%) i/s   (40.79 μs/i) -     74.871k in   3.053986s
+            zipf5000     23.478k (± 5.5%) i/s   (42.59 μs/i) -     72.020k in   3.067597s
+              unique     24.729k (± 8.6%) i/s   (40.44 μs/i) -     77.000k in   3.113765s
+=== candidate --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one      3.320M (± 7.0%) i/s  (301.16 ns/i) -     10.169M in   3.062544s
+               top20      3.227M (± 6.7%) i/s  (309.88 ns/i) -      9.801M in   3.037059s
+     top20+20%unique    381.134k (± 7.0%) i/s    (2.62 μs/i) -      1.174M in   3.080073s
+            zipf5000    155.716k (±11.5%) i/s    (6.42 μs/i) -    485.548k in   3.118157s
+              unique     25.635k (± 5.6%) i/s   (39.01 μs/i) -     78.590k in   3.065683s
+=== base2 --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     27.695k (± 9.5%) i/s   (36.11 μs/i) -     83.160k in   3.002688s
+               top20     22.326k (±15.6%) i/s   (44.79 μs/i) -     68.510k in   3.068629s
+     top20+20%unique     26.539k (±13.4%) i/s   (37.68 μs/i) -     81.864k in   3.084676s
+            zipf5000     23.155k (±12.6%) i/s   (43.19 μs/i) -     71.550k in   3.090012s
+              unique     23.749k (± 8.3%) i/s   (42.11 μs/i) -     73.022k in   3.074677s
+=== base --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     27.026k (± 8.4%) i/s   (37.00 μs/i) -     81.592k in   3.019058s
+               top20     21.732k (±13.6%) i/s   (46.02 μs/i) -     66.742k in   3.071203s
+     top20+20%unique     24.901k (±13.8%) i/s   (40.16 μs/i) -     78.390k in   3.148018s
+            zipf5000     24.858k (± 8.5%) i/s   (40.23 μs/i) -     75.632k in   3.042510s
+              unique     24.835k (±10.7%) i/s   (40.27 μs/i) -     75.582k in   3.043340s
+=== candidate --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one      3.928M (± 3.5%) i/s  (254.56 ns/i) -     11.825M in   3.010131s
+               top20      3.748M (± 4.7%) i/s  (266.84 ns/i) -     11.462M in   3.058599s
+     top20+20%unique    382.134k (± 6.7%) i/s    (2.62 μs/i) -      1.171M in   3.063627s
+            zipf5000    161.493k (±12.5%) i/s    (6.19 μs/i) -    494.120k in   3.059691s
+              unique     25.565k (± 8.3%) i/s   (39.12 μs/i) -     77.340k in   3.025234s
+=== base2 --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     27.215k (± 6.6%) i/s   (36.74 μs/i) -     82.368k in   3.026602s
+               top20     22.638k (±16.1%) i/s   (44.17 μs/i) -     68.430k in   3.022821s
+     top20+20%unique     27.723k (± 6.0%) i/s   (36.07 μs/i) -     83.636k in   3.016869s
+            zipf5000     23.692k (± 7.6%) i/s   (42.21 μs/i) -     73.276k in   3.092900s
+              unique     25.195k (±10.2%) i/s   (39.69 μs/i) -     77.490k in   3.075618s
+=== base --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     25.457k (±10.7%) i/s   (39.28 μs/i) -     78.400k in   3.079727s
+               top20     22.510k (±15.1%) i/s   (44.42 μs/i) -     67.976k in   3.019764s
+     top20+20%unique     23.553k (±21.3%) i/s   (42.46 μs/i) -     72.100k in   3.061171s
+            zipf5000     24.518k (±11.3%) i/s   (40.79 μs/i) -     75.922k in   3.096541s
+              unique     26.439k (± 8.6%) i/s   (37.82 μs/i) -     80.570k in   3.047355s
+=== candidate --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one      3.352M (± 9.4%) i/s  (298.34 ns/i) -     10.222M in   3.049573s
+               top20      3.052M (±17.2%) i/s  (327.70 ns/i) -      9.165M in   3.003372s
+     top20+20%unique    374.427k (± 9.8%) i/s    (2.67 μs/i) -      1.149M in   3.069058s
+            zipf5000    150.075k (±23.5%) i/s    (6.66 μs/i) -    458.010k in   3.051882s
+              unique     24.209k (±10.9%) i/s   (41.31 μs/i) -     74.720k in   3.086504s
+=== base2 --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     26.960k (±11.1%) i/s   (37.09 μs/i) -     82.041k in   3.043083s
+               top20     21.135k (±23.1%) i/s   (47.32 μs/i) -     66.867k in   3.163837s
+     top20+20%unique     20.062k (±14.8%) i/s   (49.85 μs/i) -     61.005k in   3.040827s
+            zipf5000     21.637k (±15.3%) i/s   (46.22 μs/i) -     67.496k in   3.119509s
+              unique     25.191k (± 9.4%) i/s   (39.70 μs/i) -     75.671k in   3.003835s
+=== base --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     25.768k (± 9.0%) i/s   (38.81 μs/i) -     79.170k in   3.072418s
+               top20     23.064k (± 7.5%) i/s   (43.36 μs/i) -     70.928k in   3.075335s
+     top20+20%unique     21.752k (±23.6%) i/s   (45.97 μs/i) -     67.505k in   3.103368s
+            zipf5000     25.296k (± 6.7%) i/s   (39.53 μs/i) -     77.571k in   3.066476s
+              unique     23.888k (±11.1%) i/s   (41.86 μs/i) -     72.268k in   3.025250s
+=== candidate --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one      3.866M (± 6.3%) i/s  (258.70 ns/i) -     11.919M in   3.083440s
+               top20      3.776M (± 3.6%) i/s  (264.85 ns/i) -     11.413M in   3.022839s
+     top20+20%unique    384.474k (±12.9%) i/s    (2.60 μs/i) -      1.182M in   3.073281s
+            zipf5000    170.793k (±11.3%) i/s    (5.86 μs/i) -    515.871k in   3.020454s
+              unique     26.572k (± 7.4%) i/s   (37.63 μs/i) -     80.910k in   3.044892s
+=== base2 --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+                 one     29.001k (± 5.2%) i/s   (34.48 μs/i) -     87.540k in   3.018536s
+               top20     22.403k (±13.9%) i/s   (44.64 μs/i) -     69.444k in   3.099722s
+     top20+20%unique     25.190k (±14.8%) i/s   (39.70 μs/i) -     76.875k in   3.051824s
+            zipf5000     25.816k (± 7.2%) i/s   (38.74 μs/i) -     78.300k in   3.033051s
+              unique     23.906k (± 9.7%) i/s   (41.83 μs/i) -     72.333k in   3.025788s

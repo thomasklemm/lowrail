@@ -1,0 +1,60 @@
+=== base --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.620k (±11.8%) i/s   (86.06 μs/i) -     58.960k in   5.073863s
+=== candidate --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     22.601k (±14.2%) i/s   (44.25 μs/i) -    113.100k in   5.004182s
+=== base2 --zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.534k (±12.5%) i/s   (86.70 μs/i) -     58.576k in   5.078710s
+=== base --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.944k (±12.6%) i/s   (83.72 μs/i) -     60.698k in   5.081911s
+=== candidate --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     23.040k (±14.0%) i/s   (43.40 μs/i) -    115.752k in   5.023865s
+=== base2 --zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     12.135k (±10.5%) i/s   (82.40 μs/i) -     60.912k in   5.019424s
+=== base --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     12.106k (±10.6%) i/s   (82.60 μs/i) -     60.990k in   5.038042s
+=== candidate --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     23.294k (±13.4%) i/s   (42.93 μs/i) -    117.936k in   5.062996s
+=== base2 --zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.961k (±13.1%) i/s   (83.61 μs/i) -     60.400k in   5.049800s
+=== base --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.740k (±12.5%) i/s   (85.18 μs/i) -     58.914k in   5.018352s
+=== candidate --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     23.159k (±11.5%) i/s   (43.18 μs/i) -    115.858k in   5.002778s
+=== base2 --zjit round 4
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.441k (±15.3%) i/s   (87.40 μs/i) -     58.188k in   5.085700s
+=== base --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.083k (±16.4%) i/s   (90.23 μs/i) -     56.202k in   5.070854s
+=== candidate --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     23.134k (±12.1%) i/s   (43.23 μs/i) -    117.257k in   5.068696s
+=== base2 --zjit round 5
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+request with allow_browser     11.366k (±13.9%) i/s   (87.98 μs/i) -     57.100k in   5.023862s

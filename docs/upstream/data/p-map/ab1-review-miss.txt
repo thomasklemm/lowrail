@@ -1,0 +1,96 @@
+=== zjit round 1
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+         miss, uncached check     30.522k (± 7.0%) i/s   (32.76 μs/i) -    153.776k in   5.038212s
+           miss, cached check     28.506k (± 8.0%) i/s   (35.08 μs/i) -    146.025k in   5.122519s
+  Firefox 140 Linux, uncached     34.084k (±14.2%) i/s   (29.34 μs/i) -    172.516k in   5.061430s
+Firefox 140 Linux, parse only     56.462k (± 7.1%) i/s   (17.71 μs/i) -    284.239k in   5.034151s
+
+Comparison:
+Firefox 140 Linux, parse only:    56462.1 i/s
+  Firefox 140 Linux, uncached:    34084.4 i/s - 1.66x  slower
+         miss, uncached check:    30521.9 i/s - 1.85x  slower
+           miss, cached check:    28506.5 i/s - 1.98x  slower
+
+uncached 173.20 objects per miss
+cached   174.17 objects per miss
+=== yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+         miss, uncached check     21.168k (±16.3%) i/s   (47.24 μs/i) -    107.289k in   5.068481s
+           miss, cached check     20.381k (±13.2%) i/s   (49.07 μs/i) -    103.512k in   5.078946s
+  Firefox 140 Linux, uncached     30.576k (± 8.9%) i/s   (32.71 μs/i) -    153.076k in   5.006370s
+Firefox 140 Linux, parse only     45.886k (± 7.9%) i/s   (21.79 μs/i) -    231.540k in   5.045967s
+
+Comparison:
+Firefox 140 Linux, parse only:    45886.2 i/s
+  Firefox 140 Linux, uncached:    30576.2 i/s - 1.50x  slower
+         miss, uncached check:    21167.9 i/s - 2.17x  slower
+           miss, cached check:    20380.6 i/s - 2.25x  slower
+
+uncached 176.00 objects per miss
+cached   176.95 objects per miss
+=== zjit round 2
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+         miss, uncached check     29.720k (±10.4%) i/s   (33.65 μs/i) -    150.576k in   5.066533s
+           miss, cached check     26.312k (±11.6%) i/s   (38.01 μs/i) -    132.894k in   5.050668s
+  Firefox 140 Linux, uncached     34.069k (±11.7%) i/s   (29.35 μs/i) -    172.725k in   5.069835s
+Firefox 140 Linux, parse only     55.696k (± 6.5%) i/s   (17.95 μs/i) -    283.656k in   5.092976s
+
+Comparison:
+Firefox 140 Linux, parse only:    55695.5 i/s
+  Firefox 140 Linux, uncached:    34069.2 i/s - 1.63x  slower
+         miss, uncached check:    29719.7 i/s - 1.87x  slower
+           miss, cached check:    26312.2 i/s - 2.12x  slower
+
+uncached 173.20 objects per miss
+cached   174.15 objects per miss
+=== yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+         miss, uncached check     20.631k (±17.1%) i/s   (48.47 μs/i) -    103.824k in   5.032349s
+           miss, cached check     19.942k (±12.7%) i/s   (50.14 μs/i) -     99.736k in   5.001255s
+  Firefox 140 Linux, uncached     27.916k (±10.4%) i/s   (35.82 μs/i) -    142.272k in   5.096375s
+Firefox 140 Linux, parse only     40.829k (±12.9%) i/s   (24.49 μs/i) -    205.086k in   5.023046s
+
+Comparison:
+Firefox 140 Linux, parse only:    40829.0 i/s
+  Firefox 140 Linux, uncached:    27916.3 i/s - 1.46x  slower
+         miss, uncached check:    20631.3 i/s - 1.98x  slower
+           miss, cached check:    19942.2 i/s - 2.05x  slower
+
+uncached 176.00 objects per miss
+cached   176.97 objects per miss
+=== zjit round 3
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+         miss, uncached check     25.013k (±15.8%) i/s   (39.98 μs/i) -    126.412k in   5.053785s
+           miss, cached check     23.942k (±15.6%) i/s   (41.77 μs/i) -    120.433k in   5.030182s
+  Firefox 140 Linux, uncached     27.082k (±19.3%) i/s   (36.93 μs/i) -    135.520k in   5.004100s
+Firefox 140 Linux, parse only     45.893k (±18.2%) i/s   (21.79 μs/i) -    230.643k in   5.025622s
+
+Comparison:
+Firefox 140 Linux, parse only:    45893.4 i/s
+  Firefox 140 Linux, uncached:    27081.8 i/s - 1.69x  slower
+         miss, uncached check:    25013.3 i/s - 1.83x  slower
+           miss, cached check:    23942.1 i/s - 1.92x  slower
+
+uncached 173.20 objects per miss
+cached   169.44 objects per miss
+=== yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+         miss, uncached check     17.913k (±14.9%) i/s   (55.83 μs/i) -     90.336k in   5.043056s
+           miss, cached check     15.338k (±25.6%) i/s   (65.20 μs/i) -     76.752k in   5.003958s
+  Firefox 140 Linux, uncached     22.485k (±15.7%) i/s   (44.47 μs/i) -    112.566k in   5.006338s
+Firefox 140 Linux, parse only     35.682k (±20.6%) i/s   (28.03 μs/i) -    183.040k in   5.129791s
+
+Comparison:
+Firefox 140 Linux, parse only:    35681.8 i/s
+  Firefox 140 Linux, uncached:    22484.7 i/s - 1.59x  slower
+         miss, uncached check:    17912.9 i/s - 1.99x  slower
+           miss, cached check:    15338.3 i/s - 2.33x  slower
+
+uncached 176.00 objects per miss
+cached   176.95 objects per miss

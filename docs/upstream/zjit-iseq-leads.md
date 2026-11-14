@@ -356,7 +356,10 @@ iteration, against YJIT's 1.3k / 1.0k / 5.9k. Each one walks and materializes ZJ
   * `Router#serve` block;
   * `SQLite3::Statement#each` block;
   * `Formatter#generate` blocks;
-  * TZInfo `periods_for_local`.
+  * TZInfo `periods_for_local`;
+  * useragent's `UserAgent::Browsers.extend` (`return` from `all.each`), once per `UserAgent.parse`: one
+    `exit_exception_handler` per request with `allow_browser` on master `9aa0898240`; AB1's cache removes it on hits
+    ([AB1](../../bench/upstream/pr-queue/items/AB1.md), 2026-11-14).
 * **Taken:** Shopify/ruby#1093 (k0kubun), ruby/ruby#18244 (luke-gruber, draft) and, for exception-handler exits,
   ruby/ruby#18759 (rafaelfranca).
 

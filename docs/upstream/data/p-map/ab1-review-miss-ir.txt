@@ -1,0 +1,14 @@
+# ab1_miss_ir.rb under Callgrind (--toggle-collect=rb_ary_cycle; YJIT with --smc-check=all), Ruby 4.0.9, branch bundle
+# per miss = (Ir(n=1000) - Ir(n=0)) / 1000; runs in order: uncached, cached, uncached (A/A)
+interp uncached n=0 Ir=66
+interp uncached n=1000 Ir=287034251
+interp cached n=0 Ir=66
+interp cached n=1000 Ir=296777117
+interp uncached n=0 Ir=66
+interp uncached n=1000 Ir=286995747
+yjit uncached n=0 Ir=66
+yjit uncached n=1000 Ir=220314838
+yjit cached n=0 Ir=66
+yjit cached n=1000 Ir=225637454
+yjit uncached n=0 Ir=66
+yjit uncached n=1000 Ir=220443459
