@@ -23,7 +23,7 @@ instructions with the pinned Valgrind ([method](#method-and-pins)).
 | # | Finding | Modes | Reach | Magnitude (controls) | Bisected to | Existing report | Proposed next step |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **Small-Hash lookups and inserts cost more** (`h[:k]` on ≤ 8 keys, literals, `[]=`) | interp, YJIT, ZJIT (same C functions) | every app and request; railsbench Hash functions **+50.5 M Ir per iteration (interp), +48.9 M (YJIT), +7.5%**, about +0.7% of an iteration | `h[:b]` 288 → 334 Ir (+16%), wall time 2.9 → 6.4 ns; 3-pair literal 1,084 → 1,232 Ir (+14%); 12-key lookup unchanged (control); whole iteration without GC +0.35% interp, −0.16% YJIT (offset by other gains) | [`7da70f1773`](https://github.com/ruby/ruby/commit/7da70f1773) (ruby/ruby#18222, byroot, SWAR `ar_find_entry_hint`) +23 Ir and [`0b2edb5b9a`](https://github.com/ruby/ruby/commit/0b2edb5b9a) (ruby/ruby#18476, Peter Zhu, AR identity hashes) +14 Ir | none found | Show both authors the x86-64 count and the 3-line repro; try keeping the identity check and the SWAR search off the plain lookup path, then measure on railsbench. Highest reach of anything here |
-| 2 | **`nofree` major GCs in sparse large-slot heaps** (round 1 #2) | interp, YJIT | 35 census workloads; shipit | YJIT census: majors **−82.5%**, GC time **−27.4%** with the fix (two A/A rounds); shipit YJIT 24–26 → 5–9 majors, −29% GC time; bigslot 1–2 / 24–31 / 3 (4.0.9 / master / fix). Cost: +1.2–1.8 MB RSS per workload, large-slot sweep step p99 ≈ 3× | [`16da5f23c2`](https://github.com/ruby/ruby/commit/16da5f23c2) (ruby/ruby#16632), round 1 | ruby/ruby#17251 (eightbitraptor, open draft): **its current head `41c689571a` fixes it too**. Census majors −95%, shipit 4–5 majors, bigslot 1–5 at 4–5 pages; app RSS cost the same as ours | Can our piece go? Probably: keep [item GC](../../bench/upstream/pr-queue/items/GC.md) (`7bc813e025`, rebased, pushed, body refreshed) held as the fallback, and give #17251 the numbers if Thomas wants it to land before 4.1 |
+| 2 | **`nofree` major GCs in sparse large-slot heaps** (round 1 #2) | interp, YJIT | 35 census workloads; shipit | YJIT census: majors **−82.5%**, GC time **−27.4%** with the fix (two A/A rounds); shipit YJIT 24–26 → 5–9 majors, −29% GC time; bigslot 1–2 / 24–31 / 3 (4.0.9 / master / fix). Cost: +1.2–1.8 MB RSS per workload, large-slot sweep step p99 ≈ 3× | [`16da5f23c2`](https://github.com/ruby/ruby/commit/16da5f23c2) (ruby/ruby#16632), round 1 | ruby/ruby#17251 (eightbitraptor, open draft): **its current head `41c689571a` fixes it too**. Census majors −95%, shipit 4–5 majors, bigslot 1–4 at 4–5 pages; app RSS cost the same as ours, large-slot sweep step p99 unchanged from master (0.62–0.63 ms). Numbers [posted on #17251](https://github.com/ruby/ruby/pull/17251#issuecomment-6882169535) 2026-11-14 | **Decided (Thomas, 2026-11-14):** our fix is not opened; [item GC](../../bench/upstream/pr-queue/items/GC.md) (`7bc813e025`) stays held as the fallback, reopened only if #17251 stalls or is closed |
 | 3 | **Copying a 3–8-key Hash grown by insertion** (`h.dup`, `m(**h)`) | interp, YJIT, ZJIT | apps that `dup` or splat small option Hashes built with `[]=` | `m(**h)` +47 / +75 / +113% at 3 / 5 / 8 keys, `h.dup` +32 / +51 / +82%; A/A ≤ 0.2% below 8 keys, ≤ 1.9% above; very large inputs: `h.dup` of 100k +14%, `m(**h, a: v)` +6.5% | ruby/ruby#18345 (byroot, deliberate: insertion-grown Hashes become st_tables at the 3rd key) | byroot's #18345 notes the st_table churn; KW2 (ours, parked) covers the merge side | Low priority: ask byroot whether `rb_hash_dup` of a ≤ 8-entry st_table should make an AR table |
 | 4 | **rails/rails#59141 shared readers pass `&:value!` generically** (Rails, not Ruby; corrected in [zjit-leads](zjit-leads.md#correction-railsrails59141s-site-is-value-not-block)) | ZJIT, YJIT | every AR attribute read on Rails main; largest on Lobsters | ZJIT: +208 `send_block_arg_not_nil` and +51 `send_polymorphic_fallback` per Lobsters request; railsbench +22.5k per iteration; YJIT dynamic sends +5.4% (railsbench), +4.1% (Lobsters). Price on railsbench: **ZJIT −1.1%, YJIT −1.5%, a net win** (all gates pass) | `1f32b09101` (merge of #59141) against its parent `c48c154e3f` | none | Section 6 |
 | 5 | **No 320 B slot** (round 1 #3) | all | every query: `QueryIntent` (31 ivars) 320 → 512 B | census `database_statements` site +2,444 B per workload | [`c9b7088364`](https://github.com/ruby/ruby/commit/c9b7088364) (ruby/ruby#16282, deliberate) | none | Unchanged: no Ruby fix proposed; Rails could keep `QueryIntent` ≤ 30 ivars |
@@ -172,7 +172,10 @@ pushed to `thomasklemm/gc-pool-budget` on the fork with a lease on `4b02fa55cb`.
 | 4.0.9 (local build) | 2, 1, 2 (earlier today 2, 1, 1) | 9, 99, 9 |
 | master `b7e8fad022` | 31, 24, 31 (earlier today 26, 26, 28) | 4, 7, 4 |
 | master + fix | 3, 3, 3 (earlier today 3, 3, 3) | 32, 30, 30 |
-| master + ruby/ruby#17251 at `41c689571a` | 5, 1, 1, 4, 1 | 5, 5, 5, 4, 5 |
+| master + ruby/ruby#17251 at `41c689571a` | 1, 4, 1, 4, 1 | 5, 4, 5, 4, 5 |
+
+For the #17251 comment, the three builds ran three more times in alternation (majors): master 28, 28, 28; #17251 1, 1, 1;
+fix 3, 3, 3 ([`bigslot-comment.log`](data/ruby-master-round-2/receipts.tar.gz)).
 
 Variants, one run each (majors / pages): ring 300: master 10 / 9, fix 5 / 41, #17251 6 / 7. 90-element Arrays (768 B
 heap): master 41 / 5, fix 5 / 7, #17251 3 / 4. YJIT, ring 200: master 27 / 6, fix 3 / 35, #17251 1 / 5. **The
@@ -227,25 +230,32 @@ far beyond both.
   now**: about 3× at p99 in the census (0.58 → 1.7 ms) and +40–80% on shipit. The sweep pause an allocation waits
   for did not grow in the census (p99 3.06 / 2.20 → 2.15 / 2.34 ms, max about 19–20 ms in both).
 * *ruby/ruby#17251 reduces the majors but does not remove them*: **no longer holds.** The current head
-  (`41c689571a`, force-pushed 2026-11-13) removes them: bigslot 1–5 majors (master 24–31, fix 3); shipit 4 / 4
+  (`41c689571a`, force-pushed 2026-11-13) removes them: bigslot 1–4 majors (master 24–31, fix 3); shipit 4 / 4
   (interp) and 4 / 5 (YJIT) majors; census 1 / 1 majors over 35 workloads (master 25 / 15, fix 3 / 4).
   It pays about the same memory as our fix in the apps (census RSS growth +68.4 / +69.1 MB against the fix's
   +66.8 / +68.9; shipit peak RSS 166–167 MB interp and 211–212 MB YJIT, against the fix's 156–162 and 206–210).
   Only in the bigslot script does it keep the 640 B heap small (4–5 pages, fix 30–32).
 
-**#17251 against our fix** (same cells; its build is `b7e8fad022` + `41c689571a` cherry-picked, without the gcstep
-patch, so its GC ms carries no step-recording overhead and its step times are unknown):
+**#17251 against our fix** (same census cells). `#17251` is `b7e8fad022` + `41c689571a` cherry-picked, without the
+gcstep patch; `#17251 + gcstep` is the same build with [`gcstep.patch`](../../fixtures/corpus/ruby-41-watch/gcstep)
+at its default pool mode, so #17251's own budget, run like master and fix ([`gc_17251_steps.sh`](../../fixtures/corpus/ruby-master-round-2/gc_17251_steps.sh)):
 
-| build | round | majors | minors | GC ms | RSS growth MB |
-| --- | --- | ---: | ---: | ---: | ---: |
-| master | a / b | 25 / 15 | 193 / 195 | 7,703 / 6,572 | +23.5 / +5.6 |
-| fix | a / b | 3 / 4 | 202 / 202 | 5,157 / 5,203 | +66.8 / +68.9 |
-| #17251 | a / b | 1 / 1 | 218 / 217 | 4,921 / 4,962 | +68.4 / +69.1 |
+| build | round | majors | minors | GC ms | RSS growth MB | sweep pause p99 / max ms | large-slot step p99 / max ms |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| master | a / b | 25 / 15 | 193 / 195 | 7,703 / 6,572 | +23.5 / +5.6 | 3.06 / 2.20 – 19.8 | 0.58 / 0.59 – 1.9 |
+| fix | a / b | 3 / 4 | 202 / 202 | 5,157 / 5,203 | +66.8 / +68.9 | 2.15 / 2.34 – 19.9 | 1.67 / 1.74 – 1.8 |
+| #17251 | a / b | 1 / 1 | 218 / 217 | 4,921 / 4,962 | +68.4 / +69.1 | – | – |
+| #17251 + gcstep | a / b | 1 / 1 | 216 / 205 | 5,085 / 5,046 | +71.9 / +72.7 | 1.98 / 3.53 – 22.1 | 0.63 / 0.62 – 2.0 |
 
-Per 1,000 operations against master: majors −95.0%, all GCs +2.1%, GC time −30.8% (the fix: −82.5%, −4.0%, −27.4%).
+Per 1,000 operations against master: majors −95.0%, all GCs +2.1%, GC time −30.8% (`#17251`), −95.0%, −1.2%,
+−29.0% (`#17251 + gcstep`); the fix: −82.5%, −4.0%, −27.4%. **#17251 does not lengthen large-slot sweep steps**
+(p99 0.62–0.63 ms, master 0.58–0.59, fix 1.67–1.74). On shipit with gcstep, #17251 runs 4 / 4 majors (interp, GC
+2,891 / 2,539 ms) and 4 / 4 (YJIT, 2,707 / 2,730 ms), with large-slot step p99 0.02–0.05 ms like master's.
 **Can the broken piece go?** Our fix and #17251 fix the same majors at the same memory cost in the apps, and #17251
 also fixes the bigslot shape without extra pages and is written by the GC's maintainer. If #17251 lands before 4.1,
 item GC can go. If it stalls as a draft, item GC is the smaller, already-measured fallback; keep it held.
+**Decision (Thomas, 2026-11-14):** our fix is not opened; #17251 is the route. Item GC is held as a fallback, reopened
+only if #17251 stalls or is closed. The table above, with fresh bigslot runs, was [posted on #17251](https://github.com/ruby/ruby/pull/17251#issuecomment-6882169535).
 
 ## 6. rails/rails#59141: shared attribute readers under YJIT and ZJIT
 

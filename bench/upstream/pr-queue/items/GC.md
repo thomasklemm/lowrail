@@ -16,7 +16,7 @@ rank: 1
 risky: true
 state: held
 pr:
-note: "ruby/ruby#17251 head 41c689571a (draft, 2026-11-13) now removes the same majors at the same app RSS (census majors -95%); drop this if #17251 lands, keep as fallback otherwise. Round 2: docs/upstream/ruby-master-round-2.md section 5"
+note: "fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers posted on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6882169535"
 passes: []
 ---
 
@@ -30,7 +30,7 @@ I measured it in three open-source Rails apps on Rails main with YJIT, over 35 w
 
 There are two costs. Memory: the 640-byte heap in the script ends with 30 to 32 pages instead of 4 to 7. The apps' resident memory grew 1.2 to 1.8 MB more per workload, and shipit's peak RSS rose 10 to 15 MB. Sweep steps: a single step in a large-slot heap takes longer, about three times as long at the 99th percentile in the apps (0.58 → 1.7 ms) and 40–80% longer on shipit. The sweep pause an allocation sees did not grow in the apps (99th percentile 2.2–3.1 ms on both, longest about 20 ms).
 
-ruby/ruby#17251 also changes when these heaps force a major GC. Its current head, cherry-picked onto the same master, removes these majors too (the script: 1 to 5; the apps: 1 per round; shipit: 4 to 5) at about the same memory cost in the apps, while keeping the script's 640-byte heap at 4 to 5 pages. If #17251 lands, this PR is not needed.
+ruby/ruby#17251 also changes when these heaps force a major GC. Its current head, cherry-picked onto the same master, removes these majors too (the script: 1 to 4; the apps: 1 per round; shipit: 4 to 5) at about the same memory cost in the apps and without longer sweep steps, while keeping the script's 640-byte heap at 4 to 5 pages. If #17251 lands, this PR is not needed.
 
 <details><summary>Script</summary>
 
