@@ -888,6 +888,7 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 - [#572](https://github.com/ruby/ruby-bench/pull/572) (owner V3): the alternative, clock fixed at 2023-07-19 01:00 UTC next to the fixture, so the 16 time-filtered lobsters requests render stories, and `/top` binds `Time.current` with a valid `-N DAY` modifier (always empty on main). Date spread 0.003%; deliberate workload change of +44% objects against main. Head `f94d3a10df`. Opened as a draft 2026-11-05; same review passes, final Sol approve; upstream CI green (15/15), **marked ready 2026-11-05 21:04 UTC**.
 - [#574](https://github.com/ruby/ruby-bench/pull/574) (RB-PV): `--runs` tests significance across processes. **Ready**, opened 2026-11-06 17:27 UTC, head `69767b3206`.
 - [#575](https://github.com/ruby/ruby-bench/pull/575) (RBW1): a blog benchmark that writes. **Draft**, opened 2026-11-06 21:14 UTC, head `537f5752f5`.
+- [#579](https://github.com/ruby/ruby-bench/pull/579) (RBCG1): the Callgrind profile's summary line matches its totals; follow-up to Max Bernstein's #576, body references ruby/ruby#19851. **Ready**, opened 2026-11-14 18:11 UTC, head `d1ab8607b7`, maintainer edits allowed.
 
 ### Rails — rails/rails
 
