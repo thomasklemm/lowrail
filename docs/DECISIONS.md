@@ -311,8 +311,9 @@ a few seconds, without having seen our notes. If it reads like a report, it is t
   qualifiers, headings, checklists or bold. Say it as you would to a colleague at the next desk.
 * **Fixed parts.** A stacked PR starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is
   new here." Interlocking changes get one cross-link sentence with owner/repo. Bugs, regressions and compatibility
-  PRs end with a one-line `<sub>` footer after `---` saying how it was found and linking the public Lowrail
-  record (Lowrail named as my research project). ZJIT evidence uses the tools' own format (see above). No AI
+  PRs end with a one-line `<sub>` footer after `---` saying in neutral words how it was found and linking the public
+  record, e.g. "Found while measuring Rails main after #59141 ([record](…))." (Thomas, 2026-11-14: no "census", no
+  "research project Lowrail"; open PRs keep theirs). ZJIT evidence uses the tools' own format (see above). No AI
   disclaimer, except where it matters, as on #1058.
 * **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
   by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
@@ -584,7 +585,7 @@ setup in neutral words ("35 Rails workloads", not "census 9"). Before posting, c
 sentence: would the reader miss it if it were gone? If not, drop it. Example: on ruby/ruby#17251 a table with a
 column for our held GC branch was deleted the same day, and only the master and #17251 numbers were kept, as an
 update to our earlier comment there. The `<sub>` footer that links the public record is the one sanctioned mention
-of Lowrail (see PR descriptions above) until Thomas decides otherwise.
+of Lowrail, in neutral words (see PR descriptions above).
 
 ## No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
 

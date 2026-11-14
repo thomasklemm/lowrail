@@ -38,4 +38,4 @@ A second checkout of main moved by at most 0.09%.
 
 ---
 
-<sub>Found while looking at ZJIT fallbacks on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/0f5be21ef3f327f52820fabdd9edd835a33cbff6/bench/upstream/vb1/README.md)), part of my research project Lowrail.</sub>
+<sub>Found while looking at ZJIT fallbacks on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/0f5be21ef3f327f52820fabdd9edd835a33cbff6/bench/upstream/vb1/README.md)).</sub>

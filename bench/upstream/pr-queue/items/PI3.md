@@ -37,4 +37,4 @@ Callgrind instruction counts per `try(:deferred?)` call, Ruby 4.0.9 ([script](ht
 | instructions, YJIT | 2,293 | 1,894 |
 
 ---
-<sub>Found by running a private Rails app on main against 8-1-stable with [Lowrail](https://github.com/thomasklemm/lowrail), my research project: [app-suites](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md#private-rails-app-with-inertia-rails).</sub>
+<sub>Found by running a private Rails app on main against 8-1-stable ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/app-suites.md#private-rails-app-with-inertia-rails)).</sub>
