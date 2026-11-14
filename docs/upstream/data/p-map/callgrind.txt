@@ -1,0 +1,28 @@
+# label|app|workload|mode|Ir per request|objects per request|YJIT blocks compiled in window (0 = JIT-flat)
+# AB1 = thomasklemm/allow-browser-verdict-cache 207a7827a7, MK1 = thomasklemm/message-encryptor-key-len 9b00915043, base = rails 50c54eed06; N=50 requests, GC off
+## AB1
+base|blog|GET article.json|interp|2612439|643|0
+base2|blog|GET article.json|interp|2613190|645|0
+candidate|blog|GET article.json|interp|2364907|482|0
+base|blog|GET article|interp|8874838|2014|0
+base|blog|GET article.json|yjit|1488644|644|0
+candidate|blog|GET article.json|yjit|1307833|483|0
+base2|blog|GET article|interp|8893873|2016|0
+base2|blog|GET article.json|yjit|1489864|644|0
+candidate|blog|GET article|interp|8633518|1851|0
+base|blog|GET article|yjit|5169158|2025|0
+base2|blog|GET article|yjit|5167578|2024|0
+candidate|blog|GET article|yjit|4984840|1864|0
+base|fizzy|GET card|interp|78505914|13105|0
+base2|fizzy|GET card|interp|78522519|13105|0
+candidate|fizzy|GET card|interp|78227320|12935|0
+base|fizzy|GET card|yjit|47716651|13199|19
+base2|fizzy|GET card|yjit|47633043|13196|25
+candidate|fizzy|GET card|yjit|47547653|13024|62
+## MK1
+base|blog|GET article|interp|8874970|2012|0
+base2|blog|GET article|interp|8882398|2013|0
+candidate|blog|GET article|interp|8885115|2010|0
+base2|blog|GET article|yjit|5154627|2024|0
+base|blog|GET article|yjit|5164117|2026|0
+candidate|blog|GET article|yjit|5154264|2021|0

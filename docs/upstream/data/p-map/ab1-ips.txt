@@ -1,0 +1,181 @@
+=== base yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.000k i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.820k (± 6.9%) i/s  (101.84 μs/i) -     50.000k in   5.091808s
+=== candidate yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     2.135k i/100ms
+Calculating -------------------------------------
+request with allow_browser     20.801k (± 6.1%) i/s   (48.07 μs/i) -    104.615k in   5.029298s
+=== base2 yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.016k i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.734k (± 4.9%) i/s  (102.74 μs/i) -     48.768k in   5.010288s
+=== base yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.013k i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.811k (± 6.5%) i/s  (101.93 μs/i) -     49.637k in   5.059430s
+=== candidate yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.746k i/100ms
+Calculating -------------------------------------
+request with allow_browser     20.966k (± 4.3%) i/s   (47.70 μs/i) -    106.506k in   5.079938s
+=== base2 yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   999.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser     10.207k (± 2.2%) i/s   (97.98 μs/i) -     51.948k in   5.089640s
+=== base yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.016k i/100ms
+Calculating -------------------------------------
+request with allow_browser     10.032k (± 4.0%) i/s   (99.69 μs/i) -     50.800k in   5.064018s
+=== candidate yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     2.037k i/100ms
+Calculating -------------------------------------
+request with allow_browser     12.314k (±17.5%) i/s   (81.21 μs/i) -     63.147k in   5.128190s
+=== base2 yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   792.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.670k (± 5.9%) i/s  (103.41 μs/i) -     49.104k in   5.078053s
+=== base yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   961.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.983k (± 4.3%) i/s  (100.17 μs/i) -     49.972k in   5.005645s
+=== candidate yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     2.204k i/100ms
+Calculating -------------------------------------
+request with allow_browser     21.214k (± 4.6%) i/s   (47.14 μs/i) -    107.996k in   5.090698s
+=== base2 yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   888.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      8.877k (±14.1%) i/s  (112.66 μs/i) -     45.288k in   5.101976s
+=== base yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     1.003k i/100ms
+Calculating -------------------------------------
+request with allow_browser      9.092k (±10.4%) i/s  (109.99 μs/i) -     46.138k in   5.074829s
+=== candidate yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser     2.015k i/100ms
+Calculating -------------------------------------
+request with allow_browser     18.113k (±12.4%) i/s   (55.21 μs/i) -     90.675k in   5.006156s
+=== base2 yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   997.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      8.471k (±14.3%) i/s  (118.05 μs/i) -     42.871k in   5.060786s
+=== base interp round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   480.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      3.757k (±23.9%) i/s  (266.19 μs/i) -     19.200k in   5.110849s
+=== candidate interp round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   613.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      7.173k (±17.2%) i/s  (139.42 μs/i) -     36.167k in   5.042273s
+=== base2 interp round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   393.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      3.595k (±17.6%) i/s  (278.17 μs/i) -     18.078k in   5.028797s
+=== base interp round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   493.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.836k (± 9.5%) i/s  (206.79 μs/i) -     24.650k in   5.097433s
+=== candidate interp round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   829.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      7.646k (±12.5%) i/s  (130.78 μs/i) -     38.963k in   5.095613s
+=== base2 interp round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   481.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.463k (±12.3%) i/s  (224.05 μs/i) -     22.607k in   5.065151s
+=== base interp round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   461.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.057k (±14.6%) i/s  (246.52 μs/i) -     20.284k in   5.000323s
+=== candidate interp round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   733.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      7.022k (±18.6%) i/s  (142.41 μs/i) -     35.184k in   5.010437s
+=== base2 interp round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   477.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.671k (±12.0%) i/s  (214.09 μs/i) -     23.373k in   5.003857s
+=== base interp round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   336.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.146k (±18.6%) i/s  (241.18 μs/i) -     21.168k in   5.105297s
+=== candidate interp round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   637.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      6.702k (±17.4%) i/s  (149.22 μs/i) -     33.761k in   5.037800s
+=== base2 interp round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   460.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.196k (±16.2%) i/s  (238.33 μs/i) -     21.160k in   5.043017s
+=== base interp round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   392.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.175k (±20.1%) i/s  (239.50 μs/i) -     21.168k in   5.069699s
+=== candidate interp round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   780.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      6.371k (±17.3%) i/s  (156.96 μs/i) -     31.980k in   5.019517s
+=== base2 interp round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+request with allow_browser   515.000 i/100ms
+Calculating -------------------------------------
+request with allow_browser      4.232k (±12.9%) i/s  (236.31 μs/i) -     21.630k in   5.111373s
+DONE

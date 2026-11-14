@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Run a command in a census copy with script/census's environment:
+#   [PMAP_RAILS=SPEC] bench/upstream/p_map/hx CORPUS APP CMD...  (SPEC as script/census --rails; default the copy's base)
+set -euo pipefail
+root=$(cd "$(dirname "$0")/../../.." && pwd)
+corpus=$1 app=$2; shift 2
+exec "$HOME/.local/share/mise/installs/ruby/4.0.9/bin/ruby" -e '
+  load ARGV.shift
+  corpus, app = ARGV.shift(2)
+  bin = Census.ruby_bin("4.0.9")
+  rails = ENV["PMAP_RAILS"].to_s != "" ? Census.resolve_rails(ENV["PMAP_RAILS"]) : Census.state(corpus, app).fetch("base")
+  gemfile = Census.variant(corpus, app, rails, bin)
+  dir = Census.app_dir(corpus, app)
+  env = Census.env_for(app, bin, rails, gemfile).merge("CENSUS_MODE" => ENV.fetch("CENSUS_MODE", "interpreter"))
+  Dir.chdir(dir) { exec(env, *ARGV) }
+' "$root/script/census" "$corpus" "$app" "$@"
