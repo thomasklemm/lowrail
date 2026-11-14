@@ -574,6 +574,18 @@ one click.
 * **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
   unreleased.
 
+## Nothing internal upstream (Thomas, 2026-11-14)
+
+What we post upstream (PR bodies, comments, issues, review replies) contains only what helps the people there decide
+on that PR or issue. Things that only concern us or Lowrail stay in Lowrail: our held or unopened branches and fixes
+as comparisons, our queue, slots and caps, our review passes and reviewer names, internal IDs (K1, L3, F1, census and
+round numbers), orbs, and our process. Upstream numbers describe the upstream code (main, the PR, a release), with
+setup in neutral words ("35 Rails workloads", not "census 9"). Before posting, check every column, row, link and
+sentence: would the reader miss it if it were gone? If not, drop it. Example: on ruby/ruby#17251 a table with a
+column for our held GC branch was deleted the same day, and only the master and #17251 numbers were kept, as an
+update to our earlier comment there. The `<sub>` footer that links the public record is the one sanctioned mention
+of Lowrail (see PR descriptions above) until Thomas decides otherwise.
+
 ## No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
 
 We don't comment on other people's PRs or issues (measurements, reviews, suggestions, thanks) unless Thomas has
