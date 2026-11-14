@@ -5,7 +5,7 @@ One file per prepared PR in `items/<ID>.md`: the metadata, the title and the bod
 [DECISIONS](../../../docs/DECISIONS.md#submission-queue-2026-11-03).
 
 ```
-script/pr-queue status          every item by state and rank: fork head, passes on it, diff size, mergeability, next step
+script/pr-queue status          every item by state and rank: fork head, passes on it, diff size, mergeability, base drift, next step
 script/pr-queue next            the highest-ranked reviewed item whose repo has room
 script/pr-queue open ID --draft opens it (rails/rails only as draft), records pr and state
 script/pr-queue ready ID        marks a draft ready for review; rails/rails: at most 15 non-draft
@@ -14,7 +14,9 @@ script/pr-queue sync            pulls draft/ready/merged/closed from GitHub
 
 Commit the item files after `open`, `ready` and `sync`. `status` keeps a blobless clone of each upstream repo under
 `.lowrail/pr-queue/` (fetched every run) to compare the fork branch with `head` and run `git merge-tree` against
-the current base.
+the current base. MERGE is `clean`, `CHANGELOG-only` (only CHANGELOG files conflict) or `CONFLICT`; `(gh)` marks
+GitHub's view when the fork branch couldn't be fetched. BASE-MOVED counts the base commits since `built_on` (or the
+merge base) that touch the PR's files, listed below the table: an early warning that upstream moved under it.
 
 ## Item file
 

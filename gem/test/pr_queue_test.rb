@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
+require "tmpdir"
 load File.expand_path("../../script/pr-queue", __dir__)
 
 class PrQueueTest < Minitest::Test
@@ -39,5 +40,46 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("head" => "aaaaaaaaaa")]), 216)
     assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("reason" => "")]), 216)
     assert_equal %w[sol], PrQueue.missing(item(passes.first(1)).merge("waived" => [waiver.merge("reviewer" => "sol")]), 40)
+  end
+
+  def test_diff_facts_name_the_conflicting_files_and_the_base_commits_on_the_pr_files
+    Dir.mktmpdir do |dir|
+      git = ->(*args) { PrQueue.run("git", "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", *args) }
+      commit = lambda do |files|
+        files.each { |path, text| File.write(File.join(dir, path), text) }
+        git.("add", "-A")
+        git.("commit", "-q", "-m", "c")
+        git.("rev-parse", "HEAD").first.strip
+      end
+      git.("init", "-q", "-b", "main")
+      built_on = commit.({ "CHANGELOG.md" => "old\n", "lib.rb" => "a\n", "other.rb" => "x\n", "test.rb" => "t\n" })
+      git.("checkout", "-q", "-b", "pr")
+      commit.({ "CHANGELOG.md" => "ours\nold\n", "lib.rb" => "b\n" })
+      git.("checkout", "-q", "main")
+      commit.({ "other.rb" => "y\n" })
+      commit.({ "test.rb" => "u\n" })
+
+      fact = PrQueue.diff_facts(git, "main", "pr", built_on)
+      assert_equal [true, [], 0, []], fact.values_at(:clean, :conflicts, :base_commits, :base_files)
+      assert_equal "clean", PrQueue.merge_label(fact, "CONFLICTING")
+
+      commit.({ "CHANGELOG.md" => "theirs\nold\n" })
+      fact = PrQueue.diff_facts(git, "main", "pr", built_on)
+      assert_equal [["CHANGELOG.md"], 1, ["CHANGELOG.md"]], fact.values_at(:conflicts, :base_commits, :base_files)
+      assert_equal "CHANGELOG-only", PrQueue.merge_label(fact, nil)
+
+      commit.({ "lib.rb" => "c\n" })
+      fact = PrQueue.diff_facts(git, "main", "pr", built_on)
+      assert_equal [%w[CHANGELOG.md lib.rb], 2], fact.values_at(:conflicts, :base_commits)
+      assert_equal "CONFLICT", PrQueue.merge_label(fact, nil)
+      assert_equal 2, PrQueue.diff_facts(git, "main", "pr", "").fetch(:base_commits)
+      assert_nil PrQueue.diff_facts(git, "main", "pr", "0000000000").fetch(:base_commits)
+    end
+  end
+
+  def test_without_a_fetched_branch_the_merge_state_comes_from_github
+    assert_equal "CONFLICT(gh)", PrQueue.merge_label({ error: "fetch: denied" }, "CONFLICTING")
+    assert_equal "clean(gh)", PrQueue.merge_label(nil, "MERGEABLE")
+    assert_equal "", PrQueue.merge_label(nil, "UNKNOWN")
   end
 end

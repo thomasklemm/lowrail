@@ -4,7 +4,7 @@
 # Upstream PR queue: one Markdown file per PR in bench/upstream/pr-queue/items, format and states in
 # bench/upstream/pr-queue/README.md. Rules: docs/DECISIONS.md, "Submission queue" and "Review gates".
 #
-#   script/pr-queue status         every item by state and rank, with fork head, passes and mergeability
+#   script/pr-queue status         every item by state and rank, with fork head, passes, mergeability and base drift
 #   script/pr-queue next           the highest-ranked reviewed item whose repo has room
 #   script/pr-queue open ID [--draft]
 #   script/pr-queue ready ID       mark a draft ready for review (rails/rails: at most 15 non-draft)
@@ -117,7 +117,7 @@ module PrQueue
   def our_open_prs(repo)
     query = <<~GRAPHQL
       query($q: String!) { search(query: $q, type: ISSUE, first: 100) { nodes { ... on PullRequest {
-        number isDraft
+        number isDraft mergeable
         comments(first: 50) { nodes { author { login } } }
         reviews(first: 50) { nodes { author { login } } } } } } }
     GRAPHQL
@@ -125,7 +125,7 @@ module PrQueue
             .dig("data", "search", "nodes")
     nodes.map do |pr|
       others = (pr["comments"]["nodes"] + pr["reviews"]["nodes"]).map { _1.dig("author", "login") }
-      { number: pr["number"], draft: pr["isDraft"],
+      { number: pr["number"], draft: pr["isDraft"], mergeable: pr["mergeable"],
         answered: others.any? { _1 && _1 != AUTHOR && !_1.end_with?("[bot]") } }
     end
   end
@@ -144,7 +144,7 @@ module PrQueue
   end
 
   # Live facts per item from a blobless bare clone of the upstream repo under .lowrail/pr-queue:
-  # fork head, diff size against the base, and whether it merges cleanly into the current base.
+  # fork head and the diff_facts against the current base.
   def facts(list)
     list.select { _1["branch"] }.group_by { _1["repo"] }.flat_map do |repo, group|
       dir = File.join(CACHE, "#{repo.tr('/', '-')}.git")
@@ -166,14 +166,32 @@ module PrQueue
         items.map do |item|
           fork_head = heads["refs/heads/#{item['branch']}"]
           next [item.id, { fork_head: nil }] unless fork_head
-          base = "refs/heads/#{item['base'] || 'main'}"
-          stat, = git.("diff", "--shortstat", "#{base}...#{fork_head}")
-          lines = stat.scan(/(\d+) (?:insertion|deletion)/).flatten.sum(&:to_i)
-          _, conflict = git.("merge-tree", "--write-tree", "--quiet", base, fork_head)
-          [item.id, { fork_head:, lines:, clean: conflict.nil? }]
+          [item.id, { fork_head:, **diff_facts(git, "refs/heads/#{item['base'] || 'main'}", fork_head, item["built_on"]) }]
         end
       end
     end.to_h
+  end
+
+  # Diff size, the files that conflict with the base, and the base commits since built_on (else the merge base)
+  # that touch the PR's files: an early warning that upstream moved under it, not a conflict.
+  def diff_facts(git, base, head, built_on)
+    stat, = git.("diff", "--shortstat", "#{base}...#{head}")
+    lines = stat.scan(/(\d+) (?:insertion|deletion)/).flatten.sum(&:to_i)
+    out, conflict = git.("merge-tree", "--write-tree", "--name-only", "--no-messages", base, head)
+    files = git.("diff", "--name-only", "#{base}...#{head}").first.split("\n")
+    since = built_on.to_s.empty? ? head : built_on
+    count, err = files.empty? ? ["0", nil] : git.("rev-list", "--count", base, "^#{since}", "--", *files)
+    touched = files.empty? || err ? [] : git.("diff", "--name-only", since, base, "--", *files).first.split("\n")
+    { lines:, clean: conflict.nil?, conflicts: conflict ? out.lines.drop(1).map(&:chomp).reject(&:empty?) : [],
+      base_commits: err ? nil : count.to_i, base_files: touched }
+  end
+
+  def changelog_only?(fact) = fact[:conflicts].any? && fact[:conflicts].all? { File.basename(_1).start_with?("CHANGELOG") }
+
+  def merge_label(fact, mergeable)
+    if fact&.key?(:clean) then fact[:clean] ? "clean" : (changelog_only?(fact) ? "CHANGELOG-only" : "CONFLICT")
+    else { "MERGEABLE" => "clean(gh)", "CONFLICTING" => "CONFLICT(gh)" }.fetch(mergeable, "")
+    end
   end
 
   def deps_problem(item, by_id)
@@ -208,7 +226,9 @@ module PrQueue
     when "ready" then "awaiting maintainers"
     else
       return "fork moved to #{fact[:fork_head][0, 10]}: update head, review again" if moved
-      return "rebase: conflicts with #{item['base'] || 'main'}" if fact && fact[:clean] == false
+      if fact && fact[:clean] == false
+        return "rebase: #{changelog_only?(fact) ? 'only CHANGELOG conflicts' : 'conflicts'} with #{item['base'] || 'main'}"
+      end
       return "review: #{gaps.join(', ')} on this head" unless gaps.empty?
       return "push the branch to #{item.fork}" if fact && !fact[:fork_head]
       { "built" => "review", "in-review" => "set state: reviewed", "reviewed" => deps_problem(item, by_id) || "open",
@@ -221,8 +241,10 @@ module PrQueue
     list.each { |item| (p = problems(item)).empty? || warn("#{item.id}: #{p.join('; ')}") }
     by_id = list.to_h { [_1.id, _1] }
     live = facts(list.reject { %w[merged closed superseded].include?(_1["state"]) })
+    mergeable = {}
     list.map { _1["repo"] }.uniq.sort.each do |repo|
       prs = our_open_prs(repo)
+      prs.each { mergeable[[repo, _1[:number]]] = _1[:mergeable] }
       puts "#{repo}: #{prs.size} open, #{prs.count { !_1[:draft] }} non-draft; " \
            "room: #{room(repo, prs) || 'yes'}#{", ready: #{room(repo, prs, ready: true) || 'yes'}" if repo == 'rails/rails'}"
     end
@@ -234,13 +256,17 @@ module PrQueue
              elsif same_sha?(fact[:fork_head], item["head"]) then "=" else fact[:fork_head][0, 10] end
       on_head = Array(item["passes"]).select { same_sha?(_1["head"], item["head"]) }
       passes = on_head.map { "#{_1['reviewer']}:#{_1['verdict']}" }.uniq.join(" ")
-      merge = fact&.key?(:clean) ? (fact[:clean] ? "clean" : "CONFLICT") : ""
+      moved = fact&.key?(:base_commits) ? (fact[:base_commits]&.to_s || "?") : ""
       [item["state"], item["rank"].to_s, item.id, item["repo"], item["pr"].to_s, head, fork,
-       fact&.[](:lines).to_s, merge, passes, next_step(item, fact, by_id)]
+       fact&.[](:lines).to_s, merge_label(fact, mergeable[[item["repo"], item["pr"]]]), moved, passes,
+       next_step(item, fact, by_id)]
     end
-    header = %w[STATE RANK ID REPO PR HEAD FORK LINES MERGE PASSES-ON-HEAD NEXT]
+    header = %w[STATE RANK ID REPO PR HEAD FORK LINES MERGE BASE-MOVED PASSES-ON-HEAD NEXT]
     widths = header.each_index.map { |i| ([header] + rows).map { _1[i].size }.max }
     ([header] + rows).each { |row| puts row.each_with_index.map { |cell, i| cell.ljust(widths[i]) }.join("  ").rstrip }
+    drift = live.select { |_, fact| fact[:base_commits].to_i.positive? }
+    puts "\nBase commits since built_on on the PR's files:" unless drift.empty?
+    drift.sort.each { |id, fact| puts "  #{id}: #{fact[:base_commits]} on #{fact[:base_files].join(', ')}" }
   end
 
   def candidates
