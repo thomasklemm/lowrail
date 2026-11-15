@@ -124,3 +124,8 @@ answers.
 - #59675's red Buildkite run is on a docs-only diff.
 - Side finding: the queue item CW1 still says `ready`, but #59642 merged on 11-13 (skipkayhil). `script/pr-queue sync`
   will update it.
+
+## Applied 2026-11-15 (Thomas: "priorisiere selbst")
+
+To draft: #59671, #59675, #59621, #59617, #59574. To ready: #59565, #59809, #59811, #59810, making 14 ready. Slot 15 is
+held for VB1 #59803 once its rebased head is green; K6 #59804 takes the next slot that frees.

@@ -14,7 +14,7 @@ alternative_of:
 impact: "Every request of every app with Active Record at the default info log level runs \"query\".pluralize(count) for its Completed line when the count isn't 1 (43k interpreter instructions, 6 objects a call). Whole request, Callgrind interpreter: new app's JSON bare request -3.84% (A/A -0.03%), JSON show with 2 queries -1.03%, HTML bare page -1.77% (A/A -0.59%), HTML show -0.92%; 6 fewer objects. Vernier YJIT: the pluralize is about 2% of a new API app's bare JSON request. benchmark-ips on log_process_action 245.1k -> 792.6k i/s (3.2x, YJIT, best of 5, A/A -2.5%). Lifetime: Rails main, 8.x and 7.2; runs on every Ruby."
 rank: 14
 risky: false
-state: draft
+state: ready
 pr: 59809
 note: "DEF8 (docs/upstream/rails8-defaults.md). Unchanged for counts 0..2000 under default inflections; differs only for an app whose English inflections pluralize \"query\" differently: an irregular or uncountable for it, or a generic rule such as /y$/ (log text). Optional, not done: a 2-query test case (the mutant zero? ? \"queries\" : \"query\" passes the suite). Not yet run: the micro on Ruby master x ZJIT (no master build in the DEF8 orb). Suites: actionview test:integration:active_record 177 runs 0 failures; controller_runtime_test 5 runs."
 passes:
