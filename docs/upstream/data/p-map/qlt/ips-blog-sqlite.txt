@@ -1,0 +1,54 @@
+=== censusqlt blog GET article none/on/0 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    514.915 (± 7.6%) i/s    (1.94 ms/i) -      2.597k in   5.043549s
+=== censusqlt blog GET article default/off/0 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=off cache=0    508.389 (± 4.5%) i/s    (1.97 ms/i) -      2.544k in   5.004038s
+=== censusqlt blog GET article default/on/0 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=on cache=0    480.650 (±11.9%) i/s    (2.08 ms/i) -      2.438k in   5.072302s
+=== censusqlt blog GET article request_id/off/1 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=off cache=1    498.647 (± 8.8%) i/s    (2.01 ms/i) -      2.538k in   5.089777s
+=== censusqlt blog GET article request_id/on/1 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=on cache=1    414.117 (±15.0%) i/s    (2.41 ms/i) -      2.106k in   5.085523s
+=== censusqlt blog GET article none/on/0 aa round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    421.556 (±19.9%) i/s    (2.37 ms/i) -      2.115k in   5.017126s
+=== censusqlt blog GET article none/on/0 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    447.315 (±12.1%) i/s    (2.24 ms/i) -      2.244k in   5.016602s
+=== censusqlt blog GET article default/off/0 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=off cache=0    445.521 (±12.6%) i/s    (2.24 ms/i) -      2.242k in   5.032313s
+=== censusqlt blog GET article default/on/0 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=on cache=0    349.829 (±28.0%) i/s    (2.86 ms/i) -      1.750k in   5.002438s
+=== censusqlt blog GET article request_id/off/1 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=off cache=1    377.760 (±18.0%) i/s    (2.65 ms/i) -      1.891k in   5.005823s
+=== censusqlt blog GET article request_id/on/1 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=on cache=1    364.151 (±18.7%) i/s    (2.75 ms/i) -      1.855k in   5.094036s
+=== censusqlt blog GET article none/on/0 aa round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    468.743 (±11.3%) i/s    (2.13 ms/i) -      2.360k in   5.034738s
+=== censusqlt blog GET article none/on/0 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    500.235 (± 7.4%) i/s    (2.00 ms/i) -      2.538k in   5.073618s
+=== censusqlt blog GET article default/off/0 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=off cache=0    489.312 (± 6.1%) i/s    (2.04 ms/i) -      2.448k in   5.002941s
+=== censusqlt blog GET article default/on/0 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article default ps=on cache=0    439.920 (±12.5%) i/s    (2.27 ms/i) -      2.223k in   5.053196s
+=== censusqlt blog GET article request_id/off/1 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=off cache=1    474.551 (± 8.2%) i/s    (2.11 ms/i) -      2.401k in   5.059515s
+=== censusqlt blog GET article request_id/on/1 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article request_id ps=on cache=1    415.065 (±14.9%) i/s    (2.41 ms/i) -      2.112k in   5.088365s
+=== censusqlt blog GET article none/on/0 aa round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+GET article none ps=on cache=0    506.615 (± 8.5%) i/s    (1.97 ms/i) -      2.550k in   5.033410s

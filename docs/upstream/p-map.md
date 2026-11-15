@@ -119,9 +119,10 @@ Share of the Puma threads' CPU samples.
 
 Only 9–20% of CPU is in YJIT's own code, and 18–32% is in VM dispatch and the interpreter (calls YJIT hands back to
 the VM, side exits, and code it didn't compile). Allocation, malloc and GC together are 17–23%, so allocations cut
-anywhere pay twice. SQLite itself is small except in Lobsters, where query log tags turn prepared statements off
-(Rails does that when `query_log_tags_enabled` is set and `disable_prepared_statements` is left unset), so every
-query is compiled again.
+anywhere pay twice. SQLite itself is small except in Lobsters, whose story and home pages compile most of their
+queries on every request: 13 of 29 on the story page because Arel marks them unpreparable (`IN` lists, SQL
+fragments), the rest because query log tags turn prepared statements off. Turning them back on doesn't make
+Lobsters cheaper (see [Query log tags and prepared statements](#query-log-tags-and-prepared-statements-qlt)).
 
 ## Mechanisms
 
@@ -162,7 +163,7 @@ Ranked by mean share across the five apps, which already weighs reach (an app th
 |---|---|---|---|---|
 | 1 | AR query building: relations, scoping, Arel, predicate builder | 10.9%; 5 | inherent: flat, the largest method (`Delegation::ClassMethods#create`) is 0.42% and nothing else is above 0.35% | — |
 | 2 | GC (plus allocation and malloc in native) | 7.6%; 5 | inherent; the lever is fewer objects, as in AB1 (−161 objects per request) | via allocation cuts such as AB1 |
-| 3 | Database driver (C) and SQLite step/compile | 7.3%; 5 | covered for row decoding (sqlite3-ruby #769, #770 open); Lobsters' 5.1% compile is its own config (query log tags without `disable_prepared_statements = false`) | Lobsters: up to 5% by app config |
+| 3 | Database driver (C) and SQLite step/compile | 7.3%; 5 | covered for row decoding (sqlite3-ruby #769, #770 open); Lobsters' 5.1% compile is mostly queries Arel can't prepare, and prepared statements would cost it more than the compiles that query log tags add ([QLT](#query-log-tags-and-prepared-statements-qlt)) | — |
 | 4 | Puma request parse and response write | 4.4%; 5 (Blog 11) | inherent: socket syscalls, header formatting; no method above 0.6% | — |
 | 5 | Campfire's `InlineScriptHashes` (Nokogiri parse, `URI` split) | 3.7% mean (Campfire 18%); 1 | app code | — |
 | 6 | Logging and instrumentation: `Event` clocks (1.2), structured-event handlers (1.0) | 3.4%; 5 | covered: rails#58957 (silence Action Controller and Active Job handlers nobody consumes) and rails#59717 (skip `source_location`) are open; Fizzy's 3% are SQL events it consumes on purpose (`Rails.event.debug_mode`) | 0.5–1.4% in Blog, Campfire |
@@ -287,6 +288,114 @@ article request it is inside the Callgrind A/A noise (interpreter: base 8,874,97
 −0.18%, MK1 −0.19%; −2 objects), so the
 item is `held`, not `built`: not worth a reviewer's time on its own.
 
+## Query log tags and prepared statements (QLT)
+
+P-MAP first listed Lobsters' SQLite compiles (5.1% inclusive) as a cost of its own config: it enables query log tags,
+and Rails then turns prepared statements off. QLT (2026-11-15) asked whether Rails could do better for every app
+that enables query log tags in production. **Verdict: no change in Rails.** Keeping prepared statements on for
+low-cardinality tags was proposed and rejected in 2025, the explicit opt-out exists since July 2026, and the
+measurements below don't argue for reopening it: re-enabling prepared statements saves 0.6–0.7% of a small SQLite
+request and 60–160 µs of PostgreSQL server CPU per two queries, but costs Lobsters 2.2% and the PostgreSQL client
+about 1%. Nothing was built, and there's no queue item.
+
+**What Rails does** (main [50c54eed06](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/railtie.rb#L418)).
+With `query_log_tags_enabled`, the Active Record railtie sets `ActiveRecord.disable_prepared_statements = true`
+unless the app set `config.active_record.disable_prepared_statements` itself (false keeps them). Every adapter then
+reports `prepared_statements` false:
+
+* SQLite prepares each statement, runs it and closes it; nothing goes into the statement pool
+  ([`perform_query`](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb#L119-L125)).
+* PostgreSQL sends `send_query_params`/`send_query` (the unnamed statement, parsed and planned every time) instead of
+  a named prepared statement ([`perform_query`](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb#L185-L217)).
+  In both, Arel quotes the values into the SQL instead of binding them.
+* MySQL is unaffected: mysql2 has prepared statements off by default
+  ([`default_prepared_statements`](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/connection_adapters/abstract_mysql_adapter.rb#L813-L815)),
+  and Trilogy doesn't support them at all ([raises](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/connection_adapters/trilogy_adapter.rb#L100-L101)).
+
+The comment goes into the SQL text, so with prepared statements on each distinct comment is its own statement in the
+pool (1,000 per connection, oldest evicted first). The default tags are `application` (constant), `controller` and
+`action` (per action, added by Action Controller's railtie) and `job` (per job class). Custom taggings are procs
+whose cardinality Rails can't know; a `request_id` tag changes on every request. `cache_query_log_tags`
+only keeps the built comment string until the execution context changes
+([`comment`](https://github.com/rails/rails/blob/50c54eed065b8bfb1b0bbb5fa770c859baa98f9b/activerecord/lib/active_record/query_logs.rb#L282-L293));
+it doesn't touch statements.
+
+**Why, and what was discussed.** No open issue or PR (searched 2026-11-15).
+
+* [rails#48398](https://github.com/rails/rails/issues/48398) (byroot, 2023-06): Marginalia disabled prepared
+  statements on purpose, because with query logs "each query has a high chance to be unique".
+  [rails#48631](https://github.com/rails/rails/pull/48631) (zzak, merged 2023-07-03) did the same in Rails.
+* [rails#54492](https://github.com/rails/rails/pull/54492) (2025-02): a guides warning about the cost. byroot: "The
+  performance impact really isn't that bad, and if anything, production is really where query logs are important."
+  Merged as a plain note.
+* [rails#56153](https://github.com/rails/rails/pull/56153) (2025-11-13, closed the next day): stop disabling
+  prepared statements because the default tags have few combinations. zzak: "You can still enable them yourself
+  … Don't see the need for a new default"; byroot: "It's just too much of a footgun, and as @zzak said, this is just a
+  safe default, you can perfectly have both enabled if you know what you are doing." This is the "keep them for
+  request-invariant tags" option, rejected deliberately.
+* [rails#58274](https://github.com/rails/rails/pull/58274) (merged by byroot 2026-07-31): an explicit
+  `disable_prepared_statements = false` is respected; byroot preferred that to a new config value.
+  [rails#58707](https://github.com/rails/rails/pull/58707) fixed the guides' spelling of the key. The guides entry
+  for `query_log_tags_enabled` now documents the opt-out and warns about high-cardinality tags.
+
+**Measurements.** Rails main 50c54eed06, Ruby 4.0.9, Blog `GET /articles/:id` (2 queries) on SQLite and on
+PostgreSQL 17 (same app, primary database moved to PG), and Lobsters' story page (29 queries) on SQLite. Settings:
+no tags; the default tags (`application`, `controller`, `action`, `job`); the default tags plus a `request_id`
+tag; each with prepared statements off (Rails' default) or on (the opt-out), and with or without
+`cache_query_log_tags`. Tooling in [`bench/upstream/qlt/`](../../bench/upstream/qlt/), raw output in
+[`data/p-map/qlt/`](data/p-map/qlt/).
+
+Callgrind instructions per request through the full Rack stack (fixed heap, A/A, `ir.sh`), change against no tags:
+
+| Workload | Mode | no tags | A/A | default, off | default, on | default + `request_id`, off | default + `request_id`, on |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Blog article, SQLite | YJIT | 5,166,385 | −0.09% | +1.57% (cached tags +1.22%) | +0.84% (cached +0.60%) | +1.45% | +3.81% |
+| Blog article, PG (client) | YJIT | 5,224,878 | +0.04% | +0.20% | +1.17% | −0.08% | +1.16% |
+| Lobsters story, SQLite | interpreter | 106,292,427 | +0.01% | −1.95% | +0.24% | −1.86% | +2.54% |
+
+(`request_id` cells and the Lobsters cells use cached tags. Every YJIT window compiled 0 blocks. Lobsters under
+YJIT is rejected, not rerun: its windows compiled 10,322 and 10,336 blocks.)
+
+* **Blog on SQLite:** prepared statements save 0.6–0.7% of the request with the default tags.
+* **PostgreSQL client:** prepared statements cost about 1% on the client.
+  Server CPU per request (backend `schedstat`, 1,500 requests, three rounds, range) is 170–178 µs with
+  them on and 237–342 µs off with the default tags, so 60–160 µs of parse and plan for two queries. On the
+  articles index, where one of three queries is preparable, the ranges overlap (331–404 vs 291–461 µs).
+* **Lobsters:** prepared statements make the story page 2.2% *more* expensive. A split by object (`split.sh`,
+  interpreter) puts the 16 extra compiles with them off at only +0.33 M instructions in SQLite and the driver
+  (2.51 M → 2.84 M), while everything else drops by 2.69 M (105.24 M → 102.55 M). With them on the page carries
+  137 binds, which are type-cast and bound instead of quoted into the SQL (`binds.rb`); that path, not
+  compiling, is where Lobsters pays. The wall-time probe agrees on the compiles' size: 617–735 µs of `prepare` per
+  page with prepared statements on and 1,064–1,133 µs off, out of about 25 ms.
+* **`request_id`:** the worst cell everywhere. With prepared statements on every request prepares new statements,
+  fills the pool to its limit (1,000 on Lobsters) and evicts, which costs more than leaving them off
+  (Blog +3.81% vs +1.45%; PG server 419–468 µs vs 281–331 µs). This is the footgun the default guards against.
+* **Statement cache:** with the default tags and prepared statements on, Blog reuses both statements on every
+  request and Lobsters 16 of 29. The other 13 compile every time regardless, because Arel marks `IN` lists and SQL
+  fragments unpreparable (rails#58839 and rails#57694 are open on those). Across every census workload run three
+  times, the default tags grow the primary pool from 49 to 81 statements in Lobsters and from 8 to 11 in Blog, far
+  below the limit.
+
+benchmark-ips under YJIT (one request in-process, core 1, best of 3, `ips_matrix.sh`) is too noisy on this orb to
+add anything: A/A −1.6% (Blog SQLite), −9.2% (Blog PG) and −2.5% (Lobsters), with ±4–33% within rounds. For
+Lobsters its direction matches Callgrind (default tags: off 45.8 i/s, on 40.7 i/s, no tags 45.0).
+
+**Options weighed.**
+
+* *Keep prepared statements when the tags only vary by controller and action.* That's rails#56153, rejected as a
+  footgun. Rails can't tell a custom tagging proc's cardinality, so a default that depends on it isn't exact either.
+  And the measured gain is small on SQLite and negative on Lobsters and the PG client.
+* *Reuse one statement per query and ignore the comment.* Not exact: the database would report the tags of
+  whichever request prepared the statement, which defeats the feature. Comments can't be bind parameters.
+* *A bounded cache of statements per comment value.* That's the existing statement pool, and with per-request
+  tags it thrashes (the `request_id` cells).
+* *Document a recommendation.* Already in the guides since rails#58274 and rails#58707: the opt-out, and a warning
+  against high-cardinality tags.
+
+What's left for an app is its own choice: an app on PostgreSQL with only the default tags can set
+`config.active_record.disable_prepared_statements = false` to save the server's parse and plan. Lobsters
+shouldn't: on SQLite it's cheaper as it is.
+
 ## What it means for the next bets
 
 * The real-world lever in Rails isn't a method, it's allocation volume and the VM share under YJIT: 18–32% of
@@ -294,5 +403,5 @@ item is `held`, not `built`: not worth a reviewer's time on its own.
   the Fizzy and Mastodon request paths (which calls go back to the VM, and why) is the next map to draw.
 * Query building is flat at the method level. Further work there needs a structural change (fewer relation
   copies per query, or caching the built Arel for repeated association scopes), not micro patches.
-* App-level findings worth telling the apps, not Rails: Lobsters' query log tags cost about 5% in SQLite compiles,
-  and Campfire's response parsing costs about a fifth of each HTML request.
+* App-level finding worth telling the app, not Rails: Campfire's response parsing costs about a fifth of each HTML
+  request. Lobsters' query log tags, first listed here too, don't cost it anything (QLT).

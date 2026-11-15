@@ -1,0 +1,4 @@
+{"app":"lobsters","tags":"none","workloads":11,"statements":{"primary":49,"queue":0,"cache":2,"rack_attack":0}}
+{"app":"blog","tags":"none","workloads":10,"statements":{"primary":8,"cable":0,"queue":0,"cache":0}}
+{"app":"lobsters","tags":"default","workloads":11,"statements":{"primary":81,"queue":0,"cache":4,"rack_attack":0}}
+{"app":"blog","tags":"default","workloads":10,"statements":{"primary":11,"cable":0,"queue":0,"cache":0}}
