@@ -1,5 +1,7 @@
 # F1: small-Hash lookups on Ruby master, the fix (2026-11-14)
 
+**Closed 2026-11-15 in favor of byroot's [ruby/ruby#19905](https://github.com/ruby/ruby/pull/19905)** (merged as `476dfcd238`): it checks for the identical key before `ar_equal` with a `NOINLINE` slow path, the same fix, and also lets `ar_equal` inline again. The F1 PR [ruby/ruby#19899](https://github.com/ruby/ruby/pull/19899) is closed with Thomas's OK; the record below is kept as it was.
+
 A lookup in a small Hash (`h[:b]` on three Symbol keys) runs 333 instructions on master against 287 on 4.0.9,
 bisected to ruby/ruby#18222 (byroot, SWAR `ar_find_entry_hint`) and ruby/ruby#18476 (Peter Zhu, AR-table identity
 hashes).
