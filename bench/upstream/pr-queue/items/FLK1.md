@@ -33,11 +33,15 @@ passes:
 
 # Fix two causes of intermittent CI failures
 
-While going through two months of Buildkite failures on main, and on pull requests whose failing job had nothing to do with their change, I found two causes that keep turning builds red: one in Action Pack's Server-Timing tests and one in the Active Record Ractor connection proxy. Each costs a contributor a rerun and a reviewer a look at a failure their change didn't cause. Each commit explains its cause.
+While going through two months of Buildkite failures on main, and on pull requests whose failing job had nothing to do with their change, I found two causes that keep turning builds red. Each costs a contributor a rerun and a reviewer a look at a failure their change didn't cause.
 
-| Test | Cause | Failing before | After |
-|---|---|---:|---:|
-| `ServerTimingTest`, the nested and sibling event tests | compared the header with `sleep` lengths under fixed tolerances | 189/200 | 0/200 |
-| `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor) | on unpin, the Ractor proxy looked the main pool up again by name, role and pool token and unpinned nothing, so the writing pool stayed pinned for later tests | 15/120 | 0/120 |
+The nested and sibling event tests in `ServerTimingTest` compared the header with `sleep` lengths under fixed tolerances, so a busy machine failed them. They now compare it with the events it comes from.
 
-The counts come from repeated runs that make each failure likely: the Server-Timing tests on two CPUs shared with four busy processes, and the async test together with the two tests that set it up, in random order. Only the second commit changes library code: the proxy now unpins the main pool it pinned, as `ConnectionPool` itself does.
+In `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor), the Ractor connection proxy looked the main pool up again by name, role and pool token on unpin and unpinned nothing, so the writing pool stayed pinned for later tests. The proxy now unpins the main pool it pinned, as `ConnectionPool` itself does. This is the only change to library code; each commit explains its cause.
+
+| Test | Failing before | After |
+|---|---:|---:|
+| `ServerTimingTest`, nested and sibling events | 189/200 | 0/200 |
+| `AsynchronousQueriesTest`, connection failure retry | 15/120 | 0/120 |
+
+The counts come from repeated runs that make each failure likely: the Server-Timing tests on two CPUs shared with four busy processes, and the async test together with the two tests that set it up, in random order.
