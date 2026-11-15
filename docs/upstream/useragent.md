@@ -266,7 +266,9 @@ exact (their own AppleCoreMedia probes: 8 and 5 user agents, plain and mutated, 
 the specs green, and one new must-fix: the rebuilt commits had picked up an `Amp-Thread-ID` trailer from a commit
 hook. The final head `ebafb56` is the same four commits rebuilt with `git commit-tree`: the same tree, no trailers,
 and the SHA both reviewers built when they tried the fix. Their nits are applied too (the record's Ruby 2.3 sentence,
-the `to_ary` boundary, the AppleCoreMedia edge case in the probe).
+the `to_ary` boundary, the AppleCoreMedia edge case in the probe). **Both final passes approve `ebafb56`** with no
+must-fix: the patches build it, no trailers, the tree equals `3a0896a`'s, the probe gives 20,622 identical lines (md5
+`90d2620d…`) with the AppleCoreMedia mutant caught, and the specs pass.
 
 ## Scripts
 
