@@ -84,6 +84,9 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   ideas."). An idea is taken only if its own issue has an assignee or an open PR exists (e.g. ruby/ruby#18326 for
   sendforward). A name in the assignee column of a tracker table (e.g. Shopify/ruby#1039's rows) also counts as taken:
   check it before building. Lead 7 was built and then found to be row 7, assigned to k0kubun, so it stays unopened.
+* **Rails doesn't take JIT workarounds** (skipkayhil closing rails/rails#59803 and #59811, 2026-11-15: "Let's fix
+  this in the JITs?"). A Rails change whose win comes mainly from how YJIT or ZJIT compile a construct (Symbol block
+  args, `!=`) goes to the JIT instead. Rails perf PRs need a clear win in the interpreter or in allocations on their own.
 * **YJIT is in maintenance mode** (XrXr on
   [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916); k0kubun on
   [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897)). JIT performance and

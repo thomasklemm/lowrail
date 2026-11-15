@@ -129,3 +129,9 @@ answers.
 
 To draft: #59671, #59675, #59621, #59617, #59574. To ready: #59565, #59809, #59811, #59810, making 14 ready. Slot 15 is
 held for VB1 #59803 once its rebased head is green; K6 #59804 takes the next slot that frees.
+
+## 2026-11-15, afternoon
+
+skipkayhil closed VB1 #59803 and TE2 #59811 ("Let's fix this in the JITs?"). FLK1 #59812 went ready once its CI was
+green (Thomas). MB1 #59810 was briefly drafted for the slot before the closes were noticed and is ready again. That
+leaves 14 ready and one free slot; K6 #59804 is next in line, held until Thomas decides given the two closes.
