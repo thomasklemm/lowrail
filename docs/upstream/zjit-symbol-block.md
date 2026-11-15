@@ -514,13 +514,16 @@ x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
 * **Boxes:** under `RUBY_BOX=1` a send is specialized until the first `Ruby::Box.new` (271 conversion calls for
   300 sends); none of 600 later sends is, including sends in a method compiled before the box.
 * **No CI on the fork:** `thomasklemm/ruby` runs no workflows for the branch.
-* **Rails suites** (Rails main `8217632cf8`, release build of commit 1, `SEED=1`, verbose): Active Model has
-  1,272 runs, 5,636 assertions, 0 failures and 1 error both without ZJIT and with `RUBYOPT=--zjit`, and the same
-  outcome for each of the 1,268 tests the verbose logs list (the error is the Ractor and minitest-mock problem that ARM1 sees with ZJIT off too).
-  Active Record on SQLite ran on the first head `dcd4bd2b79` only: 10,375 runs, 0 failures and 5 environment
-  errors in the interpreter; under ZJIT the run was killed by the orb's memory limit in a forking test, which
-  also happened once in the interpreter, so that run says nothing about ZJIT. Both Active Record runs on the final
-  code were started after the timing runs and belong here when they finish. Action View was not run.
+* **Rails suites** (Rails main `8217632cf8`, release build of commit 1, `SEED=1`, verbose, without ZJIT and with
+  `RUBYOPT=--zjit`, compared per test with `rails_suites_cmp.rb`):
+  * Active Model: 1,272 runs, 5,636 assertions, 0 failures, 1 error in both modes, and the same outcome for each
+    of the 1,268 tests the verbose logs list. The error is the Ractor and minitest-mock problem that ARM1 sees with
+    ZJIT off too.
+  * Active Record on SQLite: 10,374 runs, 37,012 assertions, 0 failures, 5 errors, 52 skips in both modes, and the
+    same outcome for each of the 10,367 tests the logs list. The errors are the orb's: no `sqlite3` command-line
+    tool and no `pg` gem. `forked_child_recovers` is excluded: on the first head a run was killed there by the
+    orb's memory limit, once under ZJIT and once in the interpreter.
+  * Action View was not run.
 
 ### Numbers on the final code
 
@@ -728,8 +731,9 @@ Legend:
 **App page via Callgrind.** Not measured on the final code as a whole program. From the counts and ceilings above
 and the per-call saving, the expected effect is 0.2% to 0.5% of an iteration's instructions on railsbench,
 lobsters, shipit and the blog page (ISEQ ceiling × 343/380 plus C ceiling × 294/360); this is an estimate, not a
-measurement. Whole-program runs of the branch on the four workloads are queued in the orb (`~/w/cgnar3`) and
-belong in this section when they finish.
+measurement. Whole-program runs of the branch on the four workloads were started in the orb after the
+suites (`~/w/cgnar3`, 25 to 75 minutes each, with the build of `141cdfde1f`, whose generated code is that of
+`656ae95dbc`) and belong in this section when they finish.
 
 ### Reviews
 
