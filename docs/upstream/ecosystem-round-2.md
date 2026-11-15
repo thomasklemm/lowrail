@@ -171,5 +171,5 @@ SchemaContext::MappedTable") at `eabd9f003f` still counts 4. Not reported.
   `invert_create_function(args)` (read from source, not run). Neither scenic's default branch nor its tracker has
   a fix or report yet. **Reported 2026-11-04 as [scenic#466](https://github.com/scenic-views/scenic/issues/466)** (Thomas's OK).
 * **R2-3** changes what every lograge user sees in their logs on upgrade. The Rails PR calls the old subscribers
-  private API, so it is the gem's change to make; lograge has no issue or PR for it yet. **Reported 2026-11-04 as [lograge#407](https://github.com/roidrage/lograge/issues/407)** (Thomas's OK).
+  private API, so it is the gem's change to make; lograge has no issue or PR for it yet. **Reported 2026-11-04 as [lograge#407](https://github.com/roidrage/lograge/issues/407)** (Thomas's OK). **Closed as completed 2026-11-14 21:32 UTC** by johnnagro, fixed by his lograge#412 ("Remove Rails' event reporter log subscribers on Rails 8.2+", merge commit a0721ae5a3).
 * No comment was posted anywhere; any comment on these gems' trackers needs Thomas's approval.
