@@ -751,16 +751,23 @@ Legend:
 * Per iteration the apps lose about 43,000 (railsbench), 29,000 (lobsters) and 59,000 (shipit) dynamic sends,
   from the stats diff over 25 iterations.
 
-**App page via Callgrind.** Not measured on the final code as a whole program. From the counts and ceilings above
-and the per-call saving, the expected effect is 0.2% to 0.5% of an iteration's instructions on railsbench,
-lobsters, shipit and the blog page (ISEQ ceiling × 343/380 plus C ceiling × 294/360); this is an estimate, not a
-measurement. Whole-program runs of the branch on the four workloads were started in the orb after the
-suites (`~/w/cgnar3`, 25 to 75 minutes each, with the build of `141cdfde1f`, whose generated code is that of
-`656ae95dbc`) and belong in this section when they finish.
+**App page via Callgrind.** Measured as whole programs on railsbench, lobsters, shipit and the blog page, on
+master, on master again for the A/A, and on the branch (the release build of `141cdfde1f` plus the measurement
+patch, whose generated code is that of the ZJIT commit `8aedcce4ca`, `656ae95dbc` before the split). In whole-program
+instructions per iteration the branch is
 
-**Whole-program runs, as they finish** (Callgrind with `--zjit`, `RUBY_GC_HEAP_INIT_BYTES=33554432`, 150 warmup
-iterations, then windows of 2 iterations; master, master again for the A/A, and the branch build above; read with
-`zs1_report.rb cg`). A cell counts only when every window passes the JIT-flat gate; a cell that fails is recorded as
+* 0.49% below master on railsbench (0.55% below master again; the two master runs differ by 0.059%),
+* 0.42% below master on lobsters (0.32% below master again; A/A 0.094%),
+* 0.46% below the one master run with the same GC count on shipit, where the two master runs hold different
+  numbers of GCs and give no usable A/A,
+* and not measured on the blog page, whose three cells all fail the JIT-flat gate.
+
+So the three benchmark apps have a result and the app page does not. These runs replace the earlier estimate of
+0.2% to 0.5% from the ceilings; railsbench against master again is just above it.
+
+**Whole-program runs** (Callgrind with `--zjit`, `RUBY_GC_HEAP_INIT_BYTES=33554432`, 150 warmup
+iterations, then windows of 2 iterations; read with `zs1_report.rb cg`; outputs in the orb under `~/w/cgmain` and
+`~/w/cgnar3`). A cell counts only when every window passes the JIT-flat gate; a cell that fails is recorded as
 rejected and not rerun. Region columns are instructions per iteration (regions entered per iteration × instructions
 each).
 
@@ -775,6 +782,9 @@ each).
 | shipit | master | pass | 3,126,542,997 | 0 | 13,615,304 (34,810 × 391) | 5,372,590 (14,937 × 360) | 11,712,084 (16,571 × 707) | 9,738,826 (14,166 × 687) |
 | shipit | master again | pass | 3,204,568,264 | 1 | 13,615,304 (34,810 × 391) | 5,372,590 (14,937 × 360) | 11,712,084 (16,571 × 707) | 9,740,069 (14,166 × 688) |
 | shipit | branch | pass | 3,112,246,019 | 0 | 105,520 (130 × 812) | 0 (0) | 11,712,084 (16,571 × 707) | 9,740,070 (14,166 × 688) |
+| lobsters | master | pass | 2,990,583,596 | 1 | 6,359,359 (17,343 × 367) | 3,188,198 (8,864 × 360) | 6,716,978 (9,579 × 701) | 6,106,371 (9,487 × 644) |
+| lobsters | master again | pass | 2,987,781,225 | 1 | 6,360,723 (17,343 × 367) | 3,188,198 (8,864 × 360) | 6,716,978 (9,579 × 701) | 6,144,907 (9,487 × 648) |
+| lobsters | branch | pass | 2,978,153,642 | 1 | 111,072 (356 × 312) | 0 (0) | 6,716,978 (9,579 × 701) | 6,144,907 (9,487 × 648) |
 
 * **blog: rejected, all three cells.** Each cell has a window in which ZJIT compiled something (master: the
   yield-from-C window; master again: the whole-program window and both send windows; branch: the ISEQ-send window,
@@ -798,6 +808,11 @@ each).
   5,372,590 Ir/itr in the two send regions, and their yield regions differ by at most 1,243. On the branch 130
   sends to ISEQ callees per iteration still take the generic path (812 Ir each), no send to another callee does,
   and the yield regions match master's (11,712,084 exactly; 9,740,070 against 9,738,826 and 9,740,069).
+* **lobsters: −0.42%.** All three cells pass the gate and every window holds 1 GC. The branch is 12,429,954 Ir/itr
+  (0.42%) below master and 9,627,583 (0.32%) below master again; the two master runs differ by 2,802,371 (0.094%),
+  so the difference is 3.4 to 4.4 times the A/A. Master spends 9,547,557 Ir/itr in the two send regions. On the
+  branch 356 sends to ISEQ callees per iteration still take the generic path (312 Ir each), no send to another
+  callee does, and the yield regions equal master again's to the instruction.
 
 ### Reviews
 
