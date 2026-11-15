@@ -280,7 +280,7 @@ Thomas, 2026-11-15: instead of a second PR on the same helper, IM1 goes into our
 [rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) as its second commit, on
 [`thomasklemm/preload-tags-combined`](https://github.com/thomasklemm/importmap-rails/tree/thomasklemm/preload-tags-combined),
 so #336's branch only fast-forwards from `cf3d933`. Current head:
-[`3e7f512`](https://github.com/thomasklemm/importmap-rails/commit/3e7f5128d4d7fbd20f912cc0af8cc12641672da7). Queue
+[`e64dc57`](https://github.com/thomasklemm/importmap-rails/commit/e64dc57e243bb686e1da5431b044aac49d0b686c). Queue
 item: [IMP336](../../bench/upstream/pr-queue/items/IMP336.md), with the new title and body; IM1 is `superseded`.
 
 * **First head `8806855`**: IM1's `863322e` cherry-picked onto `cf3d933`. The one conflict was the helper: IM1 moved
@@ -293,6 +293,10 @@ item: [IMP336](../../bench/upstream/pr-queue/items/IMP336.md), with the new titl
   ([`imp336_generator_probe.rb`](../../bench/upstream/def8/imp336_generator_probe.rb), [output](data/def8/imp336/generator_probe.txt):
   main, `cf3d933` and `3e7f512` agree, `863322e` differs). claude-code found it; its test is in the commit (fails on
   `8806855`'s helper, passes on main's). The leak was in IM1 already; nothing of IM1 was posted.
+* **`e64dc57`, after the confirm passes**: one assertion that `javascript_module_preload_tag` keeps its nonce.
+  `3e7f512` moved that helper's nonce into the default argument of `_generate_preload_tags`, and a nil default passed
+  the suite; the assertion fails on that mutant and passes with main's and `cf3d933`'s helper. Suite 106 runs, 367
+  assertions, 0 failures on three seeds. The numbers below are of `3e7f512`, which has the same library code.
 * **Not squashed**: the commits are separate concerns, each green alone (`cf3d933` 104 runs), importmap-rails merges
   with merge commits so both stay bisectable, and a squash would rewrite the commit #336 already shows. Both reviewers
   agree.
@@ -349,14 +353,20 @@ trailers, `diff --check` clean, no comments added besides IM1's `# :nodoc:`.
 on 10-31, so a new run gets past that step. The fork has never run Actions (its workflow needs a one-time enable in the
 UI), so the matrix is replayed locally ([`imp336_ci_matrix.sh`](../../bench/upstream/def8/imp336_ci_matrix.sh): each
 job's gemfile, lockfile removed, `bundle exec rake`; Ruby 3.1.7 from ruby-builder's ubuntu-24.04 build, 3.2–3.4 and
-4.0 from mise): `8806855` 16 jobs green before the fix ([log](data/def8/imp336/ci_8806855.log)), `3e7f512`
-[log](data/def8/imp336/ci_3e7f512.log).
+4.0 from mise): `8806855` 16 jobs green before the fix ([log](data/def8/imp336/ci_8806855.log)), `3e7f512` 17 green
+([log](data/def8/imp336/ci_3e7f512.log)). Thomas then enabled Actions on the fork: `3e7f512` pushed as
+`ci/preload-tags-combined` ran the full matrix, [45/45 jobs green](https://github.com/thomasklemm/importmap-rails/actions/runs/43714500287),
+Ruby 3.1 included; `e64dc57` [45/45 green](https://github.com/thomasklemm/importmap-rails/actions/runs/43715376652) too.
 
 **Reviews** (passes in the item): claude-code and opus on `8806855`, both `changes`. claude-code: the double nonce read
 above (fixed in `3e7f512`). opus, body only: "every new Rails app" is false for `--api` and bundler apps (now "the
 default layout of a new Rails app"), and the nonce rows only showed no change (cut, with the `NONCE` switch). Optional
 and not done: an assertion for `javascript_module_preload_tag` with a nonce (dropping its `nonce:` passes the suite
-today), which belongs to #336's commit.
+today), which belongs to #336's commit. Confirm passes on `3e7f512`: claude-code `nits` (that assertion now belongs
+in the top commit, since `3e7f512` moved the nonce into a default argument; taken as `e64dc57`), opus `approve`. On `e64dc57` both approve. Both
+reproduced the fix, the probes and "no slower" (nonce path +8.4% to +9.7% and +3.9% to +7.3% in their runs); opus's
+first pass had missed the double read because its generators always returned the same value and it didn't count
+calls.
 
 ## Leads not built
 
