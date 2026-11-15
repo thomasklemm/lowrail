@@ -309,6 +309,8 @@ a few seconds, without having seen our notes. If it reads like a report, it is t
 * **Numbers.** A perf PR gets one small before/after table, whose heading says what was measured (for example
   "Objects and Callgrind instructions per call, Ruby 4.0, no JIT"). Instructions are never called time. A/A
   values, methodology, ruby-bench placement and other Rubies stay in the record. A correctness PR has no numbers.
+  Table cells stay short (a name, a number); causes and explanations go in the prose above the table, never in a
+  column (Thomas, 2026-11-15, on #59812).
 * **Leave out:** test-run and suite counts, commands, SHAs and pins, which Rubies or databases were tried, review
   history, rejected variants, differential sizes, private or `:nodoc:` override boundaries, "this is not a speed
   claim". The diff shows the tests. If a maintainer asks, the answer goes in a reply.
