@@ -190,7 +190,9 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   missing from a polymorphic send's profile) go upstream as PRs once built and reviewed, after the "Thomas can explain
   it first" step. Exception (Thomas, 2026-11-15): ZS1, ZJIT specialization of Symbol block arguments (`&:sym`,
   Shopify/ruby#1014's open "later step" after ruby/ruby#18180), because apps and gems use it everywhere; built with
-  Fable 5.2, same "Thomas can explain it first" step before opening. The script's ruby/ruby cap is the 10 above; the moratorium holds for every other item.
+  Fable 5.2, same "Thomas can explain it first" step before opening. Closed the same day without a PR: the reachable ceiling is 0.04–0.37% of an
+  iteration on Rails main, and the send side is on Rafael França's unmerged Shopify branch, the yield side on k0kubun's
+  (docs/upstream/zjit-symbol-block.md). The script's ruby/ruby cap is the 10 above; the moratorium holds for every other item.
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
   **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
   for a response to an earlier one.
