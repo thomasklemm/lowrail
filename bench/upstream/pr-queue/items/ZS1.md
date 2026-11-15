@@ -5,7 +5,7 @@ kind: perf
 area: ZJIT, sends with a Symbol block argument
 reviewer: "tekknolagi and k0kubun (ZJIT), rafaelfranca (author of the branch the first commit comes from)"
 branch: thomasklemm/zjit-symbol-block-arg
-head: "89e2da1571"
+head: "fbbb9cee7b"
 base: master
 built_on: "3be2b028a7"
 depends_on: []
@@ -16,9 +16,9 @@ rank: 1
 risky: true
 state: reviewed
 pr:
-note: "reopened 2026-11-15 after skipkayhil closed rails/rails#59803 with 'Let's fix this in the JITs?'; first commit is the Symbol part of Rafael França's Shopify/ruby zjit-perf/blockarg-direct-send (3f17d8950e), he is its author (coordinator: the design is his); the coordinator opens the draft after the three passes approve on the head; earlier heads dcd4bd2b79, 7eddd8bfce, 09d8e5308e; arm64 green on all four heads including 89e2da1571 (ARM1: zjit-test 2249/2249, test_zjit_cli 34 tests, probe diffs empty, zjit-bindgen leaves cruby_bindings.inc.rs unchanged); 89e2da1571 differs from 09d8e5308e in two tests, a rename, a comment and the bindgen entry, no generated code; all three passes on 89e2da1571 without a must-fix; body carries the run_benchmarks output and stats diff of the final code; record docs/upstream/zjit-symbol-block.md"
+note: "reopened 2026-11-15 after skipkayhil closed rails/rails#59803 with 'Let's fix this in the JITs?'; three commits: the VM extraction (Thomas), the Symbol part of Rafael França's Shopify/ruby zjit-perf/blockarg-direct-send 3f17d8950e (he is its author, Thomas co-author; coordinator: the design is his) and the tests; fbbb9cee7b has the tree of 89e2da1571 (git diff empty), on which all three passes had no must-fix and arm64 was green (ARM1); the coordinator had the VM extraction split out as its own commit and the message rewrapped, so the passes on fbbb9cee7b are confirm passes limited to tree identity, split, authorship and messages; earlier heads dcd4bd2b79, 7eddd8bfce, 09d8e5308e; no LLM disclosure and no separate ping to Rafael (coordinator); the ZJIT commit is +212 -55, so the tracker rule applies and the coordinator asks Thomas: nothing opens and nothing is posted on Shopify/ruby#1014 until he answers; record docs/upstream/zjit-symbol-block.md"
 waived:
-  - {reviewer: thermos, head: "89e2da1571", by: "coordinator, 2026-11-15", reason: "three independent passes on the exact head (Fable adversarial on exactness and invalidation, with a readability and ZJIT-style note), a mutation check of every guard, and arm64 coverage by ARM1"}
+  - {reviewer: thermos, head: "fbbb9cee7b", by: "coordinator, 2026-11-15", reason: "three independent passes on the exact head (Fable adversarial on exactness and invalidation, with a readability and ZJIT-style note), a mutation check of every guard, and arm64 coverage by ARM1"}
 passes:
   - {reviewer: opus, head: "7eddd8bfce", orb: T-01a1e02a-4640-708d-8a07-4487c093fc18, date: 2026-11-15, verdict: changes, open: "no behaviour difference found; must-fix: body called Array#map a C method and gave one fallback reason for both callee kinds, and a profiled-Symbol guard was emitted in front of a C-callee send that stays dynamic (splat, kwargs); all three fixed in 09d8e5308e, with the optional points taken: one helper for the patch points, behaviour test for the C-callee patch points, trivial-inliner skip removed, CCallVariadic prints its block"}
   - {reviewer: fable, head: "7eddd8bfce", orb: T-01a1e02a-5156-7535-b82d-6fdecf19860d, date: 2026-11-15, verdict: changes, open: "must-fix: with RUBY_BOX=1 a box that redefines Symbol#to_proc got the plain Symbol as block handler; fixed in 09d8e5308e (no specialization once a non-root box exists, RootBoxOnly patch point, CLI test). Leaf-call, GC and invalidation questions settled with source lines and runs; readability: reads like the surrounding code, asked for the patch-point helper and the CCallVariadic printer, both done"}
@@ -28,6 +28,9 @@ passes:
   - {reviewer: opus, head: "89e2da1571", orb: T-01a1e02a-4640-708d-8a07-4487c093fc18, date: 2026-11-15, verdict: approve, open: "delta from 09d8e5308e read and rerun: zjit-bindgen regenerates cruby_bindings.inc.rs with no diff; the self-redefinition test covers SendDirect, CCallWithFrame and CCallVariadic and fails without the flag check; removing the Symbol#to_proc patch point at any one call site fails the redefined-after-compile test; probe and break scripts match. Optional: five lines of commit 1's message are 73 characters"}
   - {reviewer: fable, head: "89e2da1571", orb: T-01a1e02a-5156-7535-b82d-6fdecf19860d, date: 2026-11-15, verdict: nits, open: "no must-fix, adversarial on exactness, invalidation and GC: 396 combinations of a Symbol#to_proc change, setup and timing match at four settings; the baked entry survives compaction; the only code that changes the basic bit of an existing entry is vm_method.c:1851 and all three ways to reach it are handled; the Qundef exit is built from the original send's frame state. Optional, not applied: recompile on the Qundef exit (it exits on every call after a same-definition define), a guard in front of a dynamic send for an argc mismatch and for an ISEQ callee that ignores its block, carrying the entry from the patch point to codegen; body should mention the run-time flag check (done). RootBoxOnly and the GC preparation have no failing test and no failing program. Readability: reads like the code around it"}
   - {reviewer: claude-code, head: "89e2da1571", orb: T-01a1e02a-30a2-77f9-9d94-33f157e1623d, date: 2026-11-15, verdict: approve, open: "delta from 09d8e5308e is two tests, a rename, a comment and the bindgen entry; zjit-bindgen regenerates cruby_bindings.inc.rs byte-identical; removing the patch points on one path fails the redefined-after-compile test ([4, [30], 30], [300, [4], 30], [300, [30], 4]) and removing the flag check fails the self-redefinition test; single-threaded zjit-test 2007/2007, CLI 34 tests, probe and break scripts match. Optional: five 73-character lines in commit 1's message; body to be cut (done)"}
+  - {reviewer: opus, head: "fbbb9cee7b", orb: T-01a1e02a-4640-708d-8a07-4487c093fc18, date: 2026-11-15, verdict: approve, open: "confirm pass on the split: same tree object as 89e2da1571 (63d226b442), and 8aedcce4ca has the tree of 656ae95dbc; b7dfd487a6 touches only vm_args.c and vm_core.h, 8aedcce4ca only zjit.c and zjit/, fbbb9cee7b only tests; authors, committer and trailers as intended; no message line over 72 characters. Optional, would need a new head: 8aedcce4ca's 'extracted unchanged' reads as if that commit extracted it; a Co-authored-by for Rafael on the VM commit (Thomas's call)"}
+  - {reviewer: claude-code, head: "fbbb9cee7b", orb: T-01a1e02a-30a2-77f9-9d94-33f157e1623d, date: 2026-11-15, verdict: approve, open: "confirm pass on the split: tree 63d226b442 as on 89e2da1571; b7dfd487a6 holds the whole VM change (the 22 removed lines equal the added body apart from indentation) and nothing of ZJIT, 8aedcce4ca nothing of the VM; authors, committer and trailers as intended, no Amp trailer; no message line over 72 characters, and 8aedcce4ca's message is word for word the old one. Optional: 'extracted unchanged in the previous commit'; would leave it"}
+  - {reviewer: fable, head: "fbbb9cee7b", orb: T-01a1e02a-5156-7535-b82d-6fdecf19860d, date: 2026-11-15, verdict: nits, open: "confirm pass on the split, no must-fix and no new point: same tree as 89e2da1571, the split is clean, authorship and messages as intended (longest lines 71, 72 and 72 characters). The optional points are those of the pass on 89e2da1571; the coordinator decided against the recompile on the flag-check exit"}
 ---
 
 # ZJIT: Send Symbol block arguments directly
@@ -36,23 +39,23 @@ Under ZJIT, a send with a Symbol block argument such as `foo(&:sym)` stays a dyn
 
 A static Symbol block argument now compiles to `SendDirect` for ISEQ callees and to `CCallWithFrame` or `CCallVariadic` for C functions such as `Array#reject`. The Symbol becomes the block handler through the code `vm_caller_setup_arg_block` already runs for it, so refinements behave as in the interpreter. The send is specialized only while `Symbol#to_proc` is basic and no `Ruby::Box` has been created. The callee's `yield` is unchanged.
 
-The first commit is the Symbol part of Rafael Mendonça França's [`zjit-perf/blockarg-direct-send`](https://github.com/Shopify/ruby/tree/zjit-perf/blockarg-direct-send) branch, ported to master. His branch also sends forwarded block parameters directly; that part is left to Shopify/ruby#1039.
+The first commit only extracts the VM code that ZJIT calls. The second is the Symbol part of Rafael Mendonça França's [`zjit-perf/blockarg-direct-send`](https://github.com/Shopify/ruby/tree/zjit-perf/blockarg-direct-send) branch, ported to master. His branch also sends forwarded block parameters directly; that part is left to Shopify/ruby#1039.
 
 `attr-read` runs the attribute reads of rails/rails#59803, and `symbol-block` runs `one(i, &:itself)` and `[1, 2, 3].map(&:itself)`. `master-again` is the same build of master a second time; the apps do not move beyond noise.
 
 ```
 master: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
 master-again: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
-symbol-block-arg: ruby 4.1.0dev (2026-11-15T18:34:39Z HEAD 656ae95dbc) +ZJIT +PRISM [x86_64-linux]
+symbol-block-arg: ruby 4.1.0dev (2026-11-15T19:16:23Z HEAD fbbb9cee7b) +ZJIT +PRISM [x86_64-linux]
 ruby-bench: 73918b2fc1a84702fea63e06f64d179751d69df4-dirty
 
 ------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
 bench           master (ms)  master-again (ms)  symbol-block-arg (ms)  master-again 1st itr  symbol-block-arg 1st itr  master/master-again  master/symbol-block-arg
-lobsters       960.4 ± 8.3%       954.9 ± 7.9%           917.2 ± 4.9%                 1.041                     0.974                1.006                    1.047
-railsbench    1531.6 ± 7.4%      1521.8 ± 7.0%          1524.6 ± 6.0%                 1.017                     0.994                1.006                    1.005
-shipit        1295.4 ± 9.4%     1411.5 ± 11.5%          1399.0 ± 6.8%                 1.042                     1.105                0.918                    0.926
-attr-read      308.4 ± 7.2%       303.4 ± 5.9%           270.6 ± 9.7%                 0.997                     0.998                1.016                    1.139
-symbol-block   380.6 ± 7.3%       367.9 ± 7.3%          310.2 ± 10.5%                 0.972                     1.105                1.035                    1.227
+lobsters      1006.3 ± 9.5%       972.7 ± 5.3%          1009.8 ± 7.8%                 1.110                     1.122                1.035                    0.996
+railsbench    1525.8 ± 8.3%      1511.5 ± 5.3%          1511.2 ± 7.1%                 1.205                     1.109                1.009                    1.010
+shipit        1235.9 ± 6.8%      1339.7 ± 7.6%          1283.4 ± 6.4%                 0.943                     0.972                0.923                    0.963
+attr-read      300.5 ± 3.3%       305.4 ± 6.6%           249.9 ± 4.8%                 1.112                     1.065                0.984                    1.202
+symbol-block   370.6 ± 6.7%      431.4 ± 13.2%           306.0 ± 9.7%                 1.018                     1.072                0.859                    1.211
 ------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
 ```
 

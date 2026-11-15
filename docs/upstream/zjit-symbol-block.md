@@ -321,8 +321,8 @@ JITs?"](https://github.com/rails/rails/pull/59803#issuecomment-6895904455), so R
 `cast_value(&:value!)` and `map(&:deep_dup)`, and the numbers above (Rails main with VB1) no longer describe the
 target. Thomas: JITs should handle these patterns, so ZS1 becomes a ruby/ruby PR built on Rafael França's branch
 ([DECISIONS](../DECISIONS.md)). Queue item: [ZS1](../../bench/upstream/pr-queue/items/ZS1.md). Branch:
-`thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg`, head `89e2da1571` (earlier heads
-`dcd4bd2b79`, `7eddd8bfce`, `09d8e5308e`), on master `3be2b028a7`.
+`thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg`, head `fbbb9cee7b` (earlier heads
+`dcd4bd2b79`, `7eddd8bfce`, `09d8e5308e` and `89e2da1571`, which has the same tree), on master `3be2b028a7`.
 
 ### Rails main without VB1: counts and ceilings
 
@@ -386,9 +386,21 @@ are row 42. The PR leaves both out.
 
 ### The change
 
-Scope: a send whose block argument is a static Symbol, to ISEQ and C callees. Two commits on master `3be2b028a7`:
-"ZJIT: Send Symbol block arguments directly" (+241 −77 in 11 files, Rafael França as author, Thomas as co-author)
-and "ZJIT: Test sends with a Symbol block argument" (Thomas).
+Scope: a send whose block argument is a static Symbol, to ISEQ and C callees. Three commits on master
+`3be2b028a7`, head `fbbb9cee7b`:
+
+1. `b7dfd487a6` "Extract rb_vm_symbol_block_handler() from vm_caller_setup_arg_block()" (+29 −22 in `vm_args.c`
+   and `vm_core.h`, Thomas): the VM part alone, with no change in behaviour.
+2. `8aedcce4ca` "ZJIT: Send Symbol block arguments directly" (+212 −55 in 9 files, Rafael França as author, Thomas
+   as co-author).
+3. `fbbb9cee7b` "ZJIT: Test sends with a Symbol block argument" (+354 in 3 files, Thomas).
+
+Until the reviews were done this was two commits, head `89e2da1571`, with the VM extraction inside the ZJIT commit
+(`656ae95dbc`). The coordinator had it split so that the VM change and the ZJIT change are separate commits of one
+PR ([DECISIONS](../DECISIONS.md), one concern per PR). `git diff 89e2da1571 fbbb9cee7b` is empty, and so is
+`git diff 656ae95dbc 8aedcce4ca`; only the commit boundaries and the wrapping of five lines in the ZJIT commit's
+message changed. The extraction in its present form is Thomas's: Rafael's branch moved the whole block-argument
+chain into `rb_vm_block_handler_from_blockarg()`.
 
 * `type_specialize` accepts the block argument when its type is `StaticSymbol` (a literal) or when the profile says
   so, then behind `GuardType StaticSymbol` with recompilation. It does so only while `Symbol#to_proc` is basic
@@ -420,7 +432,7 @@ Two earlier versions, for the history:
 * That head relied on the patch point alone for `Symbol#to_proc`. The reviews showed two cases it misses (below),
   so the conversion got the flag check and the specialization the box check (head `09d8e5308e`).
 
-History: commit 1 is narrowed from Rafael's `3f17d8950e` and keeps him as author with Thomas as co-author
+History: the ZJIT commit is narrowed from Rafael's `3f17d8950e` and keeps him as author with Thomas as co-author
 (coordinator: the design is his). His two stats counters, benchmark yml, bootstraptest and forwarding tests are not
 in it.
 
@@ -486,9 +498,14 @@ A lesson for these tests: warm-up calls inside `2.times { }` compile the block, 
 then first compiled after the redefinition, so the test passes without the guard. Rafael's redefinition test had
 this, and so did ours on head `09d8e5308e`; the warm-up is now plain calls.
 
-### Verification on `89e2da1571`
+### Verification
 
-x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
+Run on `89e2da1571`, whose tree is that of the final head `fbbb9cee7b`; the release build is of `656ae95dbc`, whose
+tree is that of the ZJIT commit `8aedcce4ca`. x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
+
+* **The VM commit alone** (`b7dfd487a6`): builds without a compiler warning; `test_proc`, `test_refinement`,
+  `test_symbol`, `test_call`, `test_yield` and `test_method` (608 tests, 33,045 assertions, 0 failures) pass in the
+  interpreter and with `--zjit-call-threshold=1`; `make btest` passes all 2,148.
 
 * **`make zjit-test`:** 2007 run, 2006 passed. The one failure is
   `test_profile_frames_during_direct_jit_to_jit_entry` ("rb_profile_frames was not called from SIGPROF handler"). It
@@ -500,7 +517,7 @@ x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
   `test_lambda`, `test_array`, `test_enum`, `test_hash`, `test_settracefunc`, `test_backtrace`, `test_ractor`):
   1,753 tests, 67,382 assertions, 0 failures, 1 skip, in the interpreter and with `--zjit-call-threshold=1`.
 * **`make btest`:** all 2,148 pass, in the interpreter and with `--zjit-call-threshold=1`.
-* **Differential probe** ([`zs1_probe.rb`](../../bench/upstream/zs1_probe.rb)) on the release build of commit 1:
+* **Differential probe** ([`zs1_probe.rb`](../../bench/upstream/zs1_probe.rb)) on the release build:
   the interpreter's output against `--zjit-call-threshold=1`, against `--zjit-call-threshold=2
   --zjit-num-profiles=1`, against default thresholds (612 lines each) and against default thresholds with `N=40`
   (3,502 lines): four empty diffs. With `--zjit-stats-quiet` the `N=40` run counts 15,586 conversion calls from
@@ -514,7 +531,7 @@ x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
 * **Boxes:** under `RUBY_BOX=1` a send is specialized until the first `Ruby::Box.new` (271 conversion calls for
   300 sends); none of 600 later sends is, including sends in a method compiled before the box.
 * **No CI on the fork:** `thomasklemm/ruby` runs no workflows for the branch.
-* **Rails suites** (Rails main `8217632cf8`, release build of commit 1, `SEED=1`, verbose, without ZJIT and with
+* **Rails suites** (Rails main `8217632cf8`, release build of `656ae95dbc`, `SEED=1`, verbose, without ZJIT and with
   `RUBYOPT=--zjit`, compared per test with `rails_suites_cmp.rb`):
   * Active Model: 1,272 runs, 5,636 assertions, 0 failures, 1 error in both modes, and the same outcome for each
     of the 1,268 tests the verbose logs list. The error is the Ractor and minitest-mock problem that ARM1 sees with
@@ -527,8 +544,9 @@ x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
 
 ### Numbers on the final code
 
-Release builds (`--enable-yjit --enable-zjit`, GCC 14.2.0, rustc 1.100.0): master `3be2b028a7` and commit 1
-`656ae95dbc`; commit 2 adds only tests. ruby-bench `73918b2` on Rails main `8217632cf8` without VB1, ZJIT with
+Release builds (`--enable-yjit --enable-zjit`, GCC 14.2.0, rustc 1.100.0): master `3be2b028a7` and the branch
+(`656ae95dbc` for the per-call counts and the stats, the final head `fbbb9cee7b` for `run_benchmarks.rb`; the two
+differ only in tests). ruby-bench `73918b2` on Rails main `8217632cf8` without VB1, ZJIT with
 default options. Two micros were added to the ruby-bench copy:
 [`attr-read`](../../bench/upstream/zs1/attr_read_benchmark.rb) (the first attribute reads of rails/rails#59803: 10
 records with 30 columns, every attribute read once) and
@@ -553,7 +571,7 @@ call (743 and 2,814 on `7eddd8bfce` against 751.8 and 2,825.8 now). What separat
 literal block afterwards is mostly the `yield` to the Symbol (633–707 instructions per yield in the first round's
 micro), which this change does not touch.
 
-**ZJIT stats diff**, master against commit 1, totals of 15 warmup and 10 measured iterations with `--zjit-stats`
+**ZJIT stats diff**, master against the branch, totals of 15 warmup and 10 measured iterations with `--zjit-stats`
 ([`stats_diff.rb`](../../bench/upstream/zs1/stats_diff.rb): a counter is printed when it changes by more than 1%,
 by more than 1,000 and by more than three times the difference between two master runs; an entry missing from a
 list that covers 100% of its total counts as 0):
@@ -696,16 +714,16 @@ running in the orb (a 4-core cloud sandbox, so the percentages after ± are wide
 ```
 master: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
 master-again: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
-symbol-block-arg: ruby 4.1.0dev (2026-11-15T18:34:39Z HEAD 656ae95dbc) +ZJIT +PRISM [x86_64-linux]
+symbol-block-arg: ruby 4.1.0dev (2026-11-15T19:16:23Z HEAD fbbb9cee7b) +ZJIT +PRISM [x86_64-linux]
 ruby-bench: 73918b2fc1a84702fea63e06f64d179751d69df4-dirty
 
 ------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
 bench           master (ms)  master-again (ms)  symbol-block-arg (ms)  master-again 1st itr  symbol-block-arg 1st itr  master/master-again  master/symbol-block-arg
-lobsters       960.4 ± 8.3%       954.9 ± 7.9%           917.2 ± 4.9%                 1.041                     0.974                1.006                    1.047
-railsbench    1531.6 ± 7.4%      1521.8 ± 7.0%          1524.6 ± 6.0%                 1.017                     0.994                1.006                    1.005
-shipit        1295.4 ± 9.4%     1411.5 ± 11.5%          1399.0 ± 6.8%                 1.042                     1.105                0.918                    0.926
-attr-read      308.4 ± 7.2%       303.4 ± 5.9%           270.6 ± 9.7%                 0.997                     0.998                1.016                    1.139
-symbol-block   380.6 ± 7.3%       367.9 ± 7.3%          310.2 ± 10.5%                 0.972                     1.105                1.035                    1.227
+lobsters      1006.3 ± 9.5%       972.7 ± 5.3%          1009.8 ± 7.8%                 1.110                     1.122                1.035                    0.996
+railsbench    1525.8 ± 8.3%      1511.5 ± 5.3%          1511.2 ± 7.1%                 1.205                     1.109                1.009                    1.010
+shipit        1235.9 ± 6.8%      1339.7 ± 7.6%          1283.4 ± 6.4%                 0.943                     0.972                0.923                    0.963
+attr-read      300.5 ± 3.3%       305.4 ± 6.6%           249.9 ± 4.8%                 1.112                     1.065                0.984                    1.202
+symbol-block   370.6 ± 6.7%      431.4 ± 13.2%           306.0 ± 9.7%                 1.018                     1.072                0.859                    1.211
 ------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
 
 Legend:
@@ -715,16 +733,21 @@ Legend:
 - master/symbol-block-arg: ratio of master/symbol-block-arg time. Higher is better for symbol-block-arg. Above 1 represents a speedup.
 ```
 
-* **Apps:** no change beyond noise. railsbench 1.005 against an A/A of 1.006; shipit 0.926 against an A/A of 0.918
-  (the two master columns are 8% apart there, so this run says nothing finer than that about shipit); lobsters
-  1.047 against an A/A of 1.006, which is inside the ±5–8% of its columns and is not claimed as a gain. No app is
-  slower than master beyond its A/A.
-* **Micros:** attr-read 1.139 against an A/A of 1.016, symbol-block 1.227 against 1.035.
+* **Apps:** no change beyond noise. railsbench 1.010 against an A/A of 1.009, lobsters 0.996 against 1.035, shipit
+  0.963 against 0.923. No app is slower than master beyond its A/A. On shipit the second master column is 8% slower
+  than the first in this run and in the one before it, so the order of the interleaved executables shows there.
+* **Micros:** attr-read 1.202 against an A/A of 0.984; symbol-block 1.211 against an A/A of 0.859, whose second
+  master column has ±13.2%.
+* **The same tree as `656ae95dbc`, 25 minutes earlier:** lobsters 960.4 / 954.9 / 917.2 ms (A/A 1.006, branch
+  1.047), railsbench 1531.6 / 1521.8 / 1524.6 (1.006, 1.005), shipit 1295.4 / 1411.5 / 1399.0 (0.918, 0.926),
+  attr-read 308.4 / 303.4 / 270.6 (1.016, 1.139), symbol-block 380.6 / 367.9 / 310.2 (1.035, 1.227). The body
+  shows the later run because its header names the head of the PR.
 * **Earlier run on `7eddd8bfce`** (before the flag check, with the old `symbol-block`, whose loop sat in a method
   that is called once per iteration and so ran compiled only in the last ten iterations): lobsters 829.7 / 795.8 /
   794.9 ms, railsbench 1402.5 / 1394.7 / 1437.2, shipit 1198.3 / 1157.6 / 1221.2, attr-read 320.6 / 292.9 / 241.2
-  (A/A 1.094, branch 1.329). The two runs agree on the apps and disagree on how much attr-read gains (1.14 and
-  1.33); the orb's timing noise is that large, and the per-call instruction counts above are the precise figure.
+  (A/A 1.094, branch 1.329).
+* The three runs agree on the apps. attr-read gains 14%, 20% and 33% in them: the orb's timing noise is that
+  large, and the per-call instruction counts above are the precise figure.
 * Per iteration the apps lose about 43,000 (railsbench), 29,000 (lobsters) and 59,000 (shipit) dynamic sends,
   from the stats diff over 25 iterations.
 
@@ -770,20 +793,42 @@ under `RUBY_BOX=1`) and the exit after the leaf call. Their test points went int
 self-redefinition test failed only on its ISEQ element (`reject` and `sum` resolve the refinement either way), and
 the helper belongs in the bindgen allowlist.
 
-Not applied, for Thomas and the coordinator:
+**On `89e2da1571`: claude-code `approve`, Opus `approve`, Fable `nits`.** No must-fix. Each reran the tests,
+the probe and its own break scripts on that head and confirmed by mutation that the two reworked tests fail
+without their guard; `make zjit-bindgen` regenerates the binding file unchanged in all three orbs and on the Mac.
+Fable ran 396 combinations of a `Symbol#to_proc` change, a setup and a moment, at four settings, and found the
+only code that changes the basic bit of an existing entry (vm_method.c:1851), reachable in three ways, all handled.
 
-* Commit 1 is +241 −77, above the 150-line "ask on the tracker first" rule in DECISIONS.
-* The tip of Rafael's branch says the branch was produced by an agent (`ZJIT_PERF_TASK.md`,
-  `ZJIT_PERF_SUMMARY.md`). Whether that matters under "No AI disclaimer, except where it matters", and whether
-  Rafael is fine being the author of a commit whose `vm_args.c` shape and guards now differ from his, is Thomas's
-  call.
+**On `fbbb9cee7b`, the split head: claude-code `approve`, Opus `approve`, Fable `nits`.** Confirm passes limited
+to what changed: the tree is the same object as on `89e2da1571` (`63d226b442`), the VM commit holds the whole VM
+change and nothing of ZJIT, the ZJIT commit nothing of the VM, authors, committer and trailers are as intended,
+and no message line is over 72 characters. Two optional points would need another head and are with the
+coordinator: the ZJIT commit's "extracted unchanged" could say "in the previous commit" (claude-code and Fable
+would leave it), and a `Co-authored-by` for Rafael on the VM commit, whose first version was his
+`rb_vm_block_handler_from_blockarg()` (Opus; Thomas's call).
+
+Decided by the coordinator on 2026-11-15:
+
+* **One concern per PR:** the VM extraction is its own commit in the same PR (above).
+* **Tracker rule:** the ZJIT commit is +212 −55, above the 150-line "ask on the tracker first" rule in DECISIONS.
+  The coordinator asks Thomas; until he answers nothing opens and nothing is posted on Shopify/ruby#1014.
+* **Disclosure:** the tip of Rafael's branch says the branch was produced by an agent (`ZJIT_PERF_TASK.md`,
+  `ZJIT_PERF_SUMMARY.md`). No LLM disclosure is added and Rafael is not pinged separately; the body names him and
+  links his branch.
+* **Body length:** the prose before the table (187 words with the sentence on the first commit) is fine, as
+  for ZNE1.
+* **No further code change:** Fable's recompile on the flag-check exit stays out.
+
+Not applied:
+
 * If the team asks for a split: ISEQ callees first (mirrors #18180), then C callees with the `exit_state` on the
   C-call instructions.
 * Carrying the `Symbol#to_proc` entry in `BlockArgSymbol` instead of looking it up again at code generation (the
   two lookups give the same entry, since nothing runs between HIR and codegen); one place that lowers
   `BlockArgSymbol`; parameter names in `rb_vm_symbol_block_handler` (the moved lines stay identical); the name
   of the CLI test that holds the overflow rows.
-* A send whose `Symbol#to_proc` was redefined with itself exits on every call and does not recompile.
+* A send whose `Symbol#to_proc` was redefined with itself exits on every call and does not recompile (Fable:
+  2,000 exits per 1,000 iterations of a loop with two such sends; `side_exit_with_recompile` there brings it to 12).
 * The general fix for the basic flag belongs in the VM (`method_entry_set` could invalidate the entry), as its own
   PR.
 
@@ -820,7 +865,7 @@ posted**; the PR number goes in when the draft exists:
 ### Reproduce the second round
 
 ```sh
-# Release builds: master 3be2b028a7 into ~/w/rm, commit 1 of the branch into ~/w/rp (build_rel.sh).
+# Release builds: master 3be2b028a7 into ~/w/rm, the branch into ~/w/rp (build_rel.sh).
 # ruby-bench 73918b2 copy on Rails main 8217632cf8 in ~/w/rb-rbm, with bench/upstream/zs1/*_benchmark.rb copied to
 # benchmarks/attr-read/benchmark.rb and benchmarks/symbol-block/benchmark.rb.
 ruby zs1_probe.rb > i.txt; ruby --zjit --zjit-call-threshold=1 zs1_probe.rb > z.txt; diff i.txt z.txt
