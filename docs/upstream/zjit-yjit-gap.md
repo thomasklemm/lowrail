@@ -1,14 +1,299 @@
 # Where ZJIT spends more instructions than YJIT on Rails
 
-> **Refreshed 2026-11-14:** [ruby-master-round-2.md](ruby-master-round-2.md#zjit--yjit-buckets) has the gap buckets and owners on a newer master and Rails main.
+> **Bet Z13, 2026-11-15:** remeasured on Ruby master `3be2b028a7` with the JIT-flat gate and a fixed heap in every
+> window, sorted into the Z13 classes and checked against the open leads. That measurement is the first part of this
+> page ([Result](#result)). The 2026-11-03 measurement and its lead sections follow from
+> [2026-11-03 measurement](#2026-11-03-measurement) on; [ruby-master-round-2](ruby-master-round-2.md#zjit--yjit-buckets)
+> has the 11-14 railsbench-only refresh.
 
-Which work makes ZJIT slower than YJIT on Rails, and how big is each part? The [ZJIT lead
-queue](zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03) ranks leads by fallback counts. Fallback counts don't
-say how many instructions each one costs, or whether YJIT does the same generic work at that site. This page
-measures the instruction gap directly, splits it into buckets, and ties the biggest buckets to Rails call sites.
-Nothing was built or posted.
+Which work makes ZJIT slower than YJIT on Rails, and how big is each part? This page measures the instruction gap
+directly, splits it per function, then per Ruby method and call site, and ties each part to a lead and its owner.
+Nothing was opened or posted upstream.
 
 ## Result
+
+On Ruby master `3be2b028a7`, with every measured window JIT-flat and the heap fixed, ZJIT runs **+3.4% (railsbench),
++6.4% (lobsters) and +16.3% (shipit)** more instructions per iteration than YJIT: **+158, +197 and +526 M Ir**
+(ZJIT 4,845.5 / 3,272.4 / 3,758.1 M against YJIT 4,687.6 / 3,075.0 / 3,232.5 M). Every measured window passed the
+JIT-flat gate, and the A/A runs of each mode agree within 0.19% (railsbench YJIT), 0.08% or less everywhere else.
+
+The gap split into the Z13 classes (M Ir per iteration, railsbench / lobsters / shipit, and share of each gap;
+the classes are exclusive and add up to the gap):
+
+| # | class | M Ir | share of gap | leads and owners | status |
+| --- | --- | --- | --- | --- | --- |
+| 1 | fallbacks: polymorphic, megamorphic, unprofiled sends and yields | 54.1 / 77.1 / 267.4 | 34% / 39% / 51% | lead 3 (`Type::Value#hash`, `_load_from_sql`, `association`: one method entry, many receiver classes) 8 / 49 / 202 M; lead 1 (`Array#each` yield) 43 / 12 / 35 M; megamorphic 0.5 / 12 / 21 M | known: lead 3 ours, stopped at a design question and answered on [Shopify/ruby#776](https://github.com/Shopify/ruby/issues/776) (open, unassigned); lead 1 upstream (k0kubun, [#1093](https://github.com/Shopify/ruby/issues/1093)); megamorphic upstream (k0kubun, [#1039](https://github.com/Shopify/ruby/issues/1039)) |
+| 2 | codegen quality in hot compiled code (JIT code without the entry trampoline) | 78.7 / 55.9 / 109.0 | 50% / 28% / 21% | spread over hundreds of ISEQs; the largest is `Array#each` (+10.9 M on railsbench); entry trampoline (C → JIT, counted with the fallback classes) 29.5 / 17.5 / 41.6 M; cfunc frames (lead 12), PatchPoint padding (lead 16) | known: lead 12 upstream (k0kubun, #1030 series), backend redesign upstream (tekknolagi, #1077); nothing new and concrete |
+| 3 | missing specialization: blocks | 59.8 / 40.3 / 95.3 | 38% / 20% / 18% | `&block` forwarding (lead 7) 30 / 25 / 67 M; unspecialized yields (`map`, `select`, blocks from C) 30 / 15 / 29 M; `&:sym` about 1% ([below](#symbol-block-arguments-on-rails-main-after-vb1)) | known: lead 7 upstream (k0kubun's #1039 rows 41–49); yields upstream (#1093); `&:sym` is [#1014](https://github.com/Shopify/ruby/issues/1014), open and unassigned, built by our ZS1 thread |
+| 4 | missing specialization: protected, `send`, other method types | 26.9 / 10.3 / 24.5 | 17% / 5% / 5% | protected `@parent._get(k)` in `InheritableOptions` 11.4 M of the 15.0 / 4.5 / 10.4 M protected on railsbench / lobsters / shipit; `Kernel#send` and other optimized method types (`send(:extract_session_id, …)` in the session, Arel `Visitor#visit`) 11.4 / 5.7 / 13.9 M | protected known: our ruby/ruby#19483 closed 11-04 (no `run_benchmarks.rb` change), tekknolagi's [#1109](https://github.com/Shopify/ruby/issues/1109) open and unassigned; **new Rails-side lead OO1** ([below](#rails-side-lead-oo1-orderedoptions_get-public)); `send` upstream (tekknolagi, ruby/ruby#19583 draft) |
+| 5 | missing specialization: splat, kwargs, forwarding | 21.5 / 7.5 / 17.4 | 14% / 4% / 3% | Rack `fetch_header(&block)` into a C method 11.4 M on railsbench (lead 14); `delegate`'s `(...)` (lead 6) | known: lead 14 partly free, lead 6 k0kubun's #1039 rows |
+| 6 | missing specialization: ivars | 7.9 / 21.3 / 60.3 | 5% / 11% / 11% | `getivar_fallback_no_profile_missing_ic` (lead 11): Arel `Composite#<<`, `Attribute#hash`, `url_options`; final versions (lead 15) | known: lead 11 upstream (tekknolagi: #19443 merged, #18616 draft), lead 15 partly free |
+| 7 | fallbacks: side exits and frame materialization | 13.6 / 4.5 / 10.6 | 9% / 2% / 2% | `zjit_materialize_frames` (throw, lead 17); constant patch points that keep exiting on shipit, 39.6k per iteration (lead 9) | known: lead 17 upstream (#1093), lead 9 upstream (k0kubun, ruby/ruby#19617 open) |
+| 8 | missing specialization: `super` | 5.2 / 0.9 / 2.3 | 3% / 0% / 0% | `super` with complex args, from blocks, with a block (lead 8) | known: k0kubun's super rows; lead 8 needs an ownership question |
+| 9 | missing specialization: cfuncs | 0 / 0 / 0 | 0% | no cfunc fallback reason has extra calls over YJIT; what a cfunc call costs is in class 2 (lead 12) | – |
+| 10 | code ZJIT doesn't compile | 0.4 / 0.4 / 0.4 | 0% / 0% / 0% | 6.3–8.5k YARV instructions per iteration in ISEQs without JIT code | nothing to do |
+| 11 | everything else (cfunc bodies, runtime, compile, invalidation) | −12.9 / 8.6 / −18.4 | −8% / 4% / −4% | compile and invalidation inside the windows: 0 | – |
+| 12 | interpreter after side exits | −31.2 / −22.6 / −12.1 | −20% / −11% / −2% | ZJIT compiles more ISEQs than YJIT; YJIT runs more YARV after its exits | ZJIT ahead |
+| 13 | GC, allocation, write barriers | −66.0 / −6.8 / −31.2 | −42% / −3% / −6% | ZJIT allocates less: allocation −50.3 / −13.1 / −33.7 M | ZJIT ahead; lead 13 (root marking) shrank: GC alone is −2.3 / +9.8 / +6.4 M |
+
+The price of one extra generic send or yield over YJIT's handling of the same site is **273 / 287 / 341 Ir**, and
+of one extra generic ivar read **41 / 79 / 101 Ir**.
+
+**Ranked by share of the gap**, the mean of the three benchmarks' shares: polymorphic fallbacks 41%, codegen 33%,
+blocks 25%, ivars 9%, protected and `send` 9%, splat/kwargs/forwarding 7%, side exits 4%, `super` 1%, cfuncs and
+uncompiled code 0%, everything else −2%. ZJIT is ahead on the interpreter (−11%) and on GC, allocation and write barriers
+(−17%).
+
+**New leads.** Almost all of the gap sits in leads that are already known and owned upstream. Z13 adds:
+
+* **OO1, Rails side:** make `OrderedOptions#_get` public, so `InheritableOptions` reads its parent without a
+  protected send. It wins per call on Ruby 4.0.9 by itself (−12.5% Ir per inherited read without JIT, −4.5% under
+  YJIT; −35% under master ZJIT), but whole requests don't move under YJIT, so it is **held** as a parked idea after
+  two reviews ([below](#rails-side-lead-oo1-orderedoptions_get-public)).
+* **Protected sends, ZJIT side:** a protected send costs ZJIT about 626 Ir more than the same send to a public
+  method; YJIT pays 50. That is new data for #1109, drafted as a comment [below](#zjit-side-drafts-not-posted). It
+  doesn't reopen our #19483: whole benchmarks would move by 0.3% (railsbench) or less.
+* **`&:sym` block arguments** are their own bucket of about 1% of the gap
+  ([below](#symbol-block-arguments-on-rails-main-after-vb1)); ZS1 builds the ZJIT side of #1014.
+
+No crash, wrong result or divergence turned up.
+
+## Pins and method (2026-11-15)
+
+* **Ruby:** master [`3be2b028a7`](https://github.com/ruby/ruby/commit/3be2b028a7) (2026-11-15 09:48 UTC), release
+  build, GCC 14.2, rustc 1.100, `--enable-yjit --enable-zjit`. YJIT and ZJIT ran on this one build.
+* **Stats build:** the same master plus the per-ISEQ ZJIT stats commit (`--zjit-stats-iseq`, thomasklemm/ruby
+  `1c64fd8d6a`, one `hir.rs` conflict resolved to master's side) and the interpreter-per-ISEQ patch
+  ([`zjit_yjit_gap_interp_iseq.patch`](../../bench/upstream/zjit_yjit_gap_interp_iseq.patch)). Used only for
+  counters, never under Callgrind.
+* **ruby-bench** `73918b2`: railsbench and lobsters on Rails 8.1.1, shipit on 8.1.2. The copy used for measuring sets
+  `reaping_frequency: 0` and a long `verify_timeout`, so no pool reaper thread runs inside a window.
+* **Flags:** ZJIT `--zjit --zjit-exec-mem-size=512 --zjit-mem-size=1024`; YJIT `--yjit`.
+  `compile_error_out_of_memory` was 0 in every ZJIT stats run.
+* **Callgrind:** Valgrind 3.19 with the brk reservation patch, fixed heap (`RUBY_GC_HEAP_INIT_BYTES=32 MiB`), harness
+  [`zjit_yjit_gap_harness.rb`](../../bench/upstream/zjit_yjit_gap_harness.rb): 150 warmup iterations (YJIT's call
+  threshold rises to 120 once more than 40k ISEQs are live, so 40 left it compiling on lobsters and shipit), then
+  windows of 3 iterations, at least 8 and at most 30, until two in a row are JIT-flat, then a measured window of 3
+  iterations. **JIT-flat gate:** no compiled ISEQ or block and no invalidation from the last warm windows through
+  the measured window. A window that fails is kept as a rejected attempt and the harness warms to flat again,
+  up to 4 attempts ([`cg_queue2.sh`](../../bench/upstream/z13/cg_queue2.sh)). Every used window passed.
+  Rejected windows: one, shipit YJIT run a at iteration 213 (one block compiled inside the window, 75,607 → 75,608); its retry at iteration 222 passed and is the one used. Before the cohort, probes with 40 warmup iterations failed the gate under YJIT on lobsters and shipit, which is why the warmup went to 150.
+* **A/A:** runs a (perf map by ISEQ), b (by HIR / codegen function) and c (no perf map) per JIT. Totals and classes
+  use the mean of the three runs; the per-site join uses run a. railsbench has all three runs per mode; lobsters and shipit
+  have runs a and c (the b perf maps were skipped for time). Spread of each mode's runs: railsbench ZJIT 0.08%, YJIT
+  0.19%; lobsters 0.00% / 0.01%; shipit 0.07% / 0.04%. The main + VB1 Callgrind lane was stopped unfinished; the
+  Rails main numbers below come from the counters.
+* **Attribution:** as on 11-03 (below): self Ir per function into buckets, JIT code per ISEQ from the perf map, and
+  ZJIT's per-ISEQ fallback reasons joined with YJIT's generic calls from the same ISEQ
+  ([`zjit_yjit_gap_sites.rb`](../../bench/upstream/zjit_yjit_gap_sites.rb)). New:
+  [`zjit_yjit_gap_classes.rb`](../../bench/upstream/zjit_yjit_gap_classes.rb) maps the buckets and the extra
+  fallbacks per reason to the Z13 classes. The fallback classes take the dispatch, block and trampoline delta split
+  by each reason's share of the extra generic calls at the benchmark's price per call; "codegen quality" is the JIT
+  code delta without the entry trampoline. These are estimates of the same kind as the 11-03 per-reason Ir.
+* **Counters:** `--zjit-stats-iseq` and `--yjit-stats=quiet`, 150 warmup and 10 measured iterations, same fixed heap.
+* Receipts: [`data/zjit-yjit-gap/z13-receipts.tar.gz`](data/zjit-yjit-gap/z13-receipts.tar.gz): every run's JSON
+  (gate, attempts, heap), the dump summaries, the stats JSONs, and the report, classes and sites tables.
+
+## Symbol block arguments on Rails main after VB1
+
+Thomas's question: how much do `foo(&:sym)` sends to an ISEQ callee still cost under ZJIT on Rails main once VB1
+removes #59141's `&:value!` and `&:deep_dup`? (ZJIT `send_fallback_send_block_arg_not_nil`, YJIT
+`send_iseq_block_arg_type`; scope [Shopify/ruby#1014](https://github.com/Shopify/ruby/issues/1014).) Sent to the ZS1
+thread, which builds the ZJIT change.
+
+Counts per iteration, Rails main `8217632cf8` + VB1 (`5796a82a82`), same pins and warmup as the cohort. The ZJIT
+counter is split per ISEQ by what the ISEQ's own `&arg` calls pass
+([`zjit_yjit_gap_blockargs.rb`](../../bench/upstream/zjit_yjit_gap_blockargs.rb), Prism); yields are counted by a
+probe that prepends `Array#each`/`#map`/`#select`/`#find` and `Kernel#then`/`#tap` (the Ruby builtins whose `yield`
+JIT code runs) and counts elements when the block is a Symbol proc
+([`symyield_harness.rb`](../../bench/upstream/z13/symyield_harness.rb)):
+
+| | railsbench | lobsters | shipit |
+| --- | ---: | ---: | ---: |
+| ZJIT `send_block_arg_not_nil`, all | 92,610 | 28,159 | 140,099 |
+| … of which `&:sym` | **9,987** | **2,588** (+458 in ISEQs that also forward) | **8,017** (+1,602) |
+| … of which forwarding a block parameter (lead 7) | 82,623 | 25,113 | 130,421 |
+| YJIT `send_iseq_block_arg_type` (Symbol and other non-Proc block args) | 10,000 | 4,214 | 10,606 |
+| yields to those Symbol procs in the builtins | 7,274 | 9,475 | 12,200 |
+| Rails main without VB1: `&:sym` sends | 32,467 | 16,925 (+458) | 34,680 (+1,602) |
+
+YJIT's `invokeblock_symbol` (23,274 / 40,301 / 129,762) is not a count of yields to Symbol handlers: YJIT emits it
+on the generic path of a yield site whose handler at compile time was a Symbol, so it counts every later yield at
+that site ([vm-share](vm-share.md) row 4 found the same for `Array#each`).
+
+Top Symbol sites on main + VB1 (sends are the ZJIT fallback count of the enclosing ISEQ; yields are elements
+handed to the Symbol proc):
+
+| benchmark | site | sends | yields |
+| --- | --- | ---: | ---: |
+| railsbench | `map(&:strip)` / `reject(&:blank?)`, request_forgery_protection.rb:576 and rendering.rb:231 (Vary header) | 3,974 | 3,974 |
+| railsbench | `tap(&:start_session)`, asynchronous_queries_tracker.rb:37 | 2,000 | 2,000 |
+| railsbench | `each(&:call)`, execution_context.rb:80; `each(&:close!)`, rack tempfile_reaper.rb:27 | 4,000 | 0 |
+| railsbench | `map(&:body)`, jbuilder collection_renderer.rb:28 | 13 | 1,300 |
+| lobsters | `select(&:has_default?)`, activerecord-typedstore typed_hash.rb:16 | 359 | 6,821 |
+| lobsters | preloader batch.rb:13–33 (`flat_map(&:branches)`, `each(&:run)`, `map(&:klass)` …) | 679 | 466 |
+| lobsters | `each(&:readonly!)`, relation.rb:1488 (mixed ISEQ) | 334 | – |
+| shipit | `then(&:first)`, singular_association.rb:47/52 | 2,424 | 2,424 |
+| shipit | `with_connection(&:default_timezone)`, integration.rb:208 | 1,788 | – |
+| shipit | `each(&:readonly!)`, relation.rb:1488 (mixed ISEQ) | 1,602 | – |
+| shipit | `collect(&:to_param)`, to_query.rb:57 | 971 | – |
+| shipit | `map(&:to_s)`, shipit github_app.rb:137 | 787 | 3,094 |
+| shipit | `map(&:last)`, indexed_row.rb:241; `map(&:alias)`/`map(&:name)`, join_dependency.rb:151/296 | 282 | 4,512 |
+
+Without VB1, `fetch_value_at!`/`value_at!` `cast_value(&:value!)` add 22.5k / 14.3k / 26.7k sends per iteration,
+the largest single Symbol site on every benchmark.
+
+**Price** (Callgrind micro, [`sym_micro.rb`](../../bench/upstream/z13/sym_micro.rb), Ir per call, both
+JIT A/A runs identical):
+
+| | interpreter | YJIT | ZJIT |
+| --- | ---: | ---: | ---: |
+| `one(x, &:foo)`, callee yields once | 1,921 | 2,027 | 2,115 |
+| `one(x) { \|x\| x.foo }` | 1,504 | 1,259 | 991 |
+| `A.map(&:foo)`, 10 elements | 11,184 | 10,821 | 11,400 |
+| `A.map { \|x\| x.foo }` | 9,014 | 3,490 | 6,708 |
+
+A `&:sym` send costs ZJIT about 400 Ir over a direct call ([lead 7c](zjit-leads.md#rails-side-option-a-block-literal-in-fetch_value_at)
+measured 384–426), and each yield to a Symbol handler about 700 Ir more than a yield to a block literal; YJIT pays
+the same within 90 Ir per call and 60 per element. (`map`'s literal case under ZJIT is itself generic here: its
+`yield` saw both handlers.)
+
+**Answer.** On Rails main after VB1, `&:sym` costs ZJIT about **9 M Ir per railsbench iteration (0.19%)**,
+**8 M on lobsters (0.24%)** and **12 M on shipit (0.3%)**, more of it in the yields than in the sends. It explains
+**about 1% of the ZJIT − YJIT gap**, because YJIT is generic at the same sites. A ZJIT fix would put ZJIT ahead of
+YJIT there rather than close the gap.
+
+**Coverage upstream.** No open ruby/ruby or Shopify/ruby PR handles Symbol block arguments. #1014 is open and
+unassigned (tekknolagi on 11-06: "Is this done now that Alan added the PR?", unanswered). Merged: dak2's
+ruby/ruby#18180 (Proc block args), #19077 (inline `&proc`), our #19484 (Proc to an explicit block param). Shopify/ruby
+branch `zjit-perf/blockarg-direct-send` (Rafael França, `3f17d8950e`, 2026-09-11, agent-generated, never opened as a
+PR) sends a static Symbol directly via `rb_vm_block_handler_from_blockarg` behind a `Symbol#to_proc` PatchPoint; its
+own summary leaves the yields `invokeblock_not_specialized`, so it covers the send side only.
+
+## Rails-side lead OO1: `OrderedOptions#_get` public
+
+`InheritableOptions` reads a key it doesn't hold from its parent in its default proc with `@parent._get(k)`
+(ordered_options.rb:94 in 8.1.1, :108 on main). `_get` is a protected alias of `Hash#[]`. ZJIT doesn't compile a
+protected send with an explicit receiver (`SendNotOptimizedNeedPermission`, hir.rs; the compiled readers'
+`_get(:key)` is an FCALL and is compiled), so each read falls back: **41.8k per railsbench iteration** on Rails
+8.1.1 (21 per request, from about seven reads that each fall through three levels; 55k protected sends in
+total), 49.7k on Rails main. YJIT compiles the same send behind a check that the caller is an `OrderedOptions`. Which reads miss on railsbench (callers probe on `_get`,
+[`callers_harness.rb`](../../bench/upstream/z13/callers_harness.rb)): `logger` (12,000 per iteration, from
+`cleanup_view_runtime`) and the CSRF settings (`allow_forgery_protection`, `request_forgery_protection_token`,
+`per_form_csrf_tokens` and twice `csrf_token_storage_strategy`, 5,961 each), 41,805 in total, the same as ZJIT's
+count. All are delegated to the controller's config and fall through to the class's.
+
+The Rails change deletes `protected :_get`. It has to win on Ruby 4.0.9 by itself, and per call it does: the
+interpreter checks the caller's class on each protected call, about 240 of the 518 Ir such a call costs (claude-code
+review below).
+
+Callgrind Ir per read through two inheritance levels (two protected sends per read;
+[`oo1_micro.rb`](../../bench/upstream/z13/oo1_micro.rb), N = 21,000 minus N = 1,000, divided by 20,000; Rails main
+`8217632cf8` against the branch, A/A in parentheses):
+
+| | main | branch | change |
+| --- | ---: | ---: | ---: |
+| Ruby 4.0.9, no JIT | 3,821.6 (3,823.7) | 3,343.1 (3,341.8) | −12.5% |
+| Ruby 4.0.9, YJIT | 2,202.4 (2,202.0) | 2,102.3 (2,103.8) | −4.5% |
+| master `3be2b028a7`, no JIT | 3,977.8 (3,981.3) | 3,505.5 (3,507.5) | −11.9% |
+| master, YJIT | 2,272.4 (2,271.0) | 2,170.9 (2,170.6) | −4.5% |
+| master, ZJIT | 3,528.2 (3,528.9) | 2,276.2 (2,274.9) | −35.5% |
+
+benchmark-ips on 4.0.9 ([`oo1_ips.rb`](../../bench/upstream/z13/oo1_ips.rb), main / branch / main / branch,
+taken while Callgrind runs used the other cores, ±25%): no JIT 1.716M / 2.160M / 1.779M / 2.206M i/s, YJIT
+3.186M / 3.353M / 3.324M / 3.184M. The interpreter gain shows; YJIT's 4.5% is inside this noise, so Ir carries it.
+
+Per railsbench iteration that is about 10 M Ir without JIT (0.1%), 2 M under YJIT (0.04%) and 26 M under master
+ZJIT (0.5%, 16% of the ZJIT − YJIT gap), estimated from the counts and the per-read prices. Below the rails/rails
+opening bar of DECISIONS (a change that measurably moves whole requests); both reviews measured it on whole requests.
+
+Behaviour: the only difference a caller can see is that `options._get` called from outside an `OrderedOptions`
+used to go to `method_missing` and read a key named `:_get`; it now calls the alias of `Hash#[]` without `to_sym`
+([`oo1_probe.rb`](../../bench/upstream/z13/oo1_probe.rb)). `ordered_options_test` (35 runs, 106 assertions) and
+`configurable_test` (10, 35) pass on 4.0.9.
+
+Branch `thomasklemm/rails` [`thomasklemm/ordered-options-public-get`](https://github.com/thomasklemm/rails/tree/thomasklemm/ordered-options-public-get),
+head `b44663e7e9`, queue item [OO1](../../bench/upstream/pr-queue/items/OO1.md), **held as a parked idea**. Reviews on
+`715436d3b1` (same tree; only the commit message changed after them):
+
+* **claude-code** ([orb](https://ampcode.com/threads/T-01a1df46-8b92-73f8-b0e5-42629f57434b)): changes. Code exact
+  and L0; 687-case differential probe identical for every read on 4.0.9 with and without YJIT. Must-fix: the commit
+  carried an `Amp-Thread-ID` trailer; "most of the cost" was wrong (the check is 240 of 518 Ir per call); "twenty
+  reads" were calls (seven reads per request). Micro reproduced: −12.5% no JIT, −4.5% YJIT. Whole railsbench on
+  4.0.9: −0.15% Ir without JIT (A/A ≤ 0.07%), −0.02% under YJIT (inside the 0.12% A/A).
+* **opus** ([orb](https://ampcode.com/threads/T-01a1df46-d5d8-7266-8fdf-0f168c4e9de5)): changes, the same trailer and
+  count findings, plus "three or four levels" (a scaffold page adds the view's config). Micro: −12.6% / −4.4%.
+  Whole requests: about 0.12% without JIT and 0.04% under YJIT, inside its A/A.
+
+The trailer and the text are fixed on `b44663e7e9` (fork branch rewritten with lease; nothing opened). **Verdict:**
+the change wins per call on 4.0.9 by itself, but whole requests don't move under the production JIT, so it fails the
+rails/rails opening bar. It stays a parked idea; if ZJIT doesn't learn protected sends (#1109) before 4.1, it is the
+cheapest way to remove the largest protected site.
+
+If ZJIT compiles protected sends (#1109), the ZJIT row shrinks to roughly the YJIT row; the 4.0.9 gain stays.
+
+## ZJIT-side drafts (not posted)
+
+DECISIONS: performance leads don't become issues on their own, and nothing goes upstream from here. The Z13 run has
+one ZJIT-side item with new data, the protected sends of #1109. The other ZJIT-side classes are known and owned
+(table above), and the `&:sym` part is with ZS1. The draft below is a comment for
+[Shopify/ruby#1109](https://github.com/Shopify/ruby/issues/1109), in ZJIT's format, for whoever takes it.
+
+### Comment draft for Shopify/ruby#1109 (protected methods)
+
+> Some numbers for this from ruby-bench's Rails benchmarks on master `3be2b028a7`. `@parent._get(k)` in
+> `InheritableOptions` is the largest protected call site: 41.8k sends per railsbench iteration (21 per request),
+> of 55k protected sends in total; lobsters has 16k and shipit 30k. In Callgrind with a fixed heap, ZJIT spends
+> 15.0 / 4.5 / 10.4 M more instructions per iteration than YJIT on them, about 10% / 2% / 2% of the ZJIT − YJIT gap
+> on those benchmarks. Per send that's about 600 instructions more than when `_get` is public.
+>
+> A micro with the same shape (each read falls through two levels of default procs, so it makes two protected
+> sends; the second file only drops `protected :_get`):
+>
+> ```
+> yjit: ruby 4.1.0dev (2026-11-15T09:48:53Z master 3be2b028a7) +YJIT +PRISM [x86_64-linux]
+> zjit: ruby 4.1.0dev (2026-11-15T09:48:53Z master 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
+> ruby-bench: 73918b2fc1a84702fea63e06f64d179751d69df4
+>
+> -------------------  ------------  -------------  ------------  ---------
+> bench                   yjit (ms)      zjit (ms)  zjit 1st itr  yjit/zjit
+> zjit_protected_send  71.3 ± 26.3%  171.7 ± 22.8%         0.452      0.415
+> zjit_public_send     73.8 ± 28.3%  110.0 ± 22.3%         1.498      0.671
+> -------------------  ------------  -------------  ------------  ---------
+>
+> Legend:
+> - zjit 1st itr: ratio of yjit/zjit time for the first iteration.
+> - yjit/zjit: ratio of yjit/zjit time. Higher is better for zjit. Above 1 represents a speedup.
+> ```
+>
+> `--zjit-stats` diff, 15 iterations of 500k reads:
+>
+> ```
+>                                            protected :_get    public _get
+> send_not_optimized_need_permission              14,999,971              0
+> dynamic_send_count                              15,000,172             77
+> optimized_send_count                                18,097     15,017,736
+> non_variadic_cfunc_optimized_send_count                268     15,000,241
+> rb_vm_opt_send_without_block                    14,999,971              0
+> ```
+
+The run_benchmarks.rb output was taken on core 0 while three Callgrind runs used the other cores; the orb's vCPU
+also runs at two speeds, hence ±22–28%. Callgrind on the same shape carries the claim (OO1 table: ZJIT 3,528 →
+2,276 Ir per read). The public variant is still about 1.5× YJIT's time: the default proc is called from C
+(`Hash#[]` → `rb_proc_call`) and runs through `rb_vm_exec` and ZJIT's entry trampoline (29.5 M per railsbench
+iteration, counted with the fallback classes). Not measured further here.
+
+Scripts: [`zjit_protected_send.rb`](../../bench/upstream/z13/zjit_protected_send.rb) and
+[`zjit_public_send.rb`](../../bench/upstream/z13/zjit_public_send.rb), copied into `benchmarks/` of a ruby-bench
+checkout. Our ruby/ruby#19483 closed on 11-04 because whole benchmarks didn't move outside the spread of two master
+builds; at 0.3% of a railsbench iteration that still holds, so the draft gives data and offers no PR.
+
+## 2026-11-03 measurement
+
+The sections from here on are the first measurement, on master `a8b095a07e` with 15 warmup iterations, without a fixed heap and without
+the JIT-flat gate, and the leads it found. Lead numbers (3, 7, 11–17) are the ones the table above uses.
+
+## Result, 2026-11-03
 
 On one Ruby master build, ZJIT runs **+3.9% (railsbench), +5.8% (lobsters) and +18.3% (shipit)** more instructions
 per iteration than YJIT. Without GC the gaps are +3.4%, +5.6% and +17.2%, and every run is within 0.27% of the other

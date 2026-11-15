@@ -39,35 +39,53 @@ def run_benchmark(_num_itrs_hint, **, &block)
   if ENV["GAP_MODE"] == "callgrind"
     require "lowrail_callgrind"
     no_gc = ENV["CG_NO_GC"] == "1"
+    # A measured window that fails the gate is kept as a rejected attempt (its dump stays on disk) and the harness
+    # warms up to flat again before the next attempt, up to MEASURE_ATTEMPTS. Dump 1 is the empty window, dump
+    # N + 1 is attempt N. FLAT_MIN_WINDOWS warm windows run before the first attempt in any case, so that JITs that
+    # go flat at different times still measure the same iterations (lobsters writes rows every iteration).
+    attempts = []
+    itr = WARMUP_ITRS
     flat_history = []
-    flat = 0
-    if (last = gap_jit_counters)
-      Integer(ENV.fetch("FLAT_MAX_WINDOWS", 8)).times do
-        MEASURE_ITRS.times { block.call }
-        now = gap_jit_counters
-        flat = now == last ? flat + 1 : 0
-        flat_history << now
-        last = now
-        break if flat == FLAT_WINDOWS
+    Integer(ENV.fetch("MEASURE_ATTEMPTS", 1)).times do |attempt|
+      flat = 0
+      min_windows = attempt.zero? ? Integer(ENV.fetch("FLAT_MIN_WINDOWS", 0)) : 0
+      if (last = gap_jit_counters)
+        Integer(ENV.fetch("FLAT_MAX_WINDOWS", 8)).times do |window|
+          MEASURE_ITRS.times { block.call }
+          itr += MEASURE_ITRS
+          now = gap_jit_counters
+          flat = now == last ? flat + 1 : 0
+          flat_history << now
+          last = now
+          break if flat >= FLAT_WINDOWS && window + 1 >= min_windows
+        end
       end
+      if attempt.zero?
+        3.times { GC.start }
+        LowrailCallgrindBench.start(no_gc)
+        LowrailCallgrindBench.finish
+      end
+      3.times { GC.start }
+      heap_before = gap_heap
+      before = gap_gc
+      # Read right next to the window: the harness's own GC.stat calls can compile code.
+      jit_before = gap_jit_counters
+      LowrailCallgrindBench.start(no_gc)
+      MEASURE_ITRS.times { block.call }
+      segments = LowrailCallgrindBench.finish
+      jit_after = gap_jit_counters
+      after = gap_gc
+      gate = jit_before.nil? ? "n/a" : (flat >= FLAT_WINDOWS && jit_before == jit_after ? "pass" : "fail")
+      attempts << { dump: attempt + 2, first_itr: itr, gate:, gc_segments: segments,
+        gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(MEASURE_ITRS)] }, measured_before: jit_before,
+        measured_after: jit_after, heap_before: }
+      itr += MEASURE_ITRS
+      break unless gate == "fail"
     end
-    3.times { GC.start }
-    LowrailCallgrindBench.start(no_gc)
-    LowrailCallgrindBench.finish
-    3.times { GC.start }
-    heap_before = gap_heap
-    before = gap_gc
-    # Read right next to the window: the harness's own GC.stat calls can compile code.
-    jit_before = gap_jit_counters
-    LowrailCallgrindBench.start(no_gc)
-    MEASURE_ITRS.times { block.call }
-    segments = LowrailCallgrindBench.finish
-    jit_after = gap_jit_counters
-    after = gap_gc
-    gate = jit_before.nil? ? "n/a" : (flat == FLAT_WINDOWS && jit_before == jit_after ? "pass" : "fail")
-    gap_write(itrs: MEASURE_ITRS, gc_segments: segments, gc: after.to_h { |k, v| [k, (v - before[k]).fdiv(MEASURE_ITRS)] },
-      jit_flat: { gate:, warm_windows: flat_history, measured_before: jit_before, measured_after: jit_after },
-      heap_before:)
+    used = attempts.last
+    gap_write(itrs: MEASURE_ITRS, gc_segments: used[:gc_segments], gc: used[:gc], dump: used[:dump],
+      jit_flat: { gate: used[:gate], warm_windows: flat_history, measured_before: used[:measured_before],
+        measured_after: used[:measured_after] }, heap_before: used[:heap_before], attempts:)
   else
     jit = RubyVM::ZJIT.enabled? ? RubyVM::ZJIT : (RubyVM::YJIT if defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?)
     ii = RubyVM.respond_to?(:lowrail_ii=) && ENV["GAP_II"] == "1"

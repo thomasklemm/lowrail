@@ -130,7 +130,7 @@ durations of `cache_*.active_support` events per measured iteration):
   `HTTP status is 500 instead of 200 for req 27/114, "/replies/unread"`, from
   `Errno::ENOENT … rb_file_s_rename (…/tmp/cache/.user3A123Aunread_replies…, …/tmp/cache/927/BE0/user%3A12%3Aunread_replies)`.
   `FileStore#delete` removes empty directories while another process renames into them. With `:memory_store` the
-  same three processes all exit 0. This is the 500 recorded in [zjit-yjit-gap](zjit-yjit-gap.md#result) and
+  same three processes all exit 0. This is the 500 recorded in [zjit-yjit-gap](zjit-yjit-gap.md#result-2026-11-03) and
   [zjit-iseq-leads](zjit-iseq-leads.md).
 * **Iteration 1 depends on the previous run.** A cold `tmp/cache` costs lobsters 2 extra regenerations (the 20 KB
   users tree and the inbox count, +88 ms) and shipit 84 fragment writes (105 ms of file writes alone) plus the
