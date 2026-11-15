@@ -13,12 +13,13 @@ bundled PR (queue item [FLK1](../../bench/upstream/pr-queue/items/FLK1.md)), one
   activejob integration job fails in 330 of 1,816 runs on main, but it is soft-failed and never turns a build red.
 - **The flake that turned the most builds red is outside Rails too:** activemodel `RailtieTest` (17 red builds) hits
   a Ruby bug with `require` inside a Ractor. Main already guards against it.
-- **Fixed in the PR (two commits, head 866942ff69), with before and after rates:**
+- **Fixed in the PR (two commits, head fdd771cf79), with before and after rates:**
   - `ServerTimingTest`, three tests: compared the header with `sleep` lengths under fixed tolerances. 189/200 failing
     before, 0/200 after, on GitHub runners with the CPU throttled the way a container limited to 2 CPUs is.
-  - `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor): the Ractor proxy unpinned
-    a different main pool than it pinned, so the writing pool stayed pinned for later tests. 14/120 failing before,
-    0/120 after on GitHub runners, with the three tests involved in random order; both CI seeds fail on main and pass with the fix.
+  - `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor): the Ractor proxy looked
+    the main pool up again by name and role at unpin and unpinned nothing, so the writing pool stayed pinned for later
+    tests. 15/120 failing before, 0/120 after on GitHub runners (120 distinct seeds), with the three tests
+    involved in random order; both CI seeds fail on main and pass with the fix.
 - **Already fixed, or with an open fix by someone else:** 9 more flakes, listed below. `TestUnconnectedAdapter` has
   an open fix (rails/rails#59174) that matthewd steered; our first fix for it was the approach he turned down, so we
   dropped it.
@@ -92,7 +93,7 @@ one name, the sum for siblings, each event for different names).
 | GitHub runner, cgroup `cpu.max` 2 CPUs, 4 busy processes (run 43711709644) | 188/200 | 0/200 |
 | GitHub runner, idle and `stress-ng --cpu 8` without a quota (run 43710141822) | 0/600 | 0/600 |
 
-The before rate depends on the host: 97/100 in our orb (`docker --cpus 2`), 188/200 on GitHub runners, 133/200 and 51/100 in the two review orbs (cgroup `cpu.max` 2 CPUs with 4 busy processes); every after run was 0. The CI failures reported 61.41 to 85.16 ms against 40 ± 20 (builds 134657, 134681, 134967, 135436, 136058). The GitHub after side of runs 43710141822 and 43711709644 checked out the branch by name (an earlier head with the same actionpack change); run 43721043566 pins it to the reviewed head 866942ff69: 189/200 before (93 + 96), 0/200 after; the PR body cites this run.
+The before rate depends on the host: 97/100 in our orb (`docker --cpus 2`), 188/200 on GitHub runners, 133/200 and 51/100 in the two review orbs (cgroup `cpu.max` 2 CPUs with 4 busy processes); every after run was 0. The CI failures reported 61.41 to 85.16 ms against 40 ± 20 (builds 134657, 134681, 134967, 135436, 136058). The GitHub after side of runs 43710141822 and 43711709644 checked out the branch by name (an earlier head with the same actionpack change); run 43721043566 pins it to head 866942ff69, whose Server-Timing commit fd0e61b728 is unchanged in fdd771cf79: 189/200 before (93 + 96), 0/200 after; the PR body cites this run. The Fable review orb, with a 1-CPU quota and 4 busy processes, got 200/200 before and 0/200 after, and 1/200 before without a quota.
 
 The failure needs the thread stalled for longer than the tolerance, which a CPU quota does and fair scheduling on an
 unthrottled host does not. Mutation checks: summing nested same-name events fails the same-name test, and
@@ -113,26 +114,38 @@ The pin that outlives its test comes from `DatabaseSelectorTest#test_can_write_w
 (and any test that calls `establish_connection` for a new role under transactional fixtures). The fixtures'
 `!connection.active_record` subscriber runs `setup_shared_connection_pool`, which makes the new reading role point at
 the writing pool config, then pins the new proxy pool. Through the proxy, `pin_main_connection!` resolves the main
-pool by name and role at that moment and gets the **writing** pool (depth 1 → 2). At teardown the fixtures restore the
-reading pool first; `unpin_main_connection!` looks up name, role and pool token again and finds the reading pool or
-nothing, so the writing pool's depth never returns to 0 (pin log: depth stayed ≥ 1 from that test to the end of the
+pool by name and role at that moment and gets the **writing** pool (depth 1 → 2). At teardown the fixtures unpin before they
+restore the reading pool (`teardown_shared_connection_pool` comes last), and `unpin_main_connection!` looks up name,
+role and pool token again and unpins nothing: while the roles still share a pool the lookup finds the writing pool
+under another pool token and skips it, and in `DatabaseSelectorTest` the test's own teardown
+(`clean_up_connection_handler`) has already removed the reading role, so the lookup finds no pool (traced on main by
+the Fable review; our probe saw `main=` empty at that unpin). Either way the writing pool's depth never returns to 0 (pin log: depth stayed ≥ 1 from that test to the end of the
 run, 2,483 pin events). With the plain sqlite3 adapter `ConnectionPool#unpin_connection!` acts on the pool object it
 pinned, so the bug is proxy-only.
 
 The fix records, on the main side, which pool each proxy pin pinned (a stack per proxy pool key) and unpins that pool,
 skipping it if it was discarded meanwhile. Regression test
-`ProxyConnectionPoolTest#test_unpin_releases_the_main_pool_that_was_pinned` reproduces the shared-pool sequence: on
-main it raises `There isn't a pinned connection` (unpin hits the never-pinned reading pool), with the fix the writing
-pool ends with no busy connection.
+`ProxyConnectionPoolTest#test_unpin_releases_the_main_pool_that_was_pinned` pins and unpins while the reading role
+shares the writing pool, the order the fixtures use: on main it fails with `Expected: 0, Actual: 1` (one busy
+connection left on the writing pool) under both `ARCONN=sqlite3` and `sqlite3_ractor`, with the fix it passes.
+`test_unpin_in_a_forked_child_skips_the_discarded_main_pool` covers the `discarded?` guard: in a forked child the
+inherited pin stack names the parent's pool, which the fork discarded; without the guard the child's unpin raises
+`NoMethodError`. It passes on main too (main finds a new pool under another token there and unpins nothing), so it
+guards the new code, not the bug. Fable also noted that the pin stack is per proxy pool key and shared by all
+Ractors: if the pool swap falls between two Ractors' pins, the first unpin releases the other Ractor's pool; the end
+state is right, and main leaves both pinned.
 
 | Loop | Before (main 8217632cf8) | After |
 |---|---:|---:|
-| orb, the three tests in seeded random class order, 60 seeds | 7/60 | 0/60 |
+| orb, the three tests in seeded random class order, seeds 1–120 | 15/120 | 0/120 |
+| Fable review orb, same loop, 120 distinct seeds | 12/120 | 0/120 |
 | orb, full `sqlite3:test:ractor` with CI seeds 6870 and 20983 | 2/2 | 0/2 |
 | orb, full `sqlite3:test:ractor` seeds 1, 2 and full `test:sqlite3` seed 6870 | – | 0 failures, 0 errors |
 
-7/60 matches the share of class orders (1 in 6) that run the pinning test, then the dirtying test, then the retry
-test. GitHub loops: run 43715792755 (7/60 and 7/60 before, 0/120 after) and run 43721043566 pinned to 866942ff69 (14/120 before, 0/120 after; cited in the PR body).
+About 1 in 8 matches the share of class orders (1 in 6) that run the pinning test, then the dirtying test, then the
+retry test. The earlier GitHub runs 43715792755 and 43721043566 used seeds 1–60 in both shards, so their "14/120"
+was 7/60 counted twice (Fable). Run 43725460078 gives each shard its own seeds (1–60, 61–120), after side pinned to
+fdd771cf79: 15/120 before, 0/120 after; the PR body cites it.
 
 ## Already fixed or owned by someone else
 
