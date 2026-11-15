@@ -1,0 +1,219 @@
+diff --git a/eval_intern.h b/eval_intern.h
+index ca4e4b5061..128eeb3020 100644
+--- a/eval_intern.h
++++ b/eval_intern.h
+@@ -163,11 +163,14 @@ rb_ec_tag_state(const rb_execution_context_t *ec)
+     return state;
+ }
+ 
++extern int rb_lowrail_neq_active;
++void rb_lowrail_neq_jump(void);
+ NORETURN(static inline void rb_ec_tag_jump(const rb_execution_context_t *ec, enum ruby_tag_type st));
+ static inline void
+ rb_ec_tag_jump(const rb_execution_context_t *ec, enum ruby_tag_type st)
+ {
+     RUBY_ASSERT(st > TAG_NONE && st <= TAG_FATAL, ": Invalid tag jump: %d", (int)st);
++    if (UNLIKELY(rb_lowrail_neq_active)) rb_lowrail_neq_jump();
+ #if USE_ZJIT
+     rb_zjit_materialize_frames_for_longjmp(ec, ec->cfp);
+ #endif
+diff --git a/lowrail_neq.h b/lowrail_neq.h
+new file mode 100644
+index 0000000000..25be394931
+--- /dev/null
++++ b/lowrail_neq.h
+@@ -0,0 +1,143 @@
++/* Lowrail measurement build (ZNE1): `!=` sends that reach BasicObject#!= through a generic send.
++ *
++ * Counting (RubyVM.lowrail_neq = true): one row per "from\tsite\treceiver class\ttarget".
++ *   from jit    : rb_vm_opt_send_without_block, the generic send ZJIT code falls back to
++ *   from interp : opt_neq in the interpreter when its fast path does not apply
++ * Callgrind region (RubyVM.lowrail_neq_cg = true; false restores whole-program collection):
++ * collection is on only from the start of a generic `!=` send from ZJIT code whose target is
++ * BasicObject#!= until that send returns, the `==` it performs included. */
++#include <valgrind/callgrind.h>
++
++int rb_lowrail_neq_count_on;
++int rb_lowrail_neq_cg_on;
++int rb_lowrail_neq_active;
++static unsigned long lowrail_neq_enters, lowrail_neq_abnormal;
++static st_table *lowrail_neq_table;
++
++void
++rb_lowrail_neq_jump(void)
++{
++    rb_lowrail_neq_active = 0;
++    lowrail_neq_abnormal++;
++    CALLGRIND_TOGGLE_COLLECT;
++}
++
++static int
++lowrail_neq_basic_p(VALUE recv)
++{
++    const rb_callable_method_entry_t *cme = rb_callable_method_entry(CLASS_OF(recv), idNeq);
++    return cme && cme->owner == rb_cBasicObject && METHOD_ENTRY_BASIC(cme);
++}
++
++static void
++lowrail_neq_count(const rb_control_frame_t *cfp, VALUE recv, const char *from)
++{
++    char key[1200], cls[256];
++    const rb_iseq_t *iseq = CFP_ISEQ(cfp);
++    VALUE label = ISEQ_BODY(iseq)->location.label, path = rb_iseq_path(iseq), klass = CLASS_OF(recv), name;
++    const rb_callable_method_entry_t *cme = rb_callable_method_entry(klass, idNeq);
++    if (RCLASS_SINGLETON_P(klass)) {
++        snprintf(cls, sizeof(cls), "#<singleton>");
++    }
++    else {
++        name = rb_mod_name(klass);
++        snprintf(cls, sizeof(cls), "%.250s", NIL_P(name) ? "#<anon>" : RSTRING_PTR(name));
++    }
++    name = cme ? rb_mod_name(cme->owner) : Qnil;
++    snprintf(key, sizeof(key), "%s\t%.120s@%.500s:%d\t%s\t%s%s", from,
++             RB_TYPE_P(label, T_STRING) ? RSTRING_PTR(label) : "?", RB_TYPE_P(path, T_STRING) ? RSTRING_PTR(path) : "?",
++             rb_vm_get_sourceline(cfp), cls,
++             !cme ? "missing" : lowrail_neq_basic_p(recv) ? "BasicObject#!=" : NIL_P(name) ? "#<anon>" : RSTRING_PTR(name),
++             !cme || lowrail_neq_basic_p(recv) ? "" : "#!= (own)");
++    st_data_t v;
++    if (!lowrail_neq_table) lowrail_neq_table = st_init_strtable();
++    if (st_lookup(lowrail_neq_table, (st_data_t)key, &v)) {
++        (*(uint64_t *)v)++;
++    }
++    else {
++        uint64_t *count = malloc(sizeof(uint64_t));
++        *count = 1;
++        st_insert(lowrail_neq_table, (st_data_t)strdup(key), (st_data_t)count);
++    }
++}
++
++static inline int
++lowrail_neq_enter(const rb_control_frame_t *cfp, const struct rb_callinfo *ci)
++{
++    if (LIKELY(!rb_lowrail_neq_count_on && !rb_lowrail_neq_cg_on) || vm_ci_mid(ci) != idNeq || vm_ci_argc(ci) != 1) return 0;
++    VALUE recv = cfp->sp[-2];
++    if (rb_lowrail_neq_count_on) {
++        rb_lowrail_neq_count_on = 0;
++        lowrail_neq_count(cfp, recv, "jit");
++        rb_lowrail_neq_count_on = 1;
++    }
++    if (!rb_lowrail_neq_cg_on || rb_lowrail_neq_active || !lowrail_neq_basic_p(recv)) return 0;
++    rb_lowrail_neq_active = 1;
++    lowrail_neq_enters++;
++    CALLGRIND_TOGGLE_COLLECT;
++    return 1;
++}
++
++static inline void
++lowrail_neq_exit(int token)
++{
++    if (UNLIKELY(token) && rb_lowrail_neq_active) {
++        rb_lowrail_neq_active = 0;
++        CALLGRIND_TOGGLE_COLLECT;
++    }
++}
++
++static int
++lowrail_neq_clear_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    free((void *)k); free((void *)v);
++    return ST_DELETE;
++}
++
++static VALUE
++lowrail_neq_set(VALUE self, VALUE on)
++{
++    if (lowrail_neq_table) st_foreach(lowrail_neq_table, lowrail_neq_clear_i, 0);
++    rb_lowrail_neq_count_on = RTEST(on);
++    return on;
++}
++
++static int
++lowrail_neq_dump_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    rb_ary_push((VALUE)a, rb_ary_new_from_args(2, rb_str_new_cstr((const char *)k), ULL2NUM(*(uint64_t *)v)));
++    return ST_CONTINUE;
++}
++
++static VALUE
++lowrail_neq_dump(VALUE self)
++{
++    int was = rb_lowrail_neq_count_on;
++    rb_lowrail_neq_count_on = 0;
++    VALUE rows = rb_ary_new();
++    if (lowrail_neq_table) st_foreach(lowrail_neq_table, lowrail_neq_dump_i, (st_data_t)rows);
++    rb_lowrail_neq_count_on = was;
++    return rows;
++}
++
++/* Set right after CALLGRIND_START_INSTRUMENTATION, which turns collection back on: true turns it
++ * off outside the regions and drops what the seam collected. */
++static VALUE
++lowrail_neq_cg_set(VALUE self, VALUE on)
++{
++    if (RTEST(on)) {
++        CALLGRIND_TOGGLE_COLLECT;
++        CALLGRIND_ZERO_STATS;
++    }
++    rb_lowrail_neq_cg_on = RTEST(on);
++    rb_lowrail_neq_active = 0;
++    lowrail_neq_enters = lowrail_neq_abnormal = 0;
++    return on;
++}
++
++/* [regions entered, regions left by a non-local jump, collection still on] */
++static VALUE
++lowrail_neq_cg_state(VALUE self)
++{
++    return rb_ary_new_from_args(3, ULONG2NUM(lowrail_neq_enters), ULONG2NUM(lowrail_neq_abnormal), INT2FIX(rb_lowrail_neq_active));
++}
+diff --git a/vm.c b/vm.c
+index cf83b488b9..db75c9fe3d 100644
+--- a/vm.c
++++ b/vm.c
+@@ -706,6 +706,7 @@ static void add_opt_method_entry(const rb_method_entry_t *me);
+ 
+ static const rb_box_t * current_box_on_cfp(const rb_execution_context_t *ec, const rb_control_frame_t *cfp);
+ 
++#include "lowrail_neq.h"
+ #include "vm_insnhelper.c"
+ 
+ #include "vm_exec.c"
+@@ -4676,6 +4677,10 @@ Init_VM(void)
+     rb_undef_alloc_func(rb_cRubyVM);
+     rb_undef_method(CLASS_OF(rb_cRubyVM), "new");
+     rb_define_singleton_method(rb_cRubyVM, "stat", vm_stat, -1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_neq=", lowrail_neq_set, 1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_neq_dump", lowrail_neq_dump, 0);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_neq_cg=", lowrail_neq_cg_set, 1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_neq_cg_state", lowrail_neq_cg_state, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines", vm_keep_script_lines, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines=", vm_keep_script_lines_set, 1);
+ 
+diff --git a/vm_insnhelper.c b/vm_insnhelper.c
+index fc90c254e9..44d4cc2b11 100644
+--- a/vm_insnhelper.c
++++ b/vm_insnhelper.c
+@@ -6474,9 +6474,11 @@ VALUE
+ rb_vm_opt_send_without_block(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, CALL_DATA cd)
+ {
+     stack_check(ec);
++    int neq = lowrail_neq_enter(GET_CFP(), cd->ci);
+     VALUE bh = VM_BLOCK_HANDLER_NONE;
+     VALUE val = vm_sendish(ec, GET_CFP(), cd, bh, mexp_search_method);
+     VM_EXEC(ec, val);
++    lowrail_neq_exit(neq);
+     return val;
+ }
+ 
+@@ -7189,6 +7191,11 @@ vm_opt_mod(VALUE recv, VALUE obj)
+ static VALUE
+ vm_opt_neq(struct rb_control_frame_struct *reg_cfp, CALL_DATA cd, CALL_DATA cd_eq, VALUE recv, VALUE obj)
+ {
++    if (UNLIKELY(rb_lowrail_neq_count_on) && !vm_method_cfunc_is(reg_cfp, cd, recv, rb_obj_not_equal)) {
++        rb_lowrail_neq_count_on = 0;
++        lowrail_neq_count(reg_cfp, recv, "interp");
++        rb_lowrail_neq_count_on = 1;
++    }
+     if (vm_method_cfunc_is(reg_cfp, cd, recv, rb_obj_not_equal)) {
+         VALUE val = opt_equality(reg_cfp, recv, obj, cd_eq);
+ 
