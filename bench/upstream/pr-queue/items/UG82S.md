@@ -23,8 +23,4 @@ passes:
 
 # Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset
 
-This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" for a change on main that breaks existing apps and that the guide doesn't mention yet. `Rack::Sendfile` is omitted when `x_sendfile_header` is unset (#56915), so `insert_before Rack::Sendfile` then raises on boot, as in [Redmine](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/config/application.rb#L79).
-
----
-
-<sub>Found by running the test suites of Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/c7893f5d5b509a2514303c84459f74bb0499d6fc/docs/upstream/app-suites.md)).</sub>
+This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" for a change on main that breaks existing apps and that the guide doesn't mention yet. `Rack::Sendfile` is omitted when `x_sendfile_header` is unset (#56915), so `insert_before Rack::Sendfile` then raises on boot, as I found running Redmine's test suite on main ([its `config/application.rb`](https://github.com/redmine/redmine/blob/41cd39c24a9f913a69c8a9ec4cbc128a6600fbce/config/application.rb#L79)).

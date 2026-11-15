@@ -23,8 +23,4 @@ passes:
 
 # Note in the upgrade guide that Sidekiq 8.0.3 or later is required
 
-This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" for a change on main that breaks existing apps and that the guide doesn't mention yet. Sidekiq 8.0.3 or later is needed (#56518): older releases, including the 7.3.3+ that the 8.1 deprecation recommends, can fail to load Sidekiq's adapter, which sidekiq/sidekiq#6669 fixed in 8.0.3. Sidekiq must also be required before initialization, including when its Gemfile entry uses `require: false`.
-
----
-
-<sub>Found by running the test suites of Rails apps on Rails main and 8-1-stable side by side ([record](https://github.com/thomasklemm/lowrail/blob/c7893f5d5b509a2514303c84459f74bb0499d6fc/docs/upstream/app-suites.md)).</sub>
+This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" for a change on main that breaks existing apps and that the guide doesn't mention yet. Booting an app that uses Sidekiq 7 on main, I found that Sidekiq 8.0.3 or later is needed (#56518): older releases, including the 7.3.3+ that the 8.1 deprecation recommends, can fail to load Sidekiq's adapter, which sidekiq/sidekiq#6669 fixed in 8.0.3. Sidekiq must also be required before initialization, including when its Gemfile entry uses `require: false`.
