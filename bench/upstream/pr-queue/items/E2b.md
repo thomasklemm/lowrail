@@ -28,16 +28,13 @@ passes:
   - {reviewer: skeptic, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "no tie-order assertion left; type != 'table' mutant and permanent-wins mutant fail; posted body checked"}
   - {reviewer: sol, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "round 4, scope stated"}
   - {reviewer: astra, head: "bc90b487f2", date: 2026-11-05, verdict: approve, open: "all four table/view shadowing combinations; no order-dependent assertions"}
+  - {reviewer: claude-code, head: "bc90b487f2", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by ecosystem-tests.md E2/E2b."}
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers
 
-The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of `sqlite_master` and `sqlite_temp_master` rows. When a temporary table has the same name as a permanent one, both rows match, and the pragmas resolve both to the temporary table, as SQLite does. So columns and indexes are duplicated, and the primary key becomes composite.
+The batched SQLite schema readers from 2cb3daba96 join each pragma to a list of `sqlite_master` and `sqlite_temp_master` rows. While fixing their table-name case lookup (#59671), I found that when a temporary table has the same name as a permanent one, both rows match, and the pragmas resolve both to the temporary table, as SQLite does. So columns and indexes are duplicated, and the primary key becomes composite.
 
 The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Collations and check constraints now come from the temporary table's CREATE statement too; 8-1-stable read the columns from the temporary table but the statement of the permanent one.
 
 Shared index names remain a separate issue. #59671 (table names in any ASCII case) is stacked on this one.
-
----
-
-<sub>Found while fixing the table-name case lookup in the same readers, which [ransack's suite](https://github.com/activerecord-hackery/ransack/blob/fbc3baf164da2a80435d5678a77924c66472f694/spec/ransack/active_record/context_spec.rb#L73-L81) hit on Rails main ([record](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/ecosystem-tests.md), part of my research project Lowrail).</sub>

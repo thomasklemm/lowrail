@@ -32,11 +32,12 @@ passes:
   - {reviewer: claude-code, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Message-only change: tree 6488869689 identical to c69e94955e, same parent 48091f4694. GC sentence accurate (rb_ary_store pre-fills nil; cells 0..i-1 written when cell i converts); all lines <= 72, author/committer Thomas Klemm <github@tklemm.eu>, no trailers. PR body and title match DRV2.md; still draft at this head. Nothing open."}
   - {reviewer: sol, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
   - {reviewer: astra, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
+  - {reviewer: claude-code, head: "16cc8f7b7ac6fc9bb4272df07693437dad41aaec", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by driver-cpu.md."}
 ---
 
 # Fill multi-column statement rows at their known size
 
-Each cell in a SQLite row goes through `rb_ary_store`, although the final column count is already known. Fetching 1,000 seven-column rows repeats that work 7,000 times.
+While measuring the CPU cost of Ruby's database drivers, I found that each cell in a SQLite row goes through `rb_ary_store`, although the final column count is already known. Fetching 1,000 seven-column rows repeats that work 7,000 times.
 
 Set a multi-column row's length once without growing its capacity, then fill its cells. Single-column rows keep their existing path. Values and frozen result rows stay the same.
 
@@ -48,6 +49,3 @@ Callgrind instructions per 1,000-row, seven-column Active Record load (`to_a`), 
 | YJIT | 13,019,464 | 12,667,677 |
 
 These measurements use SQLite 3.40.1.
-
----
-<sub>Found through Lowrail, my performance research project: [driver CPU study](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/driver-cpu.md).</sub>

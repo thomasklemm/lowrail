@@ -26,11 +26,12 @@ passes:
   - {reviewer: claude-code, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Reviewed 16c9550b68; message-only fix applied. Bind matrix (33 kinds of string incl. broken/frozen/shared/subclass UTF-8, US-ASCII, Latin-1, SJIS, UTF-16/32, UTF8-MAC, CESU-8, binary, Blob; with and without default_internal ISO-8859-1; positional and named) identical to main on Ruby 3.2.11/3.3.13/3.4.12/4.0.9 (system SQLite 3.40.1): bytes, types, errors, caller string unchanged. New tests pass on main and kill 4 mutants (&& !USASCII_P, scrub, raise on broken, blob for broken). Suite 430/880 green on 4.0.9. Exact-head CI 133 pass, 2 fail: sqlcipher mingw (target not found) and Windows 3.3 collation, both failing on upstream main schedule run 41797589777; earlier busy_timeout flake fails on main in 5+ runs. Nothing open."}
   - {reviewer: sol, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
   - {reviewer: astra, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
+  - {reviewer: claude-code, head: "64b0190a0a5df7abc35368535aa791f192bc65b4", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: nits, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Clause backed by driver-cpu.md. Nit not applied (wording predates this cleanup): 'do not claim a request-level speedup' is on the DECISIONS leave-out list."}
 ---
 
 # Avoid a redundant String when binding UTF-8 text
 
-Binding a UTF-8 string currently allocates a redundant String through `rb_str_encode`: the condition `!UTF8_P(value) || !USASCII_P(value)` is always true. A lookup such as `where(name: names).pluck(:id)` makes one unnecessary String for every name.
+While measuring the CPU cost of Ruby's database drivers, I found that binding a UTF-8 string currently allocates a redundant String through `rb_str_encode`: the condition `!UTF8_P(value) || !USASCII_P(value)` is always true. A lookup such as `where(name: names).pluck(:id)` makes one unnecessary String for every name.
 
 Pass UTF-8 strings straight to SQLite, which still takes its own copy. Other encodings keep their existing conversion, including errors for invalid US-ASCII strings.
 
@@ -42,6 +43,3 @@ Objects and Callgrind instructions per 20-name Active Record lookup, Ruby 4.0.9,
 | Instructions | 1,092,175 | 1,083,184 |
 
 These measurements use SQLite 3.40.1 and do not claim a request-level speedup.
-
----
-<sub>Found through Lowrail, my performance research project: [driver CPU study](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/driver-cpu.md).</sub>

@@ -22,6 +22,7 @@ passes:
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: changes, open: "code approved as is; body must-fix: tzinfo-data copies were identical objects, linked files unpushed; should-fix: scope of TimeWithZone callers, run spread, NaN/raising fields; all applied"}
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: nits, open: "body re-review: no must-fix; nits applied (Hash wording, zones with transitions); kept the ~210 per unequal comparison"}
   - {reviewer: sol, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: nits, open: "code approved; body nits applied: custom overrides in the boundary, +210 scoped to the measured case, zones with transitions, same-period label, Rails pin, differential described precisely, body shortened"}
+  - {reviewer: claude-code, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. No clause added (the body already says where the problem shows up, or the clause was already there); link cut."}
 ---
 
 # Return early from TimezoneTransition#== for the same object
@@ -39,6 +40,6 @@ Callgrind instructions per call, Ruby 4.0.9 without a JIT, Active Support from R
 | `70.days.ago(time_with_zone)`, same period | 66,626 | 58,621 |
 | `[period].include?(different_period)` | 4,333 | 4,543 |
 
-The measured comparison of two different periods costs 210 instructions more. `rake test` passes on Ruby 4.0.9, and the [Tests workflow](https://github.com/thomasklemm/tzinfo/actions/runs/42114287387) passes on my fork. A comparison of `==` and `eql?` before and after, with a check that equal transitions have equal hashes, over every transition up to 2100 of every zone (zoneinfo files and tzinfo-data) against itself, its neighbours, equal copies and non-nil values of other types gives identical results. The benchmark, the comparison, more cases and the method are [here](https://github.com/thomasklemm/lowrail/tree/bfeb3d349cf0d7464fe0c2830028c13f6037b5cc/bench/upstream/ruby_bench_dst).
+The measured comparison of two different periods costs 210 instructions more. `rake test` passes on Ruby 4.0.9, and the [Tests workflow](https://github.com/thomasklemm/tzinfo/actions/runs/42114287387) passes on my fork. A comparison of `==` and `eql?` before and after, with a check that equal transitions have equal hashes, over every transition up to 2100 of every zone (zoneinfo files and tzinfo-data) against itself, its neighbours, equal copies and non-nil values of other types gives identical results.
 
 I found this while looking at why the lobsters benchmark in ruby-bench does more work near a DST change.

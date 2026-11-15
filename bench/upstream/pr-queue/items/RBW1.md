@@ -27,6 +27,7 @@ passes:
   - {reviewer: sol, head: "537f5752f5", date: 2026-11-06, verdict: approve, open: "confirm pass: all four a233212fad points resolved (JRuby README note, driver claim scoped to the A/B runs, provenance pinned, no-growth qualified); none"}
 waived:
   - {reviewer: thermos, head: "537f5752f5", by: coordinator, reason: "Thermos ran on 950a2bc27d in the claude-code pass (fixes in 65151273f6); the delta since is the rollback fix (own transaction when pin_connection! has none) plus README/body, approved by claude-code and Sol on this head; most of the 3,600 lines are the generated app"}
+  - {reviewer: claude-code, head: "d761531b83", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. No clause added (the body already says where the problem shows up, or the clause was already there); link cut."}
 ---
 
 # Add a blog benchmark that writes
@@ -39,7 +40,7 @@ What it finds and what it doesn't is below. Would a write workload like this be 
 
 ### What it finds, and what it doesn't
 
-It catches changes the other Rails benchmarks never run. A small busy loop injected into `save` and `destroy` adds 2.3% to blog's instructions per iteration, and that code doesn't run at all in railsbench's or lobsters' timed iterations. Its per-request split also shows where a Rails change lands: from Rails 8.1.4.1 to main, reads take 9–14% fewer instructions while creates stay flat. It overlaps with railsbench and lobsters on per-query and database-driver overhead, and in our A/B runs it didn't separate those changes better. Its total alone says little, since about two thirds of it is reads much like railsbench's. The measurements are in [this record](https://github.com/thomasklemm/lowrail/blob/bfe17841b1529509f60f09554b5468681517eaf0/docs/upstream/ruby-bench-blog-findings.md).
+It catches changes the other Rails benchmarks never run. A small busy loop injected into `save` and `destroy` adds 2.3% to blog's instructions per iteration, and that code doesn't run at all in railsbench's or lobsters' timed iterations. Its per-request split also shows where a Rails change lands: from Rails 8.1.4.1 to main, reads take 9–14% fewer instructions while creates stay flat. It overlaps with railsbench and lobsters on per-query and database-driver overhead, and in our A/B runs it didn't separate those changes better. Its total alone says little, since about two thirds of it is reads much like railsbench's.
 
 ### Details
 

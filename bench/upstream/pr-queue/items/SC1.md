@@ -22,15 +22,13 @@ passes:
   - {reviewer: skeptic, head: "a302bc09b8555d6da525adb51f64df26eb9651da", date: 2026-11-05, verdict: approve, open: "Mutable references and frozen registration verified through request parsing; revised body approved"}
   - {reviewer: sol, head: "a302bc09b8", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed, no new finding"}
   - {reviewer: astra, head: "a302bc09b8", date: 2026-11-05, verdict: approve, open: "confirm: earlier findings addressed; optional title nit: 'Register the SCIM parser with frozen parameter registries'; not applied"}
+  - {reviewer: claude-code, head: "a302bc09b8555d6da525adb51f64df26eb9651da", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by app-suites.md OpenProject boot shim (scimitar 2.15.0, OP1)."}
 ---
 
 # Register the SCIM parser through the parameter parser writer
 
-On Rails main, `ActionDispatch::Request.parameter_parsers` is frozen, so adding the SCIM parser to it raises `FrozenError` and an app using Scimitar doesn't boot.
+Running OpenProject's test suite on Rails main, I found that `ActionDispatch::Request.parameter_parsers` is frozen there, so adding the SCIM parser to it raises `FrozenError` and an app using Scimitar doesn't boot.
 
 When the registry is frozen, this adds the parser to a copy and sets it with `parameter_parsers=`, as the Rails docs suggest. On released Rails the registry isn't frozen, and the parser is added in place as before.
 
 I'll keep this as a draft until the Rails 8.2 beta, since Rails may still keep this registry writable, and update it then.
-
----
-<sub>Found through Lowrail's [Rails-main gem census](https://github.com/thomasklemm/lowrail/blob/main/docs/upstream/gem-side-candidates.md#sc1-scimitar-parser-registration).</sub>
