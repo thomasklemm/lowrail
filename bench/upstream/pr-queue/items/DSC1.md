@@ -16,7 +16,7 @@ rank: 40
 risky: false
 state: held
 pr:
-note: "From VM1's side finding on rails#59570 (docs/upstream/vm-share.md, '#59570 and Discourse's UTF-8 repair'; Lowrail b8424e7). Rails side: no change (option a; boundary disclosed in #59570, a guard costs every app +3.3% to +8.1% per unsafe append, exact check is worse than before #59570). Fix: also prepend OutputBuffer#<<, concat and append= (bench/upstream/vm1/discourse_erb/discourse_output_buffer_sketch.rb; 23 cases match 8.1 + patch on 8.1 and main), with a spec that renders a template. Held until the Rails 8.2 beta (DECISIONS: no compatibility PRs for Rails main before it); works on 8.1 too, so it may open earlier if Thomas says so. Needs a branch, two passes and Discourse's contribution rules checked before opening."
+note: "From VM1's side finding on rails#59570 (docs/upstream/vm-share.md, '#59570 and Discourse's UTF-8 repair'; Lowrail b8424e7). Rails side: no change (option a; boundary disclosed in #59570, a guard costs every app +3.3% to +8.1% per unsafe append, exact check is worse than before #59570). Fix: also prepend OutputBuffer#<<, concat and append= (bench/upstream/vm1/discourse_erb/discourse_output_buffer_sketch.rb; 23 cases match 8.1 + patch on 8.1 and main), with a spec that renders a template. Held until the Rails 8.2 beta (DECISIONS: no compatibility PRs for Rails main before it; Thomas confirmed 2026-11-15). Needs a branch, two passes and Discourse's contribution rules checked before opening."
 passes: []
 ---
 
