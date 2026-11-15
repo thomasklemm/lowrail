@@ -205,12 +205,15 @@ The Fizzy YJIT A/A cell ended without output twice (no OOM kill; cause not trace
 blocks, so only Blog has a YJIT A/A; the TE2 YJIT cells move 10× more than it. Lobsters' 50-story index page was
 too slow for these windows under Callgrind and was dropped.
 
-**benchmark-ips** (TE2's body script, [`tag/ips.rb`](../../bench/upstream/vm1/tag/ips.rb), core 3, interleaved):
-no cohort on this orb is usable for a body yet. The quietest (best of 8, nothing else running) gives `tag.a` 199.4k
-→ 253.3k i/s (+27.0%) and `content_tag` 335.1k → 426.4k (+27.3%) with A/A +4.4% and −0.2%, and TE2 beat both main
-checkouts in 8 of 8 `tag.a` rounds, but single runs carry ±13–27% errors and the best-of numbers are well above
-Callgrind's −7.2%. Earlier cohorts ran beside Callgrind jobs and failed their A/A
-([all cohorts](data/vm-share/prototypes-ips.txt)). TE2's body waits for a quiet cohort.
+**benchmark-ips** (TE2's body script, [`tag/ips.rb`](../../bench/upstream/vm1/tag/ips.rb), core 3, interleaved,
+every other job and service stopped): 10 rounds of main, a second main checkout and TE2 give, best of 10, `tag.a`
+196.5k / 196.7k / 214.0k i/s (A/A +0.1%, TE2 +8.9%) and `content_tag` 319.1k / 327.8k / 345.7k (A/A +2.7%, TE2
++8.3%). Medians agree for `tag.a` (+9.3% against A/A +1.5%; TE2 beat every main run in 9 of 10 rounds) and are
+smaller for `content_tag` (+3.0% against −1.6%). An earlier idle cohort of 5 rounds gave +7.1% and +4.7% against
+A/A −0.6% and +0.7%, near Callgrind's −7.2%. Single runs still carry ±2–21% errors: a fresh a1.small orb that ran
+only this measurement found the vCPU switching between two speeds (a pure-Ruby loop swung about 2× per 100 ms with
+no steal or throttling) and failed its A/A (+12.3%). Earlier cohorts ran beside Callgrind jobs and failed their
+A/A ([all cohorts](data/vm-share/prototypes-ips.txt)). TE2's body uses the 10-round cohort's best runs.
 
 **Reviews.** Two independent passes per branch (claude-code and Opus standing in for Sol), recorded in
 [TE1](../../bench/upstream/pr-queue/items/TE1.md) and [TE2](../../bench/upstream/pr-queue/items/TE2.md):

@@ -1,4 +1,4 @@
-# benchmark-ips cohorts for bench/upstream/vm1/tag/ips.rb, core 3, interleaved rounds, best of N per tree (ips_best.rb). All rejected for a body: A/A outside the effect or run errors above 13%.
+# benchmark-ips cohorts for bench/upstream/vm1/tag/ips.rb, core 3, interleaved rounds, best of N per tree (ips_best.rb). TE2's body uses te2-ips-idle2 (A/A +0.1% and +2.7%); all earlier cohorts are rejected for a body: A/A outside the effect, run errors above 13%, or both.
 ## te1/ips-yjit.txt
 tag.a: base 420.1k (2.381 µs, n=5), base2 416.3k (2.402 µs, n=5), branch 453.7k (2.204 µs, n=5); base2/base -0.9%, branch/base +8.0%
 content_tag: base 654.0k (1.529 µs, n=5), base2 669.7k (1.493 µs, n=5), branch 682.8k (1.465 µs, n=5); base2/base +2.4%, branch/base +4.4%
@@ -36,3 +36,85 @@ base r6 195.270k	base2 r6 208.236k	TE2 r6 253.345k
 base r7 181.623k	base2 r7 195.584k	TE2 r7 225.466k
 base r8 199.417k	base2 r8 180.064k	TE2 r8 221.947k
 # te1/*: branch = TE1 only; te-ips-noisy and te-ips-loaded ran while Callgrind used cores 0-2.
+
+## te2-ips-idle/yjit.txt (2026-11-15 03:40, every other job and census-pg/redis stopped, core 3; per-run errors +-2-17%)
+tag.a: base 189.0k (5.291 µs, n=5), base2 187.8k (5.325 µs, n=5), TE2 202.5k (4.939 µs, n=5); base2/base -0.6%, TE2/base +7.1%
+content_tag: base 307.2k (3.256 µs, n=5), base2 309.4k (3.232 µs, n=5), TE2 321.6k (3.110 µs, n=5); base2/base +0.7%, TE2/base +4.7%
+base r1 tag.a 180.123k (± 7.6%)
+base r1 content_tag 298.913k (± 5.0%)
+base2 r1 tag.a 183.422k (± 4.8%)
+base2 r1 content_tag 290.092k (± 9.3%)
+TE2 r1 tag.a 194.127k (±14.0%) i/s
+TE2 r1 content_tag 321.554k (± 4.1%)
+base r2 tag.a 188.223k (± 1.9%)
+base r2 content_tag 307.155k (± 1.4%)
+base2 r2 tag.a 187.808k (±17.4%) i/s
+base2 r2 content_tag 304.418k (± 5.6%)
+TE2 r2 tag.a 202.486k (± 8.3%)
+TE2 r2 content_tag 316.663k (± 4.7%)
+base r3 tag.a 185.451k (±11.2%) i/s
+base r3 content_tag 283.897k (±10.7%) i/s
+base2 r3 tag.a 184.195k (± 7.1%)
+base2 r3 content_tag 297.317k (± 5.7%)
+TE2 r3 tag.a 195.959k (± 8.1%)
+TE2 r3 content_tag 302.532k (± 9.1%)
+base r4 tag.a 189.015k (± 9.7%)
+base r4 content_tag 298.504k (± 7.4%)
+base2 r4 tag.a 184.198k (± 5.5%)
+base2 r4 content_tag 309.437k (± 5.1%)
+TE2 r4 tag.a 198.854k (± 6.0%)
+TE2 r4 content_tag 309.623k (± 5.9%)
+base r5 tag.a 182.491k (± 6.5%)
+base r5 content_tag 305.276k (± 5.0%)
+base2 r5 tag.a 163.768k (±16.5%) i/s
+base2 r5 content_tag 288.821k (±16.8%) i/s
+TE2 r5 tag.a 178.560k (±15.6%) i/s
+TE2 r5 content_tag 304.336k (± 6.2%)
+ 03:40:57 up  3:27,  0 users,  load average: 0.72, 0.78, 0.97
+cpu  2638984 3209 133116 2154799 21444 0 8418 19643 0 0
+ 03:44:55 up  3:31,  0 users,  load average: 1.00, 0.91, 1.00
+cpu  2661754 3209 133900 2224691 21453 0 8475 21651 0 0
+
+## te2-ips-idle2/yjit.txt (2026-11-15 03:59-04:08, every other job and service stopped, core 3, 10 rounds; per-run errors +-2.1-20.9%, steal 1.9% of all CPU time; used for TE2's body: before = base r2 tag.a and base r3 content_tag, after = TE2 r2 tag.a and TE2 r1 content_tag)
+tag.a: base 196.5k (5.090 µs, n=10), base2 196.7k (5.084 µs, n=10), TE2 214.0k (4.673 µs, n=10); base2/base +0.1%, TE2/base +8.9%
+content_tag: base 319.1k (3.134 µs, n=10), base2 327.8k (3.050 µs, n=10), TE2 345.7k (2.893 µs, n=10); base2/base +2.7%, TE2/base +8.3%
+medians: tag.a base 188.3k, base2 191.1k (A/A +1.5%), TE2 205.9k (+9.3%); content_tag base 310.5k, base2 305.4k (A/A -1.6%), TE2 319.7k (+3.0%); TE2 beat every main and main2 tag.a run in 9 of 10 rounds (r9 196.1k vs best main 196.7k)
+base r1 tag.a 190.926k (± 6.1%) content_tag 308.955k (± 5.0%)
+base2 r1 tag.a 196.697k (±12.3%) content_tag 327.849k (±17.3%)
+TE2 r1 tag.a 210.020k (±11.1%) content_tag 345.707k (±10.1%)
+base r2 tag.a 196.472k (±19.3%) content_tag 318.200k (±12.8%)
+base2 r2 tag.a 184.164k (± 8.9%) content_tag 298.293k (± 8.4%)
+TE2 r2 tag.a 214.006k (± 6.4%) content_tag 312.849k (±13.8%)
+base r3 tag.a 181.437k (± 9.1%) content_tag 319.109k (± 6.9%)
+base2 r3 tag.a 191.559k (± 7.3%) content_tag 308.988k (±10.7%)
+TE2 r3 tag.a 206.749k (± 4.8%) content_tag 323.977k (± 5.2%)
+base r4 tag.a 193.421k (± 5.3%) content_tag 315.560k (± 2.1%)
+base2 r4 tag.a 186.110k (± 9.5%) content_tag 304.673k (± 9.0%)
+TE2 r4 tag.a 203.650k (± 3.9%) content_tag 318.245k (± 8.6%)
+base r5 tag.a 186.560k (±10.2%) content_tag 309.004k (± 6.2%)
+base2 r5 tag.a 195.117k (± 9.0%) content_tag 270.112k (±17.9%)
+TE2 r5 tag.a 205.096k (± 5.3%) content_tag 322.544k (±12.7%)
+base r6 tag.a 188.378k (± 7.2%) content_tag 303.002k (± 4.6%)
+base2 r6 tag.a 187.635k (± 5.2%) content_tag 301.916k (±14.2%)
+TE2 r6 tag.a 203.637k (±19.6%) content_tag 313.775k (± 7.0%)
+base r7 tag.a 185.224k (±17.2%) content_tag 306.600k (± 5.5%)
+base2 r7 tag.a 191.360k (± 4.6%) content_tag 305.681k (± 4.7%)
+TE2 r7 tag.a 198.680k (±12.5%) content_tag 338.754k (±17.6%)
+base r8 tag.a 188.260k (± 4.7%) content_tag 315.985k (± 6.9%)
+base2 r8 tag.a 192.422k (± 3.1%) content_tag 310.970k (± 3.1%)
+TE2 r8 tag.a 213.703k (± 7.5%) content_tag 321.085k (± 9.0%)
+base r9 tag.a 185.060k (± 8.1%) content_tag 312.023k (± 5.1%)
+base2 r9 tag.a 190.901k (±14.3%) content_tag 305.132k (± 4.9%)
+TE2 r9 tag.a 196.052k (±20.9%) content_tag 295.871k (±15.1%)
+base r10 tag.a 191.494k (± 2.6%) content_tag 302.036k (± 7.6%)
+base2 r10 tag.a 183.959k (± 6.7%) content_tag 310.011k (± 2.4%)
+TE2 r10 tag.a 207.760k (± 9.1%) content_tag 318.365k (± 9.4%)
+ 03:59:47 up  3:38,  0 users,  load average: 0.28, 0.34, 0.69
+cpu  2662562 3209 135072 2367792 21474 0 8575 24054 0 0
+ 04:07:39 up  3:45,  0 users,  load average: 1.30, 1.09, 0.92
+cpu  2708371 3209 136732 2506560 21489 0 8701 27745 0 0
+
+## fresh a1.small claude-code orb T-01a1dd4f-4c06-74f2-a99b-357ec3a3c9a1 (2026-11-15 03:51-03:55, idle: load 0.16, 100.0 id, 0.0 st; taskset -c 1, 5 rounds): rejected
+tag.a: main 215.3k (+-26.1%), main2 241.7k (+-17.5%), TE2 220.7k (+-27.0%); A/A +12.3%, TE2 +2.5%
+content_tag: main 422.2k (+-13.4%), main2 415.6k (+-9.1%), TE2 418.2k (+-15.8%); A/A -1.6%, TE2 -1.0%
+cause (that orb's diagnosis, host mechanism a hypothesis): the vCPU runs at two speeds; a fib(18) loop counted per 100 ms window swung 952-2539 iterations on core 1 (median 1220) with steal ~1%, nr_throttled 0 and CPU/wall 1.0; plain fib(20) under benchmark-ips gave +-36.9%. Raw output in that orb's .amp/in/orb-backup/te2-ips/.
