@@ -20,5 +20,6 @@ mutate "detect_product with casecmp?" lib/user_agent/browsers/base.rb 's.sub!("u
 mutate "Chrome#application memoized" lib/user_agent/browsers/chrome.rb 's.sub!("self.reject", "@application ||= self.reject")'
 git -C "$ua" checkout -q -- . && git -C "$ua" apply "$here/mutant-lazy-version.patch" && probe "$mut" > /tmp/ua1-mut.txt &&
   echo "Version parsed lazily: $(diff /tmp/ua1-mut-main.txt /tmp/ua1-mut.txt | grep -c '^>') of $(wc -l < /tmp/ua1-mut.txt) lines differ"
+mutate "AppleCoreMedia#application is first" lib/user_agent/browsers/apple_core_media.rb 's.sub!("self.reject { |agent| agent.comment.nil? || agent.comment.empty? }.first", "first")'
 mutate "extend? skips IE" lib/user_agent/browsers.rb 's.sub!("all.each do |extension|", "(all - [InternetExplorer]).each do |extension|")'
 git -C "$ua" checkout -q -- .

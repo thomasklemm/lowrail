@@ -89,7 +89,8 @@ uas.concat([nil, "", " ", "\t", "Mozilla", "/", "//", "'\"Mozilla/5.0'", "a\nb/1
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36".encode("UTF-16LE"),
             "Mozilla/5.0 (Windows NT 10.0) Chrome/120.0.0.0 Safari/537.36".b, "Mozilla/5.0 (Windows NT 10.0) ÇHRÖME/120.0 Safari/537.36",
             "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/11.0", "Iron/1.0 Chrome/120 Safari/1",
-            "Mozilla/5.0 (Linux) CRIOS/120.0 Safari/1", "Mozilla/5.0,gzip(gfe) Chrome/1", "Mozilla/5.0 (a; b; c; d; e) İ/1.0", "Mozilla/5.0 (X11) Straße/1.0 Chrome/120.0"])
+            "Mozilla/5.0 (Linux) CRIOS/120.0 Safari/1", "Mozilla/5.0,gzip(gfe) Chrome/1", "Mozilla/5.0 (a; b; c; d; e) İ/1.0", "Mozilla/5.0 (X11) Straße/1.0 Chrome/120.0",
+            "Foo/1 AppleCoreMedia/1.0.0.12B435 (iPhone; U; CPU OS 8_1_1 like Mac OS X; en_us)"])
 uas.each { |s| puts line(s) }
 version_strings = ODD + uas.compact.flat_map { |s| (UserAgent.parse(s).map { |a| a.version.to_s } rescue []) }
 version_lines(version_strings).each { |l| puts l }

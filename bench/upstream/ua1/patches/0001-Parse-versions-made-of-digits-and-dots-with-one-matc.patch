@@ -1,4 +1,4 @@
-From 5f50d6e3d9a55214c2853275d65d838503595e33 Mon Sep 17 00:00:00 2001
+From b39b161fe755c5287c4bf568c55d2263af6728dc Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Sun, 15 Nov 2026 13:40:41 +0000
 Subject: [PATCH 1/4] Parse versions made of digits and dots with one match
@@ -28,8 +28,6 @@ Parsing 21 current browser, bot and in-app user agents, and running Rails'
     after:   parse x21      2.459k (± 7.0%) i/s  (406.74 μs/i) -     12.432k in   5.056624s
     before:  check x21      1.229k (± 8.2%) i/s  (813.41 μs/i) -      6.188k in   5.033369s
     after:   check x21      1.567k (± 4.7%) i/s  (638.29 μs/i) -      7.952k in   5.075670s
-
-Amp-Thread-ID: https://ampcode.com/threads/T-01a1def5-5235-7214-8cf5-9d74afcc5a06
 ---
  lib/user_agent/version.rb | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)

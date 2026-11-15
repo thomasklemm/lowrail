@@ -9,7 +9,7 @@ exactly and without a cache.
 six files) make `allow_browser`'s whole check about 1.4× faster under YJIT (benchmark-ips over 21 real user agents:
 1.44× against the first main run, 41.1 to 28.5 µs per user agent, and 1.36× against main's A/A run, which was 6%
 faster; the two reviews measured 1.44× and 1.37×; 1.42× on ZJIT master). They cut 30.6% of the check's YJIT
-instructions (27.8% in the interpreter) and 34 of its 183 objects. The differential probe over 20,401 user agents
+instructions (27.8% in the interpreter) and 34 of its 183 objects. The differential probe over 20,402 user agents
 is byte-identical to main. On the profiled apps that is about 0.9% of a Blog request, 0.4% of Campfire's and 0.15% of
 Fizzy's, against AB1's 3.0, 1.3 and 0.5%; on a fresh app's bare page about 4% of the 12.9%. That is short of the
 2× bar, and the gem's only merger hasn't merged anything since 2024-12 or answered any of the ten PRs opened in
@@ -75,7 +75,8 @@ lazy-version mutant changes 222 of 20,621 probe lines. Not used.
 ## The changes
 
 On useragent master [680915a](https://github.com/gshutler/useragent/commit/680915a) (0.16.11), local branch
-`thomasklemm/faster-parse` at `3a0896a`: four commits, author and committer Thomas Klemm, no trailers. Callgrind
+`thomasklemm/faster-parse` at `ebafb56`: four commits, author and committer Thomas Klemm, no trailers (`git am
+--committer-date-is-author-date` on the patches gives that SHA). Callgrind
 instructions and objects per check, 21 user agents × 20 rounds, GC off in the window, every YJIT window JIT-flat (0
 blocks compiled), cumulative from top to bottom ([raw](data/ua1/callgrind.txt)):
 
@@ -90,7 +91,8 @@ blocks compiled), cumulative from top to bottom ([raw](data/ua1/callgrind.txt)):
 | | all four against main | −27.8% | −30.6% | −33.9 |
 
 AppleCoreMedia joined change 3 after the reviews (an optional point: it had the same code). None of the 21 user
-agents is AppleCoreMedia, so the measurements stand; the probe and the specs were rerun on `3a0896a`.
+agents is AppleCoreMedia, so the measurements stand; the probe and the specs were rerun on the final head, and the
+probe gained an edge case that reaches AppleCoreMedia's `application` (a mutant returning `first` changes 1 line).
 
 `UserAgent.parse` alone: 200,791 to 145,879 Ir in the interpreter (−27.3%, A/A −0.06%), 165,645 to 117,492 under
 YJIT (−29.1%, A/A −0.05%); 126.1 to 114.0 objects.
@@ -109,7 +111,7 @@ Why each is exact (the commit messages say the same):
 4. The same `to_a` calls in the same order, the same six positions with a missing part read as 0, the same
    branches.
 
-Change 1 uses `=~` and not `match?`, because Ruby 2.3 is still in the gem's CI matrix and `match?` needs 2.4.
+Change 1 uses `=~` and not `match?`, because the gem's CI still tests Rubies before 2.4 (2.2, 2.3), which lack `match?`.
 `match?` there would save another 2.7% of the check's interpreter instructions and 13 objects. The branch uses
 nothing newer than Ruby 2.2 by reading, but it was run only on 4.0.9; Ruby 2.2, 2.3 and JRuby 9.4, which the gem's CI
 lists, were not run.
@@ -131,9 +133,9 @@ Dropped:
 The differential probe ([`probe.rb`](../../bench/upstream/ua1/probe.rb), corpus by
 [`corpus.rb`](../../bench/upstream/ua1/corpus.rb)) runs main, the branch and a second copy of main (A/A) over 20,380
 unique user agents: the strings in useragent's own specs, ua-parser/uap-core's test_ua, test_os and test_device
-fixtures (73e7340c3e), intoli/user-agents (8a2b6f229b) and monperrus/crawler-user-agents (a727b35790). It adds 21
+fixtures (73e7340c3e), intoli/user-agents (8a2b6f229b) and monperrus/crawler-user-agents (a727b35790). It adds 22
 edge cases: nil, blank, `/`, quotes, newlines, binary, invalid UTF-8, UTF-16LE, `ÇHRÖME`, `İ`, `Straße`,
-chromeframe and `,gzip(gfe)`. For each user agent it writes every public result:
+chromeframe, `,gzip(gfe)` and an AppleCoreMedia product after another one. For each user agent it writes every public result:
 
 * the class and every reader twice (`to_s`, `inspect`, `browser`, `version`, `platform`, `os`, `mobile?`, `bot?`,
   `to_h`, `application`, `build`, `security`, `localization`, `webkit`, and Internet Explorer's `real_version`,
@@ -147,7 +149,8 @@ chromeframe and `,gzip(gfe)`. For each user agent it writes every public result:
 Then come 220 lines of `Version.new` over every version string seen and 32 odd ones: all pairs compared, and every
 version read again after mutating the string it was given.
 
-All three outputs are byte-identical: 20,621 lines, md5 `d6c196bc1124…`. Every browser class appears (8,013 `Base`,
+All three outputs are byte-identical: 20,622 lines, md5 `90d2620d4c89…` (20,621 lines, md5 `d6c196bc1124…`, before
+the AppleCoreMedia edge case, which the reviews ran). Every browser class appears (8,013 `Base`,
 5,226 Webkit, 3,979 Chrome, 1,694 Gecko, 763 Opera, 638 Internet Explorer, down to 2 Libavformat), and the two inputs
 that raise (invalid UTF-8, UTF-16LE) raise the same error class and message.
 
@@ -168,8 +171,8 @@ accepted:
   and `split` on the fast path where main called `=~` three times and `scan`, and four times on the old path; a
   subclass overriding `scan`, `split` or `=~` gets a different `to_a`.
 * **A `Version` subclass** whose `to_a` returns an Enumerator, a Set or an object with `to_ary` compares on main and
-  raises `NoMethodError` (`[]`) on the branch; with `nil` the error is `NoMethodError` instead of `TypeError`; parts
-  that define `!=` apart from `==` can give another result.
+  gives another result or raises `NoMethodError` on the branch (a Struct with `[]` gives `nil`); with `nil` the error is
+  `NoMethodError` instead of `TypeError`; parts that define `!=` apart from `==` can give another result.
 * **Foreign elements pushed after the application** (`ua << nil`, `Object.new`, a product with an Integer comment):
   on main `application` and everything that reads it raise `NoMethodError`, because `reject` reached them; the
   branch's `detect` stops at the application and returns it.
@@ -258,7 +261,12 @@ that comes through `UserAgent.parse` or Rails, and holding right.
   the boundaries, the mutant counts, "three to six", "the largest part", and ten PRs opened in 2026 (not nine).
   Optional, applied: AppleCoreMedia in change 3, CI's old Rubies and JRuby named as not run, a second trigger.
 
-All must-fixes are applied on `3a0896a`, with the probe (identical, md5 `d6c196bc…`) and the specs rerun there.
+The fixes went in as `3a0896a`. Both confirm passes on it (same threads) found the five fixes in, AppleCoreMedia
+exact (their own AppleCoreMedia probes: 8 and 5 user agents, plain and mutated, identical), the probe identical and
+the specs green, and one new must-fix: the rebuilt commits had picked up an `Amp-Thread-ID` trailer from a commit
+hook. The final head `ebafb56` is the same four commits rebuilt with `git commit-tree`: the same tree, no trailers,
+and the SHA both reviewers built when they tried the fix. Their nits are applied too (the record's Ruby 2.3 sentence,
+the `to_ary` boundary, the AppleCoreMedia edge case in the probe).
 
 ## Scripts
 

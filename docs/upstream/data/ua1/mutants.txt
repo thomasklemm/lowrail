@@ -5,3 +5,4 @@ detect_product with casecmp?: 1 of 20621 lines differ
 Chrome#application memoized: 3979 of 20621 lines differ
 Version parsed lazily: 222 of 20621 lines differ
 extend? skips IE: 638 of 20621 lines differ
+AppleCoreMedia#application is first (run separately on the final branch, probe with the AppleCoreMedia edge case, 20,622 lines): 1 of 20622 lines differ

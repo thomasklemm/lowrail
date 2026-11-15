@@ -1,4 +1,4 @@
-From 0c1de83743cb8e53e884afbc2731cb8a66c28909 Mon Sep 17 00:00:00 2001
+From 82135e2765a7a5a9b3ac60b521eb10c9dc7ae9b9 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Sun, 15 Nov 2026 13:40:41 +0000
 Subject: [PATCH 3/4] Find the application with detect
@@ -14,8 +14,6 @@ agent.
 Callgrind instructions per `allow_browser` check over 21 current browser,
 bot and in-app user agents, Ruby 4.0.9: 220,106 before and 213,301 after
 without JIT, 165,624 and 160,465 with YJIT, and 3 fewer objects.
-
-Amp-Thread-ID: https://ampcode.com/threads/T-01a1def5-5235-7214-8cf5-9d74afcc5a06
 ---
  lib/user_agent/browsers/apple_core_media.rb | 2 +-
  lib/user_agent/browsers/chrome.rb           | 2 +-
