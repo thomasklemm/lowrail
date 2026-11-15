@@ -5,13 +5,13 @@ View's `tag_options` as `!(type == :aria || type == :class)`, with
 ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722). ZNE1 is the
 ZJIT fix, prepared as one ruby/ruby PR ([DECISIONS](../DECISIONS.md), ruby/ruby exception of 2026-11-15).
 
-**Result: built, tested, measured and reviewed; nothing opened.** Branch
+**Result: open as draft [ruby/ruby#19909](https://github.com/ruby/ruby/pull/19909)** (Thomas, 2026-11-15), from
 [`thomasklemm/ruby:zjit-opt-neq-polymorphic`](https://github.com/thomasklemm/ruby/tree/zjit-opt-neq-polymorphic),
 head `18d33e8a24`, one commit on master `fc4cd8872b`. Queue item with the PR body:
-[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). All three review passes have no must-fix on
-this head and arm64 is green, so it is ready for Thomas to open as a draft, apart from the thermos gate for diffs
-over 200 lines (pass or waiver, the coordinator's call). The first reviewed head, `52d41cc992`, is on fork branch `zjit-polymorphic-neq`; the new
-head differs by one test, one test comment and the commit message ([reviews](#reviews)).
+[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). Three review passes have no must-fix on this head, arm64 is
+green and thermos is waived by the coordinator. The first reviewed head, `52d41cc992`, differed by one test, one
+test comment and the commit message ([reviews](#reviews)); its fork branch `zjit-polymorphic-neq` is deleted.
+Bugs on master found on the way are under [Leads](#leads-on-master-not-part-of-this-change).
 
 * The premise of the brief was half out of date. Since ruby/ruby#19162 (nozomemein, merged) `BasicObject#!=` is a
   Ruby builtin under ZJIT and a `!=` whose call site sees **one** receiver class is already inlined.
@@ -204,9 +204,13 @@ iteration and by 10 times what two master runs differ by ([stats_diff.rb](../../
 two master runs the send counters are identical; what moves there are a few allocation counters and a swap between
 `invokeblock_not_specialized` and `invokeblock_polymorphic_miss` (±10,462 on lobsters, ±21,879 on shipit).
 The stats runs used the build made before the commit (its version line reads `zjit-polymorphic-neq fc4cd8872b`);
-`zjit/src/hir.rs` is identical at `18d33e8a24`. A lobsters run on the build of `18d33e8a24` gives the same send
-counters (`send_fallback_send_polymorphic` 493, `dynamic_send_count` 772,240 per iteration). Raw files:
-`data/zne1/stats-{master,master2,branch}-*.json.gz` and `stats-branch-head-lobsters.json.gz`.
+`zjit/src/hir.rs` is identical at `18d33e8a24`. Runs on the build of `18d33e8a24` give the same send counters per
+iteration: lobsters `send_fallback_send_polymorphic` 493, `dynamic_send_count` 772,240 and
+`ccall_rb_vm_opt_send_without_block` 423,870 (the body has 772,237 and 423,868); shipit 259, 1,841,219 and
+1,014,738 (the body has 1,841,220 for the second). Against master with the same filter, the head run prints the
+body's counters for both apps, plus `ccall_rb_hash_new` +760 on shipit, an allocation counter that also moves by
+several hundred between the two branch builds. Raw files: `data/zne1/stats-{master,master2,branch}-*.json.gz` and
+`stats-branch-head-{lobsters,shipit}.json.gz`.
 On lobsters `getivar_fallback_no_side_exits` also drops by 1,821 per iteration, 10 times more than between the two
 master runs; why was not traced.
 
@@ -286,8 +290,27 @@ warmup iterations and the JIT-flat gate (passed in every run). A ceiling counts 
 | shipit | 3,731,618,637 | 14,561,025 | 0.390% | 30,074 | 484 |
 
 Data: [a-railsbench.json](data/zne1/a-railsbench.json), [a-lobsters.json](data/zne1/a-lobsters.json),
-[a-shipit.json](data/zne1/a-shipit.json). A second lobsters run ([b-lobsters.json](data/zne1/b-lobsters.json))
-gives the same region, 4,644,536 Ir in 10,323 calls, in 2,520,766,832 Ir: 0.184% again.
+[a-shipit.json](data/zne1/a-shipit.json). Second runs give the same regions: lobsters
+([b-lobsters.json](data/zne1/b-lobsters.json)) 4,644,536 Ir in 10,323 calls of 2,520,766,832 Ir, 0.184% again;
+shipit ([b-shipit.json](data/zne1/b-shipit.json)) 14,561,025 Ir in 30,074 calls of 3,735,669,420 Ir, 0.390% again.
+The second railsbench run failed to start and was not repeated; its region is empty in the first.
+
+### Whole-program instructions, master against the branch
+
+The ceiling counts what the generic path costs. This is the direct measurement: Callgrind instructions per
+iteration of the whole program, on the release builds the timings use (master twice as the A/A, and the branch at
+`18d33e8a24`), fixed heap, 100 warmup iterations, JIT-flat gate passed, one GC in every window.
+
+| lobsters | Ir per iteration | Against master |
+| --- | --- | --- |
+| master | 2,514,771,237 | |
+| master, second run | 2,516,611,127 | +0.073% |
+| branch | 2,511,119,508 | −0.145% |
+
+The branch runs 3.7 to 5.5 million instructions fewer per iteration than the two master runs, which differ by
+1.8 million. That is the size of the ceiling (4.6 million), so most of the generic path's cost goes away, and it
+is 2 to 3 times the A/A, so it is a small effect and not a precise one. Data:
+`data/zne1/cgab-{master,master2,branch}-lobsters.json`.
 
 ## Which applies
 
@@ -347,15 +370,51 @@ same for a monomorphic `!=`: giving an instance of a profiled heap class a singl
 defining `!=` on an unrelated class with a subclass or on an included module (fable). The body is 169 words,
 above the 150 DECISIONS names; every reviewer left that optional.
 
-Found on the way, on master too, not part of this change:
+Four things on master turned up on the way; they are under [Leads](#leads-on-master-not-part-of-this-change).
 
-* With a refinement of `Kernel#==` defined anywhere, even if never activated, `A.new != 1` raises `NoMethodError`
-  in the interpreter (`rb_obj_not_equal` through `rb_funcall`; Ruby 4.0.7 too) and returns `true` under `--zjit`,
-  compiled or not, because of the builtin. This is a third interpreter-against-ZJIT difference besides the two in
-  the probe.
-* `TestRefinement#test_module_inclusion2` fails under `--zjit --zjit-call-threshold=2` on master and branch.
-* A `RUBY_DEBUG` assertion (`vm_method.c:508 clear_method_cache_by_id_in_class`, owner `T_MODULE`) fires on dev
-  builds of master and branch, with and without `--zjit`, for a `define_method(:!=)` with `super` on a module.
+## Leads on master, not part of this change
+
+Recorded 2026-11-15; nothing is posted upstream. Scripts are in
+[bench/upstream/zne1/leads](../../bench/upstream/zne1/leads). All were run here on release builds of master
+`fc4cd8872b` (x86_64 Linux) unless a line says otherwise.
+
+1. **ZJIT: `super` in a refined method reaches another refinement (wrong result).**
+   [refined_super_chain.rb](../../bench/upstream/zne1/leads/refined_super_chain.rb): `Foo#y` is refined by `FooExt`
+   and by `FooExt2`, both calling `super`, and a client uses both. The interpreter, YJIT and ZJIT at call
+   threshold 1 return `"FooExt2#y Foo#y"` for every call. With `--zjit --zjit-call-threshold=2` the first call is
+   right and the next three return `"FooExt2#y FooExt#y Foo#y"`; with plain `--zjit` and 100 calls, 29 are right
+   and 71 wrong. So it starts when the refined method is compiled, and it happens at the default settings. In
+   `test/ruby/test_refinement.rb` at threshold 2 it shows as one failure whose name depends on the test order:
+   `test_super_not_chained` or `test_module_inclusion2` (seeds 1 to 8, the same test on master and on the branch
+   for each seed, [refine-seeds.txt](data/zne1/refine-seeds.txt)). The fable pass saw it first. Cause not traced;
+   one search of ruby/ruby and Shopify/ruby issues and PRs ("zjit refinement super") found nothing. This is the
+   strongest of the four: a small script, a wrong value, default options.
+2. **`!=` with a refinement of `Kernel#==` defined: the interpreter raises, ZJIT does not.**
+   [kernel_eq_refinement.rb](../../bench/upstream/zne1/leads/kernel_eq_refinement.rb): after
+   `Module.new { refine(Kernel) { def ==(other) = 1 } }`, never activated, `A.new != 1` raises
+   `NoMethodError: undefined method '=='` in the interpreter and returns `true` under `--zjit`, also when nothing
+   is compiled. `A.new == 1` works in both. Ruby 4.0.9 raises as well, and there `nil != 1` raises too, while on
+   master `nil != 1` returns `true`. The raising path is C `rb_obj_not_equal` calling `==` through `rb_funcall`
+   (fable pass); the builtin of #19162 calls `==` from Ruby instead. The interpreter's behaviour looks like the
+   bug, and it predates ZJIT.
+3. **Backtraces under `--zjit` lack the C frame of `==` below `BasicObject#!=`.**
+   [missing_c_frame.rb](../../bench/upstream/zne1/leads/missing_c_frame.rb): `1 != E.new` with a raising `E#==`
+   shows `E#== < Integer#== < BasicObject#!=` in the interpreter and `E#== < BasicObject#!=` under `--zjit`,
+   compiled or not; `1 == E.new` keeps the `Integer#==` frame in both. Explained by reading
+   `rb_ec_partial_backtrace_object` in `vm_backtrace.c`: a frame of an `<internal:...>` method behaves like a C
+   method, and "to keep only one internal frame" the C frames collected just above it are discarded. So this
+   follows from `BasicObject#!=` being a builtin under ZJIT and is the backtrace code working as written. It
+   accounts for the 1,332 backtrace lines in the probe. Whether the ZJIT team wants `!=` to keep that frame is a
+   question for #19162's authors, not a bug report.
+4. **`RUBY_DEBUG` assertion in `clear_method_cache_by_id_in_class`.**
+   [module_alias_assert.rb](../../bench/upstream/zne1/leads/module_alias_assert.rb), four lines without ZJIT or
+   `!=`: a module aliases a method that a class owns (`alias_method(:foo, :equal?)`), the alias is called through
+   an including class, then the module defines `foo` itself. A debug build aborts with
+   `vm_method.c:508: Assertion Failed: clear_method_cache_by_id_in_class:RB_TYPE_P(owner, RUBY_T_CLASS): owner:
+   T_MODULE`. Reduced from the fable pass's fuzz seed 110, which fired it on debug builds of master and the
+   branch. The reduced script was run here on the `--enable-zjit=dev` build of the branch only, without `--zjit`;
+   release builds of master and Ruby 4.0.9 print `2` and exit normally. Whether the assertion or the cache state
+   is wrong is not known.
 
 ## Reproduce
 

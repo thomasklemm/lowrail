@@ -1,0 +1,17 @@
+seed 1 build-base: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 1 build-zne1: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 2 build-base: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 2 build-zne1: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 3 build-base: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 3 build-zne1: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 4 build-base: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 4 build-zne1: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 5 build-base: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 5 build-zne1: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 6 build-base: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 6 build-zne1: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 7 build-base: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 7 build-zne1: TestRefinement#test_module_inclusion2 195 tests, 3924 assertions, 1 failures, 0 errors, 0 skips 
+seed 8 build-base: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seed 8 build-zne1: TestRefinement#test_super_not_chained 195 tests, 3923 assertions, 1 failures, 0 errors, 0 skips 
+seeds done
