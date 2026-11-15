@@ -1,0 +1,12 @@
+-ccall_String#==: 1,359
++ccall_String#==: 1,242 (-117)
+-ccall_rb_vm_opt_send_without_block: 434,680
++ccall_rb_vm_opt_send_without_block: 423,868 (-10813)
+-dynamic_send_count: 783,048
++dynamic_send_count: 772,237 (-10811)
+-getivar_fallback_no_side_exits: 144,858
++getivar_fallback_no_side_exits: 143,037 (-1821)
+-not_inlined_cfuncs_String#==: 1,359
++not_inlined_cfuncs_String#==: 1,242 (-117)
+-send_fallback_send_polymorphic: 10,816
++send_fallback_send_polymorphic: 493 (-10323)

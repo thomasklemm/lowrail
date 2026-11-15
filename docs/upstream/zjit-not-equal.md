@@ -17,7 +17,7 @@ the arm64 run.
   such a site (nil and Symbol), and so are the top Rails sites in lobsters and shipit.
 * The fix is +4 −24 lines in `zjit/src/hir.rs`: `opt_neq` joins the arm the other `opt_*` instructions share, which
   dispatches on the profiled receiver classes. It adds no assumption of its own.
-* Effect: 4.8x on a `tag_options`-shaped micro. lobsters and shipit lose 10,323 and 30,074 polymorphic sends per
+* Effect: about 5x on a `tag_options`-shaped micro. lobsters and shipit lose 10,323 and 30,074 polymorphic sends per
   iteration; their times stay within the master-against-master noise. railsbench has no such site.
 
 ## How `a != b` runs (master `fc4cd8872b`)
@@ -135,8 +135,15 @@ Each guard was removed in turn; every mutation fails at least one new test:
 
   One test in each fails in every configuration, the interpreter included (two Ractor tests and
   `UrlForTest#test_protocol_encoding_is_preserved`). Active Support did not load here (redis gem missing).
-* arm64: thread ARM1 runs `make zjit-test` and the probe on the A64 backend; result pending.
-* `make btest` and `test-all` with the ZJIT run options: pending.
+* `make btest RUN_OPTS=--zjit-call-threshold=2` on the branch: PASS all 2,148 tests.
+* `make test-all` over `test/ruby` with `RUN_OPTS=--zjit-call-threshold=1` on the branch: 11,572 tests, 1 failure,
+  2 errors (`TestThread#test_handle_interrupt_masks_sigint`, `TestIO#test_seek`, `TestIO#test_seek_symwhence`). All
+  three fail the same way on master and with `--zjit-disable`; they come from the orb (signals, `SEEK_DATA`).
+* **arm64** (thread ARM1, A64 backend, M3, macOS 26.7.1): `make zjit-test` 2,241 of 2,241 on the branch and 2,233
+  of 2,233 on master, the difference being the new tests; the probe prints the x86_64 md5s in all 12 runs, with
+  release and with dev builds; `make btest RUN_OPTS=--zjit-call-threshold=2` passes 2,148 tests on both; Active
+  Model on Rails main gives the same result with ZJIT off, on, and at call threshold 1 and 2 (1,272 runs, the one
+  Ractor error in every mode).
 
 ## Reach
 
@@ -161,36 +168,66 @@ Generic `!=` sends from compiled code that land in `BasicObject#!=`, per iterati
 
 `stale_target?` compares an Integer or nil; `value_for` compares model singleton classes. railsbench: 0.
 
+ZJIT stats diff, master → branch per iteration, printing a counter only when it moves by at least 1%, by 100 per
+iteration and by 10 times what two master runs differ by ([stats_diff.rb](../../bench/upstream/zne1/stats_diff.rb)):
+[lobsters](data/zne1/stats-lobsters.diff), [shipit](data/zne1/stats-shipit.diff); railsbench prints nothing. Between
+two master runs the send counters are identical; what moves there are a few allocation counters and a swap between
+`invokeblock_not_specialized` and `invokeblock_polymorphic_miss` (±10,462 on lobsters, ±21,879 on shipit).
+
 ## Numbers
 
 `run_benchmarks.rb --no-sudo --interleave --pvalue` with master, master again (A/A) and the branch, all `--zjit`.
-Raw output: [bench-apps.txt](data/zne1/bench-apps.txt), [bench-micro2.txt](data/zne1/bench-micro2.txt).
+The run for the body is the one on the pushed head, with Callgrind paused:
+[bench-micro3.txt](data/zne1/bench-micro3.txt), [bench-apps3.txt](data/zne1/bench-apps3.txt).
 
 | bench | master (ms) | master-aa (ms) | branch (ms) | A/A | master/branch |
 | --- | --- | --- | --- | --- | --- |
-| `neq_nil_symbol` | 153.8 ± 12.1% | 184.3 ± 28.1% | 31.7 ± 17.8% | 0.835 | 4.849 |
-| lobsters | 778.6 ± 3.9% | 775.2 ± 6.9% | 814.2 ± 8.7% | 1.004 | 0.956 |
-| railsbench | 1732.6 ± 4.7% | 1687.5 ± 4.1% | 1638.0 ± 3.6% | 1.027 | 1.058 |
-| shipit | 1460.2 ± 7.2% | 1590.9 ± 11.0% | 1443.9 ± 4.1% | 0.918 | 1.011 |
+| `neq_nil_symbol` | 184.6 ± 17.5% | 157.2 ± 14.0% | 31.8 ± 17.1% | 1.175 | 5.810 |
+| lobsters | 885.5 ± 5.2% | 939.8 ± 5.8% | 850.1 ± 9.4% | 0.942 | 1.042 |
+| railsbench | 1793.6 ± 7.6% | 1800.6 ± 12.0% | 1706.0 ± 3.6% | 0.996 | 1.051 |
+| shipit | 1474.7 ± 7.8% | 1395.1 ± 6.3% | 1417.7 ± 3.9% | 1.057 | 1.040 |
 
-* The apps are within A/A. railsbench has no counter change, so its 1.058 (p 0.012) is noise.
+* The apps are within A/A (p 0.268, 0.104, 0.204). railsbench has no counter change, so its 1.051 is noise.
 * Only the micro ([neq_nil_symbol.rb](../../bench/upstream/zne1/neq_nil_symbol.rb), the `tag_options` condition
-  with nil and Symbol types) is outside A/A. This run shared the machine with Callgrind and test suites, hence the
-  A/A of 0.835; the first form of the micro, on a quiet machine, gave 195.3 → 39.3 ms with A/A 0.976
-  ([bench-micro.txt](data/zne1/bench-micro.txt); its loop sat in a block that compiled only at iteration 30).
+  with nil and Symbol types) is outside A/A. The orb is noisy: two runs of the same master binary differ by 1.175
+  (p < 0.001) on it. The iteration minima are 139, 137 and 28 ms for master, master again and branch, so the
+  effect is about 5x either way.
+* Earlier runs, kept for comparison: the same micro while Callgrind and the test suites ran
+  ([bench-micro2.txt](data/zne1/bench-micro2.txt)): 153.8 → 31.7 ms, A/A 0.835. The first form of the micro, whose
+  loop sat in a block that compiled only at iteration 30 ([bench-micro.txt](data/zne1/bench-micro.txt)):
+  195.3 → 39.3 ms, A/A 0.976. The apps on the build before the commit, same tree
+  ([bench-apps.txt](data/zne1/bench-apps.txt)): lobsters 0.956, railsbench 1.058, shipit 1.011, A/A 1.004,
+  1.027, 0.918.
+* A quiet machine would give a cleaner table. Thomas's Mac has both release builds and ruby-bench ready
+  (thread ARM1), but the coordinator allows no speed claims from it for now.
 * TE2's own benchmark-ips script on Rails main under ZJIT, 5 interleaved rounds, best of 5
   ([ips-tag.txt](data/zne1/ips-tag.txt)): `tag.a` 301.1k / 285.7k / 318.0k i/s for master / master again /
   branch (+5.6%, branch highest in all 5 rounds, each round ±9–15%); `content_tag` 516.1k / 510.6k / 561.0k
   (within the rounds' spread).
 
-Callgrind ceilings (fixed heap, JIT-flat windows): pending.
+### Callgrind ceilings
+
+Instructions per iteration inside generic `!=` sends from compiled code that land in `BasicObject#!=`, on the
+measurement build (master with [neq_count.patch](../../bench/upstream/zne1/neq_count.patch)), fixed heap, after 100
+warmup iterations and the JIT-flat gate (passed in every run). A ceiling counts the whole generic dispatch with the
+`==` inside it; nothing is subtracted for what the specialized code still costs.
+
+| | Whole iteration (Ir) | `!=` region (Ir) | Share | Calls | Ir per call |
+| --- | --- | --- | --- | --- | --- |
+| railsbench | 4,867,836,681 | 0 | 0.000% | 0 | |
+| lobsters | 2,521,649,671 | 4,644,536 | 0.184% | 10,323 | 450 |
+| shipit | 3,731,618,637 | 14,561,025 | 0.390% | 30,074 | 484 |
+
+Data: [a-railsbench.json](data/zne1/a-railsbench.json), [a-lobsters.json](data/zne1/a-lobsters.json),
+[a-shipit.json](data/zne1/a-shipit.json). A second run of each is pending.
 
 ## Which applies
 
 The brief's rule: stop if the ceiling is under 0.3% everywhere and the change is not tiny; a small, clean, general
-change may still be worth it. The second applies. The app effect is inside A/A, but the change removes more lines
+change may still be worth it. The ceiling is above 0.3% on shipit (0.390%) and below it on lobsters (0.184%) and
+railsbench (0), so the stop rule does not apply; and the change is small and general anyway: it removes more lines
 than it adds, brings `opt_neq` in line with every other `opt_*` instruction and makes the pattern Rails declined to
-rewrite 4.8x faster in isolation.
+rewrite about 5x faster in isolation. The app times do not show it: they stay inside A/A.
 
 ## Reproduce
 

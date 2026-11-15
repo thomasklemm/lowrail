@@ -1,0 +1,6 @@
+-ccall_rb_vm_opt_send_without_block: 1,051,321
++ccall_rb_vm_opt_send_without_block: 1,014,738 (-36583)
+-dynamic_send_count: 1,877,801
++dynamic_send_count: 1,841,220 (-36581)
+-send_fallback_send_polymorphic: 30,333
++send_fallback_send_polymorphic: 259 (-30074)

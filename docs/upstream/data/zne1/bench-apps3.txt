@@ -1,0 +1,41 @@
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T16:33:27Z zjit-polymorphic-neq 52d41cc992) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
+bench         master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value       sig  master/branch  p-value  sig
+lobsters     885.5 ± 5.2%    939.8 ± 5.8%   850.1 ± 9.4%              0.940           0.968         0.942 (*)    0.036  p < 0.05          1.042    0.268
+railsbench  1793.6 ± 7.6%  1800.6 ± 12.0%  1706.0 ± 3.6%              0.889           0.889             0.996    0.935                    1.051    0.104
+shipit      1474.7 ± 7.8%   1395.1 ± 6.3%  1417.7 ± 3.9%              0.923           0.952             1.057    0.118                    1.040    0.204
+----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+Total time spent benchmarking: 395s
+
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T16:33:27Z zjit-polymorphic-neq 52d41cc992) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
+bench         master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value       sig  master/branch  p-value  sig
+lobsters     885.5 ± 5.2%    939.8 ± 5.8%   850.1 ± 9.4%              0.940           0.968         0.942 (*)    0.036  p < 0.05          1.042    0.268
+railsbench  1793.6 ± 7.6%  1800.6 ± 12.0%  1706.0 ± 3.6%              0.889           0.889             0.996    0.935                    1.051    0.104
+shipit      1474.7 ± 7.8%   1395.1 ± 6.3%  1417.7 ± 3.9%              0.923           0.952             1.057    0.118                    1.040    0.204
+----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+
+Output:
+/home/user/w/zne1/out/bench-apps3.json
