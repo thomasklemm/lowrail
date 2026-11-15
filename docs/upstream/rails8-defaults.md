@@ -14,7 +14,7 @@ Two of these have a small exact fix that isn't already in flight, and both are b
 
 * **IM1** (importmap-rails): keep the modulepreload tags of an entry point in the map's cache when the page has no CSP
   nonce. `javascript_importmap_tags` gets 4.1× faster (benchmark-ips, YJIT). A new app's bare page gets 9.5% fewer
-  instructions under YJIT (10.4% in the interpreter) and 62 fewer objects; the scaffold show page 5.2%.
+  instructions under YJIT (10.4% in the interpreter) and about 60 fewer objects; the scaffold show page 5.2%.
 * **QL1** (Rails): spell out "query"/"queries" in the request log line instead of `"query".pluralize(count)`, which
   ran the inflector's rules on every request with a query count other than 1. `log_process_action` gets 3.2× faster.
   A whole request gets 3.8% fewer interpreter instructions for a small JSON response and 1.8% fewer for a bare HTML
@@ -173,24 +173,27 @@ new app, including `--api`; "HTML" is every app without `--api`; "importmap" and
 
 Both are on our forks, built on the current upstream main, one commit each by Thomas Klemm with no trailers and no
 comments. Queue items: [QL1](../../bench/upstream/pr-queue/items/QL1.md) and
-[IM1](../../bench/upstream/pr-queue/items/IM1.md), state `built`; review passes are recorded there.
+[IM1](../../bench/upstream/pr-queue/items/IM1.md), state `in-review`; review passes are recorded there and summed up
+under [Reviews](#reviews).
 
 ### IM1: cache the modulepreload tags (importmap-rails)
 
 [`thomasklemm/cache-module-preload-tags`](https://github.com/thomasklemm/importmap-rails/tree/thomasklemm/cache-module-preload-tags),
-[`52e2d73`](https://github.com/thomasklemm/importmap-rails/commit/52e2d737898d731e0fa3b29811d2fa9d9f0e89df) on
-importmap-rails main `f255e55`. `javascript_importmap_module_preload_tags` built one `<link rel="modulepreload">` per
+[`863322e`](https://github.com/thomasklemm/importmap-rails/commit/863322e8a1d98da1b460abab019d76e8313cf2a5) on
+importmap-rails main `f255e55` (the measurements below are of the first head, `52e2d73`, which differs only for a
+`false` nonce; see [Reviews](#reviews)). `javascript_importmap_module_preload_tags` built one `<link rel="modulepreload">` per
 preloaded package on every page (seven in a new app), from packages the map already caches per entry point. Without a
-CSP nonce the tags depend only on those packages, so they now go into the same map cache (`cache_as`, made public as
+CSP nonce (a nil one) the tags depend only on those packages, so they now go into the same map cache (`cache_as`, made public as
 `:nodoc:`) under the entry point, are cleared with it when a pin changes or the sweeper runs, and are returned as a
-copy. Pages with a nonce build them as before.
+copy. Pages with a nonce, `false` included, build them as before.
 
-Exactness: a differential probe ([`im1_probe.rb`](../../bench/upstream/def8/im1_probe.rb)) of 17 cases (plain, nonce,
+Exactness: a differential probe ([`im1_probe.rb`](../../bench/upstream/def8/im1_probe.rb)) of 20 cases (a `false` nonce before and after a plain page, plain, nonce,
 plain after a nonce, another nonce, no request, full tags with and without nonce, a custom map with String, other and
 Array entry points, a caller appending to the result, a pin added after the first render, `javascript_module_preload_tag`,
 result identity) prints identical output on main and the branch, and main against itself. Suite: 105 runs, 0 failures
-(Rails 8.1, Ruby 4.0.9), including one new test that renders without a nonce, then with one, then without, and
-checks the nonce isn't lost or leaked.
+(Rails 8.1, Ruby 4.0.9, three seeds). The one new test renders two entry points, two nonces and a `false` one, appends
+to a result and adds a pin; it passes on main and fails on the first head and on five wrong versions (no copy, caching
+only with a nonce, a key without the entry point, a cache outside the map that pins don't clear).
 
 Callgrind, whole request through the default app, interpreter, importmap-rails main against the branch (a second
 run of main as A/A):
@@ -222,8 +225,8 @@ production, YJIT, core 3, best of 5, [raw](data/def8/ips/): `imb` main, `imaa` i
 Completed line of every request. `String#pluralize(count)` returns the word itself for 1 and otherwise runs
 `Inflector.pluralize` with `:en`, which checks the uncountables and then the plural rules (43k interpreter instructions
 and 6 objects a call, after jhawthorn's rails/rails#59651 already made the rules cheaper). The count is an Integer, so
-the branch writes `queries_count == 1 ? "query" : "queries"`. It differs only for an app that defines its own English
-inflection for "query". `"query".pluralize(n)` equals the literal for every n from −3 to 2,000 and for 0.0, 1.0 and
+the branch writes `queries_count == 1 ? "query" : "queries"`. It differs only for an app whose English inflections
+pluralize "query" differently (an irregular or uncountable for it, or a generic rule such as `/y$/` to `ys`). `"query".pluralize(n)` equals the literal for every n from −3 to 2,000 and for 0.0, 1.0 and
 2.5 under the default inflections. Suites: Action View's Active Record integration tests (177 runs, which include the
 `(0 queries, 0 cached)` and `(1 query, 0 cached)` assertions) and `controller_runtime_test.rb`, 0 failures.
 
@@ -244,6 +247,28 @@ benchmark-ips of `log_process_action` with two queries (`ql_ips.rb`, YJIT, core 
 |---|---:|---:|---:|---:|
 | `log_process_action` | 245,107 i/s | 239,083 (−2.5%) | 792,623 i/s | 3.2× |
 
+
+### Reviews
+
+Two claude-code orbs (Opus 5.5, effort high) reviewed both heads independently:
+[claude-code](https://ampcode.com/threads/T-01a1dc64-bf9b-767f-a931-99cff8cc12ab) and
+[opus](https://ampcode.com/threads/T-01a1dc64-c914-71e3-b32d-db2e5e85f50f). Both found the code of QL1 exact and the
+IM1 approach right; both asked for changes.
+
+* **IM1, code (opus).** The first head cached whenever the nonce was falsy, but a nonce generator may return `false`
+  (`->(r) { r.ssl? && SecureRandom.base64(16) }`), and main then renders `nonce="false"` on that page only. The head
+  cached those tags and served them to later pages without a nonce. Now only a nil nonce caches (`863322e`); the probe
+  gained the `false` cases and is identical to main, and opus measured the fixed bare page at −10.54% (interpreter),
+  as before. claude-code didn't find this one.
+* **IM1, test (both).** The first head's test let four of five plausible wrong versions pass. The new test is
+  claude-code's with a `false`-nonce step from opus's.
+* **QL1, body (both).** The Completed line ends in `| GC: …ms)`, so "ends in" became "includes"; the bare HTML page
+  measured 1.43% and 1.81%, so "2 to 4 percent" became "up to 4 percent". The head is unchanged.
+* **Numbers reproduced** on 2-core orbs, core 1: IM1 ips 3.9× in both (record 4.1×), bare page −10.55% and −10.64%
+  interpreter, −9.89% YJIT; 59 and 63 fewer objects (record 62), so the body says about 60. QL1 ips 3.3× and 3.0×
+  (record 3.2×), JSON bare −3.56% (record −3.84%).
+* **Not done**, optional: a 2-query case in `controller_runtime_test.rb` (the mutant `zero? ? "queries" : "query"`
+  passes today); a dedicated method instead of the public `:nodoc:` `cache_as`, if a maintainer asks.
 
 ## Leads not built
 

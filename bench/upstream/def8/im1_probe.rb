@@ -14,7 +14,7 @@ def view(nonce: nil, request: true)
   c = PagesController.new
   env = Rack::MockRequest.env_for("https://localhost/home", "REMOTE_ADDR" => "127.0.0.1")
   env["action_dispatch.content_security_policy_nonce"] = nonce if nonce
-  if nonce
+  unless nonce.nil?
     env["action_dispatch.content_security_policy"] = ActionDispatch::ContentSecurityPolicy.new { _1.script_src :self }
     env["action_dispatch.content_security_policy_nonce_generator"] = ->(_) { nonce }
     env["action_dispatch.content_security_policy_nonce_directives"] = %w[script-src]
@@ -35,11 +35,14 @@ custom.pin "bar", preload: false
 custom.pin "baz", preload: "admin"
 
 steps = [
+  ["false nonce first", -> { view(nonce: false).javascript_importmap_module_preload_tags }],
+  ["plain after false nonce", -> { view.javascript_importmap_module_preload_tags }],
   ["plain", -> { view.javascript_importmap_module_preload_tags }],
   ["plain again", -> { view.javascript_importmap_module_preload_tags }],
   ["nonce", -> { view(nonce: "n0nce").javascript_importmap_module_preload_tags }],
   ["plain after nonce", -> { view.javascript_importmap_module_preload_tags }],
   ["other nonce", -> { view(nonce: "other").javascript_importmap_module_preload_tags }],
+  ["false nonce after plain", -> { view(nonce: false).javascript_importmap_module_preload_tags }],
   ["no request", -> { view(request: false).javascript_importmap_module_preload_tags }],
   ["full tags", -> { view.javascript_importmap_tags }],
   ["full tags nonce", -> { view(nonce: "n0nce").javascript_importmap_tags }],
