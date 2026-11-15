@@ -396,6 +396,9 @@ Recorded 2026-11-15; nothing is posted upstream. Scripts are in
    for each seed, [refine-seeds.txt](data/zne1/refine-seeds.txt)). The fable pass saw it first. Cause not traced;
    one search of ruby/ruby and Shopify/ruby issues and PRs ("zjit refinement super") found nothing. This is the
    strongest of the four: a small script, a wrong value, default options.
+   **Filed 2026-11-15 as [Shopify/ruby#1128](https://github.com/Shopify/ruby/issues/1128)** (Thomas's OK), after
+   reproducing it on master `aa26cc7114` too (71 of 100 wrong with `--zjit`, all right with `--yjit` and at
+   threshold 1).
 2. **`!=` with a refinement of `Kernel#==` defined: the interpreter raises, ZJIT does not.**
    [kernel_eq_refinement.rb](../../bench/upstream/zne1/leads/kernel_eq_refinement.rb): after
    `Module.new { refine(Kernel) { def ==(other) = 1 } }`, never activated, `A.new != 1` raises
