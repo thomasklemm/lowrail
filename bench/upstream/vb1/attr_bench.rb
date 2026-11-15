@@ -17,10 +17,12 @@ if STATS
     def self.dump(_) = nil
   end
   COUNTERS = %i[send_iseq_block_arg_type send_fallback_send_block_arg_not_nil dynamic_send_count
+    send_blockarg_symbol_direct_count send_fallback_invokeblock_not_specialized
     num_send_dynamic yjit_insns_count zjit_insn_count side_exit_count]
   def stats_per_call(n)
     all = defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled? ? RubyVM::ZJIT.stats : RubyVM::YJIT.runtime_stats
-    all.slice(*COUNTERS).transform_values { |v| v.fdiv(n).round(2) }
+    all = all.slice(*COUNTERS) unless ENV["STATS_ALL"] == "1" # STATS_ALL=1: every non-zero counter
+    all.select { |_, v| v.is_a?(Numeric) && v != 0 }.transform_values { |v| v.fdiv(n).round(2) }
   end
 else
   $LOAD_PATH.unshift(ENV.fetch("IRWIN_DIR"))
