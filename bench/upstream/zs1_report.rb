@@ -44,7 +44,8 @@ if kind == "count"
   end
 else
   base = path.sub(/\.json\z/, ".cg")
-  totals = Dir["#{base}.*"].to_h { [_1[/\d+\z/].to_i, File.foreach(_1).grep(/\Atotals:/).first.split[1].to_i] }
+  totals = data["totals"]&.transform_keys(&:to_i) ||
+    Dir["#{base}.*"].to_h { [_1[/\d+\z/].to_i, File.foreach(_1).grep(/\Atotals:/).first.split[1].to_i] }
   k = data.fetch("itrs")
   names = {0 => "whole program", 1 => "send, ISEQ callee", 2 => "send, other callee", 4 => "yield, invokeblock", 8 => "yield, from C"}
   whole = nil

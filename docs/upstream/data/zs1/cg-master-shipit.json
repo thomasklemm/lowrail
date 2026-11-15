@@ -1,0 +1,93 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]",
+  "zjit": true,
+  "itrs": 2,
+  "jit_flat": "pass",
+  "warm_windows": [
+    {
+      "compiled_iseq_count": 6229,
+      "compiled_side_exit_count": 131600,
+      "invalidation_time_ns": 147037078
+    },
+    {
+      "compiled_iseq_count": 6229,
+      "compiled_side_exit_count": 131600,
+      "invalidation_time_ns": 147037078
+    }
+  ],
+  "windows": [
+    {
+      "mask": 0,
+      "gcs": 0,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 0,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 1,
+      "gcs": 0,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 69620,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 2,
+      "gcs": 0,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 29874,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 4,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 33142,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 8,
+      "gcs": 0,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 28332,
+      "left_by_jump": 0,
+      "still_on": 0
+    }
+  ],
+  "totals": {
+    "1": 2269,
+    "2": 6253088263,
+    "3": 27230608,
+    "4": 10745180,
+    "5": 23424168,
+    "6": 19477651
+  }
+}

@@ -765,11 +765,17 @@ instructions per iteration the branch is
 So the three benchmark apps have a result and the app page does not. These runs replace the earlier estimate of
 0.2% to 0.5% from the ceilings; railsbench against master again is just above it.
 
-**Whole-program runs** (Callgrind with `--zjit`, `RUBY_GC_HEAP_INIT_BYTES=33554432`, 150 warmup
-iterations, then windows of 2 iterations; read with `zs1_report.rb cg`; outputs in the orb under `~/w/cgmain` and
-`~/w/cgnar3`). A cell counts only when every window passes the JIT-flat gate; a cell that fails is recorded as
-rejected and not rerun. Region columns are instructions per iteration (regions entered per iteration × instructions
-each).
+**Whole-program runs** (Callgrind with `--zjit`, `RUBY_GC_HEAP_INIT_BYTES=33554432`, 150 warmup iterations, then
+windows of 2 iterations; read with `zs1_report.rb cg`). A cell counts only when every window passes the JIT-flat
+gate; a cell that fails is recorded as rejected and not rerun. Region columns are instructions per iteration
+(regions entered per iteration × instructions each).
+
+Data: `data/zs1/cg-{master,master2,branch}-{railsbench,lobsters,shipit,blog}.json`, one file per cell: the harness
+output (gate result, compile counters of the warm windows, and per window the GC count, the JIT counters' change
+and the regions entered) with the `totals:` line of each of the cell's six Callgrind dumps added as `totals` (1 the
+empty window, 2 the whole program, 3 to 6 the region windows in the table's order). `zs1_report.rb cg FILE` reads
+these files directly; its output for the twelve cells is [cg-summary.txt](data/zs1/cg-summary.txt). The Callgrind
+dumps themselves are not kept.
 
 | workload | cell | gate | whole program, Ir/itr | GCs | send, ISEQ callee | send, other callee | yield, invokeblock | yield, from C |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |

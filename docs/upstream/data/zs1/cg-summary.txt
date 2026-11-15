@@ -1,0 +1,72 @@
+cg-master-railsbench: JIT-flat pass, 2 iterations per window
+  whole program          3,937,287,334 Ir/itr, 1 GCs
+  send, ISEQ callee         11,961,311 Ir/itr 0.304%, 32,467 regions/itr, 368 Ir each, 0 left by a jump, 1 GCs
+  send, other callee         3,586,640 Ir/itr 0.091%, 9,974 regions/itr, 360 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         4,579,774 Ir/itr 0.116%, 7,274 regions/itr, 630 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              5,850,760 Ir/itr 0.149%, 7,974 regions/itr, 734 Ir each, 0 left by a jump, 1 GCs
+cg-master2-railsbench: JIT-flat pass, 2 iterations per window
+  whole program          3,939,615,741 Ir/itr, 1 GCs
+  send, ISEQ callee         11,961,311 Ir/itr 0.304%, 32,467 regions/itr, 368 Ir each, 0 left by a jump, 1 GCs
+  send, other callee         3,586,640 Ir/itr 0.091%, 9,974 regions/itr, 360 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         4,579,774 Ir/itr 0.116%, 7,274 regions/itr, 630 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              5,852,124 Ir/itr 0.149%, 7,974 regions/itr, 734 Ir each, 0 left by a jump, 1 GCs
+cg-branch-railsbench: JIT-flat pass, 2 iterations per window
+  whole program          3,918,065,982 Ir/itr, 1 GCs
+  send, ISEQ callee                  0 Ir/itr 0.000%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs
+  send, other callee                 0 Ir/itr 0.000%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         4,579,774 Ir/itr 0.117%, 7,274 regions/itr, 630 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              5,850,760 Ir/itr 0.149%, 7,974 regions/itr, 734 Ir each, 0 left by a jump, 1 GCs
+cg-master-lobsters: JIT-flat pass, 2 iterations per window
+  whole program          2,990,583,596 Ir/itr, 1 GCs
+  send, ISEQ callee          6,359,359 Ir/itr 0.213%, 17,343 regions/itr, 367 Ir each, 0 left by a jump, 1 GCs
+  send, other callee         3,188,198 Ir/itr 0.107%, 8,864 regions/itr, 360 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         6,716,978 Ir/itr 0.225%, 9,579 regions/itr, 701 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              6,106,371 Ir/itr 0.204%, 9,487 regions/itr, 644 Ir each, 0 left by a jump, 1 GCs
+cg-master2-lobsters: JIT-flat pass, 2 iterations per window
+  whole program          2,987,781,225 Ir/itr, 1 GCs
+  send, ISEQ callee          6,360,723 Ir/itr 0.213%, 17,343 regions/itr, 367 Ir each, 0 left by a jump, 1 GCs
+  send, other callee         3,188,198 Ir/itr 0.107%, 8,864 regions/itr, 360 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         6,716,978 Ir/itr 0.225%, 9,579 regions/itr, 701 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              6,144,907 Ir/itr 0.206%, 9,487 regions/itr, 648 Ir each, 0 left by a jump, 1 GCs
+cg-branch-lobsters: JIT-flat pass, 2 iterations per window
+  whole program          2,978,153,642 Ir/itr, 1 GCs
+  send, ISEQ callee            111,072 Ir/itr 0.004%, 356 regions/itr, 312 Ir each, 0 left by a jump, 1 GCs
+  send, other callee                 0 Ir/itr 0.000%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         6,716,978 Ir/itr 0.226%, 9,579 regions/itr, 701 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              6,144,907 Ir/itr 0.206%, 9,487 regions/itr, 648 Ir each, 0 left by a jump, 1 GCs
+cg-master-shipit: JIT-flat pass, 2 iterations per window
+  whole program          3,126,542,997 Ir/itr, 0 GCs
+  send, ISEQ callee         13,615,304 Ir/itr 0.435%, 34,810 regions/itr, 391 Ir each, 0 left by a jump, 0 GCs
+  send, other callee         5,372,590 Ir/itr 0.172%, 14,937 regions/itr, 360 Ir each, 0 left by a jump, 0 GCs
+  yield, invokeblock        11,712,084 Ir/itr 0.375%, 16,571 regions/itr, 707 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              9,738,826 Ir/itr 0.311%, 14,166 regions/itr, 687 Ir each, 0 left by a jump, 0 GCs
+cg-master2-shipit: JIT-flat pass, 2 iterations per window
+  whole program          3,204,568,264 Ir/itr, 1 GCs
+  send, ISEQ callee         13,615,304 Ir/itr 0.425%, 34,810 regions/itr, 391 Ir each, 0 left by a jump, 0 GCs
+  send, other callee         5,372,590 Ir/itr 0.168%, 14,937 regions/itr, 360 Ir each, 0 left by a jump, 0 GCs
+  yield, invokeblock        11,712,084 Ir/itr 0.365%, 16,571 regions/itr, 707 Ir each, 0 left by a jump, 0 GCs
+  yield, from C              9,740,069 Ir/itr 0.304%, 14,166 regions/itr, 688 Ir each, 0 left by a jump, 0 GCs
+cg-branch-shipit: JIT-flat pass, 2 iterations per window
+  whole program          3,112,246,019 Ir/itr, 0 GCs
+  send, ISEQ callee            105,520 Ir/itr 0.003%, 130 regions/itr, 812 Ir each, 0 left by a jump, 0 GCs
+  send, other callee                 0 Ir/itr 0.000%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock        11,712,084 Ir/itr 0.376%, 16,571 regions/itr, 707 Ir each, 0 left by a jump, 0 GCs
+  yield, from C              9,740,070 Ir/itr 0.313%, 14,166 regions/itr, 688 Ir each, 0 left by a jump, 0 GCs
+cg-master-blog: JIT-flat fail, 2 iterations per window
+  whole program          2,646,691,384 Ir/itr, 1 GCs
+  send, ISEQ callee          4,704,373 Ir/itr 0.178%, 12,002 regions/itr, 392 Ir each, 0 left by a jump, 1 GCs
+  send, other callee         1,875,332 Ir/itr 0.071%, 4,506 regions/itr, 416 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         2,678,606 Ir/itr 0.101%, 3,510 regions/itr, 763 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              7,173,354 Ir/itr 0.271%, 9,000 regions/itr, 797 Ir each, 0 left by a jump, 1 GCs, JIT CHANGED
+cg-master2-blog: JIT-flat fail, 2 iterations per window
+  whole program          2,648,151,395 Ir/itr, 1 GCs, JIT CHANGED
+  send, ISEQ callee          4,649,912 Ir/itr 0.176%, 12,002 regions/itr, 387 Ir each, 0 left by a jump, 1 GCs, JIT CHANGED
+  send, other callee         1,911,776 Ir/itr 0.072%, 4,508 regions/itr, 424 Ir each, 0 left by a jump, 1 GCs, JIT CHANGED
+  yield, invokeblock         2,487,727 Ir/itr 0.094%, 3,506 regions/itr, 710 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              7,108,113 Ir/itr 0.268%, 9,000 regions/itr, 790 Ir each, 0 left by a jump, 1 GCs
+cg-branch-blog: JIT-flat fail, 2 iterations per window
+  whole program          2,638,941,365 Ir/itr, 1 GCs
+  send, ISEQ callee            192,320 Ir/itr 0.007%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs, JIT CHANGED
+  send, other callee           188,482 Ir/itr 0.007%, 0 regions/itr, 0 Ir each, 0 left by a jump, 1 GCs
+  yield, invokeblock         2,481,050 Ir/itr 0.094%, 3,506 regions/itr, 708 Ir each, 0 left by a jump, 1 GCs
+  yield, from C              6,894,451 Ir/itr 0.261%, 9,000 regions/itr, 766 Ir each, 0 left by a jump, 1 GCs

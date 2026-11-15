@@ -1,0 +1,98 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-15T18:09:46Z HEAD 141cdfde1f) +ZJIT +PRISM [x86_64-linux]",
+  "zjit": true,
+  "itrs": 2,
+  "jit_flat": "fail",
+  "warm_windows": [
+    {
+      "compiled_iseq_count": 3281,
+      "compiled_side_exit_count": 69115,
+      "invalidation_time_ns": 135090236
+    },
+    {
+      "compiled_iseq_count": 3281,
+      "compiled_side_exit_count": 69115,
+      "invalidation_time_ns": 135090236
+    },
+    {
+      "compiled_iseq_count": 3281,
+      "compiled_side_exit_count": 69115,
+      "invalidation_time_ns": 135090236
+    }
+  ],
+  "windows": [
+    {
+      "mask": 0,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 0,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 1,
+      "gcs": 1,
+      "jit_unchanged": false,
+      "jit_delta": {
+        "compiled_iseq_count": 2,
+        "compiled_side_exit_count": 48,
+        "invalidation_time_ns": 0
+      },
+      "regions": 0,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 2,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 0,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 4,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 7012,
+      "left_by_jump": 0,
+      "still_on": 0
+    },
+    {
+      "mask": 8,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 18000,
+      "left_by_jump": 0,
+      "still_on": 0
+    }
+  ],
+  "totals": {
+    "1": 2245,
+    "2": 5277884975,
+    "3": 384640,
+    "4": 376964,
+    "5": 4962099,
+    "6": 13788902
+  }
+}
