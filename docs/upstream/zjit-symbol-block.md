@@ -769,6 +769,9 @@ each).
 | blog | master | **fail** | 2,646,691,384 | 1 | 4,704,373 (12,002 × 392) | 1,875,332 (4,506 × 416) | 2,678,606 (3,510 × 763) | 7,173,354 (9,000 × 797) |
 | blog | master again | **fail** | 2,648,151,395 | 1 | 4,649,912 (12,002 × 387) | 1,911,776 (4,508 × 424) | 2,487,727 (3,506 × 710) | 7,108,113 (9,000 × 790) |
 | blog | branch | **fail** | 2,638,941,365 | 1 | 192,320 (0) | 188,482 (0) | 2,481,050 (3,506 × 708) | 6,894,451 (9,000 × 766) |
+| railsbench | master | pass | 3,937,287,334 | 1 | 11,961,311 (32,467 × 368) | 3,586,640 (9,974 × 360) | 4,579,774 (7,274 × 630) | 5,850,760 (7,974 × 734) |
+| railsbench | master again | pass | 3,939,615,741 | 1 | 11,961,311 (32,467 × 368) | 3,586,640 (9,974 × 360) | 4,579,774 (7,274 × 630) | 5,852,124 (7,974 × 734) |
+| railsbench | branch | pass | 3,918,065,982 | 1 | 0 (0) | 0 (0) | 4,579,774 (7,274 × 630) | 5,850,760 (7,974 × 734) |
 
 * **blog: rejected, all three cells.** Each cell has a window in which ZJIT compiled something (master: the
   yield-from-C window; master again: the whole-program window and both send windows; branch: the ISEQ-send window,
@@ -777,6 +780,12 @@ each).
   1,460,011 (0.055%), and every window holds 1 GC. The branch enters no send region (a region starts in
   `vm_caller_setup_arg_block`, which the specialized sends do not go through), and its yield regions are entered
   as often as on master.
+* **railsbench: −0.49%.** All three cells pass the gate and every window holds 1 GC. The branch is 19,221,352
+  Ir/itr (0.49%) below master and 21,549,759 (0.55%) below master again; the two master runs differ by 2,328,407
+  (0.059%), so the difference is 8 to 9 times the A/A. The branch enters no send region, and both yield regions
+  are identical to master's to the instruction. The saving is larger than the 15,547,951 Ir/itr that master spends
+  inside the two send regions; a region leaves out the called method's body, and the remaining 3.7 million are not
+  attributed.
 
 ### Reviews
 
