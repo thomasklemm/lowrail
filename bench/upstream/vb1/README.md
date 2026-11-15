@@ -175,7 +175,9 @@ table for what wall time can't show. Since e0a9e88 the body names no other Ruby,
 numbers stay here (table above). Ruby 4.0.9 with YJIT, benchmark-ips 2.15.1, SQLite 3 gem 2.10.2, run by
 [`ab1_review.sh`](../p_map/ab1_review.sh) on core 1 of a 2-core orb (`taskset -c 1`): five rounds of main
 (`50c54eed06`), the branch (`59db98e25c`) and main again (the A/A), interleaved; each label's best round by
-[`ab1_best.rb`](../p_map/ab1_best.rb). The table has 30 columns (`id`, 27 strings, the two timestamps), 10 rows.
+[`ab1_best.rb`](../p_map/ab1_best.rb). `ab1_review.sh` doesn't check which tree a process loaded; each Gemfile
+points at one tree by path, and `LazyIndexedAttributeSet#deep_dup`'s `source_location` was checked once per
+Gemfile before the runs. The table has 30 columns (`id`, 27 strings, the two timestamps), 10 rows.
 Cohorts 1 and 2 ran [`ips_dup.rb`](ips_dup.rb) (reads and `dup`), cohorts 3 and 4 the body's [`ips.rb`](ips.rb)
 (reads only); cohort 3 was named the body's before it ran, cohort 4 repeats it. Raw:
 [results/ips-1.txt](results/ips-1.txt) to [ips-4.txt](results/ips-4.txt).
@@ -194,10 +196,11 @@ Cohorts 1 and 2 ran [`ips_dup.rb`](ips_dup.rb) (reads and `dup`), cohorts 3 and 
 YJIT −7.5% for the same reads without the query. Round by round it is noisier (branch against main 0.92–1.24×, main
 again against main 0.90–1.20×; cohort 3's fourth main round ran at ±14.8%), so only best of 5 is used.
 `dup` of a loaded record does not separate from its A/A: 0.99× and 1.06× against A/As of −4.9% and +2.2%, rounds
-0.84–1.26× against 0.90–1.13×. Callgrind's YJIT −5.7% for `dup` (≈13k of ≈227k instructions) is about as large as
+0.83–1.26× against 0.90–1.13×. Callgrind's YJIT −5.7% for `dup` (≈13k of ≈227k instructions) is about as large as
 that A/A, so benchmark-ips can't resolve it on this orb. So the body shows the ips script for reads and keeps `dup` as
-its one supporting Callgrind line: with YJIT, 5.7% fewer instructions (run c −5.72%; the reviews' reruns −5.58% and
-−5.94%). No table is needed for it.
+its one supporting Callgrind line: with YJIT, 5.7% fewer CPU instructions (run c −5.72%; the reviews' reruns −5.58%
+and −5.94%). The body says "CPU instructions (Callgrind)" because YJIT's own `yjit_insns_count` rises on the branch
+(9,852 → 9,975 per `dup`). No table is needed for it.
 
 ```
 Trees ~/ips/{main,vb1} (worktrees at 50c54eed06 and 59db98e25c), each with ~/ips/gem-TREE/Gemfile:
