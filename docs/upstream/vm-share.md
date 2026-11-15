@@ -229,7 +229,92 @@ A/A ([all cohorts](data/vm-share/prototypes-ips.txt)). TE2's body uses the 10-ro
   `:nodoc:` methods except for escaping, so TE1 stays held like C2. Rated L2, and flat under ZJIT.
 * **Side finding on #59570** (merged, unreleased): angular_xss also prepends `OutputBuffer#<<`, so its `<%= %>`
   coverage survives, but Discourse patches no `OutputBuffer` method, so on Rails main its UTF-8 repair no longer
-  runs for template appends. Not acted on; for Thomas.
+  runs for template appends. Not acted on; for Thomas. Verified below.
+
+### #59570 and Discourse's UTF-8 repair (verified 2026-11-15)
+
+**The patch.** Discourse's
+[`lib/freedom_patches/erb_util.rb`](https://github.com/discourse/discourse/blob/9daeae2a745b73533215775ebf132191ca4c5056/lib/freedom_patches/erb_util.rb)
+prepends `unwrapped_html_escape` and `html_escape_once` on `ERB::Util` and its singleton class. For a string that
+isn't html_safe and fails `valid_encoding?` it runs `ActiveSupport::Multibyte::Unicode.tidy_bytes` first. It
+arrived with Discourse's Rails 8.1 upgrade (discourse/discourse#43005, merged 2026-09-21: "Preserve invalid UTF-8
+repair before HTML escaping"), because 8.1 dropped that repair from `html_escape` (rails/rails `a31ac87a1e`,
+byroot: "Semantically it makes no sense to deal with invalid strings at that layer"). The PR links no issue or meta
+topic and has no discussion. Discourse locks Rails 8.1.4.1 (`~> 8.1.0`) and has no CI job against Rails main or
+edge. Its spec calls `ERB::Util.html_escape`, `html_escape_once` and `EmberAssets.plain_error` and renders no
+template, so it passes on main.
+
+**Reproduction.** Ruby 4.0.9, a file template rendered by `ActionController::Base.render` through the ERB handler,
+with Discourse's file loaded after Rails ([scripts](../../bench/upstream/vm1/discourse_erb),
+[raw](data/vm-share/discourse-erb-repro.txt)):
+
+| `<p>Café <%= str %></p>` | 8-1-stable `71e963ed1b` + patch | main before #59570 `13b5592657` + patch | main `50c54eed06` + patch |
+|---|---|---|---|
+| invalid UTF-8 `"caf\xE9 <b>"`, also via `to_s` | `Café café &lt;b&gt;` | same | `Café caf\xE9 &lt;b&gt;` (invalid UTF-8) |
+| binary `"caf\xC3\xA9 <b>".b`, `"caf\xE9 <b>".b` | `Encoding::CompatibilityError`; raw bytes in a binary body when the buffer is still ASCII | same | same |
+| valid `"café <b>"` | `Café café &lt;b&gt;` | same | same |
+
+Main raises nowhere that 8.1 rendered. It renders different bytes in one case: a string tagged UTF-8 with
+invalid bytes, through a bare `<%= %>`. That is what every 8.1 app without such a patch already renders. On main,
+`<%= h(str) %>`, `ERB::Util.html_escape`, `html_escape_once` and tag attribute values still repair. Tag content
+(`tag.p(str)`, `content_tag`) raises `ArgumentError` in `present?` before escaping, on 8.1 and main alike. The
+patch never touches binary strings, which are always `valid_encoding?`. The escaped characters are the same in
+every case, so this is not an escaping difference.
+
+**Reach: low.** PostgreSQL UTF8 databases reject invalid bytes, and ActionDispatch raises
+`ActionController::BadRequest` for them in query and form params (checked on main), so posts, DB rows and params
+can't carry them. What remains is strings from files, subprocesses, Redis and exception messages. The only
+in-tree producer, dev build errors (`EmberAssets.plain_error`), escapes through `ERB::Util.html_escape` and
+renders `messageHtml.html_safe`, so it is unaffected. Downstream, `CspScriptNonceInjector`'s String `gsub`
+accepts the invalid body. rack-mini-profiler's `inject` raises `ArgumentError` on it, but its own
+`rescue Exception` returns the page without the profiler script. Browsers show U+FFFD where 8.1 showed `é`
+(`tidy_bytes` reads such bytes as CP1252).
+
+**Other callers.** I paged through all 516 legacy GitHub code-search hits for `"def unwrapped_html_escape"`, ran
+14 narrower queries (prepend, alias, `module_eval`, `ERB::Util.prepend`, `tidy_bytes`) and checked Canvas, GitLab
+and Mastodon by repo. The search covers default
+branches only and skips archived repos (`makandra/angular_xss` returns 0). Only discourse/discourse and three copies
+of its file (ISBF-Lab/ISBFweb, yalla-coop/discourse-upgrade-2026, jrkrnjrk/railway-forum) prepend there without an
+`OutputBuffer` patch. angular_xss 1.0.0 also prepends `OutputBuffer#<<` and `append=` (checked in the gem). The
+remaining hits are vendored Rails or Ruby, callers, or Rails 2–3 code (rails_xss, Canvas forks, slnz/sp).
+
+**Options.**
+
+* **(a) Nothing.** #59570's body disclosed the boundary, byroot merged it, and main's output equals plain 8.1's.
+  Cost: Discourse loses this repair silently when it moves to 8.2, because its spec renders no template.
+* **(b) Discourse-side fix.** Prepend `OutputBuffer#<<`, `concat` and `append=` with the same repair
+  ([sketch](../../bench/upstream/vm1/discourse_erb/discourse_output_buffer_sketch.rb), not posted). With it, all 23
+  cases match 8.1 + patch, on both 8.1 and main, so it can land before 8.2. It should come with a spec that renders
+  a template.
+* **(c) Rails restores the dispatch when `ERB::Util` is overridden.** The cheapest prototype
+  ([`c_memo.patch`](../../bench/upstream/vm1/discourse_erb/c_memo.patch)) keeps a flag that is set at load and
+  refreshed by a hook on `ERB::Util.singleton_class.prepend`. It misses methods added to an already prepended
+  module. It restores 8.1's output, but every app without an override pays for it: +49.5 Ir per unsafe append under
+  YJIT (+3.3%, 13% of what #59570 saved) and +206 Ir in the interpreter (+8.1%, 20%). An exact per-append owner check
+  ([`c_exact.patch`](../../bench/upstream/vm1/discourse_erb/c_exact.patch)) costs +658 and +1,199 Ir, more than
+  before #59570. Both benchmark-ips cohorts failed their A/A (main2 −13.3% under YJIT, +5.4% in the interpreter,
+  ±4–32% per run). They are recorded, not rerun ([raw](data/vm-share/discourse-erb-ips.txt)).
+* **(d) Revert.** This gives up #59570's 378 Ir per append under YJIT and 1,023 in the interpreter (5–6% of
+  erubi-rails) to keep one app's encoding repair.
+
+Callgrind, Ir per 8 unsafe appends to a fresh buffer, GC off
+([`ir_append.rb`](../../bench/upstream/vm1/discourse_erb/ir_append.rb), [raw](data/vm-share/discourse-erb-ir.txt)):
+
+| | main | A/A | before #59570 | c-memo | c-exact | before + Discourse | c-memo + Discourse |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| interpreter | 20,303 | 0.00% | +40.3% | +8.1% | +47.2% | 37,379 | +4.5% |
+| YJIT | 11,954 | −0.04% | +25.3% | +3.3% | +44.0% | 20,887 | +1.9% |
+
+**Under DECISIONS.** Escaping is the exception to accepting `:nodoc:` overrides. That is why TE1 stays held: there
+the lost prepend is angular_xss's `{{` escaping. For #59570 the known security prepend survives and the escaped
+characters are unchanged; only an encoding repair is lost. Of the three restore conditions, the change is unreleased
+and one large caller changes silently, but its output isn't wrong by Rails' own 8.1 semantics. An exact restore
+isn't small: it needs a hook on `prepend` and costs every app on each append. "No deprecation shims for internal
+API" and "No new compatibility PRs for Rails main until the 8.2 beta" also point to the app.
+
+**Recommendation: (a) for Rails, (b) queued.** Record the finding and its sketch as a compatibility item and
+open a short Discourse issue or PR at the Rails 8.2 beta. Since the fix also works on 8.1, it could open earlier
+if Thomas prefers. Not (c) or (d).
 
 ## Leads recorded, not built
 

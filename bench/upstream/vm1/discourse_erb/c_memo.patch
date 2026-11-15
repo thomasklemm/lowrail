@@ -1,0 +1,35 @@
+diff --git a/actionview/lib/action_view/buffers.rb b/actionview/lib/action_view/buffers.rb
+index 6327c99523..e99dcf9abd 100644
+--- a/actionview/lib/action_view/buffers.rb
++++ b/actionview/lib/action_view/buffers.rb
+@@ -21,6 +21,21 @@ module ActionView
+   # ```
+   #
+   class OutputBuffer # :nodoc:
++    class << self
++      attr_reader :erb_util_overridden
++
++      def detect_erb_util_override
++        @erb_util_overridden = !ERB::Util.method(:unwrapped_html_escape).owner.equal?(ActiveSupport::CoreExt::ERBUtil)
++      end
++    end
++    detect_erb_util_override
++
++    ERB::Util.singleton_class.singleton_class.prepend(Module.new do
++      def prepend(*)
++        super.tap { ActionView::OutputBuffer.detect_erb_util_override }
++      end
++    end)
++
+     def initialize(buffer = "")
+       @raw_buffer = String.new(buffer)
+       @raw_buffer.encode!
+@@ -46,6 +61,8 @@ def <<(value)
+         value = value.to_s
+         @raw_buffer << if value.html_safe?
+           value
++        elsif OutputBuffer.erb_util_overridden
++          ERB::Util.unwrapped_html_escape(value)
+         else
+           ERB::Escape.html_escape(value)
+         end

@@ -1,0 +1,17 @@
+# ir_append.sh: Ir per iteration (8 unsafe appends to a fresh buffer), Ruby 4.0.9, N=2000, GC off. "+discourse" loads Discourse 9daeae2a74 lib/freedom_patches/erb_util.rb after Rails.
+interp rmain 20303
+interp rmain2 20303
+interp rpre 28487
+interp rcmemo 21948
+interp rcexact 29891
+interp rpre+discourse 37379
+interp rcmemo+discourse 39052
+interp rcexact+discourse 46963
+yjit rmain 11954
+yjit rmain2 11949
+yjit rpre 14978
+yjit rcmemo 12350
+yjit rcexact 17218
+yjit rpre+discourse 20887
+yjit rcmemo+discourse 21286
+yjit rcexact+discourse 26225

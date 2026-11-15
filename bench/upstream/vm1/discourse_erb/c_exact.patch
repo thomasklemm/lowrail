@@ -1,0 +1,16 @@
+diff --git a/actionview/lib/action_view/buffers.rb b/actionview/lib/action_view/buffers.rb
+index 6327c99523..96db7109df 100644
+--- a/actionview/lib/action_view/buffers.rb
++++ b/actionview/lib/action_view/buffers.rb
+@@ -46,8 +46,10 @@ def <<(value)
+         value = value.to_s
+         @raw_buffer << if value.html_safe?
+           value
+-        else
++        elsif ERB::Util.method(:unwrapped_html_escape).owner.equal?(ActiveSupport::CoreExt::ERBUtil)
+           ERB::Escape.html_escape(value)
++        else
++          ERB::Util.unwrapped_html_escape(value)
+         end
+       end
+       self

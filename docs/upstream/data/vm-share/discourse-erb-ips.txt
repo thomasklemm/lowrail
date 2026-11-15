@@ -1,0 +1,184 @@
+# benchmark-ips, ips_append.rb (8 unsafe OutputBuffer#<< appends to a fresh buffer), Ruby 4.0.9, core 1,
+# 5 interleaved rounds per tree. Both cohorts fail their A/A (main2 vs main) and are recorded, not rerun.
+#
+# YJIT: the raw file was overwritten when the supervising orb service restarted the script after it finished;
+# these per-round lines were printed from it before that (awk over the "i/s" lines).
+# best of 5: main 497.1k, main2 431.1k (-13.3%), pre 397.9k, cmemo 423.2k, cexact 316.9k
+main r1 446.154k (±25.6%) i/s
+main2 r1 335.645k (±22.8%) i/s
+pre r1 397.904k (±11.3%) i/s
+cmemo r1 423.221k (±19.4%) i/s
+cexact r1 272.690k (±23.9%) i/s
+main r2 497.083k (±11.1%) i/s
+main2 r2 431.060k (±17.9%) i/s
+pre r2 348.842k (± 9.0%) i/s
+cmemo r2 351.249k (±16.6%) i/s
+cexact r2 229.741k (±16.2%) i/s
+main r3 337.047k (±23.5%) i/s
+main2 r3 311.125k (± 3.5%) i/s
+pre r3 329.055k (±19.4%) i/s
+cmemo r3 379.321k (±14.8%) i/s
+cexact r3 244.441k (±17.0%) i/s
+main r4 417.467k (±27.2%) i/s
+main2 r4 401.765k (±16.5%) i/s
+pre r4 341.416k (±16.1%) i/s
+cmemo r4 319.222k (±16.3%) i/s
+cexact r4 299.800k (±16.3%) i/s
+main r5 369.864k (±18.2%) i/s
+main2 r5 321.440k (±14.0%) i/s
+pre r5 272.373k (±20.5%) i/s
+cmemo r5 361.911k (±20.1%) i/s
+cexact r5 316.964k (±21.2%) i/s
+
+# Interpreter, raw ips_matrix.sh output.
+# best of 5 (ips_best.rb): main 306.4k, main2 322.8k (+5.4%), pre 222.5k (-27.4%), cmemo 278.8k (-9.0%), cexact 221.5k (-27.7%)
+== main round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    19.467k i/100ms
+Calculating -------------------------------------
+             append8    211.743k (±18.4%) i/s    (4.72 μs/i) -      1.071M in   5.056541s
+== main2 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    17.823k i/100ms
+Calculating -------------------------------------
+             append8    234.628k (±31.8%) i/s    (4.26 μs/i) -      1.176M in   5.013549s
+== pre round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    22.251k i/100ms
+Calculating -------------------------------------
+             append8    167.738k (±17.5%) i/s    (5.96 μs/i) -    845.538k in   5.040836s
+== cmemo round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    24.139k i/100ms
+Calculating -------------------------------------
+             append8    252.777k (±17.5%) i/s    (3.96 μs/i) -      1.279M in   5.061256s
+== cexact round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    16.781k i/100ms
+Calculating -------------------------------------
+             append8    198.134k (±14.5%) i/s    (5.05 μs/i) -      1.007M in   5.081705s
+== main round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    20.515k i/100ms
+Calculating -------------------------------------
+             append8    250.324k (±24.5%) i/s    (3.99 μs/i) -      1.272M in   5.081140s
+== main2 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    23.834k i/100ms
+Calculating -------------------------------------
+             append8    253.378k (±21.0%) i/s    (3.95 μs/i) -      1.287M in   5.079500s
+== pre round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    17.751k i/100ms
+Calculating -------------------------------------
+             append8    167.412k (±12.4%) i/s    (5.97 μs/i) -    852.048k in   5.089542s
+== cmemo round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    18.635k i/100ms
+Calculating -------------------------------------
+             append8    225.886k (±21.9%) i/s    (4.43 μs/i) -      1.137M in   5.032336s
+== cexact round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    13.444k i/100ms
+Calculating -------------------------------------
+             append8    169.308k (±14.3%) i/s    (5.91 μs/i) -    846.972k in   5.002543s
+== main round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    29.584k i/100ms
+Calculating -------------------------------------
+             append8    205.815k (±10.4%) i/s    (4.86 μs/i) -      1.035M in   5.030938s
+== main2 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    27.408k i/100ms
+Calculating -------------------------------------
+             append8    222.389k (±24.7%) i/s    (4.50 μs/i) -      1.124M in   5.052989s
+== pre round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    16.811k i/100ms
+Calculating -------------------------------------
+             append8    190.749k (±24.0%) i/s    (5.24 μs/i) -    975.038k in   5.111619s
+== cmemo round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    26.212k i/100ms
+Calculating -------------------------------------
+             append8    278.827k (±10.8%) i/s    (3.59 μs/i) -      1.415M in   5.076443s
+== cexact round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    21.478k i/100ms
+Calculating -------------------------------------
+             append8    200.549k (±15.0%) i/s    (4.99 μs/i) -      1.009M in   5.033505s
+== main round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    30.955k i/100ms
+Calculating -------------------------------------
+             append8    287.974k (±14.9%) i/s    (3.47 μs/i) -      1.455M in   5.052140s
+== main2 round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    27.031k i/100ms
+Calculating -------------------------------------
+             append8    291.201k (±14.6%) i/s    (3.43 μs/i) -      1.460M in   5.012595s
+== pre round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    24.234k i/100ms
+Calculating -------------------------------------
+             append8    222.522k (±10.3%) i/s    (4.49 μs/i) -      1.115M in   5.009683s
+== cmemo round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    26.788k i/100ms
+Calculating -------------------------------------
+             append8    223.076k (±28.9%) i/s    (4.48 μs/i) -      1.125M in   5.043556s
+== cexact round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    20.300k i/100ms
+Calculating -------------------------------------
+             append8    206.383k (±12.3%) i/s    (4.85 μs/i) -      1.035M in   5.016393s
+== main round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    24.097k i/100ms
+Calculating -------------------------------------
+             append8    306.368k (±20.6%) i/s    (3.26 μs/i) -      1.542M in   5.033840s
+== main2 round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    34.516k i/100ms
+Calculating -------------------------------------
+             append8    322.841k (±12.4%) i/s    (3.10 μs/i) -      1.622M in   5.024921s
+== pre round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    22.619k i/100ms
+Calculating -------------------------------------
+             append8    211.746k (±14.8%) i/s    (4.72 μs/i) -      1.063M in   5.020596s
+== cmemo round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    24.516k i/100ms
+Calculating -------------------------------------
+             append8    274.962k (±17.4%) i/s    (3.64 μs/i) -      1.397M in   5.082205s
+== cexact round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             append8    17.143k i/100ms
+Calculating -------------------------------------
+             append8    221.504k (±11.7%) i/s    (4.51 μs/i) -      1.114M in   5.030591s
