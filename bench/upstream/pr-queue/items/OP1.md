@@ -14,7 +14,7 @@ alternative_of:
 impact: "graphiti, graphiti-rails, jsonapi-rails and scimitar (OpenProject) boot on main again instead of raising FrozenError; fixes unreleased #57952"
 rank: 3
 risky: true
-state: draft
+state: ready
 pr: 59661
 note: "opened as draft 2026-11-05; earlier heads c5df553fa3, 860a2c7220, 6331f39542; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test list (in the diff); Ractor shareability note; evidence in docs/upstream/app-suites.md#openproject"
 passes:
