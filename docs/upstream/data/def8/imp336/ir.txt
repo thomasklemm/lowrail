@@ -1,0 +1,18 @@
+# Callgrind instructions and objects per javascript_importmap_tags call with a CSP nonce (run_ir.sh, N=200,
+# GC off, YJIT windows compiled 0 blocks). aa = main again; im1 = 863322e alone; comb = 8806855.
+blog interp main 502831 objects=129.02 compiled=0
+blog interp aa 503071 objects=129.02 compiled=0
+blog interp im1 505627 objects=129.02 compiled=0
+blog interp comb 499180 objects=115.02 compiled=0
+blog yjit main 312688 objects=129.075 compiled=0
+blog yjit aa 312203 objects=129.075 compiled=0
+blog yjit im1 313229 objects=129.075 compiled=0
+blog yjit comb 301642 objects=115.075 compiled=0
+blog50 interp main 2765135 objects=644.02 compiled=0
+blog50 interp aa 2765283 objects=644.02 compiled=0
+blog50 interp im1 2769547 objects=644.02 compiled=0
+blog50 interp comb 2722496 objects=544.02 compiled=0
+blog50 yjit main 1732387 objects=644.075 compiled=0
+blog50 yjit aa 1729847 objects=644.075 compiled=0
+blog50 yjit im1 1733909 objects=644.075 compiled=0
+blog50 yjit comb 1652187 objects=544.075 compiled=0

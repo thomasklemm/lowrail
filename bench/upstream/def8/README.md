@@ -29,3 +29,8 @@ posts, 5 comments each), `gem "vernier", "1.12.0"` and `gem "benchmark-ips"` wit
 * `micro.sh APP helpers_micro.rb|snippets_micro.rb N CASE...` prices one helper call or snippet.
 * Prototypes: `ql_ips.rb` and `im1_ips.rb` (benchmark-ips for the PR bodies, run with `taskset -c 3`, best of 5,
   interleaved with an A/A), `im1_probe.rb` (differential output probe for IM1).
+* IMP336 (IM1 folded into importmap-rails#336, 2026-11-15): `imp336_ips.rb` (the body's benchmark, `NONCE=1` for a
+  CSP nonce) through `imp336_run_ips.sh` (core 1, five interleaved rounds of main, its A/A, IM1 alone and the
+  combined head, apps with 7 and 50 preloaded modules) and `imp336_table.rb`; `imp336_run_ir.sh` and `imp336_ir.rb`
+  (Callgrind per call with a nonce), `imp336_allocs.rb`, `imp336_probe.rb` (integrity and nonce differential) and
+  `imp336_ci_matrix.sh` (the upstream CI matrix replayed locally).
