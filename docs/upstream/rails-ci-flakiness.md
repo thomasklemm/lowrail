@@ -13,19 +13,17 @@ bundled PR (queue item [FLK1](../../bench/upstream/pr-queue/items/FLK1.md)), one
   activejob integration job fails in 330 of 1,816 runs on main, but it is soft-failed and never turns a build red.
 - **The flake that turned the most builds red is outside Rails too:** activemodel `RailtieTest` (17 red builds) hits
   a Ruby bug with `require` inside a Ractor. Main already guards against it.
-- **Fixed in the PR (three commits), with before and after rates:**
+- **Fixed in the PR (two commits), with before and after rates:**
   - `ServerTimingTest`, three tests: compared the header with `sleep` lengths under fixed tolerances. 188/200 failing
     before, 0/200 after, on GitHub runners with the CPU throttled the way a container limited to 2 CPUs is.
-  - `ServerTest#test_restart_rails_server_with_custom_pid_file_path`: `bin/rails restart` can touch
-    `tmp/restart.txt` in the same timestamp tick in which Puma recorded it. 32/100 failing before, 0/100 after,
-    with the touch made right after boot.
   - `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor): the Ractor proxy unpinned
     a different main pool than it pinned, so the writing pool stayed pinned for later tests. 7/60 failing before,
     0/60 after, with the three tests involved in random order; both CI seeds fail on main and pass with the fix.
 - **Already fixed, or with an open fix by someone else:** 9 more flakes, listed below. `TestUnconnectedAdapter` has
   an open fix (rails/rails#59174) that matthewd steered; our first fix for it was the approach he turned down, so we
   dropped it.
-- **Left:** the engine `commands_test.rb` hang (cause unknown, not reproduced; open candidate rails/rails#53215),
+- **Left:** `ServerTest#test_restart_rails_server_with_custom_pid_file_path` (cause on CI not established; a
+  commit was built and dropped, see below), the engine `commands_test.rb` hang (cause unknown, not reproduced; open candidate rails/rails#53215),
   `MultipleFixtureConnectionsTest` and `InstrumentationTest` (not reproduced).
 
 ## Method
@@ -54,7 +52,7 @@ Builds that failed the test, of the 2,430 in scope; "red" counts builds whose fi
 | 1 | Buildkite agent interruption (exit -1) | 689 jobs | rare | – | whole window | all | agent lost or cancelled | outside Rails, retried automatically |
 | 2 | activejob integration job | 330/1,816 runs on main | 0 | – | whole window | activejob integration | queue adapters against live services | soft-failed, not investigated |
 | 3 | activemodel `RailtieTest` (5 tests) | 23 | 17 | 0 | Sep 18–Nov 5 | activemodel (4.0) | Ruby bug: `require` in a Ractor breaks `Kernel#require`'s alias chain (Ruby #22273, #22263) | mitigated on main |
-| 4 | `ServerTest#test_restart_rails_server_with_custom_pid_file_path` | 7 | 7 | 3 | Oct 29–Nov 14 | railties (3.3, 4.0, rack-2, rack-3-0) | restart.txt mtime unchanged within one timestamp tick | **fixed in FLK1** |
+| 4 | `ServerTest#test_restart_rails_server_with_custom_pid_file_path` | 7 | 7 | 3 | Oct 29–Nov 14 | railties (3.3, 4.0, rack-2, rack-3-0) | Puma never sees the touch; cause on CI not established | not fixed (commit dropped) |
 | 5 | `RactorsTest#test_jobs_are_performed_from_a_non-main_Ractor` | 22 | 4 | 1 | Sep 21–Oct 15 | railties (4.0) [rack-head] | `ractorize!` on nil during the Ractor work | stopped after Oct 15 |
 | 6 | `HerbCheckerTest` | 24 | 7 | 1 | Sep 24–Nov 4 | railties (4.0) [rack-head] | Herb 0.11 behaviour | fixed upstream (#58874) |
 | 7 | `FieldOrderedValuesTest` (19 tests) | 9 | 9 | 4 | Nov 4–5 | activerecord postgresql | order-dependent | fixed upstream (a712a0a9bc) |
@@ -98,29 +96,6 @@ The failure needs the thread stalled for longer than the tolerance, which a CPU 
 unthrottled host does not. Mutation checks: summing nested same-name events fails the same-name test, and
 subtracting children of another name fails the different-name test, so the new tests still catch the bugs #58800
 fixed.
-
-### Pre-date restart.txt in the server restart test
-
-Puma's tmp_restart plugin creates `tmp/restart.txt` when it starts (before "Use Ctrl-C to stop"), records its mtime,
-and restarts once it sees a later one. `rails("restart")` forks the already loaded test process and touches the file
-12 to 44 ms later (measured in the orb). File timestamps advance with the kernel's timer tick: 4 ms in the orb,
-10 ms on the CI hosts (Amazon Linux 2023, `CONFIG_HZ=100`). If the touch lands in the same tick, the mtime does not
-change and Puma never restarts; the test waits 100 s for "Restarting", retries once and fails at about 205 s.
-rails/rails#59588 (yahonda, Nov 4) fixed an earlier race in the same test; it failed twice after that, in builds
-136351 (main, Nov 9) and 136623 (#59803, Nov 14), both with no output at all after "Use Ctrl-C to stop", which is
-what an unchanged mtime gives. The test now creates `restart.txt` with an mtime a minute in the past before it boots
-the server, so any touch moves the mtime forward.
-
-| Loop | Before | After |
-|---|---:|---:|
-| orb, amplified test touching restart.txt right after boot (N=100) | 32/100 | 0/100 |
-| orb, touch that keeps the mtime (shows the symptom) | 100 s silence, no restart | – |
-| orb, unmodified test | 0/200 | – |
-| GitHub runner, amplified (run 43711709644) | 0/100 | 0/100 |
-
-The race needs the touch inside one tick of Puma's recording. GitHub's runners did not hit it even when amplified,
-and the unmodified test never failed locally, so the rate only shows on fast hosts with a coarse tick; only Rails'
-Buildkite can confirm the CI rate drops to zero.
 
 ### Unpin the main pool the Ractor proxy pinned
 
@@ -174,6 +149,29 @@ test. GitHub loop: run 43715792755 (`async_retry_order`).
   later failures are pull requests on older bases.
 
 ## Not fixed
+
+### Server restart test: a commit built and dropped
+
+`ServerTest#test_restart_rails_server_with_custom_pid_file_path` waits up to 100 s for Puma's "Restarting" after
+`rails("restart")` touches `tmp/restart.txt`. rails/rails#59588 (yahonda, Nov 4) fixed one race in it (the plugin
+detecting the touch before the server ran); it failed twice after that, in builds 136351 (main, Nov 9, seed 42753)
+and 136623 (#59803, Nov 14, seed 32620). In both, nothing at all was printed after "Use Ctrl-C to stop", and the file
+took 205 s while the test's profile shows 101.8 s per attempt, so **the run and its minitest-retry attempt both
+failed**: whatever stops the restart held for two fresh apps in a row on that host.
+
+We built a fix on the hypothesis that the touch keeps restart.txt's mtime unchanged: Puma's tmp_restart plugin creates
+the file at boot, records its mtime and restarts only on a strictly later one, so a touch inside the same timestamp
+tick is never seen. The commit (b4661e4891, kept on `flk1-before-drop` in the local clone) pre-dated restart.txt by
+60 s. Evidence for the mechanism: a touch that keeps the mtime reproduces the symptom exactly (100 s silence), and a
+variant that touches in-process right after boot failed 32/100 in our orb (4 ms tick) and 0/100 with the pre-date.
+The opus review showed it does not explain CI: its orb (250 Hz) gave 0/100 for the same variant (the touch landed
+4–8 ms, 1–2 ticks, after Puma's recording), the real `rails("restart")` path touches 24–44 ms after (our orb: 12–44
+ms), GitHub runners gave 0/100, and on CI the app lives in a tmpfs at `/rails/tmp` whose timestamps advance at least
+every tick (10 ms at `CONFIG_HZ=100`). Two consecutive failures do not fit a race inside one tick. The CI seeds pass
+on main in the CI image (2/2), so it is not test order. The commit was dropped: the pre-date would also cover a
+backward clock step or coarse timestamps, but we cannot show that either happens on Rails' agents. Next step that
+only Rails' Buildkite can take: on failure, print restart.txt's mtime at boot and after the touch, and the plugin
+thread's state.
 
 - **Engine `commands_test.rb` hang** (railties, Ruby 3.3 and 3.4, mostly shard 10 of 12): 20 jobs hit the 30-minute
   timeout. Mapping the seeds shows the hung test is `test_server_command_work_inside_engine` 18 times and
