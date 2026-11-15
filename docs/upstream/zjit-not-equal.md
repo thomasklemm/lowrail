@@ -8,8 +8,9 @@ ZJIT fix, prepared as one ruby/ruby PR ([DECISIONS](../DECISIONS.md), ruby/ruby 
 **Result: built, tested, measured and reviewed; nothing opened.** Branch
 [`thomasklemm/ruby:zjit-opt-neq-polymorphic`](https://github.com/thomasklemm/ruby/tree/zjit-opt-neq-polymorphic),
 head `18d33e8a24`, one commit on master `fc4cd8872b`. Queue item with the PR body:
-[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). Thomas opens it as a draft once the three review passes approve
-this head; arm64 is green. The first reviewed head, `52d41cc992`, is on fork branch `zjit-polymorphic-neq`; the new
+[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). All three review passes have no must-fix on
+this head and arm64 is green, so it is ready for Thomas to open as a draft, apart from the thermos gate for diffs
+over 200 lines (pass or waiver, the coordinator's call). The first reviewed head, `52d41cc992`, is on fork branch `zjit-polymorphic-neq`; the new
 head differs by one test, one test comment and the commit message ([reviews](#reviews)).
 
 * The premise of the brief was half out of date. Since ruby/ruby#19162 (nozomemein, merged) `BasicObject#!=` is a
@@ -208,7 +209,10 @@ master runs; why was not traced.
 ## Numbers
 
 `run_benchmarks.rb --no-sudo --interleave --pvalue --force-pinning`, all `--zjit`: master, a second independent
-build of master (`master-aa`, the A/A) and the branch at head `18d33e8a24`. Three rounds with nothing else running
+build of master (`master-aa`, the A/A) and the branch at head `18d33e8a24`. The two master builds were configured
+separately with the same options (`--enable-yjit --enable-zjit --disable-install-doc`) into the prefixes `~/w/rm`
+and `~/w/rm2`; their `bin/ruby` files differ (77,100,520 and 77,099,936 bytes, sha256 `b432668c6955b091…` and
+`3a042ba13995ea65…`) and print the same version line. Three rounds with nothing else running
 (Callgrind paused), each pinned to one core by the tool: [rounds-1.txt](data/zne1/rounds-1.txt),
 [rounds-2.txt](data/zne1/rounds-2.txt), [rounds-3.txt](data/zne1/rounds-3.txt),
 summary by [rounds.rb](../../bench/upstream/zne1/rounds.rb) in [rounds-summary.txt](data/zne1/rounds-summary.txt).
@@ -278,7 +282,8 @@ warmup iterations and the JIT-flat gate (passed in every run). A ceiling counts 
 | shipit | 3,731,618,637 | 14,561,025 | 0.390% | 30,074 | 484 |
 
 Data: [a-railsbench.json](data/zne1/a-railsbench.json), [a-lobsters.json](data/zne1/a-lobsters.json),
-[a-shipit.json](data/zne1/a-shipit.json). A second run of each is pending.
+[a-shipit.json](data/zne1/a-shipit.json). A second lobsters run ([b-lobsters.json](data/zne1/b-lobsters.json))
+gives the same region, 4,644,536 Ir in 10,323 calls, in 2,520,766,832 Ir: 0.184% again.
 
 ## Which applies
 
@@ -313,6 +318,30 @@ Applied in `18d33e8a24`: the comment is one sentence; `test_opt_neq_polymorphic`
 returns true, and now fails when the last arm is made unconditional; the commit message says "no new kind of
 assumption", names the added patch points and their cost, and fixes two wordings. The body was cut and its
 numbers replaced by one pinned run.
+
+Second round, on head `18d33e8a24`:
+
+| Pass | Verdict | Must-fix |
+| --- | --- | --- |
+| claude-code | nits | none |
+| opus | nits | none |
+| fable (adversarial) | approve | none |
+
+* **fable**: reran its 12 mutations, 22 attack scripts (198 pairs) and 108 new fuzz pairs; no difference. It
+  corrected this record on `NoSingletonClass` (see "Why it is exact") and measured the monomorphic invalidation
+  case on master.
+* **opus**: first `changes` for one body sentence (`master-aa` was called a second build while the numbers shown
+  used one binary twice), then `nits` once the pinned rounds used a second build. It recomputed the round choice
+  and the stats claims from the committed files; its three optional points are applied.
+* **claude-code**: reproduced `rounds-summary.txt` and the stats-diff blocks byte for byte and checked every
+  sentence of the body and the commit message. It withdrew its earlier point about one small table, because
+  DECISIONS asks for the tools' own format in ZJIT PRs.
+
+Open, optional, not applied because it would need a new head and new passes: the commit message's last paragraph
+names redefining `!=` or `==` for a profiled class as what invalidates a site. Two more triggers exist, both the
+same for a monomorphic `!=`: giving an instance of a profiled heap class a singleton class (claude-code) and
+defining `!=` on an unrelated class with a subclass or on an included module (fable). The body is 169 words,
+above the 150 DECISIONS names; every reviewer left that optional.
 
 Found on the way, on master too, not part of this change:
 
