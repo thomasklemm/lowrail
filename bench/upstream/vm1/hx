@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# p_map/hx with a choice of Ruby: VM1_RUBY is a bin directory or a mise version (default 4.0.9).
+#   [VM1_RUBY=DIR] bench/upstream/vm1/hx CORPUS APP CMD...
+set -euo pipefail
+root=$(cd "$(dirname "$0")/../../.." && pwd)
+corpus=$1 app=$2; shift 2
+exec "$HOME/.local/share/mise/installs/ruby/4.0.9/bin/ruby" -e '
+  load ARGV.shift
+  corpus, app = ARGV.shift(2)
+  bin = Census.ruby_bin(ENV.fetch("VM1_RUBY", "4.0.9"))
+  rails = Census.state(corpus, app).fetch("base")
+  gemfile = Census.variant(corpus, app, rails, bin)
+  dir = Census.app_dir(corpus, app)
+  env = Census.env_for(app, bin, rails, gemfile).merge("CENSUS_MODE" => ENV.fetch("CENSUS_MODE", "interpreter"))
+  Dir.chdir(dir) { exec(env, *ARGV) }
+' "$root/script/census" "$corpus" "$app" "$@"

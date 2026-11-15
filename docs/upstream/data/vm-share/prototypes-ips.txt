@@ -1,0 +1,38 @@
+# benchmark-ips cohorts for bench/upstream/vm1/tag/ips.rb, core 3, interleaved rounds, best of N per tree (ips_best.rb). All rejected for a body: A/A outside the effect or run errors above 13%.
+## te1/ips-yjit.txt
+tag.a: base 420.1k (2.381 µs, n=5), base2 416.3k (2.402 µs, n=5), branch 453.7k (2.204 µs, n=5); base2/base -0.9%, branch/base +8.0%
+content_tag: base 654.0k (1.529 µs, n=5), base2 669.7k (1.493 µs, n=5), branch 682.8k (1.465 µs, n=5); base2/base +2.4%, branch/base +4.4%
+## te1/ips-interp.txt
+tag.a: base 197.8k (5.057 µs, n=5), base2 214.2k (4.669 µs, n=5), branch 210.1k (4.759 µs, n=5); base2/base +8.3%, branch/base +6.3%
+content_tag: base 389.2k (2.570 µs, n=5), base2 393.1k (2.544 µs, n=5), branch 418.4k (2.390 µs, n=5); base2/base +1.0%, branch/base +7.5%
+## te-ips-noisy/yjit.txt
+tag.a: base 389.8k (2.566 µs, n=5), base2 390.2k (2.563 µs, n=4), TE1 386.1k (2.590 µs, n=4), TE2 444.2k (2.251 µs, n=4); base2/base +0.1%, TE1/base -0.9%, TE2/base +14.0%
+content_tag: base 640.5k (1.561 µs, n=5), base2 577.5k (1.732 µs, n=4), TE1 692.9k (1.443 µs, n=4), TE2 680.7k (1.469 µs, n=4); base2/base -9.8%, TE1/base +8.2%, TE2/base +6.3%
+## te-ips-loaded/yjit.txt
+tag.a: base 369.2k (2.709 µs, n=5), base2 392.6k (2.547 µs, n=5), TE1 427.6k (2.338 µs, n=5), TE2 433.9k (2.305 µs, n=5); base2/base +6.3%, TE1/base +15.8%, TE2/base +17.5%
+content_tag: base 641.1k (1.560 µs, n=5), base2 634.6k (1.576 µs, n=5), TE1 683.4k (1.463 µs, n=5), TE2 648.3k (1.543 µs, n=5); base2/base -1.0%, TE1/base +6.6%, TE2/base +1.1%
+## te-ips-loaded/interp.txt
+tag.a: base 210.1k (4.760 µs, n=5), base2 207.0k (4.830 µs, n=5), TE1 211.0k (4.740 µs, n=5), TE2 198.8k (5.031 µs, n=5); base2/base -1.5%, TE1/base +0.4%, TE2/base -5.4%
+content_tag: base 390.6k (2.560 µs, n=5), base2 415.9k (2.404 µs, n=5), TE1 424.1k (2.358 µs, n=5), TE2 396.9k (2.520 µs, n=5); base2/base +6.5%, TE1/base +8.6%, TE2/base +1.6%
+## te-ips-loaded/zjit.txt
+tag.a: base 352.3k (2.838 µs, n=5), base2 362.8k (2.757 µs, n=5), TE1 352.5k (2.837 µs, n=5), TE2 412.9k (2.422 µs, n=5); base2/base +3.0%, TE1/base +0.1%, TE2/base +17.2%
+content_tag: base 575.2k (1.738 µs, n=5), base2 662.6k (1.509 µs, n=5), TE1 679.9k (1.471 µs, n=5), TE2 749.1k (1.335 µs, n=5); base2/base +15.2%, TE1/base +18.2%, TE2/base +30.2%
+## te2-ips-1/yjit.txt
+tag.a: base 227.0k (4.406 µs, n=5), base2 212.4k (4.708 µs, n=5), TE2 237.4k (4.212 µs, n=5); base2/base -6.4%, TE2/base +4.6%
+content_tag: base 368.6k (2.713 µs, n=5), base2 343.8k (2.909 µs, n=5), TE2 366.0k (2.732 µs, n=5); base2/base -6.7%, TE2/base -0.7%
+## te2-ips-1/zjit.txt
+tag.a: base 188.8k (5.298 µs, n=5), base2 212.5k (4.705 µs, n=5), TE2 220.5k (4.536 µs, n=5); base2/base +12.6%, TE2/base +16.8%
+content_tag: base 359.3k (2.783 µs, n=5), base2 381.0k (2.625 µs, n=5), TE2 378.9k (2.640 µs, n=5); base2/base +6.0%, TE2/base +5.4%
+## te2-ips/yjit.txt
+tag.a: base 199.4k (5.014 µs, n=8), base2 208.2k (4.802 µs, n=8), TE2 253.3k (3.947 µs, n=8); base2/base +4.4%, TE2/base +27.0%
+content_tag: base 335.1k (2.984 µs, n=8), base2 334.5k (2.989 µs, n=8), TE2 426.4k (2.345 µs, n=8); base2/base -0.2%, TE2/base +27.3%
+## te2-ips/yjit.txt per round (tag.a i/s)
+base r1 172.734k	base2 r1 187.289k	TE2 r1 205.919k
+base r2 178.560k	base2 r2 174.861k	TE2 r2 219.436k
+base r3 176.397k	base2 r3 201.730k	TE2 r3 203.058k
+base r4 187.696k	base2 r4 177.155k	TE2 r4 206.331k
+base r5 199.444k	base2 r5 186.202k	TE2 r5 210.129k
+base r6 195.270k	base2 r6 208.236k	TE2 r6 253.345k
+base r7 181.623k	base2 r7 195.584k	TE2 r7 225.466k
+base r8 199.417k	base2 r8 180.064k	TE2 r8 221.947k
+# te1/*: branch = TE1 only; te-ips-noisy and te-ips-loaded ran while Callgrind used cores 0-2.

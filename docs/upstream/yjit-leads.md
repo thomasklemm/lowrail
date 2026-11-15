@@ -86,3 +86,12 @@ The interpreter and ZJIT print `:type_error` ("self has wrong type to call super
   #19671 leaves, counted as `send_forwarding_caller_args`. ZJIT's counterpart is #18326 (nozomemein).
 - **`where!(opts, *rest)` with a splat** allocates 2 Arrays under YJIT vs 1 in the interpreter
   ([JIT parity census](jit-parity-census.md)).
+- **`invokeblock` keeps the first block-handler type of a non-inlined builtin** ([VM1](vm-share.md#ranked-sites)).
+  `gen_invokeblock_specialized` returns `None` for a Symbol handler, and the generic version of `Array#each` (the
+  one C Enumerables call) keeps that for every later block: after 60 `a.each(&:to_s)`, 2,000 `each_with_index`
+  and `group_by` over 20 elements count 80,000 `invokeblock_symbol` instead of 0. 258–11,728 per request in the
+  VM1 apps (preloader `group_by`/`each_with_object`, `Result::RowLayout`).
+- **`BasicObject#!=` for receivers whose `==` is `BasicObject#==`** ([VM1](vm-share.md#ranked-sites)).
+  `jit_rb_obj_not_equal` specializes only Integer and String pairs, so `nil != :sym` calls `rb_obj_not_equal`,
+  which calls `==` through `rb_funcall` (about 20 ns per comparison on 4.0.9; `!(a == b)` is inlined). TE2 removes the
+  hottest Rails caller (`tag_options`, 0.5–0.6% of Blog and Lobsters samples).

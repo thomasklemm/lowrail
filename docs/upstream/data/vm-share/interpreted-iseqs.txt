@@ -1,0 +1,66 @@
+blog: interpreted 2768 insns/request (0.5% of retired; per-ISEQ sum 2765), not compiled 43.7%, after exits 56.3%
+        733  26.5% after-exit   method calls=120       _app_views_articles__article_html_erb__3996220961670057546_15232@censuspmap-blog/app/views/articles/_article.html.erb:0
+        667  24.1% interpreted  method calls=41519     initialize@<internal:timev>:440
+        294  10.6% after-exit   method calls=120       translate@i18n-1.15.2/lib/i18n/backend/base.rb:28
+        130   4.7% after-exit   method calls=120       generate_message@rails-50c54eed065b/activemodel/lib/active_model/error.rb:69
+         81   2.9% after-exit   block  calls=120       block in run_callbacks@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:116
+         56   2.0% interpreted  method calls=99        default@i18n-1.15.2/lib/i18n/backend/base.rb:128
+         54   1.9% interpreted  method calls=29        plus@<internal:pathname_builtin>:671
+         51   1.8% after-exit   method calls=120       human@rails-50c54eed065b/activemodel/lib/active_model/naming.rb:216
+         45   1.6% interpreted  method calls=119       reader@rails-50c54eed065b/activerecord/lib/active_record/associations/collection_association.rb:37
+         41   1.5% interpreted  method calls=117       initialize@i18n-1.15.2/lib/i18n/exceptions.rb:52
+fizzy: interpreted 3551 insns/request (0.2% of retired; per-ISEQ sum 3549), not compiled 31.9%, after exits 68.1%
+        580  16.3% after-exit   method calls=120       value_for@rails-50c54eed065b/activerecord/lib/active_record/scoping.rb:121
+        265   7.5% after-exit   method calls=120       run_callbacks@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:99
+        260   7.3% after-exit   method calls=120       with_connection@rails-50c54eed065b/activerecord/lib/active_record/connection_handling.rb:360
+        175   4.9% after-exit   method calls=120       scope@rails-50c54eed065b/activerecord/lib/active_record/associations/association_scope.rb:21
+        156   4.4% after-exit   block  calls=120       block in run_callbacks@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:116
+        104   2.9% after-exit   method calls=30        each@<internal:array>:219
+         80   2.2% after-exit   method calls=120       build_joins@rails-50c54eed065b/activerecord/lib/active_record/relation/query_methods.rb:2237
+         69   1.9% after-exit   method calls=120       find_target@rails-50c54eed065b/activerecord/lib/active_record/associations/association.rb:265
+         63   1.8% interpreted  method calls=0         touch_record@rails-50c54eed065b/activerecord/lib/active_record/associations/builder/belongs_to.rb:46
+         60   1.7% interpreted  method calls=118       handle_request@puma-8.0.2/lib/puma/response.rb:53
+mastodon: interpreted 8272 insns/request (0.4% of retired; per-ISEQ sum 8269), not compiled 46.4%, after exits 53.6%
+       1391  16.8% interpreted  method calls=118       initialize@active_model_serializers-0.10.16/lib/active_model/serializer/association.rb:14
+        786   9.5% after-exit   method calls=120       serializer@active_model_serializers-0.10.16/lib/active_model/serializer/lazy_association.rb:32
+        727   8.8% after-exit   method calls=120       serializable_hash@active_model_serializers-0.10.16/lib/active_model/serializer/association.rb:52
+        589   7.1% interpreted  method calls=101117    escape@uri-1.1.2/lib/uri/rfc2396_parser.rb:286
+        499   6.0% after-exit   method calls=120       serializer_for@active_model_serializers-0.10.16/lib/active_model/serializer.rb:45
+        471   5.7% after-exit   method calls=120       value_for@rails-50c54eed065b/activerecord/lib/active_record/scoping.rb:121
+        435   5.3% after-exit   block  calls=120       block (2 levels) in associations@active_model_serializers-0.10.16/lib/active_model/serializer.rb:356
+        384   4.6% after-exit   block  calls=120       block (2 levels) in object_cache_keys@active_model_serializers-0.10.16/lib/active_model/serializer/concerns/caching.rb:198
+        303   3.7% interpreted  method calls=1         matched_attribute_method@rails-50c54eed065b/activemodel/lib/active_model/attribute_methods.rb:616
+        261   3.2% interpreted  method calls=118       build_association@active_model_serializers-0.10.16/lib/active_model/serializer/reflection.rb:197
+CE2 blog: interpreted 6167 insns/request (0.6% of retired; per-ISEQ sum 6163), not compiled 58.9%, after exits 41.1%
+       2905  47.1% interpreted  method calls=120319    initialize@<internal:timev>:440
+       1650  26.8% after-exit   method calls=120       _app_views_articles__article_html_erb__4059278006725039529_15320@censusce2-blog/app/views/articles/_article.html.erb:0
+        410   6.7% after-exit   method calls=120       translate@i18n-1.15.2/lib/i18n/backend/base.rb:28
+        167   2.7% interpreted  method calls=119       reader@rails-50c54eed065b/activerecord/lib/active_record/associations/collection_association.rb:37
+        133   2.2% after-exit   block  calls=120       block in serializable_add_includes@rails-50c54eed065b/activemodel/lib/active_model/serialization.rb:217
+         92   1.5% after-exit   method calls=120       create@rails-50c54eed065b/activerecord/lib/active_record/relation/delegation.rb:139
+         91   1.5% interpreted  method calls=99        default@i18n-1.15.2/lib/i18n/backend/base.rb:128
+         60   1.0% interpreted  method calls=29        plus@<internal:pathname_builtin>:671
+         56   0.9% after-exit   block  calls=120       block in run_callbacks@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:116
+         52   0.8% interpreted  method calls=117       initialize@i18n-1.15.2/lib/i18n/exceptions.rb:52
+CE2 fizzy: interpreted 23884 insns/request (0.6% of retired; per-ISEQ sum 23879), not compiled 61.7%, after exits 38.3%
+       8000  33.5% interpreted  method calls=30122     namespace_key@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:1016
+       3872  16.2% after-exit   method calls=30        map@<internal:array>:237
+       2400  10.1% interpreted  method calls=119       expand_and_namespace_key@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:988
+       1095   4.6% after-exit   method calls=120       with_connection@rails-50c54eed065b/activerecord/lib/active_record/connection_handling.rb:360
+       1000   4.2% after-exit   method calls=120       expanded_key@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:1041
+       1000   4.2% interpreted  method calls=119       normalize_key@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:983
+       1000   4.2% after-exit   method calls=120       normalize_key@solid_cache-1.0.10/lib/solid_cache/store/api.rb:140
+        798   3.3% interpreted  method calls=20932     init_with_attributes@rails-50c54eed065b/activerecord/lib/active_record/core.rb:565
+        633   2.7% interpreted  method calls=20119     fragment_name_with_digest@rails-50c54eed065b/actionview/lib/action_view/helpers/cache_helper.rb:306
+        420   1.8% after-exit   method calls=120       value_for@rails-50c54eed065b/activerecord/lib/active_record/scoping.rb:121
+CE2 lobsters: interpreted 24745 insns/request (0.5% of retired; per-ISEQ sum 24741), not compiled 29.8%, after exits 70.2%
+      12867  52.0% after-exit   block  calls=120       block in _app_views_home_index_html_erb___4486879601703326628_35528@censusce2-lobsters/app/views/home/index.html.erb:6
+       4778  19.3% interpreted  method calls=28        url_for@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:952
+       1094   4.4% interpreted  method calls=74        cast_value@rails-50c54eed065b/activemodel/lib/active_model/type/boolean.rb:41
+        825   3.3% interpreted  method calls=60        as_json@censusce2-lobsters/app/models/story.rb:536
+        563   2.3% after-exit   method calls=120       extensions@rails-50c54eed065b/activerecord/lib/active_record/associations/association.rb:174
+        542   2.2% after-exit   method calls=120       cast_value@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:566
+        442   1.8% after-exit   method calls=120       relation@rails-50c54eed065b/activerecord/lib/active_record/core.rb:481
+        425   1.7% after-exit   block  calls=120       block in <class:JSONGemCoderEncoder>@rails-50c54eed065b/activesupport/lib/active_support/json/encoding.rb:199
+        375   1.5% after-exit   method calls=120       initialize@rails-50c54eed065b/activerecord/lib/active_record/associations/collection_proxy.rb:37
+        279   1.1% after-exit   method calls=120       create@rails-50c54eed065b/activerecord/lib/active_record/relation/delegation.rb:139

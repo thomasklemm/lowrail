@@ -1,0 +1,96 @@
+diff --git a/iseq.c b/iseq.c
+index cd5f5305bd..9e4bdaf9bf 100644
+--- a/iseq.c
++++ b/iseq.c
+@@ -4520,11 +4520,66 @@ iseqw_script_lines(VALUE self)
+  *  Of course, this class is MRI specific.
+  */
+ 
++static int
++vm1_dump_i(void *vstart, void *vend, size_t stride, void *data)
++{
++    FILE *f = data;
++    VALUE v = (VALUE)vstart;
++    for (; v != (VALUE)vend; v += stride) {
++        if (rb_obj_is_iseq(v)) {
++            const rb_iseq_t *iseq = (const rb_iseq_t *)v;
++            struct rb_iseq_constant_body *body = ISEQ_BODY(iseq);
++            if (body && (body->vm1_interp_insns || body->jit_entry_calls)) {
++                VALUE path = rb_iseq_path(iseq), label = body->location.label;
++                fprintf(f, "%p\t%llu\t%lu\t%d\t%d\t%d\t%.*s\t%.*s\n", (void *)iseq,
++                        (unsigned long long)body->vm1_interp_insns, body->jit_entry_calls, body->jit_entry != NULL,
++                        (int)body->type, (int)body->location.first_lineno,
++                        RB_TYPE_P(path, T_STRING) ? (int)RSTRING_LEN(path) : 0, RB_TYPE_P(path, T_STRING) ? RSTRING_PTR(path) : "",
++                        RB_TYPE_P(label, T_STRING) ? (int)RSTRING_LEN(label) : 0, RB_TYPE_P(label, T_STRING) ? RSTRING_PTR(label) : "");
++            }
++        }
++    }
++    return 0;
++}
++
++static int
++vm1_reset_i(void *vstart, void *vend, size_t stride, void *data)
++{
++    VALUE v = (VALUE)vstart;
++    for (; v != (VALUE)vend; v += stride) {
++        if (rb_obj_is_iseq(v) && ISEQ_BODY((const rb_iseq_t *)v)) ISEQ_BODY((const rb_iseq_t *)v)->vm1_interp_insns = 0;
++    }
++    return 0;
++}
++
++static VALUE
++vm1_dump(VALUE self, VALUE path)
++{
++    FILE *f = fopen(StringValueCStr(path), "w");
++    if (!f) rb_sys_fail(StringValueCStr(path));
++    RB_VM_LOCKING() {
++        rb_objspace_each_objects(vm1_dump_i, f);
++    }
++    fclose(f);
++    return Qnil;
++}
++
++static VALUE
++vm1_reset(VALUE self)
++{
++    RB_VM_LOCKING() {
++        rb_objspace_each_objects(vm1_reset_i, NULL);
++    }
++    return Qnil;
++}
++
+ void
+ Init_ISeq(void)
+ {
+     /* declare ::RubyVM::InstructionSequence */
+     rb_cISeq = rb_define_class_under(rb_cRubyVM, "InstructionSequence", rb_cObject);
++    rb_define_singleton_method(rb_cISeq, "vm1_dump", vm1_dump, 1);
++    rb_define_singleton_method(rb_cISeq, "vm1_reset", vm1_reset, 0);
+     rb_undef_alloc_func(rb_cISeq);
+     rb_define_method(rb_cISeq, "inspect", iseqw_inspect, 0);
+     rb_define_method(rb_cISeq, "disasm", iseqw_disasm, 0);
+diff --git a/vm_core.h b/vm_core.h
+index 9b463abef0..c7adf6087d 100644
+--- a/vm_core.h
++++ b/vm_core.h
+@@ -563,6 +563,7 @@ struct rb_iseq_constant_body {
+     // Used to estimate how frequently this ISEQ gets called
+     uint64_t yjit_calls_at_interv;
+ #endif
++    uint64_t vm1_interp_insns;
+ 
+ #if USE_ZJIT
+     // ZJIT stores some data on each iseq.
+diff --git a/vm_insnhelper.h b/vm_insnhelper.h
+index 6d32a7535b..55871d427c 100644
+--- a/vm_insnhelper.h
++++ b/vm_insnhelper.h
+@@ -20,7 +20,7 @@ RUBY_EXTERN rb_serial_t ruby_vm_global_cvar_state;
+ // Increment vm_insn_count for --yjit-stats. We increment this even when
+ // --yjit or --yjit-stats is not used because branching to skip it is slower.
+ // We also don't use ATOMIC_INC for performance, allowing inaccuracy on Ractors.
+-#define JIT_COLLECT_USAGE_INSN(insn) rb_vm_insn_count++
++#define JIT_COLLECT_USAGE_INSN(insn) (rb_vm_insn_count++, ISEQ_BODY(reg_cfp->iseq)->vm1_interp_insns++)
+ #else
+ #define JIT_COLLECT_USAGE_INSN(insn) // none
+ #endif

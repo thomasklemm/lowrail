@@ -1,0 +1,318 @@
+## ce2-blog
+Puma samples 1057: JIT 13.7%, VM 15.5%, allocation 4.9%, GC 8.6%, core C 40.7%, other 16.6%
+
+c_calls_ruby: 8.61% of Puma samples
+  entry points: send_internal 1.42%, rb_obj_not_equal 1.14%, rb_class_new_instance_pass_kw 0.76%, rb_vm_invoke_proc 0.76%, rb_hash_each_key 0.66%, rb_hash_each_pair 0.66%, rb_vm_yield_with_cfunc 0.38%, rb_f_array 0.28%
+    0.95%  _run@rails-50c54eed065b/actionview/lib/action_view/base.rb:351
+    0.57%  block in tag_options@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1547
+    0.47%  block in handle_request@puma-8.0.2/lib/puma/response.rb:124
+    0.38%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.38%  cached_names@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:586
+    0.38%  serializable_add_includes@rails-50c54eed065b/activemodel/lib/active_model/serialization.rb:210
+    0.38%  each@<internal:array>:219
+    0.28%  cast_value@rails-50c54eed065b/activemodel/lib/active_model/type/string.rb:38
+    0.28%  record_key_for_dom_id@rails-50c54eed065b/actionview/lib/action_view/record_identifier.rb:155
+    0.28%  optimizable_default_url_options?@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:934
+    0.28%  hash@rails-50c54eed065b/activemodel/lib/active_model/attribute.rb:148
+    0.28%  compute_if_absent@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb:85
+    0.19%  keys@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:343
+    0.19%  block in _extract_method_values@jbuilder-2.15.1/lib/jbuilder.rb:304
+    0.19%  url_for@rails-50c54eed065b/actionview/lib/action_view/routing_url_for.rb:86
+
+gc: 8.61% of Puma samples
+  entry points: [unknown] 0.95%, rb_obj_alloc 0.85%, rb_hash_merge 0.66%, rb_ec_ary_new_from_values 0.66%, rb_ary_or 0.66%, rb_hash_new 0.57%, rb_vm_opt_send_without_block 0.47%, rb_class_new_instance_pass_kw 0.28%
+    0.95%  block in each@sqlite3-2.10.1-x86_64-linux-gnu/lib/sqlite3/statement.rb:142
+    0.47%  call@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:227
+    0.47%  keys@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:343
+    0.28%  parameterize_args@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:317
+    0.28%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+    0.28%  (no JIT frame)
+    0.28%  stringify_keys@rails-50c54eed065b/activesupport/lib/active_support/core_ext/hash/keys.rb:12
+    0.19%  extract_non_symbol_default!@i18n-1.15.2/lib/i18n/backend/fallbacks.rb:97
+    0.19%  lookup@i18n-1.15.2/lib/i18n/backend/simple.rb:93
+    0.19%  _run@rails-50c54eed065b/actionview/lib/action_view/base.rb:351
+    0.19%  translate_key@i18n-1.15.2/lib/i18n.rb:422
+    0.19%  fast_string_to_time@rails-50c54eed065b/activemodel/lib/active_model/type/helpers/time_value.rb:64
+    0.19%  block in index_with@rails-50c54eed065b/activesupport/lib/active_support/core_ext/enumerable.rb:331
+    0.19%  _app_views_articles__article_json_jbuilder___1451309708024482361_137336@censusce2-blog/app/views/articles/_article.json.jbuilder:0
+    0.19%  extensions@rails-50c54eed065b/activerecord/lib/active_record/associations/association.rb:174
+
+alloc: 4.92% of Puma samples
+  entry points: rb_ec_ary_new_from_values 0.57%, rb_obj_alloc 0.38%, rb_str_concat_literals 0.28%, rb_class_new_instance_pass_kw 0.28%, rb_hash_new 0.28%, rb_str_dup 0.19%, str_buf_cat4.part.0 0.19%, rb_ary_and 0.09%
+    0.66%  (no JIT frame)
+    0.28%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.19%  association_cache@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:84
+    0.19%  build_from_row@rails-50c54eed065b/activemodel/lib/active_model/attribute_set/builder.rb:133
+    0.19%  content_tag_string@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1532
+    0.09%  cached_names@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:586
+    0.09%  initialize@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:299
+    0.09%  start_intent_log@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:829
+    0.09%  row_keys@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:581
+    0.09%  perform_query@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:112
+    0.09%  serializable_hash@rails-50c54eed065b/activemodel/lib/active_model/serialization.rb:140
+    0.09%  cache_control_headers@rails-50c54eed065b/actionpack/lib/action_dispatch/http/cache.rb:271
+    0.09%  reset@rails-50c54eed065b/activerecord/lib/active_record/associations/collection_association.rb:83
+    0.09%  handle_exception@i18n-1.15.2/lib/i18n.rb:452
+    0.09%  make_request@rails-50c54eed065b/actionpack/lib/action_dispatch/middleware/session/abstract_store.rb:42
+
+helper: 3.41% of Puma samples
+  entry points: obj_respond_to 0.57%, rb_hash_aref 0.47%, vm_defined 0.28%, rb_vm_ic_hit_p 0.28%, vm_call_iseq_setup_normal_0start_2params_2locals 0.28%, rb_vm_yield_with_cfunc 0.19%, rb_vm_cframe_keyword_p 0.19%, wkmap_aref 0.09%
+    0.38%  respond_to?@rails-50c54eed065b/activemodel/lib/active_model/attribute_methods.rb:597
+    0.19%  button_to_generates_button_tag@rails-50c54eed065b/actionview/lib/action_view/helpers/navigation_helper.rb:27
+    0.19%  token_tag@rails-50c54eed065b/actionview/lib/action_view/helpers/form_tag_helper.rb:1155
+    0.19%  value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:527
+    0.19%  respond_to?@rails-50c54eed065b/actionview/lib/action_view/helpers/controller_helper.rb:39
+    0.19%  block in grouped_records@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/branch.rb:83
+    0.19%  each@<internal:array>:219
+    0.09%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.09%  cast_value@rails-50c54eed065b/activemodel/lib/active_model/type/string.rb:38
+    0.09%  block in each@sqlite3-2.10.1-x86_64-linux-gnu/lib/sqlite3/statement.rb:142
+    0.09%  zone@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/zones.rb:15
+    0.09%  key_at?@rails-50c54eed065b/activemodel/lib/active_model/indexed_row.rb:23
+    0.09%  call_direct@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:737
+    0.09%  translate@rails-50c54eed065b/actionview/lib/action_view/helpers/tags/translator.rb:14
+    0.09%  block in info?@rails-50c54eed065b/activesupport/lib/active_support/broadcast_logger.rb:190
+
+dynamic_send: 2.55% of Puma samples
+  entry points: rb_vm_opt_send_without_block 0.76%, rb_vm_invokesuper 0.66%, rb_vm_send 0.38%, rb_vm_sendforward 0.38%, rb_vm_invokeblock 0.38%
+    0.57%  html_escape@rails-50c54eed065b/activesupport/lib/active_support/core_ext/erb/util.rb:11
+    0.19%  protect_against_forgery?@rails-50c54eed065b/actionpack/lib/action_controller/metal/request_forgery_protection.rb:117
+    0.09%  type_cast@rails-50c54eed065b/activemodel/lib/active_model/attribute.rb:199
+    0.09%  response_body=@rails-50c54eed065b/actionpack/lib/action_controller/metal.rb:304
+    0.09%  block in transform_attributes!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:473
+    0.09%  block in _app_views_customers_edit_html_erb___1061090484918943186_14808@censusce2-blog/app/views/customers/edit.html.erb:18
+    0.09%  block in extend@useragent-0.16.11/lib/user_agent/browsers.rb:47
+    0.09%  where@rails-50c54eed065b/activemodel/lib/active_model/errors.rb:207
+    0.09%  value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:527
+    0.09%  mark_transaction_dirty@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/query_intent.rb:386
+    0.09%  each@<internal:array>:219
+    0.09%  block in index_with@rails-50c54eed065b/activesupport/lib/active_support/core_ext/enumerable.rb:331
+    0.09%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.09%  add_bind@rails-50c54eed065b/activerecord/lib/arel/collectors/sql_string.rb:15
+    0.09%  _app_views_articles__article_json_jbuilder___1451309708024482361_137336@censusce2-blog/app/views/articles/_article.json.jbuilder:0
+
+interpreter: 0.95% of Puma samples
+  entry points: rb_vm_exec 0.57%, rb_f_catch 0.28%, rb_vm_sendforward 0.09%
+    0.28%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.19%  translate_key@i18n-1.15.2/lib/i18n.rb:422
+    0.09%  fast_string_to_time@rails-50c54eed065b/activemodel/lib/active_model/type/helpers/time_value.rb:64
+    0.09%  block in translate@i18n-1.15.2/lib/i18n/backend/fallbacks.rb:55
+    0.09%  with_renderer@rails-50c54eed065b/actiontext/lib/action_text/rendering.rb:19
+    0.09%  forget_attribute_assignments@rails-50c54eed065b/activemodel/lib/active_model/dirty.rb:452
+    0.09%  flash@rails-50c54eed065b/actionpack/lib/action_controller/metal/flash.rb:10
+
+## ce2-fizzy
+Puma samples 3921: JIT 12.1%, VM 17.3%, allocation 5.6%, GC 7.2%, core C 39.5%, other 18.3%
+
+gc: 7.19% of Puma samples
+  entry points: rb_str_scan 0.97%, rb_ec_ary_new_from_values 0.89%, [unknown] 0.64%, rb_obj_alloc 0.38%, rb_vm_exec 0.31%, rb_vm_opt_send_without_block 0.28%, rb_marshal_load_with_proc 0.20%, rb_hash_new_with_size 0.20%
+    0.89%  serialize@censusce2-fizzy/lib/rails_ext/active_record_uuid_type.rb:23
+    0.61%  block in each@sqlite3-2.9.6-x86_64-linux-gnu/lib/sqlite3/statement.rb:124
+    0.26%  hex_to_base36@censusce2-fizzy/lib/rails_ext/active_record_uuid_type.rb:14
+    0.23%  block in owners_by_key@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/association.rb:176
+    0.20%  load@<internal:marshal>:33
+    0.18%  map@<internal:array>:237
+    0.18%  render_bind@rails-50c54eed065b/activerecord/lib/active_record/structured_event_subscriber.rb:56
+    0.15%  (no JIT frame)
+    0.13%  initialize@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:299
+    0.10%  pack@<internal:pack>:7
+    0.10%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.10%  build_where_clause@rails-50c54eed065b/activerecord/lib/active_record/relation/query_methods.rb:1996
+    0.10%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.10%  send_preload_links_header@rails-50c54eed065b/actionview/lib/action_view/helpers/asset_tag_helper.rb:717
+    0.10%  visit_Arel_Nodes_BoundSqlLiteral@rails-50c54eed065b/activerecord/lib/arel/visitors/to_sql.rb:795
+
+dynamic_send: 5.99% of Puma samples
+  entry points: rb_vm_opt_send_without_block 3.32%, rb_vm_invokeblock 0.99%, rb_vm_send 0.66%, rb_vm_sendforward 0.46%, rb_vm_invokesuper 0.38%, rb_vm_exec 0.13%, rb_vm_invokesuperforward 0.05%
+    0.82%  map@<internal:array>:237
+    0.54%  _reflections@rails-50c54eed065b/activerecord/lib/active_record/reflection.rb:13
+    0.15%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+    0.13%  default_connection_handler@rails-50c54eed065b/activerecord/lib/active_record/core.rb:106
+    0.10%  enable_lazy_transactions!@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:552
+    0.10%  mark_transaction_dirty@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/query_intent.rb:386
+    0.10%  initialize@rails-50c54eed065b/activesupport/lib/active_support/cache/coder.rb:109
+    0.10%  attribute_aliases@rails-50c54eed065b/activemodel/lib/active_model/attribute_methods.rb:64
+    0.10%  attribute_types@rails-50c54eed065b/activerecord/lib/active_record/attributes.rb:282
+    0.10%  with_connection@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:470
+    0.10%  block in select_all@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb:270
+    0.08%  default_shard@rails-50c54eed065b/activerecord/lib/active_record/core.rb:110
+    0.08%  _reflect_on_association@rails-50c54eed065b/activerecord/lib/active_record/reflection.rb:153
+    0.08%  current_shard@rails-50c54eed065b/activerecord/lib/active_record/core.rb:199
+    0.08%  each@<internal:array>:219
+
+c_calls_ruby: 5.87% of Puma samples
+  entry points: rb_vm_yield_with_cfunc 0.66%, rb_vm_send 0.51%, rb_hash_aref 0.36%, rb_obj_not_equal 0.33%, send_internal 0.31%, monitor_synchronize 0.28%, rb_obj_dup 0.26%, rb_ary_any_p 0.23%
+    0.66%  each@<internal:array>:219
+    0.28%  mon_synchronize@/home/user/.rubies/ruby-409-fp/lib/ruby/4.0.0/monitor.rb:200
+    0.23%  block in []@nokogiri-1.19.7-x86_64-linux-gnu/lib/nokogiri/css/selector_cache.rb:12
+    0.23%  _run@rails-50c54eed065b/actionview/lib/action_view/base.rb:351
+    0.20%  compute_if_absent@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb:85
+    0.18%  initialize@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/association.rb:107
+    0.15%  preloaders_for_reflection@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/branch.rb:91
+    0.15%  key_hash_for@solid_cache-1.0.10/app/models/solid_cache/entry.rb:123
+    0.13%  css@nokogiri-1.19.7-x86_64-linux-gnu/lib/nokogiri/xml/document_fragment.rb:173
+    0.13%  load@<internal:marshal>:33
+    0.13%  hash@rails-50c54eed065b/activemodel/lib/active_model/attribute.rb:148
+    0.13%  block in tag_options@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1547
+    0.13%  block in cast_values@rails-50c54eed065b/activerecord/lib/active_record/result.rb:168
+    0.10%  css@nokogiri-1.19.7-x86_64-linux-gnu/lib/nokogiri/xml/node_set.rb:85
+    0.10%  perform_query@rails-50c54eed065b/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:112
+
+alloc: 5.64% of Puma samples
+  entry points: rb_ec_ary_new_from_values 0.74%, rb_obj_alloc 0.59%, rb_str_scan 0.43%, rb_marshal_load_with_proc 0.26%, [unknown] 0.20%, rb_wb_protected_newobj_of 0.20%, rb_hash_new_with_size 0.18%, rb_vm_exec 0.18%
+    0.43%  serialize@censusce2-fizzy/lib/rails_ext/active_record_uuid_type.rb:23
+    0.26%  load@<internal:marshal>:33
+    0.20%  map@<internal:array>:237
+    0.13%  block in each@sqlite3-2.9.6-x86_64-linux-gnu/lib/sqlite3/statement.rb:124
+    0.13%  raw_timestamp_to_cache_version@rails-50c54eed065b/activerecord/lib/active_record/integration.rb:226
+    0.13%  block in owners_by_key@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/association.rb:176
+    0.10%  (no JIT frame)
+    0.10%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+    0.10%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.10%  reset@rails-50c54eed065b/activerecord/lib/active_record/associations/collection_association.rb:83
+    0.10%  new@nokogiri-1.19.7-x86_64-linux-gnu/lib/nokogiri/xml/document_fragment.rb:42
+    0.10%  pack@<internal:pack>:7
+    0.10%  build_default_scope@rails-50c54eed065b/activerecord/lib/active_record/scoping/default.rb:167
+    0.08%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.08%  key_hash_for@solid_cache-1.0.10/app/models/solid_cache/entry.rb:123
+
+helper: 4.46% of Puma samples
+  entry points: vm_call_iseq_setup_normal_0start_0params_0locals 0.89%, rb_vm_exec 0.82%, vm_call_iseq_setup_normal_0start_1params_1locals 0.23%, ary_hash_values 0.18%, rb_hash_aref 0.15%, rb_vm_yield_with_cfunc 0.13%, vm_throw_start 0.13%, wkmap_aref 0.10%
+    0.18%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+    0.18%  association_instance_get@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:97
+    0.18%  each@<internal:array>:219
+    0.18%  current_role@rails-50c54eed065b/activerecord/lib/active_record/core.rb:179
+    0.15%  _reflect_on_association@rails-50c54eed065b/activerecord/lib/active_record/reflection.rb:153
+    0.15%  hash@rails-50c54eed065b/activemodel/lib/active_model/attribute.rb:148
+    0.10%  clone@<internal:kernel>:47
+    0.10%  connection_pool@rails-50c54eed065b/activerecord/lib/active_record/connection_handling.rb:395
+    0.10%  fetch_or_store@rails-50c54eed065b/activesupport/lib/active_support/weak_key_map.rb:38
+    0.08%  connection_handler@rails-50c54eed065b/activerecord/lib/active_record/core.rb:145
+    0.08%  value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:527
+    0.05%  current_shard@rails-50c54eed065b/activerecord/lib/active_record/core.rb:199
+    0.05%  block (3 levels) in read_multi@solid_cache-1.0.10/app/models/solid_cache/entry.rb:41
+    0.05%  instantiate_instance_of@rails-50c54eed065b/activerecord/lib/active_record/persistence.rb:297
+    0.05%  value@rails-50c54eed065b/activesupport/lib/active_support/cache/coder.rb:116
+
+interpreter: 0.97% of Puma samples
+  entry points: rb_vm_exec 0.92%, rb_vm_sendforward 0.03%, rb_vm_invokesuper 0.03%
+    0.15%  block in index_by@rails-50c54eed065b/activesupport/lib/active_support/core_ext/enumerable.rb:61
+    0.15%  can_use_fast_cache_version?@rails-50c54eed065b/activerecord/lib/active_record/integration.rb:202
+    0.13%  _app_views_cards_display__previews_html_erb__4329072877118948792_62976@censusce2-fizzy/app/views/cards/display/_previews.html.erb:0
+    0.10%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.08%  block in instrument_multi@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:1113
+    0.05%  block in make_lambda@rails-50c54eed065b/activesupport/lib/active_support/callbacks.rb:398
+    0.03%  make_response!@rails-50c54eed065b/actionpack/lib/action_controller/metal/default_headers.rb:12
+    0.03%  present?@rails-50c54eed065b/activesupport/lib/active_support/core_ext/object/blank.rb:31
+    0.03%  _fragment_name_with_digest@jbuilder-2.15.1/lib/jbuilder/jbuilder_template.rb:215
+    0.03%  block (2 levels) in render_collection@rails-50c54eed065b/actionview/lib/action_view/renderer/collection_renderer.rb:179
+    0.03%  find_target@rails-50c54eed065b/activerecord/lib/active_record/associations/singular_association.rb:44
+    0.03%  block in instrument@rails-50c54eed065b/activesupport/lib/active_support/cache.rb:1094
+    0.03%  identity=@censusce2-fizzy/app/models/current.rb:13
+    0.03%  load@rails-50c54eed065b/activerecord/lib/active_record/relation.rb:1241
+    0.03%  with_renderer@rails-50c54eed065b/actiontext/lib/action_text/rendering.rb:19
+
+## ce2-lobsters
+Puma samples 3578: JIT 16.2%, VM 20.8%, allocation 6.5%, GC 5.2%, core C 37.8%, other 13.4%
+
+c_calls_ruby: 11.71% of Puma samples
+  entry points: rb_vm_send 2.38%, rb_obj_not_equal 0.87%, rb_vm_invokeblock 0.61%, rb_class_new_instance_pass_kw 0.61%, rb_ary_bsearch_index 0.61%, send_internal 0.48%, rb_hash_aref 0.42%, rb_hash_each_pair 0.39%
+    2.35%  _run@rails-50c54eed065b/actionview/lib/action_view/base.rb:351
+    0.61%  find_minimum_transition@tzinfo-2.0.6/lib/tzinfo/data_sources/transitions_data_timezone_info.rb:159
+    0.61%  each@<internal:array>:219
+    0.59%  block in tag_options@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1547
+    0.48%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.42%  change@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:150
+    0.31%  (no JIT frame)
+    0.28%  extract_parameterized_parts@rails-50c54eed065b/actionpack/lib/action_dispatch/journey/formatter.rb:124
+    0.25%  is_new?@censusce2-lobsters/app/models/user.rb:505
+    0.25%  tag_options@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1543
+    0.22%  send_referrer?@censusce2-lobsters/app/models/story.rb:1179
+    0.20%  []@rails-50c54eed065b/activesupport/lib/active_support/ordered_options.rb:48
+    0.20%  handle_positional_args@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:360
+    0.20%  block in initialize@rails-50c54eed065b/activesupport/lib/active_support/ordered_options.rb:108
+    0.17%  query_attribute@rails-50c54eed065b/activerecord/lib/active_record/attribute_methods/query.rb:54
+
+alloc: 6.46% of Puma samples
+  entry points: rb_obj_alloc 0.70%, rb_hash_new 0.36%, rb_str_concat_literals 0.34%, rb_hash_merge 0.28%, rb_class_new_instance_pass_kw 0.25%, rb_hash_new_with_size 0.17%, time_subsec 0.17%, step 0.17%
+    0.50%  (no JIT frame)
+    0.28%  title_as_slug@censusce2-lobsters/app/models/story.rb:1098
+    0.28%  change@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:150
+    0.17%  for_time@tzinfo-2.0.6/lib/tzinfo/timestamp.rb:206
+    0.17%  new!@tzinfo-2.0.6/lib/tzinfo/timestamp.rb:192
+    0.14%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+    0.14%  dasherize@rails-50c54eed065b/activesupport/lib/active_support/inflector/methods.rb:257
+    0.14%  call@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:227
+    0.14%  content_tag_string@rails-50c54eed065b/actionview/lib/action_view/helpers/tag_helper.rb:1532
+    0.14%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.14%  _run@rails-50c54eed065b/actionview/lib/action_view/base.rb:351
+    0.11%  plus_with_duration@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:313
+    0.11%  avatar_path@censusce2-lobsters/app/models/user.rb:250
+    0.11%  advance@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:216
+    0.11%  wrap_with_time_zone@rails-50c54eed065b/activesupport/lib/active_support/time_with_zone.rb:661
+
+gc: 5.20% of Puma samples
+  entry points: rb_ec_ary_new_from_values 0.48%, rb_obj_alloc 0.31%, step 0.22%, rb_class_new_instance_pass_kw 0.22%, str_gsub 0.20%, rb_str_concat_literals 0.20%, rb_hash_merge 0.20%, rb_vm_send 0.17%
+    0.39%  title_as_slug@censusce2-lobsters/app/models/story.rb:1098
+    0.31%  (no JIT frame)
+    0.20%  change@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:150
+    0.17%  handle_positional_args@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:360
+    0.17%  block (2 levels) in load_records@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/association.rb:219
+    0.11%  extract_parameterized_parts@rails-50c54eed065b/actionpack/lib/action_dispatch/journey/formatter.rb:124
+    0.11%  block in periods_for_local@tzinfo-2.0.6/lib/tzinfo/data_sources/transitions_data_timezone_info.rb:90
+    0.11%  for_time@tzinfo-2.0.6/lib/tzinfo/timestamp.rb:206
+    0.11%  html_safe@rails-50c54eed065b/activesupport/lib/active_support/core_ext/string/output_safety.rb:244
+    0.08%  block in as_json@censusce2-lobsters/app/models/story.rb:557
+    0.08%  call@rails-50c54eed065b/actionpack/lib/action_dispatch/routing/route_set.rb:227
+    0.08%  block in apply_inflections@rails-50c54eed065b/activesupport/lib/active_support/inflector/methods.rb:421
+    0.08%  tag_link@censusce2-lobsters/app/helpers/application_helper.rb:192
+    0.08%  mask_token@rails-50c54eed065b/actionpack/lib/action_controller/metal/request_forgery_protection.rb:775
+    0.08%  association@rails-50c54eed065b/activerecord/lib/active_record/associations.rb:55
+
+dynamic_send: 4.78% of Puma samples
+  entry points: rb_vm_opt_send_without_block 2.24%, rb_vm_invokesuper 1.06%, rb_vm_sendforward 0.70%, rb_vm_send 0.48%, rb_vm_invokeblock 0.28%, rb_vm_invokesuperforward 0.03%
+    0.50%  html_escape@rails-50c54eed065b/activesupport/lib/active_support/core_ext/erb/util.rb:11
+    0.31%  default_url_options@censusce2-lobsters/extras/routes.rb:9
+    0.22%  respond_to?@rails-50c54eed065b/actionview/lib/action_view/helpers/controller_helper.rb:39
+    0.17%  _reflections@rails-50c54eed065b/activerecord/lib/active_record/reflection.rb:13
+    0.17%  attribute?@activerecord-typedstore-1.6.0/lib/active_record/typed_store/behavior.rb:56
+    0.11%  avatar_path@censusce2-lobsters/app/models/user.rb:250
+    0.11%  select@<internal:array>:262
+    0.11%  ===@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:22
+    0.11%  form_authenticity_token@rails-50c54eed065b/actionpack/lib/action_controller/metal/request_forgery_protection.rb:116
+    0.08%  method_missing@rails-50c54eed065b/activesupport/lib/active_support/time_with_zone.rb:619
+    0.08%  extract_parameterized_parts@rails-50c54eed065b/actionpack/lib/action_dispatch/journey/formatter.rb:124
+    0.08%  each@<internal:array>:219
+    0.08%  compute_asset_host@rails-50c54eed065b/actionview/lib/action_view/helpers/asset_url_helper.rb:281
+    0.08%  resolve_asset_source@rails-50c54eed065b/actionview/lib/action_view/helpers/asset_tag_helper.rb:669
+    0.08%  asset_path@rails-50c54eed065b/actionview/lib/action_view/helpers/asset_url_helper.rb:189
+
+helper: 3.30% of Puma samples
+  entry points: rb_vm_exec 0.73%, rb_hash_aref 0.36%, rb_vm_ic_hit_p 0.28%, vm_call_iseq_setup_normal_0start_0params_0locals 0.22%, vm_call_iseq_setup_normal_0start_2params_2locals 0.17%, vm_defined 0.14%, rb_vm_opt_getconstant_path 0.14%, rb_ec_stack_check 0.11%
+    0.42%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.20%  []@rails-50c54eed065b/activesupport/lib/active_support/ordered_options.rb:48
+    0.11%  title_path@censusce2-lobsters/extras/routes.rb:28
+    0.08%  for@tzinfo-2.0.6/lib/tzinfo/timestamp.rb:112
+    0.08%  accessor@rails-50c54eed065b/activerecord/lib/active_record/type/serialized.rb:55
+    0.08%  relation_delegate_class@rails-50c54eed065b/activerecord/lib/active_record/relation/delegation.rb:27
+    0.06%  where_clause=@rails-50c54eed065b/activerecord/lib/active_record/relation/query_methods.rb:196
+    0.06%  asset_path@rails-50c54eed065b/actionview/lib/action_view/helpers/asset_url_helper.rb:189
+    0.06%  title_url@censusce2-lobsters/extras/routes.rb:32
+    0.06%  fetch_or_store@rails-50c54eed065b/activesupport/lib/active_support/weak_key_map.rb:38
+    0.06%  block in grouped_records@rails-50c54eed065b/activerecord/lib/active_record/associations/preloader/branch.rb:83
+    0.06%  for_timestamp@tzinfo-2.0.6/lib/tzinfo/timestamp.rb:256
+    0.06%  block in _app_views_home_index_html_erb___1192086559791290728_35528@censusce2-lobsters/app/views/home/index.html.erb:6
+    0.06%  current@rails-50c54eed065b/activesupport/lib/active_support/core_ext/time/calculations.rb:44
+    0.06%  token_tag@rails-50c54eed065b/actionview/lib/action_view/helpers/form_tag_helper.rb:1155
+
+interpreter: 1.06% of Puma samples
+  entry points: rb_vm_exec 1.03%, rb_vm_invokesuper 0.03%
+    0.36%  fetch_value_at!@rails-50c54eed065b/activemodel/lib/active_model/attribute_set.rb:405
+    0.22%  title_path@censusce2-lobsters/extras/routes.rb:28
+    0.20%  block (2 levels) in _app_views_home_index_html_erb___1192086559791290728_35528@censusce2-lobsters/app/views/home/index.html.erb:125
+    0.08%  block (2 levels) in _app_views_home_index_html_erb___1192086559791290728_35528@censusce2-lobsters/app/views/home/index.html.erb:129
+    0.08%  title_url@censusce2-lobsters/extras/routes.rb:32
+    0.06%  block in handle_request@puma-8.0.2/lib/puma/response.rb:78
+    0.03%  find_target@rails-50c54eed065b/activerecord/lib/active_record/associations/has_many_through_association.rb:241
+    0.03%  block in capture@rails-50c54eed065b/actionview/lib/action_view/helpers/capture_helper.rb:59
+

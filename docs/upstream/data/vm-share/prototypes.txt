@@ -1,0 +1,38 @@
+# label|app|workload|mode|Ir per request|objects per request|YJIT blocks compiled in window (0 = JIT-flat); base = rails 50c54eed06, TE1 = 794137646531, TE2 = 21540e738f (code identical to d018a5b457)
+base2|blog|GET article|interp|8895869|2013|0
+TE1|blog|GET article|interp|8847757|2016|0
+base|blog|GET article|interp|8901438|2014|0
+TE2|blog|GET article|interp|8899060|2010|0
+TE1|blog|GET article|yjit|5130771|2026|0
+base|blog|GET article|yjit|5160763|2025|0
+base2|blog|GET article|yjit|5153083|2024|0
+TE2|blog|GET article|yjit|5080798|2025|0
+base|fizzy|GET card|yjit|47626652|13198|0
+TE1|fizzy|GET card|yjit|46961512|13202|27
+TE2|fizzy|GET card|yjit|46544311|13198|0
+base2|fizzy|GET card|interp|78468297|13102|0
+base|fizzy|GET card|interp|78517395|13102|0
+TE1|fizzy|GET card|interp|77646393|13102|0
+TE2|fizzy|GET card|interp|78016412|13102|0
+base2|lobsters|GET settings (form)|yjit|14922047|5596|2
+base|lobsters|GET settings (form)|yjit|14863431|5590|0
+TE1|lobsters|GET settings (form)|yjit|14781756|5598|0
+TE2|lobsters|GET settings (form)|yjit|14605828|5590|0
+base2|lobsters|GET settings (form)|interp|25641039|5537|0
+TE1|lobsters|GET settings (form)|interp|25445636|5539|0
+base|lobsters|GET settings (form)|interp|25651701|5543|0
+TE2|lobsters|GET settings (form)|interp|25602169|5540|0
+
+# Callgrind micro tag/ir_micro.rb, label|mode|Ir per iteration (N=2000)
+base|interp|67565
+base2|interp|67556
+TE1|interp|64691
+TE2|interp|66405
+base|yjit|37316
+base2|yjit|37390
+TE1|yjit|35342
+TE2|yjit|34622
+base|zjit|38907
+base2|zjit|38815
+TE1|zjit|38950
+TE2|zjit|32338
