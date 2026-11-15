@@ -1,4 +1,4 @@
-# benchmark-ips cohorts for bench/upstream/vm1/tag/ips.rb, core 3, interleaved rounds, best of N per tree (ips_best.rb). TE2's body uses te2-ips-idle2 (A/A +0.1% and +2.7%); all earlier cohorts are rejected for a body: A/A outside the effect, run errors above 13%, or both.
+# benchmark-ips cohorts for bench/upstream/vm1/tag/ips.rb, core 3, interleaved rounds, best of N per tree (ips_best.rb). TE2's body uses te2-ips-idle2 (A/A +0.1% and +2.7%); all earlier cohorts are rejected for a body: A/A outside the effect, run errors above 13%, or both. Raw output of te2-ips-idle2: te2-ips-idle2-raw.txt.
 ## te1/ips-yjit.txt
 tag.a: base 420.1k (2.381 µs, n=5), base2 416.3k (2.402 µs, n=5), branch 453.7k (2.204 µs, n=5); base2/base -0.9%, branch/base +8.0%
 content_tag: base 654.0k (1.529 µs, n=5), base2 669.7k (1.493 µs, n=5), branch 682.8k (1.465 µs, n=5); base2/base +2.4%, branch/base +4.4%

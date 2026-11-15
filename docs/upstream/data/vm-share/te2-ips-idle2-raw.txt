@@ -1,0 +1,241 @@
+== base round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.339k i/100ms
+         content_tag    32.948k i/100ms
+Calculating -------------------------------------
+               tag.a    190.926k (± 6.1%) i/s    (5.24 μs/i) -    971.967k in   5.090806s
+         content_tag    308.955k (± 5.0%) i/s    (3.24 μs/i) -      1.549M in   5.012240s
+== base2 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.900k i/100ms
+         content_tag    33.474k i/100ms
+Calculating -------------------------------------
+               tag.a    196.697k (±12.3%) i/s    (5.08 μs/i) -      1.003M in   5.100228s
+         content_tag    327.849k (±17.3%) i/s    (3.05 μs/i) -      1.674M in   5.105087s
+== TE2 round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.146k i/100ms
+         content_tag    33.904k i/100ms
+Calculating -------------------------------------
+               tag.a    210.020k (±11.1%) i/s    (4.76 μs/i) -      1.068M in   5.083971s
+         content_tag    345.707k (±10.1%) i/s    (2.89 μs/i) -      1.763M in   5.099723s
+== base round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    17.982k i/100ms
+         content_tag    27.311k i/100ms
+Calculating -------------------------------------
+               tag.a    196.472k (±19.3%) i/s    (5.09 μs/i) -    989.010k in   5.033855s
+         content_tag    318.200k (±12.8%) i/s    (3.14 μs/i) -      1.611M in   5.063954s
+== base2 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.794k i/100ms
+         content_tag    31.119k i/100ms
+Calculating -------------------------------------
+               tag.a    184.164k (± 8.9%) i/s    (5.43 μs/i) -    930.318k in   5.051568s
+         content_tag    298.293k (± 8.4%) i/s    (3.35 μs/i) -      1.494M in   5.007532s
+== TE2 round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    21.219k i/100ms
+         content_tag    31.890k i/100ms
+Calculating -------------------------------------
+               tag.a    214.006k (± 6.4%) i/s    (4.67 μs/i) -      1.082M in   5.056731s
+         content_tag    312.849k (±13.8%) i/s    (3.20 μs/i) -      1.594M in   5.096710s
+== base round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.412k i/100ms
+         content_tag    31.508k i/100ms
+Calculating -------------------------------------
+               tag.a    181.437k (± 9.1%) i/s    (5.51 μs/i) -    920.600k in   5.073943s
+         content_tag    319.109k (± 6.9%) i/s    (3.13 μs/i) -      1.607M in   5.035614s
+== base2 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.688k i/100ms
+         content_tag    31.075k i/100ms
+Calculating -------------------------------------
+               tag.a    191.559k (± 7.3%) i/s    (5.22 μs/i) -    964.712k in   5.036101s
+         content_tag    308.988k (±10.7%) i/s    (3.24 μs/i) -      1.554M in   5.028508s
+== TE2 round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    23.614k i/100ms
+         content_tag    35.317k i/100ms
+Calculating -------------------------------------
+               tag.a    206.749k (± 4.8%) i/s    (4.84 μs/i) -      1.039M in   5.025506s
+         content_tag    323.977k (± 5.2%) i/s    (3.09 μs/i) -      1.625M in   5.014506s
+== base round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.618k i/100ms
+         content_tag    30.878k i/100ms
+Calculating -------------------------------------
+               tag.a    193.421k (± 5.3%) i/s    (5.17 μs/i) -    968.136k in   5.005332s
+         content_tag    315.560k (± 2.1%) i/s    (3.17 μs/i) -      1.606M in   5.088278s
+== base2 round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.356k i/100ms
+         content_tag    31.145k i/100ms
+Calculating -------------------------------------
+               tag.a    186.110k (± 9.5%) i/s    (5.37 μs/i) -    936.156k in   5.030121s
+         content_tag    304.673k (± 9.0%) i/s    (3.28 μs/i) -      1.526M in   5.008989s
+== TE2 round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.966k i/100ms
+         content_tag    32.309k i/100ms
+Calculating -------------------------------------
+               tag.a    203.650k (± 3.9%) i/s    (4.91 μs/i) -      1.027M in   5.044606s
+         content_tag    318.245k (± 8.6%) i/s    (3.14 μs/i) -      1.615M in   5.076119s
+== base round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.371k i/100ms
+         content_tag    32.013k i/100ms
+Calculating -------------------------------------
+               tag.a    186.560k (±10.2%) i/s    (5.36 μs/i) -    949.179k in   5.087799s
+         content_tag    309.004k (± 6.2%) i/s    (3.24 μs/i) -      1.569M in   5.076429s
+== base2 round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    17.365k i/100ms
+         content_tag    31.570k i/100ms
+Calculating -------------------------------------
+               tag.a    195.117k (± 9.0%) i/s    (5.13 μs/i) -    989.805k in   5.072884s
+         content_tag    270.112k (±17.9%) i/s    (3.70 μs/i) -      1.358M in   5.025739s
+== TE2 round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.346k i/100ms
+         content_tag    32.415k i/100ms
+Calculating -------------------------------------
+               tag.a    205.096k (± 5.3%) i/s    (4.88 μs/i) -      1.038M in   5.059327s
+         content_tag    322.544k (±12.7%) i/s    (3.10 μs/i) -      1.621M in   5.024899s
+== base round 6
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.776k i/100ms
+         content_tag    31.572k i/100ms
+Calculating -------------------------------------
+               tag.a    188.378k (± 7.2%) i/s    (5.31 μs/i) -    957.576k in   5.083278s
+         content_tag    303.002k (± 4.6%) i/s    (3.30 μs/i) -      1.515M in   5.001469s
+== base2 round 6
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.145k i/100ms
+         content_tag    31.101k i/100ms
+Calculating -------------------------------------
+               tag.a    187.635k (± 5.2%) i/s    (5.33 μs/i) -    957.250k in   5.101661s
+         content_tag    301.916k (±14.2%) i/s    (3.31 μs/i) -      1.524M in   5.047594s
+== TE2 round 6
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.783k i/100ms
+         content_tag    30.884k i/100ms
+Calculating -------------------------------------
+               tag.a    203.637k (±19.6%) i/s    (4.91 μs/i) -      1.018M in   5.000899s
+         content_tag    313.775k (± 7.0%) i/s    (3.19 μs/i) -      1.606M in   5.118223s
+== base round 7
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.607k i/100ms
+         content_tag    25.474k i/100ms
+Calculating -------------------------------------
+               tag.a    185.224k (±17.2%) i/s    (5.40 μs/i) -    930.350k in   5.022833s
+         content_tag    306.600k (± 5.5%) i/s    (3.26 μs/i) -      1.554M in   5.068220s
+== base2 round 7
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.706k i/100ms
+         content_tag    30.822k i/100ms
+Calculating -------------------------------------
+               tag.a    191.360k (± 4.6%) i/s    (5.23 μs/i) -    972.712k in   5.083161s
+         content_tag    305.681k (± 4.7%) i/s    (3.27 μs/i) -      1.541M in   5.041529s
+== TE2 round 7
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    14.999k i/100ms
+         content_tag    26.054k i/100ms
+Calculating -------------------------------------
+               tag.a    198.680k (±12.5%) i/s    (5.03 μs/i) -      1.005M in   5.058038s
+         content_tag    338.754k (±17.6%) i/s    (2.95 μs/i) -      1.720M in   5.076149s
+== base round 8
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.270k i/100ms
+         content_tag    30.223k i/100ms
+Calculating -------------------------------------
+               tag.a    188.260k (± 4.7%) i/s    (5.31 μs/i) -    944.230k in   5.015555s
+         content_tag    315.985k (± 6.9%) i/s    (3.16 μs/i) -      1.602M in   5.069292s
+== base2 round 8
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.003k i/100ms
+         content_tag    30.987k i/100ms
+Calculating -------------------------------------
+               tag.a    192.422k (± 3.1%) i/s    (5.20 μs/i) -    969.153k in   5.036595s
+         content_tag    310.970k (± 3.1%) i/s    (3.22 μs/i) -      1.580M in   5.081953s
+== TE2 round 8
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.863k i/100ms
+         content_tag    33.026k i/100ms
+Calculating -------------------------------------
+               tag.a    213.703k (± 7.5%) i/s    (4.68 μs/i) -      1.085M in   5.076548s
+         content_tag    321.085k (± 9.0%) i/s    (3.11 μs/i) -      1.618M in   5.040020s
+== base round 9
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    17.630k i/100ms
+         content_tag    31.031k i/100ms
+Calculating -------------------------------------
+               tag.a    185.060k (± 8.1%) i/s    (5.40 μs/i) -    934.390k in   5.049122s
+         content_tag    312.023k (± 5.1%) i/s    (3.20 μs/i) -      1.583M in   5.072002s
+== base2 round 9
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    19.280k i/100ms
+         content_tag    29.844k i/100ms
+Calculating -------------------------------------
+               tag.a    190.901k (±14.3%) i/s    (5.24 μs/i) -    964.000k in   5.049746s
+         content_tag    305.132k (± 4.9%) i/s    (3.28 μs/i) -      1.552M in   5.085954s
+== TE2 round 9
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    20.046k i/100ms
+         content_tag    24.428k i/100ms
+Calculating -------------------------------------
+               tag.a    196.052k (±20.9%) i/s    (5.10 μs/i) -    982.254k in   5.010161s
+         content_tag    295.871k (±15.1%) i/s    (3.38 μs/i) -      1.490M in   5.036341s
+== base round 10
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.612k i/100ms
+         content_tag    31.518k i/100ms
+Calculating -------------------------------------
+               tag.a    191.494k (± 2.6%) i/s    (5.22 μs/i) -    967.824k in   5.054065s
+         content_tag    302.036k (± 7.6%) i/s    (3.31 μs/i) -      1.513M in   5.008883s
+== base2 round 10
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    18.019k i/100ms
+         content_tag    29.553k i/100ms
+Calculating -------------------------------------
+               tag.a    183.959k (± 6.7%) i/s    (5.44 μs/i) -    936.988k in   5.093459s
+         content_tag    310.011k (± 2.4%) i/s    (3.23 μs/i) -      1.566M in   5.052437s
+== TE2 round 10
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               tag.a    21.417k i/100ms
+         content_tag    34.105k i/100ms
+Calculating -------------------------------------
+               tag.a    207.760k (± 9.1%) i/s    (4.81 μs/i) -      1.049M in   5.051179s
+         content_tag    318.365k (± 9.4%) i/s    (3.14 μs/i) -      1.603M in   5.034894s
+DONE
