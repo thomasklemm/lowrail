@@ -6,8 +6,13 @@ while read -r _ local_sha _ remote_sha; do
   exclude=(--not --remotes)
   git cat-file -e "$remote_sha^{commit}" 2>/dev/null && exclude+=("$remote_sha")
   for commit in $(git rev-list "$local_sha" "${exclude[@]}"); do
-    if git log -1 --format=%B "$commit" | grep -qiE '^(Amp-Thread-ID|Co-authored-by):'; then
+    message=$(git log -1 --format=%B "$commit")
+    if grep -qiE '^(Amp-Thread-ID|Co-authored-by):' <<<"$message"; then
       echo "pre-push: $(git log -1 --format='%h %s' "$commit") has a trailer; rebuild it without one (git commit-tree)" >&2
+      refused=1
+    fi
+    if grep -qE '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9]+|github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussions)/[0-9]+' <<<"$message"; then
+      echo "pre-push: $(git log -1 --format='%h %s' "$commit") references an upstream issue or PR, which shows on that thread; name it by item ID instead (git commit --amend)" >&2
       refused=1
     fi
   done

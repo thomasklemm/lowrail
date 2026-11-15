@@ -51,8 +51,10 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   runs such as Ruby builds or a census; it doesn't reduce wall-time noise, and Callgrind stays primary.
 * **No upstream references in Lowrail commit messages.** A commit message containing `owner/repo#N` or an issue or
   PR URL puts a public "added a commit that references this issue" entry on that upstream thread, and a force-push
-  does not remove it. Name upstream work in plain words in commit messages ("Ledger: the Kernel#dup reply"); links
-  belong in the docs, where they create no entry.
+  does not remove it. Name upstream work in plain words or by queue item ID in commit messages ("ZNE1: body
+  rewording", "Ledger: the Kernel#dup reply"); numbers and links belong in the docs, where they create no entry.
+  Since 2026-11-15 `script/hooks/pre-push` refuses such a commit (Thomas, after entries on four upstream threads
+  on 2026-11-15; history left as it is).
 * **Commit identity.** Commits are authored and committed by Thomas Klemm `<github@tklemm.eu>` via `/usr/bin/git`,
   with no Amp or co-author trailer (`/opt/git` adds one). Upstream: one commit per fix on a freshly fetched base.
   Before every push to a fork branch or upstream, check `git log --format='%(trailers:only)' base..HEAD` is empty
