@@ -1,0 +1,572 @@
+diff --git a/eval_intern.h b/eval_intern.h
+index ca4e4b5061..35cdb76d60 100644
+--- a/eval_intern.h
++++ b/eval_intern.h
+@@ -163,11 +163,14 @@ rb_ec_tag_state(const rb_execution_context_t *ec)
+     return state;
+ }
+ 
++extern int rb_lowrail_sb_active;
++void rb_lowrail_sb_jump(void);
+ NORETURN(static inline void rb_ec_tag_jump(const rb_execution_context_t *ec, enum ruby_tag_type st));
+ static inline void
+ rb_ec_tag_jump(const rb_execution_context_t *ec, enum ruby_tag_type st)
+ {
+     RUBY_ASSERT(st > TAG_NONE && st <= TAG_FATAL, ": Invalid tag jump: %d", (int)st);
++    if (UNLIKELY(rb_lowrail_sb_active)) rb_lowrail_sb_jump();
+ #if USE_ZJIT
+     rb_zjit_materialize_frames_for_longjmp(ec, ec->cfp);
+ #endif
+diff --git a/insns.def b/insns.def
+index 1dc0cf5262..e1831b3722 100644
+--- a/insns.def
++++ b/insns.def
+@@ -860,8 +860,10 @@ send
+ // attr rb_snum_t sp_inc = sp_inc_of_sendish(cd->ci);
+ // attr rb_snum_t comptime_sp_inc = sp_inc_of_sendish(ci);
+ {
++    int sb = LOWRAIL_SB_SEND_ENTER(GET_CFP(), cd->ci, 0);
+     VALUE bh = vm_caller_setup_arg_block(ec, GET_CFP(), cd->ci, blockiseq, false);
+     val = vm_sendish(ec, GET_CFP(), cd, bh, mexp_search_method);
++    lowrail_sb_exit(sb);
+     JIT_EXEC(ec, val);
+ 
+     if (UNDEF_P(val)) {
+@@ -1136,8 +1138,10 @@ invokesuper
+         .cc = original_cc,
+     };
+ 
++    int sb = LOWRAIL_SB_SEND_ENTER(GET_CFP(), cd->ci, 1);
+     VALUE bh = vm_caller_setup_arg_block(ec, GET_CFP(), adjusted_cd.ci, blockiseq, true);
+     val = vm_sendish(ec, GET_CFP(), &adjusted_cd, bh, mexp_search_super);
++    lowrail_sb_exit(sb);
+     JIT_EXEC(ec, val);
+ 
+     if (original_cc != adjusted_cd.cc && vm_cc_markable(adjusted_cd.cc)) {
+@@ -1189,8 +1193,10 @@ invokeblock
+ // attr rb_snum_t comptime_sp_inc = sp_inc_of_invokeblock(ci);
+ // attr bool zjit_profile = true;
+ {
++    int sb = LOWRAIL_SB_YIELD_ENTER(GET_CFP());
+     VALUE bh = VM_BLOCK_HANDLER_NONE;
+     val = vm_sendish(ec, GET_CFP(), cd, bh, mexp_search_invokeblock);
++    lowrail_sb_exit(sb);
+     JIT_EXEC(ec, val);
+ 
+     if (UNDEF_P(val)) {
+diff --git a/lowrail_sb.h b/lowrail_sb.h
+new file mode 100644
+index 0000000000..e69aa529d4
+--- /dev/null
++++ b/lowrail_sb.h
+@@ -0,0 +1,307 @@
++/* Lowrail measurement build (ZS1): Symbol block arguments and Symbol block handlers.
++ *
++ * Counting (RubyVM.lowrail_sb = true): one table row per distinct event string.
++ *   send  : a send or super whose block handler is a Symbol, at method resolution (vm_sendish)
++ *   yield : a block invocation whose handler is a Symbol (vm_invoke_symbol_block, vm_yield_with_symbol)
++ *
++ * Callgrind regions (RubyVM.lowrail_sb_cg = MASK; 0 restores whole-program collection): collection
++ * is on only inside the selected regions, and off again while the called method's body runs
++ * (vm_exec and cfunc invokers), so the Ir of a window is the dispatch overhead alone.
++ *   1  send with a Symbol block argument on the stack, ISEQ callee
++ *   2  the same, any other callee (cfunc, bmethod, super, ...)
++ *   4  invokeblock whose block handler is a Symbol (a Ruby-level yield)
++ *   8  vm_yield_with_symbol (rb_yield from C, Proc#call, instance_exec) */
++#include <valgrind/callgrind.h>
++
++int rb_lowrail_sb_count_on;
++int rb_lowrail_sb_cg_mode;
++int rb_lowrail_sb_active;
++static unsigned long lowrail_sb_enters, lowrail_sb_abnormal;
++static VALUE lowrail_sb_direct = Qundef;
++static int lowrail_sb_from, lowrail_sb_via_jit, lowrail_sb_cur_jit;
++static st_table *lowrail_sb_table;
++
++void
++rb_lowrail_sb_jump(void)
++{
++    rb_lowrail_sb_active = 0;
++    lowrail_sb_abnormal++;
++    CALLGRIND_TOGGLE_COLLECT;
++}
++
++static inline int
++lowrail_sb_enter(int mode)
++{
++    if (LIKELY(!(rb_lowrail_sb_cg_mode & mode)) || rb_lowrail_sb_active) return 0;
++    rb_lowrail_sb_active = 1;
++    lowrail_sb_enters++;
++    CALLGRIND_TOGGLE_COLLECT;
++    return 1;
++}
++
++static inline void
++lowrail_sb_exit(int token)
++{
++    if (UNLIKELY(token) && rb_lowrail_sb_active) {
++        rb_lowrail_sb_active = 0;
++        CALLGRIND_TOGGLE_COLLECT;
++    }
++}
++
++static inline int
++lowrail_sb_body_begin(void)
++{
++    if (LIKELY(!rb_lowrail_sb_active)) return 0;
++    rb_lowrail_sb_active = 0;
++    CALLGRIND_TOGGLE_COLLECT;
++    return 1;
++}
++
++static inline void
++lowrail_sb_body_end(int token)
++{
++    if (UNLIKELY(token) && !rb_lowrail_sb_active) {
++        rb_lowrail_sb_active = 1;
++        CALLGRIND_TOGGLE_COLLECT;
++    }
++}
++
++static int lowrail_sb_send_bit(const rb_control_frame_t *cfp, const struct rb_callinfo *ci, int is_super);
++#define LOWRAIL_SB_SEND_ENTER(cfp, ci, is_super) (UNLIKELY(rb_lowrail_sb_cg_mode & 3) && lowrail_sb_symbol_blockarg_p(cfp, ci) ? lowrail_sb_enter(lowrail_sb_send_bit(cfp, ci, is_super)) : 0)
++#define LOWRAIL_SB_YIELD_ENTER(cfp) (UNLIKELY(rb_lowrail_sb_cg_mode & 4) && lowrail_sb_symbol_handler_p(VM_CF_BLOCK_HANDLER(cfp)) ? lowrail_sb_enter(4) : 0)
++
++static inline int
++lowrail_sb_symbol_blockarg_p(const rb_control_frame_t *cfp, const struct rb_callinfo *ci)
++{
++    return (vm_ci_flag(ci) & VM_CALL_ARGS_BLOCKARG) && SYMBOL_P(cfp->sp[-1]);
++}
++
++static inline int
++lowrail_sb_symbol_handler_p(VALUE bh)
++{
++    if (bh == VM_BLOCK_HANDLER_NONE) return 0;
++    if (SYMBOL_P(bh)) return 1;
++    if (!SPECIAL_CONST_P(bh) && !(bh & 0x03) && rb_obj_is_proc(bh)) {
++        const struct rb_block *block = vm_proc_block(bh);
++        while (vm_block_type(block) == block_type_proc) block = vm_proc_block(block->as.proc);
++        return vm_block_type(block) == block_type_symbol;
++    }
++    return 0;
++}
++
++static const char *
++lowrail_sb_class_name(VALUE klass, char *buf, size_t n)
++{
++    VALUE path;
++    if (!klass) return "?";
++    if (RB_TYPE_P(klass, T_ICLASS)) klass = RBASIC_CLASS(klass);
++    if (RB_TYPE_P(klass, T_CLASS) && RCLASS_SINGLETON_P(klass)) {
++        VALUE attached = RCLASS_ATTACHED_OBJECT(klass);
++        if (RB_TYPE_P(attached, T_CLASS) || RB_TYPE_P(attached, T_MODULE)) {
++            path = rb_mod_name(attached);
++            snprintf(buf, n, "%s.", NIL_P(path) ? "#<anon>" : RSTRING_PTR(path));
++            return buf;
++        }
++        return "#<singleton>";
++    }
++    path = rb_mod_name(klass);
++    return NIL_P(path) ? "#<anon>" : RSTRING_PTR(path);
++}
++
++/* "TYPE\tOwner#mid\tdefinition" of a method entry, aliases and refinements resolved. */
++static void
++lowrail_sb_method(const rb_callable_method_entry_t *cme, char *buf, size_t n)
++{
++    const rb_method_entry_t *me = (const rb_method_entry_t *)cme;
++    const char *type = "OTHER", *where = "-";
++    char cls[256], loc[320];
++    if (!me || !me->def) { snprintf(buf, n, "MISSING\t-\t-"); return; }
++    for (int i = 0; i < 8; i++) {
++        if (me->def->type == VM_METHOD_TYPE_ALIAS && me->def->body.alias.original_me) me = me->def->body.alias.original_me;
++        else if (me->def->type == VM_METHOD_TYPE_REFINED && me->def->body.refined.orig_me) me = me->def->body.refined.orig_me;
++        else break;
++    }
++    switch (me->def->type) {
++      case VM_METHOD_TYPE_ISEQ: {
++        const rb_iseq_t *iseq = me->def->body.iseq.iseqptr;
++        VALUE path = rb_iseq_path(iseq);
++        const char *p = RB_TYPE_P(path, T_STRING) ? RSTRING_PTR(path) : "?";
++        type = strncmp(p, "<internal:", 10) == 0 ? "ISEQ_BUILTIN" : "ISEQ";
++        snprintf(loc, sizeof(loc), "%.280s:%d", p, (int)rb_iseq_line_no(iseq, 0));
++        where = loc;
++        break;
++      }
++      case VM_METHOD_TYPE_CFUNC: type = "CFUNC"; break;
++      case VM_METHOD_TYPE_ATTRSET: type = "ATTRSET"; break;
++      case VM_METHOD_TYPE_IVAR: type = "IVAR"; break;
++      case VM_METHOD_TYPE_BMETHOD: type = "BMETHOD"; break;
++      case VM_METHOD_TYPE_ZSUPER: type = "ZSUPER"; break;
++      case VM_METHOD_TYPE_OPTIMIZED: type = "OPTIMIZED"; break;
++      case VM_METHOD_TYPE_MISSING: type = "MISSING"; break;
++      case VM_METHOD_TYPE_REFINED: type = "REFINED"; break;
++      case VM_METHOD_TYPE_ALIAS: type = "ALIAS"; break;
++      default: break;
++    }
++    snprintf(buf, n, "%s\t%s#%s\t%s", type, lowrail_sb_class_name(me->owner, cls, sizeof(cls)),
++             rb_id2name(me->def->original_id) ? rb_id2name(me->def->original_id) : "?", where);
++}
++
++/* Looked up before the region starts, with collection off, so the lookup is not counted. */
++static int
++lowrail_sb_send_bit(const rb_control_frame_t *cfp, const struct rb_callinfo *ci, int is_super)
++{
++    if (is_super) return 2;
++    VALUE recv = cfp->sp[-(int)vm_ci_argc(ci) - 2];
++    const rb_method_entry_t *me = (const rb_method_entry_t *)rb_callable_method_entry(CLASS_OF(recv), vm_ci_mid(ci));
++    for (int i = 0; me && me->def && i < 8; i++) {
++        if (me->def->type == VM_METHOD_TYPE_ALIAS && me->def->body.alias.original_me) me = me->def->body.alias.original_me;
++        else if (me->def->type == VM_METHOD_TYPE_REFINED && me->def->body.refined.orig_me) me = me->def->body.refined.orig_me;
++        else break;
++    }
++    return me && me->def && me->def->type == VM_METHOD_TYPE_ISEQ ? 1 : 2;
++}
++
++/* "label@path:line" of the nearest Ruby frame at or below cfp. */
++static void
++lowrail_sb_site(const rb_execution_context_t *ec, const rb_control_frame_t *cfp, char *buf, size_t n)
++{
++    cfp = rb_vm_get_ruby_level_next_cfp(ec, cfp);
++    if (!cfp) { snprintf(buf, n, "?"); return; }
++    const rb_iseq_t *iseq = CFP_ISEQ(cfp);
++    VALUE label = ISEQ_BODY(iseq)->location.label, path = rb_iseq_path(iseq);
++    snprintf(buf, n, "%.120s@%.300s:%d", RB_TYPE_P(label, T_STRING) ? RSTRING_PTR(label) : "?",
++             RB_TYPE_P(path, T_STRING) ? RSTRING_PTR(path) : "?", rb_vm_get_sourceline(cfp));
++}
++
++static void
++lowrail_sb_add(const char *key)
++{
++    st_data_t v;
++    if (!lowrail_sb_table) lowrail_sb_table = st_init_strtable();
++    if (st_lookup(lowrail_sb_table, (st_data_t)key, &v)) {
++        (*(uint64_t *)v)++;
++    }
++    else {
++        uint64_t *count = malloc(sizeof(uint64_t));
++        *count = 1;
++        st_insert(lowrail_sb_table, (st_data_t)strdup(key), (st_data_t)count);
++    }
++}
++
++static const char *
++lowrail_sb_sym(VALUE symbol)
++{
++    const char *name = SYMBOL_P(symbol) ? rb_id2name(rb_sym2id(symbol)) : NULL;
++    return name ? name : "?";
++}
++
++/* send \t arg|fwd \t send|super \t callee type \t callee \t callee definition \t symbol \t site */
++static void
++lowrail_sb_count_send(const rb_execution_context_t *ec, const rb_control_frame_t *cfp,
++                      const struct rb_callcache *cc, VALUE block_handler, int is_super)
++{
++    char key[1400], callee[700], site[480];
++    int direct = lowrail_sb_direct == block_handler;
++    lowrail_sb_direct = Qundef;
++    lowrail_sb_method(vm_cc_cme(cc), callee, sizeof(callee));
++    lowrail_sb_site(ec, cfp, site, sizeof(site));
++    snprintf(key, sizeof(key), "send\t%s\t%s\t%s\t%s\t%s\t%s", direct ? "arg" : "fwd", is_super ? "super" : "send",
++             callee, lowrail_sb_sym(block_handler), site, lowrail_sb_cur_jit ? "jit" : "interp");
++    lowrail_sb_add(key);
++}
++
++/* yield \t iseq|cfunc|proc|other \t yielder \t target type \t target \t target definition \t symbol \t site \t at */
++static void
++lowrail_sb_count_yield(const rb_execution_context_t *ec, const char *kind, VALUE symbol, VALUE recv)
++{
++    char key[2600], target[700], site[480], at[480], yielder[480], cls[256];
++    const rb_control_frame_t *cfp = ec->cfp;
++    ID mid = rb_sym2id(symbol);
++    lowrail_sb_method(rb_callable_method_entry(CLASS_OF(recv), mid), target, sizeof(target));
++    /* site: the Ruby frame that called the yielding method; at: the yield itself (Ruby frames only) */
++    lowrail_sb_site(ec, RUBY_VM_PREVIOUS_CONTROL_FRAME(cfp), site, sizeof(site));
++    if (VM_FRAME_RUBYFRAME_P(cfp)) lowrail_sb_site(ec, cfp, at, sizeof(at)); else snprintf(at, sizeof(at), "-");
++    if (VM_FRAME_RUBYFRAME_P(cfp)) {
++        const rb_callable_method_entry_t *me = rb_vm_frame_method_entry(cfp);
++        const rb_iseq_t *iseq = CFP_ISEQ(cfp);
++        VALUE path = rb_iseq_path(iseq);
++        int builtin = RB_TYPE_P(path, T_STRING) && strncmp(RSTRING_PTR(path), "<internal:", 10) == 0;
++        if (me && me->def) {
++            snprintf(yielder, sizeof(yielder), "%s %s#%s", builtin ? "ISEQ_BUILTIN" : "ISEQ",
++                     lowrail_sb_class_name(me->owner, cls, sizeof(cls)), rb_id2name(me->def->original_id));
++        }
++        else {
++            snprintf(yielder, sizeof(yielder), "%s -", builtin ? "ISEQ_BUILTIN" : "ISEQ");
++        }
++    }
++    else {
++        const rb_callable_method_entry_t *me = rb_vm_frame_method_entry(cfp);
++        if (me && me->def) {
++            snprintf(yielder, sizeof(yielder), "CFUNC %s#%s", lowrail_sb_class_name(me->owner, cls, sizeof(cls)),
++                     rb_id2name(me->def->original_id));
++        }
++        else {
++            snprintf(yielder, sizeof(yielder), "CFRAME -");
++        }
++    }
++    snprintf(key, sizeof(key), "yield\t%s\t%s\t%s\t%s\t%s\t%s\t%s", kind, yielder, target, lowrail_sb_sym(symbol), site, at,
++             kind[0] != 'i' ? "-" : lowrail_sb_cur_jit ? "jit" : "interp");
++    lowrail_sb_add(key);
++}
++
++static int
++lowrail_sb_clear_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    free((void *)k); free((void *)v);
++    return ST_DELETE;
++}
++
++static VALUE
++lowrail_sb_set(VALUE self, VALUE on)
++{
++    if (lowrail_sb_table) st_foreach(lowrail_sb_table, lowrail_sb_clear_i, 0);
++    lowrail_sb_direct = Qundef;
++    rb_lowrail_sb_count_on = RTEST(on);
++    return on;
++}
++
++static int
++lowrail_sb_dump_i(st_data_t k, st_data_t v, st_data_t a)
++{
++    rb_ary_push((VALUE)a, rb_ary_new_from_args(2, rb_str_new_cstr((const char *)k), ULL2NUM(*(uint64_t *)v)));
++    return ST_CONTINUE;
++}
++
++static VALUE
++lowrail_sb_dump(VALUE self)
++{
++    int was = rb_lowrail_sb_count_on;
++    rb_lowrail_sb_count_on = 0;
++    VALUE rows = rb_ary_new();
++    if (lowrail_sb_table) st_foreach(lowrail_sb_table, lowrail_sb_dump_i, (st_data_t)rows);
++    rb_lowrail_sb_count_on = was;
++    return rows;
++}
++
++static VALUE
++lowrail_sb_cg_set(VALUE self, VALUE mode)
++{
++    /* Set a mask right after CALLGRIND_START_INSTRUMENTATION, which turns collection back on:
++     * this turns it off outside the regions and drops what the seam collected. */
++    int m = NUM2INT(mode);
++    if (m != 0) {
++        CALLGRIND_TOGGLE_COLLECT;
++        CALLGRIND_ZERO_STATS;
++    }
++    rb_lowrail_sb_cg_mode = m;
++    rb_lowrail_sb_active = 0;
++    lowrail_sb_enters = lowrail_sb_abnormal = 0;
++    return mode;
++}
++
++/* [regions entered, regions left by a non-local jump, collection still on] */
++static VALUE
++lowrail_sb_cg_state(VALUE self)
++{
++    return rb_ary_new_from_args(3, ULONG2NUM(lowrail_sb_enters), ULONG2NUM(lowrail_sb_abnormal), INT2FIX(rb_lowrail_sb_active));
++}
+diff --git a/vm.c b/vm.c
+index cf83b488b9..3ad82b57ec 100644
+--- a/vm.c
++++ b/vm.c
+@@ -706,6 +706,7 @@ static void add_opt_method_entry(const rb_method_entry_t *me);
+ 
+ static const rb_box_t * current_box_on_cfp(const rb_execution_context_t *ec, const rb_control_frame_t *cfp);
+ 
++#include "lowrail_sb.h"
+ #include "vm_insnhelper.c"
+ 
+ #include "vm_exec.c"
+@@ -1927,6 +1928,7 @@ invoke_block_from_c_bh(rb_execution_context_t *ec, VALUE block_handler,
+                                    VM_BH_TO_IFUNC_BLOCK(block_handler)->self,
+                                    argc, argv, kw_splat, passed_block_handler, NULL);
+       case block_handler_type_symbol:
++        lowrail_sb_from = 1;
+         return vm_yield_with_symbol(ec, VM_BH_TO_SYMBOL(block_handler),
+                                     argc, argv, kw_splat, passed_block_handler);
+       case block_handler_type_proc:
+@@ -2023,6 +2025,7 @@ invoke_block_from_c_proc(rb_execution_context_t *ec, const rb_proc_t *proc,
+         }
+         return vm_yield_with_cfunc(ec, &block->as.captured, self, argc, argv, kw_splat, passed_block_handler, me);
+       case block_type_symbol:
++        lowrail_sb_from = 2;
+         return vm_yield_with_symbol(ec, block->as.symbol, argc, argv, kw_splat, passed_block_handler);
+       case block_type_proc:
+         is_lambda = block_proc_is_lambda(block->as.proc);
+@@ -2891,6 +2894,7 @@ VALUE
+ vm_exec(rb_execution_context_t *ec)
+ {
+     VALUE result = Qundef;
++    volatile int sb_body = 0;
+ 
+     EC_PUSH_TAG(ec);
+ 
+@@ -2913,6 +2917,7 @@ vm_exec(rb_execution_context_t *ec)
+ #else
+     enum ruby_tag_type state;
+     if ((state = EC_EXEC_TAG()) == TAG_NONE) {
++        sb_body = lowrail_sb_body_begin();
+         if (UNDEF_P(result = jit_exec(ec))) {
+             result = vm_exec_core(ec);
+         }
+@@ -2922,6 +2927,7 @@ vm_exec(rb_execution_context_t *ec)
+     else {
+         result = vm_exec_loop(ec, state, &_tag, ec->errinfo);
+     }
++    lowrail_sb_body_end(sb_body);
+ #endif
+ 
+     EC_POP_TAG();
+@@ -4676,6 +4682,10 @@ Init_VM(void)
+     rb_undef_alloc_func(rb_cRubyVM);
+     rb_undef_method(CLASS_OF(rb_cRubyVM), "new");
+     rb_define_singleton_method(rb_cRubyVM, "stat", vm_stat, -1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_sb=", lowrail_sb_set, 1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_sb_dump", lowrail_sb_dump, 0);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_sb_cg=", lowrail_sb_cg_set, 1);
++    rb_define_singleton_method(rb_cRubyVM, "lowrail_sb_cg_state", lowrail_sb_cg_state, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines", vm_keep_script_lines, 0);
+     rb_define_singleton_method(rb_cRubyVM, "keep_script_lines=", vm_keep_script_lines_set, 1);
+ 
+diff --git a/vm_args.c b/vm_args.c
+index db19437914..10c34f1b2f 100644
+--- a/vm_args.c
++++ b/vm_args.c
+@@ -1157,6 +1157,7 @@ vm_caller_setup_arg_block(const rb_execution_context_t *ec, rb_control_frame_t *
+             return VM_CF_BLOCK_HANDLER(reg_cfp);
+         }
+         else if (SYMBOL_P(block_code) && rb_method_basic_definition_p(rb_cSymbol, idTo_proc)) {
++            if (UNLIKELY(rb_lowrail_sb_count_on)) lowrail_sb_direct = block_code;
+             const rb_cref_t *cref = vm_env_cref(reg_cfp->ep);
+             if (cref && !NIL_P(cref->refinements)) {
+                 VALUE ref = cref->refinements;
+diff --git a/vm_eval.c b/vm_eval.c
+index c68c5e93df..faf8a1d510 100644
+--- a/vm_eval.c
++++ b/vm_eval.c
+@@ -163,7 +163,9 @@ vm_call0_cfunc_with_frame(rb_execution_context_t* ec, struct rb_calling_info *ca
+ 
+         if (len >= 0) rb_check_arity(argc, len, len);
+ 
++        int sb_body = lowrail_sb_body_begin();
+         val = (*cfunc->invoker)(recv, argc, argv, cfunc->func);
++        lowrail_sb_body_end(sb_body);
+ 
+         CHECK_CFP_CONSISTENCY("vm_call0_cfunc_with_frame");
+         rb_vm_pop_frame(ec);
+diff --git a/vm_insnhelper.c b/vm_insnhelper.c
+index fc90c254e9..8e35b90974 100644
+--- a/vm_insnhelper.c
++++ b/vm_insnhelper.c
+@@ -3933,7 +3933,9 @@ vm_call_cfunc_with_frame_(rb_execution_context_t *ec, rb_control_frame_t *reg_cf
+     if (len >= 0) rb_check_arity(argc, len, len);
+ 
+     reg_cfp->sp = stack_bottom;
++    int sb_body = lowrail_sb_body_begin();
+     val = (*cfunc->invoker)(recv, argc, argv, cfunc->func);
++    lowrail_sb_body_end(sb_body);
+ 
+     CHECK_CFP_CONSISTENCY("vm_call_cfunc");
+ 
+@@ -5428,8 +5430,24 @@ rb_vm_yield_with_cfunc(rb_execution_context_t *ec, const struct rb_captured_bloc
+     return vm_yield_with_cfunc(ec, captured, captured->self, argc, argv, 0, VM_BLOCK_HANDLER_NONE, NULL);
+ }
+ 
++static VALUE vm_yield_with_symbol0(rb_execution_context_t *ec,  VALUE symbol, int argc, const VALUE *argv, int kw_splat, VALUE block_handler);
++
+ static VALUE
+ vm_yield_with_symbol(rb_execution_context_t *ec,  VALUE symbol, int argc, const VALUE *argv, int kw_splat, VALUE block_handler)
++{
++    int from = lowrail_sb_from;
++    lowrail_sb_from = 0;
++    if (UNLIKELY(rb_lowrail_sb_count_on) && argc > 0) {
++        lowrail_sb_count_yield(ec, from == 1 ? "cfunc" : from == 2 ? "proc" : "other", symbol, argv[0]);
++    }
++    int sb = UNLIKELY(rb_lowrail_sb_cg_mode & 8) ? lowrail_sb_enter(8) : 0;
++    VALUE val = vm_yield_with_symbol0(ec, symbol, argc, argv, kw_splat, block_handler);
++    lowrail_sb_exit(sb);
++    return val;
++}
++
++static VALUE
++vm_yield_with_symbol0(rb_execution_context_t *ec,  VALUE symbol, int argc, const VALUE *argv, int kw_splat, VALUE block_handler)
+ {
+     VALUE passed_proc = rb_vm_bh_to_procval(ec, block_handler);
+ 
+@@ -5667,6 +5685,7 @@ vm_invoke_symbol_block(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp,
+         calling->recv = TOPN(--calling->argc);
+     }
+ 
++    if (UNLIKELY(rb_lowrail_sb_count_on)) lowrail_sb_count_yield(ec, "iseq", symbol, calling->recv);
+     return vm_call_symbol(ec, reg_cfp, calling, ci, symbol, flags);
+ }
+ 
+@@ -6411,6 +6430,9 @@ vm_sendish(
+     enum method_explorer_type method_explorer
+ ) {
+     VALUE val = Qundef;
++    /* consumed here: code that this send runs must not inherit the flag */
++    lowrail_sb_cur_jit = lowrail_sb_via_jit;
++    lowrail_sb_via_jit = 0;
+     const struct rb_callinfo *ci = cd->ci;
+     const struct rb_callcache *cc;
+     int argc = vm_ci_argc(ci);
+@@ -6426,10 +6448,12 @@ vm_sendish(
+     switch (method_explorer) {
+       case mexp_search_method:
+         calling.cc = cc = vm_search_method_fastpath(reg_cfp, cd, CLASS_OF(recv));
++        if (UNLIKELY(rb_lowrail_sb_count_on) && SYMBOL_P(block_handler)) lowrail_sb_count_send(ec, reg_cfp, cc, block_handler, 0);
+         val = vm_cc_call(cc)(ec, GET_CFP(), &calling);
+         break;
+       case mexp_search_super:
+         calling.cc = cc = vm_search_super_method(reg_cfp, cd, recv);
++        if (UNLIKELY(rb_lowrail_sb_count_on) && SYMBOL_P(block_handler)) lowrail_sb_count_send(ec, reg_cfp, cc, block_handler, 1);
+         val = vm_cc_call(cc)(ec, GET_CFP(), &calling);
+         break;
+       case mexp_search_invokeblock:
+@@ -6443,9 +6467,12 @@ VALUE
+ rb_vm_send(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, CALL_DATA cd, ISEQ blockiseq)
+ {
+     stack_check(ec);
++    int sb = LOWRAIL_SB_SEND_ENTER(GET_CFP(), cd->ci, 0);
+     VALUE bh = vm_caller_setup_arg_block(ec, GET_CFP(), cd->ci, blockiseq, false);
++    lowrail_sb_via_jit = 1;
+     VALUE val = vm_sendish(ec, GET_CFP(), cd, bh, mexp_search_method);
+     VM_EXEC(ec, val);
++    lowrail_sb_exit(sb);
+     return val;
+ }
+ 
+@@ -6495,7 +6522,9 @@ rb_vm_invokesuper(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, CALL_
+         .cc = original_cc,
+     };
+ 
++    int sb = LOWRAIL_SB_SEND_ENTER(GET_CFP(), cd->ci, 1);
+     VALUE bh = vm_caller_setup_arg_block(ec, GET_CFP(), adjusted_cd.ci, blockiseq, true);
++    lowrail_sb_via_jit = 1;
+     VALUE val = vm_sendish(ec, GET_CFP(), &adjusted_cd, bh, mexp_search_super);
+ 
+     if (original_cc != adjusted_cd.cc && vm_cc_markable(adjusted_cd.cc)) {
+@@ -6504,6 +6533,7 @@ rb_vm_invokesuper(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, CALL_
+     }
+ 
+     VM_EXEC(ec, val);
++    lowrail_sb_exit(sb);
+     return val;
+ }
+ 
+@@ -6531,9 +6561,12 @@ VALUE
+ rb_vm_invokeblock(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, CALL_DATA cd)
+ {
+     stack_check(ec);
++    int sb = LOWRAIL_SB_YIELD_ENTER(GET_CFP());
+     VALUE bh = VM_BLOCK_HANDLER_NONE;
++    lowrail_sb_via_jit = 1;
+     VALUE val = vm_sendish(ec, GET_CFP(), cd, bh, mexp_search_invokeblock);
+     VM_EXEC(ec, val);
++    lowrail_sb_exit(sb);
+     return val;
+ }
+ 

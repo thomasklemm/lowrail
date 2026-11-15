@@ -403,6 +403,16 @@ its title covers every non-nil block argument, and dak2's comment lists "Symbol 
 Row 7 does not handle Symbols. No open ruby/ruby PR (searched ZJIT + block arg, block_arg, blockarg, block param,
 getblockparamproxy, `&blk`, forward block, symbol block). No draft.
 
+**Correction (2026-11-15, [zjit-symbol-block](zjit-symbol-block.md)):** that search looked at row 7 and at open PRs
+only. Two unmerged branches handle Symbols, neither with a PR:
+
+* The yield side is on k0kubun's `k0kubun/ruby:zjit-lobsters7`, the branch behind #1039, in two rows without an
+  assignee: row 17, `ed1c0f97b2` "Compile a `yield` to a Symbol block as the send it stands for" (his lobsters delta
+  +0.05%), and row 56, `c6347abcc4` "Dispatch a Symbol block's send through the megamorphic class table" (−0.77%,
+  listed among the largest regressions).
+* The send side is on `Shopify/ruby:zjit-perf/blockarg-direct-send` (Rafael França, `3f17d8950e`, 2026-09-11):
+  a static Symbol block argument becomes a direct send to ISEQ and C callees behind a `Symbol#to_proc` patch point.
+
 **Rails reach.** Round 2's top lead 7 sites on ruby-bench (Rails 8.1) are 7a/7b: `_read_attribute(name, &block)`,
 `mon_synchronize(&b)`, Notifications `iterate_guarding_exceptions`, `ConnectionPool::Queue#synchronize`
 (railsbench 108k, lobsters 88k, shipit 196k extra per iteration). On Rails main, #59141 added 7c (below).
