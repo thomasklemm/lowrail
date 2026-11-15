@@ -1,0 +1,9 @@
+# Variants on top of change 1, interpreter, same ir.sh setup as callgrind.txt: b-fix here is change 1 alone (225,331 interp, 168,478 YJIT). x1 extend detect, x2 detect_product hoisted (later made lazy), x3 application detect, x4 match? in the fast path, x5 <=> while loop, x6 offsets instead of m[0].length (rejected)
+b-fix|interp|check|225331|168.8|0
+b-fix|yjit|check|168478|168.8|0
+b-x1|interp|check|223343|167.8|0
+b-x2|interp|check|219945|161.0|0
+b-x3|interp|check|217339|166.1|0
+b-x4|interp|check|219324|156.1|0
+b-x5|interp|check|219419|159.2|0
+b-x6|interp|check|232572|160.3|0

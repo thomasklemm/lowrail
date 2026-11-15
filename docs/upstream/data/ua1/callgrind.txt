@@ -1,0 +1,32 @@
+# Callgrind Ir per call: GEMFILE_DIR|MODE|WHAT|Ir|objects|blocks compiled (ir.sh, 20 rounds x 21 user agents, Ruby 4.0.9 3e93b23afc)
+# b-main: useragent 680915a; b-aa: a second checkout of 680915a; b-fix: five changes (first block), four after the drop (last block); b-c1..b-c4: after change 1..4; b-pr73: gshutler/useragent#73 head b08ed42; b-both: #73 plus the five changes
+b-main|interp|check|287390|182.7|0
+b-aa|interp|check|287208|182.7|0
+b-fix|interp|check|207092|147.8|0
+b-main|interp|parse|200791|126.1|0
+b-aa|interp|parse|200666|126.1|0
+b-fix|interp|parse|145437|113.1|0
+b-main|yjit|check|224158|182.7|0
+b-aa|yjit|check|223942|182.7|0
+b-fix|yjit|check|157441|147.8|0
+b-main|yjit|parse|165645|126.1|0
+b-aa|yjit|parse|165557|126.1|0
+b-fix|yjit|parse|119370|113.1|0
+b-pr73|interp|check|280926|159.2|0
+b-both|interp|check|200350|120.1|0
+b-pr73|yjit|check|217752|159.2|0
+b-both|yjit|check|150645|120.1|0
+# Four-commit branch (823b187 tree = b-c4 = b-fix after dropping change 5); rows above with b-fix are the five-commit state
+b-c1|interp|check|225186|168.8|0
+b-c1|yjit|check|168535|168.8|0
+b-c2|interp|check|220106|161.0|0
+b-c2|yjit|check|165624|161.0|0
+b-c3|interp|check|213301|158.4|0
+b-c3|yjit|check|160465|158.4|0
+b-c4|interp|check|207471|148.8|0
+b-c4|yjit|check|155669|148.8|0
+b-fix|interp|parse|145879|114.0|0
+b-fix|yjit|parse|117492|114.0|0
+# b-both rebuilt: #73 plus the four commits
+b-both|interp|check|200990|121.0|0
+b-both|yjit|check|148948|121.0|0

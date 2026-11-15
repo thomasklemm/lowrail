@@ -1,0 +1,51 @@
+From 39d775ba2f637ef623c25aab8683c4366957e9e6 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sun, 15 Nov 2026 13:09:50 +0000
+Subject: [PATCH 1/4] Parse versions made of digits and dots with one match
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Rails' default `allow_browser versions: :modern` parses the user agent with
+UserAgent on every request, and `UserAgent.parse` builds a Version for each
+product in it, four to six for a current browser. Each one ran two or three
+regexp matches, a scan and one more match per part. In Rails apps that use
+`allow_browser`, its check is 0.5 to 3 percent of a request.
+
+A version made only of digits and dots, such as `537.36` or `142.0.0.0`, now
+takes one anchored match and a split. The old branches give these strings the
+same result: they aren't blank, they start with digits followed by a dot or
+the end, and the scan's tokens are the parts between the dots. Any other
+string takes the old path. It uses `=~` rather than `match?` so that it still
+runs on Ruby 2.3.
+
+Parsing 21 current browser, bot and in-app user agents, and running Rails'
+`allow_browser versions: :modern` check on each of them:
+
+    ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+
+    before:  parse x21      1.768k (± 7.7%) i/s  (565.66 μs/i) -      8.918k in   5.044540s
+    after:   parse x21      2.459k (± 7.0%) i/s  (406.74 μs/i) -     12.432k in   5.056624s
+    before:  check x21      1.229k (± 8.2%) i/s  (813.41 μs/i) -      6.188k in   5.033369s
+    after:   check x21      1.567k (± 4.7%) i/s  (638.29 μs/i) -      7.952k in   5.075670s
+---
+ lib/user_agent/version.rb | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/user_agent/version.rb b/lib/user_agent/version.rb
+index 5bc32d8..cba11bc 100644
+--- a/lib/user_agent/version.rb
++++ b/lib/user_agent/version.rb
+@@ -18,7 +18,11 @@ class UserAgent
+     def initialize(str)
+       @str = str
+ 
+-      if @str =~ /^\s*$/
++      if str =~ /\A\d+(?:\.\d+)*\z/
++        @nil        = false
++        @sequences  = str.split(".").map(&:to_i)
++        @comparable = true
++      elsif @str =~ /^\s*$/
+         @nil        = true
+         @sequences  = []
+         @comparable = false

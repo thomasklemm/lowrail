@@ -1,0 +1,36 @@
+diff --git a/lib/user_agent/version.rb b/lib/user_agent/version.rb
+index cba11bc..bb66eec 100644
+--- a/lib/user_agent/version.rb
++++ b/lib/user_agent/version.rb
+@@ -17,6 +17,10 @@ class UserAgent
+ 
+     def initialize(str)
+       @str = str
++    end
++
++    def parse!
++      str = @str
+ 
+       if str =~ /\A\d+(?:\.\d+)*\z/
+         @nil        = false
+@@ -38,10 +42,12 @@ class UserAgent
+     end
+ 
+     def nil?
++      parse! unless defined?(@nil)
+       @nil
+     end
+ 
+     def to_a
++      parse! unless defined?(@nil)
+       @sequences.dup
+     end
+ 
+@@ -69,6 +75,7 @@ class UserAgent
+     def <=>(other)
+       case other
+       when Version
++        parse! unless defined?(@nil)
+         if @comparable
+           ([0]*6).zip(to_a, other.to_a).each do |dump, a, b|
+             a ||= 0

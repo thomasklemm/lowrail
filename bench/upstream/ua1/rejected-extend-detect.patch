@@ -1,0 +1,17 @@
+diff --git a/lib/user_agent/browsers.rb b/lib/user_agent/browsers.rb
+index 2206ace..1e43410 100644
+--- a/lib/user_agent/browsers.rb
++++ b/lib/user_agent/browsers.rb
+@@ -44,10 +44,8 @@ class UserAgent
+     end
+ 
+     def self.extend(array)
+-      all.each do |extension|
+-        return extension.new(array) if extension.extend?(array)
+-      end
+-      array
++      extension = all.detect { |extension| extension.extend?(array) }
++      extension ? extension.new(array) : array
+     end
+   end
+ end

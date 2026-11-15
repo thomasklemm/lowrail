@@ -1,0 +1,50 @@
+=== main
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+compiled_iseq_count          458
+failed_iseq_count            0
+side_exit_count              20890
+compiled_side_exit_count     10332
+zjit_alloc_bytes             1330243
+compile_error_out_of_memory  0
+  exit_exception_handler     19947
+  exit_guard_type_failure    499
+  exit_guard_shape_failure   224
+  exit_no_profile_send       122
+  exit_no_profile_getivar    41
+  exit_unhandled_block_arg   29
+  exit_no_profile_setivar    18
+  exit_invoke_block_iseq_changed 9
+  exit_invoke_block_handler_not_iseq 1
+=== fix
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+compiled_iseq_count          459
+failed_iseq_count            0
+side_exit_count              951
+compiled_side_exit_count     10137
+zjit_alloc_bytes             1323172
+compile_error_out_of_memory  0
+  exit_guard_type_failure    514
+  exit_guard_shape_failure   224
+  exit_no_profile_send       111
+  exit_no_profile_getivar    50
+  exit_unhandled_block_arg   29
+  exit_no_profile_setivar    13
+  exit_invoke_block_iseq_changed 9
+  exit_invoke_block_handler_not_iseq 1
+=== main
+ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +ZJIT +PRISM [x86_64-linux]
+compiled_iseq_count          458
+failed_iseq_count            0
+side_exit_count              20890
+compiled_side_exit_count     10332
+zjit_alloc_bytes             1330243
+compile_error_out_of_memory  0
+  exit_exception_handler     19947
+  exit_guard_type_failure    499
+  exit_guard_shape_failure   224
+  exit_no_profile_send       122
+  exit_no_profile_getivar    41
+  exit_unhandled_block_arg   29
+  exit_no_profile_setivar    18
+  exit_invoke_block_iseq_changed 9
+  exit_invoke_block_handler_not_iseq 1

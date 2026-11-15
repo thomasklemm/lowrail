@@ -1,0 +1,60 @@
+From f065cb0633e197d38b31b7a1b6493cf938346c94 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sun, 15 Nov 2026 13:09:50 +0000
+Subject: [PATCH 3/4] Find the application with detect
+
+Chrome, Webkit and Vivaldi found their application by building an array of
+the products that have a comment and taking its first element. `detect`
+returns the same product without building the array; the block only reads
+`comment`. `platform`, `os` and `bot?` call `application`, and Webkit's
+`browser` and `version` call `os` and `platform`, so Rails' `allow_browser`
+check builds that array several times for a Safari user agent.
+
+Callgrind instructions per `allow_browser` check over the same 21 user
+agents, Ruby 4.0.9: 220,106 before and 213,301 after without JIT, 165,624
+and 160,465 with YJIT, and 3 fewer objects.
+---
+ lib/user_agent/browsers/chrome.rb  | 2 +-
+ lib/user_agent/browsers/vivaldi.rb | 2 +-
+ lib/user_agent/browsers/webkit.rb  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/user_agent/browsers/chrome.rb b/lib/user_agent/browsers/chrome.rb
+index d26b1a9..f95a74f 100644
+--- a/lib/user_agent/browsers/chrome.rb
++++ b/lib/user_agent/browsers/chrome.rb
+@@ -31,7 +31,7 @@ class UserAgent
+       end
+ 
+       def application
+-        self.reject { |agent| agent.comment.nil? || agent.comment.empty? }.first
++        detect { |agent| !(agent.comment.nil? || agent.comment.empty?) }
+       end
+ 
+       def platform
+diff --git a/lib/user_agent/browsers/vivaldi.rb b/lib/user_agent/browsers/vivaldi.rb
+index 013f558..e354b00 100644
+--- a/lib/user_agent/browsers/vivaldi.rb
++++ b/lib/user_agent/browsers/vivaldi.rb
+@@ -18,7 +18,7 @@ class UserAgent
+       end
+ 
+       def application
+-        self.reject { |agent| agent.comment.nil? || agent.comment.empty? }.first
++        detect { |agent| !(agent.comment.nil? || agent.comment.empty?) }
+       end
+ 
+       def platform
+diff --git a/lib/user_agent/browsers/webkit.rb b/lib/user_agent/browsers/webkit.rb
+index 50ee150..17e73fd 100644
+--- a/lib/user_agent/browsers/webkit.rb
++++ b/lib/user_agent/browsers/webkit.rb
+@@ -69,7 +69,7 @@ class UserAgent
+       end
+ 
+       def application
+-        self.reject { |agent| agent.comment.nil? || agent.comment.empty? }.first
++        detect { |agent| !(agent.comment.nil? || agent.comment.empty?) }
+       end
+ 
+       def platform

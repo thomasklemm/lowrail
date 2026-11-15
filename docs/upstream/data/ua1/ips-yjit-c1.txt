@@ -1,0 +1,90 @@
+=== base --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.768k (± 7.7%) i/s  (565.66 μs/i) -      8.918k in   5.044540s
+           check x21      1.229k (± 8.2%) i/s  (813.41 μs/i) -      6.188k in   5.033369s
+             request     10.052k (± 4.8%) i/s   (99.48 μs/i) -     50.400k in   5.013820s
+=== candidate --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      2.459k (± 7.0%) i/s  (406.74 μs/i) -     12.432k in   5.056624s
+           check x21      1.539k (±12.6%) i/s  (649.90 μs/i) -      7.748k in   5.035421s
+             request     11.251k (± 7.6%) i/s   (88.88 μs/i) -     56.870k in   5.054456s
+=== base2 --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.737k (±10.2%) i/s  (575.58 μs/i) -      8.700k in   5.007583s
+           check x21      1.072k (± 8.9%) i/s  (932.84 μs/i) -      5.428k in   5.063452s
+             request      8.430k (±13.1%) i/s  (118.62 μs/i) -     42.312k in   5.019113s
+=== base --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.569k (±11.3%) i/s  (637.53 μs/i) -      8.008k in   5.105365s
+           check x21      1.081k (±10.5%) i/s  (925.18 μs/i) -      5.452k in   5.044105s
+             request      9.375k (± 7.1%) i/s  (106.66 μs/i) -     47.436k in   5.059723s
+=== candidate --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      2.358k (± 6.7%) i/s  (424.02 μs/i) -     11.816k in   5.010277s
+           check x21      1.567k (± 4.7%) i/s  (638.29 μs/i) -      7.952k in   5.075670s
+             request     11.548k (± 4.4%) i/s   (86.59 μs/i) -     58.292k in   5.047653s
+=== base2 --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.601k (±13.2%) i/s  (624.51 μs/i) -      8.041k in   5.021696s
+           check x21      1.154k (± 8.1%) i/s  (866.35 μs/i) -      5.781k in   5.008356s
+             request      9.131k (± 8.9%) i/s  (109.51 μs/i) -     46.260k in   5.066020s
+=== base --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.740k (± 7.6%) i/s  (574.58 μs/i) -      8.788k in   5.049439s
+           check x21      1.104k (± 9.4%) i/s  (905.52 μs/i) -      5.612k in   5.081776s
+             request      9.000k (±10.1%) i/s  (111.11 μs/i) -     45.364k in   5.040525s
+=== candidate --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      2.353k (± 9.5%) i/s  (424.95 μs/i) -     11.826k in   5.025451s
+           check x21      1.379k (±12.3%) i/s  (725.25 μs/i) -      6.970k in   5.055026s
+             request      9.901k (± 7.5%) i/s  (101.00 μs/i) -     50.715k in   5.122259s
+=== base2 --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.461k (±15.1%) i/s  (684.39 μs/i) -      7.426k in   5.082250s
+           check x21      1.088k (± 6.8%) i/s  (919.48 μs/i) -      5.456k in   5.016697s
+             request      8.662k (±12.2%) i/s  (115.45 μs/i) -     43.736k in   5.049220s
+=== base --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.570k (± 7.7%) i/s  (636.88 μs/i) -      7.987k in   5.086772s
+           check x21      1.128k (± 9.2%) i/s  (886.70 μs/i) -      5.661k in   5.019627s
+             request      9.288k (±10.0%) i/s  (107.66 μs/i) -     47.334k in   5.096136s
+=== candidate --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      2.254k (± 8.1%) i/s  (443.63 μs/i) -     11.362k in   5.040502s
+           check x21      1.376k (±11.8%) i/s  (726.72 μs/i) -      6.890k in   5.007088s
+             request     10.194k (± 9.0%) i/s   (98.10 μs/i) -     51.450k in   5.047280s
+=== base2 --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.776k (± 6.2%) i/s  (562.95 μs/i) -      9.006k in   5.069903s
+           check x21      1.110k (±10.0%) i/s  (901.26 μs/i) -      5.586k in   5.034448s
+             request      9.441k (± 7.3%) i/s  (105.92 μs/i) -     47.304k in   5.010270s
+=== base --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.283k (±15.8%) i/s  (779.38 μs/i) -      6.480k in   5.050360s
+           check x21      1.082k (±10.3%) i/s  (924.13 μs/i) -      5.452k in   5.038355s
+             request      8.666k (±13.0%) i/s  (115.39 μs/i) -     43.515k in   5.021126s
+=== candidate --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      2.314k (± 9.5%) i/s  (432.19 μs/i) -     11.781k in   5.091611s
+           check x21      1.511k (± 7.7%) i/s  (661.60 μs/i) -      7.636k in   5.052013s
+             request     10.701k (± 9.1%) i/s   (93.45 μs/i) -     53.508k in   5.000141s
+=== base2 --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+           parse x21      1.528k (±17.1%) i/s  (654.48 μs/i) -      7.772k in   5.086650s
+           check x21      1.078k (±14.0%) i/s  (928.06 μs/i) -      5.456k in   5.063516s
+             request      9.268k (±14.1%) i/s  (107.90 μs/i) -     46.644k in   5.032827s

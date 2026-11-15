@@ -183,6 +183,8 @@ Both are on [thomasklemm/rails](https://github.com/thomasklemm/rails), built on 
 not already in flight.
 
 **AB1, [`thomasklemm/allow-browser-verdict-cache`](https://github.com/thomasklemm/rails/tree/thomasklemm/allow-browser-verdict-cache).**
+Closed by fatkodima on 2026-11-14 as not worth the complexity. The exact, cache-free fix one level down in the
+useragent gem is [UA1](useragent.md): 1.44× for the check, held.
 `BrowserBlocker` parses the user agent with the useragent gem on every request (22 µs for the parse, 37–53 µs per
 request for the whole check under YJIT). The verdict depends only on the user agent string and the named version
 set, so it is kept per user agent for Symbol sets (`:modern`), at most 1,000 user agents of at most 512 bytes per

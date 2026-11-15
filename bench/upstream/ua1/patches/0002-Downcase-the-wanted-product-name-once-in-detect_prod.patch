@@ -1,0 +1,33 @@
+From 71469ec069ec03c08d1f77a9188e8ca93b49c8f0 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sun, 15 Nov 2026 13:09:50 +0000
+Subject: [PATCH 2/4] Downcase the wanted product name once in detect_product
+
+`detect_product` downcased the name it looks for again for every product it
+compared. `respond_to?`, `method_missing` and most browsers' `version` and
+`browser` go through it, so Rails' `allow_browser` check runs it several
+times per request. The name is now downcased at the first comparison and
+kept, so the calls happen in the same order as before and an empty list still
+never downcases it.
+
+Callgrind instructions per `allow_browser` check over the same 21 user
+agents, Ruby 4.0.9: 225,186 before and 220,106 after without JIT, 168,535
+and 165,624 with YJIT, and 8 fewer objects.
+---
+ lib/user_agent/browsers/base.rb | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/user_agent/browsers/base.rb b/lib/user_agent/browsers/base.rb
+index 86e5e9d..4440c82 100644
+--- a/lib/user_agent/browsers/base.rb
++++ b/lib/user_agent/browsers/base.rb
+@@ -117,7 +117,8 @@ class UserAgent
+ 
+       private
+         def detect_product(product)
+-          detect { |useragent| useragent.product.to_s.downcase == product.to_s.downcase }
++          name = nil
++          detect { |useragent| useragent.product.to_s.downcase == (name ||= product.to_s.downcase) }
+         end
+ 
+         def detect_comment(comment)
