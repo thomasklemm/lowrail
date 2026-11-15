@@ -173,7 +173,7 @@ new app, including `--api`; "HTML" is every app without `--api`; "importmap" and
 
 Both are on our forks, built on the current upstream main, one commit each by Thomas Klemm with no trailers and no
 comments. Queue items: [QL1](../../bench/upstream/pr-queue/items/QL1.md) and
-[IM1](../../bench/upstream/pr-queue/items/IM1.md), state `in-review`; review passes are recorded there and summed up
+[IM1](../../bench/upstream/pr-queue/items/IM1.md), state `reviewed`; review passes are recorded there and summed up
 under [Reviews](#reviews).
 
 ### IM1: cache the modulepreload tags (importmap-rails)
@@ -267,6 +267,9 @@ IM1 approach right; both asked for changes.
 * **Numbers reproduced** on 2-core orbs, core 1: IM1 ips 3.9× in both (record 4.1×), bare page −10.55% and −10.64%
   interpreter, −9.89% YJIT; 59 and 63 fewer objects (record 62), so the body says about 60. QL1 ips 3.3× and 3.0×
   (record 3.2×), JSON bare −3.56% (record −3.84%).
+* **Confirm passes** on `863322e` and the QL1 body: both reviewers approve IM1 (the new test fails on every wrong
+  version they tried, including the old head; the 20-case probe and their wider probes match main; ips 4.0× on the
+  fixed head). QL1: opus approves, claude-code `nits` (the optional 2-query test below). Both items are `reviewed`.
 * **Not done**, optional: a 2-query case in `controller_runtime_test.rb` (the mutant `zero? ? "queries" : "query"`
   passes today); a dedicated method instead of the public `:nodoc:` `cache_as`, if a maintainer asks.
 
