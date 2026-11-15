@@ -208,8 +208,9 @@ too slow for these windows under Callgrind and was dropped.
 **benchmark-ips** (TE2's body script, [`tag/ips.rb`](../../bench/upstream/vm1/tag/ips.rb), core 3, interleaved,
 every other job and service stopped): 10 rounds of main, a second main checkout and TE2 give, best of 10, `tag.a`
 196.5k / 196.7k / 214.0k i/s (A/A +0.1%, TE2 +8.9%) and `content_tag` 319.1k / 327.8k / 345.7k (A/A +2.7%, TE2
-+8.3%). Medians agree for `tag.a` (+9.3% against A/A +1.5%; TE2 beat every main run in 9 of 10 rounds) and are
-smaller for `content_tag` (+3.0% against −1.6%). An earlier idle cohort of 5 rounds gave +7.1% and +4.7% against
++8.3%). Medians agree for `tag.a` (+9.3% against A/A +1.5%; TE2 beat both mains in 10 of 10 rounds) and are
+smaller for `content_tag` (+3.0% against −1.6%, 8 of 10 rounds; its best rests on one run, and Callgrind on the
+same block gives about −5%). An earlier idle cohort of 5 rounds gave +7.1% and +4.7% against
 A/A −0.6% and +0.7%, near Callgrind's −7.2%. Single runs still carry ±2–21% errors: a fresh a1.small orb that ran
 only this measurement found the vCPU switching between two speeds (a pure-Ruby loop swung about 2× per 100 ms with
 no steal or throttling) and failed its A/A (+12.3%). Earlier cohorts ran beside Callgrind jobs and failed their

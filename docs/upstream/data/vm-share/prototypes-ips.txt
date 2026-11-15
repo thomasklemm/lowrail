@@ -78,7 +78,7 @@ cpu  2661754 3209 133900 2224691 21453 0 8475 21651 0 0
 ## te2-ips-idle2/yjit.txt (2026-11-15 03:59-04:08, every other job and service stopped, core 3, 10 rounds; per-run errors +-2.1-20.9%, steal 1.9% of all CPU time; used for TE2's body: before = base r2 tag.a and base r3 content_tag, after = TE2 r2 tag.a and TE2 r1 content_tag)
 tag.a: base 196.5k (5.090 µs, n=10), base2 196.7k (5.084 µs, n=10), TE2 214.0k (4.673 µs, n=10); base2/base +0.1%, TE2/base +8.9%
 content_tag: base 319.1k (3.134 µs, n=10), base2 327.8k (3.050 µs, n=10), TE2 345.7k (2.893 µs, n=10); base2/base +2.7%, TE2/base +8.3%
-medians: tag.a base 188.3k, base2 191.1k (A/A +1.5%), TE2 205.9k (+9.3%); content_tag base 310.5k, base2 305.4k (A/A -1.6%), TE2 319.7k (+3.0%); TE2 beat every main and main2 tag.a run in 9 of 10 rounds (r9 196.1k vs best main 196.7k)
+medians: tag.a base 188.3k, base2 191.1k (A/A +1.5%), TE2 205.9k (+9.3%); content_tag base 310.5k, base2 305.4k (A/A -1.6%), TE2 319.7k (+3.0%); per round TE2 beat both mains in 10 of 10 tag.a rounds and 8 of 10 content_tag rounds; 9 of 10 TE2 tag.a runs beat every main and main2 run (r9 196.1k vs best main 196.7k)
 base r1 tag.a 190.926k (± 6.1%) content_tag 308.955k (± 5.0%)
 base2 r1 tag.a 196.697k (±12.3%) content_tag 327.849k (±17.3%)
 TE2 r1 tag.a 210.020k (±11.1%) content_tag 345.707k (±10.1%)
