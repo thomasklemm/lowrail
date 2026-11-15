@@ -1,0 +1,33 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]",
+  "zjit": true,
+  "itrs": 2,
+  "jit_flat": "pass",
+  "warm_windows": [
+    {
+      "compiled_iseq_count": 5902,
+      "compiled_side_exit_count": 121760,
+      "invalidation_time_ns": 180879391
+    },
+    {
+      "compiled_iseq_count": 5902,
+      "compiled_side_exit_count": 121760,
+      "invalidation_time_ns": 180879391
+    }
+  ],
+  "windows": [
+    {
+      "region": false,
+      "gcs": 1,
+      "jit_unchanged": true,
+      "jit_delta": {
+        "compiled_iseq_count": 0,
+        "compiled_side_exit_count": 0,
+        "invalidation_time_ns": 0
+      },
+      "regions": 0,
+      "left_by_jump": 0,
+      "still_on": false
+    }
+  ]
+}

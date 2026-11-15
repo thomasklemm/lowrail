@@ -301,16 +301,23 @@ The ceiling counts what the generic path costs. This is the direct measurement: 
 iteration of the whole program, on the release builds the timings use (master twice as the A/A, and the branch at
 `18d33e8a24`), fixed heap, 100 warmup iterations, JIT-flat gate passed, one GC in every window.
 
-| lobsters | Ir per iteration | Against master |
+| | Ir per iteration | Against master |
 | --- | --- | --- |
-| master | 2,514,771,237 | |
-| master, second run | 2,516,611,127 | +0.073% |
-| branch | 2,511,119,508 | −0.145% |
+| lobsters, master | 2,514,771,237 | |
+| lobsters, master again | 2,516,611,127 | +0.073% |
+| lobsters, branch | 2,511,119,508 | −0.145% |
+| shipit, master | 3,718,173,034 | |
+| shipit, master again | 3,717,253,243 | −0.025% |
+| shipit, branch | 3,709,858,229 | −0.224% |
 
-The branch runs 3.7 to 5.5 million instructions fewer per iteration than the two master runs, which differ by
-1.8 million. That is the size of the ceiling (4.6 million), so most of the generic path's cost goes away, and it
-is 2 to 3 times the A/A, so it is a small effect and not a precise one. Data:
-`data/zne1/cgab-{master,master2,branch}-lobsters.json`.
+* shipit: the branch runs 7.4 to 8.3 million instructions fewer per iteration than the two master runs, which
+  differ by 0.9 million. That is 8 to 9 times the A/A and a little over half of the ceiling (14.6 million); the
+  rest is what the specialized arms and their type checks still cost.
+* lobsters: 3.7 to 5.5 million fewer, with the two master runs 1.8 million apart. That is about the size of the
+  ceiling (4.6 million) but only 2 to 3 times the A/A, so the direction is clear and the amount is not.
+* Both fit the timings: an effect of 0.15% to 0.22% of instructions cannot show in wall time on this orb.
+
+Data: `data/zne1/cgab-{master,master2,branch}-{lobsters,shipit}.json`.
 
 ## Which applies
 
