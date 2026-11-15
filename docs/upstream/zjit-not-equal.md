@@ -311,8 +311,8 @@ iteration of the whole program, on the release builds the timings use (master tw
 | shipit, branch | 3,709,858,229 | −0.224% |
 
 * shipit: the branch runs 7.4 to 8.3 million instructions fewer per iteration than the two master runs, which
-  differ by 0.9 million. That is 8 to 9 times the A/A and a little over half of the ceiling (14.6 million); the
-  rest is what the specialized arms and their type checks still cost.
+  differ by 0.9 million. That is 8 to 9 times the A/A and a little over half of the ceiling (14.6 million). Where
+  the other half goes was not measured.
 * lobsters: 3.7 to 5.5 million fewer, with the two master runs 1.8 million apart. That is about the size of the
   ceiling (4.6 million) but only 2 to 3 times the A/A, so the direction is clear and the amount is not.
 * Both fit the timings: an effect of 0.15% to 0.22% of instructions cannot show in wall time on this orb.
