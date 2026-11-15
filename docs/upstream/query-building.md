@@ -30,7 +30,7 @@ Two exact levers exist, both in association scopes:
   [`merges.txt`](data/query-building/merges.txt)). **MB1** skips it with one guard; it is built as
   [`thomasklemm/merge-blank-relation`](https://github.com/thomasklemm/rails/tree/thomasklemm/merge-blank-relation):
   building `post.comments.where(approved: true)` is 15–21% faster in the interpreter, YJIT and ZJIT (A/A ≤ 2.1%),
-  and whole association-heavy requests run 0.4–1.4% fewer instructions (A/A ≤ 0.11%). Two independent reviews
+  and whole association-heavy requests run 0.4–1.4% fewer instructions (A/A ≤ 0.06%). Two independent reviews
   (claude-code, opus) found the first head inexact (it kept duplicate predicates); the final head is identical to
   main on all three probes (352, 1,477 and 1,728 cases).
 
@@ -250,7 +250,7 @@ what an exact change could remove, as a share of a request.
 | # | Opportunity | Share (mean; range) | Exact? | Verdict | Would bring |
 |---|---|---|---|---|---|
 | 1 | Association reader: don't build the scope when the statement cache serves the read | 2.0%; 0.3–3.7% | yes, with a `global_current_scope` guard (matthewd's nested-through case) | **covered**: [rails/rails#59212](https://github.com/rails/rails/pull/59212), open since 2026-10-20, our census comment on it | up to 2.0% (upper bound: also counts scope building on the skip path); Fizzy 3.7%, Mastodon 3.0% |
-| 2 | Skip merging a blank relation into a relation without conditions (`scope_for_association` of a model without a default scope, 39–48% of all merges) | 0.2–0.5% (7–25 merges × 5–6 objects per request) | yes, with two guards: a null relation and a receiver with where or having conditions (whose duplicate predicates `WhereClause#merge` drops) keep going through the merge | **built: MB1** (reviews: nits) | 0.4–1.4% of instructions on association-heavy pages (Fizzy card 1.40%, Lobsters story 0.88%, Campfire message 0.81%, Fizzy card list 0.39%); nothing on list pages that preload; overlaps #59212 on the cached reader path |
+| 2 | Skip merging a blank relation into a relation without conditions (`scope_for_association` of a model without a default scope, 39–48% of all merges) | 0.2–0.5% (7–25 merges × 5–6 objects per request) | yes, with two guards: a null relation and a receiver with where or having conditions (whose duplicate predicates `WhereClause#merge` drops) keep going through the merge | **built: MB1** (reviews: nits) | 0.4–1.4% of instructions on association-heavy pages (Fizzy card 1.39%, Campfire message 0.78%, Lobsters story 0.61%, Fizzy card list 0.39%); nothing on list pages that preload; overlaps #59212 on the cached reader path |
 | 3 | A bound relation template per association (build `WHERE fk = ?` once per reflection, bind each owner) | `AssociationScope.scope` 2.3%, `CollectionProxy#scope` 1.6%; after #1 and #2 about 1–1.5% | not as a small change: a Relation is mutable, carries extensions and current scopes, and every proxy method would need the bound copy | structural; a design for a maintainer discussion, not a PR | 1–1.5% |
 | 4 | Statement cache for `exists?`/`count`/`size` on a bare association | count and `exists?` origins 1.0%, proxy predicates (`any?`, `many?`, `include?`) 0.2–0.3% each | partly: the same gates as the reader plus `distinct`, `group`, counter caches and loaded targets | possible follow-up after #59212; most calls come with extra conditions | ≤0.5% |
 | 5 | Cache constant scopes (`scope :published, -> { where(published: true) }`) and default scopes | `_exec_scope` 0.96%, `default_scope` 0.52% | no: a lambda can read the time, `Current`, its arguments or the owner, and Rails can't tell. The last two default-scope fixes (#59234, #59237) were exactly that bug | rejected; an opt-in API would be a feature, and the merge into the caller's relation remains | — |
@@ -312,12 +312,16 @@ having, `none`, a collection proxy, a proxy chain, an association, after `.arel`
 `readonly(false)`, a proxy, another model's where). It compares SQL, `null_relation?`, value keys, extension methods,
 loaded records, raised errors and the receiver. On the head every case is identical to main (the first head's
 `UnmodifiableRelation` difference for `merge!` into a loaded or Arel-built receiver with a where clause is gone too,
-since such a receiver has conditions). The reviewers' own probes (1,477 and 1,728 cases on the first head) found
-nothing beyond these two kinds.
+since such a receiver has conditions). On the first head, the reviewers' own probes (1,477 and 1,728 cases) found
+the duplicate predicates, the `UnmodifiableRelation` change for `merge!` and, in claude-code's, a contrived subclass
+that overrides the private `values_for_merge` to return `{}` while it has a where clause. On the final head only that
+private override differs (claude-code) and opus's probe finds 0 differences.
 
-**Tests.** The commit adds `test_merge_relation_without_values` to `merging_test.rb`: it fails when either the
-null-relation or the conditions guard is removed. Active Record on the head (Ruby 4.0.9): `rake test:sqlite3`
-10,376 runs, 0 failures, 0 errors; `rake test:postgresql` (PostgreSQL 17) 11,299 runs, 0 failures, 0 errors.
+**Tests.** The commit adds `test_merge_relation_without_values` to `merging_test.rb`: it fails when any one of the
+null-relation, where or having guards is removed, and passes with main's `merger.rb`. Active Record on 0008bb1b1b,
+whose `merger.rb` is the head's (Ruby 4.0.9): `rake test:sqlite3` 10,376 runs, 0 failures, 0 errors;
+`rake test:postgresql` (PostgreSQL 17) 11,299 runs, 0 failures, 0 errors. On the head: `merging_test.rb` 45 runs,
+0 failures, and claude-code's `rake test:sqlite3` 10,376 runs, 0 failures.
 
 **benchmark-ips** ([`qb/mb1_ips.rb`](../../bench/upstream/qb/mb1_ips.rb), [`mb1_ips.sh`](../../bench/upstream/qb/mb1_ips.sh)):
 a `has_many` chain on SQLite in memory, one pinned core, best of 5 per tree, trees in a rotating palindromic order,
@@ -335,21 +339,24 @@ Measured on 0008bb1b1b, whose `merger.rb` is the final head's. Objects per chain
 −1.7% and −1.0% in a reviewer's run, within noise. No ZJIT loss.
 
 **Whole requests, Callgrind** ([`data/query-building/callgrind.txt`](data/query-building/callgrind.txt)), interpreter,
-fixed heap, instructions and objects per request. MB1 cells are on 0008bb1b1b (the final head's `merger.rb`); the
-two list pages that didn't move on the first head (5dd4ff1529, which skipped strictly more merges) weren't rerun.
+fixed heap, instructions and objects per request. MB1 cells are on 0008bb1b1b (the final head's `merger.rb`). The
+first three rows have base and A/A rerun in the same round as MB1; the other rows compare with the first round's
+base, because Lobsters' base drifted −0.26% (−26 objects) between rounds, which is larger than their A/A.
 
 | Workload | base | A/A | MB1 | change | objects |
 |---|---:|---:|---:|---:|---:|
-| Fizzy GET card | 78,483,514 | +0.11% | 77,381,214 | −1.40% | 13,098 → 12,928 |
-| Campfire POST message (turbo_stream) | 44,504,393 | +0.01% | 44,145,665 | −0.81% | 10,948 → 10,892 |
-| Lobsters GET story | 105,787,363 | +0.10% | 104,859,799 | −0.88% | 20,995 → 20,884 |
-| Fizzy GET cards (100), CE2 | 209,725,160 | +0.01% | 208,903,012 | −0.39% | 23,779 → 23,649 |
-| Lobsters GET newest (100), CE2 (first head) | 504,713,905 | −0.01% | 504,505,161 | −0.04% | 88,277 → 88,259 |
-| Blog GET articles (100), CE2 (first head) | 136,469,614 | −0.02% | 136,493,803 | +0.02% | 18,386 → 18,390 |
+| Fizzy GET card | 78,468,304 | +0.05% | 77,381,214 | −1.39% | 13,105 → 12,928 |
+| Campfire POST message (turbo_stream) | 44,494,709 | −0.01% | 44,145,665 | −0.78% | 10,942 → 10,892 |
+| Lobsters GET story | 105,507,216 | −0.06% | 104,859,799 | −0.61% | 20,969 → 20,884 |
+| Fizzy GET cards (100), CE2 (first-round base) | 209,725,160 | +0.01% | 208,903,012 | −0.39% | 23,779 → 23,649 |
+| Lobsters GET newest (100), CE2 (first head, first round) | 504,713,905 | −0.01% | 504,505,161 | −0.04% | 88,277 → 88,259 |
+| Blog GET articles (100), CE2 (first head, first round) | 136,469,614 | −0.02% | 136,493,803 | +0.02% | 18,386 → 18,390 |
 
-The first head cut 0.4 points more on Fizzy's card page and Campfire's message: those pages also merge a blank
-relation into a receiver that already has conditions (`AssociationScope#add_constraints`, 1.6–2.0 per request),
-which the final head leaves to the full merge.
+Against first-round bases, the first head (5dd4ff1529, which skipped strictly more merges) gave −1.79%, −1.18% and
+−0.85% on the same three pages, so the cross-round comparison overstated MB1 by up to 0.27 points (Lobsters). The
+first head skipped 15–17 more objects per request on Fizzy's card and Campfire's message, about what the 1.6–2.0
+blank merges per request into receivers with conditions (`AssociationScope#add_constraints`) cost at 6 objects each;
+the final head leaves those to the full merge. That is consistent with the gap but not measured in one round.
 
 Mastodon's `GET status context` is rejected twice for path changes, not for MB1. On the first head its base and A/A
 differed by 26% (9,075 against 10,382 objects). On 0008bb1b1b base and A/A agree (49,813,542 and +0.12%), but the
@@ -358,9 +365,10 @@ without Valgrind, 20 requests after 20 warmups, twice per tree: 10,379 objects p
 MB1, the same in both runs. The list pages that preload their associations (Blog's and Lobsters' index pages)
 build few association scopes, so they don't move.
 
-The YJIT Callgrind cells for Fizzy's card page (base, MB1, A/A; pinned Valgrind 3.19.0 with the 512 MiB brk
-reservation, since stock Valgrind overflows the brk segment under YJIT) are still running; they will be added to
-this section and to `callgrind.txt`.
+Under YJIT (Fizzy GET card, 150 warmup requests, pinned Valgrind 3.19.0 with the 512 MiB brk reservation, since
+stock Valgrind overflows the brk segment under YJIT): base 47,575,998 Ir and 13,195 objects per request, A/A
++0.04% with 0 blocks compiled in either window. MB1 gives 47,053,090 (−1.10%, 13,029 objects), but its window
+compiled 18 YJIT blocks, so the cohort fails the JIT-flat gate and is recorded, not claimed and not rerun.
 
 **Whole requests, benchmark-ips under YJIT**, first head 5dd4ff1529 ([`qb/page_ips.sh`](../../bench/upstream/qb/page_ips.sh)): one census
 request in process, 400 warmup requests, then benchmark-ips for 5 s, one pinned core, best of 5 per tree, base twice
@@ -382,9 +390,9 @@ queue item, each with its own differential probe:
 | 5dd4ff1529 (skip every merge without values) | `changes`: duplicate where/having predicates kept (88 of 1,477 probe cases); null guard untested | `changes`: same dedup finding (84 of 1,728 cases); null guard untested; a YJIT `.to_a` +7.6% line didn't reproduce |
 | 0008bb1b1b (receiver-without-conditions guard, test) | `nits`: identical to main except a private `values_for_merge` override; the null-relation assertion didn't reach the early return | — |
 | ef6f3ff44b (assertion uses `Post.all`) | — | `nits`: 0 of 1,728 cases differ; the having guard was untested |
-| ee000f1671 (having assertion) | pending confirm with the body | pending confirm with the body |
+| ee000f1671 (having assertion) | `nits` with the body (78ea3ab): every body number matches the cells; nits on wording and on comparing second-round cells with a first-round base | `approve` with the body (78ea3ab): 0 of 1,728 cases differ, each guard removal fails the test, every body number checked against the cells |
 
-Both reviewers' fixes were applied: each of the three guards now fails the test when removed (lines 19, 21 and 22).
+Both reviewers' fixes were applied: removing any one of the three guards now fails the test.
 Neither found a problem with the code on 0008bb or later, and both expect a maintainer to take it. No Fable review
 was commissioned: the change touches merging, not scoping, and the two probes already cover `scoping`, default
 scopes, STI, through chains and `unscoped`.

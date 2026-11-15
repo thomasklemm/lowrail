@@ -32,3 +32,14 @@ base|mastodon|GET status context|interp|49813542|10382|0
 aa|mastodon|GET status context|interp|49872632|10382|0
 branch|mastodon|GET status context|interp|50644564|10557|0
 # mastodon GET status context, objects counted without Valgrind (request_ir.rb, 20 requests after 20 warmups), two runs per tree: base 207588 and 207589, branch 207188 and 207189 (10,379 -> 10,359 per request)
+## third round: same-round base and A/A for the second-round branch cells (interp)
+base|fizzy|GET card|interp|78468304|13105|0
+base|campfire|POST message (turbo_stream)|interp|44494709|10942|0
+base|lobsters|GET story|interp|105507216|20969|0
+aa|fizzy|GET card|interp|78505564|13105|0
+aa|campfire|POST message (turbo_stream)|interp|44490926|10940|0
+aa|lobsters|GET story|interp|105444816|20974|0
+## YJIT (Valgrind 3.19.0 ~/valgrind-brk, 150 warmups, --smc-check=all); branch 0008bb1b1b window compiled 18 blocks: rejected, not JIT-flat
+base|fizzy|GET card|yjit|47575998|13195|0
+branch|fizzy|GET card|yjit|47053090|13029|18
+aa|fizzy|GET card|yjit|47596395|13195|0
