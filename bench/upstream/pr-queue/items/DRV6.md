@@ -13,7 +13,7 @@ depends_on: []
 impact: "Makes main's CI green again: sqlcipher on Windows (red on every run since MSYS2 dropped the mingw64 package) and two intermittent test failures. Unblocks green CI for DRV1/DRV2 and every other PR."
 rank: 19
 risky: false
-state: ready
+state: merged
 pr: 773
 note: "Bundles DRV3, DRV4 and DRV5 (Thomas, 2026-11-06, to stay within the per-repo cap) as three commits cherry-picked unchanged onto 48091f4694 (patch-identical to 3966a52d0f, bfdb863448, ccd8267678). Fork CI with all three: 134/134 green, run 42213230921."
 passes:
