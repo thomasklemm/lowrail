@@ -257,6 +257,36 @@ sorted by name. `tag` escapes exactly what `hidden_field_tag` escaped, since `hi
 `tag :input` and `tag_options`: html_safe top-level keys and SafeBuffer `to_param` values are written unescaped on
 main and K6 alike (with `"` still replaced), nested keys are escaped because the name is interpolated.
 
+## benchmark-ips for the body (2026-11-15)
+
+DECISIONS' "Benchmark tables in the project's own format" (2026-11-14) came after the first body: a Rails body leads
+with a short benchmark-ips script and its before/after output, Callgrind is at most one supporting line, and the
+master × ZJIT numbers (above) stay here. The body's script is [`ips.rb`](ips.rb): two `button_to` calls on
+`ActionView::Base.empty`, with 1 and 20 params. Ruby 4.0.9 with YJIT, benchmark-ips 2.15.1, run by
+[`ab1_review.sh`](../p_map/ab1_review.sh) on core 1 of a 2-core orb (`taskset -c 1`): five rounds of main
+(`50c54eed06`), K6 (`aba0855fcf`) and main again (the A/A), interleaved; each label's best round by
+[`ab1_best.rb`](../p_map/ab1_best.rb). Raw: [results/ips.txt](results/ips.txt).
+
+| best of 5, YJIT | main | A/A (main again) | K6 | change |
+|---|---:|---:|---:|---:|
+| `button_to`, 1 param | 11.88 µs | 12.02 µs (−1.1%) | 10.30 µs | 1.15× |
+| `button_to`, 20 params | 99.15 µs | 101.99 µs (−2.8%) | 69.66 µs | 1.42× |
+
+Every round agrees: K6 against main in the same round is 1.10–1.23× with 1 param and 1.42–1.55× with 20; main again
+against main is 0.89–1.04× and 0.86–1.06×. Main's and K6's best rounds are all round 3, whose lines the body quotes. The
+interpreter Callgrind rows above say the same (−11.7% and −29.2%), and the body keeps one supporting line from them:
+120 fewer objects per call with 20 params (368 → 248 in the interpreter, 369 → 249 with YJIT) and within 3% of the
+instructions before #50312 (+2.6% interpreter, +0.7% YJIT).
+
+```
+Trees ~/ips/{main,k6} (worktrees at 50c54eed06 and aba0855fcf), each with ~/ips/gem-TREE/Gemfile:
+  gem "activesupport"/"activemodel"/"activerecord"/"actionview"/"actionpack", path: "~/ips/TREE/<gem>"
+  gem "sqlite3"; gem "benchmark-ips"            (BUNDLE_PATH=~/ips/gems)
+BUNDLE_PATH=~/ips/gems bench/upstream/p_map/ab1_review.sh $(mise where ruby@4.0.9)/bin ~/ips/gem-main ~/ips/gem-k6 \
+  --yjit bench/upstream/k6/ips.rb > bench/upstream/k6/results/ips.txt
+ruby bench/upstream/p_map/ab1_best.rb bench/upstream/k6/results/ips.txt
+```
+
 ## Not done
 
 * Sol/Astra: the opus pass stands in for Sol (DECISIONS); `risky: false`, so no Astra.

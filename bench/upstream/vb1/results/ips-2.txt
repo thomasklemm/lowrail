@@ -1,0 +1,75 @@
+=== base --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.754k (± 5.8%) i/s  (173.80 μs/i) -     29.223k in   5.078962s
+                         dup a post     40.120k (± 1.5%) i/s   (24.93 μs/i) -    203.149k in   5.063536s
+=== candidate --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      6.132k (± 6.6%) i/s  (163.09 μs/i) -     31.208k in   5.089619s
+                         dup a post     39.519k (± 5.7%) i/s   (25.30 μs/i) -    198.240k in   5.016285s
+=== base2 --yjit round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.889k (± 4.1%) i/s  (169.81 μs/i) -     29.472k in   5.004544s
+                         dup a post     41.417k (± 4.0%) i/s   (24.14 μs/i) -    209.682k in   5.062750s
+=== base --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.752k (± 5.3%) i/s  (173.85 μs/i) -     29.300k in   5.093924s
+                         dup a post     40.231k (± 5.4%) i/s   (24.86 μs/i) -    202.884k in   5.042961s
+=== candidate --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      6.344k (± 3.7%) i/s  (157.62 μs/i) -     31.824k in   5.016184s
+                         dup a post     34.942k (±10.6%) i/s   (28.62 μs/i) -    176.773k in   5.058978s
+=== base2 --yjit round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.474k (± 8.8%) i/s  (182.69 μs/i) -     27.750k in   5.069523s
+                         dup a post     38.503k (± 3.8%) i/s   (25.97 μs/i) -    193.501k in   5.025566s
+=== base --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.578k (± 8.4%) i/s  (179.29 μs/i) -     28.126k in   5.042726s
+                         dup a post     40.633k (± 2.4%) i/s   (24.61 μs/i) -    205.163k in   5.049172s
+=== candidate --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      6.154k (± 1.8%) i/s  (162.50 μs/i) -     30.957k in   5.030558s
+                         dup a post     43.225k (± 4.0%) i/s   (23.13 μs/i) -    219.076k in   5.068317s
+=== base2 --yjit round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.966k (± 2.8%) i/s  (167.62 μs/i) -     30.240k in   5.068842s
+                         dup a post     40.506k (± 2.1%) i/s   (24.69 μs/i) -    202.752k in   5.005478s
+=== base --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.730k (± 3.0%) i/s  (174.53 μs/i) -     28.800k in   5.026531s
+                         dup a post     38.702k (± 6.3%) i/s   (25.84 μs/i) -    195.550k in   5.052760s
+=== candidate --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      6.604k (± 2.6%) i/s  (151.43 μs/i) -     33.495k in   5.071992s
+                         dup a post     42.954k (± 3.5%) i/s   (23.28 μs/i) -    216.060k in   5.030028s
+=== base2 --yjit round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.973k (± 3.3%) i/s  (167.43 μs/i) -     30.450k in   5.098188s
+                         dup a post     41.543k (± 5.4%) i/s   (24.07 μs/i) -    211.406k in   5.088788s
+=== base --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      6.154k (± 4.9%) i/s  (162.49 μs/i) -     31.300k in   5.085977s
+                         dup a post     40.352k (± 3.3%) i/s   (24.78 μs/i) -    204.967k in   5.079425s
+=== candidate --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.671k (± 8.9%) i/s  (176.35 μs/i) -     28.608k in   5.045034s
+                         dup a post     39.652k (± 5.4%) i/s   (25.22 μs/i) -    198.904k in   5.016247s
+=== base2 --yjit round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+load 10 posts, read every attribute      5.749k (± 3.3%) i/s  (173.93 μs/i) -     28.900k in   5.026672s
+                         dup a post     39.125k (± 1.5%) i/s   (25.56 μs/i) -    198.156k in   5.064684s
