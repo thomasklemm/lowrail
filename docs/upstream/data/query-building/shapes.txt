@@ -1,0 +1,190 @@
+== blog census
+  2.0/req  relation load
+           SELECT "articles".* FROM "articles" ORDER BY "articles"."created_at" DESC LIMIT ?
+  2.0/req  preload
+           SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?+)
+  1.0/req  calc exists?
+           SELECT ? AS one FROM "articles" LIMIT ?
+  1.0/req  calc calculate
+           SELECT COUNT(*) FROM "comments" WHERE "comments"."article_id" = ?
+== campfire census
+  3.0/req  calc exists?
+           SELECT ? AS one FROM "bans" WHERE "bans"."ip_address" = ? LIMIT ?
+  3.0/req  association reader (reflection scope) ActionText::RichText#embeds_attachments
+           SELECT "active_storage_attachments".* FROM "active_storage_attachments" WHERE "active_storage_attachments"."record_id" = ? AND "active_storage_attachments"."record_type" = ? AND "active_storage_attachments"."name" = ?
+  3.0/req  association reader (reflection scope) Message#attachment_attachment
+           SELECT "active_storage_attachments".* FROM "active_storage_attachments" WHERE "active_storage_attachments"."record_id" = ? AND "active_storage_attachments"."record_type" = ? AND "active_storage_attachments"."name" = ? LI
+  3.0/req  relation find_by
+           SELECT "rooms".* FROM "rooms" INNER JOIN "memberships" ON "rooms"."id" = "memberships"."room_id" WHERE "memberships"."user_id" = ? AND "rooms"."id" = ? LIMIT ?
+  2.0/req  relation find_by!
+           SELECT "memberships".* FROM "memberships" WHERE "memberships"."user_id" = ? AND "memberships"."room_id" = ? LIMIT ?
+  2.0/req  relation load (named scope) scope app/models/boost.rb:5
+           SELECT "boosts".* FROM "boosts" WHERE "boosts"."message_id" = ? ORDER BY "boosts"."created_at" ASC
+  2.0/req  relation find_by scope GEMS/rails-50c54eed065b/activerecord/lib/active_record/enum.rb:378,app/models/user/bot.rb:5
+           SELECT "users".* FROM "users" WHERE "users"."status" = ? AND "users"."role" = ? AND "users"."id" = ? AND "users"."bot_token" = ? LIMIT ?
+  1.0/req  relation find
+           SELECT "messages".* FROM "messages" WHERE "messages"."room_id" = ? AND "messages"."id" = ? LIMIT ?
+  1.0/req  association reader (reflection scope) Message#rich_text_body
+           SELECT "action_text_rich_texts".* FROM "action_text_rich_texts" WHERE "action_text_rich_texts"."record_id" = ? AND "action_text_rich_texts"."record_type" = ? AND "action_text_rich_texts"."name" = ? LIMIT ?
+  1.0/req  relation last scope app/models/message.rb:17,GEMS/rails-50c54eed065b/actiontext/lib/action_text/attribute.rb:89
+           SELECT "messages".* FROM "messages" WHERE "messages"."room_id" = ? ORDER BY "messages"."created_at" DESC LIMIT ?
+  1.0/req  calc pluck
+           SELECT "users"."name" FROM "users" INNER JOIN "memberships" ON "users"."id" = "memberships"."user_id" WHERE "memberships"."room_id" = ? AND ?=?
+  1.0/req  relation load (named scope) scope GEMS/rails-50c54eed065b/activerecord/lib/active_record/enum.rb:378,app/models/user/bot.rb:5
+           SELECT "users".* FROM "users" INNER JOIN "memberships" ON "users"."id" = "memberships"."user_id" WHERE "memberships"."room_id" = ? AND "users"."status" = ? AND "users"."role" = ? AND "users"."id" != ?
+== fizzy census
+127.0/req  cache store (Solid Cache)
+           SELECT "solid_cache_entries"."key", "solid_cache_entries"."value" FROM "solid_cache_entries" WHERE "solid_cache_entries"."key_hash" IN (?+)
+ 11.0/req  find_by fallback (value is a Array)
+           SELECT "sessions".* FROM "sessions" WHERE "sessions"."id" = ? LIMIT ?
+ 11.0/req  relation find_by
+           SELECT "users".* FROM "users" WHERE "users"."identity_id" = ? AND "users"."account_id" = ? LIMIT ?
+ 11.0/req  calc exists?
+           SELECT ? AS one FROM "account_imports" WHERE "account_imports"."account_id" = ? AND "account_imports"."status" IN (?+) LIMIT ?
+  9.0/req  preload
+           SELECT "active_storage_attachments".* FROM "active_storage_attachments" WHERE "active_storage_attachments"."record_type" = ? AND "active_storage_attachments"."name" = ? AND "active_storage_attachments"."record_id" IN (?+
+  9.0/req  association reader (reflection scope) Comment#rich_text_body
+           SELECT "action_text_rich_texts".* FROM "action_text_rich_texts" WHERE "action_text_rich_texts"."record_id" = ? AND "action_text_rich_texts"."record_type" = ? AND "action_text_rich_texts"."name" = ? LIMIT ?
+  7.0/req  find_by fallback (current_scope)
+           SELECT "filters".* FROM "filters" WHERE "filters"."creator_id" = ? AND "filters"."params_digest" = ? LIMIT ?
+  7.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "boards" INNER JOIN "accesses" ON "boards"."id" = "accesses"."board_id" WHERE "accesses"."user_id" = ? LIMIT ?) AS subquery_for_count
+  5.0/req  calc pluck
+           SELECT "rowid" FROM "search_records" WHERE "search_records"."searchable_type" = ? AND "search_records"."searchable_id" = ? LIMIT ?
+  5.0/req  relation find_by!
+           SELECT "cards".* FROM "cards" INNER JOIN "boards" ON "cards"."board_id" = "boards"."id" INNER JOIN "accesses" ON "boards"."id" = "accesses"."board_id" WHERE "accesses"."user_id" = ? AND "cards"."number" = ? LIMIT ?
+  5.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "accounts" INNER JOIN "users" ON "accounts"."id" = "users"."account_id" WHERE "users"."identity_id" = ? LIMIT ?) AS subquery_for_count
+  5.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "users" WHERE "users"."identity_id" = ? LIMIT ?) AS subquery_for_count
+  4.0/req  preload
+           SELECT "users".* FROM "users" WHERE "users"."id" IN (?+)
+  4.0/req  relation last scope app/models/column/positioned.rb:5
+           SELECT "columns".* FROM "columns" WHERE "columns"."board_id" = ? AND (position < ?) ORDER BY "columns"."position" DESC LIMIT ?
+  4.0/req  relation first scope app/models/column/positioned.rb:5
+           SELECT "columns".* FROM "columns" WHERE "columns"."board_id" = ? AND (position > ?) ORDER BY "columns"."position" ASC LIMIT ?
+== lobsters census
+ 12.0/req  calc pluck
+           SELECT "keystores"."value" FROM "keystores" WHERE "keystores"."key" = ? LIMIT ?
+ 10.0/req  preload
+           SELECT "users".* FROM "users" WHERE "users"."id" IN (?+)
+  8.0/req  calc exists?
+           SELECT ? AS one FROM "tags" INNER JOIN "tag_filters" ON "tags"."id" = "tag_filters"."tag_id" WHERE "tag_filters"."user_id" = ? AND "tags"."id" = ? LIMIT ?
+  4.0/req  calc pluck
+           SELECT "comments"."id" FROM "comments" WHERE LOWER("comments"."short_id") = LOWER(?+) LIMIT ?
+  4.0/req  calc pluck
+           SELECT "comments"."id" FROM "comments" WHERE LOWER("comments"."token") = LOWER(?+) LIMIT ?
+  4.0/req  calc exists?
+           SELECT ? AS one FROM "comments" WHERE "comments"."short_id" = ? LIMIT ?
+  4.0/req  calc pluck
+           SELECT "stories"."id" FROM "stories" WHERE "stories"."merged_story_id" = ?
+  4.0/req  relation first scope app/models/story.rb:72
+           SELECT "stories".* FROM "stories" WHERE "stories"."short_id" = ? ORDER BY "stories"."id" ASC LIMIT ?
+  4.0/req  calc calculate
+           SELECT COUNT(*) FROM "notifications" WHERE "notifications"."user_id" = ? AND "notifications"."read_at" IS NULL
+  4.0/req  relation load
+           SELECT "saved_stories".* FROM "saved_stories" WHERE "saved_stories"."user_id" = ? AND "saved_stories"."story_id" IN (?+)
+  4.0/req  relation load
+           SELECT "hidden_stories".* FROM "hidden_stories" WHERE "hidden_stories"."user_id" = ? AND "hidden_stories"."story_id" IN (?+)
+  4.0/req  relation load
+           SELECT "votes".* FROM "votes" WHERE "votes"."user_id" = ? AND "votes"."story_id" IN (?+) AND "votes"."comment_id" IS NULL ORDER BY "votes"."id" ASC LIMIT ?
+  4.0/req  preload
+           SELECT "tags".* FROM "tags" WHERE "tags"."id" IN (?+) ORDER BY tags.is_media desc, tags.tag
+  4.0/req  preload
+           SELECT "taggings".* FROM "taggings" WHERE "taggings"."story_id" IN (?+)
+  4.0/req  preload
+           SELECT "domains".* FROM "domains" WHERE "domains"."id" IN (?+)
+== mastodon census
+  8.0/req  preload
+           SELECT "accounts"."id", "accounts"."actor_type", "accounts"."also_known_as", "accounts"."attribution_domains", "accounts"."avatar_content_type", "accounts"."avatar_description", "accounts"."avatar_file_name", "accounts".
+  5.0/req  relation take scope app/models/account.rb:175,app/models/account.rb:176
+           SELECT "accounts"."id", "accounts"."actor_type", "accounts"."also_known_as", "accounts"."attribution_domains", "accounts"."avatar_content_type", "accounts"."avatar_description", "accounts"."avatar_file_name", "accounts".
+  5.0/req  relation load
+           SELECT "bookmarks"."status_id" FROM "bookmarks" WHERE "bookmarks"."status_id" IN (?+) AND "bookmarks"."account_id" = ?
+  5.0/req  relation load
+           SELECT "favourites"."status_id" FROM "favourites" WHERE "favourites"."status_id" IN (?+) AND "favourites"."account_id" = ?
+  5.0/req  relation load
+           SELECT "statuses"."reblog_of_id" FROM "statuses" WHERE "statuses"."reblog_of_id" IN (?+) AND "statuses"."account_id" = ?
+  5.0/req  calc exists?
+           SELECT ? AS one FROM "webauthn_credentials" WHERE "webauthn_credentials"."user_id" = ? LIMIT ?
+  4.0/req  preload scope app/models/status.rb:130,GEMS/discard-2.0.0/lib/discard/model.rb:17
+           SELECT "statuses".* FROM "statuses" WHERE "statuses"."deleted_at" IS NULL AND "statuses"."id" IN (?+) ORDER BY "statuses"."id" DESC
+  4.0/req  relation load
+           SELECT "conversation_mutes"."conversation_id" FROM "conversation_mutes" WHERE "conversation_mutes"."conversation_id" IN (?+) AND "conversation_mutes"."account_id" = ?
+  4.0/req  preload
+           SELECT "users"."id", "users"."account_id", "users"."age_verified_at", "users"."approved", "users"."chosen_languages", "users"."confirmation_sent_at", "users"."confirmation_token", "users"."confirmed_at", "users"."consume
+  4.0/req  preload
+           SELECT "account_stats".* FROM "account_stats" WHERE "account_stats"."account_id" IN (?+)
+  4.0/req  preload
+           SELECT "tags".* FROM "tags" WHERE "tags"."id" IN (?+)
+  4.0/req  preload
+           SELECT "quotes".* FROM "quotes" WHERE "quotes"."status_id" IN (?+)
+  4.0/req  preload
+           SELECT "preview_cards_statuses".* FROM "preview_cards_statuses" WHERE "preview_cards_statuses"."status_id" IN (?+)
+  4.0/req  preload
+           SELECT "tagged_objects".* FROM "tagged_objects" WHERE "tagged_objects"."status_id" IN (?+)
+  4.0/req  preload
+           SELECT "mentions".* FROM "mentions" WHERE "mentions"."silent" = ? AND "mentions"."status_id" IN (?+)
+== blog ce2
+  4.0/req  relation load
+           SELECT "articles".* FROM "articles" ORDER BY "articles"."created_at" DESC LIMIT ?
+  4.0/req  preload
+           SELECT "comments".* FROM "comments" WHERE "comments"."article_id" IN (?+)
+  2.0/req  calc exists?
+           SELECT ? AS one FROM "articles" LIMIT ?
+== fizzy ce2
+102.0/req  cache store (Solid Cache)
+           SELECT "solid_cache_entries"."key", "solid_cache_entries"."value" FROM "solid_cache_entries" WHERE "solid_cache_entries"."key_hash" IN (?+)
+  6.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "boards" INNER JOIN "accesses" ON "boards"."id" = "accesses"."board_id" WHERE "accesses"."user_id" = ? LIMIT ?) AS subquery_for_count
+  3.0/req  preload
+           SELECT "active_storage_attachments".* FROM "active_storage_attachments" WHERE "active_storage_attachments"."record_type" = ? AND "active_storage_attachments"."name" = ? AND "active_storage_attachments"."record_id" IN (?+
+  3.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT DISTINCT "cards".* FROM "cards" INNER JOIN "boards" ON "cards"."board_id" = "boards"."id" INNER JOIN "accesses" ON "boards"."id" = "accesses"."board_id" LEFT OUTER JOIN "card_not_nows" AS "no
+  3.0/req  relation load (named scope) scope app/models/card.rb:35,GEMS/rails-50c54eed065b/actiontext/lib/action_text/attribute.rb:89
+           SELECT DISTINCT "cards".* FROM "cards" INNER JOIN "boards" ON "cards"."board_id" = "boards"."id" INNER JOIN "accesses" ON "boards"."id" = "accesses"."board_id" LEFT OUTER JOIN "card_not_nows" AS "not_now" ON "not_now"."c
+  3.0/req  find_by fallback (value is a Array)
+           SELECT "sessions".* FROM "sessions" WHERE "sessions"."id" = ? LIMIT ?
+  3.0/req  relation find_by
+           SELECT "users".* FROM "users" WHERE "users"."identity_id" = ? AND "users"."account_id" = ? LIMIT ?
+  3.0/req  calc exists?
+           SELECT ? AS one FROM "account_imports" WHERE "account_imports"."account_id" = ? AND "account_imports"."status" IN (?+) LIMIT ?
+  3.0/req  find_by fallback (current_scope)
+           SELECT "filters".* FROM "filters" WHERE "filters"."creator_id" = ? AND "filters"."params_digest" = ? LIMIT ?
+  2.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "accounts" INNER JOIN "users" ON "accounts"."id" = "users"."account_id" WHERE "users"."identity_id" = ? LIMIT ?) AS subquery_for_count
+  2.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "users" WHERE "users"."identity_id" = ? LIMIT ?) AS subquery_for_count
+  2.0/req  relation load (named scope) scope app/models/user/role.rb:10,app/models/user/named.rb:5
+           SELECT "users".* FROM "users" WHERE "users"."account_id" = ? AND "users"."active" = ? AND "users"."role" IN (?+) ORDER BY lower(name)
+  2.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "users" WHERE "users"."account_id" = ? AND "users"."active" = ? AND "users"."role" IN (?+) LIMIT ?) AS subquery_for_count
+  2.0/req  relation load (named scope) scope app/models/tag.rb:11
+           SELECT "tags".* FROM "tags" WHERE "tags"."account_id" = ? ORDER BY lower(title)
+  2.0/req  calc calculate
+           SELECT COUNT(*) FROM (SELECT ? AS one FROM "tags" WHERE "tags"."account_id" = ? LIMIT ?) AS subquery_for_count
+== lobsters ce2
+  3.0/req  calc pluck
+           SELECT "keystores"."value" FROM "keystores" WHERE "keystores"."key" = ? LIMIT ?
+  3.0/req  relation load (named scope) scope app/models/story.rb:76,app/models/story.rb:69
+           SELECT "stories".* FROM "stories" WHERE ("stories"."is_deleted" = FALSE OR "stories"."user_id" = ?) ORDER BY "stories"."id" DESC LIMIT ? OFFSET ?
+  3.0/req  preload
+           SELECT "hidden_stories".* FROM "hidden_stories" WHERE "hidden_stories"."story_id" IN (?+)
+  3.0/req  preload
+           SELECT "story_texts".* FROM "story_texts" WHERE "story_texts"."id" IN (?+)
+  3.0/req  preload
+           SELECT "users".* FROM "users" WHERE "users"."id" IN (?+)
+  3.0/req  preload
+           SELECT "domains".* FROM "domains" WHERE "domains"."id" IN (?+)
+  3.0/req  preload
+           SELECT "taggings".* FROM "taggings" WHERE "taggings"."story_id" IN (?+)
+  3.0/req  preload
+           SELECT "tags".* FROM "tags" WHERE "tags"."id" IN (?+) ORDER BY tags.is_media desc, tags.tag
+  3.0/req  relation load
+           SELECT "votes".* FROM "votes" WHERE "votes"."user_id" = ? AND "votes"."story_id" IN (?+) AND "votes"."comment_id" IS NULL ORDER BY "votes"."id" ASC LIMIT ?
+  3.0/req  relation load
+           SELECT "hidden_stories".* FROM "hidden_stories" WHERE "hidden_stories"."user_id" = ? AND "hidden_stories"."story_id" IN (?+)
+  3.0/req  relation load
+           SELECT "saved_stories".* FROM "saved_stories" WHERE "saved_stories"."user_id" = ? AND "saved_stories"."story_id" IN (?+)
+  3.0/req  calc calculate
+           SELECT COUNT(*) FROM "notifications" WHERE "notifications"."user_id" = ? AND "notifications"."read_at" IS NULL

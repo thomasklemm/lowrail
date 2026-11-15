@@ -151,6 +151,7 @@ module PMap
 
   # Heavier pages than the census set: list pages and JSON lists near 100 records.
   def extra_ops(name, c, ops)
+    return [] if c.ce2?
     w = Census4Workloads
     case name
     when "fizzy"

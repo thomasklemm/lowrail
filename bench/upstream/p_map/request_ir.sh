@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Callgrind Ir per request: (Ir(N) - Ir(0)) / N for one census workload.
-#   [PMAP_RAILS=SPEC] request_ir.sh APP WORKLOAD MODE [N]   MODE: interp | yjit
+#   [PMAP_RAILS=SPEC] [PMAP_CORPUS=censuspmap] request_ir.sh APP WORKLOAD MODE [N]   MODE: interp | yjit
 # Prints: APP|WORKLOAD|MODE|Ir per request|objects per request|blocks compiled in the N window
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -8,7 +8,7 @@ app=$1 workload=$2 mode=$3 n=${4:-200}
 flag=() smc=()
 if [ "$mode" = yjit ]; then flag=(--yjit) smc=(--smc-check=all); fi
 run() {
-  CENSUS_MODE=$([ "$mode" = yjit ] && echo yjit || echo interpreter) "$here/hx" censuspmap "$app" \
+  CENSUS_MODE=$([ "$mode" = yjit ] && echo yjit || echo interpreter) "$here/hx" "${PMAP_CORPUS:-censuspmap}" "$app" \
     valgrind --tool=callgrind --collect-atstart=no --toggle-collect=rb_ary_cycle "${smc[@]}" --callgrind-out-file=/dev/null \
     ruby -rbundler/setup "${flag[@]}" "$here/request_ir.rb" "$app" "$workload" "$1" 2>&1
 }
