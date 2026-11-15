@@ -13,12 +13,12 @@ bundled PR (queue item [FLK1](../../bench/upstream/pr-queue/items/FLK1.md)), one
   activejob integration job fails in 330 of 1,816 runs on main, but it is soft-failed and never turns a build red.
 - **The flake that turned the most builds red is outside Rails too:** activemodel `RailtieTest` (17 red builds) hits
   a Ruby bug with `require` inside a Ractor. Main already guards against it.
-- **Fixed in the PR (two commits), with before and after rates:**
-  - `ServerTimingTest`, three tests: compared the header with `sleep` lengths under fixed tolerances. 188/200 failing
+- **Fixed in the PR (two commits, head 866942ff69), with before and after rates:**
+  - `ServerTimingTest`, three tests: compared the header with `sleep` lengths under fixed tolerances. 189/200 failing
     before, 0/200 after, on GitHub runners with the CPU throttled the way a container limited to 2 CPUs is.
   - `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor): the Ractor proxy unpinned
-    a different main pool than it pinned, so the writing pool stayed pinned for later tests. 7/60 failing before,
-    0/60 after, with the three tests involved in random order; both CI seeds fail on main and pass with the fix.
+    a different main pool than it pinned, so the writing pool stayed pinned for later tests. 14/120 failing before,
+    0/120 after on GitHub runners, with the three tests involved in random order; both CI seeds fail on main and pass with the fix.
 - **Already fixed, or with an open fix by someone else:** 9 more flakes, listed below. `TestUnconnectedAdapter` has
   an open fix (rails/rails#59174) that matthewd steered; our first fix for it was the approach he turned down, so we
   dropped it.
@@ -92,6 +92,8 @@ one name, the sum for siblings, each event for different names).
 | GitHub runner, cgroup `cpu.max` 2 CPUs, 4 busy processes (run 43711709644) | 188/200 | 0/200 |
 | GitHub runner, idle and `stress-ng --cpu 8` without a quota (run 43710141822) | 0/600 | 0/600 |
 
+The before rate depends on the host: 97/100 in our orb (`docker --cpus 2`), 188/200 on GitHub runners, 133/200 and 51/100 in the two review orbs (cgroup `cpu.max` 2 CPUs with 4 busy processes); every after run was 0. The CI failures reported 61.41 to 85.16 ms against 40 ± 20 (builds 134657, 134681, 134967, 135436, 136058). The GitHub after side of runs 43710141822 and 43711709644 checked out the branch by name (an earlier head with the same actionpack change); run 43721043566 pins it to the reviewed head 866942ff69: 189/200 before (93 + 96), 0/200 after; the PR body cites this run.
+
 The failure needs the thread stalled for longer than the tolerance, which a CPU quota does and fair scheduling on an
 unthrottled host does not. Mutation checks: summing nested same-name events fails the same-name test, and
 subtracting children of another name fails the different-name test, so the new tests still catch the bugs #58800
@@ -130,7 +132,7 @@ pool ends with no busy connection.
 | orb, full `sqlite3:test:ractor` seeds 1, 2 and full `test:sqlite3` seed 6870 | – | 0 failures, 0 errors |
 
 7/60 matches the share of class orders (1 in 6) that run the pinning test, then the dirtying test, then the retry
-test. GitHub loop: run 43715792755 (`async_retry_order`).
+test. GitHub loops: run 43715792755 (7/60 and 7/60 before, 0/120 after) and run 43721043566 pinned to 866942ff69 (14/120 before, 0/120 after; cited in the PR body).
 
 ## Already fixed or owned by someone else
 
