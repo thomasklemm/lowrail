@@ -5,9 +5,9 @@ kind: fix
 area: Date#<=>
 reviewer:
 branch: thomasklemm/cmp-nan
-head: "8a34d5a595324d561665326e975ff8ab45f816c0"
+head: "1c273d40ccfea71f8a9db0fc3fe9b4111cd8fb73"
 base: master
-built_on: "2c48b11dde0fd173e61a91c10ea27ec616c09474"
+built_on: "6f788dda79b4de7cad2c0e03e7f2c7ed74bbbfbb"
 depends_on: []
 stacked_on:
 alternative_of:
@@ -16,7 +16,7 @@ rank:
 risky: false
 state: ready
 pr: 199
-note: "Opened before the queue tracked it; item added 2026-11-14 so status watches it. Reworked 2026-11-14 onto 2c48b11 as two commits (Date#<=> nil for NaN with -1/0/1 normalization kept; step/upto/downto use rb_cmpint), force-pushed with a lease on f1d893f834. No pass yet on 8a34d5a; an independent review follows. Record: docs/upstream/contributions.md."
+note: "2026-11-15 (red-PR sweep): conflicted with master 6f788dd (wtn's tests, which add two DateTime offset asserts at the end of test__compare). Rebased: kept both sides' added lines unchanged (master's asserts, then our normalization assert and test__compare_nan); our +/- lines and both messages unchanged, commit 2 identical. Force-pushed with a lease on 8a34d5a595; rake compile test on Ruby 4.0.7: 156 tests, 0 failures. Upstream CI shows action_required: the build workflow waits for a maintainer to approve it, as on every earlier head. Opened before the queue tracked it; item added 2026-11-14 so status watches it. Reworked 2026-11-14 onto 2c48b11 as two commits (Date#<=> nil for NaN with -1/0/1 normalization kept; step/upto/downto use rb_cmpint), force-pushed with a lease on f1d893f834. No pass yet on 8a34d5a; an independent review follows. Record: docs/upstream/contributions.md."
 passes:
   - {reviewer: skeptic, head: "58d4ef92967425aeb3a3d9170086115dacafb0d1", date: 2026-11-14, verdict: changes, open: "cmp_gen correct, -1/0/1/nil kept. Must fix: step/upto/downto pass Date#<=> to FIX2INT, so a NaN limit gives TypeError on 64-bit Linux and, by the Ruby 4.0 header, an endless downto where int and long are the same size; fixed as a second commit. Nits applied: drop the ajd local, DateTime case at noon UTC. Title nit kept to match the PR."}
   - {reviewer: sol, head: "f1e916ea731a3417d1fc2d8c9d06966c3b85c512", date: 2026-11-14, verdict: changes, open: "C code and commit split approved. Applied: step(limit, 1) assertions, yielding blocks flunk instead of {}, commit 2 message states only the verified TypeError, body says the comparisons in step/upto/downto raise. Not applied, by Thomas: asserting d < Float::NAN (Comparable, dropped on purpose)."}
