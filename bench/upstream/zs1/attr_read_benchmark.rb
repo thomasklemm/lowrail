@@ -27,5 +27,5 @@ end
 ROWS = Item.connection.select_all(Item.where(id: 1..10).arel)
 
 run_benchmark(20) do
-  500.times { Item._load_from_sql(ROWS).each { |r| Item.read_all(r) } }
+  5_000.times { Item._load_from_sql(ROWS).each { |r| Item.read_all(r) } }
 end

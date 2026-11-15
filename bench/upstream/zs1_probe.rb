@@ -313,6 +313,6 @@ end
 
 if ENV["PROBE_STATS"] == "1" && defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
   stats = RubyVM::ZJIT.stats
-  keys = stats.keys.grep(/blockarg|block_arg|invokeblock_not_spec|compiled_iseq_count|^side_exit_count|unhandled_block/i)
+  keys = stats.keys.grep(/blockarg|block_arg|symbol_block|invokeblock_not_spec|compiled_iseq_count|^side_exit_count|unhandled_block/i)
   warn keys.to_h { [_1, stats[_1]] }.select { _2 != 0 }.inspect
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # ruby-bench micro for ZS1 (docs/upstream/zjit-symbol-block.md): a Symbol block argument sent to a Ruby method
-# that yields once and to Array#map over three elements. Copy to <ruby-bench>/benchmarks/symbol-block/benchmark.rb.
+# that yields once and to Array#map (defined in Ruby when a JIT is on) over three elements. Copy to <ruby-bench>/benchmarks/symbol-block/benchmark.rb.
 require_relative "../../lib/harness/loader"
 
 def one(x) = yield x
