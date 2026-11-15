@@ -87,6 +87,10 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Rails doesn't take JIT workarounds** (skipkayhil closing rails/rails#59803 and #59811, 2026-11-15: "Let's fix
   this in the JITs?"). A Rails change whose win comes mainly from how YJIT or ZJIT compile a construct (Symbol block
   args, `!=`) goes to the JIT instead. Rails perf PRs need a clear win in the interpreter or in allocations on their own.
+  Thomas, 2026-11-15: JITs should handle these patterns, so each one becomes a ZJIT PR on ruby/ruby that cites the
+  closed Rails PR and the maintainer's comment as the pattern to optimize (ZNE1 for #59811, ZS1 for #59803). Where
+  someone already has a branch, the PR builds on it with their commits and authorship kept and credits them in the body.
+  GitHub's cross-reference links it from the Rails PR, so no comment goes there.
 * **YJIT is in maintenance mode** (XrXr on
   [ruby#19664](https://github.com/ruby/ruby/pull/19664#pullrequestreview-5752852916); k0kubun on
   [ruby#19671](https://github.com/ruby/ruby/pull/19671#issuecomment-6596469897)). JIT performance and
