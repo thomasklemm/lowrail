@@ -1,0 +1,32 @@
+== main
+generator returning nil: 3 calls per page
+generator returning false: 3 calls per page
+generator returning "s": 1 calls per page
+generator returning nil, then "late":
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">
+next plain page:
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">
+== p336
+generator returning nil: 3 calls per page
+generator returning false: 3 calls per page
+generator returning "s": 1 calls per page
+generator returning nil, then "late":
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">
+next plain page:
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">
+== im1
+generator returning nil: 4 calls per page
+generator returning false: 4 calls per page
+generator returning "s": 1 calls per page
+generator returning nil, then "late":
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js" nonce="late">
+next plain page:
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js" nonce="late">
+== comb
+generator returning nil: 3 calls per page
+generator returning false: 3 calls per page
+generator returning "s": 1 calls per page
+generator returning nil, then "late":
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">
+next plain page:
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js">

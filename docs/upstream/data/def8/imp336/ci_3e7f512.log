@@ -1,0 +1,9 @@
+Ruby 3.1, Rails 6.1, sprockets: 106 runs, 366 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.0, sprockets: 106 runs, 366 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.0, propshaft: 106 runs, 362 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.1, sprockets: 106 runs, 368 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.1, propshaft: 106 runs, 364 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.2, sprockets: 106 runs, 368 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.1, Rails 7.2, propshaft: 106 runs, 364 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.2, Rails 6.1, sprockets: 106 runs, 367 assertions, 0 failures, 0 errors, 0 skips
+Ruby 3.2, Rails 7.0, sprockets: 106 runs, 367 assertions, 0 failures, 0 errors, 0 skips

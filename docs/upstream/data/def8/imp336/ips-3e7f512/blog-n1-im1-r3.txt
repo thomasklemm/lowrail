@@ -1,0 +1,5 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+javascript_importmap_tags     1.948k i/100ms
+Calculating -------------------------------------
+javascript_importmap_tags     19.110k (± 7.8%) i/s   (52.33 μs/i) -     97.400k in   5.096697s

@@ -16,3 +16,8 @@ blog50 yjit main 1732387 objects=644.075 compiled=0
 blog50 yjit aa 1729847 objects=644.075 compiled=0
 blog50 yjit im1 1733909 objects=644.075 compiled=0
 blog50 yjit comb 1652187 objects=544.075 compiled=0
+# After the first review round: 3e7f512 (the nonce read once and passed down), same setup.
+blog interp comb-3e7f512 496890 objects=115.02 compiled=0
+blog yjit comb-3e7f512 301218 objects=115.075 compiled=0
+blog50 interp comb-3e7f512 2722941 objects=544.02 compiled=0
+blog50 yjit comb-3e7f512 1651978 objects=544.075 compiled=0

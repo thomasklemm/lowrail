@@ -277,62 +277,86 @@ IM1 approach right; both asked for changes.
 ### IMP336: IM1 folded into #336
 
 Thomas, 2026-11-15: instead of a second PR on the same helper, IM1 goes into our open
-[rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) as its second commit. The combined head is
-[`8806855`](https://github.com/thomasklemm/importmap-rails/commit/88068558d3e47031b0925fe3e8fe014b04017f91) on
-[`thomasklemm/preload-tags-combined`](https://github.com/thomasklemm/importmap-rails/tree/thomasklemm/preload-tags-combined):
-IM1's `863322e` cherry-picked onto #336's `cf3d933`, so #336's branch only fast-forwards. The one conflict was the
-helper: IM1 moved the package lookup and the tag block into `_generate_module_preload_tags`, which now carries #336's
-block. Against `863322e` the tree differs only by #336's lines; against `cf3d933` only by IM1's. Not squashed: the two
-commits are separate concerns, each correct alone, and a squash would rewrite the commit #336 already shows. Queue
+[rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) as its second commit, on
+[`thomasklemm/preload-tags-combined`](https://github.com/thomasklemm/importmap-rails/tree/thomasklemm/preload-tags-combined),
+so #336's branch only fast-forwards from `cf3d933`. Current head:
+[`3e7f512`](https://github.com/thomasklemm/importmap-rails/commit/3e7f5128d4d7fbd20f912cc0af8cc12641672da7). Queue
 item: [IMP336](../../bench/upstream/pr-queue/items/IMP336.md), with the new title and body; IM1 is `superseded`.
+
+* **First head `8806855`**: IM1's `863322e` cherry-picked onto `cf3d933`. The one conflict was the helper: IM1 moved
+  the package lookup and the tag block into `_generate_module_preload_tags`, which now carries #336's block.
+* **`3e7f512`, after the first review round**: the nonce is read once in `javascript_importmap_module_preload_tags`
+  and passed down. Rails' `content_security_policy_nonce` calls the generator again on every read while the stored
+  nonce is nil or `false`, so with the decision and the render reading separately (IM1 as reviewed, and `8806855`) a
+  generator that returns nil and then a string cached `nonce="late"` and served it to later pages without a nonce, and
+  each page called a nil or `false` generator 4 times instead of main's 3
+  ([`imp336_generator_probe.rb`](../../bench/upstream/def8/imp336_generator_probe.rb), [output](data/def8/imp336/generator_probe.txt):
+  main, `cf3d933` and `3e7f512` agree, `863322e` differs). claude-code found it; its test is in the commit (fails on
+  `8806855`'s helper, passes on main's). The leak was in IM1 already; nothing of IM1 was posted.
+* **Not squashed**: the commits are separate concerns, each green alone (`cf3d933` 104 runs), importmap-rails merges
+  with merge commits so both stay bisectable, and a squash would rewrite the commit #336 already shows. Both reviewers
+  agree.
 
 **Does #336 still earn its place?** With the cache, its lines run only on pages with a CSP nonce and on a cache miss.
 Per `javascript_importmap_tags` call with a nonce generator (Callgrind, [`imp336_run_ir.sh`](../../bench/upstream/def8/imp336_run_ir.sh),
 200 calls, GC off, every YJIT window compiled no blocks; [raw](data/def8/imp336/ir.txt)):
 
-| Modules, mode | main Ir (objects) | A/A | IM1 alone | combined |
-|---|---:|---:|---:|---:|
-| 7, interpreter | 502,831 (129) | +0.05% | +0.56% (129) | −0.73% (115) |
-| 7, YJIT | 312,688 (129) | −0.16% | +0.17% (129) | −3.53% (115) |
-| 50, interpreter | 2,765,135 (644) | +0.01% | +0.16% (644) | −1.54% (544) |
-| 50, YJIT | 1,732,387 (644) | −0.15% | +0.09% (644) | −4.63% (544) |
+| Modules, mode | main Ir (objects) | A/A | IM1 alone | `8806855` | `3e7f512` |
+|---|---:|---:|---:|---:|---:|
+| 7, interpreter | 502,831 (129) | +0.05% | +0.56% (129) | −0.73% (115) | −1.18% (115) |
+| 7, YJIT | 312,688 (129) | −0.16% | +0.17% (129) | −3.53% (115) | −3.67% (115) |
+| 50, interpreter | 2,765,135 (644) | +0.01% | +0.16% (644) | −1.54% (544) | −1.53% (544) |
+| 50, YJIT | 1,732,387 (644) | −0.15% | +0.09% (644) | −4.63% (544) | −4.64% (544) |
 
-IM1 alone costs a little on this path (it reads the nonce once more to decide); #336 removes two objects per module and
-more than that cost. In benchmark-ips the nonce path is within the A/A either way, so the body claims only the objects
-and "the same speed within noise". Verdict: keep it.
+IM1 alone costs a little on this path (its second nonce read); #336 removes two objects per module and more than that
+cost. Verdict: keep it. The slowest input the reviewers found is a nonce page whose map preloads nothing: +17% on
+`8806855` (+2.4k instructions, the second read), +2.3% for one module; `3e7f512` drops the second read.
 
-**benchmark-ips** of `javascript_importmap_tags` ([`imp336_ips.rb`](../../bench/upstream/def8/imp336_ips.rb), the body's
-script; `bin/rails runner` in production, YJIT, Ruby 4.0.9, `taskset -c 1` on a 2-thread orb with nothing else running,
-five rounds interleaving main, a second run of main as A/A, IM1 alone (nonce only) and the combined head; best of 5;
-[raw](data/def8/imp336/ips/)). Apps: a new app from Rails 8.1.4.1 (7 preloaded modules) and the same app with 43 more
-Stimulus controllers (50, fewer than Campfire's pins). A first run was discarded because one combined-nonce round
-wrote no output.
+**benchmark-ips** of `javascript_importmap_tags` ([`imp336_ips.rb`](../../bench/upstream/def8/imp336_ips.rb); with
+`NONCE` unset it runs the body's script; `bin/rails runner` in production, YJIT, Ruby 4.0.9, `taskset -c 1` on a
+2-thread orb with nothing else running, five rounds interleaving main, a second run of main as A/A, IM1 alone (nonce
+only) and the combined head; best of 5). Apps: a new app from Rails 8.1.4.1 (7 preloaded modules) and the same app
+with 43 more Stimulus controllers (50; Writebook preloads about 36, Campfire about 90, Fizzy about 100).
 
 | Modules, nonce | main | A/A | IM1 alone | combined | change |
 |---|---:|---:|---:|---:|---:|
-| 7, none | 22,860 i/s | 22,380 (−2.1%) | | 93,413 | 4.1× |
+| `3e7f512` ([raw](data/def8/imp336/ips-3e7f512/)), 7, none | 22,784 i/s | 22,786 (+0.0%) | | 90,026 | 4.0× |
+| 7, nonce | 20,073 | 19,411 (−3.3%) | 19,110 (−4.8%) | 20,386 | +1.6% |
+| 50, none | 4,165 | 4,225 (+1.4%) | | 77,263 | 18.6× |
+| 50, nonce | 3,797 | 3,714 (−2.2%) | 3,776 (−0.6%) | 4,061 | +7.0% |
+| `8806855` ([raw](data/def8/imp336/ips-8806855/)), 7, none | 22,860 | 22,380 (−2.1%) | | 93,413 | 4.1× |
 | 7, nonce | 19,816 | 19,560 (−1.3%) | 18,994 (−4.1%) | 19,845 | +0.1% |
 | 50, none | 4,344 | 4,275 (−1.6%) | | 78,130 | 18× |
 | 50, nonce | 3,777 | 3,821 (+1.2%) | 3,800 (+0.6%) | 3,819 | +1.1% |
 
-Objects per call ([`imp336_allocs.rb`](../../bench/upstream/def8/imp336_allocs.rb), YJIT): without a nonce 120 → 37
-(7 modules) and 592 → 36 (50); with one 129 → 115 and 644 → 544. IM1 alone matches main with a nonce and the combined
-head without one.
+A first `8806855` run was discarded because one combined-nonce round wrote no output. The reviewers measured the
+nonce path at +5.4% and +7.5% (claude-code) and +5.1% and +15.0% (opus, Rails main app); never slower, so the body
+says "no slower" and shows only the rows without a nonce.
 
-**Exactness.** [`im1_probe.rb`](../../bench/upstream/def8/im1_probe.rb) (20 cases) prints identical output on main,
-`cf3d933`, `863322e` and `8806855`. [`imp336_probe.rb`](../../bench/upstream/def8/imp336_probe.rb) renders a custom
-map with `enable_integrity!`, an integrity with quotes and angle brackets, a pin without one and a CDN URL, through
-both helpers and `javascript_module_preload_tag` (with no paths, too), under nil, `"n0"`, `false`, `""`, nil
-again and `"n1"` nonces: identical on main and `8806855` (132 lines). Suite: 105 runs, 363 assertions, 0 failures
-on seeds 1, 4242 and 31337 (Rails 8.1.1, Ruby 4.0.9). Author and committer Thomas, no trailers, `diff --check` clean,
-no comments added besides IM1's `# :nodoc:`.
+Objects per call ([`imp336_allocs.rb`](../../bench/upstream/def8/imp336_allocs.rb), YJIT): without a nonce 120 → 37
+(7 modules) and 592 → 36 (50); with one 129 → 115 and 644 → 544.
+
+**Exactness.** [`im1_probe.rb`](../../bench/upstream/def8/im1_probe.rb) (20 cases, 147 lines) and
+[`imp336_probe.rb`](../../bench/upstream/def8/imp336_probe.rb) (a custom map with `enable_integrity!`, an integrity
+with quotes and angle brackets, a pin without one and a CDN URL, through both helpers and
+`javascript_module_preload_tag`, under nil, `"n0"`, `false`, `""`, nil and `"n1"` nonces; 132 lines) print the same on
+main and every combined head; the reviewers' wider probes (up to 1,758 lines) agree. Suite on `3e7f512`: 106 runs, 365
+assertions, 0 failures on seeds 1, 4242 and 31337 (Rails 8.1.1, Ruby 4.0.9). Author and committer Thomas, no
+trailers, `diff --check` clean, no comments added besides IM1's `# :nodoc:`.
 
 **CI.** #336's seven red checks on `cf3d933` are the Ruby 3.1 jobs, which failed in setup-ruby before any test ran
 (`Unavailable version 3.1.7 for ruby on ubuntu-26.04`, 10-22). ruby/ruby-builder published 3.1.7 for ubuntu-26.04
 on 10-31, so a new run gets past that step. The fork has never run Actions (its workflow needs a one-time enable in the
-UI), so the matrix was replayed locally ([`imp336_ci_matrix.sh`](../../bench/upstream/def8/imp336_ci_matrix.sh): each
+UI), so the matrix is replayed locally ([`imp336_ci_matrix.sh`](../../bench/upstream/def8/imp336_ci_matrix.sh): each
 job's gemfile, lockfile removed, `bundle exec rake`; Ruby 3.1.7 from ruby-builder's ubuntu-24.04 build, 3.2–3.4 and
-4.0 from mise; [log](data/def8/imp336/ci_8806855.log)).
+4.0 from mise): `8806855` 16 jobs green before the fix ([log](data/def8/imp336/ci_8806855.log)), `3e7f512`
+[log](data/def8/imp336/ci_3e7f512.log).
+
+**Reviews** (passes in the item): claude-code and opus on `8806855`, both `changes`. claude-code: the double nonce read
+above (fixed in `3e7f512`). opus, body only: "every new Rails app" is false for `--api` and bundler apps (now "the
+default layout of a new Rails app"), and the nonce rows only showed no change (cut, with the `NONCE` switch). Optional
+and not done: an assertion for `javascript_module_preload_tag` with a nonce (dropping its `nonce:` passes the suite
+today), which belongs to #336's commit.
 
 ## Leads not built
 

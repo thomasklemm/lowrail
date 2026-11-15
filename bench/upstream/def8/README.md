@@ -33,4 +33,4 @@ posts, 5 comments each), `gem "vernier", "1.12.0"` and `gem "benchmark-ips"` wit
   CSP nonce) through `imp336_run_ips.sh` (core 1, five interleaved rounds of main, its A/A, IM1 alone and the
   combined head, apps with 7 and 50 preloaded modules) and `imp336_table.rb`; `imp336_run_ir.sh` and `imp336_ir.rb`
   (Callgrind per call with a nonce), `imp336_allocs.rb`, `imp336_probe.rb` (integrity and nonce differential) and
-  `imp336_ci_matrix.sh` (the upstream CI matrix replayed locally).
+  `imp336_ci_matrix.sh` (the upstream CI matrix replayed locally), `imp336_generator_probe.rb` (generator calls per page and a nonce generated late).
