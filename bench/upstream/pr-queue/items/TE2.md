@@ -62,4 +62,4 @@ after:  content_tag    345.707k (±10.1%) i/s    (2.89 μs/i) -      1.763M in  
 
 ---
 
-<sub>Found while measuring which calls leave YJIT's compiled code on real Rails pages ([record](https://github.com/thomasklemm/lowrail/blob/0273cc5c22f4725822b36e88da6d5e3fbe609b5e/docs/upstream/vm-share.md)).</sub>
+<sub>Found while measuring which calls leave YJIT's compiled code on real Rails pages ([record](https://github.com/thomasklemm/lowrail/blob/e66da8c7c380401d58beeaa576c39f19c227ae3c/docs/upstream/vm-share.md)).</sub>
