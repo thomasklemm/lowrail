@@ -4,7 +4,7 @@ repo: ruby/ruby
 kind: perf
 area: ZJIT, opt_neq
 reviewer: "tekknolagi (polymorphic dispatch, #15949) or nozomemein (BasicObject#!= builtin, #19162)"
-branch: thomasklemm/zjit-opt-neq-polymorphic
+branch: zjit-opt-neq-polymorphic
 head: "18d33e8a24"
 base: master
 built_on: "fc4cd8872b"
@@ -14,9 +14,11 @@ alternative_of:
 impact: "a `!=` with more than one receiver class (nil or Symbol, Integer or nil, model classes) is specialized per class instead of staying a dynamic send; 4.6x on a tag_options-shaped micro (4.4x to 5.1x in three rounds); lobsters -10,323 and shipit -30,074 polymorphic sends per iteration, app times within A/A"
 rank: 3
 risky: true
-state: in-review
+state: reviewed
 pr:
 note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. claude-code (nits), opus (nits) and fable (approve) have no must-fix on head 18d33e8a24, so Thomas can open it as a draft once the thermos gate is passed or waived; arm64 is green (ARM1, T-01a1e00a-99a3-7183-9a14-acf3268bdc46: zjit-test 2,241 of 2,241 on 18d33e8a24; probe, btest and Active Model on 52d41cc992, same code). Earlier head 52d41cc992 is on fork branch zjit-polymorphic-neq; 18d33e8a24 changes one test, one test comment and the commit message. The body shows the three-way run_benchmarks output with the master-against-master columns by the coordinator's instruction for this item. The diff is 259 changed lines, 229 of them tests and snapshots, so the thermos gate applies or needs a waiver. Record: docs/upstream/zjit-not-equal.md."
+waived:
+  - {reviewer: thermos, head: "18d33e8a24", by: "coordinator, 2026-11-15", reason: "26 changed lines in hir.rs, the rest tests and snapshots; three independent passes on the exact head (Fable adversarial on exactness and invalidation, 22 attack scripts in 9 configurations and about 1,280 fuzz run pairs), a guard-removal check against the new tests, and arm64 coverage by ARM1. Optional nits left as is: the commit message's invalidation paragraph (would need a new head) and the 169-word body"}
 passes:
   - {reviewer: claude-code, orb: T-01a1e017-0b4b-7405-a5c9-6e381e0a03bb, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "body only: over 150 words, two tables, a sentence that contradicted its table; code, tests, probe and 14 guard-breaking scripts without a finding; commit-message wording nits applied in 18d33e8a24"}
   - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "superfluous first sentence of the comment in test_opt_neq_polymorphic_refined, fixed in 18d33e8a24; 13 scripts and 7 mutations without a finding; body too long"}
