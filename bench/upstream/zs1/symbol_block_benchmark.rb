@@ -6,17 +6,18 @@ require_relative "../../lib/harness/loader"
 
 def one(x) = yield x
 
-def sends(array)
-  i = 0
-  while i < 1_000_000
-    one(i, &:itself)
-    array.map(&:itself)
-    i += 1
-  end
+def sends(i, array)
+  one(i, &:itself)
+  array.map(&:itself)
 end
 
 ARRAY = [1, 2, 3].freeze
 
+# The loop stays outside `sends`: a method that holds the loop is called once per iteration and compiled too late.
 run_benchmark(20) do
-  sends(ARRAY)
+  i = 0
+  while i < 1_000_000
+    sends(i, ARRAY)
+    i += 1
+  end
 end

@@ -5,8 +5,14 @@
 generic block invocation. ZS1 was to make ZJIT handle it and prepare one ruby/ruby PR
 ([DECISIONS](../DECISIONS.md), ruby/ruby exception of 2026-11-15).
 
-**Result: measured, not built, nothing opened.** Both halves already exist as unmerged branches of Shopify's ZJIT
-contributors, without a PR, and the half that was ours to build is too small:
+**Status: reopened the same day and built.** The first round below measured Rails main with VB1
+(rails/rails#59803) applied and closed ZS1 without building. skipkayhil then closed VB1 with "Let's fix this in
+the JITs?", which changes the target, and ZS1 became a ruby/ruby PR on top of Rafael França's branch: see
+[Reopened](#reopened-the-send-side-as-a-rubyruby-pr-2026-11-15). Everything from here to that section is the
+first round's record, kept as written.
+
+**First-round result: measured, not built, nothing opened.** Both halves already exist as unmerged branches of
+Shopify's ZJIT contributors, without a PR, and the half that was ours to build is too small:
 
 * The send to an ISEQ callee, which is what a change shaped like ruby/ruby#18180 covers, costs at most
   **0.12%** of instructions on railsbench, lobsters, shipit and a blog page, on Rails 8.1 and on Rails main with
@@ -16,8 +22,8 @@ contributors, without a PR, and the half that was ours to build is too small:
   k0kubun's row 17 covers) and 0.43% from `rb_yield` in C methods (covered by nobody).
 * These are ceilings: the whole generic dispatch, with nothing subtracted for what a specialized send still costs.
 
-**Decision (2026-11-15): ZS1 is closed without building.** The send side is not built, rows 17 and 56 are not
-ported, and the C-level yield is not taken up as a bet ([recommendation](#recommendation)).
+**First-round decision (2026-11-15, superseded): ZS1 is closed without building.** The send side is not built,
+rows 17 and 56 are not ported, and the C-level yield is not taken up as a bet ([recommendation](#recommendation)).
 
 ## Existing work (checked 2026-11-15)
 
@@ -307,3 +313,521 @@ WARMUP_ITRS=150 MEASURE_ITRS=2 FLAT_MAX_WINDOWS=20 bench/upstream/zs1_run.sh cg 
 ruby bench/upstream/zs1_report.rb count ~/w/cnt81/zjit-lobsters.json
 ruby bench/upstream/zs1_report.rb cg ~/w/cg81/a-lobsters.json
 ```
+
+## Reopened: the send side as a ruby/ruby PR (2026-11-15)
+
+skipkayhil closed rails/rails#59803 (VB1) with ["Let's fix this in the
+JITs?"](https://github.com/rails/rails/pull/59803#issuecomment-6895904455), so Rails main keeps
+`cast_value(&:value!)` and `map(&:deep_dup)`, and the numbers above (Rails main with VB1) no longer describe the
+target. Thomas: JITs should handle these patterns, so ZS1 becomes a ruby/ruby PR built on Rafael França's branch
+([DECISIONS](../DECISIONS.md)). Queue item: [ZS1](../../bench/upstream/pr-queue/items/ZS1.md). Branch:
+`thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg`, head `89e2da1571` (earlier heads
+`dcd4bd2b79`, `7eddd8bfce`, `09d8e5308e`), on master `3be2b028a7`.
+
+### Rails main without VB1: counts and ceilings
+
+Rails main `8217632cf8`, Ruby master `3be2b028a7` plus the measurement patch, ZJIT, 150 warmup iterations. Counts
+per iteration:
+
+| per iteration | railsbench | lobsters | shipit | blog page |
+| --- | ---: | ---: | ---: | ---: |
+| `send_block_arg_not_nil` | 115,090 | 42,496 | 166,762 | 61,502 |
+| Symbol block sends to an ISEQ callee | 32,467 | 17,343 | 34,810 | 12,000 |
+| Symbol block sends to a C callee | 9,974 | 8,864 | 14,937 | 4,501 |
+| yields to a Symbol handler | 15,248 | 19,066 | 30,737 | 12,501 |
+
+VB1's `cast_value(&:value!)` is what moved: Symbol sends to ISEQ callees were 9,987 / 2,588 / 8,017 per iteration
+with VB1 applied.
+
+Callgrind ceilings, share of all instructions of an iteration (fixed heap, JIT-flat windows, run a; the whole
+generic region, nothing subtracted for what a specialized path still costs):
+
+| share of an iteration | railsbench | lobsters | shipit | blog page |
+| --- | ---: | ---: | ---: | ---: |
+| generic send, ISEQ callee | 0.304% | 0.213% | 0.435% | 0.178% |
+| generic send, C callee | 0.091% | 0.107% | 0.172% | 0.071% |
+| `yield` to a Symbol (invokeblock) | 0.116% | 0.225% | 0.375% | 0.101% |
+| `rb_yield` to a Symbol from C | 0.149% | 0.204% | 0.311% | 0.271% |
+
+The blog page failed the JIT-flat gate in run a. A generic Symbol send costs 360–392 instructions per send, a
+yield to a Symbol 630–797. The send side together is 0.25–0.61% of an iteration, which clears the 0.3% bar on
+railsbench, lobsters and shipit.
+
+### Rafael's branch on current master
+
+`Shopify/ruby:zjit-perf/blockarg-direct-send` has 11 commits and is 1,463 commits behind master. Ten of them
+landed upstream as ruby/ruby#18725, so only `3f17d8950e` "ZJIT: Directly send non-nil block arguments" had to be
+ported. It conflicts with master in `zjit/src/hir.rs` (19 hunks), `codegen.rs`, the snapshots and
+`test/ruby/test_zjit.rb` (which master replaced by the Rust test harness). The port, `e353bbed96`, is local only
+and keeps what the commit does: block arguments of every kind (Symbol, Proc, nil, forwarded block parameter) go
+through `rb_vm_block_handler_from_blockarg()` to ISEQ and C callees. It is a port, not a rewrite: the mechanism and
+most of the text survive.
+
+What the port removes per iteration, counted on Rails main (`ZS1_SYMBOL_ONLY=1` restricts the same build to static
+Symbols, as a proxy for the narrowed PR):
+
+| per iteration | railsbench | lobsters | shipit | blog page |
+| --- | ---: | ---: | ---: | ---: |
+| `send_block_arg_not_nil`, master | 115,090 | 42,496 | 166,762 | 61,502 |
+| Symbols only | 82,623 | 25,509 | 132,082 | 49,501 |
+| full port | 0 | 0 | 54 | 0 |
+| dynamic sends, master | 913,616 | 768,317 | 1,782,551 | 784,011 |
+| Symbols only | 871,175 | 742,789 | 1,724,383 | 767,505 |
+| full port | 715,516 | 707,846 | 1,587,949 | 694,505 |
+| `invokeblock_not_specialized`, all three | 78,069 | 57,281 | 90,435 | 44,004 |
+
+Neither variant reaches the `yield` in `cast_value`: `invokeblock_not_specialized` does not move, and that part
+needs k0kubun's row 17. Row 17 (`ed1c0f97b2`) does not apply to master (20 conflict hunks in 4 files), so there is
+no second PR, and rows 17 and 56 stay with him.
+
+The forwarded block parameter (`foo(&block)` with the block param proxy) is most of what the full port removes
+beyond Symbols. It is row 7 of Shopify/ruby#1039, assigned to k0kubun, and Proc and nil block arguments to C callees
+are row 42. The PR leaves both out.
+
+### The change
+
+Scope: a send whose block argument is a static Symbol, to ISEQ and C callees. Two commits on master `3be2b028a7`:
+"ZJIT: Send Symbol block arguments directly" (+241 −77 in 11 files, Rafael França as author, Thomas as co-author)
+and "ZJIT: Test sends with a Symbol block argument" (Thomas).
+
+* `type_specialize` accepts the block argument when its type is `StaticSymbol` (a literal) or when the profile says
+  so, then behind `GuardType StaticSymbol` with recompilation. It does so only while `Symbol#to_proc` is basic
+  and no box has been created with `Ruby::Box.new`, and for a C callee only when the call has no splat or
+  keywords, so no guard is emitted in front of a send that stays dynamic. It strips the block argument from the
+  argument list and records `BlockHandler::BlockArgSymbol(symbol)`.
+* When the send commits to `SendDirect`, `CCallWithFrame` or `CCallVariadic`,
+  `gen_patch_points_for_symbol_block_arg` puts `PatchPoint RootBoxOnly` and `PatchPoint MethodRedefined(Symbol,
+  to_proc)` in front of the callee's own patch point.
+* Codegen calls `rb_zjit_symbol_block_handler(cfp, symbol, to_proc_cme)` before the frame push and uses the result
+  as the callee frame's block handler. The function returns `Qundef` when the basic flag of the watched
+  `Symbol#to_proc` entry is cleared, and compiled code then side-exits on the frame state of the original send
+  (`UnhandledBlockArg`). Otherwise it calls `rb_vm_symbol_block_handler(cfp, symbol)`, the body of the Symbol
+  branch of `vm_caller_setup_arg_block`, extracted unchanged: without refinements in the caller's cref it returns
+  the Symbol, with them the cached or a new refined lambda. It allocates but calls no Ruby code, so it is a leaf
+  call with `gen_prepare_leaf_call_with_gc` on the frame state of the original send.
+* The C-callee instructions get an `exit_state`, as `SendDirect` has: the stack overflow check before a C frame is
+  pushed must exit with the block argument still on the stack.
+* The general inliner skips a send with a Symbol block. The trivial inliner does not: a callee it inlines never
+  uses its block.
+* Left as on master: dynamic Symbols and every other block argument object (a Proc to an ISEQ callee is #18180),
+  bmethod and other callee types, and the callee's `yield` to the Symbol.
+
+Two earlier versions, for the history:
+
+* The first called the whole block-argument chain, as Rafael's branch does. Callgrind showed 124 of that helper's
+  176 instructions per call in `rb_method_basic_definition_p(rb_cSymbol, idTo_proc)`, which the patch point
+  covers, so the extraction was narrowed to the Symbol branch (head `7eddd8bfce`).
+* That head relied on the patch point alone for `Symbol#to_proc`. The reviews showed two cases it misses (below),
+  so the conversion got the flag check and the specialization the box check (head `09d8e5308e`).
+
+History: commit 1 is narrowed from Rafael's `3f17d8950e` and keeps him as author with Thomas as co-author
+(coordinator: the design is his). His two stats counters, benchmark yml, bootstraptest and forwarding tests are not
+in it.
+
+### Where the interpreter does more than pass the Symbol, and what covers it
+
+The interpreter's rule (`vm_caller_setup_arg_block`): a Symbol block argument becomes the block handler as it is
+when `Symbol#to_proc` is basic in the box of the running frame; with refinements in the caller's cref it becomes
+a refined lambda, cached per Symbol in the cref's refinement table; otherwise `to_proc` is called.
+
+| condition | what the compiled send does |
+| --- | --- |
+| `Symbol#to_proc` redefined before compilation | not specialized (`rb_method_basic_definition_p` at compile time) |
+| redefined after compilation (`def`, `define_method`, `prepend`, `remove_method`, `undef_method`, `alias_method`, a refinement of `Symbol#to_proc`) | `PatchPoint MethodRedefined(Symbol, to_proc)` invalidates the code |
+| redefined with its own definition (`Symbol.define_method(:to_proc, Symbol.instance_method(:to_proc))`): the VM clears the basic flag in place and invalidates nothing | the conversion checks the flag of the watched entry and side-exits |
+| another box redefines `Symbol#to_proc` (`RUBY_BOX=1`) | not specialized once a box was created with `Ruby::Box.new`; `PatchPoint RootBoxOnly` for code compiled before |
+| refinements in the caller's cref | the conversion is the interpreter's own code, run on the caller's frame, so it returns the same refined lambda |
+| dynamic Symbols | not specialized: the type and the guard are `StaticSymbol`. Nothing is embedded in code except the `to_proc` method entry, as a GC-tracked operand |
+| `&sym_variable` | profiled, behind `GuardType StaticSymbol`; another object side-exits and recompiles |
+| a C callee with a splat or keywords | not specialized, and no guard is emitted |
+| private and protected methods, `method_missing`, `respond_to_missing?`, a yield with no, several, splatted or keyword arguments, frozen and `BasicObject` receivers, `break`, exceptions | all happen in the callee's `yield` (`vm_invoke_symbol_block`, `vm_yield_with_symbol`), which gets the same block handler as in the interpreter and is not changed |
+| `block_given?`, and `lambda?` and `arity` of a materialized `&block` | the callee frame holds the same handler value, so `getblockparam` builds the same Proc |
+| backtraces and `caller_locations` | the same frames are pushed; the conversion pushes none |
+| TracePoint | as before: every instruction a TracePoint can affect sits behind `PatchPoint NoTracePoint` |
+| stack overflow while pushing the callee frame | exits on the frame state of the original send (`exit_state`), block argument on the stack |
+| Ractors | the conversion reads only the running frame and its cref; a non-main Ractor running the sends under `GC.stress` matched (Fable pass) |
+
+[`zs1_probe.rb`](../../bench/upstream/zs1_probe.rb) runs these cases N times at one call site and prints every
+result or exception; the interpreter's output is compared with ZJIT's at four settings.
+
+### Guards and the tests that fail without them
+
+Each row was checked by removing the guard and running the tests (`.amp/in/orb-backup/zs1/mutate.py`, logs
+orb-local): all rows on the tree of `09d8e5308e`, and the patch-point and flag-check rows again on `89e2da1571`,
+whose tests for them changed.
+
+| removed | failing behaviour test |
+| --- | --- |
+| `Symbol#to_proc` patch point, on the ISEQ, C or variadic C path alone | `test_send_symbol_block_arg_to_proc_redefined_after_compile`: `[4, [30], 30]`, `[300, [4], 30]`, `[300, [30], 4]` for `[300, [30], 30]` |
+| compile-time `Symbol#to_proc` check | `test_send_symbol_block_arg_to_proc_redefined_before_compile` |
+| basic-flag check in `rb_zjit_symbol_block_handler` | `test_send_symbol_block_arg_to_proc_redefined_with_itself`, on all three paths (`proc(&:double)` and `Proc.new(&:double)` are the C callees) |
+| compile-time box check | `test_send_symbol_block_arg_in_box_with_redefined_to_proc` (test_zjit_cli.rb, `RUBY_BOX=1`) |
+| `GuardType StaticSymbol` on a profiled block argument | `test_send_symbol_block_arg_guard_precedes_to_proc`, `test_send_symbol_block_arg_side_exit` |
+| the conversion call | `test_send_symbol_block_arg_with_refinements` |
+| complex-argument check for C callees | `test_send_to_cfunc_with_symbol_block_arg_and_splat_falls_back` (HIR snapshot: no guard in front of the `Send`) |
+| `exit_state` in the C-callee overflow checks | `test_stack_overflow_exit_from_send_with_normalized_keywords` (`[1].sum(&:itself)`, `[1, nil].reject(&:nil?)`), each path confirmed alone |
+| the general inliner's skip | seven codegen tests and two snapshots, and the same CLI test (`target(1, &:itself)`) |
+| `PatchPoint RootBoxOnly` | none (HIR snapshots only) |
+| `gen_prepare_leaf_call_with_gc` before the conversion | none |
+
+Two pieces have no failing test:
+
+* **`PatchPoint RootBoxOnly`.** The compile-time check covers code compiled after `Ruby::Box.new`; the patch point
+  covers code compiled before. Two reviewers tried to build a program where such code later runs with another
+  box's `Symbol#to_proc` (a main method or block called from a box, a method transplanted with
+  `define_singleton_method`, `instance_exec` in the box) and found none: main's code keeps main's `Symbol`. It
+  stays because upstream's `assume_root_box` pairs the same check with the same patch point.
+* **The leaf-call preparation.** It is GC protocol: it writes the PC and SP the conversion's allocation needs.
+  Uncached refinement Symbols under `GC.stress` and `GC.auto_compact` match with it; three reviewer programs
+  written to fail without it pass too. A reviewer suggested an `ObjectSpace.allocation_sourceline` test (line 10
+  in the interpreter, 9 without the preparation); not added.
+
+A lesson for these tests: warm-up calls inside `2.times { }` compile the block, and the methods under test are
+then first compiled after the redefinition, so the test passes without the guard. Rafael's redefinition test had
+this, and so did ours on head `09d8e5308e`; the warm-up is now plain calls.
+
+### Verification on `89e2da1571`
+
+x86-64 orb, dev build (`--enable-zjit=dev`), unless noted.
+
+* **`make zjit-test`:** 2007 run, 2006 passed. The one failure is
+  `test_profile_frames_during_direct_jit_to_jit_entry` ("rb_profile_frames was not called from SIGPROF handler"). It
+  failed here in a parallel and in a single-threaded run while other jobs were running, passes alone three times
+  out of three, and fails the same way with base `3be2b028a7`'s `zjit/` (Opus and Fable passes). The claude-code
+  pass ran the suite single-threaded in its orb: 2007 of 2007. The 61 block-argument tests pass.
+* **`test/ruby/test_zjit_cli.rb`:** 34 tests, 7,903 assertions, 0 failures.
+* **Core tests** (`test_proc`, `test_refinement`, `test_symbol`, `test_method`, `test_call`, `test_yield`,
+  `test_lambda`, `test_array`, `test_enum`, `test_hash`, `test_settracefunc`, `test_backtrace`, `test_ractor`):
+  1,753 tests, 67,382 assertions, 0 failures, 1 skip, in the interpreter and with `--zjit-call-threshold=1`.
+* **`make btest`:** all 2,148 pass, in the interpreter and with `--zjit-call-threshold=1`.
+* **Differential probe** ([`zs1_probe.rb`](../../bench/upstream/zs1_probe.rb)) on the release build of commit 1:
+  the interpreter's output against `--zjit-call-threshold=1`, against `--zjit-call-threshold=2
+  --zjit-num-profiles=1`, against default thresholds (612 lines each) and against default thresholds with `N=40`
+  (3,502 lines): four empty diffs. With `--zjit-stats-quiet` the `N=40` run counts 15,586 conversion calls from
+  compiled code (`ccall_rb_zjit_symbol_block_handler`) and 1,344 `send_block_arg_not_nil` fallbacks (the Procs,
+  dynamic Symbols and other objects the probe passes on purpose).
+* **arm64** (ARM1 thread, M3): `make zjit-test` 2,249 of 2,249 in a YJIT+ZJIT build, the 61 block-argument tests,
+  `test_zjit_cli.rb` 34 tests with 0 failures on dev and release builds, the probe's diffs empty at three
+  settings with the same counters, and `make zjit-bindgen` leaves `cruby_bindings.inc.rs` unchanged. Active Model
+  on Rails main with the release build of `09d8e5308e`: 1,272 runs with the same outcome without ZJIT, with
+  `--zjit` and at thresholds 1 and 2 (one error in all four, a Ractor and minitest-mock problem).
+* **Boxes:** under `RUBY_BOX=1` a send is specialized until the first `Ruby::Box.new` (271 conversion calls for
+  300 sends); none of 600 later sends is, including sends in a method compiled before the box.
+* **No CI on the fork:** `thomasklemm/ruby` runs no workflows for the branch.
+* **Rails suites** (Rails main `8217632cf8`, release build of commit 1, `SEED=1`, verbose): Active Model has
+  1,272 runs, 5,636 assertions, 0 failures and 1 error both without ZJIT and with `RUBYOPT=--zjit`, and the same
+  outcome for each of the 1,268 tests the verbose logs list (the error is the Ractor and minitest-mock problem that ARM1 sees with ZJIT off too).
+  Active Record on SQLite ran on the first head `dcd4bd2b79` only: 10,375 runs, 0 failures and 5 environment
+  errors in the interpreter; under ZJIT the run was killed by the orb's memory limit in a forking test, which
+  also happened once in the interpreter, so that run says nothing about ZJIT. Both Active Record runs on the final
+  code were started after the timing runs and belong here when they finish. Action View was not run.
+
+### Numbers on the final code
+
+Release builds (`--enable-yjit --enable-zjit`, GCC 14.2.0, rustc 1.100.0): master `3be2b028a7` and commit 1
+`656ae95dbc`; commit 2 adds only tests. ruby-bench `73918b2` on Rails main `8217632cf8` without VB1, ZJIT with
+default options. Two micros were added to the ruby-bench copy:
+[`attr-read`](../../bench/upstream/zs1/attr_read_benchmark.rb) (the first attribute reads of rails/rails#59803: 10
+records with 30 columns, every attribute read once) and
+[`symbol-block`](../../bench/upstream/zs1/symbol_block_benchmark.rb) (`one(i, &:itself)` and
+`[1, 2, 3].map(&:itself)`).
+
+**Per call**, Callgrind instructions under ZJIT, from two run lengths
+([`per_call.rb`](../../bench/upstream/zs1/per_call.rb)):
+
+| call | master | branch | difference |
+| --- | ---: | ---: | ---: |
+| `one(i, &:itself)`, ISEQ callee | 1,094.8 | 751.8 | −343.0 (−31.3%) |
+| `one(i) { _1 }` | 93.9 | 93.9 | −0.1 |
+| `[1, 2, 3].map(&:itself)`, ISEQ callee under a JIT | 3,171.6 | 2,825.8 | −345.8 (−10.9%) |
+| `[1, 2, 3].map { _1 }` | 1,043.0 | 1,042.7 | −0.3 |
+| `[1, 2, 3].sum(&:itself)`, C callee | 2,343.2 | 2,049.7 | −293.5 (−12.5%) |
+| `[1, 2, 3].sum { _1 }` | 1,565.7 | 1,566.1 | +0.5 |
+
+The send gets about 343 instructions cheaper for an ISEQ callee and 294 for a C callee; a generic Symbol send
+costs 360–392 on the apps. The flag check and the compare that the review fixes added cost 9 to 12 instructions per
+call (743 and 2,814 on `7eddd8bfce` against 751.8 and 2,825.8 now). What separates `one(i, &:itself)` from the
+literal block afterwards is mostly the `yield` to the Symbol (633–707 instructions per yield in the first round's
+micro), which this change does not touch.
+
+**ZJIT stats diff**, master against commit 1, totals of 15 warmup and 10 measured iterations with `--zjit-stats`
+([`stats_diff.rb`](../../bench/upstream/zs1/stats_diff.rb): a counter is printed when it changes by more than 1%,
+by more than 1,000 and by more than three times the difference between two master runs; an entry missing from a
+list that covers 100% of its total counts as 0):
+
+```diff
+# railsbench
+ calls to C functions from JIT code:
+-  rb_vm_send: 5,945,619
++  rb_vm_send: 4,879,037
+-send fallback reasons (total): 23,062,604
++send fallback reasons (total): 21,996,028
+ send fallback reasons:
+-  send_block_arg_not_nil: 2,880,681
++  send_block_arg_not_nil: 2,068,088
+-  one_or_more_complex_arg_pass: 2,631,868
++  one_or_more_complex_arg_pass: 2,377,877
+-dynamic_send_count: 23,062,604
++dynamic_send_count: 21,996,028
+-iseq_optimized_send_count: 78,334,168
++iseq_optimized_send_count: 79,584,504
+-vm_write_stack_count: 72,548,064
++vm_write_stack_count: 71,735,501
+# lobsters
+ calls to C functions from JIT code:
+-  rb_vm_send: 2,385,653
++  rb_vm_send: 1,664,764
+-send fallback reasons (total): 21,240,260
++send fallback reasons (total): 20,527,432
+ send fallback reasons:
+-  send_block_arg_not_nil: 1,430,280
++  send_block_arg_not_nil: 951,550
+-  one_or_more_complex_arg_pass: 987,312
++  one_or_more_complex_arg_pass: 745,157
+-dynamic_send_count: 21,240,260
++dynamic_send_count: 20,527,432
+-iseq_optimized_send_count: 46,404,245
++iseq_optimized_send_count: 46,915,275
+-non_variadic_cfunc_optimized_send_count: 14,617,275
++non_variadic_cfunc_optimized_send_count: 14,795,608
+-guard_type_count: 98,542,681
++guard_type_count: 99,553,608
+# shipit
+-not inlined C methods (total): 37,368,932
++not inlined C methods (total): 37,749,771
+ not inlined C methods:
+-  Enumerable#flat_map: 343,572
++  Enumerable#flat_map: 371,774
+ calls to C functions from JIT code:
+-  rb_vm_send: 5,364,592
++  rb_vm_send: 4,115,154
+-send fallback reasons (total): 44,569,405
++send fallback reasons (total): 43,091,646
+ send fallback reasons:
+-  send_polymorphic_fallback: 21,397,981
++  send_polymorphic_fallback: 21,169,657
+-  send_block_arg_not_nil: 4,163,172
++  send_block_arg_not_nil: 3,294,392
+-  one_or_more_complex_arg_pass: 1,663,755
++  one_or_more_complex_arg_pass: 1,283,100
+-dynamic_send_count: 44,569,405
++dynamic_send_count: 43,091,646
+-iseq_optimized_send_count: 85,127,837
++iseq_optimized_send_count: 86,225,319
+-non_variadic_cfunc_optimized_send_count: 19,246,354
++non_variadic_cfunc_optimized_send_count: 19,567,384
+-vm_write_stack_count: 86,844,780
++vm_write_stack_count: 85,747,865
+# attr-read
+-most called JIT functions (total): 308,175,494
++most called JIT functions (total): 344,425,556
+-send fallback reasons (total): 40,331,108
++send fallback reasons (total): 2,824,849
+ send fallback reasons:
+-  send_block_arg_not_nil: 37,504,066
++  send_block_arg_not_nil: 2,966
+-  one_or_more_complex_arg_pass: 131,805
++  one_or_more_complex_arg_pass: 126,643
+-dynamic_send_count: 40,331,108
++dynamic_send_count: 2,824,849
+-optimized_send_count: 1,008,756,250
++optimized_send_count: 1,046,262,499
+-iseq_optimized_send_count: 261,943,205
++iseq_optimized_send_count: 335,694,254
+-inline_iseq_optimized_send_count: 157,873,940
++inline_iseq_optimized_send_count: 121,623,965
+-vm_write_jit_frame_count: 500,218,335
++vm_write_jit_frame_count: 537,724,682
+-vm_write_sp_count: 500,218,335
++vm_write_sp_count: 537,724,682
+-vm_write_stack_count: 106,617,134
++vm_write_stack_count: 69,116,115
+-guard_type_count: 754,984,671
++guard_type_count: 792,490,547
+-load_field_count: 1,103,630,247
++load_field_count: 1,028,630,118
+# symbol-block
+ calls to C functions from JIT code:
+-  rb_vm_send: 49,999,942
++  rb_vm_send: 0
+-send fallback reasons (total): 150,000,221
++send fallback reasons (total): 100,000,265
+ send fallback reasons:
+-  send_block_arg_not_nil: 49,999,942
++  send_block_arg_not_nil: 0
+-dynamic_send_count: 150,000,221
++dynamic_send_count: 100,000,265
+-optimized_send_count: 250,019,226
++optimized_send_count: 300,019,136
+-iseq_optimized_send_count: 85
++iseq_optimized_send_count: 50,000,025
+-vm_write_jit_frame_count: 250,017,303
++vm_write_jit_frame_count: 300,017,231
+-vm_write_sp_count: 250,017,303
++vm_write_sp_count: 300,017,231
+-vm_write_stack_count: 150,016,241
++vm_write_stack_count: 100,016,301
+-guard_type_count: 17,008
++guard_type_count: 50,016,958
+-load_field_count: 175,047,242
++load_field_count: 150,047,288
+ calls to C functions from JIT code:
+-  rb_zjit_symbol_block_handler: 0
++  rb_zjit_symbol_block_handler: 49,999,942
+```
+
+* `send_block_arg_not_nil` is the ISEQ callees, `one_or_more_complex_arg_pass` the C callees, which master
+  reports as complex argument passing.
+* **attr-read under `--zjit-stats`:** `inline_iseq_optimized_send_count` falls because `name_at` is no longer
+  inlined into `fetch_value_at!`. The counter instructions that `--zjit-stats` adds count toward the inliner's
+  budget of 200 instructions per caller, and the two patch points of the Symbol send push `fetch_value_at!` over
+  it. Without `--zjit-stats`, and with stats and `--zjit-inline-budget=260`, the HIR shows `name_at` inlined on the
+  branch, so the timed runs are not affected.
+* The yields do not move: `invokeblock_not_specialized` is unchanged on all three apps.
+* symbol-block: the 50 million sends of 25 iterations leave `rb_vm_send` and go through the conversion; the 100
+  million dynamic sends that remain are the yields to the Symbol.
+
+**`run_benchmarks.rb`**, interleaved, 20 warmup and 20 measured iterations, master twice for the A/A, nothing else
+running in the orb (a 4-core cloud sandbox, so the percentages after ± are wide):
+
+```
+master: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
+master-again: ruby 4.1.0dev (2026-11-15T09:48:53Z HEAD 3be2b028a7) +ZJIT +PRISM [x86_64-linux]
+symbol-block-arg: ruby 4.1.0dev (2026-11-15T18:34:39Z HEAD 656ae95dbc) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 73918b2fc1a84702fea63e06f64d179751d69df4-dirty
+
+------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
+bench           master (ms)  master-again (ms)  symbol-block-arg (ms)  master-again 1st itr  symbol-block-arg 1st itr  master/master-again  master/symbol-block-arg
+lobsters       960.4 ± 8.3%       954.9 ± 7.9%           917.2 ± 4.9%                 1.041                     0.974                1.006                    1.047
+railsbench    1531.6 ± 7.4%      1521.8 ± 7.0%          1524.6 ± 6.0%                 1.017                     0.994                1.006                    1.005
+shipit        1295.4 ± 9.4%     1411.5 ± 11.5%          1399.0 ± 6.8%                 1.042                     1.105                0.918                    0.926
+attr-read      308.4 ± 7.2%       303.4 ± 5.9%           270.6 ± 9.7%                 0.997                     0.998                1.016                    1.139
+symbol-block   380.6 ± 7.3%       367.9 ± 7.3%          310.2 ± 10.5%                 0.972                     1.105                1.035                    1.227
+------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
+
+Legend:
+- master-again 1st itr: ratio of master/master-again time for the first iteration.
+- master/master-again: ratio of master/master-again time. Higher is better for master-again. Above 1 represents a speedup.
+- symbol-block-arg 1st itr: ratio of master/symbol-block-arg time for the first iteration.
+- master/symbol-block-arg: ratio of master/symbol-block-arg time. Higher is better for symbol-block-arg. Above 1 represents a speedup.
+```
+
+* **Apps:** no change beyond noise. railsbench 1.005 against an A/A of 1.006; shipit 0.926 against an A/A of 0.918
+  (the two master columns are 8% apart there, so this run says nothing finer than that about shipit); lobsters
+  1.047 against an A/A of 1.006, which is inside the ±5–8% of its columns and is not claimed as a gain. No app is
+  slower than master beyond its A/A.
+* **Micros:** attr-read 1.139 against an A/A of 1.016, symbol-block 1.227 against 1.035.
+* **Earlier run on `7eddd8bfce`** (before the flag check, with the old `symbol-block`, whose loop sat in a method
+  that is called once per iteration and so ran compiled only in the last ten iterations): lobsters 829.7 / 795.8 /
+  794.9 ms, railsbench 1402.5 / 1394.7 / 1437.2, shipit 1198.3 / 1157.6 / 1221.2, attr-read 320.6 / 292.9 / 241.2
+  (A/A 1.094, branch 1.329). The two runs agree on the apps and disagree on how much attr-read gains (1.14 and
+  1.33); the orb's timing noise is that large, and the per-call instruction counts above are the precise figure.
+* Per iteration the apps lose about 43,000 (railsbench), 29,000 (lobsters) and 59,000 (shipit) dynamic sends,
+  from the stats diff over 25 iterations.
+
+**App page via Callgrind.** Not measured on the final code as a whole program. From the counts and ceilings above
+and the per-call saving, the expected effect is 0.2% to 0.5% of an iteration's instructions on railsbench,
+lobsters, shipit and the blog page (ISEQ ceiling × 343/380 plus C ceiling × 294/360); this is an estimate, not a
+measurement. Whole-program runs of the branch on the four workloads are queued in the orb (`~/w/cgnar3`) and
+belong in this section when they finish.
+
+### Reviews
+
+Three independent orbs, each rerunning the probe and trying to break a guard; passes are recorded in
+[ZS1.md](../../bench/upstream/pr-queue/items/ZS1.md). Thermos is waived for ZS1 (coordinator, 2026-11-15).
+
+**On `7eddd8bfce`: three times `changes`.** No reviewer found a difference in the cases of the brief; each found
+one outside them.
+
+* **claude-code:** `Symbol.define_method(:to_proc, Symbol.instance_method(:to_proc))`. `method_entry_set`
+  (vm_method.c) clears the basic flag of the entry in place when a method is set again with its own definition,
+  and invalidates nothing. The interpreter then calls `to_proc`, which gives a plain Proc that ignores the
+  caller's refinements; compiled code kept the refined lambda (`[6, 6]` for `[NoMethodError, 6]`). The head before
+  it, `dcd4bd2b79`, did not have this: it still checked at run time. Fix: the flag check in the conversion.
+* **Fable:** with `RUBY_BOX=1`, a box that redefines `Symbol#to_proc`. The compile-time check and the patch point
+  look at the box that is current when the caller is compiled; the callee's code runs in the other box. Base ZJIT
+  resolves ordinary methods in the wrong box in the same program shape, so a maintainer may call it out of scope;
+  it was still a difference this branch added. Fix: no specialization once a box exists.
+* **Opus:** the body called `Array#map` a C method (under a JIT it is defined in Ruby) and quoted one fallback
+  reason for both callee kinds; a profiled-Symbol guard was emitted in front of a C-callee send that stays
+  dynamic (`a.each_slice(*args, &s)`), the shape #18180 removed. Fixed.
+
+Their answers on the questions put to them: the conversion is rightly a leaf call (the refinement tables are
+identity hashes, so no `hash` or `eql?` runs; `rb_vm_ifunc_new` cannot raise for these arities; only
+`NoMemoryError` can leave it); no GC can run while only a register holds the handler (LIR between the call and
+the store into the callee's specval slot is `Store`, `Lea`, `Mov`, `Cmp`, `Jbe`); nothing between the
+`Symbol#to_proc` patch point and the callee frame calls Ruby or checks interrupts; the interpreter is unchanged
+(`vm.o` has no call relocation to `rb_vm_symbol_block_handler` at -O3, and base and head interpreters print the
+same on the probe and 28 scenario files).
+
+**On `09d8e5308e`: Opus `nits`, claude-code `nits`.** Both confirmed the flag check against
+`rb_method_basic_definition_p` (16 single changes at three moments, eight sequences with `GC.compact`, the same
+under `RUBY_BOX=1`) and the exit after the leaf call. Their test points went into `89e2da1571`: the
+self-redefinition test failed only on its ISEQ element (`reject` and `sum` resolve the refinement either way), and
+the helper belongs in the bindgen allowlist.
+
+Not applied, for Thomas and the coordinator:
+
+* Commit 1 is +241 −77, above the 150-line "ask on the tracker first" rule in DECISIONS.
+* The tip of Rafael's branch says the branch was produced by an agent (`ZJIT_PERF_TASK.md`,
+  `ZJIT_PERF_SUMMARY.md`). Whether that matters under "No AI disclaimer, except where it matters", and whether
+  Rafael is fine being the author of a commit whose `vm_args.c` shape and guards now differ from his, is Thomas's
+  call.
+* If the team asks for a split: ISEQ callees first (mirrors #18180), then C callees with the `exit_state` on the
+  C-call instructions.
+* Carrying the `Symbol#to_proc` entry in `BlockArgSymbol` instead of looking it up again at code generation (the
+  two lookups give the same entry, since nothing runs between HIR and codegen); one place that lowers
+  `BlockArgSymbol`; parameter names in `rb_vm_symbol_block_handler` (the moved lines stay identical); the name
+  of the CLI test that holds the overflow rows.
+* A send whose `Symbol#to_proc` was redefined with itself exits on every call and does not recompile.
+* The general fix for the basic flag belongs in the VM (`method_entry_set` could invalidate the entry), as its own
+  PR.
+
+### Found on the way, present on master, not from this change
+
+* **Interpreter crash, also on 4.0.9** (Fable): the cached refinement lambda keeps the `svar_lep` of the frame
+  that created it. With `using` a refinement, `def sv = (y2("abc", /b/, &:match); $~)` called at two stack depths
+  ends in a segfault on 4.0.9 and `[BUG] vm_svar_valid_p` on master (9 lines, `svar_bug.rb` in the reviewer's
+  orb, thread T-01a1e02a-5156-7535-b82d-6fdecf19860d). The PR moves that code and does not change it.
+* **`Array#map` under any JIT:** it reports `call`/`return` instead of `c_call`/`c_return` to a TracePoint, and
+  a Symbol proc passed to it ignores the caller's refinements (YJIT on 4.0.9 does the same), because `map` is a
+  Ruby method then. A comparison of interpreter against JIT has to use `--zjit --zjit-call-threshold=1000000` as
+  its baseline where `map`, `each` or `select` is involved.
+* **`RUBY_BOX=1`:** `[1, 2].sum(&:dbl)` with refinements raises `NoMethodError` with nothing compiled.
+* **Compaction:** ZJIT with `GC.auto_compact` and `GC.stress` once printed `ToProc#to_proc gives ` with an empty
+  class name, on base and in one of three head runs (Fable).
+* **`test_profile_frames_during_direct_jit_to_jit_entry`** fails in a full `make zjit-test` in this orb
+  ("rb_profile_frames was not called from SIGPROF handler"), on base as well, and passes alone.
+
+### PR body and the #1014 comment
+
+The body is in [ZS1.md](../../bench/upstream/pr-queue/items/ZS1.md), verbatim as it will be posted. It references
+Shopify/ruby#1014, #18180 and Shopify/ruby#1039, and has no footer and no Lowrail link. Nothing is opened or
+posted: the coordinator opens the draft, and only after Thomas has read the change and can explain it
+([DECISIONS](../DECISIONS.md)).
+
+Draft reply to tekknolagi's question on Shopify/ruby#1014 ("Is this done now that Alan added the PR?"), **not
+posted**; the PR number goes in when the draft exists:
+
+> Not all of it: ruby/ruby#18180 covers a profiled `Proc`, and ruby/ruby#19484 callees that declare `&block`. A
+> Symbol block argument (`foo(&:sym)`) still fell back to a dynamic send; ruby/ruby#NNNNN sends it directly to
+> ISEQ and C callees. Forwarded block parameters and the `yield` to a Symbol are not in it.
+
+### Reproduce the second round
+
+```sh
+# Release builds: master 3be2b028a7 into ~/w/rm, commit 1 of the branch into ~/w/rp (build_rel.sh).
+# ruby-bench 73918b2 copy on Rails main 8217632cf8 in ~/w/rb-rbm, with bench/upstream/zs1/*_benchmark.rb copied to
+# benchmarks/attr-read/benchmark.rb and benchmarks/symbol-block/benchmark.rb.
+ruby zs1_probe.rb > i.txt; ruby --zjit --zjit-call-threshold=1 zs1_probe.rb > z.txt; diff i.txt z.txt
+./run_benchmarks.rb railsbench lobsters shipit attr-read symbol-block --no-sudo --interleave --warmup=20 --bench=20 \
+  -e "master::$HOME/w/rm/bin/ruby --zjit" -e "master-again::$HOME/w/rm/bin/ruby --zjit" \
+  -e "symbol-block-arg::$HOME/w/rp/bin/ruby --zjit"
+WARMUP_ITRS=15 MIN_BENCH_ITRS=10 MIN_BENCH_TIME=0 ruby --zjit --zjit-stats benchmarks/railsbench/benchmark.rb 2> rm.stats
+ruby bench/upstream/zs1/stats_diff.rb rm.stats rm2.stats rp.stats
+valgrind --tool=callgrind ruby --disable-gems --zjit bench/upstream/zs1/per_call.rb iseq_symbol 20000   # and 120000
+ruby bench/upstream/zs1/per_call_table.rb OUT
+```
+
+The orb-local scripts (`rbm.sh`, `stats.sh`, `per_call.sh`, `verify.sh`, `mutate.py`, `rails_suites.sh`) are in
+`.amp/in/orb-backup/zs1/` of the ZS1 thread and are not committed.
