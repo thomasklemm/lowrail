@@ -5,11 +5,12 @@ View's `tag_options` as `!(type == :aria || type == :class)`, with
 ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722). ZNE1 is the
 ZJIT fix, prepared as one ruby/ruby PR ([DECISIONS](../DECISIONS.md), ruby/ruby exception of 2026-11-15).
 
-**Result: built, tested and measured; nothing opened.** Branch
-[`thomasklemm/ruby:zjit-polymorphic-neq`](https://github.com/thomasklemm/ruby/tree/zjit-polymorphic-neq), head
-`52d41cc992`, one commit on master `fc4cd8872b`. Queue item with the PR body:
-[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). Thomas opens it as a draft after the three review passes and
-the arm64 run.
+**Result: built, tested, measured and reviewed; nothing opened.** Branch
+[`thomasklemm/ruby:zjit-opt-neq-polymorphic`](https://github.com/thomasklemm/ruby/tree/zjit-opt-neq-polymorphic),
+head `18d33e8a24`, one commit on master `fc4cd8872b`. Queue item with the PR body:
+[ZNE1](../../bench/upstream/pr-queue/items/ZNE1.md). Thomas opens it as a draft once the three review passes approve
+this head; arm64 is green. The first reviewed head, `52d41cc992`, is on fork branch `zjit-polymorphic-neq`; the new
+head differs by one test, one test comment and the commit message ([reviews](#reviews)).
 
 * The premise of the brief was half out of date. Since ruby/ruby#19162 (nozomemein, merged) `BasicObject#!=` is a
   Ruby builtin under ZJIT and a `!=` whose call site sees **one** receiver class is already inlined.
@@ -76,7 +77,7 @@ Each arm is the path a monomorphic `!=` already takes on master, entered only fo
 | `!=` redefined later | `MethodRedefined(class, !=)` patch point |
 | class defines its own `!=` | direct send to it |
 | `!=` refined, private or undefined | stays a dynamic send |
-| singleton class with its own `!=` | `NoSingletonClass` patch point |
+| singleton class with its own `!=` | exact class check, original `Send` |
 | `==` redefined later | `MethodRedefined(class, ==)` patch point |
 | `==` is `method_missing`, refined | `==` stays a dynamic send |
 | `==` returns a non-boolean | `BoolNegate` tests truthiness |
@@ -88,7 +89,22 @@ Each arm is the path a monomorphic `!=` already takes on master, entered only fo
 
 * Refinements: `BasicObject#!=` calls `==` from its own body, so a refinement of `==` active at the caller does not
   apply. That matches `rb_funcall` in the C version.
+* Singleton classes: `CondBranchHasType` compares the exact class of a heap object, so an object with a singleton
+  class misses its arm and takes the original `Send`. `NoSingletonClass` is still emitted in each arm, as on the
+  monomorphic path, but nothing depends on it here (both reviewers removed it; only snapshots change).
+* Cost: more code is specialized, so a redefinition of `==` or `!=` on a profiled class invalidates more. A script
+  that redefines core `==` methods repeatedly takes 1,297 side exits on the branch against 201 on master (claude-code
+  pass) or 247 against 52 (opus pass), with identical results; a steady polymorphic loop takes the same number on
+  both.
 * What differs between the interpreter and ZJIT is the same on master and on the branch: see the probe below.
+* "No new assumption" means no new kind. A polymorphic site had no patch points on master and now has
+  `MethodRedefined(class, !=)`, `MethodRedefined(class, ==)` and `NoSingletonClass(class)` per arm, so it can be
+  invalidated where it could not before. The fable pass measured the worst case: 3,014,000 calls of
+  `a != :aria && a != :class` on nil, Symbols and one user class, with six redefinition events between rounds.
+  When an unrelated class with a subclass (or an unrelated included module) defines and removes `!=`, master
+  compiles 2 ISEQs and takes 0 side exits; the branch compiles 5, reaches the version limit and then takes
+  3,006,000 `patchpoint_method_redefined` exits, one per call. Results are identical. A monomorphic `!=` behaves
+  the same way on master, so this is ZJIT's existing behaviour reaching more sites, not a defect of the change.
 
 ### Tests
 
@@ -107,6 +123,7 @@ Each guard was removed in turn; every mutation fails at least one new test:
 | `!=` assumed to be BasicObject's | `refined`, `redefined_neq`, `method_missing` |
 | negate by identity | `truthiness`, `method_missing` |
 | `==` assumed to be identity | `truthiness`, `redefined_eq`, `basic_object`, `method_missing` |
+| fallback `Send` unreachable (last arm unconditional) | `polymorphic`, both snapshots |
 
 ## Verification (x86_64 Linux)
 
@@ -146,6 +163,9 @@ Each guard was removed in turn; every mutation fails at least one new test:
   Ractor error in every mode).
 
 ## Reach
+
+Rails main has 266 lines with `!=` in 166 files under its `*/lib` directories (`rg -c -g '*/lib/**/*.rb' ' != '`).
+
 
 ZJIT stats per iteration (100 warmup iterations, 10 measured, ruby-bench `0e67be0`, Rails 8.1.4.1), master → branch:
 
@@ -229,11 +249,47 @@ railsbench (0), so the stop rule does not apply; and the change is small and gen
 than it adds, brings `opt_neq` in line with every other `opt_*` instruction and makes the pattern Rails declined to
 rewrite about 5x faster in isolation. The app times do not show it: they stay inside A/A.
 
+## Reviews
+
+Three independent Claude Code orbs on head `52d41cc992`; each rebuilt master and the branch, reran the probe (same
+md5s) and tried to break a guard.
+
+| Pass | Verdict | Must-fix |
+| --- | --- | --- |
+| claude-code | changes | body only |
+| opus | changes | one test comment |
+| fable (adversarial) | nits | none |
+
+* **claude-code** (T-01a1e017-0b4b-7405-a5c9-6e381e0a03bb): 14 guard-breaking scripts in 6 configurations and 7
+  mutations, no finding in code, tests or commit message. Body: over 150 words, two tables, and a sentence that
+  contradicted the first table (railsbench 1.058 with p 0.012 against "within noise").
+* **opus** (T-01a1e017-14c1-7599-8e9c-3e9b47151185): 13 scripts in 7 configurations and 7 mutations, no finding in
+  the code. Must-fix: the first sentence of the comment in `test_opt_neq_polymorphic_refined` restated the code.
+* **fable** (T-01a1e017-1db1-700f-a67e-f8584f45187d): 21 attack scripts in 9 configurations (189 pairs), a fuzzer
+  (1,170 run pairs) and 26 `test/ruby` files at three thresholds: no difference between master and branch. Points:
+  `test_opt_neq_polymorphic` passed with the fallback `Send` made unreachable; "no assumption" should be "no new
+  kind"; the invalidation cost above.
+
+Applied in `18d33e8a24`: the comment is one sentence; `test_opt_neq_polymorphic` calls an unprofiled class whose `==`
+returns true, and now fails when the last arm is made unconditional; the commit message says "no new kind of
+assumption", names the added patch points and their cost, and fixes two wordings. The body was cut and its
+numbers replaced by one pinned run.
+
+Found on the way, on master too, not part of this change:
+
+* With a refinement of `Kernel#==` defined anywhere, even if never activated, `A.new != 1` raises `NoMethodError`
+  in the interpreter (`rb_obj_not_equal` through `rb_funcall`; Ruby 4.0.7 too) and returns `true` under `--zjit`,
+  compiled or not, because of the builtin. This is a third interpreter-against-ZJIT difference besides the two in
+  the probe.
+* `TestRefinement#test_module_inclusion2` fails under `--zjit --zjit-call-threshold=2` on master and branch.
+* A `RUBY_DEBUG` assertion (`vm_method.c:508 clear_method_cache_by_id_in_class`, owner `T_MODULE`) fires on dev
+  builds of master and branch, with and without `--zjit`, for a `define_method(:!=)` with `super` on a module.
+
 ## Reproduce
 
 ```sh
 git clone https://github.com/ruby/ruby && cd ruby && git remote add fork https://github.com/thomasklemm/ruby
-git fetch fork zjit-polymorphic-neq          # head 52d41cc992, base fc4cd8872b
+git fetch fork zjit-opt-neq-polymorphic      # head 18d33e8a24, base fc4cd8872b
 ./autogen.sh && ./configure --enable-zjit=dev && make -j && make zjit-test ZJIT_TESTS=opt_neq
 bench/upstream/zne1/probe.sh MASTER_RUBY BRANCH_RUBY        # from a Lowrail checkout, release ZJIT builds
 ```

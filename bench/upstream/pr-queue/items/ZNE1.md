@@ -4,8 +4,8 @@ repo: ruby/ruby
 kind: perf
 area: ZJIT, opt_neq
 reviewer: "tekknolagi (polymorphic dispatch, #15949) or nozomemein (BasicObject#!= builtin, #19162)"
-branch: thomasklemm/zjit-polymorphic-neq
-head: "52d41cc992"
+branch: thomasklemm/zjit-opt-neq-polymorphic
+head: "18d33e8a24"
 base: master
 built_on: "fc4cd8872b"
 depends_on: []
@@ -16,17 +16,20 @@ rank: 3
 risky: true
 state: in-review
 pr:
-note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. Thomas opens it as a draft once claude-code, opus and fable approve the head and ARM1 (T-01a1e00a-99a3-7183-9a14-acf3268bdc46) reports arm64 green. Record: docs/upstream/zjit-not-equal.md."
-passes: []
+note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. Thomas opens it as a draft once claude-code, opus and fable approve the head; arm64 is green (ARM1, T-01a1e00a-99a3-7183-9a14-acf3268bdc46, on 52d41cc992, same code). Earlier head 52d41cc992 is on fork branch zjit-polymorphic-neq; 18d33e8a24 changes one test, one test comment and the commit message. The body shows the three-way run_benchmarks output with the master-against-master columns by the coordinator's instruction for this item. The diff is 259 changed lines, 229 of them tests and snapshots, so the thermos gate applies or needs a waiver. Record: docs/upstream/zjit-not-equal.md."
+passes:
+  - {reviewer: claude-code, orb: T-01a1e017-0b4b-7405-a5c9-6e381e0a03bb, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "body only: over 150 words, two tables, a sentence that contradicted its table; code, tests, probe and 14 guard-breaking scripts without a finding; commit-message wording nits applied in 18d33e8a24"}
+  - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "superfluous first sentence of the comment in test_opt_neq_polymorphic_refined, fixed in 18d33e8a24; 13 scripts and 7 mutations without a finding; body too long"}
+  - {reviewer: fable, orb: T-01a1e017-1db1-700f-a67e-f8584f45187d, head: "52d41cc992", date: 2026-11-15, verdict: nits, open: "adversarial on exactness and invalidation: 189 script-configuration pairs and 1,170 fuzz run pairs, no master/branch difference; test_opt_neq_polymorphic did not discriminate the fallback Send (fixed in 18d33e8a24); say no new kind of assumption (applied)"}
 ---
 
 # ZJIT: Specialize polymorphic opt_neq
 
-`x != y` on nil, Symbols and plain objects is everywhere in Ruby and Rails code, and all of them use `BasicObject#!=`. Since #19162 ZJIT inlines it when the call site sees one receiver class. With more than one, the `!=` stays a dynamic send. Action View's `tag_options` has such a site, `type != :aria`, where `type` is nil or a Symbol. rails/rails#59811 rewrote that line for the JITs and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722), so this handles the pattern in ZJIT.
+`x != y` on nil, Symbols and plain objects uses `BasicObject#!=`, which ZJIT inlines since #19162 when a call site sees one receiver class. With more than one it stays a dynamic send, as in `type != :aria && type != :class` in Action View's `tag_options`, where `type` is nil or a Symbol. My rails/rails#59811 rewrote that line for the JITs and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722).
 
-`opt_neq` had its own arm in the HIR builder, because its `!=` call data is the second operand. That arm skipped the dispatch on profiled receiver classes that the other `opt_*` instructions get. It now shares their arm. Each profiled class takes the path a monomorphic `!=` already takes, behind a type check: `!=` and `==` are resolved for that class under their `MethodRedefined` patch points, and a receiver the profile has not seen takes the original send. So this adds no new assumption.
+`opt_neq` had its own arm in the HIR builder, because its `!=` call data is the second operand, and that arm skipped the dispatch on profiled receiver classes that other sends get. It now shares their arm: each profiled class takes the path a monomorphic `!=` already takes, with the same patch points, and any other class takes the original send.
 
-The micro is the `tag_options` condition with nil and Symbol types. The apps are within the noise of master against master (`master-aa`); railsbench runs no polymorphic `!=`.
+`neq_nil_symbol` runs that condition in a loop; `master-aa` is a second build of master. lobsters and shipit lose about 10,000 and 30,000 polymorphic sends per iteration; their times stay within noise.
 
 ```
 master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
@@ -46,7 +49,7 @@ shipit      1474.7 ± 7.8%   1395.1 ± 6.3%  1417.7 ± 3.9%              0.923  
 ----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
 ```
 
-ZJIT stats per iteration, lobsters and then shipit, leaving out what also moves between two runs of master:
+ZJIT stats per iteration for lobsters, then shipit, without what also moves between two runs of master:
 
 ```diff
 -ccall_String#==: 1,359
