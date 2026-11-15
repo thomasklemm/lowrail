@@ -268,7 +268,7 @@ pursued.
 Branch [`thomasklemm/merge-blank-relation`](https://github.com/thomasklemm/rails/tree/thomasklemm/merge-blank-relation),
 head [`ee000f1671`](https://github.com/thomasklemm/rails/commit/ee000f16715dd3b701b403a34f163c0979895bb5), one
 commit on rails/rails main 50c54eed06 ("Skip merging a blank relation into a relation without conditions"). Queue
-item [MB1](../../bench/upstream/pr-queue/items/MB1.md), `in-review`. The first head, 5dd4ff1529, skipped every merge
+item [MB1](../../bench/upstream/pr-queue/items/MB1.md), `reviewed`. The first head, 5dd4ff1529, skipped every merge
 of a relation without values; both reviews returned `changes` on it (below).
 
 ```{ .diff file="activerecord/lib/active_record/relation/merger.rb" }
@@ -339,9 +339,11 @@ Measured on 0008bb1b1b, whose `merger.rb` is the final head's. Objects per chain
 −1.7% and −1.0% in a reviewer's run, within noise. No ZJIT loss.
 
 **Whole requests, Callgrind** ([`data/query-building/callgrind.txt`](data/query-building/callgrind.txt)), interpreter,
-fixed heap, instructions and objects per request. MB1 cells are on 0008bb1b1b (the final head's `merger.rb`). The
-first three rows have base and A/A rerun in the same round as MB1; the other rows compare with the first round's
-base, because Lobsters' base drifted −0.26% (−26 objects) between rounds, which is larger than their A/A.
+fixed heap, instructions and objects per request. MB1 cells are on 0008bb1b1b (the final head's `merger.rb`). For the
+first three rows, base and A/A were rerun right after the MB1 cells, in the same session (same orb, build and
+Valgrind, one cell at a time, not interleaved); the other rows compare with the first round's base. Lobsters' base
+drifted −0.26% (−26 objects) between the first round and this session, which is larger than its A/A, so the first
+round's base is not used for the first three rows.
 
 | Workload | base | A/A | MB1 | change | objects |
 |---|---:|---:|---:|---:|---:|
@@ -390,7 +392,7 @@ queue item, each with its own differential probe:
 | 5dd4ff1529 (skip every merge without values) | `changes`: duplicate where/having predicates kept (88 of 1,477 probe cases); null guard untested | `changes`: same dedup finding (84 of 1,728 cases); null guard untested; a YJIT `.to_a` +7.6% line didn't reproduce |
 | 0008bb1b1b (receiver-without-conditions guard, test) | `nits`: identical to main except a private `values_for_merge` override; the null-relation assertion didn't reach the early return | — |
 | ef6f3ff44b (assertion uses `Post.all`) | — | `nits`: 0 of 1,728 cases differ; the having guard was untested |
-| ee000f1671 (having assertion) | `nits` with the body (78ea3ab): every body number matches the cells; nits on wording and on comparing second-round cells with a first-round base | `approve` with the body (78ea3ab): 0 of 1,728 cases differ, each guard removal fails the test, every body number checked against the cells |
+| ee000f1671 (having assertion) | `nits` with the body (78ea3ab), then `nits` at 4ec311b: every number recomputed from the cells matches; postable as is | `approve` with the body (78ea3ab): 0 of 1,728 cases differ, each guard removal fails the test, every body number checked against the cells |
 
 Both reviewers' fixes were applied: removing any one of the three guards now fails the test.
 Neither found a problem with the code on 0008bb or later, and both expect a maintainer to take it. No Fable review

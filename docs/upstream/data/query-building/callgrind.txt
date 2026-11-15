@@ -32,7 +32,7 @@ base|mastodon|GET status context|interp|49813542|10382|0
 aa|mastodon|GET status context|interp|49872632|10382|0
 branch|mastodon|GET status context|interp|50644564|10557|0
 # mastodon GET status context, objects counted without Valgrind (request_ir.rb, 20 requests after 20 warmups), two runs per tree: base 207588 and 207589, branch 207188 and 207189 (10,379 -> 10,359 per request)
-## third round: same-round base and A/A for the second-round branch cells (interp)
+## third round: base and A/A for the second-round branch cells (interp). Rounds two and three ran back to back in one session (same orb, build and Valgrind 3.24.0, one cell at a time; YJIT cells between them), not interleaved
 base|fizzy|GET card|interp|78468304|13105|0
 base|campfire|POST message (turbo_stream)|interp|44494709|10942|0
 base|lobsters|GET story|interp|105507216|20969|0
