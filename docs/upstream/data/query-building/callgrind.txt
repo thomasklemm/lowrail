@@ -1,23 +1,34 @@
 # QB1 / MB1 Callgrind cells: TREE|APP|WORKLOAD|MODE|Ir per request|objects per request|YJIT blocks compiled in the window
-# base and aa: rails/rails 50c54eed06; branch: thomasklemm/merge-blank-relation 5dd4ff1529. Valgrind 3.24.0 (interp), GC off after GC.start.
+# base and aa: rails/rails 50c54eed06. branch-5dd4ff: thomasklemm/merge-blank-relation 5dd4ff1529 (first head). branch: 0008bb1b1b (merger.rb identical to the final head ee000f1671).
+# Valgrind 3.24.0 (interp), GC off after GC.start, one cell at a time.
+## first round (head 5dd4ff1529)
 aa|blog|GET articles (100)|interp|136447335|18390|0
 base|blog|GET articles (100)|interp|136469614|18386|0
-branch|blog|GET articles (100)|interp|136493803|18390|0
+branch-5dd4ff|blog|GET articles (100)|interp|136493803|18390|0
 aa|campfire|POST message (turbo_stream)|interp|44507590|10954|0
 base|campfire|POST message (turbo_stream)|interp|44504393|10948|0
-branch|campfire|POST message (turbo_stream)|interp|43977273|10883|0
+branch-5dd4ff|campfire|POST message (turbo_stream)|interp|43977273|10883|0
 aa|fizzy|GET card|interp|78572682|13098|0
 base|fizzy|GET card|interp|78483514|13098|0
-branch|fizzy|GET card|interp|77081828|12904|0
+branch-5dd4ff|fizzy|GET card|interp|77081828|12904|0
 aa|fizzy|GET cards (100)|interp|209745605|23778|0
 base|fizzy|GET cards (100)|interp|209725160|23779|0
-branch|fizzy|GET cards (100)|interp|208795267|23650|0
+branch-5dd4ff|fizzy|GET cards (100)|interp|208795267|23650|0
 aa|lobsters|GET newest (100)|interp|504661266|88267|0
 base|lobsters|GET newest (100)|interp|504713905|88277|0
-branch|lobsters|GET newest (100)|interp|504505161|88259|0
+branch-5dd4ff|lobsters|GET newest (100)|interp|504505161|88259|0
 aa|lobsters|GET story|interp|105890022|20993|0
 base|lobsters|GET story|interp|105787363|20995|0
-branch|lobsters|GET story|interp|104887501|20901|0
+branch-5dd4ff|lobsters|GET story|interp|104887501|20901|0
 aa|mastodon|GET status context|interp|49869377|10382|0
 base|mastodon|GET status context|interp|39469232|9075|0
-branch|mastodon|GET status context|interp|49750642|10362|0
+branch-5dd4ff|mastodon|GET status context|interp|49750642|10362|0
+## second round (head 0008bb1b1b)
+branch|fizzy|GET card|interp|77381214|12928|0
+branch|campfire|POST message (turbo_stream)|interp|44145665|10892|0
+branch|lobsters|GET story|interp|104859799|20884|0
+branch|fizzy|GET cards (100)|interp|208903012|23649|0
+base|mastodon|GET status context|interp|49813542|10382|0
+aa|mastodon|GET status context|interp|49872632|10382|0
+branch|mastodon|GET status context|interp|50644564|10557|0
+# mastodon GET status context, objects counted without Valgrind (request_ir.rb, 20 requests after 20 warmups), two runs per tree: base 207588 and 207589, branch 207188 and 207189 (10,379 -> 10,359 per request)

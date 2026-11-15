@@ -1,0 +1,53 @@
+# QB1: Merger#merge calls per request on rails/rails 50c54eed06 (bench/upstream/qb/merges.rb, census workloads, one request each after 3 warmups)
+blog: 0.9 merges per request (mean over 9 workloads)
+  blank                              0.4
+  values                             0.4
+    0.4  blank                            from ActiveRecord::Associations::Association#target_scope
+    0.4  values                           from ActiveRecord::Associations::Association#scope
+campfire: 21.7 merges per request (mean over 7 workloads)
+  blank                              8.4
+  values                            11.3
+  blank, receiver has conditions     2.0
+    6.7  blank                            from ActiveRecord::Associations::Association#target_scope
+    6.7  values                           from ActiveRecord::Associations::Association#scope
+    2.1  values                           from Array#each
+    2.1  values                           from ActiveRecord::Associations::Preloader::Association#build_scope
+    2.0  blank, receiver has conditions   from block (2 levels) in ActiveRecord::Associations::AssociationScope#add_constraints
+    1.7  blank                            from block in ActiveRecord::Associations::ThroughAssociation#target_scope
+    0.3  values                           from block in <class:Membership>
+fizzy: 52.8 merges per request (mean over 11 workloads)
+  blank                             24.7
+  values                            26.5
+  blank, receiver has conditions     1.6
+   19.6  blank                            from ActiveRecord::Associations::Association#target_scope
+   19.6  values                           from ActiveRecord::Associations::Association#scope
+    5.1  blank                            from block in ActiveRecord::Associations::ThroughAssociation#target_scope
+    3.2  values                           from Array#each
+    3.2  values                           from ActiveRecord::Associations::Preloader::Association#build_scope
+    1.6  blank, receiver has conditions   from block (2 levels) in ActiveRecord::Associations::AssociationScope#add_constraints
+    0.3  values                           from block in <class:Board>
+    0.2  values                           from block (2 levels) in <module:Watchable>
+lobsters: 14.7 merges per request (mean over 9 workloads)
+  blank                              7.1
+  values                             7.1
+  blank, receiver has conditions     0.4
+    5.2  blank                            from ActiveRecord::Associations::Association#target_scope
+    5.2  values                           from ActiveRecord::Associations::Association#scope
+    1.9  blank                            from block in ActiveRecord::Associations::ThroughAssociation#target_scope
+    0.9  values                           from ActiveRecord::Associations::Preloader::Association#build_scope
+    0.4  values                           from Array#each
+    0.4  values                           from block (2 levels) in ActiveRecord::Associations::AssociationScope#add_constraints
+    0.4  blank, receiver has conditions   from block (2 levels) in ActiveRecord::Associations::AssociationScope#add_constraints
+    0.1  values                           from block in <class:Story>
+mastodon: 24.1 merges per request (mean over 12 workloads)
+  blank                             10.6
+  values                            13.2
+  blank, receiver has conditions     0.3
+   10.8  values                           from ActiveRecord::Associations::Association#scope
+   10.3  blank                            from ActiveRecord::Associations::Association#target_scope
+    0.7  values                           from PublicFeed#get
+    0.4  values                           from ActiveRecord::Associations::Association#target_scope
+    0.4  values                           from Array#each
+    0.4  values                           from ActiveRecord::Associations::Preloader::Association#build_scope
+    0.3  blank, receiver has conditions   from block (2 levels) in ActiveRecord::Associations::AssociationScope#add_constraints
+    0.2  blank                            from block in ActiveRecord::Associations::ThroughAssociation#target_scope

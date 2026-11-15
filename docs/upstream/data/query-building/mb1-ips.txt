@@ -1,3 +1,5 @@
+# MB1 benchmark-ips (bench/upstream/qb/mb1_ips.sh), core 3. First block: branch head 5dd4ff1529. Second block: head 0008bb1b1b, whose merger.rb is identical to the final head ee000f1671 (later commits change only the test).
+#### head 5dd4ff1529
 ##### micro-interp (best of 5 per tree; main, branch, aa = main again)
 ### main round 1
 ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
@@ -187,3 +189,193 @@ ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linu
 post.comments.where(approved: true).to_a     25.288k (± 5.7%) i/s   (39.54 μs/i) -    127.655k in   5.048112s
 post.comments.where(approved: true)           main    116928  A/A  +0.2%  branch    140967  +20.6%
 post.comments.where(approved: true).to_a      main     26029  A/A  -0.2%  branch     25977   -0.2%
+#### head 0008bb1b1b (= ee000f1671 lib)
+##### micro-interp (best of 5 per tree; main, branch, aa = main again)
+### main round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     32.705k (± 2.8%) i/s   (30.58 μs/i) -    166.400k in   5.087957s
+post.comments.where(approved: true).to_a      5.083k (± 3.6%) i/s  (196.75 μs/i) -     25.900k in   5.095729s
+### branch round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     40.650k (± 0.9%) i/s   (24.60 μs/i) -    206.601k in   5.082490s
+post.comments.where(approved: true).to_a      5.301k (± 3.8%) i/s  (188.64 μs/i) -     26.550k in   5.008454s
+### aa round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     33.221k (± 3.5%) i/s   (30.10 μs/i) -    166.821k in   5.021534s
+post.comments.where(approved: true).to_a      5.198k (± 3.4%) i/s  (192.39 μs/i) -     26.010k in   5.004181s
+### aa round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     31.336k (± 9.6%) i/s   (31.91 μs/i) -    159.222k in   5.081194s
+post.comments.where(approved: true).to_a      5.109k (± 3.7%) i/s  (195.73 μs/i) -     25.800k in   5.049909s
+### branch round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     38.206k (± 3.7%) i/s   (26.17 μs/i) -    191.568k in   5.014139s
+post.comments.where(approved: true).to_a      5.342k (± 1.4%) i/s  (187.19 μs/i) -     27.132k in   5.078890s
+### main round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     32.932k (± 3.2%) i/s   (30.37 μs/i) -    167.382k in   5.082703s
+post.comments.where(approved: true).to_a      5.152k (± 3.5%) i/s  (194.11 μs/i) -     25.921k in   5.031582s
+### main round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     33.444k (± 3.4%) i/s   (29.90 μs/i) -    169.550k in   5.069729s
+post.comments.where(approved: true).to_a      5.166k (± 4.3%) i/s  (193.56 μs/i) -     26.050k in   5.042359s
+### branch round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     38.676k (± 4.8%) i/s   (25.86 μs/i) -    193.440k in   5.001537s
+post.comments.where(approved: true).to_a      5.277k (± 1.6%) i/s  (189.49 μs/i) -     26.500k in   5.021514s
+### aa round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     32.901k (± 3.6%) i/s   (30.39 μs/i) -    165.700k in   5.036286s
+post.comments.where(approved: true).to_a      5.011k (± 5.7%) i/s  (199.57 μs/i) -     25.398k in   5.068745s
+### aa round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     31.965k (± 5.0%) i/s   (31.28 μs/i) -    162.100k in   5.071100s
+post.comments.where(approved: true).to_a      5.058k (± 3.1%) i/s  (197.72 μs/i) -     25.755k in   5.092346s
+### branch round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     38.675k (± 5.0%) i/s   (25.86 μs/i) -    194.750k in   5.035531s
+post.comments.where(approved: true).to_a      5.301k (± 1.6%) i/s  (188.63 μs/i) -     27.030k in   5.098757s
+### main round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     33.061k (± 3.1%) i/s   (30.25 μs/i) -    168.400k in   5.093682s
+post.comments.where(approved: true).to_a      5.207k (± 1.9%) i/s  (192.06 μs/i) -     26.350k in   5.060820s
+### main round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     31.755k (± 6.0%) i/s   (31.49 μs/i) -    160.100k in   5.041794s
+post.comments.where(approved: true).to_a      4.940k (± 6.9%) i/s  (202.43 μs/i) -     24.864k in   5.033301s
+### branch round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     38.897k (± 2.5%) i/s   (25.71 μs/i) -    195.534k in   5.026985s
+post.comments.where(approved: true).to_a      5.239k (± 3.7%) i/s  (190.87 μs/i) -     26.571k in   5.071688s
+### aa round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+     post.comments.where(approved: true)     32.599k (± 3.4%) i/s   (30.68 μs/i) -    164.350k in   5.041489s
+post.comments.where(approved: true).to_a      4.956k (± 5.0%) i/s  (201.79 μs/i) -     25.250k in   5.095116s
+post.comments.where(approved: true)           main     33444  A/A  -0.7%  branch     40650  +21.5%
+post.comments.where(approved: true).to_a      main      5207  A/A  -0.2%  branch      5342   +2.6%
+##### micro-yjit (best of 5 per tree; main, branch, aa = main again)
+### main round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    117.755k (± 2.9%) i/s    (8.49 μs/i) -    591.696k in   5.024814s
+post.comments.where(approved: true).to_a     21.009k (± 3.9%) i/s   (47.60 μs/i) -    106.200k in   5.054869s
+### branch round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    137.394k (± 6.6%) i/s    (7.28 μs/i) -    697.536k in   5.076891s
+post.comments.where(approved: true).to_a     21.993k (± 3.0%) i/s   (45.47 μs/i) -    110.800k in   5.037862s
+### aa round 1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    120.761k (± 3.9%) i/s    (8.28 μs/i) -    615.672k in   5.098258s
+post.comments.where(approved: true).to_a     20.625k (± 4.9%) i/s   (48.49 μs/i) -    104.040k in   5.044442s
+### aa round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    115.510k (± 4.6%) i/s    (8.66 μs/i) -    583.872k in   5.054720s
+post.comments.where(approved: true).to_a     20.813k (± 5.7%) i/s   (48.05 μs/i) -    104.762k in   5.033414s
+### branch round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    139.405k (± 5.8%) i/s    (7.17 μs/i) -    709.410k in   5.088853s
+post.comments.where(approved: true).to_a     21.849k (± 4.2%) i/s   (45.77 μs/i) -    110.211k in   5.044260s
+### main round 2
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    113.787k (± 4.3%) i/s    (8.79 μs/i) -    570.600k in   5.014634s
+post.comments.where(approved: true).to_a     19.873k (± 6.0%) i/s   (50.32 μs/i) -    100.992k in   5.081811s
+### main round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    123.359k (± 1.8%) i/s    (8.11 μs/i) -    620.776k in   5.032258s
+post.comments.where(approved: true).to_a     20.932k (± 4.4%) i/s   (47.77 μs/i) -    105.056k in   5.019005s
+### branch round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    141.771k (± 3.4%) i/s    (7.05 μs/i) -    710.696k in   5.012994s
+post.comments.where(approved: true).to_a     20.308k (± 8.2%) i/s   (49.24 μs/i) -    103.341k in   5.088809s
+### aa round 3
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    117.440k (± 5.1%) i/s    (8.51 μs/i) -    596.500k in   5.079170s
+post.comments.where(approved: true).to_a     21.158k (± 3.4%) i/s   (47.26 μs/i) -    106.350k in   5.026505s
+### aa round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    117.903k (± 5.8%) i/s    (8.48 μs/i) -    601.188k in   5.099012s
+post.comments.where(approved: true).to_a     20.619k (± 3.1%) i/s   (48.50 μs/i) -    103.116k in   5.000961s
+### branch round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    141.241k (± 2.9%) i/s    (7.08 μs/i) -    706.972k in   5.005445s
+post.comments.where(approved: true).to_a     20.767k (± 8.0%) i/s   (48.15 μs/i) -    104.295k in   5.022180s
+### main round 4
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    109.687k (±10.0%) i/s    (9.12 μs/i) -    549.801k in   5.012466s
+post.comments.where(approved: true).to_a     20.203k (± 4.8%) i/s   (49.50 μs/i) -    101.675k in   5.032573s
+### main round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    112.053k (± 9.7%) i/s    (8.92 μs/i) -    566.773k in   5.058074s
+post.comments.where(approved: true).to_a     21.036k (± 3.7%) i/s   (47.54 μs/i) -    105.213k in   5.001541s
+### branch round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    136.386k (± 6.5%) i/s    (7.33 μs/i) -    684.000k in   5.015165s
+post.comments.where(approved: true).to_a     21.383k (± 4.8%) i/s   (46.77 μs/i) -    108.927k in   5.094096s
+### aa round 5
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    118.991k (± 4.8%) i/s    (8.40 μs/i) -    599.750k in   5.040284s
+post.comments.where(approved: true).to_a     19.892k (± 8.5%) i/s   (50.27 μs/i) -    100.352k in   5.044942s
+post.comments.where(approved: true)           main    123359  A/A  -2.1%  branch    141771  +14.9%
+post.comments.where(approved: true).to_a      main     21036  A/A  +0.6%  branch     21993   +4.5%
+##### micro-zjit (best of 5 per tree; main, branch, aa = main again)
+### main round 1
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    115.157k (± 3.8%) i/s    (8.68 μs/i) -    578.708k in   5.025375s
+post.comments.where(approved: true).to_a     25.032k (± 4.4%) i/s   (39.95 μs/i) -    126.711k in   5.061997s
+### branch round 1
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    138.057k (± 3.5%) i/s    (7.24 μs/i) -    692.664k in   5.017249s
+post.comments.where(approved: true).to_a     25.588k (± 9.9%) i/s   (39.08 μs/i) -    129.340k in   5.054784s
+### aa round 1
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    113.496k (± 6.4%) i/s    (8.81 μs/i) -    579.312k in   5.104244s
+post.comments.where(approved: true).to_a     24.966k (± 5.7%) i/s   (40.05 μs/i) -    125.832k in   5.040166s
+### aa round 2
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    112.505k (± 6.7%) i/s    (8.89 μs/i) -    564.921k in   5.021285s
+post.comments.where(approved: true).to_a     24.407k (± 9.9%) i/s   (40.97 μs/i) -    122.796k in   5.031224s
+### branch round 2
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    136.775k (± 4.4%) i/s    (7.31 μs/i) -    697.809k in   5.101885s
+post.comments.where(approved: true).to_a     25.304k (± 8.4%) i/s   (39.52 μs/i) -    127.050k in   5.021012s
+### main round 2
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    115.814k (± 4.2%) i/s    (8.63 μs/i) -    582.471k in   5.029356s
+post.comments.where(approved: true).to_a     24.857k (± 6.5%) i/s   (40.23 μs/i) -    124.850k in   5.022641s
+### main round 3
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    110.692k (± 7.9%) i/s    (9.03 μs/i) -    554.832k in   5.012408s
+post.comments.where(approved: true).to_a     24.619k (± 6.5%) i/s   (40.62 μs/i) -    124.275k in   5.047998s
+### branch round 3
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    134.585k (± 6.3%) i/s    (7.43 μs/i) -    681.564k in   5.064190s
+post.comments.where(approved: true).to_a     24.593k (± 8.9%) i/s   (40.66 μs/i) -    124.196k in   5.049964s
+### aa round 3
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    113.240k (± 5.6%) i/s    (8.83 μs/i) -    574.080k in   5.069588s
+post.comments.where(approved: true).to_a     25.223k (± 5.6%) i/s   (39.65 μs/i) -    128.089k in   5.078306s
+### aa round 4
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    111.827k (± 5.3%) i/s    (8.94 μs/i) -    560.208k in   5.009593s
+post.comments.where(approved: true).to_a     23.719k (±10.4%) i/s   (42.16 μs/i) -    119.144k in   5.023077s
+### branch round 4
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    126.258k (± 9.3%) i/s    (7.92 μs/i) -    639.216k in   5.062789s
+post.comments.where(approved: true).to_a     23.670k (± 9.5%) i/s   (42.25 μs/i) -    120.120k in   5.074680s
+### main round 4
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    109.155k (± 5.0%) i/s    (9.16 μs/i) -    546.672k in   5.008239s
+post.comments.where(approved: true).to_a     23.203k (± 9.2%) i/s   (43.10 μs/i) -    116.109k in   5.004149s
+### main round 5
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    116.136k (± 3.1%) i/s    (8.61 μs/i) -    585.450k in   5.041059s
+post.comments.where(approved: true).to_a     25.340k (± 4.1%) i/s   (39.46 μs/i) -    127.410k in   5.028019s
+### branch round 5
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    136.365k (± 3.9%) i/s    (7.33 μs/i) -    691.356k in   5.069903s
+post.comments.where(approved: true).to_a     25.067k (±10.4%) i/s   (39.89 μs/i) -    126.900k in   5.062385s
+### aa round 5
+ruby 4.1.0dev (2026-11-14T18:00:28Z master 88ea6fd282) +ZJIT +PRISM [x86_64-linux]
+     post.comments.where(approved: true)    113.769k (± 3.3%) i/s    (8.79 μs/i) -    570.050k in   5.010581s
+post.comments.where(approved: true).to_a     24.569k (± 6.4%) i/s   (40.70 μs/i) -    124.488k in   5.066954s
+post.comments.where(approved: true)           main    116136  A/A  -2.0%  branch    138057  +18.9%
+post.comments.where(approved: true).to_a      main     25340  A/A  -0.5%  branch     25588   +1.0%
