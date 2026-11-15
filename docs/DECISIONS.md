@@ -307,15 +307,15 @@ a few seconds, without having seen our notes. If it reads like a report, it is t
   values, methodology, ruby-bench placement and other Rubies stay in the record. A correctness PR has no numbers.
 * **Leave out:** test-run and suite counts, commands, SHAs and pins, which Rubies or databases were tried, review
   history, rejected variants, differential sizes, private or `:nodoc:` override boundaries, "this is not a speed
-  claim". The diff shows the tests and the footer links the record. If a maintainer asks, the answer goes in a
-  reply.
+  claim". The diff shows the tests. If a maintainer asks, the answer goes in a reply.
 * **Language.** Full sentences and plain words. No internal labels (B, R, C1), arrows, shorthand, stacked
   qualifiers, headings, checklists or bold. Say it as you would to a colleague at the next desk.
 * **Fixed parts.** A stacked PR starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is
-  new here." Interlocking changes get one cross-link sentence with owner/repo. Bugs, regressions and compatibility
-  PRs end with a one-line `<sub>` footer after `---` saying in neutral words how it was found and linking the public
-  record, e.g. "Found while measuring Rails main after #59141 ([record](…))." (Thomas, 2026-11-14: no "census", no
-  "research project Lowrail"; open PRs keep theirs). ZJIT evidence uses the tools' own format (see above). No AI
+  new here." Interlocking changes get one cross-link sentence with owner/repo. **No footer** (Thomas, 2026-11-15:
+  cleaner without; replaces the `<sub>` record footer of 2026-11-14, removed from every open PR the same day). How
+  we found it goes in the text in a clause, e.g. "While profiling a few Rails apps, …", and the body says above all
+  why it matters to the reader. No link to Lowrail; if a maintainer asks for the data, link the record in a reply.
+  ZJIT evidence uses the tools' own format (see above). No AI
   disclaimer, except where it matters, as on #1058.
 * **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
   by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
@@ -610,8 +610,7 @@ round numbers), orbs, and our process. Upstream numbers describe the upstream co
 setup in neutral words ("35 Rails workloads", not "census 9"). Before posting, check every column, row, link and
 sentence: would the reader miss it if it were gone? If not, drop it. Example: on ruby/ruby#17251 a table with a
 column for our held GC branch was deleted the same day, and only the master and #17251 numbers were kept, as an
-update to our earlier comment there. The `<sub>` footer that links the public record is the one sanctioned mention
-of Lowrail, in neutral words (see PR descriptions above).
+update to our earlier comment there. PR bodies don't mention or link Lowrail (no footer since 2026-11-15).
 
 ## No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
 
