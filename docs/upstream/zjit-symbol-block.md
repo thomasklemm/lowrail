@@ -772,6 +772,9 @@ each).
 | railsbench | master | pass | 3,937,287,334 | 1 | 11,961,311 (32,467 × 368) | 3,586,640 (9,974 × 360) | 4,579,774 (7,274 × 630) | 5,850,760 (7,974 × 734) |
 | railsbench | master again | pass | 3,939,615,741 | 1 | 11,961,311 (32,467 × 368) | 3,586,640 (9,974 × 360) | 4,579,774 (7,274 × 630) | 5,852,124 (7,974 × 734) |
 | railsbench | branch | pass | 3,918,065,982 | 1 | 0 (0) | 0 (0) | 4,579,774 (7,274 × 630) | 5,850,760 (7,974 × 734) |
+| shipit | master | pass | 3,126,542,997 | 0 | 13,615,304 (34,810 × 391) | 5,372,590 (14,937 × 360) | 11,712,084 (16,571 × 707) | 9,738,826 (14,166 × 687) |
+| shipit | master again | pass | 3,204,568,264 | 1 | 13,615,304 (34,810 × 391) | 5,372,590 (14,937 × 360) | 11,712,084 (16,571 × 707) | 9,740,069 (14,166 × 688) |
+| shipit | branch | pass | 3,112,246,019 | 0 | 105,520 (130 × 812) | 0 (0) | 11,712,084 (16,571 × 707) | 9,740,070 (14,166 × 688) |
 
 * **blog: rejected, all three cells.** Each cell has a window in which ZJIT compiled something (master: the
   yield-from-C window; master again: the whole-program window and both send windows; branch: the ISEQ-send window,
@@ -786,6 +789,15 @@ each).
   are identical to master's to the instruction. The saving is larger than the 15,547,951 Ir/itr that master spends
   inside the two send regions; a region leaves out the called method's body, and the remaining 3.7 million are not
   attributed.
+* **shipit: −0.46% against the master run with the same GC count; no usable whole-program A/A.** All three cells
+  pass the gate, but the whole-program windows hold different numbers of GCs: 0 on master, 1 on master again, 0 on
+  the branch (the GC column is the whole-program window's). The two master runs differ by 78,025,267 Ir/itr
+  (2.50%), so that pair says nothing about noise at 0 GCs. Against master, which has the same GC count, the branch
+  is 14,296,978 Ir/itr (0.46%) lower; against master again it is 92,322,245 (2.88%) lower, which is the GC and not
+  the change. What can be compared exactly are the regions: both master runs spend the same 13,615,304 and
+  5,372,590 Ir/itr in the two send regions, and their yield regions differ by at most 1,243. On the branch 130
+  sends to ISEQ callees per iteration still take the generic path (812 Ir each), no send to another callee does,
+  and the yield regions match master's (11,712,084 exactly; 9,740,070 against 9,738,826 and 9,740,069).
 
 ### Reviews
 
@@ -840,7 +852,8 @@ Decided by the coordinator on 2026-11-15:
 
 * **One concern per PR:** the VM extraction is its own commit in the same PR (above).
 * **Tracker rule:** the ZJIT commit is +212 −55, above the 150-line "ask on the tracker first" rule in DECISIONS.
-  The coordinator asks Thomas; until he answers nothing opens and nothing is posted on Shopify/ruby#1014.
+  The coordinator asked Thomas, who decided to open the draft (ruby/ruby#19912) without a comment on
+  Shopify/ruby#1014.
 * **Disclosure:** the tip of Rafael's branch says the branch was produced by an agent (`ZJIT_PERF_TASK.md`,
   `ZJIT_PERF_SUMMARY.md`). No LLM disclosure is added and Rafael is not pinged separately; the body names him and
   links his branch.
@@ -879,16 +892,16 @@ Not applied:
 
 ### PR body and the #1014 comment
 
-The body is in [ZS1.md](../../bench/upstream/pr-queue/items/ZS1.md), verbatim as it will be posted. It references
-Shopify/ruby#1014, #18180 and Shopify/ruby#1039, and has no footer and no Lowrail link. Nothing is opened or
-posted: the coordinator opens the draft, and only after Thomas has read the change and can explain it
-([DECISIONS](../DECISIONS.md)).
+The body is in [ZS1.md](../../bench/upstream/pr-queue/items/ZS1.md), verbatim as posted. It references
+Shopify/ruby#1014, #18180 and Shopify/ruby#1039, and has no footer and no Lowrail link. The coordinator
+opened it as draft ruby/ruby#19912 on 2026-11-15 at `fbbb9cee7b` (three commits, maintainer edits on), after
+Thomas's decision ([DECISIONS](../DECISIONS.md)).
 
 Draft reply to tekknolagi's question on Shopify/ruby#1014 ("Is this done now that Alan added the PR?"), **not
-posted**; the PR number goes in when the draft exists:
+posted**: Thomas decided to open the PR without a comment on that issue. It stays here as a draft only:
 
 > Not all of it: ruby/ruby#18180 covers a profiled `Proc`, and ruby/ruby#19484 callees that declare `&block`. A
-> Symbol block argument (`foo(&:sym)`) still fell back to a dynamic send; ruby/ruby#NNNNN sends it directly to
+> Symbol block argument (`foo(&:sym)`) still fell back to a dynamic send; ruby/ruby#19912 sends it directly to
 > ISEQ and C callees. Forwarded block parameters and the `yield` to a Symbol are not in it.
 
 ### Reproduce the second round
