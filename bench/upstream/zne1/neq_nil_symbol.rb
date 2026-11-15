@@ -9,11 +9,24 @@ def nested?(type, value)
   type != :aria && type != :class && value.is_a?(Hash)
 end
 
+def count_nested
+  count = 0
+  i = 0
+  while i < 800
+    count += 1 if nested?(TYPES[i & 7], VALUES[i & 7])
+    i += 1
+  end
+  count
+end
+
+# Warm up outside the measured iterations, so each one runs compiled code from the start.
+100.times { count_nested }
+
 run_benchmark(100) do
   count = 0
   i = 0
-  while i < 2_000_000
-    count += 1 if nested?(TYPES[i & 7], VALUES[i & 7])
+  while i < 2_500
+    count += count_nested
     i += 1
   end
   raise "wrong count: #{count}" unless count == 250_000

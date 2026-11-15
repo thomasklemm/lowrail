@@ -1,0 +1,37 @@
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T12:58:58Z zjit-polymorphic-neq fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+--------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
+bench             master (ms)  master-aa (ms)   branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value  sig  master/branch  p-value        sig
+neq_nil_symbol  195.3 ± 33.9%   200.2 ± 33.0%  39.3 ± 59.3%              1.131           2.410             0.976    0.778         4.966 (***)  6.5e-14  p < 0.001
+--------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+Total time spent benchmarking: 30s
+
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T12:58:58Z zjit-polymorphic-neq fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+--------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
+bench             master (ms)  master-aa (ms)   branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value  sig  master/branch  p-value        sig
+neq_nil_symbol  195.3 ± 33.9%   200.2 ± 33.0%  39.3 ± 59.3%              1.131           2.410             0.976    0.778         4.966 (***)  6.5e-14  p < 0.001
+--------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+
+Output:
+/home/user/w/zne1/out/bench-micro.json

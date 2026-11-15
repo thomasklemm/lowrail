@@ -1,0 +1,31 @@
+round 1 master:                tag.a    268.427k (± 9.8%) i/s    (3.73 μs/i) -      1.350M in   5.031057s
+round 1 master:          content_tag    481.889k (±10.2%) i/s    (2.08 μs/i) -      2.419M in   5.020384s
+round 1 master-aa:                tag.a    267.187k (±13.9%) i/s    (3.74 μs/i) -      1.349M in   5.049236s
+round 1 master-aa:          content_tag    510.614k (±11.8%) i/s    (1.96 μs/i) -      2.577M in   5.046406s
+round 1 branch:                tag.a    318.037k (±10.8%) i/s    (3.14 μs/i) -      1.604M in   5.042893s
+round 1 branch:          content_tag    546.394k (± 8.5%) i/s    (1.83 μs/i) -      2.762M in   5.054849s
+round 2 master:                tag.a    301.117k (± 9.4%) i/s    (3.32 μs/i) -      1.508M in   5.008505s
+round 2 master:          content_tag    510.173k (± 8.9%) i/s    (1.96 μs/i) -      2.588M in   5.072304s
+round 2 master-aa:                tag.a    281.565k (±10.0%) i/s    (3.55 μs/i) -      1.424M in   5.057530s
+round 2 master-aa:          content_tag    509.493k (± 9.1%) i/s    (1.96 μs/i) -      2.564M in   5.033299s
+round 2 branch:                tag.a    307.818k (± 9.5%) i/s    (3.25 μs/i) -      1.552M in   5.043572s
+round 2 branch:          content_tag    493.203k (±13.7%) i/s    (2.03 μs/i) -      2.470M in   5.008831s
+round 3 master:                tag.a    279.250k (± 9.6%) i/s    (3.58 μs/i) -      1.421M in   5.090246s
+round 3 master:          content_tag    476.254k (±16.6%) i/s    (2.10 μs/i) -      2.397M in   5.033830s
+round 3 master-aa:                tag.a    285.425k (±11.9%) i/s    (3.50 μs/i) -      1.429M in   5.007893s
+round 3 master-aa:          content_tag    453.794k (±24.2%) i/s    (2.20 μs/i) -      2.303M in   5.074441s
+round 3 branch:                tag.a    303.704k (±12.2%) i/s    (3.29 μs/i) -      1.521M in   5.008020s
+round 3 branch:          content_tag    488.987k (±13.4%) i/s    (2.05 μs/i) -      2.455M in   5.020976s
+round 4 master:                tag.a    296.079k (± 9.7%) i/s    (3.38 μs/i) -      1.507M in   5.089689s
+round 4 master:          content_tag    516.051k (±10.8%) i/s    (1.94 μs/i) -      2.597M in   5.032620s
+round 4 master-aa:                tag.a    285.733k (±13.1%) i/s    (3.50 μs/i) -      1.453M in   5.085839s
+round 4 master-aa:          content_tag    485.304k (±13.7%) i/s    (2.06 μs/i) -      2.429M in   5.004574s
+round 4 branch:                tag.a    315.287k (±11.5%) i/s    (3.17 μs/i) -      1.601M in   5.077370s
+round 4 branch:          content_tag    561.018k (± 9.6%) i/s    (1.78 μs/i) -      2.845M in   5.071727s
+round 5 master:                tag.a    295.646k (± 8.9%) i/s    (3.38 μs/i) -      1.492M in   5.047747s
+round 5 master:          content_tag    506.731k (±11.3%) i/s    (1.97 μs/i) -      2.566M in   5.064333s
+round 5 master-aa:                tag.a    256.781k (±14.8%) i/s    (3.89 μs/i) -      1.291M in   5.026535s
+round 5 master-aa:          content_tag    505.202k (±12.0%) i/s    (1.98 μs/i) -      2.541M in   5.030420s
+round 5 branch:                tag.a    310.807k (± 9.3%) i/s    (3.22 μs/i) -      1.583M in   5.092707s
+round 5 branch:          content_tag    526.098k (±12.6%) i/s    (1.90 μs/i) -      2.657M in   5.049732s
+done
