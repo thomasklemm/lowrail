@@ -138,12 +138,14 @@ state is right, and main leaves both pinned.
 | Loop | Before (main 8217632cf8) | After |
 |---|---:|---:|
 | orb, the three tests in seeded random class order, seeds 1–120 | 15/120 | 0/120 |
-| Fable review orb, same loop, 120 distinct seeds | 12/120 | 0/120 |
+| Fable review orb, `bin/test` with the three files (same tests, other shuffles per seed), 120 seeds | 12/120 | 0/120 |
 | orb, full `sqlite3:test:ractor` with CI seeds 6870 and 20983 | 2/2 | 0/2 |
 | orb, full `sqlite3:test:ractor` seeds 1, 2 and full `test:sqlite3` seed 6870 | – | 0 failures, 0 errors |
 
-About 1 in 8 matches the share of class orders (1 in 6) that run the pinning test, then the dirtying test, then the
-retry test. The earlier GitHub runs 43715792755 and 43721043566 used seeds 1–60 in both shards, so their "14/120"
+About 1 in 8 is consistent with the share of class orders (1 in 6) that run the pinning test, then the dirtying test,
+then the retry test; the Fable review measured that every run in the order DatabaseSelector, Transaction, Async
+fails and no other order does (with `async_loop.sh`, main fails seeds 5 12 13 17 26 43 59 80 96 102 108 109 110
+111 118). The earlier GitHub runs 43715792755 and 43721043566 used seeds 1–60 in both shards, so their "14/120"
 was 7/60 counted twice (Fable). Run 43725460078 gives each shard its own seeds (1–60, 61–120), after side pinned to
 fdd771cf79: 15/120 before, 0/120 after; the PR body cites it.
 
