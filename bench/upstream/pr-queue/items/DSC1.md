@@ -1,7 +1,7 @@
 ---
 id: DSC1
 repo: discourse/discourse
-kind: compat
+kind: fix
 area: "lib/freedom_patches/erb_util.rb: invalid UTF-8 repair before HTML escaping"
 reviewer:
 branch:
