@@ -331,7 +331,8 @@ a few seconds, without having seen our notes. If it reads like a report, it is t
   we found it goes in the text in a clause, e.g. "While profiling a few Rails apps, …", and the body says above all
   why it matters to the reader. No link to Lowrail; if a maintainer asks for the data, link the record in a reply.
   ZJIT evidence uses the tools' own format (see above). No AI
-  disclaimer, except where it matters, as on #1058.
+  disclaimer, except where it matters, as on #1058. An earlier PR of ours is cited by reference with what it tried
+  to do, not as "My #N" (Thomas, 2026-11-15, ruby/ruby#19909; #19912 is the example).
 * **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
   by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
   big or not yet clear; split or simplify the change instead.

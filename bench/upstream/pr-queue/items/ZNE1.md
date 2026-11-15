@@ -31,7 +31,7 @@ passes:
 
 # ZJIT: Specialize polymorphic opt_neq
 
-`x != y` on nil, Symbols and plain objects uses `BasicObject#!=`, which ZJIT inlines since #19162 when a call site sees one receiver class. With more than one it stays a dynamic send, as in `type != :aria && type != :class` in Action View's `tag_options`, where `type` is nil or a Symbol. My rails/rails#59811 rewrote that line and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722).
+`x != y` on nil, Symbols and plain objects uses `BasicObject#!=`, which ZJIT inlines since #19162 when a call site sees one receiver class. With more than one it stays a dynamic send, as in `type != :aria && type != :class` in Action View's `tag_options`, where `type` is nil or a Symbol. rails/rails#59811 wrote that condition with `==` and one negation, so that the JITs would not call `BasicObject#!=` there, and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722).
 
 `opt_neq` had its own arm in the HIR builder, because its `!=` call data is the second operand, and that arm skipped the dispatch on profiled receiver classes that other sends get. It now shares their arm: each profiled class takes the path a monomorphic `!=` already takes, with the same patch points, and any other class takes the original send.
 
