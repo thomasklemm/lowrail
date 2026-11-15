@@ -166,7 +166,8 @@ Each guard was removed in turn; every mutation fails at least one new test:
   of 2,233 on master, the difference being the new tests; the probe prints the x86_64 md5s in all 12 runs, with
   release and with dev builds; `make btest RUN_OPTS=--zjit-call-threshold=2` passes 2,148 tests on both; Active
   Model on Rails main gives the same result with ZJIT off, on, and at call threshold 1 and 2 (1,272 runs, the one
-  Ractor error in every mode).
+  Ractor error in every mode). Those ran on `52d41cc992`; on the new head `18d33e8a24`, which changes only tests,
+  `make zjit-test` again passes 2,241 of 2,241.
 
 ## Reach
 
@@ -199,6 +200,10 @@ iteration and by 10 times what two master runs differ by ([stats_diff.rb](../../
 [lobsters](data/zne1/stats-lobsters.diff), [shipit](data/zne1/stats-shipit.diff); railsbench prints nothing. Between
 two master runs the send counters are identical; what moves there are a few allocation counters and a swap between
 `invokeblock_not_specialized` and `invokeblock_polymorphic_miss` (±10,462 on lobsters, ±21,879 on shipit).
+The stats runs used the build made before the commit (its version line reads `zjit-polymorphic-neq fc4cd8872b`);
+`zjit/src/hir.rs` is identical at `18d33e8a24`. Raw files: `data/zne1/stats-{master,master2,branch}-*.json.gz`.
+On lobsters `getivar_fallback_no_side_exits` also drops by 1,821 per iteration, 10 times more than between the two
+master runs; why was not traced.
 
 ## Numbers
 
@@ -232,11 +237,23 @@ All three rounds, master/master-aa and master/branch:
   28.3 ms for master, master-aa and branch.
 * The micro ([neq_nil_symbol.rb](../../bench/upstream/zne1/neq_nil_symbol.rb), the `tag_options` condition with
   nil and Symbol types) is 4.4x to 5.1x faster in every round; its A/A stays between 0.936 and 1.030.
-* The apps do not move beyond A/A. Where the branch looks slower, the second master build does too: in round 2
-  lobsters is 0.885 for the branch (p 0.007) and 0.931 for master-aa (p 0.067), and shipit 0.921 and 0.956; in
-  rounds 1 and 2 master-aa is 4% to 7% slower than master on both apps. In the quiet round all three apps are
-  within 2.4% with p above 0.2. The ZJIT counters say the same work runs apart from the removed sends, and no
-  round shows a gain either, which fits ceilings of 0.18% and 0.39%.
+* The apps do not move beyond A/A. In rounds 1 and 2 `master` is faster than both other executables on lobsters and
+  shipit (master-aa is 5% to 8% slower than master there), so the cleaner comparison is the branch against the
+  second master build, as time ratios (opus pass, recomputed from the raw files):
+
+  | branch/master-aa time | Round 1 | Round 2 | Round 3 |
+  | --- | --- | --- | --- |
+  | lobsters | 0.969 | 1.052 | 1.005 |
+  | shipit | 0.936 | 1.038 | 1.000 |
+
+  The sign flips between rounds. Against `master` alone, round 2 reads 0.885 for lobsters (p 0.007) and 0.921 for
+  shipit, next to A/A values of 0.931 and 0.956. railsbench reads 1.031 (p 0.049) and 1.044 (p 0.034) in rounds 1
+  and 2 although no counter changes there, so those are noise as well. In the quiet round all three apps are
+  within 2.4% with p above 0.2. The ZJIT counters say the same work runs apart from the removed sends, which fits
+  ceilings of 0.18% and 0.39%.
+* The round choice does not look at the branch, but it is not independent of the result: the A/A distance and
+  master/branch share `master`, so a round where master is the noisy run is both rejected and shows the branch
+  off. The body therefore says the table is the quietest of three rounds. A rerun elsewhere can look like round 2.
 * Earlier runs on this orb while other jobs ran, not used: [bench-micro.txt](data/zne1/bench-micro.txt),
   [bench-micro2.txt](data/zne1/bench-micro2.txt), [bench-micro3.txt](data/zne1/bench-micro3.txt),
   [bench-apps.txt](data/zne1/bench-apps.txt), [bench-apps3.txt](data/zne1/bench-apps3.txt). Their A/A used the

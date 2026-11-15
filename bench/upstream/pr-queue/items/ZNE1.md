@@ -16,22 +16,23 @@ rank: 3
 risky: true
 state: in-review
 pr:
-note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. Thomas opens it as a draft once claude-code, opus and fable approve the head; arm64 is green (ARM1, T-01a1e00a-99a3-7183-9a14-acf3268bdc46, on 52d41cc992, same code). Earlier head 52d41cc992 is on fork branch zjit-polymorphic-neq; 18d33e8a24 changes one test, one test comment and the commit message. The body shows the three-way run_benchmarks output with the master-against-master columns by the coordinator's instruction for this item. The diff is 259 changed lines, 229 of them tests and snapshots, so the thermos gate applies or needs a waiver. Record: docs/upstream/zjit-not-equal.md."
+note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. Thomas opens it as a draft once claude-code, opus and fable approve the head; arm64 is green (ARM1, T-01a1e00a-99a3-7183-9a14-acf3268bdc46: zjit-test 2,241 of 2,241 on 18d33e8a24; probe, btest and Active Model on 52d41cc992, same code). Earlier head 52d41cc992 is on fork branch zjit-polymorphic-neq; 18d33e8a24 changes one test, one test comment and the commit message. The body shows the three-way run_benchmarks output with the master-against-master columns by the coordinator's instruction for this item. The diff is 259 changed lines, 229 of them tests and snapshots, so the thermos gate applies or needs a waiver. Record: docs/upstream/zjit-not-equal.md."
 passes:
   - {reviewer: claude-code, orb: T-01a1e017-0b4b-7405-a5c9-6e381e0a03bb, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "body only: over 150 words, two tables, a sentence that contradicted its table; code, tests, probe and 14 guard-breaking scripts without a finding; commit-message wording nits applied in 18d33e8a24"}
   - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "superfluous first sentence of the comment in test_opt_neq_polymorphic_refined, fixed in 18d33e8a24; 13 scripts and 7 mutations without a finding; body too long"}
   - {reviewer: fable, orb: T-01a1e017-1db1-700f-a67e-f8584f45187d, head: "52d41cc992", date: 2026-11-15, verdict: nits, open: "adversarial on exactness and invalidation: 189 script-configuration pairs and 1,170 fuzz run pairs, no master/branch difference; test_opt_neq_polymorphic did not discriminate the fallback Send (fixed in 18d33e8a24); say no new kind of assumption (applied)"}
   - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "18d33e8a24", date: 2026-11-15, verdict: changes, open: "code, tests, comments and commit message without a must-fix; body said master-aa is a second build of master while the numbers shown used one binary twice; fixed by the pinned rounds, which use a second build"}
   - {reviewer: fable, orb: T-01a1e017-1db1-700f-a67e-f8584f45187d, head: "18d33e8a24", date: 2026-11-15, verdict: approve, open: "198 attack-script pairs and 108 new fuzz pairs without a difference; corrected the record: NoSingletonClass is the only guard when the class check folds away for a constant receiver, as on master"}
+  - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "18d33e8a24", date: 2026-11-15, verdict: nits, open: "body at Lowrail 0541b1a: block, round choice and stats claims recomputed from the committed files; applied: the body says the table is the quietest of three rounds, stats-diff header reworded, record corrected on railsbench in rounds 1 and 2"}
 ---
 
 # ZJIT: Specialize polymorphic opt_neq
 
-`x != y` on nil, Symbols and plain objects uses `BasicObject#!=`, which ZJIT inlines since #19162 when a call site sees one receiver class. With more than one it stays a dynamic send, as in `type != :aria && type != :class` in Action View's `tag_options`, where `type` is nil or a Symbol. My rails/rails#59811 rewrote that line for the JITs and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722).
+`x != y` on nil, Symbols and plain objects uses `BasicObject#!=`, which ZJIT inlines since #19162 when a call site sees one receiver class. With more than one it stays a dynamic send, as in `type != :aria && type != :class` in Action View's `tag_options`, where `type` is nil or a Symbol. My rails/rails#59811 rewrote that line and was closed with ["Let's fix this in the JITs?"](https://github.com/rails/rails/pull/59811#issuecomment-6895930722).
 
 `opt_neq` had its own arm in the HIR builder, because its `!=` call data is the second operand, and that arm skipped the dispatch on profiled receiver classes that other sends get. It now shares their arm: each profiled class takes the path a monomorphic `!=` already takes, with the same patch points, and any other class takes the original send.
 
-`neq_nil_symbol` runs that condition in a loop; `master-aa` is a second build of master. lobsters and shipit lose about 10,000 and 30,000 polymorphic sends per iteration; their times stay within noise.
+`neq_nil_symbol` runs that condition in a loop, and `master-aa` is a second build of master; the table is the quietest of three rounds. lobsters and shipit lose about 10,000 and 30,000 polymorphic sends per iteration; their times stay within noise.
 
 ```
 master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
@@ -47,7 +48,7 @@ neq_nil_symbol   144.9 ± 6.6%    146.4 ± 8.9%   31.6 ± 20.9%              1.1
 --------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
 ```
 
-ZJIT stats per iteration for lobsters, then shipit, leaving out counters that also move between two runs of master:
+ZJIT stats per iteration for lobsters, then shipit, leaving out counters that move as much between two runs of master:
 
 ```diff
 -ccall_String#==: 1,359
