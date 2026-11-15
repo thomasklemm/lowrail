@@ -39,16 +39,18 @@ def run_benchmark(_num_itrs_hint, **, &block)
     3.times { GC.start }
     LowrailCallgrindBench.start
     LowrailCallgrindBench.finish
-    windows = [false, true].map do |region|
+    # Without the measurement build (a plain master or branch build) only the whole-program window runs.
+    patched = RubyVM.respond_to?(:lowrail_neq_cg=)
+    windows = (patched ? [false, true] : [false]).map do |region|
       3.times { GC.start }
       gc = GC.count
       jit = zne1_jit # read next to the window: the harness's own calls can compile code
       LowrailCallgrindBench.start
-      RubyVM.lowrail_neq_cg = region # after start: starting instrumentation turns collection back on
+      RubyVM.lowrail_neq_cg = region if patched # after start: starting instrumentation turns collection back on
       MEASURE_ITRS.times { block.call }
       LowrailCallgrindBench.finish
-      state = RubyVM.lowrail_neq_cg_state
-      RubyVM.lowrail_neq_cg = false
+      state = patched ? RubyVM.lowrail_neq_cg_state : [0, 0, false]
+      RubyVM.lowrail_neq_cg = false if patched
       after = zne1_jit
       {region:, gcs: GC.count - gc, jit_unchanged: jit == after, jit_delta: jit && after.to_h { |k, v| [k, v - jit[k]] },
        regions: state[0], left_by_jump: state[1], still_on: state[2]}

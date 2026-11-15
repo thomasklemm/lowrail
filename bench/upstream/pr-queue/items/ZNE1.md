@@ -11,7 +11,7 @@ built_on: "fc4cd8872b"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "a `!=` with more than one receiver class (nil or Symbol, Integer or nil, model classes) is specialized per class instead of staying a dynamic send; about 5x on a tag_options-shaped micro; lobsters -10,323 and shipit -30,074 polymorphic sends per iteration, app times within A/A"
+impact: "a `!=` with more than one receiver class (nil or Symbol, Integer or nil, model classes) is specialized per class instead of staying a dynamic send; 4.6x on a tag_options-shaped micro (4.4x to 5.1x in three rounds); lobsters -10,323 and shipit -30,074 polymorphic sends per iteration, app times within A/A"
 rank: 3
 risky: true
 state: in-review
@@ -21,6 +21,8 @@ passes:
   - {reviewer: claude-code, orb: T-01a1e017-0b4b-7405-a5c9-6e381e0a03bb, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "body only: over 150 words, two tables, a sentence that contradicted its table; code, tests, probe and 14 guard-breaking scripts without a finding; commit-message wording nits applied in 18d33e8a24"}
   - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "52d41cc992", date: 2026-11-15, verdict: changes, open: "superfluous first sentence of the comment in test_opt_neq_polymorphic_refined, fixed in 18d33e8a24; 13 scripts and 7 mutations without a finding; body too long"}
   - {reviewer: fable, orb: T-01a1e017-1db1-700f-a67e-f8584f45187d, head: "52d41cc992", date: 2026-11-15, verdict: nits, open: "adversarial on exactness and invalidation: 189 script-configuration pairs and 1,170 fuzz run pairs, no master/branch difference; test_opt_neq_polymorphic did not discriminate the fallback Send (fixed in 18d33e8a24); say no new kind of assumption (applied)"}
+  - {reviewer: opus, orb: T-01a1e017-14c1-7599-8e9c-3e9b47151185, head: "18d33e8a24", date: 2026-11-15, verdict: changes, open: "code, tests, comments and commit message without a must-fix; body said master-aa is a second build of master while the numbers shown used one binary twice; fixed by the pinned rounds, which use a second build"}
+  - {reviewer: fable, orb: T-01a1e017-1db1-700f-a67e-f8584f45187d, head: "18d33e8a24", date: 2026-11-15, verdict: approve, open: "198 attack-script pairs and 108 new fuzz pairs without a difference; corrected the record: NoSingletonClass is the only guard when the class check folds away for a constant receiver, as on master"}
 ---
 
 # ZJIT: Specialize polymorphic opt_neq
@@ -34,22 +36,18 @@ passes:
 ```
 master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
 master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
-branch: ruby 4.1.0dev (2026-11-15T16:33:27Z zjit-polymorphic-neq 52d41cc992) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T17:35:02Z zjit-opt-neq-polymorphic 18d33e8a24) +ZJIT +PRISM [x86_64-linux]
 
---------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---------  -------------  -------  ---------
-bench             master (ms)  master-aa (ms)   branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value        sig  master/branch  p-value        sig
-neq_nil_symbol  184.6 ± 17.5%   157.2 ± 14.0%  31.8 ± 17.1%              0.968           3.237       1.175 (***)  3.4e-05  p < 0.001    5.810 (***)  1.1e-27  p < 0.001
---------------  -------------  --------------  ------------  -----------------  --------------  ----------------  -------  ---------  -------------  -------  ---------
-
-----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
-bench         master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value       sig  master/branch  p-value  sig
-lobsters     885.5 ± 5.2%    939.8 ± 5.8%   850.1 ± 9.4%              0.940           0.968         0.942 (*)    0.036  p < 0.05          1.042    0.268
-railsbench  1793.6 ± 7.6%  1800.6 ± 12.0%  1706.0 ± 3.6%              0.889           0.889             0.996    0.935                    1.051    0.104
-shipit      1474.7 ± 7.8%   1395.1 ± 6.3%  1417.7 ± 3.9%              0.923           0.952             1.057    0.118                    1.040    0.204
-----------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
+bench             master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value  sig  master/branch  p-value        sig
+lobsters        787.7 ± 10.7%    782.1 ± 5.7%   785.9 ± 9.3%              1.082           1.074             1.007    0.863               1.002    0.963
+railsbench      1660.6 ± 4.0%   1668.1 ± 2.6%  1701.3 ± 3.9%              1.033           0.945             0.995    0.779               0.976    0.208
+shipit          1347.1 ± 3.3%   1345.9 ± 6.1%  1346.4 ± 4.8%              0.991           0.997             1.001    0.969               1.000    0.981
+neq_nil_symbol   144.9 ± 6.6%    146.4 ± 8.9%   31.6 ± 20.9%              1.108           5.238             0.990    0.497         4.583 (***)  2.0e-65  p < 0.001
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  ---  -------------  -------  ---------
 ```
 
-ZJIT stats per iteration for lobsters, then shipit, without what also moves between two runs of master:
+ZJIT stats per iteration for lobsters, then shipit, leaving out counters that also move between two runs of master:
 
 ```diff
 -ccall_String#==: 1,359

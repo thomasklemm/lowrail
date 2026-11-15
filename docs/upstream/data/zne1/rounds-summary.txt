@@ -1,0 +1,21 @@
+round 1: A/A distance 0.181
+  lobsters        master/master-aa 0.926  master/branch 0.956
+  neq_nil_symbol  master/master-aa 1.030  master/branch 5.134
+  railsbench      master/master-aa 1.020  master/branch 1.031
+  shipit          master/master-aa 0.946  master/branch 1.011
+round 2: A/A distance 0.183
+  lobsters        master/master-aa 0.931  master/branch 0.885
+  neq_nil_symbol  master/master-aa 0.936  master/branch 4.357
+  railsbench      master/master-aa 1.001  master/branch 1.044
+  shipit          master/master-aa 0.956  master/branch 0.921
+round 3: A/A distance 0.023
+  lobsters        master/master-aa 1.007  master/branch 1.002
+  neq_nil_symbol  master/master-aa 0.990  master/branch 4.583
+  railsbench      master/master-aa 0.995  master/branch 0.976
+  shipit          master/master-aa 1.001  master/branch 1.000
+quietest round: 3
+best of 3 (fastest iteration, ms):
+  lobsters        master 696.1  master-aa 678.3  branch 691.2  master/master-aa 1.026  master/branch 1.007
+  neq_nil_symbol  master 137.3  master-aa 135.6  branch 28.3  master/master-aa 1.012  master/branch 4.847
+  railsbench      master 1555.3  master-aa 1592.9  branch 1564.0  master/master-aa 0.976  master/branch 0.994
+  shipit          master 1226.5  master-aa 1199.0  branch 1276.2  master/master-aa 1.023  master/branch 0.961

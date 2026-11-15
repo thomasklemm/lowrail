@@ -18,7 +18,7 @@ head differs by one test, one test comment and the commit message ([reviews](#re
   such a site (nil and Symbol), and so are the top Rails sites in lobsters and shipit.
 * The fix is +4 −24 lines in `zjit/src/hir.rs`: `opt_neq` joins the arm the other `opt_*` instructions share, which
   dispatches on the profiled receiver classes. It adds no assumption of its own.
-* Effect: about 5x on a `tag_options`-shaped micro. lobsters and shipit lose 10,323 and 30,074 polymorphic sends per
+* Effect: 4.4x to 5.1x on a `tag_options`-shaped micro in three pinned rounds. lobsters and shipit lose 10,323 and 30,074 polymorphic sends per
   iteration; their times stay within the master-against-master noise. railsbench has no such site.
 
 ## How `a != b` runs (master `fc4cd8872b`)
@@ -77,7 +77,7 @@ Each arm is the path a monomorphic `!=` already takes on master, entered only fo
 | `!=` redefined later | `MethodRedefined(class, !=)` patch point |
 | class defines its own `!=` | direct send to it |
 | `!=` refined, private or undefined | stays a dynamic send |
-| singleton class with its own `!=` | exact class check, original `Send` |
+| singleton class with its own `!=` | exact class check; `NoSingletonClass` if folded |
 | `==` redefined later | `MethodRedefined(class, ==)` patch point |
 | `==` is `method_missing`, refined | `==` stays a dynamic send |
 | `==` returns a non-boolean | `BoolNegate` tests truthiness |
@@ -91,7 +91,11 @@ Each arm is the path a monomorphic `!=` already takes on master, entered only fo
   apply. That matches `rb_funcall` in the C version.
 * Singleton classes: `CondBranchHasType` compares the exact class of a heap object, so an object with a singleton
   class misses its arm and takes the original `Send`. `NoSingletonClass` is still emitted in each arm, as on the
-  monomorphic path, but nothing depends on it here (both reviewers removed it; only snapshots change).
+  monomorphic path. While the class check runs, nothing depends on it (two passes removed it; only snapshots
+  change). It is the only guard when the site is inlined into a caller that passes a constant object, because the
+  class check folds away: with `def caller_k(b) = site(KOBJ, b)` and a later `def KOBJ.!=`, a build without the
+  patch point returns `true` instead of `:singleton` (fable pass, second round). Master produces the same HIR for
+  that caller, so this is not new exposure.
 * Cost: more code is specialized, so a redefinition of `==` or `!=` on a profiled class invalidates more. A script
   that redefines core `==` methods repeatedly takes 1,297 side exits on the branch against 201 on master (claude-code
   pass) or 247 against 52 (opus pass), with identical results; a steady polymorphic loop takes the same number on
@@ -99,12 +103,14 @@ Each arm is the path a monomorphic `!=` already takes on master, entered only fo
 * What differs between the interpreter and ZJIT is the same on master and on the branch: see the probe below.
 * "No new assumption" means no new kind. A polymorphic site had no patch points on master and now has
   `MethodRedefined(class, !=)`, `MethodRedefined(class, ==)` and `NoSingletonClass(class)` per arm, so it can be
-  invalidated where it could not before. The fable pass measured the worst case: 3,014,000 calls of
+  invalidated where it could not before. The fable pass measured one such case: 3,014,000 calls of
   `a != :aria && a != :class` on nil, Symbols and one user class, with six redefinition events between rounds.
   When an unrelated class with a subclass (or an unrelated included module) defines and removes `!=`, master
   compiles 2 ISEQs and takes 0 side exits; the branch compiles 5, reaches the version limit and then takes
   3,006,000 `patchpoint_method_redefined` exits, one per call. Results are identical. A monomorphic `!=` behaves
-  the same way on master, so this is ZJIT's existing behaviour reaching more sites, not a defect of the change.
+  the same way on master (measured: the same script with only nil receivers takes 3,006,000 exits and compiles 5
+  ISEQs on master and branch alike), so this is ZJIT's existing behaviour reaching more sites, not a defect of the
+  change. The trigger is wider than the profiled classes because all arms share the `BasicObject#!=` method entry.
 
 ### Tests
 
@@ -196,34 +202,50 @@ two master runs the send counters are identical; what moves there are a few allo
 
 ## Numbers
 
-`run_benchmarks.rb --no-sudo --interleave --pvalue` with master, master again (A/A) and the branch, all `--zjit`.
-The run for the body is the one on the pushed head, with Callgrind paused:
-[bench-micro3.txt](data/zne1/bench-micro3.txt), [bench-apps3.txt](data/zne1/bench-apps3.txt).
+`run_benchmarks.rb --no-sudo --interleave --pvalue --force-pinning`, all `--zjit`: master, a second independent
+build of master (`master-aa`, the A/A) and the branch at head `18d33e8a24`. Three rounds with nothing else running
+(Callgrind paused), each pinned to one core by the tool: [rounds-1.txt](data/zne1/rounds-1.txt),
+[rounds-2.txt](data/zne1/rounds-2.txt), [rounds-3.txt](data/zne1/rounds-3.txt),
+summary by [rounds.rb](../../bench/upstream/zne1/rounds.rb) in [rounds-summary.txt](data/zne1/rounds-summary.txt).
+
+The body shows the quietest round. It is chosen without looking at the branch: the round whose
+master/master-aa ratios are closest to 1 (sum of the absolute logs over the four benchmarks: 0.181, 0.183, 0.023).
+That is round 3:
 
 | bench | master (ms) | master-aa (ms) | branch (ms) | A/A | master/branch |
 | --- | --- | --- | --- | --- | --- |
-| `neq_nil_symbol` | 184.6 ± 17.5% | 157.2 ± 14.0% | 31.8 ± 17.1% | 1.175 | 5.810 |
-| lobsters | 885.5 ± 5.2% | 939.8 ± 5.8% | 850.1 ± 9.4% | 0.942 | 1.042 |
-| railsbench | 1793.6 ± 7.6% | 1800.6 ± 12.0% | 1706.0 ± 3.6% | 0.996 | 1.051 |
-| shipit | 1474.7 ± 7.8% | 1395.1 ± 6.3% | 1417.7 ± 3.9% | 1.057 | 1.040 |
+| `neq_nil_symbol` | 144.9 ± 6.6% | 146.4 ± 8.9% | 31.6 ± 20.9% | 0.990 | 4.583 |
+| lobsters | 787.7 ± 10.7% | 782.1 ± 5.7% | 785.9 ± 9.3% | 1.007 | 1.002 |
+| railsbench | 1660.6 ± 4.0% | 1668.1 ± 2.6% | 1701.3 ± 3.9% | 0.995 | 0.976 |
+| shipit | 1347.1 ± 3.3% | 1345.9 ± 6.1% | 1346.4 ± 4.8% | 1.001 | 1.000 |
 
-* The apps are within A/A (p 0.268, 0.104, 0.204). railsbench has no counter change, so its 1.051 is noise.
-* Only the micro ([neq_nil_symbol.rb](../../bench/upstream/zne1/neq_nil_symbol.rb), the `tag_options` condition
-  with nil and Symbol types) is outside A/A. The orb is noisy: two runs of the same master binary differ by 1.175
-  (p < 0.001) on it. The iteration minima are 139, 137 and 28 ms for master, master again and branch, so the
-  effect is about 5x either way.
-* Earlier runs, kept for comparison: the same micro while Callgrind and the test suites ran
-  ([bench-micro2.txt](data/zne1/bench-micro2.txt)): 153.8 → 31.7 ms, A/A 0.835. The first form of the micro, whose
-  loop sat in a block that compiled only at iteration 30 ([bench-micro.txt](data/zne1/bench-micro.txt)):
-  195.3 → 39.3 ms, A/A 0.976. The apps on the build before the commit, same tree
-  ([bench-apps.txt](data/zne1/bench-apps.txt)): lobsters 0.956, railsbench 1.058, shipit 1.011, A/A 1.004,
-  1.027, 0.918.
-* A quiet machine would give a cleaner table. Thomas's Mac has both release builds and ruby-bench ready
-  (thread ARM1), but the coordinator allows no speed claims from it for now.
+All three rounds, master/master-aa and master/branch:
+
+| bench | Round 1 | Round 2 | Round 3 | Best of 3 |
+| --- | --- | --- | --- | --- |
+| `neq_nil_symbol` | 1.030, 5.134 | 0.936, 4.357 | 0.990, 4.583 | 1.012, 4.847 |
+| lobsters | 0.926, 0.956 | 0.931, 0.885 | 1.007, 1.002 | 1.026, 1.007 |
+| railsbench | 1.020, 1.031 | 1.001, 1.044 | 0.995, 0.976 | 0.976, 0.994 |
+| shipit | 0.946, 1.011 | 0.956, 0.921 | 1.001, 1.000 | 1.023, 0.961 |
+
+* "Best of 3" compares the fastest iteration of each executable over all rounds: `neq_nil_symbol` 137.3, 135.6 and
+  28.3 ms for master, master-aa and branch.
+* The micro ([neq_nil_symbol.rb](../../bench/upstream/zne1/neq_nil_symbol.rb), the `tag_options` condition with
+  nil and Symbol types) is 4.4x to 5.1x faster in every round; its A/A stays between 0.936 and 1.030.
+* The apps do not move beyond A/A. Where the branch looks slower, the second master build does too: in round 2
+  lobsters is 0.885 for the branch (p 0.007) and 0.931 for master-aa (p 0.067), and shipit 0.921 and 0.956; in
+  rounds 1 and 2 master-aa is 4% to 7% slower than master on both apps. In the quiet round all three apps are
+  within 2.4% with p above 0.2. The ZJIT counters say the same work runs apart from the removed sends, and no
+  round shows a gain either, which fits ceilings of 0.18% and 0.39%.
+* Earlier runs on this orb while other jobs ran, not used: [bench-micro.txt](data/zne1/bench-micro.txt),
+  [bench-micro2.txt](data/zne1/bench-micro2.txt), [bench-micro3.txt](data/zne1/bench-micro3.txt),
+  [bench-apps.txt](data/zne1/bench-apps.txt), [bench-apps3.txt](data/zne1/bench-apps3.txt). Their A/A used the
+  same master binary twice and reached 0.835 and 1.175 on the micro.
+* Thomas's Mac stays functional-only (coordinator): its wall-time A/A was ±4.5% while in use.
 * TE2's own benchmark-ips script on Rails main under ZJIT, 5 interleaved rounds, best of 5
-  ([ips-tag.txt](data/zne1/ips-tag.txt)): `tag.a` 301.1k / 285.7k / 318.0k i/s for master / master again /
-  branch (+5.6%, branch highest in all 5 rounds, each round ±9–15%); `content_tag` 516.1k / 510.6k / 561.0k
-  (within the rounds' spread).
+  ([ips-tag.txt](data/zne1/ips-tag.txt), build before the commit, same code): `tag.a` 301.1k / 285.7k / 318.0k i/s
+  for master / master again / branch (+5.6%, branch highest in all 5 rounds, each round ±9–15%); `content_tag`
+  516.1k / 510.6k / 561.0k (within the rounds' spread).
 
 ### Callgrind ceilings
 
@@ -247,7 +269,7 @@ The brief's rule: stop if the ceiling is under 0.3% everywhere and the change is
 change may still be worth it. The ceiling is above 0.3% on shipit (0.390%) and below it on lobsters (0.184%) and
 railsbench (0), so the stop rule does not apply; and the change is small and general anyway: it removes more lines
 than it adds, brings `opt_neq` in line with every other `opt_*` instruction and makes the pattern Rails declined to
-rewrite about 5x faster in isolation. The app times do not show it: they stay inside A/A.
+rewrite 4.4x to 5.1x faster in isolation. The app times do not show it: they stay inside A/A.
 
 ## Reviews
 

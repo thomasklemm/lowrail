@@ -1,0 +1,43 @@
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T17:35:02Z zjit-opt-neq-polymorphic 18d33e8a24) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---------
+bench             master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value       sig  master/branch  p-value        sig
+lobsters         764.9 ± 5.8%    821.9 ± 9.0%   864.7 ± 9.7%              0.959           0.907             0.931    0.067               0.885 (**)    0.007   p < 0.01
+railsbench      1753.5 ± 4.3%   1752.6 ± 5.8%  1679.4 ± 3.5%              1.093           1.065             1.001    0.983                1.044 (*)    0.034   p < 0.05
+shipit          1370.6 ± 5.8%  1433.1 ± 11.3%  1488.1 ± 9.9%              0.925           1.000             0.956    0.319                    0.921    0.055
+neq_nil_symbol   150.7 ± 9.5%   161.0 ± 13.9%   34.6 ± 24.3%              1.211           7.160        0.936 (**)    0.008  p < 0.01    4.357 (***)  6.3e-51  p < 0.001
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---------
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+Total time spent benchmarking: 400s
+
+master: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-15T12:58:58Z master fc4cd8872b) +ZJIT +PRISM [x86_64-linux]
+branch: ruby 4.1.0dev (2026-11-15T17:35:02Z zjit-opt-neq-polymorphic 18d33e8a24) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 0e67be03ef1bb943fe8e077b6482baaaf9784363-dirty
+
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---------
+bench             master (ms)  master-aa (ms)    branch (ms)  master-aa 1st itr  branch 1st itr  master/master-aa  p-value       sig  master/branch  p-value        sig
+lobsters         764.9 ± 5.8%    821.9 ± 9.0%   864.7 ± 9.7%              0.959           0.907             0.931    0.067               0.885 (**)    0.007   p < 0.01
+railsbench      1753.5 ± 4.3%   1752.6 ± 5.8%  1679.4 ± 3.5%              1.093           1.065             1.001    0.983                1.044 (*)    0.034   p < 0.05
+shipit          1370.6 ± 5.8%  1433.1 ± 11.3%  1488.1 ± 9.9%              0.925           1.000             0.956    0.319                    0.921    0.055
+neq_nil_symbol   150.7 ± 9.5%   161.0 ± 13.9%   34.6 ± 24.3%              1.211           7.160        0.936 (**)    0.008  p < 0.01    4.357 (***)  6.3e-51  p < 0.001
+--------------  -------------  --------------  -------------  -----------------  --------------  ----------------  -------  --------  -------------  -------  ---------
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- branch 1st itr: ratio of master/branch time for the first iteration.
+- master/branch: ratio of master/branch time. Higher is better for branch. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
+
+Output:
+/home/user/w/zne1/out/rounds-2.json
