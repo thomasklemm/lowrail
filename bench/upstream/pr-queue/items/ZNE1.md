@@ -14,7 +14,7 @@ alternative_of:
 impact: "a `!=` with more than one receiver class (nil or Symbol, Integer or nil, model classes) is specialized per class instead of staying a dynamic send; 4.6x on a tag_options-shaped micro (4.4x to 5.1x in three rounds); lobsters -10,323 and shipit -30,074 polymorphic sends per iteration, app times within A/A"
 rank: 3
 risky: true
-state: draft
+state: ready
 pr: 19909
 note: "DECISIONS exception of 2026-11-15, answers skipkayhil's close of rails/rails#59811. claude-code (nits), opus (nits) and fable (approve) have no must-fix on head 18d33e8a24, so Thomas can open it as a draft once the thermos gate is passed or waived; arm64 is green (ARM1, T-01a1e00a-99a3-7183-9a14-acf3268bdc46: zjit-test 2,241 of 2,241 on 18d33e8a24; probe, btest and Active Model on 52d41cc992, same code). Earlier head 52d41cc992 was on fork branch zjit-polymorphic-neq, deleted 2026-11-15 after the PR opened; 18d33e8a24 changes one test, one test comment and the commit message. The body shows the three-way run_benchmarks output with the master-against-master columns by the coordinator's instruction for this item. The diff is 259 changed lines, 229 of them tests and snapshots, so the thermos gate applies or needs a waiver. Record: docs/upstream/zjit-not-equal.md."
 waived:

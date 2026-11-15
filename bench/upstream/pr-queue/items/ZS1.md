@@ -14,7 +14,7 @@ alternative_of:
 impact: "foo(&:sym) to ISEQ and C callees no longer falls back to a dynamic send under ZJIT; railsbench on Rails main: 42,441 of 115,090 block-arg fallbacks per iteration"
 rank: 1
 risky: true
-state: draft
+state: ready
 pr: 19912
 note: "reopened 2026-11-15 after skipkayhil closed rails/rails#59803 with 'Let's fix this in the JITs?'; three commits: the VM extraction (Thomas), the Symbol part of Rafael França's Shopify/ruby zjit-perf/blockarg-direct-send 3f17d8950e (he is its author, Thomas co-author; coordinator: the design is his) and the tests; fbbb9cee7b has the tree of 89e2da1571 (git diff empty), on which all three passes had no must-fix and arm64 was green (ARM1); the coordinator had the VM extraction split out as its own commit and the message rewrapped, so the passes on fbbb9cee7b are confirm passes limited to tree identity, split, authorship and messages; earlier heads dcd4bd2b79, 7eddd8bfce, 09d8e5308e; no LLM disclosure and no separate ping to Rafael (coordinator); the ZJIT commit is +212 -55, so the tracker rule applies and the coordinator asks Thomas: nothing opens and nothing is posted on Shopify/ruby#1014 until he answers; record docs/upstream/zjit-symbol-block.md"
 waived:
