@@ -161,8 +161,10 @@ Each guard was removed in turn; every mutation fails at least one new test:
   `UrlForTest#test_protocol_encoding_is_preserved`). Active Support did not load here (redis gem missing).
 * `make btest RUN_OPTS=--zjit-call-threshold=2` on the branch: PASS all 2,148 tests.
 * `make test-all` over `test/ruby` with `RUN_OPTS=--zjit-call-threshold=1` on the branch: 11,572 tests, 1 failure,
-  2 errors (`TestThread#test_handle_interrupt_masks_sigint`, `TestIO#test_seek`, `TestIO#test_seek_symwhence`). All
-  three fail the same way on master and with `--zjit-disable`; they come from the orb (signals, `SEEK_DATA`).
+  2 errors (`TestThread#test_handle_interrupt_masks_sigint`, `TestIO#test_seek`, `TestIO#test_seek_symwhence`). None
+  comes from the change: the first fails the same way on master and on the branch, at threshold 1 and with
+  `--zjit-disable`; the two `TestIO` errors (`Errno::ENOENT` from `IO#seek`) also occur on master at threshold 1
+  and on the branch with `--zjit-disable`. They look like limits of the orb; the cause was not traced.
 * **arm64** (thread ARM1, A64 backend, M3, macOS 26.7.1): `make zjit-test` 2,241 of 2,241 on the branch and 2,233
   of 2,233 on master, the difference being the new tests; the probe prints the x86_64 md5s in all 12 runs, with
   release and with dev builds; `make btest RUN_OPTS=--zjit-call-threshold=2` passes 2,148 tests on both; Active
@@ -202,7 +204,9 @@ iteration and by 10 times what two master runs differ by ([stats_diff.rb](../../
 two master runs the send counters are identical; what moves there are a few allocation counters and a swap between
 `invokeblock_not_specialized` and `invokeblock_polymorphic_miss` (±10,462 on lobsters, ±21,879 on shipit).
 The stats runs used the build made before the commit (its version line reads `zjit-polymorphic-neq fc4cd8872b`);
-`zjit/src/hir.rs` is identical at `18d33e8a24`. Raw files: `data/zne1/stats-{master,master2,branch}-*.json.gz`.
+`zjit/src/hir.rs` is identical at `18d33e8a24`. A lobsters run on the build of `18d33e8a24` gives the same send
+counters (`send_fallback_send_polymorphic` 493, `dynamic_send_count` 772,240 per iteration). Raw files:
+`data/zne1/stats-{master,master2,branch}-*.json.gz` and `stats-branch-head-lobsters.json.gz`.
 On lobsters `getivar_fallback_no_side_exits` also drops by 1,821 per iteration, 10 times more than between the two
 master runs; why was not traced.
 
