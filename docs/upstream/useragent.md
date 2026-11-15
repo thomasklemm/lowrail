@@ -5,15 +5,17 @@ as added complexity for a small gain. Thomas asked whether to fix the same cost 
 useragent gem ([gshutler/useragent](https://github.com/gshutler/useragent) 0.16.11, which Action Pack depends on),
 exactly and without a cache.
 
-**Result: built locally and held, no fork, nothing opened.** Four small exact commits (17 lines added, 11 removed,
-five files) make `allow_browser`'s whole check 1.44× faster under YJIT (benchmark-ips, 41.1 to 28.5 µs per user agent
-over 21 real ones; 1.42× on ZJIT master) and `UserAgent.parse` 1.41× faster. They cut 30.6% of the check's YJIT
+**Result: built locally and held, no fork, nothing opened.** Four small exact commits (18 lines added, 12 removed,
+six files) make `allow_browser`'s whole check about 1.4× faster under YJIT (benchmark-ips over 21 real user agents:
+1.44× against the first main run, 41.1 to 28.5 µs per user agent, and 1.36× against main's A/A run, which was 6%
+faster; the two reviews measured 1.44× and 1.37×; 1.42× on ZJIT master). They cut 30.6% of the check's YJIT
 instructions (27.8% in the interpreter) and 34 of its 183 objects. The differential probe over 20,401 user agents
 is byte-identical to main. On the profiled apps that is about 0.9% of a Blog request, 0.4% of Campfire's and 0.15% of
 Fizzy's, against AB1's 3.0, 1.3 and 0.5%; on a fresh app's bare page about 4% of the 12.9%. That is short of the
-2× bar, and the gem's only merger hasn't merged anything since 2024-12 or answered any of the nine PRs opened in
+2× bar, and the gem's only merger hasn't merged anything since 2024-12 or answered any of the ten PRs opened in
 2026. The commits are kept as `git am` patches in [`bench/upstream/ua1/patches/`](../../bench/upstream/ua1/patches/),
-queue item [UA1](../../bench/upstream/pr-queue/items/UA1.md) (`held`).
+queue item [UA1](../../bench/upstream/pr-queue/items/UA1.md) (`held`). Two independent reviews asked only for text
+fixes, which are applied ([Reviews](#reviews)).
 
 ## Where the time goes
 
@@ -62,18 +64,18 @@ The leads from the brief, checked:
 * **`version` and `browser` recomputed on every call.** Rails reads each once per request, so memoizing them saves
   nothing there. Memoizing on the parsed object also isn't exact: it is an `Array` subclass, every product's
   `comment` is a mutable `Array` and its strings are mutable, so any mutator changes the answer. The probe mutates
-  parsed objects and reads everything again; a memoized `Chrome#application` mutant changes 594 of 3,103 lines.
+  parsed objects and reads everything again; a memoized `Chrome#application` mutant changes 3,979 of 20,621 lines.
 * **`bot?`.** 0.3%, since Rails reaches it only for a guarded browser below the minimum.
 * **Allocations.** The four commits remove 34 of 183 objects per check.
 
 `Version` could also parse lazily, about 1.3× more on the check. That isn't exact: an unparsed `Version` has other
 instance variables, which `instance_values`, `as_json` (Active Support renders the ivars) and `Marshal.dump` show. A
-lazy-version mutant changes 85 of 3,103 probe lines. Not used.
+lazy-version mutant changes 222 of 20,621 probe lines. Not used.
 
 ## The changes
 
 On useragent master [680915a](https://github.com/gshutler/useragent/commit/680915a) (0.16.11), local branch
-`thomasklemm/faster-parse` at `9332878`: four commits, author and committer Thomas Klemm, no trailers. Callgrind
+`thomasklemm/faster-parse` at `3a0896a`: four commits, author and committer Thomas Klemm, no trailers. Callgrind
 instructions and objects per check, 21 user agents × 20 rounds, GC off in the window, every YJIT window JIT-flat (0
 blocks compiled), cumulative from top to bottom ([raw](data/ua1/callgrind.txt)):
 
@@ -83,9 +85,12 @@ blocks compiled), cumulative from top to bottom ([raw](data/ua1/callgrind.txt)):
 | | main again (A/A) | 287,208 (−0.06%) | 223,942 (−0.10%) | 182.7 |
 | 1 | `Version#initialize`: a version of only digits and dots (`537.36`, `142.0.0.0`) takes one anchored `=~` and `split(".")` | 225,186 (−21.6%) | 168,535 (−24.8%) | 168.8 |
 | 2 | `detect_product` downcases the wanted name once, at the first comparison | 220,106 (−2.3%) | 165,624 (−1.7%) | 161.0 |
-| 3 | `application` (Chrome, Webkit, Vivaldi): `detect` instead of `reject { … }.first` | 213,301 (−3.1%) | 160,465 (−3.1%) | 158.4 |
+| 3 | `application` (Chrome, Webkit, Vivaldi, AppleCoreMedia): `detect` instead of `reject { … }.first` | 213,301 (−3.1%) | 160,465 (−3.1%) | 158.4 |
 | 4 | `Version#<=>`: a `while` loop over the six positions instead of `([0]*6).zip(...).each` | 207,471 (−2.7%) | 155,669 (−3.0%) | 148.8 |
 | | all four against main | −27.8% | −30.6% | −33.9 |
+
+AppleCoreMedia joined change 3 after the reviews (an optional point: it had the same code). None of the 21 user
+agents is AppleCoreMedia, so the measurements stand; the probe and the specs were rerun on `3a0896a`.
 
 `UserAgent.parse` alone: 200,791 to 145,879 Ir in the interpreter (−27.3%, A/A −0.06%), 165,645 to 117,492 under
 YJIT (−29.1%, A/A −0.05%); 126.1 to 114.0 objects.
@@ -106,7 +111,8 @@ Why each is exact (the commit messages say the same):
 
 Change 1 uses `=~` and not `match?`, because Ruby 2.3 is still in the gem's CI matrix and `match?` needs 2.4.
 `match?` there would save another 2.7% of the check's interpreter instructions and 13 objects. The branch uses
-nothing newer than Ruby 2.3 by reading; it was not run on 2.3.
+nothing newer than Ruby 2.2 by reading, but it was run only on 4.0.9; Ruby 2.2, 2.3 and JRuby 9.4, which the gem's CI
+lists, were not run.
 
 Dropped:
 
@@ -146,17 +152,32 @@ All three outputs are byte-identical: 20,621 lines, md5 `d6c196bc1124…`. Every
 that raise (invalid UTF-8, UTF-16LE) raise the same error class and message.
 
 The probe catches every mutant tried ([`mutants.sh`](../../bench/upstream/ua1/mutants.sh), on a checkout at change
-1): a fast path that accepts any digits and dots, one anchored per line, `casecmp?` in `detect_product` (caught only
+1; [counts](data/ua1/mutants.txt), the same in both reviews): a fast path that accepts any digits and dots, one anchored per line, `casecmp?` in `detect_product` (caught only
 by the `Straße` edge case), a memoized `application`, a lazy `Version`, and an `extend` that skips Internet Explorer.
 The gem's 1,321 specs pass with `-w` on main and the branch, with no warning from the gem's code. They need
 `ostruct` added outside the repo, because the specs `require "ostruct"`, which Ruby 4.0 no longer ships as a default
 gem (gshutler/useragent#75 adds it).
 
-[Checklist](../DECISIONS.md#exactness-checklist): the only new call on an object the gem doesn't create is `split`
-and the anchored `=~` on the version string, which a String subclass with its own `=~` or `split` would see; that's
-a global redefinition, accepted. `detect` instead of `reject` on the gem's own `Array` subclasses would differ only
-for a user subclass of `Browsers::Chrome` (or Webkit, Vivaldi) overriding `reject`, which is the gem's internals,
-accepted. Frozen parsed objects behave as before (nothing is stored on them).
+[Checklist](../DECISIONS.md#exactness-checklist). Nothing differs for any string passed to `UserAgent.parse`. Both
+reviews' own edge probes (UTF-16, UTF-32, Shift_JIS, non-ASCII digits, frozen strings, 400-digit and 40-part versions,
+frozen parsed objects, odd `allow_browser` minimums) found no difference there. They found these differences, each
+needing a user subclass, a singleton method or a foreign element, none reachable from a parsed user agent; all are
+accepted:
+
+* **A String subclass or singleton methods on the version string** (items 1 and 2): `Version.new` now calls `=~` once
+  and `split` on the fast path where main called `=~` three times and `scan`, and four times on the old path; a
+  subclass overriding `scan`, `split` or `=~` gets a different `to_a`.
+* **A `Version` subclass** whose `to_a` returns an Enumerator, a Set or an object with `to_ary` compares on main and
+  raises `NoMethodError` (`[]`) on the branch; with `nil` the error is `NoMethodError` instead of `TypeError`; parts
+  that define `!=` apart from `==` can give another result.
+* **Foreign elements pushed after the application** (`ua << nil`, `Object.new`, a product with an Integer comment):
+  on main `application` and everything that reads it raise `NoMethodError`, because `reject` reached them; the
+  branch's `detect` stops at the application and returns it.
+* **`respond_to?` with a name that is neither String nor Symbol**: its `to_s` is called once instead of once per
+  product; the result and any `TypeError` are the same.
+
+A user subclass of `Browsers::Chrome` (or Webkit, Vivaldi, AppleCoreMedia) overriding `reject` no longer sees it
+called, and frozen parsed objects behave as before (nothing is stored on them).
 
 ## Wall time
 
@@ -173,7 +194,8 @@ of main, the branch and main again (A/A), best of 5 ([raw](data/ua1/)). "check" 
 | master ZJIT | check ×21 | 681.66 µs | 678.43 µs (+0.5%) | 481.23 µs | 1.42× |
 | master ZJIT | request | 84.49 µs | 85.02 µs (−0.6%) | 69.31 µs | 1.22× |
 
-The YJIT A/A is up to 6.8% on this orb, so the request row says only that a bare request gets about 12 µs cheaper,
+Against main's A/A run instead of its first run, the YJIT check is 1.36× and parse 1.42×, so the change is about
+1.4×. The YJIT A/A is up to 6.8% on this orb, so the request row says only that a bare request gets about 12 µs cheaper,
 which matches the check's 12.6 µs per user agent. Change 1 alone (`ips-yjit-c1.txt`): parse 1.39× (A/A +0.5%),
 check 1.28× (A/A −6.1%); its commit message quotes those lines.
 
@@ -202,20 +224,41 @@ The four commits change nothing that matters (`zjit-stats4.txt`):
   Rails, pinged 2026-08-03, no reply). #73 alone: −2.3% of the check's interpreter instructions, −2.9% under YJIT,
   −23 objects. With the four commits on top: −30.1% and −33.6%, 121 objects. They apply together without conflicts.
 * **Maintainer.** Garry Shutler (gshutler) merged all 25 merged PRs (2015–2024) and made every release. The last merge
-  and release, 0.16.11, was on 2024-12-04. The nine PRs opened since July 2026 (#73–#81) and issue #72 (BingPreview
-  not a bot, so `allow_browser` answers 406) have no maintainer reply; #71 and #69 were closed by their authors the
-  day they opened. He is active on GitHub elsewhere (a review in cronofy/cronofy-ruby on 2026-11-09). RubyGems lists
+  and release, 0.16.11, was on 2024-12-04. Ten PRs opened in 2026: #71 (closed by its author the same day) and #73–#81,
+  which are open with no maintainer reply, as is issue #72 (BingPreview not a bot, so `allow_browser` answers 406).
+  #69 (2025) was also closed by its author the day it opened. He is active on GitHub elsewhere (a review in cronofy/cronofy-ruby on 2026-11-09). RubyGems lists
   gshutler and qrush (Nick Quaranto) as owners, so qrush could publish a release, but he has merged nothing in the
   repo; nobody else is visible with merge rights (the collaborator list needs push access). 156.9 M downloads.
 
 ## Verdict
 
 The gem-level fix is exact, small, needs no cache and helps every app on Rails' default `allow_browser`. But it is
-1.44× for the check, not 2×. What remains is spread over the parse loop, the browser classes' predicates, GC and
+about 1.4× for the check, not 2×. What remains is spread over the parse loop, the browser classes' predicates, GC and
 Rails' own readers, with no single exact lever left (the largest, a lazy `Version`, isn't exact). It also needs a
 merge and a release from a maintainer who hasn't answered a PR in almost two years. So it is held: no fork, no push.
-If gshutler answers #73 or becomes active again, this goes next as one PR with four commits (draft body in the queue
-item). Pushing the branch to a fork takes one command when Thomas wants it there.
+If gshutler answers #73, or any new commit or release lands in the repo, this goes next as one PR with four commits
+(draft body in the queue item). Before it opens, the body's benchmark-ips lines are rerun until the A/A is tight. Pushing the branch to a fork takes one command when Thomas wants it there.
+
+## Reviews
+
+Two independent review orbs on head `9332878` (before the text fixes and the AppleCoreMedia line), both on Ruby
+4.0.9 and Rails main 8217632. Both verdicts were **changes, all text**; both called the code exact for every input
+that comes through `UserAgent.parse` or Rails, and holding right.
+
+* **claude-code** ([thread](https://ampcode.com/threads/T-01a1df56-3d92-727d-b974-39933e08ee00)): `git am` gives
+  `9332878`; probe main, branch and A/A 20,621 lines each, md5 `d6c196bc…`; specs 1,321 green with -w; mutants all
+  caught; Callgrind check −27.6% interpreter, −30.35% YJIT (A/A +0.05%, +0.06%), parse −27.1% and −29.3%, objects
+  182.7 to 148.8; ips YJIT check 1.37× (A/A +1.7%), parse 1.32×, request 1.22×. Must-fixes: record the four
+  non-parse boundaries and say "for any user agent" in the body; "the largest part", not "most"; "three to six"
+  products (Firefox has three); give the speedup as a range, since 1.44× is against the slower main run; current
+  mutant counts.
+* **opus** ([thread](https://ampcode.com/threads/T-01a1df56-4eb5-73ac-af77-2d09288a5c81)): the same probe and spec
+  results; its own edge probe found the same four boundaries; Callgrind check −27.6% and −30.4% (A/A +0.05%,
+  −0.03%), parse −27.1% and −29.4%; ips YJIT check 1.44× (A/A +2.5%), parse 1.41×, request 1.21×. Must-fixes:
+  the boundaries, the mutant counts, "three to six", "the largest part", and ten PRs opened in 2026 (not nine).
+  Optional, applied: AppleCoreMedia in change 3, CI's old Rubies and JRuby named as not run, a second trigger.
+
+All must-fixes are applied on `3a0896a`, with the probe (identical, md5 `d6c196bc…`) and the specs rerun there.
 
 ## Scripts
 

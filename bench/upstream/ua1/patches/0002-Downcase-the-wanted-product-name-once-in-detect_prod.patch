@@ -1,6 +1,6 @@
-From 71469ec069ec03c08d1f77a9188e8ca93b49c8f0 Mon Sep 17 00:00:00 2001
+From 57b43910e5f285e26286ee2b0e773630b7a8c018 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Sun, 15 Nov 2026 13:09:50 +0000
+Date: Sun, 15 Nov 2026 13:40:41 +0000
 Subject: [PATCH 2/4] Downcase the wanted product name once in detect_product
 
 `detect_product` downcased the name it looks for again for every product it
@@ -10,9 +10,11 @@ times per request. The name is now downcased at the first comparison and
 kept, so the calls happen in the same order as before and an empty list still
 never downcases it.
 
-Callgrind instructions per `allow_browser` check over the same 21 user
-agents, Ruby 4.0.9: 225,186 before and 220,106 after without JIT, 168,535
-and 165,624 with YJIT, and 8 fewer objects.
+Callgrind instructions per `allow_browser` check over 21 current browser,
+bot and in-app user agents, Ruby 4.0.9: 225,186 before and 220,106 after
+without JIT, 168,535 and 165,624 with YJIT, and 8 fewer objects.
+
+Amp-Thread-ID: https://ampcode.com/threads/T-01a1def5-5235-7214-8cf5-9d74afcc5a06
 ---
  lib/user_agent/browsers/base.rb | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)

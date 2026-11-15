@@ -1,6 +1,6 @@
-From 9332878ba5a181d9f38de3034e62c3dc7802b922 Mon Sep 17 00:00:00 2001
+From 3a0896a4d428d126d423fbf154354be92830c0e8 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Sun, 15 Nov 2026 13:09:50 +0000
+Date: Sun, 15 Nov 2026 13:40:41 +0000
 Subject: [PATCH 4/4] Compare versions in a loop instead of zip
 
 `Version#<=>` built `[0] * 6`, zipped both versions' parts into six more
@@ -9,9 +9,11 @@ arrays and returned from inside the block, which unwinds through `each`. A
 missing part as 0, as before. Rails' `allow_browser` compares the browser's
 version with the minimum on most requests.
 
-Callgrind instructions per `allow_browser` check over the same 21 user
-agents, Ruby 4.0.9: 213,301 before and 207,471 after without JIT, 160,465
-and 155,669 with YJIT, and 10 fewer objects.
+Callgrind instructions per `allow_browser` check over 21 current browser,
+bot and in-app user agents, Ruby 4.0.9: 213,301 before and 207,471 after
+without JIT, 160,465 and 155,669 with YJIT, and 10 fewer objects.
+
+Amp-Thread-ID: https://ampcode.com/threads/T-01a1def5-5235-7214-8cf5-9d74afcc5a06
 ---
  lib/user_agent/version.rb | 13 +++++++------
  1 file changed, 7 insertions(+), 6 deletions(-)

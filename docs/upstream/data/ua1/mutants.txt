@@ -1,0 +1,7 @@
+# mutants.sh over the full corpus (20,380 + 21 edge cases), Ruby 4.0.9; mutant checkout at change 1
+fast path accepts any digits and dots: 3 of 20621 lines differ
+fast path anchored per line: 2 of 20621 lines differ
+detect_product with casecmp?: 1 of 20621 lines differ
+Chrome#application memoized: 3979 of 20621 lines differ
+Version parsed lazily: 222 of 20621 lines differ
+extend? skips IE: 638 of 20621 lines differ
