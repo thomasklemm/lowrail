@@ -758,6 +758,26 @@ measurement. Whole-program runs of the branch on the four workloads were started
 suites (`~/w/cgnar3`, 25 to 75 minutes each, with the build of `141cdfde1f`, whose generated code is that of
 `656ae95dbc`) and belong in this section when they finish.
 
+**Whole-program runs, as they finish** (Callgrind with `--zjit`, `RUBY_GC_HEAP_INIT_BYTES=33554432`, 150 warmup
+iterations, then windows of 2 iterations; master, master again for the A/A, and the branch build above; read with
+`zs1_report.rb cg`). A cell counts only when every window passes the JIT-flat gate; a cell that fails is recorded as
+rejected and not rerun. Region columns are instructions per iteration (regions entered per iteration × instructions
+each).
+
+| workload | cell | gate | whole program, Ir/itr | GCs | send, ISEQ callee | send, other callee | yield, invokeblock | yield, from C |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | master | **fail** | 2,646,691,384 | 1 | 4,704,373 (12,002 × 392) | 1,875,332 (4,506 × 416) | 2,678,606 (3,510 × 763) | 7,173,354 (9,000 × 797) |
+| blog | master again | **fail** | 2,648,151,395 | 1 | 4,649,912 (12,002 × 387) | 1,911,776 (4,508 × 424) | 2,487,727 (3,506 × 710) | 7,108,113 (9,000 × 790) |
+| blog | branch | **fail** | 2,638,941,365 | 1 | 192,320 (0) | 188,482 (0) | 2,481,050 (3,506 × 708) | 6,894,451 (9,000 × 766) |
+
+* **blog: rejected, all three cells.** Each cell has a window in which ZJIT compiled something (master: the
+  yield-from-C window; master again: the whole-program window and both send windows; branch: the ISEQ-send window,
+  2 ISEQs), so none of the three passes the gate and the row is not a result. For the record only: the branch is
+  7,750,019 Ir/itr (0.29%) below master and 9,210,030 (0.35%) below master again, the two master runs differ by
+  1,460,011 (0.055%), and every window holds 1 GC. The branch enters no send region (a region starts in
+  `vm_caller_setup_arg_block`, which the specialized sends do not go through), and its yield regions are entered
+  as often as on master.
+
 ### Reviews
 
 Three independent orbs, each rerunning the probe and trying to break a guard; passes are recorded in
