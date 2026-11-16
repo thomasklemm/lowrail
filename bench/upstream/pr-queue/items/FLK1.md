@@ -3,10 +3,10 @@ id: FLK1
 repo: rails/rails
 fork: thomasklemm/rails
 kind: fix
-area: CI flakiness (Action Pack Server-Timing tests, Active Record Ractor proxy pinning)
+area: CI flakiness (Action Pack Server-Timing tests)
 reviewer: yahonda
 branch: thomasklemm/fix-flaky-ci-tests
-head: "8e3e822033"
+head: "fd0e61b728"
 base: main
 built_on: "8217632cf8"
 depends_on: []
@@ -15,7 +15,7 @@ rank: 41
 risky: true
 state: ready
 pr: 59812
-note: "8e3e822033 (2026-11-15, coordinator) only wraps the fork test in if Process.respond_to?(:fork), as the other seven AR files that fork do; fable's nits pass on fdd771cf79 carries over (coordinator), claude-code and opus confirm on 8e3e822033. Reviewed on fdd771cf79 by all three before that. fdd771cf79 applies the fable must-fixes on 866942ff69: proxy commit message and body name the real cause (unpin looked the pool up again and unpinned nothing), the regression test unpins while the roles share a pool as the fixtures do (main: Expected 0, Actual 1), a fork test covers the discarded? guard; library code unchanged. Body counts: Server-Timing 189/200 -> 0/200 from run 43721043566 (fd0e61b728 unchanged since), async order 15/120 -> 0/120 from run 43725460078 (120 distinct seeds, after pinned to fdd771cf79). Bundled flake fixes, one commit per cause; record docs/upstream/rails-ci-flakiness.md. risky because the second commit changes Ractor proxy pinning. Review orbs: claude-code T-01a1df43-c4b2-76c7-9b56-e863e94d97f3, opus T-01a1df43-cdbe-723b-8292-cadbac75cbc2. The restart.txt commit (b4661e4891) was dropped after the opus pass: CI runs the app on a tmpfs and the touch comes tens of ms after Puma records the mtime, so the same-tick cause does not explain CI (both CI failures failed the run and its retry). TestUnconnectedAdapter left to rails/rails#59174 (open, Kutomore, steered by matthewd). The body keeps before/after counts because the FLK1 bet asks for them."
+note: "Split 2026-11-16 at yahonda's request (comment 6908431968), with Thomas's OK: #59812 reset with a lease from 8e3e822033 to its first commit fd0e61b728 (Server-Timing only, title and body changed); the Ractor proxy commit cherry-picked onto 8217632cf8 as 72f906e05d (diff and message byte-identical to 8e3e822033's commit) and opened as rails/rails#59817 (item FLK1b); reply comment 6910166925. No new review passes: the coordinator counts the passes on 8e3e822033, since neither commit's code or message changed. 8e3e822033 (2026-11-15, coordinator) only wraps the fork test in if Process.respond_to?(:fork), as the other seven AR files that fork do; fable's nits pass on fdd771cf79 carries over (coordinator), claude-code and opus confirm on 8e3e822033. Reviewed on fdd771cf79 by all three before that. fdd771cf79 applies the fable must-fixes on 866942ff69: proxy commit message and body name the real cause (unpin looked the pool up again and unpinned nothing), the regression test unpins while the roles share a pool as the fixtures do (main: Expected 0, Actual 1), a fork test covers the discarded? guard; library code unchanged. Body counts: Server-Timing 189/200 -> 0/200 from run 43721043566 (fd0e61b728 unchanged since), async order 15/120 -> 0/120 from run 43725460078 (120 distinct seeds, after pinned to fdd771cf79). Bundled flake fixes, one commit per cause; record docs/upstream/rails-ci-flakiness.md. risky because the second commit changes Ractor proxy pinning. Review orbs: claude-code T-01a1df43-c4b2-76c7-9b56-e863e94d97f3, opus T-01a1df43-cdbe-723b-8292-cadbac75cbc2. The restart.txt commit (b4661e4891) was dropped after the opus pass: CI runs the app on a tmpfs and the touch comes tens of ms after Puma records the mtime, so the same-tick cause does not explain CI (both CI failures failed the run and its retry). TestUnconnectedAdapter left to rails/rails#59174 (open, Kutomore, steered by matthewd). The body keeps before/after counts because the FLK1 bet asks for them."
 passes:
   - {reviewer: opus, orb: T-01a1df43-cdbe-723b-8292-cadbac75cbc2, head: "4c2ab2a6816f2d789d1ece0b172af7ee7d298bc0", date: 2026-11-15, verdict: changes, open: "Code fine. Must-fix: body counts and the loops sentence (counts kept per the bet, sentence made self-contained, restart row gone); restart commit message claimed a few ms gap, measured 24-44 ms (commit dropped). Nits applied: empty @pinned_pools keys deleted; record restart numbers added. Nits not applied: shorter server_test comment (commit dropped), partials.size assert. Rates: Server-Timing 133/200 -> 0/200 (cpu.max 2 CPUs, 4 hogs); restart amplified 0/100 -> 0/100; async order 7/60 -> 0/60; sqlite3:ractor seeds 20983 and 6870 fail the async test on main; on head 20983 and random seed 59226 are clean, 6870 has 0F plus 4E from a missing sqlite3 CLI in the reviewer orb. Mutations caught; differential probe of pin/unpin (shared pool, swap, removed, discarded, worker Ractors) changed only as intended."}
   - {reviewer: opus, orb: T-01a1df43-cdbe-723b-8292-cadbac75cbc2, head: "bc520a6a1734378df7c11ed14798fc2a54204366", date: 2026-11-15, verdict: approve, open: "Confirm pass. Two commits on 8217632cf8; proxy.rb diff since 4c2ab2a681 only deletes an empty stack key under the same lock; rubocop clean. Differential probe identical to 4c2ab2a under both ARCONNs (shared pool, swap, replaced, removed, discarded, worker Ractors). ractor_connection_handling_test.rb 62 runs 0F 0E under sqlite3 and sqlite3_ractor; regression test errors with the lib reverted. Async loop 0/60 on head (7/60 on main). Author/committer Thomas, no trailers. Body claims checked against the runs; counts table accepted per the bet."}
@@ -31,17 +31,10 @@ passes:
   - {reviewer: fable, head: "8e3e822033ed8ad90b855980130e52b9f57e659e", orb: T-01a1df85-04c7-75bc-9f03-14168c3b8446, date: 2026-11-15, verdict: approve, open: "Short confirm. diff -w from fdd771cf79 is only the if Process.respond_to?(:fork) guard around the fork test, the same form as in reaper_test.rb and connection_handler_test.rb; fd0e61b728 unchanged, second commit's message identical. Fork test passes on the head and fails with the discarded? guard removed (child exits 1); regression test fails with main's library (Expected 0, Actual 1); whole file 63 runs 0F 0E; all under both ARCONNs. Body cell now says name, role and pool token, which is what the old lookup compared. Identity Thomas, no trailers, no added comments, rubocop and diff --check clean. My nit on the guard is applied; the two record wording nits stay optional."}
 ---
 
-# Fix two causes of intermittent CI failures
+# Compare Server-Timing durations with the events they come from
 
-While going through two months of Buildkite failures on main, and on pull requests whose failing job had nothing to do with their change, I found two causes that keep turning builds red. Each costs a contributor a rerun and a reviewer a look at a failure their change didn't cause.
+While going through two months of Buildkite failures on main, and on pull requests whose failing job had nothing to do with their change, I found that the nested and sibling event tests in `ServerTimingTest` keep turning builds red. Each failure costs a contributor a rerun and a reviewer a look at a failure their change didn't cause.
 
-The nested and sibling event tests in `ServerTimingTest` compared the header with `sleep` lengths under fixed tolerances, so a busy machine failed them. They now compare it with the events it comes from.
+The tests compared the header with `sleep` lengths under fixed tolerances, so a busy machine failed them. They now compare it with the events it comes from. On two CPUs shared with four busy processes, they failed in 189 of 200 runs before and in none after.
 
-In `AsynchronousQueriesTest#test_async_query_retries_connection_failure` (sqlite3:ractor), the Ractor connection proxy looked the main pool up again by name, role and pool token on unpin and unpinned nothing, so the writing pool stayed pinned for later tests. The proxy now unpins the main pool it pinned, as `ConnectionPool` itself does. This is the only change to library code; each commit explains its cause.
-
-| Test | Failing before | After |
-|---|---:|---:|
-| `ServerTimingTest`, nested and sibling events | 189/200 | 0/200 |
-| `AsynchronousQueriesTest`, connection failure retry | 15/120 | 0/120 |
-
-The counts come from repeated runs that make each failure likely: the Server-Timing tests on two CPUs shared with four busy processes, and the async test together with the two tests that set it up, in random order.
+The Ractor connection proxy fix that was also here is now #59817.
