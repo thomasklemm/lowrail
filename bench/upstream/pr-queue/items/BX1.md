@@ -38,6 +38,11 @@ BUNDLE_PATH=vendor bundle exec ruby -rrainbow -e 'puts Gem.loaded_specs["rainbow
 
 Ruby 4.0.9 prints `3.0.0`. Master raises `Gem::LoadError: You have already activated rainbow 3.1.1, but your Gemfile requires rainbow 3.0.0.`
 
-`bundle exec` asks Ruby to set Bundler up in two ways: through the `BUNDLER_SETUP` environment variable, which RubyGems reads while Ruby starts, and through `-rbundler/setup` in `RUBYOPT`. Only the first comes before the `-r` libraries on the command line. Since #18218, Ruby skips `BUNDLER_SETUP` at startup by default, so `-rrainbow` is loaded before Bundler and gets the newest installed version.
+How it got here:
 
-#18218 needed the skip only inside a `Ruby::Box` ([Bug #22123](https://bugs.ruby-lang.org/issues/22123)), so this limits it to that case again and undoes the test change in #18400, which worked around the same problem. Everything else stays: error_highlight, did_you_mean and syntax_suggest still load only when an error is shown ([Feature #21951](https://bugs.ruby-lang.org/issues/21951)), and new boxes still don't set Bundler up again. One thing goes back to how Ruby 4.0 behaves: a child process that clears or replaces `RUBYOPT` but keeps `BUNDLER_SETUP` runs with the bundle again.
+1. [Feature #19089](https://bugs.ruby-lang.org/issues/19089) made `bundle exec` set Bundler up while RubyGems loads, through the `BUNDLER_SETUP` environment variable. That is before the `-r` libraries on the command line, so they come from the bundle.
+2. [Feature #21951](https://bugs.ruby-lang.org/issues/21951) made error_highlight, did_you_mean and syntax_suggest load only when an error is shown.
+3. #18218 ([Bug #22123](https://bugs.ruby-lang.org/issues/22123)) skipped `BUNDLER_SETUP` at startup inside a `Ruby::Box`, and also whenever those three gems load lazily, which since step 2 is the default. Bundler is now set up only by `-rbundler/setup` in `RUBYOPT`, which comes after `-rrainbow`.
+4. #18400 changed a spec to pass `-rbundler/setup` explicitly, because `bundle exec ruby -ropenssl` had stopped showing the bundled gems warning for the same reason.
+
+This skips `BUNDLER_SETUP` only inside a `Ruby::Box` again, which is all Bug #22123 needs, and undoes the spec change from #18400. The three gems still load only when an error is shown, and new boxes still don't set Bundler up again. One thing goes back to how Ruby 4.0 behaves: a child process that clears or replaces `RUBYOPT` but keeps `BUNDLER_SETUP` runs with the bundle again.
