@@ -16,13 +16,13 @@ rank: 1
 risky: false
 state: built
 pr:
-note: "DECISIONS exception of 2026-11-16 (a PR with the repro instead of a Redmine issue). Built and tested on the M3 (release build, docs/upstream/ruby-master-round-3.md). Fail without the fix, pass with it: test_box.rb test_bundler_setup_loaded_only_in_main_box_while_decorator_gems_are_autoloaded (renamed from ..._not_loaded_while_..., which asserted the regression) and the reverted `bundle exec ruby -r./stub -ropenssl` example in spec/bundled_gems_spec.rb. No lockfile example in that spec: it is about bundled_gems.rb's warnings, and spec/bundler/commands/exec_spec.rb is synced from ruby/rubygems. Follow-up for ruby/rubygems: lib/rubygems.rb's note that the BUNDLER_SETUP require can go once 4.1 is the oldest supported Ruby. Reverses one behaviour #18218 named on purpose: a child that clears RUBYOPT but keeps BUNDLER_SETUP is bundled again, as on 4.0.9."
+note: "Thomas, 2026-11-16: open as a PR restoring 4.0 behaviour (variant A); #18218 read as an optimization whose behaviour change slipped through; the narrower RUBYOPT-only variant (B) is the fallback if hsbt wants to keep #18218's cleared-RUBYOPT child behaviour. Body: we -> I, rubygems follow-up promise cut (fix the lib/rubygems.rb note separately after merge). DECISIONS exception of 2026-11-16 (a PR with the repro instead of a Redmine issue). Built and tested on the M3 (release build, docs/upstream/ruby-master-round-3.md). Fail without the fix, pass with it: test_box.rb test_bundler_setup_loaded_only_in_main_box_while_decorator_gems_are_autoloaded (renamed from ..._not_loaded_while_..., which asserted the regression) and the reverted `bundle exec ruby -r./stub -ropenssl` example in spec/bundled_gems_spec.rb. No lockfile example in that spec: it is about bundled_gems.rb's warnings, and spec/bundler/commands/exec_spec.rb is synced from ruby/rubygems. Follow-up for ruby/rubygems: lib/rubygems.rb's note that the BUNDLER_SETUP require can go once 4.1 is the oldest supported Ruby. Reverses one behaviour #18218 named on purpose: a child that clears RUBYOPT but keeps BUNDLER_SETUP is bundled again, as on 4.0.9."
 passes: []
 ---
 
 # Set up Bundler before command-line -r libraries again
 
-While running nokogiri's tests on Ruby master, we found that `bundle exec ruby -rGEM` no longer uses the locked version of GEM. With rainbow 3.1.1 installed and 3.0.0 locked:
+While running nokogiri's tests on Ruby master, I found that `bundle exec ruby -rGEM` no longer uses the locked version of GEM. With rainbow 3.1.1 installed and 3.0.0 locked:
 
 ```sh
 printf 'source "https://rubygems.org"\ngem "rainbow", "3.0.0"\n' > Gemfile
@@ -32,6 +32,6 @@ BUNDLE_PATH=vendor bundle exec ruby -rrainbow -e 'puts Gem.loaded_specs["rainbow
 
 Ruby 4.0.9 prints `3.0.0`. Master raises `Gem::LoadError: You have already activated rainbow 3.1.1, but your Gemfile requires rainbow 3.0.0.`
 
-RubyGems sets Bundler up from `BUNDLER_SETUP` while it loads, which is before the command line's `-r` libraries. Since c3c0e280d0 (Bug #22123), gem_prelude.rb removes that variable first whenever error_highlight, did_you_mean and syntax_suggest are autoloaded, as they are by default since cadf8e7933 (Feature #21951). Bundler is then set up only by `-rbundler/setup` in `RUBYOPT`, which runs after `-rrainbow`.
+RubyGems sets Bundler up from `BUNDLER_SETUP` while it loads, which is before the command line's `-r` libraries. Since c3c0e280d0 (#18218, Bug #22123), gem_prelude.rb removes that variable first whenever error_highlight, did_you_mean and syntax_suggest are autoloaded, as they are by default since cadf8e7933 (Feature #21951). Bundler is then set up only by `-rbundler/setup` in `RUBYOPT`, which runs after `-rrainbow`.
 
-Bug #22123 needs the skip only outside the main box, so this keeps that condition alone and reverts the spec change in #18400, whose `-ropenssl` warning had stopped for the same reason. The decorator gems stay autoloaded, and new boxes still don't set Bundler up again. As on 4.0, a child process that clears `RUBYOPT` but keeps `BUNDLER_SETUP` is bundled again. The note in lib/rubygems.rb that its `BUNDLER_SETUP` require can go once 4.1 is the oldest supported Ruby no longer holds; I'll send that change to ruby/rubygems.
+Bug #22123 needs the skip only outside the main box, so this keeps that condition alone and reverts the spec change in #18400, whose `-ropenssl` warning had stopped for the same reason. The decorator gems stay autoloaded, and new boxes still don't set Bundler up again. As on 4.0, a child process that clears `RUBYOPT` but keeps `BUNDLER_SETUP` is bundled again.
