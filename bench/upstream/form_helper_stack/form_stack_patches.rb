@@ -93,3 +93,17 @@ if patches.include?("E")
     end
   end
 end
+
+if patches.include?("L")
+  # Tags::Translator: drop the default key when it is the key already looked up.
+  ActionView::Helpers::Tags::Translator.class_eval do
+    private def i18n_default
+      if model
+        key = model.model_name.i18n_key
+        key.name == object_name ? "" : ["#{key}.#{method_and_value}".to_sym, ""]
+      else
+        ""
+      end
+    end
+  end
+end

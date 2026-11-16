@@ -64,3 +64,45 @@ C12 (actionview-render-c12.md) and rails-common-paths.md rejected B, C and the `
 as under the share bar (`field_id` 0.022% of instructions in 7 apps) or as inexact (an unguarded `@errors.empty?`
 skipped `normalize_arguments`; A guards on the attribute's class). Together they remove 7 of 27 objects per
 builder field, but form pages remain a small share of request time.
+
+## `f.label` and `f.submit`
+
+`i18n_probe.rb` logs every backend lookup and `I18n::MissingTranslation` for one call, with no app translations:
+
+```
+f.label  (Post, :title)
+  helpers.label.post.title            miss
+  helpers.label.post.title            miss   (the same key again, as the default) -> MissingTranslation
+  activerecord.attributes.post.title  miss
+  attributes.title                    miss   -> MissingTranslation, then "title".humanize
+f.submit (persisted Post)
+  activerecord.models.post            miss   (model_name.human)
+  helpers.submit.post.update          miss
+  helpers.submit.update               hit    "Update %{model}"
+```
+
+**Candidate L (label), Action View only.** `Tags::Translator#i18n_default` adds
+`:"#{model.model_name.i18n_key}.#{method}"` as the first default. It is there for forms whose object name differs from
+the model (`as: :article`, nested attributes), but when the object name is the model's `i18n_key`, the usual case, it
+is the key just looked up, so it is looked up twice and its miss builds a `MissingTranslation`. L drops that default
+when `key.name == object_name`:
+
+* `f.label` 77 → 68 objects, 4 → 3 lookups, one `MissingTranslation` fewer; benchmark-ips (wall time, orb, three
+  rounds) 14.2k → 16.3k i/s. No speed claim without `lowrail bench`.
+* `label_equiv.rb`: 720 lines (3,600 `f.label` calls) over 8 translation setups (none, hit, empty string, Proc, Symbol
+  link, `activerecord.attributes`, nested and namespaced `helpers.label` keys, `value:` keys), both settings of
+  `raise_on_missing_translations`, and 9 builders (Symbol and String object names, `as:`, nested attributes,
+  namespaced model with `admin_user` and `admin/user`, Active Model, a non-model object, nil). Byte-identical with
+  and without L, with `Backend::Simple` and with `Backend::Fallbacks` (`de` → `en`). Lookups per case drop only where
+  the object name is the `i18n_key`.
+* Observable only to code that watches lookups, such as a backend or `lookup` override that logs or counts them: it
+  sees the duplicate lookup disappear.
+
+**Rest of `f.label`:** the `human_attribute_name` miss (`lookup_ancestors` walks `ancestors` per call, one
+`MissingTranslation`, `humanize`). The i18n side is i18n-performance.md's C2/C3 and the `MissingTranslation` lead
+(not exact). Not new.
+
+**`f.submit`** runs once per form, not per field. Its 60 objects are mostly i18n plumbing and interpolation, two
+`humanize` calls (model name, then "Update Post" for the last default, built even though Action View's own locale
+file has `helpers.submit.update`), and `set_default_disable_with`'s `fetch("data", {})` plus `deep_merge!` (3 Hashes).
+Building the last default lazily needs a Proc default, which custom backends see; not exact. Not built.
