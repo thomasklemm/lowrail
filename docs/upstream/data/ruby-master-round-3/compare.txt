@@ -1,0 +1,77 @@
+## campfire
+  r409: 634 runs, 3860 assertions, 1 failures, 0 errors, 0 skips (634 named)
+  master: 634 runs, 3860 assertions, 1 failures, 0 errors, 0 skips (634 named)
+  zjit: 634 runs, 3860 assertions, 1 failures, 0 errors, 0 skips (634 named)
+  new warning master (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  new warning zjit (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  r409 F: VipsLoaderPolicyTest#test_denies_NIFTI_files_through_niftiload Expected /^niftiload: operation is blocked$/ to match # encoding: ASCII-8BIT
+## writebook
+  r409: 310 runs, 1259 assertions, 1 failures, 1 errors, 0 skips (310 named)
+  master: 310 runs, 1259 assertions, 1 failures, 1 errors, 0 skips (310 named)
+  zjit: 310 runs, 1259 assertions, 1 failures, 1 errors, 0 skips (310 named)
+  r409 E: ActiveStorageAuthorizationTest#test_unpublishing_a_book_revokes_the_disk_URL_behind_a_page_upload NoMethodError: undefined method 'request_uri' for an instance of URI::Generic
+  r409 F: VipsLoaderPolicyTest#test_denies_NIFTI_files_through_niftiload Expected /^niftiload: operation is blocked$/ to match # encoding: ASCII-8BIT
+## fizzy
+  r409: 1787 runs, 6796 assertions, 1 failures, 4 errors, 4 skips (1787 named)
+  master: 1787 runs, 6796 assertions, 1 failures, 4 errors, 4 skips (1787 named)
+  zjit: 1787 runs, 6796 assertions, 1 failures, 4 errors, 4 skips (1787 named)
+  new warning master (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  new warning zjit (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  r409 S: Search::ShardingTest#test_the_schema_holds_a_table_for_every_shard_the_adapter_routes_to 
+  r409 S: Search::ShardingTest#test_every_shard_answers_a_full-text_match_against_its_own_index 
+  r409 S: Search::ShardingTest#test_a_document_stores_the_account_token_its_shard's_fulltext_index_matches_on 
+  r409 E: Webhook::DeliveryTest#test_renders_the_creator_name_when_event_creator_is_current_user NoMethodError: undefined method 'parse' for class CGI
+  r409 E: Webhook::DeliveryTest#test_deliver_with_basecamp_webhook_format NoMethodError: undefined method 'parse' for class CGI
+  r409 E: Webhook::DeliveryTest#test_basecamp_webhook_payload_html-escapes_special_characters NoMethodError: undefined method 'parse' for class CGI
+  r409 E: Webhook::DeliveryTest#test_renders_creator_name_when_event_creator_is_not_current_user NoMethodError: undefined method 'parse' for class CGI
+  r409 S: Comment::SearchableTest#test_reindexing_clears_a_stored_column_the_document_does_not_supply 
+  r409 F: VipsLoaderPolicyTest#test_denies_NIFTI_files_through_niftiload Expected /^niftiload: operation is blocked$/ to match # encoding: ASCII-8BIT
+## thinkroom
+  r409: 833 runs, 5144 assertions, 2 failures, 1 errors, 0 skips (833 named)
+  master: 833 runs, 5144 assertions, 2 failures, 1 errors, 0 skips (833 named)
+  zjit: 833 runs, 5144 assertions, 2 failures, 1 errors, 0 skips (833 named)
+  r409 F: AgentUploadTest#test_upload_response_escapes_a_hostile_filename_in_ready_HTML Expected "<img src=\"/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--fd2b829a1f2c1d38039577158c3bcc52901f4adb/plot-%20onerror=-alert(1).png\" alt=\"plot- onerror=-alert(1)\">" to include "&quot;".
+  r409 E: SyncChannelTest#test_locked_guest_owner_updates_still_persist_and_relay NoMethodError: undefined method 'owner_token=' for an instance of ApplicationCable::Connection
+  r409 F: DocumentPreviewHtmlTest#test_raw_script_blocks_render_as_inert_text,_matching_the_editor Expected "<p>safe</p>" to include "&lt;script".
+## react-starter-kit
+  r409: 35 examples, 0 failures (35 named)
+  master: 35 examples, 0 failures (35 named)
+  zjit: 35 examples, 0 failures (35 named)
+## redprints-cfp
+  r409: 50 examples, 3 failures (50 named)
+  master: 50 examples, 3 failures (50 named)
+  zjit: 50 examples, 3 failures (50 named)
+  differs zjit: ./spec/requests/proposals_spec.rb /proposals GET /:id is expected to eq "Eum aut est doloremque." r409="." zjit=nil
+  differs zjit: ./spec/requests/proposals_spec.rb /proposals GET /:id is expected to eq "Iusto id voluptatem occaecati." r409=nil zjit="."
+  r409 F: ./spec/forms/auth/oauth_form_spec.rb Auth::OAuthForm#save when user doesn't exist creates a new user, account and oauth credentials RSpec::Expectations::ExpectationNotMetError:    expected `User::ActiveRecord_Relation#count` to have changed by 1, but was changed by 0
+
+...and:
+
+   expected `User::OAuthProvider::ActiveRecord_Relation#count` to have changed by 1, but was c
+  r409 F: ./spec/models/evaluation/distribution_spec.rb Evaluation::Distribution#invalidate! creates pending reviews for all missing proposal-reviewer pairs RSpec::Expectations::ExpectationNotMetError: expected `Review::ActiveRecord_AssociationRelation#count` to have changed by 2, but was changed by 9
+  r409 F: ./spec/models/evaluation/distribution_spec.rb Evaluation::Distribution#invalidate! when submitted reviews exist doesn't affect existing reviews RSpec::Expectations::ExpectationNotMetError: expected `Review::ActiveRecord_AssociationRelation#count` to have changed by 1, but was changed by 8
+## pingcrm
+  r409: 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips (1 named)
+  master: 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips (1 named)
+  zjit: 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips (1 named)
+## codetriage
+  r409: 222 runs, 451 assertions, 0 failures, 6 errors, 0 skips (222 named)
+  master: 222 runs, 451 assertions, 0 failures, 6 errors, 0 skips (222 named)
+  zjit: 222 runs, 451 assertions, 0 failures, 6 errors, 0 skips (222 named)
+  new warning master (x1): prepare: GEMS/skylight-7.1.1/lib/skylight/helpers.rb:202: warning: the fallback to Object for alias of 'singleton_class' in module 'Skylight::Helpers::ClassMethods' is deprecated and will be removed in Ruby 4.3
+  new warning master (x1): GEMS/skylight-7.1.1/lib/skylight/helpers.rb:202: warning: the fallback to Object for alias of 'singleton_class' in module 'Skylight::Helpers::ClassMethods' is deprecated and will be removed in Ruby 4.3
+  new warning master (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  new warning zjit (x1): prepare: GEMS/skylight-7.1.1/lib/skylight/helpers.rb:202: warning: the fallback to Object for alias of 'singleton_class' in module 'Skylight::Helpers::ClassMethods' is deprecated and will be removed in Ruby 4.3
+  new warning zjit (x1): GEMS/skylight-7.1.1/lib/skylight/helpers.rb:202: warning: the fallback to Object for alias of 'singleton_class' in module 'Skylight::Helpers::ClassMethods' is deprecated and will be removed in Ruby 4.3
+  new warning zjit (x1): GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:20: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3
+  r409 E: UserMailerTest#test_sends_subscribed/created_email NoMethodError: undefined method '<=' for an instance of UserMailerTest
+  r409 E: UserMailerTest#test_poke_inactive_works NoMethodError: undefined method '<=' for an instance of UserMailerTest
+  r409 E: UserMailerTest#test_sends_issues NoMethodError: undefined method '<=' for an instance of UserMailerTest
+  r409 E: UserMailerTest#test_sends_docs NoMethodError: undefined method '<=' for an instance of UserMailerTest
+  r409 E: UserMailerTest#test_send_triage_works NoMethodError: undefined method '<=' for an instance of UserMailerTest
+  r409 E: BackgroundInactiveEmailJobTest#test_sends_poke_inactive_email_for_user_without_subscriptions RuntimeError: Delivery method cannot be nil
+## hackatime
+  r409: 794 runs, 3540 assertions, 1 failures, 0 errors, 0 skips (794 named)
+  master: 794 runs, 3540 assertions, 1 failures, 0 errors, 0 skips (794 named)
+  zjit: 794 runs, 3540 assertions, 1 failures, 0 errors, 0 skips (794 named)
+  r409 F: ProfileStatsServiceTest#test_og_stats_reports_totals_and_top_language_from_rollups Expected false to be truthy.

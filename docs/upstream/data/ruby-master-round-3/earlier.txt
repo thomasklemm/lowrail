@@ -1,0 +1,22 @@
+== r409: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [arm64-darwin25]
+-- bundle exec ruby -rGEM (rainbow 2.2.2 locked, 3.1.1 installed)
+2.2.2
+-- default net-http with net-protocol 0.2.2 locked
+{net_http: "0.9.1", net_protocol: "0.2.2"}
+"ok"
+== master: ruby 4.1.0dev (2026-11-16T00:27:01Z HEAD d2a6a9d9fa) +PRISM [arm64-darwin25]
+-- bundle exec ruby -rGEM (rainbow 2.2.2 locked, 3.1.1 installed)
+~/Code/lowrail-bench/install/r3master/lib/ruby/4.1.0+6/bundler/runtime.rb:409:in 'Bundler::Runtime#check_for_activated_spec!': You have already activated rainbow 3.1.1, but your Gemfile requires rainbow 2.2.2. Prepending `bundle exec` to your command may solve this. (Gem::LoadError)
+-- default net-http with net-protocol 0.2.2 locked
+Your bundle downgrades the following default gems shipped with ruby 4.1.0.dev:
+  * net-protocol 0.2.2 (default: 0.4.0)
+{net_http: "0.10.0", net_protocol: "0.2.2"}
+~/Code/lowrail-bench/install/r3master/lib/ruby/4.1.0+6/net/http/response.rb:164:in 'Net::HTTPResponse.read_line': uninitialized constant Net::ReadLimitExceeded (NameError)
+~/Code/lowrail-bench/r3/earlier/netproto-master/b/ruby/4.1.0+6/gems/net-protocol-0.2.2/lib/net/protocol.rb:194:in 'Net::BufferedIO#readuntil': wrong number of arguments (given 3, expected 1..2) (ArgumentError)
+
+    caller: ~/Code/lowrail-bench/install/r3master/lib/ruby/4.1.0+6/net/http/response.rb:163
+    |       sock.readuntil("\n", ignore_eof, limit: limit)
+                ^^^^^^^^^^
+    callee: ~/Code/lowrail-bench/r3/earlier/netproto-master/b/ruby/4.1.0+6/gems/net-protocol-0.2.2/lib/net/protocol.rb:194
+    |     def readuntil(terminator, ignore_eof = false)
+              ^^^^^^^^^
