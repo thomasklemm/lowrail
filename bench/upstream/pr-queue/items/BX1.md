@@ -42,8 +42,8 @@ Ruby 4.0.9 prints `3.0.0`. Master raises `Gem::LoadError: You have already activ
 How it got here:
 
 1. [Feature #19089](https://bugs.ruby-lang.org/issues/19089) made `bundle exec` set Bundler up while RubyGems loads, through the `BUNDLER_SETUP` environment variable. That is before the `-r` libraries on the command line, so they come from the bundle.
-2. [Feature #21951](https://bugs.ruby-lang.org/issues/21951) made error_highlight, did_you_mean and syntax_suggest load only when an error is shown.
-3. #18218 ([Bug #22123](https://bugs.ruby-lang.org/issues/22123)) skipped `BUNDLER_SETUP` at startup inside a `Ruby::Box`, and also whenever those three gems load lazily, which since step 2 is the default. Bundler is now set up only by `-rbundler/setup` in `RUBYOPT`, which comes after `-rrainbow`.
+2. [Feature #21951](https://bugs.ruby-lang.org/issues/21951) made error_highlight, did_you_mean and syntax_suggest load lazily instead of at startup.
+3. #18218 ([Bug #22123](https://bugs.ruby-lang.org/issues/22123)) skipped `BUNDLER_SETUP` at startup in boxes other than the main box, and also whenever those three gems load lazily, which since step 2 is the default. Bundler is now set up only by `-rbundler/setup` in `RUBYOPT`, which comes after `-rrainbow`.
 4. #18400 changed a spec to pass `-rbundler/setup` explicitly, because `bundle exec ruby -ropenssl` had stopped showing the bundled gems warning for the same reason.
 
-This skips `BUNDLER_SETUP` only inside a `Ruby::Box` again, which is all Bug #22123 needs, and undoes the spec change from #18400. The three gems still load only when an error is shown, and new boxes still don't set Bundler up again. One thing goes back to how Ruby 4.0 behaves: a child process that clears or replaces `RUBYOPT` but keeps `BUNDLER_SETUP` runs with the bundle again.
+This skips `BUNDLER_SETUP` only in boxes other than the main box again, which is all Bug #22123 needs, and undoes the spec change from #18400. It leaves the lazy loading of the three gems unchanged, and new boxes still don't set Bundler up again. One thing goes back to how Ruby 4.0 behaves: a child process that clears or replaces `RUBYOPT` but keeps `BUNDLER_SETUP` runs with the bundle again.
