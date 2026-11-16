@@ -22,7 +22,7 @@ passes: []
 
 # Set up Bundler before command-line -r libraries again
 
-While running nokogiri's tests on Ruby master, I found that `bundle exec ruby -rGEM` no longer uses the locked version of GEM. With rainbow 3.1.1 installed and 3.0.0 locked:
+On Ruby master, `bundle exec ruby -rGEM` no longer uses the locked version of GEM, which showed up in nokogiri's test suite. With rainbow 3.1.1 installed and 3.0.0 locked:
 
 ```sh
 printf 'source "https://rubygems.org"\ngem "rainbow", "3.0.0"\n' > Gemfile

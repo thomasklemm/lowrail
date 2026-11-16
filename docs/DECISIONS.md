@@ -78,7 +78,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   or where we have little to add at that moment; an issue needs a verified bug or a question we can answer
   ourselves. New issues need Thomas's OK. Past mistakes stay as they are (no GitHub Support requests to erase
   them); the rules above prevent repeats.
-* **Write "I", not "we".** One account is one person.
+* **No "I" or "we" where the sentence works without** (Thomas, 2026-11-16): say what happens, e.g. "On Ruby master, X no
+  longer …, which showed up in Y's test suite." Where a person is needed, write "I", not "we": one account is one person.
 * **Closing comments:** thank where it is earned (see above), accept the point, leave one neutral fact for the record; don't belittle our result.
 * **Search before building:** open, closed and Dependabot PRs, issues, and earlier maintainer decisions in the
   target repo (missed on 2026-11-03: cbor-ruby#31, tiktoken_ruby#130, ruby/ruby#16909).
