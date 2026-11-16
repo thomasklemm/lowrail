@@ -10,7 +10,7 @@ parts = ["post", "comment", "[", "]", "][", "_", "?", ".", ":", "-", "ä", " ", 
 names = ["", "post", "post[title]", "post[tags][]", "user_", "_", "a.b:c-d", "q?", "?", "ä", :post, :title?, nil, 12] +
         200.times.map { Array.new(rng.rand(1..5)) { parts.sample(random: rng) }.join }
 names << "bad\xFF".dup.force_encoding("UTF-8") << "x".encode("UTF-16LE")
-opts = [{}, { id: nil }, { "id" => nil }, { id: "x" }, { "id" => "a", id: "b" }, { class: "c", type: "email" },
+opts = [ActiveSupport::HashWithIndifferentAccess.new("autocomplete" => "on", "type" => "x"), ActiveSupport::HashWithIndifferentAccess.new(id: nil), { "autocomplete" => "on" }, { "type" => "email" }, {}, { id: nil }, { "id" => nil }, { id: "x" }, { "id" => "a", id: "b" }, { class: "c", type: "email" },
         { "type" => "number", type: :range }, { value: "v" }, { name: "n" }, { autocomplete: "on" }, { data: { a: 1 } }]
 def show(&b) = (b.call.inspect rescue "#{$!.class}: #{$!.message}")
 names.each do |n|

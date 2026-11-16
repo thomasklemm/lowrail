@@ -106,3 +106,30 @@ when `key.name == object_name`:
 `humanize` calls (model name, then "Update Post" for the last default, built even though Action View's own locale
 file has `helpers.submit.update`), and `set_default_disable_with`'s `fetch("data", {})` plus `deep_merge!` (3 Hashes).
 Building the last default lazily needs a Proc default, which custom backends see; not exact. Not built.
+
+## `hidden_field_tag` itself (alternative to K6's change in `button_to`)
+
+K6 rebuilds the hidden field inside `button_to`. Instead, `button_to` can keep main's
+`hidden_field_tag(name, value, id: nil)` and the shared helpers get cheaper, for every caller:
+
+| | Change | Exact? |
+| --- | --- | --- |
+| T | `tag`: `.freeze.html_safe`, as `content_tag_string` and `self_closing_tag_string` in the same file already do, so the SafeBuffer shares the string instead of Ruby allocating a hidden one | yes |
+| Z | `sanitize_to_id`: `tr!` on the `delete` result instead of a second copy | yes |
+| I | `text_field_tag`: compute `sanitize_to_id(name)` only when the options have no `id` (the reviewer's suggestion on #59804) | invalid UTF-8 names with an explicit `id` render instead of raising `ArgumentError`; the error came from computing an id that is then dropped |
+| K | `hidden_field_tag`: `{ **options, type: :hidden }` instead of `merge` | **no**: with a HashWithIndifferentAccess, a String `"autocomplete"` key is no longer seen by `key?(:autocomplete)` (214 of 15,984 fuzz lines differ). Rejected |
+
+`form_stack_fuzz.rb` (15,984 outputs, now with HashWithIndifferentAccess and String-keyed options): T and Z
+identical; I and T+Z+I differ only in the 15 invalid-UTF-8 lines. Builder scenarios byte-identical with T+Z+I.
+
+| Objects per call (`hft_count.rb`) | main | T+Z+I | K6 (estimate) |
+| --- | ---: | ---: | ---: |
+| `hidden_field_tag(name, value, id: nil)` | 11 | 8 | 5 in `button_to` |
+| `hidden_field_tag(name, value)` | 11 | 9 | – |
+| `text_field_tag` | 9 | 7 | – |
+| `tag(:input, …)` | 5 | 4 | – |
+| `button_to` with 20 params | 452 | 391 | about 332 (−6 per param) |
+| `f.text_field` / `f.check_box` (T only reaches them) | 27 / 31 | 26 / 29 | – |
+
+benchmark-ips (wall time, orb, two rounds; not a speed claim): `hidden_field_tag(id: nil)` +20%, `button_to` with
+20 params +13%, `tag(:input)` +6%, `text_field_tag` +1%.

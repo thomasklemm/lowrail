@@ -107,3 +107,63 @@ if patches.include?("L")
     end
   end
 end
+
+# N: small exact rewrites in the shared helpers, so callers keep calling hidden_field_tag.
+if patches.include?("T")
+  # tag: freeze before html_safe, as content_tag_string and self_closing_tag_string already do.
+  ActionView::Helpers::TagHelper.module_eval do
+    def tag(name = nil, options = nil, open = false, escape = true)
+      if name.nil?
+        tag_builder
+      else
+        ensure_valid_html5_tag_name(name)
+        "<#{name}#{tag_builder.tag_options(options, escape) if options}#{open ? ">" : " />"}".freeze.html_safe
+      end
+    end
+  end
+end
+if patches.include?("Z")
+  ActionView::Helpers::FormTagHelper.module_eval do
+    private def sanitize_to_id(name)
+      id = name.to_s.delete("]")
+      id.tr!("^-a-zA-Z0-9:.", "_")
+      id
+    end
+  end
+end
+if patches.include?("H")
+  ActionView::Helpers::FormTagHelper.module_eval do
+    def hidden_field_tag(name, value = nil, options = {})
+      html_options = options.merge({ type: :hidden })
+      unless ActionView::Base.remove_hidden_field_autocomplete
+        html_options[:autocomplete] = "off" unless html_options.key?(:autocomplete)
+      end
+      text_field_tag(name, value, html_options)
+    end
+  end
+end
+if patches.include?("I")
+  # text_field_tag computes the id only when the caller didn't pass one (the reviewer's suggestion).
+  ActionView::Helpers::FormTagHelper.module_eval do
+    def text_field_tag(name, value = nil, options = {})
+      options = options.stringify_keys
+      tag :input, { "type" => "text", "name" => name, "id" => (sanitize_to_id(name) unless options.key?("id")), "value" => value }.update(options)
+    end
+  end
+end
+if patches.include?("K")
+  ActionView::Helpers::FormTagHelper.module_eval do
+    def hidden_field_tag(name, value = nil, options = {})
+      html_options = { **options, type: :hidden }
+      unless ActionView::Base.remove_hidden_field_autocomplete
+        html_options[:autocomplete] = "off" unless html_options.key?(:autocomplete)
+      end
+      text_field_tag(name, value, html_options)
+    end
+  end
+end
+if patches.include?("6")
+  ActionView::Helpers::UrlHelper.module_eval do
+    alias_method :__orig_hft, :hidden_field_tag
+  end
+end
