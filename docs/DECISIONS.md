@@ -39,8 +39,10 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   actions, releases, visibility changes, reversing a decision he made, and before posting a reply that pushes back
   on a maintainer or answers an "is this worth it" challenge.
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
-* **Always thank maintainers and reviewers** (Thomas, 2026-11-04) in every reply and closing comment, in one plain
-  sentence. **No standalone thank-you comment after a plain merge** (Thomas, 2026-11-05, on rails/rails#59640). Every
+* **Thank for something concrete, never as a filler** (Thomas, 2026-11-16, replaces "always thank" of 2026-11-04).
+  Thank a maintainer or reviewer in one plain sentence when they did something for the PR, e.g. "Thanks for taking a
+  look!" on a close after their review. No reflexive "Thanks!" at the end of a reply that only reports what we did,
+  such as "Done: … is in #N." (rails/rails#59812, 2026-11-16). **No standalone thank-you comment after a plain merge** (Thomas, 2026-11-05, on rails/rails#59640). Every
   new comment notifies the maintainer who merged, so avoid notification spam. A thank-you comment only when it is
   worth a notification: the maintainer spent real time on the review, we went through several rounds, or they added
   work of their own. For a small change merged quickly, react with 👍 on their comment or review instead, if they
@@ -77,7 +79,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   ourselves. New issues need Thomas's OK. Past mistakes stay as they are (no GitHub Support requests to erase
   them); the rules above prevent repeats.
 * **Write "I", not "we".** One account is one person.
-* **Closing comments:** thank, accept the point, leave one neutral fact for the record; don't belittle our result.
+* **Closing comments:** thank where it is earned (see above), accept the point, leave one neutral fact for the record; don't belittle our result.
 * **Search before building:** open, closed and Dependabot PRs, issues, and earlier maintainer decisions in the
   target repo (missed on 2026-11-03: cbor-ruby#31, tiktoken_ruby#130, ruby/ruby#16909).
 * **ZJIT ideas are free to take** (k0kubun on
@@ -159,7 +161,7 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 * **No follow-ups to a fix a maintainer called narrow, and nothing in code a maintainer is reworking.** The search
   before building includes recent maintainer commits and PRs on the same functions.
 * **Answer review with the change or one named blocker**, not a menu of options.
-* **Closing comments don't reopen decisions**: thanks, the reason, nothing more.
+* **Closing comments don't reopen decisions**: the reason, a thank-you only where it is earned, nothing more.
 * **Tests test one thing**, plus asserts on the invariants the change relies on.
 * **Report zjit_alloc_bytes** for any new per-ISEQ or per-profile state.
 * **Rails:** keep the pattern (small, obvious, numbers from real apps). Drop or simplify L2 candidates and any that
