@@ -1,0 +1,237 @@
+diff --git a/actionview/lib/action_view/helpers/active_model_helper.rb b/actionview/lib/action_view/helpers/active_model_helper.rb
+index 4b1245a1c8..596bc33162 100644
+--- a/actionview/lib/action_view/helpers/active_model_helper.rb
++++ b/actionview/lib/action_view/helpers/active_model_helper.rb
+@@ -18,7 +18,7 @@ def object
+         end
+       end
+ 
+-      def content_tag(type, options, *)
++      def content_tag(type, content_or_options_with_block, options = nil, escape = true)
+         select_markup_helper?(type) ? super : error_wrapping(super)
+       end
+ 
+diff --git a/actionview/lib/action_view/helpers/form_options_helper.rb b/actionview/lib/action_view/helpers/form_options_helper.rb
+index 2e72f23545..b024c88951 100644
+--- a/actionview/lib/action_view/helpers/form_options_helper.rb
++++ b/actionview/lib/action_view/helpers/form_options_helper.rb
+@@ -371,7 +371,7 @@ def weekday_select(object, method, options = {}, html_options = {}, &block)
+       def options_for_select(container, selected = nil)
+         return container if String === container
+ 
+-        selected, disabled = extract_selected_and_disabled(selected).map do |r|
++        selected, disabled = extract_selected_and_disabled(selected).map! do |r|
+           Array(r).map(&:to_s)
+         end
+ 
+diff --git a/actionview/lib/action_view/helpers/form_tag_helper.rb b/actionview/lib/action_view/helpers/form_tag_helper.rb
+index a945b6c942..fc7f90587d 100644
+--- a/actionview/lib/action_view/helpers/form_tag_helper.rb
++++ b/actionview/lib/action_view/helpers/form_tag_helper.rb
+@@ -110,9 +110,12 @@ def field_id(object_name, method_name, *suffixes, index: nil, namespace: nil)
+           object_name = object_name.model_name.singular
+         end
+ 
+-        sanitized_object_name = object_name.to_s.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_").delete_suffix("_")
++        sanitized_object_name = object_name.to_s
++        sanitized_object_name = sanitized_object_name.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_") if sanitized_object_name.match?(/[^-a-zA-Z0-9:._]/)
++        sanitized_object_name = sanitized_object_name.delete_suffix("_") if sanitized_object_name.end_with?("_")
+ 
+-        sanitized_method_name = method_name.to_s.delete_suffix("?")
++        sanitized_method_name = method_name.to_s
++        sanitized_method_name = sanitized_method_name.delete_suffix("?") if sanitized_method_name.end_with?("?")
+ 
+         [
+           namespace,
+@@ -138,7 +141,7 @@ def field_id(object_name, method_name, *suffixes, index: nil, namespace: nil)
+       # ```
+       #
+       def field_name(object_name, method_name, *method_names, multiple: false, index: nil)
+-        names = method_names.map! { |name| "[#{name}]" }.join
++        names = method_names.empty? ? "" : method_names.map! { |name| "[#{name}]" }.join
+ 
+         # a little duplication to construct fewer strings
+         case
+@@ -302,8 +305,7 @@ def label_tag(name = nil, content_or_options = nil, options = nil, &block)
+         if block_given? && content_or_options.is_a?(Hash)
+           options = content_or_options = content_or_options.stringify_keys
+         else
+-          options ||= {}
+-          options = options.stringify_keys
++          options = options ? options.stringify_keys : {}
+         end
+         options["for"] = sanitize_to_id(name) unless name.blank? || options.has_key?("for")
+         content_tag :label, content_or_options || name.to_s.humanize, options, &block
+@@ -330,7 +332,8 @@ def label_tag(name = nil, content_or_options = nil, options = nil, &block)
+       #      value="" onchange="alert(&#39;Input collected!&#39;)" autocomplete="off" />
+       # ```
+       def hidden_field_tag(name, value = nil, options = {})
+-        html_options = options.merge(type: :hidden)
++        html_options = options.dup
++        html_options[:type] = :hidden
+         unless ActionView::Base.remove_hidden_field_autocomplete
+           html_options[:autocomplete] = "off" unless html_options.key?(:autocomplete)
+         end
+@@ -510,7 +513,7 @@ def checkbox_tag(name, *args)
+           raise ArgumentError, "wrong number of arguments (given #{args.length + 1}, expected 1..4)"
+         end
+         options = args.extract_options!
+-        value, checked = args.empty? ? ["1", false] : [*args, false]
++        value, checked = args.empty? ? ["1", false] : args
+         html_options = { "type" => "checkbox", "name" => name, "id" => sanitize_to_id(name), "value" => value }.update(options.stringify_keys)
+         html_options["checked"] = "checked" if checked
+         tag :input, html_options
+diff --git a/actionview/lib/action_view/helpers/tag_helper.rb b/actionview/lib/action_view/helpers/tag_helper.rb
+index 0c617a729b..dc5a356cec 100644
+--- a/actionview/lib/action_view/helpers/tag_helper.rb
++++ b/actionview/lib/action_view/helpers/tag_helper.rb
+@@ -1543,6 +1543,11 @@ def content_tag_string(name, content, options, escape = true) # :nodoc:
+         def tag_options(options, escape = true) # :nodoc:
+           return if options.blank?
+           output = +""
++          append_tag_options(output, options, escape)
++          output unless output.empty?
++        end
++
++        def append_tag_options(output, options, escape) # :nodoc:
+           sep    = " "
+           options.each_pair do |key, value|
+             next if key.blank?
+@@ -1596,7 +1601,6 @@ def tag_options(options, escape = true) # :nodoc:
+               append_tag_option(output, name, value, escape)
+             end
+           end
+-          output unless output.empty?
+         end
+ 
+         private
+@@ -1611,7 +1615,10 @@ def tag_string(name, options, content = nil, escape: true, &block)
+           end
+ 
+           def self_closing_tag_string(name, options, escape = true, tag_suffix = " />")
+-            "<#{name}#{tag_options(options, escape)}#{tag_suffix}".freeze.html_safe
++            output = +"<#{name}"
++            append_tag_options(output, options, escape) unless options.blank?
++            output << tag_suffix
++            output.freeze.html_safe
+           end
+ 
+           def boolean_tag_option(key)
+@@ -1668,7 +1675,8 @@ def prefix_tag_option(prefix, key, value, escape)
+           end
+ 
+           def append_prefix_tag_option(output, prefix, key, value, escape)
+-            key = "#{prefix}-#{(Symbol === key ? key.name : key.to_s).dasherize}"
++            key = Symbol === key ? key.name : key.to_s
++            key = "#{prefix}-#{key.include?("_") ? key.dasherize : key}"
+             unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
+               value = value.to_json
+             end
+@@ -1759,7 +1767,10 @@ def tag(name = nil, options = nil, open = false, escape = true)
+           tag_builder
+         else
+           ensure_valid_html5_tag_name(name)
+-          "<#{name}#{tag_builder.tag_options(options, escape) if options}#{open ? ">" : " />"}".html_safe
++          output = +"<#{name}"
++          tag_builder.append_tag_options(output, options, escape) unless options.blank?
++          output << (open ? ">" : " />")
++          output.html_safe
+         end
+       end
+ 
+diff --git a/actionview/lib/action_view/helpers/tags/base.rb b/actionview/lib/action_view/helpers/tags/base.rb
+index 8023849ade..132e64600a 100644
+--- a/actionview/lib/action_view/helpers/tags/base.rb
++++ b/actionview/lib/action_view/helpers/tags/base.rb
+@@ -50,13 +50,12 @@ def value
+           def value_before_type_cast
+             return unless object
+ 
+-            method_before_type_cast = @method_name + "_before_type_cast"
+-
+-            if value_came_from_user? && object.respond_to?(method_before_type_cast)
+-              object.public_send(method_before_type_cast)
+-            else
+-              value
++            if value_came_from_user?
++              method_before_type_cast = @method_name + "_before_type_cast"
++              return object.public_send(method_before_type_cast) if object.respond_to?(method_before_type_cast)
+             end
++
++            value
+           end
+ 
+           def value_came_from_user?
+@@ -122,11 +121,14 @@ def tag_id(index = nil, namespace = nil)
+           end
+ 
+           def sanitized_method_name
+-            @sanitized_method_name ||= @method_name.delete_suffix("?")
++            @sanitized_method_name ||= @method_name.end_with?("?") ? @method_name.delete_suffix("?") : @method_name
+           end
+ 
+           def sanitized_value(value)
+-            value.to_s.gsub(/[\s.]/, "_").gsub(/[^-[[:word:]]]/, "").downcase
++            sanitized = value.to_s.gsub(/[\s.]/, "_")
++            sanitized.gsub!(/[^-[[:word:]]]/, "")
++            sanitized.downcase!
++            sanitized
+           end
+ 
+           def name_and_id_index(options)
+diff --git a/actionview/lib/action_view/helpers/tags/check_box.rb b/actionview/lib/action_view/helpers/tags/check_box.rb
+index 3976c23d98..ac9233170c 100644
+--- a/actionview/lib/action_view/helpers/tags/check_box.rb
++++ b/actionview/lib/action_view/helpers/tags/check_box.rb
+@@ -58,7 +58,9 @@ def checked?(value)
+ 
+           def hidden_field_for_checkbox(options)
+             if @unchecked_value
+-              tag_options = options.slice("name", "disabled", "form").merge!("type" => "hidden", "value" => @unchecked_value)
++              tag_options = options.slice("name", "disabled", "form")
++              tag_options["type"] = "hidden"
++              tag_options["value"] = @unchecked_value
+               tag_options["autocomplete"] = "off" unless ActionView::Base.remove_hidden_field_autocomplete
+               tag("input", tag_options)
+             else
+diff --git a/actionview/lib/action_view/helpers/tags/placeholderable.rb b/actionview/lib/action_view/helpers/tags/placeholderable.rb
+index e9f7601e57..ae3d6e8380 100644
+--- a/actionview/lib/action_view/helpers/tags/placeholderable.rb
++++ b/actionview/lib/action_view/helpers/tags/placeholderable.rb
+@@ -4,8 +4,8 @@ module ActionView
+   module Helpers
+     module Tags # :nodoc:
+       module Placeholderable # :nodoc:
+-        def initialize(*)
+-          super
++        def initialize(...)
++          super(...)
+ 
+           if tag_value = @options[:placeholder]
+             placeholder = tag_value if tag_value.is_a?(String)
+diff --git a/actionview/lib/action_view/helpers/tags/translator.rb b/actionview/lib/action_view/helpers/tags/translator.rb
+index e81ca3aef0..f3236d88e8 100644
+--- a/actionview/lib/action_view/helpers/tags/translator.rb
++++ b/actionview/lib/action_view/helpers/tags/translator.rb
+@@ -5,7 +5,7 @@ module Helpers
+     module Tags # :nodoc:
+       class Translator # :nodoc:
+         def initialize(object, object_name, method_and_value, scope:)
+-          @object_name = object_name.gsub(/\[(.*)_attributes\]\[\d+\]/, '.\1')
++          @object_name = object_name.include?("_attributes][") ? object_name.gsub(/\[(.*)_attributes\]\[\d+\]/, '.\1') : object_name
+           @method_and_value = method_and_value
+           @scope = scope
+           @model = object.respond_to?(:to_model) ? object.to_model : nil
+diff --git a/activemodel/lib/active_model/errors.rb b/activemodel/lib/active_model/errors.rb
+index eb8803ba11..88bf7939bf 100644
+--- a/activemodel/lib/active_model/errors.rb
++++ b/activemodel/lib/active_model/errors.rb
+@@ -517,6 +517,8 @@ def full_messages_for(attribute, type = nil)
+     # ```
+     #: (Symbol | String, ?untyped) -> Array[untyped]
+     def messages_for(attribute, type = nil)
++      return [] if @errors.empty? && type.nil? && (Symbol === attribute || attribute.instance_of?(String))
++
+       where(attribute, type).map(&:message)
+     end
+ 
