@@ -12,15 +12,15 @@ On master, a gem named with `-r` under `bundle exec` is activated before Bundler
 ```sh
 gem install rainbow -v 3.1.1
 mkdir repro && cd repro
-printf 'source "https://rubygems.org"\ngem "rainbow", "2.2.2"\n' > Gemfile
+printf 'source "https://rubygems.org"\ngem "rainbow", "3.0.0"\n' > Gemfile
 BUNDLE_PATH=vendor bundle install
 BUNDLE_PATH=vendor bundle exec ruby -rrainbow -e 'puts Gem.loaded_specs["rainbow"].version'
 ```
 
-Ruby 4.0.9 prints `2.2.2`. Master raises:
+Ruby 4.0.9 prints `3.0.0`. Master raises:
 
 ```
-Gem::LoadError: You have already activated rainbow 3.1.1, but your Gemfile requires rainbow 2.2.2.
+Gem::LoadError: You have already activated rainbow 3.1.1, but your Gemfile requires rainbow 3.0.0. Prepending `bundle exec` to your command may solve this.
 ```
 
 `bundle exec` sets `BUNDLER_SETUP` and adds `-rbundler/setup` to `RUBYOPT`. Until now, `rubygems.rb` required `ENV["BUNDLER_SETUP"]` while it loaded, so Bundler was set up before the command-line `-r` options ran. Since [c3c0e280d0](https://github.com/ruby/ruby/commit/c3c0e280d0) (Bug #22123), `gem_prelude.rb` removes `BUNDLER_SETUP` before loading RubyGems whenever error_highlight, did_you_mean and syntax_suggest are autoloaded, which is the default since [cadf8e7933](https://github.com/ruby/ruby/commit/cadf8e7933) (Feature #21951). Its comment says Bundler is then set up by `RUBYOPT=-rbundler/setup` after boot, but command-line `-r` options run before `RUBYOPT`'s, so `-rrainbow` activates 3.1.1 first.
