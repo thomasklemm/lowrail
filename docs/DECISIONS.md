@@ -271,6 +271,9 @@ required review; it covers what the Sol/stand-in slot covered (exactness probe, 
 message). Astra on `risky` items and thermos above 200 changed lines stay as before. Passes already recorded keep
 counting.
 
+Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
+trying Sol 6.2, but it isn't offered yet.
+
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
 Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
