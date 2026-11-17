@@ -61,7 +61,7 @@ singleton receivers.
 | 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.64 s → 3.53 s of compile time; app compile time within A/A | ours (assigned), but tenderlove's #19962 is open | **built, ZWB1** |
 | 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −7.5% Ir per call, apps about 0.015% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1** |
 | 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
-| 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue | every inlined call; unmeasured | free | not built |
+| 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
 | 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
 | 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | free (#1039 row 78 unassigned) | old build, not rebased |
 | 7 | lead 3 polymorphic recompile (ZL3) | answered on #776, waits for the team | largest on lobsters and shipit | ours | held |
@@ -179,6 +179,29 @@ Branch [`thomasklemm/zjit-string-dup`](https://github.com/thomasklemm/ruby/tree/
 > (lobsters 4.2k, shipit 5.6k), and a loop of `s.dup` goes from 388 to 359 instructions per call. The allocation
 > itself is still `rb_ec_str_resurrect`; an inline allocation for strings not known at compile time would be a
 > separate step. Branch: https://github.com/thomasklemm/ruby/commit/c71669b114. OK to open it on ruby/ruby?
+
+## #1130: one stack-overflow check for inlined frames (measured 2026-11-17, not built)
+
+Each `PushInlineFrame` runs `gen_stack_overflow_check` (lea, cmp, jbe: 3 instructions on the hot path). The issue
+proposes one depth check at the entry to the host function F instead. Measurement build: master `7919a47d46` plus
+two counters (patch in the orb at `.amp/in/orb-backup/inline-frame-counters.patch`, not pushed). One counter counts
+each inlined frame push. The other counts each entry to a function that has at least one `PushInlineFrame`, which is
+where the hoisted check would run. Per iteration, ruby-bench, 15 warmup + 10 measured:
+
+| | inlined frame pushes | entries to hosts | pushes per entry | checks saved | Ir saved (×3) | share of iteration |
+| --- | --- | --- | --- | --- | --- | --- |
+| railsbench | 2,408,855 | 1,665,888 | 1.45 | 742,967 | about 2.2 M | 0.045% (A/A 0.03%) |
+| lobsters | 823,623 | 815,741 | 1.01 | 7,882 | about 0.02 M | 0.001% (A/A 0.01%) |
+| shipit | 1,976,706 | 2,206,369 | 0.90 | −229,663 | about −0.7 M | +0.018% (A/A 0.03%) |
+
+Iteration totals and A/A are the master Callgrind windows from zjit-leads.md (4,904 / 2,499 / 3,761 M Ir). The
+Ir column is count × 3, not a new Callgrind run: the effect is too small to show up in an app window. Most host
+functions take one inlined path per call, and many entries never reach the inlined call (shipit has more entries
+than pushes), so a check at entry often replaces nothing. The ceiling, where the caller's existing check for F's
+frame also covers inline depth, removes every push check: about 7.2 / 2.5 / 5.9 M Ir (0.15% / 0.10% / 0.16%).
+That needs the caller to know F's final inlining depth, which changes when F recompiles. Interpreter entries would
+still need a check at entry. Stop here unless tekknolagi wants the caller-side version, or #1023's
+virtual inline frames change the costs. No comment draft: there is no result worth reporting on the issue.
 
 ## How we take an item
 
