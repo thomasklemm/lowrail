@@ -202,6 +202,8 @@ are I18n (see above and LBL1).
 | 6 `Errors#messages_for` without errors | AM | activemodel errors.rb | −4 | −4 | −4 | −4 | −20 | every `errors[:attr]` on a valid model |
 | all six | | | 28 → 15 | 32 → 19 | 41 → 29 | 100 → 85 | 279 → 213 | `hidden_field_tag` 11 → 9, `button_to` with one param 47 → 45 |
 
+Status (Thomas, 2026-11-17): PR 1 is FB1 and PR 6 is AM1, both open as drafts. PR 2 is being built as FH2, together with LBL1; both open as drafts after their review. PR 4 (TO1) waits for K6. PR 3 and PR 5 are parked, at −1 object per call each too weak to send; HFT had already been rejected in K6 (a Hash subclass sees `dup` and `[]=` instead of `merge`). TB and T2 stay parked.
+
 The combined diff on `a5203b3d4d` is `sweep_recommended.patch` (9 files, +45 −25). Counted on that checkout, it
 gives the same numbers as the prototypes.
 
