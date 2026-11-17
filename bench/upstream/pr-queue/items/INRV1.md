@@ -14,7 +14,7 @@ alternative_of:
 impact: "Rails 8.0, 8.1 and main CI jobs green again on master and every open PR (6 Vary specs fail since Rails 8.0.5.2 and 8.1.4.1); specs only"
 rank:
 risky: false
-state: ready
+state: merged
 pr: 444
 note: "2026-11-17: opened as inertiajs/inertia-rails#444 (Thomas asked for a separate PR to get CI green; exception to the per-gem cap of 2 because it unblocks all open PRs there). Body: claude-code must-fix (not every open PR was red; seven specs compare the header, six fail) and the Precognition wording nit applied; commit-message nit (precognition_spec:129 not named) left, it would need a new head. 2026-11-17. Cause confirmed: the same 6 specs pass with Rails pinned to 8.0.5.1 and fail on 8.0.5.2, whose only Vary change is b58c107abe (backport of e38dd281d3, GHSA-r9jg-fmfx-2gv6; 8.1.4.1 has 7a955ca367). The library's Vary output is correct under the new Rails (X-Inertia once, after the app's values; Precognition last; no duplicates), so only the specs change. Full rspec (--tag ~type:generator) and rake test green on the whole CI matrix: Ruby 3.0/Rails 6.1.7.10, 3.1/7.0.10, 3.2/7.1.6, 3.3/7.2.4, 3.4/8.0.5.2, 3.4/8.1.4.1, 4.0.9/8.1.4.1, 4.0.9/main 4f00fbc; master fails exactly the 6 on 8.0/8.1/main. Six mutations of renderer.rb/middleware.rb are caught by the same specs on 8.1.4.1 and 7.2.4 as master's specs catch on 7.2.4. Rubocop clean. No CHANGELOG entry: specs only."
 passes:

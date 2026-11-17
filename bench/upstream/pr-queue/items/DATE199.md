@@ -14,7 +14,7 @@ alternative_of:
 impact:
 rank:
 risky: false
-state: ready
+state: merged
 pr: 199
 note: "2026-11-15 (red-PR sweep): conflicted with master 6f788dd (wtn's tests, which add two DateTime offset asserts at the end of test__compare). Rebased: kept both sides' added lines unchanged (master's asserts, then our normalization assert and test__compare_nan); our +/- lines and both messages unchanged, commit 2 identical. Force-pushed with a lease on 8a34d5a595; rake compile test on Ruby 4.0.7: 156 tests, 0 failures. Upstream CI shows action_required: the build workflow waits for a maintainer to approve it, as on every earlier head. Opened before the queue tracked it; item added 2026-11-14 so status watches it. Reworked 2026-11-14 onto 2c48b11 as two commits (Date#<=> nil for NaN with -1/0/1 normalization kept; step/upto/downto use rb_cmpint), force-pushed with a lease on f1d893f834. No pass yet on 8a34d5a; an independent review follows. Record: docs/upstream/contributions.md."
 passes:
