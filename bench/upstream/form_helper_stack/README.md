@@ -285,3 +285,96 @@ With GC on (one run each, N = 3,000) the cells move by up to 3 points either way
 * AM1 boundary found by its claude-code pass (2026-11-17): with an empty error list, `errors[]` and `messages_for`
   no longer reach an override of `Errors#where` or `normalize_arguments` (subclass or prepend). GitHub search and 8
   sampled patchers (openproject, canvas, porta, active_interaction, activeresource, caprese, …) override neither.
+
+## FH2 and LBL1 built, 2026-11-17
+
+Rails main `4500a94c34`, Ruby 4.0.9. FH2 is the sweep's PR 2, LBL1 is candidate L. Both on the fork, no PR:
+
+* FH2 `thomasklemm/form-builder-tag-copies` at `d6ff7e8c4c`: PH, AMT, V, SV and TR, one commit. CB and OS dropped.
+* LBL1 `thomasklemm/label-translation-key-once` at `67073f74f7`: L, guarded on a Symbol `i18n_key`.
+
+**Dropped from FH2.** CB isn't exact: with HashWithIndifferentAccess options (the probe's `HWIA.new(form: "f")`), its
+`[]=` converts a caller's Array unchecked value in place, so `["a", { b: 1 }]` comes back holding a HashWithIndifferentAccess;
+main's `merge!` dupped the Array first. OS is exact but loses under YJIT: Array#map runs as Ruby there and `map!` doesn't,
+so `f.select` runs 469 more instructions with OS and 363 fewer without it (interpreter: OS saves 89).
+
+**TR's shape.** The sweep's `include?("_attributes][")` guard raised differently from main's `gsub`: an invalid UTF-8
+object name rendered where `gsub` raised `ArgumentError`, and a UTF-16 one raised another error. FH2 checks the same
+pattern with `match?` (a constant now, so it's written once), which raises for the same Strings. Remaining boundary:
+`Tags::Translator` (`:nodoc:`) called directly with a Symbol object name works where main raised `NoMethodError` for
+`gsub` (and for nil, Integer or other objects the message names `match?`). Rails' own callers pass Strings; the gems
+that call it directly (view_component-form, phlex-form, HealthDataInsight/design_system) pass a builder's
+`object_name`. AMT, as in the sweep: wrong-arity calls say "expected 2..4".
+
+**TR goes in FH2, not LBL1.** The two edit different methods of translator.rb (`initialize` and `i18n_default`).
+`git merge-tree` is clean for FH2 × LBL1, FH2 × FB1 `a2a13fc793`, LBL1 × FB1 and all three together. FB1 and FH2 both
+edit tags/base.rb, with two unchanged lines between `sanitized_method_name` and `sanitized_value`.
+
+### Equivalence
+
+* `fh2_probe.rb` (new): 32,272 lines of builder fields (text, email, number, text area, select, label in four shapes,
+  check box, hidden, radio, collection radio buttons and check boxes) over 22 object names (Symbol, String, SafeBuffer,
+  frozen, String subclasses, one with its own `gsub`/`include?`, `_attributes][` names, `post[]`, ISO-8859-1, UTF-16LE,
+  binary, invalid UTF-8, a `to_s` object, nil, Integer), 7 method names, 24 values for radio, label `value:` and
+  check boxes, 8 objects (persisted, new from user input, changed, invalid, Active Model, nil, and a duck that logs
+  every `respond_to?`/`public_send`), check box hidden fields with 11 unchecked values × 9 option shapes,
+  `options_for_select` over 9 containers × 17 selected shapes, Translator directly, and `content_tag` by arity. Every
+  line prints class, encoding, frozen, html_safe, the duck's calls and the caller's arguments afterwards. Main against
+  `d6ff7e8c4c` (`fh2_probe_diff.txt`): only the Translator boundary above (Symbol, `to_s` object, nil, Integer) and the
+  four arity messages. The caller's object name is never mutated.
+* `sweep_fuzz.rb`: 86,726 lines, byte-identical to main.
+* `lbl1_probe.rb` (new): 23,904 lines per backend, 12 translation setups (none, hit, empty, Proc, Proc returning nil,
+  Symbol link, Hash, `activerecord`/`activemodel` attributes, nested, values, placeholders, a key under `as:`), both
+  `raise_on_missing_translations`, 11 models (Post, nested Comment, `Admin::User`, Active Model, a non-model, nil, and
+  model_name ducks whose `i18n_key` is a Symbol, a String, nil, a counting `to_s` object or a namespaced Symbol), 16
+  object names and 6 methods, through `f.label` (plain, `value:` true and String, text, block), `text_field` and
+  `text_area` placeholders and Translator directly. Fallbacks (`de` → `en`): identical. Simple: 48 lines differ
+  (`lbl1_probe_diff.txt`), all with a translation Proc that returns nil, where I18n renders "Translation missing" into
+  the label and main's message lists `en.helpers.label.post.title` twice. A missing Symbol link, nil and false
+  render as on main. Lookups over the run: 417,750 → 404,282 (Fallbacks 819,466 → 792,814), lower only where the
+  object name is the `i18n_key`; the Proc is called as often as on main. Without the Symbol guard, a String
+  `i18n_key` (perpetuity returns one) would raise `NoMethodError` for `name`.
+
+### Objects per call and instructions
+
+Objects (`sweep_count.rb`, the sweep's setup). `fh2_alloc.rb` and `lbl1_alloc.rb` are the bodies' scripts; they leave
+out the new-app defaults, so their `radio_button` counts 32 → 30 and `select` 43 → 42, the rest as below:
+
+| Objects per call | main | FH2 | LBL1 | FH2 + LBL1 + FB1 |
+| --- | ---: | ---: | ---: | ---: |
+| `f.text_field` | 28 | 26 | 28 | 20 |
+| `f.text_area` | 28 | 25 | 28 | 19 |
+| `f.hidden_field` | 23 | 21 | 23 | 15 |
+| `f.radio_button` | 31 | 29 | 31 | 23 |
+| `f.select` | 41 | 40 | 41 | 34 |
+| `f.label` | 100 | 95 | 85 | 74 |
+| `f.label` with text | 31 | 28 | 31 | 22 |
+| `form_with` (5 fields) | 279 | 270 | 279 | 240 |
+
+Callgrind (`fh2_ir.sh`, `fh2_ir.rb`: the same setup, 2,000 warm-up calls, GC off, every scenario in its own
+`Array#cycle(1000)` and Callgrind part, minus a `cycle(0)` part; raw output in `fh2_ir.txt`). Main ran twice; the
+change is against their mean:
+
+| Instructions per call | main | A/A | FH2 | LBL1 |
+| --- | ---: | ---: | ---: | ---: |
+| `f.text_field`, interpreter | 111,988 | 0.04% | −1.22% | +0.06% |
+| `f.text_area`, interpreter | 88,956 | 0.03% | −2.33% | +0.01% |
+| `f.radio_button`, interpreter | 113,804 | 0.05% | −0.34% | −0.06% |
+| `f.select`, interpreter | 131,734 | 0.02% | −0.55% | −0.04% |
+| `f.label`, interpreter | 289,240 | 0.08% | −0.85% | −16.08% |
+| `form_with` (5 fields), interpreter | 1,134,482 | 0.04% | −0.44% | −0.02% |
+| `f.text_field`, YJIT | 60,014 | 0.18% | −0.81% | −0.08% |
+| `f.text_area`, YJIT | 48,130 | 0.01% | −1.13% | +0.22% |
+| `f.radio_button`, YJIT | 63,144 | 0.15% | −0.78% | +0.07% |
+| `f.select`, YJIT | 70,407 | 0.00% | −0.52% | −0.01% |
+| `f.label`, YJIT | 167,770 | 0.45% | −2.48% | −16.44% |
+| `form_with` (5 fields), YJIT | 611,597 | 0.09% | −0.17% | −0.02% |
+
+LBL1 doesn't run on `text_area` and still moves it by +0.22% under YJIT, so between different trees untouched paths move
+by about 0.2% even where the same-tree A/A is 0.01%. FH2's `form_with` under YJIT is inside that; its per-field cells
+aren't. Not measured: ZJIT on Ruby master (no master build in this orb).
+
+### Tests
+
+Action View `rake test` on FH2, LBL1 and the three combined (FH2 + LBL1 + FB1): 2,967 + 251 + 177 runs, 0 failures each,
+the same counts as main. Active Model isn't touched. RuboCop: no offenses on the changed files.

@@ -1,0 +1,197 @@
+# fh2_probe.rb: main 4500a94c34 (<) against FH2 b7e3c6fa66 (>), Ruby 4.0.9, 32,272 lines each, object addresses normalized
+32121c32121
+< translator 0 0	NoMethodError: undefined method 'gsub' for an instance of Symbol	[]
+---
+> translator 0 0	"\"Label T\" String UTF-8 frozen=false safe=false | :post Symbol" String UTF-8 frozen=false safe=false	[]
+32123c32123
+< translator 0 1	NoMethodError: undefined method 'gsub' for an instance of Symbol	[]
+---
+> translator 0 1	"\"Label T\" String UTF-8 frozen=false safe=false | :post Symbol" String UTF-8 frozen=false safe=false	[]
+32125c32125
+< translator 0 2	NoMethodError: undefined method 'gsub' for an instance of Symbol	[]
+---
+> translator 0 2	"\"Label T\" String UTF-8 frozen=false safe=false | :post Symbol" String UTF-8 frozen=false safe=false	[]
+32127c32127
+< translator 1 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 1 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32129c32129
+< translator 1 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 1 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32131c32131
+< translator 1 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 1 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32133c32133
+< translator 2 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 2 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" ActiveSupport::SafeBuffer UTF-8 frozen=false safe=true" String UTF-8 frozen=false safe=false	[]
+32135c32135
+< translator 2 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 2 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" ActiveSupport::SafeBuffer UTF-8 frozen=false safe=true" String UTF-8 frozen=false safe=false	[]
+32137c32137
+< translator 2 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 2 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" ActiveSupport::SafeBuffer UTF-8 frozen=false safe=true" String UTF-8 frozen=false safe=false	[]
+32139c32139
+< translator 3 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 3 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32141c32141
+< translator 3 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 3 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32143c32143
+< translator 3 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 3 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32145c32145
+< translator 4 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 4 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" SubString UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32147c32147
+< translator 4 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 4 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" SubString UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32149c32149
+< translator 4 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 4 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" SubString UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32151c32151
+< translator 5 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	["Custom#gsub"]
+---
+> translator 5 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" Custom UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32153c32153
+< translator 5 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	["Custom#gsub"]
+---
+> translator 5 1	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" Custom UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32155c32155
+< translator 5 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	["Custom#gsub"]
+---
+> translator 5 2	"\"Label T\" String UTF-8 frozen=false safe=false | \"post\" Custom UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+32169c32169
+< translator 8 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post[comments_attributes][x]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 8 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post[comments_attributes][x]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32171c32171
+< translator 8 1	"\"Title\" String UTF-8 frozen=false safe=false | \"post[comments_attributes][x]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 8 1	"\"Title\" String UTF-8 frozen=false safe=false | \"post[comments_attributes][x]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32173c32173
+< translator 8 2	"nil NilClass | \"post[comments_attributes][x]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 8 2	"nil NilClass | \"post[comments_attributes][x]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32181c32181
+< translator 10 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"_attributes][\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 10 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"_attributes][\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32183c32183
+< translator 10 1	"\"Title\" String UTF-8 frozen=false safe=false | \"_attributes][\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 10 1	"\"Title\" String UTF-8 frozen=false safe=false | \"_attributes][\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32185c32185
+< translator 10 2	"nil NilClass | \"_attributes][\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 10 2	"nil NilClass | \"_attributes][\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32187c32187
+< translator 11 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post[]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 11 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"post[]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32189c32189
+< translator 11 1	"\"Title\" String UTF-8 frozen=false safe=false | \"post[]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 11 1	"\"Title\" String UTF-8 frozen=false safe=false | \"post[]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32191c32191
+< translator 11 2	"nil NilClass | \"post[]\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 11 2	"nil NilClass | \"post[]\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32193c32193
+< translator 12 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 12 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32195c32195
+< translator 12 1	"\"Title\" String UTF-8 frozen=false safe=false | \"\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 12 1	"\"Title\" String UTF-8 frozen=false safe=false | \"\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32197c32197
+< translator 12 2	"nil NilClass | \"\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 12 2	"nil NilClass | \"\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32199c32199
+< translator 13 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"admin/post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 13 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"admin/post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32201c32201
+< translator 13 1	"\"Title\" String UTF-8 frozen=false safe=false | \"admin/post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 13 1	"\"Title\" String UTF-8 frozen=false safe=false | \"admin/post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32203c32203
+< translator 13 2	"nil NilClass | \"admin/post\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 13 2	"nil NilClass | \"admin/post\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32205c32205
+< translator 14 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"a b.c\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 14 0	"\"Label T\" String UTF-8 frozen=false safe=false | \"a b.c\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32207c32207
+< translator 14 1	"\"Title\" String UTF-8 frozen=false safe=false | \"a b.c\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 14 1	"\"Title\" String UTF-8 frozen=false safe=false | \"a b.c\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32209c32209
+< translator 14 2	"nil NilClass | \"a b.c\" String UTF-8 frozen=false safe=false" String UTF-8 frozen=false safe=false	[]
+---
+> translator 14 2	"nil NilClass | \"a b.c\" String UTF-8 frozen=true safe=false" String UTF-8 frozen=false safe=false	[]
+32235c32235
+< translator 19 0	NoMethodError: undefined method 'gsub' for an instance of Named	[]
+---
+> translator 19 0	NoMethodError: undefined method 'match?' for an instance of Named	[]
+32237c32237
+< translator 19 1	NoMethodError: undefined method 'gsub' for an instance of Named	[]
+---
+> translator 19 1	NoMethodError: undefined method 'match?' for an instance of Named	[]
+32239c32239
+< translator 19 2	NoMethodError: undefined method 'gsub' for an instance of Named	[]
+---
+> translator 19 2	NoMethodError: undefined method 'match?' for an instance of Named	[]
+32241c32241
+< translator 20 0	NoMethodError: undefined method 'gsub' for nil	[]
+---
+> translator 20 0	NoMethodError: undefined method 'match?' for nil	[]
+32243c32243
+< translator 20 1	NoMethodError: undefined method 'gsub' for nil	[]
+---
+> translator 20 1	NoMethodError: undefined method 'match?' for nil	[]
+32245c32245
+< translator 20 2	NoMethodError: undefined method 'gsub' for nil	[]
+---
+> translator 20 2	NoMethodError: undefined method 'match?' for nil	[]
+32247c32247
+< translator 21 0	NoMethodError: undefined method 'gsub' for an instance of Integer	[]
+---
+> translator 21 0	NoMethodError: undefined method 'match?' for an instance of Integer	[]
+32249c32249
+< translator 21 1	NoMethodError: undefined method 'gsub' for an instance of Integer	[]
+---
+> translator 21 1	NoMethodError: undefined method 'match?' for an instance of Integer	[]
+32251c32251
+< translator 21 2	NoMethodError: undefined method 'gsub' for an instance of Integer	[]
+---
+> translator 21 2	NoMethodError: undefined method 'match?' for an instance of Integer	[]
+32253c32253
+< content_tag 1 0	ArgumentError: wrong number of arguments (given 1, expected 2+)	[]
+---
+> content_tag 1 0	ArgumentError: wrong number of arguments (given 1, expected 2..4)	[]
+32257c32257
+< content_tag 5 0	ArgumentError: wrong number of arguments (given 5, expected 1..4)	[]
+---
+> content_tag 5 0	ArgumentError: wrong number of arguments (given 5, expected 2..4)	[]
+32263c32263
+< content_tag 1 1	ArgumentError: wrong number of arguments (given 1, expected 2+)	[]
+---
+> content_tag 1 1	ArgumentError: wrong number of arguments (given 1, expected 2..4)	[]
+32267c32267
+< content_tag 5 1	ArgumentError: wrong number of arguments (given 5, expected 1..4)	[]
+---
+> content_tag 5 1	ArgumentError: wrong number of arguments (given 5, expected 2..4)	[]

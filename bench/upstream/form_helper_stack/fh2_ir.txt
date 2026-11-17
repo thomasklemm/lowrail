@@ -1,0 +1,63 @@
+# fh2_ir.sh, Ruby 4.0.9, N=1000, GC off, 2,000 warm-up calls. Trees: main 4500a94c34 (run twice), FH2 b7e3c6fa66 (with OS) and d6ff7e8c4c (without OS; measured as a b7e3c6fa66 worktree with OS reverted, tree 9964699d6f = d6ff7e8c4c's), LBL1 67073f74f7.
+# Run 1 (main, b7e3c6fa66, LBL1, main again):
+4500a94c34 interp f.text_field 111965
+4500a94c34 interp f.text_area 88941
+4500a94c34 interp f.radio_button 113832
+4500a94c34 interp f.select 131745
+4500a94c34 interp f.label 289360
+4500a94c34 interp form_with (5 fields) 1134690
+b7e3c6fa66 interp f.text_field 110589
+b7e3c6fa66 interp f.text_area 86860
+b7e3c6fa66 interp f.radio_button 113419
+b7e3c6fa66 interp f.select 130914
+b7e3c6fa66 interp f.label 287054
+b7e3c6fa66 interp form_with (5 fields) 1129527
+67073f74f7 interp f.text_field 112052
+67073f74f7 interp f.text_area 88968
+67073f74f7 interp f.radio_button 113732
+67073f74f7 interp f.select 131685
+67073f74f7 interp f.label 242722
+67073f74f7 interp form_with (5 fields) 1134244
+4500a94c34 interp f.text_field 112011
+4500a94c34 interp f.text_area 88970
+4500a94c34 interp f.radio_button 113777
+4500a94c34 interp f.select 131722
+4500a94c34 interp f.label 289120
+4500a94c34 interp form_with (5 fields) 1134275
+4500a94c34 yjit f.text_field 59959
+4500a94c34 yjit f.text_area 48126
+4500a94c34 yjit f.radio_button 63098
+4500a94c34 yjit f.select 70407
+4500a94c34 yjit f.label 168148
+4500a94c34 yjit form_with (5 fields) 611312
+b7e3c6fa66 yjit f.text_field 59615
+b7e3c6fa66 yjit f.text_area 47600
+b7e3c6fa66 yjit f.radio_button 62783
+b7e3c6fa66 yjit f.select 70513
+b7e3c6fa66 yjit f.label 163440
+b7e3c6fa66 yjit form_with (5 fields) 610601
+67073f74f7 yjit f.text_field 59968
+67073f74f7 yjit f.text_area 48235
+67073f74f7 yjit f.radio_button 63187
+67073f74f7 yjit f.select 70403
+67073f74f7 yjit f.label 140188
+67073f74f7 yjit form_with (5 fields) 611465
+4500a94c34 yjit f.text_field 60069
+4500a94c34 yjit f.text_area 48133
+4500a94c34 yjit f.radio_button 63190
+4500a94c34 yjit f.select 70407
+4500a94c34 yjit f.label 167393
+4500a94c34 yjit form_with (5 fields) 611882
+# Run 2 (FH2 without OS, the final head; lines print the worktree's HEAD b7e3c6fa66, tree is d6ff7e8c4c's):
+d6ff7e8c4c interp f.text_field 110619
+d6ff7e8c4c interp f.text_area 86887
+d6ff7e8c4c interp f.radio_button 113416
+d6ff7e8c4c interp f.select 131003
+d6ff7e8c4c interp f.label 286778
+d6ff7e8c4c interp form_with (5 fields) 1129508
+d6ff7e8c4c yjit f.text_field 59528
+d6ff7e8c4c yjit f.text_area 47586
+d6ff7e8c4c yjit f.radio_button 62649
+d6ff7e8c4c yjit f.select 70044
+d6ff7e8c4c yjit f.label 163604
+d6ff7e8c4c yjit form_with (5 fields) 610555
