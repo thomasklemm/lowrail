@@ -1,0 +1,25 @@
+# lbl1_form_ir.sh, Ruby 4.0.9, N=1000. 4500a94c34 twice (two worktrees, A/A), 67073f74f7 once.
+4500a94c34 interp f.text_area 88722
+4500a94c34 interp f.label 289427
+4500a94c34 interp form_with 5 fields with label text 1641223
+4500a94c34 interp form_with 5 fields with f.label 2689524
+4500a94c34 interp f.text_area 88719
+4500a94c34 interp f.label 289284
+4500a94c34 interp form_with 5 fields with label text 1640772
+4500a94c34 interp form_with 5 fields with f.label 2688085
+67073f74f7 interp f.text_area 88689
+67073f74f7 interp f.label 242849
+67073f74f7 interp form_with 5 fields with label text 1641007
+67073f74f7 interp form_with 5 fields with f.label 2457020
+4500a94c34 yjit f.text_area 48810
+4500a94c34 yjit f.label 165538
+4500a94c34 yjit form_with 5 fields with label text 872563
+4500a94c34 yjit form_with 5 fields with f.label 1473718
+4500a94c34 yjit f.text_area 48903
+4500a94c34 yjit f.label 165273
+4500a94c34 yjit form_with 5 fields with label text 871264
+4500a94c34 yjit form_with 5 fields with f.label 1473312
+67073f74f7 yjit f.text_area 49103
+67073f74f7 yjit f.label 138556
+67073f74f7 yjit form_with 5 fields with label text 872310
+67073f74f7 yjit form_with 5 fields with f.label 1339094

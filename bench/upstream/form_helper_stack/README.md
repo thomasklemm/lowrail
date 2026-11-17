@@ -96,7 +96,8 @@ when `key.name == object_name`:
   and without L, with `Backend::Simple` and with `Backend::Fallbacks` (`de` → `en`). Lookups per case drop only where
   the object name is the `i18n_key`.
 * Observable only to code that watches lookups, such as a backend or `lookup` override that logs or counts them: it
-  sees the duplicate lookup disappear.
+  sees the duplicate lookup disappear. (Not only: i18n-active_record's `Missing` stops storing a stub; see the LBL1
+  claude-code pass below.)
 
 **Rest of `f.label`:** the `human_attribute_name` miss (`lookup_ancestors` walks `ancestors` per call, one
 `MissingTranslation`, `humanize`). The i18n side is i18n-performance.md's C2/C3 and the `MissingTranslation` lead
@@ -394,3 +395,44 @@ the same counts as main. Active Model isn't touched. RuboCop: no offenses on the
   with its own `match?` (one extra call). `fh2_probe.rb` and `sweep_fuzz.rb` reproduce the recorded diffs exactly.
 * Callgrind (`fh2_ir_review.txt`): interpreter cells reproduce; YJIT doesn't hold the body's label −2.5% (−1.3% now)
   or text_field −0.8% (−0.4% against a 0.35% A/A); the YJIT A/A reaches 1.2% on `radio_button`.
+
+### LBL1 claude-code pass, 2026-11-17 (head `67073f74f7`, verdict changes)
+
+* **i18n-active_record's `Missing` stops storing label stubs.** Its documented setup
+  (`Chain(ActiveRecord, Simple)` with `Missing`, 1.4.1) stores a stub row whenever a `translate` call ends in
+  `MissingTranslation`. On main only the repeated Symbol default does (the outer call ends in `""`), so main stores
+  `helpers.label.post.title` and `helpers.placeholder.post.title` for `form_with(model: post)`; the head stores neither,
+  for every form whose object name is the `i18n_key`. Nested and `scope:`/`as:` forms still store the model key's stub.
+  So the candidate L line above ("observable only to code that watches lookups") is wrong. Rendered output is identical
+  under that backend apart from the Proc boundary. GitHub code search finds one app initializer using `Missing` besides
+  vendored copies; the gem has 4.48M downloads. Not run: lit 1.1.6, whose `lookup` stores an Array default's Symbol
+  (normalized, or humanized) as the key's content and stores nothing for a `""` default, so it likely differs as well.
+* `lbl1_backends_probe.rb`, main against the head, about 60,000 cases per backend (16 translation setups, 4 missing
+  modes: none, Rails' raising `exception_handler`, Action View's and Active Model's `raise_on_missing_translations`;
+  24 builders plus `form_with`, `fields_for` nested and not, `scope:`; perpetuity 1.0.1's String `i18n_key`, ducks
+  with nil, counting `to_s`, namespaced and non-ASCII keys; 9 field shapes; Translator directly). Output identical with
+  Fallbacks (`de` → `en`) and KeyValue (no Proc setups); with Simple, Chain, Memoize and the Missing chain, 284 lines differ,
+  all Proc-returning-nil: the label or placeholder shows, and under Rails' raising handler the `MissingTranslationData`
+  says, `Translation missing: en.helpers.label.post.title` instead of main's list of the key twice and `en.helpers.label`.
+  `I18n::Backend::Cache` adds 10 Proc call counts that move because these labels now share the `""` default's cache key.
+  Lookups never rise and drop only where the object name is the Symbol `i18n_key` (Simple 132,888 → 117,596); Proc
+  and `to_s` call counts are identical; `on_fallback` fires once fewer when a `value:` key passes through a Symbol link.
+* `if key == object_name.to_sym` (instead of `key.is_a?(Symbol) && key.name == object_name`) gives identical probe
+  output and lookups with Simple and Fallbacks and the same objects. Optional.
+* Fresh numbers: body script 100 → 85 objects (2 → 1 `MissingTranslation`, 4 → 3 lookups); nested and `as:` labels
+  unchanged (107, 100). Callgrind (`lbl1_form_ir.sh`, `lbl1_form_ir.txt`, main twice in two worktrees):
+
+| Instructions per call | main | A/A | LBL1 |
+| --- | ---: | ---: | ---: |
+| `f.label`, interpreter | 289,356 | 0.05% | −16.07% |
+| `form_with` 5 fields with `f.label`, interpreter | 2,688,805 | 0.05% | −8.62% |
+| `form_with` 5 fields with label text, interpreter | 1,640,998 | 0.03% | +0.00% |
+| `f.label`, YJIT | 165,406 | 0.16% | −16.23% |
+| `form_with` 5 fields with `f.label`, YJIT | 1,473,515 | 0.03% | −9.12% |
+| `form_with` 5 fields with label text, YJIT | 871,914 | 0.15% | +0.05% |
+
+  `f.text_area` (untouched) moves +0.50% under YJIT between trees. A whole request wasn't measured.
+* Tests: Action View `rake test` on the head and on FH2 + LBL1 + FB1: 2,967 + 251 + 177 runs, 0 failures. RuboCop
+  clean. `git merge-tree` clean against main `4500a94c34` (current), FH2, FB1 and all three. No added comments.
+* Body: "Most apps have no `helpers.label` translations": 7 of 9 sampled open-source apps define none in English
+  (mastodon, discourse, chatwoot, once-campfire, lobsters, rubygems.org, solidus); forem has 231 keys, maybe 1.
