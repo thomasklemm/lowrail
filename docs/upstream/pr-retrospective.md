@@ -1,5 +1,7 @@
 # Upstream PR retrospective (2026-11-04)
 
+Second round, 2026-11-04 to 2026-11-17: [pr-retrospective-2026-11-17](pr-retrospective-2026-11-17.md).
+
 Every upstream PR by thomasklemm opened from 2026-10-15 to 2026-11-04 in rails/rails, ruby/ruby, ruby/ruby-bench and
 the gems: 111 PRs (47 Rails, 34 Ruby, 30 gems and ruby-bench). Not included: argos-ri, roundhouse-rb, Campfire,
 matz/spinel, rubycdp and personal repos. GitHub state, comments, reviews and timeline as of 2026-11-04 10:30 UTC
