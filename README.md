@@ -87,6 +87,31 @@ your own app, see [Run it on your own app](docs/upstream/census.md#run-it-on-you
 Each report under [docs/upstream/](docs/upstream/) lists its pins and commands;
 receipts of published rounds are in [docs/upstream/data/](docs/upstream/data/).
 
+## Profile your own app
+
+`lowrail-profile` (prototype) runs inside your app instead of copying it: add
+the gem to the development and test group with `require: false`, then run
+your suite through it.
+
+```ruby
+gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
+```
+
+```sh
+bundle exec lowrail-profile -- bin/rails test                  # or: -- bundle exec rspec spec/requests
+RAILS_ENV=production bundle exec lowrail-profile --paths paths.txt
+```
+
+It counts objects per source line while requests are served, runs the
+command twice (the repeat is the noise floor) and writes
+`tmp/lowrail-profile/report.md`: lines in Rails, Ruby and gems by objects per
+request, grouped by gem, with the app line that leads to each, matching
+ledger entries, and test-mode-only work (debug logging, error pages) listed
+apart. Without the command the gem loads nothing. On the Blog and Campfire its
+production `--paths` counts match the census within 1%, and their own test
+suites share 10–13 of the census's top 20 lines. [docs/profile.md](docs/profile.md)
+has the method, the safety checks and a comparison with the census.
+
 ## Lowering prototype (research)
 
 Lowrail's original prototype, as it stood on 2026-10-22. It stays in the tree

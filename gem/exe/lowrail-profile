@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Where does your app spend avoidable work in Rails, Ruby and gems? Runs a
+# command that serves requests (your test suite, a local server, a path list)
+# twice with allocation counting on, and reports objects per request by source
+# line (docs/profile.md). Run it from the app directory:
+#
+#   bundle exec lowrail-profile -- bin/rails test test/integration test/controllers
+#   bundle exec lowrail-profile -- bundle exec rspec spec/requests
+#   bundle exec lowrail-profile --paths paths.txt          # GETs in this process's RAILS_ENV
+#   bundle exec lowrail-profile report tmp/lowrail-profile # report again from saved runs
+#
+# Options: --out DIR (default tmp/lowrail-profile), --runs N (default 2; the
+# second run is the noise floor), --top N (default 30), --seed N (default
+# 1234, as SEED and --seed for both runs), --ledger PATH (contributions.md).
+require "rbconfig"
+require "fileutils"
+require_relative "../lib/lowrail/profile_report"
+
+lib = File.expand_path("../lib", __dir__)
+args = ARGV.dup
+opt = ->(name, default) { (i = args.index(name)) ? args.slice!(i, 2).last : default }
+out = File.expand_path(opt.("--out", "tmp/lowrail-profile"))
+runs = Integer(opt.("--runs", "2"))
+top = Integer(opt.("--top", "30"))
+seed = opt.("--seed", "1234")
+ledger = opt.("--ledger", File.expand_path("../../docs/upstream/contributions.md", __dir__))
+paths = opt.("--paths", nil)
+
+if args.first == "report"
+  dir = File.expand_path(args[1] || out)
+  report = Lowrail::ProfileReport.new(dir, ledger: ledger, top: top)
+  report.write
+  puts report.markdown
+  exit
+end
+
+command = (i = args.index("--")) ? args[(i + 1)..] : args
+if paths
+  command = ["bin/rails", "runner", File.join(lib, "lowrail/profile_paths.rb"), File.expand_path(paths)]
+end
+abort "usage: lowrail-profile [options] -- COMMAND... | --paths FILE | report [DIR]" if command.empty?
+
+# Built once per Ruby build, outside the app and never during its boot.
+variant = [RUBY_ENGINE, RUBY_VERSION, RUBY_REVISION, RUBY_PLATFORM].join("-")
+cache = File.join(ENV.fetch("XDG_CACHE_HOME", File.expand_path("~/.cache")), "lowrail", "profile", variant)
+ext = File.join(cache, "lowrail_profile.#{RbConfig::CONFIG.fetch("DLEXT")}")
+source = File.expand_path("../ext/lowrail_profile", __dir__)
+if !File.exist?(ext) || Dir["#{source}/*"].any? { File.mtime(_1) > File.mtime(ext) }
+  FileUtils.mkdir_p(cache)
+  log = File.join(cache, "build.log")
+  ok = Dir.chdir(cache) do
+    system(RbConfig.ruby, File.join(source, "extconf.rb"), out: log, err: log) &&
+      system(RbConfig::CONFIG.fetch("MAKE", "make"), out: [log, "a"], err: [log, "a"])
+  end
+  abort "lowrail-profile: building the counter failed, see #{log}" unless ok && File.exist?(ext)
+end
+
+FileUtils.rm_rf(out)
+statuses = (1..runs).map do |n|
+  dir = File.join(out, "run#{n}")
+  FileUtils.mkdir_p(dir)
+  # The repeat run also records which app line leads to each of the first
+  # run's top lines (without allocating, so its counts stay comparable).
+  watch = File.join(out, "watch.tsv")
+  if n == 2 && File.exist?(File.join(out, "run1")) && !Dir["#{out}/run1/*.tsv"].empty?
+    first = Lowrail::ProfileReport.new(out, top: top)
+    File.write(watch, first.ranked.first(top * 2).map { "#{_1.path}\t#{_1.line}\n" }.join)
+  end
+  env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
+    **(n > 1 && File.exist?(watch) ? { "LOWRAIL_PROFILE_WATCH" => watch } : {}),
+    "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
+    "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }
+  warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
+  system(env, *command)
+  $?.exitstatus
+end
+File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\nexit #{statuses.join(" ")}\n")
+
+report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
+report.write
+puts report.markdown
+warn "lowrail-profile: report in #{File.join(out, "report.md")}"
+warn "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
