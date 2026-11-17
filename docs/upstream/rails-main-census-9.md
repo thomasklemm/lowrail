@@ -229,6 +229,13 @@ claimed.
 Ruby master × ZJIT was not measured. [DECISIONS](../DECISIONS.md#evidence-and-measurement) requires it before L6
 opens.
 
+benchmark-ips (2026-11-17, for the body opus asked to lead with it): [l6_ips.rb](data/rails-main-census-9/lead6/l6_ips.rb),
+a 30-column table, YJIT, Ruby 4.0.9, 6 interleaved rounds of main, L6 and main2 pinned to one core with
+`bench/upstream/l3/ips_rounds.sh` ([raw](data/rails-main-census-9/lead6/l6_ips_aa.txt)). Best rounds, L6 against
+main: `update!` of one column +1.1%, find then `changed?` +5.6%, `serializable_hash` +2.2%; main2 against
+main +0.9%, +6.4% and +4.3%. The A/A is as large as the effect in every row, so wall time doesn't resolve L6 on an orb,
+and the body keeps the Callgrind table, as FB1 did.
+
 ## `button_to` since #50312
 
 | Case (interpreter, Ir per call) | 8.1 | before #50312 | #50312 | main | K5 | K6 | **K7** | K8 (attribution) | K7 vs main | Objects before #50312 / main / K7 |

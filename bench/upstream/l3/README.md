@@ -278,6 +278,22 @@ main and the fix alike.
 * If tenderlove removes `IndexedRow` from ORM loads or changes `@attributes`' `nil` convention, `attributes` gets
   cheaper by itself and this override becomes unnecessary. Neither is in an open PR.
 
+## benchmark-ips for the body (2026-11-17)
+
+The body leads with [l3_ips.rb](l3_ips.rb) (a 30-column table: 9 × string, integer, boolean, `id` and timestamps)
+under YJIT, Ruby 4.0.9, on this orb (2 cores), pinned to core 1 by [ips_rounds.sh](ips_rounds.sh): 6 rounds of main,
+the fix and main2 (a second checkout of main, the A/A), interleaved. Raw: [l3_ips_aa.txt](l3_ips_aa.txt); best
+rounds by [ips_best.rb](ips_best.rb):
+
+| best of 6, i/s | main | fix | main2 (A/A) |
+|---|---:|---:|---:|
+| `Marshal.dump` | 37,427 | 45,888 (+22.6%) | 36,021 (−3.8%) |
+| `attributes_for_database` | 92,856 | 165,488 (+78.2%) | 92,600 (−0.3%) |
+
+Every fix round beats every main and main2 round on both rows (slowest fix 42,689 and 156,953 i/s against the fastest
+main 37,427 and 92,856). The body shows main's and the fix's best rounds. Its ZJIT sentence and the A/A sentence went
+to this record (DECISIONS: the body names no other Ruby; A/A stays in the record).
+
 ## Rerun
 
 ```
@@ -295,4 +311,7 @@ RUBY_BIN=~/w/ruby-master/bin SUITE=suiteM BUNDLE_PATH=~/l3/gemsM IRWIN_DIR=~/l3/
 K1+L3: git merge of the two branches into ~/l3/k1l3; K1's cases with bench/upstream/k1/run.sh, its tree paths
 pointed at ~/l3. BUNDLE_GEMFILE=~/l3/suite-TREE/Gemfile ruby bench/upstream/l3/concurrency_probe.rb
 (YIELD_IN_STORE=1 or 2 injects yields into store or before default_attribute).
+benchmark-ips: trees ~/ips/{main,main2,l3,l6} (worktrees of 50c54eed06, 52587b6f5d, 641c84c43a), each with
+~/ips/b-TREE/Gemfile (activesupport, activemodel, activerecord by path, sqlite3, msgpack, benchmark-ips; BUNDLE_PATH ~/ips/gems):
+bench/upstream/l3/ips_rounds.sh $PWD/bench/upstream/l3/l3_ips.rb l3 6 --yjit > OUT; ruby bench/upstream/l3/ips_best.rb OUT
 ```

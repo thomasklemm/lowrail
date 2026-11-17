@@ -1,0 +1,55 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+main r1: update! of one column      4.076k (±15.4%) i/s  (245.35 μs/i) -     20.548k in   5.041375s
+main r1:   find, then changed?     13.988k (± 8.3%) i/s   (71.49 μs/i) -     71.334k in   5.099788s
+main r1:     serializable_hash     27.289k (±12.6%) i/s   (36.64 μs/i) -    137.970k in   5.055795s
+l6 r1: update! of one column      3.945k (±12.5%) i/s  (253.51 μs/i) -     19.823k in   5.025250s
+l6 r1:   find, then changed?     13.105k (±11.0%) i/s   (76.31 μs/i) -     65.880k in   5.027055s
+l6 r1:     serializable_hash     31.971k (±10.7%) i/s   (31.28 μs/i) -    159.952k in   5.003016s
+main2 r1: update! of one column      4.366k (± 6.1%) i/s  (229.03 μs/i) -     22.050k in   5.050156s
+main2 r1:   find, then changed?     14.231k (± 4.7%) i/s   (70.27 μs/i) -     71.950k in   5.055703s
+main2 r1:     serializable_hash     31.969k (± 8.7%) i/s   (31.28 μs/i) -    161.568k in   5.053969s
+main r2: update! of one column      4.340k (± 6.6%) i/s  (230.41 μs/i) -     21.792k in   5.020995s
+main r2:   find, then changed?     13.465k (± 7.7%) i/s   (74.26 μs/i) -     67.350k in   5.001682s
+main r2:     serializable_hash     30.523k (± 4.9%) i/s   (32.76 μs/i) -    153.050k in   5.014328s
+l6 r2: update! of one column      4.526k (± 5.9%) i/s  (220.96 μs/i) -     22.724k in   5.021095s
+l6 r2:   find, then changed?     15.193k (± 2.9%) i/s   (65.82 μs/i) -     76.492k in   5.034790s
+l6 r2:     serializable_hash     34.097k (± 6.6%) i/s   (29.33 μs/i) -    171.598k in   5.032598s
+main2 r2: update! of one column      4.605k (± 6.2%) i/s  (217.15 μs/i) -     23.375k in   5.075825s
+main2 r2:   find, then changed?     15.039k (± 3.4%) i/s   (66.49 μs/i) -     76.479k in   5.085339s
+main2 r2:     serializable_hash     34.990k (± 3.9%) i/s   (28.58 μs/i) -    175.010k in   5.001688s
+main r3: update! of one column      4.674k (± 3.1%) i/s  (213.94 μs/i) -     23.664k in   5.062598s
+main r3:   find, then changed?     14.870k (± 4.1%) i/s   (67.25 μs/i) -     75.556k in   5.081062s
+main r3:     serializable_hash     32.965k (± 7.1%) i/s   (30.34 μs/i) -    166.991k in   5.065691s
+l6 r3: update! of one column      4.630k (± 3.3%) i/s  (216.00 μs/i) -     23.424k in   5.059587s
+l6 r3:   find, then changed?     15.222k (± 5.5%) i/s   (65.70 μs/i) -     76.700k in   5.038837s
+l6 r3:     serializable_hash     34.724k (± 7.4%) i/s   (28.80 μs/i) -    176.220k in   5.074915s
+main2 r3: update! of one column      4.760k (± 3.0%) i/s  (210.07 μs/i) -     23.863k in   5.012885s
+main2 r3:   find, then changed?     15.857k (± 2.1%) i/s   (63.06 μs/i) -     80.719k in   5.090300s
+main2 r3:     serializable_hash     34.778k (± 3.8%) i/s   (28.75 μs/i) -    174.363k in   5.013556s
+main r4: update! of one column      4.387k (± 9.0%) i/s  (227.94 μs/i) -     21.942k in   5.001495s
+main r4:   find, then changed?     14.906k (± 5.8%) i/s   (67.09 μs/i) -     75.450k in   5.061591s
+main r4:     serializable_hash     33.963k (± 6.9%) i/s   (29.44 μs/i) -    170.200k in   5.011353s
+l6 r4: update! of one column      4.688k (± 5.5%) i/s  (213.29 μs/i) -     23.868k in   5.090836s
+l6 r4:   find, then changed?     15.743k (± 3.4%) i/s   (63.52 μs/i) -     79.680k in   5.061354s
+l6 r4:     serializable_hash     34.352k (± 4.8%) i/s   (29.11 μs/i) -    171.941k in   5.005293s
+main2 r4: update! of one column      4.711k (± 3.2%) i/s  (212.26 μs/i) -     23.896k in   5.072096s
+main2 r4:   find, then changed?     14.880k (± 7.1%) i/s   (67.20 μs/i) -     74.568k in   5.011313s
+main2 r4:     serializable_hash     35.094k (± 3.6%) i/s   (28.49 μs/i) -    178.750k in   5.093458s
+main r5: update! of one column      4.679k (± 3.7%) i/s  (213.74 μs/i) -     23.760k in   5.078423s
+main r5:   find, then changed?     14.418k (± 9.2%) i/s   (69.36 μs/i) -     72.944k in   5.059104s
+main r5:     serializable_hash     32.701k (± 7.4%) i/s   (30.58 μs/i) -    165.048k in   5.047203s
+l6 r5: update! of one column      4.772k (± 3.0%) i/s  (209.56 μs/i) -     23.880k in   5.004274s
+l6 r5:   find, then changed?     14.847k (± 3.7%) i/s   (67.35 μs/i) -     74.640k in   5.027208s
+l6 r5:     serializable_hash     34.360k (± 8.1%) i/s   (29.10 μs/i) -    174.720k in   5.084981s
+main2 r5: update! of one column      4.522k (± 6.6%) i/s  (221.13 μs/i) -     22.883k in   5.060232s
+main2 r5:   find, then changed?     14.812k (± 4.1%) i/s   (67.51 μs/i) -     74.844k in   5.052887s
+main2 r5:     serializable_hash     34.435k (± 6.0%) i/s   (29.04 μs/i) -    173.607k in   5.041602s
+main r6: update! of one column      4.718k (± 2.6%) i/s  (211.95 μs/i) -     23.912k in   5.068202s
+main r6:   find, then changed?     14.398k (± 9.1%) i/s   (69.46 μs/i) -     72.803k in   5.056550s
+main r6:     serializable_hash     32.871k (± 8.8%) i/s   (30.42 μs/i) -    165.024k in   5.020410s
+l6 r6: update! of one column      4.278k (±11.6%) i/s  (233.73 μs/i) -     21.504k in   5.026132s
+l6 r6:   find, then changed?     13.870k (± 7.3%) i/s   (72.10 μs/i) -     69.870k in   5.037587s
+l6 r6:     serializable_hash     32.112k (±11.7%) i/s   (31.14 μs/i) -    163.200k in   5.082243s
+main2 r6: update! of one column      4.680k (± 5.0%) i/s  (213.68 μs/i) -     23.814k in   5.088663s
+main2 r6:   find, then changed?     14.748k (± 5.1%) i/s   (67.81 μs/i) -     74.001k in   5.017736s
+main2 r6:     serializable_hash     35.435k (± 3.6%) i/s   (28.22 μs/i) -    180.438k in   5.092142s
