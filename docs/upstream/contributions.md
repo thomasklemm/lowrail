@@ -947,6 +947,8 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 
 ### Inertia — inertiajs/inertia-rails
 
+- [#444](https://github.com/inertiajs/inertia-rails/pull/444) (INRV1), specs ignore the `Accept` and `X-Requested-With` that Rails 8.0.5.2, 8.1.4.1 and main now add to `Vary` (GHSA-r9jg-fmfx-2gv6); six Vary specs had turned the Rails 8.0/8.1/main jobs red for every open PR, including ours. Spec-only, library behaviour verified unchanged across 23 Vary scenarios. Opened 2026-11-17 (Thomas), head `dc24da9980`, claude-code pass with a body fix applied.
+
 - [#441](https://github.com/inertiajs/inertia-rails/pull/441), the renderer reads `X-Inertia-*` headers by Rack env key like the middleware — 8 header-key Strings per render → 0; 42/55 workloads across six Inertia apps. Sol approve on both rubrics; opened 2026-11-03.
 - [#442](https://github.com/inertiajs/inertia-rails/pull/442), the props resolver asks only prop types for deferred?/once?/rescue? (bug fix: a plain record with a `once` column raised `NoMethodError`, one with `deferred` was dropped), walks hashes with `each` and copies plain values without paths — 23-value page **165 → 40** objects, 73 → 38 µs interpreter; 41/55 Inertia workloads, median **−1.8%** (Hackatime XHR −14%). Three commits in one PR (no stacking). Sol approve / approve-with-nits (spec gap fixed); opened 2026-11-03.
 
