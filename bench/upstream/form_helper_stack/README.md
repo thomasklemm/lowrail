@@ -265,3 +265,18 @@ Callgrind instruction counts instead.
   `am1_ips_aa.txt`.
 * O: kept for later as queue item TO1 (held), after #59804 merges.
 * TB and T2: parked; they are the weakest candidates (1 object each for a moved override boundary).
+
+## FB1 (#59824) instructions per call, 2026-11-17
+
+`fb1_ir.sh` runs `fb1_ir.rb` under Callgrind: the body's ActiveModel `Post`, 3,000 warm-up calls, GC off, then
+`(Ir(2000) − Ir(0)) / 2000`. Ruby 4.0.7, main `a5203b3d4d` against `a2a13fc793`, main measured twice per cell, with a
+plain and a persisted `Post` (no difference). Raw output in `fb1_ir.txt`.
+
+| | main | branch | change | main A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `text_field`, interpreter | 120,226 | 116,558 | −3.1% | 0.33% |
+| `checkbox`, interpreter | 163,928 | 160,346 | −2.2% | 0.12% |
+| `text_field`, YJIT | 66,619 | 63,084 | −5.3% | 0.63% |
+| `checkbox`, YJIT | 88,842 | 85,328 | −4.0% | 0.25% |
+
+With GC on (one run each, N = 3,000) the cells move by up to 3 points either way, depending on when a GC lands.
