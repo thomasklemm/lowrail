@@ -53,6 +53,16 @@ trailer. It works in Lowrail and in upstream checkouts (run it from there), and 
 moves: author and committer, the message byte for byte, empty `%(trailers:only)`, and in Lowrail no `owner/repo#N`
 or issue or PR URL in the message.
 
+## Body numbers
+
+Every number in a body (objects, Callgrind instructions, benchmark-ips) comes from one
+[`script/upstream-bench`](../../../script/upstream-bench) run of the item's base against its head, committed under
+`bench/upstream/<topic>/body/<ID>/` next to its benchmark script; `impact` and the body cite that directory. It
+measures base twice in every cell and prints "within noise" for a change inside that A/A, which the body then
+doesn't claim. Usage, method and limits: [body-numbers](../../../docs/upstream/body-numbers.md). Examples:
+`form_helper_stack/body/fb1` and `body/am1`. A reviewer checks a body number by rerunning the run's `commands.sh`,
+or the whole run into a new directory.
+
 ## Item file
 
 ```markdown

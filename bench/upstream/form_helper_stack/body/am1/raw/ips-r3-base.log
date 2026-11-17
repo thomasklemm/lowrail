@@ -1,0 +1,9 @@
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+      errors[:title]   226.995k i/100ms
+     errors["title"]   184.932k i/100ms
+          text_field     8.833k i/100ms
+Calculating -------------------------------------
+      errors[:title]      2.363M (± 3.9%) i/s  (423.12 ns/i) -     12.031M in   5.090450s
+     errors["title"]      1.750M (± 6.3%) i/s  (571.33 ns/i) -      8.877M in   5.071539s
+          text_field    101.367k (± 7.9%) i/s    (9.87 μs/i) -    512.314k in   5.054057s

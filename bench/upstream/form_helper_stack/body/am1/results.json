@@ -1,0 +1,222 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/form_helper_stack/am1_body.rb",
+  "at": "2026-11-17T23:40:59Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby",
+      "tree": "/home/user/workspace/rails-am1-main",
+      "description": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "4f00fbc946c9ca055e6c1fbc7b40274625766be1",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby",
+      "tree": "/home/user/workspace/rails-am1",
+      "description": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "8cef505ecce3da94bf828281be341d489b955061",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp errors[:title]": {
+      "base": 4.999,
+      "base1": 4.999,
+      "base2": 4.999,
+      "candidate": 0.999,
+      "change": -0.8001600320064013,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp errors[\"title\"]": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 2.0,
+      "change": -0.6666666666666667,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp text_field": {
+      "base": 27.996,
+      "base1": 27.996,
+      "base2": 27.996,
+      "candidate": 23.996,
+      "change": -0.14287755393627666,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit errors[:title]": {
+      "base": 4.999,
+      "base1": 4.999,
+      "base2": 4.999,
+      "candidate": 0.999,
+      "change": -0.8001600320064013,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit errors[\"title\"]": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 2.0,
+      "change": -0.6666666666666667,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit text_field": {
+      "base": 28.996,
+      "base1": 28.996,
+      "base2": 28.996,
+      "candidate": 24.996,
+      "change": -0.1379500620775279,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp errors[:title]": {
+      "base": 4937.391,
+      "base1": 4937.391,
+      "base2": 4937.391,
+      "candidate": 2039.578,
+      "change": -0.5869117920780429,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp errors[\"title\"]": {
+      "base": 5544.498,
+      "base1": 5544.5,
+      "base2": 5544.496,
+      "candidate": 2525.779,
+      "change": -0.5444530776275869,
+      "aa": 0.0000007214359171750829,
+      "claim": true
+    },
+    "interp text_field": {
+      "base": 120008.715,
+      "base1": 120012.254,
+      "base2": 120005.176,
+      "candidate": 116668.314,
+      "change": -0.027834653508288953,
+      "aa": 0.000058979049979779076,
+      "claim": true
+    },
+    "yjit errors[:title]": {
+      "base": 3574.0424999999996,
+      "base1": 3575.3785,
+      "base2": 3572.7065,
+      "candidate": 1683.509,
+      "change": -0.5289622325420025,
+      "aa": 0.000747612822175457,
+      "claim": true
+    },
+    "yjit errors[\"title\"]": {
+      "base": 4228.16675,
+      "base1": 4220.1575,
+      "base2": 4236.176,
+      "candidate": 1937.945,
+      "change": -0.5416583321838004,
+      "aa": 0.0037885213491166427,
+      "claim": true
+    },
+    "yjit text_field": {
+      "base": 66359.66750000001,
+      "base1": 66149.88,
+      "base2": 66569.455,
+      "candidate": 64091.3705,
+      "change": -0.034181862047455436,
+      "aa": 0.006322741143933505,
+      "claim": true
+    }
+  },
+  "ips": {
+    "errors[:title]": {
+      "base": 2374000.0,
+      "base1": 2380000.0,
+      "base2": 2368000.0,
+      "candidate": 10109000.0,
+      "change": 3.25821398483572,
+      "aa": 0.005054759898904802,
+      "claim": true,
+      "rounds": {
+        "base": [
+          2171000.0,
+          2380000.0,
+          2363000.0
+        ],
+        "candidate": [
+          9814000.0,
+          10001000.0,
+          10109000.0
+        ],
+        "base2": [
+          2125000.0,
+          2368000.0,
+          2286000.0
+        ]
+      }
+    },
+    "errors[\"title\"]": {
+      "base": 1889000.0,
+      "base1": 1871000.0,
+      "base2": 1907000.0,
+      "candidate": 5669000.0,
+      "change": 2.0010587612493382,
+      "aa": 0.019057702488088937,
+      "claim": true,
+      "rounds": {
+        "base": [
+          1767000.0,
+          1871000.0,
+          1750000.0
+        ],
+        "candidate": [
+          5633000.0,
+          5669000.0,
+          5609000.0
+        ],
+        "base2": [
+          1750000.0,
+          1907000.0,
+          1854000.0
+        ]
+      }
+    },
+    "text_field": {
+      "base": 104553.5,
+      "base1": 107013.0,
+      "base2": 102094.0,
+      "candidate": 112781.0,
+      "change": 0.07869177024202911,
+      "aa": 0.04704768372173098,
+      "claim": true,
+      "rounds": {
+        "base": [
+          104856.0,
+          107013.0,
+          101367.0
+        ],
+        "candidate": [
+          105390.0,
+          112781.0,
+          107132.0
+        ],
+        "base2": [
+          100689.0,
+          101738.0,
+          102094.0
+        ]
+      }
+    }
+  }
+}

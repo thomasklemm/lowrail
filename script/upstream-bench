@@ -1,0 +1,274 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Body numbers for an upstream PR: base against candidate, with base measured twice as an A/A in every cell.
+# Usage and the benchmark script format: docs/upstream/body-numbers.md.
+
+module UpstreamBench
+  CASES = {}
+  def self.report(name, &block) = CASES[name.to_s] = block
+end
+
+if ARGV.first == "--worker"
+  _, mode, script, *rest = ARGV
+  ARGV.clear
+  load File.expand_path(script)
+  case mode
+  when "objects"
+    UpstreamBench::CASES.each do |name, call|
+      3000.times { call.call }
+      GC.start
+      GC.disable
+      # Two windows, so an allocation outside the calls (the first GC.stat, a lazy constant) cancels out.
+      counts = [1000, 2000].map do |n|
+        before = GC.stat(:total_allocated_objects)
+        n.times { call.call }
+        GC.stat(:total_allocated_objects) - before
+      end
+      GC.enable
+      puts "objects #{name}\t#{(counts[1] - counts[0]) / 1000.0}"
+    end
+  when "ir"
+    # The harness subtracts an N=0 run, so only the calls inside rb_ary_cycle remain.
+    name, n = rest
+    call = UpstreamBench::CASES.fetch(name)
+    3000.times { call.call }
+    GC.start
+    GC.disable
+    [call].cycle(Integer(n)) { |c| c.call }
+  when "ips"
+    require "benchmark/ips"
+    time, warmup = rest.map { Float(_1) }
+    Benchmark.ips do |x|
+      x.config(time: time, warmup: warmup)
+      UpstreamBench::CASES.each { |name, call| x.report(name) { call.call } }
+    end
+  end
+  exit
+end
+
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "shellwords"
+require "time"
+
+ROOT = File.expand_path("..", __dir__)
+HEAP = { "RUBY_GC_HEAP_0_INIT_SLOTS" => "1000000", "RUBY_GC_HEAP_1_INIT_SLOTS" => "250000",
+  "RUBY_GC_HEAP_2_INIT_SLOTS" => "100000", "RUBY_GC_HEAP_3_INIT_SLOTS" => "20000",
+  "RUBY_GC_HEAP_4_INIT_SLOTS" => "10000" }.freeze
+MODE_FLAGS = { "interp" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.freeze
+MODE_TITLES = { "interp" => "no JIT", "yjit" => "YJIT", "zjit" => "ZJIT" }.freeze
+
+o = { gems: nil, with: [], n: 2000, ips: 0, ips_mode: "yjit", ips_time: 5, ips_warmup: 2, core: 1,
+  names: %w[Before After], modes: nil }
+parser = OptionParser.new do |p|
+  p.banner = "Usage: script/upstream-bench --out NEW_DIR [--base TREE --candidate TREE] [--ruby R | --base-ruby R --candidate-ruby R] BENCH.rb"
+  p.on("--out DIR", "Raw output, commands and table; must not exist") { o[:out] = File.expand_path(_1) }
+  p.on("--base TREE", "Base Rails or gem checkout") { o[:base] = File.expand_path(_1) }
+  p.on("--candidate TREE", "Candidate checkout") { o[:candidate] = File.expand_path(_1) }
+  p.on("--tree TREE", "One checkout for both sides (when only the Ruby differs)") { o[:base] = o[:candidate] = File.expand_path(_1) }
+  p.on("--gems LIST", Array, "Gems to load from each tree, e.g. activesupport,activemodel,actionview (default: the root gemspec)") { o[:gems] = _1 }
+  p.on("--with GEM", "Extra Gemfile dependency, repeatable") { o[:with] << _1 }
+  p.on("--ruby R", "Ruby for both sides: an executable or a mise version") { o[:base_ruby] = o[:candidate_ruby] = _1 }
+  p.on("--base-ruby R") { o[:base_ruby] = _1 }
+  p.on("--candidate-ruby R") { o[:candidate_ruby] = _1 }
+  p.on("--valgrind PREFIX", "Prefix built by script/bench-valgrind (default $LOWRAIL_VALGRIND)") { o[:valgrind] = _1 }
+  p.on("--modes LIST", Array, "interp,yjit,zjit (default: all the Rubies have)") { o[:modes] = _1 }
+  p.on("-n N", Integer, "Calls per Callgrind window (default 2000)") { o[:n] = _1 }
+  p.on("--ips ROUNDS", Integer, "benchmark-ips rounds of base/candidate/base (default 0: none)") { o[:ips] = _1 }
+  p.on("--ips-mode MODE", "interp, yjit or zjit (default yjit)") { o[:ips_mode] = _1 }
+  p.on("--ips-time S", Float) { o[:ips_time] = _1 }
+  p.on("--core N", Integer, "CPU for benchmark-ips (default 1)") { o[:core] = _1 }
+  p.on("--names BEFORE,AFTER", Array, "Column names (default Before,After)") { o[:names] = _1 }
+end
+parser.parse!
+script = ARGV.shift
+abort parser.banner unless script && ARGV.empty? && o[:out]
+script = File.expand_path(script)
+abort "#{o[:out]} exists; use a new directory" if File.exist?(o[:out])
+o[:base_ruby] ||= RbConfig.ruby
+o[:candidate_ruby] ||= o[:base_ruby]
+
+def ruby_path(spec)
+  return File.expand_path(spec) if spec.include?("/")
+  out, status = Open3.capture2("mise", "where", "ruby@#{spec}")
+  abort "unknown Ruby #{spec}" unless status.success?
+  File.join(out.strip, "bin/ruby")
+end
+
+def capture(*cmd) = Open3.capture2e(*cmd).first.strip
+
+out = o[:out]
+FileUtils.mkdir_p(File.join(out, "raw"))
+FileUtils.cp(script, File.join(out, File.basename(script)))
+COMMANDS = File.open(File.join(out, "commands.sh"), "w")
+COMMANDS.puts "# Every command script/upstream-bench ran, in order."
+COMMANDS.sync = true
+
+def run(env, cmd, log:, chdir: Dir.pwd)
+  vars = env.map { |k, v| v ? "#{k}=#{v.shellescape}" : "-u #{k}" }.join(" ")
+  COMMANDS.puts "(cd #{chdir.shellescape} && env #{vars} #{cmd.shelljoin}) > #{log.shellescape} 2>&1"
+  ok = system(env, *cmd, chdir: chdir, out: log, err: [:child, :out])
+  abort "failed, see #{log}" unless ok
+  File.read(log)
+end
+
+sides = {}
+{ "base" => [o[:base], o[:base_ruby]], "candidate" => [o[:candidate], o[:candidate_ruby]] }.each do |side, (tree, rb)|
+  ruby = ruby_path(rb)
+  env = HEAP.merge("RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => nil, "PATH" => "#{File.dirname(ruby)}:#{ENV.fetch("PATH")}")
+  gems = []
+  if tree
+    names = o[:gems] || Dir[File.join(tree, "*.gemspec")].map { File.basename(_1, ".gemspec") }
+    gems = names.map do |name|
+      dir = [File.join(tree, name), tree].find { File.file?(File.join(_1, "#{name}.gemspec")) }
+      abort "no #{name}.gemspec in #{tree}" unless dir
+      %(gem #{name.dump}, path: #{dir.dump})
+    end
+  end
+  gems += o[:with].map { %(gem #{_1.dump}) }
+  gems << %(gem "benchmark-ips") if o[:ips] > 0
+  unless gems.empty?
+    dir = File.join(out, side)
+    FileUtils.mkdir_p(dir)
+    File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\n#{gems.join("\n")}\n")
+    env["BUNDLE_GEMFILE"] = File.join(dir, "Gemfile")
+    run(env, [File.join(File.dirname(ruby), "bundle"), "install"], log: File.join(out, "raw", "#{side}-bundle.log"))
+  end
+  sides[side] = { ruby: ruby, env: env, tree: tree,
+    description: capture(env, ruby, "-e", "print RUBY_DESCRIPTION"),
+    zjit: system(env, ruby, "--zjit", "-e", "exit defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?", out: File::NULL, err: File::NULL),
+    head: tree && capture("git", "-C", tree, "rev-parse", "HEAD"),
+    dirty: tree && !capture("git", "-C", tree, "status", "--porcelain", "--untracked-files=no").empty? }
+end
+
+if sides.values.all? { _1[:env]["BUNDLE_GEMFILE"] }
+  third_party = sides.values.map do |s|
+    File.read("#{s[:env]["BUNDLE_GEMFILE"]}.lock").split(/\n\n/).grep_v(/\APATH\n/).join("\n\n")
+  end
+  abort "base and candidate resolved different third-party gems; compare #{out}/*/Gemfile.lock" unless third_party.uniq.size == 1
+end
+same_ruby = sides["base"][:description] == sides["candidate"][:description]
+abort "base and candidate are identical: same tree and same Ruby" if sides.values.map { _1[:ruby] }.uniq.size == 1 && o[:base] == o[:candidate]
+
+modes = o[:modes] || ["interp", "yjit", *("zjit" if sides.values.all? { _1[:zjit] })]
+prefix = File.expand_path(o[:valgrind] || ENV["LOWRAIL_VALGRIND"] || abort("pass --valgrind PREFIX (build it with script/bench-valgrind)"))
+manifest = File.join(prefix, "share/lowrail/valgrind.json")
+abort "#{prefix} is not a script/bench-valgrind prefix" unless File.file?(manifest)
+FileUtils.cp(manifest, File.join(out, "valgrind.json"))
+valgrind = File.join(prefix, "bin/valgrind")
+
+worker = ->(side, mode, *args) do
+  s = sides.fetch(side)
+  [s[:ruby], *MODE_FLAGS.fetch(mode), *("-rbundler/setup" if s[:env]["BUNDLE_GEMFILE"]), File.expand_path(__FILE__), "--worker", *args]
+end
+cases = nil
+runs = %w[base candidate base2]
+side_of = ->(run) { run.delete_suffix("2") }
+
+# Objects: deterministic, but still run base twice so a nondeterministic case shows.
+objects = modes.to_h do |mode|
+  [mode, runs.to_h do |r|
+    text = run(sides[side_of[r]][:env], worker[side_of[r], mode, "objects", script], log: File.join(out, "raw", "objects-#{mode}-#{r}.log"))
+    [r, text.scan(/^objects (.+)\t(\S+)$/).to_h { [_1, Float(_2)] }]
+  end]
+end
+cases = objects.values.first.fetch("base").keys
+abort "#{script} defines no UpstreamBench.report cases" if cases.empty?
+
+instructions = modes.to_h do |mode|
+  [mode, cases.each_with_index.to_h do |name, index|
+    [name, runs.to_h do |r|
+      side = side_of[r]
+      counts = [0, o[:n]].map do |n|
+        log = File.join(out, "raw", "ir-#{mode}-#{index + 1}-#{name.gsub(/\W+/, "_")}-#{r}-n#{n}")
+        cmd = [valgrind, "--verbose", "--tool=callgrind", "--collect-atstart=no", "--toggle-collect=rb_ary_cycle",
+          *("--smc-check=all" unless mode == "interp"), "--callgrind-out-file=/dev/null", "--log-file=#{log}.valgrind.log",
+          *worker[side, mode, "ir", script, name, n.to_s]]
+        run(sides[side][:env], cmd, log: "#{log}.log")
+        vlog = File.read("#{log}.valgrind.log")
+        abort "Valgrind brk reservation exhausted in #{log}.valgrind.log; nothing is reported" if vlog.match?(/brk segment overflow|Cannot map memory to grow brk segment/)
+        Integer(vlog.scan(/Collected : (\d+)/).last&.first || abort("no Callgrind total in #{log}.valgrind.log"))
+      end
+      [r, (counts[1] - counts[0]) / o[:n].to_f]
+    end]
+  end]
+end
+
+ips = nil
+if o[:ips] > 0
+  ips = Hash.new { |h, k| h[k] = Hash.new { |hh, kk| hh[kk] = [] } }
+  o[:ips].times do |round|
+    runs.each do |r|
+      side = side_of[r]
+      cmd = ["taskset", "-c", o[:core].to_s, *worker[side, o[:ips_mode], "ips", script, o[:ips_time].to_s, o[:ips_warmup].to_s]]
+      text = run(sides[side][:env], cmd, log: File.join(out, "raw", "ips-r#{round + 1}-#{r}.log"))
+      text.split("Calculating -------------------------------------").last.scan(/^\s*(.+?)\s+([\d.]+)([kMB]?) \(±\s*[\d.]+%\) i\/s/) do |name, value, unit|
+        ips[name][r] << Float(value) * { "" => 1, "k" => 1e3, "M" => 1e6, "B" => 1e9 }.fetch(unit)
+      end
+    end
+  end
+end
+
+# A change counts only when it is larger than the spread between the two base runs.
+def compare(b1, cand, b2)
+  base = (b1 + b2) / 2.0
+  aa = base.zero? ? 0.0 : (b2 - b1).abs / base
+  change = base.zero? ? (cand.zero? ? 0.0 : Float::INFINITY) : cand / base - 1
+  { base: base, base1: b1, base2: b2, candidate: cand, change: change, aa: aa, claim: change.abs > aa }
+end
+
+def int(x) = x.round.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
+# Objects per call can be fractional (a cache that sometimes skips an allocation); the exact value is in results.json.
+def num(x) = (x - x.round).abs < 0.05 ? int(x) : format("%.1f", x)
+def pct(x) = format("%+.1f%%", x * 100).sub("-", "−")
+def rate(x) = x >= 1e6 ? format("%.2fM", x / 1e6) : x >= 1e3 ? format("%.1fk", x / 1e3) : format("%.0f", x)
+
+before, after = o[:names]
+ruby_label = same_ruby ? "Ruby #{sides["base"][:description][/\Aruby (\S+)/, 1]}" : "base and candidate Ruby"
+results = { script: script, at: Time.now.utc.iso8601, n: o[:n], heap: HEAP, sides: sides.transform_values { _1.except(:env) },
+  objects: {}, instructions: {}, ips: {} }
+md = []
+notes = []
+modes.each do |mode|
+  md << "Objects and Callgrind instructions per call, #{ruby_label}, #{MODE_TITLES.fetch(mode)}"
+  md << ""
+  md << "| | Objects, #{before.downcase} | Objects, #{after.downcase} | Instructions, #{before.downcase} | Instructions, #{after.downcase} | Change |"
+  md << "| --- | ---: | ---: | ---: | ---: | ---: |"
+  cases.each do |name|
+    ob = compare(*runs.map { objects[mode][_1].fetch(name) })
+    ir = compare(*runs.map { instructions[mode][name][_1] })
+    results[:objects][[mode, name].join(" ")] = ob
+    results[:instructions][[mode, name].join(" ")] = ir
+    notes << "#{mode} #{name}: objects differ between the two base runs (#{num(ob[:base1])}, #{num(ob[:base2])})" unless ob[:aa].zero?
+    objs = ob[:aa].zero? ? [num(ob[:base]), num(ob[:candidate])] : ["–", "–"]
+    md << "| `#{name}` | #{objs.join(" | ")} | #{int(ir[:base])} | #{int(ir[:candidate])} | #{ir[:claim] ? pct(ir[:change]) : "within noise"} |"
+    notes << "#{mode} #{name}: instructions #{pct(ir[:change])} with A/A #{format("%.2f%%", ir[:aa] * 100)} " \
+      "(base #{int(ir[:base1])} / #{int(ir[:base2])}, candidate #{int(ir[:candidate])})#{ir[:claim] ? "" : ": inside the A/A, no claim"}"
+  end
+  md << ""
+end
+if ips
+  md << "benchmark-ips, #{ruby_label}, #{MODE_TITLES.fetch(o[:ips_mode])}, best of #{o[:ips]} on one core"
+  md << ""
+  md << "| | #{before} | #{after} | Change |"
+  md << "| --- | ---: | ---: | ---: |"
+  ips.each do |name, r|
+    c = compare(*runs.map { r[_1].max })
+    results[:ips][name] = c.merge(rounds: r)
+    md << "| `#{name}` | #{rate(c[:base])} i/s | #{rate(c[:candidate])} i/s | #{c[:claim] ? pct(c[:change]) : "within noise"} |"
+    notes << "ips #{name}: #{pct(c[:change])} with A/A #{format("%.2f%%", c[:aa] * 100)} (best base #{rate(c[:base1])} / " \
+      "#{rate(c[:base2])}, candidate #{rate(c[:candidate])})#{c[:claim] ? "" : ": inside the A/A, no claim"}"
+  end
+  md << ""
+end
+md << "Record (not for the body): base = mean of two base runs; A/A = their spread. Raw output and commands in #{out}."
+sides.each do |side, s|
+  md << "- #{side}: #{s[:description]}#{s[:tree] && ", #{s[:tree]} at #{s[:head][0, 10]}#{" (dirty)" if s[:dirty]}"}"
+end
+md += notes.map { "- #{_1}" }
+File.write(File.join(out, "results.json"), JSON.pretty_generate(results))
+File.write(File.join(out, "table.md"), md.join("\n") + "\n")
+puts md

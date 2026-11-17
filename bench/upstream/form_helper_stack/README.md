@@ -436,3 +436,11 @@ the same counts as main. Active Model isn't touched. RuboCop: no offenses on the
   clean. `git merge-tree` clean against main `4500a94c34` (current), FH2, FB1 and all three. No added comments.
 * Body: "Most apps have no `helpers.label` translations": 7 of 9 sampled open-source apps define none in English
   (mastodon, discourse, chatwoot, once-campfire, lobsters, rubygems.org, solidus); forem has 231 keys, maybe 1.
+
+## Body numbers (2026-11-17)
+
+`body/fb1` and `body/am1`: `script/upstream-bench` runs of `fb1_body.rb` and `am1_body.rb`, FB1 head `a2a13fc793`
+against main `a5203b3d4d` and AM1 head `8cef505ecc` against main `4f00fbc946`, Ruby 4.0.7, interpreter and YJIT,
+three benchmark-ips rounds. They reproduce `am1_objs.rb`'s objects and `fb1_ir.txt` to within about its main
+A/A: interpreter / YJIT text_field −2.8% / −4.6% against the recorded −3.1% / −5.3%, checkbox −2.1% / −3.8%
+against −2.2% / −4.0% ([body-numbers](../../../docs/upstream/body-numbers.md)).

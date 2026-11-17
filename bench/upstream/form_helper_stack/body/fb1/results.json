@@ -1,0 +1,284 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/form_helper_stack/fb1_body.rb",
+  "at": "2026-11-17T23:00:53Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby",
+      "tree": "/home/user/workspace/rails-fb1-main",
+      "description": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "a5203b3d4d8461550ff8891c28932acab192648c",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby",
+      "tree": "/home/user/workspace/rails-fb1",
+      "description": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "a2a13fc793439edcff50fa4471830c500079a362",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp text_field": {
+      "base": 27.995,
+      "base1": 27.995,
+      "base2": 27.995,
+      "candidate": 21.995,
+      "change": -0.21432398642614747,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp checkbox": {
+      "base": 32.0,
+      "base1": 32.0,
+      "base2": 32.0,
+      "candidate": 26.0,
+      "change": -0.1875,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp text_field, persisted": {
+      "base": 27.996,
+      "base1": 27.996,
+      "base2": 27.996,
+      "candidate": 21.996,
+      "change": -0.21431633090441493,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp checkbox, persisted": {
+      "base": 32.0,
+      "base1": 32.0,
+      "base2": 32.0,
+      "candidate": 26.0,
+      "change": -0.1875,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit text_field": {
+      "base": 28.995,
+      "base1": 28.995,
+      "base2": 28.995,
+      "candidate": 22.995,
+      "change": -0.20693222969477498,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit checkbox": {
+      "base": 34.0,
+      "base1": 34.0,
+      "base2": 34.0,
+      "candidate": 28.0,
+      "change": -0.17647058823529416,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit text_field, persisted": {
+      "base": 28.996,
+      "base1": 28.996,
+      "base2": 28.996,
+      "candidate": 22.996,
+      "change": -0.20692509311629192,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit checkbox, persisted": {
+      "base": 34.0,
+      "base1": 34.0,
+      "base2": 34.0,
+      "candidate": 28.0,
+      "change": -0.17647058823529416,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp text_field": {
+      "base": 120058.32699999999,
+      "base1": 120079.8485,
+      "base2": 120036.8055,
+      "candidate": 116667.723,
+      "change": -0.02824130641100797,
+      "aa": 0.0003585174062936141,
+      "claim": true
+    },
+    "interp checkbox": {
+      "base": 164148.435,
+      "base1": 164065.049,
+      "base2": 164231.821,
+      "candidate": 160622.316,
+      "change": -0.021481283083813807,
+      "aa": 0.0010159828815912695,
+      "claim": true
+    },
+    "interp text_field, persisted": {
+      "base": 120119.81450000001,
+      "base1": 120068.3265,
+      "base2": 120171.3025,
+      "candidate": 116710.5685,
+      "change": -0.02838204516208287,
+      "aa": 0.0008572773811602053,
+      "claim": true
+    },
+    "interp checkbox, persisted": {
+      "base": 164135.96875,
+      "base1": 164119.5045,
+      "base2": 164152.433,
+      "candidate": 160605.5775,
+      "change": -0.021508943328425567,
+      "aa": 0.00020061720932195112,
+      "claim": true
+    },
+    "yjit text_field": {
+      "base": 66234.9015,
+      "base1": 66117.9305,
+      "base2": 66351.8725,
+      "candidate": 63216.065,
+      "change": -0.04557773064703663,
+      "aa": 0.0035320049505923315,
+      "claim": true
+    },
+    "yjit checkbox": {
+      "base": 89222.29425,
+      "base1": 89238.989,
+      "base2": 89205.5995,
+      "candidate": 85851.2255,
+      "change": -0.03778280729426553,
+      "aa": 0.00037422821594844575,
+      "claim": true
+    },
+    "yjit text_field, persisted": {
+      "base": 66398.7065,
+      "base1": 66394.7945,
+      "base2": 66402.6185,
+      "candidate": 63541.7795,
+      "change": -0.043026847217272235,
+      "aa": 0.00011783362074972421,
+      "claim": true
+    },
+    "yjit checkbox, persisted": {
+      "base": 89230.7505,
+      "base1": 89259.714,
+      "base2": 89201.787,
+      "candidate": 85995.831,
+      "change": -0.03625341579974706,
+      "aa": 0.0006491820328241058,
+      "claim": true
+    }
+  },
+  "ips": {
+    "text_field": {
+      "base": 107480.0,
+      "base1": 110131.0,
+      "base2": 104829.0,
+      "candidate": 113935.0,
+      "change": 0.06005768515072574,
+      "aa": 0.049330107927056194,
+      "claim": true,
+      "rounds": {
+        "base": [
+          110131.0,
+          99411.0,
+          105873.0
+        ],
+        "candidate": [
+          113935.0,
+          111690.0,
+          110390.0
+        ],
+        "base2": [
+          103134.0,
+          104581.0,
+          104829.0
+        ]
+      }
+    },
+    "checkbox": {
+      "base": 75208.5,
+      "base1": 75557.0,
+      "base2": 74860.0,
+      "candidate": 79387.0,
+      "change": 0.05555887964791206,
+      "aa": 0.009267569490150715,
+      "claim": true,
+      "rounds": {
+        "base": [
+          75557.0,
+          72532.0,
+          72564.0
+        ],
+        "candidate": [
+          79387.0,
+          73230.0,
+          74627.0
+        ],
+        "base2": [
+          74860.0,
+          73323.0,
+          72397.0
+        ]
+      }
+    },
+    "text_field, persisted": {
+      "base": 106611.5,
+      "base1": 107519.0,
+      "base2": 105704.0,
+      "candidate": 115289.0,
+      "change": 0.08139365828264311,
+      "aa": 0.01702442982229872,
+      "claim": true,
+      "rounds": {
+        "base": [
+          107519.0,
+          105798.0,
+          103379.0
+        ],
+        "candidate": [
+          115289.0,
+          113285.0,
+          111394.0
+        ],
+        "base2": [
+          105704.0,
+          103763.0,
+          98027.0
+        ]
+      }
+    },
+    "checkbox, persisted": {
+      "base": 76470.0,
+      "base1": 75639.0,
+      "base2": 77301.0,
+      "candidate": 80432.0,
+      "change": 0.051811167778213596,
+      "aa": 0.021734013338564142,
+      "claim": true,
+      "rounds": {
+        "base": [
+          75639.0,
+          72414.0,
+          72509.0
+        ],
+        "candidate": [
+          80432.0,
+          76044.0,
+          71101.0
+        ],
+        "base2": [
+          77301.0,
+          73143.0,
+          68159.0
+        ]
+      }
+    }
+  }
+}
