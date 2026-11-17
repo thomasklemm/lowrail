@@ -943,3 +943,5 @@ ruby bench/upstream/zs1/per_call_table.rb OUT
 
 The orb-local scripts (`rbm.sh`, `stats.sh`, `per_call.sh`, `verify.sh`, `mutate.py`, `rails_suites.sh`) are in
 `.amp/in/orb-backup/zs1/` of the ZS1 thread and are not committed.
+
+**Rebase 2026-11-17.** Head `aa36fa0ea4` on master `b4ade67ba5`, for a conflict in the `Array#zip` snapshot of `test_optimize_send_variadic_with_block` after master's stack maps in side exits. `git range-diff`: commits 1 and 3 `=`, commit 2 changes only that snapshot; codegen, HIR and LIR unchanged. The passes and measurements above are on `fbbb9cee7b`, whose code this head keeps. arm64 dev build: `make zjit-test` 2,272 passed, test_zjit_cli 34 tests, `make btest` with `--zjit-call-threshold=2` all 2,148; the ZJIT-vs-interpreter probe is unchanged.
