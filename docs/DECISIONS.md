@@ -555,6 +555,11 @@ The rails/rails#59628 draft comment named ridgepole as broken, but ridgepole 3.2
   date#199 is the example: a probe of `<` with NaN shows that Integer, Float and BigDecimal define their own `<` and
   return false, while Comparable-based classes such as Time and Rational raise.
 
+## Orbs only, not Thomas's Mac (Thomas, 2026-11-17)
+
+All work runs in orbs. The Mac runner is not used: test suites there open sockets and macOS asks Thomas to allow
+incoming connections for `ruby`. arm64-only checks are skipped unless Thomas offers the Mac for one specific run.
+
 ## Orb time (Thomas, 2026-11-04)
 
 Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8
