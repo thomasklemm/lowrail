@@ -1,0 +1,30 @@
+rails 8.1.4.1
+ActionMailer::Base.default_url_options frozen?: [{}, false]
+ActionController::Base.default_url_options frozen?: [{}, false]
+PostsController.new.default_url_options frozen?: [{}, false]
+UrlThing.default_url_options frozen?: [{}, false]
+UrlThing.new.default_url_options frozen?: [{}, false]
+integration session default_url_options: [{}, false]
+ActionMailer::Base.default_url_options[:host] =: "shop.example.com"
+UrlThing.default_url_options[:host] =: "x.example.com"
+routes.default_url_options frozen? and []=: [false, "r.example.com"]
+assign new Hash to mailer: {host: "new.example.com"}
+override method mail url: "http://override.example.com/posts"
+rspec-rails 8.0.5 configure=false ips/gems
+feature group defined: default_url_options={host: "www.example.com"}
+
+rails 8.1.4.1
+ActionMailer::Base.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+ActionController::Base.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+PostsController.new.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+UrlThing.default_url_options frozen?: [{}, false]
+UrlThing.new.default_url_options frozen?: [{}, false]
+integration session default_url_options: [{}, false]
+ActionMailer::Base.default_url_options[:host] =: "shop.example.com"
+UrlThing.default_url_options[:host] =: "x.example.com"
+routes.default_url_options frozen? and []=: [false, "r.example.com"]
+assign new Hash to mailer: {host: "new.example.com"}
+override method mail url: "http://override.example.com/posts"
+rspec-rails 8.0.5 configure=true ips/gems
+feature group defined: default_url_options={host: "www.example.com"}
+

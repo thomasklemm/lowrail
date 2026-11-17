@@ -1,0 +1,3 @@
+load1_changed?                   266844.2    45.02 3
+update1                          828983.7   188.00 0
+serializable_hash_warm           248472.0    37.00 0

@@ -1,0 +1,22 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 84784dc584..672656ef42 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -318,7 +318,7 @@ def initialize_copy(other)
+ 
+     #: (String) -> ActiveModel::Attribute
+     def [](name)
+-      if index = index_for_name(name)
++      if index = @indexes[name]
+         attribute_at(name, index)
+       else
+         Attribute.null(name)
+@@ -343,7 +343,7 @@ def key?(name)
+     def keys
+       keys = row_keys | @ctx.type_keys | cached_names
+       keys.keep_if do |name|
+-        index = index_for_name(name)
++        index = @indexes[name]
+         if attribute = lookup(index)
+           attribute.initialized?
+         else

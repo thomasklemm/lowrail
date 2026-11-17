@@ -1,0 +1,49 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+main r1:            Marshal.dump     34.046k (± 7.6%) i/s   (29.37 μs/i) -    172.704k in   5.072676s
+main r1: attributes_for_database     85.828k (± 6.7%) i/s   (11.65 μs/i) -    432.685k in   5.041313s
+l3 r1:            Marshal.dump     43.786k (± 7.5%) i/s   (22.84 μs/i) -    222.300k in   5.076919s
+l3 r1: attributes_for_database    166.040k (± 6.0%) i/s    (6.02 μs/i) -    835.107k in   5.029541s
+main2 r1:            Marshal.dump     30.321k (±21.2%) i/s   (32.98 μs/i) -    152.938k in   5.043974s
+main2 r1: attributes_for_database     89.067k (± 4.7%) i/s   (11.23 μs/i) -    447.903k in   5.028837s
+l3h r1:            Marshal.dump     36.208k (±11.8%) i/s   (27.62 μs/i) -    182.454k in   5.038993s
+l3h r1: attributes_for_database     95.355k (±11.3%) i/s   (10.49 μs/i) -    485.393k in   5.090385s
+main r2:            Marshal.dump     35.388k (± 7.6%) i/s   (28.26 μs/i) -    178.416k in   5.041704s
+main r2: attributes_for_database     84.655k (± 9.0%) i/s   (11.81 μs/i) -    428.407k in   5.060635s
+l3 r2:            Marshal.dump     26.937k (±33.9%) i/s   (37.12 μs/i) -    138.039k in   5.124575s
+l3 r2: attributes_for_database    107.776k (±20.5%) i/s    (9.28 μs/i) -    547.989k in   5.084516s
+main2 r2:            Marshal.dump     28.149k (±15.5%) i/s   (35.52 μs/i) -    141.120k in   5.013241s
+main2 r2: attributes_for_database     68.666k (±16.2%) i/s   (14.56 μs/i) -    346.332k in   5.043732s
+l3h r2:            Marshal.dump     31.330k (±17.8%) i/s   (31.92 μs/i) -    157.092k in   5.014077s
+l3h r2: attributes_for_database    103.378k (±13.0%) i/s    (9.67 μs/i) -    516.960k in   5.000686s
+main r3:            Marshal.dump     29.055k (±20.5%) i/s   (34.42 μs/i) -    147.552k in   5.078447s
+main r3: attributes_for_database     75.907k (±16.9%) i/s   (13.17 μs/i) -    384.408k in   5.064227s
+l3 r3:            Marshal.dump     32.086k (±27.4%) i/s   (31.17 μs/i) -    160.875k in   5.013871s
+l3 r3: attributes_for_database    142.253k (±19.7%) i/s    (7.03 μs/i) -    712.400k in   5.007995s
+main2 r3:            Marshal.dump     32.840k (±13.6%) i/s   (30.45 μs/i) -    164.285k in   5.002524s
+main2 r3: attributes_for_database     84.672k (±13.2%) i/s   (11.81 μs/i) -    423.567k in   5.002449s
+l3h r3:            Marshal.dump     34.429k (±17.9%) i/s   (29.05 μs/i) -    173.639k in   5.043425s
+l3h r3: attributes_for_database    100.445k (±14.3%) i/s    (9.96 μs/i) -    502.254k in   5.000290s
+main r4:            Marshal.dump     31.910k (±14.7%) i/s   (31.34 μs/i) -    160.140k in   5.018565s
+main r4: attributes_for_database     90.028k (± 6.2%) i/s   (11.11 μs/i) -    457.765k in   5.084693s
+l3 r4:            Marshal.dump     43.431k (± 7.7%) i/s   (23.03 μs/i) -    220.948k in   5.087334s
+l3 r4: attributes_for_database    153.328k (±10.2%) i/s    (6.52 μs/i) -    770.904k in   5.027817s
+main2 r4:            Marshal.dump     34.765k (±10.1%) i/s   (28.76 μs/i) -    173.852k in   5.000841s
+main2 r4: attributes_for_database     87.849k (± 5.4%) i/s   (11.38 μs/i) -    444.103k in   5.055271s
+l3h r4:            Marshal.dump     33.313k (±15.1%) i/s   (30.02 μs/i) -    167.076k in   5.015312s
+l3h r4: attributes_for_database     97.632k (±17.5%) i/s   (10.24 μs/i) -    490.320k in   5.022102s
+main r5:            Marshal.dump     34.061k (± 9.7%) i/s   (29.36 μs/i) -    170.448k in   5.004187s
+main r5: attributes_for_database     90.448k (± 2.8%) i/s   (11.06 μs/i) -    454.116k in   5.020752s
+l3 r5:            Marshal.dump     42.177k (± 8.4%) i/s   (23.71 μs/i) -    211.547k in   5.015654s
+l3 r5: attributes_for_database    149.720k (± 8.4%) i/s    (6.68 μs/i) -    755.259k in   5.044480s
+main2 r5:            Marshal.dump     32.216k (±14.1%) i/s   (31.04 μs/i) -    161.436k in   5.011085s
+main2 r5: attributes_for_database     86.731k (± 5.7%) i/s   (11.53 μs/i) -    438.288k in   5.053433s
+l3h r5:            Marshal.dump     40.399k (± 4.6%) i/s   (24.75 μs/i) -    203.732k in   5.043023s
+l3h r5: attributes_for_database    105.882k (± 5.0%) i/s    (9.44 μs/i) -    531.036k in   5.015366s
+main r6:            Marshal.dump     31.913k (±11.2%) i/s   (31.34 μs/i) -    160.261k in   5.021845s
+main r6: attributes_for_database     85.132k (± 9.3%) i/s   (11.75 μs/i) -    432.864k in   5.084643s
+l3 r6:            Marshal.dump     41.759k (±10.3%) i/s   (23.95 μs/i) -    210.171k in   5.032957s
+l3 r6: attributes_for_database    132.895k (±11.5%) i/s    (7.52 μs/i) -    678.132k in   5.102781s
+main2 r6:            Marshal.dump     29.847k (±13.4%) i/s   (33.50 μs/i) -    151.920k in   5.089885s
+main2 r6: attributes_for_database     75.828k (±12.8%) i/s   (13.19 μs/i) -    384.384k in   5.069166s
+l3h r6:            Marshal.dump     35.135k (±12.1%) i/s   (28.46 μs/i) -    179.587k in   5.111402s
+l3h r6: attributes_for_database    105.351k (± 9.8%) i/s    (9.49 μs/i) -    530.305k in   5.033694s

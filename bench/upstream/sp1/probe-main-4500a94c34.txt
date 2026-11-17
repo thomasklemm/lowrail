@@ -1,0 +1,32 @@
+rails 8.2.0.alpha ips/main configure=false
+ActionMailer::Base.default_url_options frozen?: [{}, true]
+ActionController::Base.default_url_options frozen?: [{}, true]
+PostsController.new.default_url_options frozen?: [{}, true]
+UrlThing.default_url_options frozen?: [{}, true]
+UrlThing.new.default_url_options frozen?: [{}, true]
+integration session default_url_options: [{}, true]
+ActionMailer::Base.default_url_options[:host] =: FrozenError: can't modify frozen Hash: {}
+UrlThing.default_url_options[:host] =: FrozenError: can't modify frozen Hash: {}
+routes.default_url_options frozen? and []=: [false, "r.example.com"]
+assign new Hash to mailer: {host: "new.example.com"}
+override method mail url: "http://override.example.com/posts"
+rspec-rails 8.0.5 configure=false ips/main
+FrozenError: can't modify frozen Hash: {}
+/home/user/ips/gems/ruby/4.0.0/gems/rspec-rails-8.0.5/lib/rspec/rails/example/feature_example_group.rb:19:in 'block in <module:FeatureExampleGroup>'
+
+rails 8.2.0.alpha ips/main configure=true
+ActionMailer::Base.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+ActionController::Base.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+PostsController.new.default_url_options frozen?: [{host: "cfg.example.com"}, false]
+UrlThing.default_url_options frozen?: [{}, true]
+UrlThing.new.default_url_options frozen?: [{}, true]
+integration session default_url_options: [{}, true]
+ActionMailer::Base.default_url_options[:host] =: "shop.example.com"
+UrlThing.default_url_options[:host] =: FrozenError: can't modify frozen Hash: {}
+routes.default_url_options frozen? and []=: [false, "r.example.com"]
+assign new Hash to mailer: {host: "new.example.com"}
+override method mail url: "http://override.example.com/posts"
+rspec-rails 8.0.5 configure=true ips/main
+FrozenError: can't modify frozen Hash: {}
+/home/user/ips/gems/ruby/4.0.0/gems/rspec-rails-8.0.5/lib/rspec/rails/example/feature_example_group.rb:19:in 'block in <module:FeatureExampleGroup>'
+

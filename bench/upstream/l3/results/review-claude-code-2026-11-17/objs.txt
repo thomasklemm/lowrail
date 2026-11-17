@@ -1,0 +1,5 @@
+main: cols=6 afd=4.001 abtc=4.0 dump=16.0 sha=4cb3c318fd0a;cols=30 afd=4.001 abtc=4.031 dump=16.0 sha=7e70ad62e349;cols=100 afd=4.001 abtc=4.0 dump=16.0 sha=26a34e8f7a48;
+l3: cols=6 afd=1.001 abtc=1.0 dump=13.0 sha=4cb3c318fd0a;cols=30 afd=1.001 abtc=1.0 dump=13.031 sha=7e70ad62e349;cols=100 afd=1.032 abtc=1.0 dump=13.0 sha=26a34e8f7a48;
+l3h: cols=6 afd=1.001 abtc=1.0 dump=13.0 sha=4cb3c318fd0a;cols=30 afd=1.001 abtc=1.0 dump=13.031 sha=7e70ad62e349;cols=100 afd=1.032 abtc=1.0 dump=13.0 sha=26a34e8f7a48;
+l3b: cols=6 afd=1.001 abtc=1.0 dump=13.0 sha=4cb3c318fd0a;cols=30 afd=1.001 abtc=1.0 dump=13.031 sha=7e70ad62e349;cols=100 afd=1.001 abtc=1.0 dump=13.0 sha=26a34e8f7a48;
+l6: cols=6 afd=4.001 abtc=4.0 dump=16.0 sha=4cb3c318fd0a;cols=30 afd=4.001 abtc=4.031 dump=16.0 sha=7e70ad62e349;cols=100 afd=4.032 abtc=4.0 dump=16.0 sha=26a34e8f7a48;

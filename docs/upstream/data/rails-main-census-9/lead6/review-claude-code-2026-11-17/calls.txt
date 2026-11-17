@@ -1,0 +1,2 @@
+main {"[]": 41, attribute_at: 43, index_for_name: 230, keys: 3, lookup: 223} {changed: {"[]": 30, attribute_at: 30, index_for_name: 90, keys: 1, lookup: 90}} 
+l6 {"[]": 41, attribute_at: 2, index_for_name: 99, keys: 3, lookup: 92} {changed: {"[]": 30, index_for_name: 30, keys: 1, lookup: 30}} 
