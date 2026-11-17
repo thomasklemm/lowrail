@@ -378,3 +378,19 @@ aren't. Not measured: ZJIT on Ruby master (no master build in this orb).
 
 Action View `rake test` on FH2, LBL1 and the three combined (FH2 + LBL1 + FB1): 2,967 + 251 + 177 runs, 0 failures each,
 the same counts as main. Active Model isn't touched. RuboCop: no offenses on the changed files.
+
+### claude-code pass, 2026-11-17 (head `d6ff7e8c4c`, verdict changes)
+
+* **AMT breaks overrides of `content_tag`.** With named parameters, `ActiveModelInstanceTag#content_tag`'s bare `super`
+  passes all four, so an override of the public `TagHelper#content_tag` below it gets `escape` (`true`) as its last
+  argument. The usual `def content_tag(name, *args, &block)` with `args.extract_options!` then passes five arguments and
+  `f.text_area`, `f.label` and `f.select` raise `ArgumentError`; main renders (`fh2_amt_override.rb`). `(type, ...)`
+  allocates the Array too, so there is no exact allocation-free form: drop AMT. Without it, `f.text_area` 28 → 26,
+  `f.label` 100 → 96, `f.select` unchanged, `form_with` 279 → 273 (sweep setup); Action View green as well.
+* `fh2_review_probe.rb` (202,330 lines, main against the head): AMT's override and arity lines, TR's Symbol, nil,
+  Integer and `to_s` object names, and three contrived String subclass boundaries: an SV value whose `to_s` returns a
+  subclass with its own `gsub` (one returning a frozen String now raises `FrozenError`), a V method name whose `to_s`
+  returns a subclass with its own `+` (no longer called for values not from the user), and a TR object name subclass
+  with its own `match?` (one extra call). `fh2_probe.rb` and `sweep_fuzz.rb` reproduce the recorded diffs exactly.
+* Callgrind (`fh2_ir_review.txt`): interpreter cells reproduce; YJIT doesn't hold the body's label −2.5% (−1.3% now)
+  or text_field −0.8% (−0.4% against a 0.35% A/A); the YJIT A/A reaches 1.2% on `radio_button`.

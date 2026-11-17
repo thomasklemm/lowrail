@@ -1,0 +1,58 @@
+# claude-code pass 2026-11-17: fh2_ir.sh, Ruby 4.0.9, N=1000, run order main, head (parallel), main; then FH2 without AMT (tree d6ff7e8c4c with active_model_helper.rb from main; lines print d6ff7e8c4c).
+# Bundler re-execs into the locked 4.0.12 under valgrind without BUNDLE_VERSION=system, which leaves empty Callgrind files.
+# main1_interp
+4500a94c34 interp f.text_field 111930
+4500a94c34 interp f.text_area 88956
+4500a94c34 interp f.radio_button 113730
+4500a94c34 interp f.select 131749
+4500a94c34 interp f.label 288931
+4500a94c34 interp form_with (5 fields) 1134647
+# fh2_interp
+d6ff7e8c4c interp f.text_field 110508
+d6ff7e8c4c interp f.text_area 86838
+d6ff7e8c4c interp f.radio_button 113477
+d6ff7e8c4c interp f.select 131063
+d6ff7e8c4c interp f.label 287004
+d6ff7e8c4c interp form_with (5 fields) 1130235
+# main2_interp
+4500a94c34 interp f.text_field 111865
+4500a94c34 interp f.text_area 88937
+4500a94c34 interp f.radio_button 113735
+4500a94c34 interp f.select 131757
+4500a94c34 interp f.label 288938
+4500a94c34 interp form_with (5 fields) 1134581
+# main1_yjit
+4500a94c34 yjit f.text_field 60413
+4500a94c34 yjit f.text_area 48229
+4500a94c34 yjit f.radio_button 63104
+4500a94c34 yjit f.select 70389
+4500a94c34 yjit f.label 165677
+4500a94c34 yjit form_with (5 fields) 611572
+# fh2_yjit
+d6ff7e8c4c yjit f.text_field 60263
+d6ff7e8c4c yjit f.text_area 47560
+d6ff7e8c4c yjit f.radio_button 62622
+d6ff7e8c4c yjit f.select 69966
+d6ff7e8c4c yjit f.label 163351
+d6ff7e8c4c yjit form_with (5 fields) 610117
+# main2_yjit
+4500a94c34 yjit f.text_field 60626
+4500a94c34 yjit f.text_area 48208
+4500a94c34 yjit f.radio_button 63885
+4500a94c34 yjit f.select 70323
+4500a94c34 yjit f.label 165402
+4500a94c34 yjit form_with (5 fields) 613150
+# noamt_interp
+d6ff7e8c4c interp f.text_field 110555
+d6ff7e8c4c interp f.text_area 87425
+d6ff7e8c4c interp f.radio_button 113402
+d6ff7e8c4c interp f.select 131706
+d6ff7e8c4c interp f.label 287628
+d6ff7e8c4c interp form_with (5 fields) 1131853
+# noamt_yjit
+d6ff7e8c4c yjit f.text_field 59603
+d6ff7e8c4c yjit f.text_area 47936
+d6ff7e8c4c yjit f.radio_button 62754
+d6ff7e8c4c yjit f.select 70426
+d6ff7e8c4c yjit f.label 163960
+d6ff7e8c4c yjit form_with (5 fields) 610665
