@@ -59,7 +59,7 @@ singleton receivers.
 | # | item | ask | Rails relevance | owner | state |
 | --- | --- | --- | --- | --- | --- |
 | 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.64 s → 3.53 s of compile time; app compile time within A/A | ours (assigned), but tenderlove's #19962 is open | **built, ZWB1** |
-| 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration, now a `CCallWithFrame` | free | not built |
+| 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −7.5% Ir per call, apps about 0.015% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1** |
 | 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue | every inlined call; unmeasured | free | not built |
 | 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
@@ -136,6 +136,49 @@ Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
 > a guarded store instead of a generic write: 475 → 392 instructions per write in a loop. On ruby-bench it only
 > touches lobsters (−584 generic writes per iteration). Branch:
 > https://github.com/thomasklemm/ruby/commit/fe6ea9ef84. OK to open it on ruby/ruby?
+
+## ZSD1: `String#dup` on bare Strings (built 2026-11-17)
+
+Branch [`thomasklemm/zjit-string-dup`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-string-dup)
+@ `c71669b114`, one commit on `7919a47d46`, 8 files, +138/−11 (production code about 30 lines in
+`cruby_methods.rs`, `hir.rs`, `cruby.rs`, `stats.rs` and the bindings). Queue item
+[ZSD1](../../bench/upstream/pr-queue/items/ZSD1.md).
+
+* **Ownership (checked 2026-11-17).** #1106 has no assignee and no comments; no open or closed ruby/ruby PR mentions
+  `String#dup` with ZJIT; none of #1039's 83 rows touches string copies.
+* **What it does.** `annotate!(rb_cString, "dup", inline_string_dup)`: when the receiver is likely `StringExact`
+  and its profiled shape has no ivars, guard `StringExact`, guard `shape_id & SHAPE_ID_HAS_IVAR_MASK == 0` (new
+  `guard_no_ivars`, side-exit reason `GuardNoIvars`), and emit `StringCopy`. That is `rb_str_dup_m`'s
+  `BARE_STRING_P` check. Subclasses, strings with ivars and redefined `dup` keep `CCallWithFrame`. No return-type
+  annotation, because `String#dup` on a subclass returns the subclass. `SHAPE_ID_HAS_IVAR_MASK` was added to the
+  bindings by hand: `make zjit-bindgen` fails in this orb on a gcc-configured build (an unrelated
+  `jit_bindgen_constants` replacement), so CI's bindgen check is the one to confirm it.
+* **One difference, not observable to Ruby code:** `rb_ec_str_resurrect` embeds an embedded source of any length;
+  `str_duplicate` shares a buffer for embedded sources above 256 bytes. Same contents, encoding and flags.
+* **Numbers.** Micro (compiled loop keeping `s.dup` of a 20-byte String, Callgrind slope over 200,000 calls,
+  threshold 2): master 388, master-aa 388, branch 359 Ir per call (−7.5%). Stats per iteration (15 warmup + 10,
+  512/1024 MiB, 0 OOM; diff filtered against a second master build): `ccall_String#dup` railsbench 25,218 → 0,
+  lobsters 4,243 → 43, shipit 5,663 → 12, all moved to `rb_ec_str_resurrect`; no `exit_guard_no_ivars_failure`. At
+  29 Ir per call that is about 0.7 M Ir per railsbench iteration (0.015%), below the Callgrind A/A, so no app run
+  and no time claim. The larger saving tekknolagi's issue hints at, an inline allocation for runtime strings like
+  `gen_string_copy`'s constant fast path, is not in this change.
+* **Tests** (`--enable-zjit=dev`, head `c71669b114`): `make zjit-test` 2,017 of 2,018 (the SIGPROF test that fails
+  on master in this orb); two new HIR tests and two codegen tests; two existing snapshots
+  (`test_no_elide_freeze_with_unfrozen_str`, `test_no_elide_uminus_with_unfrozen_str`) now show the inlined copy.
+  btest at thresholds 1 and 2: all 2,148. `test_zjit_cli`, `test_optimization`, `test_string`,
+  `test_string_memory` at thresholds 1 and 2: 653 tests, 0 failures. Differential probe (18 receivers: literal,
+  frozen, interned, shared, 5,000 bytes, binary, UTF-8, US-ASCII, capacity, with ivars, with object_id, extended,
+  singleton, two subclasses, one with `initialize_copy`; plus a mid-run redefinition of `String#dup`): identical
+  output from the interpreter and ZJIT at thresholds 1 and 2 and `--zjit-max-versions=1`, on master and the branch.
+
+### Comment draft for #1106 (not posted)
+
+> A bare String (class String, no ivars) can take the same `StringCopy` as `dupstring`: guard `StringExact` and
+> `shape_id & SHAPE_ID_HAS_IVAR_MASK == 0`, which is `rb_str_dup_m`'s `BARE_STRING_P`. Everything else keeps the C
+> call. On ruby-bench that takes all of railsbench's 25k `String#dup` calls per iteration off `CCallWithFrame`
+> (lobsters 4.2k, shipit 5.6k), and a loop of `s.dup` goes from 388 to 359 instructions per call. The allocation
+> itself is still `rb_ec_str_resurrect`; an inline allocation for strings not known at compile time would be a
+> separate step. Branch: https://github.com/thomasklemm/ruby/commit/c71669b114. OK to open it on ruby/ruby?
 
 ## How we take an item
 
