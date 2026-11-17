@@ -23,3 +23,23 @@ am1 r4:      errors["title"]      8.812M (± 4.0%) i/s  (113.48 ns/i) -     44.3
 am_main r4:       errors[:title]      3.801M (±11.4%) i/s  (263.07 ns/i) -     19.268M in   5.068867s
 am_main r4:      errors["title"]      3.000M (± 3.3%) i/s  (333.32 ns/i) -     15.003M in   5.000733s
 finished
+claude-code pass 2026-11-17, head 8cef505ecc: ruby --yjit, taskset -c 1, main/branch/main2 interleaved
+am_main r1:       errors[:title]      4.066M (± 3.0%) i/s  (245.94 ns/i) -     20.413M in   5.020380s
+am_main r1:      errors["title"]      3.084M (± 2.9%) i/s  (324.26 ns/i) -     15.695M in   5.089427s
+am1 r1:       errors[:title]     17.849M (± 2.9%) i/s   (56.02 ns/i) -     90.459M in   5.067937s
+am1 r1:      errors["title"]      9.268M (± 3.1%) i/s  (107.90 ns/i) -     46.916M in   5.062246s
+am_main2 r1:       errors[:title]      4.091M (± 3.0%) i/s  (244.45 ns/i) -     20.502M in   5.011777s
+am_main2 r1:      errors["title"]      3.134M (± 2.8%) i/s  (319.07 ns/i) -     15.856M in   5.059108s
+am_main r2:       errors[:title]      4.053M (± 6.9%) i/s  (246.73 ns/i) -     20.294M in   5.007170s
+am_main r2:      errors["title"]      3.118M (± 3.5%) i/s  (320.71 ns/i) -     15.602M in   5.003839s
+am1 r2:       errors[:title]     17.613M (± 2.9%) i/s   (56.77 ns/i) -     89.358M in   5.073295s
+am1 r2:      errors["title"]      8.640M (± 7.4%) i/s  (115.74 ns/i) -     43.466M in   5.030749s
+am_main2 r2:       errors[:title]      4.099M (± 3.0%) i/s  (243.97 ns/i) -     20.497M in   5.000598s
+am_main2 r2:      errors["title"]      3.092M (± 3.7%) i/s  (323.38 ns/i) -     15.521M in   5.019323s
+am_main r3:       errors[:title]      3.921M (± 2.9%) i/s  (255.07 ns/i) -     19.785M in   5.046449s
+am_main r3:      errors["title"]      3.072M (± 2.8%) i/s  (325.48 ns/i) -     15.486M in   5.040289s
+am1 r3:       errors[:title]     17.075M (± 5.4%) i/s   (58.57 ns/i) -     86.199M in   5.048276s
+am1 r3:      errors["title"]      9.027M (± 4.6%) i/s  (110.77 ns/i) -     45.467M in   5.036490s
+am_main2 r3:       errors[:title]      3.970M (± 2.8%) i/s  (251.91 ns/i) -     20.056M in   5.052135s
+am_main2 r3:      errors["title"]      3.036M (± 2.7%) i/s  (329.38 ns/i) -     15.382M in   5.066596s
+finished
