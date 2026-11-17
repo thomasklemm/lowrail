@@ -604,8 +604,8 @@ one click.
 * **No deprecation shims for internal API** (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
   APIs. That's what internal means."). Private or `:nodoc:` breakage gets fixed in the gem or app that relies on
   it. Rails gets a fix only when Rails itself is wrong, not a deprecated restore.
-* **Open gem PRs** (inertia-rails, i18n, rubocop-performance, others): no pings. One short, friendly ping only after
-  four weeks without any maintainer reaction; closing only at a maintainer's request or when superseded.
+* **Open PRs and issues anywhere: no pings** (Thomas, 2026-11-17, superseding the four-week ping): maintainers have
+  their own time. Closing only at a maintainer's request or when superseded.
 * **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
   fixes block real users.
 * **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
