@@ -62,7 +62,8 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   Before every push to a fork branch or upstream, check `git log --format='%(trailers:only)' base..HEAD` is empty
   (Thomas, 2026-11-05: in public repos it must not land). In Lowrail the ones already on main stay, and since
   2026-11-14 `script/hooks/pre-push`, which `.agents/setup` installs, refuses to push a commit whose message has an
-  `Amp-Thread-ID:` or `Co-authored-by:` trailer.
+  `Amp-Thread-ID:` or `Co-authored-by:` trailer. `script/commit -F msgfile` commits the index that way in Lowrail and upstream
+  checkouts and verifies it.
 
 ## Upstream etiquette
 

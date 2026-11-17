@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Commits the staged index as Thomas Klemm (author and committer) with no trailers, in Lowrail or an upstream
+# checkout (run it from there). A plain `git commit` in Amp adds an Amp-Thread-ID trailer (DECISIONS, Commit identity).
+#
+#   script/commit -F MSGFILE [--amend]
+#   script/commit -m MESSAGE [--amend]   --amend replaces HEAD and keeps its author date
+set -euo pipefail
+usage() { sed -n '4,5s/^# *//p' "$0" >&2; exit 2; }
+git=/usr/bin/git
+[ -x "$git" ] || git=git
+lowrail=$(cd "$(dirname "$0")/.." && pwd)
+message=$(mktemp)
+trap 'rm -f "$message"' EXIT
+amend=0 given=0
+while (($#)); do
+  case $1 in
+    -F) [ $# -ge 2 ] || usage; cat "$2" > "$message"; given=1; shift 2 ;;
+    -m) [ $# -ge 2 ] || usage; printf '%s\n' "$2" > "$message"; given=1; shift 2 ;;
+    --amend) amend=1; shift ;;
+    *) usage ;;
+  esac
+done
+((given)) || usage
+[ -s "$message" ] || { echo "commit: empty message" >&2; exit 1; }
+[ "$(tail -c1 "$message" | od -An -c | tr -d ' ')" = '\n' ] || echo >> "$message"
+
+export GIT_AUTHOR_NAME="Thomas Klemm" GIT_AUTHOR_EMAIL=github@tklemm.eu
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+unset GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+old=$($git rev-parse -q --verify HEAD || true)
+parents=()
+if ((amend)); then
+  [ -n "$old" ] || { echo "commit: nothing to amend" >&2; exit 1; }
+  for p in $($git rev-list --parents -n1 HEAD | cut -d' ' -f2-); do parents+=(-p "$p"); done
+  GIT_AUTHOR_DATE="@$($git log -1 --format=%ad --date=raw HEAD)"
+  export GIT_AUTHOR_DATE
+elif [ -n "$old" ]; then
+  parents=(-p "$old")
+fi
+tree=$($git write-tree)
+if ((!amend)) && [ -n "$old" ] && [ "$tree" = "$($git rev-parse 'HEAD^{tree}')" ]; then
+  echo "commit: nothing staged" >&2; exit 1
+fi
+if [ "$($git rev-parse --show-toplevel)" = "$lowrail" ] &&
+   grep -qE '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9]+|github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussions)/[0-9]+' "$message"; then
+  echo "commit: the message references an upstream issue or PR, which shows on that thread; name it by item ID instead" >&2
+  exit 1
+fi
+new=$($git commit-tree "$tree" "${parents[@]}" < "$message")
+
+# Verify before HEAD moves: identity, the message byte for byte, no trailers.
+ident="Thomas Klemm <github@tklemm.eu> "
+header=$($git cat-file commit "$new" | sed '/^$/q')
+grep -q "^author $ident" <<<"$header" && grep -q "^committer $ident" <<<"$header" ||
+  { echo "commit: $new isn't authored and committed by $ident" >&2; exit 1; }
+cmp -s "$message" <($git cat-file commit "$new" | sed '1,/^$/d') || { echo "commit: $new changed the message" >&2; exit 1; }
+[ -z "$($git log -1 --format='%(trailers:only)' "$new")" ] || {
+  echo "commit: the message ends in trailers:" >&2; $git log -1 --format='%(trailers:only)' "$new" >&2; exit 1; }
+$git update-ref -m "script/commit" HEAD "$new" ${old:+"$old"}
+$git log -1 --format='%h %s (author %an <%ae> %ad, committer %cn <%ce>, no trailers)' "$new"

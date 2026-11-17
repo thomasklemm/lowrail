@@ -8,7 +8,7 @@ while read -r _ local_sha _ remote_sha; do
   for commit in $(git rev-list "$local_sha" "${exclude[@]}"); do
     message=$(git log -1 --format=%B "$commit")
     if grep -qiE '^(Amp-Thread-ID|Co-authored-by):' <<<"$message"; then
-      echo "pre-push: $(git log -1 --format='%h %s' "$commit") has a trailer; rebuild it without one (git commit-tree)" >&2
+      echo "pre-push: $(git log -1 --format='%h %s' "$commit") has a trailer; rebuild it without one (script/commit --amend for HEAD)" >&2
       refused=1
     fi
     if grep -qE '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9]+|github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussions)/[0-9]+' <<<"$message"; then
