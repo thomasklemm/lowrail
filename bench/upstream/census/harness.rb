@@ -17,6 +17,8 @@ module RailsCensus
 
   ROOT = File.expand_path("../../..", __dir__)
   MODES = %w[interpreter yjit zjit].freeze
+  RAILS_GEMS = %w[actioncable actionmailbox actionmailer actionpack actiontext actionview activejob activemodel activerecord
+    activestorage activesupport railties].freeze
 
   class << self
     public(*RailsMainCensus4.private_instance_methods(false))
@@ -47,8 +49,16 @@ module RailsCensus
       ensure
         RubyVM::YJIT.define_singleton_method(:enable, manual_enable) if manual_enable
       end
-      @rails_dir = File.dirname(Gem.loaded_specs.fetch("railties").full_gem_path)
-      raise "wrong Rails revision: #{@rails_dir}" unless File.basename(@rails_dir).end_with?("-#{rails_sha[0, 12]}")
+      if (version = ENV["CENSUS_RAILS_VERSION"])
+        # script/census app on the app's own released Rails: one gem per
+        # component, keyed RAILS/COMPONENT/... like a rails/rails checkout.
+        raise "wrong Rails version: #{Rails.version}, expected #{version}" unless Rails.version == version
+        @rails_gems = Gem.loaded_specs.values_at(*RAILS_GEMS).compact.to_h { [_1.full_gem_path + "/", _1.name] }
+        @rails_dir = Gem.loaded_specs.fetch("railties").full_gem_path
+      else
+        @rails_dir = File.dirname(Gem.loaded_specs.fetch("railties").full_gem_path)
+        raise "wrong Rails revision: #{@rails_dir}" unless File.basename(@rails_dir).end_with?("-#{rails_sha[0, 12]}")
+      end
       raise "wrong YJIT mode" unless RubyVM::YJIT.enabled? == (mode == "yjit")
       raise "wrong ZJIT mode" unless !!(defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?) == (mode == "zjit")
       Rails.logger.level = :fatal
@@ -109,7 +119,15 @@ module RailsCensus
     # with ../ce2/overlays.
     def ce2? = ENV["CENSUS_SET"] == "ce2"
 
+    # script/census app: an app outside the registered corpus, with workloads
+    # from a file or discovered from its routes (app_workloads.rb).
+    def app? = ENV["CENSUS_APP"] == "1"
+
     def workloads(name)
+      if app?
+        load File.join(__dir__, "app_workloads.rb")
+        return CensusAppWorkloads.load(self, ENV["CENSUS_APP_WORKLOADS"])
+      end
       if background?
         load File.join(__dir__, "background_workloads.rb")
         return BackgroundWorkloads.public_send(copy_of(name).tr("-", "_"), self)
@@ -128,7 +146,10 @@ module RailsCensus
       marker = "tmp/census-fixtures.json"
       raise "fixtures already prepared" if File.exist?(marker)
       require "active_record/fixtures"
-      case name
+      case app? ? :app : name
+      when :app
+        load File.join(__dir__, "app_workloads.rb")
+        CensusAppWorkloads.prepare
       when "blog", "redprints-cfp", "react-starter-kit"
         load "db/seeds.rb"
       when "pingcrm"
@@ -213,6 +234,8 @@ module RailsCensus
         "<no Ruby source>"
       elsif file.start_with?(Rails.root.to_s + "/")
         file.sub(Rails.root.to_s + "/", "APP/")
+      elsif @rails_gems && (gem = @rails_gems.find { |dir, _| file.start_with?(dir) })
+        "RAILS/#{gem[1]}/" + file.delete_prefix(gem[0])
       elsif file.start_with?(rails_dir + "/")
         "RAILS/" + file.delete_prefix(rails_dir + "/")
       elsif file.include?("/gems/")
@@ -278,6 +301,15 @@ module RailsCensus
         totals: after.reject { |_, v| v == 0 }) + "\n")
     end
 
+    # Where site keys point on disk, so script/census app's report can quote
+    # each line's source: GEM/ is relative to the first ".../gems/" of a gem path.
+    def source_roots
+      gem_dir = Gem.loaded_specs.fetch("railties").full_gem_path
+      { "APP" => Rails.root.to_s, "RUBY" => RbConfig::CONFIG.fetch("rubylibdir"),
+        "GEM" => gem_dir.split("/gems/", 2).first + "/gems",
+        "RAILS" => @rails_gems ? @rails_gems.to_h { |dir, gem| [gem, dir.chomp("/")] } : rails_dir }
+    end
+
     def profile(name, output)
       raise "fresh output required" if File.exist?(output)
       ops = workloads(name)
@@ -289,6 +321,7 @@ module RailsCensus
       result = { app: name, ruby: RUBY_DESCRIPTION, mode: mode, yjit: RubyVM::YJIT.enabled?, rails: rails_sha,
         rails_dir: File.basename(rails_dir), adapter: ActiveRecord::Base.connection_db_config.adapter,
         lock_sha256: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest, workloads: results }
+      result[:source_roots] = source_roots if app?
       File.write(output, JSON.pretty_generate(result) + "\n")
       puts JSON.generate(result.except(:workloads).merge(workloads: results.map { _1.except(:sites) }))
     end

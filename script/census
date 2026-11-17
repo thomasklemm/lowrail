@@ -10,6 +10,7 @@
 #   script/census prs      --label L [--mode interp] [--top N] [--refresh]
 #   script/census list     [--apps LIST] [--ruby R]
 #   script/census watch    [--base SHA] [--head SHA] [--bisect N] [--watch-dir DIR] [--jobs N]
+#   script/census app      DIR [--workloads FILE] [--rails SPEC] ...  (any app checkout; app --help)
 # SPEC is [OWNER/REPO@|/local/rails/repo@]REF (default repo rails/rails), REF a
 # branch, tag or commit. --gem NAME=SPEC (repeatable) also pins gem NAME to a
 # git ref in every app whose Gemfile lists it (rank --gem NAME ranks its lines).
@@ -26,6 +27,7 @@ require "time"
 require_relative "../bench/upstream/census/rank"
 require_relative "../bench/upstream/census/compare"
 require_relative "../bench/upstream/census/watch"
+require_relative "../bench/upstream/census/app"
 
 module Census
   ROOT = File.expand_path("..", __dir__)
@@ -208,7 +210,16 @@ module Census
     { "spec" => spec, "source" => %(github: "#{repo}"), "ref" => ref, "sha" => sha }
   end
 
-  def app_dir(corpus, app) = File.join(ROOT, ".corpus", "#{corpus}-#{APPS.fetch(app).fetch(:copy, app)}")
+  # A registered app, or one set up by `script/census app` (its configuration
+  # is kept in its copy, .corpus/census-app-NAME/.census.json).
+  def conf(app)
+    return APPS[app] if APPS.key?(app)
+    path = File.join(ROOT, ".corpus", "census-app-#{app}", ".census.json")
+    raise "unknown app #{app}" unless File.exist?(path)
+    JSON.parse(File.read(path)).fetch("conf").transform_keys(&:to_sym)
+  end
+
+  def app_dir(corpus, app) = File.join(ROOT, ".corpus", "#{corpus}-#{conf(app).fetch(:copy, app)}")
 
   def state(corpus, app)
     path = File.join(app_dir(corpus, app), ".census.json")
@@ -223,7 +234,7 @@ module Census
       "RAILS_LOG_LEVEL" => "fatal", "SKIP_TELEMETRY" => "1", "APP_VERSION" => "census", "APP_HOST" => "localhost",
       "RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => "0", "RUBY_ZJIT_ENABLE" => "0", "GEM_HOME" => nil, "GEM_PATH" => nil,
       "CENSUS_RAILS_SHA" => rails.fetch("sha"), "DISABLE_DATABASE_ENVIRONMENT_CHECK" => "1" }
-      .merge(APPS.fetch(app).fetch(:env, {}))
+      .merge("CENSUS_RAILS_VERSION" => rails["version"]).merge(conf(app).fetch(:env, {}))
   end
 
   # The app's census Gemfile with Rails at this commit (and no ruby pin, so the
@@ -244,9 +255,12 @@ module Census
     gemfile = File.join(dir, "Gemfile.census-#{rails.fetch("sha")[0, 12]}#{suffix}#{ruby_suffix(bin)}")
     unless File.exist?(gemfile)
       lines = File.readlines(File.join(dir, "Gemfile"))
-      pins = lines.each_index.filter_map { |i| [i, $1] if lines[i] =~ /\A\s*gem ["'](#{RAILS_GEMS.join("|")})["'],/ }
-      raise "#{app}: expected a gem \"rails\" line (or its components), found none" if pins.empty?
-      pins.each { |i, gem| lines[i] = %(gem "#{gem}", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n) }
+      # An outside app's Gemfile may name Rails without a version (gem "rails").
+      ending = APPS.key?(app) ? "," : %q{(?:,|\s*(?:#.*)?$)}
+      pins = lines.each_index.filter_map { |i| [i, $1] if lines[i] =~ /\A\s*gem ["'](#{RAILS_GEMS.join("|")})["']#{ending}/ }
+      # rails["own"] (script/census app): the app's own Rails, Gemfile unchanged but for the ruby pin.
+      raise "#{app}: expected a gem \"rails\" line (or its components), found none" if pins.empty? && !rails["own"]
+      pins.each { |i, gem| lines[i] = %(gem "#{gem}", #{rails.fetch("source")}, ref: "#{rails.fetch("sha")}"\n) } unless rails["own"]
       gems.each do |name, g|
         line = %(gem "#{name}", #{g.fetch("source")}, ref: "#{g.fetch("sha")}")
         if (i = lines.index { _1.match?(/\A\s*gem ["']#{Regexp.escape(name)}["']/) })
@@ -279,7 +293,7 @@ module Census
   end
 
   def check_services(apps)
-    apps.flat_map { APPS.fetch(_1).fetch(:services, []) }.uniq.each do |service|
+    apps.flat_map { conf(_1).fetch(:services, []) }.uniq.each do |service|
       ok = if service == "postgresql"
         system("pg_isready", "-q")
       else
@@ -294,7 +308,7 @@ module Census
     end
   end
 
-  def apps_option(value) = value == "all" ? APPS.keys : value.split(",").each { |app| APPS.fetch(app) { raise "unknown app #{app}" } }
+  def apps_option(value) = value == "all" ? APPS.keys : value.split(",").each { conf(_1) }
 
   def setup(opts)
     rails = resolve_rails(opts.fetch(:rails))
@@ -884,6 +898,7 @@ module Census
 
   def main(argv)
     command = argv.shift
+    return CensusApp.main(argv) if command == "app"
     opts = { corpus: "census", out: File.join(ROOT, ".lowrail/private/census"), ruby: "4.0.9", apps: APPS.keys,
       modes: %w[interpreter yjit], mode: "interpreter", limit: 60, tiers: CensusRank::TIERS, top: 40, jobs: 1,
       app: "blog", overlays: OVERLAYS, bisect: 20, watch_dir: File.join(ROOT, "docs/upstream/rails-main-watch"), gems: {} }

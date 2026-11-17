@@ -15,10 +15,140 @@ attributes new allocations and SQL or behavior-control diffs to commits: [rails-
 
 ## Run it on your own app
 
-The census runs only apps registered in this repository: each has a pinned source, a dependency overlay, an entry
-in `script/census`, a data preparation step and a workload list. There is no option that points it at an app
-directory outside the repo. Running your app therefore means adding it in a local checkout, as below. Start with
-the Blog to check the setup.
+`script/census app DIR` runs the census on any Rails app checkout and writes one report: objects and instructions
+per workload, each with its A/A pair, and the Rails, Ruby and gem lines that allocate and run the most, each with
+the open rails/rails PRs and [ledger](contributions.md) entries that touch it. Registering the app (below) is only
+needed to add it to the rounds we run ourselves.
+
+```sh
+mise exec -- script/census app ~/src/myapp                                  # GET pages found from the routes
+mise exec -- script/census app ~/src/myapp --workloads census.yml           # your requests, jobs and mails
+mise exec -- script/census app ~/src/myapp --workloads census.yml --rails main   # and what Rails main changes
+```
+
+**What it does.** DIR is only read. The app's tracked and untracked-but-not-ignored files (so uncommitted edits
+count) and its `config/database.yml` are copied to `.corpus/census-app-NAME`; results go to
+`.lowrail/private/census-app/NAME`, with the report in `report.md`. NAME is DIR's basename (`--name` picks another;
+a checkout of a registered app becomes `NAME-own`). Setup, once per copy: bundle the app's own `Gemfile.lock`
+(the `ruby` pin dropped, so the Ruby is a parameter), boot once in production to read its database configuration,
+check its services, `db:create db:schema:load` (or `db:migrate` without a schema), `--build` commands,
+`assets:precompile`, seed (`--prepare FILE`, else `db/seeds.rb`, with `srand(42)` and a fixed Faker seed), then
+replay every workload three times. Later runs reuse the copy and any result already measured; `--fresh` starts over.
+
+It measures on the app's own Rails and Ruby (`.ruby-version`, else the lock's `RUBY VERSION`; `--ruby` overrides),
+in the interpreter (`--modes interp,yjit` adds YJIT), with the same harness, windows and controls as a round
+([What a run measures](#what-a-run-measures)). Each label runs as an A/A pair: `own`/`own2`, and `main`/`main2`
+with `--rails SPEC`, which swaps the Rails line exactly as `run --rails` does. Instructions come from
+`script/cpu-census` when the patched Valgrind is installed (`script/cpu-census build`, once; `--no-cpu` skips them).
+A released Rails is attributed as `RAILS/COMPONENT/…`, the same keys as a rails/rails checkout.
+
+**Refusals.** Each stops before anything is written to a database, with what to do next:
+
+* any `*DATABASE_URL` in the environment;
+* an app that does not boot in production (the last lines of its error, and `--env K=V` for throwaway secrets);
+* a database adapter other than SQLite, PostgreSQL or MySQL, a database host that is not local, or a SQLite file
+  outside the copy;
+* a database server, Redis or memcached (when `redis`, `redis-client`, `sidekiq` or `dalli` is bundled) that is
+  not reachable (`--assume-service redis` when the measured requests never use it);
+* a server database that already exists, which may hold someone's data;
+* a lock that does not install on the chosen Ruby, a failing asset build, seed or workload (`CENSUS_DEBUG=1`
+  prints the exception behind a bare 500).
+
+### Workloads file
+
+YAML, rendered with ERB inside the booted app, so `<% %>` can look records up and reset state left by an earlier
+run. Without `--workloads`, up to 20 GET routes are discovered: routes without parameters, and `:id` or `:NAME_id`
+filled with the first record of the matching model; each must answer 200 three times. The chosen pages are cached
+in the copy (`tmp/census-discovered.json`), so every run measures the same ones, and skipped routes are printed
+with the reason. A `.rb` file defining `CensusAppWorkloads.custom(c)` that returns `c::Op` values is the escape hatch.
+
+```yaml
+<% article = Article.order(:id).first! %>
+sign_in:                           # once, for every request (signed_in: false opts one out)
+  path: /session                   # the form at `form:` (default: path) supplies the CSRF token
+  params: { email: census@example.com, password: secret }
+  # or: cookie: { name: session_token, value: <%= token %>, signed: true }
+csrf_from: /articles/new           # page whose token the writes send (default: the first GET)
+requests:
+  - GET /articles                  # shorthand: name and path
+  - { name: GET article, path: /articles/<%= article.id %> }
+  - name: PATCH article
+    method: patch                  # get (default), post, patch, put, delete
+    path: /articles/<%= article.id %>
+    expect: 303                    # default 200 for GET, any 2xx/302/303 for writes
+    jobs: true                     # the jobs it enqueues become workloads of their own
+    alternate:                     # used in turn, so writes flip between two states
+      - params: { article: { title: A } }
+      - params: { article: { title: B } }
+  - name: POST comment
+    method: post
+    path: /comments
+    xhr: true                      # X-Requested-With; the token goes in X-CSRF-Token
+    params: { comment: "Census comment %{n}" }   # %{n}: the operation's number
+  - { name: GET feed.json, path: /feed.json }    # .json, json: or format: json send JSON headers
+skip_jobs: [CachePageJob]
+setup: |                           # Ruby, run once after the requests; its locals feed the mailers
+  comment = Comment.last!
+mailers:
+  - { name: deliver CommentMailer#created, ruby: CommentMailer.created(comment) }
+jobs:
+  - { class: DigestJob, args: [1] }
+```
+
+Writes must not accumulate state from run to run, or the A/A pair drifts: delete what the previous run created in
+the ERB, or flip between two values with `alternate`. Each request keeps its own turn, so two requests that flip the
+same record (the Blog's PATCH and PATCH.json) can each start by writing the value the other left, which the SQL
+control shows as a skipped UPDATE. The Blog and Lobsters files used in the validation below are in
+[fixtures/census-app](../../fixtures/census-app).
+
+### The report
+
+One page per app, plain counts, no speedup claims. Per workload: objects and instructions per operation and their
+A/A difference, and SQL queries. Then where the objects come from (Rails, gems, Ruby's library, the app), and two
+rankings of Rails, Ruby and gem lines, by mean objects and by mean sampled instructions over every workload, each
+with the line's source, its A/A, how many workloads it reaches, its main class or method, and known work: open
+rails/rails PRs whose diff covers the line (cached by `prs`, so `gh` is needed once; on a released Rails the line
+numbers are main's, so a match is a hint) and ledger entries naming the line's file, or its method with its gem or
+component. With `--rails`, a table of what the other Rails changes per workload, counted only beyond both A/A pairs,
+and whether the SQL changed.
+
+### Validation: Blog and Lobsters as outside apps (2026-11-17)
+
+Both apps from plain checkouts outside `.corpus` (the Blog from its retained archive, Lobsters cloned at
+`366e211`), with the files in [fixtures/census-app](../../fixtures/census-app), against the registered census of
+the same apps and workloads (`run --aa` and `cpu-census run --aa`), Ruby 4.0.9, interpreter. To compare like with
+like, `--rails` named the registered copies' commit: Rails main `4500a94c34` for the Blog, and for Lobsters
+`c48c154e3f`, the parent of the merge that breaks activerecord-typedstore 1.6.0 (Lobsters does not boot on current
+main; [ar-gems-after-59141](ar-gems-after-59141.md)). Outside, Bundler resolved Rails main from the app's own lock;
+the registered overlays differ from those locks only in herb (0.11.1 against 0.11.2).
+
+* **Workloads.** The same names (10 and 11) passed `list` on both sides. Every Lobsters workload and 8 of 10 Blog
+  workloads ran the same masked SQL; the Blog's two PATCH workloads differ only in the SQL control (see
+  [Workloads file](#workloads-file)).
+* **Objects.** Traced objects per operation without the census client's own lines: Lobsters within −30 to +16 of
+  7,000 to 24,000 (mail and job identical), the Blog within ±8 except its comment POST (−120, inside the 10–180
+  that comment writes move between identical runs). The census values (medians of the GC-enabled windows) are 3 to
+  13 objects lower outside for the Blog, which is the request client: the registered workloads build a headers
+  Hash per call, the file builds them once. The Blog's job differs by +130 in the median because one of its three
+  windows caught one-time allocations; its traced count is identical (607.1).
+* **Rankings.** The top 15 lines by objects: 13 of 15 shared for the Blog with the top 10 in the same order, 15 of
+  15 for Lobsters. By instructions, the Blog's top 15 are the same 15 lines, the first 8 in the same order.
+* **Instructions.** The Blog per workload within ±0.30% of the registered run, against A/A differences up to 0.24%.
+  Lobsters 0.06% to 0.45% lower outside (A/A up to 0.39%), comment preview 0.82% lower; its top 15 lines by
+  instructions are the same 15, the first 10 in the same order.
+* **The rounds themselves.** `rank` and `compare --detail` print byte-identical output from this tree and from the
+  previous commit on both apps' receipts. A Blog A/A pair run by the previous commit's harness and one run by this
+  tree's have the same receipt keys, workload names and SQL digests, and median +0.0 between them.
+
+The default without a file found the Blog's five pages (`/`, `/articles`, `/articles/new`, edit and show) and
+skipped Turbo's three `*_historical_location` routes as a gem's controller. Refusals were checked with a
+`DATABASE_URL` set, a missing directory, a non-Rails directory, an initializer that needs a secret, PostgreSQL in
+production without `pg` in the bundle, and (on constructed configurations) PostgreSQL, Redis and MySQL not
+running.
+
+### Registering an app
+
+For the rounds we run ourselves, an app is registered in this repository instead.
 
 **Requirements.** Git, network access, [mise](https://mise.jdx.dev) (the script runs under `mise exec --` or any Ruby on `PATH`;
 it measures on Ruby 4.0.9 by default, installed on demand, and `--ruby` picks another), the app's own build tools

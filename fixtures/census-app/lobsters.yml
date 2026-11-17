@@ -1,0 +1,49 @@
+# Lobsters' census workloads as a user would describe them: a signed-in
+# member reading and writing. The ERB resets census state and picks records.
+<%
+  user = User.active.where(is_moderator: false).order(:id).first!
+  Comment.where("comment LIKE 'Census comment%'").find_each { |cm| Vote.where(comment_id: cm.id).delete_all; cm.delete }
+  user.update!(password: "census-password", password_confirmation: "census-password")
+  stories = Story.where(is_deleted: false, merged_story_id: nil).where.not(user_id: user.id).order(:id)
+  shown, target, voted = stories.first(3)
+  tag = shown.tags.first!
+%>
+sign_in:
+  path: /login
+  params: { email: <%= user.email.to_json %>, password: census-password }
+  expect: 302
+csrf_from: /
+requests:
+  - { name: GET home, path: / }
+  - { name: GET active, path: /active }
+  - { name: GET story, path: "/s/<%= shown.short_id %>/<%= shown.title_as_slug %>" }
+  - { name: GET tag, path: "/t/<%= tag.tag %>" }
+  - { name: GET hottest.json, path: /hottest.json }
+  - { name: GET story.json, path: "/s/<%= shown.short_id %>.json" }
+  - name: POST story vote toggle
+    method: post
+    xhr: true
+    expect: 200
+    alternate:
+      - path: "/stories/<%= voted.short_id %>/upvote"
+      - path: "/stories/<%= voted.short_id %>/unvote"
+  - name: POST comment preview
+    method: post
+    path: /comments
+    xhr: true
+    expect: 200
+    params: { story_id: "<%= target.short_id %>", comment: Census preview, preview: "1" }
+  - name: POST comment (XHR)
+    method: post
+    path: /comments
+    xhr: true
+    expect: 200
+    jobs: true
+    params: { story_id: "<%= target.short_id %>", comment: "Census comment %{n}" }
+skip_jobs: [CachePageJob]
+setup: |
+  reply = Comment.where(story_id: <%= target.id %>).order(:id).last!
+  recipient = User.find(<%= target.user_id %>)
+mailers:
+  - name: deliver EmailReplyMailer#reply
+    ruby: EmailReplyMailer.reply(reply, recipient)

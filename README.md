@@ -82,8 +82,27 @@ mise exec -- script/census compare --base base2 --aa base     # the A/A noise fl
 ```
 
 Omit `--apps` for every app. To measure a Rails branch, run it under a new
-label with `--rails OWNER/REPO@BRANCH` and compare it against `base2`. To add
-your own app, see [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app).
+label with `--rails OWNER/REPO@BRANCH` and compare it against `base2`.
+
+### On your own app
+
+`script/census app` runs the same census on any Rails app checkout and writes
+one report of where its requests, jobs and mails allocate objects and spend
+instructions in Rails, Ruby and gems, with the A/A noise floor and the known
+PRs and ledger entries for each top line. Your checkout is only read; the
+census works on a copy with its own throwaway databases:
+
+```sh
+mise exec -- script/census app ~/src/myapp                          # GET pages found from the routes
+mise exec -- script/census app ~/src/myapp --workloads census.yml   # requests, jobs and mails you describe
+mise exec -- script/census app ~/src/myapp --rails main             # also on Rails main, for an upgrade
+```
+
+It measures on the app's own Rails and Ruby in production mode, and refuses
+what it cannot run safely (a `DATABASE_URL` in the environment, services that
+are not running, an app that does not boot in production). The counts are
+work, not timings. See [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app).
+
 Each report under [docs/upstream/](docs/upstream/) lists its pins and commands;
 receipts of published rounds are in [docs/upstream/data/](docs/upstream/data/).
 

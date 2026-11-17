@@ -1,0 +1,40 @@
+# The Blog's census workloads, described as a user would. ERB runs inside the
+# booted app before the workloads, so it can look records up and reset state.
+<%
+  article = Article.order(:id).first!
+  target = Article.order(:id).last!
+  Comment.where(commenter: "Census").delete_all
+  Article.where(title: ["Census title A", "Census title B"]).where.not(id: article.id).delete_all
+%>
+csrf_from: /articles/new
+requests:
+  - { name: GET articles, path: /articles }
+  - { name: GET article, path: /articles/<%= article.id %> }
+  - { name: GET article edit, path: /articles/<%= article.id %>/edit }
+  - { name: GET articles.json, path: /articles.json }
+  - { name: GET article.json, path: /articles/<%= article.id %>.json }
+  - name: PATCH article (redirect)
+    method: patch
+    path: /articles/<%= article.id %>
+    expect: 303
+    jobs: true
+    alternate:
+      - params: { article: { title: Census title A, body: <%= article.body.to_json %> } }
+      - params: { article: { title: Census title B, body: <%= article.body.to_json %> } }
+  - name: POST article invalid (422)
+    method: post
+    path: /articles
+    params: { article: { title: "", body: short } }
+    expect: 422
+  - name: POST comment (redirect)
+    method: post
+    path: /articles/<%= target.id %>/comments
+    params: { comment: { commenter: Census, body: A census comment } }
+    expect: 302
+  - name: PATCH article.json
+    method: patch
+    path: /articles/<%= article.id %>.json
+    expect: 200
+    alternate:
+      - json: { article: { title: Census title A, body: <%= article.body.to_json %> } }
+      - json: { article: { title: Census title B, body: <%= article.body.to_json %> } }
