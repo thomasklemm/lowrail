@@ -23,8 +23,7 @@ These were submitted before the policy. Each has a full record in [contributions
 
 ### `super` in a block rebound with `instance_exec` skips the receiver check
 
-**Parked 2026-11-10 by Thomas; pick up from 2026-11-17.** Not filed. Target: an issue on
-[bugs.ruby-lang.org](https://bugs.ruby-lang.org/) (Ruby's Redmine), not GitHub; a fix PR on ruby/ruby can follow.
+**Filed 2026-11-17 as [Shopify/ruby#1131](https://github.com/Shopify/ruby/issues/1131)** (Thomas's approved task of 2026-11-14, the draft below with the recheck added). Rechecked first on the ruby/ruby-dev-builder ruby-head of 2026-11-16 (`3eb1f25fc5`): the interpreter and `--zjit` print `:type_error`, `--yjit` and `--yjit --yjit-call-threshold=1` print `:base`. No duplicate found in Shopify/ruby issues. Parked 2026-11-10 by Thomas; a fix PR on ruby/ruby can follow.
 Found during the 2026-11-10 recheck of [#19487](https://github.com/ruby/ruby/pull/19487)
 ([record](contributions.md)). It is not caused by #19487, and that PR's `4f8f7fe7e7` keeps it out of the new
 Class/Module exemption.
