@@ -9,6 +9,7 @@
 #   script/pr-queue open ID [--draft]
 #   script/pr-queue ready ID       mark a draft ready for review (rails/rails: at most 15 non-draft)
 #   script/pr-queue sync           pull draft/ready/merged/closed states from GitHub
+#   script/pr-queue rebase ID [--push]  rebuild a branch with only CHANGELOG conflicts on its base; --push force-pushes
 
 require "date"
 require "json"
@@ -31,6 +32,12 @@ module PrQueue
   # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt. ruby/ruby opens only items Thomas names (DECISIONS).
   CAPS = { "rails/rails" => { open: 22, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
+  # /opt/git adds an Amp-Thread-ID trailer to commits and breaks `cat-file commit`.
+  GIT = File.executable?("/usr/bin/git") ? "/usr/bin/git" : "git"
+  THOMAS = { "NAME" => "Thomas Klemm", "EMAIL" => "github@tklemm.eu" }.freeze
+  CHANGELOGS = ":(glob)**/CHANGELOG*"
+  NOT_CHANGELOGS = ":(exclude,glob)**/CHANGELOG*"
+  LEDGER = File.join(ROOT, "docs/upstream/contributions.md")
 
   Item = Struct.new(:path, :meta, :title, :body) do
     def id = meta["id"]
@@ -112,7 +119,7 @@ module PrQueue
   def set(item, key, value)
     text = File.read(item.path)
     raise "#{item.id}: no #{key}: line" unless text.match?(/^#{key}:/)
-    File.write(item.path, text.sub(/^#{key}:.*$/, "#{key}: #{value}"))
+    File.write(item.path, text.sub(/^#{key}:.*$/) { "#{key}: #{value}" })
     item.meta[key] = value
   end
 
@@ -160,7 +167,7 @@ module PrQueue
   # fork head and the diff_facts against the current base.
   def facts(list)
     list.select { _1["branch"] }.group_by { _1["repo"] }.flat_map do |repo, group|
-      dir = File.join(CACHE, "#{repo.tr('/', '-')}.git")
+      dir = cache(repo)
       unless Dir.exist?(dir)
         _, err = run("git", "clone", "--quiet", "--bare", "--filter=blob:none", "https://github.com/#{repo}", dir)
         next group.map { [_1.id, { error: "clone: #{err}" }] } if err
@@ -199,6 +206,8 @@ module PrQueue
       base_commits: err ? nil : count.to_i, base_files: touched }
   end
 
+  def cache(repo) = File.join(CACHE, "#{repo.tr('/', '-')}.git")
+
   def changelog_only?(fact) = fact[:conflicts].any? && fact[:conflicts].all? { File.basename(_1).start_with?("CHANGELOG") }
 
   def merge_label(fact, mergeable)
@@ -233,15 +242,16 @@ module PrQueue
     lines = fact&.[](:lines)
     gaps = item["head"] ? missing(item.meta, lines) : []
     moved = fact&.[](:fork_head) && item["head"] && !same_sha?(fact[:fork_head], item["head"])
+    conflict = if fact && fact[:clean] == false
+                 changelog_only?(fact) ? "script/pr-queue rebase #{item.id}: only CHANGELOG conflicts" : "rebase by hand: conflicts with #{item['base'] || 'main'}"
+               end
     case item["state"]
     when "merged", "closed", "superseded" then "-"
     when "held" then "held: #{item['note']}"
-    when "ready" then "awaiting maintainers"
+    when "ready" then conflict || "awaiting maintainers"
     else
       return "fork moved to #{fact[:fork_head][0, 10]}: update head, review again" if moved
-      if fact && fact[:clean] == false
-        return "rebase: #{changelog_only?(fact) ? 'only CHANGELOG conflicts' : 'conflicts'} with #{item['base'] || 'main'}"
-      end
+      return conflict if conflict
       return "review: #{gaps.join(', ')} on this head" unless gaps.empty?
       return "push the branch to #{item.fork}" if fact && !fact[:fork_head]
       { "built" => "review", "in-review" => "set state: reviewed", "reviewed" => deps_problem(item, by_id) || "open",
@@ -255,13 +265,16 @@ module PrQueue
     by_id = list.to_h { [_1.id, _1] }
     live = facts(list.reject { %w[merged closed superseded].include?(_1["state"]) })
     mergeable = {}
+    open_prs = {}
     list.map { _1["repo"] }.uniq.sort.each do |repo|
       prs = our_open_prs(repo)
       prs.each { mergeable[[repo, _1[:number]]] = _1[:mergeable] }
+      prs.each { open_prs[[repo, _1[:number]]] = _1 }
       puts "#{repo}: #{prs.size} open, #{prs.count { !_1[:draft] }} non-draft; " \
            "room: #{room(repo, prs) || 'yes'}#{", ready: #{room(repo, prs, ready: true) || 'yes'}" if repo == 'rails/rails'}"
     end
     puts
+    stale = github_drift(list, open_prs)
     rows = list.sort_by { [STATES.index(_1["state"]) || 99, _1["repo"], _1["rank"] || 999, _1.id] }.map do |item|
       fact = live[item.id]
       head = item["head"].to_s[0, 10]
@@ -272,7 +285,7 @@ module PrQueue
       moved = fact&.key?(:base_commits) ? (fact[:base_commits]&.to_s || "?") : ""
       [item["state"], item["rank"].to_s, item.id, item["repo"], item["pr"].to_s, head, fork,
        fact&.[](:lines).to_s, merge_label(fact, mergeable[[item["repo"], item["pr"]]]), moved, passes,
-       next_step(item, fact, by_id)]
+       stale[item.id] || next_step(item, fact, by_id)]
     end
     header = %w[STATE RANK ID REPO PR HEAD FORK LINES MERGE BASE-MOVED PASSES-ON-HEAD NEXT]
     widths = header.each_index.map { |i| ([header] + rows).map { _1[i].size }.max }
@@ -280,6 +293,30 @@ module PrQueue
     drift = live.select { |_, fact| fact[:base_commits].to_i.positive? }
     puts "\nBase commits since built_on on the PR's files:" unless drift.empty?
     drift.sort.each { |id, fact| puts "  #{id}: #{fact[:base_commits]} on #{fact[:base_files].join(', ')}" }
+    puts "\nOut of date with GitHub or the ledger:" unless stale.empty?
+    stale.each { |id, problem| puts "  #{id}: #{problem}" }
+  end
+
+  # Items whose state disagrees with our open PRs on GitHub (fixed by sync), and merged items missing from the
+  # Merged section of the contributions ledger, which is kept by hand.
+  def github_drift(list, open_prs)
+    merged_section = File.read(LEDGER)[/^## Merged\n.*?(?=^## )/m].to_s.downcase
+    list.select { _1["pr"] }.sort_by(&:id).filter_map do |item|
+      pr = open_prs[[item["repo"], item["pr"]]]
+      problem = case item["state"]
+                when "draft", "ready"
+                  if !pr then "sync: #{item['state']} here, ##{item['pr']} no longer open on GitHub"
+                  elsif pr[:draft] != (item["state"] == "draft")
+                    "sync: #{item['state']} here, ##{item['pr']} #{pr[:draft] ? 'draft' : 'ready'} on GitHub"
+                  end
+                when "merged", "closed"
+                  if pr then "#{item['state']} here, ##{item['pr']} open on GitHub"
+                  elsif item["state"] == "merged" && !merged_section.include?("github.com/#{item['repo'].downcase}/pull/#{item['pr']})")
+                    "ledger: ##{item['pr']} merged, not under Merged in docs/upstream/contributions.md"
+                  end
+                end
+      [item.id, problem] if problem
+    end.to_h
   end
 
   def candidates
@@ -355,6 +392,144 @@ module PrQueue
       set(item, "state", state)
     end
   end
+
+  def git_in(dir)
+    lambda do |*args, env: {}, input: nil|
+      out, err, st = Open3.capture3(env, GIT, "-C", dir, *args, stdin_data: input.to_s, binmode: true)
+      raise "git #{args.first(2).join(' ')}: #{err.strip}" unless st.success?
+      out
+    end
+  end
+
+  # The block that `after` inserts into `before`, placed into `current` the same way: below the heading it was
+  # under (e.g. "## [Unreleased]") and its blank lines, or at the top of the file. Nil when the change isn't one
+  # inserted block there, or `current` lacks the heading.
+  def place_entry(before, after, current)
+    b, a, c = [before, after, current].map(&:lines)
+    blank = ->(line) { line.nil? || line.strip.empty? }
+    heading = ->(line) { line.nil? || line.start_with?("#") }
+    pre = 0
+    pre += 1 while pre < b.size && b[pre] == a[pre]
+    suf = 0
+    suf += 1 while suf < b.size - pre && b[-1 - suf] == a[-1 - suf]
+    return if pre + suf != b.size || a.size == b.size
+    entry = a[pre...(a.size - suf)]
+    blanks = entry.reverse.take_while(&blank)
+    entry = entry[0, entry.size - blanks.size]
+    under = b[0...pre].reverse.find { !blank.(_1) }
+    at = 0
+    if under
+      return unless heading.(under) && (at = c.index(under))
+      at += 1
+      at += 1 while c[at] && blank.(c[at])
+    end
+    # Blank lines that separated the entry from the next section don't go between it and an entry, and back.
+    gap = if heading.(c[at]) then blanks.empty? ? ["\n"] : blanks
+          elsif heading.(a[a.size - suf]) then []
+          else blanks end
+    (c[0...at] + entry + gap + c[at..]).join
+  end
+
+  # Replays mb..old_head onto base: each commit's diff outside CHANGELOG files, and its CHANGELOG entries on top of
+  # the base's. Keeps each message byte for byte and its author and author date; Thomas commits. A temporary
+  # index in the bare cache, so no checkout is touched.
+  def rebuild(dir, base, old_head)
+    git = git_in(dir)
+    prev = git.("rev-parse", "#{base}^{commit}").strip
+    mb = git.("merge-base", prev, old_head).strip
+    commits = git.("rev-list", "--reverse", "--parents", "#{mb}..#{old_head}").lines.map(&:split)
+    raise "merge commit #{commits.find { _1.size > 2 }[0][0, 10]} in the branch; rebase by hand" if commits.any? { _1.size > 2 }
+    Tempfile.create("pr-queue-index") do |index|
+      env = { "GIT_INDEX_FILE" => index.path }
+      pairs = commits.map do |commit, parent|
+        git.("read-tree", prev, env:)
+        code = git.("diff", "--binary", "--full-index", parent, commit, "--", ".", NOT_CHANGELOGS)
+        begin
+          git.("apply", "--cached", "--binary", env:, input: code) unless code.empty?
+        rescue RuntimeError => e
+          raise "#{commit[0, 10]} doesn't apply on #{base}: rebase by hand (#{e.message})"
+        end
+        git.("diff", "--name-only", parent, commit, "--", CHANGELOGS).split("\n").each do |path|
+          show = ->(rev) { git.("cat-file", "-p", "#{rev}:#{path}") rescue nil }
+          before, after, current = show.(parent), show.(commit), show.(prev)
+          text = before && after && current && place_entry(before, after, current)
+          raise "#{commit[0, 10]}: the #{path} change isn't one entry on top; rebase by hand" unless text
+          blob = git.("hash-object", "-w", "--stdin", input: text).strip
+          mode = git.("ls-tree", commit, "--", path).split.first
+          git.("update-index", "--add", "--cacheinfo", "#{mode},#{blob},#{path}", env:)
+        end
+        tree = git.("write-tree", env:).strip
+        header, message = git.("cat-file", "commit", commit).split("\n\n", 2)
+        name, email, date = header[/^author (.*)$/, 1].match(/\A(.*) <(.*)> (\d+ [+-]\d{4})\z/).captures
+        ident = { "GIT_AUTHOR_NAME" => name, "GIT_AUTHOR_EMAIL" => email, "GIT_AUTHOR_DATE" => "@#{date}",
+                  "GIT_COMMITTER_NAME" => THOMAS["NAME"], "GIT_COMMITTER_EMAIL" => THOMAS["EMAIL"], "GIT_COMMITTER_DATE" => nil }
+        prev = git.("commit-tree", tree, "-p", prev, env: ident, input: message).strip
+        [commit, prev]
+      end
+      [mb, pairs]
+    end
+  end
+
+  # [ok, line] per check of the rebuilt commits against the old ones.
+  def rebase_checks(dir, pairs)
+    git = git_in(dir)
+    changes = lambda do |commit, *paths|
+      git.("diff", "#{commit}^", commit, "--", *paths).lines.grep(/^(diff --git|[+-])/).reject { _1.start_with?("+++", "---") }
+    end
+    raw = ->(commit) { git.("cat-file", "commit", commit).split("\n\n", 2) }
+    pairs.flat_map do |old, new|
+      (old_header, old_message), (new_header, new_message) = raw.(old), raw.(new)
+      committer = new_header[/^committer (.*) <(.*)> /, 0].to_s
+      added = changes.(new, CHANGELOGS)
+      [[changes.(old, ".", NOT_CHANGELOGS) == changes.(new, ".", NOT_CHANGELOGS), "code diff identical (added and removed lines)"],
+       [changes.(old, CHANGELOGS).grep(/^\+./) == added.grep(/^\+./) && added.none? { _1.start_with?("-") },
+        "CHANGELOG: same entry added, nothing removed"],
+       [old_message == new_message, "message byte-identical"],
+       [old_header[/^author .*$/] == new_header[/^author .*$/], "author and author date kept"],
+       [committer == "committer #{THOMAS['NAME']} <#{THOMAS['EMAIL']}> ", "committer #{THOMAS['NAME']}"],
+       [git.("log", "-1", "--format=%(trailers:only)", new).strip.empty?, "no trailers"]]
+        .map { |ok, what| [ok, "#{new[0, 10]} (was #{old[0, 10]}): #{what}"] }
+    end
+  end
+
+  def rebase(id, push:)
+    item = find(id)
+    base = item["base"] || "main"
+    fact = facts([item])[id] || abort("#{id}: no branch")
+    abort "#{id}: #{fact[:error]}" if fact[:error]
+    abort "#{id}: no fork branch #{item.fork}:#{item['branch']}" unless (old = fact[:fork_head])
+    abort "#{id}: fork head #{old[0, 10]} isn't head #{item['head']}; update the item first" unless same_sha?(old, item["head"])
+    abort "#{id}: merges cleanly with #{base}; nothing to rebase (DECISIONS: no force-push without a conflict)" if fact[:clean]
+    abort "#{id}: conflicts outside CHANGELOG files (#{fact[:conflicts].join(', ')}); rebase by hand" unless changelog_only?(fact)
+    dir = cache(item["repo"])
+    git = git_in(dir)
+    onto = git.("rev-parse", "refs/heads/#{base}").strip
+    mb, pairs = begin
+      rebuild(dir, onto, old)
+    rescue RuntimeError => e
+      abort "#{id}: #{e.message}"
+    end
+    new = pairs.last.last
+    git.("update-ref", "refs/rebase/#{id}", new)
+    puts "#{id}: #{pairs.size} commit(s) from #{old[0, 10]} rebuilt on #{base} #{onto[0, 10]}: #{new} (#{dir} refs/rebase/#{id})"
+    puts "\n#{git.('range-diff', '--no-color', "#{mb}..#{old}", "#{onto}..#{new}")}"
+    checks = rebase_checks(dir, pairs)
+    checks.each { |ok, line| puts "#{ok ? 'ok  ' : 'FAIL'} #{line}" }
+    abort "#{id}: checks failed; not pushed" unless checks.all?(&:first)
+    return puts("\nNot pushed, item unchanged. Pushing an open PR needs Thomas's OK (DECISIONS); then rerun with --push.") unless push
+
+    _, err = run(GIT, "-C", dir, "-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential", "push", "--quiet",
+                 "--force-with-lease=refs/heads/#{item['branch']}:#{old}", "https://github.com/#{item.fork}",
+                 "#{new}:refs/heads/#{item['branch']}")
+    abort "#{id}: push failed: #{err}" if err
+    note = "#{Date.today} (CHANGELOG rebase): rebuilt on #{base} #{onto[0, 10]} from #{old[0, 10]} with script/pr-queue " \
+           "rebase; code diff identical, CHANGELOG entry on top of the base's; messages, authors and author dates kept, " \
+           "committer Thomas, no trailers. Force-pushed with a lease on #{old[0, 10]}."
+    set(item, "head", %("#{new}"))
+    set(item, "built_on", %("#{onto}"))
+    set(item, "note", [note, item["note"]].compact.join(" ").to_json)
+    puts "pushed #{new[0, 10]} to #{item.fork}:#{item['branch']}; updated head, built_on and note; commit #{item.path}"
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
@@ -365,6 +540,7 @@ if $PROGRAM_NAME == __FILE__
   when "open" then PrQueue.open_pr(id || abort("open ID [--draft]"), draft: rest == ["--draft"])
   when "ready" then PrQueue.mark_ready(id || abort("ready ID"))
   when "sync" then PrQueue.sync
+  when "rebase" then PrQueue.rebase(id || abort("rebase ID [--push]"), push: rest == ["--push"])
   else abort File.read(__FILE__)[/^#   script.*?(?=\n\n)/m].gsub(/^# ?/, "")
   end
 end

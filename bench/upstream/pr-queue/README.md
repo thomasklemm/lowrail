@@ -10,13 +10,48 @@ script/pr-queue next            the highest-ranked reviewed item whose repo has 
 script/pr-queue open ID --draft opens it (rails/rails only as draft), records pr and state
 script/pr-queue ready ID        marks a draft ready for review; rails/rails: at most 15 non-draft
 script/pr-queue sync            pulls draft/ready/merged/closed from GitHub
+script/pr-queue rebase ID       rebuilds a branch whose only conflicts are CHANGELOG files on the current base
+script/pr-queue rebase ID --push  ... and force-pushes it with a lease on the old head, updating head, built_on, note
 ```
 
-Commit the item files after `open`, `ready` and `sync`. `status` keeps a blobless clone of each upstream repo under
+Commit the item files after `open`, `ready`, `sync` and `rebase --push`, with `script/commit`. `status` keeps a blobless clone of each upstream repo under
 `.lowrail/pr-queue/` (fetched every run) to compare the fork branch with `head` and run `git merge-tree` against
 the current base. MERGE is `clean`, `CHANGELOG-only` (only CHANGELOG files conflict) or `CONFLICT`; `(gh)` marks
 GitHub's view when the fork branch couldn't be fetched. BASE-MOVED counts the base commits since `built_on` (or the
 merge base) that touch the PR's files, listed below the table: an early warning that upstream moved under it.
+An item whose state disagrees with our open PRs on GitHub (a draft or ready item that merged, closed or changed
+draft state; a merged or closed one that is open) shows `sync: …` in NEXT and under "Out of date with GitHub or
+the ledger", as does a merged item missing from the Merged section of
+[contributions.md](../../../docs/upstream/contributions.md), which is kept by hand. Run `sync` and add the ledger
+entry; `status` itself writes nothing.
+
+## Rebasing a CHANGELOG-only conflict
+
+`script/pr-queue rebase ID` does what was done by hand for PR59574 and INR436/437/442 on 2026-11-17. It refuses
+unless the fork branch is at `head` and `git merge-tree` against the current base conflicts only in CHANGELOG
+files. In the bare cache with a temporary index (no checkout touched), it replays each commit of the branch onto
+the base: the commit's diff outside CHANGELOG files applied unchanged, and the entry it added to a CHANGELOG put on
+top of the base's file, under the same heading it was under (`## [Unreleased]`) or at the top (Rails). The message
+stays byte for byte, the author and author date stay, Thomas commits, nothing adds a trailer. It refuses when a
+code diff doesn't apply, the branch has a merge, or a CHANGELOG change isn't one entry inserted on top; rebase
+those by hand.
+
+It leaves the result at `refs/rebase/ID` in `.lowrail/pr-queue/<repo>.git`, prints the range-diff against the old
+head and these checks per commit: code diff identical (added and removed lines), same CHANGELOG entry and nothing
+removed, message byte-identical, author and author date kept, committer Thomas, no trailers. It pushes only with
+`--push`, and never when a check fails. Pushing an open PR still needs Thomas's OK
+([DECISIONS](../../../docs/DECISIONS.md#working-mode)), so run it without `--push` first, show him the range-diff,
+and run the repo's tests on `refs/rebase/ID` if the base moved code the PR touches (BASE-MOVED). `--push` rebuilds
+(same trees, a new committer date), force-pushes with `--force-with-lease` on the old head, prepends a dated
+entry to `note` and sets `head` and `built_on`; the new head has no passes yet.
+
+## Commits without trailers
+
+`script/commit -F MSGFILE` (or `-m MESSAGE`, `--amend` to replace HEAD and keep its author date) commits the staged
+index as Thomas Klemm for author and committer through `/usr/bin/git commit-tree`, so Amp adds no Amp-Thread-ID
+trailer. It works in Lowrail and in upstream checkouts (run it from there), and checks the new commit before HEAD
+moves: author and committer, the message byte for byte, empty `%(trailers:only)`, and in Lowrail no `owner/repo#N`
+or issue or PR URL in the message.
 
 ## Item file
 
