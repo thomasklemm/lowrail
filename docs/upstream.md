@@ -16,6 +16,13 @@ PRs) and [second round 2026-11-17](upstream/pr-retrospective-2026-11-17.md) (105
 | `SchemaContext::Attributes#builder` builds a new `AttributeSet::Builder` and a primary-key defaults subset on every `attributes_builder` call (about 4 objects per loaded row) | Campfire `Message` load-only: 60.8 → 37.2 µs at 20 rows with a guarded per-model variant (`+ar_instantiate`) | Rails main at e3d5c569 (Campfire's pin) | none needed | **already fixed upstream**: [rails/rails@f126797d45](https://github.com/rails/rails/commit/f126797d45) (2026-10-15) builds the builder once. Campfire's pin predates it; the pass's alpha gain will disappear on current main |
 | `MessagesHelper#message_fragment_cache_key` serializes live message/room/creator/body/boost dependencies and SHA-256 hashes them during collection cache-key construction | **14.08%** of uncached-room request raw-stack weight allocated exclusively to this helper's subtree (Lowrail absent, production Ruby 4.0.7 +YJIT, StackProf wall, 1,000 requests; response cache off, fragment caches warm). Cost share, not intrinsic self time or removable saving | **Campfire app code**, corpus pin, not an Action View/I18n defect | Investigation only: preserve content-based detection of foreign SQL edits and attachment/direct-room boundaries; timestamp-only memoization is not equivalent | Recorded privately in [the ERB profile](passes/erb.md); **no app change, pass, issue or PR**. No publication or speed claim |
 
+## Leads outside rails/rails (2026-11-17)
+
+[Leads outside rails/rails](upstream/outside-rails-leads.md) ranks request costs in gems whose repos have room,
+with Ruby's default gems counted on their own: rack decoding and escaping through `cgi/escape` (RK3, RK4; −0.6% to
+−5.2% per request with a query, form or cookie), nokogiri's per-call CSS translation (NK2), graphql-ruby's held GQ1
+and ruby/uri underneath (UR1, parked). Nothing built or opened.
+
 ## General Rails hotspot audit (2026-10-21)
 
 Compared the [hotspot map](passes/hotspots.md), [allocation census](passes/allocations.md),

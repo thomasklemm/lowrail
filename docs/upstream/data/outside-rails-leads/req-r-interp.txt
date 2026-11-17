@@ -1,0 +1,34 @@
+blog GET article interp none.rb Ir/op 8354242 objs/op 2026.4
+blog GET article interp none.rb Ir/op 8340235 objs/op 2025.3
+blog GET article interp rack_both.rb Ir/op 8216129 objs/op 1963.8
+blog PATCH article (redirect) interp none.rb Ir/op 4714026 objs/op 1437.4
+blog PATCH article (redirect) interp none.rb Ir/op 4714190 objs/op 1438.4
+blog PATCH article (redirect) interp rack_both.rb Ir/op 4468803 objs/op 1294.8
+blog POST comment (redirect) interp none.rb Ir/op 7089548 objs/op 1905.2
+blog POST comment (redirect) interp none.rb Ir/op 7064743 objs/op 1904.2
+blog POST comment (redirect) interp rack_both.rb Ir/op 6905903 objs/op 1805.4
+blog GET articles.json interp none.rb Ir/op 4248075 objs/op 1130.8
+blog GET articles.json interp none.rb Ir/op 4249224 objs/op 1130.8
+blog GET articles.json interp rack_both.rb Ir/op 4247653 objs/op 1130.8
+pingcrm GET contacts interp none.rb Ir/op 13855462 objs/op 3354.0
+pingcrm GET contacts interp none.rb Ir/op 13846391 objs/op 3349.2
+pingcrm GET contacts interp rack_both.rb Ir/op 13660819 objs/op 3257.8
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 7127324 objs/op 1833.0
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 7110092 objs/op 1824.2
+pingcrm PUT contact (Inertia redirect) interp rack_both.rb Ir/op 6884065 objs/op 1722.6
+pingcrm GET contacts (Inertia JSON) interp none.rb Ir/op 12495956 objs/op 3095.5
+pingcrm GET contacts (Inertia JSON) interp none.rb Ir/op 12494863 objs/op 3097.6
+pingcrm GET contacts (Inertia JSON) interp rack_both.rb Ir/op 12297481 objs/op 3000.6
+codetriage GET repo interp none.rb Ir/op 14909342 objs/op 3271.6
+codetriage GET repo interp none.rb Ir/op 14905921 objs/op 3264.8
+codetriage GET repo interp rack_both.rb Ir/op 14751417 objs/op 3200.8
+codetriage PATCH repo subscription (redirect) interp none.rb Ir/op 14325388 objs/op 2594.7
+codetriage PATCH repo subscription (redirect) interp none.rb Ir/op 14335352 objs/op 2596.7
+codetriage PATCH repo subscription (redirect) interp rack_both.rb Ir/op 14168533 objs/op 2503.6
+campfire GET room interp none.rb Ir/op 158117399 objs/op 35521.0
+campfire GET room interp none.rb Ir/op 14276366 objs/op 5668.8
+campfire GET room interp rack_both.rb Ir/op 24929357 objs/op 7717.4
+writebook GET book interp none.rb Ir/op 28520722 objs/op 5716.0
+writebook GET book interp none.rb Ir/op 28531562 objs/op 5718.2
+writebook GET book interp rack_both.rb Ir/op 28355569 objs/op 5631.4
+writebook POST search interp none.rb Ir/op 18463870 objs/op 4606.6

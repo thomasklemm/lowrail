@@ -1,0 +1,4 @@
+yjit URI.encode_www_form_component(COOKIE)         65936
+yjit alt_escape(COOKIE)                            9105
+yjit URI.encode_www_form_component("hello")        4786
+yjit alt_escape("hello")                           3276

@@ -1,0 +1,2 @@
+campfire|POST message (turbo_stream)
+writebook|PATCH page (turbo_stream)

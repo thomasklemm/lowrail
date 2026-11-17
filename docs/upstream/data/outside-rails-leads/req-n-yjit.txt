@@ -1,0 +1,2 @@
+campfire POST message (turbo_stream) yjit none.rb Ir/op 26634176 objs/op 11011.1
+campfire POST message (turbo_stream) yjit none.rb Ir/op 26698015 objs/op 11020.2

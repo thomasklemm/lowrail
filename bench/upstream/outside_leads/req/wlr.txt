@@ -1,0 +1,12 @@
+blog|GET article
+blog|PATCH article (redirect)
+blog|POST comment (redirect)
+blog|GET articles.json
+pingcrm|GET contacts
+pingcrm|PUT contact (Inertia redirect)
+pingcrm|GET contacts (Inertia JSON)
+codetriage|GET repo
+codetriage|PATCH repo subscription (redirect)
+campfire|GET room
+writebook|GET book
+writebook|POST search

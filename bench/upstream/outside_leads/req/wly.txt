@@ -1,0 +1,4 @@
+blog|PATCH article (redirect)
+blog|GET article
+pingcrm|PUT contact (Inertia redirect)
+codetriage|GET repo

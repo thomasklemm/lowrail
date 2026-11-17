@@ -1,0 +1,3 @@
+pingcrm GET contacts interp none.rb Ir/op 13862084 objs/op 3360.0
+pingcrm GET contacts interp cancan_bound.rb Ir/op 13811521 objs/op 3339.0
+pingcrm GET contacts yjit none.rb Ir/op 7757724 objs/op 3368.8
