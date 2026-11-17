@@ -1,39 +1,144 @@
-# ZJIT shortlist: where we can help (2026-11-03)
+# ZJIT shortlist: where we can help (2026-11-17)
 
-Triage of the 102 open "ZJIT" issues on Shopify/ruby, the tracking issues (#1021, #1030, #1039, #995, #1074)
-and open ZJIT PRs on ruby/ruby. Claim status comes from assignees and comments only.
+Refresh of the 2026-11-03 triage on ruby/ruby master `7919a47d46` (2026-11-17 22:17 UTC): 135 open Shopify/ruby
+issues (the ZJIT ones read for assignees and comments), the 71 open ruby/ruby PRs with "ZJIT" in the title, and the
+27 merged since 11-03. Claim status comes from assignees, open PRs and comments only. Nothing was posted upstream.
 
-## What is already owned
+Ranking rule (PR retrospective of 2026-11-17): an item with a stated ask, an issue or comment from a ZJIT maintainer
+or a Rails PR closed with "fix it in the JITs", ranks above an unasked one; each change stays well under ZS1's 672
+lines and uses #19909's evidence format. Nothing opens until ZS1 (ruby/ruby#19912) gets a response.
 
-* All three "good first issue" items are claimed (#1083, #1084, #1086). No issue carries "help wanted" or "easy".
-* k0kubun's lobsters burndown (#1039) is an 83-row list of his own `zjit-lobsters7` commits. Polymorphic and
-  megamorphic sends, ivar shape tables and yield dispatch (rows 5–10, 24–27, 35, 38, 52–56, 77–78) collide with it.
-* Correctness bugs #970, #976, #988 (XrXr #18960), #1092 (nozomemein #19607), #1032 (k0kubun branch) are owned.
-* Big projects (#1021): stack maps, adaptive compilation, minimize SSA, global load-store, inline frames,
-  exceptions, perf comments: all owned.
+## What changed since 11-03
 
-## Shortlist, ranked
+* **Did not move:** tekknolagi's `send(:sym)` ruby/ruby#19583 (draft, last update 11-03) and k0kubun's
+  ruby/ruby#19617 (recompile invalidated final versions, last update 11-03). `Kernel#dup` in Ruby
+  ([zjit-cfunc-paths](zjit-cfunc-paths.md#kerneldup-in-ruby-tekknolagis-question)) stays blocked on both, and the
+  #1058 attempt stays withdrawn.
+* **Merged and relevant to our leads:** tekknolagi's ruby/ruby#19858 profiles only the shape for
+  `getinstancevariable`, so singleton receivers are no longer "other" there. railsbench's
+  `getivar_fallback_no_side_exits` is now 0 (lead 15b is done for reads; lobsters 148,534 and shipit 326,606 per
+  iteration remain, lead 15a/15c). XrXr's stack maps (ruby/ruby#18960) made `iseq_may_write_block_code()` a large
+  compile-time cost again (below). Our ZNE1 (#19909) merged 11-16.
+* **New issues from the team, all unassigned:** #1106 `String#dup`, #1107 fold `IsMethodCFunc` to false, #1110
+  locals after last use, #1113 shared arrays in `Array#[]=` (tenderlove's ruby/ruby#19863, approved), #1119 Valgrind
+  translations, #1120 no-singleton assumptions (design), #1122 profile the real class for `setinstancevariable`,
+  #1124 validator and dead code (bug), #1129 fold `IsBitEqual` on disjoint types, #1130 hoist stack-overflow checks
+  of inlined frames, #1103 compressed profiles (efegokdemir's ruby/ruby#19791 open), #1104 precise caches, #1127
+  `Proc#call` with keywords (nozomemein's ruby/ruby#19901 open).
+* **Ours, open, no response:** ZS1 #19912 (since 11-15), #19659 and #19681 (last activity 11-15).
+* **#1064 came back.** tenderlove opened ruby/ruby#19962 today: since stack maps, his 4,000-call method spends
+  5.6 s in LIR instead of 1.4 s, and he caches the scan in the ISEQ's params bits. XrXr asked for another place for
+  the bit, k0kubun pointed to `IseqPayload` "like #19680 did", and tekknolagi asked: "Perhaps we should re-open the
+  other one now that this is a bigger compile time sink?" #1064 is still assigned to us.
+* **efegokdemir** opens ZJIT PRs against Shopify/ruby for many fresh issues (#1111 protected calls, #1117, #1126 for
+  #1122, …); tekknolagi closed them asking for ruby/ruby PRs. He may refile any of them on ruby/ruby.
 
-| # | Issue | What | Size | Rails relevance | Bet |
+## Rails relevance, master `7919a47d46`
+
+ZJIT stats per iteration, ruby-bench `73918b2` with `reaping_frequency: 0`, 15 warmup and 10 measured iterations,
+`--zjit-exec-mem-size=512 --zjit-mem-size=1024`, `RUBY_GC_HEAP_INIT_BYTES=32 MiB`, no out-of-memory compile errors
+(railsbench / lobsters / shipit):
+
+| counter | railsbench | lobsters | shipit |
+| --- | ---: | ---: | ---: |
+| dynamic sends | 1,075,941 | 775,453 | 1,835,621 |
+| `send_polymorphic_fallback` (lead 3) | 30,483 | 272,334 | 774,234 |
+| `send_megamorphic` | 189,766 | 108,239 | 123,483 |
+| `getivar_fallback_no_side_exits` (15a/15c) | 0 | 148,534 | 326,606 |
+| `setivar_fallback_no_side_exits` | 30 | 5,951 | 41,002 |
+| `ccall_Kernel#dup` | 60,215 | 19,223 | 49,533 |
+| `ccall_String#dup` | 25,218 | 4,243 | 5,663 |
+
+railsbench's top megamorphic sites are Rails' `extend`ed logger (`Logger#level` 51,922, `local_level` 25,961,
+`debug?`, `info?`): the singleton receivers count as "other" in the send profile, which is #1120's design question,
+not a free fix. shipit's 41,002 generic ivar writes are `Relation#reset` and `#initialize` in final versions, not
+singleton receivers.
+
+## Ranked
+
+| # | item | ask | Rails relevance | owner | state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | [#1091](https://github.com/Shopify/ruby/issues/1091) | Integer/Module `to_s` in objtostring (cruby_methods pattern of #19587) | S–M | medium: allocation parity, −0.10% / −0.22% objects on lobsters / shipit ([Z5](zjit-objtostring.md)) | Z5: claimed with a data comment 2026-11-03 |
-| 2 | [#1059](https://github.com/Shopify/ruby/issues/1059) | `String#match?` via Ruby builtin (nirvdrum's TruffleRuby design) | M | low: ≤ 0.05% Ir, Onigmo dominates ([Z7](zjit-cfunc-paths.md)) | Z7: not taken |
-| 3 | [#1058](https://github.com/Shopify/ruby/issues/1058) | `Kernel#dup` beyond immediates | M | high: −0.50% to −0.90% Ir in a prototype ([Z7](zjit-cfunc-paths.md)) | Z7: claimed 2026-11-03; tekknolagi asked for a Ruby-level design, measured in [zjit-cfunc-paths](zjit-cfunc-paths.md#kerneldup-in-ruby-tekknolagis-question) |
-| 4 | [#1065](https://github.com/Shopify/ruby/issues/1065)/[#1075](https://github.com/Shopify/ruby/issues/1075) | quadratic `handle_caller_saved_regs`, stopgap | S–M | compile time of large apps | Z6 |
-| 5 | [#993](https://github.com/Shopify/ruby/issues/993) | InvokeSuper from a block | M | `synchronize { super }`; ask k0kubun first (rows 45–46) | held |
-| 6 | [#1064](https://github.com/Shopify/ruby/issues/1064) | cache `iseq_may_write_block_code` | S | compile time | Z6 |
-| 7 | [#746](https://github.com/Shopify/ruby/issues/746) + #995 | per-ISEQ stats; `IncrCounter` double-counting across optimize passes | S then M | our own counters depend on it | Z8 (L2) |
-| 8 | [#808](https://github.com/Shopify/ruby/issues/808) | `Hash#size`, single-byte `String#length` inline loads | S | low: `Hash#size` ≤ 2,000 calls/itr, already a leaf `CCall` | dropped from Z5 |
-| 9 | [#1049](https://github.com/Shopify/ruby/issues/1049) | FxHash | S | only with compile-time data | Z6 add-on |
-| 10 | [#1042](https://github.com/Shopify/ruby/issues/1042) | less GC work for ProfiledType | M | high (GC per request), but near k0kubun's memdiet rows | data only |
+| 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.64 s → 3.53 s of compile time; app compile time within A/A | ours (assigned), but tenderlove's #19962 is open | **built, ZWB1** |
+| 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration, now a `CCallWithFrame` | free | not built |
+| 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
+| 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue | every inlined call; unmeasured | free | not built |
+| 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
+| 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | free (#1039 row 78 unassigned) | old build, not rebased |
+| 7 | lead 3 polymorphic recompile (ZL3) | answered on #776, waits for the team | largest on lobsters and shipit | ours | held |
+
+Not taken: anything in k0kubun's #1039 rows (yield dispatch, polymorphic and megamorphic sends, ivar shape tables),
+tekknolagi's backend redesign (#1077), #1120 (design), the protected-send PR (closed 11-04, not rebuilt).
+
+## ZWB1: `iseq_may_write_block_code()` on the payload (built)
+
+Branch [`thomasklemm/zjit-cache-may-write-block-code-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code-2)
+@ `82c529aa2e`, one commit on `7919a47d46`, 3 files, +25/−1: the commit of our closed ruby/ruby#19680 rebased
+without conflict. Queue item [ZWB1](../../bench/upstream/pr-queue/items/ZWB1.md).
+
+* **Shape.** k0kubun's #19962 comment asks for `IseqPayload`, which is this. His 11-04 objection to #19680 was
+  permanent memory: the `Option<bool>` fits in padding, `size_of::<IseqPayload>()` is 152 bytes on master and on the
+  branch (gdb on both release builds), and `zjit_alloc_bytes` on the apps stays within the master A/A.
+* **Numbers.** #19962's program, `--zjit-call-threshold=2`: master `compile_time_ns` 11,640,744,647
+  (`compile_lir_time_ns` 11,592,179,366), branch 3,532,881,700 (3,485,295,016). On ruby-bench, 3 iterations, two
+  rounds each, master / master-aa (second build) / branch `compile_time_ns`: railsbench 1.72 1.25 / 1.36 1.27 /
+  1.46 1.38 s, lobsters 4.71 4.37 / 4.26 4.34 / 4.24 4.28 s, shipit 3.56 3.67 / 3.96 3.84 / 3.61 3.56 s. The A/A
+  spread is ±10%, so no app claim; #19680's Callgrind measured −1.2% of compile instructions before stack maps.
+* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,014 of 2,015, the failure is
+  `test_profile_frames_during_direct_jit_to_jit_entry` (SIGPROF not delivered in this orb; fails 2 of 3 times alone
+  on master too); btest at `--zjit-call-threshold=1` and `=2` all 2,148; `test_zjit_cli.rb` and
+  `test_optimization.rb` at both thresholds 143 tests, 0 failures. Differential: generated code is unchanged by
+  construction (same answer, cached).
+* **Decision for Thomas.** tenderlove's #19962 is the active PR on the same issue. Options: reopen #19680 with this
+  head (its branch still holds the old commit, so the fork branch would have to be force-pushed first), offer the
+  branch in a comment on #19962, or leave it to tenderlove. The draft below is for #1064 and also fits #19962.
+
+### Comment draft (not posted)
+
+> Since stack maps, every JITFrame calls `iseq_may_write_block_code()`, so tenderlove's 4,000-call method from
+> ruby/ruby#19962 spends 11.6 s in `compile_lir` on today's master. Keeping the answer in `IseqPayload`, as k0kubun
+> suggested there, brings it to 3.5 s. The `Option<bool>` fits in the payload's padding, so `IseqPayload` stays
+> 152 bytes. The branch is #19680's commit rebased:
+> https://github.com/thomasklemm/ruby/commit/82c529aa2e. Should I reopen #19680 with it, or would you rather finish
+> it in #19962?
+
+## ZSV1: the real class for `setinstancevariable` (built)
+
+Branch [`thomasklemm/zjit-setivar-real-class`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-setivar-real-class)
+@ `fe6ea9ef84`, two commits on `7919a47d46`, 2 files, +106/−1 (production code +21/−1 in `zjit/src/profile.rs`).
+Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
+
+* **What it does.** `setinstancevariable` gets `profile_self_real_class`, which records `rb_obj_class(obj)` instead
+  of the singleton class. The class is used only for shape transitions
+  (`rb_shape_transition_add_ivar_no_warnings`), and the interpreter looks them up with the real class
+  (`obj_get_owner_class()`), so the transition is the one the interpreter makes. The real class is not a singleton
+  class, so `observe_profiled_type` keeps it. `definedivar` is not changed: it uses only the shape and could take
+  #19858's `profile_self_shape`, but it has no Rails reach.
+* **Mechanism.** Two HIR tests: an `extend`ed receiver writing an existing ivar and one adding an ivar. On master
+  both are `SideExit NoProfileSetIvar recompile`; on the branch a shape guard and `StoreField` (and the shape write
+  for the transition).
+* **Numbers.** Micro (`O = C.new.extend(M)`, `def bump = @a = 1`, Callgrind slope over 200,000 calls): master 475,
+  master-aa 475, branch 392 Ir per call; master writes 999,869 of 1,000,000 generically. Apps: lobsters −584 generic
+  writes per iteration, railsbench and shipit unchanged (shipit's 54 moved to `not_t_object`). No time claim.
+* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,015 of 2,016 (the same SIGPROF test); btest at thresholds 1
+  and 2 all 2,148; `test_zjit_cli`, `test_optimization`, `test_shapes`, `test_object`, `test_variable` at both
+  thresholds 323 tests, 0 failures. Differential probe (extended, subclassed, frozen, `instance_variable_set` and
+  >70-shape receivers, class ivars): identical output from the interpreter and from ZJIT at threshold 1, 2 and
+  `--zjit-max-versions=1`, on master and the branch.
+* **Recommendation.** It answers #1122 and is small, but has almost no Rails reach; it is a tidy follow-up to
+  #19858 rather than a performance PR. Before anything is posted, check that efegokdemir hasn't refiled #1126 on
+  ruby/ruby.
+
+### Comment draft for #1122 (not posted)
+
+> `setinstancevariable` uses the profiled class only for the shape transition, and the interpreter takes that from
+> the real class (`obj_get_owner_class()`), so profiling `rb_obj_class(obj)` is enough. With that, a write on an
+> `extend`ed object gets a shape guard instead of `SideExit NoProfileSetIvar`, and once the ISEQ is out of versions,
+> a guarded store instead of a generic write: 475 → 392 instructions per write in a loop. On ruby-bench it only
+> touches lobsters (−584 generic writes per iteration). Branch:
+> https://github.com/thomasklemm/ruby/commit/fe6ea9ef84. OK to open it on ruby/ruby?
 
 ## How we take an item
 
-1. Measure the Rails effect first (census apps, ruby-bench counters, Callgrind with A/A).
-2. Before writing a PR, comment on the issue with that data and say we would like to take it. That comment is
-   the substance; it gives the owner a chance to say "already on my branch". Wait for no objection.
-3. Then build, review (Astra, plus the adversarial Sol round), and open through the queue: at most two new ZJIT
-   PRs open at once. Prefer finishing our open ones (#19483, #19558, #19655, #19659, #19662) over new ones.
-
-Not taken (until 2026-11-03, see DECISIONS "ZJIT ideas are free to take"): anything in k0kubun's #1039 rows, tekknolagi's backend redesign area (#1077), core-semantics changes
-without a ZJIT reviewer's interest.
+1. Measure the Rails effect first (ruby-bench counters, Callgrind with A/A), and check for a stated ask.
+2. Comment on the issue with that data before writing a PR, and wait for no objection.
+3. Then review (claude-code plus the adversarial pass) and open through the queue, after ZS1 has a response.
