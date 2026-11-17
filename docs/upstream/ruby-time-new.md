@@ -40,8 +40,13 @@ instant and the fields:
 Integer and string offsets behave identically: `utc_offset_arg` turns both into the same `vtm.utc_offset`. The wrong
 instants all have day 31 in February, April, June, September or November, a negative offset, and a local time that
 is on the next day in UTC. The review's 1,152 of 340,200 used a different grid; the cases are the same kind.
-`Time.new` without a zone (local time) is unaffected: 0 of 2,400 differ from `Time.local` under
-`TZ=America/New_York`, before and after.
+`Time.new` without a zone (local time) also changes, only for a day past the month's end, and now matches
+`Time.local`, which normalizes in `time_arg()` (Bug #15340, 2c652768a8). On master the two disagree near DST changes
+and for years with |year − 1900| > INT_MAX: in 144 to 715 of 82,320 nil-zone cases under each of 14 TZ settings; on
+the head in 0 (claude-code pass). Examples on master: under `TZ=Pacific/Auckland`, `Time.new(2000, 9, 31, 3, 30)` is
+04:30 +1300 (head and `Time.local`: 03:30); Pacific/Chatham 1987-02-29 02:59 gets +1345 instead of +1245;
+Europe/Berlin 1916-04-31 12:00 becomes 13:00; `Time.new(3_000_000_000, 2, 31, 23)` is March 1 under Berlin instead
+of March 2. The earlier "0 of 2,400" under `TZ=America/New_York` sampled no such case.
 
 ## What the documented behaviour is
 
@@ -51,8 +56,8 @@ and mday in `time_arg()` (April 31 → May 1, February 30 → March 2 or 1), and
 the same way (mame's examples in Bug #21301 and Feature #21307). So day 31 of a 30-day month is documented input and
 should mean the same instant whatever the zone. For an offset that is `Time.utc(y, m, d, h, mi, s) - offset`; for a
 zone object it is whatever its `local_to_utc` returns, with fields read as `utc_to_local` of it. Feature #21307
-(a strict constructor) asks whether rolling over is wanted at all. It is still open, and nothing there makes the
-results above intended: the negative-offset result is a month away from any reading of the input.
+(a strict constructor) was accepted as an opt-in `strict: true` keyword, so rolling over stays the default, and
+nothing there makes the results above intended: the negative-offset result is a month away from any reading of the input.
 
 ## Root cause (time.c, `time_init_vtm`)
 
@@ -90,7 +95,7 @@ Branch `thomasklemm/time-new-normalize-mday` on master c2c5ac6d1b, two commits:
 
 Normalizing before the branch is safe: after it `mday` is at most the month's length, so `vtm_add_day` and
 `vtm_day_wraparound` (hour 24) see valid dates. `timegmw`/`timelocalw` already gave the same instant for in-range
-input, and the local path is unchanged (0 of 2,400 differ).
+input. The local path changes only for days past the month's end, where it now agrees with `Time.local`.
 
 Tests: `test_month_mday_normalization_with_negative_utc_offset` in test/ruby/test_time.rb (Integer and string
 offsets, leap and common February, April 31, April 31 24:00, and the string form `"2026-02-31 23:00:00 -05:00"`),
@@ -115,11 +120,12 @@ Not run: the full test-all, hosted CI, and a Thermos pass. Nothing measured for 
 * [Bug #21301](https://bugs.ruby-lang.org/issues/21301) (mame, open): the same field cache with `"UTC"`. The
   candidate fixes are ruby/ruby#13246 (closed by its author unmerged) and ruby/ruby#16469 (khasinski, open,
   approved). Both normalize only in the `"UTC"` branch, so neither fixes the offset or zone-object cases.
-  [Bug #22375](https://bugs.ruby-lang.org/issues/22375) (`Time.new("2026-02-30T00:00:00Z")`) is closed as its
-  duplicate.
+  [Bug #22375](https://bugs.ruby-lang.org/issues/22375) (`Time.new("2026-02-30T00:00:00Z")`) is open; nobu
+  marked it a duplicate of #21301 on 2026-09-23.
 * [Bug #18274](https://bugs.ruby-lang.org/issues/18274) (closed, 1d666ed50f): a different `vtm_add_day` bug (leap
   day with a positive offset).
-* [Feature #21307](https://bugs.ruby-lang.org/issues/21307) (open): a strict constructor; related, not a report.
+* [Feature #21307](https://bugs.ruby-lang.org/issues/21307) (Assigned): a strict constructor, accepted at the dev
+  meeting as a `strict: true` keyword, not implemented yet; related, not a report.
 * Redmine subject searches for `Time.new` and `utc_offset`, and ruby/ruby PR searches for mday and
   normalization, found nothing on the negative-offset instant or on zone objects.
 
@@ -168,8 +174,17 @@ ruby-core reports.
 > t.day   #=> 1
 > ```
 >
-> Both happen on 3.3, 3.4, 4.0 and master. In `time_init_vtm()`, `vtm_add_offset()` calls `vtm_add_day()`, which
-> turns day 31 into 32, stored as 0 in the 5-bit `mday`. The timezone object path caches the fields as given.
+> Without a zone, `Time.new` disagrees with `Time.local` near DST changes, because only `Time.local` normalizes
+> first (Bug #15340):
+>
+> ```ruby
+> ENV["TZ"] = "Pacific/Auckland"
+> Time.new(2000, 9, 31, 3, 30)   #=> 2000-10-01 04:30:00 +1300
+> Time.local(2000, 9, 31, 3, 30) #=> 2000-10-01 03:30:00 +1300
+> ```
+>
+> The first two happen on 3.3, 3.4, 4.0 and master. In `time_init_vtm()`, `vtm_add_offset()` calls `vtm_add_day()`, which
+> turns day 31 into 32, stored as 0 in the 5-bit `mday`. The timezone object path caches the fields as given, and the local path converts before normalizing.
 >
 > Calling `vtm_normalize_month_mday()` from github.com/ruby/ruby/pull/16469 right after `validate_vtm()`, instead
 > of only in the UTC branch, fixes all three cases:
