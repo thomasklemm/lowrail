@@ -263,6 +263,14 @@ question (for example security or exactness) whenever it helps (Thomas, 2026-11-
 `orb`, which must differ from the `orb` of the claude-code pass on the same head and from any other stand-in counted
 with it, so every slot keeps its own reviewer. Sol and Astra passes count as before.
 
+### One detailed review instead of two (Thomas, 2026-11-17)
+
+Thomas: "lieber ein detailliertes review als 2". The claude-code and Opus passes both ran on Opus and duplicated each
+other (FB1 got the same must-fix from both). From now on one thorough claude-code pass on the current head is the
+required review; it covers what the Sol/stand-in slot covered (exactness probe, every body sentence, the commit
+message). Astra on `risky` items and thermos above 200 changed lines stay as before. Passes already recorded keep
+counting.
+
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
 Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:

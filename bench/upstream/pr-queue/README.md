@@ -83,7 +83,7 @@ any state -> held | superseded
 * **built:** branch pushed, body drafted, no pass yet on this head.
 * **in-review:** passes are being run on this head.
 * **reviewed:** every required pass approves on the current `head` (latest pass per reviewer counts), no
-  must-fix. Required: claude-code and Sol (or a stand-in) always, Astra (or a stand-in) when `risky`, thermos when the diff against the base has
+  must-fix. Required: one detailed claude-code pass always ([DECISIONS 2026-11-17](../../../docs/DECISIONS.md#one-detailed-review-instead-of-two-thomas-2026-11-17)), Astra (or a stand-in) when `risky`, thermos when the diff against the base has
   more than 200 changed lines. `open` refuses otherwise.
 * **draft**, **ready**, **merged**, **closed:** the PR's state on GitHub; `sync` keeps them current.
 * **held:** not to open now; `note` says why and what unblocks it. **superseded:** replaced by another item or PR.

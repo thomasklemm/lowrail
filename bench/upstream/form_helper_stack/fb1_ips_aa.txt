@@ -1,0 +1,37 @@
+main r1:           text_field    156.808k (± 5.6%) i/s    (6.38 μs/i) -    786.216k in   5.013872s
+main r1:             checkbox    112.986k (± 5.0%) i/s    (8.85 μs/i) -    574.272k in   5.082679s
+fb1 r1:           text_field    200.289k (± 9.7%) i/s    (4.99 μs/i) -      1.014M in   5.064314s
+fb1 r1:             checkbox    150.222k (± 1.6%) i/s    (6.66 μs/i) -    762.111k in   5.073233s
+main r1:           text_field    206.036k (± 1.7%) i/s    (4.85 μs/i) -      1.040M in   5.048311s
+main r1:             checkbox    146.023k (± 2.2%) i/s    (6.85 μs/i) -    733.500k in   5.023166s
+main r2:           text_field    203.050k (± 2.5%) i/s    (4.92 μs/i) -      1.034M in   5.091418s
+main r2:             checkbox    130.331k (± 9.4%) i/s    (7.67 μs/i) -    663.123k in   5.088003s
+fb1 r2:           text_field    196.282k (± 9.2%) i/s    (5.09 μs/i) -    989.352k in   5.040452s
+fb1 r2:             checkbox    123.705k (± 8.1%) i/s    (8.08 μs/i) -    618.526k in   4.999998s
+main r2:           text_field    172.273k (± 8.5%) i/s    (5.80 μs/i) -    873.494k in   5.070395s
+main r2:             checkbox    114.958k (± 2.3%) i/s    (8.70 μs/i) -    579.216k in   5.038509s
+main r3:           text_field    158.291k (± 2.6%) i/s    (6.32 μs/i) -    799.590k in   5.051386s
+main r3:             checkbox    128.396k (± 8.2%) i/s    (7.79 μs/i) -    650.628k in   5.067352s
+fb1 r3:           text_field    202.620k (± 7.2%) i/s    (4.94 μs/i) -      1.033M in   5.098268s
+fb1 r3:             checkbox    127.388k (±10.1%) i/s    (7.85 μs/i) -    640.752k in   5.029907s
+main r3:           text_field    195.204k (± 6.7%) i/s    (5.12 μs/i) -    996.296k in   5.103883s
+main r3:             checkbox    136.293k (± 9.1%) i/s    (7.34 μs/i) -    693.056k in   5.085053s
+main r4:           text_field    173.039k (± 3.5%) i/s    (5.78 μs/i) -    877.716k in   5.072367s
+main r4:             checkbox    125.529k (± 2.7%) i/s    (7.97 μs/i) -    637.696k in   5.080061s
+fb1 r4:           text_field    218.636k (± 0.9%) i/s    (4.57 μs/i) -      1.102M in   5.041435s
+fb1 r4:             checkbox    129.802k (± 7.6%) i/s    (7.70 μs/i) -    656.266k in   5.055906s
+main r4:           text_field    185.717k (± 5.9%) i/s    (5.38 μs/i) -    935.220k in   5.035734s
+main r4:             checkbox    128.254k (± 4.0%) i/s    (7.80 μs/i) -    649.305k in   5.062656s
+main r5:           text_field    169.610k (± 2.6%) i/s    (5.90 μs/i) -    858.452k in   5.061332s
+main r5:             checkbox    118.202k (± 4.4%) i/s    (8.46 μs/i) -    601.475k in   5.088554s
+fb1 r5:           text_field    183.261k (± 3.3%) i/s    (5.46 μs/i) -    929.500k in   5.071989s
+fb1 r5:             checkbox    130.296k (± 2.7%) i/s    (7.67 μs/i) -    658.200k in   5.051586s
+main r5:           text_field    170.867k (± 3.2%) i/s    (5.85 μs/i) -    870.100k in   5.092262s
+main r5:             checkbox    121.389k (± 3.6%) i/s    (8.24 μs/i) -    614.601k in   5.063084s
+main r6:           text_field    157.233k (± 6.6%) i/s    (6.36 μs/i) -    790.728k in   5.029030s
+main r6:             checkbox    131.673k (± 1.3%) i/s    (7.59 μs/i) -    670.450k in   5.091773s
+fb1 r6:           text_field    215.562k (± 3.4%) i/s    (4.64 μs/i) -      1.079M in   5.006209s
+fb1 r6:             checkbox    141.674k (± 8.5%) i/s    (7.06 μs/i) -    712.272k in   5.027536s
+main r6:           text_field    142.981k (± 9.4%) i/s    (6.99 μs/i) -    724.185k in   5.064919s
+main r6:             checkbox    117.128k (± 8.4%) i/s    (8.54 μs/i) -    592.296k in   5.056847s
+finished

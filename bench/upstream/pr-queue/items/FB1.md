@@ -5,7 +5,7 @@ kind: perf
 area: Action View, form builder ids and names
 reviewer: "Action View maintainers"
 branch: thomasklemm/form-builder-field-names
-head: "870085d5a9"
+head: "a2a13fc793"
 base: main
 built_on: "a5203b3d4d"
 depends_on: []
@@ -16,7 +16,7 @@ rank: 30
 risky: false
 state: draft
 pr: 59824
-note: "2026-11-16 (Thomas: open as a separate draft overnight). Candidates B, C and D of bench/upstream/form_helper_stack. Action View suite green (2,967 + 251 + 177 runs). benchmark-ips YJIT in the body, best rounds, A/A within 1-4%. Only contrived inputs differ (String subclasses overriding gsub/delete_suffix, to_s not returning a String). sanitized_method_name may now return @method_name itself; no in-tree caller mutates it. Needs claude-code and opus/astra passes before ready; rails/rails is at 15/15 non-draft."
+note: "2026-11-17: a2a13fc793 has 870085d5a9's tree; only the commit message changed (date_select and friends don't call field_id, claude-code must-fix), force-pushed with a lease. Body: benchmark-ips replaced by objects per call and the Callgrind line, because wall time didn't reproduce (opus and claude-code must-fix; six rounds with an A/A in bench/upstream/form_helper_stack/fb1_ips_aa.txt). 2026-11-16 (Thomas: open as a separate draft overnight). Candidates B, C and D of bench/upstream/form_helper_stack. Action View suite green (2,967 + 251 + 177 runs). benchmark-ips YJIT in the body, best rounds, A/A within 1-4%. Only contrived inputs differ (String subclasses overriding gsub/delete_suffix, to_s not returning a String). sanitized_method_name may now return @method_name itself; no in-tree caller mutates it. Needs claude-code and opus/astra passes before ready; rails/rails is at 15/15 non-draft."
 passes:
   - {reviewer: skeptic, head: "870085d5a9", date: 2026-11-16, verdict: nits, open: "3,182 name pairs, 231,948 outputs and 390 regex inputs against main: identical apart from overridden String methods and non-String to_s; optional: a commit-message line on the no-op path, a comment that the match? class tracks the gsub class plus _"}
   - {reviewer: opus, orb: "T-01a1e86b-ce01-72c5-bb1c-f3f065ce2863", head: "870085d5a9", date: 2026-11-17, verdict: changes, open: "Code: no must-fix. match? class [^-a-zA-Z0-9:._] is exactly the gsub class plus _ (][ is two non-class chars); differential probe main vs branch, 5,974 lines over 199 inputs (Symbol, String, frozen literal, String subclass, SafeBuffer, binary, US-ASCII, UTF-16LE, invalid UTF-8, brackets, trailing _ and ?, index/namespace/multiple, collection_checkboxes/radio_buttons with nil value, form_with namespace, fields_for index and child arrays): every public output identical in value, class, encoding, frozen and html_safe, 1,835 raising inputs identical. Only private Tags::Base#sanitized_method_name differs: it is now @method_name itself, frozen for Symbol names (the usual case) and a SafeBuffer for SafeBuffer names; the only in-tree caller that keeps the String (collection_helpers sanitize_attribute_name) already dups it, and the html_safe label for stays escaped. No caller in simple_form 5.4.1, formtastic 6.0.0, bootstrap_form 5.6.1, govuk_design_system_formbuilder 6.6.0, client_side_validations 25.0.0, primer_view_components 0.53.5, activeadmin, administrate, avo, trestle, cocoon, nested_form, view_component or phlex-rails; GitHub code search finds only vendored Rails and gems defining their own sanitized_method_name. Objects per call (GC.stat, 1,000 calls, body's ActiveModel Post): text_field 28 -> 22, checkbox 32 -> 26, hidden_field 25 -> 19, select 43 -> 37, nested fields_for text_field 29 -> 26; field_id alone 11 -> 7 (a no-op gsub allocates 2). Branch form helper, form tag, collections, options and form_with tests: 907 runs, 0 failures; clean merge-tree on main 4f00fbc946, no base drift in these files. No added comments. MUST-FIX (body only, keeps head): the benchmark doesn't reproduce here. Body script, YJIT, pinned core, main/branch/main interleaved, best rounds: text_field 176.2k / 190.7k (+8%, A/A 174.0k), checkbox over 8 rounds 131.1k / 136.4k (+4%, A/A 125.9k, inside noise) against the body's +11% and +11%; the body's checkbox before row is +-8.0%, and Lowrail keeps neither its raw output nor an A/A. Rerun with more rounds and an A/A, record both under form_helper_stack, and post numbers that hold (or only text_field plus the object counts). Optional: the commit message's 'Every form builder field' isn't exact (an explicit id: skips field_id); the body's 'A form builder field' is fine."}
@@ -25,7 +25,7 @@ passes:
 
 # Skip copying form field names that need no changes
 
-A form builder field computes its id with `field_id` and its name with `field_name`, and `Tags::Base#sanitized_method_name` strips a trailing `?` from the method name. For the usual names, such as `post` and `title`, none of them changes anything, but each made a copy: `field_id` copied the object name twice and the method name once, `field_name` joined an empty Array into a new String, and `sanitized_method_name` copied the method name.
+Form builder fields such as `text_field` and `checkbox` compute their id with `field_id` and their name with `field_name`, and `Tags::Base#sanitized_method_name` strips a trailing `?` from the method name. For usual names such as `post` and `title`, none of them changes anything, but each made a copy: `field_id` copied the object name twice and the method name once, `field_name` joined an empty Array into a new String, and `sanitized_method_name` copied the method name.
 
 This makes each copy only when there is something to replace. A `_` counts as nothing to replace, because `field_id`'s `gsub` turns it into itself. Ids and names are the same as before.
 
@@ -33,7 +33,6 @@ This makes each copy only when there is something to replace. A `_` counts as no
 require "active_support/all"
 require "active_model"
 require "action_view"
-require "benchmark/ips"
 
 class Post
   include ActiveModel::Model
@@ -45,19 +44,21 @@ end
 view = ActionView::Base.empty
 form = ActionView::Helpers::FormBuilder.new(:post, Post.new(title: "Hello", published: true), view, {})
 
-Benchmark.ips do |x|
-  x.report("text_field") { form.text_field(:title) }
-  x.report("checkbox") { form.checkbox(:published) }
+{ "text_field" => -> { form.text_field(:title) }, "checkbox" => -> { form.checkbox(:published) } }.each do |name, field|
+  field.call
+  before = GC.stat(:total_allocated_objects)
+  1000.times { field.call }
+  puts "#{name}: #{(GC.stat(:total_allocated_objects) - before) / 1000} objects"
 end
 ```
 
 ```
-ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]
 
-before:           text_field    109.453k (± 2.3%) i/s    (9.14 μs/i) -    558.500k in   5.102639s
-before:             checkbox     74.598k (± 8.0%) i/s   (13.41 μs/i) -    378.800k in   5.077869s
-after:            text_field    121.593k (± 2.1%) i/s    (8.22 μs/i) -    608.884k in   5.007572s
-after:              checkbox     82.564k (± 2.8%) i/s   (12.11 μs/i) -    418.808k in   5.072535s
+before: text_field: 28 objects
+before: checkbox: 32 objects
+after:  text_field: 22 objects
+after:  checkbox: 26 objects
 ```
 
-Each field also allocates 6 fewer objects: `text_field` 28 → 22, `checkbox` 32 → 26.
+Under Callgrind, a `text_field` call runs 2.8% fewer instructions in the interpreter and 5.7% fewer with YJIT, and a `checkbox` call 2.3% and 4.8% fewer.

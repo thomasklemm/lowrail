@@ -81,7 +81,7 @@ module PrQueue
   # Unknown diff size (nil) requires thermos, so an unchecked item never looks reviewed.
   # The final review is a separate Claude Code orb's (DECISIONS 4b6ec99); orbs' own skeptic passes stay as records.
   def required(meta, lines)
-    list = %w[claude-code sol]
+    list = %w[claude-code] # one detailed review, DECISIONS 2026-11-17
     list << "astra" if meta["risky"]
     list << "thermos" if lines.nil? || lines > THERMOS_LINES
     list

@@ -249,3 +249,11 @@ gives the same numbers as the prototypes.
 3. O adds a `:nodoc:` method, `TagBuilder#append_tag_options`, and `tag()` stops calling `tag_options`. It goes after
    #59804, which edits the same line.
 4. TB and T2 move a helper-override boundary (`safe_join`, `tag`) for 1 object each. Build them, or keep them parked?
+
+## FB1 (#59824) wall time, 2026-11-17
+
+`fb1_ips.rb` (the first body's benchmark-ips script) under YJIT, Ruby 4.0.7, pinned to one core, six rounds of main,
+branch, main again: raw output in `fb1_ips_aa.txt`. Best of six, branch against main: `text_field` +7.7%, `checkbox`
++14.1%; main against main: +1.5% and +10.9%. Medians: +19.5% / +1.5% against an A/A of +9.5% / −0.1%. The orb's
+wall time doesn't resolve this change, so the body shows objects per call (`fb1_alloc.rb`: 28 → 22, 32 → 26) and the
+Callgrind instruction counts instead.
