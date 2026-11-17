@@ -1,0 +1,25 @@
+am_main r1:       errors[:title]      3.623M (± 3.4%) i/s  (276.03 ns/i) -     18.340M in   5.062469s
+am_main r1:      errors["title"]      3.042M (± 9.1%) i/s  (328.69 ns/i) -     15.490M in   5.091568s
+am1 r1:       errors[:title]     19.207M (± 6.7%) i/s   (52.06 ns/i) -     97.830M in   5.093354s
+am1 r1:      errors["title"]      9.743M (± 5.0%) i/s  (102.64 ns/i) -     49.528M in   5.083648s
+am_main r1:       errors[:title]      4.174M (± 9.2%) i/s  (239.58 ns/i) -     20.925M in   5.013370s
+am_main r1:      errors["title"]      3.561M (± 8.0%) i/s  (280.82 ns/i) -     17.935M in   5.036628s
+am_main r2:       errors[:title]      4.776M (± 1.2%) i/s  (209.37 ns/i) -     24.214M in   5.069759s
+am_main r2:      errors["title"]      3.639M (± 4.8%) i/s  (274.80 ns/i) -     18.541M in   5.095148s
+am1 r2:       errors[:title]     18.933M (±10.0%) i/s   (52.82 ns/i) -     95.088M in   5.022489s
+am1 r2:      errors["title"]      9.753M (± 9.1%) i/s  (102.53 ns/i) -     49.532M in   5.078464s
+am_main r2:       errors[:title]      4.664M (± 0.7%) i/s  (214.40 ns/i) -     23.434M in   5.024416s
+am_main r2:      errors["title"]      3.612M (± 1.3%) i/s  (276.82 ns/i) -     18.192M in   5.035917s
+am_main r3:       errors[:title]      3.991M (±10.4%) i/s  (250.58 ns/i) -     20.392M in   5.109866s
+am_main r3:      errors["title"]      2.935M (± 4.0%) i/s  (340.77 ns/i) -     14.944M in   5.092306s
+am1 r3:       errors[:title]     20.836M (± 8.7%) i/s   (47.99 ns/i) -    104.431M in   5.011934s
+am1 r3:      errors["title"]     11.119M (± 6.3%) i/s   (89.93 ns/i) -     56.347M in   5.067556s
+am_main r3:       errors[:title]      4.701M (± 1.7%) i/s  (212.70 ns/i) -     23.725M in   5.046424s
+am_main r3:      errors["title"]      3.026M (± 5.9%) i/s  (330.52 ns/i) -     15.427M in   5.098966s
+am_main r4:       errors[:title]      3.617M (± 5.8%) i/s  (276.48 ns/i) -     18.297M in   5.058963s
+am_main r4:      errors["title"]      2.969M (± 4.8%) i/s  (336.82 ns/i) -     14.884M in   5.013427s
+am1 r4:       errors[:title]     20.091M (± 6.6%) i/s   (49.77 ns/i) -    101.382M in   5.046192s
+am1 r4:      errors["title"]      8.812M (± 4.0%) i/s  (113.48 ns/i) -     44.384M in   5.036689s
+am_main r4:       errors[:title]      3.801M (±11.4%) i/s  (263.07 ns/i) -     19.268M in   5.068867s
+am_main r4:      errors["title"]      3.000M (± 3.3%) i/s  (333.32 ns/i) -     15.003M in   5.000733s
+finished

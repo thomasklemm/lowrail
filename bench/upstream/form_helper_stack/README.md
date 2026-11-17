@@ -257,3 +257,11 @@ branch, main again: raw output in `fb1_ips_aa.txt`. Best of six, branch against 
 +14.1%; main against main: +1.5% and +10.9%. Medians: +19.5% / +1.5% against an A/A of +9.5% / −0.1%. The orb's
 wall time doesn't resolve this change, so the body shows objects per call (`fb1_alloc.rb`: 28 → 22, 32 → 26) and the
 Callgrind instruction counts instead.
+
+## Decisions, 2026-11-17 (Thomas)
+
+* AM: built and opened as draft rails/rails#59832 (queue item AM1). The invalid-UTF-8 raise from discarded work is a
+  bug, not a contract, so the body doesn't mention it. `am1_ips.rb`, `am1_objs.rb`, raw rounds with an A/A in
+  `am1_ips_aa.txt`.
+* O: kept for later as queue item TO1 (held), after #59804 merges.
+* TB and T2: parked; they are the weakest candidates (1 object each for a moved override boundary).
