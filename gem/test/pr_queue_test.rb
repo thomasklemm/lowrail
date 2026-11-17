@@ -13,12 +13,12 @@ class PrQueueTest < Minitest::Test
 
   def test_only_approving_passes_on_the_current_head_count
     old = [pass("claude-code", "aaaaaaaaaa"), pass("sol", "aaaaaaaaaa")]
-    assert_equal %w[claude-code sol], PrQueue.missing(item(old), 40)
+    assert_equal %w[claude-code], PrQueue.missing(item(old), 40)
 
     current = [pass("claude-code", "bbbbbbbbbb4f1c"), pass("sol", "bbbbbbb", "nits")]
     assert_empty PrQueue.missing(item(old + current), 40)
 
-    assert_equal %w[sol], PrQueue.missing(item(old + current + [pass("sol", "bbbbbbbbbb", "changes")]), 40)
+    assert_equal %w[claude-code], PrQueue.missing(item(old + current + [pass("claude-code", "bbbbbbbbbb", "changes")]), 40)
     assert_equal %w[astra], PrQueue.missing(item(current + [pass("astra", "aaaaaaaaaa")], risky: true), 40)
   end
 
@@ -33,26 +33,24 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes), nil)
   end
 
-  def test_opus_or_fable_from_another_orb_stands_in_for_sol_and_astra
-    claude = pass("claude-code", "bbbbbbbbbb").merge("orb" => "T-a")
-    opus = ->(orb, verdict = "approve", head = "bbbbbbbbbb") { pass("opus", head, verdict).merge("orb" => orb) }
-    fable = pass("fable", "bbbbbbbbbb").merge("orb" => "T-c")
+def test_opus_or_fable_from_another_orb_stands_in_for_astra
+  claude = pass("claude-code", "bbbbbbbbbb").merge("orb" => "T-a")
+  opus = ->(orb, verdict = "approve", head = "bbbbbbbbbb") { pass("opus", head, verdict).merge("orb" => orb) }
+  fable = pass("fable", "bbbbbbbbbb").merge("orb" => "T-c")
+  risky = ->(passes) { PrQueue.missing(item(passes, risky: true), 40) }
 
-    assert_empty PrQueue.missing(item([claude, opus.("T-b")]), 40)
-    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-a")]), 40)
-    assert_equal %w[sol], PrQueue.missing(item([claude, opus.(nil)]), 40)
-    assert_equal %w[sol], PrQueue.missing(item([claude.except("orb"), opus.("T-b")]), 40)
-    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-b", "approve", "aaaaaaaaaa")]), 40)
-    assert_equal %w[sol], PrQueue.missing(item([claude, opus.("T-b"), opus.("T-b", "changes")]), 40)
-    assert_empty PrQueue.missing(item([claude, opus.("T-b", "changes"), opus.("T-b", "nits")]), 40)
-    assert_equal %w[thermos], PrQueue.missing(item([claude, opus.("T-b"), fable]), 201)
-
-    assert_equal %w[astra], PrQueue.missing(item([claude, opus.("T-b")], risky: true), 40)
-    assert_equal %w[astra], PrQueue.missing(item([claude, opus.("T-b"), fable.merge("orb" => "T-b")], risky: true), 40)
-    assert_empty PrQueue.missing(item([claude, opus.("T-b"), fable], risky: true), 40)
-    assert_empty PrQueue.missing(item([claude, pass("sol", "bbbbbbbbbb"), fable.merge("orb" => "T-b")], risky: true), 40)
-    assert_empty PrQueue.missing(item([claude.except("orb"), pass("sol", "bbbbbbbbbb"), pass("astra", "bbbbbbbbbb")], risky: true), 40)
-  end
+  assert_empty PrQueue.missing(item([claude]), 40)
+  assert_empty risky.([claude, opus.("T-b")])
+  assert_equal %w[astra], risky.([claude, opus.("T-a")])
+  assert_equal %w[astra], risky.([claude, opus.(nil)])
+  assert_equal %w[astra], risky.([claude.except("orb"), opus.("T-b")])
+  assert_equal %w[astra], risky.([claude, opus.("T-b", "approve", "aaaaaaaaaa")])
+  assert_equal %w[astra], risky.([claude, opus.("T-b"), opus.("T-b", "changes")])
+  assert_empty risky.([claude, opus.("T-b", "changes"), opus.("T-b", "nits")])
+  assert_empty risky.([claude, fable])
+  assert_equal %w[thermos], PrQueue.missing(item([claude, opus.("T-b"), fable]), 201)
+  assert_empty risky.([claude.except("orb"), pass("astra", "bbbbbbbbbb")])
+end
 
   def test_a_thermos_waiver_counts_only_on_the_current_head_with_a_reason
     passes = [pass("claude-code", "bbbbbbbbbb"), pass("sol", "bbbbbbbbbb")]
@@ -60,7 +58,7 @@ class PrQueueTest < Minitest::Test
     assert_empty PrQueue.missing(item(passes).merge("waived" => [waiver]), 216)
     assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("head" => "aaaaaaaaaa")]), 216)
     assert_equal %w[thermos], PrQueue.missing(item(passes).merge("waived" => [waiver.merge("reason" => "")]), 216)
-    assert_equal %w[sol], PrQueue.missing(item(passes.first(1)).merge("waived" => [waiver.merge("reviewer" => "sol")]), 40)
+    assert_equal %w[astra], PrQueue.missing(item(passes.first(1), risky: true).merge("waived" => [waiver.merge("reviewer" => "astra")]), 40)
   end
 
   def test_diff_facts_name_the_conflicting_files_and_the_base_commits_on_the_pr_files
