@@ -280,3 +280,6 @@ plain and a persisted `Post` (no difference). Raw output in `fb1_ir.txt`.
 | `checkbox`, YJIT | 88,842 | 85,328 | −4.0% | 0.25% |
 
 With GC on (one run each, N = 3,000) the cells move by up to 3 points either way, depending on when a GC lands.
+* AM1 boundary found by its claude-code pass (2026-11-17): with an empty error list, `errors[]` and `messages_for`
+  no longer reach an override of `Errors#where` or `normalize_arguments` (subclass or prepend). GitHub search and 8
+  sampled patchers (openproject, canvas, porta, active_interaction, activeresource, caprese, …) override neither.
