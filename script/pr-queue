@@ -26,6 +26,8 @@ module PrQueue
   KINDS = %w[fix perf docs restore].freeze
   REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
+  # Thermos on Sol (or Opus for crash fixes) is the default review and a thermos review (DECISIONS 2026-11-18).
+  ACCEPTS = { "claude-code" => %w[claude-code thermos-sol thermos-opus], "thermos" => %w[thermos thermos-sol thermos-opus] }.freeze
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
@@ -102,11 +104,11 @@ module PrQueue
     waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
     approves = ->(pass) { VERDICTS.first(2).include?(pass&.fetch("verdict", nil)) }
     latest_per_orb = passes.uniq { [_1["reviewer"], _1["orb"]] }
-    claude_orb = passes.find { _1["reviewer"] == "claude-code" }&.[]("orb").to_s
+    claude_orb = passes.find { ACCEPTS["claude-code"].include?(_1["reviewer"]) }&.[]("orb").to_s
     used = ["", claude_orb]
     required(meta, lines).reject do |who|
       next true if waived.any? { _1["reviewer"] == who }
-      next true if approves.(passes.find { _1["reviewer"] == who })
+      next true if approves.(passes.find { ACCEPTS.fetch(who, [who]).include?(_1["reviewer"]) })
       next false if claude_orb.empty?
       stand_in = latest_per_orb.find do
         STAND_INS.fetch(who, []).include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)

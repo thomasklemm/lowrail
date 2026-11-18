@@ -33,6 +33,13 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes), nil)
   end
 
+  def test_a_thermos_sol_or_opus_pass_is_the_review_and_the_thermos_pass
+    %w[thermos-sol thermos-opus].each do |who|
+      assert_empty PrQueue.missing(item([pass(who, "bbbbbbbbbb")]), 201)
+      assert_equal %w[claude-code thermos], PrQueue.missing(item([pass(who, "bbbbbbbbbb", "changes")]), 201)
+    end
+  end
+
 def test_opus_or_fable_from_another_orb_stands_in_for_astra
   claude = pass("claude-code", "bbbbbbbbbb").merge("orb" => "T-a")
   opus = ->(orb, verdict = "approve", head = "bbbbbbbbbb") { pass("opus", head, verdict).merge("orb" => orb) }
