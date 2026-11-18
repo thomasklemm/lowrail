@@ -231,3 +231,231 @@ tests against a worktree of `85e58dcf`): `gem/test/profile_test.rb` (7 new) and 
   not name) can still appear, hence the warning. F7: the action floor's multipliers remain Campfire-derived.
 * Not rerun: Writebook, Pingcrm and CodeTriage from the earlier matrix, the Lobsters YAML/DSL pair, and the
   earlier `--workloads` proof numbers, which predate B's `Host`/`Origin` headers (marked in profile.md).
+
+## Confirm review of 76be8b58 (2026-11-18)
+
+**Verdict: changes.** The original destructive-directory, Ruby-injection, Cable and stale-extension/hook failures
+are fixed in the exercised cases. This is not confirmation that all fourteen findings are closed: F2 still exports
+some values the app filters, F7 still accepts incomplete or different evidence, and F12 still enables a request
+that does not replay as recorded. There are also new output-path comparison and concurrent warm-count regressions.
+Do not offer B's recording or comparison as a generally safe workflow yet. A with hand-authored, reviewed workloads
+can remain an explicitly constrained expert prototype, not a promise of arbitrary A/B equivalence; generated
+workloads feed A too, so A does not bypass the recording problems.
+
+### Method and executed checks
+
+Loaded `thermos`, `thermo-nuclear-review` and `thermo-nuclear-code-quality-review`. At the requester's explicit
+direction one reviewer performed both passes in this thread, without subagents or new threads; this is not a claim
+of two independent reviewers. Used detached scratch worktrees at `85e58dcf` and `76be8b58`, inspected the fix's
+fourteen-file diff and downstream consumers, and left implementation/tests unchanged in the main checkout.
+The main checkout also contained the unrelated later `a9f0dab4`, which is not part of this review.
+
+Ruby was mise **4.0.9**, revision `3e93b23afc`, Linux x86-64; installed Rails **8.1.4**, sqlite3 **2.10.2**, bcrypt
+**3.1.22**, rack **3.2.8** and rack-test **2.3.0** into this orb, not repository dependency files. On the exact fix:
+
+```text
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/profile_test.rb --verbose
+9 runs, 89 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/workloads_test.rb --verbose
+3 runs, 18 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/load_hooks_test.rb --verbose
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Copied only the fix's two test files into the baseline scratch worktree and ran the same commands against its
+implementation and documentation: profile **9 runs, 49 assertions, 7 failures**, workloads **3 runs, 3 assertions,
+3 failures**, no errors or skips. Load hooks on the baseline: **2 runs, 4 assertions, all pass**. Every added
+profile test fails there, including every P1 regression test. The combined F1/F2 test stops at its secret-export
+assertion on the baseline; the separate recorder-to-evaluation marker probe below establishes F1 independently.
+The new A/B contract test fails there because `Replayer` does not exist, not because it independently observes the
+old policy divergence; the separate outgoing-request probe below establishes that divergence.
+
+### F1–F14 confirmation ledger
+
+The probes reconstructed the original report's inputs and controls. Synthetic secrets and disposable directories
+only; no real application data or external services were used.
+
+| Finding | Reproduced on 85e58dcf | Observed on 76be8b58 |
+| --- | --- | --- |
+| F1 | A routed format `html); $profile_review_injected = true; #`, URL-encoded in `/widgets.FORMAT`, makes the global `true` when the recording is evaluated. | Global stays `nil`; format arrives as data. Also evaluated an unnamed-route format containing a quote and Ruby text: still data. Fixed for these probes. |
+| F2 | Record a POST password, nested `api_token`, GET query token and write-query token: raw synthetic values appear in exported files. | These original values do not appear; redacted requests/bindings are disabled. **Not closed:** filtered formats and an updated filter list leak, C1. |
+| F3 | Run with `--out unowned` containing `must-keep.txt`: child runs and the file disappears, even when the child makes no report. | Refuses before the child, sentinel survives. The regression also checks `--out .` refusal and a user's file surviving reuse of a marked directory. |
+| F4 | Actual Rails Cable subscription with `--record` raises `NameError` for `env`; only the non-recording second run completes. | Both runs preserve the successful return/transmission and the identity of the channel's and job's exceptions. |
+| F5 | Built `60d9c677`'s actual C extension on this Ruby, put it in an isolated newer-mtime old cache: zero successful requests, wrong-arity and missing-attribute errors. A frozen Metal prevents Base loading. A job-shaped method under the actual wrapper changes plain `731` to `Ractor::UnsafeError`. | Old cache ignored, both requests return 200; the separate old-API regression refuses before hooks. Frozen Metal warns but Base loads twice. Ractor result is `731`, as plain. Frozen-only CLI exits 1 because no window/report exists; the application itself succeeds. |
+| F6 | Execute the documented Compare step's actual `compare ... \| tee` under its selected GitHub shell: regression is green without pipefail. | The documented `shell: bash` makes the complete step fail on the regression. |
+| F7 | `{}` versus `{}` exits 0; half-empty capture exits 0; `[nil,nil]` action versus `[100,100]` fabricates +100 and exits 1; three-run `[10,1000,10]` versus `[20,1010,20]` exits 1 with floor 1. | Those give 2, 2, 0 (explicitly not compared), and 0 respectively. One-run/failed captures are rejected by the suite. **Not closed:** C2 and C3. |
+| F8 | Alternating two ten-allocation threads: 20 String objects, reach 20 for two windows. Interleaved request/job fibers: `[1,0,0,0]`. Overlapping Ruby threads with `RUBY_MN_THREADS=1`: one window; ordinary threading: two. | Reach 2 for 20 objects/two windows; fibers `[1,1,0,0]`; two windows with and without M:N. Attribution-enabled 3,000 sequential threads, three Strings each and GC: baseline RSS 14,404 → 48,652 KiB, fix 14,376 → 14,684 KiB. Counting-only controls: 14,408 → 14,748 and 14,472 → 14,696 KiB. All snapshots drop 0; 20 compaction-inside-window iterations with attribution also drop 0. **New first-window regression and retained-fiber limitation:** C5/C6. |
+| F9 | Both path-only JSON override forms lose `{"x":1}` and yield nil bodies. | Both keep that body, covered through the DSL. |
+| F10 | `csrf_from "/csrf"; post "/write", csrf: false`: A sends GET then POST with Origin/form type; B sends only POST, without Origin/form type. | Both send only POST with Origin/form type. The real-app contract test passes for form sign-in, anonymous requests, XHR, JSON alternates, tokens and asymmetric headers. Cookie policy is still not equivalent, C6. |
+| F11 | After manifest creation mutate nested param `before` to `before after`: live request changes with old provenance. | Frozen copies/header digests pass the new test. **Measured block outputs still bypass comparison provenance**, C2; their presence in a receipt is not sufficient. |
+| F12 | `/search?q=needle` renders without its query; a fork child inherits the parent's recorded shape while native windows reset. The recording test also exposes the unconditional record binding. | Query retained, disabled-only binding commented, child shapes 0/parent 1, native windows zero in child. The injection probe keeps distinct formats. **JSON query requests remain wrong**, C4. |
+| F13 | Actual Active Job `:inline`, `post "/work", jobs: true, csrf: false`: job performs 30 times, receipt says `not_replayed.enqueued_by`. | Still 30 performances, correctly reports `queue_adapter: inline` and request side effects; no misleading `enqueued_by` exclusion. Adapter left unchanged. This is a valid narrowed promise, not side-effect isolation. |
+| F14 | `-- ruby -e 'p ARGV' -- --workloads --out x` is intercepted as Lowrail options. | Child prints `["--workloads", "--out", "x"]` unchanged; no report is expected. |
+
+### C1 — P1: the new filter boundary still leaks app-filtered values
+
+**Locations:** `gem/lib/lowrail/profile.rb:190–200,227–242`. Remaining F2, including defects in the new filtering
+implementation, not a claim that the baseline was safe.
+
+Two real routed Rails probes contradict the resolution's “only unfiltered keys can still appear” boundary:
+
+1. Configure `filter_parameters += [:format]`, record `GET /widgets.format-secret`. The literal `format-secret`
+   appears in the shapes JSON and the enabled generated request. `format` is copied into flags/grouping before
+   filtering, while only required path parts go through the filter. The same probe filtered passwords and tokens
+   correctly, so this is not an absent filter configuration.
+2. Record `/widgets` once to initialize the cached filter; then append `:credential` to
+   `Rails.application.env_config["action_dispatch.parameter_filter"]` and request
+   `/widgets/1?credential=changed-filter-secret`. On the exact same env, Rails' `filtered_parameters` contains
+   `"credential" => "[FILTERED]"`; the retained shape contains `"credential" => "changed-filter-secret"`.
+   The cache checks array identity, not contents. Distinct route shapes prevent first-shape reuse hiding the bug.
+
+**Smallest fix:** filter all retained path values, including format, before making a retained grouping key/name;
+mark affected shapes disabled. Build a fresh ParameterFilter outside the window, or cache an immutable snapshot
+and invalidate on content changes, not just identity. Add both counterexamples to the recorder/export regression.
+Also make the unavailable-filter branch actually discard raw params: inspection shows `params` is assigned before
+the conditional and returned unchanged if filtering is unavailable. That branch was not reached in the real Rails
+8.1.4 controls, which load ParameterFilter; do not represent it as an observed Rails leak.
+
+### C2 — P2: the comparison validator still promotes insufficient/different evidence to green
+
+**Locations:** `gem/lib/lowrail/profile_compare.rb:46–112`, `gem/lib/lowrail/profile_report.rb:534–546`, and
+`gem/lib/lowrail/profile_workloads.rb:42–61`. Remaining F7/F11 and an incomplete new validation boundary.
+
+Repros through the actual CLI, not just private helper calls:
+
+* Start with the new test's `report([10.0,10.0])` fixture. Delete head's `ranked` key: exit **0**, fabricated
+  improvement 10 → 0. A one-element warm array for a two-run capture also exits **0**. Delete command and seed
+  from both metadata hashes: exit **0**. Metadata `format` is not checked either.
+* Base summary has request windows in both runs, head has only job windows: exit **0**, `compared: []`, no
+  regressions. This is no comparison, not evidence that allocations did not regress.
+* More importantly, use the unchanged file below with a real Rails app serving `/one` and `/two` through the same
+  action. Run two complete two-run captures into the same output location, copying each `report.json` aside;
+  set `REPLAY_PATH=/one` for one capture and `/two` for the other:
+
+  ```ruby
+  get("/one", name: "variant") { |n| { path: ENV.fetch("REPLAY_PATH") } }
+  ```
+
+  Both commands exit 0, with 20 measured requests per run and no drops. Receipts correctly show `/one` versus
+  `/two`, but report metadata has the same workload digest `f112f1be7092dff8` in this fixture, because it hashes
+  only the declaration. `compare one.json two.json --json` exits **0**, `problems: []`. Thus even genuine,
+  unedited captures of different workloads can be green; the synthetic missing-key cases are not the sole issue.
+
+**Smallest fix:** validate the required report/version/metadata shape and every warm vector's run count, keeping
+an absent collection distinct from an empty one; return 2 when no kind is comparable. Carry a digest of the
+resolved measured workload sequence/counts for **each** run (and effective replay host/browser policy) into
+capture metadata, or refuse to CI-compare dynamic blocks until it exists. A set of last-run variants alone does
+not establish equal frequencies/order. Preserve the diagnostic report rather than pretending declarations certify
+measurements. Per-process Ruby/environment conflicts must not be discarded by `load_run`'s first-value `||=`
+before validation; this last point is a source-inspection limitation, not an executed mixed-Ruby capture.
+
+### C3 — P2: output paths make equivalent workloads impossible to compare
+
+**Locations:** `gem/exe/lowrail-profile:82,153`, `gem/lib/lowrail/profile_compare.rb:65–67`. Introduced by the new
+command-compatibility check acting on the existing generated runner command.
+
+On one unchanged minimal Rails app with `get "/widgets"`, run:
+
+```sh
+lowrail-profile --out base --workloads
+lowrail-profile --out head --workloads
+lowrail-profile compare base/report.json head/report.json --json
+```
+
+Both captures succeed, but comparison exits **2** solely because the commands end in `base/workloads.json`
+versus `head/workloads.json`. The output receipt is not a workload input. Absolute installation/app paths also
+prevent otherwise equivalent captures from different checkouts comparing.
+
+**Smallest fix:** keep the actual argv for diagnostics, but record structured logical capture identity separately:
+mode, workload manifest and meaningful command arguments, excluding generated output destinations. For ordinary
+commands keep argv boundaries rather than the ambiguous `join(" ")`. Test the complete two-output invocation.
+
+### C4 — P2: preserving a JSON GET query moves it into the body
+
+**Locations:** `gem/lib/lowrail/profile.rb:195,221–222`, `gem/lib/lowrail/workloads.rb:408–411`, interacting with
+the existing IntegrationTest-style `Request` conversion at line 42. Remaining F12 with a new wrong replay form.
+
+A real `GET /lookup?q=needle` with `Accept: application/json`, recorded and evaluated, becomes
+`get lookup_path, as: :json, params: {"q" => "needle"}`. On the baseline the query was lost outright. On the fix
+the declared request has verb `post`, body `{"q":"needle"}` and no query. Replaying it through Rails returns:
+
+```text
+original: GET query={"q" => "needle"} body={}
+replay:   GET query={} body={"q" => "needle"}
+```
+
+Rack's method override restores the effective GET inside Rails, but middleware sees a POST and the controller's
+query/body distinction changed. A controller reading `query_parameters` now executes a different operation.
+
+**Smallest fix:** do not infer JSON request-body encoding from response Accept for recorded GETs. Render the
+actual Accept header and keep GET query params (or conservatively comment out this shape with a reason). Leave
+the hand-written DSL's intentional IntegrationTest behavior alone. Assert method, raw query and body end to end.
+
+### C5 — P2: native merging changes “first reached” to “first completed”
+
+**Location:** `gem/ext/lowrail_profile/lowrail_profile.c:399–406`. Introduced by the F8 fix; independent of the
+fixed reach multiplicity.
+
+Use two ordinary Ruby threads and one allocating method `def allocate_at_one_site(n); n.times { String.new }; end`.
+Thread A enters request kind 0, calls it with 10, then waits on a Queue. Thread B enters, calls it with 2 and
+leaves; release A and join both. Start the real counter before this and inspect the String row after both close:
+
+```text
+85e58dcf: objects=12 windows_reached=2 first=10
+76be8b58: objects=12 windows_reached=2 first=2
+```
+
+The documented warm count changes from **1 to 5 objects/request** for the same allocation sequence. In parallel
+suites this keeps the slow first request's lazy initialization instead of removing it. Reach is now correct, but
+the original warm definition regressed. Action first-completion bookkeeping already existed; this attribution is
+specifically about the newly changed per-site first count.
+
+**Smallest fix:** retain first-touch ownership/order independently of merge order (for example a site's first
+touch reserves its window identity, with the count merged when that owner closes). Keep per-window seen sets for
+reach. Add this asymmetric close-order probe as a native public-snapshot regression.
+
+### C6 — P2: important deferrals are not narrowed in the user-facing promise
+
+**Locations:** `docs/profile.md:52–55,123–144`, `docs/upstream/census.md:139–144`, `README.md:135–168`; native
+owner marking at `gem/ext/lowrail_profile/lowrail_profile.c:528–534`. The Resolution states these limits honestly,
+but readers following the README/profile guide do not get all of them.
+
+* A fiber abandoned while a window is open is permanently rooted, along with its thread/stack and reachable app
+  records. Executed `Fiber.new { Profile.enter(0); Fiber.yield }`, resumed once, dropped the only Ruby reference,
+  then checked a WeakRef after three GCs: baseline **collected**, fix **retained**. The user guide still says
+  “no retained records” and advertises fiber-scheduler requests without the abandoned-window restriction. This is
+  potentially unbounded app-state retention, not merely a reusable C buffer. Either fix lifetime cleanup without
+  Ruby allocation in NEWOBJ, or explicitly exclude abandoning/cancelling open fibers and long-running use with
+  that behavior; do not call the broad never-change-app resource claim established.
+* Cookie path/expiry semantics are not merely transport differences. With a response
+  `Set-Cookie: auth=yes; Path=/private`, followed by GETs to `/public` and `/private/me`, the actual census client
+  sends no auth cookie to `/public`; B sends `auth=yes` to both. This plain-cookie-map behavior predates the fix,
+  but contradicts the newly broadened shared-policy/equivalence prose. Match cookie policy or explicitly restrict
+  the equivalence claim to the contract test's cases/root-scoped non-expiring cookies. No need for a general
+  browser emulator to make an honest restricted claim.
+* Child-fiber undercounting, non-main Ractor exclusion, disposable services, and the Campfire-derived action
+  multiplier are now disclosed in the guide; F13's narrowed promise is acceptable. The guide marks its earlier
+  proof table as pre-fix, but the README still states an unqualified “same objects per line within about 1%” after
+  the changed Host/Origin/form policy. Qualify that as historical, measured app/route evidence, not arbitrary DSL
+  equivalence. The block-output boundary is in `census.md`; that does not make B's false-green gate in C2 sound.
+
+### Maintainability and admission conclusion
+
+The shared Replayer is a useful canonical boundary: policy is no longer duplicated and the tested outgoing
+requests really agree. The small profiler failure boundaries are appropriate because they do not rescue or replay
+application `super`. No production file crosses 1,000 lines (largest affected report: 565; counter: 626), and no
+unrelated decomposition or generic adapter framework is requested. The structural miss is capture provenance:
+transport/output argv, logical workload identity and measured variants are represented separately but validated as
+though they were the same thing. Fix that boundary directly rather than adding per-example exclusions to compare.
+
+Gemspec and off-path controls on both pins load zero new features/define no Lowrail; loading profiling and Active
+Support alone defines none of Action Controller, Active Job, Action Mailer or Action Cable. The load-hook tests
+pass. These are bounded invariant-1/invariant-7 checks, not proof for every app or scheduler. Preserve lazy loading
+when repairing filters and ownership; declining an unsupported shape/window must not affect app execution.
+
+This confirm review reran **no** Campfire/Lobsters/Writebook/Pingcrm/CodeTriage suite, corpus YAML/DSL cohort,
+`lowrail verify`, `lowrail bench`, timing, instruction or speed experiment. The author's reported matrix and
+historical numbers remain attributed evidence, not independently confirmed results. This commit records the
+review only; C1–C6 are not implementation fixes. C1/C4 block promoting recording for either consumer; C2/C3 block
+B's advertised CI workflow; C5 blocks trusting its concurrent warm measurements; C6 must be fixed or explicitly
+scoped before offering general app/fiber/A/B safety claims.
