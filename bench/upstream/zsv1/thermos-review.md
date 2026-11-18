@@ -225,3 +225,122 @@ RUBY_GC_HEAP_INIT_BYTES=33554432 valgrind --tool=callgrind --smc-check=all-non-f
 Original application counters and a release ruby-bench speed comparison were not rerun. This review does not
 claim AArch64, sanitizer or nondefault-GC validation. No setup repair, Ruby fork push, upstream post or PR opening
 was performed.
+
+## Confirm of revision 2 (2026-11-18)
+
+Verdict: **changes**, on exactly `47b2ed7110f84ca76cc7aa6e767a1119e62c09a3`. Both rubrics were applied directly
+by the same `thermos-sol` reviewer, without another reviewer, subagent or thread. **No code must-fix remains.**
+The remaining required edit is a false other-app comparison in the public drafts; cutting that comparison also
+removes the remaining A/A-methodology narration. This is not a request to change the Ruby implementation.
+
+The fix-round input is [results-2.md](results-2.md), retained on Lowrail `bbc076c8`. The Ruby fork ref fetched for
+this confirm is `thomasklemm/zjit-setivar-real-class-2`, at the exact head above.
+
+### Four-findings closure check
+
+| Original finding | Confirm result |
+| --- | --- |
+| Redundant comments | **Closed.** Both test comments (three lines) and the constructor doc comment are gone. The sole added comment is one why-line connecting real-class profiling to the interpreter's transition owner. It explains the choice rather than narrating the implementation. |
+| Unsupported numbers | **Closed for the remaining positive claim.** Micro figures are cut. All nine gzip files are valid and identify the expected Ruby build and 10 measured iterations. All six retained branch/A/A diffs regenerate byte-for-byte. The lobsters -584 is independently recovered from three raw counters, with zero A/A movement for those counters. No timing, instruction or request-speed claim is certified. |
+| Body and commit wording | **Partly closed; one must-fix remains below.** The message and body now qualify ordinary singleton receivers and preserve layout/frozen/capacity boundaries. Test-history and micro methodology are gone. The new blanket claim about other apps is false, and the stats lead-in still narrates the A/A filter. |
+| Commit packaging | **Closed.** Exactly one commit, with direct parent `4414d3ea25fe74f06bf13370b06973544bbc1dd4`, Thomas Klemm as author and committer, and no trailers. The final tests are in that commit. |
+
+### Correctness/security and maintainability confirm
+
+`git diff fe6ea9ef84 47b2ed7110 -- zjit/src/profile.rs zjit/src/hir/opt_tests.rs` contains only the comment
+edits above. Comparing both files after removing comment-only lines yields byte-identical text, including the
+Ruby test programs and HIR snapshots. Neither file nor `hir.rs`, `gc.rs`, `shape.c` or `object.c` changed between
+the old base and the new base. The original guard/barrier/fallback audit therefore still applies; no new type,
+branch, guard, state, allocation or abstraction is introduced by the fix round. Maintainability remains L0.
+
+Current Ruby master at this confirm is `353c293c1b1171916bd7c82f73751b01f2fb4cb4`. Those relevant files also have
+no drift from the new base, and `git merge-tree --write-tree origin/master 47b2ed7110` succeeds. This is a clean
+application check, not a claim that the current-master combination was rebuilt. The original upstream-overlap
+search was not repeated as part of this four-finding confirm.
+
+Rebuilt the exact head in this review checkout with `make -j2 miniruby ruby`, using the earlier dev configure
+and toolchain. Ran:
+
+```sh
+make zjit-test "ZJIT_TESTS=-j1 -E 'test(test_setivar_singleton_receiver)'"
+```
+
+Both selected HIR tests pass; 2,029 other tests are filtered out. The same retained 33-row differential probe
+passes again with the rebuilt full Ruby: interpreter, ZJIT threshold 1 and 2, and both with
+`--zjit-max-versions=1`. All five processes exit 0 and emit identical rows; the interpreter output also matches
+the original review's output. This rechecks mutation/frozen/layout/GC/fiber/Ractor boundaries on the new exact
+head, without treating comment-only source equality as fresh runtime execution. The builder's full
+2,016-test, btest and selected Ruby-suite results in `results-2.md` were not rerun in this confirm.
+
+### Raw stats replay
+
+Read `stats/run.sh`, `../zne1/stats_harness.rb` and `../zne1/stats_diff.rb`, not only their summaries. The harness
+resets counters after warm-up and retains non-zero integer totals over 10 iterations. Dividing those totals by
+the stored iteration count gives:
+
+| Workload / counter | Master | Master A/A | Branch |
+| --- | ---: | ---: | ---: |
+| lobsters: `dynamic_setivar_count` | 11,405 | 11,405 | 10,821 |
+| lobsters: `setivar_fallback_no_side_exits` | 5,956 | 5,956 | 5,372 |
+| lobsters: `ccall_rb_vm_setinstancevariable` | 11,345 | 11,345 | 10,761 |
+| railsbench: `dynamic_setivar_count` | 4,060 | 4,060 | 4,060 |
+| railsbench: `setivar_fallback_no_side_exits` | 30 | 30 | 30 |
+| railsbench: `setivar_fallback_not_t_object` | 4,030 | 4,030 | 4,030 |
+| shipit: `dynamic_setivar_count` | 48,920 | 48,920 | 48,920 |
+| shipit: `ccall_rb_vm_setinstancevariable` | 48,883 | 48,883 | 48,883 |
+| shipit: `setivar_fallback_no_side_exits` | 41,029 | 41,029 | 40,948 |
+| shipit: `setivar_fallback_not_t_object` | 7,891 | 7,891 | 7,972 |
+
+The printed lobsters -584 values are exact, not rounding artifacts. Railsbench's setivar family is unchanged.
+Shipit's two fallback-reason changes cancel, leaving its total generic writes unchanged. They are **not** A/A
+noise: master and master-aa match on both. Each 81-per-iteration movement is below the diff tool's absolute
+100 cutoff; the no-side-exits change also misses its 1% cutoff. Thus an empty filtered diff does not establish
+that no underlying counter changed.
+
+The unrelated railsbench `ccall_rb_hash_new` row remains in the retained diff and is not claimed in the body.
+No raw values were edited or baseline regenerated. The raw Shipit window also records 2/0/1 compiled ISEQs and
+39/0/13 compiled side exits (master/master-aa/branch totals); it is not JIT-flat even before considering the
+missing `invalidation_count`. Counter evidence is accepted as diagnostic mechanism/reach evidence, not as a
+speed measurement. The team-requested-change exception is unchanged.
+
+Replay performed from the Lowrail root, decompressing into the review's scratch directory, for each of
+`lobsters`, `railsbench` and `shipit`:
+
+```sh
+gzip -t bench/upstream/zsv1/stats/*.json.gz
+work=.amp/in/orb-backup/zsv1-review
+mkdir -p "$work"
+for b in lobsters railsbench shipit; do
+  for side in master master-aa branch; do
+    gzip -cd "bench/upstream/zsv1/stats/stats-$side-$b.json.gz" > "$work/confirm-$side-$b.json"
+  done
+  ruby bench/upstream/zne1/stats_diff.rb "$work/confirm-master-$b.json" \
+    "$work/confirm-branch-$b.json" "$work/confirm-master-$b.json" \
+    "$work/confirm-master-aa-$b.json" --pct 1 > "$work/confirm-$b.diff"
+  diff -u "bench/upstream/zsv1/stats/stats-$b.diff" "$work/confirm-$b.diff"
+  ruby bench/upstream/zne1/stats_diff.rb "$work/confirm-master-$b.json" \
+    "$work/confirm-master-aa-$b.json" --pct 1 > "$work/confirm-aa-$b.diff"
+  diff -u "bench/upstream/zsv1/stats/stats-aa-$b.diff" "$work/confirm-aa-$b.diff"
+done
+```
+
+All six `diff` commands exit 0. The decompressed JSON, replay output and build/probe logs are retained under
+`.amp/in/orb-backup/zsv1-review/` with a `confirm-` prefix. This confirms the retained data's arithmetic and
+filtering; it does not independently reproduce the builder's three release builds or rerun the applications.
+
+### Remaining required draft edit
+
+The item body says “railsbench and shipit show no change in setivar counters”; its `impact` and the shortlist
+overview made the same blanket claim. The comment draft says “it only touches lobsters.” The raw Shipit rows
+above contradict these statements. `results-2.md` itself correctly records the -81/+81 redistribution.
+
+Prefer cutting, not explaining more upstream:
+
+* Replace the item's entire stats lead-in with **“ZJIT stats per iteration for lobsters:”**. This also removes
+  the A/A-methodology clause, which belongs in this record under DECISIONS.
+* Replace the comment's “On ruby-bench it only touches lobsters” with **“On lobsters, it removes 584 generic
+  writes per iteration.”** The supported positive finding needs no exclusivity claim.
+
+The review updates the queue's internal impact/note and shortlist status to avoid repeating the false summary,
+but leaves the actual public drafts as reviewed. Only this text correction needs confirming if the Ruby head
+stays unchanged; the code does not need another fix round or a new branch for this finding.
