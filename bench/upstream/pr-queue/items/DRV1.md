@@ -15,7 +15,7 @@ rank: 22
 risky: true
 state: ready
 pr: 769
-note: "Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads. Claude Code final review 2026-11-06: f1709a4f53 = 16c9550b68 with an identical tree; the commit message drops its measurement paragraph (numbers stay in the body and driver-cpu.md) and rewords the tests paragraph (\"a change to this branch\" read as a git branch). Body unchanged; no CHANGELOG entry (flavorjones adds them at merge, as on #758). 2026-11-13: rebased onto main d1d82840f3 (#773 merged) and force-pushed with a lease on f1709a4f53; range-diff identical, message unchanged, Thomas author/committer, no trailers. Suite 430 runs, 0 failures, 1 skip on Ruby 4.0.7. Exact-head CI 135/135 green (runs 43384286134, 43384285997), incl. test source (windows, 3.3, enable); sqlcipher (windows, mingw) is now sqlcipher (windows, ucrt) after #773 and passes. Title/body unchanged, no comment; mergeable, clean."
+note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without the SQLite version and no-claim sentence, unposted; code unchanged. Restacked 2026-11-06 into one commit, 16c9550b68, on 48091f4694; force-pushed. C change identical to b2735e1a77, so measurements stand. Allocation test dropped (DECISIONS e7dccb6: behaviour only, no GC.stat); retained-text mutation test dropped as covered by SQLITE_TRANSIENT and not at risk from this branch. Kept invalid/truncated UTF-8 bound as TEXT with exact bytes (catches a scrub/validate regression the suite misses) and invalid US-ASCII still raising (catches the `!UTF8_P && !USASCII_P` mutant). Reasoning and measurements now in the commit message. Skeptic nits on the restack applied (f9005a2 history, system SQLite 3.40.1). Body unchanged. Earlier passes name old heads. Claude Code final review 2026-11-06: f1709a4f53 = 16c9550b68 with an identical tree; the commit message drops its measurement paragraph (numbers stay in the body and driver-cpu.md) and rewords the tests paragraph (\"a change to this branch\" read as a git branch). Body unchanged; no CHANGELOG entry (flavorjones adds them at merge, as on #758). 2026-11-13: rebased onto main d1d82840f3 (#773 merged) and force-pushed with a lease on f1709a4f53; range-diff identical, message unchanged, Thomas author/committer, no trailers. Suite 430 runs, 0 failures, 1 skip on Ruby 4.0.7. Exact-head CI 135/135 green (runs 43384286134, 43384285997), incl. test source (windows, 3.3, enable); sqlcipher (windows, mingw) is now sqlcipher (windows, ucrt) after #773 and passes. Title/body unchanged, no comment; mergeable, clean."
 passes:
   - {reviewer: skeptic, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-05, verdict: approve, open: "Publish the linked driver-cpu.md report before upstream use."}
   - {reviewer: sol, head: "b2735e1a77898954b21d1cd4f2f8b0dc518200bb", date: 2026-11-06, verdict: nits, open: "Add engine-independent invalid-UTF-8 and retained-binding tests; clarify String allocation and measurement scope."}
@@ -35,11 +35,9 @@ While measuring the CPU cost of Ruby's database drivers, I found that binding a 
 
 Pass UTF-8 strings straight to SQLite, which still takes its own copy. Other encodings keep their existing conversion, including errors for invalid US-ASCII strings.
 
-Objects and Callgrind instructions per 20-name Active Record lookup, Ruby 4.0.9, interpreter:
+Objects and Callgrind instructions per 20-name Active Record lookup, Ruby 4.0, no JIT:
 
 | | Before | After |
 |---|---:|---:|
 | Objects | 162 | 142 |
 | Instructions | 1,092,175 | 1,083,184 |
-
-These measurements use SQLite 3.40.1 and do not claim a request-level speedup.

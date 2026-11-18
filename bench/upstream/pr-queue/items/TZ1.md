@@ -17,7 +17,7 @@ rank:
 risky: false
 state: ready
 pr: 175
-note: "our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
+note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without SHA, rake/CI and differential lines, unposted; code unchanged. our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
 passes:
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: changes, open: "code approved as is; body must-fix: tzinfo-data copies were identical objects, linked files unpushed; should-fix: scope of TimeWithZone callers, run spread, NaN/raising fields; all applied"}
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: nits, open: "body re-review: no must-fix; nits applied (Hash wording, zones with transitions); kept the ~210 per unequal comparison"}
@@ -31,7 +31,7 @@ In zones with transitions, `period_for_local`, `periods_for_local` and `period_f
 
 This returns `true` from `TimezoneTransition#==` when the argument is the same object, as `Array#include?` and `Hash` lookups already do. `eql?` is an alias of `==`, and `hash` is unchanged. Results only change for transitions no data source builds: a field that isn't equal to itself (such as `Float::NAN`) or whose `==` raises, or a subclass that overrides `equal?`, `kind_of?` or the field readers.
 
-Callgrind instructions per call, Ruby 4.0.9 without a JIT, Active Support from Rails main (1e235cee11), America/Chicago from the system zoneinfo files. Master from a second checkout differs by at most 81 instructions per call.
+Callgrind instructions per call, Ruby 4.0, no JIT, America/Chicago:
 
 | | master | this PR |
 |---|---:|---:|
@@ -40,6 +40,4 @@ Callgrind instructions per call, Ruby 4.0.9 without a JIT, Active Support from R
 | `70.days.ago(time_with_zone)`, same period | 66,626 | 58,621 |
 | `[period].include?(different_period)` | 4,333 | 4,543 |
 
-The measured comparison of two different periods costs 210 instructions more. `rake test` passes on Ruby 4.0.9, and the [Tests workflow](https://github.com/thomasklemm/tzinfo/actions/runs/42114287387) passes on my fork. A comparison of `==` and `eql?` before and after, with a check that equal transitions have equal hashes, over every transition up to 2100 of every zone (zoneinfo files and tzinfo-data) against itself, its neighbours, equal copies and non-nil values of other types gives identical results.
-
-I found this while looking at why the lobsters benchmark in ruby-bench does more work near a DST change.
+Comparing two different periods costs 210 instructions more. I found this while looking at why the lobsters benchmark in ruby-bench does more work near a DST change.
