@@ -1,0 +1,218 @@
+=== Exactness and random differentials ===
+review_exactness-3.2.9-clean.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-3.2.9-util.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-3.3.10-clean.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-3.3.10-util.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-3.4.12-clean.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-3.4.12-pure.txt: 17897 checks; {}
+review_exactness-3.4.12-util.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-4.0.9-clean.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+review_exactness-4.0.9-pure.txt: 17897 checks; {}
+review_exactness-4.0.9-util.txt: 17897 checks; {"subclass/escape" => 2, "subclass/unescape" => 6, "subclass/query_unescape" => 6}
+diff_escape-3.2.9-clean.txt: ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-3.2.9-util.txt: ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-3.3.10-clean.txt: ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-3.3.10-util.txt: ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-3.4.12-clean.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-3.4.12-pure.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 0 differences
+diff_escape-3.4.12-util.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-4.0.9-clean.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_escape-4.0.9-pure.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 0 differences
+diff_escape-4.0.9-util.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 1 differences
+diff_unescape-3.2.9-clean.txt: ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-3.2.9-util.txt: ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-3.3.10-clean.txt: ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-3.3.10-util.txt: ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-3.4.12-clean.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-3.4.12-pure.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 0 differences
+diff_unescape-3.4.12-util.txt: ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-4.0.9-clean.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+diff_unescape-4.0.9-pure.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 0 differences
+diff_unescape-4.0.9-util.txt: ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences
+.amp/in/orb-backup/rk3-confirm/exactness-2.7.8-util.txt
+{"ruby":"ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]","checks":17897,"differences":{"subclass/escape":2,"subclass/unescape":6,"subclass/query_unescape":6},"cgi_util_loaded":true}
+.amp/in/orb-backup/rk3-confirm/exactness-2.7.8.txt
+{"ruby":"ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]","checks":17897,"differences":{"subclass/escape":2,"subclass/unescape":6,"subclass/query_unescape":6},"cgi_util_loaded":true}
+
+=== Full suites ===
+/tmp/rk3-confirm-suite4-clean.log
+1293 runs, 6270 assertions, 0 failures, 0 errors, 2 skips
+All test files passed
+/tmp/rk3-confirm-suite4-util.log
+1293 runs, 6270 assertions, 0 failures, 0 errors, 2 skips
+All test files passed
+/tmp/rk3-confirm-suite34-clean.log
+1293 runs, 6270 assertions, 0 failures, 0 errors, 2 skips
+All test files passed
+/tmp/rk3-confirm-suite34-util.log
+1293 runs, 6270 assertions, 0 failures, 0 errors, 2 skips
+All test files passed
+
+=== Mutants ===
+mutation=exact-class ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 31857
+
+# Running:
+
+...............................................................................
+
+Finished in 0.036868s, 2142.7588 runs/s, 9818.7177 assertions/s.
+
+79 runs, 362 assertions, 0 failures, 0 errors, 0 skips
+mutation=instance-of ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 8906
+
+# Running:
+
+.....E.........................................................................
+
+Finished in 0.035438s, 2229.2643 runs/s, 10158.6728 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0009_escape objects that respond to to_s, BasicObject included:
+NoMethodError: undefined method 'instance_of?' for #<BasicObject:0x00007f210d78a700>
+    lib/rack/utils.rb:3:in 'Rack::Utils.escape'
+    test/spec_utils.rb:87:in 'block (2 levels) in <top (required)>'
+
+79 runs, 360 assertions, 0 failures, 1 errors, 0 skips
+mutation=is-a ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 24030
+
+# Running:
+
+...................................E...........................................
+
+Finished in 0.035191s, 2244.8861 runs/s, 10229.8607 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0009_escape objects that respond to to_s, BasicObject included:
+NoMethodError: undefined method 'is_a?' for #<BasicObject:0x00007f981340d000>
+    lib/rack/utils.rb:3:in 'Rack::Utils.escape'
+    test/spec_utils.rb:87:in 'block (2 levels) in <top (required)>'
+
+79 runs, 360 assertions, 0 failures, 1 errors, 0 skips
+mutation=no-ascii ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 55176
+
+# Running:
+
+...............................................................................
+
+Finished in 0.035859s, 2203.0863 runs/s, 10095.1549 assertions/s.
+
+79 runs, 362 assertions, 0 failures, 0 errors, 0 skips
+mutation=no-decode-guard ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 8623
+
+# Running:
+
+...............................................................................
+
+Finished in 0.034646s, 2280.1832 runs/s, 10448.4344 assertions/s.
+
+79 runs, 362 assertions, 0 failures, 0 errors, 0 skips
+mutation=no-guard ruby=ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util=false
+Run options: --seed 42299
+
+# Running:
+
+.........................................E......E.................E............
+
+Finished in 0.034132s, 2314.5273 runs/s, 9668.2787 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0005_escape objects that responds to to_s:
+TypeError: no implicit conversion of Symbol into String
+    lib/rack/utils.rb:4:in 'CGI::EscapeExt#escape'
+    lib/rack/utils.rb:4:in 'Rack::Utils.escape'
+    test/spec_utils.rb:66:in 'block (2 levels) in <top (required)>'
+
+  2) Error:
+Rack::Utils#test_0009_escape objects that respond to to_s, BasicObject included:
+TypeError: no implicit conversion of BasicObject into String
+    lib/rack/utils.rb:4:in 'CGI::EscapeExt#escape'
+    lib/rack/utils.rb:4:in 'Rack::Utils.escape'
+    test/spec_utils.rb:87:in 'block (2 levels) in <top (required)>'
+
+  3) Error:
+Rack::Utils#test_0027_build nested query strings correctly:
+TypeError: no implicit conversion of Integer into String
+    lib/rack/utils.rb:4:in 'CGI::EscapeExt#escape'
+    lib/rack/utils.rb:4:in 'Rack::Utils.escape'
+    lib/rack/utils.rb:143:in 'Rack::Utils.build_nested_query'
+    lib/rack/utils.rb:137:in 'block in Rack::Utils.build_nested_query'
+    lib/rack/utils.rb:136:in 'Hash#each'
+    lib/rack/utils.rb:136:in 'Enumerable#map'
+    lib/rack/utils.rb:136:in 'Rack::Utils.build_nested_query'
+    test/spec_utils.rb:28:in 'assert_nested_query'
+    test/spec_utils.rb:352:in 'block (2 levels) in <top (required)>'
+
+79 runs, 330 assertions, 0 failures, 3 errors, 0 skips
+mutation=no-ascii ruby=ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux] util=false
+Run options: --seed 32349
+
+# Running:
+
+..........................................E....................................
+
+Finished in 0.038799s, 2036.1380 runs/s, 9304.3777 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0008_escape to a US-ASCII String:
+NoMethodError: super: no superclass method 'escape' for class CGI
+    lib/rack/utils.rb:5:in 'CGI::Escape#escape'
+    lib/rack/utils.rb:5:in 'Rack::Utils.escape'
+    test/spec_utils.rb:81:in 'block (2 levels) in <top (required)>'
+
+79 runs, 361 assertions, 0 failures, 1 errors, 0 skips
+
+=== Exhaustive ordinary-subclass comparisons ===
+{
+  "checks": 131586,
+  "differences": {
+    "escape": 4423,
+    "unescape": 64771
+  },
+  "unexpected": []
+}
+
+=== Native CGI and SafeBuffer ===
+{"input_safe":true,"input_bytes":[104,101,108,108,111],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"hello"}
+{"input_safe":false,"input_bytes":[104,101,108,108,111],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"hello"}
+{"input_safe":true,"input_bytes":[60,105,109,103,32,115,114,99,61,120,32,111,110,101,114,114,111,114,61,97,108,101,114,116,40,49,41,62],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"<img src=x onerror=alert(1)>"}
+{"input_safe":false,"input_bytes":[60,105,109,103,32,115,114,99,61,120,32,111,110,101,114,114,111,114,61,97,108,101,114,116,40,49,41,62],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"<img src=x onerror=alert(1)>"}
+{"input_safe":true,"input_bytes":[37,51,67,115,99,114,105,112,116,37,51,69],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;script&gt;"}
+{"input_safe":false,"input_bytes":[37,51,67,115,99,114,105,112,116,37,51,69],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;script&gt;"}
+{"input_safe":true,"input_bytes":[120,43,121],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"x y"}
+{"input_safe":false,"input_bytes":[120,43,121],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"x y"}
+{"input_safe":true,"input_bytes":[126],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"~"}
+{"input_safe":false,"input_bytes":[126],"uri_class":"String","uri_safe":false,"rack_class":"ActiveSupport::SafeBuffer","rack_safe":true,"rack_ivars":[],"same_object":false,"html":"~"}
+
+=== Pure Ruby CGI and SafeBuffer ===
+{"input_safe":true,"input_bytes":[104,101,108,108,111],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"hello"}
+{"input_safe":false,"input_bytes":[104,101,108,108,111],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"hello"}
+{"input_safe":true,"input_bytes":[60,105,109,103,32,115,114,99,61,120,32,111,110,101,114,114,111,114,61,97,108,101,114,116,40,49,41,62],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;img src=x onerror=alert(1)&gt;"}
+{"input_safe":false,"input_bytes":[60,105,109,103,32,115,114,99,61,120,32,111,110,101,114,114,111,114,61,97,108,101,114,116,40,49,41,62],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;img src=x onerror=alert(1)&gt;"}
+{"input_safe":true,"input_bytes":[37,51,67,115,99,114,105,112,116,37,51,69],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;script&gt;"}
+{"input_safe":false,"input_bytes":[37,51,67,115,99,114,105,112,116,37,51,69],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"&lt;script&gt;"}
+{"input_safe":true,"input_bytes":[120,43,121],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"x y"}
+{"input_safe":false,"input_bytes":[120,43,121],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"x y"}
+{"input_safe":true,"input_bytes":[126],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"~"}
+{"input_safe":false,"input_bytes":[126],"uri_class":"String","uri_safe":false,"rack_class":"String","rack_safe":false,"rack_ivars":[],"same_object":false,"html":"~"}
+
+=== Rewritten candidate CI ===
+["test (ubuntu-latest, jruby-head)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889223"]
+["test (ubuntu-latest, truffleruby-head)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889207"]
+["test (macos-latest, 4.0)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889171"]
+["test (ubuntu-latest, ruby-head)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889128"]
+["test (ubuntu-latest, 3.1)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889113"]
+["test (ubuntu-latest, 3.2)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889111"]
+["test (ubuntu-latest, 3.0)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889101"]
+["test (ubuntu-latest, 3.4)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889087"]
+["test (ubuntu-latest, 2.7.3)","completed","failure","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707889042"]
+["test (ubuntu-latest, 2.7)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707888996"]
+["test (ubuntu-latest, 4.0)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707888987"]
+["test (ubuntu-latest, 3.3)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096060/job/134707888913"]
+["test (ubuntu-latest, 3.4)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096060/job/134707888863"]
+["test (ubuntu-latest, 3.3)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096091/job/134707888818"]
+["test (ubuntu-latest, 4.0)","completed","success","https://github.com/thomasklemm/rack/actions/runs/44277096060/job/134707888296"]
