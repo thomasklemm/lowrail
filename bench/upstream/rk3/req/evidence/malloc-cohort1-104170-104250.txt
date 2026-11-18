@@ -1,0 +1,6 @@
+# 104170 104250 cohort1 blog GET articles.json none.rb 4,240,270 vs rk3.rb 4,308,258
+1359749	PROGRAM TOTALS
+745309	./malloc/./malloc/malloc.c:malloc_consolidate [/usr/lib/x86_64-linux-gnu/libc.so.6]
+281979	./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+218032	./malloc/./malloc/malloc.c:unlink_chunk.isra.0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+87087	/work/.build/4.0.9-x86_64_linux-yjit/src/ruby/ruby-4.0.9/gc/default/default.c:gc_writebarrier_generational.constprop.0 [/home/user/.local/share/mise/insta

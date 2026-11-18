@@ -439,7 +439,7 @@ must-fixes from the thermos-sol pass on `6f48723a86`: the decoders convert the e
 * **Suite:** 1295 runs, 0 failures on 3.2–4.0, clean and with `-rcgi/util`. RuboCop: nothing new.
 * **Body numbers:** `script/upstream-bench`, [`body/RK3`](../../bench/upstream/rk3/body/RK3/table.md): per call
   −34.9% / −49.1% / −72.2% instructions (interpreter, A/A ≤ 0.23%), −43.7% / −52.4% / −74.3% (YJIT, A/A ≤ 0.61%),
-  YJIT benchmark-ips 1.91x / 2.29x / 3.19x (A/A ≤ 5.4%).
+  YJIT benchmark-ips 1.91x / 2.29x / 3.19x (best-of-three base rates differ by ≤ 5.4%; not in the body, as the ips worker has no JIT-flat gate).
 * **Per request on the exact head**, RK3 alone / both commits:
 
 | Workload | Interpreter A/A | Interpreter | YJIT A/A | YJIT (JIT-flat) |
@@ -452,5 +452,5 @@ must-fixes from the thermos-sol pass on `6f48723a86`: the decoders convert the e
 
 The JSON control is inside its A/A in both modes. Two interpreter cohorts on this head are rejected, not rescored:
 blog GET article's A/A was 0.97% and the JSON control alternated between 4.24M and 4.31M Ir; Callgrind put the
-difference in glibc's `malloc_consolidate`, so the accepted cohort ran with `GLIBC_TUNABLES=glibc.malloc.mxfast=0`.
+difference in glibc's `malloc_consolidate`, so the accepted cohort ran with `GLIBC_TUNABLES=glibc.malloc.mxfast=0`. Invocations, environment and the attribution: [`req/evidence/`](../../bench/upstream/rk3/req/evidence/README.md).
 Fork CI: `2.7.3` fails in setup again (ubuntu-26.04); the body says so.

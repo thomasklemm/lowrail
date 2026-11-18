@@ -1,0 +1,13 @@
+# 103216 103308 cohort1 blog GET article none.rb 8,344,027 vs none.rb 8,425,292
+1625300	PROGRAM TOTALS
+818128	./malloc/./malloc/malloc.c:malloc_consolidate [/usr/lib/x86_64-linux-gnu/libc.so.6]
+440063	./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+272571	./malloc/./malloc/malloc.c:unlink_chunk.isra.0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+24160	{
+24140	{
+24080	{
+24060	{
+24040	{
+24040	{
+24000	{
+23920	{
