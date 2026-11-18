@@ -14,9 +14,9 @@ alternative_of:
 impact: see docs/upstream/contributions.md
 rank:
 risky: false
-state: ready
+state: closed
 pr: 59644
-note: "2026-11-18 (rules review adopted after thermos-sol confirm, Lowrail 9f494264): shortened body; the FileSystemResolver/godmin/rbexy paragraph removed as the confirm required; body PATCHed. 2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): proposed body added (body corrected in this item only, not PATCHed (live body unchanged)): 176 -> 141 words; the test-shape sentence and the Chatwoot spec count are cut, the FileSystemResolver boundary kept in one clause."
+note: "2026-11-18 (Thomas): closed with comment (issuecomment-6994087583) after the slot triage (rails-slot-triage-2026-11-18.md): real break, but restoring the private _find_all hook is the wrong repair site. 2026-11-18 (rules review adopted after thermos-sol confirm, Lowrail 9f494264): shortened body; the FileSystemResolver/godmin/rbexy paragraph removed as the confirm required; body PATCHed. 2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): proposed body added (body corrected in this item only, not PATCHed (live body unchanged)): 176 -> 141 words; the test-shape sentence and the Chatwoot spec count are cut, the FileSystemResolver boundary kept in one clause."
 passes:
   - {reviewer: claude-code, head: "0d3ef774bd", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by app-suites.md CW2."}
   - reviewer: thermos-sol
