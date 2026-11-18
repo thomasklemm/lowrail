@@ -272,6 +272,14 @@ required review; it covers what the Sol/stand-in slot covered (exactness probe, 
 message). Astra on `risky` items and thermos above 200 changed lines stay as before. Passes already recorded keep
 counting.
 
+### The coordinator decides when a review runs (Thomas, 2026-11-18)
+
+Thomas: "entscheide einfach selbst wann ein review nötig ist und lass es ausführen". The coordinator decides which
+passes a head needs (a full claude-code pass, a short confirm pass after a small fix, Astra, thermos, or a waiver
+such as RBW1's thermos waiver for a mostly generated app) and starts them without asking. The item's note records
+the choice and why. This does not change what needs Thomas's approval upstream: posting, opening and pushing to open
+PRs still need it unless he has approved that action.
+
 Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
 trying Sol 6.2, but it isn't offered yet.
 
