@@ -1,0 +1,43 @@
+Using postgresql
+Run options: --seed 6462
+
+# Running:
+
+E
+
+Finished in 0.032536s, 30.7357 runs/s, 30.7357 assertions/s.
+
+  1) Error:
+HasManyOwnerConditionsSerializationTest#test_joining_an_association_whose_default_scope_has_an_out_of_range_condition_matches_no_records:
+ActiveModel::RangeError: 1180591620717411303424 is out of range for ActiveModel::Type::Integer with limit 4 bytes
+    /home/user/c10/base2/activemodel/lib/active_model/type/integer.rb:89:in 'ActiveModel::Type::Integer#serialize'
+    /home/user/c10/base2/activemodel/lib/active_model/attribute.rb:191:in 'ActiveModel::Attribute#_value_for_database'
+    lib/active_record/relation/query_attribute.rb:29:in 'ActiveRecord::Relation::QueryAttribute#value_for_database'
+    lib/active_record/relation/query_attribute.rb:61:in 'ActiveRecord::Relation::QueryAttribute#hash'
+    lib/arel/nodes/binary.rb:21:in 'Arel::Nodes::Binary#hash'
+    lib/active_record/relation/where_clause.rb:22:in 'Array#-'
+    lib/active_record/relation/where_clause.rb:22:in 'ActiveRecord::Relation::WhereClause#-'
+    lib/active_record/reflection.rb:236:in 'ActiveRecord::Reflection::AbstractReflection#join_scope'
+    lib/active_record/associations/join_dependency/join_association.rb:46:in 'block in ActiveRecord::Associations::JoinDependency::JoinAssociation#join_constraints'
+    lib/active_record/associations/join_dependency/join_association.rb:43:in 'Array#reverse_each'
+    lib/active_record/associations/join_dependency/join_association.rb:43:in 'ActiveRecord::Associations::JoinDependency::JoinAssociation#join_constraints'
+    lib/active_record/associations/join_dependency.rb:205:in 'ActiveRecord::Associations::JoinDependency#make_constraints'
+    lib/active_record/associations/join_dependency.rb:198:in 'block in ActiveRecord::Associations::JoinDependency#make_join_constraints'
+    lib/active_record/associations/join_dependency.rb:197:in 'Array#each'
+    lib/active_record/associations/join_dependency.rb:197:in 'Enumerable#flat_map'
+    lib/active_record/associations/join_dependency.rb:197:in 'ActiveRecord::Associations::JoinDependency#make_join_constraints'
+    lib/active_record/associations/join_dependency.rb:98:in 'ActiveRecord::Associations::JoinDependency#join_constraints'
+    lib/active_record/relation/query_methods.rb:2250:in 'ActiveRecord::QueryMethods#build_joins'
+    lib/active_record/relation/query_methods.rb:2097:in 'ActiveRecord::QueryMethods#build_arel'
+    lib/active_record/relation/query_methods.rb:1977:in 'ActiveRecord::QueryMethods#arel'
+    lib/active_record/relation/finder_methods.rb:425:in 'block (2 levels) in ActiveRecord::FinderMethods#exists?'
+    lib/active_record/connection_adapters/abstract/connection_pool.rb:477:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+    lib/active_record/connection_handling.rb:361:in 'ActiveRecord::ConnectionHandling#with_connection'
+    lib/active_record/relation/delegation.rb:106:in 'ActiveRecord::Delegation#with_connection'
+    lib/active_record/relation/finder_methods.rb:424:in 'block in ActiveRecord::FinderMethods#exists?'
+    lib/active_record/relation.rb:1542:in 'ActiveRecord::Relation#skip_query_cache_if_necessary'
+    lib/active_record/relation/finder_methods.rb:423:in 'ActiveRecord::FinderMethods#exists?'
+    lib/active_record/encryption/extended_deterministic_queries.rb:103:in 'ActiveRecord::Encryption::ExtendedDeterministicQueries::RelationQueries#exists?'
+    lib/active_record/relation.rb:383:in 'ActiveRecord::Relation#empty?'
+
+1 runs, 1 assertions, 0 failures, 1 errors, 0 skips

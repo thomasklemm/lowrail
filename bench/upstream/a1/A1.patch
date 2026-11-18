@@ -1,89 +1,41 @@
-From 9877a852dd29208d4c15c04d6dea01506fc74982 Mon Sep 17 00:00:00 2001
+From e6bfe76e9599baed1b51030634566302f90a2151 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
-Date: Wed, 18 Nov 2026 00:47:24 +0000
-Subject: [PATCH 1/2] Check the owner conditions only when an association scope
- was merged
+Date: Wed, 18 Nov 2026 02:57:50 +0000
+Subject: [PATCH] Don't compare owner conditions when joining an association
+ without a scope
 
-Since the association scope can no longer remove the conditions tying the
-records to the owner, every association scope and join scope builds the
-differences between its where clauses before and after merging the scope,
-also when the association has no scope and nothing can be removed.
+To detect conditions that the association scope removed, join_scope
+subtracts where clauses before and after merging the scope items, also
+when there are none. Comparing predicates can call into their bind
+values: Array#- hashes both sides once they are large enough, and
+QueryAttribute#hash and #== serialize the value. So a join whose target
+default scope has an out of range condition raised
+ActiveModel::RangeError instead of matching no records.
 
-Keep the where clauses and compute the differences only after a scope item
-was merged.
+Skip the comparison when the association has no scope items, since
+nothing can have removed a condition.
 ---
- .../associations/association_scope.rb         | 19 ++++++++++++-------
- activerecord/lib/active_record/reflection.rb  |  8 +++++---
- 2 files changed, 17 insertions(+), 10 deletions(-)
+ activerecord/CHANGELOG.md                     |  8 ++++
+ activerecord/lib/active_record/reflection.rb  |  8 ++--
+ .../has_many_associations_test.rb             | 38 +++++++++++++++++++
+ 3 files changed, 51 insertions(+), 3 deletions(-)
 
-diff --git a/activerecord/lib/active_record/associations/association_scope.rb b/activerecord/lib/active_record/associations/association_scope.rb
-index b9ac884e7d..6e81ce1ffb 100644
---- a/activerecord/lib/active_record/associations/association_scope.rb
-+++ b/activerecord/lib/active_record/associations/association_scope.rb
-@@ -43,11 +43,10 @@ def join(table, constraint)
-         end
- 
-         # Returns the scope with the conditions that tie the records to the owner,
--        # and the key conditions among them.
-+        # and its where clause after the key conditions.
-         def last_chain_scope(scope, reflection, owner)
-           table = reflection.aliased_table
-           route = reflection.association_route
--          where_clause = scope.where_clause
- 
-           route.each_constraint do |origin_column, destination_column|
-             value = value_reader.call(owner, origin_column)
-@@ -59,13 +58,13 @@ def last_chain_scope(scope, reflection, owner)
-             scope = apply_scope(scope, table, destination_column, value)
-           end
- 
--          key_clause = scope.where_clause - where_clause
-+          key_where_clause = scope.where_clause
- 
-           route.destination_fixed_values.each do |column, value|
-             scope = apply_scope(scope, table, column, value)
-           end
- 
--          [scope, key_clause]
-+          [scope, key_where_clause]
-         end
- 
-         def next_chain_scope(scope, reflection, next_reflection)
-@@ -122,17 +121,19 @@ def get_chain(reflection, association, tracker, routes)
- 
-         def add_constraints(scope, owner, chain)
-           where_clause = scope.where_clause
--          scope, key_clause = last_chain_scope(scope, chain.last, owner)
-+          scope, key_where_clause = last_chain_scope(scope, chain.last, owner)
- 
-           chain.each_cons(2) do |reflection, next_reflection|
-             scope = next_chain_scope(scope, reflection, next_reflection)
-           end
- 
--          fixed_clause = scope.where_clause - where_clause - key_clause
-+          chain_where_clause = scope.where_clause
-+          scoped = false
- 
-           chain_head = chain.first
-           chain.reverse_each do |reflection|
-             reflection.constraints.each do |scope_chain_item|
-+              scoped = true
-               item = eval_scope(reflection, scope_chain_item, owner)
- 
-               if scope_chain_item == chain_head.scope
-@@ -159,7 +160,11 @@ def add_constraints(scope, owner, chain)
-             end
-           end
- 
--          chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
-+          if scoped
-+            key_clause = key_where_clause - where_clause
-+            fixed_clause = chain_where_clause - where_clause - key_clause
-+            chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
-+          end
- 
-           scope
-         end
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 09d6165a50..a9d5076a79 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,11 @@
++*   Don't compare owner conditions when joining an association without a scope.
++
++    Comparing the where clauses could serialize their bind values early, so a
++    join raised `ActiveModel::RangeError` for an out of range condition in the
++    target's default scope instead of matching no records.
++
++    *Thomas Klemm*
++
+ *   Add `config.active_record.association_scope_keeps_owner_conditions` to
+     always apply the conditions tying the records of an association to the
+     owner, and deprecate removing them with the association scope.
 diff --git a/activerecord/lib/active_record/reflection.rb b/activerecord/lib/active_record/reflection.rb
 index ff46897cfb..a46f7a2ae8 100644
 --- a/activerecord/lib/active_record/reflection.rb
@@ -103,31 +55,11 @@ index ff46897cfb..a46f7a2ae8 100644
  
          route.each_match do |origin_column, destination_column|
            destination_attribute = predicate_builder.predicate_attribute(table[destination_column])
--- 
-2.55.0
-
-
-From 80daecf52a16cee2383b78d036e0126535598044 Mon Sep 17 00:00:00 2001
-From: Thomas Klemm <github@tklemm.eu>
-Date: Wed, 18 Nov 2026 02:28:28 +0000
-Subject: [PATCH 2/2] Test that owner conditions are serialized when the query
- is built
-
-Comparing where clauses hashes their predicates once both sides have
-more than 16, which serializes the bind values. Checking the owner
-conditions before the association scope runs, or for joins that have no
-scope, serialized them earlier than 8.1 did: a join raised
-ActiveModel::RangeError for an out of range default scope condition, and
-an association scope changing how its keys serialize no longer applied.
----
- .../has_many_associations_test.rb             | 57 +++++++++++++++++++
- 1 file changed, 57 insertions(+)
-
 diff --git a/activerecord/test/cases/associations/has_many_associations_test.rb b/activerecord/test/cases/associations/has_many_associations_test.rb
-index c3b988851d..d23a782577 100644
+index c3b988851d..cfec5161a5 100644
 --- a/activerecord/test/cases/associations/has_many_associations_test.rb
 +++ b/activerecord/test/cases/associations/has_many_associations_test.rb
-@@ -3711,3 +3711,60 @@ class DeprecatedHasManyAssociationsTest < ActiveRecord::TestCase
+@@ -3711,3 +3711,41 @@ class DeprecatedHasManyAssociationsTest < ActiveRecord::TestCase
      assert_predicate @car, :destroyed?
    end
  end
@@ -140,7 +72,7 @@ index c3b988851d..d23a782577 100644
 +
 +  setup do
 +    connection = ActiveRecord::Base.lease_connection
-+    connection.create_table(:owner_conditions_parents, force: true) { |t| KEYS.each { |key| t.integer key } }
++    connection.create_table(:owner_conditions_parents, force: true)
 +    connection.create_table(:owner_conditions_children, force: true) do |t|
 +      t.integer :parent_id
 +      KEYS.each { |key| t.integer key }
@@ -162,30 +94,11 @@ index c3b988851d..d23a782577 100644
 +      self.table_name = "owner_conditions_parents"
 +      has_many :children, anonymous_class: child, foreign_key: :parent_id
 +    end
-+    parent.create!
++    owner = parent.create!
++    child.unscoped.create!(parent_id: owner.id)
 +
 +    assert_empty parent.joins(:children)
 +    assert_empty parent.eager_load(:children).where.not(children: { id: nil })
-+  end
-+
-+  test "the association scope runs before the owner conditions are serialized" do
-+    type = Class.new(ActiveModel::Type::Integer) do
-+      attr_accessor :offset
-+      def serialize(value) = super(value) + offset.to_i
-+    end.new
-+    child = Class.new(ActiveRecord::Base) do
-+      self.table_name = "owner_conditions_children"
-+      KEYS.each { |key| attribute key, type }
-+    end
-+    parent = Class.new(ActiveRecord::Base) do
-+      self.table_name = "owner_conditions_parents"
-+      has_many :children, -> { type.offset = 100; all }, anonymous_class: child, primary_key: KEYS, foreign_key: KEYS
-+    end
-+    owner = parent.create!(KEYS.zip(1..).to_h)
-+    child.create!(KEYS.zip(1..).to_h)
-+    shifted = child.create!(KEYS.zip(101..).to_h)
-+
-+    assert_equal [shifted.id], owner.association(:children).scope.pluck(:id)
 +  end
 +end
 -- 

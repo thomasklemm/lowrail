@@ -1,5 +1,10 @@
 # A1 follow-up: the review's counterexamples against Rails 8.1
 
+**Superseded in part, 2026-11-18** ([second review](../review-thermos-sol-80daecf52a/README.md),
+[narrowed head](../narrow/README.md)). The matrix below holds for these probes only. Two later probes show
+`80daecf52a`'s reader departing from both 8.1 and main, so "A1 restores 8.1" and "8.1 gives the branch's answer"
+do not hold in general. A1 is now narrowed to unscoped `join_scope`.
+
 Thermos asked for changes ([review](../review-thermos-sol/README.md)): `WhereClause#-` can hash predicates, which
 serializes bind values, so computing the differences later than main gives different SQL and records. This
 follow-up reran those repros on Rails 8.1 and on #59836's parent, added five more probes, and added regression tests
@@ -10,9 +15,9 @@ Ruby 4.0.9, SQLite 3.54.1 and PostgreSQL 17.12. Trees: 8-1-stable `aab611acd8`, 
 
 ## Result
 
-**8.1 gives the branch's answer in every case, and main's answers first appear at #59836's merge.** The
-counterexamples show #59836 changing *when* bind values are serialized, compared with 8.1. They do not show A1
-departing from released behavior. Raw output is one file per tree in [raw/](raw/). 8.1, #59836's parent and the
+**8.1 gives the branch's answer in every case, and main's answers first appear at #59836's merge.** For
+these probes, #59836 changed *when* bind values are serialized compared with 8.1, and `80daecf52a` gave 8.1's
+answer. Raw output is one file per tree in [raw/](raw/). 8.1, #59836's parent and the
 head are byte-identical (34 lines). Main and #59836's merge are byte-identical too, and differ from 8.1 on 14 lines.
 On PostgreSQL, 8.1 and the head are identical, and main differs from SQLite only in the adapter class named in
 error messages.
@@ -23,8 +28,8 @@ error messages.
 | [join_serialization.rb](join_serialization.rb): review repro 2, unscoped `as:` join, 17 target default-scope conditions | `k0=101` | `k0=1` | `k0=101` |
 | both at width 16 | same as head | same as head | same |
 | [linear_join.rb](linear_join.rb): **two** conditions, a context-dependent type on `parent_type` and a target default scope on the same column | `ParentX` | `Parent` | `ParentX` |
-| [range_join.rb](range_join.rb) / [range_plain.rb](range_plain.rb): **built-in integer**, 17 default-scope conditions, one out of range, `joins` (`as:` and plain `has_many`) | `[]` (`1=0`) | **`ActiveModel::RangeError`** | `[]` |
-| [range_paths.rb](range_paths.rb): the same through `preload`, `eager_load`, `includes.references`, a reader | `eager_load` and `includes.references` `[]`; `preload` and the reader raise | all four raise | same as 8.1 |
+| [range_join.rb](range_join.rb) / [range_plain.rb](range_plain.rb): **built-in integer**, 17 default-scope conditions, one out of range, `joins` (`as:` and plain `has_many`) | no rows (`1=0`) | **`ActiveModel::RangeError`** | `[]` |
+| [range_paths.rb](range_paths.rb): the same through `preload`, `eager_load`, `includes.references`, a reader | `eager_load` and `includes.references` return one parent with zero children (outer join); `preload` and the reader raise | all four raise | same as 8.1 |
 | [scoped_join.rb](scoped_join.rb): repro 2 with a scope on the joined association | `k0=1` | `k0=1` | `k0=1` |
 
 All rows are the same with `association_scope_keeps_owner_conditions` false and true. 8.1 has no such setting, so

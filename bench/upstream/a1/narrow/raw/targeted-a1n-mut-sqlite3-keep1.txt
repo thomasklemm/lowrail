@@ -1,0 +1,14 @@
+Using sqlite3
+Run options: --seed 23249
+
+# Running:
+
+F
+
+Finished in 0.031522s, 31.7243 runs/s, 63.4487 assertions/s.
+
+  1) Failure:
+HasManyOwnerConditionsSerializationTest#test_joining_an_association_whose_default_scope_has_an_out_of_range_condition_matches_no_records [test/cases/zz_a1n_tmp_test.rb:35]:
+Expected #<ActiveRecord::Relation [#<#<Class:0x00007f48f406baf0> id: 1>]> to be empty.
+
+1 runs, 2 assertions, 1 failures, 0 errors, 0 skips

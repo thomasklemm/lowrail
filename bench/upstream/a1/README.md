@@ -2,9 +2,14 @@
 
 Census 10's lead A1 ([rails-main-census-10](../../../docs/upstream/rails-main-census-10.md#lead-a1-owner-condition-bookkeeping-on-every-association-scope)),
 built on rails/rails main `e30c36266b` (2026-11-18) as `thomasklemm/association-owner-conditions-unscoped`. The
-head is [`80daecf52a`](https://github.com/thomasklemm/rails/commit/80daecf52a): the fix
-[`9877a852dd`](https://github.com/thomasklemm/rails/commit/9877a852dd) (+17/−10) plus regression tests (+57/−0)
-([patch](A1.patch)). Queue item [A1](../pr-queue/items/A1.md). Not opened.
+head is [`e6bfe76e95`](https://github.com/thomasklemm/rails/commit/e6bfe76e95), narrowed to `join_scope` with one
+regression test and a CHANGELOG entry ([narrow](narrow/README.md), [patch](A1.patch)). Earlier heads `9877a852dd`
+and `80daecf52a` also changed the reader. Queue item [A1](../pr-queue/items/A1.md). Not opened.
+
+**Second review, 2026-11-18: changes requested on `80daecf52a`** ([review](review-thermos-sol-80daecf52a/README.md)).
+The reader change gave answers matching neither 8.1 nor main in two probes. So A1 now changes only unscoped
+`join_scope`, where it gives 8.1's answer, and the reader is main's. Everything below about the reader, and the
+follow-up's "restores 8.1", applies to the earlier heads only.
 
 **Review, 2026-11-18: changes requested.** The [Thermos review](review-thermos-sol/README.md) found that
 `WhereClause#-` can hash predicates and so serialize bind values; computing the differences later than main
