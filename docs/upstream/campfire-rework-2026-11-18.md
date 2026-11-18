@@ -6,6 +6,10 @@ Scope: our eight open basecamp/once-campfire PRs (#320, #345, #346, #347, #350, 
 Thomas approved: removing the trailers from all eight PR branches, adopting namespaceMarcello's two #350 commits
 (`af77995`, `6077be9`) with him as author, and fixing Codex's two valid #347 findings.
 
+The builder's recommendations below are superseded by the [thermos-sol confirmation](#thermos-sol-confirmation)
+at the end of this record. In particular, the queue-first backup is an improvement, not a coherent two-database
+snapshot, and a restored claimed job does not necessarily fail as `ProcessMissingError` at boot.
+
 New fork branches with the suffix `-2` on thomasklemm/once-campfire. Thomas Klemm is author and committer with the
 original author dates, except namespaceMarcello's two commits (his authorship and dates, Thomas as committer).
 Each commit was checked with `git cat-file commit` and `%(trailers:only)`: none has a trailer, and none contains
@@ -224,5 +228,251 @@ line in `pagination.rb`; the multi-line ones went to one line each.
 6. #352's body number comes from a quick micro; rerun it with `script/upstream-bench` before posting?
 7. kredis: #347-2 removes it, and Marcello's #389 does too. Leave it in #347, or drop it there and let #389 take it?
 
-Reviews: none run on the `-2` heads yet. The thermos-sol confirm in progress reviews the `-lean` heads; the
-coordinator decides which passes the `-2` heads need.
+## Thermos-sol confirmation
+
+Reviewer: `thermos-sol`, [review thread](https://ampcode.com/threads/T-01a1eeb5-7700-72fe-bf46-08ff46efc3ad),
+2026-11-18. Both correctness/security and maintainability rubrics were self-performed; no other reviewer,
+subagent or thread was started. Record reviewed at Lowrail `aec098fb3dcd3ff9b13a9c9279d56c2e951b0417`.
+All seven proposed heads descend from Campfire `7b809885a194f4c2f06f4f43e8e34704968f543e`. The existing queue
+`head`/`branch` fields continue to identify published PRs; each new code pass names the proposed head instead.
+CF374's closure-only pass names current main, not an unreviewed PR head.
+
+| Item | Exact proposed head | Verdict |
+| --- | --- | --- |
+| CF320 | `2b433b61d6f39808717c8ecc5346415fe00e7e45` | approve |
+| CF345 | `19e5d8f8cd8ef5fd72edd03afc2c3a42f44304d0` | changes: unnecessary and misleading generated comments |
+| CF346 | `ab3cc5f4fef286cac3ea4bd8048eb9e7ffcaa2c3` | changes: residual backup consistency gap; false comment and restore claims |
+| CF347 | `260c05071eb99b53eeff3ae74dcead9aa1611309` | changes: inherits CF345/346; development Cable fix confirmed |
+| CF417 | `9b11cb7c4ae7b9d825095b2556792c5afdeec39d` | changes for inherited CF346; own retry commit approved |
+| CF352 | `59f8a80bf6f5b0fcd24eaafcacaab8eee4e762e6` | changes: dense-input slowdown in the size sweep; proposed body number excluded |
+| CF350 | `6d3d7c72c84057c81dfc937be0f98e77a4f07ff6` | changes if retained; agree close in favour of narrower CF412/413 |
+| CF374 | `7b809885a194f4c2f06f4f43e8e34704968f543e` (current main, closure check) | approve closure, not a PR-head code approval; qualify supersession |
+
+### Executed checks and negative controls
+
+I independently ran `mise exec ruby@4.0.9 -- bin/rails test` and
+`mise exec ruby@4.0.9 -- bin/rubocop` in a separate detached worktree for each exact head, with installed locked
+bundles, prepared test databases and a local Redis. Every normal-suite result had zero failures/errors and the same two
+libvips-loader skips as clean main. Every whole-tree RuboCop result had no offenses.
+
+| Tree | Rails tests | Assertions | RuboCop files |
+| --- | ---: | ---: | ---: |
+| main `7b80988` | 649 | 3,921 | 335 |
+| CF320 | 652 | 3,932 | 335 |
+| CF345 | 649 | 3,921 | 335 |
+| CF346 | 649 | 3,921 | 334 |
+| CF347 | 649 | 3,921 | 334 |
+| CF417 | 650 | 3,927 | 336 |
+| CF352 | 650 | 3,922 | 335 |
+| CF350 | 662 | 3,974 | 334 |
+
+Harnesses and raw logs are retained under `.amp/in/orb-backup/` in the review thread, not upstream. Decisive
+suite logs are `main-test.log`, `cf320-test.log`, `cf345-test.log`, `cf346-test.log` and
+`cf{347,417,352,350}-test-isolated.log`; lint logs are `cfNNN-rubocop.log`. Excessive parallel supplemental runs
+on this two-core/four-GB orb stalled, so the normal suites were rerun sequentially. Initial contention failures
+remain in the earlier logs. An early supplemental CF346 `test:system` attempt stalled/timed out and was cancelled.
+
+Supplemental browser verification also ran on every exact head. CF320 and CF345 passed `bin/rails test:system`.
+CF346 completed with a sign-in assertion failure and a Selenium stale-element error, both in
+`SystemTestHelper#sign_in` before the affected composer tests. Clean main separately failed the same `a.btn`
+sign-in assertion before its unfurling test. The inspected main/CF346 captures show the authenticated Designers
+room, not an authentication error; the cause is not established, and this is **not** a claim that CF346's browser
+suite is green or that every failure is proved unrelated. Its normal suite is green as above.
+
+The monolithic CF347 browser run was killed after 17 tests by the memory cgroup (kernel OOM log confirmed).
+The remaining four heads were then run sequentially with one fresh process per existing browser-test file:
+`bin/rails test test/system/FILE_test.rb`. No app, test or browser-option change was made. All eight files per
+head completed, covering the full 30-test browser set, with zero failures/errors. The failed and killed attempts
+are retained, not replaced by green logs. These are local results, not hosted CI.
+
+| Tree | Browser tests | Assertions | Failures | Errors | Execution |
+| --- | ---: | ---: | ---: | ---: | --- |
+| main `7b80988` | 30 | 216 | 1 | 0 | single process |
+| CF320 | 30 | 221 | 0 | 0 | single process |
+| CF345 | 30 | 221 | 0 | 0 | single process |
+| CF346 | 30 | 212 | 1 | 1 | single process |
+| CF347 | 30 | 221 | 0 | 0 | eight file-bounded processes, after OOM |
+| CF417 | 30 | 221 | 0 | 0 | eight file-bounded processes |
+| CF352 | 30 | 221 | 0 | 0 | eight file-bounded processes |
+| CF350 | 30 | 221 | 0 | 0 | eight file-bounded processes |
+
+Browser logs: `main-system-isolated.log`, `cf{320,345,346,347}-system-isolated.log`,
+`system-suites.log`, `system-bounded.log` and `cf{347,417,352,350}-system-*_test.log` in the review thread's
+scratch directory. The per-item normal-suite counts refer to the first table, not a blanket browser approval.
+
+- CF320: `auth_probe.rb` added five scratch integration cases, 28 assertions, all passing. Substituting main's
+  authentication method made two shipped controller cases and three scratch cases fail (31 tests, five
+  failures in `cf320-auth-base.log`). A valid header wins over a valid path key; an invalid nonempty Bearer
+  does not fall back to a valid path key. Blank/malformed/Basic headers only fall back with a valid legacy
+  credential, and a key-free route without a credential rejects. Bot access to another room and a human-only
+  controller still rejects. Pagination follows the authenticated route. Removing the new 401s or blank-header
+  fail-closed branch is not a demonstrated security regression: main's session, CSRF and authorization checks
+  still run, and possessing the fallback key already authorizes the legacy request. Query-key fallback is an
+  inherited main boundary, not a newly accepted credential.
+- CF345: production `db:prepare` created the cache DB; `Rails.cache` round-tripped through `SolidCache::Store`;
+  primary/cache `wal_autocheckpoint` were 0/1000 (`cf345-production.log`). No new shipped test claims to fail
+  on main.
+- CF346 and CF347: production `backup_probe.rb` loaded the real `script/admin/prepare-backup`, retained an
+  existing ready job and a claimed job/process row, then injected actual `Room#destroy_later` between the two
+  snapshots. Both exact heads reproduced **primary room=1, memberships=0; queue deletion job=0**, checking the
+  exact newly enqueued job ID, not just the class count (`cf346-backup.log`, `cf347-backup.log`). The real
+  `hooks/post-restore` restored the ready job, claim and process. The boot orphan check left the claim alone;
+  aging/pruning the dead process produced `SolidQueue::Processes::ProcessPrunedError`, not `ProcessMissingError`
+  (`cf346-restore.log`, `cf347-restore.log`). CF347 also delivered a development Solid Cable broadcast across
+  two actual processes (`cf347-cable.log`). Neither head adds a backup regression test.
+- CF417: the shipped six-assertion test fails with `perform` disabled (`cf417-no-retry.log`). A further two
+  scratch cases/26 assertions exercised all three interruption classes, the purge allowlist, exactly three
+  retries and ordinary-error exclusion (`cf417-boundaries.log`). The policy is not merely inferred from an
+  empty or entirely excluded queue.
+- CF352: restoring both main filter methods still passes the new nested-tags test: 20 filter tests/83
+  assertions pass (`cf352-differential-fixtures.log`). It is a semantic regression guard, not evidence of a
+  pre-existing bug. Differential execution was byte-identical on 13 fixture bodies, ten adversarial inputs,
+  three 1.26-MB absent/early/late forbidden-tag inputs and a 3,000-element body. The dense-input slowdown in
+  the first stress run survived a new/old/old/new repeat with GC between windows, described below. The
+  coordinator is independently remeasuring the ordinary-message number in the proposed body; that number
+  is still outside this pass, whereas the input-shape regression is a code finding.
+- CF350: with the helper before Marcello's commits (`2fc4620`), the 38 fragment/helper cases give two encoding
+  errors; the exact head passes all 38/203 assertions (`cf350-fragments.log`). The added invalid-text room
+  test separately errors on clean main with `ActionView::Template::Error: invalid byte sequence in UTF-8`
+  (`cf350-main-invalid-body.log`). The stored-row and attachment cases are regression guards too; do not
+  claim each fails the previous key. The new `Rails.cache.expects(:fetch).never` case pins the implementation,
+  not a user-visible result, and should be removed if the branch survives.
+
+### Required changes and maintainer judgment
+
+**CF346/347 restore safety.** Queue-first is safer than deliberately throwing away the queue on restore, but
+it does not establish a coherent backup. A request in the gap can commit deletion state to the primary snapshot
+without its cleanup job being in the earlier queue snapshot. This is a real caller:
+[`Room#destroy_later` removes memberships, then enqueues](https://github.com/thomasklemm/once-campfire/blob/ab3cc5f4fef286cac3ea4bd8048eb9e7ffcaa2c3/app/models/room.rb#L51-L59),
+and the documented self-hosting path explicitly runs the snapshot inside a running container
+([backup instructions](https://github.com/thomasklemm/once-campfire/blob/ab3cc5f4fef286cac3ea4bd8048eb9e7ffcaa2c3/docs/self-hosting.md#L177-L180)).
+Running jobs may also finish/delete primary rows after the queue copy, contradicting "the primary snapshot has
+every record its jobs refer to." This is a residual loss boundary, not proof that main's nonpersistent Resque
+was safer. Do not report Codex's cleanup-loss P1 fully fixed. Either establish quiescence/reconciliation across
+the pair, or have Thomas explicitly accept the residual semantics and disclose them. Add a hook-level regression
+case for the chosen contract; do not hide the gap by testing only a quiet queue. Delete the false order comment
+and corresponding commit-message claim. CF417 cannot recover a job absent from the restored queue.
+
+The running-job explanation must distinguish normal orphan startup from restoring a queue **with process rows**.
+In the latter, the restored process remains until stale-process pruning, then produces `ProcessPrunedError`.
+CF417 handles that class too. Banned-content removal intentionally remains outside its retry allowlist because
+the user may have been unbanned. The item draft and P1 reply have been corrected; the earlier builder statements
+above about universal boot-time `ProcessMissingError` are superseded here.
+
+**CF352 dense-input regression.** `dense_filters_probe.rb` evaluates the exact proposed methods against main
+through `TextMessagePresentationFilters.apply`, checks exact output, forces GC between windows and runs new,
+old, old, new. No other suite ran alongside it. For `"<span>x</span>" * 90_000` (1,260,000 bytes), both versions
+return exactly the input, but the new windows take **115,093 / 149,879 ms**, versus **16,598 / 16,970 ms** on
+main (`cf352-dense.log`). The earlier stress run was 128,944 versus 15,222 ms; it was not dismissed as noise.
+At 3,000 elements the new windows were 248–408 versus 391–456 ms; at 12,000, 1,957/2,013 versus 1,476/1,777 ms.
+These are diagnostic shape controls, not a publication-quality speed table. The regression is repeatable in
+both orders and is material even though this is not a normal chat message. DECISIONS requires this size sweep
+precisely to catch improvements measured only where they win. Keeping only the solo-link shortcut with main's
+tag selector gives 15,112/15,387 ms on the same dense input (`cf352-solo-control.log`), isolating the added
+cost to the tag pass. Do not publish this synthetic row upstream.
+
+After the builder supplied a specific explanation, I independently checked installed Nokogiri 1.19.5:
+`XML::DocumentFragment#css` (`lib/nokogiri/xml/document_fragment.rb:173–178`) delegates to `children.css`;
+`NodeSet#css` (`node_set.rb:85–91`) unions a result for each child; `+` aliases `|`, whose C implementation
+copies the accumulated set (`ext/nokogiri/xml_node_set.c:252–267`). Every allowed top-level span matches `*`,
+so these growing unions make the new selection quadratic; main's exclusion selector keeps the unions empty
+on that input. `source.xpath(".//*")` evaluates once on the fragment instead. My direct primitive control
+at 3,000/6,000/12,000 spans gave CSS 0.082/0.240/1.853 s versus XPath 0.0012/0.0017/0.0093 s, with identical
+node identities/order (`cf352-xpath-primitive.log`). A mixed nested fragment also matched all 300 nodes in
+order. The full filter differential with just that replacement was byte-identical on all 13 fixtures,
+ten adversarial, three large absent/early/late and 3,000-element inputs, including forbidden parents and
+SVG/MathML; selection order matched on every input (`cf352-xpath-differential.log`).
+
+**The right must-fix is the one-line `css("*")` → `xpath(".//*")` substitution, not reverting the whole tag
+change.** It removes the identified per-child unions without a new guard, abstraction or explanatory comment,
+and preserves the set-based walk and solo-link saving. The scratch full dense XPath variant was 13.6/41.3 s
+against interleaved main's 21.3/21.9 s while a browser suite ran; those noisy windows are retained in
+`cf352-xpath-dense.log`, not certified as a performance result. The original uncontended regression and the
+primitive/source attribution establish the requested fix. This does not approve an unbuilt replacement head;
+rerun its suites and ordinary-message/large-input measurements after rebuilding. No Campfire source was edited.
+
+**Guards and comments, all changed lines checked against DECISIONS.**
+
+- CF320's header-first `|| params[:bot_key]` is the ordinary Rails helper plus the real legacy caller; keep it.
+  No new comment. Do not restore blanket 401/session/blank-header machinery without a contract needing it.
+- CF345 has no speculative guard. Keep the local Gemfile section label and the one-line checkpoint reason:
+  copying the primary's zero into the cache would otherwise leave its WAL unchecked. Cut the new production
+  "Replace the default in-process memory cache" comment (the base is Redis, and it narrates the change).
+  Cut `cache.yml`'s optional `max_age` explanation/commented setting: generator provenance does not exempt it
+  from the no-unnecessary-comments rule. These are required `changes`, not nits.
+- CF346's post-restore `-f` preserves main's missing-snapshot behavior; do not replace it with speculative
+  modes. The queue pool reason, primary-only checkpoint reason and pre-fork flock reason explain real
+  hazards and can stay as short local comments. Existing checkpoint comments only rename Resque. The queue-first
+  comment is false and must go. The sequential two-DB operation needs a consistency contract, not a new
+  generic backup abstraction. CF347 inherits this and CF345's comments; its own checkpoint line is useful,
+  and the existing room comment's Redis-to-broadcast wording is appropriate.
+- CF417's error-class filter, two-job allowlist, retry cap and `RecordNotFound` race rescue all protect real
+  policy or manual retry/discard. Keep them. The one-line class policy, execution-counter reason, manual-race
+  rescue reason and test-DB reason would not be improved by narrating more implementation detail. The own
+  commit is direct and cohesive; the full head is blocked only by its CF346 parent.
+- CF352's sole-unfurled-URL guard avoids real unnecessary attachment/mention rendering. The element-name set
+  has no new defensive branch and no comment. Its shape is readable, but that does not override the dense-input
+  regression above; no compatibility wrapper or speculative guard is the remedy.
+- CF350's preloading capability check serves real `Message::Page` and search relations; its request-render and
+  transaction gates exclude detached broadcasts/uncommitted data. Direct-room, attachment and embedded-tag
+  exclusions protect actual viewer-specific metadata; case-insensitive stored-byte matching and nil-safe `.b`
+  handle Marcello's reproduced inputs. Keep locale/origin/mount/deployment namespaces and the byte-size bound.
+  The relocated record-cache version/budget/transaction, persisted/unchanged-record and epoch rechecks still
+  protect real cache admission and foreign writes. No arbitrary-object fallback needs adding. However, cut
+  the public-helper narration above `message_runs`/`cache_message_actions`/`perform_caching`, the multi-line
+  stored-value/body explanations (including Marcello's), the redundant collection-cached-text comment and
+  the pagination scope narration. Attribution is not a comment-rule exception. Keep a short why for the
+  timestamp-independent key and unversioned-build namespace. The `_message` key-bump reminder explains an
+  otherwise invisible deployment obligation, but trim its "cached once" narration. No file crosses 1,000
+  lines; separate the local-cache MemoryStore rewrite from fragment sharing if reviving this branch. The
+  pagination diff only rewords comments; it is not a pagination behavior change.
+
+**Proposed bodies and For Thomas, sentence by sentence.** The reviewed drafts stay in the items, unposted.
+CF320's credential-log problem, route, pagination, page and webhook statements agree with the callers and probes;
+the casing/webhook reply is current. CF345's DB creation, cold cache, checkpoint, disposable restore and benchmark
+preparation statements agree with the executed production probe and source. CF346's Resque restart loss and
+worker/pool statements agree with the configs and Marcello's linked run; its unconditional restore sentence
+needed the missing-jobs/running-jobs boundary. The draft also cuts the Docker-run validation sentence under
+Leave out. The batching/timeout reply keeps unrelated optimizations separate.
+CF347's dependency paragraph, removed Redis consumers, multi-worker development reason and transient restore
+statements agree with the diff and broadcast probe; its proposed P1 "Fixed" reply must not be sent unchanged.
+The baseline-image and `db:prepare` review threads remain addressed; `Resque.queue_sizes` was present in 2.7.0
+and the removed guide makes that thread moot. CF417's interruption classes, cadence, cap, allowlist and
+non-idempotent-job exclusions agree with the code/probes; it does not promise recovery of missing queue rows.
+The two stacked bodies' short SHA clauses are explicitly permitted by DECISIONS' fixed stacked-body format,
+not general-purpose validation prose.
+
+CF352's "has an unfurled link" was tightened to **one**; "fifty" was cut (the actual allowlist has 54 names).
+The equivalent-output and walk/set statements are supported by the differential inputs. Its original commit
+message also says "fifty"; use "a long selector" if that message is rebuilt. The numeric table is deliberately
+not certified or replaced by this pass. CF350's key dependencies/fresh-render/local-cache statements agree with
+source and tests; sharing needs a shared store, and independently booted applications need a stable
+`GIT_REVISION` to share namespaces. An unversioned build intentionally gets a different namespace each boot,
+but sibling Puma workers inherit the parent's namespace: `config/puma.rb` loads the environment before forking.
+Do not overstate this as requiring a revision for all cross-worker reuse. The actual independent-boot boundary
+is now explicit in the draft. Its Marcello sentence is supported by his two original commits, the negative
+controls and the opened load-run
+comment; it does not reuse his earlier timings as an exact-head speed claim. No test counts, commands, rejected
+variants or internal review history belong in any proposed upstream body. These remain in this record instead.
+
+**Closure decisions.** Agree close CF350 in favour of the narrower open #412/#413, not because they include
+everything: cross-worker sharing, mixed cacheable runs and the MemoryStore swap remain unique. The own branch
+is too broad for that common goal; the invalid-body failure deserves a separate small correctness fix whichever
+option wins. Agree close CF374 for the now-cached common path. Merged #370 (`c8f74a0`) uses a **one-entry last-key
+cache**, not a map of all hosts forever: alternating base URL/host/mount keys still recompute. The old "once per
+worker and host" note and "runs once per worker now" closing sentence were overstatements and are corrected in
+the item. This approves the proposed closure, not the old head/body's stale per-request premise. No new CF374
+head was supplied, so no new CF374 suite/identity approval is claimed. Its pass names current main, not the
+unchanged published head `af857b016152cfd9bd3ce707c1ec899403a3e668`, so a closure-only approval cannot satisfy
+the queue's code-review gates on that PR head.
+
+**Identity.** `git cat-file commit` and `git log --format='%(trailers:only)'` were inspected for all nine unique
+rebuilt commits (plus the replayed queue commit in CF347). Thomas is author and committer except the two
+Marcello commits, whose author is Marcello Costagliola; Thomas is their committer. The original **author**
+timestamps/timezones match, including Marcello's `1793085139 +0100` and `1793090210 +0100`. Rebuilt committer
+dates are new on 2026-11-18, not preserved original committer dates. Thus this confirms the builder's stated
+author-date preservation, not a stronger both-dates-preserved claim. Every inspected message is trailer-free;
+no Amp/Claude/Cursor attribution line was inserted. Raw objects are in `identity.txt` in the review thread.
+
+Delivery scope: only this Lowrail record and the eight queue-item review/draft updates; no fork/PR branch push,
+review submission, comment, closure or other upstream post is authorized by or performed in this pass.
