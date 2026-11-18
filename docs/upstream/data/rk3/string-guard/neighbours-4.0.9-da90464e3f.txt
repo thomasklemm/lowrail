@@ -1,0 +1,28 @@
+4.0.9 cgi/util=false
+escape_html(Sub 'a'): "a" (Sub)
+escape_html(Sub '<'): "&lt;" (String)
+escape_html(BasicObject to_s): "a b" (String)
+escape_path(BasicObject to_s): raises NoMethodError: undefined method 'gsub' for #<BasicObject:0x00007f57d81250c0>
+escape_path(Sub 'a'): "a" (String)
+unescape_path(Sub 'a'): "a" (String)
+unescape_path(BasicObject to_str): raises NoMethodError: undefined method 'encoding' for #<BasicObject:0x00007f57d8124ff8>
+build_query(x: BasicObject): raises NoMethodError: undefined method 'class' for #<BasicObject:0x00007f57d81250c0>
+build_nested_query(x: BasicObject): "x=a+b" (String)
+set_cookie_header(BasicObject): "k=a+b" (String)
+build_query(x: Sub 'a'): "x=a" (String)
+parse_query(Sub 'a=b') value: "b" (String)
+parse_query(BasicObject): raises NoMethodError: undefined method 'empty?' for #<BasicObject:0x00007f57d8124ff8>
+parse_nested_query(BasicObject): raises NoMethodError: undefined method 'empty?' for #<BasicObject:0x00007f57d8124ff8>
+parse_cookies_header(BasicObject): raises NoMethodError: undefined method 'split' for #<BasicObject:0x00007f57d8124ff8>
+parse_cookies_header('a'): {"a" => nil} (Hash)
+escape(BasicObject to_s): "a+b" (String)
+unescape(BasicObject to_str+b): "aA" (String)
+escape(Sub 'a'): "a" (String)
+escape(Sub 'a b'): "a+b" (String)
+unescape(Sub 'a'): "a" (String)
+unescape(Sub 'a%41'): "aA" (String)
+escape(nil): "" (String)
+unescape(nil): raises NoMethodError: undefined method 'b' for nil
+escape(:sym): "a+b" (String)
+escape(1): "1" (String)
+unescape(:sym): raises NoMethodError: undefined method 'b' for an instance of Symbol

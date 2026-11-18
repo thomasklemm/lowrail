@@ -1,0 +1,7 @@
+escape "a": URI "a" ActiveSupport::SafeBuffer html_safe=false | Rack "a" ActiveSupport::SafeBuffer html_safe=false
+unescape "a": URI "a" String html_safe=false | Rack "a" String html_safe=false
+escape "a b": URI "a+b" ActiveSupport::SafeBuffer html_safe=false | Rack "a+b" ActiveSupport::SafeBuffer html_safe=false
+unescape "a b": URI "a b" String html_safe=false | Rack "a b" String html_safe=false
+escape "<x>&y": URI "%3Cx%3E%26y" ActiveSupport::SafeBuffer html_safe=false | Rack "%3Cx%3E%26y" ActiveSupport::SafeBuffer html_safe=false
+unescape "<x>&y": URI "<x>&y" String html_safe=false | Rack "<x>&y" String html_safe=false
+set_cookie_header: "k=a+b" / build_query: "k=a" String

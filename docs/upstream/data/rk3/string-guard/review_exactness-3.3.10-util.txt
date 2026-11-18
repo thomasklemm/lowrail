@@ -1,0 +1,83 @@
+{
+  "ruby": "ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]",
+  "cgi_util_loaded": true,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+    "subclass/escape": 2,
+    "subclass/unescape": 6,
+    "subclass/query_unescape": 6
+  },
+  "examples": {
+    "subclass/escape": [
+      "subclass/",
+      [
+        "ok",
+        "String",
+        "US-ASCII",
+        [
+
+        ],
+        false,
+        true
+      ],
+      [
+        "ok",
+        null,
+        "US-ASCII",
+        [
+
+        ],
+        false,
+        true
+      ]
+    ],
+    "subclass/unescape": [
+      "subclass/",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+
+        ],
+        false,
+        true
+      ],
+      [
+        "ok",
+        null,
+        "UTF-8",
+        [
+
+        ],
+        false,
+        true
+      ]
+    ],
+    "subclass/query_unescape": [
+      "subclass/",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+
+        ],
+        false,
+        true
+      ],
+      [
+        "ok",
+        null,
+        "UTF-8",
+        [
+
+        ],
+        false,
+        true
+      ]
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+stateful encoding %FF: same
+stateful encoding %41: same
+encoding raising on 2nd to_str: same
+encoding mutating the input: same
+BasicObject to_str+b: same
+BasicObject to_str+b, lone %: same
+BasicObject to_str only: same
+plain BasicObject: same
+cgi/util loaded: true
+nil: same
+:sym: same
+:"a%41": same
+12: same
+"abc": same
+"a%": same
+"a%41": same
+"a": DIFF [:ok, "String", #<Encoding:UTF-8>, "a", false, true] [:ok, "anonymous < String", #<Encoding:UTF-8>, "a", false, true] [:ok, "anonymous < String", #<Encoding:UTF-8>, "a", false, true]
+"a%": same
+boundary "a": DIFF [:ok, "String", #<Encoding:UTF-8>, "hooked", false, true] [:ok, "String", #<Encoding:UTF-8>, "a", false, true] [:ok, "String", #<Encoding:UTF-8>, "a", false, true]
+ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 17 fixed, 1 differences

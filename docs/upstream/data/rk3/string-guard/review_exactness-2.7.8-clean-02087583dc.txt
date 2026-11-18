@@ -1,0 +1,11 @@
+{
+  "ruby": "ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]",
+  "cgi_util_loaded": true,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+  },
+  "examples": {
+  }
+}

@@ -1,0 +1,20 @@
+stateful encoding %FF: same
+stateful encoding %41: same
+encoding raising on 2nd to_str: same
+encoding mutating the input: same
+BasicObject to_str+b: DIFF [:ok, "String", #<Encoding:UTF-8>, "aA", false, true] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"]
+BasicObject to_str+b, lone %: DIFF [:err, NoMethodError, "undefined method 'to_s' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"]
+BasicObject to_str only: DIFF [:err, NoMethodError, "undefined method 'b' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method 'instance_of?' for #<BasicObject:0x>"]
+plain BasicObject: DIFF [:err, TypeError, "no implicit conversion of BasicObject into String"] [:err, NoMethodError, "undefined method 'instance_of?' for an instance of BasicObject"] [:err, NoMethodError, "undefined method 'instance_of?' for an instance of BasicObject"]
+cgi/util loaded: false
+nil: same
+:sym: same
+:"a%41": same
+12: same
+"abc": same
+"a%": same
+"a%41": same
+"a": same
+"a%": same
+boundary "a": DIFF [:ok, "String", #<Encoding:UTF-8>, "hooked", false, true] [:ok, "String", #<Encoding:UTF-8>, "a", false, true] [:ok, "String", #<Encoding:UTF-8>, "a", false, true]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 17 fixed, 4 differences
