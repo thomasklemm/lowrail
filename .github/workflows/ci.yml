@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GEM_HOME: /home/runner/gems
+      # A missing prerequisite fails instead of skipping; tests that need what CI lacks are excluded by name below.
+      LOWRAIL_STRICT_GATES: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.7" # mise.toml
+          bundler: none
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/cache@v6
+        with:
+          path: /home/runner/gems
+          key: gems-${{ runner.os }}-ruby-4.0.7-${{ hashFiles('script/gate-gems') }}
+      - name: Gems (script/gate-gems, the gate's gem set)
+        run: |
+          echo "$GEM_HOME/bin" >> "$GITHUB_PATH"
+          ruby script/gate-gems
+      - name: Rust tests
+        run: cargo test --locked
+      - name: Gem tests
+        working-directory: gem
+        run: |
+          excluded=(
+            # Need corpus apps from script/corpus (.corpus/real-blog, real-blog-r4, campfire: network, bundles, assets).
+            'BlogProductionTest#test_cold_sealed_admission_does_not_prepare_the_app'
+            'BlogProductionTest#test_terminal_completion_distinguishes_pending_jobs_from_drained_cable'
+            'E2ETest#test_real_blog_outcomes_identical_with_hooks'
+            'FactsRealBlogTest#.*'
+            'FormScaffoldTest#test_passive_production_token_and_collection_public_artifact'
+            'FormScaffoldTest#test_public_sealed_build_preserves_forms_observers_and_refuses_custom_builder'
+            'MaterializeCorpusTest#.*'
+            'ObserveCorpusTest#.*'
+            'TestCertificateTest#test_render_.*'
+            # Need the Rails v8.1.4 checkout and its bundle from script/rails-suite --prepare.
+            'RailsSuiteReportTest#test_separate_build_does_not_change_view_primary_key_results'
+            'RailsSuiteReportTest#test_profiling_preserves_backtrace_cleaner_results'
+          )
+          pattern="/^($(IFS='|'; echo "${excluded[*]}"))\$/"
+          ruby -S rake test TESTOPTS="--verbose --seed=1729 --exclude='$pattern'"
