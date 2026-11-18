@@ -39,6 +39,12 @@ side_effects = {
 warn "lowrail-profile: the requests are real#{" (#{side_effects.map { "#{_1} #{_2}" }.join(", ")})" unless side_effects.empty?}; " \
   "run them against a disposable database, queue and mail service"
 measured = {}
+# Every counted request as sent, in order: compare checks that two captures
+# measured the same sequence, not only the same declarations.
+require "digest"
+sequence = Digest::SHA256.new
+sequence << JSON.generate([host, Lowrail::Workloads::BROWSER])
+counted = 0
 write = lambda do
   next unless receipt
   File.write(receipt, JSON.pretty_generate("manifest" => definition.manifest, "replayed" => definition.requests.map(&:name),
@@ -47,7 +53,12 @@ write = lambda do
         "adapter runs their jobs in the request, any other enqueues real work"),
     "not_replayed" => { "mails" => definition.mails.map(&:name), "jobs" => definition.jobs.map(&:name) },
     # A block's or alternate's requests as measured (the manifest has only the declaration).
-    "measured_variants" => measured) + "\n")
+    "measured_variants" => measured,
+    "measured" => { "requests" => counted, "sha256" => sequence.hexdigest[0, 16] }) + "\n")
+  # Per run, for the report's capture metadata (LOWRAIL_PROFILE is the run's directory).
+  if (run = ENV["LOWRAIL_PROFILE"]) && File.directory?(run)
+    File.write(File.join(run, "measured.json"), JSON.generate("requests" => counted, "sha256" => sequence.hexdigest[0, 16]) + "\n")
+  end
 end
 write.()
 
@@ -56,7 +67,10 @@ pass = lambda do |record|
   definition.requests.each do |r|
     current = r
     spec = replay.perform(r)
-    next unless record && (r.block || r.alternate)
+    next unless record
+    counted += 1
+    sequence << JSON.generate([r.name, r.verb, r.signed_in, spec.variant, spec.to_h["headers_sha256"]])
+    next unless r.block || r.alternate
     list = measured[r.name] ||= []
     list << spec.variant unless list.size >= 20 || list.include?(spec.variant)
   end

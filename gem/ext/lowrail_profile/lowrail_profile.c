@@ -27,7 +27,8 @@ typedef struct {
     uint64_t key;      /* via << 63 | kind << 61 | path id << 35 | line << 5 | ruby type; 0 = empty */
     uint64_t count;
     uint64_t requests; /* windows in which the line allocated */
-    uint64_t first;    /* objects in the first window that reached the line */
+    uint64_t first;    /* objects of its first window: the one that reached the line first */
+    uint64_t owner;    /* that window's id, reserved at its first touch, before it closes */
 } site_t;
 
 static site_t *sites;
@@ -63,12 +64,15 @@ static size_t app_root_len;
  * so overlapping threads (M:N included) and independent fibers each have
  * their own. Its sites and pairs are merged once when it closes; the slot
  * and its buffers are then reused, so threads that come and go leave
- * nothing behind. The owner is marked (pinned) while the window is open. */
+ * nothing behind. The owner is marked (pinned) while the window is open, so
+ * a fiber abandoned inside a window stays alive; past MAX_OPEN open windows
+ * the oldest one off the current fiber is dropped (counted in dropped),
+ * which bounds that. (Ruby 4.0 exports no weak marking to extensions.) */
 typedef struct { uint64_t key, count; } seen_t;
 typedef struct {
     VALUE thread, fiber; /* fiber 0 = free slot */
     int depth;
-    uint64_t kind, name, objects;
+    uint64_t id, kind, name, objects;
     seen_t *seen;
     size_t seen_cap, seen_len;
     pend_t *pend;
@@ -78,8 +82,9 @@ static win_t *wins;
 static size_t wins_cap, wins_open;
 /* Buffers larger than this are freed when their window closes. */
 #define KEEP_CAP (1 << 16)
+#define MAX_OPEN 1024
 
-static uint64_t windows[KINDS], objects[KINDS], dropped;
+static uint64_t windows[KINDS], objects[KINDS], dropped, window_seq;
 static VALUE tracepoint = Qnil;
 
 static uint64_t
@@ -293,6 +298,8 @@ current_window(void)
     return window_of(rb_fiber_current());
 }
 
+static site_t *site_for(uint64_t key);
+
 static void
 newobj(VALUE tpval, void *data)
 {
@@ -331,7 +338,14 @@ newobj(VALUE tpval, void *data)
     if ((w->seen_len + 1) * 2 > w->seen_cap && !grow_pairs((void **)&w->seen, &w->seen_cap, sizeof(seen_t), 1)) { dropped++; return; }
     size_t i = mix(key) & (w->seen_cap - 1);
     while (w->seen[i].key && w->seen[i].key != key) i = (i + 1) & (w->seen_cap - 1);
-    if (!w->seen[i].key) { w->seen[i].key = key; w->seen_len++; }
+    if (!w->seen[i].key) {
+        w->seen[i].key = key;
+        w->seen_len++;
+        /* The first window to touch a line owns its first count, however the
+         * windows close; the global entry is reserved now, merged at close. */
+        site_t *s = site_for(key);
+        if (s && !s->owner && !s->requests) s->owner = w->id;
+    }
     w->seen[i].count++;
     if (attributing && seen && pid) attribute(w, (pid << 32) | line);
 }
@@ -401,7 +415,7 @@ close_window(win_t *w)
         if (!e->key) continue;
         site_t *s = site_for(e->key);
         if (!s) { dropped += e->count; continue; }
-        if (s->requests == 0) s->first = e->count;
+        if (s->owner == w->id || (!s->owner && !s->requests)) s->first = e->count;
         s->requests++;
         s->count += e->count;
     }
@@ -432,6 +446,13 @@ profile_enter(VALUE self, VALUE k)
     win_t *w = window_of(fiber);
     if (w) { w->depth++; return Qtrue; }
     w = window_of(0);
+    if (!w && wins_open >= MAX_OPEN) {
+        win_t *oldest = NULL;
+        for (size_t i = 0; i < wins_cap; i++)
+            if (wins[i].fiber && wins[i].fiber != fiber && (!oldest || wins[i].id < oldest->id)) oldest = &wins[i];
+        /* Its objects are lost, so the capture says so (compare refuses it). */
+        if (oldest) { release(oldest); dropped++; w = oldest; }
+    }
     if (!w) {
         size_t cap = wins_cap ? wins_cap * 2 : 16;
         win_t *next = realloc(wins, cap * sizeof(win_t));
@@ -444,6 +465,7 @@ profile_enter(VALUE self, VALUE k)
     w->thread = thread;
     w->fiber = fiber;
     w->depth = 1;
+    w->id = ++window_seq;
     w->kind = (FIXNUM_P(k) ? (uint64_t)FIX2LONG(k) : 0) % KINDS;
     w->name = 0;
     w->objects = 0;
@@ -575,7 +597,7 @@ profile_snapshot(VALUE self)
     action_t *acopy = malloc((actions_len + 1) * sizeof(action_t));
     attrib_t *tcopy = malloc((attribs_len + 1) * sizeof(attrib_t));
     if (!copy || !acopy || !tcopy) { free(copy); free(acopy); free(tcopy); rb_raise(rb_eNoMemError, "lowrail profile snapshot"); }
-    for (size_t j = 0; j < sites_cap && n <= sites_len; j++) if (sites[j].key) copy[n++] = sites[j];
+    for (size_t j = 0; j < sites_cap && n <= sites_len; j++) if (sites[j].key && sites[j].requests) copy[n++] = sites[j];
     for (size_t j = 0; j < actions_cap && na <= actions_len; j++) if (actions[j].windows) acopy[na++] = actions[j];
     for (size_t j = 0; j < attribs_cap && nt <= attribs_len; j++) if (attribs[j].site) tcopy[nt++] = attribs[j];
     uint64_t w[KINDS], o[KINDS], d = dropped;

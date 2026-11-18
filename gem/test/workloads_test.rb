@@ -47,7 +47,7 @@ class WorkloadsTest < Minitest::Test
   # lowrail-profile's client (B), through the shared policy, recorded by a
   # middleware in front of the app. The file has a sign-in, CSRF from a page,
   # a header, an XHR and a JSON write with an alternate, a write with
-  # csrf: false and a signed-out request.
+  # csrf: false, a signed-out request, and a cookie scoped to a path.
   def test_census_and_profile_send_the_same_requests
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
@@ -60,6 +60,9 @@ class WorkloadsTest < Minitest::Test
             post "/items" => "pages#ok"
             post "/api" => "pages#ok"
             post "/nocsrf" => "pages#nocsrf"
+            get "/private/login" => "pages#scoped"
+            get "/private/me" => "pages#ok"
+            get "/public" => "pages#ok"
           end
         RUBY
         "app/controllers/pages_controller.rb" => <<~'RUBY',
@@ -70,6 +73,7 @@ class WorkloadsTest < Minitest::Test
             def me = render(plain: "user #{session[:user].inspect}")
             def ok = render(plain: "ok")
             def nocsrf = render(plain: "ok")
+            def scoped = (cookies[:auth] = { value: "yes", path: "/private" }; render(plain: "ok"))
           end
         RUBY
         "config/initializers/recorder.rb" => <<~'RUBY',
@@ -98,6 +102,9 @@ class WorkloadsTest < Minitest::Test
           post "/items", name: "item (XHR)", xhr: true, params: { item: { name: "y" } }
           post "/api", name: "api", as: :json, params: { n: 1 }, alternate: [{ path: "/api?v=2" }, { params: { n: 2 } }]
           get "/me", name: "me (signed out)", signed_in: false
+          get "/private/login", name: "scoped cookie"
+          get "/public", name: "outside its path"
+          get "/private/me", name: "inside its path"
         RUBY
         "contract.rb" => <<~RUBY)
           require "./config/environment"
@@ -129,8 +136,9 @@ class WorkloadsTest < Minitest::Test
       assert_equal [{ "item" => { "name" => "x" }, "authenticity_token" => "T" }, false], item.values_at("params", "token_header")
       assert_equal [{ "item" => { "name" => "y" } }, true, "XMLHttpRequest"], [*xhr.values_at("params", "token_header"), xhr["headers"]["HTTP_X_REQUESTED_WITH"]]
       assert_equal ["v=2", { "n" => 1, "v" => "2" }, true, "application/json"], api.values_at("query", "params", "token_header", "type")
-      assert_equal({ "n" => 2 }, sent[13]["params"])
+      assert_equal({ "n" => 2 }, sent[16]["params"])
       assert_equal [["_fixture_app_session"], []], sent.values_at(2, 8).map { _1["cookies"] }
+      assert_equal [%w[_fixture_app_session], %w[_fixture_app_session auth]], sent.values_at(10, 11).map { _1["cookies"] }
     end
   end
 end

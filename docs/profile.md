@@ -52,7 +52,9 @@ bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 
 `script/census app` does, through the same code (`Lowrail::Workloads::Replayer`): a browser's `Host`, `Origin`,
 `Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in (a form, or a cookie, signed
 with the app's key for `signed: true`), CSRF tokens (none for `csrf: false`), alternates and blocks, and the cookies
-earlier responses set. A status outside a request's `expect:` stops the run.
+earlier responses set, kept as the census's Rack::Test session keeps them (by name and `Path`, sent only under that
+path, dropped after their `Expires`; `Domain` and `Max-Age` are not modeled). A status outside a request's
+`expect:` stops the run.
 
 **The requests are real.** They write to the app's database and go through its own queue adapter and mail
 delivery: an inline adapter performs the jobs they enqueue inside the request (and counts them as part of it), any
@@ -63,12 +65,15 @@ output directory holds the file's manifest, the adapters the requests used, the 
 requests with an alternate or block the variants measured.
 
 `--record [FILE]` records, in the first run, the shape of every routed request: method, route, format, JSON or XHR,
-an Accept the file would not send anyway (a Turbo Stream's), and one request's params (a GET's query, a write's
-body). It then writes the 20 most frequent shapes as a workloads file (default `lowrail/workloads.rb`, or
+an Accept the file would not send anyway (a Turbo Stream's, or a GET's `application/json`), and one request's params
+(a GET's query, a write's body). A JSON GET is written as a GET with its `Accept` header and query, not with
+`as: :json`, which would send the query as a JSON body. It then writes the 20 most frequent shapes as a workloads file (default `lowrail/workloads.rb`, or
 `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row
 (`Article.first!`, for models the app has loaded). Recording is sensitive: params pass through the app's
-`filter_parameters` before anything is kept, filtered values are written as `[FILTERED]`, and nothing is taken from
-the raw path or query string; still check the file before you commit it. Every value from a request is written as
+`filter_parameters` (the list as it is when the request runs) before anything is kept or used to group requests,
+every path value and the format included; filtered values are written as `[FILTERED]`, nothing is taken from the raw
+path or query string, and without the app's filter no params are kept. Still check the file before you commit it:
+only what the filter names is hidden. Every value from a request is written as
 a quoted literal, never as Ruby. Only GETs that replay as recorded are enabled; each other shape is commented out
 with its reason, until you make it work:
 
@@ -121,7 +126,8 @@ is built outside the app, never during its boot.
 `LOWRAIL_PROFILE` (set by the command, never by you) makes `RUBYOPT=-rlowrail/profile` install:
 
 * an internal `NEWOBJ` hook, the one `ObjectSpace.trace_object_allocations` uses, that keeps a count per file,
-  line, object type and kind of window in C memory (no Ruby objects, no retained records; GC stays on);
+  line, object type and kind of window in C memory (no Ruby objects, no retained records; GC stays on). An open
+  window keeps its fiber and thread alive until it closes, see below;
 * windows, so only objects allocated inside one count, each named after what it runs:
   * a request: `Rails::Engine#call`, named by the first controller action it dispatches
     (`ActionController::Metal#dispatch`, so `RoomsController#show`);
@@ -141,7 +147,11 @@ is built outside the app, never during its boot.
   jobs and mail it runs and jobs, mails and Cable actions reported apart are the ones that ran on their own.
   A window belongs to the fiber that opened it: overlapping threads (with M:N threads too) and independent fibers
   (a fiber scheduler's requests) each count their own, and allocations in another fiber the window starts
-  (`Enumerator#next`) are not counted. Code in Ractors other than the main one runs uncounted;
+  (`Enumerator#next`) are not counted. A fiber dropped while its window is open (a scheduler cancelling a request
+  mid-flight and never resuming it) stays alive, with what it references, until more than 1,024 windows are open;
+  then the oldest open window off the current fiber is given up, counted as dropped, and its fiber can be collected.
+  So such an app retains at most 1,024 abandoned fibers, and its capture is not valid evidence for `compare`. Code
+  in Ractors other than the main one runs uncounted;
 * an `at_exit` writer (one TSV per process; forked test workers reset their counts and recorded shapes and write
   their own).
 
@@ -234,11 +244,15 @@ outside the app and per action (requests, jobs, mails and Cable actions apart), 
 exits 1 when anything grew beyond its noise floor and 0 when nothing did, but only for valid evidence; otherwise it
 exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
 
-* **Valid evidence**: both reports come from this version of lowrail-profile (they carry capture metadata), with
-  at least two runs each, every run's command exiting 0, no dropped samples and windows in every run; and base and
-  head ran the same command with the same seed, Ruby, environment, number of runs and workloads manifest. A
+* **Valid evidence**: both reports come from this version of lowrail-profile, complete (every collection present,
+  one finite warm value per run for every line and action), with at least two runs each, every run's command
+  exiting 0, no dropped samples, windows in every run, and one Ruby and environment in every process; and base and
+  head have the same capture identity, seed, Ruby, environment and number of runs. The identity of a command is its
+  arguments; of `--workloads` it is the file's manifest, the replay host and, per run, a digest of every counted
+  request as sent (so a block that sends other requests is a different capture), never the output directory. A
   missing or partial report, a failing suite or a one-run profile is never a green result.
-* A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of both reports has some.
+* A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of both reports has some;
+  a kind some runs have and others lack, or no comparable kind at all, exits 2.
   A line one side never reached is a measured zero there; an action one side did not run, or that has no warm value
   on a side (it ran once per process), is listed as not compared.
 * A line's noise floor is the larger of its run-to-run spread (largest minus smallest run, so every run counts with
@@ -254,6 +268,14 @@ with 3 regressions: the action (+45.85 per request against a floor of 26.47) and
 calls (+1.68 per request each over all requests, floor 1.0), and nothing else; 35 actions that run once per process
 are listed as not compared. Comparing a `bin/rails test -v` profile with a `bin/rails test` one exits 2 (different
 commands). Rechecked after the review fixes; the first measurement gave +46.35 against 26.48.
+
+**The line floor is not enough for an A/A pair.** After the confirm-review fixes, a second A/A pair of
+`bin/rails test -v` on the same Campfire copy exited 1 with one regression: `GEM/json/lib/json/common.rb:364`,
++1.69 objects per request against a floor of 1.0. Across six Campfire captures that line's per-run values range from
+107.3 to 111.2, but inside one capture its two runs moved only 0.27 to 3.3, so the run-to-run spread underestimates
+the variation between invocations, as it does for actions. Until a floor measured between invocations exists, treat
+a line regression of a few objects as a reason to look, raise `--min`, or profile more runs; compare's exit 1 is not
+a confidence bound.
 
 A GitHub Actions job that profiles the pull request's base and head with the same command and fails on a
 regression:
@@ -370,7 +392,7 @@ the harness left out) are in the profile's top N. The census's own A/A overlap i
 | Blog, the census's 5 GETs replayed in production, vs the census's 5 GET workloads | 100 | 9 | 16 | 45 | 19 | 20 (Rails 19) |
 
 **Where they agree.** Lines both reach have nearly the same cost per request. Replaying the same GETs in production (then `--paths`, now `--workloads`; [below](#workloads-against---paths)), the
-counts match the census within about 1%: `useragent` `browsers/base.rb:120` 32.67 against 33.00,
+counts matched the census within about 1% (on these GETs, before the review fixes): `useragent` `browsers/base.rb:120` 32.67 against 33.00,
 `output_safety.rb:245` 30.81 against 31.40, `sqlite3` `statement.rb:143` 18.66 against 19.00. The 1% is the warm
 column leaving out each line's first of 100 requests. On Campfire's suite the same `uri` and `rack` lines lead both
 rankings (`uri/generic.rb:1007` first in both, 531 against 428 objects per request; `url.rb:361` 266 against 211),

@@ -133,14 +133,18 @@ into every receipt (`workloads_manifest`), `lowrail-profile` into its output dir
 for the same workloads without reading the Ruby again. Each request keeps frozen copies of the values the file
 passed, so changing those objects later changes neither the requests nor the manifest. A block's overrides are not
 in the manifest, only its source line: the line does not certify what the block returns on a given run (it may read
-the database or the clock). `lowrail-profile --workloads` lists the variants it measured in its receipt; the
-census's per-workload SQL control is what shows that two runs sent the same requests.
+the database or the clock). `lowrail-profile --workloads` lists the variants it measured in its receipt and records a
+digest of every counted request per run, which `compare` checks; the census's per-workload SQL control is what shows
+that two of its runs sent the same requests.
 
 Both tools send the file's requests through one implementation, `Lowrail::Workloads::Replayer`: sign-in, the CSRF
 token and where it goes, alternates and blocks, and which client (signed in or not) sends each. Their clients
-differ only in transport (census 4's Rack::Test session, lowrail-profile's `Rack::MockRequest`) and send the same
-browser headers (`Host`, `Origin`, `Accept`, `User-Agent`, `Sec-Fetch-Site`); a test
-(`gem/test/workloads_test.rb`) runs both against one app and checks that the app sees the same requests. What
+differ in transport (census 4's Rack::Test session, lowrail-profile's `Rack::MockRequest`), send the same browser
+headers (`Host`, `Origin`, `Accept`, `User-Agent`, `Sec-Fetch-Site`) and keep cookies the same way (by name and
+`Path`, until `Expires`). A test (`gem/test/workloads_test.rb`) runs both against one app and checks that the app
+sees the same requests: form sign-in, CSRF from a page, headers, XHR, JSON with an alternate, `csrf: false`, a
+signed-out client and a path-scoped cookie. That is the extent of the equivalence claim: cookie `Domain` (there is
+one host), `Max-Age` (Rack::Test ignores it) and anything else the test does not cover are not established. What
 differs is the measurement: the census captures jobs and delivers mail to the test deliverer, lowrail-profile uses
 the app's own adapters ([profile.md](../profile.md#run-it)).
 

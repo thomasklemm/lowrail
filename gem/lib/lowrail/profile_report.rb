@@ -75,6 +75,8 @@ module Lowrail
         run[:roots] |= [meta["root"]]
         run[:ruby] ||= meta["ruby"]
         run[:rails_env] ||= meta["rails_env"]
+        (run[:rubies] ||= []) << meta["ruby"]
+        (run[:rails_envs] ||= []) << meta["rails_env"]
         rows.each do |row|
           fields = row.split("\t")
           case fields[0]
@@ -528,22 +530,29 @@ module Lowrail
       File.write(File.join(dir, "report.json"), JSON.pretty_generate(to_h) + "\n")
     end
 
-    # The capture as compare checks it: command, seed and exit status of
-    # each run (command.txt), Ruby, environment, dropped samples, and the
-    # workloads file's manifest for --workloads.
+    # The capture as compare checks it (capture.json, written by lowrail-profile): its identity (the command's
+    # arguments, or for --workloads the manifest and each run's measured
+    # request sequence), seed and exit status of each run; Ruby and
+    # environment of every process; dropped samples. A report without
+    # capture.json has no identity, which compare refuses.
     def meta
-      command_file = File.join(dir, "command.txt")
-      lines = File.exist?(command_file) ? File.readlines(command_file, chomp: true) : []
-      exits = lines.find { _1.start_with?("exit ") }&.split&.drop(1)&.map { Integer(_1, exception: false) }
-      receipt = File.join(dir, "workloads.json")
-      manifest = JSON.parse(File.read(receipt))["manifest"] if File.exist?(receipt)
-      if manifest
+      capture_file = File.join(dir, "capture.json")
+      capture = File.exist?(capture_file) ? JSON.parse(File.read(capture_file)) : {}
+      identity = capture["identity"]
+      if identity && identity["mode"] == "workloads"
         require "digest"
-        manifest = Digest::SHA256.hexdigest(JSON.generate(manifest.except("file")))[0, 16]
+        receipt = File.join(dir, "workloads.json")
+        manifest = JSON.parse(File.read(receipt))["manifest"] if File.exist?(receipt)
+        measured = @runs.map do |run|
+          file = File.join(dir, run[:name], "measured.json")
+          File.exist?(file) ? JSON.parse(File.read(file)) : nil
+        end
+        identity = identity.merge("manifest" => manifest && Digest::SHA256.hexdigest(JSON.generate(manifest.except("file")))[0, 16],
+          "measured" => measured)
       end
-      { format: 1, command: lines.first, seed: lines.find { _1.start_with?("seed ") }&.delete_prefix("seed "), exit: exits,
-        runs: @runs.size, ruby: @runs.map { _1[:ruby] }.uniq, rails_env: @runs.map { _1[:rails_env] }.uniq,
-        dropped: @runs.map { _1[:dropped] }, workloads: manifest }
+      { format: 2, identity: identity, argv: capture["argv"], seed: capture["seed"], exit: capture["exit"], runs: @runs.size,
+        ruby: @runs.flat_map { _1[:rubies] || [] }.uniq, rails_env: @runs.flat_map { _1[:rails_envs] || [] }.uniq,
+        dropped: @runs.map { _1[:dropped] } }
     end
 
     def to_h

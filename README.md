@@ -183,8 +183,10 @@ mise exec -- script/census app ~/src/myapp --rails main  # and the same on Rails
 
 The usual path: run your suite through `lowrail-profile --record`, keep the
 requests that matter in `lowrail/workloads.rb` (make its writes repeatable),
-then measure that file with `script/census app`. On the same requests in
-production both count the same objects per line within about 1%.
+then measure that file with `script/census app`. On the Blog's five GETs in
+production both counted the same objects per line within about 1% (measured
+before lowrail-profile's request policy changed; one app and route set, not a
+claim for any workloads file).
 The file's format is in [Workloads file](docs/upstream/census.md#workloads-file),
 the census in [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app),
 the profiler in [docs/profile.md](docs/profile.md).

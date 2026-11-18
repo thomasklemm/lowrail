@@ -187,17 +187,21 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           def note(env)
             return if env[NOTED] || !(route = env["action_dispatch.route"])
             env[NOTED] = true
-            path_params = env["action_dispatch.request.path_parameters"] || {}
-            format = path_params[:format]&.to_s
+            verb = env["REQUEST_METHOD"].to_s.downcase
+            filter = parameter_filter(env)
+            # Every path value, the format included, is filtered before it names,
+            # groups or is kept; without the app's filter none is kept.
+            path_params = filter ? filter.filter((env["action_dispatch.request.path_parameters"] || {}).transform_keys(&:to_s)) : {}
+            format = path_params["format"]&.to_s
             accept = env["HTTP_ACCEPT"].to_s
             first = accept[/\A[^,;]*/].strip.downcase
-            accept = nil if first.empty? || PLAIN_ACCEPT.include?(first)
-            json = [env["CONTENT_TYPE"], env["HTTP_ACCEPT"]].any? { _1.to_s.start_with?(JSON_TYPE) }
+            # A GET keeps its Accept, never as: :json, which would send its query as a body.
+            json = verb != "get" && [env["CONTENT_TYPE"], env["HTTP_ACCEPT"]].any? { _1.to_s.start_with?(JSON_TYPE) }
+            accept = nil if first.empty? || (PLAIN_ACCEPT.include?(first) && !(verb == "get" && first == JSON_TYPE))
             xhr = env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
-            verb = env["REQUEST_METHOD"].to_s.downcase
             spec = route.path.spec.to_s
-            shape = shapes[[verb, spec, json, xhr, format, accept]] ||=
-              shape_of(env, route, verb, spec, path_params, format: format, json: json, xhr: xhr, accept: accept)
+            shape = shapes[[verb, spec, json, xhr, format, accept, !filter]] ||=
+              shape_of(env, route, verb, spec, path_params, filter, format: format, json: json, xhr: xhr, accept: accept)
             shape["count"] += 1
           rescue StandardError
             nil
@@ -207,7 +211,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           # app's filter_parameters applied before anything is kept. Params
           # are kept only if they could be filtered; nothing is taken from the
           # raw path or query string.
-          def shape_of(env, route, verb, spec, path_params, **flags)
+          def shape_of(env, route, verb, spec, path_params, filter, **flags)
             lossy = [false]
             controller = route.defaults[:controller].to_s
             required = route.required_parts.map(&:to_s)
@@ -216,30 +220,33 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
               model = base.singularize.camelize if base && !base.empty?
               [part, (model if model && record_class?(model))]
             end
-            lossy[0] = true if (path_params.keys.map(&:to_s) - %w[controller action format] - required - route.defaults.keys.map(&:to_s)).any?
+            lossy[0] = true if (path_params.keys - %w[controller action format] - required - route.defaults.keys.map(&:to_s)).any?
             query = env["QUERY_STRING"].to_s
             params = if verb == "get"
+              lossy[0] = true if env["CONTENT_LENGTH"].to_i > 0
               query.empty? ? {} : env["action_dispatch.request.query_parameters"] || (lossy[0] = true; {})
             else
               lossy[0] = true unless query.empty?
               env["action_dispatch.request.request_parameters"] || (env["CONTENT_LENGTH"].to_i > 0 ? (lossy[0] = true; {}) : {})
             end
-            if (filter = parameter_filter(env))
-              params = plain(filter.filter(params.except("authenticity_token")), lossy)
-              seen = plain(filter.filter(path_params.transform_keys(&:to_s).slice(*required)), lossy)
-            end
+            params = filter && plain(filter.filter(params.except("authenticity_token")), lossy)
+            seen = filter && plain(path_params.slice(*required), lossy)
             name = route.name || env["action_dispatch.routes"]&.routes&.find { _1.name && _1.path.spec.to_s == spec }&.name
             { "verb" => verb, "template" => spec.sub(/\(\.:format\)\z/, ""), "route" => name, "parts" => parts,
               "seen" => seen, **flags.transform_keys(&:to_s), "params" => params, "unfiltered" => !filter,
-              "filtered" => filtered?(params) || filtered?(seen), "lossy" => lossy[0], "count" => 0 }
+              "filtered" => filtered?(params) || filtered?(seen) || flags[:format] == FILTERED, "lossy" => lossy[0], "count" => 0 }
           end
 
+          # The app's filter, rebuilt whenever its list changes (an initializer
+          # or test may append to it after the first request).
           def parameter_filter(env)
             klass = Lowrail.loaded_constant("ActiveSupport::ParameterFilter") or return
-            filters = env["action_dispatch.parameter_filter"] || []
-            @filter = nil unless @filter_source.equal?(filters)
-            @filter_source = filters
-            @filter ||= klass.new(filters, mask: FILTERED)
+            filters = Array(env["action_dispatch.parameter_filter"])
+            unless @filter && @filter_source == filters
+              @filter_source = filters.dup
+              @filter = klass.new(@filter_source, mask: FILTERED)
+            end
+            @filter
           end
 
           # An Active Record model the app has loaded already (never loads one).

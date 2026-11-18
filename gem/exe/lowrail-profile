@@ -131,7 +131,7 @@ if File.exist?(out)
     abort "lowrail-profile: #{out} exists and was not created by lowrail-profile; pick another --out or remove it yourself"
   end
   Dir.children(out).each do |entry|
-    FileUtils.rm_rf(File.join(out, entry)) if entry.match?(/\Arun\d+\z/) || %w[command.txt report.md report.json workloads.json].include?(entry)
+    FileUtils.rm_rf(File.join(out, entry)) if entry.match?(/\Arun\d+\z/) || %w[command.txt capture.json report.md report.json workloads.json].include?(entry)
   end
 end
 FileUtils.mkdir_p(out)
@@ -151,6 +151,12 @@ statuses = (1..runs).map do |n|
   $?.exitstatus
 end
 File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\nexit #{statuses.join(" ")}\n")
+# What compare checks two captures against: the workloads (their manifest and
+# what was measured, from the receipt) or the command's arguments, never the
+# output directory; argv stays apart for diagnostics.
+identity = workloads ? { "mode" => "workloads", "host" => ENV.fetch("LOWRAIL_PROFILE_HOST", "localhost") } : { "mode" => "command", "argv" => command }
+File.write(File.join(out, "capture.json"), JSON.generate("format" => 1, "identity" => identity, "argv" => command, "seed" => seed,
+  "runs" => runs, "exit" => statuses) + "\n")
 
 begin
   report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)

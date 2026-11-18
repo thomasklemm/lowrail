@@ -245,23 +245,31 @@ module Lowrail
 
     # lowrail-profile --workloads' client: Rack::MockRequest through the app's
     # full middleware stack with BROWSER's headers, keeping the cookies earlier
-    # responses set, as a browser keeps the session. Requires rack/mock.
+    # responses set as census 4's Rack::Test session keeps them: by name and
+    # Path (default: the request's directory), sent to paths under it, dropped
+    # once their Expires has passed. Domain, Secure and Max-Age are not modeled
+    # (Rack::Test ignores Max-Age; there is one host). Requires rack/mock.
     class MockClient
       Response = Struct.new(:status, :body)
+      Cookie = Struct.new(:name, :value, :path, :expires)
 
       def initialize(app, host)
-        @app, @host, @cookies = app, host, {}
+        @app, @host, @cookies = app, host, []
         @headers = BROWSER.merge("HTTP_HOST" => host, "HTTP_ORIGIN" => "https://#{host}").freeze
       end
 
-      def cookie(name, value) = @cookies[name] = value
+      def cookie(name, value) = store(Cookie.new(name, value, "/", nil))
 
       def request(verb, path, params: {}, headers: {}, expect: [200], body: nil)
         opts = { method: verb.to_s.upcase, **@headers, **headers }
-        opts["HTTP_COOKIE"] = @cookies.map { "#{_1}=#{_2}" }.join("; ") unless @cookies.empty?
+        request_path = path[/\A[^?#]*/]
+        now = Time.now
+        sent = @cookies.select { !(_1.expires && _1.expires < now) && request_path.start_with?(_1.path) }
+        opts["HTTP_COOKIE"] = sent.map { "#{_1.name}=#{_1.value}" }.join("; ") unless sent.empty?
         # As Rack::Test: a write without a body is still an empty form.
         if body then opts[:input] = body
-        elsif verb != :get || !params.empty? then opts[:params] = params
+        # A copy: Rack::MockRequest merges a GET's query into the Hash it gets.
+        elsif verb != :get || !params.empty? then opts[:params] = params.dup
         end
         status, response_headers, response = @app.call(Rack::MockRequest.env_for("https://#{@host}#{path}", opts))
         text = +""
@@ -271,12 +279,24 @@ module Lowrail
           response.close if response.respond_to?(:close)
         end
         Array(response_headers["set-cookie"]).flat_map { _1.split("\n") }.each do |line|
-          key, value = line.split(";", 2).first.split("=", 2)
-          line.match?(/;\s*max-age=0|;\s*expires=Thu, 01 Jan 1970/i) ? @cookies.delete(key) : @cookies[key] = value
+          pair, *attributes = line.split(/; */)
+          name, value = pair.split("=", 2)
+          options = attributes.to_h { |a| k, v = a.split("=", 2); [k.downcase, v] }
+          cookie_path = options["path"] || request_path.sub(%r{/[^/]*\z}, "")
+          expires = (require "time"; Time.parse(options["expires"]) rescue nil) if options["expires"]
+          store(Cookie.new(name, value.to_s, cookie_path.empty? ? "/" : cookie_path, expires))
         end
         raise "#{verb.upcase} #{path} returned #{status} (expected #{Array(expect).join(" or ")})" unless Array(expect).include?(status)
         raise "#{verb.upcase} #{path}: empty body" if status == 200 && text.empty? && verb == :get
         Response.new(status, text)
+      end
+
+      private
+
+      def store(cookie)
+        @cookies.reject! { _1.name.downcase == cookie.name.downcase && _1.path == cookie.path }
+        @cookies << cookie
+        @cookies.sort_by! { [_1.name, _1.path] }
       end
     end
 

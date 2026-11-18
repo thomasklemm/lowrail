@@ -12,13 +12,18 @@ module Lowrail
   # parallel test workers split an action's requests differently from run to
   # run (A/A on Campfire: every action within 0.08% and 6.5 objects).
   #
-  # Only valid evidence is compared: two complete captures of the same command,
-  # seed, Ruby, environment and workloads, at least two runs each, every command
-  # exiting 0, no dropped samples. Otherwise #status is 2 (insufficient
-  # evidence), whatever the numbers say. A kind of window is compared only when
-  # every run of both reports has some; a line one side never reached is a
-  # measured zero there, but an action one side did not run, or that has no warm
-  # value (it ran once per process), is not compared.
+  # Only valid evidence is compared: two complete reports of this version
+  # (every collection present, every warm vector one value per run), at least
+  # two runs each, every command exiting 0, no dropped samples, one Ruby and
+  # environment; and the same capture identity (the command's arguments, or
+  # for --workloads the manifest and every run's measured request sequence,
+  # not the output directory), seed and number of runs. A kind of window is
+  # compared when every run of both reports has some; one some runs have and
+  # others lack, or no comparable kind at all, is not evidence. Otherwise
+  # #status is 2 (insufficient evidence), whatever the numbers say. A line one
+  # side never reached is a measured zero there, but an action one side did
+  # not run, or that has no warm value (it ran once per process), is not
+  # compared.
   class ProfileCompare
     ACTION_SHARE = 0.001
     ACTION_MIN = 20
@@ -45,30 +50,61 @@ module Lowrail
     # Why the two reports are not evidence for a comparison (empty when they are).
     def problems
       @problems ||= begin
-        list = []
-        { "base" => @base, "head" => @head }.each do |label, report|
-          meta = report.is_a?(Hash) && report["meta"]
-          next list << "#{label} is not a report.json of this lowrail-profile (no capture metadata)" unless meta.is_a?(Hash)
-          runs = meta["runs"].to_i
-          summary = Array(report["summary"])
-          list << "#{label} has #{runs} run(s); a noise floor needs at least 2" if runs < 2
-          list << "#{label}'s summary has #{summary.size} run(s), its metadata #{runs}" if summary.size != runs
-          exits = Array(meta["exit"])
-          list << "#{label}'s command exited #{exits.empty? ? "unknown" : exits.join(", ")}" unless exits.size == runs && exits.all?(0)
-          dropped = Array(meta["dropped"])
-          list << "#{label} dropped samples (#{dropped.join(", ")})" unless dropped.size == runs && dropped.all?(0)
-          list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { windows(_1).values.sum == 0 }
-          list << "#{label} ran on more than one Ruby or environment" if Array(meta["ruby"]).size != 1 || Array(meta["rails_env"]).size != 1
-          list << "#{label} has values that are not finite numbers" unless finite?(report)
-        end
+        list = { "base" => @base, "head" => @head }.flat_map { |label, report| report_problems(label, report) }
         if list.empty?
-          %w[command seed ruby rails_env runs workloads].each do |key|
+          %w[identity seed runs ruby rails_env].each do |key|
             b, h = @base["meta"][key], @head["meta"][key]
-            list << "base and head differ in #{key}: #{b.inspect} and #{h.inspect}" if b != h
+            list << "base and head differ in #{key}: #{b.to_json} and #{h.to_json}" if b != h
           end
+          partial = KINDS.select { |kind| counts(kind).uniq.size > 1 && counts(kind).include?(false) }
+          list << "#{partial.join(", ")} windows ran in some runs only" if partial.any?
+          list << "no kind of window ran in every run of both reports" if partial.empty? && kinds.empty?
         end
         list
       end
+    end
+
+    def report_problems(label, report)
+      meta = report.is_a?(Hash) && report["meta"]
+      return ["#{label} is not a report.json of this lowrail-profile (no capture metadata)"] unless meta.is_a?(Hash) && meta["format"] == 2
+      list = []
+      runs = meta["runs"]
+      return ["#{label} has no run count"] unless runs.is_a?(Integer)
+      identity = meta["identity"]
+      list << "#{label} has no capture identity (profile it again with this lowrail-profile)" unless identity.is_a?(Hash) && identity["mode"]
+      list << "#{label} has no seed" unless meta["seed"].is_a?(String)
+      if identity.is_a?(Hash) && identity["mode"] == "workloads"
+        measured = Array(identity["measured"])
+        list << "#{label} has no workloads manifest" unless identity["manifest"].is_a?(String)
+        unless measured.size == runs && measured.all? { _1.is_a?(Hash) && _1["sha256"] }
+          list << "#{label} does not record the requests each run measured"
+        end
+        list << "#{label}'s runs measured different requests" if measured.map { _1.is_a?(Hash) && _1["sha256"] }.uniq.size > 1
+      end
+      summary = report["summary"]
+      return list << "#{label} has no summary" unless summary.is_a?(Array) && summary.all?(Hash)
+      list << "#{label} has #{runs} run(s); a noise floor needs at least 2" if runs < 2
+      list << "#{label}'s summary has #{summary.size} run(s), its metadata #{runs}" if summary.size != runs
+      exits = Array(meta["exit"])
+      list << "#{label}'s command exited #{exits.empty? ? "unknown" : exits.join(", ")}" unless exits.size == runs && exits.all?(0)
+      dropped = Array(meta["dropped"])
+      list << "#{label} dropped samples (#{dropped.join(", ")})" unless dropped.size == runs && dropped.all?(0)
+      list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { windows(_1).values.sum == 0 }
+      list << "#{label} ran on more than one Ruby or environment" if Array(meta["ruby"]).size != 1 || Array(meta["rails_env"]).size != 1
+      KINDS.each do |kind|
+        source = kind == "request" ? report : report.dig("outside_requests", kind)
+        %w[ranked actions].each do |key|
+          entries = source.is_a?(Hash) && source[key]
+          next list << "#{label} has no #{kind} #{key}" unless entries.is_a?(Array) && entries.all?(Hash)
+          nils = key == "actions"
+          bad = entries.count do |e|
+            warm = e["warm"]
+            !(warm.is_a?(Array) && warm.size == runs && warm.all? { (nils && _1.nil?) || (_1.is_a?(Numeric) && _1.to_f.finite?) })
+          end
+          list << "#{label} has #{bad} #{kind} #{key} without one finite warm value per run" if bad > 0
+        end
+      end
+      list
     end
 
     def valid? = problems.empty?
@@ -78,15 +114,8 @@ module Lowrail
 
     def windows(run) = run.is_a?(Hash) && run["windows"].is_a?(Hash) ? run["windows"] : {}
 
-    def finite?(report)
-      values = Array(report["ranked"]).flat_map { Array(_1["warm"]) } +
-        Array(report["actions"]).flat_map { Array(_1["warm"]).compact } +
-        KINDS.drop(1).flat_map do |kind|
-          Array(report.dig("outside_requests", kind, "ranked")).flat_map { Array(_1["warm"]) } +
-            Array(report.dig("outside_requests", kind, "actions")).flat_map { Array(_1["warm"]).compact }
-        end
-      values.all? { _1.is_a?(Numeric) && _1.to_f.finite? }
-    end
+    # Per run of both reports: whether it has windows of the kind.
+    def counts(kind) = [@base, @head].flat_map { |r| Array(r["summary"]).map { windows(_1)[kind].to_i > 0 } }
 
     def mean(values) = values.sum / values.size
 
@@ -94,9 +123,7 @@ module Lowrail
     def spread(values) = values.size > 1 ? values.max - values.min : 0.0
 
     # Kinds every run of both reports has windows of.
-    def kinds
-      KINDS.select { |kind| [@base, @head].all? { |r| Array(r["summary"]).all? { windows(_1)[kind].to_i > 0 } } }
-    end
+    def kinds = KINDS.select { |kind| counts(kind).all? }
 
     def lines(report, kind)
       list = kind == "request" ? report["ranked"] : report.dig("outside_requests", kind, "ranked")
@@ -140,7 +167,7 @@ module Lowrail
 
     def markdown
       out = +"# Lowrail profile compare\n\n"
-      out << "Base: `#{@base["command"]}`. Head: `#{@head["command"]}`.\n\n" if @base["command"] || @head["command"]
+      out << "Base: `#{@base["command"]}`. Head: `#{@head["command"]}`.\n\n" if @base.is_a?(Hash) && @head.is_a?(Hash) && (@base["command"] || @head["command"])
       unless valid?
         out << "## Insufficient evidence\n\nThese reports are not a valid comparison (exit 2):\n\n"
         problems.each { out << "* #{_1}\n" }
