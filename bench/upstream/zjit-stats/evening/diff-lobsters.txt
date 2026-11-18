@@ -1,0 +1,104 @@
+-load_field_count                                       7,520,778
++load_field_count                                       7,371,015   (-149,763, -2.0%, A/A 1.5)
+-zjit_insn_count                                       33,646,365
++zjit_insn_count                                       33,507,996   (-138,369, -0.4%, A/A 22.0)
+-vm_write_stack_count                                   1,830,384
++vm_write_stack_count                                   1,732,566   (-97,818, -5.3%, A/A 1.0)
+-dynamic_send_count                                       772,267
++dynamic_send_count                                       681,142   (-91,124, -11.8%, A/A 1.9)
+-ccall_rb_vm_invokeblock                                  166,882
++ccall_rb_vm_invokeblock                                   77,151   (-89,731, -53.8%, A/A 2.6)
+-block_iseq_direct_optimized_send_count                    24,942
++block_iseq_direct_optimized_send_count                   114,503   (+89,561, 359.1%, A/A 2.8)
+-iseq_optimized_send_count                              1,491,789
++iseq_optimized_send_count                              1,428,652   (-63,138, -4.2%, A/A 1.3)
+-optimized_send_count                                   6,445,641
++optimized_send_count                                   6,505,847   (+60,206, 0.9%, A/A 7.6)
+-send_fallback_invokeblock_polymorphic_miss               100,887
++send_fallback_invokeblock_polymorphic_miss                43,424   (-57,463, -57.0%, A/A 0.1)
+-total_mem_bytes                                        5,637,622
++total_mem_bytes                                        5,693,014   (+55,391, 1.0%, A/A 1,378)
+-inline_iseq_optimized_send_count                       1,097,255
++inline_iseq_optimized_send_count                       1,147,220   (+49,966, 4.6%, A/A 0.5)
+-code_region_bytes                                      2,711,962
++code_region_bytes                                      2,751,283   (+39,322, 1.4%, A/A 0.0)
+-vm_write_jit_frame_count                               5,230,059
++vm_write_jit_frame_count                               5,194,808   (-35,251, -0.7%, A/A 60.2)
+-vm_write_sp_count                                      5,230,059
++vm_write_sp_count                                      5,194,808   (-35,251, -0.7%, A/A 60.2)
+-send_fallback_invokeblock_not_specialized                 65,995
++send_fallback_invokeblock_not_specialized                 33,727   (-32,268, -48.9%, A/A 2.5)
+-send_count                                             7,217,908
++send_count                                             7,186,989   (-30,919, -0.4%, A/A 5.7)
+-guard_type_count                                       3,335,567
++guard_type_count                                       3,305,868   (-29,700, -0.9%, A/A 2.0)
+-jit_frame_region_bytes                                   814,285
++jit_frame_region_bytes                                   827,392   (+13,107, 1.6%, A/A 0.0)
+-inline_cfunc_optimized_send_count                      2,858,350
++inline_cfunc_optimized_send_count                      2,846,727   (-11,623, -0.4%, A/A 2.1)
+-ccall_rb_hash_aset                                        99,942
++ccall_rb_hash_aset                                        95,674   (-4,268, -4.3%, A/A 0.3)
+-ccall_rb_vm_getinstancevariable                          106,795
++ccall_rb_vm_getinstancevariable                          102,642   (-4,153, -3.9%, A/A 0.0)
+-send_fallback_send_polymorphic_fallback                  259,141
++send_fallback_send_polymorphic_fallback                  256,648   (-2,493, -1.0%, A/A 0.0)
+-ccall_rb_ivar_get                                        243,360
++ccall_rb_ivar_get                                        245,833   (+2,473, 1.0%, A/A 0.1)
+-not_inlined_cfuncs_Array#join                              7,925
++not_inlined_cfuncs_Array#join                              5,498   (-2,427, -30.6%, A/A 0.1)
+-ccall_Array#join                                           7,925
++ccall_Array#join                                           5,498   (-2,427, -30.6%, A/A 0.1)
+-variadic_cfunc_optimized_send_count                      407,929
++variadic_cfunc_optimized_send_count                      405,503   (-2,426, -0.6%, A/A 0.2)
+-ccall_Hash#delete                                         28,338
++ccall_Hash#delete                                         26,204   (-2,134, -7.5%, A/A 0.0)
+-not_annotated_cfuncs_Hash#delete                          28,338
++not_annotated_cfuncs_Hash#delete                          26,204   (-2,134, -7.5%, A/A 0.0)
+-not_inlined_cfuncs_Hash#delete                            28,338
++not_inlined_cfuncs_Hash#delete                            26,204   (-2,134, -7.5%, A/A 0.0)
+-ccall_rb_hash_aref                                       419,908
++ccall_rb_hash_aref                                       417,774   (-2,134, -0.5%, A/A 0.3)
+-ccall_rb_optimized_call                                   12,531
++ccall_rb_optimized_call                                   10,397   (-2,134, -17.0%, A/A 0.0)
+-non_variadic_cfunc_optimized_send_count                  565,376
++non_variadic_cfunc_optimized_send_count                  563,242   (-2,134, -0.4%, A/A 0.7)
+-guard_shape_count                                      1,443,594
++guard_shape_count                                      1,441,639   (-1,954, -0.1%, A/A 1.0)
+-getivar_fallback_no_side_exits                           142,653
++getivar_fallback_no_side_exits                           140,956   (-1,697, -1.2%, A/A 0.1)
+-dynamic_getivar_count                                    350,155
++dynamic_getivar_count                                    348,475   (-1,680, -0.5%, A/A 0.1)
+-ccall_rb_vm_opt_send_without_block                       424,006
++ccall_rb_vm_opt_send_without_block                       422,612   (-1,394, -0.3%, A/A 0.1)
+-send_fallback_send_megamorphic                           118,319
++send_fallback_send_megamorphic                           119,418   (+1,099, 0.9%, A/A 0.0)
+-ccall_rb_ec_ary_new_from_values                            5,357
++ccall_rb_ec_ary_new_from_values                            4,846   (-511, -9.5%, A/A 78.3)
+-jit_frame_count                                           27,437
++jit_frame_count                                           27,861   (+424, 1.5%, A/A 0.1)
+-ccall_rb_ec_str_resurrect                                  1,654
++ccall_rb_ec_str_resurrect                                  1,335   (-319, -19.3%, A/A 31.0)
+-ccall_rb_fix_to_s                                          4,270
++ccall_rb_fix_to_s                                          3,961   (-309, -7.2%, A/A 0.1)
+-ccall_rb_str_concat_literals                              30,365
++ccall_rb_str_concat_literals                              30,056   (-309, -1.0%, A/A 0.0)
+-ccall_rb_hash_bulk_insert                                 13,162
++ccall_rb_hash_bulk_insert                                 12,956   (-206, -1.6%, A/A 0.1)
+-side_exit_size_bytes                                       3,233
++side_exit_size_bytes                                       3,350   (+117, 3.6%, A/A 0.0)
+-getivar_fallback_no_profile_missing_ic                   205,400
++getivar_fallback_no_profile_missing_ic                   205,513   (+113, 0.1%, A/A 0.0)
+-getivar_fallback_polymorphic                                 347
++getivar_fallback_polymorphic                                 251   (-96.0, -27.7%, A/A 0.0)
+-jit_frame_stack_map_bytes                                    520
++jit_frame_stack_map_bytes                                    544   (+23.8, 4.6%, A/A 0.0)
+-ccall_exit_recompile                                        36.5
++ccall_exit_recompile                                        22.0   (-14.5, -39.7%, A/A 0.0)
+-exit_guard_type_failure                                      677
++exit_guard_type_failure                                      663   (-14.0, -2.1%, A/A 0.0)
+-ccall_rb_zjit_materialize_frames                           1,205
++ccall_rb_zjit_materialize_frames                           1,191   (-13.9, -1.2%, A/A 0.4)
+-side_exit_count                                           10,167
++side_exit_count                                           10,153   (-13.9, -0.1%, A/A 0.4)
+-ccall_rb_ary_resurrect                                      81.1
++ccall_rb_ary_resurrect                                      70.5   (-10.6, -13.1%, A/A 3.2)

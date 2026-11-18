@@ -4,6 +4,9 @@ Which side exits, send fallbacks, not-inlined C methods and compile failures lea
 lobsters on current Ruby master, who owns each, and what is the next ZJIT fix worth building. Nothing was opened or
 posted upstream.
 
+Rerun the same evening on master `825d71e673`, after ruby/ruby#17864 force-inlined `Primitive.inline_block`
+methods: [zjit-stats-2026-11-18-evening.md](zjit-stats-2026-11-18-evening.md).
+
 **Result.** Compile failures are zero. Side exits are almost all `exception_handler` (99.9% / 88%), which is owned
 upstream (rafaelfranca's ruby/ruby#18759, k0kubun's Shopify/ruby#1093). The large send fallbacks (polymorphic and
 megamorphic sends and yields, `&block`, complex arguments, `...`) are all owned or held, as in Z13. The largest free

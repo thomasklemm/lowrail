@@ -1,0 +1,104 @@
+runs: railsbench-parent (4936.8 ms/itr), railsbench-new (3585.3 ms/itr), railsbench-aa (2386.0 ms/itr), lobsters-parent (1116.5 ms/itr), lobsters-new (1206.7 ms/itr), lobsters-aa (1252.3 ms/itr), shipit-parent (4126.8 ms/itr), shipit-new (5733.5 ms/itr), shipit-aa (1987.6 ms/itr)
+ruby 4.1.0dev (2026-11-18T20:04:50Z HEAD e5e6cd45db) +ZJIT +PRISM [x86_64-linux]
+
+## totals per iteration
+zjit_insn_count                             71,609,224  71,108,667  71,108,669  33,646,365  33,507,996  33,508,018  67,840,512  67,762,028  67,762,042
+total_insn_count                                     -           -           -           -           -           -           -           -           -
+ratio_in_zjit                                        -           -           -           -           -           -           -           -           -
+side_exit_count                                 21,687      21,688      21,687      10,167      10,153      10,153      50,230      50,232      50,229
+dynamic_send_count                           1,083,890     869,975     869,975     772,267     681,142     681,141   1,841,464   1,567,641   1,567,642
+optimized_send_count                        14,363,669  14,472,043  14,472,043   6,445,641   6,505,847   6,505,854  13,000,842  13,260,789  13,260,797
+iseq_optimized_send_count                    3,028,162   2,822,525   2,822,525   1,491,789   1,428,652   1,428,653   2,987,887   2,877,298   2,877,313
+inline_cfunc_optimized_send_count            6,142,211   6,096,929   6,096,929   2,858,350   2,846,727   2,846,729   5,792,041   5,780,677   5,780,669
+non_variadic_cfunc_optimized_send_count      1,203,083   1,194,026   1,194,026     565,376     563,242     563,243     898,600     897,194     897,195
+variadic_cfunc_optimized_send_count            974,468     965,413     965,413     407,929     405,503     405,503     744,439     742,970     742,970
+dynamic_getivar_count                          201,419     201,419     201,419     350,155     348,475     348,475     939,702     939,598     939,598
+dynamic_setivar_count                            4,060       4,060       4,060      11,382      11,382      11,382      48,920      48,920      48,920
+compiled_iseq_count                                0.2           -           -         2.7         2.7         2.7         0.6         0.6         0.4
+failed_iseq_count                                    -           -           -           -           -           -           -           -           -
+compile_error_out_of_memory                          -           -           -           -           -           -           -           -           -
+
+## side exits (exit_*, per iteration)
+exception_handler                                     21,657      21,657      21,657       8,962       8,962       8,962       9,757       9,757       9,757
+patchpoint_stable_constant_names                           -           -           -           -           -           -      39,633      39,633      39,633
+guard_type_failure                                       0.2         0.4         0.4         677         663         663         826         826         826
+patchpoint_method_redefined                                -           -           -         483         483         483           -           -           -
+guard_shape_failure                                     30.0        30.0        30.0        20.1        20.1        20.1         7.6         7.6         7.6
+guard_super_method_entry                                   -           -           -        16.0        16.0        16.0           -           -           -
+interrupt                                                  -         0.2           -         1.0         1.4         1.0         6.1         7.4         4.9
+no_profile_getivar                                         -           -           -         5.7         5.7         5.7           -           -           -
+function_stub_not_profiled                               0.1           -           -         1.3         1.5         1.5           -         0.1           -
+no_profile_send                                            -           -           -         0.5           -           -           -           -           -
+
+## send fallback reasons (send_fallback_*, per iteration)
+send_polymorphic_fallback                             30,483      30,483      30,483     259,141     256,648     256,648     775,903     777,236     777,238
+send_megamorphic                                     189,766     189,766     189,766     118,319     119,418     119,418     126,769     126,770     126,769
+send_block_arg_not_nil                               121,987     121,987     121,987      95,270      95,270      95,271     208,847     208,849     208,847
+invokeblock_polymorphic_miss                         215,912      50,235      50,235     100,887      43,424      43,424     310,206     101,458     101,455
+one_or_more_complex_arg_pass                         106,495     106,495     106,495      41,239      41,239      41,239      85,002      85,788      85,789
+sendforward_not_specialized                           75,134      75,134      75,134      31,847      31,847      31,847     100,882     100,882     100,882
+invokeblock_not_specialized                          133,062      84,822      84,822      65,995      33,727      33,724     105,191      37,913      37,913
+send_not_optimized_method_type_optimized              41,673      41,673      41,673      25,646      25,646      25,646      67,050      67,050      67,050
+send_not_optimized_need_permission                    54,836      54,836      54,836      15,959      15,959      15,959      30,469      30,469      30,469
+super_complex_args_pass                               39,252      39,252      39,252       3,125       3,125       3,125       7,100       7,100       7,100
+send_not_optimized_method_type                        31,293      31,296      31,296       5,789       5,789       5,789       9,301       9,301       9,304
+invokesuperforward_not_specialized                    19,970      19,970      19,970       2,474       2,474       2,474       6,736       6,736       6,736
+super_from_block                                       6,000       6,000       6,000       1,397       1,397       1,397       2,717       2,717       2,717
+super_polymorphic                                      4,026       4,026       4,026       2,661       2,661       2,661       2,132       2,132       2,132
+super_call_with_block                                  6,039       6,039       6,039         743         743         743       1,907       1,907       1,907
+
+## not inlined C methods (not_inlined_cfuncs_*, per iteration)
+Hash#fetch                                           145,474     145,474     145,474     147,097     147,097     147,097     402,869     402,869     402,869
+Hash#key?                                            125,384     125,384     125,384      45,124      45,124      45,124     170,854     169,449     169,449
+Regexp#match?                                        137,174     137,174     137,174      41,710      41,710      41,710      23,032      23,032      23,032
+Array#any?                                            61,557      61,557      61,557      19,459      19,459      19,459      58,492      58,492      58,492
+Hash#delete                                           62,027      52,970      52,970      28,338      26,204      26,204      52,947      52,947      52,947
+Kernel#dup                                            60,215      60,215      60,215      20,819      20,819      20,819      49,533      49,533      49,533
+String#<<                                             54,111      54,111      54,111      59,197      59,197      59,197       9,401       9,401       9,401
+Hash#[]                                               63,879      63,879      63,879      10,417      10,417      10,417       9,687       9,687       9,687
+ObjectSpace::WeakKeyMap#[]                            23,970      23,970      23,970       7,226       7,226       7,226      49,239      49,239      49,239
+Array#include?                                        26,391      26,391      26,391      19,753      19,753      19,753      28,226      28,226      28,226
+Symbol#end_with?                                      47,844      47,844      47,844      10,186      10,186      10,186      11,810      11,810      11,810
+ERB::Util.html_escape                                 42,172      42,172      42,172      22,799      22,799      22,799       2,693       2,693       2,693
+Array#reverse_each                                    10,540      10,540      10,540       7,251       7,251       7,251      44,966      44,966      44,966
+String#include?                                       39,688      39,688      39,688      11,968      11,968      11,968      10,880      10,880      10,880
+Kernel#Array                                          24,409      24,409      24,409       4,416       4,416       4,416      33,610      33,610      33,610
+
+## unspecialized send method types (unspecialized_send_def_type_*, per iteration)
+optimized_send                                        41,673      41,673      41,673      25,488      25,488      25,488      66,674      66,674      66,674
+optimized                                             25,280      25,283      25,283       1,407       1,407       1,407       2,101       2,101       2,104
+null                                                   6,013       6,013       6,013       4,366       4,366       4,366       7,200       7,200       7,200
+optimized_block_call                                       -           -           -         158         158         158         376         376         376
+zsuper                                                     -           -           -        16.0        16.0        16.0           -           -           -
+
+## unspecialized super method types (unspecialized_super_def_type_*, per iteration)
+attrset                                                2,000       2,000       2,000         114         114         114        57.0        57.0        57.0
+ivar                                                       -           -           -           -           -           -         720         720         720
+
+## SendDirect fallback contexts (send_direct_fallback_context_*, per iteration)
+send                                                  10,008      10,008      10,008       5,115       5,115       5,115      21,491      21,491      21,491
+
+## complex argument passing (complex_arg_pass_*, per iteration)
+param_kwrest                                          10,008      10,008      10,008       5,099       5,099       5,099      21,491      21,491      21,491
+caller_kw_splat                                       15,909      15,909      15,909       3,069       3,069       3,069       4,567       4,567       4,567
+caller_splat                                          11,974      11,974      11,974         704         704         704       3,546       4,333       4,333
+caller_blockarg                                        8,000       8,000       8,000       4,429       4,429       4,429       1,139       1,139       1,139
+caller_kwarg                                            56.0        56.0        56.0       1,496       1,496       1,496       5,537       5,537       5,537
+does_not_use_block                                         -           -           -        16.0        16.0        16.0           -           -           -
+
+## getivar fallbacks (getivar_fallback_*, per iteration)
+no_profile_missing_ic                                201,419     201,419     201,419     205,400     205,513     205,513     601,642     601,847     601,847
+no_side_exits                                              -           -           -     142,653     140,956     140,956     335,358     335,050     335,050
+polymorphic                                                -           -           -         347         251         251       2,702       2,702       2,702
+complex                                                    -           -           -         937         937         937           -           -           -
+megamorphic                                                -           -           -         818         818         818           -           -           -
+
+## setivar fallbacks (setivar_fallback_*, per iteration)
+no_side_exits                                           30.0        30.0        30.0       5,951       5,951       5,951      41,029      41,029      41,029
+not_t_object                                           4,030       4,030       4,030       5,099       5,099       5,099       7,891       7,891       7,891
+complex                                                    -           -           -         332         332         332           -           -           -
+
+## inline rejections (inline_reject_*, per iteration)
+budget_exceeded                                          0.4           -           -         3.3         3.3         3.3         0.6         0.6         0.2
+too_large                                                  -           -           -         1.0         1.0         1.0         0.3         0.3         0.2
+complex_params                                             -           -           -         0.3         0.3         0.3         0.4         0.4         0.4
