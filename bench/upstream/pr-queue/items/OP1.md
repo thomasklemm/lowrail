@@ -4,10 +4,10 @@ repo: rails/rails
 kind: fix
 area: Action Dispatch parameter parsers
 reviewer: "byroot (merged #57952)"
-branch: thomasklemm/parameter-parsers-register-in-place
-head: "49b835ba58"
+branch: thomasklemm/parameter-parsers-register-in-place-lean2
+head: "d1e2cdbcc2"
 base: main
-built_on: "bdb3d96012"
+built_on: "8e097e9d81"
 depends_on: []
 stacked_on:
 alternative_of:
@@ -16,7 +16,7 @@ rank: 3
 risky: true
 state: ready
 pr: 59661
-note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): on current main (046cca206b renamed main's hook to action_dispatch.ractorize) the head adds a second initializer with that name. Candidate thomasklemm/parameter-parsers-register-in-place-lean 58c3765e8a on main 8e097e9d81: the flag, the ObjectSpace walk and &.freeze are gone; DEFAULT_PARSERS.dup on include, an unfrozen writer, and one freeze line in main's existing hook (Rails parses only with ActionDispatch::Request.parameter_parsers); lib +3/-2. Action Pack 4,526 runs 0 F/E; railties ractors_test (RACK=head) 21 runs 0 F/E; RuboCop 4 files clean; no-dup and writer-freeze mutants fail. Needs claude-code and Astra (risky) on the new head; its body is under For Thomas. opened as draft 2026-11-05; earlier heads c5df553fa3, 860a2c7220, 6331f39542; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test list (in the diff); Ractor shareability note; evidence in docs/upstream/app-suites.md#openproject"
+note: "2026-11-18 (-lean2, after Astra changes on 58c3765e8a): thomasklemm/parameter-parsers-register-in-place-lean2 d1e2cdbcc2 on main 8e097e9d81, one commit, author date 2026-11-05T12:05:18Z, no trailers; the PR branch still holds 49b835ba58 and nothing was posted. Fixes the duplicate action_dispatch.ractorize initializer (one line in main's hook) and Astra's three points: the writer freezes a replacement of frozen parsers (`@parameter_parsers.frozen? ? parsers.freeze : parsers`), so a later before_ractorize hook can't put a mutable table back; the hook freezes inside ActiveSupport.on_load(:action_dispatch_request), as Active Record's does, so Request is not loaded by ractorize!; the body names the one lost freeze, direct includers of Http::Parameters (Request subclasses freeze on assignment as on main). Finding: any route loads Request (RouteSet#request_class), so production apps with a route, or with Action Mailbox or Active Storage routes, load it at boot; only a route-less app sees point 2. lib +7/-2 against main. Two railties tests, both fail on 58c3765e8a and each on its own mutant. Action Pack 4,526 runs 0 F/E/S; ractors_test (RACK=head) 23 runs 0 F/E; RuboCop 4 files clean. Needs claude-code and Astra on d1e2cdbcc2. 2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): on current main (046cca206b renamed main's hook to action_dispatch.ractorize) the head adds a second initializer with that name. Candidate thomasklemm/parameter-parsers-register-in-place-lean 58c3765e8a on main 8e097e9d81: the flag, the ObjectSpace walk and &.freeze are gone; DEFAULT_PARSERS.dup on include, an unfrozen writer, and one freeze line in main's existing hook (Rails parses only with ActionDispatch::Request.parameter_parsers); lib +3/-2. Action Pack 4,526 runs 0 F/E; railties ractors_test (RACK=head) 21 runs 0 F/E; RuboCop 4 files clean; no-dup and writer-freeze mutants fail. Needs claude-code and Astra (risky) on the new head; its body is under For Thomas. opened as draft 2026-11-05; earlier heads c5df553fa3, 860a2c7220, 6331f39542; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test list (in the diff); Ractor shareability note; evidence in docs/upstream/app-suites.md#openproject"
 passes:
   - {reviewer: sol, head: unrecorded, date: 2026-11-05, verdict: changes, open: "two rounds, applied"}
   - {reviewer: astra, head: "c5df553fa3", date: 2026-11-05, verdict: changes, open: "frozen? check, applied"}
@@ -45,7 +45,7 @@ This restores in-place registration, keeping parsers mutable until `ractorize!`,
 
 ## For Thomas
 
-### Body for the -lean head (2026-11-18, not posted)
+### Body for the -lean2 head d1e2cdbcc2 (2026-11-18, not posted)
 
 Since #57952, the default parameter parsers are [the frozen `DEFAULT_PARSERS` constant](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/http/parameters.rb#L31), and [assigned parsers are frozen too](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/http/parameters.rb#L45). Running OpenProject's test suite on Rails main, I found that registering a parser in place now raises `FrozenError` while the app boots:
 
@@ -56,7 +56,40 @@ ActionDispatch::Request.parameter_parsers[:jsonapi] = ->(raw) { JSON.parse(raw) 
 
 Released gems do this from their railtie or engine: [graphiti 2.2.3](https://github.com/graphiti-api/graphiti/blob/1b11959b323cce2d9d8185a9f6c18164c9763eb1/lib/graphiti/rails/railtie.rb#L84), [graphiti-rails 0.4.2](https://github.com/graphiti-api/graphiti-rails/blob/f8031d1f9659825d7a41f73a4650c616085c187c/lib/graphiti/rails/railtie.rb#L75), [jsonapi-rails 0.4.1](https://github.com/jsonapi-rb/jsonapi-rails/blob/75314ad9742e8fe4746e1c8418779d2aacf7d9b8/lib/jsonapi/rails/railtie.rb#L43) and [scimitar 2.15.0](https://github.com/pond/scimitar/blob/a7edc24d208ef4d2316c982c48bd2a5fe4fdcb5d/lib/scimitar/engine.rb#L14), which OpenProject uses, so apps using them don't boot on main.
 
-This keeps the parsers mutable while the app boots, and the existing `before_ractorize` hook freezes `ActionDispatch::Request.parameter_parsers`, the ones requests are parsed with. `DEFAULT_PARSERS` itself stays frozen, and reading the parsers from another Ractor still requires every parser value to be shareable. Parsers assigned after `ractorize!` and those of other classes that include `ActionDispatch::Http::Parameters`, which no request is parsed with, are no longer frozen.
+This keeps the parsers mutable while the app boots. The existing `before_ractorize` hook freezes `ActionDispatch::Request.parameter_parsers`, which Rails parses requests with, once the class is loaded, and parsers assigned after that stay frozen. `DEFAULT_PARSERS` itself stays frozen, and reading the parsers from another Ractor still requires every parser value to be shareable. Classes that include `ActionDispatch::Http::Parameters` directly now keep mutable parsers, which another Ractor can't read.
+
+### Guards and comments on -lean2 (2026-11-18)
+
+Each surviving guard and comment, with the reproducer that keeps it. Reproducers are in this orb's
+`.amp/in/orb-backup/` (Astra's `op1_probe.rb` and `op1_app_probe.rb`, plus `op1_writer_probe.rb` and `op1_mutants.sh`).
+
+* `@parameter_parsers.frozen? ? parsers.freeze : parsers` in the writer: Astra's later-hook replacement. On
+  58c3765e8a, `op1_probe.rb late_hook` and the production app with a later `before_ractorize` hook end with a mutable
+  table and `Ractor::IsolationError` reading the JSON parser; with the guard both are frozen and return
+  `{"a" => 1}`. The no-guard mutant fails the later-hook test. It is Rails' own idiom for carrying frozenness over
+  (`enum.rb`, `time_zone_conversion.rb`). A Request subclass has no table of its own (`nil.frozen?` is true), so its
+  assignments freeze as on main; only direct includers of `Http::Parameters` stay mutable (`op1_writer_probe.rb`:
+  main freezes every assignment; 58c3765e8a freezes none after the hook; -lean2 freezes Request after the hook and
+  subclasses always).
+* `ActiveSupport.on_load(:action_dispatch_request) { parameter_parsers.freeze }` inside the `before_ractorize` hook,
+  instead of naming `ActionDispatch::Request`: Astra's lazy-load probe (`op1_probe.rb lazy`: 58c3765e8a runs the
+  request hooks inside ractorization, -lean2 leaves `ActionDispatch.autoload?(:Request)` set) and a route-less
+  production app with `eager_load = false`. This railtie already reaches Request only through that hook, and
+  Active Record's ractorize hook nests `on_load(:active_record)` the same way. The direct-reference mutant fails the
+  lazy test; a mutant that registers the freeze at boot instead raises `FrozenError` in two tests. Scope: any route
+  loads Request (`RouteSet#request_class` from `Mapping#conditions`), so a production app with a route of its own,
+  or the Action Mailbox or Active Storage routes, has it loaded at boot. Only a production app without routes sees
+  the difference; local environments draw their lazy routes on demand and were not probed further.
+* Test comment `# Drawing any route loads ActionDispatch::Request.` above `use_frameworks` without Action Mailbox,
+  `draw_routes = false` and an empty route set: without it a reader would drop that setup as noise, and the test
+  would then fail on `ActionDispatch.autoload?(:Request)` rather than test the lazy path. No lib comments.
+* Dropped as before (rules review): the flag, the `ObjectSpace` walk and `&.freeze`. The walk's coverage for direct
+  includers is the one difference the body states.
+
+Tests, both through `Rails.application.ractorize!` in `railties/test/application/ractors_test.rb`:
+"keeps the parameter parsers frozen when a later before_ractorize hook assigns them" (fails on 58c3765e8a: not
+frozen) and "freezes the parameter parsers once ActionDispatch::Request is loaded" (fails on 58c3765e8a:
+`ActionDispatch.autoload?(:Request)` is nil). Ruby 4.0.9, Rack main via `RACK=head`.
 
 ### Astra adversarial review of 58c3765e8a (2026-11-18)
 
