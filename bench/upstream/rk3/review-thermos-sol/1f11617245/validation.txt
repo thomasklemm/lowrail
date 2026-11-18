@@ -1,0 +1,105 @@
+Fresh exact-head review evidence: 1f11617245ca3ef082c57f1bd11130931e0a5d78
+
+COMMAND: CI=spec bundle exec rake (matching mise Ruby, independent per-version bundle)
+results/3.2.9/suite-clean.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/3.2.9/suite-util.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/3.3.10/suite-clean.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/3.3.10/suite-util.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/3.4.12/suite-clean.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/3.4.12/suite-util.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/4.0.9/suite-clean.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+results/4.0.9/suite-util.log 1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips ; All test files passed
+
+COMMANDS: diff_unescape.rb / diff_escape.rb, each 300000 random cases
+results/3.2.9/diff_escape-clean.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.2.9/diff_escape-util.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.2.9/diff_unescape-clean.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.2.9/diff_unescape-util.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.3.10/diff_escape-clean.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.3.10/diff_escape-util.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.3.10/diff_unescape-clean.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.3.10/diff_unescape-util.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.4.12/diff_escape-clean.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.4.12/diff_escape-pure.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.4.12/diff_escape-util.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/3.4.12/diff_unescape-clean.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.4.12/diff_unescape-pure.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/3.4.12/diff_unescape-util.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/4.0.9/diff_escape-clean.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/4.0.9/diff_escape-pure.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/4.0.9/diff_escape-util.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences
+results/4.0.9/diff_unescape-clean.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/4.0.9/diff_unescape-pure.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+results/4.0.9/diff_unescape-util.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]: 300000 random cases + 18 fixed, 4 differences
+
+COMMAND: review_exactness.rb (native clean/util; pure on 3.4/4.0)
+results/3.2.9/review_exactness-clean.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux] util= False checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.2.9/review_exactness-util.txt ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.3.10/review_exactness-clean.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux] util= False checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.3.10/review_exactness-util.txt ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.4.12/review_exactness-clean.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux] util= False checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.4.12/review_exactness-pure.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/3.4.12/review_exactness-util.txt ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/4.0.9/review_exactness-clean.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util= False checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/4.0.9/review_exactness-pure.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util= False checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+results/4.0.9/review_exactness-util.txt ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-2.7.3-clean.json ruby 2.7.3p183 (2021-04-05 revision 6847ee089d) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-2.7.3-util.json ruby 2.7.3p183 (2021-04-05 revision 6847ee089d) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-2.7.8-clean.json ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-2.7.8-util.json ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-3.0.7-clean.json ruby 3.0.7p220 (2024-04-23 revision 724a071175) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-3.0.7-util.json ruby 3.0.7p220 (2024-04-23 revision 724a071175) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-3.1.7-clean.json ruby 3.1.7p261 (2025-03-26 revision 0a3704f218) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+review_exactness-3.1.7-util.json ruby 3.1.7p261 (2025-03-26 revision 0a3704f218) [x86_64-linux] util= True checks= 17897 differences= {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+TOTAL 322146 comparisons; three accepted BasicObject differences per configuration, exit 1 expected
+
+COMMAND: adversarial.rb under actual base and head libs; SAFE=1 uses ActiveSupport 8.1.4.1
+adversarial-2.7.3-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-2.7.3-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-2.7.8-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-2.7.8-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.0.7-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.0.7-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.1.7-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.1.7-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.2.9-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.2.9-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.3.10-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.3.10-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.4.12-clean checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-3.4.12-util checks= 5424 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-4.0.9-clean checks= 6372 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+safe-adversarial-3.4.12-clean checks= 6372 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-4.0.9-util checks= 6372 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+safe-adversarial-3.4.12-util checks= 6372 differences= 788 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 68, 'singleton_dup': 160, 'singleton_encoding': 360}
+adversarial-4.0.9-pure checks= 6372 differences= 948 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 228, 'singleton_dup': 160, 'singleton_encoding': 360}
+safe-adversarial-3.4.12-pure checks= 6372 differences= 948 families= {'ivar': 40, 'singleton_to_s': 160, 'singleton_b': 228, 'singleton_dup': 160, 'singleton_encoding': 360}
+All ordinary subclass, SafeBuffer, parsed-caller and unmodified-String observations match main, including frozen cases.
+Ivar differences are direct escape outputs only; singleton differences include result and dispatch changes.
+
+ADVERSARIAL EXAMPLES (base then head)
+ivar/1/UTF-8/false/escape
+main {"result": {"class": "String", "bytes": [97], "encoding": "US-ASCII", "frozen": false, "valid": true, "ivars": [["@tag", "tag"]], "safe": false, "rendered": [97]}, "input": {"class": "String", "bytes": [97], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [["@tag", "tag"]], "safe": false, "rendered": [97]}, "events": []}
+head {"result": {"class": "String", "bytes": [97], "encoding": "US-ASCII", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [97]}, "input": {"class": "String", "bytes": [97], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [["@tag", "tag"]], "safe": false, "rendered": [97]}, "events": []}
+singleton_b/1/UTF-8/false/unescape
+main {"result": {"class": "String", "bytes": [104, 111, 111, 107, 101, 100], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [104, 111, 111, 107, 101, 100]}, "input": {"class": "String", "bytes": [97], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [97]}, "events": ["b"]}
+head {"result": {"class": "String", "bytes": [97], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [97]}, "input": {"class": "String", "bytes": [97], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [97]}, "events": []}
+unsafe_dup/7/UTF-8/true/unescape
+main {"result": {"class": "String", "bytes": [60, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 62], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [38, 108, 116, 59, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 38, 103, 116, 59]}, "input": {"class": "ActiveSupport::SafeBuffer", "bytes": [60, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 62], "encoding": "UTF-8", "frozen": true, "valid": true, "ivars": [["@html_unsafe", true]], "safe": false, "rendered": [38, 108, 116, 59, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 38, 103, 116, 59]}, "events": []}
+head {"result": {"class": "String", "bytes": [60, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 62], "encoding": "UTF-8", "frozen": false, "valid": true, "ivars": [], "safe": false, "rendered": [38, 108, 116, 59, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 38, 103, 116, 59]}, "input": {"class": "ActiveSupport::SafeBuffer", "bytes": [60, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 62], "encoding": "UTF-8", "frozen": true, "valid": true, "ivars": [["@html_unsafe", true]], "safe": false, "rendered": [38, 108, 116, 59, 105, 109, 103, 32, 115, 114, 99, 61, 120, 32, 111, 110, 101, 114, 114, 111, 114, 61, 97, 108, 101, 114, 116, 40, 49, 41, 38, 103, 116, 59]}, "events": []}
+
+COMMAND: no-ascii.rb diagnostic + review_exactness.rb
+no-ascii-exactness-3.4.12.json 17897 {'matrix/escape': 3458, 'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+no-ascii-exactness-4.0.9.json 17897 {'basicobject/escape': 1, 'basicobject/unescape': 1, 'basicobject/query_unescape': 1}
+Extra counterexample: on Ruby 4, UTF-16LE exact String @tag survives candidate escape/URI but is dropped without the ASCII predicate.
+
+COMMAND: review_rails.rb with ActionDispatch 8.1.4.1
+All request results and TracePoint counts equal; only first-row source locations differ.
+
+COMMAND: RuboCop --format json, exact same four touched files, same config
+main {'offense_count': 61, 'target_file_count': 4, 'inspected_file_count': 4}
+head {'offense_count': 61, 'target_file_count': 4, 'inspected_file_count': 4}
+Offense identity multisets equal.
+
+COMMAND: guard_mutants.sh on Ruby 4.0.9 and 3.4.12; detailed output retained separately.
+Guards/comments: all three URI guards, both percent checks, fixture conversion check and one MRI why-comment keep; individual Rack-style justifications in README.

@@ -1,0 +1,34 @@
+commit 1f11617245ca3ef082c57f1bd11130931e0a5d78
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed Nov 18 01:08:08 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed Nov 18 09:48:11 2026 +0000
+
+    Escape components with CGI.escape
+
+    URI.encode_www_form_component dups the string and runs a gsub! with a
+    Hash lookup per character it escapes, which adds up for long values
+    such as Base64-encoded cookies. CGI.escape does the same, in C on MRI,
+    except that it escapes * and leaves ~ alone, so map those two back. %2A
+    in its output can only come from a *, since a % is escaped to %25.
+
+    Anything that is not a plain String still goes through URI, and so does
+    a String in an encoding that is not ASCII compatible: on MRI before 4.0
+    the C CGI.escape hands those to a Ruby fallback that only cgi/util
+    defines.
+
+commit d8bfe684c1db6b8b8818b9c5449a41f45ace195a
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed Nov 18 01:07:56 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed Nov 18 09:46:38 2026 +0000
+
+    Decode query components with CGI.unescape
+
+    URI.decode_www_form_component copies the string and runs a gsub with a
+    Hash lookup per escape. cgi/escape, which ships with every Ruby Rack
+    supports, decodes + and %XX the same way, in C on MRI. Keep URI's check
+    for an invalid %-encoding and its message, decode to binary and convert
+    the encoding argument once afterwards as URI does, and pass anything
+    that is not a plain String, including subclasses, to URI unchanged, as
+    well as Strings in an encoding that is not ASCII compatible.

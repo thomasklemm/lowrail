@@ -1,0 +1,70 @@
+{
+  "ruby": "ruby 2.7.3p183 (2021-04-05 revision 6847ee089d) [x86_64-linux]",
+  "cgi_util_loaded": true,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+    "basicobject/escape": 1,
+    "basicobject/unescape": 1,
+    "basicobject/query_unescape": 1
+  },
+  "examples": {
+    "basicobject/escape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "US-ASCII",
+        [
+          97,
+          43,
+          98
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000559aeda179c0>:0x0000559aeda177e0>"
+      ]
+    ],
+    "basicobject/unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000559aeda179c0>:0x0000559aeda164d0>"
+      ]
+    ],
+    "basicobject/query_unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000559aeda179c0>:0x0000559aeda151c0>"
+      ]
+    ]
+  }
+}

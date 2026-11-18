@@ -1,0 +1,70 @@
+{
+  "ruby": "ruby 3.1.7p261 (2025-03-26 revision 0a3704f218) [x86_64-linux]",
+  "cgi_util_loaded": true,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+    "basicobject/escape": 1,
+    "basicobject/unescape": 1,
+    "basicobject/query_unescape": 1
+  },
+  "examples": {
+    "basicobject/escape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "US-ASCII",
+        [
+          97,
+          43,
+          98
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x00007f1dfed2d188>:0x00007f1dfed2cd50>\n\n      return URI.encode_www_form_component(s) unless s.instance_of?(String) && s.encoding.ascii_compatible?\n                                                      ^^^^^^^^^^^^^"
+      ]
+    ],
+    "basicobject/unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x00007f1dfed2d188>:0x00007f1dfec7e688>\n\n      return URI.decode_www_form_component(s, encoding) unless s.instance_of?(String) && s.encoding.ascii_compatible?\n                                                                ^^^^^^^^^^^^^"
+      ]
+    ],
+    "basicobject/query_unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x00007f1dfed2d188>:0x00007f1dfec8ddb8>\n\n      return URI.decode_www_form_component(string, encoding) unless string.instance_of?(String) && string.encoding.ascii_compatible?\n                                                                          ^^^^^^^^^^^^^"
+      ]
+    ]
+  }
+}
