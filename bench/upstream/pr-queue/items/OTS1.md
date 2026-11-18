@@ -16,7 +16,7 @@ rank: 3
 risky: false
 state: built
 pr:
-note: "Built 2026-11-18 from the ZJIT stats pass (docs/upstream/zjit-stats-2026-11-18.md). Production +4/-4 in zjit/src/hir.rs, one new HIR test, seven snapshots gain `recompile`. zjit-test 2,014/2,015 (the profiler-signal test test_profile_frames_during_direct_jit_to_jit_entry, also failing before the change, passes alone), btest t1/t2 all 2,148. Not opened: needs Thomas's explain-first step and review passes. Opens under the permanent-exit exception (DECISIONS, Playbook), not for a time win."
+note: "2026-11-18 (Thomas): open as a ruby/ruby draft once the thermos-sol review on the head approves. Built 2026-11-18 from the ZJIT stats pass (docs/upstream/zjit-stats-2026-11-18.md). Production +4/-4 in zjit/src/hir.rs, one new HIR test, seven snapshots gain `recompile`. zjit-test 2,014/2,015 (the profiler-signal test test_profile_frames_during_direct_jit_to_jit_entry, also failing before the change, passes alone), btest t1/t2 all 2,148. Not opened: needs Thomas's explain-first step and review passes. Opens under the permanent-exit exception (DECISIONS, Playbook), not for a time win."
 passes: []
 ---
 
