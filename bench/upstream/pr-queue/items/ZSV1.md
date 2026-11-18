@@ -16,7 +16,7 @@ rank: 2
 risky: false
 state: reviewed
 pr:
-note: "2026-11-18 thermos-sol text-only confirm: approve, no must-fixes, exact Ruby head 47b2ed7110 unchanged. Both cuts in Lowrail 899e36d9 are confirmed: the body names only lobsters and the comment claims only its 584 fewer generic writes per iteration. Independently rechecked the three raw lobsters counters, zero A/A movement and byte-identical diff replay. Prior code, guard, comment, message and packaging findings are closed; both earlier passes retained below. Record: bench/upstream/zsv1/thermos-review.md, Text-only confirm of revision 2. No speed claim, fork push, PR or upstream post; posting still requires the usual approval."
+note: "2026-11-18 (Thomas and coordinator): held, neither opened nor commented on Shopify/ruby#1122. Small effect (584 of about 772k dynamic dispatches per lobsters iteration, no change in railsbench/shipit totals) while ruby/ruby#19912, #19976 and #19982 have no maintainer response; revisit when one of them gets one. 2026-11-18 thermos-sol text-only confirm: approve, no must-fixes, exact Ruby head 47b2ed7110 unchanged. Both cuts in Lowrail 899e36d9 are confirmed: the body names only lobsters and the comment claims only its 584 fewer generic writes per iteration. Independently rechecked the three raw lobsters counters, zero A/A movement and byte-identical diff replay. Prior code, guard, comment, message and packaging findings are closed; both earlier passes retained below. Record: bench/upstream/zsv1/thermos-review.md, Text-only confirm of revision 2. No speed claim, fork push, PR or upstream post; posting still requires the usual approval."
 passes:
   - reviewer: thermos-sol
     orb: "T-01a1ef67-4308-7296-a24a-80471f35f540"
