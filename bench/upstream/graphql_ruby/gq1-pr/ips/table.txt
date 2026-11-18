@@ -1,0 +1,7 @@
+rounds: 6; best of all rounds; A/A = best of rounds 1,2,3 vs 4,5,6
+scenario | master | head | head/master | master A/A | head A/A
+validate - introspection | 1216.0 | 1394.0 | 1.15x | +2.2% | -1.1%
+validate - abstract fragments | 1942.0 | 2122.0 | 1.09x | -3.8% | -1.6%
+validate - abstract fragments 2 | 1282.0 | 1412.0 | 1.10x | -0.1% | -1.0%
+validate - big query | 149.8 | 173.3 | 1.16x | +3.9% | -1.6%
+validate - fields will merge | 38.2 | 74.8 | 1.96x | +2.2% | +0.2%

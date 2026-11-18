@@ -1,0 +1,14 @@
+# head 8af96ec046d5831a3031eadd400249c168be8b87 round 2 2026-11-18T20:12:28Z
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+      validate - introspection    142.000 i/100ms
+  validate - abstract fragments   198.000 i/100ms
+validate - abstract fragments 2   144.000 i/100ms
+           validate - big query    17.000 i/100ms
+   validate - fields will merge     7.000 i/100ms
+Calculating -------------------------------------
+      validate - introspection       1.235k (±10.4%) i/s  (809.87 μs/i) -      6.248k in   5.060084s
+  validate - abstract fragments      1.881k (±13.1%) i/s  (531.50 μs/i) -      9.504k in   5.051406s
+validate - abstract fragments 2      1.268k (±11.7%) i/s  (788.95 μs/i) -      6.480k in   5.112384s
+           validate - big query    155.616 (±10.9%) i/s    (6.43 ms/i) -    782.000 in   5.025183s
+   validate - fields will merge     74.073 (± 5.4%) i/s   (13.50 ms/i) -    378.000 in   5.103050s

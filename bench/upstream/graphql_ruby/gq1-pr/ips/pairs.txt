@@ -1,0 +1,6 @@
+round 1: introspection 1.17x, abstract fragments 1.05x, abstract fragments 2 1.09x, big query 1.25x, fields will merge 2.07x
+round 2: introspection 1.07x, abstract fragments 1.00x, abstract fragments 2 1.02x, big query 1.08x, fields will merge 1.98x
+round 3: introspection 1.23x, abstract fragments 1.24x, abstract fragments 2 1.21x, big query 1.25x, fields will merge 2.12x
+round 4: introspection 1.17x, abstract fragments 1.12x, abstract fragments 2 1.09x, big query 1.13x, fields will merge 1.87x
+round 5: introspection 1.16x, abstract fragments 1.13x, abstract fragments 2 1.10x, big query 1.12x, fields will merge 1.96x
+round 6: introspection 1.13x, abstract fragments 1.15x, abstract fragments 2 1.09x, big query 1.19x, fields will merge 1.96x

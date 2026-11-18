@@ -320,18 +320,18 @@ hasn't migrated to `Visibility`. The body says so in one sentence.
 **Shape.** I looked for an exact variant a maintainer would accept, such as keeping per-selection calls when a type
 overrides `.get_field` or the schema overrides `get_type`. It would need an override check on every type's method
 owner (and on app base classes that include their own modules), which is a guard rmosolgo wouldn't write
-(DECISIONS, guards in the target repository's idiom). His own code already settled the contract: master's
-`Visibility::Profile#@cached_parent_fields` calls `type.get_field(field_name, @context)` once per name per query,
-by value (profile.rb L119–123, since 2024), and #5586 ("Cache field and type lookups in Visibility::Profile",
-Scott Walkinshaw, merged by rmosolgo 2026-03-25) added by-value type and field result caches. Running the hook probes
-on master with `use GraphQL::Schema::Visibility` gives exactly the branch's answers and call counts
-(`gq1-pr/probes/`). With named or preloaded profiles, which are shared between queries, Visibility calls the hook
-even less often. So the plain by-value cache stays, and the body states the hook contract change in one sentence.
+(DECISIONS, guards in the target repository's idiom). His own code sets the precedent for fields only:
+master's `Visibility::Profile#@cached_parent_fields` calls `type.get_field(field_name, @context)` once per name per
+profile, by value (profile.rb L119–123), and #5586 (merged by rmosolgo 2026-03-25) added by-value type and field
+result caches. Profile does not call `Schema.get_type` overrides at all (`compute_type` goes through
+`Visibility#get_type`), so it is no precedent for that hook; `gm-visibility.hookprobe.txt` shows no `Schema.get_type`
+call where the head shows one. *Corrected after Astra: an earlier version of this paragraph said master with
+Visibility gives exactly the head's answers and call counts, which the retained logs contradict.* So the plain by-value cache stays, and the body states the hook contract change in one sentence.
 The helper is `read_through_by_name`, next to `read_through`, without a comment (the test protects it); the earlier
 branch's one-line comment is gone. Described out loud: "look up a type by its name; look up a field by its owner
 type, then by its name; names are compared by their characters, owner types by identity."
 
-**Test.** `warden_spec.rb`, `describe "#get_type and #get_field"`, beside rmosolgo's own `#loadable_possible_types`
+**Test (first head `4a77cd59bf`, replaced in the fix round below).** `warden_spec.rb`, `describe "#get_type and #get_field"`, beside rmosolgo's own `#loadable_possible_types`
 spec (42f9fab995) and in its style: a schema with `self.use_visibility_profile = false`, a type overriding
 `.get_field` and a schema overriding `.get_type`, both recording the names they are asked for in the query context;
 validating `{ a: thing { ... on Thing { name } } b: thing { ... on Thing { name } } }` must ask for `name` once and
@@ -339,7 +339,7 @@ validating `{ a: thing { ... on Thing { name } } b: thing { ... on Thing { name 
 `["Thing", "Thing", "Thing", "Thing"]`, so each half is covered. It counts calls of the two documented hooks, which
 is the contract this changes, not internal state (DECISIONS, tests check behaviour).
 
-**Tests on the head.** `SERIAL=1 rake test`: 2,735 tests, 0 failures, 13 skips. `SERIAL=1 GRAPHQL_CPARSER=1`: 2,783,
+**Tests on the first head.** `SERIAL=1 rake test`: 2,735 tests, 0 failures, 13 skips. `SERIAL=1 GRAPHQL_CPARSER=1`: 2,783,
 0 failures. `SERIAL=1 GRAPHQL_FUTURE=1`: 2,735, 0 failures. rubocop on both files and `srb tc` clean. Ruby 4.0.9.
 
 **Differential probes** (`gq1-pr/probes/`, master vs head): `exec/wprobe.rb` (results, validation errors,
@@ -367,6 +367,42 @@ The same picture as round 2 on `2e8473ea7d`. The legacy-interpreter introspectio
 there the identity cache already hit for the repeated nodes of one document, and hashing the String costs more; the
 body covers them with "the execution benchmarks move by less than 1% either way". No wall-time claim. The Zammad
 replay (−0.64%) was not rerun on this master and is not in the body.
+
+### GQ1 fix round after Astra (2026-11-18)
+
+New head [`8af96ec046`](https://github.com/thomasklemm/graphql-ruby/commit/8af96ec046d5831a3031eadd400249c168be8b87),
+one commit on `9c9f8f28cc`, lease-pushed over the unopened `4a77cd59bf`; `lib/` is byte-identical to `4a77cd59bf`, so
+the Callgrind table above stands for it. Thomas author and committer, no trailers.
+
+1. **Test asserts results, not hook calls.** Same anonymous schema; the `.get_field` and `Schema.get_type` overrides
+   return nil while `context[:hidden]` is set. A Warden that looked up `name` and `Thing` before `hidden` was set
+   still returns the same field and type afterwards; a fresh query whose context starts hidden gets nil for both, so
+   the cache isn't shared between queries. On master the first re-lookup returns nil
+   (`expected Thing.name, actual nil`); with only `get_type` reverted, `Thing` comes back nil; with only `get_field`
+   reverted, the field does. Passes with the Ruby parser, the C parser and `GRAPHQL_FUTURE`. A first draft executed
+   `__type` around a context-changing root field, but under `GRAPHQL_FUTURE` (Execution::Next) the root object is
+   nil and the resolver can't run, so the test calls the Warden directly.
+2. **Claims.** The body names `Visibility::Profile` as precedent for `.get_field` only and says the cache lives as
+   long as the Warden, "which normally lives for one query" (an explicitly passed `warden:` keeps its entries). The
+   commit message says equal names in distinct Strings missed, and that nil results are kept too.
+3. **Numbers.** The body's table is now `rake bench:validate` (benchmark-ips, Ruby 4.0.9, no JIT, pinned to one
+   CPU, master and head alternating, six rounds, nothing else running; `gq1-pr/ips/`, scripts `ips.sh`,
+   `ipstab.rb`). Best of six, i/s, with A/A as best of rounds 1–3 against best of rounds 4–6 per revision:
+
+   | scenario | master | head | head/master | master A/A | head A/A |
+   | --- | ---: | ---: | ---: | ---: | ---: |
+   | validate - introspection | 1,216 | 1,394 | 1.15x | +2.2% | −1.1% |
+   | validate - abstract fragments | 1,942 | 2,122 | 1.09x | −3.8% | −1.6% |
+   | validate - abstract fragments 2 | 1,282 | 1,412 | 1.10x | −0.1% | −1.0% |
+   | validate - big query | 149.8 | 173.3 | 1.16x | +3.9% | −1.6% |
+   | validate - fields will merge (5000 × `hello`, record only) | 38.2 | 74.8 | 1.96x | +2.2% | +0.2% |
+
+   Head is ahead in all 24 round pairs of the four body rows (lowest 1.00x, abstract fragments, round 2;
+   `ips/pairs.txt`). The stress row stays here, as DECISIONS' realistic-size rule asks. The body's execution
+   sentence now says "instruction counts".
+
+Suites on `8af96ec046`, Ruby 4.0.9: `SERIAL=1 rake test` 2,735 tests, 0 failures; `GRAPHQL_CPARSER=1` 2,783, 0;
+`GRAPHQL_FUTURE=1` 2,735, 0. rubocop and `srb tc` clean.
 
 ### GQ1 Astra review (2026-11-18)
 
