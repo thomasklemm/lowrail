@@ -304,8 +304,8 @@ Superseded the same day by the PR below (Thomas wants a PR, not an issue); the i
 ### GQ1 as a pull request (2026-11-18)
 
 Branch [`thomasklemm/warden-name-caches-by-value`](https://github.com/thomasklemm/graphql-ruby/tree/thomasklemm/warden-name-caches-by-value)
-@ `4a77cd59bf`, one commit on master `9c9f8f28cc` (2026-11-17), queue item
-[GQ1](../../bench/upstream/pr-queue/items/GQ1.md) (`in-review`, `risky`; Astra requires changes below). Not
+@ `8af96ec046`, one commit on master `9c9f8f28cc` (2026-11-17), queue item
+[GQ1](../../bench/upstream/pr-queue/items/GQ1.md) (`reviewed`, `risky`; Astra and thermos-sol approve this head). Not
 opened. Data: [gq1-pr](../../bench/upstream/graphql_ruby/gq1-pr).
 
 The builder's rationale and original verification follow. The [Astra review](#gq1-astra-review-2026-11-18)
@@ -405,6 +405,92 @@ the Callgrind table above stands for it. Thomas author and committer, no trailer
 
 Suites on `8af96ec046`, Ruby 4.0.9: `SERIAL=1 rake test` 2,735 tests, 0 failures; `GRAPHQL_CPARSER=1` 2,783, 0;
 `GRAPHQL_FUTURE=1` 2,735, 0. rubocop and `srb tc` clean.
+
+### GQ1 thermos-sol review (2026-11-18)
+
+**Verdict: approve; no remaining must-fix on correctness/security or maintainability.** Both Thermos rubrics
+were applied directly in [this Sol review](https://ampcode.com/threads/T-01a1f055-2764-74cf-bd79-103bc7afb6da),
+without other reviewers, subagents or child threads, building on the Astra review and confirm below. Fetched fork
+head `8af96ec046d5831a3031eadd400249c168be8b87`; its sole parent and freshly fetched canonical master both equal
+`9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6`. `git diff 4a77cd59bf 8af96ec046 -- lib` is empty. Review approval
+is for Thomas's requested draft, not a claim of exact compatibility or a decision to mark it ready.
+
+**Correctness/security.** Traced both changed caches through `Schema.get_type`, `Schema.get_field`, query setup,
+visibility/reachability and the Profile field-cache precedent. Only the type-name and inner field-name keys
+change; field owners and all member-visibility caches remain identity-keyed. Entries belong to a Warden, not to
+a schema or multiplex. No new synchronization, feature gate, dependency or loading behavior is introduced.
+The intentional hook change can retain a now-denied definition or an initial nil after context mutation; neither
+Profile nor the guide makes that exact compatibility. The body discloses it, and runtime authorization must not
+depend on refreshing these cached definitions. No additional production defect was demonstrated.
+
+Ran `astra-boundaries.rb` on base/head with Ruby 4.0.9: both outputs are byte-identical to the retained
+`probes/astra-{master,head}.txt`. This rechecks both directions of the context change, ordinary multiplex
+isolation, nil caching, mutable/frozen Strings, a plain String subclass, Symbols and a `to_str` object. Additional
+base/head probes independently checked the body's exact two-selection example (equal but distinct AST names,
+no validation errors, `Schema.get_field` for `name` called 2→1 times), same-named fields on different owners
+(`SolLeft.name`, `SolRight.name`, then `SolLeft.name`), and name encodings. UTF-8/US-ASCII/ASCII-8BIT ASCII names
+resolve identically; UTF-16LE does not alias them. A field/type hook exception retains its class and message,
+and a subsequent lookup succeeds after the throwing flag is cleared: an exception is not cached as nil.
+Counters here are diagnostic instrumentation, not upstream test assertions.
+
+Executed the submitted spec block unchanged against each library using `-rgraphql -rminitest/autorun`:
+head passes 1 test / 6 assertions both normally and with Visibility migration mode, name rejection and
+Execution::Next as default. Base fails at the repeated field lookup. Independently reverting just the type-cache
+choice in memory fails at the repeated type lookup, and reverting just the field-cache choice fails at the field
+lookup. These controls distinguish both intended changes. The spec observes returned definitions and a fresh
+query, not cache ivars, helper calls or invocation counts; it is valid component-level behavioral coverage.
+
+**Body, sentence by sentence.** The title and first sentence describe the two name-keyed identity caches in
+base. The second sentence's concrete example was executed above; repeated traversal is not a claim that
+`visible?` itself ran twice. The default-Warden sentence matches `Schema.use_visibility_profile?` (prints false),
+`Query#prepare_ast` and the install template (no Visibility plugin); inherited/indirect plugin activation is
+included in that opt-in boundary. The next sentence correctly limits lifetime to the Warden and Profile
+precedent to a type's `.get_field`, not `Schema.get_type`. The override sentence states the context-mutation
+change and quotes [the guide](https://github.com/rmosolgo/graphql-ruby/blob/9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6/guides/schema/dynamic_types.md#L3-L10)
+verbatim. The benchmark heading identifies the existing `Rakefile`/`benchmark/run.rb` task and Ruby major
+version. All four table rows reproduce after rounding. The final sentence labels instructions, not time:
+independently deriving slopes from all 72 retained Ir totals gives execution deltas −0.943046%, +0.302531%,
+−0.051113%, +0.318573% and +0.426899%. The 5,000-field stress case is absent from the body. No text change needed.
+
+**Commit message, sentence by sentence.** The first sentence matches base's name-key/identity implementation.
+The second restricts misses to equal names in distinct Strings, preserving the fact that repeated visits to the
+same String already hit; the parser probe above confirms that shape. The third accurately describes first-result
+reuse, including nil, for the Warden lifetime. The fourth preserves owner identity; the fifth is field-only
+Profile precedent. Author and committer are Thomas Klemm `<github@tklemm.eu>`, and the trailer list is empty.
+
+**Retained benchmark-ips audit.** Read all twelve raw outputs, their SHA/Ruby headers and `ips.sh`; independently
+parsed the Calculating rows rather than relying on `ipstab.rb`. Regenerating `ips/table.txt` with that script also
+gives an empty diff. Best-of-six rates and head/base ratios reproduce as:
+
+| scenario | master i/s | head i/s | ratio | master / head split-half A/A |
+| --- | ---: | ---: | ---: | ---: |
+| introspection | 1,216 | 1,394 | 1.146382x | +2.184874% / −1.076040% |
+| abstract fragments | 1,942 | 2,122 | 1.092688x | −3.810505% / −1.555137% |
+| abstract fragments 2 | 1,282 | 1,412 | 1.101404x | −0.078003% / −0.991501% |
+| big query | 149.772 | 173.259 | 1.156818x | +3.921732% / −1.633970% |
+
+This supports the table and the recorded 1.09–1.16x throughput range, not a per-query latency or whole-app/JIT
+claim. The ±3.9% is a best-of-three halves control, not overall uncertainty: within-run dispersion reaches
+±16.3%, and round 2 abstract fragments is a printed i/s tie. All six rounds were included. The script pins CPU 1
+and alternates master/head; headers identify the requested revisions and Ruby 4.0.9 without JIT. This is an
+arithmetic/source replay, not a fresh timing run or independent proof of an otherwise idle measurement host.
+
+**Maintainability and adverse case.** L0: look up a type by name value; look up a field by owner identity and
+name value; on a miss run the existing logic. The new private helper has two real uses beside the identity helper;
+parameterizing the old helper or adding override detection would add complexity. No new guards, code comments,
+branches or lifecycle state need justification. Warden grows 729→733 lines; the spec 1,192→1,230, already over
+1,000. Astra's production-method Flog/RuboCop scores apply unchanged because `lib/` is byte-identical; those tools
+were not rerun. Repeated already-hit long names are the losing shape, not hidden by the validation gains:
+rerunning `astra-size.rb` gives about 0.061–0.068→0.076–0.080 ms per 1,000 lookups at 8/64 B, and
+0.059–0.088→204.7–206.0 ms at 1 MiB. These unpinned diagnostic samples confirm linear hashing cost, not a realistic
+application regression or a reason to add a special guard. The retained +0.43% legacy-introspection Ir row is
+still a regression, accurately covered by the body's less-than-1% statement.
+
+**Limits and delivery.** No fresh full-suite, C-parser, Sorbet or Callgrind run; the builder's full-suite results
+remain separately attributed. No fork edits/push, PR opening or upstream post. Scratch probes and arithmetic
+checks are retained under this thread's `.amp/in/orb-backup/gq1-sol-*`; new review conclusions are recorded here
+and in the item's exact-head `thermos-sol` pass. Lowrail's `gem/test/pr_queue_test.rb`: 10 tests / 54 assertions,
+zero failures. The item moves to `reviewed`; opening the draft stays with the coordinator.
 
 ### GQ1 Astra confirm (2026-11-18)
 
