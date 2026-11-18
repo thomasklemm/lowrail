@@ -27,6 +27,8 @@ micro figures are diagnostic only; request YJIT windows are flat. Earlier review
 * `review_exactness.rb`: deterministic 17,897-comparison matrix including genuinely frozen/chilled inputs,
   encodings and encoding-coercion callbacks, BasicObject, String subclasses and megabyte inputs; exits nonzero
   on differences. `review_fix_probe.rb` diagnostically checks the proposed minimal repairs without changing Rack.
+* `guard_mutants.sh RACK`: guard mutants of the `unescape-cgi-3` head against spec_utils and spec_query_parser, plus
+  the same tests on older libs ([receipts](../../../docs/upstream/data/rk3/instance-of-guard/README.md)).
 * `review_rails.rb`: actual ActionDispatch query/form/cookie results and errors with Rack decoder-call counts.
 * `review_receipts.rb`: independent arithmetic and JIT-counter audit of the historical request and body receipts.
   Review receipts, suite logs, the inconclusive old-head wall-time rerun and limitations are in `review-thermos-sol/`;

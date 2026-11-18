@@ -21,7 +21,9 @@ n.times do
 end
 sub = Class.new(String)
 counted = Object.new.tap { |o| def o.to_s = (($to_s_calls += 1); "a b") }
-extra = [nil, :sym, :"a b*", 12, 1.5, sub.new("a b*~"), sub.new(""), counted, Object.new.tap { |o| def o.to_s = 1 }]
+tagged = sub.new("a").tap { |x| x.instance_variable_set(:@tag, true) }
+extra = [nil, :sym, :"a b*", 12, 1.5, sub.new("a b*~"), sub.new(""), sub.new("~"), sub.new("*"), sub.new("a"), tagged,
+  counted, Object.new.tap { |o| def o.to_s = 1 }]
 # BasicObject has no instance_of?; URI only needs to_s.
 basics = {
   "BasicObject to_s" => -> { o = BasicObject.new; def o.to_s = "a b*~"; o },

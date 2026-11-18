@@ -1,0 +1,5 @@
+2.7.8 split: [Sub, Sub]
+parse_query(Sub 'a=b&c=%41'): [String, String]
+parse_nested_query(Sub 'a=b'): [String]
+Request#GET with Sub QUERY_STRING: [String]
+Request#cookies with Sub HTTP_COOKIE: [String]

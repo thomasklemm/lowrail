@@ -26,8 +26,9 @@ n.times do
   p [s, s.encoding, t, a, b, c] if bad < 10
 end
 sub = Class.new(String)
+tagged = sub.new("a").tap { |x| x.instance_variable_set(:@tag, true) }
 extra = [nil, :sym, :"a%41", 12, "abc".encode("UTF-16LE"), "a%".encode("UTF-16LE"), sub.new("a%41"), sub.new("a"),
-  sub.new("a%")]
+  sub.new("a%"), tagged]
 # Fresh objects per side: encoding arguments whose to_str is stateful, raises on a second call or mutates the input,
 # and BasicObject inputs (no instance_of?) with and without the conversions URI uses.
 def stateful_enc = Object.new.tap { |o| def o.to_str = (@n = (@n || 0) + 1) == 1 ? "UTF-8" : "ASCII-8BIT" }

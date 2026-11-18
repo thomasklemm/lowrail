@@ -1,0 +1,20 @@
+BasicObject to_s: DIFF [:ok, "String", #<Encoding:US-ASCII>, "a+b*%7E", false] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"] [:ok, "String", #<Encoding:UTF-8>, "x=a+b*%7E", false] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"]
+BasicObject to_s returning a subclass: DIFF [:ok, "anonymous < String", #<Encoding:US-ASCII>, "a+b", false] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"] [:ok, "String", #<Encoding:UTF-8>, "x=a+b", false] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"]
+plain BasicObject: DIFF [:err, NoMethodError, "undefined method `to_s' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method `to_s' for #<BasicObject:0x>"] [:err, NoMethodError, "undefined method `instance_of?' for #<BasicObject:0x>"]
+cgi/util loaded: false
+nil: same
+:sym: same
+:"a b*": same
+12: same
+1.5: same
+"a b*~": same
+"": same
+"~": same
+"*": same
+"a": same
+"a": same
+#<Object:0x00007f1ca29d6b90>: same
+#<Object:0x00007f1ca29d67a8>: same
+boundary "a b": DIFF [:ok, "String", #<Encoding:US-ASCII>, "hooked", false] [:ok, "String", #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+boundary "a b": DIFF [:ok, "String", #<Encoding:US-ASCII>, "hooked", false] [:ok, "String", #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]: 300000 random cases + 16 fixed, 3 differences

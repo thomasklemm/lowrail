@@ -1,0 +1,200 @@
+rubocop-packaging extension supports plugin, specify `plugins: rubocop-packaging` instead of `require: rubocop-packaging` in /tmp/rc-da90464e/.rubocop.yml.
+For more information, see https://docs.rubocop.org/rubocop/plugin_migration_guide.html.
+Inspecting 4 files
+CCCC
+
+Offenses:
+
+lib/rack/utils.rb:166:35: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator +.
+        param = header.slice!(0, i+1)
+                                  ^
+lib/rack/query_parser.rb:130:49: C: [Correctable] Layout/SpaceAroundEqualsInParameterDefault: Surrounding space missing in default value assignment.
+    def normalize_params(params, name, v, _depth=nil)
+                                                ^
+lib/rack/query_parser.rb:157:26: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator -.
+        k = name[1, start-1]
+                         ^
+lib/rack/query_parser.rb:158:27: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator +.
+        after = name[start+1, name.length]
+                          ^
+lib/rack/query_parser.rb:182:93: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator -.
+        unless after[2] == '[' && after.end_with?(']') && (child_key = after[3, after.length-4]) && !child_key.empty? && !child_key.index('[') && !child_key.index(']')
+                                                                                            ^
+test/spec_utils.rb:244:70: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator =>.
+    Rack::Utils.parse_nested_query("foo%81E=1").must_equal "foo\x81E"=>"1"
+                                                                     ^^
+test/spec_utils.rb:264:25: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+      must_equal "d" => {"[" => "5"}, "e]" => ["6"], "f" => { "[" => { "]" => "7" } }
+                        ^
+test/spec_utils.rb:264:36: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+      must_equal "d" => {"[" => "5"}, "e]" => ["6"], "f" => { "[" => { "]" => "7" } }
+                                   ^
+test/spec_utils.rb:267:77: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator =>.
+      must_equal "g" => { "h" => { "i" => "8" } }, "j" => { "k" => { "l[m]" =>"9" } }
+                                                                            ^^
+test/spec_utils.rb:270:21: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator =>.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                    ^^
+test/spec_utils.rb:270:23: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                      ^
+test/spec_utils.rb:270:33: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator =>.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                                ^^
+test/spec_utils.rb:270:35: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                                  ^
+test/spec_utils.rb:270:44: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator =>.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                                           ^^
+test/spec_utils.rb:270:50: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                                                 ^
+test/spec_utils.rb:270:51: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+      must_equal "l"=>{"[[[[[[["=>{"]]]]]]"=>"10"}}
+                                                  ^
+test/spec_utils.rb:472:62: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    Rack::Utils.forwarded_values('for=a;' * 1024).must_equal({for: ["a"]*1024})
+                                                             ^
+test/spec_utils.rb:472:73: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator *.
+    Rack::Utils.forwarded_values('for=a;' * 1024).must_equal({for: ["a"]*1024})
+                                                                        ^
+test/spec_utils.rb:472:78: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    Rack::Utils.forwarded_values('for=a;' * 1024).must_equal({for: ["a"]*1024})
+                                                                             ^
+test/spec_utils.rb:473:78: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    Rack::Utils.forwarded_values('for="a' + "\\\\" * 1024 + 'b"').must_equal({for: ['a' + ("\\" * 1024) + 'b']})
+                                                                             ^
+test/spec_utils.rb:473:111: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    Rack::Utils.forwarded_values('for="a' + "\\\\" * 1024 + 'b"').must_equal({for: ['a' + ("\\" * 1024) + 'b']})
+                                                                                                              ^
+test/spec_utils.rb:564:26: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+      payload_too_large: {status_code: 413, standard_symbol: :content_too_large},
+                         ^
+test/spec_utils.rb:564:80: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+      payload_too_large: {status_code: 413, standard_symbol: :content_too_large},
+                                                                               ^
+test/spec_utils.rb:565:29: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+      unprocessable_entity: {status_code: 422, standard_symbol: :unprocessable_content}
+                            ^
+test/spec_utils.rb:565:87: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+      unprocessable_entity: {status_code: 422, standard_symbol: :unprocessable_content}
+                                                                                      ^
+test/spec_utils.rb:567:24: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    dropped_statuses = {bandwidth_limit_exceeded: 509, not_extended: 510}
+                       ^
+test/spec_utils.rb:567:73: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    dropped_statuses = {bandwidth_limit_exceeded: 509, not_extended: 510}
+                                                                        ^
+test/spec_utils.rb:665:43: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    Rack::Utils.set_cookie_header('name', {value: 'value', partitioned: true}).must_equal 'name=value; partitioned'
+                                          ^
+test/spec_utils.rb:665:77: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    Rack::Utils.set_cookie_header('name', {value: 'value', partitioned: true}).must_equal 'name=value; partitioned'
+                                                                            ^
+test/spec_utils.rb:686:59: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    Rack::Utils.delete_set_cookie_header!(header, 'name', {domain: "mydomain.com"})
+                                                          ^
+test/spec_utils.rb:686:82: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    Rack::Utils.delete_set_cookie_header!(header, 'name', {domain: "mydomain.com"})
+                                                                                 ^
+test/spec_utils.rb:695:59: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    Rack::Utils.delete_set_cookie_header!(header, 'name', {path: "/a/b"})
+                                                          ^
+test/spec_utils.rb:695:72: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    Rack::Utils.delete_set_cookie_header!(header, 'name', {path: "/a/b"})
+                                                                       ^
+test/spec_query_parser.rb:12:55: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a").must_equal({"a" => "a"})
+                                                      ^
+test/spec_query_parser.rb:12:66: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a").must_equal({"a" => "a"})
+                                                                 ^
+test/spec_query_parser.rb:13:54: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=").must_equal({"a" => ""})
+                                                     ^
+test/spec_query_parser.rb:13:64: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=").must_equal({"a" => ""})
+                                                               ^
+test/spec_query_parser.rb:14:53: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a").must_equal({"a" => nil})
+                                                    ^
+test/spec_query_parser.rb:14:64: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a").must_equal({"a" => nil})
+                                                               ^
+test/spec_query_parser.rb:22:48: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_query("a=a").must_equal({"a" => "a"})
+                                               ^
+test/spec_query_parser.rb:22:59: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_query("a=a").must_equal({"a" => "a"})
+                                                          ^
+test/spec_query_parser.rb:23:55: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a").must_equal({"a" => "a"})
+                                                      ^
+test/spec_query_parser.rb:23:66: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a").must_equal({"a" => "a"})
+                                                                 ^
+test/spec_query_parser.rb:24:60: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a", '&').must_equal({"a" => "a"})
+                                                           ^
+test/spec_query_parser.rb:24:71: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a", '&').must_equal({"a" => "a"})
+                                                                      ^
+test/spec_query_parser.rb:34:49: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_query("a=aa").must_equal({"a" => "aa"})
+                                                ^
+test/spec_query_parser.rb:34:61: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_query("a=aa").must_equal({"a" => "aa"})
+                                                            ^
+test/spec_query_parser.rb:35:56: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=aa").must_equal({"a" => "aa"})
+                                                       ^
+test/spec_query_parser.rb:35:68: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=aa").must_equal({"a" => "aa"})
+                                                                   ^
+test/spec_query_parser.rb:36:61: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=aa", '&').must_equal({"a" => "aa"})
+                                                            ^
+test/spec_query_parser.rb:36:73: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=aa", '&').must_equal({"a" => "aa"})
+                                                                        ^
+test/spec_query_parser.rb:42:52: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_query("a=a&b=b").must_equal({"a" => "a", "b" => "b"})
+                                                   ^
+test/spec_query_parser.rb:42:75: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_query("a=a&b=b").must_equal({"a" => "a", "b" => "b"})
+                                                                          ^
+test/spec_query_parser.rb:43:59: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a&b=b").must_equal({"a" => "a", "b" => "b"})
+                                                          ^
+test/spec_query_parser.rb:43:82: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a&b=b").must_equal({"a" => "a", "b" => "b"})
+                                                                                 ^
+test/spec_query_parser.rb:44:64: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a&b=b", '&').must_equal({"a" => "a", "b" => "b"})
+                                                               ^
+test/spec_query_parser.rb:44:87: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a&b=b", '&').must_equal({"a" => "a", "b" => "b"})
+                                                                                      ^
+test/spec_query_parser.rb:55:56: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_query("a=a&b=b&c=c").must_equal({"a" => "a", "b" => "b", "c" => "c"})
+                                                       ^
+test/spec_query_parser.rb:55:91: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_query("a=a&b=b&c=c").must_equal({"a" => "a", "b" => "b", "c" => "c"})
+                                                                                          ^
+test/spec_query_parser.rb:56:63: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside { missing.
+    query_parser.parse_nested_query("a=a&b=b&c=c").must_equal({"a" => "a", "b" => "b", "c" => "c"})
+                                                              ^
+test/spec_query_parser.rb:56:98: C: [Correctable] Layout/SpaceInsideHashLiteralBraces: Space inside } missing.
+    query_parser.parse_nested_query("a=a&b=b&c=c").must_equal({"a" => "a", "b" => "b", "c" => "c"})
+                                                                                                 ^
+
+4 files inspected, 61 offenses detected, 61 offenses autocorrectable
+
+Tip: Based on detected gems, the following RuboCop extension libraries might be helpful:
+  * rubocop-minitest (https://rubygems.org/gems/rubocop-minitest)
+  * rubocop-rake (https://rubygems.org/gems/rubocop-rake)
+
+You can opt out of this message by adding the following to your config (see https://docs.rubocop.org/rubocop/plugins.html#plugin-suggestions for more options):
+  AllCops:
+    SuggestExtensions: false

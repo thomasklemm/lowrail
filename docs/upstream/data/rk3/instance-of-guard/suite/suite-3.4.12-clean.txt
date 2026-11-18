@@ -1,0 +1,3 @@
+ruby 3.4.12 clean exit 0
+1294 runs, 6272 assertions, 0 failures, 0 errors, 2 skips
+files: 40
