@@ -181,6 +181,55 @@ per create and destroy (all via `AttributeMutationTracker#attr_names` or `Attrib
   strategy, decoupling `becomes`, and the 6.1 marshal removal; none covers `keys`. czj's `#to_hash` went in through
   that thread before the merge.
 
+## Rebuild on main 8e097e9d81 (2026-11-18)
+
+Bruno Costanzo's #59833 (opened 2026-11-17, after #59800; merged by byroot 2026-11-18 as af6081aeeb) removed
+`| cached_names` and `cached_names` itself, which is K1's `cached_names` part. It is the only base commit since
+`50c54eed06` that touches `attribute_set.rb` or `builder.rb`. It leaves `row_keys | @ctx.type_keys` in `#keys`,
+materialize's `type_keys` walk and the `type_keys` readers, so K1 is still needed, only smaller.
+
+Rebuilt as `af84ab1445` on fork branch `thomasklemm/lazy-indexed-keys-2` (PR branch not updated): the conflict in
+`#keys` resolves to K1's `row_keys.keep_if`, and the `cached_names` hunk is already on main. The resulting
+`attribute_set.rb` is blob `a737087860`, the same blob as at `bbdd9945d3`, and `builder.rb` is the same change, so
+the tree is the same code as before on a newer base (+2/−8 against main instead of +2/−15). The message drops "and built
+names" from the subject and the `cached_names` clause, and says the union built one more Array instead of two.
+Author date 2026-11-14 kept, author and committer Thomas, no trailers. The commit adds no guard and no comment.
+
+The proof above still holds without `cached_names`: every `type_keys` name is in `indexes`, so the union is `row_keys`.
+Probes on main `8e097e9d81` against the rebuild (Ruby 4.0.9): `keys_probe.rb`'s diff is byte for byte
+[probe-main-vs-fix.diff](results/probe-main-vs-fix.diff) (only the after_find mid-result case, main raising);
+`edge_probe.rb` identical over 164 lines; `review_probe.rb` differs only in the eager_load mid-result, foreign
+`IndexedRow` and `Result#indexed_rows` cases, as before.
+
+Tests with `-w`, SQLite, Ruby 4.0.9: Active Model 1,271 runs, 0 failures, 0 errors; Active Record `rake test:sqlite3`
+10,402 runs, 0 failures, 5 errors from the environment (4 in `sqlite_rake_test` without the `sqlite3` CLI, 1 because
+`pg` was not in the bundle); 23 attribute, dirty, serialization, store, dup, inheritance and persistence files 1,399
+runs, 0 failures, 0 errors; no warnings.
+
+The numbers moved, because main no longer pays for `cached_names`. 30 columns, N=200, same harness; raw:
+[rebuild-8e097e9d81](results/rebuild-8e097e9d81):
+
+| Ir per call, 30 cols | 4.0.9 main | A/A | fix | objects | master ZJIT main | A/A | fix | master interp main | A/A | fix |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `changed?` | 191,913 | −0.13% | **−13.0%** | 3 → 1 | 89,278 | +0.21% | **−21.8%** | 190,341 | −0.09% | **−10.3%** |
+| `serializable_hash` | 203,291 | −0.18% | **−12.1%** | 35 → 33 | 143,825 | +0.12% | **−13.7%** | 200,110 | −0.03% | **−9.7%** |
+| `update!` of one column | 1,376,572 | +0.02% | **−5.4%** | 189 → 183 | 670,368 | +0.13% | **−8.8%** | 1,401,171 | +0.00% | **−4.3%** |
+| `find` then `save` | 1,530,210 | −0.05% | **−8.4%** | 169 → 163 | 709,382 | +0.47% | **−12.2%** | 1,548,971 | −0.01% | **−7.5%** |
+| `find` then `dup` | 1,118,916 | −0.02% | **−5.0%** | 182 → 182 | 520,549 | +0.20% | **−5.4%** | 1,122,245 | +0.03% | **−4.9%** |
+| `find` | 401,812 | +0.01% | −0.02% | 68 → 68 | 202,046 | +0.11% | +0.03% | 407,326 | +0.03% | +0.03% |
+| `#attributes` | 621,563 | −0.00% | −0.04% | 83 → 83 | 290,601 | +0.13% | +0.07% | 628,323 | +0.04% | +0.12% |
+| `new` | 55,183 | +0.04% | −0.16% | 9 → 9 | 19,739 | +0.44% | −0.08% | 56,475 | −0.03% | −0.54% |
+
+On 4.0.9 the largest A/A over all 19 cases is 0.22%; `attribute_names` −27%, partial `changed?` −29%, partial
+`as_json` −26%, and every load, reader and `#attributes` case is within the A/A. Every ZJIT window compiled 0 ISEQs
+and 0 side exits and spent 0 ns invalidating, on all three trees; no ZJIT loss. Objects: 2 fewer per `#keys` call at
+30 columns (the union's Array and the Hash `Array#|` builds above 16 names), 6 per save. Master interpreter
+controls over three runs (`master/rep1`, `master/rep2`): `find` fix +0.02% to +0.04% (A/A up to +0.12%),
+`#attributes` −0.05% to +0.12% (A/A −0.09% to +0.10%), `new` −0.54% to −0.67% in every run (fix 56,018–56,168
+against main 56,394–56,475 and main2 56,459–56,733). `new` calls neither `#keys` nor `materialize`; the 2026-11-14
+pass saw the same cell move the other way (+0.43%), so this reads as the ID-table layout shift recorded there (a
+hypothesis), and it is a gain, not a loss.
+
 ## Rerun
 
 ```
