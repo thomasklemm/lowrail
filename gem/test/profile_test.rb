@@ -436,6 +436,24 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # Code evaluated from line -1 (Sidekiq's Web views) allocates at lines -1
+  # and 0: both count at line 0, not as dropped samples, which compare refuses.
+  def test_code_evaluated_at_a_negative_line_is_counted
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "probe.rb"), <<~'RUBY')
+        P = Lowrail::Profile
+        P.enter(0)
+        eval("String.new\nString.new", nil, "view.erb", -1)
+        P.leave
+        _, _, dropped, rows = P.snapshot
+        strings = rows.select { _1[0] == "view.erb" && P::TYPES[_1[2]] == "String" }
+        puts "dropped #{dropped} strings #{strings.map { _1.values_at(1, 3) }}"
+      RUBY
+      out, err, = profile(dir, "--out", "profile", "--runs", "1", "--", RUBY, "probe.rb")
+      assert_includes out, "dropped 0 strings [[0, 2]]\n", err
+    end
+  end
+
   # --record notes Rack requests only: a Cable subscription returns what it
   # returned, and its exceptions, and a job's, pass through as the same
   # objects, in both runs.

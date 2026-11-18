@@ -308,7 +308,9 @@ newobj(VALUE tpval, void *data)
     rb_trace_arg_t *arg = rb_tracearg_from_tracepoint(tpval);
     VALUE obj = rb_tracearg_object(arg);
     VALUE path = rb_tracearg_path(arg);
-    uint64_t line = NUM2ULONG(rb_tracearg_lineno(arg));
+    /* Code evaluated from a negative line (ERB compiled at -1) counts at line 0. */
+    long lineno = NUM2LONG(rb_tracearg_lineno(arg));
+    uint64_t line = lineno > 0 ? (uint64_t)lineno : 0;
     uint64_t via = 0;
     /* Ruby's own <internal:...> frames (Pathname, Kernel#tap, ...) are charged
      * to their nearest caller outside them, flagged in bit 63. */
