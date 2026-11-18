@@ -4,26 +4,28 @@ repo: ruby/ruby
 kind: perf
 area: ZJIT, objtostring guards
 reviewer: "none asked; precedent k0kubun's #19603 (coerce_to guards recompile)"
-branch: thomasklemm/zjit-objtostring-recompile
-head: "2cc3e0de4d"
+branch: thomasklemm/zjit-objtostring-recompile-2
+head: "6a3dc53c87"
 base: master
 built_on: "9de06831e3"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "removes a permanent side exit: a String-profiled interpolation that also sees a Symbol exits on every such call; lobsters guard_type_failure 677 -> 139 per iteration (content_tag_string), side exits 10,167 -> 9,629, railsbench unchanged; run_benchmarks.rb within A/A (A/A spread up to 10% on the orb)"
+impact: "removes a permanent side exit: a String-profiled interpolation that also sees a Symbol exits on every such call; lobsters guard_type_failure 677 -> 139 per iteration (content_tag_string), side exits 10,167 -> 9,629 (two runs each on -2); the recompiled version keeps FixnumToString and rb_mod_name for profiled Integers and Modules, so no probe mode allocates more than master (diagnostic Callgrind slopes -1.6% to -3.5% on String-led mixes, the rest within A/A); run_benchmarks.rb within A/A on the old head"
 rank: 3
 risky: false
 state: built
 pr:
-note: "2026-11-18 (Thomas): open as a ruby/ruby draft once the thermos-sol review on the head approves. 2026-11-18 thermos-sol: changes on 2cc3e0de4d. Recompiling the Integer/Module guards loses specialized conversions on mixed inputs; release-build reproducer adds 1,000,000 allocations per 600,000 calls. Cut the false frozen-string claim from body and commit message and the body's setup parenthesis. Review record and reproducer below. Independently run zjit-test 2,015/2,015 and btest t1/t2 2,148 each; new test fails on base production code. Built from docs/upstream/zjit-stats-2026-11-18.md, production +4/-4, one new HIR test, seven changed snapshots. Not opened: review must-fixes remain. The permanent-exit exception waives the timing-evidence gate only; the separate draft approval is conditional on a passing review."
+note: "2026-11-18 (Thomas): open as a ruby/ruby draft once the thermos-sol review on the head approves. 2026-11-18 thermos-sol on 2cc3e0de4d: changes (conversion regression, body text). 2026-11-18 rebuild -2 @ 6a3dc53c87 (one commit on 9de06831e3, still current master): only the String guard recompiles; the polymorphic path keeps the monomorphic Integer/Module conversions for profiled types (production +18/-2 in zjit/src/hir.rs). zjit-test 2,016/2,016, btest t1/t2 2,148 each; new test fails on 2cc3e0de4d and on master. Needs a fresh review on -2, including the design check the review asked for on new polymorphic lowering. Not opened. The permanent-exit exception waives the timing-evidence gate only; the draft approval is conditional on a passing review."
 passes:
   - {reviewer: thermos-sol, orb: T-01a1ee95-733f-70d2-80da-ed3434c4e36b, head: "2cc3e0de4d", date: 2026-11-18, verdict: changes, open: "P2: mixed Integer/Module interpolation loses specialized conversions after recompile (release allocation regression); narrow the change or preserve those conversions. Body and commit message overgeneralize frozen strings; cut that clause. Remove body pins/setup and unqualified two-runs claim. No semantic divergence found; both rubrics applied directly by one reviewer, as requested."}
 ---
 
-# ZJIT: Recompile when an objtostring guard fails
+# ZJIT: Recompile when an objtostring String guard fails
 
-When `objtostring` has a monomorphic profile, ZJIT guards the profiled type: a String goes straight into the concatenation, an Integer or a Module becomes its frozen string, and any other class sends `#to_s`. These guards didn't recompile, so a value of another type side-exited on every call for as long as that version stayed. They now recompile, like `coerce_to`'s since #19603.
+When `objtostring` has only seen Strings, ZJIT guards that the value is a String. That guard didn't recompile, so any other value side-exited on every call for as long as that version stayed. It now recompiles, like `coerce_to`'s since #19603.
+
+The recompiled version takes the polymorphic path, which sent `#to_s` for everything that isn't a String. It now keeps the monomorphic path's Integer and Module conversions for the types the profile saw, because `#to_s` allocates a new string where `rb_fix_to_s()` shares one for 0..9 and `rb_mod_name()` returns a named module's name. The Integer and Module guards are unchanged.
 
 On lobsters, Action View's `TagBuilder#content_tag_string` interpolates a tag name that is a String in most calls and a Symbol in about one in six:
 
@@ -34,9 +36,114 @@ On lobsters, Action View's `TagBuilder#content_tag_string` interpolates a tag na
 +side_exit_count:            9,629
 ```
 
-(ZJIT stats per iteration, ruby-bench `8083f57`, 15 warmup + 10 measured iterations, two runs per build agree; railsbench doesn't move.)
+(ZJIT stats per lobsters iteration.)
 
 ## For Thomas
+
+### Rebuild -2, 2026-11-18
+
+Branch [`thomasklemm/zjit-objtostring-recompile-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-objtostring-recompile-2)
+@ [`6a3dc53c87`](https://github.com/thomasklemm/ruby/commit/6a3dc53c874f5b9df4f6d6a2fe2fe091b5aab7cb), one commit on
+master `9de06831e3` (still the tip of ruby/ruby master at build time), Thomas Klemm as author and committer, no
+trailers, made with `/usr/bin/git commit-tree`. 2 files, +166/−4, production +18/−2 in `zjit/src/hir.rs`
+([ots1-2.diff](../../zjit-stats/ots1-2.diff)). The old branch and `2cc3e0de4d` are untouched. Not opened, nothing posted.
+
+**What changed against `2cc3e0de4d`.** Only the String guard recompiles; the Integer, Module and other-class guards
+are back to master. The polymorphic `objtostring` path (no monomorphic profile) used to branch on String and send
+`#to_s` for everything else. It now first branches on each profiled type for which `try_objtostring_cfunc` applies
+(`polymorphic_summary` + `polymorphic_arms`, the same helpers `send`/`opt_send_without_block` use for their
+polymorphic dispatch), and that arm gets the monomorphic path's `FixnumToString` or `rb_mod_name` conversion with
+its existing patchpoints. Everything else still falls to the `#to_s` send. Described out loud: "If it is a String,
+use it. Otherwise, for each type the profile saw that the monomorphic path converts without a send, check for that
+type and convert it the same way. Anything else sends `to_s`."
+
+**How #19603 and ZJIT handle polymorphic profiles.** #19603 only switched `coerce_to`'s guard to
+`guard_type_recompile` (plus making `newrange` recompile); it relies on the next version taking whatever path the
+new profile selects. For `objtostring` that path was a generic send (the `TODO(max): Handle polymorphic profiles`
+case), which is exactly what lost the conversions. Sends already dispatch polymorphic receivers with
+`CondBranchHasType` arms per profiled type and a generic fallback; this patch applies that shape to `objtostring`'s
+non-String side only. Megamorphic profiles (more than 8 types) still send `#to_s` for every non-String, which is
+why the Integer and Module guards are kept as they are: recompiling them would trade master's conversion for sends
+on such sites.
+
+**Guards and comments.** No guard is added or widened. Surviving changed guard: the String guard (protects direct
+concatenation; now `guard_type_recompile`, the file's idiom). The new arms are branches, not guards; each arm's
+conversion keeps the existing original-C-function check, no-singleton patchpoint and method-redefined patchpoint
+from `try_objtostring_cfunc`, and the Module arm keeps its final-version refusal and String-result guard. The
+Fixnum/Module `GuardType` that `try_objtostring_cfunc` emits is removed as redundant after the arm's `RefineType`
+(visible in the snapshot). No production comment added. An arm block whose conversion is refused stays unreachable
+and is dropped from the RPO; a reviewer may prefer creating it only after the check. Readability: L1 (17 new lines
+in an existing branch, no new names or helpers).
+
+**Tests.** `test_objtostring_guard_failure_recompiles` (from the old head, unchanged: String warmup, then Symbols,
+expects version 2 with the polymorphic path) and new `test_objtostring_guard_failure_keeps_fixnum_to_string`
+(String warmup, then small Integers; expects version 2 with `CondBranchHasType v10, Fixnum` and `FixnumToString`
+before the `to_s` fallback). Two existing String snapshots gain `recompile`; the five Integer/Module/Array snapshot
+changes of the old head are gone.
+
+* Fail without the fix: with production `hir.rs` from `2cc3e0de4d`, the new test fails at the snapshot (version 2
+  has `Send :to_s` where it expects `FixnumToString`); the old test passes there. With master's `hir.rs`, both fail
+  at the version count (`left: 2, right: 1`, `opt_tests.rs:10419` and `:10497`).
+* `--enable-zjit=dev`, `make zjit-test`: **2,016 passed**, 15 skipped (the profiler-signal test passed this time).
+  `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` and `=2`: **2,148 passed** each.
+* Differential ([ots1_2_diff_probe.rb](../../zjit-stats/ots1_2_diff_probe.rb), 227 rows: four sites warmed on
+  String, Integer, Module and Symbol, then 16 value kinds including 0/9/10/−1/Bignum, anonymous module and class,
+  String subclass, binary String, singleton `to_s` on a named module, `Integer#to_s` and `Module#to_s` redefined and
+  restored after compile; compares value, encoding, frozenness and class): release master and -2 match the
+  interpreter at thresholds 1, 2, 30, threshold 2 with exit budget 1, with max-versions 2, and with
+  inline-threshold 0. `--zjit-dump-hir-opt` confirms the Fixnum and Class arms compile in the mixed sites.
+
+**Reviewer's reproducer, repeated.** Release builds `--enable-zjit --disable-yjit --disable-install-doc
+--without-jemalloc` in one build dir with only `zjit/src/hir.rs` swapped; GCC 14.2.0, Rust 1.100.0. Probe
+[ots1_review_cost.rb](../../zjit-stats/ots1_review_cost.rb) with two added modes (`string_integer`,
+`string_module`). Allocations at N=600,000 on core 1; Callgrind from the pinned `script/bench-valgrind` tool (3.19.0
++ brk patch, tool sha256 `257b28c0…`), Ir from the `totals:` line, slope = N=10,000 minus N=1,000, core 0. Old head
+= `2cc3e0de4d`, narrow = only the String guard recompiles (no arms), new = `6a3dc53c87`, all guards + arms =
+`2cc3e0de4d` plus the arms (not pushed). Raw: [ots1-2-cost.json](../../zjit-stats/raw/ots1-2-cost.json).
+
+| Input cycle | Allocations: base / old head / narrow / new | Slope vs base, round 1: old head / narrow / new | Round 2: new / all guards + arms |
+| --- | ---: | ---: | ---: |
+| String only | 1,200,014 / 1,200,014 / 1,200,014 / 1,200,014 | −0.53% / −0.48% / −0.46% | −0.39% / −0.25% |
+| Five Strings, one Symbol | 1,200,014 / 1,200,014 / 1,200,014 / 1,200,014 | −1.03% / −2.11% / −1.59% | −2.01% / −0.80% |
+| Five small Integers, one Symbol | 1,200,014 / 2,200,014 / 1,200,014 / 1,200,014 | +40.03% / +0.24% / +0.37% | −0.36% / −1.73% |
+| Five small Integers, one String | 1,200,014 / 2,200,014 / 1,200,014 / 1,200,014 | +34.93% / −0.41% / −0.80% | −0.09% / −3.08% |
+| Five named classes, one Symbol | 1,200,014 / 2,200,014 / 1,200,014 / 1,200,014 | +13.91% / +1.07% / +1.20% | +0.03% / −23.17% |
+| Five Strings, one small Integer | 1,200,014 / 1,400,014 / 1,400,014 / 1,200,014 | +4.74% / +5.02% / −2.83% | −3.54% / −3.79% |
+| Five Strings, one named class | 1,200,014 / 1,400,014 / 1,400,014 / 1,200,014 | +3.04% / +3.72% / −2.95% | −2.70% / −2.72% |
+
+A/A: base round 2 vs round 1 −0.41% to +0.69%; new round 2 vs round 1 −0.59% to +0.30%. Compiles in every
+measured region: 0. Exits on -2 are master's for the Integer- and Module-led cycles (100,000 / 500,000: their guards
+still don't recompile) and 0 for the String-led ones; -2 makes no dynamic sends except the 200,000 Symbol `to_s` in
+the String/Symbol cycle. The narrow variant (the first suggestion in the review) still adds 200,000 objects and
++3.7–5.0% slope on String-led cycles that see an Integer or a named class, which is why the arms are needed.
+Diagnostic micros: default heap, GC on, no isolation; not admitted prices or lobsters speed estimates; native
+times not claimed.
+
+**Lobsters ZJIT stats** (release master and -2 installs, ruby-bench `8083f57`, `run.sh`, 15 warmup + 10 measured,
+two runs each; raw `lob-master-rerun{1,2}` and `lob-ots1-2-{1,2}`):
+
+```diff
+-exit_guard_type_failure:              677.2      677.2
++exit_guard_type_failure:              139.2      139.2
+-side_exit_count:                   10,166.3   10,166.7
++side_exit_count:                    9,628.9    9,628.8
+-ccall_rb_zjit_materialize_frames:   1,204.3    1,204.7
++ccall_rb_zjit_materialize_frames:     666.9      666.8
+-send_fallback_send_polymorphic:       493.0      493.0
++send_fallback_send_polymorphic:     1,574.0    1,574.0
+-dynamic_send_count:               772,269.1  772,265.5
++dynamic_send_count:               773,337.8  773,340.3
+```
+
+Every counter that moves beyond the run-to-run spread moves the same way as on the old head (`lob-ots1`), so on
+lobsters -2 and `2cc3e0de4d` are indistinguishable: the Integer/Module guards never fail there. No `run_benchmarks.rb`
+round was made for -2.
+
+**Open for the next review.** (1) This is new polymorphic lowering, which the review said needs a fresh design
+check. (2) The "all guards + arms" variant also removes the Integer/Module permanent exits and was the best in
+round 2 (−23% on the class cycle), at the cost of sends on megamorphic Integer/Module sites; not built, since no
+measured app has such an exit. (3) Body and commit message rewritten: no frozen-string claim, no pins or setup, no
+two-runs claim, exit diff labeled as ZJIT stats per iteration.
 
 ### thermos-sol review, 2026-11-18
 

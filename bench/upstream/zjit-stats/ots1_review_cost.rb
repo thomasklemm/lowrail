@@ -18,6 +18,8 @@ when "symbol" then ["div", "span", "b", "i", "a", :em]
 when "string" then ["div"]
 when "integer" then [1, 2, 3, 4, 5, :em]
 when "integer_string" then [1, 2, 3, 4, 5, ""]
+when "string_integer" then ["div", "span", "b", "i", "a", 1]
+when "string_module" then ["div", "span", "b", "i", "a", Object]
 when "module" then [Object, String, Array, Hash, Integer, :em]
 when "custom"
   value = Object.new

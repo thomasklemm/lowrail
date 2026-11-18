@@ -1,0 +1,514 @@
+{
+ "builder": "OTS1 rebuild (-2)",
+ "date": "2026-11-18",
+ "variants": {
+  "base": "9de06831e37534f8a163e598cc0c6903c7687430 (master)",
+  "oldhead": "2cc3e0de4d63abe7e307d3cc8d6b216fe5be55c9 (all four guards recompile)",
+  "narrow": "String guard recompiles only (base + 1 line); not pushed",
+  "new": "6a3dc53c874f5b9df4f6d6a2fe2fe091b5aab7cb (String guard recompiles + Integer/Module arms on the polymorphic path)",
+  "fullarms": "2cc3e0de4d production + the same arms (all four guards recompile); not pushed"
+ },
+ "configure": "--enable-zjit --disable-yjit --disable-install-doc --without-jemalloc (one out-of-tree release build dir, only zjit/src/hir.rs swapped between variants; miniruby)",
+ "platform": "x86_64-linux, GCC 14.2.0 (Debian 14.2.0-19), glibc 2.41, Rust 1.100.0",
+ "valgrind": "pinned script/bench-valgrind: 3.19.0 + bench/valgrind-brk.patch, tool sha256 257b28c078740f0642c3cc6dbffc32c03af0e8ef7db3a5ea9cc0d5044190e08c; Ir from the callgrind out file's totals: line",
+ "probe": "bench/upstream/zjit-stats/ots1_review_cost.rb (reviewer's probe plus string_integer and string_module modes)",
+ "commands": {
+  "native": "MODE=$m N=600000 taskset -c 1 miniruby --zjit --zjit-stats-quiet ots1_review_cost.rb",
+  "callgrind": "MODE=$m N=$n taskset -c 0 valgrind --tool=callgrind --callgrind-out-file=... miniruby --zjit --zjit-stats-quiet ots1_review_cost.rb, n in 1000 10000; slope = totals(N=10000) - totals(N=1000)"
+ },
+ "limits": "Diagnostic micros: default heap, GC enabled, no isolation; not admitted prices or lobsters speed estimates. Native seconds not claimed (builds ran concurrently). Compiles in every measured region: 0.",
+ "round1": {
+  "string/base": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52997913,
+   "Ir_10000": 74766483,
+   "slope": 21768570
+  },
+  "string/oldhead": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52984717,
+   "Ir_10000": 74637016,
+   "slope": 21652299
+  },
+  "string/narrow": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52989670,
+   "Ir_10000": 74653890,
+   "slope": 21664220
+  },
+  "string/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52995794,
+   "Ir_10000": 74663283,
+   "slope": 21667489
+  },
+  "symbol/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53183779,
+   "Ir_10000": 76157017,
+   "slope": 22973238
+  },
+  "symbol/oldhead": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55161059,
+   "Ir_10000": 77898796,
+   "slope": 22737737
+  },
+  "symbol/narrow": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55277476,
+   "Ir_10000": 77766058,
+   "slope": 22488582
+  },
+  "symbol/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55192435,
+   "Ir_10000": 77799886,
+   "slope": 22607451
+  },
+  "integer/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53287101,
+   "Ir_10000": 76440984,
+   "slope": 23153883
+  },
+  "integer/oldhead": {
+   "allocations": 2200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 1200000,
+   "compiles": 0,
+   "Ir_1000": 57677252,
+   "Ir_10000": 90099174,
+   "slope": 32421922
+  },
+  "integer/narrow": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53305999,
+   "Ir_10000": 76515044,
+   "slope": 23209045
+  },
+  "integer/new": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53303451,
+   "Ir_10000": 76543684,
+   "slope": 23240233
+  },
+  "integer_string/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53156074,
+   "Ir_10000": 75874412,
+   "slope": 22718338
+  },
+  "integer_string/oldhead": {
+   "allocations": 2200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 1000000,
+   "compiles": 0,
+   "Ir_1000": 57011161,
+   "Ir_10000": 87664147,
+   "slope": 30652986
+  },
+  "integer_string/narrow": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53160549,
+   "Ir_10000": 75784669,
+   "slope": 22624120
+  },
+  "integer_string/new": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53269694,
+   "Ir_10000": 75805647,
+   "slope": 22535953
+  },
+  "module/base": {
+   "allocations": 1200014,
+   "exits": 500000,
+   "guard_type_exits": 500000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55513454,
+   "Ir_10000": 86014666,
+   "slope": 30501212
+  },
+  "module/oldhead": {
+   "allocations": 2200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 1200000,
+   "compiles": 0,
+   "Ir_1000": 58230084,
+   "Ir_10000": 92972919,
+   "slope": 34742835
+  },
+  "module/narrow": {
+   "allocations": 1200014,
+   "exits": 500000,
+   "guard_type_exits": 500000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55339242,
+   "Ir_10000": 86167288,
+   "slope": 30828046
+  },
+  "module/new": {
+   "allocations": 1200014,
+   "exits": 500000,
+   "guard_type_exits": 500000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55333224,
+   "Ir_10000": 86201610,
+   "slope": 30868386
+  },
+  "string_integer/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53185639,
+   "Ir_10000": 75984548,
+   "slope": 22798909
+  },
+  "string_integer/oldhead": {
+   "allocations": 1400014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55435066,
+   "Ir_10000": 79313544,
+   "slope": 23878478
+  },
+  "string_integer/narrow": {
+   "allocations": 1400014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55416313,
+   "Ir_10000": 79360668,
+   "slope": 23944355
+  },
+  "string_integer/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55517326,
+   "Ir_10000": 77671414,
+   "slope": 22154088
+  },
+  "string_module/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53174866,
+   "Ir_10000": 75990501,
+   "slope": 22815635
+  },
+  "string_module/oldhead": {
+   "allocations": 1400014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55585668,
+   "Ir_10000": 79094151,
+   "slope": 23508483
+  },
+  "string_module/narrow": {
+   "allocations": 1400014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55394833,
+   "Ir_10000": 79059675,
+   "slope": 23664842
+  },
+  "string_module/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55991411,
+   "Ir_10000": 78134154,
+   "slope": 22142743
+  }
+ },
+ "round2": {
+  "string/base": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52968893,
+   "Ir_10000": 74779177,
+   "slope": 21810284
+  },
+  "string/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53015469,
+   "Ir_10000": 74741343,
+   "slope": 21725874
+  },
+  "string/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 52988335,
+   "Ir_10000": 74744854,
+   "slope": 21756519
+  },
+  "symbol/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53200618,
+   "Ir_10000": 76135724,
+   "slope": 22935106
+  },
+  "symbol/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55321204,
+   "Ir_10000": 77794476,
+   "slope": 22473272
+  },
+  "symbol/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55165802,
+   "Ir_10000": 77916586,
+   "slope": 22750784
+  },
+  "integer/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53314132,
+   "Ir_10000": 76499098,
+   "slope": 23184966
+  },
+  "integer/new": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53309323,
+   "Ir_10000": 76411979,
+   "slope": 23102656
+  },
+  "integer/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 55714435,
+   "Ir_10000": 78497766,
+   "slope": 22783331
+  },
+  "integer_string/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53152544,
+   "Ir_10000": 75777439,
+   "slope": 22624895
+  },
+  "integer_string/new": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53169420,
+   "Ir_10000": 75773586,
+   "slope": 22604166
+  },
+  "integer_string/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55642412,
+   "Ir_10000": 77570849,
+   "slope": 21928437
+  },
+  "module/base": {
+   "allocations": 1200014,
+   "exits": 500000,
+   "guard_type_exits": 500000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55315317,
+   "Ir_10000": 86026409,
+   "slope": 30711092
+  },
+  "module/new": {
+   "allocations": 1200014,
+   "exits": 500000,
+   "guard_type_exits": 500000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55331164,
+   "Ir_10000": 86050337,
+   "slope": 30719173
+  },
+  "module/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 200000,
+   "compiles": 0,
+   "Ir_1000": 59852272,
+   "Ir_10000": 83448365,
+   "slope": 23596093
+  },
+  "string_integer/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53162142,
+   "Ir_10000": 76043730,
+   "slope": 22881588
+  },
+  "string_integer/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55513753,
+   "Ir_10000": 77584308,
+   "slope": 22070555
+  },
+  "string_integer/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55506378,
+   "Ir_10000": 77519849,
+   "slope": 22013471
+  },
+  "string_module/base": {
+   "allocations": 1200014,
+   "exits": 100000,
+   "guard_type_exits": 100000,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 53197497,
+   "Ir_10000": 75965737,
+   "slope": 22768240
+  },
+  "string_module/new": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55976927,
+   "Ir_10000": 78129445,
+   "slope": 22152518
+  },
+  "string_module/fullarms": {
+   "allocations": 1200014,
+   "exits": 0,
+   "guard_type_exits": 0,
+   "dynamic_sends": 0,
+   "compiles": 0,
+   "Ir_1000": 55968800,
+   "Ir_10000": 78118288,
+   "slope": 22149488
+  }
+ }
+}

@@ -137,7 +137,7 @@ is taken ([lead queue](zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03)
 "<#{name}#{tag_options}>#{PRE_CONTENT_STRINGS[name]}#{content}</#{name}>".html_safe
 ```
 
-`name` is a String in 2,500 calls and a Symbol in 533 per iteration
+`name` is a String in 2,500 calls and a Symbol in 538 per iteration
 ([lobsters-content-tag-string-classes.json](../../bench/upstream/zjit-stats/raw/lobsters-content-tag-string-classes.json)).
 `objtostring` with a monomorphic String profile emits `GuardType v, String` with `recompile: None`, so once the
 profile saw only Strings, every Symbol call side-exits, for as long as the ISEQ lives. A 10-line repro
@@ -196,7 +196,7 @@ still guards and recompiles after five exits.
 +send_fallback_send_polymorphic:     1,574.0    1,574.0
 ```
 
-  The recompiled `content_tag_string` sends `Symbol#to_s` (533 per iteration) where it exited before, so dynamic
+  The recompiled `content_tag_string` sends `Symbol#to_s` (538 per iteration) where it exited before, so dynamic
   sends rise by 1,072. railsbench: no counter moves (its `guard_type_failure` is 0.4).
 * **`run_benchmarks.rb`** (master, master again, branch; `--interleave --pvalue`, default harness with 15 warmup and 10 measured iterations,
   2-CPU orb without sudo, so no CPU isolation): round 1 lobsters master/master-aa **1.097 (p 0.003)**, master/branch
@@ -205,6 +205,12 @@ still guards and recompiles after five exits.
   [round2.txt](../../bench/upstream/zjit-stats/run_benchmarks/round2.txt)). The A/A spread on this orb is up to 10%,
   so there is no time effect to claim in either direction. By count, 538 exits at a few thousand instructions each
   are about 1–2 M Ir per lobsters iteration, ≈0.05%; no Callgrind run was made.
+
+**Rebuild -2 (2026-11-18, after the thermos-sol review).** Recompiling the Integer and Module guards made mixed
+Integer/String and class/Symbol sites send `#to_s` and allocate (+1,000,000 objects per 600,000 calls). The -2 branch
+[`6a3dc53c87`](https://github.com/thomasklemm/ruby/commit/6a3dc53c874f5b9df4f6d6a2fe2fe091b5aab7cb) recompiles only the
+String guard and keeps the Integer/Module conversions for profiled types on the polymorphic path; lobsters counters
+match the old head. Details in [OTS1](../../bench/upstream/pr-queue/items/OTS1.md#rebuild--2-2026-11-18).
 
 ## Recommendation
 
