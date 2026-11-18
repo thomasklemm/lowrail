@@ -1,0 +1,51 @@
+argc=0 lead=0: :none
+argc=0 lead=1: [nil]
+argc=0 lead=2: [nil, nil]
+argc=0 lead=3: [nil, nil, nil]
+argc=1 lead=0: :none
+argc=1 lead=1: [10]
+argc=1 lead=2: [10, nil]
+argc=1 lead=3: [10, nil, nil]
+argc=2 lead=0: :none
+argc=2 lead=1: [10]
+argc=2 lead=2: [10, 20]
+argc=2 lead=3: [10, 20, nil]
+argc=3 lead=0: :none
+argc=3 lead=1: [10]
+argc=3 lead=2: [10, 20]
+argc=3 lead=3: [10, 20, 30]
+argc=4 lead=0: :none
+argc=4 lead=1: [10]
+argc=4 lead=2: [10, 20]
+argc=4 lead=3: [10, 20, 30]
+argc=5 lead=0: :none
+argc=5 lead=1: [10]
+argc=5 lead=2: [10, 20]
+argc=5 lead=3: [10, 20, 30]
+splat |a,b| [5,6]: [5, 6]
+splat |a,| [5,6]: 5
+splat |a,| (5,6): 5
+splat |a| [5,6]: [5, 6]
+splat _1 [5,6]: [5, 6]
+splat it [5,6]: [5, 6]
+_1,_2 (5,6): [5, 6]
+_1 (5,6): 5
+|a,(b,c)| (1,[2,3]): [1, 2, 3]
+duck into |a,b|: [[:d1, :d2], 1]
+duck into no params: [:none, 0]
+duck surplus into |a|: [1, 0]
+Array subclass into |a,b|: [7, 8]
+dropped args order: [3, [:a, :b, :c]]
+dropped arg raises: "ArgumentError: dropped"
+lambda arity: "ArgumentError: wrong number of arguments (given 2, expected 1)"
+proc surplus: 1
+break with surplus: 100
+too few |a,b,c|: [1, nil, nil]
+rest |a,*r|: [1, [2]]
+opt |a,b=9|: [1, 9]
+side exit fixnum: [0, 2, 3]
+side exit float: [[0, 2, 3], [0, 2.5, 3], [0, 2, 3]]
+GC with heap args: "sss"
+times no param: 3
+each no param: 3
+polymorphic: [:z, 1, 3, 6]
