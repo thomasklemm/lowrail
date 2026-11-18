@@ -193,7 +193,9 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             # groups or is kept; without the app's filter none is kept.
             path_params = filter ? filter.filter((env["action_dispatch.request.path_parameters"] || {}).transform_keys(&:to_s)) : {}
             format = path_params["format"]&.to_s&.dup&.freeze
-            accept = env["HTTP_ACCEPT"].to_s.dup.freeze
+            # Accept is filtered as Rails' filtered_env filters it, and not kept
+            # without the app's filter.
+            accept = filter ? filter.filter("HTTP_ACCEPT" => env["HTTP_ACCEPT"].to_s)["HTTP_ACCEPT"].to_s.dup.freeze : ""
             first = accept[/\A[^,;]*/].strip.downcase
             # A GET keeps its Accept as sent, never as: :json, which would send its query as a body.
             json = verb != "get" && [env["CONTENT_TYPE"], env["HTTP_ACCEPT"]].any? { _1.to_s.start_with?(JSON_TYPE) }
@@ -234,7 +236,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             name = route.name || env["action_dispatch.routes"]&.routes&.find { _1.name && _1.path.spec.to_s == spec }&.name
             { "verb" => verb, "template" => spec.sub(/\(\.:format\)\z/, ""), "route" => name, "parts" => parts,
               "seen" => seen, **flags.transform_keys(&:to_s), "params" => params, "unfiltered" => !filter,
-              "filtered" => filtered?(params) || filtered?(seen) || flags[:format] == FILTERED, "lossy" => lossy[0], "count" => 0 }
+              "filtered" => filtered?(params) || filtered?(seen) || flags[:format] == FILTERED || flags[:accept] == FILTERED, "lossy" => lossy[0], "count" => 0 }
           end
 
           # The app's filter, only when its list is names and patterns: a Proc

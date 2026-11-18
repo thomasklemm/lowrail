@@ -260,8 +260,8 @@ class ProfileTest < Minitest::Test
   # the app's filter list as it is when the request runs (appended to, or a
   # String in it changed in place, after the first request); with a Proc in
   # the list, which may need Rails' merged params, no value is kept. A GET is
-  # recorded as a GET with its Accept (JSON or XML) and query, not as a JSON
-  # body.
+  # recorded as a GET with its Accept (JSON or XML, filtered as Rails filters
+  # the env) and query, not as a JSON body.
   def test_record_filters_every_value_and_keeps_json_gets_as_gets
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
@@ -287,6 +287,10 @@ class ProfileTest < Minitest::Test
           call.("/lookup?q=needle", "HTTP_ACCEPT" => "application/json")
           call.("/lookup?q=xml", "HTTP_ACCEPT" => "application/xml")
           filters = Rails.application.env_config["action_dispatch.parameter_filter"]
+          saved = filters.dup
+          filters.replace([:accept])
+          call.("/lookup?q=safe", "HTTP_ACCEPT" => "application/xml; token=accept-secret")
+          filters.replace(saved)
           mutable = +"not_a_key"
           filters.replace([mutable])
           call.("/widgets")
@@ -296,16 +300,19 @@ class ProfileTest < Minitest::Test
             value.replace("[FILTERED]") if key == "credential" && original["controller"] == "widgets"
           }])
           call.("/widgets/1.proc-format-secret?credential=proc-secret")
+          call.("/lookup?q=proc", "HTTP_ACCEPT" => "application/xml; token=proc-accept-secret")
         RUBY
       out, err, status = profile(dir, "--out", "profile", "--record", "--", RUBY, "requests.rb")
       assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
       recorded = File.read(File.join(dir, "lowrail/workloads.rb"))
       written = [recorded, *Dir[File.join(dir, "profile/**/*")].select { File.file?(_1) }.map { File.read(_1) }]
-      %w[format-secret changed-filter-secret string-secret proc-secret].each do |secret|
+      %w[format-secret changed-filter-secret string-secret proc-secret accept-secret proc-accept-secret].each do |secret|
         assert written.none? { _1.include?(secret) }, "#{secret} was exported:\n#{recorded}"
       end
       assert_match(/^# get "\/widgets\.\[FILTERED\]"|^# get widgets_path\(format: "\[FILTERED\]"\)/, recorded)
       assert_match(/^# get widget_path\(widget\), .*params: \{"credential" => "\[FILTERED\]"\}$/, recorded)
+      # An Accept the filter masks is filtered, so its request is commented out.
+      assert_match(/^# get lookup_path, name: "GET \/lookup \(\[FILTERED\]\)", headers: \{ "Accept" => "\[FILTERED\]" \}, params: \{"q" => "safe"\}$/, recorded)
       assert_match(/^# 1 request \(the app's filter_parameters is not only names and patterns \(a Proc\).*\n# get widget_path\(widget\), name: "GET \/widgets\/:id"\n/, recorded)
 
       check = <<~'RUBY'
@@ -330,16 +337,27 @@ class ProfileTest < Minitest::Test
   # --workloads captures compare by what they measured: two of the same file
   # in different output directories compare, and a block that sends another
   # request in one of them does not, though the file is the same; nor does a
-  # capture that stopped before measuring anything.
+  # capture that stopped before measuring anything, or one with requests its
+  # receipt does not cover (a forked child's, an at_exit one).
   def test_workloads_captures_compare_by_what_they_measured
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
         "bin/rails" => "#!#{RUBY}\nabort unless ARGV.shift == \"runner\"\nscript = ARGV.shift\nrequire_relative \"../config/environment\"\nload script\n",
-        "lowrail/workloads.rb" => "get(\"/widgets\", name: \"variant\") { |n| exit(0) if n == 2 && ENV[\"STOP\"]; { path: ENV.fetch(\"REPLAY_PATH\") } }\n")
+        "lowrail/workloads.rb" => <<~'RUBY')
+          parent = Process.pid
+          at_exit { Rails.application.call(Rack::MockRequest.env_for("https://localhost/widgets?after=1")) } if ENV["AFTER"]
+          get("/widgets", name: "variant") do |n|
+            exit(0) if n == 2 && ENV["STOP"]
+            if n == 11 && ENV["FORK"] && (pid = fork) then Process.wait(pid) end
+            exit(0) if n == 12 && Process.pid != parent
+            { path: ENV.fetch("REPLAY_PATH") }
+          end
+        RUBY
       File.chmod(0o755, File.join(dir, "bin/rails"))
-      { "base" => "/widgets?v=1", "head" => "/widgets?v=1", "other" => "/widgets?v=2", "stopped" => "/widgets?v=1" }.each do |out, path|
-        _, err, status = profile(dir, "--out", out, "--workloads", env: { "REPLAY_PATH" => path, **(out == "stopped" ? { "STOP" => "1" } : {}) })
+      flags = { "stopped" => "STOP", "forked" => "FORK", "after" => "AFTER" }
+      { "base" => "/widgets?v=1", "head" => "/widgets?v=1", "other" => "/widgets?v=2" }.merge(flags.transform_values { "/widgets?v=1" }).each do |out, path|
+        _, err, status = profile(dir, "--out", out, "--workloads", env: { "REPLAY_PATH" => path, **(flags[out] ? { flags[out] => "1" } : {}) })
         assert status.success?, err
       end
       compare = ->(a, b) { Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "#{a}/report.json", "#{b}/report.json", "--json", chdir: dir) }
@@ -351,6 +369,12 @@ class ProfileTest < Minitest::Test
       out, _, status = compare.("stopped", "stopped")
       assert_equal 2, status.exitstatus, out
       assert_match(/finished measuring at least one request/, JSON.parse(out)["problems"].join)
+      # A forked child's or an at_exit request is a window the receipt does not cover.
+      %w[forked after].each do |capture|
+        out, _, status = compare.(capture, capture)
+        assert_equal 2, status.exitstatus, out
+        assert_match(/not the one process's measured requests/, JSON.parse(out)["problems"].join)
+      end
     end
   end
 
@@ -558,7 +582,7 @@ class ProfileTest < Minitest::Test
 
   def run_windows(counts)
     windows = %w[request job mail cable].to_h { [_1, counts.fetch(_1, 0)] }
-    { "windows" => windows, "completed" => windows }
+    { "processes" => 1, "objects_per_request" => 5.0, "windows" => windows, "completed" => windows }
   end
 
   def compare(dir, base, head)
@@ -609,8 +633,16 @@ class ProfileTest < Minitest::Test
       workloads = lambda do |measured|
         meta.(report([10.0, 10.0]), identity: { "mode" => "workloads", "host" => "localhost", "manifest" => "m", "measured" => [measured] * 2 })
       end
-      complete = { "requests" => 20, "sha256" => "s", "complete" => true }
+      complete = { "requests" => 10, "sha256" => "s", "complete" => true }
       assert_equal 0, compare(dir, workloads.(complete), workloads.(complete))[0]
+      empty = ->(r) { meta.(r, identity: r["meta"]["identity"].merge("manifest" => "", "host" => "", "measured" => [complete.merge("sha256" => "")] * 2)) }
+      assert_equal 2, compare(dir, empty.(workloads.(complete)), empty.(workloads.(complete)))[0], "empty identity values"
+      assert_equal 2, compare(dir, workloads.(complete.merge("requests" => 9)), workloads.(complete.merge("requests" => 9)))[0],
+        "fewer measured requests than request windows"
+      bad = ->(r) { r.merge("summary" => r["summary"].map { _1.merge("objects_per_request" => "bad") }) }
+      File.write(File.join(dir, "bad.json"), JSON.generate(bad.(report([10.0, 10.0]))))
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "bad.json", "bad.json", chdir: dir)
+      assert_equal 2, status.exitstatus, "a mistyped summary number, Markdown output: #{out}"
       [{ "requests" => 0, "sha256" => "s", "complete" => true }, complete.merge("complete" => false), complete.except("complete"),
         complete.merge("uncertified" => ["variant"])].each do |measured|
         assert_equal 2, compare(dir, workloads.(measured), workloads.(measured))[0], measured.inspect

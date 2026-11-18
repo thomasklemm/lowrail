@@ -18,8 +18,9 @@ module Lowrail
   # dropped samples, every window finished, one known Ruby and environment;
   # and the same capture identity (the command's arguments, or for
   # --workloads the manifest and every run's measured request sequence, once
-  # the run finished at least one measured request, not the output
-  # directory), seed and number of runs. A kind of window is
+  # the run finished at least one measured request in one process that
+  # opened no other request windows, not the output directory), seed and
+  # number of runs. A kind of window is
   # compared when every run of both reports has some; one some runs have and
   # others lack, or no comparable kind at all, is not evidence. Otherwise
   # #status is 2 (insufficient evidence), whatever the numbers say. A line one
@@ -89,9 +90,18 @@ module Lowrail
       list << "#{label} dropped samples (#{dropped.to_json})" unless dropped.is_a?(Array) && dropped.size == runs && dropped.all?(0)
       summary = report["summary"]
       unless summary.is_a?(Array) && summary.size == runs && summary.all? do |run|
-          run.is_a?(Hash) && %w[windows completed].all? { |k| run[k].is_a?(Hash) && KINDS.all? { count.(run[k][_1]) } }
+          run.is_a?(Hash) && %w[windows completed].all? { |k| run[k].is_a?(Hash) && KINDS.all? { count.(run[k][_1]) } } &&
+            count.(run["processes"]) && run["objects_per_request"].is_a?(Numeric) && run["objects_per_request"].to_f.finite?
         end
-        return list << "#{label}'s summary is not one row per run with windows and completed windows of every kind"
+        return list << "#{label}'s summary is not one row per run with processes, objects per request, and windows and completed windows of every kind"
+      end
+      # A workloads certificate covers its run only if that run is one process
+      # whose request windows are exactly the requests it measured (a fork or
+      # an at_exit request would add windows the certificate does not cover).
+      measured = meta["identity"].is_a?(Hash) && meta["identity"]["mode"] == "workloads" && meta["identity"]["measured"]
+      if measured.is_a?(Array) && measured.size == runs && measured.all?(Hash)
+        uncovered = summary.zip(measured).reject { |run, m| run["processes"] == 1 && run["windows"]["request"] == m["requests"] }
+        list << "#{label} has #{uncovered.size} run(s) whose request windows are not the one process's measured requests" if uncovered.any?
       end
       list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { |run| KINDS.sum { run["windows"][_1] } == 0 }
       open = summary.reject { |run| KINDS.all? { run["windows"][_1] == run["completed"][_1] } }
@@ -127,10 +137,11 @@ module Lowrail
         argv.is_a?(Array) && !argv.empty? && argv.all? { _1.is_a?(String) } ? [] : ["#{label}'s command identity has no arguments"]
       when "workloads"
         list = []
-        list << "#{label} has no workloads manifest or host" unless identity["manifest"].is_a?(String) && identity["host"].is_a?(String)
+        known = ->(v) { v.is_a?(String) && !v.empty? }
+        list << "#{label} has no workloads manifest or host" unless known.(identity["manifest"]) && known.(identity["host"])
         measured = identity["measured"]
         unless measured.is_a?(Array) && measured.size == runs && measured.all? do |m|
-            m.is_a?(Hash) && m["complete"] == true && m["sha256"].is_a?(String) && m["requests"].is_a?(Integer) && m["requests"] >= 1
+            m.is_a?(Hash) && m["complete"] == true && known.(m["sha256"]) && m["requests"].is_a?(Integer) && m["requests"] >= 1
           end
           return list << "#{label} does not record that every run finished measuring at least one request"
         end

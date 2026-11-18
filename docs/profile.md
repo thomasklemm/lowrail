@@ -71,10 +71,11 @@ query, not with `as: :json`, which would send the query as a JSON body. It then 
 `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row
 (`Article.first!`, for models the app has loaded). Recording is sensitive: params pass through the app's
 `filter_parameters` (the list as it is when the request runs) before anything is kept or used to group requests,
-every path value and the format included; filtered values are written as `[FILTERED]` and nothing is taken from the
-raw path or query string. Values are kept only when every entry of the list is a Symbol, String or Regexp: a Proc
+every path value, the format and the `Accept` header included (the header as Rails' `filtered_env` filters it);
+filtered values are written as `[FILTERED]`, a request with one is commented out, and nothing is taken from the raw
+path or query string. Values are kept only when every entry of the list is a Symbol, String or Regexp: a Proc
 may depend on Rails' merged params, which Lowrail does not reproduce, so with one in the list (or without the app's
-filter) no request values are kept and each such shape is commented out. Still check the file before you commit
+filter) no request values, `Accept` included, are kept and each such shape is commented out. Still check the file before you commit
 it: only what the filter names is hidden. Every value from a request is written as
 a quoted literal, never as Ruby. Only GETs that replay as recorded are enabled; each other shape is commented out
 with its reason, until you make it work:
@@ -249,14 +250,17 @@ exits 1 when anything grew beyond its noise floor and 0 when nothing did, but on
 exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
 
 * **Valid evidence**: both reports come from this version of lowrail-profile and pass one strict check of their
-  shape (every key compare reads present with its type, line rows with a unique site and action rows with a unique
+  shape (every key compare reads present with its type, every summary number included, line rows with a unique site and action rows with a unique
   name, one warm value per run that is finite, or for an action that ran once per process none), with at least two
   runs each, every run's command exiting 0, no dropped samples, every window finished, windows in every run, and one
   known Ruby and environment in every process; and base and head have the same capture identity, seed, Ruby,
   environment and number of runs. The identity of a command is its arguments; of `--workloads` it is the file's
   manifest (header and `env:` values digested as values), the replay host and, per run, a digest of every counted
   request as sent (so a block that sends other requests is a different capture), recorded only once the run
-  finished measuring at least one request, never the output directory. An `env:` value that is not a JSON value
+  finished measuring at least one request, never the output directory; none of these may be empty. That digest
+  covers a run only when the run is one process whose request windows are exactly the requests it measured, so a
+  workload that forks, or sends requests from `at_exit`, is not CI evidence (ordinary command captures may have
+  any number of processes). An `env:` value that is not a JSON value
   (String, number, true, false, nil, or Arrays and Hashes of them) has no identity a digest can certify, so such a
   capture is not CI evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
   profile is never a green result.

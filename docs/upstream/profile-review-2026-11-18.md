@@ -935,3 +935,24 @@ comparable-capture/strict-malformed-input claims remain too strong under E2/E3. 
 process-load-order and completed-window results above remain attributed evidence: **Campfire's 634 tests were
 not rerun here**, nor was another corpus, `lowrail verify`, `lowrail bench`, timing, instruction counting, speed,
 unrestricted scheduler/Ractor or sanitizer/OOM coverage. The compare floor policy is deliberately unchanged.
+
+## Resolution of the third confirm review (2026-11-18)
+
+Fixed on main after `10e646e4`, by refusing rather than adding machinery; the floor policy is unchanged. Each
+finding has a regression test that fails on `10e646e4` (the new tests in a worktree of it: 3 runs, 3 failures; the
+cases behind each first failing assertion were checked apart and fail too).
+
+| Finding | Change | Test (and what it gives on 10e646e4) |
+| --- | --- | --- |
+| E1 | `note` passes `HTTP_ACCEPT` through the app's (Symbol/String/Regexp-only) filter, as `filtered_env` does, before grouping or keeping it; a masked Accept marks the shape filtered, so it is commented out and its name and header say `[FILTERED]`. With an unsupported filter (a Proc) or none, no Accept is kept at all. | `test_record_filters_every_value_and_keeps_json_gets_as_gets`: `[:accept]` with `application/xml; token=accept-secret`, and the existing Proc list with `...token=proc-accept-secret`: neither secret is in any written file; the first shape is `# get lookup_path, name: "GET /lookup ([FILTERED])", headers: { "Accept" => "[FILTERED]" }, ...`. The unfiltered JSON and XML GET replays still keep their Accept (10e646e4: both secrets exported). |
+| E2 | For `--workloads`, `compare` requires each run to be one process whose request windows equal its measured requests; ordinary command captures keep any number of processes. | `test_workloads_captures_compare_by_what_they_measured`: the review's fork at n=11 (2 processes, 21 windows, 20 measured) and an `at_exit` request (1 process, 21 windows, 20 measured), each compared with itself, exit 2 (10e646e4: exit 0). Compare test: 9 measured against 10 windows exits 2. |
+| E3 | Empty manifest, host and measured digests are refused; every summary row must have an Integer `processes` and a finite `objects_per_request` before anything formats it. | `test_compare_needs_complete_comparable_captures`: the empty workloads identity exits 2 (10e646e4: 0); `objects_per_request: "bad"` with Markdown output exits 2 (10e646e4: `NoMethodError`, exit 1). |
+
+`docs/profile.md` now says Accept is filtered and dropped with unsupported filters, and that workload evidence must
+be one fully measured process with non-empty identity values.
+
+The three suites pass: 18 runs, 183 assertions. Rechecked on Campfire (`bin/rails test -v`, 634 tests): per-test
+outcomes identical with no gem, gem listed but off, and both profiled runs (632 pass, 2 skip); all 18 processes
+load every feature outside Lowrail, Bundler and RubyGems in the same order; no `[lowrail-profile]` warning; each
+run's 2 processes completed every window (666 requests, 16 jobs, 19 Cable actions), and that command capture
+compared with itself exits 0, so multi-process command evidence is still accepted.
