@@ -1,15 +1,25 @@
 # A1: check the owner conditions only when an association scope was merged
 
 Census 10's lead A1 ([rails-main-census-10](../../../docs/upstream/rails-main-census-10.md#lead-a1-owner-condition-bookkeeping-on-every-association-scope)),
-built on rails/rails main `e30c36266b` (2026-11-18) as `thomasklemm/association-owner-conditions-unscoped` at
-[`9877a852dd`](https://github.com/thomasklemm/rails/commit/9877a852dd) (+17/−10, [patch](A1.patch)). Queue item
-[A1](../pr-queue/items/A1.md). Not opened.
+built on rails/rails main `e30c36266b` (2026-11-18) as `thomasklemm/association-owner-conditions-unscoped`. The
+head is [`80daecf52a`](https://github.com/thomasklemm/rails/commit/80daecf52a): the fix
+[`9877a852dd`](https://github.com/thomasklemm/rails/commit/9877a852dd) (+17/−10) plus regression tests (+57/−0)
+([patch](A1.patch)). Queue item [A1](../pr-queue/items/A1.md). Not opened.
 
-**Review, 2026-11-18: changes requested.** [Thermos review and evidence](review-thermos-sol/README.md) supersede
-the exactness argument below: subtraction can serialize custom bind values, and delaying it changes SQL and
-records for wide composite keys and scalar-key joins with large default scopes, under both settings on SQLite
-and PostgreSQL. The scoped YJIT control is not unchanged, the body cohort has no JIT-flat evidence, and a simple
-join performs three differences, not two. Do not propose the current head as exact.
+**Review, 2026-11-18: changes requested.** The [Thermos review](review-thermos-sol/README.md) found that
+`WhereClause#-` can hash predicates and so serialize bind values; computing the differences later than main
+changes SQL and records in two repros.
+
+**Follow-up, same day** ([followup-81](followup-81/README.md)): on Rails 8.1 both repros, and five more probes, give
+the branch's answer. Main's answers first appear at #59836's merge. On main, a join whose target default scope has
+17 conditions, one of them an out-of-range plain integer, raises `ActiveModel::RangeError`; 8.1 and the branch return
+no rows. So the counterexamples are a regression of main against 8.1, and A1 restores 8.1 there. It is not exact
+against main, and no exact fast path against main exists: user code is reachable with two predicates, and with
+built-in types. The head adds two regression tests, which fail on main and pass on 8.1 and the head.
+
+The sections below are from the first build. Where they say "same as main" for user-code calls, or "no user-supplied
+object reaches the changed lines", the review and the follow-up supersede them. The YJIT columns are diagnostic: the
+body cohort recorded no JIT-flat counters.
 
 ## The change
 
@@ -17,13 +27,13 @@ Since #59825 and #59836 (kamipo, merged 2026-11-17), `AssociationScope#add_const
 `AbstractReflection#join_scope` build `WhereClause` differences before and after merging the association's own
 scope, so `keep_owner_conditions` can tell whether the scope removed the key or polymorphic type conditions. They
 build them for every association, also one without a scope, where nothing can be removed: five `WhereClause#-`
-(ten objects) and an Array per load, two per join.
+(ten objects) and an Array per load, three per `join_scope`.
 
 The branch keeps the where clauses (no allocation; `WhereClause` is never changed in place, `+=` and `-` build new
 ones) and computes the same differences after the loop only if a scope item was merged. `join_scope` skips them when
 `join_scopes` is empty. `last_chain_scope` returns its where clause after the key conditions instead of the
-difference. Preloader (`preloader/association.rb`) and `disable_joins` already compute theirs only when needed and
-are unchanged.
+difference. The preloader (`preloader/association.rb`) and `disable_joins` are unchanged. `disable_joins` still
+computes its type difference and final check unconditionally.
 
 ## Exactness (DECISIONS checklist)
 
@@ -57,8 +67,10 @@ are unchanged.
 * MySQL: not installed in this orb; not run.
 * `-w` caught an unused local left in `last_chain_scope`; removed before the commit.
 
-No new test: the change has no observable behaviour, and the existing owner-condition tests from #59825/#59836
-(scoped associations that `unscope` or `rewhere`, with the setting on and off) cover the branch that still checks.
+The first build added no test. Head `80daecf52a` adds `HasManyOwnerConditionsSerializationTest`, which covers the
+out-of-range join and the scope-changes-serializer repro; see [followup-81](followup-81/README.md#tests). The
+existing owner-condition tests from #59825/#59836 cover the scoped path that still checks. On the head: SQLite 3,272
+runs, PostgreSQL 3,277, 0 failures.
 
 ## Numbers
 
@@ -85,8 +97,9 @@ lower in 28 of 29. Hackatime's two higher cells (`GET dashboard` +0.21%, `GET le
 Body numbers: [`body/a1`](body/a1/table.md) (`script/upstream-bench`, [`a1_body.rb`](a1_body.rb), 2,000 calls per
 window, A/A per cell): interpreter `author.posts` −1.8%, `author.profile` −2.2%, `comment.post` −2.3%, through
 −1.6%, `joins(:posts)` −3.0% (A/A ≤ 0.08%); YJIT −1.8%, −2.0%, −1.2%, −1.3%, −4.1% (A/A ≤ 1.12%, the joins cell);
-10 fewer objects per load, 8 per join. The scoped control `author.published_posts` is −0.1% interpreted and
-**+0.3% under YJIT** (A/A 0.10%): the `scoped` flag and the extra locals on the path that still checks.
+10 fewer objects per load, 8 per join. The YJIT numbers are diagnostic: `script/upstream-bench` recorded no
+JIT-flat counters. The scoped control `author.published_posts` is −0.1% interpreted, and its allocations are
+unchanged. Its YJIT instruction count was +0.3% (A/A 0.10%, diagnostic), and the cause was not isolated.
 
 Not measured yet: Ruby master × ZJIT (DECISIONS requires it before opening).
 

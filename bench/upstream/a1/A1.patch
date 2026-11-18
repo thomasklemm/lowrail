@@ -1,3 +1,21 @@
+From 9877a852dd29208d4c15c04d6dea01506fc74982 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 18 Nov 2026 00:47:24 +0000
+Subject: [PATCH 1/2] Check the owner conditions only when an association scope
+ was merged
+
+Since the association scope can no longer remove the conditions tying the
+records to the owner, every association scope and join scope builds the
+differences between its where clauses before and after merging the scope,
+also when the association has no scope and nothing can be removed.
+
+Keep the where clauses and compute the differences only after a scope item
+was merged.
+---
+ .../associations/association_scope.rb         | 19 ++++++++++++-------
+ activerecord/lib/active_record/reflection.rb  |  8 +++++---
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
 diff --git a/activerecord/lib/active_record/associations/association_scope.rb b/activerecord/lib/active_record/associations/association_scope.rb
 index b9ac884e7d..6e81ce1ffb 100644
 --- a/activerecord/lib/active_record/associations/association_scope.rb
@@ -85,3 +103,91 @@ index ff46897cfb..a46f7a2ae8 100644
  
          route.each_match do |origin_column, destination_column|
            destination_attribute = predicate_builder.predicate_attribute(table[destination_column])
+-- 
+2.55.0
+
+
+From 80daecf52a16cee2383b78d036e0126535598044 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 18 Nov 2026 02:28:28 +0000
+Subject: [PATCH 2/2] Test that owner conditions are serialized when the query
+ is built
+
+Comparing where clauses hashes their predicates once both sides have
+more than 16, which serializes the bind values. Checking the owner
+conditions before the association scope runs, or for joins that have no
+scope, serialized them earlier than 8.1 did: a join raised
+ActiveModel::RangeError for an out of range default scope condition, and
+an association scope changing how its keys serialize no longer applied.
+---
+ .../has_many_associations_test.rb             | 57 +++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/activerecord/test/cases/associations/has_many_associations_test.rb b/activerecord/test/cases/associations/has_many_associations_test.rb
+index c3b988851d..d23a782577 100644
+--- a/activerecord/test/cases/associations/has_many_associations_test.rb
++++ b/activerecord/test/cases/associations/has_many_associations_test.rb
+@@ -3711,3 +3711,60 @@ class DeprecatedHasManyAssociationsTest < ActiveRecord::TestCase
+     assert_predicate @car, :destroyed?
+   end
+ end
++
++class HasManyOwnerConditionsSerializationTest < ActiveRecord::TestCase
++  self.use_transactional_tests = false
++
++  # Array#- hashes its elements, serializing bind values, once both sides have more than 16.
++  KEYS = Array.new(17) { |i| :"key#{i}" }
++
++  setup do
++    connection = ActiveRecord::Base.lease_connection
++    connection.create_table(:owner_conditions_parents, force: true) { |t| KEYS.each { |key| t.integer key } }
++    connection.create_table(:owner_conditions_children, force: true) do |t|
++      t.integer :parent_id
++      KEYS.each { |key| t.integer key }
++    end
++  end
++
++  teardown do
++    connection = ActiveRecord::Base.lease_connection
++    connection.drop_table :owner_conditions_parents, if_exists: true
++    connection.drop_table :owner_conditions_children, if_exists: true
++  end
++
++  test "joining an association whose default scope has an out of range condition matches no records" do
++    child = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_children"
++      default_scope { where(KEYS.index_with(1).merge(key0: 2**70)) }
++    end
++    parent = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_parents"
++      has_many :children, anonymous_class: child, foreign_key: :parent_id
++    end
++    parent.create!
++
++    assert_empty parent.joins(:children)
++    assert_empty parent.eager_load(:children).where.not(children: { id: nil })
++  end
++
++  test "the association scope runs before the owner conditions are serialized" do
++    type = Class.new(ActiveModel::Type::Integer) do
++      attr_accessor :offset
++      def serialize(value) = super(value) + offset.to_i
++    end.new
++    child = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_children"
++      KEYS.each { |key| attribute key, type }
++    end
++    parent = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_parents"
++      has_many :children, -> { type.offset = 100; all }, anonymous_class: child, primary_key: KEYS, foreign_key: KEYS
++    end
++    owner = parent.create!(KEYS.zip(1..).to_h)
++    child.create!(KEYS.zip(1..).to_h)
++    shifted = child.create!(KEYS.zip(101..).to_h)
++
++    assert_equal [shifted.id], owner.association(:children).scope.pluck(:id)
++  end
++end
+-- 
+2.55.0
+
