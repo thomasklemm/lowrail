@@ -1,0 +1,36 @@
+diff --git a/zjit/src/hir.rs b/zjit/src/hir.rs
+index dd6aa5dfb6..7fec5b793b 100644
+--- a/zjit/src/hir.rs
++++ b/zjit/src/hir.rs
+@@ -4706,7 +4706,7 @@ impl Function {
+                 return None;
+             }
+             self.gen_patch_points_for_optimized_ccall(block, klass, method_id, cme, state);
+-            let recv = self.push_insn(block, Insn::GuardType { val: recv, guard_type: Type::from_profiled_type(profiled_type), state, recompile: None });
++            let recv = self.guard_type_recompile(block, recv, Type::from_profiled_type(profiled_type), state, Recompile);
+             Some(self.push_insn(block, Insn::FixnumToString { val: recv, state }))
+         } else if !self.policy.no_side_exits && !profiled_type.flags().is_immediate() && klass.is_subclass_of(unsafe { rb_cModule }) == ClassRelationship::Subclass {
+             let cme = unsafe { rb_callable_method_entry(klass, method_id) };
+@@ -4714,7 +4714,7 @@ impl Function {
+                 return None;
+             }
+             self.gen_patch_points_for_optimized_ccall(block, klass, method_id, cme, state);
+-            let recv = self.push_insn(block, Insn::GuardType { val: recv, guard_type: Type::from_profiled_type(profiled_type), state, recompile: None });
++            let recv = self.guard_type_recompile(block, recv, Type::from_profiled_type(profiled_type), state, Recompile);
+             // rb_mod_name() doesn't allocate. An anonymous module has no name, and its #to_s can
+             // call #inspect, so it side-exits and recompiles, and the last version sends #to_s. A
+             // temporary name can be a String subclass.
+@@ -11207,11 +11207,11 @@ fn add_iseq_to_hir(
+                         if profiled_type.is_string() {
+                             // TODO(max): Do we need PatchPoint? We are checking T_STRING-ness.
+                             fun.push_insn(block, Insn::PatchPoint { invariant: Invariant::NoSingletonClass { klass: profiled_type.class() }, state: exit_id });
+-                            fun.push_insn(block, Insn::GuardType { val: recv, guard_type: types::String, state: exit_id, recompile: None })
++                            fun.guard_type_recompile(block, recv, types::String, exit_id, Recompile)
+                         } else if let Some(str) = fun.try_objtostring_cfunc(block, recv, profiled_type, cd, exit_id) {
+                             str
+                         } else {
+-                            let recv = fun.push_insn(block, Insn::GuardType { val: recv, guard_type: Type::from_profiled_type(profiled_type), state: exit_id, recompile: None });
++                            let recv = fun.guard_type_recompile(block, recv, Type::from_profiled_type(profiled_type), exit_id, Recompile);
+                             fun.push_insn(block, Insn::Send { recv, cd, block: None, args: vec![], caller_splat_length: None, state: exit_id, reason: ObjToStringNotString })
+                         }
+                     } else {

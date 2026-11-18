@@ -1,0 +1,7 @@
+{
+  "total": 38.0,
+  "sites": {
+    "NameError actionview-8.1.4.1/lib/action_view/helpers/tags/base.rb:66:Kernel#instance_variable_defined? < actionview-8.1.4.1/lib/action_view/helpers/tags/base.rb:66:ActionView::Helpers::Tags::Base#retrieve_object": 37.0,
+    "ActionView::MissingTemplate actionview-8.1.4.1/lib/action_view/path_set.rb:42:ActionView::PathSet#find < actionview-8.1.4.1/lib/action_view/lookup_context.rb:131:ActionView::LookupContext::ViewPaths#find": 1.0
+  }
+}

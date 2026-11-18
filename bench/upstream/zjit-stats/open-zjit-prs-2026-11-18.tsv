@@ -1,0 +1,72 @@
+19891	tekknolagi	true	2026-11-13	ZJIT: Small cleanups
+19743	XrXr	false	2026-11-12	ZJIT: [DOC] Talk about ZJIT_JIT_RETURN_C_FRAME choosing space efficiency
+19583	tekknolagi	true	2026-11-03	ZJIT: Support .send(:symbol)
+19791	efegokdemir	true	2026-11-09	ZJIT: Compress type-profile buckets
+19949	nithya4005	false	2026-11-17	ZJIT: Specialize Hash#fetch(key, default)
+19912	thomasklemm	false	2026-11-17	ZJIT: Send Symbol block arguments directly
+19902	swebb	false	2026-11-18	ZJIT: Inline and fold Array#last
+19434	tenderlove	false	2026-10-22	ZJIT: Inline Array#fetch
+19789	efegokdemir	true	2026-11-09	ZJIT: Make tracing safe across Ractors
+19039	nirvdrum	false	2026-11-04	ZJIT: Lazy instrumentation strings
+19873	XrXr	false	2026-11-13	ZJIT: Allocate side-exit JITFrames after deduplication
+19859	tekknolagi	false	2026-11-12	ZJIT: Fold FixnumBitCheck on constant kw_bits
+19962	tenderlove	false	2026-11-17	ZJIT: Cache "may write block code" on ISeq
+19901	nozomemein	false	2026-11-15	ZJIT: Specialize Proc#call with explicit keyword arguments
+19889	tekknolagi	false	2026-11-13	ZJIT: Pass kw_bits as a normal argument
+19869	GAchuzia	true	2026-11-13	ZJIT: Mark Regexp#to_s as returning StringExact
+19847	XrXr	true	2026-11-12	YJIT&ZJIT: DTrace probes for adverse performance events
+19787	rintarosu	false	2026-11-13	ZJIT: Align Integer#downto with the C implementation
+19976	thomasklemm	true	2026-11-18	ZJIT: Don't specialize super from a refined method
+18950	jacob-shops	false	2026-11-04	ZJIT: Make load store global
+19790	efegokdemir	true	2026-11-09	ZJIT: Preserve spilled values in parallel-copy cycles
+19617	k0kubun	false	2026-11-03	ZJIT: Recompile final versions invalidated by PatchPoint
+19924	nirvdrum	false	2026-11-16	ZJIT: PatchPoints no longer prevent empty inline frame elision
+19724	nozomemein	false	2026-11-05	ZJIT: Test Method procs with empty keyword splats
+19851	tekknolagi	true	2026-11-12	ZJIT: Add a GitHub action to comment perf differences
+19652	XrXr	false	2026-11-04	ZJIT: Print CCall stack maps when printing LIR
+18759	rafaelfranca	false	2026-09-15	ZJIT: Compile exception handlers
+19888	luke-gruber	false	2026-11-13	ZJIT: Fix wrong assumption about frozen objects and object layout
+18949	rafaelfranca	false	2026-09-29	ZJIT: Reuse JITFrame slot offsets
+19863	tenderlove	false	2026-11-12	ZJIT: Use a C function for writing to an array
+19649	supervacuus	false	2026-11-17	ZJIT: optimize code emission with bulk writes and scoped borrows
+18875	hmcguire-shopify	false	2026-09-18	ZJIT: globally remove duplicate CheckInterrupts
+19241	himura467	false	2026-11-10	ZJIT: Sign-extend narrow loads to 64 bits
+19659	thomasklemm	false	2026-11-15	ZJIT: Drop surplus args when yielding to simple ISEQ blocks
+19653	supervacuus	false	2026-11-05	ZJIT: optimize code emission with bulk writes and single ownership
+19680	thomasklemm	false	2026-11-18	ZJIT: Cache iseq_may_write_block_code() on the ISEQ payload
+19351	tekknolagi	true	2026-10-14	ZJIT: Handle inlined block iseq literal in getblockparamproxy
+19681	thomasklemm	false	2026-11-15	ZJIT: Find caller-saved survivors without scanning every interval per CCall
+19432	XrXr	true	2026-10-24	[WIP] ZJIT: locals in stackmap + bitstream stack map codes
+19739	XrXr	false	2026-11-05	ZJIT: Dodge &mut-on-read-only UB with C frame JITFrame
+18834	tenderlove	true	2026-09-14	ZJIT: add an array ptr instruction
+18766	jacob-shops	false	2026-11-04	ZJIT: Optimize the remove_trivial_block_params pass
+18249	tekknolagi	true	2026-08-07	ZJIT: Deduplicate ivar branches
+18997	tekknolagi	true	2026-09-24	ZJIT: Make FloatAdd, FloatMul, etc handle HeapFloat
+19430	supervacuus	false	2026-10-27	ZJIT: optimize code emission with bulk writes and scoped writers
+18753	rafaelfranca	false	2026-10-01	ZJIT: Inline common `String#force_encoding` calls
+18616	tekknolagi	true	2026-11-16	ZJIT: Seed polymorphic type branches with shape data too
+18326	nozomemein	true	2026-11-03	ZJIT: Specialize monomorphic sendforward calls
+18280	tekknolagi	true	2026-08-10	ZJIT: Expand splatarray into HIR
+18305	tekknolagi	true	2026-10-08	ZJIT: Add dominator-based global value numbering
+18500	tekknolagi	true	2026-08-25	ZJIT: Make SideExit not a terminator
+19120	XrXr	false	2026-10-01	ZJIT: BakablePtr allowlist to make correct VALUE baking easy 
+17569	tekknolagi	true	2026-06-30	ZJIT: SHRINK IT ALL
+18771	tenderworks	true	2026-09-11	ZJIT: model array reads on a virtual heap
+18055	khasinski	true	2026-07-27	Implement ZJIT FPR float fast paths
+17865	tekknolagi	true	2026-07-14	ZJIT: Re-enable RData setivar optimizations
+17864	tekknolagi	false	2026-10-27	ZJIT: Force inlining of methods annotated with Primitive.inline_block
+18244	luke-gruber	true	2026-08-07	ZJIT: Don't side-exit on throw insn
+18015	tekknolagi	false	2026-09-15	ZJIT: Don't use an Assembler for generating stubs
+17720	tekknolagi	true	2026-07-07	ZJIT: Refine self type to owner class
+17718	tekknolagi	true	2026-07-07	ZJIT: Make union-find embedded in HIR
+17594	tekknolagi	true	2026-07-06	ZJIT: Bit-pack Opnd into 8 bytes
+18338	tekknolagi	true	2026-08-14	ZJIT: Count reads of different levels in a block
+17478	tekknolagi	true	2026-06-25	ZJIT: Optimize GetEP in optimize_load_store
+17854	tekknolagi	true	2026-07-13	ZJIT: Record compile error exits in Perfetto traces
+17013	dak2	true	2026-10-24	ZJIT: Widen HIR canonicalize to dominator scope to drop more type guards
+18968	rafaelfranca	false	2026-09-23	ZJIT: Preserve the caller PC when pushing a C frame when PC_POISON is set
+17557	alanwu-shopify-inc	true	2026-06-30	ZJIT: Fix local variable desync after `Kernel#eval` and friends
+16314	tekknolagi	true	2026-03-05	ZJIT: Add Emitter struct for block-editing infra
+16667	tekknolagi	true	2026-06-01	ZJIT: Move tracing and LIR passes into run_pass! macro
+16685	tekknolagi	true	2026-04-09	ZJIT: Make InsnId and BlockId use u32 instead of usize
+16563	tekknolagi	true	2026-03-27	ZJIT: Don't run full LIR compiler for stubs that don't need it

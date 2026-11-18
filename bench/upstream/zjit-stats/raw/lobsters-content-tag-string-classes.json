@@ -1,0 +1,8 @@
+{
+  "name=String tag_options=String content=String": 2169.0,
+  "name=Symbol tag_options=String content=String": 507.0,
+  "name=String tag_options=String content=ActiveSupport::SafeBuffer": 326.0,
+  "name=Symbol tag_options=String content=ActiveSupport::SafeBuffer": 26.0,
+  "name=String tag_options=String content=NilClass": 5.0,
+  "name=Symbol tag_options=String content=NilClass": 5.0
+}

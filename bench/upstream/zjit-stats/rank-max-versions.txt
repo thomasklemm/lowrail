@@ -1,0 +1,92 @@
+runs: lobsters (1218.9 ms/itr), lobsters-max-versions-16 (1166.7 ms/itr)
+ruby 4.1.0dev (2026-11-18T09:28:31Z master 9de06831e3) +ZJIT +PRISM [x86_64-linux]
+
+## totals per iteration
+zjit_insn_count                             33,646,414  33,615,725
+total_insn_count                                     -           -
+ratio_in_zjit                                        -           -
+side_exit_count                                 10,167      11,086
+dynamic_send_count                             772,268     794,515
+optimized_send_count                         6,445,646   6,419,611
+iseq_optimized_send_count                    1,491,787   1,473,358
+inline_cfunc_optimized_send_count            2,858,357   2,854,837
+non_variadic_cfunc_optimized_send_count        565,376     565,293
+variadic_cfunc_optimized_send_count            407,929     407,934
+dynamic_getivar_count                          350,155     306,241
+dynamic_setivar_count                           11,382      11,015
+compiled_iseq_count                                2.7        11.6
+failed_iseq_count                                    -           -
+compile_error_out_of_memory                          -           -
+
+## side exits (exit_*, per iteration)
+exception_handler                                      8,962       8,962
+guard_type_failure                                       677       2,023
+patchpoint_method_redefined                              483           -
+guard_shape_failure                                     20.1        50.4
+guard_super_method_entry                                16.0        16.0
+no_profile_getivar                                       5.7        22.5
+function_stub_not_profiled                               1.3        10.9
+interrupt                                                1.5         1.1
+no_profile_send                                          0.5         0.5
+
+## send fallback reasons (send_fallback_*, per iteration)
+send_polymorphic_fallback                            259,141     247,994
+send_megamorphic                                     118,318     151,355
+invokeblock_polymorphic_miss                         100,887     100,766
+send_block_arg_not_nil                                95,271      95,377
+invokeblock_not_specialized                           65,996      66,590
+one_or_more_complex_arg_pass                          41,239      41,019
+sendforward_not_specialized                           31,847      31,845
+send_not_optimized_method_type_optimized              25,646      25,646
+send_not_optimized_need_permission                    15,959      15,959
+send_not_optimized_method_type                         5,789       5,789
+
+## not inlined C methods (not_inlined_cfuncs_*, per iteration)
+Hash#fetch                                           147,097     147,097
+String#<<                                             59,197      59,220
+Hash#key?                                             45,124      45,120
+Regexp#match?                                         41,710      41,710
+Hash#delete                                           28,338      28,338
+ERB::Util.html_escape                                 22,799      22,799
+Kernel#dup                                            20,819      20,819
+Array#include?                                        19,753      19,753
+String#match?                                         19,513      19,513
+Array#any?                                            19,459      19,464
+
+## unspecialized send method types (unspecialized_send_def_type_*, per iteration)
+optimized_send                                        25,488      25,488
+null                                                   4,366       4,366
+optimized                                              1,407       1,407
+optimized_block_call                                     158         158
+zsuper                                                  16.0        16.0
+
+## unspecialized super method types (unspecialized_super_def_type_*, per iteration)
+attrset                                                  114         114
+
+## SendDirect fallback contexts (send_direct_fallback_context_*, per iteration)
+send                                                   5,115       5,115
+
+## complex argument passing (complex_arg_pass_*, per iteration)
+param_kwrest                                           5,099       5,099
+caller_blockarg                                        4,429       4,429
+caller_kw_splat                                        3,069       3,069
+caller_kwarg                                           1,496       1,496
+caller_splat                                             704         691
+does_not_use_block                                      16.0        16.0
+
+## getivar fallbacks (getivar_fallback_*, per iteration)
+no_profile_missing_ic                                205,400     200,721
+no_side_exits                                        142,653     103,655
+complex                                                  937         937
+megamorphic                                              818         604
+polymorphic                                              347         325
+
+## setivar fallbacks (setivar_fallback_*, per iteration)
+no_side_exits                                          5,951       5,640
+not_t_object                                           5,099       5,099
+complex                                                  332         276
+
+## inline rejections (inline_reject_*, per iteration)
+budget_exceeded                                          3.3        24.6
+too_large                                                1.0         3.0
+complex_params                                           0.3         1.2

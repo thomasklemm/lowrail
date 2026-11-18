@@ -1,0 +1,17 @@
+master: ruby 4.1.0dev (2026-11-18T09:28:31Z master 9de06831e3) +ZJIT +PRISM [x86_64-linux]
+master-aa: ruby 4.1.0dev (2026-11-18T09:28:31Z master 9de06831e3) +ZJIT +PRISM [x86_64-linux]
+ots: ruby 4.1.0dev (2026-11-18T09:28:31Z thomasklemm/zjit-objtostring-recompile 9de06831e3) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 8083f572bb7f4691a764dd424f63cc14cf3367dc
+
+----------  -------------  --------------  -------------  -----------------  -----------  ----------------  -------  --------  ----------  -------  --------
+bench         master (ms)  master-aa (ms)       ots (ms)  master-aa 1st itr  ots 1st itr  master/master-aa  p-value       sig  master/ots  p-value       sig
+lobsters     785.8 ± 6.6%    716.4 ± 2.7%   721.4 ± 6.6%              0.957        0.998        1.097 (**)    0.003  p < 0.01   1.089 (*)    0.013  p < 0.05
+railsbench  1656.6 ± 4.3%   1615.4 ± 2.5%  1629.4 ± 2.6%              1.070        1.063             1.025    0.150                 1.017    0.339
+----------  -------------  --------------  -------------  -----------------  -----------  ----------------  -------  --------  ----------  -------  --------
+
+Legend:
+- master-aa 1st itr: ratio of master/master-aa time for the first iteration.
+- master/master-aa: ratio of master/master-aa time. Higher is better for master-aa. Above 1 represents a speedup.
+- ots 1st itr: ratio of master/ots time for the first iteration.
+- master/ots: ratio of master/ots time. Higher is better for ots. Above 1 represents a speedup.
+- ***: p < 0.001, **: p < 0.01, *: p < 0.05 (Welch's t-test)
