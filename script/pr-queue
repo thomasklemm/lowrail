@@ -24,7 +24,7 @@ module PrQueue
   AUTHOR = "thomasklemm"
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
   KINDS = %w[fix perf docs restore].freeze
-  REVIEWERS = %w[skeptic claude-code sol astra thermos opus fable].freeze
+  REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
