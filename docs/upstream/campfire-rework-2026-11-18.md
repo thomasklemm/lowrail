@@ -552,7 +552,13 @@ mid-run, comments only):
 | formatted list | 3,216,595 | 1,407,040 | −56.3% | 0.07% | 891 → 521 |
 | Lexxy paragraphs | 2,950,623 | 999,700 | −66.1% | 0.08% | 576 → 384 |
 
-`body/CF352-3-yjit` is still running and not committed; it goes into the record when it finishes, not into the body.
+The YJIT half, [`body/CF352-3-yjit`](../../bench/upstream/campfire-rework/body/CF352-3-yjit/raw), **aborted, no claim**.
+After the objects runs and 2 of its 24 Callgrind windows, main's N = 500 worker stopped with `SQLite3::BusyException:
+database is locked` while creating the bench messages (`raw/ir-yjit-1-plain-base-n500.log`, 14:37). At that moment
+the builder was running a browser test on the same main checkout and test database (`composer_test.rb`, which ended
+at 14:37). That was our own contention, not a property of either side. The run was not restarted (cohort rule;
+coordinator's instruction), so there is no YJIT figure for `-3`. Its objects counts are kept in `raw/`; they back no
+claim either. The body's no-JIT table is unaffected.
 
 **Browser suites.** The sign-in failure is main's, not ours. `sign_in` asserts `a.btn` "Designers", which is in the
 sidebar, a turbo frame loaded by a second request after the room renders (`sidebar_turbo_frame_tag(src:
@@ -568,7 +574,7 @@ per file they pass (review).
 
 1. #346: closed by Thomas's explicit acceptance (Lowrail `949c8211`), including no automatic reconciliation.
 2. #350 and #374: closed upstream on 2026-11-18 (Lowrail `f44cdb21`); nothing left to decide.
-3. #352: the body uses the `-3` no-JIT table; the YJIT run follows in the record only.
+3. #352: the body uses the `-3` no-JIT table; the `-3` YJIT run aborted (database lock from our own browser run) and makes no claim.
 
 ### Thermos-sol confirmation of the -3 heads
 
