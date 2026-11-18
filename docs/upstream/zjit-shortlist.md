@@ -58,7 +58,7 @@ singleton receivers.
 
 | # | item | ask | Rails relevance | owner | state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.64 s → 3.53 s of compile time; app compile time within A/A | ours (assigned), but tenderlove's #19962 is open | **built, ZWB1** |
+| 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 10.9–12.0 s → 3.3–3.4 s of compile time; no new payloads, app alloc within A/A | ours (assigned), #19680 reopened by tekknolagi; tenderlove's #19962 is open | **built, ZWB1 -3** |
 | 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −7.5% Ir per call, apps about 0.015% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1** |
 | 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
@@ -69,37 +69,30 @@ singleton receivers.
 Not taken: anything in k0kubun's #1039 rows (yield dispatch, polymorphic and megamorphic sends, ivar shape tables),
 tekknolagi's backend redesign (#1077), #1120 (design), the protected-send PR (closed 11-04, not rebuilt).
 
-## ZWB1: `iseq_may_write_block_code()` on the payload (built)
+## ZWB1: `iseq_may_write_block_code()` on the payload (built, -3)
 
-Branch [`thomasklemm/zjit-cache-may-write-block-code-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code-2)
-@ `82c529aa2e`, one commit on `7919a47d46`, 3 files, +25/−1: the commit of our closed ruby/ruby#19680 rebased
-without conflict. Queue item [ZWB1](../../bench/upstream/pr-queue/items/ZWB1.md).
+Branch [`thomasklemm/zjit-cache-may-write-block-code-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code-3)
+@ `35d9707959`, one commit on `7919a47d46` (merges cleanly onto `3a19e2efcf`), 3 files, +37/−2. Queue item
+[ZWB1](../../bench/upstream/pr-queue/items/ZWB1.md) holds the replacement body and the comment draft.
 
-* **Shape.** k0kubun's #19962 comment asks for `IseqPayload`, which is this. His 11-04 objection to #19680 was
-  permanent memory: the `Option<bool>` fits in padding, `size_of::<IseqPayload>()` is 152 bytes on master and on the
-  branch (gdb on both release builds), and `zjit_alloc_bytes` on the apps stays within the master A/A.
-* **Numbers.** #19962's program, `--zjit-call-threshold=2`: master `compile_time_ns` 11,640,744,647
-  (`compile_lir_time_ns` 11,592,179,366), branch 3,532,881,700 (3,485,295,016). On ruby-bench, 3 iterations, two
-  rounds each, master / master-aa (second build) / branch `compile_time_ns`: railsbench 1.72 1.25 / 1.36 1.27 /
-  1.46 1.38 s, lobsters 4.71 4.37 / 4.26 4.34 / 4.24 4.28 s, shipit 3.56 3.67 / 3.96 3.84 / 3.61 3.56 s. The A/A
-  spread is ±10%, so no app claim; #19680's Callgrind measured −1.2% of compile instructions before stack maps.
-* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,014 of 2,015, the failure is
-  `test_profile_frames_during_direct_jit_to_jit_entry` (SIGPROF not delivered in this orb; fails 2 of 3 times alone
-  on master too); btest at `--zjit-call-threshold=1` and `=2` all 2,148; `test_zjit_cli.rb` and
-  `test_optimization.rb` at both thresholds 143 tests, 0 failures. Differential: generated code is unchanged by
-  construction (same answer, cached).
-* **Decision for Thomas.** tenderlove's #19962 is the active PR on the same issue. Options: reopen #19680 with this
-  head (its branch still holds the old commit, so the fork branch would have to be force-pushed first), offer the
-  branch in a comment on #19962, or leave it to tenderlove. The draft below is for #1064 and also fits #19962.
-
-### Comment draft (not posted)
-
-> Since stack maps, every JITFrame calls `iseq_may_write_block_code()`, so tenderlove's 4,000-call method from
-> ruby/ruby#19962 spends 11.6 s in `compile_lir` on today's master. Keeping the answer in `IseqPayload`, as k0kubun
-> suggested there, brings it to 3.5 s. The `Option<bool>` fits in the payload's padding, so `IseqPayload` stays
-> 152 bytes. The branch is #19680's commit rebased:
-> https://github.com/thomasklemm/ruby/commit/82c529aa2e. Should I reopen #19680 with it, or would you rather finish
-> it in #19962?
+* **Why -3.** The review of -2 (`82c529aa2e`) found that `get_or_create_iseq_payload()` in the check created payloads
+  for callee ISEQs that never get one otherwise (`gen_send_iseq_direct`). Temporary counter on payload creation,
+  railsbench / lobsters / shipit, one iteration: master 2,640 / 4,945 / 4,865, -2 2,689 / 5,019 / 4,944, -3 2,640 /
+  4,945 / 4,865. That is the permanent memory k0kubun objected to on 11-04. -3 reads the payload without creating
+  one and scans as before when there is none. The ISEQ being compiled always has a payload by then
+  (`update_self_is_heap_object` and `compile_iseq` create it), so the large method keeps the full win.
+* **Wording.** "Every JITFrame since stack maps" overstated #18960: JITFrames for CCalls with a frame already called
+  it; #18960 added the call per side exit.
+* **Numbers.** #19962's program, `--zjit-call-threshold=2`, 3 runs each: master `compile_time_ns` 11.98 / 10.90 /
+  11.42 s, master-aa 11.09 / 11.45 / 10.95 s, branch 3.33 / 3.32 / 3.45 s; `zjit_alloc_bytes` 5,190,585 in all nine.
+  (The reviewer saw master at 13.2–13.7 s on another machine; the earlier 11.64 s was one run.) ruby-bench
+  `zjit_alloc_bytes` and `compiled_iseq_count` are within the master A/A on all three apps.
+* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,014 of 2,015 (the known SIGPROF
+  `test_profile_frames_during_direct_jit_to_jit_entry`, fails on master too); btest at `--zjit-call-threshold=1` and
+  `=2` all 2,148; `test_zjit_cli.rb` and `test_optimization.rb` at default and threshold 1, 143 tests, 0 failures.
+  Generated code is unchanged by construction (same answer, cached or not).
+* **State.** tekknolagi reopened #19680 on 2026-11-17 22:27. Thomas approved pushing -3 to #19680's branch, the new
+  body, marking it ready and the comment, after a confirm pass; the coordinator thread does that, not this one.
 
 ## ZSV1: the real class for `setinstancevariable` (built)
 
