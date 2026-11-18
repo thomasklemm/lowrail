@@ -231,6 +231,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   maintainer of that file would have written and drops what they would have left out. A guard stays only for a real
   caller, a documented case, or a correctness or safety property (such as the ASCII check in RK3 or keeping html_safe
   intact); "exactly like before for any object" is not a reason. A review lists each surviving guard with its reason.
+  The same goes for code comments (Thomas, 2026-11-18): a comment stays only where that file's maintainer would keep
+  one, because a reader would otherwise undo or misread the line; one line, why not what, in the file's own style.
 
 ## Evidence and measurement
 
