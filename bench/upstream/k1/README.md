@@ -254,32 +254,38 @@ against its headers, Ruby 4.0.9, main and main2 at `8e097e9d81`, fix at `af84ab1
 from the tree path, the same harness, cases, heap floors and window protocol. All three arms exited 0 and **no log has
 a brk overflow**. Logs and dumps (`callgrind.tar.xz`) are kept.
 
+Ir per window is each Callgrind dump's trailing `totals:` line (docs/bench.md: Valgrind 3.19 can wrap `summary:` after
+repeated zero/dump requests). The first export of this cohort read `summary:`, which differed from `totals:` in 99 of
+the 114 measured windows and made `new` look like a main-arm outlier (A/A −1.33%); after the measurement confirm
+(Lowrail 6342156f) run.sh exports through [export.rb](export.rb), which reads only `totals:` and fails without it
+([export_test.rb](export_test.rb) covers a dump whose `summary:` differs and one without `totals:`). The same retained
+dumps were re-exported; the summary-based exports are kept as `*.summary.jsonl`. All other fields are identical. No
+new cohort was run. The earlier stock-tool exports in this record were also summary-based and have no dumps left.
+
 | Ir per call, 30 cols, Ruby 4.0.9 | main | A/A | fix | objects |
 |---|---:|---:|---:|---:|
-| `changed?` | 192,007 | −0.29% | **−12.98%** | 3 → 1 |
-| `serializable_hash` | 203,699 | −0.51% | **−12.42%** | 35 → 33 |
-| `update!` of one column | 1,375,887 | −0.07% | **−5.40%** | 189 → 183 |
-| `find` then `save` | 1,530,134 | −0.12% | **−8.36%** | 169 → 163 |
-| `find` then `dup` | 1,118,732 | −0.05% | **−4.99%** | 182 → 182 |
-| `attribute_names` | 90,368 | −0.48% | −27.12% | 3 → 1 |
-| partial `changed?` | 84,419 | −0.52% | −29.17% | 3 → 1 |
-| `find` | 401,586 | +0.01% | −0.01% | 68 → 68 |
-| `#attributes` | 621,374 | −0.03% | −0.02% | 83 → 83 |
-| STI `#attributes` | 651,360 | −0.03% | −0.04% | 88 → 88 |
-| `new` | 55,944 | −1.33% | −1.54% | 9 → 9 |
+| `changed?` | 191,805 | −0.29% | **−12.99%** | 3 → 1 |
+| `serializable_hash` | 203,514 | −0.51% | **−12.43%** | 35 → 33 |
+| `update!` of one column | 1,375,929 | −0.07% | **−5.40%** | 189 → 183 |
+| `find` then `save` | 1,530,171 | −0.12% | **−8.36%** | 169 → 163 |
+| `find` then `dup` | 1,118,770 | −0.05% | **−5.00%** | 182 → 182 |
+| `attribute_names` | 90,150 | −0.48% | −27.19% | 3 → 1 |
+| partial `changed?` | 84,204 | −0.52% | −29.25% | 3 → 1 |
+| `find` | 401,438 | +0.01% | −0.01% | 68 → 68 |
+| `#attributes` | 621,280 | −0.03% | −0.02% | 83 → 83 |
+| STI `#attributes` | 651,274 | −0.03% | −0.04% | 88 → 88 |
+| `new` | 54,973 | −0.00% | −0.21% | 9 → 9 |
 
-The A/A is at most 0.52% on every case except `new`, where the main arm is the outlier (main 55,944, main2 55,198,
-fix 55,085); `new` calls neither `#keys` nor `materialize`, and the fix against main2 is −0.20%. So the largest A/A
-over all 19 cases is 1.33%, on a control. All five body rows are within 0.3 points of the stock-tool rebuild above (`serializable_hash` −12.42% against −12.15%, the rest within 0.04);
-the body table now uses this cohort.
+The largest A/A over all 19 cases is 0.52% (partial `changed?`); load, readers, `#attributes` and `new` are within it.
+The body table uses this cohort.
 
 Diagnostic cohort [brk512-8e097e9d81/master](results/brk512-8e097e9d81/master), same pinned tool, Ruby master
-`9aa0898240`, eight cases, ZJIT then interpreter, declared and run once: no brk overflow in any of the six arms, every
-ZJIT window 0 compiled ISEQs, 0 side exits, 0 ns invalidating. ZJIT: `changed?` −22.2%, `serializable_hash` −13.6%,
-`update!` −8.4%, `find` then `save` −12.1%, `find` then `dup` −5.6% (A/A ≤ 0.56%); `find` −0.16% and `#attributes`
-−0.10% (A/A −0.04%, −0.07%); `new` main is again the outlier (A/A −4.8%, fix −4.8%, fix against main2 +0.03%).
-Master interpreter: −10.4%, −10.0%, −4.4%, −7.5%, −5.0% (A/A ≤ 0.10%), `find`, `#attributes` within 0.03%, `new`
-−0.54% (A/A +0.06%), as in the stock runs. No ZJIT loss. Diagnostic only: master has no invalidation count.
+`9aa0898240`, eight cases, ZJIT then interpreter, declared and run once, same `totals:` re-export: no brk overflow in
+any of the six arms, every ZJIT window 0 compiled ISEQs, 0 side exits, 0 ns invalidating. ZJIT: `changed?` −22.2%,
+`serializable_hash` −13.6%, `update!` −8.5%, `find` then `save` −12.1%, `find` then `dup` −5.6% (A/A ≤ 0.56%);
+`find` −0.16%, `#attributes` −0.10%, `new` −0.10% (A/A −0.04%, −0.06%, +0.02%). Master interpreter: −10.4%, −10.0%,
+−4.4%, −7.5%, −5.0% (A/A ≤ 0.10%), `find` and `#attributes` within 0.03%, `new` −0.54% (A/A +0.06%). No ZJIT loss.
+Diagnostic only: master has no invalidation count.
 
 ## Rerun
 
@@ -290,6 +296,7 @@ N=200 WARM=100 bench/upstream/k1/run.sh OUT TREE WIDTH interp|yjit [CASE...]
 Since 2026-11-18 on the pinned tool only: script/bench-valgrind NEW_PREFIX, ulimit -d unlimited, PATH=NEW_PREFIX/bin:$PATH,
 irwin rebuilt with CPATH=NEW_PREFIX/include into IRWIN_DIR; keep NEW_PREFIX/share/lowrail/valgrind.json with the cohort.
 OUT must be new; run.sh exits 3 on a brk overflow, which rejects the whole cohort.
+run.sh exports with export.rb (Callgrind `totals:` only); re-export kept dumps with ruby bench/upstream/k1/export.rb DIR TREE MODE.
 ruby bench/upstream/k1/table.rb OUT; ruby bench/upstream/k1/sweep.rb OUT interp
 BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/keys_probe.rb > TREE.txt
 BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/edge_probe.rb > edge-TREE.txt

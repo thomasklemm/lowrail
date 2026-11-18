@@ -25,18 +25,4 @@ RAILS=$HOME/k1/$tree BUNDLE_GEMFILE=$HOME/k1/$suite-$tree/Gemfile WIDTH=$width P
 if grep -qE 'brk segment overflow|Cannot map memory to grow brk segment' "$dir/stderr"; then
   echo "REJECTED: brk overflow in $dir/stderr" >&2; exit 3
 fi
-ruby -rjson -e '
-  dir, tree, mode = ARGV
-  ir = {}
-  Dir["#{dir}/cg.*.*"].each do |f|
-    text = File.read(f)
-    name = text[/^desc: Trigger: Client Request: (.*)$/, 1] or next
-    ir[name] = Integer(text[/^(?:totals|summary): (\d+)/, 1])
-  end
-  rows = File.readlines("#{dir}/stdout").map { JSON.parse(_1) }
-  empty = ir.fetch("_empty").fdiv(rows.first["n"])
-  rows.each do |r|
-    r["ir"] = (ir.fetch(r["case"]).fdiv(r["n"]) - empty).round
-    puts JSON.generate(r.merge("tree" => tree, "mode" => mode))
-  end
-' "$dir" "$tree" "$mode" > "$out/$tree-$mode-w$width.jsonl"
+ruby "$here/export.rb" "$dir" "$tree" "$mode" > "$out/$tree-$mode-w$width.jsonl"
