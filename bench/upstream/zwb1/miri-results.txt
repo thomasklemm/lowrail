@@ -1,0 +1,9 @@
+== Stacked Borrows, old
+error: Undefined Behavior: attempting a write access using <1988> at alloc913[0x18], but that tag does not exist in the borrow stack for this location
+== Tree Borrows, old
+ok old
+== Stacked Borrows, new
+ok new
+== Tree Borrows, new
+ok new
+miri 0.1.0 (5df8c02afd 2026-11-16)

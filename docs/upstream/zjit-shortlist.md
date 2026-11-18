@@ -58,7 +58,7 @@ singleton receivers.
 
 | # | item | ask | Rails relevance | owner | state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 10.9–12.0 s → 3.3–3.4 s of compile time; no new payloads, app alloc within A/A | ours (assigned), #19680 reopened by tekknolagi; tenderlove's #19962 is open | **built, ZWB1 -3** |
+| 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.0–11.9 s → 3.3–3.6 s of compile time; no new payloads, app alloc within A/A | ours (assigned), #19680 reopened by tekknolagi; tenderlove's #19962 is open | **built, ZWB1 -4** |
 | 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −7.5% Ir per call, apps about 0.015% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1 -2** |
 | 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
@@ -69,30 +69,28 @@ singleton receivers.
 Not taken: anything in k0kubun's #1039 rows (yield dispatch, polymorphic and megamorphic sends, ivar shape tables),
 tekknolagi's backend redesign (#1077), #1120 (design), the protected-send PR (closed 11-04, not rebuilt).
 
-## ZWB1: `iseq_may_write_block_code()` on the payload (built, -3)
+## ZWB1: `iseq_may_write_block_code()` on the payload (built, -4)
 
-Branch [`thomasklemm/zjit-cache-may-write-block-code-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code-3)
-@ `35d9707959`, one commit on `7919a47d46` (merges cleanly onto `3a19e2efcf`), 3 files, +37/−2. Queue item
-[ZWB1](../../bench/upstream/pr-queue/items/ZWB1.md) holds the replacement body and the comment draft.
+Branch [`thomasklemm/zjit-cache-may-write-block-code-4`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-cache-may-write-block-code-4)
+@ `25e91f0d07`, one commit on master `3a19e2efcf`, 3 files, +34/−2. Queue item
+[ZWB1](../../bench/upstream/pr-queue/items/ZWB1.md) holds the body and the comment draft.
 
-* **Why -3.** The review of -2 (`82c529aa2e`) found that `get_or_create_iseq_payload()` in the check created payloads
-  for callee ISEQs that never get one otherwise (`gen_send_iseq_direct`). Temporary counter on payload creation,
-  railsbench / lobsters / shipit, one iteration: master 2,640 / 4,945 / 4,865, -2 2,689 / 5,019 / 4,944, -3 2,640 /
-  4,945 / 4,865. That is the permanent memory k0kubun objected to on 11-04. -3 reads the payload without creating
-  one and scans as before when there is none. The ISEQ being compiled always has a payload by then
-  (`update_self_is_heap_object` and `compile_iseq` create it), so the large method keeps the full win.
-* **Wording.** "Every JITFrame since stack maps" overstated #18960: JITFrames for CCalls with a frame already called
-  it; #18960 added the call per side exit.
-* **Numbers.** #19962's program, `--zjit-call-threshold=2`, 3 runs each: master `compile_time_ns` 11.98 / 10.90 /
-  11.42 s, master-aa 11.09 / 11.45 / 10.95 s, branch 3.33 / 3.32 / 3.45 s; `zjit_alloc_bytes` 5,190,585 in all nine.
-  (The reviewer saw master at 13.2–13.7 s on another machine; the earlier 11.64 s was one run.) ruby-bench
-  `zjit_alloc_bytes` and `compiled_iseq_count` are within the master A/A on all three apps.
-* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,014 of 2,015 (the known SIGPROF
-  `test_profile_frames_during_direct_jit_to_jit_entry`, fails on master too); btest at `--zjit-call-threshold=1` and
-  `=2` all 2,148; `test_zjit_cli.rb` and `test_optimization.rb` at default and threshold 1, 143 tests, 0 failures.
-  Generated code is unchanged by construction (same answer, cached or not).
-* **State.** tekknolagi reopened #19680 on 2026-11-17 22:27. Thomas approved pushing -3 to #19680's branch, the new
-  body, marking it ready and the comment, after a confirm pass; the coordinator thread does that, not this one.
+* **History.** -2 (`82c529aa2e`) created payloads for callee ISEQs (the permanent memory k0kubun objected to on
+  11-04). -3 (`35d9707959`) only used existing payloads but turned the raw pointer into a second whole-payload
+  `&mut` while `gen_iseq()` holds one. -4 borrows only the `may_write_block_code` field through the raw pointer.
+* **Miri.** `bench/upstream/zwb1/miri` models `gen_iseq()` holding its `&mut` while `gen_entry_point()` and a side
+  exit read the cache. -3's shape: UB under Stacked Borrows. -4's shape: clean under Stacked and Tree Borrows. Master
+  already has overlapping whole-payload `&mut`s for the compiled ISEQ (`add_iseq_to_hir`, `CompilePolicy::new`); not
+  in this change.
+* **Numbers.** #19962's program, `--zjit-call-threshold=2`, `compile_time_ns` over 3 runs: master 11.89 / 11.35 /
+  11.85 s, master-aa 11.44 / 11.22 / 10.98 s, -4 3.45 / 3.60 / 3.27 s; `zjit_alloc_bytes` 5,190,585 in all nine.
+  Payloads created (temporary counter, one iteration), railsbench / lobsters / shipit: master 2,640 / 4,945 /
+  4,865, -4 the same. `size_of::<IseqPayload>()` 152 on master and -4 (gdb on the release builds).
+* **Tests** (`--enable-zjit=dev`, `25e91f0d07`): `make zjit-test` 2,015 of 2,015 (the SIGPROF test passed this run);
+  btest at thresholds 1 and 2 all 2,148; `test_zjit_cli.rb` and `test_optimization.rb` at the default threshold and
+  at 1, 143 tests, 0 failures.
+* **State.** #19680's branch is untouched. The coordinator thread pushes -4 there, replaces the body, marks it ready
+  and posts the comment after a confirm pass.
 
 ## ZSV1: the real class for `setinstancevariable` (built)
 
