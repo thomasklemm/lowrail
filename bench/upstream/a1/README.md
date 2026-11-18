@@ -5,6 +5,12 @@ built on rails/rails main `e30c36266b` (2026-11-18) as `thomasklemm/association-
 [`9877a852dd`](https://github.com/thomasklemm/rails/commit/9877a852dd) (+17/−10, [patch](A1.patch)). Queue item
 [A1](../pr-queue/items/A1.md). Not opened.
 
+**Review, 2026-11-18: changes requested.** [Thermos review and evidence](review-thermos-sol/README.md) supersede
+the exactness argument below: subtraction can serialize custom bind values, and delaying it changes SQL and
+records for wide composite keys and scalar-key joins with large default scopes, under both settings on SQLite
+and PostgreSQL. The scoped YJIT control is not unchanged, the body cohort has no JIT-flat evidence, and a simple
+join performs three differences, not two. Do not propose the current head as exact.
+
 ## The change
 
 Since #59825 and #59836 (kamipo, merged 2026-11-17), `AssociationScope#add_constraints` and

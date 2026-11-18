@@ -1,0 +1,6 @@
+author.posts: {}
+author.profile: {}
+comment.post: {}
+author.comments (through): {}
+Author.joins(:posts): {}
+author.published_posts (scoped): {["association_scope.rb", 164, "ActiveRecord::Associations::AssociationScope#add_constraints"] => 1, ["association_scope.rb", 165, "ActiveRecord::Associations::AssociationScope#add_constraints"] => 2, ["reflection.rb", 257, "ActiveRecord::Reflection::AbstractReflection#keep_owner_conditions"] => 1, ["reflection.rb", 258, "ActiveRecord::Reflection::AbstractReflection#keep_owner_conditions"] => 1}
