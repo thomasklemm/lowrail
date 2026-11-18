@@ -54,7 +54,8 @@ module PrQueue
     meta = YAML.safe_load(front, permitted_classes: [Date])
     rest = rest.to_s.sub(/\A\n+/, "")
     title, body = rest.split("\n", 2)
-    Item.new(path, meta, title.to_s.delete_prefix("# "), body.to_s.sub(/\A\n/, "").chomp)
+    body = body.to_s.sub(/\n*^## For Thomas$.*\z/m, "\n")
+    Item.new(path, meta, title.to_s.delete_prefix("# "), body.sub(/\A\n/, "").chomp)
   end
 
   def items = Dir[File.join(ITEMS, "*.md")].map { parse(_1) }

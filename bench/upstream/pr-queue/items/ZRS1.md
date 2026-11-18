@@ -5,8 +5,8 @@ fork: thomasklemm/ruby
 kind: fix
 area: ZJIT, super from a refined method
 reviewer: "nirvdrum (original invokesuper specialization)"
-branch: zjit-super-from-refinement
-head: "be791c1fb825885912dec8a4f78e1481e9ad026b"
+branch: zjit-super-from-refinement-2
+head: "1d86986033707d121a0a3a514bf15bd6afdfe203"
 base: master
 built_on: "7919a47d467ba961b8912fa61e0ee1fe0ff4ef0c"
 depends_on: []
@@ -15,9 +15,9 @@ alternative_of:
 impact: "Fixes Shopify/ruby#1128: compiled super can call a refinement activated only by the caller; +15 implementation lines and one codegen test, no speed claim"
 rank: 4
 risky: false
-state: reviewed
+state: built
 pr:
-note: "2026-11-18: thermos-sol nits on be791c1fb8, no correctness or maintainability must-fix. Both rubrics applied by one reviewer in the same thread, as requested; no delegated reviewers. Kept built because the separate claude-code submission gate is not satisfied. No Ruby fork changes, push or external post. Submission still needs Thomas's approval. Builder's record: docs/upstream/zjit-differential.md, Rerun on master 7919a47d46 (2026-11-18)."
+note: "2026-11-18: Review nits applied as 1d86986033 on branch zjit-super-from-refinement-2, one commit on 7919a47d46; the old branch stays at be791c1fb8. The commit message is qualified to calls through `using` and names Shopify/ruby#1128 and 4a21b83693 (ruby/ruby#15816); the guard comment is one line; T_MODULE is checked before the refinement flag, as RICLASS_FOR_REFINEMENT_P and YJIT do. Rerun on this head: the codegen test fails without the guard (R2 R1 A) and passes with it; probe_refined_super.rb 100/100 correct in interp, default, z1, z2 and zmv (no guard: 71 wrong at default, 99 at z2 and zmv); test_refinement.rb and test_super.rb 245 tests, 4,133 assertions, no failures in interp, z1, z2 and zmv (no guard: test_super_not_chained fails at z2); zjit-test 2,014 passed, 1 failed (SIGPROF, test_profile_frames_during_direct_jit_to_jit_entry), 15 skipped; ZJIT_TESTS=invokesuper 47/47. Prepended-singleton, prepended-class and included-module controls give the interpreter's results and the same ZJIT counters with the old and the new guard. No C declarations touched, so no bindgen. Thomas approved submission once the nits are in; this head has no review pass yet, so the state is built. No PR opened, nothing posted. Earlier, 2026-11-18: thermos-sol nits on be791c1fb8, no correctness or maintainability must-fix. Both rubrics applied by one reviewer in the same thread, as requested; no delegated reviewers. Kept built because the separate claude-code submission gate is not satisfied. No Ruby fork changes, push or external post. Submission still needs Thomas's approval. Builder's record: docs/upstream/zjit-differential.md, Rerun on master 7919a47d46 (2026-11-18)."
 passes:
   - reviewer: thermos-sol
     orb: T-01a1eccf-a5a0-70bc-9626-78d1a8f81e0b
@@ -114,4 +114,21 @@ For a method reached through `using`, the profiled CME's `defined_class` can be 
 
 Fall back to the VM's super dispatch for these calls, as YJIT already does. ZJIT leaves them as generic `InvokeSuper`, with a `SuperFromRefinement` fallback reason. The VM helper preserves the distinction between refined classes and modules and honors refinements active at the `super` call site.
 
-The new codegen test fails without the fix and passes with it. `test_refinement.rb` and `test_super.rb` pass all 245 tests in the interpreter and at ZJIT thresholds 1 and 2. The full `zjit-test` run has one SIGPROF profiling-test failure that also occurs on the unmodified base in this orb.
+The new codegen test fails without the fix and passes with it. `test_refinement.rb` and `test_super.rb` pass all 245 tests in the interpreter, at ZJIT call thresholds 1 and 2, and at threshold 2 with `--zjit-num-profiles=1 --zjit-max-versions=1`. The full `zjit-test` run has one SIGPROF profiling-test failure that also occurs on the unmodified base in this orb.
+
+## For Thomas
+
+In a refined method, `super` should go to the method that is active where that `super` is written, not to another refinement that only the caller switched on with `using`. Since ZJIT's `invokesuper` optimization (4a21b83693), compiled code computes the target from the caller's refinements, so once `R2#foo` is compiled, `Client.test(A.new)` below returns `"R2 R1 A"` instead of `"R2 A"`:
+
+```ruby
+class A; def foo = "A"; end
+module R1; refine(A) { def foo = "R1 " + super }; end
+module R2; refine(A) { def foo = "R2 " + super }; end
+module Client
+  using R1
+  using R2
+  def self.test(a) = a.foo
+end
+```
+
+The fix stops ZJIT from optimizing a `super` inside a refined method and leaves it to the VM's normal `super` call, which already handles refinements and is what YJIT does. It is safe because it only gives up an optimization in this one case for the path the interpreter already uses, the new test fails without the fix, and Ruby's refinement and `super` tests pass in every ZJIT mode we ran.

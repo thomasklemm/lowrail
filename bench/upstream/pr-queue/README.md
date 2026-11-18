@@ -95,6 +95,10 @@ passes:                       # oldest first
 # Keep token_tag and method_tag where FormTagHelper can reach them
 
 The body, verbatim, as it is posted.
+
+## For Thomas
+
+Optional, last: what Thomas needs to retell the change. Everything from this heading on is not posted.
 ```
 
 `reviewer` in a pass: `claude-code` (the separate final review orb), `skeptic` (the orb's skeptical reviewer

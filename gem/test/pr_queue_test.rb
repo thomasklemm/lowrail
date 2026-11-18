@@ -103,6 +103,14 @@ end
     end
   end
 
+  def test_a_for_thomas_section_is_not_part_of_the_body
+    text = "---\nid: X1\n---\n\n# Title\n\nBody line.\n\n## Fixes\n\nMore.\n\n## For Thomas\n\nPrivate notes.\n"
+    item = PrQueue.parse("X1.md", text)
+    assert_equal "Title", item.title
+    assert_equal "Body line.\n\n## Fixes\n\nMore.", item.body
+    assert_equal "Body line.", PrQueue.parse("X1.md", "---\nid: X1\n---\n\n# Title\n\nBody line.\n").body
+  end
+
   def test_without_a_fetched_branch_the_merge_state_comes_from_github
     assert_equal "CONFLICT(gh)", PrQueue.merge_label({ error: "fetch: denied" }, "CONFLICTING")
     assert_equal "clean(gh)", PrQueue.merge_label(nil, "MERGEABLE")
