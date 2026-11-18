@@ -1,0 +1,1702 @@
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w -I"lib:test" /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/rake_test_loader.rb "test/spec_auth_basic.rb" "test/spec_body_proxy.rb" "test/spec_builder.rb" "test/spec_cascade.rb" "test/spec_common_logger.rb" "test/spec_conditional_get.rb" "test/spec_config.rb" "test/spec_content_length.rb" "test/spec_content_type.rb" "test/spec_deflater.rb" "test/spec_directory.rb" "test/spec_etag.rb" "test/spec_events.rb" "test/spec_files.rb" "test/spec_head.rb" "test/spec_headers.rb" "test/spec_lint.rb" "test/spec_lock.rb" "test/spec_media_type.rb" "test/spec_method_override.rb" "test/spec_mime.rb" "test/spec_mock_request.rb" "test/spec_mock_response.rb" "test/spec_multipart.rb" "test/spec_null_logger.rb" "test/spec_query_parser.rb" "test/spec_recursive.rb" "test/spec_request.rb" "test/spec_response.rb" "test/spec_rewindable_input.rb" "test/spec_runtime.rb" "test/spec_sendfile.rb" "test/spec_show_exceptions.rb" "test/spec_show_status.rb" "test/spec_static.rb" "test/spec_tempfile_reaper.rb" "test/spec_urlmap.rb" "test/spec_utils.rb" "test/spec_version.rb" "test/gemloader.rb" -v
+Run options: -v --seed 14540
+
+# Running:
+
+Rack::RewindableInput::given an IO object that is not rewindable#test_0002_be able to handle to read(nil) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0008_be able to handle size = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0001_be able to handle to read() = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0012_close the underlying tempfile upon calling #close = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0016_be possible to call #close multiple times = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0004_be able to handle to read(length, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0009_be able to handle each = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0013_handle partial writes to tempfile = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0011_buffer into a Tempfile when data has been consumed for the first time = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0010_not buffer into a Tempfile if no data has been read yet = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0014_close the underlying tempfile upon calling #close when not using posix semantics = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0005_be able to handle to read(nil, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0007_be able to handle gets = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0015_be possible to call #close when no data has been buffered yet = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0003_be able to handle to read(length) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is not rewindable#test_0006_rewind to the beginning when #rewind is called = 0.00 s = .
+Rack::TestEvents#test_finish_is_called_if_there_is_an_exception = 0.00 s = .
+Rack::TestEvents#test_evented_body_proxy_respond_to_each_matches_body = 0.00 s = .
+Rack::TestEvents#test_send_is_called_on_each = 0.00 s = .
+Rack::TestEvents#test_evented_body_proxy_respond_to_other_methods = 0.00 s = .
+Rack::TestEvents#test_send_and_finish_are_not_run_until_body_is_sent = 0.00 s = .
+Rack::TestEvents#test_finish_is_called_in_reverse_order = 0.00 s = .
+Rack::TestEvents#test_send_is_called_on_call = 0.00 s = .
+Rack::TestEvents#test_events_fire = 0.00 s = .
+Rack::TestEvents#test_finish_is_called_on_close = 0.00 s = .
+Rack::BodyProxy#test_0008_allows calling delegated methods with keywords = 0.00 s = .
+Rack::BodyProxy#test_0014_be closed when the callback is triggered = 0.00 s = .
+Rack::BodyProxy#test_0001_call each on the wrapped body = 0.00 s = .
+Rack::BodyProxy#test_0010_not respond to :to_ary if body does not respond to it = 0.00 s = .
+Rack::BodyProxy#test_0004_call the passed block on close = 0.00 s = .
+Rack::BodyProxy#test_0011_not respond to :to_str = 0.00 s = .
+Rack::BodyProxy#test_0009_respond to :to_ary if body does responds to it, and have to_ary call close = 0.00 s = .
+Rack::BodyProxy#test_0002_call close on the wrapped body = 0.00 s = .
+Rack::BodyProxy#test_0012_not respond to :to_path if body does not respond to it = 0.00 s = .
+Rack::BodyProxy#test_0005_call the passed block on close even if there is an exception = 0.00 s = .
+Rack::BodyProxy#test_0007_allows #method to work with delegated methods = 0.00 s = .
+Rack::BodyProxy#test_0013_not close more than one time = 0.00 s = .
+Rack::BodyProxy#test_0003_only call close on the wrapped body if it responds to close = 0.00 s = .
+Rack::BodyProxy#test_0006_allow multiple arguments in respond_to? = 0.00 s = .
+Rack::CommonLogger#test_0001_log to rack.errors by default = 0.00 s = .
+Rack::CommonLogger#test_0012_log path with SERVER_PROTOCOL = 0.00 s = .
+Rack::CommonLogger#test_0004_log - content length if header is missing = 0.00 s = .
+Rack::CommonLogger#test_0008_log in common log format = 0.00 s = .
+Rack::CommonLogger#test_0009_escapes non printable characters including newline = 0.00 s = .
+Rack::CommonLogger#test_0002_log to anything with +write+ = 0.00 s = .
+Rack::CommonLogger#test_0010_log path with PATH_INFO = 0.00 s = .
+Rack::CommonLogger#test_0005_log - content length if header is zero = 0.00 s = .
+Rack::CommonLogger#test_0007_log - records host from RFC 7239 forwarded for header = 0.00 s = .
+Rack::CommonLogger#test_0011_log path with SCRIPT_NAME = 0.00 s = .
+Rack::CommonLogger#test_0003_work with standard library logger = 0.00 s = .
+Rack::CommonLogger#test_0006_log - records host from X-Forwarded-For header = 0.00 s = .
+Rack::Lock::Proxy#test_0003_not delegate to_path if body does not implement it = 0.00 s = .
+Rack::Lock::Proxy#test_0001_delegate each = 0.00 s = .
+Rack::Lock::Proxy#test_0002_delegate to_path = 0.00 s = .
+Rack::Lint#test_0013_notice header errors = 0.00 s = .
+Rack::Lint#test_0012_notice status errors = 0.00 s = .
+Rack::Lint#test_0001_pass valid request = 0.00 s = .
+Rack::Lint#test_0010_notices request-target absolute-form errors = 0.00 s = .
+Rack::Lint#test_0014_notice rack.early_hints errors = 0.00 s = .
+Rack::Lint#test_0041_allows body.to_path to return nil after iterating body = 0.00 s = .
+Rack::Lint#test_0006_notice response errors = 0.00 s = .
+Rack::Lint#test_0018_handles body.to_path returning nil = 0.00 s = .
+Rack::Lint#test_0004_notice input errors = 0.00 s = .
+Rack::Lint#test_0034_notices when the response protocol is not an array of strings = 0.00 s = .
+Rack::Lint#test_0025_notices when request env doesn't have a valid rack.hijack callback = 0.00 s = .
+Rack::Lint#test_0030_allows non-hijack responses when server supports hijacking = 0.00 s = .
+Rack::Lint#test_0002_notice fatal errors = 0.00 s = .
+Rack::Lint#test_0009_notices request-target authority form errors = 0.00 s = .
+Rack::Lint#test_0007_accepts empty PATH_INFO = 0.00 s = .
+Rack::Lint#test_0011_notices request-target origin-form errors = 0.00 s = .
+Rack::Lint#test_0020_notice input handling errors = 0.01 s = .
+Rack::Lint#test_0029_handles valid rack.hijack response header = 0.00 s = .
+Rack::Lint#test_0033_notices rack.response_finished errors = 0.00 s = .
+Rack::Lint#test_0022_notice error handling errors = 0.00 s = .
+Rack::Lint#test_0036_notices when the response protocol is specified in the response but not in the request = 0.00 s = .
+Rack::Lint#test_0040_notices rack.response_finished values that are not callable = 0.00 s = .
+Rack::Lint#test_0021_can call close = 0.00 s = .
+Rack::Lint#test_0035_notices when the response protocol is specified in the response but not in the request = 0.00 s = .
+Rack::Lint#test_0027_notices when rack.hijack env entry does not respond to #call = 0.00 s = .
+Rack::Lint#test_0028_notices when rack.hijack env entry does not return an IO = 0.00 s = .
+Rack::Lint#test_0008_notices request-target asterisk form errors = 0.00 s = .
+Rack::Lint#test_0039_allows missing SERVER_PORT = 0.00 s = .
+Rack::Lint#test_0024_pass valid read calls = 0.00 s = .
+Rack::Lint#test_0003_notice environment errors = 0.00 s = .
+Rack::Lint#test_0015_notice content-type errors = 0.00 s = .
+Rack::Lint#test_0005_notice error errors = 0.00 s = .
+Rack::Lint#test_0016_notice content-length errors = 0.00 s = .
+Rack::Lint#test_0017_responds to to_path = 0.00 s = .
+Rack::Lint#test_0032_notices when the response headers has a rack.hijack callback with hijacking being supported = 0.00 s = .
+Rack::Lint#test_0031_notices when the response headers don't have a valid rack.hijack callback = 0.00 s = .
+Rack::Lint#test_0026_handles valid rack.hijack env = 0.00 s = .
+Rack::Lint#test_0037_pass valid rack.protocol = 0.00 s = .
+Rack::Lint#test_0023_notice HEAD errors = 0.00 s = .
+Rack::Lint#test_0019_notice body errors = 0.00 s = .
+Rack::Lint#test_0038_raises if app does not respond to call = 0.00 s = .
+Rack::Auth::Basic#test_0004_return 400 Bad Request if different auth scheme used = 0.00 s = .
+Rack::Auth::Basic#test_0001_challenge correctly when no credentials are specified = 0.00 s = .
+Rack::Auth::Basic#test_0009_supports #request for a Rack::Request object = 0.00 s = .
+Rack::Auth::Basic#test_0002_rechallenge if incorrect credentials are specified = 0.00 s = .
+Rack::Auth::Basic#test_0007_return 400 Bad Request for a authorization header with only username = 0.00 s = .
+Rack::Auth::Basic#test_0005_return 400 Bad Request for a malformed authorization header = 0.00 s = .
+Rack::Auth::Basic#test_0008_takes realm as optional constructor arg = 0.00 s = .
+Rack::Auth::Basic#test_0003_return application output if correct credentials are specified = 0.00 s = .
+Rack::Auth::Basic#test_0006_return 401 Bad Request for a nil authorization header = 0.00 s = .
+Rack::Builder::new_from_string#test_0001_builds a rack app from string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0152_not strip '46' => '.' => '.' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0218_not strip '112' => 'p' => 'p' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0215_not strip '109' => 'm' => 'm' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0102_parse with junk before boundary = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0054_handle empty values in form_pairs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0178_not strip '72' => 'H' => 'H' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0111_detect invalid multipart form data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0210_not strip '104' => 'h' => 'h' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0003_can get a key from the env = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0217_not strip '111' => 'o' => 'o' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0233_handles ASCII NUL input of 33554432 bytes = 0.23 s = .
+RackRequestTest::TestProxyRequest#test_0155_not strip '49' => '1' => '1' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0065_treat empty content type as nil = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0052_return form_pairs for url-encoded POST data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0047_limit POST body read to bytesize_limit when parsing url-encoded data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0171_not strip '65' => 'A' => 'A' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0123_uses a custom trusted proxy filter = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0181_not strip '75' => 'K' => 'K' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0150_not strip '44' => '%2C' => ',' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0104_parse multipart form data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0040_return empty POST data if rack.input is missing = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0132_can use Rack::Config to set rack.request.config = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0005_can calculate the authority without a port = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0189_not strip '83' => 'S' => 'S' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0060_include file uploads in multipart form_pairs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0051_clean up Safari's ajax POST body with limited read = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0146_not strip '40' => '%28' => '(' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0211_not strip '105' => 'i' => 'i' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0199_not strip '93' => '%5D' => ']' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0202_not strip '96' => '%60' => '`' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0108_closes tempfiles it created in the case of too many created = 0.09 s = .
+RackRequestTest::TestProxyRequest#test_0097_restore the base URL = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0182_not strip '76' => 'L' => 'L' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0223_not strip '117' => 'u' => 'u' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0196_not strip '90' => 'Z' => 'Z' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0153_not strip '47' => '%2F' => '/' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0063_extract user agent correctly = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0213_not strip '107' => 'k' => 'k' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0194_not strip '88' => 'X' => 'X' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0074_not modify the params hash in place = 0.00 s = S
+RackRequestTest::TestProxyRequest#test_0176_not strip '70' => 'F' => 'F' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0121_not allow IP spoofing via Client-IP and X-Forwarded-For headers = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0118_parse Accept-Language correctly = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0071_parse cookies = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0204_not strip '98' => 'b' => 'b' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0095_provide setters = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0093_parse cookies according to RFC 2109 = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0222_not strip '116' => 't' => 't' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0021_figure out the correct host with port = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0013_can delete env values = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0024_handles invalid unicode in query string value = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0151_not strip '45' => '-' => '-' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0128_trusts only specified IPs when rack.request.trusted_proxy is a callable = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0177_not strip '71' => 'G' => 'G' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0124_regards local addresses as proxies = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0068_figure out if prefetch request = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0161_not strip '55' => '7' => '7' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0131_handles custom logic in rack.request.trusted_proxy callable = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0092_pass through non-uri escaped cookies as-is = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0103_not infinite loop with a malformed HTTP request = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0012_can add to multivalued headers in the env = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0156_not strip '50' => '2' => '2' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0116_conform to the Rack spec = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0064_treat missing content type as nil = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0028_should use the query_parser from environment for query parsing = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0029_should use the multipart_parser from environment for multipart parsing = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0148_not strip '42' => '%2A' => '*' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0046_clean up Safari's ajax POST body = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0045_safely accepts POST requests with empty body = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0183_not strip '77' => 'M' => 'M' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0007_can calculate the server authority = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0079_modify params hash by changing only POST = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0139_not strip '33' => '%21' => '!' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0009_yields to the block if no value has been set = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0149_not strip '43' => '%2B' => '+' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0109_parse big multipart form data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0141_not strip '35' => '%23' => '#' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0170_not strip '64' => '%40' => '@' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0184_not strip '78' => 'N' => 'N' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0006_can calculate the authority without a port on ssl = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0143_not strip '37' => '%25' => '%' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0134_sets the default session options to an empty hash = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0154_not strip '48' => '0' => '0' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0061_return empty array for empty multipart form_pairs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0130_supports IPv6 addresses in rack.request.trusted_proxy callable = 0.01 s = .
+RackRequestTest::TestProxyRequest#test_0043_not parse POST data when media type is not form-data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0173_not strip '67' => 'C' => 'C' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0235_handles ASCII NUL input of 134217728 bytes = 0.85 s = .
+RackRequestTest::TestProxyRequest#test_0022_does not leak invalid Host through host_with_port; base_url uses SERVER_NAME = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0138_not strip '32' => '+' => ' ' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0185_not strip '79' => 'O' => 'O' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0208_not strip '102' => 'f' => 'f' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0135_allow subclass request to be instantiated after parent request = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0077_modify params hash, even if param didn't exist before = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0014_can recognize a QUERY request = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0175_not strip '69' => 'E' => 'E' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0050_truncate POST body at bytesize_limit when parsing url-encoded data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0025_handles invalid unicode in query string key = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0209_not strip '103' => 'g' => 'g' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0105_parse multipart delimiter-only boundary = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0162_not strip '56' => '8' => '8' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0220_not strip '114' => 'r' => 'r' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0100_handle multiple media type parameters = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0167_not strip '61' => '%3D' => '=' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0137_raise TypeError every time if request parameters are broken = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0031_should parse url-encoded POST data if multipart_parser is nil in environment = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0019_have forwarded_* methods respect forwarded_priority set globally = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0195_not strip '89' => 'Y' => 'Y' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0227_not strip '121' => 'y' => 'y' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0066_return nil media type for empty content type = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0163_not strip '57' => '9' => '9' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0232_handles ASCII NUL input of 16777216 bytes = 0.16 s = .
+RackRequestTest::TestProxyRequest#test_0001_copies the env when duping = 0.00 s = S
+RackRequestTest::TestProxyRequest#test_0038_use the query_parser's params_class for multipart params = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0207_not strip '101' => 'e' => 'e' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0193_not strip '87' => 'W' => 'W' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0018_use rack.request.config :authority for authority host, hostname, host_with_port, and port = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0016_figure out the correct host = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0203_not strip '97' => 'a' => 'a' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0008_can calculate the port without an authority = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0192_not strip '86' => 'V' => 'V' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0190_not strip '84' => 'T' => 'T' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0127_trusts no proxies when rack.request.trusted_proxy is false = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0069_ssl detection = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0113_correctly parse the part name from Content-Id header = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0042_parse POST data with explicit content type regardless of method = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0044_parse POST data on PUT when media type is form-data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0076_modify params hash if param is in POST = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0125_uses rack.request.trusted_proxy env key when set to nil (default behavior) = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0236_Env sets @env on initialization = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0174_not strip '68' => 'D' => 'D' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0041_parse POST data when method is POST and no content-type given = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0062_extract referrer correctly = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0017_figure out the correct port = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0082_allow deleting from params hash if param is in POST = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0198_not strip '92' => '%5C' => '\' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0226_not strip '120' => 'x' => 'x' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0180_not strip '74' => 'J' => 'J' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0032_should use the default multipart_parser if rack.request.config does not include multipart_parser = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0191_not strip '85' => 'U' => 'U' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0036_limit the allowed parameter depth when parsing parameters = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0049_handle nil return from rack.input.read when parsing url-encoded data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0230_not strip '124' => '%7C' => '|' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0212_not strip '106' => 'j' => 'j' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0122_preserves ip for trusted proxy chain = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0160_not strip '54' => '6' => '6' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0059_preserve duplicate keys in multipart form_pairs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0221_not strip '115' => 's' => 's' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0197_not strip '91' => '%5B' => '[' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0187_not strip '81' => 'Q' => 'Q' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0020_have forwarded_* methods respect forwarded_priority set via rack.request.config = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0145_not strip '39' => '%27' => ''' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0089_set or add HTTP header in env via headers.add = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0206_not strip '100' => 'd' => 'd' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0144_not strip '38' => '%26' => '&' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0004_can calculate the authority = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0098_restore the URL = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0186_not strip '80' => 'P' => 'P' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0086_allows deleting specific HTTP header via headers.delete = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0033_should not use the multipart_parser for url-encoded POST data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0107_MultipartPartLimitError when request has too many multipart total parts if limit set = 0.05 s = .
+RackRequestTest::TestProxyRequest#test_0126_trusts all proxies when rack.request.trusted_proxy is true = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0110_record tempfiles from multipart form data in env[rack.tempfiles] = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0073_modify the cookies hash in place = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0205_not strip '99' => 'c' => 'c' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0094_parse cookies with quotes = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0057_raise same error for form_pairs as POST with invalid encoding = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0157_not strip '51' => '3' => '3' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0067_figure out if called via XHR = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0228_not strip '122' => 'z' => 'z' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0219_not strip '113' => 'q' => 'q' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0011_can set values in the env = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0114_not try to interpret binary as utf8 = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0075_modify params hash if param is in GET = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0188_not strip '82' => 'R' => 'R' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0140_not strip '34' => '%22' => '"' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0088_ignore headers.add for existing env values that are not strings or arrays = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0010_can iterate over values = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0214_not strip '108' => 'l' => 'l' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0002_can check if something has been set = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0106_MultipartPartLimitError when request has too many multipart file parts if limit set = 0.04 s = .
+RackRequestTest::TestProxyRequest#test_0056_return empty array for form_pairs with non-form content type = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0129_supports CIDR ranges in rack.request.trusted_proxy callable = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0084_allows access to specific HTTP header via headers.fetch = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0168_not strip '62' => '%3E' => '>' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0030_should not parse multipart data if multipart_parser is nil in environment = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0078_modify params hash by changing only GET = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0085_allows checking for specific HTTP header via headers.has_key? = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0058_return form_pairs for multipart form data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0027_should use the query_parser set via attr_writer for query parsing = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0224_not strip '118' => 'v' => 'v' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0053_preserve duplicate keys in form_pairs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0216_not strip '110' => 'n' => 'n' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0172_not strip '66' => 'B' => 'B' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0070_prevents scheme abuse = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0048_read POST body without a length limit when bytesize_limit is nil = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0158_not strip '52' => '4' => '4' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0142_not strip '36' => '%24' => '$' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0037_not unify GET and POST when calling params = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0201_not strip '95' => '_' => '_' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0200_not strip '94' => '%5E' => '^' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0099_restore the full path = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0034_return empty form_pairs for multipart content type without boundary = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0169_not strip '63' => '%3F' => '?' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0039_raise if input params has invalid %-encoding = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0101_returns the same error for invalid post inputs = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0119_provide ip information = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0112_consistently raise EOFError on bad multipart form data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0090_allows iterating over HTTP headers via headers.each = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0015_wrap the rack variables = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0225_not strip '119' => 'w' => 'w' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0091_allows retrieving a hash of HTTP headers via headers.to_h = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0147_not strip '41' => '%29' => ')' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0117_parse Accept-Encoding correctly = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0133_sets the default session to an empty hash = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0072_always return the same hash object = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0055_return empty array for form_pairs with no POST data = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0136_allow parent request to be instantiated after subclass request = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0087_set HTTP header in env via headers[]= = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0120_deals with proxies = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0035_does not use semi-colons as separators for query strings in GET = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0165_not strip '59' => '%3B' => ';' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0080_modify params hash, even if param is defined in both POST and GET = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0081_allow deleting from params hash if param is in GET = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0096_provide the original env = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0164_not strip '58' => '%3A' => ':' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0231_not strip '125' => '%7D' => '}' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0159_not strip '53' => '5' => '5' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0115_use form_hash when form_input is a Tempfile = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0026_not truncate query strings containing semi-colons #543 only in POST = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0234_handles ASCII NUL input of 67108864 bytes = 0.42 s = .
+RackRequestTest::TestProxyRequest#test_0229_not strip '123' => '%7B' => '{' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0023_parse the query string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0179_not strip '73' => 'I' => 'I' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0083_allows access to specific HTTP header via headers[] = 0.00 s = .
+RackRequestTest::TestProxyRequest#test_0166_not strip '60' => '%3C' => '<' escaped character from parameters when accessed as string = 0.00 s = .
+Rack::ShowExceptions#test_0004_works with binary data in the Rack environment = 0.04 s = .
+Rack::ShowExceptions#test_0001_catches exceptions = 0.00 s = .
+Rack::ShowExceptions#test_0010_escapes non-printable characters in exception messages written to rack.errors = 0.00 s = .
+Rack::ShowExceptions#test_0002_handles exceptions with backtrace lines for files that are not readable = 0.00 s = .
+Rack::ShowExceptions#test_0008_knows to prefer plaintext for non-html = 0.00 s = .
+Rack::ShowExceptions#test_0005_responds with HTML only to requests accepting HTML = 0.01 s = .
+Rack::ShowExceptions#test_0007_allows subclasses to override template = 0.00 s = .
+Rack::ShowExceptions#test_0009_prefers Exception#detailed_message instead of Exception#message if available = 0.00 s = .
+Rack::ShowExceptions#test_0003_handles invalid POST data exceptions = 0.00 s = .
+Rack::ShowExceptions#test_0006_handles exceptions without a backtrace = 0.00 s = .
+Rack::Recursive#test_0003_support forwarding = 0.00 s = .
+Rack::Recursive#test_0001_allow for subrequests = 0.00 s = .
+Rack::Recursive#test_0002_raise error on requests not below the app = 0.00 s = .
+Rack::URLMap#test_0002_dispatches hosts correctly = 0.00 s = .
+Rack::URLMap#test_0004_route root apps correctly = 0.00 s = .
+Rack::URLMap#test_0001_dispatches paths correctly = 0.00 s = .
+Rack::URLMap#test_0005_not squeeze slashes = 0.00 s = .
+Rack::URLMap#test_0007_not allow locations unless they start with / = 0.00 s = .
+Rack::URLMap#test_0003_be nestable = 0.00 s = .
+Rack::URLMap#test_0006_not be case sensitive with hosts = 0.00 s = .
+Rack::TempfileReaper#test_0010_handle missing rack.tempfiles on normal response = 0.00 s = .
+Rack::TempfileReaper#test_0009_append env[rack.tempfiles] when already present = 0.00 s = .
+Rack::TempfileReaper#test_0001_do nothing (i.e. not bomb out) without env[rack.tempfiles] = 0.00 s = .
+Rack::TempfileReaper#test_0004_close env[rack.tempfiles] when app raises an error with rack.response_finished = 0.00 s = .
+Rack::TempfileReaper#test_0013_handle missing rack.tempfiles on error with rack.response_finished = 0.00 s = .
+Rack::TempfileReaper#test_0008_initialize env[rack.tempfiles] when not already present = 0.00 s = .
+Rack::TempfileReaper#test_0002_does nothing without env[rack.tempfiles] with rack.response_finished = 0.00 s = .
+Rack::TempfileReaper#test_0011_handle missing rack.tempfiles on normal response with rack.response_finished = 0.00 s = .
+Rack::TempfileReaper#test_0005_close env[rack.tempfiles] when app raises an non-StandardError = 0.00 s = .
+Rack::TempfileReaper#test_0007_close env[rack.tempfiles] when rack.response_finished = 0.00 s = .
+Rack::TempfileReaper#test_0012_handle missing rack.tempfiles on error = 0.00 s = .
+Rack::TempfileReaper#test_0003_close env[rack.tempfiles] when app raises an error = 0.00 s = .
+Rack::TempfileReaper#test_0006_close env[rack.tempfiles] when body is closed = 0.00 s = .
+Rack::MediaType::when content_type contains only media_type#test_0001_#type is application/text = 0.00 s = .
+Rack::MediaType::when content_type contains only media_type#test_0002_#params is empty = 0.00 s = .
+Rack::ConditionalGet#test_0001_set a 304 status and truncate body when if-modified-since hits = 0.00 s = .
+Rack::ConditionalGet#test_0012_not affect requests with malformed HTTP_IF_NONE_MATCH = 0.00 s = .
+Rack::ConditionalGet#test_0004_set a 304 status and truncate body when if-none-match hits = 0.00 s = .
+Rack::ConditionalGet#test_0008_not set a 304 status if if-modified-since hits but etag does not = 0.00 s = .
+Rack::ConditionalGet#test_0009_set a 304 status and truncate body when both if-none-match and if-modified-since hits = 0.00 s = .
+Rack::ConditionalGet#test_0002_set a 304 status and truncate body when if-modified-since hits and is higher than current time = 0.00 s = .
+Rack::ConditionalGet#test_0010_not affect non-GET/HEAD requests = 0.00 s = .
+Rack::ConditionalGet#test_0005_set a 304 status and truncate body when if-none-match hits a QUERY request = 0.00 s = .
+Rack::ConditionalGet#test_0007_not set a 304 status if last-modified is too short = 0.00 s = .
+Rack::ConditionalGet#test_0011_not affect non-200 requests = 0.00 s = .
+Rack::ConditionalGet#test_0003_closes bodies = 0.00 s = .
+Rack::ConditionalGet#test_0006_set a 304 status and truncate body when if-none-match hits but if-modified-since is after last-modified = 0.00 s = .
+Rack::Config#test_0001_accept a block that modifies the environment = 0.00 s = .
+Rack::ContentType#test_0002_set content-type to chosen default if none is set = 0.00 s = .
+Rack::ContentType#test_0001_set content-type to default text/html if none is set = 0.00 s = .
+Rack::ContentType#test_0004_not set content-type on 100 responses = 0.00 s = .
+Rack::ContentType#test_0005_not set content-type on 204 responses = 0.00 s = .
+Rack::ContentType#test_0003_not change content-type if it is already set = 0.00 s = .
+Rack::ContentType#test_0006_not set content-type on 304 responses = 0.00 s = .
+Rack::.release#test_0001_returns the version string = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and incomplete params#test_0001_#type is application/text = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and incomplete params#test_0002_#params has key "charset" with value "" = 0.00 s = .
+Rack::QueryParser#test_0004_accepts params_limit to specify maximum number of query parameters to parse = 0.00 s = .
+Rack::QueryParser#test_0001_can normalize values with missing values = 0.00 s = .
+Rack::QueryParser#test_0009_supports custom unescaper when parsing query = 0.00 s = .
+Rack::QueryParser#test_0002_accepts bytesize_limit to specify maximum size of query string to parse = 0.00 s = .
+Rack::QueryParser#test_0007_ignores nil name when normalizing params = 0.00 s = .
+Rack::QueryParser#test_0005_does not enforce a params limit when params_limit is nil = 0.00 s = .
+Rack::QueryParser#test_0008_unescapes keys and values to UTF-8 = 0.00 s = .
+Rack::QueryParser#test_0003_does not enforce a bytesize limit when bytesize_limit is nil = 0.00 s = .
+Rack::QueryParser#test_0006_raises when normalizing params with incompatible encoding such as UTF-16LE = 0.00 s = .
+Rack::ShowStatus#test_0004_escape error = 0.00 s = .
+Rack::ShowStatus#test_0001_provide a default status message = 0.00 s = .
+Rack::ShowStatus#test_0002_let the app provide additional information = 0.00 s = .
+Rack::ShowStatus#test_0008_close the original body = 0.00 s = .
+Rack::ShowStatus#test_0005_not replace existing messages = 0.00 s = .
+Rack::ShowStatus#test_0007_replace existing messages if there is detail = 0.00 s = .
+Rack::ShowStatus#test_0003_let the app provide additional information with non-String details = 0.00 s = .
+Rack::ShowStatus#test_0006_pass on original headers = 0.00 s = .
+RackHeadersTest#test_fetch = 0.00 s = .
+RackHeadersTest#test_delete_if_and_reject = 0.00 s = .
+RackHeadersTest#test_dup_and_clone = 0.00 s = .
+RackHeadersTest#test_to_hash = 0.00 s = .
+RackHeadersTest#test_filter! = 0.00 s = .
+RackHeadersTest#test_default_values = 0.00 s = .
+RackHeadersTest#test_keep_if = 0.00 s = .
+RackHeadersTest#test_to_h = 0.00 s = .
+RackHeadersTest#test_assoc = 0.00 s = .
+RackHeadersTest#test_empty = 0.00 s = .
+RackHeadersTest#test_key = 0.00 s = .
+RackHeadersTest#test_compare_by_identity = 0.00 s = .
+RackHeadersTest#test_has_key = 0.00 s = .
+RackHeadersTest#test_compact = 0.00 s = .
+RackHeadersTest#test_has_value = 0.00 s = .
+RackHeadersTest#test_rassoc = 0.00 s = .
+RackHeadersTest#test_clear = 0.00 s = .
+RackHeadersTest#test_dig = 0.00 s = .
+RackHeadersTest#test_class_aref = 0.00 s = .
+RackHeadersTest#test_default_proc= = 0.00 s = .
+RackHeadersTest#test_compare_by_identity? = 0.00 s = .
+RackHeadersTest#test_delete = 0.00 s = .
+RackHeadersTest#test_keys = 0.00 s = .
+RackHeadersTest#test_public_interface = 0.00 s = .
+RackHeadersTest#test_sort = 0.00 s = .
+RackHeadersTest#test_to_a = 0.00 s = .
+RackHeadersTest#test_transform_keys! = 0.00 s = .
+RackHeadersTest#test_to_proc = 0.00 s = .
+RackHeadersTest#test_each = 0.00 s = .
+RackHeadersTest#test_invert = 0.00 s = .
+RackHeadersTest#test_values = 0.00 s = .
+RackHeadersTest#test_fetch_values = 0.00 s = .
+RackHeadersTest#test_compact! = 0.00 s = .
+RackHeadersTest#test_slice = 0.00 s = .
+RackHeadersTest#test_deconstruct_keys = 0.00 s = .
+RackHeadersTest#test_values_at = 0.00 s = .
+RackHeadersTest#test_transform_values! = 0.00 s = .
+RackHeadersTest#test_transform_keys = 0.00 s = .
+RackHeadersTest#test_replace = 0.00 s = .
+RackHeadersTest#test_transform_values = 0.00 s = .
+RackHeadersTest#test_each_key = 0.00 s = .
+RackHeadersTest#test_store_and_retrieve = 0.00 s = .
+RackHeadersTest#test_each_value = 0.00 s = .
+RackHeadersTest#test_merge_and_update = 0.00 s = .
+RackHeadersTest#test_select = 0.00 s = .
+RackHeadersTest#test_length = 0.00 s = .
+RackHeadersTest#test_inspect = 0.00 s = .
+RackHeadersTest#test_select! = 0.00 s = .
+RackHeadersTest#test_flatten = 0.00 s = .
+RackHeadersTest#test_except = 0.00 s = .
+RackHeadersTest#test_shift = 0.00 s = .
+Rack::Mime#test_0004_should support null fallbacks = 0.00 s = .
+Rack::Mime#test_0001_should return the fallback mime-type for files with no extension = 0.00 s = .
+Rack::Mime#test_0002_should always return 'application/octet-stream' for unknown file extensions = 0.00 s = .
+Rack::Mime#test_0008_should match type wildcard mimes = 0.00 s = .
+Rack::Mime#test_0005_should match exact mimes = 0.00 s = .
+Rack::Mime#test_0007_should match full wildcards = 0.00 s = .
+Rack::Mime#test_0003_should return the mime-type for a given extension = 0.00 s = .
+Rack::Mime#test_0006_should match class wildcard mimes = 0.00 s = .
+Rack::ContentLength#test_0002_not set content-length on variable length bodies = 0.00 s = .
+Rack::ContentLength#test_0004_not set content-length on 304 responses = 0.00 s = .
+Rack::ContentLength#test_0001_set content-length on Array bodies if none is set = 0.00 s = .
+Rack::ContentLength#test_0005_not set content-length when transfer-encoding is chunked = 0.00 s = .
+Rack::ContentLength#test_0007_support single-execute bodies = 0.00 s = .
+Rack::ContentLength#test_0003_not change content-length if it is already set = 0.00 s = .
+Rack::ContentLength#test_0006_close bodies that need to be closed = 0.00 s = .
+Rack::Builder::parse_file#test_0002_removes __END__ before evaluating app = 0.00 s = .
+Rack::Builder::parse_file#test_0004_requires an_underscore_app not ending in .ru = 0.00 s = .
+Rack::Builder::parse_file#test_0001_raises if parses commented options = 0.00 s = .
+Rack::Builder::parse_file#test_0005_sets __LINE__ correctly = 0.00 s = .
+Rack::Builder::parse_file#test_0007_respects the frozen_string_literal magic comment = 0.00 s = .
+Rack::Builder::parse_file#test_0003_supports multi-line comments = 0.00 s = .
+Rack::Builder::parse_file#test_0006_strips leading unicode byte order mark when present = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0002_ignores HTTP_X_SENDFILE_TYPE header attempting to enable x-accel-redirect = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0004_ignores HTTP_X_ACCEL_MAPPING when application-level mappings are configured = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0001_ignores HTTP_X_SENDFILE_TYPE header to prevent attacker-controlled sendfile activation = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0005_allows HTTP_X_ACCEL_MAPPING only when x-accel-redirect explicitly enabled with no app mappings = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0007_requires explicit middleware configuration for any sendfile variation = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0003_ignores HTTP_X_ACCEL_MAPPING when x-accel-redirect is not explicitly enabled = 0.00 s = .
+Rack::Sendfile::security: information disclosure prevention#test_0006_does not allow x-lighttpd-send-file activation via header = 0.00 s = .
+Rack::Deflater#test_0002_should not update vary response header if it includes * or accept-encoding = 0.00 s = .
+Rack::Deflater#test_0001_be able to deflate bodies that respond to each = 0.00 s = .
+Rack::Deflater#test_0010_be able to fallback to no deflation = 0.00 s = .
+Rack::Deflater#test_0021_not deflate if content-length is 0 = 0.00 s = .
+Rack::Deflater#test_0028_uses current time as gzip mtime if GzipStream is not given an mtime = 0.00 s = .
+Rack::Deflater#test_0014_do nothing when no-transform cache-control directive present = 0.00 s = .
+Rack::Deflater#test_0018_deflate if content-type is included it :include = 0.00 s = .
+Rack::Deflater#test_0015_do nothing when content-encoding already present = 0.00 s = .
+Rack::Deflater#test_0011_be able to skip when there is no response entity body = 0.00 s = .
+Rack::Deflater#test_0012_handle the lack of an acceptable encoding = 0.00 s = .
+Rack::Deflater#test_0013_handle gzip response with last-modified header = 0.00 s = .
+Rack::Deflater#test_0007_be able to gzip bodies that respond to each = 0.00 s = .
+Rack::Deflater#test_0008_be able to gzip files = 0.00 s = .
+Rack::Deflater#test_0003_be able to deflate bodies that respond to each and contain empty chunks = 0.00 s = .
+Rack::Deflater#test_0024_check for content-length via :if = 0.00 s = .
+Rack::Deflater#test_0016_deflate when content-encoding is identity = 0.00 s = .
+Rack::Deflater#test_0009_flush gzipped chunks to the client as they become ready = 0.00 s = .
+Rack::Deflater#test_0017_deflate if content-type matches :include = 0.00 s = .
+Rack::Deflater#test_0004_flush deflated chunks to the client as they become ready = 0.00 s = .
+Rack::Deflater#test_0020_not deflate if content-type do not match :include = 0.00 s = .
+Rack::Deflater#test_0022_deflate response if :if lambda evaluates to true = 0.00 s = .
+Rack::Deflater#test_0025_will honor sync: false to avoid unnecessary flushing = 0.00 s = .
+Rack::Deflater#test_0026_will honor sync: false to avoid unnecessary flushing when deflating files = 0.00 s = .
+Rack::Deflater#test_0005_does not raise when a client aborts reading = 0.00 s = .
+Rack::Deflater#test_0023_not deflate if :if lambda evaluates to false = 0.00 s = .
+Rack::Deflater#test_0027_does not close the response body prematurely = 0.00 s = .
+Rack::Deflater#test_0019_not deflate if content-type is not set but given in :include = 0.00 s = .
+Rack::Deflater#test_0006_be able to deflate String bodies = 0.00 s = .
+Rack::Response::headers#test_0002_get_header = 0.00 s = .
+Rack::Response::headers#test_0001_has_header? = 0.00 s = .
+Rack::Response::headers#test_0004_add_header = 0.00 s = .
+Rack::Response::headers#test_0005_delete_header = 0.00 s = .
+Rack::Response::headers#test_0003_set_header = 0.00 s = .
+Rack::Head#test_response = 0.00 s = .
+Rack::Head#test_0001_pass GET, QUERY, POST, PUT, DELETE, OPTIONS, TRACE requests = 0.00 s = .
+Rack::Head#test_0003_close the body when it is removed = 0.00 s = .
+Rack::Head#test_0002_remove body from HEAD requests = 0.00 s = .
+Rack::Static::applies path-specific header rules after path normalization#test_0004_applies admin header rules when dot segments are percent-encoded = 0.00 s = .
+Rack::Static::applies path-specific header rules after path normalization#test_0001_applies admin header rules for a dot-segment path = 0.00 s = .
+Rack::Static::applies path-specific header rules after path normalization#test_0003_applies admin header rules for a mixed encoded dot-segment path = 0.00 s = .
+Rack::Static::applies path-specific header rules after path normalization#test_0002_applies admin header rules for a fully encoded dot-segment path = 0.00 s = .
+Rack::Response::Raw#test_0004_delete_header = 0.00 s = .
+Rack::Response::Raw#test_0001_has_header? = 0.00 s = .
+Rack::Response::Raw#test_0003_set_header = 0.00 s = .
+Rack::Response::Raw#test_0002_get_header = 0.00 s = .
+Rack::RewindableInput::Middleware#test_0001_wraps rack.input in RewindableInput = 0.00 s = .
+Rack::RewindableInput::Middleware#test_0002_preserves a nil rack.input = 0.00 s = .
+Rack::MockRequest#test_0002_be able to only return the environment = 0.00 s = .
+Rack::MockRequest#test_0001_return a MockResponse = 0.00 s = .
+Rack::MockRequest#test_0010_allow posting = 0.00 s = .
+Rack::MockRequest#test_0018_accept raw input in params for GET requests = 0.00 s = .
+Rack::MockRequest#test_0026_defaults encoding to ASCII 8BIT = 0.00 s = .
+Rack::MockRequest#test_0014_properly convert method name to an uppercase string = 0.00 s = .
+Rack::MockRequest#test_0016_accept :http_version option to set SERVER_PROTOCOL = 0.00 s = .
+Rack::MockRequest#test_0015_accept :script_name option to set SCRIPT_NAME = 0.00 s = .
+Rack::MockRequest#test_0011_use all parts of an URL = 0.00 s = .
+Rack::MockRequest#test_0012_set SSL port and HTTP flag on when using https = 0.00 s = .
+Rack::MockRequest#test_0013_prepend slash to uri path = 0.00 s = .
+Rack::MockRequest#test_0007_provide sensible defaults = 0.00 s = .
+Rack::MockRequest#test_0008_allow GET/POST/PUT/DELETE/HEAD/QUERY = 0.00 s = .
+Rack::MockRequest#test_0003_should handle a non-GET request with :input String and :params = 0.00 s = .
+Rack::MockRequest#test_0022_accept raw input in params for QUERY requests = 0.00 s = .
+Rack::MockRequest#test_0009_set content length = 0.00 s = .
+Rack::MockRequest#test_0017_accept params and build query string for GET requests = 0.00 s = .
+Rack::MockRequest#test_0004_should convert :input IO object to binary encoding = 0.00 s = .
+Rack::MockRequest#test_0020_accept raw input in params for POST requests = 0.00 s = .
+Rack::MockRequest#test_0021_accept params and build url encoded params for QUERY requests = 0.00 s = .
+Rack::MockRequest#test_0024_behave valid according to the Rack spec = 0.00 s = .
+Rack::MockRequest#test_0005_should handle :input object that does not respond to set_encoding = 0.00 s = .
+Rack::MockRequest#test_0023_accept params and build multipart encoded params for POST requests = 0.00 s = .
+Rack::MockRequest#test_0025_call close on the original body object = 0.00 s = .
+Rack::MockRequest#test_0019_accept params and build url encoded params for POST requests = 0.00 s = .
+Rack::MockRequest#test_0006_return an environment with a path = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and params#test_0001_#type is application/text = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and params#test_0002_#params has key "charset" with value "utf-8" = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0004_ignore missing or syntactically invalid byte ranges = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0001_returns an empty list if the sum of the ranges is too large = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0009_handle byte ranges of empty files = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0002_returns an empty list if the number of ranges exceeds what is allowed = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0007_truncate byte ranges = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0005_parse simple byte ranges = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0008_ignore unsatisfiable byte ranges = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0003_parse simple byte ranges from env = 0.00 s = .
+Rack::Utils::get_byte_ranges#test_0006_parse several byte ranges = 0.00 s = .
+Rack::Response#test_0028_can set same site cookies with symbol value :Strict = 0.00 s = .
+Rack::Response#test_0034_can delete cookies = 0.00 s = .
+Rack::Response#test_0063_should specify to cache content = 0.00 s = .
+Rack::Response#test_0025_can set same site cookies with string value 'Lax' = 0.00 s = .
+Rack::Response#test_0018_can set http only cookies with :http_only = 0.00 s = .
+Rack::Response#test_0004_has an etag method = 0.00 s = .
+Rack::Response#test_0053_does not wrap body = 0.00 s = .
+Rack::Response#test_0050_provide access to the HTTP headers = 0.00 s = .
+Rack::Response#test_0024_can set same site cookies with symbol value :Lax = 0.00 s = .
+Rack::Response#test_0046_correctly updates content-length when writing when initialized with object body that responds to #each = 0.00 s = .
+Rack::Response#test_0010_doesn't mutate given headers = 0.00 s = .
+Rack::Response#test_0033_omits same site attribute given a false value = 0.00 s = .
+Rack::Response#test_0001_has standard constructor = 0.00 s = .
+Rack::Response#test_0021_can set same site cookies with symbol value :None = 0.00 s = .
+Rack::Response#test_0022_can set same site cookies with string value 'None' = 0.00 s = .
+Rack::Response#test_0012_can get and set set-cookie header = 0.00 s = .
+Rack::Response#test_0006_have sensible default values = 0.00 s = .
+Rack::Response#test_0030_validates the same site option value = 0.00 s = .
+Rack::Response#test_0014_can set cookies with the same name for multiple domains = 0.00 s = .
+Rack::Response#test_0043_correctly updates content-length when writing when initialized without body = 0.00 s = .
+Rack::Response#test_0020_can set same site cookies with symbol value :none = 0.00 s = .
+Rack::Response#test_0047_doesn't return invalid responses = 0.00 s = .
+Rack::Response#test_0049_provide access to the HTTP status = 0.00 s = .
+Rack::Response#test_0003_has cache-control methods = 0.00 s = .
+Rack::Response#test_0013_can set cookies = 0.00 s = .
+Rack::Response#test_0002_raises ArgumentError unless headers is a hash = 0.00 s = .
+Rack::Response#test_0009_can set and read headers = 0.00 s = .
+Rack::Response#test_0007_can be written to inside finish block and it does not generate a content-length header = 0.00 s = .
+Rack::Response#test_0011_can override the initial content-type with a different case = 0.00 s = .
+Rack::Response#test_0048_knows if it's empty = 0.00 s = .
+Rack::Response#test_0040_can do redirects = 0.00 s = .
+Rack::Response#test_0044_correctly updates content-length when writing when initialized with Array body = 0.00 s = .
+Rack::Response#test_0029_can set same site cookies with string value 'Strict' = 0.00 s = .
+Rack::Response#test_0057_calls close on #body when 204 or 304 = 0.00 s = .
+Rack::Response#test_0039_only delete cookies with the domain and path specified = 0.00 s = .
+Rack::Response#test_0015_formats the Cookie expiration date accordingly to RFC 6265 = 0.00 s = .
+Rack::Response#test_0054_does wraps body when using #write = 0.00 s = .
+Rack::Response#test_0027_can set same site cookies with symbol value :strict = 0.00 s = .
+Rack::Response#test_0062_should not cache content if calling cache! after do_not_cache! = 0.00 s = .
+Rack::Response#test_0005_has a content-type method = 0.00 s = .
+Rack::Response#test_0042_has a constructor that can take a block = 0.00 s = .
+Rack::Response#test_0008_#write calls #<< on non-iterable body = 0.00 s = .
+Rack::Response#test_0045_correctly updates content-length when writing when initialized with String body = 0.00 s = .
+Rack::Response#test_0060_flatten doesn't cause infinite loop = 0.00 s = .
+Rack::Response#test_0055_handles string reuse in existing body when calling #write = 0.00 s = .
+Rack::Response#test_0035_can delete cookies with the same name from multiple domains = 0.00 s = .
+Rack::Response#test_0059_doesn't clear #body when 101 and streaming = 0.00 s = .
+Rack::Response#test_0016_can set secure cookies = 0.00 s = .
+Rack::Response#test_0041_has a useful constructor = 0.00 s = .
+Rack::Response#test_0017_can set http only cookies = 0.00 s = .
+Rack::Response#test_0032_omits same site attribute given a nil value = 0.00 s = .
+Rack::Response#test_0036_only deletes cookies for the domain specified = 0.00 s = .
+Rack::Response#test_0052_updates length when body appended to using #write = 0.00 s = .
+Rack::Response#test_0056_calls close on #body = 0.00 s = .
+Rack::Response#test_0031_can set same site cookies with symbol value = 0.00 s = .
+Rack::Response#test_0058_doesn't call close on #body when 205 = 0.00 s = .
+Rack::Response#test_0026_can set same site cookies with boolean value true = 0.00 s = .
+Rack::Response#test_0061_should specify not to cache content = 0.00 s = .
+Rack::Response#test_0037_can delete cookies with the same name with different paths = 0.00 s = .
+Rack::Response#test_0023_can set same site cookies with symbol value :lax = 0.00 s = .
+Rack::Response#test_0051_does not add or change content-length when #finish()ing = 0.00 s = .
+Rack::Response#test_0019_can set prefers :httponly for http only cookie setting when :httponly and :http_only provided = 0.00 s = .
+Rack::Response#test_0038_only delete cookies with the path specified = 0.00 s = .
+Rack::Deflater::custom deflaters#test_0001_uses custom deflater when provided = 0.00 s = .
+Rack::Deflater::custom deflaters#test_0002_still supports gzip when custom deflaters are provided = 0.00 s = .
+Rack::Static#test_0022_supports folder rules provided as a String = 0.00 s = .
+Rack::Static#test_0010_serves hidden files = 0.00 s = .
+Rack::Static#test_0001_serves files = 0.00 s = .
+Rack::Static#test_0002_does not serve files outside :urls = 0.00 s = .
+Rack::Static#test_0032_supports urls ending in / = 0.00 s = .
+Rack::Static#test_0011_calls down the chain if the URI is not specified = 0.00 s = .
+Rack::Static#test_0021_supports file extension header rules provided as an Array = 0.00 s = .
+Rack::Static#test_0029_escapes Array rule entries when building regexp = 0.00 s = .
+Rack::Static#test_0018_supports serving fixed cache-control (legacy option) = 0.00 s = .
+Rack::Static#test_0012_allows the root URI to be configured via hash options = 0.00 s = .
+Rack::Static#test_0013_serves gzipped files if client accepts gzip encoding and gzip files are present = 0.00 s = .
+Rack::Static#test_0014_serves regular files if client accepts gzip encoding and gzip files are not present = 0.00 s = .
+Rack::Static#test_0007_calls index file when requesting root in the given folder = 0.00 s = .
+Rack::Static#test_0008_does not call index file when requesting folder with unknown prefix = 0.00 s = .
+Rack::Static#test_0003_404s if url root is known but it can't find the file = 0.00 s = .
+Rack::Static#test_0024_supports flexible header rules provided as Regexp = 0.00 s = .
+Rack::Static#test_0015_serves regular files if client does not accept gzip encoding = 0.00 s = .
+Rack::Static#test_0028_applies Regexp header rules to URL-encoded paths = 0.00 s = .
+Rack::Static#test_0016_returns 304 if gzipped file isn't modified since last serve = 0.00 s = .
+Rack::Static#test_0009_doesn't call index file if :index option was omitted = 0.00 s = .
+Rack::Static#test_0017_return 304 if gzipped file isn't modified since last serve = 0.00 s = .
+Rack::Static#test_0004_serves files when using :cascade option = 0.00 s = .
+Rack::Static#test_0020_supports header rule :fonts = 0.00 s = .
+Rack::Static#test_0025_prioritizes header rules over fixed cache-control setting (legacy option) = 0.00 s = .
+Rack::Static#test_0027_applies Array header rules to URL-encoded paths = 0.00 s = .
+Rack::Static#test_0026_applies :fonts header rules to URL-encoded paths = 0.00 s = .
+Rack::Static#test_0030_not allow directory traversal via root prefix bypass = 0.00 s = .
+Rack::Static#test_0005_calls down the chain if if can't find the file when using the :cascade option = 0.00 s = .
+Rack::Static#test_0023_supports folder header rules provided as a String not starting with a slash = 0.00 s = .
+Rack::Static#test_0031_expands the root path upon the middleware initialization = 0.00 s = .
+Rack::Static#test_0019_supports header rule :all = 0.00 s = .
+Rack::Static#test_0006_calls down the chain if url root is not known = 0.00 s = .
+Rack::MediaType::when content_type is empty string#test_0001_#type is nil = 0.00 s = .
+Rack::MediaType::when content_type is empty string#test_0002_#params is empty = 0.00 s = .
+Rack::Files#test_0010_allows safe directory traversal = 0.00 s = .
+Rack::Files#test_0027_does not add custom HTTP headers when none are supplied = 0.00 s = .
+Rack::Files#test_0001_can be used without root = 0.00 s = .
+Rack::Files#test_0006_returns 304 if file isn't modified since last serve = 0.00 s = .
+Rack::Files#test_0012_allows files with .. in their name = 0.00 s = .
+Rack::Files#test_0014_allows safe directory traversal with encoded periods = 0.00 s = .
+Rack::Files#test_0028_only supports GET, HEAD, and OPTIONS requests = 0.00 s = .
+Rack::Files#test_0029_sets Allow correctly for OPTIONS requests = 0.00 s = .
+Rack::Files#test_0022_returns correct multiple byte ranges in body = 0.00 s = .
+Rack::Files#test_0002_serves files with + in the file name = 0.00 s = .
+Rack::Files#test_0033_does not set the content-type header if the MIME type is not specified = 0.00 s = .
+Rack::Files#test_0018_returns bodies that respond to #to_path = 0.00 s = .
+Rack::Files#test_0011_does not allow unsafe directory traversal = 0.00 s = .
+Rack::Files#test_0030_sets content-length correctly for HEAD requests = 0.00 s = .
+Rack::Files#test_0007_returns the file if it has been modified since last serve = 0.00 s = .
+Rack::Files#test_0013_does not allow unsafe directory traversal with encoded periods = 0.00 s = .
+Rack::Files#test_0025_supports custom http headers = 0.00 s = .
+Rack::Files#test_0034_returns 404 and empty body for a HEAD request when the file is not found = 0.00 s = .
+Rack::Files#test_0024_ignores range when file size is 0 bytes = 0.00 s = .
+Rack::Files#test_0021_handles cases where the file is truncated during request = 0.00 s = .
+Rack::Files#test_0008_serves files with URL encoded filenames = 0.00 s = .
+Rack::Files#test_0003_serves the correct file content for a GET request = 0.00 s = .
+Rack::Files#test_0015_returns 404 if it can't find the file = 0.00 s = .
+Rack::Files#test_0005_sets the last-modified header = 0.00 s = .
+Rack::Files#test_0016_uses bytesize not size for Content-Length in error responses with multibyte UTF-8 = 0.00 s = .
+Rack::Files#test_0009_serves uri with URL encoded null byte (%00) in filenames = 0.00 s = .
+Rack::Files#test_0017_detects SystemCallErrors = 0.00 s = .
+Rack::Files#test_0004_does not serve directories = 0.00 s = .
+Rack::Files#test_0020_returns correct byte range in body = 0.00 s = .
+Rack::Files#test_0032_allows the default MIME type to be set = 0.00 s = .
+Rack::Files#test_0031_defaults to a MIME type of text/plain = 0.00 s = .
+Rack::Files#test_0035_can be made ractor shareable = 0.00 s = .
+Rack::Files#test_0026_allows customizing the way http header's are set = 0.00 s = .
+Rack::Files#test_0023_returns 416 error and correct Content-Range for unsatisfiable byte range = 0.00 s = .
+Rack::Files#test_0019_returns bodies that do not respond to #to_path if a byte range is requested = 0.00 s = .
+Rack::Builder#test_0002_forwards positional hashes and keyword arguments to middleware = 0.00 s = .
+Rack::Builder#test_0015_yields the generated app to a block for warmup = 0.00 s = .
+Rack::Builder#test_0017_allows use after run = 0.00 s = .
+Rack::Builder#test_0020_does not strip byte order mark if file is not read as UTF-8 = 0.00 s = .
+Rack::Builder#test_0012_has explicit #to_app = 0.00 s = .
+Rack::Builder#test_0014_accepts middleware-only map blocks = 0.00 s = .
+Rack::Builder#test_0013_can mix map and run for endpoints = 0.00 s = .
+Rack::Builder#test_0010_has implicit #to_app = 0.00 s = .
+Rack::Builder#test_0011_supports blocks on use = 0.00 s = .
+Rack::Builder#test_0007_doesn't dupe env even when mapping = 0.00 s = .
+Rack::Builder#test_0008_dupe #to_app when mapping so Rack::Reloader can reload the application on each request = 0.00 s = .
+Rack::Builder#test_0003_supports run with block = 0.00 s = .
+Rack::Builder#test_0018_supports #freeze_app for freezing app and middleware = 0.00 s = .
+Rack::Builder#test_0009_chains apps by default = 0.00 s = .
+Rack::Builder#test_0001_can provide options = 0.00 s = .
+Rack::Builder#test_0016_initialize apps once = 0.00 s = .
+Rack::Builder#test_0004_raises if #run provided both app and block = 0.00 s = .
+Rack::Builder#test_0005_supports mapping = 0.00 s = .
+Rack::Builder#test_0019_complains about a missing run = 0.00 s = .
+Rack::Builder#test_0006_supports use when mapping = 0.00 s = .
+Rack::Cascade#test_0004_return 404 if empty = 0.00 s = .
+Rack::Cascade#test_0001_dispatch onward on 404 and 405 by default = 0.00 s = .
+Rack::Cascade#test_0002_dispatch onward on whatever is passed = 0.00 s = .
+Rack::Cascade#test_0008_close the body on cascade = 0.00 s = .
+Rack::Cascade#test_0005_uses new response object if empty = 0.00 s = .
+Rack::Cascade#test_0007_append new app = 0.00 s = .
+Rack::Cascade#test_0003_include? returns whether app is included = 0.00 s = .
+Rack::Cascade#test_0006_returns final response if all responses are cascaded = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0002_be able to handle to read(nil) = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0008_be able to handle size = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0001_be able to handle to read() = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0012_close the underlying tempfile upon calling #close = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0016_be possible to call #close multiple times = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0004_be able to handle to read(length, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0009_be able to handle each = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0013_handle partial writes to tempfile = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0011_buffer into a Tempfile when data has been consumed for the first time = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0010_not buffer into a Tempfile if no data has been read yet = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0014_close the underlying tempfile upon calling #close when not using posix semantics = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0005_be able to handle to read(nil, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0007_be able to handle gets = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0015_be possible to call #close when no data has been buffered yet = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0003_be able to handle to read(length) = 0.00 s = .
+Rack::RewindableInput::given an IO object whose rewind method raises Errno::ESPIPE#test_0006_rewind to the beginning when #rewind is called = 0.00 s = .
+Rack::VERSION#test_0001_is a version string = 0.00 s = .
+Rack::Utils#test_0018_parse nil as an empty query string = 0.00 s = .
+Rack::Utils#test_0012_unescape to the given encoding = 0.00 s = .
+Rack::Utils#test_0010_escape path spaces with %20 = 0.00 s = .
+Rack::Utils#test_0025_build query strings correctly = 0.00 s = .
+Rack::Utils#test_0039_return status code for string = 0.00 s = .
+Rack::Utils#test_0043_return rfc2822 format from rfc2822 helper = 0.00 s = .
+Rack::Utils#test_0001_can be mixed in and used = 0.00 s = .
+Rack::Utils#test_0020_parse nested query strings correctly = 0.00 s = .
+Rack::Utils#test_0028_parse query strings that have a non-existent value = 0.00 s = .
+Rack::Utils#test_0006_escape non-UTF8 strings = 0.00 s = .
+Rack::Utils#test_0022_only moves to a new array when the full key has been seen = 0.00 s = .
+Rack::Utils#test_0004_escape correctly for multibyte characters = 0.00 s = .
+Rack::Utils#test_0014_raise on invalid %-encoding when unescaping = 0.00 s = .
+Rack::Utils#test_0030_parse q-values = 0.00 s = .
+Rack::Utils#test_0003_escape correctly = 0.00 s = .
+Rack::Utils#test_0013_unescape String subclasses to a String = 0.00 s = .
+Rack::Utils#test_0002_round trip binary data = 0.00 s = .
+Rack::Utils#test_0009_not hang on escaping long strings that end in % (http://redmine.ruby-lang.org/issues/5149) = 0.00 s = .
+Rack::Utils#test_0007_escape * and ~ like URI.encode_www_form_component = 0.00 s = .
+Rack::Utils#test_0011_unescape correctly = 0.00 s = .
+Rack::Utils#test_0024_allow setting the params hash class to use for parsing query strings = 0.00 s = .
+Rack::Utils#test_0029_build query strings without = with non-existent values = 0.00 s = .
+Rack::Utils#test_0033_escape html entities [&><'"/] = 0.00 s = .
+Rack::Utils#test_0047_clean slash only paths = 0.00 s = .
+Rack::Utils#test_0027_performs the inverse function of #parse_nested_query = 0.00 s = .
+Rack::Utils#test_0015_parse query strings correctly = 0.00 s = .
+Rack::Utils#test_0046_not clean directory traversal with encoded periods = 0.00 s = .
+Rack::Utils#test_0021_can parse a query string with a key that has invalid UTF-8 encoded bytes = 0.00 s = .
+Rack::Utils#test_0005_escape objects that responds to to_s = 0.00 s = .
+Rack::Utils#test_0040_return status code for symbol = 0.00 s = .
+Rack::Utils#test_0034_escape html entities in unicode strings = 0.00 s = .
+Rack::Utils#test_0008_escape to a US-ASCII String = 0.00 s = .
+Rack::Utils#test_0041_return status code and give deprecation warning for obsolete symbols = 0.00 s = .
+Rack::Utils#test_0045_clean unsafe directory traversal to safe path = 0.00 s = .
+Rack::Utils#test_0042_raise an error for an invalid symbol = 0.00 s = .
+Rack::Utils#test_0035_escape_html handles non-strings = 0.00 s = .
+Rack::Utils#test_0044_clean directory traversal = 0.00 s = .
+Rack::Utils#test_0016_parse query strings correctly using arrays = 0.00 s = .
+Rack::Utils#test_0017_not create infinite loops with cycle structures = 0.00 s = .
+Rack::Utils#test_0032_select best quality match = 0.00 s = .
+Rack::Utils#test_0036_figure out which encodings are acceptable = 0.00 s = .
+Rack::Utils#test_0031_parses RFC 7239 Forwarded header = 0.02 s = .
+Rack::Utils#test_0026_build nested query strings correctly = 0.00 s = .
+Rack::Utils#test_0037_should perform constant time string comparison = 0.00 s = .
+Rack::Utils#test_0023_handles unexpected use of [ and ] in parameter keys as normal characters = 0.00 s = .
+Rack::Utils#test_0019_raise an exception if the params are too deep = 0.00 s = .
+Rack::Utils#test_0038_return status code for integer = 0.00 s = .
+Rack::MockResponse#test_0002_provides access to the HTTP status = 0.00 s = .
+Rack::MockResponse#test_0015_provides access to the Rack errors = 0.00 s = .
+Rack::MockResponse#test_0017_ignores plain strings passed as errors = 0.00 s = .
+Rack::MockResponse#test_0021_closes streaming bodies that respond to close = 0.00 s = .
+Rack::MockResponse#test_0012_handles an empty cookie = 0.00 s = .
+Rack::MockResponse#test_0014_provides access to the HTTP body = 0.00 s = .
+Rack::MockResponse#test_0013_parses multiple set-cookie headers provided as hash with array value = 0.00 s = .
+Rack::MockResponse#test_0010_parses cookie headers with equals sign at the end = 0.00 s = .
+Rack::MockResponse#test_0011_returns nil if a non existent cookie is requested = 0.00 s = .
+Rack::MockResponse#test_0007_provides access to persistent cookies set with expires = 0.00 s = .
+Rack::MockResponse#test_0008_parses cookies giving max-age precedence over expires = 0.00 s = .
+Rack::MockResponse#test_0003_provides access to the HTTP headers = 0.00 s = .
+Rack::MockResponse#test_0018_optionally makes Rack errors fatal = 0.00 s = .
+Rack::MockResponse#test_0009_provides access to secure cookies = 0.00 s = .
+Rack::MockResponse#test_0001_has standard constructor = 0.00 s = .
+Rack::MockResponse#test_0016_allows calling body.close afterwards = 0.00 s = .
+Rack::MockResponse#test_0004_provides access to session cookies = 0.00 s = .
+Rack::MockResponse#test_0005_forwards keyword arguments from cookies to their values = 0.00 s = .
+Rack::MockResponse#test_0020_handles Proc bodies = 0.00 s = .
+Rack::MockResponse#test_0019_does not calculate content length for streaming body = 0.00 s = .
+Rack::MockResponse#test_0006_provides access to persistent cookies set with max-age = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0002_be able to handle to read(nil) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0008_be able to handle size = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0001_be able to handle to read() = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0012_close the underlying tempfile upon calling #close = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0016_be possible to call #close multiple times = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0004_be able to handle to read(length, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0009_be able to handle each = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0013_handle partial writes to tempfile = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0011_buffer into a Tempfile when data has been consumed for the first time = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0010_not buffer into a Tempfile if no data has been read yet = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0014_close the underlying tempfile upon calling #close when not using posix semantics = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0005_be able to handle to read(nil, buffer) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0007_be able to handle gets = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0015_be possible to call #close when no data has been buffered yet = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0003_be able to handle to read(length) = 0.00 s = .
+Rack::RewindableInput::given an IO object that is already rewindable#test_0006_rewind to the beginning when #rewind is called = 0.00 s = .
+Rack::Directory#test_0002_serve root directory index = 0.00 s = .
+Rack::Directory#test_0015_uri escape path parts = 0.00 s = .
+Rack::Directory#test_0017_correctly escape script name with ' = 0.00 s = .
+Rack::Directory#test_0021_handles root directory ending in separator = 0.00 s = .
+Rack::Directory#test_0012_not allow directory traversal via root prefix bypass = 0.00 s = .
+Rack::Directory#test_0014_404 if it can't find the file = 0.00 s = .
+Rack::Directory#test_0013_not allow dir globs = 0.00 s = .
+Rack::Directory#test_0010_allow directory traversal inside root directory = 0.00 s = .
+Rack::Directory#test_0011_not allow directory traversal = 0.00 s = .
+Rack::Directory#test_0007_pass to app if file found = 0.00 s = .
+Rack::Directory#test_0008_serve uri with URL encoded filenames = 0.00 s = .
+Rack::Directory#test_0003_serve directory indices = 0.00 s = .
+Rack::Directory#test_0018_correctly escape script name = 0.00 s = .
+Rack::Directory#test_0009_serve uri with URL encoded null byte (%00) in filenames = 0.00 s = .
+Rack::Directory#test_0001_serves directories with + in the name = 0.00 s = .
+Rack::Directory#test_0016_correctly escape script name with spaces = 0.00 s = .
+Rack::Directory#test_0004_return 404 for pipes = 0.00 s = .
+Rack::Directory#test_0005_serve directory indices with bad symlinks = 0.00 s = .
+Rack::Directory#test_0020_handles root paths containing regex metacharacters = 0.00 s = .
+Rack::Directory#test_0019_return error when file not found for head request = 0.00 s = .
+Rack::Directory#test_0006_return 404 for unreadable directories = 0.00 s = .
+RackRequestTest#test_0152_not strip '46' => '.' => '.' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0218_not strip '112' => 'p' => 'p' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0215_not strip '109' => 'm' => 'm' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0102_parse with junk before boundary = 0.00 s = .
+RackRequestTest#test_0054_handle empty values in form_pairs = 0.00 s = .
+RackRequestTest#test_0178_not strip '72' => 'H' => 'H' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0111_detect invalid multipart form data = 0.00 s = .
+RackRequestTest#test_0210_not strip '104' => 'h' => 'h' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0003_can get a key from the env = 0.00 s = .
+RackRequestTest#test_0217_not strip '111' => 'o' => 'o' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0233_handles ASCII NUL input of 33554432 bytes = 0.21 s = .
+RackRequestTest#test_0155_not strip '49' => '1' => '1' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0065_treat empty content type as nil = 0.00 s = .
+RackRequestTest#test_0052_return form_pairs for url-encoded POST data = 0.00 s = .
+RackRequestTest#test_0047_limit POST body read to bytesize_limit when parsing url-encoded data = 0.00 s = .
+RackRequestTest#test_0171_not strip '65' => 'A' => 'A' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0123_uses a custom trusted proxy filter = 0.00 s = .
+RackRequestTest#test_0181_not strip '75' => 'K' => 'K' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0150_not strip '44' => '%2C' => ',' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0104_parse multipart form data = 0.00 s = .
+RackRequestTest#test_0040_return empty POST data if rack.input is missing = 0.00 s = .
+RackRequestTest#test_0132_can use Rack::Config to set rack.request.config = 0.00 s = .
+RackRequestTest#test_0005_can calculate the authority without a port = 0.00 s = .
+RackRequestTest#test_0189_not strip '83' => 'S' => 'S' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0060_include file uploads in multipart form_pairs = 0.00 s = .
+RackRequestTest#test_0051_clean up Safari's ajax POST body with limited read = 0.00 s = .
+RackRequestTest#test_0146_not strip '40' => '%28' => '(' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0211_not strip '105' => 'i' => 'i' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0199_not strip '93' => '%5D' => ']' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0202_not strip '96' => '%60' => '`' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0108_closes tempfiles it created in the case of too many created = 0.06 s = .
+RackRequestTest#test_0097_restore the base URL = 0.00 s = .
+RackRequestTest#test_0182_not strip '76' => 'L' => 'L' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0223_not strip '117' => 'u' => 'u' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0196_not strip '90' => 'Z' => 'Z' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0153_not strip '47' => '%2F' => '/' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0063_extract user agent correctly = 0.00 s = .
+RackRequestTest#test_0213_not strip '107' => 'k' => 'k' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0194_not strip '88' => 'X' => 'X' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0074_not modify the params hash in place = 0.00 s = .
+RackRequestTest#test_0176_not strip '70' => 'F' => 'F' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0121_not allow IP spoofing via Client-IP and X-Forwarded-For headers = 0.00 s = .
+RackRequestTest#test_0118_parse Accept-Language correctly = 0.00 s = .
+RackRequestTest#test_0071_parse cookies = 0.00 s = .
+RackRequestTest#test_0204_not strip '98' => 'b' => 'b' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0095_provide setters = 0.00 s = .
+RackRequestTest#test_0093_parse cookies according to RFC 2109 = 0.00 s = .
+RackRequestTest#test_0222_not strip '116' => 't' => 't' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0021_figure out the correct host with port = 0.00 s = .
+RackRequestTest#test_0013_can delete env values = 0.00 s = .
+RackRequestTest#test_0024_handles invalid unicode in query string value = 0.00 s = .
+RackRequestTest#test_0151_not strip '45' => '-' => '-' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0128_trusts only specified IPs when rack.request.trusted_proxy is a callable = 0.00 s = .
+RackRequestTest#test_0177_not strip '71' => 'G' => 'G' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0124_regards local addresses as proxies = 0.00 s = .
+RackRequestTest#test_0068_figure out if prefetch request = 0.00 s = .
+RackRequestTest#test_0161_not strip '55' => '7' => '7' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0131_handles custom logic in rack.request.trusted_proxy callable = 0.00 s = .
+RackRequestTest#test_0092_pass through non-uri escaped cookies as-is = 0.00 s = .
+RackRequestTest#test_0103_not infinite loop with a malformed HTTP request = 0.00 s = .
+RackRequestTest#test_0012_can add to multivalued headers in the env = 0.00 s = .
+RackRequestTest#test_0156_not strip '50' => '2' => '2' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0116_conform to the Rack spec = 0.00 s = .
+RackRequestTest#test_0064_treat missing content type as nil = 0.00 s = .
+RackRequestTest#test_0028_should use the query_parser from environment for query parsing = 0.00 s = .
+RackRequestTest#test_0029_should use the multipart_parser from environment for multipart parsing = 0.00 s = .
+RackRequestTest#test_0148_not strip '42' => '%2A' => '*' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0046_clean up Safari's ajax POST body = 0.00 s = .
+RackRequestTest#test_0045_safely accepts POST requests with empty body = 0.00 s = .
+RackRequestTest#test_0183_not strip '77' => 'M' => 'M' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0007_can calculate the server authority = 0.00 s = .
+RackRequestTest#test_0079_modify params hash by changing only POST = 0.00 s = .
+RackRequestTest#test_0139_not strip '33' => '%21' => '!' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0009_yields to the block if no value has been set = 0.00 s = .
+RackRequestTest#test_0149_not strip '43' => '%2B' => '+' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0109_parse big multipart form data = 0.00 s = .
+RackRequestTest#test_0141_not strip '35' => '%23' => '#' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0170_not strip '64' => '%40' => '@' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0184_not strip '78' => 'N' => 'N' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0006_can calculate the authority without a port on ssl = 0.00 s = .
+RackRequestTest#test_0143_not strip '37' => '%25' => '%' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0134_sets the default session options to an empty hash = 0.00 s = .
+RackRequestTest#test_0154_not strip '48' => '0' => '0' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0061_return empty array for empty multipart form_pairs = 0.00 s = .
+RackRequestTest#test_0130_supports IPv6 addresses in rack.request.trusted_proxy callable = 0.00 s = .
+RackRequestTest#test_0043_not parse POST data when media type is not form-data = 0.00 s = .
+RackRequestTest#test_0173_not strip '67' => 'C' => 'C' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0235_handles ASCII NUL input of 134217728 bytes = 0.84 s = .
+RackRequestTest#test_0022_does not leak invalid Host through host_with_port; base_url uses SERVER_NAME = 0.00 s = .
+RackRequestTest#test_0138_not strip '32' => '+' => ' ' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0185_not strip '79' => 'O' => 'O' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0208_not strip '102' => 'f' => 'f' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0135_allow subclass request to be instantiated after parent request = 0.00 s = .
+RackRequestTest#test_0077_modify params hash, even if param didn't exist before = 0.00 s = .
+RackRequestTest#test_0014_can recognize a QUERY request = 0.00 s = .
+RackRequestTest#test_0175_not strip '69' => 'E' => 'E' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0050_truncate POST body at bytesize_limit when parsing url-encoded data = 0.01 s = .
+RackRequestTest#test_0025_handles invalid unicode in query string key = 0.00 s = .
+RackRequestTest#test_0209_not strip '103' => 'g' => 'g' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0105_parse multipart delimiter-only boundary = 0.00 s = .
+RackRequestTest#test_0162_not strip '56' => '8' => '8' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0220_not strip '114' => 'r' => 'r' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0100_handle multiple media type parameters = 0.00 s = .
+RackRequestTest#test_0167_not strip '61' => '%3D' => '=' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0137_raise TypeError every time if request parameters are broken = 0.00 s = .
+RackRequestTest#test_0031_should parse url-encoded POST data if multipart_parser is nil in environment = 0.00 s = .
+RackRequestTest#test_0019_have forwarded_* methods respect forwarded_priority set globally = 0.00 s = .
+RackRequestTest#test_0195_not strip '89' => 'Y' => 'Y' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0227_not strip '121' => 'y' => 'y' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0066_return nil media type for empty content type = 0.00 s = .
+RackRequestTest#test_0163_not strip '57' => '9' => '9' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0232_handles ASCII NUL input of 16777216 bytes = 0.15 s = .
+RackRequestTest#test_0001_copies the env when duping = 0.00 s = .
+RackRequestTest#test_0038_use the query_parser's params_class for multipart params = 0.00 s = .
+RackRequestTest#test_0207_not strip '101' => 'e' => 'e' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0193_not strip '87' => 'W' => 'W' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0018_use rack.request.config :authority for authority host, hostname, host_with_port, and port = 0.00 s = .
+RackRequestTest#test_0016_figure out the correct host = 0.00 s = .
+RackRequestTest#test_0203_not strip '97' => 'a' => 'a' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0008_can calculate the port without an authority = 0.00 s = .
+RackRequestTest#test_0192_not strip '86' => 'V' => 'V' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0190_not strip '84' => 'T' => 'T' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0127_trusts no proxies when rack.request.trusted_proxy is false = 0.00 s = .
+RackRequestTest#test_0069_ssl detection = 0.00 s = .
+RackRequestTest#test_0113_correctly parse the part name from Content-Id header = 0.00 s = .
+RackRequestTest#test_0042_parse POST data with explicit content type regardless of method = 0.00 s = .
+RackRequestTest#test_0044_parse POST data on PUT when media type is form-data = 0.00 s = .
+RackRequestTest#test_0076_modify params hash if param is in POST = 0.00 s = .
+RackRequestTest#test_0125_uses rack.request.trusted_proxy env key when set to nil (default behavior) = 0.00 s = .
+RackRequestTest#test_0236_Env sets @env on initialization = 0.00 s = .
+RackRequestTest#test_0174_not strip '68' => 'D' => 'D' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0041_parse POST data when method is POST and no content-type given = 0.00 s = .
+RackRequestTest#test_0062_extract referrer correctly = 0.00 s = .
+RackRequestTest#test_0017_figure out the correct port = 0.00 s = .
+RackRequestTest#test_0082_allow deleting from params hash if param is in POST = 0.00 s = .
+RackRequestTest#test_0198_not strip '92' => '%5C' => '\' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0226_not strip '120' => 'x' => 'x' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0180_not strip '74' => 'J' => 'J' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0032_should use the default multipart_parser if rack.request.config does not include multipart_parser = 0.00 s = .
+RackRequestTest#test_0191_not strip '85' => 'U' => 'U' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0036_limit the allowed parameter depth when parsing parameters = 0.00 s = .
+RackRequestTest#test_0049_handle nil return from rack.input.read when parsing url-encoded data = 0.00 s = .
+RackRequestTest#test_0230_not strip '124' => '%7C' => '|' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0212_not strip '106' => 'j' => 'j' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0122_preserves ip for trusted proxy chain = 0.00 s = .
+RackRequestTest#test_0160_not strip '54' => '6' => '6' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0059_preserve duplicate keys in multipart form_pairs = 0.00 s = .
+RackRequestTest#test_0221_not strip '115' => 's' => 's' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0197_not strip '91' => '%5B' => '[' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0187_not strip '81' => 'Q' => 'Q' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0020_have forwarded_* methods respect forwarded_priority set via rack.request.config = 0.00 s = .
+RackRequestTest#test_0145_not strip '39' => '%27' => ''' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0089_set or add HTTP header in env via headers.add = 0.00 s = .
+RackRequestTest#test_0206_not strip '100' => 'd' => 'd' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0144_not strip '38' => '%26' => '&' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0004_can calculate the authority = 0.00 s = .
+RackRequestTest#test_0098_restore the URL = 0.00 s = .
+RackRequestTest#test_0186_not strip '80' => 'P' => 'P' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0086_allows deleting specific HTTP header via headers.delete = 0.00 s = .
+RackRequestTest#test_0033_should not use the multipart_parser for url-encoded POST data = 0.00 s = .
+RackRequestTest#test_0107_MultipartPartLimitError when request has too many multipart total parts if limit set = 0.04 s = .
+RackRequestTest#test_0126_trusts all proxies when rack.request.trusted_proxy is true = 0.00 s = .
+RackRequestTest#test_0110_record tempfiles from multipart form data in env[rack.tempfiles] = 0.00 s = .
+RackRequestTest#test_0073_modify the cookies hash in place = 0.00 s = .
+RackRequestTest#test_0205_not strip '99' => 'c' => 'c' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0094_parse cookies with quotes = 0.00 s = .
+RackRequestTest#test_0057_raise same error for form_pairs as POST with invalid encoding = 0.00 s = .
+RackRequestTest#test_0157_not strip '51' => '3' => '3' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0067_figure out if called via XHR = 0.00 s = .
+RackRequestTest#test_0228_not strip '122' => 'z' => 'z' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0219_not strip '113' => 'q' => 'q' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0011_can set values in the env = 0.00 s = .
+RackRequestTest#test_0114_not try to interpret binary as utf8 = 0.00 s = .
+RackRequestTest#test_0075_modify params hash if param is in GET = 0.00 s = .
+RackRequestTest#test_0188_not strip '82' => 'R' => 'R' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0140_not strip '34' => '%22' => '"' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0088_ignore headers.add for existing env values that are not strings or arrays = 0.00 s = .
+RackRequestTest#test_0010_can iterate over values = 0.00 s = .
+RackRequestTest#test_0214_not strip '108' => 'l' => 'l' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0002_can check if something has been set = 0.00 s = .
+RackRequestTest#test_0106_MultipartPartLimitError when request has too many multipart file parts if limit set = 0.03 s = .
+RackRequestTest#test_0056_return empty array for form_pairs with non-form content type = 0.00 s = .
+RackRequestTest#test_0129_supports CIDR ranges in rack.request.trusted_proxy callable = 0.00 s = .
+RackRequestTest#test_0084_allows access to specific HTTP header via headers.fetch = 0.00 s = .
+RackRequestTest#test_0168_not strip '62' => '%3E' => '>' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0030_should not parse multipart data if multipart_parser is nil in environment = 0.00 s = .
+RackRequestTest#test_0078_modify params hash by changing only GET = 0.00 s = .
+RackRequestTest#test_0085_allows checking for specific HTTP header via headers.has_key? = 0.00 s = .
+RackRequestTest#test_0058_return form_pairs for multipart form data = 0.00 s = .
+RackRequestTest#test_0027_should use the query_parser set via attr_writer for query parsing = 0.00 s = .
+RackRequestTest#test_0224_not strip '118' => 'v' => 'v' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0053_preserve duplicate keys in form_pairs = 0.00 s = .
+RackRequestTest#test_0216_not strip '110' => 'n' => 'n' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0172_not strip '66' => 'B' => 'B' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0070_prevents scheme abuse = 0.00 s = .
+RackRequestTest#test_0048_read POST body without a length limit when bytesize_limit is nil = 0.00 s = .
+RackRequestTest#test_0158_not strip '52' => '4' => '4' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0142_not strip '36' => '%24' => '$' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0037_not unify GET and POST when calling params = 0.00 s = .
+RackRequestTest#test_0201_not strip '95' => '_' => '_' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0200_not strip '94' => '%5E' => '^' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0099_restore the full path = 0.00 s = .
+RackRequestTest#test_0034_return empty form_pairs for multipart content type without boundary = 0.00 s = .
+RackRequestTest#test_0169_not strip '63' => '%3F' => '?' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0039_raise if input params has invalid %-encoding = 0.00 s = .
+RackRequestTest#test_0101_returns the same error for invalid post inputs = 0.00 s = .
+RackRequestTest#test_0119_provide ip information = 0.00 s = .
+RackRequestTest#test_0112_consistently raise EOFError on bad multipart form data = 0.00 s = .
+RackRequestTest#test_0090_allows iterating over HTTP headers via headers.each = 0.00 s = .
+RackRequestTest#test_0015_wrap the rack variables = 0.00 s = .
+RackRequestTest#test_0225_not strip '119' => 'w' => 'w' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0091_allows retrieving a hash of HTTP headers via headers.to_h = 0.00 s = .
+RackRequestTest#test_0147_not strip '41' => '%29' => ')' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0117_parse Accept-Encoding correctly = 0.00 s = .
+RackRequestTest#test_0133_sets the default session to an empty hash = 0.00 s = .
+RackRequestTest#test_0072_always return the same hash object = 0.00 s = .
+RackRequestTest#test_0055_return empty array for form_pairs with no POST data = 0.00 s = .
+RackRequestTest#test_0136_allow parent request to be instantiated after subclass request = 0.00 s = .
+RackRequestTest#test_0087_set HTTP header in env via headers[]= = 0.00 s = .
+RackRequestTest#test_0120_deals with proxies = 0.00 s = .
+RackRequestTest#test_0035_does not use semi-colons as separators for query strings in GET = 0.00 s = .
+RackRequestTest#test_0165_not strip '59' => '%3B' => ';' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0080_modify params hash, even if param is defined in both POST and GET = 0.00 s = .
+RackRequestTest#test_0081_allow deleting from params hash if param is in GET = 0.00 s = .
+RackRequestTest#test_0096_provide the original env = 0.00 s = .
+RackRequestTest#test_0164_not strip '58' => '%3A' => ':' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0231_not strip '125' => '%7D' => '}' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0159_not strip '53' => '5' => '5' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0115_use form_hash when form_input is a Tempfile = 0.00 s = .
+RackRequestTest#test_0026_not truncate query strings containing semi-colons #543 only in POST = 0.00 s = .
+RackRequestTest#test_0234_handles ASCII NUL input of 67108864 bytes = 0.44 s = .
+RackRequestTest#test_0229_not strip '123' => '%7B' => '{' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0023_parse the query string = 0.00 s = .
+RackRequestTest#test_0179_not strip '73' => 'I' => 'I' escaped character from parameters when accessed as string = 0.00 s = .
+RackRequestTest#test_0083_allows access to specific HTTP header via headers[] = 0.00 s = .
+RackRequestTest#test_0166_not strip '60' => '%3C' => '<' escaped character from parameters when accessed as string = 0.00 s = .
+Rack::ETag#test_0002_returns a valid response body when using a linted app = 0.00 s = .
+Rack::ETag#test_0008_not set cache-control if directive isn't present = 0.00 s = .
+Rack::ETag#test_0001_set etag if none is set if status is 200 = 0.00 s = .
+Rack::ETag#test_0012_not set etag if last-modified is set = 0.00 s = .
+Rack::ETag#test_0016_close the original body = 0.00 s = .
+Rack::ETag#test_0004_set cache-control to 'max-age=0, private, must-revalidate' (default) if none is set = 0.00 s = .
+Rack::ETag#test_0009_not change etag if it is already set = 0.00 s = .
+Rack::ETag#test_0013_not set etag if a sendfile_body is given = 0.00 s = .
+Rack::ETag#test_0011_set handle empty body parts = 0.00 s = .
+Rack::ETag#test_0010_not set etag if body is empty = 0.00 s = .
+Rack::ETag#test_0014_not set etag if a status is not 200 or 201 = 0.00 s = .
+Rack::ETag#test_0005_set cache-control to chosen one if none is set = 0.00 s = .
+Rack::ETag#test_0007_not set cache-control if it is already set = 0.00 s = .
+Rack::ETag#test_0015_set etag even if no-cache is given = 0.00 s = .
+Rack::ETag#test_0003_set etag if none is set if status is 201 = 0.00 s = .
+Rack::ETag#test_0006_set a given cache-control even if digest could not be calculated = 0.00 s = .
+Rack::MethodOverride#test_0002_sets rack.errors for invalid UTF8 _method values = 0.00 s = .
+Rack::MethodOverride#test_0008_store the original REQUEST_METHOD prior to overriding = 0.00 s = .
+Rack::MethodOverride#test_0001_not affect GET requests = 0.00 s = .
+Rack::MethodOverride#test_0012_writes error to RACK_ERRORS when the multipart boundary is too long = 0.00 s = .
+Rack::MethodOverride#test_0016_not set form input when the content type is JSON = 0.00 s = .
+Rack::MethodOverride#test_0004_modify REQUEST_METHOD for POST requests when _method parameter is set to query = 0.00 s = .
+Rack::MethodOverride#test_0009_not modify REQUEST_METHOD when given invalid multipart form data = 0.00 s = .
+Rack::MethodOverride#test_0013_writes error to RACK_ERRORS when the multipart part limit is exceeded = 0.01 s = .
+Rack::MethodOverride#test_0011_writes error to RACK_ERRORS when using incompatible multipart encoding = 0.00 s = .
+Rack::MethodOverride#test_0010_writes error to RACK_ERRORS when given invalid multipart form data = 0.00 s = .
+Rack::MethodOverride#test_0014_not modify REQUEST_METHOD for POST requests when the params are unparseable because too deep = 0.00 s = .
+Rack::MethodOverride#test_0005_modify REQUEST_METHOD for POST requests when X-HTTP-Method-Override is set = 0.00 s = .
+Rack::MethodOverride#test_0007_not modify REQUEST_METHOD when _method is nil = 0.00 s = .
+Rack::MethodOverride#test_0015_not modify REQUEST_METHOD for POST requests when the params are unparseable = 0.00 s = .
+Rack::MethodOverride#test_0003_modify REQUEST_METHOD for POST requests when _method parameter is set = 0.00 s = .
+Rack::MethodOverride#test_0006_not modify REQUEST_METHOD if the method is unknown = 0.00 s = .
+Rack::MockResponse::headers#test_0002_get_header = 0.00 s = .
+Rack::MockResponse::headers#test_0004_add_header = 0.00 s = .
+Rack::MockResponse::headers#test_0001_has_header? = 0.00 s = .
+Rack::MockResponse::headers#test_0005_delete_header = 0.00 s = .
+Rack::MockResponse::headers#test_0007_delegates respond_to? for cookies to the cookie value = 0.00 s = .
+Rack::MockResponse::headers#test_0003_set_header = 0.00 s = .
+Rack::MockResponse::headers#test_0006_does not add extra headers = 0.00 s = .
+Rack::Sendfile#test_0008_sets x-accel-redirect response header to percent-encoded path = 0.00 s = .
+Rack::Sendfile#test_0014_ignores x-accel-mapping header when mappings are configured but none match = 0.00 s = .
+Rack::Sendfile#test_0001_does nothing when no x-sendfile-type header present = 0.00 s = .
+Rack::Sendfile#test_0010_does nothing when body does not respond to #to_path = 0.00 s = .
+Rack::Sendfile#test_0004_closes body when x-sendfile used = 0.00 s = .
+Rack::Sendfile#test_0011_sets x-accel-redirect response header and discards body when initialized with multiple mappings = 0.00 s = .
+Rack::Sendfile#test_0009_writes to rack.error when no x-accel-mapping is specified = 0.00 s = .
+Rack::Sendfile#test_0002_does nothing and logs to rack.errors when incorrect x-sendfile-type header present = 0.00 s = .
+Rack::Sendfile#test_0012_sets x-accel-redirect response header and discards body when initialized with multiple mappings via header = 0.00 s = .
+Rack::Sendfile#test_0005_sets x-lighttpd-send-file response header and discards body = 0.00 s = .
+Rack::Sendfile#test_0007_does not do a regexp substitution on the internal path = 0.00 s = .
+Rack::Sendfile#test_0013_ignores x-accel-mapping header when x-accel-redirect is not configured via the constructor = 0.00 s = .
+Rack::Sendfile#test_0003_sets x-sendfile response header and discards body = 0.00 s = .
+Rack::Sendfile#test_0006_sets x-accel-redirect response header and discards body = 0.00 s = .
+Rack::Utils::cookies#test_0004_raises an error if the cookie key is invalid = 0.00 s = .
+Rack::Utils::cookies#test_0001_parses cookies = 0.00 s = .
+Rack::Utils::cookies#test_0009_sets and deletes cookies in header hash = 0.00 s = .
+Rack::Utils::cookies#test_0002_generates appropriate cookie header value = 0.00 s = .
+Rack::Utils::cookies#test_0007_deletes cookies in header field with domain = 0.00 s = .
+Rack::Utils::cookies#test_0005_sets partitioned cookie attribute = 0.00 s = .
+Rack::Utils::cookies#test_0008_deletes cookies in header field with path = 0.00 s = .
+Rack::Utils::cookies#test_0003_sets and deletes cookies in header hash = 0.00 s = .
+Rack::Utils::cookies#test_0006_deletes cookies in header field = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and empty params#test_0001_#type is application/text = 0.00 s = .
+Rack::MediaType::when content_type contains media_type and empty params#test_0002_#params has key "charset" with value of empty string = 0.00 s = .
+Rack::Utils::Context#test_0004_raises for invalid context = 0.00 s = .
+Rack::Utils::Context#test_0001_set context correctly = 0.00 s = .
+Rack::Utils::Context#test_0003_run different apps = 0.00 s = .
+Rack::Utils::Context#test_0002_alter app on recontexting = 0.00 s = .
+Rack::MediaType::when content_type nil#test_0001_#type is nil = 0.00 s = .
+Rack::MediaType::when content_type nil#test_0002_#params is empty = 0.00 s = .
+Rack::RELEASE#test_0001_is the same as VERSION = 0.00 s = .
+Rack::Multipart#test_0062_parses multipart form with a single quote in the filename = 0.00 s = .
+Rack::Multipart#test_0092_raises ArgumentError if params is not a Hash = 0.00 s = .
+Rack::Multipart#test_0006_raises an exception if Content-Length exceeds total bytesize limit = 0.00 s = .
+Rack::Multipart#test_0049_raises an EOF error on content-length mismatch = 0.00 s = .
+Rack::Multipart#test_0098_limits very long file name extensions in multipart tempfiles = 0.00 s = .
+Rack::Multipart#test_0007_allows requests within the total bytesize limit = 0.00 s = .
+Rack::Multipart#test_0054_parses multipart upload file using custom tempfile class = 0.00 s = .
+Rack::Multipart#test_0063_parses multipart form with a null byte in the filename = 0.00 s = .
+Rack::Multipart#test_0060_parses multipart upload with a filename containing invalid characters = 0.00 s = .
+Rack::Multipart#test_0099_parses unquoted parameter values at end of line = 0.00 s = .
+Rack::Multipart#test_0093_is able to parse fields with a content type = 0.00 s = .
+Rack::Multipart#test_0100_parses quoted chars in name parameter = 0.00 s = .
+Rack::Multipart#test_0042_parses content-disposition with escaped parameter values in name = 0.00 s = .
+Rack::Multipart#test_0028_parses when the MIME head terminator straddles the BUFSIZE boundary = 0.01 s = .
+Rack::Multipart#test_0088_treats a multipart limit of 0 as no limit = 0.00 s = .
+Rack::Multipart#test_0018_sets US_ASCII encoding based on charset = 0.00 s = .
+Rack::Multipart#test_0059_parses multipart upload with quoted boundary = 0.00 s = .
+Rack::Multipart#test_0077_supports uploading files in binary mode = 0.00 s = .
+Rack::Multipart#test_0065_does not include file params if no file was selected = 0.00 s = .
+Rack::Multipart#test_0089_reaches a multipart file limit = 0.00 s = .
+Rack::Multipart#test_0061_parses multipart form with an encoded word filename = 0.00 s = .
+Rack::Multipart#test_0084_can parse fields that end at the end of the buffer = 0.00 s = .
+Rack::Multipart#test_0075_parses filename with unescaped percentage characters that look like partial hex escapes = 0.00 s = .
+Rack::Multipart#test_0032_rejects excessive buffered mime data size when split into multiple parameters = 0.08 s = .
+Rack::Multipart#test_0108_returns nil when parsing input without a content type = 0.00 s = .
+Rack::Multipart#test_0094_parses multipart upload with no content-length header = 0.00 s = .
+Rack::Multipart#test_0069_parses filename with escaped quotes = 0.00 s = .
+Rack::Multipart#test_0074_parses filename with unescaped percentage characters that look like partial hex escapes = 0.00 s = .
+Rack::Multipart#test_0052_preserves extension in the created tempfile = 0.00 s = .
+Rack::Multipart#test_0079_builds multipart body = 0.00 s = .
+Rack::Multipart#test_0020_sets BINARY encoding on things without content type = 0.00 s = .
+Rack::Multipart#test_0017_prefers filename over filename* when both are present = 0.00 s = .
+Rack::Multipart#test_0045_allows content-disposition values up to 1536 bytes = 0.00 s = .
+Rack::Multipart#test_0068_parses filename and modification param = 0.00 s = .
+Rack::Multipart#test_0102_falls back to content-type for the name = 0.00 s = .
+Rack::Multipart#test_0016_ignores initial end boundaries = 0.00 s = .
+Rack::Multipart#test_0091_returns nil if no UploadedFiles were used = 0.00 s = .
+Rack::Multipart#test_0004_ignores a parameter whose name merely ends in boundary = 0.00 s = .
+Rack::Multipart#test_0013_parses multipart content when content type is present but disposition is not when using IO = 0.00 s = .
+Rack::Multipart#test_0086_does not reach a multi-part limit = 0.00 s = .
+Rack::Multipart#test_0067_parses IE multipart upload and cleans up the filename = 0.00 s = .
+Rack::Multipart#test_0022_sets default text to UTF8 = 0.00 s = .
+Rack::Multipart#test_0047_allows up to 8192 quoted escapes during parsing = 0.05 s = .
+Rack::Multipart#test_0033_allows large nonbuffered mime parameters = 0.09 s = .
+Rack::Multipart#test_0043_parses up to 16 content-disposition params = 0.00 s = .
+Rack::Multipart#test_0046_ignores content-disposition values over to 1536 bytes = 0.00 s = .
+Rack::Multipart#test_0025_rejects insanely long boundaries = 0.01 s = .
+Rack::Multipart#test_0009_enforces total bytesize limit during streaming when Content-Length is absent = 0.00 s = .
+Rack::Multipart#test_0085_builds complete params with the chunk size of 16384 slicing exactly on boundary = 0.00 s = .
+Rack::Multipart#test_0076_raises a RuntimeError for invalid file path = 0.00 s = .
+Rack::Multipart#test_0064_is robust separating content-disposition fields = 0.00 s = .
+Rack::Multipart#test_0003_raises an exception if there are multiple boundries = 0.00 s = .
+Rack::Multipart#test_0104_handles Content-Disposition without semicolon = 0.00 s = .
+Rack::Multipart#test_0071_parses filename with percent escaped quotes = 0.00 s = .
+Rack::Multipart#test_0057_parses multipart upload with an empty file = 0.00 s = .
+Rack::Multipart#test_0050_parses multipart upload with text file = 0.00 s = .
+Rack::Multipart#test_0011_parses multipart content when content type is present but disposition is not = 0.00 s = .
+Rack::Multipart#test_0105_handles Content-Type parameter without equals sign = 0.00 s = .
+Rack::Multipart#test_0021_sets UTF8 encoding on names of things without a content type = 0.00 s = .
+Rack::Multipart#test_0012_parses multipart content when called using Rack::Request#parse_multipart = 0.00 s = .
+Rack::Multipart#test_0024_parses multipart form webkit style = 0.00 s = .
+Rack::Multipart#test_0010_raises a bad request exception if no body is given but content type indicates a multipart body = 0.00 s = .
+Rack::Multipart#test_0073_parses filename with unescaped percentage characters = 0.00 s = .
+Rack::Multipart#test_0029_does not retain parsed parts when reads end inside a MIME head = 0.00 s = .
+Rack::Multipart#test_0002_raises an exception if boundary is too long = 0.00 s = .
+Rack::Multipart#test_0066_parses multipart/mixed = 0.00 s = .
+Rack::Multipart#test_0056_parses multipart upload with binary file = 0.00 s = .
+Rack::Multipart#test_0001_returns nil if the content type is not multipart = 0.00 s = .
+Rack::Multipart#test_0040_parses content-disposition with IE full paths in filename = 0.00 s = .
+Rack::Multipart#test_0078_delegates keyword arguments to the tempfile = 0.00 s = .
+Rack::Multipart#test_0058_parses multipart upload with a filename containing semicolons = 0.00 s = .
+Rack::Multipart#test_0027_rejects excessive mime header size = 0.01 s = .
+Rack::Multipart#test_0053_parses multipart upload with text file with a no name field = 0.00 s = .
+Rack::Multipart#test_0097_does not remove escaped quotes in filenames = 0.00 s = .
+Rack::Multipart#test_0044_stops parsing content-disposition after 16 params = 0.00 s = .
+Rack::Multipart#test_0070_parses filename with plus character = 0.00 s = .
+Rack::Multipart#test_0048_disallows more than 8192 quoted escapes during parsing = 0.03 s = .
+Rack::Multipart#test_0030_does not retain parsed parts when reads end at the start of a MIME body = 0.00 s = .
+Rack::Multipart#test_0014_parses multipart content when content type present but filename is not = 0.00 s = .
+Rack::Multipart#test_0095_parses very long unquoted multipart file names = 0.00 s = .
+Rack::Multipart#test_0082_builds nested multipart body using hash = 0.00 s = .
+Rack::Multipart#test_0090_reaches a multipart total limit = 0.00 s = .
+Rack::Multipart#test_0034_parses strange multipart pdf = 0.04 s = .
+Rack::Multipart#test_0041_parses content-disposition with escaped parameter values in name = 0.00 s = .
+Rack::Multipart#test_0039_parses content-disposition with backslash escaped parameter values = 0.00 s = .
+Rack::Multipart#test_0107_uses the default query parser when parsing directly from env = 0.00 s = .
+Rack::Multipart#test_0015_raises for invalid data preceding the boundary = 0.00 s = .
+Rack::Multipart#test_0019_sets BINARY encoding for invalid charsets = 0.00 s = .
+Rack::Multipart#test_0005_raises an exception if a boundary parameter precedes the one that is parsed = 0.00 s = .
+Rack::Multipart#test_0072_parses filename with escaped quotes and modification param = 0.00 s = .
+Rack::Multipart#test_0055_parses multipart upload with nested parameters = 0.00 s = .
+Rack::Multipart#test_0008_skips total bytesize check when there is no limit = 0.00 s = .
+Rack::Multipart#test_0087_treats a multipart limit of 0 as no limit = 0.00 s = .
+Rack::Multipart#test_0035_parses content-disposition with modification date before the name parameter = 0.00 s = .
+Rack::Multipart#test_0037_parses content-disposition with name= in parameter value before the name parameter = 0.00 s = .
+Rack::Multipart#test_0080_builds multipart filename with space = 0.00 s = .
+Rack::Multipart#test_0081_builds nested multipart body using array = 0.00 s = .
+Rack::Multipart#test_0096_parses very long quoted multipart file names = 0.00 s = .
+Rack::Multipart#test_0036_parses content-disposition with colon in parameter value before the name parameter = 0.00 s = .
+Rack::Multipart#test_0103_supports ISO-2022-JP-encoded part = 0.00 s = .
+Rack::Multipart#test_0031_rejects excessive buffered mime data size in a single parameter = 0.08 s = .
+Rack::Multipart#test_0026_rejects excessive data before boundary = 0.01 s = .
+Rack::Multipart#test_0106_prevents CRLF injection in parameter values via obs-fold = 0.00 s = .
+Rack::Multipart#test_0101_supports mixed case metadata = 0.00 s = .
+Rack::Multipart#test_0023_handles quoted encodings = 0.00 s = .
+Rack::Multipart#test_0051_accepts the params hash class to use for multipart parsing = 0.00 s = .
+Rack::Multipart#test_0083_builds multipart body from StringIO = 0.00 s = .
+Rack::Multipart#test_0038_parses content-disposition with unquoted parameter values = 0.00 s = .
+Rack::Lock#test_0004_call synchronize on lock = 0.00 s = .
+Rack::Lock#test_0001_call super on close = 0.00 s = .
+Rack::Lock#test_0009_not replace the environment = 0.00 s = .
+Rack::Lock#test_0002_not unlock until body is closed = 0.00 s = .
+Rack::Lock#test_0007_not unlock if an error is raised before the mutex is locked = 0.00 s = .
+Rack::Lock#test_0005_unlock if the app raises = 0.00 s = .
+Rack::Lock#test_0008_unlock if an exception occurs before returning = 0.00 s = .
+Rack::Lock#test_0003_return value from app = 0.00 s = .
+Rack::Lock#test_0006_unlock if the app throws = 0.00 s = .
+Rack::Runtime#test_0004_allow multiple timers to be set = 0.10 s = .
+Rack::Runtime#test_0001_sets x-runtime is none is set = 0.00 s = .
+Rack::Runtime#test_0003_allow a suffix to be set = 0.00 s = .
+Rack::Runtime#test_0002_doesn't set the x-runtime if it is already set = 0.00 s = .
+Rack::NullLogger#test_0001_act as a noop logger = 0.00 s = .
+
+Finished in 4.441148s, 290.9157 runs/s, 1411.7970 assertions/s.
+
+  1) Skipped:
+RackRequestTest::TestProxyRequest#test_0074_not modify the params hash in place [test/spec_request.rb:1405]:
+delegate requests don't cache params, so mutations have no impact
+
+  2) Skipped:
+RackRequestTest::TestProxyRequest#test_0001_copies the env when duping [test/spec_request.rb:20]:
+delegate requests don't dup environments
+
+1292 runs, 6270 assertions, 0 failures, 0 errors, 2 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_auth_basic.rb
+Run options: --seed 38599
+
+# Running:
+
+.........
+
+Finished in 0.001229s, 7322.6694 runs/s, 32545.1971 assertions/s.
+
+9 runs, 40 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_body_proxy.rb
+Run options: --seed 10370
+
+# Running:
+
+..............
+
+Finished in 0.000830s, 16862.0050 runs/s, 28906.2942 assertions/s.
+
+14 runs, 24 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_builder.rb
+Run options: --seed 64672
+
+# Running:
+
+............................
+
+Finished in 0.011477s, 2439.7591 runs/s, 5925.1292 assertions/s.
+
+28 runs, 68 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_cascade.rb
+Run options: --seed 16886
+
+# Running:
+
+........
+
+Finished in 0.001827s, 4378.2981 runs/s, 24080.6395 assertions/s.
+
+8 runs, 44 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_common_logger.rb
+Run options: --seed 4916
+
+# Running:
+
+............
+
+Finished in 0.007366s, 1629.1901 runs/s, 5837.9312 assertions/s.
+
+12 runs, 43 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_conditional_get.rb
+Run options: --seed 41314
+
+# Running:
+
+............
+
+Finished in 0.002275s, 5275.0499 runs/s, 14066.7997 assertions/s.
+
+12 runs, 32 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_config.rb
+Run options: --seed 25874
+
+# Running:
+
+.
+
+Finished in 0.001005s, 994.6884 runs/s, 994.6884 assertions/s.
+
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_content_length.rb
+Run options: --seed 41723
+
+# Running:
+
+.......
+
+Finished in 0.001403s, 4988.3629 runs/s, 5700.9861 assertions/s.
+
+7 runs, 8 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_content_type.rb
+Run options: --seed 38499
+
+# Running:
+
+......
+
+Finished in 0.001160s, 5173.3013 runs/s, 5173.3013 assertions/s.
+
+6 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_deflater.rb
+Run options: --seed 44039
+
+# Running:
+
+..............................
+
+Finished in 0.014179s, 2115.8674 runs/s, 7969.7674 assertions/s.
+
+30 runs, 113 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_directory.rb
+Run options: --seed 19726
+
+# Running:
+
+.....................
+
+Finished in 0.013463s, 1559.8410 runs/s, 6165.0857 assertions/s.
+
+21 runs, 83 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_etag.rb
+Run options: --seed 13419
+
+# Running:
+
+................
+
+Finished in 0.001798s, 8897.0247 runs/s, 11121.2809 assertions/s.
+
+16 runs, 20 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_events.rb
+Run options: --seed 52898
+
+# Running:
+
+.........
+
+Finished in 0.000936s, 9617.5732 runs/s, 14960.6695 assertions/s.
+
+9 runs, 14 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_files.rb
+Run options: --seed 47940
+
+# Running:
+
+...................................
+
+Finished in 0.011491s, 3045.7872 runs/s, 11748.0365 assertions/s.
+
+35 runs, 135 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_head.rb
+Run options: --seed 5195
+
+# Running:
+
+....
+
+Finished in 0.001285s, 3113.8388 runs/s, 22575.3315 assertions/s.
+
+4 runs, 29 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_headers.rb
+Run options: --seed 9504
+
+# Running:
+
+...................................................
+
+Finished in 0.002451s, 20808.4278 runs/s, 123218.5334 assertions/s.
+
+51 runs, 302 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_lint.rb
+Run options: --seed 28088
+
+# Running:
+
+.........................................
+
+Finished in 0.028234s, 1452.1522 runs/s, 27767.9826 assertions/s.
+
+41 runs, 784 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_lock.rb
+Run options: --seed 17998
+
+# Running:
+
+............
+
+Finished in 0.001766s, 6794.7361 runs/s, 13023.2442 assertions/s.
+
+12 runs, 23 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_media_type.rb
+Run options: --seed 33311
+
+# Running:
+
+............
+
+Finished in 0.001079s, 11117.0917 runs/s, 11117.0917 assertions/s.
+
+12 runs, 12 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_method_override.rb
+Run options: --seed 20383
+
+# Running:
+
+................
+
+Finished in 0.053286s, 300.2687 runs/s, 450.4030 assertions/s.
+
+16 runs, 24 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_mime.rb
+Run options: --seed 38642
+
+# Running:
+
+........
+
+Finished in 0.000808s, 9906.8386 runs/s, 22290.3868 assertions/s.
+
+8 runs, 18 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_mock_request.rb
+Run options: --seed 27231
+
+# Running:
+
+..........................
+
+Finished in 0.014821s, 1754.2553 runs/s, 7286.9066 assertions/s.
+
+26 runs, 108 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_mock_response.rb
+Run options: --seed 63774
+
+# Running:
+
+............................
+
+Finished in 0.014790s, 1893.1613 runs/s, 8248.7744 assertions/s.
+
+28 runs, 122 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_multipart.rb
+Run options: --seed 47810
+
+# Running:
+
+............................................................................................................
+
+Finished in 0.440420s, 245.2205 runs/s, 790.1551 assertions/s.
+
+108 runs, 348 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_null_logger.rb
+Run options: --seed 43121
+
+# Running:
+
+.
+
+Finished in 0.000815s, 1226.4235 runs/s, 2452.8471 assertions/s.
+
+1 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_query_parser.rb
+Run options: --seed 22647
+
+# Running:
+
+.........
+
+Finished in 0.001628s, 5529.1657 runs/s, 22731.0147 assertions/s.
+
+9 runs, 37 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_recursive.rb
+Run options: --seed 18884
+
+# Running:
+
+...
+
+Finished in 0.001748s, 1716.3345 runs/s, 8009.5611 assertions/s.
+
+3 runs, 14 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_request.rb
+Run options: --seed 52086
+
+# Running:
+
+...................................................................................................................................................................................................................................................................................S............................................................................................................................................................................S.......................
+
+Finished in 3.735279s, 126.3627 runs/s, 678.3965 assertions/s.
+
+472 runs, 2534 assertions, 0 failures, 0 errors, 2 skips
+
+You have skipped tests. Run with --verbose for details.
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_response.rb
+Run options: --seed 31346
+
+# Running:
+
+........................................................................
+
+Finished in 0.003626s, 19854.7022 runs/s, 74179.3735 assertions/s.
+
+72 runs, 269 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_rewindable_input.rb
+Run options: --seed 15991
+
+# Running:
+
+..................................................
+
+Finished in 0.006760s, 7396.2856 runs/s, 13461.2398 assertions/s.
+
+50 runs, 91 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_runtime.rb
+Run options: --seed 56268
+
+# Running:
+
+....
+
+Finished in 0.101980s, 39.2235 runs/s, 107.8645 assertions/s.
+
+4 runs, 11 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_sendfile.rb
+Run options: --seed 58553
+
+# Running:
+
+.....................
+
+Finished in 0.010910s, 1924.7957 runs/s, 12465.3434 assertions/s.
+
+21 runs, 136 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_show_exceptions.rb
+Run options: --seed 36344
+
+# Running:
+
+..........
+
+Finished in 0.039984s, 250.1025 runs/s, 2926.1989 assertions/s.
+
+10 runs, 117 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_show_status.rb
+Run options: --seed 43625
+
+# Running:
+
+........
+
+Finished in 0.003712s, 2155.4314 runs/s, 15357.4487 assertions/s.
+
+8 runs, 57 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_static.rb
+Run options: --seed 36937
+
+# Running:
+
+....................................
+
+Finished in 0.013977s, 2575.6600 runs/s, 10016.4556 assertions/s.
+
+36 runs, 140 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_tempfile_reaper.rb
+Run options: --seed 63138
+
+# Running:
+
+.............
+
+Finished in 0.002516s, 5165.9091 runs/s, 7947.5525 assertions/s.
+
+13 runs, 20 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_urlmap.rb
+Run options: --seed 31368
+
+# Running:
+
+.......
+
+Finished in 0.002839s, 2465.9323 runs/s, 39454.9162 assertions/s.
+
+7 runs, 112 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_utils.rb
+Run options: --seed 38588
+
+# Running:
+
+.....................................................................
+
+Finished in 0.027481s, 2510.7949 runs/s, 11826.2077 assertions/s.
+
+69 runs, 325 assertions, 0 failures, 0 errors, 0 skips
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -w test/spec_version.rb
+Run options: --seed 54216
+
+# Running:
+
+...
+
+Finished in 0.000808s, 3713.6710 runs/s, 4951.5614 assertions/s.
+
+3 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+All test files passed

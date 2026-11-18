@@ -1,0 +1,1 @@
+["ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]", ["/home/user/.local/share/mise/installs/ruby/2.7.8/lib/ruby/2.7.0/x86_64-linux/cgi/escape.so", "/home/user/.local/share/mise/installs/ruby/2.7.8/lib/ruby/2.7.0/cgi/util.rb"]]

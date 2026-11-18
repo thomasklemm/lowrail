@@ -1,0 +1,117 @@
+{
+  "ruby": "ruby 2.7.8p225 (2023-03-30 revision 1f4d455848) [x86_64-linux]",
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+    "basicobject/escape": 1,
+    "basicobject/unescape": 1,
+    "basicobject/query_unescape": 1,
+    "encoding/unescape": 3,
+    "encoding/query_unescape": 3
+  },
+  "examples": {
+    "basicobject/escape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "US-ASCII",
+        [
+          97,
+          43,
+          98
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000557258413118>:0x0000557258412f38>"
+      ]
+    ],
+    "basicobject/unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000557258413118>:0x0000557258411c28>"
+      ]
+    ],
+    "basicobject/query_unescape": [
+      "basicobject/coercible",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          65
+        ],
+        false,
+        true
+      ],
+      [
+        "error",
+        "NoMethodError",
+        "undefined method `instance_of?' for #<#<Class:0x0000557258413118>:0x0000557258410918>"
+      ]
+    ],
+    "encoding/unescape": [
+      "encoding/stateful to_str",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          255
+        ],
+        false,
+        false
+      ],
+      [
+        "ok",
+        "String",
+        "ASCII-8BIT",
+        [
+          255
+        ],
+        false,
+        true
+      ]
+    ],
+    "encoding/query_unescape": [
+      "encoding/stateful to_str",
+      [
+        "ok",
+        "String",
+        "UTF-8",
+        [
+          255
+        ],
+        false,
+        false
+      ],
+      [
+        "ok",
+        "String",
+        "ASCII-8BIT",
+        [
+          255
+        ],
+        false,
+        true
+      ]
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+["\u5A2B\u3039\u202D\u3725\u6145_", [:ok, String, #<Encoding:US-ASCII>, "%2BZ90-+%257Ea_%00", false], [:err, NoMethodError, "super: no superclass method 'escape' for class CGI"]]
+["\u3225\x41", [:ok, String, #<Encoding:US-ASCII>, "%252A", false], [:err, NoMethodError, "super: no superclass method 'escape' for class CGI"]]
+["\u2026\u3725\u2645", [:ok, String, #<Encoding:US-ASCII>, "%26+%257E%26", false], [:err, NoMethodError, "super: no superclass method 'escape' for class CGI"]]
+["\u412D\x32", [:ok, String, #<Encoding:US-ASCII>, "-A2", false], [:err, NoMethodError, "super: no superclass method 'escape' for class CGI"]]
+nil: same
+:sym: same
+:"a b*": same
+12: same
+1.5: same
+"a b*~": same
+"": same
+#<Object:0x00007f07071bd338>: same
+#<Object:0x00007f07071bd158>: same
+boundary "a b": DIFF [:ok, String, #<Encoding:US-ASCII>, "hooked", false] [:ok, String, #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+boundary "a b": DIFF [:ok, String, #<Encoding:US-ASCII>, "hooked", false] [:ok, String, #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 9 fixed, 59722 differences

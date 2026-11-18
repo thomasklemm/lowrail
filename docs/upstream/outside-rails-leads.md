@@ -255,9 +255,30 @@ gain is in skipping the translation, which needs flavorjones to accept a second 
 
 ## RK3 built (2026-11-18)
 
+**Thermos review supersedes blanket exactness below (2026-11-18).** Verdict **changes** on amended head
+`6f48723a86`, recorded as `thermos-sol`. The restored escape guard fixes the old-head UTF-16 loader failure.
+Full Rack suites on 3.4.12/4.0.9 each with and without `cgi/util`: 1,292 runs, 6,270 assertions, zero failures/errors,
+two skips; separate-file tests pass. Both original 300k scripts also pass in all four configurations. Two P3
+compatibility edges remain: encoding ducks are coerced twice and before native decoding, and BasicObject values
+with valid URI coercions fail at `instance_of?`. Smallest repairs: decode to BINARY then force the caller's
+encoding once; `String === s` before all exact-class guards. Diagnostic fixes pass 17,897 comparisons in each
+of eight configurations (2.7.3/3.4.12/4.0.9 with/without explicit util preload, plus pure 3.4/4.0). Old ERB loads
+util incidentally on 2.7.3; that case is not a no-util execution. Both parallel reviewers approve with nits under
+an ordinary-input contract; the unified changes verdict reflects the requested exactness and false only-boundary
+claim, not a security blocker. One PR retaining two commits is recommended after repairs, changelog and evidence
+corrections. The Rack branch was not changed or pushed. Minimum Ruby is 2.7.3, not 2.4; JRuby's inspected CGI
+loader selects Java, TruffleRuby's skips C; neither VM was executed. Hosted 2.7.3 fails provisioning because that
+patch is unavailable on ubuntu-26.04, with rake skipped (public job/check annotations retained; full log forbidden).
+New-head body-ips arithmetic checks out, maximum A/A 9.124%; the old reviewer wall-time cohort remains inconclusive
+(56–210% A/A). Fresh interpreter cookie escape: 90,311/90,303 -> 14,369 Ir/op. Historical request arithmetic and
+accepted YJIT 0/0 counters were checked, not rerun on the amendment. The under-0.02% guard estimate is not an
+exact-head request measurement. JSON YJIT is +0.203% against 0.170% A/A, not simply unchanged. Full claim audit:
+[`amended-head review`](../../bench/upstream/rk3/review-thermos-sol/6f48723a86/README.md). The following is the
+builder's report, retained as history rather than an approval.
+
 Branch `thomasklemm/unescape-cgi` on the fork, two commits on rack main `da90464e3f`:
 `d85c4b9a42` decodes with `CGI.unescape` (RK3), `6f48723a86` escapes with `CGI.escape` (RK4). Queue item
-[RK3](../../bench/upstream/pr-queue/items/RK3.md) (state built, draft title and body). Scripts:
+[RK3](../../bench/upstream/pr-queue/items/RK3.md) (state in-review, unapproved draft title and body). Scripts:
 [`bench/upstream/rk3/`](../../bench/upstream/rk3/README.md); receipts: [`data/rk3/`](data/rk3/).
 
 The escape commit keeps the lead patch's `ascii_compatible?` guard. A first head (`a8a5d747d0`) dropped it, because

@@ -1,0 +1,46 @@
+
+interp (A/A spread / base mean)
+blog PATCH article (redirect): base 4707344.0, A/A 0.041%, interpreter
+  rk3.rb -3.152%, objects 1438.50 -> 1338.3 (saved 100.20)
+  rk34.rb -5.115%, objects 1438.50 -> 1302.8 (saved 135.70)
+pingcrm PUT contact (Inertia redirect): base 7099801.5, A/A 0.012%, interpreter
+  rk3.rb -0.480%, objects 1820.50 -> 1743.9 (saved 76.60)
+  rk34.rb -2.952%, objects 1820.50 -> 1728.6 (saved 91.90)
+blog GET article: base 8343453.0, A/A 0.082%, interpreter
+  rk3.rb -0.421%, objects 2022.70 -> 1978.7 (saved 44.00)
+  rk34.rb -1.541%, objects 2022.70 -> 1966.8 (saved 55.90)
+codetriage GET repo: base 14894758.5, A/A 0.022%, interpreter
+  rk3.rb -0.378%, objects 3270.05 -> 3219.8 (saved 50.25)
+  rk34.rb -1.012%, objects 3270.05 -> 3204.4 (saved 65.65)
+blog GET articles.json: base 4247777.5, A/A 0.032%, interpreter
+  rk3.rb 0.047%, objects 1130.80 -> 1130.8 (saved 0.00)
+  rk34.rb -0.024%, objects 1130.80 -> 1130.8 (saved 0.00)
+
+yjit (A/A spread / base mean)
+blog PATCH article (redirect): base 2572478.0, A/A 0.157%, all windows flat=true
+  rk3.rb -4.812%, objects 1441.20 -> 1344.3 (saved 96.90)
+  rk34.rb -9.801%, objects 1441.20 -> 1307.8 (saved 133.40)
+blog GET article: base 4756409.7, A/A 0.249%, all windows flat=true
+  rk3.rb -0.920%, objects 2035.97 -> 1989.0 (saved 46.97)
+  rk34.rb -2.832%, objects 2035.97 -> 1977.7 (saved 58.27)
+pingcrm PUT contact (Inertia redirect): base 4108438.0, A/A 1.996%, all windows flat=false
+  rk3.rb -2.219%, objects 1837.43 -> 1755.7 (saved 81.73)
+  rk34.rb -6.240%, objects 1837.43 -> 1742.4 (saved 95.03)
+blog GET articles.json: base 2208688.3, A/A 0.170%, all windows flat=true
+  rk3.rb -0.079%, objects 1139.60 -> 1139.6 (saved 0.00)
+  rk34.rb 0.203%, objects 1139.60 -> 1139.6 (saved 0.00)
+
+yjit FLAT=40 (A/A spread / base mean)
+pingcrm PUT contact (Inertia redirect): base 4079633.7, A/A 0.201%, all windows flat=true
+  rk3.rb -1.548%, objects 1836.67 -> 1755.4 (saved 81.27)
+  rk34.rb -5.451%, objects 1836.67 -> 1739.5 (saved 97.17)
+
+Body benchmark-ips interp: independently computed best of three / main spread
+parse_nested_query 41121 -> 72638 (1.766x), A/A 8.919%
+parse_cookies_header 112658 -> 237960 (2.112x), A/A 9.124%
+set_cookie_header 92786 -> 288196 (3.106x), A/A 7.515%
+
+Body benchmark-ips yjit: independently computed best of three / main spread
+parse_nested_query 49556 -> 98963 (1.997x), A/A 4.526%
+parse_cookies_header 119650 -> 262407 (2.193x), A/A 4.383%
+set_cookie_header 95698 -> 337350 (3.525x), A/A 0.899%

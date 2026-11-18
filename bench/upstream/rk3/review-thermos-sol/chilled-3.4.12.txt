@@ -1,0 +1,5 @@
+["#<Class:URI>", :encode_www_form_component, false, #<Encoding:US-ASCII>]
+["#<Class:URI>", :decode_www_form_component, false, #<Encoding:UTF-8>]
+["#<Class:Rack::Utils>", :escape, false, #<Encoding:US-ASCII>]
+["#<Class:Rack::Utils>", :unescape, false, #<Encoding:UTF-8>]
+-e:1: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)

@@ -1,0 +1,76 @@
+{
+  "id": 134483564156,
+  "run_id": 44209391097,
+  "workflow_name": "Test",
+  "head_branch": "thomasklemm/unescape-cgi",
+  "run_url": "https://api.github.com/repos/thomasklemm/rack/actions/runs/44209391097",
+  "run_attempt": 1,
+  "node_id": "CR_kwDOAFXwA88AAAAfT9hWfA",
+  "head_sha": "6f48723a862129d42e901d2baae16b1b826404bc",
+  "url": "https://api.github.com/repos/thomasklemm/rack/actions/jobs/134483564156",
+  "html_url": "https://github.com/thomasklemm/rack/actions/runs/44209391097/job/134483564156",
+  "status": "completed",
+  "conclusion": "failure",
+  "created_at": "2026-11-18T00:37:51Z",
+  "started_at": "2026-11-18T00:37:53Z",
+  "completed_at": "2026-11-18T00:37:58Z",
+  "name": "test (ubuntu-latest, 2.7.3)",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1,
+      "started_at": "2026-11-18T00:37:54Z",
+      "completed_at": "2026-11-18T00:37:55Z"
+    },
+    {
+      "name": "Run actions/checkout@v6",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2,
+      "started_at": "2026-11-18T00:37:55Z",
+      "completed_at": "2026-11-18T00:37:56Z"
+    },
+    {
+      "name": "Run ruby/setup-ruby@v1",
+      "status": "completed",
+      "conclusion": "failure",
+      "number": 3,
+      "started_at": "2026-11-18T00:37:56Z",
+      "completed_at": "2026-11-18T00:37:56Z"
+    },
+    {
+      "name": "Run bundle exec rake",
+      "status": "completed",
+      "conclusion": "skipped",
+      "number": 4,
+      "started_at": "2026-11-18T00:37:56Z",
+      "completed_at": "2026-11-18T00:37:56Z"
+    },
+    {
+      "name": "Post Run actions/checkout@v6",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 8,
+      "started_at": "2026-11-18T00:37:56Z",
+      "completed_at": "2026-11-18T00:37:56Z"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9,
+      "started_at": "2026-11-18T00:37:56Z",
+      "completed_at": "2026-11-18T00:37:57Z"
+    }
+  ],
+  "check_run_url": "https://api.github.com/repos/thomasklemm/rack/check-runs/134483564156",
+  "labels": [
+    "ubuntu-latest"
+  ],
+  "runner_id": 1000027855,
+  "runner_name": "GitHub Actions 1000027855",
+  "runner_group_id": 0,
+  "runner_group_name": "GitHub Actions"
+}

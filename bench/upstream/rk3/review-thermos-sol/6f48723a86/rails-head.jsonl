@@ -1,0 +1,8 @@
+{"ruby":"ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]","rails":"8.1.4.1","rack_utils":["/home/user/workspace/repo/.amp/in/orb-backup/rack/lib/rack/utils.rb",63]}
+{"query":"name=a+%2B&x=%E3%81%82","get":{"value":{"name":"a +","x":"あ"}},"post":{"value":{"name":"a +","x":"あ"}},"get_decode_calls":{},"post_decode_calls":{"Rack::QueryParser":4}}
+{"query":"x=%FF","get":{"error":"ActionController::BadRequest","message":"Invalid query parameters: Invalid encoding for parameter: �"},"post":{"error":"ActionController::BadRequest","message":"Invalid request parameters: Invalid encoding for parameter: �"},"get_decode_calls":{},"post_decode_calls":{"Rack::QueryParser":2}}
+{"query":"x=%","get":{"error":"ActionController::BadRequest","message":"Invalid query parameters: invalid %-encoding (%)"},"post":{"error":"ActionController::BadRequest","message":"Invalid request parameters: invalid %-encoding (%)"},"get_decode_calls":{},"post_decode_calls":{"Rack::QueryParser":2}}
+{"query":"x=%%","get":{"error":"ActionController::BadRequest","message":"Invalid query parameters: invalid %-encoding (%%)"},"post":{"error":"ActionController::BadRequest","message":"Invalid request parameters: invalid %-encoding (%%)"},"get_decode_calls":{},"post_decode_calls":{"Rack::QueryParser":2}}
+{"query":"x=%2a%7e%2B","get":{"value":{"x":"*~+"}},"post":{"value":{"x":"*~+"}},"get_decode_calls":{},"post_decode_calls":{"Rack::QueryParser":2}}
+{"cookies":{"value":{"name":"a +","invalid":"%","mixed":"*~+"}},"decode_calls":{"Rack::Utils":3}}
+{"set_cookie":"name=a+%2B*%7E; httponly; samesite=lax"}

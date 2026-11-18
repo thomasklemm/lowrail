@@ -1,0 +1,10 @@
+| interp | main | branch | | main A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `parse_nested_query` | 18,528 | 38,088 | 2.06x | 56.1% |
+| `parse_cookies_header` | 54,162 | 114,290 | 2.11x | 99.3% |
+| `set_cookie_header` | 41,968 | 160,581 | 3.83x | 82.9% |
+| yjit | main | branch | | main A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `parse_nested_query` | 40,559 | 93,942 | 2.32x | 58.6% |
+| `parse_cookies_header` | 120,981 | 253,998 | 2.10x | 209.7% |
+| `set_cookie_header` | 101,258 | 305,262 | 3.01x | 207.3% |
