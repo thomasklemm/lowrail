@@ -1,0 +1,194 @@
+==525151== Callgrind, a call-graph generating cache profiler
+==525151== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==525151== Using Valgrind-3.24.0-fcdaa47426-20241101 and LibVEX; rerun with -h for copyright info
+==525151== Command: ruby /home/user/workspace/repo/bench/upstream/k1/attr_bench.rb
+==525151== 
+--525151-- Valgrind options:
+--525151--    --verbose
+--525151--    --tool=callgrind
+--525151--    --instr-atstart=no
+--525151--    --callgrind-out-file=/tmp/k1-stockctl/main-interp-w30/cg.%p
+--525151-- Contents of /proc/version:
+--525151--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--525151-- 
+--525151-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed-fma
+--525151-- Page sizes: currently 4096, max supported 4096
+--525151-- Valgrind library directory: /usr/libexec/valgrind
+==525151== For interactive control, run 'callgrind_control -h'.
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--525151-- Reading syms from /usr/libexec/valgrind/callgrind-amd64-linux
+--525151--    object doesn't have a dynamic symbol table
+--525151-- Scheduler: using generic scheduler lock implementation.
+==525151== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-525151-by-user-on-???
+==525151== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-525151-by-user-on-???
+==525151== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-525151-by-user-on-???
+==525151== 
+==525151== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==525151== don't want to do, unless you know exactly what you're doing,
+==525151== or are doing some strange experiment):
+==525151==   /usr/bin/vgdb --pid=525151 ...command...
+==525151== 
+==525151== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==525151==   /path/to/gdb ruby
+==525151== and then give GDB the following command
+==525151==   target remote | /usr/bin/vgdb --pid=525151
+==525151== --pid is optional if only one valgrind process is running
+==525151== 
+--525151-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--525151--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--525151--   .. build-id is valid
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--525151--   Considering /usr/lib/debug/.build-id/5e/5b51f4c39af9ac589408c1dc432ba390a273cc.debug ..
+--525151--   .. build-id is valid
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/monitor.so
+==525151== brk segment overflow in thread #1: can't grow to 0x4844000
+==525151== (see section Limitations in user manual)
+==525151== NOTE: further instances of this message will not be shown
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/parser.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/generator.so
+--525151-- Reading syms from /home/user/k1/ext/irwin.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/cgi/escape.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/date-3.6.0/lib/date_core.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/psych-5.5.0/lib/psych.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_16le.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/utf_16_32.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_16be.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_32le.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_32be.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/zlib.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/etc.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/strscan.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bigdecimal-4.1.3/lib/bigdecimal.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/socket.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/openssl.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/digest.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/io/nonblock.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/stringio-3.2.0/lib/stringio.so
+--525151-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/sqlite3-2.10.2-x86_64-linux-gnu/lib/sqlite3/4.0/sqlite3_native.so
+--525151-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--525151-- Client Request: instrumentation switched ON
+--525151--   Considering /usr/lib/debug/.build-id/86/f7eb4ff495ed3f2831c6d3d662e4321762a2a3.debug ..
+--525151--   .. build-id is valid
+--525151-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x133c0=0x40133c0
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 15074047 (Client Request: _empty)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.1
+--525151-- Dumping done.
+--525151--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--525151--   .. build-id is valid
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 48848814 (Client Request: load1)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.2
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 61537898 (Client Request: reader_warm)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.3
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 106465878 (Client Request: load1_attributes)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.4
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 123484409 (Client Request: attribute_names_warm)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.5
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 144786480 (Client Request: changed?_warm)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.6
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 195411843 (Client Request: load1_changed?)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.7
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 248707962 (Client Request: load1_assign_changes)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.8
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 338542277 (Client Request: load1_save)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.9
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 423311958 (Client Request: update1)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.10
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 545022168 (Client Request: load1_update1)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.11
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 616702464 (Client Request: load1_dup)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.12
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 640191748 (Client Request: serializable_hash_warm)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.13
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 694275022 (Client Request: load1_as_json)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.14
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 711405778 (Client Request: partial_changed?)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.15
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 728162738 (Client Request: partial_as_json)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.16
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 780624931 (Client Request: sti_load1_changed?)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.17
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 827839738 (Client Request: sti_load1_attributes)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.18
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 843428940 (Client Request: new)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.19
+--525151-- Dumping done.
+--525151--   Zeroing costs...
+--525151--   ...done
+--525151-- Start dumping at BB 870464787 (Client Request: new_changed?)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151.20
+--525151-- Dumping done.
+--525151--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--525151--   .. build-id is valid
+--525151--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--525151--   .. build-id is valid
+==525151== 
+--525151-- Start dumping at BB 874885540 (Prg.Term.)...
+--525151-- Dump to /tmp/k1-stockctl/main-interp-w30/cg.525151
+--525151-- Dumping done.
+==525151== Events    : Ir
+==525151== Collected : 2393742869
+==525151== 
+==525151== I   refs:      2,393,742,869

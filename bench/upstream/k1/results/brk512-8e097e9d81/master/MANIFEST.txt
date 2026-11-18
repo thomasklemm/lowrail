@@ -1,0 +1,7 @@
+K1 diagnostic cohort brk512-master-8e097e9d81, declared 2026-11-18T11:04:05Z before any run; one run per arm, not retried. Diagnostic only (Ruby master has no invalidation count).
+tool: /tmp/k1-valgrind-brk512/bin/valgrind valgrind-3.19.0 (512 MiB brk, valgrind.json), ulimit -d unlimited, --verbose; irwin ~/k1/extM-brk512 built with CPATH=/tmp/k1-valgrind-brk512/include
+ruby: ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +PRISM [x86_64-linux] (--enable-yjit --enable-zjit, optflags=-O3)
+tree main: 8e097e9d81f65fe8701c77352f5758be4f75f957, bundle ~/k1/suiteM-main lock (path stripped) 77c6b0b51b68436f
+tree main2: 8e097e9d81f65fe8701c77352f5758be4f75f957, bundle ~/k1/suiteM-main2 lock (path stripped) 77c6b0b51b68436f
+tree fix: af84ab1445e84199020177034e28541687b0c462, bundle ~/k1/suiteM-fix lock (path stripped) 77c6b0b51b68436f
+params: WIDTH=30 N=200 WARM=100, cases changed?_warm serializable_hash_warm update1 load1_save load1_dup load1 load1_attributes new; modes zjit then interp; same heap floors; order main, main2, fix

@@ -1,0 +1,194 @@
+==542638== Callgrind, a call-graph generating cache profiler
+==542638== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==542638== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==542638== Command: ruby /home/user/workspace/repo/bench/upstream/k1/attr_bench.rb
+==542638== 
+--542638-- Valgrind options:
+--542638--    --verbose
+--542638--    --tool=callgrind
+--542638--    --instr-atstart=no
+--542638--    --callgrind-out-file=/tmp/k1-brk512/main-interp-w30/cg.%p
+--542638-- Contents of /proc/version:
+--542638--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--542638-- 
+--542638-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--542638-- Page sizes: currently 4096, max supported 4096
+--542638-- Valgrind library directory: /tmp/k1-valgrind-brk512/libexec/valgrind
+==542638== For interactive control, run 'callgrind_control -h'.
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--542638--   Considering /usr/lib/debug/.build-id/86/f7eb4ff495ed3f2831c6d3d662e4321762a2a3.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /tmp/k1-valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--542638--    object doesn't have a dynamic symbol table
+--542638-- Scheduler: using generic scheduler lock implementation.
+==542638== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-542638-by-user-on-???
+==542638== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-542638-by-user-on-???
+==542638== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-542638-by-user-on-???
+==542638== 
+==542638== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==542638== don't want to do, unless you know exactly what you're doing,
+==542638== or are doing some strange experiment):
+==542638==   /tmp/k1-valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=542638 ...command...
+==542638== 
+==542638== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==542638==   /path/to/gdb ruby
+==542638== and then give GDB the following command
+==542638==   target remote | /tmp/k1-valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=542638
+==542638== --pid is optional if only one valgrind process is running
+==542638== 
+--542638-- Reading syms from /tmp/k1-valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--542638--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--542638--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--542638--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--542638--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--542638--    object doesn't have a symbol table
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--542638--   Considering /usr/lib/debug/.build-id/5e/5b51f4c39af9ac589408c1dc432ba390a273cc.debug ..
+--542638--   .. build-id is valid
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/parser.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/generator.so
+--542638-- Reading syms from /home/user/k1/ext-brk512/irwin.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/cgi/escape.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/date-3.6.0/lib/date_core.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/psych-5.5.0/lib/psych.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_16le.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/utf_16_32.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_16be.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_32le.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/utf_32be.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/zlib.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/etc.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/strscan.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bigdecimal-4.1.3/lib/bigdecimal.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/socket.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/openssl.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/digest.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/io/nonblock.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/stringio-3.2.0/lib/stringio.so
+--542638-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/sqlite3-2.10.2-x86_64-linux-gnu/lib/sqlite3/4.0/sqlite3_native.so
+--542638--    object doesn't have a symbol table
+--542638-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--542638--    object doesn't have a symbol table
+--542638-- Client Request: instrumentation switched ON
+--542638-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x133c0=0x40133c0
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 15079240 (Client Request: _empty)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.1
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 48855343 (Client Request: load1)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.2
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 61542308 (Client Request: reader_warm)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.3
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 106480548 (Client Request: load1_attributes)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.4
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 123514395 (Client Request: attribute_names_warm)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.5
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 144835757 (Client Request: changed?_warm)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.6
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 195482525 (Client Request: load1_changed?)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.7
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 248801622 (Client Request: load1_assign_changes)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.8
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 338706151 (Client Request: load1_save)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.9
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 423585775 (Client Request: update1)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.10
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 545250255 (Client Request: load1_update1)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.11
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 617030538 (Client Request: load1_dup)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.12
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 640594790 (Client Request: serializable_hash_warm)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.13
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 694715952 (Client Request: load1_as_json)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.14
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 711861024 (Client Request: partial_changed?)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.15
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 728632645 (Client Request: partial_as_json)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.16
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 781093448 (Client Request: sti_load1_changed?)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.17
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 828315344 (Client Request: sti_load1_attributes)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.18
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 843928481 (Client Request: new)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.19
+--542638-- Dumping done.
+--542638--   Zeroing costs...
+--542638--   ...done
+--542638-- Start dumping at BB 871010560 (Client Request: new_changed?)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638.20
+--542638-- Dumping done.
+==542638== 
+--542638-- Start dumping at BB 875425232 (Prg.Term.)...
+--542638-- Dump to /tmp/k1-brk512/main-interp-w30/cg.542638
+--542638-- Dumping done.
+==542638== Events    : Ir
+==542638== Collected : 2394917090
+==542638== 
+==542638== I   refs:      2,394,917,090

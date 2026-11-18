@@ -207,7 +207,9 @@ Tests with `-w`, SQLite, Ruby 4.0.9: Active Model 1,271 runs, 0 failures, 0 erro
 runs, 0 failures, 0 errors; no warnings.
 
 The numbers moved, because main no longer pays for `cached_names`. 30 columns, N=200, same harness; raw:
-[rebuild-8e097e9d81](results/rebuild-8e097e9d81):
+[rebuild-8e097e9d81](results/rebuild-8e097e9d81). These ran on stock Valgrind 3.24 with the old run.sh, which deleted
+the Valgrind logs, so whether they hit a brk overflow is unverified; a stock run of main with the fixed run.sh
+overflowed (below). They are superseded by the pinned-tool cohort below and are not evidence for the body.
 
 | Ir per call, 30 cols | 4.0.9 main | A/A | fix | objects | master ZJIT main | A/A | fix | master interp main | A/A | fix |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -230,12 +232,64 @@ against main 56,394–56,475 and main2 56,459–56,733). `new` calls neither `#k
 pass saw the same cell move the other way (+0.43%), so this reads as the ID-table layout shift recorded there (a
 hypothesis), and it is a gain, not a loss.
 
+### Pinned-tool cohort (2026-11-18, after the thermos-sol confirm)
+
+The confirm on `af84ab1445` (thermos-sol, thread T-01a1ee42-22c6-70af-9a1a-6a1138a03083) found that run.sh accepted a
+zero Valgrind exit without reading its log and then deleted the log and dumps. Its fresh stock Valgrind 3.24.0 cohort
+(Ruby 4.0.9, width 30, N=200, WARM=100, all 19 cases, census heap floors) logged `brk segment overflow` in main,
+main2 and fix while exiting 0, with A/A up to 1.887%. That cohort is **rejected** under
+[docs/bench.md](../../../docs/bench.md) (Valgrind brk reservation correction) and is not rerun; its dumps and logs are
+in that review's orb under `.amp/in/orb-backup/k1-confirm/bench`.
+
+run.sh now runs Valgrind with `--verbose`, records the tool path, version and `ulimit -d` in `TREE-MODE-wWIDTH/tool`,
+keeps stdout, stderr and the Callgrind dumps in `TREE-MODE-wWIDTH/` next to the JSONL, refuses an existing output
+directory, and exits 3 (rejecting the run) when the log has a brk overflow, whatever Valgrind returned. Check: a stock
+3.24.0 run of main with it was refused with exit 3 (`brk segment overflow in thread #1: can't grow to 0x4844000`);
+retained as [rejected-stock-3.24-8e097e9d81](results/rejected-stock-3.24-8e097e9d81).
+
+Declared cohort [brk512-8e097e9d81](results/brk512-8e097e9d81) (manifest written before the first run; one run per
+arm, not retried): Valgrind 3.19.0 built by `script/bench-valgrind` with the 512 MiB brk reservation
+(`valgrind.json`: tool SHA-256 `d11018bd…`, patch `ab95c4a3…`, glibc 2.41), `ulimit -d unlimited`, irwin built
+against its headers, Ruby 4.0.9, main and main2 at `8e097e9d81`, fix at `af84ab1445`, Gemfile.lock identical apart
+from the tree path, the same harness, cases, heap floors and window protocol. All three arms exited 0 and **no log has
+a brk overflow**. Logs and dumps (`callgrind.tar.xz`) are kept.
+
+| Ir per call, 30 cols, Ruby 4.0.9 | main | A/A | fix | objects |
+|---|---:|---:|---:|---:|
+| `changed?` | 192,007 | −0.29% | **−12.98%** | 3 → 1 |
+| `serializable_hash` | 203,699 | −0.51% | **−12.42%** | 35 → 33 |
+| `update!` of one column | 1,375,887 | −0.07% | **−5.40%** | 189 → 183 |
+| `find` then `save` | 1,530,134 | −0.12% | **−8.36%** | 169 → 163 |
+| `find` then `dup` | 1,118,732 | −0.05% | **−4.99%** | 182 → 182 |
+| `attribute_names` | 90,368 | −0.48% | −27.12% | 3 → 1 |
+| partial `changed?` | 84,419 | −0.52% | −29.17% | 3 → 1 |
+| `find` | 401,586 | +0.01% | −0.01% | 68 → 68 |
+| `#attributes` | 621,374 | −0.03% | −0.02% | 83 → 83 |
+| STI `#attributes` | 651,360 | −0.03% | −0.04% | 88 → 88 |
+| `new` | 55,944 | −1.33% | −1.54% | 9 → 9 |
+
+The A/A is at most 0.52% on every case except `new`, where the main arm is the outlier (main 55,944, main2 55,198,
+fix 55,085); `new` calls neither `#keys` nor `materialize`, and the fix against main2 is −0.20%. So the largest A/A
+over all 19 cases is 1.33%, on a control. All five body rows are within 0.3 points of the stock-tool rebuild above (`serializable_hash` −12.42% against −12.15%, the rest within 0.04);
+the body table now uses this cohort.
+
+Diagnostic cohort [brk512-8e097e9d81/master](results/brk512-8e097e9d81/master), same pinned tool, Ruby master
+`9aa0898240`, eight cases, ZJIT then interpreter, declared and run once: no brk overflow in any of the six arms, every
+ZJIT window 0 compiled ISEQs, 0 side exits, 0 ns invalidating. ZJIT: `changed?` −22.2%, `serializable_hash` −13.6%,
+`update!` −8.4%, `find` then `save` −12.1%, `find` then `dup` −5.6% (A/A ≤ 0.56%); `find` −0.16% and `#attributes`
+−0.10% (A/A −0.04%, −0.07%); `new` main is again the outlier (A/A −4.8%, fix −4.8%, fix against main2 +0.03%).
+Master interpreter: −10.4%, −10.0%, −4.4%, −7.5%, −5.0% (A/A ≤ 0.10%), `find`, `#attributes` within 0.03%, `new`
+−0.54% (A/A +0.06%), as in the stock runs. No ZJIT loss. Diagnostic only: master has no invalidation count.
+
 ## Rerun
 
 ```
 RAILS trees under ~/k1 (git worktree add --detach), bundles in ~/k1/suite-TREE (copies of .lowrail/rails-suite
 pointed at the tree, plus argon2); irwin.so built from irwin.c into ~/k1/ext.
 N=200 WARM=100 bench/upstream/k1/run.sh OUT TREE WIDTH interp|yjit [CASE...]
+Since 2026-11-18 on the pinned tool only: script/bench-valgrind NEW_PREFIX, ulimit -d unlimited, PATH=NEW_PREFIX/bin:$PATH,
+irwin rebuilt with CPATH=NEW_PREFIX/include into IRWIN_DIR; keep NEW_PREFIX/share/lowrail/valgrind.json with the cohort.
+OUT must be new; run.sh exits 3 on a brk overflow, which rejects the whole cohort.
 ruby bench/upstream/k1/table.rb OUT; ruby bench/upstream/k1/sweep.rb OUT interp
 BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/keys_probe.rb > TREE.txt
 BUNDLE_GEMFILE=~/k1/suite-TREE/Gemfile ruby bench/upstream/k1/edge_probe.rb > edge-TREE.txt
