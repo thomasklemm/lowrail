@@ -160,3 +160,88 @@ The independent-pin and checkout-exclusion comments explain why; shorten/remove 
 environment/matrix labels under DECISIONS' one-line/why rule. No structural maintainability blocker was found.
 The table centralizes pins, not release work: a lock, entropy row, CI entry, closure audit and fresh verification
 remain necessary. Setup refused the mixed primary home; 8.1.4 used a clean disposable physical copy instead.
+
+### Fix-round confirm (2026-11-18)
+
+Reviewer: **thermos-sol**, correctness/security and maintainability rubrics applied directly, without other threads
+or reviewers. Commit: `b96620b31998391ca8cd3cfcb1cddc72f8d3f586`, following the confirm of `33f044c2` above.
+**Verdict: not confirmed as written.** The named render/form fixes work, but the unconditional release-binding
+claim still exceeds the endpoint artifact's admission contract. This review changes no gem code.
+
+**Must-fixes:**
+
+1. **P2 — Bind endpoint artifacts too, and correct the opening guarantee until then.**
+   `EndpointBuild.build` (`gem/lib/lowrail/endpoint_build.rb:89–94`) records no build release;
+   `Endpoint.activate` (`gem/lib/lowrail/endpoint.rb:51–57`) asks only whether the running release is in the table,
+   then checks sources and method signatures. Using `EndpointTest`'s app and build/compiler path, an artifact built
+   on 8.1.4.1 still activates both actions when `Rails.version` is redefined to the other allowed release, 8.1.4,
+   before `lowrail/setup`: two endpoint hits, two HTTP 200 responses, identical bodies/effects, no refusal.
+   The ordinary 8.1.4.1 control also takes two hits. This is a pre-existing admission omission exposed by the
+   requested complete inventory, not an introduced HTML divergence or an actual cross-gem execution. It contradicts
+   the newly added assertion that every artifact records its release and every unit refuses another one.
+   Record and compare the endpoint build release, silently refuse older artifacts lacking it, and add an
+   allowed-to-allowed regression; testing an unknown future label only exercises the allow-list.
+2. **P3 — Delete the new narrative test comment** at `gem/test/form_scaffold_test.rb:118` ("A process on another
+   Rails release..."). It restates the following setup/assertions rather than explaining a reason a reader would
+   otherwise miss. DECISIONS' comment rule explicitly includes tests and makes this a required change, not a nit.
+
+**Closed items and executed controls:**
+
+- The 8.1.4.1 support sentences now name only the retained blog's verification-tier Article/Comment instantiate,
+  token's empty/unprotected branch and collection. They make no link, form or endpoint support claim. The
+  table-only wording now lists the separate lock, entropy row, CI entry, closure audit and verification work.
+- Rebuilt the retained 8.1.4.1 blog with `lowrail build --sealed --verify-test --env test --jit interpreter`, then
+  `lowrail verify APP -- ruby bin/rails test --seed 41231`, with worker 1, CI=1 and SQL trace off. Ordinary control:
+  **21 identical outcomes, 51 hits (30/9/11/1)**. The original `RUBYOPT` reproducer reporting 8.1.4.2 now gives
+  **21 identical outcomes, zero hits**, with token/collection recording
+  `verification_render_Rails_release_changed;_rebuild`. Rebuilding/running the same mismatch with 33f044c2 gives
+  **21 identical outcomes, 12 hits (0/0/11/1)**. No actual future Rails gem was substituted.
+- Deleted just `verification_render.rails_version` from the new artifact: **21 identical outcomes, 39 AR hits,
+  zero render hits**, `verification_render_observation_unknown`, no escaped exception. In an isolated production
+  scaffold, removed the release key from render certificates, form inventory, and both, separately. Each affected
+  unit refused with zero hits; unaffected units remained active. Ordinary control hits all three units. Reporting
+  8.1.4.2 refuses all three. All cases preserve complete response objects against off, with no escaped exception
+  or Lowrail warning. Missing keys take the existing rescue paths; no schema-version bump is needed for refusal.
+- Overlaid the two current test files on an archived 33f044c2 checkout with its original gem runtime and rebuilt
+  CLI. In **both** isolated release homes, the two extended tests fail: verification render reports
+  `invalid dispatch certificate admitted`; production render expects zero hits but gets two. The missing and
+  mismatched view-context modes run before the new release mode, which is the failing case.
+- `script/corpus real-blog` accepts a disposable correctly pinned/locked specimen and refuses each of an
+  independently wrong Gemfile and wrong lock. The actual stale generated blog is also refused. Setup and
+  `script/gate --prepare` invoke this path, so they inherit the check. Pinned corpus sources/locks were not edited.
+
+**Strict gem suites.** Ruby 4.0.7, interpreter, `LOWRAIL_STRICT_GATES=1`, `MT_CPU=8`,
+`ruby -S rake test TESTOPTS='--verbose --seed=1729'`, using isolated release homes:
+
+- 8.1.4: **226 tests, 7359 assertions, one failure, no errors, one missing-Campfire skip**. The sole failure is
+  `ObserveCorpusTest#test_real_blog_suite`: this review's disposable corpus used a symlink to `real-blog-r4`, while
+  the observer filters source paths by the textual `LOWRAIL_OBSERVE_ROOT`. Reproduced the missing controller
+  samples, then reran that same test against a physical copy of the retained app: **11 assertions, no failures,
+  errors or skips**. This is a review-fixture path mismatch, not a change in b96620b3; the raw suite is not green.
+- 8.1.4.1: **224 tests, 7353 assertions, no failures or errors, one missing-Campfire skip**. The two Rails-checkout
+  report cases are excluded as in `script/gate`. Neither local result is an unqualified full-gate pass.
+
+Both extended regressions pass in both current homes and fail on 33f044c2 as above. `cargo build --locked`,
+`bash -n script/corpus` and `git diff --check` pass. CI run 44326627232 is successful on the exact b96620b3 head:
+209 tests per release, 6321/6322 assertions, no failures/errors/skips; its corpus exclusions are not integration
+coverage. Initial setup refused the mixed primary gem home and stale generated blog; the review used a disposable
+physical primary-home copy and an exactly pinned/re-locked generated-blog copy, leaving setup files unchanged.
+
+**Complete runtime admission inventory.** Traced `Passes::REGISTRY`, verification-tier installation, manifest/file
+delivery and their builders. AR instantiate and AR plans already compare recorded Rails releases; preload also
+does, and its entire artifact is currently quarantined. Production token/collection, verification render and form
+now compare the recorded release. Sealed link lacks a recorded-release comparison but manifest admission refuses
+the entire artifact before any installer or lowered-file delivery; source link/route passes and nonempty generic
+template delivery are likewise quarantined. Memo and digest memo specialize URI/Digest rather than Rails-release
+bodies. Inertia props specializes native Hash iteration over pinned Inertia code; Inertia config certifies the
+Inertia version/schema and the exact Active Support `Hash#extract!` implementation/source instead of choosing a
+Rails-release implementation. Neither makes the table's release-specific claim. Endpoint is the remaining live
+table-gated artifact with no build-release comparison.
+
+**Design and claims.** The three new comparisons belong at their existing admission boundaries, each before
+granting fast-path authority; their distinct artifact shapes do not warrant a shared wrapper. Recording the
+release and refusing a missing key protect real build facts, not hypothetical internal states. The corpus check
+guards reused generated input, not just initial generation. These guards satisfy DECISIONS; the single added test
+comment does not. No structural regression, unjustified abstraction, new file over 1,000 lines or additional
+maintainability blocker was found. Every changed documentation sentence was checked against code and executed
+evidence; the opening universal artifact/refusal sentence is the exception identified above.
