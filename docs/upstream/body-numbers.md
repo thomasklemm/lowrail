@@ -16,8 +16,11 @@ mise exec ruby@4.0.9 -- script/upstream-bench \
 ```
 
 For two Ruby builds use `--tree DIR` (or no tree, for plain Ruby) with `--base-ruby` and `--candidate-ruby`
-(executables or mise versions). `--modes interp,yjit` limits the modes; by default it runs the interpreter, YJIT,
-and ZJIT when both Rubies have it. `-n` sets the calls per Callgrind window (default 2000), `--core` the CPU for
+(executables or mise versions). For an app, whose bundle cannot be rebuilt from a gemspec, pass `--gems ""`: the
+worker then gets its side's checkout in `UPSTREAM_BENCH_TREE` and the script boots the app from it
+([cf352_body.rb](../../bench/upstream/campfire-rework/cf352_body.rb)); benchmark-ips needs its own Gemfile, so use
+Callgrind only. `--modes interp,yjit` limits the modes; by default it runs the interpreter, YJIT, and ZJIT when both
+Rubies have it. `-n` sets the calls per Callgrind window (default 2000), `--core` the CPU for
 benchmark-ips (default 1), `--with GEM` adds a third-party gem to both Gemfiles.
 
 ## The benchmark script

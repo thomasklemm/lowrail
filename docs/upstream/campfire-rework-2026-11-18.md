@@ -9,6 +9,7 @@ Thomas approved: removing the trailers from all eight PR branches, adopting name
 The builder's recommendations below are superseded by the [thermos-sol confirmation](#thermos-sol-confirmation)
 at the end of this record. In particular, the queue-first backup is an improvement, not a coherent two-database
 snapshot, and a restored claimed job does not necessarily fail as `ProcessMissingError` at boot.
+The [fix round](#fix-round--3) then replaced the `-2` heads of #345, #346, #347, #417 and #352 with `-3` heads.
 
 New fork branches with the suffix `-2` on thomasklemm/once-campfire. Thomas Klemm is author and committer with the
 original author dates, except namespaceMarcello's two commits (his authorship and dates, Thomas as committer).
@@ -476,3 +477,93 @@ no Amp/Claude/Cursor attribution line was inserted. Raw objects are in `identity
 
 Delivery scope: only this Lowrail record and the eight queue-item review/draft updates; no fork/PR branch push,
 review submission, comment, closure or other upstream post is authorized by or performed in this pass.
+
+## Fix round (-3)
+
+After the thermos-sol confirmation. New fork branches with the suffix `-3`, built with `/usr/bin/git commit-tree`
+on main `7b80988`, Thomas Klemm as author and committer, original author dates; `git cat-file commit` and
+`%(trailers:only)` show no trailer and no Amp, Claude or Cursor line on any of the six commits. Not pushed to a
+PR branch, nothing posted. #320 is already on its PR (coordinator, `2b433b61d6`); #350 and #374 are closed.
+
+| PR | Branch | Head | Diff against main | Suite (Ruby 4.0.9) | RuboCop |
+| --- | --- | --- | --- | --- | --- |
+| #345 | `deps/solid-cache-3` | `0605b38aad` | 9 files +58 −6 | 649 runs, 0 failures | 335 files, clean |
+| #346 | `feat/solid-queue-cutover-3` | `2394bc3997` | 28 files +300 −87 | 650 runs, 0 failures | 335 files, clean |
+| #347 | `deps/solid-cable-removal-3` | `8b22b56402` | 38 files +405 −155 | 650 runs, 0 failures | 335 files, clean |
+| #417 | `feat/retry-interrupted-jobs-3` | `1791623703` | own commit 3 files +67 | 651 runs, 0 failures | 337 files, clean |
+| #352 | `claude/project-thread-1ks0h3-3` | `dd74f7028c` | 3 files +17 −7 | 650 runs, 0 failures | 335 files, clean |
+
+Skips are the two libvips loaders, as on main. Stack: #345-3 ← #347-3 (#346-3 replayed as `8e17a98fbd`, then the
+`-2` Cable commit with an identical diff) and #346-3 ← #417-3.
+
+**#345.** The `-2` commit minus the production "Replace the default in-process memory cache store" comment and
+`cache.yml`'s commented `max_age` lines. Message unchanged. Comments left: the Gemfile section header and the
+`database.yml` checkpoint line. Guards: none.
+
+**#346.** Reconciliation checked and rejected: `Room#destroy_later` leaves a closed room without memberships, and an
+admin can leave a closed room the same way (`Rooms::ClosedsController#update` revokes any members), so re-enqueuing
+`Room::DestroyJob` for such rooms after a restore could delete a live room. Re-running banned users' removals would
+cover only that half. Copying both files at the same instant would not help either: the room's update and its job
+are separate commits in separate databases. So the gap is accepted as stated (pending Thomas), in the commit message
+and the body: a job enqueued while the backup runs can be missing, so a room deleted in that moment comes back closed
+and without members, with its messages; a job running at the backup comes back claimed by its process and fails
+once that process is pruned (`ProcessPrunedError`). The queue-first comment and the matching message sentence are
+gone. New test `test/script/admin/prepare_backup_test.rb` (in the style of `reset_password_test.rb`): it loads the
+real script with a claimed job (process row included) and a queued one, then reads both backup files. It fails on
+the `-2` script with the queue snapshot removed (`no such table: solid_queue_jobs`). The hook itself
+(`hooks/post-restore`, `/rails` paths) stays untested, as on main. The test environment's queue database moves here
+from #417, since the backup test needs it. Comments added: `# SQLite can't back up a connection in the middle of a
+write transaction.` above `use_transactional_tests = false` (else someone turns them back on; inside the fixture
+transaction the backup copies zero pages). Others as in `-2`.
+
+**#347.** Inherits both; the Cable commit is unchanged. No Codex P1 reply until Thomas decides #346's gap.
+
+**#417.** The approved retry commit on `2394bc3997`, minus the test queue database and its message paragraph. Body
+adds: "A job missing from a restored queue isn't there to retry." Guards and comments as in `-2`.
+
+**#352.** `source.css("*")` → `source.xpath(".//*")` and "a long selector of" in the message (first built as
+`015240e9e2` with "fifty", replaced on the fork branch by `dd74f7028c`, same tree). Byte-identical to main on the 13
+fixture bodies plus 7 adversarial ones. No dense-input test: a timing test would be flaky. Guards and comments as in
+`-2`. Dense timings, one call each, no JIT, one Callgrind process on the other CPU
+([cf352_dense.txt](../../bench/upstream/campfire-rework/cf352_dense.txt)):
+
+| `<span>x</span>` × | main | `-2` `59f8a80bf6` | `-3` `015240e9e2` | main again |
+| ---: | ---: | ---: | ---: | ---: |
+| 3,000 | 0.56 s | 0.61 s | 0.23 s | 0.49 s |
+| 12,000 | 1.77 s | 1.72 s | 0.73 s | 1.68 s |
+| 90,000 | 15.57 s | 94.37 s | 6.69 s | 21.27 s |
+
+Body number: `script/upstream-bench`, declared cohort in
+[cf352_cohort.md](../../bench/upstream/campfire-rework/cf352_cohort.md). The `-2` cohort
+([interp](../../bench/upstream/campfire-rework/body/CF352-interp/table.md),
+[YJIT](../../bench/upstream/campfire-rework/body/CF352-yjit/table.md)) is diagnostic only. Its YJIT table was
+computed by hand from `raw/`: the run was stopped during its last window, so one A/A is missing and that row makes no
+claim. Instructions per call, no JIT: −53.6% to −65.7%, A/A ≤ 0.13%. The `-3` cohort, candidate `015240e9e2`
+(same tree as `dd74f7028c`), gives the body table
+([interp](../../bench/upstream/campfire-rework/body/CF352-3-interp/table.md); the script's header comment was rewrapped
+mid-run, comments only):
+
+| No JIT | Instructions, main | `-3` | Change | A/A | Objects, main → `-3` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| plain | 1,797,206 | 734,556 | −59.1% | 0.00% | 451 → 286 |
+| mention + link | 3,403,479 | 1,101,044 | −67.6% | 0.33% | 820 → 365 |
+| formatted list | 3,216,595 | 1,407,040 | −56.3% | 0.07% | 891 → 521 |
+| Lexxy paragraphs | 2,950,623 | 999,700 | −66.1% | 0.08% | 576 → 384 |
+
+`body/CF352-3-yjit` is still running and not committed; it goes into the record when it finishes, not into the body.
+
+**Browser suites.** The sign-in failure is main's, not ours. `sign_in` asserts `a.btn` "Designers", which is in the
+sidebar, a turbo frame loaded by a second request after the room renders (`sidebar_turbo_frame_tag(src:
+user_sidebar_path)`), within Capybara's default 2 s. Likely cause, not proven: on a loaded orb that request takes longer, and the frame
+replacing itself would explain the stale element too; the review's captures show the signed-in room, consistent with
+that. It failed the same way on clean main in the review. Here, one process per file, `-3` #346 signed in 18 times in composer, unfurling
+links and sending messages, with 0 sign-in failures. This orb's Chrome for Testing 158 rejects Capybara 3.40's
+`Storage.clearDataForOrigin(origin: "*")` in every teardown, on main too (`* is not a valid URL`), so these runs are
+not green; they only show sign-in. The CF347 OOM was the four-GB orb running all 30 browser tests in one process;
+per file they pass (review).
+
+### Open questions (fix round)
+
+1. #346: accept the stated residual gap between the two snapshots?
+2. #350 and #374: closed upstream on 2026-11-18 (Lowrail `f44cdb21`); nothing left to decide.
+3. #352: the body uses the `-3` no-JIT table; the YJIT run follows in the record only.

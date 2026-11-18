@@ -159,6 +159,8 @@ sides = {}
 { "base" => [o[:base], o[:base_ruby]], "candidate" => [o[:candidate], o[:candidate_ruby]] }.each do |side, (tree, rb)|
   ruby = ruby_path(rb)
   env = HEAP.merge("RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => nil, "PATH" => "#{File.dirname(ruby)}:#{ENV.fetch("PATH")}")
+  # An app's script boots from this checkout itself (with --gems ""), since its bundle cannot be rebuilt here.
+  env["UPSTREAM_BENCH_TREE"] = tree if tree
   gems = []
   if tree
     names = o[:gems] || Dir[File.join(tree, "*.gemspec")].map { File.basename(_1, ".gemspec") }

@@ -1,0 +1,107 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/campfire-rework/cf352_body.rb",
+  "at": "2026-11-18T13:53:38Z",
+  "n": 500,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/workspace/repos/campfire",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "7b809885a194f4c2f06f4f43e8e34704968f543e",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/workspace/repos/wt-cf352",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "59f8a80bf6f5b0fcd24eaafcacaab8eee4e762e6",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp plain": {
+      "base": 450.997,
+      "base1": 450.997,
+      "base2": 450.997,
+      "candidate": 304.999,
+      "change": -0.3237227742091411,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp mention + link": {
+      "base": 819.996,
+      "base1": 819.996,
+      "base2": 819.996,
+      "candidate": 384.0,
+      "change": -0.5317050327074766,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp formatted list": {
+      "base": 890.994,
+      "base1": 890.994,
+      "base2": 890.994,
+      "candidate": 540.0,
+      "change": -0.39393531269570836,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp Lexxy paragraphs": {
+      "base": 575.998,
+      "base1": 575.998,
+      "base2": 575.998,
+      "candidate": 406.0,
+      "change": -0.2951364414459773,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp plain": {
+      "base": 1797929.74,
+      "base1": 1797551.22,
+      "base2": 1798308.26,
+      "candidate": 798658.246,
+      "change": -0.5557900688599766,
+      "aa": 0.0004210620599668357,
+      "claim": true
+    },
+    "interp mention + link": {
+      "base": 3396826.943,
+      "base1": 3397481.18,
+      "base2": 3396172.706,
+      "candidate": 1166562.256,
+      "change": -0.6565729501162874,
+      "aa": 0.0003852047872785596,
+      "claim": true
+    },
+    "interp formatted list": {
+      "base": 3214496.143,
+      "base1": 3213086.5,
+      "base2": 3215905.786,
+      "candidate": 1493051.906,
+      "change": -0.5355253702041851,
+      "aa": 0.000877053782173366,
+      "claim": true
+    },
+    "interp Lexxy paragraphs": {
+      "base": 2949325.506,
+      "base1": 2951250.098,
+      "base2": 2947400.914,
+      "candidate": 1089359.818,
+      "change": -0.6306410344386043,
+      "aa": 0.0013051065378065997,
+      "claim": true
+    }
+  },
+  "ips": {}
+}

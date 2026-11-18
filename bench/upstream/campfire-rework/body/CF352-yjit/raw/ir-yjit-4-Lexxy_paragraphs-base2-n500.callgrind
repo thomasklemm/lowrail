@@ -1,0 +1,21 @@
+# callgrind format
+version: 1
+creator: callgrind-3.19.0
+pid: 650650
+cmd:  /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --yjit /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/campfire-rework/cf352_body.rb Lexxy paragraphs 500
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 872146292
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+totals: 0
