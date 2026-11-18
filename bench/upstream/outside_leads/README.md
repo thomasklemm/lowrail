@@ -8,7 +8,9 @@ Scripts behind [docs/upstream/outside-rails-leads.md](../../../docs/upstream/out
   the result (`owncallers`, `callers`, `methods`, `incl`, `inclown`, `cfuncs`).
 * `req/reqrun.rb APP WORKLOAD N MODE PATCH` counts Callgrind instructions and objects per request of one census
   workload, only inside `Rails.application#call`, with a measurement patch loaded after boot (`none.rb` for base
-  and A/A); `req/batch2.sh OUT MODE PATCH...` loops over a workload list. `req/countrun.rb APP` counts calls per
+  and A/A); `req/batch2.sh OUT MODE PATCH...` loops over a workload list. Each line ends with
+  `jit B/I settle S`: YJIT blocks compiled and invalidations in the measured window (a YJIT number counts only at
+  `0/0`) and the extra warm-up windows `FLAT=K` needed to get there. `req/countrun.rb APP` counts calls per
   request of the methods the leads touch.
 * `micro/` has the per-call Callgrind setups (run with `bench/upstream/gem_request_census/ir.sh`) and the
   differentials for the rack decode and escape variants.

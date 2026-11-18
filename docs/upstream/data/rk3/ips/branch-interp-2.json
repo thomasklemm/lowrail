@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Rack::Utils.unescape(\"hello\")",
+    "central_tendency": 3850388.1831143396,
+    "ips": 3850388.1831143396,
+    "error": 349901,
+    "stddev": 349901,
+    "microseconds": 5078773.668003082,
+    "iterations": 19345400,
+    "cycles": 386908
+  },
+  {
+    "name": "Rack::Utils.unescape(\"article%5Btitle%5D\")",
+    "central_tendency": 2200134.5994814257,
+    "ips": 2200134.5994814257,
+    "error": 130991,
+    "stddev": 130991,
+    "microseconds": 5031171.1480026245,
+    "iterations": 11023320,
+    "cycles": 200424
+  },
+  {
+    "name": "Rack::Utils.unescape(\"Hello+world+from+Rack\")",
+    "central_tendency": 2668499.838921342,
+    "ips": 2668499.838921342,
+    "error": 180227,
+    "stddev": 180227,
+    "microseconds": 5057099.942996025,
+    "iterations": 13418722,
+    "cycles": 216431
+  },
+  {
+    "name": "Rack::Utils.unescape(ESCAPED_COOKIE)",
+    "central_tendency": 596170.2404725208,
+    "ips": 596170.2404725208,
+    "error": 67050,
+    "stddev": 67050,
+    "microseconds": 5043970.401000977,
+    "iterations": 2960350,
+    "cycles": 59207
+  },
+  {
+    "name": "Rack::Utils.escape(\"hello\")",
+    "central_tendency": 2043752.0672721686,
+    "ips": 2043752.0672721686,
+    "error": 201996,
+    "stddev": 201996,
+    "microseconds": 5064200.20099926,
+    "iterations": 10218877,
+    "cycles": 192809
+  },
+  {
+    "name": "Rack::Utils.escape(COOKIE)",
+    "central_tendency": 772871.6957983755,
+    "ips": 772871.6957983755,
+    "error": 43414,
+    "stddev": 43414,
+    "microseconds": 5037542.010997772,
+    "iterations": 3880332,
+    "cycles": 62586
+  },
+  {
+    "name": "Rack::Utils.parse_nested_query(FORM)",
+    "central_tendency": 67509.02840592102,
+    "ips": 67509.02840592102,
+    "error": 7052,
+    "stddev": 7052,
+    "microseconds": 5009423.680999756,
+    "iterations": 333249,
+    "cycles": 6801
+  },
+  {
+    "name": "Rack::Utils.parse_cookies_header(COOKIE_HEADER)",
+    "central_tendency": 222773.5284050641,
+    "ips": 222773.5284050641,
+    "error": 16367,
+    "stddev": 16367,
+    "microseconds": 5061564.913000107,
+    "iterations": 1119832,
+    "cycles": 19997
+  },
+  {
+    "name": "Rack::Utils.set_cookie_header(\"_blog_session\", {value: COOKIE, path: \"/\", httponly: true, same_site: :lax})",
+    "central_tendency": 267124.3036245705,
+    "ips": 267124.3036245705,
+    "error": 17927,
+    "stddev": 17927,
+    "microseconds": 5001719.00399971,
+    "iterations": 1328975,
+    "cycles": 25075
+  }
+]

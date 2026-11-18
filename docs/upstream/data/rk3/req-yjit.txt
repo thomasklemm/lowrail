@@ -1,0 +1,21 @@
+blog PATCH article (redirect) yjit none.rb Ir/op 2570396 objs/op 1439.8 jit 0/0 settle 0
+blog PATCH article (redirect) yjit none.rb Ir/op 2574441 objs/op 1442.8 jit 0/0 settle 0
+blog PATCH article (redirect) yjit rk3.rb Ir/op 2448687 objs/op 1344.3 jit 0/0 settle 0
+blog PATCH article (redirect) yjit rk34.rb Ir/op 2320362 objs/op 1307.8 jit 0/0 settle 0
+blog PATCH article (redirect) yjit none.rb Ir/op 2572597 objs/op 1441.0 jit 0/0 settle 0
+blog GET article yjit none.rb Ir/op 4755595 objs/op 2035.1 jit 0/0 settle 0
+blog GET article yjit none.rb Ir/op 4750891 objs/op 2034.9 jit 0/0 settle 0
+blog GET article yjit rk3.rb Ir/op 4712656 objs/op 1989.0 jit 0/0 settle 0
+blog GET article yjit rk34.rb Ir/op 4621693 objs/op 1977.7 jit 0/0 settle 0
+blog GET article yjit none.rb Ir/op 4762743 objs/op 2037.9 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4161100 objs/op 1838.4 jit 14/0 settle 0
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4079080 objs/op 1835.7 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) yjit rk3.rb Ir/op 4017255 objs/op 1755.7 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) yjit rk34.rb Ir/op 3852077 objs/op 1742.4 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4085134 objs/op 1838.2 jit 0/0 settle 0
+blog GET articles.json yjit none.rb Ir/op 2207188 objs/op 1139.6 jit 0/0 settle 0
+blog GET articles.json yjit none.rb Ir/op 2207939 objs/op 1139.6 jit 0/0 settle 0
+blog GET articles.json yjit rk3.rb Ir/op 2206942 objs/op 1139.6 jit 0/0 settle 0
+blog GET articles.json yjit rk34.rb Ir/op 2213176 objs/op 1139.6 jit 0/0 settle 0
+blog GET articles.json yjit none.rb Ir/op 2210938 objs/op 1139.6 jit 0/0 settle 0
+DONE

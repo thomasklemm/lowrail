@@ -1,6 +1,7 @@
 # ruby reqrun.rb APP WORKLOAD N MODE [PATCH] -> Callgrind Ir and objects per operation of a census workload,
 # counting only Rails.application#call (req.rb), with PATCH loaded after boot. WARM (default 200) warm-up
-# operations; NOGC=1 disables GC for the measured window (fixed heap). Needs valgrind's callgrind.h.
+# operations; NOGC=1 disables GC for the measured window (fixed heap). "jit B/I" is YJIT blocks compiled and
+# invalidations during the measured window; a YJIT number counts only when both are 0 (JIT-flat). Needs valgrind's callgrind.h.
 require "tmpdir"
 load File.expand_path("../../../../script/census", __dir__)
 app, wl, n, mode, patch = ARGV
@@ -21,5 +22,6 @@ cmd = ["valgrind", "--tool=callgrind", "--instr-atstart=no", "--collect-atstart=
   File.join(bin, "ruby"), "-rbundler/setup", *Census::FLAGS.fetch(Census::MODES.fetch(mode)), File.expand_path("req.rb", __dir__), app, wl, n, patch.to_s]
 system(env, *cmd, chdir: copy, err: "#{out}.err") or abort File.read("#{out}.err")[-3000..]
 tot = Dir["#{out}.*"].grep(/\.\d+(\.\d+)?\z/).sum { |f| File.read(f)[/^totals: (\d+)/, 1].to_i }
-objs = File.read("#{out}.err")[/OBJS (\d+)/, 1].to_i
-puts format("%s %s %s %s Ir/op %d objs/op %.1f", app, wl, mode, File.basename(patch.to_s), tot / Integer(n), objs.fdiv(Integer(n)))
+err = File.read("#{out}.err")
+objs = err[/OBJS (\d+)/, 1].to_i
+puts format("%s %s %s %s Ir/op %d objs/op %.1f jit %s", app, wl, mode, File.basename(patch.to_s), tot / Integer(n), objs.fdiv(Integer(n)), "#{err[/JIT (\S+)/, 1]} settle #{err[/SETTLE (\d+)/, 1]}")

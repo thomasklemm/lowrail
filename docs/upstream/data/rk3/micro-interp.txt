@@ -1,0 +1,9 @@
+interp|Rack::Utils.unescape("hello")|4677|4666|3186
+interp|Rack::Utils.unescape("article%5Btitle%5D")|13858|13844|4893
+interp|Rack::Utils.unescape("Hello+world+from+Rack")|16192|16103|4452
+interp|Rack::Utils.unescape(ESCAPED_COOKIE)|51141|51116|16378
+interp|Rack::Utils.escape("hello")|6054|6037|5497
+interp|Rack::Utils.escape(COOKIE)|90343|90287|13930
+interp|Rack::Utils.parse_nested_query(FORM)|183607|183438|113376
+interp|Rack::Utils.parse_cookies_header(COOKIE_HEADER)|71446|71504|35083
+interp|Rack::Utils.set_cookie_header("_blog_session", {value: COOKIE, path: "/", httponly: true, same_site: :lax})|105200|105189|28707

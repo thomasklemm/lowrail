@@ -239,9 +239,7 @@ A/A is their difference. Receipts: `req-r-interp.txt`, `req-rackA.txt`, `req-n-i
 Campfire GET room is left out: its two base runs were 158.1M and 14.3M Ir (A/A failed). Split on blog GET article
 (one batch, base 8,916,738): RK3 alone −0.73% (8,851,747), RK4 alone −0.50% (8,872,522), both −1.64% (8,770,195).
 
-**YJIT is not claimed.** blog PATCH's A/A failed (2,591,277 vs 2,701,514, 4.2%; with RK3+RK4 2,352,904), and blog GET
-article read +1.2% with RK3+RK4 (4,781,689 → 4,838,833) with 200 warm-ups and no JIT-flat check. The 1,000-warm-up
-YJIT batch was stopped for memory before it finished. A PR needs a YJIT number with passing controls first.
+**YJIT** (this lead pass, superseded): blog PATCH's A/A failed (2,591,277 vs 2,701,514, 4.2%) and blog GET article read +1.2% with 200 warm-ups and no JIT-flat check. Those runs measured the warm-up's first compile of the harness's own block inside the window; the build below fixes the harness and has the YJIT numbers.
 
 **NK2** ([`req/noko_cache.rb`](../../bench/upstream/outside_leads/req/noko_cache.rb), joined-XPath cache, L2;
 [`req/noko_flatkey2.rb`](../../bench/upstream/outside_leads/req/noko_flatkey2.rb), flat `SelectorCache` key, exact):
@@ -254,6 +252,117 @@ YJIT batch was stopped for memory before it finished. A PR needs a YJIT number w
 A second campfire batch repeats the cache at −1.68% (43,317,326 → 42,591,298). YJIT: base A/A 26,634,176 /
 26,698,015 (0.24%); the cache run was stopped for memory. So the exact flat key alone is a fifth of a percent; the
 gain is in skipping the translation, which needs flavorjones to accept a second cache.
+
+## RK3 built (2026-11-18)
+
+Branch `thomasklemm/unescape-cgi` on the fork, two commits on rack main `da90464e3f`:
+`d85c4b9a42` decodes with `CGI.unescape` (RK3), `a8a5d747d0` escapes with `CGI.escape` (RK4). Queue item
+[RK3](../../bench/upstream/pr-queue/items/RK3.md) (state built, draft title and body). Scripts:
+[`bench/upstream/rk3/`](../../bench/upstream/rk3/README.md); receipts: [`data/rk3/`](data/rk3/).
+
+The escape commit has no `ascii_compatible?` guard: `CGI.escape` escapes UTF-16 and UTF-32 input byte for byte like
+URI on Ruby 3.2–4.0 (C and Ruby fallback), so the guard the lead's measurement patch had was dropped after the
+differential showed it unnecessary.
+
+**Exactness.** [`diff_unescape.rb`](../../bench/upstream/rk3/diff_unescape.rb) (both decode methods) and
+[`diff_escape.rb`](../../bench/upstream/rk3/diff_escape.rb) against URI, loading rack from the branch: 300,000 random
+cases plus 9 fixed odd inputs each, **0 differences** on Ruby 4.0.9, 3.4.12, 3.3.10 and 3.2.9, and on 3.4.12 with
+`cgi/escape`'s pure-Ruby fallback ([`pure_cgi.rb`](../../bench/upstream/rk3/pure_cgi.rb)). Boundary, printed by the
+scripts and not counted: a singleton `#b` (decode) or `#to_s`/`#dup` (escape) on a String argument is no longer
+called. Ruby 2.7–3.1 not run (no precompiled Ruby on this orb); rack's hosted CI covers them.
+
+**Tests.** 6 new tests in `spec_utils.rb` and `spec_query_parser.rb` (result encoding incl. invalid bytes
+and Shift_JIS, String subclasses, the invalid %-encoding messages through `parse_query`, `*`/`~`, US-ASCII result,
+UTF-16LE). Mutants caught: dropping the `force_encoding` (decode), the lone-`%` check, either `gsub!`, the US-ASCII
+`force_encoding`, the `instance_of?` guards in `Utils` (the one in `QueryParser#unescape` only ever sees Strings from `split`). Full suite (`CI=spec bundle exec rake`): 1292 runs, 6270 assertions,
+0 failures, 2 skips on 4.0.9, 3.4.12, 3.3.10 and 3.2.9. RuboCop (rack's `.rubocop.yml`): no new
+offenses in the four touched files against main; main has 436 elsewhere and rack's CI does not run RuboCop.
+
+**Per call** (Callgrind Ir, GC off, rack main twice as A/A / branch; [`micro.sh`](../../bench/upstream/rk3/micro.sh),
+a 284-byte Rails-style encrypted cookie, a 5-field form):
+
+| Call | interpreter main (A/A) | branch | | YJIT main (A/A) | branch | |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `unescape("hello")` | 4,677 / 4,666 | 3,186 | −32% | 3,287 / 3,994 | 2,296 | −37% |
+| `unescape("article%5Btitle%5D")` | 13,858 / 13,844 | 4,893 | −65% | 12,905 / 13,167 | 4,215 | −68% |
+| `unescape("Hello+world+from+Rack")` | 16,192 / 16,103 | 4,452 | −72% | 15,123 / 15,150 | 3,587 | −76% |
+| `unescape(escaped cookie)` | 51,141 / 51,116 | 16,378 | −68% | 50,411 / 50,269 | 15,451 | −69% |
+| `escape("hello")` | 6,054 / 6,037 | 5,497 | −9% | 4,397 / 4,823 | 4,445 | −4% |
+| `escape(cookie)` | 90,343 / 90,287 | 13,930 | −85% | 89,285 / 89,276 | 12,924 | −86% |
+| `parse_nested_query(form)` | 183,607 / 183,438 | 113,376 | −38% | 151,049 / 150,736 | 82,539 | −45% |
+| `parse_cookies_header` | 71,446 / 71,504 | 35,083 | −51% | 67,421 / 67,867 | 31,673 | −53% |
+| `set_cookie_header` (session cookie) | 105,200 / 105,189 | 28,707 | −73% | 102,044 / 101,807 | 25,813 | −75% |
+
+YJIT's small-call A/A is loose (`unescape("hello")` 3,287 / 3,994, `escape("hello")` 4,397 / 4,823), so the
+`escape("hello")` row is no claim; the rest move far outside it.
+
+**Per request** (Callgrind Ir inside `Rails.application#call`, 20 requests, GC off; patches
+[`req/rk3.rb`](../../bench/upstream/rk3/req/rk3.rb) and [`req/rk34.rb`](../../bench/upstream/rk3/req/rk34.rb) are the
+branch's method bodies verbatim over rack 3.2.7, whose three methods equal main's).
+
+Interpreter, 200 warm-ups, base = mean of two `none.rb` runs:
+
+| Workload | A/A | Base | RK3 | RK3+RK4 | Objects base → RK3 / both |
+| --- | ---: | ---: | ---: | ---: | --- |
+| blog PATCH article (redirect) | 0.04% | 4,707,344 | −3.15% | **−5.11%** | 1,438.5 → 1,338.3 / 1,302.8 |
+| pingcrm PUT contact (Inertia redirect) | 0.01% | 7,099,802 | −0.48% | **−2.95%** | 1,820.5 → 1,743.9 / 1,728.6 |
+| blog GET article | 0.08% | 8,343,453 | −0.42% | **−1.54%** | 2,022.7 → 1,978.7 / 1,966.8 |
+| codetriage GET repo | 0.02% | 14,894,759 | −0.38% | **−1.01%** | 3,270.0 → 3,219.8 / 3,204.4 |
+| blog GET articles.json (control) | 0.03% | 4,247,778 | +0.05% | −0.02% | 1,130.8 → 1,130.8 / 1,130.8 |
+
+YJIT, 1,000 warm-ups, base = mean of three `none.rb` runs (two before, one after the patched runs), A/A = their
+spread, every measured window JIT-flat (0 blocks compiled, 0 invalidations, `jit 0/0` in the receipts):
+
+| Workload | A/A | Base | RK3 | RK3+RK4 | Objects base → both |
+| --- | ---: | ---: | ---: | ---: | --- |
+| blog PATCH article (redirect) | 0.16% | 2,572,478 | −4.81% | **−9.80%** | 1,441.2 → 1,307.8 |
+| pingcrm PUT contact (Inertia redirect) | 0.20% | 4,079,634 | −1.55% | **−5.45%** | 1,836.7 → 1,739.5 |
+| blog GET article | 0.25% | 4,756,410 | −0.92% | **−2.83%** | 2,036.0 → 1,977.7 |
+| blog GET articles.json (control) | 0.17% | 2,208,688 | −0.08% | +0.20% | 1,139.6 → 1,139.6 |
+
+Rejected and recorded, not rescored: the first YJIT pingcrm cohort (its first base window compiled 14 blocks;
+[`req-yjit.txt`](data/rk3/req-yjit.txt)); the pingcrm row above is a fresh cohort with `FLAT=40` (warm in 20-request
+windows until one is flat; one window was enough). Also rejected: an earlier YJIT run of this build before the harness
+fix ([`req-yjit-rejected-noflat.txt`](data/rk3/req-yjit-rejected-noflat.txt)), whose windows each compiled 12–66 blocks
+and invalidated 2 (the harness's measured block and its toggles first ran inside the window). `req.rb` now warms up
+through the same block it measures, reports `jit B/I` per window, and takes `FLAT=K`.
+
+Memory held: one valgrind at a time on this 2-CPU, 3.9 GB orb; codetriage was left out of YJIT to keep each run under
+the cap.
+
+**Wall time** (benchmark-ips, Ruby 4.0.9, one pinned core, best of 3 alternating rounds; main's spread over rounds as
+A/A; receipts [`data/rk3/ips/`](data/rk3/ips/)):
+
+| interp | main | branch | | main A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Rack::Utils.unescape("hello")` | 2,283,649 | 3,989,478 | 1.75x | 5.3% |
+| `Rack::Utils.unescape("article%5Btitle%5D")` | 645,041 | 2,322,515 | 3.60x | 8.6% |
+| `Rack::Utils.unescape("Hello+world+from+Rack")` | 539,861 | 2,801,910 | 5.19x | 5.8% |
+| `Rack::Utils.unescape(ESCAPED_COOKIE)` | 173,816 | 674,675 | 3.88x | 28.4% |
+| `Rack::Utils.escape("hello")` | 1,806,937 | 2,190,253 | 1.21x | 26.1% |
+| `Rack::Utils.escape(COOKIE)` | 110,136 | 802,221 | 7.28x | 2.3% |
+| `Rack::Utils.parse_nested_query(FORM)` | 39,640 | 71,659 | 1.81x | 2.1% |
+| `Rack::Utils.parse_cookies_header(COOKIE_HEADER)` | 105,312 | 233,920 | 2.22x | 14.6% |
+| `Rack::Utils.set_cookie_header("_blog_session", {value: COOKIE, path: "/", httponly: true, same_site: :lax})` | 97,535 | 295,193 | 3.03x | 20.3% |
+
+| yjit | main | branch | | main A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Rack::Utils.unescape("hello")` | 3,184,819 | 6,698,543 | 2.10x | 0.5% |
+| `Rack::Utils.unescape("article%5Btitle%5D")` | 701,969 | 3,166,054 | 4.51x | 4.8% |
+| `Rack::Utils.unescape("Hello+world+from+Rack")` | 587,375 | 3,822,373 | 6.51x | 9.1% |
+| `Rack::Utils.unescape(ESCAPED_COOKIE)` | 170,206 | 729,160 | 4.28x | 15.2% |
+| `Rack::Utils.escape("hello")` | 2,527,914 | 2,834,751 | 1.12x | 3.6% |
+| `Rack::Utils.escape(COOKIE)` | 114,042 | 832,773 | 7.30x | 8.9% |
+| `Rack::Utils.parse_nested_query(FORM)` | 47,243 | 98,208 | 2.08x | 1.0% |
+| `Rack::Utils.parse_cookies_header(COOKIE_HEADER)` | 107,320 | 255,270 | 2.38x | 4.7% |
+| `Rack::Utils.set_cookie_header("_blog_session", {value: COOKIE, path: "/", httponly: true, same_site: :lax})` | 85,917 | 320,542 | 3.73x | 0.6% |
+
+The orb's wall-time A/A is wide (up to 28% for one row in the interpreter), so only rows whose change is well
+outside it count; `escape("hello")` (1.21x / 1.12x) does not. The body's own script
+([`body_ips.rb`](../../bench/upstream/rk3/body_ips.rb), receipts [`data/rk3/body-ips/`](data/rk3/body-ips/)), same way:
+`parse_nested_query` 40,386 → 73,282 i/s (1.81x, A/A 11.6%), `parse_cookies_header` 106,527 → 226,019 (2.12x, 23.0%),
+`set_cookie_header` 88,566 → 296,275 (3.35x, 9.8%); YJIT 49,586 → 98,712 (1.99x, 6.3%), 120,966 → 257,566 (2.13x,
+5.2%), 98,116 → 335,523 (3.42x, 4.0%).
 
 ## Checked and rejected
 

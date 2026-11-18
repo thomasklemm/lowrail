@@ -1,0 +1,6 @@
+blog PATCH article (redirect) yjit none.rb Ir/op 2629123 objs/op 1447.2
+blog PATCH article (redirect) yjit none.rb Ir/op 2603349 objs/op 1443.8
+blog PATCH article (redirect) yjit rk3.rb Ir/op 2467965 objs/op 1344.8
+blog PATCH article (redirect) yjit rk34.rb Ir/op 2339364 objs/op 1307.8
+blog PATCH article (redirect) yjit none.rb Ir/op 2679991 objs/op 1447.6
+blog GET article yjit none.rb Ir/op 4777049 objs/op 2035.4

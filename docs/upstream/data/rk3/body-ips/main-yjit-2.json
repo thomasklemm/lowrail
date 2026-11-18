@@ -1,0 +1,32 @@
+[
+  {
+    "name": "parse_nested_query",
+    "central_tendency": 49585.543514996265,
+    "ips": 49585.543514996265,
+    "error": 1539,
+    "stddev": 1539,
+    "microseconds": 5071091.063991547,
+    "iterations": 251200,
+    "cycles": 5024
+  },
+  {
+    "name": "parse_cookies_header",
+    "central_tendency": 120966.27303403882,
+    "ips": 120966.27303403882,
+    "error": 6394,
+    "stddev": 6394,
+    "microseconds": 5078867.184995651,
+    "iterations": 612450,
+    "cycles": 12249
+  },
+  {
+    "name": "set_cookie_header",
+    "central_tendency": 94302.73818962811,
+    "ips": 94302.73818962811,
+    "error": 11575,
+    "stddev": 11575,
+    "microseconds": 5022309.152009964,
+    "iterations": 464457,
+    "cycles": 9107
+  }
+]
