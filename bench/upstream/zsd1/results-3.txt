@@ -1,0 +1,54 @@
+ZSD1 -3 (2026-11-18), head baed628ce1 on thomasklemm/zjit-string-dup-3, one commit on ruby/ruby 3a19e2efcf.
+String#dup on a bare String (StringExact + no-ivars shape guard) becomes StringDup, a frameless leaf call
+(gen_prepare_leaf_call_with_gc) to rb_str_dup, behind PatchPoint NoNewObjHook; not inlined while a NEWOBJ hook
+is active (Function::assume_no_newobj_hook). The -2 frozen filter in gen_string_copy is reverted: StringCopy
+again only comes from string literals.
+
+Builds (orb, Linux x86-64, GCC 14.2.0, Rust 1.100.0, bootstrap Ruby 4.0.9):
+  release: configure --enable-zjit --disable-install-doc --without-jemalloc, make install
+    master  3a19e2efcf  -> ~/rb/master
+    -3      working tree of baed628ce1 before the commit (RUBY_DESCRIPTION says eab95f8c5b, the cherry-picked
+            -2; file contents identical to baed628ce1, bindings byte-identical after make zjit-bindgen)
+  dev:     configure --enable-zjit=dev --disable-install-doc --without-jemalloc, for tests and probes
+
+Micro: micro.sh (dup_micro.rb, s.dup of a 20-byte String passed as an argument, --zjit-call-threshold=2,
+Callgrind slope between N=50,000 and N=250,000). Raw summary lines in zsd3-raw/callgrind.txt.
+  default heap:                  master 397, master-aa 397, -3 387, -3-aa 387 Ir per call  (-10, -2.5%)
+  RUBY_GC_HEAP_INIT_BYTES=32 MiB: master 250,                -3 240 Ir per call           (-10)
+  (-2's StringCopy was -29: rb_ec_str_resurrect takes the EC and skips rb_obj_class and the embed-size check.)
+
+railsbench, ruby-bench 73918b2, HARNESS=jit_stats (bench/upstream/ruby_bench_jit_stats.rb, 15 warmup + 10),
+--zjit --zjit-stats-quiet, per iteration (raw JSON in zsd3-raw/railsbench-*.json):
+                         master    master2   -3
+  ccall_String#dup       25,218    25,218    0
+  ccall_rb_str_dup       0         0         25,218
+  ccall_rb_ec_str_resurrect 2,101.1 1,916.8  1,460.2   (moves between runs; not attributed)
+  exit_guard_no_ivars_failure, exit_patchpoint_no_newobj_hook: 0 in -3
+  At 10 Ir per call that is about 0.25 M Ir per railsbench iteration (0.005% of 4,904 M). lobsters and shipit
+  not rerun.
+
+Production code: 60 added lines outside tests and generated bindings (50 without blanks and comments), 5 removed;
+-2 had about 30.
+
+Probes (dev build of -3; probes.sh in the orb backup): interpreter vs ZJIT t1, t2, t1+max-versions=1,
+t2+max-versions=1, and the review's focused modes f1/f2/f2mv1 (num-profiles=1, inline-threshold=0):
+  probe.rb 63 lines, const_probe.rb 30, thermos_probe.rb 115, thermos_allocation_probe.rb early/late/memory
+  3/3/11, zsd3_probe.rb 636 (sizes 0..3000 around the embed cutoff in five encodings, frozen/mutable/interned/
+  embedded-large sources, memsize, storage, broken and multibyte contents, mutable and frozen constants mutated
+  after compilation), zsd3_probe.rb early/late 6/6 (allocation tracing on before/after warmup):
+  all identical in every mode, except probe.rb t1+max-versions=1 line 52 (allocation count 305 vs 303),
+  the same on master. Summary in zsd3-raw/probe-summary.txt, focused allocation output verbatim in
+  zsd3-raw/thermos-allocations-zsd3.txt: ["String", :dup, ...] in every mode; memory 40 bytes per copy
+  from 232 bytes up, as the interpreter. zsd3_probe.rb on master ZJIT t1/t2 also identical to the interpreter.
+  The 232-byte boundary: a mutable 232-byte embedded source copies to a 40-byte shared heap string in the
+  interpreter, master and -3 (the source turns shared too); -2 made a 512-byte embedded copy.
+
+Tests (dev build, baed628ce1):
+  make zjit-test: 2,018 passed, 1 failed, 15 skipped; the failure is
+    codegen::tests::test_profile_frames_during_direct_jit_to_jit_entry (SIGPROF, fails on master in this orb too)
+  btest --zjit-call-threshold=1 and =2: PASS all 2,148 each
+  test_zjit_cli, test_string, test_string_memory, test_stringchar, test_optimization at t1 and t2:
+    657 tests, 39,844 assertions, 0 failures, 0 errors, 0 skips each; memory_leak supplement 16 tests,
+    194 assertions, 0 failures each
+  make zjit-bindgen (rustfmt installed): exit 0, output identical to the hand edit
+  git diff --check 3a19e2efcf..baed628ce1: clean
