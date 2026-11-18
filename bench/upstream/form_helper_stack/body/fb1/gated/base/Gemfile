@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/workspace/rails-fb1-main/activesupport"
+gem "activemodel", path: "/home/user/workspace/rails-fb1-main/activemodel"
+gem "actionview", path: "/home/user/workspace/rails-fb1-main/actionview"
+gem "benchmark-ips"

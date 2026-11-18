@@ -86,9 +86,10 @@ the rows it needs; a single cell that is "within noise" is not claimed in prose 
   instructions per call in AM1, whose gated rerun `bench/upstream/jit_flat_gate/am1` gives YJIT `errors[:title]`
   3,101 → 1,231 (−60.3%) where `body/am1` had 3,574 → 1,684 (−52.9%). A benchmark-ips report whose warm-up
   enters `call_times` fewer times than the call threshold compiled it in the timed loop (AM1 with a 1 s warm-up).
-  Those runs' YJIT rows are uncertified. `jit_flat_gate/redefine` shows refused cells: a method redefined in
-  every window, +0.1% Callgrind and +1.8% ips above their A/A, both "not JIT-flat, no claim". The objects worker
-  has no gate; its counts are deterministic and checked by their own A/A.
+  Those runs' YJIT rows are uncertified; FB1's gated rerun is `form_helper_stack/body/fb1/gated`.
+  `jit_flat_gate/redefine` shows refused cells: a method redefined in every window, +0.1% Callgrind and +1.8% ips
+  above their A/A, both "not JIT-flat, no claim". The objects worker has no gate; its counts are deterministic
+  and checked by their own A/A.
 * The A/A is one pair per cell, not a confidence interval. For Callgrind with GC off it is usually under 1%; for
   benchmark-ips on an orb it is often several percent, so most wall-time changes come out as noise.
 * Each case gets its own Callgrind processes, so many cases and modes take a while: FB1, with 4 cases, 2 modes and

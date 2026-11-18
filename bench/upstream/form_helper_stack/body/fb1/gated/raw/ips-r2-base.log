@@ -1,0 +1,15 @@
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           text_field    11.112k i/100ms
+             checkbox     7.258k i/100ms
+text_field, persisted    10.609k i/100ms
+  checkbox, persisted     6.739k i/100ms
+Calculating -------------------------------------
+           text_field    102.909k (± 6.0%) i/s    (9.72 μs/i) -    522.264k in   5.074985s
+jit text_field	compiled_iseq_count=482>482 compiled_block_count=7982>7982 invalidation_count=248>248
+             checkbox     70.377k (± 7.1%) i/s   (14.21 μs/i) -    355.642k in   5.053400s
+jit checkbox	compiled_iseq_count=486>486 compiled_block_count=8007>8007 invalidation_count=248>248
+text_field, persisted    103.301k (± 6.4%) i/s    (9.68 μs/i) -    519.841k in   5.032273s
+jit text_field, persisted	compiled_iseq_count=486>486 compiled_block_count=8009>8009 invalidation_count=248>248
+  checkbox, persisted     72.381k (± 7.8%) i/s   (13.82 μs/i) -    363.906k in   5.027665s
+jit checkbox, persisted	compiled_iseq_count=486>486 compiled_block_count=8009>8009 invalidation_count=248>248

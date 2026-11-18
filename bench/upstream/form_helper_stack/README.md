@@ -444,3 +444,8 @@ against main `a5203b3d4d` and AM1 head `8cef505ecc` against main `4f00fbc946`, R
 three benchmark-ips rounds. They reproduce `am1_objs.rb`'s objects and `fb1_ir.txt` to within about its main
 A/A: interpreter / YJIT text_field −2.8% / −4.6% against the recorded −3.1% / −5.3%, checkbox −2.1% / −3.8%
 against −2.2% / −4.0% ([body-numbers](../../../docs/upstream/body-numbers.md)).
+
+`body/fb1/gated` (2026-11-18) reruns `body/fb1` with the JIT-flat gate on the same trees and Ruby: every YJIT window
+is flat. Interpreter / YJIT text_field −3.3% / −5.4%, checkbox −2.2% / −3.6% (persisted −2.9% / −4.4% and
+−2.2% / −4.0%), all outside their A/A; the body rounds them to 3% / 5% and 2% / 4% (provenance and table in
+[PROVENANCE](body/fb1/gated/PROVENANCE.md)).

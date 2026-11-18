@@ -1,0 +1,50 @@
+Fetching gem metadata from https://rubygems.org/.........
+Resolving dependencies...
+Fetching bigdecimal 4.1.3
+Fetching concurrent-ruby 1.3.8
+Fetching connection_pool 3.0.3
+Fetching i18n 1.15.2
+Fetching json 3.1.0
+Installing bigdecimal 4.1.3 with native extensions
+Fetching prism 2.1.0 (x86_64-linux-gnu)
+Installing json 3.1.0 with native extensions
+Fetching minitest 6.1.0
+Fetching date 3.6.0
+Fetching stringio 3.2.0
+Installing date 3.6.0 with native extensions
+Installing stringio 3.2.0 with native extensions
+Fetching psych 5.5.0
+Fetching ractor-dispatch 0.3.0
+Fetching securerandom 0.4.1
+Fetching tzinfo 2.0.6
+Fetching uri 1.1.2
+Fetching builder 3.3.0
+Fetching erubi 1.13.1
+Fetching herb 0.11.2 (x86_64-linux-gnu)
+Fetching nokogiri 1.19.7 (x86_64-linux-gnu)
+Fetching rails-dom-testing 2.3.0
+Fetching crass 1.0.8
+Fetching loofah 2.25.3
+Fetching rails-html-sanitizer 1.7.2
+Fetching benchmark-ips 2.15.1
+Installing concurrent-ruby 1.3.8
+Installing connection_pool 3.0.3
+Installing i18n 1.15.2
+Installing prism 2.1.0 (x86_64-linux-gnu)
+Installing minitest 6.1.0
+Installing ractor-dispatch 0.3.0
+Installing securerandom 0.4.1
+Installing tzinfo 2.0.6
+Installing uri 1.1.2
+Installing builder 3.3.0
+Installing erubi 1.13.1
+Installing herb 0.11.2 (x86_64-linux-gnu)
+Installing nokogiri 1.19.7 (x86_64-linux-gnu)
+Installing rails-dom-testing 2.3.0
+Installing crass 1.0.8
+Installing loofah 2.25.3
+Installing rails-html-sanitizer 1.7.2
+Installing benchmark-ips 2.15.1
+Installing psych 5.5.0 with native extensions
+Bundle complete! 4 Gemfile dependencies, 30 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
