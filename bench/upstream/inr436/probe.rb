@@ -30,6 +30,14 @@ class Raising
   def to_inertia = raise('boom')
 end
 
+class LateFailure
+  def as_json(*) = raise('late query failed')
+end
+
+Projection = Struct.new(:value) do
+  def to_inertia = value
+end
+
 Rec = Struct.new(:id, :deferred, :once, :rescue) do
   def deferred? = deferred
   def once? = once
@@ -89,6 +97,41 @@ CASES = {
   },
   'big_plain_array' => ->(c) { { a: Array.new(50) { |i| { id: i, tags: %w[x y] } } } },
   'scroll_ser' => ->(c) { { s: I.scroll { c << :s; [Ser.new('A')] } } },
+  'always_deep_exec' => lambda { |c|
+    { other: 1, al: I.always { { rows: [[Ser.new('A'), -> { c << :closure; 7 }],
+                                     { x: I.optional { c << :optional; 8 }, u: Ser.new('B') }] } } }
+  },
+  'always_serializer_with_exec' => lambda { |c|
+    { other: 1, al: I.always { { u: Projection.new({ name: 'A', x: -> { c << :x; 7 },
+                                                   later: I.defer { c << :later; 8 } }) } } }
+  },
+  'optional_array_positions' => lambda { |c|
+    { o: I.optional { [11, { u: Ser.new('A'), r: Raising.new },
+                       [Ser.new('B'), I.optional { c << :inner; 8 }], [], {}] } }
+  },
+  'optional_serializer_returns_array' => lambda { |c|
+    { o: I.optional { { u: Projection.new([Ser.new('A'), -> { c << :x; 7 }]) } } }
+  },
+  'always_empty_serializer' => ->(c) { { other: 1, al: I.always { { u: Projection.new({}) } } } },
+  'always_null_serializer' => ->(c) { { other: 1, al: I.always { { u: Projection.new(nil) } } } },
+  'always_string_serializer' => ->(c) { { other: 1, al: I.always { { u: DuckSer.new } } } },
+  'defer_late_hash' => ->(c) { { d: I.defer(rescue: true) { { u: Ser.new('A'), lazy: LateFailure.new } } } },
+  'defer_late_array' => ->(c) { { d: I.defer(rescue: true) { [Ser.new('A'), LateFailure.new] } } },
+  'defer_late_plain_control' => ->(c) { { d: I.defer(rescue: true) { { u: 'A', lazy: LateFailure.new } } } },
+  'defer_direct_late_serializer_control' => lambda { |c|
+    { d: I.defer(rescue: true) { Projection.new({ u: 'A', lazy: LateFailure.new }) } }
+  },
+  'mixed_predicates_in_always' => lambda { |c|
+    { al: I.always { { u: Ser.new('A'), rec: Rec.new(9, true, true, true) } } }
+  },
+  'optional_empty_containers' => ->(c) { { o: I.optional { { u: Ser.new('A'), h: {}, a: [], n: nil } } } },
+  'always_partial_plain_array' => ->(c) { { al: I.always { { u: Ser.new('A'), rows: [11, 22, 33] } } } },
+  'optional_hash_subclass' => lambda { |c|
+    { o: I.optional { ActiveSupport::HashWithIndifferentAccess.new(u: Ser.new('A'), rows: [1, Ser.new('B')]) } }
+  },
+  'serializer_in_array_with_props' => lambda { |c|
+    { al: I.always { [Projection.new({ u: Ser.new('A'), x: I.optional { c << :x; 7 } }), 11] } }
+  },
 }.freeze
 
 VISITS = {
@@ -98,6 +141,10 @@ VISITS = {
   'only_children' => { component: true, only: %w[o.u al.posts al.rows.0 d.u a.u page.panel] },
   'except_children' => { component: true, only: %w[o d al m], except: %w[o.n d.r al.e al.x] },
   'except_once' => { except_once: %w[o r2 rec] },
+  'only_array_positions' => { component: true, only: %w[o.1.u o.2.1 al.rows.1 al.0.u] },
+  'except_parent' => { component: true, except: %w[al o d] },
+  'except_exec_children' => { component: true, except: %w[al.u.x al.rows.0.1 o.1.r] },
+  'reset_and_scroll' => { component: true, only: %w[al m s], reset: %w[m al.posts], scroll_intent: 'prepend' },
 }.freeze
 
 evaluator = InertiaRails::PropEvaluator.new(Object.new)
