@@ -50,6 +50,7 @@ passes:
       original author date 1793880318 +0000, no trailers. The message correctly
       drops the old post-ractorize-freezing promise. Separate Astra risk slot
       remains required; this pass does not fill it.
+  - {reviewer: astra, head: "d1e2cdbcc2", orb: T-01a1ee7c-6230-7048-ae2d-0791548851ec, date: 2026-11-18, verdict: approve, open: "No remaining must-fixes found. Prior reproducers pass; engine/app/on_load registration order and production lazy/eager boot with/without routes checked. Request subclasses retain Ractor reads; direct/concern/singleton-class includers lose them as disclosed, unless explicitly frozen. Candidate body and commit message accurate within that scope. Identity/original date/no-trailers verified. Ractors 23 tests/78 assertions and webservice 9/22, no F/E/S. Details under For Thomas."}
 ---
 
 # Allow registering parameter parsers in place during boot
@@ -66,6 +67,69 @@ Released gems do this from their railtie or engine: [graphiti 2.2.3](https://git
 This restores in-place registration, keeping parsers mutable until `ractorize!`, which then freezes them on every class that includes `ActionDispatch::Http::Parameters`. Parsers assigned or included after that are frozen as before, and `DEFAULT_PARSERS` itself stays frozen. Reading them from another Ractor still requires every parser value to be shareable.
 
 ## For Thomas
+
+### Astra adversarial review of d1e2cdbcc2 (2026-11-18)
+
+**Verdict: approve; no remaining must-fixes found.** Reviewed directly, without
+delegation, in orb `T-01a1ee7c-6230-7048-ae2d-0791548851ec`. Exact fork head
+`d1e2cdbcc2fe0a8e664eb57a7fee937e04c5a23f` is one commit on
+`8e097e9d81f65fe8701c77352f5758be4f75f957`; the remote -lean2 branch still
+pointed there when checked. This approval covers the narrower scope stated in
+the proposed -lean2 body below, not the old body's promise to freeze every
+includer.
+
+* **The previous writer and lazy-loading failures are fixed.** Replayed
+  `op1_probe.rb` modes `normal`, `late_hook`, `after_writer`, `includer` (a
+  Request subclass), and `lazy` against the candidate and parent/old-head
+  two-file controls. All parser reads returned `{"a" => 1}`; the isolated
+  lazy probe left the Request autoload intact. Replayed the actual production
+  app with `eager_load` both false and true, with and without a later
+  `before_ractorize` replacement: the table was frozen and Ractor-readable
+  after every `ractorize!`. The lazy normal case did not run Request hooks
+  until the probe explicitly referenced Request after ractorization.
+* **Registration order did not expose another early freeze.** A real engine
+  initializer ordered after `action_dispatch.ractorize`, a later application
+  initializer, `after_initialize`, and post-boot registration all worked.
+  Separate probes registered Request load callbacks before the initializers,
+  in the engine/application initializers, in `after_initialize`, and after
+  boot. All callbacks completed their in-place registrations and the engine's
+  writer-then-in-place registration before freezing. Tested all four
+  combinations of production eager loading on/off and an empty/nonempty route
+  set. Route-less lazy boot stayed lazy through `ractorize!`; the other three
+  loaded Request during boot. A late Request load callback using the writer
+  after ractorization also preserved freezing and returned the expected custom
+  parser result from another Ractor (`"xY9"` became `"9Yx"`).
+* **The custom-table tradeoff is real, but disclosed.** Request subclasses
+  assigned their own tables before and after the hook remained frozen and
+  Ractor-readable, including subsequent replacements: the initial absent ivar
+  is nil, whose `frozen?` is true. Direct includers before/after the hook,
+  inclusion through another concern, and a singleton-class includer instead
+  retained mutable tables and raised `Ractor::IsolationError` even reading the
+  shareable default JSON parser. Parent main and the old ObjectSpace-based
+  implementation allowed all those reads. Explicitly freezing a direct
+  includer's table restored its reads and the candidate writer retained that
+  freeze. This is not equivalent coverage to the old walk; retaining this
+  reduction is the stated scope choice, not evidence such tables are unused.
+* **Wording and identity checked.** The proposed -lean2 body no longer claims
+  custom tables are never used and states their lost Ractor readability.
+  `params_parsers` in stock Rails does use Request's table; custom overrides
+  remain possible. The commit's freeze/replacement/copy statements match the
+  implementation. The old body above still describes the live old PR head and
+  must not be reused for -lean2. Raw headers name Thomas Klemm
+  `<github@tklemm.eu>` as author and committer, preserve author timestamp
+  `1793880318 +0000` (`2026-11-05T12:05:18Z`, independently matched against the
+  live PR commit), and have no trailers.
+
+Verification: Ruby 4.0.9, Rack `da90464e3fa93e3cb49dc2d4ede798e6c6b70b4f`.
+`RACK=head bundle exec ruby -Itest test/application/ractors_test.rb` in railties:
+**23 runs, 78 assertions, 0 failures/errors/skips**. Action Pack
+`webservice_test.rb`: **9 runs, 22 assertions, 0 failures/errors/skips**. Did not
+rerun the full Action Pack or OpenProject suites. The prior orb was archived,
+so `download_thread_file` refused the requested transfer; recovered both
+original reproducers from its transcript instead. Those and new
+`op1_order_probe.rb`, `op1_tables_probe.rb`, route fixtures, and the suite's
+`OP1.Gemfile`/lock are retained in this orb's `.amp/in/orb-backup/`. Only this
+Lowrail review record is changed; no fork/PR write or public comment.
 
 ### Body for the -lean2 head d1e2cdbcc2 (2026-11-18, not posted)
 
