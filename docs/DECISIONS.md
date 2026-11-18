@@ -301,8 +301,10 @@ it). The default review of a head is now a `thermos` review in its own GPT-6.1 S
 served by the ChatGPT subscription): correctness/security and maintainability in parallel, plus the body, comment
 and commit message sentence by sentence. Its pass is recorded as `reviewer: thermos-sol`. The coordinator adds an
 Opus pass where a second reviewer helps (claims-heavy bodies, measurements) and Astra on `risky` items. Passes
-already recorded as `claude-code` keep counting. Every new Sol thread starts with effort `high` (Thomas, 2026-11-18;
-the default is medium). Opus 5.5 threads get `high` for reviews, exactness work and hard builds, and `medium` where
+already recorded as `claude-code` keep counting. Every Sol review thread runs at effort `xhigh` (Thomas, 2026-11-18,
+raised from `high`; the default is medium). A head that answers a maintainer's review comments gets an intensive Opus
+review (`thermos-opus`) next to `thermos-sol`, both on the same head, and Thomas sees the reply drafts before they
+are posted (Thomas, 2026-11-18). Opus 5.5 threads get `high` for reviews, exactness work and hard builds, and `medium` where
 the coordinator judges it enough, such as record updates, reruns of known measurements and small follow-ups.
 OpenAI's provider refused the TN2 review (a segfault) as possible cybersecurity content, so crash and memory-safety
 fixes get their thermos review on Opus 5.5 (`reviewer: thermos-opus`).
