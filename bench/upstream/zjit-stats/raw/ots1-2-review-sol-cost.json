@@ -1,0 +1,1120 @@
+{
+ "reviewer": "thermos-sol",
+ "head": "6a3dc53c874f5b9df4f6d6a2fe2fe091b5aab7cb",
+ "base": "9de06831e37534f8a163e598cc0c6903c7687430",
+ "tool": {
+  "version": "3.19.0",
+  "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+  "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+  "brk_reservation_mib": 512,
+  "tool": "libexec/valgrind/callgrind-amd64-linux",
+  "tool_sha256": "0b357640414f672d8b6f0031eedcabf2581a6b402cb89ebfa1db2a9847d78dd8",
+  "compiler": "cc (Debian 14.2.0-19) 14.2.0",
+  "libc": "glibc 2.41"
+ },
+ "probe_sha256": "1dfc269d3f9fe8aac19b3da16c60e4403beae24db3d18645fc6156b4e0767b33",
+ "configure": "--enable-zjit --disable-yjit --disable-install-doc --without-jemalloc",
+ "method": "taskset core 0; Callgrind totals: Ir at N=10000 minus N=1000; allocations N=600000; two rounds per binary",
+ "limits": "Diagnostic only: default heap, GC enabled, no CPU isolation. No native-time or app-speed claim.",
+ "rounds": {
+  "1": {
+   "string/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 52971438,
+     "10000": 74720167
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 21748729
+   },
+   "string/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 52982496,
+     "10000": 74662501
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 21680005
+   },
+   "symbol/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53289313,
+     "10000": 76197311
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22907998
+   },
+   "symbol/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 200000,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55144065,
+     "10000": 77813361
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 3332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22669296
+   },
+   "integer/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53315461,
+     "10000": 76414650
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23099189
+   },
+   "integer/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53297569,
+     "10000": 76525187
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23227618
+   },
+   "integer_string/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53160848,
+     "10000": 75854402
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22693554
+   },
+   "integer_string/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53185328,
+     "10000": 75775337
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22590009
+   },
+   "module/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 500000,
+     "side_exit_count": 500000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55299199,
+     "10000": 86046922
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 833,
+      "side_exit_count": 833,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 8333,
+      "side_exit_count": 8333,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 30747723
+   },
+   "module/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 500000,
+     "side_exit_count": 500000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55304995,
+     "10000": 86056530
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 833,
+      "side_exit_count": 833,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 8333,
+      "side_exit_count": 8333,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 30751535
+   },
+   "string_integer/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53252662,
+     "10000": 75953304
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22700642
+   },
+   "string_integer/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55501237,
+     "10000": 77556845
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22055608
+   },
+   "string_module/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53186832,
+     "10000": 75994760
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22807928
+   },
+   "string_module/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55992418,
+     "10000": 78103030
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22110612
+   },
+   "custom/base": {
+    "allocations": 1400014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53794014,
+     "10000": 77213805
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23419791
+   },
+   "custom/head": {
+    "allocations": 1400014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 200000,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55737141,
+     "10000": 78902399
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 3332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23165258
+   }
+  },
+  "2": {
+   "string/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53006733,
+     "10000": 74647488
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 21640755
+   },
+   "string/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 52997478,
+     "10000": 74707228
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 21709750
+   },
+   "symbol/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 200000,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55161577,
+     "10000": 77689313
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 3332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22527736
+   },
+   "symbol/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53198384,
+     "10000": 76152866
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22954482
+   },
+   "integer/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53299749,
+     "10000": 76419257
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23119508
+   },
+   "integer/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53285985,
+     "10000": 76488070
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23202085
+   },
+   "integer_string/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53172823,
+     "10000": 75793875
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22621052
+   },
+   "integer_string/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53153292,
+     "10000": 75869777
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22716485
+   },
+   "module/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 500000,
+     "side_exit_count": 500000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55503729,
+     "10000": 86159229
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 833,
+      "side_exit_count": 833,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 8333,
+      "side_exit_count": 8333,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 30655500
+   },
+   "module/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 500000,
+     "side_exit_count": 500000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55429464,
+     "10000": 86051190
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 833,
+      "side_exit_count": 833,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 8333,
+      "side_exit_count": 8333,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 30621726
+   },
+   "string_integer/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55509669,
+     "10000": 77567224
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22057555
+   },
+   "string_integer/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53173019,
+     "10000": 75928385
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22755366
+   },
+   "string_module/head": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55983387,
+     "10000": 78110788
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22127401
+   },
+   "string_module/base": {
+    "allocations": 1200014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53195934,
+     "10000": 76054904
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 22858970
+   },
+   "custom/head": {
+    "allocations": 1400014,
+    "stats": {
+     "exit_guard_type_failure": 0,
+     "side_exit_count": 0,
+     "dynamic_send_count": 200000,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 55882473,
+     "10000": 78970547
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 0,
+      "side_exit_count": 0,
+      "dynamic_send_count": 3332,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23088074
+   },
+   "custom/base": {
+    "allocations": 1400014,
+    "stats": {
+     "exit_guard_type_failure": 100000,
+     "side_exit_count": 100000,
+     "dynamic_send_count": 0,
+     "compiled_iseq_count": 0,
+     "invalidation_time_ns": 0,
+     "zjit_alloc_bytes": 0
+    },
+    "Ir": {
+     "1000": 53777184,
+     "10000": 77241238
+    },
+    "callgrind_stats": {
+     "1000": {
+      "exit_guard_type_failure": 166,
+      "side_exit_count": 166,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     },
+     "10000": {
+      "exit_guard_type_failure": 1666,
+      "side_exit_count": 1666,
+      "dynamic_send_count": 0,
+      "compiled_iseq_count": 0,
+      "invalidation_time_ns": 0,
+      "zjit_alloc_bytes": 0
+     }
+    },
+    "slope": 23464054
+   }
+  }
+ },
+ "date": "2026-11-18",
+ "binaries_sha256": {
+  "base": "f6a7742544346fe185ee4b7726e77e3cd78374cead96711f9bd7bd7d1519c73c",
+  "head": "19016e4e435e0e8d0b44a4fc286e80d3271d9261eb49e4043b13ccf9d764c4e1"
+ },
+ "build_control": "One checkout at candidate head, production hir.rs swapped byte-for-byte to base for the base executable; same release configuration and remaining source.",
+ "final_version_boundary": "Separate dev check: MODE=string_module N=60000 gives 120014 objects on base and default head; head with --zjit-max-versions=2 gives 140014 objects and 20000 dynamic sends because the existing final-version policy declines the Module arm. Values remain identical."
+}
