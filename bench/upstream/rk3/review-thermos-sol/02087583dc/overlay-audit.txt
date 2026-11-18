@@ -1,0 +1,3 @@
+lib/rack/utils.rb#escape: Rack 3.2.7 equals base; overlay equals exact head
+lib/rack/utils.rb#unescape: Rack 3.2.7 equals base; overlay equals exact head
+lib/rack/query_parser.rb#unescape: Rack 3.2.7 equals base; overlay equals exact head

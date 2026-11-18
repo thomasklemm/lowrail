@@ -1,0 +1,17 @@
+Run options: --name "/unescape with an encoding argument converted once/" --seed 30823
+
+# Running:
+
+E
+
+Finished in 0.000988s, 1011.9983 runs/s, 0.0000 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0015_unescape with an encoding argument converted once:
+RuntimeError: converted twice
+    test/spec_utils.rb:130:in 'to_str'
+    -e:1:in 'String#force_encoding'
+    -e:1:in 'unescape'
+    test/spec_utils.rb:134:in 'block (2 levels) in <top (required)>'
+
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips

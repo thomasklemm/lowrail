@@ -1,0 +1,45 @@
+Body instructions: recomputed from raw N=0/N=2000 Callgrind logs
+interp parse_nested_query (5 fields): 182956.5 / 183004.1 -> 119032.0, delta -34.9482%, A/A 0.0260%
+interp parse_cookies_header (session cookie + 1): 70988.7 / 71152.7 -> 36151.1, delta -49.1336%, A/A 0.2308%
+interp set_cookie_header (session cookie): 103909.6 / 103893.5 -> 28841.2, delta -72.2418%, A/A 0.0155%
+yjit parse_nested_query (5 fields): 153453.5 / 153565.3 -> 86397.0, delta -43.7187%, A/A 0.0729%
+yjit parse_cookies_header (session cookie + 1): 68052.0 / 67640.0 -> 32306.7, delta -52.3822%, A/A 0.6072%
+yjit set_cookie_header (session cookie): 100838.3 / 100835.9 -> 25882.9, delta -74.3320%, A/A 0.0024%
+
+Body objects: recomputed from worker output
+interp parse_nested_query (5 fields): 99.994 / 99.994 / 50.994
+interp parse_cookies_header (session cookie + 1): 33.999 / 33.999 / 17.0
+interp set_cookie_header (session cookie): 29.0 / 29.0 / 15.0
+yjit parse_nested_query (5 fields): 99.999 / 99.999 / 50.999
+yjit parse_cookies_header (session cookie + 1): 34.0 / 34.0 / 17.0
+yjit set_cookie_header (session cookie): 29.0 / 29.0 / 15.0
+
+Body YJIT rates: best candidate versus mean of two independent best-of-three baselines
+parse_nested_query (5 fields): 42841.5 -> 81724.0, 1.9076x, best-baseline A/A 3.4149%, raw baseline-round range 5.3735%
+parse_cookies_header (session cookie + 1): 86912.5 -> 199007.0, 2.2897x, best-baseline A/A 2.4082%, raw baseline-round range 10.0093%
+set_cookie_header (session cookie): 76247.0 -> 242812.0, 3.1845x, best-baseline A/A 5.3510%, raw baseline-round range 11.4961%
+
+Whole requests: independent aggregate arithmetic, not a rerun of the app experiments
+fh-interp.txt: REJECTED, retained
+blog PATCH article (redirect): base 4711208.0 (3 runs), both -4.8150%, A/A 0.5032%, saved 137.767 objects, all windows flat=true
+pingcrm PUT contact (Inertia redirect): base 7117577.0 (3 runs), both -3.1424%, A/A 0.3105%, saved 94.900 objects, all windows flat=true
+blog GET article: base 8372046.3 (3 runs), both -1.1004%, A/A 0.9707%, saved 60.233 objects, all windows flat=true
+codetriage GET repo: base 14879869.0 (3 runs), both -0.9572%, A/A 0.0880%, saved 61.767 objects, all windows flat=true
+blog GET articles.json: base 4240984.0 (3 runs), both -0.0037%, A/A 0.0263%, saved 0.000 objects, all windows flat=true
+fh-interp2.txt: REJECTED, retained
+blog PATCH article (redirect): base 4707935.7 (3 runs), both -5.5349%, A/A 0.2247%, saved 131.100 objects, all windows flat=true
+pingcrm PUT contact (Inertia redirect): base 7102722.3 (3 runs), both -2.9695%, A/A 0.2758%, saved 94.800 objects, all windows flat=true
+blog GET article: base 8341922.3 (3 runs), both -0.6755%, A/A 0.1462%, saved 57.667 objects, all windows flat=true
+codetriage GET repo: base 14879260.7 (3 runs), both -0.9351%, A/A 0.0999%, saved 62.567 objects, all windows flat=true
+blog GET articles.json: base 4285336.7 (3 runs), both +0.5354%, A/A 1.5736%, saved 0.000 objects, all windows flat=true
+fh-interp3.txt: accepted cohort
+blog PATCH article (redirect): base 4678946.0 (3 runs), both -5.3468%, A/A 0.0885%, saved 131.367 objects, all windows flat=true
+pingcrm PUT contact (Inertia redirect): base 7104179.3 (3 runs), both -3.1263%, A/A 0.1827%, saved 97.800 objects, all windows flat=true
+blog GET article: base 8338236.0 (3 runs), both -1.6092%, A/A 0.1481%, saved 59.600 objects, all windows flat=true
+codetriage GET repo: base 14867231.0 (3 runs), both -0.8942%, A/A 0.0292%, saved 62.933 objects, all windows flat=true
+blog GET articles.json: base 4231043.3 (3 runs), both +0.0123%, A/A 0.0303%, saved 0.000 objects, all windows flat=true
+fh-yjit.txt: accepted cohort
+blog PATCH article (redirect): base 2582500.3 (3 runs), both -10.1360%, A/A 0.0601%, saved 135.600 objects, all windows flat=true
+blog GET article: base 4762446.0 (3 runs), both -2.9439%, A/A 0.2789%, saved 61.267 objects, all windows flat=true
+pingcrm PUT contact (Inertia redirect): base 4083330.0 (3 runs), both -5.6596%, A/A 0.5063%, saved 96.467 objects, all windows flat=true
+blog GET articles.json: base 2208838.3 (3 runs), both +0.0404%, A/A 0.2172%, saved 0.000 objects, all windows flat=true

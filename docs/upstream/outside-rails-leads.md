@@ -438,9 +438,11 @@ must-fixes from the thermos-sol pass on `6f48723a86`: the decoders convert the e
   ([`data/rk3/final-head/`](data/rk3/final-head/)). The same scripts show 8 + 3 differences on `6f48723a86`.
 * **Suite:** 1295 runs, 0 failures on 3.2–4.0, clean and with `-rcgi/util`. RuboCop: nothing new.
 * **Body numbers:** `script/upstream-bench`, [`body/RK3`](../../bench/upstream/rk3/body/RK3/table.md): per call
-  −34.9% / −49.1% / −72.2% instructions (interpreter, A/A ≤ 0.23%), −43.7% / −52.4% / −74.3% (YJIT, A/A ≤ 0.61%),
-  YJIT benchmark-ips 1.91x / 2.29x / 3.19x (best-of-three base rates differ by ≤ 5.4%; not in the body, as the ips worker has no JIT-flat gate).
-* **Per request on the exact head**, RK3 alone / both commits:
+  −34.9% / −49.1% / −72.2% instructions (interpreter, A/A ≤ 0.23%). Diagnostic only, not body claims:
+  −43.7% / −52.4% / −74.3% YJIT instructions (A/A ≤ 0.61%) and benchmark-ips 1.91x / 2.29x / 3.19x
+  (best-of-three base rates differ by ≤ 5.4%; raw baseline rounds span up to 11.5%). Neither worker records
+  per-window JIT-flat counters; 3,000 warm-up calls are not a substitute for that check.
+* **Per request with exact-head method bodies over Rack 3.2.7**, RK3 alone / both commits:
 
 | Workload | Interpreter A/A | Interpreter | YJIT A/A | YJIT (JIT-flat) |
 | --- | ---: | ---: | ---: | ---: |
@@ -453,4 +455,17 @@ must-fixes from the thermos-sol pass on `6f48723a86`: the decoders convert the e
 The JSON control is inside its A/A in both modes. Two interpreter cohorts on this head are rejected, not rescored:
 blog GET article's A/A was 0.97% and the JSON control alternated between 4.24M and 4.31M Ir; Callgrind put the
 difference in glibc's `malloc_consolidate`, so the accepted cohort ran with `GLIBC_TUNABLES=glibc.malloc.mxfast=0`. Invocations, environment and the attribution: [`req/evidence/`](../../bench/upstream/rk3/req/evidence/README.md).
+That changes allocator work and may change an allocation-reducing patch's effect; this is a separate
+allocator-specific experiment, not confirmation under the default allocator. The recorded batch invocation and
+verified inherited-environment implementation support symmetric application to base and candidate; no fresh
+per-process environment capture is claimed. Request YJIT ran without this tunable and every measured window
+reports 0/0. These are method-overlay measurements, not full-head-checkout request integration results.
 Fork CI: `2.7.3` fails in setup again (ubuntu-26.04); the body says so.
+
+**Final Thermos confirmation:** reviewer `thermos-sol` approves `02087583dc` with nits; no remaining code
+must-fix. Eight independent matrices: 143,176 comparisons, zero differences. Full suites on 3.4.12/4.0.9,
+with and without `cgi/util`: 1,295 runs, 6,274 assertions, zero failures/errors, two skips each. Extended 300k
+scripts also pass clean/util/pure on both Rubies. Raw malloc dumps and all request/micro arithmetic were audited,
+not rebenchmarked here. The draft drops ungated YJIT micro claims and qualifies packaging, String dispatch and
+the request setup. Optional: add an input-mutating encoding test to protect late coercion as well as once-only
+coercion. One PR retaining both commits. [Full sentence audit, commands and receipts](../../bench/upstream/rk3/review-thermos-sol/02087583dc/README.md).

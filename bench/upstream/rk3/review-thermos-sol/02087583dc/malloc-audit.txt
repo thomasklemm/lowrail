@@ -1,0 +1,15 @@
+103216 -> 103308: recomputed from committed measured-window dumps
+PROGRAM TOTALS: 166880551 -> 168505851, difference 1625300
+:malloc_consolidate: 106438 -> 924566, difference 818128
+:_int_malloc: 818104 -> 1258167, difference 440063
+:unlink_chunk.isra.0: 66864 -> 339435, difference 272571
+104170 -> 104250: recomputed from committed measured-window dumps
+PROGRAM TOTALS: 84805417 -> 86165166, difference 1359749
+:malloc_consolidate: 101272 -> 846581, difference 745309
+:_int_malloc: 244917 -> 526896, difference 281979
+:unlink_chunk.isra.0: 30737 -> 248769, difference 218032
+108839 -> 108878: recomputed from committed measured-window dumps
+PROGRAM TOTALS: 84812293 -> 86160969, difference 1348676
+:malloc_consolidate: 90233 -> 847884, difference 757651
+:_int_malloc: 225144 -> 527687, difference 302543
+:unlink_chunk.isra.0: 28943 -> 249950, difference 221007

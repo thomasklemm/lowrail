@@ -1,0 +1,15 @@
+Run options: --name "/escape objects that respond to to_s/" --seed 23961
+
+# Running:
+
+E
+
+Finished in 0.001155s, 865.5116 runs/s, 0.0000 assertions/s.
+
+  1) Error:
+Rack::Utils#test_0009_escape objects that respond to to_s, BasicObject included:
+NoMethodError: undefined method 'instance_of?' for #<BasicObject:0x00007f73263386a0>
+    -e:1:in 'escape'
+    test/spec_utils.rb:88:in 'block (2 levels) in <top (required)>'
+
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
