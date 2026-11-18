@@ -41,6 +41,11 @@ class WorkloadsTest < Minitest::Test
     refute params.frozen?, "the file's own objects are not frozen"
     other = definition { get "/a", params: { "item" => { "name" => "before" } }, headers: { "Accept" => "application/json" } }
     refute_equal d.manifest["requests"][0]["headers_sha256"], other.manifest["requests"][0]["headers_sha256"]
+    # env: values are digested as values; an object without one is marked, not named by its class.
+    flag = ->(value) { definition { get "/a", env: { "app.flag" => value } }.manifest["requests"][0] }
+    refute_equal flag.(1)["headers_sha256"], flag.(2)["headers_sha256"]
+    assert_nil flag.(1)["headers_uncertified"]
+    assert_equal ["app.flag"], flag.(Object.new)["headers_uncertified"]
   end
 
   # A and B send the same requests: census 4's Rack::Test client (A) and
@@ -73,7 +78,7 @@ class WorkloadsTest < Minitest::Test
             def me = render(plain: "user #{session[:user].inspect}")
             def ok = render(plain: "ok")
             def nocsrf = render(plain: "ok")
-            def scoped = (cookies[:auth] = { value: "yes", path: "/private" }; render(plain: "ok"))
+            def scoped = (cookies[:auth] = { value: "yes", path: "/private" }; cookies[:listed] = { value: "yes", path: "/private,/other" }; render(plain: "ok"))
           end
         RUBY
         "config/initializers/recorder.rb" => <<~'RUBY',
@@ -138,7 +143,7 @@ class WorkloadsTest < Minitest::Test
       assert_equal ["v=2", { "n" => 1, "v" => "2" }, true, "application/json"], api.values_at("query", "params", "token_header", "type")
       assert_equal({ "n" => 2 }, sent[16]["params"])
       assert_equal [["_fixture_app_session"], []], sent.values_at(2, 8).map { _1["cookies"] }
-      assert_equal [%w[_fixture_app_session], %w[_fixture_app_session auth]], sent.values_at(10, 11).map { _1["cookies"] }
+      assert_equal [%w[_fixture_app_session], %w[_fixture_app_session auth listed]], sent.values_at(10, 11).map { _1["cookies"] }
     end
   end
 end

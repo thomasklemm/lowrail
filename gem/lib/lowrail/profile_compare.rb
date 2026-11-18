@@ -13,11 +13,13 @@ module Lowrail
   # run (A/A on Campfire: every action within 0.08% and 6.5 objects).
   #
   # Only valid evidence is compared: two complete reports of this version
-  # (every collection present, every warm vector one value per run), at least
-  # two runs each, every command exiting 0, no dropped samples, one Ruby and
-  # environment; and the same capture identity (the command's arguments, or
-  # for --workloads the manifest and every run's measured request sequence,
-  # not the output directory), seed and number of runs. A kind of window is
+  # (every collection present, rows with unique keys, every warm vector one
+  # value per run), at least two runs each, every command exiting 0, no
+  # dropped samples, every window finished, one known Ruby and environment;
+  # and the same capture identity (the command's arguments, or for
+  # --workloads the manifest and every run's measured request sequence, once
+  # the run finished at least one measured request, not the output
+  # directory), seed and number of runs. A kind of window is
   # compared when every run of both reports has some; one some runs have and
   # others lack, or no comparable kind at all, is not evidence. Otherwise
   # #status is 2 (insufficient evidence), whatever the numbers say. A line one
@@ -40,8 +42,7 @@ module Lowrail
     attr_reader :not_compared
 
     def initialize(base, head, min: 1.0, top: 20)
-      @base = JSON.parse(File.read(base))
-      @head = JSON.parse(File.read(head))
+      @base, @head = [base, head].map { |file| JSON.parse(File.read(file)) rescue nil }
       @min = min
       @top = top
       @not_compared = []
@@ -64,47 +65,82 @@ module Lowrail
       end
     end
 
+    # One strict check of a report's shape before any arithmetic: every key
+    # compare reads is present with its type, rows have unique keys, and
+    # anything unexpected is a problem (exit 2), never a crash or a zero.
     def report_problems(label, report)
       meta = report.is_a?(Hash) && report["meta"]
       return ["#{label} is not a report.json of this lowrail-profile (no capture metadata)"] unless meta.is_a?(Hash) && meta["format"] == 2
-      list = []
       runs = meta["runs"]
-      return ["#{label} has no run count"] unless runs.is_a?(Integer)
-      identity = meta["identity"]
-      list << "#{label} has no capture identity (profile it again with this lowrail-profile)" unless identity.is_a?(Hash) && identity["mode"]
-      list << "#{label} has no seed" unless meta["seed"].is_a?(String)
-      if identity.is_a?(Hash) && identity["mode"] == "workloads"
-        measured = Array(identity["measured"])
-        list << "#{label} has no workloads manifest" unless identity["manifest"].is_a?(String)
-        unless measured.size == runs && measured.all? { _1.is_a?(Hash) && _1["sha256"] }
-          list << "#{label} does not record the requests each run measured"
-        end
-        list << "#{label}'s runs measured different requests" if measured.map { _1.is_a?(Hash) && _1["sha256"] }.uniq.size > 1
-      end
-      summary = report["summary"]
-      return list << "#{label} has no summary" unless summary.is_a?(Array) && summary.all?(Hash)
+      return ["#{label} has no run count"] unless runs.is_a?(Integer) && runs > 0
+      list = []
+      count = ->(v) { v.is_a?(Integer) && v >= 0 }
       list << "#{label} has #{runs} run(s); a noise floor needs at least 2" if runs < 2
-      list << "#{label}'s summary has #{summary.size} run(s), its metadata #{runs}" if summary.size != runs
-      exits = Array(meta["exit"])
-      list << "#{label}'s command exited #{exits.empty? ? "unknown" : exits.join(", ")}" unless exits.size == runs && exits.all?(0)
-      dropped = Array(meta["dropped"])
-      list << "#{label} dropped samples (#{dropped.join(", ")})" unless dropped.size == runs && dropped.all?(0)
-      list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { windows(_1).values.sum == 0 }
-      list << "#{label} ran on more than one Ruby or environment" if Array(meta["ruby"]).size != 1 || Array(meta["rails_env"]).size != 1
+      list.concat(identity_problems(label, meta["identity"], runs))
+      list << "#{label} has no seed" unless meta["seed"].is_a?(String) && !meta["seed"].empty?
+      ruby, env = meta["ruby"], meta["rails_env"]
+      unless ruby.is_a?(Array) && ruby.size == 1 && ruby[0].is_a?(String) && !ruby[0].empty? &&
+          env.is_a?(Array) && env.size == 1 && env[0].is_a?(String)
+        list << "#{label} does not record one known Ruby and environment (#{ruby.to_json}, #{env.to_json})"
+      end
+      exits = meta["exit"]
+      list << "#{label}'s command exited #{exits.to_json}" unless exits.is_a?(Array) && exits.size == runs && exits.all?(0)
+      dropped = meta["dropped"]
+      list << "#{label} dropped samples (#{dropped.to_json})" unless dropped.is_a?(Array) && dropped.size == runs && dropped.all?(0)
+      summary = report["summary"]
+      unless summary.is_a?(Array) && summary.size == runs && summary.all? do |run|
+          run.is_a?(Hash) && %w[windows completed].all? { |k| run[k].is_a?(Hash) && KINDS.all? { count.(run[k][_1]) } }
+        end
+        return list << "#{label}'s summary is not one row per run with windows and completed windows of every kind"
+      end
+      list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { |run| KINDS.sum { run["windows"][_1] } == 0 }
+      open = summary.reject { |run| KINDS.all? { run["windows"][_1] == run["completed"][_1] } }
+      list << "#{label} has #{open.size} run(s) with windows that never finished, which no line or action counts" if open.any?
+      outside = report["outside_requests"]
+      return list << "#{label} has no outside_requests" unless outside.is_a?(Hash)
       KINDS.each do |kind|
-        source = kind == "request" ? report : report.dig("outside_requests", kind)
-        %w[ranked actions].each do |key|
+        source = kind == "request" ? report : outside[kind]
+        { "ranked" => "site", "actions" => "name" }.each do |key, id|
           entries = source.is_a?(Hash) && source[key]
           next list << "#{label} has no #{kind} #{key}" unless entries.is_a?(Array) && entries.all?(Hash)
-          nils = key == "actions"
+          actions = key == "actions"
+          names = entries.map { _1[id] }
+          unless names.all? { _1.is_a?(String) || (actions && _1.nil?) } && names.uniq.size == names.size
+            list << "#{label} has #{kind} #{key} without a unique #{id}"
+          end
           bad = entries.count do |e|
             warm = e["warm"]
-            !(warm.is_a?(Array) && warm.size == runs && warm.all? { (nils && _1.nil?) || (_1.is_a?(Numeric) && _1.to_f.finite?) })
+            !(warm.is_a?(Array) && warm.size == runs && warm.all? { (actions && _1.nil?) || (_1.is_a?(Numeric) && _1.to_f.finite?) })
           end
           list << "#{label} has #{bad} #{kind} #{key} without one finite warm value per run" if bad > 0
         end
       end
       list
+    end
+
+    # A command's arguments, or a workloads capture: its manifest, host, and
+    # per run the requests it measured once it finished, all certified.
+    def identity_problems(label, identity, runs)
+      case identity.is_a?(Hash) && identity["mode"]
+      when "command"
+        argv = identity["argv"]
+        argv.is_a?(Array) && !argv.empty? && argv.all? { _1.is_a?(String) } ? [] : ["#{label}'s command identity has no arguments"]
+      when "workloads"
+        list = []
+        list << "#{label} has no workloads manifest or host" unless identity["manifest"].is_a?(String) && identity["host"].is_a?(String)
+        measured = identity["measured"]
+        unless measured.is_a?(Array) && measured.size == runs && measured.all? do |m|
+            m.is_a?(Hash) && m["complete"] == true && m["sha256"].is_a?(String) && m["requests"].is_a?(Integer) && m["requests"] >= 1
+          end
+          return list << "#{label} does not record that every run finished measuring at least one request"
+        end
+        names = measured.flat_map { Array(_1["uncertified"]) }.uniq
+        list << "#{label} sends env: values a digest cannot certify (#{names.join(", ")}): it is not CI evidence" if names.any?
+        list << "#{label}'s runs measured different requests" if measured.map { _1["sha256"] }.uniq.size > 1
+        list
+      else
+        ["#{label} has no known capture identity (profile it again with this lowrail-profile)"]
+      end
     end
 
     def valid? = problems.empty?

@@ -744,3 +744,30 @@ cohorts, `lowrail verify`, `lowrail bench`, timing, instruction counts or speed.
 historical measurements above remain attributed evidence. This is a **review-document-only** change; D1–D6 are
 not implementation fixes. C3/C5 and the original narrow repros are confirmed, not an approval of recording or
 comparison as a generally safe workflow.
+
+## Resolution of the second confirm review (2026-11-18)
+
+Fixed on main after `a05d1dab`, preferring refusal over new machinery. Each finding has a regression test through
+the CLI or the DSL that fails on `a05d1dab` (the new tests in a worktree of it: 16 runs, 5 failures, 1 error; D2
+checked apart by restoring only its old Accept condition, which drops the XML Accept). The compare floor policy is
+unchanged.
+
+| Finding | Change | Test (and what it gives on a05d1dab) |
+| --- | --- | --- |
+| D1 | `parameter_filter` returns no filter unless every `filter_parameters` entry is a Symbol, String or Regexp: with a Proc, which may read Rails' merged params, no request values are kept and the shape is commented out as unfiltered (its own group, never merged with filtered shapes). The cache keeps frozen copies of String entries, so an in-place change rebuilds the filter. What filtering returns is copied and frozen, not the input. | `test_record_filters_every_value_and_keeps_json_gets_as_gets`: the review's three-argument Proc on `/widgets/1.proc-format-secret?credential=proc-secret` and the in-place `+"not_a_key"` → `"credential"` String on `/widgets.string-format?credential=string-secret`; neither secret is in any written file, and the Proc shape is commented out with its reason (a05d1dab: exported). |
+| D2 | A recorded GET keeps its Accept as sent; the anyway-sent list now applies to writes only. | Same test: `/lookup?q=xml` with `application/xml` is declared with that Accept and the app sees it on replay through MockClient (a05d1dab: no Accept, `text/html`). |
+| D3 | The receipt written before the passes is marked `complete: false` and writes no `runN/measured.json`; only the final write, after all counted passes, writes it with `complete: true`. `compare` requires every run's entry complete with at least one measured request. | `test_workloads_captures_compare_by_what_they_measured`: the same block with `exit(0) if n == 2` (one warmup, nothing measured), compared with itself, exits 2 (a05d1dab: exit 0). |
+| D4 | `Request#to_h` digests header and `env:` values that are JSON values (String, Integer, finite Float, true, false, nil, Arrays and String-keyed Hashes of them) as values; any other object is listed in `headers_uncertified`, carried into each run's measured entry, and `compare` refuses that capture. | `test_requests_are_frozen_copies_and_the_manifest_covers_header_values`: `env: {"app.flag" => 1}` and `2` have different digests; an `Object.new` value is uncertified (a05d1dab: equal digests). Compare test: an `uncertified` measured entry exits 2. |
+| D5 | The report's summary has, per run and kind, `completed` windows (the sum of its action windows) next to `windows`; the Markdown lists a run with unfinished windows, and `compare` refuses one where they differ. Non-final snapshots and the 1,024 cap are unchanged. | `test_unfinished_windows_are_not_comparable`: the review's `Fiber.yield` controller abandoned once, then three requests: summary 4 and completed 3 in each run, and comparing the report with itself exits 2 (a05d1dab: no `completed`, exit 0). |
+| D6 | One strict schema check before any arithmetic: identity `command` with a nonempty String argv, or `workloads` with a String manifest and host and complete measured entries, otherwise exit 2; one nonempty String Ruby and one String environment (empty allowed); `exit`, `dropped` and `summary` one per run with nonnegative Integer counts for every kind; `outside_requests` a Hash; unique String `site` per line and unique `name` (nil allowed) per action. An unreadable JSON file is exit 2 too. | `test_compare_needs_complete_comparable_captures`: `{"mode":"command"}`, `{"mode":"banana"}`, `ruby`/`rails_env` `[null]`, window count `"ten"`, `outside_requests: "bad"`, key-less 10→30 rows, a duplicated site and unfinished windows all exit 2 (a05d1dab: 0, or 1 on the type errors). |
+| P3 | MockClient takes a cookie's Path as Rack::Test does: the first comma-separated value, stripped. | `test_census_and_profile_send_the_same_requests` adds `Path=/private,/other`: both clients send it on `/private/me` (a05d1dab: A and B differ). |
+
+`docs/profile.md` now states the Symbol/String/Regexp-only rule, that a GET keeps its Accept, the unfinished-window
+refusal next to the fiber-retention limit, and the strict validity rule (which allows nil warm values for actions
+that ran once per process, consistent with the not-compared list). `docs/upstream/census.md` notes uncertified
+`env:` values and the Path normalization.
+
+The three suites pass: 18 runs, 168 assertions. Rechecked on Campfire (`bin/rails test -v`, 634 tests): per-test
+outcomes identical with no gem, gem listed but off, and both profiled runs (632 pass, 2 skip); all 18 processes
+load every feature outside Lowrail, Bundler and RubyGems in the same order; no `[lowrail-profile]` warning; every
+window finished (666 requests, 16 jobs, 19 Cable actions completed per run).

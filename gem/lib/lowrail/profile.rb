@@ -44,7 +44,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         NOTED = "lowrail.profile.noted"
         FILTERED = "[FILTERED]"
         JSON_TYPE = "application/json"
-        # Accept values a workloads file sends anyway (html, IntegrationTest's, xhr:, as: :json).
+        # A write's Accept values a workloads file sends anyway (html, IntegrationTest's, xhr:, as: :json).
         PLAIN_ACCEPT = %w[*/* text/html text/xml application/xml application/xhtml+xml application/json text/javascript].freeze
         CONSTANT = /\A[A-Z]\w*(?:::[A-Z]\w*)*\z/
         KERNEL_CLASS = Kernel.instance_method(:class)
@@ -192,12 +192,12 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             # Every path value, the format included, is filtered before it names,
             # groups or is kept; without the app's filter none is kept.
             path_params = filter ? filter.filter((env["action_dispatch.request.path_parameters"] || {}).transform_keys(&:to_s)) : {}
-            format = path_params["format"]&.to_s
-            accept = env["HTTP_ACCEPT"].to_s
+            format = path_params["format"]&.to_s&.dup&.freeze
+            accept = env["HTTP_ACCEPT"].to_s.dup.freeze
             first = accept[/\A[^,;]*/].strip.downcase
-            # A GET keeps its Accept, never as: :json, which would send its query as a body.
+            # A GET keeps its Accept as sent, never as: :json, which would send its query as a body.
             json = verb != "get" && [env["CONTENT_TYPE"], env["HTTP_ACCEPT"]].any? { _1.to_s.start_with?(JSON_TYPE) }
-            accept = nil if first.empty? || (PLAIN_ACCEPT.include?(first) && !(verb == "get" && first == JSON_TYPE))
+            accept = nil if first.empty? || (verb != "get" && PLAIN_ACCEPT.include?(first))
             xhr = env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
             spec = route.path.spec.to_s
             shape = shapes[[verb, spec, json, xhr, format, accept, !filter]] ||=
@@ -237,13 +237,17 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
               "filtered" => filtered?(params) || filtered?(seen) || flags[:format] == FILTERED, "lossy" => lossy[0], "count" => 0 }
           end
 
-          # The app's filter, rebuilt whenever its list changes (an initializer
-          # or test may append to it after the first request).
+          # The app's filter, only when its list is names and patterns: a Proc
+          # may depend on Rails' merged params, which the parts filtered here
+          # are not, so with one no request value is kept. Rebuilt when the
+          # list's contents change (an initializer or test may change it after
+          # the first request, or a String in it in place).
           def parameter_filter(env)
             klass = Lowrail.loaded_constant("ActiveSupport::ParameterFilter") or return
             filters = Array(env["action_dispatch.parameter_filter"])
+            return unless filters.all? { Symbol === _1 || String === _1 || Regexp === _1 }
             unless @filter && @filter_source == filters
-              @filter_source = filters.dup
+              @filter_source = filters.map { String === _1 ? _1.dup.freeze : _1 }.freeze
               @filter = klass.new(@filter_source, mask: FILTERED)
             end
             @filter
@@ -273,7 +277,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             when String
               if !value.valid_encoding? || (value.encoding != Encoding::UTF_8 && !value.ascii_only?) then (lossy[0] = true; "(binary)")
               elsif value.size > 2000 then (lossy[0] = true; value[0, 2000])
-              else value
+              else value.dup.freeze
               end
             when Integer, true, false, nil then value
             when Float then value.finite? ? value : (lossy[0] = true; nil)

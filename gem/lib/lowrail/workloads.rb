@@ -74,8 +74,11 @@ module Lowrail
       def to_h
         h = { "name" => name, "method" => verb.to_s, "path" => path, "params_sha256" => Workloads.digest(params),
           "body_sha256" => Workloads.digest(body), "headers" => headers.keys.sort,
-          "headers_sha256" => Workloads.digest(headers.sort.map { |k, v| [k, String === v ? v : Workloads.class_of(v).name] }),
+          "headers_sha256" => Workloads.digest(headers.sort.map { |k, v| [k, Workloads.json_value?(v) ? v : Workloads.class_of(v).name] }),
           "expect" => expect, "kind" => kind.to_s }
+        # env: objects other than JSON values have no identity a digest can certify.
+        uncertified = headers.reject { Workloads.json_value?(_2) }.keys.sort
+        h["headers_uncertified"] = uncertified unless uncertified.empty?
         h["xhr"] = true if @xhr
         h["as"] = "json" if @json
         h["jobs"] = true if jobs
@@ -282,7 +285,8 @@ module Lowrail
           pair, *attributes = line.split(/; */)
           name, value = pair.split("=", 2)
           options = attributes.to_h { |a| k, v = a.split("=", 2); [k.downcase, v] }
-          cookie_path = options["path"] || request_path.sub(%r{/[^/]*\z}, "")
+          # Rack::Test's normalization: the first comma-separated path, stripped.
+          cookie_path = options["path"] ? (options["path"].split(",").first || "/").strip : request_path.sub(%r{/[^/]*\z}, "")
           expires = (require "time"; Time.parse(options["expires"]) rescue nil) if options["expires"]
           store(Cookie.new(name, value.to_s, cookie_path.empty? ? "/" : cookie_path, expires))
         end
@@ -346,6 +350,16 @@ module Lowrail
     KERNEL_CLASS = Kernel.instance_method(:class)
     def class_of(value) = KERNEL_CLASS.bind_call(value)
 
+    def json_value?(value)
+      case value
+      when String, Integer, true, false, nil then true
+      when Float then value.finite?
+      when Array then value.all? { json_value?(_1) }
+      when Hash then value.all? { |k, v| String === k && json_value?(v) }
+      else false
+      end
+    end
+
     def source(block) = block.source_location.then { "#{File.basename(_1)}:#{_2}" }
     def caller_source(locations) = locations.first.then { "#{File.basename(_1.path)}:#{_1.lineno}" }
 
@@ -382,7 +396,7 @@ module Lowrail
         name = "#{s["verb"].upcase} #{s["template"]}#{".#{format}" if format}#{" (#{s["accept"]})" if s["accept"]}"
         reasons = []
         reasons << "a write: make it repeatable, then uncomment" if s["verb"] != "get"
-        reasons << "the app's filter_parameters could not be applied, so its params were not kept" if s["unfiltered"]
+        reasons << "the app's filter_parameters is not only names and patterns (a Proc), or could not be applied, so no request values were kept" if s["unfiltered"]
         reasons << "values the app filters are #{FILTERED}: fill them in" if s["filtered"]
         reasons << "part of the request was not kept (long or binary values, uploads, optional path parts or a write's query)" if s["lossy"]
         missing = s["parts"].reject(&:last).map { ":#{_1[0]}" }

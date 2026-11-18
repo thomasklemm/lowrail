@@ -127,7 +127,8 @@ mail { EmailReplyMailer.reply(reply, recipient) }
 ```
 
 The file is evaluated into a frozen manifest: per request its method, path, a digest of its params and body, the
-header names and a digest of their values, expected statuses and options, the sign-in's settings (digests for its
+header names and a digest of their values (`env:` values that are not JSON values are listed as uncertified, not
+digested by class), expected statuses and options, the sign-in's settings (digests for its
 params and a cookie's value), and the file's sha256. The census writes it to `workloads.json` next to the report and
 into every receipt (`workloads_manifest`), `lowrail-profile` into its output directory, so two runs can be checked
 for the same workloads without reading the Ruby again. Each request keeps frozen copies of the values the file
@@ -141,9 +142,9 @@ Both tools send the file's requests through one implementation, `Lowrail::Worklo
 token and where it goes, alternates and blocks, and which client (signed in or not) sends each. Their clients
 differ in transport (census 4's Rack::Test session, lowrail-profile's `Rack::MockRequest`), send the same browser
 headers (`Host`, `Origin`, `Accept`, `User-Agent`, `Sec-Fetch-Site`) and keep cookies the same way (by name and
-`Path`, until `Expires`). A test (`gem/test/workloads_test.rb`) runs both against one app and checks that the app
+`Path`, the first of a comma-separated list as Rack::Test takes it, until `Expires`). A test (`gem/test/workloads_test.rb`) runs both against one app and checks that the app
 sees the same requests: form sign-in, CSRF from a page, headers, XHR, JSON with an alternate, `csrf: false`, a
-signed-out client and a path-scoped cookie. That is the extent of the equivalence claim: cookie `Domain` (there is
+signed-out client and path-scoped cookies. That is the extent of the equivalence claim: cookie `Domain` (there is
 one host), `Max-Age` (Rack::Test ignores it) and anything else the test does not cover are not established. What
 differs is the measurement: the census captures jobs and delivers mail to the test deliverer, lowrail-profile uses
 the app's own adapters ([profile.md](../profile.md#run-it)).

@@ -45,7 +45,15 @@ require "digest"
 sequence = Digest::SHA256.new
 sequence << JSON.generate([host, Lowrail::Workloads::BROWSER])
 counted = 0
-write = lambda do
+# Written before the passes (a diagnostic if the run stops) and after them;
+# only the final one is complete, and only it writes the run's measured.json.
+write = lambda do |complete|
+  measured_run = { "requests" => counted, "sha256" => sequence.hexdigest[0, 16], "complete" => complete }
+  uncertified = definition.manifest["requests"].select { _1["headers_uncertified"] }.map { _1["name"] }
+  measured_run["uncertified"] = uncertified unless uncertified.empty?
+  if complete && (run = ENV["LOWRAIL_PROFILE"]) && File.directory?(run)
+    File.write(File.join(run, "measured.json"), JSON.generate(measured_run) + "\n")
+  end
   next unless receipt
   File.write(receipt, JSON.pretty_generate("manifest" => definition.manifest, "replayed" => definition.requests.map(&:name),
     "side_effects" => side_effects.merge("requests_enqueuing_jobs" => definition.requests.select(&:jobs).map(&:name),
@@ -54,13 +62,9 @@ write = lambda do
     "not_replayed" => { "mails" => definition.mails.map(&:name), "jobs" => definition.jobs.map(&:name) },
     # A block's or alternate's requests as measured (the manifest has only the declaration).
     "measured_variants" => measured,
-    "measured" => { "requests" => counted, "sha256" => sequence.hexdigest[0, 16] }) + "\n")
-  # Per run, for the report's capture metadata (LOWRAIL_PROFILE is the run's directory).
-  if (run = ENV["LOWRAIL_PROFILE"]) && File.directory?(run)
-    File.write(File.join(run, "measured.json"), JSON.generate("requests" => counted, "sha256" => sequence.hexdigest[0, 16]) + "\n")
-  end
+    "measured" => measured_run) + "\n")
 end
-write.()
+write.(false)
 
 current = nil
 pass = lambda do |record|
@@ -83,4 +87,4 @@ begin
 rescue RuntimeError => e
   abort "lowrail-profile: #{current ? "#{current.name}: " : "sign_in: "}#{e.message}"
 end
-write.()
+write.(true)

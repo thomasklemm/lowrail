@@ -257,9 +257,11 @@ class ProfileTest < Minitest::Test
   end
 
   # Every path value, the format included, is filtered before it is kept, by
-  # the app's filter list as it is when the request runs (here appended to
-  # after the first request); a JSON GET is recorded as a GET with its Accept
-  # and query, not as a JSON body.
+  # the app's filter list as it is when the request runs (appended to, or a
+  # String in it changed in place, after the first request); with a Proc in
+  # the list, which may need Rails' merged params, no value is kept. A GET is
+  # recorded as a GET with its Accept (JSON or XML) and query, not as a JSON
+  # body.
   def test_record_filters_every_value_and_keeps_json_gets_as_gets
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
@@ -270,7 +272,8 @@ class ProfileTest < Minitest::Test
           class WidgetsController < ApplicationController
             def index = head(:ok)
             def show = head(:ok)
-            def lookup = render(json: { method: request.request_method, query: request.query_parameters, body: request.request_parameters })
+            def lookup = render(json: { method: request.request_method, query: request.query_parameters, body: request.request_parameters,
+              accept: request.get_header("HTTP_ACCEPT") })
           end
         RUBY
         "boot.rb" => "require_relative \"config/environment\"\nWidget.create!(name: \"first\", password: \"x\")\n",
@@ -282,44 +285,61 @@ class ProfileTest < Minitest::Test
           Rails.application.env_config["action_dispatch.parameter_filter"] << :credential
           call.("/widgets/1?credential=changed-filter-secret")
           call.("/lookup?q=needle", "HTTP_ACCEPT" => "application/json")
+          call.("/lookup?q=xml", "HTTP_ACCEPT" => "application/xml")
+          filters = Rails.application.env_config["action_dispatch.parameter_filter"]
+          mutable = +"not_a_key"
+          filters.replace([mutable])
+          call.("/widgets")
+          mutable.replace("credential")
+          call.("/widgets.string-format?credential=string-secret")
+          filters.replace([/\Aformat\z/, ->(key, value, original) {
+            value.replace("[FILTERED]") if key == "credential" && original["controller"] == "widgets"
+          }])
+          call.("/widgets/1.proc-format-secret?credential=proc-secret")
         RUBY
       out, err, status = profile(dir, "--out", "profile", "--record", "--", RUBY, "requests.rb")
       assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
       recorded = File.read(File.join(dir, "lowrail/workloads.rb"))
       written = [recorded, *Dir[File.join(dir, "profile/**/*")].select { File.file?(_1) }.map { File.read(_1) }]
-      %w[format-secret changed-filter-secret].each do |secret|
+      %w[format-secret changed-filter-secret string-secret proc-secret].each do |secret|
         assert written.none? { _1.include?(secret) }, "#{secret} was exported:\n#{recorded}"
       end
       assert_match(/^# get "\/widgets\.\[FILTERED\]"|^# get widgets_path\(format: "\[FILTERED\]"\)/, recorded)
       assert_match(/^# get widget_path\(widget\), .*params: \{"credential" => "\[FILTERED\]"\}$/, recorded)
+      assert_match(/^# 1 request \(the app's filter_parameters is not only names and patterns \(a Proc\).*\n# get widget_path\(widget\), name: "GET \/widgets\/:id"\n/, recorded)
 
       check = <<~'RUBY'
         require "./boot"
         require "json"
         require "rack/mock"
         require "lowrail/workloads"
-        r = Lowrail::Workloads.load("lowrail/workloads.rb").requests.find { _1.path.start_with?("/lookup") }
-        sent = Lowrail::Workloads::MockClient.new(Rails.application, "localhost").request(r.verb, r.path, params: r.params, headers: r.headers, body: r.body)
-        puts JSON.generate(declared: [r.verb, r.params, r.body, r.headers["HTTP_ACCEPT"]], seen: JSON.parse(sent.body))
+        replays = Lowrail::Workloads.load("lowrail/workloads.rb").requests.select { _1.path.start_with?("/lookup") }.map do |r|
+          sent = Lowrail::Workloads::MockClient.new(Rails.application, "localhost").request(r.verb, r.path, params: r.params, headers: r.headers, body: r.body)
+          { declared: [r.verb, r.params, r.body, r.headers["HTTP_ACCEPT"]], seen: JSON.parse(sent.body) }
+        end
+        puts JSON.generate(replays.sort_by { _1[:declared][1]["q"] })
       RUBY
       replay = ruby_json(check, chdir: dir, setup: false, env: { "RAILS_ENV" => "test", "RUBYOPT" => "-I#{GEM_LIB}" })
-      assert_equal ["get", { "q" => "needle" }, nil, "application/json"], replay["declared"], recorded
-      assert_equal({ "method" => "GET", "query" => { "q" => "needle" }, "body" => {} }, replay["seen"])
+      assert_equal [["get", { "q" => "needle" }, nil, "application/json"], ["get", { "q" => "xml" }, nil, "application/xml"]],
+        replay.map { _1["declared"] }, recorded
+      assert_equal [{ "method" => "GET", "query" => { "q" => "needle" }, "body" => {}, "accept" => "application/json" },
+        { "method" => "GET", "query" => { "q" => "xml" }, "body" => {}, "accept" => "application/xml" }], replay.map { _1["seen"] }
     end
   end
 
   # --workloads captures compare by what they measured: two of the same file
   # in different output directories compare, and a block that sends another
-  # request in one of them does not, though the file is the same.
+  # request in one of them does not, though the file is the same; nor does a
+  # capture that stopped before measuring anything.
   def test_workloads_captures_compare_by_what_they_measured
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
         "bin/rails" => "#!#{RUBY}\nabort unless ARGV.shift == \"runner\"\nscript = ARGV.shift\nrequire_relative \"../config/environment\"\nload script\n",
-        "lowrail/workloads.rb" => "get(\"/widgets\", name: \"variant\") { |n| { path: ENV.fetch(\"REPLAY_PATH\") } }\n")
+        "lowrail/workloads.rb" => "get(\"/widgets\", name: \"variant\") { |n| exit(0) if n == 2 && ENV[\"STOP\"]; { path: ENV.fetch(\"REPLAY_PATH\") } }\n")
       File.chmod(0o755, File.join(dir, "bin/rails"))
-      { "base" => "/widgets?v=1", "head" => "/widgets?v=1", "other" => "/widgets?v=2" }.each do |out, path|
-        _, err, status = profile(dir, "--out", out, "--workloads", env: { "REPLAY_PATH" => path })
+      { "base" => "/widgets?v=1", "head" => "/widgets?v=1", "other" => "/widgets?v=2", "stopped" => "/widgets?v=1" }.each do |out, path|
+        _, err, status = profile(dir, "--out", out, "--workloads", env: { "REPLAY_PATH" => path, **(out == "stopped" ? { "STOP" => "1" } : {}) })
         assert status.success?, err
       end
       compare = ->(a, b) { Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "#{a}/report.json", "#{b}/report.json", "--json", chdir: dir) }
@@ -328,6 +348,39 @@ class ProfileTest < Minitest::Test
       out, _, status = compare.("base", "other")
       assert_equal 2, status.exitstatus, out
       assert_match(/differ in identity/, JSON.parse(out)["problems"].join)
+      out, _, status = compare.("stopped", "stopped")
+      assert_equal 2, status.exitstatus, out
+      assert_match(/finished measuring at least one request/, JSON.parse(out)["problems"].join)
+    end
+  end
+
+  # A request left open in an abandoned fiber is counted in the run's
+  # windows but merged into no line or action: the report says so and
+  # compare refuses it.
+  def test_unfinished_windows_are_not_comparable
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "app/controllers/widgets_controller.rb" => <<~'RUBY',
+          class WidgetsController < ApplicationController
+            def index = (Fiber.yield if params[:abandon]; render(plain: "ok"))
+          end
+        RUBY
+        "requests.rb" => <<~'RUBY')
+          require_relative "config/environment"
+          require "rack/mock"
+          call = ->(path) { Rails.application.call(Rack::MockRequest.env_for("http://localhost#{path}")) }
+          Fiber.new { call.("/widgets?abandon=1") }.resume
+          3.times { call.("/widgets") }
+        RUBY
+      out, err, status = profile(dir, "--out", "profile", "--", RUBY, "requests.rb")
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      report = JSON.parse(File.read(File.join(dir, "profile/report.json")))
+      assert_equal [[4, 3]] * 2, report["summary"].map { [_1["windows"]["request"], _1["completed"]["request"]] }
+      assert_includes out, "left windows unfinished (1 request)"
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "profile/report.json", "profile/report.json", "--json", chdir: dir)
+      assert_equal 2, status.exitstatus, out
+      assert_match(/windows that never finished/, JSON.parse(out)["problems"].join)
     end
   end
 
@@ -498,9 +551,14 @@ class ProfileTest < Minitest::Test
       "seed" => "1234", "exit" => exit, "runs" => runs, "ruby" => ["ruby 4"], "rails_env" => ["test"], "dropped" => [0] * runs,
       # 76be8b58's fields, so a case that must be refused is not refused only for lacking them there
       "command" => "bin/rails test", "workloads" => nil }
-    { "command" => "bin/rails test", "summary" => Array.new(runs) { { "windows" => { "request" => 10 } } }, "meta" => meta,
+    { "command" => "bin/rails test", "summary" => Array.new(runs) { run_windows("request" => 10) }, "meta" => meta,
       "ranked" => [{ "site" => "GEM/x/lib/x.rb:1", "warm" => warm }], "actions" => actions,
       "outside_requests" => %w[job mail cable].to_h { [_1, { "actions" => [], "ranked" => [] }] } }
+  end
+
+  def run_windows(counts)
+    windows = %w[request job mail cable].to_h { [_1, counts.fetch(_1, 0)] }
+    { "windows" => windows, "completed" => windows }
   end
 
   def compare(dir, base, head)
@@ -530,9 +588,33 @@ class ProfileTest < Minitest::Test
       assert_equal 2, compare(dir, report([10.0, 10.0]), report([10.0]))[0], "one warm value for two runs"
       bare = ->(r) { r.merge("meta" => r["meta"].except("identity", "seed", "command")) }
       assert_equal 2, compare(dir, bare.(report([10.0, 10.0])), bare.(report([10.0, 10.0])))[0]
-      jobs = report([10.0, 10.0]).merge("summary" => [{ "windows" => { "job" => 3 } }] * 2)
+      jobs = report([10.0, 10.0]).merge("summary" => [run_windows("job" => 3)] * 2)
       status, result = compare(dir, report([10.0, 10.0]), jobs)
       assert_equal 2, status, "nothing comparable: #{result}"
+
+      # One strict check of the shape: anything unknown, missing, duplicated or mistyped is exit 2, not 0 or a crash.
+      meta = ->(r, **change) { r.merge("meta" => r["meta"].merge(change.transform_keys(&:to_s))) }
+      both = ->(change) { compare(dir, change.(report([10.0, 10.0])), change.(report([10.0, 10.0])))[0] }
+      assert_equal 2, both.(->(r) { meta.(r, identity: { "mode" => "command" }) }), "a command identity without arguments"
+      assert_equal 2, both.(->(r) { meta.(r, identity: { "mode" => "banana" }) }), "an unknown identity mode"
+      assert_equal 2, both.(->(r) { meta.(r, ruby: [nil], rails_env: [nil]) }), "no known Ruby or environment"
+      assert_equal 2, both.(->(r) { r.merge("summary" => r["summary"].map { _1.merge("windows" => _1["windows"].merge("request" => "ten")) }) })
+      assert_equal 2, both.(->(r) { r.merge("outside_requests" => "bad") })
+      assert_equal 2, both.(->(r) { r.merge("summary" => r["summary"].map { _1.merge("completed" => _1["completed"].merge("request" => 9)) }) }),
+        "a run with a window that never finished"
+      keyless = ->(warm) { report([10.0, 10.0]).merge("ranked" => [{ "warm" => warm }, { "warm" => [0.0, 0.0] }]) }
+      assert_equal 2, compare(dir, keyless.([10.0, 10.0]), keyless.([30.0, 30.0]))[0], "rows without a site key"
+      twice = ->(r) { r.merge("ranked" => r["ranked"] * 2) }
+      assert_equal 2, both.(twice), "the same site twice"
+      workloads = lambda do |measured|
+        meta.(report([10.0, 10.0]), identity: { "mode" => "workloads", "host" => "localhost", "manifest" => "m", "measured" => [measured] * 2 })
+      end
+      complete = { "requests" => 20, "sha256" => "s", "complete" => true }
+      assert_equal 0, compare(dir, workloads.(complete), workloads.(complete))[0]
+      [{ "requests" => 0, "sha256" => "s", "complete" => true }, complete.merge("complete" => false), complete.except("complete"),
+        complete.merge("uncertified" => ["variant"])].each do |measured|
+        assert_equal 2, compare(dir, workloads.(measured), workloads.(measured))[0], measured.inspect
+      end
     end
   end
 

@@ -245,7 +245,10 @@ module Lowrail
       @runs.map do |run|
         { run: run[:name], processes: run[:processes], requests: run[:requests],
           objects_per_request: run[:requests] > 0 ? run[:objects].fdiv(run[:requests]) : 0.0, dropped: run[:dropped],
-          windows: KINDS.to_h { [_1, run[:windows][_1]] } }
+          windows: KINDS.to_h { [_1, run[:windows][_1]] },
+          # Windows that finished (were merged into an action); fewer than
+          # windows means some were still open when the process wrote.
+          completed: KINDS.to_h { |kind| [kind, run[:actions].sum { |(k, _), (n, *)| k == kind ? n : 0 }] } }
       end
     end
 
@@ -445,6 +448,11 @@ module Lowrail
         w = s[:windows]
         out << "| #{s[:run]} | #{s[:processes]} | #{s[:requests]} | #{s[:objects_per_request].round(1)} | #{w["job"]} | " \
           "#{w["mail"]} | #{w["cable"]} | #{s[:dropped]} |\n"
+      end
+      summary.each do |s|
+        open = KINDS.to_h { [_1, s[:windows][_1] - s[:completed][_1]] }.select { _2 > 0 }
+        out << "\n#{s[:run]} left windows unfinished (#{open.map { "#{_2} #{_1}" }.join(", ")}), which no line or action " \
+          "counts; compare refuses it.\n" unless open.empty?
       end
       if (floor = noise_floor)
         out << "\nNoise floor (last run minus first, warm, top #{floor[:top_lines]} lines): median |Δ| #{floor[:median_abs]}, " \

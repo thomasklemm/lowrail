@@ -65,15 +65,17 @@ output directory holds the file's manifest, the adapters the requests used, the 
 requests with an alternate or block the variants measured.
 
 `--record [FILE]` records, in the first run, the shape of every routed request: method, route, format, JSON or XHR,
-an Accept the file would not send anyway (a Turbo Stream's, or a GET's `application/json`), and one request's params
-(a GET's query, a write's body). A JSON GET is written as a GET with its `Accept` header and query, not with
-`as: :json`, which would send the query as a JSON body. It then writes the 20 most frequent shapes as a workloads file (default `lowrail/workloads.rb`, or
+a GET's `Accept` as sent (a write's only when the file would not send it anyway, such as a Turbo Stream's), and one
+request's params (a GET's query, a write's body). A JSON or XML GET is written as a GET with its `Accept` header and
+query, not with `as: :json`, which would send the query as a JSON body. It then writes the 20 most frequent shapes as a workloads file (default `lowrail/workloads.rb`, or
 `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row
 (`Article.first!`, for models the app has loaded). Recording is sensitive: params pass through the app's
 `filter_parameters` (the list as it is when the request runs) before anything is kept or used to group requests,
-every path value and the format included; filtered values are written as `[FILTERED]`, nothing is taken from the raw
-path or query string, and without the app's filter no params are kept. Still check the file before you commit it:
-only what the filter names is hidden. Every value from a request is written as
+every path value and the format included; filtered values are written as `[FILTERED]` and nothing is taken from the
+raw path or query string. Values are kept only when every entry of the list is a Symbol, String or Regexp: a Proc
+may depend on Rails' merged params, which Lowrail does not reproduce, so with one in the list (or without the app's
+filter) no request values are kept and each such shape is commented out. Still check the file before you commit
+it: only what the filter names is hidden. Every value from a request is written as
 a quoted literal, never as Ruby. Only GETs that replay as recorded are enabled; each other shape is commented out
 with its reason, until you make it work:
 
@@ -150,7 +152,9 @@ is built outside the app, never during its boot.
   (`Enumerator#next`) are not counted. A fiber dropped while its window is open (a scheduler cancelling a request
   mid-flight and never resuming it) stays alive, with what it references, until more than 1,024 windows are open;
   then the oldest open window off the current fiber is given up, counted as dropped, and its fiber can be collected.
-  So such an app retains at most 1,024 abandoned fibers, and its capture is not valid evidence for `compare`. Code
+  So such an app retains at most 1,024 abandoned fibers. A window still open when the process writes is in its
+  run's window count but merged into no line or action; the report lists it as unfinished, and `compare` refuses
+  that capture (as it refuses one with dropped windows). Code
   in Ractors other than the main one runs uncounted;
 * an `at_exit` writer (one TSV per process; forked test workers reset their counts and recorded shapes and write
   their own).
@@ -244,13 +248,18 @@ outside the app and per action (requests, jobs, mails and Cable actions apart), 
 exits 1 when anything grew beyond its noise floor and 0 when nothing did, but only for valid evidence; otherwise it
 exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
 
-* **Valid evidence**: both reports come from this version of lowrail-profile, complete (every collection present,
-  one finite warm value per run for every line and action), with at least two runs each, every run's command
-  exiting 0, no dropped samples, windows in every run, and one Ruby and environment in every process; and base and
-  head have the same capture identity, seed, Ruby, environment and number of runs. The identity of a command is its
-  arguments; of `--workloads` it is the file's manifest, the replay host and, per run, a digest of every counted
-  request as sent (so a block that sends other requests is a different capture), never the output directory. A
-  missing or partial report, a failing suite or a one-run profile is never a green result.
+* **Valid evidence**: both reports come from this version of lowrail-profile and pass one strict check of their
+  shape (every key compare reads present with its type, line rows with a unique site and action rows with a unique
+  name, one warm value per run that is finite, or for an action that ran once per process none), with at least two
+  runs each, every run's command exiting 0, no dropped samples, every window finished, windows in every run, and one
+  known Ruby and environment in every process; and base and head have the same capture identity, seed, Ruby,
+  environment and number of runs. The identity of a command is its arguments; of `--workloads` it is the file's
+  manifest (header and `env:` values digested as values), the replay host and, per run, a digest of every counted
+  request as sent (so a block that sends other requests is a different capture), recorded only once the run
+  finished measuring at least one request, never the output directory. An `env:` value that is not a JSON value
+  (String, number, true, false, nil, or Arrays and Hashes of them) has no identity a digest can certify, so such a
+  capture is not CI evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
+  profile is never a green result.
 * A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of both reports has some;
   a kind some runs have and others lack, or no comparable kind at all, exits 2.
   A line one side never reached is a measured zero there; an action one side did not run, or that has no warm value

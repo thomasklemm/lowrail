@@ -170,7 +170,7 @@ if record
   target = File.expand_path(record == :default ? Lowrail::Workloads::PATH : record)
   target = File.join(out, "workloads.rb") if record == :default && File.exist?(target)
   shapes = Dir["#{out}/run1/*.shapes.json"].flat_map { JSON.parse(File.read(_1)) }
-  merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept") }
+  merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept", "unfiltered") }
     .map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
   if merged.empty?
     warn "lowrail-profile: --record saw no routed requests; nothing written"
