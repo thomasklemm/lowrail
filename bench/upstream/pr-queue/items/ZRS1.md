@@ -211,6 +211,33 @@ passes:
       per PR). The profiling SIGABRT also occurs in master's full run; alone it passes 6/6 on both, not
       the builder's 5 of 6 failures. Details: docs/upstream/zjit-differential.md, ZRS1 Opus review of
       7a1eed11f4. No Ruby push or external post.
+  - reviewer: thermos-opus
+    orb: T-01a1f051-f32b-7206-936f-08a375829cc1
+    head: "a5ac62d1a22e8ffa9a2cc8e5ac4720ea5b191482"
+    date: 2026-11-18
+    verdict: approve
+    open: >-
+      Short confirm of the fix round for this reviewer's 7a1eed11f4 findings; both rubrics applied directly
+      in this thread, no subagents or other threads. Both must-fixes resolved. git ls-remote: -4 at
+      a5ac62d1a2, -2 still 1d86986033. Two commits on 7db0202722: 61f275c7e5 (only opt_tests.rs, +50) and
+      a5ac62d1a2. Thomas author/committer on both, no trailers. Head tree 3052f43db8 equals 7a1eed11f4's,
+      so the earlier source review, probe and suite runs carry over. Commit 1 built alone: make zjit-test
+      ZJIT_TESTS=invokesuper 47/47, the new baseline test passes with master's snapshot. Head rebuilt:
+      invokesuper 48/48, and the 14-scenario probe is byte-identical to the interpreter in default, z1, z2
+      and zmv. git diff 61f275c7e5 a5ac62d1a2 -- opt_tests.rs is exactly what tekknolagi asked to see:
+      nine lines out (the PatchPoint on Unknown@, the CME/specval guards, PushInlineFrame, the inner
+      polymorphic InvokeSuper, PopInlineFrame), one in (InvokeSuper with 'call from a refined method').
+      GitHub's combined Files view still shows only the after, so reply 1 rightly points at the commits.
+      The body no longer has the suite-count/SIGPROF paragraph and says "The VM's super lookup".
+      Read sentence by sentence against the code: accurate. Reply 1 is accurate. Reply 2 is accurate:
+      YJIT checks T_ICLASS, T_MODULE and the flag; internal/class.h has the static inline function;
+      vm_search_normal_superclass uses it. The German note is corrected (Funktion, not Makro; ZJIT no
+      longer duplicates the check). Nits, not blocking: (a) the note says a5ac62d1a2 keeps 7a1eed11f4's
+      message byte for byte, but its raw message has one extra trailing newline (git cat-file).
+      git log and GitHub show the same text. (b) In commit 1 the test is named ..._remains_invokesuper
+      while its snapshot shows inlining, so the name only becomes true in commit 2. tekknolagi's baseline
+      tests have neutral names. Renaming it test_invokesuper_from_refined_method in both commits is
+      optional. Not rerun: full zjit-test, test-all, btest, hosted CI, arm64. No Ruby push or post.
 ---
 
 # ZJIT: Don't specialize super from a refined method
