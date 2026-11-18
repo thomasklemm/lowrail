@@ -1074,3 +1074,20 @@ evidence: **Campfire's 634 tests were not rerun here**. Neither another corpus n
 timing/instruction measurements, speed, unrestricted Ractor/scheduler or sanitizer/OOM coverage was run or is
 claimed. The floor policy is unchanged; this approval of E1–E3 does not turn compare's heuristic into a confidence
 bound or establish a new support claim.
+
+## Floor between invocations (2026-11-18)
+
+Thomas decided the open floor question recorded in the first confirm resolution: `compare BASE HEAD --aa BASE2`
+takes an A/A pair, a second profile of the unchanged base, and a row's noise is the base's spread across all runs
+of both base reports (so the pair's difference and each one's own spread) or head's own spread, whichever is larger;
+the line and action floors keep their form and `--min`. Without `--aa`, compare lists what exceeds the spread inside
+each capture, says it is not a gate, and exits 0 (2 without valid evidence). The A/A report passes the same strict
+schema check as base and head and must match base in identity, seed, Ruby, environment and runs; workloads evidence
+from more than one contributing process is still refused. The documented CI step profiles the base twice.
+
+`test_compare_gates_on_the_floor_of_an_a_a_pair` covers a Campfire-shaped line and action (small spread inside each
+capture, larger between them) passing, a planted regression beyond the pair's floor failing, a mismatched or invalid
+pair exiting 2, and no pair not gating; it fails on the code before. On Campfire two unchanged `-v` captures whose
+json line moved 0.22 and 0.12 inside each reproduce the false regression (`json/common.rb:364` +1.86 against 1.0,
+exit 1 before); with any of three other unchanged captures as the A/A report they exit 0, and the planted
+`html_escape` still exits 1 with its 3 regressions ([profile.md](../profile.md#compare-two-reports-in-ci)).

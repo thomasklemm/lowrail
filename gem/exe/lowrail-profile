@@ -11,11 +11,11 @@
 #   bundle exec lowrail-profile --workloads                # lowrail/workloads.rb's requests, in this RAILS_ENV
 #   bundle exec lowrail-profile --record -- bin/rails test # also write the suite's requests as lowrail/workloads.rb
 #   bundle exec lowrail-profile report tmp/lowrail-profile # report again from saved runs
-#   bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression, 2 without valid evidence
+#   bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # exit 1 on a regression, 2 without valid evidence
 #
 # Options, all before "--" (everything after it is the command's, unchanged):
 # --out DIR (default tmp/lowrail-profile; a directory lowrail-profile created,
-# or a new or empty one), --runs N (default 2; the runs' spread is the noise
+# or a new or empty one), --runs N (default 2; the runs' spread is in the noise
 # floor), --top N (default 30), --seed N (default 1234, as SEED and --seed for
 # every run), --ledger PATH (contributions.md), --workloads [FILE] (default
 # lowrail/workloads.rb), --record [FILE] (default lowrail/workloads.rb, or
@@ -61,19 +61,21 @@ if args.first == "report"
   exit
 end
 
-# compare BASE.json HEAD.json [--min N] [--json]: exit 1 on a regression
-# beyond the noise floor, 2 when the reports are not valid evidence for one.
+# compare BASE.json HEAD.json --aa BASE2.json [--min N] [--json]: exit 1 on a
+# regression beyond the noise floor of the A/A pair BASE and BASE2, 2 when the
+# reports are not valid evidence for one; without --aa, 0 or 2.
 if args.first == "compare"
   require_relative "../lib/lowrail/profile_compare"
   min = Float(opt.("--min", "1"))
+  aa = opt.("--aa", nil)
   json = args.delete("--json")
-  abort "usage: lowrail-profile compare BASE.json HEAD.json [--min N] [--json]" unless args.size == 3
-  compare = Lowrail::ProfileCompare.new(args[1], args[2], min: min, top: top)
+  abort "usage: lowrail-profile compare BASE.json HEAD.json [--aa BASE2.json] [--min N] [--json]" unless args.size == 3
+  compare = Lowrail::ProfileCompare.new(args[1], args[2], aa: aa, min: min, top: top)
   puts json ? JSON.pretty_generate(compare.to_h) : compare.markdown
   exit compare.status
 end
 
-usage = "usage: lowrail-profile [options] -- COMMAND... | --workloads [FILE] | report [DIR] | compare BASE HEAD"
+usage = "usage: lowrail-profile [options] -- COMMAND... | --workloads [FILE] | report [DIR] | compare BASE HEAD [--aa BASE2]"
 if workloads
   abort "lowrail-profile: --workloads runs its own command; drop the one after --" if command
   abort usage unless args.empty?

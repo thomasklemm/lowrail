@@ -14,7 +14,7 @@ your side:
 Then the census's view: top lines outside the app by objects per request, grouped by gem, a noise floor from a
 repeat run, the app line that leads to each one, and upstream pull requests from Lowrail's
 [contributions ledger](upstream/contributions.md) that change that method. `lowrail-profile compare` sets two
-reports against each other for CI.
+reports against each other for CI, with a second profile of the base as the noise floor.
 
 It is a prototype. The census (`script/census app`) instead copies an app, boots it in production and measures the
 same workloads file with an A/A pair, instructions, jobs and mailers; [Your own app](../README.md#your-own-app) says
@@ -43,7 +43,7 @@ bundle exec lowrail-profile --record -- bin/rails test             # the same, a
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
   bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
 bundle exec lowrail-profile report                                   # rebuild the report from tmp/lowrail-profile
-bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression, 2 without valid evidence
+bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # exit 1 on a regression, 2 without valid evidence
 ```
 
 `--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
@@ -115,7 +115,7 @@ Options, all before the first `--` (everything after it, a second `--` included,
 * `--out DIR` (default `tmp/lowrail-profile`): a new or empty directory, or one lowrail-profile created before (it
   leaves a `.lowrail-profile` marker), where it replaces only its own runs and reports. It refuses any other
   existing directory and deletes nothing in it.
-* `--runs N` (default 2; the spread between runs is the noise floor), `--top N` (default 30), `--seed N` (default
+* `--runs N` (default 2; the spread between runs is part of compare's noise floor), `--top N` (default 30), `--seed N` (default
   1234, passed as `SEED` and `--seed` to every run, so test order repeats), `--ledger PATH` (default: the ledger of
   the Lowrail checkout the gem comes from).
 
@@ -244,17 +244,23 @@ changes (`--missing` after GitHub's rate limit stops it).
 
 ## Compare two reports in CI
 
-`lowrail-profile compare BASE.json HEAD.json` sets the `report.json` of two profiles against each other, per line
-outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per request. It
-exits 1 when anything grew beyond its noise floor and 0 when nothing did, but only for valid evidence; otherwise it
-exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
+`lowrail-profile compare BASE.json HEAD.json --aa BASE2.json` sets the `report.json` of two profiles against each
+other, per line outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per
+request. `BASE2.json` is a second profile of the unchanged base, so `BASE.json` and `BASE2.json` are an A/A pair:
+how much they differ is how much two invocations of the same code differ. compare exits 1 when anything grew beyond
+its noise floor and 0 when nothing did, but only for valid evidence; otherwise it exits 2 and says why. `--json`
+prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
 
-* **Valid evidence**: both reports come from this version of lowrail-profile and pass one strict check of their
+**Without `--aa`, compare is not a gate.** It lists the changes beyond the spread inside each capture, says that
+this is a look and not a gate, and exits 0 (or 2 without valid evidence): that spread misses how much invocations
+differ (below), so such a list is a reason to look, not a confidence bound.
+
+* **Valid evidence**: every report (base, head and the A/A report) comes from this version of lowrail-profile and pass one strict check of their
   shape (every key compare reads present with its type, every summary number included, line rows with a unique site and action rows with a unique
   name, one warm value per run that is finite, or for an action that ran once per process none), with at least two
   runs each, every run's command exiting 0, no dropped samples, every window finished, windows in every run, and one
-  known Ruby and environment in every process; and base and head have the same capture identity, seed, Ruby,
-  environment and number of runs. The identity of a command is its arguments; of `--workloads` it is the file's
+  known Ruby and environment in every process; and head and the A/A report each have the same capture identity,
+  seed, Ruby, environment and number of runs as base. The identity of a command is its arguments; of `--workloads` it is the file's
   manifest (header and `env:` values digested as values), the replay host and, per run, a digest of every counted
   request as sent (so a block that sends other requests is a different capture), recorded only once the run
   finished measuring at least one request, never the output directory; none of these may be empty. That digest
@@ -265,34 +271,46 @@ exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) 
   (String, number, true, false, nil, or Arrays and Hashes of them) has no identity a digest can certify, so such a
   capture is not CI evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
   profile is never a green result.
-* A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of both reports has some;
+* A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of every report has some;
   a kind some runs have and others lack, or no comparable kind at all, exits 2.
-  A line one side never reached is a measured zero there; an action one side did not run, or that has no warm value
-  on a side (it ran once per process), is listed as not compared.
-* A line's noise floor is the larger of its run-to-run spread (largest minus smallest run, so every run counts with
-  `--runs` above 2) in either report and `--min`.
-* An action's is the largest of twice its run-to-run spread, 0.1% of its objects per request and 20 × `--min`,
-  because parallel test workers split an action's requests differently from one invocation to the next, which the
-  spread inside one invocation does not show. That multiplier comes from Campfire's A/A pair, not from a general
-  confidence bound.
+  A line a report never reached is a measured zero there; an action base, head or the A/A report did not run, or
+  that has no warm value there (it ran once per process), is listed as not compared.
+* A row's noise is the base's spread across the A/A pair: largest minus smallest of all the runs of both base
+  reports, so it covers the pair's difference and each one's own spread (every run counts with `--runs` above 2);
+  or head's own spread, if that is larger. Without `--aa` it is the larger spread inside base or head.
+* A line's noise floor is the larger of its noise and `--min`.
+* An action's is the largest of twice its noise, 0.1% of its objects per request and 20 × `--min`, because parallel
+  test workers split an action's requests differently from one invocation to the next. That multiplier comes from
+  Campfire's first A/A pair, before the floor spanned invocations, not from a general confidence bound.
 
 On Campfire's suite an A/A pair (two invocations of `bin/rails test` on the same code) exits 0 with no changes
 beyond the floor, and adding `20.times { ERB::Util.html_escape("a<b") }` to `RoomsController#show` gives exit 1
 with 3 regressions: the action (+45.85 per request against a floor of 26.47) and the two Active Support lines it
 calls (+1.68 per request each over all requests, floor 1.0), and nothing else; 35 actions that run once per process
 are listed as not compared. Comparing a `bin/rails test -v` profile with a `bin/rails test` one exits 2 (different
-commands). Rechecked after the review fixes; the first measurement gave +46.35 against 26.48.
+commands). Rechecked after the review fixes; the first measurement gave +46.35 against 26.48. These runs predate
+the A/A floor: each compared two captures, with the floor from the spread inside each.
 
-**The line floor is not enough for an A/A pair.** After the confirm-review fixes, a second A/A pair of
-`bin/rails test -v` on the same Campfire copy exited 1 with one regression: `GEM/json/lib/json/common.rb:364`,
-+1.69 objects per request against a floor of 1.0. Across six Campfire captures that line's per-run values range from
-107.3 to 111.2, but inside one capture its two runs moved only 0.27 to 3.3, so the run-to-run spread underestimates
-the variation between invocations, as it does for actions. Until a floor measured between invocations exists, treat
-a line regression of a few objects as a reason to look, raise `--min`, or profile more runs; compare's exit 1 is not
-a confidence bound.
+**Why the floor spans two invocations.** After the confirm-review fixes, a second A/A pair of `bin/rails test -v`
+on the same Campfire copy exited 1 with one regression: `GEM/json/lib/json/common.rb:364`, +1.69 objects per
+request against a floor of 1.0. Across six Campfire captures that line's per-run values range from 107.3 to 111.2,
+but inside one capture its two runs moved only 0.27 to 3.3, so the spread inside one invocation underestimates the
+variation between invocations, as it does for actions. The A/A pair measures that variation for every row.
 
-A GitHub Actions job that profiles the pull request's base and head with the same command and fails on a
-regression:
+Rechecked with the A/A floor (fresh `script/corpus campfire` copy, Ruby 4.0.7, `bin/rails test -v`, 634 tests,
+seed 1234): five unchanged captures, each its own invocation, and one with the planted `html_escape`. The json
+line's two runs moved 3.9, 2.5, 2.6, 0.22 and 0.12 in the five. The last two are the case above: compared directly,
+compare before the A/A floor exits 1 with `json/common.rb:364` +1.86 against 1.0; now it lists that line without
+`--aa`, says it is not a gate and exits 0, and with any of three other unchanged captures as the A/A report it exits
+0 with no regression. Every other unchanged base, A/A and head combination tried exits 0 (the closest row reached half
+its floor). The planted change exits 1 against every pair tried, with the same 3 regressions and nothing else: the
+action +43.2 to +44.8 against a floor of 25.76 and both Active Support lines +1.68 against 1.0. With a plain
+`bin/rails test` profile as the A/A report of a `-v` base it exits 2 (base and the A/A report differ in identity).
+One A/A pair is one more sample of the variation between invocations, not a confidence bound: a row that varies more
+than this pair shows can still exceed it.
+
+A GitHub Actions job that profiles the pull request's base twice (the A/A pair) and its head with the same command
+and fails on a regression:
 
 ```yaml
 lowrail-profile:
@@ -307,6 +325,7 @@ lowrail-profile:
         git checkout ${{ github.event.pull_request.base.sha }}
         bin/rails db:test:prepare
         bundle exec lowrail-profile --out tmp/base -- bin/rails test
+        bundle exec lowrail-profile --out tmp/base2 -- bin/rails test
     - name: Profile head
       run: |
         git checkout ${{ github.event.pull_request.head.sha }}
@@ -314,13 +333,14 @@ lowrail-profile:
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
       shell: bash # pipefail, so tee does not hide compare's exit status
-      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json | tee -a "$GITHUB_STEP_SUMMARY"
+      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json | tee -a "$GITHUB_STEP_SUMMARY"
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step from the head's
 Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles, for a look at the report, but compare then
 exits 2; check the suite in its own job. `shell: bash` matters: without it GitHub runs the step without `pipefail`,
-and `tee` would turn compare's exit status into 0.
+and `tee` would turn compare's exit status into 0. Without `--aa tmp/base2/report.json` the step never fails: compare
+without an A/A pair is not a gate. The second base profile costs one more suite run.
 
 ## Safety
 

@@ -132,7 +132,7 @@ class ProfileTest < Minitest::Test
       head["ranked"].find { _1["site"] == "GEM/probe/lib/probe.rb:5" }["warm"].map! { _1 + 50 }
       head["actions"].find { _1["name"] == "WidgetsController#index" }["warm"].map! { _1 + 101 }
       File.write(File.join(dir, "head.json"), JSON.generate(head))
-      out, _, status = compare.("profile/report.json", "head.json")
+      out, _, status = compare.("profile/report.json", "head.json", "--aa", "profile/report.json")
       assert_equal 1, status.exitstatus
       assert_equal [["action", "WidgetsController#index"], ["line", "GEM/probe/lib/probe.rb:5"]],
         JSON.parse(out)["regressions"].map { [_1["what"], _1["name"]] }.sort
@@ -585,11 +585,70 @@ class ProfileTest < Minitest::Test
     { "processes" => 1, "objects_per_request" => 5.0, "windows" => windows, "completed" => windows }
   end
 
-  def compare(dir, base, head)
-    File.write(File.join(dir, "base.json"), JSON.generate(base))
-    File.write(File.join(dir, "head.json"), JSON.generate(head))
-    out, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--json", chdir: dir)
+  # aa: the A/A report (by default base again, whose floor is base's own spread), or nil for none.
+  def compare(dir, base, head, aa: base)
+    { "base" => base, "head" => head, "aa" => aa }.each { |name, r| File.write(File.join(dir, "#{name}.json"), JSON.generate(r)) if r }
+    pair = aa ? %w[--aa aa.json] : []
+    out, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", *pair, "--json", chdir: dir)
     [status.exitstatus, (JSON.parse(out) rescue err)]
+  end
+
+  # The floor is measured between invocations: on Campfire a line moves little
+  # inside one capture and more between two (json/common.rb:364), so an A/A
+  # pair's spread passes a move of its own size and fails one beyond it. The
+  # pair passes the same checks as base and head, and without one compare
+  # lists what it sees but does not gate.
+  def test_compare_gates_on_the_floor_of_an_a_a_pair
+    realpath_tmpdir do |dir|
+      action = ->(warm) { [{ "name" => "RoomsController#show", "warm" => warm }] }
+      capture = ->(line, act) { report(line, actions: action.(act)) }
+      base = capture.([108.0, 108.27], [20_000.0, 20_001.0])
+      aa = capture.([110.9, 111.2], [20_060.0, 20_061.0])
+      same = capture.([109.6, 109.9], [20_055.0, 20_056.0])
+      status, result = compare(dir, base, same, aa: aa)
+      assert_equal [0, true, []], [status, result["gate"], result["regressions"]], "an A/A-sized move: #{result}"
+
+      planted = capture.([113.4, 113.7], [20_200.0, 20_201.0])
+      status, result = compare(dir, base, planted, aa: aa)
+      assert_equal 1, status, result.to_s
+      assert_equal [["action", 200.0, 122.0], ["line", 5.415, 3.2]],
+        result["regressions"].map { [_1["what"], _1["delta"].round(3), _1["noise_floor"].round(3)] }
+
+      # The A/A pair adds to the spread inside each capture, it does not replace it.
+      status, result = compare(dir, report([100.0, 104.0]), report([103.0, 103.5]), aa: report([100.0, 104.0]))
+      assert_equal 0, status, result.to_s
+
+      # Without a pair the same move is listed, as a look, and exits 0.
+      status, result = compare(dir, base, same, aa: nil)
+      assert_equal [0, false], [status, result["gate"]]
+      assert_equal [["action", 55.0], ["line", 1.615]], result["regressions"].map { [_1["what"], _1["delta"].round(3)] }.sort
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", chdir: dir)
+      assert_equal 0, status.exitstatus
+      assert_match(/Not a gate \(exit 0\): no A\/A pair/, out)
+
+      # An action the A/A report did not run has no floor between invocations.
+      status, result = compare(dir, base, planted, aa: report([110.9, 111.2]))
+      assert_equal [1, [{ "kind" => "request", "name" => "RoomsController#show", "reason" => "not run in the A/A report" }]],
+        [status, result["not_compared"]]
+
+      # The pair is evidence like base and head, and of the same capture as base.
+      meta = ->(r, **change) { r.merge("meta" => r["meta"].merge(change.transform_keys(&:to_s))) }
+      {
+        "another command" => meta.(aa, identity: { "mode" => "command", "argv" => %w[bin/rails test -v] }),
+        "another seed" => meta.(aa, seed: "99"),
+        "a failing run" => meta.(aa, exit: [0, 1]),
+        "no capture metadata" => {},
+        "a short warm vector" => capture.([110.9], [20_060.0, 20_061.0])
+      }.each do |why, bad|
+        status, result = compare(dir, base, planted, aa: bad)
+        assert_equal 2, status, "#{why}: #{result}"
+        assert_match(/the A\/A report/, result["problems"].join, why)
+      end
+      status, result = compare(dir, base, planted, aa: report([110.9, 111.2, 111.0], runs: 3, actions: action.([1.0, 1.0, 1.0])))
+      assert_equal 2, status, "another number of runs: #{result}"
+      _, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--aa", "missing.json", chdir: dir)
+      assert_equal 2, status.exitstatus, err
+    end
   end
 
   # compare gates only on valid evidence (exit 2 otherwise), takes the noise
@@ -661,7 +720,7 @@ class ProfileTest < Minitest::Test
       FileUtils.mkdir_p(File.join(dir, "bin"))
       File.write(File.join(dir, "bin/bundle"), "#!/bin/sh\nshift 2\nexec #{RUBY} #{PROFILE} \"$@\"\n")
       File.chmod(0o755, File.join(dir, "bin/bundle"))
-      %w[base head].zip([10.0, 30.0]) do |name, warm|
+      %w[base base2 head].zip([10.0, 10.0, 30.0]) do |name, warm|
         FileUtils.mkdir_p(File.join(dir, "tmp", name))
         File.write(File.join(dir, "tmp", name, "report.json"), JSON.generate(report([warm, warm])))
       end

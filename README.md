@@ -137,9 +137,11 @@ environment and database. It names the app line behind each cost, ranks your
 app lines by the framework and gem objects they lead to and your controller
 actions by objects per request, counts jobs, mails and Action Cable actions
 apart, and names the upstream pull requests that change a costly line.
-`lowrail-profile compare base/report.json head/report.json` exits 1 on a
-regression beyond the noise floor, for CI, and 2 when the two reports are not
-valid evidence (a failing suite, one run, different commands).
+`lowrail-profile compare base/report.json head/report.json --aa base2/report.json`
+exits 1 on a regression beyond the noise floor of an A/A pair (two profiles of
+the base), for CI, and 2 when the reports are not valid evidence (a failing
+suite, one run, different commands); without `--aa` it lists what it sees and
+does not gate.
 
 ```ruby
 gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
