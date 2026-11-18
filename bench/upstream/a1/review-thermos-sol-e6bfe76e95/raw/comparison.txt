@@ -1,0 +1,52 @@
+sqlite3 === composite WIDTH=16 KEEP=0 === head equals stable,parent,merge,main
+sqlite3 === composite WIDTH=16 KEEP=1 === head equals stable,parent,merge,main
+sqlite3 === join_serialization WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === range_join WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === range_plain WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === scoped_join WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === linear_join WIDTH=16 (both KEEP settings) === head equals stable,parent
+sqlite3 === range_paths WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === composite WIDTH=17 KEEP=0 === head equals merge,main
+sqlite3 === composite WIDTH=17 KEEP=1 === head equals merge,main
+sqlite3 === join_serialization WIDTH=17 (both KEEP settings) === head equals stable,parent
+sqlite3 === range_join WIDTH=17 (both KEEP settings) === head equals stable,parent
+sqlite3 === range_plain WIDTH=17 (both KEEP settings) === head equals stable,parent
+sqlite3 === scoped_join WIDTH=17 (both KEEP settings) === head equals stable,parent,merge,main
+sqlite3 === linear_join WIDTH=17 (both KEEP settings) === head equals stable,parent
+sqlite3 === range_paths WIDTH=17 (both KEEP settings) === head equals stable,parent
+sqlite3 scoped head byte-identical to main: True
+sqlite3 scoped-order head byte-identical to main: True
+sqlite3 scoped-effects head byte-identical to main: True
+sqlite3 scoped-hash head byte-identical to main: True
+sqlite3 finite 16 cases 130 different from main 0 neither main nor stable 0
+sqlite3 finite 17 cases 130 different from main 0 neither main nor stable 0
+sqlite3 range 16 cases 130 different from main 20 neither main nor stable 0
+sqlite3 range 17 cases 130 different from main 90 neither main nor stable 0
+sqlite3 phase 16 cases 130 different from main 0 neither main nor stable 0
+sqlite3 phase 17 cases 130 different from main 12 neither main nor stable 0
+postgresql === composite WIDTH=16 KEEP=0 === head equals stable,parent,merge,main
+postgresql === composite WIDTH=16 KEEP=1 === head equals stable,parent,merge,main
+postgresql === join_serialization WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === range_join WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === range_plain WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === scoped_join WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === linear_join WIDTH=16 (both KEEP settings) === head equals stable,parent
+postgresql === range_paths WIDTH=16 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === composite WIDTH=17 KEEP=0 === head equals merge,main
+postgresql === composite WIDTH=17 KEEP=1 === head equals merge,main
+postgresql === join_serialization WIDTH=17 (both KEEP settings) === head equals stable,parent
+postgresql === range_join WIDTH=17 (both KEEP settings) === head equals stable,parent
+postgresql === range_plain WIDTH=17 (both KEEP settings) === head equals stable,parent
+postgresql === scoped_join WIDTH=17 (both KEEP settings) === head equals stable,parent,merge,main
+postgresql === linear_join WIDTH=17 (both KEEP settings) === head equals stable,parent
+postgresql === range_paths WIDTH=17 (both KEEP settings) === head equals stable,parent
+postgresql scoped head byte-identical to main: True
+postgresql scoped-order head byte-identical to main: True
+postgresql scoped-effects head byte-identical to main: True
+postgresql scoped-hash head byte-identical to main: True
+postgresql finite 16 cases 130 different from main 0 neither main nor stable 0
+postgresql finite 17 cases 130 different from main 0 neither main nor stable 0
+postgresql range 16 cases 130 different from main 20 neither main nor stable 0
+postgresql range 17 cases 130 different from main 90 neither main nor stable 0
+postgresql phase 16 cases 130 different from main 0 neither main nor stable 0
+postgresql phase 17 cases 130 different from main 12 neither main nor stable 0

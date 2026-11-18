@@ -1,0 +1,320 @@
+User.posts load: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+User.posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1"
+User.posts where: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."id" != ?
+User.published_posts load: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."published" = ?
+User.published_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1 AND \"posts\".\"published\" = TRUE"
+User.published_posts where: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."published" = ? AND "posts"."id" != ?
+User.all_posts load: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+User.all_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1"
+User.all_posts where: ["Post#1", "Post#2", "SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."id" != ?
+User.rewhere_posts load: []
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = ?
+User.rewhere_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 0 AND \"posts\".\"user_id\" = 1"
+User.rewhere_posts where: []
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = ? AND "posts"."id" != ?
+User.messages load: ["Message#1"]
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+User.messages to_sql: "SELECT \"messages\".* FROM \"messages\" WHERE (sender_id = 1 OR recipient_id = 1) AND \"messages\".\"user_id\" = 1"
+User.messages where: ["Message#1"]
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ? AND "messages"."id" != ?
+User.visible_messages load: ["Message#1"]
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."user_id" = ? AND "messages"."visible" = ?
+User.visible_messages to_sql: "SELECT \"messages\".* FROM \"messages\" WHERE \"messages\".\"user_id\" = 1 AND \"messages\".\"visible\" = TRUE"
+User.visible_messages where: ["Message#1"]
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."user_id" = ? AND "messages"."visible" = ? AND "messages"."id" != ?
+User.comments load: ["Comment#1", "Comment#2", "Comment#3", "Comment#4", "Comment#5", "Comment#6"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+User.comments to_sql: "SELECT \"comments\".* FROM \"comments\" INNER JOIN \"posts\" ON \"comments\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1"
+User.comments where: ["Comment#1", "Comment#2", "Comment#3", "Comment#4", "Comment#5", "Comment#6"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."id" != ?
+User.visible_comments load: ["Comment#1", "Comment#3", "Comment#5"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."visible" = ?
+User.visible_comments to_sql: "SELECT \"comments\".* FROM \"comments\" INNER JOIN \"posts\" ON \"comments\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1 AND \"comments\".\"visible\" = TRUE"
+User.visible_comments where: ["Comment#1", "Comment#3", "Comment#5"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."visible" = ? AND "comments"."id" != ?
+User.tags load: ["Tag#1", "Tag#2", "Tag#3"]
+  sql SELECT "tags".* FROM "tags" INNER JOIN "taggings" ON "tags"."id" = "taggings"."tag_id" INNER JOIN "posts" ON "taggings"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+User.tags to_sql: "SELECT \"tags\".* FROM \"tags\" INNER JOIN \"taggings\" ON \"tags\".\"id\" = \"taggings\".\"tag_id\" INNER JOIN \"posts\" ON \"taggings\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 1"
+User.tags where: ["Tag#1", "Tag#2", "Tag#3"]
+  sql SELECT "tags".* FROM "tags" INNER JOIN "taggings" ON "tags"."id" = "taggings"."tag_id" INNER JOIN "posts" ON "taggings"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "tags"."id" != ?
+User.pictures load: ["Picture#1"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ?
+User.pictures to_sql: "SELECT \"pictures\".* FROM \"pictures\" WHERE \"pictures\".\"imageable_id\" = 1 AND \"pictures\".\"imageable_type\" = 'User'"
+User.pictures where: ["Picture#1"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ? AND "pictures"."id" != ?
+User.typeless_pictures load: ["Picture#1"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ?
+User.typeless_pictures to_sql: "SELECT \"pictures\".* FROM \"pictures\" WHERE \"pictures\".\"imageable_id\" = 1 AND \"pictures\".\"imageable_type\" = 'User'"
+User.typeless_pictures where: ["Picture#1"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ? AND "pictures"."id" != ?
+User.latest_post load: ["SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? ORDER BY "posts"."id" DESC LIMIT ?
+User.latest_post to_sql: ["SpecialPost#3"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? ORDER BY "posts"."id" DESC LIMIT ?
+User.latest_post where: nil
+Admin.posts load: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+Admin.posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2"
+Admin.posts where: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."id" != ?
+Admin.published_posts load: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."published" = ?
+Admin.published_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2 AND \"posts\".\"published\" = TRUE"
+Admin.published_posts where: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."published" = ? AND "posts"."id" != ?
+Admin.all_posts load: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+Admin.all_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2"
+Admin.all_posts where: ["Post#4", "Post#5", "SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."id" != ?
+Admin.rewhere_posts load: []
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = ?
+Admin.rewhere_posts to_sql: "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 0 AND \"posts\".\"user_id\" = 2"
+Admin.rewhere_posts where: []
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = ? AND "posts"."id" != ?
+Admin.messages load: ["Message#2"]
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+Admin.messages to_sql: "SELECT \"messages\".* FROM \"messages\" WHERE (sender_id = 2 OR recipient_id = 2) AND \"messages\".\"user_id\" = 2"
+Admin.messages where: ["Message#2"]
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ? AND "messages"."id" != ?
+Admin.visible_messages load: ["Message#2"]
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."user_id" = ? AND "messages"."visible" = ?
+Admin.visible_messages to_sql: "SELECT \"messages\".* FROM \"messages\" WHERE \"messages\".\"user_id\" = 2 AND \"messages\".\"visible\" = TRUE"
+Admin.visible_messages where: ["Message#2"]
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."user_id" = ? AND "messages"."visible" = ? AND "messages"."id" != ?
+Admin.comments load: ["Comment#10", "Comment#11", "Comment#12", "Comment#7", "Comment#8", "Comment#9"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+Admin.comments to_sql: "SELECT \"comments\".* FROM \"comments\" INNER JOIN \"posts\" ON \"comments\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2"
+Admin.comments where: ["Comment#10", "Comment#11", "Comment#12", "Comment#7", "Comment#8", "Comment#9"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."id" != ?
+Admin.visible_comments load: ["Comment#11", "Comment#7", "Comment#9"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."visible" = ?
+Admin.visible_comments to_sql: "SELECT \"comments\".* FROM \"comments\" INNER JOIN \"posts\" ON \"comments\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2 AND \"comments\".\"visible\" = TRUE"
+Admin.visible_comments where: ["Comment#11", "Comment#7", "Comment#9"]
+  sql SELECT "comments".* FROM "comments" INNER JOIN "posts" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "comments"."visible" = ? AND "comments"."id" != ?
+Admin.tags load: ["Tag#4", "Tag#5", "Tag#6"]
+  sql SELECT "tags".* FROM "tags" INNER JOIN "taggings" ON "tags"."id" = "taggings"."tag_id" INNER JOIN "posts" ON "taggings"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+Admin.tags to_sql: "SELECT \"tags\".* FROM \"tags\" INNER JOIN \"taggings\" ON \"tags\".\"id\" = \"taggings\".\"tag_id\" INNER JOIN \"posts\" ON \"taggings\".\"post_id\" = \"posts\".\"id\" WHERE \"posts\".\"deleted_at\" IS NULL AND \"posts\".\"user_id\" = 2"
+Admin.tags where: ["Tag#4", "Tag#5", "Tag#6"]
+  sql SELECT "tags".* FROM "tags" INNER JOIN "taggings" ON "tags"."id" = "taggings"."tag_id" INNER JOIN "posts" ON "taggings"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "tags"."id" != ?
+Admin.pictures load: ["Picture#2"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ?
+Admin.pictures to_sql: "SELECT \"pictures\".* FROM \"pictures\" WHERE \"pictures\".\"imageable_id\" = 2 AND \"pictures\".\"imageable_type\" = 'User'"
+Admin.pictures where: ["Picture#2"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ? AND "pictures"."id" != ?
+Admin.typeless_pictures load: ["Picture#2"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ?
+Admin.typeless_pictures to_sql: "SELECT \"pictures\".* FROM \"pictures\" WHERE \"pictures\".\"imageable_id\" = 2 AND \"pictures\".\"imageable_type\" = 'User'"
+Admin.typeless_pictures where: ["Picture#2"]
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ? AND "pictures"."id" != ?
+Admin.latest_post load: ["SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? ORDER BY "posts"."id" DESC LIMIT ?
+Admin.latest_post to_sql: ["SpecialPost#6"]
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? ORDER BY "posts"."id" DESC LIMIT ?
+Admin.latest_post where: nil
+preload posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+includes posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+eager_load posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "posts"."id" AS t1_r0, "posts"."user_id" AS t1_r1, "posts"."title" AS t1_r2, "posts"."type" AS t1_r3, "posts"."published" AS t1_r4, "posts"."deleted_at" AS t1_r5 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" WHERE "posts"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload published_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."published" = ? AND "posts"."user_id" IN (?, ?)
+includes published_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."published" = ? AND "posts"."user_id" IN (?, ?)
+eager_load published_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "posts"."id" AS t1_r0, "posts"."user_id" AS t1_r1, "posts"."title" AS t1_r2, "posts"."type" AS t1_r3, "posts"."published" AS t1_r4, "posts"."deleted_at" AS t1_r5 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."published" = ? AND "posts"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins published_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."published" = ? AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins published_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."published" = ? AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated published_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" AS "published_posts" ON "published_posts"."deleted_at" IS NULL AND "published_posts"."published" = ? AND "published_posts"."user_id" = "users"."id" WHERE "published_posts"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload all_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+includes all_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+eager_load all_posts: [["Post#1", "Post#2", "SpecialPost#3"], ["Post#4", "Post#5", "SpecialPost#6"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "posts"."id" AS t1_r0, "posts"."user_id" AS t1_r1, "posts"."title" AS t1_r2, "posts"."type" AS t1_r3, "posts"."published" AS t1_r4, "posts"."deleted_at" AS t1_r5 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins all_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins all_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated all_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" AS "all_posts" ON "all_posts"."deleted_at" IS NULL AND "all_posts"."user_id" = "users"."id" WHERE "all_posts"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload rewhere_posts: [[], []]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" IN (?, ?)
+  calls {type_hash: 1}
+includes rewhere_posts: [[], []]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" IN (?, ?)
+  calls {type_hash: 1}
+eager_load rewhere_posts: [[], []]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "posts"."id" AS t1_r0, "posts"."user_id" AS t1_r1, "posts"."title" AS t1_r2, "posts"."type" AS t1_r3, "posts"."published" AS t1_r4, "posts"."deleted_at" AS t1_r5 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins rewhere_posts: []
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins rewhere_posts: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated rewhere_posts: []
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" AS "rewhere_posts" ON "rewhere_posts"."deleted_at" IS NULL AND "rewhere_posts"."user_id" = ? AND "rewhere_posts"."user_id" = "users"."id" WHERE "rewhere_posts"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload messages: [["Message#1"], ["Message#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+includes messages: [["Message#1"], ["Message#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+  sql SELECT "messages".* FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+eager_load messages: "ArgumentError: The association scope 'messages' is instance dependent (the scope block takes an argument). Eager loading instance dependent scopes is not supported."
+joins messages: "ArgumentError: The association scope 'messages' is instance dependent (the scope block takes an argument). Eager loading instance dependent scopes is not supported."
+left_joins messages: "ArgumentError: The association scope 'messages' is instance dependent (the scope block takes an argument). Eager loading instance dependent scopes is not supported."
+where.associated messages: "ArgumentError: The association scope 'messages' is instance dependent (the scope block takes an argument). Eager loading instance dependent scopes is not supported."
+preload visible_messages: [["Message#1"], ["Message#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."visible" = ? AND "messages"."user_id" IN (?, ?)
+includes visible_messages: [["Message#1"], ["Message#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "messages".* FROM "messages" WHERE "messages"."visible" = ? AND "messages"."user_id" IN (?, ?)
+eager_load visible_messages: [["Message#1"], ["Message#2"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "messages"."id" AS t1_r0, "messages"."user_id" AS t1_r1, "messages"."sender_id" AS t1_r2, "messages"."recipient_id" AS t1_r3, "messages"."body" AS t1_r4, "messages"."visible" AS t1_r5 FROM "users" LEFT OUTER JOIN "messages" ON "messages"."visible" = ? AND "messages"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins visible_messages: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "messages" ON "messages"."visible" = ? AND "messages"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins visible_messages: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "messages" ON "messages"."visible" = ? AND "messages"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated visible_messages: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "messages" AS "visible_messages" ON "visible_messages"."visible" = ? AND "visible_messages"."user_id" = "users"."id" WHERE "visible_messages"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload comments: [["Comment#1", "Comment#2", "Comment#3", "Comment#4", "Comment#5", "Comment#6"], ["Comment#10", "Comment#11", "Comment#12", "Comment#7", "Comment#8", "Comment#9"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+  sql SELECT "comments".* FROM "comments" WHERE "comments"."post_id" IN (?, ?, ?, ?, ?, ?)
+includes comments: [["Comment#1", "Comment#2", "Comment#3", "Comment#4", "Comment#5", "Comment#6"], ["Comment#10", "Comment#11", "Comment#12", "Comment#7", "Comment#8", "Comment#9"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+  sql SELECT "comments".* FROM "comments" WHERE "comments"."post_id" IN (?, ?, ?, ?, ?, ?)
+eager_load comments: [["Comment#1", "Comment#2", "Comment#3", "Comment#4", "Comment#5", "Comment#6"], ["Comment#10", "Comment#11", "Comment#12", "Comment#7", "Comment#8", "Comment#9"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "comments"."id" AS t1_r0, "comments"."post_id" AS t1_r1, "comments"."body" AS t1_r2, "comments"."visible" AS t1_r3 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "comments" ON "comments"."post_id" = "posts"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "comments" ON "comments"."post_id" = "posts"."id" ORDER BY "users"."id" ASC
+left_joins comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "comments" ON "comments"."post_id" = "posts"."id" ORDER BY "users"."id" ASC
+where.associated comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "comments" ON "comments"."post_id" = "posts"."id" WHERE "comments"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload visible_comments: [["Comment#1", "Comment#3", "Comment#5"], ["Comment#11", "Comment#7", "Comment#9"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts"."id" AS t0_r0, "posts"."user_id" AS t0_r1, "posts"."title" AS t0_r2, "posts"."type" AS t0_r3, "posts"."published" AS t0_r4, "posts"."deleted_at" AS t0_r5, "comments"."id" AS t1_r0, "comments"."post_id" AS t1_r1, "comments"."body" AS t1_r2, "comments"."visible" AS t1_r3 FROM "posts" LEFT OUTER JOIN "comments" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "comments"."visible" = ? AND "posts"."user_id" IN (?, ?)
+includes visible_comments: [["Comment#1", "Comment#3", "Comment#5"], ["Comment#11", "Comment#7", "Comment#9"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts"."id" AS t0_r0, "posts"."user_id" AS t0_r1, "posts"."title" AS t0_r2, "posts"."type" AS t0_r3, "posts"."published" AS t0_r4, "posts"."deleted_at" AS t0_r5, "comments"."id" AS t1_r0, "comments"."post_id" AS t1_r1, "comments"."body" AS t1_r2, "comments"."visible" AS t1_r3 FROM "posts" LEFT OUTER JOIN "comments" ON "comments"."post_id" = "posts"."id" WHERE "posts"."deleted_at" IS NULL AND "comments"."visible" = ? AND "posts"."user_id" IN (?, ?)
+eager_load visible_comments: [["Comment#1", "Comment#3", "Comment#5"], ["Comment#11", "Comment#7", "Comment#9"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "comments"."id" AS t1_r0, "comments"."post_id" AS t1_r1, "comments"."body" AS t1_r2, "comments"."visible" AS t1_r3 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "comments" ON "comments"."visible" = ? AND "comments"."post_id" = "posts"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins visible_comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "comments" ON "comments"."visible" = ? AND "comments"."post_id" = "posts"."id" ORDER BY "users"."id" ASC
+left_joins visible_comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "comments" ON "comments"."visible" = ? AND "comments"."post_id" = "posts"."id" ORDER BY "users"."id" ASC
+where.associated visible_comments: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "comments" ON "comments"."visible" = ? AND "comments"."post_id" = "posts"."id" WHERE "comments"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload tags: [["Tag#1", "Tag#2", "Tag#3"], ["Tag#4", "Tag#5", "Tag#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+  sql SELECT "taggings".* FROM "taggings" WHERE "taggings"."post_id" IN (?, ?, ?, ?, ?, ?)
+  sql SELECT "tags".* FROM "tags" WHERE "tags"."id" IN (?, ?, ?, ?, ?, ?)
+includes tags: [["Tag#1", "Tag#2", "Tag#3"], ["Tag#4", "Tag#5", "Tag#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?)
+  sql SELECT "taggings".* FROM "taggings" WHERE "taggings"."post_id" IN (?, ?, ?, ?, ?, ?)
+  sql SELECT "tags".* FROM "tags" WHERE "tags"."id" IN (?, ?, ?, ?, ?, ?)
+eager_load tags: [["Tag#1", "Tag#2", "Tag#3"], ["Tag#4", "Tag#5", "Tag#6"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "tags"."id" AS t1_r0, "tags"."name" AS t1_r1 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "taggings" ON "taggings"."post_id" = "posts"."id" LEFT OUTER JOIN "tags" ON "tags"."id" = "taggings"."tag_id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins tags: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "taggings" ON "taggings"."post_id" = "posts"."id" INNER JOIN "tags" ON "tags"."id" = "taggings"."tag_id" ORDER BY "users"."id" ASC
+left_joins tags: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" LEFT OUTER JOIN "taggings" ON "taggings"."post_id" = "posts"."id" LEFT OUTER JOIN "tags" ON "tags"."id" = "taggings"."tag_id" ORDER BY "users"."id" ASC
+where.associated tags: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" INNER JOIN "taggings" ON "taggings"."post_id" = "posts"."id" INNER JOIN "tags" ON "tags"."id" = "taggings"."tag_id" WHERE "tags"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_type" = ? AND "pictures"."imageable_id" IN (?, ?)
+includes pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_type" = ? AND "pictures"."imageable_id" IN (?, ?)
+eager_load pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "pictures"."id" AS t1_r0, "pictures"."imageable_id" AS t1_r1, "pictures"."imageable_type" AS t1_r2, "pictures"."url" AS t1_r3 FROM "users" LEFT OUTER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" WHERE "pictures"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload typeless_pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_type" = ? AND "pictures"."imageable_id" IN (?, ?)
+includes typeless_pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "pictures".* FROM "pictures" WHERE "pictures"."imageable_type" = ? AND "pictures"."imageable_id" IN (?, ?)
+eager_load typeless_pictures: [["Picture#1"], ["Picture#2"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "pictures"."id" AS t1_r0, "pictures"."imageable_id" AS t1_r1, "pictures"."imageable_type" AS t1_r2, "pictures"."url" AS t1_r3 FROM "users" LEFT OUTER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins typeless_pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins typeless_pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "pictures" ON "pictures"."imageable_type" = ? AND "pictures"."imageable_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated typeless_pictures: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "pictures" AS "typeless_pictures" ON "typeless_pictures"."imageable_type" = ? AND "typeless_pictures"."imageable_id" = "users"."id" WHERE "typeless_pictures"."id" IS NOT NULL ORDER BY "users"."id" ASC
+preload latest_post: [["SpecialPost#3"], ["SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?) ORDER BY "posts"."id" DESC
+includes latest_post: [["SpecialPost#3"], ["SpecialPost#6"]]
+  sql SELECT "users".* FROM "users" WHERE "users"."id" IN (?, ?)
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" IN (?, ?) ORDER BY "posts"."id" DESC
+eager_load latest_post: [["Post#1"], ["Post#4"]]
+  sql SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, "users"."type" AS t0_r2, "posts"."id" AS t1_r0, "posts"."user_id" AS t1_r1, "posts"."title" AS t1_r2, "posts"."type" AS t1_r3, "posts"."published" AS t1_r4, "posts"."deleted_at" AS t1_r5 FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" WHERE "users"."id" IN (?, ?) ORDER BY "users"."id" ASC
+joins latest_post: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+left_joins latest_post: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" LEFT OUTER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" ORDER BY "users"."id" ASC
+where.associated latest_post: [1, 2, 3]
+  sql SELECT DISTINCT "users"."id" FROM "users" INNER JOIN "posts" AS "latest_post" ON "latest_post"."deleted_at" IS NULL AND "latest_post"."user_id" = "users"."id" WHERE "latest_post"."id" IS NOT NULL ORDER BY "users"."id" ASC
+belongs_to: ["Post#1"]
+  sql SELECT "comments".* FROM "comments" ORDER BY "comments"."id" ASC LIMIT ?
+  sql SELECT "comments".* FROM "comments" ORDER BY "comments"."id" ASC LIMIT ?
+  sql SELECT "posts".* FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."id" = ? LIMIT ?
+belongs_to polymorphic: ["User#1"]
+  sql SELECT "pictures".* FROM "pictures" ORDER BY "pictures"."id" ASC LIMIT ?
+  sql SELECT "pictures".* FROM "pictures" ORDER BY "pictures"."id" ASC LIMIT ?
+  sql SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?
+Post.joins(:user, :tags): [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  sql SELECT "posts"."id" FROM "posts" INNER JOIN "users" ON "users"."id" = "posts"."user_id" INNER JOIN "taggings" ON "taggings"."post_id" = "posts"."id" INNER JOIN "tags" ON "tags"."id" = "taggings"."tag_id" WHERE "posts"."deleted_at" IS NULL ORDER BY "posts"."id" ASC
+Admin.joins(:posts): [2, 2, 2]
+  sql SELECT "users"."id" FROM "users" INNER JOIN "posts" ON "posts"."deleted_at" IS NULL AND "posts"."user_id" = "users"."id" WHERE "users"."type" = ?
+SpecialPost.joins(:user): [3, 6, 9]
+  sql SELECT "posts"."id" FROM "posts" INNER JOIN "users" ON "users"."id" = "posts"."user_id" WHERE "posts"."type" = ? AND "posts"."deleted_at" IS NULL ORDER BY "posts"."id" ASC
+build: {"user_id" => 1, "title" => "n"}
+create: 1
+  sql BEGIN immediate TRANSACTION
+  sql INSERT INTO "posts" ("user_id", "title") VALUES (?, ?) RETURNING "id"
+  sql COMMIT TRANSACTION
+delete_all: 1
+  sql DELETE FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ? AND "posts"."title" = ?
+count: [3, 3, 1, 1]
+  sql SELECT COUNT(*) FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+  sql SELECT COUNT(*) FROM "posts" WHERE "posts"."deleted_at" IS NULL AND "posts"."user_id" = ?
+  sql SELECT COUNT(*) FROM "messages" WHERE (sender_id = ? OR recipient_id = ?) AND "messages"."user_id" = ?
+  sql SELECT COUNT(*) FROM "pictures" WHERE "pictures"."imageable_id" = ? AND "pictures"."imageable_type" = ?

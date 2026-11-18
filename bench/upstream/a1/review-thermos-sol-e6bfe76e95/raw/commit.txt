@@ -1,0 +1,18 @@
+commit e6bfe76e9599baed1b51030634566302f90a2151
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed Nov 18 02:57:50 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed Nov 18 02:57:50 2026 +0000
+
+    Don't compare owner conditions when joining an association without a scope
+    
+    To detect conditions that the association scope removed, join_scope
+    subtracts where clauses before and after merging the scope items, also
+    when there are none. Comparing predicates can call into their bind
+    values: Array#- hashes both sides once they are large enough, and
+    QueryAttribute#hash and #== serialize the value. So a join whose target
+    default scope has an out of range condition raised
+    ActiveModel::RangeError instead of matching no records.
+    
+    Skip the comparison when the association has no scope items, since
+    nothing can have removed a condition.

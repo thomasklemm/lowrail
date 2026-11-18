@@ -1,0 +1,10 @@
+    33.6: flog total
+    33.6: flog/method average
+
+    33.6: MetricTarget#join_scope          .amp/in/orb-backup/metrics-head.rb:2-26
+== .amp/in/orb-backup/metrics-head.rb ==
+R:  2:  7: Metrics/AbcSize: Assignment Branch Condition size for join_scope is too high. [<12, 25, 3> 27.89/0]
+R:  2:  7: Metrics/CyclomaticComplexity: Cyclomatic complexity for join_scope is too high. [4/0]
+R:  2:  7: Metrics/PerceivedComplexity: Perceived complexity for join_scope is too high. [4/0]
+
+1 file inspected, 3 offenses detected

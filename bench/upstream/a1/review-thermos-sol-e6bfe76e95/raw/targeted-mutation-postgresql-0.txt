@@ -1,0 +1,15 @@
+Using postgresql
+Run options: --seed 49150
+
+# Running:
+
+F
+
+Finished in 0.033889s, 29.5079 runs/s, 59.0158 assertions/s.
+
+  1) Failure:
+HasManyOwnerConditionsSerializationTest#test_joining_an_association_whose_default_scope_has_an_out_of_range_condition_matches_no_records [.amp/in/orb-backup/rails/activerecord/test/cases/associations/has_many_associations_test.rb:3747]:
+Expected #<ActiveRecord::Relation [#<#<Class:0x00007fc051f106f8> id: 1>]> to be empty.
+
+1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+exit 1
