@@ -1,11 +1,11 @@
 # RK3 on the exact head: cohort manifest
 
-Declared 2026-11-18 before any measured process ran, committed with the results. Each cohort runs once. A rejected
+Declared 2026-11-18 before the declared cohorts ran (a WARM=5/N=2 pipeline smoke test ran earlier and is not evidence), committed with the results. Each cohort runs once. A rejected
 cohort stays recorded and is not rerun.
 
 Head `c0a8e93011` (thomasklemm/rack, decode `9285fa0f4d` + escape `c0a8e93011`) against rack main `da90464e3f`.
 Ruby 4.0.9, pinned Valgrind 3.19.0 with the 512 MiB brk reservation (`script/bench-valgrind ~/w/valgrind-brk512`,
-manifest in each cohort's `valgrind.json`), `--verbose` logs kept. Every count is the trailing `totals:` line of
+manifest kept with cohort M as `valgrind.json`; the request cohorts used the same prefix), `--verbose` logs kept. Every count is the trailing `totals:` line of
 its Callgrind dump, not `summary:` or the log's `Collected`.
 
 ## Cohort M: micro (body table)
