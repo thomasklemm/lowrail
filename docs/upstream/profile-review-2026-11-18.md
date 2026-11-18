@@ -1091,3 +1091,145 @@ pair exiting 2, and no pair not gating; it fails on the code before. On Campfire
 json line moved 0.22 and 0.12 inside each reproduce the false regression (`json/common.rb:364` +1.86 against 1.0,
 exit 1 before); with any of three other unchanged captures as the A/A report they exit 0, and the planted
 `html_escape` still exits 1 with its 3 regressions ([profile.md](../profile.md#compare-two-reports-in-ci)).
+
+## Confirm review of the A/A floor, 16dbc027 (2026-11-18)
+
+**Verdict: changes. One P2 must-fix, AA1; two nonblocking nits, AA-N1 and AA-N2.** A supplied A/A file containing
+JSON `null` bypasses validation and disables the gate, so even the documented CI pipeline passes invalid evidence
+with detected regressions. The floor arithmetic otherwise implements the chosen policy. Its sensitivity and
+coverage limits are real, not a confidence guarantee, but are not additional correctness defects under that policy.
+This is a review-document-only change; the finding is not fixed here.
+
+### Scope and executed checks
+
+Loaded `thermos`, `thermo-nuclear-review` and `thermo-nuclear-code-quality-review`. One reviewer applied both
+rubrics in this thread, without subagents or other threads, as requested; this is not independent dual-reviewer
+coverage. Read `AGENTS.md`, `docs/PLAN.md`, the earlier review/resolutions, the complete six-file
+`9a944c8aa40b8e9a96ea7b7ea3ae9ab8291f45a8..16dbc027ed9b148d026ce9ea02252702e07fafb0` diff, the comparison
+reader, report producer, workload receipts and CLI consumers. The checkout started at `cacec69e`; the relevant
+implementation, tests, README and profile guide are identical to the requested commit. Unrelated main changes
+are excluded. The reviewed commit's GitHub pulls lookup returned no PRs. Nothing was posted upstream.
+
+Used mise **Ruby 4.0.7**, revision `229531a6cf`, Linux x86-64; Rails **8.1.4**, sqlite3 **2.10.2**, bcrypt
+**3.1.22**, Rack **3.2.8**, rack-test **2.3.0**. Installed missing test gems in the orb without changing dependency
+files. All three requested suites pass:
+
+```text
+mise exec ruby@4.0.7 -- ruby -Igem/lib -Igem/test gem/test/profile_test.rb --verbose
+14 runs, 184 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.7 -- ruby -Igem/lib -Igem/test gem/test/workloads_test.rb --verbose
+3 runs, 22 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.7 -- ruby -Igem/lib -Igem/test gem/test/load_hooks_test.rb --verbose
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Total: **19 runs, 210 assertions**. A separate scratch harness exercises **44 comparison cases in both JSON and
+Markdown**, plus three executions of the guide's actual Compare step under
+`bash --noprofile --norc -eo pipefail`, with a local `bundle exec` shim to the real CLI. It supplies synthetic
+reports, not Campfire data. Harness and outputs remain private under `.amp/in/orb-backup/aa-confirm/`:
+
+```sh
+mise exec ruby@4.0.7 -- ruby .amp/in/orb-backup/aa-confirm/probe.rb
+```
+
+### AA1 — P2 must-fix: JSON null in a supplied A/A file silently disables the gate
+
+**Locations:** `gem/lib/lowrail/profile_compare.rb:52–53,166–174`, reached by
+`gem/exe/lowrail-profile:69–75`. Introduced by the new optional A/A-report selection.
+
+The constructor uses `nil` for an omitted filename, but `JSON.parse("null")` also returns `nil`. `gate?` tests
+only that parsed value, so `reports` excludes the supplied file before the strict validator can reject it. A
+readable, syntactically valid JSON file with no report thus takes the advisory path rather than exit 2.
+
+With matching, otherwise complete two-run reports, base line `[100.0,100.0]`, head line `[130.0,130.0]`, base
+action `[1000.0,1000.0]`, head action `[1100.0,1100.0]`:
+
+| A/A input | CLI and explicit-pipefail CI exit | Result |
+| --- | --- | --- |
+| The valid base report | 1 | Two regressions: line +30 against 1; action +100 against 20. |
+| A file containing `null` | **0** | JSON has `status:0`, `gate:false`, `problems:[]`, and both regressions. Markdown incorrectly says no A/A pair was supplied. |
+| No `--aa` | 0 | Same advisory result, intentional only in this case. |
+
+The null file also returns 0 against unchanged head data, so this is an invalid-evidence admission defect, not
+just a difference in regression classification. Other tested non-report JSON values (`false`, `true`, `0`, an
+Array, an object and a String) correctly exit 2; unreadable A/A evidence is covered by the passing profile suite.
+
+**Smallest fix:** preserve the distinction between an omitted argument and an invalid parsed report. For example,
+normalize a parsed null to the existing invalid-report sentinel when a filename was supplied, so it still reaches
+`report_problems`; no new schema framework or CLI mode is needed. Keep the intentional no-argument advisory path.
+Add a CLI regression for `--aa` pointing to a file containing `null`, with unchanged and regressing head controls,
+requiring exit 2 and an A/A-specific problem in both output formats. This must be fixed because it produces green
+CI on invalid evidence and contradicts the guide's strict A/A-validation promise, not because advisory mode is
+inherently forbidden.
+
+### Floor, missing-row and admission findings
+
+The formula is correct for the documented heuristic: maximum minus minimum across **all** base and A/A runs,
+or head's own spread if larger. It is not the spread of capture means, does not accidentally include the head's
+mean shift in the base floor, and retains within-capture outliers. The same rule is applied separately to each
+line/action and each window kind. Asymmetric three-run probes for request, job, mail and Cable data give line
+delta 7, floor 6, and action delta 70, floor 60. Equality passes, an extra 0.1 fails, head's larger own spread wins,
+and `--min 10` gives line/action minima of 10/200. The retained action 2× multiplier and 0.1% share are empirical
+policy, not statistically derived confidence limits.
+
+The requested adversarial cases have these concrete outcomes:
+
+* **Unbounded noisy pair:** with the same stable base/head above and A/A line/action `[100000.0,100000.0]`,
+  exit 0, `gate:true`, no problems or regressions. The line floor is 99,900 and action floor 198,000. There is no
+  quality cutoff: selecting a worse pair can conceal an arbitrarily large finite planted increase. This is loss
+  of detection power under the chosen floor, not proof that the change is harmless. Command identity does not
+  certify that someone actually captured unchanged code; these files are trusted measurement inputs, not an
+  attestation format. Clamping the floor would invent detection confidence, not repair it.
+* **A line present in base/head but absent from the A/A ranked collection:** base 100, head 130, A/A absent
+  becomes A/A zero, noise/floor 100, exit 0. An absent collection is rejected (2); an absent row in a complete
+  collection is the documented measured-zero case. The report producer includes every ranked site, not only
+  the displayed top N. Treating genuine absence as zero is consistent; it can still make the pair uninformative.
+* **A missing, renamed or nil-warm A/A action:** a stable action increase of 100 is excluded, exit 0,
+  `gate:true`, and explicitly listed in `not_compared` as absent/no warm A/A value. The matching-capture check
+  concerns identity/seed/Ruby/environment/runs, not identical action sets. This implements the stated exclusion,
+  rather than inventing zero or a floor. It is not coverage of that action and must not be advertised as such.
+
+These cases are not promoted to must-fixes merely for lying below the declared floor or being explicitly outside
+the compared action set. No universal detection claim is justified. Two nonblocking improvements would make the
+limits harder to misread:
+
+* **AA-N1 — Expose sensitivity/coverage on a passing gate.** At
+  `profile_compare.rb:261–282`, accepted rows' deltas and floors are omitted from both formats, and Markdown
+  summarizes skipped actions only by count/reason. Consider exposing those floors and the skipped names, or a
+  clear warning about poor sensitivity/partial action coverage. Do not silently cap noise or reject normal action
+  variation without a separately chosen policy. This is a diagnostic nit, not a demand for more machinery.
+* **AA-N2 — CI omission is not fail-closed.** README lines 140–144, the guide's explicit advisory paragraph and
+  its updated CI recipe agree with the intentional exit-0-without-a-pair decision. The exact published Compare
+  step fails with the valid pair, but deleting `--aa tmp/base2/report.json` makes it pass the same two regressions;
+  `pipefail` cannot detect a gate the command deliberately did not run. The summary does visibly say **Not a
+  gate**, so it is not silent in the output, only green at job level. The guide already warns about this; do not
+  claim omission resistance. If that stronger property is wanted, the CI integration must independently require
+  `gate:true` (or a distinct required-gate interface). Add an omission-control test if that policy changes.
+
+Beyond AA1, the A/A report correctly gets the existing strict schema and cohort checks. Both output formats
+reject changed command/seed/Ruby/environment, failed runs, dropped samples, unfinished windows, short warm vectors,
+missing collections, duplicate sites, mistyped summary totals and partially present window kinds with exit 2.
+The new profile test also rejects a different run count. For workloads, the extra A/A input preserves refusal of
+multiple contributing processes, fewer measured requests than windows, empty digests, incomplete receipts and
+uncertified env values; a complete one-process workload control passes. No earlier settled admission rule was
+found weakened apart from the null/omitted conflation.
+
+### Maintainability, invariants and limits
+
+No separate structural maintainability finding. Noise belongs in the comparator, the report registry reuses the
+canonical validator, and the change adds no dependency or parallel identity model. The comparator grows from
+255 to 285 lines; neither production file crosses 1,000 lines. The maintainability repair for AA1 is precisely
+to keep option presence distinct from parsed content, not add another wrapper or validation layer.
+
+The changed paths do not instrument the app, install lowering, alter fallbacks or force framework loads. The
+requested suites exercise unchanged returns/exceptions, unusable counters, frozen hooks, lazy loading and real
+workload replay. Fresh-process controls also show gemspec evaluation loads zero features and defines no Lowrail;
+requiring the off profiler loads only its own file and defines no Lowrail. These are bounded invariant-1 and
+invariant-7 checks, not general app-support certification. No specialization or guard claim is added, and gaps
+are recorded rather than hidden. Repair AA1 in comparison admission without changing application execution.
+
+**Not rerun or claimed:** Campfire or another corpus suite/capture, the author's five unchanged captures or planted
+Campfire regression, `lowrail verify`, `lowrail bench`, timing, instruction counts, speed, sanitizer/OOM or broad
+scheduler/Ractor coverage. Historical Campfire figures above and in the profile guide remain the builder's
+attributed evidence, not results of this confirm review. The heuristic's implemented formula is confirmed; its
+statistical power across apps is not.
