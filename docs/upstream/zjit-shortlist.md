@@ -92,17 +92,17 @@ Branch [`thomasklemm/zjit-cache-may-write-block-code-4`](https://github.com/thom
 * **State.** #19680's branch is untouched. The coordinator thread pushes -4 there, replaces the body, marks it ready
   and posts the comment after a confirm pass.
 
-## ZSV1: the real class for `setinstancevariable` (-2, body changes requested)
+## ZSV1: the real class for `setinstancevariable` (-2, reviewed)
 
 Branch [`thomasklemm/zjit-setivar-real-class-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-setivar-real-class-2)
 @ `47b2ed7110`, one commit on `4414d3ea25`, 2 files, +100/−1 (production code +18/−1 in `zjit/src/profile.rs`).
-The `thermos-sol` confirm accepts the code, comment cleanup, message and single-commit packaging. All six
-retained stats diffs replay byte-for-byte, supporting lobsters −584 generic writes per iteration. One text
-must-fix remains: Shipit's generic-write total is unchanged, but fallback reasons shift −81/+81, so cut the
-body's “setivar counters unchanged” and the comment's “only touches lobsters” comparisons, plus the body's
-A/A-methodology clause. No new Ruby code fix is needed. Full
-[confirm](../../bench/upstream/zsv1/thermos-review.md#confirm-of-revision-2-2026-11-18); builder tests and raw
-stats provenance in [results-2.md](../../bench/upstream/zsv1/results-2.md). The bullets below describe the first build,
+The `thermos-sol` text-only confirm approves the revised body and comment with no must-fixes, carrying forward
+the code, comment cleanup, message and single-commit packaging review on the unchanged head. All six retained
+stats diffs replay byte-for-byte; the text confirm independently rechecks lobsters −584 generic writes per
+iteration and its diff replay. The false other-app comparison and A/A-methodology clause are gone. Shipit's
+generic-write total is unchanged, but fallback reasons shift −81/+81; no speed claim is certified. Full
+[text confirm](../../bench/upstream/zsv1/thermos-review.md#text-only-confirm-of-revision-2-2026-11-18); builder
+tests and raw stats provenance in [results-2.md](../../bench/upstream/zsv1/results-2.md). The bullets below describe the first build,
 `thomasklemm/zjit-setivar-real-class` @ `fe6ea9ef84` (two commits on `7919a47d46`, +106/−1).
 Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
 
@@ -127,18 +127,17 @@ Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
   sole reviewer, without subagents or other threads. No introduced correctness/security or structural defect
   found; existing shape/layout/frozen guards and GC barriers remain intact. Must trim redundant comments,
   substantiate or cut the original body numbers, qualify ordinary singleton receivers, remove body test/A-A
-  narration, and package one coherent fix commit on refreshed master. The historical numbers above and the
-  draft below are retained as author claims, not approved posting text. Full guard trace, sentence audit and
+  narration, and package one coherent fix commit on refreshed master. The historical numbers above were
+  unverified author claims in that pass; the draft below is the revised, confirmed text. Full guard trace, sentence audit and
   new execution evidence: [review record](../../bench/upstream/zsv1/thermos-review.md).
 * **Upstream check (2026-11-18).** Applies cleanly to master `4414d3ea25` (30 commits beyond the base, no
   relevant file drift). #1122 is open/unassigned with no comments; #1126 is closed/unmerged, and Ruby PR
   searches, the issue timeline and efegokdemir's PR list show no replacement. #19858 handles reads only.
-* **Recommendation.** It answers the team's request with a small change; almost-zero Rails reach remains a
-  historical claim, not a new verified measurement. Do not publish the current comments/body or claim speed
-  from the diagnostic micro. Address the review, then obtain a fresh exact-head pass and the usual posting
-  approval. The Ruby branch and drafts were not changed by the review.
+* **Recommendation (-2).** All review findings are closed on `47b2ed7110`, including the two final draft cuts.
+  The revised body and comment are approved; the original diagnostic micro above does not support a speed
+  claim. Nothing has been opened or posted, and the usual upstream approval still applies.
 
-### Comment draft for #1122 (not posted; -2, changes requested)
+### Comment draft for #1122 (not posted; -2, reviewed)
 
 > `setinstancevariable` uses the profiled class only for the shape transition, and the interpreter takes that from
 > the real class (`obj_get_owner_class()`), so profiling `rb_obj_class(obj)` is enough. With that, a write on an

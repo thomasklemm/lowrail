@@ -344,3 +344,27 @@ Prefer cutting, not explaining more upstream:
 The review updates the queue's internal impact/note and shortlist status to avoid repeating the false summary,
 but leaves the actual public drafts as reviewed. Only this text correction needs confirming if the Ruby head
 stays unchanged; the code does not need another fix round or a new branch for this finding.
+
+## Text-only confirm of revision 2 (2026-11-18)
+
+Verdict: **approve**, no must-fixes, on unchanged Ruby head
+`47b2ed7110f84ca76cc7aa6e767a1119e62c09a3`. Read the complete item body and shortlist comment draft after
+Lowrail `899e36d9`. The live fork ref still resolves to that exact Ruby head. Both requested cuts are present:
+
+* The body lead-in is now “ZJIT stats per iteration for lobsters:”, with no other-app comparison or A/A narration.
+* The comment now says “On lobsters, it removes 584 generic writes per iteration.” It no longer claims that
+  lobsters is the only affected workload.
+
+Independently parsed the three retained `stats/stats-{master,master-aa,branch}-lobsters.json.gz` files with
+Ruby `Zlib` and `JSON`, checked their Ruby pins and 10-iteration denominators, and divided integer totals exactly:
+`dynamic_setivar_count` 11,405 / 11,405 / 10,821; `setivar_fallback_no_side_exits` 5,956 / 5,956 / 5,372;
+`ccall_rb_vm_setinstancevariable` 11,345 / 11,345 / 10,761. Every branch delta is exactly -584 per iteration and
+every A/A delta is zero. Repeated the lobsters replay command above with a `text-confirm-` scratch prefix;
+`diff -u stats/stats-lobsters.diff` against the regenerated output exits 0. Both printed body rows and the
+comment's generic-write claim are supported without rounding or an exclusivity claim.
+
+The rest of the drafts retain the previously audited mechanism and guard boundaries. All four original
+findings and the final text finding are closed. This scoped text-only confirm carries forward the solo
+correctness/security and maintainability review, exact-head execution and packaging audit above; it is not a
+new Ruby build, suite run, application run, master-application check or upstream-overlap search. No speed claim
+is certified. The public drafts are unchanged by this pass; no fork push, PR opening or upstream post was made.
