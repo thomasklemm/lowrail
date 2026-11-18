@@ -1,0 +1,11 @@
+{
+  "ruby": "ruby 3.2.9 (2025-07-24 revision 8f611e0c46) [x86_64-linux]",
+  "cgi_util_loaded": false,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+  },
+  "examples": {
+  }
+}

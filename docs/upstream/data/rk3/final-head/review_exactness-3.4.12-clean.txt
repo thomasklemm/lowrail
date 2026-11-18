@@ -1,0 +1,9 @@
+{
+  "ruby": "ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]",
+  "cgi_util_loaded": false,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {},
+  "examples": {}
+}

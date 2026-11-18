@@ -3,20 +3,20 @@ require "cgi/escape"
 module Rack
   module Utils
     def unescape(s, encoding = Encoding::UTF_8)
-      return URI.decode_www_form_component(s, encoding) unless s.instance_of?(String)
+      return URI.decode_www_form_component(s, encoding) unless String === s && s.instance_of?(String)
 
       raise ArgumentError, "invalid %-encoding (#{s})" if /%(?!\h\h)/.match?(s)
-      CGI.unescape(s, encoding).force_encoding(encoding)
+      CGI.unescape(s, Encoding::BINARY).force_encoding(encoding)
     end
     module_function :unescape
   end
 
   class QueryParser
     private def unescape(string, encoding = Encoding::UTF_8)
-      return URI.decode_www_form_component(string, encoding) unless string.instance_of?(String)
+      return URI.decode_www_form_component(string, encoding) unless String === string && string.instance_of?(String)
 
       raise ArgumentError, "invalid %-encoding (#{string})" if /%(?!\h\h)/.match?(string)
-      CGI.unescape(string, encoding).force_encoding(encoding)
+      CGI.unescape(string, Encoding::BINARY).force_encoding(encoding)
     end
   end
 end

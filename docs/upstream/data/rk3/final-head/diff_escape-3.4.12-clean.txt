@@ -1,0 +1,16 @@
+BasicObject to_s: same
+BasicObject to_s returning a subclass: same
+plain BasicObject: same
+cgi/util loaded: false
+nil: same
+:sym: same
+:"a b*": same
+12: same
+1.5: same
+"a b*~": same
+"": same
+#<Object:0x00007fceef180f90>: same
+#<Object:0x00007fceef180dd8>: same
+boundary "a b": DIFF [:ok, "String", #<Encoding:US-ASCII>, "hooked", false] [:ok, "String", #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+boundary "a b": DIFF [:ok, "String", #<Encoding:US-ASCII>, "hooked", false] [:ok, "String", #<Encoding:US-ASCII>, "a+b", false] to_s 0/0
+ruby 3.4.12 (2026-10-23 revision 366f5fdc00) +PRISM [x86_64-linux]: 300000 random cases + 12 fixed, 0 differences

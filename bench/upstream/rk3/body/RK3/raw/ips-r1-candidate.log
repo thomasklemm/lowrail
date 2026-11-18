@@ -1,0 +1,9 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+            parse_nested_query (5 fields)     7.829k i/100ms
+parse_cookies_header (session cookie + 1)    19.040k i/100ms
+       set_cookie_header (session cookie)    24.989k i/100ms
+Calculating -------------------------------------
+            parse_nested_query (5 fields)     80.866k (± 4.3%) i/s   (12.37 μs/i) -    407.108k in   5.034335s
+parse_cookies_header (session cookie + 1)    198.313k (± 4.2%) i/s    (5.04 μs/i) -      1.009M in   5.088521s
+       set_cookie_header (session cookie)    233.790k (± 8.2%) i/s    (4.28 μs/i) -      1.174M in   5.023675s

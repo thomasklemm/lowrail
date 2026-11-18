@@ -1,0 +1,16 @@
+4.0.9 clean exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+/bin/bash: line 1: /tmp/s-4.0.9-rcgi/util.log: No such file or directory
+4.0.9 -rcgi/util exit 1 
+3.4.12 clean exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+/bin/bash: line 1: /tmp/s-3.4.12-rcgi/util.log: No such file or directory
+3.4.12 -rcgi/util exit 1 
+3.3.10 clean exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+/bin/bash: line 1: /tmp/s-3.3.10-rcgi/util.log: No such file or directory
+3.3.10 -rcgi/util exit 1 
+3.2.9 clean exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+/bin/bash: line 1: /tmp/s-3.2.9-rcgi/util.log: No such file or directory
+3.2.9 -rcgi/util exit 1 
+4.0.9 util exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+3.4.12 util exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+3.3.10 util exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips
+3.2.9 util exit 0 1295 runs, 6274 assertions, 0 failures, 0 errors, 2 skips

@@ -423,3 +423,34 @@ rack main's passing 2.7.3 job of 2026-10-31 ran on ubuntu-24.04.
 * **Campfire's and Writebook's `InlineScriptHashes`** (16% and 5.6% under YJIT, 182 and 74 URI parses per page): app
   code, our once-campfire#374.
 * **sentry-rails `ActiveSupportLogger` breadcrumbs** (codetriage 2.3%): spread over many methods, opt-in.
+
+## RK3 after the Thermos review (2026-11-18)
+
+Head `02087583dc` (decode `e3470303`, escape `02087583dc`) on rack main `da90464e3f` fixes the two exactness
+must-fixes from the thermos-sol pass on `6f48723a86`: the decoders convert the encoding argument once, after decoding
+(`CGI.unescape(s, Encoding::BINARY).force_encoding(encoding)`), and every guard is
+`String === s && s.instance_of?(String)`, so `BasicObject` coercions reach URI again. It also adds two CHANGELOG lines
+(rack#2550 had one; an earlier note here said otherwise) and drops the redundant inner `require 'cgi/escape'`.
+
+* **Exactness:** [`diff_all.sh`](../../bench/upstream/rk3/diff_all.sh) runs both differentials (now with
+  encoding-argument ducks and `BasicObject` cases) and the reviewer's `review_exactness.rb` (17,897 checks) on Ruby
+  3.2–4.0, clean and with `cgi/util`, and on 3.4/4.0 with the Ruby CGI: 0 differences
+  ([`data/rk3/final-head/`](data/rk3/final-head/)). The same scripts show 8 + 3 differences on `6f48723a86`.
+* **Suite:** 1295 runs, 0 failures on 3.2–4.0, clean and with `-rcgi/util`. RuboCop: nothing new.
+* **Body numbers:** `script/upstream-bench`, [`body/RK3`](../../bench/upstream/rk3/body/RK3/table.md): per call
+  −34.9% / −49.1% / −72.2% instructions (interpreter, A/A ≤ 0.23%), −43.7% / −52.4% / −74.3% (YJIT, A/A ≤ 0.61%),
+  YJIT benchmark-ips 1.91x / 2.29x / 3.19x (A/A ≤ 5.4%).
+* **Per request on the exact head**, RK3 alone / both commits:
+
+| Workload | Interpreter A/A | Interpreter | YJIT A/A | YJIT (JIT-flat) |
+| --- | ---: | ---: | ---: | ---: |
+| blog PATCH article | 0.09% | −2.61% / −5.35% | 0.06% | −5.10% / −10.14% |
+| pingcrm PUT contact | 0.18% | −0.89% / −3.13% | 0.51% | −1.66% / −5.66% |
+| blog GET article | 0.15% | −0.50% / −1.61% | 0.28% | −0.88% / −2.94% |
+| codetriage GET repo | 0.03% | −0.36% / −0.89% | — | not run |
+| blog GET articles.json | 0.03% | +0.01% / +0.01% | 0.22% | −0.09% / +0.04% |
+
+The JSON control is inside its A/A in both modes. Two interpreter cohorts on this head are rejected, not rescored:
+blog GET article's A/A was 0.97% and the JSON control alternated between 4.24M and 4.31M Ir; Callgrind put the
+difference in glibc's `malloc_consolidate`, so the accepted cohort ran with `GLIBC_TUNABLES=glibc.malloc.mxfast=0`.
+Fork CI: `2.7.3` fails in setup again (ubuntu-26.04); the body says so.

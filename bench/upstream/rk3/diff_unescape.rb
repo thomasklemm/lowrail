@@ -2,7 +2,10 @@
 #   ruby -I RACK/lib diff_unescape.rb [N]
 require "uri"
 require "rack/utils"
-def run(&b) = (r = b.call; [:ok, r.class, r.encoding, r.b, r.frozen?, r.valid_encoding?]) rescue [:err, $!.class, $!.message]
+# Anonymous classes and object addresses differ between the fresh objects each side gets.
+def cls(c) = c.name || "anonymous < #{c.superclass}"
+def msg(e) = e.message.gsub(/0x\h+/, "0x")
+def run(&b) = (r = b.call; [:ok, cls(r.class), r.encoding, r.b, r.frozen?, r.valid_encoding?]) rescue [:err, $!.class, msg($!)]
 qp = Rack::Utils.default_query_parser
 alpha = ["%", "+", "a", "Z", "0", "9", "f", "F", "g", " ", "=", "&", "é", "\xFF".b, "%2", "%41", "%e3%81%82", "%FF",
   "%zz", "~", "*", "\u3042", "\0", "%%", "%2B"]
@@ -25,6 +28,39 @@ end
 sub = Class.new(String)
 extra = [nil, :sym, :"a%41", 12, "abc".encode("UTF-16LE"), "a%".encode("UTF-16LE"), sub.new("a%41"), sub.new("a"),
   sub.new("a%")]
+# Fresh objects per side: encoding arguments whose to_str is stateful, raises on a second call or mutates the input,
+# and BasicObject inputs (no instance_of?) with and without the conversions URI uses.
+def stateful_enc = Object.new.tap { |o| def o.to_str = (@n = (@n || 0) + 1) == 1 ? "UTF-8" : "ASCII-8BIT" }
+def once_enc = Object.new.tap { |o| def o.to_str = (raise "second conversion" if @done; @done = true; "UTF-8") }
+def mutating_enc(input) = Object.new.tap { |o| o.instance_variable_set(:@s, input); def o.to_str = (@s.replace("%ZZ"); "UTF-8") }
+def basic(str, b: true)
+  o = BasicObject.new
+  o.instance_eval { @v = str }
+  def o.to_str = @v
+  if b
+    def o.b = @v.b
+  end
+  o
+end
+ducks = {
+  "stateful encoding %FF" => -> { ["%FF".dup, stateful_enc] },
+  "stateful encoding %41" => -> { ["%41".dup, stateful_enc] },
+  "encoding raising on 2nd to_str" => -> { ["%E3%81%82".dup, once_enc] },
+  "encoding mutating the input" => -> { s = "%41".dup; [s, mutating_enc(s)] },
+  "BasicObject to_str+b" => -> { [basic("a%41"), Encoding::UTF_8] },
+  "BasicObject to_str+b, lone %" => -> { [basic("a%"), Encoding::UTF_8] },
+  "BasicObject to_str only" => -> { [basic("a%41", b: false), Encoding::UTF_8] },
+  "plain BasicObject" => -> { [BasicObject.new, Encoding::UTF_8] },
+}
+ducks.each do |name, make|
+  a = run { URI.decode_www_form_component(*make.()) }; b = run { Rack::Utils.unescape(*make.()) }
+  c = run { qp.send(:unescape, *make.()) }
+  same = a == b && a == c
+  bad += 1 unless same
+  puts "#{name}: #{same ? "same" : "DIFF #{a} #{b} #{c}"}"
+end
+puts "cgi/util loaded: #{$LOADED_FEATURES.any? { _1.end_with?("cgi/util.rb") }}"
+
 # The branch calls nothing on a String argument; URI calls #b on it. A singleton or prepended String#b is the boundary.
 boundary = ["a".dup.tap { |x| def x.b = "hooked" }]
 (extra + boundary).each do |s|
@@ -33,4 +69,4 @@ boundary = ["a".dup.tap { |x| def x.b = "hooked" }]
   bad += 1 unless same || boundary.any? { |x| x.equal?(s) }
   puts "#{boundary.any? { |x| x.equal?(s) } ? "boundary " : ""}#{s.inspect}: #{same ? "same" : "DIFF #{a} #{b} #{c}"}"
 end
-puts "#{RUBY_DESCRIPTION}: #{n} random cases + #{extra.size} fixed, #{bad} differences"
+puts "#{RUBY_DESCRIPTION}: #{n} random cases + #{extra.size + ducks.size} fixed, #{bad} differences"

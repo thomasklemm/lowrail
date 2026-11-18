@@ -1,0 +1,11 @@
+{
+  "ruby": "ruby 3.3.10 (2025-10-23 revision 343ea05002) [x86_64-linux]",
+  "cgi_util_loaded": true,
+  "cgi_escape": null,
+  "cgi_unescape": null,
+  "checks": 17897,
+  "differences": {
+  },
+  "examples": {
+  }
+}
