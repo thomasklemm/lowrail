@@ -256,17 +256,21 @@ gain is in skipping the translation, which needs flavorjones to accept a second 
 ## RK3 built (2026-11-18)
 
 Branch `thomasklemm/unescape-cgi` on the fork, two commits on rack main `da90464e3f`:
-`d85c4b9a42` decodes with `CGI.unescape` (RK3), `a8a5d747d0` escapes with `CGI.escape` (RK4). Queue item
+`d85c4b9a42` decodes with `CGI.unescape` (RK3), `6f48723a86` escapes with `CGI.escape` (RK4). Queue item
 [RK3](../../bench/upstream/pr-queue/items/RK3.md) (state built, draft title and body). Scripts:
 [`bench/upstream/rk3/`](../../bench/upstream/rk3/README.md); receipts: [`data/rk3/`](data/rk3/).
 
-The escape commit has no `ascii_compatible?` guard: `CGI.escape` escapes UTF-16 and UTF-32 input byte for byte like
-URI on Ruby 3.2–4.0 (C and Ruby fallback), so the guard the lead's measurement patch had was dropped after the
-differential showed it unnecessary.
+The escape commit keeps the lead patch's `ascii_compatible?` guard. A first head (`a8a5d747d0`) dropped it, because
+`CGI.escape` matched URI on UTF-16 and UTF-32 locally; rack's CI on the fork then failed on Ruby 3.2, 3.3 and 3.4. CI
+installs the doc group, whose erb 6.0.7 no longer loads `cgi/util`, and the C `CGI.escape` hands a string in an
+ASCII-incompatible encoding to `super`, the Ruby fallback in `cgi/util`: `NoMethodError` in the new UTF-16LE test.
+Locally the default erb had loaded `cgi/util`. The amended head `6f48723a86` sends those strings to URI again; the
+differentials below were rerun under rack's CI bundle (erb 6.0.7, `cgi/util` not loaded) as well.
 
 **Exactness.** [`diff_unescape.rb`](../../bench/upstream/rk3/diff_unescape.rb) (both decode methods) and
 [`diff_escape.rb`](../../bench/upstream/rk3/diff_escape.rb) against URI, loading rack from the branch: 300,000 random
-cases plus 9 fixed odd inputs each, **0 differences** on Ruby 4.0.9, 3.4.12, 3.3.10 and 3.2.9, and on 3.4.12 with
+cases plus 9 fixed odd inputs each, **0 differences** on Ruby 4.0.9, 3.4.12, 3.3.10 and 3.2.9, each both plainly and
+under `bundle exec` in the rack checkout with the doc group (`diff-*-bundle.txt`), and on 3.4.12 with
 `cgi/escape`'s pure-Ruby fallback ([`pure_cgi.rb`](../../bench/upstream/rk3/pure_cgi.rb)). Boundary, printed by the
 scripts and not counted: a singleton `#b` (decode) or `#to_s`/`#dup` (escape) on a String argument is no longer
 called. Ruby 2.7–3.1 not run (no precompiled Ruby on this orb); rack's hosted CI covers them.
@@ -292,6 +296,11 @@ a 284-byte Rails-style encrypted cookie, a 5-field form):
 | `parse_nested_query(form)` | 183,607 / 183,438 | 113,376 | −38% | 151,049 / 150,736 | 82,539 | −45% |
 | `parse_cookies_header` | 71,446 / 71,504 | 35,083 | −51% | 67,421 / 67,867 | 31,673 | −53% |
 | `set_cookie_header` (session cookie) | 105,200 / 105,189 | 28,707 | −73% | 102,044 / 101,807 | 25,813 | −75% |
+
+With the restored guard (measured after the request runs below): `escape("hello")` 5,935 / 4,758, `escape(cookie)`
+14,360 / 13,042 (−84% / −85%). The guard adds about 430 instructions per escape call, at most about 900 per
+request (one or two `Set-Cookie` values), under 0.02% of any request below and inside every A/A, so the request
+tables, measured without it, stand.
 
 YJIT's small-call A/A is loose (`unescape("hello")` 3,287 / 3,994, `escape("hello")` 4,397 / 4,823), so the
 `escape("hello")` row is no claim; the rest move far outside it.
@@ -330,7 +339,7 @@ through the same block it measures, reports `jit B/I` per window, and takes `FLA
 Memory held: one valgrind at a time on this 2-CPU, 3.9 GB orb; codetriage was left out of YJIT to keep each run under
 the cap.
 
-**Wall time** (benchmark-ips, Ruby 4.0.9, one pinned core, best of 3 alternating rounds; main's spread over rounds as
+**Wall time** (benchmark-ips on the first head `a8a5d747d0`, Ruby 4.0.9, one pinned core, best of 3 alternating rounds; main's spread over rounds as
 A/A; receipts [`data/rk3/ips/`](data/rk3/ips/)):
 
 | interp | main | branch | | main A/A |
@@ -359,10 +368,15 @@ A/A; receipts [`data/rk3/ips/`](data/rk3/ips/)):
 
 The orb's wall-time A/A is wide (up to 28% for one row in the interpreter), so only rows whose change is well
 outside it count; `escape("hello")` (1.21x / 1.12x) does not. The body's own script
-([`body_ips.rb`](../../bench/upstream/rk3/body_ips.rb), receipts [`data/rk3/body-ips/`](data/rk3/body-ips/)), same way:
-`parse_nested_query` 40,386 → 73,282 i/s (1.81x, A/A 11.6%), `parse_cookies_header` 106,527 → 226,019 (2.12x, 23.0%),
-`set_cookie_header` 88,566 → 296,275 (3.35x, 9.8%); YJIT 49,586 → 98,712 (1.99x, 6.3%), 120,966 → 257,566 (2.13x,
-5.2%), 98,116 → 335,523 (3.42x, 4.0%).
+([`body_ips.rb`](../../bench/upstream/rk3/body_ips.rb), receipts [`data/rk3/body-ips/`](data/rk3/body-ips/)) on the final
+head `6f48723a86`, same way: `parse_nested_query` 41,121 → 72,638 i/s (1.77x, A/A 8.9%), `parse_cookies_header`
+112,658 → 237,960 (2.11x, 9.1%), `set_cookie_header` 92,786 → 288,196 (3.11x, 7.5%); YJIT 49,556 → 98,963 (2.00x,
+4.5%), 119,650 → 262,407 (2.19x, 4.4%), 95,698 → 337,350 (3.53x, 0.9%). (On the first head: 1.81x, 2.12x, 3.35x;
+YJIT 1.99x, 2.13x, 3.42x.)
+
+**Rack CI on the fork** (`6f48723a86`): Test and Test External pass on 2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 4.0, ruby-head,
+jruby-head, truffleruby-head and macOS 4.0. `2.7.3` fails after 5 s, before any test, on both heads, while rack
+main passes it; its log was not readable yet (GitHub API rate limit).
 
 ## Checked and rejected
 

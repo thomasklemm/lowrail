@@ -1,32 +1,32 @@
 [
   {
     "name": "parse_nested_query",
-    "central_tendency": 46663.370171429204,
-    "ips": 46663.370171429204,
-    "error": 1910,
-    "stddev": 1910,
-    "microseconds": 5034930.539997101,
-    "iterations": 234549,
-    "cycles": 4599
+    "central_tendency": 47542.98083993152,
+    "ips": 47542.98083993152,
+    "error": 3592,
+    "stddev": 3592,
+    "microseconds": 5019593.559995651,
+    "iterations": 237122,
+    "cycles": 4474
   },
   {
     "name": "parse_cookies_header",
-    "central_tendency": 116566.77719949913,
-    "ips": 116566.77719949913,
-    "error": 5978,
-    "stddev": 5978,
-    "microseconds": 5053445.107997894,
-    "iterations": 587424,
-    "cycles": 10128
+    "central_tendency": 114625.79464971377,
+    "ips": 114625.79464971377,
+    "error": 10777,
+    "stddev": 10777,
+    "microseconds": 5086956.996995926,
+    "iterations": 576342,
+    "cycles": 10673
   },
   {
     "name": "set_cookie_header",
-    "central_tendency": 98116.37171394611,
-    "ips": 98116.37171394611,
-    "error": 5156,
-    "stddev": 5156,
-    "microseconds": 5050370.354005814,
-    "iterations": 494046,
-    "cycles": 9149
+    "central_tendency": 95698.49556980608,
+    "ips": 95698.49556980608,
+    "error": 8943,
+    "stddev": 8943,
+    "microseconds": 5010749.3060112,
+    "iterations": 474496,
+    "cycles": 7414
   }
 ]
