@@ -292,6 +292,8 @@ Opus pass where a second reviewer helps (claims-heavy bodies, measurements) and 
 already recorded as `claude-code` keep counting. Every new Sol thread starts with effort `high` (Thomas, 2026-11-18;
 the default is medium). Opus 5.5 threads get `high` for reviews, exactness work and hard builds, and `medium` where
 the coordinator judges it enough, such as record updates, reruns of known measurements and small follow-ups.
+OpenAI's provider refused the TN2 review (a segfault) as possible cybersecurity content, so crash and memory-safety
+fixes get their thermos review on Opus 5.5 (`reviewer: thermos-opus`).
 
 Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
 trying Sol 6.2, but it isn't offered yet.
