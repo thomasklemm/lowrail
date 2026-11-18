@@ -1,0 +1,12 @@
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+      errors[:title]   235.876k i/100ms
+     errors["title"]   197.719k i/100ms
+          text_field    10.655k i/100ms
+Calculating -------------------------------------
+      errors[:title]      2.262M (± 4.2%) i/s  (442.07 ns/i) -     11.322M in   5.005090s
+jit errors[:title]	compiled_iseq_count=459>459 compiled_block_count=7508>7508 invalidation_count=245>245
+     errors["title"]      1.862M (± 2.9%) i/s  (537.13 ns/i) -      9.491M in   5.097619s
+jit errors["title"]	compiled_iseq_count=463>463 compiled_block_count=7533>7533 invalidation_count=245>245
+          text_field    103.036k (± 3.7%) i/s    (9.71 μs/i) -    522.095k in   5.067089s
+jit text_field	compiled_iseq_count=463>463 compiled_block_count=7535>7535 invalidation_count=245>245

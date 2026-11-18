@@ -1,0 +1,492 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/jit_flat_gate/redefine_body.rb",
+  "at": "2026-11-18T02:53:23Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby",
+      "tree": null,
+      "description": "ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": null,
+      "dirty": null
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": null,
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": null,
+      "dirty": null
+    }
+  },
+  "objects": {
+    "interp flat.value": {
+      "base": -0.001,
+      "base1": -0.001,
+      "base2": -0.001,
+      "candidate": -0.001,
+      "change": 0.0,
+      "aa": -0.0,
+      "claim": false
+    },
+    "interp redefine, then redefined.value": {
+      "base": 3.0,
+      "base1": 3.0,
+      "base2": 3.0,
+      "candidate": 3.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit flat.value": {
+      "base": -0.001,
+      "base1": -0.001,
+      "base2": -0.001,
+      "candidate": -0.001,
+      "change": 0.0,
+      "aa": -0.0,
+      "claim": false
+    },
+    "yjit redefine, then redefined.value": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp flat.value": {
+      "base": 992.1975,
+      "base1": 992.1975,
+      "base2": 992.1975,
+      "candidate": 992.1975,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp redefine, then redefined.value": {
+      "base": 6627.612,
+      "base1": 6627.612,
+      "base2": 6627.612,
+      "candidate": 6617.2715,
+      "change": -0.0015602150518165825,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit flat.value": {
+      "base": 884.007,
+      "base1": 884.007,
+      "base2": 884.007,
+      "candidate": 884.007,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                160,
+                160
+              ],
+              "compiled_block_count": [
+                2387,
+                2387
+              ],
+              "invalidation_count": [
+                33,
+                33
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                160,
+                160
+              ],
+              "compiled_block_count": [
+                2387,
+                2387
+              ],
+              "invalidation_count": [
+                33,
+                33
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                157,
+                157
+              ],
+              "compiled_block_count": [
+                2219,
+                2219
+              ],
+              "invalidation_count": [
+                28,
+                28
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                157,
+                157
+              ],
+              "compiled_block_count": [
+                2219,
+                2219
+              ],
+              "invalidation_count": [
+                28,
+                28
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                160,
+                160
+              ],
+              "compiled_block_count": [
+                2387,
+                2387
+              ],
+              "invalidation_count": [
+                33,
+                33
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                160,
+                160
+              ],
+              "compiled_block_count": [
+                2387,
+                2387
+              ],
+              "invalidation_count": [
+                33,
+                33
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit redefine, then redefined.value": {
+      "base": 205303.47775000002,
+      "base1": 205376.638,
+      "base2": 205230.3175,
+      "candidate": 205493.0145,
+      "change": 0.0009232028218770783,
+      "aa": 0.0007127034651511236,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n2000 compiled_block_count +2000",
+          "base n2000 invalidation_count +2000",
+          "candidate n2000 compiled_block_count +2000",
+          "candidate n2000 invalidation_count +2000",
+          "base2 n2000 compiled_block_count +2000",
+          "base2 n2000 invalidation_count +2000"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                161,
+                161
+              ],
+              "compiled_block_count": [
+                5361,
+                5361
+              ],
+              "invalidation_count": [
+                3003,
+                3003
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                161,
+                161
+              ],
+              "compiled_block_count": [
+                5361,
+                7361
+              ],
+              "invalidation_count": [
+                3003,
+                5003
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                158,
+                158
+              ],
+              "compiled_block_count": [
+                5193,
+                5193
+              ],
+              "invalidation_count": [
+                2998,
+                2998
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                158,
+                158
+              ],
+              "compiled_block_count": [
+                5193,
+                7193
+              ],
+              "invalidation_count": [
+                2998,
+                4998
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                161,
+                161
+              ],
+              "compiled_block_count": [
+                5361,
+                5361
+              ],
+              "invalidation_count": [
+                3003,
+                3003
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                161,
+                161
+              ],
+              "compiled_block_count": [
+                5361,
+                7361
+              ],
+              "invalidation_count": [
+                3003,
+                5003
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {
+    "flat.value": {
+      "base": 17340500.0,
+      "base1": 17598000.0,
+      "base2": 17083000.0,
+      "candidate": 16088999.999999998,
+      "change": -0.07217208269657749,
+      "aa": 0.029699258960237594,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                173,
+                173
+              ],
+              "compiled_block_count": [
+                40857,
+                40857
+              ],
+              "invalidation_count": [
+                38396,
+                38396
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                170,
+                170
+              ],
+              "compiled_block_count": [
+                39799,
+                39799
+              ],
+              "invalidation_count": [
+                37501,
+                37501
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                173,
+                173
+              ],
+              "compiled_block_count": [
+                42813,
+                42813
+              ],
+              "invalidation_count": [
+                40352,
+                40352
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          17598000.0
+        ],
+        "candidate": [
+          16088999.999999998
+        ],
+        "base2": [
+          17083000.0
+        ]
+      }
+    },
+    "redefine, then redefined.value": {
+      "base": 18520.5,
+      "base1": 18548.0,
+      "base2": 18493.0,
+      "candidate": 18845.0,
+      "change": 0.017521125239599256,
+      "aa": 0.002969682243999892,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "r1 base compiled_block_count +38020",
+          "r1 base invalidation_count +38020",
+          "r1 candidate compiled_block_count +38052",
+          "r1 candidate invalidation_count +38052",
+          "r1 base2 compiled_block_count +38120",
+          "r1 base2 invalidation_count +38120"
+        ],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                173,
+                173
+              ],
+              "compiled_block_count": [
+                40857,
+                78877
+              ],
+              "invalidation_count": [
+                38396,
+                76416
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                170,
+                170
+              ],
+              "compiled_block_count": [
+                39799,
+                77851
+              ],
+              "invalidation_count": [
+                37501,
+                75553
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                173,
+                173
+              ],
+              "compiled_block_count": [
+                42813,
+                80933
+              ],
+              "invalidation_count": [
+                40352,
+                78472
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          18548.0
+        ],
+        "candidate": [
+          18845.0
+        ],
+        "base2": [
+          18493.0
+        ]
+      }
+    }
+  }
+}

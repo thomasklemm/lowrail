@@ -55,10 +55,19 @@ when the two sides resolve different third-party gems.
   N = 0, divided by N. One process per window. A brk overflow in any Valgrind log stops the run.
 * **benchmark-ips** (`--ips ROUNDS`): base, candidate, base again per round, each pinned with `taskset -c CORE`,
   5 s per report; the table takes the best round of each.
+* **JIT-flat gate** (YJIT and ZJIT cells, [bench.md](../bench.md)): each measured window records
+  `compiled_iseq_count`, `compiled_block_count` and `invalidation_count` from `RubyVM::YJIT.runtime_stats` (ZJIT:
+  `compiled_iseq_count`, `failed_iseq_count`, `compiled_side_exit_count`, `invalidation_count` from
+  `RubyVM::ZJIT.stats`) before and after: every Callgrind N and N = 0 run, and each benchmark-ips report from
+  `running` to its last timed interval (read in `Timing.time_us`, outside the intervals). The warm-up runs
+  through the measured block itself: 3,000 calls of the `cycle` block (yielded from C by `reverse_each`), and
+  3,000 `call_times(1)` per report before benchmark-ips' own warm-up. Interpreter cells are unchanged.
 
 Every cell has base, candidate and base again. The A/A is |base₁ − base₂| / mean(base), and a change counts only
-when it is larger. Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". Objects
-that differ between the two base runs are shown as "–".
+when it is larger. Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". A JIT
+cell where any window compiled, invalidated or lacked a counter says "not JIT-flat, no claim", whatever its
+A/A, and the notes name the windows and counters that moved (ZJIT without `invalidation_count` never passes).
+Objects that differ between the two base runs are shown as "–".
 
 ## Output
 
@@ -72,8 +81,14 @@ the rows it needs; a single cell that is "within noise" is not claimed in prose 
 
 ## Limits
 
-* Callgrind instructions are not time. YJIT and ZJIT instruction counts include compilation that falls into the
-  window; with 3,000 warm-up calls it usually does not.
+* Callgrind instructions are not time. Before the gate (commit `2884604afe` up to the gate's commit), every YJIT
+  Callgrind N window compiled the `cycle` block itself, which the 3,000 warm-up calls never ran: about 470
+  instructions per call in AM1, whose gated rerun `bench/upstream/jit_flat_gate/am1` gives YJIT `errors[:title]`
+  3,101 → 1,231 (−60.3%) where `body/am1` had 3,574 → 1,684 (−52.9%). A benchmark-ips report whose warm-up
+  enters `call_times` fewer times than the call threshold compiled it in the timed loop (AM1 with a 1 s warm-up).
+  Those runs' YJIT rows are uncertified. `jit_flat_gate/redefine` shows refused cells: a method redefined in
+  every window, +0.1% Callgrind and +1.8% ips above their A/A, both "not JIT-flat, no claim". The objects worker
+  has no gate; its counts are deterministic and checked by their own A/A.
 * The A/A is one pair per cell, not a confidence interval. For Callgrind with GC off it is usually under 1%; for
   benchmark-ips on an orb it is often several percent, so most wall-time changes come out as noise.
 * Each case gets its own Callgrind processes, so many cases and modes take a while: FB1, with 4 cases, 2 modes and

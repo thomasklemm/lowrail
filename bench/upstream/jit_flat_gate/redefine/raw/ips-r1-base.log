@@ -1,0 +1,9 @@
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+                    flat.value     1.778M i/100ms
+redefine, then redefined.value     1.901k i/100ms
+Calculating -------------------------------------
+                    flat.value     17.598M (± 1.0%) i/s   (56.83 ns/i) -     35.556M in   2.020468s
+jit flat.value	compiled_iseq_count=173>173 compiled_block_count=40857>40857 invalidation_count=38396>38396
+redefine, then redefined.value     18.548k (± 4.0%) i/s   (53.91 μs/i) -     38.020k in   2.049773s
+jit redefine, then redefined.value	compiled_iseq_count=173>173 compiled_block_count=40857>78877 invalidation_count=38396>76416

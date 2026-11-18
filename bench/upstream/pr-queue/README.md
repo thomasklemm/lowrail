@@ -59,7 +59,9 @@ Every number in a body (objects, Callgrind instructions, benchmark-ips) comes fr
 [`script/upstream-bench`](../../../script/upstream-bench) run of the item's base against its head, committed under
 `bench/upstream/<topic>/body/<ID>/` next to its benchmark script; `impact` and the body cite that directory. It
 measures base twice in every cell and prints "within noise" for a change inside that A/A, which the body then
-doesn't claim. Usage, method and limits: [body-numbers](../../../docs/upstream/body-numbers.md). Examples:
+doesn't claim. A YJIT or ZJIT cell also records compile and invalidation counters around every measured window
+and says "not JIT-flat, no claim" when any moved, so a body claims JIT rows only from runs that have the gate.
+Usage, method and limits: [body-numbers](../../../docs/upstream/body-numbers.md). Examples:
 `form_helper_stack/body/fb1` and `body/am1`. A reviewer checks a body number by rerunning the run's `commands.sh`,
 or the whole run into a new directory.
 

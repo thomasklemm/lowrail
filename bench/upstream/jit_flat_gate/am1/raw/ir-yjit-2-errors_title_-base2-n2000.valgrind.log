@@ -1,0 +1,112 @@
+==57685== Callgrind, a call-graph generating cache profiler
+==57685== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==57685== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==57685== Command: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby --yjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/form_helper_stack/am1_body.rb errors["title"] 2000
+==57685== Parent PID: 52565
+==57685== 
+--57685-- 
+--57685-- Valgrind options:
+--57685--    --verbose
+--57685--    --tool=callgrind
+--57685--    --collect-atstart=no
+--57685--    --toggle-collect=rb_ary_cycle
+--57685--    --smc-check=all
+--57685--    --callgrind-out-file=/dev/null
+--57685--    --log-file=/home/user/workspace/repo/bench/upstream/jit_flat_gate/am1/raw/ir-yjit-2-errors_title_-base2-n2000.valgrind.log
+--57685-- Contents of /proc/version:
+--57685--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--57685-- 
+--57685-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--57685-- Page sizes: currently 4096, max supported 4096
+--57685-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==57685== For interactive control, run 'callgrind_control -h'.
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--57685--   Considering /usr/lib/debug/.build-id/86/f7eb4ff495ed3f2831c6d3d662e4321762a2a3.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--57685--    object doesn't have a dynamic symbol table
+--57685-- Scheduler: using generic scheduler lock implementation.
+==57685== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-57685-by-user-on-???
+==57685== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-57685-by-user-on-???
+==57685== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-57685-by-user-on-???
+==57685== 
+==57685== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==57685== don't want to do, unless you know exactly what you're doing,
+==57685== or are doing some strange experiment):
+==57685==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=57685 ...command...
+==57685== 
+==57685== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==57685==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby
+==57685== and then give GDB the following command
+==57685==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=57685
+==57685== --pid is optional if only one valgrind process is running
+==57685== 
+--57685-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--57685--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--57685--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--57685--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--57685--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--57685--    object doesn't have a symbol table
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--57685--   Considering /usr/lib/debug/.build-id/5e/5b51f4c39af9ac589408c1dc432ba390a273cc.debug ..
+--57685--   .. build-id is valid
+--57685-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x133c0=0x40133c0
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/date-3.6.0/lib/date_core.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/cgi/escape.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/etc.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/strscan.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/psych-5.5.0/lib/psych.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/utf_16le.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/utf_16_32.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/utf_16be.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/utf_32le.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/utf_32be.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bigdecimal-4.1.3/lib/bigdecimal.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/openssl.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/digest.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/io/nonblock.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/socket.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/parser.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/json-3.1.0/lib/json/ext/generator.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/erb/escape.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/nokogiri-1.19.7-x86_64-linux-gnu/lib/nokogiri/4.0/nokogiri.so
+--57685--    object doesn't have a symbol table
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/stringio-3.2.0/lib/stringio.so
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/extensions/x86_64-linux/4.0.0-static/racc-1.8.1/racc/cparse.so
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP.so
+--57685--   Considering /usr/lib/debug/.build-id/45/3ef331672041300a39bfbcbe40f0792bb9aa77.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libJIS.so
+--57685--   Considering /usr/lib/debug/.build-id/b2/92785807b77c552bb94c07b0034fdb082a6148.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libGB.so
+--57685--   Considering /usr/lib/debug/.build-id/6d/6c7b4897e4e1d5d9f8a46d445e7d1c6d974694.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libKSC.so
+--57685--   Considering /usr/lib/debug/.build-id/7f/86d4e84def1b162b120db3bf66149d066d6057.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/CP932.so
+--57685--   Considering /usr/lib/debug/.build-id/08/ce31a7642d677969b12ae749624ac4269d2021.debug ..
+--57685--   .. build-id is valid
+--57685-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/zlib.so
+==57685== 
+--57685-- Start dumping at BB 560167598 (Prg.Term.)...
+--57685-- Dump to /dev/null
+--57685-- Dumping done.
+==57685== Events    : Ir
+==57685== Collected : 7490336
+==57685== 
+==57685== I   refs:      7,490,336

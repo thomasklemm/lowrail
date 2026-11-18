@@ -13,6 +13,14 @@ if ARGV.first == "--worker"
   _, mode, script, *rest = ARGV
   ARGV.clear
   load File.expand_path(script)
+  # docs/bench.md's JIT-flat counters, read before and after each measured window; a missing one fails the gate.
+  keys, stats = if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+    [%i[compiled_iseq_count failed_iseq_count compiled_side_exit_count invalidation_count], -> { RubyVM::ZJIT.stats || {} }]
+  elsif defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
+    [%i[compiled_iseq_count compiled_block_count invalidation_count], -> { RubyVM::YJIT.runtime_stats }]
+  end
+  jit = keys && -> { stats.().values_at(*keys) }
+  window = ->(name, before, after) { puts "jit #{name}\t#{keys.zip(before, after).map { |k, b, a| "#{k}=#{b}>#{a}" }.join(" ")}" }
   case mode
   when "objects"
     UpstreamBench::CASES.each do |name, call|
@@ -32,16 +40,48 @@ if ARGV.first == "--worker"
     # The harness subtracts an N=0 run, so only the calls inside rb_ary_cycle remain.
     name, n = rest
     call = UpstreamBench::CASES.fetch(name)
-    3000.times { call.call }
-    GC.start
-    GC.disable
-    [call].cycle(Integer(n)) { |c| c.call }
+    if jit
+      # Warm up through the measured block itself; reverse_each yields from C like cycle (Array#each is Ruby under YJIT).
+      block = proc { |c| c.call }
+      Array.new(3000, call).reverse_each(&block)
+      GC.start
+      GC.disable
+      before = jit.()
+      [call].cycle(Integer(n), &block)
+      window.(name, before, jit.())
+    else
+      3000.times { call.call }
+      GC.start
+      GC.disable
+      [call].cycle(Integer(n)) { |c| c.call }
+    end
   when "ips"
     require "benchmark/ips"
     time, warmup = rest.map { Float(_1) }
+    if jit
+      # benchmark-ips calls Timing.time_us right after each timed interval, so a read there times nothing.
+      gate = Class.new do
+        # Every ivar is set here: a later shape change would recompile `interval` inside the first window.
+        def initialize(read, report) = (@read, @report, @reads, @label, @before, @after = read, report, 0, nil, nil, nil)
+        def warming(*) = nil
+        def warmup_stats(*) = nil
+        def running(label, _) = (@label, @reads, @before = label, 0, @read.())
+        def interval = (@after = @read.(); @reads += 1)
+        def add_report(*)
+          raise "benchmark-ips did not call Timing.time_us after the timed intervals" if @reads.zero?
+          @report.(@label, @before, @after)
+        end
+      end.new(jit, window)
+      Benchmark::Timing.singleton_class.prepend(Module.new { define_method(:time_us) { |b, a| gate.interval; super(b, a) } })
+    end
     Benchmark.ips do |x|
-      x.config(time: time, warmup: warmup)
+      x.config(time: time, warmup: warmup, suite: gate)
       UpstreamBench::CASES.each { |name, call| x.report(name) { call.call } }
+      if gate
+        # Each report's call_times and the gate's read run 3,000 times first, so neither compiles in a timed loop.
+        x.list.each { |entry| 3000.times { entry.call_times(1) } }
+        3000.times { Benchmark::Timing.time_us(0.0, 1.0) }
+      end
     end
   end
   exit
@@ -178,6 +218,19 @@ end
 cases = objects.values.first.fetch("base").keys
 abort "#{script} defines no UpstreamBench.report cases" if cases.empty?
 
+# JIT workers print "jit NAME\tKEY=BEFORE>AFTER ..." for each measured window; the gate checks them per cell.
+jit = {}
+record_jit = ->(cell, mode, text, log, names, window) do
+  return if mode == "interp"
+  seen = text.scan(/^jit (.+)\t(.*)$/).to_h do |name, counters|
+    [name, counters.scan(/(\w+)=(\d*)>(\d*)/).to_h { |k, b, a| [k, [b, a].map { _1.empty? ? nil : Integer(_1) }] }]
+  end
+  names.each do |name|
+    (jit["#{cell} #{name}"] ||= []) << { window: window, counters: seen.fetch(name) { abort "no JIT counters for #{name} in #{log}" } }
+  end
+end
+windows = ->(mode, key) { mode == "interp" ? [] : jit.fetch(key) { abort "no JIT windows for #{key}" } }
+
 instructions = modes.to_h do |mode|
   [mode, cases.each_with_index.to_h do |name, index|
     [name, runs.to_h do |r|
@@ -187,7 +240,7 @@ instructions = modes.to_h do |mode|
         cmd = [valgrind, "--verbose", "--tool=callgrind", "--collect-atstart=no", "--toggle-collect=rb_ary_cycle",
           *("--smc-check=all" unless mode == "interp"), "--callgrind-out-file=/dev/null", "--log-file=#{log}.valgrind.log",
           *worker[side, mode, "ir", script, name, n.to_s]]
-        run(sides[side][:env], cmd, log: "#{log}.log")
+        record_jit.(mode, mode, run(sides[side][:env], cmd, log: "#{log}.log"), "#{log}.log", [name], "#{r} n#{n}")
         vlog = File.read("#{log}.valgrind.log")
         abort "Valgrind brk reservation exhausted in #{log}.valgrind.log; nothing is reported" if vlog.match?(/brk segment overflow|Cannot map memory to grow brk segment/)
         Integer(vlog.scan(/Collected : (\d+)/).last&.first || abort("no Callgrind total in #{log}.valgrind.log"))
@@ -204,10 +257,12 @@ if o[:ips] > 0
     runs.each do |r|
       side = side_of[r]
       cmd = ["taskset", "-c", o[:core].to_s, *worker[side, o[:ips_mode], "ips", script, o[:ips_time].to_s, o[:ips_warmup].to_s]]
-      text = run(sides[side][:env], cmd, log: File.join(out, "raw", "ips-r#{round + 1}-#{r}.log"))
+      log = File.join(out, "raw", "ips-r#{round + 1}-#{r}.log")
+      text = run(sides[side][:env], cmd, log: log)
       text.split("Calculating -------------------------------------").last.scan(/^\s*(.+?)\s+([\d.]+)([kMB]?) \(±\s*[\d.]+%\) i\/s/) do |name, value, unit|
         ips[name][r] << Float(value) * { "" => 1, "k" => 1e3, "M" => 1e6, "B" => 1e9 }.fetch(unit)
       end
+      record_jit.("ips", o[:ips_mode], text, log, cases, "r#{round + 1} #{r}")
     end
   end
 end
@@ -226,6 +281,20 @@ def num(x) = (x - x.round).abs < 0.05 ? int(x) : format("%.1f", x)
 def pct(x) = format("%+.1f%%", x * 100).sub("-", "−")
 def rate(x) = x >= 1e6 ? format("%.2fM", x / 1e6) : x >= 1e3 ? format("%.1fk", x / 1e3) : format("%.0f", x)
 
+# JIT-flat (docs/bench.md): a JIT cell counts only when no window compiled or invalidated, whatever its A/A.
+def gate(cell, windows)
+  return cell if windows.empty?
+  moved = windows.flat_map do |w|
+    w[:counters].filter_map { |k, (b, a)| "#{w[:window]} #{k} #{b && a ? format("%+d", a - b) : "missing"}" unless b && b == a }
+  end
+  cell.merge(claim: cell[:claim] && moved.empty?, jit: { flat: moved.empty?, moved: moved, windows: windows })
+end
+def change(c) = c[:jit] && !c[:jit][:flat] ? "not JIT-flat, no claim" : c[:claim] ? pct(c[:change]) : "within noise"
+def verdict(c)
+  return ": not JIT-flat (#{c[:jit][:moved].first(3).join(", ")}#{", …" if c[:jit][:moved].size > 3}), no claim" if c[:jit] && !c[:jit][:flat]
+  "#{", JIT-flat in #{c[:jit][:windows].size} windows" if c[:jit]}#{": inside the A/A, no claim" unless c[:claim]}"
+end
+
 before, after = o[:names]
 ruby_label = same_ruby ? "Ruby #{sides["base"][:description][/\Aruby (\S+)/, 1]}" : "base and candidate Ruby"
 results = { script: script, at: Time.now.utc.iso8601, n: o[:n], heap: HEAP, sides: sides.transform_values { _1.except(:env) },
@@ -239,14 +308,14 @@ modes.each do |mode|
   md << "| --- | ---: | ---: | ---: | ---: | ---: |"
   cases.each do |name|
     ob = compare(*runs.map { objects[mode][_1].fetch(name) })
-    ir = compare(*runs.map { instructions[mode][name][_1] })
+    ir = gate(compare(*runs.map { instructions[mode][name][_1] }), windows.(mode, "#{mode} #{name}"))
     results[:objects][[mode, name].join(" ")] = ob
     results[:instructions][[mode, name].join(" ")] = ir
     notes << "#{mode} #{name}: objects differ between the two base runs (#{num(ob[:base1])}, #{num(ob[:base2])})" unless ob[:aa].zero?
     objs = ob[:aa].zero? ? [num(ob[:base]), num(ob[:candidate])] : ["–", "–"]
-    md << "| `#{name}` | #{objs.join(" | ")} | #{int(ir[:base])} | #{int(ir[:candidate])} | #{ir[:claim] ? pct(ir[:change]) : "within noise"} |"
+    md << "| `#{name}` | #{objs.join(" | ")} | #{int(ir[:base])} | #{int(ir[:candidate])} | #{change(ir)} |"
     notes << "#{mode} #{name}: instructions #{pct(ir[:change])} with A/A #{format("%.2f%%", ir[:aa] * 100)} " \
-      "(base #{int(ir[:base1])} / #{int(ir[:base2])}, candidate #{int(ir[:candidate])})#{ir[:claim] ? "" : ": inside the A/A, no claim"}"
+      "(base #{int(ir[:base1])} / #{int(ir[:base2])}, candidate #{int(ir[:candidate])})#{verdict(ir)}"
   end
   md << ""
 end
@@ -256,15 +325,19 @@ if ips
   md << "| | #{before} | #{after} | Change |"
   md << "| --- | ---: | ---: | ---: |"
   ips.each do |name, r|
-    c = compare(*runs.map { r[_1].max })
+    c = gate(compare(*runs.map { r[_1].max }), windows.(o[:ips_mode], "ips #{name}"))
     results[:ips][name] = c.merge(rounds: r)
-    md << "| `#{name}` | #{rate(c[:base])} i/s | #{rate(c[:candidate])} i/s | #{c[:claim] ? pct(c[:change]) : "within noise"} |"
+    md << "| `#{name}` | #{rate(c[:base])} i/s | #{rate(c[:candidate])} i/s | #{change(c)} |"
     notes << "ips #{name}: #{pct(c[:change])} with A/A #{format("%.2f%%", c[:aa] * 100)} (best base #{rate(c[:base1])} / " \
-      "#{rate(c[:base2])}, candidate #{rate(c[:candidate])})#{c[:claim] ? "" : ": inside the A/A, no claim"}"
+      "#{rate(c[:base2])}, candidate #{rate(c[:candidate])})#{verdict(c)}"
   end
   md << ""
 end
 md << "Record (not for the body): base = mean of two base runs; A/A = their spread. Raw output and commands in #{out}."
+unless jit.empty?
+  md << "- JIT-flat: #{jit.values.map { _1.first[:counters].keys.join(", ") }.uniq.join("; ")} unchanged in every measured window " \
+    "(each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval)"
+end
 sides.each do |side, s|
   md << "- #{side}: #{s[:description]}#{s[:tree] && ", #{s[:tree]} at #{s[:head][0, 10]}#{" (dirty)" if s[:dirty]}"}"
 end

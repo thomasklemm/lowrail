@@ -1,0 +1,73 @@
+==53332== Callgrind, a call-graph generating cache profiler
+==53332== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==53332== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==53332== Command: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/jit_flat_gate/redefine_body.rb redefine,\ then\ redefined.value 0
+==53332== Parent PID: 52878
+==53332== 
+--53332-- 
+--53332-- Valgrind options:
+--53332--    --verbose
+--53332--    --tool=callgrind
+--53332--    --collect-atstart=no
+--53332--    --toggle-collect=rb_ary_cycle
+--53332--    --callgrind-out-file=/dev/null
+--53332--    --log-file=/home/user/workspace/repo/bench/upstream/jit_flat_gate/redefine/raw/ir-interp-2-redefine_then_redefined_value-base2-n0.valgrind.log
+--53332-- Contents of /proc/version:
+--53332--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--53332-- 
+--53332-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--53332-- Page sizes: currently 4096, max supported 4096
+--53332-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==53332== For interactive control, run 'callgrind_control -h'.
+--53332-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--53332--   Considering /usr/lib/debug/.build-id/86/f7eb4ff495ed3f2831c6d3d662e4321762a2a3.debug ..
+--53332--   .. build-id is valid
+--53332-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--53332--    object doesn't have a dynamic symbol table
+--53332-- Scheduler: using generic scheduler lock implementation.
+==53332== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-53332-by-user-on-???
+==53332== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-53332-by-user-on-???
+==53332== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-53332-by-user-on-???
+==53332== 
+==53332== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==53332== don't want to do, unless you know exactly what you're doing,
+==53332== or are doing some strange experiment):
+==53332==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=53332 ...command...
+==53332== 
+==53332== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==53332==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby
+==53332== and then give GDB the following command
+==53332==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=53332
+==53332== --pid is optional if only one valgrind process is running
+==53332== 
+--53332-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--53332--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--53332--   .. build-id is valid
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--53332--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--53332--   .. build-id is valid
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--53332--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--53332--   .. build-id is valid
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--53332--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--53332--   .. build-id is valid
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--53332--    object doesn't have a symbol table
+--53332-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--53332--   Considering /usr/lib/debug/.build-id/5e/5b51f4c39af9ac589408c1dc432ba390a273cc.debug ..
+--53332--   .. build-id is valid
+--53332-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x133c0=0x40133c0
+--53332-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--53332-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--53332-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/monitor.so
+==53332== 
+--53332-- Start dumping at BB 146318262 (Prg.Term.)...
+--53332-- Dump to /dev/null
+--53332-- Dumping done.
+==53332== Events    : Ir
+==53332== Collected : 57
+==53332== 
+==53332== I   refs:      57
