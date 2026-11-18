@@ -280,6 +280,17 @@ such as RBW1's thermos waiver for a mostly generated app) and starts them withou
 the choice and why. This does not change what needs Thomas's approval upstream: posting, opening and pushing to open
 PRs still need it unless he has approved that action.
 
+### Thermos on Sol is the default review; Opus 5.5 instead of Claude Code (Thomas, 2026-11-18)
+
+With the Claude subscription linked, Amp runs every Claude model through the Claude Agent SDK on that plan, so an
+`external-agent:claude-code` thread and an `anthropic/claude-opus-5-5` thread use the same model, tools, guidance
+and billing. New build and review threads therefore run as plain Opus 5.5 (Fable 5.2 where a risky question needs
+it). The default review of a head is now a `thermos` review in its own GPT-6.1 Sol thread (`openai/gpt-6.1-sol`,
+served by the ChatGPT subscription): correctness/security and maintainability in parallel, plus the body, comment
+and commit message sentence by sentence. Its pass is recorded as `reviewer: thermos-sol`. The coordinator adds an
+Opus pass where a second reviewer helps (claims-heavy bodies, measurements) and Astra on `risky` items. Passes
+already recorded as `claude-code` keep counting.
+
 Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
 trying Sol 6.2, but it isn't offered yet.
 
