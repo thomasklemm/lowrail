@@ -238,12 +238,13 @@ instructions = modes.to_h do |mode|
       counts = [0, o[:n]].map do |n|
         log = File.join(out, "raw", "ir-#{mode}-#{index + 1}-#{name.gsub(/\W+/, "_")}-#{r}-n#{n}")
         cmd = [valgrind, "--verbose", "--tool=callgrind", "--collect-atstart=no", "--toggle-collect=rb_ary_cycle",
-          *("--smc-check=all" unless mode == "interp"), "--callgrind-out-file=/dev/null", "--log-file=#{log}.valgrind.log",
+          *("--smc-check=all" unless mode == "interp"), "--callgrind-out-file=#{log}.callgrind", "--log-file=#{log}.valgrind.log",
           *worker[side, mode, "ir", script, name, n.to_s]]
         record_jit.(mode, mode, run(sides[side][:env], cmd, log: "#{log}.log"), "#{log}.log", [name], "#{r} n#{n}")
         vlog = File.read("#{log}.valgrind.log")
         abort "Valgrind brk reservation exhausted in #{log}.valgrind.log; nothing is reported" if vlog.match?(/brk segment overflow|Cannot map memory to grow brk segment/)
-        Integer(vlog.scan(/Collected : (\d+)/).last&.first || abort("no Callgrind total in #{log}.valgrind.log"))
+        # bench.md: the dump's trailing totals line, since Valgrind 3.19 can wrap summary (and the log's Collected).
+        Integer(File.read("#{log}.callgrind").scan(/^totals: (\d+)/).last&.first || abort("no totals line in #{log}.callgrind"))
       end
       [r, (counts[1] - counts[0]) / o[:n].to_f]
     end]

@@ -52,7 +52,8 @@ when the two sides resolve different third-party gems.
   differently.
 * **Callgrind instructions per call:** as `fb1_ir.sh`: 3,000 warm-up calls, `GC.start`, GC off, N calls inside
   `Array#cycle` with `--toggle-collect=rb_ary_cycle` (`--smc-check=all` under a JIT), minus the same run with
-  N = 0, divided by N. One process per window. A brk overflow in any Valgrind log stops the run.
+  N = 0, divided by N. One process per window; each count is the trailing `totals:` line of its dump in `raw/`
+  ([bench.md](../bench.md)). A brk overflow in any Valgrind log stops the run.
 * **benchmark-ips** (`--ips ROUNDS`): base, candidate, base again per round, each pinned with `taskset -c CORE`,
   5 s per report; the table takes the best round of each.
 * **JIT-flat gate** (YJIT and ZJIT cells, [bench.md](../bench.md)): each measured window records
