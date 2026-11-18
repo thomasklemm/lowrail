@@ -1,0 +1,16 @@
+=== scoped_late_serialization WIDTH=16 ===
+[false, :children, [3]]
+[false, :scoped_children, [3]]
+[true, :children, [3]]
+[true, :scoped_children, [3]]
+=== scoped_late_serialization WIDTH=17 ===
+[false, :children, [1]]
+[false, :scoped_children, [2]]
+[true, :children, [1]]
+[true, :scoped_children, [2]]
+=== scoped_range WIDTH=16 ===
+[false, []]
+[true, []]
+=== scoped_range WIDTH=17 ===
+[false, ActiveModel::RangeError, "1180591620717411303424 is out of range for ActiveModel::Type::Integer with limit 4 bytes"]
+[true, ActiveModel::RangeError, "1180591620717411303424 is out of range for ActiveModel::Type::Integer with limit 4 bytes"]

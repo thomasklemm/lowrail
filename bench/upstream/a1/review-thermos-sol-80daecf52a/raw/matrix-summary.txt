@@ -1,0 +1,17 @@
+PASS sqlite3: all original matrix outputs group 8.1 = parent = head, merge = main
+PASS sqlite3: scoped hash probe third result at width 17, equal width-16 control, both KEEP settings
+sqlite3 81 KEEP=0: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+sqlite3 81 KEEP=1: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+sqlite3 main KEEP=0: 2 runs, 2 assertions, 1 failures, 1 errors, 0 skips
+sqlite3 main KEEP=1: 2 runs, 2 assertions, 1 failures, 1 errors, 0 skips
+sqlite3 rails KEEP=0: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+sqlite3 rails KEEP=1: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+PASS postgresql: all original matrix outputs group 8.1 = parent = head, merge = main
+PASS postgresql: scoped hash probe third result at width 17, equal width-16 control, both KEEP settings
+postgresql 81 KEEP=0: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+postgresql 81 KEEP=1: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+postgresql main KEEP=0: 2 runs, 2 assertions, 1 failures, 1 errors, 0 skips
+postgresql main KEEP=1: 2 runs, 2 assertions, 1 failures, 1 errors, 0 skips
+postgresql rails KEEP=0: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+postgresql rails KEEP=1: 2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+PASS: exact-head full suites completed; see tests-head-sqlite3.txt and tests-head-postgresql.txt

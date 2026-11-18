@@ -1,0 +1,19 @@
+interp author.posts: Ir 720039.36525 -> 706949.83800, -1.81789%; A/A 0.01448%; objects 120.999 -> 110.999
+interp author.profile: Ir 593753.03975 -> 580714.25500, -2.19599%; A/A 0.07565%; objects 101.0 -> 91.0
+interp comment.post: Ir 572512.21000 -> 559364.07900, -2.29657%; A/A 0.04018%; objects 101.0 -> 91.0
+interp author.comments (through): Ir 819114.98400 -> 806149.86600, -1.58282%; A/A 0.05447%; objects 157.999 -> 147.999
+interp Author.joins(:posts): Ir 358826.83475 -> 347917.09650, -3.04039%; A/A 0.01043%; objects 107.0 -> 99.0
+interp author.published_posts (scoped): Ir 905883.64175 -> 904572.20600, -0.14477%; A/A 0.05784%; objects 169.0 -> 169.0
+yjit author.posts: Ir 310143.04225 -> 304612.20800, -1.78332%; A/A 0.03459%; objects 122.999 -> 112.999
+yjit author.profile: Ir 255771.80550 -> 250542.68050, -2.04445%; A/A 0.25397%; objects 103.0 -> 93.0
+yjit comment.post: Ir 257904.66750 -> 254729.63150, -1.23109%; A/A 0.00142%; objects 103.0 -> 93.0
+yjit author.comments (through): Ir 362659.42250 -> 358120.61700, -1.25153%; A/A 0.21955%; objects 159.999 -> 149.999
+yjit Author.joins(:posts): Ir 146902.88175 -> 140842.91850, -4.12515%; A/A 1.11612%; objects 109.0 -> 101.0
+yjit author.published_posts (scoped): Ir 372224.16100 -> 373261.19550, 0.27860%; A/A 0.09600%; objects 172.0 -> 172.0
+PASS: 36 instruction cells reconstructed from 72 raw Callgrind windows; 36 raw object cells; all deltas and A/A values
+census main vs 8.1 has_many: 644108.0 -> 667083.3, 3.56699%; A/A 0.01409%; objects 148.05 -> 107.04
+census main vs 8.1 has_one: 507939.2 -> 534617.8, 5.25232%; A/A 0.01833%; objects 120.0 -> 86.0
+census main vs 8.1 joins_has_many: 340708.6 -> 359771.1, 5.59496%; A/A 0.01028%; objects 127.0 -> 107.0
+census main vs 8.1 joins_through: 530195.4 -> 571641.25, 7.81709%; A/A 0.01272%; objects 182.0 -> 151.0
+census reach: 56/70 workloads, 8/8 apps
+request summary (not underlying raw windows): 29 workloads, median -0.19%, min -0.89%, objects lower in 28

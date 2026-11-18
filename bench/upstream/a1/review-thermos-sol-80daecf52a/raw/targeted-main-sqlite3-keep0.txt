@@ -1,0 +1,48 @@
+Using sqlite3
+Run options: --seed 46048
+
+# Running:
+
+FE
+
+Finished in 0.056252s, 35.5543 runs/s, 35.5543 assertions/s.
+
+  1) Failure:
+HasManyOwnerConditionsSerializationTest#test_the_association_scope_runs_before_the_owner_conditions_are_serialized [.amp/in/orb-backup/a1-review/serialization_tests.rb:55]:
+Expected: [2]
+  Actual: [1]
+
+  2) Error:
+HasManyOwnerConditionsSerializationTest#test_joining_an_association_whose_default_scope_has_an_out_of_range_condition_matches_no_records:
+ActiveModel::RangeError: 1180591620717411303424 is out of range for ActiveRecord::ConnectionAdapters::SQLite3Adapter::SQLite3Integer with limit 8 bytes
+    .amp/in/orb-backup/a1-review/main/activemodel/lib/active_model/type/integer.rb:89:in 'ActiveModel::Type::Integer#serialize'
+    .amp/in/orb-backup/a1-review/main/activemodel/lib/active_model/attribute.rb:191:in 'ActiveModel::Attribute#_value_for_database'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/query_attribute.rb:29:in 'ActiveRecord::Relation::QueryAttribute#value_for_database'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/query_attribute.rb:61:in 'ActiveRecord::Relation::QueryAttribute#hash'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/arel/nodes/binary.rb:21:in 'Arel::Nodes::Binary#hash'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/where_clause.rb:22:in 'Array#-'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/where_clause.rb:22:in 'ActiveRecord::Relation::WhereClause#-'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/reflection.rb:236:in 'ActiveRecord::Reflection::AbstractReflection#join_scope'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency/join_association.rb:46:in 'block in ActiveRecord::Associations::JoinDependency::JoinAssociation#join_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency/join_association.rb:43:in 'Array#reverse_each'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency/join_association.rb:43:in 'ActiveRecord::Associations::JoinDependency::JoinAssociation#join_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:205:in 'ActiveRecord::Associations::JoinDependency#make_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:198:in 'block in ActiveRecord::Associations::JoinDependency#make_join_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:197:in 'Array#each'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:197:in 'Enumerable#flat_map'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:197:in 'ActiveRecord::Associations::JoinDependency#make_join_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/associations/join_dependency.rb:98:in 'ActiveRecord::Associations::JoinDependency#join_constraints'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/query_methods.rb:2250:in 'ActiveRecord::QueryMethods#build_joins'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/query_methods.rb:2097:in 'ActiveRecord::QueryMethods#build_arel'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/query_methods.rb:1977:in 'ActiveRecord::QueryMethods#arel'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/finder_methods.rb:425:in 'block (2 levels) in ActiveRecord::FinderMethods#exists?'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:477:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/connection_handling.rb:361:in 'ActiveRecord::ConnectionHandling#with_connection'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/delegation.rb:106:in 'ActiveRecord::Delegation#with_connection'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/finder_methods.rb:424:in 'block in ActiveRecord::FinderMethods#exists?'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation.rb:1542:in 'ActiveRecord::Relation#skip_query_cache_if_necessary'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation/finder_methods.rb:423:in 'ActiveRecord::FinderMethods#exists?'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/encryption/extended_deterministic_queries.rb:103:in 'ActiveRecord::Encryption::ExtendedDeterministicQueries::RelationQueries#exists?'
+    .amp/in/orb-backup/a1-review/main/activerecord/lib/active_record/relation.rb:383:in 'ActiveRecord::Relation#empty?'
+
+2 runs, 2 assertions, 1 failures, 1 errors, 0 skips

@@ -1,0 +1,20 @@
+=== scoped_extension WIDTH=16 ===
+[false, :children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[false, :scoped_children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[false, :indirect_children, [1], 200, [[:extended, 100], [:extended, 200]]]
+[true, :children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[true, :scoped_children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[true, :indirect_children, [1], 200, [[:extended, 100], [:extended, 200]]]
+=== scoped_extension WIDTH=17 ===
+[false, :children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[false, :scoped_children, [2], 200, [[:extended, 100], [:serialize_first_key, 100], [:extended, 200]]]
+[false, :indirect_children, [1], 200, [[:extended, 100], [:extended, 200]]]
+[true, :children, [3], 200, [[:extended, 100], [:extended, 200], [:serialize_first_key, 200]]]
+[true, :scoped_children, [2], 200, [[:extended, 100], [:serialize_first_key, 100], [:extended, 200]]]
+[true, :indirect_children, [1], 200, [[:extended, 100], [:extended, 200]]]
+=== scoped_removed_bind WIDTH=16 ===
+[false, "SELECT \"removed_bind_children\".* FROM \"removed_bind_children\" WHERE \"removed_bind_children\".\"label\" = 'chosen'", [1]]
+[true, "SELECT \"removed_bind_children\".* FROM \"removed_bind_children\" WHERE \"removed_bind_children\".\"label\" = 'chosen'", [1]]
+=== scoped_removed_bind WIDTH=17 ===
+[false, "SELECT \"removed_bind_children\".* FROM \"removed_bind_children\" WHERE \"removed_bind_children\".\"label\" = 'chosenX'", [2]]
+[true, "SELECT \"removed_bind_children\".* FROM \"removed_bind_children\" WHERE \"removed_bind_children\".\"label\" = 'chosenX'", [2]]

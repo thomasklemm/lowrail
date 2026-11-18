@@ -1,0 +1,15 @@
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: --name /test_with_tuple_syntax_and_large_values_list/ --verbose --seed 52225
+
+# Running:
+
+ActiveRecord::WhereTest#test_with_tuple_syntax_and_large_values_list = 0.03 s = S
+
+Finished in 0.029886s, 33.4603 runs/s, 0.0000 assertions/s.
+
+  1) Skipped:
+ActiveRecord::WhereTest#test_with_tuple_syntax_and_large_values_list [.amp/in/orb-backup/a1-review/rails/activerecord/test/cases/relation/where_test.rb:207]:
+Skipped, no message given
+
+1 runs, 0 assertions, 0 failures, 0 errors, 1 skips

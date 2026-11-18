@@ -1,0 +1,14 @@
+Using sqlite3
+Run options: --seed 55460
+
+# Running:
+
+F.
+
+Finished in 0.046748s, 42.7823 runs/s, 64.1734 assertions/s.
+
+  1) Failure:
+HasManyOwnerConditionsSerializationTest#test_joining_an_association_whose_default_scope_has_an_out_of_range_condition_matches_no_records [.amp/in/orb-backup/a1-review/seeded_no_filter_tests.rb:35]:
+Expected #<ActiveRecord::Relation [#<#<Class:0x00007f5249323e88> id: 1, key0: nil, key1: nil, key2: nil, key3: nil, key4: nil, key5: nil, key6: nil, key7: nil, key8: nil, key9: nil, key10: nil, key11: nil, key12: nil, key13: nil, key14: nil, key15: nil, key16: nil>]> to be empty.
+
+2 runs, 3 assertions, 1 failures, 0 errors, 0 skips

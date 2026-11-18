@@ -1,0 +1,30 @@
+commit 80daecf52a16cee2383b78d036e0126535598044
+Author: Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed, 18 Nov 2026 02:28:28 +0000
+Commit: Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed, 18 Nov 2026 02:28:28 +0000
+
+Test that owner conditions are serialized when the query is built
+
+Comparing where clauses hashes their predicates once both sides have
+more than 16, which serializes the bind values. Checking the owner
+conditions before the association scope runs, or for joins that have no
+scope, serialized them earlier than 8.1 did: a join raised
+ActiveModel::RangeError for an out of range default scope condition, and
+an association scope changing how its keys serialize no longer applied.
+
+commit 9877a852dd29208d4c15c04d6dea01506fc74982
+Author: Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed, 18 Nov 2026 00:47:24 +0000
+Commit: Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed, 18 Nov 2026 00:47:24 +0000
+
+Check the owner conditions only when an association scope was merged
+
+Since the association scope can no longer remove the conditions tying the
+records to the owner, every association scope and join scope builds the
+differences between its where clauses before and after merging the scope,
+also when the association has no scope and nothing can be removed.
+
+Keep the where clauses and compute the differences only after a scope item
+was merged.

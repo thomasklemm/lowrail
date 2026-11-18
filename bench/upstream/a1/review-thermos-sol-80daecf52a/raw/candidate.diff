@@ -1,0 +1,106 @@
+diff --git a/activerecord/lib/active_record/associations/association_scope.rb b/activerecord/lib/active_record/associations/association_scope.rb
+index b9ac884e7d..6e81ce1ffb 100644
+--- a/activerecord/lib/active_record/associations/association_scope.rb
++++ b/activerecord/lib/active_record/associations/association_scope.rb
+@@ -46 +46 @@ def join(table, constraint)
+-        # and the key conditions among them.
++        # and its where clause after the key conditions.
+@@ -50 +49,0 @@ def last_chain_scope(scope, reflection, owner)
+-          where_clause = scope.where_clause
+@@ -62 +61 @@ def last_chain_scope(scope, reflection, owner)
+-          key_clause = scope.where_clause - where_clause
++          key_where_clause = scope.where_clause
+@@ -68 +67 @@ def last_chain_scope(scope, reflection, owner)
+-          [scope, key_clause]
++          [scope, key_where_clause]
+@@ -125 +124 @@ def add_constraints(scope, owner, chain)
+-          scope, key_clause = last_chain_scope(scope, chain.last, owner)
++          scope, key_where_clause = last_chain_scope(scope, chain.last, owner)
+@@ -131 +130,2 @@ def add_constraints(scope, owner, chain)
+-          fixed_clause = scope.where_clause - where_clause - key_clause
++          chain_where_clause = scope.where_clause
++          scoped = false
+@@ -135,0 +136 @@ def add_constraints(scope, owner, chain)
++              scoped = true
+@@ -162 +163,5 @@ def add_constraints(scope, owner, chain)
+-          chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
++          if scoped
++            key_clause = key_where_clause - where_clause
++            fixed_clause = chain_where_clause - where_clause - key_clause
++            chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
++          end
+diff --git a/activerecord/lib/active_record/reflection.rb b/activerecord/lib/active_record/reflection.rb
+index ff46897cfb..a46f7a2ae8 100644
+--- a/activerecord/lib/active_record/reflection.rb
++++ b/activerecord/lib/active_record/reflection.rb
+@@ -236,3 +236,5 @@ def join_scope(table, foreign_table, foreign_klass)
+-        fixed_clause = klass_scope.where_clause - where_clause
+-        scope_chain_items.inject(klass_scope, &:merge!)
+-        keep_owner_conditions(klass_scope, Relation::WhereClause.empty, fixed_clause)
++        unless scope_chain_items.empty?
++          fixed_clause = klass_scope.where_clause - where_clause
++          scope_chain_items.inject(klass_scope, &:merge!)
++          keep_owner_conditions(klass_scope, Relation::WhereClause.empty, fixed_clause)
++        end
+diff --git a/activerecord/test/cases/associations/has_many_associations_test.rb b/activerecord/test/cases/associations/has_many_associations_test.rb
+index c3b988851d..d23a782577 100644
+--- a/activerecord/test/cases/associations/has_many_associations_test.rb
++++ b/activerecord/test/cases/associations/has_many_associations_test.rb
+@@ -3713,0 +3714,57 @@ class DeprecatedHasManyAssociationsTest < ActiveRecord::TestCase
++
++class HasManyOwnerConditionsSerializationTest < ActiveRecord::TestCase
++  self.use_transactional_tests = false
++
++  # Array#- hashes its elements, serializing bind values, once both sides have more than 16.
++  KEYS = Array.new(17) { |i| :"key#{i}" }
++
++  setup do
++    connection = ActiveRecord::Base.lease_connection
++    connection.create_table(:owner_conditions_parents, force: true) { |t| KEYS.each { |key| t.integer key } }
++    connection.create_table(:owner_conditions_children, force: true) do |t|
++      t.integer :parent_id
++      KEYS.each { |key| t.integer key }
++    end
++  end
++
++  teardown do
++    connection = ActiveRecord::Base.lease_connection
++    connection.drop_table :owner_conditions_parents, if_exists: true
++    connection.drop_table :owner_conditions_children, if_exists: true
++  end
++
++  test "joining an association whose default scope has an out of range condition matches no records" do
++    child = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_children"
++      default_scope { where(KEYS.index_with(1).merge(key0: 2**70)) }
++    end
++    parent = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_parents"
++      has_many :children, anonymous_class: child, foreign_key: :parent_id
++    end
++    parent.create!
++
++    assert_empty parent.joins(:children)
++    assert_empty parent.eager_load(:children).where.not(children: { id: nil })
++  end
++
++  test "the association scope runs before the owner conditions are serialized" do
++    type = Class.new(ActiveModel::Type::Integer) do
++      attr_accessor :offset
++      def serialize(value) = super(value) + offset.to_i
++    end.new
++    child = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_children"
++      KEYS.each { |key| attribute key, type }
++    end
++    parent = Class.new(ActiveRecord::Base) do
++      self.table_name = "owner_conditions_parents"
++      has_many :children, -> { type.offset = 100; all }, anonymous_class: child, primary_key: KEYS, foreign_key: KEYS
++    end
++    owner = parent.create!(KEYS.zip(1..).to_h)
++    child.create!(KEYS.zip(1..).to_h)
++    shifted = child.create!(KEYS.zip(101..).to_h)
++
++    assert_equal [shifted.id], owner.association(:children).scope.pluck(:id)
++  end
++end

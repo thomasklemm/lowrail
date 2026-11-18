@@ -1,0 +1,10 @@
+Using sqlite3
+Run options: --seed 42013
+
+# Running:
+
+..
+
+Finished in 0.041814s, 47.8314 runs/s, 119.5785 assertions/s.
+
+2 runs, 5 assertions, 0 failures, 0 errors, 0 skips

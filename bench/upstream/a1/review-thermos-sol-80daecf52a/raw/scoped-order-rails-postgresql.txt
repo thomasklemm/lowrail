@@ -1,0 +1,20 @@
+=== scoped_default_order WIDTH=16 ===
+[false, :children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+[false, :scoped_children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+[false, :unscoped_children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+[true, :children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+[true, :scoped_children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+[true, :unscoped_children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100]]]
+=== scoped_default_order WIDTH=17 ===
+[false, :children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100], [:key, 17, 100]]]
+[false, :scoped_children, [1], [[:key, 1, 0], [:key, 2, 0], [:key, 3, 0], [:key, 4, 0], [:key, 5, 0], [:key, 6, 0], [:key, 7, 0], [:key, 8, 0], [:key, 9, 0], [:key, 10, 0], [:key, 11, 0], [:key, 12, 0], [:key, 13, 0], [:key, 14, 0], [:key, 15, 0], [:key, 16, 0], [:key, 17, 0], [:flag, 1]]]
+[false, :unscoped_children, [1], [[:key, 1, 0], [:key, 2, 0], [:key, 3, 0], [:key, 4, 0], [:key, 5, 0], [:key, 6, 0], [:key, 7, 0], [:key, 8, 0], [:key, 9, 0], [:key, 10, 0], [:key, 11, 0], [:key, 12, 0], [:key, 13, 0], [:key, 14, 0], [:key, 15, 0], [:key, 16, 0], [:key, 17, 0], [:flag, 1]]]
+[true, :children, [2], [[:flag, 1], [:key, 1, 100], [:key, 2, 100], [:key, 3, 100], [:key, 4, 100], [:key, 5, 100], [:key, 6, 100], [:key, 7, 100], [:key, 8, 100], [:key, 9, 100], [:key, 10, 100], [:key, 11, 100], [:key, 12, 100], [:key, 13, 100], [:key, 14, 100], [:key, 15, 100], [:key, 16, 100], [:key, 17, 100]]]
+[true, :scoped_children, [1], [[:key, 1, 0], [:key, 2, 0], [:key, 3, 0], [:key, 4, 0], [:key, 5, 0], [:key, 6, 0], [:key, 7, 0], [:key, 8, 0], [:key, 9, 0], [:key, 10, 0], [:key, 11, 0], [:key, 12, 0], [:key, 13, 0], [:key, 14, 0], [:key, 15, 0], [:key, 16, 0], [:key, 17, 0], [:flag, 1]]]
+[true, :unscoped_children, [1], [[:key, 1, 0], [:key, 2, 0], [:key, 3, 0], [:key, 4, 0], [:key, 5, 0], [:key, 6, 0], [:key, 7, 0], [:key, 8, 0], [:key, 9, 0], [:key, 10, 0], [:key, 11, 0], [:key, 12, 0], [:key, 13, 0], [:key, 14, 0], [:key, 15, 0], [:key, 16, 0], [:key, 17, 0], [:flag, 1]]]
+=== scoped_join_removed WIDTH=16 ===
+[false, [1]]
+[true, [1]]
+=== scoped_join_removed WIDTH=17 ===
+[false, ActiveModel::RangeError, "1180591620717411303424 is out of range for ActiveModel::Type::Integer with limit 4 bytes"]
+[true, ActiveModel::RangeError, "1180591620717411303424 is out of range for ActiveModel::Type::Integer with limit 4 bytes"]

@@ -1,0 +1,10 @@
+Using postgresql
+Run options: --seed 55165
+
+# Running:
+
+..
+
+Finished in 0.106480s, 18.7829 runs/s, 46.9573 assertions/s.
+
+2 runs, 5 assertions, 0 failures, 0 errors, 0 skips
