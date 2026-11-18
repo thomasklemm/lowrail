@@ -222,7 +222,6 @@ if [ ! -d "$dest" ]; then
     echo "gsub_file 'Gemfile', /^gem \"rails\", .*\$/, 'gem \"rails\", \"$rails\"'" > "$railsrc/pin-rails.rb"
     echo "--template=$railsrc/pin-rails.rb" > "$railsrc/rails/railsrc"
     XDG_CONFIG_HOME="$railsrc" RAILS_NEW_VERSION=$rails "$tmp/scripts/create-blog" "$dest" >/dev/null
-    grep -qx "gem \"rails\", \"$rails\"" "$dest/Gemfile" || { echo "real-blog Gemfile does not pin rails $rails" >&2; exit 1; }
     if ! "$source_only"; then
       (cd "$dest" && bin/rails db:prepare >/dev/null)
     fi
@@ -231,6 +230,11 @@ if [ ! -d "$dest" ]; then
   fi
   rm -rf "$tmp"
   echo "$repo@$rev:$sub" > "$dest/.lowrail-corpus-source"
+fi
+if [ "$name" = real-blog ] && ! { grep -qx "gem \"rails\", \"$rails\"" "$dest/Gemfile" &&
+    grep -qx "    rails ($rails)" "$dest/Gemfile.lock"; }; then
+  echo "$dest does not pin and lock rails $rails; it is generated, so delete it to regenerate (docs/development/testing.md)" >&2
+  exit 1
 fi
 if [ "$name" != real-blog ]; then
   [ "$(git -C "$dest" rev-parse HEAD)" = "$rev" ] || {

@@ -79,6 +79,7 @@ module Lowrail
       return "actual-holder binary not certified; rebuild" unless data.fetch("sources").key?(binary)
       return "stale sources; rebuild" unless data.fetch("sources").all? { |file, sha| File.file?(file) && Manifest.sha256_file(file) == sha }
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("application_class")
+      return "Rails release changed; rebuild" unless Rails.version == data.fetch("rails_version")
       data.fetch("methods").each do |entry|
         type = entry.fetch("holder") == "view" ? view_class : Lowrail.loaded_constant(entry.fetch("holder"))
         return "dependency #{entry['holder']} not already loaded; keep original" unless type

@@ -82,6 +82,7 @@ module Lowrail
       view_class = controller && ivar(controller, :@view_context_class)
       return "view class not naturally cached; keep original" unless view_class && exact.call(view, view_class)
       return "application class changed; rebuild" unless Rails.application.class.name == data.fetch("inventory").fetch("application_class")
+      return "Rails release changed; rebuild" unless Rails.version == data.fetch("inventory").fetch("rails_version")
 
       mutation_holders = {native => [:exact_class?], BasicObject => [:instance_exec]}
       data.fetch("inventory").fetch("methods").each do |name, expected|

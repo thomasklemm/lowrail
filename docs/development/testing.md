@@ -205,9 +205,9 @@ release ([rails-pins.md](../rails-pins.md)). `script/gate` prepares one gem home
 the gem suite in each.
 
 Blogs generated before that pin say `"~> 8.1.4"`, so their bundles installed
-Rails 8.1.4.1 into the gate's gem home. Unbundled fixtures then load 8.1.4.1,
-and the 8.1.4-only passes refuse with `unsupported_rails_version`, failing the
-endpoint and form-scaffold tests. To clean such a checkout, delete
+Rails 8.1.4.1 into the gate's gem home. `script/corpus` (and with it
+`script/gate --prepare`) refuses a `real-blog` whose Gemfile and lock do not
+both name the release. To clean such a checkout, delete
 `.corpus/real-blog` (it is generated, not retained), then either start a fresh
 gate home with `rm -rf .lowrail/gate-gems` or remove the newer Rails from the
 existing one:

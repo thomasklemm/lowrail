@@ -2,7 +2,9 @@
 
 The sealed and render passes certify stock Rails source. Which releases they accept is one reviewed table,
 `Lowrail::RailsPins::RELEASES` (`gem/lib/lowrail/rails_pins.rb`). Any release not in it refuses at build and at
-runtime (invariant 1), so a new security release is a safe no-op until someone adds it.
+runtime (invariant 1), so a new security release is a safe no-op until someone adds it. Artifacts record the release
+they were built on, and every unit refuses in a process on another release, including cached render and form
+certificates (`Rails release changed; rebuild`).
 
 ## The table
 
@@ -27,6 +29,8 @@ Outside the gem, the same releases key:
   `.corpus/rails-VERSION/`) and runs the gem suite in each. CI runs a matrix job per release.
 
 ## Adding a release
+
+The table centralizes the pins, not the release work. A release needs its row and all of the following:
 
 1. Install it into a fresh home: `LOWRAIL_RAILS=X script/gate-gems` with that `GEM_HOME`.
 2. Hash the files and inventories (the algorithm in `source_inventory`), and diff every pinned file and gem against
@@ -77,11 +81,33 @@ CI=1, SQL trace off), then `lowrail verify APP -- ruby bin/rails test --seed 412
 | 8.1.4.1 | 21 of 21 identical | 5 | 30 / 9 / 11 / 1 = 51 | form (same) |
 | 8.1.4.1 without its table row (control) | 21 of 21 identical | 2 (AR only) | 30 / 9 / – / – = 39 | – |
 
-Link has no verification-tier unit on either release (build refusal `verification_literal_table_observer_unavailable`),
-and form refuses at activation by design, as recorded in [test-certificate-render.md](test-certificate-render.md).
-Their production paths, and the endpoint prototype, are covered on each release by the public regressions that
-assert non-zero hits (SealedLinkTest, FormScaffoldTest, EndpointTest, BlogProductionTest), run against that release's
-gem home and corpus.
+Supported on 8.1.4.1 under invariant 3 are therefore only these verification-tier units on the retained blog:
+Article and Comment instantiate, token (its 11 hits take the empty/unprotected branch) and collection. Link has no
+verification-tier unit on either release (build refusal `verification_literal_table_observer_unavailable`), and form
+refuses at activation by design ([test-certificate-render.md](test-certificate-render.md)). No link, form or endpoint
+support is claimed on 8.1.4.1: SealedLinkTest asserts quarantine, no link unit and zero hits, and form's isolated
+production regression hits do not replace `lowrail verify`. The suite passing in the 8.1.4.1 home shows only that
+those paths stay correct there.
+
+### Release binding (fix round, 2026-11-18)
+
+Before this fix the render certificates (`render_units_build.rb`, `test_certificate_render_build.rb`) and the form
+inventory did not record the build's Rails release, so an artifact built on 8.1.4.1 still admitted token and
+collection in a process reporting another release. Reproducer: an ordinary 8.1.4.1 verification artifact, verified
+with `RUBYOPT` preloading `bundler/setup`, `rails` and `Rails.define_singleton_method(:version) { "8.1.4.2" }`.
+
+| Code | Outcomes | Hits (Article / Comment / token / collection) | Activation refusals |
+|---|---|---|---|
+| 33f044c2 | 21 of 21 identical | 0 / 0 / 11 / 1 = 12 | form |
+| with the binding | 21 of 21 identical | 0 / 0 / 0 / 0 | form; token and collection `verification_render_Rails_release_changed;_rebuild` |
+
+AR already compared its recorded release and took no hits in either run.
+
+Each certificate now stores `rails_version` and its admission compares it with `Rails.version`, as AR does. The public
+regressions `TestCertificateTest#test_render_missing_or_mismatched_view_context_certificate_stays_original` (mode
+`release`) and `FormScaffoldTest#test_render_units_without_blog_models_templates_or_form_inventory` (production token
+and collection under a redefined release) fail on 33f044c2 and pass on both homes. An ordinary 8.1.4.1 verify after
+the fix still records 51 hits (30 / 9 / 11 / 1).
 
 ## Confirm review (2026-11-18)
 

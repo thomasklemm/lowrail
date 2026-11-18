@@ -1,8 +1,9 @@
 # Rails 8.1.4.1 and the 8.1.4-certified passes
 
-Status 2026-11-18: built. 8.1.4.1 is now certified alongside 8.1.4 through the per-release table in
-[rails-pins.md](rails-pins.md), which also records the `tag_options` audit and the verify results. The analysis
-below is what led to it.
+Status 2026-11-18: built. 8.1.4.1 is now in the per-release table in [rails-pins.md](rails-pins.md), which also
+records the `tag_options` audit and the verify results. `lowrail verify` supports on 8.1.4.1 only the retained blog's
+verification-tier units: Article and Comment instantiate, token (empty/unprotected branch) and collection. Link, form
+and the endpoint prototype make no 8.1.4.1 support claim. The analysis below is what led to it.
 
 Rails 8.1.4.1 (2026-11-04) is
 the current 8.1 security release. On it, every pass that requires Rails 8.1.4
@@ -88,6 +89,6 @@ The code is small. The evidence is the larger part.
   `lock_sha256`) is 8.1.4. Certifying 8.1.4.1 needs a second retained
   specimen, or a second lock with its own entropy pin, running those gates.
   The gate and CI would also need a second gem home with 8.1.4.1 only, because
-  unbundled fixtures load the newest installed Rails. Each Rails x.y.z.w
-  security release repeats this unless the pins move to a reviewed table per
-  version.
+  unbundled fixtures load the newest installed Rails. A per-release table
+  keeps the pins in one place, but each security release still needs its own
+  lock, entropy row, CI entry, closure audit and `lowrail verify` run.

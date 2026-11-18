@@ -439,11 +439,15 @@ class TestCertificateTest < Minitest::Test
       changed = boot.sub!('raise "not naturally admitted" unless Lowrail::TokenTag.admitted? && Lowrail::CollectionRender.admitted?',
         'raise "invalid dispatch certificate admitted" if Lowrail::TokenTag.admitted? || Lowrail::CollectionRender.admitted?')
       raise "admission assertion not found" unless changed
-      %w[missing mismatched].each do |mode|
+      %w[missing mismatched release].each do |mode|
         manifest = JSON.parse(original)
         manifest.fetch("units").each do |unit|
           next unless (data = unit["verification_render"])
-          mode == "missing" ? data.delete("view_context") : data["view_context"] = {"owner" => "NotBasicObject"}
+          case mode
+          when "missing" then data.delete("view_context")
+          when "mismatched" then data["view_context"] = {"owner" => "NotBasicObject"}
+          else data["rails_version"] = "#{RAILS}.9"
+          end
         end
         File.write(path, JSON.generate(manifest))
         result = ruby_json(boot + <<~'RUBY', chdir: dir, env: certificate_env(dir))
@@ -461,7 +465,8 @@ class TestCertificateTest < Minitest::Test
         assert_equal result.fetch("tokens").first, result.fetch("tokens").last, mode
         assert_equal [1, 1], result.fetch("tokens").last.drop(1)
         assert_equal result.fetch("collections").first, result.fetch("collections").last, mode
-        reason = mode == "missing" ? "verification_render_observation_unknown" : "verification_render_view_context_dispatch_changed;_rebuild"
+        reason = {"missing" => "verification_render_observation_unknown", "mismatched" => "verification_render_view_context_dispatch_changed;_rebuild",
+          "release" => "verification_render_Rails_release_changed;_rebuild"}.fetch(mode)
         result.fetch("render_ids").each do |id|
           assert_equal 0, result.dig("stats", "unit_hits").fetch(id, 0)
           assert_equal [reason], result.dig("stats", "unit_refusals", id)

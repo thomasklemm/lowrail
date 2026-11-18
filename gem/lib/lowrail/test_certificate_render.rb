@@ -114,6 +114,7 @@ module Lowrail
           native = Lowrail.loaded_constant("Lowrail::Native")
           exact = native&.method(:exact_class?)
           @admission = {state: "pending", attempts: @admission.fetch(:attempts) + 1}.freeze
+          return retire_render("Rails release changed; rebuild") unless Rails.version == @data.fetch("rails_version")
           return retire_render("actual-holder primitive changed") unless exact && Sealed.signature(exact) == @data.fetch("native_method")
           return retire_render("view context dispatch changed; rebuild") unless Sealed.view_context_fact == @data.fetch("view_context")
           binary = $LOADED_FEATURES.find { _1.start_with?("#{Lowrail::NATIVE_PATH}.") }

@@ -187,7 +187,7 @@ module Lowrail
           [method_name.to_s, fact]
         end
       end
-      {"application_class" => Rails.application.class.name,
+      {"application_class" => Rails.application.class.name, "rails_version" => Rails.version,
         "methods" => facts, "form_config" => {"ids" => true, "remote" => false, "utf8" => false},
         "columns" => %w[commenter body].to_h { [_1, [Comment.columns_hash.fetch(_1).sql_type, Comment.column_defaults.fetch(_1)]] }}
     rescue StandardError, ScriptError => error

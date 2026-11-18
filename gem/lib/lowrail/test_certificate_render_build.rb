@@ -59,7 +59,7 @@ module Lowrail
       return refusal.call("non-stock symmetric render observer") unless expected &&
         Sealed.signature(observer, sequence: expected.to_a) == Sealed.signature(observer)
       sources = [binary, source, *facts.flat_map { _1.fetch("chain").filter_map { |body| body.dig("source_location", 0) } }].uniq.select { File.file?(_1) }
-      data = {"version" => 1, "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer),
+      data = {"version" => 1, "rails_version" => Rails.version, "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer),
         "view_context" => view_context, "methods" => facts, "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }}
       {units: [{"pass" => pass, "kind" => "runtime", "target" => pass == TokenTag::PASS ? "ArticlesController#token_tag" :
         "ActionView::CollectionRenderer#collection_with_template", "facts" => [], "verification_render" => data}],

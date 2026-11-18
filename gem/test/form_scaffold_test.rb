@@ -115,6 +115,14 @@ class FormScaffoldTest < Minitest::Test
         assert_operator declined.fetch("hits").fetch(collection.fetch("id").to_s, 0), :>, 0
       end
 
+      # A process on another Rails release than the build's keeps both units original.
+      File.write(File.join(app, ".lowrail/manifest.json"), JSON.generate(artifact))
+      other = scenario.sub('require "./config/environment"', "\\0\nRails.define_singleton_method(:version) { \"#{RAILS}.9\" }")
+      released = ruby_json(other, chdir: app, env: env.merge("RUBYOPT" => SETUP_OPT,
+        "LOWRAIL" => "1", "LOWRAIL_SEALED" => "1", "LOWRAIL_STATS" => "1"))
+      assert_equal off.fetch("bodies"), released.fetch("bodies")
+      artifact.fetch("units").each { assert_equal 0, released.fetch("hits").fetch(_1.fetch("id").to_s, 0) }
+
       # A custom token helper must remain live; unrelated collection admission
       # must not inherit its refusal or require a form-builder certificate.
       FileUtils.mkdir_p(File.join(app, "config/initializers"))

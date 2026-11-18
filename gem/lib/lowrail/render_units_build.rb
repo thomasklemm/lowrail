@@ -75,7 +75,7 @@ module Lowrail
         *controllers.values.flat_map { |entries| entries.values.filter_map { _1.dig("source_location", 0) } }].uniq.select { File.file?(_1) }
       observer = pass == TokenTag::PASS ? TokenTag::Variant.instance_method(:token_tag) :
         CollectionRender::Variant.instance_method(:collection_with_template)
-      data = {"version" => 2, "application_class" => Rails.application.class.name,
+      data = {"version" => 2, "application_class" => Rails.application.class.name, "rails_version" => Rails.version,
         "native_method" => Sealed.signature(exact), "observer" => Sealed.signature(observer), "view_context" => context,
         "sources" => sources.to_h { [_1, Manifest.sha256_file(_1)] }, "methods" => facts}
       data["controllers"] = controllers if pass == TokenTag::PASS
