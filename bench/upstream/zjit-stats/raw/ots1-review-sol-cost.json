@@ -1,0 +1,558 @@
+{
+  "reviewer": "thermos-sol",
+  "date": "2026-11-18",
+  "head": "2cc3e0de4d63abe7e307d3cc8d6b216fe5be55c9",
+  "base": "9de06831e37534f8a163e598cc0c6903c7687430",
+  "configure": "--enable-zjit --disable-yjit --disable-install-doc --without-jemalloc",
+  "platform": "x86_64-linux, GCC 14.2, Rust 1.100.0, Valgrind 3.24.0",
+  "ruby_flags": [
+    "--zjit",
+    "--zjit-stats-quiet"
+  ],
+  "probe": "bench/upstream/zjit-stats/ots1_review_cost.rb",
+  "warmup": {
+    "monomorphic_calls": 200,
+    "mixed_calls": 1000
+  },
+  "limits": "Diagnostic only: whole-process Callgrind counts differenced at N=10000 minus N=1000, default heap and GC enabled, taskset core 0 but no isolation. No fixed-heap certificate: these are not admitted performance prices or lobsters speed estimates. Native times are not claimed. Compiles, invalidation_time_ns and ZJIT allocation bytes are zero in every measured region. Native allocation runs use core 1.",
+  "native_600000": {
+    "string": {
+      "base": {
+        "seconds": 0.22422722500004966,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 0,
+        "side_exit_count": 0,
+        "dynamic_send_count": 0,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      },
+      "head": {
+        "seconds": 0.21548125699973752,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 0,
+        "side_exit_count": 0,
+        "dynamic_send_count": 0,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      }
+    },
+    "symbol": {
+      "base": {
+        "seconds": 0.24399961700009953,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 100000,
+        "side_exit_count": 100000,
+        "dynamic_send_count": 0,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      },
+      "head": {
+        "seconds": 0.2315636030002679,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 0,
+        "side_exit_count": 0,
+        "dynamic_send_count": 200000,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      }
+    },
+    "integer_string": {
+      "base": {
+        "seconds": 0.23536208399991665,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 100000,
+        "side_exit_count": 100000,
+        "dynamic_send_count": 0,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      },
+      "head": {
+        "seconds": 0.29651187799981926,
+        "allocations": 2200014,
+        "exit_guard_type_failure": 0,
+        "side_exit_count": 0,
+        "dynamic_send_count": 1000000,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      }
+    },
+    "module": {
+      "base": {
+        "seconds": 0.24385993699979736,
+        "allocations": 1200014,
+        "exit_guard_type_failure": 500000,
+        "side_exit_count": 500000,
+        "dynamic_send_count": 0,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      },
+      "head": {
+        "seconds": 0.3262021420000565,
+        "allocations": 2200014,
+        "exit_guard_type_failure": 0,
+        "side_exit_count": 0,
+        "dynamic_send_count": 1200000,
+        "compiled_iseq_count": 0,
+        "invalidation_time_ns": 0,
+        "zjit_alloc_bytes": 0
+      }
+    }
+  },
+  "callgrind": {
+    "string": {
+      "rounds": [
+        {
+          "base": {
+            "N1000_Ir": 52924062,
+            "N10000_Ir": 74584718,
+            "difference_Ir": 21660656,
+            "N1000_counters": {
+              "seconds": 0.018364939000093727,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.14586624899993694,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 52948650,
+            "N10000_Ir": 74635681,
+            "difference_Ir": 21687031,
+            "N1000_counters": {
+              "seconds": 0.017631335999794828,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1411180830000376,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": 0.1217645485898533
+        },
+        {
+          "base": {
+            "N1000_Ir": 52943548,
+            "N10000_Ir": 74634576,
+            "difference_Ir": 21691028,
+            "N1000_counters": {
+              "seconds": 0.018073832000027323,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.16503564899994672,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 52955222,
+            "N10000_Ir": 74594002,
+            "difference_Ir": 21638780,
+            "N1000_counters": {
+              "seconds": 0.018721685000400612,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1396475200003806,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": -0.24087378431303375
+        }
+      ],
+      "base_AA_percent": 0.14021735999132368,
+      "head_AA_percent": -0.22248780849716265
+    },
+    "symbol": {
+      "rounds": [
+        {
+          "base": {
+            "N1000_Ir": 53160237,
+            "N10000_Ir": 76057741,
+            "difference_Ir": 22897504,
+            "N1000_counters": {
+              "seconds": 0.01664342799995211,
+              "allocations": 2014,
+              "exit_guard_type_failure": 166,
+              "side_exit_count": 166,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.14735494499973356,
+              "allocations": 20014,
+              "exit_guard_type_failure": 1666,
+              "side_exit_count": 1666,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 55244285,
+            "N10000_Ir": 77756559,
+            "difference_Ir": 22512274,
+            "N1000_counters": {
+              "seconds": 0.01677419199995711,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 332,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1449969840000449,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 3332,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": -1.6824104496280468
+        },
+        {
+          "base": {
+            "N1000_Ir": 53192237,
+            "N10000_Ir": 76090027,
+            "difference_Ir": 22897790,
+            "N1000_counters": {
+              "seconds": 0.01640416300006109,
+              "allocations": 2014,
+              "exit_guard_type_failure": 166,
+              "side_exit_count": 166,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1445290249998834,
+              "allocations": 20014,
+              "exit_guard_type_failure": 1666,
+              "side_exit_count": 1666,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 55234327,
+            "N10000_Ir": 77636873,
+            "difference_Ir": 22402546,
+            "N1000_counters": {
+              "seconds": 0.016817038000226603,
+              "allocations": 2014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 332,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1433196749999297,
+              "allocations": 20014,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 3332,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": -2.162846283418618
+        }
+      ],
+      "base_AA_percent": 0.0012490444373236542,
+      "head_AA_percent": -0.48741411018717873
+    },
+    "integer_string": {
+      "rounds": [
+        {
+          "base": {
+            "N1000_Ir": 53125334,
+            "N10000_Ir": 75741479,
+            "difference_Ir": 22616145,
+            "N1000_counters": {
+              "seconds": 0.01641249299973424,
+              "allocations": 2014,
+              "exit_guard_type_failure": 166,
+              "side_exit_count": 166,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.14945975699993141,
+              "allocations": 20014,
+              "exit_guard_type_failure": 1666,
+              "side_exit_count": 1666,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 56975342,
+            "N10000_Ir": 87584903,
+            "difference_Ir": 30609561,
+            "N1000_counters": {
+              "seconds": 0.022575401999802125,
+              "allocations": 3682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 1668,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.2067214970002169,
+              "allocations": 36682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 16668,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": 35.3438483879547
+        },
+        {
+          "base": {
+            "N1000_Ir": 53159438,
+            "N10000_Ir": 75855637,
+            "difference_Ir": 22696199,
+            "N1000_counters": {
+              "seconds": 0.016304639000281895,
+              "allocations": 2014,
+              "exit_guard_type_failure": 166,
+              "side_exit_count": 166,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.1432538169997315,
+              "allocations": 20014,
+              "exit_guard_type_failure": 1666,
+              "side_exit_count": 1666,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 57003624,
+            "N10000_Ir": 87652053,
+            "difference_Ir": 30648429,
+            "N1000_counters": {
+              "seconds": 0.02259893100017507,
+              "allocations": 3682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 1668,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.22171620300014183,
+              "allocations": 36682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 16668,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": 35.037717108490284
+        }
+      ],
+      "base_AA_percent": 0.3539683708253527,
+      "head_AA_percent": 0.1269799328386334
+    },
+    "module": {
+      "rounds": [
+        {
+          "base": {
+            "N1000_Ir": 55299541,
+            "N10000_Ir": 85999073,
+            "difference_Ir": 30699532,
+            "N1000_counters": {
+              "seconds": 0.021561780999945768,
+              "allocations": 2014,
+              "exit_guard_type_failure": 833,
+              "side_exit_count": 833,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.19451154299986229,
+              "allocations": 20014,
+              "exit_guard_type_failure": 8333,
+              "side_exit_count": 8333,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 58268672,
+            "N10000_Ir": 93011187,
+            "difference_Ir": 34742515,
+            "N1000_counters": {
+              "seconds": 0.025159718999930192,
+              "allocations": 3682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 2000,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.2683511210002507,
+              "allocations": 36682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 20000,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": 13.169526493107453
+        },
+        {
+          "base": {
+            "N1000_Ir": 55271585,
+            "N10000_Ir": 85985767,
+            "difference_Ir": 30714182,
+            "N1000_counters": {
+              "seconds": 0.021865172000161692,
+              "allocations": 2014,
+              "exit_guard_type_failure": 833,
+              "side_exit_count": 833,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.19468229400035852,
+              "allocations": 20014,
+              "exit_guard_type_failure": 8333,
+              "side_exit_count": 8333,
+              "dynamic_send_count": 0,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head": {
+            "N1000_Ir": 58242977,
+            "N10000_Ir": 92899686,
+            "difference_Ir": 34656709,
+            "N1000_counters": {
+              "seconds": 0.0278314520001004,
+              "allocations": 3682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 2000,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            },
+            "N10000_counters": {
+              "seconds": 0.23729817699995692,
+              "allocations": 36682,
+              "exit_guard_type_failure": 0,
+              "side_exit_count": 0,
+              "dynamic_send_count": 20000,
+              "compiled_iseq_count": 0,
+              "invalidation_time_ns": 0,
+              "zjit_alloc_bytes": 0
+            }
+          },
+          "head_vs_base_percent": 12.836177763093293
+        }
+      ],
+      "base_AA_percent": 0.04772059717392807,
+      "head_AA_percent": -0.24697693877371307
+    }
+  }
+}
