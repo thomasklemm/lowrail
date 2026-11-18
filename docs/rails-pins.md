@@ -250,3 +250,30 @@ guards reused generated input, not just initial generation. These guards satisfy
 comment does not. No structural regression, unjustified abstraction, new file over 1,000 lines or additional
 maintainability blocker was found. Every changed documentation sentence was checked against code and executed
 evidence; the opening universal artifact/refusal sentence is the exception identified above.
+
+### Endpoint fix confirm (2026-11-18)
+
+Reviewer: **thermos-sol**, both rubrics applied directly without other threads or reviewers. Commit:
+`53f9b7118eebf5026a3a7788c0cd1cee64c5a492`; scope: the two b96620b3 must-fixes and the opening refusal sentence.
+**Verdict: confirmed for this scope. Must-fixes: none.** No gem code was changed by this confirm.
+
+- **P2 closed.** Each endpoint unit records `Rails.version`; admission compares it before source checks, factory
+  evaluation or wrapper installation. A missing key compares unequal and silently drops that unit. In both isolated
+  homes, `ruby -Igem/lib:gem/test gem/test/endpoint_test.rb --verbose --seed=1729` passes **114 assertions, no
+  failures/errors/skips**. The same current test over archived b96620b3 gem code fails in both homes: the new
+  `release` case expects empty hit/fallback maps but gets one hit per action. Both allowed-release directions
+  are therefore covered, not just the unknown-release allow-list case.
+- Independent fresh-artifact probes in each home pass **33 assertions**: matching release takes two hits;
+  reporting the other allowed release or deleting both release keys takes zero. Removing or mismatching only
+  the first unit's key preserves the second unit's one hit. Every case keeps both HTTP responses, bodies and
+  callback effects identical to the matching control, with empty stderr and no escaped exception.
+- **P3 closed.** The flagged form-test comment is removed, with no replacement narrative comment. The new
+  equality protects the documented cached-build contract in the existing per-unit filter; no helper or extra
+  abstraction is warranted. No correctness/security or structural maintainability blocker remains in this diff.
+
+The opening refusal sentence is now supported for this document's audited Rails-specific admissions: the other
+live Rails-specific artifacts already compare their recorded release, and quarantined delivery refuses before
+admission. Rails-independent memo/Digest/Inertia authority remains as described above; this adds no support claim.
+CI 44341006335 was independently checked: both release jobs succeeded on the exact 53f9b711 head. Full strict gem
+suites were not repeated for this short confirm; the builder's reported 226/224 runs with one Campfire skip each
+are not represented here as an independent full-suite result. `git diff --check` passes.
