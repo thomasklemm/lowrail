@@ -16,7 +16,7 @@ rank: 26
 risky: false
 state: ready
 pr: 59810
-note: "QB1 (docs/upstream/query-building.md#mb1-skip-merging-a-blank-relation-into-a-relation-without-conditions). First head 5dd4ff1529 skipped every merge without values and kept duplicate where/having predicates (both reviews: changes). Final guard also requires a receiver without where/having conditions; differential probes identical to main (ours 352 cases, claude-code 1,477, opus 1,728). Test covers all three guards (null-relation nit applied in ef6f3ff44b, having nit in ee000f1671, test-only). AR suites on 0008bb1b1b (merger.rb identical to the head): sqlite3 10,376 runs 0 F 0 E, postgresql 11,299 runs 0 F 0 E; merging_test on head 45 runs 0 F. Mastodon Callgrind rejected twice for path changes; direct count 10,379 -> 10,359 objects per request"
+note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): body corrected in this item only, not PATCHed (live body unchanged): 386 -> 317 words; the boundary paragraph shortened, the unclear '17 to 22 percent faster without YJIT', the .to_a noise line and the per-page list cut. QB1 (docs/upstream/query-building.md#mb1-skip-merging-a-blank-relation-into-a-relation-without-conditions). First head 5dd4ff1529 skipped every merge without values and kept duplicate where/having predicates (both reviews: changes). Final guard also requires a receiver without where/having conditions; differential probes identical to main (ours 352 cases, claude-code 1,477, opus 1,728). Test covers all three guards (null-relation nit applied in ef6f3ff44b, having nit in ee000f1671, test-only). AR suites on 0008bb1b1b (merger.rb identical to the head): sqlite3 10,376 runs 0 F 0 E, postgresql 11,299 runs 0 F 0 E; merging_test on head 45 runs 0 F. Mastodon Callgrind rejected twice for path changes; direct count 10,379 -> 10,359 objects per request"
 passes:
   - {reviewer: claude-code, head: "5dd4ff1529b9f8f754e8988603d3794f8541af46", orb: T-01a1dc8b-c8a7-72af-bc88-95d050defaed, date: 2026-11-15, verdict: changes, open: "Code fine, exactness claim wrong. Must-fix: (1) public merge not exact: WhereClause#merge (predicates | other.predicates) drops the receiver's duplicate predicates even for an empty other; the early return keeps them (Post.where(title: 'a').where(title: 'a').merge(Post.all), RANDOM() condition twice now runs twice; also merge(blank/unscoped/Comment.all/{}) and having); records identical in every deterministic case, association chains identical; body/commit/record must stop saying 'changes nothing'/'identical in every case'. (2) null-relation guard untested: rake test:sqlite3 passes with it removed; add none.only(:order)/none.except(:where) tests. UnmodifiableRelation change for merge! into loaded/.arel receiver with where (24 cases) acceptable (:nodoc:, main already inconsistent). Probe 1,477 cases (23 receivers x 32 args x merge/merge! + 5), 135 differ: 88+1 dedup, 24 UnmodifiableRelation, 22 private values_for_merge override. sqlite3 10,375 runs 0 F (5 E: sqlite3 CLI, pg gem). Allocations 5/6 per blank merge, chain 33 -> 28 confirmed. ips core 1: interp +20%, YJIT best 159.3k -> 191.7k (+20%); .to_a noise. Body: STI wording, 0.85 to 1.8 percent, mention Fizzy card list, drop or cite 'about half of the merges'. Worth the line (shape of #59572)."}
   - {reviewer: opus, head: "5dd4ff1529b9f8f754e8988603d3794f8541af46", orb: T-01a1dc8b-d1ad-770d-ae97-fb4487370a47, date: 2026-11-15, verdict: changes, open: "Code line fine. Must-fix: (1) blank merge was not a no-op: Array#| in WhereClause#merge deduplicated the receiver's repeated where/having predicates (bind, SQL string, having; merge and merge!); now they stay; rows same, SQL/binds differ; association paths unaffected; body/record wording wrong. (2) no test covers !other.null_relation?: rake test:sqlite3 10,375 runs green without it while Post.all.merge(Post.none.only(:order)) returns every row. (3) YJIT .to_a +7.6% does not reproduce (13,765 -> 13,686, -0.6%, A/A -1.7%); drop. Probe 1,728 cases (27 receivers x 32 args x merge/merge!), 112 differ: 84 dedup, 28 UnmodifiableRelation for merge! into loaded/.arel receiver with where (acceptable, :nodoc:). Tests: sqlite3 10,375 0 F (4 E sqlite3 CLI), merging 44/0/0, relation 59/0/0, hmt 185/0/0; one order-dependent failure reproduces on main (SEED=48538). Allocations 32 -> 27 and 5-6 per merge confirmed. ips core 1 best of 3: interp chain 29,270 -> 34,295 (+17.2%, A/A +0.5%), YJIT 88,766 -> 103,840 (+17.0%, A/A +4.0%), interp .to_a +0.4%. 'About half of merges' unverified. Nits: STI subclasses not blank; mention Fizzy card list -0.44%; mention #59212 overlap. Value: maintainer likely to take it."}
@@ -37,10 +37,9 @@ and the association relation it is merged into has no conditions yet. Merging it
 still goes through every value and merges the where and having clauses, which allocates 5 to 6 objects each time.
 In Fizzy, Lobsters, Mastodon and Campfire, that is 39 to 48 percent of the merges in a request.
 
-This returns early when the other relation has no values and the receiver has no where or having conditions. A
-relation can be null without values (`Post.none.only(:order)`), so a null relation still goes through the merge
-and makes the receiver null. A receiver with conditions also still goes through it, because `WhereClause#merge`
-drops duplicate predicates: `Post.where(id: 1).where(id: 1).merge(Post.all)` keeps one condition.
+This returns early when the other relation has no values and the receiver has no where or having conditions. A null
+relation still goes through the merge, since it can be null without values (`Post.none.only(:order)`), and so
+does a receiver with conditions, because the merge drops duplicate predicates.
 
 ```ruby
 require "bundler/inline"
@@ -87,11 +86,7 @@ before: post.comments.where(approved: true)    123.359k (± 1.8%) i/s    (8.11 �
 after:  post.comments.where(approved: true)    141.771k (± 3.4%) i/s    (7.05 μs/i) -    710.696k in   5.012994s
 ```
 
-Building the chain allocates 32 objects before and 27 after, and without YJIT it is 17 to 22 percent faster. With `.to_a`
-the SQLite query dominates and the difference is within noise.
-
-In full requests of three open-source apps (a card page in Fizzy, a story page in Lobsters, posting a message in
-Campfire), it is 50 to 177 fewer objects and 0.6 to 1.4 percent fewer instructions. Fizzy's card list runs 0.4 percent fewer
-instructions; the Blog and Lobsters list pages, which preload their associations, don't change. With
+Building the chain allocates 32 objects before and 27 after. In full requests of Fizzy, Lobsters and Campfire,
+it is 50 to 177 fewer objects and 0.6 to 1.4 percent fewer instructions. With
 [#59212](https://github.com/rails/rails/pull/59212), an association reader served by the statement cache would no
 longer build its scope; this still covers collection chains, counts and readers that skip the cache.

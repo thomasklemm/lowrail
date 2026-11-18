@@ -16,7 +16,7 @@ rank: 3
 risky: true
 state: ready
 pr: 59661
-note: "opened as draft 2026-11-05; earlier heads c5df553fa3, 860a2c7220, 6331f39542; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test list (in the diff); Ractor shareability note; evidence in docs/upstream/app-suites.md#openproject"
+note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-rails-ruby.md): on current main (046cca206b renamed main's hook to action_dispatch.ractorize) the head adds a second initializer with that name. Candidate thomasklemm/parameter-parsers-register-in-place-lean 58c3765e8a on main 8e097e9d81: the flag, the ObjectSpace walk and &.freeze are gone; DEFAULT_PARSERS.dup on include, an unfrozen writer, and one freeze line in main's existing hook (Rails parses only with ActionDispatch::Request.parameter_parsers); lib +3/-2. Action Pack 4,526 runs 0 F/E; railties ractors_test (RACK=head) 21 runs 0 F/E; RuboCop 4 files clean; no-dup and writer-freeze mutants fail. Needs claude-code and Astra (risky) on the new head; its body is under For Thomas. opened as draft 2026-11-05; earlier heads c5df553fa3, 860a2c7220, 6331f39542; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: test list (in the diff); Ractor shareability note; evidence in docs/upstream/app-suites.md#openproject"
 passes:
   - {reviewer: sol, head: unrecorded, date: 2026-11-05, verdict: changes, open: "two rounds, applied"}
   - {reviewer: astra, head: "c5df553fa3", date: 2026-11-05, verdict: changes, open: "frozen? check, applied"}
@@ -41,3 +41,18 @@ ActionDispatch::Request.parameter_parsers[:jsonapi] = ->(raw) { JSON.parse(raw) 
 Released gems do this from their railtie or engine: [graphiti 2.2.3](https://github.com/graphiti-api/graphiti/blob/1b11959b323cce2d9d8185a9f6c18164c9763eb1/lib/graphiti/rails/railtie.rb#L84), [graphiti-rails 0.4.2](https://github.com/graphiti-api/graphiti-rails/blob/f8031d1f9659825d7a41f73a4650c616085c187c/lib/graphiti/rails/railtie.rb#L75), [jsonapi-rails 0.4.1](https://github.com/jsonapi-rb/jsonapi-rails/blob/75314ad9742e8fe4746e1c8418779d2aacf7d9b8/lib/jsonapi/rails/railtie.rb#L43) and [scimitar 2.15.0](https://github.com/pond/scimitar/blob/a7edc24d208ef4d2316c982c48bd2a5fe4fdcb5d/lib/scimitar/engine.rb#L14), which OpenProject uses, so apps using them don't boot on main.
 
 This restores in-place registration, keeping parsers mutable until `ractorize!`, which then freezes them on every class that includes `ActionDispatch::Http::Parameters`. Parsers assigned or included after that are frozen as before, and `DEFAULT_PARSERS` itself stays frozen. Reading them from another Ractor still requires every parser value to be shareable.
+
+## For Thomas
+
+### Body for the -lean head (2026-11-18, not posted)
+
+Since #57952, the default parameter parsers are [the frozen `DEFAULT_PARSERS` constant](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/http/parameters.rb#L31), and [assigned parsers are frozen too](https://github.com/rails/rails/blob/bdb3d960121e7eb73a61c04099d1eef3c821e397/actionpack/lib/action_dispatch/http/parameters.rb#L45). Running OpenProject's test suite on Rails main, I found that registering a parser in place now raises `FrozenError` while the app boots:
+
+```ruby
+ActionDispatch::Request.parameter_parsers[:jsonapi] = ->(raw) { JSON.parse(raw) }
+# 8.1: registered; main: FrozenError: can't modify frozen Hash
+```
+
+Released gems do this from their railtie or engine: [graphiti 2.2.3](https://github.com/graphiti-api/graphiti/blob/1b11959b323cce2d9d8185a9f6c18164c9763eb1/lib/graphiti/rails/railtie.rb#L84), [graphiti-rails 0.4.2](https://github.com/graphiti-api/graphiti-rails/blob/f8031d1f9659825d7a41f73a4650c616085c187c/lib/graphiti/rails/railtie.rb#L75), [jsonapi-rails 0.4.1](https://github.com/jsonapi-rb/jsonapi-rails/blob/75314ad9742e8fe4746e1c8418779d2aacf7d9b8/lib/jsonapi/rails/railtie.rb#L43) and [scimitar 2.15.0](https://github.com/pond/scimitar/blob/a7edc24d208ef4d2316c982c48bd2a5fe4fdcb5d/lib/scimitar/engine.rb#L14), which OpenProject uses, so apps using them don't boot on main.
+
+This keeps the parsers mutable while the app boots, and the existing `before_ractorize` hook freezes `ActionDispatch::Request.parameter_parsers`, the ones requests are parsed with. `DEFAULT_PARSERS` itself stays frozen, and reading the parsers from another Ractor still requires every parser value to be shareable. Parsers assigned after `ractorize!` and those of other classes that include `ActionDispatch::Http::Parameters`, which no request is parsed with, are no longer frozen.
