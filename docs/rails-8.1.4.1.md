@@ -1,6 +1,10 @@
 # Rails 8.1.4.1 and the 8.1.4-certified passes
 
-Status 2026-11-18: analysis only, nothing built. Rails 8.1.4.1 (2026-11-04) is
+Status 2026-11-18: built. 8.1.4.1 is now certified alongside 8.1.4 through the per-release table in
+[rails-pins.md](rails-pins.md), which also records the `tag_options` audit and the verify results. The analysis
+below is what led to it.
+
+Rails 8.1.4.1 (2026-11-04) is
 the current 8.1 security release. On it, every pass that requires Rails 8.1.4
 exactly refuses (`unsupported_rails_version` and similar). An up-to-date app
 gets the original code everywhere: safe (invariant 1), but those passes then

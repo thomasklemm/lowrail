@@ -10,8 +10,8 @@ module Lowrail
     def build(pass, denied:)
       refusal = ->(reason) { {units: [], files: [], ledger: [{"pass" => pass, "outcome" => reason}]} }
       return refusal.call("denylisted by verify --bisect") if denied.any? { _1["pass"] == pass }
-      return refusal.call("requires production Ruby 4.0.7 / Rails 8.1.4") unless
-        ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+      return refusal.call("requires production Ruby 4.0.7 / an audited Rails") unless
+        ENV["RAILS_ENV"] == "production" && RUBY_VERSION == "4.0.7" && RailsPins.release
       roots = FormScaffoldInventory.source_inventory(gems: pass == TokenTag::PASS ? %w[actionview activesupport] : %w[actionview])
       return refusal.call(roots) if String === roots
       compiled = {}
@@ -45,7 +45,7 @@ module Lowrail
       end
       methods = if pass == TokenTag::PASS
         {"ActionView::Helpers::TagHelper::TagBuilder" => [ActionView::Helpers::TagHelper::TagBuilder, %i[tag_options tag_option]],
-          "String" => [String, %i[to_s html_safe html_safe? gsub include?]], "Hash" => [Hash, %i[merge]], "Symbol" => [Symbol, %i[to_s]]}
+          "String" => [String, %i[to_s html_safe html_safe? gsub include?]], "Hash" => [Hash, %i[merge]], "Symbol" => [Symbol, %i[to_s name]]}
       else
         {"ActionView::CollectionRenderer" => [ActionView::CollectionRenderer, %i[collection_with_template]]}
       end
@@ -63,6 +63,9 @@ module Lowrail
           return refusal.call("custom ERB escaping; keep original") unless fact
           facts << {"holder" => "ERB::Util", "method" => method_name.to_s, "singleton" => true, "body" => fact}
         end
+        fact = FormScaffoldInventory.stock_fact(Symbol.method(:===), roots: roots, compiled: compiled)
+        return refusal.call("custom Symbol.===; keep original") unless fact
+        facts << {"holder" => "Symbol", "method" => "===", "singleton" => true, "body" => fact}
       end
       sources = [__FILE__, File.join(__dir__, "render_units.rb"), File.join(__dir__, "setup.rb"),
         File.join(__dir__, "guard.rb"),

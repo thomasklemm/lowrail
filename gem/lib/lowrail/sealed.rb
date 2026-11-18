@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative "rails_pins"
+
 module Lowrail
   # The first sealed pilot is deliberately narrower than the contract: stock
-  # Rails 8.1.4 blog views, literal link names/classes, and live URL generation.
+  # Rails blog views (an audited RailsPins release), literal link names/classes, and live URL generation.
   # Mutation callbacks trip the existing epoch, not a complete VM barrier:
   # production must still honor SEAL001–009. Test processes refuse delivery.
   module Sealed
@@ -79,7 +81,7 @@ module Lowrail
       def activate
         return decline("production_only; this test runs unoptimized") unless ENV["RAILS_ENV"] == "production" ||
           (defined?(TestCertificate) && TestCertificate.active?)
-        return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+        return decline("unsupported Ruby/Rails") unless RUBY_VERSION == "4.0.7" && RailsPins.release
         return decline("application class differs from certificate") unless Rails.application.class.name == @data.fetch("application_class")
         # Certification may prepare a disposable build process. Admission may
         # only observe the real app. The optional primitive was loaded equally

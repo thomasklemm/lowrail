@@ -3,30 +3,26 @@
 require "json"
 require_relative "manifest"
 require_relative "sealed"
+require_relative "rails_pins"
 
 module Lowrail
   # Build-only closed inventory. Its synthetic schema, translation, view and
   # compiler probes are not a passive observation of a running application.
   # These are audited gem-source pins, not hashes learned from an app's boot.
   module FormScaffoldInventory
-    STOCK = {
-      "actionview" => "b7135e378dc024f779abcf81b6f002e4ffc840fd691a77ea8278803ceddd35fd",
-      "actionpack" => "aa7b3edafe53f19d4a54737b1dc5f84e49af40e08fc694f07bd28fcc7d609844",
-      "activemodel" => "2927864a4658fc82c0d2aac115b7d72521739306ac8b2e2a3ee520d9f3edb39b",
-      "activerecord" => "71e11e0f71594fdfbf318dc2b289c4f6da5f1e5b8daae2a8cc36ff9e5e7d3d6c",
-      "activesupport" => "7b52dc2e11d86c2abe911faf31882990cd783d49e3c5bc54c554130cdcc1a0f7",
-      "i18n" => "5428c85c55a8c7af9a535cbe6f2ada4d96739e168ada02553ddfa917a06c3229"
-    }.freeze
+    I18N = "5428c85c55a8c7af9a535cbe6f2ada4d96739e168ada02553ddfa917a06c3229"
 
     module_function
 
     # Shared build-only audit. Render units do not assume a model, locale,
     # constructor, route, form builder or template merely to use stock Rails.
-    def source_inventory(gems: STOCK.keys)
+    def source_inventory(gems: %w[actionview actionpack activemodel activerecord activesupport i18n])
       return "source inventory released; restart to recertify" if @released
+      stock = RailsPins.release&.fetch("gems")&.merge("i18n" => I18N)
+      return "unaudited Rails #{Rails.version}" unless stock
       roots = gems.to_h { |name| [name, Gem.loaded_specs.fetch(name).full_gem_path] }
       gems.each do |name|
-        expected = STOCK.fetch(name)
+        expected = stock.fetch(name)
         root = roots.fetch(name)
         files = Dir[File.join(root, "lib/**/*.rb")].sort.to_h { [_1.delete_prefix(root + "/"), Manifest.sha256_file(_1)] }
         return "non-stock #{name} source inventory" unless Digest::SHA256.hexdigest(JSON.generate(files)) == expected
@@ -40,8 +36,8 @@ module Lowrail
       # such a certificate exists, exact-or-refuse means the original form.
       return "form certification requires runtime controller/view/I18n/ERB effects; passive activation unavailable; keep original" if runtime
       return "source inventory released; restart to recertify" if @released
-      return "requires production Ruby 4.0.7 / Rails 8.1.4 blog" unless (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) &&
-        RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+      return "requires production Ruby 4.0.7 / an audited Rails blog" unless (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) &&
+        RUBY_VERSION == "4.0.7" && RailsPins.release
       return "eager-loaded targets required; keep lazy applications original" unless (verification_test || Rails.application.config.eager_load) &&
         %w[Article Comment ArticlesController].all? { Lowrail.loaded_constant(_1) }
       roots = source_inventory
@@ -160,7 +156,7 @@ module Lowrail
       end
       {Comment => %i[model_name human_attribute_name lookup_ancestors i18n_scope],
         Article => %i[model_name human_attribute_name lookup_ancestors i18n_scope],
-        I18n => %i[t translate], tags::TextField => %i[field_type],
+        I18n => %i[t translate], Symbol => %i[===], tags::TextField => %i[field_type],
         ActionView::Base => %i[default_form_builder automatically_disable_submit_tag],
         ERB::Util => %i[unwrapped_html_escape xml_name_escape],
         polymorphic => %i[polymorphic_method get build plural new]}.each do |type, names|

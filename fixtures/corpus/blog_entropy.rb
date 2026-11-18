@@ -25,15 +25,21 @@ module BlogProduction
       File.join(root, file)
     end
 
+    def self.release(app, policy)
+      lock = Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest
+      policy.fetch("rails").values.find { _1.fetch("lock_sha256") == lock }
+    end
+
     def self.validate(app, policy: JSON.parse(File.read(POLICY)))
+      release = self.release(app, policy)
       reason = if policy.fetch("app_source_sha256") != source_pin(app)
         "app source pin mismatch"
-      elsif policy.fetch("lock_sha256") != Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest
+      elsif !release
         "lockfile pin mismatch"
       elsif policy.fetch("ruby_version") != RUBY_VERSION
         "Ruby version pin mismatch"
       else
-        policy.fetch("runtime_sources").find { |key, digest| Digest::SHA256.file(source_path(key)).hexdigest != digest }&.then { |key, _| "runtime source pin mismatch: #{key}" }
+        policy.fetch("runtime_sources").merge(release.fetch("runtime_sources")).find { |key, digest| Digest::SHA256.file(source_path(key)).hexdigest != digest }&.then { |key, _| "runtime source pin mismatch: #{key}" }
       end
       {"active" => reason.nil?, "reason" => reason, "policy" => policy}
     rescue KeyError, Errno::ENOENT, Gem::LoadError => error

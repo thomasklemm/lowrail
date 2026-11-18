@@ -17,8 +17,15 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # Lowrail::RailsPins releases; each job's gem home holds only that Rails.
+        rails: ["8.1.4", "8.1.4.1"]
+    name: test (Rails ${{ matrix.rails }})
     env:
       GEM_HOME: /home/runner/gems
+      LOWRAIL_RAILS: ${{ matrix.rails }}
       # A missing prerequisite fails instead of skipping; tests that need what CI lacks are excluded by name below.
       LOWRAIL_STRICT_GATES: "1"
     steps:
@@ -32,12 +39,13 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: /home/runner/gems
-          key: gems-${{ runner.os }}-ruby-4.0.7-${{ hashFiles('script/gate-gems') }}
+          key: gems-${{ runner.os }}-ruby-4.0.7-rails-${{ matrix.rails }}-${{ hashFiles('script/gate-gems') }}
       - name: Gems (script/gate-gems, the gate's gem set)
         run: |
           echo "$GEM_HOME/bin" >> "$GITHUB_PATH"
           ruby script/gate-gems
       - name: Rust tests
+        if: matrix.rails == '8.1.4'
         run: cargo test --locked
       - name: Gem tests
         working-directory: gem

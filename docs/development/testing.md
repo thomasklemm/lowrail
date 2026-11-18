@@ -199,7 +199,10 @@ This fetches the pinned Roundhouse generator, generates a Rails 8.1.4 blog,
 installs its bundle and prepares its database. In the prepared orb it took
 about **28 seconds**, so its absence is not an expensive-setup exemption.
 The generated Gemfile pins
-`gem "rails", "8.1.4"` exactly, because the passes are certified against 8.1.4.
+`gem "rails"` to one exact audited release (`LOWRAIL_RAILS`, default 8.1.4), because the passes are certified per
+release ([rails-pins.md](../rails-pins.md)). `script/gate` prepares one gem home and one corpus per release in
+`Lowrail::RailsPins` (8.1.4.1 under `.lowrail/gate-gems/…-rails-8.1.4.1` and `.corpus/rails-8.1.4.1/`) and runs
+the gem suite in each.
 
 Blogs generated before that pin say `"~> 8.1.4"`, so their bundles installed
 Rails 8.1.4.1 into the gate's gem home. Unbundled fixtures then load 8.1.4.1,

@@ -15,6 +15,8 @@ module LowrailTest
   COMPILE = File.join(GEM_ROOT, "exe", "lowrail-compile")
   CORPUS_ROOT = File.expand_path(ENV.fetch("LOWRAIL_TEST_CORPUS_ROOT", "../../.corpus"), __dir__)
   RUBY = RbConfig.ruby
+  # The audited Rails release the gem home holds (script/gate-gems).
+  RAILS = ENV.fetch("LOWRAIL_RAILS", "8.1.4")
   SETUP_OPT = "-I#{GEM_LIB} -rlowrail/setup"
   # Variables a developer's shell might carry into the subprocesses.
   CLEAN_ENV = %w[LOWRAIL LOWRAIL_ROOT LOWRAIL_DIR LOWRAIL_STATS LOWRAIL_OUTCOMES LOWRAIL_DEBUG LOWRAIL_JIT_DIAGNOSTICS RUBYOPT

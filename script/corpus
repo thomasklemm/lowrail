@@ -36,6 +36,8 @@ dest="$root/.corpus/$dirname"
 mkdir -p "$root/.corpus"
 # Census pin; script/gate passes the lowering prototype's 4.0.7.
 ruby_version=${LOWRAIL_CORPUS_RUBY:-4.0.9}
+# An audited release from Lowrail::RailsPins for the two blogs; use a DIRNAME per release.
+rails=${LOWRAIL_RAILS:-8.1.4}
 mise=$(command -v mise || true)
 mise=${mise:-$HOME/.local/bin/mise}
 if [ -n "${CORPUS_RUBY_BIN:-}" ]; then
@@ -55,12 +57,15 @@ case "$name" in
     if [ ! -d "$dest" ]; then
       mkdir -p "$dest"
       tar -xzf "$archive" -C "$dest" --strip-components=1 real-blog-r4
+      lock=$(ruby -rjson -e 'print JSON.parse(File.read(ARGV[0])).fetch("rails").fetch(ARGV[1]).fetch("lock", "")' \
+        "$root/fixtures/corpus/blog-entropy-controls.json" "$rails")
+      if [ -n "$lock" ]; then cp "$root/$lock" "$dest/Gemfile.lock"; fi
     fi
-    ruby -r"$root/fixtures/corpus/blog_entropy" - "$dest" <<'RUBY'
-app = ARGV.fetch(0)
+    ruby -r"$root/fixtures/corpus/blog_entropy" - "$dest" "$rails" <<'RUBY'
+app, rails = ARGV
 policy = JSON.parse(File.read(BlogProduction::Entropy::POLICY))
 unless BlogProduction::Entropy.source_pin(app) == policy.fetch("app_source_sha256") &&
-    Digest::SHA256.file(File.join(app, "Gemfile.lock")).hexdigest == policy.fetch("lock_sha256")
+    BlogProduction::Entropy.release(app, policy) == policy.fetch("rails").fetch(rails)
   abort "retained blog source/lock mismatch; preserve this directory and use a new DIRNAME"
 end
 RUBY
@@ -210,14 +215,14 @@ if [ ! -d "$dest" ]; then
   if [ "$name" = real-blog ]; then
     # real-blog is generated, not checked in: Roundhouse's create-blog runs
     # `rails new` plus scaffolds against the pinned Rails version.
-    # The passes are certified against Rails 8.1.4 exactly. `rails new` writes "~> 8.1.4" and bundles at once,
+    # The passes are certified per exact Rails release. `rails new` writes "~> 8.1.4" and bundles at once,
     # installing the newest 8.1.4.x into the gem home, so a template (applied before that bundle) pins the line.
     railsrc="$tmp/xdg"
     mkdir -p "$railsrc/rails"
-    echo "gsub_file 'Gemfile', /^gem \"rails\", .*\$/, 'gem \"rails\", \"8.1.4\"'" > "$railsrc/pin-rails.rb"
+    echo "gsub_file 'Gemfile', /^gem \"rails\", .*\$/, 'gem \"rails\", \"$rails\"'" > "$railsrc/pin-rails.rb"
     echo "--template=$railsrc/pin-rails.rb" > "$railsrc/rails/railsrc"
-    XDG_CONFIG_HOME="$railsrc" RAILS_NEW_VERSION=8.1.4 "$tmp/scripts/create-blog" "$dest" >/dev/null
-    grep -qx 'gem "rails", "8.1.4"' "$dest/Gemfile" || { echo "real-blog Gemfile does not pin rails 8.1.4" >&2; exit 1; }
+    XDG_CONFIG_HOME="$railsrc" RAILS_NEW_VERSION=$rails "$tmp/scripts/create-blog" "$dest" >/dev/null
+    grep -qx "gem \"rails\", \"$rails\"" "$dest/Gemfile" || { echo "real-blog Gemfile does not pin rails $rails" >&2; exit 1; }
     if ! "$source_only"; then
       (cd "$dest" && bin/rails db:prepare >/dev/null)
     fi

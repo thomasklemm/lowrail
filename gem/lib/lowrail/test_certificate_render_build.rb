@@ -41,7 +41,7 @@ module Lowrail
           "Hash" => [Hash, %i[merge each_pair empty? blank? [] []= default default_proc key? size]],
           "String" => [String, %i[to_s html_safe html_safe? gsub include? empty? blank? match? nil? <<]],
           "NilClass" => [NilClass, %i[nil? == !=]],
-          "Symbol" => [Symbol, %i[to_s blank? empty? nil?]], "Regexp" => [Regexp, %i[match?]]}
+          "Symbol" => [Symbol, %i[to_s name blank? empty? nil?]], "Regexp" => [Regexp, %i[match?]]}
       else
         {"ActionView::CollectionRenderer" => [context.fetch(:type), %i[collection_with_template]]}
       end
@@ -50,7 +50,7 @@ module Lowrail
       end
       if pass == TokenTag::PASS
         %i[unwrapped_html_escape xml_name_escape].each { facts << audit(ERB::Util, "ERB::Util", _1, singleton: true) }
-        [Array, Hash, Regexp].each { facts << audit(_1, _1.name, :===, singleton: true) }
+        [Array, Hash, Regexp, Symbol].each { facts << audit(_1, _1.name, :===, singleton: true) }
       end
       observer = pass == TokenTag::PASS ? TokenTag::Variant.instance_method(:token_tag) :
         CollectionRender::Variant.instance_method(:collection_with_template)

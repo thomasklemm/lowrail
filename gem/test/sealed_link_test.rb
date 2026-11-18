@@ -30,7 +30,7 @@ class SealedLinkTest < Minitest::Test
     missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
-        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\ngem 'bootsnap'\n",
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '#{RAILS}'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\ngem 'bootsnap'\n",
         "Gemfile.lock" => "",
         "config/environment.rb" => "require_relative 'application'\nRails.application.initialize!\n",
         "config/application.rb" => <<~'RUBY',

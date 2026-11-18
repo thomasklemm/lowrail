@@ -42,7 +42,7 @@ module AREquivalence
   end
 
   def self.schema
-    gem "activerecord", ENV.fetch("AR_EQ_RAILS", "8.1.4")
+    gem "activerecord", ENV.fetch("AR_EQ_RAILS", ENV.fetch("LOWRAIL_RAILS", "8.1.4"))
     require "active_record"
     require_relative "ar_equivalence_runtime"
     Object.const_set(:Rails, Module.new) unless defined?(Rails)

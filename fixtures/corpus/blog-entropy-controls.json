@@ -1,7 +1,31 @@
 {
   "format": 1,
   "app_source_sha256": "86ebd4a8c0b4acd8ecb302f81ee61e593bc2288ea8a44cb532c00c43a2c5f1cf",
-  "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+  "rails": {
+    "8.1.4": {
+      "lock_sha256": "570c9c31129469dc2679780a9f7f7d26aca93e57e4e119250735322741ac8596",
+      "runtime_sources": {
+        "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "a9fe0df38a05ce2ee4486c801ce78719afe239abf66b01a388c61c27ed1f6b4d",
+        "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
+        "actionpack:lib/action_dispatch/middleware/cookies.rb": "9db3611f9911521c8f3959b38d0e2025697f9449e7bb8555c0e7b9d70e5333ea",
+        "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61",
+        "activejob:lib/active_job/core.rb": "b740be56b9be48c76b1e8d65bdc44cef4341d0d596246fac0691da71f6fe35e1",
+        "actionpack:lib/action_dispatch/middleware/flash.rb": "310b093336210f80a0cd369f9070281408c9ab9cdf14dc54ec33f36b58860553"
+      }
+    },
+    "8.1.4.1": {
+      "lock": "fixtures/corpus/real-blog-r4-rails-8.1.4.1.Gemfile.lock",
+      "lock_sha256": "2f705f9c398704a6d72002dd2bbd7455165a80863b40b9073378f1f545d3d153",
+      "runtime_sources": {
+        "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "44d4ec1005ea4f2e9abd5be992bc1aa342d4ac29f787f26ccc79bd804784e46d",
+        "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
+        "actionpack:lib/action_dispatch/middleware/cookies.rb": "bc2b700841a3b2e2349aeba2aa26f00be639333981c77b737d6cefba3faf9abf",
+        "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61",
+        "activejob:lib/active_job/core.rb": "b740be56b9be48c76b1e8d65bdc44cef4341d0d596246fac0691da71f6fe35e1",
+        "actionpack:lib/action_dispatch/middleware/flash.rb": "310b093336210f80a0cd369f9070281408c9ab9cdf14dc54ec33f36b58860553"
+      }
+    }
+  },
   "ruby_version": "4.0.7",
   "seeds": [0, 1],
   "evidence": "docs/sealed-verification.md#declared-blog-entropy-companions",
@@ -21,13 +45,7 @@
     "ruby:openssl/cipher.rb": "087436098382bbe93b90cacad6b33b7ed63acf7c7014bdfe89b0d515c1e0259b",
     "securerandom:lib/securerandom.rb": "2a99f878e3cf2d92b88dad1512c9c86272ca8679af9a8a1d5790f7c37a9d40a4",
     "rack:lib/rack/runtime.rb": "c07bc0de1850728c77b2e5436c930abdfc3b0decb036a27dc7d77a58c28122bf",
-    "rack:lib/rack/utils.rb": "82ab7360295a67ebfe3a9dd0502eba3377dc453bf2b9bf778f5dd2a6bd4db18e",
-    "actionpack:lib/action_dispatch/middleware/session/abstract_store.rb": "a9fe0df38a05ce2ee4486c801ce78719afe239abf66b01a388c61c27ed1f6b4d",
-    "actionpack:lib/action_controller/metal/request_forgery_protection.rb": "01af4e9a30bc81f78ead041c27f8571c9f01a68f94d6c9450abd2e594209d051",
-    "actionpack:lib/action_dispatch/middleware/cookies.rb": "9db3611f9911521c8f3959b38d0e2025697f9449e7bb8555c0e7b9d70e5333ea",
-    "activesupport:lib/active_support/message_encryptor.rb": "f23ae37f44fa36b9cbc8f189a4d5e0d753b1b0a99e3bf76b835b804739935d61",
-    "activejob:lib/active_job/core.rb": "b740be56b9be48c76b1e8d65bdc44cef4341d0d596246fac0691da71f6fe35e1",
-    "actionpack:lib/action_dispatch/middleware/flash.rb": "310b093336210f80a0cd369f9070281408c9ab9cdf14dc54ec33f36b58860553"
+    "rack:lib/rack/utils.rb": "82ab7360295a67ebfe3a9dd0502eba3377dc453bf2b9bf778f5dd2a6bd4db18e"
   },
   "random_sites": [
     {"name": "csrf_token", "provider": "SecureRandom", "source": "actionpack:lib/action_controller/metal/request_forgery_protection.rb", "method": "generate_csrf_token", "bytes": 32},

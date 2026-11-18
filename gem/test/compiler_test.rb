@@ -12,7 +12,7 @@ class CompilerTest < Minitest::Test
     missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
-        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '#{RAILS}'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
         # Keep ephemeral framework classes alive in both fact censuses. This
         # fixture compares ALL facts, not GC-dependent ObjectSpace survivors.
         "config/environment.rb" => "GC.disable\n" + LowrailTest::RAILS_APP.fetch("config/environment.rb"),
@@ -56,7 +56,7 @@ class CompilerTest < Minitest::Test
     missing_prerequisite "install Prism 1.4.0 for the locked-bundle regression" if Gem::Specification.find_all_by_name("prism", "1.4.0").empty?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
-        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'minitest', '5.27.0'\ngem 'prism', '1.4.0'\n",
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '#{RAILS}'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'minitest', '5.27.0'\ngem 'prism', '1.4.0'\n",
         "config/database.yml" => "production:\n  adapter: sqlite3\n  database: ':memory:'\n")
       out, err, status = Open3.capture3(CLEAN_ENV, "bundle", "lock", "--local", chdir: dir)
       assert status.success?, "fixture lock failed:\n#{out}\n#{err}"

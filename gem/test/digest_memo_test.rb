@@ -16,6 +16,8 @@ class DigestMemoTest < Minitest::Test
       Dir.children(fixture).reject { %w[.lowrail log tmp Gemfile.lock].include?(_1) }.each do |name|
         FileUtils.cp_r(File.join(fixture, name), dir)
       end
+      gemfile = File.join(dir, "Gemfile")
+      File.write(gemfile, File.read(gemfile).sub('gem "rails", "8.1.4"', "gem \"rails\", \"#{RAILS}\""))
       out, err, status = Open3.capture3(CLEAN_ENV, "bundle", "lock", "--local", chdir: dir)
       assert status.success?, "#{err}\n#{out}"
       out, err, status = Open3.capture3(CLEAN_ENV, binary, "build", dir)

@@ -4,22 +4,13 @@ require_relative "prism_grammar"
 require_relative "manifest"
 require_relative "sealed"
 require_relative "templates"
+require_relative "rails_pins"
 
 module Lowrail
   module SealedBuild
     PASS = Sealed::PASS
     VIEW = %w[link_to convert_options_to_data_attributes url_target content_tag ensure_valid_html5_tag_name tag_builder].freeze
     BUILDER = %w[initialize content_tag_string tag_options tag_option].freeze
-    # Independent Rails v8.1.4 source pins, not digests learned from the app's
-    # potentially modified boot. Effective bodies must match these files too.
-    STOCK = {
-      "action_view/helpers/tag_helper.rb" => "7bca8efe1bd2421c5e65671aabdf35c97831ab0cb2cbdcdb5dd317d22aa16c31",
-      "action_view/helpers/url_helper.rb" => "ebdccd38cf87f6f83d758ba424df61d72c8033629f0e70a8ddb21b7b8ed086ee",
-      "action_controller/metal.rb" => "c8559e0a0c9e40ac9a29a4ae01de7c9aab7c438e1af751368e10e3802024cb36",
-      "active_support/core_ext/object/blank.rb" => "203eefc5b094f4a0f5bf68b4c34198891127f52ed7825e146c2fa089a46f8ec7",
-      "active_support/core_ext/erb/util.rb" => "1e348e9c8840caa9942691a290e0424c1755256b03a90eb96a094bbf86ff368f",
-      "active_support/core_ext/string/output_safety.rb" => "8d8c461dbcd14db6b894671a1ec53b03c39637a67c27222e7d22bbe3c2f411d6"
-    }.freeze
 
     class Calls < Prism::Visitor
       attr_reader :calls
@@ -41,7 +32,8 @@ module Lowrail
 
     def stock?(method)
       path = method.source_location&.first
-      pin = STOCK.find { |suffix, _| path&.end_with?("/lib/#{suffix}") }&.last
+      # Independent pins, not digests learned from the app's possibly modified boot.
+      pin = RailsPins.release&.fetch("files")&.find { |suffix, _| path&.end_with?("/lib/#{suffix}") }&.last
       pin && Digest::SHA256.file(path).hexdigest == pin &&
         Sealed.signature(method) == edited_signature(method, File.read(path))
     end
@@ -49,8 +41,8 @@ module Lowrail
     def build(denied: [], verification_test: false)
       ledger = []
       refuse = ->(reason) { {units: [], files: [], ledger: [{"pass" => PASS, "method" => "ArticlesController", "outcome" => reason}]} }
-      return refuse.call("sealed pilot requires production Ruby 4.0.7 / Rails 8.1.4 blog") unless
-        (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) && RUBY_VERSION == "4.0.7" && Rails.version == "8.1.4"
+      return refuse.call("sealed pilot requires production Ruby 4.0.7 / an audited Rails blog") unless
+        (ENV["RAILS_ENV"] == "production" || (verification_test && ENV["RAILS_ENV"] == "test")) && RUBY_VERSION == "4.0.7" && RailsPins.release
       if verification_test
         return refuse.call("verification helper holders not naturally available") unless
           %w[ArticlesController ActionView::Helpers::TagHelper::TagBuilder ActionView::Helpers::UrlHelper ERB::Util].all? { Lowrail.loaded_constant(_1) }
@@ -91,13 +83,13 @@ module Lowrail
       # The source literals are folded, not arbitrary strings. Reject Ruby
       # primitive overrides at boot instead of treating their effects as pure.
       primitives = {String => %i[to_s empty? size == match? include? gsub],
-        Hash => %i[each_pair empty? blank? [] size], Regexp => %i[match?]}
+        Hash => %i[each_pair empty? blank? [] size], Regexp => %i[match?], Symbol => %i[name]}
       return refuse.call("custom native primitive") unless primitives.all? do |holder, names|
         names.all? do |name|
           method = holder.instance_method(name)
           method.owner.equal?(holder) && method.source_location.nil? && Sealed.visibility(holder, name) == "public"
         end
-      end
+      end && Symbol.method(:===).owner.equal?(Module) && Symbol.method(:===).source_location.nil?
       ruby_primitives = [String.instance_method(:blank?), String.instance_method(:present?),
         String.instance_method(:html_safe?),
         ERB::Util.method(:xml_name_escape), ERB::Util.method(:unwrapped_html_escape)]
@@ -106,6 +98,7 @@ module Lowrail
       primitive_methods = primitives.flat_map do |holder, names|
         names.map { {"holder" => holder.name, "method" => _1.to_s, "signature" => Sealed.signature(holder.instance_method(_1))} }
       end
+      primitive_methods << {"holder" => "Symbol", "singleton" => true, "method" => "===", "signature" => Sealed.signature(Symbol.method(:===))}
       primitive_methods << {"holder" => "Lowrail::Native", "singleton" => true,
         "method" => "exact_class?", "signature" => Sealed.signature(exact_class)}
       ruby_primitives.each do |method|

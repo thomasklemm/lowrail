@@ -4,6 +4,7 @@ require "digest"
 require_relative "prism_grammar"
 require_relative "manifest"
 require_relative "endpoint"
+require_relative "rails_pins"
 
 module Lowrail
   # First endpoint slice: specialize the no-block link_to body inside Rails'
@@ -33,7 +34,7 @@ module Lowrail
 
     def build(denied: [])
       ledger, units = [], []
-      reason = if Rails.version != "8.1.4"
+      reason = if !RailsPins.release
         "unsupported_rails_version"
       elsif Rails.application.class.name != "RealBlogR4::Application"
         "unsupported_application"

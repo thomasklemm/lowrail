@@ -3,10 +3,12 @@
 
 # Installs the gem set the gem suite expects into the current gem home: script/gate runs it in its private
 # home, CI in the runner's. Corpus apps and the Rails checkout are separate (script/corpus, script/rails-suite).
+# LOWRAIL_RAILS picks one release from Lowrail::RailsPins; a home holds exactly one.
 require "rubygems/dependency_installer"
 
+rails = ENV.fetch("LOWRAIL_RAILS", "8.1.4")
 dependencies = {
-  "rails" => "8.1.4", "rake" => ">= 13", "minitest" => "6.0.6",
+  "rails" => rails, "rake" => ">= 13", "minitest" => "6.0.6",
   "sqlite3" => ">= 2.1", "bcrypt" => ">= 0", "require-hooks" => ">= 0",
   "freezolite" => ">= 0", "rspec" => ">= 0", "stackprof" => "0.2.28",
   "bootsnap" => "1.26.0", "sorbet-runtime" => "0.5.12435",
@@ -29,5 +31,7 @@ Gem::Specification.each do |spec|
   next if spec.executables.all? { File.executable?(File.join(Gem.bindir, _1)) }
   Gem::Installer.for_spec(spec, wrappers: true).generate_bin
 end
+# Unbundled fixtures load the newest installed Rails.
+abort "Rails other than #{rails} in the gem home" if Gem::Specification.find_all_by_name("railties").any? { _1.version.to_s != rails }
 abort "Rack 2 leaked into the gem home" if Gem::Specification.find_all_by_name("rack", "< 3").any? ||
   Gem::Specification.find_all_by_name("rack-session", "< 2").any?

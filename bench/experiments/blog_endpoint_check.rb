@@ -60,7 +60,8 @@ require "rack/mock"
 Rails.application.eager_load!
 Rails.logger.level = :error
 ActiveRecord::Base.logger = nil
-raise "wrong app" unless Rails.version == "8.1.4" && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
+require_relative "../../gem/lib/lowrail/rails_pins"
+raise "wrong app" unless Lowrail::RailsPins.release && Rails.root.realpath.to_s == File.realpath(Dir.pwd)
 if ENV["LOWRAIL_FORM_CHECK"]
   expected_jit = ENV.fetch("BENCH_JIT", "interpreter")
   yjit = RubyVM::YJIT.enabled?

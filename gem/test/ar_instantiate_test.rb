@@ -8,7 +8,7 @@ class ARInstantiateTest < Minitest::Test
   SCENARIO = <<~'RUBY'
     ENV["RAILS_ENV"] = "production"
     ENV["LOWRAIL_SEALED"] = "1"
-    gem "activerecord", "8.1.4"
+    gem "activerecord", ENV.fetch("LOWRAIL_RAILS", "8.1.4")
     require "active_record"
     require "lowrail"
     require "lowrail/manifest"

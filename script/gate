@@ -33,14 +33,14 @@ if $PROGRAM_NAME == __FILE__
   env = { "MT_CPU" => receipt[:mt_cpu], "LOWRAIL_STRICT_GATES" => "1",
     "RUBYOPT" => nil, "BUNDLE_GEMFILE" => nil, "RAILS_ENV" => nil, "RACK_ENV" => nil }
   save = -> { File.write("#{out}/receipt.json", JSON.pretty_generate(receipt) + "\n") }
-  run = lambda do |name, command, directory = root, suite = false|
+  run = lambda do |name, command, directory = root, suite = false, extra = {}|
     log = "#{out}/#{name}.log"
     report = "#{out}/#{name}.json"
     step = { name: name, command: command, directory: directory, log: log }
     receipt[:steps] << step
     puts "== #{name}: #{step[:command]} =="
     $stdout.flush
-    child_env = env.merge(suite ? { "LOWRAIL_GATE_REPORT" => report, "RUBYOPT" => "-r#{__dir__}/gate_reporter.rb" } : {})
+    child_env = env.merge(extra, suite ? { "LOWRAIL_GATE_REPORT" => report, "RUBYOPT" => "-r#{__dir__}/gate_reporter.rb" } : {})
     begin
       File.open(log, "w") do |file|
         Open3.popen2e(child_env, *command, chdir: directory) do |input, output, waiter|
@@ -66,11 +66,7 @@ if $PROGRAM_NAME == __FILE__
     step[:status] == "passed"
   end
 
-  # Physical, per-build copy: never remove Rack 2 from somebody else's home.
-  home = "#{root}/.lowrail/gate-gems/#{RUBY_VERSION}-#{RbConfig::CONFIG.fetch('arch')}-#{RUBY_REVISION}"
-  env.merge!("GEM_HOME" => home, "GEM_PATH" => home, "PATH" => "#{home}/bin:#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}")
-  receipt[:gem_home] = home
-  unless File.directory?(home)
+  prepare_home = lambda do |home|
     FileUtils.mkdir_p(File.dirname(home))
     Dir.mktmpdir("copy-", File.dirname(home)) do |copy|
       staged = File.join(copy, "home")
@@ -83,16 +79,40 @@ if $PROGRAM_NAME == __FILE__
       File.rename(staged, home)
     end
   end
-  %w[gems specifications].each do |component|
-    Dir["#{home}/#{component}/rack-2.*", "#{home}/#{component}/rack-session-1.*"].each { FileUtils.rm_rf(_1) }
+  # One physical, per-build home per audited Rails release (unbundled fixtures load the newest installed Rails);
+  # never remove Rack 2 from somebody else's home. The first release also runs the bench suites and Rust.
+  require_relative "../gem/lib/lowrail/rails_pins"
+  primary = "#{root}/.lowrail/gate-gems/#{RUBY_VERSION}-#{RbConfig::CONFIG.fetch('arch')}-#{RUBY_REVISION}"
+  releases = Lowrail::RailsPins::RELEASES.keys.to_h do |rails|
+    home = rails == "8.1.4" ? primary : "#{primary}-rails-#{rails}"
+    corpus = rails == "8.1.4" ? "#{root}/.corpus" : "#{root}/.corpus/rails-#{rails}"
+    [rails, {home: home, suffix: rails == "8.1.4" ? "" : "-#{rails}", corpus: corpus,
+      env: {"GEM_HOME" => home, "GEM_PATH" => home, "PATH" => "#{home}/bin:#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}",
+        "LOWRAIL_RAILS" => rails, "LOWRAIL_TEST_CORPUS_ROOT" => corpus}}]
   end
-  run.call("gems", [RbConfig.ruby, "script/gate-gems"])
-  %w[real-blog real-blog-r4].each { run.call("prepare-#{_1}", ["env", "LOWRAIL_CORPUS_RUBY=4.0.7", "bash", "script/corpus", _1]) }
+  env.merge!(releases.fetch("8.1.4").fetch(:env))
+  receipt[:gem_homes] = releases.transform_values { _1.fetch(:home) }
+  releases.each do |rails, release|
+    home = release.fetch(:home)
+    prepare_home.call(home) unless File.directory?(home)
+    %w[gems specifications].each do |component|
+      Dir["#{home}/#{component}/rack-2.*", "#{home}/#{component}/rack-session-1.*"].each { FileUtils.rm_rf(_1) }
+    end
+    run.call("gems#{release[:suffix]}", [RbConfig.ruby, "script/gate-gems"], root, false, release.fetch(:env))
+    %w[real-blog real-blog-r4].each do |app|
+      dirname = rails == "8.1.4" ? app : "rails-#{rails}/#{app}"
+      run.call("prepare-#{app}#{release[:suffix]}", ["env", "LOWRAIL_CORPUS_RUBY=4.0.7", "bash", "script/corpus", app, dirname], root, false, release.fetch(:env))
+    end
+  end
   run.call("prepare-rails", [RbConfig.ruby, "script/rails-suite", "--prepare"])
   unless options[:prepare]
     run.call("valgrind", ["valgrind", "--version"])
     run.call("build", %w[cargo build --locked])
-    run.call("gem", [RbConfig.ruby, "-S", "rake", "test", "TESTOPTS=--verbose --seed=1729"], "#{root}/gem", true)
+    releases.each_value do |release|
+      # The Rails-checkout tests run that checkout's own suite and bundle, which only the 8.1.4 home holds.
+      exclude = release[:suffix].empty? ? "" : " --exclude='/RailsSuiteReportTest#test_(separate_build|profiling)_/'"
+      run.call("gem#{release[:suffix]}", [RbConfig.ruby, "-S", "rake", "test", "TESTOPTS=--verbose --seed=1729#{exclude}"], "#{root}/gem", true, release.fetch(:env))
+    end
     %w[ar_diagnostics callback_survey pass profile_summary rails_drift request_pairs screen].each do |name|
       run.call("bench-#{name}", [RbConfig.ruby, "bench/#{name}_test.rb", "--verbose", "--seed=1729"], root, true)
     end

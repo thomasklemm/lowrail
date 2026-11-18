@@ -301,7 +301,8 @@ class BlogProductionTest < Minitest::Test
       lock = File.join(app, "Gemfile.lock")
       File.write(lock, "pinned lock")
       policy = {"app_source_sha256" => BlogProduction::Entropy.source_pin(app),
-        "lock_sha256" => Digest::SHA256.file(lock).hexdigest, "ruby_version" => RUBY_VERSION, "runtime_sources" => {}}
+        "rails" => {"8.1.4" => {"lock_sha256" => Digest::SHA256.file(lock).hexdigest, "runtime_sources" => {}}},
+        "ruby_version" => RUBY_VERSION, "runtime_sources" => {}}
       assert BlogProduction::Entropy.validate(app, policy: policy).fetch("active")
       File.write(lock, "new lock")
       report = BlogProduction::Entropy.validate(app, policy: policy)

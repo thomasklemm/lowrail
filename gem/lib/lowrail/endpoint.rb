@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "rails_pins"
+
 module Lowrail
   # An incremental endpoint pilot, NOT the hand-written ceiling specimen.
   # Rails runs process, callbacks, actions, renderers and events exactly once.
@@ -46,7 +48,7 @@ module Lowrail
       def activate
         require "digest"
         @entries = {}
-        return unless Rails.version == "8.1.4" && Rails.application.class.name == "RealBlogR4::Application"
+        return unless RailsPins.release && Rails.application.class.name == "RealBlogR4::Application"
         @units.group_by { _1.fetch("endpoint").fetch("controller") }.each do |name, units|
           klass = Lowrail.loaded_constant(name)
           valid = units.select do |unit|

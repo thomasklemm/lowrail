@@ -58,7 +58,7 @@ class ViewTest < Minitest::Test
     missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir,
-        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '#{RAILS}'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
         "app/controllers/widgets_controller.rb" => "class WidgetsController < ApplicationController; def index; end; end\n",
         "app/views/widgets/index.html.erb" => '<% 10.times do %><%= link_to "link", "/target" %><% end %>')
       out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "test"), bin, "build", dir, "--passes", "default")
@@ -185,7 +185,7 @@ class ViewTest < Minitest::Test
     missing_prerequisite "Rails, sqlite3 or bcrypt not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
       LowrailTest.write_rails_app(dir, {
-        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '8.1.4'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
+        "Gemfile" => "source 'https://rubygems.org'\ngem 'rails', '#{RAILS}'\ngem 'sqlite3'\ngem 'bcrypt'\ngem 'prism'\n",
         "app/controllers/widgets_controller.rb" => "class WidgetsController < ApplicationController; def index; end; end\n"
       }.merge(extra))
       out, err, status = Open3.capture3(CLEAN_ENV.merge("RAILS_ENV" => "test"), bin, "build", dir, "--passes", "default")
