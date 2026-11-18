@@ -29,6 +29,23 @@ passes:
   - {reviewer: opus, orb: T-01a1df43-cdbe-723b-8292-cadbac75cbc2, head: "8e3e822033ed8ad90b855980130e52b9f57e659e", date: 2026-11-15, verdict: approve, open: "Confirm: diff -w from fdd771cf79 is only the Process.respond_to?(:fork) guard; range-diff shows fd0e61b728 unchanged and no message hunk; diff --check and rubocop clean; identity Thomas, no trailers. File 63 runs 0F 0E under both ARCONNs; regression test fails with main lib (Expected 0); fork test fails without the discarded? guard."}
   - {reviewer: claude-code, orb: T-01a1df43-c4b2-76c7-9b56-e863e94d97f3, head: "8e3e822033ed8ad90b855980130e52b9f57e659e", date: 2026-11-15, verdict: approve, open: "Confirm: diff -w from fdd771cf79 is only the Process.respond_to?(:fork) guard; range-diff shows fd0e61b728 unchanged and only the test hunk in the second commit, message unchanged; identity Thomas, no trailers, lines <= 72; diff --check and rubocop clean. File 63 runs 0F 0E under both ARCONNs; with main's proxy the regression test fails (Expected 0) and the fork test passes; with only the discarded? guard removed the fork test fails (child exit 1) under both."}
   - {reviewer: fable, head: "8e3e822033ed8ad90b855980130e52b9f57e659e", orb: T-01a1df85-04c7-75bc-9f03-14168c3b8446, date: 2026-11-15, verdict: approve, open: "Short confirm. diff -w from fdd771cf79 is only the if Process.respond_to?(:fork) guard around the fork test, the same form as in reaper_test.rb and connection_handler_test.rb; fd0e61b728 unchanged, second commit's message identical. Fork test passes on the head and fails with the discarded? guard removed (child exits 1); regression test fails with main's library (Expected 0, Actual 1); whole file 63 runs 0F 0E; all under both ARCONNs. Body cell now says name, role and pool token, which is what the old lookup compared. Identity Thomas, no trailers, no added comments, rubocop and diff --check clean. My nit on the guard is applied; the two record wording nits stay optional."}
+  - reviewer: thermos-sol
+    orb: T-01a1ee60-a4df-75cc-9428-abffe636e31c
+    head: "fd0e61b7280b4de6e8c78d933026c01fc5f93384"
+    date: 2026-11-18
+    verdict: approve
+    open: >-
+      Both Thermos rubrics applied personally; body-only confirm of the isolated
+      Server-Timing commit. No added guards or comments remain. Comparing the
+      header with its actual notification events removes scheduler-sensitive
+      sleep expectations without changing middleware behavior; no new layer or
+      unrelated test relaxation. Ruby 4.0.9 server_timing_test passes 8 runs/21
+      assertions. The 189/200 before and 0/200 after are recorded flake evidence
+      in rails-ci-flakiness.md, not ordinary suite totals or a new local rate.
+      The deleted split-history clause is properly absent; remaining sentences
+      match the code and record. Raw cat-file: one commit on 8217632cf8,
+      Thomas author/committer, author date 1794742871 +0000, no trailers.
+      No must-fix.
 ---
 
 # Compare Server-Timing durations with the events they come from

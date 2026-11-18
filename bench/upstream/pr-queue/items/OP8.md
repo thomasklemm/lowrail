@@ -31,6 +31,28 @@ passes:
   - {reviewer: claude-code, head: "490fdf855b", date: 2026-11-07, verdict: approve, open: "body confirm pass: live body equals the recorded one; all five links resolve (OpenProject migration L34 is `t.jsonb :results, null: false, default: {}`); every claim matches 490fdf855b (Mutable freezes only nil, Serialized never, encrypts forwards explicitly, normalizes by delegation, other types as on main, non-freezable models take 8.1's writable path); 18-22% label holds: measured on 8b817f9f36, which leaves the same measured models unfrozen, and the freezability check runs only at schema load"}
   - {reviewer: claude-code, head: "71c77e3a01", date: 2026-11-14, verdict: approve, open: "Rebase check after rails#59141 (main 50c54eed06, Ruby 4.0.9, PostgreSQL 17). Where new-record defaults come from now: Core#initialize calls attributes_builder.build_from_initialize, a LazyIndexedAttributeSet over an empty row with the FromInitContext; the first read (fetch_value_at!, behind _read_attribute_at!) goes cast_value -> default_attribute -> store(index, @ctx.default_at(index).dup), and the builder's @defaults are the Attribute objects of schema_attributes.defaults, the set build_default_attributes returns (now laid out by index_default_attributes into an IndexedRow::Mutable). That set is still frozen, which casts each value, only when every attribute is freezable?; Attribute#freezable?, #freeze, #initialize_dup, Helpers::Mutable and Type::Serialized are unchanged since 9ba8b1edee, and nothing on the new path casts a shared default in place (column_defaults deep_dups, init_attributes uses with_value_from_user). So OP8's decision applies unchanged. Plain main: OP8's two tests fail 4/4 on SQLite and PostgreSQL; serialized_jsonb_default_insert.rb changed=[results], PG::NotNullViolation; op8_probe2.rb unread changed=[prefs] saved nil, nested shared true, coder loads 2 before the first read; op8_probe3.rb nested jsonb, text[] and hstore defaults shared in Native and its STI child, read-only defaults. With OP8 every line equals 8-1-stable 71e963ed1b (saved {}; unread [] saved empty string, read first [prefs] saved nil, nothing shared, loads 0/2 in both models; probe3 nothing shared), models with scalar or NULL defaults keep read-only defaults. Reverting any of the four production lines fails OP8's tests. serialized_attribute_test 121 runs on sqlite3, postgresql and sqlite3_ractor; AR SQLite 10,379 and PostgreSQL 11,302 runs, only the secure_password timing test (green alone) and 4 sqlite_rake_test errors from a missing sqlite3 CLI (15 runs green once installed); AM 1,269; RuboCop 3,581 files clean. Callgrind vs main, median of 3, identical lockfiles (op8-bench/matrix5.sh, results-50c54eed06.tsv): scalar defaults -0.01%, '{}' JSON +18.94%, nested JSON +22.26%, A/A 0.00%, so the body's 18-22% holds; body unchanged. Range-diff against 490fdf855b is =, so the Sol and Astra passes on 490fdf855b reviewed the same patch; not rerun."}
   - {reviewer: claude-code, head: "71c77e3a01", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: nits, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Clause backed by app-suites.md OP8 (storages health status controller specs). op8-bench results link cut. Nit applied: 'in OpenProject's test suite' -> 'in its test suite'."}
+  - reviewer: thermos-sol
+    orb: T-01a1ee60-a4df-75cc-9428-abffe636e31c
+    head: "71c77e3a013680390154ef9f8390c263e9fed126"
+    date: 2026-11-18
+    verdict: approve
+    open: >-
+      Both Thermos rubrics applied personally; the earlier-revision parenthesis
+      is unnecessary and its removal leaves the recorded measurements honest.
+      Keep respond_to?(:freezable_default?) for real duck-typed/decorated types
+      without the optional hook, and the nil predicate for the only safely
+      freezable Mutable default. Serialized must return false even for nil;
+      the surviving coder-may-load-nil-as-container comment prevents replacing
+      it with Mutable's predicate; encrypted_attribute_type's # :nodoc: keeps
+      the internal hook out of the public docs. Both optional-hook guards use
+      the same real type contract. Existing forwarding/delegation preserves
+      normalizes and encrypts. Opened model/migration links and checked the
+      described default against app-suites.md; body accurately separates the
+      correctness restoration from its recorded instruction cost. Ruby 4.0.9
+      serialized_attribute_test: 121 runs/290 assertions, 0F/0E, one existing
+      Psych safe_load Time skip. Raw cat-file: one commit on 50c54eed06,
+      Thomas author/committer, author date 1794052149 +0000, no trailers.
+      No must-fix or structural regression.
 ---
 
 # Keep models with mutable defaults off the frozen defaults

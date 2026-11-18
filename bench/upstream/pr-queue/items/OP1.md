@@ -28,6 +28,28 @@ passes:
   - {reviewer: skeptic, head: "49b835ba58", date: 2026-11-05, verdict: nits, open: "optional: before_ractorize hook walks ObjectSpace (others use .descendants); flag name parameter_parsers_frozen; one garbled body sentence; railties ractors_test not run (needs RACK=head)"}
   - {reviewer: claude-code, head: "49b835ba58", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: nits, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Clause backed by app-suites.md OP1. Nit applied: 'code that registers a parser' -> 'registering a parser'."}
   - {reviewer: astra, head: "58c3765e8a", orb: T-01a1ee60-ae6e-70c0-8121-529b8f4e7a5a, date: 2026-11-18, verdict: changes, open: "Reproduced unfrozen replacement from a later before_ractorize callback, breaking non-main-Ractor parser reads before ractorize! even returns; preserve writer freezing once ractorization starts. The direct Request reference also triggers its on_load hook early with eager_load=false; preserve lazy loading. Qualify the body's no-request-is-parsed-with-other-tables claim and disclose the lost Ractor reads. Identity/date/no-trailers verified. Details under For Thomas."}
+  - reviewer: thermos-sol
+    orb: T-01a1ee60-a4df-75cc-9428-abffe636e31c
+    head: "58c3765e8a424c69236f755b5abfced112715ab2"
+    date: 2026-11-18
+    verdict: approve
+    open: >-
+      Both Thermos rubrics applied personally, no delegated reviewers. Reviewed
+      the lean candidate and its For Thomas body, not the live head's old body.
+      One freeze is added inside main's existing action_dispatch.ractorize
+      initializer; no second initializer, flag or ObjectSpace walk remains.
+      params_parsers reads Request.parameter_parsers, not other includers;
+      post-ractorize assignment and other-includer differences are disclosed.
+      The writer's surviving respond_to?(:symbol) handles documented MIME-type
+      keys; the existing RUBY_VERSION/RACK test condition requires the Ractor
+      APIs under test. No added code/test comments. Opened the linked gem callers;
+      in-place registration is real. Ruby 4.0.9: webservice_test.rb 9 runs/22
+      assertions and RACK=head application/ractors_test.rb 21/71, all pass.
+      The two new webservice cases error with FrozenError on base and pass on
+      lean. Raw cat-file: one commit on 8e097e9d81, Thomas author/committer,
+      original author date 1793880318 +0000, no trailers. The message correctly
+      drops the old post-ractorize-freezing promise. Separate Astra risk slot
+      remains required; this pass does not fill it.
 ---
 
 # Allow registering parameter parsers in place during boot
