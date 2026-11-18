@@ -528,9 +528,27 @@ module Lowrail
       File.write(File.join(dir, "report.json"), JSON.pretty_generate(to_h) + "\n")
     end
 
+    # The capture as compare checks it: command, seed and exit status of
+    # each run (command.txt), Ruby, environment, dropped samples, and the
+    # workloads file's manifest for --workloads.
+    def meta
+      command_file = File.join(dir, "command.txt")
+      lines = File.exist?(command_file) ? File.readlines(command_file, chomp: true) : []
+      exits = lines.find { _1.start_with?("exit ") }&.split&.drop(1)&.map { Integer(_1, exception: false) }
+      receipt = File.join(dir, "workloads.json")
+      manifest = JSON.parse(File.read(receipt))["manifest"] if File.exist?(receipt)
+      if manifest
+        require "digest"
+        manifest = Digest::SHA256.hexdigest(JSON.generate(manifest.except("file")))[0, 16]
+      end
+      { format: 1, command: lines.first, seed: lines.find { _1.start_with?("seed ") }&.delete_prefix("seed "), exit: exits,
+        runs: @runs.size, ruby: @runs.map { _1[:ruby] }.uniq, rails_env: @runs.map { _1[:rails_env] }.uniq,
+        dropped: @runs.map { _1[:dropped] }, workloads: manifest }
+    end
+
     def to_h
       command_file = File.join(dir, "command.txt")
-      { command: File.exist?(command_file) ? File.read(command_file).lines.first.strip : nil,
+      { command: File.exist?(command_file) ? File.read(command_file).lines.first.strip : nil, meta: meta,
         summary: summary, noise_floor: noise_floor, rows: rows, mode_rows: mode_rows,
         ranked: ranked.map { site_json(_1) }, app_lines: app_lines, unattributed: unattributed, actions: actions,
         outside_requests: (KINDS - ["request"]).to_h do |kind|

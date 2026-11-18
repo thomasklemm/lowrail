@@ -119,7 +119,8 @@ app lines by the framework and gem objects they lead to and your controller
 actions by objects per request, counts jobs, mails and Action Cable actions
 apart, and names the upstream pull requests that change a costly line.
 `lowrail-profile compare base/report.json head/report.json` exits 1 on a
-regression beyond the noise floor, for CI.
+regression beyond the noise floor, for CI, and 2 when the two reports are not
+valid evidence (a failing suite, one run, different commands).
 
 ```ruby
 gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
@@ -130,6 +131,12 @@ bundle exec lowrail-profile -- bin/rails test                  # your suite (or:
 bundle exec lowrail-profile --record -- bin/rails test         # ... and write its most frequent requests as lowrail/workloads.rb
 RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's requests, warmed, through the full stack
 ```
+
+`--record` applies the app's `filter_parameters` and enables only GETs that
+replay as recorded; check the file for secrets before committing it.
+`--workloads` sends real requests through the app's own database, queue and
+mail delivery, so run it only against disposable ones, with the gem installed
+in that environment ([docs/profile.md](docs/profile.md#run-it)).
 
 **`script/census app`** (this repository, on a copy of your app) is the
 measurement: production mode, 50 warmup operations, an A/A pair for the noise

@@ -12,17 +12,22 @@
  * per-object records, so GC stays on and nothing is retained. The hook never
  * allocates Ruby objects or calls Ruby; its tables use libc malloc so it
  * cannot start a GC. Lines are attributed like
- * ObjectSpace.allocation_sourcefile/sourceline: the nearest Ruby frame. */
+ * ObjectSpace.allocation_sourcefile/sourceline: the nearest Ruby frame.
+ *
+ * Every function runs in the main Ractor with the GVL held (lowrail/profile
+ * calls none of them from another Ractor, and NEWOBJ hooks are per Ractor),
+ * so the process-global tables need no lock. They are not Ractor-safe. */
 
 #define KINDS 4
+/* Lowrail::Profile::API: lowrail/profile refuses an extension built from
+ * other sources (an older cache) before it hooks anything. */
+#define API 2
 
 typedef struct {
     uint64_t key;      /* via << 63 | kind << 61 | path id << 35 | line << 5 | ruby type; 0 = empty */
     uint64_t count;
     uint64_t requests; /* windows in which the line allocated */
-    uint64_t last;     /* last window seen */
     uint64_t first;    /* objects in the first window that reached the line */
-    uint64_t first_window;
 } site_t;
 
 static site_t *sites;
@@ -45,7 +50,7 @@ static size_t actions_cap, actions_len;
 
 /* Attribution (the repeat run): per window name, allocating line and the
  * nearest app frame (path id + 1 << 32 | line; caller 0 = none). Each window
- * buffers its own pairs per thread until it ends and its name is known. */
+ * buffers its own pairs until it ends and its name is known. */
 typedef struct { uint64_t site, caller, count; } pend_t;
 typedef struct { uint64_t kind, name, site, caller, count, first; } attrib_t;
 static attrib_t *attribs;
@@ -54,11 +59,27 @@ static int attributing;
 static char *app_root;
 static size_t app_root_len;
 
-static uint64_t windows[KINDS], objects[KINDS], window_seq, dropped;
-static __thread int depth;
-static __thread uint64_t window, kind, name, window_objects;
-static __thread pend_t *pend;
-static __thread size_t pend_cap, pend_len;
+/* An open window, owned by the fiber (and its Ruby thread) that entered it,
+ * so overlapping threads (M:N included) and independent fibers each have
+ * their own. Its sites and pairs are merged once when it closes; the slot
+ * and its buffers are then reused, so threads that come and go leave
+ * nothing behind. The owner is marked (pinned) while the window is open. */
+typedef struct { uint64_t key, count; } seen_t;
+typedef struct {
+    VALUE thread, fiber; /* fiber 0 = free slot */
+    int depth;
+    uint64_t kind, name, objects;
+    seen_t *seen;
+    size_t seen_cap, seen_len;
+    pend_t *pend;
+    size_t pend_cap, pend_len;
+} win_t;
+static win_t *wins;
+static size_t wins_cap, wins_open;
+/* Buffers larger than this are freed when their window closes. */
+#define KEEP_CAP (1 << 16)
+
+static uint64_t windows[KINDS], objects[KINDS], dropped;
 static VALUE tracepoint = Qnil;
 
 static uint64_t
@@ -183,21 +204,26 @@ attribs_grow(void)
     return 1;
 }
 
+/* Open addressing on {key, count} pairs (window sites, attribution pairs). */
 static int
-pend_grow(void)
+grow_pairs(void **table, size_t *cap, size_t size, size_t key_words)
 {
-    size_t cap = pend_cap ? pend_cap * 2 : 1024;
-    pend_t *table = calloc(cap, sizeof(pend_t));
-    if (!table) return 0;
-    for (size_t j = 0; j < pend_cap; j++) {
-        if (!pend[j].site) continue;
-        size_t i = mix(pend[j].site ^ mix(pend[j].caller)) & (cap - 1);
-        while (table[i].site) i = (i + 1) & (cap - 1);
-        table[i] = pend[j];
+    size_t ncap = *cap ? *cap * 2 : 256;
+    char *next = calloc(ncap, size);
+    if (!next) return 0;
+    char *old = *table;
+    for (size_t j = 0; j < *cap; j++) {
+        uint64_t *e = (uint64_t *)(old + j * size);
+        if (!e[0]) continue;
+        uint64_t h = e[0];
+        for (size_t w = 1; w < key_words; w++) h ^= mix(e[w]);
+        size_t i = mix(h) & (ncap - 1);
+        while (*(uint64_t *)(next + i * size)) i = (i + 1) & (ncap - 1);
+        memcpy(next + i * size, e, size);
     }
-    free(pend);
-    pend = table;
-    pend_cap = cap;
+    free(old);
+    *table = next;
+    *cap = ncap;
     return 1;
 }
 
@@ -226,14 +252,14 @@ app_caller(void)
 }
 
 static void
-attribute(uint64_t site)
+attribute(win_t *w, uint64_t site)
 {
     uint64_t caller = app_caller();
-    if ((pend_len + 1) * 2 > pend_cap && !pend_grow()) { dropped++; return; }
-    size_t i = mix(site ^ mix(caller)) & (pend_cap - 1);
-    while (pend[i].site && (pend[i].site != site || pend[i].caller != caller)) i = (i + 1) & (pend_cap - 1);
-    if (!pend[i].site) { pend[i].site = site; pend[i].caller = caller; pend_len++; }
-    pend[i].count++;
+    if ((w->pend_len + 1) * 2 > w->pend_cap && !grow_pairs((void **)&w->pend, &w->pend_cap, sizeof(pend_t), 2)) { dropped++; return; }
+    size_t i = mix(site ^ mix(caller)) & (w->pend_cap - 1);
+    while (w->pend[i].site && (w->pend[i].site != site || w->pend[i].caller != caller)) i = (i + 1) & (w->pend_cap - 1);
+    if (!w->pend[i].site) { w->pend[i].site = site; w->pend[i].caller = caller; w->pend_len++; }
+    w->pend[i].count++;
 }
 
 static int
@@ -245,10 +271,33 @@ visible(VALUE obj)
     }
 }
 
+static win_t *
+window_of(VALUE fiber)
+{
+    for (size_t i = 0; i < wins_cap; i++) if (wins[i].fiber == fiber) return &wins[i];
+    return NULL;
+}
+
+/* The current fiber's open window, or NULL. A thread with no open window
+ * returns before asking for its fiber: rb_fiber_current allocates a root
+ * fiber's object the first time. A thread with one has it already (enter
+ * asked, and switching to any other fiber creates the root's). */
+static win_t *
+current_window(void)
+{
+    if (!wins_open) return NULL;
+    VALUE thread = rb_thread_current();
+    size_t i = 0;
+    while (i < wins_cap && !(wins[i].fiber && wins[i].thread == thread)) i++;
+    if (i == wins_cap) return NULL;
+    return window_of(rb_fiber_current());
+}
+
 static void
 newobj(VALUE tpval, void *data)
 {
-    if (depth <= 0) return;
+    win_t *w = current_window();
+    if (!w) return;
     rb_trace_arg_t *arg = rb_tracearg_from_tracepoint(tpval);
     VALUE obj = rb_tracearg_object(arg);
     VALUE path = rb_tracearg_path(arg);
@@ -270,28 +319,21 @@ newobj(VALUE tpval, void *data)
             break;
         }
     }
-    objects[kind]++;
+    objects[w->kind]++;
     int seen = visible(obj);
-    if (seen) window_objects++;
+    if (seen) w->objects++;
     size_t id = RB_TYPE_P(path, T_STRING) ? path_id(path) : 0;
     if (id == SIZE_MAX || line >= (1ULL << 30) || id + 1 >= (1ULL << 26)) { dropped++; return; }
     /* Path id 0 means no Ruby frame: real ids are shifted by one. */
     uint64_t pid = RB_TYPE_P(path, T_STRING) ? id + 1 : 0;
-    uint64_t key = via | (kind << 61) | (pid << 35) | (line << 5) | (BUILTIN_TYPE(obj) & 31);
+    uint64_t key = via | (w->kind << 61) | (pid << 35) | (line << 5) | (BUILTIN_TYPE(obj) & 31);
     if (!key) key = 1ULL << 5; /* never collide with the empty marker */
-    if ((sites_len + 1) * 2 > sites_cap && !sites_grow()) { dropped++; return; }
-    size_t i = mix(key) & (sites_cap - 1);
-    while (sites[i].key && sites[i].key != key) i = (i + 1) & (sites_cap - 1);
-    site_t *s = &sites[i];
-    if (!s->key) { s->key = key; sites_len++; }
-    s->count++;
-    if (s->last != window) {
-        if (!s->requests) s->first_window = window;
-        s->last = window;
-        s->requests++;
-    }
-    if (window == s->first_window) s->first++;
-    if (attributing && seen && pid) attribute((pid << 32) | line);
+    if ((w->seen_len + 1) * 2 > w->seen_cap && !grow_pairs((void **)&w->seen, &w->seen_cap, sizeof(seen_t), 1)) { dropped++; return; }
+    size_t i = mix(key) & (w->seen_cap - 1);
+    while (w->seen[i].key && w->seen[i].key != key) i = (i + 1) & (w->seen_cap - 1);
+    if (!w->seen[i].key) { w->seen[i].key = key; w->seen_len++; }
+    w->seen[i].count++;
+    if (attributing && seen && pid) attribute(w, (pid << 32) | line);
 }
 
 static action_t *
@@ -317,57 +359,105 @@ action_for(uint64_t k, uint64_t n)
     return &actions[i];
 }
 
-/* The window ended: its objects and attributed pairs go to its name. */
-static void
-close_window(void)
+static site_t *
+site_for(uint64_t key)
 {
+    if ((sites_len + 1) * 2 > sites_cap && !sites_grow()) return NULL;
+    size_t i = mix(key) & (sites_cap - 1);
+    while (sites[i].key && sites[i].key != key) i = (i + 1) & (sites_cap - 1);
+    if (!sites[i].key) { sites[i].key = key; sites_len++; }
+    return &sites[i];
+}
+
+static void
+release(win_t *w)
+{
+    if (w->seen_cap > KEEP_CAP) { free(w->seen); w->seen = NULL; w->seen_cap = 0; }
+    else if (w->seen) memset(w->seen, 0, w->seen_cap * sizeof(seen_t));
+    w->seen_len = 0;
+    if (w->pend_cap > KEEP_CAP) { free(w->pend); w->pend = NULL; w->pend_cap = 0; }
+    else if (w->pend) memset(w->pend, 0, w->pend_cap * sizeof(pend_t));
+    w->pend_len = 0;
+    w->fiber = w->thread = 0;
+    w->depth = 0;
+    wins_open--;
+}
+
+/* The window ended: each line it reached counts the window once, and its
+ * objects and attributed pairs go to its name. */
+static void
+close_window(win_t *w)
+{
+    uint64_t kind = w->kind, name = w->name;
     action_t *a = action_for(kind, name);
     int first = a && a->windows == 0;
     if (a) {
         a->windows++;
-        a->objects += window_objects;
-        if (first) a->first += window_objects;
+        a->objects += w->objects;
+        if (first) a->first += w->objects;
     }
-    for (size_t j = 0; pend_len && j < pend_cap; j++) {
-        pend_t *p = &pend[j];
+    for (size_t j = 0; w->seen_len && j < w->seen_cap; j++) {
+        seen_t *e = &w->seen[j];
+        if (!e->key) continue;
+        site_t *s = site_for(e->key);
+        if (!s) { dropped += e->count; continue; }
+        if (s->requests == 0) s->first = e->count;
+        s->requests++;
+        s->count += e->count;
+    }
+    for (size_t j = 0; w->pend_len && j < w->pend_cap; j++) {
+        pend_t *p = &w->pend[j];
         if (!p->site) continue;
-        if ((attribs_len + 1) * 2 > attribs_cap && !attribs_grow()) { dropped += p->count; }
-        else {
-            size_t i = attrib_hash(kind, name, p->site, p->caller) & (attribs_cap - 1);
-            attrib_t *e;
-            while ((e = &attribs[i])->site && (e->kind != kind || e->name != name || e->site != p->site || e->caller != p->caller))
-                i = (i + 1) & (attribs_cap - 1);
-            if (!e->site) { e->kind = kind; e->name = name; e->site = p->site; e->caller = p->caller; attribs_len++; }
-            e->count += p->count;
-            if (first) e->first += p->count;
-        }
-        p->site = 0;
-        p->caller = 0;
-        p->count = 0;
+        if ((attribs_len + 1) * 2 > attribs_cap && !attribs_grow()) { dropped += p->count; continue; }
+        size_t i = attrib_hash(kind, name, p->site, p->caller) & (attribs_cap - 1);
+        attrib_t *e;
+        while ((e = &attribs[i])->site && (e->kind != kind || e->name != name || e->site != p->site || e->caller != p->caller))
+            i = (i + 1) & (attribs_cap - 1);
+        if (!e->site) { e->kind = kind; e->name = name; e->site = p->site; e->caller = p->caller; attribs_len++; }
+        e->count += p->count;
+        if (first) e->first += p->count;
     }
-    pend_len = 0;
+    release(w);
 }
 
 /* Lowrail::Profile.enter(kind) / leave bracket a window on the current
- * thread. Nested windows (mounted engines, a mail inside a request or job)
- * count as the outermost one. */
+ * fiber. Nested windows (mounted engines, a mail inside a request or job)
+ * count as the outermost one. Neither raises: enter returns false when it
+ * cannot open a window (out of memory), and the code runs uncounted. */
 static VALUE
 profile_enter(VALUE self, VALUE k)
 {
-    if (depth++ == 0) {
-        kind = NUM2UINT(k) % KINDS;
-        name = 0;
-        window_objects = 0;
-        window = __atomic_add_fetch(&window_seq, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&windows[kind], 1, __ATOMIC_RELAXED);
+    VALUE thread = rb_thread_current();
+    VALUE fiber = rb_fiber_current();
+    win_t *w = window_of(fiber);
+    if (w) { w->depth++; return Qtrue; }
+    w = window_of(0);
+    if (!w) {
+        size_t cap = wins_cap ? wins_cap * 2 : 16;
+        win_t *next = realloc(wins, cap * sizeof(win_t));
+        if (!next) return Qfalse;
+        memset(next + wins_cap, 0, (cap - wins_cap) * sizeof(win_t));
+        w = next + wins_cap;
+        wins = next;
+        wins_cap = cap;
     }
-    return Qnil;
+    w->thread = thread;
+    w->fiber = fiber;
+    w->depth = 1;
+    w->kind = (FIXNUM_P(k) ? (uint64_t)FIX2LONG(k) : 0) % KINDS;
+    w->name = 0;
+    w->objects = 0;
+    wins_open++;
+    windows[w->kind]++;
+    return Qtrue;
 }
 
 static VALUE
 profile_leave(VALUE self)
 {
-    if (depth > 0 && --depth == 0) close_window();
+    if (!wins_open) return Qnil;
+    win_t *w = window_of(rb_fiber_current());
+    if (w && --w->depth == 0) close_window(w);
     return Qnil;
 }
 
@@ -377,7 +467,9 @@ profile_leave(VALUE self)
 static VALUE
 profile_label(VALUE self, VALUE klass, VALUE sep, VALUE action)
 {
-    if (depth <= 0 || name) return Qnil;
+    if (!wins_open) return Qnil;
+    win_t *w = window_of(rb_fiber_current());
+    if (!w || w->name || !RB_TYPE_P(klass, T_CLASS)) return Qnil;
     VALUE cname = rb_mod_name(klass);
     if (!RB_TYPE_P(cname, T_STRING) || !RB_TYPE_P(sep, T_STRING)) return Qnil;
     if (RB_TYPE_P(action, T_SYMBOL)) action = rb_sym2str(action);
@@ -389,7 +481,7 @@ profile_label(VALUE self, VALUE klass, VALUE sep, VALUE action)
     memcpy(buf + a, RSTRING_PTR(sep), b);
     memcpy(buf + a + b, RSTRING_PTR(action), c);
     size_t id = intern(buf, a + b + c);
-    if (id != SIZE_MAX) name = id + 1;
+    if (id != SIZE_MAX) w->name = id + 1;
     return Qnil;
 }
 
@@ -403,6 +495,7 @@ profile_attribute(VALUE self, VALUE root)
     if (!copy) rb_raise(rb_eNoMemError, "lowrail profile attribute");
     memcpy(copy, RSTRING_PTR(root), RSTRING_LEN(root));
     copy[RSTRING_LEN(root)] = 0;
+    free(app_root);
     app_root = copy;
     app_root_len = RSTRING_LEN(root);
     attributing = 1;
@@ -418,12 +511,10 @@ reset(void)
     actions_len = 0;
     if (attribs) memset(attribs, 0, attribs_cap * sizeof(attrib_t));
     attribs_len = 0;
-    if (pend) memset(pend, 0, pend_cap * sizeof(pend_t));
-    pend_len = 0;
+    for (size_t i = 0; i < wins_cap; i++) if (wins[i].fiber) release(&wins[i]);
     memset(windows, 0, sizeof(windows));
     memset(objects, 0, sizeof(objects));
     dropped = 0;
-    depth = 0;
 }
 
 static VALUE
@@ -432,6 +523,18 @@ profile_reset(VALUE self)
     reset();
     return Qnil;
 }
+
+static void
+wins_mark(void *ptr)
+{
+    for (size_t i = 0; i < wins_cap; i++) {
+        if (!wins[i].fiber) continue;
+        rb_gc_mark(wins[i].fiber);
+        rb_gc_mark(wins[i].thread);
+    }
+}
+
+static const rb_data_type_t wins_type = { "lowrail_profile_windows", { wins_mark, NULL, NULL, }, 0, 0, 0 };
 
 static VALUE
 profile_start(VALUE self)
@@ -510,6 +613,9 @@ Init_lowrail_profile(void)
 {
     VALUE lowrail = rb_define_module("Lowrail");
     VALUE profile = rb_define_module_under(lowrail, "Profile");
+    VALUE holder = TypedData_Wrap_Struct(0, &wins_type, &wins);
+    rb_gc_register_mark_object(holder);
+    rb_define_const(profile, "API", INT2FIX(API));
     rb_define_singleton_method(profile, "start", profile_start, 0);
     rb_define_singleton_method(profile, "enter", profile_enter, 1);
     rb_define_singleton_method(profile, "leave", profile_leave, 0);

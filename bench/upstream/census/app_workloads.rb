@@ -24,22 +24,23 @@ module CensusAppWorkloads
     d
   end
 
+  # The requests go through the policy lowrail-profile --workloads uses too
+  # (Lowrail::Workloads::Replayer): sign-in, CSRF tokens, turns.
   def load(c, path)
-    client = c::Client.new
+    client, anonymous = c::Client.new, c::Client.new
     d = definition(client, path)
-    sign_in(client, d.sign_in_spec) if d.sign_in_spec
+    replay = Lowrail::Workloads::Replayer.new(d, client, anonymous)
+    begin
+      replay.sign_in
+    rescue RuntimeError => e
+      raise "sign_in failed: #{e.message}"
+    end
     @manifest = d.manifest
     raise "no workloads: the file lists none and discovery found no page" if d.requests.empty? && d.mails.empty? && d.jobs.empty?
-    anonymous = c::Client.new
-    token_page = d.csrf_page_or_default
-    tokens = {}
-    token = ->(cl) { tokens.fetch(cl) { tokens[cl] = token_page && cl.csrf(token_page, required: false) } }
     ops = []
     jobs = []
     d.requests.each do |r|
-      cl = r.signed_in ? client : anonymous
-      turn = [0]
-      call = -> { perform(cl, r.at(turn[0] += 1), r.verb == :get ? nil : token.(cl)) }
+      call = -> { replay.perform(r) }
       ops << c::Op.new(r.name, r.kind, call)
       jobs.concat(c.jobs_from(&call)) if r.jobs
     end
@@ -51,34 +52,6 @@ module CensusAppWorkloads
     names = ops.map(&:name)
     raise "duplicate workload names: #{names.select { names.count(_1) > 1 }.uniq.join(", ")}" if names.uniq.size != names.size
     ops
-  end
-
-  def perform(client, r, token)
-    headers = r.headers
-    params = r.params
-    if token && r.csrf != "false"
-      headers = headers.merge("HTTP_X_CSRF_TOKEN" => token) if r.csrf == "header"
-      params = params.merge("authenticity_token" => token) if r.csrf == "param" && !r.body
-    end
-    client.request(r.verb, r.path, params: params, headers: headers, expect: r.expect, body: r.body)
-  end
-
-  # Signs the measuring client in once: the form page's token, then the POST;
-  # or a cookie (signed: true for a signed one), e.g. a session token the
-  # file created.
-  def sign_in(client, s)
-    if (cookie = s[:cookie])
-      name, value = cookie.fetch(:name).to_s, cookie.fetch(:value).to_s
-      return client.cookie(*(cookie[:signed] ? RailsCensus.signed_cookie(name.to_sym, value) : [name, value]))
-    end
-    body = client.get(s[:form]).body
-    token = body[/<meta name="csrf-token" content="([^"]+)"/, 1] || body[/name="authenticity_token" value="([^"]+)"/, 1]
-    params = s[:params]
-    params = params.merge("authenticity_token" => token) if token
-    client.request(s[:method].to_sym, s[:path], params: params, headers: token ? { "HTTP_X_CSRF_TOKEN" => token } : {},
-      expect: s[:expect])
-  rescue RuntimeError => e
-    raise "sign_in failed: #{e.message}"
   end
 
   # GET routes the app serves with 200, found once (at setup) and cached, so

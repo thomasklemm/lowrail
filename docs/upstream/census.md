@@ -105,7 +105,7 @@ patch article_path(article, format: :json), as: :json, name: "PATCH article.json
 | a block, `do \|n\| { params: … } end` | The overrides for the n-th run (from 1), for writes that must differ each time. |
 | `jobs: true` | The jobs this request enqueues become workloads of their own (`perform JobClass`); `skip_jobs "CachePageJob"` leaves some out. |
 | `signed_in: false` | Send this request from a second, signed-out client. |
-| `csrf: false` | Do not send the CSRF token. Otherwise writes send the token of `csrf_from PATH` (default: the first HTML GET), as a param, or as X-CSRF-Token for `xhr:` and `as: :json`. |
+| `csrf: false` | Do not send the CSRF token (and do not fetch a page for it). Otherwise writes send the token of `csrf_from PATH` (default: the first HTML GET), as a param, or as X-CSRF-Token for `xhr:` and `as: :json`. |
 | `setup { … }` | Runs once, where it stands in the file: resets and records the requests need. |
 | `let(:name) { … }` | A value computed on first use and then kept, for records the requests create before a mail or job uses them. |
 | `sign_in PATH, params:` | Signs the measuring client in once: GET `form:` (default PATH) for the token, then the request (`method:`, `expect:`, default 302/303); or `sign_in cookie: { name:, value:, signed: true }`. |
@@ -127,9 +127,22 @@ mail { EmailReplyMailer.reply(reply, recipient) }
 ```
 
 The file is evaluated into a frozen manifest: per request its method, path, a digest of its params and body, the
-header names, expected statuses and options, and the file's sha256. The census writes it to `workloads.json` next to
-the report and into every receipt (`workloads_manifest`), `lowrail-profile` into its output directory, so two runs
-can be checked for the same workloads without reading the Ruby again.
+header names and a digest of their values, expected statuses and options, the sign-in's settings (digests for its
+params and a cookie's value), and the file's sha256. The census writes it to `workloads.json` next to the report and
+into every receipt (`workloads_manifest`), `lowrail-profile` into its output directory, so two runs can be checked
+for the same workloads without reading the Ruby again. Each request keeps frozen copies of the values the file
+passed, so changing those objects later changes neither the requests nor the manifest. A block's overrides are not
+in the manifest, only its source line: the line does not certify what the block returns on a given run (it may read
+the database or the clock). `lowrail-profile --workloads` lists the variants it measured in its receipt; the
+census's per-workload SQL control is what shows that two runs sent the same requests.
+
+Both tools send the file's requests through one implementation, `Lowrail::Workloads::Replayer`: sign-in, the CSRF
+token and where it goes, alternates and blocks, and which client (signed in or not) sends each. Their clients
+differ only in transport (census 4's Rack::Test session, lowrail-profile's `Rack::MockRequest`) and send the same
+browser headers (`Host`, `Origin`, `Accept`, `User-Agent`, `Sec-Fetch-Site`); a test
+(`gem/test/workloads_test.rb`) runs both against one app and checks that the app sees the same requests. What
+differs is the measurement: the census captures jobs and delivers mail to the test deliverer, lowrail-profile uses
+the app's own adapters ([profile.md](../profile.md#run-it)).
 
 Without a file, up to 20 GET routes are discovered: routes without parameters, and `:id` or `:NAME_id` filled with
 the first record of the matching model; each must answer 200 three times. The chosen pages are cached in the copy

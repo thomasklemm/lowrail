@@ -176,3 +176,58 @@ The rest of the gem suite was not rerun. Known `pr_queue`, endpoint, form-scaffo
 ## Re-review boundary
 
 Apply the smallest fixes, rerun the profile tests plus the failing recording/cache/hook/concurrency/compare cases, and repeat per-test/load-order controls on the supported real-app matrix before making invariant-1/invariant-7 claims. This report applies only to the pinned code. Report publication commits, unrelated concurrent main changes and a later green check do not retroactively certify a fixed implementation.
+
+## Resolution (2026-11-18)
+
+Fixed on main after `850f8496`, for re-review; the findings above describe the pinned code and are left as written.
+Each P1 has a regression test through the CLI or the DSL that fails on the pinned code (checked by running the new
+tests against a worktree of `85e58dcf`): `gem/test/profile_test.rb` (7 new) and `gem/test/workloads_test.rb` (new,
+3 tests).
+
+| Finding | Change | Test |
+| --- | --- | --- |
+| F1 | The renderer writes every request-derived value as a quoted literal (`format: "…"`, escaped path segments, `inspect` for names and params); route helpers and model names are used only when they are identifiers. | `test_record_keeps_request_values_as_data_and_filters_secrets` evaluates a recording of `/widgets.html); $lowrail_injected = true; #`: the global stays nil and the format arrives as data. |
+| F2 | Params, a GET's query and path values pass through the app's `ActiveSupport::ParameterFilter` (from `filter_parameters`) before anything is kept; filtered values are `[FILTERED]`; `ORIGINAL_FULLPATH` is never stored; no filter, no params kept. Filtered shapes are commented out; the file and stderr warn that recordings are sensitive. | Same test: a password, a nested `api_token` and two query tokens appear in no file under the output directory or in the workloads file. |
+| F3 | `--out` takes a new or empty directory or one with lowrail-profile's `.lowrail-profile` marker, where it removes only `runN/`, `command.txt`, `report.*` and `workloads.json`; any other existing directory is refused before the command runs. | `test_out_never_clears_a_directory_it_did_not_create` (`--out mine` with a file in it, `--out .`, and a marked directory keeping a user's file). |
+| F4 | The Cable wrapper no longer records request shapes; only `Rails::Engine#call`, which has the Rack env, does. | `test_recording_leaves_cable_subscriptions_and_exceptions_unchanged`: return value, transmissions, and the identity of a channel's and a job's exception, plain and in both `--record` runs. |
+| F5 | The counter is cached under a digest of its sources and compiler settings, built aside and moved in whole; `lowrail/profile` checks `Lowrail::Profile::API` before hooking anything. Every wrapper calls the profiler through Ruby methods that rescue profiler failures at their own call (open, name, close, note), never around `super`; on_load installation is contained per framework with a warning. Non-main Ractors skip the counter (`Ractor.main?`) without marking the C methods Ractor-safe. | `test_an_unusable_counter_or_hook_leaves_the_app_alone` (an older counter's API: request 200, profiling off; frozen `ActionController::Metal`: the app loads Base in both runs). Ractor: a job-shaped method under the real Job wrapper returns its value from a non-main Ractor (probe). |
+| F6 | `shell: bash` on the documented Compare step. | `test_documented_ci_compare_step_fails_on_a_regression` runs the step from `docs/profile.md` with GitHub's command for its shell. |
+| F7 | `report.json` carries capture metadata (command, seed, exit statuses, runs, Ruby, environment, dropped samples, workloads manifest digest). `compare` exits 2 unless both are complete, comparable, finite, multi-run captures with every command exiting 0; compares a kind only when every run of both has windows; leaves out (and lists) actions without a warm value or run on one side; uses the full run range as the spread. | `test_compare_needs_complete_comparable_captures` (`{}`, half-empty, one run, failed run, `[10, 1000, 10]` against `[20, 1010, 20]`, a `[nil, nil]` action). |
+| F8 | A window belongs to its fiber and Ruby thread (a slot owned by `rb_fiber_current()`, its owner marked while open); each window keeps its own seen sites and attribution pairs and merges them once on close, so reach counts windows; slots and their buffers are reused (buffers above 64 Ki entries freed). No `__thread` state is left. | Probes: alternating threads reach 2 (was 20); interleaved request and job fibers `[1, 1, 0, 0]` (was `[1, 0, 0, 0]`); overlapping threads under `RUBY_MN_THREADS=1` 2 windows (was 1); 3,000 short-lived threads with attribution 13,964 → 14,296 KiB (was 50,520); compaction inside windows with attribution, 0 dropped. Existing exact-count tests unchanged. |
+| F9 | A request keeps its declared params apart from the encoded body, so a path-only override (alternate or block) keeps the JSON body. | `test_path_only_overrides_keep_a_json_body`. |
+| F10 | Request policy in one place, `Lowrail::Workloads::Replayer` (sign-in, CSRF page and token placement, no token fetch for `csrf: false`, turns, signed-in vs anonymous client), used by both `script/census app` and `--workloads`; signed cookies through one `Workloads.signed_cookie`. B's client now sends census 4's `Host` and `Origin` and an empty form for a bodiless write (the contract test found both). | `test_census_and_profile_send_the_same_requests`: census 4's Rack::Test client and B's client against one app, recorded by a middleware (method, path, query, parsed params, media type, browser and CSRF headers, cookie names): identical, with sign-in, CSRF from a page, a header, XHR, JSON with an alternate, `csrf: false` first and a signed-out request. |
+| F11 | Requests hold frozen copies of the file's values (the file's own objects are not frozen); the manifest (format 2) adds a digest of header and env values and the sign-in's form, expected statuses, cookie flag and value digest. Docs state that a block's source line does not certify its outputs; `--workloads` lists measured variants of alternates and blocks. | `test_requests_are_frozen_copies_and_the_manifest_covers_header_values`. |
+| F12 | Only GETs that replay as recorded are enabled; writes, filtered, lossy (long/binary/upload values, optional path parts, a write's query) and unresolved shapes are commented out with the reason; GET queries are kept; format and a non-default Accept are part of the shape; model lookups only enabled entries use stay enabled; models are verified as loaded Active Record classes (never loaded for this). Forked children clear the recorded shapes. | The F1/F2 test (`params: {"q" => "needle"}` enabled, a commented-out lookup); fork probe: child shapes 0, parent 1. |
+| F13 | Receipt and docs say requests use the app's own queue adapter and mail delivery (inline adapters run jobs in the request, others enqueue real work) and name both; the docs require disposable database, queue, mail and third-party services. No adapter is changed. | Blog replay receipt (`queue_adapter test, delivery_method test`). |
+| F14 | Arguments are split at the first `--` before any option or refusal is parsed. | `test_arguments_after_the_separator_belong_to_the_command`. |
+
+**Safety and equivalence rerun** (details in [profile.md](../profile.md#rechecked-after-the-review-fixes-2026-11-18)):
+
+* Campfire (`bin/rails test -v`, 634 tests) and Lobsters (`rspec --seed 1234`, 927 examples), fresh
+  `script/corpus` copies: per-test outcomes identical with no gem, gem listed but off, and both profiled runs; load
+  order outside Lowrail, Bundler and RubyGems identical in every process, except Lobsters' first-ever plain run,
+  whose two repeats match off and profiled exactly.
+* `compare` on Campfire: an A/A pair of `bin/rails test` exits 0; the planted `20.times { ERB::Util.html_escape }`
+  exits 1 with the action (+45.85, floor 26.47) and the two Active Support lines (+1.68, floor 1.0) and nothing
+  else, against both A/A reports; a `-v` against a plain profile exits 2. The documented step fails the job with
+  `shell: bash` and passes without it.
+* A's YAML (`11804786`) against the DSL on the Blog, through the new shared policy: the same 10 workload names,
+  every masked SQL digest identical in both pairs, and every DSL median inside the YAML runs' own windows (largest
+  move: POST comment −30.8 against a YAML A/A of −124).
+* The Blog suite under `--record` (21 tests) keeps per-test outcomes; its recording replays through `--workloads`.
+
+**Deferred or narrowed, with the reason:**
+
+* F8: allocations in another fiber a window starts (`Enumerator#next`) are no longer counted: per-fiber ownership
+  is what makes independent fibers correct, and the docs say so. A fiber abandoned inside an open window keeps its
+  slot (and stays marked) until the process exits; bounded by such fibers, not by requests.
+* F10: transports still differ (Rack::Test's cookie jar against a plain cookie map). The equivalence claim is the
+  contract test's: what the app sees for the covered cases. Cookie attributes (path, expiry) are not modeled.
+* F11: the census does not list block variants (recording them would allocate inside its measured operations);
+  its SQL control remains the behavior check, as documented.
+* F13: request-enqueued work is not suppressed or captured in `--workloads` (an implementation choice left open by
+  the review); the claim is corrected instead.
+* F2: only what `filter_parameters` names is filtered; other secrets (unfiltered keys, path segments the filter does
+  not name) can still appear, hence the warning. F7: the action floor's multipliers remain Campfire-derived.
+* Not rerun: Writebook, Pingcrm and CodeTriage from the earlier matrix, the Lobsters YAML/DSL pair, and the
+  earlier `--workloads` proof numbers, which predate B's `Host`/`Origin` headers (marked in profile.md).

@@ -3,10 +3,12 @@
 # exe/lowrail-profile on the minimal Rails app of test_helper.rb: objects per
 # source line inside requests only, warm and repeat-run columns, census-style
 # keys, the app line and action that lead to a gem's allocations, and jobs and
-# mails counted apart from requests.
+# mails counted apart from requests; and what it must never do to the app or
+# to the files around it.
 #   ruby -Igem/lib -Igem/test gem/test/profile_test.rb
 
 require "test_helper"
+require "uri"
 
 class ProfileTest < Minitest::Test
   include LowrailTest
@@ -187,6 +189,258 @@ class ProfileTest < Minitest::Test
       assert_equal [3.0, 3.0], report["ranked"].find { _1["site"] == "GEM/probe/lib/probe.rb:4" }["all"]
       manifest = JSON.parse(File.read(File.join(dir, "replay.json")))["manifest"]
       assert_equal [["get", "/widgets"], ["get", "/widgets/1"]], manifest["requests"].map { _1.values_at("method", "path") }
+    end
+  end
+
+  PROFILE = File.join(GEM_ROOT, "exe/lowrail-profile")
+
+  def profile_env(dir) = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test")
+
+  def profile(dir, *args) = Open3.capture3(profile_env(dir), RUBY, PROFILE, *args, chdir: dir)
+
+  # Recording keeps request values as data: a routed format becomes a quoted
+  # string, never Ruby; values the app's filter_parameters hides (a password,
+  # a nested API token, a query token) are not exported anywhere; a GET's query
+  # stays; and a request that cannot replay as recorded is commented out.
+  def test_record_keeps_request_values_as_data_and_filters_secrets
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      injected = "html); $lowrail_injected = true; #"
+      LowrailTest.write_rails_app(dir,
+        "config/initializers/filter.rb" => "Rails.application.config.filter_parameters += [:password, :api_token, :token]\n",
+        "config/routes.rb" => "Rails.application.routes.draw { resources :widgets, only: %i[index show create] }\n",
+        "app/controllers/widgets_controller.rb" => <<~'RUBY',
+          class WidgetsController < ApplicationController
+            skip_forgery_protection
+            def index = head(:ok)
+            def show = head(:ok)
+            def create = head(:created)
+          end
+        RUBY
+        "boot.rb" => "require_relative \"config/environment\"\nWidget.create!(name: \"first\", password: \"x\")\n",
+        "requests.rb" => <<~RUBY)
+          require_relative "boot"
+          require "rack/mock"
+          call = ->(path, **opts) { Rails.application.call(Rack::MockRequest.env_for("http://localhost\#{path}", opts)) }
+          3.times { call.("/widgets?q=needle") }
+          call.("/widgets.\#{ERB::Util.url_encode(#{injected.inspect})}")
+          call.("/widgets/1?token=query-secret-1")
+          call.("/widgets?token=query-secret-2", method: "POST",
+            params: { widget: { name: "n", password: "pw-secret-3", api: { api_token: "api-secret-4" } } })
+        RUBY
+      out, err, status = profile(dir, "--out", "profile", "--record", "--", RUBY, "requests.rb")
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      recorded = File.read(File.join(dir, "lowrail/workloads.rb"))
+      written = [recorded, *Dir[File.join(dir, "profile/**/*")].select { File.file?(_1) }.map { File.read(_1) }]
+      %w[query-secret-1 query-secret-2 pw-secret-3 api-secret-4].each do |secret|
+        assert written.none? { _1.include?(secret) }, "#{secret} was exported:\n#{recorded}"
+      end
+      assert_includes recorded, %(get widgets_path, name: "GET /widgets", params: {"q" => "needle"}\n)
+      assert_match(/^# post widgets_path, name: "POST \/widgets", params: .*"password" => "\[FILTERED\]".*"api_token" => "\[FILTERED\]"/, recorded)
+      assert_match(/^# get widget_path\(widget\), name: "GET \/widgets\/:id", params: \{"token" => "\[FILTERED\]"\}$/, recorded)
+      # Only a commented-out request uses the record, so its lookup is commented out too.
+      assert_includes recorded, "# widget = Widget.first!\n"
+
+      check = <<~'RUBY'
+        require "./boot"
+        require "json"
+        require "lowrail/workloads"
+        requests = Lowrail::Workloads.load("lowrail/workloads.rb").requests
+        puts JSON.generate(injected: $lowrail_injected, requests: requests.map { [_1.name, _1.path] })
+      RUBY
+      evaluated = ruby_json(check, chdir: dir, setup: false, env: { "RAILS_ENV" => "test", "RUBYOPT" => "-I#{GEM_LIB}" })
+      assert_nil evaluated["injected"], recorded
+      name, path = evaluated["requests"].find { _1[0].include?("lowrail_injected") }
+      assert_equal "GET /widgets.#{injected}", name
+      assert_equal "/widgets.#{injected}", URI.decode_uri_component(path)
+    end
+  end
+
+  # --record notes Rack requests only: a Cable subscription returns what it
+  # returned, and its exceptions, and a job's, pass through as the same
+  # objects, in both runs.
+  def test_recording_leaves_cable_subscriptions_and_exceptions_unchanged
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "cable.rb" => <<~'RUBY')
+        require "active_job/railtie"
+        require_relative "config/environment"
+        require "action_cable"
+        require "action_cable/channel/test_case"
+        require "rack/mock"
+        class OkChannel < ActionCable::Channel::Base
+          def subscribed = nil
+        end
+        class BadChannel < ActionCable::Channel::Base
+          def subscribed = raise($boom = RuntimeError.new("boom"))
+        end
+        class BoomJob < ActiveJob::Base
+          def perform = raise($job_boom = ArgumentError.new("job"))
+        end
+        connection = ActionCable::Channel::ConnectionStub.new
+        puts "subscribed #{OkChannel.new(connection, "{}", {}).subscribe_to_channel.inspect} #{connection.transmissions.size}"
+        begin
+          BadChannel.new(connection, "{}", {}).subscribe_to_channel
+        rescue => e
+          puts "channel raised #{e.class} #{e.equal?($boom)}"
+        end
+        begin
+          BoomJob.perform_now
+        rescue => e
+          puts "job raised #{e.class} #{e.equal?($job_boom)}"
+        end
+        status, = Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+        puts "request #{status}"
+      RUBY
+      plain, err, status = Open3.capture3(profile_env(dir), RUBY, "cable.rb", chdir: dir)
+      assert status.success?, err
+      expected = "subscribed true 1\nchannel raised RuntimeError true\njob raised ArgumentError true\nrequest 200\n"
+      assert_equal expected, plain
+      out, err, status = profile(dir, "--out", "profile", "--record", "--", RUBY, "cable.rb")
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      assert_equal 2, out.scan(expected).size, "#{out}\n#{err}"
+      report = JSON.parse(File.read(File.join(dir, "profile/report.json")))
+      assert_equal [{ "OkChannel#subscribed" => [1, 1], "BadChannel#subscribed" => [1, 1] }],
+        [report["outside_requests"]["cable"]["actions"].to_h { [_1["name"], _1["windows"]] }]
+    end
+  end
+
+  # --out refuses a directory it did not create, and in one it did, clears
+  # only its own runs and reports.
+  def test_out_never_clears_a_directory_it_did_not_create
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "requests.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        File.write("ran.txt", "")
+        Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+      RUBY
+      FileUtils.mkdir_p(File.join(dir, "mine"))
+      File.write(File.join(dir, "mine/must-keep.txt"), "x")
+      out, err, status = profile(dir, "--out", "mine", "--", RUBY, "requests.rb")
+      refute status.success?, out
+      assert_match(/was not created by lowrail-profile/, err)
+      assert File.exist?(File.join(dir, "mine/must-keep.txt"))
+      refute File.exist?(File.join(dir, "ran.txt")), "the command ran"
+      _, err, status = profile(dir, "--out", ".", "--", RUBY, "requests.rb")
+      refute status.success?, err
+      assert File.exist?(File.join(dir, "config/environment.rb"))
+
+      _, err, status = profile(dir, "--out", "profile", "--runs", "3", "--", RUBY, "requests.rb")
+      assert status.success?, err
+      File.write(File.join(dir, "profile/notes.txt"), "x")
+      _, err, status = profile(dir, "--out", "profile", "--", RUBY, "requests.rb")
+      assert status.success?, err
+      assert_equal %w[.lowrail-profile command.txt notes.txt report.json report.md run1 run2],
+        Dir.children(File.join(dir, "profile")).sort
+    end
+  end
+
+  # A counter of another version is refused before anything is hooked, and a
+  # framework hook that cannot be installed (into a frozen class) leaves the
+  # app's load as it was.
+  def test_an_unusable_counter_or_hook_leaves_the_app_alone
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        # The API of an older counter (enter without a kind, no Profile::API).
+        "old_counter.rb" => <<~'RUBY',
+          module Lowrail
+            module Profile
+              %i[start leave reset].each { |m| define_singleton_method(m) { nil } }
+              def self.enter = nil
+              def self.label(*) = nil
+              def self.snapshot = [[0] * 4, [0] * 4, 0, [], [], []]
+            end
+          end
+        RUBY
+        "requests.rb" => <<~'RUBY',
+          require_relative "config/environment"
+          require "rack/mock"
+          status, = Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+          puts "request #{status}"
+        RUBY
+        "frozen.rb" => <<~'RUBY')
+          require "action_controller"
+          ActionController::Metal.freeze
+          ActionController::Base
+          puts "loaded Base"
+        RUBY
+      env = profile_env(dir).merge("LOWRAIL_PROFILE" => File.join(dir, "out"), "LOWRAIL_PROFILE_EXT" => File.join(dir, "old_counter.rb"),
+        "RUBYOPT" => "-I#{GEM_LIB} -rlowrail/profile")
+      FileUtils.mkdir_p(File.join(dir, "out"))
+      out, err, = Open3.capture3(env, RUBY, "requests.rb", chdir: dir)
+      assert_equal "request 200\n", out, err
+      assert_match(/\[lowrail-profile\] off: LoadError: .*old_counter\.rb is not this lowrail-profile's counter/, err)
+
+      out, err, = profile(dir, "--out", "profile", "--", RUBY, "frozen.rb")
+      assert_equal 2, out.scan("loaded Base\n").size, err
+      assert_match(/ActionController::Metal#dispatch not profiled: FrozenError/, err)
+    end
+  end
+
+  # Everything after the first -- is the command's, a second -- and
+  # profiler-looking flags included.
+  def test_arguments_after_the_separator_belong_to_the_command
+    realpath_tmpdir do |dir|
+      out, err, = profile(dir, "--out", "profile", "--runs", "1", "--", RUBY, "-e", "p ARGV", "--", "--workloads", "--out", "x")
+      assert_equal "[\"--workloads\", \"--out\", \"x\"]\n", out, err
+      assert_match(/no report: no runs with requests/, err)
+    end
+  end
+
+  def report(warm, runs: 2, exit: [0] * runs, actions: [])
+    { "command" => "bin/rails test", "summary" => Array.new(runs) { { "windows" => { "request" => 10 } } },
+      "meta" => { "command" => "bin/rails test", "seed" => "1234", "exit" => exit, "runs" => runs, "ruby" => ["ruby 4"],
+        "rails_env" => ["test"], "dropped" => [0] * runs, "workloads" => nil },
+      "ranked" => [{ "site" => "GEM/x/lib/x.rb:1", "warm" => warm }], "actions" => actions }
+  end
+
+  def compare(dir, base, head)
+    File.write(File.join(dir, "base.json"), JSON.generate(base))
+    File.write(File.join(dir, "head.json"), JSON.generate(head))
+    out, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--json", chdir: dir)
+    [status.exitstatus, (JSON.parse(out) rescue err)]
+  end
+
+  # compare gates only on valid evidence (exit 2 otherwise), takes the noise
+  # floor from every run, and leaves out actions one side cannot measure.
+  def test_compare_needs_complete_comparable_captures
+    realpath_tmpdir do |dir|
+      assert_equal 2, compare(dir, {}, {})[0]
+      assert_equal 2, compare(dir, report([10.0, 10.0]), {})[0]
+      assert_equal 2, compare(dir, report([10.0], runs: 1), report([30.0], runs: 1))[0], "one run has no noise floor"
+      assert_equal 2, compare(dir, report([10.0, 10.0], exit: [0, 1]), report([30.0, 30.0]))[0]
+      assert_equal 1, compare(dir, report([10.0, 10.0]), report([30.0, 30.0]))[0]
+      status, result = compare(dir, report([10.0, 1000.0, 10.0], runs: 3), report([20.0, 1010.0, 20.0], runs: 3))
+      assert_equal 0, status, "a middle run's spread is noise too: #{result}"
+      status, result = compare(dir, report([1.0, 1.0], actions: [{ "name" => "A#b", "warm" => [nil, nil] }]),
+        report([1.0, 1.0], actions: [{ "name" => "A#b", "warm" => [100.0, 100.0] }]))
+      assert_equal [0, [{ "kind" => "request", "name" => "A#b", "reason" => "no warm value" }]], [status, result["not_compared"]]
+    end
+  end
+
+  # The CI step docs/profile.md shows fails the job on a regression, run the
+  # way GitHub Actions runs it (an explicit shell: bash adds pipefail).
+  def test_documented_ci_compare_step_fails_on_a_regression
+    require "yaml"
+    realpath_tmpdir do |dir|
+      yaml = File.read(File.join(GEM_ROOT, "../docs/profile.md"))[/```yaml\n(.*?)```/m, 1]
+      step = YAML.safe_load(yaml).values.first.fetch("steps").find { _1["name"] == "Compare" }
+      shell = { nil => %w[bash -e], "bash" => %w[bash --noprofile --norc -eo pipefail] }.fetch(step["shell"])
+      FileUtils.mkdir_p(File.join(dir, "bin"))
+      File.write(File.join(dir, "bin/bundle"), "#!/bin/sh\nshift 2\nexec #{RUBY} #{PROFILE} \"$@\"\n")
+      File.chmod(0o755, File.join(dir, "bin/bundle"))
+      %w[base head].zip([10.0, 30.0]) do |name, warm|
+        FileUtils.mkdir_p(File.join(dir, "tmp", name))
+        File.write(File.join(dir, "tmp", name, "report.json"), JSON.generate(report([warm, warm])))
+      end
+      File.write(File.join(dir, "step.sh"), step.fetch("run"))
+      env = CLEAN_ENV.merge("PATH" => "#{File.join(dir, "bin")}:#{ENV["PATH"]}", "GITHUB_STEP_SUMMARY" => File.join(dir, "summary.md"))
+      _, _, status = Open3.capture3(env, *shell, "step.sh", chdir: dir)
+      refute status.success?, "the documented Compare step passes on a regression"
+      assert_match(/Regressions: 1/, File.read(File.join(dir, "summary.md")))
     end
   end
 end

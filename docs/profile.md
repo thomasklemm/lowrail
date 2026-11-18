@@ -31,6 +31,9 @@ Add the gem to the development and test group, unrequired:
 gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
 ```
 
+`--workloads` in production (below) needs the gem installed there too: list it in a group your production
+`bundle install` keeps, or run that profile from a checkout whose Bundler settings do not exclude it.
+
 Then, from the app directory:
 
 ```sh
@@ -40,46 +43,78 @@ bundle exec lowrail-profile --record -- bin/rails test             # the same, a
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
   bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
 bundle exec lowrail-profile report                                   # rebuild the report from tmp/lowrail-profile
-bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression beyond the noise floor
+bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression, 2 without valid evidence
 ```
 
 `--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
 `RAILS_ENV`, evaluates the [workloads file](upstream/census.md#workloads-file) after boot, and sends its requests
-10 times as warmup and 20 times counted, in file order, through the full middleware stack: with a browser's
-`Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in (a form, or a cookie, signed with the app's key for `signed: true`), CSRF tokens, alternates and
-blocks, and the cookies earlier responses set. A status outside a request's `expect:` aborts the run. Its mails and
-jobs, and the jobs its requests enqueue, are not run here (they need the census's capture); `workloads.json` in the
-output directory holds the file's manifest and lists what was replayed and what was not. Use a disposable database:
-the requests are real requests.
+10 times as warmup and 20 times counted, in file order, through the full middleware stack. It sends them the way
+`script/census app` does, through the same code (`Lowrail::Workloads::Replayer`): a browser's `Host`, `Origin`,
+`Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in (a form, or a cookie, signed
+with the app's key for `signed: true`), CSRF tokens (none for `csrf: false`), alternates and blocks, and the cookies
+earlier responses set. A status outside a request's `expect:` stops the run.
 
-`--record [FILE]` records, in the first run, the shape of every routed request: method, route, JSON or XHR, and for
-a write one request's params. It then writes the 20 most frequent shapes as a workloads file (default
-`lowrail/workloads.rb`, or `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's
-first row (`Article.first!`), GETs ready to run, writes commented out until they are made repeatable (a `setup`
-reset, `alternate:` or a block). Shapes are noted after the counting window closes, so recording does not change
-the counts. From the Blog's suite (21 tests, 12 requests) it writes:
+**The requests are real.** They write to the app's database and go through its own queue adapter and mail
+delivery: an inline adapter performs the jobs they enqueue inside the request (and counts them as part of it), any
+other adapter enqueues real work that workers will run, and mail is delivered as the environment is configured. Run
+it only against a disposable database and disposable queue, mail and third-party services. What it does not run is
+the file's own `mail` and `job` workloads (the census runs those, with jobs captured). `workloads.json` in the
+output directory holds the file's manifest, the adapters the requests used, the requests that enqueue jobs, and for
+requests with an alternate or block the variants measured.
+
+`--record [FILE]` records, in the first run, the shape of every routed request: method, route, format, JSON or XHR,
+an Accept the file would not send anyway (a Turbo Stream's), and one request's params (a GET's query, a write's
+body). It then writes the 20 most frequent shapes as a workloads file (default `lowrail/workloads.rb`, or
+`tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row
+(`Article.first!`, for models the app has loaded). Recording is sensitive: params pass through the app's
+`filter_parameters` before anything is kept, filtered values are written as `[FILTERED]`, and nothing is taken from
+the raw path or query string; still check the file before you commit it. Every value from a request is written as
+a quoted literal, never as Ruby. Only GETs that replay as recorded are enabled; each other shape is commented out
+with its reason, until you make it work:
+
+* a write (it repeats one test's params): make it repeatable with a `setup` reset, `alternate:` or a block;
+* params with `[FILTERED]` values: fill them in;
+* params that were shortened (long or binary values, uploads), optional path parts, or a write's query string;
+* a path part the file cannot look up (`:slug`, a model the app had not loaded): the path is the one seen.
+
+A record lookup only commented-out requests use is commented out too. Shapes are noted after the counting window
+closes, so recording does not change the counts. From the Blog's suite (21 tests, 12 requests) it writes:
 
 ```ruby
 article = Article.first!
-comment = Comment.first!
+# comment = Comment.first!
 
 # 2 requests (a write: make it repeatable, then uncomment)
 # patch article_path(article), name: "PATCH /articles/:id", params: {"article" => {"body" => "Rails is a web application framework running on the Ruby programming language.", "title" => "Updated Title"}}
 # ...
+
+# 1 request
 get articles_path, name: "GET /articles"
+
+# 1 request
 get article_path(article), name: "GET /articles/:id"
-get edit_article_path(article), name: "GET /articles/:id/edit"
-get new_article_path, name: "GET /articles/new"
+# ...
+
+# 1 request (a write: make it repeatable, then uncomment)
+# delete article_comment_path(article, comment), name: "DELETE /articles/:article_id/comments/:id"
 ```
 
 That file is what `script/census app` then measures as fixed workloads. `--paths FILE` is gone; a `paths.txt` line
 `GET /articles` is `get "/articles"` in the workloads file.
 
-Options (before `--`; everything after it is the command's): `--out DIR` (default `tmp/lowrail-profile`), `--runs N` (default 2; the last run is compared with the
-first as the noise floor), `--top N` (default 30), `--seed N` (default 1234, passed as `SEED` and `--seed` to both
-runs, so test order repeats), `--ledger PATH` (default: the ledger of the Lowrail checkout the gem comes from).
-The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/`; it needs a C compiler and
-Ruby's headers, and is built outside the app, never during its boot.
+Options, all before the first `--` (everything after it, a second `--` included, is the command's, unchanged):
+
+* `--out DIR` (default `tmp/lowrail-profile`): a new or empty directory, or one lowrail-profile created before (it
+  leaves a `.lowrail-profile` marker), where it replaces only its own runs and reports. It refuses any other
+  existing directory and deletes nothing in it.
+* `--runs N` (default 2; the spread between runs is the noise floor), `--top N` (default 30), `--seed N` (default
+  1234, passed as `SEED` and `--seed` to every run, so test order repeats), `--ledger PATH` (default: the ledger of
+  the Lowrail checkout the gem comes from).
+
+The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/DIGEST/`, where the digest
+covers its sources and compiler settings, so another Lowrail checkout never picks up a different build; the app
+also refuses an extension of another version before hooking anything. It needs a C compiler and Ruby's headers, and
+is built outside the app, never during its boot.
 
 ## What it measures
 
@@ -100,10 +135,15 @@ Ruby's headers, and is built outside the app, never during its boot.
 
   Each is prepended from Active Support's on_load hook for its framework class (`before_configuration`,
   `action_controller`, `active_job`, `action_mailer`, `action_cable_channel`), so nothing loads earlier than the
-  app loads it, and a framework the app never loads is never hooked. A window inside another (a job performed
+  app loads it, and a framework the app never loads is never hooked. A hook that cannot be installed (the class is
+  frozen) prints a warning, and that framework is not counted. A window inside another (a job performed
   inline, a mail delivered inside a request) counts as part of the outer one, so a request's numbers include the
-  jobs and mail it runs and jobs, mails and Cable actions reported apart are the ones that ran on their own;
-* an `at_exit` writer (one TSV per process; forked test workers reset their counts and write their own).
+  jobs and mail it runs and jobs, mails and Cable actions reported apart are the ones that ran on their own.
+  A window belongs to the fiber that opened it: overlapping threads (with M:N threads too) and independent fibers
+  (a fiber scheduler's requests) each count their own, and allocations in another fiber the window starts
+  (`Enumerator#next`) are not counted. Code in Ractors other than the main one runs uncounted;
+* an `at_exit` writer (one TSV per process; forked test workers reset their counts and recorded shapes and write
+  their own).
 
 The repeat run also records, for every allocation inside a window, the nearest frame in the app's own code (under
 the app root, outside `test/`, `spec/` and vendored gems) and the window's name. It reads the stack with
@@ -191,19 +231,29 @@ changes (`--missing` after GitHub's rate limit stops it).
 
 `lowrail-profile compare BASE.json HEAD.json` sets the `report.json` of two profiles against each other, per line
 outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per request. It
-exits 1 when anything grew beyond its noise floor, 0 otherwise; `--json` prints the changes as JSON, `--min N`
-(default 1) sets the smallest change that counts.
+exits 1 when anything grew beyond its noise floor and 0 when nothing did, but only for valid evidence; otherwise it
+exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
 
-* A line's noise floor is the larger of its run-to-run difference in either report and `--min`.
-* An action's is the largest of twice its run-to-run difference, 0.1% of its objects per request and 20 × `--min`,
+* **Valid evidence**: both reports come from this version of lowrail-profile (they carry capture metadata), with
+  at least two runs each, every run's command exiting 0, no dropped samples and windows in every run; and base and
+  head ran the same command with the same seed, Ruby, environment, number of runs and workloads manifest. A
+  missing or partial report, a failing suite or a one-run profile is never a green result.
+* A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of both reports has some.
+  A line one side never reached is a measured zero there; an action one side did not run, or that has no warm value
+  on a side (it ran once per process), is listed as not compared.
+* A line's noise floor is the larger of its run-to-run spread (largest minus smallest run, so every run counts with
+  `--runs` above 2) in either report and `--min`.
+* An action's is the largest of twice its run-to-run spread, 0.1% of its objects per request and 20 × `--min`,
   because parallel test workers split an action's requests differently from one invocation to the next, which the
-  difference inside one invocation does not show. Actions that ran once per process have no warm value and are not
-  compared.
+  spread inside one invocation does not show. That multiplier comes from Campfire's A/A pair, not from a general
+  confidence bound.
 
-On Campfire's suite an A/A pair (two invocations on the same code) has no changes beyond the floor (the largest
-action move was 6.5 objects, 0.08%), and adding `20.times { ERB::Util.html_escape("a<b") }` to
-`RoomsController#show` gives 3 regressions and exit 1: the action (+46.35 per request against a floor of 26.48) and
-the two Active Support lines it calls (+1.68 per request each over all requests, floor 1.0), and nothing else.
+On Campfire's suite an A/A pair (two invocations of `bin/rails test` on the same code) exits 0 with no changes
+beyond the floor, and adding `20.times { ERB::Util.html_escape("a<b") }` to `RoomsController#show` gives exit 1
+with 3 regressions: the action (+45.85 per request against a floor of 26.47) and the two Active Support lines it
+calls (+1.68 per request each over all requests, floor 1.0), and nothing else; 35 actions that run once per process
+are listed as not compared. Comparing a `bin/rails test -v` profile with a `bin/rails test` one exits 2 (different
+commands). Rechecked after the review fixes; the first measurement gave +46.35 against 26.48.
 
 A GitHub Actions job that profiles the pull request's base and head with the same command and fails on a
 regression:
@@ -227,20 +277,56 @@ lowrail-profile:
         bin/rails db:test:prepare
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
+      shell: bash # pipefail, so tee does not hide compare's exit status
       run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json | tee -a "$GITHUB_STEP_SUMMARY"
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step from the head's
-Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles; check the suite in its own job.
+Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles, for a look at the report, but compare then
+exits 2; check the suite in its own job. `shell: bash` matters: without it GitHub runs the step without `pipefail`,
+and `tee` would turn compare's exit status into 0.
 
 ## Safety
 
 With the gem in the Gemfile and `require: false`, an app that does not run `lowrail-profile` loads none of
 Lowrail. The gemspec no longer requires `lib/lowrail.rb` (Bundler evaluates a path or git gem's gemspec in every
-process). When the command runs it, any failure to load the counter prints one warning and leaves the app as it is,
-and a failure to write the report never changes the exit status.
+process). When the command runs it:
 
-Checked on five apps' own suites (fresh `script/corpus APP DIR --source-only` copies at their corpus pins, each
+* a counter that fails to load, or one of another version (an older build), prints one warning and nothing is
+  hooked;
+* a framework hook that cannot be installed later (its class is frozen) prints one warning, and the app's load goes
+  on as it would;
+* every profiler call inside the app (opening, naming and closing a window, noting a request's shape) is contained
+  where it runs, so the app's own results and exceptions pass through unchanged, as the same objects;
+* code in a Ractor other than the main one runs uncounted, without calling the counter (its tables are not
+  Ractor-safe, and are not marked so);
+* a failure to write the report never changes the command's exit status.
+
+`gem/test/profile_test.rb` checks the cases above that a test can reach: a Cable subscription's return value and
+exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
+it did not create.
+
+### Rechecked after the review fixes (2026-11-18)
+
+After the fixes for the [review](upstream/profile-review-2026-11-18.md), the same three ways on fresh copies of
+the two apps the review asked for, with the same scripts (seed 1234, `$LOADED_FEATURES` from every process):
+
+| App, suite | Ruby, Rails | Tests | Outcomes (plain = off = run 1 = run 2) | Suite time: plain, off, run 1, run 2 | Wall: plain, off, profiled |
+| --- | --- | ---: | --- | --- | --- |
+| Campfire, `bin/rails test -v` (2 workers) | 4.0.7, main `e3d5c569` | 634 | identical per test: 632 pass, 2 skip | 19.7, 20.8, 19.0, 31.4 s | 22.5, 23.3, 64.4 s |
+| Lobsters, `bundle exec rspec --seed 1234 --format documentation` | 4.0.9, 8.1.3.1 | 927 | identical per example (timestamps and random tokens masked): 0 failures | 33.4, 33.3, 35.5, 40.8 s | 39.0, 37.9, 96.2 s |
+
+* Load order: Campfire's 6 processes per setup load every feature outside Lowrail, RubyGems and Bundler in the
+  same order plain, off and in both profiled runs. Lobsters' off and both profiled runs are identical, and so are
+  two more plain runs and one more off run made as a control. Only the copy's first plain run after `db:prepare`
+  loaded Lobsters' `extras/sponge.rb` and Ruby's `unicode_normalize` at another point (same files, 291 positions
+  moved); its repeats did not, so that is the cold first run, not the gem.
+* Lobsters' command now reaches RSpec with its own `--seed 1234`: options after `--` are no longer read by
+  lowrail-profile (in the table below, that run's report showed the command without it).
+* The profiled processes print no `[lowrail-profile]` warning; the numbers (666 Campfire requests at 19,487
+  objects per request) match the earlier runs.
+
+Checked first on five apps' own suites (fresh `script/corpus APP DIR --source-only` copies at their corpus pins, each
 suite run the way its CI runs it, with the request, job, mail and Action Cable hooks above). Each suite ran three
 ways: without the gem, with the gem in a copy of the Gemfile but not run ("off"), and through `lowrail-profile`
 (both runs), with `$LOADED_FEATURES` dumped at exit from every process and seed 1234 throughout:
@@ -262,9 +348,12 @@ ways: without the gem, with the gem in a copy of the Gemfile but not run ("off")
   allocation to find the app frame and costs 1–45% (Campfire's suite, at 19,400 objects per request, the most).
 * `--record` notes a request's shape after the counting window closes and requires `json` only at exit, when
   Bundler has long set up. On the Blog's suite (21 tests, Rails 8.1.4) per-test outcomes are identical plain and
-  under `--record`.
+  under `--record` (rechecked after the fixes, with the gem listed but off as the control).
 
 ## Proof on two corpus apps
+
+These runs predate the review fixes: `--workloads` then sent no `Host` or `Origin` header and no form type for an
+empty write, which it now sends like the census client.
 
 Both apps are the census copies (`script/census setup --rails main`, Rails main `4500a94c34`, Ruby 4.0.9) with the
 gem added to a copy of the census Gemfile, and compared with a census A/A pair on the same copies
