@@ -1,0 +1,9 @@
+has_many {}
+has_many_scoped {}
+has_many_through {}
+has_many_as {}
+has_one {}
+belongs_to {}
+joins_has_many {}
+joins_through {}
+control {type_eq: 1}

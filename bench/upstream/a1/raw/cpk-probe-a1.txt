@@ -1,0 +1,6 @@
+cpk_has_many {} [1, "SELECT \"items\".* FROM \"items\" WHERE \"items\".\"shop_id\" = 1 AND \"items\".\"order_id\" = 1"]
+cpk_has_many_scoped {} [1, "SELECT \"items\".* FROM \"items\" WHERE \"items\".\"shop_id\" = 1 AND \"items\".\"order_id\" = 1 AND \"items\".\"sku\" = 'a'"]
+cpk_belongs_to {} [[1, 1]]
+through_cpk {} [1, "SELECT \"items\".* FROM \"items\" INNER JOIN \"orders\" ON \"items\".\"shop_id\" = \"orders\".\"shop_id\" AND \"items\".\"order_id\" = \"orders\".\"id\" WHERE \"orders\".\"shop_id\" = 1"]
+disable_joins {} [["t"]]
+joins_cpk {} ["SELECT \"orders\".* FROM \"orders\" INNER JOIN \"items\" ON \"items\".\"shop_id\" = \"orders\".\"shop_id\" AND \"items\".\"order_id\" = \"orders\".\"id\""]

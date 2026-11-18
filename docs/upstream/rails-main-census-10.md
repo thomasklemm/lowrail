@@ -130,7 +130,10 @@ empty; `join_scope` skips it when there are no scope items. Against the checklis
 * Order: with a scope item the differences now run after the scope lambdas instead of between them; they compare
   Rails' own Arel nodes and record nothing, so the order is not observable. A reviewer may prefer keeping the
   `key_clause` line where it is and only skipping the rest; that costs one difference (2 objects) per load.
-* Not checked yet: preloader (`preloader/association.rb:308`, unchanged by the ceiling) and Ruby master × ZJIT.
+* **Built (2026-11-18)** as [A1](../../bench/upstream/a1/README.md) on main `e30c36266b`: the preloader and
+  `disable_joins` already compute their differences only when needed; the full differential probe (preload, eager
+  load, joins, STI, `as:`, scoped through, `unscope`/`rewhere`, both settings) and the association and relation tests
+  on SQLite and PostgreSQL pass. Ruby master × ZJIT is still missing.
 
 **Prior work.** None on the cost. #59825 and #59836 have no reviews or comments on performance (kamipo merged both
 himself); #59836's description says the check exists for the `unscope(where: :user_id)` pattern. Our open #59569

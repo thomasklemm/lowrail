@@ -1,0 +1,6 @@
+objects author.posts	122.999
+objects author.profile	103.0
+objects comment.post	103.0
+objects author.comments (through)	159.999
+objects Author.joins(:posts)	109.0
+objects author.published_posts (scoped)	172.0

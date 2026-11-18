@@ -1,0 +1,6 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Fetching prism 2.1.0 (x86_64-linux-gnu)
+Installing prism 2.1.0 (x86_64-linux-gnu)
+Bundle complete! 4 Gemfile dependencies, 22 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

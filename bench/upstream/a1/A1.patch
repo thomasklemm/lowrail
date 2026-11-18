@@ -1,0 +1,87 @@
+diff --git a/activerecord/lib/active_record/associations/association_scope.rb b/activerecord/lib/active_record/associations/association_scope.rb
+index b9ac884e7d..6e81ce1ffb 100644
+--- a/activerecord/lib/active_record/associations/association_scope.rb
++++ b/activerecord/lib/active_record/associations/association_scope.rb
+@@ -43,11 +43,10 @@ def join(table, constraint)
+         end
+ 
+         # Returns the scope with the conditions that tie the records to the owner,
+-        # and the key conditions among them.
++        # and its where clause after the key conditions.
+         def last_chain_scope(scope, reflection, owner)
+           table = reflection.aliased_table
+           route = reflection.association_route
+-          where_clause = scope.where_clause
+ 
+           route.each_constraint do |origin_column, destination_column|
+             value = value_reader.call(owner, origin_column)
+@@ -59,13 +58,13 @@ def last_chain_scope(scope, reflection, owner)
+             scope = apply_scope(scope, table, destination_column, value)
+           end
+ 
+-          key_clause = scope.where_clause - where_clause
++          key_where_clause = scope.where_clause
+ 
+           route.destination_fixed_values.each do |column, value|
+             scope = apply_scope(scope, table, column, value)
+           end
+ 
+-          [scope, key_clause]
++          [scope, key_where_clause]
+         end
+ 
+         def next_chain_scope(scope, reflection, next_reflection)
+@@ -122,17 +121,19 @@ def get_chain(reflection, association, tracker, routes)
+ 
+         def add_constraints(scope, owner, chain)
+           where_clause = scope.where_clause
+-          scope, key_clause = last_chain_scope(scope, chain.last, owner)
++          scope, key_where_clause = last_chain_scope(scope, chain.last, owner)
+ 
+           chain.each_cons(2) do |reflection, next_reflection|
+             scope = next_chain_scope(scope, reflection, next_reflection)
+           end
+ 
+-          fixed_clause = scope.where_clause - where_clause - key_clause
++          chain_where_clause = scope.where_clause
++          scoped = false
+ 
+           chain_head = chain.first
+           chain.reverse_each do |reflection|
+             reflection.constraints.each do |scope_chain_item|
++              scoped = true
+               item = eval_scope(reflection, scope_chain_item, owner)
+ 
+               if scope_chain_item == chain_head.scope
+@@ -159,7 +160,11 @@ def add_constraints(scope, owner, chain)
+             end
+           end
+ 
+-          chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
++          if scoped
++            key_clause = key_where_clause - where_clause
++            fixed_clause = chain_where_clause - where_clause - key_clause
++            chain.first.keep_owner_conditions(scope, key_clause, fixed_clause)
++          end
+ 
+           scope
+         end
+diff --git a/activerecord/lib/active_record/reflection.rb b/activerecord/lib/active_record/reflection.rb
+index ff46897cfb..a46f7a2ae8 100644
+--- a/activerecord/lib/active_record/reflection.rb
++++ b/activerecord/lib/active_record/reflection.rb
+@@ -233,9 +233,11 @@ def join_scope(table, foreign_table, foreign_klass)
+         route.destination_fixed_values.each do |column, value|
+           klass_scope._where!(column => value)
+         end
+-        fixed_clause = klass_scope.where_clause - where_clause
+-        scope_chain_items.inject(klass_scope, &:merge!)
+-        keep_owner_conditions(klass_scope, Relation::WhereClause.empty, fixed_clause)
++        unless scope_chain_items.empty?
++          fixed_clause = klass_scope.where_clause - where_clause
++          scope_chain_items.inject(klass_scope, &:merge!)
++          keep_owner_conditions(klass_scope, Relation::WhereClause.empty, fixed_clause)
++        end
+ 
+         route.each_match do |origin_column, destination_column|
+           destination_attribute = predicate_builder.predicate_attribute(table[destination_column])

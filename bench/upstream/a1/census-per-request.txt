@@ -1,0 +1,30 @@
+casa       GET dashboard                          A1  -0.36%  A/A  -0.13%  objs   4165 ->   4116
+casa       GET casa cases                         A1  -0.15%  A/A  -0.07%  objs  10580 ->  10525
+casa       GET casa case                          A1  -0.45%  A/A  -0.14%  objs  16860 ->  16630
+casa       GET casa case edit                     A1  -0.89%  A/A  -0.17%  objs  23950 ->  23253
+casa       GET volunteers                         A1  -0.36%  A/A  -0.05%  objs  16107 ->  15963
+casa       GET supervisors                        A1  -0.57%  A/A  -0.15%  objs  10498 ->  10341
+casa       GET case contacts                      A1  -0.19%  A/A  -0.06%  objs  30904 ->  30682
+casa       POST api sign_in.json                  A1  -0.00%  A/A  +0.00%  objs   1125 ->   1115
+casa       PATCH casa case (redirect)             A1  -0.34%  A/A  +0.19%  objs   4478 ->   4407
+casa       PATCH casa case.json                   A1  -0.42%  A/A  -0.05%  objs   4173 ->   4106
+writebook  GET books                              A1  -0.19%  A/A  -0.04%  objs   4448 ->   4426
+writebook  GET book                               A1  -0.24%  A/A  -0.01%  objs   5787 ->   5746
+writebook  GET leaf                               A1  -0.18%  A/A  -0.00%  objs   7978 ->   7914
+writebook  GET leaf.md                            A1  -0.40%  A/A  +0.00%  objs   3649 ->   3600
+writebook  PATCH page (turbo_stream)              A1  -0.26%  A/A  -0.07%  objs   8088 ->   8018
+writebook  POST search                            A1  -0.18%  A/A  -0.14%  objs   4638 ->   4601
+writebook  POST page (turbo_stream)               A1  -0.31%  A/A  -0.31%  objs   6769 ->   6717
+writebook  perform Turbo::Streams::BroadcastJob   A1  -0.41%  A/A  -0.72%  objs    561 ->    567
+hackatime  GET dashboard                          A1  +0.21%  A/A  +0.04%  objs  13570 ->  13526
+hackatime  GET projects                           A1  -0.17%  A/A  -0.03%  objs   7604 ->   7555
+hackatime  GET leaderboards                       A1  +0.34%  A/A  +0.07%  objs   6456 ->   6416
+hackatime  GET settings profile                   A1  -0.10%  A/A  -0.05%  objs   7871 ->   7819
+hackatime  GET dashboard (Inertia XHR)            A1  -0.14%  A/A  -0.00%  objs  12408 ->  12343
+hackatime  GET dashboard stats (deferred)         A1  -0.08%  A/A  +0.10%  objs  10406 ->  10361
+hackatime  GET leaderboard entries (deferred)     A1  +0.01%  A/A  +0.08%  objs   2668 ->   2659
+hackatime  PATCH display name (Inertia redirect)  A1  +0.12%  A/A  +0.17%  objs   2974 ->   2967
+hackatime  PATCH username invalid (Inertia 422)   A1  -0.03%  A/A  +0.06%  objs   7964 ->   7935
+hackatime  GET statusbar today                    A1  -0.21%  A/A  +0.12%  objs   2442 ->   2407
+hackatime  POST heartbeat                         A1  -0.06%  A/A  +0.12%  objs   4203 ->   4186
+# 29 workloads: median -0.19%, min -0.89%; beyond A/A: 17
