@@ -60,7 +60,7 @@ singleton receivers.
 | --- | --- | --- | --- | --- | --- |
 | 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.0–11.9 s → 3.3–3.6 s of compile time; no new payloads, app alloc within A/A | ours (assigned), #19680 reopened by tekknolagi; tenderlove's #19962 is open | **built, ZWB1 -4** |
 | 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −2.5% Ir per call (−10), railsbench about 0.005% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1 -3** (near both stop limits) |
-| 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
+| 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | generic fallback removed for eligible extended objects; original micro/app figures unverified | free (no replacement for the closed wrong-repo attempt found on 11-18) | **changes requested, ZSV1** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
 | 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
 | 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | taken 2026-11-18: tekknolagi's draft ruby/ruby#18616 (11-16 head) covers final versions | old build, not rebased, stays unopened |
@@ -92,7 +92,7 @@ Branch [`thomasklemm/zjit-cache-may-write-block-code-4`](https://github.com/thom
 * **State.** #19680's branch is untouched. The coordinator thread pushes -4 there, replaces the body, marks it ready
   and posts the comment after a confirm pass.
 
-## ZSV1: the real class for `setinstancevariable` (built)
+## ZSV1: the real class for `setinstancevariable` (changes requested)
 
 Branch [`thomasklemm/zjit-setivar-real-class`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-setivar-real-class)
 @ `fe6ea9ef84`, two commits on `7919a47d46`, 2 files, +106/−1 (production code +21/−1 in `zjit/src/profile.rs`).
@@ -107,17 +107,28 @@ Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
 * **Mechanism.** Two HIR tests: an `extend`ed receiver writing an existing ivar and one adding an ivar. On master
   both are `SideExit NoProfileSetIvar recompile`; on the branch a shape guard and `StoreField` (and the shape write
   for the transition).
-* **Numbers.** Micro (`O = C.new.extend(M)`, `def bump = @a = 1`, Callgrind slope over 200,000 calls): master 475,
+* **Original numbers (unverified in review).** Micro (`O = C.new.extend(M)`, `def bump = @a = 1`, Callgrind slope over 200,000 calls): master 475,
   master-aa 475, branch 392 Ir per call; master writes 999,869 of 1,000,000 generically. Apps: lobsters −584 generic
   writes per iteration, railsbench and shipit unchanged (shipit's 54 moved to `not_t_object`). No time claim.
-* **Tests** (`--enable-zjit=dev`): `make zjit-test` 2,015 of 2,016 (the same SIGPROF test); btest at thresholds 1
+* **Original test report** (`--enable-zjit=dev`): `make zjit-test` 2,015 of 2,016 (the same SIGPROF test); btest at thresholds 1
   and 2 all 2,148; `test_zjit_cli`, `test_optimization`, `test_shapes`, `test_object`, `test_variable` at both
   thresholds 323 tests, 0 failures. Differential probe (extended, subclassed, frozen, `instance_variable_set` and
   >70-shape receivers, class ivars): identical output from the interpreter and from ZJIT at threshold 1, 2 and
   `--zjit-max-versions=1`, on master and the branch.
-* **Recommendation.** It answers #1122 and is small, but has almost no Rails reach; it is a tidy follow-up to
-  #19858 rather than a performance PR. Before anything is posted, check that efegokdemir hasn't refiled #1126 on
-  ruby/ruby.
+* **Thermos review (2026-11-18).** `thermos-sol`, exact `fe6ea9ef84`, **changes**; both rubrics applied by the
+  sole reviewer, without subagents or other threads. No introduced correctness/security or structural defect
+  found; existing shape/layout/frozen guards and GC barriers remain intact. Must trim redundant comments,
+  substantiate or cut the original body numbers, qualify ordinary singleton receivers, remove body test/A-A
+  narration, and package one coherent fix commit on refreshed master. The historical numbers above and the
+  draft below are retained as author claims, not approved posting text. Full guard trace, sentence audit and
+  new execution evidence: [review record](../../bench/upstream/zsv1/thermos-review.md).
+* **Upstream check (2026-11-18).** Applies cleanly to master `4414d3ea25` (30 commits beyond the base, no
+  relevant file drift). #1122 is open/unassigned with no comments; #1126 is closed/unmerged, and Ruby PR
+  searches, the issue timeline and efegokdemir's PR list show no replacement. #19858 handles reads only.
+* **Recommendation.** It answers the team's request with a small change; almost-zero Rails reach remains a
+  historical claim, not a new verified measurement. Do not publish the current comments/body or claim speed
+  from the diagnostic micro. Address the review, then obtain a fresh exact-head pass and the usual posting
+  approval. The Ruby branch and drafts were not changed by the review.
 
 ### Comment draft for #1122 (not posted)
 
