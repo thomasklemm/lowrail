@@ -17,7 +17,7 @@ rank:
 risky: false
 state: ready
 pr: 175
-note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without SHA, rake/CI and differential lines, unposted; code unchanged. our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
+note: "2026-11-18 (rules review): body cleaned per Leave out, thermos-sol body-only approve (a26f9b16), PATCHed live. 2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without SHA, rake/CI and differential lines, unposted; code unchanged. our #171 is still open there without a response; tzinfo's last release is 2.0.6 (2023)"
 passes:
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: changes, open: "code approved as is; body must-fix: tzinfo-data copies were identical objects, linked files unpushed; should-fix: scope of TimeWithZone callers, run spread, NaN/raising fields; all applied"}
   - {reviewer: skeptic, head: "2b2f4b458dadd3e132790d7c5bf934cee1820af6", date: 2026-11-05, verdict: nits, open: "body re-review: no must-fix; nits applied (Hash wording, zones with transitions); kept the ~210 per unequal comparison"}

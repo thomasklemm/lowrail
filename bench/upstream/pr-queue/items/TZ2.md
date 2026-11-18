@@ -17,7 +17,7 @@ rank: 2
 risky: false
 state: ready
 pr: 171
-note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without the fork-CI line, unposted; code unchanged. posted 2026-11-05: PR branch moved 57c9c3ad35 -> 57056ddd7f (rebase onto master 1207d6098d, same patch) and body replaced; Thomas allowed the update"
+note: "2026-11-18 (rules review): body cleaned per Leave out, thermos-sol body-only approve (a26f9b16), PATCHed live. 2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without the fork-CI line, unposted; code unchanged. posted 2026-11-05: PR branch moved 57c9c3ad35 -> 57056ddd7f (rebase onto master 1207d6098d, same patch) and body replaced; Thomas allowed the update"
 passes:
   - {reviewer: skeptic, head: "57056ddd7f46f9c292e46687821636e812102c85", date: 2026-11-05, verdict: approve, open: "exact code and shortened body approved; no must-fix or body nit; recommends one update as a simpler file-load decoder, not an app-speed claim; record's skip wording corrected"}
   - {reviewer: sol, head: "57056ddd7f", date: 2026-11-05, verdict: approve, open: "body checked against the record; patch identical to 57c9c3ad35"}
