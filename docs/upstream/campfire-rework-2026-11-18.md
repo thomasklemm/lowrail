@@ -10,6 +10,8 @@ The builder's recommendations below are superseded by the [thermos-sol confirmat
 at the end of this record. In particular, the queue-first backup is an improvement, not a coherent two-database
 snapshot, and a restored claimed job does not necessarily fail as `ProcessMissingError` at boot.
 The [fix round](#fix-round--3) then replaced the `-2` heads of #345, #346, #347, #417 and #352 with `-3` heads.
+Their [confirmation](#thermos-sol-confirmation-of-the--3-heads) approves all five exact heads, after Thomas
+explicitly accepted the disclosed residual backup semantics (Lowrail `949c8211`).
 
 New fork branches with the suffix `-2` on thomasklemm/once-campfire. Thomas Klemm is author and committer with the
 original author dates, except namespaceMarcello's two commits (his authorship and dates, Thomas as committer).
@@ -504,8 +506,8 @@ Skips are the two libvips loaders, as on main. Stack: #345-3 ← #347-3 (#346-3 
 admin can leave a closed room the same way (`Rooms::ClosedsController#update` revokes any members), so re-enqueuing
 `Room::DestroyJob` for such rooms after a restore could delete a live room. Re-running banned users' removals would
 cover only that half. Copying both files at the same instant would not help either: the room's update and its job
-are separate commits in separate databases. So the gap is accepted as stated (pending Thomas), in the commit message
-and the body: a job enqueued while the backup runs can be missing, so a room deleted in that moment comes back closed
+are separate commits in separate databases. Thomas explicitly accepted this gap (Lowrail `949c8211`). The commit message
+and body state it: a job enqueued while the backup runs can be missing, so a room deleted in that moment comes back closed
 and without members, with its messages; a job running at the backup comes back claimed by its process and fails
 once that process is pruned (`ProcessPrunedError`). The queue-first comment and the matching message sentence are
 gone. New test `test/script/admin/prepare_backup_test.rb` (in the style of `reset_password_test.rb`): it loads the
@@ -564,6 +566,213 @@ per file they pass (review).
 
 ### Open questions (fix round)
 
-1. #346: accept the stated residual gap between the two snapshots?
+1. #346: closed by Thomas's explicit acceptance (Lowrail `949c8211`), including no automatic reconciliation.
 2. #350 and #374: closed upstream on 2026-11-18 (Lowrail `f44cdb21`); nothing left to decide.
 3. #352: the body uses the `-3` no-JIT table; the YJIT run follows in the record only.
+
+### Thermos-sol confirmation of the -3 heads
+
+Reviewer: `thermos-sol`, [review thread](https://ampcode.com/threads/T-01a1ef2c-1922-7747-9a0f-a329b1b6bfa6),
+2026-11-18. Both correctness/security and maintainability rubrics self-performed, without another reviewer,
+subagent or thread. This confirms the must-fixes recorded in Lowrail `4e230208` against the rebuilt heads and
+drafts recorded in `272a7e83`. All five exact heads descend from Campfire
+`7b809885a194f4c2f06f4f43e8e34704968f543e`; published queue `head`/`branch` fields are deliberately unchanged.
+
+| Item | Exact proposed head | Verdict |
+| --- | --- | --- |
+| CF345 | `0605b38aad4b3cbbe51e3a0e5486d13820ad51aa` | approve; no remaining must-fix |
+| CF346 | `2394bc39977b3fcf071db7818c4ab71d6d15c7ee` | approve; disclosed backup gap accepted, no remaining must-fix |
+| CF347 | `8b22b56402b2d7c3085bbe3710ff9b079368c458` | approve; inherited acceptance closed, no remaining must-fix |
+| CF417 | `179162370395817fa60d9eb9a876eac20fc048fa` | approve; inherited acceptance closed, no remaining must-fix |
+| CF352 | `dd74f7028c61a2dae2da92c9fa06c90a9728d2e0` | approve; no remaining must-fix |
+
+**Acceptance is closed.** It remained pending at the start of this review. The coordinator then relayed Thomas's
+explicit acceptance, recorded in Lowrail `949c8211`, of exactly the current CF346-3 body: a room destroyed between
+the queue and primary snapshots restores closed, without members, with its messages, and no automatic
+reconciliation. I fetched and read that commit's CF346/CF347/CF417 notes. This closes the predecessor's only
+remaining condition; none of the heads or upstream bodies changed. On their own merits all five exact heads
+have **no other must-fixes** under either rubric, so all five final passes approve. Acceptance does not make the
+snapshots coherent or authorize a reply claiming Codex's original P1 fully fixed. No upstream action is authorized
+by this confirmation.
+
+#### Previous findings, confirmed closed
+
+- **CF345:** the misleading memory-cache replacement comment and both optional `max_age` lines are gone. The
+  rest of the `-2` tree and message are unchanged. Production `db:prepare` succeeded; the exact head uses
+  `SolidCache::Store`, round-trips a value, and reports primary/cache `wal_autocheckpoint` 0/1000.
+- **CF346:** the queue-first comment and its false record-preservation claim are gone. The body and message
+  distinguish retaining queued/claimed jobs from obtaining a coherent snapshot. The proposed reconciliation is
+  correctly rejected: an actual authenticated `Rooms::ClosedsController#update` request with every checkbox
+  unchecked leaves a live closed room with zero memberships and its messages, without a `Room::DestroyJob`.
+  Inferring deletion intent from that state and enqueuing destruction would delete live content. Recovering only
+  banned users' removals would not recover rooms. A new deletion marker/outbox or an app-wide quiescence contract
+  would be a different change, not a harmless extra restore hook. Simultaneous file snapshots alone would still
+  not make the separate primary-state and enqueue commits atomic.
+- **Gap wording:** reproduced on CF346 and CF347 by invoking real `Room#destroy_later` immediately after the
+  queue snapshot and before the primary snapshot. The backup retains the earlier job, while the exact new
+  deletion job ID is absent; its primary has the newly closed room, zero memberships and the message left in it.
+  The draft's room example and conditional “can be missing” describe this residual loss, not loss of the whole
+  queue or guaranteed loss on every backup. There is no promised millisecond bound or coherent-snapshot claim.
+  A job's primary-state commit and enqueue are separate too, so the boundary is not only the elapsed copy time.
+- **Restore wording:** the new backup contains the claimed execution **and its process row**. I ran each real
+  restore hook with only its `/rails/` path prefix remapped into the disposable checkout, after closing database
+  connections. The restored claim is not an orphan and survives the startup orphan-failure operation; aging and
+  pruning its process produces `SolidQueue::Processes::ProcessPrunedError`. Thus “fails once that process is
+  pruned” is correct; universal immediate boot-time `ProcessMissingError` is not. Each backup/restore/real-controller
+  probe passed 3 cases/23 assertions. CF417 cannot retry a missing queue row, and its body now says so.
+- **Backup test:** the shipped case passes 1 test/3 assertions and checks the real script's primary snapshot, ready/running job
+  IDs and claim/process association, not a mocked snapshot call. Removing only `snapshot SolidQueue::Record`
+  makes it error with `no such table: solid_queue_jobs`; restoring that line passes again. Enabling transactional
+  tests independently produces the same missing-table error from an empty queue copy. The one-line SQLite why
+  above `self.use_transactional_tests = false` is therefore justified, not template narration. Direct script
+  loading, a short local path helper and closing the SQLite handles fit the existing admin-script test style.
+  No test pretending to reconcile the gap is needed when no reconciliation is implemented; acceptance is
+  explicit. Scratch mutations were reverted, and all exact-head worktrees have no tracked changes.
+- **CF347 replay:** `8e17a98fbd2633048609e490774cc27c8822be90` has the same queue implementation, schema, test,
+  test configuration, initializer and message as CF346-3. Its differences from that tree are exactly the expected
+  Solid Cache additions/restore cleanup from CF345-3, including the shared benchmark-preparation line already
+  present in CF346. The Cable commit's stable patch ID is identical to `260c05071e`'s. On the final head an actual
+  development subscriber in one Ruby process received another process's Solid Cable broadcast. No runtime Redis,
+  Kredis or Resque reference remains in `app`, `lib`, `config`, `bin` or CI.
+- **CF417:** its own job, recurrence and test are byte-identical to the previously approved retry implementation.
+  The test-queue configuration has moved into CF346, where both tests need it; it is not removed from the full
+  head. There is no new retry policy, safety boundary or comment divergence.
+- **CF352:** `xpath(".//*")` replaces `css("*")`, and “a long selector” replaces “fifty” in the message. Full
+  old/new filter execution was byte-identical on all 13 fixture bodies, 14 adversarial inputs (including mention,
+  zero/one/two embeds, nested forbidden parents, SVG/MathML, namespaces and a String subclass), three 1.26-MB
+  absent/early/late inputs and 3,000 allowed spans. A fresh main/new/new/main dense control at 90,000 spans gave
+  24.51/21.65 s on main and 13.84/12.91 s on this head, with exact output equality. Browser work was running, so
+  these are diagnostic scaling controls, not a replacement speed table; all windows are retained. The previous
+  growing-CSS-union regression is gone without a new guard, compatibility layer or timing test.
+
+#### Guards, comments and maintainer shape
+
+Cold read: cache uses its own disposable database; backup copies queue then primary and restore replaces both;
+Cable shares broadcasts through its own transient database; interrupted-job retries are bounded and allowlisted;
+filters avoid plain-text rendering without a sole embed and remove disallowed nodes in one XPath-selected walk.
+No source file crosses 1,000 lines, no generic backup/reconciliation mechanism was added, and no new wrapper,
+speculative mode or scattered feature branch is warranted.
+
+- **CF345:** no speculative guard. Keep the file's Gemfile section label and primary-only checkpoint reason;
+  the production narration and optional-age commentary were the only required cuts.
+- **CF346:** the restore hook's `-f` is main's existing missing-snapshot contract. The independent pool-of-five
+  reason, primary-only checkpoint reason, pre-fork flock reason and test-adapter/queue-record distinction each
+  prevent a real misreading. The SQLite transaction comment is proved by the negative control. The two existing
+  checkpoint comments only rename Resque. No false queue-order comment remains.
+- **CF347:** inherits those justified comments; its own cable checkpoint reason serves the same real boundary.
+  The existing room comment's “broadcast per member” replaces the removed Redis implementation, without adding
+  new narration or a guard.
+- **CF417:** keep the three interruption classes, two-job allowlist, three-retry cap and `RecordNotFound` rescue
+  for a concurrent manual retry/discard. The class-policy line, execution-counter why and manual-race rescue why
+  remain the short comments the predecessor approved. The test-DB explanation now lives only in the parent.
+- **CF352:** the sole-unfurled-URL check skips actual attachment/mention rendering; it does not pretend to support
+  arbitrary user objects. The allowed-name set has no defensive fallback or new explanatory comment.
+
+#### Drafts, commit messages and retained body data
+
+Every current body, For Thomas section and unique commit message was read against the exact diff, app callers,
+locked gem source and executed probes. CF345's cold-cache, schema preparation, independent checkpoint and
+disposable-restore statements agree with those checks. CF346's nonpersistent Resque, upgrade-loss, pool and
+worker setup statements agree with `redis.conf`, `queue.yml`, database configuration and boot/Procfile changes;
+its message also correctly explains checkpoint hooks and the benchmark's separate baseline image. CF347's
+removed dependencies, multi-worker development reason and disposable Cable restore match source and the
+cross-process probe. CF417's cadence, allowlist, cap and missing-row exclusion match source and the suite; its
+linked Solid Queue v1.7.2 interruption documentation was opened and supports the app-owned recovery policy.
+CF352's sole-link condition and selector/set walk agree with the differential execution. There is no requested
+body or message rewrite left in this pass.
+
+The CF352 body table is supported by the **declared `CF352-3-interp` cohort**, not the withdrawn quick micro or
+the diagnostic `-2` cohort. I fetched the retained measured commit `015240e9e20f2749583b21792890b94529fa0201`:
+its entire tree is identical to `dd74f7028c`. The archived/current benchmark scripts differ only in comment
+wrapping. Independently subtracting each N=0 trailing Callgrind `totals:` from N=500 and dividing by 500
+reproduces all four candidate values and both main values in `results.json`; the body rounds their mean correctly.
+All 24 dumps are complete and no Valgrind log reports a brk overflow. Raw objects also match the JSON, with
+identical base/base2 counts. Replaying the three fixed-heap objects workers on fresh local fixtures reproduces
+every **rounded** body cell with identical main/main counts (the unrounded Lexxy base is 575.921 here, 575.998
+in the retained cohort; both round to 576).
+
+| Case | Retained main mean → candidate instructions | Recomputed instruction A/A | Rounded objects |
+| --- | ---: | ---: | ---: |
+| plain | 1,797,205.636 → 734,556.436 | 0.00458% | 451 → 286 |
+| mention + link | 3,403,478.894 → 1,101,044.118 | 0.33129% | 820 → 365 |
+| formatted list | 3,216,594.938 → 1,407,039.598 | 0.06763% | 891 → 521 |
+| Lexxy paragraphs | 2,950,622.539 → 999,700.326 | 0.08086% | 576 → 384 |
+
+The table describes interpreter instructions/objects, not elapsed time, production throughput or a YJIT result.
+No YJIT cohort is certified by this confirmation. All upstream drafts obey Leave out: no suite counts, validation
+commands, pins/SHAs outside the permitted stacked-body clauses, A/A, other-Ruby comparisons, rejected variants,
+internal cohort/review labels or footer. The CF352 heading's Ruby 4.0/no-JIT label identifies its measurement;
+the record, not the body, carries its exact pin, A/A and diagnostic dense row.
+
+#### Independently executed normal suites
+
+Sequential `mise exec ruby@4.0.9 -- bin/rails test` and `bin/rubocop` on every exact head and clean main, using
+each frozen locked bundle, prepared test databases, local Redis and `PARALLEL_WORKERS=1`:
+
+| Tree | Runs | Assertions | Failures/errors | Skips | Whole-tree RuboCop |
+| --- | ---: | ---: | --- | ---: | --- |
+| main `7b80988` | 649 | 3,921 | 0/0 | 2 | 335 files, clean |
+| CF345 `0605b38aad` | 649 | 3,921 | 0/0 | 2 | 335 files, clean |
+| CF346 `2394bc3997` | 650 | 3,924 | 0/0 | 2 | 335 files, clean |
+| CF347 `8b22b56402` | 650 | 3,924 | 0/0 | 2 | 335 files, clean |
+| CF417 `1791623703` | 651 | 3,930 | 0/0 | 2 | 337 files, clean |
+| CF352 `dd74f7028c` | 650 | 3,922 | 0/0 | 2 | 335 files, clean |
+
+The skips remain main's two libvips loaders. These are normal-suite results, not a blanket browser-suite or
+hosted-CI approval. Logs and harnesses are retained in this confirmation thread's `.amp/in/orb-backup/`:
+`suites.log`, `main-{test,rubocop}.log`, `cfNNN-{test,rubocop}.log`, `backup_probe.rb`,
+`cf{346,347}-backup-probe.log`, `cf346-{no-queue-backup,with-transactions,backup-final}.log`,
+`cf345-production*.log`, `cf347-cable.log`, `filters_probe.rb`, `cf352-{filters,dense-confirm,objects-replay}.log`.
+
+#### Browser outcomes, separate from the normal suite
+
+I ran all eight `test/system/*_test.rb` files in separate Ruby processes for each tree, with Chrome for Testing
+158.0.8127.36, Selenium 4.49.0 and Capybara 3.40.0. No harness workaround or assertion suppression was applied.
+These runs are **not green**: Capybara's Chrome `reset!` issues
+`Storage.clearDataForOrigin(origin: "*", storageTypes: "cookies,local_storage")` after navigating to `about:blank`,
+which this Chrome rejects as `invalid argument: * is not a valid URL`. I read the installed method at
+`capybara/selenium/driver_specializations/chrome_driver.rb:40–55`; the same teardown error is present on main.
+An errored reset is not evidence of isolated browser state for the next case.
+
+All eight files completed on every tree. Raw Minitest totals, without folding the fresh-process diagnostic into
+the suite or calling assertion completion a pass:
+
+| Tree | Runs | Assertions | Failures | Errors | Browser verdict |
+| --- | ---: | ---: | ---: | ---: | --- |
+| main `7b80988` | 30 | 217 | 1 | 29 | not green |
+| CF345 `0605b38aad` | 30 | 220 | 1 | 29 | not green |
+| CF346 `2394bc3997` | 30 | 221 | 0 | 30 | not green |
+| CF347 `8b22b56402` | 30 | 221 | 0 | 30 | not green |
+| CF417 `1791623703` | 30 | 221 | 0 | 30 | not green |
+| CF352 `dd74f7028c` | 30 | 221 | 0 | 30 | not green |
+
+There are zero browser skips. Each tree's logs contain 30 instances of the same invalid-origin teardown error,
+including after the cases whose assertion failure takes precedence in Minitest's totals. CF346, CF347, CF417
+and CF352 have no assertion failure; that does not waive their 30 teardown errors.
+
+The raw main run also failed the three-connected-Cable-stream assertion in the Trix-saved-mention editing case
+(found one), not a sign-in assertion. CF345's raw composer run failed the arrow-up edit assertion. Its inspected
+screenshot shows an authenticated Designers room and a **nonempty composer containing the previous test's
+`<em>Kevin</em> says hi` reply**, so the empty-composer precondition was contaminated. The unchanged composer
+controller persists drafts in localStorage, which the rejected reset was meant to clear. A bounded fresh-process
+control of that one arrow-up case on main and CF345 each reached **4 assertions, 0 failures, 1 teardown error**.
+This explains why that raw CF345 failure is not an empty-composer regression; it does not turn either suite green.
+The builder's separately observed sidebar/sign-in flake is not silently relabeled as reproduced by these runs,
+nor is the main stream-connection failure assigned a proven timing cause. No browser assertion failure is hidden
+by the normal-suite table or used as a fork-specific must-fix without a reproducible code link.
+
+Logs: `browser.log`, `{main,cfNNN}-system-*_test.log`, `{main,cf345}-browser-isolated-arrow.log` in this review's
+scratch directory. Failure screenshots remain alongside those disposable worktrees under `tmp/screenshots`;
+they are not upstream attachments or a browser approval.
+
+#### Identity and delivery scope
+
+Raw `/usr/bin/git cat-file commit` objects for all six unique rebuilt commits, including the CF347 queue replay,
+confirm Thomas Klemm <github@tklemm.eu> as **both author and committer**. Comparing raw author identities,
+timestamps and timezones with their `-2` counterparts preserves all original author dates. Committer dates are
+new, not preserved original dates. Every message has no trailers and no Amp/Claude/Cursor attribution line;
+raw objects are retained in `identity.txt`. The cache and Cable messages are unchanged, the queue/replay messages
+are identical, and the retry-message reduction and filter-message wording change are the recorded ones.
+
+Only this Lowrail record and one exact-head `thermos-sol` pass per item are changed. No Campfire source change,
+fork/PR push, body edit upstream, comment, review submission or other upstream post is part of this confirmation.
