@@ -176,11 +176,14 @@ and says what the pull request means for the version the app runs:
   An added line in a git checkout or before any release is left out, because the same code can stand in the app's
   older version too.
 
-On Campfire's report (Rails main `e3d5c569`, 300 top lines) this gives 21 matches. Each was checked by hand against
-the pull request's diff: in every one the app's line is a line the pull request removes, in the method it changes.
-The text match it replaces had 50, among them a pull request on `Array#to_query` matched to `Object#to_query` in the
-same file, a correctness fix (#59634) matched through the same code in another method, and another author's pull
-request the ledger only mentions. A backport merged as its own commit (Rails stable branches) is not found by merge
+On Campfire's report (Rails main `e3d5c569` of 2026-10-05, 300 top lines) this gives 19 matches: 7 open upstream
+work (importmap-rails#336 twice, #59804 twice, nokogiri#3759 twice, rack#2550) and 12 merged after the app's
+revision (#59329, #59235, #59613, #59562, #59274, #59551, #59605, #59316, #59537, #59561). Each was checked by hand
+against the pull request's diff: in every one the app's line is a line the pull request removes, in the method
+whose hunk removes it. The text match it replaces had 50, among them a pull request on `Array#to_query` matched to
+`Object#to_query` in the same file, a correctness fix (#59634) matched through the same code in another method,
+#59555 (a regression fix on `index_with`), and #59141, another author's pull request the ledger only mentions.
+A backport merged as its own commit (Rails stable branches) is not found by merge
 commit, so such a fix shows as not released. Rebuild the index with `script/profile-ledger` after the ledger
 changes (`--missing` after GitHub's rate limit stops it).
 
