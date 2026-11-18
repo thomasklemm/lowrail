@@ -375,8 +375,9 @@ head `6f48723a86`, same way: `parse_nested_query` 41,121 → 72,638 i/s (1.77x, 
 YJIT 1.99x, 2.13x, 3.42x.)
 
 **Rack CI on the fork** (`6f48723a86`): Test and Test External pass on 2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 4.0, ruby-head,
-jruby-head, truffleruby-head and macOS 4.0. `2.7.3` fails after 5 s, before any test, on both heads, while rack
-main passes it; its log was not readable yet (GitHub API rate limit).
+jruby-head, truffleruby-head and macOS 4.0. `2.7.3` fails after 5 s on both heads, and on a rerun: runner setup, not this change. `ubuntu-latest` is now
+ubuntu-26.04, for which ruby/setup-ruby has no 2.7.3 build ("Unavailable version 2.7.3 for ruby on ubuntu-26.04");
+rack main's passing 2.7.3 job of 2026-10-31 ran on ubuntu-24.04.
 
 ## Checked and rejected
 
