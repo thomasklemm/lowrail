@@ -484,3 +484,263 @@ A second `-v` profile compared against it **exits 1** with one line, `json/commo
 0.27–3.3. The 2-run line floor is unchanged by these fixes (and by 76be8b58); this is a new observation, recorded in
 the guide, not fixed: choosing a floor measured between invocations is a decision, not a threshold to tune until green.
 The capture from the first round is refused as having no capture metadata (exit 2), as intended.
+
+## Second confirm review of a05d1dab (2026-11-18)
+
+**Verdict: changes.** The reported C1–C6 corrections work on the narrow cases below, but their broader
+boundaries are not all closed. Recording still exports values Rails filters and can enable a different GET;
+comparison still accepts incomplete captures and indistinguishable identities for different workloads. The
+first-touch correction and the overflow cap work in the exercised thread/fiber cases. This review requests the
+bounded fixes below, not a floor-policy change, general browser emulation or a profiler redesign.
+
+### Scope, method and executed checks
+
+Loaded `thermos`, `thermo-nuclear-review` and `thermo-nuclear-code-quality-review`. At the requester's direction
+one reviewer performed both passes here, without subagents or new threads; this is not two independent reviews.
+Reviewed the thirteen-file `a05d1dab^..a05d1dab` diff, the relevant downstream readers and the original inputs
+from the previous confirm thread. Its archived workspace could not transfer the old harness files, so the inputs
+were reconstructed in new harnesses, not represented as recovered binaries/scripts. Before/after implementation
+pins were detached `76be8b58e9a535b85622e9e5738ab14ca8b76eac` and clean main
+`a05d1dab1d3d680ee91cc0e4b2fdeb1f33372164`. Unrelated intervening commits were excluded. No implementation or
+permanent test was changed. The commit-associated GitHub pulls endpoint returned no PRs; nothing was posted there.
+
+Used mise **Ruby 4.0.9**, revision `3e93b23afc`, Linux x86-64; Rails **8.1.4**, sqlite3 **2.10.2**, bcrypt
+**3.1.22**, Rack **3.2.8**, rack-test **2.3.0**. Dependencies were installed in the orb, without changing repository
+dependency files. These commands on the exact fix all passed, without skips:
+
+```text
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/profile_test.rb --verbose
+12 runs, 114 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/workloads_test.rb --verbose
+3 runs, 19 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/load_hooks_test.rb --verbose
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Total: **17 runs, 137 assertions**. Loading the fix's test files with the baseline's `gem/lib` and test helper,
+the four relevant profile cases gave **4 runs, 16 assertions, 4 failures**, and the A/B contract case gave
+**1 run, 2 assertions, 1 failure**, without errors/skips. The combined cases stop at their first failed assertion;
+the independent probes below establish the other boundaries rather than claiming those assertions ran.
+
+### C1–C6 before/after ledger
+
+All requests used synthetic values and the repository's minimal Rails fixture, not corpus apps or real services.
+Private scripts and generated inputs are under `.amp/in/orb-backup/confirm/`; its `base/` is the detached old
+worktree, `native-base/` and `native-head/` are separately built extensions. For example, from the repo root:
+
+```sh
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/confirm/rails_probe.rb .amp/in/orb-backup/confirm/base
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/confirm/rails_probe.rb .
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/confirm/compare_probe.rb .
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/confirm/native_probe.rb head threads
+```
+
+| Finding | Reproduced on 76be8b58 | Observed on a05d1dab |
+| --- | --- | --- |
+| C1 | `[:format]` plus `/widgets.format-secret` exports the format. After the first request, appending `:credential` to the same env filter array exports `changed-filter-secret`, although Rails masks it. | Both values absent from generated workloads and capture JSON; the filtered shapes are disabled. **Original cases fixed; other filters remain unsafe, D1.** |
+| C2 | Missing `ranked`, short warm vector, no identity/seed/command, unknown format and no common kind all exit 0. Same-file block choosing `?which=one` versus `?which=two`, same output directory, gives two complete 20-request-per-run captures and compare 0. | Schema cases exit 2. The real block captures exit 2 for differing measured identities (`3bc0bdb47be0cb1e` versus `17c4067dd9c10bc4`); an action with `[nil,nil]` remains explicitly not compared, not fabricated as zero. **Original cases fixed; D3/D4/D6 remain.** |
+| C3 | Identical workloads into `left/` and `right/`: both captures succeed, compare 2 because receipt output paths differ. | Same complete invocation pair compares 0. Workload identity excludes generated output/install paths; command identity preserves argv boundaries. **Fixed in these cases.** |
+| C4 | Recorded JSON Accept plus `/lookup?q=needle` declares POST with JSON body; Rails sees GET, query `{}`, body `{"q"=>"needle"}`. Independently, MockClient given a frozen GET params hash raises `FrozenError`. | Declares GET, query params, nil body and JSON Accept; Rails sees GET, query `{"q"=>"needle"}`, body `{}`. Frozen GET params plus an existing `x=1` query gives `q=needle&x=1` without mutating the input. **Original cases fixed; other GET Accept values remain wrong, D2.** |
+| C5 | First-touch thread A allocates 10 Strings; B allocates 2 and closes before A: public snapshot `count=12, reach=2, first=2`. Same failure with interleaved fibers. | `12,2,10` for threads, fibers, M:N threads (`RUBY_MN_THREADS=1`) and attribution-enabled threads. All drop 0. **Fixed in these completed-window cases.** |
+| C6 | One abandoned fiber retained; 1,100 abandoned fibers all retained, dropped 0. `auth=yes; Path=/private` is sent to `/public`. | One fiber still retained, as disclosed; 1,024/1,025/1,100 opens leave 1,024/1,024/1,024 alive and drop 0/1/76. The first fiber is collectible after overflow, the last remains alive. A real two-run 1,100-open capture is refused (2) for `dropped=[76,76]`. Path-scoped cookie is absent on `/public`, present on `/private/me`, like Rack::Test. **Overflow and ordinary Path fixed; finalization gap D5.** |
+
+The reconstructed original one-abandoned-fiber probe deliberately still reports retained on the fix: C6 chose a
+documented cap, not immediate weak collection. It would be incorrect to claim that original lifetime changed to
+collected. Twenty `GC.verify_compaction_references(double_heap: true, toward: :empty)` calls inside completed
+windows, both counting-only and with attribution enabled on the fix, preserved counts and dropped 0. This is not
+a sanitizer, OOM or unrestricted Ractor campaign.
+
+### D1 — P1: Proc context and shallow filter snapshots still export app-filtered secrets
+
+**Locations:** `gem/lib/lowrail/profile.rb:194,232,242–247`. Remaining C1/F2, not a claim that these were safe
+on 76be8b58. Both failures were observed on both pins with Rails' own filtered parameters as the control.
+
+1. A supported three-argument ParameterFilter Proc can depend on the complete original params. With:
+
+   ```ruby
+   filters.replace([/\Aformat\z/, ->(key, value, original) {
+     value.replace("[FILTERED]") if key == "credential" && original["controller"] == "widgets"
+   }])
+   ```
+
+   record `GET /widgets.proc-format-secret?credential=proc-secret`. On a05d1dab Rails' `filtered_parameters`
+   masks both credential and format, but shapes JSON and the generated file contain `"credential"=>"proc-secret"`.
+   The format regexp works; this is not a missing filter. Lowrail filters the path and query separately, so the
+   query Proc never sees the controller that Rails passes in the merged original hash. Commenting this particular
+   request out because its format was filtered does not prevent exporting the credential.
+2. After an initial request builds the cache with `mutable = +"not_a_key"; filters.replace([mutable])`, run
+   `mutable.replace("credential")`, then a distinct shape `/widgets.string-format?credential=string-secret`.
+   Rails masks the credential; Lowrail exports it in an **enabled** workload. `filters.dup` aliases its String
+   elements, so `@filter_source == filters` stays true and the already-compiled regexp is stale.
+
+**Smallest fix:** construct a fresh ParameterFilter outside counting windows rather than maintaining a shallow
+snapshot cache (or snapshot String values immutably). Do not pass split params as though they were Rails' complete
+Proc context. Preserve the full original context and precedence without forcing unparsed input/framework loads;
+if that cannot be done faithfully, keep no request values for such Procs and record the unsupported reason.
+Ordinary two-argument masking Procs and regexp-list replacements/restoration passed explicit controls. This is
+not a claim that all Procs or regexps fail, or that a regexp itself is mutable.
+
+### D2 — P2: an XML GET still becomes an enabled HTML replay
+
+**Locations:** `gem/lib/lowrail/profile.rb:198–200`, `PLAIN_ACCEPT` at line 48. Remaining F12 at the modified
+Accept boundary; the JSON-specific C4 repro is fixed, not every GET Accept.
+
+In the fixture, route `/lookup` to an action returning `request.get_header("HTTP_ACCEPT")`. Record
+`GET /lookup?q=needle` with `HTTP_ACCEPT=application/xml`. Both profiled originals return `200 application/xml`.
+The generated enabled request is:
+
+```ruby
+get lookup_path, name: "GET /lookup", params: {"q" => "needle"}
+```
+
+Load it and replay through MockClient: on a05d1dab it returns **`200 text/html`**. The original recording already
+omits the header on 76be8b58; its frozen-GET-params failure prevents that unmodified client from completing this
+replay there. The modified condition preserves `application/json` but continues treating XML (and other
+`PLAIN_ACCEPT` values) as if the ordinary GET client sent it by default. It does not.
+
+**Smallest fix:** retain the actual GET Accept unless it exactly equals what the selected replay flags/client
+will send; retaining all present GET Accept values is simpler and correct. Extend the existing end-to-end recorder
+case with asymmetric XML/default HTML, not just JSON. Do not change hand-authored `as: :json` semantics.
+
+### D3 — P2: the initial measured receipt certifies a run that measured nothing
+
+**Locations:** `gem/lib/lowrail/profile_workloads.rb:47–63,78–86`, `profile_compare.rb:76–82`. The initial
+receipt existed on 76be8b58; the new per-run measured identity also publishes it as acceptable evidence.
+
+Unchanged workload file:
+
+```ruby
+get("/widgets", name: "variant") { |n|
+  exit(0) if n == 2
+  { path: ENV.fetch("REPLAY_PATH") }
+}
+```
+
+Use a successful `/widgets` action. Capture twice into the same `--out capture --workloads`, with
+`REPLAY_PATH=/widgets?which=one` and `...which=two`, copying each report aside before the next capture. Each run
+serves one warmup request and stops before any measured request. On a05d1dab both commands have `exit=[0,0]`,
+both `measured.json` files contain `requests:0, sha256:a2c0a43afea3c8e0`, and **compare exits 0** with no problems.
+The requests actually served differ, but the digest covers only the initial host/browser preamble. The old pin
+also compares green; this is a remaining completeness failure, not evidence that the new digest is worse.
+
+**Smallest fix:** publish the per-run comparable receipt only after all counted passes finish successfully, or
+mark initial/final receipts explicitly incomplete/complete and validate that marker plus expected counted request
+count. Keep any early receipt diagnostic-only. Checking merely for a truthy digest (or matching zero counts) cannot
+establish completion. This is distinct from ordinary failed commands, which the new validator correctly refuses.
+
+### D4 — P2: different supported Rack env values have the same measured identity
+
+**Locations:** new `profile_workloads.rb:72` consuming `workloads.rb:77`. The lossy header/env digest predates
+the fix; using it as the new measured request certificate does not close F11/C2 for these declarations.
+
+Use this same file in two complete captures, with `FLAG=1` and `FLAG=2`:
+
+```ruby
+get "/widgets", env: { "app.flag" => ENV.fetch("FLAG").to_i }
+```
+
+The controller records `request.env["app.flag"]`: it sees integer **1 versus 2** on every corresponding request.
+Both runs of each capture measure 20 requests, with successful exits and no drops. On a05d1dab the manifest digest
+is `6332ec9fcf3e4856` and measured digest `d7a2005416fd8ece` on both sides; **compare exits 0**, `problems:[]`.
+The baseline also exits 0. The DSL accepts `env:` and preserves these scalar values, but `Request#to_h` substitutes
+the class name `Integer` for both values before hashing them. This is not a source-file change hidden from SHA.
+
+**Smallest fix:** fix the canonical `Request#to_h` value digest to encode supported scalar/structured env values
+deterministically. For arbitrary Rack objects whose identity cannot be certified, record that boundary and refuse
+CI comparison instead of treating equal class names as equal requests. Do not add a second, divergent digest in
+the profile runner.
+
+### D5 — P2: unfinished windows below the cap still produce green, incomplete reports
+
+**Locations:** `lowrail_profile.c:449–454,473,600–605`, `profile.rb:285–303`, and the new guarantee in
+`docs/profile.md:150–154`. Remaining C6/F7; the overflow counter itself is correct.
+
+Use a real fixture controller, not a mock window wrapper:
+
+```ruby
+def index
+  Fiber.yield if params[:abandon]
+  render(plain: "ok")
+end
+```
+
+The command starts `Fiber.new { Rails.application.call(env_for("https://localhost/widgets?abandon=1")) }.resume`,
+drops its reference, then makes three completed ordinary `/widgets` calls. Both plain and profiled commands
+succeed. In each profiled run on a05d1dab, the summary counts **4 requests**, the action counts **3** completed
+requests, and dropped is **0**. Comparing this report to itself **exits 0**, although the abandoned request's
+site counts were never merged and the denominator includes it. The baseline has the same failure. The first-touch
+reservation can also remain unresolved when its owner never closes; absence of overflow does not make that data
+complete. The guide's statement that such a capture is invalid for compare is therefore too broad.
+
+**Smallest fix:** make final export record/refuse still-open windows (the existing entered-window and closed
+action-window counts already expose the mismatch), not just evicted windows. Do not change application fiber
+execution or pretend the 1,024 cap detects every cancellation. Preserve non-final snapshot semantics if callers
+need to inspect a running process. Keep the documented retention limit even after adding the finalization check.
+
+### D6 — P2: the new schema check still accepts identity-less and key-less data
+
+**Locations:** `profile_compare.rb:73–104,128–135`. Incomplete C2 validation at the newly expanded boundary;
+these are CLI malformed-input probes, not claims that the normal writer emitted these particular reports.
+
+Starting with the passing two-run `ProfileTest#report` fixture:
+
+* Change both identities to `{"mode":"command"}`, with no argv: **exit 0**. `{"mode":"banana"}` also exits 0.
+  Thus two reports with no usable logical command can still be called comparable.
+* Set both `meta.ruby` and `meta.rails_env` to `[null]`: **exit 0**, despite having no known Ruby/environment.
+* Set base ranked rows to `[{"warm":[10,10]},{"warm":[0,0]}]`, head to
+  `[{"warm":[30,30]},{"warm":[0,0]}]`, omitting site keys: **exit 0**, no regression. The rows silently overwrite
+  each other at the nil hash key. A collection and finite warm vectors alone are not a complete line identity.
+* A window count `"ten"` or `outside_requests:"bad"` raises `TypeError` and exits **1** instead of a diagnostic
+  **2**. These errors also existed on the baseline; the new schema boundary does not contain them.
+
+**Smallest fix:** validate the discriminated identity (`command` with nonempty String argv, or the complete
+workloads identity), known nonempty Ruby metadata, String env metadata, nonnegative integer window counts, nested
+object types and unique required row keys before arithmetic, `dig` or `to_h`. Empty `RAILS_ENV` is legitimate for
+non-Rails command windows; do not reject it merely for being empty. Keep malformed evidence separate from an
+allocation regression and from a measured zero; no general schema framework is needed.
+
+### Cookie Path check and non-blocking limit
+
+The actual census client and MockClient now agree for explicit/default directory paths, same-name cookies on `/`
+and `/private` (including their header order), expiry, and a login URL containing a query. Both send the
+`Path=/private` cookie to `/privateish`, matching Rack::Test 2.3.0's prefix policy; that is **not** a new browser-RFC
+guarantee. There is still one verified, low-priority normalization difference: with
+`Set-Cookie: auth=yes; Path=/private,/other`, Rack::Test sends it on `/private/me`, MockClient does not. Rack::Test
+takes the first comma-delimited path and strips whitespace; MockClient stores the path verbatim at
+`workloads.rb:285–287`. Smallest matching fix: apply that same normalization. This is outside the now explicitly
+test-bounded equivalence claim, so it is a **P3 nit**, not a demand to implement Domain/Max-Age or full browser
+semantics before this prototype can be used.
+
+### Maintainability, documentation and admission conclusion
+
+The first-touch owner/id is a direct fix at the native source of truth, and the cap reuses the existing slot
+lifetime rather than adding a second collector. Structured capture identity correctly separates output argv from
+logical workload identity. No affected production file crosses 1,000 lines (counter 648, report 574). No broad
+decomposition or generic validation/transport framework is warranted. The structural improvement still needed is
+an explicit completed-capture boundary: initial receipts and live counters must not be indistinguishable from
+final, comparable evidence. Fix header/env provenance in its canonical producer, not with comparison exceptions.
+
+README's 1% statement is now correctly historical, specific to the Blog's five GETs before policy changes.
+The census guide bounds equivalence to the contract test, and the request-side-effect/disposable-services warnings
+are appropriate. The profile guide correctly retains child-fiber undercounting, non-main-Ractor exclusion and
+up-to-1,024-fiber retention. Its blanket filtering, enabled-GET replay and incomplete-capture refusal claims need
+D1–D6; an explicit prototype label or a warning to inspect secrets does not close a demonstrated export leak.
+The guide allows nil warm actions later in the same section, although its new opening schema bullet says every
+action has a finite number; the implementation correctly lists nil actions as not compared. That wording can be
+made consistent when updating the validity claims.
+
+The documented Campfire A/A line failure and warning that exit 1 is not a confidence bound are honest. **No floor
+policy was chosen or tuned here.** A green comparison is not a general absence-of-regression guarantee, and the
+current extra false greens are completeness/identity defects, not a reason to raise or lower `--min`.
+
+Fresh-process gemspec controls load zero new features and define no Lowrail on both pins. Requiring the off
+profiler defines no Lowrail and loads only that file; enabling profiling and then Active Support alone defines
+none of Action Controller, Active Job, Action Mailer or Action Cable. Together with the three passing suites these
+are bounded invariant-1/invariant-7 controls, not a claim that every app/scheduler is safe. Repairs must continue
+to leave app returns/exceptions and lazy loading alone and record unsupported filters/env/capture states explicitly.
+
+**Not rerun or claimed:** Campfire's 634 tests, any other corpus suite, historical YAML/DSL or A/B equivalence
+cohorts, `lowrail verify`, `lowrail bench`, timing, instruction counts or speed. The author's Campfire results and
+historical measurements above remain attributed evidence. This is a **review-document-only** change; D1–D6 are
+not implementation fixes. C3/C5 and the original narrow repros are confirmed, not an approval of recording or
+comparison as a generally safe workflow.
