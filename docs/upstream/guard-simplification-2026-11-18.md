@@ -17,7 +17,7 @@ main, the head and the simple branch on Ruby 4.0.7.
 | Rank | Item | Simplification | Risk | Branch |
 | --- | --- | --- | --- | --- |
 | 1 | I18N764 | lib +16/−1 → +7/−1, tests 58 → 6 lines, two comments gone | to_ary-convertible non-Array defaults, outside the documented API | `thomasklemm/fallback-defaults-without-wrapper-simple` `a419bdecbd` |
-| 2 | I18N765 | `instance_of?(Hash)` branch and its comment gone, lib +8/−1 → +3/−1, one 14-line test gone | Hash subclasses overriding `[]=`, which `I18n.t` never passes | `thomasklemm/fallback-options-without-merge-kwargs-simple` `21801f98f1` |
+| 2 | I18N765 | `instance_of?(Hash)` branch and its comment gone, lib +8/−1 → +3/−1, one 14-line test gone | custom Hash merge/copy/store hooks, which `I18n.t` never passes | `thomasklemm/fallback-options-without-merge-kwargs-simple` `21801f98f1` |
 | 3 | PR59574 | keyword sentinel and "not both" raise gone, 2+/15− against the head | calls passing both forms, which neither 8.1's nor main's signature allows | `thomasklemm/arel-table-positional-name-simple` `cbe39c2a96` |
 | 4 | TAP2748 | one of five clauses gone | none for Tapioca's own callers | not built |
 | 5 | I18N766 | keep the guard; trim the four-line comment to one | none (comment only) | not built |
@@ -47,13 +47,13 @@ defaults = [default].flatten
 Differences (probe, head vs simple): a non-Array default with `to_ary` is returned as itself instead of being
 flattened (this also differs from main). `I18n.t` documents defaults as a String, Symbol, or Array of them
 (`lib/i18n.rb:182-193`), and the fallbacks doc adds Proc and Hash. Nothing in i18n or Rails passes a `to_ary`
-object. Called directly, the private method with a nil or false default now sets `options[:default] = []`, but
+object. Called directly, the undocumented helper with a nil or false default now sets `options[:default] = []`, but
 `translate` only calls it `if options[:default]`. Array subclasses and elements whose `to_ary` mutates the Array
 behave as on main, because Arrays still go through `[default].flatten`. Symbol, String, Proc, Hash, Integer, Array,
 nested, empty and frozen Arrays are identical across main, head and simple.
 
 Tests: `rake test` 1608 runs, 2676 assertions, 0 failures (head 1615, main 1607). The head's own tests on the
-simple code fail in exactly the three `to_ary` tests and error in the private nil/false call. The commit message's
+simple code fail in exactly the three `to_ary` tests and error in the direct nil/false helper call. The commit message's
 second paragraph now says it in one sentence: "A non-Array default that defines to_ary is no longer flattened."
 
 ## I18N765 (ruby-i18n/i18n 765)
@@ -99,8 +99,49 @@ Differences (probe): only the three both-given shapes, `(:users, name: :posts)`,
 signature is `initialize(name, as: nil, ...)` with no `name:` keyword (8.1.4 `activerecord/lib/arel/table.rb:14`),
 and main's accepts only `name:`, so no caller written for either passes both. The nine other shapes, deprecated or
 not, are identical. Arel tests: 813 runs, 1390 assertions, 0 failures (head 814/1400; the removed test is the
-difference). RuboCop not run. The commit message's "Passing both raises" sentence now reads: "A call passing both uses
+difference). RuboCop was not run during the build (run in the confirm review below). The commit message's "Passing both raises" sentence now reads: "A call passing both uses
 the positional name; neither the Rails 8.1 signature nor main's allows both."
+
+## Thermos confirm (2026-11-18)
+
+**All three approved on their exact simple heads, no remaining must-fix.** `thermos-sol` applied both correctness/security
+and maintainability rubrics personally in the review thread, as requested; not two independent reviewers. Full passes
+and corrected proposed bodies are in the three queue items. Their live PR heads/branches were not changed or posted to.
+Each candidate is one commit on the stated base, with Thomas as author and committer, its original author date and no
+`Amp-Thread-ID` or `Co-authored-by` trailer. All three use the target repository's existing idiom.
+
+Independent probes are under `.amp/in/orb-backup/guard-review/` in the review thread: `i18n_contract_probe.rb` (72 cases
+per tree, base/old/simple) and `arel_contract_probe.rb` (20 shapes, old/simple). The builder's probe files could not be
+downloaded from the archived sweep thread. The i18n probe preserves Symbol-vs-String distinctions in its JSON.
+
+| Item / head | Ruby 4.0.7 suite | Retained tests on base source | Sampled mutants |
+| --- | --- | --- | --- |
+| I18N764 `a419bdecbd` | `bundle exec rake test`: 1608 runs, 2676 assertions, 0 F/E/S | pass, including the new nested-Array test | removing flattening: 1 F; not clearing a scalar default: 3 F; removing the scalar Symbol guard or returning its value survives the suite but fails the independent probe |
+| I18N765 `21801f98f1` | `bundle exec rake test`: 1608 runs, 2680 assertions, 0 F/E/S | pass, including the new options-copy test | no copy: 1 F/5 E; no progress flag: 2 F; wrong original locale: 9 F/10 E |
+| PR59574 `cbe39c2a96` | `bundle exec rake test:arel`: 813 runs, 1390 assertions, 0 F/E/S | 1 F/4 E; base lacks the deprecator and rejects fresh-process positional construction | nil sentinel: 1 F; no assignment: 1 F/1 E; no warning: 2 F; missing deprecator require: 1 F/4 E; missing deprecation require: 1 F |
+
+The i18n changes preserve supported results and reduce allocations; their retained tests are compatibility controls,
+not base-red allocation tests. This is sampled mutation coverage, not a claim that every wrong implementation fails.
+I18N764's missing retained scalar-Symbol coverage is optional follow-up: the independent probe distinguishes original
+locale default precedence (`"Regional"` vs `"Other"`) and a stateful Proc evaluated once vs twice with a changed result.
+The candidate agrees with base in both cases; no branch code or retained tests were changed in this review.
+Fresh `sites.rb` checks reproduce I18N764 String 23 → 21 and Symbol 29 → 27 objects/call, and I18N765 hello 13 → 12,
+greet 21 → 20 and time localization 52 → 49. Census and instruction rows in proposed bodies are marked historical,
+not measurements of the simple heads.
+
+Two boundary corrections matter: I18N764 also skips a custom non-Array coercion's exceptions/side effects, and direct
+nil/false calls to its **undocumented but Ruby-public** extraction helper now write (or raise on frozen options).
+I18N765 differs for custom `merge` and duplication hooks as well as `[]=`: direct-backend interpolation returned
+`"Input"` → `"Copied"` for `initialize_copy`, and `"Merged"` → `"Input"` for `merge`. Those hooks are not supplied by
+the traced library callers, and all public `I18n.t` cases agree. The I18N765 body now names the broader boundary;
+the commit's narrower `[]=` sentence is true, but is not an exhaustive equivalence claim.
+
+For Arel, only both-given calls differed in the 20-shape comparison, including nil/false keywords and invalid
+positional nil. `flipper_repro.rb` on flipper-active_record 1.4.2/SQLite raises positional `ArgumentError` on base
+and returns the expected search/beta gates with two warnings on the simple head. RuboCop **1.90.0**, repository
+configuration and all five plugins, on `table.rb`, `table_test.rb`, `require_test.rb`: **3 files, no offenses**.
+No source changes required. The stale posted bodies' removed-test, subclass-equivalence and both-given-raises
+sentences were corrected only in the queue items; adoption and public body updates remain separate actions.
 
 ## TAP2748 (Shopify/tapioca 2748)
 
