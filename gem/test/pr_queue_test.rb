@@ -103,6 +103,21 @@ end
     end
   end
 
+  def test_diff_facts_list_pr_commits_with_amp_trailers
+    Dir.mktmpdir do |dir|
+      git = ->(*args) { PrQueue.run(PrQueue::GIT, "-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", *args) }
+      git.("init", "-q", "-b", "main")
+      git.("commit", "-q", "--allow-empty", "-m", "base\n\nAmp-Thread-ID: T-base")
+      git.("checkout", "-q", "-b", "pr")
+      git.("commit", "-q", "--allow-empty", "-m", "clean\n\nSigned-off-by: t <t@t>\nCo-authored-by: Thomas Klemm <github@tklemm.eu>")
+      assert_empty PrQueue.diff_facts(git, "main", "pr", "").fetch(:trailers)
+
+      git.("commit", "-q", "--allow-empty", "-m", "ours\n\nAmp-Thread-ID: T-1\nCo-authored-by: A <a@a>")
+      sha = git.("rev-parse", "--short", "HEAD").first.strip
+      assert_equal ["#{sha} Amp-Thread-ID, Co-authored-by"], PrQueue.diff_facts(git, "main", "pr", "").fetch(:trailers)
+    end
+  end
+
   def test_a_for_thomas_section_is_not_part_of_the_body
     text = "---\nid: X1\n---\n\n# Title\n\nBody line.\n\n## Fixes\n\nMore.\n\n## For Thomas\n\nPrivate notes.\n"
     item = PrQueue.parse("X1.md", text)

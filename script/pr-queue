@@ -205,8 +205,16 @@ module PrQueue
     since = built_on.to_s.empty? ? head : built_on
     count, err = files.empty? ? ["0", nil] : git.("rev-list", "--count", base, "^#{since}", "--", *files)
     touched = files.empty? || err ? [] : git.("diff", "--name-only", since, base, "--", *files).first.split("\n")
+    log, = git.("log", "--format=%h%x1f%(trailers:key=Amp-Thread-ID,key=Co-authored-by,separator=%x1f)", "#{base}..#{head}")
+    trailers = log.to_s.lines.filter_map do |line|
+      sha, *found = line.chomp.split("\x1f")
+      # Thomas as co-author credits him on someone else's commit (ZS1).
+      found.reject! { _1.end_with?("<#{THOMAS['EMAIL']}>") }
+      "#{sha} #{found.map { _1[/\A[^:]+/] }.uniq.join(', ')}" if found.any?
+    end
     { lines:, clean: conflict.nil?, conflicts: conflict ? out.lines.drop(1).map(&:chomp).reject(&:empty?) : [],
-      base_commits: err ? nil : count.to_i, base_files: touched }
+      base_commits: err ? nil : count.to_i, base_files: touched,
+      trailers: }
   end
 
   def cache(repo) = File.join(CACHE, "#{repo.tr('/', '-')}.git")
@@ -296,6 +304,9 @@ module PrQueue
     drift = live.select { |_, fact| fact[:base_commits].to_i.positive? }
     puts "\nBase commits since built_on on the PR's files:" unless drift.empty?
     drift.sort.each { |id, fact| puts "  #{id}: #{fact[:base_commits]} on #{fact[:base_files].join(', ')}" }
+    trailered = live.select { |_, fact| fact[:trailers]&.any? }
+    puts "\nAmp trailers on PR commits (rebuild with /usr/bin/git):" unless trailered.empty?
+    trailered.sort.each { |id, fact| puts "  #{id}: #{fact[:trailers].size} commits (#{fact[:trailers].map { _1.split.first }.join(', ')})" }
     puts "\nOut of date with GitHub or the ledger:" unless stale.empty?
     stale.each { |id, problem| puts "  #{id}: #{problem}" }
   end
