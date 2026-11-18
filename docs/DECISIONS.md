@@ -227,6 +227,10 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   and protects the documented contract and real callers, not arbitrary objects outside it. When we accept a
   difference outside the contract, the body says so in one sentence. Sweep:
   [guard-simplification-2026-11-18](upstream/guard-simplification-2026-11-18.md).
+  Ours have been too elaborate (Thomas, 2026-11-18): every builder and reviewer checks each guard against what a
+  maintainer of that file would have written and drops what they would have left out. A guard stays only for a real
+  caller, a documented case, or a correctness or safety property (such as the ASCII check in RK3 or keeping html_safe
+  intact); "exactly like before for any object" is not a reason. A review lists each surviving guard with its reason.
 
 ## Evidence and measurement
 
