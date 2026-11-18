@@ -194,10 +194,12 @@ ruby-core reports.
 
 2026-11-18. A side finding of the claude-code pass on TN1. **Real on 3.3.13, 3.4.12, 4.0.9 and master 3a19e2efcf;
 unreported.** Fix branch:
-[thomasklemm/ruby `thomasklemm/time-new-to-str-utc-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-to-str-utc-2)
-(head `8d626f3a52`, one commit on master 3a19e2efcf), queue item [TN2](../../bench/upstream/pr-queue/items/TN2.md),
-state built. The first head, `a0670a0a30` on `thomasklemm/time-new-to-str-utc`, stays as it was; the thermos-opus pass
-on it (code approved, changes in the test, this record and the draft) is applied below. Nothing posted.
+[thomasklemm/ruby `thomasklemm/time-new-to-str-utc-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-to-str-utc-3)
+(head `d6d39dbf17`, one commit on master 3a19e2efcf, standalone, not stacked on TN1), queue item
+[TN2](../../bench/upstream/pr-queue/items/TN2.md), state built. The earlier heads stay on their branches:
+`a0670a0a30` (`thomasklemm/time-new-to-str-utc`; thermos-opus: code approved, changes in the test, this record and
+the draft) and `8d626f3a52` (`-2`; thermos-opus confirm: one time.c must-fix, the hour-24 overflow below). Both are
+applied here. Nothing posted.
 
 ```ruby
 o = Object.new
@@ -210,7 +212,7 @@ Time.new(2026, 1, 1, 0, 0, 0, o)  # [BUG] Segmentation fault at 0x00000000000000
 `time_init_vtm()` treats any zone argument that is not nil, an Integer or a String as a timezone object
 (`maybe_tzobj_p`). When `zone_timelocal()` fails (no `local_to_utc`), it falls back to
 `vtm.utc_offset = utc_offset_arg(zone)`, which converts with `to_str`. That fallback handles only `nil` (try
-`Time.find_timezone`). Three other results go wrong:
+`Time.find_timezone`). Three other results go wrong, and a fourth problem shows once the first is fixed:
 
 * **`UTC_ZONE`** (`Qundef`, returned for `"UTC"`, `"Z"` and `-00:00`-style strings), since 4f9ab3a01a (2.7.0), which
   added `UTC_ZONE` and converted it only in the String branch. The `utc == UTC_ZONE` check below doesn't see it,
@@ -229,6 +231,12 @@ Time.new(2026, 1, 1, 0, 0, 0, o)  # [BUG] Segmentation fault at 0x00000000000000
 * **Fixed offsets out of range.** The String branch's offset is range-checked by `validate_vtm()`, which has already
   run when the fallback assigns. So `to_str` `"+24:00"`, `"+25:00"` and `"-24:00"` give `+2400`, `+2500` and `-2400`
   where the String raises "utc_offset out of range" (3.3.13 through master; found by the thermos-opus pass).
+* **Hour 24 on a day past the end of the month.** Before trying the timezone object, the zone block runs
+  `vtm_day_wraparound(&vtm)` on the fields it hands to `zone_timelocal()`. When the fallback then takes the offset or
+  UTC path, it gets those wrapped fields: April 31 24:00 has become April 32 00:00, stored as day 0, so the instant
+  is March 31. The String path gets the unwrapped fields and gives May 2. On master this already shows for `to_str`
+  `"+00:00"` (10 of 288 overflow pairs differ); on `8d626f3a52`, which made `"UTC"`/`"Z"`/`"-00:00"` take that path,
+  it showed for those too (10 of 288 each; found by the thermos-opus confirm).
 
 The other callers of `utc_offset_arg()` (`rb_time_num_new` for `Time.at(in:)`/`Time.now(in:)`, `time_zonelocal`
 for `#localtime`, `time_getlocaltime`) check `off == UTC_ZONE` and call `validate_utc_offset()`, and they don't crash.
@@ -242,6 +250,8 @@ for `#localtime`, `time_getlocaltime`) check `off == UTC_ZONE` and call `validat
 | `to_str` → `"UTC"` plus `utc_to_local` but no `local_to_utc` | segfault | UTC |
 | `to_str` → a name a converting `find_timezone` resolves | wrong instant (system local wall time) | same as the String name |
 | `to_str` → `"+24:00"`, `"+25:00"`, `"-24:00"` | `+2400`, `+2500`, `-2400` | ArgumentError, as the String |
+| `to_str` → `"+00:00"`, day past the month end at 24:00 | a month early (March 31 for April 31) | same as the String |
+| `Time.find_timezone` returning the String `"UTC"` for a String name | segfault | UTC |
 | `to_str` → `"+00:00"`, `"+09:00"`, `"-05:00"`, `"+23:59"`, `"-23:59:59"`, `"A"` | right (fixed offset) | unchanged |
 | `to_str` → `"EST"`, `"Europe/Berlin"` with the default `find_timezone` | ArgumentError | unchanged |
 | `Time.new(in: o)`, `Time.now(in: o)`, `Time.at(0, in: o)`, `t.localtime(o)`, `t.getlocal(o)` (`"UTC"`, `"Z"`) | UTC, no crash | unchanged |
@@ -253,12 +263,19 @@ two heads except the three out-of-range rows, which only the new head rejects.
 
 ### Fix
 
-`8d626f3a52`, time.c +4/−1: the fallback assigns to `utc` instead of `vtm.utc_offset`, returns after a successful
+`d6d39dbf17`, time.c +7/−3: the zone block wraps a copy of the fields for the timezone object, and the fallback assigns to `utc` instead of `vtm.utc_offset`, returns after a successful
 `find_timezone`/`zone_timelocal`, then converts with the String branch's own line and checks the offset with
 `validate_utc_offset()`, the check `validate_vtm()` applies to the String branch. Setting `utc` makes the
 `utc == UTC_ZONE` branch below run, as for a String `"UTC"`.
 
 ```diff
+         time_set_timew(time, tobj, timegmw(&vtm));
+-        vtm_day_wraparound(&vtm);
+-        time_set_vtm(time, tobj, vtm);
++        struct vtm tvtm = vtm;
++        vtm_day_wraparound(&tvtm);
++        time_set_vtm(time, tobj, tvtm);
+ ...
 -        else if (NIL_P(vtm.utc_offset = utc_offset_arg(zone))) {
 +        else if (NIL_P(utc = utc_offset_arg(zone))) {
              if (NIL_P(zone = find_timezone(time, zone)) || !zone_timelocal(zone, time))
@@ -273,7 +290,8 @@ two heads except the three out-of-range rows, which only the new head rejects.
 Tests:
 
 * `test_new_with_zone_to_str` in test/ruby/test_time.rb: `"UTC"`, `"Z"`, `"-00:00"` positional, with `in:` at 24:00,
-  and the string form with `in:` (`to_a` equal to the String's), and `"+24:00"` raising "utc_offset out of range".
+  and the string form with `in:` (`to_a` equal to the String's), April 31 24:00 equal to `Time.utc(2000, 5, 2)`
+  (segfaults on master, fails on `8d626f3a52`), and `"+24:00"` raising "utc_offset out of range".
 * `test_new_with_zone_name_to_str` in test/ruby/test_time_tz.rb (the reviewer's version): DummyTZ `Africa/Ndjamena`
   (+01:00) and `Asia/Tokyo` (+09:00) by name through `to_str`, instant `time_class.utc(2018, 1, 1, 12) - utc_offset`
   and offset. With only Ndjamena it passed on master under TZ=Europe/Berlin and Africa/Lagos (system offset equal to
@@ -289,9 +307,13 @@ and 18:00 +0100 (17:00 UTC) under New York, expected 11:00 UTC. On the head both
   (DummyTZ 52, GemTZInfo 49, GemTimezone 49 tests): 344 tests, 0 failures under TZ=UTC, Europe/Berlin, Africa/Lagos,
   Asia/Tokyo, America/New_York and Australia/Sydney.
 * `make test-spec SPECOPTS=../ruby/spec/ruby/core/time`: 652 examples, 7876 expectations, 0 failures.
-* The probe: as in the table; `git merge-tree` with TN1's head d3e0a31795 is clean.
+* The probe: as in the table, identical to `8d626f3a52`; `git merge-tree` with TN1's head d3e0a31795 is clean.
+* Overflow pairs (`tn2/pairs.rb`: `to_str` against the String for 2000 and 2026, every month, days 28–31, hours 0,
+  23 and 24, names UTC, Z, -00:00, +00:00, +09:00, -05:00, +05:30): 0 of 2,016 differ on the head alone and on the
+  head merged with TN1. Master: crashes for the first three, 10 of 288 for +00:00; `8d626f3a52`: 10 of 288 for each
+  of the first four.
 
-Not run: the full test-all, hosted CI, a pass on the new head.
+Not run: the full test-all, hosted CI, a pass on `d6d39dbf17`.
 
 ### Prior reports
 
@@ -337,4 +359,11 @@ fallback. New.
 > Time.new(2026, 1, 1, 12, 0, 0, o).getutc       #=> 2026-01-01 17:00:00 UTC
 > ```
 >
-> Fix: https://github.com/thomasklemm/ruby/commit/8d626f3a52
+> A `Time.find_timezone` that returns the String `"UTC"` crashes the same way, without a `to_str` object:
+>
+> ```ruby
+> def Time.find_timezone(n) = (n == "Mine" ? "UTC" : nil)
+> Time.new(2026, 1, 1, 0, 0, 0, "Mine")  # [BUG] Segmentation fault
+> ```
+>
+> Fix: https://github.com/thomasklemm/ruby/commit/d6d39dbf17
