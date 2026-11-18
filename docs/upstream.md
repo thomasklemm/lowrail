@@ -24,6 +24,13 @@ with Ruby's default gems counted on their own: rack decoding and escaping throug
 and ruby/uri underneath (UR1, parked). RK3 and RK4 are built (2026-11-18) as queue item RK3 on the fork,
 not opened: −1.0% to −5.1% per request in the interpreter and −2.8% to −9.8% under YJIT, exact by differential.
 
+## Rails-main census 10 (2026-11-17)
+
+[Census 10](upstream/rails-main-census-10.md) measures Rails main `4500a94c34` against 8-1-stable and census 9's main
+on census 9's 8 apps. Main is −5.95% against 8.1 but +0.42% against census 9, mostly from the owner-condition checks
+that #59825 and #59836 added to every association scope (lead A1, a new regression against 8.1 on association loads
+and joins, with an exact fast path for associations without a scope). Nothing built or posted.
+
 ## General Rails hotspot audit (2026-10-21)
 
 Compared the [hotspot map](passes/hotspots.md), [allocation census](passes/allocations.md),

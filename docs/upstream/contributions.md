@@ -1152,6 +1152,13 @@ on main.
   +33–36% against 8.1). Rejected: AT-1, one builder per `_load_from_sql` (skips the overridable
   `instantiate_instance_of`).
 
+- **Rails-main census 10 (2026-11-17, main `4500a94c34` against 8-1-stable `aab611acd8` and census 9's main):**
+  main is −5.95% against 8.1 but +0.42% against census 9 (12 of 70 workloads slower beyond 1%, casa up to +1.91%;
+  [rails-main-census-10](rails-main-census-10.md)). New regression against 8.1: the owner-condition checks of #59825
+  and #59836 cost every association load and join five `WhereClause` differences (`author.posts` +3.6%, has_one +5.3%,
+  `joins` +5.6% to +7.8% vs 8.1). Leads, none built (rails/rails at the cap): A1 (exact fast path when no scope item
+  was merged, recovers 70%), A2 (#59823's second `AliasTracker` per through load), C (#59816's block forwarding).
+
 - **Census gems on Ruby master (2026-11-03, bet E2):** 11 of the 13 configurations that did not bundle on master
   `9aa0898240` now install and pass `list` through dependency-only master overlays, so 21 of 23 can run on master.
   Released bumps (redcarpet 3.6.1, commonmarker 2.10.1, stackprof 0.2.28, numo-narray-alt 0.10.7, datadog 2.45.0,

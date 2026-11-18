@@ -1,0 +1,7 @@
+assoc_reader             668574.6   107.04 0
+assoc_through            817201.1   158.02 0
+assoc_scope_where        574907.7    84.00 0
+merge                     59440.7    10.00 0
+merge_scope              236641.0    42.00 0
+path_helper               42096.0     7.00 0
+link_to                   72307.3    11.00 0

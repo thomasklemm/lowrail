@@ -1,0 +1,70 @@
+blog               GET article                                   2024   +11.0 0.54%
+blog               GET article edit                              1737    +0.0 0.00%
+blog               GET article.json                               644    +0.0 0.00%
+blog               GET articles                                  2125    +0.0 0.00%
+blog               GET articles.json                             1131    +0.0 0.00%
+blog               PATCH article (redirect)                      1440    +0.0 0.00%
+blog               PATCH article.json                            1018    +0.0 0.00%
+blog               POST article invalid (422)                    4297    +0.0 0.00%
+blog               POST comment (redirect)                       1827   +11.0 0.60%
+blog               perform Turbo::Streams::ActionBroadcastJob     672   +11.0 1.64%
+casa               GET casa case                                16829  +275.0 1.63%
+casa               GET casa case edit                           23909  +661.0 2.76%
+casa               GET casa cases                               10569   +61.0 0.58%
+casa               GET case contacts                            30864  +249.0 0.81%
+casa               GET dashboard                                 4140   +55.0 1.33%
+casa               GET supervisors                              10486  +192.0 1.83%
+casa               GET volunteers                               16090  +201.0 1.25%
+casa               PATCH casa case (redirect)                    4469   +88.0 1.97%
+casa               PATCH casa case.json                          4162   +77.0 1.85%
+casa               POST api sign_in.json                         1086   +11.0 1.01%
+codetriage         GET home                                      3290    +0.0 0.00%
+codetriage         GET repo                                      3304   +33.0 1.00%
+codetriage         GET repo info.json                            1532   +11.0 0.72%
+codetriage         GET subscribers                               2707   +11.0 0.41%
+codetriage         GET user edit (signed in)                     3102    +0.0 0.00%
+codetriage         PATCH repo subscription (redirect)            2623   +22.0 0.84%
+codetriage         perform SendSingleTriageEmailJob              2286   +17.0 0.74%
+hackatime          GET dashboard                                13571   +55.0 0.41%
+hackatime          GET dashboard (Inertia XHR)                  12390   +55.0 0.44%
+hackatime          GET dashboard stats (deferred)               10397   +44.0 0.42%
+hackatime          GET leaderboard entries (deferred)            2664   +11.0 0.41%
+hackatime          GET leaderboards                              6447   +33.0 0.51%
+hackatime          GET projects                                  7595   +50.0 0.66%
+hackatime          GET settings profile                          7853   +44.0 0.56%
+hackatime          GET statusbar today                           2449   +44.0 1.80%
+hackatime          PATCH display name (Inertia redirect)         2977   +11.0 0.37%
+hackatime          PATCH username invalid (Inertia 422)          7969   +44.0 0.55%
+hackatime          POST heartbeat                                4205   +33.0 0.78%
+pingcrm            GET contact edit                              4212   +22.0 0.52%
+pingcrm            GET contacts                                  3364   +11.0 0.33%
+pingcrm            GET contacts (Inertia JSON)                   3106   +11.0 0.35%
+pingcrm            GET dashboard                                 1915   +11.0 0.57%
+pingcrm            GET organizations                             2903   +11.0 0.38%
+pingcrm            GET organizations (Inertia JSON)              2645   +11.0 0.42%
+pingcrm            POST contact invalid (Inertia errors)         2406   +11.0 0.46%
+pingcrm            PUT contact (Inertia redirect)                1830    +0.0 0.00%
+react-starter-kit  GET dashboard                                 2183   +11.0 0.50%
+react-starter-kit  GET dashboard (Inertia JSON)                  1616   +11.0 0.68%
+react-starter-kit  GET home                                      2180   +11.0 0.50%
+react-starter-kit  GET settings profile                          2176   +11.0 0.51%
+react-starter-kit  GET settings sessions                         2330   +22.0 0.94%
+react-starter-kit  PATCH profile (Inertia redirect)              1580   +11.0 0.70%
+react-starter-kit  PATCH profile invalid (Inertia errors)        1818   +11.0 0.61%
+react-starter-kit  deliver UserMailer#email_verification         1612    +0.0 0.00%
+redprints-cfp      GET home                                      1713    +0.0 0.00%
+redprints-cfp      GET proposal                                  2311   +33.0 1.43%
+redprints-cfp      GET proposal edit                             2380   +33.0 1.39%
+redprints-cfp      GET proposals                                 1960   +11.0 0.56%
+redprints-cfp      GET proposals (Inertia JSON)                  1610   +11.0 0.68%
+redprints-cfp      PATCH proposal (Inertia redirect)             1886   +22.0 1.17%
+redprints-cfp      POST proposal invalid (Inertia errors)        2732   +22.0 0.81%
+redprints-cfp      deliver ProposalMailer#proposal_submitted     2093    +0.0 0.00%
+writebook          GET book                                      5777   +55.0 0.95%
+writebook          GET books                                     4436   +22.0 0.50%
+writebook          GET leaf                                      7971   +77.0 0.97%
+writebook          GET leaf.md                                   3645   +55.0 1.51%
+writebook          PATCH page (turbo_stream)                     8090   +99.0 1.22%
+writebook          POST page (turbo_stream)                      6768   +77.0 1.14%
+writebook          POST search                                   4641   +33.0 0.71%
+writebook          perform Turbo::Streams::BroadcastJob           562    +0.0 0.00%

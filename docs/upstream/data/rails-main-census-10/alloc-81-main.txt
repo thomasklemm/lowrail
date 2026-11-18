@@ -1,0 +1,46 @@
+a10s2: Rails rails/rails@aab611acd84b4754e2403a9ab005532ccb0ed374 aab611acd8, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a10s: Rails rails/rails@aab611acd84b4754e2403a9ab005532ccb0ed374 aab611acd8, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a10m: Rails rails/rails@4500a94c34d7052b84f81f6d7fd44f5bb8af3fff 4500a94c34, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+-- A/A control (a10s2 - a10s): the noise floor for every comparison below
+== a10s2 vs a10s
+blog-interpreter               moved  3/10 median   +0.0 min   -47.8 | 
+blog-yjit                      moved  2/10 median   +0.4 min  -114.8 | 
+casa-interpreter               moved  3/10 median   +1.4 min    -2.1 | 
+casa-yjit                      moved  4/10 median   +0.0 min    -2.1 | 
+codetriage-interpreter         moved  5/ 7 median   -2.1 min    -8.6 | 
+codetriage-yjit                moved  2/ 7 median   +0.6 min    -4.4 | 
+hackatime-interpreter          moved  3/11 median   +1.2 min    -3.2 | 
+hackatime-yjit                 moved  3/11 median   +0.8 min    -5.2 | 
+pingcrm-interpreter            moved  2/ 8 median   +0.2 min    -2.5 | 
+pingcrm-yjit                   moved  8/ 8 median   -4.6 min    -7.4 | 
+react-starter-kit-interpreter  moved  5/ 8 median   -1.4 min    -6.4 | 
+react-starter-kit-yjit         moved  2/ 8 median   +0.3 min    -4.0 | 
+redprints-cfp-interpreter      moved  4/ 8 median   +0.0 min    -2.5 | 
+redprints-cfp-yjit             moved  4/ 8 median   -0.1 min    -3.1 | 
+writebook-interpreter          moved  3/ 8 median   +0.0 min    -4.9 | 
+writebook-yjit                 moved  5/ 8 median   -1.0 min    -4.7 | 
+ALL interpreter workloads  70  median  -0.1  moved<=-1:  28  moved>=+1:  20
+ALL yjit        workloads  70  median  -0.1  moved<=-1:  30  moved>=+1:  13
+SQL interpreter workloads  70  changed SQL:   0
+SQL yjit        workloads  70  changed SQL:   0
+== a10m vs a10s2
+blog-interpreter               moved 10/10 median -509.3 min  -942.1 | 
+blog-yjit                      moved 10/10 median -461.6 min  -940.2 | 
+casa-interpreter               moved 10/10 median -5408.5 min -10542.2 | 
+casa-yjit                      moved 10/10 median -5472.5 min -10758.0 | 
+codetriage-interpreter         moved  7/ 7 median -671.1 min -1052.1 | 
+codetriage-yjit                moved  7/ 7 median -681.3 min -1056.7 | 
+hackatime-interpreter          moved 11/11 median -1220.9 min -1878.6 | 
+hackatime-yjit                 moved 11/11 median -1262.1 min -1922.4 | 
+pingcrm-interpreter            moved  8/ 8 median -423.4 min  -821.3 | 
+pingcrm-yjit                   moved  8/ 8 median -415.0 min  -817.3 | 
+react-starter-kit-interpreter  moved  8/ 8 median -363.4 min  -516.9 | 
+react-starter-kit-yjit         moved  8/ 8 median -366.0 min  -516.5 | 
+redprints-cfp-interpreter      moved  8/ 8 median -352.2 min  -525.5 | 
+redprints-cfp-yjit             moved  8/ 8 median -350.9 min  -528.0 | 
+writebook-interpreter          moved  8/ 8 median -1115.6 min -2843.9 | 
+writebook-yjit                 moved  8/ 8 median -1122.5 min -2856.0 | 
+ALL interpreter workloads  70  median -553.4  moved<=-1:  70  moved>=+1:   0
+ALL yjit        workloads  70  median -582.8  moved<=-1:  70  moved>=+1:   0
+SQL interpreter workloads  70  changed SQL:  11
+SQL yjit        workloads  70  changed SQL:  11

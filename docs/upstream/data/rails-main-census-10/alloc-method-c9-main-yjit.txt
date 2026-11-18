@@ -1,0 +1,12 @@
+# alloc yjit: a10c9 -> a10m, 70 workloads in all four labels
+# apps_up wl_up mean_up(min delta) | apps_down wl_down mean_down | method | example (base -> head)
+ 8  56      +51.8 |  0   0       +0.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#- | casa GET casa case edit 0.0 -> 626.0
+ 7  33       +6.8 |  0   0       +0.0 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#last_chain_scope | casa GET casa case edit 0.0 -> 35.0
+ 5  19       +4.2 |  0   0       +0.0 | activerecord/lib/active_record/associations/alias_tracker.rb ActiveRecord::Associations::AliasTracker.create | casa GET casa case 50.0 -> 60.0
+ 1   6       +4.5 |  0   0       +0.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#initialize | casa GET casa case 193.0 -> 198.0
+ 1   6       +4.5 |  0   0       +0.0 | activerecord/lib/active_record/relation/delegation.rb ActiveRecord::Delegation::ClassMethods#create | casa GET casa case 193.0 -> 198.0
+ 1   6       +4.5 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#build_scope | casa GET casa case 4.0 -> 9.0
+ 1   6       +4.5 |  0   0       +0.0 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#with | casa GET casa case 9.0 -> 14.0
+ 1   2       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#execute_grouped_calculation | hackatime GET dashboard 36.0 -> 38.0
+ 0   0       +0.0 |  1   6       -4.5 | activerecord/lib/active_record/core.rb ActiveRecord::Core::ClassMethods#relation | casa GET casa case 115.0 -> 110.0
+ 0   0       +0.0 |  1   1       -1.2 | activerecord/lib/arel/nodes/select_core.rb Arel::Nodes::SelectCore#initialize | blog POST comment (redirect) 7.2 -> 6.0

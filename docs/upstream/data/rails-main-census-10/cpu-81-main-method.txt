@@ -1,0 +1,42 @@
+# method, interpreter: c10s -> c10m; 70 workloads in all four labels; floor = max(A/A, 1000 Ir)
+# apps wl  mean d Ir/op  mean%  max%   %all | apps wl  mean d   %all | key
+ 8  40      +367713  1.13  2.77 +0.646 |  0   0        +0 +0.000 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_tag_option (new)
+ 8  67      +105659  0.34  1.12 +0.311 |  0   0        +0 +0.000 | activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#initialize (new)
+ 8  56      +121489  0.38  2.06 +0.299 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#index_for_name (new)
+ 8  61      +100898  0.19  1.27 +0.270 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#value_at! (new)
+ 8  44      +132382  0.36  1.09 +0.256 |  0   0        +0 +0.000 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper#call
+ 8  66       +86672  0.24  0.57 +0.251 |  0   0        +0 +0.000 | activesupport/lib/active_support/weak_key_map.rb ActiveSupport::WeakKeyMap#fetch_or_store (new)
+ 8  47       +94923  0.14  0.90 +0.196 |  0   0        +0 +0.000 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#association_route (new)
+ 8  45       +88887  0.24  0.78 +0.176 |  0   0        +0 +0.000 | actionpack/lib/action_dispatch/journey/visitors.rb ActionDispatch::Journey::Format#add_to (new)
+ 8  61       +65572  0.18  0.71 +0.176 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value_at! (new)
+ 8  52       +68426  0.41  1.01 +0.156 |  2   2     -2047 -0.000 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#csrf_token_hmac
+ 8  60       +56884  0.17  0.72 +0.150 |  0   0        +0 +0.000 | activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow.key_at? (new)
+ 8  50       +68151  0.10  0.77 +0.150 |  0   0        +0 +0.000 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#current_default_association_route? (new)
+ 8  55       +59732  0.14  1.24 +0.144 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#initialize (new)
+ 8  25      +127801  0.76  2.20 +0.140 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#keys (new)
+ 8  56       +56487  0.15  0.99 +0.139 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cast_value (new)
+ 8  65       +42861  0.17  0.38 +0.122 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#start_intent_log (new)
+ 8  49       +51733  0.13  0.34 +0.111 |  0   0        +0 +0.000 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#empty?
+ 8  54       +44878  0.12  0.36 +0.107 |  0   0        +0 +0.000 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#-
+ 8  44       +52030  0.09  0.50 +0.101 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value! (new)
+ 8  65       +35083  0.14  0.30 +0.100 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/query_intent.rb ActiveRecord::ConnectionAdapters::QueryIntent#initialize (new)
+ 8  57       +33416  0.09  0.24 +0.084 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_attributes (new)
+ 8  35       +53917  0.07  0.42 +0.083 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#current_schema_context (new)
+ 8  47       +39843  0.17  0.46 +0.082 |  5   6    -36848 -0.010 | activesupport/lib/active_support/isolated_execution_state.rb ActiveSupport::IsolatedExecutionState.[]
+ 8  51       +33109  0.08  0.22 +0.074 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#table_name
+ 8  50       +33656  0.08  0.22 +0.074 |  0   0        +0 +0.000 | activerecord/lib/arel/table.rb Arel::Table#name (new)
+ 8  40       +40983  0.12  0.30 +0.072 |  1   1   -238584 -0.010 | activerecord/lib/active_record/relation/merger.rb ActiveRecord::Relation::Merger#merge
+ 8  53       +30589  0.08  0.49 +0.071 |  0   0        +0 +0.000 | activerecord/lib/active_record/result.rb ActiveRecord::Result#map_rows (new)
+ 8  53       +29129  0.08  0.23 +0.068 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#loaded_mapped_table (new)
+ 8  45       +33798  0.06  0.24 +0.067 |  0   0        +0 +0.000 | activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_context (new)
+ 8  54       +27110  0.07  0.18 +0.064 |  0   0        +0 +0.000 | activerecord/lib/arel/attributes/attribute.rb Arel::Attributes::Attribute#type_caster
+ 8  61       +23997  0.07  0.14 +0.064 |  0   0        +0 +0.000 | activerecord/lib/active_record/scoping/default.rb ActiveRecord::Scoping::Default::ClassMethods#has_default_scope? (new)
+ 8  50       +28535  0.08  0.37 +0.063 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder::Context#type_at (new)
+ 8  62       +22678  0.09  0.19 +0.062 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb ActiveRecord::ConnectionAdapters::ConnectionPool::UsedPoolSet#query_cache_for (new)
+ 8  40       +31840  0.05  0.14 +0.056 |  0   0        +0 +0.000 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#class_name (new)
+ 8  31       +41072  0.27  0.90 +0.056 |  0   0        +0 +0.000 | activesupport/lib/active_support/event_reporter.rb ActiveSupport::EventReporter#notify (new)
+ 8  55       +22059  0.08  0.18 +0.053 |  0   0        +0 +0.000 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#execute_intent (new)
+ 8  64       +18847  0.13  0.54 +0.053 |  0   0        +0 +0.000 | activesupport/lib/active_support/event_reporter/log_subscriber.rb ActiveSupport::EventReporter::LogSubscriber.subscription_filter (new)
+ 8  39       +30722  0.07  0.14 +0.053 |  2   2     -2458 -0.000 | activerecord/lib/arel.rb Arel.arel_node?
+ 8  28       +42002  0.05  0.30 +0.052 |  0   0        +0 +0.000 | activerecord/lib/active_record/associations/belongs_to_association.rb ActiveRecord::Associations::BelongsToAssociation#initialize (new)
+ 8  25       +45912  0.27  0.84 +0.050 |  0   0        +0 +0.000 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cached_names (new)

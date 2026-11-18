@@ -1,0 +1,22 @@
+4500a94c34 2026-11-17 Jeremy Daer | Instrument the query `rails query` runs, not its first argument (#59845)
+3f7a6504a2 2026-11-17 Hartley McGuire | Merge pull request #59829 from andrewfader/fix-sql-literal-bind-values
+525fa958c2 2026-11-17 Yasuo Honda | Merge pull request #59841 from yahonda/fix-actioncable-stream-test-order-dependent-failure
+ff53633d52 2026-11-17 Ryuta Kamizono | Merge pull request #59836 from kamipo/association-scope-keeps-owner-conditions
+f0c9373b05 2026-11-17 Yasuo Honda | Merge pull request #59740 from yahonda/fix-url-for-protocol-encoding
+f502ee67d8 2026-11-17 Yasuo Honda | Merge pull request #59835 from yahonda/actioncable-websocket-handshake-headers
+32cec21516 2026-11-17 Yasuo Honda | Merge pull request #59838 from yahonda/fix-reflection-test-order-dependent-failure
+4f00fbc946 2026-11-17 Ryuta Kamizono | Merge pull request #59828 from kamipo/disable-joins-polymorphic-type
+04988cc35d 2026-11-17 Ryuta Kamizono | Merge pull request #59827 from kamipo/pg-only-schema-creation
+a58ae65dd0 2026-11-17 Ryuta Kamizono | Merge pull request #59825 from kamipo/keep-association-key-condition
+a5203b3d4d 2026-11-17 Ryuta Kamizono | Merge pull request #59823 from kamipo/fix-through-default-scope-aliased-table
+3d4914e1b2 2026-11-17 Ryuta Kamizono | Merge pull request #59819 from kamipo/pg-index-definitions-from-catalogs
+4617bd9eae 2026-11-16 Rafael Mendonça França | Merge pull request #58169 from hachi8833/update_i18n_guides
+4e381e67f5 2026-11-16 Rafael Mendonça França | Merge pull request #58967 from hachi8833/fix_i18n_guide
+667831f578 2026-11-16 Jean Boussier | Merge pull request #59821 from americodls/fix-unscope-aliased-join
+ed17c90871 2026-11-16 Jean Boussier | Merge pull request #59820 from byroot/break-actionmailer-activejob-dependency
+23cac06228 2026-11-16 Ryuta Kamizono | Merge pull request #59816 from kamipo/type-for-attribute-block
+d0eec80537 2026-11-16 Ryuta Kamizono | Merge pull request #59813 from kamipo/fix-nested-through-preload-dropping-scope
+78039119db 2026-11-16 Ryuta Kamizono | Merge pull request #59797 from czj/fix-nested-through-preload-scope
+e9c26763e2 2026-11-15 fatkodima | Merge pull request #59809 from thomasklemm/thomasklemm/controller-runtime-query-literal
+8217632cf8 2026-11-15 fatkodima | Merge pull request #59806 from skatkov/docs/create-table-as-block
+fb8e6422c9 2026-11-15 fatkodima | Merge pull request #59802 from corsonknowles/unused-routes-method-defined

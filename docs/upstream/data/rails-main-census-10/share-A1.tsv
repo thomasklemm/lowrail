@@ -1,0 +1,72 @@
+app	workload	Ir/op	self	self%	max incl%
+blog	GET articles	9557044	0	0.000%	0.000%
+blog	GET article	9068219	8181	0.090%	0.090%
+blog	GET article edit	6614396	0	0.000%	0.000%
+blog	GET articles.json	4702616	0	0.000%	0.000%
+blog	GET article.json	2700451	0	0.000%	0.000%
+blog	PATCH article (redirect)	5587862	0	0.000%	0.000%
+blog	POST article invalid (422)	15787401	0	0.000%	0.000%
+blog	POST comment (redirect)	7933370	8180	0.103%	0.103%
+blog	PATCH article.json	4740771	0	0.000%	0.000%
+blog	perform Turbo::Streams::ActionBroadcastJob	3258381	1628	0.050%	0.125%
+casa	GET dashboard	23093783	58996	0.255%	0.277%
+casa	GET casa cases	56711790	59896	0.106%	0.120%
+casa	GET casa case	105595917	247197	0.234%	0.273%
+casa	GET casa case edit	141878044	687329	0.484%	0.478%
+casa	GET volunteers	89358366	191363	0.214%	0.213%
+casa	GET supervisors	56124258	185426	0.330%	0.322%
+casa	GET case contacts	208349156	237207	0.114%	0.144%
+casa	POST api sign_in.json	472105439	10787	0.002%	0.002%
+casa	PATCH casa case (redirect)	29324173	91026	0.310%	0.296%
+casa	PATCH casa case.json	27887106	68863	0.247%	0.265%
+codetriage	GET home	14501388	0	0.000%	0.000%
+codetriage	GET repo	15895746	36873	0.232%	0.222%
+codetriage	GET subscribers	12888765	9824	0.076%	0.083%
+codetriage	GET user edit (signed in)	14033030	0	0.000%	0.000%
+codetriage	GET repo info.json	7563991	10632	0.141%	0.130%
+codetriage	PATCH repo subscription (redirect)	15396266	21286	0.138%	0.144%
+codetriage	perform SendSingleTriageEmailJob	11709899	18030	0.154%	0.175%
+hackatime	GET dashboard	51385018	67272	0.131%	0.225%
+hackatime	GET projects	33835110	31165	0.092%	0.102%
+hackatime	GET leaderboards	27054488	20495	0.076%	0.085%
+hackatime	GET settings profile	39008056	34441	0.088%	0.088%
+hackatime	GET dashboard (Inertia XHR)	47089855	64799	0.138%	0.260%
+hackatime	GET dashboard stats (deferred)	37570370	52483	0.140%	0.297%
+hackatime	GET leaderboard entries (deferred)	11351102	9830	0.087%	0.108%
+hackatime	PATCH display name (Inertia redirect)	17548074	5733	0.033%	0.056%
+hackatime	PATCH username invalid (Inertia 422)	39241232	34434	0.088%	0.088%
+hackatime	GET statusbar today	11489324	34414	0.300%	0.307%
+hackatime	POST heartbeat	23411360	18023	0.077%	0.112%
+pingcrm	GET dashboard	7857778	7362	0.094%	0.094%
+pingcrm	GET contacts	14925408	8185	0.055%	0.049%
+pingcrm	GET organizations	12251185	4094	0.033%	0.047%
+pingcrm	GET contact edit	17903811	20486	0.114%	0.096%
+pingcrm	GET contacts (Inertia JSON)	13571865	7369	0.054%	0.054%
+pingcrm	GET organizations (Inertia JSON)	10914299	9009	0.083%	0.083%
+pingcrm	PUT contact (Inertia redirect)	8150497	0	0.000%	0.000%
+pingcrm	POST contact invalid (Inertia errors)	10015518	11461	0.114%	0.114%
+react-starter-kit	GET home	8058348	6546	0.081%	0.071%
+react-starter-kit	GET dashboard	7824064	10632	0.136%	0.188%
+react-starter-kit	GET settings profile	7822574	6543	0.084%	0.084%
+react-starter-kit	GET settings sessions	8758111	15533	0.177%	0.205%
+react-starter-kit	GET dashboard (Inertia JSON)	5889411	8180	0.139%	0.153%
+react-starter-kit	PATCH profile (Inertia redirect)	6377670	6545	0.103%	0.141%
+react-starter-kit	PATCH profile invalid (Inertia errors)	6797579	10638	0.156%	0.144%
+react-starter-kit	deliver UserMailer#email_verification	4485126	0	0.000%	0.000%
+redprints-cfp	GET home	6290065	0	0.000%	0.000%
+redprints-cfp	GET proposals	7441396	8993	0.121%	0.132%
+redprints-cfp	GET proposal	10437445	24570	0.235%	0.275%
+redprints-cfp	GET proposal edit	10701785	22934	0.214%	0.291%
+redprints-cfp	GET proposals (Inertia JSON)	6390587	8180	0.128%	0.128%
+redprints-cfp	PATCH proposal (Inertia redirect)	10228932	18014	0.176%	0.200%
+redprints-cfp	POST proposal invalid (Inertia errors)	11660491	21302	0.183%	0.169%
+redprints-cfp	deliver ProposalMailer#proposal_submitted	5774694	0	0.000%	0.000%
+writebook	GET books	18859795	27030	0.143%	0.200%
+writebook	GET book	30015886	47566	0.158%	0.202%
+writebook	GET leaf	41679209	55742	0.134%	0.171%
+writebook	GET leaf.md	15187237	52387	0.345%	0.426%
+writebook	PATCH page (turbo_stream)	39562730	70503	0.178%	0.230%
+writebook	POST search	20059191	38497	0.192%	0.192%
+writebook	POST page (turbo_stream)	30125889	72150	0.239%	0.318%
+writebook	perform Turbo::Streams::BroadcastJob	2783262	0	0.000%	0.000%
+# 56 of 70 workloads; self share median 0.114%, max 0.484%; of all Ir 0.137%

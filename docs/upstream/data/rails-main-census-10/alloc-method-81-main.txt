@@ -1,0 +1,608 @@
+# alloc interpreter: a10s -> a10m, 70 workloads in all four labels
+# apps_up wl_up mean_up(min delta) | apps_down wl_down mean_down | method | example (base -> head)
+ 8  56      +51.8 |  0   0       +0.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#- | casa GET casa case edit 0.0 -> 626.0
+ 8  57      +25.3 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#initialize | casa GET case contacts 0.0 -> 430.0
+ 8  55      +25.9 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder#build_from_row | casa GET case contacts 0.0 -> 430.0
+ 8  44      +29.6 |  0   0       +0.0 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper#call | casa GET case contacts 0.0 -> 192.0
+ 8  43      +19.7 |  0   0       +0.0 | activerecord/lib/active_record/associations.rb ActiveRecord::Associations#association_cache | casa GET case contacts 0.0 -> 406.0
+ 8  56      +13.4 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#table_name_qualified_unscope_values | casa GET casa case edit 4.0 -> 110.0
+ 8  67       +9.9 |  0   0       +0.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result#map_rows | casa GET casa case edit 0.0 -> 88.0
+ 8  48      +13.8 |  0   0       +0.0 | activerecord/lib/active_record/scoping/default.rb ActiveRecord::Scoping::Default::ClassMethods#build_default_scope | casa GET casa case edit 0.0 -> 125.0
+ 8  61      +10.0 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter#build_retry_budget | casa GET casa case edit 0.0 -> 62.0
+ 8  61       +9.8 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#start_intent_log | casa GET casa case edit 0.0 -> 62.0
+ 8  46      +12.0 |  0   0       +0.0 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#append_sec_fetch_site_to_vary_header | hackatime GET dashboard 0.0 -> 13.0
+ 8  35      +15.8 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/enumerable.rb Array#index_with | hackatime POST heartbeat 0.0 -> 73.0
+ 8  60       +8.3 |  0   0       +0.0 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::EncryptedKeyRotatingCookieJar#encryptor | codetriage GET home 0.0 -> 11.0
+ 8  59       +8.4 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#select_all | casa GET casa case edit 0.0 -> 62.0
+ 8  53       +9.0 |  0   0       +0.0 | activerecord/lib/active_record/scoping/default.rb ActiveRecord::Scoping::Default::ClassMethods#has_default_scope? | casa GET case contacts 0.0 -> 85.0
+ 8  25      +12.4 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#keys | casa PATCH casa case.json 0.0 -> 70.0
+ 8  31       +9.2 |  0   0       +0.0 | activesupport/lib/active_support/event_reporter.rb ActiveSupport::EventReporter#notify | codetriage GET home 0.0 -> 30.0
+ 8  52       +4.2 |  0   0       +0.0 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#csrf_token_hmac | casa GET case contacts 18.0 -> 38.0
+ 8  24       +7.4 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#row_keys | casa PATCH casa case.json 0.0 -> 37.0
+ 8  24       +6.4 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cached_names | casa PATCH casa case.json 0.0 -> 35.0
+ 8  22       +6.5 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#internal_build_intent | hackatime GET dashboard 0.0 -> 12.0
+ 8  65       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/event_reporter.rb ActiveSupport::EventReporter#emitting? | blog GET articles 0.0 -> 2.0
+ 8  65       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/session.rb ActionDispatch::Http::Session.create | blog GET articles 0.0 -> 2.0
+ 8  12       +5.2 |  0   0       +0.0 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#_build_update_manager | writebook PATCH page (turbo_stream) 0.0 -> 18.0
+ 7  26      +12.0 |  7  32       -8.8 | activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout#build_handle | casa GET case contacts 374.0 -> 530.0
+ 7  29       +9.6 |  0   0       +0.0 | actionview/lib/action_view/path_set.rb ActionView::PathSet#search_combinations | casa GET case contacts 0.0 -> 64.0
+ 6  33       +7.5 |  0   0       +0.0 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#root_entry? | blog GET articles 0.0 -> 12.0
+ 6  31       +6.4 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#association_route_chain | casa GET casa case edit 0.0 -> 33.0
+ 6  12      +13.1 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#default_attribute | hackatime POST heartbeat 0.0 -> 72.0
+ 6  46       +3.4 |  0   0       +0.0 | activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout::EventObjectGroup#build_event | codetriage GET home 2.0 -> 15.0
+ 6  22       +5.7 |  6  37      -18.0 | activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout#groups_for | codetriage GET home 19.0 -> 32.0
+ 6  18       +4.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#root_entry_or_precompressed? | blog GET articles 0.0 -> 4.0
+ 6  29       +2.2 |  0   0       +0.0 | activesupport/lib/active_support/json/decoding.rb ActiveSupport::JSON.decode | hackatime GET dashboard 50.0 -> 53.0
+ 6   9       +2.6 |  0   0       +0.0 | actionpack/lib/action_controller/metal/strong_parameters.rb:(top) | codetriage GET home 0.0 -> 6.0
+ 5  29      +21.9 |  0   0       +0.0 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper#parameterize_args | casa GET case contacts 0.0 -> 96.0
+ 5  20      +26.4 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#classify_join_values | casa GET casa case edit 0.0 -> 162.0
+ 5  31       +6.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_order! | casa GET casa case edit 0.0 -> 46.0
+ 5  19       +5.8 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#store | casa GET case contacts 0.0 -> 20.0
+ 5  18       +4.0 |  1   1       -2.0 | activerecord/lib/active_record/associations/alias_tracker.rb ActiveRecord::Associations::AliasTracker.create | casa GET casa case 50.0 -> 60.0
+ 5  19       +3.6 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::ThroughReflection#association_route_chain | casa GET casa case 0.0 -> 10.0
+ 5   7       +2.7 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#initialize_dup | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 5   7       +2.7 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#initialize_copy | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 5   7       +2.7 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#map | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 5   8       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/utils.rb ActionDispatch::Http::Utils::ParamEncoder.normalize_encode_params | blog PATCH article.json 0.0 -> 2.0
+ 4  15       +7.3 |  0   0       +0.0 | activejob/lib/active_job/queue_adapter.rb ActiveJob.adapter_name | hackatime GET dashboard 0.0 -> 16.0
+ 4   7      +15.4 |  0   0       +0.0 | activerecord/lib/active_record/sanitization.rb ActiveRecord::Sanitization::ClassMethods#bound_sql_literal_for | casa GET casa case 0.0 -> 50.0
+ 4  15       +6.3 |  0   0       +0.0 | actionview/lib/action_view/helpers/form_tag_helper.rb ActionView::Helpers::FormTagHelper#token_tag | casa GET case contacts 0.0 -> 34.0
+ 4  15       +4.3 |  0   0       +0.0 | activesupport/lib/active_support/structured_event_subscriber.rb ActiveSupport::StructuredEventSubscriber#emit_event | hackatime GET dashboard 0.0 -> 8.0
+ 4  24       +2.6 |  0   0       +0.0 | activesupport/lib/active_support/message_verifier.rb ActiveSupport::MessageVerifier#generate_digest | writebook GET books 0.0 -> 4.0
+ 4  10       +5.4 |  0   0       +0.0 | activejob/lib/active_job/structured_event_subscriber.rb ActiveJob::StructuredEventSubscriber#perform_start | hackatime GET dashboard 0.0 -> 8.0
+ 4  10       +5.0 |  0   0       +0.0 | activesupport/lib/active_support/inflector/methods.rb ActiveSupport::Inflector#demodulize | hackatime GET dashboard 0.0 -> 8.0
+ 4  18       +2.7 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#add_as_through | casa GET volunteers 22.0 -> 32.0
+ 4  10       +4.8 |  0   0       +0.0 | activejob/lib/active_job/structured_event_subscriber.rb ActiveJob::StructuredEventSubscriber#perform | hackatime GET dashboard 0.0 -> 8.0
+ 4   8       +3.5 |  0   0       +0.0 | actionview/lib/action_view/helpers/output_safety_helper.rb ActionView::Helpers::OutputSafetyHelper#safe_join | blog GET articles 4.0 -> 10.0
+ 4   8       +3.5 |  0   0       +0.0 | actionview/lib/action_view/helpers/navigation_helper.rb ActionView::Helpers::NavigationHelper#button_to | blog GET articles 0.0 -> 6.0
+ 4   7       +3.4 |  1   3       -8.3 | actionview/lib/action_view/helpers/form_tag_helper.rb ActionView::Helpers::FormTagHelper#extra_tags_for_form | blog GET articles 0.0 -> 6.0
+ 4   5       +4.2 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#apply_returning_to! | writebook POST page (turbo_stream) 0.0 -> 9.0
+ 4   7       +2.0 |  0   0       +0.0 | activejob/lib/active_job/structured_event_subscriber.rb ActiveJob::StructuredEventSubscriber#enqueue | blog POST comment (redirect) 0.0 -> 2.0
+ 4   4       +3.5 |  0   0       +0.0 | activerecord/lib/active_record/transactions.rb ActiveRecord::Transactions#restore_transaction_record_state | blog POST article invalid (422) 0.0 -> 5.0
+ 3  14      +28.9 |  0   0       +0.0 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_prefix_tag_option | casa GET case contacts 0.0 -> 167.0
+ 3  16      +23.1 |  0   0       +0.0 | actionview/lib/action_view/helpers/navigation_helper.rb ActionView::Helpers::NavigationHelper#link_to | casa GET case contacts 0.0 -> 72.0
+ 3   7      +17.1 |  0   0       +0.0 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#initialize | casa GET casa case edit 24.0 -> 72.0
+ 3  21       +4.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::SignedKeyRotatingCookieJar#verifier | react-starter-kit GET home 0.0 -> 4.0
+ 3   9       +7.6 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_joins! | casa GET casa case edit 0.0 -> 28.0
+ 3   8       +8.1 |  0   0       +0.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#wrap_sql_literal | casa GET casa case 0.0 -> 25.0
+ 3  10       +5.9 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#type_cast_pluck_values | casa PATCH casa case (redirect) 3.0 -> 12.0
+ 3   7       +6.3 |  0   0       +0.0 | actionpack/lib/action_dispatch/routing/polymorphic_routes.rb ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder#dispatch_model | casa GET casa cases 0.0 -> 18.0
+ 3   5       +6.4 |  0   0       +0.0 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#normalize_action_path | casa GET case contacts 17.0 -> 34.0
+ 3   5       +6.2 |  0   0       +0.0 | activesupport/lib/active_support/json/encoding.rb ActiveSupport::JSON::Encoding::JSONGemCoderEncoder#escape! | casa PATCH casa case (redirect) 0.0 -> 11.0
+ 3  15       +2.0 |  0   0       +0.0 | actionpack/lib/action_controller/metal/implicit_render.rb ActionController::ImplicitRender#default_render | blog GET articles 0.0 -> 2.0
+ 3  15       +2.0 |  0   0       +0.0 | actionview/lib/action_view/lookup_context.rb ActionView::LookupContext::ViewPaths#find | blog GET articles 0.0 -> 2.0
+ 3   7       +2.4 |  2   7      -39.7 | activesupport/lib/active_support/core_ext/string/output_safety.rb String#html_safe | blog GET article 54.0 -> 58.0
+ 3   4       +3.2 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#update | writebook PATCH page (turbo_stream) 6.0 -> 12.0
+ 3   4       +3.2 |  0   0       +0.0 | activerecord/lib/arel/nodes/update_statement.rb Arel::Nodes::UpdateStatement#initialize | writebook PATCH page (turbo_stream) 30.0 -> 36.0
+ 3   4       +3.2 |  0   0       +0.0 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence#_identity_query_constraints_hash | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 3   4       +3.0 |  0   0       +0.0 | actionview/lib/action_view/helpers/form_tag_helper.rb ActionView::Helpers::FormTagHelper#method_tag | casa GET casa case edit 0.0 -> 4.0
+ 3   4       +2.5 |  0   0       +0.0 | actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#capture | blog GET articles 0.0 -> 3.0
+ 3   4       +2.5 |  0   0       +0.0 | actionview/lib/action_view/helpers/capture_helper.rb ActionView::Helpers::CaptureHelper#capture | blog GET articles 0.0 -> 3.0
+ 3   4       +2.5 |  0   0       +0.0 | actionview/lib/action_view/helpers/form_tag_helper.rb ActionView::Helpers::FormTagHelper#form_tag_with_body | blog GET articles 0.0 -> 3.0
+ 3   3       +2.3 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder#build_from_initialize | writebook POST page (turbo_stream) 0.0 -> 3.0
+ 2   3     +102.7 |  0   0       +0.0 | activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow::Remapper#initialize | casa GET case contacts 0.0 -> 158.0
+ 2   6      +32.2 |  0   0       +0.0 | activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow.unset_row | casa GET case contacts 0.0 -> 152.0
+ 2   3      +46.7 |  0   0       +0.0 | activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow::Remapper#build | casa GET case contacts 0.0 -> 108.0
+ 2   6      +22.3 |  0   0       +0.0 | activesupport/lib/active_support/time_with_zone.rb ActiveSupport::TimeWithZone#to_date | casa GET casa cases 0.0 -> 82.0
+ 2   8      +13.4 |  0   0       +0.0 | activesupport/lib/active_support/values/time_zone.rb ActiveSupport::TimeZone#today | casa GET casa cases 83.0 -> 166.0
+ 2   3      +23.3 |  0   0       +0.0 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#instantiate | casa GET case contacts 0.0 -> 54.0
+ 2   9       +7.3 |  0   0       +0.0 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#find_target | casa GET casa case edit 0.0 -> 26.0
+ 2   9       +7.3 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#association_scope_cache | casa GET casa case edit 0.0 -> 26.0
+ 2   7       +8.9 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_join_buckets | casa GET casa case edit 166.0 -> 193.0
+ 2   4      +13.8 |  0   0       +0.0 | actionview/lib/action_view/renderer/collection_renderer.rb ActionView::CollectionRenderer#collection_into_buffer | casa GET case contacts 0.0 -> 40.0
+ 2   9       +6.1 |  0   0       +0.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#initialize | casa GET case contacts 0.0 -> 34.0
+ 2   3      +16.7 |  0   0       +0.0 | activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#to_hash | casa PATCH casa case (redirect) 0.0 -> 24.0
+ 2   8       +5.4 |  0   0       +0.0 | activerecord/lib/active_record/key.rb ActiveRecord::Key::Single#where_hash | casa GET case contacts 0.0 -> 18.0
+ 2   5       +6.8 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/object/to_query.rb Array#to_param | codetriage GET repo 28.0 -> 42.0
+ 2   6       +5.7 |  0   0       +0.0 | activerecord/lib/active_record/key.rb ActiveRecord::Key::Single#where_clauses | casa GET case contacts 0.0 -> 18.0
+ 2   6       +5.7 |  0   0       +0.0 | activerecord/lib/active_record/relation/predicate_builder/association_query_value.rb ActiveRecord::PredicateBuilder::AssociationQueryValue#association_route_for | casa GET case contacts 0.0 -> 18.0
+ 2   7       +3.9 |  1   1      -14.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#execute_grouped_calculation | hackatime GET dashboard 36.0 -> 42.0
+ 2   7       +3.3 |  0   0       +0.0 | activesupport/lib/active_support/broadcast_logger.rb ActiveSupport::BroadcastLogger#tagged | hackatime GET dashboard 0.0 -> 4.0
+ 2   7       +3.3 |  0   0       +0.0 | activesupport/lib/active_support/broadcast_logger.rb ActiveSupport::BroadcastLogger#_tagged | hackatime GET dashboard 0.0 -> 4.0
+ 2   5       +4.2 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_unscope! | casa GET casa case 0.0 -> 6.0
+ 2  10       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/response.rb ActionDispatch::Response#media_type | codetriage GET home 0.0 -> 2.0
+ 2   5       +4.0 |  0   0       +0.0 | actionpack/lib/action_controller/structured_event_subscriber.rb ActionController::StructuredEventSubscriber#fragment_cache | codetriage GET repo 0.0 -> 8.0
+ 2   5       +3.4 |  1   1       -5.0 | activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#sql_key | casa PATCH casa case (redirect) 9.0 -> 13.0
+ 2   5       +3.4 |  0   0       +0.0 | activesupport/lib/active_support/cache.rb ActiveSupport::Cache.retrieve_cache_key | codetriage GET repo 0.0 -> 7.0
+ 2   3       +5.3 |  0   0       +0.0 | activerecord/lib/active_record/integration.rb ActiveRecord::Integration#cache_key | writebook PATCH page (turbo_stream) 8.0 -> 16.0
+ 2   3       +5.0 |  2   6       -3.3 | activesupport/lib/active_support/core_ext/hash/keys.rb Hash#stringify_keys | blog GET articles 22.0 -> 28.0
+ 2   6       +2.3 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_extending! | codetriage GET home 0.0 -> 4.0
+ 2   3       +4.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#instantiate | casa GET case contacts 116.0 -> 122.0
+ 2   3       +4.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#remapper | casa GET case contacts 0.0 -> 6.0
+ 2   4       +3.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper#merge_url_and_query_options! | casa GET supervisors 0.0 -> 4.0
+ 2   4       +2.2 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_group! | casa GET volunteers 0.0 -> 3.0
+ 2   3       +2.7 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/string/output_safety.rb ActiveSupport::SafeBuffer#+ | blog GET articles 0.0 -> 3.0
+ 2   3       +2.7 |  0   0       +0.0 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#primary_key_aliases | casa GET case contacts 0.0 -> 4.0
+ 2   3       +2.7 |  0   0       +0.0 | activesupport/lib/active_support/cache.rb ActiveSupport::Cache.expand_cache_key | codetriage GET repo 0.0 -> 4.0
+ 2   2       +3.5 |  0   0       +0.0 | activerecord/lib/active_record/integration.rb ActiveRecord::Integration#cache_key_with_version | writebook PATCH page (turbo_stream) 0.0 -> 4.0
+ 2   3       +2.0 |  2   3       -9.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#initialize_copy | casa PATCH casa case (redirect) 29.0 -> 31.0
+ 2   3       +2.0 |  2   7       -7.4 | activerecord/lib/arel/table.rb Arel::Table#[] | casa PATCH casa case (redirect) 59.0 -> 61.0
+ 2   3       +2.0 |  2   2       -4.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#arel_columns | casa PATCH casa case (redirect) 4.0 -> 6.0
+ 2   2       +3.0 |  0   0       +0.0 | actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#<< | casa GET casa case edit 7.0 -> 10.0
+ 2   3       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb ActiveRecord::ConnectionAdapters::QueryCache#select_all | casa PATCH casa case (redirect) 1.0 -> 3.0
+ 2   3       +2.0 |  1   1       -3.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result#cast_values | casa PATCH casa case (redirect) 1.0 -> 3.0
+ 2   3       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#pluck | casa PATCH casa case (redirect) 1.0 -> 3.0
+ 2   3       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/validations/uniqueness.rb ActiveRecord::Validations::UniquenessValidator#validate_each | casa PATCH casa case (redirect) 7.0 -> 9.0
+ 2   3       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#pick | casa PATCH casa case (redirect) 0.0 -> 2.0
+ 2   3       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#insert | casa PATCH casa case (redirect) 0.0 -> 2.0
+ 2   2       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#warn_unscope_of_other_tables | casa GET casa case 0.0 -> 2.0
+ 1   3      +68.7 |  0   0       +0.0 | actionview/lib/action_view/helpers/rendering_helper.rb ActionView::Helpers::RenderingHelper#render | casa GET case contacts 133.0 -> 269.0
+ 1   4      +39.2 |  7  39      -12.2 | actionview/lib/action_view/structured_event_subscriber.rb ActionView::StructuredEventSubscriber::Utils#from_rails_root | codetriage GET home 14.0 -> 62.0
+ 1   5      +26.0 |  0   0       +0.0 | actionview/lib/action_view/helpers/navigation_helper.rb ActionView::Helpers::NavigationHelper#remove_trailing_slash! | hackatime GET dashboard 0.0 -> 26.0
+ 1   3      +34.3 |  1   2       -8.0 | activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout::BaseTimeGroup#finish | casa GET case contacts 108.0 -> 176.0
+ 1   3      +34.3 |  0   0       +0.0 | actionview/lib/action_view/template/renderable.rb ActionView::Template::Renderable#render | casa GET case contacts 0.0 -> 68.0
+ 1   3      +33.7 |  0   0       +0.0 | actionview/lib/action_view/template/renderable.rb ActionView::Template::Renderable#initialize | casa GET case contacts 0.0 -> 68.0
+ 1   9       +8.9 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::ByteaDecodeDetection#unescape_bytea | hackatime GET dashboard 0.0 -> 16.0
+ 1   4      +16.8 |  0   0       +0.0 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#make_constraints | casa GET casa case edit 47.0 -> 93.0
+ 1  10       +6.6 |  0   0       +0.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result#map_rows_by | casa GET volunteers 0.0 -> 15.0
+ 1   7       +9.0 |  0   0       +0.0 | activesupport/lib/active_support/event_reporter.rb ActiveSupport::EventReporter#debug | codetriage GET home 0.0 -> 12.0
+ 1   7       +8.7 |  0   0       +0.0 | activerecord/lib/active_record/structured_event_subscriber.rb ActiveRecord::StructuredEventSubscriber#render_bind | codetriage PATCH repo subscription (redirect) 0.0 -> 20.0
+ 1   4      +15.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#register_handlers | pingcrm GET contacts 0.0 -> 15.0
+ 1   7       +7.9 |  0   0       +0.0 | activesupport/lib/active_support/structured_event_subscriber.rb ActiveSupport::StructuredEventSubscriber#emit_debug_event | codetriage PATCH repo subscription (redirect) 0.0 -> 11.0
+ 1   1      +50.0 |  0   0       +0.0 | activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods::ClassMethods::AttributeMethodPattern#method_for_attr | casa GET volunteers 0.0 -> 50.0
+ 1   7       +6.6 |  0   0       +0.0 | activerecord/lib/active_record/structured_event_subscriber.rb ActiveRecord::StructuredEventSubscriber#sql | codetriage PATCH repo subscription (redirect) 0.0 -> 18.0
+ 1   2      +20.0 |  0   0       +0.0 | actiontext/lib/action_text/bottom_up_reducer.rb ActionText::BottomUpReducer#traverse_bottom_up | writebook PATCH page (turbo_stream) 0.0 -> 20.0
+ 1   7       +5.6 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_references! | casa GET volunteers 0.0 -> 14.0
+ 1   4       +9.8 |  0   0       +0.0 | actionview/lib/action_view/helpers/navigation_helper.rb ActionView::Helpers::NavigationHelper#convert_options_to_data_attributes | codetriage GET home 0.0 -> 13.0
+ 1   6       +6.2 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_includes! | casa GET volunteers 0.0 -> 14.0
+ 1   1      +35.0 |  3   6      -62.5 | activerecord/lib/arel/visitors/to_sql.rb Arel::Visitors::ToSql#visit_Arel_Nodes_BoundSqlLiteral | codetriage perform SendSingleTriageEmailJob 0.0 -> 35.0
+ 1   2      +16.5 |  2   5      -32.8 | activesupport/lib/active_support/core_ext/time/calculations.rb Time#change | casa GET supervisors 84.0 -> 106.0
+ 1   1      +33.0 |  0   0       +0.0 | activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods::ClassMethods::AttributeMethodPattern#matched_attribute_name | casa GET casa case edit 0.0 -> 33.0
+ 1   6       +4.5 |  0   0       +0.0 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#with | casa GET casa case 9.0 -> 14.0
+ 1   4       +6.0 |  0   0       +0.0 | actionview/lib/action_view/structured_event_subscriber.rb ActionView::StructuredEventSubscriber#render_partial | codetriage GET home 0.0 -> 7.0
+ 1   1      +24.0 |  0   0       +0.0 | activesupport/lib/active_support/time_formats.rb:(top) | codetriage GET user edit (signed in) 0.0 -> 24.0
+ 1  11       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/parameter_filter.rb ActiveSupport::ParameterFilter#extract_exact_key | hackatime GET dashboard 0.0 -> 2.0
+ 1   6       +3.5 |  0   0       +0.0 | activerecord/lib/active_record/association_route.rb ActiveRecord::AssociationRoute#each_match | casa GET casa case 0.0 -> 5.0
+ 1   5       +4.0 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#build_scope | casa GET casa case 4.0 -> 9.0
+ 1   6       +3.3 |  0   0       +0.0 | activejob/lib/active_job/execution.rb ActiveJob::Execution::ClassMethods#perform_now | hackatime GET dashboard 4.0 -> 8.0
+ 1   1      +17.0 |  0   0       +0.0 | activerecord/lib/arel/nodes/bound_sql_literal.rb Arel::Nodes::BoundSqlLiteral#initialize | codetriage perform SendSingleTriageEmailJob 0.0 -> 17.0
+ 1   7       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/string_inquirer.rb ActiveSupport::StringInquirer#method_missing | writebook GET books 1.0 -> 3.0
+ 1   3       +4.0 |  2   3       -2.0 | activerecord/lib/active_record/relation/spawn_methods.rb ActiveRecord::SpawnMethods#except | casa GET volunteers 16.0 -> 22.0
+ 1   6       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/cache/strategy/local_cache.rb ActiveSupport::Cache::Strategy::LocalCache#read_multi_entries_from_local_cache | hackatime GET dashboard 0.0 -> 2.0
+ 1   2       +6.0 |  0   0       +0.0 | actiontext/lib/action_text/bottom_up_reducer.rb ActionText::BottomUpReducer#reduce | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 1   2       +5.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#execute_simple_calculation | casa GET volunteers 34.0 -> 39.0
+ 1   2       +5.0 |  0   0       +0.0 | activerecord/lib/active_record/integration.rb ActiveRecord::Integration#raw_timestamp_to_cache_version | writebook PATCH page (turbo_stream) 8.0 -> 16.0
+ 1   2       +5.0 |  0   0       +0.0 | actionview/lib/action_view/helpers/date_helper.rb ActionView::Helpers::DateHelper#distance_translation | casa GET casa case edit 0.0 -> 8.0
+ 1   5       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/key.rb ActiveRecord::Key::Single#_value_of | redprints-cfp GET proposals 0.0 -> 2.0
+ 1   3       +3.3 |  0   0       +0.0 | activerecord/lib/active_record/association_route.rb ActiveRecord::AssociationLink#write_reference | redprints-cfp POST proposal invalid (Inertia errors) 0.0 -> 6.0
+ 1   3       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::ThroughReflection#collect_join_chain | casa GET volunteers 11.0 -> 16.0
+ 1   3       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#source_scope_filters_source? | casa GET case contacts 0.0 -> 4.0
+ 1   2       +4.0 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/string/filters.rb String#squish! | hackatime GET statusbar today 4.0 -> 8.0
+ 1   4       +2.0 |  0   0       +0.0 | actionview/lib/action_view/template_details.rb ActionView::TemplateDetails#rank_for | blog GET articles 0.0 -> 2.0
+ 1   3       +2.7 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/module/attribute_accessors_per_thread.rb Module#thread_mattr_reader | blog POST comment (redirect) 0.0 -> 4.0
+ 1   2       +4.0 |  0   0       +0.0 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence#_update_row | writebook PATCH page (turbo_stream) 0.0 -> 6.0
+ 1   1       +8.0 |  0   0       +0.0 | actionview/lib/action_view/template/resolver.rb ActionView::FileSystemResolver#find_all | redprints-cfp deliver ProposalMailer#proposal_submitted 0.0 -> 8.0
+ 1   2       +4.0 |  0   0       +0.0 | actiontext/lib/action_text/editor/trix_editor.rb ActionText::Editor::TrixEditor#as_canonical | writebook PATCH page (turbo_stream) 0.0 -> 4.0
+ 1   1       +6.0 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/time/conversions.rb Time#to_fs | codetriage GET repo 6.0 -> 12.0
+ 1   2       +3.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/session.rb ActionDispatch::Http::Session.disabled | blog POST comment (redirect) 0.0 -> 3.0
+ 1   2       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter.partition_optimizer_hints | casa GET supervisors 0.0 -> 4.0
+ 1   2       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/association_route.rb ActiveRecord::AssociationRoute#each_matching_origin | casa PATCH casa case (redirect) 0.0 -> 3.0
+ 1   3       +2.0 |  0   0       +0.0 | activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow#transform_row | redprints-cfp GET proposal edit 0.0 -> 2.0
+ 1   1       +4.0 |  1   2      -45.0 | activerecord/lib/active_record/associations/preloader/batch.rb ActiveRecord::Associations::Preloader::Batch#call | casa GET case contacts 162.0 -> 166.0
+ 1   2       +2.0 |  0   0       +0.0 | actiontext/lib/action_text/fragment.rb ActionText::Fragment#update | writebook PATCH page (turbo_stream) 8.0 -> 10.0
+ 1   2       +2.0 |  0   0       +0.0 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_tag_option | blog GET article edit 0.0 -> 2.0
+ 1   1       +4.0 |  0   0       +0.0 | activemodel/lib/active_model/validations/numericality.rb ActiveModel::Validations::NumericalityValidator#decimal_type_for | codetriage PATCH repo subscription (redirect) 0.0 -> 4.0
+ 1   2       +2.0 |  0   0       +0.0 | actiontext/lib/action_text/bottom_up_reducer.rb ActionText::BottomUpReducer#initialize | writebook PATCH page (turbo_stream) 0.0 -> 2.0
+ 1   2       +2.0 |  0   0       +0.0 | actiontext/lib/action_text/markdown_conversion.rb ActionText::MarkdownConversion#fragment_by_unwrapping_raw_markdown_tags | writebook PATCH page (turbo_stream) 0.0 -> 2.0
+ 1   1       +3.0 |  2   3      -12.0 | activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter#collector | codetriage perform SendSingleTriageEmailJob 15.0 -> 18.0
+ 1   1       +3.0 |  3   3       -3.0 | activerecord/lib/arel/visitors/to_sql.rb Arel::Visitors::ToSql#visit_Arel_Nodes_SqlLiteral | writebook POST page (turbo_stream) 0.0 -> 3.0
+ 1   1       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#insert | writebook POST page (turbo_stream) 3.0 -> 6.0
+ 1   1       +3.0 |  0   0       +0.0 | activerecord/lib/arel/nodes/insert_statement.rb Arel::Nodes::InsertStatement#initialize | writebook POST page (turbo_stream) 3.0 -> 6.0
+ 1   1       +3.0 |  0   0       +0.0 | activerecord/lib/active_record/model_schema/schema_context/mapped_table.rb ActiveRecord::ModelSchema::SchemaContext::MappedTable#_returning_columns_for_insert | writebook POST page (turbo_stream) 0.0 -> 3.0
+ 1   1       +2.2 |  0   0       +0.0 | activesupport/lib/active_support/core_ext/enumerable.rb Enumerable#index_by | writebook perform Turbo::Streams::BroadcastJob 0.0 -> 2.2
+ 1   1       +2.0 |  1   3       -6.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#flattened_args | codetriage PATCH repo subscription (redirect) 1.0 -> 3.0
+ 1   1       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#each_candidate_filepath | blog GET article.json 2.0 -> 4.0
+ 1   1       +2.0 |  1   1      -10.0 | activerecord/lib/active_record/querying.rb:(top) | writebook perform Turbo::Streams::BroadcastJob 2.0 -> 4.0
+ 1   1       +2.0 |  1   3       -7.0 | activerecord/lib/active_record/relation/predicate_builder/array_handler.rb ActiveRecord::PredicateBuilder::ArrayHandler#call | writebook perform Turbo::Streams::BroadcastJob 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#merge | casa GET case contacts 3.0 -> 5.0
+ 1   1       +2.0 |  0   0       +0.0 | activemodel/lib/active_model/type/helpers/time_value.rb ActiveModel::Type::Helpers::TimeValue#apply_seconds_precision | casa GET supervisors 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activesupport/lib/active_support/time_with_zone.rb ActiveSupport::TimeWithZone#change | casa GET supervisors 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#calculate | casa GET supervisors 26.0 -> 28.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/builder/belongs_to.rb ActiveRecord::Associations::Builder::BelongsTo.define_validations | redprints-cfp PATCH proposal (Inertia redirect) 2.0 -> 4.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#add_constraints | casa GET supervisors 18.0 -> 20.0
+ 1   1       +2.0 |  1   1       -2.0 | activerecord/lib/active_record/sanitization.rb ActiveRecord::Sanitization::ClassMethods#disallow_raw_sql! | codetriage PATCH repo subscription (redirect) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_subquery | casa GET supervisors 6.0 -> 8.0
+ 1   1       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/session.rb ActionDispatch::Http::Session::Options#initialize | blog POST comment (redirect) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | actionpack/lib/action_dispatch/http/session.rb ActionDispatch::Http::Session#initialize | blog POST comment (redirect) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#build_association | writebook POST page (turbo_stream) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/sanitization.rb ActiveRecord::Sanitization::ClassMethods#bind_value_for_sql_literal | casa GET volunteers 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_optimizer_hints! | casa GET supervisors 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/model_schema/schema_context/mapped_table.rb ActiveRecord::ModelSchema::SchemaContext::MappedTable#_returning_columns_for_update | codetriage PATCH repo subscription (redirect) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activemodel/lib/active_model/attribute_registration.rb ActiveModel::AttributeRegistration::ClassMethods#resolve_attribute_name | codetriage PATCH repo subscription (redirect) 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activemodel/lib/active_model/attribute.rb ActiveModel::Attribute#initialize_dup | hackatime POST heartbeat 0.0 -> 2.0
+ 1   1       +2.0 |  0   0       +0.0 | activerecord/lib/active_record/associations/builder/belongs_to.rb ActiveRecord::Associations::Builder::BelongsTo.touch_record | writebook POST page (turbo_stream) 0.0 -> 2.0
+ 0   0       +0.0 |  8  40     -123.0 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_option | casa GET case contacts 925.0 -> 0.0
+ 0   0       +0.0 |  8  40      -37.2 | activesupport/lib/active_support/core_ext/string/output_safety.rb ActiveSupport::SafeBuffer#initialize | casa GET case contacts 697.0 -> 389.0
+ 0   0       +0.0 |  2   6      -43.0 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_options | casa GET casa case edit 336.0 -> 176.0
+ 0   0       +0.0 |  8  44      -29.5 | actionpack/lib/action_dispatch/journey/visitors.rb ActionDispatch::Journey::Format#evaluate | casa GET case contacts 293.0 -> 98.0
+ 0   0       +0.0 |  5  24      -20.5 | activerecord/lib/active_record/integration.rb ActiveRecord::Integration#to_param | casa GET case contacts 174.0 -> 58.0
+ 0   0       +0.0 |  2   6      -43.0 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#content_tag_string | casa GET casa case edit 284.0 -> 124.0
+ 0   0       +0.0 |  6  33      -34.1 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#file_readable? | blog GET articles 36.0 -> 0.0
+ 0   0       +0.0 |  5  27      -23.4 | actionpack/lib/action_controller/metal/url_for.rb ActionController::UrlFor#url_options | casa GET case contacts 99.0 -> 2.0
+ 0   0       +0.0 |  5  29      -21.5 | actionpack/lib/action_dispatch/http/url.rb ActionDispatch::Http::URL.add_params | casa GET case contacts 100.0 -> 4.0
+ 0   0       +0.0 |  8  44      -59.8 | actionpack/lib/action_dispatch/journey/formatter.rb ActionDispatch::Journey::Formatter#generate | casa GET case contacts 392.0 -> 6.0
+ 0   0       +0.0 |  8  44      -59.8 | actionpack/lib/action_dispatch/journey/formatter.rb ActionDispatch::Journey::Formatter#extract_parameterized_parts | casa GET case contacts 392.0 -> 6.0
+ 0   0       +0.0 |  8  41      -30.7 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper#call | casa GET case contacts 192.0 -> 0.0
+ 0   0       +0.0 |  5  29      -21.9 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet#generate | casa GET case contacts 98.0 -> 2.0
+ 0   0       +0.0 |  8  44      -29.6 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet#url_for | casa GET case contacts 196.0 -> 4.0
+ 0   0       +0.0 |  5  22      -11.6 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#initialize | casa GET case contacts 318.0 -> 251.0
+ 0   0       +0.0 |  8  43      -29.7 | activesupport/lib/active_support/core_ext/object/to_query.rb Hash#to_query | casa GET case contacts 198.0 -> 6.0
+ 0   0       +0.0 |  4  22      -18.3 | actionpack/lib/action_dispatch/journey/router/utils.rb ActionDispatch::Journey::Router::Utils::UriEncoder#escape | casa GET case contacts 78.0 -> 0.0
+ 0   0       +0.0 |  4  18      -17.1 | actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper#handle_positional_args | casa GET case contacts 78.0 -> 0.0
+ 0   0       +0.0 |  1   2      -24.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#references_eager_loaded_tables? | casa GET supervisors 122.0 -> 95.0
+ 0   0       +0.0 |  5  22      -11.9 | activerecord/lib/active_record/relation/delegation.rb ActiveRecord::Delegation::ClassMethods#create | casa GET case contacts 321.0 -> 254.0
+ 0   0       +0.0 |  8  68      -19.0 | activesupport/lib/active_support/callbacks.rb ActiveSupport::Callbacks::Filters::Before#call | casa PATCH casa case (redirect) 60.0 -> 0.0
+ 0   0       +0.0 |  6  31       -9.0 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#each_precompressed_filepath | blog GET articles 9.0 -> 0.0
+ 0   0       +0.0 |  3  13       -7.7 | actionpack/lib/action_dispatch/routing/polymorphic_routes.rb ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder#handle_model | casa GET casa cases 36.0 -> 0.0
+ 0   0       +0.0 |  3   6       -6.8 | actionpack/lib/action_dispatch/routing/polymorphic_routes.rb ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder#handle_model_call | casa GET casa cases 18.0 -> 0.0
+ 0   0       +0.0 |  3   7       -6.3 | actionpack/lib/action_dispatch/routing/polymorphic_routes.rb ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder#get_method_for_string | casa GET casa cases 18.0 -> 0.0
+ 0   0       +0.0 |  8  65       -9.5 | actionpack/lib/action_dispatch/http/request.rb ActionDispatch::Request#initialize | pingcrm GET dashboard 11.0 -> 0.0
+ 0   0       +0.0 |  8  43      -17.3 | actionview/lib/action_view/template/resolver.rb ActionView::FileSystemResolver#_find_all | casa GET case contacts 64.0 -> 0.0
+ 0   0       +0.0 |  8  41      -17.9 | actionview/lib/action_view/template/resolver.rb ActionView::FileSystemResolver#filter_and_sort_by_details | casa GET case contacts 64.0 -> 0.0
+ 0   0       +0.0 |  1   2      -16.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#runnable_loaders | casa GET volunteers 84.0 -> 68.0
+ 0   0       +0.0 |  1   1       -5.0 | actionview/lib/action_view/template_path.rb ActionView::TemplatePath.virtual | writebook POST page (turbo_stream) 27.0 -> 22.0
+ 0   0       +0.0 |  4   7       -5.6 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#per_form_csrf_token | casa GET case contacts 51.0 -> 34.0
+ 0   0       +0.0 |  2   3       -5.7 | actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#initialize | casa GET case contacts 78.0 -> 66.0
+ 0   0       +0.0 |  4  15      -15.7 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#token_tag | casa GET case contacts 85.0 -> 0.0
+ 0   0       +0.0 |  8  55      -26.5 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::AttributeSet::Builder#build_from_database | casa GET case contacts 430.0 -> 0.0
+ 0   0       +0.0 |  8  67      -43.9 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::LazyAttributeSet#initialize | casa GET case contacts 860.0 -> 0.0
+ 0   0       +0.0 |  2   6       -6.8 | activemodel/lib/active_model/type/string.rb ActiveModel::Type::String#cast_value | casa GET volunteers 78.0 -> 61.0
+ 0   0       +0.0 |  8  57      -25.9 | activerecord/lib/active_record/associations.rb ActiveRecord::Associations#init_internals | casa GET case contacts 430.0 -> 0.0
+ 0   0       +0.0 |  1   2      -24.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#owners_by_key | casa GET volunteers 92.0 -> 68.0
+ 0   0       +0.0 |  5  12      -66.5 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#preloaders_for_reflection | casa GET case contacts 615.0 -> 72.0
+ 0   0       +0.0 |  1   2      -12.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#future_classes | casa GET volunteers 72.0 -> 60.0
+ 0   0       +0.0 |  8  67      -25.5 | activerecord/lib/active_record/result.rb ActiveRecord::Result#indexed_rows | casa GET case contacts 419.0 -> 44.0
+ 0   0       +0.0 |  1   1       -3.0 | activesupport/lib/active_support/core_ext/string/filters.rb String#truncate | blog GET articles 6.0 -> 3.0
+ 0   0       +0.0 |  8  56      -14.3 | actionpack/lib/action_dispatch/http/response.rb ActionDispatch::Response#parse_content_type | codetriage GET home 23.0 -> 2.0
+ 0   0       +0.0 |  8  41       -8.4 | actionview/lib/action_view/template.rb ActionView::Template#render | casa GET case contacts 132.0 -> 56.0
+ 0   0       +0.0 |  6  34       -9.1 | actionview/lib/action_view/template.rb ActionView::Template#instrument_payload | casa GET case contacts 76.0 -> 0.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#joined_includes_values | casa GET volunteers 23.0 -> 20.0
+ 0   0       +0.0 |  1   1       -5.0 | activesupport/lib/active_support/key_generator.rb ActiveSupport::CachingKeyGenerator#generate_key | blog PATCH article.json 5.0 -> 0.0
+ 0   0       +0.0 |  1   1       -5.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#new_cipher | blog PATCH article.json 5.0 -> 0.0
+ 0   0       +0.0 |  8  63       -6.0 | actionpack/lib/abstract_controller/logger.rb:(top) | codetriage GET repo 26.0 -> 0.0
+ 0   0       +0.0 |  8  58       -8.5 | actionpack/lib/action_controller/metal/request_forgery_protection.rb:(top) | casa GET case contacts 73.0 -> 17.0
+ 0   0       +0.0 |  8  36       -3.1 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#masked_authenticity_token | casa GET case contacts 18.0 -> 0.0
+ 0   0       +0.0 |  2   8       -2.0 | actionview/lib/action_view/helpers/asset_tag_helper.rb ActionView::Helpers::AssetTagHelper#stylesheet_link_tag | blog GET articles 16.0 -> 14.0
+ 0   0       +0.0 |  8  46      -20.2 | actionview/lib/action_view/lookup_context.rb ActionView::LookupContext::ViewPaths#normalize_name | casa GET case contacts 190.0 -> 0.0
+ 0   0       +0.0 |  2   3       -5.7 | actionview/lib/action_view/renderer/abstract_renderer.rb ActionView::AbstractRenderer#build_rendered_template | casa GET case contacts 75.0 -> 63.0
+ 0   0       +0.0 |  2   3      -10.3 | activemodel/lib/active_model/attribute.rb ActiveModel::Attribute.with_cast_value | casa GET supervisors 46.0 -> 29.0
+ 0   0       +0.0 |  1   2       -6.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#runnable_loaders | casa GET volunteers 28.0 -> 22.0
+ 0   0       +0.0 |  1   2      -34.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#load_records | casa GET volunteers 111.0 -> 77.0
+ 0   0       +0.0 |  1   2      -10.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderRecords#already_loaded_records | casa GET volunteers 32.0 -> 22.0
+ 0   0       +0.0 |  1   2      -10.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#loaders | casa GET volunteers 50.0 -> 40.0
+ 0   0       +0.0 |  1   2      -25.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#build_children | casa GET volunteers 128.0 -> 103.0
+ 0   0       +0.0 |  1   2       -8.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#immediate_future_classes | casa GET volunteers 54.0 -> 46.0
+ 0   0       +0.0 |  8  65       -4.0 | activesupport/lib/active_support/inflector/methods.rb ActiveSupport::Inflector#underscore | casa GET dashboard 11.0 -> 6.0
+ 0   0       +0.0 |  8  65      -24.1 | activesupport/lib/active_support/inflector/methods.rb ActiveSupport::Inflector#camelize | hackatime GET statusbar today 104.0 -> 0.0
+ 0   0       +0.0 |  3  23       -2.0 | actionpack/lib/action_controller/metal/allow_browser.rb ActionController::AllowBrowser::BrowserBlocker#normalized_browser_name | blog GET articles 3.0 -> 1.0
+ 0   0       +0.0 |  6  31       -3.0 | actionpack/lib/action_dispatch/middleware/static.rb ActionDispatch::FileHandler#try_files | blog GET articles 3.0 -> 0.0
+ 0   0       +0.0 |  3  14      -28.9 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#prefix_tag_option | casa GET case contacts 167.0 -> 0.0
+ 0   0       +0.0 |  3  11       -3.3 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#method_missing | writebook POST page (turbo_stream) 8.0 -> 2.0
+ 0   0       +0.0 |  4   8       -5.2 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#button_to | blog GET articles 9.0 -> 0.0
+ 0   0       +0.0 |  4  10       -3.6 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#method_tag | casa GET casa case edit 8.0 -> 0.0
+ 0   0       +0.0 |  4  24      -12.4 | actionview/lib/action_view/lookup_context.rb ActionView::LookupContext::ViewPaths#detail_args_for | casa GET case contacts 133.0 -> 70.0
+ 0   0       +0.0 |  3   5      -13.0 | actionview/lib/action_view/renderer/collection_renderer.rb ActionView::CollectionRenderer#collection_with_template | casa GET case contacts 44.0 -> 0.0
+ 0   0       +0.0 |  7  35      -26.5 | activemodel/lib/active_model/attribute.rb ActiveModel::Attribute.from_database | casa GET case contacts 362.0 -> 20.0
+ 0   0       +0.0 |  1   2      -20.0 | activerecord/lib/active_record/associations.rb ActiveRecord::Associations#association | casa GET supervisors 64.0 -> 39.0
+ 0   0       +0.0 |  7  30      -44.3 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#foreign_key_for? | casa GET case contacts 643.0 -> 0.0
+ 0   0       +0.0 |  1   1      -20.0 | activerecord/lib/active_record/associations/collection_association.rb ActiveRecord::Associations::CollectionAssociation#reset | casa GET supervisors 56.0 -> 36.0
+ 0   0       +0.0 |  8  54       -6.3 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#to_sql_and_binds | casa GET casa case edit 191.0 -> 139.0
+ 0   0       +0.0 |  2   3      -11.3 | activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb ActiveRecord::ConnectionAdapters::QueryCache#cache_sql | casa GET supervisors 75.0 -> 49.0
+ 0   0       +0.0 |  8  24       -4.1 | activerecord/lib/active_record/connection_adapters/abstract/quoting.rb ActiveRecord::ConnectionAdapters::Quoting#type_casted_binds | casa GET supervisors 35.0 -> 23.0
+ 0   0       +0.0 |  8  61      -10.0 | activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter#log | casa GET casa case edit 62.0 -> 0.0
+ 0   0       +0.0 |  2   5      -20.6 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#instantiate_instance_of | casa GET case contacts 430.0 -> 376.0
+ 0   0       +0.0 |  8  44      -11.4 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#extensions | casa GET case contacts 108.0 -> 0.0
+ 0   0       +0.0 |  8  56      -16.5 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#values | casa GET casa case edit 114.0 -> 1.0
+ 0   0       +0.0 |  6  38       -6.6 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#preload_associations | casa GET casa case edit 49.0 -> 4.0
+ 0   0       +0.0 |  5  16       -5.2 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#construct_relation_for_exists | casa GET supervisors 32.0 -> 6.0
+ 0   0       +0.0 |  2   3       -4.3 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_arel | casa GET supervisors 41.0 -> 33.0
+ 0   0       +0.0 |  1   2       -8.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result#initialize_copy | casa GET supervisors 38.0 -> 25.0
+ 0   0       +0.0 |  8  51      -17.6 | activerecord/lib/arel.rb Arel.sql | casa GET casa case edit 248.0 -> 58.0
+ 0   0       +0.0 |  1   2       -5.5 | activerecord/lib/arel/collectors/bind.rb Arel::Collectors::Bind#initialize | casa GET supervisors 32.0 -> 24.0
+ 0   0       +0.0 |  1   2       -5.5 | activerecord/lib/arel/collectors/composite.rb Arel::Collectors::Composite#value | casa GET supervisors 32.0 -> 24.0
+ 0   0       +0.0 |  2   3       -4.3 | activerecord/lib/arel/collectors/plain_string.rb Arel::Collectors::PlainString#initialize | casa GET supervisors 32.0 -> 24.0
+ 0   0       +0.0 |  1   2       -5.5 | activerecord/lib/arel/nodes/join_source.rb Arel::Nodes::JoinSource#initialize | casa GET supervisors 44.0 -> 36.0
+ 0   0       +0.0 |  2   3      -24.0 | activerecord/lib/arel/nodes/select_core.rb Arel::Nodes::SelectCore#initialize | casa GET supervisors 264.0 -> 216.0
+ 0   0       +0.0 |  2   3      -12.0 | activerecord/lib/arel/nodes/select_statement.rb Arel::Nodes::SelectStatement#initialize | casa GET supervisors 132.0 -> 108.0
+ 0   0       +0.0 |  1   2       -5.5 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#initialize | casa GET supervisors 44.0 -> 36.0
+ 0   0       +0.0 |  7  41      -11.5 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#project | casa GET casa case edit 98.0 -> 0.0
+ 0   0       +0.0 |  4  15       -4.1 | activesupport/lib/active_support/broadcast_logger.rb ActiveSupport::BroadcastLogger#method_missing | hackatime GET dashboard 10.0 -> 2.0
+ 0   0       +0.0 |  7  34       -8.4 | activesupport/lib/active_support/core_ext/enumerable.rb Enumerable#compact_blank | casa GET casa case edit 104.0 -> 57.0
+ 0   0       +0.0 |  1   1       -5.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#extract_part | blog PATCH article.json 5.0 -> 0.0
+ 0   0       +0.0 |  2   5       -2.8 | activesupport/lib/active_support/messages/rotator.rb ActiveSupport::Messages::Rotator#initialize | blog PATCH article.json 6.0 -> 0.0
+ 0   0       +0.0 |  6  23       -3.8 | actionpack/lib/action_dispatch/journey/gtg/transition_table.rb ActionDispatch::Journey::GTG::TransitionTable#move | hackatime PATCH display name (Inertia redirect) 16.0 -> 0.0
+ 0   0       +0.0 |  7  45       -2.0 | actionpack/lib/action_dispatch/middleware/remote_ip.rb ActionDispatch::RemoteIp::GetIp#calculate_ip | blog GET articles 4.0 -> 2.0
+ 0   0       +0.0 |  7  34      -20.9 | actionview/lib/action_view/helpers/asset_url_helper.rb ActionView::Helpers::AssetUrlHelper#asset_path | writebook GET book 124.0 -> 44.0
+ 0   0       +0.0 |  7  33      -10.8 | actionview/lib/action_view/helpers/asset_url_helper.rb ActionView::Helpers::AssetUrlHelper#compute_asset_host | writebook GET book 40.0 -> 0.0
+ 0   0       +0.0 |  7  30      -13.7 | actionview/lib/action_view/helpers/tag_helper.rb:(top) | casa GET casa case edit 175.0 -> 0.0
+ 0   0       +0.0 |  8  46       -2.0 | actionview/lib/action_view/layouts.rb ActionView::Layouts#_include_layout? | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -8.0 | actionview/lib/action_view/renderer/collection_renderer.rb ActionView::CollectionRenderer::SameCollectionIterator#each_with_info | casa GET case contacts 24.0 -> 16.0
+ 0   0       +0.0 |  6  30       -2.0 | actionview/lib/action_view/renderer/template_renderer.rb ActionView::TemplateRenderer#resolve_layout | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  8  46       -2.0 | actionview/lib/action_view/rendering.rb ActionView::Rendering#_process_render_template_options | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  7  33       -2.1 | actionview/lib/action_view/structured_event_subscriber.rb ActionView::StructuredEventSubscriber::Start#start | redprints-cfp GET home 3.0 -> 0.0
+ 0   0       +0.0 |  1   2      -10.0 | activerecord/lib/active_record/associations/preloader.rb ActiveRecord::Associations::Preloader#initialize | casa GET volunteers 46.0 -> 36.0
+ 0   0       +0.0 |  1   2       -4.0 | activerecord/lib/active_record/associations/preloader.rb ActiveRecord::Associations::Preloader#call | casa GET volunteers 20.0 -> 16.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/associations/preloader.rb ActiveRecord::Associations::Preloader#loaders | casa GET volunteers 23.0 -> 18.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#initialize | casa GET volunteers 24.0 -> 19.0
+ 0   0       +0.0 |  1   2       -4.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#future_classes | casa GET volunteers 20.0 -> 16.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#loader_query | casa GET volunteers 16.0 -> 11.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderQuery#records_for | casa GET volunteers 16.0 -> 11.0
+ 0   0       +0.0 |  1   2      -11.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderQuery#load_records_for_keys | casa GET volunteers 40.0 -> 29.0
+ 0   0       +0.0 |  1   2      -10.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderRecords#initialize | casa GET volunteers 32.0 -> 22.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderRecords#populate_keys_to_load_and_already_loaded_records | casa GET volunteers 16.0 -> 11.0
+ 0   0       +0.0 |  1   2      -14.0 | activerecord/lib/active_record/associations/preloader/batch.rb ActiveRecord::Associations::Preloader::Batch#group_and_load_similar | casa GET volunteers 66.0 -> 52.0
+ 0   0       +0.0 |  1   2       -6.0 | activerecord/lib/active_record/associations/preloader/batch.rb ActiveRecord::Associations::Preloader::Batch#initialize | casa GET volunteers 30.0 -> 24.0
+ 0   0       +0.0 |  1   2      -10.0 | activerecord/lib/active_record/associations/preloader/branch.rb ActiveRecord::Associations::Preloader::Branch#grouped_records | casa GET volunteers 50.0 -> 40.0
+ 0   0       +0.0 |  8  66       -9.9 | activerecord/lib/active_record/querying.rb ActiveRecord::Querying#_load_from_sql | casa GET casa case edit 141.0 -> 59.0
+ 0   0       +0.0 |  7  40       -7.2 | activerecord/lib/active_record/querying.rb ActiveRecord::Querying#_query_by_sql | casa GET casa case edit 120.0 -> 73.0
+ 0   0       +0.0 |  1   2       -7.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#join_scopes | casa GET volunteers 36.0 -> 29.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#values_for_queries | casa GET volunteers 15.0 -> 12.0
+ 0   0       +0.0 |  8  62      -26.7 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder.references | casa GET casa case edit 267.0 -> 69.0
+ 0   0       +0.0 |  5  19       -9.5 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#expand_from_hash | casa GET supervisors 160.0 -> 120.0
+ 0   0       +0.0 |  7  40       -8.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_select | casa GET casa case edit 99.0 -> 8.0
+ 0   0       +0.0 |  2  13       -3.5 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#preprocess_order_args | casa GET supervisors 20.0 -> 8.0
+ 0   0       +0.0 |  8  54       -6.5 | activerecord/lib/active_record/result.rb ActiveRecord::Result#column_types | casa GET casa case edit 47.0 -> 0.0
+ 0   0       +0.0 |  8  57       -6.9 | activerecord/lib/active_record/result.rb ActiveRecord::Result#column_indexes | casa GET casa case edit 47.0 -> 0.0
+ 0   0       +0.0 |  8  52      -13.5 | activerecord/lib/arel.rb Arel.star | casa GET casa case edit 184.0 -> 0.0
+ 0   0       +0.0 |  6  47       -4.6 | activesupport/lib/active_support/broadcast_logger.rb ActiveSupport::BroadcastLogger#dispatch | codetriage GET home 12.0 -> 0.0
+ 0   0       +0.0 |  6  14       -7.4 | activesupport/lib/active_support/core_ext/array/wrap.rb Array.wrap | hackatime POST heartbeat 27.0 -> 3.0
+ 0   0       +0.0 |  8  62       -5.9 | activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#initialize | casa GET volunteers 25.0 -> 0.0
+ 0   0       +0.0 |  4   4       -3.8 | activesupport/lib/active_support/inflector/methods.rb ActiveSupport::Inflector#apply_inflections | casa GET supervisors 9.0 -> 3.0
+ 0   0       +0.0 |  1   1       -5.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#initialize | blog PATCH article.json 5.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor.key_len | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -4.0 | activesupport/lib/active_support/messages/rotator.rb ActiveSupport::Messages::Rotator#build_rotation | blog PATCH article.json 4.0 -> 0.0
+ 0   0       +0.0 |  8  62       -2.6 | activesupport/lib/active_support/messages/serializer_with_fallback.rb ActiveSupport::Messages::SerializerWithFallback.[] | react-starter-kit GET home 4.0 -> 0.0
+ 0   0       +0.0 |  5   6       -2.2 | activesupport/lib/active_support/ordered_options.rb ActiveSupport::InheritableOptions#inheritable_copy | writebook GET leaf.md 3.0 -> 0.0
+ 0   0       +0.0 |  8  65       -4.9 | activesupport/lib/active_support/parameter_filter.rb ActiveSupport::ParameterFilter#compile_filters! | hackatime GET dashboard 10.0 -> 3.0
+ 0   0       +0.0 |  2   5       -4.2 | actionpack/lib/abstract_controller/caching.rb:(top) | codetriage GET repo 8.0 -> 0.0
+ 0   0       +0.0 |  8  30       -2.3 | actionpack/lib/action_dispatch/http/mime_type.rb Mime::Type.lookup_by_extension | casa GET casa case 4.0 -> 0.0
+ 0   0       +0.0 |  8  65       -3.0 | actionpack/lib/action_dispatch/http/query_parser.rb ActionDispatch::QueryParser.each_pair | blog GET articles 3.0 -> 0.0
+ 0   0       +0.0 |  8  32      -18.8 | actionpack/lib/action_dispatch/http/url.rb ActionDispatch::Http::URL#host | writebook GET book 75.0 -> 0.0
+ 0   0       +0.0 |  6  23       -2.6 | actionpack/lib/action_dispatch/journey/gtg/simulator.rb ActionDispatch::Journey::GTG::Simulator#memos | hackatime PATCH display name (Inertia redirect) 5.0 -> 0.0
+ 0   0       +0.0 |  8  28       -3.0 | actionpack/lib/action_dispatch/journey/path/pattern.rb ActionDispatch::Journey::Path::Pattern#match | blog GET articles 3.0 -> 0.0
+ 0   0       +0.0 |  1   1       -4.0 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::CookieJar#initialize | blog PATCH article.json 4.0 -> 0.0
+ 0   0       +0.0 |  8  61       -8.3 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::EncryptedKeyRotatingCookieJar#initialize | codetriage GET home 11.0 -> 0.0
+ 0   0       +0.0 |  1   1       -3.0 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::EncryptedKeyRotatingCookieJar#parse | blog PATCH article.json 3.0 -> 0.0
+ 0   0       +0.0 |  2  10       -2.8 | actionpack/lib/action_dispatch/middleware/flash.rb ActionDispatch::Flash::FlashHash#[] | codetriage GET home 4.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | actionpack/lib/action_dispatch/middleware/session/cookie_store.rb ActionDispatch::Session::CookieStore#load_session | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  5  36      -18.2 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session#[] | casa GET case contacts 72.0 -> 0.0
+ 0   0       +0.0 |  3   4       -2.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session#[]= | redprints-cfp GET home 2.0 -> 0.0
+ 0   0       +0.0 |  8  65       -2.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session.create | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session::Options#initialize | blog POST comment (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session#initialize | blog POST comment (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  4  12       -2.7 | actionview/lib/action_view/path_set.rb ActionView::PathSet#find_all | writebook PATCH page (turbo_stream) 4.0 -> 0.0
+ 0   0       +0.0 |  2   4       -5.5 | actionview/lib/action_view/renderer/abstract_renderer.rb ActionView::AbstractRenderer::RenderedCollection#body | casa GET case contacts 16.0 -> 0.0
+ 0   0       +0.0 |  1   4       -2.0 | actionview/lib/action_view/renderer/abstract_renderer.rb ActionView::AbstractRenderer#prepend_formats | redprints-cfp GET home 4.0 -> 2.0
+ 0   0       +0.0 |  1   1       -8.0 | actionview/lib/action_view/renderer/abstract_renderer.rb ActionView::AbstractRenderer#build_rendered_collection | casa GET case contacts 8.0 -> 0.0
+ 0   0       +0.0 |  3  12      -17.6 | actionview/lib/action_view/renderer/partial_renderer.rb ActionView::PartialRenderer#find_template | casa GET case contacts 62.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association::LoaderRecords#records | casa GET volunteers 4.0 -> 2.0
+ 0   0       +0.0 |  8  68       -2.0 | activerecord/lib/active_record/asynchronous_queries_tracker.rb ActiveRecord::AsynchronousQueriesTracker::Session#initialize | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  8  68       -2.0 | activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb ActiveRecord::ConnectionAdapters::ConnectionHandler#each_connection_pool | blog GET articles 2.0 -> 0.0
+ 0   0       +0.0 |  2   4       -2.8 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#select_rows | casa GET supervisors 9.0 -> 4.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/active_record/relation/delegation.rb:(top) | casa GET volunteers 12.0 -> 9.0
+ 0   0       +0.0 |  2   4       -2.8 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#exists? | casa GET supervisors 8.0 -> 3.0
+ 0   0       +0.0 |  8  62      -25.3 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#convert_dot_notation_to_hash | casa GET case contacts 198.0 -> 10.0
+ 0   0       +0.0 |  6  38      -15.3 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#where | casa GET casa case edit 80.0 -> 1.0
+ 0   0       +0.0 |  5  33      -14.1 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_where_clause | casa GET casa case edit 426.0 -> 363.0
+ 0   0       +0.0 |  7  44      -14.3 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#column_references | casa GET casa case edit 147.0 -> 0.0
+ 0   0       +0.0 |  1   6       -5.8 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#includes | casa GET volunteers 13.0 -> 0.0
+ 0   0       +0.0 |  1   6       -6.2 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#includes! | casa GET volunteers 14.0 -> 0.0
+ 0   0       +0.0 |  2   4       -2.8 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#_select! | casa GET supervisors 8.0 -> 3.0
+ 0   0       +0.0 |  5  31       -5.4 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#order | casa GET casa case edit 45.0 -> 0.0
+ 0   0       +0.0 |  5  31       -6.1 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#order! | casa GET casa case edit 46.0 -> 0.0
+ 0   0       +0.0 |  8  62      -20.8 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#+ | casa GET casa case edit 346.0 -> 118.0
+ 0   0       +0.0 |  6  32       -6.9 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#predicates_with_wrapped_sql_literals | casa GET casa case edit 99.0 -> 46.0
+ 0   0       +0.0 |  7  39      -11.8 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#non_empty_predicates | casa GET casa case edit 97.0 -> 0.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/arel/collectors/bind.rb Arel::Collectors::Bind#add_binds | casa GET volunteers 12.0 -> 9.0
+ 0   0       +0.0 |  1   2       -9.0 | activerecord/lib/arel/collectors/sql_string.rb Arel::Collectors::SQLString#add_binds | casa GET volunteers 42.0 -> 33.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/arel/nodes/homogeneous_in.rb Arel::Nodes::HomogeneousIn#casted_values | casa GET volunteers 12.0 -> 9.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/arel/nodes/homogeneous_in.rb Arel::Nodes::HomogeneousIn#proc_for_binds | casa GET volunteers 12.0 -> 9.0
+ 0   0       +0.0 |  4  27       -5.2 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#order | casa GET casa case edit 45.0 -> 2.0
+ 0   0       +0.0 |  2   2       -3.5 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#take | casa GET supervisors 10.0 -> 5.0
+ 0   0       +0.0 |  8  67       -3.7 | activesupport/lib/active_support/broadcast_logger.rb:(top) | hackatime GET dashboard 12.0 -> 0.0
+ 0   0       +0.0 |  8  56      -17.2 | activesupport/lib/active_support/core_ext/array/extract.rb Array#extract! | casa GET casa case edit 132.0 -> 2.0
+ 0   0       +0.0 |  5  15       -7.1 | activesupport/lib/active_support/core_ext/erb/util.rb ActiveSupport::CoreExt::ERBUtil#html_escape | casa GET case contacts 84.0 -> 40.0
+ 0   0       +0.0 |  3   7       -2.0 | activesupport/lib/active_support/core_ext/hash/indifferent_access.rb Hash#with_indifferent_access | blog POST article invalid (422) 4.0 -> 2.0
+ 0   0       +0.0 |  5  10       -2.3 | activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#dup | casa PATCH casa case (redirect) 7.0 -> 4.0
+ 0   0       +0.0 |  1   1       -4.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#encrypt | blog PATCH article.json 4.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#decrypt | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activesupport/lib/active_support/message_encryptor.rb ActiveSupport::MessageEncryptor#extract_parts | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activesupport/lib/active_support/messages/rotator.rb ActiveSupport::Messages::Rotator#rotate | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  4   8      -45.9 | actionview/lib/action_view/helpers/tags/base.rb ActionView::Helpers::Tags::Base#initialize | casa GET casa case edit 213.0 -> 0.0
+ 0   0       +0.0 |  1   1      -12.0 | actionview/lib/action_view/helpers/form_tag_helper.rb ActionView::Helpers::FormTagHelper#field_id | casa GET casa case edit 568.0 -> 556.0
+ 0   0       +0.0 |  8  56      -27.1 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#extract_attributes | casa GET casa case edit 212.0 -> 5.0
+ 0   0       +0.0 |  1   2      -72.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#merge | casa GET supervisors 296.0 -> 184.0
+ 0   0       +0.0 |  1   1       -9.0 | actionpack/lib/action_dispatch/routing/polymorphic_routes.rb ActionDispatch::Routing::PolymorphicRoutes::HelperMethodBuilder#handle_list | blog GET article 18.0 -> 9.0
+ 0   0       +0.0 |  6  12      -10.6 | activemodel/lib/active_model/attribute.rb ActiveModel::Attribute#dup_or_share | hackatime POST heartbeat 40.0 -> 0.0
+ 0   0       +0.0 |  8  35       -9.3 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#target_scope | casa GET casa case edit 100.0 -> 50.0
+ 0   0       +0.0 |  1   2      -18.0 | activerecord/lib/active_record/relation/spawn_methods.rb ActiveRecord::SpawnMethods#merge! | casa GET supervisors 74.0 -> 46.0
+ 0   0       +0.0 |  8  56      -20.3 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#last_chain_scope | casa GET casa case edit 184.0 -> 35.0
+ 0   0       +0.0 |  8  50       -7.6 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#collect_join_chain | casa GET casa case edit 97.0 -> 34.0
+ 0   0       +0.0 |  4   4       -5.0 | activemodel/lib/active_model/translation.rb ActiveModel::Translation#human_attribute_name | blog POST article invalid (422) 68.0 -> 58.0
+ 0   0       +0.0 |  8  35       -9.0 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#scope | casa GET casa case edit 50.0 -> 0.0
+ 0   0       +0.0 |  6  28       -7.0 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#apply_scope | casa GET casa case edit 114.0 -> 83.0
+ 0   0       +0.0 |  8  41       -5.1 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#join_id_for | casa GET casa case edit 52.0 -> 0.0
+ 0   0       +0.0 |  1   1       -5.0 | activerecord/lib/active_record/relation/query_attribute.rb ActiveRecord::Relation::QueryAttribute#with_cast_value | casa GET supervisors 6.0 -> 1.0
+ 0   0       +0.0 |  8  35      -10.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#except_predicates | casa GET casa case edit 51.0 -> 1.0
+ 0   0       +0.0 |  1   1       -5.0 | activerecord/lib/active_record/statement_cache.rb ActiveRecord::StatementCache::BindMap#bind | casa GET supervisors 6.0 -> 1.0
+ 0   0       +0.0 |  7  16      -11.2 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#permitted_scalar_filter | hackatime POST heartbeat 56.0 -> 0.0
+ 0   0       +0.0 |  6  14       -5.9 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#each_pair | hackatime POST heartbeat 24.0 -> 0.0
+ 0   0       +0.0 |  6  14       -5.5 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#permit! | hackatime POST heartbeat 24.0 -> 0.0
+ 0   0       +0.0 |  6  12       -2.8 | activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#deep_dup | writebook POST page (turbo_stream) 6.0 -> 0.0
+ 0   0       +0.0 |  1   1       -5.0 | activemodel/lib/active_model/validations.rb ActiveModel::Validations#context_for_validation | casa GET supervisors 6.0 -> 1.0
+ 0   0       +0.0 |  1   1      -15.0 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#get_chain | casa GET supervisors 53.0 -> 38.0
+ 0   0       +0.0 |  7  33       -7.0 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#scope | casa GET casa case edit 35.0 -> 0.0
+ 0   0       +0.0 |  8  41       -7.8 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope.get_bind_values | casa GET casa case edit 79.0 -> 0.0
+ 0   0       +0.0 |  3   3       -2.3 | activerecord/lib/active_record/inheritance.rb ActiveRecord::Inheritance::ClassMethods#new | writebook POST page (turbo_stream) 3.0 -> 0.0
+ 0   0       +0.0 |  1   1       -5.0 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#scopes | casa GET supervisors 19.0 -> 14.0
+ 0   0       +0.0 |  7  36       -7.4 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#constraints | casa GET casa case edit 38.0 -> 0.0
+ 0   0       +0.0 |  7  33       -7.0 | activerecord/lib/active_record/relation.rb ActiveRecord::Relation#alias_tracker | casa GET casa case edit 35.0 -> 0.0
+ 0   0       +0.0 |  1   3       -8.3 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#build_bind_attribute | casa GET supervisors 70.0 -> 57.0
+ 0   0       +0.0 |  8  57       -9.2 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#extending! | casa GET casa case edit 72.0 -> 0.0
+ 0   0       +0.0 |  1   3       -8.3 | activerecord/lib/arel/predications.rb Arel::Predications#eq | casa GET supervisors 79.0 -> 66.0
+ 0   0       +0.0 |  5  18       -7.6 | actionpack/lib/action_dispatch/http/url.rb ActionDispatch::Http::URL.normalize_protocol | writebook GET leaf 48.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activemodel/lib/active_model/type/helpers/time_value.rb ActiveModel::Type::Helpers::TimeValue#fast_string_to_time | writebook PATCH page (turbo_stream) 8.0 -> 6.0
+ 0   0       +0.0 |  2   2       -2.0 | activesupport/lib/active_support/core_ext/date_and_time/zones.rb DateAndTime::Zones#time_with_zone | writebook PATCH page (turbo_stream) 22.0 -> 20.0
+ 0   0       +0.0 |  8  26       -4.0 | actionpack/lib/action_dispatch/http/mime_negotiation.rb ActionDispatch::Http::MimeNegotiation#content_mime_type | blog POST article invalid (422) 4.0 -> 0.0
+ 0   0       +0.0 |  5  18       -5.0 | actionpack/lib/action_dispatch/http/url.rb ActionDispatch::Http::URL.build_host_url | writebook GET leaf 64.0 -> 32.0
+ 0   0       +0.0 |  2   6       -5.5 | actionpack/lib/action_dispatch/http/url.rb ActionDispatch::Http::URL.normalize_host | writebook GET leaf 16.0 -> 0.0
+ 0   0       +0.0 |  4  11       -6.2 | activesupport/lib/active_support/core_ext/object/to_query.rb Object#to_param | casa GET volunteers 21.0 -> 5.0
+ 0   0       +0.0 |  3   7       -2.9 | activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#slice | casa PATCH casa case (redirect) 4.0 -> 0.0
+ 0   0       +0.0 |  8  23      -30.0 | activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::LazyAttributeSet#keys | casa PATCH casa case (redirect) 200.0 -> 0.0
+ 0   0       +0.0 |  3   5       -6.0 | activejob/lib/active_job/arguments.rb ActiveJob::Arguments#serialize_hash | blog POST comment (redirect) 10.0 -> 3.0
+ 0   0       +0.0 |  2   3      -18.7 | activerecord/lib/active_record/result.rb ActiveRecord::Result#hash_rows | casa GET case contacts 44.0 -> 0.0
+ 0   0       +0.0 |  8  21       -8.0 | activerecord/lib/active_record/result.rb ActiveRecord::Result::IndexedRow#keys | casa PATCH casa case (redirect) 50.0 -> 0.0
+ 0   0       +0.0 |  8  18       -5.0 | actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#unmask_token | blog POST article invalid (422) 5.0 -> 0.0
+ 0   0       +0.0 |  3   7       -2.9 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#hash_filter | casa PATCH casa case (redirect) 4.0 -> 0.0
+ 0   0       +0.0 |  4  12       -2.5 | actionpack/lib/action_dispatch/http/mime_type.rb Mime::Type#== | blog PATCH article.json 4.8 -> 0.8
+ 0   0       +0.0 |  8  22       -3.2 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#internal_execute | hackatime GET dashboard 6.0 -> 0.0
+ 0   0       +0.0 |  4  10       -2.6 | activesupport/lib/active_support/parameter_filter.rb ActiveSupport::ParameterFilter#value_for_key | hackatime PATCH display name (Inertia redirect) 4.0 -> 0.0
+ 0   0       +0.0 |  2   3       -2.0 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#new_instance_with_inherited_permitted_status | casa PATCH casa case (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.0 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#convert_value_to_parameters | casa PATCH casa case (redirect) 5.0 -> 3.0
+ 0   0       +0.0 |  2   3       -2.0 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#slice | casa PATCH casa case (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  3  14       -6.9 | activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods#respond_to? | casa GET case contacts 40.0 -> 0.0
+ 0   0       +0.0 |  5   7       -7.1 | activemodel/lib/active_model/attribute_mutation_tracker.rb ActiveModel::AttributeMutationTracker#forced_changes | casa PATCH casa case (redirect) 14.0 -> 0.0
+ 0   0       +0.0 |  8  17       -3.4 | activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#map | writebook PATCH page (turbo_stream) 12.0 -> 0.0
+ 0   0       +0.0 |  5   8       -5.0 | activerecord/lib/active_record/attribute_methods/time_zone_conversion.rb ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter#cast | writebook POST page (turbo_stream) 10.0 -> 0.0
+ 0   0       +0.0 |  4   4      -11.2 | activerecord/lib/active_record/connection_adapters/abstract/transaction.rb ActiveRecord::ConnectionAdapters::TransactionManager#within_new_transaction | hackatime PATCH username invalid (Inertia 422) 264.0 -> 248.0
+ 0   0       +0.0 |  8  12       -5.2 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#_update_record | writebook PATCH page (turbo_stream) 24.0 -> 6.0
+ 0   0       +0.0 |  3   4       -3.2 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence#_query_constraints_hash | writebook PATCH page (turbo_stream) 6.0 -> 0.0
+ 0   0       +0.0 |  6  25       -5.1 | activesupport/lib/active_support/core_ext/enumerable.rb Enumerable#index_with | casa PATCH casa case.json 27.0 -> 0.0
+ 0   0       +0.0 |  2   3       -2.7 | activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#convert_value | casa PATCH casa case (redirect) 3.0 -> 0.0
+ 0   0       +0.0 |  5   5      -10.0 | activesupport/lib/active_support/core_ext/string/filters.rb String#remove | blog POST article invalid (422) 24.0 -> 0.0
+ 0   0       +0.0 |  5   5      -17.8 | activemodel/lib/active_model/error.rb ActiveModel::Error.generate_message | blog POST article invalid (422) 150.0 -> 110.0
+ 0   0       +0.0 |  2   2       -6.0 | activemodel/lib/active_model/error.rb ActiveModel::Error.full_message | blog POST article invalid (422) 12.0 -> 6.0
+ 0   0       +0.0 |  2   2      -10.0 | activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter::Version#<=> | writebook POST page (turbo_stream) 15.0 -> 0.0
+ 0   0       +0.0 |  6   9       -9.1 | activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#keys | writebook POST page (turbo_stream) 20.0 -> 0.0
+ 0   0       +0.0 |  3   5       -6.2 | activesupport/lib/active_support/json/encoding.rb ActiveSupport::JSON::Encoding::JSONGemCoderEncoder#encode | casa PATCH casa case (redirect) 11.0 -> 0.0
+ 0   0       +0.0 |  1   2       -3.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session.disabled | blog POST comment (redirect) 3.0 -> 0.0
+ 0   0       +0.0 |  4   5       -5.6 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#sql_for_insert | writebook POST page (turbo_stream) 12.0 -> 0.0
+ 0   0       +0.0 |  2   4       -4.5 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#unscope | casa GET supervisors 7.0 -> 0.0
+ 0   0       +0.0 |  3   7       -6.1 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#unscope! | casa GET supervisors 13.0 -> 0.0
+ 0   0       +0.0 |  5   8       -2.0 | actionpack/lib/action_dispatch/request/utils.rb ActionDispatch::Request::Utils::ParamEncoder.normalize_encode_params | blog PATCH article.json 2.0 -> 0.0
+ 0   0       +0.0 |  2  18      -39.4 | activesupport/lib/active_support/core_ext/object/deep_dup.rb Object#deep_dup | hackatime GET dashboard 560.0 -> 460.0
+ 0   0       +0.0 |  2   2       -3.0 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#find_with_ids | writebook perform Turbo::Streams::BroadcastJob 4.0 -> 0.0
+ 0   0       +0.0 |  3  10       -3.1 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#find_one | writebook perform Turbo::Streams::BroadcastJob 6.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#find | writebook perform Turbo::Streams::BroadcastJob 2.0 -> 0.0
+ 0   0       +0.0 |  4  33      -18.7 | activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result | casa GET supervisors 976.0 -> 735.0
+ 0   0       +0.0 |  4  36     -115.7 | activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#get_oid_type | casa GET casa case edit 793.0 -> 0.0
+ 0   0       +0.0 |  4  36      -31.9 | activerecord/lib/arel/visitors/postgresql.rb:(top) | casa GET case contacts 224.0 -> 0.0
+ 0   0       +0.0 |  3  16      -23.1 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#link_to | casa GET case contacts 72.0 -> 0.0
+ 0   0       +0.0 |  6  23      -26.1 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#foreign_key_values | casa GET case contacts 302.0 -> 0.0
+ 0   0       +0.0 |  6  23      -26.1 | activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#association_primary_key_values | casa GET case contacts 302.0 -> 0.0
+ 0   0       +0.0 |  4  33      -14.2 | activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#handle_warnings | casa GET casa case edit 62.0 -> 0.0
+ 0   0       +0.0 |  5  30       -7.7 | activerecord/lib/active_record/relation/finder_methods.rb ActiveRecord::FinderMethods#_order_columns | writebook PATCH page (turbo_stream) 40.0 -> 20.0
+ 0   0       +0.0 |  1   1       -6.0 | activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#ast | casa GET supervisors 27.0 -> 21.0
+ 0   0       +0.0 |  1   1       -8.0 | activerecord/lib/active_record/connection_adapters/abstract/schema_statements.rb ActiveRecord::ConnectionAdapters::SchemaStatements#table_alias_for | hackatime GET projects 16.0 -> 8.0
+ 0   0       +0.0 |  4  33      -14.6 | activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#perform_query | casa GET casa case edit 92.0 -> 29.0
+ 0   0       +0.0 |  1   1      -14.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations::ColumnAliasTracker#column_alias_for | hackatime GET projects 28.0 -> 14.0
+ 0   0       +0.0 |  2   6      -22.3 | activesupport/lib/active_support/time_with_zone.rb:(top) | casa GET casa cases 82.0 -> 0.0
+ 0   0       +0.0 |  4  22       -4.5 | activerecord/lib/active_record/relation/delegation.rb ActiveRecord::Delegation::GeneratedRelationMethods#generate_method | casa GET casa cases 16.0 -> 2.0
+ 0   0       +0.0 |  1  10      -46.2 | activesupport/lib/active_support/descendants_tracker.rb ActiveSupport::DescendantsTracker#descendants | casa GET volunteers 126.0 -> 6.0
+ 0   0       +0.0 |  1   3      -11.0 | activerecord/lib/active_record/inheritance.rb ActiveRecord::Inheritance::ClassMethods#type_condition | casa GET casa cases 69.0 -> 42.0
+ 0   0       +0.0 |  1   1       -6.0 | activerecord/lib/arel/alias_predication.rb Arel::AliasPredication#as | hackatime GET projects 12.0 -> 6.0
+ 0   0       +0.0 |  1   4       -2.0 | actionview/lib/action_view/helpers/asset_tag_helper.rb ActionView::Helpers::AssetTagHelper#javascript_include_tag | redprints-cfp GET home 20.0 -> 18.0
+ 0   0       +0.0 |  6  33       -4.5 | activerecord/lib/active_record/associations/belongs_to_association.rb ActiveRecord::Associations::BelongsToAssociation#foreign_key_present? | casa GET casa case edit 48.0 -> 0.0
+ 0   0       +0.0 |  3   8       -4.6 | actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#boolean_tag_option | casa GET casa case edit 19.0 -> 0.0
+ 0   0       +0.0 |  1   5       -7.6 | activerecord/lib/active_record/core.rb ActiveRecord::Core::ClassMethods#relation | casa GET casa cases 23.0 -> 0.0
+ 0   0       +0.0 |  4  17       -7.9 | activerecord/lib/active_record/relation/merger.rb ActiveRecord::Relation::Merger#merge | casa GET volunteers 50.0 -> 21.0
+ 0   0       +0.0 |  2   4       -2.2 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#group | casa GET volunteers 3.0 -> 0.0
+ 0   0       +0.0 |  2   4       -2.2 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#group! | casa GET volunteers 3.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/arel/expressions.rb Arel::Expressions#maximum | hackatime GET projects 4.0 -> 2.0
+ 0   0       +0.0 |  2   3       -2.0 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#distinct | casa GET casa case edit 2.0 -> 0.0
+ 0   0       +0.0 |  4  21      -12.0 | activesupport/lib/active_support/notifications/instrumenter.rb ActiveSupport::Notifications::Event#initialize | hackatime GET dashboard 34.0 -> 0.0
+ 0   0       +0.0 |  4  21      -20.2 | activesupport/lib/active_support/subscriber.rb ActiveSupport::Subscriber#call | hackatime GET dashboard 60.0 -> 0.0
+ 0   0       +0.0 |  1   4      -44.5 | activesupport/lib/active_support/time_with_zone.rb ActiveSupport::TimeWithZone#strftime | casa GET casa case 90.0 -> 30.0
+ 0   0       +0.0 |  1   3      -29.3 | actionpack/lib/action_dispatch/journey/formatter.rb ActionDispatch::Journey::Formatter#match_route | casa GET volunteers 128.0 -> 80.0
+ 0   0       +0.0 |  2   3      -34.7 | activerecord/lib/active_record/associations/join_dependency.rb ActiveRecord::Associations::JoinDependency#construct | casa GET case contacts 126.0 -> 42.0
+ 0   0       +0.0 |  2   3      -23.3 | activerecord/lib/active_record/associations/join_dependency/join_part.rb ActiveRecord::Associations::JoinDependency::JoinPart#extract_record | casa GET case contacts 54.0 -> 0.0
+ 0   0       +0.0 |  2   6      -91.0 | actionview/lib/action_view/helpers/form_options_helper.rb ActionView::Helpers::FormOptionsHelper#options_for_select | casa GET casa case edit 621.0 -> 283.0
+ 0   0       +0.0 |  2   6      -86.8 | actionview/lib/action_view/helpers/form_options_helper.rb ActionView::Helpers::FormOptionsHelper#option_html_attributes | casa GET casa case edit 320.0 -> 0.0
+ 0   0       +0.0 |  2   6      -86.0 | actionview/lib/action_view/helpers/form_options_helper.rb ActionView::Helpers::FormOptionsHelper#option_text_and_value | casa GET casa case edit 320.0 -> 0.0
+ 0   0       +0.0 |  1   2       -6.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#records_by_owner | casa GET volunteers 36.0 -> 30.0
+ 0   0       +0.0 |  1   2       -9.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#future_classes | casa GET volunteers 53.0 -> 44.0
+ 0   0       +0.0 |  3   7      -58.6 | activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#join_scope | casa GET casa case edit 322.0 -> 46.0
+ 0   0       +0.0 |  5  20      -12.6 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#select_named_joins | casa GET casa case edit 81.0 -> 0.0
+ 0   0       +0.0 |  1   3       -6.3 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#reflection_scope | casa GET volunteers 9.0 -> 0.0
+ 0   0       +0.0 |  1   3       -9.0 | activerecord/lib/active_record/associations/preloader/association.rb ActiveRecord::Associations::Preloader::Association#build_scope | casa GET volunteers 13.0 -> 0.0
+ 0   0       +0.0 |  1   2       -6.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#runnable_loaders | casa GET volunteers 32.0 -> 26.0
+ 0   0       +0.0 |  1   2       -4.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#middle_records | casa GET volunteers 12.0 -> 8.0
+ 0   0       +0.0 |  1   7       -6.6 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#references! | casa GET volunteers 18.0 -> 0.0
+ 0   0       +0.0 |  1   4      -16.8 | activerecord/lib/active_record/associations/join_dependency/join_association.rb ActiveRecord::Associations::JoinDependency::JoinAssociation#join_constraints | casa GET casa case edit 324.0 -> 278.0
+ 0   0       +0.0 |  1   2       -2.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#source_preloaders | casa GET volunteers 6.0 -> 4.0
+ 0   0       +0.0 |  1   2       -2.0 | activerecord/lib/active_record/associations/preloader/through_association.rb ActiveRecord::Associations::Preloader::ThroughAssociation#through_records_by_owner | casa GET volunteers 6.0 -> 4.0
+ 0   0       +0.0 |  1   1       -4.0 | activerecord/lib/active_record/connection_adapters/abstract/quoting.rb ActiveRecord::ConnectionAdapters::Quoting#quote | codetriage perform SendSingleTriageEmailJob 4.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.0 | activerecord/lib/active_record/relation/merger.rb ActiveRecord::Relation::Merger#merge_preloads | casa GET volunteers 7.0 -> 5.0
+ 0   0       +0.0 |  2  11       -7.1 | activerecord/lib/active_record/relation/predicate_builder/association_query_value.rb ActiveRecord::PredicateBuilder::AssociationQueryValue#queries | casa GET case contacts 36.0 -> 0.0
+ 0   0       +0.0 |  3   8       -9.5 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#select_association_list | casa GET casa case edit 27.0 -> 0.0
+ 0   0       +0.0 |  3   9       -7.6 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#joins! | casa GET casa case edit 28.0 -> 0.0
+ 0   0       +0.0 |  1   2      -70.0 | activerecord/lib/active_record/associations/through_association.rb ActiveRecord::Associations::ThroughAssociation#stale_state | casa GET case contacts 240.0 -> 120.0
+ 0   0       +0.0 |  3   6      -26.8 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_bound_sql_literal | casa GET casa case 75.0 -> 0.0
+ 0   0       +0.0 |  5  19       -8.9 | activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#next_chain_scope | casa GET casa case 35.0 -> 10.0
+ 0   0       +0.0 |  1   2       -5.0 | activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb ActiveRecord::ConnectionAdapters::QueryCache#cache_notification_info | casa GET volunteers 18.0 -> 12.0
+ 0   0       +0.0 |  4  14       -5.9 | activerecord/lib/active_record/enum.rb ActiveRecord::Enum::EnumMethods#define_enum_methods | casa GET case contacts 40.0 -> 0.0
+ 0   0       +0.0 |  1   1      -28.1 | actionview/lib/action_view/helpers/tags/base.rb ActionView::Helpers::Tags::Base#retrieve_object | casa GET casa case 28.1 -> 0.0
+ 0   0       +0.0 |  1   2       -7.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#reorder | casa GET casa case 7.0 -> 0.0
+ 0   0       +0.0 |  1   6       -4.5 | activerecord/lib/active_record/associations/through_association.rb ActiveRecord::Associations::ThroughAssociation#target_scope | casa GET casa case 15.0 -> 10.0
+ 0   0       +0.0 |  4  22       -4.5 | activerecord/lib/active_record/enum.rb ActiveRecord::Enum::EnumType#serialize | casa GET case contacts 20.0 -> 0.0
+ 0   0       +0.0 |  1   6       -3.5 | activerecord/lib/active_record/table_metadata.rb ActiveRecord::TableMetadata#associated_table | casa GET casa case 5.0 -> 0.0
+ 0   0       +0.0 |  3   9       -7.6 | actionview/lib/action_view/helpers/date_helper.rb ActionView::Helpers::DateHelper#distance_of_time_in_words | casa GET casa case edit 32.0 -> 0.0
+ 0   0       +0.0 |  1   3       -6.0 | activerecord/lib/active_record/relation/merger.rb ActiveRecord::Relation::Merger#merge_multi_values | casa GET supervisors 10.0 -> 0.0
+ 0   0       +0.0 |  3   9       -3.8 | activesupport/lib/active_support/core_ext/object/with_options.rb Object#with_options | casa GET casa case edit 16.0 -> 0.0
+ 0   0       +0.0 |  1   2       -5.0 | activesupport/lib/active_support/deep_mergeable.rb ActiveSupport::DeepMergeable#deep_merge | casa GET casa case edit 8.0 -> 0.0
+ 0   0       +0.0 |  1   2       -5.0 | activesupport/lib/active_support/option_merger.rb ActiveSupport::OptionMerger#initialize | casa GET casa case edit 8.0 -> 0.0
+ 0   0       +0.0 |  1   2       -5.0 | activesupport/lib/active_support/option_merger.rb ActiveSupport::OptionMerger#method_missing | casa GET casa case edit 8.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#extending | codetriage GET home 2.0 -> 0.0
+ 0   0       +0.0 |  1   3      -10.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#joins | casa GET casa case edit 25.0 -> 0.0
+ 0   0       +0.0 |  2   4       -7.2 | activerecord/lib/active_record/attribute_methods/read.rb ActiveRecord::AttributeMethods::Read#read_attribute | casa GET casa case edit 22.0 -> 0.0
+ 0   0       +0.0 |  3   6       -7.3 | activesupport/lib/active_support/core_ext/object/blank.rb String#blank? | casa GET volunteers 20.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#excluding! | writebook GET leaf 6.0 -> 4.0
+ 0   0       +0.0 |  1   1       -5.0 | activerecord/lib/active_record/relation/spawn_methods.rb ActiveRecord::SpawnMethods#merge | casa GET volunteers 5.0 -> 0.0
+ 0   0       +0.0 |  1   1       -4.0 | activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#to_sql | casa GET volunteers 4.0 -> 0.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/active_record/relation/calculations.rb ActiveRecord::Calculations#build_count_subquery | casa GET supervisors 6.0 -> 2.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods::WhereChain#missing | casa GET supervisors 5.0 -> 3.0
+ 0   0       +0.0 |  1   1      -19.0 | activerecord/lib/active_record/connection_adapters/postgresql/oid/array.rb ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Array#deserialize | casa GET case contacts 58.0 -> 39.0
+ 0   0       +0.0 |  1   1      -20.0 | activerecord/lib/active_record/connection_adapters/postgresql/oid/array.rb ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Array#type_cast_array | casa GET case contacts 20.0 -> 0.0
+ 0   0       +0.0 |  2   3       -2.0 | actionpack/lib/action_controller/metal/strong_parameters.rb ActionController::Parameters#fetch | writebook PATCH page (turbo_stream) 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -6.0 | activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence#update_columns | casa POST api sign_in.json 15.0 -> 9.0
+ 0   0       +0.0 |  1   1       -2.0 | activesupport/lib/active_support/time_with_zone.rb ActiveSupport::TimeWithZone#to_s | casa POST api sign_in.json 4.0 -> 2.0
+ 0   0       +0.0 |  3   4       -6.0 | activerecord/lib/active_record/autosave_association.rb ActiveRecord::AutosaveAssociation#save_belongs_to_association | writebook POST page (turbo_stream) 8.0 -> 2.0
+ 0   0       +0.0 |  1   8      -17.8 | activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods::ClassMethods#define_attribute_methods | redprints-cfp GET proposal edit 43.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.0 | activerecord/lib/active_record/associations/through_association.rb ActiveRecord::Associations::ThroughAssociation#construct_join_attributes | casa PATCH casa case (redirect) 4.0 -> 2.0
+ 0   0       +0.0 |  2   3       -2.0 | activerecord/lib/active_record/validations/uniqueness.rb ActiveRecord::Validations::UniquenessValidator#build_relation | casa PATCH casa case (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  3   5       -8.8 | activerecord/lib/active_record/attribute_assignment.rb ActiveRecord::AttributeAssignment#_assign_attributes | redprints-cfp GET proposal edit 12.0 -> 0.0
+ 0   0       +0.0 |  1   4       -9.8 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#convert_options_to_data_attributes | codetriage GET home 13.0 -> 0.0
+ 0   0       +0.0 |  2   5       -4.0 | actionpack/lib/abstract_controller/caching.rb AbstractController::Caching::ConfigMethods#cache_store | codetriage GET repo 8.0 -> 0.0
+ 0   0       +0.0 |  3  12       -7.0 | activesupport/lib/active_support/cache.rb ActiveSupport::Cache::Store#_instrument | hackatime GET dashboard 14.0 -> 0.0
+ 0   0       +0.0 |  1   2       -3.5 | activesupport/lib/active_support/cache/mem_cache_store.rb ActiveSupport::Cache::MemCacheStore#normalize_key | codetriage GET repo 8.0 -> 4.0
+ 0   0       +0.0 |  4  25       -4.0 | actionpack/lib/action_dispatch/middleware/cookies.rb ActionDispatch::Cookies::SignedKeyRotatingCookieJar#initialize | codetriage GET home 4.0 -> 0.0
+ 0   0       +0.0 |  1   1      -24.0 | activesupport/lib/active_support/core_ext/time/conversions.rb:(top) | codetriage GET user edit (signed in) 24.0 -> 0.0
+ 0   0       +0.0 |  2   3       -5.3 | activemodel/lib/active_model/attribute_mutation_tracker.rb ActiveModel::AttributeMutationTracker#change_to_attribute | writebook POST page (turbo_stream) 16.0 -> 4.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/validations/numericality.rb ActiveRecord::Validations::NumericalityValidator#column_precision_for | codetriage PATCH repo subscription (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  1   1       -2.0 | activerecord/lib/active_record/validations/numericality.rb ActiveRecord::Validations::NumericalityValidator#column_scale_for | codetriage PATCH repo subscription (redirect) 2.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.5 | activemodel/lib/active_model/attribute_mutation_tracker.rb ActiveModel::AttributeMutationTracker#changes | writebook PATCH page (turbo_stream) 3.0 -> 0.0
+ 0   0       +0.0 |  1   1      -19.0 | activerecord/lib/active_record/sanitization.rb ActiveRecord::Sanitization::ClassMethods#replace_named_bind_variables | codetriage perform SendSingleTriageEmailJob 19.0 -> 0.0
+ 0   0       +0.0 |  1   5      -26.0 | actionview/lib/action_view/helpers/url_helper.rb ActionView::Helpers::UrlHelper#remove_trailing_slash! | hackatime GET dashboard 26.0 -> 0.0
+ 0   0       +0.0 |  1   9       -9.2 | activemodel/lib/active_model/type/binary.rb ActiveModel::Type::Binary#cast | hackatime GET dashboard 17.0 -> 0.0
+ 0   0       +0.0 |  1   9       -8.9 | activerecord/lib/active_record/connection_adapters/postgresql/oid/bytea.rb ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Bytea#deserialize | hackatime GET dashboard 16.0 -> 0.0
+ 0   0       +0.0 |  2  17       -3.4 | activerecord/lib/active_record/enum.rb ActiveRecord::Enum::EnumType#serializable? | writebook GET leaf 8.0 -> 0.0
+ 0   0       +0.0 |  5  40       -5.4 | activesupport/lib/active_support/current_attributes.rb ActiveSupport::CurrentAttributes#resolve_defaults | react-starter-kit GET home 14.0 -> 4.0
+ 0   0       +0.0 |  4  26       -3.0 | actionpack/lib/action_dispatch/request/session.rb ActionDispatch::Request::Session#delete | hackatime GET dashboard 3.0 -> 0.0
+ 0   0       +0.0 |  2   6       -3.7 | activerecord/lib/arel/select_manager.rb Arel::SelectManager#lock | hackatime GET dashboard 6.0 -> 2.0
+ 0   0       +0.0 |  1   3       -2.0 | activesupport/lib/active_support/values/time_zone.rb ActiveSupport::TimeZone.seconds_to_utc_offset | hackatime GET dashboard 4.0 -> 2.0
+ 0   0       +0.0 |  1   2       -3.0 | activerecord/lib/active_record/associations/belongs_to_polymorphic_association.rb ActiveRecord::Associations::BelongsToPolymorphicAssociation#replace_keys | writebook POST page (turbo_stream) 4.0 -> 0.0
+ 0   0       +0.0 |  1   1      -34.0 | activerecord/lib/active_record/insert_all.rb ActiveRecord::InsertAll#primary_keys | hackatime POST heartbeat 35.0 -> 1.0
+ 0   0       +0.0 |  2  15      -15.5 | actionpack/lib/action_dispatch/http/content_security_policy.rb ActionDispatch::ContentSecurityPolicy#validate | pingcrm GET dashboard 22.0 -> 0.0
+ 0   0       +0.0 |  1   4      -15.0 | activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#initialize | pingcrm GET contacts 18.0 -> 3.0
+ 0   0       +0.0 |  1   3       -3.7 | activerecord/lib/active_record/associations/belongs_to_association.rb ActiveRecord::Associations::BelongsToAssociation#stale_state | redprints-cfp PATCH proposal (Inertia redirect) 6.0 -> 0.0
+ 0   0       +0.0 |  1   3       -3.3 | activerecord/lib/active_record/associations/belongs_to_association.rb ActiveRecord::Associations::BelongsToAssociation#replace_keys | redprints-cfp POST proposal invalid (Inertia errors) 6.0 -> 0.0
+ 0   0       +0.0 |  1   4      -10.0 | activesupport/lib/active_support/inflector/transliterate.rb ActiveSupport::Inflector#parameterize | writebook GET leaf 20.0 -> 0.0
+ 0   0       +0.0 |  1   3       -4.7 | activerecord/lib/active_record/delegated_type.rb ActiveRecord::DelegatedType#define_delegated_type_methods | writebook GET leaf 6.0 -> 0.0
+ 0   0       +0.0 |  1   2       -8.0 | actiontext/lib/action_text/plain_text_conversion.rb ActionText::PlainTextConversion#plain_text_method_for_node | writebook PATCH page (turbo_stream) 18.2 -> 10.2
+ 0   0       +0.0 |  1   2      -18.0 | actiontext/lib/action_text/plain_text_conversion.rb ActionText::PlainTextConversion::BottomUpReducer#reduce | writebook PATCH page (turbo_stream) 18.0 -> 0.0
+ 0   0       +0.0 |  1   2      -18.0 | actiontext/lib/action_text/plain_text_conversion.rb ActionText::PlainTextConversion::BottomUpReducer#traverse_bottom_up | writebook PATCH page (turbo_stream) 18.0 -> 0.0
+ 0   0       +0.0 |  1   2       -7.0 | activerecord/lib/active_record/autosave_association.rb ActiveRecord::AutosaveAssociation#save_has_one_association | writebook PATCH page (turbo_stream) 8.0 -> 1.0
+ 0   0       +0.0 |  1   2       -3.0 | activesupport/lib/active_support/number_helper/number_converter.rb ActiveSupport::NumberHelper::NumberConverter#i18n_format_options | writebook PATCH page (turbo_stream) 3.0 -> 0.0
+ 0   0       +0.0 |  1   2       -2.0 | actiontext/lib/action_text/plain_text_conversion.rb ActionText::PlainTextConversion::BottomUpReducer#initialize | writebook PATCH page (turbo_stream) 2.0 -> 0.0
+ 0   0       +0.0 |  1   2       -9.0 | activesupport/lib/active_support/number_helper/number_to_delimited_converter.rb ActiveSupport::NumberHelper::NumberToDelimitedConverter#parts | writebook PATCH page (turbo_stream) 9.0 -> 0.0
+ 0   0       +0.0 |  1   1      -10.0 | activerecord/lib/active_record/associations/foreign_association.rb ActiveRecord::Associations::ForeignAssociation#set_owner_attributes | writebook POST page (turbo_stream) 10.0 -> 0.0

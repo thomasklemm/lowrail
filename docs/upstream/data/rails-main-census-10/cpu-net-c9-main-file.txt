@@ -1,0 +1,54 @@
+# c10c9 -> c10m: 70 workloads; per app: median whole-workload change, median |A/A| (c10m vs c10m2)
+blog                  10 wl  median  -0.04%  min  -0.41%  max  +0.76%  A/A 0.07%
+casa                  10 wl  median  +1.14%  min  +0.01%  max  +1.91%  A/A 0.10%
+codetriage             7 wl  median  +0.58%  min  -0.03%  max  +0.99%  A/A 0.12%
+hackatime             11 wl  median  +0.28%  min  -1.22%  max  +0.65%  A/A 0.07%
+pingcrm                8 wl  median  +0.21%  min  -0.46%  max  +0.53%  A/A 0.11%
+react-starter-kit      8 wl  median  +0.34%  min  +0.04%  max  +2.71%  A/A 0.21%
+redprints-cfp          8 wl  median  +0.74%  min  -0.25%  max  +1.73%  A/A 0.58%
+writebook              8 wl  median  +0.82%  min  +0.64%  max  +1.37%  A/A 0.05%
+ALL 70 workloads: median +0.42%, slower 12, faster 1 (beyond 1%)
+
+# net self Ir by file, % of all c10c9 instructions (grew)
+ +0.179% 8 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb
+ +0.054% 8 apps  RAILS/activerecord/lib/active_record/relation/query_methods.rb
+ +0.041% 8 apps  RAILS/activerecord/lib/arel/attributes/attribute.rb
+ +0.038% 8 apps  RAILS/activerecord/lib/arel/table.rb
+ +0.028% 8 apps  RAILS/activerecord/lib/active_record/reflection.rb
+ +0.025% 8 apps  RAILS/activerecord/lib/active_record/relation/predicate_builder.rb
+ +0.025% 8 apps  RAILS/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb
+ +0.024% 8 apps  RAILS/activesupport/lib/active_support/isolated_execution_state.rb
+ +0.023% 4 apps  pg
+ +0.021% 8 apps  concurrent-ruby
+ +0.021% 8 apps  RAILS/activerecord/lib/active_record/associations/association_scope.rb
+ +0.016% 8 apps  RAILS/activerecord/lib/active_record/model_schema.rb
+ +0.015% 8 apps  RUBY
+ +0.014% 8 apps  RAILS/activerecord/lib/active_record/type_caster/map.rb
+ +0.013% 3 apps  sqlite3
+ +0.013% 8 apps  RAILS/railties/lib/rails/engine.rb
+ +0.012% 8 apps  RAILS/activerecord/lib/active_record/associations/alias_tracker.rb
+ +0.011% 7 apps  RAILS/activerecord/lib/active_record/connection_handling.rb
+ +0.010% 8 apps  RAILS/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb
+ +0.009% 8 apps  RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb
+
+# net self Ir by file (shrank)
+ -0.014%  RAILS/actionview/lib/action_view/buffers.rb
+ -0.013%  RAILS/activerecord/lib/active_record/associations/association.rb
+ -0.012%  RAILS/activemodel/lib/active_model/attribute_methods.rb
+ -0.010%  RAILS/activesupport/lib/active_support/core_ext/object/deep_dup.rb
+ -0.009%  uri
+ -0.009%  RAILS/activesupport/lib/active_support/core_ext/hash/keys.rb
+ -0.007%  RAILS/actionpack/lib/action_dispatch/http/request.rb
+ -0.007%  RAILS/activerecord/lib/active_record/relation/merger.rb
+ -0.005%  RAILS/activerecord/lib/active_record/scoping.rb
+ -0.005%  RAILS/activesupport/lib/active_support/event_reporter.rb
+ -0.005%  RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb
+ -0.005%  RAILS/actionview/lib/action_view/helpers/tag_helper.rb
+ -0.005%  RAILS/actionview/lib/action_view/renderer/partial_renderer.rb
+ -0.005%  solid_cache
+ -0.005%  RAILS/activemodel/lib/active_model/attribute_set.rb
+ -0.005%  RAILS/activerecord/lib/arel/collectors/composite.rb
+ -0.005%  RAILS/activerecord/lib/active_record/relation.rb
+ -0.004%  RAILS/actionview/lib/action_view/helpers/output_safety_helper.rb
+ -0.004%  RAILS/activerecord/lib/arel/nodes/select_statement.rb
+ -0.004%  RAILS/activerecord/lib/arel/collectors/bind.rb

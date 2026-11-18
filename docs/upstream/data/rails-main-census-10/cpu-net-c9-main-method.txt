@@ -1,0 +1,64 @@
+# c10c9 -> c10m: 70 workloads; per app: median whole-workload change, median |A/A| (c10m vs c10m2)
+blog                  10 wl  median  -0.04%  min  -0.41%  max  +0.76%  A/A 0.07%
+casa                  10 wl  median  +1.14%  min  +0.01%  max  +1.91%  A/A 0.10%
+codetriage             7 wl  median  +0.58%  min  -0.03%  max  +0.99%  A/A 0.12%
+hackatime             11 wl  median  +0.28%  min  -1.22%  max  +0.65%  A/A 0.07%
+pingcrm                8 wl  median  +0.21%  min  -0.46%  max  +0.53%  A/A 0.11%
+react-starter-kit      8 wl  median  +0.34%  min  +0.04%  max  +2.71%  A/A 0.21%
+redprints-cfp          8 wl  median  +0.74%  min  -0.25%  max  +1.73%  A/A 0.58%
+writebook              8 wl  median  +0.82%  min  +0.64%  max  +1.37%  A/A 0.05%
+ALL 70 workloads: median +0.42%, slower 12, faster 1 (beyond 1%)
+
+# net self Ir by method, % of all c10c9 instructions (grew)
+ +0.116% 8 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#-
+ +0.054% 1 apps  APP/app/views/layouts/casa_app.html.erb #<Class:0x000000004712f470>#_app_views_layouts_casa_app_html_erb__975156827048728998_40304
+ +0.050% 8 apps  RAILS/activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#where_clause
+ +0.041% 8 apps  RAILS/activerecord/lib/arel/attributes/attribute.rb Arel::Attributes::Attribute#type_caster
+ +0.039% 8 apps  RAILS/activerecord/lib/arel/table.rb Arel::Table#type_for_attribute
+ +0.038% 1 apps  APP/app/views/case_contacts/_case_contact.html.erb #<Class:0x000000004712f470>#_app_views_case_contacts__case_contact_html_erb___2316936919835492222_259304
+ +0.030% 1 apps  APP/app/views/case_contacts/_reminder_control.html.erb #<Class:0x000000004712f470>#_app_views_case_contacts__reminder_control_html_erb___1017083877997406949_79544
+ +0.025% 3 apps  GEM/4.0.0/gems/pg-1.6.3-x86_64-linux/lib/pg/connection.rb PG::Connection#get_result
+ +0.025% 8 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#empty?
+ +0.024% 1 apps  APP/app/views/volunteers/index.html.erb #<Class:0x000000004712f470>#_app_views_volunteers_index_html_erb___693001554442866537_166984
+ +0.024% 1 apps  APP/app/views/layouts/_nav_link.html.erb #<Class:0x000000004712f470>#_app_views_layouts__nav_link_html_erb__4059555474613144786_40336
+ +0.022% 8 apps  RAILS/activesupport/lib/active_support/isolated_execution_state.rb ActiveSupport::IsolatedExecutionState.[]
+ +0.019% 1 apps  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb #<Module:0x000000004607cee8>._routes
+ +0.019% 8 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#initialize
+ +0.018% 7 apps  GEM/4.0.0/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb Concurrent::Collection::NonConcurrentMapBackend#get_or_default
+ +0.015% 7 apps  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AbstractReflection#keep_owner_conditions
+ +0.014% 1 apps  APP/app/views/shared/_favicons.html.erb #<Class:0x000000004712f470>#_app_views_shared__favicons_html_erb___433162502913937539_39856
+ +0.014% 8 apps  RAILS/activerecord/lib/active_record/type_caster/map.rb ActiveRecord::TypeCaster::Map#type_for_attribute
+ +0.014% 1 apps  APP/app/views/casa_cases/index.html.erb #<Class:0x000000004712f470>#_app_views_casa_cases_index_html_erb__4403447030827639594_40040
+ +0.013% 7 apps  RAILS/railties/lib/rails/engine.rb Rails::Engine#build_request
+ +0.012% 8 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause.empty
+ +0.012% 8 apps  RAILS/activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#build
+ +0.011% 8 apps  RAILS/activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#add_constraints
+ +0.011% 7 apps  RAILS/activerecord/lib/active_record/relation/predicate_builder.rb ActiveRecord::PredicateBuilder#build_bind_attribute
+ +0.010% 8 apps  RAILS/activerecord/lib/active_record/associations/association_scope.rb ActiveRecord::Associations::AssociationScope#last_chain_scope
+
+# net self Ir by method (shrank)
+ -0.054%  APP/app/views/layouts/casa_app.html.erb #<Class:0x000000004711e580>#_app_views_layouts_casa_app_html_erb___3154724730461634888_40304
+ -0.036%  APP/app/views/case_contacts/_case_contact.html.erb #<Class:0x000000004711e580>#_app_views_case_contacts__case_contact_html_erb__3195149011639621547_259304
+ -0.030%  APP/app/views/case_contacts/_reminder_control.html.erb #<Class:0x000000004711e580>#_app_views_case_contacts__reminder_control_html_erb__359937797905092334_79544
+ -0.024%  APP/app/views/layouts/_nav_link.html.erb #<Class:0x000000004711e580>#_app_views_layouts__nav_link_html_erb___582768514275684650_40336
+ -0.023%  APP/app/views/volunteers/index.html.erb #<Class:0x000000004711e580>#_app_views_volunteers_index_html_erb__2020150532360502388_166984
+ -0.019%  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb #<Module:0x000000004603c3c0>._routes
+ -0.013%  APP/app/views/casa_cases/index.html.erb #<Class:0x000000004711e580>#_app_views_casa_cases_index_html_erb___1995810742714302392_40040
+ -0.013%  APP/app/views/shared/_favicons.html.erb #<Class:0x000000004711e580>#_app_views_shared__favicons_html_erb___4391659898446483080_39856
+ -0.012%  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#association_route
+ -0.009%  RAILS/activesupport/lib/active_support/core_ext/object/deep_dup.rb Object#deep_dup
+ -0.009%  APP/config/initializers/census_blind_index.rb #<Module:0x000000004ba42c70>#has_blind_indexes?
+ -0.009%  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_options
+ -0.008%  GEM/4.0.0/gems/rack-3.2.8/lib/rack/request.rb Rack::Request::Env#set_header
+ -0.008%  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb #<Module:0x000000004bda9580>._routes
+ -0.008%  APP/app/views/layouts/inertia.html.erb #<Class:0x0000000041d8c098>#_app_views_layouts_inertia_html_erb___1123717799190547357_38944
+ -0.007%  APP/app/views/casa_cases/show.html.erb #<Class:0x000000004711e580>#_app_views_casa_cases_show_html_erb__2444617791015832030_79056
+ -0.007%  RAILS/activesupport/lib/active_support/core_ext/hash/keys.rb Hash#stringify_keys
+ -0.007%  APP/app/views/case_contacts/index.html.erb #<Class:0x000000004711e580>#_app_views_case_contacts_index_html_erb___1209007821654503676_259280
+ -0.007%  RAILS/actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#safe_concat
+ -0.007%  GEM/4.0.0/gems/uri-1.1.2/lib/uri/common.rb URI._decode_uri_component
+ -0.006%  GEM/4.0.0/gems/i18n-1.15.2/lib/i18n/backend/fallbacks.rb I18n::Backend::Fallbacks#translate
+ -0.006%  APP/app/views/casa_cases/_case_contact_card.html.erb #<Class:0x000000004711e580>#_app_views_casa_cases__case_contact_card_html_erb___2332143758369153261_79512
+ -0.006%  APP/app/views/casa_cases/_court_order_fields.html.erb #<Class:0x000000004711e580>#_app_views_casa_cases__court_order_fields_html_erb___2644861233314935007_153176
+ -0.005%  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::ClassMethods#_reflect_on_association
+ -0.005%  GEM/4.0.0/gems/sentry-ruby-6.7.0/lib/sentry/utils/sample_rand.rb Sentry::Utils::SampleRand#random_from_trace_id

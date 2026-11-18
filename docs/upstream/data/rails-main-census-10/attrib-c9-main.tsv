@@ -1,0 +1,72 @@
+app	workload	total	A1	C
+blog	GET article	+0.21%	+0.208%	+0.027%
+blog	GET article edit	-0.24%	+0.000%	+0.000%
+blog	GET article.json	-0.05%	+0.000%	+0.000%
+blog	GET articles	-0.04%	+0.060%	+0.009%
+blog	GET articles.json	+0.01%	+0.052%	+0.087%
+blog	PATCH article (redirect)	-0.41%	+0.000%	+0.058%
+blog	PATCH article.json	+0.02%	+0.000%	+0.017%
+blog	POST article invalid (422)	-0.12%	+0.000%	+0.000%
+blog	POST comment (redirect)	-0.09%	+0.175%	+0.010%
+blog	perform Turbo::Streams::ActionBroadcastJob	+0.76%	+0.253%	+0.101%
+casa	GET casa case	+1.12%	+0.451%	+0.096%
+casa	GET casa case edit	+1.54%	+0.869%	+0.276%
+casa	GET casa cases	+0.40%	+0.199%	+0.125%
+casa	GET case contacts	+0.38%	+0.210%	+0.087%
+casa	GET dashboard	+0.84%	+0.508%	+0.111%
+casa	GET supervisors	+1.64%	+0.694%	+0.272%
+casa	GET volunteers	+1.17%	+0.425%	+0.186%
+casa	PATCH casa case (redirect)	+1.77%	+0.563%	+0.171%
+casa	PATCH casa case.json	+1.91%	+0.581%	+0.186%
+casa	POST api sign_in.json	+0.01%	+0.005%	+0.001%
+codetriage	GET home	+0.03%	+0.017%	-0.000%
+codetriage	GET repo	+0.94%	+0.463%	+0.172%
+codetriage	GET repo info.json	+0.84%	+0.382%	+0.098%
+codetriage	GET subscribers	+0.57%	+0.096%	+0.077%
+codetriage	GET user edit (signed in)	-0.03%	+0.023%	+0.035%
+codetriage	PATCH repo subscription (redirect)	+0.58%	+0.278%	+0.166%
+codetriage	perform SendSingleTriageEmailJob	+0.99%	+0.297%	+0.262%
+hackatime	GET dashboard	+0.28%	+0.211%	+0.062%
+hackatime	GET dashboard (Inertia XHR)	+0.36%	+0.166%	+0.143%
+hackatime	GET dashboard stats (deferred)	-1.22%	+0.151%	+0.125%
+hackatime	GET leaderboard entries (deferred)	+0.60%	+0.167%	+0.036%
+hackatime	GET leaderboards	+0.28%	+0.270%	+0.055%
+hackatime	GET projects	+0.50%	+0.232%	+0.168%
+hackatime	GET settings profile	+0.28%	+0.124%	+0.063%
+hackatime	GET statusbar today	+0.65%	+0.639%	+0.172%
+hackatime	PATCH display name (Inertia redirect)	+0.22%	+0.061%	+0.051%
+hackatime	PATCH username invalid (Inertia 422)	+0.15%	+0.213%	+0.067%
+hackatime	POST heartbeat	+0.42%	+0.214%	+0.141%
+pingcrm	GET contact edit	+0.53%	+0.161%	+0.078%
+pingcrm	GET contacts	+0.02%	+0.186%	+0.137%
+pingcrm	GET contacts (Inertia JSON)	+0.18%	+0.085%	+0.072%
+pingcrm	GET dashboard	+0.28%	+0.240%	+0.000%
+pingcrm	GET organizations	-0.06%	+0.120%	+0.040%
+pingcrm	GET organizations (Inertia JSON)	+0.32%	+0.181%	+0.173%
+pingcrm	POST contact invalid (Inertia errors)	+0.24%	+0.197%	+0.008%
+pingcrm	PUT contact (Inertia redirect)	-0.46%	-0.030%	+0.040%
+react-starter-kit	GET dashboard	+0.04%	+0.188%	-0.021%
+react-starter-kit	GET dashboard (Inertia JSON)	+0.41%	+0.209%	+0.070%
+react-starter-kit	GET home	+2.71%	+0.167%	+0.031%
+react-starter-kit	GET settings profile	+0.07%	+0.146%	+0.010%
+react-starter-kit	GET settings sessions	+0.43%	+0.516%	+0.028%
+react-starter-kit	PATCH profile (Inertia redirect)	+0.43%	+0.348%	+0.052%
+react-starter-kit	PATCH profile invalid (Inertia errors)	+0.27%	+0.205%	-0.000%
+react-starter-kit	deliver UserMailer#email_verification	+0.06%	+0.000%	+0.000%
+redprints-cfp	GET home	+1.73%	+0.000%	+0.000%
+redprints-cfp	GET proposal	+1.18%	+0.445%	+0.103%
+redprints-cfp	GET proposal edit	+1.01%	+0.278%	+0.008%
+redprints-cfp	GET proposals	-0.25%	+0.219%	+0.044%
+redprints-cfp	GET proposals (Inertia JSON)	+0.72%	+0.232%	+0.116%
+redprints-cfp	PATCH proposal (Inertia redirect)	+0.76%	+0.444%	+0.073%
+redprints-cfp	POST proposal invalid (Inertia errors)	+0.69%	+0.262%	+0.064%
+redprints-cfp	deliver ProposalMailer#proposal_submitted	+0.56%	+0.000%	+0.000%
+writebook	GET book	+0.65%	+0.404%	+0.126%
+writebook	GET books	+0.64%	+0.206%	+0.092%
+writebook	GET leaf	+0.68%	+0.293%	+0.107%
+writebook	GET leaf.md	+1.37%	+0.437%	+0.148%
+writebook	PATCH page (turbo_stream)	+0.70%	+0.376%	+0.127%
+writebook	POST page (turbo_stream)	+0.94%	+0.330%	+0.176%
+writebook	POST search	+1.15%	+0.256%	+0.078%
+writebook	perform Turbo::Streams::BroadcastJob	+0.94%	-0.147%	+0.266%
+# 70 workloads; A1 median +0.209% max +0.869%, of all Ir +0.258%; C median +0.073% max +0.276%, of all +0.094%; total of all +0.529%

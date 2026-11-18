@@ -1,0 +1,44 @@
+# c10s -> c10m: 70 workloads; per app: median whole-workload change, median |A/A| (c10m vs c10m2)
+blog                  10 wl  median -12.01%  min -24.86%  max  -5.30%  A/A 0.07%
+casa                  10 wl  median  -7.76%  min -24.44%  max  -0.12%  A/A 0.10%
+codetriage             7 wl  median  -3.20%  min -12.73%  max  +5.04%  A/A 0.12%
+hackatime             11 wl  median  -5.40%  min  -9.42%  max  -2.23%  A/A 0.07%
+pingcrm                8 wl  median  -5.48%  min  -6.49%  max  -1.77%  A/A 0.11%
+react-starter-kit      8 wl  median  -5.92%  min  -8.40%  max  -4.75%  A/A 0.21%
+redprints-cfp          8 wl  median  -5.99%  min  -9.46%  max  -1.64%  A/A 0.58%
+writebook              8 wl  median  -6.50%  min  -9.22%  max  -2.71%  A/A 0.05%
+ALL 70 workloads: median -5.95%, slower 2, faster 67 (beyond 1%)
+
+# net self Ir by file, % of all c10s instructions (grew)
+ +1.472% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb
+ +0.637% 4 apps  pg
+ +0.369% 8 apps  RAILS/activerecord/lib/active_record/connection_adapters/query_intent.rb
+ +0.342% 8 apps  RAILS/activerecord/lib/active_record/model_schema.rb
+ +0.255% 8 apps  RAILS/activesupport/lib/active_support/weak_key_map.rb
+ +0.250% 8 apps  RAILS/activemodel/lib/active_model/indexed_row.rb
+ +0.212% 8 apps  RAILS/activerecord/lib/active_record/reflection.rb
+ +0.193% 8 apps  RAILS/activerecord/lib/active_record/key.rb
+ +0.171% 8 apps  RAILS/activerecord/lib/active_record/association_route.rb
+ +0.162% 8 apps  RAILS/activesupport/lib/active_support/event_reporter.rb
+ +0.160% 6 apps  RAILS/actionview/lib/action_view/helpers/navigation_helper.rb
+ +0.141% 8 apps  RAILS/actionpack/lib/action_dispatch/http/session.rb
+ +0.134% 8 apps  RAILS/actionpack/lib/action_controller/metal/request_forgery_protection.rb
+ +0.124% 8 apps  RAILS/activerecord/lib/arel/table.rb
+ +0.118% 4 apps  RAILS/activerecord/lib/active_record/type/hash_lookup_type_map.rb
+
+# net self Ir by file (shrank)
+ -1.227%  RAILS/activemodel/lib/active_model/attribute_set/builder.rb
+ -0.935%  RAILS/actionpack/lib/action_dispatch/journey/formatter.rb
+ -0.763%  RAILS/activerecord/lib/active_record/result.rb
+ -0.756%  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb
+ -0.570%  RUBY
+ -0.566%  RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb
+ -0.555%  RAILS/activesupport/lib/active_support/core_ext/object/blank.rb
+ -0.476%  RAILS/activerecord/lib/active_record/querying.rb
+ -0.376%  concurrent-ruby
+ -0.324%  RAILS/activerecord/lib/active_record/associations/association.rb
+ -0.267%  RAILS/activesupport/lib/active_support/inflector/methods.rb
+ -0.265%  RAILS/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb
+ -0.258%  RAILS/activemodel/lib/active_model/attribute.rb
+ -0.245%  RAILS/activerecord/lib/active_record/attribute_methods/read.rb
+ -0.208%  RAILS/actionview/lib/action_view/helpers/tag_helper.rb
