@@ -51,8 +51,16 @@ end
 signed_in, anonymous = client.new(host), client.new(host)
 if (s = definition.sign_in_spec)
   if (cookie = s[:cookie])
-    abort "lowrail-profile: sign_in cookie: signed: is not supported here; use sign_in with a path" if cookie[:signed]
-    signed_in.cookie(cookie.fetch(:name).to_s, cookie.fetch(:value).to_s)
+    name, value = cookie.fetch(:name).to_s, cookie.fetch(:value).to_s
+    if cookie[:signed]
+      # Signed with the app's own key generator, as the census signs it.
+      require "action_dispatch/testing/test_request"
+      request = ActionDispatch::TestRequest.create
+      request.env.merge!(Rails.application.env_config)
+      request.cookie_jar.signed[name.to_sym] = value
+      name, value = request.cookie_jar.to_header.split("=", 2)
+    end
+    signed_in.cookie(name, value)
   else
     token = signed_in.token(s[:form])
     signed_in.request(s[:method], s[:path], params: token ? s[:params].merge("authenticity_token" => token) : s[:params],

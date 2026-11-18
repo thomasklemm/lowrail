@@ -201,6 +201,10 @@ only: the Blog on its own Rails 8.1.4, Lobsters on its own Rails 8.1.3.1 and on 
   IntegrationTest's `Accept` (`text/javascript, text/html, application/xml, text/xml, */*`), which Rails parses into
   more MIME types (`mime_type.rb:210–219`, +5 objects each); the YAML sent `text/html`. The same file with
   `headers: { accept: "text/html" }` on the three requests is back within the A/A (−3.0, −0.2, +8.2).
+  This is the realistic default (it is what Rails' own `xhr: true` sends), so it stays. **Comparing receipts across
+  this change**, Lobsters' three XHR writes (`POST story vote toggle`, `POST comment preview`, `POST comment (XHR)`)
+  step up once by 30 to 47 objects from the header alone; that step is not a Rails or app change. Receipts written by
+  `11804786` and earlier sent `text/html`.
 * **YJIT.** `--modes interp,yjit` on the Blog: all ten workloads, A/A within ±4 objects.
 * **`--init`** on the Blog wrote its five pages as route helpers and listed Turbo's three routes as left out; the
   file `lowrail-profile --record` wrote from the Blog's suite ran as four GET workloads, A/A within 1.3 objects.
@@ -312,6 +316,8 @@ within one mode; counts are per process and unaffected). `script/census list` re
 against the base, a smoke test after changing workloads. `script/census help` prints every option.
 
 **Rails refs.** `SPEC` is `REF`, `OWNER/REPO@REF` or `/path/to/rails@REF`, where REF is a branch, tag or commit.
+A commit may be abbreviated (`c48c154e3f`): it is resolved with `git rev-parse` in a commits-only bare clone of
+the repository's branches (`.corpus/refs-OWNER-REPO.git`), and refused when it names more than one commit.
 `setup` records the resolved commit as the base. `run --rails SPEC` measures another commit. A label's
 commit and Ruby are fixed by its first run (`meta.json`), and a later run under that label must match them.
 

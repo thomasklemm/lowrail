@@ -35,7 +35,7 @@ bundle exec lowrail-profile report                                   # rebuild t
 `--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
 `RAILS_ENV`, evaluates the [workloads file](upstream/census.md#workloads-file) after boot, and sends its requests
 10 times as warmup and 20 times counted, in file order, through the full middleware stack: with a browser's
-`Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in, CSRF tokens, alternates and
+`Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in (a form, or a cookie, signed with the app's key for `signed: true`), CSRF tokens, alternates and
 blocks, and the cookies earlier responses set. A status outside a request's `expect:` aborts the run. Its mails and
 jobs, and the jobs its requests enqueue, are not run here (they need the census's capture); `workloads.json` in the
 output directory holds the file's manifest and lists what was replayed and what was not. Use a disposable database:

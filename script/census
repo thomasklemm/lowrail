@@ -12,7 +12,7 @@
 #   script/census watch    [--base SHA] [--head SHA] [--bisect N] [--watch-dir DIR] [--jobs N]
 #   script/census app      DIR [--workloads FILE] [--rails SPEC] ...  (any app checkout; app --help)
 # SPEC is [OWNER/REPO@|/local/rails/repo@]REF (default repo rails/rails), REF a
-# branch, tag or commit. --gem NAME=SPEC (repeatable) also pins gem NAME to a
+# branch, tag or (abbreviated) commit. --gem NAME=SPEC (repeatable) also pins gem NAME to a
 # git ref in every app whose Gemfile lists it (rank --gem NAME ranks its lines).
 # R is a mise Ruby version or a path to a ruby binary or
 # its bin directory. Common options: --corpus NAME (app copies in
@@ -196,6 +196,20 @@ module Census
       'print RUBY_PATCHLEVEL < 0 ? "-ruby-#{RUBY_REVISION[0, 10]}" : ""')
   end
 
+  # An abbreviated commit on one of REPO's branches, through a commits-only
+  # bare clone kept in .corpus; refused when it names more than one commit.
+  def abbreviated_sha(repo, ref)
+    dir = File.join(ROOT, ".corpus", "refs-#{repo.tr("/", "-")}.git")
+    unless File.exist?(dir)
+      system("git", "clone", "--quiet", "--bare", "--filter=tree:0", "https://github.com/#{repo}.git", dir, exception: true)
+    end
+    system("git", "-C", dir, "fetch", "--quiet", "--filter=tree:0", "origin", "+refs/heads/*:refs/heads/*", exception: true)
+    out, err, status = Open3.capture3("git", "-C", dir, "rev-parse", "--verify", "#{ref}^{commit}")
+    raise "#{ref} is ambiguous in #{repo}: give more digits or the full commit" if err.include?("ambiguous")
+    raise "#{ref} is not a commit on a branch of #{repo}; give the full commit" unless status.success?
+    out.strip
+  end
+
   # [OWNER/REPO@|/path@]REF -> source, ref and commit.
   def resolve_rails(spec, default_repo = "rails/rails")
     repo, ref = spec.include?("@") ? spec.split("@", 2) : [default_repo, spec]
@@ -206,6 +220,7 @@ module Census
     sha = ref if ref.match?(/\A\h{40}\z/)
     sha ||= capture("git", "ls-remote", "https://github.com/#{repo}.git", "refs/heads/#{ref}", "refs/tags/#{ref}", ref)
       .lines.first&.split&.first
+    sha ||= abbreviated_sha(repo, ref) if ref.match?(/\A\h{4,39}\z/)
     raise "cannot resolve #{spec}" unless sha
     { "spec" => spec, "source" => %(github: "#{repo}"), "ref" => ref, "sha" => sha }
   end
