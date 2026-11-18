@@ -475,6 +475,107 @@ the generated-binding hash matches again, and its tracked worktree is clean. Log
 Not run here: full Ruby test-all, btest, hosted CI, arm64, benchmarks. No speed claim. The pass records review
 evidence, not permission to push the Ruby PR branch or publish replies.
 
+### ZRS1 Opus review of 7a1eed11f4 (2026-11-18)
+
+**Verdict: changes.** Reviewer `thermos-opus`, thread `T-01a1f051-f32b-7206-936f-08a375829cc1`. Both Thermos
+rubrics applied directly in this thread, no subagents or other threads, no contact with the Sol reviewer (its
+pass above landed first; read only after this review's evidence was collected). The source is correct; the two
+must-fixes are about how the PR answers tekknolagi. Nothing pushed to Ruby, nothing posted.
+
+**Pins.** `git ls-remote` on thomasklemm/ruby: `zjit-super-from-refinement-3` at `7a1eed11f4…`, PR branch
+`-2` still at `1d86986033`; `gh api` shows the PR at `1d86986033`, open, ready, the live body without the helper
+sentence. One commit on `7db0202722`, Thomas author and committer, empty `%(trailers:only)`. x86_64 orb,
+bootstrap Ruby 4.0.7, Rust 1.100.0, cargo-nextest 0.9.152, libclang 19; `configure --enable-zjit=dev
+--disable-install-doc`, `make -j2`. Probe and logs: `.amp/in/orb-backup/zrs1-opus/` in this thread.
+
+**Guard exactness.** `vm_search_normal_superclass` (vm_insnhelper.c) is `RCLASS_SUPER(RCLASS_ORIGIN(klass))`
+whenever `RICLASS_FOR_REFINEMENT_P(klass)` is false, which is exactly ZJIT's existing computation, so the
+refusal covers precisely the cases where the VM and ZJIT disagree, and nothing else. The new helper returns
+`RICLASS_FOR_REFINEMENT_P` itself, so the T_ICLASS / T_MODULE / RMODULE_IS_REFINEMENT order cannot drift from
+the VM's. Refined modules: `add_activated_refinement` builds an iclass of the refinement module, so the same
+predicate fires; the VM's class/module distinction only matters for what super resolves to, and the generic
+path delegates that to the VM. Prepended/included modules of an ordinary class are iclasses of non-refinement
+modules (predicate false), unchanged.
+
+Probe `probe.rb`, 14 scenarios × 100 calls with asymmetric arguments so each layer leaves a distinct number:
+
+| scenario | interp (= head, every mode) | master ZJIT |
+|---|---|---|
+| refined class, caller-only `using R1; using R2` | `R2 A6` | z1 95, default 71, z2/zmv 99 calls `R2 R1 A7` |
+| refined module (included into a class) | `R2 M6` | same pattern, `R2 R1 M7` |
+| refined class with prepended P and included I below | `R2 PABI148` | `R2 R1 PABI151` |
+| `send(:foo)` / `method(:foo).call` through `using` | `R2 A6` | 100/100 `R2 R1 A7` |
+| caller with only R2, then the two-refinement caller again, then mixed callers | `R2 A6` | again 100 wrong; mixed 50/50 |
+| lexical chain (`using R4a` inside R4b) | `R4b R4a A7` | unchanged |
+| plain `super` with a refinement active at the super site | `B R5 A7` | unchanged |
+| `bind_call` of the refinement's UnboundMethod | `R6 A4` | unchanged |
+| prepend-class, prepended-singleton, include controls | `PBA8`, `SA8`, `DI2` | unchanged |
+
+Head output is byte-identical to the interpreter in default, z1, z2 and zmv. Master diverges in 7 of 14 in
+every ZJIT mode, z1 included. Head z2 `--zjit-stats`: `super_from_refinement` 1,094.
+
+**HIR test.** Removing only the seven-line guard from head: both new tests fail. The HIR snapshot becomes
+`PatchPoint MethodRedefined(Unknown@…)`, the CME/specval guards, `PushInlineFrame :foo` (R1#foo inlined) and an
+inner `InvokeSuper … polymorphic call site`; the codegen test returns `"R2 R1 A"`. Restored head: `ZJIT_TESTS=
+invokesuper` 48/48.
+
+**Must-fix 1: the PR does not show before/after HIR.** tekknolagi asked to "see before/after hir output". The
+single commit adds only the after snapshot; the before exists only in our notes. His own ZJIT PRs do this with a
+baseline commit: ruby/ruby#19770 (`47557025d5` "Add baseline tests for Float#== nil, true, false", then
+`f4e44fad2d` the fold), #19594 (`3b150a90ff` "Add before tests for equality with nil"), #19585 (`9982455489`
+"Add tests demonstrating current IsBitEqual behavior"). Smallest fix: two commits on `7db0202722`.
+Commit 1, e.g. "ZJIT: Add a test for super from a refined method", adds only the opt_tests.rs test with master's
+snapshot (`baseline-hir-test-on-7db0202722.patch`); commit 2 is today's tree, whose opt_tests.rs diff is then the
+before/after (`fix-commit-opt_tests-diff.patch`). Checked: the baseline test passes on master 7db0202722, and
+the head tree passes. The codegen test stays in commit 2. Reply 1 then names the commits.
+
+**Must-fix 2: body.** "The new HIR and codegen tests fail without the fix…" and the 245-test / SIGPROF sentences
+are suite counts and test-run results, which [DECISIONS](../DECISIONS.md#pull-requests) lists under Leave out.
+Cut the paragraph when the body is patched (the Sol pass made the same point as a nit).
+
+**Helper shape.** Name, `bool` return, location right after `rb_zjit_singleton_class_p` and the bindgen
+allowlist line beside it match the precedent. `make zjit-bindgen` (after `rustup component add rustfmt`) left the
+tree clean. Not a macro: `RICLASS_FOR_REFINEMENT_P` is a `static inline` function in `internal/class.h`, which
+bindgen cannot bind without wrap-static support (no `wrap_static_fns` in the bindgen config, absent from
+`cruby_bindings.inc.rs`). That is the honest answer to "is there a better api?": the predicate exists, but a
+non-exported C wrapper in zjit.c is how ZJIT reaches static inline helpers. No `jit.c` (shared) placement: YJIT
+is not touched and one concern per PR rules it out. zjit.c compiles without warnings.
+
+**YJIT.** `gen_invokesuper_specialized` has the same three checks inline and counts `invokesuper_refinement`; it
+is correct. Moving it onto a shared `rb_jit_` helper would touch YJIT in a ZJIT PR, so leaving it is right;
+the reply can offer it as a follow-up if he wants.
+
+**Profiling-test failure.** `make -s zjit-test`: head 2,015 passed, 1 failed, 15 skipped; master 7db0202722
+2,013 passed, 1 failed, 15 skipped; both `test_profile_frames_during_direct_jit_to_jit_entry` SIGABRT. Run alone,
+6/6 pass on master and 6/6 on head. Pre-existing and load-dependent; the item note's "fails 5 of 6 completed
+runs" when run alone did not reproduce here.
+
+**Text, sentence by sentence.**
+- Commit message: accurate. Optional: "When a refined method is called" — elsewhere in ZJIT "refined" means
+  `VM_METHOD_TYPE_REFINED` (`cruby_methods.rs`, the super-target stat `refined`), and Ruby's refinements doc says
+  "refinement method"; the reason string "super: call from a refined method" has the same ambiguity. Not blocking.
+- Body: "The check is the interpreter's own `RICLASS_FOR_REFINEMENT_P`, exposed through a small helper in
+  `zjit.c`." accurate. The next sentence, "The VM helper preserves…", now reads as if it meant the zjit.c helper;
+  say "The VM's super lookup preserves…".
+- Reply 1: accurate about content; must point at the baseline commit after must-fix 1.
+- Reply 2: "the interpreter uses `RICLASS_FOR_REFINEMENT_P` in `vm_search_normal_superclass`" true. "ZJIT now
+  calls that macro" false: function. Suggested wording below.
+- For Thomas (German): "es gibt nur noch eine Definition der Regel" is false while YJIT keeps its copy; say ZJIT
+  nutzt jetzt dieselbe Prüfung wie der Interpreter, statt sie nachzubauen. "C-Makro" → C-Funktion.
+
+Suggested replies:
+
+> Added `test_invokesuper_from_refined_method_remains_invokesuper` in `hir/opt_tests.rs` as a separate first
+> commit with the current HIR, so the fix commit shows the change: before, `R2#foo` inlines `R1#foo`
+> (`PushInlineFrame`); after, it stays `InvokeSuper` with `SuperFromRefinement`.
+
+> YJIT has the same three checks inline in `gen_invokesuper_specialized`. The interpreter's version is
+> `RICLASS_FOR_REFINEMENT_P` in `internal/class.h`, which `vm_search_normal_superclass` uses, but it is
+> `static inline`, so bindgen can't reach it. ZJIT now calls it through `rb_zjit_iclass_for_refinement_p` in
+> `zjit.c`, like `rb_zjit_singleton_class_p`. I left YJIT's copy alone to keep this PR to ZJIT.
+
+Not run: full test-all, btest, hosted CI, arm64.
+
 ### Z11 on three census apps
 
 Campfire, Fizzy and Writebook are census apps. Their own suites above are Z11's comparison (interpreter against

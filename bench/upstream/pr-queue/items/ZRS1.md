@@ -179,6 +179,38 @@ passes:
       under DECISIONS. The German explanation should say ZJIT no longer duplicates the predicate, not
       that only one definition exists globally while YJIT retains its copy. Drafts left unchanged for
       Thomas; no Ruby push or external post. Final exact-head invokesuper rerun and limitations in record.
+  - reviewer: thermos-opus
+    orb: T-01a1f051-f32b-7206-936f-08a375829cc1
+    head: "7a1eed11f443881206906acf4efc95ee7f8b7715"
+    date: 2026-11-18
+    verdict: changes
+    open: >-
+      Source is correct; two must-fixes in how the PR answers the review. Both Thermos rubrics applied
+      directly in this thread, no subagents or other threads, no contact with the Sol reviewer.
+      (1) The PR does not show the before/after HIR tekknolagi asked for: the one commit adds only the
+      after snapshot. His own ZJIT PRs put the current HIR in a first baseline-test commit and let the
+      fix commit change it (ruby/ruby#19770 47557025d5 then f4e44fad2d, #19594 3b150a90ff, #19585
+      9982455489). Smallest fix: split into two commits on 7db0202722. The first adds only
+      test_invokesuper_from_refined_method_remains_invokesuper with master's snapshot (PatchPoint on
+      Unknown@, PushInlineFrame of R1#foo, inner InvokeSuper). The second is today's tree, so its
+      opt_tests.rs diff is exactly the before/after. Checked: the baseline passes on master and the
+      head tree passes. Then reword the first reply and body sentence 4 to point at it.
+      (2) The body keeps the suite-count and SIGPROF sentences, which DECISIONS lists under Leave out. Cut
+      them when the body is patched. Nits: reply 2 and For Thomas call RICLASS_FOR_REFINEMENT_P a macro, but it
+      is a static inline function that bindgen cannot bind, which is the real answer to "better API?".
+      "The VM helper" right after "a small helper in zjit.c" has an unclear referent. The German "nur
+      noch eine Definition" is false while YJIT keeps its copy. Optional: "refined method" means
+      VM_METHOD_TYPE_REFINED elsewhere in ZJIT (cruby_methods.rs, super-target stats "refined"); Ruby's
+      docs say "refinement method". Guard exact: outside RICLASS_FOR_REFINEMENT_P,
+      vm_search_normal_superclass is ZJIT's RCLASS_SUPER(RCLASS_ORIGIN(klass)). A 14-scenario asymmetric
+      probe matches the interpreter in default, z1, z2 and zmv on head. On master 7 diverge in every
+      ZJIT mode, including z1. Covered: refined class, refined module, prepend/include under the refined
+      class, send, Method, mixed callers. Lexical chaining, bind_call and controls are unchanged. Both new
+      tests fail without the guard; make zjit-bindgen gives no diff. Helper name, location next to
+      rb_zjit_singleton_class_p and the bindgen line are right; YJIT left alone is right (one concern
+      per PR). The profiling SIGABRT also occurs in master's full run; alone it passes 6/6 on both, not
+      the builder's 5 of 6 failures. Details: docs/upstream/zjit-differential.md, ZRS1 Opus review of
+      7a1eed11f4. No Ruby push or external post.
 ---
 
 # ZJIT: Don't specialize super from a refined method
