@@ -4,35 +4,43 @@ repo: rmosolgo/graphql-ruby
 kind: perf
 area: Schema::Warden type and field caches
 reviewer: rmosolgo
-branch: thomasklemm/warden-name-caches
-head: "4337055468"
+branch: thomasklemm/warden-name-caches-by-value
+head: "4a77cd59bfed27d21f2787c70603850e70853e3a"
 base: master
-built_on: "2e8473ea7d"
+built_on: "9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "validate - fields will merge -43% Ir, big query -7.5%, abstract fragments -8.7%; Zammad replay -0.6%"
+impact: "every schema without `use GraphQL::Schema::Visibility` (the default; the install generator doesn't add it) validates through the Warden: tracked validate benchmarks -7.5% (big query), -7.9% (abstract fragments), -43.0% (fields will merge) Callgrind Ir; execution within 1%; Zammad replay -0.64% (2026-11-05, earlier master)"
 rank: 1
-risky: false
-state: held
+risky: true
+state: built
 pr:
-note: "Ir: fields-will-merge -43.2%, big query -7.5%, abstract fragments -8.7%, execute_next introspection -1.2%, legacy big-schema introspection +0.56%, Zammad replay -0.64%; tests green except dataloader timing flakes, srb tc and rubocop clean; held: behaviour change, not exact: .get_field/Schema.get_type overrides run once per name per query, not per AST node (exec/exprobe2.rb); opens only if Thomas wants it posted as that"
+note: "2026-11-18: rebuilt as a PR on master 9c9f8f2 (Thomas wants a PR, not an issue), to open as a draft after a deep Astra review the coordinator arranges. Plain by-value cache kept: master's Visibility::Profile already calls `.get_field(name, context)` once per name per query and caches type/field results by name (#5586, merged by rmosolgo); an override-detecting exact variant would be a guard he wouldn't write (DECISIONS, guards in the target repo's idiom). The hook contract change is stated in the body. risky: caching plus a documented-hook behaviour change. The regression test counts calls of the documented `.get_field`/`Schema.get_type` hooks, which is the contract this changes (DECISIONS forbids internal call counts; these are public hooks). Record: docs/upstream/graphql-ruby.md#gq1-as-a-pull-request-2026-11-18, data bench/upstream/graphql_ruby/gq1-pr/. Old branch thomasklemm/warden-name-caches 4337055468 (on 2e8473ea7d) superseded, left on the fork."
 passes:
   - {reviewer: skeptic, head: "5cb15cfdd1", date: 2026-11-05, verdict: changes, open: "context-dependent get_field overrides see one call per name per query; different execute result when a resolver mutates context (exprobe2.rb); comment reworded in 4337055468 (same code)"}
 ---
 
 # Cache Warden type and field lookups by name
 
-Warden caches `get_type` and `get_field` by name, but compares names by identity. Every AST node carries its own name String, so the cache misses on every node, and validating a field repeats `Schema.get_field` and its visibility checks each time the field appears.
+`Warden#get_type` and `Warden#get_field` cache lookups by name but compare names by identity. Each AST node has its own name String, so the cache misses on every node: validating `{ a: thing { name } b: thing { name } }` runs `Schema.get_field` and the visibility checks for `name` twice. This is the default path for schemas without `use GraphQL::Schema::Visibility`.
 
-This compares names by value, as `Visibility::Profile` already does. Results and `visible?` calls stay the same. One thing changes: a type's `.get_field` override, or `Schema.get_type`, now runs once per name per query instead of once per node, so it sees the context of the first lookup.
+This compares names by value. A type's `.get_field` override and `Schema.get_type` now run once per name per query, as `.get_field` overrides already do with `Visibility`, so an override that reads context a resolver changes mid-query keeps its first answer.
 
-| `rake bench:validate` | master | this PR |
+Callgrind instructions per call, Ruby 4.0, no JIT:
+
+| | master | this PR |
 | --- | ---: | ---: |
-| fields will merge | 36–37 i/s | 70–72 i/s |
-| big query | 136–137 i/s | 156–161 i/s |
-| introspection | 1.12–1.13k i/s | 1.34k i/s |
+| validate - fields will merge | 226.8M | 129.2M |
+| validate - big query | 35.3M | 32.6M |
+| validate - abstract fragments | 2.38M | 2.20M |
 
----
+The execution benchmarks move by less than 1% either way.
 
-<sub>Found while profiling graphql-ruby for ruby/ruby-bench ([record](https://github.com/thomasklemm/lowrail/blob/8e699a82a8888c0ab0480402fca100a70438d4b6/docs/upstream/graphql-ruby.md#gq1-warden-name-caches-compare-by-value-held)).</sub>
+## For Thomas
+
+Die Warden von graphql-ruby (Standard für jedes Schema ohne `use GraphQL::Schema::Visibility`, also die meisten Apps) merkt sich Typ- und Feld-Lookups pro Name, vergleicht den Namen aber nach Objektidentität. Jeder Knoten im Query-Dokument hat seinen eigenen String, also trifft der Cache nie, und jedes `name` im Dokument fragt das Schema erneut. Der PR vergleicht nach Wert: drei Zeilen Code plus ein Test. Validierung wird 7,5–43% billiger (Callgrind), Ausführung bewegt sich unter 1%.
+
+Der Haken, offen im Body: Wer `.get_field` auf einem Typ oder `Schema.get_type` überschreibt (dokumentierter Hook), sieht diesen Aufruf jetzt einmal pro Name und Query statt einmal pro Vorkommen. Liest der Override Context, den ein Resolver mitten in der Query ändert, bleibt die erste Antwort. Genau so verhält sich `Visibility::Profile` heute schon (geprüft auf master), und rmosolgo hat dort selbst ein Name-Caching gemergt (#5586). Darum keine Sonderbehandlung für überschriebene Hooks: das wäre ein Guard, den er nicht schreiben würde.
+
+Zu entscheiden: nur, ob der Draft nach dem Astra-Review so aufgeht.

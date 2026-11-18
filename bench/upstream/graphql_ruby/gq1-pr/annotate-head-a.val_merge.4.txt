@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file 'head-a.val_merge.4.out' (creator: callgrind-3.24.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 802431588
+Trigger: Program termination
+Profiled target:  /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -rbundler/setup /home/user/workspace/repo/.amp/in/orb-backup/gq1/ex.rb val_merge 4 (PID 67420, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+3,811,460,725 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+220,678,021 ( 5.79%)  vm.inc:vm_exec_core'2
+196,807,215 ( 5.16%)  vm_insnhelper.c:vm_exec_core'2
+110,313,170 ( 2.89%)  encoding.c:rb_enc_mbclen
+102,840,409 ( 2.70%)  ./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 98,980,420 ( 2.60%)  prism/prism.c:parser_lex
+ 89,942,428 ( 2.36%)  vm_insnhelper.c:vm_call_cfunc_with_frame_'2
+ 86,592,882 ( 2.27%)  insns.def:vm_exec_core'2
+ 61,204,043 ( 1.61%)  enc/utf_8.c:mbc_enc_len
+ 55,425,425 ( 1.45%)  file.c:rb_file_expand_path_internal
+ 52,305,331 ( 1.37%)  ./malloc/./malloc/malloc.c:free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 51,881,550 ( 1.36%)  file.c:rb_file_expand_path_internal'2
+ 50,163,556 ( 1.32%)  compile.c:iseq_setup
+ 44,567,621 ( 1.17%)  siphash.c:ruby_sip_hash13
+ 44,074,758 ( 1.16%)  st.c:rb_st_lookup
+ 40,086,465 ( 1.05%)  string.c:rb_str_set_len
+ 39,786,030 ( 1.04%)  regexec.c:match_at
+ 39,417,115 ( 1.03%)  ./malloc/./malloc/malloc.c:calloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 38,478,191 ( 1.01%)  vm_insnhelper.c:vm_call_ivar
+ 37,486,995 ( 0.98%)  vm_callinfo.h:vm_exec_core'2
+ 37,235,658 ( 0.98%)  prism/util/pm_constant_pool.c:pm_constant_pool_insert_shared
+ 32,989,578 ( 0.87%)  prism/util/pm_newline_list.c:pm_newline_list_line
+ 32,831,535 ( 0.86%)  gc.c:rb_gc_writebarrier
+ 31,180,121 ( 0.82%)  ./include/ruby/internal/special_consts.h:vm_exec_core'2
+ 31,170,729 ( 0.82%)  ./shape.h:vm_exec_core'2
+ 28,116,449 ( 0.74%)  vm_insnhelper.c:rb_vm_opt_getconstant_path
+ 27,981,092 ( 0.73%)  ./malloc/./malloc/malloc.c:_int_free_chunk [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 27,438,816 ( 0.72%)  vm_eval.c:clear_method_cache_by_id_in_class.part.0
+ 26,260,585 ( 0.69%)  ./malloc/./malloc/malloc.c:malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 23,220,002 ( 0.61%)  vm.c:invoke_block_from_c_bh'2
+ 21,100,529 ( 0.55%)  compile.c:iseq_peephole_optimize
+ 20,321,103 ( 0.53%)  ./malloc/./malloc/malloc.c:malloc_consolidate [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 19,760,041 ( 0.52%)  hash.c:rb_hash_aref
+ 19,707,329 ( 0.52%)  compile.c:new_insn_core
+ 19,577,357 ( 0.51%)  vm_insnhelper.c:vm_search_super_method
+ 19,070,317 ( 0.50%)  st.c:find_table_entry_ind

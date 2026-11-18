@@ -1,0 +1,9 @@
+{"d":"{ a: thing { name } becomeStaff b: thing { name } }","r":{"data":{"a":{"name":"n"},"becomeStaff":true,"b":{"name":"n"}}},"calls":1,"log":{"Thing.get_field(name) staff=nil":1}}
+{"d":"{ a: thing { name } b: thing { name } c: thing { name } }","r":{"data":{"a":{"name":"n"},"b":{"name":"n"},"c":{"name":"n"}}},"calls":1,"log":{"Thing.get_field(name) staff=nil":1}}
+{"d":"{ thing { ...F } } fragment F on Thing { name }","r":{"data":{"thing":{"name":"n"}}},"calls":1,"log":{"Thing.get_field(name) staff=nil":1}}
+[:get_type_calls_after_validate, 1]
+[:get_type_calls_after_2_more, 1]
+[:field_after_ctx_mutation, "Thing.staffName"]
+[:fresh_field_before, nil]
+[:fresh_field_after_mutation_new_string, nil]
+[:fresh_field_after_mutation_same_literal, nil]

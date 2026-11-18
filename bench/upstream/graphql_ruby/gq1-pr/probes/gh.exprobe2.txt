@@ -1,0 +1,2 @@
+{"d":"{ a: node { staffName } dropStaff b: node { staffName } }","r":{"data":{"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"staff"}}},"log":["Thing.get_field(staffName) staff=true"]}
+{"d":"{ a: node { ... on Named { staffName } } dropStaff b: node { ... on Named { staffName } } }","r":{"data":{"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"staff"}}},"log":["Thing.get_field(staffName) staff=true"]}

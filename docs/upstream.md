@@ -20,7 +20,7 @@ PRs) and [second round 2026-11-17](upstream/pr-retrospective-2026-11-17.md) (105
 
 [Leads outside rails/rails](upstream/outside-rails-leads.md) ranks request costs in gems whose repos have room,
 with Ruby's default gems counted on their own: rack decoding and escaping through `cgi/escape` (RK3, RK4; −0.6% to
-−5.2% per request with a query, form or cookie), nokogiri's per-call CSS translation (NK2), graphql-ruby's held GQ1
+−5.2% per request with a query, form or cookie), nokogiri's per-call CSS translation (NK2), graphql-ruby's GQ1 (built as a PR 2026-11-18, not opened)
 and ruby/uri underneath (UR1, parked). RK3 and RK4 are built (2026-11-18) as queue item RK3 on the fork,
 not opened: −1.0% to −5.1% per request in the interpreter and −2.8% to −9.8% under YJIT, exact by differential.
 

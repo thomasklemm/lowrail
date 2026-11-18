@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file 'head-a.exe_intro_big.6.out' (creator: callgrind-3.24.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 2347718819
+Trigger: Program termination
+Profiled target:  /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -I/home/user/w/gh/lib /home/user/workspace/repo/.amp/in/orb-backup/gq1/ver.rb exe_intro_big 6 (PID 68516, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                      
+--------------------------------------------------------------------------------
+13,339,803,343 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+1,815,934,806 (13.61%)  vm.inc:vm_exec_core'2
+1,668,567,022 (12.51%)  vm_insnhelper.c:vm_exec_core'2
+  744,484,518 ( 5.58%)  insns.def:vm_exec_core'2
+  379,272,896 ( 2.84%)  vm_insnhelper.c:vm_call_cfunc_with_frame_'2
+  277,503,880 ( 2.08%)  vm_insnhelper.c:vm_call_ivar
+  266,089,487 ( 1.99%)  vm_callinfo.h:vm_exec_core'2
+  230,764,143 ( 1.73%)  vm_args.c:args_setup_kw_parameters
+  222,929,982 ( 1.67%)  vm_insnhelper.c:vm_invoke_iseq_block
+  221,092,405 ( 1.66%)  vm_insnhelper.c:vm_call_iseq_setup_normal_0start
+  211,924,583 ( 1.59%)  vm_args.c:setup_parameters_complex
+  210,861,394 ( 1.58%)  ./include/ruby/internal/special_consts.h:vm_exec_core'2
+  196,295,283 ( 1.47%)  shape.c:rb_shape_get_iv_index_with_hint
+  170,994,257 ( 1.28%)  vm_insnhelper.c:rb_vm_opt_getconstant_path
+  169,954,884 ( 1.27%)  vm_insnhelper.c:vm_lookup_cc
+  159,143,811 ( 1.19%)  vm_insnhelper.c:vm_sendish.constprop.0'2
+  155,591,801 ( 1.17%)  gc.c:rb_gc_writebarrier
+  149,253,370 ( 1.12%)  vm_core.h:rb_vm_check_ints
+  139,666,042 ( 1.05%)  siphash.c:ruby_sip_hash13
+  131,461,725 ( 0.99%)  vm_insnhelper.c:vm_call_iseq_setup
+  122,104,762 ( 0.92%)  ./shape.h:vm_exec_core'2
+  121,455,630 ( 0.91%)  st.c:rb_st_lookup
+  118,832,652 ( 0.89%)  vm_insnhelper.c:CALLER_SETUP_ARG
+  112,880,383 ( 0.85%)  vm_insnhelper.c:vm_call_iseq_setup_normal_0start_0params_0locals
+  105,140,029 ( 0.79%)  hash.c:rb_hash_aref
+   94,523,861 ( 0.71%)  vm_insnhelper.c:vm_callee_setup_arg
+   93,850,863 ( 0.70%)  vm_insnhelper.c:vm_call_iseq_setup_normal_opt_start
+   93,716,089 ( 0.70%)  hash.c:ar_update
+   91,055,193 ( 0.68%)  vm_insnhelper.c:vm_search_cc
+   89,129,486 ( 0.67%)  symbol.c:rb_id2sym
+   80,176,726 ( 0.60%)  id_table.c:rb_managed_id_table_lookup
+   79,345,513 ( 0.59%)  vm.c:invoke_block_from_c_bh'2
+   78,882,184 ( 0.59%)  vm_args.c:vm_caller_setup_arg_block.constprop.0
+   74,189,020 ( 0.56%)  ./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+   70,604,316 ( 0.53%)  prism/prism.c:parser_lex
+   70,590,130 ( 0.53%)  vm_insnhelper.c:vm_call_attrset_direct.constprop.0

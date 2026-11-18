@@ -299,6 +299,72 @@ Name und Query“ der gewollte Hook-Vertrag (der Guide sagt schon, Schema-Elemen
 nimmt er dann den PR, oder will er die Aufrufe pro Knoten behalten oder eine andere Form? Zu entscheiden: ob das Issue
 so gepostet wird. Ein neues Issue braucht dein OK (DECISIONS, Upstream etiquette).
 
+Superseded the same day by the PR below (Thomas wants a PR, not an issue); the issue is not posted.
+
+### GQ1 as a pull request (2026-11-18)
+
+Branch [`thomasklemm/warden-name-caches-by-value`](https://github.com/thomasklemm/graphql-ruby/tree/thomasklemm/warden-name-caches-by-value)
+@ `4a77cd59bf`, one commit on master `9c9f8f28cc` (2026-11-17), queue item
+[GQ1](../../bench/upstream/pr-queue/items/GQ1.md) (`built`, `risky`; opens as a draft after a deep Astra review). Not
+opened. Data: [gq1-pr](../../bench/upstream/graphql_ruby/gq1-pr).
+
+**Who it reaches.** Master still validates and executes through the Warden by default: `Schema.use_visibility_profile?`
+is false unless the schema has `use GraphQL::Schema::Visibility` (schema.rb L857–865; `Query#prepare_ast` builds
+`schema.warden_class.new`, query.rb L599), and the install generator's schema template doesn't add
+it. `Visibility::Profile` replaces the Warden only for schemas that opt in. So the change reaches every schema that
+hasn't migrated to `Visibility`. The body says so in one sentence.
+
+**Shape.** I looked for an exact variant a maintainer would accept, such as keeping per-selection calls when a type
+overrides `.get_field` or the schema overrides `get_type`. It would need an override check on every type's method
+owner (and on app base classes that include their own modules), which is a guard rmosolgo wouldn't write
+(DECISIONS, guards in the target repository's idiom). His own code already settled the contract: master's
+`Visibility::Profile#@cached_parent_fields` calls `type.get_field(field_name, @context)` once per name per query,
+by value (profile.rb L119–123, since 2024), and #5586 ("Cache field and type lookups in Visibility::Profile",
+Scott Walkinshaw, merged by rmosolgo 2026-03-25) added by-value type and field result caches. Running the hook probes
+on master with `use GraphQL::Schema::Visibility` gives exactly the branch's answers and call counts
+(`gq1-pr/probes/`). With named or preloaded profiles, which are shared between queries, Visibility calls the hook
+even less often. So the plain by-value cache stays, and the body states the hook contract change in one sentence.
+The helper is `read_through_by_name`, next to `read_through`, without a comment (the test protects it); the earlier
+branch's one-line comment is gone. Described out loud: "look up a type by its name; look up a field by its owner
+type, then by its name; names are compared by their characters, owner types by identity."
+
+**Test.** `warden_spec.rb`, `describe "#get_type and #get_field"`, beside rmosolgo's own `#loadable_possible_types`
+spec (42f9fab995) and in its style: a schema with `self.use_visibility_profile = false`, a type overriding
+`.get_field` and a schema overriding `.get_type`, both recording the names they are asked for in the query context;
+validating `{ a: thing { ... on Thing { name } } b: thing { ... on Thing { name } } }` must ask for `name` once and
+`Thing` once. On master it fails with `["name", "name"]`; with only the `get_type` half reverted it fails with
+`["Thing", "Thing", "Thing", "Thing"]`, so each half is covered. It counts calls of the two documented hooks, which
+is the contract this changes, not internal state (DECISIONS, tests check behaviour).
+
+**Tests on the head.** `SERIAL=1 rake test`: 2,735 tests, 0 failures, 13 skips. `SERIAL=1 GRAPHQL_CPARSER=1`: 2,783,
+0 failures. `SERIAL=1 GRAPHQL_FUTURE=1`: 2,735, 0 failures. rubocop on both files and `srb tc` clean. Ruby 4.0.9.
+
+**Differential probes** (`gq1-pr/probes/`, master vs head): `exec/wprobe.rb` (results, validation errors,
+deprecation warnings, `visible?` hook counts; 3,199 lines) byte-identical with the Ruby and the C parser.
+`exec/exprobe2.rb` and `exec/hookprobe.rb` differ only as expected: `.get_field`/`Schema.get_type` run once per name
+per query, and in exprobe2 `b` answers `staff` instead of `alt`. master with `Visibility` answers like the head.
+
+**Callgrind on the exact head** (`gq1-pr/table.txt`, raw per-process totals in `raw.txt`, top functions of
+val_merge and exe_intro_big in `annotate-*`). Ruby 4.0.9 interpreter, fixed heap, per-iteration Ir from two
+iteration counts, two processes per revision (A/A):
+
+| scenario | master (A/A) | head (A/A) | change |
+| --- | ---: | ---: | ---: |
+| validate - fields will merge (tracked) | 226,793,625 (0.10%) | 129,171,347 (0.11%) | **−43.04%** |
+| validate - big query (tracked) | 35,254,826 (0.05%) | 32,607,049 (0.06%) | **−7.51%** |
+| validate - abstract fragments (tracked) | 2,382,214 (0.99%) | 2,195,050 (0.28%) | **−7.86%** |
+| validate - introspection (`bench:validate`) | 3,741,024 (0.19%) | 3,276,698 (1.11%) | −12.41% |
+| execute - introspection (tracked, Next) | 51,788,972 (0.09%) | 51,300,579 (0.04%) | −0.94% |
+| execute - small query on large schema (tracked) | 807,912 (1.43%) | 810,357 (1.19%) | +0.30%, within A/A |
+| execute - large result (tracked) | 284,291,331 (0.11%) | 284,146,022 (0.17%) | −0.05%, within A/A |
+| legacy interpreter, Jazz introspection | 189,694,071 (0.10%) | 190,298,386 (0.15%) | +0.32% |
+| legacy interpreter, big-schema introspection | 1,320,018,223 (0.09%) | 1,325,653,362 (0.08%) | +0.43% |
+
+The same picture as round 2 on `2e8473ea7d`. The legacy-interpreter introspection rows cost a little more because
+there the identity cache already hit for the repeated nodes of one document, and hashing the String costs more; the
+body covers them with "the execution benchmarks move by less than 1% either way". No wall-time claim. The Zammad
+replay (−0.64%) was not rerun on this master and is not in the body.
+
 ## Rejected
 
 - **`Schema.default_logger` memoization.** Without Rails, every query builds `Logger.new($stdout)`, and the
