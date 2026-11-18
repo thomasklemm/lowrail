@@ -223,6 +223,37 @@ That needs the caller to know F's final inlining depth, which changes when F rec
 still need a check at entry. Stop here unless tekknolagi wants the caller-side version, or #1023's
 virtual inline frames change the costs. No comment draft: there is no result worth reporting on the issue.
 
+## Our open ZJIT PRs after ruby/ruby#17864 (checked 2026-11-18)
+
+#17864 (merged as `825d71e673`) force-inlines the `Primitive.inline_block` methods (`Array#each`/`map`/`select`/
+`find`/`each_index`, `Integer#times`/`upto`/`downto`, `Kernel#tap`/`then`/`loop`). Each PR head was merged into
+`825d71e673` as a scratch tree (`--enable-zjit=dev`, nothing pushed), then tested with `make zjit-test` and btest at
+`--zjit-call-threshold=1`:
+
+| PR | item | zjit-test | btest t=1 | effect on new master |
+| --- | --- | --- | --- | --- |
+| #19659 surplus yield args | RUBY19659 | 2023/2024 | 2148/2148 | still there, now in the inlining caller |
+| #19912 Symbol block args | ZS1 | 2029/2030 | 2148/2148 | still there |
+| #19976 super from refinement | ZRS1 | 2015/2016 | 2148/2148 | unaffected |
+| #19982 objtostring recompile | OTS1 | 2015/2016 | 2148/2148 | unaffected |
+| #19680 may_write_block_code cache | ZWB1 | 2014/2015 | 2148/2148 | unaffected |
+| #19681 caller-saved regs | RUBY19681 | 2014/2015 | 2148/2148 | unaffected |
+
+The one zjit-test failure in every run is `test_profile_frames_during_direct_jit_to_jit_entry`, the known SIGPROF
+test. It fails on master `825d71e673` alone too (2013/2014). No snapshot moved, and no PR needs a rebuild. All six
+also merge clean with master `a4beace140` (a `vm_eval.c` fix, not rebuilt).
+
+* **#19659.** On master without the PR, `n.times { }`, `a.each { }`, `0.then { }` and `yield(1, 2)` into `{ |a| }`
+  still go through generic invokeblock (`InvokeBlock: not yet specialized`). Dynamic sends per 2,000-iteration probe:
+  5,998 / 5,997 / 1,999 / 1,999 on master, 0 with the PR. Since `times`/`each` are now inlined, the PR's
+  `InvokeBlockIseqDirect argc=1` shows up directly in the caller's HIR. The controls with a block param
+  (`times { |i| }`, `each { |x| }`) are direct on both.
+* **#19912.** On master, `a.map(&:succ)`, `each`, `times`, `then` and an ISEQ `foo(&:succ)` are still a `Send` with
+  "block argument is not nil", and `a.reject(&:odd?)` is "Complex argument passing". With the PR they become
+  `SendDirect` / `CCallWithFrame`, one dynamic send fewer per call. The Symbol-block call stays a `SendDirect` and is
+  not force-inlined, and the yield to the Symbol block handler inside the callee stays generic on both, as the
+  commit message says.
+
 ## How we take an item
 
 1. Measure the Rails effect first (ruby-bench counters, Callgrind with A/A), and check for a stated ask.
