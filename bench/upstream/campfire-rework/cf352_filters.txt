@@ -1,0 +1,11 @@
+# bin/rails runner bench/upstream/campfire-rework/cf352_filters.rb, RAILS_ENV=test, Ruby 4.0.9 (no JIT), orb a1.medium,
+# basecamp/once-campfire main 7b80988 with the two filter files swapped per row, two runs each, in this order.
+main r1: 684.5 µs/message
+main r2: 673.4 µs/message
+lean (pre-check + set walk) r1: 236.0 µs/message
+lean (pre-check + set walk) r2: 234.3 µs/message
+-2 (no pre-check + set walk) r1: 247.4 µs/message
+-2 (no pre-check + set walk) r2: 248.3 µs/message
+no pre-check, old selector r1: 374.2 µs/message
+no pre-check, old selector r2: 357.1 µs/message
+main r3: 694.6 µs/message
