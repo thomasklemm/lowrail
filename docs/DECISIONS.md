@@ -223,6 +223,10 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   `script/pr-queue rebase ID --push` on an open PR without asking first.
 * **Approved and unmerged after 14 days:** one short, neutral note on a weekday (Thomas), never asking anyone to
   merge. Once per PR.
+* **Guards in the target repository's idiom** (Thomas, 2026-11-18): a guard uses the target repository's own idiom
+  and protects the documented contract and real callers, not arbitrary objects outside it. When we accept a
+  difference outside the contract, the body says so in one sentence. Sweep:
+  [guard-simplification-2026-11-18](upstream/guard-simplification-2026-11-18.md).
 
 ## Evidence and measurement
 
