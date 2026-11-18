@@ -40,7 +40,7 @@ RUBY
 cargo fetch --locked --manifest-path "$root/Cargo.toml"
 # Retain physical Rack-3-only gems, both blogs and the Rails component bundle
 # in the orb snapshot. Warm runs use the package managers' own checks.
-ruby "$root/script/gate" --prepare
+ruby "$root/script/gate" --prepare --recover
 # Amp and services start in new login shells, not this setup process.
 marker='# Lowrail orb toolchain'
 if ! grep -Fqx "$marker" "$HOME/.bash_profile" 2>/dev/null; then

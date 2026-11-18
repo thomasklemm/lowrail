@@ -207,7 +207,10 @@ the gem suite in each.
 Blogs generated before that pin say `"~> 8.1.4"`, so their bundles installed
 Rails 8.1.4.1 into the gate's gem home. `script/corpus` (and with it
 `script/gate --prepare`) refuses a `real-blog` whose Gemfile and lock do not
-both name the release. To clean such a checkout, delete
+both name the release, and `script/gate-gems` a home holding another Rails.
+Orb setup recovers on its own: `script/gate --prepare --recover` deletes a
+release's generated `real-blog` and gem home together when either is stale,
+then rebuilds both; plain `script/gate` keeps refusing. To clean by hand, delete
 `.corpus/real-blog` (it is generated, not retained), then either start a fresh
 gate home with `rm -rf .lowrail/gate-gems` or remove the newer Rails from the
 existing one:

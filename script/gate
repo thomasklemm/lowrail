@@ -14,11 +14,13 @@ if $PROGRAM_NAME == __FILE__
   root = File.expand_path("..", __dir__)
   options = {}
   OptionParser.new do |o|
-    o.banner = "Usage: mise exec ruby@4.0.7 -- script/gate [--prepare] [--output NEW_DIR]"
+    o.banner = "Usage: mise exec ruby@4.0.7 -- script/gate [--prepare [--recover]] [--output NEW_DIR]"
     o.on("--prepare", "Prepare prerequisites only (also used by orb setup)") { options[:prepare] = true }
+    o.on("--recover", "With --prepare: delete a release's generated real-blog and gem home when either holds another Rails") { options[:recover] = true }
     o.on("--output DIR", "Logs and JSON receipt; must not exist") { options[:output] = File.expand_path(_1) }
   end.parse!
   abort "unexpected arguments: #{ARGV.join(' ')}" unless ARGV.empty?
+  abort "--recover requires --prepare" if options[:recover] && !options[:prepare]
   abort "gate requires Ruby 4.0.7; use mise exec ruby@4.0.7 -- script/gate" unless RUBY_VERSION == "4.0.7"
   sha, status = Open3.capture2("git", "rev-parse", "HEAD", chdir: root)
   abort "cannot identify checkout" unless status.success?
@@ -94,6 +96,16 @@ if $PROGRAM_NAME == __FILE__
   receipt[:gem_homes] = releases.transform_values { _1.fetch(:home) }
   releases.each do |rails, release|
     home = release.fetch(:home)
+    blog = "#{release.fetch(:corpus)}/real-blog"
+    lines = ->(file) { File.file?(file) ? File.readlines(file, chomp: true) : [] }
+    stale_blog = File.exist?(blog) && !(lines.call("#{blog}/Gemfile").include?(%(gem "rails", "#{rails}")) &&
+      lines.call("#{blog}/Gemfile.lock").include?("    rails (#{rails})"))
+    mixed_home = Dir["#{home}/specifications/railties-*.gemspec"].any? { File.basename(_1) != "railties-#{rails}.gemspec" }
+    if options[:recover] && (stale_blog || mixed_home)
+      # The generated blog's bundle lives only in this home, so neither is rebuilt without the other.
+      puts "recover #{rails}: removing #{blog} and #{home}"
+      FileUtils.rm_rf([blog, home])
+    end
     prepare_home.call(home) unless File.directory?(home)
     %w[gems specifications].each do |component|
       Dir["#{home}/#{component}/rack-2.*", "#{home}/#{component}/rack-session-1.*"].each { FileUtils.rm_rf(_1) }
