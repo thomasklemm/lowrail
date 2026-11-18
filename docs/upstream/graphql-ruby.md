@@ -262,6 +262,43 @@ Tests: `rake test` 2,715 tests, 4 failures, all dataloader timing asserts (`asyn
 `nonblocking_dataloader_spec.rb:174/209`) under a loaded orb; `SERIAL=1 GRAPHQL_CPARSER=1 rake test` 2,705 tests,
 1 failure (`async_dataloader_spec.rb:300`). rubocop and `srb tc` clean.
 
+### Draft issue for rmosolgo (2026-11-18, not posted)
+
+Checked first: master `9c9f8f2` (2026-11-17) and the released 2.6.16 still have the identity-keyed `read_through`
+in `Warden#get_type`/`#get_field`; no open or closed issue or PR raises it (the nearest is rmosolgo's own
+[#5035](https://github.com/rmosolgo/graphql-ruby/issues/5035), "Audit `compare_by_identity` usage", closed; open PRs
+touching warden/visibility are #5905, #5865, #5821, all unrelated).
+
+Draft: [gq1-issue/issue.md](../../bench/upstream/graphql_ruby/gq1-issue/issue.md) (171 words of prose plus the
+script). The probe [probe.rb](../../bench/upstream/graphql_ruby/gq1-issue/probe.rb) runs against the released gem
+(`gem install graphql -v 2.6.16`), patches the Warden with GQ1's lookup and prints
+([probe.txt](../../bench/upstream/graphql_ruby/gq1-issue/probe.txt), Ruby 4.0.9; the ms are one wall-clock run):
+
+```
+graphql 2.6.16, Ruby 4.0.9
+as released:
+  validate 5000 x alt: Thing.get_field called 5000 times, 26.8 ms
+  {"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"alt"}}
+  Thing.get_field("staffName") called 2 times
+names cached by value:
+  validate 5000 x alt: Thing.get_field called 1 times, 9.9 ms
+  {"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"staff"}}
+  Thing.get_field("staffName") called 1 times
+```
+
+The difference needs the field selected through the interface (`node { staffName }`); with `... on Thing` both
+revisions answer `staff`.
+
+**For Thomas.** Die Warden von graphql-ruby merkt sich Typ- und Feld-Lookups pro Name, vergleicht den Namen aber nach
+Objektidentität. Jeder Knoten im Query-Dokument hat seinen eigenen String, also trifft der Cache nie, und jedes
+`hello` im Dokument fragt das Schema erneut. Nach Wert verglichen wird Validierung 7,5–43% billiger. Der Haken: Apps
+dürfen `.get_field(name, context)` auf einem Typ überschreiben (dokumentierter Hook), und der liefe dann nur noch
+einmal pro Name und Query statt einmal pro Knoten. Ändert ein Resolver mitten in der Query den Context, sieht der
+Hook die Änderung nicht mehr (im Skript: `b` liefert `staff` statt `alt`). Die Frage an rmosolgo: Ist „einmal pro
+Name und Query“ der gewollte Hook-Vertrag (der Guide sagt schon, Schema-Elemente würden pro Operation gecacht) und
+nimmt er dann den PR, oder will er die Aufrufe pro Knoten behalten oder eine andere Form? Zu entscheiden: ob das Issue
+so gepostet wird. Ein neues Issue braucht dein OK (DECISIONS, Upstream etiquette).
+
 ## Rejected
 
 - **`Schema.default_logger` memoization.** Without Rails, every query builds `Logger.new($stdout)`, and the

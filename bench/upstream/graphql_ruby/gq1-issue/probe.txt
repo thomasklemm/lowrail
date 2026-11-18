@@ -1,0 +1,9 @@
+graphql 2.6.16, Ruby 4.0.9
+as released:
+  validate 5000 x alt: Thing.get_field called 5000 times, 26.8 ms
+  {"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"alt"}}
+  Thing.get_field("staffName") called 2 times
+names cached by value:
+  validate 5000 x alt: Thing.get_field called 1 times, 9.9 ms
+  {"a":{"staffName":"staff"},"dropStaff":true,"b":{"staffName":"staff"}}
+  Thing.get_field("staffName") called 1 times
