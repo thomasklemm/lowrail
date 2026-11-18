@@ -1,13 +1,14 @@
 # Profile your own app: `lowrail-profile`
 
 `lowrail-profile` shows where your Rails app spends avoidable work in Rails, Ruby and gems, from inside the app:
-it counts the objects allocated per source line while the app serves requests (your own test suite, a list of
-paths, or any command that serves requests), and writes the same kind of report as the
+it counts the objects allocated per source line while the app serves requests (your own test suite, the requests
+of your `lowrail/workloads.rb`, or any command that serves requests), and writes the same kind of report as the
 [census](upstream/census.md): top lines by objects per request, grouped by gem, a noise floor from a repeat run,
 the app line that leads to each one, and matching entries of Lowrail's [contributions ledger](upstream/contributions.md).
 
-It is a prototype (option B). The census (option A) instead copies an app, boots it in production and replays
-described workloads; [below](#compared-with-the-census) compares the two.
+It is a prototype. The census (`script/census app`) instead copies an app, boots it in production and measures the
+same workloads file with an A/A pair, instructions, jobs and mailers; [Your own app](../README.md#your-own-app) says
+when to use which.
 
 Results are allocation counts, not timings. A line with many objects per request is a place to look, not a
 measured speedup.
@@ -25,15 +26,43 @@ Then, from the app directory:
 ```sh
 bundle exec lowrail-profile -- bin/rails test                      # Minitest: integration, controller, system tests
 bundle exec lowrail-profile -- bundle exec rspec spec/requests       # RSpec
+bundle exec lowrail-profile --record -- bin/rails test             # the same, and write lowrail/workloads.rb from it
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
-  bundle exec lowrail-profile --paths paths.txt                      # GETs through the full stack, closest to production
+  bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
 bundle exec lowrail-profile report                                   # rebuild the report from tmp/lowrail-profile
 ```
 
-`paths.txt` holds one request per line (`GET /articles`, or just `/articles`). `--paths` boots the app with
-`bin/rails runner` in the current `RAILS_ENV`, sends each path 10 times as warmup and 20 times counted, with a
-browser's `Accept`, `User-Agent` and `Sec-Fetch-Site` headers and the cookies earlier responses set, and aborts on
-any response outside 2xx/3xx. Use a disposable database: the command's requests are real requests.
+`--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
+`RAILS_ENV`, evaluates the [workloads file](upstream/census.md#workloads-file) after boot, and sends its requests
+10 times as warmup and 20 times counted, in file order, through the full middleware stack: with a browser's
+`Accept`, `User-Agent` and `Sec-Fetch-Site` headers under the file's own, its sign-in, CSRF tokens, alternates and
+blocks, and the cookies earlier responses set. A status outside a request's `expect:` aborts the run. Its mails and
+jobs, and the jobs its requests enqueue, are not run here (they need the census's capture); `workloads.json` in the
+output directory holds the file's manifest and lists what was replayed and what was not. Use a disposable database:
+the requests are real requests.
+
+`--record [FILE]` records, in the first run, the shape of every routed request: method, route, JSON or XHR, and for
+a write one request's params. It then writes the 20 most frequent shapes as a workloads file (default
+`lowrail/workloads.rb`, or `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's
+first row (`Article.first!`), GETs ready to run, writes commented out until they are made repeatable (a `setup`
+reset, `alternate:` or a block). Shapes are noted after the counting window closes, so recording does not change
+the counts. From the Blog's suite (21 tests, 12 requests) it writes:
+
+```ruby
+article = Article.first!
+comment = Comment.first!
+
+# 2 requests (a write: make it repeatable, then uncomment)
+# patch article_path(article), name: "PATCH /articles/:id", params: {"article" => {"body" => "Rails is a web application framework running on the Ruby programming language.", "title" => "Updated Title"}}
+# ...
+get articles_path, name: "GET /articles"
+get article_path(article), name: "GET /articles/:id"
+get edit_article_path(article), name: "GET /articles/:id/edit"
+get new_article_path, name: "GET /articles/new"
+```
+
+That file is what `script/census app` then measures as fixed workloads. `--paths FILE` is gone; a `paths.txt` line
+`GET /articles` is `get "/articles"` in the workloads file.
 
 Options: `--out DIR` (default `tmp/lowrail-profile`), `--runs N` (default 2; the last run is compared with the
 first as the noise floor), `--top N` (default 30), `--seed N` (default 1234, passed as `SEED` and `--seed` to both
@@ -90,6 +119,9 @@ Checked on Campfire's suite (634 tests, 2 forked workers, Rails main `4500a94c34
 * Every feature outside Lowrail and Bundler's own library loads in the same order in all three setups (3,236 files
   in the main process, 1,136 of them Rails). Listing a path gem adds Bundler's gemspec source and
   `rubygems/specification_policy.rb`; a released gem would not.
+* `--record` notes a request's shape after the counting window closes and requires `json` only at exit, when
+  Bundler has long set up. On the Blog's suite (21 tests, Rails 8.1.4) per-test outcomes are identical plain and
+  under `--record`.
 * Wall time: 14.8 s and 14.9 s profiled against 15.1 s plain (the suite's own "Finished in"). The hook costs about
   as much as the noise between runs here; heavier allocation paths will cost more.
 
@@ -107,9 +139,9 @@ the harness left out) are in the profile's top N. The census's own A/A overlap i
 | Blog, own suite, dev/test lines left out | 12 | 5 | 13 | 26 | 11 | |
 | Campfire, own suite (`bin/rails test`, 2 workers) | 666 | 6 | 13 | 30 | 5 | 20 (Rails 20) |
 | Campfire, own suite, dev/test lines left out | 666 | 9 | 17 | 37 | 8 | |
-| Blog, `--paths` with the census's 5 GETs, production, vs the census's 5 GET workloads | 100 | 9 | 16 | 45 | 19 | 20 (Rails 19) |
+| Blog, the census's 5 GETs replayed in production, vs the census's 5 GET workloads | 100 | 9 | 16 | 45 | 19 | 20 (Rails 19) |
 
-**Where they agree.** Lines both reach have nearly the same cost per request. With `--paths` in production the
+**Where they agree.** Lines both reach have nearly the same cost per request. Replaying the same GETs in production (then `--paths`, now `--workloads`; [below](#workloads-against---paths)), the
 counts match the census within about 1%: `useragent` `browsers/base.rb:120` 32.67 against 33.00,
 `output_safety.rb:245` 30.81 against 31.40, `sqlite3` `statement.rb:143` 18.66 against 19.00. The 1% is the warm
 column leaving out each line's first of 100 requests. On Campfire's suite the same `uri` and `rack` lines lead both
@@ -130,25 +162,22 @@ the census.
 * **The workload.** A suite requests what its tests need, not a request mix. In 5 of the Blog's 12 requests
   the suite reaches I18n lookups (with `MissingTranslation` fallbacks), so I18n lines lead its profile (`i18n/backend/base.rb:157` 39 per request
   against 17 in the census). Its tests send Rails' `Rails Testing` user agent, not a browser's, and the `useragent` lines that the
-  census (Firefox header, through the app's `allow_browser`) ranks 2nd and 3rd are absent; `--paths`, which sends the census's Firefox header, finds them at the census's cost. Compared only
-  with the census's GET workloads, the Blog suite overlaps in 2 of 20 lines, `--paths` in 16.
+  census (Firefox header, through the app's `allow_browser`) ranks 2nd and 3rd are absent; the replay, which sends the census's Firefox header, finds them at the census's cost. Compared only
+  with the census's GET workloads, the Blog suite overlaps in 2 of 20 lines, the replay in 16.
 * **Attribution.** Lines marked † are charged from Pathname and other `<internal:…>` code to their caller; the
   census keeps them on the internal line (`propshaft/helper.rb:113` 23.6 against 1.8 in production for this reason).
-* **Unexplained.** `uri/common.rb:465` (`_decode_uri_component`) costs 28.5 per GET in the census and 10.2 with
-  `--paths`; the census's rack-test cookie jar is a plausible cause, not checked.
+* **Unexplained.** `uri/common.rb:465` (`_decode_uri_component`) costs 28.5 per GET in the census and 10.2 in the
+  replay; the census's rack-test cookie jar is a plausible cause, not checked.
 
 The noise floor is small in every run: median |Δ| 0.0, max 1.17 objects per request over Campfire's top 40 lines
-(`json/common.rb:297`), 0.63 for the Blog's `--paths`, 0.0 for the Blog's suite.
+(`json/common.rb:297`), 0.63 for the Blog's replay, 0.0 for the Blog's suite.
 
-## Compared with the census
+## `--workloads` against `--paths`
 
-| | Census (`script/census`, option A) | `lowrail-profile` (option B) |
-| --- | --- | --- |
-| Setup for a user | Register the app (source, overlay, seed step, workload file), local services, production boot of a copy | Add one gem line, run one command; the suite's own database and fixtures |
-| Workload | Described requests, jobs and mails, warmed 50 times, production | Whatever the suite or path list requests, in its environment |
-| Finds | Production per-request cost, comparable across apps and Rails commits; jobs and mailers | The app's real request mix as tested, plus dev/test-mode costs, plus the app line that causes each one |
-| Accuracy against the census | It is the census | Same per-line counts for the same requests in production (within 1%); a test suite overlaps in 10–13 of the top 20, 13–17 without dev/test work |
-| Risks | Production boot of other people's apps often needs fixes; seeding and resets are per app | A native hook inside the user's process; test-mode costs can be mistaken for production ones; ledger matches are text matches; no jobs outside requests |
-
-Option B is the cheaper way for someone else to look at their own app; option A is still what a support or upstream
-claim needs, because only it fixes the workload, the mode and the Rails commit across apps.
+The Blog's census copy in production (Rails 8.1.4, Ruby 4.0.9; production mode turns YJIT on, the same for both),
+the five GETs once as `paths.txt` through the previous `--paths` and once as five `get` lines through
+`--workloads`: 100 counted requests each, 2,660.07 and 2,659.68 objects per request in the first run. The same
+878 lines are ranked, the top 10, 20 and 50 are the same lines, and no line differs by 0.5 objects per request or
+more (largest: `uri/common.rb:456` and `:465`, −0.35 and −0.33, against a noise floor of 0.18 and 0.30). The
+whole Blog file (its nine requests, writes included) replays as 180 counted requests; its job is listed as not
+replayed.

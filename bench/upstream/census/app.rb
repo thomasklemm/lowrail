@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 # script/census app: the census on an app outside the registered corpus.
-#   script/census app DIR [--name N] [--workloads FILE] [--prepare FILE] [--rails SPEC] [--ruby R]
-#     [--modes interp] [--env K=V] [--build CMD] [--db TASKS] [--no-assets] [--no-cpu] [--assume-service S] [--fresh]
+#   script/census app DIR [--init] [--name N] [--workloads FILE] [--prepare FILE] [--rails SPEC] [--ruby R]
+#     [--modes interp] [--env K=V] [--build CMD] [--db TASKS] [--no-assets] [--cpu|--no-cpu] [--assume-service S] [--fresh]
 # DIR is only read: the census works on a copy in .corpus/census-app-NAME and
 # writes under .lowrail/private/census-app/NAME. See docs/upstream/census.md.
 require_relative "app_report"
+require_relative "../../../gem/lib/lowrail/workloads"
 
 module CensusApp
   LOCAL_HOSTS = [nil, "", "localhost", "127.0.0.1", "::1"].freeze
@@ -23,11 +24,12 @@ module CensusApp
   def refuse(message) = raise(Refusal, message)
 
   def main(argv)
-    opts = { modes: %w[interpreter], env: {}, build: [], assume: [], cpu: true, assets: true }
+    opts = { modes: %w[interpreter], env: {}, build: [], assume: [], cpu: nil, assets: true }
     parser = OptionParser.new do |o|
       o.banner = "usage: script/census app DIR [options]  (docs/upstream/census.md#run-it-on-your-own-app)"
       o.on("--name N", "copy and output name (default: DIR's basename)") { opts[:name] = _1 }
-      o.on("--workloads FILE", "YAML (or .rb) workloads; default: GET pages discovered from the routes") { opts[:workloads] = File.expand_path(_1) }
+      o.on("--workloads FILE", "workloads file (default: DIR/lowrail/workloads.rb, else GET pages found from the routes)") { opts[:workloads] = File.expand_path(_1) }
+      o.on("--init", "write a starter DIR/lowrail/workloads.rb from the routes, then stop") { opts[:init] = true }
       o.on("--prepare FILE", "Ruby run inside the booted app to seed the copy's database (default: db/seeds.rb)") { opts[:prepare] = File.expand_path(_1) }
       o.on("--rails SPEC", "also measure on this Rails (main, a commit, OWNER/REPO@REF) next to the app's own") { opts[:rails] = _1 }
       o.on("--ruby R", "Ruby to measure on (default: the app's .ruby-version or Gemfile.lock)") { opts[:ruby] = _1 }
@@ -36,7 +38,7 @@ module CensusApp
       o.on("--build CMD", "shell command run in the copy before assets:precompile (repeatable)") { opts[:build] << _1 }
       o.on("--db TASKS", "database tasks (default: db:create db:schema:load, or db:migrate without a schema)") { opts[:db] = _1.split }
       o.on("--no-assets", "skip assets:precompile") { opts[:assets] = false }
-      o.on("--no-cpu", "objects only; skip the Callgrind instruction run") { opts[:cpu] = false }
+      o.on("--[no-]cpu", "instructions too (needs the patched Valgrind: script/cpu-census build); default: when it is built") { opts[:cpu] = _1 }
       o.on("--assume-service S", "do not require S (redis, memcached) to be running") { opts[:assume] << _1 }
       o.on("--fresh", "delete this app's copy and results first") { opts[:fresh] = true }
       o.on("--top N", Integer, "report: lines per ranking (default 15)") { opts[:top] = _1 }
@@ -63,14 +65,67 @@ module CensusApp
     out = File.join(root, ".lowrail/private/census-app", name)
     refuse "#{source} is inside the census copy" if source.start_with?(copy)
     FileUtils.rm_rf([copy, out]) if opts[:fresh]
+    refuse "#{opts[:workloads]}: YAML workloads were replaced by a Ruby file, lowrail/workloads.rb (docs/upstream/census.md#workloads-file)" if opts[:workloads]&.match?(/\.ya?ml\z/)
+    cpu = cpu?(opts) unless opts[:init]
     state = setup(source, name, copy, opts)
     services(copy, state, opts)
     bin = Census.ruby_bin(state.fetch("ruby"))
+    return init(source, name, copy, out, state, bin) if opts[:init]
+    sync_workloads(source, copy, out, opts)
+    opts = opts.merge(cpu: cpu)
     variants = [["own", state.fetch("base")]]
     variants << ["main", Census.resolve_rails(opts[:rails] == "main" ? "rails/rails@main" : opts[:rails])] if opts[:rails]
     variants.each { |label, rails| measure(name, copy, out, label, rails, bin, opts) }
     report = CensusAppReport.write(out, name, variants.map(&:first), state, top: opts[:top] || 15, refresh: opts[:refresh])
     puts "report: #{report.delete_prefix(root + "/")}"
+  end
+
+  def valgrind = File.join(ENV.fetch("VALGRIND_PREFIX", "/opt/c8-valgrind"), "bin/valgrind")
+
+  # Instructions are opt-in until the patched Valgrind is built (a long build, once).
+  def cpu?(opts)
+    built = File.executable?(valgrind)
+    refuse "--cpu needs the patched Valgrind at #{valgrind}: run script/cpu-census build once (VALGRIND_PREFIX picks another)" if opts[:cpu] && !built
+    return opts[:cpu] unless opts[:cpu].nil?
+    puts "instructions: off, objects only. Instructions need the patched Valgrind at #{valgrind}; build it once with " \
+      "script/cpu-census build, then rerun (or pass --no-cpu to silence this)." unless built
+    built
+  end
+
+  # The workloads file for this run, copied into the copy every run, so an
+  # edit after setup counts; results measured with another file are dropped.
+  def workloads_file(source, opts) = opts[:workloads] || [File.join(source, Lowrail::Workloads::PATH)].find { File.exist?(_1) }
+
+  def sync_workloads(source, copy, out, opts)
+    file = workloads_file(source, opts)
+    refuse "workloads file not found: #{file}" if file && !File.exist?(file)
+    dest = File.join(copy, ".census-app", "workloads.rb")
+    file ? FileUtils.cp(file, dest) : FileUtils.rm_f(dest)
+    digest = file ? Digest::SHA256.file(file).hexdigest : "discovered"
+    mark = File.join(out, "workloads.sha256")
+    if File.exist?(mark) && File.read(mark).strip != digest
+      puts "the workloads file changed since the last run; measuring again"
+      FileUtils.rm_rf(Dir[File.join(out, "*")])
+    end
+    FileUtils.mkdir_p(out)
+    File.write(mark, digest + "\n")
+    puts "workloads: #{file || "GET pages discovered from the routes (#{Lowrail::Workloads::PATH} or --workloads describes your own)"}"
+  end
+
+  # --init: discovery's pages as DIR/lowrail/workloads.rb, the one file this
+  # command writes into DIR, and only when it does not exist yet.
+  def init(source, name, copy, out, state, bin)
+    target = File.join(source, Lowrail::Workloads::PATH)
+    target = File.join(out, "workloads.rb") if File.exist?(target)
+    rails = state.fetch("base")
+    env = Census.env_for(name, bin, rails, Census.variant("census-app", name, rails, bin)).merge("CENSUS_MODE" => "interpreter")
+    scratch = File.join(copy, "tmp", "census-init.rb")
+    FileUtils.rm_f(scratch)
+    step(env, copy, "discovering the routes failed; CENSUS_DEBUG=1 prints the exception", "bundle", "exec", "ruby", Census::HARNESS, "init", name, scratch)
+    FileUtils.mkdir_p(File.dirname(target))
+    FileUtils.cp(scratch, target)
+    puts "wrote #{target}#{" (#{File.join(source, Lowrail::Workloads::PATH)} exists, so it is left as is)" if target.start_with?(out)}"
+    puts "edit it, then: script/census app #{source}"
   end
 
   # The copy: the app's tracked and untracked-but-not-ignored files (so
@@ -119,17 +174,15 @@ module CensusApp
     version = File.read(File.join(source, "Gemfile.lock"))[/^    railties \(([^)]+)\)/, 1]
     refuse "#{source}/Gemfile.lock has no railties; is this a Rails app?" unless version
     puts "copying #{source} to #{copy.delete_prefix(root + "/")} (#{copy_app(source, copy)} files)"
-    env = { "CENSUS_APP" => "1" }
-    { workloads: "workloads", prepare: "prepare" }.each do |key, base|
-      next unless opts[key]
-      refuse "#{key} file not found: #{opts[key]}" unless File.exist?(opts[key])
-      dest = File.join(copy, ".census-app", base + File.extname(opts[key]))
-      FileUtils.cp(opts[key], dest)
-      env["CENSUS_APP_#{key.upcase}"] = dest
+    env = { "CENSUS_APP" => "1", "CENSUS_APP_WORKLOADS" => File.join(copy, ".census-app", "workloads.rb") }
+    if opts[:prepare]
+      refuse "prepare file not found: #{opts[:prepare]}" unless File.exist?(opts[:prepare])
+      env["CENSUS_APP_PREPARE"] = File.join(copy, ".census-app", "prepare.rb")
+      FileUtils.cp(opts[:prepare], env["CENSUS_APP_PREPARE"])
     end
     rails = { "own" => true, "spec" => "own", "sha" => "own-#{version}", "version" => version }
     state = { "app" => name, "source" => source, "base" => rails, "ruby" => app_ruby(source, opts), "created" => Time.now.utc.iso8601,
-      "workloads" => opts[:workloads], "prepare" => opts[:prepare],
+      "prepare" => opts[:prepare],
       "conf" => { "env" => env.merge(opts[:env]), "services" => [], "assume" => opts[:assume] } }
     File.write(path, JSON.pretty_generate(state) + "\n")
     bin = Census.ruby_bin(state["ruby"])
@@ -149,6 +202,7 @@ module CensusApp
         "if the measured pages do not need compiled assets", "bundle", "exec", "rails", "assets:precompile")
     end
     harness = env.merge("CENSUS_MODE" => "interpreter")
+    sync_workloads(source, copy, File.join(root, ".lowrail/private/census-app", name), opts) unless opts[:init]
     step(harness, copy, "preparing data failed (#{opts[:prepare] || "db/seeds.rb"}); pass --prepare FILE",
       "bundle", "exec", "ruby", Census::HARNESS, "prepare", name)
     step(harness, copy, "a workload failed; CENSUS_DEBUG=1 prints the exception behind a bare 500",
@@ -259,8 +313,6 @@ module CensusApp
       end
     end
     return unless opts[:cpu]
-    valgrind = File.join(ENV.fetch("VALGRIND_PREFIX", "/opt/c8-valgrind"), "bin/valgrind")
-    return warn("instructions skipped: no patched Valgrind at #{valgrind} (script/cpu-census build)") unless File.executable?(valgrind)
     cpu = File.join(out, "cpu")
     return if labels.product(opts[:modes]).all? { |l, m| File.exist?(File.join(cpu, l, "#{name}-#{m}.json")) }
     FileUtils.rm_rf(labels.map { File.join(cpu, _1) })

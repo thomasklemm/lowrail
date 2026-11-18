@@ -18,12 +18,14 @@ attributes new allocations and SQL or behavior-control diffs to commits: [rails-
 `script/census app DIR` runs the census on any Rails app checkout and writes one report: objects and instructions
 per workload, each with its A/A pair, and the Rails, Ruby and gem lines that allocate and run the most, each with
 the open rails/rails PRs and [ledger](contributions.md) entries that touch it. Registering the app (below) is only
-needed to add it to the rounds we run ourselves.
+needed to add it to the rounds we run ourselves. When to use it and when [`lowrail-profile`](../profile.md) instead:
+[Your own app](../../README.md#your-own-app).
 
 ```sh
-mise exec -- script/census app ~/src/myapp                                  # GET pages found from the routes
-mise exec -- script/census app ~/src/myapp --workloads census.yml           # your requests, jobs and mails
-mise exec -- script/census app ~/src/myapp --workloads census.yml --rails main   # and what Rails main changes
+mise exec -- script/census app ~/src/myapp --init        # writes ~/src/myapp/lowrail/workloads.rb from the routes
+mise exec -- script/census app ~/src/myapp               # measures lowrail/workloads.rb (else GET pages from the routes)
+mise exec -- script/census app ~/src/myapp --rails main  # and what Rails main changes
+mise exec -- script/census app ~/src/myapp --workloads other.rb --modes interp,yjit
 ```
 
 **What it does.** DIR is only read. The app's tracked and untracked-but-not-ignored files (so uncommitted edits
@@ -34,12 +36,17 @@ a checkout of a registered app becomes `NAME-own`). Setup, once per copy: bundle
 check its services, `db:create db:schema:load` (or `db:migrate` without a schema), `--build` commands,
 `assets:precompile`, seed (`--prepare FILE`, else `db/seeds.rb`, with `srand(42)` and a fixed Faker seed), then
 replay every workload three times. Later runs reuse the copy and any result already measured; `--fresh` starts over.
+The workloads file is copied into the copy on every run, so an edit counts, and results measured with an earlier
+version of it are measured again. `--init` is the one write to DIR: it writes `lowrail/workloads.rb` when there is
+none (else next to the report), from the pages discovery finds.
 
 It measures on the app's own Rails and Ruby (`.ruby-version`, else the lock's `RUBY VERSION`; `--ruby` overrides),
 in the interpreter (`--modes interp,yjit` adds YJIT), with the same harness, windows and controls as a round
 ([What a run measures](#what-a-run-measures)). Each label runs as an A/A pair: `own`/`own2`, and `main`/`main2`
 with `--rails SPEC`, which swaps the Rails line exactly as `run --rails` does. Instructions come from
-`script/cpu-census` when the patched Valgrind is installed (`script/cpu-census build`, once; `--no-cpu` skips them).
+`script/cpu-census` when the patched Valgrind is built: `script/cpu-census build`, once, a long build. Until then
+the census measures objects only and says so at the start of each run; `--cpu` requires instructions (and refuses
+without the build), `--no-cpu` skips them silently.
 A released Rails is attributed as `RAILS/COMPONENT/…`, the same keys as a rails/rails checkout.
 
 **Refusals.** Each stops before anything is written to a database, with what to do next:
@@ -56,50 +63,82 @@ A released Rails is attributed as `RAILS/COMPONENT/…`, the same keys as a rail
 
 ### Workloads file
 
-YAML, rendered with ERB inside the booted app, so `<% %>` can look records up and reset state left by an earlier
-run. Without `--workloads`, up to 20 GET routes are discovered: routes without parameters, and `:id` or `:NAME_id`
-filled with the first record of the matching model; each must answer 200 three times. The chosen pages are cached
-in the copy (`tmp/census-discovered.json`), so every run measures the same ones, and skipped routes are printed
-with the reason. A `.rb` file defining `CensusAppWorkloads.custom(c)` that returns `c::Op` values is the escape hatch.
+`lowrail/workloads.rb` in the app (`--workloads FILE` for another), the same file
+[`lowrail-profile --workloads`](../profile.md) replays. It is Ruby in `ActionDispatch::IntegrationTest`'s words, so
+lines can be copied from the app's own tests, and it is evaluated only after the app has booted, so it loads
+nothing earlier than the app would. Plain Ruby at the top looks records up; route helpers work. The Blog's file
+([fixtures/census-app/blog.rb](../../fixtures/census-app/blog.rb)):
 
-```yaml
-<% article = Article.order(:id).first! %>
-sign_in:                           # once, for every request (signed_in: false opts one out)
-  path: /session                   # the form at `form:` (default: path) supplies the CSRF token
-  params: { email: census@example.com, password: secret }
-  # or: cookie: { name: session_token, value: <%= token %>, signed: true }
-csrf_from: /articles/new           # page whose token the writes send (default: the first GET)
-requests:
-  - GET /articles                  # shorthand: name and path
-  - { name: GET article, path: /articles/<%= article.id %> }
-  - name: PATCH article
-    method: patch                  # get (default), post, patch, put, delete
-    path: /articles/<%= article.id %>
-    expect: 303                    # default 200 for GET, any 2xx/302/303 for writes
-    jobs: true                     # the jobs it enqueues become workloads of their own
-    alternate:                     # used in turn, so writes flip between two states
-      - params: { article: { title: A } }
-      - params: { article: { title: B } }
-  - name: POST comment
-    method: post
-    path: /comments
-    xhr: true                      # X-Requested-With; the token goes in X-CSRF-Token
-    params: { comment: "Census comment %{n}" }   # %{n}: the operation's number
-  - { name: GET feed.json, path: /feed.json }    # .json, json: or format: json send JSON headers
-skip_jobs: [CachePageJob]
-setup: |                           # Ruby, run once after the requests; its locals feed the mailers
-  comment = Comment.last!
-mailers:
-  - { name: deliver CommentMailer#created, ruby: CommentMailer.created(comment) }
-jobs:
-  - { class: DigestJob, args: [1] }
+```ruby
+article = Article.order(:id).first!
+target = Article.order(:id).last!
+
+setup do
+  # Writes must not accumulate from run to run, or the A/A pair drifts.
+  Comment.where(commenter: "Census").delete_all
+  Article.where(title: ["Census title A", "Census title B"]).where.not(id: article.id).delete_all
+end
+
+csrf_from new_article_path
+
+get articles_path, name: "GET articles"
+get article_path(article), name: "GET article"
+get edit_article_path(article), name: "GET article edit"
+get articles_path(format: :json), as: :json, name: "GET articles.json"
+get article_path(article, format: :json), as: :json, name: "GET article.json"
+
+# Flip between two titles, so the record ends each run as it started.
+titles = ["Census title A", "Census title B"].map { { params: { article: { title: _1, body: article.body } } } }
+patch article_path(article), name: "PATCH article (redirect)", expect: 303, jobs: true, alternate: titles
+post articles_path, name: "POST article invalid (422)", params: { article: { title: "", body: "short" } }, expect: 422
+post article_comments_path(target), name: "POST comment (redirect)",
+  params: { comment: { commenter: "Census", body: "A census comment" } }, expect: 302
+patch article_path(article, format: :json), as: :json, name: "PATCH article.json", alternate: titles
 ```
 
-Writes must not accumulate state from run to run, or the A/A pair drifts: delete what the previous run created in
-the ERB, or flip between two values with `alternate`. Each request keeps its own turn, so two requests that flip the
-same record (the Blog's PATCH and PATCH.json) can each start by writing the value the other left, which the SQL
-control shows as a skipped UPDATE. The Blog and Lobsters files used in the validation below are in
-[fixtures/census-app](../../fixtures/census-app).
+| Call | What it does |
+| --- | --- |
+| `get`, `post`, `patch`, `put`, `delete PATH` | One request workload. As in an integration test: `params:`, `headers:` (`"Accept"` or `HTTP_ACCEPT`), `env:`, `xhr: true` (X-Requested-With and IntegrationTest's Accept), `as: :json` (JSON Accept and Content-Type, params sent as a JSON body; a GET with params becomes a POST with a method override). |
+| `name:` | The workload's name (default `"GET /path"`). Names are the keys of every comparison, so keep them stable. |
+| `expect:` | Allowed statuses (default 200 for GET, any of 200, 201, 202, 204, 302, 303 for writes). Anything else stops the run. |
+| `alternate: [{ params: }, { path: }]` | Overrides used in turn, so a write flips between two states. Each request keeps its own turn. |
+| a block, `do \|n\| { params: … } end` | The overrides for the n-th run (from 1), for writes that must differ each time. |
+| `jobs: true` | The jobs this request enqueues become workloads of their own (`perform JobClass`); `skip_jobs "CachePageJob"` leaves some out. |
+| `signed_in: false` | Send this request from a second, signed-out client. |
+| `csrf: false` | Do not send the CSRF token. Otherwise writes send the token of `csrf_from PATH` (default: the first HTML GET), as a param, or as X-CSRF-Token for `xhr:` and `as: :json`. |
+| `setup { … }` | Runs once, where it stands in the file: resets and records the requests need. |
+| `let(:name) { … }` | A value computed on first use and then kept, for records the requests create before a mail or job uses them. |
+| `sign_in PATH, params:` | Signs the measuring client in once: GET `form:` (default PATH) for the token, then the request (`method:`, `expect:`, default 302/303); or `sign_in cookie: { name:, value:, signed: true }`. |
+| `mail { Mailer.action(args) }` | A mail delivered with `deliver_now` (name `deliver Mailer#action`, or `mail("name") { … }`). |
+| `job { SomeJob.new(args) }` | A job performed as a queue would run it (name `perform SomeJob`). |
+
+Lobsters' file adds a signed-in member, XHR writes, a block, a job filter and a mail
+([fixtures/census-app/lobsters.rb](../../fixtures/census-app/lobsters.rb)):
+
+```ruby
+sign_in "/login", params: { email: user.email, password: "census-password" }, expect: 302
+post "/comments", xhr: true, name: "POST comment (XHR)", expect: 200, jobs: true do |n|
+  { params: { story_id: target.short_id, comment: "Census comment #{n}" } }
+end
+skip_jobs "CachePageJob"
+let(:reply) { Comment.where(story_id: target.id).order(:id).last! }
+let(:recipient) { User.find(target.user_id) }
+mail { EmailReplyMailer.reply(reply, recipient) }
+```
+
+The file is evaluated into a frozen manifest: per request its method, path, a digest of its params and body, the
+header names, expected statuses and options, and the file's sha256. The census writes it to `workloads.json` next to
+the report and into every receipt (`workloads_manifest`), `lowrail-profile` into its output directory, so two runs
+can be checked for the same workloads without reading the Ruby again.
+
+Without a file, up to 20 GET routes are discovered: routes without parameters, and `:id` or `:NAME_id` filled with
+the first record of the matching model; each must answer 200 three times. The chosen pages are cached in the copy
+(`tmp/census-discovered.json`), so every run measures the same ones, and skipped routes are printed with the reason.
+`--init` writes the same pages as a starter file, with route helpers. `lowrail-profile --record` writes the most
+frequent request shapes of a test suite instead, writes commented out until they are made repeatable.
+
+Each request keeps its own turn, so two requests that flip the same record (the Blog's PATCH and PATCH.json) can
+each start by writing the value the other left, which the SQL control shows as a skipped UPDATE.
 
 ### The report
 
@@ -145,6 +184,26 @@ skipped Turbo's three `*_historical_location` routes as a gem's controller. Refu
 `DATABASE_URL` set, a missing directory, a non-Rails directory, an initializer that needs a secret, PostgreSQL in
 production without `pg` in the bundle, and (on constructed configurations) PostgreSQL, Redis and MySQL not
 running.
+
+### Validation: the workloads file replaces YAML (2026-11-18)
+
+The Blog and Lobsters files were rewritten from YAML with ERB to the Ruby DSL (`blog.rb`, `lobsters.rb`) and run
+against the YAML at the previous commit (`11804786`) from the same checkouts, Ruby 4.0.9, interpreter, objects
+only: the Blog on its own Rails 8.1.4, Lobsters on its own Rails 8.1.3.1 and on Rails main `c48c154e3f`.
+
+* **Names and SQL.** The same workload names (10 and 11), and every workload ran the same masked SQL in every pair,
+  in both of Lobsters' Rails.
+* **Blog.** Each workload's median within the spread of the YAML run's own three windows; the largest difference,
+  the comment POST (+31), against windows of 2,267 to 2,433 in one YAML run.
+* **Lobsters, reads, mail and job.** Within the A/A of the same copy (GET home −0.8, GET active +53 against
+  windows that move by 20 to 70 between A/A runs of one copy; the mail and job identical).
+* **Lobsters, XHR writes.** 30 to 47 objects more on both Rails, from one deliberate change: `xhr: true` sends
+  IntegrationTest's `Accept` (`text/javascript, text/html, application/xml, text/xml, */*`), which Rails parses into
+  more MIME types (`mime_type.rb:210–219`, +5 objects each); the YAML sent `text/html`. The same file with
+  `headers: { accept: "text/html" }` on the three requests is back within the A/A (−3.0, −0.2, +8.2).
+* **YJIT.** `--modes interp,yjit` on the Blog: all ten workloads, A/A within ±4 objects.
+* **`--init`** on the Blog wrote its five pages as route helpers and listed Turbo's three routes as left out; the
+  file `lowrail-profile --record` wrote from the Blog's suite ran as four GET workloads, A/A within 1.3 objects.
 
 ### Registering an app
 

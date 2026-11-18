@@ -8,15 +8,19 @@
 #
 #   bundle exec lowrail-profile -- bin/rails test test/integration test/controllers
 #   bundle exec lowrail-profile -- bundle exec rspec spec/requests
-#   bundle exec lowrail-profile --paths paths.txt          # GETs in this process's RAILS_ENV
+#   bundle exec lowrail-profile --workloads                # lowrail/workloads.rb's requests, in this RAILS_ENV
+#   bundle exec lowrail-profile --record -- bin/rails test # also write the suite's requests as lowrail/workloads.rb
 #   bundle exec lowrail-profile report tmp/lowrail-profile # report again from saved runs
 #
 # Options: --out DIR (default tmp/lowrail-profile), --runs N (default 2; the
 # second run is the noise floor), --top N (default 30), --seed N (default
-# 1234, as SEED and --seed for both runs), --ledger PATH (contributions.md).
+# 1234, as SEED and --seed for both runs), --ledger PATH (contributions.md),
+# --workloads [FILE] (default lowrail/workloads.rb), --record [FILE] (default
+# lowrail/workloads.rb, or tmp/lowrail-profile/workloads.rb when that exists).
 require "rbconfig"
 require "fileutils"
 require_relative "../lib/lowrail/profile_report"
+require_relative "../lib/lowrail/workloads"
 
 lib = File.expand_path("../lib", __dir__)
 args = ARGV.dup
@@ -26,7 +30,16 @@ runs = Integer(opt.("--runs", "2"))
 top = Integer(opt.("--top", "30"))
 seed = opt.("--seed", "1234")
 ledger = opt.("--ledger", File.expand_path("../../docs/upstream/contributions.md", __dir__))
-paths = opt.("--paths", nil)
+# --workloads and --record take an optional FILE.
+flag = lambda do |name|
+  next unless (i = args.index(name))
+  value = args[i + 1] if args[i + 1] && !args[i + 1].start_with?("-")
+  args.slice!(i, value ? 2 : 1)
+  value || :default
+end
+workloads = flag.("--workloads")
+record = flag.("--record")
+abort "lowrail-profile: --paths was replaced by --workloads FILE (lowrail/workloads.rb, docs/profile.md)" if args.include?("--paths")
 
 if args.first == "report"
   dir = File.expand_path(args[1] || out)
@@ -37,10 +50,13 @@ if args.first == "report"
 end
 
 command = (i = args.index("--")) ? args[(i + 1)..] : args
-if paths
-  command = ["bin/rails", "runner", File.join(lib, "lowrail/profile_paths.rb"), File.expand_path(paths)]
+if workloads
+  file = File.expand_path(workloads == :default ? Lowrail::Workloads::PATH : workloads)
+  abort "lowrail-profile: no #{file}; write one (docs/profile.md) or record one: lowrail-profile --record -- bin/rails test" unless File.exist?(file)
+  command = ["bin/rails", "runner", File.join(lib, "lowrail/profile_workloads.rb"), file, File.join(out, "workloads.json")]
 end
-abort "usage: lowrail-profile [options] -- COMMAND... | --paths FILE | report [DIR]" if command.empty?
+abort "usage: lowrail-profile [options] -- COMMAND... | --workloads [FILE] | report [DIR]" if command.empty?
+abort "lowrail-profile: --record records a command's requests; drop --workloads" if record && workloads
 
 # Built once per Ruby build, outside the app and never during its boot.
 variant = [RUBY_ENGINE, RUBY_VERSION, RUBY_REVISION, RUBY_PLATFORM].join("-")
@@ -70,6 +86,7 @@ statuses = (1..runs).map do |n|
   end
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
     **(n > 1 && File.exist?(watch) ? { "LOWRAIL_PROFILE_WATCH" => watch } : {}),
+    **(record && n == 1 ? { "LOWRAIL_PROFILE_RECORD" => "1" } : {}),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
     "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
@@ -81,5 +98,23 @@ File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\ne
 report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
 report.write
 puts report.markdown
+if record
+  target = File.expand_path(record == :default ? Lowrail::Workloads::PATH : record)
+  target = File.join(out, "workloads.rb") if record == :default && File.exist?(target)
+  shapes = Dir["#{out}/run1/*.shapes.json"].flat_map { JSON.parse(File.read(_1)) }
+  merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr") }.map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
+  if merged.empty?
+    warn "lowrail-profile: --record saw no routed requests; nothing written"
+  else
+    FileUtils.mkdir_p(File.dirname(target))
+    File.write(target, Lowrail::Workloads.render(Lowrail::Workloads.recorded(merged, 20), <<~TEXT))
+      Workloads for lowrail-profile --workloads and script/census app (docs/profile.md).
+      Recorded by `lowrail-profile --record -- #{command.join(" ")}`: the #{[merged.size, 20].min} most frequent
+      request shapes of #{merged.sum { _1["count"] }} requests, most frequent first. Records are each model's first row;
+      writes keep the params one test sent and are commented out until you make them repeatable (setup, alternate:).
+    TEXT
+    warn "lowrail-profile: wrote #{target}"
+  end
+end
 warn "lowrail-profile: report in #{File.join(out, "report.md")}"
 warn "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)

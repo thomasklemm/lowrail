@@ -28,6 +28,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             super
           ensure
             Profile.leave
+            Profile.note(env) if Profile.shapes
           end
         end
 
@@ -42,6 +43,44 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         end
 
         class << self
+          # lowrail-profile --record: request shapes by route, noted after the
+          # window closes, so they are not counted.
+          attr_accessor :shapes
+
+          def note(env)
+            return if env["lowrail.profile.noted"] || !(route = env["action_dispatch.route"])
+            env["lowrail.profile.noted"] = true
+            json = [env["CONTENT_TYPE"], env["HTTP_ACCEPT"]].any? { _1.to_s.start_with?("application/json") }
+            xhr = env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+            verb = (env["rack.methodoverride.original_method"] && env["REQUEST_METHOD"] || env["REQUEST_METHOD"]).downcase
+            shape = shapes[[verb, route.path.spec.to_s, json, xhr]] ||= begin
+              controller = route.defaults[:controller].to_s
+              parts = route.required_parts.map do |part|
+                model = part == :id ? controller.split("/").last.to_s.singularize.camelize : part.to_s.delete_suffix("_id").camelize if part == :id || part.to_s.end_with?("_id")
+                [part.to_s, (model unless model.to_s.empty?)]
+              end
+              params = (env["action_dispatch.request.request_parameters"] || {}).except("authenticity_token") unless verb == "get"
+              # Only a path's first route is named (PATCH and DELETE share GET's helper).
+              spec = route.path.spec.to_s
+              name = route.name || env["action_dispatch.routes"]&.routes&.find { _1.name && _1.path.spec.to_s == spec }&.name
+              { "verb" => verb, "template" => spec.sub(/\(\.:format\)\z/, ""), "route" => name, "parts" => parts,
+                "format" => env.dig("action_dispatch.request.path_parameters", :format), "json" => json, "xhr" => xhr,
+                "path" => env["ORIGINAL_FULLPATH"], "params" => plain(params), "count" => 0 }
+            end
+            shape["count"] += 1
+          rescue StandardError
+            nil
+          end
+
+          def plain(value)
+            case value
+            when Hash then value.to_h { [_1.to_s, plain(_2)] }
+            when Array then value.first(5).map { plain(_1) }
+            when String, Integer, Float, true, false, nil then value.is_a?(String) ? value[0, 200] : value
+            else "(#{value.class})"
+            end
+          end
+
           def write(dir)
             requests, objects, dropped, rows = snapshot
             return if requests == 0
@@ -54,6 +93,11 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             end
             callers.each { |row| lines << ["@", *row.map { _1 || "-" }].join("\t") }
             File.write(File.join(dir, "#{Process.pid}.tsv"), lines.join("\n") << "\n")
+            if shapes&.any?
+              # At exit Bundler has long set up, so json resolves to the app's own.
+              require "json"
+              File.write(File.join(dir, "#{Process.pid}.shapes.json"), JSON.generate(shapes.values))
+            end
           rescue StandardError => error
             warn "[lowrail-profile] not written: #{error.class}: #{error.message}"
           end
@@ -72,6 +116,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
       list = File.readlines(watch, chomp: true).map { |row| path, line = row.split("\t"); [path, Integer(line)] }
       Lowrail::Profile.watch(list, File.join(ENV.fetch("LOWRAIL_PROFILE_ROOT", Dir.pwd), ""))
     end
+    Lowrail::Profile.shapes = {} if ENV["LOWRAIL_PROFILE_RECORD"] == "1"
     Process.singleton_class.prepend(Lowrail::Profile::Fork)
     at_exit { Lowrail::Profile.write(dir) }
     Lowrail::Profile.start

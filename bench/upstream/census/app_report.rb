@@ -31,7 +31,8 @@ module CensusAppReport
   def pct(v) = v.nil? ? "–" : format("%+.2f%%", v).sub("-", "−")
 
   def harness?(file)
-    file.start_with?("LOWRAIL/") || (CensusRank.gem_name(file) && CensusRank::HARNESS_GEMS.include?(CensusRank.gem_name(file))) ||
+    # The workloads file's own blocks run in the copy, keyed APP/.census-app/.
+    file.start_with?("LOWRAIL/", "APP/.census-app/") || (CensusRank.gem_name(file) && CensusRank::HARNESS_GEMS.include?(CensusRank.gem_name(file))) ||
       file.match?(%r{\AGEM/.*/rack-[\d.]+/lib/rack/mock_(?:request|response)\.rb\z})
   end
 
@@ -175,6 +176,13 @@ module CensusAppReport
     meta = load(File.join(out, labels.first, "meta.json"))
     o << "App: `#{state["source"]}` (measured on a copy). Rails #{state.dig("base", "version")} (the app's own), " \
       "#{meta["ruby"]}. Measured #{meta.dig("runs", -1, "finished")}, #{own["workloads"].size} workloads, #{modes.join(" and ")}."
+    if (manifest = own["workloads_manifest"])
+      File.write(File.join(out, "workloads.json"), JSON.pretty_generate(manifest) + "\n")
+      counts = %w[requests mails jobs].map { "#{manifest[_1].size} #{_1}" }.join(", ")
+      o << "" << "Workloads: #{manifest["sha256"] ? "the workloads file (sha256 `#{manifest["sha256"][0, 12]}`)" : "GET pages discovered from the routes"}, " \
+        "#{counts}, plus the jobs those requests enqueue. Every request's method, path and a digest of its params are in " \
+        "`workloads.json`, so another run can be checked for the same workloads without reading the file."
+    end
     o << "" << "Each workload is one request, job or mail, run in a production boot of the app with its own Gemfile.lock. " \
       "**Objects** are Ruby objects allocated per operation (median of three windows of 20). **Instructions** are CPU " \
       "instructions per operation, counted exactly by Callgrind for the measuring thread. Everything ran twice in separate " \

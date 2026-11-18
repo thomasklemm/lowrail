@@ -321,7 +321,10 @@ module RailsCensus
       result = { app: name, ruby: RUBY_DESCRIPTION, mode: mode, yjit: RubyVM::YJIT.enabled?, rails: rails_sha,
         rails_dir: File.basename(rails_dir), adapter: ActiveRecord::Base.connection_db_config.adapter,
         lock_sha256: Digest::SHA256.file(ENV.fetch("BUNDLE_GEMFILE") + ".lock").hexdigest, workloads: results }
-      result[:source_roots] = source_roots if app?
+      if app?
+        result[:source_roots] = source_roots
+        result[:workloads_manifest] = CensusAppWorkloads.manifest
+      end
       File.write(output, JSON.pretty_generate(result) + "\n")
       puts JSON.generate(result.except(:workloads).merge(workloads: results.map { _1.except(:sites) }))
     end
@@ -336,6 +339,9 @@ if $PROGRAM_NAME == __FILE__
   when "profile" then RailsCensus.profile(name, output)
   when "list" then RailsCensus.list(name)
   when "stats" then RailsCensus.stats(name, output)
-  else abort "usage: harness.rb prepare|profile|stats|list APP [NEW_JSON]"
+  when "init"
+    load File.join(__dir__, "app_workloads.rb")
+    CensusAppWorkloads.init(RailsCensus, output)
+  else abort "usage: harness.rb prepare|profile|stats|list|init APP [NEW_JSON|NEW_RB]"
   end
 end

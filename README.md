@@ -84,52 +84,78 @@ mise exec -- script/census compare --base base2 --aa base     # the A/A noise fl
 Omit `--apps` for every app. To measure a Rails branch, run it under a new
 label with `--rails OWNER/REPO@BRANCH` and compare it against `base2`.
 
-### On your own app
-
-`script/census app` runs the same census on any Rails app checkout and writes
-one report of where its requests, jobs and mails allocate objects and spend
-instructions in Rails, Ruby and gems, with the A/A noise floor and the known
-PRs and ledger entries for each top line. Your checkout is only read; the
-census works on a copy with its own throwaway databases:
-
-```sh
-mise exec -- script/census app ~/src/myapp                          # GET pages found from the routes
-mise exec -- script/census app ~/src/myapp --workloads census.yml   # requests, jobs and mails you describe
-mise exec -- script/census app ~/src/myapp --rails main             # also on Rails main, for an upgrade
-```
-
-It measures on the app's own Rails and Ruby in production mode, and refuses
-what it cannot run safely (a `DATABASE_URL` in the environment, services that
-are not running, an app that does not boot in production). The counts are
-work, not timings. See [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app).
-
 Each report under [docs/upstream/](docs/upstream/) lists its pins and commands;
 receipts of published rounds are in [docs/upstream/data/](docs/upstream/data/).
 
-## Profile your own app
+## Your own app
 
-`lowrail-profile` (prototype) runs inside your app instead of copying it: add
-the gem to the development and test group with `require: false`, then run
-your suite through it.
+Two tools show where your Rails app does avoidable work in Rails, Ruby and
+gems, and which known PRs and [ledger](docs/upstream/contributions.md) entries
+touch each line. Both count work (objects; the census also instructions), not
+time. Both read one file, `lowrail/workloads.rb`, in the words of your
+integration tests:
+
+```ruby
+# lowrail/workloads.rb, evaluated after the app has booted
+article = Article.order(:id).first!
+
+setup do                       # runs once: resets so runs do not accumulate
+  Comment.where(commenter: "Census").delete_all
+end
+
+get articles_path
+get article_path(article)
+get article_path(article, format: :json), as: :json
+post article_comments_path(article), params: { comment: { commenter: "Census", body: "Hi" } }, expect: 302
+patch article_path(article), expect: 303, jobs: true,
+  alternate: [{ params: { article: { title: "A" } } }, { params: { article: { title: "B" } } }]
+mail { CommentMailer.created(Comment.last!) }
+```
+
+**`lowrail-profile`** (the gem, inside your app) is the first look: one
+Gemfile line, then your own suite or the workloads file, in your own
+environment and database. It names the app line behind each cost.
 
 ```ruby
 gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
 ```
 
 ```sh
-bundle exec lowrail-profile -- bin/rails test                  # or: -- bundle exec rspec spec/requests
-RAILS_ENV=production bundle exec lowrail-profile --paths paths.txt
+bundle exec lowrail-profile -- bin/rails test                  # your suite (or: -- bundle exec rspec spec/requests)
+bundle exec lowrail-profile --record -- bin/rails test         # ... and write its most frequent requests as lowrail/workloads.rb
+RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's requests, warmed, through the full stack
 ```
 
-It counts objects per source line while requests are served, runs the
-command twice (the repeat is the noise floor) and writes
-`tmp/lowrail-profile/report.md`: lines in Rails, Ruby and gems by objects per
-request, grouped by gem, with the app line that leads to each, matching
-ledger entries, and test-mode-only work (debug logging, error pages) listed
-apart. Without the command the gem loads nothing. On the Blog and Campfire its
-production `--paths` counts match the census within 1%, and their own test
-suites share 10–13 of the census's top 20 lines. [docs/profile.md](docs/profile.md)
-has the method, the safety checks and a comparison with the census.
+**`script/census app`** (this repository, on a copy of your app) is the
+measurement: production mode, 50 warmup operations, an A/A pair for the noise
+floor, instructions when the patched Valgrind is built, jobs and mailers as
+workloads of their own, and `--rails main` for what an upgrade changes. Your
+checkout is only read; the census works on a copy with its own throwaway
+databases, and refuses what it cannot run safely (a `DATABASE_URL` in the
+environment, services that are not running, an app that does not boot in
+production).
+
+```sh
+mise exec -- script/census app ~/src/myapp --init        # a starter lowrail/workloads.rb from the routes
+mise exec -- script/census app ~/src/myapp               # measures lowrail/workloads.rb (else GET pages from the routes)
+mise exec -- script/census app ~/src/myapp --rails main  # and the same on Rails main
+```
+
+| Use | `lowrail-profile` | `script/census app` |
+| --- | --- | --- |
+| For | a first look, your own suite, the app line behind each cost | production steady state, numbers to compare or publish |
+| Workload | your suite's requests, or the file's requests | the file: requests, the jobs they enqueue, mails, jobs |
+| Mode | your environment (test-mode logging and error pages are listed apart) | production, warmed, A/A pair |
+| Counts | objects per source line | objects and instructions, per workload and per line |
+| Rails swap | no | `--rails SPEC` next to the app's own |
+
+The usual path: run your suite through `lowrail-profile --record`, keep the
+requests that matter in `lowrail/workloads.rb` (make its writes repeatable),
+then measure that file with `script/census app`. On the same requests in
+production both count the same objects per line within about 1%.
+The file's format is in [Workloads file](docs/upstream/census.md#workloads-file),
+the census in [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app),
+the profiler in [docs/profile.md](docs/profile.md).
 
 ## Lowering prototype (research)
 

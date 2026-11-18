@@ -60,4 +60,54 @@ class ProfileTest < Minitest::Test
       assert_includes plain, "lowrail loaded: false"
     end
   end
+
+  # B -> --record -> a workloads file -> replayed: the suite's request shapes
+  # come back as route helpers on each model's first row, and replaying the
+  # file counts the same line per request again.
+  def test_record_writes_a_workloads_file_that_replays
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "gems/probe-1.0/lib/probe.rb" => "# frozen_string_literal: true\n\nmodule Probe\n  def self.three = [String.new, String.new]\nend\n",
+        "app/controllers/widgets_controller.rb" => <<~'RUBY',
+          class WidgetsController < ApplicationController
+            def index = (@probe = Probe.three; @widgets = Widget.all)
+            def show = (@probe = Probe.three; @widget = Widget.find(params[:id]))
+          end
+        RUBY
+        "app/views/widgets/show.html.erb" => "<%= @widget.name %>\n",
+        "boot.rb" => <<~'RUBY',
+          require_relative "gems/probe-1.0/lib/probe"
+          require_relative "config/environment"
+          Widget.create!(name: "first", password: "x")
+          Widget.create!(name: "second", password: "x")
+        RUBY
+        "requests.rb" => <<~'RUBY')
+          require_relative "boot"
+          require "rack/mock"
+          [*["/widgets"] * 3, "/widgets/2"].each do |path|
+            status, = Rails.application.call(Rack::MockRequest.env_for("http://localhost#{path}"))
+            raise "HTTP #{status}" unless status == 200
+          end
+        RUBY
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test")
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "profile", "--record",
+        "--", RUBY, "requests.rb", chdir: dir)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      recorded = File.read(File.join(dir, "lowrail/workloads.rb"))
+      assert_match(/^widget = Widget\.first!$/, recorded)
+      # Most frequent first; the record is the model's first row, not the one the test used.
+      assert_operator recorded.index("get widgets_path,"), :<, recorded.index("get widget_path(widget),")
+
+      replay = File.join(GEM_ROOT, "lib/lowrail/profile_workloads.rb")
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "replay", "--top", "200",
+        "--", RUBY, "-r./boot", replay, "lowrail/workloads.rb", "replay.json", chdir: dir)
+      assert status.success?, "replay failed:\n#{err}\n#{out}"
+      report = JSON.parse(File.read(File.join(dir, "replay/report.json")))
+      assert_equal [40, 40], report["summary"].map { _1["requests"] }
+      assert_equal [3.0, 3.0], report["ranked"].find { _1["site"] == "GEM/probe/lib/probe.rb:4" }["all"]
+      manifest = JSON.parse(File.read(File.join(dir, "replay.json")))["manifest"]
+      assert_equal [["get", "/widgets"], ["get", "/widgets/1"]], manifest["requests"].map { _1.values_at("method", "path") }
+    end
+  end
 end
