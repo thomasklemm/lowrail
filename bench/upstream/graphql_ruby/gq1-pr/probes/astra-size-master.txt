@@ -1,0 +1,4 @@
+8 bytes: 0.000102 / 0.000097 seconds per 1000 cached missing-field lookups
+64 bytes: 0.000096 / 0.000095 seconds per 1000 cached missing-field lookups
+1024 bytes: 0.000096 / 0.000095 seconds per 1000 cached missing-field lookups
+1048576 bytes: 0.000099 / 0.000141 seconds per 1000 cached missing-field lookups

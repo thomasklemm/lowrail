@@ -1,0 +1,16 @@
+{"label":"default","value":[false,"GraphQL::Schema::Warden::NullWarden"]}
+{"label":"deny:false->true","value":["Thing.name","Thing.name",["name"],null]}
+{"label":"deny:true->false","value":[null,null,["name"],null]}
+{"label":"deny_type:false->true","value":["Thing","Thing",null,null]}
+{"label":"deny_type:true->false","value":["Thing","Thing",null,null]}
+{"label":"name_kind_0","value":["Thing.name",false]}
+{"label":"name_kind_1","value":["Thing.name",true]}
+{"label":"name_kind_2","value":["Thing.name",false]}
+{"label":"name_kind_3","value":[null,true]}
+{"label":"name_kind_4","value":[null,false]}
+{"label":"mutated_field_string","value":["Thing.name","Thing.other","Thing.name",false]}
+{"label":"mutated_type_string","value":["Thing","String","Thing",false]}
+{"label":"symbol_then_string","value":[null,"Thing",null,"Thing.name"]}
+{"label":"visible_hook_already_memoized","value":["Thing.secret","Thing.secret"]}
+{"label":"multiplex","value":[{"data":{"thing":{"name":"name","secret":"secret"}}},{"errors":[{"message":"Field 'secret' doesn't exist on type 'Thing'","locations":[{"line":1,"column":16}],"path":["query","thing","secret"],"extensions":{"code":"undefinedField","typeName":"Thing","fieldName":"secret"}}]},{"data":{"thing":{"name":"name","secret":"secret"}}}]}
+{"label":"type_override_execution","value":{"data":{"a":{"name":"Thing"},"hideType":true,"b":{"name":"Thing"}}}}

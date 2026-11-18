@@ -305,8 +305,11 @@ Superseded the same day by the PR below (Thomas wants a PR, not an issue); the i
 
 Branch [`thomasklemm/warden-name-caches-by-value`](https://github.com/thomasklemm/graphql-ruby/tree/thomasklemm/warden-name-caches-by-value)
 @ `4a77cd59bf`, one commit on master `9c9f8f28cc` (2026-11-17), queue item
-[GQ1](../../bench/upstream/pr-queue/items/GQ1.md) (`built`, `risky`; opens as a draft after a deep Astra review). Not
+[GQ1](../../bench/upstream/pr-queue/items/GQ1.md) (`in-review`, `risky`; Astra requires changes below). Not
 opened. Data: [gq1-pr](../../bench/upstream/graphql_ruby/gq1-pr).
+
+The builder's rationale and original verification follow. The [Astra review](#gq1-astra-review-2026-11-18)
+corrects its Profile-equivalence and test-policy conclusions; those original claims are not approval evidence.
 
 **Who it reaches.** Master still validates and executes through the Warden by default: `Schema.use_visibility_profile?`
 is false unless the schema has `use GraphQL::Schema::Visibility` (schema.rb L857–865; `Query#prepare_ast` builds
@@ -364,6 +367,131 @@ The same picture as round 2 on `2e8473ea7d`. The legacy-interpreter introspectio
 there the identity cache already hit for the repeated nodes of one document, and hashing the String costs more; the
 body covers them with "the execution benchmarks move by less than 1% either way". No wall-time claim. The Zammad
 replay (−0.64%) was not rerun on this master and is not in the body.
+
+### GQ1 Astra review (2026-11-18)
+
+**Verdict: changes, do not open this head/body yet.** Reviewed
+[`4a77cd59bfed27d21f2787c70603850e70853e3a`](https://github.com/thomasklemm/graphql-ruby/commit/4a77cd59bfed27d21f2787c70603850e70853e3a),
+whose sole parent is `9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6`; fetching canonical master during review returned
+that same base. Both Thermos rubrics applied directly by Astra, without other reviewers or delegation, in
+[the review thread](https://ampcode.com/threads/T-01a1f036-3f72-70d5-b936-d1e3f63faddf).
+The production implementation is L0. The blockers are the test, overstated contract reasoning, and presentation
+and measurement requirements, not a demand for an override-detection guard.
+
+**Required changes, smallest fixes:**
+
+1. **Test observable results, not hook invocation counts.** `warden_spec.rb:1156–1157` asserts arrays whose only
+   purpose is to count `.get_field` and `.get_type` invocations. These are observable public hooks, so this is more
+   meaningful than counting private helper calls, but DECISIONS explicitly says no call-count assertions; it does
+   not grant an exception for documented hooks. The guide documents dynamic definitions and operation-duration
+   caching, not an exact invocation count. Replace those assertions with returned-field/type or execution-result
+   assertions that distinguish the changed semantics, plus a fresh-query control proving the cache is not shared.
+   The retained boundary probe below supplies both directions (present→denied and denied→present). Keep hook
+   counters in benchmark/review instrumentation, outside the upstream suite. The submitted test itself was run
+   unchanged in isolation: head passes 1 test/3 assertions; base fails with `["name", "name"]` versus `["name"]`.
+2. **Narrow the equivalence and cache-lifetime claims.** Profile already caches field lookups by `(owner, name)`
+   and type results by name, but `Profile#compute_type` calls `Visibility#get_type`, not `Schema.get_type`.
+   The retained `gm-visibility.hookprobe.txt` already contradicts “exactly the branch's answers and call counts”:
+   the fragment query logs no `Schema.get_type` call there, versus one on head. New probes confirm a denying
+   `Schema.get_type` override returns nil on head but is bypassed by Profile. State only the field-cache precedent;
+   do not claim equivalent hooks or proof of compatibility. Describe first-result reuse in a Warden (normally one
+   query), including nil, rather than an unconditional once-per-query hook guarantee. An explicitly reused
+   `warden:` retains its entries across queries. The commit message's “every selection missed” also needs “distinct
+   equal name Strings”: repeated visits to one AST node already hit. Keep the mid-query behavior warning.
+3. **Use plausible workloads and current-head benchmark-ips evidence in the body.** The headline 43% row is
+   `Array.new(5000, "hello")`, not a representative application query. Keep that stress result in this record,
+   as DECISIONS' realistic-size rule requires. Lead with a short benchmark-ips script/output on the existing big
+   query and abstract-fragment workloads (or another realistic repeated-selection query), with exact-base/head
+   raw runs and A/A retained. The older wall-time section is not evidence for this exact head. Instructions are
+   correctly labeled, but an Ir-only body does not meet the later “Benchmark tables in the project's own format”
+   rule; omitting the word “speed” does not waive it. Say “execution instruction counts” rather than the ambiguous
+   “execution benchmarks move”. Distinguish repeated visibility traversal from repeated `visible?` hooks: those
+   hooks were already cached by member identity. No extra paragraphs about review process belong upstream.
+
+**Correctness/security findings.** The behavior change is real and can return either more or less than a later
+hook would allow. Rerunning `exec/exprobe2.rb` on base/head gives `b.staffName = "alt"` / `"staff"` after
+`dropStaff`. In the new probe, `{ a: __type(name: "Thing") { name } hideType b: __type(name: "Thing") { name } }`
+gives `b = nil` on base and `b = {name: "Thing"}` on head. Both type and field lookup also retain an initial nil
+after the context starts allowing the name. This must not be described as unchanged authorization behavior.
+However, the [dynamic-types guide](https://github.com/rmosolgo/graphql-ruby/blob/9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6/guides/schema/dynamic_types.md#L3-L10)
+already describes schema-element caching for the duration of an operation, and `.visible?` itself is already
+memoized on base. No new production-code blocker was demonstrated for a schema whose definitions are stable
+within an operation. The intended change is acceptable to propose explicitly; Profile's existence alone is not
+evidence that every existing Warden app is compatible. Authorization that must change during execution belongs
+in runtime authorization/resolution, not in a once-cached schema lookup.
+
+The exact-name partition remains `(parent identity, field-name value)` / `type-name value`. The visibility and
+reachability checks on the first lookup are unchanged; duplicate-definition detection is still on that path.
+Unchanged-context results, validation errors and `visible?` hook tallies in `exec/wprobe.rb` are byte-identical
+on base/head (2,523 output lines in this run). Ordinary multiplex executes allowed/denied/allowed contexts with
+distinct Wardens and returns the same data/error/data sequence on both revisions. The cache is not newly global
+or multiplex-scoped. Passing the same Warden explicitly to two queries keeps the first answer on head; its context
+and other caches were already instance-bound, so sharing one across changing principals was never a safe isolation
+mechanism. Named Visibility profiles are deliberately shared; `preload: true` alone does not make every dynamic
+profile shared (`Visibility#profile_for` still constructs a profile for an ordinary query context).
+
+Mutable/frozen plain Strings and an unmodified String subclass work; no caller String is frozen. A mutable name
+changed from `name` to `other` returns `Thing.other` on head, whereas base's identity cache returns stale
+`Thing.name`; similarly `Thing`→`String` selects the new type on head. Fresh `name`/`Thing` Strings still retrieve
+the original definitions. Ruby's ordinary Hash retains the original String key value rather than following the
+caller's mutation. Symbols and Strings remain distinct (`:name`/`:Thing` return nil, the Strings find definitions),
+and a duck-typed `to_str` object is not implicitly converted on either revision. No new coercion or frozen-input
+failure was found. Custom hash/equality semantics and in-place schema mutation are not reasons to add guards to
+this small name-cache change; they are not a stable GraphQL name/definition contract.
+
+**Default path and upstream overlap.** `ruby -Ilib -rgraphql -e 'p GraphQL::Schema.use_visibility_profile?'` prints
+`false`; `Query#prepare_ast` creates a Warden, and the install generator omits Visibility. This verifies the default,
+not a claim about what fraction of real apps have migrated. `AlwaysVisible` internally enables Visibility too.
+Read all 26 current open PR titles and searched issues/PRs for `Warden`, `visibility cache`, `get_field cache`,
+`compare_by_identity`, and recent cache work. No direct duplicate of these two Warden changes was found.
+[5586](https://github.com/rmosolgo/graphql-ruby/pull/5586) is the merged Profile precedent (rmosolgo,
+2026-03-25); its parent experiment [5578](https://github.com/rmosolgo/graphql-ruby/pull/5578) is closed and also
+describes 5,000 identical fields as pathological. [5814](https://github.com/rmosolgo/graphql-ruby/pull/5814)
+is already in base and fixes different Warden loadability behavior. Open
+[5821](https://github.com/rmosolgo/graphql-ruby/pull/5821) changes migration comparison, not these caches;
+[5696](https://github.com/rmosolgo/graphql-ruby/pull/5696) changes execution steps;
+[5724](https://github.com/rmosolgo/graphql-ruby/pull/5724) caches fragment complexity; and
+[5905](https://github.com/rmosolgo/graphql-ruby/pull/5905) documents `extra_types`.
+[5761](https://github.com/rmosolgo/graphql-ruby/issues/5761) concerns shared Visibility traversal state, not a
+query-local Warden cache. [4778](https://github.com/rmosolgo/graphql-ruby/issues/4778) plans Warden removal in 3.0,
+so this is an optimization of the current legacy default, not the future architecture.
+[5035](https://github.com/rmosolgo/graphql-ruby/issues/5035) was about `compare_by_identity` returning self,
+not an earlier rejection of value keys; [4443](https://github.com/rmosolgo/graphql-ruby/pull/4443) motivates identity
+keys for class objects, which this patch preserves. All inspection was read-only; nothing was posted upstream.
+
+**Maintainability.** Cold read: cache a type by its name; cache a field by owner identity and name value; on a miss
+run the existing visibility logic. No new branch, guard, comment, dependency, or lifecycle state. The small helper
+has two meaningful uses and makes the key distinction explicit beside the existing helper; no larger abstraction
+or owner-inspection fallback is warranted. The surrounding anonymous-schema test style matches rmosolgo's
+`42f9fab99` changes. Warden grows 729→733 lines; the spec was already 1,192 lines and becomes 1,225, not a new
+1,000-line crossing. Flog 4.9.4: `get_type` 6.6→6.6, `get_field` 9.5→9.5, new helper 2.8. RuboCop 1.92.3 metrics,
+using zero thresholds to print scores: `get_type` ABC 6.40 / cyclomatic 4 / perceived 5 unchanged; `get_field`
+8.25 / 4 / 5 unchanged; new helper 4.24 / 1 / 1. Existing identity helper unchanged. The call-count test is the
+only required source-shape change; no speculative refactor is requested.
+
+**Measurement replay and adverse input.** Independently parsed all 72 totals in `gq1-pr/raw.txt`, calculated
+`(Ir(N2) - Ir(N1)) / (N2 - N1)` separately for each process pair, then averaged a/b. All nine table deltas and A/A
+values reproduce. Body rows round to 226.8M→129.2M (−43.0445%, A/A 0.1019%/0.1096%), 35.3M→32.6M (−7.5104%,
+0.0484%/0.0576%), and 2.38M→2.20M (−7.8567%, 0.9914%/0.2764%). Execution deltas range −0.9430% to +0.4269%; the
+small and large-result rows are within their A/A, not wins. These are arithmetic replays, not new Callgrind runs;
+the retained totals do not independently prove all runtime/heap conditions. `table.rb` truncates per-process slopes
+to integers, explaining sub-instruction differences in the record without affecting any published rounding.
+
+The adverse case is an already-hit name, especially a long one: value hashing scans bytes while identity lookup
+does not. `astra-size.rb` tests cached missing fields with the same String, 1,000 lookups twice, Ruby 4.0.9 without
+JIT. Base stays about 0.10 ms at 8 B, 64 B, 1 KiB and 1 MiB; head is about 0.12, 0.14, 0.37 and 279 ms. These
+diagnostic wall samples are not pinned-core performance claims or application regressions. They confirm the
+expected length-dependent tradeoff; the 1 MiB stress row belongs here, never in the body. Ordinary name lengths
+and the retained legacy-execution Ir regressions are small; no defensive guard is justified by that stress case.
+
+**Reproduction and limits.** Retained new source/output: `gq1-pr/astra-boundaries.rb`, `astra-size.rb`, and
+`gq1-pr/probes/astra-{master,head,profile,size-master,size-head}.txt`. With `BASE` and `HEAD` set to checkouts of the
+two reviewed revisions, run `ruby -I"$BASE/lib" bench/upstream/graphql_ruby/gq1-pr/astra-boundaries.rb`, repeat
+with `HEAD`, and run the base with `PROFILE=1`. The earlier `exec/{wprobe,hookprobe,exprobe2}.rb` also ran against
+both revisions. The submitted spec block was extracted unchanged from head and evaluated with
+`-rgraphql -rminitest/autorun` against each library. This review did not rerun the full suite, C-parser build or
+Sorbet; the builder's suite counts above remain builder evidence, not new verification. No fork modifications,
+fork push, PR opening, or upstream comments were made.
 
 ## Rejected
 
