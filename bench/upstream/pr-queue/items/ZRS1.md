@@ -238,6 +238,29 @@ passes:
       while its snapshot shows inlining, so the name only becomes true in commit 2. tekknolagi's baseline
       tests have neutral names. Renaming it test_invokesuper_from_refined_method in both commits is
       optional. Not rerun: full zjit-test, test-all, btest, hosted CI, arm64. No Ruby push or post.
+  - reviewer: thermos-sol
+    orb: T-01a1f051-e70d-74df-8d5a-51990dfd4dbf
+    head: "a5ac62d1a22e8ffa9a2cc8e5ac4720ea5b191482"
+    date: 2026-11-18
+    verdict: approve
+    open: >-
+      Short confirm, both Thermos rubrics applied directly, no delegated reviewers. No must-fixes or
+      remaining body/reply wording changes. Exact fork branch verified: two commits on 7db0202722.
+      Commit 61f275c7e5 changes only opt_tests.rs, adding the test with master's HIR snapshot; checked out
+      alone, make -j2 miniruby succeeds and ZJIT_TESTS=invokesuper passes 47/47, including the new baseline
+      test. Final head's tree is exactly 7a1eed11f4's (tree 3052f43db83164971aebc405ddd609446e0bb40b);
+      its fix commit shows the requested before/after HIR diff. Rebuilt exact head: invokesuper 48/48,
+      isolated profiling test 6/6, repro at threshold 2 returns R2 A 100/100. Both commits have Thomas as
+      author and committer and no trailers. Record precision: the fix-message prose is identical, but
+      raw messages are 946 versus 947 bytes because the new one adds a trailing LF; not a source or
+      message-content issue, and no Ruby rewrite is needed. The shortened body is accurate and removes
+      the suite-count paragraph; VM's super lookup now clearly names dispatch rather than the predicate.
+      Reply 1 accurately names the baseline commit and HIR transition. All four sentences of reply 2
+      match YJIT, internal/class.h, vm_search_normal_superclass, the wrapper and current bindgen options
+      (inline emission and static-wrapper generation are not enabled). YJIT remains unchanged. Details:
+      docs/upstream/zjit-differential.md, ZRS1 Sol confirm of a5ac62d1a2. Earlier full-suite evidence and
+      its pre-existing profiling failure still apply to the identical tree; no new full-suite claim.
+      No Ruby push or external post; drafts left unchanged for Thomas.
 ---
 
 # ZJIT: Don't specialize super from a refined method

@@ -576,6 +576,65 @@ Suggested replies:
 
 Not run: full test-all, btest, hosted CI, arm64.
 
+### ZRS1 Sol confirm of a5ac62d1a2 (2026-11-18)
+
+**Verdict: approve; no must-fixes or remaining body/reply wording changes.** `thermos-sol`, orb
+`T-01a1f051-e70d-74df-8d5a-51990dfd4dbf`. Both Thermos rubrics applied directly, with no delegated reviewer,
+subagent, new thread or coordination with the independent reviewer. This is the requested short confirm of
+`thomasklemm/ruby:zjit-super-from-refinement-4`, exact head
+`a5ac62d1a22e8ffa9a2cc8e5ac4720ea5b191482`, against `7db0202722a286011518bd291f51a15fb652dc02`.
+
+**Commit partition and executed checks.** The branch has exactly two commits. First,
+`61f275c7e5e3aea346f6291be2678dca2b5796ef` adds only 50 lines in `zjit/src/hir/opt_tests.rs`: the new test
+with master's snapshot. Checked out alone, `make -j2 miniruby` succeeds and
+`make -s zjit-test ZJIT_TESTS=invokesuper` reports **47 passed**, including the new baseline test. The binary
+banner names `61f275c7e5`. The fix commit then shows the requested before/after directly: remove the method
+entry/frame guards, `PushInlineFrame`, inner polymorphic `InvokeSuper` and `PopInlineFrame`; retain a generic
+`InvokeSuper` with the refined-method reason. No failing intermediate commit is required.
+
+`git rev-parse a5ac62d1a2^{tree} 7a1eed11f4^{tree}` returns
+`3052f43db83164971aebc405ddd609446e0bb40b` twice; `git diff --exit-code 7a1eed11f4 a5ac62d1a2` is empty.
+Rebuilt exact head: the same invokesuper command reports **48 passed**, including both new tests. Six fixed
+standalone runs of `test_profile_frames_during_direct_jit_to_jit_entry` pass **6/6**. The 100-call repro at
+threshold 2 returns `{"R2 A"=>100}`. Scratch source worktree restored clean at exact head. Logs are under
+`.amp/in/orb-backup/zrs1-review/round4-{baseline,head}-*.log` in this orb.
+
+Both commits use Thomas as author and committer and have no trailers. The baseline message accurately
+describes its sole test addition. The fix-message prose is unchanged from the reviewed `7a1eed11f4` message;
+all causal, lookup, helper and regression-attribution sentences retain the earlier evidence. A precision
+correction to the builder note: raw messages are **946 versus 947 bytes**, not byte-identical; the new message
+has one extra terminal LF. No content difference or Ruby history rewrite is needed.
+
+**Body, sentence by sentence.** The issue and introducing-commit attribution retain the earlier historical
+repro evidence. The next three sentences accurately describe a caller-specific refinement iclass, the wrong
+origin-super target and `"R2 R1 A"` versus `"R2 A"`. The fallback sentence agrees with the generic VM path and
+YJIT's existing refusal. `InvokeSuper`/`SuperFromRefinement` and the canonical predicate/wrapper sentences
+match the head. The final sentence now says **"The VM's super lookup preserves…"**, correctly attributing
+class/module and definition-site refinement handling to lookup, not the predicate. The suite-count/SIGPROF
+paragraph is gone. No further body edit is required.
+
+**Reply 1, its single sentence.** The named test exists in the named file; commit 1 carries the current/base
+HIR and passes alone. Its `R2#foo` snapshot inlines `R1#foo` via `PushInlineFrame`; commit 2 changes that same
+snapshot to generic `InvokeSuper` with the displayed reason mapped from `SuperFromRefinement`. Every clause
+is accurate, and the two-commit presentation now supplies the requested before/after.
+
+**Reply 2, all four sentences.** (1) YJIT's `gen_invokesuper_specialized` has the same three checks inline.
+(2) `RICLASS_FOR_REFINEMENT_P` is `static inline bool` in `internal/class.h` and is used by
+`vm_search_normal_superclass`. "bindgen can't reach it" is accurate for this project's configuration:
+`zjit/bindgen/src/main.rs` enables neither inline-function emission nor static-function wrapping, and the
+predicate has no direct binding. (3) The new `zjit.c` wrapper calls that predicate, immediately beside the
+existing singleton predicate wrapper, and HIR calls its generated binding. (4) No YJIT file changes; leaving
+its correct copy alone keeps this a ZJIT fix. No reply wording change remains; drafts stay unposted for Thomas.
+
+**Both rubrics.** The identical final tree retains the earlier correctness/security and maintainability
+findings: canonical C predicate behind the established FFI boundary, idiomatic wrapper and generated binding,
+one conservative refusal at the existing specialization boundary, no new lookup implementation or unrelated
+YJIT refactor. The partition adds no runtime changes beyond that already-reviewed tree. No new source finding.
+The earlier guard-removal controls and full-suite evidence still apply; the profiling failure was reproduced
+on unmodified master and was not a deterministic standalone failure. Full ZJIT/Ruby suites, btest, hosted CI
+and arm64 were not rerun in this short confirm; this is not a claim of wholly green full suites. No Ruby push
+or external post.
+
 ### Z11 on three census apps
 
 Campfire, Fizzy and Writebook are census apps. Their own suites above are Z11's comparison (interpreter against
