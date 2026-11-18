@@ -63,7 +63,7 @@ singleton receivers.
 | 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | micro −17% Ir per write; lobsters −584 generic writes per iteration, others 0 | free (efegokdemir's attempt was on the wrong repo) | **built, ZSV1** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
 | 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
-| 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | free (#1039 row 78 unassigned) | old build, not rebased |
+| 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | taken 2026-11-18: tekknolagi's draft ruby/ruby#18616 (11-16 head) covers final versions | old build, not rebased, stays unopened |
 | 7 | lead 3 polymorphic recompile (ZL3) | answered on #776, waits for the team | largest on lobsters and shipit | ours | held |
 
 Not taken: anything in k0kubun's #1039 rows (yield dispatch, polymorphic and megamorphic sends, ivar shape tables),

@@ -118,12 +118,14 @@ and `send_polymorphic_fallback` (lead 3, lobsters 259k).
   `run_benchmarks.rb` can show.
 * `Kernel#dup` stays blocked ([zjit-shortlist](zjit-shortlist.md)); `String#dup` is ZSD1 (parked).
 
-### 5. Generic ivar reads: owned except 15a
+### 5. Generic ivar reads: owned
 
 `getivar_fallback_no_profile_missing_ic` 201k / 205k (`url_options`, `optimize_routes_generation?`, `performed?`):
-lead 11, tekknolagi's draft ruby/ruby#18616. `getivar_fallback_no_side_exits` 0 / 143k: final versions; the
-attr_reader piece is our lead 15a (built 11-03 on `thomasklemm/zjit-final-attr-reader-shape`, not rebased; the rest
-is k0kubun's #1031/#19617). 15a's last measurement was −0.60% Ir on shipit and within A/A on railsbench and lobsters.
+lead 11, tekknolagi's draft ruby/ruby#18616. `getivar_fallback_no_side_exits` 0 / 143k: final versions; the rest is
+k0kubun's #1031/#19617. The attr_reader piece was our lead 15a (built 11-03 on
+`thomasklemm/zjit-final-attr-reader-shape`, −0.60% Ir on shipit); checked later the same day, #18616's 11-16 head
+covers it too: a monomorphic attr_reader in a final version branches on class and shape and loads the field, so 15a
+is taken ([lead queue](zjit-iseq-leads.md#queue-which-leads-are-free-2026-11-03)).
 
 ### 6. `guard_type_failure` on lobsters: new, free, small (OTS1)
 
@@ -211,8 +213,9 @@ still guards and recompiles after five exits.
    outside A/A. Expected gain on these two benchmarks is ≈0.05% of lobsters and 0 on railsbench, so the body should
    say exactly that and show the exit diff, not a time. Before opening: Thomas's "can explain it first" step, a
    Callgrind A/A on lobsters if a number is wanted, and the usual review passes. Not opened.
-2. **Larger and also free: rebase 15a.** Lobsters has 143k generic ivar reads in final versions per iteration;
-   15a removed 28k of them on 11-03 and 163k on shipit (−0.60% Ir). Worth a rebase and fresh numbers after OTS1.
+2. ~~Larger and also free: rebase 15a.~~ Taken (checked later on 11-18): tekknolagi's draft ruby/ruby#18616, refreshed
+   on 11-16, gives a monomorphic attr_reader in a final version a class and shape branch with a field load, which is
+   15a's change. On the 15a probe the final version's 1,002 generic reads on master drop to 0 on #18616's head.
 3. **Not worth it now:** frameless `Hash#key?`/`Regexp#match?` (≈0.03–0.08%, ~180 lines each), and everything in
    causes 1–3 and 5, which is owned. Old leads not reopened: ZSD1 stays parked (`String#dup` 25k calls, ≈0.005%),
    ZS1 is open as ruby/ruby#19912, VB1 is closed Rails-side and answered by ZS1.
