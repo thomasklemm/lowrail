@@ -27,6 +27,7 @@ passes:
   - {reviewer: sol, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
   - {reviewer: astra, head: "f1709a4f539ddec0363b18daab0e0b057c0959b9", date: 2026-11-06, verdict: approve, open: "Final confirm on restacked head; no findings."}
   - {reviewer: claude-code, head: "64b0190a0a5df7abc35368535aa791f192bc65b4", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: nits, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Clause backed by driver-cpu.md. Nit not applied (wording predates this cleanup): 'do not claim a request-level speedup' is on the DECISIONS leave-out list."}
+  - {reviewer: thermos-sol, orb: "T-01a1ee72-6d4f-7377-b2ff-f1240d8bebeb", head: "64b0190a0a5df7abc35368535aa791f192bc65b4", date: 2026-11-18, verdict: approve, open: "body only; live/generated bodies, source, record and upstream template checked; both rubrics self-performed, no delegation. UTF-8 predicate, SQLite copy and invalid-encoding behavior agree with source; table agrees with driver record. No body correction needed; not a new code approval."}
 ---
 
 # Avoid a redundant String when binding UTF-8 text

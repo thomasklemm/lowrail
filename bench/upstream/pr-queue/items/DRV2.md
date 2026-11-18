@@ -33,6 +33,7 @@ passes:
   - {reviewer: sol, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
   - {reviewer: astra, head: "6c212edd9c751fdb9e4b4173ef373e8fadd0ef6b", date: 2026-11-06, verdict: approve, open: "Commit message confirm; no findings."}
   - {reviewer: claude-code, head: "16cc8f7b7ac6fc9bb4272df07693437dad41aaec", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by driver-cpu.md."}
+  - {reviewer: thermos-sol, orb: "T-01a1ee72-6d4f-7377-b2ff-f1240d8bebeb", head: "979b9f6b9914ea61c3f4f5b3b06b264c7f9e760c", date: 2026-11-18, verdict: approve, open: "body only; live/generated bodies, source, record and upstream template checked; both rubrics self-performed, no delegation. Known-size row fill, single-column path and frozen results agree with source; full-model table agrees with driver record. No body correction needed; not a new code approval."}
 ---
 
 # Fill multi-column statement rows at their known size

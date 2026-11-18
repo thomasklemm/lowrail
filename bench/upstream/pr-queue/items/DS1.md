@@ -19,6 +19,7 @@ pr: 45658
 note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body without the test-run paragraph, unposted; code unchanged. opened 2026-11-05; the Queue table still listed it as blocked on the CLA"
 passes:
   - {reviewer: claude-code, head: "75526aa95c", orb: T-01a1ded6-4813-7653-94e8-9b8375d70deb, date: 2026-11-15, verdict: approve, open: "Footer cleanup (DECISIONS 4eb18bee, Fixed parts): reviewed the old and new body word diff. Only the <sub> footer and Lowrail links are removed and, where useful, one how-found clause is added; numbers, tables, scripts and wording unchanged; no internal labels or private names. Added clause backed by app-suites.md DS1."}
+  - {reviewer: thermos-sol, orb: "T-01a1ee72-6d4f-7377-b2ff-f1240d8bebeb", head: "75526aa95c", date: 2026-11-18, verdict: approve, open: "body only; live/generated bodies, source, record and upstream template checked; both rubrics self-performed, no delegation. Association mapping, serialization and deliberately unchanged destroy behavior agree with source and Rails compatibility record; permalinks retained. No body correction needed; not a new code approval."}
 ---
 
 # FIX: Scope Category#category_channels to the category's channels

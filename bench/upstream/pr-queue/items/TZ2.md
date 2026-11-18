@@ -21,6 +21,7 @@ note: "2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem
 passes:
   - {reviewer: skeptic, head: "57056ddd7f46f9c292e46687821636e812102c85", date: 2026-11-05, verdict: approve, open: "exact code and shortened body approved; no must-fix or body nit; recommends one update as a simpler file-load decoder, not an app-speed claim; record's skip wording corrected"}
   - {reviewer: sol, head: "57056ddd7f", date: 2026-11-05, verdict: approve, open: "body checked against the record; patch identical to 57c9c3ad35"}
+  - {reviewer: thermos-sol, orb: "T-01a1ee72-6d4f-7377-b2ff-f1240d8bebeb", head: "57056ddd7f46f9c292e46687821636e812102c85", date: 2026-11-18, verdict: approve, open: "body only; live/generated bodies, source, record and upstream template checked; both rubrics self-performed, no delegation. Signed unpack, checked read and unchanged format-1 path agree with source; complete synthetic-file table retained without CI prose. No body correction needed; not a new code approval."}
 ---
 
 # Decode signed 64-bit zoneinfo transition times directly
