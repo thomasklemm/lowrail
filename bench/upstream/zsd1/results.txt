@@ -1,0 +1,33 @@
+ZSD1 claude-code pass on c71669b114 (2026-11-18). Builds: clang-19 --enable-zjit=dev of c71669b114 (head),
+7919a47d46 (master) and head + fix.diff (fix); gcc --enable-zjit release installs of head and master for Callgrind
+and stats.
+
+const2.rb (BUF = +"abc"; def f = BUF.dup; mutate BUF after f is compiled)
+  interpreter, master ZJIT t1/t2, fix ZJIT t1/t2: "abcxyz"/6, BINARY, "Q", "é" valid non-ASCII, "", 40
+  head ZJIT t1 and t2: "abc"/3 on every line, UTF-8, ascii_only true, bytesize 3 after BUF.replace("z" * 40)
+  HIR on head: Const Value(BUF) -> GuardNoBitsSet SHAPE_ID_HAS_IVAR_MASK -> StringCopy; gen_string_copy's
+  constant fast path (rb_zjit_str_resurrect_fastpath) bakes BUF's compile-time bytes, length and flags.
+
+probe.rb (62 lines; 20 receivers, mutation after dup, ivars added after compilation, chilled literal,
+mutated constant, allocation tracing, TracePoint c_call, GC.stat allocations, GC.compact, refinement,
+prepended module, redefinition and restore), interpreter vs ZJIT t1 and t2:
+  head:   2 lines differ (the mutated-constant encoding and contents lines, as const2.rb)
+  fix:    0 lines differ;  master: 0 lines differ; interpreter output identical on head and master
+
+micro.sh (dup_micro.rb, s.dup of a 20-byte String passed as argument, threshold 2, slope 50,000 -> 250,000):
+  default heap:              master 397, master rerun 397, head 368, head rerun 368 Ir per call (-29)
+  RUBY_GC_HEAP_INIT_BYTES=32M: master 250, head 221 Ir per call (-29)
+
+railsbench, ruby_bench_jit_stats.rb (15 warmup + 10), per iteration:
+  master:  ccall_String#dup 25,218  ccall_rb_ec_str_resurrect 558.5
+  master2: ccall_String#dup 25,218  ccall_rb_ec_str_resurrect 496.7
+  head:    ccall_String#dup 0       ccall_rb_ec_str_resurrect 25,779.7   no exit_guard_no_ivars_failure
+
+make zjit-test: head 2,017/2,018, master 2,013/2,014, fix 2,018/2,019; the one failure in each is
+  codegen::tests::test_profile_frames_during_direct_jit_to_jit_entry (rb_profile_frames not called from SIGPROF).
+  test_string_dup_of_mutated_constant (fix.diff) on head: FAIL, ["abc", UTF-8] instead of ["abc!", BINARY].
+btest head t1 and t2: PASS all 2148. test-all test_zjit*, test_string*, test_optimization head t1 and t2:
+  657 tests, 0 failures.
+make zjit-bindgen (clang-19 dev build, after rustup component add rustfmt): exit 0, git diff empty, so the
+  hand-added SHAPE_ID_HAS_IVAR_MASK = 67633150 and shape_id_mask match. Without rustfmt it panics with
+  "no line to replace: pub type jit_bindgen_constants = u32".

@@ -1,0 +1,40 @@
+diff --git a/zjit/src/codegen.rs b/zjit/src/codegen.rs
+index 1df6fd8..182196f 100644
+--- a/zjit/src/codegen.rs
++++ b/zjit/src/codegen.rs
+@@ -2253,7 +2253,7 @@ fn gen_string_copy(jit: &mut JITState, asm: &mut Assembler, function: &Function,
+     // TODO: split rb_ec_str_resurrect into separate functions
+     gen_prepare_leaf_call_with_gc(asm, state);
+ 
+-    let Some(src) = function.type_of(val_id).ruby_object() else {
++    let Some(src) = function.type_of(val_id).ruby_object().filter(|src| src.is_frozen()) else {
+         return asm_ccall!(asm, rb_ec_str_resurrect, EC, recv, (chilled as i64).into());
+     };
+ 
+diff --git a/zjit/src/codegen_tests.rs b/zjit/src/codegen_tests.rs
+index ef155f2..941dea3 100644
+--- a/zjit/src/codegen_tests.rs
++++ b/zjit/src/codegen_tests.rs
+@@ -333,6 +333,22 @@ fn test_string_dup_with_ivars_or_subclass() {
+     "#), @"[1, MyString, true]");
+ }
+ 
++#[test]
++fn test_string_dup_of_mutated_constant() {
++    eval(r#"
++        S = +"abc"
++        def test = S.dup
++        test
++        test
++    "#);
++    assert_snapshot!(assert_compiles(r#"
++        S << "!"
++        S.force_encoding(Encoding::BINARY)
++        dup = test
++        [dup, dup.encoding]
++    "#), @r#"["abc!", #<Encoding:BINARY (ASCII-8BIT)>]"#);
++}
++
+ #[test]
+ fn test_dupchilledstring() {
+     eval(r#"
