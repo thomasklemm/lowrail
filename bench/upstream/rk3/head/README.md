@@ -58,4 +58,45 @@ then R-yjit, one chain; cohort M runs alongside it (two CPUs).
 
 ## Results
 
-Filled in after the runs.
+Each cohort ran once, all three accepted. No Valgrind log has a brk overflow, every dump has a `totals:` line (the
+process-exit dumps of the request runs are all `totals: 0`; in the micro dumps `summary:` equals `totals:`), and no
+process failed. A launch before the scripts existed started nothing and measured nothing.
+
+**Cohort M** ([`../body/RK3-head`](../body/RK3-head/table.md), `valgrind.json` equal to the prefix's manifest): every
+cell is claimed; YJIT cells are JIT-flat in all 6 windows.
+
+| Interpreter, per call | Main (A/A) | Head | Change | Objects |
+| --- | ---: | ---: | ---: | --- |
+| `parse_nested_query` | 184,866 / 184,536 (0.18%) | 121,136 | −34.4% | 100 → 51 |
+| `parse_cookies_header` | 71,386 / 71,466 (0.11%) | 36,470 | −48.9% | 34 → 17 |
+| `set_cookie_header` | 103,951 / 104,199 (0.24%) | 28,580 | −72.5% | 29 → 15 |
+
+YJIT: −42.5% (A/A 0.11%), −52.0% (0.02%), −74.8% (0.09%), same objects.
+
+**Cohort R-interp** ([`interp/results.txt`](interp/results.txt), [`interp/table.md`](interp/table.md)): accepted,
+worst A/A 0.27%.
+
+| Workload | A/A | Main | Head | Change | Objects main → head |
+| --- | ---: | ---: | ---: | ---: | --- |
+| blog PATCH article (redirect) | 0.27% | 4,692,856 | 4,433,253 | −5.53% | 1433.0 → 1281.7 |
+| pingcrm PUT contact (Inertia redirect) | 0.23% | 7,107,335 | 6,879,118 | −3.21% | 1824.3 → 1717.4 |
+| blog GET article | 0.05% | 8,338,573 | 8,210,414 | −1.54% | 2020.8 → 1958.6 |
+| codetriage GET repo | 0.12% | 14,880,426 | 14,726,281 | −1.04% | 3264.1 → 3198.6 |
+| blog GET articles.json | 0.02% | 4,233,873 | 4,233,067 | within A/A | 1126.6 → 1126.6 |
+
+**Cohort R-yjit** ([`yjit/results.txt`](yjit/results.txt), [`yjit/table.md`](yjit/table.md)): accepted, worst A/A
+0.40%, every window `jit 0/0` after one settling window.
+
+| Workload | A/A | Main | Head | Change | Objects main → head |
+| --- | ---: | ---: | ---: | ---: | --- |
+| blog PATCH article (redirect) | 0.37% | 2,574,045 | 2,315,864 | −10.03% | 1437.7 → 1286.8 |
+| blog GET article | 0.33% | 4,752,210 | 4,621,296 | −2.75% | 2033.7 → 1969.7 |
+| pingcrm PUT contact (Inertia redirect) | 0.40% | 4,084,924 | 3,861,941 | −5.46% | 1834.0 → 1728.4 |
+| blog GET articles.json | 0.24% | 2,217,952 | 2,210,626 | −0.33% | 1135.6 → 1135.6 |
+
+The YJIT JSON control is −0.33%, just outside its 0.24% A/A, with identical objects; it is not attributed to the
+change and not used. The body takes the micro table's interpreter rows and the YJIT range over the three requests
+that read or write the session cookie, rounded to what the A/A supports: 3% to 10%.
+
+Per-process files in `interp/raw` and `yjit/raw`: the exact command and environment (`.cmd`), the verbose Valgrind
+log, and stderr (`OBJS`, `JIT`, `SETTLE`); the dumps are in each cohort's `callgrind-dumps.tar.xz`.

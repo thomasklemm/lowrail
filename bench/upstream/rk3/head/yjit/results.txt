@@ -1,0 +1,17 @@
+blog PATCH article (redirect) yjit main Ir/op 2578924 objs/op 1438.6 jit 0/0 settle 1
+blog PATCH article (redirect) yjit main Ir/op 2573928 objs/op 1437.0 jit 0/0 settle 1
+blog PATCH article (redirect) yjit head Ir/op 2315864 objs/op 1286.8 jit 0/0 settle 1
+blog PATCH article (redirect) yjit main Ir/op 2569282 objs/op 1437.5 jit 0/0 settle 1
+blog GET article yjit main Ir/op 4762650 objs/op 2038.0 jit 0/0 settle 1
+blog GET article yjit main Ir/op 4747057 objs/op 2033.6 jit 0/0 settle 1
+blog GET article yjit head Ir/op 4621296 objs/op 1969.7 jit 0/0 settle 1
+blog GET article yjit main Ir/op 4746924 objs/op 2029.4 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit main Ir/op 4084020 objs/op 1833.2 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit main Ir/op 4077190 objs/op 1830.4 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit head Ir/op 3861941 objs/op 1728.4 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit main Ir/op 4093561 objs/op 1838.3 jit 0/0 settle 1
+blog GET articles.json yjit main Ir/op 2217723 objs/op 1135.6 jit 0/0 settle 1
+blog GET articles.json yjit main Ir/op 2215377 objs/op 1135.6 jit 0/0 settle 1
+blog GET articles.json yjit head Ir/op 2210626 objs/op 1135.6 jit 0/0 settle 1
+blog GET articles.json yjit main Ir/op 2220757 objs/op 1135.6 jit 0/0 settle 1
+DONE

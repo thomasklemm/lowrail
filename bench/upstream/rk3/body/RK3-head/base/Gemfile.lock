@@ -1,0 +1,21 @@
+PATH
+  remote: /home/user/up/rack-main
+  specs:
+    rack (3.2.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  rack!
+
+CHECKSUMS
+  rack (3.2.0)
+
+BUNDLED WITH
+  4.0.20

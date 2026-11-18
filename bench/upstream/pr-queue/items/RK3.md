@@ -12,12 +12,13 @@ built_on: "da90464e3fa93e3cb49dc2d4ede798e6c6b70b4f"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Query/form keys and values and cookies read or written are decoded and escaped by cgi/escape: method bodies of 02087583dc (identical to head apart from the guard) over Rack 3.2.7 save −0.9% to −5.4% instructions per request in the interpreter with glibc fastbins off (four requests, three apps) and −2.9% to −10.1% under YJIT (three requests, two apps, every window JIT-flat), about 60–140 fewer objects; no differences against URI in 300k-case differentials plus coercion cases on Ruby 3.2–4.0 except BasicObject, which now raises NoMethodError, with and without cgi/util and with the Ruby CGI implementation"
+impact: "Query/form keys and values and cookies read or written are decoded and escaped by cgi/escape: full checkouts of the head against rack main save −1.0% to −5.5% instructions per request in the interpreter with glibc fastbins off (four requests, three apps) and −2.8% to −10.0% under YJIT (three requests, two apps, every window JIT-flat), about 60–150 fewer objects; no differences against URI in 300k-case differentials plus coercion cases on Ruby 3.2–4.0 except BasicObject, which now raises NoMethodError, with and without cgi/util and with the Ruby CGI implementation"
 rank: 1
 risky: false
 state: ready
 pr: 2557
 note: >-
+  Exact-head numbers 2026-11-18 (thermos-sol body confirm on c0a8e93011 required them): three cohorts declared in bench/upstream/rk3/head/README.md (committed before the runs), each run once, all accepted; pinned Valgrind 3.19.0 with 512 MiB brk, verbose logs kept, no brk overflow, counts from each dump's trailing totals line. Micro (script/upstream-bench, now reading totals; bench/upstream/rk3/body/RK3-head): interpreter main → head 184.7k → 121.1k, 71.4k → 36.5k, 104.1k → 28.6k per call (A/A 0.18%, 0.11%, 0.24%), objects unchanged at 100 → 51, 34 → 17, 29 → 15; YJIT cells JIT-flat. Requests on full checkouts (census Gemfile variants pinning rack to da90464e3f or c0a8e93011, no overlay; base is now rack main instead of 3.2.7, and there is no decode-only column): interpreter with mxfast=0 −5.53% blog PATCH, −3.21% pingcrm PUT, −1.54% blog GET article, −1.04% codetriage GET repo, JSON control within A/A (worst A/A 0.27%); YJIT −10.03%, −2.75%, −5.46%, every window 0/0, worst A/A 0.40%, JSON control −0.33% against 0.24% A/A with identical objects (recorded, not used). Body: table and request range (3% to 10%) replaced; it had no earlier-revision sentence left (removed in the rules review). PR, fork and body on GitHub untouched; nothing posted.
   2026-11-18 (rules review, docs/upstream/rules-review-2026-11-18-ecosystem.md): body checked against PR descriptions/Leave out: differential Ruby list, allocator methodology, earlier-revision note and fork-CI paragraph removed, cut to about 330 words, unposted.
   Adopted 2026-11-18 (Thomas approved): body sentence on ivars narrowed to the CGI escape fast path exactly as the thermos-sol text confirm on c0a8e93011 required (its only must-fix; messages and trees passed); lease-pushed c0a8e93011 onto thomasklemm/unescape-cgi over 02087583dc and PATCHed the body; GitHub reports MERGEABLE.
   Wording -4 2026-11-18 (thermos-sol confirm on 1f11617245: changes, text only): fork branch unescape-cgi-4, head c0a8e93011 (decode 9285fa0f4d + escape c0a8e93011 on rack main da90464e3f), rebuilt with /usr/bin/git commit-tree; trees equal d8bfe684c1/1f11617245 (081e31d2, 59515c05), original author dates, Thomas as author and committer, no trailers. Only the messages changed: both now say a BasicObject has no instance_of? and raises NoMethodError at the guard instead of going to URI. Body: "One thing changes" replaced by "A `BasicObject` that URI could convert now raises `NoMethodError` at the guard" (a plain BasicObject already fails on main), and the limitations sentence adds "Unlike URI, escaping a plain String does not copy its instance variables."; that also holds on the live PR head 02087583dc. The PR branch thomasklemm/unescape-cgi stays at 02087583dc and nothing was posted; moving the PR is Thomas's decision. No code, guard, comment or test changed, so the 1f11617245 review evidence applies.
@@ -54,8 +55,8 @@ Callgrind instructions and objects per call for a Rails-like form body, session 
 
 | | main | this branch |
 | --- | ---: | ---: |
-| `parse_nested_query` | 183.0k / 100 | 119.0k / 51 |
-| `parse_cookies_header` | 71.1k / 34 | 36.2k / 17 |
-| `set_cookie_header` | 103.9k / 29 | 28.8k / 15 |
+| `parse_nested_query` | 184.7k / 100 | 121.1k / 51 |
+| `parse_cookies_header` | 71.4k / 34 | 36.5k / 17 |
+| `set_cookie_header` | 104.1k / 29 | 28.6k / 15 |
 
-In Rails, cookies are read and written through these methods and form bodies are parsed by Rack. In whole requests of two open-source Rails apps with YJIT, this removes 2.9% to 10.1% of the instructions per request, mostly from the session cookie.
+In Rails, cookies are read and written through these methods and form bodies are parsed by Rack. In whole requests of two open-source Rails apps with YJIT, this removes 3% to 10% of the instructions per request, mostly from the session cookie.

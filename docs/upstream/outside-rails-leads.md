@@ -255,6 +255,12 @@ gain is in skipping the translation, which needs flavorjones to accept a second 
 
 ## RK3 built (2026-11-18)
 
+**Exact-head numbers (2026-11-18).** On head `c0a8e93011` against rack main `da90464e3f`, three declared cohorts,
+each run once and accepted ([manifest and results](../../bench/upstream/rk3/head/README.md)): the body's micro table
+(interpreter −34.4%, −48.9%, −72.5% per call, A/A ≤ 0.24%) and whole requests on full checkouts, not method overlays
+(interpreter with fastbins off −1.0% to −5.5%, four requests in three apps, A/A ≤ 0.27%; YJIT −2.8% to −10.0%, three
+requests in two apps, every window JIT-flat, A/A ≤ 0.40%). The request figures below are earlier records.
+
 **Thermos review supersedes blanket exactness below (2026-11-18).** Verdict **changes** on amended head
 `6f48723a86`, recorded as `thermos-sol`. The restored escape guard fixes the old-head UTF-16 loader failure.
 Full Rack suites on 3.4.12/4.0.9 each with and without `cgi/util`: 1,292 runs, 6,270 assertions, zero failures/errors,

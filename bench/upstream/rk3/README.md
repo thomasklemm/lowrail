@@ -20,6 +20,9 @@ micro figures are diagnostic only; request YJIT windows are flat. Earlier review
   (setup `micro.rb`), main twice as the A/A.
 * `ips.sh MAIN_LIB BRANCH_LIB OUTDIR [yjit]`: benchmark-ips of the same lines on one pinned core, main and branch
   alternating, `ROUNDS` rounds; `ips_table.rb OUTDIR...` prints best-of-rounds tables.
+* `head/`: the exact-head cohorts (micro table via `script/upstream-bench` into `body/RK3-head`, whole requests on
+  full Rack checkouts through census Gemfile variants): declaration, scripts, results and receipts in
+  [`head/README.md`](head/README.md). They replace `req/` and `body/RK3` for the body's numbers.
 * `req/`: measurement patches for `bench/upstream/outside_leads/req/batch2.sh` (rack 3.2.7 in the census apps has
   the same three methods as main): `rk3.rb` is the first commit's methods verbatim, `rk34.rb` both commits,
   `none.rb` the A/A. Workload lists `wl-interp.txt`, `wl-yjit.txt`, `wl-yjit-pingcrm.txt` (run with `FLAT=40`).

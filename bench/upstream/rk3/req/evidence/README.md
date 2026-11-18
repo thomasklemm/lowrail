@@ -11,6 +11,9 @@ Each line of a cohort is one process: `reqrun.rb APP WORKLOAD 20 MODE PATCH` und
 `Rails.application#call`, GC off for the 20 measured requests (`NOGC=1`). Order per workload: none, none, rk3, rk34,
 none, so every workload has three unchanged runs; A/A = (max − min) / mean of those three.
 
+Superseded for the body by the exact-head, full-checkout cohorts in [`../../head/`](../../head/README.md); kept as
+the record of these runs.
+
 ## Cohorts
 
 Run from `bench/upstream/rk3/req`:
