@@ -22,6 +22,10 @@ class EndpointTest < Minitest::Test
       raise "no endpoint units" unless built[:units].size == 2
       compiled = Lowrail::Compiler.compile({"out" => File.expand_path(".lowrail"), "rails_env" => "test", "units" => built[:units]})
       raise "endpoint ISeq declined" unless compiled.fetch("units").size == 2
+      if ENV["MUTATE"] == "release"
+        other = Lowrail::RailsPins::RELEASES.keys.find { _1 != Rails.version }
+        Rails.define_singleton_method(:version) { other }
+      end
       Lowrail.setup(root: Dir.pwd)
       if ENV["MUTATE"] == "warm"
         2.times do
@@ -118,7 +122,7 @@ class EndpointTest < Minitest::Test
       end
       puts JSON.generate({responses: results, hits: Lowrail::Stats.unit_hits, fallbacks: Lowrail::Stats.unit_fallbacks})
     RUBY
-    %w[0 1 2 3 4 5 warm template filter constant].each do |mutation|
+    %w[0 1 2 3 4 5 warm template filter constant release].each do |mutation|
       realpath_tmpdir do |dir|
         write_endpoint_app(dir)
         result = ruby_json(scenario, chdir: dir, setup: false,
@@ -133,7 +137,11 @@ class EndpointTest < Minitest::Test
         assert_equal %w[1 2 3 4 warm].include?(mutation) ? 10 : 0, index.fetch("body").scan("<!-- live helper -->").size
         assert_equal mutation == "template", index.fetch("body").include?("<!-- changed template -->")
         assert_equal mutation == "filter" ? ["once", "once"] : [nil, nil], [index.fetch("filter"), show.fetch("filter")]
-        assert_equal 1, result.fetch(%w[0 constant].include?(mutation) ? "hits" : "fallbacks").fetch("0", 0)
+        if mutation == "release"
+          assert_equal [{}, {}], [result.fetch("hits"), result.fetch("fallbacks")]
+        else
+          assert_equal 1, result.fetch(%w[0 constant].include?(mutation) ? "hits" : "fallbacks").fetch("0", 0)
+        end
         if mutation == "warm"
           ["0", "1"].each do |mode|
             control = ruby_json(scenario, chdir: dir, setup: false,

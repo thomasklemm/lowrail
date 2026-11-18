@@ -88,7 +88,7 @@ module Lowrail
         end
         units << {"pass" => PASS, "kind" => "runtime", "target" => target, "file" => target,
           "sites" => 1, "facts" => [], "endpoint" => {"controller" => CONTROLLER, "action" => action,
-            "locale" => I18n.locale.to_s,
+            "locale" => I18n.locale.to_s, "rails_version" => Rails.version,
             "sources" => sources, "templates" => templates, "helper" => Endpoint.method_signature(helper),
             "process" => Endpoint.method_signature(original), "run" => Endpoint.method_signature(run),
             "code" => dispatcher(templates)}}

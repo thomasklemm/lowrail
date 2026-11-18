@@ -53,7 +53,7 @@ module Lowrail
           klass = Lowrail.loaded_constant(name)
           valid = units.select do |unit|
             data = unit.fetch("endpoint")
-            data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha } &&
+            data["rails_version"] == Rails.version && data.fetch("sources").all? { |path, sha| File.file?(path) && Manifest.sha256_file(path) == sha } &&
               method_signature(klass.instance_method(:process)) == data.fetch("process")
           end
           next if valid.empty?

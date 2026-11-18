@@ -4,7 +4,7 @@ The sealed and render passes certify stock Rails source. Which releases they acc
 `Lowrail::RailsPins::RELEASES` (`gem/lib/lowrail/rails_pins.rb`). Any release not in it refuses at build and at
 runtime (invariant 1), so a new security release is a safe no-op until someone adds it. Artifacts record the release
 they were built on, and every unit refuses in a process on another release, including cached render and form
-certificates (`Rails release changed; rebuild`).
+certificates (`Rails release changed; rebuild`) and endpoint units (silently kept original).
 
 ## The table
 
@@ -108,6 +108,11 @@ regressions `TestCertificateTest#test_render_missing_or_mismatched_view_context_
 `release`) and `FormScaffoldTest#test_render_units_without_blog_models_templates_or_form_inventory` (production token
 and collection under a redefined release) fail on 33f044c2 and pass on both homes. An ordinary 8.1.4.1 verify after
 the fix still records 51 hits (30 / 9 / 11 / 1).
+
+The endpoint prototype had the same gap between two allowed releases: built on 8.1.4.1 and run as 8.1.4, both
+actions activated (b96620b3 review). Its units now store `rails_version` too, and `Endpoint.activate` drops units whose
+release differs or is missing. `EndpointTest` mode `release` builds on one allowed release and runs as the other; on
+b96620b3 it takes 2 hits in both homes, with the fix 0 hits and the original responses.
 
 ## Confirm review (2026-11-18)
 
