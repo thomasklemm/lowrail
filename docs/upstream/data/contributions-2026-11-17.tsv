@@ -1,0 +1,237 @@
+# repository	state	merged_at	number (gh api search/issues, 2026-11-17 22:45 UTC)
+ClosureTree/with_advisory_lock	open		150
+IAPark/tiktoken_ruby	closed		132
+MiniProfiler/rack-mini-profiler	open		670
+Shopify/tapioca	open		2748
+activerecord-hackery/ransack	closed	2026-11-05T21:52:23Z	1792
+activerecord-hackery/ransack	closed	2026-11-08T13:11:37Z	1795
+ankane/blind_index	closed		62
+basecamp/once-campfire	closed		319
+basecamp/once-campfire	closed		321
+basecamp/once-campfire	closed	2026-10-07T10:22:52Z	318
+basecamp/once-campfire	closed	2026-10-07T22:09:49Z	337
+basecamp/once-campfire	closed	2026-10-08T11:34:46Z	339
+basecamp/once-campfire	closed	2026-10-08T11:34:46Z	341
+basecamp/once-campfire	closed	2026-10-08T11:34:46Z	342
+basecamp/once-campfire	closed	2026-10-08T11:34:46Z	343
+basecamp/once-campfire	closed	2026-10-08T11:34:46Z	344
+basecamp/once-campfire	open		320
+basecamp/once-campfire	open		345
+basecamp/once-campfire	open		346
+basecamp/once-campfire	open		347
+basecamp/once-campfire	open		350
+basecamp/once-campfire	open		352
+basecamp/once-campfire	open		374
+basecamp/once-campfire	open		417
+cabo/cbor-ruby	closed		43
+caxlsx/caxlsx	closed	2026-11-03T17:55:11Z	550
+discourse/discourse	open		45658
+fables-tales/rubyfmt	closed		882
+fables-tales/rubyfmt	closed		963
+fables-tales/rubyfmt	closed	2026-05-10T19:50:46Z	872
+fables-tales/rubyfmt	closed	2026-05-10T20:27:45Z	876
+fables-tales/rubyfmt	closed	2026-05-10T22:47:47Z	880
+fables-tales/rubyfmt	closed	2026-10-04T05:24:29Z	957
+fables-tales/rubyfmt	closed	2026-10-04T08:52:19Z	956
+getlago/lago-expression	open		91
+inertiajs/inertia-rails	closed	2026-11-17T10:12:32Z	444
+inertiajs/inertia-rails	closed	2026-11-17T10:44:40Z	441
+inertiajs/inertia-rails	closed	2026-11-17T10:48:20Z	435
+inertiajs/inertia-rails	open		436
+inertiajs/inertia-rails	open		437
+inertiajs/inertia-rails	open		442
+kane50613/takumi	open		1973
+kane50613/takumi	open		1974
+matz/spinel	closed		6782
+matz/spinel	closed		7718
+matz/spinel	closed	2026-10-01T17:19:32Z	6701
+matz/spinel	closed	2026-10-01T17:19:32Z	6705
+matz/spinel	closed	2026-10-01T22:08:58Z	6856
+matz/spinel	closed	2026-10-04T10:57:15Z	6720
+mperham/connection_pool	closed	2026-11-03T17:56:35Z	225
+pond/scimitar	open		172
+rack/rack	open		2550
+rails/importmap-rails	open		336
+rails/propshaft	open		289
+rails/rails	closed		59557
+rails/rails	closed		59564
+rails/rails	closed		59577
+rails/rails	closed		59609
+rails/rails	closed		59621
+rails/rails	closed		59623
+rails/rails	closed		59628
+rails/rails	closed		59630
+rails/rails	closed		59637
+rails/rails	closed		59659
+rails/rails	closed		59660
+rails/rails	closed		59663
+rails/rails	closed		59667
+rails/rails	closed		59672
+rails/rails	closed		59673
+rails/rails	closed		59674
+rails/rails	closed		59677
+rails/rails	closed		59803
+rails/rails	closed		59808
+rails/rails	closed		59811
+rails/rails	closed	2026-10-21T12:33:51Z	59235
+rails/rails	closed	2026-10-21T12:46:29Z	59236
+rails/rails	closed	2026-10-21T16:46:28Z	59244
+rails/rails	closed	2026-10-21T19:45:41Z	59252
+rails/rails	closed	2026-10-22T15:33:36Z	59270
+rails/rails	closed	2026-10-22T20:35:57Z	59274
+rails/rails	closed	2026-10-22T21:49:47Z	59278
+rails/rails	closed	2026-10-24T02:34:22Z	59316
+rails/rails	closed	2026-10-24T02:42:03Z	59329
+rails/rails	closed	2026-11-02T16:14:27Z	59533
+rails/rails	closed	2026-11-02T18:26:52Z	59535
+rails/rails	closed	2026-11-02T18:35:23Z	59536
+rails/rails	closed	2026-11-02T18:42:16Z	59537
+rails/rails	closed	2026-11-02T18:55:52Z	59538
+rails/rails	closed	2026-11-02T19:06:51Z	59539
+rails/rails	closed	2026-11-02T19:15:55Z	59534
+rails/rails	closed	2026-11-02T19:28:15Z	59541
+rails/rails	closed	2026-11-02T19:32:01Z	59542
+rails/rails	closed	2026-11-02T19:46:36Z	59543
+rails/rails	closed	2026-11-02T19:50:13Z	59544
+rails/rails	closed	2026-11-03T01:56:24Z	59553
+rails/rails	closed	2026-11-03T02:25:36Z	59554
+rails/rails	closed	2026-11-03T02:28:52Z	59551
+rails/rails	closed	2026-11-03T02:37:01Z	59555
+rails/rails	closed	2026-11-03T02:43:34Z	59552
+rails/rails	closed	2026-11-03T03:29:32Z	59556
+rails/rails	closed	2026-11-03T04:27:07Z	59558
+rails/rails	closed	2026-11-03T04:38:59Z	59560
+rails/rails	closed	2026-11-03T04:54:04Z	59561
+rails/rails	closed	2026-11-03T08:49:31Z	59563
+rails/rails	closed	2026-11-03T08:58:28Z	59568
+rails/rails	closed	2026-11-03T13:59:13Z	59571
+rails/rails	closed	2026-11-03T14:19:34Z	59576
+rails/rails	closed	2026-11-03T15:24:58Z	59562
+rails/rails	closed	2026-11-04T00:25:37Z	59583
+rails/rails	closed	2026-11-04T01:04:49Z	59585
+rails/rails	closed	2026-11-04T07:33:14Z	59596
+rails/rails	closed	2026-11-04T07:37:34Z	59597
+rails/rails	closed	2026-11-04T07:43:32Z	59598
+rails/rails	closed	2026-11-04T13:14:47Z	59603
+rails/rails	closed	2026-11-04T13:29:02Z	59605
+rails/rails	closed	2026-11-04T13:49:27Z	59606
+rails/rails	closed	2026-11-04T13:57:13Z	59607
+rails/rails	closed	2026-11-04T14:09:22Z	59608
+rails/rails	closed	2026-11-04T14:16:35Z	59613
+rails/rails	closed	2026-11-04T14:31:29Z	59615
+rails/rails	closed	2026-11-04T14:58:25Z	59616
+rails/rails	closed	2026-11-04T15:41:03Z	59618
+rails/rails	closed	2026-11-04T15:42:56Z	59614
+rails/rails	closed	2026-11-04T15:50:06Z	59619
+rails/rails	closed	2026-11-04T15:57:48Z	59620
+rails/rails	closed	2026-11-04T16:21:38Z	59624
+rails/rails	closed	2026-11-04T16:30:42Z	59625
+rails/rails	closed	2026-11-04T16:36:57Z	59626
+rails/rails	closed	2026-11-05T01:41:19Z	59584
+rails/rails	closed	2026-11-05T03:25:10Z	59634
+rails/rails	closed	2026-11-05T08:20:51Z	59640
+rails/rails	closed	2026-11-05T09:34:25Z	59570
+rails/rails	closed	2026-11-07T11:01:53Z	59676
+rails/rails	closed	2026-11-09T11:14:41Z	59629
+rails/rails	closed	2026-11-13T04:55:30Z	59642
+rails/rails	closed	2026-11-15T16:49:56Z	59809
+rails/rails	open		59565
+rails/rails	open		59569
+rails/rails	open		59574
+rails/rails	open		59611
+rails/rails	open		59617
+rails/rails	open		59627
+rails/rails	open		59644
+rails/rails	open		59661
+rails/rails	open		59662
+rails/rails	open		59668
+rails/rails	open		59671
+rails/rails	open		59675
+rails/rails	open		59734
+rails/rails	open		59735
+rails/rails	open		59800
+rails/rails	open		59804
+rails/rails	open		59810
+rails/rails	open		59812
+rails/rails	open		59817
+rails/rails	open		59824
+rails/rails	open		59832
+rmosolgo/graphql-ruby	closed	2026-11-05T15:54:11Z	5877
+rmosolgo/graphql-ruby	closed	2026-11-05T20:39:10Z	5880
+rmosolgo/graphql-ruby	closed	2026-11-05T20:42:02Z	5881
+roundhouse-rb/once-campfire	closed	2026-10-05T20:44:08Z	1
+roundhouse-rb/once-campfire	closed	2026-10-05T20:44:15Z	2
+roundhouse-rb/once-campfire	closed	2026-10-06T16:06:18Z	3
+rubocop/rubocop-performance	open		550
+rubocop/rubocop-performance	open		551
+rubocop/rubocop-performance	open		552
+rubocop/rubocop-rails	open		1670
+ruby-i18n/i18n	open		763
+ruby-i18n/i18n	open		764
+ruby-i18n/i18n	open		765
+ruby-i18n/i18n	open		766
+ruby/bigdecimal	open		562
+ruby/date	closed	2026-11-17T02:16:36Z	199
+ruby/prism	closed	2026-10-22T14:37:28Z	4298
+ruby/ruby	closed		19478
+ruby/ruby	closed		19483
+ruby/ruby	closed		19488
+ruby/ruby	closed		19555
+ruby/ruby	closed		19558
+ruby/ruby	closed		19625
+ruby/ruby	closed		19655
+ruby/ruby	closed		19661
+ruby/ruby	closed		19662
+ruby/ruby	closed		19663
+ruby/ruby	closed		19664
+ruby/ruby	closed		19665
+ruby/ruby	closed		19666
+ruby/ruby	closed		19667
+ruby/ruby	closed		19670
+ruby/ruby	closed		19671
+ruby/ruby	closed		19685
+ruby/ruby	closed		19899
+ruby/ruby	closed		19919
+ruby/ruby	closed	2026-10-29T20:49:53Z	19586
+ruby/ruby	closed	2026-10-29T20:52:27Z	19554
+ruby/ruby	closed	2026-10-29T20:53:38Z	19538
+ruby/ruby	closed	2026-10-29T21:47:34Z	19485
+ruby/ruby	closed	2026-10-30T16:11:26Z	19619
+ruby/ruby	closed	2026-11-03T01:08:02Z	19484
+ruby/ruby	closed	2026-11-03T16:41:27Z	19660
+ruby/ruby	closed	2026-11-05T00:07:40Z	19699
+ruby/ruby	closed	2026-11-05T01:31:26Z	19678
+ruby/ruby	closed	2026-11-05T01:51:13Z	19682
+ruby/ruby	closed	2026-11-06T00:24:12Z	19648
+ruby/ruby	closed	2026-11-06T13:16:54Z	19620
+ruby/ruby	closed	2026-11-16T17:20:12Z	19909
+ruby/ruby	open		19487
+ruby/ruby	open		19492
+ruby/ruby	open		19659
+ruby/ruby	open		19680
+ruby/ruby	open		19681
+ruby/ruby	open		19912
+ruby/ruby-bench	closed	2026-11-05T00:48:25Z	564
+ruby/ruby-bench	closed	2026-11-05T18:48:55Z	567
+ruby/ruby-bench	closed	2026-11-05T18:49:35Z	568
+ruby/ruby-bench	closed	2026-11-05T18:50:25Z	566
+ruby/ruby-bench	closed	2026-11-05T18:53:04Z	565
+ruby/ruby-bench	open		569
+ruby/ruby-bench	open		570
+ruby/ruby-bench	open		571
+ruby/ruby-bench	open		572
+ruby/ruby-bench	open		574
+ruby/ruby-bench	open		575
+ruby/ruby-bench	open		579
+rubycdp/cuprite	closed	2026-11-08T07:06:23Z	360
+rubycdp/ferrum	closed		697
+rubycdp/ferrum	closed	2026-11-07T07:50:40Z	696
+skryukov/rails_vite	closed	2026-11-12T20:40:15Z	57
+sparklemotion/nokogiri	open		3759
+sparklemotion/sqlite3-ruby	closed	2026-10-26T17:08:19Z	758
+sparklemotion/sqlite3-ruby	closed	2026-11-12T16:00:35Z	773
+sparklemotion/sqlite3-ruby	open		769
+sparklemotion/sqlite3-ruby	open		770
+trailblazer/cells-rails	open		75
+tzinfo/tzinfo	open		171
+tzinfo/tzinfo	open		175

@@ -25,6 +25,25 @@ superseded PRs are omitted except for the notes under [Closed](#closed).
 [Reviews](#reviews) · [Roundhouse](#roundhouse) ·
 [Investigated, not submitted](#investigated-not-submitted)
 
+## Counts (2026-11-17)
+
+Pull requests by `thomasklemm` created since 2026-05-01, read on 2026-11-17 at 22:45 UTC
+([list](data/contributions-2026-11-17.tsv)):
+
+```sh
+gh api -X GET search/issues --paginate -f per_page=100 \
+  -f q='author:thomasklemm type:pr -repo:argos-ri/argos -repo:roundhouse-rb/roundhouse -user:thomasklemm created:>=2026-05-01'
+```
+
+| Repository | Opened | Merged | Open | Closed |
+| --- | ---: | ---: | ---: | ---: |
+| rails/rails | 103 | 62 | 21 | 20 |
+| ruby/ruby | 38 | 13 | 6 | 19 |
+| 33 other repositories | 79 | 29 | 44 | 6 |
+
+Left out as not Lowrail work: fables-tales/rubyfmt, matz/spinel and roundhouse-rb/once-campfire (16 PRs). Merged
+means GitHub's `merged_at`; ankane/blind_index#62 counts as closed although its change landed as ankane's commit.
+
 ## Merged
 
 All entries in this section are **merged; rechecked on 2026-11-02**.
@@ -117,6 +136,10 @@ From [census 3/3b](rails-main-census-3.md); allocation counts only, no timing cl
 **Combined (2026-11-03):** all eleven merged #59533–#59544 together, against the same Rails main with them
 reverted, remove 1.66% / 1.64% of allocations (interpreter / YJIT) over 206 workloads in sixteen apps; wall time on
 railsbench and lobsters is a tie within A/A ([combined effect](combined-effect.md)).
+
+**Combined, round 3 (2026-11-17):** 56 of the 61 merged PRs reverted together on main `4500a94c34` remove 5.48% / 5.38%
+of census allocations (interpreter / YJIT, 104 workloads in eleven apps) on Ruby 4.0.9 and 5.86% / 5.79% (interpreter /
+ZJIT) on Ruby master ([round 3](combined-effect.md#round-3-every-merged-pr-on-rails-main-2026-11-17)).
 
 ### Ruby — ruby/ruby
 

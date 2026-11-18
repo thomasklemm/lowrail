@@ -3,7 +3,15 @@
 Lowrail bet R5. Each of our rails/rails PRs claimed allocation counts only, measured on its own. This page measures
 all merged ones together, as one before/after: Rails main against the same commit with every one of them reverted.
 
-**Result.** Measured together on Rails main `5810776eec` against the same commit with all eleven merged PRs
+**Latest: round 3 (2026-11-17, [below](#round-3-every-merged-pr-on-rails-main-2026-11-17)).** Rails main `4500a94c34`
+against the same commit with 56 of our 61 merged rails/rails PRs reverted: **−5.48% of census allocations
+interpreted and −5.38% under YJIT** on Ruby 4.0.9 (104 workloads, eleven apps, A/A ≤ ±0.04%), −5.86% / −5.79%
+interpreted / ZJIT on Ruby master (78 workloads, eight apps), ruby-bench −4.2% to −12.7% objects per iteration, and
+−2.24% (railsbench) and −3.43% (shipit) interpreted instructions per iteration (A/A ≤ 0.04%). Our merged ruby/ruby
+commits, reverted as a separate axis, leave census allocations flat. Round 1 (bet R5) and bet F2 follow first; round 2
+is [merged-sum](merged-sum.md).
+
+**Round 1.** Measured together on Rails main `5810776eec` against the same commit with all eleven merged PRs
 reverted (#59533–#59544), our merged Rails PRs remove **1.66% of all allocations (interpreter) and 1.64% (YJIT)**
 across 206 request, job and mailer workloads in sixteen open-source apps (19 configurations, SQLite, PostgreSQL and
 MySQL): about 195 objects per workload. Every app moves, by 0.8% to 3.0%, and no workload allocates more. Each
@@ -306,3 +314,250 @@ Receipts: [`data/combined-effect/zjit.tar.xz`](data/combined-effect/zjit.tar.xz)
 single-revert labels `zs1`/`zs1b` for #59541, `zs37`/`zs37b` for #59537 and `zs68`/`zs68b` for #59568, and the
 1024 MiB reruns `zmw`, `zmw2`, `zmwo`, `zmwo2`, `zm41`, `zm41b`, `zm37`, `zm37b`), the summarized
 fallback and exit traces per app and tree, the Callgrind logs and totals, and the ruby-bench code-memory check (`oomcheck.txt`).
+
+## Round 3: every merged PR on Rails main (2026-11-17)
+
+**Result.** Rails main `4500a94c34` against the same commit with 56 of our 61 merged rails/rails PRs reverted, on
+Ruby 4.0.9: the census apps allocate **5.48% fewer objects per workload in the interpreter and 5.38% under YJIT**
+(104 request, job and mailer workloads in eleven apps; each tree's A/A within ±0.04% overall). Every workload falls
+by at least one object in the interpreter, and all but one under YJIT; none rises in the interpreter. Per app the
+saving runs from 2.5% (Campfire) to 8.3% (CASA). ruby-bench iterations allocate **6.2% (railsbench), 4.2% (lobsters)
+and 12.5–12.7% (shipit) fewer objects** (A/A ≤ 0.01%). Interpreted instructions per iteration, fixed heap, fall **2.24%
+on railsbench and 3.43% on shipit** (A/A ≤ 0.04%); lobsters moves by −0.11% and is not claimed. No YJIT instruction
+row passes the JIT-flat gate. On Ruby master the same Rails trees save **5.86% interpreted and 5.79% under ZJIT** in the eight apps
+that install there (78 workloads, A/A ≤ ±0.05%), and reverting our 14 merged ruby/ruby commits instead leaves
+census allocations flat (+0.02% / −0.04%, inside the A/A) while ZJIT ruby-bench allocates 0.12% (lobsters) and 0.30%
+(shipit) fewer objects with them. These are allocation and instruction counts, not a measured speedup.
+
+### Pins
+
+* **Rails, with:** canonical `rails/rails` main
+  [`4500a94c34`](https://github.com/rails/rails/commit/4500a94c34d7052b84f81f6d7fd44f5bb8af3fff) (#59845,
+  2026-11-17 20:48 UTC), 8.2.0.alpha.
+* **Rails, without:** the same commit with 56 reverts, local commit `bb283c942f` (not pushed), reproducible from
+  [`reverted.tsv`](../../bench/upstream/combined_r3/reverted.tsv) and the
+  [README](../../bench/upstream/combined_r3/README.md). 46 files change under `*/lib/*` (+123/−266).
+* **Ruby 4.0.9** (`3e93b23afc`), interpreter and `--yjit`, production environment.
+* **Ruby master** [`7919a47d46`](https://github.com/ruby/ruby/commit/7919a47d467ba961b8912fa61e0ee1fe0ff4ef0c)
+  (2026-11-17 22:17 UTC) and the same commit with our ruby/ruby commits reverted, `854f34bbac` (local), both
+  `--enable-yjit --enable-zjit`, Rust 1.100.0, ZJIT defaults.
+* **ruby-bench** `8083f57` with [`ruby-bench.patch`](../../bench/upstream/combined_r3/ruby-bench.patch).
+* **Orb:** 2 CPUs, 4 GB, no swap, so census runs used `--jobs 2`.
+
+### Which PRs
+
+The list is every rails/rails PR by `thomasklemm` that GitHub reports merged
+(`gh search prs --author thomasklemm --repo rails/rails --merged`, 63 on 2026-11-17), each checked with `gh pr view
+--json mergeCommit,mergedAt` and found in main's first-parent history. The ledger's Merged section lists the same PRs
+(plus #59713 and #59714, which are byroot's follow-ups, not ours). Two are left out before reverting: #7260 (2012
+docs) and #59584, which byroot already reverted on main in #59713.
+
+**Reverted (56):** #59235, #59244, #59252, #59270, #59274, #59278, #59316, #59329, #59533–#59539, #59541–#59544,
+#59551–#59554, #59556, #59558, #59560–#59563, #59570, #59571, #59576, #59583, #59585, #59596–#59598, #59603,
+#59605–#59608, #59613–#59616, #59618–#59620, #59624–#59626, #59629, #59642, #59676, #59809. Most are performance
+changes; the tree also reverts the merged correctness and test fixes that revert cleanly (#59606, #59624–#59626,
+#59629, #59676, #59809), because the question is what our merged work does together.
+
+**Reverts that did not apply cleanly, and how they were resolved.** The first pass reverted newest first in main's
+first-parent order and aborted every revert that conflicted (13). For those, test and CHANGELOG conflicts keep main's
+file; library conflicts were resolved by hand only where the PR's own lines are still on main:
+
+| PR | Conflict | Resolution |
+| --- | --- | --- |
+| #59642 | `query_methods.rb`: 518784d2e3 changed the same line to `opts.to_s` | the pre-PR `"(#{opts})"` line; CHANGELOG and test keep main |
+| #59576, #59533 | `where_clause.rb`, behind #59642 | clean once #59642 is reverted |
+| #59556 | `merger.rb`: kamipo's #59572 self-merge check reads `values_for_merge` | `Merger#initialize` reads `other.values` again; the self-merge check compares `other.values_for_merge`, so `values_for_merge` stays |
+| #59551 | `merger.rb`: a later `with_values` line next to it | `extending!` unconditional again; the later line stays |
+| #59554 | `merger.rb`: later unscope qualification and self-merge check | `NORMAL_VALUES.each` with `:"#{name}!"` again; the later lines stay |
+| #59543 | `spawn_methods.rb`: later `with_recursive` lines | `except`/`only` read `values` (the copy) again; the later lines stay |
+| #59316 | `url_for_test.rb` only | lib reverts cleanly; the test keeps main |
+
+**Not reverted (5)**, so their effect, if any, is in both trees:
+
+* #59236 (CurrentAttributes defaults) and #59568 (`attribute_types` once): their code is no longer on main.
+  kamipo's 84048ad477 rewrote `resolve_defaults`, and tenderlove's #59141 rewrote `_load_from_sql`.
+* #59555, #59634 and #59640 (correctness fixes): later commits rewrote their lines (f9fe866f49 in `enumerable.rb`,
+  kamipo's `_where!` work in four Active Record files, byroot's #59714 in `local_cache.rb`), and reverting them
+  would mean rewriting someone else's code.
+
+**SQL control.** The masked SQL digest differs between the trees on 2 of 104 workloads, both in Lobsters (`POST
+story vote toggle`, `POST comment (XHR)`), against 0 in either A/A pair. Dumping the statements shows why: with
+#59642 reverted, a bound SQL literal inside an `or` is wrapped once more, `("story"."merged_story_id" = ? OR
+("story"."id" = ?))` against main's `... OR "story"."id" = ?)`. That is #59642's intended change (it fixed the extra
+parentheses from #58427). Query counts per operation are the same in both trees (19.5 and 57.0). No other workload
+changes its SQL.
+
+### Apps
+
+The eleven census apps that set up on Rails main here: blog, Campfire, Writebook, Fizzy, Lobsters, redprints-cfp,
+react-starter-kit, CodeTriage, PingCRM, CASA and Hackatime (SQLite and PostgreSQL). `script/census setup --rails
+…@4500a94c34` used the default overlays. Fizzy and Lobsters failed `prepare` on current main, as
+[ruby-master-round-2](ruby-master-round-2.md#6-railsrails59141-shared-attribute-readers-under-yjit-and-zjit)
+recorded: Fizzy's `uuid_primary_keys.rb` recurses in `primary_key`, and activerecord-typedstore 1.6.0 raises "has no
+attribute `prefers_color_scheme` to define a reader for" since d74214f745 (#59141). Both were set up again with the
+census-4 overlay plus CE2's local workarounds (`fixtures/corpus/ce2/fizzy.patch`, `lobsters.patch`), the same in both
+trees. MySQL and the larger PostgreSQL apps (Mastodon, Discourse, Docuseal, Lago, Loomio, Sure, Chatwoot) were not set
+up on this orb. `run`'s dependency control reported no lock difference outside Rails for any app.
+
+### Census allocations (Ruby 4.0.9)
+
+[`run_409.sh`](../../bench/upstream/combined_r3/run_409.sh): `script/census run --modes interp,yjit --jobs 2` in ABBA
+order `r3w`, `r3wo`, `r3wo2`, `r3w2`, 23:03–23:27 UTC. Table:
+`ruby bench/upstream/combined_r3/census_table.rb .lowrail/private/census interpreter,yjit r3w r3w2 r3wo r3wo2`.
+Interpreter / YJIT in every cell; the A/A counts in brackets are `r3w2` against `r3w`.
+
+| App | Workloads | Objects/workload without → with | Δ objects/workload | Share | A/A with, without | Moved ≤ −1 (A/A) | Moved ≥ +1 (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | 10 | 1769 → 1688 / 1759 → 1708 | −81.4 / −50.5 | −4.60% / −2.87% | −0.50%, −0.40% / +0.12%, +0.80% | 10 (3) / 9 (2) | 0 (2) / 1 (2) |
+| campfire | 9 | 6432 → 6273 / 6459 → 6299 | −159.6 / −159.7 | −2.48% / −2.47% | −0.00%, +0.00% / +0.00%, −0.00% | 9 (0) / 9 (0) | 0 (0) / 0 (1) |
+| casa | 10 | 13318 → 12207 / 13433 → 12322 | −1111.1 / −1111.7 | −8.34% / −8.28% | +0.00%, −0.01% / −0.00%, −0.00% | 10 (3) / 10 (4) | 0 (4) / 0 (2) |
+| codetriage | 7 | 2850 → 2692 / 2866 → 2709 | −158.5 / −157.2 | −5.56% / −5.49% | +0.01%, +0.05% / +0.02%, +0.08% | 7 (2) / 7 (1) | 0 (2) / 0 (3) |
+| fizzy | 14 | 10636 → 9957 / 10718 → 10043 | −678.7 / −675.0 | −6.38% / −6.30% | −0.01%, +0.05% / +0.17%, −0.15% | 14 (2) / 14 (1) | 0 (0) / 0 (3) |
+| hackatime | 11 | 7522 → 7138 / 7538 → 7154 | −383.4 / −383.5 | −5.10% / −5.09% | −0.02%, −0.01% / +0.00%, −0.00% | 11 (7) / 11 (3) | 0 (1) / 0 (4) |
+| lobsters | 11 | 11568 → 11085 / 11601 → 11125 | −483.0 / −476.5 | −4.18% / −4.11% | +0.18%, +0.08% / −0.03%, −0.01% | 11 (1) / 11 (7) | 0 (7) / 0 (2) |
+| pingcrm | 8 | 2909 → 2797 / 2917 → 2806 | −111.8 / −111.0 | −3.84% / −3.81% | −0.04%, −0.05% / +0.01%, +0.04% | 8 (5) / 8 (3) | 0 (1) / 0 (3) |
+| react-starter-kit | 8 | 1993 → 1938 / 1996 → 1941 | −55.6 / −54.9 | −2.79% / −2.75% | +0.03%, −0.04% / +0.07%, −0.00% | 8 (2) / 8 (2) | 0 (2) / 0 (4) |
+| redprints-cfp | 8 | 2161 → 2086 / 2169 → 2094 | −75.2 / −75.1 | −3.48% / −3.46% | −0.07%, −0.01% / −0.01%, +0.04% | 8 (4) / 8 (2) | 0 (1) / 0 (1) |
+| writebook | 8 | 5518 → 5237 / 5550 → 5269 | −281.6 / −281.1 | −5.10% / −5.06% | +0.01%, +0.02% / +0.00%, +0.02% | 8 (0) / 8 (3) | 0 (3) / 0 (4) |
+| **All 11 apps** | 104 | 6618 → 6255 / 6651 → 6293 | −362.5 / −358.1 | −5.48% / −5.38% | +0.02%, +0.01% / +0.04%, −0.01% | 104 (29) / 103 (28) | 0 (23) / 1 (29) |
+
+* **Every app moves, in both modes.** Each app's A/A is within ±0.18%, except the Blog's (up to 0.80%, from its write
+  workloads), which is still several times smaller than its effect (−4.60% / −2.87%).
+* **One workload rises under YJIT**, in the Blog (it also moves in its own A/A); none rises in the interpreter.
+  `script/census compare --base r3wo --aa r3w r3w r3w2 r3wo2`: 104 / 103 workloads fall by at least one object in
+  both `with` runs; the reverted tree's own A/A moves 33 / 30 down and 26 / 29 up.
+* **Larger than round 2** (−3.78% on five apps, 39 PRs): 17 more PRs are reverted, the five apps that both rounds share
+  save more here (Fizzy −6.4% against −5.1%, Writebook −5.1% against −4.2%), and CASA (−8.3%) and Hackatime (−5.1%) are
+  new. The two rounds are not one pin, so this is no Rails-version trend.
+
+### ruby-bench (Ruby 4.0.9)
+
+Fixed heap (`RUBY_GC_HEAP_0..4_INIT_SLOTS` 1,000,000 / 250,000 / 100,000 / 20,000 / 10,000). Objects per iteration:
+[`sumalloc.rb`](../../bench/upstream/merged_sum/sumalloc.rb), 5 warmup + 10 measured iterations, processes in the
+order main-a, without-a, without-b, main-b; table by
+[`alloc_table.rb`](../../bench/upstream/merged_sum/alloc_table.rb).
+
+| Benchmark | Mode | Objects/iter without → with | Δ | A/A with, without | GC/iter without → with |
+| --- | --- | ---: | ---: | ---: | ---: |
+| railsbench | interpreter | 983,931 → 922,444 | **−6.25%** | +0.00%, +0.00% | 1.30 → 1.20 |
+| railsbench | YJIT | 989,269 → 927,782 | **−6.22%** | +0.00%, +0.00% | 1.30 → 1.20 |
+| lobsters | interpreter | 541,211 → 518,469 | **−4.20%** | −0.00%, −0.00% | 0.60 → 0.60 |
+| lobsters | YJIT | 544,673 → 521,933 | **−4.17%** | +0.01%, +0.01% | 0.60 → 0.60 |
+| shipit | interpreter | 981,026 → 856,374 | **−12.71%** | −0.00%, −0.00% | 1.60 → 1.40 |
+| shipit | YJIT | 994,230 → 869,556 | **−12.54%** | −0.00%, +0.00% | 1.60 → 1.40 |
+
+No major GC in any measured iteration. Instructions per iteration:
+[`ruby_bench_ir.rb`](../../bench/upstream/actionview_cpu/ruby_bench_ir.rb) (Valgrind 3.19.0 from
+`script/bench-valgrind`; a 4-iteration run minus a 1-iteration run, 2 warmups), variants main-a, main-b, without-a.
+
+| Benchmark | Mode | with vs without | A/A (main-b vs main-a) | Claimed |
+| --- | --- | ---: | ---: | --- |
+| railsbench | interpreter | **−2.24%** | −0.02% | yes |
+| shipit | interpreter | **−3.43%** | −0.03% | yes |
+| lobsters | interpreter | −0.11% | −0.04% | no: below 3× its A/A |
+| railsbench | YJIT | −3.05% | +0.41% | no: not JIT-flat |
+| shipit | YJIT | −1.71% | +0.35% | no: not JIT-flat |
+| lobsters | YJIT | +0.78% | +0.38% | no: not JIT-flat |
+
+`summary` reports the reverted tree against main-a; the table inverts it (with / without − 1). Under YJIT every
+benchmark compiles new blocks in the measured window (main-a: railsbench +184, lobsters +3,187, shipit +4,184 blocks), so
+by [bench.md](../bench.md) no YJIT row counts. Lobsters allocates 4.2% fewer objects, but its instructions do not
+move beyond noise.
+
+**Wall time** was not measured in this round: rounds 1 and 2 found it unresolvable at this effect size on a quiet
+8-CPU orb, and this orb has 2 CPUs shared with the build and census jobs.
+
+### Ruby master and ZJIT
+
+[`run_master.sh`](../../bench/upstream/combined_r3/run_master.sh), `--modes interp,zjit`, 200 warmup operations
+(`CENSUS_WARMUP=200`, as in bet F2), 00:55–01:44 UTC. Two axes, each with its own A/A:
+
+* **Rails axis:** Ruby master `7919a47d46`, Rails main against the reverted Rails tree, ABBA `r3zw`, `r3zwo`,
+  `r3zwo2`, `r3zw2`.
+* **Ruby axis:** Rails main, Ruby master against master with our 14 merged ruby/ruby commits reverted (`854f34bbac`),
+  `r3zw2`, `r3rwo`, `r3rwo2`, `r3zw3`.
+
+**Our merged ruby/ruby PRs** (`gh search prs --author thomasklemm --repo ruby/ruby --merged`, 13 on 2026-11-17):
+#19484, #19485, #19538, #19554, #19586, #19648, #19660, #19678, #19682, #19699, #19909 land on master as 12 commits
+(#19586 as two), plus two of our ruby/date changes synced into master (ruby/date#199 and `Date#step`'s incomparable limit); #19619 and
+#19620 are backports to `ruby_4_0` and `ruby_3_4` and are not on master. All 14 commits were reverted newest first;
+only #19484's revert conflicts, in the test file `zjit/src/hir/opt_tests.rs` (master's version kept).
+
+**Apps.** Eight of the eleven install on master: Writebook (redcarpet 3.6.0), Lobsters (commonmarker's rb-sys) and
+CodeTriage (bluecloth 2.2.0) fail to compile their C extensions against Ruby 4.1's removed APIs, as census 8 and
+[Ruby master round 3](ruby-master-round-3.md) recorded. 78 workloads.
+
+**Rails axis, census** (interpreter / ZJIT; `census_table.rb … interpreter,zjit r3zw r3zw2 r3zwo r3zwo2`):
+
+| App | Workloads | Objects/workload without → with | Δ objects/workload | Share | A/A with, without | Moved ≤ −1 (A/A) | Moved ≥ +1 (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | 10 | 1705 → 1641 / 1698 → 1643 | −63.4 / −55.5 | −3.72% / −3.27% | +0.17%, +0.06% / +0.54%, +0.01% | 10 (1) / 10 (2) | 0 (2) / 0 (2) |
+| campfire | 9 | 6377 → 6217 / 6531 → 6373 | −159.7 / −158.7 | −2.50% / −2.43% | −0.00%, +0.00% / +0.00%, −0.00% | 9 (0) / 9 (0) | 0 (0) / 0 (0) |
+| casa | 10 | 13150 → 12038 / 13195 → 12086 | −1111.4 / −1108.3 | −8.45% / −8.40% | −0.01%, +0.01% / +0.00%, −0.00% | 10 (4) / 10 (2) | 0 (3) / 0 (2) |
+| fizzy | 14 | 10447 → 9779 / 10466 → 9804 | −668.3 / −662.1 | −6.40% / −6.33% | −0.12%, −0.06% / +0.06%, +0.17% | 14 (4) / 14 (1) | 0 (1) / 0 (2) |
+| hackatime | 11 | 7420 → 7038 / 7434 → 7052 | −381.9 / −381.7 | −5.15% / −5.13% | −0.00%, −0.01% / −0.02%, −0.02% | 11 (4) / 11 (6) | 0 (3) / 0 (2) |
+| pingcrm | 8 | 2866 → 2755 / 2865 → 2755 | −111.0 / −109.5 | −3.87% / −3.82% | +0.07%, +0.02% / −0.12%, −0.01% | 8 (1) / 8 (6) | 0 (5) / 0 (0) |
+| react-starter-kit | 8 | 1942 → 1887 / 1943 → 1890 | −54.4 / −52.8 | −2.80% / −2.72% | −0.06%, +0.08% / +0.06%, −0.02% | 8 (3) / 8 (1) | 0 (2) / 0 (4) |
+| redprints-cfp | 8 | 2095 → 2020 / 2097 → 2023 | −75.3 / −74.7 | −3.59% / −3.56% | +0.01%, +0.01% / −0.01%, +0.11% | 8 (2) / 8 (2) | 0 (3) / 0 (2) |
+| **All 8 apps** | 78 | 6270 → 5902 / 6298 → 5934 | −367.5 / −364.5 | −5.86% / −5.79% | −0.03%, −0.01% / +0.03%, +0.05% | 78 (19) / 78 (20) | 0 (19) / 0 (14) |
+
+Every workload falls by at least one object in both modes, none rises (`script/census compare --base r3zwo --aa r3zw`:
+78 / 78 for both `with` runs; the reverted tree's A/A moves 17 / 15 down and 22 / 20 up), and SQL digests change on
+none. ZJIT keeps the interpreter's saving to within 0.45 points per app (the Blog: −3.72% / −3.27%).
+
+**Ruby axis, census** (`census_table.rb … interpreter,zjit r3zw2 r3zw3 r3rwo r3rwo2`):
+
+| App | Workloads | Objects/workload without → with | Δ objects/workload | Share | A/A with, without | Moved ≤ −1 (A/A) | Moved ≥ +1 (A/A) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| blog | 10 | 1643 → 1642 / 1644 → 1648 | −1.6 / +4.0 | −0.10% / +0.24% | −0.12%, −0.18% / +0.10%, +0.65% | 4 (3) / 4 (1) | 0 (0) / 1 (2) |
+| campfire | 9 | 6217 → 6217 / 6373 → 6373 | −0.1 / −0.2 | −0.00% / −0.00% | +0.00%, +0.00% / −0.00%, −0.00% | 0 (0) / 2 (0) | 0 (0) / 0 (0) |
+| casa | 10 | 12038 → 12038 / 12110 → 12086 | −0.7 / −23.5 | −0.01% / −0.19% | −0.01%, −0.00% / −0.01%, −0.00% | 6 (4) / 7 (5) | 2 (1) / 1 (5) |
+| fizzy | 14 | 9768 → 9773 / 9804 → 9807 | +5.7 / +3.2 | +0.06% / +0.03% | +0.00%, +0.00% / +0.01%, −0.06% | 1 (1) / 8 (1) | 2 (3) / 4 (2) |
+| hackatime | 11 | 7038 → 7039 / 7054 → 7052 | +0.2 / −2.7 | +0.00% / −0.04% | +0.00%, −0.01% / +0.00%, +0.01% | 3 (3) / 8 (4) | 3 (4) / 0 (4) |
+| pingcrm | 8 | 2752 → 2755 / 2756 → 2756 | +2.8 / −0.3 | +0.10% / −0.01% | −0.07%, −0.17% / +0.15%, +0.16% | 0 (5) / 4 (0) | 8 (1) / 2 (8) |
+| react-starter-kit | 8 | 1888 → 1887 / 1890 → 1890 | −0.4 / +0.5 | −0.02% / +0.03% | +0.06%, +0.06% / −0.05%, +0.03% | 2 (1) / 2 (3) | 1 (4) / 4 (3) |
+| redprints-cfp | 8 | 2020 → 2020 / 2023 → 2023 | +0.4 / −0.2 | +0.02% / −0.01% | +0.03%, −0.04% / +0.03%, +0.07% | 1 (2) / 3 (2) | 2 (3) / 1 (2) |
+| **All 8 apps** | 78 | 5900 → 5901 / 5937 → 5935 | +1.0 / −2.3 | +0.02% / −0.04% | −0.01%, −0.02% / +0.01%, +0.02% | 17 (19) / 38 (16) | 18 (16) / 13 (26) |
+
+**Flat, as expected.** Our ruby/ruby PRs are JIT correctness fixes and ZJIT specializations; they do not change what
+the interpreter allocates, and only #19678 (interpolating Integers and Modules without `to_s`) can save objects under
+ZJIT. The totals (+0.02% / −0.04%) are inside the A/A. Under ZJIT 38 workloads fall by at least one object against 16
+in the A/A, and CASA's −0.19% is the only per-app move outside its A/A (±0.01%).
+
+**ruby-bench objects per iteration under ZJIT** (fixed heap; [`zjit_alloc_table.rb`](../../bench/upstream/combined_r3/zjit_alloc_table.rb)):
+
+| Axis | Benchmark | Objects/iter without → with | Δ | A/A with, without | GC/iter without → with |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Rails | railsbench | 964,946 → 903,458 | −6.37% | +0.00%, −0.00% | 5.00 → 4.55 |
+| Rails | lobsters | 533,121 → 510,378 | −4.27% | +0.01%, −0.00% | 0.65 → 0.55 |
+| Rails | shipit | 955,856 → 831,187 | −13.04% | +0.00%, +0.00% | 5.25 → 4.20 |
+| Ruby | railsbench | 903,458 → 903,458 | −0.00% | −0.00%, +0.00% | 5.00 → 4.45 |
+| Ruby | lobsters | 511,015 → 510,389 | −0.12% | −0.00%, +0.01% | 0.50 → 0.55 |
+| Ruby | shipit | 833,687 → 831,184 | −0.30% | −0.00%, −0.00% | 4.10 → 4.30 |
+
+On the Ruby axis, lobsters and shipit allocate 626 and 2,503 fewer objects per iteration with our commits, with an
+A/A ≤ 0.01%. The [ledger](contributions.md)'s #19678 entry records 645 and 2,474 fewer ZJIT-only objects per iteration on the same
+two benchmarks, so that saving is still there. railsbench does not move.
+GC runs per iteration vary between processes of the same tree here (railsbench 4.45–5.00), so no GC claim is made.
+
+**Instructions per iteration under ZJIT** (`ruby_bench_ir.rb … --modes zjit`, the same 4-minus-1-iteration
+difference with 2 warmups; tags `zm` for Ruby master, `zr` for master with our commits reverted):
+
+| Axis | Benchmark | with vs without | A/A (main-b vs main-a) |
+| --- | --- | ---: | ---: |
+| Rails | railsbench | −4.78% | −1.53% |
+| Rails | lobsters | −1.96% | −0.42% |
+| Rails | shipit | −5.24% | +1.29% |
+| Ruby | railsbench | −3.5% | −1.53% |
+| Ruby | lobsters | −1.0% | −0.42% |
+| Ruby | shipit | +0.2% | +1.29% |
+
+(Rails axis: `summary` against main-a, inverted. Ruby axis: the mean of `zm` main-a and main-b against `zr` main-a,
+one sample.) **Observed, not claimed.** With 2 warmups ZJIT is still compiling in the measured window, the A/A
+reaches 1.5%, and the harness has no ZJIT flat check. The Rails-axis rows sit 3–5× outside their A/A and point the
+same way as bet F2's −0.5% (15 warmups, A/A ≤ 0.18%), but a ZJIT instruction claim needs F2's longer harness.
+
+
+Receipts: [`data/combined-effect/r3.tar.xz`](data/combined-effect/r3.tar.xz) holds every census run JSON, log and
+`meta.json` (`r3w`, `r3w2`, `r3wo`, `r3wo2`, `r3zw`, `r3zw2`, `r3zw3`, `r3zwo`, `r3zwo2`, `r3rwo`, `r3rwo2`), the ruby-bench allocation JSONs and logs, the Valgrind
+logs and `.ir`/`.jit` files, the revert log and the Lobsters SQL dumps.

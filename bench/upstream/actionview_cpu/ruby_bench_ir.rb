@@ -10,7 +10,7 @@
 # Each variant runs ruby-bench's default harness twice: WARMUP_ITRS (--warmup, default 2) with
 # MIN_BENCH_ITRS=1, and with MIN_BENCH_ITRS=--long (default 4). Ir per iteration is
 # the difference over the extra iterations, so boot and warmup cancel. YJIT runs
-# use --smc-check=all-non-file (YJIT writes code at run time).
+# and ZJIT runs use --smc-check=all-non-file (the JITs write code at run time).
 require "json"
 require "optparse"
 require "fileutils"
@@ -55,12 +55,13 @@ when "run"
         env["DATABASE_URL"] = "sqlite3:#{File.join(out, "#{name}.sqlite3")}" if bench == "railsbench"
         vg = [opts.fetch(:valgrind), "--tool=cachegrind", "--cache-sim=no", "--branch-sim=no",
               "--cachegrind-out-file=/dev/null"]
+        vg << "--smc-check=all-non-file" if mode == "zjit"
         if mode == "yjit"
           vg << "--smc-check=all-non-file"
           env["RUBYOPT"] = "-r#{File.expand_path("jit_counts.rb", __dir__)}"
           env["JIT_COUNTS_PATH"] = File.join(out, "#{name}.jit")
         end
-        cmdline = [*vg, opts.fetch(:ruby), *("--yjit" if mode == "yjit"), File.join("benchmarks", bench, "benchmark.rb")]
+        cmdline = [*vg, opts.fetch(:ruby), *({ "yjit" => "--yjit", "zjit" => "--zjit" }[mode]), File.join("benchmarks", bench, "benchmark.rb")]
         log, status = Open3.capture2e(env, *cmdline, chdir: RUBY_BENCH)
         File.write(File.join(out, "#{name}.log"), log)
         ir = log[/I\s+refs:\s+([\d,]+)/, 1]
@@ -73,7 +74,7 @@ when "run"
   workers.each(&:join)
 when "summary"
   ir = Dir[File.join(out, "*.ir")].to_h do |f|
-    File.basename(f, ".ir") =~ /\A([^-]+)-(.+)-(interpreter|yjit)-(.+)-(\d+)\z/
+    File.basename(f, ".ir") =~ /\A([^-]+)-(.+)-(interpreter|yjit|zjit)-(.+)-(\d+)\z/
     [[$1, $2, $3, $4, $5.to_i], Integer(File.read(f))]
   end
   per = ir.keys.map { _1[0, 4] }.uniq.filter_map do |k|

@@ -16,7 +16,11 @@ Ruby. That work is kept below as [research](#lowering-prototype-research)
 
 [`script/census`](docs/upstream/census.md) moves about 20 open-source apps onto
 one pinned Rails main commit and runs their request, job and mailer workloads.
-The latest round, [census 7](docs/upstream/rails-main-census-7.md), covered 20
+The latest round, [census 9](docs/upstream/rails-main-census-9.md)
+(2026-11-14), compared Rails main with 8-1-stable on 8 apps and 71 workloads:
+main runs fewer interpreted instructions in 70 of them (median −6.5%), and the
+slower paths left after the attribute-set rewrite are ranked as leads. The
+broadest round, [census 8](docs/upstream/rails-main-census-8.md), covered 20
 apps in 23 configurations and 251 workloads, on SQLite, PostgreSQL and MySQL,
 in the interpreter and under YJIT. The apps include Mastodon, Discourse,
 Lobsters, Chatwoot, Sure, Fizzy, Campfire, Writebook, Loomio and CASA. Each app
@@ -44,19 +48,34 @@ In short, from [method.md](docs/upstream/method.md):
 Measured together, as Rails main against the same commit with our merged PRs
 reverted ([combined effect](docs/upstream/combined-effect.md)):
 
-* **11 PRs** (#59533–#59544), Ruby 4.0.7: **1.66%** fewer allocations in the
-  interpreter and **1.64%** under YJIT, across 206 request, job and mailer
-  workloads in sixteen apps. Every app moves, by 0.8% to 3.0%, and no workload
-  allocates more. Wall time on ruby-bench's railsbench and lobsters is a tie
-  within the A/A, and GC runs per iteration do not change.
-* **22 PRs** (merged by 2026-11-03 10:43 UTC), Ruby master: **3.27%** fewer
-  allocations interpreted and **3.21%** under ZJIT, across census 4's nine apps
-  (97 workloads). Under ZJIT, ruby-bench runs **0.54%** (railsbench) and
-  **0.49%** (lobsters) fewer instructions per iteration, outside the A/A.
+* **Round 3, 56 PRs** (2026-11-17, Rails main `4500a94c34`; five of the 61
+  merged PRs could not be reverted and are in both trees), Ruby 4.0.9:
+  **5.48%** fewer allocations in the interpreter and **5.38%** under YJIT,
+  across 104 request, job and mailer workloads in eleven apps. Every app moves,
+  by 2.5% to 8.3%. ruby-bench iterations allocate 6.2% (railsbench), 4.2%
+  (lobsters) and 12.5–12.7% (shipit) fewer objects, and run **2.24%** (railsbench)
+  and **3.43%** (shipit) fewer interpreted instructions, outside the A/A.
+  On Ruby master the same trees save **5.86%** interpreted and **5.79%** under
+  ZJIT in eight apps. Reverting our 14 merged ruby/ruby commits instead leaves
+  the census flat.
+* **Earlier rounds:** 11 PRs on Ruby 4.0.7 saved 1.66% / 1.64% (interpreter /
+  YJIT) across 206 workloads in sixteen apps, with wall time on railsbench and
+  lobsters a tie within the A/A; 22 PRs on Ruby master saved 3.27% / 3.21%
+  (interpreter / ZJIT); 39 PRs on 4.0.9 saved 3.78% in five apps
+  ([merged-sum](docs/upstream/merged-sum.md)).
 
 These are allocation and instruction savings, not a measured speedup.
 
 ## Contributions
+
+Pull requests opened since 2026-05-01, counted on 2026-11-17 with a GitHub
+search ([command and list](docs/upstream/contributions.md#counts-2026-11-17)):
+
+| Repository | Opened | Merged | Open | Closed |
+| --- | ---: | ---: | ---: | ---: |
+| rails/rails | 103 | 62 | 21 | 20 |
+| ruby/ruby (YJIT, ZJIT, VM) | 38 | 13 | 6 | 19 |
+| 33 other repositories (gems, ruby-bench, Prism, Campfire) | 79 | 29 | 44 | 6 |
 
 The [contributions ledger](docs/upstream/contributions.md) lists merged, open
 and closed PRs, each with its own measured result and caveats: rails/rails,
