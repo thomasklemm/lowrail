@@ -143,6 +143,24 @@ configuration and all five plugins, on `table.rb`, `table_test.rb`, `require_tes
 No source changes required. The stale posted bodies' removed-test, subclass-equivalence and both-given-raises
 sentences were corrected only in the queue items; adoption and public body updates remain separate actions.
 
+### Maintainer-style confirm under the expanded rule
+
+Rechecked after DECISIONS `9fa887a3`; no further must-fix. Each item's same-head pass now lists every surviving
+candidate guard/comment and its reason, including the inherited conditions in the touched method. This is not an
+unrelated cleanup of upstream's preexisting comments elsewhere in those files.
+
+* **I18N764:** the Array branch follows this file's `is_a?` idiom; the scalar Symbol return preserves documented
+  fallback-key precedence. The inherited Symbol scan and truthy-result branch retain list-prefix and nil/false
+  semantics. No candidate code or test comments remain; neither removed compatibility explanation belongs back.
+* **I18N765:** no new guard or comment remains. Each inherited translate gate serves an actual fallback rule:
+  opt-out, recursion prevention, nil/false default handling, accepting false results, reporting a changed locale,
+  an explicit nil default, or evaluating a deferred default. `dup` needs no arbitrary-Hash compatibility branch.
+* **PR59574:** the positional sentinel identity check distinguishes omitted from explicit nil, and freezing it
+  permits Ractor access. Both match existing Rails code. The inherited optional-klass lookup, name validation,
+  Symbol normalization and redundant-alias check each serve supported construction. The only candidate comment
+  forms are Rails' exact `# :nodoc:` sentinel directive and the CHANGELOG example's `# deprecated` label, which
+  distinguishes the old call from its replacement. Neither is an implementation explanation; both survive.
+
 ## TAP2748 (Shopify/tapioca 2748)
 
 Current guard in `Reflection.constantize`: `(namespace == Object || symbol.start_with?("::")) && symbol.match?(...)
