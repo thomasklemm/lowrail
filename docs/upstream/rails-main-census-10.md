@@ -7,6 +7,11 @@ and with census 9's main [`50c54eed06`](https://github.com/rails/rails/commit/50
 our 15 open-PR cap. Ranking follows tonight's PR retrospective: unreleased regressions against 8.1 first, then
 changes that move a whole request on their own.
 
+**A1 update, 2026-11-18.** The census numbers below describe those historical pins, not today's main or the
+effect of the open A1 PR. Its broad reader prototype was rejected; the current head changes only unscoped
+`join_scope`. [The exact-head confirm](#a1-confirm-on-current-main-2026-11-18) approves that correctness fix
+against current main, with no performance claim. The PR remains draft.
+
 **Result.** Main is still faster than 8.1 in 67 of 70 workloads (median −5.95% of interpreted instructions, A/A median
 0.12%; census 9 had −6.48%), and allocates a median 553 fewer objects per request. But **main is now slower than
 census 9's main**: median +0.42%, 12 workloads slower beyond 1% (casa +1.14% median, up to +1.91%; writebook
@@ -21,9 +26,9 @@ check that its own scope did not remove the owner conditions, and a through asso
 +5.3%, a polymorphic `as:` has_many +5.0%, `joins(:posts)` +5.6%, `joins` through +7.8% (A/A ≤ 0.1%). Under YJIT
 main stays faster than 8.1, but these paths are +2.9% to +5.4% against census 9 in the JIT-flat cells. `WhereClause#-` is now the
 largest allocation that main adds over 8.1: 56 of 70 workloads in all 8 apps, a median 0.56% of a request's objects
-and up to 2.76% (casa's case edit page, +661 objects). An exact fast path for associations without a scope
-recovers 70% of the instructions and 10 of the 11 objects (lead A1). 8-1-stable moved by two backports that change no
-library code.
+and up to 2.76% (casa's case edit page, +661 objects). The broad ceiling prototype recovered 70% of the extra
+instructions and 10 of the 11 objects in the association micro, but was not exact; these are not savings of
+the narrowed A1 PR. 8-1-stable moved by two backports that change no library code.
 
 Every number is Callgrind instructions (Ir) per call or per request with census 8's patched Valgrind, a fixed heap
 and an A/A twin. YJIT numbers count only where every measured window compiled nothing.
@@ -35,7 +40,7 @@ objects per request in the workloads named. A/A is main against a second checkou
 
 | # | Lead | Main file:line | Reach | Magnitude (A/A) | Against 8.1 | Existing PR / owner | Exact? | Next step |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **A1: owner-condition bookkeeping on every association scope** (#59825, #59836): five `WhereClause#-` and an Array per load, also on every `joins(:assoc)` | AR `association_scope.rb:62/68/131/162`, `reflection.rb:236–256` | 8/8 apps, 56 of 70 workloads; `WhereClause#-`, `#empty?` and `keep_owner_conditions` +0.258% of all Ir vs c9 (max +0.87% per request); objects median 0.56%, max 2.76% (casa case edit, +661) | `author.posts` +2.7%, has_one +3.4%, `as:` +3.9%, `joins` +3.4% / +4.7%, +11 objects each vs c9 (A/A ≤ 0.1%); ceiling recovers 70% of the instructions and 10 of 11 objects | **Regression:** has_many +3.6%, has_one +5.3%, `as:` +5.0%, `joins` +5.6%, `joins` through +7.8% (interp); YJIT still below 8.1 | kamipo, merged 2026-11-17, no reviews; none open on these files | Yes for associations without a scope item (the common case); probed: SQL, records, warnings, no user `==`/`hash` calls | **Build first** when a slot frees: skip the differences unless a scope item was merged. Or hand kamipo the repro |
+| 1 | **A1: owner-condition bookkeeping on every association scope** (#59825, #59836): five `WhereClause#-` and an Array per load, also on every `joins(:assoc)` | AR `association_scope.rb:62/68/131/162`, `reflection.rb:236–256` | Historical census reach, not PR savings: 8/8 apps, 56 of 70 workloads; `WhereClause#-`, `#empty?` and `keep_owner_conditions` +0.258% of all Ir vs c9 (max +0.87% per request); objects median 0.56%, max 2.76% (casa case edit, +661) | `author.posts` +2.7%, has_one +3.4%, `as:` +3.9%, `joins` +3.4% / +4.7%, +11 objects each vs c9 (A/A ≤ 0.1%); rejected ceiling recovered 70% of the extra instructions and 10 of 11 objects | **Historical regression:** has_many +3.6%, has_one +5.3%, `as:` +5.0%, `joins` +5.6%, `joins` through +7.8% (interp); YJIT still below 8.1 | kamipo, merged 2026-11-17; current PR #59851 | Broad prototype: no, effectful binds disprove exactness. Current PR: unscoped join correctness only | [Confirm approved on exact head](#a1-confirm-on-current-main-2026-11-18); no current performance claim, stays draft |
 | 2 | **A2: a second `AliasTracker` per through load** (#59823) | AR `through_association.rb:39–51` | 5/8 apps, 19 workloads (`AliasTracker.create` +4.2 objects); +0.017% of all Ir | `author.comments` +3.6%, +6 objects at #59823 | No (main still −10.6% vs 8.1) | Our open #59569 removes the same tracker cost elsewhere | Probably (unaliased chain: `aliased_table_for` returns `arel_table`); not proved | After A1; or fold into #59569's follow-up |
 | 3 | **C: block forwarding in `type_caster`/`type_for_attribute`** (#59816) | AR `arel/attributes/attribute.rb:12`, `arel/table.rb:112`, `type_caster/map.rb:15` | Every `where` key (2–3 calls); +0.094% of all Ir vs c9 (max +0.28%) | `where(title:)` +1.1%, three keys +1.8%, `group.count` +0.8% and +5 objects (interp); YJIT flat except `group_count` | Not alone (where still −0.8% to −7.9% vs 8.1) | kamipo, merged 2026-11-16; our #59607 removed a block here before | Yes | Low; mention with A1 |
 | 4 | **Lead 8 (census 9): `table_name_qualified_unscope_values` per merge** (#59709) | AR `query_methods.rb:1066` | 8/8 apps, 56 workloads, +13.4 objects | Small | Yes, small | None | Yes (early return) | Fold into A1 |
@@ -113,27 +118,16 @@ Bisect over the first-parent merges ([req micro](data/rails-main-census-10/raw/r
 additionally 773,749 → 801,251 / +6 objects at #59823 (lead A2). Nothing else between census 9 and main moves these
 cases.
 
-**Exact change?** Yes, for the case that matters. The ceiling ([diff](data/rails-main-census-10/A1-ceiling.diff),
-local only) keeps the where-clause snapshots (no allocation) and computes the differences only when
-`add_constraints` merged at least one scope item; `keep_owner_conditions` returns at once when both clauses are
-empty; `join_scope` skips it when there are no scope items. Against the checklist:
-
-* Output: SQL and records identical for direct, scoped, `as:`, through, composite-key, `disable_joins` and join
-  cases on main and the ceiling ([probe](../../bench/upstream/census10/a1_cpk_probe.rb),
-  [main](data/rails-main-census-10/a1-cpk-probe-main.txt), [ceiling](data/rails-main-census-10/a1-cpk-probe-proto.txt)).
-  The deprecation warning cannot fire without a scope item, so it fires in the same cases.
-* Calls into user code (item 4): the skipped `Array#-` compares predicates either with themselves (`rb_eql`'s
-  identity check) or with predicates on another column, where `Struct#==` stops at the attribute name before the
-  bind value. A custom key type that counts `==`, `eql?` and `hash` sees no call on census 9, main or the ceiling in
-  any case ([probe](../../bench/upstream/census10/a1_calls_probe.rb), [main](data/rails-main-census-10/a1-calls-probe-main.txt));
-  the positive control (subtracting two independently built `where(author_id: 1)`) records one.
-* Order: with a scope item the differences now run after the scope lambdas instead of between them; they compare
-  Rails' own Arel nodes and record nothing, so the order is not observable. A reviewer may prefer keeping the
-  `key_clause` line where it is and only skipping the rest; that costs one difference (2 objects) per load.
-* **Built (2026-11-18)** as [A1](../../bench/upstream/a1/README.md) on main `e30c36266b`: the preloader and
-  `disable_joins` already compute their differences only when needed; the full differential probe (preload, eager
-  load, joins, STI, `as:`, scoped through, `unscope`/`rewhere`, both settings) and the association and relation tests
-  on SQLite and PostgreSQL pass. Ruby master × ZJIT is still missing.
+**Exact change?** Not the broad ceiling ([diff](data/rails-main-census-10/A1-ceiling.diff)). The initial
+[ordinary SQL/records probe](../../bench/upstream/census10/a1_cpk_probe.rb) and
+[call-count probe](../../bench/upstream/census10/a1_calls_probe.rb) missed effectful bind serialization.
+The earlier assertions that the skipped comparisons cannot call user code and that moving them past scope
+lambdas is unobservable are withdrawn: `QueryAttribute#hash` and `#==` serialize values. The
+[first review](../../bench/upstream/a1/review-thermos-sol/README.md) and
+[second review](../../bench/upstream/a1/review-thermos-sol-80daecf52a/README.md) demonstrate different records,
+including reader answers matching neither 8.1 nor main. [A1 was narrowed](../../bench/upstream/a1/narrow/README.md)
+to unscoped `join_scope`, with a seeded regression test and a CHANGELOG entry. It restores the demonstrated
+unscoped join results, not all 8.1 behavior; readers and scoped comparisons remain main's.
 
 **Prior work.** None on the cost. #59825 and #59836 have no reviews or comments on performance (kamipo merged both
 himself); #59836's description says the check exists for the `unscope(where: :user_id)` pattern. Our open #59569
@@ -142,6 +136,137 @@ cleanly with main. **Collision risk is high:** kamipo made six commits to associ
 relations on 2026-11-16 and 11-17. None of his eight open PRs touches `association_scope.rb` or `reflection.rb`
 (#58814 touches `alias_tracker.rb`, #58815 the preloader, #39863 `predicate_builder.rb`); wtn's #59826 touches the
 through preloader.
+
+### A1 confirm on current main (2026-11-18)
+
+**Verdict: approve; no must-fixes.** Reviewer `thermos-sol`, thread
+`T-01a1f0e1-7fe7-77ba-871a-795ff75f861d`. Both Thermos rubrics were loaded and applied here by the same
+reviewer, without other reviewers, subagents or threads. This is a single-reviewer confirm, not two independent
+passes. The [queue pass](../../bench/upstream/pr-queue/items/A1.md) covers exact head
+[`5660fa833ded644617a0900fd8f8ab6d39408182`](https://github.com/thomasklemm/rails/commit/5660fa833ded644617a0900fd8f8ab6d39408182)
+against freshly fetched rails/rails main
+[`78f4f0df59866e8951646183c1f275e186916ba7`](https://github.com/rails/rails/commit/78f4f0df59866e8951646183c1f275e186916ba7),
+also the final remote-ref recheck. Reference 8-1-stable:
+[`aab611acd84b4754e2403a9ab005532ccb0ed374`](https://github.com/rails/rails/commit/aab611acd84b4754e2403a9ab005532ccb0ed374).
+
+The fork branch and live PR GET both matched the requested head and draft state. The current main merge is
+clean. Its `reflection.rb`, `association_scope.rb` and has-many test file are unchanged since the head's parent
+`8e097e9d81`. The A1 reflection/reader blobs are identical to previously approved `e6bfe76e95`; the test changes
+since then only move DDL to `test/schema/schema.rb` and restore transactional fixtures. The CHANGELOG entry is
+unchanged, merely moved above newer main entries. This confirms those changes rather than carrying an old pass.
+
+**Executed regression and suites.** Ruby 4.0.9 (`3e93b23afc`), SQLite 3.54.1 / sqlite3 2.10.2, minitest 6.1.0.
+Each checkout supplied its own framework sources. No installed Rails gem or production database was used.
+The exact added class was extracted by the existing
+[`targeted_test.rb`](../../bench/upstream/a1/review-thermos-sol-e6bfe76e95/targeted_test.rb); only its schema
+addition was transplanted to current main for the negative control, not the library fix.
+
+| Scenario | Result under each owner-condition setting |
+| --- | --- |
+| New test on current main | 1 run, 1 error: `ActiveModel::RangeError`; stack reaches `QueryAttribute#hash` from `reflection.rb:236` |
+| New test on exact head | 1 run, 4 assertions, pass |
+| New test on exact head, `ARCONN=sqlite3_ractor` | 1 run, 4 assertions, pass; this is the self-proxy test mode, not the full Ractor suite |
+| Exact head, test's default scope removed in memory | 1 failure: seeded joined parent returned; dropping the conditions is not a passing fix |
+
+The full command below ran with `ARCONN=sqlite3` from each tree's `activerecord/`, with warnings enabled:
+
+```sh
+ruby -w -I../railties/lib -I../activesupport/lib -I../activemodel/lib -Ilib -Itest \
+  -e 'ARGV.each { |f| require File.expand_path(f) }' \
+  test/cases/associations/*_test.rb test/cases/associations_test.rb \
+  test/cases/reflection_test.rb test/cases/relation_test.rb test/cases/relations_test.rb \
+  test/cases/relation/*_test.rb test/cases/scoping/*_test.rb
+```
+
+| Tree | Runs | Assertions | Failures / errors | Skips |
+| --- | ---: | ---: | --- | ---: |
+| Exact head | 3,271 | 10,741 | 0 / 0 | 1 |
+| Unchanged current main | 3,271 | 10,738 | 0 / 0 | 1 |
+| Current main + unchanged A1 library/test delta | 3,272 | 10,742 | 0 / 0 | 1 |
+
+These include inner/outer joins, eager loading, through and nested associations, reflections, relations and
+scoping. Each command exited 0. The existing skip is
+`ActiveRecord::WhereTest#test_with_tuple_syntax_and_large_values_list`, confirmed in isolation; its SQLite
+expression-tree-limit guard is unchanged. Initial runs on both trees stopped at missing `bcrypt`; installed
+it and reran both complete commands, without changing tests. The extra main test comes from its unrelated
+single-predicate OR fix; equal totals do not mean identical test inventories. No PostgreSQL/MySQL, full Ractor
+suite, Ruby master, JIT or performance rerun is claimed by this pass.
+
+**Differential confirm.** Reran the existing
+[`adversarial_joins.rb`](../../bench/upstream/a1/review-thermos-sol-e6bfe76e95/adversarial_joins.rb) unchanged
+on main/head/8.1, SQLite, finite/range/context-dependent modes and widths 16/17. Each cell contains 130
+observations: both settings × 13 association shapes × five operations. Each tree has 780 observations, 2,340
+total. Seeded records distinguish owners, polymorphic types, STI, defaults and serializer phases.
+
+| Mode / width | Head differs from main | Head matches neither main nor 8.1 |
+| --- | ---: | ---: |
+| Finite / 16, 17 | 0, 0 | 0, 0 |
+| Out-of-range / 16, 17 | 20, 90 | 0, 0 |
+| Context-dependent / 16, 17 | 0, 12 | 0, 0 |
+
+STI adds a predicate, so 17 is the reproducer's threshold, not a universal Rails contract. Scoped range
+failures remain; no new exception kind occurred. The
+[`linear_join`](../../bench/upstream/a1/followup-81/linear_join.rb) probe also confirms equality can serialize
+with only two predicates: main selects `Parent`, head and 8.1 select `ParentX`. Both widths of
+[`scoped_hash_phase`](../../bench/upstream/a1/review-thermos-sol-80daecf52a/scoped_hash_phase.rb),
+[`scoped_extension`](../../bench/upstream/a1/review-thermos-sol-80daecf52a/scoped_extension.rb) and
+[`scoped_join_removed`](../../bench/upstream/a1/review-thermos-sol-80daecf52a/scoped_join_removed.rb)
+match main byte for byte; the former third-answer reader cases still select records 35 and 2, not 69 or 4.
+The ordinary probe is byte-identical (334 lines / 14 warnings with KEEP=0, 320 / no warnings with KEEP=1),
+as is the CPK/`disable_joins` probe. `range_paths` confirms unfiltered outer joins retain the parent with zero
+children; readers/preload and scoped joins removing the bad condition are not repaired. These are retained
+boundaries, not new defects. Scripts and raw logs from this confirm are under `.amp/in/orb-backup/a1-confirm/`.
+
+**Body, CHANGELOG and commit audit.** The queue body matched the live PR body exactly. No body edit is needed.
+Each factual sentence was checked, not carried over from the prior review:
+
+* Title and final “nothing can have removed a condition” sentence: the sole production change guards the
+  original comparison/merge block on `scope_chain_items.empty?`; default/STI/route predicates and key joins stay.
+* “Since #59836” and “also when there are no scope items”: inspected `ff53633d52^1..ff53633d52`'s reflection diff
+  and current main. It introduces the initial difference and the two helper differences, unconditionally.
+* “Comparing predicates can call into their bind values”: read `WhereClause#-` and `QueryAttribute#hash`/`#==`;
+  the failing stack and range/context/two-predicate probes execute the mechanism.
+* “So joining ... raises ... instead of matching no records” and the Ruby snippet: extracted the exact body
+  model definitions into an in-memory SQLite schema with the 17 integer columns and a seeded matching owner/
+  child. Current main raises under both settings; exact head and 8.1 return `[]`. This is an inner-join example,
+  not a promise about all scoped joins or outer-join parents.
+* CHANGELOG heading and paragraph describe that same concrete failure and narrow fix. Top placement,
+  indentation and Thomas credit match Rails guidance. No broadened 8.1-restoration or performance claim.
+* Commit subject and each explanatory sentence make the same checked claims as the body. One fix commit,
+  author/committer Thomas Klemm, no trailers; no rewrite needed. PR discussion was read after the audit:
+  comments, inline comments and reviews were all empty.
+
+**Claims retired, not recertified.** The body and CHANGELOG contain **zero performance sentences**, so there
+is nothing to cut there. The earlier census summary's “An exact fast path ... recovers 70% ... and 10 of the
+11 objects” is replaced above: that was a rejected broad prototype, not this PR. The ranked row now labels
+its 8/8-app reach and ceiling numbers historical, not PR savings. The old “Exact change? Yes” and “order is not
+observable” reasoning is withdrawn above. The method/limits below no longer call the ceiling exact.
+Removed the queue impact sentence “Internal cost note: Author.joins(:posts) about -3% instructions (body/a1 join
+cell); reader savings dropped with the narrowing” and the triage's “Intern etwa −3% Join-Micro” clause: neither
+is a new current-main measurement. Historical pinned tables remain history, not a present-day speed claim.
+
+**Maintainability, guards and comments.** Cold read: build the class/default and fixed route conditions; if
+association scope items exist, perform the same comparisons and merges as before; then add key equalities.
+The sole surviving guard is idiomatic `unless scope_chain_items.empty?`: an empty Rails-owned Array means no
+scope merge could have removed an owner condition. It is the correctness boundary, not arbitrary-object
+defense. Checking only `scope` would miss through/source-type items; moving the guard to the helper would
+leave the first effectful subtraction in place. No smaller equivalent structure is apparent.
+
+The only added comment is the one line explaining why the test needs more than 16 predicates; without it a
+reader could reduce the width and lose the regression. No production/API comment, helper, cache, sentinel,
+copied method or ad-hoc user-object guard was added. Files were already above 1,000 lines (reflection
+1,628 → 1,630; has-many tests 3,713 → 3,734); no threshold crossing. Fresh extracted-method metrics, flog 4.9.4 /
+RuboCop 1.92.3: flog 31.1 → 33.6, ABC 26.91 → 27.89, cyclomatic/perceived 3 → 4. The one branch expresses the
+real empty/nonempty distinction; abstraction would obscure it. Metrics maxima were zero to print values,
+not a claim that the complete Rails RuboCop suite passed.
+
+Checklist scope: custom type subclasses, effectful equality/hash/serialization and extension callbacks were
+executed; no user-returned accumulator is adopted. Construction/load order and the nonempty branch are
+unchanged. Rails' internal scope-item Array contract needs no singleton/subclass/conversion fallback guards;
+no claim is made to have exhausted arbitrary overrides, frozen-value or fiber schedules. The tested behavioral
+differences are intentional unscoped-join repairs, not exact equivalence to all of main or all of 8.1.
+
+Only Lowrail records were edited. No fork push, GitHub PATCH, ready action, comment or CI rerun was performed.
 
 ## Lead A2: a second `AliasTracker` per through-association load
 
@@ -288,7 +413,8 @@ after kamipo's and Hartley McGuire's edits. Everything census 9 listed as kept s
   `association_scope_keeps_owner_conditions = true`, the 8.2 default for new apps.
 * **Fixed heap:** `RUBY_GC_HEAP_{0..4}_INIT_SLOTS=1000000/250000/100000/20000/10000` for every run.
 * **Ceiling prototype** for lead A1: a local patch on main ([diff](data/rails-main-census-10/A1-ceiling.diff)), not
-  a branch; it measures what an exact fast path could recover, nothing more.
+  a branch; a historical cost ceiling, subsequently rejected for effectful-bind behavior. It does not price
+  the narrowed correctness PR.
 * **Receipts:** [data/rails-main-census-10](data/rails-main-census-10/) (micro raw output in `raw/`). Orb scripts
   and notes in `.amp/in/orb-backup/`.
 
@@ -297,5 +423,5 @@ after kamipo's and Hartley McGuire's edits. Everything census 9 listed as kept s
 * No ZJIT and no YJIT CPU census; YJIT claims come from the micros.
 * The 8 apps include no MySQL app and none on `load_defaults "8.2"`, so the census runs
   `association_scope_keeps_owner_conditions = false`; the micro shows `true` costs the same.
-* Lead A1's exactness is argued and probed for direct, polymorphic and through associations with and without a
-  scope; composite keys and `disable_joins` are not probed yet.
+* Lead A1's initial broad exactness argument was disproved. The current join-only fix, CPK/`disable_joins`
+  controls and remaining boundaries are in the [confirm](#a1-confirm-on-current-main-2026-11-18).
