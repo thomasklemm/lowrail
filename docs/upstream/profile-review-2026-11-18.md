@@ -771,3 +771,167 @@ The three suites pass: 18 runs, 168 assertions. Rechecked on Campfire (`bin/rail
 outcomes identical with no gem, gem listed but off, and both profiled runs (632 pass, 2 skip); all 18 processes
 load every feature outside Lowrail, Bundler and RubyGems in the same order; no `[lowrail-profile]` warning; every
 window finished (666 requests, 16 jobs, 19 Cable actions completed per run).
+
+## Third confirm review of 10e646e4 (2026-11-18)
+
+**Verdict: changes.** This fourth review round confirms the original D1–D6 repros and P3 are corrected, but
+finds three must-fixes under the requested strict severity bar: preserving Accept introduces an export of a
+value Rails filters; a complete workload receipt still certifies requests it did not cover; and the schema
+check still returns green on malformed/identity-less reports. No floor-policy change or profiler redesign is
+requested. This commit records the review only; it does not fix the findings.
+
+### Scope and fresh checks
+
+Loaded `thermos`, `thermo-nuclear-review` and `thermo-nuclear-code-quality-review`. One reviewer applied both
+rubrics in this thread as requested, without subagents or other threads; this is not independent dual-reviewer
+coverage. Read the fix author's resolution above, the eleven-file `10e646e4^..10e646e4` diff, the relevant
+producers/readers, and Rails' ParameterFilter and request filtering code. The implementation pins are
+`a05d1dab1d3d680ee91cc0e4b2fdeb1f33372164` and `10e646e403018de71f964660bb710cd6d93b6bd8`.
+Unrelated intervening main changes are excluded. No implementation or permanent test was changed; nothing was
+posted upstream. The fix's GitHub commit-to-pulls lookup returned no PRs to inspect.
+
+The earlier scratch harnesses were not in this orb. Reconstructed their documented inputs using the repository's
+minimal Rails fixture, synthetic values and disposable outputs, rather than claiming the old files were recovered.
+Used mise Ruby **4.0.9**, revision `3e93b23afc`, Rails **8.1.4**, sqlite3 **2.10.2**, bcrypt **3.1.22**, Rack
+**3.2.8**, rack-test **2.3.0**, Linux x86-64. Missing gems were installed in the orb; repository dependencies were
+not changed. All three requested files passed on the exact head:
+
+```text
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/profile_test.rb --verbose
+13 runs, 142 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/workloads_test.rb --verbose
+3 runs, 22 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/load_hooks_test.rb --verbose
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Total: **18 runs, 168 assertions**, independently reproduced. Loading the head's profile/workloads tests with
+only the baseline's library and test helper gives **16 runs, 123 assertions, 5 failures, 1 error, 0 skips**.
+Those combined tests stop at the first assertion; the separate probes below establish the masked cases too.
+
+### Original D1–D6 and P3 before/after ledger
+
+| Finding | Reproduced on a05d1dab | Observed on 10e646e4 |
+| --- | --- | --- |
+| D1 | The three-argument Proc depending on `original["controller"]` and the in-place `"not_a_key"` → `"credential"` String mutation export `proc-secret` and `string-secret`, although Rails masks both. | Neither value occurs in recorded JSON or generated workloads. The Proc shape is disabled with its reason. Symbol, String and Regexp controls mask their values; the app's mutable String remains unfrozen. **Original param cases fixed; new header leak E1 below.** |
+| D2 | Recording `/lookup?q=xml` with `application/xml` omits Accept; actual MockClient replay returns `text/html`. | The declaration and app both see `application/xml`; JSON and explicit HTML controls also retain their Accept and GET query. **Original XML case fixed.** |
+| D3 | Same file, `exit(0) if n == 2`, different first paths `?which=one`/`?which=two`, same output directory with reports copied aside: both runs exit 0; measured requests 0, digest `a2c0a43afea3c8e0`; compare 0. | Initial receipt has `complete:false`, no `runN/measured.json`; comparing either the stopped capture to itself or the differing early-path captures exits 2. Complete ordinary runs have `complete:true` and 20 measured requests. **Original case fixed; coverage gap E2 remains.** |
+| D4 | Complete captures using `env: {"app.flag" => 1}` versus `2` have identical manifest/measured digests and compare 0. A capture with `Object.new` also compares green to itself. | Integer values change manifest and measured digests; compare 2. `Object.new` is listed under `headers_uncertified`, propagated as a measured `uncertified` request, and compare 2. **Fixed in these cases.** |
+| D5 | One yielded/abandoned request followed by three completed requests: summary windows 4, action windows 3, dropped 0; self-compare 0. | Each summary has windows 4 and completed 3, Markdown says unfinished, self-compare 2. **Original case fixed.** |
+| D6 | No command argv, unknown mode, `[null]` Ruby/environment, duplicate site and key-less 10→30 rows compare 0; String windows and String `outside_requests` exit 1. | Each exits 2. Invalid/unreadable JSON also exits 2. Valid empty environment and a nil-name/nil-warm action are accepted; that action is explicitly not compared. **Named cases fixed; E3 remains.** |
+| P3 | `auth=yes; Path=/private,/other` is sent to `/private/me` by Rack::Test but not MockClient. | Both send it there and neither sends it to `/public`. **Fixed for the requested Path normalization, not a broader browser claim.** |
+
+Private probes and generated data are retained under `.amp/in/orb-backup/fourth/`: `repro.rb`, `edges.rb`,
+`header_and_finalizer.rb`, `schema.rb`, `remaining.rb` and `invariants.rb`; `base/` is the detached old worktree.
+Each takes a repository path first; the Rails probes use a separate disposable app/output path. For example:
+
+```sh
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fourth/repro.rb . .amp/in/orb-backup/fourth/head
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fourth/schema.rb . .amp/in/orb-backup/fourth/schema-head
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fourth/edges.rb . .amp/in/orb-backup/fourth/head/app
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fourth/header_and_finalizer.rb . .amp/in/orb-backup/fourth/head/app
+```
+
+### E1 — Must-fix: GET Accept preservation newly exports a Rails-filtered value
+
+**Locations:** `gem/lib/lowrail/profile.rb:196–204`, `shape_of` and generated request names/headers in
+`gem/lib/lowrail/workloads.rb`. Introduced for these XML headers by the changed Accept condition in `10e646e4`.
+
+Set `Rails.application.env_config["action_dispatch.parameter_filter"].replace([:accept])` and serve
+`GET /lookup?q=safe` with `HTTP_ACCEPT=application/xml; token=accept-secret`. In the actual controller,
+`request.filtered_env["HTTP_ACCEPT"]` is `[FILTERED]`; the request succeeds. On the fix both shapes JSON and the
+generated enabled GET export the literal header, including the secret, in `accept`, the request name and
+`headers: { "Accept" => ... }`. The baseline omits this XML Accept and exports neither synthetic header secret.
+
+Replace the filter list with `[->(k, v) { v.replace("[FILTERED]") if k == "HTTP_ACCEPT" }]` and repeat with
+`application/xml; token=proc-accept-secret`. Rails again masks the header. The fix refuses params and comments
+the request out, yet still writes that secret into its name/header and JSON. The comment even says no request
+values were kept. All four Rails filtering controls (both requests in both runs) returned true on both pins.
+This is Rails' real filtered-env contract, not an assertion that `filtered_parameters` contains headers.
+
+**Smallest fix:** apply the supported name/pattern filter to the `HTTP_ACCEPT` value before grouping or retaining
+it, and disable a shape whose Accept was masked. With an unsupported filter/Proc, retain no raw Accept either;
+the shape is already refused, so reproducing Proc env context is unnecessary. Redact/omit the value in names and
+commented declarations as well as executable declarations. Keep unfiltered XML/JSON replay controls.
+
+### E2 — Must-fix: a parent's final receipt certifies uncovered request windows
+
+**Locations:** `gem/lib/lowrail/profile_workloads.rb:50–55,70–90`, `ProfileReport#meta`, and
+`gem/lib/lowrail/profile_compare.rb:90–98,128–139`. Remaining completeness gap, present on both pins; the new
+`complete` marker closes the single-process early-stop repro but does not establish coverage of the whole run.
+
+Use the same workload file in both captures:
+
+```ruby
+parent = Process.pid
+get("/widgets", name: "forked") do |n|
+  if n == 11
+    pid = fork
+    Process.wait(pid) if pid
+  end
+  exit(0) if n == 12 && Process.pid != parent
+  { path: Process.pid == parent ? "/widgets?which=parent" : "/widgets?which=#{ENV.fetch('CHILD')}" }
+end
+```
+
+Capture with `CHILD=a` and `CHILD=b`. Every run exits 0, has **2 processes, 21 request windows, 21 completed,
+0 dropped**, but its only `measured.json` describes **20** parent requests and digest `f3d637c3953295dd`.
+The child exits after its first measured request and never writes a complete receipt. The fixture's per-PID
+request log verifies the child serves `which=a` versus `which=b`. The parent receipt and manifest are identical;
+**compare exits 0 with no problems or regressions on both pins**. Requiring one complete entry per run does not
+require one for every process contributing data.
+
+There is also a one-process control: register `at_exit { Rails.application.call(Rack::MockRequest.env_for(
+"https://localhost/widgets?which=#{ENV.fetch('AFTER')}")) }` in an otherwise fixed workload file. `AFTER=a` versus
+`b` again gives 21 completed windows against a 20-request receipt and compare 0. The complete receipt precedes
+the app's exit work, while the profiler's later writer includes it.
+
+**Smallest fix:** for workload comparisons, require each measured request count to equal its run's captured
+request windows, and conservatively refuse contributing multiple processes unless all are covered by the
+certificate. Refusing multi-process workload evidence needs no per-PID receipt framework. Leave ordinary
+multi-process command profiling alone: a parent with 3 requests and children with 3 and 4 gave 3 processes,
+10 windows and 10 completed on the fix, and valid self-compare 0. Do not change app fork/exit behavior to force
+the counters to fit the receipt.
+
+### E3 — Must-fix: the new strict schema still admits malformed evidence
+
+**Locations:** `gem/lib/lowrail/profile_compare.rb:90–94,130–134,202–215`. Remaining D6 boundary, reproduced on
+both pins, not an allegation that the normal writer emitted these edited reports.
+
+Starting from the otherwise valid two-run fixture (10 windows/completed per run, complete collections, known
+Ruby/environment and finite warm vectors):
+
+* Set workload identity to `{"mode":"workloads","manifest":"","host":"","measured":[
+  {"requests":10,"complete":true,"sha256":""},{"requests":10,"complete":true,"sha256":""}]}` in both reports.
+  **Compare exits 0**, despite no manifest or request digest at all. The measured count matches the windows;
+  E2's count check alone would not close this case.
+* Keep a valid command identity but set each summary's `objects_per_request` to `"bad"`. **`--json` exits 0**
+  with no problems, while default Markdown raises `NoMethodError` at `round` and exits **1**, not the promised
+  diagnostic 2. That field is read after the purported all-keys schema boundary without checking its type.
+
+**Smallest fix:** reject empty manifest/host/request-digest identities and validate the summary number before
+the formatter consumes it, using the same finite-number rule as warm vectors. Keep valid empty `rails_env`
+distinct from an unknown identity. These are small additions to the canonical validator, not a reason for a
+generic schema framework. They are must-fixes here because they return green on invalid evidence and contradict
+the documented strict-check guarantee; a mere false exit 2 or missing diagnostic would not meet that bar.
+
+### Maintainability, invariants, nits and limits
+
+**No independent maintainability blocker or separate nit.** Refusing Proc-based parameter recording is simpler
+than recreating Rails' merged context; immutable String snapshots, JSON-value checks, and deriving completed
+windows from existing action counts stay in their owning modules. No changed production file crosses 1,000
+lines (largest: `profile_report.rb`, 582). The needed simplification remains a conservative admission boundary,
+not another identity store or general transport/schema abstraction.
+
+Fresh-process controls passed on both pins: gemspec evaluation loads zero features and defines no Lowrail;
+requiring the unset/empty profiler defines no Lowrail; enabling it and loading Active Support defines none of
+Action Controller, Active Job, Action Mailer or Action Cable. The passing request/Cable/job tests exercise
+unchanged returns and exception identity. No app-outcome or lazy-loading regression was found in these bounded
+controls, and none of the proposed refusals should alter app execution.
+
+The docs accurately describe the original fixed repros, JSON env refusal, nil warm-action handling and bounded
+cookie Path behavior. Their blanket "no request values"/filtered-value promise is false for E1, and complete
+comparable-capture/strict-malformed-input claims remain too strong under E2/E3. The author's Campfire outcome,
+process-load-order and completed-window results above remain attributed evidence: **Campfire's 634 tests were
+not rerun here**, nor was another corpus, `lowrail verify`, `lowrail bench`, timing, instruction counting, speed,
+unrestricted scheduler/Ractor or sanitizer/OOM coverage. The compare floor policy is deliberately unchanged.
