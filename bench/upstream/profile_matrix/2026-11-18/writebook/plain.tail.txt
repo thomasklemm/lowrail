@@ -1,0 +1,3 @@
+Run options: -v --seed 1234
+Finished in 44.531865s, 6.9613 runs/s, 28.1821 assertions/s.
+310 runs, 1255 assertions, 0 failures, 1 errors, 2 skips

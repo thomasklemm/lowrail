@@ -1,0 +1,3 @@
+bin/rails test -v --exclude /test_unpublishing_a_book_revokes_the_disk_URL/
+seed 1234
+exit 0 0

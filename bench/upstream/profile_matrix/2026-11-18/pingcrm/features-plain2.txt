@@ -1,0 +1,10 @@
+base plain2: 1 processes
+plain 72978.txt 2744: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  missing: []  same set: false
+off 74044.txt 2742: identical to a plain2 process
+profiled run1-75058.txt 2742: identical to a plain2 process
+profiled run2-76088.txt 2742: identical to a plain2 process
+base2 run1-77378.txt 2742: identical to a plain2 process
+base2 run2-78143.txt 2742: identical to a plain2 process
+head run1-78924.txt 2742: identical to a plain2 process
+head run2-79772.txt 2742: identical to a plain2 process

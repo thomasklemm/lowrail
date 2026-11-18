@@ -1,0 +1,8 @@
+lowrail-profile: run 1 of 2: bin/rails test -v --exclude /test_unpublishing_a_book_revokes_the_disk_URL/
+Run options: -v --exclude /test_unpublishing_a_book_revokes_the_disk_URL/ --seed 1234
+Finished in 60.978696s, 5.0673 runs/s, 20.5810 assertions/s.
+309 runs, 1255 assertions, 0 failures, 0 errors, 2 skips
+lowrail-profile: run 2 of 2: bin/rails test -v --exclude /test_unpublishing_a_book_revokes_the_disk_URL/
+Run options: -v --exclude /test_unpublishing_a_book_revokes_the_disk_URL/ --seed 1234
+Finished in 50.670335s, 6.0982 runs/s, 24.7679 assertions/s.
+309 runs, 1255 assertions, 0 failures, 0 errors, 2 skips

@@ -1,0 +1,5 @@
+status 0 compared: 5211 lines, 25 actions; not compared 22
+  request action PagesController#create: -9.00 against 21.40 (42%)
+  request action PicturesController#update: +4.50 against 20.00 (22%)
+  request action SessionsController#destroy: +3.55 against 20.00 (18%)
+  request action Users::ProfilesController#show: +3.50 against 20.00 (18%)

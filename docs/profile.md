@@ -363,6 +363,39 @@ process). When the command runs it:
 exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
 it did not create.
 
+### Rerun on main (2026-11-18)
+
+The three apps the review fixes left unchecked, on main `7ca0a20e` with the counter fix below, in fresh
+`script/corpus` copies, three ways as before (seed 1234, `$LOADED_FEATURES` from every process), plus two more
+profiles of each, so that `compare BASE HEAD --aa BASE2` ran on three invocations of the same code. Receipts,
+scripts and the three captures' reports: [bench/upstream/profile_matrix/2026-11-18](../bench/upstream/profile_matrix/2026-11-18).
+Other runs shared the 2-CPU orb, so no times are given.
+
+| App, suite | Ruby, Rails | Tests | Outcomes (plain = off = every profiled run) | Load order | `compare --aa` |
+| --- | --- | ---: | --- | --- | --- |
+| Writebook, `bin/rails test -v` | 4.0.7, main `36e0f96b9d` | 310 | identical per test: 307 pass, 2 skip, 1 error | identical in every process | 2: the error fails every run; without that test 0 (5,211 lines, 25 actions compared) |
+| Pingcrm, `bin/rails test:all -v` | 4.0.7, 8.1.4 | 26 | identical per test: 26 pass | identical to a second plain run | 0 (2,962 lines, 11 actions) |
+| CodeTriage, `bin/rails test --verbose` | 4.0.7, 8.1.4 | 222 | identical per test for the 217 that print a line, totals 222 everywhere: 0 failures | same files; yard's handlers in another order | 0 (8,477 lines, 18 actions); 2 before the fix |
+
+* Writebook's error is the same as before (`URI::Generic#request_uri`, without the gem too). A suite that fails
+  never gives a gate (exit 2, "base's command exited [1,1]"); excluding that test
+  (`--exclude /test_unpublishing_a_book_revokes_the_disk_URL/`) the A/A pair exits 0.
+* Every `compare` with an A/A pair exits 0 with nothing beyond its floor; the closest rows reach 42% (Writebook,
+  `PagesController#create` −9.0 against 21.4), 50% (Pingcrm, a `vite_ruby` line −0.73 against 1.46) and 62%
+  (CodeTriage, `BackgroundInactiveEmailJob#perform` +87.5 against 142.0) of their floor. Without `--aa`, CodeTriage's
+  pair lists that job as a regression (+87.5 against the 78.0 its captures' own spread gives) and exits 0 as not a
+  gate. This is three more A/A samples, not a detection bound; no change was measured.
+* **Fixed: code evaluated from line −1 dropped samples.** Sidekiq's Web compiles its ERB views with
+  `class_eval …, -1`; the counter read that line as 2⁶⁴−1 and dropped the allocation, so every CodeTriage run had
+  `dropped=1` and `compare` refused every pair (exit 2). Lines below 1 now count at line 0
+  (`test_code_evaluated_at_a_negative_line_is_counted`).
+* Load order: Writebook's 4 plain, 4 off and 24 profiled processes load the same features in the same order.
+  Pingcrm's first plain run also loaded `vite_ruby/runner.rb` and `io.rb`, because Vite built the copy's assets
+  then; a second plain run does not and matches every off and profiled process. CodeTriage loads the same files in
+  every process, and the same order except for yard's 27 handler files: yard loads them by walking
+  `Module#constants`, and their order is stable within a setup but differs between plain, off and profiled (off
+  loads no Lowrail code). Its first plain run also loaded `enc/trans/single_byte.so`; a second did not.
+
 ### Rechecked after the review fixes (2026-11-18)
 
 After the fixes for the [review](upstream/profile-review-2026-11-18.md), the same three ways on fresh copies of
@@ -400,7 +433,8 @@ ways: without the gem, with the gem in a copy of the Gemfile but not run ("off")
 * Load order: in every process of every app, every feature outside Lowrail, RubyGems and Bundler loads in the same
   order in all setups. Profiled processes miss RubyGems files (`bundler_version_finder.rb`, for Lobsters also
   `request_set/…`) that `bundle exec lowrail-profile` loaded in the parent already. CodeTriage's yard loads its
-  handlers in directory order, which already differs between plain and off; without them the order matches.
+  handlers by walking `Module#constants`, in an order that already differs between plain and off; without them the
+  order matches.
 * Overhead: the first run (counting only) costs 0–11% of suite time. The repeat run walks the stack on every
   allocation to find the app frame and costs 1–45% (Campfire's suite, at 19,400 objects per request, the most).
 * `--record` notes a request's shape after the counting window closes and requires `json` only at exit, when

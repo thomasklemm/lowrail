@@ -1,0 +1,68 @@
+{
+  "status": 0,
+  "gate": true,
+  "problems": [],
+  "min": 1.0,
+  "compared": [
+    "request"
+  ],
+  "regressions": [],
+  "improvements": [],
+  "not_compared": [
+    {
+      "kind": "request",
+      "name": "OrganizationsController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "UsersController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "UsersController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ContactsController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "UsersController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "OrganizationsController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ContactsController#new",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ContactsController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "OrganizationsController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ContactsController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Users::SessionsController#destroy",
+      "reason": "no warm value"
+    }
+  ]
+}

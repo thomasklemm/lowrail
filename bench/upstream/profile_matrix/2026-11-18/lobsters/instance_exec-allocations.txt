@@ -1,0 +1,3 @@
+dsl (instance_exec + 2 lets)   1.000
+instance_exec, no lets         1.000
+yaml-like lambda               0.000

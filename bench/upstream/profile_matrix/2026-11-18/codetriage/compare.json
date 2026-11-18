@@ -1,0 +1,40 @@
+{
+  "status": 0,
+  "gate": true,
+  "problems": [],
+  "min": 1.0,
+  "compared": [
+    "request",
+    "job",
+    "mail"
+  ],
+  "regressions": [],
+  "improvements": [],
+  "not_compared": [
+    {
+      "kind": "request",
+      "name": "Devise::SessionsController#new",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ReposController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "IssueAssignmentsController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "mail",
+      "name": "UserMailer#poke_inactive",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "mail",
+      "name": "UserMailer#send_triage",
+      "reason": "no warm value"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+base plain: 1 processes
+off 74044.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+profiled run1-75058.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+profiled run2-76088.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+base2 run1-77378.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+base2 run2-78143.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+head run1-78924.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false
+head run2-79772.txt 2742: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/runner.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/vite_ruby-3.11.1/lib/vite_ruby/io.rb"]  same set: false

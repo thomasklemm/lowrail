@@ -1,0 +1,6 @@
+plain exit 0 wall 28.733708677 at 11:50:03
+off exit 0 wall 18.704092331 at 11:50:22
+profiled exit 0 wall 41.248904799 at 11:51:03
+base2 exit 0 wall 37.356292763 at 11:51:40
+head exit 0 wall 37.085880901 at 11:52:17
+plain2 exit 0 wall 17.840636614 at 11:53:13

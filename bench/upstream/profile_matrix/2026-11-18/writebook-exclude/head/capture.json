@@ -1,0 +1,1 @@
+{"format":1,"identity":{"mode":"command","argv":["bin/rails","test","-v","--exclude","/test_unpublishing_a_book_revokes_the_disk_URL/"]},"argv":["bin/rails","test","-v","--exclude","/test_unpublishing_a_book_revokes_the_disk_URL/"],"seed":"1234","runs":2,"exit":[0,0]}

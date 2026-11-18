@@ -231,6 +231,10 @@ tests against a worktree of `85e58dcf`): `gem/test/profile_test.rb` (7 new) and 
   not name) can still appear, hence the warning. F7: the action floor's multipliers remain Campfire-derived.
 * Not rerun: Writebook, Pingcrm and CodeTriage from the earlier matrix, the Lobsters YAML/DSL pair, and the
   earlier `--workloads` proof numbers, which predate B's `Host`/`Origin` headers (marked in profile.md).
+  The matrix and the pair were rerun on main later the same day, with a `compare --aa` per app
+  ([profile.md](../profile.md#rerun-on-main-2026-11-18)); that rerun found and fixed dropped samples for code
+  evaluated from line −1 (CodeTriage), and found a +2 to +3 object offset, left as recorded, on Lobsters' mail
+  between YAML and DSL.
 
 ## Confirm review of 76be8b58 (2026-11-18)
 

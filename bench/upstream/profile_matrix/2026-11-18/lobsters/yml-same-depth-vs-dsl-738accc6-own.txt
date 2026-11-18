@@ -1,0 +1,13 @@
+names equal: true (11); dsl pair names equal: true
+workload                                            yml       dsl        Δ   A/A yml   A/A dsl  sql                yml windows
+GET home                                        36603.8   36706.0   +102.1     +71.5     -33.0  same (4 runs)      [36603.0, 36679.9]
+GET active                                      36833.0   36933.6   +100.5     +77.5     -26.2  same (4 runs)      [36831.4, 36913.5]
+GET story                                       28862.4   28862.3     -0.0      +1.8      -0.6  same (4 runs)      [28859.3, 28865.5]
+GET tag                                         10003.4   10005.2     +1.8      -1.2      -0.9  same (4 runs)      [10000.0, 10005.8]
+GET hottest.json                                14181.8   14181.4     -0.4     -23.0     -22.1  same (4 runs)      [14155.7, 14182.4]
+GET story.json                                  11455.6   11460.3     +4.7      -0.2      -6.6  same (4 runs)      [11451.2, 11460.1]
+POST story vote toggle                           4503.4    4545.0    +41.6      -0.2      -1.2  same as a yml run  [4499.9, 4504.9]
+POST comment preview                             5981.5    6027.4    +45.9      -0.1      -5.6  same (4 runs)      [5974.3, 5986.6]
+POST comment (XHR)                              11225.9   11265.0    +39.1      -8.2      -0.0  same (4 runs)      [11216.7, 11234.4]
+deliver EmailReplyMailer#reply                   2021.8    2023.8     +2.0      +0.0      +0.0  same (4 runs)      [2021.9, 2021.9]
+perform NotifyCommentJob                         1325.4    1325.4     +0.0      +0.0      +0.0  same (4 runs)      [1325.5, 1325.5]

@@ -1,0 +1,8 @@
+lowrail-profile: run 1 of 2: bin/rails test:all -v
+Run options: -v --seed 1234
+Finished in 15.915442s, 1.6336 runs/s, 10.3045 assertions/s.
+26 runs, 164 assertions, 0 failures, 0 errors, 0 skips
+lowrail-profile: run 2 of 2: bin/rails test:all -v
+Run options: -v --seed 1234
+Finished in 16.807425s, 1.5469 runs/s, 9.7576 assertions/s.
+26 runs, 164 assertions, 0 failures, 0 errors, 0 skips

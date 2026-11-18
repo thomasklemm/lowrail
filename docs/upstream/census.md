@@ -227,6 +227,18 @@ only: the Blog on its own Rails 8.1.4, Lobsters on its own Rails 8.1.3.1 and on 
 * **`--init`** on the Blog wrote its five pages as route helpers and listed Turbo's three routes as left out; the
   file `lowrail-profile --record` wrote from the Blog's suite ran as four GET workloads, A/A within 1.3 objects.
 
+**Lobsters rerun on main `7ca0a20e`** (after the profiler review fixes, which changed the shared request code; the
+same clone, YAML from `11804786`, both Rails;
+[receipts](../../bench/upstream/profile_matrix/2026-11-18/README.md#lobsters-yamldsl-pair-lobsters)): the same 11
+names, every workload's masked SQL the same in all four runs on both Rails, reads within the moves between A/A runs,
+the job identical, the XHR writes +35 to +47 and back within the A/A with `accept: "text/html"` (−4.8, +3.9, −2.1).
+**The mail is not identical: +3.0 objects per operation on both Rails, against an A/A of 0.0.** One is
+rack-mini-profiler splitting the template path, one directory deeper in this DSL copy than in the YAML's; with
+both copies at the same depth, +2.0 remain, the same at `738accc6`, with traced objects and every site identical.
+They are the census client's: it runs a mail block with `instance_exec`, which allocates one VM-internal object
+per call on Ruby 4.0.9 (the YAML's lambda none); the second is not identified. Compare a mail's receipts across the
+YAML-to-DSL change with that +2 in mind.
+
 ### Registering an app
 
 For the rounds we run ourselves, an app is registered in this repository instead.

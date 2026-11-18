@@ -1,0 +1,182 @@
+{
+  "format": 2,
+  "file": "/home/user/workspace/repo/.corpus/census-app-lobsters-rb/.census-app/workloads.rb",
+  "sha256": "be764a9f1823425b06402a2313107a5d677ab794e96710a8a120980f049d75de",
+  "setup": [
+    "workloads.rb:5"
+  ],
+  "lets": [],
+  "sign_in": {
+    "method": "post",
+    "path": "/login",
+    "form": "/login",
+    "expect": [
+      302
+    ],
+    "params_sha256": "59bad1bf8a22b59e"
+  },
+  "csrf_from": "/",
+  "requests": [
+    {
+      "name": "GET home",
+      "method": "get",
+      "path": "/",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [],
+      "headers_sha256": null,
+      "expect": [
+        200
+      ],
+      "kind": "html"
+    },
+    {
+      "name": "GET active",
+      "method": "get",
+      "path": "/active",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [],
+      "headers_sha256": null,
+      "expect": [
+        200
+      ],
+      "kind": "html"
+    },
+    {
+      "name": "GET story",
+      "method": "get",
+      "path": "/s/i5dabg/aut_nostrum_adipisci",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [],
+      "headers_sha256": null,
+      "expect": [
+        200
+      ],
+      "kind": "html"
+    },
+    {
+      "name": "GET tag",
+      "method": "get",
+      "path": "/t/aut",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [],
+      "headers_sha256": null,
+      "expect": [
+        200
+      ],
+      "kind": "html"
+    },
+    {
+      "name": "GET hottest.json",
+      "method": "get",
+      "path": "/hottest.json",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [
+        "CONTENT_TYPE",
+        "HTTP_ACCEPT"
+      ],
+      "headers_sha256": "3262e7cbc7d6c8e6",
+      "expect": [
+        200
+      ],
+      "kind": "json",
+      "as": "json"
+    },
+    {
+      "name": "GET story.json",
+      "method": "get",
+      "path": "/s/i5dabg.json",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [
+        "CONTENT_TYPE",
+        "HTTP_ACCEPT"
+      ],
+      "headers_sha256": "3262e7cbc7d6c8e6",
+      "expect": [
+        200
+      ],
+      "kind": "json",
+      "as": "json"
+    },
+    {
+      "name": "POST story vote toggle",
+      "method": "post",
+      "path": "/stories/8hiwbo/upvote",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [
+        "HTTP_ACCEPT",
+        "HTTP_X_REQUESTED_WITH"
+      ],
+      "headers_sha256": "8e86d68882372800",
+      "expect": [
+        200
+      ],
+      "kind": "form",
+      "xhr": true,
+      "alternate": [
+        {
+          "path": "/stories/8hiwbo/upvote",
+          "params_sha256": null,
+          "body_sha256": null
+        },
+        {
+          "path": "/stories/8hiwbo/unvote",
+          "params_sha256": null,
+          "body_sha256": null
+        }
+      ]
+    },
+    {
+      "name": "POST comment preview",
+      "method": "post",
+      "path": "/comments",
+      "params_sha256": "534e210b865ed5cd",
+      "body_sha256": null,
+      "headers": [
+        "HTTP_ACCEPT",
+        "HTTP_X_REQUESTED_WITH"
+      ],
+      "headers_sha256": "8e86d68882372800",
+      "expect": [
+        200
+      ],
+      "kind": "form",
+      "xhr": true
+    },
+    {
+      "name": "POST comment (XHR)",
+      "method": "post",
+      "path": "/comments",
+      "params_sha256": null,
+      "body_sha256": null,
+      "headers": [
+        "HTTP_ACCEPT",
+        "HTTP_X_REQUESTED_WITH"
+      ],
+      "headers_sha256": "8e86d68882372800",
+      "expect": [
+        200
+      ],
+      "kind": "form",
+      "xhr": true,
+      "jobs": true,
+      "block": "workloads.rb:28"
+    }
+  ],
+  "mails": [
+    {
+      "name": "deliver EmailReplyMailer#reply",
+      "block": "workloads.rb:36"
+    }
+  ],
+  "jobs": [],
+  "skip_jobs": [
+    "CachePageJob"
+  ]
+}

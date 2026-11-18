@@ -1,0 +1,8 @@
+lowrail-profile: run 1 of 2: bin/rails test --verbose
+Run options: --verbose --seed 1234
+Finished in 5.729711s, 38.7454 runs/s, 84.2974 assertions/s.
+222 runs, 483 assertions, 0 failures, 0 errors, 0 skips
+lowrail-profile: run 2 of 2: bin/rails test --verbose
+Run options: --verbose --seed 1234
+Finished in 7.793839s, 28.4840 runs/s, 61.9720 assertions/s.
+222 runs, 483 assertions, 0 failures, 0 errors, 0 skips

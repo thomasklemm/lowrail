@@ -1,0 +1,37 @@
+base plain2: 2 processes
+plain 52734.txt 5921: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so"]  missing: []  same set: false
+plain 52803.txt 5920: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so"]  missing: []  same set: false
+off 52830.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+off 52866.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+off2 53902.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+off2 53939.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+profiled run1-58683.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+profiled run1-58720.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+profiled run2-58739.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+profiled run2-58778.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+base2 run1-58808.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+base2 run1-58847.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+base2 run2-58866.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+base2 run2-58904.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+head run1-58942.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+head run1-59070.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true
+head run2-59089.txt 5920: DIFFERS
+  extra: []  missing: []  same set: true
+head run2-59210.txt 5919: DIFFERS
+  extra: []  missing: []  same set: true

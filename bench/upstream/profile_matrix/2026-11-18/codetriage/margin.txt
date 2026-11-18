@@ -1,0 +1,5 @@
+status 0 compared: 8477 lines, 18 actions; not compared 5
+  mail line GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870: -0.62 against 1.00 (62%)
+  mail line GEM/mail/lib/mail/parsers/content_type_parser.rb:734: -0.62 against 1.00 (62%)
+  job action BackgroundInactiveEmailJob#perform: +87.50 against 142.00 (62%)
+  job line GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870: -0.38 against 1.00 (38%)

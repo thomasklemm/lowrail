@@ -1,0 +1,3 @@
+Run options: --verbose --seed 1234
+Finished in 5.541967s, 40.0580 runs/s, 87.1532 assertions/s.
+222 runs, 483 assertions, 0 failures, 0 errors, 0 skips

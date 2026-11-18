@@ -1,0 +1,14 @@
+{
+  "status": 2,
+  "gate": true,
+  "problems": [
+    "base's command exited [1,1]",
+    "head's command exited [1,1]",
+    "the A/A report's command exited [1,1]"
+  ],
+  "min": 1.0,
+  "compared": [],
+  "regressions": [],
+  "improvements": [],
+  "not_compared": []
+}

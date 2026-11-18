@@ -1,0 +1,5 @@
+status 0 compared: 2962 lines, 11 actions; not compared 11
+  request line GEM/vite_ruby/lib/vite_ruby/builder.rb:77: -0.73 against 1.46 (50%)
+  request line GEM/vite_ruby/lib/vite_ruby/builder.rb:98: -0.57 against 1.14 (50%)
+  request line GEM/vite_ruby/lib/vite_ruby/builder.rb:80: -0.57 against 1.14 (50%)
+  request line GEM/vite_ruby/lib/vite_ruby/builder.rb:61: -0.41 against 1.00 (41%)

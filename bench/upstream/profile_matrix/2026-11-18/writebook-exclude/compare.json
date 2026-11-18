@@ -1,0 +1,124 @@
+{
+  "status": 0,
+  "gate": true,
+  "problems": [],
+  "min": 1.0,
+  "compared": [
+    "request",
+    "job"
+  ],
+  "regressions": [],
+  "improvements": [],
+  "not_compared": [
+    {
+      "kind": "request",
+      "name": "FirstRunsController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "PagesController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "PicturesController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "PicturesController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "PagesController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Books::Leaves::MovesController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "SectionsController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "SectionsController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Books::PublicationsController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Accounts::CustomStylesController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Sessions::TransfersController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Books::PublicationsController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "FirstRunsController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Sessions::TransfersController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "UsersController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "UsersController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Accounts::JoinCodesController#create",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Accounts::CustomStylesController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "Users::ProfilesController#update",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ActiveStorage::Representations::RedirectController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ActiveStorage::Representations::ProxyController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ActiveStorage::Blobs::ProxyController#show",
+      "reason": "no warm value"
+    }
+  ]
+}
