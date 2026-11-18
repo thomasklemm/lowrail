@@ -1,0 +1,4 @@
+-ccall_rb_class_allocate_instance: 2,872
++ccall_rb_class_allocate_instance: 3,175 (+303)
+-ccall_rb_ec_ary_new_from_values: 4,246
++ccall_rb_ec_ary_new_from_values: 4,397 (+151)

@@ -1,0 +1,4 @@
+-ccall_rb_class_allocate_instance: 2,907
++ccall_rb_class_allocate_instance: 3,050 (+143)
+-ccall_rb_ec_str_resurrect: 1,431
++ccall_rb_ec_str_resurrect: 1,572 (+141)

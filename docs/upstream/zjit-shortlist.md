@@ -60,7 +60,7 @@ singleton receivers.
 | --- | --- | --- | --- | --- | --- |
 | 1 | #1064 cache `iseq_may_write_block_code` on `IseqPayload` | tekknolagi and k0kubun on ruby/ruby#19962, today | a 4,000-call method 11.0–11.9 s → 3.3–3.6 s of compile time; no new payloads, app alloc within A/A | ours (assigned), #19680 reopened by tekknolagi; tenderlove's #19962 is open | **built, ZWB1 -4** |
 | 2 | #1106 `String#dup` on `StringExact` without ivars | tekknolagi's issue | 25k / 4k / 6k calls per iteration become frameless; micro −2.5% Ir per call (−10), railsbench about 0.005% | free (no assignee, comment or PR; not in #1039) | **built, ZSD1 -3** (near both stop limits) |
-| 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | generic fallback removed for eligible extended objects; original micro/app figures unverified | free (no replacement for the closed wrong-repo attempt found on 11-18) | **changes requested, ZSV1** |
+| 3 | #1122 profile the real class for `setinstancevariable` | tekknolagi's issue | generic fallback removed for eligible extended objects; lobsters −584 generic writes per iteration (stats with A/A) | free (no replacement for the closed wrong-repo attempt found on 11-18) | **ZSV1 -2 built, needs a pass** |
 | 4 | #1130 one stack-overflow check for all inlined frames | tekknolagi's issue (design note, no comments) | net −0.74 M / −8 k / +0.23 M checks per iteration (railsbench / lobsters / shipit), at most 0.05% of Ir | free | **measured, not built** |
 | 5 | #1129 / #1107 constant folds | tekknolagi's issues | unmeasured, small | free | not built |
 | 6 | 15a attr_reader in a final version | none | lobsters / shipit share of 148k / 327k | taken 2026-11-18: tekknolagi's draft ruby/ruby#18616 (11-16 head) covers final versions | old build, not rebased, stays unopened |
@@ -92,10 +92,14 @@ Branch [`thomasklemm/zjit-cache-may-write-block-code-4`](https://github.com/thom
 * **State.** #19680's branch is untouched. The coordinator thread pushes -4 there, replaces the body, marks it ready
   and posts the comment after a confirm pass.
 
-## ZSV1: the real class for `setinstancevariable` (changes requested)
+## ZSV1: the real class for `setinstancevariable` (-2 built, needs a pass)
 
-Branch [`thomasklemm/zjit-setivar-real-class`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-setivar-real-class)
-@ `fe6ea9ef84`, two commits on `7919a47d46`, 2 files, +106/−1 (production code +21/−1 in `zjit/src/profile.rs`).
+Branch [`thomasklemm/zjit-setivar-real-class-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/zjit-setivar-real-class-2)
+@ `47b2ed7110`, one commit on `4414d3ea25`, 2 files, +100/−1 (production code +18/−1 in `zjit/src/profile.rs`).
+It addresses all four must-fixes of the review below; changes, tests and the new master/master-aa/branch stats
+diff (lobsters −584 reproduced, railsbench and shipit setivar counters unchanged) are in
+[results-2.md](../../bench/upstream/zsv1/results-2.md). The bullets below describe the first build,
+`thomasklemm/zjit-setivar-real-class` @ `fe6ea9ef84` (two commits on `7919a47d46`, +106/−1).
 Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
 
 * **What it does.** `setinstancevariable` gets `profile_self_real_class`, which records `rb_obj_class(obj)` instead
@@ -130,14 +134,13 @@ Queue item [ZSV1](../../bench/upstream/pr-queue/items/ZSV1.md).
   from the diagnostic micro. Address the review, then obtain a fresh exact-head pass and the usual posting
   approval. The Ruby branch and drafts were not changed by the review.
 
-### Comment draft for #1122 (not posted)
+### Comment draft for #1122 (not posted; -2, unreviewed)
 
 > `setinstancevariable` uses the profiled class only for the shape transition, and the interpreter takes that from
 > the real class (`obj_get_owner_class()`), so profiling `rb_obj_class(obj)` is enough. With that, a write on an
 > `extend`ed object gets a shape guard instead of `SideExit NoProfileSetIvar`, and once the ISEQ is out of versions,
-> a guarded store instead of a generic write: 475 → 392 instructions per write in a loop. On ruby-bench it only
-> touches lobsters (−584 generic writes per iteration). Branch:
-> https://github.com/thomasklemm/ruby/commit/fe6ea9ef84. OK to open it on ruby/ruby?
+> a guarded store instead of a generic write. On ruby-bench it only touches lobsters (−584 generic writes per
+> iteration). Branch: https://github.com/thomasklemm/ruby/commit/47b2ed7110. OK to open it on ruby/ruby?
 
 ## ZSD1: `String#dup` on bare Strings (built, -3 on 2026-11-18)
 
