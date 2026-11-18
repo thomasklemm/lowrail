@@ -259,8 +259,9 @@ exits 2 and says why. `--json` prints the result as JSON, `--min N` (default 1) 
   request as sent (so a block that sends other requests is a different capture), recorded only once the run
   finished measuring at least one request, never the output directory; none of these may be empty. That digest
   covers a run only when the run is one process whose request windows are exactly the requests it measured, so a
-  workload that forks, or sends requests from `at_exit`, is not CI evidence (ordinary command captures may have
-  any number of processes). An `env:` value that is not a JSON value
+  workload run with more than one contributing process (such as a forked child that runs a job), or with requests
+  it did not measure (such as from `at_exit`), is not CI evidence (ordinary command captures may have any number of
+  processes). An `env:` value that is not a JSON value
   (String, number, true, false, nil, or Arrays and Hashes of them) has no identity a digest can certify, so such a
   capture is not CI evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
   profile is never a green result.

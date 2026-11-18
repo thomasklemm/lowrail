@@ -15,7 +15,7 @@ alternative_of:
 impact: "Fixes Shopify/ruby#1128: compiled super can call a refinement activated only by the caller; +15 implementation lines and one codegen test, no speed claim"
 rank: 4
 risky: false
-state: built
+state: reviewed
 pr:
 note: "2026-11-18: thermos-sol nits on be791c1fb8, no correctness or maintainability must-fix. Both rubrics applied by one reviewer in the same thread, as requested; no delegated reviewers. Kept built because the separate claude-code submission gate is not satisfied. No Ruby fork changes, push or external post. Submission still needs Thomas's approval. Builder's record: docs/upstream/zjit-differential.md, Rerun on master 7919a47d46 (2026-11-18)."
 passes:
