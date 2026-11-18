@@ -198,6 +198,25 @@ bash script/corpus real-blog
 This fetches the pinned Roundhouse generator, generates a Rails 8.1.4 blog,
 installs its bundle and prepares its database. In the prepared orb it took
 about **28 seconds**, so its absence is not an expensive-setup exemption.
+The generated Gemfile pins
+`gem "rails", "8.1.4"` exactly, because the passes are certified against 8.1.4.
+
+Blogs generated before that pin say `"~> 8.1.4"`, so their bundles installed
+Rails 8.1.4.1 into the gate's gem home. Unbundled fixtures then load 8.1.4.1,
+and the 8.1.4-only passes refuse with `unsupported_rails_version`, failing the
+endpoint and form-scaffold tests. To clean such a checkout, delete
+`.corpus/real-blog` (it is generated, not retained), then either start a fresh
+gate home with `rm -rf .lowrail/gate-gems` or remove the newer Rails from the
+existing one:
+
+```sh
+home=$(ls -d .lowrail/gate-gems/4.0.7-*)
+GEM_HOME=$home GEM_PATH=$home mise exec ruby@4.0.7 -- gem uninstall -x -I $(printf '%s:8.1.4.1 ' \
+  rails railties actionpack actionview activerecord activemodel activesupport activejob \
+  actionmailer actionmailbox actioncable activestorage actiontext)
+mise exec ruby@4.0.7 -- script/gate --prepare
+```
+
 The separate `real-blog-r4` used by sealed experiments does not satisfy the
 `real-blog` test path. Missing source/lock/bundle and `LOWRAIL_REAL_BLOG=0`
 fail these strict gates; ordinary partial runs can still skip them by name.

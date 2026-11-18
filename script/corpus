@@ -210,7 +210,14 @@ if [ ! -d "$dest" ]; then
   if [ "$name" = real-blog ]; then
     # real-blog is generated, not checked in: Roundhouse's create-blog runs
     # `rails new` plus scaffolds against the pinned Rails version.
-    RAILS_NEW_VERSION=8.1.4 "$tmp/scripts/create-blog" "$dest" >/dev/null
+    # The passes are certified against Rails 8.1.4 exactly. `rails new` writes "~> 8.1.4" and bundles at once,
+    # installing the newest 8.1.4.x into the gem home, so a template (applied before that bundle) pins the line.
+    railsrc="$tmp/xdg"
+    mkdir -p "$railsrc/rails"
+    echo "gsub_file 'Gemfile', /^gem \"rails\", .*\$/, 'gem \"rails\", \"8.1.4\"'" > "$railsrc/pin-rails.rb"
+    echo "--template=$railsrc/pin-rails.rb" > "$railsrc/rails/railsrc"
+    XDG_CONFIG_HOME="$railsrc" RAILS_NEW_VERSION=8.1.4 "$tmp/scripts/create-blog" "$dest" >/dev/null
+    grep -qx 'gem "rails", "8.1.4"' "$dest/Gemfile" || { echo "real-blog Gemfile does not pin rails 8.1.4" >&2; exit 1; }
     if ! "$source_only"; then
       (cd "$dest" && bin/rails db:prepare >/dev/null)
     fi
