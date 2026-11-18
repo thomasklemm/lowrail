@@ -153,6 +153,32 @@ passes:
       Logs and probes retained in this orb under .amp/in/orb-backup/zrs1-confirm. The full zjit-test result
       and known SIGPROF failure remain the builder's recorded run, not a new full-suite certification.
       Not rerun: full zjit-test, full test-all, hosted CI, arm64. No Ruby changes published or external post.
+  - reviewer: thermos-sol
+    orb: T-01a1f051-e70d-74df-8d5a-51990dfd4dbf
+    head: "7a1eed11f443881206906acf4efc95ee7f8b7715"
+    date: 2026-11-18
+    verdict: nits
+    open: >-
+      No source must-fixes. Both Thermos rubrics loaded and applied directly by this reviewer, with no
+      subagents, other reviewers or threads, as explicitly requested. Exact fork head verified, one commit
+      on master 7db0202722a286011518bd291f51a15fb652dc02; 89 added lines in seven files, including 20
+      implementation/binding lines. The canonical predicate, helper naming and position beside
+      rb_zjit_singleton_class_p match ZJIT's existing shape. make zjit-bindgen reproduces the checked-in
+      bindings byte for byte. Leaving YJIT unchanged is correct: its equivalent refusal already exists.
+      Both new tests pass on head and fail after removing only the seven-line guard. The HIR failure shows
+      PushInlineFrame instead of the refined-method InvokeSuper; the codegen failure returns R2 R1 A.
+      Head full zjit-test: 2,015 passed, one failed, 15 skipped. Unmodified exact base full zjit-test:
+      2,013 passed, the same one failed, 15 skipped. Both fail the profiling-test zero-samples assertion
+      with SIGABRT. All six isolated base runs pass here: pre-existing and workload-sensitive, not a
+      deterministic standalone failure. Four Ruby suite modes each pass 245 tests / 4,139 assertions.
+      The 41-scenario differential matches the interpreter in default, z1, z2 and zmv on head; base has
+      6/5/6/6 divergent scenarios. Full sentence-by-sentence text audit and commands are in
+      docs/upstream/zjit-differential.md, ZRS1 follow-up review of 7a1eed11f4. Wording nits: the second reply
+      calls RICLASS_FOR_REFINEMENT_P a macro, but it is a static inline function; say predicate. The first
+      reply is accurate. Prefer VM lookup over VM helper in the body, and drop its suite-count paragraph
+      under DECISIONS. The German explanation should say ZJIT no longer duplicates the predicate, not
+      that only one definition exists globally while YJIT retains its copy. Drafts left unchanged for
+      Thomas; no Ruby push or external post. Final exact-head invokesuper rerun and limitations in record.
 ---
 
 # ZJIT: Don't specialize super from a refined method

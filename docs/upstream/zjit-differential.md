@@ -342,6 +342,139 @@ Status: Shopify/ruby#1128 is open, filed by us on 2026-11-15, with no assignee a
 The fork has no CI for the branch. Nothing has been posted. Under the ruby/ruby moratorium in
 [DECISIONS](../DECISIONS.md#pull-requests), it waits for Thomas, after the "Thomas can explain it first" step.
 
+### ZRS1 follow-up review of 7a1eed11f4 (2026-11-18)
+
+**Verdict: nits, no source must-fixes.** Reviewer `thermos-sol`, thread
+`T-01a1f051-e70d-74df-8d5a-51990dfd4dbf`. Both Thermos rubrics were loaded and applied directly by this reviewer,
+without subagents, other reviewers or threads, as requested. No contact with the parallel Opus reviewer.
+The earlier status above is historical: ruby/ruby#19976 is now open and ready, still at
+`1d86986033707d121a0a3a514bf15bd6afdfe203`. Nothing was posted or pushed to Ruby in this review.
+
+**Pins and method.** `git ls-remote` verified `thomasklemm/ruby:zjit-super-from-refinement-3` at
+`7a1eed11f443881206906acf4efc95ee7f8b7715`. Its parent is canonical master
+`7db0202722a286011518bd291f51a15fb652dc02` (`gh api repos/ruby/ruby/commits/7db0202722…` checked).
+`git rev-list --count BASE..HEAD` is 1. Thomas is author and committer, with no trailers. The diff adds 89 lines
+in seven files: 20 implementation/binding lines and 69 test lines. x86_64 Linux orb, bootstrap Ruby 4.0.7,
+Rust 1.100.0, cargo-nextest 0.9.152, libclang 19; `./autogen.sh`,
+`./configure --enable-zjit=dev --disable-install-doc`, `make -j2`.
+Source and raw logs are under `.amp/in/orb-backup/zrs1-review/` in this review thread.
+
+**Correctness/security.** Cold read: if the profiled method was defined through a refinement iclass, keep the
+original `InvokeSuper` and let the VM resolve it at runtime; otherwise use the existing specialization.
+`profile_invokesuper` records the live frame CME. `rb_using_refinement` constructs the caller's iclass chain,
+and `rb_method_entry_complement_defined_class` supplies the iclass in the CME. The new refusal precedes
+`RCLASS_SUPER(RCLASS_ORIGIN(defined_class))` and both ISeq and C-function target lookups. It preserves the
+instruction's arguments and FrameState and sets its existing dynamic-send reason field. `InvokeSuper` retains
+`effects::Any`; codegen prepares the live frame and calls `rb_vm_invokesuper`. No cached target, new user-object
+call, allocation, runtime state or invalidation assumption is introduced by the predicate wrapper. Previously
+specialized non-refinement calls retain their existing CME guards and invalidation. Forwarding, blocks and
+unsupported argument patterns keep their existing generic boundaries. Class/module lexical-refinement controls
+confirm that the fix does not mean that `super` can never call another refinement.
+
+**Maintainability and helper shape.** `internal/class.h:680–686` defines `RICLASS_FOR_REFINEMENT_P` as a
+`static inline bool` function, not a macro. It checks `T_ICLASS`, then `T_MODULE`, then the refinement flag.
+The six-line `rb_zjit_iclass_for_refinement_p(VALUE iclass)` wrapper sits immediately after
+`rb_zjit_singleton_class_p`, before the Ruby primitives section. Its name, return type and placement follow that
+existing wrapper; `git log -S rb_zjit_singleton_class_p` and `git show ef95e5ba3d` checked the maintainer precedent.
+Bindgen reads `zjit.c` directly, so a new header declaration is unnecessary. The allowlist gains one line beside
+the singleton helper, and generated bindings gain one declaration. After installing the missing rustfmt
+component, `make -s zjit-bindgen` succeeded and reproduced the checked-in file byte for byte:
+SHA-256 `a2767c2ccefa288dcfd6551521bde985a85360e4cb0550c9437f0d9ab9493623` before and after, with an empty
+`git diff -- zjit/src/cruby_bindings.inc.rs`. This verifies reproducible generated content, not the author's
+historical editing actions. There is no duplicated ZJIT predicate or extra lookup implementation to remove.
+No file crosses 1,000 lines; larger files were already above it. The added branch is beside the existing super
+refusals and uses their normal instruction/reason pattern. The exhaustive reason/counter mappings are complete.
+The one-line guard comment explains the wrong-target hazard; the enum documentation follows its neighbors;
+the two warmup comments match the neighboring codegen test and explain the otherwise duplicate calls.
+
+YJIT's `gen_invokesuper_specialized` already performs the same three checks and refuses specialization with
+`invokesuper_refinement`; its caller uses VM dispatch. Its inline copy is correct and need not change to fix ZJIT.
+Sharing a new cross-JIT API would enlarge this PR without fixing another bug. Leaving it alone is appropriate.
+
+**HIR request and negative control.** The new test is immediately after
+`test_invokesuper_to_iseq_optimizes`. The existing test snapshots ordinary `super` specializing to an inlined
+parent. The new test profiles two calls through both refinements, obtains `R2`'s actual method ISeq and uses the
+normal `hir_string_proc` optimizer/snapshot harness. It snapshots optimized HIR, not separate unoptimized and
+optimized dumps. Toggling the guard gives the requested old/new optimizer output and a regression-sensitive test:
+
+- Exact head: generic `InvokeSuper`, reason `super: call from a refined method`.
+- Removed only the seven-line guard in `hir.rs`, retaining both tests, helper and reason mappings:
+  `make -s zjit-test ZJIT_TESTS=from_refined_method` runs two tests and both fail. Codegen produces `"R2 R1 A"`
+  instead of `"R2 A"`. The HIR diff replaces the expected refusal with method-entry guards,
+  `PushInlineFrame :foo`, an inner `InvokeSuper` marked polymorphic, and `PopInlineFrame`: it is inlining the
+  caller's `R1#foo` into `R2#foo`. This is not an interpreter-only test. Log: `no-guard-tests.log`.
+
+**Executed checks.** Ruby suites used
+`make -s test-all TESTS='test/ruby/test_refinement.rb test/ruby/test_super.rb'`
+with `TESTOPTS='-q --tty=no --seed=41231'`. Each mode passes 245 tests, 4,139 assertions, no failures, errors or
+skips: interpreter; `--zjit --zjit-call-threshold=1`; threshold 2; threshold 2 plus
+`--zjit-num-profiles=1 --zjit-max-versions=1` (`zmv`). The zmv run was restarted sequentially after concurrent
+make processes briefly raced while relinking miniruby; its completed test run is green, not a suppressed failure.
+
+| Full `make -s zjit-test` | Passed | Failed | Skipped |
+| --- | ---: | ---: | ---: |
+| Exact candidate | 2,015 | 1 | 15 |
+| Unmodified exact parent/master | 2,013 | 1 | 15 |
+
+Both full runs fail only `test_profile_frames_during_direct_jit_to_jit_entry`, at the same zero-samples assertion:
+`rb_profile_frames was not called from SIGPROF handler`, followed by SIGABRT. For the base control the scratch
+checkout was switched to the parent, with no retained candidate tests or implementation; miniruby,
+libminiruby.a and the Rust tests were rebuilt. Six further bounded standalone base runs of that test all pass
+here. Thus the failure really is pre-existing on master, but the builder's five-of-six standalone failures are
+not a universal property. No root cause for this sampling flake is claimed. Logs: `head-zjit-test.log`,
+`base-zjit-test.log`, `base-profile-{1..6}.log`.
+
+The 100-call example returns `R2 A` 100/100 in interp/default/z1/z2/zmv on head. On base: interp and z1 are
+correct; default has 71 wrong calls; z2 and zmv have 99 wrong calls. Head z2 records 99
+`send_fallback_super_from_refinement` hits. `probe.rb` adds 41 deterministic scenarios, each with 100 calls:
+class, inherited class, included module, prepended class and Array-subclass receivers; caller-only and lexical
+refinement activation; asymmetric simple arguments, explicit keywords/blocks, modified-local zsuper,
+duck-typed splat conversion and its call counts; plus a refined C-function target. Exact head has zero differences
+from its interpreter in default/z1/z2/zmv; base has 6/5/6/6 divergent scenarios respectively. Base/head interpreter
+outputs are byte-identical. The block/complex-argument cases are controls for existing refusals, not proof that
+the new guard is reached there. Logs: `{head,base}-{repro,probe}-{interp,default,z1,z2,zmv}.log`.
+
+**Sentence-by-sentence text audit.** Read the candidate commit with `git show --format=fuller HEAD`, the item's
+entire public body and both reply drafts. After the source audit, read the live PR body, inline comments, reviews
+and conversation through `gh api`; only tekknolagi's two quoted requests were present. Opened Shopify/ruby#1128
+through `gh api`; it contains the same repro and observed wrong result. `git show 4a21b83693` confirms the named
+subject, PR number and introduction of the wrong lookup; the historical first-bad build was not repeated here.
+
+- Body opening: issue attribution and introducing commit match those sources. The next three sentences about
+  `using`, CME, superclass lookup and `R2 R1 A` match the traced code and head/base repro.
+- The fallback and `SuperFromRefinement` sentences match both dispatch paths, enum, Display and counter mapping.
+  The new helper sentence is accurate. The final sentence of that paragraph is accurate for VM lookup, including
+  the class/module distinction, but say **"The VM's lookup"** instead of **"The VM helper"** so it cannot be
+  mistaken for the new boolean predicate wrapper.
+- Every sentence of the final test paragraph is confirmed by the checks above. It nevertheless conflicts with
+  DECISIONS' body rule against suite counts and test-run reports: recommend deleting that paragraph and keeping
+  the evidence here. This is text cleanup, not a source blocker or a claim that the full suite passes.
+- Commit message: each causal sentence matches the CME/lookup path and repro; its embedded Client snippet is
+  the caller from the test; the VM/YJIT and helper sentences match source; the introduction/fixes lines match
+  history and the issue. No unsupported speed claim or extra code comment.
+- First reply: both sentences are accurate, including test placement, ordinary-super comparison and the
+  guard-removal HIR result. No wording change is needed.
+- Second reply: the first sentence is accurate. In the second, replace **"that macro"** with **"that
+  predicate"**: the uppercase VM helper is a static inline function. The singleton-wrapper analogy and
+  single-call claim are accurate. Its last sentence correctly describes the PR's ZJIT-only scope.
+- The internal German explanation has the same macro/function nit. Replace **"es gibt nur noch eine
+  Definition der Regel"** with **"ZJIT dupliziert die Bedingung damit nicht mehr"**; YJIT still has its inline
+  copy, so there is not one global definition. Say the PR stays scoped to ZJIT rather than presenting the local
+  one-concern rule as an absolute upstream prohibition.
+
+The minimally corrected second reply, for Thomas to read before posting:
+
+> YJIT has the same check inline in `gen_invokesuper_specialized`, and the interpreter uses
+> `RICLASS_FOR_REFINEMENT_P` in `vm_search_normal_superclass`. ZJIT now calls that predicate through
+> `rb_zjit_iclass_for_refinement_p` in `zjit.c`, like `rb_zjit_singleton_class_p`, so the condition is a single
+> call. I left YJIT's copy alone to keep this PR to ZJIT.
+
+Drafts remain unchanged in the item; nothing is approved for posting by this review. The scratch checkout was
+restored to the exact candidate and rebuilt: final `make -s zjit-test ZJIT_TESTS=invokesuper` passes 48/48,
+the generated-binding hash matches again, and its tracked worktree is clean. Log: `final-invokesuper.log`.
+Not run here: full Ruby test-all, btest, hosted CI, arm64, benchmarks. No speed claim. The pass records review
+evidence, not permission to push the Ruby PR branch or publish replies.
+
 ### Z11 on three census apps
 
 Campfire, Fizzy and Writebook are census apps. Their own suites above are Z11's comparison (interpreter against
