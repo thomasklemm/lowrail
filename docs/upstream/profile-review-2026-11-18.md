@@ -956,3 +956,121 @@ outcomes identical with no gem, gem listed but off, and both profiled runs (632 
 load every feature outside Lowrail, Bundler and RubyGems in the same order; no `[lowrail-profile]` warning; each
 run's 2 processes completed every window (666 requests, 16 jobs, 19 Cable actions), and that command capture
 compared with itself exits 0, so multi-process command evidence is still accepted.
+
+## Fourth confirm review of 4893b90e (2026-11-18)
+
+**Verdict: nits. No must-fixes.** This fifth review round reproduces E1–E3 on `10e646e4` and confirms their
+correction on `4893b90e`. No introduced export of a Rails-filtered value, app-outcome change, or false-green
+comparison was found in the exercised cases. One documentation precision nit remains about helper processes;
+it does not weaken the admission gate or require more profiling machinery. This commit records the review only.
+
+### Scope and executed checks
+
+Loaded `thermos`, `thermo-nuclear-review` and `thermo-nuclear-code-quality-review`. As requested, one reviewer
+applied both rubrics here without subagents or other threads; this is not independent dual-reviewer coverage.
+Read the fix author's resolution above, the five-file `4893b90e^..4893b90e` diff, its downstream producers and
+readers, and Rails' `FilterParameters` and `ParameterFilter`. Compared detached
+`10e646e403018de71f964660bb710cd6d93b6bd8` with `4893b90e8e9f9e29ece6a66029b0241393bc76da`;
+unrelated intervening main changes were not attributed to this fix. The commit's GitHub pulls lookup returned
+no PRs. Nothing was posted upstream, and no implementation or permanent test was changed.
+
+The earlier scratch files were absent from this orb. Reconstructed the documented repro inputs rather than
+claiming to have recovered those harnesses. Probes used synthetic values, the repository's minimal Rails fixture
+and disposable outputs. Used mise **Ruby 4.0.9**, revision `3e93b23afc`, Linux x86-64; Rails **8.1.4**, sqlite3
+**2.10.2**, bcrypt **3.1.22**, Rack **3.2.8**, rack-test **2.3.0**. Installed missing gems in the orb without changing
+repository dependency files. The requested suites on the exact fix all pass:
+
+```text
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/profile_test.rb --verbose
+13 runs, 157 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/workloads_test.rb --verbose
+3 runs, 22 assertions, 0 failures, 0 errors, 0 skips
+mise exec ruby@4.0.9 -- ruby -Igem/lib -Igem/test gem/test/load_hooks_test.rb --verbose
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Total: **18 runs, 183 assertions**, independently reproduced. Loading the fix's three changed profile test cases
+with the baseline's library and test helper gives **3 runs, 41 assertions, 3 failures, 0 errors, 0 skips**. Those
+combined tests stop at their first failure; separate probes below cover the later cases too.
+
+### E1–E3 before/after ledger
+
+| Finding and exact input | On 10e646e4 | On 4893b90e |
+| --- | --- | --- |
+| E1: GET `/lookup?q=safe`, filter `[:accept]`, Accept `application/xml; token=accept-secret`; repeat with a Proc masking the `HTTP_ACCEPT` key and `proc-accept-secret`. | The changed regression test exports both secrets. Independent requests with the same filters and distinct synthetic tokens also export both, while the actual controller's `request.filtered_env["HTTP_ACCEPT"]` is `[FILTERED]`. | Neither masked token occurs in any recording output. A masked name/header reads `[FILTERED]` and the declaration is commented out; a Proc shape has no Accept or params and is commented out. |
+| E2: the preceding review's same-file fork at n=11, child exit at n=12, parent `/widgets?which=parent`, child `/widgets?which=a` versus `b`. | Per run: 2 processes, 21 request windows, 21 completed, 0 dropped; the sole complete receipt has 20 requests, digest `f3d637c3953295dd`. Child request logs confirm `a` versus `b`. Self-comparisons and `a` against `b` all exit 0. | Same counts, same receipts and actual child requests; all those comparisons exit 2 for uncovered windows/processes. App commands still exit 0. |
+| E2: fixed workload with `at_exit { Rails.application.call(Rack::MockRequest.env_for("https://localhost/widgets?which=#{ENV.fetch('VARIANT')}")) }`, `VARIANT=a` versus `b`. | Per run: 1 process, 21 request windows/completed, 0 dropped, 20 measured. Actual final requests differ; self-comparisons and `a` against `b` all exit 0. | Same app behavior and counts, but all comparisons exit 2. The count check closes this gap without relying on the process check. |
+| E3: otherwise valid two-run fixture, 10 request windows/completed per run; workloads identity with empty manifest, host and each measured sha256, complete=true and requests=10. | JSON and Markdown both exit 0. Empty each field separately also exits 0. | All four variants exit 2 in both output formats. |
+| E3: valid command identity, summary `objects_per_request: "bad"`. | JSON exits 0; Markdown raises `NoMethodError` at `round`, exit 1. | Both formats give insufficient evidence, exit 2, without a formatter exception. |
+
+The independent Accept matrix also checks `['cCeP']`, `['http_accept']`, `/ACCEP/`, `/accept/i`,
+`/\AHTTP_ACCEPT\z/`, Rails-precompiled `['headers.accept', :accept]`, and an in-place String filter change
+from `not_a_key` to `accept`. Rails masks each control; only the baseline exports its header. Conversely,
+case-sensitive `/accept/`, nested `'headers.accept'` and `/headers\.accept/` do not mask the flat uppercase
+`HTTP_ACCEPT` in Rails, and Lowrail correctly keeps those headers. Enabled declarations replay their actual
+Accept and query through MockClient, including JSON and XML controls. A recorder probe before ParameterFilter
+is available keeps no Accept and marks the shape unfiltered without forcing the class to load.
+
+The schema probe independently rejects missing/null/string summary totals, nonfinite totals represented by
+`1e999` and `-1e999`, and missing/null/string/float/negative process counts on the fix (the baseline accepts
+them in JSON). Finite Integer, zero and fractional totals, empty `rails_env`, and a nil-name/nil-warm action
+remain valid in both formats. A real jobs-only capture has 3 completed job windows, no requests and
+`objects_per_request: 0.0` per run; self-compare exits 0. A real ordinary command with parent 3 requests and
+children 3 and 4 has 3 processes and 10 completed request windows per run; self-compare still exits 0.
+
+Private harnesses and outputs remain under `.amp/in/orb-backup/fifth/`: `review.rb`, `schema.rb`, `invariants.rb`,
+detached `base/`, and separate `baseline/`, `fix/`, `schema-base/` and `schema-fix/` outputs. Reproduce from the
+repository root (use fresh output paths for the request log):
+
+```sh
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fifth/review.rb .amp/in/orb-backup/fifth/base .amp/in/orb-backup/fifth/baseline-new
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fifth/review.rb . .amp/in/orb-backup/fifth/fix-new
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fifth/schema.rb .amp/in/orb-backup/fifth/base .amp/in/orb-backup/fifth/schema-base-new
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fifth/schema.rb . .amp/in/orb-backup/fifth/schema-fix-new
+mise exec ruby@4.0.9 -- ruby .amp/in/orb-backup/fifth/invariants.rb . .amp/in/orb-backup/fifth/fix-new/app
+```
+
+### N1 — Documentation precision: only contributing processes are counted
+
+**Location:** `docs/profile.md:261–263`, “a workload that forks … is not CI evidence.” The preceding
+one-process/count-equality rule is correct, but this shorthand is broader than the actual exclusion. Add this
+before an otherwise ordinary workload declaration:
+
+```ruby
+pid = fork { String.new; exit(0) }
+Process.wait(pid)
+get "/widgets"
+```
+
+On both pins the helper opens no window and writes no TSV. Each run therefore has **1 contributing process,
+20 request windows/completed and 20 measured requests**; self-compare exits **0**. A helper that instead performs
+one Active Job writes its own TSV: **2 contributing processes, 20 request windows/completed, 1 completed job,
+20 measured requests**; the baseline accepts it and the fix refuses it (2). That refusal is the requested
+conservative policy, not an app-outcome regression or a reason to add per-PID certification.
+
+**Smallest improvement:** say “more than one process contributes profiling windows, or the request-window
+count differs from the measured count” instead of implying every fork is rejected. No code change is needed.
+This is a nonblocking wording nit: the actual admission rule is documented immediately before it, and the
+accepted no-window helper adds no uncovered data. No broader browser, process or scheduler guarantee is claimed.
+
+### Maintainability, invariants and limits
+
+No independent maintainability finding. The fix reuses the canonical ParameterFilter, the existing final
+receipt and summary, and the existing validator. It adds no transport, per-PID identity store, wrapper or generic
+schema framework. The affected production files remain 359 and 255 lines; no file crosses 1,000 lines. The
+single-process restriction is scoped to workloads; checking the normal report producer shows that finite totals
+and Integer process counts are its existing output contract, including jobs-only captures.
+
+Fresh-process gemspec evaluation loads no features and defines no Lowrail; requiring the unset/empty profiler
+defines no Lowrail. Enabling the counter and then loading Active Support forces none of Action Controller,
+Active Job, Action Mailer or Action Cable. Fifteen synthetic requests have identical query, raw Accept and Rails
+filtered-env results plain and profiled, and the app's mutable filter String remains unfrozen. The requested
+suites also pass their existing return/exception-identity, incompatible-counter and frozen-hook controls. These
+bounded checks found no app-outcome or lazy-loading regression. No lowering or specialization changed.
+
+Apart from N1, the guide describes the exercised filtering, workload-coverage and summary-validation behavior
+accurately. Previously confirmed findings were not reopened. The author's Campfire results remain attributed
+evidence: **Campfire's 634 tests were not rerun here**. Neither another corpus nor `lowrail verify`, `lowrail bench`,
+timing/instruction measurements, speed, unrestricted Ractor/scheduler or sanitizer/OOM coverage was run or is
+claimed. The floor policy is unchanged; this approval of E1–E3 does not turn compare's heuristic into a confidence
+bound or establish a new support claim.
