@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Builds docs/upstream/contributions-index.json for lowrail-profile's ledger
+# column: for every pull request the contributions ledger links, its state,
+# merge date and first release containing it, and the files and methods it
+# changes, with the code lines each method's hunks remove and add (from
+# GitHub's diff hunks), and whether its ledger entry reports allocation work.
+# The report matches a line by gem, file, method and the line's own code
+# against this index (docs/profile.md).
+#   script/profile-ledger [--ledger docs/upstream/contributions.md] [--out PATH] [--missing]
+# Needs `gh` signed in; reads public data only. A pull request it cannot read
+# (GitHub's rate limit) keeps its earlier entry; --missing reads only those
+# not in the index yet.
+require "json"
+require "open3"
+require "optparse"
+require "time"
+
+root = File.expand_path("..", __dir__)
+ledger = File.join(root, "docs/upstream/contributions.md")
+out = File.join(root, "docs/upstream/contributions-index.json")
+missing = false
+OptionParser.new do |o|
+  o.on("--ledger PATH") { ledger = _1 }
+  o.on("--out PATH") { out = _1 }
+  o.on("--missing") { missing = true }
+end.parse!
+previous = File.exist?(out) ? JSON.parse(File.read(out))["pulls"].to_h { [[_1["repo"], Integer(_1["ref"][/\d+\z/])], _1] } : {}
+
+def gh(*args)
+  stdout, stderr, status = Open3.capture3("gh", "api", *args)
+  raise "gh api #{args.join(" ")}: #{stderr}" unless status.success?
+  JSON.parse(stdout)
+end
+
+# Per method a file's hunks change (the def enclosing each added or removed
+# line, starting from the def git names in the hunk header): the code lines
+# removed and added, stripped, without blank and comment lines. The report
+# matches an app's source line against them.
+def changes_of(patch)
+  return {} unless patch
+  current = nil
+  patch.lines.each_with_object({}) do |line, methods|
+    if line.start_with?("@@")
+      current = line[/@@[^@]*@@.*?\bdef\s+(?:self\.)?([^\s(;=]+=?)/, 1]
+      next
+    end
+    current = $1 if line =~ /\A[ +-]\s*def\s+(?:self\.)?([^\s(;=]+=?)/
+    next unless current && (sign = line[/\A[+-]/])
+    code = line[1..].strip
+    next if code.empty? || code.start_with?("#") || code.length < 6
+    entry = methods[current] ||= { removed: [], added: [] }
+    list = entry[sign == "-" ? :removed : :added]
+    list << code unless list.include?(code)
+  end
+end
+
+# Whether the ledger entry for the pull request reports allocation or speed
+# work (objects, allocations, instructions, time) rather than a correctness or
+# compatibility fix.
+def allocation_work?(text)
+  return false unless text
+  return false if text.match?(/\b(?:no (?:performance )?(?:measurement|claim)|correctness fix|compatibility fix)\b/i)
+  text.match?(/\b(?:objects?|allocat\w*|instructions?|Callgrind|faster|ns\b)|→/i)
+end
+
+RELEASE = /\Av?(\d+(?:\.\d+)+)\z/
+$tags = {}
+$dates = {}
+
+# The oldest release tag (of the repository's newest 30) that contains the commit.
+def first_release(repo, sha, merged_at)
+  tags = ($tags[repo] ||= gh("repos/#{repo}/tags?per_page=30").select { _1["name"].match?(RELEASE) })
+  candidates = tags.filter_map do |tag|
+    date = ($dates[[repo, tag["name"]]] ||= Time.parse(gh("repos/#{repo}/commits/#{tag.dig("commit", "sha")}").dig("commit", "committer", "date")))
+    [tag["name"], Gem::Version.new(tag["name"][RELEASE, 1])] if date >= merged_at
+  end
+  candidates.sort_by(&:last).each do |name, version|
+    status = gh("repos/#{repo}/compare/#{name}...#{sha}")["status"]
+    return version.to_s if %w[behind identical].include?(status)
+  end
+  nil
+end
+
+bullets = File.read(ledger).split(/^(?=\s*- )/).each_with_object({}) do |text, acc|
+  m = text.match(/\A\s*- (?:\*\*[^*]*\*\* )?\[[^\]]*\]\(https:\/\/github\.com\/([\w.-]+\/[\w.-]+)\/pull\/(\d+)\)/)
+  acc[[m[1], Integer(m[2])]] ||= text if m
+end
+refs = File.read(ledger).scan(/\[((?:[\w.-]+\/[\w.-]+)?#\d+)\]\(https:\/\/github\.com\/([\w.-]+\/[\w.-]+)\/(pull|issues)\/(\d+)/)
+  .map { |_, repo, kind, number| [repo, Integer(number), kind] }.uniq
+failed = 0
+entries = refs.filter_map do |repo, number, kind|
+  next unless kind == "pull"
+  next previous[[repo, number]] if missing && previous.key?([repo, number])
+  pr = gh("repos/#{repo}/pulls/#{number}")
+  files = gh("repos/#{repo}/pulls/#{number}/files?per_page=100")
+  merged_at = pr["merged_at"] && Time.parse(pr["merged_at"])
+  state = merged_at ? "merged" : pr["state"] == "open" ? "open" : "closed"
+  warn "#{repo}##{number}: #{state}"
+  { ref: repo == "rails/rails" ? "##{number}" : "#{repo}##{number}", repo: repo, title: pr["title"], state: state,
+    allocation_work: allocation_work?(bullets[[repo, number]]),
+    merged_at: merged_at&.utc&.iso8601, base: pr.dig("base", "ref"),
+    released_in: merged_at && first_release(repo, pr["merge_commit_sha"], merged_at),
+    files: files.reject { _1["filename"].match?(%r{(\A|/)(test|spec)/|_test\.rb\z|_spec\.rb\z|CHANGELOG}) }
+      .map { { path: _1["filename"], methods: changes_of(_1["patch"]) } } }
+rescue RuntimeError => error
+  warn error.message
+  failed += 1
+  previous[[repo, number]]
+end
+warn "#{failed} pull requests could not be read; run again with --missing" if failed > 0
+File.write(out, JSON.pretty_generate({ generated: Time.now.utc.iso8601, ledger: File.basename(ledger), pulls: entries }) + "\n")
+warn "#{entries.size} pull requests in #{out}"

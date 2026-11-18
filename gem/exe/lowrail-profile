@@ -11,6 +11,7 @@
 #   bundle exec lowrail-profile --workloads                # lowrail/workloads.rb's requests, in this RAILS_ENV
 #   bundle exec lowrail-profile --record -- bin/rails test # also write the suite's requests as lowrail/workloads.rb
 #   bundle exec lowrail-profile report tmp/lowrail-profile # report again from saved runs
+#   bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression
 #
 # Options: --out DIR (default tmp/lowrail-profile), --runs N (default 2; the
 # second run is the noise floor), --top N (default 30), --seed N (default
@@ -24,7 +25,8 @@ require_relative "../lib/lowrail/workloads"
 
 lib = File.expand_path("../lib", __dir__)
 args = ARGV.dup
-opt = ->(name, default) { (i = args.index(name)) ? args.slice!(i, 2).last : default }
+# Options after "--" belong to the command (rspec --seed).
+opt = ->(name, default) { (i = args.index(name)) && i < (args.index("--") || args.size) ? args.slice!(i, 2).last : default }
 out = File.expand_path(opt.("--out", "tmp/lowrail-profile"))
 runs = Integer(opt.("--runs", "2"))
 top = Integer(opt.("--top", "30"))
@@ -47,6 +49,17 @@ if args.first == "report"
   report.write
   puts report.markdown
   exit
+end
+
+# compare BASE.json HEAD.json [--min N] [--json]: exit 1 on a regression beyond the noise floor.
+if args.first == "compare"
+  require_relative "../lib/lowrail/profile_compare"
+  min = Float(opt.("--min", "1"))
+  json = args.delete("--json")
+  abort "usage: lowrail-profile compare BASE.json HEAD.json [--min N] [--json]" unless args.size == 3
+  compare = Lowrail::ProfileCompare.new(args[1], args[2], min: min, top: top)
+  puts json ? JSON.pretty_generate(compare.to_h) : compare.markdown
+  exit(compare.regressions.empty? ? 0 : 1)
 end
 
 command = (i = args.index("--")) ? args[(i + 1)..] : args
@@ -77,15 +90,10 @@ FileUtils.rm_rf(out)
 statuses = (1..runs).map do |n|
   dir = File.join(out, "run#{n}")
   FileUtils.mkdir_p(dir)
-  # The repeat run also records which app line leads to each of the first
-  # run's top lines (without allocating, so its counts stay comparable).
-  watch = File.join(out, "watch.tsv")
-  if n == 2 && File.exist?(File.join(out, "run1")) && !Dir["#{out}/run1/*.tsv"].empty?
-    first = Lowrail::ProfileReport.new(out, top: top)
-    File.write(watch, first.ranked.first(top * 2).map { "#{_1.path}\t#{_1.line}\n" }.join)
-  end
+  # The repeat run also records the nearest app line of every allocation
+  # (without allocating, so its counts stay comparable).
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
-    **(n > 1 && File.exist?(watch) ? { "LOWRAIL_PROFILE_WATCH" => watch } : {}),
+    **(n == [runs, 2].min ? { "LOWRAIL_PROFILE_ATTRIBUTE" => "1" } : {}),
     **(record && n == 1 ? { "LOWRAIL_PROFILE_RECORD" => "1" } : {}),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
     "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }

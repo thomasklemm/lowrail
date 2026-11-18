@@ -1,10 +1,20 @@
 # Profile your own app: `lowrail-profile`
 
 `lowrail-profile` shows where your Rails app spends avoidable work in Rails, Ruby and gems, from inside the app:
-it counts the objects allocated per source line while the app serves requests (your own test suite, the requests
-of your `lowrail/workloads.rb`, or any command that serves requests), and writes the same kind of report as the
-[census](upstream/census.md): top lines by objects per request, grouped by gem, a noise floor from a repeat run,
-the app line that leads to each one, and matching entries of Lowrail's [contributions ledger](upstream/contributions.md).
+it counts the objects allocated per source line while the app serves requests, runs jobs, builds and delivers mail
+and handles Action Cable actions (your own test suite, the requests of your `lowrail/workloads.rb`, or any command
+that serves requests), and writes the same kind of report as the [census](upstream/census.md), plus two views from
+your side:
+
+* **Your code**: for each app line, the objects that Rails, Ruby and gems allocate below it per request, and the
+  lines and actions it reaches most, so the report answers "what in my app should I change".
+* **Actions**: objects per request for each controller action (and per job, mailer action and channel action), so
+  heavy endpoints stand out.
+
+Then the census's view: top lines outside the app by objects per request, grouped by gem, a noise floor from a
+repeat run, the app line that leads to each one, and upstream pull requests from Lowrail's
+[contributions ledger](upstream/contributions.md) that change that method. `lowrail-profile compare` sets two
+reports against each other for CI.
 
 It is a prototype. The census (`script/census app`) instead copies an app, boots it in production and measures the
 same workloads file with an A/A pair, instructions, jobs and mailers; [Your own app](../README.md#your-own-app) says
@@ -30,6 +40,7 @@ bundle exec lowrail-profile --record -- bin/rails test             # the same, a
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
   bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
 bundle exec lowrail-profile report                                   # rebuild the report from tmp/lowrail-profile
+bundle exec lowrail-profile compare base/report.json head/report.json  # exit 1 on a regression beyond the noise floor
 ```
 
 `--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
@@ -64,7 +75,7 @@ get new_article_path, name: "GET /articles/new"
 That file is what `script/census app` then measures as fixed workloads. `--paths FILE` is gone; a `paths.txt` line
 `GET /articles` is `get "/articles"` in the workloads file.
 
-Options: `--out DIR` (default `tmp/lowrail-profile`), `--runs N` (default 2; the last run is compared with the
+Options (before `--`; everything after it is the command's): `--out DIR` (default `tmp/lowrail-profile`), `--runs N` (default 2; the last run is compared with the
 first as the noise floor), `--top N` (default 30), `--seed N` (default 1234, passed as `SEED` and `--seed` to both
 runs, so test order repeats), `--ledger PATH` (default: the ledger of the Lowrail checkout the gem comes from).
 The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/`; it needs a C compiler and
@@ -72,29 +83,60 @@ Ruby's headers, and is built outside the app, never during its boot.
 
 ## What it measures
 
-`LOWRAIL_PROFILE` (set by the command, never by you) makes `RUBYOPT=-rlowrail/profile` install three things:
+`LOWRAIL_PROFILE` (set by the command, never by you) makes `RUBYOPT=-rlowrail/profile` install:
 
 * an internal `NEWOBJ` hook, the one `ObjectSpace.trace_object_allocations` uses, that keeps a count per file,
-  line and object type in C memory (no Ruby objects, no retained records; GC stays on);
-* a window around `Rails::Engine#call`, so only objects allocated while a request is served count. It is prepended
-  from Active Support's `before_configuration` hook, so nothing loads earlier than the app loads it;
+  line, object type and kind of window in C memory (no Ruby objects, no retained records; GC stays on);
+* windows, so only objects allocated inside one count, each named after what it runs:
+  * a request: `Rails::Engine#call`, named by the first controller action it dispatches
+    (`ActionController::Metal#dispatch`, so `RoomsController#show`);
+  * a job: `ActiveJob::Base#perform_now` (`CachePageJob#perform`), and `ActiveJob::Base.execute` around it so a
+    worker's argument deserialization counts too;
+  * a mail: its build, `ActionMailer::Base#process` (`ProbeMailer#hello`), and its delivery,
+    `ActionMailer::Base.deliver_mail` (`ProbeMailer.deliver_mail`), as two windows because apps often run them
+    apart (`deliver_later`);
+  * an Action Cable action: `ActionCable::Channel::Base#perform_action` (named by the action in the message) and
+    `#subscribe_to_channel` (`RoomChannel#subscribed`).
+
+  Each is prepended from Active Support's on_load hook for its framework class (`before_configuration`,
+  `action_controller`, `active_job`, `action_mailer`, `action_cable_channel`), so nothing loads earlier than the
+  app loads it, and a framework the app never loads is never hooked. A window inside another (a job performed
+  inline, a mail delivered inside a request) counts as part of the outer one, so a request's numbers include the
+  jobs and mail it runs and jobs, mails and Cable actions reported apart are the ones that ran on their own;
 * an `at_exit` writer (one TSV per process; forked test workers reset their counts and write their own).
 
-The report then ranks lines outside the app:
+The repeat run also records, for every allocation inside a window, the nearest frame in the app's own code (under
+the app root, outside `test/`, `spec/` and vendored gems) and the window's name. It reads the stack with
+`rb_profile_frames`, which allocates nothing, so its counts stay comparable to the first run's; walking the stack
+on every allocation is what costs time (below).
 
-* **Warm/req**: objects per request, leaving out each line's first request per process. That removes one-time
-  lazy work (route table build, template compilation, I18n load) which the census removes with 50 warmup
-  operations. **All/req** keeps it.
-* **Reach**: the share of requests in which the line allocated.
-* **Δ**: last run minus first. The noise floor line summarizes it for the top lines.
-* **From the app**: the repeat run watches the first run's top lines and records the nearest app frame on the
-  stack for each of their allocations, without allocating, so its counts stay comparable to the first run's.
-* **†**: Ruby's own `<internal:…>` code (Pathname, `Kernel#tap`) allocated it and is charged to its nearest caller
-  outside such code. The census charges these to `<internal:…>` lines instead.
-* **Ledger**: entries that name the line's method in a code span and also name its file, gem or Rails component.
-  This is a text match, so treat it as a lead to read, not a confirmed match.
-* **Dev/test-mode work** gets its own table: debug logging, error pages, template compilation, route building and
-  asset lookup, which test and development mode do and production mostly does not.
+The report has these views:
+
+* **Your code**: per app line, the warm objects per request that Rails, Ruby and gem code below it allocates (its
+  own allocations apart, in Own), dev/test-only work apart, the lines it reaches most and the actions it runs in.
+  App middleware that only hands the request on (`@app.call(env)`) is the nearest app frame of the whole stack
+  below it, so it is listed under the table, not ranked. A last line gives the objects with no app line on the
+  stack (middleware, routing, rendering setup).
+* **Actions**: per controller action, objects per request (everything the request allocates) by run, its
+  run-to-run Δ, and the lines outside the app and app lines it reaches most. Warm leaves out the action's first
+  request in each process; an action that ran once per process has no warm value and is listed last.
+* **Top lines outside the app**, as before:
+  * **Warm/req**: objects per request, leaving out each line's first request per process. That removes one-time
+    lazy work (route table build, template compilation, I18n load) which the census removes with 50 warmup
+    operations. **All/req** keeps it.
+  * **Reach**: the share of requests in which the line allocated.
+  * **Δ**: last run minus first. The noise floor line summarizes it for the top lines.
+  * **From the app**: the nearest app lines on the stack (repeat run).
+  * **†**: Ruby's own `<internal:…>` code (Pathname, `Kernel#tap`) allocated it and is charged to its nearest caller
+    outside such code. The census charges these to `<internal:…>` lines instead.
+  * **Ledger**: [below](#ledger-matches).
+* **Dev/test-mode work** gets its own table: debug logging, error pages, template compilation (Action View, erubi,
+  Herb, Temple, Slim, Haml), route building, asset lookup (Propshaft, importmap, Sprockets compiling live, Vite Ruby
+  checking its build with `autoBuild`) and code reload checks (`FileUpdateChecker`), which test and development mode
+  do and production mostly does not. rack-mini-profiler (Lobsters, CodeTriage) stays ranked: both apps load it in
+  every environment.
+* **By gem**, and **Outside requests**: jobs, mails and Action Cable actions, each with its own action table and
+  top lines, per window instead of per request.
 
 Keys follow the census (`RAILS/actionpack/lib/…`, `GEM/name/path`, `RUBY/path`), so a report can be set against
 `script/census rank`. Test runners and clients (minitest, rspec, rack-test, capybara) are left out, as the census
@@ -102,7 +144,91 @@ leaves out rack-test.
 
 Not measured: instructions or CPU samples. Per-line instructions need Callgrind, which is
 [`script/cpu-census`](upstream/census.md#cpu-census-scriptcpu-census)'s job; a sampling profiler from inside the app
-was left out of this prototype.
+was left out of this prototype. Per-request instructions from a hardware counter (`perf_event_open`, user space)
+were planned but not built: in the orb this was developed in, `perf_event_open` for
+`PERF_COUNT_HW_INSTRUCTIONS` fails with `ENOENT` (no PMU exposed to the VM; only software events open), so the
+counting path could not be checked anywhere it would ship from.
+
+### Ledger matches
+
+A line gets a ledger entry when an upstream pull request linked from the
+[contributions ledger](upstream/contributions.md) reduces allocations or time and changes that very line.
+`script/profile-ledger` reads each linked pull request from GitHub into
+[contributions-index.json](upstream/contributions-index.json): its state, merge date, the oldest of the repository's
+30 newest release tags that contains its merge commit, and per file and method the code lines it removes and adds.
+It marks a pull request as allocation work when its ledger entry reports objects, allocations, instructions or time
+and is not a correctness or compatibility fix. The report then needs all of:
+
+* the same repository: `RAILS/actionpack/lib/…` is `rails/rails` `actionpack/lib/…`, `GEM/name/…` the repository
+  named like the gem, `RUBY/…` (and default gems) `ruby/ruby`;
+* the same file and the same method;
+* the line's own code among the lines the pull request removes or adds in that method.
+
+and says what the pull request means for the version the app runs:
+
+* **open upstream work**: still open, and the app's line is one it removes;
+* **fixed in VERSION**: the app's line is one it removes, and it was first released in VERSION, newer than the gem
+  version the app locks;
+* **fixed in VERSION, after this app's revision**: the same for a gem the app takes from git;
+* **merged DATE, after this app's version, not released yet**: the app's line is one it removes, so the app runs
+  the code from before it;
+* **merged, in VERSION, which this app runs**: the app's line is one it adds and the app's version is VERSION or newer.
+  An added line in a git checkout or before any release is left out, because the same code can stand in the app's
+  older version too.
+
+On Campfire's report (Rails main `e3d5c569`, 300 top lines) this gives 21 matches. Each was checked by hand against
+the pull request's diff: in every one the app's line is a line the pull request removes, in the method it changes.
+The text match it replaces had 50, among them a pull request on `Array#to_query` matched to `Object#to_query` in the
+same file, a correctness fix (#59634) matched through the same code in another method, and another author's pull
+request the ledger only mentions. A backport merged as its own commit (Rails stable branches) is not found by merge
+commit, so such a fix shows as not released. Rebuild the index with `script/profile-ledger` after the ledger
+changes (`--missing` after GitHub's rate limit stops it).
+
+## Compare two reports in CI
+
+`lowrail-profile compare BASE.json HEAD.json` sets the `report.json` of two profiles against each other, per line
+outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per request. It
+exits 1 when anything grew beyond its noise floor, 0 otherwise; `--json` prints the changes as JSON, `--min N`
+(default 1) sets the smallest change that counts.
+
+* A line's noise floor is the larger of its run-to-run difference in either report and `--min`.
+* An action's is the largest of twice its run-to-run difference, 0.1% of its objects per request and 20 × `--min`,
+  because parallel test workers split an action's requests differently from one invocation to the next, which the
+  difference inside one invocation does not show. Actions that ran once per process have no warm value and are not
+  compared.
+
+On Campfire's suite an A/A pair (two invocations on the same code) has no changes beyond the floor (the largest
+action move was 6.5 objects, 0.08%), and adding `20.times { ERB::Util.html_escape("a<b") }` to
+`RoomsController#show` gives 3 regressions and exit 1: the action (+46.35 per request against a floor of 26.48) and
+the two Active Support lines it calls (+1.68 per request each over all requests, floor 1.0), and nothing else.
+
+A GitHub Actions job that profiles the pull request's base and head with the same command and fails on a
+regression:
+
+```yaml
+lowrail-profile:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 0 }
+    - uses: ruby/setup-ruby@v1
+      with: { bundler-cache: true }
+    - name: Profile base
+      run: |
+        git checkout ${{ github.event.pull_request.base.sha }}
+        bin/rails db:test:prepare
+        bundle exec lowrail-profile --out tmp/base -- bin/rails test
+    - name: Profile head
+      run: |
+        git checkout ${{ github.event.pull_request.head.sha }}
+        bin/rails db:test:prepare
+        bundle exec lowrail-profile --out tmp/head -- bin/rails test
+    - name: Compare
+      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json | tee -a "$GITHUB_STEP_SUMMARY"
+```
+
+Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step from the head's
+Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles; check the suite in its own job.
 
 ## Safety
 
@@ -111,19 +237,29 @@ Lowrail. The gemspec no longer requires `lib/lowrail.rb` (Bundler evaluates a pa
 process). When the command runs it, any failure to load the counter prints one warning and leaves the app as it is,
 and a failure to write the report never changes the exit status.
 
-Checked on Campfire's suite (634 tests, 2 forked workers, Rails main `4500a94c34`, Ruby 4.0.9), with
-`$LOADED_FEATURES` dumped at exit from every process (the two workers and two helper processes):
+Checked on five apps' own suites (fresh `script/corpus APP DIR --source-only` copies at their corpus pins, each
+suite run the way its CI runs it, with the request, job, mail and Action Cable hooks above). Each suite ran three
+ways: without the gem, with the gem in a copy of the Gemfile but not run ("off"), and through `lowrail-profile`
+(both runs), with `$LOADED_FEATURES` dumped at exit from every process and seed 1234 throughout:
 
-* Per-test outcomes, names and results, are identical without the gem, with it unloaded, and in both profiled runs
-  (632 passed, 2 skipped).
-* Every feature outside Lowrail and Bundler's own library loads in the same order in all three setups (3,236 files
-  in the main process, 1,136 of them Rails). Listing a path gem adds Bundler's gemspec source and
-  `rubygems/specification_policy.rb`; a released gem would not.
+| App, suite | Ruby, Rails | Tests | Outcomes (plain = off = run 1 = run 2) | Suite time: plain, off, run 1, run 2 | Wall: plain, profiled (2 runs + report) |
+| --- | --- | ---: | --- | --- | --- |
+| Campfire, `bin/rails test -v` (2 workers) | 4.0.7, main `e3d5c569` | 634 | identical per test: 632 pass, 2 skip | 18.4, 17.7, 17.9, 26.7 s | 20.9, 57.3 s |
+| Lobsters, `bundle exec rspec --format documentation` | 4.0.9 (YJIT), 8.1.3.1 | 927 | identical per example (timestamps and random tokens masked): 0 failures | 29.7, 29.5, 31.2, 36.2 s | 33.6, 84.8 s |
+| Writebook, `bin/rails test -v` (2 workers) | 4.0.7, main | 310 | identical per test: 307 pass, 2 skip, 1 error | 26.5, 26.2, 27.0, 32.1 s | 28.7, 67.2 s |
+| Pingcrm, `bin/rails test:all -v` (system tests, headless Chrome) | 4.0.7, 8.1.4 | 26 | identical per test: 26 pass | 14.0, 13.8, 15.5, 14.2 s | 15.2, 33.0 s |
+| CodeTriage, `bin/rails test --verbose` | 4.0.7, 8.1.4 | 222 | identical per test for the 217 that print a line, totals 222 everywhere: 0 failures | 4.7, 4.3, 4.7, 6.0 s | 6.8, 16.7 s |
+
+* Writebook's one error (`ActiveStorageAuthorizationTest`, `URI::Generic#request_uri`) happens without the gem too.
+* Load order: in every process of every app, every feature outside Lowrail, RubyGems and Bundler loads in the same
+  order in all setups. Profiled processes miss RubyGems files (`bundler_version_finder.rb`, for Lobsters also
+  `request_set/…`) that `bundle exec lowrail-profile` loaded in the parent already. CodeTriage's yard loads its
+  handlers in directory order, which already differs between plain and off; without them the order matches.
+* Overhead: the first run (counting only) costs 0–11% of suite time. The repeat run walks the stack on every
+  allocation to find the app frame and costs 1–45% (Campfire's suite, at 19,400 objects per request, the most).
 * `--record` notes a request's shape after the counting window closes and requires `json` only at exit, when
   Bundler has long set up. On the Blog's suite (21 tests, Rails 8.1.4) per-test outcomes are identical plain and
   under `--record`.
-* Wall time: 14.8 s and 14.9 s profiled against 15.1 s plain (the suite's own "Finished in"). The hook costs about
-  as much as the noise between runs here; heavier allocation paths will cost more.
 
 ## Proof on two corpus apps
 

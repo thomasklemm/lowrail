@@ -114,7 +114,12 @@ mail { CommentMailer.created(Comment.last!) }
 
 **`lowrail-profile`** (the gem, inside your app) is the first look: one
 Gemfile line, then your own suite or the workloads file, in your own
-environment and database. It names the app line behind each cost.
+environment and database. It names the app line behind each cost, ranks your
+app lines by the framework and gem objects they lead to and your controller
+actions by objects per request, counts jobs, mails and Action Cable actions
+apart, and names the upstream pull requests that change a costly line.
+`lowrail-profile compare base/report.json head/report.json` exits 1 on a
+regression beyond the noise floor, for CI.
 
 ```ruby
 gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
@@ -148,6 +153,7 @@ mise exec -- script/census app ~/src/myapp --rails main  # and the same on Rails
 | Mode | your environment (test-mode logging and error pages are listed apart) | production, warmed, A/A pair |
 | Counts | objects per source line | objects and instructions, per workload and per line |
 | Rails swap | no | `--rails SPEC` next to the app's own |
+| Per action | objects per controller action, job, mailer and channel action; `compare` for CI | per workload |
 
 The usual path: run your suite through `lowrail-profile --record`, keep the
 requests that matter in `lowrail/workloads.rb` (make its writes repeatable),
