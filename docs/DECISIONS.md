@@ -289,8 +289,9 @@ it). The default review of a head is now a `thermos` review in its own GPT-6.1 S
 served by the ChatGPT subscription): correctness/security and maintainability in parallel, plus the body, comment
 and commit message sentence by sentence. Its pass is recorded as `reviewer: thermos-sol`. The coordinator adds an
 Opus pass where a second reviewer helps (claims-heavy bodies, measurements) and Astra on `risky` items. Passes
-already recorded as `claude-code` keep counting. Every new Opus 5.5 and Sol thread starts with effort `high` (Thomas,
-2026-11-18; both default to medium).
+already recorded as `claude-code` keep counting. Every new Sol thread starts with effort `high` (Thomas, 2026-11-18;
+the default is medium). Opus 5.5 threads get `high` for reviews, exactness work and hard builds, and `medium` where
+the coordinator judges it enough, such as record updates, reruns of known measurements and small follow-ups.
 
 Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
 trying Sol 6.2, but it isn't offered yet.
