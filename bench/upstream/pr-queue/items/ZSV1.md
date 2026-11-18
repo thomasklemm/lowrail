@@ -16,7 +16,7 @@ rank: 2
 risky: false
 state: in-review
 pr:
-note: "2026-11-18 thermos-sol confirm of exact 47b2ed7110: changes, text only. Comments, executable/test equivalence, qualified commit message, single-commit packaging and lobsters -584 evidence accepted; all six stats diffs replay byte-for-byte. The body still falsely says Shipit setivar counters are unchanged, and the comment says only lobsters is touched: raw Shipit fallback reasons shift -81/+81 below the filter's 100 cutoff, with totals unchanged. Cut those comparisons and the body A/A-methodology clause, then confirm the text on this same head; no new Ruby code fix needed. Detailed confirm in bench/upstream/zsv1/thermos-review.md; builder tests in results-2.md. Public drafts preserved as reviewed; not opened or posted. Earlier exact-head pass retained below."
+note: "2026-11-18 (coordinator): applied the confirm's two text must-fixes verbatim: body lead-in is now \"ZJIT stats per iteration for lobsters:\" and the #1122 comment draft says \"On lobsters, it removes 584 generic writes per iteration.\" Ruby head 47b2ed7110 unchanged; needs a text-only confirm. 2026-11-18 thermos-sol confirm of exact 47b2ed7110: changes, text only. Comments, executable/test equivalence, qualified commit message, single-commit packaging and lobsters -584 evidence accepted; all six stats diffs replay byte-for-byte. The body still falsely says Shipit setivar counters are unchanged, and the comment says only lobsters is touched: raw Shipit fallback reasons shift -81/+81 below the filter's 100 cutoff, with totals unchanged. Cut those comparisons and the body A/A-methodology clause, then confirm the text on this same head; no new Ruby code fix needed. Detailed confirm in bench/upstream/zsv1/thermos-review.md; builder tests in results-2.md. Public drafts preserved as reviewed; not opened or posted. Earlier exact-head pass retained below."
 passes:
   - reviewer: thermos-sol
     orb: "T-01a1ef67-4308-7296-a24a-80471f35f540"
@@ -65,7 +65,7 @@ The profiler records an ordinary object with a singleton class as "other" (#1954
 
 Fixes Shopify/ruby#1122
 
-ZJIT stats per iteration for lobsters, leaving out counters that move as much between two runs of master; railsbench and shipit show no change in setivar counters:
+ZJIT stats per iteration for lobsters:
 
 ```diff
 -dynamic_setivar_count: 11,405
