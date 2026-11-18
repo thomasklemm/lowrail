@@ -219,6 +219,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 * **Keep open PRs mergeable** (Thomas): resolve conflicts promptly and keep CI green where the failure is ours
   (show unrelated failures fail on base when asked). Don't force-push without a conflict, a requested change or a
   failure of ours, because each push notifies reviewers and reruns CI.
+  Standing OK (Thomas, 2026-11-18): when only CHANGELOG files conflict, the coordinator may run
+  `script/pr-queue rebase ID --push` on an open PR without asking first.
 * **Approved and unmerged after 14 days:** one short, neutral note on a weekday (Thomas), never asking anyone to
   merge. Once per PR.
 
