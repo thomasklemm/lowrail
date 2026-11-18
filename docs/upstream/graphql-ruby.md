@@ -397,12 +397,79 @@ the Callgrind table above stands for it. Thomas author and committer, no trailer
    | validate - big query | 149.8 | 173.3 | 1.16x | +3.9% | −1.6% |
    | validate - fields will merge (5000 × `hello`, record only) | 38.2 | 74.8 | 1.96x | +2.2% | +0.2% |
 
-   Head is ahead in all 24 round pairs of the four body rows (lowest 1.00x, abstract fragments, round 2;
-   `ips/pairs.txt`). The stress row stays here, as DECISIONS' realistic-size rule asks. The body's execution
+   Head has higher printed i/s in 23 of the 24 body-row pairs; abstract fragments in round 2 rounds to a tie
+   at 1.881k. Its printed per-iteration times are 531.64→531.50 µs, a negligible 0.026% difference, so the raw
+   output supports the reported direction but not a meaningful win in every round (`ips/pairs.txt`).
+   The stress row stays here, as DECISIONS' realistic-size rule asks. The body's execution
    sentence now says "instruction counts".
 
 Suites on `8af96ec046`, Ruby 4.0.9: `SERIAL=1 rake test` 2,735 tests, 0 failures; `GRAPHQL_CPARSER=1` 2,783, 0;
 `GRAPHQL_FUTURE=1` 2,735, 0. rubocop and `srb tc` clean.
+
+### GQ1 Astra confirm (2026-11-18)
+
+**Verdict: approve; all three must-fixes resolved.** Confirmed exact fork head
+[`8af96ec046d5831a3031eadd400249c168be8b87`](https://github.com/thomasklemm/graphql-ruby/commit/8af96ec046d5831a3031eadd400249c168be8b87)
+in the [same Astra review thread](https://ampcode.com/threads/T-01a1f036-3f72-70d5-b936-d1e3f63faddf), without
+delegation. `git rev-parse HEAD^` is `9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6`;
+`git diff 4a77cd59bf 8af96ec046 -- lib` is empty. Only the spec and commit message changed from the previously
+reviewed patch. This confirms this review's approval, not permission to open or post; queue delivery remains
+with the coordinator.
+
+**Returned-value test accepted.** `Warden#get_field` and `#get_type` are public Ruby methods of the component
+under test. The class is `:nodoc:`, but using its callable interface in its own spec is not an internal-state
+assertion: the test reads no cache ivars, invokes no private helper, and counts no calls. It checks the field/type
+returned after context changes, then checks a fresh query with a different context. It would survive replacing the
+Hash implementation. This meets DECISIONS' behavioral-test rule and matches the adjacent upstream
+`#loadable_possible_types` test, which also calls a Warden directly. Full execution is not necessary for this
+component contract, and adding root-resolver setup only to satisfy both execution engines would obscure it.
+
+Executed the new spec block unchanged with `-rgraphql -rminitest/autorun` against each library, using Ruby 4.0.9.
+Head: 1 test, 6 assertions, no failures. With the FUTURE setup from `spec_helper.rb` (Visibility migration mode,
+number/name rejection, Execution::Next as default): the same 6 assertions pass. Base fails at the repeated field
+lookup. Reverting only the type-cache selection in memory fails at the repeated type lookup; reverting only the
+field-cache selection fails at the repeated field lookup. These negative controls prove both halves matter.
+The retained `astra-boundaries.rb` output on the new head is byte-identical to `probes/astra-head.txt`, including
+nil caching and query isolation. No new full-suite, C-parser or Sorbet run was performed in this confirm; the
+builder's suite results above remain separately attributed.
+
+**Body, sentence by sentence.** The title names the changed name-cache behavior. The first sentence correctly
+describes identity keys; the distinct-selection example correctly describes repeat schema lookup and visibility/
+reachability traversal, not repeat `visible?` hook execution. The default-Warden sentence matches schema/query
+initialization (including plugins which enable Visibility indirectly). The next sentence now limits lifetime to
+the Warden and the Profile precedent to a type's `.get_field`. The override sentence openly states the retained
+first answer after mid-query context mutation and quotes the dynamic-types guide accurately. The table identifies
+the existing `rake bench:validate` workload, Ruby major version and i/s; its four rows match the retained output
+after rounding, with no 5,000-field stress row. The final sentence explicitly says execution instruction counts
+and matches the earlier replay (−0.9430% through +0.4269%). The example, compatibility warning and compact table
+are appropriate; no suite counts, internal review labels or Lowrail links occur in the body. Reusing the existing
+rake benchmark command rather than copying its script is sufficient to identify this upstream-owned benchmark.
+
+**Commit message, sentence by sentence.** The name-key/identity description matches the old source. The miss
+claim is now restricted to equal names in distinct Strings, so it no longer denies existing identity hits.
+The new behavior is first-result reuse for the Warden lifetime, including nil; unchanged owner-identity keys
+are stated explicitly. The final sentence is field-only Profile precedent, not a claim about `Schema.get_type`.
+Thomas is author and committer and the trailer list is empty. No further source or message edit is required.
+
+**Independent benchmark replay.** Read all twelve raw files, checked their base/head SHA headers and Ruby 4.0.9
+version lines, and parsed the `Calculating` rows independently of `ipstab.rb`. The script's regenerated table is
+also byte-identical to `ips/table.txt`. Best-of-six body-row ratios are 1.14638158, 1.09268795, 1.10140406 and
+1.15681836. Split-half A/A, best of rounds 4–6 relative to best of 1–3, is:
+
+| scenario | master A/A | head A/A |
+| --- | ---: | ---: |
+| introspection | +2.184874% | −1.076040% |
+| abstract fragments | −3.810505% | −1.555137% |
+| abstract fragments 2 | −0.078003% | −0.991501% |
+| big query | +3.921732% | −1.633970% |
+
+Those round to the recorded ±3.9% bound; the 1.09–1.16x best-of-six effects exceed that control. Within-run
+benchmark-ips dispersion is much larger (up to ±16.3% for these rows), so the split-half number must not be
+described as overall measurement uncertainty or a confidence interval. The 24-pair claim is qualified above:
+one pair is a rounded tie and its 0.026% per-iteration advantage is within noise. This does not invalidate the
+body's best-of-six table. `ips.sh` uses `taskset -c 1`, alternates master/head and invokes the named rake benchmark;
+the logged revision and version headers agree. These are retained-data replays, not new timing runs or independent
+proof that the measurement host had no competing work. No adverse cohort was discarded or rerun in this confirm.
 
 ### GQ1 Astra review (2026-11-18)
 
