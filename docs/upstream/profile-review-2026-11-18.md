@@ -1233,3 +1233,15 @@ Campfire regression, `lowrail verify`, `lowrail bench`, timing, instruction coun
 scheduler/Ractor coverage. Historical Campfire figures above and in the profile guide remain the builder's
 attributed evidence, not results of this confirm review. The heuristic's implemented formula is confirmed; its
 statistical power across apps is not.
+
+## Resolution of the A/A floor review (2026-11-18)
+
+* **AA1** fixed: whether `--aa` was given is kept apart from what the file parses to, so an A/A file that is `null`
+  (or anything other than a report) is checked like any other report and exits 2 with `gate: true`.
+* Also fixed, from the limits listed above: a line the A/A report lacks no longer counts as a zero there. That zero
+  made the line's floor its own size, so 100 → 130 passed; the line now takes its floor from base and head alone and
+  exits 1.
+* AA-N1 and AA-N2 left as recorded: passing rows' floors are not listed, and a CI step that drops `--aa` is
+  advisory by design (it prints "Not a gate").
+* Both new assertions fail on 16dbc027, each on its own. profile_test 14 runs / 186 assertions, workloads_test 3/22,
+  load_hooks_test 2/4, all passing on mise Ruby 4.0.7.

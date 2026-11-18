@@ -648,6 +648,13 @@ class ProfileTest < Minitest::Test
       assert_equal 2, status, "another number of runs: #{result}"
       _, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--aa", "missing.json", chdir: dir)
       assert_equal 2, status.exitstatus, err
+      File.write(File.join(dir, "null.json"), "null")
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--aa", "null.json", "--json", chdir: dir)
+      assert_equal [2, true], [status.exitstatus, JSON.parse(out)["gate"]], "a supplied A/A file that is not a report: #{out}"
+
+      # A line the A/A report lacks adds no spread; counting it as zero would make its floor the line itself.
+      status, result = compare(dir, report([100.0, 100.0]), report([130.0, 130.0]), aa: report([100.0, 100.0]).merge("ranked" => []))
+      assert_equal 1, status, result.to_s
     end
   end
 

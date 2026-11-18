@@ -273,7 +273,8 @@ differ (below), so such a list is a reason to look, not a confidence bound.
   profile is never a green result.
 * A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of every report has some;
   a kind some runs have and others lack, or no comparable kind at all, exits 2.
-  A line a report never reached is a measured zero there; an action base, head or the A/A report did not run, or
+  A line base or head never reached is a measured zero there, and one the A/A report never reached adds no spread
+  to its floor; an action base, head or the A/A report did not run, or
   that has no warm value there (it ran once per process), is listed as not compared.
 * A row's noise is the base's spread across the A/A pair: largest minus smallest of all the runs of both base
   reports, so it covers the pair's difference and each one's own spread (every run counts with `--runs` above 2);

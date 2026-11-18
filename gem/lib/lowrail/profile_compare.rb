@@ -50,6 +50,7 @@ module Lowrail
     attr_reader :not_compared
 
     def initialize(base, head, aa: nil, min: 1.0, top: 20)
+      @gate = !aa.nil?
       @base, @head, @aa = [base, head, aa].map { |file| file && (JSON.parse(File.read(file)) rescue false) }
       @min = min
       @top = top
@@ -168,7 +169,7 @@ module Lowrail
     def valid? = problems.empty?
 
     # Only an A/A pair measures how much invocations differ.
-    def gate? = !@aa.nil?
+    def gate? = @gate
 
     # 0 no regression (or no A/A pair), 1 a regression, 2 not valid evidence.
     def status = !valid? ? 2 : gate? && regressions.any? ? 1 : 0
@@ -209,7 +210,7 @@ module Lowrail
       zero = [0.0] * @base["meta"]["runs"]
       (base.keys | head.keys).map do |name|
         b, h = base[name] || zero, head[name] || zero
-        Change.new(kind: kind, what: "line", name: name, base: mean(b), head: mean(h), noise: noise(b, aa && (aa[name] || zero), h))
+        Change.new(kind: kind, what: "line", name: name, base: mean(b), head: mean(h), noise: noise(b, aa&.[](name), h))
       end
     end
 
