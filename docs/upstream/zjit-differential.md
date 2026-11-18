@@ -1,5 +1,7 @@
 # ZJIT differential run on master 90dbced795 (bet Z2)
 
+The [2026-11-18 rerun on `7919a47d46`](#rerun-on-master-7919a47d46-2026-11-18) is at the end.
+
 Bet Z2 reran the [JIT differential run](contributions.md) (which found
 [#19648](https://github.com/ruby/ruby/pull/19648) on `e83592ba14`) for ZJIT only, on ruby/ruby master
 [`90dbced795`](https://github.com/ruby/ruby/commit/90dbced795), the tip on 2026-11-03.
@@ -174,3 +176,182 @@ The hourly watch continued during this run. See [contributions.md](contributions
 - The nine census apps. They are not set up in this orb and need MySQL, PostgreSQL, Redis and memcached.
 - Active Storage, which needs service credentials, and Railties, as in the previous run.
 - YJIT modes, by request.
+
+## Rerun on master 7919a47d46 (2026-11-18)
+
+Z2's method, repeated on ruby/ruby master [`7919a47d46`](https://github.com/ruby/ruby/commit/7919a47d46), the tip
+on 2026-11-18. It covers 562 commits since `90dbced795`, 49 of them in `zjit/`:
+
+- locals in stack maps instead of spills before calls, and side exits that read locals from the stack map;
+- an env-escape fix for `GetBlockParam` in an inlined callee;
+- polymorphic-class getivar with a monomorphic shape;
+- polymorphic `opt_neq` (ours, #19909);
+- `gen_new_hash` with String keys;
+- folds of `Integer#==`/`Float#==` against `nil`, `true` and `false`;
+- `super` from a method that got a block (ours, #19682);
+- Integer and Module interpolation without `to_s` (ours, #19678);
+- `expandarray` of a profiled `nil`;
+- inlined `Integer#pred`, `anybits?` and `IO::Buffer#get_value`;
+- the `opt_new` refinement fix for Bug #22539.
+
+Our Symbol block-argument PR ruby/ruby#19912 is still open and not in this build. ruby/ruby#18960 has merged since
+Z2, so Shopify/ruby#976 no longer reproduces.
+
+**Result: one real divergence, already known and still open: Shopify/ruby#1128.** `super` in a refined method
+calls a second refinement of the same method once the method is compiled. It is wrong at the default `--zjit`.
+The first bad commit is `4a21b83693` (ruby/ruby#15816, January 2026). A small fix, mirroring the existing YJIT
+check, is on [thomasklemm/ruby `zjit-super-from-refinement`](https://github.com/thomasklemm/ruby/tree/zjit-super-from-refinement)
+(`be791c1fb8`); no PR is open. Every other difference from the interpreter is a timing flake, a test name that
+contains the date, or an orb environment failure that also happens without the JIT. No `[BUG]` report, Rust panic
+or C assertion failure appeared in any run, debug build included. The Ractor-owned-set `[BUG]` that Z2 saw in
+every mode did not appear.
+
+### Pins and method
+
+- **Ruby:** `7919a47d46`. A release build (`--enable-zjit --enable-yjit`) and a debug build
+  (`--enable-zjit=dev --enable-yjit=dev optflags=-O1`). Rust 1.100.0. Two cores, two runs at a time.
+- **Corpus:**
+  - Rails main [`36e0f96b9d`](https://github.com/rails/rails/commit/36e0f96b9d), as in Z2: Active Record (SQLite
+    in memory), Active Support, Action Pack, Action View, Active Model, Active Job and Action Mailer.
+  - Rails 8.1.4: Action Cable, Action Mailbox and Action Text.
+  - App suites on Rails 8.2: Campfire `af4dd9f`, Fizzy `77eada1` and Writebook `7478e2c`.
+  - Ruby's own suites: btest, test-all, the spec suite and test-bundled-gems.
+- **Harness:** [bench/upstream/jit-differential](../../bench/upstream/jit-differential) with Z2's
+  `outcomes.rb`/`compare.rb` for the Minitest suites.
+  - [`rsuite.sh`](../../bench/upstream/jit-differential/rsuite.sh) runs Ruby's own suites through `make`, and
+    [`rcompare.rb`](../../bench/upstream/jit-differential/rcompare.rb) compares them per test from their logs.
+  - [`qrun.sh`](../../bench/upstream/jit-differential/qrun.sh) runs two queues.
+  - [`runs-2026-11-18.txt`](../../bench/upstream/jit-differential/runs-2026-11-18.txt) lists every run with its
+    exit code and time. Where a run is listed twice, the later line counts.
+  - Seed 41231, `PARALLEL_WORKERS=1`.
+- **Modes:** Z2's 15 release modes (`interp` ×2, `ic` and the 13 ZJIT modes, with `zinb` at
+  `--zjit-inline-budget=2000` from the start). The debug build ran `interp`, `z1`, `z1ni`, `zinl`, `zmem` and `zc`.
+  `test-all` and `test-bundled-gems` ran on the release build only.
+- **Harness lesson:** the spec suite ignores `RUN_OPTS`. mspec runs the build's `miniruby` with its own flags, so
+  `make test-spec RUN_OPTS=--zjit` runs the interpreter. ZJIT CI passes the options as `SPECOPTS="-T --zjit …"`.
+  `rsuite.sh` does the same, and a probe spec confirmed `RubyVM::ZJIT.enabled?` and `GC.auto_compact` in the
+  workers. The first spec wave, which passed `RUN_OPTS`, was discarded and rerun. Unlike ZJIT CI, the spec runs did
+  not use `--repeat 2`.
+- **Workarounds, the same in every mode:**
+  - `BUNDLED WITH` was dropped from the lockfiles, because bundler 2.7.2 fails on `Pathname::SEPARATOR_PAT` and
+    master's bundler is 4.1.0.
+  - Fizzy's and Writebook's `ruby file: ".ruby-version"` was removed.
+  - Writebook got redcarpet 3.6.0 → 3.6.1 (3.6.0 does not compile on master) and `gem "benchmark"` (mini_magick
+    4.13 needs it).
+  - The Rails main bundle skips the `rubocop`, `mdl`, `doc`, `storage` and `db` groups.
+  - The apps run with `TZ=UTC CI=1 CI_PROGRESS_BAR=0`.
+
+### Coverage
+
+| Suite | Tests | Release modes | Debug modes |
+| --- | ---: | ---: | ---: |
+| test-all (`make test-all`) | 39,155 | 16 | |
+| spec (`make test-spec`) | 33,753 examples | 16 | 6 |
+| btest | 2,147 | 16 | 6 |
+| test-bundled-gems | 35 gems | 6 (`interp` ×2, `z1`, `z1ni`, `zinl`, `z30`) | |
+| activerecord (main) | 9,860 | 16 | 6 |
+| activesupport (main) | 6,794 | 16 | 6 |
+| actionpack (main) | 4,563 | 16 | 6 |
+| actionview (main) | 2,898 | 16 | 6 |
+| activemodel (main) | 1,237 | 16 | 6 |
+| actionmailer (main) | 286 | 16 | 6 |
+| activejob (main) | 234 | 16 | 6 |
+| actioncable (8.1.4) | 231 | 16 | 6 |
+| actiontext (8.1.4) | 126 | 16 | 6 |
+| actionmailbox (8.1.4) | 106 | 16 | 6 |
+| Fizzy r82 | 1,787 | 16 | 6 |
+| Campfire r82 | 634 | 16 | 6 |
+| Writebook r82 | 310 | 16 | 6 |
+
+In total there were 346 suite runs with 2,055,623 test executions, plus six test-bundled-gems runs. Every run
+produced outcomes. The interpreter baselines have failures that come from the orb, not from Ruby: no `EST` or
+`US/Eastern` zone data (most of Active Support's 56), no `sqlite3` CLI, Action Cable's JavaScript package
+test, and `TestIO#test_seek`/`test_seek_symwhence` (`ENOENT` in `IO#seek`, as in Z2). They
+fail the same way in every mode.
+
+### Differences from the interpreter
+
+| Where | Modes | Test | Verdict |
+| --- | --- | --- | --- |
+| test-all | `zmv` | `TestRefinement#test_module_inclusion2`: `"FooExt2#y FooExt#y Foo#y"` instead of `"FooExt2#y Foo#y"` | **Real, known: Shopify/ruby#1128.** Run alone, `test_refinement.rb` fails 3 of 3 seeds under `zmv` (as `test_super_not_chained`; which test fails depends on order) and passes 3 of 3 on the interpreter and at the default `--zjit`, because the test calls the method only once. The standalone repro is wrong at the default threshold. See below. |
+| Campfire r82 | release `z1`, `z1ni`, `zinl`, `zinb`, `z2i`, `zinv`, `zc`; debug `z1`, `z1ni`, `zinl`, `zmem` | `SqliteWalCheckpointTest` (one or both tests), "condition not met within 1s" | **Timing flake**, as in Z2 and Z11: a 1-second wait on a child process that inherits the JIT options. Same tests, same message, varying from run to run. |
+| activejob (main) | `z1ni` | `ArgumentSerializationTest#test_serializes_Range_…Date…` | **Artifact:** the test name contains the Julian day, and the run crossed midnight. `compare.rb` now normalizes it. |
+| test-all, spec | one log each | `TestIO#test_seek*`; `Process.clock_gettime … CLOCK_*_ALARM` | **Environment:** they fail on the interpreter too; they only show as differences where a log was read before its summary was written. |
+
+test-bundled-gems passed all 35 gems in every mode. The probes
+([`probe_zjit_since_z2.rb`](../../bench/upstream/jit-differential/probe_zjit_since_z2.rb)) cover locals across
+side exits, calls, `eval` and blocks; `GetBlockParam` with an escaping env; polymorphic getivar with singleton
+classes; polymorphic `!=` with custom `==`/`!=`; String-key hash literals with a mutated key; `expandarray` of
+`nil`; the `==` folds; `super` with and without a block; interpolation after redefining `Integer#to_s`;
+`Integer#pred`, `anybits?` and `IO::Buffer#get_value` with Bignum, Float and out-of-range inputs;
+`String.new(capacity:)`; `opt_new` with a refined `initialize`; and Symbol block arguments. They matched the
+interpreter in 7 release modes and 4 debug modes, with no debug assertion.
+
+### Shopify/ruby#1128: `super` in a refined method
+
+```ruby
+class Foo
+  def y = "Foo#y"
+end
+module FooExt
+  refine(Foo) { def y = "FooExt#y " + super }
+end
+module FooExt2
+  refine(Foo) { def y = "FooExt2#y " + super }
+end
+module Client
+  using FooExt
+  using FooExt2
+  def self.invoke_y_on(foo) = foo.y
+end
+foo = Foo.new
+puts Array.new(Integer(ARGV[0] || 4)) { Client.invoke_y_on(foo) }.tally
+```
+
+On `7919a47d46`, the interpreter returns `"FooExt2#y Foo#y"` for all 100 calls of `ruby refined_super.rb 100`.
+`--zjit` returns `"FooExt2#y FooExt#y Foo#y"` for 71 of them, and `--zjit-call-threshold=2` for 99.
+`--zjit-call-threshold=1` (no profile yet) and `--zjit-disable-hir-opt` are correct, and so is
+`--zjit-inline-threshold=0` at threshold 2, so the cause is in the `invokesuper` specialization, not in inlining.
+
+**Cause.** The specialization in `type_specialize` takes the profiled CME's `defined_class` and looks up
+`RCLASS_SUPER(RCLASS_ORIGIN(defined_class))`. For a method reached through `using`, `defined_class` is the
+refinement's iclass in the caller's chain of activated refinements (FooExt2 iclass → FooExt iclass → Foo), so the
+"superclass" is FooExt's iclass, and the HIR inlines `FooExt#y` as the super target. The interpreter's
+`vm_search_normal_superclass` skips refinement iclasses, and YJIT's `gen_invokesuper` already gives up on them
+(`invokesuper_refinement`).
+
+**First bad commit:** `4a21b83693` "ZJIT: Optimize common `invokesuper` cases" (ruby/ruby#15816). `miniruby`
+built at its parent `cdb2b0eed5` returns the right answer for all 20 calls at threshold 2; at `4a21b83693` it is
+wrong for 19 of 20.
+
+**Fix branch:** `be791c1fb8` on `zjit-super-from-refinement`. When the CME's `defined_class` is an iclass of a
+refinement, the specialization falls back to the generic `InvokeSuper`, with a new fallback reason
+`SuperFromRefinement` (counter `send_fallback_super_from_refinement`). That is +15 lines in `hir.rs` and
+`stats.rs`, plus a codegen test with two refinements and a client that uses both. The test fails without the fix
+(`"R2 R1 A"`) and passes with it. On a dev build of the branch:
+
+- the repro is correct at the default, threshold 1, threshold 2 and `zmv`;
+- `test_refinement.rb` and `test_super.rb` pass under the interpreter, threshold 1, threshold 2 and `zmv`
+  (245 tests each);
+- `make zjit-test` passes 2,014 of 2,015.
+
+The one failure, `test_profile_frames_during_direct_jit_to_jit_entry` ("rb_profile_frames was not called from
+SIGPROF handler"), also fails on master in this orb.
+
+Status: Shopify/ruby#1128 is open, filed by us on 2026-11-15, with no assignee and no PR, so it is free to take.
+The fork has no CI for the branch. Nothing has been posted. Under the ruby/ruby moratorium in
+[DECISIONS](../DECISIONS.md#pull-requests), it waits for Thomas, after the "Thomas can explain it first" step.
+
+### Z11 on three census apps
+
+Campfire, Fizzy and Writebook are census apps. Their own suites above are Z11's comparison (interpreter against
+`--zjit --zjit-call-threshold=1` on the same build) plus 12 more modes and the debug build, on Rails 8.2 instead
+of F1's overlays. Result: no divergence beyond the Campfire flake that Z11 also found. The service-backed
+census apps (Sure, Mastodon, Loomio, CASA, Lobsters, Hackatime, CodeTriage and Discourse) were not run, because
+PostgreSQL, Redis and memcached are not set up in this orb.
+
+### Not run
+
+- The Rails 8.1 app variants (Campfire `02023b0`, Fizzy `6f1d200`, Writebook `be1f8fc`). Without them, Z2's
+  redcarpet abort under auto-compaction in Fizzy r81 was not retried; Fizzy r82 under `zcm` and `ic` finished.
+- test-all on the debug build, Active Storage, Railties, and YJIT modes.

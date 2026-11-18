@@ -30,11 +30,11 @@ work=$HOME/jitdiff/apprun/$build-$app-$mode-$tag${JITDIFF_REPEAT:+-rep}
 rm -rf $work; mkdir -p $(dirname $work); cp -a $HOME/jitdiff/apps/$app $work
 [ -n "$JITDIFF_REPEAT" ] && mode_sfx=-rep$JITDIFF_REPEAT
 out=$HOME/jitdiff/out/$build$mode_sfx/app-$app; mkdir -p $out
-export BUNDLE_GEMFILE=$work/Gemfile BUNDLE_PATH=$HOME/jitdiff/appgems-$build
+unset BUNDLE_WITHOUT; export BUNDLE_GEMFILE=$work/Gemfile BUNDLE_PATH=$HOME/jitdiff/appgems-$build
 export JITDIFF_OUT=$out/$mode-$tag.json PARALLEL_WORKERS=1 RAILS_ENV=test SEED=${SEED:-41231}
 export RUBYOPT="$jit -r$HOME/jitdiff/outcomes.rb"
 rm -f $JITDIFF_OUT
-cd $work
+cd $work; export CI_PROGRESS_BAR=0 TZ=UTC CI=1
 start=$(date +%s)
 timeout ${TMO:-7200} bin/rails test --seed $SEED > $out/$mode-$tag.log 2>&1
 code=$?

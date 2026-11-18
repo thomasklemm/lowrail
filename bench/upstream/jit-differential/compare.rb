@@ -1,7 +1,7 @@
 # compare.rb DIR : compare all *.json in DIR against interp-*.json
 require "json"
 dir = ARGV[0]
-norm = ->(k) { k.gsub(/0x\h+/, "0x").gsub(/\d{4}-\d\d-\d\d[ _T]\d\d:\d\d:\d\d(\.\d+)?/, "TS").gsub(/\w{3},_\d\d_\w{3}_\d{4}_\d\d:\d\d:\d\d/, "TS").gsub(/Date:_\d{4}-\d\d-\d\d/, "Date:") }
+norm = ->(k) { k.gsub(/0x\h+/, "0x").gsub(/\d{4}-\d\d-\d\d[ _T]\d\d:\d\d:\d\d(\.\d+)?/, "TS").gsub(/\w{3},_\d\d_\w{3}_\d{4}_\d\d:\d\d:\d\d/, "TS").gsub(/Date:_\d{4}-\d\d-\d\d/, "Date:").gsub(/\(\(\d+j,/, "((Nj,") }
 load = ->(f) { JSON.parse(File.read(f))["tests"].transform_keys(&norm) rescue nil }
 files = Dir["#{dir}/*.json"].sort
 base_files = files.select { File.basename(_1).start_with?("interp") }

@@ -4,8 +4,8 @@
 build=$1 mode=$2 comp=$3 tag=${4:-0}
 label=$comp; case $comp in actionview-*) export JITDIFF_GROUP=${comp#actionview-}; comp=actionview;; esac; shift 4 2>/dev/null; [ "$1" = "--" ] && shift
 source ~/jitdiff/env.sh $build
-[ "$comp" = actioncable ] && export BUNDLE_GEMFILE=$HOME/jitdiff/bundle-cable/Gemfile
-[ -n "$RAILS_DIR" ] && export BUNDLE_GEMFILE=$HOME/jitdiff/bundle-main/Gemfile
+[ "$comp" = actioncable ] && export BUNDLE_GEMFILE=$HOME/jitdiff/rails-814/Gemfile
+[ -n "$RAILS_DIR" ] && export BUNDLE_GEMFILE=$RAILS_DIR/Gemfile BUNDLE_WITHOUT=rubocop:mdl:doc:storage:db
 case $mode in
   interp) jit="";;
   z1) jit="--zjit --zjit-call-threshold=1";;
@@ -39,7 +39,7 @@ esac
 out=${OUTROOT:-$HOME/jitdiff/out}/$build$mode_sfx/$label; mkdir -p $out
 export JITDIFF_OUT=$out/$mode-$tag.json PARALLEL_WORKERS=1 MT_CPU=1 SEED=${SEED:-41231} AJ_ADAPTER=inline ARCONN=sqlite3_mem
 rm -f $JITDIFF_OUT
-cd ${RAILS_DIR:-$HOME/workspace/repo/.corpus/rails}/$comp
+cd ${RAILS_DIR:-$HOME/jitdiff/rails-814}/$comp
 start=$(date +%s)
 flock /tmp/jitdiff-lock-$comp$mode_sfx timeout ${TMO:-7200} ruby $jit -rbundler/setup -r$HOME/jitdiff/outcomes.rb $HOME/jitdiff/run_component.rb "$@" --seed $SEED $EXTRA_ARGS > $out/$mode-$tag.log 2>&1
 code=$?

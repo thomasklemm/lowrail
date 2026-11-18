@@ -1,5 +1,8 @@
 # ZJIT differential on the census apps' own test suites (bet Z11)
 
+Rerun on master `7919a47d46` (2026-11-18) for Campfire, Fizzy and Writebook in
+[zjit-differential.md](zjit-differential.md#z11-on-three-census-apps): no divergence beyond the Campfire flake.
+
 Each census app's own test suite run twice on the same Ruby master build: once on the interpreter, once with
 `--zjit --zjit-call-threshold=1`. Outcomes compared per test (and, for failing RSpec examples, per
 exception class). Each difference was rerun alone in both modes, and at the default threshold.
