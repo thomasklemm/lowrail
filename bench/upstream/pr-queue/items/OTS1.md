@@ -4,7 +4,7 @@ repo: ruby/ruby
 kind: perf
 area: ZJIT, objtostring guards
 reviewer: "thermos-sol and thermos-opus approve -3; precedent k0kubun's #19603 (coerce_to guards recompile)"
-branch: thomasklemm/zjit-objtostring-recompile-3
+branch: thomasklemm/zjit-objtostring-recompile-2
 head: "f431e8a74c"
 base: master
 built_on: "21ee43fb1e"
@@ -22,6 +22,7 @@ passes:
   - {reviewer: thermos-sol, orb: T-01a1eecc-1498-73e9-88f9-20ed54fd2455, head: "6a3dc53c87", date: 2026-11-18, verdict: approve, open: "No must-fix. Both Thermos rubrics applied directly, including the fresh polymorphic-arm design check. Exact-head tests and negative controls executed; release allocations/slopes rerun with pinned Callgrind totals and A/A; body, message, guards, comments and identity checked. Final-version Module fallback remains an explicit limitation, not a universal allocation-parity claim."}
   - {reviewer: thermos-sol, orb: T-01a1f995-3889-767b-a2bf-4ea3525b61d2, head: "f431e8a74c", date: 2026-11-20, verdict: approve, open: "No code must-fix on the whole rebased PR. Both rubrics applied directly without delegation. Corrected the reply's snapshot clause locally: only block/instruction IDs change; the unreachable String block was never printed. Two full zjit-test runs: 2016 passed, one SIGPROF failure, 15 skipped; clean exact base reproduces it (2014 passed, one failed), isolated head 0/3. btest t1/t2 2148 each; restored-head objtostring tests 18/18; both new tests fail on base production. Interpreter/base/head differential probes match in seven configurations. Needs the same-head thermos-opus pass and Thomas's reply approval; nothing posted or pushed to Ruby."}
   - {reviewer: thermos-opus, orb: T-01a1f995-4197-7255-99ac-b0cc802c9d22, head: "f431e8a74c", date: 2026-11-20, verdict: approve, open: "No code must-fix. Both rubrics applied directly, no subagents. Reply: 'the two snapshots only lose that block' was inaccurate (the unreachable block was never printed; only IDs shift); thermos-sol's correction 'only change block and instruction IDs' is accurate, other sentences verified. Refused Symbol arm leftover: not expected by tekknolagi; a two-line remove_block fix exists if asked (tested), so the record's 'would duplicate the helper's checks' was wrong. zjit-test 2016/2017 (SIGPROF flake, alone 3/3), btest t1/t2 2148 each, removing the skip fails both snapshots. Nothing pushed or posted to Ruby."}
+  - {reviewer: thermos, orb: T-01a1fb10-8e0e-7052-9330-487001494928, head: "f431e8a74c0a2d9910115a485b42d8651a81c405", date: 2026-11-20, verdict: approve, open: "Intensive full-PR review; both rubrics applied directly without delegation. No introduced must-fix; live body, both messages and posted reply accurate. Dev zjit-test: 2016 passed, 1 failed, 15 skipped; exact base: 2014 passed, same failure, 15 skipped; isolated head 2/2 passed. btest t1/t2: 2148 each; restored objtostring: 24/24. Differential: 208 result/event rows and existing 227 rows match in eight configurations; temporary-name probe 11 rows matches in five. Separate TracePoint row differs in three configurations, reproduced on exact base, not hidden as a green probe. Three deliberate wrong variants are detected. Optional: semantic mixed-Module test and removing refused non-String blocks. Nothing pushed or posted to Ruby."}
 ---
 
 # ZJIT: Recompile when an objtostring String guard fails
@@ -88,6 +89,181 @@ Reply draft for his comment:
 > Yes, thanks. The String branch before the arms already takes every String, subclasses included, so a String
 > arm could never run and its block was left unused. f431e8a skips String buckets before creating an arm block;
 > the two snapshots only change block and instruction IDs. I also rebased onto master.
+
+### Intensive full-PR Thermos review, 2026-11-20
+
+Verdict: **approve; no introduced must-fix**, on exact fork head
+[`f431e8a74c0a2d9910115a485b42d8651a81c405`](https://github.com/thomasklemm/ruby/commit/f431e8a74c0a2d9910115a485b42d8651a81c405),
+branch `thomasklemm/zjit-objtostring-recompile-2`, against
+`21ee43fb1ea46e168a148b174ca1ce95c080e7cf`. Both Thermos rubrics were applied directly by this reviewer, without
+subagents or other threads. Earlier approvals were not evidence for this verdict. Code audit preceded reading the
+GitHub discussion. The PR is open and ready at this head; its posted reply is the corrected draft above, not the
+earlier inaccurate snapshot wording. The frontmatter branch now matches the live PR. Historical delivery notes
+above and in older passes describe their own times, not the current Ruby branch state. This pass changed no Ruby
+branch and posted nothing upstream.
+
+**Correctness/security audit.** The relevant ownership path is `vm_objtostring` in `vm_insnhelper.c:6566`,
+`YARVINSN_objtostring` in `zjit/src/hir.rs:11200`, the existing `try_objtostring_cfunc` at 4700, profiling and type
+grouping, then guard lowering, stack maps, `exit_recompile` and patchpoint invalidation. No credentials, new unsafe
+operation, feature gate, dependency, build contract or public API changes.
+
+* Strings: the interpreter returns any `T_STRING` unchanged, ignoring even a refined/redefined/raising `to_s`.
+  Both the monomorphic guard and first polymorphic branch use `types::String`, not `StringExact`; the latter
+  covers subclasses and Strings with singleton classes. `polymorphic_arms` groups by bit-equal
+  `Type::from_profiled_type`; each group is nonempty and no group mixes String and non-String representations.
+  The `buckets[0].is_string()` skip is therefore valid for the whole group. `objtostring` profiles class-bearing
+  `ProfiledType::new` entries, so this is not an object-/shape-only entry whose `class()` could panic. Multiple
+  shapes do not affect these conversions.
+* Integers: accepted arms refine to the profiled Fixnum representation before reusing the existing helper. The
+  unchanged original-C-function, singleton-class and method/TracePoint checks remain in force. Only 0..9 use the
+  shared `rb_fix_to_s_static` strings (`numeric.c:4106`); -1, 10, other negative/large Fixnums allocate through
+  `rb_fix2str`, and heap/Bignum Integers take the send path. There is no frozen-string claim for arbitrary Integers.
+* Modules and Classes: the same helper checks the original `rb_mod_to_s` method, including refinements, and
+  guards the receiver before reading its name. `rb_mod_name` is read on each execution and can return a temporary
+  String subclass; its result guard is deliberately `String`, not `StringExact`. Renaming, removing the temporary
+  name and subsequently giving a permanent name are handled. Nil means an anonymous object: exit before any
+  user callback and let the interpreter run `Module#to_s`. An anonymous singleton class may call its attached
+  object's `inspect`; the dedicated probe observes exactly one call in both modes.
+* Invalidation: the new arms reuse `NoSingletonClass`, `NoTracePoint` and `MethodRedefined` patchpoints rather
+  than relying on the type profile as a method-resolution proof. Refinements/redefinitions fail the C-function
+  eligibility check and send. Creating a singleton method, extending a class, replacing/restoring Integer or
+  Module `to_s`, and replacing `to_s` between two interpolations preserve results and callback counts in probes.
+  Patchpoints resume the pre-`objtostring` snapshot; neither the type branch nor `rb_mod_name` runs Ruby code
+  before that snapshot is used. Generic sends keep the existing post-call/`anytostring` handling, so non-String
+  returns, exceptions, private methods, fibers and GC compaction do not duplicate conversion callbacks.
+* Recompile: `guard_type_recompile` adds existing recompile metadata and infers the guarded type, not a new
+  invalidation mechanism. Side-exit stack maps save the receiver and the original PC before returning to the
+  interpreter. `exit_recompile` targets the compiled owner, including when this body was inlined; incoming
+  JIT-to-JIT calls are re-stubbed and profiling resumes. Existing exit and version budgets still apply.
+* Final fallback: after a previous invalidation, the final permitted version sets `no_side_exits`; the helper
+  then refuses Module conversion, retaining the non-String send fallback. Fixnum conversion remains possible.
+  Profile overflow beyond eight types also refuses this polymorphic specialization. This is not universal
+  allocation parity with the interpreter. With `--zjit-max-versions=1`, no prior invalidation can happen, so the
+  first version may keep exiting permanently; do not promise that every custom budget eventually produces a
+  generic version. No policy change is needed for this PR.
+
+**Maintainability audit.** Cold read: recompile a failed String speculation; otherwise branch around all Strings,
+try the already-supported conversions for profiled non-String types, send for the rest, then join. This extends
+the canonical instruction builder (+22/−2 production lines, +147/−2 test lines), with no new
+helper/type/state/flag/instruction or scattered policy. The two files were already
+12,480 and 29,637 lines and become 12,500 and 29,782; no new 1k-line threshold is crossed. Ruby-specific flog and
+RuboCop metrics do not apply to these Rust methods. Readability L1 for the full dispatch addition, L0 for the skip.
+Deleting the arms would be shorter but would lose the interpreter's shared conversions on String-led mixed
+sites; another eligibility helper would duplicate the canonical helper. Extracting this small dispatch out of
+the instruction builder would add indirection without removing a responsibility. No structural blocker found.
+
+Two optional improvements, neither a prerequisite to keeping the current head:
+
+1. Extend an existing codegen test with semantic assertions after String-led recompilation, using a named Module
+   and an anonymous or temporarily named Module. The two new tests assert version count and HIR, not the Ruby
+   return values, and do not directly assert a mixed Module arm. The review probes cover that gap for this pass;
+   one persistent semantic test would protect against a plausible future miscompile without more snapshot bulk.
+2. A rejected non-String arm (e.g. Symbol) still leaves an unreachable block. If cleanup is requested, add
+   `else { fun.remove_block(arm_block); }` after the helper's `if let`; it needs no duplicated eligibility checks.
+   This is compile-time debris, skipped by RPO-based passes, not an executed path or a correctness issue. The
+   String skip specifically requested by tekknolagi is already before block/instruction allocation.
+
+**Live text, checked sentence by sentence.** Body and reply were read from GitHub, messages from commit objects:
+
+| Text | Check |
+| --- | --- |
+| Body: “When `objtostring` has only seen Strings…” | Matches monomorphic profiling and the builtin String guard; includes subclasses, not only exact String. |
+| “That guard didn't recompile…” | Base has `recompile: None`; the mechanism probe keeps 80 type exits per phase on base. “For as long as that version stayed” correctly bounds the claim. |
+| “It now recompiles, like `coerce_to`'s since #19603.” | New call is the same existing helper used by `coerce_to`; the merged precedent changes that metadata. Subject to the existing budgets above. |
+| “The recompiled version takes the polymorphic path…” | Profile keeps the original String and new type; old path sends for non-Strings. This describes the reported String-to-mixed case, not all conceivable version histories. |
+| “It now keeps… Integer and Module conversions… 0..9… named module's name.” | Calls the unchanged helper only for eligible profiles. Correctly limits sharing to 0..9 and named Modules, not all frozen strings or all budgets. |
+| “The Integer and Module guards are unchanged.” | True: helper body and the non-String monomorphic guard are identical to base. New callers reuse them; Module name failure already had recompilation. |
+| Lobsters sentence and four stats lines; “per lobsters iteration” | Saved class data has 2,500 Strings and 538 Symbols. Saved two base and two -2 runs give 677.2 → 139.2 type exits and 10,166.3–10,166.7 → 9,628.8–9,628.9 total exits. Rounded numbers are supported historical evidence, not a fresh app/speed run on this dev head. |
+| First commit title and first paragraph | Same String-guard mechanism as body, verified against base/head and actual exits. |
+| First commit Lobsters paragraph | Same class/stat evidence; no added timing claim. |
+| First commit “Make the String guard recompile…” | Existing helper; no new global recompile policy. |
+| First commit “The next version takes…” | The String-to-mixed scenario produces that path. |
+| First commit “It now keeps…” | Same eligible conversion paths and 0..9/named-Module limits as the body. |
+| First commit final sentence about unchanged guards and “more than eight types” | Distribution capacity is eight; megamorphic summaries decline these arms and fall back to sends for non-Strings. It does not claim all final versions keep the Module arm. |
+| Second commit title and first sentence | The initial builtin String branch already handles exact/subclass/singleton Strings; none can reach a later arm. |
+| Second commit “`try_objtostring_cfunc()` doesn't convert Strings either…” | Helper accepts only Fixnums and Module subclasses; declined String block previously remained unreachable. |
+| Posted reply “Yes, thanks.” | Thanks for the actual inline finding, not filler. |
+| “The String branch… subclasses included…” | Correct for `types::String` and class-bearing buckets, as above. |
+| “f431e8a skips…; the two snapshots only change block and instruction IDs.” | Skip precedes `new_block`; normalized parent/head snapshots are identical after replacing `bbN`/`vN`. No printed block disappears. |
+| “I also rebased onto master.” | First parent is `522a37c28c` on `21ee43fb1e`; `git range-diff` of old `6a3dc53c87` and this first commit is `=`. No claim it follows future master tips. |
+
+Both commit objects use Thomas Klemm `<github@tklemm.eu>` as author/committer and have no trailers. The live body,
+both messages and already-posted reply need no correction. No body edit or upstream reply is proposed.
+
+**Build and executed checks.** Linux x86_64, GCC 14.2, Rust 1.100; bootstrap Ruby 4.0.9. Fresh exact-head build:
+
+```sh
+./autogen.sh
+./configure --enable-zjit=dev --disable-yjit --disable-install-doc --without-jemalloc
+make -j2
+make zjit-test
+make btest RUN_OPTS='--zjit --zjit-call-threshold=1'
+make btest RUN_OPTS='--zjit --zjit-call-threshold=2'
+```
+
+Installed missing bison and cargo-nextest 0.9.152 for the existing build/test workflow. Clean detached exact base
+was configured identically and built with `make -j2 miniruby` for the control. The Rust test harness sets its own
+call threshold (2); the explicit thresholds above exercise btest, not a second threshold setting for Rust tests.
+
+| Executed check | Result |
+| --- | --- |
+| Exact-head full `make zjit-test` | 2,016 passed, 1 failed, 15 skipped. |
+| Clean exact-base full `make zjit-test` | 2,014 passed, 1 failed, 15 skipped; same `test_profile_frames_during_direct_jit_to_jit_entry`, “rb_profile_frames was not called from SIGPROF handler”. This is reproduced on base, not proved to have any particular timing cause. |
+| Isolated profiler test, head | 2/2 runs passed; this does not turn either full suite green. |
+| btest, threshold 1 / threshold 2 | 2,148/2,148 passed each. |
+| Restored-head `make zjit-test ZJIT_TESTS=objtostring` | 24/24 passed. |
+| Focused differential probe | 208/208 result/error/event rows match interpreter in each of eight configs; one additional TracePoint row differs in three configs (below). |
+| Existing `ots1_2_diff_probe.rb` | 227/227 rows match interpreter in each of the same eight configs. |
+| Temporary-name/singleton-class probe | 11/11 rows match in each of five configs. |
+
+Eight configs: thresholds 1, 2, 30; threshold 2 with max versions 1; threshold 2 with max versions 2 or 3 and exit
+budget 1; threshold 2 with inlining disabled; threshold 60 with 40 profiles. The five name configs are thresholds
+1, 2, 30, max versions 2/exit budget 1, and noinline. Differential coverage includes hostile String subclasses,
+multiple shapes, singleton Strings, frozen/binary/UTF-8 strings, negative and boundary Fixnums, Bignums,
+refinements, redefinitions/restoration, singleton/extended Modules, Module subclasses, anonymous/temporary names,
+non-String/raising/private conversions, mid-expression mutation, fiber suspension and GC compaction.
+
+**TracePoint limitation, not hidden.** The focused probe has a separate final `:c_call` count for Integer `to_s`:
+interpreter 1, head 4 at thresholds 1/2 and noinline; exact base gives 4 in those same configs. A smaller probe
+with an unused Integer refinement gives interpreter 0, base/head 3 at threshold 2, and base/head 0 at threshold
+30. This is an existing interpreter/JIT event discrepancy, not an introduced must-fix. The full comparison
+runner deliberately still exits nonzero on it; no claim that all probe stdout is identical. All 208 other rows
+match; base also differs at max3 where head now matches. Investigate separately if pursued; nothing posted.
+
+**Mechanism/budgets and negative controls.** An inlined String-to-Integer site shows base type exits 80 then 80,
+head 1 then 0 in two 160-call phases (head total exits 2 then 0); outputs include -12, 10 and a Bignum and match.
+Unrelated caller compilation is possible, so these are not per-site compile counts. Mixed String/Integer/Module
+HIR contains the initial String branch, `FixnumToString`, Module/Class `rb_mod_name` arms and the final send, no
+String-subclass arm. With inlining disabled and max versions 1/2/3/4, the named/anonymous Module driver produces
+exactly 1/2/3/4 versions of its interpolation method. `rb_mod_name` calls by version are `[0]`, `[0,0]`, `[0,1,0]`,
+`[0,1,1,0]`. Final anonymous-only phase at budgets 2–4: zero type exits/compiles, 160 sends; budget 1: 160 exits.
+
+Three local deliberate wrong variants were built/run, then restored (not committed or pushed):
+
+1. Remove only String guard recompile metadata: both new tests fail (0/2 pass), expected 2 versions, actual 1.
+2. Narrow the polymorphic String branch to `StringExact`: 13 focused result/event rows diverge, including raising
+   subclass/singleton `to_s`; the unrelated TracePoint difference remains separately visible. This proves that
+   the subclass coverage is not a vacuous successful execution.
+3. Remove only the String-bucket skip: both new tests fail (0/2 pass), snapshots differ only in IDs. This catches
+   the requested compile-time change but does not itself prove runtime correctness.
+
+Exact source restored byte-for-byte; Ruby worktrees clean. Restored head binary hashes match saved original
+binaries (`ruby` SHA256 `a24cd14e82ffb6ececae98789083672d9e98214be8fbb8f29a3697aee1f73877`, `miniruby`
+`42f9c22d7e067dab3df627c4ac445c7cf79a01e8872d7abd1b173f0ba6afd243`). No snapshots accepted from a wrong variant.
+Scripts, stdout, HIR, discussion JSON and copied build/test logs are retained under
+`.amp/in/orb-backup/ots1-current/` in [this review thread](https://ampcode.com/threads/T-01a1fb10-8e0e-7052-9330-487001494928):
+`focused.rb`, `names.rb`, `arms.rb`, `budget.rb`, `mechanism.rb`, `trace.rb`, `run_probes.py`, `probe-results.json`,
+`arms-dump/`, `budget-ns{1,2,3,4}/` and `logs/`. From Lowrail root, `python3
+.amp/in/orb-backup/ots1-current/run_probes.py` reruns all eight value/event comparisons and intentionally reports
+the TracePoint mismatch. Use `ruby/miniruby --disable-gems --zjit --zjit-call-threshold=2 --zjit-stats-quiet
+--zjit-num-exits-until-invalidate=1 mechanism.rb` from that scratch directory for the exit control; substitute
+`base/miniruby` for base. HIR file output requires an existing directory, e.g. `--zjit-dump-hir=arms-dump/`.
+
+**Likely next maintainer question (prediction, not feedback).** The inline request is answered. The closest
+remaining questions are why a refused Symbol/non-String block is left allocated, or whether there is a semantic
+mixed-Module regression test in addition to HIR snapshots. The small cleanup/test above answers either; neither
+justifies another unsolicited upstream post. If asked about the final version, say explicitly that named Modules
+can revert to sends/allocation there rather than claiming every version preserves the conversion fast path.
 
 ### thermos-opus review of -3, 2026-11-20
 
