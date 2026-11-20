@@ -6,9 +6,9 @@ kind: perf
 area: Rack::Utils.escape/unescape, QueryParser#unescape
 reviewer: jeremyevans
 branch: thomasklemm/unescape-cgi
-head: "c0a8e93011567e93c80800f81bdd111b9f0fa166"
+head: "0282f31c32"
 base: main
-built_on: "da90464e3fa93e3cb49dc2d4ede798e6c6b70b4f"
+built_on: "07de23cdef"
 depends_on: []
 stacked_on:
 alternative_of:
