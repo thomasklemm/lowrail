@@ -3,7 +3,7 @@ id: OTS1
 repo: ruby/ruby
 kind: perf
 area: ZJIT, objtostring guards
-reviewer: "thermos-sol approves -2; precedent k0kubun's #19603 (coerce_to guards recompile)"
+reviewer: "thermos-sol approves -3; precedent k0kubun's #19603 (coerce_to guards recompile)"
 branch: thomasklemm/zjit-objtostring-recompile-3
 head: "f431e8a74c"
 base: master
@@ -16,10 +16,11 @@ rank: 3
 risky: false
 state: ready
 pr: 19982
-note: "2026-11-20 fix round -3 (answers tekknolagi's discussion_r4635641256): fork branch thomasklemm/zjit-objtostring-recompile-3 @ f431e8a74c = the -2 commit rebased unchanged onto master 21ee43fb1e (522a37c28c) plus one commit that skips String buckets before creating an arm block; snapshot IDs only. zjit-test 2016/2017 (only the known SIGPROF flake, passes alone 3/3), btest t1/t2 2148 each. The PR still points at 6a3dc53c87: not pushed to the PR branch, no reply posted, body unchanged; needs thermos-sol and thermos-opus on f431e8a74c and Thomas's OK on the reply draft (For Thomas). 2026-11-19 21:56 UTC: tekknolagi inline review on hir.rs:11231 (discussion_r4635641256): \"seems this should skip the `is_string` cases, no?\" In the polymorphic arms a String bucket reaches try_objtostring_cfunc, which returns None, so its arm block is left unused; the String case is already handled by the first CondBranchHasType. Fix round started 2026-11-20 on branch -3. 2026-11-18 (post-inline_block check on master 825d71e673, which force-inlines Primitive.inline_block methods): scratch merge of head into 825d71e673, --enable-zjit=dev, not pushed. make zjit-test 2015/2016, the one failure test_profile_frames_during_direct_jit_to_jit_entry (SIGPROF, also fails in the full master run here, 2013/2014); btest --zjit-call-threshold=1 2148/2148. No test or snapshot moved. Still merges clean (git merge-tree) with master a4beace140 (vm_eval.c only, not rebuilt). No rebuild needed; branch untouched, nothing posted. 2026-11-18 15:10 UTC: Thomas marked the PR ready for review. 2026-11-18 (opened, Thomas approved a draft after a green review): ruby/ruby#19982 as a draft at 6a3dc53c87 after the thermos-sol approve (17a88daf). 2026-11-18 (Thomas): open as a ruby/ruby draft once the thermos-sol review on the head approves. 2026-11-18 thermos-sol approves exact head 6a3dc53c87: both rubrics applied directly by one reviewer, including a fresh design check; no must-fix. Independently passed zjit-test 2,016/2,016 and btest t1/t2 2,148 each, reproduced both base failures and the old-head conversion loss, and reran release costs with the pinned tool and A/A. The previous changes verdict on 2cc3e0de4d is superseded for -2, not erased. Module conversion still declines in a final version; see the review's explicit allocation boundary. The permanent-exit exception waives the timing-evidence gate only. Not opened; no fork push or upstream post."
+note: "2026-11-20 thermos-sol approves whole PR on f431e8a74c including rebase, no code must-fix. Reply snapshot clause corrected locally to block/instruction IDs only. Full zjit-test twice: 2016 pass, one SIGPROF failure; clean base reproduces it (2014 pass, one failure), isolated head 0/3 on this orb. btest t1/t2 2148 each, objtostring 18/18, base negative controls and seven-configuration differential pass; details below. Still needs thermos-opus on this head and Thomas's corrected-reply OK. 2026-11-20 fix round -3 (answers tekknolagi's discussion_r4635641256): fork branch thomasklemm/zjit-objtostring-recompile-3 @ f431e8a74c = the -2 commit rebased unchanged onto master 21ee43fb1e (522a37c28c) plus one commit that skips String buckets before creating an arm block; snapshot IDs only. Builder's zjit-test 2016/2017 (only the known SIGPROF flake, passes alone 3/3), btest t1/t2 2148 each. The PR still points at 6a3dc53c87: not pushed to the PR branch, no reply posted, body unchanged. 2026-11-19 21:56 UTC: tekknolagi inline review on hir.rs:11231 (discussion_r4635641256): \"seems this should skip the `is_string` cases, no?\" In the polymorphic arms a String bucket reaches try_objtostring_cfunc, which returns None, so its arm block is left unused; the String case is already handled by the first CondBranchHasType. Fix round started 2026-11-20 on branch -3. 2026-11-18 (post-inline_block check on master 825d71e673, which force-inlines Primitive.inline_block methods): scratch merge of head into 825d71e673, --enable-zjit=dev, not pushed. make zjit-test 2015/2016, the one failure test_profile_frames_during_direct_jit_to_jit_entry (SIGPROF, also fails in the full master run here, 2013/2014); btest --zjit-call-threshold=1 2148/2148. No test or snapshot moved. Still merges clean (git merge-tree) with master a4beace140 (vm_eval.c only, not rebuilt). No rebuild needed; branch untouched, nothing posted. 2026-11-18 15:10 UTC: Thomas marked the PR ready for review. 2026-11-18 (opened, Thomas approved a draft after a green review): ruby/ruby#19982 as a draft at 6a3dc53c87 after the thermos-sol approve (17a88daf). 2026-11-18 (Thomas): open as a ruby/ruby draft once the thermos-sol review on the head approves. 2026-11-18 thermos-sol approves exact head 6a3dc53c87: both rubrics applied directly by one reviewer, including a fresh design check; no must-fix. Independently passed zjit-test 2,016/2,016 and btest t1/t2 2,148 each, reproduced both base failures and the old-head conversion loss, and reran release costs with the pinned tool and A/A. The previous changes verdict on 2cc3e0de4d is superseded for -2, not erased. Module conversion still declines in a final version; see the review's explicit allocation boundary. The permanent-exit exception waives the timing-evidence gate only. Not opened; no fork push or upstream post."
 passes:
   - {reviewer: thermos-sol, orb: T-01a1ee95-733f-70d2-80da-ed3434c4e36b, head: "2cc3e0de4d", date: 2026-11-18, verdict: changes, open: "P2: mixed Integer/Module interpolation loses specialized conversions after recompile (release allocation regression); narrow the change or preserve those conversions. Body and commit message overgeneralize frozen strings; cut that clause. Remove body pins/setup and unqualified two-runs claim. No semantic divergence found; both rubrics applied directly by one reviewer, as requested."}
   - {reviewer: thermos-sol, orb: T-01a1eecc-1498-73e9-88f9-20ed54fd2455, head: "6a3dc53c87", date: 2026-11-18, verdict: approve, open: "No must-fix. Both Thermos rubrics applied directly, including the fresh polymorphic-arm design check. Exact-head tests and negative controls executed; release allocations/slopes rerun with pinned Callgrind totals and A/A; body, message, guards, comments and identity checked. Final-version Module fallback remains an explicit limitation, not a universal allocation-parity claim."}
+  - {reviewer: thermos-sol, orb: T-01a1f995-3889-767b-a2bf-4ea3525b61d2, head: "f431e8a74c", date: 2026-11-20, verdict: approve, open: "No code must-fix on the whole rebased PR. Both rubrics applied directly without delegation. Corrected the reply's snapshot clause locally: only block/instruction IDs change; the unreachable String block was never printed. Two full zjit-test runs: 2016 passed, one SIGPROF failure, 15 skipped; clean exact base reproduces it (2014 passed, one failed), isolated head 0/3. btest t1/t2 2148 each; restored-head objtostring tests 18/18; both new tests fail on base production. Interpreter/base/head differential probes match in seven configurations. Needs the same-head thermos-opus pass and Thomas's reply approval; nothing posted or pushed to Ruby."}
 ---
 
 # ZJIT: Recompile when an objtostring String guard fails
@@ -67,8 +68,8 @@ and committer, no trailers. The -2 branch is untouched.
                                  let arm_block = fun.new_block(insn_idx);
 ```
 
-Tests: no new test. The two snapshots of the PR's own tests lose exactly the String arm's block and instruction
-(every later `bb`/`v` ID drops by one, nothing else changes), so reintroducing the arm fails them. A refused
+Tests: no new test. The two snapshots of the PR's own tests change only block and instruction IDs because the
+unreachable String block and its `RefineType` are no longer allocated; no printed block disappears. A refused
 non-String arm (the Symbol bucket in `test_objtostring_guard_failure_recompiles`) still leaves an unreachable block;
 he didn't ask about that, and avoiding it would duplicate the helper's eligibility checks (see the -2 review).
 
@@ -84,7 +85,109 @@ Reply draft for his comment:
 
 > Yes, thanks. The String branch before the arms already takes every String, subclasses included, so a String
 > arm could never run and its block was left unused. f431e8a skips String buckets before creating an arm block;
-> the two snapshots only lose that block. I also rebased onto master.
+> the two snapshots only change block and instruction IDs. I also rebased onto master.
+
+### thermos-sol review of -3, 2026-11-20
+
+Verdict: **approve**, no code must-fix, on exact head
+[`f431e8a74c0a2d9910115a485b42d8651a81c405`](https://github.com/thomasklemm/ruby/commit/f431e8a74c0a2d9910115a485b42d8651a81c405),
+two commits on `21ee43fb1ea46e168a148b174ca1ce95c080e7cf`. This reviewer loaded Thermos and applied both its
+correctness/security and maintainability rubrics directly, without subagents or other threads, as requested.
+This pass covers the whole PR, its rebase, both commit messages, the body and the reply draft. It does not replace
+the requested same-head thermos-opus pass or Thomas's approval of the reply. Only this Lowrail record was edited.
+
+**Rebase and scope.** `git range-diff 6a3dc53c87^..6a3dc53c87 21ee43fb1e..522a37c28c` reports `=`.
+`git merge-tree --write-tree 21ee43fb1e 6a3dc53c87` succeeds and gives exactly `522a37c28c^{tree}`
+(`88d8189d2e9540596d74f9ba7f5ba267b75c0319`). The whole candidate is two Rust files, +169/−4; production is
++22/−2. Inspected the intervening ZJIT payload/codegen cache change and forced `Primitive.inline_block` annotations,
+the latter's snapshot changes, and the adjacent VM method/call changes. The objtostring helper, profile/type
+contracts, recompile path and dispatch code have not changed underneath the rebased patch. Fresh execution below
+exercises the new master's forced Array#map/each inlining with objtostring guards and arms inside compiled owners.
+
+**Correctness and surviving guards.** Cold read: use a String unchanged; otherwise try each profiled non-String
+type for which the existing helper can convert directly; send `to_s` for the rest; merge the result. Only a failed
+monomorphic String guard now requests recompilation. The [dispatch](https://github.com/thomasklemm/ruby/blob/f431e8a74c0a2d9910115a485b42d8651a81c405/zjit/src/hir.rs#L11201-L11260)
+keeps the original pre-instruction exit state: no user conversion has run before its patchpoints or the Module
+name guard. `side_exit_with_recompile` identifies the compiled owner even for an inline frame; `exit_recompile`
+observes its exit/version budgets and invalidation re-stubs incoming calls and re-enables profiling. No new
+profiling state, instruction, invalidation mechanism or unbounded retry policy is introduced.
+
+* The monomorphic String guard protects direct interpolation and retains its existing no-singleton patchpoint.
+  The polymorphic String branch tests `T_STRING`, not exact String class, matching `vm_objtostring`'s bypass of `to_s`.
+* Each conversion arm's type branch dominates its `RefineType`. `polymorphic_arms` creates nonempty groups of
+  bit-equal `Type::from_profiled_type` values; those distinguish class and immediate/heap representation, not shape.
+  Thus `buckets[0]` is sufficient for both the new skip and the existing shape-independent conversion helper.
+  `ProfiledType::is_string` includes subclasses; their `StringSubclass` bits plus `TypeExact` class remain inside
+  `types::String`. Non-Module singleton profiles go to `other`, not an unsafe arm.
+* The unchanged helper checks the original C function and emits its existing `NoSingletonClass`, `NoTracePoint`
+  and `MethodRedefined` patchpoints. Fixnums cannot gain singleton classes. Redefined/refined methods and singleton
+  overrides still use invalidation/send paths; String overrides are intentionally bypassed as in the interpreter.
+* The Module/Class arm still refuses a final-version conversion and guards the name's String result, because
+  anonymous modules may have no name and must use `to_s`/`inspect`. Empty and both megamorphic profile kinds retain
+  the generic non-String send. The Integer/Module monomorphic receiver guards are byte-unchanged against base.
+
+**Maintainability.** L1 for the whole PR: a bounded extension of the existing objtostring owner using canonical
+dispatch and conversion machinery, no new helper/type/state or copied conversion eligibility checks. Both files
+already exceed 1,000 lines; neither crosses that boundary. The new `continue` removes known-useless construction
+at the right layer. Moving it into the conversion helper would be too late; a general dispatch abstraction would
+obscure the different snapshot/profile contracts of sends and these direct conversions. No obvious simplification
+justifies a broader refactor. Other refused candidates leave bounded unreachable blocks, ignored by RPO-based
+inference/cleanup/lowering; removing those would split or duplicate the helper's contract. No production comment
+was added. The test phase comments distinguish profiling, compilation and invalidation calls in the surrounding
+test idiom; snapshot fallback annotations are generated output. No comment or guard needs removal.
+
+**Executed verification, x86_64 Linux.** Fresh build with `--enable-zjit=dev --disable-yjit --disable-install-doc
+--without-jemalloc`, GCC 14.2.0, Rust 1.100.0, bootstrap Ruby 4.0.9, cargo-nextest 0.9.152.
+
+* `make zjit-test RUN_OPTS='--zjit --zjit-call-threshold=1'`, then `=2`: each **2,016 passed, one failed, 15 skipped**.
+  `RUN_OPTS` does not configure Rust tests: their harness sets threshold 2 itself and tests may override it.
+  Both commands were executed, but they are two full suite runs, not two Rust threshold configurations.
+* The only failure is `test_profile_frames_during_direct_jit_to_jit_entry` at `codegen_tests.rs:7619`,
+  `rb_profile_frames was not called from SIGPROF handler`. Three fixed isolated head runs also fail (0/3), unlike
+  the builder's 3/3 on its orb. A clean checkout/build of exact base `21ee43fb1e` reproduces the identical failure
+  in the full suite: **2,014 passed, one failed, 15 skipped**. This is a verified base failure, not a green suite
+  or a newly demonstrated regression. Its timing/signal root cause was not established here.
+* `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` and `=2`: **PASS all 2148 tests** each, on exact head.
+* Keeping the candidate tests but using exact base production makes both new tests fail at expected 2 / actual 1
+  versions (`opt_tests.rs:10457` and `:10535`). After restoring/rebuilding exact head,
+  `make zjit-test ZJIT_TESTS=test_objtostring`: **18 passed**. Fork source is clean and restored to the reviewed SHA.
+* The committed 227-row `ots1_2_diff_probe.rb` and a separate 129-row focused probe match interpreter/base/head in
+  seven configurations: thresholds 1, 2, 30; threshold 2 with max-versions 1; threshold 2 with max-versions 2 / exit
+  budget 1; threshold 2 without inlining; threshold 60 with 40 profiles. The focused cases cover String subclasses
+  with raising `to_s`, distinct shapes and singleton overrides, binary/frozen strings, Integer boundaries/Bignum,
+  Module subclasses, named/anonymous modules/classes, private and non-String/String-subclass conversion results,
+  exceptions, core-method redefinition/restoration, singleton creation/removal, GC compaction and suspended fibers.
+  Optimized HIR dumps with threshold 2 / exit budget 1 show `FixnumToString` and `rb_mod_name` arms, including inside
+  inlined owners, so this is not only fallback coverage. The original exit probe gives base 10,000 type exits /
+  two new compiles versus head 6 exits / three new compiles at threshold 2, with identical output.
+* Repeated the existing eight allocation probe modes at N=60,000 on base/head dev binaries: 120,014 objects in
+  each non-custom mode and 140,014 for custom, with zero compiles/invalidation time/ZJIT-allocation deltas in each
+  measured region. The documented worst boundary remains: head String/Module with max-versions 2 allocates 140,014
+  and sends 20,000 times, versus 120,014 / zero sends on base and default head. Values still agree. No new release
+  instruction-count, native-speed or app benchmark is claimed; ARM64 and app suites were not run.
+
+**Reply draft, sentence by sentence.** “Yes, thanks” acknowledges a concrete correct review observation. The first
+technical sentence is accurate: the String branch covers subclasses and the attempted String conversion returned
+`None`, leaving an unconnected block. The first clause of the next sentence is accurate: `f431e8a` skips whole
+String groups before `new_block`. Its original “the two snapshots only lose that block” clause was imprecise:
+the unreachable block was never printed. Extracting both affected test bodies at `522a37c28c` and `f431e8a74c`,
+then normalizing only `bb[0-9]+` and `v[0-9]+`, makes them byte-identical. The first test still prints 12 blocks
+across its two snapshots and the second 11. Corrected that clause above to “the two snapshots only change block
+and instruction IDs,” and corrected the supporting explanation. “I also rebased onto master” is verified by the
+range-diff/merge-tree and exact parent above. The corrected draft is accurate; it remains unposted for Thomas.
+
+**Body, messages and upstream context.** Checked the PR discussion only after the code audit: the sole inline
+comment is tekknolagi's stated String question, with no additional review finding. Live PR head is still
+`6a3dc53c87` on the -2 branch and its body matches this item's upstream body. The title and first three sentences
+match the base/head guard, negative controls and merged [coerce_to precedent](https://github.com/ruby/ruby/pull/19603).
+The conversion sentences match `try_objtostring_cfunc`, `vm_objtostring` and `numeric.c:4106` (shared Fixnum strings
+only for 0..9); the Integer/Module guards are unchanged. The Lobsters sentence is supported by the saved trace
+and class file (2,500 Strings, 538 Symbols). Recomputed the saved two base and two -2 runs: type exits 677.2 → 139.2,
+total exits 10,166.3–10,166.7 → 9,628.8–9,628.9 per iteration, supporting every displayed number and its label.
+These remain historical -2 measurements, not fresh app measurements on the new base. Both commit messages agree
+with the code and that evidence; both commits have Thomas as author/committer and empty trailers. The permanent-exit
+exception remains applicable to the timing-evidence gate only. No Ruby branch push, body edit, review or comment
+was made; the pending Opus pass and Thomas's corrected-reply approval remain separate gates.
 
 ### Rebuild -2, 2026-11-18
 
