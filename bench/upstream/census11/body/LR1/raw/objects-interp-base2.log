@@ -1,0 +1,6 @@
+objects lease_connection	-0.001
+objects with_connection	0.0
+objects has_many reset/load	121.0
+objects has_one reset/load	101.0
+objects belongs_to reset/load	101.0
+objects joins to_sql	106.0

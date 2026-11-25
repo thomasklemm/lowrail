@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/lr1/rails-base/activesupport"
+gem "activemodel", path: "/home/user/lr1/rails-base/activemodel"
+gem "activerecord", path: "/home/user/lr1/rails-base/activerecord"
+gem "sqlite3"
+gem "benchmark-ips"

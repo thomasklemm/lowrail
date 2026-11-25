@@ -1,0 +1,467 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/census11/lr1_miss.rb",
+  "at": "2026-11-25T15:39:01Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/lr1/rails-base",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "cf0325a832a1594f01d866da1e4ad23d962d886b",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/lr1/rails-head",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "7e342de11f12e6ee056e6c7ff5df713b2518e03c",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp fresh fiber with_connection": {
+      "base": 12.968,
+      "base1": 12.968,
+      "base2": 12.968,
+      "candidate": 12.999,
+      "change": 0.0023904996915484755,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp fresh fiber": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 4.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp registry miss, new key": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit fresh fiber with_connection": {
+      "base": 12.998999999999999,
+      "base1": 13.03,
+      "base2": 12.968,
+      "candidate": 12.968,
+      "change": -0.0023847988306792134,
+      "aa": 0.00476959766135852,
+      "claim": false
+    },
+    "yjit fresh fiber": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 4.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit registry miss, new key": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp fresh fiber with_connection": {
+      "base": 70628.03175,
+      "base1": 70629.608,
+      "base2": 70626.4555,
+      "candidate": 68735.503,
+      "change": -0.02679571698527472,
+      "aa": 0.00004463525206472298,
+      "claim": true
+    },
+    "interp fresh fiber": {
+      "base": 5909.03825,
+      "base1": 5908.977,
+      "base2": 5909.0995,
+      "candidate": 5908.7915,
+      "change": -0.000041758064436181463,
+      "aa": 0.00002073095397553065,
+      "claim": true
+    },
+    "interp registry miss, new key": {
+      "base": 7213.53275,
+      "base1": 7210.3755,
+      "base2": 7216.69,
+      "candidate": 7908.246,
+      "change": 0.0963069378176733,
+      "aa": 0.0008753685910692646,
+      "claim": true
+    },
+    "yjit fresh fiber with_connection": {
+      "base": 34139.9205,
+      "base1": 34146.9165,
+      "base2": 34132.9245,
+      "candidate": 33461.8025,
+      "change": -0.01986290507032673,
+      "aa": 0.00040984278214702846,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7034,
+                7034
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7034,
+                7034
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7035,
+                7035
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7035,
+                7035
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7034,
+                7034
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                432,
+                432
+              ],
+              "compiled_block_count": [
+                7034,
+                7034
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit fresh fiber": {
+      "base": 6121.646,
+      "base1": 6125.516,
+      "base2": 6117.776,
+      "candidate": 6117.5595,
+      "change": -0.0006675492179716302,
+      "aa": 0.00126436582579257,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                343,
+                343
+              ],
+              "compiled_block_count": [
+                6349,
+                6349
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit registry miss, new key": {
+      "base": 4742.2185,
+      "base1": 4741.061,
+      "base2": 4743.376,
+      "candidate": 5244.6465,
+      "change": 0.10594788072291483,
+      "aa": 0.00048816814324361253,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6391,
+                6391
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6391,
+                6391
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6396,
+                6396
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6396,
+                6396
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6391,
+                6391
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                347,
+                347
+              ],
+              "compiled_block_count": [
+                6391,
+                6391
+              ],
+              "invalidation_count": [
+                232,
+                232
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {}
+}

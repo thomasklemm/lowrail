@@ -1,0 +1,6 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Fetching benchmark-ips 2.15.1
+Installing benchmark-ips 2.15.1
+Bundle complete! 5 Gemfile dependencies, 23 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

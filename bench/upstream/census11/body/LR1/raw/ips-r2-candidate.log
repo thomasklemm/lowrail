@@ -1,0 +1,21 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+     lease_connection   193.898k i/100ms
+      with_connection   184.267k i/100ms
+  has_many reset/load     1.356k i/100ms
+   has_one reset/load     1.391k i/100ms
+belongs_to reset/load     1.508k i/100ms
+         joins to_sql     3.231k i/100ms
+Calculating -------------------------------------
+     lease_connection      1.886M (± 3.0%) i/s  (530.32 ns/i) -      9.501M in   5.038546s
+jit lease_connection	compiled_iseq_count=1278>1278 compiled_block_count=19132>19132 invalidation_count=279>279
+      with_connection      1.810M (± 2.8%) i/s  (552.46 ns/i) -      9.213M in   5.089977s
+jit with_connection	compiled_iseq_count=1282>1282 compiled_block_count=19157>19163 invalidation_count=279>279
+  has_many reset/load     13.269k (± 9.2%) i/s   (75.37 μs/i) -     66.444k in   5.007603s
+jit has_many reset/load	compiled_iseq_count=1282>1282 compiled_block_count=19165>19165 invalidation_count=279>279
+   has_one reset/load     14.493k (± 8.1%) i/s   (69.00 μs/i) -     72.332k in   4.990667s
+jit has_one reset/load	compiled_iseq_count=1282>1282 compiled_block_count=19165>19165 invalidation_count=279>279
+belongs_to reset/load     14.971k (± 7.3%) i/s   (66.79 μs/i) -     75.400k in   5.036246s
+jit belongs_to reset/load	compiled_iseq_count=1282>1282 compiled_block_count=19165>19165 invalidation_count=279>279
+         joins to_sql     32.784k (± 6.4%) i/s   (30.50 μs/i) -    164.781k in   5.026311s
+jit joins to_sql	compiled_iseq_count=1282>1282 compiled_block_count=19165>19209 invalidation_count=279>279

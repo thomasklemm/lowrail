@@ -1,0 +1,34 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Your bundle downgrades the following default gems shipped with ruby 4.1.0.dev:
+  * stringio 3.2.0 (default: 3.2.1.dev)
+Fetching concurrent-ruby 1.3.8
+Fetching connection_pool 3.0.3
+Fetching i18n 1.15.2
+Fetching date 3.6.0
+Fetching stringio 3.2.0
+Fetching json 3.2.0
+Fetching psych 5.5.0
+Fetching ractor-dispatch 0.3.0
+Fetching securerandom 0.4.1
+Installing i18n 1.15.2
+Fetching tzinfo 2.0.6
+Installing connection_pool 3.0.3
+Installing stringio 3.2.0 with native extensions
+Fetching uri 1.1.2
+Installing securerandom 0.4.1
+Fetching timeout 0.6.1
+Installing ractor-dispatch 0.3.0
+Installing date 3.6.0 with native extensions
+Fetching mini_portile2 2.8.9
+Fetching sqlite3 2.10.2
+Installing tzinfo 2.0.6
+Installing json 3.2.0 with native extensions
+Installing timeout 0.6.1
+Installing uri 1.1.2
+Installing mini_portile2 2.8.9
+Installing concurrent-ruby 1.3.8
+Installing sqlite3 2.10.2 with native extensions
+Installing psych 5.5.0 with native extensions
+Bundle complete! 4 Gemfile dependencies, 23 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

@@ -1,0 +1,6 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Your bundle downgrades the following default gems shipped with ruby 4.1.0.dev:
+  * stringio 3.2.0 (default: 3.2.1.dev)
+Bundle complete! 4 Gemfile dependencies, 23 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
