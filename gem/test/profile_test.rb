@@ -883,15 +883,21 @@ class ProfileTest < Minitest::Test
           RSpec.configure { |c| c.after(:suite) { child("after_suite") } }
           RSpec.describe("widgets") { it("serves") { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) } }
         RUBY
-      caller_env = { "SEED" => "99", "SPEC_OPTS" => "--no-color", "RUBYOPT" => "-W0", "RUBYLIB" => File.join(dir, "lib") }
+      # MT_NO_PLUGINS: the app is not bundled, so Minitest 5 would load every
+      # installed minitest's plugins (a 6.x beside 5.27 replaces it, 0 tests run).
+      caller_env = { "SEED" => "99", "SPEC_OPTS" => "--no-color", "RUBYOPT" => "-W0", "RUBYLIB" => File.join(dir, "lib"),
+        "MT_NO_PLUGINS" => "1" }
       plain = "RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"
-      suites = { "minitest" => [[RUBY, "suite_test.rb"], "test"] }
-      suites["rspec"] = [[RUBY, "-e", 'require "rspec/core"; exit RSpec::Core::Runner.run(ARGV)', "suite_spec.rb"], "after_suite"] if rspec
-      suites.each do |name, (command, child)|
-        _, err, status = Open3.capture3(profile_env(dir).merge(caller_env, "OUT" => "plain-#{name}"), *command, chdir: dir)
-        assert status.success?, err
+      suites = { "minitest" => [[RUBY, "suite_test.rb"], "test", /^1 runs, \d+ assertions, 0 failures, 0 errors/] }
+      suites["rspec"] = [[RUBY, "-e", 'require "rspec/core"; exit RSpec::Core::Runner.run(ARGV)', "suite_spec.rb"], "after_suite", /^1 example, 0 failures/] if rspec
+      suites.each do |name, (command, child, ran)|
+        out, err, status = Open3.capture3(profile_env(dir).merge(caller_env, "OUT" => "plain-#{name}"), *command, chdir: dir)
+        assert status.success?, "#{name} plain: #{status.inspect}\n#{err}\n#{out}"
+        assert_match ran, out, "#{name} plain: the suite ran its test"
         out, err, status = profile(dir, "--runs", "1", "--out", "p-#{name}", "--", *command, env: caller_env.merge("OUT" => "profiled-#{name}"))
-        assert status.success?, err
+        assert status.success?, "#{name} profiled: #{status.inspect}\n#{err}\n#{out}"
+        assert_match ran, out, "#{name} profiled: the suite ran its test"
+        assert_match(/lowrail-profile: run 1 of 1/, err, "#{name}: the caller's -W0 does not silence lowrail-profile")
         assert_match(/--seed 1234|Randomized with seed 1234/, out + err, "#{name}: the suite has the seed")
         assert_equal 1, Dir[File.join(dir, "p-#{name}/run1/*.tsv")].size, "#{name}: only the suite's process is profiled"
         assert_equal [plain, plain], %w[plain profiled].map { File.read(File.join(dir, "#{_1}-#{name}-#{child}.txt")) }, name

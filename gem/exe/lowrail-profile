@@ -180,13 +180,13 @@ statuses = (1..runs).map do |n|
     "LOWRAIL_PROFILE_LIB" => lib, "LOWRAIL_PROFILE_CALLER_SEED" => ENV["SEED"], "LOWRAIL_PROFILE_CALLER_SPEC_OPTS" => ENV["SPEC_OPTS"],
     "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
     "RUBYOPT" => [ENV["RUBYOPT"], ("-I#{lib}" unless lib.match?(/\s/)), "-rlowrail/profile"].compact.join(" ") }
-  warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
+  $stderr.puts "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   system(env, *command)
   # A shell's convention: the exit status, or 128 + the signal that ended it.
   status = $?.exitstatus || 128 + $?.termsig.to_i
   # A workloads run that stops (a refused write, a response outside expect:) measured nothing to repeat.
   if workloads && status != 0
-    warn "lowrail-profile: the workloads run exited #{status}; nothing measured"
+    $stderr.puts "lowrail-profile: the workloads run exited #{status}; nothing measured"
     exit status
   end
   status
@@ -206,7 +206,7 @@ begin
   report.write
   puts report.markdown
 rescue StandardError => error
-  warn "lowrail-profile: no report: #{error.message}; the command exited #{statuses.join(", ")}"
+  $stderr.puts "lowrail-profile: no report: #{error.message}; the command exited #{statuses.join(", ")}"
   exit(failed || 1)
 end
 begin
@@ -217,7 +217,7 @@ begin
     merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept", "unfiltered") }
       .map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
     if merged.empty?
-      warn "lowrail-profile: --record saw no routed requests; nothing written"
+      $stderr.puts "lowrail-profile: --record saw no routed requests; nothing written"
     else
       FileUtils.mkdir_p(File.dirname(target))
       File.write(target, Lowrail::Workloads.render(Lowrail::Workloads.recorded(merged, 20), <<~TEXT))
@@ -229,13 +229,13 @@ begin
         Recorded from real requests: values the app's filter_parameters hides are #{Lowrail::Workloads::FILTERED},
         but check the file for other secrets before you commit it.
       TEXT
-      warn "lowrail-profile: wrote #{target} from real requests (filter_parameters applied); check it for secrets before committing it"
+      $stderr.puts "lowrail-profile: wrote #{target} from real requests (filter_parameters applied); check it for secrets before committing it"
     end
   end
 rescue StandardError => error
-  warn "lowrail-profile: --record: #{error.message}"
+  $stderr.puts "lowrail-profile: --record: #{error.message}"
   exit(failed || 1)
 end
-warn "lowrail-profile: report in #{File.join(out, "report.md")}"
-warn "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
+$stderr.puts "lowrail-profile: report in #{File.join(out, "report.md")}"
+$stderr.puts "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
 exit(failed || 0)
