@@ -1,0 +1,40 @@
+BrowseHelperTest#test_printable_element_name = 0.28 s = .
+BrowseHelperTest#test_element_icon = 0.29 s = .
+SearchesControllerTest#test_identify_error = 0.01 s = .
+SearchesControllerTest#test_nominatim_reverse_link_without_zoom = 0.03 s = .
+SearchesControllerTest#test_routes = 0.00 s = .
+SearchesControllerTest#test_identify_format = 0.22 s = .
+SearchesControllerTest#test_identify_latlon_sw_dm = 0.14 s = .
+SearchesControllerTest#test_identify_ca_postcode = 0.03 s = .
+SearchesControllerTest#test_identify_latlon_se_d = 0.09 s = .
+SearchesControllerTest#test_identify_latlon_ne_mixed_precision = 0.13 s = .
+SearchesControllerTest#test_nominatim_reverse_link_with_zero_zoom = 0.04 s = .
+SearchesControllerTest#test_identify_latlon_ne_d_int_deg = 0.19 s = .
+Api::ChangesetCommentsControllerTest#test_create_by_experienced_user_with_rate_limit = 0.76 s = .
+SearchesControllerTest#test_identify_latlon_nw_dms = 0.17 s = .
+SearchesControllerTest#test_identify_latlon_nw_d = 0.07 s = .
+SearchesControllerTest#test_identify_latlon_close_to_zero = 0.10 s = .
+SearchesControllerTest#test_identify_latlon_nw_dm = 0.09 s = .
+SearchesControllerTest#test_identify_us_postcode = 0.10 s = .
+SearchesControllerTest#test_identify_latlon_se_dms = 0.21 s = .
+SearchesControllerTest#test_identify_latlon_ne_dms = 0.19 s = .
+SearchesControllerTest#test_identify_uk_postcode = 0.15 s = .
+SearchesControllerTest#test_identify_latlon_sw_d = 0.18 s = .
+SearchesControllerTest#test_search_osm_nominatim_reverse_json = 0.15 s = .
+SearchesControllerTest#test_identify_latlon_ne_d = 0.07 s = .
+NodeTagTest#test_length_key_valid = 0.04 s = .
+NodeTagTest#test_length_value_invalid = 0.04 s = .
+NodeTagTest#test_orphaned_node_tag_invalid = 0.03 s = .
+NodeTagTest#test_uniqueness = 0.05 s = .
+NodeTagTest#test_length_value_valid = 0.02 s = .
+NodeTagTest#test_length_key_invalid = 0.07 s = .
+SearchesControllerTest#test_identify_latlon_sw_dms = 0.25 s = .
+SearchesControllerTest#test_identify_latlon_se_dm = 0.26 s = .
+SearchesControllerTest#test_no_identify_latlon_ne_missing_fraction_part = 0.53 s = .
+
+Finished in 75.190786s, 36.6667 runs/s, 17504.4984 assertions/s.
+2757 runs, 1316177 assertions, 0 failures, 0 errors, 0 skips
+Coverage report generated for Minitest, Minitest (subprocess: 1)-0, Minitest (subprocess: 2)-1, Minitest (subprocess: 3)-2, Minitest (subprocess: 4)-3, Minitest (subprocess: 5)-4, Minitest (subprocess: 6)-5, Minitest (subprocess: 7)-6, Minitest (subprocess: 8)-7 to coverage/index.html
+Line coverage: 7465 / 7740 (96.44%)
+Lcov style coverage report generated for Minitest, Minitest (subprocess: 1)-0, Minitest (subprocess: 2)-1, Minitest (subprocess: 3)-2, Minitest (subprocess: 4)-3, Minitest (subprocess: 5)-4, Minitest (subprocess: 6)-5, Minitest (subprocess: 7)-6, Minitest (subprocess: 8)-7 to coverage/lcov.info
+exit 0 secs 81

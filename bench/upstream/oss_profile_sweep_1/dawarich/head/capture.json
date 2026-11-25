@@ -1,0 +1,1 @@
+{"format":1,"identity":{"mode":"command","argv":["bundle","exec","rspec","spec/requests","--format","documentation"]},"argv":["bundle","exec","rspec","spec/requests","--format","documentation"],"seed":"1234","runs":2,"exit":[0,0]}

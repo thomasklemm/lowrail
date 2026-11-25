@@ -1,0 +1,24 @@
+# lowrail-profile compare
+
+Base: `bundle exec rspec spec/requests --format documentation`. Head: `bundle exec rspec spec/requests --format documentation`.
+
+Objects per request (all, by run): base 16987.0 / 16980.9, head 16980.6 / 16990.1.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request, mail.
+
+## Regressions: 3
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | ResponseTemplatesController#update | 15028.3 | 15154.4 | +126.10 | 20.0 |
+| request action | ModerationsController#article | 23629.3 | 23686.25 | +56.95 | 23.69 |
+| request action | ModerationsController#actions_panel | 27980.35 | 28009.3 | +28.95 | 28.01 |
+
+## Improvements: 2
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | ArticlesController#manage | 24097.45 | 24054.95 | -42.50 | 24.1 |
+| request action | Api::V1::TagsController#create | 11397.6 | 11374.45 | -23.15 | 20.0 |
+
+Not compared: 103 actions (103 no warm value).

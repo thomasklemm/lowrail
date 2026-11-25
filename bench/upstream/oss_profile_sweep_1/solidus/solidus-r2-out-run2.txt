@@ -1,0 +1,1028 @@
+  as a non admin
+    cannot see any customer returns
+    cannot create a new customer return
+    cannot see a single customer return
+    cannot learn how to create a new customer return
+    cannot update a customer return
+  as an admin
+    can view admin_metadata
+    can update a customer return admin_metadata
+    can query the results through a parameter
+    can control the page size through a parameter
+    can show customer return
+    can get a list of customer returns
+    can learn how to create a new customer return
+    can update a customer return
+    when creating new return items
+      can create a new customer return
+    when referencing existing return items
+      does not change the reception status of the return item
+      can create a new customer return
+      with reception_status_event provided for return item
+        updates the reception status of the return item
+  can list a single option type
+  cannot alter an option type
+  can search for an option type
+  cannot create a new option type
+  can list all option types
+  can retrieve a list of specific option types
+  cannot delete an option type
+  as an admin
+    can create an option type with nested option values
+    can delete an option type
+    cannot create an option type with invalid attributes
+    can update an option type
+    can create an option type
+    cannot update an option type with invalid attributes
+  is able to checkout with the create request
+  is able to checkout with individualized requests
+  is able to checkout with the update request
+  can control the page size through a parameter
+  gets a zone
+  can query the results through a paramter
+  gets list of zones
+  as an admin
+    updates a zone
+    can create a new zone
+    can delete a zone
+    when the user is authorized
+      updates the credit card
+    when the user is not authorized
+      rejects the request
+    the user id doesn't exist
+    calling user is in admin role
+      no credit cards exist for user
+      can view all credit cards for user
+    calling user is not in admin role
+      can view own credit cards
+      can not view admin user cards
+      when user has multiple credit cards
+        can control the page size through a parameter
+        can query the results through a parameter
+    refuses a guest card built by a real guest checkout
+    refuses to update a stranger's guest credit card
+  as address book owner
+    with ability
+      returns my address book
+      removes the address from my address book
+      updates my address book
+      when updating a default address
+        changes the address and marks the changed address as default
+      when updating an address
+        marks the update_target
+      when creating an address
+        marks the update_target
+      when updating a default address with email, VAT-ID and reverse charge status
+        changes the address and marks the changed address as default
+  unauthenticated
+    DELETE returns a 401
+    GET returns a 401
+    UPDATE returns a 401
+  on behalf of address book owner
+    without ability
+      does not archive another user address
+      does not update another user address
+      does not return another user address book
+    with ability
+      updates another user's address
+      returns another user's address book
+      removes the address from the other user's address book
+  lets a subclass override the product associations that are eager-loaded
+  when validating based on an order token
+    with an incorrect order token
+      returns unauthorized
+    with a correct order token
+      succeeds
+      succeeds with an order_number parameter
+  cannot make a request to the API
+    without an API key
+    with an invalid API key
+    using an invalid token param
+  when validating presence of params
+    if params are missing
+      returns an unprocessable_entity
+    if params are not missing
+      does not return an unprocessable_entity
+    with @order not defined
+      returns a 422 status
+      serializes the errors
+    with @order defined
+      returns a 422 status
+      serializes the gateway errors with existing order errors
+  insufficient stock
+    returns an error message
+    should return a 422
+  lock_order
+    without an existing lock
+      succeeds
+    with an existing lock
+      returns a 409 conflict
+  GET mine
+    no current api user
+      returns a 401
+    the current api user is authenticated
+      the user has store credit
+        returns a 200
+        should contain the store credit allocation event
+      the user doesn't have store credit
+        returns a 200
+        should set the events variable to empty list
+  as another non-admin user that's not the order's owner
+    cannot create a new return authorization
+  as just another user
+    cannot update a return authorization on the order
+    cannot add a return authorization to the order
+    cannot delete a return authorization on the order
+  as an admin
+    can show return authorization
+    can view admin_metadata
+    can update a return authorization on the order
+    can update a return authorization on the order and metadata
+    can control the page size through a parameter
+    can query the results through a paramter
+    can get a list of return authorizations
+    can learn how to create a new return authorization
+    can delete a return authorization on the order
+    can cancel a return authorization on the order
+    behaves like a return authorization creator
+      cannot create a return authorization for another order's inventory unit
+      can create a new return authorization
+  as the order owner
+    cannot delete a return authorization
+    cannot update a return authorization
+    cannot see a single return authorization
+    cannot see any return authorizations
+    cannot learn how to create a new return authorization
+    behaves like a return authorization creator
+      cannot create a return authorization for another order's inventory unit
+      can create a new return authorization
+  as a user
+    when the order does not belong to the user
+      can view the payments for an order given the order token
+      cannot view payments for somebody else's order
+    when the order belongs to the user
+      cannot update a payment
+      can view a pre-existing payment's details
+      can learn how to create a new payment
+      cannot authorize a payment
+      cannot view admin_metadata
+      can view the payments for their order
+      payment source is not required
+        allows creating payment with customer metadata but not admin metadata
+        can create a new payment
+        disallowed payment method
+          does not create a new payment
+      payment source is required
+        no source is provided
+          returns errors
+        source is provided
+          can create a new payment
+          when the gateway profile id belongs to another user's card
+            does not create a payment
+  as an admin
+    can view the payments on any order
+    for a given payment
+      purchasing
+        can purchase
+        purchasing fails
+          returns a 422 status
+      updating
+        can update
+        update fails
+          can update a payment admin_metadata
+          returns a 403 status when the payment is not pending
+          returns a 422 status when the amount is invalid
+          can view admin_metadata
+      voiding
+        can void
+        voiding fails
+          returns a 422 status
+      capturing
+        can capture
+        capturing fails
+          returns a 422 status
+      authorizing
+        can authorize
+        authorization fails
+          returns a 422 status
+    multiple payments
+      can control the page size through a parameter
+      can view all payments on an order
+      can query the results through a parameter
+  as an admin
+    can delete a product
+    can see all products
+    updating a product
+      puts primary taxon for the updated product
+      puts the created product in the given taxons
+      can update a product
+      puts the created product in the given taxon
+      can update an existing variant on a product
+      can create new option types on a product
+      cannot update a product with an invalid attribute
+      can create new variants on a product
+    deleted products
+      does not include deleted products
+      can include deleted products
+    behaves like not shared-cacheable product responses
+      does not allow shared caches to store the product list
+      does not allow shared caches to store a single product
+    creating a product
+      puts the created product in the given taxon
+      can create a new product with embedded product_properties
+      can create a new product
+      cannot create a new product with invalid attributes
+      creates with embedded variants
+      puts the created product in the given taxons
+      puts primary taxon for the product
+      creates with shipping categories
+      can create a new product with option_types
+      when tracking is disabled
+        still displays valid json with total_on_hand Float::INFINITY
+      with authentication_required set to false
+        can still create a product
+  as a normal user
+    retrieves a list of products by id
+    retrieves a list of products
+    gets a single product
+    cannot see inactive products
+    loads stock for every product variant without an N+1
+    does not return inactive products when queried by ids
+    does not list unavailable products
+    retrieves a list of products by ids string
+    can search for products
+    can learn how to create a new product
+    returns a 404 error when it cannot find a product
+    finds a product by slug first then by id
+      is expected to match /droids/
+    product has more than one price
+      returns distinct products only
+    tracking is disabled
+      still displays valid json with total_on_hand Float::INFINITY
+    pagination
+      can control the page size through a parameter
+      can select the next page of products
+    behaves like modifying product actions are restricted
+      cannot create a new product if not an admin
+      cannot delete a product
+      cannot update a product
+    behaves like not shared-cacheable product responses
+      does not allow shared caches to store a single product
+      does not allow shared caches to store the product list
+    with caching enabled
+      returns unique products
+  can learn how to create a new variant
+  cannot delete a variant
+  cannot update a variant
+  cannot create a new variant if not an admin
+    can see a single variant
+    can see a single variant with images
+    when tracking is disabled
+      still displays valid json with total_on_hand Float::INFINITY
+    variant has variant properties
+      variant properties is an array of variant property values
+      contains the expected attributes
+    variant doesn't have variant properties
+      variant properties is an empty list
+      contains the expected attributes
+  when a product is not yet available
+    cannot show its variant
+    cannot list its variants
+    does not include its variants in the index
+    as an admin
+      can list its variants
+      can show its variant
+      includes its variants in the index
+  when a product is discontinued
+    cannot list its variants
+    does not include its variants in the index
+    cannot show its variant
+    can query the results through ransack
+    can query the results through the search class
+    variants returned contain option values data
+    variants returned contain images data
+    can see a paginated list of variants
+    can control the page size through a parameter
+    stock filtering
+      only variants in stock
+        variant is out of stock
+          is not returned in the results
+        variant is in stock
+          is returned in the results
+      only suplliable variants
+        variant is backorderable
+          is not returned in the results
+        variant is unsuppliable
+          is returned in the results
+      all variants
+        variant is out of stock
+          is returned in the results
+        variant is in stock
+          is returned in the results
+    a deleted variant
+      is not returned even when show_deleted is passed
+      is not returned in the results
+    stock item filter
+      only returns stock items for active stock locations
+    pagination
+      can select the next page of variants
+  as an admin
+    variants returned contain cost price data
+    creates new variants with nested option values
+    can update a variant
+    create new variants with options
+    can create a new variant
+    creates a new variant with tax category
+    can delete a variant
+    deleted variants
+      are visible by admin
+  as an admin
+    cannot create a new taxon with invalid attributes
+    cannot create a new taxon with invalid taxonomy_id
+    can destroy
+    can create
+    can update the position in the list
+  as a normal user
+    gets all taxons for a taxonomy
+    cannot create a new taxon if not an admin
+    can learn how to create a new taxon
+    does not include children when asked not to
+    paginates through taxons
+    cannot update a taxon if not an admin
+    gets a single taxon
+    cannot delete a taxon if not an admin
+    getting all products into a taxon
+      can query the resulting products through a parameter
+      returns all the products with detailed information
+      returns a simplified json response when simple: true is passed
+      with caching enabled
+        handles exclude_data correctly
+    filtering by taxon ids
+      returns only requested ids
+      returns only requested id
+    searching
+      with a name
+        with no results
+          returns an empty array of taxons
+        with one result
+          returns an array including the matching taxon
+      with no filters
+        gets all taxons
+  as a normal user
+    can create a new user
+    cannot update other users details
+    cannot get other users details
+    can view customer_metadata
+    should only get own details on index
+    cannot delete itself
+    cannot delete other user
+    can update own details
+    cannot view admin_metadata
+    can get own details
+    can learn how to create a new user
+    can update own details in JSON with unwrapped parameters (Rails default)
+    cannot create a new user with invalid attributes
+    can create a new user with customer_metadata
+  updating passwords
+    allows a user to update their own password
+    with the user management permission set
+      ignores the password of a user with roles
+      allows updating the password of a user without roles
+  as an admin
+    can create
+    gets all users
+    softs-deletes when user is soft-deletable
+    can view admin_metadata
+    can control the page size through a parameter
+    cannot destroy user with orders
+    loads user addresses without an N+1
+    can update admin_metadata
+    returns distinct search results
+    can update
+    can query the results through a paramter
+    can destroy user without orders
+  without any option type scoping
+    can retrieve a list of all option values
+  filtering by product
+    can filter by product
+  for a particular option type
+    can list all option values
+    cannot delete an option value
+    can search for an option type
+    cannot alter an option value
+    cannot create a new option value
+    can list a single option value
+    can retrieve a list of option types
+    as an admin
+      can delete an option value
+      cannot create an option type with invalid attributes
+      can create an option value
+      permits the correct attributes
+      cannot update an option value with invalid attributes
+      can update an option value
+  as an admin
+    can list stock items
+    gets a stock item
+    requires a stock_location_id to be passed as a parameter
+    can control the page size through a parameter
+    can delete a stock item
+    can query the results through a paramter
+    creating a stock item
+      creates a stock movement
+      can create a new stock item
+      variant tracks inventory
+        sets the stock item's count_on_hand
+      attempting to set negative inventory
+        does not allow negative inventory for the stock item
+      variant does not track inventory
+        doesn't set the stock item's count_on_hand
+    updating a stock item
+      adjusting count_on_hand
+        can update a stock item to add new inventory
+        creates a stock movement for the adjusted quantity
+        not tracking inventory
+          doesn't set the stock item's count_on_hand
+        tracking inventory
+          sets the stock item's count_on_hand
+        attempting to set negative inventory
+          does not allow negative inventory for the stock item
+      setting count_on_hand
+        creates a stock movement for the adjusted quantity
+        can set a stock item to modify the current inventory
+        tracking inventory
+          updates the stock item's count_on_hand
+        attempting to set negative inventory
+          does not allow negative inventory for the stock item
+        not tracking inventory
+          doesn't update the stock item's count_on_hand
+  as a normal user
+      cannot list stock items for an inactive stock location
+      can list stock items for an active stock location
+      cannot see a stock item for an inactive stock location
+      can see a stock item for an active stock location
+      cannot update a stock item
+      cannot create a stock item
+      cannot destroy a stock item
+  does not have inconsistent interpolations
+  does not have unused keys
+  does not have missing keys
+  files are normalized
+  can learn how to create a new line item
+  as the order owner
+    can delete a line item on the order
+    default quantity to 1 if none is given
+    can update a line item on the order
+    allows creating line item with customer metadata but not admin metadata
+    cannot see admin_metadata
+    can add a new line item to an existing order with options
+    can add a new line item to an existing order
+    can update a line item customer metadata on the order
+    increases a line item's quantity if it exists already
+    can update a line item's options on the order
+    when the variant's product is not yet available
+      cannot add the line item
+    dealing with a completed order
+      can't add a new line item
+      can't update a line item
+      can't delete a line item
+    when the variant's product is discontinued
+      cannot add the line item
+    order contents changed after shipments were created
+      clear out shipments on delete
+      clear out shipments on create
+      clear out shipments on update
+      order is completed
+        doesn't destroy shipments or restart checkout flow
+  as an admin
+    can add a line item for a discontinued product
+    can see admin_metadata
+    allows creating line item with customer metadata and admin metadata
+    can add a line item for a product that is not yet available
+  authenticating with a token
+    can add a new line item to an existing order
+    can add a new line item to an existing order with token in header
+  as just another user
+    cannot update a line item on the order
+    cannot add a new line item to the order
+    cannot delete a line item on the order
+  restarts the checkout when the ship address changes
+  can see a list of all properties
+  can see a property by name
+  cannot create a new property if not an admin
+  can learn how to create a new property
+  can see a single property
+  retrieves a list of properties by ids string
+  cannot delete a property if not admin
+  can control the page size through a parameter
+  cannot update a property if not admin
+  retrieves a list of properties by id
+  can query the results through a parameter
+  as an admin
+    can update a property
+    can create a new property
+    can delete a property
+  can generate an API key
+  can clear an api key without persisting
+  can clear an API key
+  can generate an API key without persisting
+  auto-api-key grant
+    after user create
+      generate_api_key_for_all_roles
+        grants an api key on create when set to true
+        does not grant api key default
+    after role user create
+      roles_for_auto_api_key is defined
+        is expected to change `user.reload.spree_api_key` from nil
+        is expected not to change `user.reload.spree_api_key`
+      for all roles
+        is expected to change `user.reload.spree_api_key` from nil
+        is expected to change `other_user.reload.spree_api_key` from nil
+      roles_for_auto_api_key default
+        the user already has an api key
+          is expected not to change `user.reload.spree_api_key`
+        the user has no api key
+          is expected to change `user.reload.spree_api_key` from nil
+  PUT 'next'
+    can transition an order to the next state
+    cannot transition to address without a line item
+    cannot transition if order email is blank
+  complete
+    with order in confirm state
+      can transition from confirm to complete
+      returns a sensible error when no payment method is specified
+      when cannot complete
+        returns a state machine error
+      with mismatched expected_total
+        returns an error if expected_total is present and does not match actual total
+  PUT 'update'
+    can take line_items as a parameter
+    returns errors when source is required and missing
+    returns the order if the order is already complete
+    can take line_items_attributes as a parameter
+    cannot update attributes of another step
+    can update payment method and transition from payment to confirm
+    can update shipping method and transition from delivery to payment
+    should transition a recently created order from cart to address
+    should transition a recently created order from cart to address with order token in header
+    can assign an email to the order
+    will return an error if the order cannot transition
+    when the current user can administer orders but cannot see users
+      cannot assign a user to the order
+    when source is missing attributes
+      returns errors
+    reusing another user's gateway profile id
+      does not create a payment
+    in delivery state
+      can update the special instructions for an order
+    transitioning to delivery
+      does not contain duplicate variant data in delivery return (PENDING: SQLite adapter fails sometimes to provide a unique index for the convoluted chain
+      can update addresses and transition from address to delivery (PENDING: SQLite adapter fails sometimes to provide a unique index for the convoluted chain
+      can update addresses but not transition to delivery w/o shipping setup
+    as an admin
+      can assign a user to the order
+    reusing a credit card
+      succeeds
+    setting the payment amount
+      sets the payment amount to the order total
+    with disallowed payment method
+      returns not found
+    reusing a guest's gateway profile id
+      does not create a payment
+    when attempting to set a state on an order
+      and arbitrary state setting is disabled
+        does not allow setting a future state
+        allows setting a previous state
+        allows setting the current state
+      and arbitrary state setting is enabled
+        allows setting the current state
+        allows setting a previous state
+        allows setting a future state
+    payment method with source and transition from payment to confirm
+      succeeds
+  PUT 'advance'
+    continues to advance an order while it can move forward
+    returns the order
+  returns some configuration settings
+  returns Spree::Money settings
+  cannot arbitrarily set the line items price
+  can view an order if the token is passed in header
+  can create an order
+  orders contain the basic checkout steps
+  can view an order if the token is known
+  can view their own order
+  can create an order without any parameters
+  cannot view all orders
+  can not view someone else's order
+  cannot cancel an order that doesn't belong to them
+  assigns email when creating a new order
+  admin user imports order
+    is able to set any default unpermitted attribute
+  the current api user is authenticated
+    can filter the returned results
+    cannot view orders for a different store
+    returns orders in reverse chronological order by completed_at
+    can view all of their own orders for the current store
+  specifying additional parameters for a line items
+    is allowed using options parameter
+    is allowed on line item level
+  PUT update
+    when the user cannot administer the order
+      updates the user's email
+      is expected to be successful
+      does not associate users
+      does not change forbidden attributes
+      when attempting to update the variant on an existing line item
+        does not update the variant
+        creates a new variant
+      creating payment
+        with allowed payment method
+          is expected to be successful
+          creates a payment
+          trying to change the address
+            invalidates the shipments
+            changes the address
+        with disallowed payment method
+          is expected to be not found
+          creates no payments
+    when the user can administer the order
+      updates the otherwise forbidden attributes
+      will associate users
+    when the user can administer the order but cannot see users
+      is expected to be not found
+      does not update the order
+      without a user_id
+        updates the order
+  GET #show
+    when shipment adjustments are present
+      contains adjustments on shipment
+    when inventory information is present
+      contains stock information on variant
+    when credit cards are present
+      contains the credit cards
+      renders the payment source view for gateway
+    when store credit is present
+      renders the payment source view for store credit
+    when an item does not track inventory
+      contains stock information on variant
+  working with an order
+    can add shipping address
+    receives error message if trying to add billing address with errors
+    updates quantities of existing line items
+    receives error message if trying to add shipping address with errors
+    cannot set the user_id for the order
+    adds an extra line item
+    can add billing address
+    cannot change the price of an existing line item
+    order has shipments
+      clears out all existing shipments on line item update
+    with a line item
+      lists variants product id
+      includes the tax_total in the response
+      can list its line items with images
+      lists payments source without gateway info
+      can empty an order
+      lists line item adjustments
+      when in delivery
+        includes the ship_total in the response
+        returns available shipments for an order
+  POST create
+    when the current user cannot administrate the order
+      does not include unpermitted params, or allow overriding the user
+      is expected to be successful
+      creating payment
+        when passing an amount
+          ignores the amount parameter
+        with disallowed payment method
+          is expected to be not found
+          creates no payments
+        with allowed payment method
+          creates a payment
+          is expected to be successful
+    when the current user can administrate the order
+      is expected to be successful
+      it permits all params and allows overriding the user
+    when the line items have custom attributes
+      can create an order with line items that have custom permitted attributes
+    when the user is not admin but has ability to create and update orders
+      cannot view admin_metadata
+      allows creating order with customer metadata but not admin metadata
+      cannot update customer metadata if the order is complete
+      allows updating order but ignores admin metadata
+    when the current user can administrate the order but cannot see users
+      is expected to be not found
+      does not create an order
+      without a user_id
+        creates the order for the current user
+  the current api user does not exist
+    returns a 401
+  as an admin
+    lists payments source with gateway info
+    search
+      can query the results through a parameter
+    updating
+      can view admin_metadata
+      cannot cancel not completed order
+      can update a order admin_metadata
+      can set the user_id for the order
+      can update customer metadata if the order is complete
+    caching enabled
+      returns unique orders
+    with two orders
+      can control the page size through a parameter
+      can view all orders
+    can cancel an order
+      is expected to eq 1354
+    creation
+      can create an order without any parameters
+      can arbitrarily set the line items price
+      can set the user_id for the order
+      with payment
+        with source
+          creates a payment
+          when payment_method is missing
+            returns an error
+    with no orders
+      still returns a root :orders key
+  current
+    uses the user's last_incomplete_spree_order logic with the current store
+    when the current user is not present
+      when the spree guest token is present
+        returns a 401
+      when the spree guest token is not present
+        returns a 401
+  when a guest order has been associated with a user
+    accepts the rotated token
+    rejects updates with the original guest token
+    rejects the original guest token
+  on an address that does not belong to this order
+    cannot update address information
+    cannot retrieve address information
+  with order
+    with their own address
+      update replaces the readonly Address associated to the Order
+      gets an address
+      receives the errors object if address is invalid
+  as an admin
+    can make a shipment ready
+    cannot make a shipment ready if the order is unpaid
+    can update a shipment and it's metadata
+    can update a shipment
+    for shipped shipments
+      cannot remove a variant from a shipment
+      adds a variant to a shipment
+    for ready shipments
+      removes a variant from a shipment
+      adds a variant to a shipment
+      the current api user is authenticated and has orders
+        succeeds
+        with filtering
+          filters
+        json output
+          contains the shipments
+          store credit payment
+            only contains the id of the payment source
+          credit card payment
+            contains the id and cc_type of the credit card
+          check payment
+            does not try to render a nil source
+      the current api user does not exist
+        returns a 401
+    for empty shipments
+      adds a variant to a shipment
+    POST #create
+      creates a new shipment
+      when stock_location_id is missing
+        returns proper error
+    for completed orders
+      removes a destroyed variant from a shipment
+      removes a variant from a shipment
+      adds a variant to a shipment
+  transfers
+    POST /api/shipments/transfer_to_location
+      for an unsuccessful transfer
+        returns the correct message
+      for a successful transfer
+        returns the correct message
+      if the user can not destroy shipments
+        is forbidden
+      if the user can not update shipments
+        is forbidden
+      if the source shipment can not be found
+        returns a 404
+      if the user can only read active stock locations
+        transfers to an active stock location
+        and the stock location is inactive
+          returns a 404
+    POST /api/shipments/transfer_to_shipment
+      if the source shipment can not be found
+        returns a 404
+      if the target shipment belongs to another order
+        returns a 404 and does not move the inventory units
+      if the user can not update the target shipment
+        returns a 403 and does not move the inventory units
+      for a successful transfer
+        returns the correct message
+  as a non-admin
+    cannot add contents to the shipment
+    cannot make a shipment ready
+    cannot make a shipment shipped
+    cannot update the shipment
+    cannot remove order contents from shipment
+    returns rates available to admin
+    returns rates available to user
+    returns success
+    the user is not allowed to ship the shipment
+      responds with a 403
+      does nothing
+    the user is allowed to ship the shipment
+      ships the shipment
+      sent emails
+        send_mailer set to false
+          does not send the shipped shipments mailer
+        send_mailer set to true
+          sends the shipped shipments mailer
+        send_mailer not present
+          sends the shipped shipments mailer
+    the user is not allowed to view the shipment
+      responds with a 403
+      does nothing
+    can delete attributes
+    can be changed
+    is expected to eq [:foo]
+    sets the promotion_attributes
+  GET #show
+    when non admin
+      is forbidden
+    when admin
+      when finding by a promotion
+        behaves like a JSON response
+          should be ok
+          should return JSON
+      when id does not exist
+        should be 404
+  without authentication
+    retrieves a list of products
+    allows shared caches to store a single product
+    allows shared caches to store the product list
+    behaves like modifying product actions are restricted
+      cannot update a product
+      cannot delete a product
+      cannot create a new product if not an admin
+  gets all the states for a particular country
+  gets all states
+  can view a state
+  pagination
+    can select the next page and control page size
+  with two states
+    gets all states for a country
+    can query the results through a paramter
+    can view all states
+  GET /api/variants/:id
+    does not serve admin-only attributes to a customer after an admin request
+    serves admin-only attributes to an admin after a customer request
+  GET /api/orders/:number
+    does not serve admin-only attributes to a guest after an admin request
+  GET /api/shipments/mine
+    does not serve admin-only attributes to a customer after an admin request
+  as an user
+    cannot update an existing store
+    cannot get the store details
+    cannot list all the stores
+    cannot create a new store
+  as an admin
+    can list the available stores
+    can update an existing store
+    can create a new store
+    can get the store details
+    deleting a store
+      will destroy the store
+      will fail if it's the default Store
+    reverse_charge_status attribute
+      can update an existing store with reverse_charge_status
+      can create a new store with reverse_charge_status
+    address
+      can update the address of an existing store
+      can create a new store with an address
+      responds with an error for an invalid address
+      includes the address in the store details
+    when unsuccessful
+      returns an error
+    when successful
+      removes the coupon
+    when unsuccessful
+      returns an error
+    when successful
+      applies the coupon
+  as a normal user
+    gets a single taxonomy
+    gets a single taxonomy with set=nested
+    can learn how to create a new taxonomy
+    cannot create a new taxonomy if not an admin
+    cannot update a taxonomy if not an admin
+    can control the page size through a parameter
+    cannot delete a taxonomy if not an admin
+    gets all taxonomies
+    can query the results through a paramter
+  as an admin
+    can destroy
+    cannot create a new taxonomy with invalid attributes
+    can create a taxonomy
+    can update a taxonomy
+  as an admin
+      can delete a stock location
+      can see inactive stock locations
+      can see active stock locations
+      can update a stock location
+      can create a new stock location
+      can query the results through a paramter
+      can see active stock locations
+      gets stock location information
+      can see inactive stock locations
+      can control the page size through a parameter
+  as a user
+      can see active stock locations
+      cannot see inactive stock locations
+      cannot create a new stock location
+      cannot see inactive stock locations
+      can see active stock locations
+      cannot update a stock location
+      cannot delete a stock location
+  as an admin
+    updates an inventory unit
+    gets an inventory unit
+    fires state event
+      if supplied with :fire param
+      and returns exception bad state
+      and returns exception if cannot fire
+  as a user
+    cannot see a stock movement
+    cannot see a list of stock movements
+    cannot create a stock movement
+  as an admin
+    loads stock movement variant prices in a single query
+    gets a stock movement
+    can control the page size through a parameter
+    can query the results through a paramter
+    gets list of stock movements
+    can create a new stock movement
+  as an admin
+    should touch the taxon
+    can change the order a product
+  as a user
+    cannot change the order of a product
+  doesn't create a cache key collision for models with different jbuilder templates
+  filtering by allowed attributes
+    filtering is supported for allowed attributes
+  filtering by attributes
+    id is filterable by default
+    most attributes are not filterable by default
+  it maintains desired association behavior
+    allows filtering of variants product name
+  filtering by attributes one association away
+    does not allow the filtering of variants by order attributes
+  filtering by attributes two associations away
+    does not allow the filtering of variants by user attributes
+  includes states
+  gets all countries
+  with two countries
+    can query the results through a paramter
+    can view all countries
+    can control the page size through a parameter
+  as a non-admin
+    cannot update an image
+    cannot create an image
+    cannot delete an image
+  as an admin
+    can upload a new image for a variant
+    when image belongs to another product
+      cannot get an image of another variant
+      cannot get an image of another product
+      cannot update image of another product
+    working with an existing product image
+      can delete an image
+      returns nil attribute values and noimage urls when the image cannot be found
+      can get a list of variant images
+      can get a single variant image
+      can get a list of product images
+      can update image data
+      can get a single product image
+  can learn how to create a new product property
+  can control the page size through a parameter
+  cannot create a new product property if not an admin
+  can see a single product_property
+  can see a list of all product properties
+  cannot update a product property
+  cannot delete a product property
+  can query the results through a parameter
+  if product is deleted
+    can not see a list of product properties
+  with product identified by id
+    can see a single product_property by id
+    can see a list of all product properties
+  as an admin
+    can update a product property
+    can create a new product property
+    can delete a product property
+    when product property does not exist
+      cannot update because is not found
+      cannot delete because is not found

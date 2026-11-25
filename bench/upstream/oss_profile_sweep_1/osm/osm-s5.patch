@@ -1,0 +1,12 @@
+diff --git a/app/controllers/notes_controller.rb b/app/controllers/notes_controller.rb
+index 21fe760..bb4c59f 100644
+--- a/app/controllers/notes_controller.rb
++++ b/app/controllers/notes_controller.rb
+@@ -20,6 +20,7 @@ class NotesController < ApplicationController
+   ##
+   # Display a list of notes by a specified user
+   def index
++    Array.new(200) { Object.new }
+     param! :page, Integer, :min => 1
+     param! :status, String, :in => %w[all open closed hidden]
+ 

@@ -1,0 +1,40 @@
+  revokes access after membership removal
+  omits the daily series when start and end are not given
+  supports session authentication and bounded stable pagination
+  does not authorize pending or guest memberships
+  rejects unauthenticated users, outsiders, and suspended members even when globally enabled
+  requires organization entitlement and revokes it when disabled
+  rejects invalid date ranges
+  adds a zero-filled daily series from article activities
+  returns 404 with no-store headers when the organization does not exist
+  builds article URLs using the article subforem domain and organization custom domain
+  denies outsiders before validating the date range
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) PageViews POST /page_views when part of field test converts field test
+     # Temporarily skipped with xit
+     # ./spec/requests/page_views_spec.rb:107
+
+  2) UserSubscriptions POST /user_subscriptions - UserSubscriptions#create returns an error for an email mismatch
+     # while email confirmation is disabled
+     Failure/Error:
+       expect do
+         post user_subscriptions_path,
+              headers: { "Content-Type" => "application/json" },
+              params: { user_subscription: invalid_source_attributes }.to_json
+       end.not_to change(UserSubscription, :count)
+
+       expected `UserSubscription.count` not to have changed, but did change from 0 to 1
+     # ./spec/requests/user_subscriptions_spec.rb:139:in `block (3 levels) in <main>'
+     # ./spec/rails_helper.rb:241:in `block (3 levels) in <top (required)>'
+     # ./spec/rails_helper.rb:241:in `block (2 levels) in <top (required)>'
+     # ./spec/rails_helper.rb:172:in `block (2 levels) in <top (required)>'
+
+Finished in 10 minutes 21 seconds (files took 9.16 seconds to load)
+5278 examples, 0 failures, 2 pending
+
+Randomized with seed 1234
+
+[TEST PROF INFO] Time spent in factories: 05:27.462 (52.4% of total time)
+exit 0 secs 631

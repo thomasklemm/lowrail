@@ -1,0 +1,21 @@
+PATH
+  remote: /home/user/oss/up/cancancan-main
+  specs:
+    cancancan (3.7.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  cancancan!
+
+CHECKSUMS
+  cancancan (3.7.1)
+
+BUNDLED WITH
+  4.0.20

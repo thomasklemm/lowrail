@@ -1,0 +1,40 @@
+| gem: lowrail-profile | 0.0 | 0.0 | `profile.rb:95` 0.0, `profile.rb:83` 0.0, `profile.rb:55` 0.0 |
+| gem: sentry-rails | 0.0 | 0.0 | `active_job.rb:32` 0.0 |
+| gem: rack-protection | 0.0 | 0.0 | `base.rb:37` 0.0, `base.rb:24` 0.0, `base.rb:35` 0.0 |
+| gem: ffi | 0.0 | 0.1 | `function.rb:84` 0.0, `dynamic_library.rb:101` 0.0, `library.rb:233` 0.0 |
+| gem: simpleidn | 0.0 | 0.8 | `uts46mapping.rb:1322` 0.0, `uts46mapping.rb:2279` 0.0, `uts46mapping.rb:1876` 0.0 |
+| gem: regexp_parser | 0.0 | 0.1 | `scanner.rb:153` 0.0, `scanner.rb:942` 0.0, `scanner.rb:1011` 0.0 |
+| gem: kaminari-actionview | 0.0 | 0.0 | `action_view_extension.rb:0` 0.0, `action_view_extension.rb:12` 0.0, `action_view_extension.rb:10` 0.0 |
+| rails: actionmailbox | 0.0 | 0.0 | `routes.rb:4` 0.0, `routes.rb:21` 0.0, `routes.rb:10` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `factory.rb:16` 0.0, `factory.rb:29` 0.0, `factory.rb:37` 0.0 |
+| gem: json | 0.0 | 0.0 | `state.rb:65` 0.0, `state.rb:33` 0.0, `state.rb:43` 0.0 |
+| test harness: rspec-expectations | 0.0 | 0.0 | `expectation_target.rb:45` 0.0, `matchers.rb:559` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Users::Digests::Yearly::CalculatingJob#perform | 1 / 1 | – / – |  | 33531.0 |  |  |
+| 2 | EnhancedImport::DestroyJob#perform | 1 / 1 | – / – |  | 8895.0 |  |  |
+| 3 | Import::ProcessJob#perform | 1 / 1 | – / – |  | 7505.0 |  |  |
+| 4 | ActionMailer::MailDeliveryJob#perform | 1 / 1 | – / – |  | 3401.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/yabeda-prometheus/lib/yabeda/prometheus/adapter.rb:93` † | 467.5 / 467.5 | 100% | `app/services/stats/calculate_month.rb:131` 14%, `app/services/enhanced_import/destroy.rb:50` 11% | `[metric.group, metric.name, metric.unit].compact.join('_').to_sym` |
+| 2 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:165` | 370.75 / 370.75 | 100% | `app/services/stats/calculate_month.rb:10` 35%, `app/services/stats/calculate_month.rb:131` 12% | `ar_result = if result.fields.empty?` |
+| 3 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:880` | 342.0 / 342.0 | 100% | `app/services/stats/calculate_month.rb:10` 37%, `app/services/stats/calculate_month.rb:131` 12% | `type_map.fetch(oid, fmod, sql_type) {` |
+| 4 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 341.0 / 341.0 | 100% | `app/services/stats/calculate_month.rb:135` 13%, `app/services/stats/calculate_month.rb:17` 13% | `binds = binds.inspect` |
+| 5 | `RAILS/activesupport/lib/active_support/core_ext/object/deep_dup.rb:16` | 309.5 / 309.5 | 100% | `app/services/users/safe_settings.rb:115` 99%, `app/services/notifications.rb:43` 0% | `duplicable? ? dup : self` |
+| 6 | `GEM/prometheus-client/lib/prometheus/client/label_set_validator.rb:52` | 255.0 / 255.0 | 100% | `app/services/stats/calculate_month.rb:131` 14%, `app/services/enhanced_import/destroy.rb:50` 11% | `labelset.keys.sort == expected_labels` |
+| 7 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:177` (debug logging) | 253.5 / 253.5 | 100% | `app/services/stats/calculate_month.rb:131` 14%, `app/services/enhanced_import/destroy.rb:50` 11% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 8 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:175` (debug logging) | 169.0 / 169.0 | 100% | `app/services/stats/calculate_month.rb:131` 14%, `app/services/enhanced_import/destroy.rb:50` 11% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+| 9 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:176` | 149.5 / 149.5 | 100% | `app/services/stats/calculate_month.rb:10` 26%, `app/services/enhanced_import/destroy.rb:50` 6% | `ActiveRecord::Result.new(fields, result.values, types.freeze, affected` |
+| 10 | `RAILS/activesupport/lib/active_support/notifications/fanout.rb:288` | 130.75 / 130.75 | 100% | `app/services/stats/calculate_month.rb:131` 13%, `app/services/enhanced_import/destroy.rb:50` 11% | `group_klass.new(grouped_listeners, name, id, payload)` |
+lowrail-profile: report in /home/user/oss/dawarich/tmp/lowrail-profile-head/report.md
+exit 0 secs 1272
+ 1 file changed, 5963 insertions(+), 5963 deletions(-)

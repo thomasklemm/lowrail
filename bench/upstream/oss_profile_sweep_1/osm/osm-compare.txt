@@ -1,0 +1,22 @@
+# lowrail-profile compare
+
+Base: `bin/rails test -v`. Head: `bin/rails test -v`.
+
+Objects per request (all, by run): base 9377.3 / 9383.0, head 9383.0 / 9379.6.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request, job, mail.
+
+## Regressions: 4
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | NotesController#index | 8167.85 | 27067.7 | +18899.85 | 3846.4 |
+| request action | ChangesetsController#index | 7249.6 | 11280.6 | +4031.00 | 294.6 |
+| request action | Oauth2AuthorizationsController#create | 3755.9 | 6172.25 | +2416.35 | 672.4 |
+| request action | Traces::IconsController#show | 2498.1 | 2523.6 | +25.50 | 20.0 |
+
+## Improvements: 0
+
+None.
+
+Not compared: 85 actions (82 no warm value, 3 no warm value in the A/A report).

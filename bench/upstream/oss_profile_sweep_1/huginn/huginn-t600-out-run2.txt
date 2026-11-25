@@ -1,0 +1,2601 @@
+  allows a custom accuracy field
+  does create an event when far enough
+  requires a valid secret for a web request
+  does not create an event when too close
+  does create event when accurate enough
+  does not create event when too inaccurate
+  does not accept a web request that is not POST
+  creates an event on a web request
+  receives an event
+  should be created via Agent#to_liquid
+  should have created_at
+  should have agent
+  should use created_at from the payload if it exists
+  should have _location_
+  should be iteratable
+  should have attributes of its payload
+    checks to see if the Agent has received any events in the last 'expected_receive_period_in_days' days
+  validation
+    should validate presence of message
+    should be valid without a message when 'keep_event' is set
+    should also accept a boolean keep_event value
+    validates that 'must_match' is a positive integer, not greater than the number of rules, if provided
+    should validate the three fields in each rule
+    if present, 'keep_event' must equal true or false
+    should validate non-hash rules
+    handles array of negated regex
+    handles multiple events
+    matches a top-level field
+    handles negated comparisons
+    handles exact comparisons
+    handles array of exact comparisons
+    handles numerical comparisons
+    handles array of `not in` comparisons
+    handles negated regex
+    handles array of negated comparisons
+    handles array of regex
+    puts can extract values into the message based on paths
+    handles array of numerical comparisons
+    handles regex
+    handles Liquid rules
+    when 'keep_event' is true
+      can re-emit the origin event
+      merges 'message' into the original event when present
+    with multiple rules
+      handles ANDing rules together
+      can accept a partial rule set match when 'must_match' is present and less than the total number of rules
+  stores the job's uniqueness key
+  skips a duplicate job for the same schedule
+  returns false and records an enqueue error for a duplicate
+  enqueues jobs for different schedules independently
+  releases the key when the job permanently fails
+  does not deduplicate jobs without a uniqueness key
+  automatic agent checks
+    enqueues different agents independently
+    does not deduplicate event deliveries or manual checks
+    keeps the key while running or waiting for a retry
+    executes the serialized check and allows another run after completion
+    allows another run after permanent failure
+    deduplicates repeated schedule runs per agent
+    deduplicates SchedulerAgent commands
+    deduplicates commands from both checks and events
+    coalesces schedules and commands with schedule_first=false
+    coalesces schedules and commands with schedule_first=true
+    checks if events have been received within expected receive period
+  validation
+    should validate presence of content key
+    should validate presence of expected_receive_period_in_days key
+    checks if content key is working fine
+    should handle multiple events
+    should push to hubs when push_hubs is given
+    requires a valid secret
+    outputting nesting
+      can output RSS
+      can output JSON
+    outputting events as RSS and JSON
+      can output RSS
+      can output RSS with hub links when push_hubs is specified
+      can output JSON
+      with media namespace not set
+        can output RSS
+      with media namespace set false
+        can output RSS
+      ordering
+        can reorder the last `events_to_show` events based on a Liquid expression
+      with itunes namespace set false
+        can output RSS
+      with a specified icon
+        can output RSS
+      with media namespace set true
+        can output RSS
+      with more events
+        limiting
+          can select the last `events_to_show` events
+      interpolating "events"
+        can output JSON
+        can output RSS
+        with event with "events"
+          can access the value without being overridden
+      with itunes namespace set true
+        can output RSS
+      with custom response_headers given
+        can respond with custom headers
+      with custom rss_content_type given
+        can output RSS with the Content-Type
+      with itunes namespace not set
+        can output RSS
+    checks if events have been received within expected receive period
+  validation
+    should validate presence of expected_receive_period_in_days
+    should validate presence of template and template.item
+    should validate presence and length of secrets
+  .load
+    loads hashes with indifferent access
+    loads nil as an empty hash with indifferent access
+    loads JSON strings with indifferent access
+  returns posts across paginated responses
+  raises the Threads API error message
+  adds the access token to account requests
+  adds the access token to text post creation requests
+  parse_each_agent_gem
+    does nothing when an empty string is passed
+    does nothing when nil is passed
+    parses valid gem strings correctly
+  client options
+    uses Tumblr's OAuth 1 endpoints
+    returns the Tumblr user payload
+    returns nil when no blog is available
+    fetches the avatar URL from the Tumblr API
+  with example Agents
+      generates a richer DOT script
+      generates a DOT script
+  DotHelper::DotDrawer
+      properly escapes double quotaion and backslash
+  initialization
+    is initialized with an attributes hash
+    when an a scenario already exists with the given guid for the importing user
+        adds errors on validation when updated options are unparsable
+        returns AgentDiff objects that include 'current' values from any agents that already exist
+        sets the 'updated' FieldDiff values based on any feedback from the user
+        when the schema_version is less than 1
+          translates keep_events_for from days to seconds
+        honors updates coming from the UI
+        updates any existing agents in the scenario, and makes new ones as needed
+        uses the existing scenario, updating its data
+        adds errors when updated agents are invalid
+    agents which require a service
+        should add an error when no service is selected
+        should check if the agent requires a service
+        should import
+    when Bob imports Jane's scenario
+        makes a new scenario for Bob
+        does not change Jane's scenario
+    when this scenario has never been seen before
+        creates the Agents
+        makes a new scenario
+        creates new Agents, even if one already exists with the given guid (so that we don't overwrite a user's work outside of the scenario)
+        with control links
+          doesn't crash without any control links
+          creates the links
+        with an invalid scenario attribute
+          fails without creating anything
+        when the schema_version is less than 1
+          translates keep_events_for from days to seconds
+        returns AgentDiff objects for the incoming Agents
+  validations
+    is not valid when none of file, url, or data are present
+    url
+      should report fetch failures uniformly
+      should be invalid when the referenced url doesn't contain a scenario
+      should be valid when the url points to a valid scenario
+      should go through OUTBOUND_PROXY when it is set
+      should refuse an oversized response
+      should be invalid with an unreasonable URL
+      should follow redirects
+    file
+      should be valid with a valid uploaded scenario
+      should be invalid when the uploaded file doesn't contain a scenario
+    data
+      should be valid with valid data
+      should be invalid with invalid data
+    returns true if a ShellCommandAgent is present
+    returns false on most Agents
+    creates an event with the received message
+    checks if agent is working when event is received withing expected number of days
+    validates presence of query
+    validates presence of server access token
+    validates presence of expected receive period in days key
+    creates events for posts returned by the Threads API
+    does not emit duplicates for posts already seen at the latest timestamp
+    creates events for posts returned on later pages
+  should have .options
+  should have .id, .type and .name
+  should have .sources
+  should have .working
+  should be created via Agent#to_liquid
+  should have .receivers
+  should have .url
+    returns the proc result and delegates its methods
+    tracks execution time
+    does not starts when connect_to_receiver is not truthy
+    starts when connect_to_receiver is truthy
+    checks if events have been received within the expected receive period
+  Agents::JabberAgent::Worker
+    runs
+    stops
+      handles :on_message and :on_leave
+      handles :on_room_message
+      handles :on_join and :on_leave
+      it ignores messages for the first seconds
+      creates events
+  receive
+    should send an IM for each event
+  validation
+    should validate presence of of jabber_server
+    should validate presence of jabber_receiver
+    should validate presence of jabber_sender
+    should create an event when checking (unstubbed)
+    should create an event when checking
+    does not run when should_run? is false
+    with unbundle
+      unspecified
+        should be run inside of our bundler context
+      explicitly set to false
+        should be run inside of our bundler context
+      set to true
+        should be run outside of our bundler context
+    with suppress_on_failure
+      should not suppress events on success
+      should suppress events on failure
+    with suppress_on_empty_output
+      should suppress events on empty output
+      should not suppress events on non-empty output
+    creates events (unstubbed)
+    creates events
+    does not run when should_run? is false
+    generating events as scheduled
+  validation
+    should validate path
+    should validate presence of necessary fields
+    should validate path
+    it is working when at least one event was emited
+  validating
+    should require the jira url
+    should work without jql
+    should require the expected_update_period_in_days
+    should work without username
+    should require timeout
+    should require the jira password if username is specified
+    should be able to retrieve issues
+  helpers
+    should generate a correct request url
+    sets the 'since' time only after the first run
+    should generate a correct request options hash
+    on Jira Cloud
+      pages with nextPageToken until isLast
+      should generate a search/jql request url
+    the default options are valid
+    when set up to neither favorite or retweet
+      is invalid
+    emit_error_events
+      can be set to true
+      must be a boolean
+    checks if events have been received within the expected time period
+    with emit_error_events set to false
+      does not re-raise the exception on "already retweeted" error
+      does not re-raise the exception on "already favorited" error
+      re-raises the exception on failure
+    when set up to favorite
+      when the twitter client succeeds favoriting
+        should favorite the tweets from the payload
+      when the twitter client fails retweeting
+        creates an event with tweet info and the error message
+    when set up to retweet
+      when the twitter client succeeds retweeting
+        should retweet the tweets from the payload
+      when the twitter client fails retweeting
+        creates an event with tweet info and the error message
+    sets properties to an empty array
+    does not override an existing value
+    isnt when event created outside :expected_update_period_in_days
+    is when event created within :expected_update_period_in_days
+  validation
+    should validate presence of property
+    should validate presence of lookback
+    treats equivalent payloads with different key order as duplicates when using the whole event
+    creates events when memory is empty
+    should hash the value if its longer then 10 chars
+    does not create event when event is a duplicate
+    should respect the lookback value
+    should use the whole event if :property is blank
+    propagates events whose property renders empty without remembering them
+    creates events when new event is unique
+    should still work after the memory was cleared
+  rejects nonboolean flags and invalid RFC function arguments
+  defaults to RFC semantics and switches coercion and existence tests per Agent
+  normalizes JSON inputs and preserves escaping without modifying the expression
+  uses the selected dialect when a TriggerAgent receives an event
+  defers Liquid paths to runtime, where RFC validation still applies
+  validates RFC syntax unless legacy mode is explicitly enabled
+    checks if it can handle multiple events
+  validation
+    should validate presence of 'to' key
+    should validate the value of 'mode' key
+    should validate presence of content key
+    should validate presence of google_api_key
+    should validate presence of expected_receive_period_in_days key
+    checks if events have been received within expected receive period
+  checking anonymous FTP
+      filters out files that are older than the given date
+      filters out files that don't match the given format
+      automatically sets mode to read when the agent is a new record
+      requires 'data' in 'write' mode
+      requires 'filename' in 'write' mode
+      requires mode to be set to 'read' or 'write'
+      when present timestamp must be parsable into a Time object instance
+      allows an URI without a path
+      does not check the url when liquid output markup is used
+      requires patterns to be present and not empty array
+      requires url to be a valid URI
+      returns an empty StringIO instance when no data was read
+      returns the contents of the file
+      uses the encoding specified in force_encoding to convert the data to UTF-8
+      should check for changes and save known entries in memory
+      should validate the integer fields
+      does not call chdir when no path is given
+      passes connection options separately from the host
+      preserves errors raised before the FTP connection is created
+      with_path
+        logs in as anonymous when no user and password are given
+        passes the provided user and password
+      converts the string encoding when force_encoding is specified
+      writes the data at data into a file
+  checking with http basic auth
+      should check for changes
+  checking urls
+      preserves and escapes hostname, query, Unicode and bracketed URL components
+  checking with headers
+      should check for changes
+  checking without basic auth
+    behaves like WebRequestConcern
+      User-Agent
+        should have the default value of Huginn
+        should be overridden by the environment variable if present
+        should be overriden by the value in options if present
+      behaves like AgentProxyConcern
+        does not select AGENT_PROXY by default
+        does not select AGENT_PROXY with use_agent_proxy=false
+        rejects opt-in without AGENT_PROXY and never falls back to a direct connection
+        selects AGENT_PROXY with use_agent_proxy="true"
+        enforces OUTBOUND_PROXY with use_agent_proxy=nil
+        does not select AGENT_PROXY with use_agent_proxy="false"
+        enforces OUTBOUND_PROXY with use_agent_proxy=true
+        rejects an invalid boolean
+        rejects combining opt-in with an explicit proxy
+        selects AGENT_PROXY with use_agent_proxy=true
+        refuses an explicit proxy and enforces OUTBOUND_PROXY even without validation
+        enforces OUTBOUND_PROXY with use_agent_proxy="false"
+        continues to support an explicit proxy
+        enforces OUTBOUND_PROXY with use_agent_proxy="true"
+        prefers OUTBOUND_PROXY over AGENT_PROXY
+        enforces OUTBOUND_PROXY with use_agent_proxy=false
+      WebRequestConcern::DoNotEncoder
+        should work without a value present
+        should return the value when decoding
+        should not encode special characters
+        should work without an empty value
+      validations
+        should validate user_agent
+        should validate headers
+        should validate basic_auth
+        should validate disable_ssl_verification
+        should validate interpolated basic_auth credentials
+        should be valid
+        should not disable SSL verification if disable_ssl_verification option is false
+        should not disable SSL verification if disable_ssl_verification option is 'false'
+        should enable SSL verification by default
+        should disable SSL verification if disable_ssl_verification option is 'true'
+        bounds connection and request I/O
+        should use faradays default params_encoder
+        should disable SSL verification if disable_ssl_verification option is true
+        should use WebRequestConcern::DoNotEncoder when disable_url_encoding is truthy
+        should enable SSL verification when nil
+        redirect follow
+          should use FollowRedirects by default
+          should not use FollowRedirects when disabled
+        proxy
+          should leave the proxy to the environment when no proxy option is given
+          should use the proxy option when given
+          when OUTBOUND_PROXY is set
+            should use the outbound proxy
+            should refuse a proxy option
+    validations
+      should validate the integer fields
+      should validate uniqueness_look_back
+      should validate mode
+      should validate the force_encoding option
+      should validate the http_success_codes fields
+      in 'json' type
+        should ensure that all extractions have a 'path'
+      in 'html' type
+        should ensure that all extractions have either 'xpath' or 'css'
+    unzipping
+      should unzip automatically if the response has Content-Encoding: gzip
+      should unzip with unzip option
+      should either avoid or support a raw deflate stream (#1018)
+    http_success_codes
+      should allow scraping from a 404 result
+      checks if events have been received within the expected receive period
+      should take uniqueness_look_back into account during deduplication
+      should follow unique rules when parsing array of urls
+      treats payloads with different key order as unchanged
+      should log an error if the number of results for a set of extraction patterns differs
+      should parse events from all urls in array
+      should accept an array for url
+      should always save events when in :all mode
+      should check for changes (and update Event.expires_at)
+    parsing
+      should exclude hidden keys
+      should interpolate _response_
+      should format and merge values in template after extraction
+      should return everything concatenated if XPath returns many nodes
+      should return a string value returned by XPath
+      should return an integer value if XPath evaluates to one
+      parses CSS
+      should return an array if XPath returns many nodes and the raw option is specified
+      parses XPath
+      XML
+        works with CSS selectors with namespaces stripped
+        works with XPath with namespaces unstripped
+        works with CSS selectors
+        works with XPath
+      text parsing
+        works with regexp
+        works with regexp with named capture
+      JSON
+        can handle arrays
+        works with paths
+        stores the whole object if :extract is not specified
+      XML with cdata
+        works with XPath
+      with a url or url_from_event
+        should interpolate values from incoming event payload
+        should set the inbound_event when logging errors
+        should interpolate values from incoming event payload and _response_
+        should support merging of events
+        should use url_from_event as the url to scrape
+        returns an array of found nodes when the array extract_option is true
+        should use the Agent's `url` option if url_from_event is not set
+        should allow url_from_event to be an array of urls
+        should use the options url if no url is in the event payload, and `url_from_event` is not provided
+      with a data_from_event
+        with HTML data
+          should extract from the event data in the incoming event payload
+        with json data
+          should extract from the event data in the incoming event payload
+          should convert headers and status in the event data properly
+          should ignore inconvertible headers and status in the event data
+          should output an error when the data cannot be parsed
+          should support merge mode
+          should output an error when nothing can be found at the path
+    encoding
+      with no encoding information
+        for an XML file
+          with a charset in the header
+            should be detected from it
+          with no charset in the header
+            but having a BOM
+              should be detected
+            but in XML declaration
+              should be detected
+        for a JSON file
+          should be assumed to be UTF-8
+        for an HTML file
+          with a charset in the header
+            should be detected from it
+          with no charset in the header
+            should be detected from a meta tag
+          with charset desclarations both in the header and in the content
+            should be detected as that of the header
+      when force_encoding option is specified
+        for a JSON file
+          should be forced
+        for an HTML file
+          with charset specified in the header and the content
+            should still be forced
+  keeps existing agents loadable and editable
+  is never working
+  cannot be created
+  is not scheduled and does not run in the background
+  error handling
+    handles API errors gracefully
+    is not working without recent events
+    is working with recent events
+  submit mode
+      sends authorization header
+      creates an event from incoming event
+    output_mode merge
+      merges original event payload into the emitted event
+      creates an event with generation info
+      validates output_mode values
+      requires model
+      accepts missing api_key when ENV is set
+      requires api_key when ENV is not set
+      is valid with correct options
+      requires prompt for submit mode
+      accepts valid output_mode values
+      validates mode values
+  submit_and_poll mode
+      submits and stores pending generation in memory
+      polls pending generations and creates events when complete
+      keeps the generation in pending list
+  poll mode
+      is valid with correct options
+      requires generation_id for poll mode
+      polls using generation_id from incoming event
+      creates an event with completed video
+    output_mode merge in poll mode
+      merges original event payload into the poll result
+    creates events for raindrops returned by the Raindrop API
+    does not emit duplicates for raindrops already seen at the latest timestamp
+    keeps previously seen ids when a new raindrop shares the latest timestamp
+    does not emit duplicates across runs when created timestamps have fractional seconds
+    escapes service names while preserving the provider icon
+    returns nil without a service
+    returns a correct icon tag for other services
+    returns a correct icon tag for Twitter
+    returns a correct icon tag for GitHub
+    returns a FontAwesome icon element with an additional class
+    returns a Glyphicon icon element with an addidional class
+    returns a Glyphicon icon element
+    returns a FontAwesome brand icon element
+    escapes the icon name
+    returns a FontAwesome icon element
+    returns a label "No" if a given agent is not working
+    returns a label "Disabled" if a given agent is disabled
+    returns a label "Yes" if a given agent is working
+    returns a label "Missing Gems" if a given agent has dependencies missing
+    understands hl=8-
+    understands hl=-
+    understands hl=-2
+    is OK with no hl
+    understands hl=6-8
+    understands hl=1,3-4,9
+    returns a nav link
+    returns an active nav link
+    with block
+      returns an active nav link with menu when on a child page
+      returns an active nav link with menu
+      returns a nav link with menu
+    returns a label "No" if any falsy value is given
+    returns a label "Yes" if any truthy value is given
+  does not affect normal run, with dry_run? returning false
+  does not perform dry-run if Agent does not support dry-run
+  dry_run!
+    traps any destructive operations during a run
+    traps any destructive operations during a run when an event is given
+    sends client credentials in the token exchange body
+    does not include query params from the callback request
+    authenticates token requests with request body params
+  converts values to Float
+  has a convenience accessor for combined latitude and longitude
+  does not allow hash-style assignment
+  ignores invalid values
+  is droppable
+  provides hash-style access to its properties with both symbol and string keys
+  considers a location empty if either latitude or longitude is missing
+  validation
+    should make sure timestamp is optional
+    should validate presence of user
+    should make sure url_title is optional
+    should make sure title is optional
+    should validate presence of expected_receive_period_in_days
+    should make sure priority is optional
+    should make sure sound is optional
+    should validate presence of token
+    should make sure url is optional
+    should make sure device is optional
+    should make sure event sound overrides default sound
+    should make sure event url overrides default url
+    should make sure event expire overrides default expire
+    should make sure event timestamp overrides default timestamp
+    should make sure event priority overrides default priority
+    should make sure multiple events are being received
+    should make sure event retry overrides default retry
+    should make sure event text overrides default message
+    should make sure event title overrides default title
+    should make sure event url_title overrides default url_title
+    checks if events have been received within the expected receive period
+  JsonpathMigration::Path
+    does not declare array selectors semantically compatible with RFC 9535
+    leaves filters and other complex or malformed expressions for manual review
+    preserves results across both engines for automatically migrated selectors
+    normalizes roots and names without changing legacy lookup results
+  data migration
+    preserves blank optional paths but normalizes an empty webhook payload path
+    ignores unrelated agent settings and is idempotent
+    preserves explicit dialect choices and keeps legacy Agents unchanged on reruns
+    keeps possible method references on the legacy engine
+    groups private review URLs by user and lists each Agent only once
+    falls back to relative links when a public host is not configured
+    also reads and writes JSON through a legacy text attribute
+    updates only known JSONPath fields without callbacks or timestamp changes
+    normalizes website JSON extraction paths without touching XPath or templates
+    stops without exposing options if an Agent cannot store the legacy flag
+  legacy compatibility
+    retains comparisons on scalar array elements and nested array indexes
+    allows safe operations through every reference path with allow_send: false
+    preserves Hash keys and restricts method access to the listed types
+    retains numeric coercion, regular expressions, and object filters
+    supports presence checks and endpoint access inside filters
+    retains root omission and whole-document aliases for saved settings
+    allows safe operations through every reference path with allow_send: true
+  guarded references
+    does not call custom dig methods
+    never calls jsonpath_public_probe with allow_send: false
+    never calls jsonpath_private_probe with allow_send: true
+    never calls jsonpath_private_probe with allow_send: false
+    never calls jsonpath_public_probe with allow_send: true
+    does not traverse Ruby classes or expose unlisted methods
+    still reads keys whose names coincide with Ruby methods
+  rejects a mistyped recheck argument before making changes
+  preserves legacy choices by default and can recheck them on a later run
+  keeps uncertain expressions on legacy and preserves an explicit RFC choice
+  POST reemit
+    can only re-emit Events for the current user
+    clones and re-emits events
+  DELETE destroy
+    only deletes events for the current user
+  GET index
+    can filter by Agent
+    only returns Events created by Agents of the current user
+  GET show
+    only shows Events for the current user
+  behaves like WebRequestConcern
+      should disable SSL verification if disable_ssl_verification option is true
+      should enable SSL verification when nil
+      should not disable SSL verification if disable_ssl_verification option is 'false'
+      should use faradays default params_encoder
+      should use WebRequestConcern::DoNotEncoder when disable_url_encoding is truthy
+      should disable SSL verification if disable_ssl_verification option is 'true'
+      should not disable SSL verification if disable_ssl_verification option is false
+      should enable SSL verification by default
+      bounds connection and request I/O
+      redirect follow
+        should use FollowRedirects by default
+        should not use FollowRedirects when disabled
+      proxy
+        should use the proxy option when given
+        should leave the proxy to the environment when no proxy option is given
+        when OUTBOUND_PROXY is set
+          should use the outbound proxy
+          should refuse a proxy option
+    User-Agent
+      should be overridden by the environment variable if present
+      should have the default value of Huginn
+      should be overriden by the value in options if present
+    validations
+      should validate interpolated basic_auth credentials
+      should validate basic_auth
+      should validate headers
+      should be valid
+      should validate user_agent
+      should validate disable_ssl_verification
+    WebRequestConcern::DoNotEncoder
+      should work without an empty value
+      should return the value when decoding
+      should work without a value present
+      should not encode special characters
+    behaves like AgentProxyConcern
+      does not select AGENT_PROXY by default
+      rejects combining opt-in with an explicit proxy
+      rejects opt-in without AGENT_PROXY and never falls back to a direct connection
+      enforces OUTBOUND_PROXY with use_agent_proxy="false"
+      selects AGENT_PROXY with use_agent_proxy=true
+      prefers OUTBOUND_PROXY over AGENT_PROXY
+      enforces OUTBOUND_PROXY with use_agent_proxy=false
+      refuses an explicit proxy and enforces OUTBOUND_PROXY even without validation
+      continues to support an explicit proxy
+      enforces OUTBOUND_PROXY with use_agent_proxy="true"
+      does not select AGENT_PROXY with use_agent_proxy=false
+      rejects an invalid boolean
+      does not select AGENT_PROXY with use_agent_proxy="false"
+      enforces OUTBOUND_PROXY with use_agent_proxy=nil
+      selects AGENT_PROXY with use_agent_proxy="true"
+      enforces OUTBOUND_PROXY with use_agent_proxy=true
+  when no ids are available
+    calculates content MD5 sums
+  validations
+    should validate the presence and numericality of expected_update_period_in_days
+    should validate the presence of url
+  emitting RSS events
+    should fetch all events per run
+    should fetch one event per run
+    should truncate the seen_ids in memory at 500 items per default
+    should emit items as events in the order specified in the events_order option
+    should emit items as events for a FeedBurner RSS 2.0 feed
+    should truncate the seen_ids after configuring a lower limit of items when check is executed
+    should emit items as events for an Atom feed
+    should support an array of URLs
+    should track ids and not re-emit the same item when seen again
+    should truncate the seen_ids at default after removing custom limit
+  logging errors with the feed url
+    includes the feed URL when an exception is raised
+  parsing feeds
+    captures normalized timestamps, categories, enclosures, and empty authors
+    sanitizes HTML content
+    of YouTube
+      is parsed correctly
+    with an empty link in RSS
+      does not leak :no_buffer
+    with an empty link in RSS
+      does not leak :no_buffer
+    with podcast elements
+      is parsed correctly
+    with the encoding declared in both headers and the content
+      decodes the content properly with force_encoding specified
+      decodes the content properly
+  checking IMAP
+    validations
+      should validate regexp conditions
+      should validate the integer fields
+      should validate the boolean fields
+      should perform regexp matching and save named captures
+      should narrow mails by has_attachment (true)
+      should not fail when a condition on Cc is given and a mail does not have the field
+      should create just one event for multiple mails with the same Message-Id
+      should narrow mails by To
+      should narrow mail parts by MIME types
+      should narrow mails by has_attachment (false)
+      should delete mails if delete is true
+      should mark mails as read if mark_as_read is true
+      should check for mails and save memory
+      should never mark mails as read unless mark_as_read is true
+      with include_raw_mail
+        should check for mails and emit events with raw_mail
+      with event_headers
+        should check for mails and emit events with headers
+      processing mails with a broken From header value
+        should ignore them without failing if a "from" condition is given
+  Agents::ImapFolderAgent::Message::Scrubbed
+      should return a scrubbed string
+    fetches a user timeline
+    publishes a text status
+    publishes a status with an uploaded image
+  preserves ordinary failure handling
+  records an abandoned attempt and applies backoff instead of immediately executing it
+  executes an available job and releases its execution lock
+  quarantines a job after repeated abandoned attempts
+  does not overwrite an expired reservation while its previous execution owns the lock
+  .ensure_available!
+    rejects a locale without translations
+    uses English by default
+    accepts a locale that has translations
+  up
+    should update extract and template options for an existing WebsiteAgent
+  down
+    should revert extract and template options for an updated WebsiteAgent
+    ignores unknown directions
+    uses a default when no sort is given
+    applies the given sort when one is passed in
+    ignores unknown columns
+  validation
+    should validate schedule
+  save
+    should delete memory['scheduled_at'] if and only if options is changed
+  behaves like AgentControllerConcern
+    control!
+      should disable targets whose options are invalid
+      should run targets
+      should configure targets
+      should disable targets
+      should not run disabled targets
+      should enable targets
+      should enable targets and drop pending events
+      should configure targets with nested objects
+    control_action
+      returns options['action']
+      returns the result of interpolation
+    validation
+      of action
+        should not reject 'enable' or 'disable' no matter if targets include an unschedulable agent
+        should ensure that 'configure_options' exists in options when the action is 'configure'
+        should disallow obviously bad values
+        should reject 'run' if targets include an unschedulable agent
+        should allow certain values
+        should accept 'run' if all target agents are schedulable
+    preconditions
+      must be satisfied for these shared examples
+  disconnects and disables Agents using another user's private Service
+  preserves Agents using an owned or global Service
+  custom base_url
+    sends the agent key to the custom base URL
+  response_format
+    sends json_object response format when configured
+  output_mode merge
+    merges original event payload into the emitted event
+    does not merge when called via check (no incoming event)
+    creates an event
+  instance API key
+    omits Authorization over HTTP when the agent supplies a proxy
+    omits Authorization for https://api.openai.com:8443/v1
+    authenticates requests to the default API
+    strips Authorization on a redirect to another origin
+    authenticates requests to the instance-configured origin
+    omits Authorization when TLS verification is disabled
+    omits Authorization for http://api.openai.com/v1
+    omits Authorization for https://llm.example.test/v1
+    sends an authenticated request and emits the LLM response
+  behaves like AgentProxyConcern
+    does not select AGENT_PROXY by default
+    enforces OUTBOUND_PROXY with use_agent_proxy=nil
+    enforces OUTBOUND_PROXY with use_agent_proxy=true
+    does not select AGENT_PROXY with use_agent_proxy=false
+    prefers OUTBOUND_PROXY over AGENT_PROXY
+    selects AGENT_PROXY with use_agent_proxy="true"
+    enforces OUTBOUND_PROXY with use_agent_proxy="false"
+    enforces OUTBOUND_PROXY with use_agent_proxy="true"
+    rejects opt-in without AGENT_PROXY and never falls back to a direct connection
+    continues to support an explicit proxy
+    refuses an explicit proxy and enforces OUTBOUND_PROXY even without validation
+    selects AGENT_PROXY with use_agent_proxy=true
+    rejects combining opt-in with an explicit proxy
+    does not select AGENT_PROXY with use_agent_proxy="false"
+    enforces OUTBOUND_PROXY with use_agent_proxy=false
+    rejects an invalid boolean
+    is valid with correct options
+    requires api_key when ENV is not set
+    requires user_message
+    validates max_tokens is positive
+    validates output_mode values
+    requires model
+    accepts valid temperature
+    validates temperature range
+    accepts missing api_key when ENV is set
+    accepts valid output_mode values
+  error handling
+    handles API errors gracefully
+    is not working without recent events
+    is working with recent events
+    uses the Threads API error message when publishing fails
+    publishes a text post and emits an event
+  _agent_
+    computes digest values from string input
+  regex_replace_first
+    should replace the first occurrence of a string using regex
+    should support escaped characters
+  regex_replace_first block
+    should be able to take a pattern in a variable
+    should define a variable named "match" in a "with" block
+    should replace the first occurrence of a string using regex
+  to_uri
+    should normalize a URI value if an empty base URI is given
+    should return a URI value resolved against a base URI in interpolation
+    should parse an absolute URI
+    should normalize a URL
+    should return a URI value in interpolation
+    should parse a relative URI with a base URI specified
+    should stringify a non-string operand
+  to_xpath
+    should escape a string for use in XPath expression
+    should stringify a non-string operand
+  regex_replace
+    should replace the all occurrences of a string using regex
+    should support escaped characters
+  regex_extract
+    should extract the matched part
+    should return nil if not matched
+  validations
+    should finish without raising an exception
+  digest filters
+    computes digest values from string input
+  regex_replace block
+    should replace the all occurrences of a string using regex
+  json
+    serializes data to json
+  liquid_escape
+    preserves adjacent opening delimiters through a second render
+    preserves an incomplete tag through a second render
+    preserves an assignment followed by an expression through a second render
+    preserves whitespace control and line breaks through a second render
+    preserves an output expression through a second render
+    preserves a nil value through a second render
+    preserves a trailing brace after an expression through a second render
+    preserves an incomplete expression through a second render
+    preserves raw tags through a second render
+    preserves a number through a second render
+    leaves ordinary braces unchanged
+  uri_escape
+    should not raise an error when an operand is nil
+    should escape a string for use in URI
+  rebase_hrefs
+    rebases relative URLs in a fragment
+  group_by
+    should leave non-groupables alone
+    should group an enumerable by the given attribute
+  fromjson
+    should parse a JSON string
+  as_object
+    returns an array that was splitted in liquid tags
+    returns an object that was not modified in liquid
+    as_json
+      works with MatchDataDrops
+      works with Agent::Drops
+      it converts "complex" objects
+      works with URIDrops
+      works with Event::Drops
+  unescape
+    should unescape basic HTML entities
+  uri_expand
+    should detect a redirect loop
+    should respect the limit for the number of redirects
+    should be able to handle an FTP URL
+    should handle inaccessible URIs
+    should follow redirects
+    used in interpolation
+      should respect the limit for the number of redirects
+      should follow redirects
+    re-emits Events and clears the memory
+    with events_order and emit_interval
+      re-emits Events in that order and clears the memory with that interval
+    with max_emitted_events
+      re-emits max_emitted_events per run
+    checks if events have been received within expected receive period
+  validation
+    should validate keep
+    should validate max_events
+    should validate emit_interval
+    should validate presence of expected_receive_period_in_days
+    keeps the newest when 'keep' is set to 'newest'
+    keeps the oldest when 'keep' is set to 'oldest'
+    records Events
+  should run scheduled agents
+  should log when a scheduled run is already queued
+  should propagate events
+  schould register the schedules with the rufus scheduler and run
+  schould clean up expired events
+    for 0h
+    for 12h
+    for the afternoon
+    for the forenoon
+    should return an array with an instance of itself
+  cleanup_failed_jobs!
+    work without the FAILED_JOBS_TO_KEEP env variable
+    work with set FAILED_JOBS_TO_KEEP env variable
+  transcribe mode
+    output_mode merge
+      merges original event payload into the emitted event
+      requires model
+      is valid with correct transcribe options
+      validates output_mode values
+      validates mode
+      accepts missing api_key when ENV is set
+      requires api_key when ENV is not set
+      creates an event with transcription
+      creates an event with transcription
+    is not working without recent events
+    is working with recent events
+  speak mode
+    output_mode merge
+      merges original event payload into the emitted event
+      creates an event with audio data
+      creates an event with audio data from incoming event
+      requires voice for speak mode
+      requires input_text for speak mode
+      is valid with correct speak options
+  error handling
+    handles audio fetch errors
+  translate mode
+      creates an event with translation
+  emitting event
+    should emit url as event
+    should set output as json
+    should set render type as jpg
+    should set render type as plain text
+    should set wait interval to zero
+    should set ignore images
+    should not set ignore images
+    should set user agent to BlackBerry
+  validations
+    should validate the presence of url
+    uses the Raindrop API error message when publishing fails
+    creates a raindrop and emits an event
+  .configure!
+    applies the proxy to Faraday and Typhoeus defaults
+    configures HTTParty clients that copied defaults before initialization
+    routes HTTParty connections through the enforced proxy
+    clears the defaults when OUTBOUND_PROXY is not set
+  .url
+    is nil when OUTBOUND_PROXY is not set
+    returns the configured proxy URL
+    rejects values that are not http(s) URLs
+  .agent_url
+    rejects a malformed AGENT_PROXY at startup
+    is nil when AGENT_PROXY is not set
+    accepts an HTTP proxy URL independently of OUTBOUND_PROXY
+  HTTP transport
+    routes open-uri through the enforced proxy for a no_proxy destination
+    routes Net::HTTP through the enforced proxy for a no_proxy destination
+    routes HTTParty through the enforced proxy for a no_proxy destination
+  .configure_net_http
+    supports an authenticated HTTPS proxy with escaped credentials and an IPv6 host
+    preserves normal proxy behavior without enforcement
+    overrides an existing proxy and its credentials
+  .open_uri_options
+    passes proxy credentials separately from the URL
+    leaves environment proxy settings in effect without enforcement
+    sets an explicit proxy, bypassing environment no_proxy exclusions
+    when the calendar_id is in the options
+      should publish old style payload it receives
+    with Liquid templating
+      should allow Liquid in the calendar_id
+      should allow Liquid in the key
+    when the calendar_id is in the options
+      should publish any payload it receives
+    checks if events have been received within the expected receive period
+    should publish a tweet without a picture if image url is not valid
+    should not treat file urls as valid images
+    should publish a tweet along with a picture if image url is valid
+    should publish any payload it receives
+    should publish a tweet after expanding any t.co urls
+    errors when not given a JSON payload
+    emits multiple events when given a magic 'payloads' key
+    supports Liquid formatting
+    errors when given both payloads and other top-level keys
+    emits an event with the given payload
+  multiple images
+    creates one event per image
+  output_mode merge
+    merges original event payload into the emitted event
+    does not merge when called via check (no incoming event)
+    creates an event with image data
+  error handling
+    handles API errors gracefully
+  b64_json response format
+    includes base64 image data in the event
+    accepts valid output_mode values
+    requires api_key when ENV is not set
+    requires model
+    validates n is positive
+    accepts missing api_key when ENV is set
+    validates output_mode values
+    validates response_format values
+    is valid with correct options
+    requires prompt
+    validates size values
+    is not working without recent events
+    is working with recent events
+    creates an event using the incoming prompt and API authorization
+    immediately sends any payloads it receives
+    logs and re-raises any mailer errors
+    can take body option for selecting the resulting email's body
+    can receive complex events and send them on
+    can take content type option to set content type of email sent
+  behaves like EmailConcern
+      handles an array
+      wraps a string with an array
+      defaults to the user's email address
+      interpolates
+    validations
+      should validate the presence of 'subject'
+      should be valid
+      should validate that recipients, when provided, is one or more valid email addresses or Liquid commands
+      should validate the presence of 'expected_receive_period_in_days'
+  validation
+    should validate presence of method
+    should validate presence of expected_update_period_in_days
+    should validate presence of path
+    should validate presence of output
+    creates events when memory is empty
+    creates event with extra attribute for integer_difference
+    creates event with extra attribute for percentage_change with the correct rounding
+    creates event with extra attribute for percentage_change
+    creates event with extra attribute for decimal_difference
+    is when event created within :expected_update_period_in_days
+    isnt when event created outside :expected_update_period_in_days
+  unwinds a responsive Agent and records cancellation exactly once
+  keeps a sibling worker independent of a stuck child and its pipes
+  rejects a threaded worker before forking
+  keeps the watchdog alive until children exit on USR2
+  kills a stuck Agent owner, releases its DB locks and records the abandoned attempt
+  keeps the watchdog alive until children exit on TERM
+  calls Agent.receive! when run
+    is truthy when no propagation job is queued
+    is falsy when a progation job is queued
+    is truthy when a enqueued progation job failed
+  kills a worker that cannot handle the cancellation request
+  does not execute work until the master acknowledges it
+  does not cancel another execution when a stale token arrives
+  rejects malformed and oversized input frames
+  rejects oversized messages before writing
+  reads fragmented and coalesced JSON frames
+  interrupts an expired execution, runs ensure and retires the worker
+  bounds writes when the peer stops reading
+  keeps the hard deadline when cleanup hangs after cancellation
+  acknowledges consecutive executions without retiring a healthy worker
+  exits when the parent connection disappears
+  enforces the deadline even if logging is blocked
+    interpolates all string values in a structure
+    escapes </script> tags in the output JSON
+    interpolates jsonpath expressions between matching <>'s
+    optionally supports treating values that start with '$' as raw JSONPath
+    returns nil when passed nil
+    calls the specified method when the argument is present
+    html_safes the output unless :skip_safe is passed in
+    escapes </script> tags in the output JSON
+    sorts tuples like arrays by default
+    always succeeds in sorting even if it finds pairs of incomparable objects
+    sorts tuples in order specified: case 1
+    sorts tuples in order specified: case 2
+  .normalize_uri
+    should accept a URI with an IDN hostname, malformed path, query, and fragment parts
+    works with correct arguments
+    returns nil when passed nil
+    warns and returns nil when not parseable
+  .same_json?
+    treats hashes with different key order as equal
+    defaults to RFC semantics and allows explicit legacy lookups
+    should allow escaping
+    returns arrays of matching values
+    unindents to the level of the greatest consistant indention
+    returns nil when the path cannot be followed
+    returns the value at a JSON path
+    emits an event containing the file pointer
+    appends the data at data onto a file
+    does not receive when ENABLE_INSECURE_AGENTS is not set to true
+    requires the path to be set
+    requires append to be either 'true' or 'false'
+    requires watch to be present
+    is valid with the given options
+    requires mode to be either 'read' or 'write'
+    requires watch to be either 'true' or 'false'
+    creates an event if the configured file exists
+    creates an event for every file in the directory
+    does not run when ENABLE_INSECURE_AGENTS is not set to true
+    does not create events when the directory is empty
+    is working with no recent errors in write mode
+    is working with no recent errors in read mode
+    reeturns true when watch is true
+    returns false when watch is false
+  RSpec::ExampleGroups::AgentsLocalFileAgent::AgentsLocalFileAgentWorker
+      does nothing when the path does not exist
+      starts to listen to changes in the directory when the path is present
+      creates an event each changed file
+      creates an event for modifies files
+      creates an event for modifies files
+      creates an event for modifies files
+      stops the listen gem
+      initializes the listen gem
+      restricts to only the specified filename
+      returns the path when a directory is given
+    does not open the file when ENABLE_INSECURE_AGENTS is not set to true
+    opens the file
+    is falsy when the path does not exist
+    works with non-expanded paths
+    create a log entry
+    is truethy when the path exists
+    should include event_type when watch is set to true
+    should not include event_type when watch is set to false
+  only routes impersonation actions via POST
+    includes only agents that are not present in two scnearios
+    returns no agents when all are also used in a different scenario
+    equals agents when no agents are shared
+    only destroys the scenario when no mode is passed
+    destroys all agents when 'all_agents' is passed
+    only destroys unique agents when 'unique_agents' is passed
+  counters
+    maintains a counter cache on user
+  behaves like HasGuid
+    gets created before_save, but only if it's not present
+  validations
+    allows nil icon
+    validates tag_fg_color is hex color
+    validates the presence of user
+    validates the presence of name
+    only allows Agents owned by user
+    allows nil tag_fg_color
+    validates icon is an icon name
+    validates tag_bg_color is hex color
+    allows nil tag_bg_color
+  behaves like WorkingHelpers
+    recent_error_logs?
+      returns true if last_error_log_at is near last_event_at
+    received_event_without_error?
+      should return false until the first event was received
+      should return false when the last error occured after the last received event
+      should return true when the last received event occured after the last error
+    checked_without_error?
+      should return true when the last check occured after the last error
+      should return false until the first time check ran
+      should return false when the last error occured after the check
+  .bulk_check
+    should run all Agents with the given schedule
+    should skip disabled Agents
+    should skip agents of deactivated accounts
+  .drop_pending_events
+    should drop pending events while the agent was disabled when set to true
+  .run_schedule
+    will not run the 'never' schedule
+    groups agents by type
+    ignores unknown types
+    only runs agents with the given schedule
+    runs agents with the given schedule
+  scopes
+    of_type
+      should accept instances of an Agent
+      should accept strings
+      should accept classes
+  .with_execution_lock
+    serializes execution of the same Agent
+    behaves like a bounded execution lock
+      times out while another connection holds the lock and can acquire it after release
+  .active/inactive
+    is active per default
+    is not active when deactivated
+    is not active when disabled
+    is not active when disabled and deactivated
+  with an example Agent
+    .default_schedule
+      should have an empty schedule if it cannot_be_scheduled
+      sets the default on new instances, allows setting new schedules, and prevents invalid schedules
+      stores the default on the class
+    .short_type
+      returns a short name without 'Agents::'
+    Agents::SomethingSource
+      behaves like HasGuid
+        gets created before_save, but only if it's not present
+      behaves like LiquidInterpolatable
+        interpolating liquid templates
+          should work with arrays
+          should use local variables while in a block
+          should work
+          should work recursively
+          should work for strings
+          should use another self object while in a block
+        liquid tags
+          %credential
+            should not raise an exception for undefined credentials
+            should work with existing credentials
+          %line_break
+            should convert {% line_break %} to actual line breaks
+    .async_check
+      should log exceptions
+      records last_check_at and calls check on the given Agent
+      should not run disabled Agents
+      should use the checker's user
+      should log an error if the Agent has been marked with 'cannot_create_events!'
+    creating agents with propagate_immediately = true
+      should only schedule receiving agents that are set to propagate_immediately
+      does not scan for propagation without immediate receivers
+      schedules subagent events after the event transaction commits
+    validations
+      should not allow control target agents owned by other people
+      calls validate_options
+      rejects private Services owned by another user
+      allows Services owned by the Agent's user
+      should not allow target agents owned by other people
+      returns options with indifferent access after reload
+      should not allow scenarios owned by other people
+      makes options symbol-indifferent before validating
+      makes memory symbol-indifferent before validating
+      should work when assigned a hash or JSON string
+      allows global Services owned by another user
+      returns memory with indifferent access after reload
+      validates keep_events_for
+      should not allow source agents owned by other people
+      should not allow controller agents owned by other people
+    .receive!
+      should group events
+      serializes event selection and enqueueing
+      should not propagate to disabled Agents
+      should ignore events that were created before a particular Link
+      should not run agents of deactivated accounts
+      should call receive for each event when no_bulk_receive! is used
+      should not run consumers that have nothing to do
+      should use available events
+      should log exceptions
+      should not propagate from Agents with unknown types
+      only propagates to receivers in the scope
+      should not propagate to Agents with unknown types
+      does not propagate for an empty scope
+      should track when events have been seen and not received them again
+    cleaning up now-expired events
+      when keep_events_for has not changed
+        does nothing
+      when keep_events_for is changed
+        updates events relative to their created_at
+        updates events' expires_at
+        nulls out expires_at when keep_events_for is set to 0
+    Agent.build_clone
+      should create a clone of a given agent for editing
+    .async_receive
+      should not run disabled Agents
+    creating a new agent and then calling .receive!
+      should not backfill events for a newly created agent
+  changes to type
+    validates types
+    should know about available types
+    disallows changes to type once a record has been saved
+    when the agent has keep_events_for set
+      sets expires_at on created events
+    when the agent does not have keep_events_for set
+      does not set expires_at on created events
+    behaves like a bounded execution lock
+      times out while another connection holds the lock and can acquire it after release
+  .trigger_web_request
+    when .receive_web_request is defined with just request
+      calls the .trigger_web_request with headers, and they get passed to .receive_web_request
+    when .receive_web_request is defined
+      calls the .receive_web_request hook, updates last_web_request_at, and saves
+    when .receive_webhook is defined
+      outputs a deprecation warning and calls .receive_webhook with the params
+  .last_checked_event_id
+    should be updated by setting drop_pending_events to true
+    should not affect a virtual attribute drop_pending_events
+  credential
+    should return the value of the credential when credential is present
+    should memoize the load
+    should return nil when credential is not present
+  Should create post
+      should publish any payload it receives
+  Should handle tumblr error
+      should publish any payload it receives and handle error
+  truncates message to a reasonable length
+  replaces invalid byte sequences in a message
+  validations
+    requires a message
+    requires an agent
+    requires a valid log level
+    creates AgentLogs
+    accepts objects as well as strings
+    cleans up old logs when there are more than log_length
+    updates Agents' last_error_log_at when an error is logged
+    defaults to 200
+  should add a template for an existing WebsiteAgent with `url`
+    should log resquests which return an error
+    send a note
+    should return an empty array on error
+    should return an array of devices
+  helpers
+      should work for a note
+      should work for an address
+      should work for a link
+  validating
+    should require fields based on the type
+    should require the api_key
+    should try do create a device_id
+    should return an array
+    should not be working until the first event was received
+    should create a new device and assign it to the options
+    should return true when working
+    should return true when working
+    sets traps for INT TERM and QUIT
+  without traps
+    running workers
+        restarts dead workers
+        runs all the workers
+        kills no long active workers
+      handles signals
+      runs until stop is called
+      does not load workers specified in the :except option
+      loads only the workers specified in the :only option
+      loads all workers
+  receive_web_request
+    should respond with `Event Created` if the response option is nil or missing
+    should create event if secret matches
+    should respond with `201` if the code option is empty, nil or missing
+    should respond with customized response code if configured with `code` option
+    should not create event if secrets do not match
+    should respond with customized response message if configured with `response` option
+    should respond with interpolated response message if configured with `response` option
+    should be able to create multiple events when given an array
+    should respond with custom response header if configured with `response_headers` option
+    with headers
+      should pass empty event_headers_key if none of the headers exist
+      should not pass any headers if event_headers_key is not set
+      should pass selected headers specified in event_headers_key
+      should pass empty event_headers_key if event_headers is empty
+    receiving events
+      accepting only get
+        should not accept POST
+        should accept GET
+      accepting only put
+        should not accept POST
+        should not accept GET
+        should accept PUT
+      with reCAPTCHA
+        should accept a request if recaptcha_secret is set and g-recaptcha-response given is verified
+        should accept a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is above score_treshold
+        should not check a reCAPTCHA response unless recaptcha_secret is set
+        should reject a request if recaptcha_secret is set but g-recaptcha-response is not given
+        should reject a request if recaptcha_secret is set and g-recaptcha-response given is not verified
+        should reject a request if recaptcha_secret is set and g-recaptcha-response given is verified and
+        reCAPTCHA v3 score is below score_treshold
+      accepting get and post
+        should accept POST
+        should not accept PUT
+        should accept GET
+      flaky content with commas
+        should accept POST
+        should accept PUT
+        should accept GET
+        should not accept DELETE
+      default settings
+        should not accept GET
+      accepting only post
+        should not accept GET
+        should accept POST
+  HTML descriptions
+    preserves safe HTML tables and CSS classes
+    removes active HTML injected through the payload path
+    removes active HTML injected through the webhook secret
+  has agent description
+  cannot be scheduled
+  has event description
+  renders the event description when link_type=permanent
+    with permanent urls
+      creates one event with a single path
+      creates one event with the permanent dropbox link for each path
+    with temporary urls
+      with a single path
+        creates one event with the temporary dropbox link
+      with multiple comma-separated paths
+        creates one event with the temporary dropbox link for each path
+    when mode is set to 'read'
+      on subsequent checks
+        returns notes created/updated since the last time it checked
+        returns notes tagged since the last time it checked
+      the first time it checks
+        returns only notes created/updated since it was created
+  Agents::EvernoteAgent::Note
+      when no option is set
+        returns a hash with title, tags, notebook, source and source url
+      when include_resources is set to true
+        includes resources
+      when include_content is set to true
+        includes content
+    requires the mode to be 'update' or 'read'
+    mode is set to 'update'
+      requires some note parameter to be present
+      requires schedule to be 'never'
+    mode is set to 'read'
+      requires a schedule to be set
+  Agents::EvernoteAgent::NoteStore
+      updates an existing note with given params
+      creates a note with given params in evernote note store
+      finds a notebook with a given guid
+      finds a notebook with given name
+      gets a note with the given guid
+      finds tags with the given guids
+      a note with given title and notebook does not exist
+        also creates the notebook if it does not exist
+        creates a note
+      such a note does exist
+        updates the note
+  Agents::EvernoteAgent::NoteStore::Search
+      returns the guids of notes satisfying search options
+      last_checked_at is set
+        notes_with_tags is not set
+          only returns notes updated since then
+        notes_with_tags is set
+          returns notes updated since then or notes with recently added tags
+      last_checked_at is not set
+        returns notes satisfying the search options
+      builds an evernote search filter using search grammar
+    when mode is set to 'update'
+      adds a note for any payload it receives
+      include_xhtml_content is set to 'true'
+        creates an event with note content wrapped in ENML
+      a note with the same title and notebook exists
+        updates the existing note
+  start_worker? defaults to true
+  should build the worker_id
+    returns an empty array when no agent is active
+    returns active agent workers
+  LongRunnable::Worker
+    calls boolify of the agent
+    expects run to be overriden
+    scheduling
+      schedules tasks once
+      allows the cron syntax
+      schedules repeating tasks
+      gracefully stops the worker
+      terminates the thread
+      stops, setups and starts the worker
+      runs the agent worker
+      stops when rescueing a SystemExit
+      creates an agent log entry for a generic exception
+      terminates the thread
+      wakes up sleeping threads after termination
+  format_tweet
+    formats a tweet
+    when a string key hash is given
+      formats a tweet
+    when a Twitter::Tweet object is given
+      formats a tweet
+    when nil is given
+      raises an exception
+    should make sure multiple events are being received
+    should check if receive_text is working fine
+    should check if receive_call is working fine
+    checks if events have been received within the expected receive period
+  validation
+    should make sure filling sure filling server_url is not necessary
+    should validate presence of receiver_cell
+    should validate presence of sender_cell
+    should validate presence of auth_token
+    accepts boolean receive flags
+    should validate presence of of account_sid
+    in the future
+    in the past
+    when handler does not contain job_data
+      finds the agent for AgentCheckJob
+    works for running jobs
+    works for failed jobs
+    works for queued jobs
+  disables all agents before beeing destroyed
+  options serialization
+    returns options with indifferent access after reload
+  creating services via omniauth
+    should work with github services
+    should exchange a Threads token for a long-lived token
+    should work with Raindrop services
+    should work with twitter services
+    raises the provider error when exchanging a Threads token fails
+  updating the access token
+    should update the token
+    should refresh a Raindrop token with a JSON request
+    should return the correct endpoint
+    raises the provider error when refreshing a token fails
+    should refresh a Threads long-lived token
+  omniauth options provider registry for non-conforming omniauth responses
+    .register_options_provider
+      allows gem developers to add their own options provider to the registry
+  preparing for a request
+    should not update the token if the token never expires
+    should not update a Threads token outside the refresh window
+    should call refresh_token! if the token expired
+    should not update the token if the token is still valid
+    should update a Threads token inside the refresh window
+    disconnects agents and disables them if the previously global service is made private again
+    should toggle the global flag
+  .by_name
+    orders by name in the requested direction
+    rejects invalid directions
+  a blog which returns an error
+    creates an error message when status and msg are returned instead of liked_posts
+  a blog which returns likes
+    creates events based on likes
+  receive_twilio_text_message
+    should create event upon receiving request
+  receive_twilio_text_message and send a response
+    should create event and send back TwiML Message if reply_text is set
+  .seed
+    can not be turned off
+    imports a set of agents to get the user going when they are first created
+    applies network timeouts when the scenario file is a URL
+    respects an environment variable that specifies a path or URL to a different scenario
+  .import
+    can be turned off
+    imports a set of agents to get the user going when they are first created
+    is turned off for existing instances of Huginn
+    does not create event when the value rises
+    does not create event when the value is blank
+    creates events when memory is empty
+    does not create event when the value does not change
+    creates events when the value drops
+    isnt when event created outside :expected_update_period_in_days
+    is when event created within :expected_update_period_in_days
+  validation
+    should validate presence of property
+    should validate presence of property
+    does not create event when no change
+    creates events when new event changed
+    creates events when memory is empty
+  should fail on incorrect users
+  should redirect correctly
+  does not let custom response headers override the Content-Security-Policy header
+  can accept a content-type to return
+  can accept multiple custom response headers to return
+  calls receive_web_request without login and records the request time
+  sandboxes the response with a Content-Security-Policy header
+  should accept gets
+  should fail on incorrect agents
+  should pass through the received format
+  legacy update_location endpoint
+    should raise a 404 error when given an invalid user id
+    should only look at agents with the given secret
+    should only consider Agents::UserLocationAgents for the given user
+    should create events without requiring login
+  Agent response permissions
+    serves active content as text and enforces response safety headers
+    rejects an external redirect from a non-admin Agent even for an admin visitor
+    serves an RSS response as an attachment with its original media type
+    applies the same policy to a custom Location header
+    allows HTML and external redirects from an admin-owned Agent without login
+    keeps a same-origin Location header
+    allows HTML for a non-admin owner when unrestricted responses are enabled
+    should not act on non-HTTP URLs
+    should handle multi-page PDFs
+    should extract PDF info and create an event
+  GET index
+    can filter by Agent
+    only loads Agents owned by the current user
+  DELETE clear
+    only deletes logs for an Agent owned by the current user
+    deletes all logs for a specific Agent
+    should ignore retained messages that are previously received
+    checks if its generating events as scheduled
+  should stop
+    should return an array with an instance of itself
+  POST toggle_availability
+    should work for service of the user
+    should not work for a service of another user
+  DELETE destroy
+    destroys only services owned by the current user
+  GET index
+    only returns sevices of the current user
+    should call the validation method if it is defined
+    should return false of the method is undefined
+    should raise an ArgumentError for invalid  options
+    should not require any options for the default values
+    should raise an ArgumentError when not providing an array with type: array
+  re-emits all events created by the given Agent
+  doesn't re-emit events created after the the most_recent_event_id
+  when delete_old_events set to true
+    re-emits all events created by the given Agent and destroys originals
+    should generate the correct last checkpoint url
+    should return the correct request header
+    should generate the correct events url
+    should generate the correct specific tracking url
+    should check that initial run creates an event
+  path request must exist
+    should check that validation added if path does not exist
+    should require credentials
+    should check that the aftership object is valid
+    should send email with correct content type
+    should send an email
+    logs and re-raises mailer errors
+    can receive complex events and send them on
+    queues any payloads it receives
+  behaves like EmailConcern
+    validations
+      should be valid
+      should validate that recipients, when provided, is one or more valid email addresses or Liquid commands
+      should validate the presence of 'expected_receive_period_in_days'
+      should validate the presence of 'subject'
+      interpolates
+      handles an array
+      defaults to the user's email address
+      wraps a string with an array
+    returns raindrops from a collection
+    raises the Raindrop API error message
+    creates a raindrop
+  renders signed-out navigation labels from locale keys
+  renders admin navigation labels from locale keys
+  renders signed-in navigation labels from locale keys
+  creates an error log if the request fails
+    is not working without having received an event
+    is working after receiving an event without error
+    accepts audio key and uses :send_audio to send the file with truncated caption
+    accepts group key and uses :send_media_group to send the file
+    processes multiple events properly
+    accepts photo key and uses :send_photo to send the file
+    creates a log entry when no key of the received event was useable
+    accepts video key and uses :send_video to send the file
+    accepts document key and uses :send_document to send the file and the full caption
+    accepts photo key with no caption when long:split is set
+    returns false if the token is invalid
+    returns true if the token is valid
+    returns a list of all recents chats, groups and channels
+  validation
+    should validate value of disable_web_page_preview
+    should validate presence of auth_token
+    should validate value of long_message
+    should validate value of parse_mode
+    should validate value of disable_notification
+    should validate presence of chat_id
+    should validate value of caption
+  validating
+    should require the basecamp password
+    should require the basecamp user_id
+    should also allow a credential
+    should return true when valid
+    should return false when invalid
+    should return a array of hashes
+    send a message to the hipchat
+    should not be working until the first event was received
+    should not be working when the last error occured after the last received event
+    should be working when the last received event occured after the last error
+  refuses MySQL 5.7 without modifying its data
+  allows MySQL 8.0 data to reach the server upgrade process
+  allows a new data directory without creating files
+  POST create
+    does not actually create any agent, event or log
+    uses the memory of an existing Agent
+    sets created_at of the dry-runned event
+    accepts an event
+    does not actually update an agent
+  GET index
+    does not load any events without specifing sources
+    does not load events when the agent is owned by a different user
+      for new agents
+      for existing agents
+    loads the most recent events
+      load the most recent events when providing source ids
+      loads the most recent events for a saved agent
+  PUT update
+    updates attributes on Scenarios for the current user
+    shows errors
+    adds an agent to the scenario
+  GET index
+    only returns Scenarios for the current user
+  GET export
+    only exports private Scenarios for the current user
+    returns a JSON file download from an instantiated AgentsExporter
+    public exports
+      exports public scenarios for other users when logged out
+      exports public scenarios for other users when logged in
+  GET show
+    loads Agents for the requested Scenario
+    only shows Scenarios for the current user
+  POST create
+    creates Scenarios for the current user
+    will not create Scenarios for other users
+    shows errors
+  DELETE destroy
+    passes the mode to the model
+    destroys only Scenarios owned by the current user
+  GET edit
+    only shows Scenarios for the current user
+  GET share
+    only displays Scenario share information for the current user
+  PUT enable_or_disable_all_agents
+    updates disabled on all agents in a scenario for the current user
+  validation
+    should validate presence of message
+    should validate search_url
+    should validate presence of value_path
+    should validate presence of expected_receive_period_in_days
+    tracks and groups by the group_by_path
+    finds peaks
+    keeps a rolling window of data
+    raised an exception if the extracted data can not be casted to a float
+    waits and accumulates min events before triggering for peaks
+    keeps a rolling window of peaks
+    works without a group_by_path as well
+  receive
+    validations
+      should validate url
+    with an event with a successful ping
+      records a successful response, timing, URLs, and status
+      but the status code is not 200
+        returns and remembers an unsuccessful HTTP status
+      and with one event with a failing ping
+        records successful and failed responses in event order
+      with existing and non-existing headers specified
+        returns existing headers and nil for missing headers
+      but the ping returns a status code of 0
+        records a missing response and clears the previous status
+      but the ping returns a status code of -1
+        records a negative status as a missing response
+      with a response with a header
+        should save the header value according to headers_to_save
+        regarding case-insensitivity
+          should save the header value according to headers_to_save
+      but the last status code was 200
+        and change settings have been set to true
+          should NOT create any events
+          but actually, the ping failed
+            should create an event
+        and change settings have been set to false
+          should create one event
+        and no duplication settings have been set
+          should create one event
+  working
+    should not be working if the status is -1
+    should not be working if the status is missing
+    should be working when the last status is 304
+    should not be working if the status is 0
+    should be working when the last status is 200
+  check
+    should check the url
+  sort_events
+    should sort events by a given key
+    should sort events by multiple keys
+    should support _index_
+    should sort events stably
+    should sort events by time
+  validations
+    should not allow events_order to be an array containing unexpected objects
+    should not allow events_order to be a non-array object
+    should allow events_order to be unspecified, null or an empty array
+    should allow events_order to be an array containing strings and valid tuples
+  automatic event sorter
+    declaration
+      can_order_created_events!
+        should work if called from an Agent that can create events
+        should refuse to work if called from an Agent that cannot create events
+      can_order_created_events?
+        should return false unless an Agent declares can_order_created_events!
+        should return true if an Agent declares can_order_created_events!
+    behavior
+      should keep the order of created events unless events_order is specified
+      should sort events created in receive() in the order specified in events_order
+      should sort events created in check() in the order specified in events_order
+      with the include_sort_info option enabled
+        should add sort_info to events created in receive() when events_order is specified
+        should add sort_info to events created in check() when events_order is not specified
+        should add sort_info to events created in check() when events_order is specified
+    should check for changes
+  cleaning fields
+    should trim whitespace
+  credential_value
+    keeps 4-byte characters such as emoji
+  validation
+    requires credential_name
+    requires user_id
+    requires credential_name to be unique per user
+    requires credential_value
+    allows the same credential_name for another user
+    unregisters deleted SchedulerAgents
+    unregisters disabled SchedulerAgents
+    registers active SchedulerAgents
+  .period
+    flags decreases inside the window even when the counter later exceeds its baseline
+    reports actual elapsed time and missing dates rather than inventing daily counts
+    calculates daily, weekly and rolling 30-day differences
+  ContainerDownloads::Client
+    does not retry permanent failures or follow redirects to unrelated pages
+    recovers from a transient DNS failure
+    retries transient HTTP failures and bounds Retry-After
+    reports an exhausted network failure without returning zero
+  .ghcr_count
+    accepts an explicit zero
+    rejects missing, rounded, negative, malformed and ambiguous counts
+    reads the exact title, including entities and nested labels, instead of the rounded display or version count
+  .collect
+    records all five sources with a UTC timestamp
+    fails the entire snapshot when one source is unavailable
+    rejects a GHCR page with only a cumulative count
+  .docker_count
+    rejects unavailable, invalid and unrelated counters
+    reads a nonnegative integer for the requested repository
+  .ghcr_daily
+    reads dated counts in chronological order, including zero
+    rejects absent, ambiguous and malformed charts
+  .store
+    preserves snapshots including same-day runs and regenerates valid summaries and SVG
+    backfills daily counts, refreshes provisional days, and retains dates outside the source window
+    reads older flat snapshots together with partitioned records
+    rejects incomplete and older snapshots without changing history
+    rejects invalid daily data before writing any records
+  Rake tasks
+    collects a snapshot and records it without loading Rails
+    rejects missing task arguments before collecting or writing
+  URL and URLSearchParams
+    resolves relative URLs against a base
+    exposes the WHATWG URL class
+    builds query strings with URLSearchParams
+  executing code
+    works by default
+    escaping and unescaping HTML
+      can escape and unescape html with this.escapeHtml and this.unescapeHtml in the javascript environment
+    creating events
+      creates events with this.createEvent in the JavaScript environment
+    using credentials as code
+      logs an error when the credential goes away
+      accepts credentials
+    user credentials
+      updates an existing credential
+      can access an existing credential
+      will create a new credential
+    logging
+      can output AgentLogs with this.log and this.error in the JavaScript environment
+    getMemory
+      won't store NaNs
+      it stores an Array
+      it stores false
+      it stores a Hash
+      it stores null
+      it stores a nested Hash
+    setMemory
+      stores an object
+    getting incoming events
+      can access incoming events in the JavaScript enviroment via this.incomingEvents
+    deleteKey
+      returns the string value of the deleted key
+      deletes a memory key
+      returns the hash value of the deleted key
+    error handling
+      should log an error when JavaScript throws
+      should log an error when V8 has issues
+    getting and setting memory, getting options
+      can access options via this.options and work with memory via this.memory
+    when expected_receive_period_in_days is set
+      returns false when more than expected_receive_period_in_days have passed since the last event was received
+    when expected_update_period_in_days is set
+      returns false when more than expected_update_period_in_days have passed since the last event creation
+  KVS
+    can be accessed via Agent.kvs()
+  validations
+    accepts a credential, but it must exist
+    requires 'code'
+  fetch
+    sets ok to false for HTTP error statuses without throwing
+    throws a TypeError on connection failures
+    goes through OUTBOUND_PROXY when it is set
+    performs a GET request and exposes the standard response fields
+    accepts a URL object
+    rejects non-http urls
+    sends the method, headers, and body
+    follows redirects by default and reports the final url
+    does not follow redirects when redirect is manual
+    fetchAll
+      rejects invalid urls before performing any request
+      throws a TypeError when any request fails with a network error
+      does not throw on HTTP error statuses
+      performs multiple requests in parallel and preserves order
+      throws a TypeError when given a non-array
+      accepts URL objects
+    behaves like AgentProxyConcern
+      rejects an invalid boolean
+      rejects opt-in without AGENT_PROXY and never falls back to a direct connection
+      rejects combining opt-in with an explicit proxy
+      does not select AGENT_PROXY with use_agent_proxy="false"
+      enforces OUTBOUND_PROXY with use_agent_proxy=true
+      enforces OUTBOUND_PROXY with use_agent_proxy=nil
+      enforces OUTBOUND_PROXY with use_agent_proxy=false
+      refuses an explicit proxy and enforces OUTBOUND_PROXY even without validation
+      selects AGENT_PROXY with use_agent_proxy=true
+      enforces OUTBOUND_PROXY with use_agent_proxy="true"
+      prefers OUTBOUND_PROXY over AGENT_PROXY
+      does not select AGENT_PROXY with use_agent_proxy=false
+      enforces OUTBOUND_PROXY with use_agent_proxy="false"
+      selects AGENT_PROXY with use_agent_proxy="true"
+      continues to support an explicit proxy
+      does not select AGENT_PROXY by default
+  .timeout
+    stays below the delayed job runtime
+    defaults to 60 seconds
+    rejects non-positive values
+    caps a request-specific timeout
+    honors the configured timeout
+  .open_timeout
+    does not exceed the request timeout
+    defaults to 10 seconds
+  .configure_net_http
+    sets every supported I/O timeout
+  .configure!
+    sets defaults for the shared HTTP clients
+  .within
+    interrupts an operation at the common timeout
+  POST create
+    with invalid params
+      does not allow to set the admin flag
+      does not import the default scenario
+    with valid params
+      imports the default scenario for the new user
+  DELETE destroy
+    does not destroy a running job
+    destroy a job which is not running
+  GET index
+    returns all jobs
+    does not allow normal users
+    returns the last page of jobs when page is last
+  POST retry_queued
+    run the queued job
+  DELETE destroy_all
+    destroys all jobs
+  PUT run
+    queue a job that failed
+    queue a job which is not running
+    clears a failed job's stale reservation and retry count
+    not queue a running job
+  DELETE destroy_failed
+    just destroy failed jobs
+    should handle matchers and Liquid templating in instructions
+    should handle Liquid templating in mode
+    should accept merge mode
+    should allow escaping
+    formats instructions in clean mode
+    should not fail if no matchers are defined
+  validation
+    should validate the contents of matchers
+    should validate type of matchers
+    should validate presence of mode
+    should validate presence of instructions
+    requires mode to be 'clean' or 'merge'
+    activates the user and all his agents
+    returns the undefined agent types
+    returns an empty array when no agents are undefined
+    deactivates the user and all her agents
+  validations
+    invitation_code
+      when configured not to use invitation codes
+        skips this validation
+      when configured to use invitation codes
+        only accepts valid invitation codes
+        requires no authentication code when requires_no_invitation_code! is called
+        can reject invalid invitation codes
+    returns an empty array when no agents are undefined
+    returns the undefined agent types
+  routes to handle_request
+  supports the legacy /webhooks/ route
+  routes with format
+  receive_events
+    should command targets
+    to configure
+      preserves Liquid syntax in event values passed through liquid_escape
+      should conditionally configure targets interpolating agent attributes
+  behaves like AgentControllerConcern
+    validation
+      of action
+        should ensure that 'configure_options' exists in options when the action is 'configure'
+        should accept 'run' if all target agents are schedulable
+        should not reject 'enable' or 'disable' no matter if targets include an unschedulable agent
+        should reject 'run' if targets include an unschedulable agent
+        should allow certain values
+        should disallow obviously bad values
+    control!
+      should configure targets with nested objects
+      should disable targets whose options are invalid
+      should not run disabled targets
+      should configure targets
+      should enable targets
+      should run targets
+      should enable targets and drop pending events
+      should disable targets
+    preconditions
+      must be satisfied for these shared examples
+    control_action
+      returns the result of interpolation
+      returns options['action']
+  check
+    should command targets
+  preserves false and zero option values
+  works for the type :array
+  works for the type :json
+  works for the type :number
+  works for the type :string
+  works for the type :boolean
+  works for the type :text
+  renders the description markdown without errors
+  validation
+    should validate method as post, get, put, patch, or delete, defaulting to post
+    should not validate payload as a hash or an array if content_type includes a MIME type and method is not get or delete
+    should validate presence of post_url
+    requires output_mode to be 'clean' or 'merge', if present
+    requires `no_merge` to be set to true when content_type contains a MIME type
+    requires emit_events to be true or false
+    should validate absence of expected_receive_period_in_days is allowed
+    requires headers to be a hash, if present
+    should validate payload as a hash, if present
+    should validate that no_merge is 'true' or 'false', if present
+  behaves like FileHandlingConsumer
+    returns a file pointer
+    get_io raises an exception when trying to access an agent of a different user
+      returns false if the event does not contain a file pointer
+      returns true if the event contains a file pointer
+    makes a multipart request when receiving a file_pointer
+    can handle multiple events and merge the payloads with options['payload']
+    interpolates when receiving a payload
+    does not make a multipart request for an unsigned file_pointer when verification is enabled
+    can skip merging the incoming event when no_merge is set, but it still interpolates
+    can make GET requests
+    can make a GET request merging params in post_url, payload and event
+    interpolates outgoing headers with the event payload
+    checks if events have been received within expected receive period
+    checks if no event has been received
+    checks if there was an error
+    checks if 'expected_receive_period_in_days' was not set
+    sends options['payload'] as JSON as a POST request
+    sends options['payload'] as XML with custom root element name, as a POST request
+    sends options['payload'] as XML as a POST request
+    interpolates outgoing headers
+    sends options['payload'] as a GET request
+    sends options['payload'] as a POST request
+    sends options['payload'] as a string POST request when content-type continas a MIME type
+    emitting events
+      when emit_events is set to true
+        emits the response headers capitalized
+        emits the response headers only including those specified by event_headers
+        emits the response headers downcased
+        emits the response headers snakecased
+        emits the response status, body and capitalized headers by default
+        when output_mode is set to 'merge'
+          emits the received event
+        and the response is in JSON
+          emits the unparsed JSON body
+          emits the parsed JSON body when parse_body is true
+      when emit_events is not set to true
+        does not emit events
+  making requests
+    can make requests of each type
+  behaves like WebRequestConcern
+      should disable SSL verification if disable_ssl_verification option is 'true'
+      should disable SSL verification if disable_ssl_verification option is true
+      should enable SSL verification by default
+      should use faradays default params_encoder
+      should use WebRequestConcern::DoNotEncoder when disable_url_encoding is truthy
+      should not disable SSL verification if disable_ssl_verification option is 'false'
+      should not disable SSL verification if disable_ssl_verification option is false
+      bounds connection and request I/O
+      should enable SSL verification when nil
+      redirect follow
+        should use FollowRedirects by default
+        should not use FollowRedirects when disabled
+      proxy
+        should use the proxy option when given
+        should leave the proxy to the environment when no proxy option is given
+        when OUTBOUND_PROXY is set
+          should use the outbound proxy
+          should refuse a proxy option
+    WebRequestConcern::DoNotEncoder
+      should return the value when decoding
+      should work without a value present
+      should not encode special characters
+      should work without an empty value
+    User-Agent
+      should have the default value of Huginn
+      should be overriden by the value in options if present
+      should be overridden by the environment variable if present
+    behaves like AgentProxyConcern
+      does not select AGENT_PROXY with use_agent_proxy=false
+      enforces OUTBOUND_PROXY with use_agent_proxy="true"
+      enforces OUTBOUND_PROXY with use_agent_proxy="false"
+      enforces OUTBOUND_PROXY with use_agent_proxy=false
+      does not select AGENT_PROXY with use_agent_proxy="false"
+      does not select AGENT_PROXY by default
+      enforces OUTBOUND_PROXY with use_agent_proxy=nil
+      rejects an invalid boolean
+      refuses an explicit proxy and enforces OUTBOUND_PROXY even without validation
+      continues to support an explicit proxy
+      enforces OUTBOUND_PROXY with use_agent_proxy=true
+      selects AGENT_PROXY with use_agent_proxy=true
+      rejects combining opt-in with an explicit proxy
+      rejects opt-in without AGENT_PROXY and never falls back to a direct connection
+      prefers OUTBOUND_PROXY over AGENT_PROXY
+      selects AGENT_PROXY with use_agent_proxy="true"
+    validations
+      should be valid
+      should validate basic_auth
+      should validate interpolated basic_auth credentials
+      should validate headers
+      should validate user_agent
+      should validate disable_ssl_verification
+    should check for changes starting_at a future date, thus not find any
+    error messaged added if choose_home_time_line is false and username does not exist
+    requires username unless choose_home_time_line is true
+    should check for changes
+  POST create
+    shows errors
+    creates UserCredentials for the current user
+    will not create UserCredentials for other users
+  DELETE destroy
+    destroys only UserCredentials owned by the current user
+  GET index
+    only returns UserCredentials for the current user
+  GET edit
+    only shows UserCredentials for the current user
+  PUT update
+    updates attributes on UserCredentials for the current user
+    shows errors
+  Post import
+    duplicate credential name shows an error that it is not saved
+    asserts that primary id in json file is ignored
+    asserts user credentials were created for current user only
+  migrating the 'make_message' format
+    should work
+  converting JSONPath strings
+    should ignore strings which just contain a JSONPath
+    should raise an exception when encountering complex JSONPaths
+    should work
+    still migrates legacy paths without a dot after the root
+  converting escaped JSONPath strings
+    should raise an exception when encountering complex JSONPaths
+    should work
+    should convert the 'escape' method correctly
+  migrating an actual agent
+    should work with nested hashes
+    should work with nested arrays
+    should work
+    should raise an exception when encountering complex JSONPaths
+  migrating a hash
+    should work with leading_dollarsign_is_jsonpath
+    should raise an exception when encountering complex JSONPaths
+    should convert every attribute
+    should use the corresponding *_path attributes when using merge_path_attributes
+  runs the shared migration and preserves the result on rollback
+    should check for changes starting_at a future date, thus not find any
+    should check for changes
+  .seed
+    creates an admin and imports its default scenario
+    can be run multiple times and exit normally
+    generates and prints a password when SEED_PASSWORD is not set
+    uses SEED_PASSWORD when set
+    outputs a structure containing name, description, the date, all agents & their links
+    does not output links to other agents outside of the incoming set
+    outputs control links to agents within the incoming set, but not outside it
+    strips special characters
+    strips leading and trailing dashes
+    has a default when options[:name] is nil
+    strips punctuation
+    has a default when the result is empty
+    returns a default hash when an event does not have a location
+    returns a hash containing location information
+  .with_location
+    selects events with location
+  after destroy
+    nullifies any dependent AgentLogs
+  payload serialization
+    returns payload with indifferent access after reload
+  .cleanup_expired!
+    doesn't touch Events with no expired_at
+    removes any Events whose expired_at date is non-null and in the past, updating Agent counter caches
+    always keeps the latest Event regardless of its expires_at value only if the database is MySQL
+  caches
+    when an event is updated
+      does not touch the last_event_at on the agent
+    when an event is created
+      updates last_event_at on agent
+      updates a counter cache on agent
+    creates a new event identical to itself
+    creates an event with the parsed response
+  validations
+    should require a url
+    checks if events have been received within the expected receive period
+    shows dummy CSV when in serialize mode
+    works with event_per_file and without headers
+    works with event_per_row and headers
+  behaves like FileHandlingConsumer
+    returns a file pointer
+    get_io raises an exception when trying to access an agent of a different user
+      returns true if the event contains a file pointer
+      returns false if the event does not contain a file pointer
+    is working after receiving an event without error
+    is not working without having received an event
+    serializing
+      respects use_fields and writes no header
+      writes one row per received event
+      does not write the headers when with_header is false
+      writes headers when with_header is true
+      accepts multiple rows per event
+      respects the order of use_fields
+      only serialize the keys specified in use_fields
+      arrays
+        does not write a header
+        handles nested arrays
+    agent options
+      output
+        creates one event per row
+        creates one event per file
+      use_fields
+        extracts the specified columns
+      with_header
+        works without headers
+        works without headers and event_per_file
+      data_path
+        can receive the CSV via a regular event
+    handling different CSV formats
+      handles quotes correctly
+      works with tab seperated csv
+      works with OSX line endings
+      works with windows line endings
+    data_path has to be set in serialize mode
+    is valid with the given options
+    requires with_header to be either 'true' or 'false'
+  POST #switch_to_user
+    does not switch if not admin
+  POST #switch_back
+    does not switch_back without having switched
+    switches to another user and back
+  impersonation request protection
+    rejects switching users without a CSRF token
+    rejects switching back without a CSRF token
+    accepts switching users and back with valid CSRF tokens
+  POST #create
+    with valid user params
+      imports the default scenario for the new user
+    with invalid user params
+      does not import the default scenario
+    returns file entries across paginated responses
+    normalizes the root path to an empty string
+    normalizes the response url key
+    creates a shared link and forces dl=1
+    reuses an existing shared link when Dropbox reports one already exists
+    and retained_events is 0
+      should emit a event
+    but retained_events is 1
+      should emit a event
+    checks to see if the Agent has received any events in the last 'expected_receive_period_in_days' days
+    but retained_events is 1
+      retained_eventss only 1 event at a time
+    and retained_events is 0
+      retained_events any payloads it receives
+  validation
+    should validate retained_events
+  is valid with put-your-key-here or your-key
+  creates a valid agent
+  pirate weather
+    fails cases that pass the first test but are invalid
+    validates the location properly
+  Agents::WeatherAgent::VALID_COORDS_REGEX
+    matches 37.779329,-122.41915
+    matches a dozen random valid values
+    doesn't have a Service object attached
+  cannot receive events
+    requires a "dir_to_watch"
+      needs to be a positive integer
+      needs to be present
+    saves the directory listing in its memory
+    subsequent calls
+      sends an event upon a different directory listing
+      does not sent any events when there is no difference on the directory listing
+    first time
+      does not send any events
+  Agents::DropboxWatchAgent::DropboxDirDiff
+      is true when no differences are detected
+      is false when differences were detected
+      detects additions, removals, and updates
+      when the current value is not defined
+        considers all removals
+      when the previous value is not defined
+        considers all additions
+    does not include query params from the callback request
+    uses Raindrop's API host for token requests
+    uses Raindrop's JSON token exchange
+  completes the buckets
+  get_io returns a StringIO object
+    returns a hash with the contents of the bucket
+    watching
+      does not emit any events on the first run
+      detecting changes
+        emits events for added files
+        emits events for removed files
+        emits events for modified files
+      error handling
+        handles generic S3 exceptions
+        handles AccessDenied exceptions
+    not watching
+      emits an event for every file
+    should include event_type when watch is set to true
+    should not include event_type when watch is set to false
+    validates the key
+    validates the secret
+    initializes the S3 client correctly
+    requires 'filename' in 'write' mode
+    requires the bucket to be set
+    requires mode to be set to 'read' or 'write'
+    requires 'data' in 'write' mode
+    requires watch to be present
+    requires watch to be either 'true' or 'false'
+    requires region to be present
+    is working with no recent errors
+    writes the data at data into a file
+    does nothing when mode is set to 'read'
+  validating
+    should allow an icon
+    should require a channel
+    should allow attachments
+    should require a webhook_url
+    should call received_event_without_error?
+    receive an event without errors
+  POST create
+    initializes a ScenarioImport for current_user, passing in params
+  GET new
+    initializes a new ScenarioImport and renders new
+  GET new
+    with a scenario_id
+      does not see other user's scenarios
+      populates the assigned agent with the scenario
+    with :id
+      only allows the current user to clone his own Agent
+      opens a clone of a given Agent
+  PUT update
+    does not allow changing types
+    will not accept Agent sources owned by other users
+    will not accept Scenarios owned by other users
+    does not allow to modify the agents user_id
+    does not accept private Services owned by other users
+    shows errors
+    accepts JSON requests
+    updates attributes on Agents for the current user
+    does not enable an Agent whose options are invalid
+    disables an Agent whose options are invalid
+    updates last_checked_event_id when drop_pending_events is given
+    redirecting back
+      redirect back to the index path by default
+      accepts return paths to scenarios
+      sanitizes return paths
+      can redirect back to the show path
+  GET edit
+    only shows Agents for the current user
+    POST complete
+      callsAgent#complete_option and renders json
+    POST validate
+      returns with status 403 when called with an invalid option
+      returns with status 200 when called with a valid option
+  PUT toggle_visibility
+    should delete the cookie
+    should set the cookie
+  POST propagate
+    runs event propagation only for the current user's Agents
+    does not run the propagation when a job is already enqueued
+  GET index
+    combines service, scenario, and enabled filters and counts
+    filters agents that are not assigned to a scenario
+    should not show disabled agents if the cookie is set
+    only returns Agents for the current user
+    renders escaped account names with provider icons and no provider name
+    does not allow filtering by another user's scenario
+    filters agents by service_id
+    accepts the unassigned option without JavaScript
+    filters an individual scenario without duplicating agents with multiple memberships
+    does not allow filtering by another user's service
+  DELETE undefined
+    removes an undefined agent from the database
+  DELETE memory
+    does not clear memory of an agent not owned by the current user
+    clears memory of the agent
+  POST handle_details_post
+    passes control to handle_details_post on the agent
+    can only be accessed by the Agent's owner
+  PUT leave_scenario
+    removes an Agent from the given Scenario for the current user
+  PUT toggle_visibility
+    preserves the active filters and ordering
+  GET show
+    escapes a global service name owned by another user
+    only shows Agents for the current user
+  POST run
+    triggers Agent.async_check with the Agent's ID
+    can only be accessed by the Agent's owner
+  POST create
+    creates Agents for the current user
+    will not accept Agent sources owned by other users
+    shows errors
+    does not accept private Services owned by other users
+    creates Agents and accepts specifing a target agent
+    errors on bad types
+  POST reemit_events
+    enqueues an AgentReemitJob
+    can only be accessed by the Agent's owner
+    when agent has no events
+      does not enqueue an AgentReemitJob
+    when delete_old_events passed
+      enqueues an AgentReemitJob with delete_old_events set to true
+  DELETE destroy
+    redirects correctly when the Agent is deleted from the Agent itself
+    destroys only Agents owned by the current user
+    redirects correctly when the Agent is deleted from a Scenario
+  POST remove_events
+    deletes all events created by the given Agent
+    can only be accessed by the Agent's owner
+    is working after receiving an event without error
+    is not working without having received an event
+    emits an event with the contents of the receives files
+    with file pointer signature verification
+      keeps accepting unsigned file pointers when verification is not configured
+      ignores a tampered file pointer when verification is enabled
+      reads a file pointer emitted by a file-handling agent
+      ignores an unsigned file pointer when verification is enabled
+  behaves like FileHandlingConsumer
+    returns a file pointer
+    get_io raises an exception when trying to access an agent of a different user
+      returns false if the event does not contain a file pointer
+      returns true if the event contains a file pointer
+    requires require_signed_file_pointer to be a boolean value when provided
+    is valid with the given options
+    requires data_key to be present
+    should have a default of 1000
+    should default to 1000 with invalid values
+    should convert string count limits to integers
+    should not allow event limits above 1000
+  validation
+    should not allow non-integer event limits
+    should validate presence and length of secret
+    should validate the event_limit with relative time
+    should validate the event_limit
+    should validate presence of expected_receive_period_in_days
+    should allow the usage custom liquid tags
+    should respond with custom response header if configured with `response_headers` option
+    should output LF-terminated lines if line_break_is_lf is true
+    and the mode is merge events
+      should render the results as a liquid template from the last event in
+    and the mode is last event in
+      should render the results as a liquid template from the last event in
+      but the casing is wrong
+        should render the results as a liquid template from the last event in
+    and the mode is last X events
+      should not be case sensitive when limiting on time
+      should render the results as a liquid template from the last event in, allowing no limit
+      it should continue to work when the event limit is wrong
+      should render the results as a liquid template from the last event in, limiting to 1
+      should render the results as a liquid template from the last event in, limiting to 2
+      should allow the limiting by time, as well
+      but the mode was set to last X events with the wrong casing
+        should still work as last x events
+    when requested with or without the If-None-Match header
+      should conditionally return 304 responses whenever ETag matches
+    but the secret provided does not match
+      should return a 401 response
+      if the format is json
+        should return a 401 json response
+    and the mode is last event in
+      stores the last event in memory
+      but the casing is wrong
+        stores the last event in memory
+    but the mode is merge
+      should merge all of the events passed to it
+      but the casing on the mode is wrong
+        should merge all of the events passed to it
+    but the mode is anything else
+      should update nothing
+    checks if events have been received within expected receive period
+  accepting a callback url
+    should exchange and save long-lived Threads credentials
+    should update the user's credentials
+    should reauthorize an existing service in place
+    creates a scenario label with the given text
+    creates a scenario label with the scenario name
+    defauls foreground and background colors
+    returns a css style-formated version of the scenario foreground and background colors
+  validation
+    should validate key
+    should validate variable
+    should validate value
+    should validate max_keys
+  control target
+    can refer to the storage
+    receives and updates the storage
+    using _value_
+      represents the existing value
+    empty value
+      deletes the key
+    should not create events twice
+    should reset memory after 2 hours
+    should add 4 items to memory
+  validation
+    should validate presence of alert_window_in_minutes
+    should validate presence of stops
+    should validate presence of agency
+    is working after receiving an event without error
+    is not working without having received an event
+  validating
+    requires data_key to be set
+    requires data to be present
+    writes to the error log when the JSON could not be parsed
+    support merge mode
+    parses valid JSON
+  .new
+    passes an inline key to googleauth without changing the environment
+    requires explicit service account credentials
+    with a server-side key file
+      rejects the path before opening it by default
+      loads the configured file when insecure agents are enabled
+    does not expose the server environment through env
+    should filter an event and create no event if the result is a scalar value
+    does not expose the server environment through $ENV
+    should filter an event and create multiple events if the result is an array of objects
+    should filter an event and create no event if the result is an array of scalar values
+    should filter an event and create a single event if the result is an object
+    should reference passed in variables and filter an event
+    should filter an event and create no event if the result is an empty array
+  validation
+    should validate variables
+    should validate filter
+  .should_run?
+    should be true
+    when not enabled
+      should be false
+    when jq command is not available
+      should be false
+    checks if events have been received within the expected receive period
+    should publish any payload it receives
+  making sure check method works
+    expect change method to change event
+    should check for changes starting_at a future date, thus not find any
+    ignores the event if value_path is present and the value at the path is blank
+    records the event if it has a created_at newer than the last seen
+    clears any previous alert
+  validation
+    should validate presence of message
+    should validate presence of window_duration_in_days
+    alerts once if no data has been received during window_duration_in_days
+  creates text posts on the standard post endpoint
+  fetches blog likes with the api key and oauth header
+  posts reblogs to the reblog endpoint
+  returns Tumblr meta errors in the legacy format
+    renders HTML from a markdown text
+    strips event handler attributes from block HTML
+    drops url() values with disallowed URIs
+    strips script elements
+    strips event handler attributes from inline HTML
+    keeps url() values with allowed URIs in style attributes
+    drops url() values in disallowed properties
+    scrubs unsafe CSS from style attributes
+    returns an html_safe string
+    keeps tables and their alignment
+    drops javascript: links

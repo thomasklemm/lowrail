@@ -1,0 +1,17 @@
+# lowrail-profile compare
+
+Base: `bundle exec rspec --format documentation`. Head: `bundle exec rspec --format documentation`.
+
+Objects per request (all, by run): base 12387.3 / 12387.8, head 12389.2 / 12387.4.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request.
+
+## Regressions: 0
+
+None.
+
+## Improvements: 0
+
+None.
+
+Not compared: 24 actions (24 no warm value).

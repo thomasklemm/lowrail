@@ -1,0 +1,40 @@
+| 5 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 288.25 / 288.27 | 100% | `app/models/mailer.rb:746` 46%, `app/models/mailer.rb:733` 42% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 6 | `GEM/mail/lib/mail/field_list.rb:71` | 262.47 / 262.47 | 100% | `app/models/mailer.rb:746` 58%, `app/models/mailer.rb:733` 32% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 7 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 216.9 / 216.9 | 100% | `app/models/setting.rb:424` 11%, `lib/redmine/job_wrapper.rb:24` 9% | `binds = binds.inspect` |
+| 8 | `GEM/sqlite3/lib/sqlite3/statement.rb:159` | 205.36 / 205.36 | 100% | `app/models/issue.rb:299` 30%, `lib/plugins/acts_as_customizable/lib/acts_as_customizable.rb:94` 19% | `val = step` |
+| 9 | `GEM/mail/lib/mail/utilities.rb:388` | 181.14 / 181.14 | 99% | `app/models/mailer.rb:746` 100% | `charset_encoder.encode(str.dup, from_encoding).encode(to_encoding, :un` |
+| 10 | `GEM/css_parser/lib/css_parser/parser.rb:429` | 179.92 / 179.92 | 100% | `lib/redmine/job_wrapper.rb:24` 100% | `current_declarations.gsub!(/\}\s*$/, '')` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Mailer#issue_edit | 51 / 51 | 5343.9 / 5344.2 | 0.3 | 5494.3 | `GEM/sanitize/lib/sanitize.rb:203` 452.8, `GEM/mail/lib/mail/utilities.rb:215` 181.3, `GEM/sanitize/lib/sanitize.rb:206` 178.4 | `app/models/mailer.rb:733` 1363.2, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 1027.0, `app/helpers/issues_helper.rb:669` 223.4 |
+| 2 | Mailer#issue_add | 50 / 50 | 4379.9 / 4379.9 | 0.1 | 4515.5 | `GEM/sanitize/lib/sanitize.rb:203` 364.0, `GEM/mail/lib/mail/utilities.rb:215` 185.0, `GEM/sanitize/lib/sanitize.rb:206` 140.0 | `app/models/mailer.rb:733` 1385.8, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 783.0, `app/models/mailer.rb:734` 135.2 |
+| 3 | Mailer#news_added | 50 / 50 | 3955.6 / 3955.7 | 0.1 | 4013.3 | `GEM/sanitize/lib/sanitize.rb:203` 574.0, `GEM/sanitize/lib/sanitize.rb:206` 210.0, `GEM/mail/lib/mail/utilities.rb:215` 181.0 | `app/models/mailer.rb:733` 1385.5, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 1088.0, `app/models/mailer.rb:734` 135.2 |
+| 4 | Mailer#message_posted | 50 / 50 | 3919.5 / 3919.7 | 0.2 | 3982.3 | `GEM/sanitize/lib/sanitize.rb:203` 448.0, `GEM/mail/lib/mail/utilities.rb:215` 182.0, `GEM/sanitize/lib/sanitize.rb:206` 168.0 | `app/models/mailer.rb:733` 1391.9, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 906.0, `app/models/mailer.rb:734` 135.2 |
+| 5 | Mailer#news_comment_added | 50 / 50 | 3553.0 / 3552.9 | -0.1 | 3605.2 | `GEM/sanitize/lib/sanitize.rb:203` 364.0, `GEM/mail/lib/mail/utilities.rb:215` 181.0, `GEM/sanitize/lib/sanitize.rb:206` 140.0 | `app/models/mailer.rb:733` 1388.8, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 783.0, `app/models/mailer.rb:734` 137.1 |
+| 6 | Mailer#document_added | 50 / 50 | 3319.3 / 3319.2 | -0.1 | 3375.7 | `GEM/sanitize/lib/sanitize.rb:203` 364.0, `GEM/mail/lib/mail/utilities.rb:215` 179.0, `GEM/sanitize/lib/sanitize.rb:206` 140.0 | `app/models/mailer.rb:733` 1235.2, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 783.0, `lib/redmine/wiki_formatting/common_mark/markdown_filter.rb:41` 132.0 |
+| 7 | Mailer#wiki_content_updated | 50 / 50 | 3165.7 / 3165.8 | 0.1 | 3222.0 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 181.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.1 | `app/models/mailer.rb:733` 1324.9, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 135.2 |
+| 8 | Mailer#test_email | 68 / 68 | 3103.2 / 3103.9 | 0.7 | 3127.4 | `GEM/sanitize/lib/sanitize.rb:203` 247.4, `GEM/mail/lib/mail/utilities.rb:215` 171.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 116.7 | `app/models/mailer.rb:733` 1193.2, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 484.6, `app/models/setting.rb:424` 241.9 |
+| 9 | Mailer#wiki_content_added | 50 / 50 | 3055.5 / 3055.4 | -0.1 | 3111.6 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 181.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.0 | `app/models/mailer.rb:733` 1324.7, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 133.1 |
+| 10 | Mailer#attachments_added | 50 / 50 | 2908.3 / 2908.3 | 0.0 | 2960.1 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 179.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.0 | `app/models/mailer.rb:733` 1235.5, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 133.1 |
+| 11 | Mailer.deliver_mail | 668 / 668 | 2823.6 / 2823.7 | 0.1 | 2823.2 | `GEM/mail/lib/mail/utilities.rb:215` 311.7, `GEM/mail/lib/mail/field_list.rb:71` 155.1, `GEM/mail/lib/mail/utilities.rb:388` 148.1 | `app/models/mailer.rb:746` 2804.7 |
+| 12 | Mailer#account_information | 50 / 50 | 2723.3 / 2723.4 | 0.0 | 2770.2 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 177.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.1 | `app/models/mailer.rb:733` 1234.5, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 129.1 |
+| 13 | Mailer#lost_password | 50 / 50 | 2710.4 / 2710.4 | 0.0 | 2758.9 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 177.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.1 | `app/models/mailer.rb:733` 1234.7, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 127.0 |
+| 14 | Mailer#register | 50 / 50 | 2670.5 / 2670.4 | -0.1 | 2713.1 | `GEM/sanitize/lib/sanitize.rb:203` 266.0, `GEM/mail/lib/mail/utilities.rb:215` 177.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.0 | `app/models/mailer.rb:733` 1234.5, `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 518.0, `app/models/mailer.rb:734` 127.1 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 245.27 / 245.27 | 100% | `app/models/mailer.rb:746` 63%, `app/models/mailer.rb:733` 36% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/sanitize/lib/sanitize.rb:203` | 168.42 / 168.42 | 50% | `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 100% | `config[:node_name] = node.name.downcase` |
+| 3 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 128.19 / 128.19 | 100% | `app/models/mailer.rb:746` 53%, `app/models/mailer.rb:733` 47% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 4 | `GEM/mail/lib/mail/field_list.rb:71` | 119.75 / 119.75 | 100% | `app/models/mailer.rb:746` 65%, `app/models/mailer.rb:733` 35% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 5 | `GEM/mail/lib/mail/utilities.rb:291` | 81.28 / 81.28 | 100% | `app/models/mailer.rb:746` 67%, `app/models/mailer.rb:733` 28% | `value !~ /\S/` |
+| 6 | `GEM/mail/lib/mail/utilities.rb:388` | 73.88 / 73.88 | 50% | `app/models/mailer.rb:746` 100% | `charset_encoder.encode(str.dup, from_encoding).encode(to_encoding, :un` |
+| 7 | `GEM/sanitize/lib/sanitize.rb:206` | 63.22 / 63.22 | 50% | `lib/redmine/wiki_formatting/sanitization_filter.rb:132` 100% | `result = transformer.call(**config)` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:226` | 60.6 / 60.6 | 100% | `app/models/mailer.rb:746` 72%, `app/models/mailer.rb:733` 26% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+| 9 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 52.62 / 52.66 | 50% | `app/models/mailer.rb:733` 100% | `_wide = data[p].ord` |
+| 10 | `GEM/mail/lib/mail/utilities.rb:248` | 48.98 / 48.98 | 100% | `app/models/mailer.rb:746` 98%, `app/models/mailer.rb:733` 2% | `string.gsub(TO_CRLF_REGEX, Constants::CRLF)` |
+lowrail-profile: report in /home/user/oss/redmine/tmp/lowrail-profile-head/report.md
+exit 0 secs 991

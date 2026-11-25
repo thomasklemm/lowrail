@@ -1,0 +1,50 @@
+# lowrail-profile compare
+
+Base: `bundle exec rspec --format documentation`. Head: `bundle exec rspec --format documentation`.
+
+Objects per request (all, by run): base 12387.3 / 12387.8, head 12389.5 / 12387.0.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request.
+
+## Regressions: 64
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/base.rb:42` | 0.0 | 94.66 | +94.66 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:66` | 0.0 | 19.88 | +19.88 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:71` | 0.0 | 19.88 | +19.88 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:77` | 0.0 | 19.88 | +19.88 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:57` | 0.0 | 18.04 | +18.04 | 1.0 |
+| request line | `GEM/solidus_core/lib/spree/core/role_configuration.rb:43` | 0.0 | 14.43 | +14.43 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:73` | 0.0 | 10.82 | +10.82 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:74` | 0.0 | 7.22 | +7.22 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:78` | 0.0 | 7.22 | +7.22 | 1.0 |
+| request line | `GEM/solidus_core/app/models/concerns/spree/soft_deletable.rb:14` | 0.0 | 6.69 | +6.69 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/money.rb:66` | 0.0 | 5.62 | +5.62 | 1.0 |
+| request line | `GEM/solidus_core/app/models/concerns/spree/display_money.rb:28` | 0.0 | 4.88 | +4.88 | 1.0 |
+| request line | `GEM/solidus_core/lib/spree/core/role_configuration.rb:51` | 0.0 | 4.71 | +4.71 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/variant/pricing_options.rb:56` | 0.0 | 4.27 | +4.27 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:47` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:48` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:63` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:68` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:69` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:76` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:46` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:49` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:60` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:67` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:70` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:72` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:75` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/permission_sets/default_customer.rb:79` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/lib/spree/core/role_configuration.rb:44` | 0.0 | 3.61 | +3.61 | 1.0 |
+| request line | `GEM/solidus_core/app/models/spree/order.rb:653` | 0.0 | 3.47 | +3.47 | 1.0 |
+
+34 more in the JSON.
+
+## Improvements: 0
+
+None.
+
+Not compared: 24 actions (24 no warm value).

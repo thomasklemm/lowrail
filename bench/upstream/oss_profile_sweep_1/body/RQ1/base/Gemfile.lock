@@ -1,0 +1,21 @@
+PATH
+  remote: /home/user/oss/up/rqrcode_core-main
+  specs:
+    rqrcode_core (2.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  rqrcode_core!
+
+CHECKSUMS
+  rqrcode_core (2.1.0)
+
+BUNDLED WITH
+  4.0.20

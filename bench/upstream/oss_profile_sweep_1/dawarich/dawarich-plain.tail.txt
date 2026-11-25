@@ -1,0 +1,40 @@
+    3.77 seconds ./spec/requests/users/otp_challenge_spec.rb:150
+  Achievements GET /achievements when the user opens the collection GET /achievements/:key renders locked regions as geometry silhouettes when shapes exist
+    3.62 seconds ./spec/requests/achievements_spec.rb:248
+  Achievements GET /achievements when the user opens the collection GET /achievements/:key renders earned regions with the same shared spectral materials as locked ones
+    3.62 seconds ./spec/requests/achievements_spec.rb:266
+  Achievements GET /achievements when a legacy flag was disabled still renders the collection
+    3.38 seconds ./spec/requests/achievements_spec.rb:405
+  settings/onboarding when user is authenticated POST /settings/onboarding/demo_data when user is on a non-UTC timezone uses the user timezone for start_at and end_at, not the Rails default
+    3.24 seconds ./spec/requests/settings/onboarding_spec.rb:48
+
+Top 10 slowest example groups:
+  settings/onboarding
+    3 seconds average (26.96 seconds / 9 examples) ./spec/requests/settings/onboarding_spec.rb:5
+  Api::V1::Stats
+    2.84 seconds average (5.67 seconds / 2 examples) ./spec/requests/api/v1/stats_spec.rb:5
+  Api::V1::Countries::Borders
+    1.48 seconds average (5.92 seconds / 4 examples) ./spec/requests/api/v1/countries/borders_spec.rb:5
+  Thematic achievement collections
+    1.18 seconds average (5.89 seconds / 5 examples) ./spec/requests/thematic_achievements_spec.rb:5
+  Achievements
+    0.91133 seconds average (32.81 seconds / 36 examples) ./spec/requests/achievements_spec.rb:5
+  Geographic collection sharing
+    0.53755 seconds average (1.61 seconds / 3 examples) ./spec/requests/personal_achievements_spec.rb:86
+  Api::V1::Points
+    0.5306 seconds average (38.2 seconds / 72 examples) ./spec/requests/api/v1/points_spec.rb:5
+  /trips
+    0.51882 seconds average (37.36 seconds / 72 examples) ./spec/requests/trips_spec.rb:5
+  Archived Place UI
+    0.49708 seconds average (1.99 seconds / 4 examples) ./spec/requests/places_archive_ui_spec.rb:5
+  Tag management pages
+    0.48299 seconds average (4.35 seconds / 9 examples) ./spec/requests/tag_pages_spec.rb:5
+
+Finished in 8 minutes 44 seconds (files took 5.28 seconds to load)
+3078 examples, 0 failures
+
+Randomized with seed 1234
+
+Coverage report generated for RSpec to coverage/index.html
+Line coverage: 19999 / 25342 (78.91%)
+exit 0 secs 531

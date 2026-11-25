@@ -1,0 +1,40 @@
+| 1 | `GEM/prosopite/lib/prosopite.rb:419` | 366.05 / 372.81 | 95% | `no app frame` 51%, `app/jobs/trace_linestring_job.rb:95` 9% | `query_caller = caller_locations` |
+| 2 | `RAILS/activemodel/lib/active_model/attribute_methods.rb:492` | 292.0 / 232.0 | 38% | `no app frame` 76%, `app/jobs/trace_importer_job.rb:34` 9% | `@method_name % attr_name` |
+| 3 | `GEM/mail/lib/mail/utilities.rb:215` | 218.29 / 211.5 | 36% | `no app frame` 55%, `app/mailers/user_mailer.rb:95` 11% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 4 | `GEM/mail/lib/mail/encodings/8bit.rb:14` | 172.57 / 124.95 | 33% | `no app frame` 95%, `config/initializers/mail_delivery_job.rb:9` 5% | `!str.lines.find { \|line\| line.bytesize > 998 }` |
+| 5 | `GEM/mail/lib/mail/field_list.rb:71` † | 109.12 / 105.81 | 36% | `no app frame` 56%, `app/mailers/user_mailer.rb:95` 11% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 6 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 99.0 / 97.6 | 36% | `no app frame` 48%, `app/mailers/user_mailer.rb:95` 15% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 7 | `RAILS/activemodel/lib/active_model/attribute_methods.rb:333` | 70.5 / 56.0 | 38% | `no app frame` 76%, `app/jobs/trace_importer_job.rb:34` 9% | `generate_method = "define_method_#{pattern.proxy_target}"` |
+| 8 | `RAILS/activesupport/lib/active_support/code_generator.rb:35` | 70.5 / 56.0 | 38% | `no app frame` 76%, `app/jobs/trace_importer_job.rb:34` 9% | `owner.define_method(as, @cache.instance_method(canonical_name))` |
+| 9 | `RAILS/activerecord/lib/active_record/attribute_methods.rb:176` | 70.5 / 56.0 | 38% | `no app frame` 70%, `app/jobs/trace_importer_job.rb:34` 12% | `! superclass.instance_method(method_name).owner.is_a?(GeneratedAttribu` |
+| 10 | `RAILS/activemodel/lib/active_model/attribute_methods.rb:338` | 64.26 / 51.05 | 38% | `no app frame` 76%, `app/jobs/trace_importer_job.rb:34` 9% | `define_proxy_call(` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | UserMailer#gpx_success | 3 / 3 | 3736.0 / 3738.0 | 2.0 | 4042.0 | `GEM/mail/lib/mail/utilities.rb:215` 398.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 237.0, `GEM/mail/lib/mail/field_list.rb:71` 197.0 | `app/mailers/user_mailer.rb:70` 2463.0, `app/mailers/user_mailer.rb:248` 255.0, `app/views/layouts/user_mailer.html.erb:15` 211.0 |
+| 2 | UserMailer#message_notification | 4 / 4 | – / – |  | 8275.0 |  |  |
+| 3 | UserMailer#changeset_comment_notification | 1 / 1 | – / – |  | 5988.0 |  |  |
+| 4 | UserMailer#diary_comment_notification | 1 / 1 | – / – |  | 5971.0 |  |  |
+| 5 | UserMailer#follow_notification | 1 / 1 | – / – |  | 5350.0 |  |  |
+| 6 | UserMailer#note_comment_notification | 1 / 1 | – / – |  | 5475.0 |  |  |
+| 7 | UserMailer#gpx_failure | 1 / 1 | – / – |  | 4603.0 |  |  |
+| 8 | UserMailer#signup_confirm | 1 / 1 | – / – |  | 4006.0 |  |  |
+| 9 | UserMailer#email_confirm | 1 / 1 | – / – |  | 3728.0 |  |  |
+| 10 | UserMailer#lost_password | 1 / 1 | – / – |  | 3652.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 220.73 / 208.53 | 100% | `app/mailers/user_mailer.rb:114` 24%, `app/mailers/user_mailer.rb:70` 15% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 115.8 / 114.07 | 100% | `app/mailers/user_mailer.rb:114` 22%, `app/mailers/user_mailer.rb:70` 17% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 3 | `GEM/mail/lib/mail/field_list.rb:71` † | 108.73 / 103.13 | 100% | `app/mailers/user_mailer.rb:114` 24%, `app/mailers/user_mailer.rb:70` 15% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 4 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 83.87 / 82.13 | 100% | `app/mailers/user_mailer.rb:114` 20%, `app/mailers/user_mailer.rb:248` 16% | `_wide = data[p].ord` |
+| 5 | `GEM/mail/lib/mail/fields/parameter_hash.rb:56` | 57.33 / 53.0 | 100% | `app/mailers/user_mailer.rb:114` 24%, `app/mailers/user_mailer.rb:70` 13% | `map.sort_by { \|a\| a.first.to_s }.map! do \|key_name, value\|` |
+| 6 | `GEM/mail/lib/mail/utilities.rb:291` | 47.93 / 44.07 | 100% | `app/mailers/user_mailer.rb:248` 21%, `app/mailers/user_mailer.rb:114` 16% | `value !~ /\S/` |
+| 7 | `GEM/mail/lib/mail/message.rb:2130` | 45.87 / 42.4 | 100% | `app/mailers/user_mailer.rb:114` 24%, `app/mailers/user_mailer.rb:70` 13% | `content_loc_name  = header[:content_location].location rescue nil` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:226` | 43.13 / 40.27 | 100% | `app/mailers/user_mailer.rb:114` 23%, `app/mailers/user_mailer.rb:70` 13% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+| 9 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 39.67 / 39.67 | 100% | `app/mailers/user_mailer.rb:114` 27%, `app/mailers/user_mailer.rb:70` 20% | `_wide = data[p].ord` |
+| 10 | `GEM/erubi/lib/erubi.rb:134` (template compile) | 45.93 / 31.4 | 73% | `app/mailers/user_mailer.rb:114` 17%, `app/mailers/user_mailer.rb:237` 11% | `input.scan(regexp) do \|indicator, code, tailch, rspace\|` |
+lowrail-profile: report in /home/user/oss/openstreetmap-website/tmp/lowrail-profile/report.md
+exit 0 secs 223

@@ -1,0 +1,1 @@
+{"format":1,"identity":{"mode":"command","argv":["bundle","exec","rspec","--exclude-pattern","spec/features/**/*_spec.rb","--format","documentation"]},"argv":["bundle","exec","rspec","--exclude-pattern","spec/features/**/*_spec.rb","--format","documentation"],"seed":"1234","runs":2,"exit":[124],"timed_out":[1]}

@@ -1,0 +1,40 @@
+  can see a single product_property
+  can see a list of all product properties
+  cannot update a product property
+  cannot delete a product property
+  can query the results through a parameter
+  if product is deleted
+    can not see a list of product properties
+  with product identified by id
+    can see a single product_property by id
+    can see a list of all product properties
+  as an admin
+    can update a product property
+    can create a new product property
+    can delete a product property
+    when product property does not exist
+      cannot update because is not found
+      cannot delete because is not found
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) Checkouts PUT 'update' transitioning to delivery does not contain duplicate variant data in delivery return
+     # SQLite adapter fails sometimes to provide a unique index for the convoluted chain
+of ActiveRecord persistence calls that happen on
+https://github.com/solidusio/solidus/blob/8b03161a1894a7d10c8d95f62c016da55027d2b0/core/app/models/spree/stock/simple_coordinator.rb#L83
+
+     # ./spec/requests/spree/api/checkouts_spec.rb:125
+
+  2) Checkouts PUT 'update' transitioning to delivery can update addresses and transition from address to delivery
+     # SQLite adapter fails sometimes to provide a unique index for the convoluted chain
+of ActiveRecord persistence calls that happen on
+https://github.com/solidusio/solidus/blob/8b03161a1894a7d10c8d95f62c016da55027d2b0/core/app/models/spree/stock/simple_coordinator.rb#L83
+
+     # ./spec/requests/spree/api/checkouts_spec.rb:87
+
+Finished in 1 minute 8.45 seconds (files took 2.94 seconds to load)
+716 examples, 0 failures, 2 pending
+
+Randomized with seed 1234
+
+exit 0 secs 72

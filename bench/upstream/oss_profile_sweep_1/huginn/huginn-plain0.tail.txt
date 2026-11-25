@@ -1,0 +1,40 @@
+rspec ./spec/features/admin_users_spec.rb:15 # Admin::UsersController as an admin lists all users
+rspec ./spec/features/admin_users_spec.rb:68 # Admin::UsersController as an admin updating existing users updates an existing user through the user list
+rspec ./spec/features/admin_users_spec.rb:79 # Admin::UsersController as an admin updating existing users requires the passwords to match when changing them
+rspec ./spec/features/admin_users_spec.rb:43 # Admin::UsersController as an admin creating new users creates a new user through the user list
+rspec ./spec/features/admin_users_spec.rb:56 # Admin::UsersController as an admin creating new users requires the passwords to match
+rspec ./spec/features/admin_users_spec.rb:103 # Admin::UsersController as an admin (de)activating users activates an existing user
+rspec ./spec/features/admin_users_spec.rb:94 # Admin::UsersController as an admin (de)activating users deactivates an existing user
+rspec ./spec/features/admin_users_spec.rb:89 # Admin::UsersController as an admin (de)activating users does not show deactivation buttons for the current user
+rspec ./spec/features/html_safety_spec.rb:19 # HTML safety sanitizes agent options interpolated into descriptions
+rspec ./spec/features/html_safety_spec.rb:4 # HTML safety displays a shared service name as text on the agent page
+rspec ./spec/features/java_script_agent_spec.rb:23 # JavaScriptAgent creates a JavaScriptAgent with code in the ace editor
+rspec ./spec/features/java_script_agent_spec.rb:47 # JavaScriptAgent edits an existing JavaScriptAgent
+rspec ./spec/features/scenario_import_spec.rb:47 # ScenarioImportsController imports a scenario which requires a service
+rspec ./spec/features/scenario_import_spec.rb:10 # ScenarioImportsController renders the import form
+rspec ./spec/features/scenario_import_spec.rb:21 # ScenarioImportsController imports a scenario that does not exist yet
+rspec ./spec/features/scenario_import_spec.rb:32 # ScenarioImportsController asks to accept conflicts when the scenario was modified
+rspec ./spec/features/scenario_import_spec.rb:15 # ScenarioImportsController requires a URL or file uplaod
+rspec ./spec/models/agents/java_script_agent_spec.rb:419 # Agents::JavaScriptAgent URL and URLSearchParams resolves relative URLs against a base
+rspec ./spec/models/agents/java_script_agent_spec.rb:394 # Agents::JavaScriptAgent URL and URLSearchParams exposes the WHATWG URL class
+rspec ./spec/models/agents/java_script_agent_spec.rb:431 # Agents::JavaScriptAgent URL and URLSearchParams builds query strings with URLSearchParams
+rspec ./spec/models/agents/java_script_agent_spec.rb:715 # Agents::JavaScriptAgent fetch accepts a URL object
+rspec ./spec/models/agents/java_script_agent_spec.rb:679 # Agents::JavaScriptAgent fetch fetchAll accepts URL objects
+rspec ./spec/features/agent_filters_spec.rb:4 # Agent filters shows account buttons and preserves combined filters across navigation
+rspec ./spec/features/create_an_agent_spec.rb:124 # Creating a new agent opens the Agent picker and prioritizes name matches
+rspec ./spec/features/create_an_agent_spec.rb:169 # Creating a new agent allows to click on on the agent name in select2 tags
+rspec ./spec/features/create_an_agent_spec.rb:8 # Creating a new agent creates an agent
+rspec ./spec/features/create_an_agent_spec.rb:104 # Creating a new agent creates an alert if a new agent with invalid json is submitted
+rspec ./spec/features/create_an_agent_spec.rb:182 # Creating a new agent clearing unsupported fields of agents does not send previously configured sources when the current agent does not support them
+rspec ./spec/features/create_an_agent_spec.rb:193 # Creating a new agent clearing unsupported fields of agents does not send previously configured control targets when the current agent does not support them
+rspec ./spec/features/create_an_agent_spec.rb:204 # Creating a new agent clearing unsupported fields of agents does not send previously configured receivers when the current agent does not support them
+rspec ./spec/features/create_an_agent_spec.rb:158 # Creating a new agent displaying the correct information shows all options for agents that can be scheduled, create and receive events
+rspec ./spec/features/create_an_agent_spec.rb:163 # Creating a new agent displaying the correct information does not show the target select2 field when the agent can not create events
+rspec ./spec/features/create_an_agent_spec.rb:65 # Creating a new agent with associated agents creates an agent with a control target
+rspec ./spec/features/create_an_agent_spec.rb:84 # Creating a new agent with associated agents creates an agent with a controller
+rspec ./spec/features/create_an_agent_spec.rb:44 # Creating a new agent with associated agents creates an agent with a source and a receiver
+rspec ./spec/features/form_configurable_feature_spec.rb:4 # form configuring agents completes fields with predefined array values
+
+Randomized with seed 1234
+
+exit 1 secs 192

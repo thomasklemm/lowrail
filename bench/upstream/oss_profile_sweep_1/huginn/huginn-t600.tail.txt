@@ -1,0 +1,40 @@
+## Top lines outside the app
+
+Warm: objects per request by run, without each line's first request per process (one-time work). All: including it, mean of the runs. Reach: share of requests in which the line allocated (last run). † charged from Ruby's `<internal:…>` code to this caller. Ledger: upstream pull requests that reduce allocations and change this line, and whether the app's locked version has them. From the app: the nearest app line on the stack (repeat run). Dev/test-only work is listed separately below.
+
+| # | Line | Method | Warm/req | Δ | All/req | Reach | Types | Ledger | From the app | Source |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- | --- |
+
+## By gem
+
+| Group | Warm/req | All/req | Top lines (warm) |
+| --- | ---: | ---: | --- |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | AgentCheckJob#perform | 33 / 33 | 7685.4 / 7684.8 | -0.6 | 7541.7 | `GEM/hashie/lib/hashie/mash.rb:641` 1017.5, `GEM/hashie/lib/hashie/mash.rb:596` 1017.5, `GEM/json/lib/json/common.rb:297` 281.1 | `app/models/agents/weather_agent.rb:136` 2852.8, `app/concerns/liquid_interpolatable.rb:11` 1071.0, `app/concerns/liquid_interpolatable.rb:116` 461.4 |
+| 2 | AgentReceiveJob#perform | 53 / 53 | 5169.2 / 5174.1 | 4.9 | 5196.7 | `GEM/csv/lib/csv/parser.rb:1006` 198.1, `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:880` 180.2, `RAILS/activesupport/lib/active_support/descendants_tracker.rb:109` 136.6 | `app/concerns/liquid_interpolatable.rb:11` 1197.0, `app/concerns/liquid_interpolatable.rb:116` 488.9, `app/models/agents/sentiment_agent.rb:67` 314.8 |
+| 3 | AgentRunScheduleJob#perform | 1 / 1 | – / – |  | 187.0 |  |  |
+| 4 | AgentCleanupExpiredJob#perform | 1 / 1 | – / – |  | 183.0 |  |  |
+| 5 | AgentPropagateJob#perform | 1 / 1 | – / – |  | 183.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/hashie/lib/hashie/mash.rb:596` | 347.55 / 347.55 | 23% | `app/models/agents/weather_agent.rb:136` 100% | `method_name = method_name.to_s` |
+| 2 | `GEM/hashie/lib/hashie/mash.rb:641` | 347.55 / 347.55 | 23% | `app/models/agents/weather_agent.rb:136` 100% | `return false unless respond_to?(method_key)` |
+| 3 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:880` | 161.52 / 161.52 | 93% | `app/concerns/liquid_interpolatable.rb:11` 60%, `app/models/agent.rb:108` 12% | `type_map.fetch(oid, fmod, sql_type) {` |
+| 4 | `RAILS/activesupport/lib/active_support/descendants_tracker.rb:108` | 132.7 / 132.7 | 92% | `app/models/agent.rb:108` 59%, `app/concerns/liquid_interpolatable.rb:11` 34% | `subclasses = DescendantsTracker.reject!(self.subclasses)` |
+| 5 | `RAILS/activesupport/lib/active_support/descendants_tracker.rb:109` | 132.7 / 132.7 | 92% | `app/models/agent.rb:108` 59%, `app/concerns/liquid_interpolatable.rb:11` 34% | `subclasses.concat(subclasses.flat_map(&:descendants))` |
+| 6 | `GEM/json/lib/json/common.rb:297` | 114.9 / 114.9 | 91% | `app/models/agents/weather_agent.rb:136` 76%, `lib/json_with_indifferent_access.rb:7` 20% | `Parser.parse(source, options)` |
+| 7 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:177` (debug logging) | 93.98 / 93.98 | 97% | `app/concerns/liquid_interpolatable.rb:11` 34%, `lib/delayed_job_watchdog/worker.rb:78` 12% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 8 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` | 92.13 / 92.13 | 93% | `app/concerns/liquid_interpolatable.rb:11` 61%, `app/concerns/liquid_interpolatable.rb:116` 16% | `WhereClause.new(predicates \| other.predicates)` |
+| 9 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 83.64 / 83.64 | 94% | `app/concerns/liquid_interpolatable.rb:11` 24%, `app/models/agent.rb:162` 19% | `binds = binds.inspect` |
+| 10 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:175` (debug logging) | 62.65 / 62.65 | 97% | `app/concerns/liquid_interpolatable.rb:11` 34%, `lib/delayed_job_watchdog/worker.rb:78` 12% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+wall 130.30
+exit 0

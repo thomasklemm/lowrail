@@ -1,0 +1,43 @@
+# lowrail-profile compare
+
+Base: `bundle exec rspec spec/requests --format documentation`. Head: `bundle exec rspec spec/requests --format documentation`.
+
+Objects per request (all, by run): base 31682.3 / 31679.9, head 31704.2 / 31700.7.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request, job.
+
+## Regressions: 25
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | Achievements::CollectiblesController#show | 511753.5 | 513037.5 | +1284.00 | 513.04 |
+| request action | Tracks::SegmentsController#index | 581539.0 | 582818.0 | +1279.00 | 582.82 |
+| request action | RouteVideosController#destroy | 563448.5 | 564725.5 | +1277.00 | 564.73 |
+| request action | Shared::CollectiblesController#image | 267116.0 | 267762.5 | +646.50 | 267.76 |
+| request action | Trips::NotesController#destroy | 313844.75 | 314487.25 | +642.50 | 314.49 |
+| request action | PlacesController#confirm | 297443.75 | 298086.0 | +642.25 | 298.09 |
+| request action | Shared::CollectiblesController#show | 184736.35 | 185166.5 | +430.15 | 185.17 |
+| request action | PlacesController#merge | 180564.0 | 180939.5 | +375.50 | 180.94 |
+| request action | Places::HomesController#create | 114844.0 | 115101.3 | +257.30 | 115.1 |
+| request action | NotificationsController#open | 103366.6 | 103585.95 | +219.35 | 103.59 |
+| request action | AreasController#update | 95236.1 | 95418.55 | +182.45 | 95.42 |
+| request action | Settings::UsersController#destroy | 85304.45 | 85471.75 | +167.30 | 85.47 |
+| request action | Family::InvitationsController#show | 62698.0 | 62826.55 | +128.55 | 123.0 |
+| request action | Trips::NotesController#create | 63552.1 | 63678.55 | +126.45 | 63.68 |
+| request action | AchievementsController#toggle_sharing | 53663.75 | 53779.75 | +116.00 | 53.78 |
+| request action | PlacesController#create | 41585.8 | 41665.85 | +80.05 | 41.67 |
+| request action | Api::V1::VisitsController#update | 34829.25 | 34902.25 | +73.00 | 34.9 |
+| request action | Family::MembershipsController#destroy | 36274.5 | 36344.5 | +70.00 | 36.34 |
+| request action | VisitsController#update | 35354.95 | 35418.95 | +64.00 | 35.42 |
+| request action | (no name) | 41053.8 | 41104.3 | +50.50 | 41.1 |
+| request action | Api::V1::SubscriptionsController#callback | 22550.3 | 22595.05 | +44.75 | 22.6 |
+| request action | Settings::BackgroundJobsController#index | 34366.35 | 34410.95 | +44.60 | 42.6 |
+| request action | PlacesController#update | 12007.8 | 12046.75 | +38.95 | 20.0 |
+| request line | `RUBY/error_highlight/base.rb:94` | 3549.94 | 3560.84 | +10.90 | 1.0 |
+| request line | `RAILS/actionpack/lib/action_dispatch/middleware/exception_wrapper.rb:332` | 154.95 | 156.07 | +1.12 | 1.0 |
+
+## Improvements: 0
+
+None.
+
+Not compared: 32 actions (32 no warm value).

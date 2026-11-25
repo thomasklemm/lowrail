@@ -1,0 +1,40 @@
+/home/user/oss/dawarich/lib/tasks/e2e.rake:61: warning: already initialized constant E2E_REPLAY_TRACK_END
+/home/user/oss/dawarich/lib/tasks/e2e.rake:61: warning: previous definition of E2E_REPLAY_TRACK_END was here
+/home/user/oss/dawarich/lib/tasks/e2e.rake:62: warning: already initialized constant E2E_JOURNEY_TRACK_DAY
+/home/user/oss/dawarich/lib/tasks/e2e.rake:62: warning: previous definition of E2E_JOURNEY_TRACK_DAY was here
+/home/user/oss/dawarich/lib/tasks/e2e.rake:63: warning: already initialized constant E2E_JOURNEY_TRACK_START
+/home/user/oss/dawarich/lib/tasks/e2e.rake:63: warning: previous definition of E2E_JOURNEY_TRACK_START was here
+/home/user/oss/dawarich/lib/tasks/e2e.rake:64: warning: already initialized constant E2E_JOURNEY_TRACK_END
+/home/user/oss/dawarich/lib/tasks/e2e.rake:64: warning: previous definition of E2E_JOURNEY_TRACK_END was here
+/home/user/oss/dawarich/lib/tasks/e2e.rake:70: warning: already initialized constant E2E_TRIP_BACKBONE_FIXTURE
+/home/user/oss/dawarich/lib/tasks/e2e.rake:70: warning: previous definition of E2E_TRIP_BACKBONE_FIXTURE was here
+
+An error occurred while loading ./spec/requests/visits_spec.rb.
+Failure/Error: ActiveRecord::Migration.maintain_test_schema!
+
+ActiveRecord::DatabaseConnectionError:
+  There is an issue connecting to your database with your username/password, username: postgres.
+
+  Please check your database configuration to ensure the username/password are valid.
+# ./spec/rails_helper.rb:30:in '<top (required)>'
+# ./spec/requests/visits_spec.rb:3:in '<top (required)>'
+# ------------------
+# --- Caused by: ---
+# PG::ConnectionBad:
+#   connection to server at "::1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+#   connection to server at "::1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+#   ./spec/rails_helper.rb:30:in '<top (required)>'
+No examples found.
+
+Top 0 slowest examples (0 seconds, 0.0% of total time):
+
+Finished in 0.0001 seconds (files took 46.07 seconds to load)
+0 examples, 0 failures, 196 errors occurred outside of examples
+
+Coverage report generated for RSpec to coverage/index.html
+Line coverage: 811 / 2849 (28.46%)
+Stopped processing SimpleCov as a previous error not related to SimpleCov has been detected
+lowrail-profile: no report: no runs with requests, jobs or mails under /home/user/oss/dawarich/tmp/lowrail-profile-r2 (a request counts when it goes through the app, as in integration, request and system tests; controller tests and controller specs call the controller directly and are not counted); the command exited 1, 1
+Command exited with non-zero status 1
+wall 93.28
+exit 1

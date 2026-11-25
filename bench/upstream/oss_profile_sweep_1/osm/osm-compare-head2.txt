@@ -1,0 +1,22 @@
+# lowrail-profile compare
+
+Base: `bin/rails test -v`. Head: `bin/rails test -v`.
+
+Objects per request (all, by run): base 9377.3 / 9383.0, head 9390.0 / 9382.5.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request, job, mail.
+
+## Regressions: 2
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | NotesController#index | 8167.85 | 25927.1 | +17759.25 | 1475.0 |
+| request action | UserBlocksController#index | 9877.7 | 11201.35 | +1323.65 | 1235.2 |
+
+## Improvements: 1
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | Api::Messages::OutboxesController#show | 4570.8 | 4491.0 | -79.80 | 20.0 |
+
+Not compared: 88 actions (84 no warm value, 4 no warm value in the A/A report).

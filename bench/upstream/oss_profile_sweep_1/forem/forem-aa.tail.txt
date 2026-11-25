@@ -1,0 +1,40 @@
+| gem: omniauth-apple | 0.0 | 0.0 | `apple.rb:67` 0.0 |
+| gem: multi_json | 0.0 | 0.0 | `multi_json.rb:298` 0.0, `deprecated.rb:34` 0.0, `multi_json.rb:214` 0.0 |
+| test harness: rspec-core | 0.0 | 0.0 | `example_group.rb:767` 0.0 |
+| gem: algoliasearch-rails | 0.0 | 0.0 | `algoliasearch-rails.rb:278` 0.0, `algoliasearch-rails.rb:814` 0.0, `algoliasearch-rails.rb:104` 0.0 |
+| gem: ffi | 0.0 | 0.0 | `enum.rb:121` 0.0 |
+| gem: factory_bot | 0.0 | 0.0 | `aliases.rb:14` 0.0, `callbacks_observer.rb:18` 0.0, `evaluator.rb:51` 0.0 |
+| gem: oauth | 0.0 | 0.0 | `unauthorized.rb:11` 0.0 |
+| gem: google-protobuf | 0.0 | 0.0 | `repeated_field.rb:60` 0.0 |
+| gem: test-prof | 0.0 | 0.0 | `factory_bot_patch.rb:22` 0.0, `factory_bot.rb:23` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:257` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `factory.rb:27` 0.0, `bigint.rb:0` 0.0, `bigint.rb:10` 0.0 |
+| gem: pg_query | 0.0 | 0.0 | `parse.rb:122` 0.0, `parse.rb:334` 0.0, `parse.rb:335` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | NotifyMailer#trusted_role_email | 4 / 4 | 5034.7 / 5033.0 | -1.7 | 5037.5 | `GEM/mail/lib/mail/utilities.rb:215` 213.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 154.0, `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` 110.0 | `app/mailers/notify_mailer.rb:367` 1643.0, `app/models/settings/base.rb:198` 316.0, `config/initializers/timeout.rb:232` 288.0 |
+| 2 | NotifyMailer#tag_moderator_confirmation_email | 4 / 4 | 4177.0 / 4177.3 | 0.3 | 4177.3 | `GEM/mail/lib/mail/utilities.rb:215` 213.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 154.0, `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` 110.0 | `app/mailers/notify_mailer.rb:332` 1633.0, `config/initializers/ahoy_email.rb:37` 248.0, `app/views/layouts/mailer.html.erb:10` 204.0 |
+| 3 | NotifyMailer.deliver_mail | 9 / 9 | 1913.9 / 1914.1 | 0.3 | 1870.1 | `GEM/mail/lib/mail/utilities.rb:215` 221.5, `GEM/mail/lib/mail/utilities.rb:248` 131.0, `GEM/mail/lib/mail/field_list.rb:71` 110.3 | `app/services/tag_moderators/add.rb:27` 770.5, `app/services/exporter/service.rb:58` 565.0, `app/services/tag_moderators/add_trusted_role.rb:8` 563.5 |
+| 4 | NotifyMailer#export_email | 1 / 1 | – / – |  | 5290.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 210.94 / 210.94 | 100% | `app/mailers/notify_mailer.rb:332` 17%, `app/mailers/notify_mailer.rb:367` 17% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 118.39 / 118.39 | 100% | `app/mailers/notify_mailer.rb:367` 21%, `app/mailers/notify_mailer.rb:332` 21% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 3 | `GEM/mail/lib/mail/field_list.rb:71` | 104.56 / 104.56 | 100% | `app/mailers/notify_mailer.rb:367` 17%, `app/mailers/notify_mailer.rb:332` 17% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 4 | `GEM/mail/lib/mail/field.rb:263` | 84.67 / 84.67 | 100% | `app/services/tag_moderators/add.rb:27` 19%, `app/services/tag_moderators/add_trusted_role.rb:8` 19% | `field.send(name, *args, &block)` |
+| 5 | `GEM/mail/lib/mail/utilities.rb:248` | 59.5 / 59.5 | 100% | `app/services/tag_moderators/add.rb:27` 55%, `app/services/tag_moderators/add_trusted_role.rb:8` 37% | `string.gsub(TO_CRLF_REGEX, Constants::CRLF)` |
+| 6 | `GEM/mail/lib/mail/utilities.rb:226` | 56.44 / 56.44 | 100% | `app/services/tag_moderators/add_trusted_role.rb:8` 19%, `app/services/tag_moderators/add.rb:27` 19% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+| 7 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 53.22 / 53.33 | 50% | `app/mailers/notify_mailer.rb:367` 41%, `app/mailers/notify_mailer.rb:332` 41% | `_wide = data[p].ord` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:291` | 45.06 / 45.06 | 100% | `app/services/tag_moderators/add.rb:27` 22%, `app/services/tag_moderators/add_trusted_role.rb:8` 22% | `value !~ /\S/` |
+| 9 | `GEM/mail/lib/mail/parser_tools.rb:7` | 34.44 / 34.44 | 100% | `app/mailers/notify_mailer.rb:367` 28%, `app/mailers/notify_mailer.rb:332` 28% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 10 | `GEM/mail/lib/mail/parsers/content_transfer_encoding_parser.rb:380` | 32.11 / 32.11 | 56% | `app/services/tag_moderators/add_trusted_role.rb:8` 42%, `app/services/tag_moderators/add.rb:27` 42% | `_wide = data[p].ord` |
+lowrail-profile: report in /home/user/oss/forem/tmp/lowrail-profile-aa/report.md
+exit 0 secs 1831

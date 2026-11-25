@@ -1,0 +1,40 @@
+  #check with starting_at=future date
+    should check for changes starting_at a future date, thus not find any
+
+Agents::GapDetectorAgent
+  #receive
+    ignores the event if value_path is present and the value at the path is blank
+    records the event if it has a created_at newer than the last seen
+    clears any previous alert
+  validation
+    should validate presence of message
+    should validate presence of window_duration_in_days
+  #check
+    alerts once if no data has been received during window_duration_in_days
+
+TumblrApiClient
+  creates text posts on the standard post endpoint
+  fetches blog likes with the api key and oauth header
+  posts reblogs to the reblog endpoint
+  returns Tumblr meta errors in the legacy format
+
+MarkdownHelper
+  #markdown
+    renders HTML from a markdown text
+    strips event handler attributes from block HTML
+    drops url() values with disallowed URIs
+    strips script elements
+    strips event handler attributes from inline HTML
+    keeps url() values with allowed URIs in style attributes
+    drops url() values in disallowed properties
+    scrubs unsafe CSS from style attributes
+    returns an html_safe string
+    keeps tables and their alignment
+    drops javascript: links
+
+Finished in 59.24 seconds (files took 3.41 seconds to load)
+2041 examples, 0 failures
+
+Randomized with seed 1234
+
+exit 0 secs 63
