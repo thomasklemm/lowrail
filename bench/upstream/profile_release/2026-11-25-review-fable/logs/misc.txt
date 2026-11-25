@@ -1,0 +1,9 @@
+not under bundle exec, built gem: exit 0; with_unbundled_env child: SEED=1234 profiler="constant" ; tree:  M swagger/order_unbundled.txt 
+not under bundle exec, fixed: exit 0; with_unbundled_env child: profiler=nil ; tree: 
+T2 controller specs only: exit 1; no report: no runs with requests, jobs or mails
+T2 spec/requests/probe_spec.rb: exit 0; * Counted in run 1: 1 requests; 2 runs
+T2 spec/requests/probe_spec.rb spec/controllers: exit 0; * Counted in run 1: 1 requests; 2 runs
+--out 'tmp/g/{keep,x}': exit 0; tmp/g/keep: capture.json command.txt report.json report.md ; tmp/g/{keep,x}: capture.json command.txt report.json report.md run1 run2 
+--out 'tmp/g/[x]': exit 1; no report: no runs with requests; tmp/g/[x]: capture.json command.txt run1 run2 
+--timeout 5 under a pty, a command that reads the terminal: 15 s; run 1 took longer than --timeout 5.0s
+with the fix, workers=2 hang=1: exit 124 after 20.8s; capture {"runs":2,"exit":[124],"timed_out":[1]}; out: capture.json command.txt report.json report.md 

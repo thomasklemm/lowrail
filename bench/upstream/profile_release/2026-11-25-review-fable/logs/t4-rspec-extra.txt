@@ -1,0 +1,8 @@
+a process that only boots the app has RSpec::Core::Runner: "constant"
+pre: rake spec: exit 0; * Counted in run 1: 2 requests; 2 runs
+head: rake spec: exit 1; lowrail-profile: no report: no runs with requests, jobs or mails under /tmp/pr/a72/rspec/tmp/lp-x (a request c
+head: Minitest file: exit 0; seeds used: --seed 30185 --seed 32404 ; capture.json seed 1234
+head: --workloads: exit 0; measured [nil, nil]; compare exit 2; * base does not record that every run finished measuring at least one request
+fix: rake spec: exit 0; * Counted in run 1: 2 requests; 2 runs
+fix: Minitest file: exit 0; seeds used: --seed 1234 --seed 1234 ; capture.json seed 1234
+fix: --workloads: exit 0; measured [20, 20]; compare exit 0; 

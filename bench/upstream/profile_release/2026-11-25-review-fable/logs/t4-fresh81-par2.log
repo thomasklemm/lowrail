@@ -1,0 +1,36 @@
+== par2: status plain 0 profiled 0; tests 18
+outcomes run1 identical
+outcomes run2 identical
+tree plain:    5a6,7 > !! storage/test.sqlite3_0 > !! storage/test.sqlite3_1 
+tree profiled: 9a10 > !! tmp/lp-par2/ 
+child after_run.txt identical
+child after_run_nested_suite.txt DIFFERS
+2c2
+< Run options: --seed 4810
+---
+> Run options: --seed 61156
+6c6
+< ........cbaehfdg
+---
+> ........fbhcdeag
+8c8
+< Finished in 0.201640s, 39.6747 runs/s, 39.6747 assertions/s.
+---
+> Finished in 0.201669s, 39.6690 runs/s, 39.6690 assertions/s.
+child helper_load.txt DIFFERS
+3,6c3,13
+< RUBYLIB=
+< RUBYOPT=-r/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/setup
+< profiler=nil
+< features=0
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-par2/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> RUBYLIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+child in_test.txt identical
+child in_test_runner.txt identical
+child worker_setup.txt identical
+leftover: 1

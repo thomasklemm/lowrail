@@ -1,0 +1,12 @@
+inner (11/req): ranked=[] top_rows=[] app_lines=[["APP/engines/inner/lib/inner.rb:2", 5.54, 0.0]]
+gitlab_like (13/req): ranked=[] top_rows=[] app_lines=[]
+vendored (17/req): ranked=[] top_rows=[] app_lines=[]
+outer (19/req): ranked=[["GEM/outer/lib/outer.rb:2", "gem: outer", [10.769230769230768, 10.769230769230768]]] top_rows=[["GEM/outer/lib/outer.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+linked.rb (23/req): ranked=[] top_rows=[] app_lines=[]
+deep (29/req): ranked=[] top_rows=[] app_lines=[]
+gitgem (31/req): ranked=[["GEM/t1-gitgem/lib/gitgem.rb:2", "gem: t1-gitgem", [17.230769230769234, 17.230769230769234]]] top_rows=[["GEM/t1-gitgem/lib/gitgem.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+loose (37/req): ranked=[] top_rows=[] app_lines=[]
+unclassified={"objects_per_request" => 49.54, "share" => 0.0139, "files" => [{"path" => "/tmp/pr/a81/t1-loose/loose.rb", "objects_per_request" => 20.46}, {"path" => "/tmp/pr/a81/t1-linked-real/lib/linked/deep.rb", "objects_per_request" => 16.15}, {"path" => "/tmp/pr/a81/t1-linked-real/lib/linked.rb", "objects_per_request" => 12.92}]}
+controller lines=[["APP/app/controllers/articles_controller.rb:7", 24.0, 0.46, [{"name" => "GEM/t1-gitgem/lib/gitgem.rb:2", "share" => 0.62}, {"name" => "GEM/outer/lib/outer.rb:2", "share" => 0.38}]], ["APP/app/controllers/articles_controller.rb:6", 0.92, 0.0, [{"name" => "RAILS/activerecord/lib/active_record/relation.rb:77", "share" => 0.5}, {"name" => "RAILS/activerecord/lib/active_record/relation/delegation.rb:139", "share" => 0.5}]]]
+unattributed=213.69
+* Not attributed: 49.54 objects per request (1.4% of all) are on lines outside the app, Rails, Ruby and the bundle's gems, which no table below ranks; most in `/tmp/pr/a81/t1-loose/loose.rb`, `/tmp/pr/a81/t1-linked-real/lib/linked/deep.rb`, `/tmp/pr/a81/t1-linked-real/lib/linked.rb`

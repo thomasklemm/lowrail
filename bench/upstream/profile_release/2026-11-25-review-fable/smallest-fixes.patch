@@ -1,0 +1,87 @@
+diff --git a/gem/exe/lowrail-profile b/gem/exe/lowrail-profile
+index f4134b4e..da2ba66b 100755
+--- a/gem/exe/lowrail-profile
++++ b/gem/exe/lowrail-profile
+@@ -202,7 +202,11 @@ statuses = []
+       timed_out << n
+       $stderr.puts "lowrail-profile: run #{n} took longer than --timeout #{timeout}s; stopping it"
+       stop.("TERM")
+-      waiter.join(10) || (stop.("KILL"); waiter.join)
++      # The group, not only the command: a worker that outlives its parent is stopped too.
++      grace = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
++      sleep 0.1 while (Process.kill(0, -pid) rescue false) && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
++      stop.("KILL")
++      waiter.join
+     end
+     traps.each { |signal, handler| trap(signal, handler) }
+     result = waiter.value
+diff --git a/gem/lib/lowrail/profile.rb b/gem/lib/lowrail/profile.rb
+index c27020cd..4d362b0b 100644
+--- a/gem/lib/lowrail/profile.rb
++++ b/gem/lib/lowrail/profile.rb
+@@ -214,15 +214,23 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
+           def leave_env
+             return if @left
+             @left = true
+-            ENV["SEED"] = ENV["LOWRAIL_PROFILE_CALLER_SEED"]
+-            ENV["SPEC_OPTS"] = ENV["LOWRAIL_PROFILE_CALLER_SPEC_OPTS"]
+-            lib = ENV["LOWRAIL_PROFILE_LIB"]
+-            { "RUBYOPT" => [" ", ["-I#{lib}", "-rlowrail/profile"]], "RUBYLIB" => [File::PATH_SEPARATOR, [lib]] }.each do |key, (separator, ours)|
+-              parts = ENV[key].to_s.split(separator)
+-              ours.each { |part| (i = parts.index(part)) && parts.delete_at(i) }
+-              ENV[key] = parts.empty? ? nil : parts.join(separator)
++            seed, spec_opts, lib = ENV.values_at("LOWRAIL_PROFILE_CALLER_SEED", "LOWRAIL_PROFILE_CALLER_SPEC_OPTS", "LOWRAIL_PROFILE_LIB")
++            # Bundler.with_original_env and with_unbundled_env start children from the environment Bundler saved at load.
++            saved = Lowrail.loaded_constant("Bundler::ORIGINAL_ENV")
++            [ENV, (saved if Hash === saved && !saved.frozen?)].compact.each do |env|
++              put = ->(key, value) { value ? env[key] = value : env.delete(key) }
++              put.("SEED", seed)
++              put.("SPEC_OPTS", spec_opts)
++              { "RUBYOPT" => [" ", ["-I#{lib}", "-rlowrail/profile"]], "RUBYLIB" => [File::PATH_SEPARATOR, [lib]] }.each do |name, (separator, ours)|
++                [name, "BUNDLER_ORIG_#{name}"].each do |key|
++                  next unless env[key]
++                  parts = env[key].split(separator)
++                  ours.each { |part| (i = parts.index(part)) && parts.delete_at(i) }
++                  put.(key, (parts.join(separator) unless parts.empty?))
++                end
++              end
++              ENV_KEYS.each { env.delete(_1) }
+             end
+-            ENV_KEYS.each { ENV.delete(_1) }
+           rescue StandardError => error
+             warn "[lowrail-profile] processes the suite starts may be profiled: #{error.class}: #{error.message}"
+           end
+@@ -369,7 +377,8 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
+             # Gems from a path (Bundler's path:, gemspec), which no gem
+             # directory names: the report classifies their lines by these.
+             Gem.loaded_specs.each_value do |spec|
+-              gem_dir = spec.full_gem_path
++              # Ruby names a required file by its real path.
++              gem_dir = (File.realpath(spec.full_gem_path) rescue spec.full_gem_path)
+               lines << ["G", spec.name, gem_dir].join("\t") unless gem_dir.match?(%r{/(?:gems|bundler/gems)/[^/]+-(?:\d|\h{12})[^/]*\z})
+             end
+             File.write(File.join(dir, "#{Process.pid}.tsv"), lines.join("\n") << "\n")
+@@ -400,7 +409,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
+       # RSpec read SPEC_OPTS when its runner started, before the suite boots
+       # the app; a rake parent that boots it to start the suite has no runner.
+       ActiveSupport.on_load(:before_configuration) do
+-        Lowrail::Profile.leave_env if Lowrail.loaded_constant("RSpec::Core::Runner")
++        Lowrail::Profile.leave_env if caller_locations.any? { _1.path.to_s.end_with?("/rspec/core/runner.rb") }
+       end
+       ActiveSupport.on_load(:active_support_test_case) do
+         Lowrail::Profile.install("Minitest") do
+diff --git a/gem/lib/lowrail/profile_report.rb b/gem/lib/lowrail/profile_report.rb
+index 0f6c7ad1..0e31eaa7 100644
+--- a/gem/lib/lowrail/profile_report.rb
++++ b/gem/lib/lowrail/profile_report.rb
+@@ -125,7 +125,9 @@ module Lowrail
+       if path == "-" then ["(no Ruby frame)", path]
+       elsif (m = path.match(RAILS_PATH)) then ["rails: #{m[1] || m[2]}", "RAILS/#{m[1] || m[2]}/#{m[3]}"]
+       elsif (m = path.match(GEM_PATH)) then gem_site(m[1], m[3])
+-      elsif (root = @roots.find { path.start_with?(_1) }) then ["app", "APP/#{path.delete_prefix(root)}"]
++      # As the counter attributes: a gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines.
++      elsif (root = @roots.find { path.start_with?(_1) }) && !path.delete_prefix(root).match?(%r{(?:\A|/)gems/})
++        ["app", "APP/#{path.delete_prefix(root)}"]
+       elsif (name, gem_dir = path_gems.find { |_, d| path.start_with?(d) })
+         RAILS.include?(name) ? ["rails: #{name}", "RAILS/#{name}/#{path.delete_prefix(gem_dir)}"] : gem_site(name, path.delete_prefix(gem_dir))
+       elsif path.start_with?(libdir) then ["ruby stdlib", "RUBY/#{path.delete_prefix(libdir)}"]

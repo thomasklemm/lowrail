@@ -1,0 +1,156 @@
+== noseed: status plain 0 profiled 0; tests 18
+outcomes run1 identical
+outcomes run2 identical
+tree plain:    
+tree profiled: 
+child after_run.txt identical
+child after_run_nested_suite.txt DIFFERS
+2c2
+< Run options: --seed 50055
+---
+> Run options: --seed 33319
+6c6
+< c.e.h.g.b.f.d.a.
+---
+> b.d.c.f.g.e.a.h.
+8c8
+< Finished in 0.031482s, 254.1145 runs/s, 254.1145 assertions/s.
+---
+> Finished in 0.037529s, 213.1713 runs/s, 213.1713 assertions/s.
+child helper_load.txt DIFFERS
+3,6c3,13
+< RUBYLIB=
+< RUBYOPT=-r/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/setup
+< profiler=nil
+< features=0
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-noseed/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> RUBYLIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+child in_test.txt identical
+child in_test_env.txt DIFFERS
+3d2
+< RUBYLIB=
+child in_test_original_env.txt DIFFERS
+0a1,7
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-noseed/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+> SPEC_OPTS=--seed 1234
+child in_test_original_env_ruby.txt DIFFERS
+0a1,7
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-noseed/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+> SPEC_OPTS=--seed 1234
+child in_test_runner.txt identical
+child in_test_unbundled_env.txt DIFFERS
+0a1,7
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-noseed/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+> SPEC_OPTS=--seed 1234
+child in_test_unbundled_env_ruby.txt DIFFERS
+0a1,7
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-noseed/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+> SPEC_OPTS=--seed 1234
+leftover: 0
+== seed99: status plain 0 profiled 0; tests 18
+outcomes run1 identical
+outcomes run2 identical
+tree plain:    
+tree profiled: 10a11 > !! tmp/lp-seed99/ 
+child after_run.txt identical
+child after_run_nested_suite.txt DIFFERS
+8c8
+< Finished in 0.033004s, 242.3961 runs/s, 242.3961 assertions/s.
+---
+> Finished in 0.017076s, 468.4903 runs/s, 468.4903 assertions/s.
+child helper_load.txt DIFFERS
+3,8c3,15
+< RUBYLIB=
+< RUBYOPT=-r/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/setup
+< SEED=99
+< SPEC_OPTS=--no-color
+< profiler=nil
+< features=0
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-seed99/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_CALLER_SEED=99
+> LOWRAIL_PROFILE_CALLER_SPEC_OPTS=--no-color
+child in_test.txt identical
+child in_test_env.txt DIFFERS
+3d2
+< RUBYLIB=
+child in_test_original_env.txt DIFFERS
+1,2c1,9
+< SEED=99
+< SPEC_OPTS=--no-color
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-seed99/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_CALLER_SEED=99
+> LOWRAIL_PROFILE_CALLER_SPEC_OPTS=--no-color
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+child in_test_original_env_ruby.txt DIFFERS
+1,2c1,9
+< SEED=99
+< SPEC_OPTS=--no-color
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-seed99/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_CALLER_SEED=99
+> LOWRAIL_PROFILE_CALLER_SPEC_OPTS=--no-color
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+child in_test_runner.txt identical
+child in_test_unbundled_env.txt DIFFERS
+1,2c1,9
+< SEED=99
+< SPEC_OPTS=--no-color
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-seed99/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_CALLER_SEED=99
+> LOWRAIL_PROFILE_CALLER_SPEC_OPTS=--no-color
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+child in_test_unbundled_env_ruby.txt DIFFERS
+1,2c1,9
+< SEED=99
+< SPEC_OPTS=--no-color
+---
+> LOWRAIL_PROFILE=/tmp/pr/a81/fresh/tmp/lp-seed99/run2
+> LOWRAIL_PROFILE_ATTRIBUTE=1
+> LOWRAIL_PROFILE_CALLER_SEED=99
+> LOWRAIL_PROFILE_CALLER_SPEC_OPTS=--no-color
+> LOWRAIL_PROFILE_EXT=/home/user/.cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e80132cb245/lowrail_profile.so
+> LOWRAIL_PROFILE_LIB=/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1/lib
+> LOWRAIL_PROFILE_ROOT=/tmp/pr/a81/fresh
+> SEED=1234
+leftover: 0

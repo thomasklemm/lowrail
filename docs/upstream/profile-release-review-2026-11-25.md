@@ -425,3 +425,158 @@ message; P ids off by one, P written per use, reader ignoring P; 124 → 143, IN
 timeout; compare accepting several processes, exiting 1 on regressions, `aa?` always true. Hung, not failed:
 `pgroup: false`, no KILL. Survived: KILL to the pid only, traps not restored, `ENV_KEYS` without `RECORD` or
 `ALLOW_WRITES`, the Minitest < 5.24 prepend made a no-op (not reachable on the installed Minitest), `> 2` processes.
+
+## Post-field-test review: thermos-fable (2026-11-25)
+
+Scope: the lowrail-profile changes in `687f168b..1618fc38` (`8e36ae06`, `a4bc8d5a`, `dbe31072`, `9683fcf4`,
+`90ef44e3`, `9736c860`, `abf515d3`, `1618fc38`). One reviewer applied both Thermos rubrics, without delegation and
+independently of thermos-opus's pass above, which was read only after this audit. Main has since moved to
+`5cdc5669` (the report streams its runs); that commit is not reviewed here.
+**Verdict: changes requested; do not publish this gem. Seven must-fixes, all small.** T2, T7's path table and run
+deletion, the compare refusal and the report-only compare do what they say. T1, T4 and T8 each fail on a layout or
+command an unfamiliar app is likely to have. Receipts, scripts and the verified fixes:
+[2026-11-25-review-fable](../../bench/upstream/profile_release/2026-11-25-review-fable/README.md).
+
+### What ran
+
+* **Gem.** `gem build lowrail-profile.gemspec` in `gem/` at `1618fc38`: sha256
+  `e5b8991d963ebd1bf5e4c984c236c821becea0bb9a62506f088bc5cc6b4ca4b5`, as stated, 14 files. The README's install
+  line, run as written, builds the same archive and installs it.
+* **Profile suites** as `ci.yml` runs them: Ruby 4.0.7 / Rails 8.1.4, 35 runs, 1,128 assertions; Ruby 3.3.14 /
+  Rails 7.2.4, 35 runs, 1,068 assertions; 0 failures and 0 skips on both (rspec-core installed).
+* **Every new test fails with its commit reverted.** For each commit, its tests ran against its parent's `lib`,
+  `exe`, `ext` and README, on both pairs:
+
+  | Commit | Tests | At the commit | On the parent's code |
+  | --- | --- | --- | --- |
+  | `8e36ae06` T1 | path gems and an engine root | pass | fails |
+  | `a4bc8d5a` T2 | the *no runs* message | pass | fails |
+  | `dbe31072` T4 | processes the suite starts | pass | fails |
+  | `9683fcf4` CI fix | the same test (`-W0`, each suite ran) | pass | fails |
+  | `90ef44e3` T7 | runs deleted unless kept; `--out` ownership | pass | both fail |
+  | `9736c860` T8 | `--timeout` | pass | fails |
+  | `abf515d3` | compare refuses parallel workers | pass | fails |
+  | `1618fc38` | six compare and CI-step tests | pass | 5 fail, 1 errors |
+
+* **Apps**, each with the built gem installed and `bundle exec lowrail-profile`: a fresh `rails new` app on Ruby
+  4.0.7 / Rails 8.1.4.1 (Minitest, a scaffold, a job, a mailer); an RSpec app on Ruby 3.3.14 / Rails 7.2.4
+  (rspec-rails, and rswag-specs as Dawarich has) whose `after(:suite)` starts rspec and rake again; and a copy of
+  the fresh app with path gems inside and outside the root, through a symlink, a `git:` gem and the bundle in
+  `vendor/bundle`.
+
+### Must-fix
+
+Each fix below is in [smallest-fixes.patch](../../bench/upstream/profile_release/2026-11-25-review-fable/smallest-fixes.patch)
+(27 added lines, 12 removed). With it applied the reproductions below pass, and the patch also applies to main at
+`5cdc5669`. On `1618fc38` plus the patch the profile suites pass on both pairs (35 runs, 0 failures, 0 skips). It
+is a reviewer's patch, not a commit: none of it is in `gem/`, and it adds no tests.
+
+1. **P1, T4 (`dbe31072`): the RSpec trigger fires in processes that are not running RSpec.** `leave_env` runs at
+   `before_configuration` when `RSpec::Core::Runner` is *loaded*. A gem that requires `rspec/core` when the app boots
+   is enough: with rswag-specs in the bundle, `bin/rails runner` already has the constant. Reproduced on the RSpec
+   app, three ways:
+   * `lowrail-profile -- bundle exec rake spec` counts nothing and exits 1 on a passing suite (*no runs with
+     requests*, with the hint about controller specs). The rake parent drops the profiler before the suite starts.
+     The exe before `dbe31072` counted 2 requests and exited 0, so this is a regression.
+   * A Minitest file in that app ran with seeds 30185 and 32404 in its two runs while `capture.json` records seed
+     1234: the seed is dropped before Minitest reads it, and compare's seed check then certifies a seed that was
+     never used.
+   * `--workloads` there writes no `measured.json` (the runner reads `ENV["LOWRAIL_PROFILE"]` after boot), so
+     compare refuses the capture (exit 2). By the same reading `--allow-writes` is dropped too; that was not run.
+
+   Smallest fix, one line: leave only when the app boots inside RSpec's runner,
+   `caller_locations.any? { _1.path.to_s.end_with?("/rspec/core/runner.rb") }`. Then `rake spec` counts 2 requests,
+   the Minitest file runs with 1234 twice and the workloads capture compares with exit 0. Test: the existing
+   child-environment fixture with `require "rspec/core"` in `config/application.rb` and a Minitest suite.
+2. **P2, T4 (`dbe31072`): Bundler's saved environment still holds the seed and the profiler** (also thermos-opus 3).
+   `Bundler::ORIGINAL_ENV` is taken before `leave_env`, so a child started under `Bundler.with_unbundled_env` or
+   `with_original_env` gets `SEED=1234`, `SPEC_OPTS=--seed 1234` and `LOWRAIL_PROFILE*` back; with a caller
+   `SEED=99` it gets 1234. On the RSpec app a nested `bundle exec rspec` started that way printed *Randomized with
+   seed 1234* and rewrote its tracked file in another order: the Dawarich defect, and guarantee 1 is false for
+   it. Started with a plain `system` it ran in its defined order and the tree stayed clean. When lowrail-profile is
+   not itself under `bundle exec`, such a child also loads the profiler. Smallest fix: make the same edits to
+   `Bundler::ORIGINAL_ENV` when it is loaded, and to the `BUNDLER_ORIG_RUBYOPT`/`RUBYLIB` copies. With it the
+   child's environment is the plain run's in both forms and the tree is unchanged.
+3. **P2, T8 (`9736c860`): a hung worker survives `--timeout`** (also thermos-opus 1). `KILL` is sent only when the
+   command's own process is still alive 10 s after `TERM`. On the fresh app with two parallel workers and a test
+   whose worker does not exit on `TERM`, lowrail-profile exited 124 after 20.7 s and left `Rails test worker 0`
+   running under PID 1. A hung worker is the Fizzy case the flag exists for. Smallest fix: wait up to 10 s for the
+   *group* to end, then `KILL` it. With it the same run exits 124 after 30.8 s with nothing left, and a worker that
+   does exit on `TERM` still ends the run in 20.8 s. The test needs a grandchild that ignores `TERM` under a parent
+   that does not.
+4. **P2, T1 (`8e36ae06`): path gems inside the root under `gems/` or `vendor/gems/` appear nowhere** (GitLab's
+   layout). The counter does not treat such a file as an app line, but the report classifies anything under the
+   root as `app` before it looks at the path gems. So the line is in no ranked row, under no app line, and not in
+   *Not attributed* either: on the T1 app 17.2 objects per request are missing, and the header's "1.4% not
+   attributed" leaves them out. Smallest fix: `classify` treats a path under the root as the app's only when the
+   counter would (no `gems/` segment), and otherwise goes on to the path gems. With it both gems rank as
+   `GEM/<name>/…` with `articles_controller.rb:7` as their caller, and that app line's warm objects go from 24.0 to
+   63.7 per request, which is the sum of what it calls.
+5. **P2, T7 (`90ef44e3`): the run deletion globs `--out`.** This is thermos-opus's finding 2, confirmed here: after
+   `--keep-runs --out tmp/g/keep`, a capture with `--out 'tmp/g/{keep,x}'` deleted `keep/run1` and `keep/run2` and
+   kept its own. This pass had tried only `[x]`, where the report fails before anything is deleted, as it did
+   before the range. Fix as given there (`Dir.children`); it is not in the patch.
+6. **P3, README (`1618fc38`): the CI job stops on a failing suite** (also thermos-opus 4). Run step by step under
+   `bash -e`, the job succeeds for an unchanged head (0 regressions), for a planted one (3 listed) and with two
+   workers (the refusal and *compare exited 2* in the summary). With a failing test on head it fails at *Profile
+   head*, and Compare and the upload never run, so "a failing suite makes compare exit 2, which the summary shows"
+   is not what the job does. Smallest fix: say that the job fails at its profile step, or add `if: always()` to
+   the last two steps.
+7. **P2, receipts: the Hackatime and Writebook captures are not in the repository.** The t3 README says the
+   field-test threads commit them under `oss_profile_sweep_1/`; main has OSM's there and no others. The numbers the
+   no-gate decision rests on (12.5%, 4.4%, plant found in half) match the committed `options-hackatime-serial.txt`,
+   but the README's ranges (`Admin::AdminUsersController#index` 14,700–14,730 or 14,785–14,817; the plant's +40–60
+   on about 7,900) cannot be checked or replayed. Smallest fix: commit each capture's `report.json.gz` as OSM's
+   are, or correct that sentence and drop the ranges.
+
+### Should-fix
+
+* **A symlinked path gem is not classified.** Ruby names a required file by its real path, and the `G` row has the
+  path Bundler was given. The report says so correctly (it is the *Not attributed* share). One line in the patch:
+  write the real path.
+* **`docs/profile.md` still shows the gate's CI job** (thermos-opus 5 ranks it a must-fix). Its YAML has no
+  `PARALLEL_WORKERS: 1`, so on a parallel suite it exits 2. Replace it with the README's job or a link.
+* **A child started while `test_helper.rb` loads is profiled and seeded** (Minitest reads `SEED` later); one started
+  from `rails_helper.rb` is not. The README's "once Minitest or RSpec has read its options" covers it; name
+  `test_helper.rb` there.
+* **`--timeout` and a terminal.** In its own process group the command cannot read the terminal: under a pty,
+  `--timeout 5 -- ruby -e 'p STDIN.gets'` took 15 s and needed `KILL`. Say that a debugger does not work with it.
+* `DECISIONS` gives "1.7% with three base captures": that is the CI job with three base captures; one compare is
+  3.3% (`options-hackatime-serial.txt`).
+* `docs/profile.md` says paths were four fifths of Sure's TSVs; the 81% was measured on Campfire. On the T1 app
+  the path table makes the TSVs 4.1–4.2 times smaller.
+* `profile_test.rb` grew from 802 to 990 lines. The tests these fixes need belong in a new file, which `ci.yml`
+  must then list.
+
+### What passed
+
+* **T1.** A path gem outside the root ranks as `GEM/outer/…` with its app caller. One under `engines/` is keyed
+  `APP/engines/inner/…` and shown as the app's own line, as the counter attributes it. A `git:` gem ranks under its
+  repository directory's name, as before the range. With the bundle in `vendor/bundle` the result is the same, and
+  the profiler, itself a path gem there, stays unranked. A file in no gem is *Not attributed* with the right
+  number: 20.46 objects per request, 38 per call in 7 of 13 requests.
+* **T2.** Controller specs alone: exit 1 with the new message. A request spec with or without them: 1 request.
+* **T4, plain children.** Fresh app: 18 tests with identical outcomes plain and profiled, in both runs, without a
+  seed, with `SEED=99 SPEC_OPTS=--no-color`, and with two workers. RSpec app: 36 examples, identical. The tree
+  changes only by `--out`, apart from must-fix 2. Children started from a test, from `Minitest.after_run`, from
+  `after(:suite)`, from a worker's setup, a nested `bin/rails test`, `bin/rails runner`, rspec and rake see the
+  plain run's environment. A non-Ruby child sees `RUBYLIB` unset where a plain run has it empty.
+* **T7.** `--out` holds 1.95 MB with `--keep-runs` and 0.95 MB without. `report` from kept runs writes the same
+  bytes; without runs it exits 1 and says why. The tree is unchanged.
+* **T8, where `TERM` works.** Serial and with two workers, a test that hangs: exit 124 after 21 s for
+  `--timeout 20`, `timed_out: [1]`, no second run, nothing left running. A serial hang that ignores `TERM` is
+  killed after 30.5 s. compare refuses the capture (exit 2).
+* **The README's numbers.** Every rate in *Why there is no gate* and *What it can find* matches `options-*.txt`.
+  From OSM's committed captures the built gem gives 0 of 24 unchanged heads, the plant in 12 of 12 (+168.5 against
+  26.6 of 26,402) and exit 2 for the 8-worker captures (8,063 and 26,106). Its logs give 81 s plain and 554–588 s
+  per serial capture.
+
+### Maintainability
+
+No file crossed 1,000 lines and no rewrite is called for. Two places hold the same fact twice, and each produced a
+finding. What an app line is lives in the counter (the root, less `gems/`, `test/` and `spec/`) and again in
+`classify` (anything under a root): must-fix 4. What the command's environment is lives in the exe's hash and in
+`ENV_KEYS` plus the two `RUBYOPT`/`RUBYLIB` edits in `profile.rb`; let the exe name what it set. "The suite has
+read its options" is inferred from a loaded constant (must-fix 1); the stack check is still an inference, and
+RSpec offers no hook that is cheaper. The run loop's two ways to start the command should become one function
+that returns the status, so the 124 and 128-plus-signal rules exist once.

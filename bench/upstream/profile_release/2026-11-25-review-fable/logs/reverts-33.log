@@ -1,0 +1,36 @@
+8e36ae06 ruby 3.3.14 | at commit: 1 runs, 16 assertions, 0 failures, 0 errors, 0 skips | code of 8e36ae06^: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_path_gems_and_an_engine_root_are_classified [test/profile_test.rb:187]:
+a4bc8d5a ruby 3.3.14 | at commit: 1 runs, 5 assertions, 0 failures, 0 errors, 0 skips | code of a4bc8d5a^: 1 runs, 5 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_arguments_after_the_separator_belong_to_the_command [test/profile_test.rb:858]:
+dbe31072 ruby 3.3.14 | at commit: 1 runs, 12 assertions, 0 failures, 0 errors, 0 skips | code of dbe31072^: 1 runs, 6 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler [test/profile_test.rb:897]:
+9683fcf4 ruby 3.3.14 | at commit: 1 runs, 24 assertions, 0 failures, 0 errors, 0 skips | code of 9683fcf4^: 1 runs, 8 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler [test/profile_test.rb:900]:
+90ef44e3 ruby 3.3.14 | at commit: 2 runs, 629 assertions, 0 failures, 0 errors, 0 skips | code of 90ef44e3^: 2 runs, 10 assertions, 2 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_out_never_clears_a_directory_it_did_not_create [test/profile_test.rb:622]:
+      2) Failure:
+    ProfileTest#test_runs_are_deleted_after_the_report_unless_kept [test/profile_test.rb:644]:
+9736c860 ruby 3.3.14 | at commit: 1 runs, 13 assertions, 0 failures, 0 errors, 0 skips | code of 9736c860^: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileTest#test_timeout_stops_a_hung_run_and_its_processes [test/profile_test.rb:713]:
+abf515d3 ruby 3.3.14 | at commit: 1 runs, 4 assertions, 0 failures, 0 errors, 0 skips | code of abf515d3^: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+      1) Failure:
+    ProfileCompareTest#test_compare_refuses_captures_of_parallel_workers [test/profile_compare_test.rb:146]:
+1618fc38 ruby 3.3.14 | at commit: 6 runs, 114 assertions, 0 failures, 0 errors, 0 skips | code of 1618fc38^: 6 runs, 36 assertions, 5 failures, 1 errors, 0 skips
+      1) Failure:
+    ProfileCompareTest#test_compare_needs_complete_comparable_captures [test/profile_compare_test.rb:162]:
+      2) Failure:
+    ProfileCompareTest#test_compare_floor_terms [test/profile_compare_test.rb:56]:
+      3) Error:
+    ProfileCompareTest#test_documented_ci_compare_step_reports_and_never_fails:
+      4) Failure:
+    ProfileCompareTest#test_compare_lists_what_exceeds_the_floor_of_an_a_a_pair [test/profile_compare_test.rb:83]:
+      5) Failure:
+    ProfileCompareTest#test_compare_refuses_captures_of_parallel_workers [test/profile_compare_test.rb:144]:
+      6) Failure:
+    ProfileTest#test_counts_only_inside_requests_and_attributes_them_to_the_app [test/profile_test.rb:137]:
