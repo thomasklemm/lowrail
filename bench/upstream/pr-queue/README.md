@@ -53,6 +53,11 @@ trailer. It works in Lowrail and in upstream checkouts (run it from there), and 
 moves: author and committer, the message byte for byte, empty `%(trailers:only)`, and in Lowrail no `owner/repo#N`
 or issue or PR URL in the message.
 
+`script/install-fork-hooks DIR` copies `script/hooks/fork-pre-push` into an upstream checkout as its pre-push hook
+(it refuses to replace another hook). The hook checks each pushed commit that no remote-tracking ref or the pushed-to
+branch already has: no `Amp-Thread-ID:` or Amp `Co-authored-by:` trailer, author and committer Thomas Klemm
+`<github@tklemm.eu>`. Other contributors' commits that are already upstream pass.
+
 ## Body numbers
 
 Every number in a body (objects, Callgrind instructions, benchmark-ips) comes from one

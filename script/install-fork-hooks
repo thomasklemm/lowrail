@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Installs script/hooks/fork-pre-push as the pre-push hook of an upstream checkout (a Rails or Ruby fork clone), so
+# a push refuses our new commits with an Amp trailer or another author or committer than Thomas Klemm.
+#
+#   script/install-fork-hooks DIR
+set -euo pipefail
+[ $# -eq 1 ] || { sed -n '5s/^# *//p' "$0" >&2; exit 2; }
+source="$(cd "$(dirname "$0")" && pwd)/hooks/fork-pre-push"
+hook=$(git -C "$1" rev-parse --path-format=absolute --git-path hooks/pre-push)
+# A copy, not a symlink: a dangling hook is skipped silently when the Lowrail checkout moves.
+if [ -e "$hook" ] && ! grep -q '^# Lowrail fork-pre-push' "$hook"; then
+  echo "install-fork-hooks: $hook is another hook; move it aside first" >&2
+  exit 1
+fi
+mkdir -p "$(dirname "$hook")"
+rm -f "$hook"
+cp "$source" "$hook"
+chmod +x "$hook"
+echo "installed $hook"
