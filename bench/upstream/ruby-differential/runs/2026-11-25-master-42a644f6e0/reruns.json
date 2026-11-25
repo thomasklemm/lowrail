@@ -1,0 +1,57 @@
+[
+  {
+    "app": "discourse",
+    "id": "./spec/jobs/scheduled/notify_admins_of_available_upcoming_changes_spec.rb[1:10:2:1]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit1": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "8a9e7b012b"
+  },
+  {
+    "app": "sure",
+    "id": "FamilyMerchantConcurrencyTest#test_find_or_create_with_name_survives_a_real_unique-constraint_violation_without_aborting_the_caller's_transaction",
+    "modes": [
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "error:ActiveRecord::RecordNotUnique",
+        "error:ActiveRecord::RecordNotUnique"
+      ],
+      "zjit": [
+        "error:ActiveRecord::RecordNotUnique",
+        "fail:Minitest::Assertion",
+        "pass"
+      ],
+      "zjit1": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "a3b75c8a10"
+  }
+]

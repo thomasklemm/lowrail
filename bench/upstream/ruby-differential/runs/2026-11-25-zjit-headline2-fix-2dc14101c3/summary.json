@@ -1,0 +1,86 @@
+[
+  {
+    "app": "casa",
+    "mode": "zjit",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 141,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "casa",
+    "mode": "zjit1",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 147,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "tests": 22128,
+    "results": {
+      "pass": 21882,
+      "fail": 238,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 2905,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit1",
+    "tests": 22128,
+    "results": {
+      "pass": 21882,
+      "fail": 238,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 2955,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "zjit",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 626,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "zjit1",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 586,
+    "differ": 0,
+    "top": {}
+  }
+]

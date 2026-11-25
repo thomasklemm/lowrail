@@ -1,0 +1,18 @@
+# bad: [f2c3f457ff9af34e29b2283e4260a9529f92746c] ZJIT: Inline Kernel#instance_of? with a constant class
+# good: [4abea25ab04a5e0ac5f74b1bc98d2b99e81c861c] [DOC] Fix links
+git bisect start 'f2c3f457ff' '4abea25ab0'
+# good: [e918f242179262a7f7c678f19166880b055f7515] Clear the thrown value of a caught throw_data
+git bisect good e918f242179262a7f7c678f19166880b055f7515
+# good: [05771a319767e055bf0dbd41d4e3ee38ac5b35ba] ZJIT: Reuse raw f64 bits of Floats within a basic block
+git bisect good 05771a319767e055bf0dbd41d4e3ee38ac5b35ba
+# good: [c20d73364c362992be7b043dc2462d7eea319876] ZJIT: Inline tiny callees past the inline budget
+git bisect good c20d73364c362992be7b043dc2462d7eea319876
+# good: [e4b343f171cb55955e5f12a54b3d47c7d0da34e7] ZJIT: Enter compiled methods from vm_call0_cc() on calls from C
+git bisect good e4b343f171cb55955e5f12a54b3d47c7d0da34e7
+# good: [f4a8c02d66d68950f2bd29bd88d8db9aca62f366] ZJIT: Specialize super with keyword arguments to ISEQ methods
+git bisect good f4a8c02d66d68950f2bd29bd88d8db9aca62f366
+# good: [2d609d397de90fa937f88e861d9cb28abc23a12f] ZJIT: Pass braceless Hash literals to positional parameters directly
+git bisect good 2d609d397de90fa937f88e861d9cb28abc23a12f
+# bad: [58b019f6fe25aa5a26e99da4b852163bb9194862] ZJIT: Specialize zsuper from methods with keyword parameters
+git bisect bad 58b019f6fe25aa5a26e99da4b852163bb9194862
+# first 'bad' commit: [58b019f6fe25aa5a26e99da4b852163bb9194862] ZJIT: Specialize zsuper from methods with keyword parameters

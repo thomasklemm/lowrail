@@ -1,0 +1,34 @@
+[
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/jobs/scheduled/notify_admins_of_available_upcoming_changes_spec.rb[1:10:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Expectations::ExpectationNotMetError",
+      "expected {count: 2, upcoming_change_humanized_names: [\"Test upcoming change b\", \"Test upcoming change\"], upcoming_change_names: [\"test_upcoming_change_b\", \"test_upcoming_change\"]} to include {upcoming"
+    ],
+    "loc": "./spec/jobs/scheduled/notify_admins_of_available_upcoming_changes_spec.rb"
+  },
+  {
+    "app": "sure",
+    "mode": "zjit",
+    "id": "FamilyMerchantConcurrencyTest#test_find_or_create_with_name_survives_a_real_unique-constraint_violation_without_aborting_the_caller's_transaction",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "fail",
+      "Minitest::Assertion",
+      "reader never blocked on the unique index (wait_event_type=\"Client\"); timed out waiting; the race wasn't reproduced"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-25-master-42a644f6e0/sure-zjit/test/models/family_merchant_test.rb:155"
+  }
+]

@@ -1,0 +1,544 @@
+[
+  {
+    "app": "campfire",
+    "mode": "interp",
+    "tests": 634,
+    "results": {
+      "pass": 632,
+      "skip": 2
+    },
+    "exit": 0,
+    "secs": 34,
+    "differ": 0
+  },
+  {
+    "app": "campfire",
+    "mode": "yjit",
+    "tests": 634,
+    "results": {
+      "pass": 632,
+      "skip": 2
+    },
+    "exit": 0,
+    "secs": 31,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "campfire",
+    "mode": "zjit",
+    "tests": 634,
+    "results": {
+      "pass": 632,
+      "skip": 2
+    },
+    "exit": 0,
+    "secs": 41,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "campfire",
+    "mode": "zjit1",
+    "tests": 634,
+    "results": {
+      "pass": 632,
+      "skip": 2
+    },
+    "exit": 0,
+    "secs": 49,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "casa",
+    "mode": "interp",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 130,
+    "differ": 0
+  },
+  {
+    "app": "casa",
+    "mode": "yjit",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 112,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "casa",
+    "mode": "zjit",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 139,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "casa",
+    "mode": "zjit1",
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 141,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "codetriage",
+    "mode": "interp",
+    "tests": 219,
+    "results": {
+      "pass": 219
+    },
+    "exit": 0,
+    "secs": 9,
+    "differ": 0
+  },
+  {
+    "app": "codetriage",
+    "mode": "yjit",
+    "tests": 219,
+    "results": {
+      "pass": 219
+    },
+    "exit": 0,
+    "secs": 8,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "codetriage",
+    "mode": "zjit",
+    "tests": 219,
+    "results": {
+      "pass": 219
+    },
+    "exit": 0,
+    "secs": 10,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "codetriage",
+    "mode": "zjit1",
+    "tests": 219,
+    "results": {
+      "pass": 219
+    },
+    "exit": 0,
+    "secs": 12,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "tests": 22128,
+    "results": {
+      "pass": 21882,
+      "fail": 238,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 3131,
+    "differ": 0
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "tests": 22128,
+    "results": {
+      "pass": 21881,
+      "fail": 239,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 3003,
+    "differ": 1,
+    "top": {
+      "RSpec::Expectations::ExpectationNotMetError": 1
+    }
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "tests": 22128,
+    "results": {
+      "pass": 21882,
+      "fail": 238,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 3177,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit1",
+    "tests": 22128,
+    "results": {
+      "pass": 21882,
+      "fail": 238,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 3219,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "fizzy",
+    "mode": "interp",
+    "tests": 1787,
+    "results": {
+      "pass": 1777,
+      "skip": 6,
+      "error": 4
+    },
+    "exit": 1,
+    "secs": 83,
+    "differ": 0
+  },
+  {
+    "app": "fizzy",
+    "mode": "yjit",
+    "tests": 1787,
+    "results": {
+      "pass": 1777,
+      "skip": 6,
+      "error": 4
+    },
+    "exit": 1,
+    "secs": 64,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "fizzy",
+    "mode": "zjit",
+    "tests": 1787,
+    "results": {
+      "pass": 1777,
+      "skip": 6,
+      "error": 4
+    },
+    "exit": 1,
+    "secs": 81,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "fizzy",
+    "mode": "zjit1",
+    "tests": 1787,
+    "results": {
+      "pass": 1777,
+      "skip": 6,
+      "error": 4
+    },
+    "exit": 1,
+    "secs": 89,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "hackatime",
+    "mode": "interp",
+    "tests": 794,
+    "results": {
+      "pass": 794
+    },
+    "exit": 0,
+    "secs": 48,
+    "differ": 0
+  },
+  {
+    "app": "hackatime",
+    "mode": "yjit",
+    "tests": 794,
+    "results": {
+      "pass": 794
+    },
+    "exit": 0,
+    "secs": 43,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "hackatime",
+    "mode": "zjit",
+    "tests": 794,
+    "results": {
+      "pass": 794
+    },
+    "exit": 0,
+    "secs": 49,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "hackatime",
+    "mode": "zjit1",
+    "tests": 794,
+    "results": {
+      "pass": 794
+    },
+    "exit": 0,
+    "secs": 56,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "interp",
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 535,
+    "differ": 0
+  },
+  {
+    "app": "loomio",
+    "mode": "yjit",
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 437,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "zjit",
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 520,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "zjit1",
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 580,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "interp",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 592,
+    "differ": 0
+  },
+  {
+    "app": "mastodon",
+    "mode": "yjit",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 539,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "zjit",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 625,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "zjit1",
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 622,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "sure",
+    "mode": "interp",
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 917,
+    "differ": 0
+  },
+  {
+    "app": "sure",
+    "mode": "yjit",
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 821,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "sure",
+    "mode": "zjit",
+    "tests": 14236,
+    "results": {
+      "pass": 14159,
+      "fail": 16,
+      "skip": 37,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 887,
+    "differ": 1,
+    "top": {
+      "Minitest::Assertion": 1
+    }
+  },
+  {
+    "app": "sure",
+    "mode": "zjit1",
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 968,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "writebook",
+    "mode": "interp",
+    "tests": 310,
+    "results": {
+      "pass": 307,
+      "skip": 2,
+      "error": 1
+    },
+    "exit": 1,
+    "secs": 44,
+    "differ": 0
+  },
+  {
+    "app": "writebook",
+    "mode": "yjit",
+    "tests": 310,
+    "results": {
+      "pass": 307,
+      "skip": 2,
+      "error": 1
+    },
+    "exit": 1,
+    "secs": 44,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "writebook",
+    "mode": "zjit",
+    "tests": 310,
+    "results": {
+      "pass": 307,
+      "skip": 2,
+      "error": 1
+    },
+    "exit": 1,
+    "secs": 49,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "writebook",
+    "mode": "zjit1",
+    "tests": 310,
+    "results": {
+      "pass": 307,
+      "skip": 2,
+      "error": 1
+    },
+    "exit": 1,
+    "secs": 55,
+    "differ": 0,
+    "top": {}
+  }
+]

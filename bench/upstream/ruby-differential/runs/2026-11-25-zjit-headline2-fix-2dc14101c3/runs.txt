@@ -1,0 +1,6 @@
+2026-11-25T21:46:51Z 2026-11-25-zjit-headline2-fix-2dc14101c3 casa zjit exit=1 secs=141 tests=2992 jit={"yjit" => "false", "zjit" => "true"}
+2026-11-25T21:46:57Z 2026-11-25-zjit-headline2-fix-2dc14101c3 casa zjit1 exit=1 secs=147 tests=2992 jit={"yjit" => "false", "zjit" => "true"}
+2026-11-25T21:54:17Z 2026-11-25-zjit-headline2-fix-2dc14101c3 mastodon zjit1 exit=1 secs=586 tests=7748 jit={"yjit" => "false", "zjit" => "true"}
+2026-11-25T21:54:57Z 2026-11-25-zjit-headline2-fix-2dc14101c3 mastodon zjit exit=1 secs=626 tests=7748 jit={"yjit" => "false", "zjit" => "true"}
+2026-11-25T22:32:57Z 2026-11-25-zjit-headline2-fix-2dc14101c3 discourse zjit exit=1 secs=2905 tests=22128 jit={"yjit" => "false", "zjit" => "true"}
+2026-11-25T22:33:46Z 2026-11-25-zjit-headline2-fix-2dc14101c3 discourse zjit1 exit=1 secs=2955 tests=22128 jit={"yjit" => "false", "zjit" => "true"}

@@ -1,0 +1,1 @@
+../../../../fixtures/corpus/frontier-master/vendor-cargo-gem.sh

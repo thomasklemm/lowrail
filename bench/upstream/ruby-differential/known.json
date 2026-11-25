@@ -1,0 +1,8 @@
+[
+  { "app": "campfire", "id": "SqliteWalCheckpointTest#",
+    "why": "1 s wall-clock wait on a child Ruby that inherits RUBYOPT (Z11, zjit-gap-census-2)" },
+  { "app": "sure", "id": "FamilyMerchantConcurrencyTest#test_find_or_create_with_name_survives_a_real_unique-constraint_violation",
+    "why": "two-thread race with a 10 s deadline; fails on the interpreter alone too (ruby41-differential-1)" },
+  { "app": "discourse", "id": "./spec/jobs/scheduled/notify_admins_of_available_upcoming_changes_spec.rb[1:10:2:1]",
+    "why": "SELECT DISTINCT ... UNION without ORDER BY; the spec expects one order (ruby41-differential-1)" }
+]

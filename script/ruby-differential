@@ -1,0 +1,623 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Ruby interpreter/YJIT/ZJIT differential on the census apps' own test suites (docs/upstream/ruby41-differential-1.md).
+#
+#   script/ruby-differential weekly  [--jobs N] [--modes LIST] [--apps LIST]    # master tip + newest k0kubun zjit-headline*
+#   script/ruby-differential weekly  --commit SHA [--repo URL] [--name NAME] ... # one Ruby instead
+#   script/ruby-differential services                                            # fresh orb: PostgreSQL, Redis, memcached
+#   script/ruby-differential build   --commit SHA [--repo URL] [--name NAME]     # release build in $RDIFF_HOME/rubies/NAME
+#   script/ruby-differential setup   --ruby DIR [--apps LIST]                    # app copies, edits, template databases (once per orb)
+#   script/ruby-differential bundle  --ruby DIR [--apps LIST]                    # install each app's gems for that Ruby
+#   script/ruby-differential run     --ruby DIR --label L [--modes LIST] [--apps LIST] [--jobs N] [--force]   # resumes a label
+#   script/ruby-differential compare --label L [--label L2 ...] [--base-label B] # per-test differences against interp (of B)
+#   script/ruby-differential rerun   --ruby DIR --label L [--reps 3] [--jobs N]   # each difference alone, see MODES_RERUN
+#
+# weekly = build + (setup) + bundle + run + compare, then rerun and report only differences that are new against the
+# previous run of the same series (master, zjit-headline*) and known.json; writes runs/LABEL/report.md, exits 1 if any.
+# LIST is comma-separated; modes are the names in MODES or
+# NAME=FLAGS (FLAGS with + for spaces, e.g. zinl=--zjit+--zjit-call-threshold=1+--zjit-inline-threshold=500).
+# Apps default to DEFAULT_APPS (every app in APPS but Lobsters). Outcomes (compact, gzipped, kept in Git) go to
+# bench/upstream/ruby-differential/runs/LABEL/APP/MODE.json.gz; logs and run copies to $RDIFF_HOME (~/rdiff).
+# Needs PostgreSQL (socket in /var/run/postgresql, trust auth), redis-server (each run starts its own) and memcached on 11211.
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "set"
+require "time"
+require "zlib"
+
+module RubyDifferential
+  ROOT = File.expand_path("..", __dir__)
+  DIR = File.join(ROOT, "bench/upstream/ruby-differential")
+  RECORDER = File.join(DIR, "recorder.rb")
+  RSPEC_FIX = File.join(DIR, "rspec_rails_fix.rb")
+  HOME = ENV.fetch("RDIFF_HOME", File.expand_path("~/rdiff"))
+  RAILS = "cf0325a832a1594f01d866da1e4ad23d962d886b"
+  CORPUS = "censusrd" # .corpus/censusrd-APP; script/census's harness accepts copies named census*-APP
+  SEED = "41231"
+  MODES = { "interp" => "", "yjit" => "--yjit", "yjit1" => "--yjit --yjit-call-threshold=1",
+    "zjit" => "--zjit", "zjit1" => "--zjit --zjit-call-threshold=1" }.freeze
+  DEFAULT_MODES = %w[interp yjit zjit1 zjit].freeze
+  MODES_RERUN = %w[interp zjit zjit1].freeze # plus the mode that differed
+  SAMPLE = 5
+  NO_OUTCOMES = "(no outcomes)"
+
+  MINITEST = %W[bin/rails test -v --seed #{SEED}].freeze
+  RSPEC = %w[bundle exec rspec --order defined].freeze
+  NO_SYSTEM = ["--exclude-pattern", "spec/system/**/*_spec.rb"].freeze
+  ENCRYPTION = { "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY" => "census" * 6,
+    "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT" => "salt" * 8, "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY" => "primary" * 5 }.freeze
+
+  # source: r82 = script/corpus APP-r82 (Rails 8.2 pins, as Z2 and zjit-gap-census-2), census = script/census
+  # setup on Rails RAILS with this directory's overlays. db: the test database (nil for SQLite in the copy) for a
+  # token; env: per-run environment for a token and a Redis database number.
+  APPS = {
+    "campfire" => { source: "r82", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:test:prepare],
+      env: ->(_t, r) { { "REDIS_URL" => "redis://localhost:#{r}/1" } } },
+    "writebook" => { source: "r82", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:test:prepare],
+      env: ->(_t, r) { { "REDIS_URL" => "redis://localhost:#{r}/1" } } },
+    "fizzy" => { source: "r82", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:test:prepare] },
+    "lobsters" => { source: "census", kind: "rspec", cmd: RSPEC, prep: %w[bin/rails db:create db:schema:load],
+      env: ->(_t, r) { { "REDIS_URL" => "redis://localhost:#{r}/1" } } },
+    "codetriage" => { source: "census", kind: "minitest",
+      cmd: %W[bundle exec rails test -v --seed #{SEED} test/unit test/functional test/integration test/jobs test/mailers
+        test/helpers test/dependency_parsers], prep: %w[bin/rails db:create db:schema:load], db: ->(t) { "rd_codetriage_#{t}" },
+      env: ->(t, r) { { "DATABASE_ADAPTER" => "postgresql", "DATABASE_URL" => "postgres:///rd_codetriage_#{t}",
+        "REDIS_URL" => "redis://localhost:#{r}/1" } } },
+    "mastodon" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "rd_mastodon_#{t}_test" },
+      env: ->(t, r) { ENCRYPTION.merge("DB_HOST" => "/var/run/postgresql", "DB_NAME" => "rd_mastodon_#{t}", "DB_USER" => ENV.fetch("USER"),
+        "REDIS_URL" => "redis://localhost:#{r}/1", "LOCAL_DOMAIN" => "localhost", "ES_ENABLED" => "false") } },
+    "sure" => { source: "census", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "rd_sure_#{t}" },
+      env: ->(t, r) { { "DB_HOST" => "/var/run/postgresql", "POSTGRES_DB" => "rd_sure_#{t}", "REDIS_URL" => "redis://localhost:#{r}/1" } } },
+    "loomio" => { source: "census", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "rd_loomio_#{t}" },
+      env: ->(t, r) { { "DATABASE_URL" => "postgres:///rd_loomio_#{t}", "REDIS_URL" => "redis://localhost:#{r}/1",
+        "CANONICAL_HOST" => "localhost" } } },
+    "casa" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "casa_test_rd_#{t}" }, env: ->(t, _r) { { "TEST_ENV_NUMBER" => "_rd_#{t}", "APP_ENVIRONMENT" => "test" } } },
+    "hackatime" => { source: "census", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "rd_hackatime_#{t}" },
+      env: ->(t, _r) { { "TEST_DATABASE_URL" => "postgres:///rd_hackatime_#{t}", "DATABASE_URL" => "postgres:///rd_hackatime_#{t}",
+        "APP_HOST" => "localhost", "ENCRYPTION_PRIMARY_KEY" => "censusprimarykeycensusprimarykey",
+        "ENCRYPTION_DETERMINISTIC_KEY" => "censusdeterministiccensusdetermi",
+        "ENCRYPTION_KEY_DERIVATION_SALT" => "censussaltcensussaltcensussalt12" } } },
+    "discourse" => { source: "census", kind: "rspec", cmd: RSPEC + %w[spec/models spec/lib spec/serializers spec/services spec/jobs],
+      prep: %w[bin/rake db:create db:migrate], db: ->(t) { "rd_discourse_#{t}" },
+      env: ->(t, r) { { "RAILS_DB" => "rd_discourse_#{t}", "LOAD_PLUGINS" => "0", "DISCOURSE_REDIS_PORT" => r.to_s, "DISCOURSE_REDIS_DB" => "1",
+        "RDIFF_NO_VIPS" => "1" } } },
+  }.freeze
+
+  module_function
+
+  def sh(env, *cmd, chdir: ROOT, log: nil)
+    puts "+ #{cmd.join(" ")}#{" (in #{chdir})" if chdir != ROOT}"
+    opts = { chdir: chdir, exception: true }
+    opts.merge!(out: [log, "a"], err: %i[child out]) if log
+    system(env, *cmd, **opts)
+  end
+
+  def capture(*cmd, **opts)
+    out, status = Open3.capture2(*cmd, **opts)
+    raise "#{cmd.join(" ")} failed" unless status.success?
+    out.strip
+  end
+
+  def node_bin = @node_bin ||= begin
+    mise = File.expand_path("~/.local/bin/mise")
+    File.executable?(mise) && system(mise, "install", "node@24.22.0", out: File::NULL, err: File::NULL) ?
+      File.join(capture(mise, "where", "node@24.22.0"), "bin") : nil
+  end
+
+  def ruby_bin(dir) = File.executable?(File.join(dir, "bin/ruby")) ? File.join(dir, "bin") : dir
+  def revision(bin) = capture(File.join(bin, "ruby"), "-e", "print RUBY_REVISION[0, 10]")
+  def base(app) = File.join(ROOT, ".corpus", "#{CORPUS}-#{app}")
+  def modes(list) = list.split(",").to_h { |m| m.include?("=") ? m.split("=", 2).then { [_1, _2.tr("+", " ")] } : [m, MODES.fetch(m)] }
+  def out_dir(label) = File.join(DIR, "runs", label)
+
+  # The Gemfile this Ruby runs: r82 copies share one Gemfile across Rubies; census copies have a variant
+  # per Ruby revision (script/census's convention), copied from an existing one for a new revision.
+  def gemfile(app, bin)
+    dir = base(app)
+    return File.join(dir, "Gemfile") if APPS.fetch(app)[:source] == "r82"
+    want = File.join(dir, "Gemfile.census-#{RAILS[0, 12]}-ruby-#{revision(bin)}")
+    unless File.exist?(want)
+      from = Dir[File.join(dir, "Gemfile.census-#{RAILS[0, 12]}-ruby-*")].grep_v(/\.lock\z/).max_by { File.mtime(_1) }
+      raise "#{app}: no census Gemfile variant; run setup" unless from
+      FileUtils.cp(from, want)
+      FileUtils.cp(from + ".lock", want + ".lock")
+    end
+    want
+  end
+
+  def env(app, bin, token, redis, jit: "", mode: "interp")
+    path = [bin, node_bin, ENV.fetch("PATH")].compact.join(":")
+    { "PATH" => path, "BUNDLE_GEMFILE" => gemfile(app, bin), "RAILS_ENV" => "test", "RACK_ENV" => "test",
+      "RUBYOPT" => "#{jit} -r#{RECORDER}".strip, "RDIFF_MODE" => mode, "RDIFF_KIND" => APPS.fetch(app)[:kind],
+      "PARALLEL_WORKERS" => "1", "DISABLE_SPRING" => "1", "CI" => "1", "TZ" => "UTC", "CI_PROGRESS_BAR" => "0",
+      "GEM_HOME" => nil, "GEM_PATH" => nil, "BUNDLE_FROZEN" => nil, "RUBY_YJIT_ENABLE" => nil, "RUBY_ZJIT_ENABLE" => nil,
+      "RDIFF_MAIN_PID" => nil, "RDIFF_OUT" => nil, "RDIFF_JIT_OUT" => nil }
+      .merge(APPS.fetch(app).fetch(:env, ->(*) { {} }).call(token, redis))
+  end
+
+  def build(opts)
+    name = opts[:name] || opts.fetch(:commit)[0, 10]
+    src = File.join(HOME, "src", name)
+    prefix = File.join(HOME, "rubies", name)
+    return prefix if File.executable?(File.join(prefix, "bin/ruby")) && !opts[:force]
+    unless File.exist?(src)
+      FileUtils.mkdir_p(File.dirname(src))
+      sh({}, "git", "clone", "--quiet", "--filter=blob:none", opts[:repo], src)
+    end
+    sh({}, "git", "-C", src, "fetch", "--quiet", "origin", opts.fetch(:commit))
+    sh({}, "git", "-C", src, "-c", "advice.detachedHead=false", "checkout", "--quiet", opts.fetch(:commit))
+    log = File.join(HOME, "logs", "build-#{name}.log")
+    FileUtils.mkdir_p(File.dirname(log))
+    baseruby = ENV.fetch("RDIFF_BASERUBY") { capture("sh", "-c", "command -v ruby") }
+    sh({}, "./autogen.sh", chdir: src, log: log) unless File.exist?(File.join(src, "configure"))
+    FileUtils.mkdir_p(File.join(src, "build"))
+    sh({ "PATH" => "#{File.expand_path("~/.cargo/bin")}:#{ENV.fetch("PATH")}" }, "../configure", "--prefix=#{prefix}",
+      "--enable-zjit", "--enable-yjit", "--disable-install-doc", "--with-baseruby=#{baseruby}", chdir: File.join(src, "build"), log: log)
+    sh({ "PATH" => "#{File.expand_path("~/.cargo/bin")}:#{ENV.fetch("PATH")}" }, "make", "-j#{Etc.nprocessors}", chdir: File.join(src, "build"), log: log)
+    sh({}, "make", "install", chdir: File.join(src, "build"), log: log)
+    # Bundler 4.0.20 (the apps' lock) installed by a parallel `bundle install` can come out incomplete; install it once here.
+    sh({}, File.join(prefix, "bin/gem"), "install", "bundler", "-v", "4.0.20", "--no-document", log: log)
+    prefix
+  end
+
+  # Idempotent edits, the same in every mode (Z11's workarounds).
+  def edit(app)
+    dir = base(app)
+    edit_file = ->(rel, from, to) do
+      path = File.join(dir, rel)
+      text = File.read(path)
+      next if text.include?(to)
+      raise "#{app}: #{rel} has no #{from.inspect}" unless text.include?(from)
+      File.write(path, text.sub(from, to))
+    end
+    case app
+    when "mastodon" then edit_file.("spec/rails_helper.rb", "require 'rspec/rails'\n", "require 'rspec/rails'\nrequire #{RSPEC_FIX.inspect} # rdiff\n")
+    when "casa", "lobsters" then edit_file.("spec/rails_helper.rb", %(require "rspec/rails"\n), %(require "rspec/rails"\nrequire #{RSPEC_FIX.inspect} # rdiff\n))
+    when "discourse"
+      edit_file.("spec/rails_helper.rb", %(require "shoulda-matchers"\n), %(require #{RSPEC_FIX.inspect} # rdiff\nrequire "shoulda-matchers"\n))
+      # The libvips worker needs libvips >= 8.18; image-processing specs fail in every mode instead.
+      edit_file.("config/initializers/003-vips.rb", "next if !GlobalSetting.enable_vips_image_processing\n",
+        %(next if !GlobalSetting.enable_vips_image_processing || ENV["RDIFF_NO_VIPS"]\n))
+    end
+  end
+
+  def setup(opts)
+    opts[:apps].each do |app|
+      conf = APPS.fetch(app)
+      dir = base(app)
+      unless File.exist?(dir)
+        if conf[:source] == "r82"
+          sh({}, File.join(ROOT, "script/corpus"), "#{app}-r82", File.basename(dir), "--source-only")
+          gf = File.join(dir, "Gemfile")
+          File.write(gf, File.read(gf).sub(/^ruby file: ".ruby-version"\n/, "")
+            .sub(/^gem "redcarpet", "~> 3.6"$/, %(gem "redcarpet", "~> 3.6", ">= 3.6.1")))
+          lock = File.join(dir, "Gemfile.lock")
+          File.write(lock, File.read(lock).sub(/^RUBY VERSION\n.*?\n\n/m, ""))
+        else
+          sh({ "PATH" => "#{ruby_bin(opts.fetch(:ruby))}:#{ENV.fetch("PATH")}" }, File.join(ROOT, "script/census"), "setup",
+            "--corpus", CORPUS, "--rails", RAILS, "--ruby", opts.fetch(:ruby), "--ruby-overlays", File.join(DIR, "overlays"), "--apps", app)
+        end
+      end
+      edit(app)
+      bin = ruby_bin(opts.fetch(:ruby))
+      bundle(app, bin)
+      e = env(app, bin, "tpl", 6379)
+      if conf[:db]
+        system("dropdb", "--if-exists", conf[:db].call("tpl"), exception: true)
+      end
+      sh(e, *conf.fetch(:prep), chdir: dir, log: File.join(HOME, "logs", "prep-#{app}.log"))
+    end
+  end
+
+  def bundle(app, bin)
+    gf = gemfile(app, bin)
+    if app == "sure" && !File.read(gf).include?("minitest-mock")
+      File.write(gf, File.read(gf) + %(gem "minitest-mock", group: :test # rdiff: Minitest 6 split out Minitest::Mock\n))
+    end
+    # Rails main's actionmailer no longer depends on activejob, which Discourse's mailers still load and its
+    # Gemfile does not list (it names Rails components one by one).
+    if app == "discourse" && !File.read(gf).include?(%(gem "activejob"))
+      mailer = File.read(gf)[/^gem "actionmailer", (.*)$/, 1] or raise "discourse: no actionmailer line"
+      File.write(gf, File.read(gf) + %(gem "activejob", #{mailer} # rdiff\n))
+    end
+    e = env(app, bin, "tpl", 6379).merge("RUBYOPT" => nil, "RAILS_ENV" => nil, "RACK_ENV" => nil)
+    system(e, "bundle", "check", chdir: base(app), out: File::NULL, err: File::NULL) ||
+      sh(e, "bundle", "install", "--quiet", "--jobs", "8", chdir: base(app))
+  end
+
+  # A fresh copy of the app (node_modules linked, not copied) and, for server databases, a fresh database
+  # cloned from the template the setup step loaded, so every run starts from the same rows and sequences.
+  def fresh_copy(app, work, token)
+    FileUtils.rm_rf(work)
+    FileUtils.mkdir_p(File.dirname(work))
+    src = base(app)
+    system("rsync", "-a", "--exclude", "node_modules", "--exclude", "tmp/cache", "--exclude", "log/*.log", "#{src}/", "#{work}/", exception: true)
+    Dir.glob("**/node_modules", base: src).reject { _1.count("/") > 0 && _1.split("/")[0..-2].include?("node_modules") }.each do |rel|
+      next unless File.directory?(File.join(src, rel)) && !File.exist?(File.join(work, rel))
+      FileUtils.mkdir_p(File.dirname(File.join(work, rel)))
+      File.symlink(File.join(src, rel), File.join(work, rel))
+    end
+    return unless (db = APPS.fetch(app)[:db])
+    system("dropdb", "--if-exists", db.call(token), exception: true)
+    system("createdb", "-T", db.call("tpl"), db.call(token), exception: true)
+  end
+
+  def drop(app, token)
+    db = APPS.fetch(app)[:db]
+    system("dropdb", "--if-exists", db.call(token), out: File::NULL, err: File::NULL) if db
+  end
+
+  def token(*parts) = Digest::SHA256.hexdigest(parts.join("/"))[0, 10]
+
+  # Outcomes as { id => [result, exception class, message] }, with the recorder's JIT state.
+  def outcomes(kind, raw)
+    return nil unless File.exist?(raw) && File.size(raw) > 0
+    data = JSON.parse(File.read(raw))
+    if kind == "rspec"
+      data.fetch("examples").to_h do |e|
+        r = { "passed" => "pass", "failed" => "fail", "pending" => "skip" }.fetch(e["status"], e["status"])
+        [e["id"], [r, e.dig("exception", "class"), e.dig("exception", "message").to_s.lines.first.to_s.strip[0, 200], e["file_path"]]]
+      end
+    else
+      data.fetch("tests").transform_values { [_1["r"], _1["e"], _1["m"], _1["loc"]] }
+    end
+  rescue JSON::ParserError
+    nil
+  end
+
+  def run_one(app, bin, mode, jit, work, raw, log, args: nil, redis: 1, token:, timeout: ENV.fetch("RDIFF_TIMEOUT", "7200"))
+    conf = APPS.fetch(app)
+    e = env(app, bin, token, redis, jit: jit, mode: mode).merge("RDIFF_OUT" => raw, "RDIFF_JIT_OUT" => "#{raw}.jit")
+    cmd = conf.fetch(:cmd)
+    if args # a single test replaces the suite's directories and exclusions
+      cmd = cmd.take_while { !_1.start_with?("test/", "spec/") }
+      cmd = cmd[0...-1] if cmd.last == "--exclude-pattern"
+    end
+    cmd += ["--format", "json", "--out", raw, "--format", "progress"] if conf[:kind] == "rspec"
+    cmd += args if args
+    FileUtils.rm_f([raw, "#{raw}.jit"])
+    start = Time.now
+    pid = spawn(e, "timeout", "-k", "10", timeout.to_s, *cmd, chdir: work, out: log, err: %i[child out], unsetenv_others: false)
+    Process.wait(pid)
+    jitstate = File.exist?("#{raw}.jit") ? File.read("#{raw}.jit").lines.to_h { _1.chomp.split("=", 2) } : {}
+    { "exit" => $?.exitstatus || -$?.termsig.to_i, "secs" => (Time.now - start).round, "jit" => jitstate,
+      "tests" => outcomes(conf[:kind], raw) }
+  end
+
+  def write_gz(path, obj)
+    FileUtils.mkdir_p(File.dirname(path))
+    Zlib::GzipWriter.open(path, Zlib::BEST_COMPRESSION, mtime: 0) { _1.write(JSON.pretty_generate(obj)) }
+  end
+
+  def read_gz(path) = Zlib::GzipReader.open(path) { JSON.parse(_1.read) }
+
+  # A private Redis server for one run. Suites flush Redis, and Discourse's specs even run SLAVEOF on it, which
+  # makes a shared server read-only for every other suite. Ports are claimed with a lock file, so concurrent
+  # invocations (one per Ruby build) never share one.
+  def with_redis
+    FileUtils.mkdir_p(File.join(HOME, "locks"))
+    port, lock = (7001..7200).each do |p|
+      f = File.open(File.join(HOME, "locks", "redis-#{p}"), File::RDWR | File::CREAT)
+      break [p, f] if f.flock(File::LOCK_EX | File::LOCK_NB)
+      f.close
+    end
+    raise "no free Redis port" unless lock
+    pid = spawn("redis-server", "--port", port.to_s, "--bind", "127.0.0.1", "--save", "", "--appendonly", "no",
+      "--databases", "4", out: File::NULL, err: File::NULL)
+    50.times { break if system("redis-cli", "-p", port.to_s, "ping", out: File::NULL, err: File::NULL); sleep 0.1 }
+    yield port
+  ensure
+    if pid
+      Process.kill("TERM", pid) rescue nil
+      Process.wait(pid) rescue nil
+    end
+    lock&.close
+  end
+
+  def pool(jobs, items)
+    queue = Queue.new
+    items.each { queue << _1 }
+    Array.new([jobs, items.size].min) do
+      Thread.new do
+        while (item = (queue.pop(true) rescue nil))
+          begin
+            with_redis { |port| yield item, port }
+          rescue => e
+            warn "#{item.inspect}: #{e.class}: #{e.message}"
+          end
+        end
+      end
+    end.each(&:join)
+  end
+
+  # Longest suites first, so the pool's tail is short.
+  # Lobsters' suite stops in before(:suite) on Rails main (activerecord-typedstore); --apps lobsters still runs it.
+  DEFAULT_APPS = (APPS.keys - %w[lobsters]).freeze
+
+  ORDER = %w[discourse sure mastodon loomio casa fizzy lobsters hackatime campfire writebook codetriage].freeze
+
+  def run(opts)
+    bin = ruby_bin(opts.fetch(:ruby))
+    ms = modes(opts[:modes])
+    label = opts.fetch(:label)
+    ruby = capture(File.join(bin, "ruby"), "-e", "print RUBY_DESCRIPTION")
+    items = opts[:apps].sort_by { ORDER.index(_1) || 99 }.product(ms.keys)
+    # A rerun of the same label resumes: runs with an outcome file are kept unless --force.
+    items.reject! { |app, mode| File.exist?(File.join(out_dir(label), app, "#{mode}.json.gz")) } unless opts[:force]
+    pool(opts[:jobs], items) do |(app, mode), slot|
+      tok = token(label, app, mode)
+      work = File.join(HOME, "work", label, "#{app}-#{mode}")
+      logdir = File.join(HOME, "logs", label)
+      FileUtils.mkdir_p(logdir)
+      fresh_copy(app, work, tok)
+      res = run_one(app, bin, mode, ms[mode], work, File.join(logdir, "#{app}-#{mode}.raw.json"), File.join(logdir, "#{app}-#{mode}.log"),
+        redis: slot, token: tok)
+      write_gz(File.join(out_dir(label), app, "#{mode}.json.gz"), { "ruby" => ruby, "app" => app, "mode" => mode, "flags" => ms[mode] }.merge(res))
+      line = "#{Time.now.utc.iso8601} #{label} #{app} #{mode} exit=#{res["exit"]} secs=#{res["secs"]} tests=#{res["tests"]&.size.inspect} jit=#{res["jit"].slice("yjit", "zjit")}"
+      File.write(File.join(out_dir(label), "runs.txt"), line + "\n", mode: "a")
+      puts line
+      drop(app, tok)
+      FileUtils.rm_rf(work) unless ENV["RDIFF_KEEP"]
+    end
+  end
+
+  # Dates, times and object addresses in test names (Z2's compare.rb), so they pair across runs.
+  def norm(k) = k.gsub(/0x\h+/, "0x").gsub(/\d{4}-\d\d-\d\d[ _T]\d\d:\d\d:\d\d(\.\d+)?/, "TS")
+    .gsub(/\w{3},_\d\d_\w{3}_\d{4}_\d\d:\d\d:\d\d/, "TS").gsub(/Date:_\d{4}-\d\d-\d\d/, "Date:").gsub(/\(\(\d+j,/, "((Nj,")
+
+  def keyed(tests) = tests.to_h { |k, v| [norm(k), v + [k]] }
+
+  # A difference: another result, or a failure with another exception class. Missing outcomes count as a difference.
+  def differs?(a, b) = a.nil? || b.nil? || a[0] != b[0] || (%w[fail error].include?(a[0]) && a[1] != b[1])
+
+  def compare(opts)
+    report, summary, all = {}, {}, {}
+    opts.fetch(:labels).each do |label|
+      runs = Dir[File.join(out_dir(label), "*", "*.json.gz")].map { read_gz(_1) }
+      runs.group_by { _1["app"] }.sort.each do |app, rs|
+        # --base-label L: the interpreter baseline of another build (a fix build run in JIT modes only).
+        base_file = opts[:base_label] && File.join(out_dir(opts[:base_label]), app, "interp.json.gz")
+        base = base_file ? (read_gz(base_file) if File.exist?(base_file)) : rs.find { _1["mode"] == "interp" }
+        next puts("#{label} #{app}: no interp run") unless base&.dig("tests")
+        bt = keyed(base["tests"])
+        rs.sort_by { _1["mode"] }.each do |r|
+          tally = r["tests"]&.values&.map(&:first)&.tally
+          unless r["tests"]
+            # A crash, hang or boot failure: the whole run differs.
+            puts "#{label} #{app} #{r["mode"]}: NO OUTCOMES exit=#{r["exit"]}"
+            (summary[label] ||= []) << { "app" => app, "mode" => r["mode"], "tests" => nil, "exit" => r["exit"], "secs" => r["secs"],
+              "differ" => "no outcomes" }
+            (all[label] ||= {})["#{app} #{r["mode"]}"] = [NO_OUTCOMES]
+            next
+          end
+          if r.equal?(base)
+            (summary[label] ||= []) << { "app" => app, "mode" => "interp", "tests" => r["tests"].size, "results" => tally,
+              "exit" => r["exit"], "secs" => r["secs"], "differ" => 0 }
+            next
+          end
+          t = keyed(r["tests"])
+          diffs = (bt.keys | t.keys).select { differs?(bt[_1], t[_1]) }
+          puts "#{label} #{app} #{r["mode"]}: #{t.size} tests #{tally} exit=#{r["exit"]} jit=#{r["jit"].slice("yjit", "zjit")}: #{diffs.size} differ"
+          (summary[label] ||= []) << { "app" => app, "mode" => r["mode"], "tests" => t.size, "results" => tally, "exit" => r["exit"],
+            "secs" => r["secs"], "differ" => diffs.size,
+            "top" => diffs.filter_map { t[_1]&.[](1) }.tally.max_by(3) { _2 }.to_h }
+          (all[label] ||= {})["#{app} #{r["mode"]}"] = diffs
+          # Keep the first 100 of a run: one that differs in thousands failed as a whole.
+          diffs.first(100).each_with_index do |k, i|
+            a, b = bt[k], t[k]
+            puts "  #{a&.first || "MISSING"}#{"(#{a[1]})" if a&.[](1)} -> #{b&.first || "MISSING"}#{"(#{b[1]})" if b&.[](1)}  #{k}\n      #{(b || a)[2]}" if i < 20
+            (report[label] ||= []) << { "app" => app, "mode" => r["mode"], "id" => (b || a).last, "base" => a&.take(3), "got" => b&.take(3),
+              "loc" => (b || a)[3] }
+          end
+        end
+      end
+    end
+    opts.fetch(:labels).each do |label|
+      File.write(File.join(out_dir(label), "diffs.json"), JSON.pretty_generate(report.fetch(label, [])) + "\n")
+      File.write(File.join(out_dir(label), "summary.json"), JSON.pretty_generate(summary.fetch(label, [])) + "\n")
+      # Every differing test id (normalized) per "APP MODE", for the next run's comparison.
+      write_gz(File.join(out_dir(label), "diffs-all.json.gz"), all.fetch(label, {}))
+    end
+    report
+  end
+
+  def single_args(app, d)
+    if APPS.fetch(app)[:kind] == "rspec"
+      [d.fetch("id")]
+    else
+      file = d.fetch("loc").to_s.sub(/:\d+\z/, "").sub(%r{\A.*?/(test/)}, "\\1")
+      [file, "-n", d.fetch("id").split("#", 2).last]
+    end
+  end
+
+  def rerun(opts)
+    bin = ruby_bin(opts.fetch(:ruby))
+    label = opts.fetch(:label)
+    path = File.join(out_dir(label), "diffs.json")
+    diffs = File.exist?(path) ? JSON.parse(File.read(path)) : []
+    ms = MODES.merge(modes(opts[:modes]))
+    # A run with hundreds of differences failed as a whole (a crash, or one bug in a shared path);
+    # rerunning SAMPLE of them alone says the same as rerunning all.
+    diffs = diffs.select { opts[:apps].include?(_1["app"]) }
+    diffs = diffs.select { |d| opts[:only].include?([d["app"], norm(d["id"])]) } if opts[:only]
+      .group_by { [_1["app"], _1["mode"]] }
+      .flat_map { |_, ds| ds.size > 50 ? ds.select { _1.dig("base", 0) == "pass" }.sample(SAMPLE, random: Random.new(41231)) : ds }
+    by_test = diffs.group_by { [_1["app"], _1["id"]] }
+    results = []
+    pool(opts[:jobs], by_test.to_a) do |((app, id), ds), slot|
+      rerun_modes = (MODES_RERUN + ds.map { _1["mode"] }).uniq
+      tok = token(label, "rerun", app, id)
+      work = File.join(HOME, "work", label, "rerun-#{tok}")
+      logdir = File.join(HOME, "logs", label, "rerun")
+      FileUtils.mkdir_p(logdir)
+      fresh_copy(app, work, tok)
+      outcome = rerun_modes.to_h do |m|
+        [m, Array.new(opts[:reps]) do |i|
+          res = run_one(app, bin, m, ms.fetch(m), work, File.join(logdir, "#{tok}-#{m}-#{i}.raw.json"), File.join(logdir, "#{tok}-#{m}-#{i}.log"),
+            args: single_args(app, ds.first), redis: slot, token: tok, timeout: ENV.fetch("RDIFF_RERUN_TIMEOUT", "300"))
+          o = res["tests"]&.values&.first
+          o ? [o[0], o[1]].compact.join(":") : "none(exit=#{res["exit"]})"
+        end]
+      end
+      drop(app, tok)
+      FileUtils.rm_rf(work) unless ENV["RDIFF_KEEP"]
+      line = { "app" => app, "id" => id, "modes" => ds.map { _1["mode"] }, "alone" => outcome, "log" => tok }
+      results << line
+      puts JSON.generate(line)
+    end
+    out = File.join(out_dir(label), "reruns.json")
+    # Merges into an earlier rerun of the label (rerun --apps redoes only those apps).
+    kept = File.exist?(out) ? JSON.parse(File.read(out)).reject { |r| results.any? { _1.values_at("app", "id") == r.values_at("app", "id") } } : []
+    File.write(out, JSON.pretty_generate((kept + results).sort_by { [_1["app"], _1["id"]] }) + "\n")
+    results
+  end
+
+  RUBY_REPO = "https://github.com/ruby/ruby.git"
+  HEADLINE_REPO = "https://github.com/k0kubun/ruby.git"
+  WEEKLY_LABEL = /\A\d{4}-\d\d-\d\d-(master|zjit-headline\d*)-\h{10}\z/
+
+  def commit_time(repo, sha)
+    path = "repos/#{repo[%r{github\.com/(.+?)(\.git)?\z}, 1]}/commits/#{sha}"
+    json = system("gh", "--version", out: File::NULL, err: File::NULL) ? capture("gh", "api", path) : capture("curl", "-fsSL", "https://api.github.com/#{path}")
+    Time.iso8601(JSON.parse(json).dig("commit", "committer", "date"))
+  end
+
+  # The tip of ruby/ruby master and of k0kubun's newest zjit-headlineN branch (latest tip commit, then highest N).
+  def targets
+    master = capture("git", "ls-remote", RUBY_REPO, "refs/heads/master").split.first
+    heads = capture("git", "ls-remote", HEADLINE_REPO, "refs/heads/zjit-headline*").lines.map(&:split)
+      .filter_map { |sha, ref| [ref.delete_prefix("refs/heads/"), sha] if ref.match?(%r{\Arefs/heads/zjit-headline\d*\z}) }
+    raise "no zjit-headline branch on #{HEADLINE_REPO}" if heads.empty?
+    branch, sha = heads.max_by { |b, sha| [commit_time(HEADLINE_REPO, sha), b[/\d+\z/].to_i] }
+    [{ "repo" => RUBY_REPO, "commit" => master, "name" => "master-#{master[0, 10]}" },
+      { "repo" => HEADLINE_REPO, "commit" => sha, "name" => "#{branch}-#{sha[0, 10]}" }]
+  end
+
+  # master and zjit-headlineN are separate series; each app and mode is compared with the newest earlier label of the
+  # same series that ran it, so a partial round does not hide or resurface anything.
+  def series(label) = label[WEEKLY_LABEL, 1]&.sub(/\d+\z/, "")
+
+  def earlier(label)
+    Dir[File.join(DIR, "runs", "*")].map { File.basename(_1) }
+      .select { _1 < label && series(_1) && series(_1) == series(label) && File.exist?(File.join(out_dir(_1), "diffs-all.json.gz")) }.sort.reverse
+  end
+
+  KNOWN = File.join(DIR, "known.json")
+
+  # Differences of LABEL that neither the previous run of its series nor known.json (flaky app tests) has, and per
+  # run how many of the previous differences are gone. Returns the previous labels used, too.
+  def new_divergences(label)
+    now = read_gz(File.join(out_dir(label), "diffs-all.json.gz"))
+    olds = earlier(label).map { [_1, read_gz(File.join(out_dir(_1), "diffs-all.json.gz"))] }
+    prev = now.keys.to_h { |key| [key, olds.find { |_, d| d.key?(key) }] }.compact
+    before = prev.to_h { |key, (_, d)| [key, d.fetch(key)] }
+    known = File.exist?(KNOWN) ? JSON.parse(File.read(KNOWN)) : []
+    flaky = ->(app, id) { known.any? { |k| k["app"] == app && id.start_with?(k["id"]) } }
+    fresh = now.to_h { |key, ids| [key, ids - before.fetch(key, []) - ids.select { flaky.(key.split.first, _1) }] }.reject { _2.empty? }
+    gone = before.filter_map { |key, ids| n = (ids - now.fetch(key)).size; "#{key} (#{n})" if n.positive? }
+    [prev.values.map(&:first).uniq.sort.join(", ").then { _1.empty? ? nil : _1 }, fresh, gone]
+  end
+
+  def report(label, prev_label, fresh, gone, reruns)
+    summary = JSON.parse(File.read(File.join(out_dir(label), "summary.json")))
+    lines = ["# #{label}: #{fresh.empty? ? "no new divergence" : "#{fresh.size} run(s) with new differences"}", "",
+      "Compared with #{prev_label || "no earlier run of this series"} and #{File.basename(KNOWN)}.", ""]
+    fresh.each do |key, ids|
+      app, mode = key.split
+      row = summary.find { _1["app"] == app && _1["mode"] == mode } || {}
+      lines << "* **#{key}**: #{ids.size} new (#{row["differ"]} differ in all; #{row["top"]&.map { |e, n| "#{n} #{e}" }&.join(", ")})"
+      ids.first(5).each do |id|
+        alone = reruns.find { |r| r["app"] == app && norm(r["id"]) == id }
+        lines << "  * `#{id}`#{alone ? ": alone #{alone["alone"].map { |m, rs| "#{m} #{rs.join("/")}" }.join("; ")}" : ""}"
+      end
+    end
+    lines << "" << "Gone since the previous run: #{gone.join(", ")}" if gone.any?
+    lines << "" << "| App | Mode | Tests | Differ | Seconds |" << "| --- | --- | ---: | ---: | ---: |"
+    summary.each { lines << "| #{_1["app"]} | #{_1["mode"]} | #{_1["tests"]} | #{_1["differ"]} | #{_1["secs"]} |" }
+    File.write(File.join(out_dir(label), "report.md"), lines.join("\n") + "\n")
+    puts lines.first(3 + fresh.sum { |_, ids| 1 + [ids.size, 5].min })
+  end
+
+  # One weekly round: build Ruby master and the newest zjit-headline branch (or --commit), run every app in every
+  # mode on both at once, compare, rerun only the new differences alone, and write runs/LABEL/report.md.
+  # Exits 1 when a build has new differences.
+  def weekly(opts)
+    date = Time.now.utc.strftime("%F")
+    builds = opts[:commit] ? [{ "repo" => opts[:repo], "commit" => opts[:commit], "name" => opts[:name] || opts[:commit][0, 10] }] : targets
+    builds.each { _1["label"] = "#{date}-#{_1["name"]}" }
+    puts "weekly: #{builds.map { _1["label"] }.join(", ")}"
+    builds.map { |b| Thread.new { b["prefix"] = build(opts.merge(repo: b["repo"], commit: b["commit"], name: b["name"])) } }.each(&:join)
+    opts[:ruby] = builds.first["prefix"]
+    setup(opts) if opts[:apps].any? { !File.exist?(base(_1)) }
+    opts[:apps].each { edit(_1) }
+    # Bundler serializes installs per Ruby, and the r82 apps share one lockfile between Rubies: one at a time.
+    builds.each { |b| opts[:apps].each { bundle(_1, ruby_bin(b["prefix"])) } }
+    jobs = [opts[:jobs] / builds.size, 1].max
+    builds.map { |b| Thread.new { run(opts.merge(ruby: b["prefix"], label: b["label"], jobs: jobs)) } }.each(&:join)
+    found = builds.map do |b|
+      compare(opts.merge(labels: [b["label"]], base_label: nil))
+      prev_label, fresh, gone = new_divergences(b["label"])
+      only = fresh.flat_map { |key, ids| ids.map { [key.split.first, _1] } }
+      reruns = only.empty? ? [] : rerun(opts.merge(ruby: b["prefix"], label: b["label"], only: only, jobs: opts[:jobs]))
+      report(b["label"], prev_label, fresh, gone, reruns)
+      fresh.any?
+    end
+    exit(found.any? ? 1 : 0)
+  end
+
+  # PostgreSQL (trust auth, socket), Redis and memcached as orb services, for a fresh orb (Debian).
+  def services(_opts)
+    sh({}, "sudo", "env", "DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y", "-qq", "postgresql", "postgresql-17-pgvector",
+      "postgresql-17-partman", "redis-server", "memcached", "libidn-dev", "libvips-dev", "imagemagick", "libicu-dev", "libmagic-dev", "rsync")
+    conf = "/etc/postgresql/17/main"
+    sh({}, "sudo", "sed", "-i", "s/^#\\?fsync.*/fsync = off/; s/^#\\?synchronous_commit.*/synchronous_commit = off/; " \
+      "s/^#\\?full_page_writes.*/full_page_writes = off/; s/^#\\?max_connections.*/max_connections = 500/", "#{conf}/postgresql.conf")
+    sh({}, "sudo", "sed", "-i", "s/^\\(local\\|host\\)\\(.*\\)\\(peer\\|scram-sha-256\\|md5\\)$/\\1\\2trust/", "#{conf}/pg_hba.conf")
+    { "postgres" => "sudo -u postgres /usr/lib/postgresql/17/bin/postgres -D /var/lib/postgresql/17/main -c config_file=#{conf}/postgresql.conf",
+      "redis" => %(redis-server --port 6379 --save "" --appendonly no --databases 32), "memcached" => "memcached -p 11211 -m 512" }
+      .each { |name, cmd| system("amp", "orb", "service", "start", name, "--command", cmd) }
+    50.times { break if system("pg_isready", "-q"); sleep 0.2 }
+    system("sudo", "-u", "postgres", "psql", "-qc", %(create role "#{ENV.fetch("USER")}" superuser login), err: File::NULL)
+  end
+
+  def main(argv)
+    require "etc"
+    command = argv.shift
+    opts = { apps: DEFAULT_APPS, modes: DEFAULT_MODES.join(","), jobs: 1, reps: 3, repo: "https://github.com/ruby/ruby.git", labels: [] }
+    OptionParser.new do |o|
+      o.on("--commit SHA") { opts[:commit] = _1 }
+      o.on("--repo URL") { opts[:repo] = _1 }
+      o.on("--name NAME") { opts[:name] = _1 }
+      o.on("--force") { opts[:force] = true }
+      o.on("--ruby DIR") { opts[:ruby] = File.expand_path(_1) }
+      o.on("--label L") { opts[:label] = _1; opts[:labels] << _1 }
+      o.on("--modes LIST") { opts[:modes] = _1 }
+      o.on("--apps LIST") { opts[:apps] = _1 == "all" ? DEFAULT_APPS : _1.split(",").each { |a| APPS.fetch(a) } }
+      o.on("--jobs N", Integer) { opts[:jobs] = _1 }
+      o.on("--reps N", Integer) { opts[:reps] = _1 }
+      o.on("--base-label L") { opts[:base_label] = _1 }
+    end.parse!(argv)
+    case command
+    when "build" then puts build(opts)
+    when "setup" then setup(opts)
+    when "bundle" then opts[:apps].each { bundle(_1, ruby_bin(opts.fetch(:ruby))) }
+    when "run" then run(opts)
+    when "compare" then compare(opts)
+    when "rerun" then rerun(opts)
+    when "weekly" then weekly(opts)
+    when "services" then services(opts)
+    else abort File.read(__FILE__).lines[5..21].map { _1.delete_prefix("# ") }.join
+    end
+  end
+end
+
+RubyDifferential.main(ARGV) if $PROGRAM_NAME == __FILE__
