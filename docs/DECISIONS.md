@@ -355,12 +355,12 @@ one click.
   1. the removal is **unreleased**, so a restore costs maintainers no new compatibility promise,
   2. **several real callers** (released gems or apps, cited with permalinks) break, or one large one breaks
      silently or wrongly, and
-  3. the restore is **small** and keeps the change's purpose: a deprecated shim, an alias, a signature, not a
+  3. the restore is **small** and keeps the change's purpose: an alias, a signature, not a
      revert of the feature.
   The PR says openly that the API is private and names the callers. Private
   breakage that fails any of them (build_bind_attribute, `_prefixes`, Vary changes) is record-only, or goes to the
   gem or app when the fix there is small and the maintainers are active.
-* **No deprecation shims for internal API** (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
+* **No deprecation shims for internal API** (this rule wins over the restore rule above; Thomas, 2026-11-25) (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
   APIs. That's what internal means."). Private or `:nodoc:` breakage gets fixed in the gem or app that relies on
   it. Rails gets a fix only when Rails itself is wrong, not a deprecated restore.
 * **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
@@ -570,6 +570,8 @@ when `risky`, and thermos when the diff has more than 200 changed lines each app
 
 Before the queue, every candidate passes an independent Thermos review on both rubrics (correctness,
 maintainability): GPT-6.1 Sol for Rails and gems, GPT-6 Astra (`gpt-6-astra`) for ruby/ruby.
+Since thermos-sol became the default review (2026-11-18), Rails and gems get thermos-sol as their primary review;
+ruby/ruby heads keep the Astra Thermos review as well (Thomas, 2026-11-25).
 
 ### Exactness checklist
 
