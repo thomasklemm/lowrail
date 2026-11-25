@@ -167,14 +167,15 @@ statuses = (1..runs).map do |n|
   # The repeat run also records the nearest app line of every allocation
   # (without allocating, so its counts stay comparable). Every internal flag
   # is set or cleared here, so none leaks in from the caller's environment;
-  # lib goes through RUBYLIB, which, unlike RUBYOPT, takes paths with spaces.
+  # lib goes through RUBYLIB, which, unlike RUBYOPT, takes paths with spaces,
+  # and through RUBYOPT when it can, for a child that sets its own RUBYLIB.
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
     "LOWRAIL_PROFILE_ATTRIBUTE" => ("1" if n == [runs, 2].min),
     "LOWRAIL_PROFILE_RECORD" => ("1" if record && n == 1),
     "LOWRAIL_PROFILE_ALLOW_WRITES" => ("1" if allow_writes),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
     "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
-    "RUBYOPT" => [ENV["RUBYOPT"], "-rlowrail/profile"].compact.join(" ") }
+    "RUBYOPT" => [ENV["RUBYOPT"], ("-I#{lib}" unless lib.match?(/\s/)), "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   system(env, *command)
   # A shell's convention: the exit status, or 128 + the signal that ended it.

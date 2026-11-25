@@ -771,6 +771,18 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # A child Ruby that sets its own RUBYLIB still loads the profiler, though the
+  # checkout's gem is on no gem path: lib travels in RUBYOPT too.
+  def test_a_child_with_its_own_rubylib_loads_the_profiler
+    realpath_tmpdir do |dir|
+      child = 'system({ "RUBYLIB" => "/nonexistent" }, RbConfig.ruby, "-e", ' \
+        '"puts defined?(Lowrail::Profile::API) ? :profiler_loaded : :profiler_missing") or exit 9'
+      out, err, result = profile(dir, "--runs", "1", "--out", "o", "--", RUBY, "-e", child)
+      assert_equal "profiler_loaded\n", out, err
+      refute_equal 9, result.exitstatus
+    end
+  end
+
   # Everything after the first -- is the command's, a second -- and
   # profiler-looking flags included.
   def test_arguments_after_the_separator_belong_to_the_command
