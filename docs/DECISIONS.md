@@ -382,7 +382,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.
   The tool cap is 22 (the count on 2026-11-05), so `open` refuses until one closes or merges; above that, ask Thomas.
   Keep each PR small. LR1 opens as a draft as soon as a rails/rails slot frees (Thomas, 2026-11-25; the cap stays
-  22).
+  22). Open PRs that fix older, already released bugs stay open: they aren't closed to free a slot
+  (Thomas, 2026-11-25, keeping #59617 and #59611 open).
 * **rails/rails opens as draft** (Thomas, 2026-11-05), preferably in small batches grouped by theme and likely
   reviewer. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
 * **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
