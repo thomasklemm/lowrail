@@ -65,6 +65,7 @@ lead. States change often; each bet's doc is the source of truth.
 | C8 | census 8 (CPU and allocations) on 4.0.9 and pinned master | [census](upstream/census.md) |
 | Z5–Z8, Z12 | objtostring, compile speed, cfunc paths, stats correctness, warmup | [zjit-shortlist](upstream/zjit-shortlist.md) |
 | Z2, Z11 | ZJIT differential on Rails and app suites: done, no divergence | [zjit-app-differential](upstream/zjit-app-differential.md) |
+| V1, A1, S1 | Action View, Active Record and JSON serialization CPU | [actionview-cpu](upstream/actionview-cpu.md) · [activerecord-cpu](upstream/activerecord-cpu.md) · [serialization-cpu](upstream/serialization-cpu.md) |
 | G1, I18N | gem census; i18n deep dive; gem request census and round 2 | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) · [gem-request-census](upstream/gem-request-census.md) · [round 2](upstream/gem-request-census-2.md) |
 | R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
 | E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees | [gems-on-master](upstream/gems-on-master.md) |
@@ -381,8 +382,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   open count is clearly lower, a new Rails PR opens only for an unreleased regression that breaks widely used apps or
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.
   The tool cap is 22 (the count on 2026-11-05), so `open` refuses until one closes or merges; above that, ask Thomas.
-  Keep each PR small. LR1 opens as a draft as soon as a rails/rails slot frees (Thomas, 2026-11-25; the cap stays
-  22). Open PRs that fix older, already released bugs stay open: they aren't closed to free a slot
+  Keep each PR small.
+  Open PRs that fix older, already released bugs stay open: they aren't closed to free a slot
   (Thomas, 2026-11-25, keeping #59617 and #59611 open).
 * **rails/rails opens as draft** (Thomas, 2026-11-05), preferably in small batches grouped by theme and likely
   reviewer. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
@@ -554,14 +555,14 @@ with it, so every slot keeps its own reviewer. Sol and Astra passes count as bef
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
 Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**.
-Besides the detailed review above:
+Besides the detailed review above (the thermos-sol pass, or the claude-code pass it replaced):
 
 * Astra in addition for correctness changes on hot paths, Ractor/thread or frozen-object semantics, and anything a
   maintainer has pushed back on before.
 * `thermos` for larger diffs (several files or a new mechanism).
 
 Every confirmed finding is fixed and the changed part reviewed again; the round ends when a pass has no must-fix.
-A head change after the last pass means another pass. An item is `reviewed` only when the detailed review, Astra
+A head change after the last pass means another pass. An item is `reviewed` only when the detailed review (thermos-sol or claude-code), Astra
 when `risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current
 `head`; `script/pr-queue open` and `ready` check this and refuse otherwise.
 

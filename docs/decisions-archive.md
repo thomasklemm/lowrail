@@ -4,19 +4,21 @@
 Moved out of DECISIONS.md on 2026-11-25 (cleanup agreed by Thomas on 2026-11-25). Each quoted block is verbatim from
 docs/DECISIONS.md at d72d947c (only the leading "> " is added); the line above it says why it moved and what
 replaced it. Nothing here is in force unless DECISIONS.md says so. Where every paragraph of the old file went, line
-by line: bench/upstream/decisions-cleanup/mapping.md.
+by line: bench/upstream/decisions-cleanup/mapping.md. Three #self-links inside quotes (to #review-gates,
+#pr-descriptions-… and #code-comments-in-upstream-patches-…) pointed into the old DECISIONS.md and do not resolve here.
 -->
 
 Superseded wording, status notes about single items, one-off exceptions for items already opened, merged or closed,
 and history, moved out of [DECISIONS.md](DECISIONS.md) on 2026-11-25. The rules in force are there; nothing here is
-in force. Each quote is verbatim; the line above it says why it moved and what replaced it. The paragraph-by-paragraph
+in force. Each quote is verbatim; the line above it says why it moved and what replaced it. Three #self-links inside quotes
+point to the old file and do not resolve. The paragraph-by-paragraph
 mapping is in [decisions-cleanup/mapping.md](../bench/upstream/decisions-cleanup/mapping.md).
 
 ## Superseded rules
 
 ### Register intro
 
-Replaced by the new intro (the earlier-wording pointer now points here as well as to git history).
+Replaced by the new intro, which points to this archive for earlier wording instead of git history.
 
 > # Decision register
 >
@@ -77,7 +79,7 @@ rule and the 15-PR note stay.
 
 ### Ping after 14 days approved and unmerged
 
-Replaced by "Open PRs and issues anywhere: no pings" (Thomas, 2026-11-17).
+Archived because "Open PRs and issues anywhere: no pings" (Thomas, 2026-11-17) covers it: a note on an approved, unmerged PR is a ping.
 
 > * **Approved and unmerged after 14 days:** one short, neutral note on a weekday (Thomas), never asking anyone to
 >   merge. Once per PR.
@@ -253,7 +255,9 @@ The three conditions and the private-breakage rule stay in DECISIONS; the item s
 
 ### Bets table as of 2026-11-25
 
-DECISIONS keeps each bet's goal and doc; progress and results live in those docs.
+DECISIONS keeps each bet's goal and doc; progress and results live in those docs. The closing paragraph moved
+because its reasons are history: E2 and Z13 were chosen on 2026-11-03 and Z13 is done. The C8 slot has no dated
+replacement: C8 is done, C8-1 is built and unopened, and since 2026-11-25 the bets set the orb allocation.
 
 > | Bet | Goal | Doc |
 > | --- | --- | --- |
