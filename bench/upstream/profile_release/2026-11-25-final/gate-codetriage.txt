@@ -1,0 +1,12 @@
+unchanged: codetriage/profiled codetriage/base2 codetriage/head
+planted: codetriage/planted codetriage/planted2
+rc1 (line floor = noise):
+  false alarms, default: 0 of 6 (0.00%); rows: 
+  false alarms, confirm: -; rows: 
+  plant caught, default: 12 of 12 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 12 of 12 (100.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 0 of 6 (0.00%); rows: 
+  false alarms, confirm: -; rows: 
+  plant caught, default: 12 of 12 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 12 of 12 (100.00%)

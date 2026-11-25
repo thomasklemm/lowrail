@@ -1,0 +1,7 @@
+unchanged: fresh-81/c1 fresh-81/c2 fresh-81/c3 fresh-81/c4 fresh-81/c5 fresh-81/c6 fresh-81/c7 fresh-81/c8 fresh-81/c9 fresh-81/c10 fresh-81/c11 fresh-81/c12 fresh-81/c13 fresh-81/c14 fresh-81/c15 fresh-81/c16 fresh-81/c17 fresh-81/c18 fresh-81/c19 fresh-81/c20 fresh-81/c21 fresh-81/c22 fresh-81/c23 fresh-81/c24
+rc1 (line floor = noise):
+  false alarms, default: 100 of 12144 (0.8%); rows: path/pattern.rb:77 100
+  false alarms, confirm: 400 of 255024 (0.2%); rows: path/pattern.rb:77 400
+now (line floor = 2 x noise):
+  false alarms, default: 100 of 12144 (0.8%); rows: path/pattern.rb:77 100
+  false alarms, confirm: 400 of 255024 (0.2%); rows: path/pattern.rb:77 400

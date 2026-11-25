@@ -1,0 +1,53 @@
+{
+  "status": 1,
+  "gate": true,
+  "problems": [],
+  "min": 1.0,
+  "compared": [
+    "request"
+  ],
+  "regressions": [
+    {
+      "kind": "request",
+      "what": "line",
+      "name": "RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:228",
+      "base": 21.583333333333332,
+      "head": 23.25,
+      "delta": 1.6666666666666679,
+      "noise_floor": 1.0
+    }
+  ],
+  "improvements": [],
+  "not_compared": [
+    {
+      "kind": "request",
+      "name": "ArticlesController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#index",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#new",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "CommentsController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#destroy",
+      "reason": "no warm value"
+    }
+  ]
+}

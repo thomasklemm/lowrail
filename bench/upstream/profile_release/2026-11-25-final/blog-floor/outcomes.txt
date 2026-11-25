@@ -1,0 +1,18 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/plain.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/plain2.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/off.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/off-env.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/profiled.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/base2.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/head.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/planted.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/blog-floor/seed99.log: 21 outcomes; 21 runs, 46 assertions, 0 failures, 0 errors, 0 skips
+base2.outcomes = plain
+head.outcomes = plain
+off-env.outcomes = plain
+off.outcomes = plain
+plain.outcomes = plain
+plain2.outcomes = plain
+planted.outcomes = plain
+profiled.outcomes = plain
+seed99.outcomes = plain

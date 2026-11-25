@@ -1,0 +1,12 @@
+unchanged: blog-floor/profiled blog-floor/base2 blog-floor/head blog-floor/profiled blog-floor/base2 blog-floor/head blog-floor/profiled blog-floor/base2 blog-floor/head blog-floor/aa3 blog-floor/aa4 blog-floor/aa5
+planted: blog-floor/planted blog-floor/planted blog-floor/planted
+rc1 (line floor = noise):
+  false alarms, default: 60 of 1320 (4.55%); rows: uri/common.rb:394 48, RUBY/set.rb:512 12
+  false alarms, confirm: 48 of 11880 (0.40%); rows: uri/common.rb:394 47, RUBY/set.rb:512 1
+  plant caught, default: 396 of 396 (100.00%); with an unrelated line too: 58
+  plant caught, confirm: 792 of 792 (100.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 22 of 1320 (1.67%); rows: RUBY/set.rb:512 12, uri/common.rb:394 10
+  false alarms, confirm: 4 of 11880 (0.03%); rows: uri/common.rb:394 4
+  plant caught, default: 396 of 396 (100.00%); with an unrelated line too: 13
+  plant caught, confirm: 792 of 792 (100.00%)

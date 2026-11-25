@@ -1,0 +1,40 @@
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ProbeMailer.deliver_mail | 3 / 3 | 811.0 / 811.5 | 0.5 | 1095.3 | `GEM/mail/lib/mail/utilities.rb:215` 78.0, `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` 44.5, `GEM/mail/lib/mail/utilities.rb:291` 38.0 |  |
+| 2 | ProbeMailer#hello | 3 / 3 | 380.0 / 380.0 | 0.0 | 606.3 | `GEM/mail/lib/mail/utilities.rb:215` 36.0, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 26.0, `GEM/mail/lib/mail/utilities.rb:291` 24.0 | `app/mailers/probe_mailer.rb:2` 336.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 51.0 / 51.0 | 100% | `no app frame` 68%, `app/mailers/probe_mailer.rb:2` 32% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/utilities.rb:291` | 27.0 / 27.0 | 100% | `no app frame` 61%, `app/mailers/probe_mailer.rb:2` 39% | `value !~ /\S/` |
+| 3 | `GEM/mail/lib/mail/field_list.rb:71` | 23.5 / 23.5 | 100% | `no app frame` 71%, `app/mailers/probe_mailer.rb:2` 29% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 4 | `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` | 14.67 / 14.83 | 50% | `no app frame` 100% | `_wide = data[p].ord` |
+| 5 | `GEM/mail/lib/mail/parser_tools.rb:7` | 13.5 / 13.5 | 100% | `app/mailers/probe_mailer.rb:2` 69%, `no app frame` 31% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 6 | `GEM/mail/lib/mail/parsers/date_time_parser.rb:713` | 10.33 / 10.33 | 50% | `no app frame` 100% | `_wide = data[p].ord` |
+| 7 | `GEM/mail/lib/mail/elements/address.rb:110` | 9.33 / 9.33 | 50% | `no app frame` 100% | `Encodings.decode_encode("#{@data.obs_domain_list}#{get_local.strip}", ` |
+| 8 | `RUBY/bundled_gems.rb:111` | 9.17 / 9.17 | 33% | `no app frame` 55%, `app/mailers/probe_mailer.rb:2` 45% | `segments = feature.split("/", 3)` |
+| 9 | `GEM/mail/lib/mail/fields/common_date_field.rb:34` | 9.0 / 9.0 | 50% | `no app frame` 100% | `::DateTime.parse("#{element.date_string} #{element.time_string}")` |
+| 10 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 8.67 / 8.67 | 50% | `app/mailers/probe_mailer.rb:2` 100% | `_wide = data[p].ord` |
+
+### Action Cable
+
+| # | Channel action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ProbeChannel#ping | 3 / 3 | 27.0 / 27.0 | 0.0 | 34.0 | `RAILS/actioncable/lib/action_cable/channel/base.rb:313` 4.0, `RAILS/actioncable/lib/action_cable/channel/base.rb:242` 3.0, `RAILS/activesupport/lib/active_support/core_ext/hash/indifferent_access.rb:10` 2.0 | `app/channels/probe_channel.rb:3` 11.0 |
+| 2 | ProbeChannel#subscribed | 1 / 1 | – / – |  | 69.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/actioncable/lib/action_cable/channel/base.rb:313` | 2.0 / 2.0 | 75% | `no app frame` 100% | `signature << "(#{arguments.inspect})"` |
+| 2 | `RAILS/actioncable/lib/action_cable/channel/base.rb:242` | 1.5 / 1.5 | 75% | `app/channels/probe_channel.rb:3` 100% | `status = "#{self.class.name} transmitting #{data.inspect.truncate(300)` |
+| 3 | `GEM/logger/lib/logger.rb:692` † (debug logging) | 1.5 / 1.5 | 100% | `no app frame` 57%, `app/channels/probe_channel.rb:3` 43% | `format_message(format_severity(severity), Time.now, progname, message)` |
+| 4 | `RAILS/activesupport/lib/active_support/core_ext/hash/indifferent_access.rb:10` | 1.5 / 1.5 | 100% | `app/channels/probe_channel.rb:3` 86%, `no app frame` 14% | `ActiveSupport::HashWithIndifferentAccess.new(self)` |
+| 5 | `RAILS/activesupport/lib/active_support/hash_with_indifferent_access.rb:75` | 1.5 / 1.5 | 100% | `app/channels/probe_channel.rb:3` 86%, `no app frame` 14% | `update(constructor)` |
+| 6 | `RAILS/activesupport/lib/active_support/logger.rb:42` (debug logging) | 1.5 / 1.5 | 100% | `no app frame` 57%, `app/channels/probe_channel.rb:3` 43% | `"#{String === msg ? msg : msg.inspect}\n"` |
+| 7 | `RAILS/activesupport/lib/active_support/notifications/fanout.rb:324` | 1.0 / 1.0 | 50% | `no app frame` 67%, `app/channels/probe_channel.rb:3` 33% | `@string_subscribers[name] + @other_subscribers.select { \|s\| s.subscrib` |
+| 8 | `RAILS/actioncable/lib/action_cable/channel/base.rb:189` | 0.5 / 0.5 | 75% | `no app frame` 100% | `payload = { channel_class: self.class.name, action: action, data: data` |
+| 9 | `RAILS/actioncable/lib/action_cable/channel/base.rb:247` | 0.5 / 0.5 | 75% | `app/channels/probe_channel.rb:3` 100% | `payload = { channel_class: self.class.name, data: data, via: via }` |
+| 10 | `RAILS/actioncable/lib/action_cable/channel/base.rb:249` | 0.5 / 0.5 | 75% | `app/channels/probe_channel.rb:3` 100% | `connection.transmit identifier: @identifier, message: data` |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/fresh-81/c14/report.md
