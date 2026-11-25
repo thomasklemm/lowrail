@@ -3,8 +3,8 @@
 Rails main `f785381cca`: [`check_version`](https://github.com/rails/rails/blob/f785381cca8621772cba659ff93f825eb7f99942/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb#L518-L522)
 accepts SQLite >= 3.35.0 (#58284, merged 2026-07-29, unreleased), but
 [`data_source_sql`](https://github.com/rails/rails/blob/f785381cca8621772cba659ff93f825eb7f99942/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb#L216-L225)
-reads `pragma_table_list` (SQLite 3.37.0, 2021-11-27) since #52354 (Rails 8.0). 8.0.0 and 8.1.4.1 read it too and
-accept 3.23.0. Fix: [thomasklemm/sqlite-floor-3-37](https://github.com/thomasklemm/rails/tree/thomasklemm/sqlite-floor-3-37)
+reads `pragma_table_list` (SQLite 3.37.0, 2021-11-27) since #52354 (Rails 8.0). 8.0.0 and 8.1.4.1 read it too; 8.0.0
+accepts 3.8.0 and 8.1.4.1 accepts 3.23.0, so the broken range there starts lower. Fix: [thomasklemm/sqlite-floor-3-37](https://github.com/thomasklemm/rails/tree/thomasklemm/sqlite-floor-3-37)
 `183262f440`, queue item [SQ37](../pr-queue/items/SQ37.md).
 
 ## Public APIs
@@ -64,14 +64,19 @@ for a distribution's system library; no distribution image was used.
   except #56764 (PostgreSQL).
 * System SQLite 3.35/3.36: Alpine 3.14 (3.35.5, EOL 2023-05) and 3.15 (3.36.0, EOL 2023-11), Fedora 35 and 36
   (3.36.0, EOL 2022-12 and 2023-05), from aports and Fedora dist-git. Repology lists no current distribution with 3.35
-  or 3.36 (only Fedora 39's mingw cross package and xrepo); the maintained ones nearest the floor are Ubuntu 22.04,
+  or 3.36 (only cross-compilation and legacy package entries); the maintained ones nearest the floor are Ubuntu 22.04,
   Slackware 15.0 and openEuler 22.03 with 3.37.2, while RHEL/Alma/Rocky 9 and Debian 11 (3.34.1) are below 3.35 and already refused on
   main. The sqlite3 gem vendors a current SQLite unless built with `--enable-system-libraries`.
 
 ## Choice of fix
 
-Raising the floor, as #58284 did for `RETURNING`: the versions it refuses cannot run a migration or load a model
-today. A `sqlite_master` fallback in `data_source_sql` for 3.35/3.36 would need a version branch, and `sqlite_master`
+Raising the floor, as #58284 did for `RETURNING`: the versions it refuses cannot run a migration or create or find a record today (raw SQL and `create_table` still work, and are
+now refused at connect too). A `sqlite_master` fallback in `data_source_sql` for 3.35/3.36 would need a version branch, and `sqlite_master`
 cannot tell virtual and shadow tables apart, which is why #52354 moved to `pragma_table_list`. #58284 changed only
 `check_version`, the `supports_*` predicates and the CHANGELOG, with no test; no guide names the SQLite floor. The
 fix adds a test of the message and the 3.37.0 boundary next to `test_connect`.
+
+## Review
+
+thermos-sol on `183262f440` approves the code, test, body and commit; its must-fixes were record wording (applied).
+Evidence: [review-thermos-sol-2026-11-25](review-thermos-sol-2026-11-25/README.md).
