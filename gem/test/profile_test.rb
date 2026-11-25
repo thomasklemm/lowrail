@@ -335,6 +335,34 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # Before Rails 8.1 a request keeps only its route's pattern, controller and
+  # action, which overlapping routes share: such a request is not recorded
+  # (on 8.1 the matched route itself is kept), and an unambiguous one is.
+  def test_record_skips_a_request_whose_route_is_ambiguous
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "config/routes.rb" => <<~'RUBY',
+          Rails.application.routes.draw do
+            get "/probe(/:id)", to: "widgets#index", as: :first_probe, defaults: { id: "sentinel" }, constraints: { id: /sentinel/ }
+            get "/probe(/:id)", to: "widgets#index", as: :second_probe
+            get "/plain", to: "widgets#index", as: :plain
+          end
+        RUBY
+        "app/controllers/widgets_controller.rb" => "class WidgetsController < ApplicationController\n  def index = head(:ok)\nend\n",
+        "requests.rb" => <<~'RUBY')
+          require_relative "config/environment"
+          require "rack/mock"
+          %w[/probe/7 /plain].each { Rails.application.call(Rack::MockRequest.env_for("http://localhost#{_1}")) }
+        RUBY
+      out, err, status = profile(dir, "--out", "profile", "--record", "--", RUBY, "requests.rb")
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      recorded = File.read(File.join(dir, "lowrail/workloads.rb"))
+      assert_match(/^get plain_path/, recorded)
+      refute_match(/^get first_probe_path/, recorded)
+    end
+  end
+
   # --workloads captures compare by what they measured: two of the same file
   # in different output directories compare, and a block that sends another
   # request in one of them does not, though the file is the same; nor does a

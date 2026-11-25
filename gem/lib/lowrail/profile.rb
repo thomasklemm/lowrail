@@ -217,13 +217,16 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
 
           # Rails before 8.1 keeps only the matched route's pattern and
-          # parameters: the route with that pattern, controller and action.
+          # parameters: the route with that pattern, controller and action,
+          # or none when routes share them (their constraints and defaults,
+          # which tell them apart, are not run again here).
           def matched_route(env)
             spec = env["action_dispatch.route_uri_pattern"] or return
             params = env["action_dispatch.request.path_parameters"] || {}
-            env["action_dispatch.routes"]&.routes&.find do |r|
+            candidates = env["action_dispatch.routes"]&.routes&.select do |r|
               r.path.spec.to_s == spec && r.defaults[:controller] == params[:controller] && r.defaults[:action] == params[:action]
             end
+            candidates.first if candidates&.size == 1
           end
 
           # What a workloads file needs to send the request again, with the
