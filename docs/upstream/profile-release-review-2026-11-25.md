@@ -314,3 +314,114 @@ needed.
 * `blog-floor/` does not record which gem file was installed (`installed-from.txt` is a path). Only the receipt
   README ties it to `737b2df3`. That is harmless here, because both builds are identical.
 * `docs/profile.md` quotes only the Blog's rates. The README also gives the fresh app's 0.16%.
+
+## Post-field-test review: thermos-opus (2026-11-25)
+
+Scope: the lowrail-profile changes in `687f168b..1618fc38` (`8e36ae06`, `a4bc8d5a`, `dbe31072`, `9683fcf4`,
+`90ef44e3`, `9736c860`, `abf515d3`, `1618fc38`), both Thermos rubrics, run independently of thermos-fable's pass.
+**Verdict: not ready to publish. Five must-fixes, each small. Nothing in the range changes a profiled app's
+per-test outcomes or load order on the floor Blog, and TSV format 3 is written and read consistently.**
+
+**What ran.**
+
+* Gem: `gem build lowrail-profile.gemspec` from `gem/` at `1618fc38`, sha256
+  `e5b8991d963ebd1bf5e4c984c236c821becea0bb9a62506f088bc5cc6b4ca4b5`, as stated.
+* Profile suites as `ci.yml` runs them: Ruby 4.0.7 / Rails 8.1.4, 35 runs, 1,128 assertions, 0 failures, 0 skips;
+  Ruby 3.3.14 / Rails 7.2.4, 35 runs, 1,068 assertions, 0 failures, 0 skips (rspec-core installed, so the rspec half
+  of the child-environment test ran).
+* Floor Blog (`LOWRAIL_CORPUS_RUBY=3.3.14 LOWRAIL_RAILS=7.2.4 script/corpus real-blog`, the three `params.expect`
+  rewrites, installed from the gem above) through `2026-11-25/scripts/proof.sh` and `controls.sh`: plain, off,
+  off-env, profiled, base2, head, planted, seed99 all exit 0 with 21 identical outcomes (21 runs, 46 assertions, 0
+  failures); the tree is unchanged by every capture; `run1/` and `run2/` are gone after each capture. compare
+  `--json`: head exit 0 (`aa: true`, nothing listed), planted exit 0 listing only `output_safety.rb:228`, seed99
+  exit 2 (seed differs). Load order: every suite process of every capture is identical to the `bundle exec env`
+  control, seed99's are the same set in another order. Raw scratch under `.amp/in/orb-backup/opus-review/` (not
+  committed).
+* `features_cmp.rb` alone reported nothing here (`base off-env: 1 processes` and no capture rows): `dump_features.rb`
+  names its file from `ENV["LOWRAIL_PROFILE"]` at exit, which `leave_env` now deletes, so the `run*-PID` filter
+  matches no file. The comparison above was redone over every file. Receipt scripts that rely on it now pass
+  vacuously; capture the variable at load in `dump_features.rb`.
+
+### Must-fix
+
+1. **`--timeout` skips KILL when the leader exits on TERM** (`9736c860`, `exe/lowrail-profile` `waiter.join(10) ||
+   (stop.("KILL"); …)`). A grandchild that ignores TERM survives: leader `spawn(ruby -e 'trap("TERM"){}; sleep
+   300')` under `--timeout 1` exits 124 after 3 s and the grandchild keeps running (re-parented to 1, still in the
+   group). It can also write a TSV into `run1/` while the report is built or the directory deleted. Smallest fix:
+   `stop.("TERM"); waiter.join(10); stop.("KILL"); waiter.join` (ESRCH already rescued). The test only covers a
+   leader that ignores TERM; make its grandchild ignore TERM too, and bound the CLI call with a deadline: with
+   `pgroup: false` or without KILL the test hangs instead of failing (both mutants hung).
+2. **run*/ deletion globs `--out`** (`90ef44e3`, `Dir[File.join(out, "run*")]`; also `report`'s
+   `Dir["#{dir}/run*/"]` and the older `ProfileReport#initialize`). Verified on the Blog: after a `--keep-runs`
+   capture in `/tmp/g/keep`, a capture with `--out '/tmp/g/{keep,x}'` deleted `keep/run1` and `keep/run2` and left
+   its own `run1/` `run2/`; its report was built from `keep`'s runs. `out` is `File.expand_path`ed, so a `[`, `{` or
+   `*` anywhere in the checkout path is enough. Smallest fix: `Dir.children(out).grep(/\Arun\d+\z/)` (joined to
+   `out`) in all three places, as the counter sources already do.
+3. **`leave_env` does not reach Bundler's saved environment** (`dbe31072`). `Bundler::ORIGINAL_ENV` is taken when
+   Bundler loads, before `leave_env`. After `leave_env`, a plain `system` child sees no profiler, but children under
+   `Bundler.with_original_env` or `with_unbundled_env` (the usual way an `after(:suite)` or an engine starts another
+   bundle) get `LOWRAIL_PROFILE*`, `SEED`, `SPEC_OPTS`, `RUBYOPT` back and load the profiler (`profiler="constant"`).
+   Guarantee 1 as written does not hold for them. Smallest fix: run the same edits on `Bundler::ORIGINAL_ENV` when
+   defined (a plain unfrozen Hash on Ruby 4.0.7's Bundler), and on `ENV["BUNDLER_ORIG_RUBYOPT"]`/`["BUNDLER_ORIG_RUBYLIB"]`;
+   extend the child-environment test with a `Bundler.with_original_env` child.
+4. **The README CI job stops on a failing suite** (`1618fc38`, README *Compare*). lowrail-profile exits with the
+   suite's status, so under GitHub's `bash -e` the Profile step fails and Compare and the artifact upload are
+   skipped. "A failing suite makes compare exit 2, which the summary shows" is false as written. The Compare line
+   itself is right (exit 2 reaches the summary and the step exits 0, checked under `bash -e`). Smallest fix: add
+   `if: always()` to Compare and upload-artifact (the job then fails red on the suite, which is a real error, and the
+   summary still shows compare's exit 2), and say so; or drop the sentence.
+5. **`docs/profile.md` still publishes the gate** (`1618fc38` added only a banner). Its CI YAML runs `[ "$status" = 1
+   ] || exit "$status"`, which can no longer be reached, so the second head profile never runs; the prose says
+   "compare exits 1 when anything grew", "a first exit 1 profiles head once more", and "ordinary command captures
+   may have any number of processes", which `abf515d3` refuses. Smallest fix: replace the section's exit-1 prose and
+   YAML with the README's *Compare* section (or a link to it) and keep the release-candidate numbers under a history
+   heading.
+
+### Should-fix
+
+* **`ENV_KEYS` can drift from the exe's env hash.** Dropping `LOWRAIL_PROFILE_RECORD` or `_ALLOW_WRITES` from it
+  passes every test. Let the exe pass its key list (one `LOWRAIL_PROFILE_KEYS` variable) and delete that list.
+* **`HUP`/`QUIT` are not forwarded under `--timeout`**: with its own process group the command no longer gets the
+  terminal's hangup, and a TTY read (`binding.irb`) stops it with SIGTTIN. Add `HUP` and `QUIT`; document that
+  interactive debugging does not work with `--timeout`. The traps are also installed after `spawn` (small window),
+  and not restoring them passes every test.
+* **Exit 124 is not guaranteed**: with run statuses `[1, 124]` lowrail-profile exits 1 (first failure). Say "the
+  first failing run's status, 124 for the run that timed out". `timed_out` is in capture.json but not report.json
+  or report.md.
+* **compare does not refuse a report of another version** (README claims it): `meta["format"]` is still 2, while
+  `8e36ae06` changed app and path-gem keys, so base and head from different lowrail-profile revisions list key
+  changes as regressions. Bump the report format or require equal `Lowrail::Profile::VERSION`.
+* **The receipts' parallel cohorts no longer replay**: `gate.rb` and `options.rb` call `valid?`, which now refuses
+  `fresh-81` (2 processes) and t3's parallel sets, against `1618fc38`'s "still reproduce their numbers". Skip only
+  the process-count problem in those scripts, or note the gem they need.
+* `test_compare_refuses_captures_of_parallel_workers` uses 8 processes; `> 1` mutated to `> 2` survives. Use 2.
+* Gate leftovers in `profile_compare.rb`: the action floor's rationale (parallel workers) no longer applies to
+  one-process captures, `@aa_given` duplicates `!@aa.nil?`, and the `processes == 1` check for workloads is now dead.
+* Maintainability: the run loop has two inline spawn paths (`system` and spawn/detach/trap/deadline) and
+  `interrupted` is set in only one; one `run(env, command, timeout:)` would hold the 124/128+signal mapping once.
+  The TSV header literal `# lowrail-profile 3` and the run-directory pattern are written in several files.
+  Several new comments run past one line of why.
+
+### Notes
+
+* The RSpec trigger checks that `RSpec::Core::Runner` is loaded, not that it has read `SPEC_OPTS`. rspec-rails and
+  `rspec/core/rake_task` do not load it (checked); a rake parent that requires `rspec/core` before booting the app
+  would leave the env early (hypothesis). `leave_env` never runs for Spring, plain `Minitest::Test` suites without
+  `ActiveSupport::TestCase`, or processes started before `Minitest.run`; those keep the pre-range behaviour.
+* The profiled main process and its forked workers keep profiling after `leave_env`: the output directory, app
+  root and flags are captured at load. `profile_workloads.rb` reads `ENV["LOWRAIL_PROFILE"]` at the end; no
+  trigger found, but a constant would remove the risk.
+* Deletion never precedes data the report lacks: a failed report, a failed `--record` and a non-zero workloads run
+  exit first; a timed-out or interrupted capture deletes only after the partial report.
+* TSV format 3: `P` rows precede first use, including inside `@` rows; ids are per file. Format 2 runs are refused
+  ("older lowrail-profile"). No other reader of the TSVs or of report.json's old `gate` key exists in `bench/`,
+  `script/` or `fixtures/`.
+
+### Mutants
+
+21 of 27 killed. Killed: `leave_env` keeping `-rlowrail/profile` or lib, running before the seed is read, not
+restoring `SEED`, dropping the RSpec guard; `--keep-runs` ignored, deleting before `--record`, the `report`
+message; P ids off by one, P written per use, reader ignoring P; 124 → 143, INT not forwarded, no break after a
+timeout; compare accepting several processes, exiting 1 on regressions, `aa?` always true. Hung, not failed:
+`pgroup: false`, no KILL. Survived: KILL to the pid only, traps not restored, `ENV_KEYS` without `RECORD` or
+`ALLOW_WRITES`, the Minitest < 5.24 prepend made a no-op (not reachable on the installed Minitest), `> 2` processes.
