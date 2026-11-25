@@ -57,8 +57,9 @@ class ProfilePackageTest < Minitest::Test
       out, _, status = Open3.capture3(env, RUBY, exe, "--help", chdir: dir)
       assert status.success?
       assert_includes out, "--allow-writes"
-      # A capture from a gem home whose path has a space: the child starts and loads the profiler.
-      spaced = File.join(dir, "space home")
+      # A capture from a gem home whose path has a space and glob characters: the counter builds, and the
+      # child starts and loads the profiler.
+      spaced = File.join(dir, "space [home] {x}*")
       _, err, status = Open3.capture3(env, RUBY, "-S", "gem", "install", "--local", "--no-document", "--install-dir", spaced,
         File.join(dir, "p.gem"), chdir: dir)
       assert status.success?, err

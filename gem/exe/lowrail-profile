@@ -117,7 +117,9 @@ abort "lowrail-profile: --runs must be at least 1" if runs < 1
 # digest, so it is never picked up; lowrail/profile also refuses one whose API
 # differs.
 source = File.expand_path("../ext/lowrail_profile", __dir__)
-inputs = Dir["#{source}/*"].sort.map { "#{File.basename(_1)}\0#{File.binread(_1)}" }
+# Listed, not globbed: a gem home may have [, { or * in its path.
+sources = Dir.children(source).sort.map { File.join(source, _1) }
+inputs = sources.map { "#{File.basename(_1)}\0#{File.binread(_1)}" }
 inputs << RbConfig::CONFIG.values_at("CC", "CFLAGS", "LDFLAGS", "DLEXT", "rubyhdrdir", "rubyarchhdrdir").join("\0")
 variant = [RUBY_ENGINE, RUBY_VERSION, RUBY_REVISION, RUBY_PLATFORM].join("-")
 cache = File.join(ENV.fetch("XDG_CACHE_HOME", File.expand_path("~/.cache")), "lowrail", "profile", variant,
@@ -131,7 +133,7 @@ unless File.exist?(ext)
   FileUtils.mkdir_p(tmp)
   log = File.join(tmp, "build.log")
   # Built from a copy: mkmf escapes a srcdir with spaces in a way make's VPATH cannot follow.
-  FileUtils.cp(Dir["#{source}/*"], tmp)
+  FileUtils.cp(sources, tmp)
   ok = system(RbConfig.ruby, "extconf.rb", chdir: tmp, out: log, err: log) &&
     system(RbConfig::CONFIG.fetch("MAKE", "make"), chdir: tmp, out: [log, "a"], err: [log, "a"])
   unless ok && File.exist?(File.join(tmp, name))
