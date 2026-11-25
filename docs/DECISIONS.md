@@ -311,6 +311,9 @@ fixes get their thermos review on Opus 5.5 (`reviewer: thermos-opus`).
 
 Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
 trying Sol 6.2, but it isn't offered yet.
+Sol reviews stay on GPT-6.1 Sol (Thomas, 2026-11-25): GPT-6.2 Sol's safety check stopped a JIT review as possible
+security work. Fable (`anthropic/claude-fable-5-2`) may be used wherever it helps (Thomas, 2026-11-25), such as hard
+design rounds or an extra review of a large change.
 
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
