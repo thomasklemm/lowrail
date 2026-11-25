@@ -1,0 +1,850 @@
+From 05ae429a7bc28d6d282ba44a32a4c8fa69c1f681 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Rafael=20Mendon=C3=A7a=20Fran=C3=A7a?=
+ <rafael.franca@shopify.com>
+Date: Wed, 25 Nov 2026 08:33:52 +0000
+Subject: [PATCH 1/2] ZJIT: Send Symbol block arguments directly
+
+A send with a Symbol block argument such as `foo(&:sym)` stayed a
+dynamic send: "block argument is not nil" for an ISEQ callee, "complex
+argument passing" for a C function. Compile it to SendDirect for ISEQ
+callees and to CCallWithFrame or CCallVariadic for C functions, with
+the Symbol as the callee frame's block handler.
+
+The block argument must be a static Symbol, known either from its type
+(a literal) or from the profile with a GuardType. The interpreter uses
+the Symbol as the block handler when Symbol#to_proc is basic in the box
+of the running frame and the caller's cref has no refinements. The send
+is specialized only while Symbol#to_proc is not redefined and no box has
+been created with Ruby::Box.new, with patch points for both. Defining
+Symbol#to_proc again with its own definition clears the basic flag
+without invalidating the method entry, so a guard also checks the flag
+of that entry. Another guard loads the cref and exits when it has
+refinements: `using` can add refinements to a cref after the code is
+compiled. Both guards exit to the original send and recompile. Dynamic
+Symbols and other block argument objects are handled as before.
+
+The callee does not change: its `yield` to a Symbol block handler is
+still a generic invokeblock.
+
+This is the Symbol part of Rafael's zjit-perf/blockarg-direct-send
+branch in Shopify/ruby (3f17d8950e), narrowed and ported to current
+master. That branch also sends forwarded block parameters directly and
+passes Proc and nil block arguments to C functions; those parts are left
+out here.
+
+Co-authored-by: Thomas Klemm <github@tklemm.eu>
+---
+ zjit.c                         |   1 +
+ zjit/bindgen/src/main.rs       |   1 +
+ zjit/src/backend/lir.rs        |   5 +-
+ zjit/src/codegen.rs            |  37 +++++---
+ zjit/src/cruby.rs              |   8 ++
+ zjit/src/cruby_bindings.inc.rs |   1 +
+ zjit/src/hir.rs                | 165 ++++++++++++++++++++++++++-------
+ zjit/src/hir/opt_tests.rs      |  62 +++++++++++--
+ zjit/src/hir/tests.rs          |   2 +
+ 9 files changed, 228 insertions(+), 54 deletions(-)
+
+diff --git a/zjit.c b/zjit.c
+index e2e807c791..43611f9907 100644
+--- a/zjit.c
++++ b/zjit.c
+@@ -393,6 +393,7 @@ rb_zjit_callable_method_entry_is_undefined(const rb_callable_method_entry_t *cme
+ }
+ 
+ VALUE rb_vm_get_untagged_block_handler(rb_control_frame_t *reg_cfp);
++rb_cref_t *rb_vm_get_cref(const VALUE *ep);
+ bool rb_vm_once_done_value(ISE is, VALUE *result);
+ 
+ bool
+diff --git a/zjit/bindgen/src/main.rs b/zjit/bindgen/src/main.rs
+index f210a3936f..aad546ae16 100644
+--- a/zjit/bindgen/src/main.rs
++++ b/zjit/bindgen/src/main.rs
+@@ -474,6 +474,7 @@ fn main() {
+         .allowlist_function("rb_str_neq_internal")
+         .allowlist_function("rb_yarv_ary_entry_internal")
+         .allowlist_function("rb_vm_get_untagged_block_handler")
++        .allowlist_function("rb_vm_get_cref")
+         .allowlist_function("rb_FL_TEST")
+         .allowlist_function("rb_FL_TEST_RAW")
+         .allowlist_function("rb_RB_TYPE_P")
+diff --git a/zjit/src/backend/lir.rs b/zjit/src/backend/lir.rs
+index 74449b3fdb..55df62f5d9 100644
+--- a/zjit/src/backend/lir.rs
++++ b/zjit/src/backend/lir.rs
+@@ -619,10 +619,11 @@ impl From<VALUE> for Opnd {
+ }
+ 
+ /// `hir::BlockHandler` lowered for codegen: a block ISEQ (encoded as a specval
+-/// at frame push) or an already-guarded Proc VALUE.
++/// at frame push) or a block handler VALUE (an already-guarded Proc or
++/// static Symbol).
+ pub enum BlockHandler {
+     Iseq(IseqPtr),
+-    Proc(Opnd),
++    Value(Opnd),
+ }
+ 
+ /// Context for a side exit. If `SideExit` matches, it reuses the same code.
+diff --git a/zjit/src/codegen.rs b/zjit/src/codegen.rs
+index dc61e43086..0d1a228d9a 100644
+--- a/zjit/src/codegen.rs
++++ b/zjit/src/codegen.rs
+@@ -714,7 +714,7 @@ fn gen_insn(cb: &mut CodeBlock, jit: &mut JITState, asm: &mut Assembler, functio
+         &Insn::Send { cd, block: None, state, reason, .. } => gen_send_without_block(jit, asm, function, cd, &function.frame_state(state), reason),
+         &Insn::Send { cd, block: Some(BlockHandler::BlockIseq(blockiseq)), state, reason, .. } => gen_send(jit, asm, function, cd, blockiseq, &function.frame_state(state), reason),
+         &Insn::Send { cd, block: Some(BlockHandler::BlockArg), state, reason, .. } => gen_send(jit, asm, function, cd, std::ptr::null(), &function.frame_state(state), reason),
+-        &Insn::Send { block: Some(BlockHandler::BlockArgProc(_)), .. } => unreachable!("BlockArgProc only appears in SendDirect"),
++        &Insn::Send { block: Some(BlockHandler::BlockArgProc(_) | BlockHandler::BlockArgSymbol(_)), .. } => unreachable!("a guarded block arg only appears in direct calls"),
+         &Insn::SendForward { cd, blockiseq, state, reason, .. } => gen_send_forward(jit, asm, function, cd, blockiseq, &function.frame_state(state), reason),
+         Insn::SendDirect(insn) => {
+             let SendDirectData { cd, cme, iseq, recv, args, kw_bits, jit_entry_idx, block, state, exit_state, .. } = &**insn;
+@@ -799,12 +799,12 @@ fn gen_insn(cb: &mut CodeBlock, jit: &mut JITState, asm: &mut Assembler, functio
+         Insn::PatchPoint { invariant, state } => no_output!(gen_patch_point(jit, asm, function, invariant, &function.frame_state(*state))),
+         Insn::CCall { cfunc, recv, args, name, owner, return_type: _, elidable: _ } => gen_ccall(asm, *cfunc, *name, *owner, opnd!(recv), opnds!(args)),
+         Insn::CCallWithFrame(insn) => {
+-            let CCallWithFrameData { cfunc, recv, name, args, cme, state, block, .. } = &**insn;
+-            gen_ccall_with_frame(jit, asm, function, *cfunc, *name, opnd!(recv), opnds!(args), *cme, *block, &function.frame_state(*state))
++            let CCallWithFrameData { cfunc, recv, name, args, cme, state, exit_state, block, .. } = &**insn;
++            gen_ccall_with_frame(jit, asm, function, *cfunc, *name, opnd!(recv), opnds!(args), *cme, *block, &function.frame_state(*state), &function.frame_state(*exit_state))
+         }
+         Insn::CCallVariadic(insn) => {
+-            let CCallVariadicData { cfunc, recv, name, args, cme, state, block, .. } = &**insn;
+-            gen_ccall_variadic(jit, asm, function, *cfunc, *name, opnd!(recv), opnds!(args), *cme, *block, &function.frame_state(*state))
++            let CCallVariadicData { cfunc, recv, name, args, cme, state, exit_state, block, .. } = &**insn;
++            gen_ccall_variadic(jit, asm, function, *cfunc, *name, opnd!(recv), opnds!(args), *cme, *block, &function.frame_state(*state), &function.frame_state(*exit_state))
+         }
+         Insn::GetIvar { self_val, id, ic, state } => gen_getivar(jit, asm, function, *self_val, opnd!(self_val), *id, *ic, &function.frame_state(*state)),
+         Insn::SetGlobal { id, val, state } => no_output!(gen_setglobal(jit, asm, function, *id, opnd!(val), &function.frame_state(*state))),
+@@ -844,6 +844,7 @@ fn gen_insn(cb: &mut CodeBlock, jit: &mut JITState, asm: &mut Assembler, functio
+         Insn::LoadEC => gen_load_ec(),
+         Insn::LoadSP => gen_load_sp(),
+         &Insn::GetEP { level } => gen_get_ep(asm, level),
++        Insn::GetCref => gen_get_cref(asm),
+         Insn::LoadSelf => gen_load_self(asm),
+         &Insn::LoadField { recv, id, offset, return_type: _, num_bits } => gen_load_field(asm, opnd!(recv), id, offset, num_bits),
+         &Insn::StoreField { recv, id, offset, val, num_bits } => no_output!(gen_store_field(asm, opnd!(recv), id, offset, opnd!(val), num_bits)),
+@@ -888,6 +889,11 @@ fn gen_get_ep(asm: &mut Assembler, level: u32) -> Opnd {
+     ep_opnd
+ }
+ 
++fn gen_get_cref(asm: &mut Assembler) -> Opnd {
++    let ep = gen_get_ep(asm, 0);
++    asm_ccall!(asm, rb_vm_get_cref, ep)
++}
++
+ fn gen_defined(jit: &JITState, asm: &mut Assembler, function: &Function, op_type: defined_type, obj: VALUE, pushval: VALUE, tested_value: Opnd, lep_level: u32, state: &FrameState) -> Opnd {
+     match op_type as defined_type {
+         DEFINED_YIELD => {
+@@ -1112,9 +1118,10 @@ fn gen_ccall_with_frame(
+     cme: *const rb_callable_method_entry_t,
+     block: Option<BlockHandler>,
+     state: &FrameState,
++    exit_state: &FrameState,
+ ) -> lir::Opnd {
+     gen_incr_counter(asm, Counter::non_variadic_cfunc_optimized_send_count);
+-    gen_stack_overflow_check(jit, asm, function, state, state.stack_size());
++    gen_stack_overflow_check(jit, asm, function, exit_state, state.stack_size());
+ 
+     let args_with_recv_len = args.len() + 1;
+     let caller_stack_size = state.stack().len() - args_with_recv_len;
+@@ -1141,7 +1148,7 @@ fn gen_ccall_with_frame(
+         let cfp_self_addr = asm.lea(Opnd::mem(64, CFP, RUBY_OFFSET_CFP_SELF));
+         asm.or(cfp_self_addr, Opnd::Imm(1))
+     } else {
+-        VM_BLOCK_HANDLER_NONE.into()
++        block_arg_symbol(jit, block).unwrap_or_else(|| VM_BLOCK_HANDLER_NONE.into())
+     };
+ 
+     gen_push_frame(asm, args_with_recv_len, state, ControlFrame {
+@@ -1199,10 +1206,17 @@ fn gen_block_handler_specval(asm: &mut Assembler, blockiseq: IseqPtr) -> lir::Op
+     asm.or(cfp_self_addr, Opnd::Imm(1))
+ }
+ 
++fn block_arg_symbol(jit: &JITState, block: Option<BlockHandler>) -> Option<lir::Opnd> {
++    match block {
++        Some(BlockHandler::BlockArgSymbol(symbol)) => Some(jit.get_opnd(symbol)),
++        _ => None,
++    }
++}
++
+ fn lower_block_handler(jit: &JITState, bh: BlockHandler) -> lir::BlockHandler {
+     match bh {
+         BlockHandler::BlockIseq(blockiseq) => lir::BlockHandler::Iseq(blockiseq),
+-        BlockHandler::BlockArgProc(proc_id) => lir::BlockHandler::Proc(jit.get_opnd(proc_id)),
++        BlockHandler::BlockArgProc(block_arg) | BlockHandler::BlockArgSymbol(block_arg) => lir::BlockHandler::Value(jit.get_opnd(block_arg)),
+         BlockHandler::BlockArg => unreachable!("BlockArg in a direct iseq call"),
+     }
+ }
+@@ -1210,7 +1224,7 @@ fn lower_block_handler(jit: &JITState, bh: BlockHandler) -> lir::BlockHandler {
+ fn gen_block_handler_opnd(asm: &mut Assembler, bh: lir::BlockHandler) -> Opnd {
+     match bh {
+         lir::BlockHandler::Iseq(blockiseq) => gen_block_handler_specval(asm, blockiseq),
+-        lir::BlockHandler::Proc(proc) => proc,
++        lir::BlockHandler::Value(handler) => handler,
+     }
+ }
+ 
+@@ -1227,9 +1241,10 @@ fn gen_ccall_variadic(
+     cme: *const rb_callable_method_entry_t,
+     block: Option<BlockHandler>,
+     state: &FrameState,
++    exit_state: &FrameState,
+ ) -> lir::Opnd {
+     gen_incr_counter(asm, Counter::variadic_cfunc_optimized_send_count);
+-    gen_stack_overflow_check(jit, asm, function, state, state.stack_size());
++    gen_stack_overflow_check(jit, asm, function, exit_state, state.stack_size());
+ 
+     let args_with_recv_len = args.len() + 1;
+ 
+@@ -1255,7 +1270,7 @@ fn gen_ccall_variadic(
+     let block_handler_specval = if let Some(BlockHandler::BlockIseq(blockiseq)) = block {
+         gen_block_handler_specval(asm, blockiseq)
+     } else {
+-        VM_BLOCK_HANDLER_NONE.into()
++        block_arg_symbol(jit, block).unwrap_or_else(|| VM_BLOCK_HANDLER_NONE.into())
+     };
+ 
+     gen_push_frame(asm, args_with_recv_len, state, ControlFrame {
+diff --git a/zjit/src/cruby.rs b/zjit/src/cruby.rs
+index d1e1c4c9e7..0d89e247bd 100644
+--- a/zjit/src/cruby.rs
++++ b/zjit/src/cruby.rs
+@@ -1262,6 +1262,12 @@ mod manual_defs {
+     // Constants from iseq_inline_constant_cache (IC) and iseq_inline_constant_cache_entry (ICE) in vm_core.h
+     pub const RUBY_OFFSET_IC_ENTRY: i32 = 0;
+     pub const RUBY_OFFSET_ICE_VALUE: i32 = 8;
++
++    // IMEMO_FL_USER2, the flag METHOD_ENTRY_BASIC() in method.h tests
++    pub const METHOD_ENTRY_BASIC_FLAG: ruby_fl_type = RUBY_FL_USER7;
++
++    // Constants from rb_cref_t in method.h
++    pub const RUBY_OFFSET_CREF_REFINEMENTS: i32 = 8;
+ }
+ pub use manual_defs::*;
+ 
+@@ -1745,6 +1751,7 @@ pub(crate) mod ids {
+         name: to_ary
+         name: to_s
+         name: to_str
++        name: to_proc
+         name: compile
+         name: eval
+         name: plus               content: b"+"
+@@ -1769,6 +1776,7 @@ pub(crate) mod ids {
+         name: rb_mod_name
+         name: RUBY_FL_FREEZE
+         name: RUBY_ELTS_SHARED
++        name: METHOD_ENTRY_BASIC_FLAG
+         name: U8
+         name: u16
+         name: U16
+diff --git a/zjit/src/cruby_bindings.inc.rs b/zjit/src/cruby_bindings.inc.rs
+index 40bf647039..9599e36d93 100644
+--- a/zjit/src/cruby_bindings.inc.rs
++++ b/zjit/src/cruby_bindings.inc.rs
+@@ -2510,6 +2510,7 @@ unsafe extern "C" {
+         cme: *const rb_callable_method_entry_t,
+     ) -> bool;
+     pub fn rb_vm_get_untagged_block_handler(reg_cfp: *mut rb_control_frame_t) -> VALUE;
++    pub fn rb_vm_get_cref(ep: *const VALUE) -> *mut rb_cref_t;
+     pub fn rb_vm_once_done_value(is: ISE, result: *mut VALUE) -> bool;
+     pub fn rb_zjit_array_aref_with_adjusted_index(
+         ary: VALUE,
+diff --git a/zjit/src/hir.rs b/zjit/src/hir.rs
+index a533de7a3c..dcc29d634b 100644
+--- a/zjit/src/hir.rs
++++ b/zjit/src/hir.rs
+@@ -902,6 +902,9 @@ pub enum BlockHandler {
+     /// guarded Proc value, which becomes the callee frame's block handler
+     /// (a Proc VALUE is itself a valid block handler).
+     BlockArgProc(InsnId),
++    /// Block arg proven to be a static Symbol (e.g. `foo(&:bar)`). The InsnId refers to the
++    /// Symbol, which is itself the callee frame's block handler.
++    BlockArgSymbol(InsnId),
+ }
+ 
+ /// Identifier used by LoadField/StoreField/LoadArg for HIR dumps. Variants
+@@ -921,6 +924,7 @@ pub enum FieldName {
+     fields_obj,
+     thread_ptr,
+     len,
++    refinements,
+     SelfParam,
+     Id(ID),
+ }
+@@ -953,6 +957,8 @@ pub struct CCallWithFrameData {
+     pub cme: *const rb_callable_method_entry_t,
+     pub name: ID,
+     pub state: InsnId,
++    /// Snapshot of the original send, for exits that re-execute it in the interpreter
++    pub exit_state: InsnId,
+     pub return_type: Type,
+     pub elidable: bool,
+     pub block: Option<BlockHandler>,
+@@ -993,6 +999,8 @@ pub struct CCallVariadicData {
+     pub cme: *const rb_callable_method_entry_t,
+     pub name: ID,
+     pub state: InsnId,
++    /// Snapshot of the original send, for exits that re-execute it in the interpreter
++    pub exit_state: InsnId,
+     pub return_type: Type,
+     pub elidable: bool,
+     pub block: Option<BlockHandler>,
+@@ -1174,6 +1182,9 @@ pub enum Insn {
+     /// Get the EP at the given level from the current CFP.
+     GetEP { level: u32 },
+ 
++    /// Get the cref of the current CFP's EP, like vm_env_cref().
++    GetCref,
++
+     /// Own a FrameState so that instructions can look up their dominating FrameState when
+     /// generating deopt side-exits and frame reconstruction metadata. Does not directly generate
+     /// any code.
+@@ -1408,6 +1419,7 @@ macro_rules! for_each_operand_impl {
+             | Insn::LoadSP
+             | Insn::LoadEC
+             | Insn::GetEP { .. }
++            | Insn::GetCref
+             | Insn::LoadSelf
+             | Insn::BreakPoint | Insn::Unreachable
+             | Insn::IncrCounter(_)
+@@ -1663,7 +1675,7 @@ macro_rules! for_each_operand_impl {
+             Insn::SendDirect(insn) => {
+                 $visit_one!(insn.recv);
+                 $visit_many!(insn.args);
+-                if let Some(BlockHandler::BlockArgProc(id)) = &$($mut)? insn.block {
++                if let Some(BlockHandler::BlockArgProc(id) | BlockHandler::BlockArgSymbol(id)) = &$($mut)? insn.block {
+                     $visit_one!(*id);
+                 }
+                 $visit_one!(insn.state);
+@@ -1672,12 +1684,20 @@ macro_rules! for_each_operand_impl {
+             Insn::CCallWithFrame(insn) => {
+                 $visit_one!(insn.recv);
+                 $visit_many!(insn.args);
++                if let Some(BlockHandler::BlockArgSymbol(id)) = &$($mut)? insn.block {
++                    $visit_one!(*id);
++                }
+                 $visit_one!(insn.state);
++                $visit_one!(insn.exit_state);
+             }
+             Insn::CCallVariadic(insn) => {
+                 $visit_one!(insn.recv);
+                 $visit_many!(insn.args);
++                if let Some(BlockHandler::BlockArgSymbol(id)) = &$($mut)? insn.block {
++                    $visit_one!(*id);
++                }
+                 $visit_one!(insn.state);
++                $visit_one!(insn.exit_state);
+             }
+             Insn::InvokeBlock { args, state, .. } => {
+                 $visit_many!(args);
+@@ -1908,6 +1928,7 @@ impl Insn {
+             Insn::LoadSP { .. } => effects::Empty,
+             // GetEP reads from the current frame pointer (abstract_heaps::Frame) and also traverses previous frames too.
+             Insn::GetEP { .. } => Effect::read_write(abstract_heaps::Memory, abstract_heaps::Empty),
++            Insn::GetCref => Effect::read_write(abstract_heaps::Memory, abstract_heaps::Empty),
+             Insn::LoadSelf { .. } => Effect::read_write(abstract_heaps::Frame, abstract_heaps::Empty),
+             Insn::LoadField { .. } => Effect::read_write(abstract_heaps::Memory, abstract_heaps::Empty),
+             Insn::StoreField { .. } => Effect::read_write(abstract_heaps::Empty, abstract_heaps::Memory),
+@@ -2084,7 +2105,7 @@ impl<'a> InsnPrinter<'a> {
+ 
+     fn block_handler(&self, block: &BlockHandler) -> String {
+         match block {
+-            BlockHandler::BlockArgProc(proc_id) => format!("&{proc_id}"),
++            BlockHandler::BlockArgProc(block_arg) | BlockHandler::BlockArgSymbol(block_arg) => format!("&{block_arg}"),
+             BlockHandler::BlockIseq(blockiseq) => format!("{:p}", self.ptr_map.map_ptr(*blockiseq)),
+             BlockHandler::BlockArg => "&block".to_string(),
+         }
+@@ -2350,8 +2371,8 @@ impl<'a> std::fmt::Display for InsnPrinter<'a> {
+                         write!(f, "Send {recv}, {:p}, :{}", self.ptr_map.map_ptr(blockiseq), ruby_call_method_name(*cd))?,
+                     Some(BlockHandler::BlockArg) =>
+                         write!(f, "Send {recv}, &block, :{}", ruby_call_method_name(*cd))?,
+-                    Some(BlockHandler::BlockArgProc(_)) =>
+-                        unreachable!("BlockArgProc is not sent through Send"),
++                    Some(BlockHandler::BlockArgProc(_) | BlockHandler::BlockArgSymbol(_)) =>
++                        unreachable!("a guarded block arg is not sent through Send"),
+                     None =>
+                         write!(f, "Send {recv}, :{}", ruby_call_method_name(*cd))?,
+                 }
+@@ -2507,9 +2528,12 @@ impl<'a> std::fmt::Display for InsnPrinter<'a> {
+                 Ok(())
+             },
+             Insn::CCallVariadic(insn) => {
+-                let CCallVariadicData { cfunc, recv, args, name, cme, .. } = &**insn;
++                let CCallVariadicData { cfunc, recv, args, name, cme, block, .. } = &**insn;
+                 write!(f, "CCallVariadic {recv}, :{}@{:p}", qualified_method_name(unsafe { (**cme).owner }, *name), self.ptr_map.map_ptr(*cfunc))?;
+                 write_separated!(f, ", ", ", ", args);
++                if let Some(block) = block {
++                    write!(f, ", block={}", self.block_handler(block))?;
++                }
+                 Ok(())
+             },
+             Insn::IncrCounterPtr { .. } => write!(f, "IncrCounterPtr"),
+@@ -2553,6 +2577,7 @@ impl<'a> std::fmt::Display for InsnPrinter<'a> {
+             Insn::LoadEC => write!(f, "LoadEC"),
+             Insn::LoadSP => write!(f, "LoadSP"),
+             &Insn::GetEP { level } => write!(f, "GetEP {level}"),
++            Insn::GetCref => write!(f, "GetCref"),
+             Insn::LoadSelf => write!(f, "LoadSelf"),
+             &Insn::LoadField { recv, id, offset, return_type: _, num_bits: _ } => {
+                 write!(f, "LoadField {recv}, :{id}@{:#x}", self.ptr_map.map_offset(offset))
+@@ -3982,6 +4007,7 @@ impl Function {
+             Insn::LoadSP => types::CPtr,
+             Insn::LoadEC => types::CPtr,
+             Insn::GetEP { .. } => types::CPtr,
++            Insn::GetCref => types::CPtr,
+             Insn::LoadSelf => if self.self_is_heap_object { types::HeapBasicObject } else { types::BasicObject },
+             &Insn::LoadField { return_type, .. } => return_type,
+             Insn::GetSpecialSymbol { .. } => types::StringExact.union(types::NilClass),
+@@ -5129,14 +5155,15 @@ impl Function {
+                             def_type = unsafe { get_cme_def_type(cme) };
+                         }
+ 
+-                        // Check if we can optimize `foo(&block)` to a direct send: either `block` is
+-                        // nil (strip it and send without a block) or `block` is monomorphically an
+-                        // exact-class Proc (pass it through as the callee frame's specval).
++                        // Check if we can optimize `foo(&block)` to a direct send: `block` is nil
++                        // (strip it and send without a block), `block` is monomorphically an
++                        // exact-class Proc (pass it through as the callee frame's specval), or `block`
++                        // is a static Symbol (pass it through as the specval as well).
+                         // `state` keeps referring to the pre-send frame state (block arg still on the
+                         // stack). Any guard that side-exits before the call re-executes the `send` in
+                         // the interpreter, so it must reconstruct the stack with the block arg present.
+-                        // Only the direct-send frame setup uses `send_frame_state`, which has the nil
+-                        // or Proc block arg stripped from the stack.
++                        // Only the direct-send frame setup uses `send_frame_state`, which has the
++                        // block arg stripped from the stack.
+                         let mut send_block = send_block;
+                         let mut send_frame_state = state;
+                         let mut args = match resolved.insn(self) {
+@@ -5144,10 +5171,12 @@ impl Function {
+                             _ => panic!("Expected Send instruction"),
+                         };
+                         let mut stripped_block_arg = false;
+-                        if send_block == Some(BlockHandler::BlockArg) && def_type == VM_METHOD_TYPE_ISEQ {
++                        let iseq_callee = def_type == VM_METHOD_TYPE_ISEQ;
++                        let specializable_cfunc = def_type == VM_METHOD_TYPE_CFUNC && !unspecializable_c_call_type(flags & !VM_CALL_ARGS_BLOCKARG);
++                        if send_block == Some(BlockHandler::BlockArg) && (iseq_callee || specializable_cfunc) {
+                             // Reject complex argument passing before emitting any block-arg guard;
+                             // a guard in front of a send that stays dynamic gates nothing.
+-                            if unspecializable_call_type(flags & !VM_CALL_ARGS_BLOCKARG) {
++                            if iseq_callee && unspecializable_call_type(flags & !VM_CALL_ARGS_BLOCKARG) {
+                                 self.count_complex_call_features(block, insn_id, flags, state);
+                                 self.set_dynamic_send_reason(insn_id, ComplexArgPass);
+                                 self.push_insn_id(block, insn_id); continue;
+@@ -5158,7 +5187,9 @@ impl Function {
+                                 let statically_nil = self.is_a(block_arg, types::NilClass);
+                                 let block_arg_profiled_type = self.profiled_type_of_at(block_arg, state);
+                                 let profiled_nil = block_arg_profiled_type.map_or(false, |pt| pt.is_nil());
+-                                if statically_nil || profiled_nil {
++                                let statically_static_symbol = self.is_a(block_arg, types::StaticSymbol);
++                                let profiled_static_symbol = block_arg_profiled_type.is_some_and(|pt| pt.is_static_symbol());
++                                if iseq_callee && (statically_nil || profiled_nil) {
+                                     if !statically_nil {
+                                         // Guard needed when relying on profiled type. Uses the original
+                                         // `state` so a side exit re-executes the send with the block
+@@ -5186,7 +5217,7 @@ impl Function {
+                                     // from the stack so the callee frame is laid out correctly.
+                                     let new_state = self.frame_state(state).with_replaced_args(&args, original_argc);
+                                     send_frame_state = self.push_insn(block, Insn::Snapshot { state: Box::new(new_state) });
+-                                } else if block_arg_profiled_type.is_some_and(|pt| pt.is_proc()) {
++                                } else if iseq_callee && block_arg_profiled_type.is_some_and(|pt| pt.is_proc()) {
+                                     // Guard the Proc and pass it through as the callee frame's
+                                     // specval.
+                                     let guarded = self.guard_type_recompile(
+@@ -5199,8 +5230,23 @@ impl Function {
+                                     stripped_block_arg = true;
+                                     let new_state = self.frame_state(state).with_replaced_args(&args, original_argc);
+                                     send_frame_state = self.push_insn(block, Insn::Snapshot { state: Box::new(new_state) });
+-                                } else {
+-                                    // Can't prove block arg is nil or a Proc
++                                } else if (statically_static_symbol || profiled_static_symbol)
++                                    && unsafe { rb_method_basic_definition_p(rb_cSymbol, ID!(to_proc)) } != 0
++                                    && !invariants::non_root_box_created()
++                                    && !self.policy.no_side_exits
++                                {
++                                    let symbol = if statically_static_symbol {
++                                        block_arg
++                                    } else {
++                                        self.guard_type_recompile(block, block_arg, types::StaticSymbol, state, Recompile)
++                                    };
++                                    _ = args.pop();
++                                    send_block = Some(BlockHandler::BlockArgSymbol(symbol));
++                                    stripped_block_arg = true;
++                                    let new_state = self.frame_state(state).with_replaced_args(&args, original_argc);
++                                    send_frame_state = self.push_insn(block, Insn::Snapshot { state: Box::new(new_state) });
++                                } else if iseq_callee {
++                                    // Can't prove block arg is nil, a Proc or a static Symbol
+                                     self.set_dynamic_send_reason(insn_id, SendBlockArgNotNil);
+                                     self.push_insn_id(block, insn_id); continue;
+                                 }
+@@ -5209,7 +5255,7 @@ impl Function {
+ 
+                         // If the call site info indicates that the `Function` has overly complex arguments, then do not optimize into a `SendDirect`.
+                         // Optimized methods(`VM_METHOD_TYPE_OPTIMIZED`) and C methods handle their own argument constraints (e.g., kw_splat for Proc call).
+-                        // Mask out ARGS_BLOCKARG only if we've already handled the nil/Proc block arg case above.
++                        // Mask out ARGS_BLOCKARG only if we've already handled the block arg above.
+                         let mut flags_for_check = if stripped_block_arg { flags & !VM_CALL_ARGS_BLOCKARG } else { flags };
+                         if def_type == VM_METHOD_TYPE_ISEQ {
+                             // Caller splat specialization currently only supports ISEQ callees, so
+@@ -5265,6 +5311,7 @@ impl Function {
+                                 self.count(block, Counter::caller_splat_optimized);
+                             }
+ 
++                            self.gen_guards_for_symbol_block_arg(block, send_block, state);
+                             // Add PatchPoint for method redefinition
+                             self.push_insn(block, Insn::PatchPoint { invariant: Invariant::MethodRedefined { klass, method: mid, cme: lookup_cme }, state });
+ 
+@@ -5462,6 +5509,7 @@ impl Function {
+                                 send_block: Option<BlockHandler>,
+                                 args: Vec<InsnId>,
+                                 state: InsnId,
++                                direct_state: InsnId,
+                                 recv_class: VALUE,
+                                 profiled_type: Option<ProfiledType>,
+                                 cme: *const rb_callable_method_entry_struct,
+@@ -5471,8 +5519,12 @@ impl Function {
+                                 let argc = unsafe { vm_ci_argc(call_info) };
+                                 let method_id = unsafe { rb_vm_ci_mid(call_info) };
+ 
+-                                let ci_flags = unsafe { vm_ci_flag(call_info) };
+-                                // When seeing &block argument, fall back to dynamic dispatch for now
++                                let mut ci_flags = unsafe { vm_ci_flag(call_info) };
++                                // A Symbol block arg becomes the block handler, not an argument
++                                if matches!(send_block, Some(BlockHandler::BlockArgSymbol(_))) {
++                                    ci_flags &= !VM_CALL_ARGS_BLOCKARG;
++                                }
++                                // When seeing another &block argument, fall back to dynamic dispatch for now
+                                 // TODO: Support block forwarding
+                                 if unspecializable_c_call_type(ci_flags) {
+                                     // Only count features NOT already counted in type_specialize.
+@@ -5483,11 +5535,11 @@ impl Function {
+                                     return Err(());
+                                 }
+ 
+-                                let blockiseq = match send_block {
++                                let has_block = match send_block {
+                                     Some(BlockHandler::BlockArg) => unreachable!("unsupported &block should have been filtered out"),
+                                     Some(BlockHandler::BlockArgProc(_)) => unreachable!("BlockArgProc is only built for ISEQ callees"),
+-                                    Some(BlockHandler::BlockIseq(blockiseq)) => Some(blockiseq),
+-                                    None => None,
++                                    Some(BlockHandler::BlockIseq(_) | BlockHandler::BlockArgSymbol(_)) => true,
++                                    None => false,
+                                 };
+ 
+                                 let cfunc = unsafe { get_cme_def_body_cfunc(cme) };
+@@ -5503,10 +5555,8 @@ impl Function {
+                                 }
+                                 let props = props.unwrap_or_default();
+                                 let return_type = props.return_type;
+-                                let elidable = match blockiseq {
+-                                    Some(_) => false, // Don't consider cfuncs with block arguments as elidable for now
+-                                    None => props.elidable,
+-                                };
++                                // Don't consider cfuncs with block arguments as elidable for now
++                                let elidable = if has_block { false } else { props.elidable };
+ 
+                                 match cfunc_argc {
+                                     0.. => {
+@@ -5525,6 +5575,7 @@ impl Function {
+                                         }
+ 
+                                         // Commit to the replacement. Put PatchPoint.
++                                        fun.gen_guards_for_symbol_block_arg(block, send_block, state);
+                                         fun.gen_patch_points_for_optimized_ccall(block, recv_class, method_id, lookup_cme, state);
+ 
+                                         if let Some(profiled_type) = profiled_type {
+@@ -5533,7 +5584,7 @@ impl Function {
+                                         }
+ 
+                                         // Try inlining the cfunc into HIR. Only inline if we don't have a block argument
+-                                        if blockiseq.is_none() {
++                                        if !has_block {
+                                             let tmp_block = fun.new_block(u32::MAX);
+                                             if let Some(replacement) = (props.inline)(fun, tmp_block, recv, &args, state) {
+                                                 // Copy contents of tmp_block to block
+@@ -5572,10 +5623,11 @@ impl Function {
+                                             args,
+                                             cme,
+                                             name,
+-                                            state,
++                                            state: direct_state,
++                                            exit_state: state,
+                                             return_type,
+                                             elidable,
+-                                            block: blockiseq.map(BlockHandler::BlockIseq),
++                                            block: send_block,
+                                         })));
+                                         fun.insn_types[ccall] = fun.infer_type(ccall);
+                                         fun.make_equal_to(send_insn_id, ccall);
+@@ -5592,6 +5644,7 @@ impl Function {
+                                             return Err(());
+                                         }
+ 
++                                        fun.gen_guards_for_symbol_block_arg(block, send_block, state);
+                                         fun.gen_patch_points_for_optimized_ccall(block, recv_class, method_id, lookup_cme, state);
+ 
+                                         if let Some(profiled_type) = profiled_type {
+@@ -5600,7 +5653,7 @@ impl Function {
+                                         }
+ 
+                                         // Try inlining the cfunc into HIR. Only inline if we don't have a block argument
+-                                        if blockiseq.is_none() {
++                                        if !has_block {
+                                             let tmp_block = fun.new_block(u32::MAX);
+                                             if let Some(replacement) = (props.inline)(fun, tmp_block, recv, &args, state) {
+                                                 // Copy contents of tmp_block to block
+@@ -5639,10 +5692,11 @@ impl Function {
+                                             args,
+                                             cme,
+                                             name: method_id,
+-                                            state,
++                                            state: direct_state,
++                                            exit_state: state,
+                                             return_type,
+                                             elidable,
+-                                            block: blockiseq.map(BlockHandler::BlockIseq),
++                                            block: send_block,
+                                         })));
+                                         fun.insn_types[ccall] = fun.infer_type(ccall);
+                                         fun.make_equal_to(send_insn_id, ccall);
+@@ -5657,7 +5711,7 @@ impl Function {
+                                 }
+                             }
+ 
+-                            if reduce_send_to_ccall(self, block, insn_id, recv, cd, send_block, args, state, klass, profiled_type, cme, lookup_cme).is_ok() {
++                            if reduce_send_to_ccall(self, block, insn_id, recv, cd, send_block, args, state, send_frame_state, klass, profiled_type, cme, lookup_cme).is_ok() {
+                                 continue;
+                             }
+ 
+@@ -5936,6 +5990,7 @@ impl Function {
+                                             cme: super_cme,
+                                             name,
+                                             state,
++                                            exit_state: state,
+                                             return_type,
+                                             elidable,
+                                             block: None,
+@@ -5985,6 +6040,7 @@ impl Function {
+                                             cme: super_cme,
+                                             name,
+                                             state,
++                                            exit_state: state,
+                                             return_type,
+                                             elidable,
+                                             block: None,
+@@ -6158,6 +6214,10 @@ impl Function {
+                 // in HIR construction for the defined opcode to check the send flags of the method
+                 // being inlined, too.
+                 assert!(!matches!(call_block, Some(BlockHandler::BlockArg)), "BlockArg in SendDirect");
++                if matches!(call_block, Some(BlockHandler::BlockArgSymbol(_))) {
++                    search_start = send_pos + 1;
++                    continue;
++                }
+ 
+                 // Apply the cheap optimization heuristics (size, budget, denylist)
+                 // before can_inline's more expensive elibility checks. This allows
+@@ -6623,6 +6683,35 @@ impl Function {
+         Ok(())
+     }
+ 
++    fn gen_guards_for_symbol_block_arg(&mut self, block: BlockId, send_block: Option<BlockHandler>, state: InsnId) {
++        if let Some(BlockHandler::BlockArgSymbol(_)) = send_block {
++            let cme = unsafe { rb_callable_method_entry(rb_cSymbol, ID!(to_proc)) };
++            self.push_insn(block, Insn::PatchPoint { invariant: Invariant::RootBoxOnly, state });
++            self.push_insn(block, Insn::PatchPoint { invariant: Invariant::MethodRedefined { klass: unsafe { rb_cSymbol }, method: ID!(to_proc), cme }, state });
++            // Defining Symbol#to_proc with its own definition clears the flag without invalidating the entry
++            let cme = self.push_insn(block, Insn::Const { val: Const::Value(VALUE::from(cme)) });
++            let cme_flags = self.load_rbasic_flags(block, cme);
++            self.push_insn(block, Insn::GuardAnyBitSet {
++                val: cme_flags,
++                mask: Const::CUInt64(METHOD_ENTRY_BASIC_FLAG as u64),
++                mask_name: Some(ID!(METHOD_ENTRY_BASIC_FLAG)),
++                reason: Box::new(SideExitReason::UnhandledBlockArg),
++                state,
++                recompile: Some(Recompile),
++            });
++            // With refinements in the caller's cref, vm_caller_setup_arg_block() makes a refined lambda
++            let cref = self.push_insn(block, Insn::GetCref);
++            let refinements = self.load_field(block, cref, FieldName::refinements, RUBY_OFFSET_CREF_REFINEMENTS, types::RubyValue);
++            self.push_insn(block, Insn::GuardBitEquals {
++                val: refinements,
++                expected: Const::Value(Qnil),
++                reason: Box::new(SideExitReason::UnhandledBlockArg),
++                state,
++                recompile: Some(Recompile),
++            });
++        }
++    }
++
+     fn gen_patch_points_for_optimized_ccall(&mut self, block: BlockId, recv_class: VALUE, method_id: ID, cme: *const rb_callable_method_entry_struct, state: InsnId) {
+         self.push_insn(block, Insn::PatchPoint { invariant: Invariant::NoTracePoint, state });
+         self.push_insn(block, Insn::PatchPoint { invariant: Invariant::MethodRedefined { klass: recv_class, method: method_id, cme }, state });
+@@ -8364,6 +8453,7 @@ impl Function {
+             | Insn::LoadSP
+             | Insn::LoadEC
+             | Insn::GetEP { .. }
++            | Insn::GetCref
+             | Insn::BreakPoint | Insn::Unreachable
+             | Insn::LoadSelf
+             | Insn::Snapshot { .. }
+@@ -8451,6 +8541,9 @@ impl Function {
+                 if let Some(BlockHandler::BlockArgProc(proc_id)) = insn.block {
+                     self.assert_subtype(insn_id, proc_id, Type::from_class(unsafe { rb_cProc }))?;
+                 }
++                if let Some(BlockHandler::BlockArgSymbol(symbol)) = insn.block {
++                    self.assert_subtype(insn_id, symbol, types::StaticSymbol)?;
++                }
+                 Ok(())
+             }
+             Insn::CCallWithFrame(ref insn) => {
+@@ -8458,6 +8551,9 @@ impl Function {
+                 for &arg in &insn.args {
+                     self.assert_subtype(insn_id, arg, types::BasicObject)?;
+                 }
++                if let Some(BlockHandler::BlockArgSymbol(symbol)) = insn.block {
++                    self.assert_subtype(insn_id, symbol, types::StaticSymbol)?;
++                }
+                 Ok(())
+             }
+             Insn::CCallVariadic(ref insn) => {
+@@ -8465,6 +8561,9 @@ impl Function {
+                 for &arg in &insn.args {
+                     self.assert_subtype(insn_id, arg, types::BasicObject)?;
+                 }
++                if let Some(BlockHandler::BlockArgSymbol(symbol)) = insn.block {
++                    self.assert_subtype(insn_id, symbol, types::StaticSymbol)?;
++                }
+                 Ok(())
+             }
+             Insn::ArrayPackBuffer { ref elements, fmt, buffer, .. } => {
+diff --git a/zjit/src/hir/opt_tests.rs b/zjit/src/hir/opt_tests.rs
+index d36bb49a74..0a76ab4da2 100644
+--- a/zjit/src/hir/opt_tests.rs
++++ b/zjit/src/hir/opt_tests.rs
+@@ -13465,7 +13465,7 @@ mod hir_opt_tests {
+           StoreField v29, :result@0x1020, v13
+           PatchPoint NoSingletonClass(Array@0x1028)
+           PatchPoint MethodRedefined(Array@0x1028, zip@0x1030, cme:0x1038)
+-          v47:BasicObject = CCallVariadic v19, :Array#zip@0x1060, v25
++          v47:BasicObject = CCallVariadic v19, :Array#zip@0x1060, v25, block=0x1068
+           PatchPoint NoEPEscape(test)
+           CheckInterrupts
+           Return v13
+@@ -13896,9 +13896,9 @@ mod hir_opt_tests {
+     }
+ 
+     #[test]
+-    fn test_send_with_non_nil_block_arg() {
++    fn test_send_with_symbol_block_arg() {
+         eval(r#"
+-            def foo = 42
++            def foo = yield(42)
+ 
+             def test
+               block = :to_s
+@@ -13917,12 +13917,58 @@ mod hir_opt_tests {
+           v5:BasicObject = LoadArg :self@0
+           Jump bb3(v5)
+         bb3(v8:BasicObject):
+-          v27:NilClass = Const Value(nil)
++          v39:NilClass = Const Value(nil)
+           v13:StaticSymbol[:to_s] = Const Value(VALUE(0x1000))
+-          v19:BasicObject = Send v8, &block, :foo, v13 # SendFallbackReason: Send: block argument is not nil
++          PatchPoint RootBoxOnly
++          PatchPoint MethodRedefined(Symbol@0x1008, to_proc@0x1010, cme:0x1018)
++          v30:CallableMethodEntry[VALUE(0x1018)] = Const Value(VALUE(0x1018))
++          v31:CUInt64 = LoadField v30, :RBASIC_FLAGS@0x1040
++          v32:CUInt64 = GuardAnyBitSet v31, METHOD_ENTRY_BASIC_FLAG=CUInt64(524288) recompile
++          v33:CPtr = GetCref
++          v34:RubyValue = LoadField v33, :refinements@0x1041
++          v35:NilClass = GuardBitEquals v34, Value(nil) recompile
++          PatchPoint MethodRedefined(Object@0x1048, foo@0x1050, cme:0x1058)
++          v37:ObjectSubclass[class_exact*:Object@VALUE(0x1048)] = GuardType v8, ObjectSubclass[class_exact*:Object@VALUE(0x1048)] recompile
++          v38:BasicObject = SendDirect v37, &v13, :foo (0x1080)
+           PatchPoint NoEPEscape(test)
+           CheckInterrupts
+-          Return v19
++          Return v38
++        ");
++    }
++
++    #[test]
++    fn test_send_with_arbitrary_block_arg_falls_back() {
++        eval(r#"
++            class BlockargToProc
++              def to_proc = proc { |value| value }
++            end
++
++            def foo = yield(42)
++
++            def test(block)
++              foo(&block)
++            end
++            block = BlockargToProc.new
++            test(block); test(block)
++        "#);
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:9:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :block@0x1000
++          Jump bb3(v1, v3)
++        bb2():
++          EntryPoint JIT(0)
++          v6:BasicObject = LoadArg :self@0
++          v7:BasicObject = LoadArg :block@1
++          Jump bb3(v6, v7)
++        bb3(v9:BasicObject, v10:BasicObject):
++          v16:BasicObject = Send v9, &block, :foo, v10 # SendFallbackReason: Send: block argument is not nil
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v16
+         ");
+     }
+ 
+@@ -20164,7 +20210,7 @@ mod hir_opt_tests {
+     }
+ 
+     #[test]
+-    fn test_no_inline_send_with_symbol_block() {
++    fn test_send_with_unused_symbol_block_falls_back() {
+         eval(r#"
+             def callee = 123
+             public def the_block = 456
+@@ -20185,7 +20231,7 @@ mod hir_opt_tests {
+           Jump bb3(v4)
+         bb3(v6:BasicObject):
+           v11:StaticSymbol[:the_block] = Const Value(VALUE(0x1000))
+-          v13:BasicObject = Send v6, &block, :callee, v11 # SendFallbackReason: Send: block argument is not nil
++          v13:BasicObject = Send v6, &block, :callee, v11 # SendFallbackReason: Complex argument passing
+           CheckInterrupts
+           Return v13
+         ");
+diff --git a/zjit/src/hir/tests.rs b/zjit/src/hir/tests.rs
+index e576f7bd94..2998545129 100644
+--- a/zjit/src/hir/tests.rs
++++ b/zjit/src/hir/tests.rs
+@@ -61,6 +61,7 @@ mod printer_tests {
+                     cme,
+                     name,
+                     state: InsnId(0),
++                    exit_state: InsnId(0),
+                     return_type: types::Any,
+                     elidable: false,
+                     block: None,
+@@ -74,6 +75,7 @@ mod printer_tests {
+                     cme,
+                     name,
+                     state: InsnId(0),
++                    exit_state: InsnId(0),
+                     return_type: types::Any,
+                     elidable: false,
+                     block: None,
+-- 
+2.47.3
+

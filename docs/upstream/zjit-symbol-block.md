@@ -1146,3 +1146,55 @@ Scratch harnesses, base sources, the temporary validation patch, API reads and c
 `.amp/in/orb-backup/zs1-review/` in the review orb. No arm64 build or new performance measurement in this pass.
 XrXr is likely to accept the HIR-speculation shape with the basic-bit guard and corrected claims: it uses the
 machinery he requested and drops the VM extraction. This exact head is not ready; acceptance remains his decision.
+
+### Round 3 for thermos-sol (2026-11-25)
+
+Head `bdcfceb5eecaa0b7060f2df13958308ea8690624` on master `f63048e942`: `05ae429a7b` "ZJIT: Send Symbol block
+arguments directly" (Rafael as author, Thomas as co-author) and `bdcfceb5ee` "ZJIT: Test sends with a Symbol block
+argument" (Thomas). Not on the fork (still no `workflow` scope). Bundle
+[`round3/zs1-3.bundle`](../../bench/upstream/zs1/round3/zs1-3.bundle), SHA-256
+`208954879c51b0c9202b9abefc99545f496f793a79b8e755e3b1eb8eb9ae7f2b`, prerequisite
+`f63048e94229b4bab276e01bac4902f9b6a74ace`, ref `refs/heads/zs1-3`; `git bundle verify` passes in a fresh clone of
+ruby master (`0988275a9b`), and the fetch gives the same commit and tree SHAs. Patches next to it.
+
+Against `2e3108fc05` (+71 −31 in 5 files):
+
+* `gen_guards_for_symbol_block_arg` adds, after the two patch points, a `Const` of the `Symbol#to_proc` CME
+  (GC-tracked, typed `CallableMethodEntry`), `load_rbasic_flags` and `GuardAnyBitSet METHOD_ENTRY_BASIC_FLAG`, with
+  the original send's snapshot and recompile. `METHOD_ENTRY_BASIC_FLAG` is `RUBY_FL_USER7` in `cruby.rs`, the
+  `IMEMO_FL_USER2` that `METHOD_ENTRY_BASIC()` tests. One comment says why the guard sits next to the patch point.
+* The comment above `block_arg_symbol` (codegen.rs) and the two interpreter lines in hir.rs are deleted.
+* New test `test_send_symbol_block_arg_to_proc_redefined_with_itself_keeps_proc_identity`, the reviewer's probe in
+  the `inspect` style. The using-after-compile test calls `flat_map` instead of `map`.
+* The ZJIT commit message no longer says passing the Symbol gives the same result as `to_proc`; it describes both
+  guards. The test commit message names the new case. Four HIR snapshots show the new guard.
+
+Mutation: without the `GuardAnyBitSet` the new test and the four snapshots fail. The previous head printed `false`
+for [`proc_identity_probe.rb`](../../bench/upstream/zs1/round2/proc_identity_probe.rb) at threshold 1; this one prints
+`true` at thresholds 1 and 2 (one profile), default, `--zjit-inline-budget=0` and with `materialize,test` on the
+inline deny list.
+
+Verification (dev build, x86-64 orb): `make zjit-test` 2,051 of 2,052 (the SIGPROF test only); `make btest` at
+`--zjit-call-threshold=1` and `=2` 2,148 of 2,148 each; `test_zjit_cli.rb` 34 tests, 0 failures; the same 11 core
+files at threshold 1 1,380 tests, 0 failures, 1 skip; `zs1_probe.rb` identical to the interpreter at threshold 1,
+threshold 2 with one profile, default, and default with `N=40` (Thread addresses normalized); the four round-2 probes
+identical in the interpreter and at thresholds 1, 2 and default.
+
+railsbench, same setup as round 2 (master is the release build of `f63048e942`):
+
+```diff
+ calls to C functions from JIT code:
+-  rb_vm_send: 4,732,653
++  rb_vm_send: 4,289,569
+ send fallback reasons:
+-  send_block_arg_not_nil: 2,440,814
++  send_block_arg_not_nil: 2,200,733
+-  one_or_more_complex_arg_pass: 2,133,480
++  one_or_more_complex_arg_pass: 1,930,477
+-dynamic_send_count: 17,521,001
++dynamic_send_count: 17,077,924
+```
+
+No `unhandled_block_arg` exit. The body stays: its sentence that the send is specialized only while
+`Symbol#to_proc` is basic is true with the guard. The reply drafts above (replacement first reply, unchanged
+second reply) are true of this head.
