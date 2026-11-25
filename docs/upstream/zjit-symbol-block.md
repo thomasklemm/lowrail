@@ -1655,3 +1655,36 @@ Reply 1 unchanged and correct.
 | 13 `Symbol#to_proc` mutations × 3 settings | 39/39 identical |
 | Ractor and compaction probe × 3 settings × 3 runs | 9/9 identical |
 | Restored head after mutations | source diff empty |
+
+### Round 5 for Astra (2026-11-25)
+
+Head `7b03404bd7f0e08120af0836ce11a6b27d45f5b0` on master `a43519979c`, pushed as `thomasklemm/zjit-symbol-block-arg-5`
+(PR branch untouched): `f805330297` (Rafael as author, Thomas as co-author) and `7b03404bd7` (Thomas). Both messages
+are byte-identical to round 4; the test commit is unchanged in `git range-diff`. Patches and the probe in
+[`round5/`](../../bench/upstream/zs1/round5/).
+
+Astra's must-fix: `exit_block_arg_refinements` wrote the shared `IseqPayload` bool through `&mut` without the VM
+lock (two Ractor threads in the callback with the same ISEQ, `rb_vm_locked_p()` 0 in both). The existing
+`was_invalidated_for_singleton_class_creation` is written inside `with_vm_lock` (`rb_zjit_invalidate_no_singleton_class`
+in `invariants.rs`), so the fix does the same (+3 −1 in `codegen.rs`):
+
+```rust
+with_vm_lock(src_loc!(), || {
+    get_or_create_iseq_payload(iseq_raw.as_iseq()).exited_for_block_arg_refinements = true;
+});
+```
+
+No Ractor test: an unlocked write of a bool fails no assertion deterministically, so a test would not catch the
+missing lock. [`ractor_refined_probe.rb`](../../bench/upstream/zs1/round5/ractor_refined_probe.rb) runs the refined
+send from two Ractors (5 `exit_block_arg_refinements` at threshold 1): identical to the interpreter at thresholds 1, 2
+and default, and 20 of 20 runs at threshold 1.
+
+Verification (dev build, x86-64): `make zjit-test` 2,051 of 2,052 (SIGPROF test only); `make btest` at thresholds 1
+and 2 2,148 of 2,148; `zs1_probe.rb` identical at threshold 1, threshold 2 with one profile, default and `N=40`; the
+round-2 and round-3 Opus probes identical; `refined_method_cost.rb` 4 compiled, 5 exits, no `no_side_exits` fallback
+(`MOD=plain` 1 and 0), as in round 4.
+
+Not touched, as asked: `exit_recompile`'s fast path (`codegen.rs`, before its `with_vm_lock`) also takes `&mut` to the
+payload without the lock. It reads `payload.versions` (a `Vec` that a compile in another Ractor pushes to under the
+lock, so the read can race with a reallocation) and decrements `num_exits_until_invalidate` non-atomically (a lost
+update only delays the invalidation). That is master's code and the same contract question, for a separate change.
