@@ -27,12 +27,23 @@ file, receipt = ARGV.fetch(0), ARGV[1]
 # a setup block runs). Code the file runs itself is the app's, as in a test.
 unless ENV["LOWRAIL_PROFILE_ALLOW_WRITES"] == "1"
   if Rails.env.production?
+    # Every writable database: database_tasks: false only skips Rails' tasks
+    # (configs_for hides it by default), a replica takes no writes. Active
+    # Record is not loaded for this; before it is, its raw configuration.
     configs = if (base = Lowrail.loaded_constant("ActiveRecord::Base"))
-      base.configurations.configs_for(env_name: Rails.env).map(&:configuration_hash)
-    else
-      config = (Rails.application.config.database_configuration[Rails.env] rescue nil) || {}
+      base.configurations.configs_for(env_name: Rails.env, include_hidden: true).map(&:configuration_hash)
+    elsif File.exist?(Rails.root.join("config/database.yml")) || ENV["DATABASE_URL"]
+      begin
+        config = Rails.application.config.database_configuration[Rails.env] || {}
+      rescue StandardError => e
+        abort "lowrail-profile: RAILS_ENV=production and its database configuration did not load (#{e.message}); " \
+          "--workloads sends real requests, so it needs --allow-writes there"
+      end
       config.key?("adapter") || config.key?("url") ? [config] : config.values.grep(Hash)
+    else
+      []
     end
+    configs = configs.reject { _1[:replica] || _1["replica"] }
     hosts = configs.map { |c| c[:host] || c["host"] || ((url = c[:url] || c["url"]) && (URI(url).host rescue url)) }
     hosts << URI(ENV["DATABASE_URL"]).host if ENV["DATABASE_URL"]
     remote = hosts.compact.map(&:to_s).reject { _1.empty? || _1.start_with?("/") || %w[localhost 127.0.0.1 ::1 [::1]].include?(_1) }

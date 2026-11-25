@@ -644,6 +644,54 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # In production, a writable database on another machine refuses --workloads
+  # before the file runs: also one with database_tasks: false (configs_for hides
+  # it), not a replica, whether or not Active Record is loaded yet (it is not
+  # loaded for this), and a configuration that does not load is no answer.
+  def test_workloads_refuse_a_remote_production_database
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "bin/rails" => "#!#{RUBY}\nabort unless ARGV.shift == \"runner\"\nscript = ARGV.shift\nrequire_relative \"../config/environment\"\nload script\n",
+        "config/environment.rb" => <<~'RUBY',
+          require "logger"
+          require "rails"
+          require "active_record/railtie"
+          require "action_controller/railtie"
+          class FixtureApp < Rails::Application
+            config.root = File.expand_path("..", __dir__)
+            config.eager_load = false
+            config.logger = Logger.new(nil)
+            config.secret_key_base = "x" * 64
+            config.active_support.deprecation = :silence
+          end
+          Rails.application.initialize!
+          ActiveRecord::Base if ENV["LOAD_BASE"]
+        RUBY
+        "lowrail/workloads.rb" => "warn(ActiveRecord.autoload?(:Base) ? \"BASE UNLOADED\" : \"BASE LOADED\")\nabort \"EVALUATED\"\n")
+      File.chmod(0o755, File.join(dir, "bin/rails"))
+      secondary = ->(extra) { "production:\n  primary:\n    adapter: sqlite3\n    database: \":memory:\"\n  analytics:\n" \
+        "    adapter: postgresql\n    host: db.example.invalid\n    database: analytics\n    #{extra}\n" }
+      [nil, "1"].each do |load_base|
+        env = { "RAILS_ENV" => "production", "LOAD_BASE" => load_base }
+        File.write(File.join(dir, "config/database.yml"), secondary.("database_tasks: false"))
+        _, err, status = profile(dir, "--out", "w", "--workloads", env: env)
+        refute status.success?
+        assert_match(/database on db\.example\.invalid; --workloads sends real requests, so it needs --allow-writes there/, err)
+        refute_match(/EVALUATED/, err, "refused before the file runs (LOAD_BASE=#{load_base.inspect})")
+        File.write(File.join(dir, "config/database.yml"), secondary.("replica: true"))
+        _, err, = profile(dir, "--out", "w", "--workloads", env: env)
+        assert_match(/EVALUATED/, err, "a replica takes no writes")
+        assert_match(load_base ? /BASE LOADED/ : /BASE UNLOADED/, err)
+      end
+      File.write(File.join(dir, "config/database.yml"), "production:\n  adapter: <%= raise \"no secret\" %>\n")
+      _, err, status = profile(dir, "--out", "w", "--workloads", env: { "RAILS_ENV" => "production" })
+      refute status.success?
+      assert_match(/database configuration did not load \(.*no secret\)/m, err)
+      refute_match(/EVALUATED/, err)
+    end
+  end
+
   # A counter of another version is refused before anything is hooked, and a
   # framework hook that cannot be installed (into a frozen class) leaves the
   # app's load as it was.
