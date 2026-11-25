@@ -1,0 +1,6 @@
+## Fresh app, Ruby 4.0.7 / Rails 8.1.4.1, 2 workers
+unchanged: 24, planted: 0
+aa1 (300 sampled base assignments): false alarms, one compare 40 of 6600 (0.61%), CI job 160 of 138600 (0.12%); rows: path/pattern.rb:77 40; median floor: line 1.0, action 20.0 (6.1% of the action), 6 actions not compared
+aa1-all (300 sampled base assignments): false alarms, one compare 57 of 6600 (0.86%), CI job 160 of 138600 (0.12%); rows: path/pattern.rb:77 40, WidgetsController#show 17, WidgetsController#create 4; median floor: line 1.0, action 20.0 (20.3% of the action), 0 actions not compared
+k3 (300 sampled base assignments): false alarms, one compare 5 of 6300 (0.08%), CI job 20 of 126000 (0.02%); rows: path/pattern.rb:77 5; median floor: line 1.0, action 20.0 (6.1% of the action), 6 actions not compared
+k3-all (300 sampled base assignments): false alarms, one compare 5 of 6300 (0.08%), CI job 20 of 126000 (0.02%); rows: path/pattern.rb:77 5; median floor: line 1.0, action 20.0 (29.0% of the action), 0 actions not compared

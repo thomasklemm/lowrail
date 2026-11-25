@@ -1,7 +1,8 @@
 # lowrail-profile 0.1: the compare gate on parallel suites (design note)
 
-Status: proposal for decision, 2026-11-25. Nothing in it is implemented; T1, T2 and T4 of the field test are fixed
-on main independently. Covers T3, T5 and T6 (false alarms), T7 (report size) and T8 (hangs) from the OSS field test.
+Status: decided 2026-11-25 (one-process gate if the serial captures hold, otherwise no gate in 0.1); the serial
+captures are in (below): Hackatime does not hold. On main: compare refuses captures of several processes (exit 2),
+T7's run deletion and path table, T8's `--timeout`. T1, T2 and T4 of the field test are fixed independently. Covers T3, T5 and T6 (false alarms), T7 (report size) and T8 (hangs) from the OSS field test.
 Numbers: [bench/upstream/profile_release/2026-11-25-t3](../bench/upstream/profile_release/2026-11-25-t3/README.md).
 
 ## Why one A/A pair breaks on parallel suites
@@ -36,17 +37,23 @@ both comparisons for the CI job (head profiled again on exit 1).
 | App (captures) | Today: one A/A pair | Three base captures | Actions on *all* | One process per capture |
 | --- | --- | --- | --- | --- |
 | Blog, 1 process (12 + 3 planted) | 1.67% / 0.03%, plants 100% | 0.25% / 0%, plants 100% | 1.89% / 0.03% | (already one process) |
-| Fresh app, 2 workers (24) | 0.82% / 0.16% | pending | pending | 0% / 0% (12 captures) |
+| Fresh app, 2 workers (24) | 0.82% / 0.16% (all assignments) | 0.08% / 0.02% | 0.86% / 0.12% | 0% / 0% (12 captures) |
 | Campfire, 8 workers (3 + 2) | 0 of 6, plants 12 of 12 | too few captures | 0 of 6 | 8.3% / 0% (2 of 24, one action), k3 0 of 4; plants 100% |
 | CodeTriage, Lobsters, 1 process (3 + 2 each) | 0 of 6, plants 100% | too few captures | 0 of 6 | (already one process) |
-| OSM, 8 workers (4) | 79% / 67% | 1 of 4 | 83% / 67% | being captured (5 serial captures, about 2 h) |
-| Hackatime, 2 workers (6 + 2) | 52.5% / 34.4%, plant 17% / 7% | 20% / 6.7%, plant 2.5% / 0% | 67% / 47% | being captured |
-| Writebook, 16 workers (6 + 2) | 26.7% / 11.7%, plant 0% | 5% / 0%, plant 0% | 50% / 26% | being captured |
+| OSM, 8 workers (4) | 79% / 67% | 1 of 4 | 83% / 67% | 0 of 24 / 0 of 24, plant 12 of 12 (4 + 1 planted, about 9.5 min each) |
+| Hackatime, 2 workers (6 + 2) | 52.5% / 34.4%, plant 17% / 7% | 20% / 6.7%, plant 2.5% / 0% | 67% / 47% | **12.5% / 4.4%, plant 52% / 50%**; three base captures 3.3% / 1.7%, plant 40% |
+| Writebook, 16 workers (6 + 2) | 26.7% / 11.7%, plant 0% | 5% / 0%, plant 0% | 50% / 26% | 0% / 0%, plant 100% / 100% (plant in `SessionsController#create`) |
 | Writebook, 4 workers (6 + 2) | 2.5% / 0.56%, plant 0% | 0% / 0%, plant 0% | 11.7% / 3.3% | |
 
 Each cell gives false alarms for one compare / the CI job. Writebook's plant is in `BooksController#index`, which
-runs once per worker and so has no warm value. Its line rows move +0.4 against a floor of 1.0. A second Writebook
-plant, in an action that repeats, is being captured.
+runs once per worker and so has no warm value. Its line rows move +0.4 against a floor of 1.0. The serial captures
+plant `SessionsController#create` instead (64 requests per run): +55 against a floor of 20 of 1,607.
+
+**Hackatime in one process.** Its false alarms are not the split: `Admin::AdminUsersController#index` (6 requests)
+reads about 14,700–14,730 or 14,785–14,817 warm objects per request by capture, a 0.7% move the same code makes
+with other data, and one A/A pair often sees only one of the two values. The plant adds +40–60 to
+`LeaderboardsController#index`, whose unchanged captures read 7,882–7,916, so it is about twice the noise and
+found half the time.
 
 * **A. One process per capture** (`PARALLEL_WORKERS=1`, and compare refuses captures of several processes with exit
   2): the split disappears, and the order is the seed's. Where measured, false alarms are at or near zero and the
@@ -85,8 +92,9 @@ plant, in an action that repeats, is being captured.
 processes, naming `PARALLEL_WORKERS=1` (the T3 change, held back as [t3-held-compare.patch](../bench/upstream/profile_release/2026-11-25-t3/t3-held-compare.patch): its test fails without it).
 The README's CI job sets `PARALLEL_WORKERS: 1` and states the suite-time cost. Parallel captures stay useful as a
 report and as compare without `--aa`. B is an optional later improvement on one-process captures (the Blog 1.67% →
-0.25%), not a fix for parallel ones. This depends on the serial OSM, Hackatime and Writebook captures, which are
-running. If they still show false alarms, the fallback is F alone: no gate in 0.1.
+0.25%), not a fix for parallel ones. This depended on the serial captures. OSM and Writebook hold (0 false alarms,
+every plant caught); Hackatime does not (12.5% / 4.4%), above the Blog's 1.67% / 0.03% and the fresh app's 0 / 0.
+By the decision, 0.1 therefore ships without a gate: compare is a report.
 
 ## T7: report size and memory
 

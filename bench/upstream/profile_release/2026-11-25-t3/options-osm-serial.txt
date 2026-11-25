@@ -1,0 +1,6 @@
+## openstreetmap-website, PARALLEL_WORKERS=1
+unchanged: 4, planted: 1
+aa1: false alarms, one compare 0 of 24 (0.00%), CI job 0 of 24 (0.00%); plant caught, one compare 12 of 12 (100.00%); plant rows (s1+s2 vs s5): NotesController#index +168.5 floor 26.6 of 26402, Api::NotesController#index +1.0 floor 20.0 of 3360; median floor: line 1.0, action 20.0 (0.5% of the action), 29 actions not compared
+aa1-all: false alarms, one compare 0 of 24 (0.00%), CI job 0 of 24 (0.00%); plant caught, one compare 12 of 12 (100.00%); plant rows (s1+s2 vs s5): NotesController#index +170.2 floor 25.3 of 25157, Api::NotesController#index +0.9 floor 20.0 of 3452; median floor: line 1.0, action 20.0 (0.4% of the action), 0 actions not compared
+k3: false alarms, one compare 0 of 4 (0.00%); plant caught, one compare 4 of 4 (100.00%); plant rows (s1+s2+s3 vs s5): NotesController#index +168.2 floor 26.6 of 26402, Api::NotesController#index +0.2 floor 20.0 of 3361; median floor: line 1.0, action 20.0 (0.5% of the action), 29 actions not compared
+k3-all: false alarms, one compare 0 of 4 (0.00%); plant caught, one compare 4 of 4 (100.00%); plant rows (s1+s2+s3 vs s5): NotesController#index +170.0 floor 25.3 of 25158, Api::NotesController#index +0.1 floor 20.0 of 3453; median floor: line 1.0, action 20.0 (0.4% of the action), 0 actions not compared
