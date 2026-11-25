@@ -37,6 +37,27 @@ passes:
       contribution rules, 3,624,517 integer comparisons, QR parity, suites, mutants,
       complexity metrics and bounded allocation replay are recorded below For Thomas.
       No upstream changes, PR, comment or push. Evidence metadata added in this pass.
+  - reviewer: thermos-sol
+    head: "16d8339f455d3a1e15fb5b6860f22ef5cf6b82da"
+    orb: "T-01a214c3-baff-7000-a8d1-372fff9f406c"
+    date: 2026-11-25
+    verdict: approve
+    open: >-
+      Delta-only confirm under both rubrics against 51c099c822bf9c98cec301a350b5b21b0a84960f;
+      no must-fix or nit remains. Same parent ca75f7a55a29ecb990fc70f1a372a5c9724ae02d,
+      unchanged lib/ byte for byte, only two test assertions and the Unreleased
+      CHANGELOG entry added. R1 body exactly equals the prior proposed replacement;
+      commit prose now says mask construction allocates temporary Bignums, uses the
+      exclusive bound below 2**ARCH_BITS, and scopes equivalence to QR integer calls.
+      No speculative type guards, added comments or structural regression. R2 actual
+      test passes all five assertions against the base formula at widths 32/64;
+      inclusive-limit and modulo-width-count mutants are now killed at both widths.
+      R3 changelog uses the requested one-line entry. Independently reran rake test:
+      103 runs, 2,857 assertions, zero failures/errors/skips at each width; StandardRB
+      32 files, no offenses. Thomas author/committer, empty trailers, diff --check
+      clean, fork branch matches this full head. Previous runtime/QR and objects-only
+      evidence carries because runtime is identical; no benchmark rerun or expanded
+      claim, and prior non-QR boundaries remain accepted. No upstream writes.
 ---
 
 # Skip the Bignum mask in rszf when it cannot change the result
