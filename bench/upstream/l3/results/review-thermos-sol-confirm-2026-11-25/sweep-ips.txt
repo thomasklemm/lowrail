@@ -1,0 +1,234 @@
+=== main round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.986k i/100ms
+             w6 for_database    36.182k i/100ms
+           w100 Marshal.dump     1.402k i/100ms
+           w100 for_database     3.107k i/100ms
+           w300 Marshal.dump   513.000 i/100ms
+           w300 for_database     1.054k i/100ms
+          w1500 Marshal.dump   102.000 i/100ms
+          w1500 for_database   216.000 i/100ms
+      w6 Marshal 1MiB string   382.000 i/100ms
+w6 serialize 1MiB every call    86.000 i/100ms
+     w1500 cold for_database    59.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    104.627k (± 8.3%) i/s    (9.56 μs/i) -    164.790k in   1.575020s
+             w6 for_database    400.178k (± 8.7%) i/s    (2.50 μs/i) -    615.094k in   1.537051s
+           w100 Marshal.dump     13.603k (± 3.7%) i/s   (73.51 μs/i) -     21.030k in   1.546002s
+           w100 for_database     29.366k (± 9.0%) i/s   (34.05 μs/i) -     46.605k in   1.587062s
+           w300 Marshal.dump      4.739k (± 9.9%) i/s  (211.03 μs/i) -      7.695k in   1.623914s
+           w300 for_database      9.588k (± 9.8%) i/s  (104.30 μs/i) -     14.756k in   1.539084s
+          w1500 Marshal.dump      1.008k (± 3.1%) i/s  (991.68 μs/i) -      1.530k in   1.517272s
+          w1500 for_database      2.101k (± 2.0%) i/s  (476.03 μs/i) -      3.240k in   1.542321s
+      w6 Marshal 1MiB string      4.014k (± 8.4%) i/s  (249.15 μs/i) -      6.112k in   1.522813s
+w6 serialize 1MiB every call      1.643k (± 4.3%) i/s  (608.82 μs/i) -      2.494k in   1.518402s
+     w1500 cold for_database    595.038 (± 5.5%) i/s    (1.68 ms/i) -    944.000 in   1.586454s
+=== confirm round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump     9.542k i/100ms
+             w6 for_database    85.239k i/100ms
+           w100 Marshal.dump     1.813k i/100ms
+           w100 for_database     6.417k i/100ms
+           w300 Marshal.dump   665.000 i/100ms
+           w300 for_database     2.099k i/100ms
+          w1500 Marshal.dump   136.000 i/100ms
+          w1500 for_database   284.000 i/100ms
+      w6 Marshal 1MiB string   416.000 i/100ms
+w6 serialize 1MiB every call    99.000 i/100ms
+     w1500 cold for_database    59.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    125.110k (± 7.6%) i/s    (7.99 μs/i) -    190.840k in   1.525377s
+             w6 for_database    835.688k (± 6.9%) i/s    (1.20 μs/i) -      1.279M in   1.529979s
+           w100 Marshal.dump     17.952k (± 3.3%) i/s   (55.70 μs/i) -     27.195k in   1.514866s
+           w100 for_database     60.988k (± 9.7%) i/s   (16.40 μs/i) -     96.255k in   1.578259s
+           w300 Marshal.dump      6.355k (± 8.6%) i/s  (157.36 μs/i) -      9.975k in   1.569663s
+           w300 for_database     20.540k (± 9.9%) i/s   (48.68 μs/i) -     31.485k in   1.532833s
+          w1500 Marshal.dump      1.379k (± 1.4%) i/s  (725.14 μs/i) -      2.176k in   1.577897s
+          w1500 for_database      4.364k (± 1.7%) i/s  (229.15 μs/i) -      6.816k in   1.561909s
+      w6 Marshal 1MiB string      4.229k (± 5.5%) i/s  (236.45 μs/i) -      6.656k in   1.573832s
+w6 serialize 1MiB every call      1.676k (± 3.4%) i/s  (596.58 μs/i) -      2.574k in   1.535589s
+     w1500 cold for_database    714.910 (± 6.2%) i/s    (1.40 ms/i) -      1.121k in   1.568028s
+=== main2 round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.581k i/100ms
+             w6 for_database    40.198k i/100ms
+           w100 Marshal.dump     1.385k i/100ms
+           w100 for_database     2.886k i/100ms
+           w300 Marshal.dump   513.000 i/100ms
+           w300 for_database     1.048k i/100ms
+          w1500 Marshal.dump   104.000 i/100ms
+          w1500 for_database   210.000 i/100ms
+      w6 Marshal 1MiB string    80.000 i/100ms
+w6 serialize 1MiB every call    90.000 i/100ms
+     w1500 cold for_database    58.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    106.868k (± 6.5%) i/s    (9.36 μs/i) -    169.296k in   1.584160s
+             w6 for_database    394.975k (± 6.5%) i/s    (2.53 μs/i) -    602.970k in   1.526604s
+           w100 Marshal.dump     12.825k (± 8.6%) i/s   (77.97 μs/i) -     19.390k in   1.511910s
+           w100 for_database     28.218k (±10.6%) i/s   (35.44 μs/i) -     43.290k in   1.534129s
+           w300 Marshal.dump      4.751k (± 7.2%) i/s  (210.50 μs/i) -      7.695k in   1.619789s
+           w300 for_database     10.059k (±10.5%) i/s   (99.41 μs/i) -     15.720k in   1.562720s
+          w1500 Marshal.dump      1.035k (± 2.2%) i/s  (966.41 μs/i) -      1.560k in   1.507595s
+          w1500 for_database      2.050k (± 2.5%) i/s  (487.86 μs/i) -      3.150k in   1.536756s
+      w6 Marshal 1MiB string      4.101k (±17.5%) i/s  (243.84 μs/i) -      6.160k in   1.502077s
+w6 serialize 1MiB every call      1.629k (± 3.2%) i/s  (613.82 μs/i) -      2.520k in   1.546832s
+     w1500 cold for_database    609.263 (± 6.2%) i/s    (1.64 ms/i) -    928.000 in   1.523152s
+=== confirm round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    12.869k i/100ms
+             w6 for_database    88.357k i/100ms
+           w100 Marshal.dump     1.873k i/100ms
+           w100 for_database     6.463k i/100ms
+           w300 Marshal.dump   675.000 i/100ms
+           w300 for_database     2.146k i/100ms
+          w1500 Marshal.dump   126.000 i/100ms
+          w1500 for_database   383.000 i/100ms
+      w6 Marshal 1MiB string   411.000 i/100ms
+w6 serialize 1MiB every call    90.000 i/100ms
+     w1500 cold for_database    63.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    121.736k (± 4.7%) i/s    (8.21 μs/i) -    193.035k in   1.585687s
+             w6 for_database    817.177k (± 2.7%) i/s    (1.22 μs/i) -      1.237M in   1.513746s
+           w100 Marshal.dump     17.359k (± 7.6%) i/s   (57.61 μs/i) -     26.222k in   1.510579s
+           w100 for_database     58.380k (±13.0%) i/s   (17.13 μs/i) -     90.482k in   1.549881s
+           w300 Marshal.dump      6.296k (± 6.6%) i/s  (158.83 μs/i) -      9.450k in   1.500904s
+           w300 for_database     20.379k (±10.5%) i/s   (49.07 μs/i) -     32.190k in   1.579582s
+          w1500 Marshal.dump      1.378k (± 1.2%) i/s  (725.85 μs/i) -      2.142k in   1.554770s
+          w1500 for_database      4.215k (± 5.4%) i/s  (237.26 μs/i) -      6.511k in   1.544786s
+      w6 Marshal 1MiB string      3.362k (± 6.5%) i/s  (297.41 μs/i) -      5.343k in   1.589058s
+w6 serialize 1MiB every call      1.661k (± 2.3%) i/s  (601.91 μs/i) -      2.520k in   1.516821s
+     w1500 cold for_database    626.636 (± 9.9%) i/s    (1.60 ms/i) -    945.000 in   1.508052s
+=== main2 round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.794k i/100ms
+             w6 for_database    39.511k i/100ms
+           w100 Marshal.dump     1.413k i/100ms
+           w100 for_database     3.121k i/100ms
+           w300 Marshal.dump   515.000 i/100ms
+           w300 for_database     1.082k i/100ms
+          w1500 Marshal.dump   105.000 i/100ms
+          w1500 for_database   219.000 i/100ms
+      w6 Marshal 1MiB string    78.000 i/100ms
+w6 serialize 1MiB every call    90.000 i/100ms
+     w1500 cold for_database    59.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    108.796k (± 7.3%) i/s    (9.19 μs/i) -    172.704k in   1.587416s
+             w6 for_database    402.909k (± 4.1%) i/s    (2.48 μs/i) -    632.176k in   1.569028s
+           w100 Marshal.dump     13.584k (± 3.9%) i/s   (73.61 μs/i) -     21.195k in   1.560263s
+           w100 for_database     29.212k (± 8.9%) i/s   (34.23 μs/i) -     46.815k in   1.602580s
+           w300 Marshal.dump      4.896k (± 5.6%) i/s  (204.26 μs/i) -      7.725k in   1.577917s
+           w300 for_database     10.192k (±10.8%) i/s   (98.11 μs/i) -     16.230k in   1.592406s
+          w1500 Marshal.dump      1.027k (± 4.3%) i/s  (973.90 μs/i) -      1.575k in   1.533891s
+          w1500 for_database      2.066k (± 9.8%) i/s  (483.94 μs/i) -      3.285k in   1.589758s
+      w6 Marshal 1MiB string      3.568k (± 6.5%) i/s  (280.27 μs/i) -      5.382k in   1.508420s
+w6 serialize 1MiB every call      1.652k (± 2.5%) i/s  (605.22 μs/i) -      2.520k in   1.525143s
+     w1500 cold for_database    626.335 (± 5.3%) i/s    (1.60 ms/i) -    944.000 in   1.507181s
+=== main round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.830k i/100ms
+             w6 for_database    40.430k i/100ms
+           w100 Marshal.dump     1.405k i/100ms
+           w100 for_database     3.098k i/100ms
+           w300 Marshal.dump   508.000 i/100ms
+           w300 for_database     1.070k i/100ms
+          w1500 Marshal.dump   105.000 i/100ms
+          w1500 for_database   203.000 i/100ms
+      w6 Marshal 1MiB string    74.000 i/100ms
+w6 serialize 1MiB every call    90.000 i/100ms
+     w1500 cold for_database    60.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    108.066k (± 4.2%) i/s    (9.25 μs/i) -    162.450k in   1.503251s
+             w6 for_database    406.536k (± 4.5%) i/s    (2.46 μs/i) -    646.880k in   1.591200s
+           w100 Marshal.dump     13.450k (± 2.9%) i/s   (74.35 μs/i) -     21.075k in   1.566917s
+           w100 for_database     28.461k (± 9.4%) i/s   (35.14 μs/i) -     43.372k in   1.523918s
+           w300 Marshal.dump      4.894k (± 5.7%) i/s  (204.35 μs/i) -      7.620k in   1.557156s
+           w300 for_database      9.565k (±13.3%) i/s  (104.54 μs/i) -     14.980k in   1.566070s
+          w1500 Marshal.dump    999.546 (± 3.4%) i/s    (1.00 ms/i) -      1.575k in   1.575715s
+          w1500 for_database      2.060k (± 7.5%) i/s  (485.34 μs/i) -      3.248k in   1.576394s
+      w6 Marshal 1MiB string      3.582k (±10.8%) i/s  (279.14 μs/i) -      5.402k in   1.507927s
+w6 serialize 1MiB every call      1.720k (± 3.5%) i/s  (581.38 μs/i) -      2.610k in   1.517392s
+     w1500 cold for_database    599.678 (± 8.2%) i/s    (1.67 ms/i) -    960.000 in   1.600859s
+=== main2 round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.897k i/100ms
+             w6 for_database    39.978k i/100ms
+           w100 Marshal.dump     1.393k i/100ms
+           w100 for_database     3.172k i/100ms
+           w300 Marshal.dump   514.000 i/100ms
+           w300 for_database     1.092k i/100ms
+          w1500 Marshal.dump   104.000 i/100ms
+          w1500 for_database   216.000 i/100ms
+      w6 Marshal 1MiB string   416.000 i/100ms
+w6 serialize 1MiB every call    92.000 i/100ms
+     w1500 cold for_database    60.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    104.888k (± 7.4%) i/s    (9.53 μs/i) -    163.455k in   1.558376s
+             w6 for_database    404.974k (± 2.3%) i/s    (2.47 μs/i) -    639.648k in   1.579481s
+           w100 Marshal.dump     13.018k (± 8.9%) i/s   (76.82 μs/i) -     20.895k in   1.605111s
+           w100 for_database     29.262k (± 8.5%) i/s   (34.17 μs/i) -     44.408k in   1.517576s
+           w300 Marshal.dump      4.851k (± 8.5%) i/s  (206.14 μs/i) -      7.710k in   1.589373s
+           w300 for_database      9.173k (±18.6%) i/s  (109.02 μs/i) -     15.288k in   1.666652s
+          w1500 Marshal.dump      1.036k (± 1.8%) i/s  (965.66 μs/i) -      1.560k in   1.506423s
+          w1500 for_database      2.183k (± 1.1%) i/s  (458.00 μs/i) -      3.456k in   1.582850s
+      w6 Marshal 1MiB string      3.694k (± 3.1%) i/s  (270.73 μs/i) -      5.824k in   1.576720s
+w6 serialize 1MiB every call      1.656k (± 4.3%) i/s  (603.85 μs/i) -      2.484k in   1.499956s
+     w1500 cold for_database    633.827 (± 3.8%) i/s    (1.58 ms/i) -    960.000 in   1.514609s
+=== main round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump    10.257k i/100ms
+             w6 for_database    39.867k i/100ms
+           w100 Marshal.dump     1.409k i/100ms
+           w100 for_database     3.132k i/100ms
+           w300 Marshal.dump   515.000 i/100ms
+           w300 for_database     1.087k i/100ms
+          w1500 Marshal.dump    87.000 i/100ms
+          w1500 for_database   214.000 i/100ms
+      w6 Marshal 1MiB string    77.000 i/100ms
+w6 serialize 1MiB every call    87.000 i/100ms
+     w1500 cold for_database    59.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    107.334k (± 5.8%) i/s    (9.32 μs/i) -    164.112k in   1.528984s
+             w6 for_database    414.716k (± 1.8%) i/s    (2.41 μs/i) -    637.872k in   1.538093s
+           w100 Marshal.dump     13.565k (± 2.9%) i/s   (73.72 μs/i) -     21.135k in   1.558054s
+           w100 for_database     29.220k (±10.0%) i/s   (34.22 μs/i) -     43.848k in   1.500630s
+           w300 Marshal.dump      4.938k (± 5.5%) i/s  (202.50 μs/i) -      7.725k in   1.564347s
+           w300 for_database     10.056k (±11.4%) i/s   (99.45 μs/i) -     15.218k in   1.513381s
+          w1500 Marshal.dump      1.043k (± 2.6%) i/s  (959.12 μs/i) -      1.566k in   1.501986s
+          w1500 for_database      2.196k (± 2.5%) i/s  (455.40 μs/i) -      3.424k in   1.559275s
+      w6 Marshal 1MiB string      3.450k (± 7.9%) i/s  (289.87 μs/i) -      5.236k in   1.517784s
+w6 serialize 1MiB every call      1.637k (± 4.0%) i/s  (610.97 μs/i) -      2.523k in   1.541477s
+     w1500 cold for_database    595.301 (± 4.2%) i/s    (1.68 ms/i) -    944.000 in   1.585754s
+=== confirm round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             w6 Marshal.dump     9.923k i/100ms
+             w6 for_database    73.245k i/100ms
+           w100 Marshal.dump     1.628k i/100ms
+           w100 for_database     4.984k i/100ms
+           w300 Marshal.dump   575.000 i/100ms
+           w300 for_database     1.625k i/100ms
+          w1500 Marshal.dump   121.000 i/100ms
+          w1500 for_database   335.000 i/100ms
+      w6 Marshal 1MiB string    78.000 i/100ms
+w6 serialize 1MiB every call   107.000 i/100ms
+     w1500 cold for_database    59.000 i/100ms
+Calculating -------------------------------------
+             w6 Marshal.dump    121.635k (± 9.5%) i/s    (8.22 μs/i) -    188.537k in   1.550029s
+             w6 for_database    737.705k (± 5.9%) i/s    (1.36 μs/i) -      1.172M in   1.588602s
+           w100 Marshal.dump     16.267k (± 7.2%) i/s   (61.47 μs/i) -     24.420k in   1.501198s
+           w100 for_database     46.334k (± 9.6%) i/s   (21.58 μs/i) -     69.776k in   1.505942s
+           w300 Marshal.dump      5.448k (±11.8%) i/s  (183.56 μs/i) -      8.625k in   1.583177s
+           w300 for_database     14.983k (±12.2%) i/s   (66.74 μs/i) -     22.750k in   1.518432s
+          w1500 Marshal.dump      1.168k (± 8.2%) i/s  (856.08 μs/i) -      1.815k in   1.553787s
+          w1500 for_database      3.251k (± 4.1%) i/s  (307.58 μs/i) -      5.025k in   1.545606s
+      w6 Marshal 1MiB string      3.812k (± 6.6%) i/s  (262.32 μs/i) -      5.772k in   1.514094s
+w6 serialize 1MiB every call      1.588k (± 7.1%) i/s  (629.54 μs/i) -      2.461k in   1.549296s
+     w1500 cold for_database    718.541 (± 7.4%) i/s    (1.39 ms/i) -      1.121k in   1.560105s

@@ -1,0 +1,3 @@
+body: 2 operations x 3 trees x 6 rounds; complete
+sweep: 11 operations x 3 trees x 3 rounds; complete
+worst: 1 operations x 3 trees x 3 rounds; complete

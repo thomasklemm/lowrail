@@ -1,0 +1,14 @@
+/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/support/connection.rb:16:in 'ARTest.ractor_proxy?': undefined method 'end_with?' for nil (NoMethodError)
+
+    connection_name.end_with?("_ractor")
+                   ^^^^^^^^^^
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/support/connection.rb:51:in 'ARTest.connect'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/cases/test_case.rb:373:in '<class:TestCase>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/cases/test_case.rb:22:in '<module:ActiveRecord>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/cases/test_case.rb:18:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/cases/helper.rb:8:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review/confirm/activerecord/test/cases/attribute_methods_test.rb:3:in '<main>'

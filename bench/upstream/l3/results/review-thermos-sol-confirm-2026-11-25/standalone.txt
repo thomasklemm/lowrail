@@ -1,0 +1,6 @@
+=== main
+active_model OK
+active_record OK
+=== confirm
+active_model OK
+active_record OK

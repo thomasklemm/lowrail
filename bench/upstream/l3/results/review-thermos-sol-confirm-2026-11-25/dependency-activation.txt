@@ -1,0 +1,14 @@
+=== main
+=== confirm
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/settings.rb:231:in 'Bundler::Settings#processor_count'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/settings.rb:309:in 'Bundler::Settings#installation_parallelization'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:1170:in 'Bundler::Definition#preload_git_source_worker'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:1185:in 'Bundler::Definition#preload_git_sources'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:1203:in 'Bundler::Definition#find_source_requirements'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:1166:in 'Bundler::Definition#source_requirements'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:1311:in 'Bundler::Definition#new_resolution_base'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:678:in 'Bundler::Definition#resolution_base'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:660:in 'Bundler::Definition#resolver'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:779:in 'Bundler::Definition#start_resolution'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:361:in 'Bundler::Definition#resolve'
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundler/definition.rb:691:in 'Bundler::Definition#materialize'

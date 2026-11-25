@@ -1,0 +1,150 @@
+      def attributes
+        materialize
+
+        row = IndexedRow.unset_row(indexes.size)
+        @attributes&.each_with_index { |attr, i| row[i] = attr if attr }
+        IndexedRow::Mutable.new(indexes, row)
+      end
+
+      # Replaces each cached attribute with the block's result. Only for
+      def attributes
+        build_attributes if @attributes.is_a?(Hash)
+        @attributes
+      end
+
+    private
+      #: (String) -> ActiveModel::Attribute?
+      def lookup(name)
+        attributes[name]
+
+    #: (String) -> ActiveModel::Attribute
+    def [](name)
+      lookup(name) || default_attribute(name)
+    end
+
+    #: (String, ActiveModel::Attribute) -> ActiveModel::Attribute
+    def []=(name, value)
+      store(name, value)
+    end
+
+    def cast_types
+      attributes.transform_values(&:type)
+    end
+
+    def values_before_type_cast
+      attributes.transform_values(&:value_before_type_cast)
+    end
+
+    def values_for_database
+      attributes.transform_values(&:value_for_database)
+    end
+
+    def to_hash
+      hash = {}
+      attributes.each_pair { |name, attribute| hash[name] = attribute.value if attribute.initialized? }
+      hash
+    end
+    alias :to_h :to_hash
+
+    def key?(name)
+      attributes.key?(name) && self[name].initialized?
+    end
+    alias :include? :key?
+
+    def keys
+      #: () -> ActiveModel::IndexedRow::Mutable
+      def attributes
+        materialize
+
+        row = IndexedRow.unset_row(indexes.size)
+        @attributes&.each_with_index { |attr, i| row[i] = attr if attr }
+        IndexedRow::Mutable.new(indexes, row)
+      end
+
+      # Replaces each cached attribute with the block's result. Only for
+      # fresh copies, since it modifies +@attributes+ in place. The new
+      # attributes may hold new values, so their slots are uncast.
+      #: () { (ActiveModel::Attribute) -> ActiveModel::Attribute } -> self
+      def transform_attributes!
+        return self unless @attributes
+
+        size = @casted_values.size
+        @attributes.each_with_index do |attr, i|
+          next unless attr
+
+          @attributes[i] = yield(attr)
+          @casted_values[i] = UNCAST if i < size
+        end
+        self
+      end
+
+    private
+      #: () -> void
+      def materialize
+        unless @materialized
+          row_keys.each { |key| self[key] }
+          @ctx.type_keys.each { |key| self[key] }
+          @materialized = true
+        end
+      end
+
+      # +indexes+ has every name the set can hold, so a name without an
+      # index isn't an attribute.
+      #: (String) -> Integer?
+      def index_for_name(name)
+        indexes[name]
+      end
+
+      #: (Integer) -> ActiveModel::Attribute?
+      def lookup(index)
+        @attributes&.[](index)
+      end
+
+      # The attribute now holds the value, so the cast value is dropped.
+      #: (Integer, ActiveModel::Attribute) -> ActiveModel::Attribute
+      def store(index, attribute)
+        (@attributes ||= Array.new(indexes.size))[index] = attribute
+        @casted_values[index] = UNCAST if index < @casted_values.size
+        attribute
+      end
+
+
+      # Returns a hash of attributes before typecasting and deserialization.
+      #
+      # ```
+      # class Task < ActiveRecord::Base
+      # end
+      #
+      # task = Task.new(title: nil, is_done: true, completed_on: '2012-10-21')
+      # task.attributes
+      # # => {"id"=>nil, "title"=>nil, "is_done"=>true, "completed_on"=>Sun, 21 Oct 2012, "created_at"=>nil, "updated_at"=>nil}
+      # task.attributes_before_type_cast
+      # # => {"id"=>nil, "title"=>nil, "is_done"=>true, "completed_on"=>"2012-10-21", "created_at"=>nil, "updated_at"=>nil}
+      # ```
+      def attributes_before_type_cast
+        @attributes.values_before_type_cast
+      end
+
+      # Returns a hash of attributes for assignment to the database.
+      def attributes_for_database
+        @attributes.values_for_database
+      end
+
+      private
+        # Dispatch target for `*_before_type_cast` attribute methods.
+        def attribute_before_type_cast(attr_name)
+          @attributes[attr_name].value_before_type_cast
+        end
+
+        # Dispatch target for `*_for_database` attribute methods.
+        def attribute_for_database(attr_name)
+          @attributes[attr_name].value_for_database
+        end
+
+        # Dispatch target for `*_came_from_user?` attribute methods.
+        def attribute_came_from_user?(attr_name)
+          @attributes[attr_name].came_from_user?
+        end
+    end
+  end
+end

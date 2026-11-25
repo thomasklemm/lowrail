@@ -1,0 +1,144 @@
+=== main round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.342k i/100ms
+attributes_for_database     9.110k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.698k (± 4.7%) i/s   (27.25 μs/i) -    183.810k in   5.008660s
+attributes_for_database     89.596k (± 6.3%) i/s   (11.16 μs/i) -    455.500k in   5.083930s
+=== confirm round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     2.851k i/100ms
+attributes_for_database    13.180k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     42.165k (±11.0%) i/s   (23.72 μs/i) -    210.974k in   5.003586s
+attributes_for_database    144.033k (±13.7%) i/s    (6.94 μs/i) -    724.900k in   5.032864s
+=== main2 round 1 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.538k i/100ms
+attributes_for_database     8.587k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.560k (± 4.8%) i/s   (27.35 μs/i) -    183.976k in   5.032112s
+attributes_for_database     91.693k (± 3.5%) i/s   (10.91 μs/i) -    463.698k in   5.057089s
+=== confirm round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.475k i/100ms
+attributes_for_database    15.296k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     40.364k (± 7.7%) i/s   (24.77 μs/i) -    205.850k in   5.099868s
+attributes_for_database    140.957k (± 6.4%) i/s    (7.09 μs/i) -    718.912k in   5.100207s
+=== main2 round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.320k i/100ms
+attributes_for_database     8.957k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.531k (± 6.8%) i/s   (27.37 μs/i) -    185.920k in   5.089381s
+attributes_for_database     72.482k (±27.4%) i/s   (13.80 μs/i) -    367.237k in   5.066608s
+=== main round 2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.631k i/100ms
+attributes_for_database     8.453k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.389k (± 4.7%) i/s   (27.48 μs/i) -    185.181k in   5.088882s
+attributes_for_database     89.158k (± 3.1%) i/s   (11.22 μs/i) -    448.009k in   5.024894s
+=== main2 round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.508k i/100ms
+attributes_for_database     8.658k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.444k (±11.4%) i/s   (29.03 μs/i) -    175.400k in   5.092281s
+attributes_for_database     85.329k (± 9.1%) i/s   (11.72 μs/i) -    432.900k in   5.073304s
+=== main round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.441k i/100ms
+attributes_for_database     8.824k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     32.383k (±10.1%) i/s   (30.88 μs/i) -    165.168k in   5.100414s
+attributes_for_database     85.255k (± 7.1%) i/s   (11.73 μs/i) -    432.376k in   5.071585s
+=== confirm round 3 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.968k i/100ms
+attributes_for_database    11.756k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     41.332k (± 3.3%) i/s   (24.19 μs/i) -    210.304k in   5.088166s
+attributes_for_database    144.432k (± 6.7%) i/s    (6.92 μs/i) -    728.872k in   5.046465s
+=== main round 4 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.493k i/100ms
+attributes_for_database     8.737k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.196k (± 4.9%) i/s   (28.41 μs/i) -    178.143k in   5.061406s
+attributes_for_database     87.961k (± 2.1%) i/s   (11.37 μs/i) -    445.587k in   5.065755s
+=== confirm round 4 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.347k i/100ms
+attributes_for_database    15.195k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     41.696k (± 5.2%) i/s   (23.98 μs/i) -    208.656k in   5.004279s
+attributes_for_database    147.027k (± 5.2%) i/s    (6.80 μs/i) -    744.555k in   5.064086s
+=== main2 round 4 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.301k i/100ms
+attributes_for_database     8.817k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.651k (± 5.4%) i/s   (28.05 μs/i) -    178.254k in   4.999909s
+attributes_for_database     88.104k (± 4.6%) i/s   (11.35 μs/i) -    440.850k in   5.003737s
+=== confirm round 5 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.015k i/100ms
+attributes_for_database    11.316k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     42.788k (± 4.0%) i/s   (23.37 μs/i) -    216.810k in   5.067064s
+attributes_for_database    141.187k (± 7.7%) i/s    (7.08 μs/i) -    712.908k in   5.049388s
+=== main2 round 5 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.561k i/100ms
+attributes_for_database     9.016k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.653k (± 5.2%) i/s   (28.05 μs/i) -    181.611k in   5.093829s
+attributes_for_database     89.361k (± 2.7%) i/s   (11.19 μs/i) -    450.800k in   5.044692s
+=== main round 5 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.569k i/100ms
+attributes_for_database     8.580k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     33.991k (± 8.9%) i/s   (29.42 μs/i) -    171.312k in   5.039867s
+attributes_for_database     87.665k (± 5.7%) i/s   (11.41 μs/i) -    446.160k in   5.089380s
+=== main2 round 6 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.040k i/100ms
+attributes_for_database     8.308k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.078k (± 7.6%) i/s   (29.34 μs/i) -    173.280k in   5.084873s
+attributes_for_database     86.021k (± 3.5%) i/s   (11.63 μs/i) -    432.016k in   5.022238s
+=== main round 6 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.542k i/100ms
+attributes_for_database     8.900k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.177k (± 5.1%) i/s   (28.43 μs/i) -    177.100k in   5.034582s
+attributes_for_database     85.854k (± 6.5%) i/s   (11.65 μs/i) -    436.100k in   5.079537s
+=== confirm round 6 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.394k i/100ms
+attributes_for_database    15.465k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     42.350k (± 5.7%) i/s   (23.61 μs/i) -    215.306k in   5.083939s
+attributes_for_database    148.501k (± 3.9%) i/s    (6.73 μs/i) -    757.785k in   5.102881s

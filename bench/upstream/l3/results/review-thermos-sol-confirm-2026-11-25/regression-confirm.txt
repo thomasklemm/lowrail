@@ -1,0 +1,10 @@
+Using sqlite3
+Run options: -i /test_attributes_for_database_serializes_the_attributes_the_record_had_when_it_was_called/ --seed 47901
+
+# Running:
+
+.
+
+Finished in 0.040464s, 24.7132 runs/s, 24.7132 assertions/s.
+
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips

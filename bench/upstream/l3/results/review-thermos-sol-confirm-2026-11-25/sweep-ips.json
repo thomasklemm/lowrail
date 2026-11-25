@@ -1,0 +1,908 @@
+{
+  "best": {
+    "w6 Marshal.dump": {
+      "main": {
+        "tree": "main",
+        "round": 2,
+        "ips": 108066.0,
+        "output": "w6 Marshal.dump    108.066k (± 4.2%) i/s    (9.25 μs/i) -    162.450k in   1.503251s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 125110.0,
+        "output": "w6 Marshal.dump    125.110k (± 7.6%) i/s    (7.99 μs/i) -    190.840k in   1.525377s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 2,
+        "ips": 108796.0,
+        "output": "w6 Marshal.dump    108.796k (± 7.3%) i/s    (9.19 μs/i) -    172.704k in   1.587416s"
+      }
+    },
+    "w6 for_database": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 414716.0,
+        "output": "w6 for_database    414.716k (± 1.8%) i/s    (2.41 μs/i) -    637.872k in   1.538093s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 835688.0,
+        "output": "w6 for_database    835.688k (± 6.9%) i/s    (1.20 μs/i) -      1.279M in   1.529979s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 404974.0,
+        "output": "w6 for_database    404.974k (± 2.3%) i/s    (2.47 μs/i) -    639.648k in   1.579481s"
+      }
+    },
+    "w100 Marshal.dump": {
+      "main": {
+        "tree": "main",
+        "round": 1,
+        "ips": 13603.0,
+        "output": "w100 Marshal.dump     13.603k (± 3.7%) i/s   (73.51 μs/i) -     21.030k in   1.546002s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 17952.0,
+        "output": "w100 Marshal.dump     17.952k (± 3.3%) i/s   (55.70 μs/i) -     27.195k in   1.514866s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 2,
+        "ips": 13584.0,
+        "output": "w100 Marshal.dump     13.584k (± 3.9%) i/s   (73.61 μs/i) -     21.195k in   1.560263s"
+      }
+    },
+    "w100 for_database": {
+      "main": {
+        "tree": "main",
+        "round": 1,
+        "ips": 29366.0,
+        "output": "w100 for_database     29.366k (± 9.0%) i/s   (34.05 μs/i) -     46.605k in   1.587062s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 60988.0,
+        "output": "w100 for_database     60.988k (± 9.7%) i/s   (16.40 μs/i) -     96.255k in   1.578259s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 29262.0,
+        "output": "w100 for_database     29.262k (± 8.5%) i/s   (34.17 μs/i) -     44.408k in   1.517576s"
+      }
+    },
+    "w300 Marshal.dump": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 4938.0,
+        "output": "w300 Marshal.dump      4.938k (± 5.5%) i/s  (202.50 μs/i) -      7.725k in   1.564347s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 6355.0,
+        "output": "w300 Marshal.dump      6.355k (± 8.6%) i/s  (157.36 μs/i) -      9.975k in   1.569663s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 2,
+        "ips": 4896.0,
+        "output": "w300 Marshal.dump      4.896k (± 5.6%) i/s  (204.26 μs/i) -      7.725k in   1.577917s"
+      }
+    },
+    "w300 for_database": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 10056.0,
+        "output": "w300 for_database     10.056k (±11.4%) i/s   (99.45 μs/i) -     15.218k in   1.513381s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 20540.0,
+        "output": "w300 for_database     20.540k (± 9.9%) i/s   (48.68 μs/i) -     31.485k in   1.532833s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 2,
+        "ips": 10192.0,
+        "output": "w300 for_database     10.192k (±10.8%) i/s   (98.11 μs/i) -     16.230k in   1.592406s"
+      }
+    },
+    "w1500 Marshal.dump": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 1043.0,
+        "output": "w1500 Marshal.dump      1.043k (± 2.6%) i/s  (959.12 μs/i) -      1.566k in   1.501986s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 1379.0,
+        "output": "w1500 Marshal.dump      1.379k (± 1.4%) i/s  (725.14 μs/i) -      2.176k in   1.577897s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 1036.0,
+        "output": "w1500 Marshal.dump      1.036k (± 1.8%) i/s  (965.66 μs/i) -      1.560k in   1.506423s"
+      }
+    },
+    "w1500 for_database": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 2196.0,
+        "output": "w1500 for_database      2.196k (± 2.5%) i/s  (455.40 μs/i) -      3.424k in   1.559275s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 4364.0,
+        "output": "w1500 for_database      4.364k (± 1.7%) i/s  (229.15 μs/i) -      6.816k in   1.561909s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 2183.0,
+        "output": "w1500 for_database      2.183k (± 1.1%) i/s  (458.00 μs/i) -      3.456k in   1.582850s"
+      }
+    },
+    "w6 Marshal 1MiB string": {
+      "main": {
+        "tree": "main",
+        "round": 1,
+        "ips": 4014.0000000000005,
+        "output": "w6 Marshal 1MiB string      4.014k (± 8.4%) i/s  (249.15 μs/i) -      6.112k in   1.522813s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 4229.0,
+        "output": "w6 Marshal 1MiB string      4.229k (± 5.5%) i/s  (236.45 μs/i) -      6.656k in   1.573832s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 1,
+        "ips": 4101.0,
+        "output": "w6 Marshal 1MiB string      4.101k (±17.5%) i/s  (243.84 μs/i) -      6.160k in   1.502077s"
+      }
+    },
+    "w6 serialize 1MiB every call": {
+      "main": {
+        "tree": "main",
+        "round": 2,
+        "ips": 1720.0,
+        "output": "w6 serialize 1MiB every call      1.720k (± 3.5%) i/s  (581.38 μs/i) -      2.610k in   1.517392s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 1,
+        "ips": 1676.0,
+        "output": "w6 serialize 1MiB every call      1.676k (± 3.4%) i/s  (596.58 μs/i) -      2.574k in   1.535589s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 1656.0,
+        "output": "w6 serialize 1MiB every call      1.656k (± 4.3%) i/s  (603.85 μs/i) -      2.484k in   1.499956s"
+      }
+    },
+    "w1500 cold for_database": {
+      "main": {
+        "tree": "main",
+        "round": 2,
+        "ips": 599.678,
+        "output": "w1500 cold for_database    599.678 (± 8.2%) i/s    (1.67 ms/i) -    960.000 in   1.600859s"
+      },
+      "confirm": {
+        "tree": "confirm",
+        "round": 3,
+        "ips": 718.541,
+        "output": "w1500 cold for_database    718.541 (± 7.4%) i/s    (1.39 ms/i) -      1.121k in   1.560105s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 3,
+        "ips": 633.827,
+        "output": "w1500 cold for_database    633.827 (± 3.8%) i/s    (1.58 ms/i) -    960.000 in   1.514609s"
+      }
+    }
+  },
+  "samples": {
+    "w6 Marshal.dump": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 104627.0,
+          "output": "w6 Marshal.dump    104.627k (± 8.3%) i/s    (9.56 μs/i) -    164.790k in   1.575020s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 108066.0,
+          "output": "w6 Marshal.dump    108.066k (± 4.2%) i/s    (9.25 μs/i) -    162.450k in   1.503251s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 107334.0,
+          "output": "w6 Marshal.dump    107.334k (± 5.8%) i/s    (9.32 μs/i) -    164.112k in   1.528984s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 125110.0,
+          "output": "w6 Marshal.dump    125.110k (± 7.6%) i/s    (7.99 μs/i) -    190.840k in   1.525377s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 121736.0,
+          "output": "w6 Marshal.dump    121.736k (± 4.7%) i/s    (8.21 μs/i) -    193.035k in   1.585687s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 121635.0,
+          "output": "w6 Marshal.dump    121.635k (± 9.5%) i/s    (8.22 μs/i) -    188.537k in   1.550029s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 106868.0,
+          "output": "w6 Marshal.dump    106.868k (± 6.5%) i/s    (9.36 μs/i) -    169.296k in   1.584160s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 108796.0,
+          "output": "w6 Marshal.dump    108.796k (± 7.3%) i/s    (9.19 μs/i) -    172.704k in   1.587416s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 104888.0,
+          "output": "w6 Marshal.dump    104.888k (± 7.4%) i/s    (9.53 μs/i) -    163.455k in   1.558376s"
+        }
+      ]
+    },
+    "w6 for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 400178.0,
+          "output": "w6 for_database    400.178k (± 8.7%) i/s    (2.50 μs/i) -    615.094k in   1.537051s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 406536.0,
+          "output": "w6 for_database    406.536k (± 4.5%) i/s    (2.46 μs/i) -    646.880k in   1.591200s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 414716.0,
+          "output": "w6 for_database    414.716k (± 1.8%) i/s    (2.41 μs/i) -    637.872k in   1.538093s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 835688.0,
+          "output": "w6 for_database    835.688k (± 6.9%) i/s    (1.20 μs/i) -      1.279M in   1.529979s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 817177.0,
+          "output": "w6 for_database    817.177k (± 2.7%) i/s    (1.22 μs/i) -      1.237M in   1.513746s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 737705.0,
+          "output": "w6 for_database    737.705k (± 5.9%) i/s    (1.36 μs/i) -      1.172M in   1.588602s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 394975.0,
+          "output": "w6 for_database    394.975k (± 6.5%) i/s    (2.53 μs/i) -    602.970k in   1.526604s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 402909.0,
+          "output": "w6 for_database    402.909k (± 4.1%) i/s    (2.48 μs/i) -    632.176k in   1.569028s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 404974.0,
+          "output": "w6 for_database    404.974k (± 2.3%) i/s    (2.47 μs/i) -    639.648k in   1.579481s"
+        }
+      ]
+    },
+    "w100 Marshal.dump": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 13603.0,
+          "output": "w100 Marshal.dump     13.603k (± 3.7%) i/s   (73.51 μs/i) -     21.030k in   1.546002s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 13450.0,
+          "output": "w100 Marshal.dump     13.450k (± 2.9%) i/s   (74.35 μs/i) -     21.075k in   1.566917s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 13565.0,
+          "output": "w100 Marshal.dump     13.565k (± 2.9%) i/s   (73.72 μs/i) -     21.135k in   1.558054s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 17952.0,
+          "output": "w100 Marshal.dump     17.952k (± 3.3%) i/s   (55.70 μs/i) -     27.195k in   1.514866s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 17359.0,
+          "output": "w100 Marshal.dump     17.359k (± 7.6%) i/s   (57.61 μs/i) -     26.222k in   1.510579s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 16267.0,
+          "output": "w100 Marshal.dump     16.267k (± 7.2%) i/s   (61.47 μs/i) -     24.420k in   1.501198s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 12825.0,
+          "output": "w100 Marshal.dump     12.825k (± 8.6%) i/s   (77.97 μs/i) -     19.390k in   1.511910s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 13584.0,
+          "output": "w100 Marshal.dump     13.584k (± 3.9%) i/s   (73.61 μs/i) -     21.195k in   1.560263s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 13018.0,
+          "output": "w100 Marshal.dump     13.018k (± 8.9%) i/s   (76.82 μs/i) -     20.895k in   1.605111s"
+        }
+      ]
+    },
+    "w100 for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 29366.0,
+          "output": "w100 for_database     29.366k (± 9.0%) i/s   (34.05 μs/i) -     46.605k in   1.587062s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 28461.0,
+          "output": "w100 for_database     28.461k (± 9.4%) i/s   (35.14 μs/i) -     43.372k in   1.523918s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 29220.0,
+          "output": "w100 for_database     29.220k (±10.0%) i/s   (34.22 μs/i) -     43.848k in   1.500630s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 60988.0,
+          "output": "w100 for_database     60.988k (± 9.7%) i/s   (16.40 μs/i) -     96.255k in   1.578259s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 58380.0,
+          "output": "w100 for_database     58.380k (±13.0%) i/s   (17.13 μs/i) -     90.482k in   1.549881s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 46334.0,
+          "output": "w100 for_database     46.334k (± 9.6%) i/s   (21.58 μs/i) -     69.776k in   1.505942s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 28218.0,
+          "output": "w100 for_database     28.218k (±10.6%) i/s   (35.44 μs/i) -     43.290k in   1.534129s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 29212.0,
+          "output": "w100 for_database     29.212k (± 8.9%) i/s   (34.23 μs/i) -     46.815k in   1.602580s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 29262.0,
+          "output": "w100 for_database     29.262k (± 8.5%) i/s   (34.17 μs/i) -     44.408k in   1.517576s"
+        }
+      ]
+    },
+    "w300 Marshal.dump": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 4739.0,
+          "output": "w300 Marshal.dump      4.739k (± 9.9%) i/s  (211.03 μs/i) -      7.695k in   1.623914s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 4894.0,
+          "output": "w300 Marshal.dump      4.894k (± 5.7%) i/s  (204.35 μs/i) -      7.620k in   1.557156s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 4938.0,
+          "output": "w300 Marshal.dump      4.938k (± 5.5%) i/s  (202.50 μs/i) -      7.725k in   1.564347s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 6355.0,
+          "output": "w300 Marshal.dump      6.355k (± 8.6%) i/s  (157.36 μs/i) -      9.975k in   1.569663s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 6296.0,
+          "output": "w300 Marshal.dump      6.296k (± 6.6%) i/s  (158.83 μs/i) -      9.450k in   1.500904s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 5448.0,
+          "output": "w300 Marshal.dump      5.448k (±11.8%) i/s  (183.56 μs/i) -      8.625k in   1.583177s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 4751.0,
+          "output": "w300 Marshal.dump      4.751k (± 7.2%) i/s  (210.50 μs/i) -      7.695k in   1.619789s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 4896.0,
+          "output": "w300 Marshal.dump      4.896k (± 5.6%) i/s  (204.26 μs/i) -      7.725k in   1.577917s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 4851.0,
+          "output": "w300 Marshal.dump      4.851k (± 8.5%) i/s  (206.14 μs/i) -      7.710k in   1.589373s"
+        }
+      ]
+    },
+    "w300 for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 9588.0,
+          "output": "w300 for_database      9.588k (± 9.8%) i/s  (104.30 μs/i) -     14.756k in   1.539084s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 9565.0,
+          "output": "w300 for_database      9.565k (±13.3%) i/s  (104.54 μs/i) -     14.980k in   1.566070s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 10056.0,
+          "output": "w300 for_database     10.056k (±11.4%) i/s   (99.45 μs/i) -     15.218k in   1.513381s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 20540.0,
+          "output": "w300 for_database     20.540k (± 9.9%) i/s   (48.68 μs/i) -     31.485k in   1.532833s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 20379.0,
+          "output": "w300 for_database     20.379k (±10.5%) i/s   (49.07 μs/i) -     32.190k in   1.579582s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 14983.0,
+          "output": "w300 for_database     14.983k (±12.2%) i/s   (66.74 μs/i) -     22.750k in   1.518432s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 10059.0,
+          "output": "w300 for_database     10.059k (±10.5%) i/s   (99.41 μs/i) -     15.720k in   1.562720s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 10192.0,
+          "output": "w300 for_database     10.192k (±10.8%) i/s   (98.11 μs/i) -     16.230k in   1.592406s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 9173.0,
+          "output": "w300 for_database      9.173k (±18.6%) i/s  (109.02 μs/i) -     15.288k in   1.666652s"
+        }
+      ]
+    },
+    "w1500 Marshal.dump": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 1008.0,
+          "output": "w1500 Marshal.dump      1.008k (± 3.1%) i/s  (991.68 μs/i) -      1.530k in   1.517272s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 999.546,
+          "output": "w1500 Marshal.dump    999.546 (± 3.4%) i/s    (1.00 ms/i) -      1.575k in   1.575715s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 1043.0,
+          "output": "w1500 Marshal.dump      1.043k (± 2.6%) i/s  (959.12 μs/i) -      1.566k in   1.501986s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 1379.0,
+          "output": "w1500 Marshal.dump      1.379k (± 1.4%) i/s  (725.14 μs/i) -      2.176k in   1.577897s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 1378.0,
+          "output": "w1500 Marshal.dump      1.378k (± 1.2%) i/s  (725.85 μs/i) -      2.142k in   1.554770s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 1168.0,
+          "output": "w1500 Marshal.dump      1.168k (± 8.2%) i/s  (856.08 μs/i) -      1.815k in   1.553787s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 1035.0,
+          "output": "w1500 Marshal.dump      1.035k (± 2.2%) i/s  (966.41 μs/i) -      1.560k in   1.507595s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 1027.0,
+          "output": "w1500 Marshal.dump      1.027k (± 4.3%) i/s  (973.90 μs/i) -      1.575k in   1.533891s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 1036.0,
+          "output": "w1500 Marshal.dump      1.036k (± 1.8%) i/s  (965.66 μs/i) -      1.560k in   1.506423s"
+        }
+      ]
+    },
+    "w1500 for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 2101.0,
+          "output": "w1500 for_database      2.101k (± 2.0%) i/s  (476.03 μs/i) -      3.240k in   1.542321s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 2060.0,
+          "output": "w1500 for_database      2.060k (± 7.5%) i/s  (485.34 μs/i) -      3.248k in   1.576394s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 2196.0,
+          "output": "w1500 for_database      2.196k (± 2.5%) i/s  (455.40 μs/i) -      3.424k in   1.559275s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 4364.0,
+          "output": "w1500 for_database      4.364k (± 1.7%) i/s  (229.15 μs/i) -      6.816k in   1.561909s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 4215.0,
+          "output": "w1500 for_database      4.215k (± 5.4%) i/s  (237.26 μs/i) -      6.511k in   1.544786s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 3251.0,
+          "output": "w1500 for_database      3.251k (± 4.1%) i/s  (307.58 μs/i) -      5.025k in   1.545606s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 2050.0,
+          "output": "w1500 for_database      2.050k (± 2.5%) i/s  (487.86 μs/i) -      3.150k in   1.536756s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 2066.0,
+          "output": "w1500 for_database      2.066k (± 9.8%) i/s  (483.94 μs/i) -      3.285k in   1.589758s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 2183.0,
+          "output": "w1500 for_database      2.183k (± 1.1%) i/s  (458.00 μs/i) -      3.456k in   1.582850s"
+        }
+      ]
+    },
+    "w6 Marshal 1MiB string": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 4014.0000000000005,
+          "output": "w6 Marshal 1MiB string      4.014k (± 8.4%) i/s  (249.15 μs/i) -      6.112k in   1.522813s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 3582.0,
+          "output": "w6 Marshal 1MiB string      3.582k (±10.8%) i/s  (279.14 μs/i) -      5.402k in   1.507927s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 3450.0,
+          "output": "w6 Marshal 1MiB string      3.450k (± 7.9%) i/s  (289.87 μs/i) -      5.236k in   1.517784s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 4229.0,
+          "output": "w6 Marshal 1MiB string      4.229k (± 5.5%) i/s  (236.45 μs/i) -      6.656k in   1.573832s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 3362.0,
+          "output": "w6 Marshal 1MiB string      3.362k (± 6.5%) i/s  (297.41 μs/i) -      5.343k in   1.589058s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 3812.0,
+          "output": "w6 Marshal 1MiB string      3.812k (± 6.6%) i/s  (262.32 μs/i) -      5.772k in   1.514094s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 4101.0,
+          "output": "w6 Marshal 1MiB string      4.101k (±17.5%) i/s  (243.84 μs/i) -      6.160k in   1.502077s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 3568.0,
+          "output": "w6 Marshal 1MiB string      3.568k (± 6.5%) i/s  (280.27 μs/i) -      5.382k in   1.508420s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 3694.0,
+          "output": "w6 Marshal 1MiB string      3.694k (± 3.1%) i/s  (270.73 μs/i) -      5.824k in   1.576720s"
+        }
+      ]
+    },
+    "w6 serialize 1MiB every call": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 1643.0,
+          "output": "w6 serialize 1MiB every call      1.643k (± 4.3%) i/s  (608.82 μs/i) -      2.494k in   1.518402s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 1720.0,
+          "output": "w6 serialize 1MiB every call      1.720k (± 3.5%) i/s  (581.38 μs/i) -      2.610k in   1.517392s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 1637.0,
+          "output": "w6 serialize 1MiB every call      1.637k (± 4.0%) i/s  (610.97 μs/i) -      2.523k in   1.541477s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 1676.0,
+          "output": "w6 serialize 1MiB every call      1.676k (± 3.4%) i/s  (596.58 μs/i) -      2.574k in   1.535589s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 1661.0,
+          "output": "w6 serialize 1MiB every call      1.661k (± 2.3%) i/s  (601.91 μs/i) -      2.520k in   1.516821s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 1588.0,
+          "output": "w6 serialize 1MiB every call      1.588k (± 7.1%) i/s  (629.54 μs/i) -      2.461k in   1.549296s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 1629.0,
+          "output": "w6 serialize 1MiB every call      1.629k (± 3.2%) i/s  (613.82 μs/i) -      2.520k in   1.546832s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 1652.0,
+          "output": "w6 serialize 1MiB every call      1.652k (± 2.5%) i/s  (605.22 μs/i) -      2.520k in   1.525143s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 1656.0,
+          "output": "w6 serialize 1MiB every call      1.656k (± 4.3%) i/s  (603.85 μs/i) -      2.484k in   1.499956s"
+        }
+      ]
+    },
+    "w1500 cold for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 595.038,
+          "output": "w1500 cold for_database    595.038 (± 5.5%) i/s    (1.68 ms/i) -    944.000 in   1.586454s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 599.678,
+          "output": "w1500 cold for_database    599.678 (± 8.2%) i/s    (1.67 ms/i) -    960.000 in   1.600859s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 595.301,
+          "output": "w1500 cold for_database    595.301 (± 4.2%) i/s    (1.68 ms/i) -    944.000 in   1.585754s"
+        }
+      ],
+      "confirm": [
+        {
+          "tree": "confirm",
+          "round": 1,
+          "ips": 714.91,
+          "output": "w1500 cold for_database    714.910 (± 6.2%) i/s    (1.40 ms/i) -      1.121k in   1.568028s"
+        },
+        {
+          "tree": "confirm",
+          "round": 2,
+          "ips": 626.636,
+          "output": "w1500 cold for_database    626.636 (± 9.9%) i/s    (1.60 ms/i) -    945.000 in   1.508052s"
+        },
+        {
+          "tree": "confirm",
+          "round": 3,
+          "ips": 718.541,
+          "output": "w1500 cold for_database    718.541 (± 7.4%) i/s    (1.39 ms/i) -      1.121k in   1.560105s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 609.263,
+          "output": "w1500 cold for_database    609.263 (± 6.2%) i/s    (1.64 ms/i) -    928.000 in   1.523152s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 626.335,
+          "output": "w1500 cold for_database    626.335 (± 5.3%) i/s    (1.60 ms/i) -    944.000 in   1.507181s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 633.827,
+          "output": "w1500 cold for_database    633.827 (± 3.8%) i/s    (1.58 ms/i) -    960.000 in   1.514609s"
+        }
+      ]
+    }
+  }
+}

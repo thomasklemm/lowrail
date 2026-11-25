@@ -1,0 +1,10 @@
+--- /home/user/workspace/repo/bench/upstream/l3/results/review-thermos-sol-confirm-2026-11-25/dependencies-main.txt	2026-11-25 22:11:12.341746036 +0000
++++ /home/user/workspace/repo/bench/upstream/l3/results/review-thermos-sol-confirm-2026-11-25/dependencies-confirm.txt	2026-11-25 22:11:12.769752294 +0000
+@@ -21,6 +21,7 @@
+ erb 6.0.7 ruby
+ error_highlight 0.7.2 ruby
+ erubi 1.13.1 ruby
++etc 1.4.6 ruby
+ ffi 1.17.4 x86_64-linux-gnu
+ ffi-compiler 1.4.3 ruby
+ flog 4.10.0 ruby

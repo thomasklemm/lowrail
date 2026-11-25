@@ -1,0 +1,11 @@
+25	0	activemodel/lib/active_model/attribute_set.rb
+9	0	activerecord/test/cases/attribute_methods_test.rb
+   891 /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activemodel/lib/active_model/attribute_set.rb
+   916 /home/user/workspace/repo/.amp/in/orb-backup/l3-review/confirm/activemodel/lib/active_model/attribute_set.rb
+  1808 /home/user/workspace/repo/.amp/in/orb-backup/l3-review/main/activerecord/test/cases/attribute_methods_test.rb
+  1817 /home/user/workspace/repo/.amp/in/orb-backup/l3-review/confirm/activerecord/test/cases/attribute_methods_test.rb
+  5432 total
++    #: () -> Hash[String, untyped]
++    #: () -> Hash[String, untyped]
+Bruno keys change is an ancestor
+Bruno to_hash change is an ancestor
