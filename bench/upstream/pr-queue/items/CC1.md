@@ -3,22 +3,22 @@ id: CC1
 repo: CanCanCommunity/cancancan
 fork: thomasklemm/cancancan
 kind: perf
-area: Rule#initialize, Ability#add_rule_to_index
+area: Rule#initialize
 reviewer: coorasse
 branch: thomasklemm/rule-construction-allocations
-head: "2a5e8c71d19569d43c7fec09dfb7012721f792e2"
+head: "cb5768e493042c026ef4d808e8574a9db68aeecd"
 base: main
 built_on: "021b13cf76"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Every can/cannot allocates two objects fewer: an ability of six rules built per request goes from 57 to 47 objects on Ruby 4.0 (62 to 52 on 3.3), -2.9% instructions (interpreter) and -4.4% (YJIT, JIT-flat); Rule construction is 1.8% of request objects in Solidus's API suite and 0.9% in openstreetmap-website's"
-evidence: [bench/upstream/oss_profile_sweep_1/body/CC1, bench/upstream/oss_profile_sweep_1/cancancan/CC1-thermos-sol.tar.gz]
+impact: "Each can and cannot allocates one temporary array fewer: an ability defining five rules goes from 57 to 52 objects on Ruby 4.0.9, -3.9% instructions (interpreter) and -3.5% (YJIT, JIT-flat), benchmark-ips +4.8% (YJIT, best of 3; each report ±13%). Rule construction is 1.8% of request objects in Solidus's API suite and 0.9% in openstreetmap-website's, so the saving there is roughly a tenth of that (about 0.2% and 0.1% of request objects). Path unchanged on cancancan main; 4.x differs and is not checked."
+evidence: [bench/upstream/oss_profile_sweep_1/body/CC1-repair, bench/upstream/oss_profile_sweep_1/cancancan/CC1-repair-checks.tar.gz, bench/upstream/oss_profile_sweep_1/cancancan/CC1-thermos-sol.tar.gz]
 rank:
 risky: false
 state: in-review
 pr:
-note: "2026-11-25 thermos-sol: changes on the recorded head; attribute conversion runs too early and the index loses compact's detached snapshot (five demonstrated differences). Both base and head pass sqlite/postgres on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, with identical per-example outcomes. Missing regression specs and CHANGELOG; body and commit call a five-rule measurement six rules and assert false equivalence. Smallest repair and exact wording below. Nothing upstream. Original build record: found by lowrail-profile on Solidus and openstreetmap-website (docs/upstream/oss-profile-sweep-1.md), built on main 021b13cf76 (3.7.1); 80 ordinary construction cases matched; sqlite passed on Ruby 3.4.13 / AR 8.1 and 3.3.14 / AR 7.2; builder did not run postgres. Body evidence has A/A 0.02% / 0.08% and JIT-flat in 6 windows. The impact and draft body below are the reviewed, uncorrected claims, not approved claims."
+note: "2026-11-25 repair (fork head cb5768e493): F1-F4 applied; parser-only change, compact restored, CHANGELOG Unreleased entry, five public regression specs that each fail on 2a5e8c71d1 and pass on base. The repaired initialize hit RuboCop Metrics/MethodLength (11/10), so it reads extra_args.first at both uses instead of reassigning extra_args. DB=sqlite and DB=postgres rspec, seed 1234: 721 examples, 0 failures (3 / 2 pending) on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, per-example outcomes equal to thermos-sol's base runs plus the five new passing specs; rubocop 0 offenses; the 127-case differential is byte-identical to base on both Rubies. Remeasured with script/upstream-bench on Ruby 4.0.9 (body/CC1-repair): objects 57 to 52; instructions -3.9% (A/A 0.00%) interp, -3.5% (A/A 0.04%, JIT-flat) YJIT; ips +4.8% (A/A 0.14% on best-of-3, but each report ±12-15% and base rounds span 136.8k-153.2k; an earlier cohort on the unpublished intermediate head 871ec00 had base 148.9k, so wall time is supporting only). Awaiting thermos-sol confirm on cb5768e. Earlier: 2026-11-25 thermos-sol: changes on the recorded head; attribute conversion runs too early and the index loses compact's detached snapshot (five demonstrated differences). Both base and head pass sqlite/postgres on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, with identical per-example outcomes. Missing regression specs and CHANGELOG; body and commit call a five-rule measurement six rules and assert false equivalence. Smallest repair and exact wording below. Nothing upstream. Original build record: found by lowrail-profile on Solidus and openstreetmap-website (docs/upstream/oss-profile-sweep-1.md), built on main 021b13cf76 (3.7.1); 80 ordinary construction cases matched; sqlite passed on Ruby 3.4.13 / AR 8.1 and 3.3.14 / AR 7.2; builder did not run postgres. Body evidence has A/A 0.02% / 0.08% and JIT-flat in 6 windows. The impact and draft body below are the reviewed, uncorrected claims, not approved claims."
 ownership: {date: 2026-11-25, checked: ["open PRs naming add_rule_to_index, initialize, parse_attributes_from_extra_args that change lib/cancan/ability/rules.rb, lib/cancan/rule.rb"], hits: []}
 passes:
   - {reviewer: thermos-sol, head: "2a5e8c71d19569d43c7fec09dfb7012721f792e2", date: 2026-11-25, orb: "T-01a214c3-c62d-7481-8ea4-cb7c4ef33065", verdict: changes, open: "F1 conversion order; F2 lost index snapshot/new callbacks; F3 CHANGELOG; F4 body/commit/benchmark corrections. Both Thermos rubrics run directly by this reviewer, without subagents or other threads, as requested. Full report below."}
@@ -26,23 +26,53 @@ passes:
 
 # Allocate less when a rule is defined
 
-An ability is usually built per request, so each `can` and `cannot` runs on every request. Two of the objects a rule allocates are not needed:
+Applications that build an ability per request pay the cost of defining its rules each time. `Rule#initialize` gets the parsed attributes and conditions back from a helper in a temporary two-element array, then immediately unpacks it.
 
-* `Rule#initialize` took the attributes and conditions from the two-element array that `parse_attributes_from_extra_args` returned;
-* `add_rule_to_index` copied the subjects with `compact` even when none is `nil`.
+Read those arguments directly instead, keeping validation and conversion in their existing order. For an ability with a class rule, an action list with conditions, a `cannot`, attributes with conditions and a block rule, this removes one temporary array per rule.
 
-The rules, their attributes and conditions, and the index they build are unchanged.
+```ruby
+require "benchmark/ips"
+require "cancancan"
 
-An ability with six rules (a class rule, an action list with conditions, `:manage, :all`, a `cannot`, attributes with conditions and a block rule), Ruby 4.0.9:
+class Product; end
+class Order; end
+
+class Ability
+  include CanCan::Ability
+
+  def initialize(user)
+    can :read, Product
+    can [:read, :update], Order, user_id: user
+    cannot :destroy, Order
+    can :update, Order, [:name, :email], user_id: user
+    can(:show, Order) { |order| order }
+  end
+end
+
+Benchmark.ips { |x| x.report("Ability.new(user)") { Ability.new(1) } }
+```
+
+Ruby 4.0.9 with YJIT, best of three runs:
+
+```
+main:      Ability.new(user)    153.166k (±13.3%) i/s    (6.53 μs/i)
+branch:    Ability.new(user)    160.451k (±13.0%) i/s    (6.23 μs/i)
+```
+
+Objects and Callgrind instructions per ability, Ruby 4.0.9:
 
 | | Objects, main | Objects, branch | Instructions, main | Instructions, branch | Change |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| no JIT | 57 | 47 | 82,787 | 80,391 | −2.9% |
-| YJIT | 57 | 47 | 42,893 | 40,991 | −4.4% |
+| no JIT | 57 | 52 | 82,753 | 79,547 | −3.9% |
+| YJIT | 57 | 52 | 42,921 | 41,418 | −3.5% |
 
 ## For Thomas
 
 Seen in Solidus's API suite (Spree::Api::BaseController#current_ability, 929 warm objects per request below it, cancancan lines 1-3 of its top lines outside the app) and in openstreetmap-website's. The bigger cost there is the apps' own rule count; this only trims cancancan's per-rule overhead.
+
+### Repair, 2026-11-25
+
+Fork head `cb5768e493042c026ef4d808e8574a9db68aeecd` on upstream main `021b13cf76`, amended from `2a5e8c71d1`. The index keeps `compact` and the `:all` fallback exactly as on main; `Rule#initialize` shifts the attributes and reads the conditions with `extra_args.first`, and wraps actions, subjects and attributes in main's order. Reading `extra_args.first` twice instead of reassigning `extra_args` keeps the method within RuboCop's 10-line limit; `extra_args` is the call's own splat array, so nothing else can change it between the two reads. CHANGELOG gets an Unreleased section with the entry thermos-sol proposed. The five specs in `spec/cancan/ability_spec.rb` (`reads the actions of a rule before its attributes`, `rejects conditions with a block before reading the attributes`, `does not compare the subjects of a rule with nil`, `indexes every subject of an array subclass`, `indexes the subjects given to a rule, not those added while indexing`) use only `can` and `can?`; all five fail on `2a5e8c71d1` and pass on main and on the new head. The body's ips block is the best round of each side; the rounds are noisy (each report ±12-15%), so the instruction table carries the claim. Raw data: `body/CC1-repair` and `cancancan/CC1-repair-checks.tar.gz` (suite JSON and logs, locks, outcome comparison, differential outputs, spec failures on the old head). The superseded six-rule record in `body/CC1` stays for the review history.
 
 ### Thermos-sol review, 2026-11-25 — changes
 

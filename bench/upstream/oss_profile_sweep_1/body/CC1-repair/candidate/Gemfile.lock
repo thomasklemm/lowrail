@@ -1,0 +1,24 @@
+PATH
+  remote: /home/user/oss/up/cancancan
+  specs:
+    cancancan (3.7.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    benchmark-ips (2.15.1)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  benchmark-ips
+  cancancan!
+
+CHECKSUMS
+  benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
+  cancancan (3.7.1)
+
+BUNDLED WITH
+  4.0.20

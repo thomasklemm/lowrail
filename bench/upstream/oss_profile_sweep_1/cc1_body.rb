@@ -1,5 +1,5 @@
-# CC1: an ability with six rules built per request, the shape Solidus and openstreetmap-website build in
-# current_ability (a class rule, an action list with conditions, a cannot, attributes with conditions, a block rule).
+# CC1: an ability defining five rules, built per request as Solidus and openstreetmap-website do in current_ability
+# (a class rule, an action list with conditions, a cannot, attributes with conditions, a block rule).
 require "cancancan"
 
 class Product; end
@@ -10,7 +10,6 @@ class Ability
   def initialize(user)
     can :read, Product
     can [:read, :update], Order, user_id: user
-    can :manage, :all if user == 0
     cannot :destroy, Order
     can :update, Order, [:name, :email], user_id: user
     can(:show, Order) { |order| order }

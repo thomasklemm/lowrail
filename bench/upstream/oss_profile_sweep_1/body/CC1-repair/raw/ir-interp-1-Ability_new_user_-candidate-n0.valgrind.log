@@ -1,0 +1,73 @@
+==67544== Callgrind, a call-graph generating cache profiler
+==67544== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==67544== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==67544== Command: /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/cc1_body.rb Ability.new(user) 0
+==67544== Parent PID: 67420
+==67544== 
+--67544-- 
+--67544-- Valgrind options:
+--67544--    --verbose
+--67544--    --tool=callgrind
+--67544--    --collect-atstart=no
+--67544--    --toggle-collect=rb_ary_cycle
+--67544--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/CC1-repair/raw/ir-interp-1-Ability_new_user_-candidate-n0.callgrind
+--67544--    --log-file=/home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/CC1-repair/raw/ir-interp-1-Ability_new_user_-candidate-n0.valgrind.log
+--67544-- Contents of /proc/version:
+--67544--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--67544-- 
+--67544-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--67544-- Page sizes: currently 4096, max supported 4096
+--67544-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==67544== For interactive control, run 'callgrind_control -h'.
+--67544-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--67544--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--67544--   .. build-id is valid
+--67544-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--67544--    object doesn't have a dynamic symbol table
+--67544-- Scheduler: using generic scheduler lock implementation.
+==67544== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-67544-by-user-on-???
+==67544== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-67544-by-user-on-???
+==67544== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-67544-by-user-on-???
+==67544== 
+==67544== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==67544== don't want to do, unless you know exactly what you're doing,
+==67544== or are doing some strange experiment):
+==67544==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=67544 ...command...
+==67544== 
+==67544== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==67544==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+==67544== and then give GDB the following command
+==67544==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=67544
+==67544== --pid is optional if only one valgrind process is running
+==67544== 
+--67544-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--67544--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--67544--   .. build-id is valid
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--67544--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--67544--   .. build-id is valid
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--67544--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--67544--   .. build-id is valid
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--67544--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--67544--   .. build-id is valid
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--67544--    object doesn't have a symbol table
+--67544-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--67544--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--67544--   .. build-id is valid
+--67544-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--67544-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--67544-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--67544-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/monitor.so
+==67544== 
+--67544-- Start dumping at BB 195020086 (Prg.Term.)...
+--67544-- Dump to /home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/CC1-repair/raw/ir-interp-1-Ability_new_user_-candidate-n0.callgrind
+--67544-- Dumping done.
+==67544== Events    : Ir
+==67544== Collected : 57
+==67544== 
+==67544== I   refs:      57

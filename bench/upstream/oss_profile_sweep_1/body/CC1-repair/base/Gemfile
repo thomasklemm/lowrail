@@ -1,0 +1,3 @@
+source "https://rubygems.org"
+gem "cancancan", path: "/home/user/oss/up/cancancan-main"
+gem "benchmark-ips"
