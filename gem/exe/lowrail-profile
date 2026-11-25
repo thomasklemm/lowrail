@@ -220,7 +220,10 @@ statuses = []
       grace = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
       # A zombie is not waited for: an orphan whose new parent never reaps it (a container's PID 1 without init).
       running = lambda do
-        `ps -A -o pgid= -o stat=`.each_line.any? { |l| g, s = l.split; g.to_i == pid && !s.to_s.start_with?("Z") }
+        list = `ps -A -o pgid= -o stat=`
+        # A ps that fails lists no one; the group may still be cleaning up.
+        next (Process.kill(0, -pid) rescue false) unless $?.success?
+        list.each_line.any? { |l| g, s = l.split; g.to_i == pid && !s.to_s.start_with?("Z") }
       rescue SystemCallError
         Process.kill(0, -pid) rescue false
       end

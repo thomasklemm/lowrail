@@ -61,6 +61,24 @@ class ProfileEnvTest < Minitest::Test
   end
   end
 
+  # A ps that runs but fails says nothing about the group: the grace still
+  # holds, so a process that cleans up on TERM for 3 s finishes before KILL.
+  def test_timeout_waits_out_the_grace_when_ps_fails
+    realpath_tmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "bin"))
+      File.write(File.join(dir, "bin/ps"), "#!/bin/sh\nexit 1\n")
+      File.chmod(0o755, File.join(dir, "bin/ps"))
+      profile(dir, "--runs", "1", "--out", "warm", "--", RUBY, "-e", "exit") # builds the counter first
+      cleanup = 'trap("TERM") { sleep 3; File.write("cleaned", ""); exit }; File.write("ready", ""); sleep'
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "PATH" => "#{File.join(dir, "bin")}:#{ENV["PATH"]}")
+      _, err, status = Open3.capture3(env, RUBY, PROFILE, "--timeout", "2", "--out", "o", "--",
+        RUBY, "-e", "spawn(RbConfig.ruby, '-e', #{cleanup.inspect}); sleep", chdir: dir)
+      assert_equal 124, status.exitstatus, err
+      assert File.exist?(File.join(dir, "ready")), "the grandchild started"
+      assert File.exist?(File.join(dir, "cleaned")), "the grandchild's cleanup was cut off by KILL"
+    end
+  end
+
   def test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
