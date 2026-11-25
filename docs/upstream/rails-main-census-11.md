@@ -377,3 +377,100 @@ bundle exec mdl guides/source/upgrading_ruby_on_rails.md
 | Rails-configured Markdown lint | Passed | 0 violations | — |
 
 The first frameworks/Guides attempts exposed missing local `mysql2`/Dart Sass tooling; both were installed in the isolated review bundle, then the reported checks were rerun. Guides emits existing duplicate RDoc/lexer warnings. Running `mdl` from the Lowrail root applies the wrong defaults and reports numerous legacy guide violations; the Rails-root invocation above applies Rails's rules and passes. No check was suppressed or Rails source modified. This is documentation-only, so it adds no runtime test expected to fail without the note; the differential probes instead establish that the behavior it documents is real. Logs are retained under the review scratch directory (`ug82m-*-final.log`, `ug82m-mailer.log`, `ug82m-configuration.log`, `ug82m-production-controls.log`).
+
+## LR1 Astra review
+
+**Pass:** `reviewer: astra`; **head:** [`7e342de11f12e6ee056e6c7ff5df713b2518e03c`](https://github.com/thomasklemm/rails/commit/7e342de11f12e6ee056e6c7ff5df713b2518e03c); **verdict: changes (submission text/evidence), code approved**. Both Thermos rubrics were applied directly in [this independent review](https://ampcode.com/threads/T-01a2132c-31b3-71c8-b821-d29a85b09215), without delegation or reading the parallel review. The queue body reviewed is Lowrail `6fb73534e27b1285ed146f830a65384671c1662a`. No Rails file, branch, PR or comment was changed. The remote branch still named this exact head at the final check.
+
+The control is the candidate's parent, main [`cf0325a832a1594f01d866da1e4ad23d962d886b`](https://github.com/rails/rails/commit/cf0325a832a1594f01d866da1e4ad23d962d886b). The registry and pool implementation are also unchanged on fetched upstream main [`818edfd76a405b29f4695e051c07ea28a5476a4e`](https://github.com/rails/rails/commit/818edfd76a405b29f4695e051c07ea28a5476a4e); tests/probes ran against the parent and candidate, not an unlabelled moving main. CRuby runs use Ruby 4.0.9 (`3e93b23afc`), Minitest 6.1.0, SQLite gem 2.10.2 and PostgreSQL 17. All scratch sources, runtime distributions and logs are retained in `.amp/in/orb-backup/lr1-astra/` in the review orb.
+
+### What the mutex protects
+
+Read the source before the introducing discussion. [PR 59844](https://github.com/rails/rails/pull/59844) fixes a connection lost when checkout waits while another thread disconnects the pool. The waiter used to put its connection on a lease no longer in the registry; release then found a different empty lease. Byroot requested a terminated flag and a shared checkout helper, and rejected moving the map into the generation. The merged solution retains the registry, marks its old generation terminated, and re-resolves the lease after checkout if necessary. There was no performance discussion. [PR 59887](https://github.com/rails/rails/pull/59887) subsequently fixed non-MRI initialization and separated the two mutexes; [59883](https://github.com/rails/rails/pull/59883) is the closed competing fix.
+
+`@lease_mutex` serializes **creation/publication with registry clear and flag rotation**. It never enclosed the later writes to `lease.connection`, `lease.sticky`, `Lease#release` or `Lease#clear`. Removing it from hits does not remove synchronization that protected those fields. Exactness rests on these boundaries:
+
+* **Publication:** `Lease.new` completes before the map stores the reference. CRuby's [`wkmap_aref`, `wkmap_aset` and `wkmap_clear`](https://github.com/ruby/ruby/blob/3e93b23afc/weakmap.c#L799-L1010) perform their table operations under the GVL; they do not release it. The actual keys are ordinary execution-context Thread/Fiber objects. This is not a blanket claim of atomicity for arbitrary user-defined `hash`/`eql?` callbacks. JRuby/TruffleRuby use `ActiveSupport::WeakKeyMap`'s **own mutex for both reads and writes**, which publishes the fully initialized value. The hit is only registry-lock-free there, not lock-free overall.
+* **Miss:** it takes `@lease_mutex` and rechecks in `fetch_or_store`. Two misses cannot publish different leases for the same live context/generation, and creation cannot pair a fresh map entry with the outgoing terminated flag. Replacing the fallback with an unguarded `fetch_or_store` would not be equivalent.
+* **Clear:** a successful lookup linearizes before the clear that removes its entry. It may return an already-terminated lease if clear completes before the caller resumes, just as the old locked method could after releasing its mutex. A lookup after removal misses and waits for flag rotation. `checkout_lease` still repairs a lease invalidated during checkout. No cached reference is safe to use indefinitely; LR1 adds no such cache.
+* **Release, reuse and reaping:** releasing a connection leaves its empty lease reusable; it does not evict the registry entry. The live context remains strongly referenced during lookup, so weak-key GC cannot evict that context. Pool/adapter locks and ownership govern connection mutation; the reaper steals only dead owners. A forced disconnect's existing ability to invalidate a connection in use is not a new guarantee introduced by LR1.
+* **Fork/Ractors/fibers:** the fork hook discards the inherited pool and recreates it, rather than reusing its registry. Ractor proxies send operations to the main Ractor that owns the real pool; this mutable registry is not shared between Ractors. Thread/fiber isolation still selects the same key. The map lock is released before a miss takes the registry lock, so the new lookup creates no reversed nested lock order or scheduler wait cycle.
+
+No source correctness/security must-fix was found. This is an argument about the actual operations and ownership model, supported by stress and forced-interleaving probes, not a claim that finite stress proves every schedule.
+
+### Executed concurrency probes
+
+`registry.rb` evaluates the **unchanged exact Lease/LeaseRegistry class bodies** from each tree with that tree's actual `ActiveSupport::WeakKeyMap` and concurrent-ruby 1.3.8. It is a focused registry test, not a claim that the complete Active Record/JDBC stack ran on JRuby or TruffleRuby. Six 30-second runs each use 16 readers contending on one strongly held key, a clearing thread and a GC thread. They check initialized state, one lease per generation, termination after clear, and a fresh nonterminated replacement. CRuby uses `GC.verify_compaction_references(double_heap: true, toward: :empty)`; the other engines run GC bursts.
+
+| Runtime / tree | Lookups | Clears | GC bursts | Violations |
+| --- | ---: | ---: | ---: | ---: |
+| CRuby 4.0.9 / main parent | 33,418,777 | 11,638 | 237 | 0 |
+| CRuby 4.0.9 / exact head | 43,940,461 | 13,828 | 236 | 0 |
+| TruffleRuby 40.0.0 / main parent | 24,515,794 | 31,484 | 244 | 0 |
+| TruffleRuby 40.0.0 / exact head | 28,713,768 | 31,522 | 244 | 0 |
+| JRuby 10.1.3.0, OpenJDK 21 / main parent | 17,545,168 | 34,080 | 299 | 0 |
+| JRuby 10.1.3.0, OpenJDK 21 / exact head | 24,235,348 | 44,280 | 299 | 0 |
+
+Total: **172,369,316 lookups, 166,832 clears, 1,559 GC bursts, zero violations**. Counts are coverage, not comparable throughput measurements: these runs were not performance-isolated.
+
+`pool_probe.rb` boots real Active Record with file-backed SQLite and asymmetric association data (`red`, `green`, `blue`). Each 45-second run has 12 threads and 48 fibers, nested `with_connection`, association reads, explicit sticky leasing/release, compaction and concurrent reaping. It checks exact rows and owner name, active-connection identity, no nested duplicate checkout, true first/false second explicit release, automatic release, and zero remaining busy leases. Fiber-isolated runs also yield while holding the lease. Each run then abandons/reaps 12 dead owners and forks eight children from a parent with a live connection; children must get a different pool/adapter, read the same data and release, while the parent connection still works.
+
+| Tree / isolation | Complete cycles | Association result checks | Compaction bursts | Forks | Violations |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Main parent / thread | 83,131 | 166,262 | 30 | 8 | 0 |
+| Main parent / fiber | 79,736 | 159,472 | 30 | 8 | 0 |
+| Exact head / thread | 86,209 | 172,418 | 30 | 8 | 0 |
+| Exact head / fiber | 81,005 | 162,010 | 30 | 8 | 0 |
+
+Total: **330,081 cycles, 660,162 association checks, 330,081 explicit and 330,081 automatic releases, 48 reaped dead owners, 32 successful forks**. Different cycle counts reflect elapsed-time runs; every result was checked against the same independently specified values.
+
+`scheduler_probe.rb` repeats real association reads and both release modes with **Async 2.46.0 as the actual Fiber scheduler**, 12 threads and 96 fibers. Fibers sleep while holding connections to force interleaving. In 30 seconds per tree, main completed **78,353** cycles/64 compactions and the head **80,616** cycles/26 compactions, with identical expected rows and no identity/release violations. These are another **158,969** checked association/release cycles.
+
+`disconnect_probe.rb` forces the original failure schedule: a one-connection pool is full, a worker queues for checkout, the owner disconnects, and the worker stays alive after releasing. On **each** tree, **200 explicit-lease and 200 `with_connection` races passed**; the main thread then reacquired and queried the sole connection. A negative control that reinstates the pre-fix `checkout_lease` behavior in-process fails on the first race with **`lost explicit release`** (then the completion timeout). This establishes that the harness detects the original lost-lease defect rather than merely finishing threads. The production files were not modified for the control.
+
+Representative invocations from the scratch directory (the shell environment selects Ruby and the isolated component bundle):
+
+```sh
+source env.sh
+RAILS_TREE="$PWD/base" SECONDS=30 ruby registry.rb
+RAILS_TREE="$PWD/rails" SECONDS=30 ruby registry.rb
+# Repeat registry.rb with the downloaded JRuby/TruffleRuby executables and concurrent-ruby's lib on -I.
+RAILS_TREE="$PWD/base" ISOLATION=thread SECONDS=45 bundle exec ruby pool_probe.rb
+# Repeat with ISOLATION=fiber and RAILS_TREE="$PWD/rails".
+RAILS_TREE="$PWD/base" bundle exec ruby scheduler_probe.rb
+RAILS_TREE="$PWD/rails" bundle exec ruby scheduler_probe.rb
+RAILS_TREE="$PWD/base" bundle exec ruby disconnect_probe.rb
+RAILS_TREE="$PWD/rails" bundle exec ruby disconnect_probe.rb
+```
+
+### Active Record tests and ownership check
+
+From each checkout's `activerecord/`, with the bundle pointing to that same tree:
+
+```sh
+bundle exec ruby bin/test -a sqlite3 test/cases/connection_pool_test.rb test/cases/connection_adapters/connection_handler_test.rb test/cases/connection_adapters/connection_swapping_nested_test.rb test/cases/reaper_test.rb test/cases/query_cache_test.rb test/cases/connection_adapters/ractor_connection_handling_test.rb --seed 42117
+# Repeat with -a postgresql; also ran the head with -a sqlite3_mem.
+```
+
+| Tree / adapter | Runs | Assertions | Failures / errors | Skips |
+| --- | ---: | ---: | --- | ---: |
+| Exact head / SQLite memory | 259 | 1379 | 0 / 0 | 7 |
+| Exact head / SQLite file | 338 | 1786 | 0 / 0 | 2 |
+| Main parent / SQLite file | 338 | 1786 | 0 / 0 | 2 |
+| Exact head / PostgreSQL | 337 | 1811 | 0 / 0 | 0 |
+| Main parent / PostgreSQL | 337 | 1811 | 0 / 0 | 0 |
+
+File-backed SQLite and PostgreSQL include the Ractor connection-handling cases omitted by the memory-database condition. Setup initially lacked the bundle's new `herb` dependency and PostgreSQL's `en_US.UTF-8` locale; both were installed before the successful runs. An initial root-level test invocation used the wrong runner location and ran no tests; reported counts are the subsequent component-directory runs. No failures/skips were hidden or Rails sources adjusted to make these pass.
+
+Ownership was checked through search for `59844`/`LeaseRegistry`, all introducing/follow-up discussion and timeline cross-references, and a paginated scan of **all 1,336 open rails/rails PRs**. **27** touch a `connection_pool.rb` or `weak_key_map.rb` path (including proxies and unrelated historical versions); **20** touch the abstract pool itself. Their pool hunks were read; **none changes `LeaseRegistry#lease` or implements this fast hit**. The earlier “eight open PRs touch the file” is not a complete inventory. In particular, open [57253](https://github.com/rails/rails/pull/57253) changes `release_connection(existing_lease)`, not lookup, and is not a duplicate. The introducing PR's cross-references are closed 59883 and merged 59887; their timelines reveal no open lookup replacement. Raw head IDs and patches are in `ownership.json` and `pr-*.diff` in the scratch directory.
+
+### Maintainability, commit and body verdict
+
+Cold read: “Return an already published lease; otherwise take the creation/generation lock and recheck.” One `||` at the registry's own boundary is the smallest change. It leaves the general map's non-atomic `fetch_or_store` contract alone, adds no helper/state/runtime branch/comment, and keeps the pool's existing locking architecture. The file was already **1374 lines and remains 1374**; no threshold is crossed. No structural simplification or separate abstraction would improve this one-line change. `git diff --check` passes. The commit has **Thomas Klemm `<github@tklemm.eu>` as both author and committer, no trailers**, and accurately explains creation versus hit lookup.
+
+The body is otherwise concise: title names the change; the creation/terminated-flag sentence and miss sentence match the code; the before-clear ordering paragraph is sound with the runtime qualification above; the Callgrind heading correctly calls instructions instructions, not time. The table values match the committed census raw files (integer-truncated), and allocations are unchanged in those files. Two corrections are required before this can open:
+
+1. **Evidence/presentation gate:** DECISIONS now requires a small benchmark-ips/benchmark-driver script and before/after output as the Rails performance body's lead, and the queue requires numbers from `script/upstream-bench`. The current body has only the census Callgrind table, with no canonical body run. Smallest fix: run the prescribed base/head/A/A benchmark, keep raw output in its body evidence directory, and replace the table with the concise supported result. Do not promote an inside-noise row to a speed claim. The queue's Ruby-master/ZJIT check also remains outstanding; this review supplies no new JIT performance claim. The patched census Valgrind and `ir_count.so` were absent in this orb, so the census timing/count measurement was **not independently rerun**; reading its raw numbers is not a fresh confirmation of the percentage effects.
+2. **Overbroad query frequency:** delete “once or more per query” from the opening paragraph, and “i.e. on every query” from `impact`. With a connection already leased, **10 real `select_value("SELECT 23")` calls caused zero `LeaseRegistry#lease` calls**, counted with TracePoint on the exact head. The true claim is that each named pool lookup acquires the registry mutex on main, not that every SQL query does. No replacement paragraph is needed.
+
+These are submission/body must-fixes, not a request to rebuild the Rails code or to add implementation-locking tests. The existing generation/disconnect regression tests and the independent probes cover observable behavior. Keep LR1 built and unopened pending those corrections, the other required reviews and Thomas's decision.
