@@ -197,26 +197,47 @@ class ProfileCompareTest < Minitest::Test
     end
   end
 
-  # The CI step README-profile.md shows fails the job on a regression, run the
-  # way GitHub Actions runs it (an explicit shell: bash adds pipefail).
-  def test_documented_ci_compare_step_fails_on_a_regression
+  # The CI step README-profile.md shows, run the way GitHub Actions runs it
+  # (an explicit shell: bash adds pipefail): a regression fails the job only
+  # when a second profile of head shows it too; a clean or invalid compare
+  # decides at once, without profiling head again.
+  def test_documented_ci_compare_step_confirms_a_regression
     require "yaml"
     realpath_tmpdir do |dir|
       yaml = File.read(File.join(GEM_ROOT, "README-profile.md"))[/```yaml\n(.*?)```/m, 1]
       step = YAML.safe_load(yaml).values.first.fetch("steps").find { _1["name"] == "Compare" }
       shell = { nil => %w[bash -e], "bash" => %w[bash --noprofile --norc -eo pipefail] }.fetch(step["shell"])
       FileUtils.mkdir_p(File.join(dir, "bin"))
-      File.write(File.join(dir, "bin/bundle"), "#!/bin/sh\nshift 2\nexec #{RUBY} #{PROFILE} \"$@\"\n")
+      # bundle exec lowrail-profile: compare runs for real; profiling head again writes HEAD2's report.
+      File.write(File.join(dir, "bin/bundle"), <<~SH)
+        #!/bin/sh
+        shift 2
+        if [ "$1" = "--out" ]; then mkdir -p "$2" && cp "$HEAD2" "$2/report.json" && exit 0; fi
+        exec #{RUBY} #{PROFILE} "$@"
+      SH
       File.chmod(0o755, File.join(dir, "bin/bundle"))
-      %w[base base2 head].zip([10.0, 10.0, 30.0]) do |name, warm|
-        FileUtils.mkdir_p(File.join(dir, "tmp", name))
-        File.write(File.join(dir, "tmp", name, "report.json"), JSON.generate(report([warm, warm])))
-      end
       File.write(File.join(dir, "step.sh"), step.fetch("run"))
-      env = CLEAN_ENV.merge("PATH" => "#{File.join(dir, "bin")}:#{ENV["PATH"]}", "GITHUB_STEP_SUMMARY" => File.join(dir, "summary.md"))
-      _, _, status = Open3.capture3(env, *shell, "step.sh", chdir: dir)
-      refute status.success?, "the documented Compare step passes on a regression"
-      assert_match(/Regressions: 1/, File.read(File.join(dir, "summary.md")))
+      fixture = ->(name, r) { File.join(dir, "#{name}.json").tap { File.write(_1, JSON.generate(r)) } }
+      flat = ->(v) { report([v, v]) }
+      run = lambda do |head, head2|
+        FileUtils.rm_rf(File.join(dir, "tmp"))
+        { "base" => flat.(10.0), "base2" => flat.(10.0), "head" => head }.each do |name, r|
+          FileUtils.mkdir_p(File.join(dir, "tmp", name))
+          File.write(File.join(dir, "tmp", name, "report.json"), JSON.generate(r))
+        end
+        env = CLEAN_ENV.merge("PATH" => "#{File.join(dir, "bin")}:#{ENV["PATH"]}", "GITHUB_STEP_SUMMARY" => File.join(dir, "summary.md"),
+          "HEAD2" => fixture.("head2", head2))
+        File.write(File.join(dir, "summary.md"), "")
+        _, err, status = Open3.capture3(env, *shell, "step.sh", chdir: dir)
+        [status.exitstatus, File.exist?(File.join(dir, "tmp/head2")), File.read(File.join(dir, "summary.md")), err]
+      end
+      status, again, summary = run.(flat.(30.0), flat.(30.0))
+      assert_equal [1, true], [status, again], "a regression both profiles of head show fails the job"
+      assert_equal 2, summary.scan(/Regressions: 1/).size
+      status, again, = run.(flat.(30.0), flat.(10.0))
+      assert_equal [0, true], [status, again], "a regression the second profile does not show passes"
+      assert_equal [0, false], run.(flat.(10.0), flat.(30.0)).first(2), "a clean compare does not profile head again"
+      assert_equal [2, false], run.(flat.(10.0).except("ranked"), flat.(10.0)).first(2), "invalid evidence fails at once"
     end
   end
 end

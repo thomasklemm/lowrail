@@ -317,7 +317,7 @@ One A/A pair is one more sample of the variation between invocations, not a conf
 than this pair shows can still exceed it.
 
 A GitHub Actions job that profiles the pull request's base twice (the A/A pair) and its head with the same command
-and fails on a regression:
+and fails on a regression that a second profile of head shows too:
 
 ```yaml
 lowrail-profile:
@@ -340,14 +340,25 @@ lowrail-profile:
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
       shell: bash # pipefail, so tee does not hide compare's exit status
-      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json | tee -a "$GITHUB_STEP_SUMMARY"
+      run: |
+        status=0
+        bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json \
+          | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+        [ "$status" = 1 ] || exit "$status"
+        echo "Profiling head again: a regression fails the job only if it shows twice." | tee -a "$GITHUB_STEP_SUMMARY"
+        bundle exec lowrail-profile --out tmp/head2 -- bin/rails test
+        bundle exec lowrail-profile compare tmp/base/report.json tmp/head2/report.json --aa tmp/base2/report.json \
+          | tee -a "$GITHUB_STEP_SUMMARY"
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step from the head's
 Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles, for a look at the report, but compare then
 exits 2; check the suite in its own job. `shell: bash` matters: without it GitHub runs the step without `pipefail`,
 and `tee` would turn compare's exit status into 0. Without `--aa tmp/base2/report.json` the step never fails: compare
-without an A/A pair is not a gate. The second base profile costs one more suite run.
+without an A/A pair is not a gate. The second base profile costs one more suite run. A first exit 1 profiles head once more, and the
+job fails only if that comparison exits 1 too: on the receipts' Blog this took unchanged heads from 1.7% failing to
+0.03%, with every planted regression on four apps still caught
+([receipts](../bench/upstream/profile_release/2026-11-25-final)).
 
 ## Safety
 

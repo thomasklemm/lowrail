@@ -103,7 +103,8 @@ An action is compared only under the same name in every report: a renamed or new
 only, is listed under *Not compared* with the reason, and nothing about its own cost gates. Lines outside the app it
 reaches are still compared.
 
-A GitHub Actions job that profiles the pull request's base twice and its head once, and fails on a regression:
+A GitHub Actions job that profiles the pull request's base twice and its head once, and fails on a regression that
+a second profile of head shows too:
 
 ```yaml
 lowrail-profile:
@@ -126,18 +127,31 @@ lowrail-profile:
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
       shell: bash # pipefail, so tee does not hide compare's exit status
-      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json | tee -a "$GITHUB_STEP_SUMMARY"
+      run: |
+        status=0
+        bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json \
+          | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+        [ "$status" = 1 ] || exit "$status"
+        echo "Profiling head again: a regression fails the job only if it shows twice." | tee -a "$GITHUB_STEP_SUMMARY"
+        bundle exec lowrail-profile --out tmp/head2 -- bin/rails test
+        bundle exec lowrail-profile compare tmp/base/report.json tmp/head2/report.json --aa tmp/base2/report.json \
+          | tee -a "$GITHUB_STEP_SUMMARY"
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step with the head's
 Gemfile (`BUNDLE_GEMFILE`). Keep `shell: bash`: without it `tee` turns compare's exit status into 0. Check the suite
 itself in its own job: a failing suite makes compare exit 2. The job runs the suite three times, each twice (six
-suite runs); `--runs` and a narrower command (`bin/rails test test/controllers test/integration`) make it cheaper.
+suite runs), and twice more only when the first compare exits 1; `--runs` and a narrower command (`bin/rails test
+test/controllers test/integration`) make it cheaper.
 
-**When the gate fails on unchanged code.** One A/A pair is one sample of how much two invocations differ, not a
-bound. If a row fails that you did not touch, rerun the base pair; a row that varies more than one pair shows can
-still exceed its floor. Parallel test workers split an action's requests differently from run to run, which is why
-an action's floor is wider than a line's.
+**Why head is profiled again.** One A/A pair is one sample of how much two invocations differ, not a bound, and a
+capture can read other values on a line in both its runs (parallel workers split the requests differently). A
+regression is in every profile of head; such a capture is in one. So a single exit 1 is a place to look, and the job
+fails only when a second profile of head exits 1 too. Measured over every assignment of unchanged captures to base,
+A/A and head: on a generated Blog (12 captures) one compare flagged 1.7% of unchanged heads and the job 0.03% (4 of
+11,880); on a fresh Rails 8.1 app with two process workers (24 captures) 0.8% and 0.16%, from one line whose count
+depends on how the workers split seven requests. Every planted regression was still caught, in both profiles of
+head, on the Blog, Campfire, CodeTriage and Lobsters.
 
 ## Experimental: `--record` and `--workloads`
 
@@ -166,7 +180,9 @@ get article_path(article), headers: { "Accept" => "text/html" }
 `setup` block, `jobs: true`, or a GET that would reach the app as another method (an `env:` or header that changes
 it, or a JSON GET with params in an app without `Rack::MethodOverride`) is refused before anything is sent, and so
 is `RAILS_ENV=production` with a writable database on another host (any configuration but a replica, including
-`database_tasks: false` ones) or a database configuration that does not load. With `--allow-writes` the requests write to the app's database, enqueue through its queue adapter
+`database_tasks: false` ones) or a database configuration that does not load. The guard checks each request as the
+file declares it; what a block or `alternate:` returns per turn (a path and params, never a method) is not checked
+again. With `--allow-writes` the requests write to the app's database, enqueue through its queue adapter
 and deliver mail as configured: use a disposable database, queue and mail service. `--workloads` needs the gem in a
 group the environment's `bundle install` keeps.
 
