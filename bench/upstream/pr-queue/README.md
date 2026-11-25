@@ -70,6 +70,11 @@ Usage, method and limits: [body-numbers](../../../docs/upstream/body-numbers.md)
 `form_helper_stack/body/fb1` and `body/am1`. A reviewer checks a body number by rerunning the run's `commands.sh`,
 or the whole run into a new directory.
 
+`evidence:` lists the repo paths that hold the raw data (stats, dumps, captures, run directories) the body's
+numbers come from. `status` reports a problem for an item in state reviewed, draft, ready, merged or closed whose body
+has measured numbers (a unit such as objects, Ir, ns or i/s, a percentage, a factor like 1.3x, or a count with
+thousands separators) and no `evidence:` path that exists, and for every listed path that doesn't exist.
+
 ## Item file
 
 ```markdown
@@ -88,6 +93,7 @@ depends_on: []                # IDs that must be merged first
 stacked_on:                   # ID of our PR this one is stacked on (that one must be opened)
 alternative_of:               # ID this competes with; only one of them opens
 impact: one line, the effect a maintainer cares about
+evidence: [bench/upstream/form_helper_stack/body/fb1]  # repo paths with the raw data behind the body's numbers
 rank: 2                       # 1 opens first
 risky: false                  # true: Astra is required (DECISIONS, review rounds)
 guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable stand in for Sol and Astra

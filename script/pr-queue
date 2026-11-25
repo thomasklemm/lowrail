@@ -45,6 +45,10 @@ module PrQueue
   CHANGELOGS = ":(glob)**/CHANGELOG*"
   NOT_CHANGELOGS = ":(exclude,glob)**/CHANGELOG*"
   LEDGER = File.join(ROOT, "docs/upstream/contributions.md")
+  # A measured number in a body: a unit, a percentage, a factor or a thousands-separated count. Links, SHAs and
+  # #N are removed first. Such a body needs an evidence: path with the raw data to replay it (DECISIONS 2026-11-25).
+  MEASURED = /\d(?:[\d,.]*\d)?(?:\s*%|\s*(?:×|ms|µs|us|ns|i\/s|Ir|instructions|objects|allocations|bytes|[KMG]i?B)\b|x\b|\s+times\b)|\b\d{1,3}(?:,\d{3})+\b/
+  EVIDENCE_STATES = %w[reviewed draft ready merged closed].freeze
 
   Item = Struct.new(:path, :meta, :title, :body) do
     def id = meta["id"]
@@ -85,6 +89,12 @@ module PrQueue
       list << "pass verdict #{pass['verdict'].inspect}" unless VERDICTS.include?(pass["verdict"])
       list << "pass head must be a quoted SHA or unrecorded" unless sha?(pass["head"]) || pass["head"] == "unrecorded"
       list << "#{pass['reviewer']} pass needs orb" if %w[opus fable].include?(pass["reviewer"]) && pass["orb"].to_s.empty?
+    end
+    found, gone = Array(m["evidence"]).partition { _1.is_a?(String) && !_1.empty? && File.exist?(File.join(ROOT, _1)) }
+    gone.each { list << "evidence #{_1.inspect} doesn't exist" }
+    if EVIDENCE_STATES.include?(m["state"]) && found.empty? &&
+       (number = item.body.gsub(%r{https?://\S+|\b(?=\h*[a-f])\h{7,40}\b|#\d+}, "")[MEASURED])
+      list << "body has numbers (#{number}) but no evidence: path"
     end
     Array(m["waived"]).each do |waiver|
       list << "only thermos can be waived" unless waiver["reviewer"] == "thermos"

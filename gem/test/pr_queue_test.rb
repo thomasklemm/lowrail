@@ -136,6 +136,21 @@ end
     assert_equal "Body line.", PrQueue.parse("X1.md", "---\nid: X1\n---\n\n# Title\n\nBody line.\n").body
   end
 
+  def test_a_reviewed_body_with_numbers_needs_an_evidence_path_that_exists
+    problems = lambda do |state, body, evidence = nil|
+      front = { "id" => "X1", "state" => state, "kind" => "perf", "evidence" => evidence }.compact.to_yaml
+      PrQueue.problems(PrQueue.parse("X1.md", "#{front}---\n\n# Title\n\n#{body}\n"))
+    end
+    measured = "Allocations drop from 32 to 28 objects per call."
+    assert_equal ["body has numbers (28 objects) but no evidence: path"], problems.("reviewed", measured)
+    assert_equal ["body has numbers (42,441) but no evidence: path"], problems.("closed", "42,441 of the fallbacks go.")
+    assert_empty problems.("built", measured)
+    assert_empty problems.("reviewed", "Since #58211 (156cd688e9) on 8.1, 3 tests fail; see https://example.com/1.5x.")
+    assert_empty problems.("closed", measured, ["script/pr-queue"])
+    assert_equal ['evidence "bench/upstream/gone" doesn\'t exist', "body has numbers (28 objects) but no evidence: path"],
+                 problems.("closed", measured, ["bench/upstream/gone"])
+  end
+
   def test_without_a_fetched_branch_the_merge_state_comes_from_github
     assert_equal "CONFLICT(gh)", PrQueue.merge_label({ error: "fetch: denied" }, "CONFLICTING")
     assert_equal "clean(gh)", PrQueue.merge_label(nil, "MERGEABLE")

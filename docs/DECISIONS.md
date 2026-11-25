@@ -261,6 +261,10 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   when we can build it. An issue is opened only for a correctness bug (crash, wrong result, interpreter/JIT
   divergence) with a minimal repro, which we file even if we also fix it (like Shopify/ruby#1101). Performance
   leads never become issues on their own.
+* **Raw data is committed or archived before a worker reports done** (2026-11-25): four times a number in a body
+  couldn't be replayed because its stats, dumps or captures lived only in an archived orb. A worker thread commits its
+  raw data to Lowrail, or a compressed archive of it, and lists the paths in the item's `evidence:` before it
+  reports done; `script/pr-queue status` flags a reviewed or later item whose body has numbers and no such path.
 * **Where claims come from.** Callgrind instruction counts with fixed heap and A/A are primary
   ([bench.md](bench.md)). App pages find sites but can't price them (A/A up to ±7%). ZJIT speed claims come from
   ruby-bench with A/A.
