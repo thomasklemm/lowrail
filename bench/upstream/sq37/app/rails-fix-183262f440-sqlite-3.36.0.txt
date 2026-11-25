@@ -1,0 +1,11 @@
+$ bin/rails runner 'puts Rails.version, SQLite3::SQLITE_LOADED_VERSION'
+8.2.0.alpha
+3.36.0
+$ bin/rails db:prepare
+bin/rails aborted!
+Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.
+/home/user/apps/appfix/vendor/bundle/ruby/4.0.0/gems/rake-13.4.2/lib/rake/task.rb:281:in 'block in Rake::Task#execute'
+/home/user/apps/appfix/vendor/bundle/ruby/4.0.0/gems/rake-13.4.2/lib/rake/task.rb:281:in 'Array#each'
+/home/user/apps/appfix/vendor/bundle/ruby/4.0.0/gems/rake-13.4.2/lib/rake/task.rb:281:in 'Rake::Task#execute'
+/home/user/apps/appfix/vendor/bundle/ruby/4.0.0/gems/rake-13.4.2/lib/rake/task.rb:219:in 'block in Rake::Task#invoke_with_call_chain'
+exit=1

@@ -43,6 +43,7 @@ OptionParser.new do |parser|
   parser.on("--base REF", "Default: merge-base of head and rails/rails main") { options[:base] = _1 }
   parser.on("--only LIST", "Subset of sqlite,postgresql,mysql,ruby") { options[:only] = _1.split(",") }
   parser.on("--mariadb TAG", "Add a MariaDB image (Rails main states no MariaDB floor)") { options[:mariadb] = _1 }
+  parser.on("--sqlite LIST", "Add SQLite versions, such as 3.36.0, to the floor and middle") { options[:sqlite] = _1.split(",") }
   parser.on("--seed N", Integer) { options[:seed] = _1 }
   parser.on("--json FILE", "Also write the report as JSON") { options[:json] = File.expand_path(_1) }
 end.parse!
@@ -171,7 +172,7 @@ end
 def sqlite_url(version)
   a, b, c = version_key(version)
   number = format("%d%02d%02d00", a, b, c)
-  (2020..Time.now.year).map { "https://www.sqlite.org/#{_1}/sqlite-autoconf-#{number}.tar.gz" }
+  (2013..Time.now.year).map { "https://www.sqlite.org/#{_1}/sqlite-autoconf-#{number}.tar.gz" }
     .find { system("curl", "-sfI", "-o", File::NULL, _1) }
 end
 
@@ -362,7 +363,7 @@ if options[:only].include?("sqlite")
   floor_sqlite = floor_versions["sqlite"].end_with?(".0") ? last_patch(floor_minor) : floor_versions["sqlite"]
   newest_minor = version_key(sqlite_releases.last)[1]
   middle_sqlite = last_patch("3.#{(version_key(floor_minor)[1] + newest_minor) / 2}")
-  [["floor", floor_sqlite], ["middle", middle_sqlite]].each do |role, version|
+  [["floor", floor_sqlite], ["middle", middle_sqlite], *options[:sqlite]&.map { ["extra", _1] }].each do |role, version|
     dir = build_sqlite(version)
     add_cell.("SQLite #{version} (#{role}, Ruby #{RUBY_VERSION})", "sqlite-#{version}", files_for(files, "sqlite"),
       ruby: pinned_ruby, sqlite: dir, adapter: "sqlite3")

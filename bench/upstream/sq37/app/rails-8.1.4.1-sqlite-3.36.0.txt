@@ -1,0 +1,11 @@
+$ bin/rails runner 'puts Rails.version, SQLite3::SQLITE_LOADED_VERSION'
+8.1.4.1
+3.36.0
+$ bin/rails db:prepare
+bin/rails aborted!
+ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view') /*application='App81'*/
+/home/user/apps/app81/vendor/bundle/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#prepare'
+/home/user/apps/app81/vendor/bundle/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#initialize'
+/home/user/apps/app81/vendor/bundle/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/database.rb:215:in 'SQLite3::Database#prepare'
+exit=1

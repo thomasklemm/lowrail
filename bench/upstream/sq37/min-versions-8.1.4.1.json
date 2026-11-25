@@ -1,0 +1,397 @@
+{
+  "base": "3f290b759c8e2ffe7c257951b1255740751355e4",
+  "head": "3f290b759c8e2ffe7c257951b1255740751355e4",
+  "repo": "https://github.com/rails/rails.git",
+  "files": [
+    "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+  ],
+  "floors": {
+    "sqlite": "3.23.0",
+    "postgresql": "9.5",
+    "mysql": "5.6.4",
+    "ruby": "3.2.0"
+  },
+  "seed": 41231,
+  "cells": [
+    {
+      "label": "SQLite 3.23.1 (floor, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 28,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "head": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "new_in_head": []
+    },
+    {
+      "label": "SQLite 3.38.5 (middle, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 39,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "pass",
+        "summary": "15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "head": {
+        "status": "pass",
+        "summary": "15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "new_in_head": []
+    },
+    {
+      "label": "SQLite 3.35.5 (extra, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 39,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "head": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "new_in_head": []
+    },
+    {
+      "label": "SQLite 3.36.0 (extra, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 35,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "head": {
+        "status": "fail",
+        "summary": "15 runs, 5 assertions, 0 failures, 11 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": null
+      },
+      "new_in_head": []
+    },
+    {
+      "label": "SQLite 3.37.0 (extra, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 35,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "pass",
+        "summary": "15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "head": {
+        "status": "pass",
+        "summary": "15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "new_in_head": []
+    }
+  ]
+}

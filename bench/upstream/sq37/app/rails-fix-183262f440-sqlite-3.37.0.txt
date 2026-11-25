@@ -1,0 +1,11 @@
+$ bin/rails runner 'puts Rails.version, SQLite3::SQLITE_LOADED_VERSION'
+8.2.0.alpha
+3.37.0
+$ bin/rails db:prepare
+== 20261125231205 CreatePosts: migrating ======================================
+-- create_table(:posts)
+   -> 0.0012s
+== 20261125231205 CreatePosts: migrated (0.0016s) =============================
+
+== 20261125231205 CreatePosts: migrating ======================================
+exit=0

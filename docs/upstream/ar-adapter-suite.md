@@ -47,7 +47,8 @@ mise exec ruby@4.0.9 -- script/min-versions --repo ~/src/rails --only sqlite,pos
 The floors come from the base tree on every run: `check_version` in the SQLite, PostgreSQL and abstract MySQL
 adapters and `required_ruby_version` in `rails.gemspec`. Each cell runs base and head; the table lists each version's
 build time and any test that fails on head but not base (exit 1; exit 2 if a run crashed before minitest reported).
-`--json FILE` keeps the report; `--mariadb TAG` adds a MariaDB image (Rails names no MariaDB floor). Builds are cached
+`--json FILE` keeps the report; `--mariadb TAG` adds a MariaDB image (Rails names no MariaDB floor); `--sqlite 3.36.0,3.37.0`
+adds SQLite cells beside the floor and middle (SQ37 used it for the [3.35/3.36 gap](../../bench/upstream/sq37/README.md)). Builds are cached
 in `~/.cache/lowrail-min-versions`, each with its recipe and time in `BUILD.json`; delete a directory to rebuild it.
 Docker needs `sudo`; the script starts the daemon if it is down. Files under `activerecord/`'s adapter directories run
 only on their database; other Active Record files run on every cell.
