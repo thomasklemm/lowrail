@@ -57,6 +57,16 @@ def test_opus_or_fable_from_another_orb_stands_in_for_astra
   assert_empty risky.([claude, fable])
   assert_equal %w[thermos], PrQueue.missing(item([claude, opus.("T-b"), fable]), 201)
   assert_empty risky.([claude.except("orb"), pass("astra", "bbbbbbbbbb")])
+
+  guard = ->(passes) { PrQueue.missing(item(passes, risky: true).merge("guard_review" => true), 40) }
+  thermos_opus = pass("thermos-opus", "bbbbbbbbbb").merge("orb" => "T-b")
+  assert_equal %w[astra], risky.([claude, thermos_opus])
+  assert_empty guard.([claude, thermos_opus])
+  assert_empty guard.([claude, pass("thermos-fable", "bbbbbbbbbb").merge("orb" => "T-b")])
+  assert_equal %w[astra], guard.([claude, thermos_opus.merge("orb" => "T-a")])
+  assert_equal %w[astra], guard.([claude, pass("thermos-sol", "bbbbbbbbbb").merge("orb" => "T-b")])
+  assert_empty guard.([thermos_opus.merge("orb" => "T-a"), thermos_opus])
+  assert_equal %w[astra], guard.([thermos_opus])
 end
 
   def test_a_thermos_waiver_counts_only_on_the_current_head_with_a_reason

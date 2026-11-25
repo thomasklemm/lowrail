@@ -26,6 +26,9 @@ module PrQueue
   KINDS = %w[fix perf docs restore].freeze
   REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus thermos-fable opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
+  # guard_review: true, a review of our own safety guards, which Sol's and Astra's cyber-safety checks stop
+  # (DECISIONS 2026-11-25, "Reviews of our own safety guards go to Anthropic models").
+  GUARD_STAND_INS = %w[thermos-opus thermos-fable].freeze
   # Thermos on Sol (or Opus for crash fixes) is the default review and a thermos review (DECISIONS 2026-11-18).
   # A Fable thermos pass counts where an Opus one does (DECISIONS 2026-11-25).
   THERMOS_REVIEWS = %w[thermos-sol thermos-opus thermos-fable].freeze
@@ -74,6 +77,7 @@ module PrQueue
     list << "unknown kind #{m['kind'].inspect}" unless KINDS.include?(m["kind"])
     list << "head must be a quoted SHA" unless m["head"].nil? || sha?(m["head"])
     list << "pr must be a number" unless m["pr"].nil? || m["pr"].is_a?(Integer)
+    list << "guard_review must be true or false" unless [nil, true, false].include?(m["guard_review"])
     list << "#{m['state']} needs pr" if %w[draft ready merged].include?(m["state"]) && !m["pr"]
     list << "no title" if item.title.empty?
     Array(m["passes"]).each do |pass|
@@ -101,20 +105,23 @@ module PrQueue
 
   # Reviewers whose latest pass on the current head is missing or doesn't approve, unless waived on that head.
   # Passes are listed oldest first. A stand-in fills one slot, from an orb other than the claude-code pass's and
-  # the other stand-ins'.
+  # the other stand-ins'. With guard_review, a thermos-opus or thermos-fable pass stands in for Sol and Astra.
   def missing(meta, lines)
     passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }.reverse
     waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
     approves = ->(pass) { VERDICTS.first(2).include?(pass&.fetch("verdict", nil)) }
     latest_per_orb = passes.uniq { [_1["reviewer"], _1["orb"]] }
-    claude_orb = passes.find { ACCEPTS["claude-code"].include?(_1["reviewer"]) }&.[]("orb").to_s
+    guard = meta["guard_review"] ? GUARD_STAND_INS : []
+    reviews = passes.select { ACCEPTS["claude-code"].include?(_1["reviewer"]) }
+    claude_orb = (reviews.find { !guard.include?(_1["reviewer"]) } || reviews.first)&.[]("orb").to_s
     used = ["", claude_orb]
     required(meta, lines).reject do |who|
       next true if waived.any? { _1["reviewer"] == who }
       next true if approves.(passes.find { ACCEPTS.fetch(who, [who]).include?(_1["reviewer"]) })
       next false if claude_orb.empty?
+      stand_ins = STAND_INS.key?(who) ? STAND_INS[who] + guard : []
       stand_in = latest_per_orb.find do
-        STAND_INS.fetch(who, []).include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)
+        stand_ins.include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)
       end
       next false unless stand_in
       used << stand_in["orb"].to_s

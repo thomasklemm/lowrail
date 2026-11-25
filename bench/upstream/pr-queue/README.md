@@ -85,6 +85,7 @@ alternative_of:               # ID this competes with; only one of them opens
 impact: one line, the effect a maintainer cares about
 rank: 2                       # 1 opens first
 risky: false                  # true: Astra is required (DECISIONS, review rounds)
+guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable stand in for Sol and Astra
 state: draft
 pr: 59667
 note:                         # one line: why it is held, superseded, ...
@@ -106,6 +107,9 @@ subagent, kept as a record), `sol`, `astra`, `thermos`, `thermos-sol`, `thermos-
 thermos review on that model, which is also the detailed review), and for now `opus` and `fable`, which stand in for Sol or
 Astra when their `orb` (the orb's thread ID) differs from the claude-code pass's `orb` on that head and from the other
 stand-in's ([DECISIONS](../../../docs/DECISIONS.md#opus-and-fable-stand-in-for-sol-and-astra-thomas-2026-11-14-temporary-pending-thomas)).
+On an item with `guard_review: true`, `thermos-opus` and `thermos-fable` stand in the same way, since Sol's and
+Astra's cyber-safety checks stop reviews of our own safety guards
+([DECISIONS](../../../docs/DECISIONS.md#working-mode), "Reviews of our own safety guards go to Anthropic models").
 `verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
