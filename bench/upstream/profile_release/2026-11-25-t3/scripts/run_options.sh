@@ -16,12 +16,12 @@ case $1 in
   lobsters) run "Lobsters, one process" 'output_safety|erb/util|HomeController' $P/2026-11-25/lobsters/{profiled,base2,head} -- $P/2026-11-25/lobsters/planted $P/2026-11-25-final/lobsters/planted2 ;;
   osm-parallel) run "openstreetmap-website, 8 workers" 'x^' $O/osm/lowrail-profile{,-aa,-head,-head2} ;;
   osm-serial) run "openstreetmap-website, PARALLEL_WORKERS=1" 'NotesController#index|x^' $O/osm-serial/s{1,2,3,4} -- $O/osm-serial/s5 ;;
-  hackatime-serial) run "Hackatime, PARALLEL_WORKERS=1" 'LeaderboardsController#index|output_safety|erb/util' $O/census/$1/s{1,2,3,4,5,6} -- $O/census/$1/splanted{,2} ;;
-  writebook-serial) run "Writebook, PARALLEL_WORKERS=1" 'SessionsController#create|output_safety|erb/util' $O/census/$1/s{1,2,3,4,5,6} -- $O/census/$1/splanted{,2} ;;
+  hackatime-serial) run "Hackatime, PARALLEL_WORKERS=1" 'LeaderboardsController#index|output_safety|erb/util' census/$1/s{1,2,3,4,5,6} -- census/$1/splanted{,2} ;;
+  writebook-serial) run "Writebook, PARALLEL_WORKERS=1" 'SessionsController#create|output_safety|erb/util' census/$1/s{1,2,3,4,5,6} -- census/$1/splanted{,2} ;;
   hackatime|writebook|writebook-w4)
     case $1 in hackatime) n="Hackatime, 2 workers"; re='LeaderboardsController#index|output_safety|erb/util' ;;
       writebook) n="Writebook, 16 workers"; re='BooksController#index|output_safety|erb/util' ;;
       writebook-w4) n="Writebook, PARALLEL_WORKERS=4"; re='BooksController#index|output_safety|erb/util' ;; esac
-    run "$n" "$re" $O/census/$1/u{1,2,3,4,5,6} -- $O/census/$1/planted $O/census/$1/planted2 ;;
+    run "$n" "$re" census/$1/u{1,2,3,4,5,6} -- census/$1/planted census/$1/planted2 ;;
 esac > "options-$1.txt" 2>&1
 echo "$1 done"

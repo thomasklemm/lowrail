@@ -14,8 +14,11 @@ Receipts for [docs/profile-gate-design.md](../../../../docs/profile-gate-design.
     M4 plant (`planted`, `planted2`), through the M4 proof.sh. Every run exited 0, and the tree was unchanged.
 * Earlier captures are read from their receipts: the Blog (M4, fixes, confirm-opus), the fresh app with two workers
   (final `c1`–`c24`), and Campfire with 8 workers, CodeTriage and Lobsters (M4 and final `planted2`).
-* The OSM, Hackatime and Writebook captures come from the field-test threads, which commit them under
-  `bench/upstream/oss_profile_sweep_1/`; `run_options.sh` reads the copies in this orb's `.amp/in/orb-backup/`. OSM:
+* The OSM, Hackatime and Writebook captures come from the field-test threads. Hackatime and Writebook are in
+  [census](census) (report.json.gz, capture.json, command.txt, plant patches, wall times), where `run_options.sh`
+  reads them; OSM's are read from this orb's `.amp/in/orb-backup/` (not committed). `scripts/options.rb` leaves out
+  compare's refusal of captures of several processes (`abf515d3`) and reads format 2 reports as format 3, so the
+  parallel sets replay with main's `gem/lib` too; with the `gem/lib` of `3c878c94` they replay as published. OSM:
   openstreetmap-website 20ae45ec, Ruby 4.0.9, Rails 8.1.4.1, `bin/rails test -v`, 8 workers, 4 unchanged captures.
   Hackatime (2 workers) and Writebook (16 and 4 workers): 6 unchanged and 2 planted each, from the gem at
   `aa4422c8` (sha256 `f569d5f5…`).

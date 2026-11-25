@@ -16,7 +16,8 @@ unchanged, planted = ARGV.join(" ").split(" -- ").map(&:split)
 planted ||= []
 REPORTS = (unchanged + planted).to_h do |d|
   text = File.exist?("#{d}/report.json") ? File.read("#{d}/report.json") : Zlib::GzipReader.open("#{d}/report.json.gz", &:read)
-  [d, JSON.parse(text)]
+  # Format 2 reports: every capture of one app has the same keys, so read as format 3.
+  [d, JSON.parse(text).tap { |r| r["meta"]["format"] = 3 if r.dig("meta", "format") == 2 }]
 end
 
 $rc1 = false
@@ -24,7 +25,12 @@ Lowrail::ProfileCompare::Change.prepend(Module.new do
   def threshold(min) = $rc1 && what == "line" ? [noise, min].max : super
 end)
 
+# The parallel cohorts predate compare's refusal of several processes (abf515d3): they replay without that check.
+PARALLEL = / ran in \d+ processes: parallel test workers/
+
 class Gate < Lowrail::ProfileCompare
+  def problems = super.grep_v(PARALLEL)
+
   def initialize(base, head, aa)
     @aa_given = true
     @base, @head, @aa = REPORTS.fetch(base), REPORTS.fetch(head), REPORTS.fetch(aa)

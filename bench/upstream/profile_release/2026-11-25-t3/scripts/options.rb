@@ -18,7 +18,8 @@ unchanged, planted = ARGV.join(" ").split(" -- ").map(&:split)
 planted ||= []
 READ = (unchanged + planted).to_h do |d|
   text = File.exist?("#{d}/report.json") ? File.read("#{d}/report.json") : Zlib::GzipReader.open("#{d}/report.json.gz", &:read)
-  [d, JSON.parse(text)]
+  # Format 2 reports: every capture of one app has the same keys, so read as format 3.
+  [d, JSON.parse(text).tap { |r| r["meta"]["format"] = 3 if r.dig("meta", "format") == 2 }]
 end
 
 def with_all(report)
@@ -51,7 +52,8 @@ def merged(reports)
 end
 
 VALID = Hash.new do |h, d|
-  problems = Lowrail::ProfileCompare.allocate.report_problems(d, READ.fetch(d))
+  # The parallel sets predate compare's refusal of several processes (abf515d3): they replay without that check.
+  problems = Lowrail::ProfileCompare.allocate.report_problems(d, READ.fetch(d)).grep_v(/ ran in \d+ processes: parallel test workers/)
   raise "#{d}: #{problems.join("; ")}" unless problems.empty?
   h[d] = true
 end
