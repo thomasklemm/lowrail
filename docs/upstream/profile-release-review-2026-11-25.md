@@ -580,3 +580,93 @@ finding. What an app line is lives in the counter (the root, less `gems/`, `test
 read its options" is inferred from a loaded constant (must-fix 1); the stack check is still an inference, and
 RSpec offers no hook that is cheaper. The run loop's two ways to start the command should become one function
 that returns the status, so the 124 and 128-plus-signal rules exist once.
+
+## Confirm of the review fixes: thermos-opus (2026-11-25)
+
+Scope: `1618fc38..60387485` in `gem/`, docs/profile.md, the README, DECISIONS and the receipts: `5cdc5669`
+(streaming report, reviewed in full), `9b31044c` (the fixes for both reviews' must-fixes and should-fixes, T9/T10),
+`7a5ee0b6` (receipts) and `60387485` (the counter built outside the app's bundle; a symlinked path gem in the test).
+Both Thermos rubrics, each earlier finding checked by reproduction against the built gem and by a mutant against its
+test. Receipts: [2026-11-25-confirm-opus-2](../../bench/upstream/profile_release/2026-11-25-confirm-opus-2/README.md).
+**Verdict: no must-fix. All five of my must-fixes are fixed, as verified by reproduction. Two of them lack a
+regression test, so "each fix has a test that fails without it" does not hold; add the two tests below before 0.1
+ships. The gem with sha256 `c4a3a7c3d7a7806e5a310fc23e2c006975ed4f20160508ab43caeda1d729df68` (60387485) is
+otherwise ready.**
+
+**What ran.**
+
+* Gems: 7a5ee0b6 `6a807858…94470` and 60387485 `c4a3a7c3…29df68`, both as stated. The archive holds the 14
+  profiler files, with no Lowrail runtime file.
+* Profile suites at 7a5ee0b6, as `ci.yml` lists them: Ruby 4.0.7 / Rails 8.1.4, 38 runs, 1,166 assertions, 0
+  failures, 0 skips; Ruby 3.3.14 / Rails 7.2.4, 38 runs, 1,107 assertions, 0 failures, 0 skips. At 60387485 the
+  changed and neighbouring tests (`ProfileEnvTest`, `ProfileReportTest`, the path-gem and package tests) passed on
+  both: 6 runs, 63 and 61 assertions.
+* Floor Blog (Ruby 3.3.14 / Rails 7.2.4) from the 7a5ee0b6 gem: the earlier repros below, and the streaming report.
+
+**Earlier findings, reproduced against the gem.**
+
+| Finding | Reproduction at 7a5ee0b6 | Mutant against its test |
+| --- | --- | --- |
+| 1. `--timeout` skipped KILL when the leader exited on TERM | A leader that exits on TERM with a grandchild that ignores it: exit 124, the grandchild is gone | KILL only while the leader lives: killed |
+| Exit 124 after an earlier failed run | Run 1 exits 1, run 2 hangs: exit 124, `exit [1,124]`, `timed_out [2]`, notice at the top of report.md and on the terminal, `meta.timed_out` in report.json | first failure wins: killed; no notice: killed |
+| 2. run*/ deletion globbed `--out` | Blog: a `--keep-runs` capture in `/tmp/g/keep`, then `--out '/tmp/g/{keep,x}'`: `keep/run1` and `run2` stay, the literal directory's runs are deleted | glob back in the delete: **survived**; glob back in `ProfileReport`: **survived** |
+| 3. Bundler's saved environment | Blog, an integration test starting a child plainly, under `with_original_env` and `with_unbundled_env`: identical to the unprofiled run (`SEED=7`, no profiler), the suite at seed 1234, both for `bundle exec lowrail-profile -- bin/rails test` and for `lowrail-profile -- bundle exec bin/rails test` | `ORIGINAL_ENV` not edited: killed; `BUNDLER_ORIG_` not edited: **survived**, though on the Blog in the second form it leaves `BUNDLER_ORIG_RUBYOPT=-I…/lib -rlowrail/profile` in the child |
+| 4. README CI job | `if: always()` on Compare and the upload; the prose says the job fails on a failing suite and the summary still shows compare's exit 2 | checked by `test_documented_ci_compare_step_reports_and_never_fails` |
+| 5. docs/profile.md gate | The section states 0.1 has no gate, links the README's *Compare*, keeps the release-candidate numbers under their own heading; no gate YAML is left | – |
+| RSpec runner predicate | `caller_locations` includes `rspec/core/runner.rb` | back to `loaded_constant`: killed; never: killed |
+| Report format 3 required by compare | A format 2 base exits 2 with "format 2, this lowrail-profile reads 3" | any format accepted: killed; `FORMAT = 2`: killed |
+| `LOWRAIL_PROFILE_KEYS` | The exe lists its own keys, so the list cannot drift | keys not removed: killed |
+| HUP and QUIT forwarded, traps before spawn | HUP is checked by the test | HUP dropped: killed; QUIT dropped: **survived**; pending signals dropped: **survived** |
+| Path gem inside the app root, symlinked path gem | – | `gems/` as app: killed; no realpath: survived at 7a5ee0b6, killed at 60387485 |
+
+**Streaming report (5cdc5669).** It reads each TSV line by line and keeps attributed rows as flat integer arrays,
+keyed by interned window names and (path, line) ids, in first-seen order. The old code merged the same raw keys in
+the same order, and the one `Array#sum` (unattributed) still sums an array, so every float sum and tie is unchanged.
+The ids pack into `loc << 31 | caller` and `path << 32 | line`, which is safe below 2³¹ locations and 2³² lines.
+Checked:
+
+* On a kept floor-Blog capture, report.md and report.json from 1618fc38 and 5cdc5669 are byte-identical. At
+  7a5ee0b6 report.md is identical, and report.json differs only by `meta.format`, `timed_out` and `timeout`.
+  0.64 s and 39 MB before, 0.47 s and 28 MB after.
+* A 471 MB set generated from that capture with the receipts' `gen.rb blog big 16 40` gives the same result:
+  65.7 s and 1.70 GB before, 51.4 s and 235 MB after.
+* `test_report_keeps_no_object_per_attributed_row`: the report holds 8,365 objects for 80,000 rows (bound 20,000).
+  1618fc38's report holds 646,127 and fails the test. Making the attribution key `loc` alone also fails it.
+* I did not rerun the builder's fresh-app, Campfire and Sure-sized captures; their sha256 are in
+  `2026-11-25-stream/README.md`.
+
+**The counter built outside the bundle (60387485).** `Bundler.with_unbundled_env` runs extconf.rb and make in
+Bundler's saved original environment, without the bundle's additions. Built on the Blog under `bundle exec`
+with a probe in the caller's RUBYOPT:
+
+* extconf.rb still sees `CC`, `CFLAGS`, the caller's own RUBYOPT entry, an arbitrary variable and the original
+  `PATH`.
+* What is gone is only what the bundle added: `-rbundler/setup`, `BUNDLE_*`, `GEM_HOME` as `bundle exec` set it,
+  and the bundle's bin directory.
+* The Ruby is the absolute `RbConfig.ruby`, and the compiler and flags come from `RbConfig::CONFIG` or the
+  caller's environment, so the bundle can choose neither, and nothing the build needs is lost.
+* Without Bundler, or with a Bundler older than `with_unbundled_env`, it builds as before.
+* Mutant: building inside the bundle again fails `test_the_counter_builds_under_an_apps_bundle`.
+
+**Should-fix (tests only, before 0.1 ships).**
+
+1. **A regression test for the glob deletion.** It destroyed another capture's data, and both glob mutants pass
+   every test. Smallest test: a capture with `--keep-runs` in `dir/keep`, then one with `--out "dir/{keep,x}"`.
+   Assert that `keep/run1` and `keep/run2` remain, and that the literal directory's report is its own (for example
+   its `capture.json` argv).
+2. **A test for the `BUNDLER_ORIG_` edit.** Run the child-environment test's command under `bundle exec` once (a
+   Gemfile with no gems is enough), or set `BUNDLER_ORIG_RUBYOPT` to the profiler's RUBYOPT in its caller
+   environment, and include `BUNDLER_ORIG_RUBYOPT` in what `child.rb` prints.
+
+**Notes.**
+
+* QUIT forwarding and the pending-signal replay have no test (both mutants survive). Both are small and correct by
+  reading.
+* The grace loop waits while `kill(0, -pid)` succeeds. A group holding only a zombie whose parent outlives the
+  leader would wait the full 10 s before KILL (hypothesis; it only delays).
+* An app file under a `gems/` directory (`app/models/gems/…`) is no longer an app line. The counter already skips
+  such frames, so the two agree.
+* `2026-11-25-stream/README.md` names `profile_test.rb` for the bound test, which 9b31044c moved to
+  `profile_report_test.rb`.
+* Maintainability: the exe's run loop now holds the grace loop as well, and several new comments are longer than
+  one line of why. Neither blocks the release.

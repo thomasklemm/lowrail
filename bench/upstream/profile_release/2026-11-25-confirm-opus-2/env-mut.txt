@@ -1,0 +1,11 @@
+BUNDLER_ORIG_RUBYOPT=-I~/workspace/repo/.amp/in/orb-backup/opus-confirm/mutants/no_bundler_orig_prefix/lib -rlowrail/profile
+RUBYLIB=
+RUBYOPT=-r~/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/bundler/setup
+SEED=7
+profiler nil
+--
+SEED=7
+profiler nil
+--
+SEED=7
+profiler nil

@@ -1,0 +1,12 @@
+CC=gcc
+CFLAGS=-O2 -g
+MAKEFLAGS=
+PATH=~/.local/share/mise/installs/ruby/3.3.14/bin:~/.amp/bin:/opt/git/bin:~/.cargo/bin:~/.nix-profile/bin:/usr/local/games:/usr/games:~/.cargo/bin:~/.nix-profile/bin:/usr/local/games:/usr/games:~/.cargo/bin:~/.nix-profile/bin:/usr/local/games:/usr/games:~/.cargo/bin:~/.nix-profile/bin:/usr/local/games:/usr/games:~/.local/bin:~/.nix-profile/bin:/usr/local/bin:/usr/local/games:/usr/games:/usr/bin:/bin
+RUBYOPT=-r~/workspace/repo/.amp/in/orb-backup/opus-confirm/build-env/probe.rb
+RUBYLIB=
+GEM_HOME=
+GEM_PATH=
+BUNDLE_GEMFILE=
+BUNDLE_BIN_PATH=
+MY_FLAG=kept
+bundler loaded: nil

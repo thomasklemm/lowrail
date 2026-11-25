@@ -1,0 +1,20 @@
+timeout_kill_only_if_leader_lives: killed (1 runs, 16 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_timeout_stops_a_hung_run_and_its_processes
+first_failure_wins_over_124: killed (1 runs, 19 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_timeout_stops_a_hung_run_and_its_processes
+no_timeout_notice: killed (1 runs, 22 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_timeout_stops_a_hung_run_and_its_processes
+hup_not_forwarded: killed (1 runs, 36 assertions, 0 failures, 1 errors, 0 skips) ProfileTest#test_timeout_stops_a_hung_run_and_its_processes:
+quit_not_forwarded: SURVIVED (1 runs, 38 assertions, 0 failures, 0 errors, 0 skips) 
+traps_after_spawn: SURVIVED (1 runs, 38 assertions, 0 failures, 0 errors, 0 skips) 
+delete_by_glob: SURVIVED (4 runs, 713 assertions, 0 failures, 0 errors, 0 skips) 
+report_reads_by_glob: SURVIVED (4 runs, 710 assertions, 0 failures, 0 errors, 0 skips) 
+no_original_env: killed (1 runs, 12 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler
+no_bundler_orig_prefix: SURVIVED (1 runs, 24 assertions, 0 failures, 0 errors, 0 skips) 
+keys_not_removed: killed (1 runs, 12 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler
+rspec_loaded_constant: killed (1 runs, 2 assertions, 1 failures, 0 errors, 0 skips) ProfileEnvTest#test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile
+rspec_never: killed (1 runs, 24 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler
+compare_any_format: killed (5 runs, 66 assertions, 1 failures, 0 errors, 0 skips) ProfileCompareTest#test_compare_needs_complete_comparable_captures
+report_format_2: killed (7 runs, 65 assertions, 5 failures, 0 errors, 0 skips) ProfileCompareTest#test_compare_needs_complete_comparable_captures ProfileCompareTest#test_compare_floor_terms ProfileCompareTest#test_documented_ci_compare_step_reports_and_never_fails ProfileCompareTest#test_compare_lists_what_exceeds_the_floor_of_an_a_a_pair ProfileCompareTest#test_compare_refuses_captures_of_parallel_workers
+gems_in_root_are_app: killed (2 runs, 5 assertions, 1 failures, 0 errors, 0 skips) ProfileReportTest#test_a_path_gem_inside_the_app_root_is_a_gem
+no_realpath_gem_dir: SURVIVED (1 runs, 17 assertions, 0 failures, 0 errors, 0 skips) 
+attrib_key_collides: killed (3 runs, 50 assertions, 1 failures, 0 errors, 0 skips) ProfileReportTest#test_report_keeps_no_object_per_attributed_row
+no_realpath_gem_dir: killed (1 runs, 4 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_path_gems_and_an_engine_root_are_classified
+build_inside_bundle: killed (1 runs, 3 assertions, 1 failures, 0 errors, 0 skips) ProfileEnvTest#test_the_counter_builds_under_an_apps_bundle

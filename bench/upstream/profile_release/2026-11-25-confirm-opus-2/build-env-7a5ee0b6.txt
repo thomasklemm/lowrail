@@ -1,0 +1,12 @@
+CC=gcc
+CFLAGS=-O2 -g
+MAKEFLAGS=
+PATH=~/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/bin:~/.local/share/mise/installs/ruby/3.3.14/bin:~/.amp/bin:/opt/git/bin:~/.cargo/bin:~/.nix-profile/bin:/usr/local/games:/usr/games:~/.local/bin:/usr/local/bin:/usr/bin:/bin
+RUBYOPT=-r~/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/bundler/setup -r~/workspace/repo/.amp/in/orb-backup/opus-confirm/build-env/probe.rb
+RUBYLIB=
+GEM_HOME=~/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0
+GEM_PATH=
+BUNDLE_GEMFILE=~/workspace/repo/.corpus/opus-blog-floor/Gemfile.lowrail
+BUNDLE_BIN_PATH=~/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/bundler-2.5.22/exe/bundle
+MY_FLAG=kept
+bundler loaded: "constant"
