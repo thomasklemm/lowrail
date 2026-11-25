@@ -83,7 +83,7 @@ then `bundle exec lowrail-profile -- bin/rails test`. The first run compiles the
 | Internal pointers in user text | profile.md, README, report | `script/census`, `script/cpu-census`, `script/corpus`, `mise exec`, "the orb this was developed in", `bench/upstream/…` receipts, "Lowrail's contributions ledger", census key names. These describe this repository, not the user's tool. |
 | Docs are evidence logs | profile.md (502 lines) | Install, use, guarantees, review history and corpus tables are interleaved. A team cannot find "what is promised" in one place. |
 | `--workloads` sends real writes, real jobs, real mail | profile_workloads.rb | Correctly documented, but a dangerous default for a first-time user in a shared staging database. |
-| Report schema is unversioned in docs | report.json, capture.json `format: 1` | compare checks "this version of lowrail-profile", so any release breaks every saved base. Fine for CI (profiles base and head in one job), surprising for anyone who stores bases. |
+| Report schema is unversioned in docs | report.json `meta.format: 2`, capture.json `format: 1` | compare checks "this version of lowrail-profile", so any release breaks every saved base. Fine for CI (profiles base and head in one job), surprising for anyone who stores bases. |
 
 None of these is a correctness bug in what was reviewed; they are packaging, compatibility and wording.
 
@@ -184,7 +184,7 @@ Additions, all small:
 
 `report.md` (terminal and GitHub step summary) and `report.json`, unchanged in content. The release:
 
-* documents `report.json`'s fields as schema 1 (what compare reads);
+* documents `report.json`'s fields as `meta.format` 2 (what compare reads; `capture.json` is `format` 1);
 * says in the report's header what it is ("objects allocated, not time"), the ledger date, the Ruby, Rails and
   environment, and how many requests, jobs and mails were counted;
 * removes Lowrail-internal words from user text: census key names stay as keys, but the report explains them once;
@@ -220,7 +220,7 @@ Split [profile.md](profile.md) into:
 
 The proof is of the install path a stranger takes, not of a Lowrail checkout:
 
-* Build the package with `gem build gem/lowrail-profile.gemspec`, install it from a local path into a fresh
+* Build the package with `gem build lowrail-profile.gemspec` from `gem/` (its file list is relative to it), install it from a local path into a fresh
   `script/corpus` copy whose Gemfile gains only the one line, in a shell with no Lowrail checkout on `RUBYLIB` and an
   empty `~/.cache/lowrail`.
 * Follow only the gem's README.
@@ -255,7 +255,7 @@ Plus a macOS run of Campfire's suite (GitHub `macos-latest`) for the extension b
 | M0 | Thomas's decisions (§7) | — | answered |
 | M1 | Package: `lowrail-profile.gemspec`, trimmed ledger snapshot and loader, `--help`/`--version`, `--no-ledger`, `--workloads` write guard, `lowrail.gemspec` drops the executable, packaging test (`spec.files` has no lowering code; built gem runs from a temp install without the checkout) | S, 2 days | `gem build` + install + Blog suite profile from the built gem |
 | M2 | Compatibility: CI matrix Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1 with Rails installed so the 10 Rails tests run, `Ractor.main?` fallback, macOS job | M, 3–5 days | matrix green, or the floor raised with the reason recorded |
-| M3 | User docs and output: README for the gem, report header, schema 1 doc, internal references removed, profile.md becomes the evidence page | S, 2 days | a reader can install and read a report from the README alone |
+| M3 | User docs and output: README for the gem, report header, `meta.format` 2 doc, internal references removed, profile.md becomes the evidence page | S, 2 days | a reader can install and read a report from the README alone |
 | M4 | Corpus proof (§4) on three apps from the built gem, plus macOS and the real Actions run | M, 3–4 days | receipts committed, tables in profile.md |
 | M5 | Independent review (Thermos) of the release candidate and its packaging, fixes, confirm review | S–M, 2–3 days | verdict "nits" or better |
 | M6 | Release: version 0.1.0, changelog, tag, publish | S, under a day | only on Thomas's explicit approval |

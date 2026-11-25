@@ -362,7 +362,8 @@ process). When the command runs it:
   where it runs, so the app's own results and exceptions pass through unchanged, as the same objects;
 * code in a Ractor other than the main one runs uncounted, without calling the counter (its tables are not
   Ractor-safe, and are not marked so);
-* a failure to write the report never changes the command's exit status.
+* lowrail-profile exits with the command's status (the first failing run's, or 128 plus the signal that stopped
+  it), also when the report then fails; a passing command whose report cannot be built exits 1.
 
 `gem/test/profile_test.rb` checks the cases above that a test can reach: a Cable subscription's return value and
 exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
@@ -370,7 +371,7 @@ it did not create.
 
 ### Release candidate: proof from the built gem (2026-11-25)
 
-lowrail-profile 0.1.0.rc1 as a stranger installs it: `gem build gem/lowrail-profile.gemspec`, `gem install --local`
+lowrail-profile 0.1.0.rc1 as a stranger installs it: `gem build lowrail-profile.gemspec` from `gem/`, `gem install --local`
 into the app's Ruby, a Gemfile copy with only the gem's line added, no Lowrail checkout on any path and an empty
 counter cache, on fresh `script/corpus` copies. Receipts, scripts and method:
 [bench/upstream/profile_release/2026-11-25](../bench/upstream/profile_release/2026-11-25). Apps ran one after
@@ -393,7 +394,8 @@ another on an 8-CPU orb.
 * Ledger: 52 of 52 matches at `--top 300`, each checked against its pull request's diff on GitHub.
 * GitHub Actions: the README's job, verbatim, on a private copy of the Blog fails on a planted pull request
   (exit 1, one regression) and passes on an unchanged one. macOS (`macos-latest`, arm64): the counter builds with
-  Apple clang and Campfire's 634 tests are identical plain, off and profiled.
+  Apple clang and Campfire's 634 tests are identical plain, off and profiled (outcomes only; load order was not
+  compared there).
 * The stack-walking run cost Campfire 87% of its suite time here, more than the 45% measured on the 2-CPU orb on
   2026-11-18; counting alone stays under 10%.
 

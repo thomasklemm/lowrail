@@ -7,7 +7,7 @@ suite on macOS. Summary in [docs/profile.md](../../../../docs/profile.md#release
 
 ## Method
 
-* Gem: `gem build gem/lowrail-profile.gemspec` at lowrail main `fd36835b`, `lowrail-profile-0.1.0.rc1.gem`
+* Gem: `gem build lowrail-profile.gemspec` from `gem/` at lowrail main `fd36835b`, `lowrail-profile-0.1.0.rc1.gem`
   (sha256 `97aca67ac8bab61206d468c6d24074271e621fc692def4b6432f97df5f2baa3e`, 14 files, no lowering code),
   installed with `gem install --local` into the app Ruby's gem home (`*/installed-from.txt`). Each copy's
   `Gemfile.lowrail` is its Gemfile plus only `gem "lowrail-profile", "0.1.0.rc1", group: [:development, :test],

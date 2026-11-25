@@ -18,6 +18,13 @@ macOS. Windows is refused with a message.
 gem "lowrail-profile", group: [:development, :test], require: false
 ```
 
+Until 0.1 is on rubygems.org, build the release candidate from a Lowrail checkout. The gemspec's file list is
+relative to `gem/`, so build it there:
+
+```sh
+cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.0.rc1.gem
+```
+
 `require: false` matters: nothing of the gem loads in your app unless you run the command below. The first run
 compiles a small C extension (the counter) into `~/.cache/lowrail/profile/`, outside your app; it needs a C compiler
 and Ruby's headers, which `bundle install` of a Rails app already needs. A compile failure stops the profiler with
@@ -32,8 +39,13 @@ bundle exec lowrail-profile compare base/report.json head/report.json --aa base2
 ```
 
 The first runs the command twice (everything after `--` is passed unchanged) and writes `tmp/lowrail-profile/report.md`
-and `report.json`. It prints the report too. The command's own exit status is recorded; the suite runs as it
-would, with `SEED` and `--seed` fixed (default 1234) so both runs order tests the same way.
+and `report.json`. It prints the report too. The suite runs as it would, with `SEED` and `--seed` fixed (default
+1234) so both runs order tests the same way, and lowrail-profile exits with its status: the first failing run's exit
+code, or 128 plus the signal that stopped it (143 for `TERM`). A passing suite whose report cannot be built exits 1.
+
+Bypass Spring (`DISABLE_SPRING=1`, or `bin/rails test` without a Spring binstub): a Spring server that is already
+running forks the app without loading the profiler, so the run counts nothing and lowrail-profile exits 1 with *no
+runs with requests*.
 
 Options, all before `--`:
 
@@ -86,6 +98,10 @@ is a second profile of the unchanged base: the A/A pair sets the floor per row (
 both base profiles and head's own spread, at least `--min`, default 1 object per request; an action's is twice that,
 at least 0.1% of its objects and 20 × `--min`). Without `--aa` compare lists changes as places to look and exits 0:
 it is not a gate. `--json` prints the result as JSON.
+
+An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
+only, is listed under *Not compared* with the reason, and nothing about its own cost gates. Lines outside the app it
+reaches are still compared.
 
 A GitHub Actions job that profiles the pull request's base twice and its head once, and fails on a regression:
 
@@ -147,8 +163,10 @@ get article_path(article), headers: { "Accept" => "text/html" }
 ```
 
 **The requests are real.** Without `--allow-writes` it sends only GETs: a file with a write, a POST sign-in, a
-`setup` block or `jobs: true` is refused before anything is sent, and so is `RAILS_ENV=production` with a database
-on another host. With `--allow-writes` the requests write to the app's database, enqueue through its queue adapter
+`setup` block, `jobs: true`, or a GET that would reach the app as another method (an `env:` or header that changes
+it, or a JSON GET with params in an app without `Rack::MethodOverride`) is refused before anything is sent, and so
+is `RAILS_ENV=production` with a writable database on another host (any configuration but a replica, including
+`database_tasks: false` ones) or a database configuration that does not load. With `--allow-writes` the requests write to the app's database, enqueue through its queue adapter
 and deliver mail as configured: use a disposable database, queue and mail service. `--workloads` needs the gem in a
 group the environment's `bundle install` keeps.
 
@@ -161,22 +179,32 @@ Each is checked by a test in this gem or on the apps below.
 2. **No lowering.** The package holds only the profiler; it never loads Lowrail's runtime.
 3. **Off means off.** With the gem listed and `require: false`, a process the command did not start loads none of
    it.
-4. **Same outcomes.** Per-test outcomes and load order were identical plain, listed-but-off and profiled on
-   Campfire, Lobsters, CodeTriage and a Rails 7.2 / Ruby 3.3 blog, from this gem, and on Campfire on macOS
+4. **Same outcomes.** On Campfire, Lobsters, CodeTriage and a Rails 7.2 / Ruby 3.3 blog, installed from this gem
+   on Linux, per-test outcomes were identical plain, listed-but-off and profiled. CodeTriage prints an outcome for
+   217 of its 222 tests; for the other 5 only the suite's totals (0 failures) are compared. Each app process loaded
+   the same files in the same order as `bundle exec env COMMAND` (the process boundary the profiler starts the
+   command at; a plain `bundle exec COMMAND` loads Bundler's own files differently), leaving out Lowrail's,
+   Bundler's and RubyGems' files and, on CodeTriage, 27 yard handler and code-object files that yard loads by
+   walking `Module#constants`, in an order of its own. On macOS, Campfire's per-test outcomes were identical; its
+   load order was not compared there
    ([the evidence](https://github.com/thomasklemm/lowrail/blob/main/docs/profile.md)). That is a claim about those
    apps, not every app. Check yours: run the suite plain and profiled with the same seed and diff the
    per-test results (`bin/rails test -v`, `rspec --format documentation`).
-5. **Exit status passes through**, and compare never turns invalid evidence green (exit 2).
-6. **Never breaks the app.** A counter that fails to build or load, or a framework hook that cannot be installed,
-   prints one `[lowrail-profile]` warning and leaves the app as it is. Hooks are installed from Active Support's
-   `on_load` hooks, so nothing loads earlier than the app loads it.
+5. **Exit status passes through** (a failed or killed run's status, above), and compare never turns invalid
+   evidence green (exit 2).
+6. **Never breaks the app.** A counter that fails to build stops lowrail-profile before the command starts, with
+   the build log's path; the app never runs half-profiled. Once the command runs, a counter that fails to load or
+   is of another version, or a framework hook that cannot be installed, prints one `[lowrail-profile]` warning and
+   leaves the app as it is. Hooks are installed from Active Support's `on_load` hooks, so nothing loads earlier
+   than the app loads it.
 
 ## Troubleshooting
 
 * *building the counter failed, see …build.log*: install a C compiler and Ruby's headers (`build-essential` on
   Debian/Ubuntu, Xcode Command Line Tools on macOS).
 * *no runs with requests, jobs or mails*: the command served no request through `Rails.application` (unit tests
-  only, or a server started in another process). Profile integration, controller, request or system tests.
+  only, a server started in another process, or a warm Spring server: bypass it with `DISABLE_SPRING=1`). Profile
+  integration, controller, request or system tests.
 * *exists and was not created by lowrail-profile*: pick another `--out`; it never clears a directory it did not make.
 * Overhead: the first run counts (4–9% of suite time on the four apps measured), the second also walks the stack
   per allocation (31–87%, most on allocation-heavy suites such as Campfire's). Measured per app in the evidence.
