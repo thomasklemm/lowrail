@@ -132,6 +132,23 @@ class ProfileCompareTest < Minitest::Test
     end
   end
 
+  # openstreetmap-website with 8 parallel workers, the same code in every
+  # capture: NotesController#index read 8,063/8,272 warm in base, 7,624/8,362
+  # in the A/A report and 26,106/28,029 in head, by which of its 19 requests
+  # were each worker's first. From one process the same numbers are a regression.
+  def test_compare_refuses_captures_of_parallel_workers
+    realpath_tmpdir do |dir|
+      capture = ->(warm) { report([5.0, 5.0], actions: [{ "name" => "NotesController#index", "warm" => warm }]) }
+      base, aa, head = capture.([8_063.3, 8_272.4]), capture.([7_624.3, 8_361.8]), capture.([26_106.1, 28_029.3])
+      assert_equal 1, compare(dir, base, head, aa: aa)[0]
+      workers = ->(r) { r.merge("summary" => r["summary"].map { _1.merge("processes" => 8) }) }
+      status, result = compare(dir, workers.(base), workers.(head), aa: workers.(aa))
+      assert_equal [2, []], [status, result["regressions"]]
+      assert_equal ["base", "head", "the A/A report"], result["problems"].map { _1[/\A(.*) ran in 8 processes: .*PARALLEL_WORKERS=1/, 1] }
+      assert_equal 2, compare(dir, base, workers.(head), aa: aa)[0], "only head from parallel workers"
+    end
+  end
+
   # compare gates only on valid evidence (exit 2 otherwise), takes the noise
   # floor from every run, and leaves out actions one side cannot measure.
   def test_compare_needs_complete_comparable_captures

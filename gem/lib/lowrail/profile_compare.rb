@@ -115,6 +115,15 @@ module Lowrail
         uncovered = summary.zip(measured).reject { |run, m| run["processes"] == 1 && run["windows"]["request"] == m["requests"] }
         list << "#{label} has #{uncovered.size} run(s) whose request windows are not the one process's measured requests" if uncovered.any?
       end
+      # Warm leaves out each process's first window of an action. Parallel test
+      # workers split the tests anew in every capture, so in a run of several
+      # processes which windows those are, and with them every warm value, is
+      # different between captures in a way one A/A pair does not sample.
+      parallel = summary.map { _1["processes"] }.max
+      if parallel > 1
+        list << "#{label} ran in #{parallel} processes: parallel test workers split the tests differently in every capture, " \
+          "which changes what warm leaves out; profile with PARALLEL_WORKERS=1 to compare"
+      end
       list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { |run| KINDS.sum { run["windows"][_1] } == 0 }
       open = summary.reject { |run| KINDS.all? { run["windows"][_1] == run["completed"][_1] } }
       list << "#{label} has #{open.size} run(s) with windows that never finished, which no line or action counts" if open.any?
