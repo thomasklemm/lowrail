@@ -1,0 +1,31 @@
+# Ruby 4.0.9, rails/rails main f785381cca (path gem, 8.2.0.alpha) vs rails 8.1.4.1 from rubygems; one Gemfile per row: rails + sqlite3 + the named gem
+## sidekiq_boot.rb (queue_adapter :sidekiq, then :async)
+Rails 8.1.4.1 Sidekiq 7.3.10: booted, adapter ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.1.4.1 Sidekiq 7.3.10: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+Rails 8.1.4.1 Sidekiq 8.0.2: booted, adapter ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.1.4.1 Sidekiq 8.0.2: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+sidekiq-7.3.3/lib/active_job/queue_adapters/sidekiq_adapter.rb:19:in 'Module#remove_const': constant ActiveJob::QueueAdapters::SidekiqAdapter not defined (NameError)
+sidekiq-7.3.3/lib/active_job/queue_adapters/sidekiq_adapter.rb:19:in 'Module#remove_const': constant ActiveJob::QueueAdapters::SidekiqAdapter not defined (NameError)
+Rails 8.2.0.alpha Sidekiq 7.3.10: NameError: uninitialized constant ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.2.0.alpha Sidekiq 7.3.10: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+Rails 8.2.0.alpha Sidekiq 8.0.2: NameError: uninitialized constant ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.2.0.alpha Sidekiq 8.0.2: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+Rails 8.2.0.alpha Sidekiq 8.0.3: booted, adapter ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.2.0.alpha Sidekiq 8.0.3: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+Rails 8.2.0.alpha Sidekiq 8.1.7: booted, adapter ActiveJob::QueueAdapters::SidekiqAdapter
+Rails 8.2.0.alpha Sidekiq 8.1.7: booted, adapter ActiveJob::QueueAdapters::AsyncAdapter
+## sendfile_boot.rb (no header, then X-Sendfile)
+Rails 8.1.4.1 header=nil: booted, Mw at 1
+Rails 8.1.4.1 header="X-Sendfile": booted, Mw at 1
+Rails 8.2.0.alpha header=nil: RuntimeError: No such middleware to insert before: Rack::Sendfile
+Rails 8.2.0.alpha header="X-Sendfile": booted, Mw at 1
+## mailer_job.rb (config.active_job.queue_adapter = :inline, then unset; 8.1's inline run fails only on SMTP)
+Rails 8.1.4.1 config: defined?(ActiveJob::Railtie)=true deliver_later: Errno::ECONNREFUSED: Connection refused - connect(2) for "localhost" port 25
+Rails 8.1.4.1 plain: defined?(ActiveJob::Railtie)=true deliver_later: delivered via ActiveJob::QueueAdapters::AsyncAdapter
+Rails 8.2.0.alpha config: config.active_job raised NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+Rails 8.2.0.alpha plain: defined?(ActiveJob::Railtie)=false deliver_later: delivered via ActiveJob::QueueAdapters::AsyncAdapter
+## mailer_money.rb (eager_load false) / mailer_money_eager.rb (eager_load true), money-rails 3.0.0
+Rails 8.1.4.1 money-rails 3.0.0: boot ok, deliver_later ok
+Rails 8.1.4.1 money-rails 3.0.0: boot ok, deliver_later ok
+railties/lib/rails/railtie/configuration.rb:110:in 'Rails::Railtie::Configuration#method_missing': undefined method 'active_job' for an instance of Rails::Application::Configuration (NoMethodError)
+initialize! raised: undefined method 'active_job' for an instance of Rails::Application::Configuration
