@@ -945,3 +945,79 @@ The orb-local scripts (`rbm.sh`, `stats.sh`, `per_call.sh`, `verify.sh`, `mutate
 `.amp/in/orb-backup/zs1/` of the ZS1 thread and are not committed.
 
 **Rebase 2026-11-17.** Head `aa36fa0ea4` on master `b4ade67ba5`, for a conflict in the `Array#zip` snapshot of `test_optimize_send_variadic_with_block` after master's stack maps in side exits. `git range-diff`: commits 1 and 3 `=`, commit 2 changes only that snapshot; codegen, HIR and LIR unchanged. The passes and measurements above are on `fbbb9cee7b`, whose code this head keeps. arm64 dev build: `make zjit-test` 2,272 passed, test_zjit_cli 34 tests, `make btest` with `--zjit-call-threshold=2` all 2,148; the ZJIT-vs-interpreter probe is unchanged.
+
+## Fix round for XrXr's review (2026-11-25)
+
+XrXr requested changes on ruby/ruby#19912 on 2026-11-24: the `Symbol#to_proc` check should be a HIR speculation
+([r4686073773](https://github.com/ruby/ruby/pull/19912#discussion_r4686073773)), and the refinements check should be
+a guard that loads the cref, not a run-time branch
+([r4686108643](https://github.com/ruby/ruby/pull/19912#discussion_r4686108643)).
+
+New head `2e3108fc05` on master `f63048e942`, two commits: `f858d208e8` "ZJIT: Send Symbol block arguments directly"
+(Rafael as author, Thomas as co-author) and `2e3108fc05` "ZJIT: Test sends with a Symbol block argument" (Thomas).
+Meant for `thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg-2`; the push was refused (the token has no
+`workflow` scope and master changed `.github/workflows` since the fork last synced). The patches are in
+[`round2/`](../../bench/upstream/zs1/round2/), with the probes.
+
+What changed against `aa36fa0ea4`:
+
+* The VM commit is gone. `rb_vm_symbol_block_handler()` and `rb_zjit_symbol_block_handler()` are removed, and the PR
+  touches only `zjit.c` (one declaration) and `zjit/`.
+* The Symbol itself is the callee frame's block handler (`lir::BlockHandler::Value`, as for a guarded Proc); no
+  call before the frame push, no leaf-call preparation, no `Qundef` exit.
+* `Symbol#to_proc`: `PatchPoint MethodRedefined(Symbol, to_proc)` and `PatchPoint RootBoxOnly`, as before, now with
+  no run-time flag check. A same-definition redefinition (`Symbol.define_method(:to_proc,
+  Symbol.instance_method(:to_proc))`) clears the basic flag without invalidating the entry, so compiled code keeps
+  passing the Symbol while the interpreter calls `Symbol#to_proc`. Without refinements both give the same Proc
+  object (`equal?(:succ.to_proc)`, `lambda?`, `arity`, `inspect`, backtraces: `same_definition_probe.rb`); with
+  refinements the cref guard exits.
+* Refinements: a new `GetCref` instruction (calls `rb_vm_get_cref(cfp->ep)`, which is `vm_env_cref()`), then
+  `LoadField :refinements` and `GuardBitEquals nil` with recompile. It is a per-call guard and not a compile-time
+  check, because a top-level `using` adds refinements to a cref after the code is compiled. Not specialized when
+  `policy.no_side_exits`.
+* New test `test_send_symbol_block_arg_with_refinements_activated_after_compile` (ISEQ, C and variadic C callees).
+  Removing the guard fails it, `test_send_symbol_block_arg_with_refinements`,
+  `test_send_symbol_block_arg_to_proc_redefined_with_itself` and the four snapshots.
+
+Open for the reviews: `rb_vm_get_cref` calls `rb_bug` when no cref is found, where the interpreter's branch checks
+`cref &&`. No probe or test reached a NULL cref from a JIT-compiled frame.
+
+Verification (dev build, x86-64 orb): `make zjit-test` 2,050 of 2,051 (the failure is
+`test_profile_frames_during_direct_jit_to_jit_entry`, SIGPROF, as on master in orbs); `make btest` with
+`--zjit-call-threshold=1` and `=2` 2,148 of 2,148 each; `test_zjit_cli.rb` 34 tests, 0 failures; `test_proc`,
+`test_refinement`, `test_symbol`, `test_method`, `test_call`, `test_yield`, `test_lambda`, `test_array`, `test_enum`,
+`test_settracefunc`, `test_backtrace` at threshold 1: 1,380 tests, 0 failures; `zs1_probe.rb` diffs empty at
+threshold 1, threshold 2 with one profile, default, and default with `N=40` (after normalizing Thread addresses on
+stderr); the three round-2 probes identical in the interpreter and at thresholds 1 and 2.
+
+railsbench (ruby-bench, Rails 8.1.4.1, 10 warmup and 10 measured iterations, release builds, `--zjit-stats`):
+
+```diff
+ calls to C functions from JIT code:
+-  rb_vm_send: 4,732,653
++  rb_vm_send: 4,289,576
+ send fallback reasons:
+-  send_block_arg_not_nil: 2,440,814
++  send_block_arg_not_nil: 2,200,740
+-  one_or_more_complex_arg_pass: 2,133,480
++  one_or_more_complex_arg_pass: 1,930,477
+-dynamic_send_count: 17,521,001
++dynamic_send_count: 17,077,938
+```
+
+No `unhandled_block_arg` exit: the cref guard never fires there. Rails main's framework code has no `using`, and of
+railsbench's gems only irb has one. The body's numbers (from `fbbb9cee7b`) still describe the same specialized sends.
+The body's second and third paragraphs were rewritten for the new shape.
+
+Reply drafts (for Thomas, after thermos-sol and thermos-opus on the head):
+
+> r4686073773: Done: there is no run-time check anymore. `Symbol#to_proc` is covered by the `MethodRedefined` patch
+> point, and the Symbol itself becomes the callee's block handler. The old check was for
+> `Symbol.define_method(:to_proc, Symbol.instance_method(:to_proc))`, which clears the basic flag without
+> invalidating the entry. Passing the Symbol then gives the same Proc as calling `to_proc`, and under refinements
+> the cref guard below exits.
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that
+> its refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using`
+> can add refinements to the cref after the code is compiled (tested). With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT.

@@ -1,0 +1,438 @@
+From 2e3108fc0558f076a7acbbd1eaf2f5acd534f603 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 25 Nov 2026 07:36:27 +0000
+Subject: [PATCH 2/2] ZJIT: Test sends with a Symbol block argument
+
+Cover the cases where the interpreter does more than use the Symbol as
+the block handler: Symbol#to_proc redefined before the send is compiled,
+after it, with its own definition, and in another box; another block
+argument object reaching the compiled send; refinements in the caller,
+also ones that `using` adds after the send is compiled; errors raised
+through the Symbol block; and a stack overflow exit that re-executes
+the send.
+---
+ test/ruby/test_zjit_cli.rb |  21 +++++
+ zjit/src/codegen_tests.rs  | 186 +++++++++++++++++++++++++++++++++++++
+ zjit/src/hir/opt_tests.rs  | 170 +++++++++++++++++++++++++++++++++
+ 3 files changed, 377 insertions(+)
+
+diff --git a/test/ruby/test_zjit_cli.rb b/test/ruby/test_zjit_cli.rb
+index ae963725da..edb8b5e57f 100644
+--- a/test/ruby/test_zjit_cli.rb
++++ b/test/ruby/test_zjit_cli.rb
+@@ -492,6 +492,10 @@ def test_stack_overflow_exit_from_send_with_normalized_keywords
+       ['def target(a: 0, b: 0, c: 0, x: 0) = [x].sum', 'target(x: 1)', '--zjit-inline-max-iterations=0'],
+       ['def target(a: 0, b: 0, c: 0, x: 0) = [x].sum', 'target(x: 1)', nil],
+       ['def target(x:, a:) = x', 'target(a: 0, x: 1)', '--zjit-inline-max-iterations=0'],
++      ['def target(x) = yield(x)', 'target(1, &:itself)', '--zjit-inline-max-iterations=0'],
++      ['def target(x) = yield(x)', 'target(1, &:itself)', nil],
++      ['', '[1].sum(&:itself)', nil],
++      ['', '[1, nil].reject(&:nil?).first', nil],
+     ].each do |target, call, inline|
+       args = [{'RUBY_THREAD_VM_STACK_SIZE' => '32768'}, '--disable-gems', '--zjit',
+               '--zjit-call-threshold=2', '--zjit-num-profiles=1', *inline]
+@@ -518,6 +522,23 @@ def recur(n) = n == 0 ? entry : recur(n - 1)
+     end
+   end
+ 
++  def test_send_symbol_block_arg_in_box_with_redefined_to_proc
++    args = [{'RUBY_BOX' => '1'}, '--disable-gems', '-W0', '--zjit', '--zjit-call-threshold=2', '--zjit-num-profiles=1']
++    assert_in_out_err(args, <<~'RUBY', ['[11, 11, 11, 11]'])
++      box = Ruby::Box.new
++      box.eval(<<~BOXED)
++        class Symbol
++          def to_proc = proc { |x| x + 10 }
++        end
++        module Boxed
++          def self.foo = yield 1
++          def self.test = foo(&:succ)
++        end
++      BOXED
++      p 4.times.map { box::Boxed.test }
++    RUBY
++  end
++
+   def test_send_forwarded_nil_block_arg_with_polymorphic_receiver
+     # Regression test: the nil block optimization strips the block arg from the
+     # frame state used to set up the callee frame, but the pre-call guards
+diff --git a/zjit/src/codegen_tests.rs b/zjit/src/codegen_tests.rs
+index 81ba742d61..5c72851820 100644
+--- a/zjit/src/codegen_tests.rs
++++ b/zjit/src/codegen_tests.rs
+@@ -2364,6 +2364,192 @@ fn test_send_proc_block_arg_lambda() {
+     "), @"6");
+ }
+ 
++#[test]
++fn test_send_symbol_block_arg_direct() {
++    assert_snapshot!(inspect("
++        def foo = yield 3
++        def test = foo(&:succ)
++        test
++        test
++    "), @"4");
++}
++
++#[test]
++fn test_send_symbol_block_arg_to_cfunc() {
++    assert_snapshot!(inspect("
++        def test(array) = [array.reject(&:odd?), array.sum(&:succ)]
++        test([1, 2, 3])
++        test([1, 2, 3])
++    "), @"[[2], 9]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_side_exit() {
++    assert_snapshot!(inspect(r#"
++        class Integer
++          def method_missing(name, *) = name.start_with?("dynamic_") ? -self : super
++        end
++        def foo = block_given? ? yield(3) : :none
++        def test(blk) = foo(&blk)
++        test(:succ)
++        test(:succ)
++        [test(:succ), test(nil), test(proc { |x| x * 2 }), test("dynamic_#{$$}".to_sym), test(:pred)]
++    "#), @"[4, :none, 6, -3, 2]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_to_proc_redefined_after_compile() {
++    assert_snapshot!(inspect("
++        def foo = yield 3
++        def iseq = foo(&:succ)
++        def cfunc = [3].flat_map(&:succ)
++        def variadic_cfunc = [3].sum(&:succ)
++        iseq; iseq
++        cfunc; cfunc
++        variadic_cfunc; variadic_cfunc
++        class Symbol
++          def to_proc
++            Object.class_eval 'def foo = yield 30'
++            proc { |x| x * 10 }
++          end
++        end
++        [iseq, cfunc, variadic_cfunc]
++    "), @"[300, [30], 30]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_to_proc_redefined_before_compile() {
++    assert_snapshot!(inspect("
++        $calls = 0
++        class Symbol
++          def to_proc
++            $calls += 1
++            Object.class_eval \"def foo = yield #{$calls * 10}\"
++            proc { |x| x + 1 }
++          end
++        end
++        def foo = yield 0
++        def test = foo(&:succ)
++        [test, test, test]
++    "), @"[11, 21, 31]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_to_proc_redefined_with_itself() {
++    assert_snapshot!(inspect("
++        module Doubling
++          refine(Integer) { def double = self * 2 }
++        end
++        def foo = yield 3
++        module Refined
++          using Doubling
++          def self.iseq = foo(&:double)
++          def self.cfunc = proc(&:double)
++          def self.variadic_cfunc = Proc.new(&:double)
++        end
++        def test = [(Refined.iseq rescue $!.class), (Refined.cfunc.call(3) rescue $!.class), (Refined.variadic_cfunc.call(3) rescue $!.class)]
++        before = [test, test].last
++        Symbol.define_method(:to_proc, Symbol.instance_method(:to_proc))
++        [before, test]
++    "), @"[[6, 6, 6], [NoMethodError, NoMethodError, NoMethodError]]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_guard_precedes_to_proc() {
++    assert_snapshot!(inspect("
++        def foo = yield 3
++        def test(blk) = foo(&blk)
++        redefine = Object.new
++        def redefine.to_proc
++          Object.class_eval 'def foo = yield 30'
++          proc { |x| x + 1 }
++        end
++        test(:succ)
++        test(:succ)
++        test(redefine)
++    "), @"31");
++}
++
++#[test]
++fn test_send_symbol_block_arg_with_refinements() {
++    assert_snapshot!(inspect("
++        module Doubling
++          refine(Integer) do
++            def double = self * 2
++            def ten = self + 10
++            def twenty = self + 20
++            def thirty = self + 30
++          end
++        end
++        def foo = yield 3
++        module Refined
++          using Doubling
++          def self.iseq = foo(&:double)
++          def self.cfunc = [[3].flat_map(&:double), [3].sum(&:double)]
++          def self.uncached(a, b, c) = [foo(&a), [3].flat_map(&b), [3].sum(&c)]
++        end
++        def inlined = Refined.iseq
++        def unrefined = foo(&:double)
++        def error = yield.class
++        Refined.iseq
++        Refined.cfunc
++        Refined.uncached(:double, :double, :double)
++        inlined
++        unrefined rescue nil
++        GC.stress = true
++        result = [Refined.iseq, Refined.cfunc, Refined.uncached(:ten, :twenty, :thirty), inlined]
++        GC.stress = false
++        result << error { unrefined rescue $! }
++    "), @"[6, [[6], 6], [13, [23], 33], 6, NoMethodError]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_with_refinements_activated_after_compile() {
++    assert_snapshot!(inspect("
++        module Doubling
++          refine(Integer) { def double = self * 2 }
++        end
++        def foo = yield 3
++        test = -> { [(foo(&:double) rescue $!.class), ([3].map(&:double) rescue $!.class), ([3].sum(&:double) rescue $!.class)] }
++        before = [test.(), test.()].last
++        using Doubling
++        [before, test.()]
++    "), @"[[NoMethodError, NoMethodError, NoMethodError], [6, [6], 6]]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_block_param() {
++    assert_snapshot!(inspect("
++        def foo(&blk) = [block_given?, blk.lambda?, blk.arity, blk.call(3)]
++        def test = foo(&:succ)
++        test
++        test
++    "), @"[true, true, -2, 4]");
++}
++
++#[test]
++fn test_send_symbol_block_arg_errors() {
++    assert_snapshot!(inspect("
++        class Foo
++          def boom = raise('boom')
++          private def secret = 1
++        end
++        def none = yield
++        def one(x) = yield(x)
++        def no_receiver = none(&:succ)
++        def private_call(x) = one(x, &:secret)
++        def raising(x) = one(x, &:boom)
++        def message
++          yield
++        rescue => e
++          [e.class, e.message[/\\A[\\w ]+/], e.backtrace_locations.first(3).map(&:base_label)]
++        end
++        foo = Foo.new
++        2.times { message { no_receiver }; message { private_call(foo) }; message { raising(foo) } }
++        [message { no_receiver }, message { private_call(foo) }, message { raising(foo) }]
++    "), @r#"[[ArgumentError, "no receiver given", ["none", "no_receiver", "<compiled>"]], [NoMethodError, "private method ", ["one", "private_call", "<compiled>"]], [RuntimeError, "boom", ["boom", "one", "raising"]]]"#);
++}
++
+ #[test]
+ fn test_send_proc_block_arg_rest_optional_keyword_callee() {
+     // Callee has rest/optional/keyword params (so `prepare_direct_send_args` builds
+diff --git a/zjit/src/hir/opt_tests.rs b/zjit/src/hir/opt_tests.rs
+index af3de7b1f5..c54acc15e3 100644
+--- a/zjit/src/hir/opt_tests.rs
++++ b/zjit/src/hir/opt_tests.rs
+@@ -13969,6 +13969,176 @@ mod hir_opt_tests {
+         ");
+     }
+ 
++    #[test]
++    fn test_send_with_profiled_symbol_block_arg() {
++        eval("
++            def foo = yield(42)
++            def test(block) = foo(&block)
++            test(:to_s); test(:to_s)
++        ");
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:3:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :block@0x1000
++          Jump bb3(v1, v3)
++        bb2():
++          EntryPoint JIT(0)
++          v6:BasicObject = LoadArg :self@0
++          v7:BasicObject = LoadArg :block@1
++          Jump bb3(v6, v7)
++        bb3(v9:BasicObject, v10:BasicObject):
++          v24:StaticSymbol = GuardType v10, StaticSymbol recompile
++          PatchPoint RootBoxOnly
++          PatchPoint MethodRedefined(Symbol@0x1008, to_proc@0x1010, cme:0x1018)
++          v28:CPtr = GetCref
++          v29:RubyValue = LoadField v28, :refinements@0x1040
++          v30:NilClass = GuardBitEquals v29, Value(nil) recompile
++          PatchPoint MethodRedefined(Object@0x1048, foo@0x1050, cme:0x1058)
++          v32:ObjectSubclass[class_exact*:Object@VALUE(0x1048)] = GuardType v9, ObjectSubclass[class_exact*:Object@VALUE(0x1048)] recompile
++          v33:BasicObject = SendDirect v32, &v24, :foo (0x1080)
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v33
++        ");
++    }
++
++    #[test]
++    fn test_send_with_dynamic_symbol_block_arg_falls_back() {
++        eval(r#"
++            def foo = yield(42)
++            def test(block) = foo(&block)
++            block = "dynamic_block_arg".to_sym
++            2.times { test(block) rescue nil }
++        "#);
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:3:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :block@0x1000
++          Jump bb3(v1, v3)
++        bb2():
++          EntryPoint JIT(0)
++          v6:BasicObject = LoadArg :self@0
++          v7:BasicObject = LoadArg :block@1
++          Jump bb3(v6, v7)
++        bb3(v9:BasicObject, v10:BasicObject):
++          v16:BasicObject = Send v9, &block, :foo, v10 # SendFallbackReason: Send: block argument is not nil
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v16
++        ");
++    }
++
++    #[test]
++    fn test_send_to_cfunc_with_symbol_block_arg() {
++        eval("
++            def test(array) = array.reject(&:odd?)
++            test([1, 2]); test([1, 2])
++        ");
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:2:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :array@0x1000
++          Jump bb3(v1, v3)
++        bb2():
++          EntryPoint JIT(0)
++          v6:BasicObject = LoadArg :self@0
++          v7:BasicObject = LoadArg :array@1
++          Jump bb3(v6, v7)
++        bb3(v9:BasicObject, v10:BasicObject):
++          v15:StaticSymbol[:odd?] = Const Value(VALUE(0x1008))
++          PatchPoint NoSingletonClass(Array@0x1010)
++          PatchPoint RootBoxOnly
++          PatchPoint MethodRedefined(Symbol@0x1018, to_proc@0x1020, cme:0x1028)
++          v29:CPtr = GetCref
++          v30:RubyValue = LoadField v29, :refinements@0x1050
++          v31:NilClass = GuardBitEquals v30, Value(nil) recompile
++          PatchPoint MethodRedefined(Array@0x1010, reject@0x1051, cme:0x1058)
++          v34:ArrayExact = GuardType v10, ArrayExact recompile
++          v35:BasicObject = CCallWithFrame v34, :Array#reject@0x1080, block=&v15
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v35
++        ");
++    }
++
++    #[test]
++    fn test_send_to_cfunc_with_symbol_block_arg_and_splat_falls_back() {
++        eval("
++            def test(array, args, block) = array.each_slice(*args, &block)
++            test([1, 2], [1], :sum); test([1, 2], [1], :sum)
++        ");
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:2:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :array@0x1000
++          v4:BasicObject = LoadField v2, :args@0x1001
++          v5:BasicObject = LoadField v2, :block@0x1002
++          Jump bb3(v1, v3, v4, v5)
++        bb2():
++          EntryPoint JIT(0)
++          v8:BasicObject = LoadArg :self@0
++          v9:BasicObject = LoadArg :array@1
++          v10:BasicObject = LoadArg :args@2
++          v11:BasicObject = LoadArg :block@3
++          Jump bb3(v8, v9, v10, v11)
++        bb3(v13:BasicObject, v14:BasicObject, v15:BasicObject, v16:BasicObject):
++          v22:ArrayExact = ToArray v15
++          PatchPoint NoEPEscape(test)
++          v27:BasicObject = Send v14, &block, :each_slice, v22, v16 # SendFallbackReason: Complex argument passing
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v27
++        ");
++    }
++
++    #[test]
++    fn test_send_to_variadic_cfunc_with_symbol_block_arg() {
++        eval("
++            def test(array) = array.sum(&:succ)
++            test([1, 2]); test([1, 2])
++        ");
++        assert_snapshot!(hir_string("test"), @"
++        fn test@<compiled>:2:
++        bb1():
++          EntryPoint interpreter
++          v1:BasicObject = LoadSelf
++          v2:CPtr = LoadSP
++          v3:BasicObject = LoadField v2, :array@0x1000
++          Jump bb3(v1, v3)
++        bb2():
++          EntryPoint JIT(0)
++          v6:BasicObject = LoadArg :self@0
++          v7:BasicObject = LoadArg :array@1
++          Jump bb3(v6, v7)
++        bb3(v9:BasicObject, v10:BasicObject):
++          v15:StaticSymbol[:succ] = Const Value(VALUE(0x1008))
++          PatchPoint NoSingletonClass(Array@0x1010)
++          PatchPoint RootBoxOnly
++          PatchPoint MethodRedefined(Symbol@0x1018, to_proc@0x1020, cme:0x1028)
++          v29:CPtr = GetCref
++          v30:RubyValue = LoadField v29, :refinements@0x1050
++          v31:NilClass = GuardBitEquals v30, Value(nil) recompile
++          PatchPoint MethodRedefined(Array@0x1010, sum@0x1051, cme:0x1058)
++          v34:ArrayExact = GuardType v10, ArrayExact recompile
++          v35:BasicObject = CCallVariadic v34, :Array#sum@0x1080, block=&v15
++          PatchPoint NoEPEscape(test)
++          CheckInterrupts
++          Return v35
++        ");
++    }
++
+     #[test]
+     fn test_send_with_statically_nil_block_arg() {
+         eval(r#"
+-- 
+2.47.3
+
