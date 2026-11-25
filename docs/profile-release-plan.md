@@ -1,9 +1,10 @@
 # lowrail-profile for any Rails team: release plan
 
-Status: M1–M4 built, 2026-11-25 (release candidate 0.1.0.rc1, unpublished); M5 (independent review) next, M6 only
-on Thomas's approval. Support floor reached: Ruby 3.3 and Rails 7.2 (CI matrix 3.3/3.4/4.0 × 7.2/8.0/8.1, macOS,
-Ruby head). Proof: [profile.md](profile.md#release-candidate-proof-from-the-built-gem-2026-11-25). §1 describes the
-tool before this work.
+Status: M1–M4 built, 2026-11-25 (release candidate 0.1.0.rc1, unpublished); M5
+[Thermos review: changes requested](upstream/profile-release-review-2026-11-25.md), fixes and confirm review
+required before M6, which still needs Thomas's approval. Support floor exercised: Ruby 3.3 and Rails 7.2
+(CI matrix 3.3/3.4/4.0 × 7.2/8.0/8.1, macOS, Ruby head). Proof:
+[profile.md](profile.md#release-candidate-proof-from-the-built-gem-2026-11-25). §1 describes the tool before this work.
 
 M5 Astra pass: [review and adversarial checks](upstream/profile-release-astra-review-2026-11-25.md), **changes
 required** (2026-11-25): child exit status, hidden production databases, install paths with spaces, and empty
