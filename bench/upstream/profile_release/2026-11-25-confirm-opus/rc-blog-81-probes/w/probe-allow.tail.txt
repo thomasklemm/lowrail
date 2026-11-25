@@ -1,0 +1,40 @@
+| 9 | error page | `GEM/prism/lib/prism/node.rb:1312` | 1072.08 | 50% | `no app frame` 100% | `[*arguments]` |
+| 10 | error page | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:74` | 1000.83 | 100% | `no app frame` 83%, `app/views/articles/index.html.erb:27` 13% | `frame = frame.to_s` |
+
+## By gem
+
+| Group | Warm/req | All/req | Top lines (warm) |
+| --- | ---: | ---: | --- |
+| ruby stdlib | 80160.4 | 84358.0 | `base.rb:94` 70066.3, `base.rb:59` 8699.6, `ipaddr.rb:758` 566.5 |
+| ruby default gem: prism | 41011.0 | 43169.5 | `parse_result.rb:162` 25263.4, `node.rb:4628` 2397.8, `node.rb:30908` 1930.4 |
+| rails: activesupport | 6677.5 | 6779.5 | `backtrace_cleaner.rb:195` 3356.7, `backtrace_cleaner.rb:74` 1000.8, `backtrace_cleaner.rb:212` 805.6 |
+| rails: actionpack | 4138.0 | 4351.4 | `exception_wrapper.rb:332` 2039.2, `exception_wrapper.rb:333` 608.5, `exception_wrapper.rb:158` 188.1 |
+| rails: actionview | 1852.0 | 1944.0 | `buffers.rb:44` 624.2, `url_helper.rb:438` 279.3, `template.rb:509` 64.1 |
+| gem: erubi | 368.1 | 387.5 | `erubi.rb:134` 206.2, `erubi.rb:137` 46.6, `erubi.rb:139` 24.7 |
+| rails: activerecord | 262.4 | 276.0 | `integration.rb:59` 17.1, `delegation.rb:139` 6.2, `relation.rb:77` 6.2 |
+| gem: useragent | 93.6 | 98.5 | `base.rb:120` 37.1, `version.rb:27` 13.3, `user_agent.rb:25` 5.7 |
+| gem: concurrent-ruby | 48.4 | 50.0 | `non_concurrent_map_backend.rb:131` 10.0, `map.rb:245` 8.6, `non_concurrent_map_backend.rb:120` 6.7 |
+| ruby default gem: uri | 48.1 | 49.5 | `common.rb:465` 28.1, `common.rb:456` 7.6, `rfc3986_parser.rb:115` 2.9 |
+| gem: bootsnap | 47.0 | 49.5 | `kernel_require.rb:11` 47.0 |
+| gem: logger | 42.5 | 44.0 | `logger.rb:692` 10.6, `log_device.rb:33` 10.6, `log_device.rb:165` 10.6 |
+| gem: propshaft | 40.1 | 42.0 | `helper.rb:113` 19.0, `asset.rb:73` 7.6, `dynamic.rb:11` 3.8 |
+| gem: rack | 38.0 | 39.5 | `utils.rb:331` 3.9, `body_proxy.rb:12` 3.9, `request.rb:607` 3.4 |
+| app | 38.0 | 40.0 | `_article.html.erb:15` 7.1, `_article.html.erb:14` 5.7, `_article.html.erb:13` 4.3 |
+| gem: web-console | 35.6 | 36.5 | `permissions.rb:39` 21.5, `permissions.rb:21` 3.9, `request.rb:12` 2.0 |
+| ruby default gem: prettyprint | 28.5 | 30.0 | `prettyprint.rb:404` 7.6, `prettyprint.rb:264` 7.1, `prettyprint.rb:459` 4.8 |
+| gem: importmap-rails | 24.7 | 26.0 | `importmap_tags_helper.rb:30` 6.7, `importmap_tags_helper.rb:44` 6.7, `importmap_tags_helper.rb:42` 4.3 |
+| gem: sqlite3 | 20.4 | 21.5 | `statement.rb:159` 14.7, `database.rb:215` 1.4, `statement.rb:217` 1.4 |
+| gem: nokogiri | 19.5 | 20.5 | `document.rb:416` 2.9, `node.rb:66` 2.8, `document_fragment.rb:169` 1.9 |
+| ruby default gem: pp | 13.8 | 14.5 | `pp.rb:542` 5.7, `pp.rb:271` 2.9, `pp.rb:550` 2.4 |
+| rails: activemodel | 13.3 | 14.0 | `builder.rb:28` 2.9, `builder.rb:16` 2.9, `builder.rb:22` 2.9 |
+| gem: json | 13.1 | 13.5 | `common.rb:298` 11.2, `common.rb:861` 1.0, `common.rb:769` 0.5 |
+| rails: railties | 12.6 | 13.0 | `backtrace_cleaner.rb:21` 2.9, `logger.rb:57` 2.0, `finisher.rb:194` 1.0 |
+| gem: base64 | 12.0 | 12.5 | `base64.rb:310` 5.8, `base64.rb:283` 4.3, `base64.rb:374` 1.9 |
+| gem: turbo-rails | 6.7 | 7.0 | `drive_helper.rb:27` 1.4, `stream_name.rb:26` 1.4, `streams_helper.rb:61` 1.0 |
+| gem: loofah | 5.2 | 5.5 | `concerns.rb:172` 1.9, `concerns.rb:43` 1.4, `scrubber.rb:132` 1.0 |
+| ruby default gem: erb | 4.3 | 4.5 | `util.rb:65` 4.3 |
+| gem: rails-html-sanitizer | 3.3 | 3.5 | `sanitizer.rb:33` 0.5, `sanitizer.rb:56` 0.5, `scrubbers.rb:55` 0.5 |
+| ruby default gem: securerandom | 2.9 | 3.0 | `securerandom.rb:71` 2.9 |
+| gem: rack-session | 1.4 | 1.5 | `id.rb:401` 0.5, `id.rb:277` 0.5, `id.rb:275` 0.5 |
+| gem: i18n | 1.0 | 1.0 | `simple.rb:51` 1.0 |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-81-probes/w/probe-allow/report.md

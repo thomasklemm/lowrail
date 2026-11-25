@@ -1,0 +1,40 @@
+| 6 | template compile | `RAILS/actionview/lib/action_view/template.rb:503` | 473.6 | 50% | `no app frame` 100% | `mod.module_eval(compiled_source, identifier, offset)` |
+| 7 | error page | `RUBY/error_highlight/base.rb:248` | 374.15 | 50% | `no app frame` 100% | `elsif lines.match(/\G[\s)]*?(\&?\.)(\s*?)(#{ Regexp.quote(mid) }).*\n/` |
+| 8 | error page | `RAILS/actionpack/lib/action_dispatch/middleware/exception_wrapper.rb:333` | 322.53 | 50% | `no app frame` 100% | `Hash[*(start + 1..(lines.count + start)).zip(lines).flatten]` |
+| 9 | reload check | `RAILS/activesupport/lib/active_support/file_update_checker.rb:132` | 260.23 | 100% | `no app frame` 100% | `mtime = File.mtime(path)` |
+| 10 | template compile | `GEM/erubi/lib/erubi.rb:134` | 201.4 | 50% | `no app frame` 100% | `input.scan(regexp) do \|indicator, code, tailch, rspace\|` |
+
+## By gem
+
+| Group | Warm/req | All/req | Top lines (warm) |
+| --- | ---: | ---: | --- |
+| rails: activesupport | 112066.6 | 113179.0 | `backtrace_cleaner.rb:124` 90904.1, `backtrace_cleaner.rb:141` 19094.1, `backtrace_cleaner.rb:149` 746.7 |
+| ruby stdlib | 57315.9 | 60310.5 | `base.rb:57` 55125.2, `ipaddr.rb:692` 563.6, `base.rb:248` 374.0 |
+| rails: actionpack | 3787.0 | 3982.0 | `exception_wrapper.rb:332` 1960.8, `exception_wrapper.rb:333` 322.5, `exception_wrapper.rb:136` 186.7 |
+| rails: actionview | 3523.0 | 3627.1 | `buffers.rb:48` 1459.8, `buffers.rb:44` 693.5, `template.rb:503` 473.6 |
+| gem: sprockets | 425.8 | 448.3 | `path_utils.rb:166` 21.9, `http_utils.rb:18` 20.0, `http_utils.rb:17` 20.0 |
+| rails: activerecord | 380.7 | 400.5 | `log_subscriber.rb:131` 74.1, `integration.rb:59` 17.1, `delegation.rb:129` 13.8 |
+| gem: erubi | 361.5 | 380.5 | `erubi.rb:134` 201.4, `erubi.rb:137` 45.1, `erubi.rb:139` 24.2 |
+| gem: useragent | 100.7 | 106.0 | `base.rb:120` 37.1, `version.rb:27` 19.0, `user_agent.rb:25` 5.7 |
+| gem: rack | 48.6 | 50.5 | `utils.rb:331` 3.9, `body_proxy.rb:12` 3.9, `request.rb:607` 3.4 |
+| gem: concurrent-ruby | 44.3 | 45.5 | `non_concurrent_map_backend.rb:131` 10.0, `non_concurrent_map_backend.rb:120` 8.9, `mri_map_backend.rb:14` 8.9 |
+| ruby default gem: logger | 42.5 | 44.0 | `logger.rb:692` 10.6, `log_device.rb:165` 10.6, `log_device.rb:33` 10.6 |
+| app | 41.3 | 43.5 | `_article.html.erb:14` 7.1, `_article.html.erb:13` 5.7, `_article.html.erb:12` 4.3 |
+| ruby default gem: prettyprint | 28.5 | 30.0 | `prettyprint.rb:404` 7.6, `prettyprint.rb:264` 7.1, `prettyprint.rb:459` 4.8 |
+| gem: importmap-rails | 28.0 | 29.5 | `importmap_tags_helper.rb:44` 10.0, `importmap_tags_helper.rb:30` 6.7, `importmap_tags_helper.rb:42` 4.3 |
+| gem: web-console | 26.8 | 27.5 | `permissions.rb:39` 13.7, `permissions.rb:21` 3.9, `request.rb:32` 2.0 |
+| gem: sqlite3 | 22.8 | 24.0 | `statement.rb:159` 14.7, `statement.rb:76` 4.3, `statement.rb:217` 1.0 |
+| gem: nokogiri | 18.1 | 19.0 | `document.rb:416` 2.9, `node.rb:66` 2.8, `node.rb:1431` 1.9 |
+| rails: railties | 17.9 | 18.5 | `backtrace_cleaner.rb:21` 4.3, `finisher.rb:195` 2.9, `logger.rb:57` 2.9 |
+| ruby default gem: pp | 16.6 | 17.5 | `pp.rb:542` 5.7, `pp.rb:277` 2.9, `pp.rb:271` 2.9 |
+| ruby default gem: base64 | 16.3 | 17.0 | `base64.rb:283` 8.6, `base64.rb:310` 5.8, `base64.rb:374` 1.9 |
+| rails: activemodel | 14.7 | 15.5 | `builder.rb:28` 2.9, `string.rb:35` 2.9, `builder.rb:16` 2.9 |
+| gem: json | 12.7 | 13.1 | `common.rb:298` 10.8, `common.rb:378` 1.0, `common.rb:775` 0.5 |
+| gem: sprockets-rails | 12.3 | 13.0 | `helper.rb:81` 1.9, `helper.rb:357` 1.9, `helper.rb:186` 1.9 |
+| gem: turbo-rails | 7.1 | 7.5 | `stream_name.rb:26` 1.4, `streams_helper.rb:61` 1.4, `drive_helper.rb:27` 1.4 |
+| gem: loofah | 4.8 | 5.0 | `concerns.rb:172` 1.9, `concerns.rb:43` 1.0, `concerns.rb:127` 0.5 |
+| gem: rails-html-sanitizer | 4.3 | 4.5 | `sanitizer.rb:165` 1.4, `sanitizer.rb:33` 0.5, `sanitizer.rb:192` 0.5 |
+| ruby default gem: securerandom | 2.9 | 3.0 | `securerandom.rb:71` 2.9 |
+| gem: rack-session | 1.4 | 1.5 | `id.rb:275` 0.5, `id.rb:401` 0.5, `id.rb:277` 0.5 |
+| gem: i18n | 1.0 | 1.0 | `simple.rb:51` 1.0 |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-floor-probes/w/probe-allow/report.md

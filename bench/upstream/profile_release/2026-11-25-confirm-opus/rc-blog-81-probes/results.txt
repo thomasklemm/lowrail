@@ -1,0 +1,9 @@
+ruby 4.0.7 (2026-09-15 revision 229531a6cf) +PRISM [x86_64-linux]
+rails 8.1.4, lowrail-profile from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/lowrail-profile-0.1.0.rc1
+failing suite, plain: exit 1
+failing suite, profiled: exit 1 (runs: exit 1 1)
+killed suite, plain: exit 137
+killed suite, profiled: exit 137 (runs: exit 137 137)
+workloads probe (no flag): exit 1, articles 3 -> 3; lowrail-profile: /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-81-probes/w/probe.rb: GET /articles is sent as POST; --workloads sends real requests, so it needs --allow-writes
+workloads probe --allow-writes: exit 0, articles 3 -> 3; 
+workloads post --allow-writes: exit 0, articles 3 -> 63; 

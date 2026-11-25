@@ -1,0 +1,8 @@
+unchanged captures: 6
+aa1       0 of  120 unchanged heads fail (0.0%); rows: []
+aa2       0 of  360 unchanged heads fail (0.0%); rows: []
+rerun     0 of  360 unchanged heads fail (0.0%); rows: []
+RUBY/uri/common.rb:394 per capture (warm per run): []
+planted bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/planted: aa1 catches 0/30, aa2 0/120, rerun 0/0; other rows flagged in aa1: 30/30
+confirm    0 of  360 unchanged heads fail (0.0%); rows: []
+bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/planted: rows matching output_safety.rb:242|erb/util.rb:15 in 30/30; rows not matching in 0/30

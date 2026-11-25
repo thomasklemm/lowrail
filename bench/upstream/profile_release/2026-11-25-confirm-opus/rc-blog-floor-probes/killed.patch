@@ -1,0 +1,12 @@
+diff --git a/test/models/article_test.rb b/test/models/article_test.rb
+index b34f319..9f4b579 100644
+--- a/test/models/article_test.rb
++++ b/test/models/article_test.rb
+@@ -23,4 +23,7 @@ class ArticleTest < ActiveSupport::TestCase
+       article.destroy
+     end
+   end
++  test "planted killed" do
++    Process.kill("KILL", Process.pid)
++  end
+ end

@@ -1,0 +1,24 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/plain.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/plain2.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/off.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/off-env.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/profiled.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/base2.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/head.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/planted.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/seed99.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/aa3.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/aa4.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/blog-81/aa5.log: 21 outcomes; 21 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+aa3.outcomes = plain
+aa4.outcomes = plain
+aa5.outcomes = plain
+base2.outcomes = plain
+head.outcomes = plain
+off-env.outcomes = plain
+off.outcomes = plain
+plain.outcomes = plain
+plain2.outcomes = plain
+planted.outcomes = plain
+profiled.outcomes = plain
+seed99.outcomes = plain

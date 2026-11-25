@@ -1,0 +1,5 @@
+status 0 compared: 1804 lines, 3 actions; not compared 6
+  request line GEM/uri/lib/uri/common.rb:456: +0.21 against 1.00 (21%)
+  request line RAILS/activemodel/lib/active_model/error.rb:204: -0.17 against 1.00 (17%)
+  request action ArticlesController#update: -2.50 against 20.00 (12%)
+  request line RAILS/actionpack/lib/action_dispatch/http/mime_type.rb:300: +0.08 against 1.00 (8%)

@@ -1,0 +1,5 @@
+status 0 compared: 2017 lines, 3 actions; not compared 6
+  request line RUBY/uri/common.rb:394: +1.50 against 4.50 (33%)
+  request line RAILS/actionpack/lib/action_dispatch/http/response.rb:473: -0.21 against 1.00 (21%)
+  request action CommentsController#create: -6.50 against 42.00 (15%)
+  request line RAILS/actionpack/lib/action_controller/log_subscriber.rb:38: -0.12 against 1.00 (12%)

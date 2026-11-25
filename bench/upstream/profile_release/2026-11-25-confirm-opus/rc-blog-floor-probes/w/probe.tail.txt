@@ -1,0 +1,3 @@
+lowrail-profile: run 1 of 2: bin/rails runner /home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/lowrail-profile-0.1.0.rc1/lib/lowrail/profile_workloads.rb /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-floor-probes/w/probe.rb /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-floor-probes/w/probe/workloads.json
+lowrail-profile: /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-confirm-opus/rc-blog-floor-probes/w/probe.rb: GET /articles is sent as POST; --workloads sends real requests, so it needs --allow-writes
+lowrail-profile: the workloads run exited 1; nothing measured

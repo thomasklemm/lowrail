@@ -1,0 +1,20 @@
+# plain vs plain2, off
+base plain: 2 processes
+plain2 31973.txt 2229: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/utf_32le.so", "/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/trans/utf_16_32.so"]  same set: false
+off 32016.txt 2229: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/utf_32le.so", "/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/trans/utf_16_32.so"]  same set: false
+# control (bundle exec env) vs captures
+base off-env: 1 processes
+profiled run1-32080.txt 2229: identical to a off-env process
+profiled run2-32122.txt 2229: identical to a off-env process
+base2 run1-32179.txt 2229: identical to a off-env process
+base2 run2-32214.txt 2229: identical to a off-env process
+head run1-32273.txt 2229: identical to a off-env process
+head run2-32308.txt 2229: identical to a off-env process
+planted run1-32371.txt 2229: identical to a off-env process
+planted run2-32405.txt 2229: identical to a off-env process
+seed99 run1-32460.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-32816.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true

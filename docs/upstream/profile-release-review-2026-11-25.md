@@ -213,3 +213,54 @@ The explicit package allowlist and extracted `loaded_constant` source of truth a
 The Ractor and literal compatibility changes remain local. No changed file crossed 1,000 lines (counter 650,
 report 600, profiler 376, profiler tests 824); no additional structural blocker, wrapper layer or speculative
 decomposition is justified. Fix and test the five items above, then confirm the exact rebuilt candidate.
+
+## Confirm review: thermos-opus (2026-11-25)
+
+**Verdict: nits; the five findings above are fixed.** This pass checked thermos-sol's list against the fix range
+`c2e5c393..14579fb4`, only the profile commits (`b60a29e2`, `c65370c9`, `7e67b661`, `20049618`, `7b45ced2`, with
+`e3a53f20`, `85c4fedc`, `b6276362` and `14579fb4` alongside). Main was at `b6109a84`, whose `gem/` is identical to
+`14579fb4`. One reviewer applied both rubrics, without delegation. A parallel thermos-fable confirm covers the other list.
+CI at `14579fb4` succeeded on all 14 check runs. Receipts:
+[2026-11-25-confirm-opus](../../bench/upstream/profile_release/2026-11-25-confirm-opus/README.md).
+
+**Gem.** Built from `gem/` at head: sha256 `324affa6…36f2d`, byte-identical to the builder's, 14 files. Installed with
+`gem install --local` into fresh `script/corpus real-blog` copies on Ruby 3.3.14 / Rails 7.2.4 (the floor Blog, with
+its `params.expect` patch) and on Ruby 4.0.7 / Rails 8.1.4. Each copy ran the builder's `rerun.sh` unchanged, and the
+8.1 copy also ran the full floor proof. Results: 21 tests identical in all 12 setups on each Blog, trees unchanged,
+every capture process equal to `off-env`. A/A exits 0, the plant exits 1 with only the planted lines, and `--seed 99`
+exits 2. The local profiler suites passed with nothing skipped: 29 runs / 372 assertions on 4.0 and 29 / 369 on 3.3.
+
+**Reverting each fix fails its new test** (on both Rubies unless noted):
+
+| Finding | Repro from the review, installed gem | Mutation → the new test |
+| --- | --- | --- |
+| 3. Exit status | A failing suite exits 1 (runs `1 1`) and a `KILL`-ed one exits 137 (runs `137 137`), plain and profiled, on both Blogs. | Final `exit 0`; no-report `exit 1`; a signal as `exitstatus.to_i` → all fail. |
+| 1. Write guard | Without the flag, `env: { "REQUEST_METHOD" => "POST" }` is refused before any request (3 → 3 articles). With `--allow-writes` it is sent as a POST (`#create` 20 windows/run, answered 422), and a `post` writes 3 → 63. | Guard line removed; `overridden` forced false; forced true → all fail. |
+| 2. Routes before 8.1 | The review's overlapping routes: `/probe/7` is not recorded, and the unambiguous route is. Only the route table's pattern and defaults are read; no constraint runs and nothing is autoloaded. | `candidates&.first` → fails on 7.2. It passes on 8.1, as expected, because 8.1 uses its matched route; the CI matrix runs 7.2 and 8.0. |
+| 5. Compare floors | — | `ACTION_MIN = 0`; `ACTION_SHARE = 0`; both; no head spread; `1 ×` noise → all fail. |
+
+**Docs (finding 4).** Every changed README and plan sentence agrees with the receipts and code: the qualified
+guarantee 4 (`off-env` baseline, exclusions, 217 of 222, macOS outcomes only), guarantee 6's split between build and
+runtime, the exit-status paragraph, the new refusals, *Not compared*, the build from `gem/` and `meta.format` 2.
+The fixes receipts' tables match this rerun, apart from database counts and seed-independent load-order detail.
+The Spring sentence was not reproduced here.
+
+**Nits, none blocking:**
+
+* `test_a_failed_command_fails_the_profile`'s `first` case cannot tell the first failing run from the last, because
+  only run 1 fails: `statuses.reverse.find` passes it. Smallest fix: run 2 exits 4, and expect 3.
+* The `--record` failure path (`exit(failed || 1)` after a report) has no test.
+* The guard certifies each declaration. Block and `alternate:` turns change only path and params. A `_method` smuggled
+  through a form-typed JSON GET body or an alternate's params did not reach another action, because Active Support
+  escapes `&` in JSON. That is a hypothesis about other encoders, not a reproduced bypass.
+
+**A/A recommendation.** On the 3.3 / 7.2 Blog, across 12 unchanged captures and every assignment of base, A/A and
+head, the default (one A/A pair, 6 suite runs) fails an unchanged head 4.5% of the time. The cause is
+`uri/common.rb:394` (14.25–21.75) and once `set.rb:512`. Two A/A pairs (8 runs, always) reach only 1.4%.
+Re-capturing head **only when compare exits 1**, and failing only if that second comparison also exits 1, reaches
+0.4%. It costs nothing on a green run, and every plant was still caught (132 of 132 assignments with the default,
+264 of 264 with the confirm). On 4.0 / 8.1 no strategy flagged an unchanged head. Recommendation for 0.1: keep one
+A/A pair as the default, and make the README's CI job a confirm step instead. On exit 1, profile head once more
+into `head2` and fail only if `compare base head2 --aa base2` also exits 1. Say in the README that a single
+unconfirmed failure is a place to look. That is a docs-only change and needs no new option; a pooled `--head2`
+can follow later.
