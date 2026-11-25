@@ -535,3 +535,183 @@ Logs are `/tmp/zsv1-confirm-{configure,build,zjit-test,btest-1,btest-2,test-all-
 also retained with the probe outputs, supplemental script and HIR under `.amp/in/orb-backup/zsv1-confirm/`.
 No sanitizer, AArch64, alternate-GC, independent base build or new speed measurement is claimed in this pass.
 Only Lowrail's item/review record is changed; no Ruby branch push, PR opening or upstream post.
+
+## Astra full review of revision 3 (2026-11-25)
+
+**Approve; no must-fixes or maintainability findings.** Reviewed the whole change at
+[`ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5`](https://github.com/thomasklemm/ruby/commit/ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5),
+not a delta from a Sol pass. Reviewer: `astra`, thread
+[`T-01a2129c-f593-70d9-98f1-4854b086903d`](https://ampcode.com/threads/T-01a2129c-f593-70d9-98f1-4854b086903d).
+Applied both Thermos rubrics directly; no delegation or other threads. The fetched fork branch is
+`thomasklemm/zjit-setivar-real-class-3`, with direct parent `3b188d0dd5b23bbf94831a890ca907b92420c22d`.
+One commit, two files, +100/-1; Thomas is author and committer, with no trailers. Read its entire message,
+the item's body and For Thomas, both results records, retained probe, stats harness/diff and raw `stats-3/`.
+No Ruby branch was pushed, no PR opened, and nothing posted upstream.
+
+### Receiver, guard and GC audit
+
+* `profile.rs:89,244-253,392-396`: only `setinstancevariable` uses the new constructor. It preserves the
+  **actual receiver's** shape and flags from `ProfiledType::new`, replacing only the class with native
+  `rb_obj_class`. This does not dispatch the Ruby `class` method. `object.c:258-291` walks singleton/ICLASS
+  superclasses through the prime classext; all Box paths end at the same real class. Singleton methods,
+  singleton-class ivars, extension/prepend chains and method lookup are not substituted with class methods.
+* The transition-owner claim is exact for the supported ordinary-object path, **not a universal claim about
+  class/module ivar storage**. `shape.c:808-826,896-925` uses `rb_obj_class(obj)` for an ordinary object;
+  class/module-owned field imemos instead use their owner's singleton class. Those class/module layouts do
+  not get a `SetIvarSpec`, so recording `Class`/`Module` cannot build their transitions from the wrong owner.
+  Boxable classes use `Other` layout; ordinary classes/modules use `RClass`. Both take the existing generic
+  operation, preserving Box storage and Ractor ownership checks.
+* `hir.rs:6517-6577`: immediates are rejected before any shape access. An accepted spec has RObject layout,
+  or Extended layout with a sampled T_OBJECT flag; frozen and complex shapes are refused. Existing fields
+  need no class. A missing field uses the real class for the transition; a complex result, changed capacity
+  or missing field on an Extended RObject is refused. Shape edges describe the same field layout across
+  classes; the class argument controls variation/max-field accounting, not a different offset scheme.
+  No speculative transition is performed against a singleton's own ivars or methods.
+* `hir.rs:6399-6409,6580-6624,8750-8819,8865-8904,11084-11136`: the store checks the full shape on the
+  actual receiver after RHS evaluation. `shape.h` includes capacity, layout, frozen/shareable, complex and
+  object-ID bits in that shape. Heap checks protect shape loads; exact shape guards protect offsets and
+  frozen/capacity assumptions. A later freeze, growth, deletion or fiber suspension cannot reuse only an
+  entry-time check. The ordinary write barrier applies to the actual ivar storage, including field imemos.
+* A subtle boundary was checked rather than assuming shape IDs uniquely identify builtin types:
+  **an Extended T_OBJECT and a T_STRUCT can have identical full shapes**. They can then share the existing
+  field store even though T_STRUCT samples alone are not selected for specialization. This is safe: both
+  keep `fields_obj` at the same offset after `RBasic`, and missing-field transitions on Extended objects are
+  refused. `shape.c:1217-1235`, `internal/struct.h:28-43`, `shape.h` and the RObject/RTypedData definitions
+  agree. The shared-layout probe asserts full shape equality, performs 100 compiled Struct writes after
+  ordinary-object warmup with **0 generic writes**, preserves its Struct payload and still raises on freeze.
+  At thresholds 2/30 it records 1,206/968 JIT instructions. String/Array/Hash generic-table layouts do not
+  shape-match this path.
+* `ProfileOracle` binds profiles to the specific instruction snapshot (`hir.rs:9357-9400,9722-9727`);
+  the real class of a write is not reused as a method-dispatch class at later sends. After a store the
+  receiver is refined only to a heap object. Existing send/inlining/TracePoint guards remain unchanged.
+* GC: `observe_profiled_type` still barriers the **recorded class** against its ISEQ before insertion.
+  `IseqProfile::each_object[_mut]` visits it in the distribution's arrays; `gc.rs:115-153` marks it movable
+  and updates it through `rb_gc_location`. There is no new unmarked pointer, hash key, cached raw class or
+  Ruby allocation/callback inside `rb_obj_class`. The real class does not retain the ordinary receiver's
+  singleton class. Executed minor collections, anonymous-class profile compaction and reference verification.
+  The isolated retention probe leaves **0/100** singleton-bearing ordinary objects alive; each tested
+  compaction reports **448 moved T_CLASS objects**.
+
+### Fresh execution, mutation and final-version coverage
+
+Linux x86-64, GCC 14.2.0, Rust 1.100.0, bootstrap Ruby 4.0.9, checksum-verified cargo-nextest 0.9.152.
+Built from the exact head with `./autogen.sh`,
+`./configure --enable-zjit=dev --disable-install-doc --without-jemalloc`, and `make -j2`.
+
+| Check | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS=-j2` | **2,036 passed, 15 skipped**; includes both added HIR tests and the formerly flaky SIGPROF test, with no retry. |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | **PASS all 2,148 tests** (114.21 s); existing “Fiber count: 10000 (skipping)” line. |
+| Same btest at threshold 2 | **PASS all 2,148 tests** (109.42 s); same skip notice. |
+| Retained `probe.rb` | **33 identical rows**: interpreter vs thresholds 1, 2, 30, each with default versions and max-versions=1. Full Ruby interpreter also matches miniruby. |
+| New `astra-probes/adversarial.rb` | **21 asserted rows**, or **23 with RUBY_BOX=1**. Each interpreter control matches thresholds 1, 2, 30, with default versions and max-versions=1, plus threshold 100 / num-profiles=90. Full Ruby interpreter and threshold 2 also match. |
+| New `exhaust.rb` | After explicit global shape exhaustion, 100 extended objects become complex and retain the correct sum 4,950; interpreter and thresholds 1, 2, 30 match. |
+| New `retention.rb` | Interpreter and thresholds 1, 2, 30, 100 (num-profiles=90) all report 0/100 live weak references; compaction verifies moved references. |
+| Routing mutation | Change only `setinstancevariable` back to `profile_self`: **both added HIR tests fail**, 0 passed / 2 failed / 2,049 filtered, with `SideExit NoProfileSetIvar recompile` replacing the optimized store. |
+| Restore | Restore that line, rebuild miniruby/full Ruby: **both tests pass**, 2 passed / 2,049 filtered. Ruby tracked diff is empty again. No snapshot was accepted. |
+
+The new asserted rows cover singleton-owned metadata and overridden methods (including a raising `class`),
+unrelated real classes sharing shapes, BasicObject, class/module/eigenclass receivers, generic and typed
+layouts, immediate/immutable receivers, 0/2/3/8/30/126/200 initial ivars, actual shape-variation exhaustion,
+deletions/object IDs, old receivers with young heap values, anonymous classes, RHS mutation and suspension,
+and independent Box-local classes and builtin-class ivars. Unlike the retained probe's catch-all row helper,
+unexpected exceptions fail these probes; their expected values are explicit. Ordinary and Box-enabled
+adversarial outputs also match the old-routing mutant at threshold 2.
+
+**`--zjit-max-versions=1` does not by itself test `no_side_exits`.** `CompilePolicy::new` requires a previously
+invalidated version as well as reaching the limit. The dedicated `final-version.rb` uses max-versions=2,
+threshold=2 and inline-threshold=0. Inspected its HIR: first a recompile shape guard, then shape branches
+with optimized stores and a `SetIvar` fallback. After warmup it asserts **0 generic stores for 100 matching
+writes**, then changes the receiver's shape and asserts **100 generic stores and 100 no-side-exits fallbacks
+for 100 unmatched writes**. Freezing preserves the old value and raises FrozenError. Semantic output matches
+the interpreter. This is stronger evidence for this boundary than treating the earlier max-versions=1 runs
+as final-version coverage; it is not a new code finding.
+
+`mechanism.rb`, with 1,000 warmup calls and inlining disabled, checks a 100,000-write window: the old-routing
+mutant executes **100,000 generic writes / 100,000 no-side-exits fallbacks**; exact head executes **0 / 0**.
+Both execute 1,000,011 JIT instructions, with zero compiled ISEQs, no-profile-setivar exits and OOM errors in
+that window, and the same final value 99,999. An initial 100-call warmup was insufficient for the control to
+reach its final version: it exited once and interpreted the measured loop. That preliminary zero was not
+counted as optimization evidence. No timing/JIT-flat claim is inferred.
+
+An initial GC probe also handed singleton **classes** to generic sends/WeakRef construction and found 16/200
+live weak references. The old-routing mutant reproduces exactly 16/200: profiling class/module receivers is
+an existing exception and can retain those classes and attached objects. The isolated retained probe tests
+ordinary-object profiling without introducing that other retaining path; it passes on both implementations.
+The rejected probe and both failure outputs remain in scratch, not hidden as a passing check.
+
+### Maintainability and cold-profile cost
+
+No structural regression: the production diff is 18 additions / 1 deletion in the canonical profiler,
+`profile.rs` grows 597 → 614 lines, and the two HIR snapshots add 82 lines to an already-large test module.
+No new file crosses 1,000 lines. The helpers mirror `profile_self_shape`/`shape_only`, reuse the existing
+distribution/barrier machinery, and avoid changing HIR, codegen or generic dispatch. Generalizing those
+small profiling entry points with a mode/closure would add concepts without reducing meaningful complexity.
+The sole added why-comment identifies the interpreter's transition owner; the tests add no redundant comments.
+
+The losing input is many cold write methods on a receiver with a deep extension chain: `rb_obj_class` must
+walk it during sampling. Ran `cold.rb` (100 distinct writers, 29 calls each, below the default compile threshold),
+with fixed initial heap 33,554,432 bytes and Callgrind 3.24.0 `--smc-check=all-non-file`:
+
+| Extension depth | Old-routing mutant Ir | Exact-head Ir |
+| --- | ---: | ---: |
+| 0 | 112,252,669 | 112,314,839 |
+| 1 | 113,468,014 | 113,713,348 |
+| 1,000 | 170,889,615 | 177,679,180 |
+
+All six runs check the written value and exit 0. These are **whole-process diagnostic counts**, with setup
+and profiling, no A/A/heap-control cohort or JIT-flat certification. The control is a one-line routing mutant,
+not a separately built pristine base. This records the expected cold cost; it is not a speed claim. The walk
+does not occur in the warmed store and is limited to sampling windows (five samples by default).
+
+### Body and evidence audit
+
+Every public sentence and the commit message are supported:
+
+| Claim | Independent check |
+| --- | --- |
+| Ordinary singleton-bearing receivers become “other” under the old profiler | Read `observe_profiled_type` and live ruby/ruby PR 19540 with `gh api`; its top-level/Class/Module exemptions do not change the affected ordinary-object case. |
+| Missing profile leads to recompilation, then generic final-version writes | Traced `dispatch_ivar`, `CompilePolicy`, `exit_recompile`; killed the routing mutant with both HIR tests and measured its generic final-version loop. |
+| The class is used only for shape transitions; interpreter uses the real class | Re-read the complete SetIvar profile consumers and `obj_get_owner_class`; class/module-owned imemos are excluded as explained above. |
+| Existing shape/layout/frozen/capacity checks remain | Exact diff plus guard trace and executed boundary probes above. |
+| PR 19858 is the read-side shape-only counterpart | Read live PR 19858 and current `profile_self_shape`; it changes reads, not writes. |
+| Fixes the requested profiling issue | Live Shopify issue 1122 is open and asks for the real class for the transition tree; implemented routing matches that request. |
+| Lobsters -584 generic writes per iteration | Independently parsed all nine `stats-3/*.json.gz`, checked Ruby pins and denominators of 10, and replayed all six retained diffs byte-for-byte. |
+
+Lobsters master / A-A / head per iteration: `dynamic_setivar_count` **11,405 / 11,405 / 10,821**;
+`setivar_fallback_no_side_exits` **5,956 / 5,956 / 5,372**; `ccall_rb_vm_setinstancevariable`
+**11,345 / 11,345 / 10,761**. All three deltas are exactly -584, no rounding and zero A/A movement.
+Railsbench totals remain 4,060. Shipit totals remain 48,920 with the already-recorded -81/+81 fallback
+redistribution. The public body correctly makes neither an other-app exclusivity claim nor a speed claim.
+The For Thomas explanation that the actual receiver's shape remains guarded is sound; its approval status
+is updated to include this pass without treating it as the separate Sol approval.
+
+### Replay and limits
+
+New scripts are retained in [`astra-probes/`](astra-probes/), so they do not depend on a reviewer orb surviving.
+From the built Ruby directory, with `PROBES` set to that absolute directory and `RUBYLIB` including the build
+directory, `lib`, `.ext/common` and `.ext/x86_64-linux` for full Ruby:
+
+```sh
+./miniruby "$PROBES/adversarial.rb"
+./miniruby --zjit --zjit-call-threshold=2 "$PROBES/adversarial.rb"
+# Also thresholds 1/30, each with --zjit-max-versions=1; repeat with RUBY_BOX=1.
+./miniruby --zjit --zjit-call-threshold=100 --zjit-num-profiles=90 "$PROBES/adversarial.rb"
+./miniruby --zjit --zjit-call-threshold=2 --zjit-max-versions=2 \
+  --zjit-inline-threshold=0 --zjit-stats-quiet "$PROBES/final-version.rb"
+./miniruby --zjit --zjit-call-threshold=2 --zjit-inline-threshold=0 \
+  --zjit-stats-quiet "$PROBES/shared-layout.rb"
+./miniruby --zjit --zjit-call-threshold=2 "$PROBES/exhaust.rb"
+./ruby --zjit --zjit-call-threshold=100 --zjit-num-profiles=90 "$PROBES/retention.rb"
+./miniruby --zjit --zjit-inline-threshold=0 --zjit-stats-quiet "$PROBES/mechanism.rb"
+RUBY_GC_HEAP_INIT_BYTES=33554432 valgrind --tool=callgrind --smc-check=all-non-file \
+  --callgrind-out-file="$WORK/cold-1000.cg" ./miniruby --zjit "$PROBES/cold.rb" 1000
+make zjit-test "ZJIT_TESTS=-j2 -E 'test(test_setivar_singleton_receiver)'"
+```
+
+Build/test logs, interpreter/JIT output pairs, mutation failures, HIR and raw Callgrind dumps are retained in
+`.amp/in/orb-backup/zsv1-astra/` in this thread. The application workloads/release builds were **not rerun**;
+the application claim is a replay/audit of the committed raw evidence, not an independent benchmark cohort.
+No pristine-base full suite, AArch64, sanitizer or alternate-GC run is claimed. The seven retained scripts
+are review probes, not new production code or a mandatory test matrix. No guard weakening or Ruby code edit
+is requested by this review.

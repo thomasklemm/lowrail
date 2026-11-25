@@ -90,6 +90,23 @@ passes:
       diffs replay byte-for-byte; lobsters -584 independently confirmed, Shipit -81/+81 retained.
       Body and commit message accepted sentence by sentence. No speed claim, Ruby push, PR or upstream post.
       Record: bench/upstream/zsv1/thermos-review.md, Exact-head confirm of revision 3.
+  - reviewer: astra
+    orb: "T-01a2129c-f593-70d9-98f1-4854b086903d"
+    head: "ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5"
+    date: 2026-11-25
+    verdict: approve
+    open: >-
+      None. First Astra pass covers the whole change with both Thermos rubrics applied directly,
+      without delegation. Exact-head dev build: zjit-test 2036 passed/15 skipped; btest thresholds
+      1 and 2 each 2148 passed. Retained 33-row probe and new 21-row adversarial probe (23 with Box)
+      match the interpreter; explicit exhaustion, GC/compaction, shared T_OBJECT/T_STRUCT layout
+      and two-version no_side_exits probes pass. max-versions=1 alone does not force no_side_exits.
+      Routing mutation kills both added HIR tests; restoring the head passes both. All six stats-3
+      diffs replay byte-for-byte; lobsters -584 is exact, not a speed claim. Audited guards,
+      transition ownership, profile GC relocation, body and commit message; no code or text must-fix.
+      Cold deep-extension cost and controls are recorded, with seven replayable probes.
+      Record: bench/upstream/zsv1/thermos-review.md, Astra full review of revision 3.
+      No Ruby push, PR opening or upstream post.
 ---
 
 # ZJIT: Profile the real class for setinstancevariable
@@ -112,8 +129,12 @@ ZJIT stats per iteration for lobsters:
 ## For Thomas
 
 Rebased as `ca3ea90482` on master `3b188d0dd5` (range-diff `=`, lobsters −584 unchanged, body unchanged;
-[results-3.md](../../zsv1/results-3.md)). The [exact-head thermos-sol confirm](../../zsv1/thermos-review.md#exact-head-confirm-of-revision-3-2026-11-25)
-approves both rubrics, the body and commit message with no must-fixes; Astra still needs to approve that head before it opens as a draft.
+[results-3.md](../../zsv1/results-3.md)).
+The [exact-head thermos-sol confirm](../../zsv1/thermos-review.md#exact-head-confirm-of-revision-3-2026-11-25)
+and [Astra's full review](../../zsv1/thermos-review.md#astra-full-review-of-revision-3-2026-11-25)
+**both approve that exact head with no must-fixes**, each applying both Thermos rubrics independently.
+Astra adds adversarial/Box/GC and shared-layout probes, explicit final-version coverage and a killed routing
+mutation. The body and commit message are approved; the -584 counter claim is verified, not a speed claim.
 The body above and the comment draft are **approved with no must-fixes** for head `47b2ed7110`.
 The [text-only confirm](../../zsv1/thermos-review.md#text-only-confirm-of-revision-2-2026-11-18) closes the final
 wording finding and carries forward the code, comments, message and packaging review. The retained stats
