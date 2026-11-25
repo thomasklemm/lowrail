@@ -34,7 +34,7 @@ module PrQueue
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
   # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt. ruby/ruby opens only items Thomas names (DECISIONS).
-  CAPS = { "rails/rails" => { open: 22, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
+  CAPS = { "rails/rails" => { open: 23, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
   # /opt/git adds an Amp-Thread-ID trailer to commits and breaks `cat-file commit`.
   GIT = File.executable?("/usr/bin/git") ? "/usr/bin/git" : "git"
