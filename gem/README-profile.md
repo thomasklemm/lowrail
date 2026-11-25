@@ -61,6 +61,7 @@ Options, all before `--`:
 | `--ledger FILE` | bundled | A newer ledger index (`contributions-index.json`). |
 | `--no-ledger` | | No ledger column. |
 | `--keep-runs` | | Keep each run's raw counts (`run1/`, `run2/`), which `report` rebuilds from. Without it they are deleted once the report is written: compare needs only `report.json`, and on a large parallel suite the counts reach gigabytes. |
+| `--timeout SECONDS` | none | Stop a run that takes longer: `TERM` to the command's process group, `KILL` 10 s later. No further run starts, lowrail-profile exits 124, and compare treats the capture as a failed suite (exit 2). With it the command runs in its own process group, and lowrail-profile passes `INT` and `TERM` on to it. |
 | `--help`, `--version` | | |
 
 ## Reading the report

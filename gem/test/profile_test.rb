@@ -700,6 +700,41 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # --timeout stops a run that hangs (Fizzy's autoload deadlock): TERM to its
+  # process group, KILL 10 s later for one that ignores TERM, a grandchild
+  # included; no further run; exit 124, recorded in capture.json. INT from the
+  # terminal reaches the command, and a run in time passes as without it.
+  def test_timeout_stops_a_hung_run_and_its_processes
+    realpath_tmpdir do |dir|
+      hang = 'trap("TERM") {}; File.write("gc.pid", spawn("sleep", "300").to_s); sleep'
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      _, err, status = profile(dir, "--timeout", "1", "--out", "hung", "--", RUBY, "-e", hang)
+      took = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+      assert_equal 124, status.exitstatus, err
+      assert_match(/run 1 took longer than --timeout 1.0s; stopping it/, err)
+      refute_match(/run 2 of 2/, err)
+      assert_operator took, :>=, 11
+      assert_operator took, :<, 30
+      capture = JSON.parse(File.read(File.join(dir, "hung/capture.json")))
+      assert_equal [[124], [1]], capture.values_at("exit", "timed_out")
+      state = `ps -o stat= -p #{File.read(File.join(dir, "gc.pid"))}`.strip
+      assert(state.empty? || state.start_with?("Z"), "the grandchild still runs: #{state}")
+
+      _, err, status = profile(dir, "--timeout", "30", "--out", "quick", "--", RUBY, "-e", "exit 3")
+      assert_equal 3, status.exitstatus, err
+      assert_equal [[3, 3], []], JSON.parse(File.read(File.join(dir, "quick/capture.json"))).values_at("exit", "timed_out")
+
+      waits = 'trap("INT") { File.write("got", "INT"); exit 130 }; File.write("ready", ""); sleep'
+      pid = Process.spawn(profile_env(dir), RUBY, PROFILE, "--timeout", "60", "--out", "int", "--", RUBY, "-e", waits,
+        chdir: dir, err: File::NULL, out: File::NULL)
+      sleep 0.1 until File.exist?(File.join(dir, "ready"))
+      Process.kill("INT", pid)
+      Process.wait(pid)
+      assert_equal [130, "INT"], [$?.exitstatus, File.read(File.join(dir, "got"))]
+      assert_equal [130], JSON.parse(File.read(File.join(dir, "int/capture.json")))["exit"]
+    end
+  end
+
   # The app tree after a profile (default --out) is the tree before, but
   # tmp/lowrail-profile: no Gemfile, config or code is written.
   def test_profiling_leaves_the_app_tree_unchanged

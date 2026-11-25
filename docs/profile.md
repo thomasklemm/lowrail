@@ -126,6 +126,10 @@ Options, all before the first `--` (everything after it, a second `--` included,
 * `--keep-runs`: keep `run*/`, one TSV per process with the raw counts, in which each file path is written once
   (a `P` row) and rows refer to it by number. Without it `run*/` is deleted once the report is written. On Sure
   (16 workers) run 2 wrote 16 TSVs of about 240 MB, where paths were four fifths of the bytes.
+* `--timeout SECONDS` (no default): the command runs in its own process group, and lowrail-profile passes `INT` and
+  `TERM` on to it. A run still going at the deadline gets `TERM`, then `KILL` 10 s later; no further run starts,
+  `capture.json` lists it in `timed_out`, and lowrail-profile exits 124. A parallel worker of Fizzy hangs in about
+  1 of 14 profiled runs in an autoload deadlock with no lowrail frame on its stack.
 
 The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/DIGEST/`, where the digest
 covers its sources and compiler settings, so another Lowrail checkout never picks up a different build; the app

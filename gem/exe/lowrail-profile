@@ -21,6 +21,7 @@ USAGE = <<~TEXT
     --seed N          SEED and --seed for every run (default 1234)
     --ledger FILE     a newer ledger index (contributions-index.json) than the bundled one
     --no-ledger       no ledger column
+    --timeout SECONDS stop a run that takes longer (TERM, KILL 10 s later) and exit 124
     --keep-runs       keep each run's raw counts (run1/, run2/) for lowrail-profile report
     --record [FILE]   also write the suite's requests as lowrail/workloads.rb (experimental)
     --workloads [FILE] send the file's requests through the app (experimental); they are real
@@ -63,6 +64,8 @@ ledger = nil if args.delete("--no-ledger")
 abort "lowrail-profile: no ledger index #{ledger}" if ledger && !File.file?(ledger)
 allow_writes = args.delete("--allow-writes")
 keep_runs = args.delete("--keep-runs")
+timeout = opt.("--timeout", nil)&.then { Float(_1) }
+abort "lowrail-profile: --timeout must be a positive number of seconds" if timeout && timeout <= 0
 # --workloads and --record take an optional FILE.
 flag = lambda do |name|
   next unless (i = args.index(name))
@@ -166,7 +169,9 @@ if File.exist?(out)
 end
 FileUtils.mkdir_p(out)
 File.write(mark, "Created by lowrail-profile, which clears its runs and reports here on each run.\n")
-statuses = (1..runs).map do |n|
+timed_out = []
+statuses = []
+(1..runs).each do |n|
   dir = File.join(out, "run#{n}")
   FileUtils.mkdir_p(dir)
   # The repeat run also records the nearest app line of every allocation
@@ -184,15 +189,35 @@ statuses = (1..runs).map do |n|
     "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
     "RUBYOPT" => [ENV["RUBYOPT"], ("-I#{lib}" unless lib.match?(/\s/)), "-rlowrail/profile"].compact.join(" ") }
   $stderr.puts "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
-  system(env, *command)
-  # A shell's convention: the exit status, or 128 + the signal that ended it.
-  status = $?.exitstatus || 128 + $?.termsig.to_i
+  if timeout
+    # Its own process group, so the deadline stops every process it started;
+    # the terminal's INT and a TERM reach the group through this process.
+    pid = Process.spawn(env, *command, pgroup: true)
+    waiter = Process.detach(pid)
+    stop = ->(signal) { Process.kill(signal, -pid) rescue Errno::ESRCH }
+    interrupted = false
+    traps = %w[INT TERM].to_h { |signal| [signal, trap(signal) { interrupted = true; stop.(signal) }] }
+    unless waiter.join(timeout)
+      timed_out << n
+      $stderr.puts "lowrail-profile: run #{n} took longer than --timeout #{timeout}s; stopping it"
+      stop.("TERM")
+      waiter.join(10) || (stop.("KILL"); waiter.join)
+    end
+    traps.each { |signal, handler| trap(signal, handler) }
+    result = waiter.value
+  else
+    system(env, *command)
+    result = $?
+  end
+  # A shell's convention: the exit status, or 128 + the signal that ended it; 124 for --timeout, as timeout(1).
+  status = timed_out.include?(n) ? 124 : result.exitstatus || 128 + result.termsig.to_i
   # A workloads run that stops (a refused write, a response outside expect:) measured nothing to repeat.
   if workloads && status != 0
     $stderr.puts "lowrail-profile: the workloads run exited #{status}; nothing measured"
     exit status
   end
-  status
+  statuses << status
+  break if timed_out.any? || interrupted
 end
 # The first failed run's status is the command's; profiling never hides a failure.
 failed = statuses.find { _1 != 0 }
@@ -202,7 +227,7 @@ File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\ne
 # output directory; argv stays apart for diagnostics.
 identity = workloads ? { "mode" => "workloads", "host" => ENV.fetch("LOWRAIL_PROFILE_HOST", "localhost") } : { "mode" => "command", "argv" => command }
 File.write(File.join(out, "capture.json"), JSON.generate("format" => 1, "identity" => identity, "argv" => command, "seed" => seed,
-  "runs" => runs, "exit" => statuses) + "\n")
+  "runs" => runs, "exit" => statuses, "timed_out" => timed_out) + "\n")
 
 begin
   report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
