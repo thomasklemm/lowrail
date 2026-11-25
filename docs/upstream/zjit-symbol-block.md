@@ -1267,3 +1267,87 @@ it is not reported as a passing test. Matrix controls retain the prior JIT-enabl
 Logs and probe outputs are in `.amp/in/orb-backup/zs1-review/round3/` in the same review orb. No new benchmark or
 arm64 run; no speed claim added. XrXr's requested HIR speculation shape now has no remaining blocker from this
 review; acceptance remains his decision. Nothing pushed to Ruby or posted.
+
+#### thermos-opus on `bdcfceb5ee`: changes (2026-11-25)
+
+Review orb [T-01a211e6-8d3e-7275-8670-15f9b0547aa7](https://ampcode.com/threads/T-01a211e6-8d3e-7275-8670-15f9b0547aa7).
+Both Thermos rubrics applied personally, without subagents or other threads, to the whole
+`f63048e942..bdcfceb5ee` PR. Bundle SHA-256 `208954879c51b0c9202b9abefc99545f496f793a79b8e755e3b1eb8eb9ae7f2b`,
+`git bundle verify` passes, the fetch gives `bdcfceb5eecaa0b7060f2df13958308ea8690624` with parent `05ae429a7b` on
+`f63048e942`; authors, committer and the one `Co-authored-by` trailer as recorded; no message line over 72
+characters. Nothing pushed to Ruby or posted.
+
+**Shape against XrXr's two comments.** The `Symbol#to_proc` part is now what he asked for: `PatchPoint
+MethodRedefined` and `RootBoxOnly` are the existing speculation machinery, and the old run-time helper
+(`rb_zjit_symbol_block_handler` on `aa36fa0ea4`) is gone. The extra `GuardAnyBitSet` on the CME's flags is needed,
+not a leftover run-time check: `method_entry_set` (`vm_method.c:1574–1588`) reuses an equal definition, clears the
+basic bit and invalidates nothing, so no patch point can fire. Making that path invalidate would be a VM change and,
+under one concern per PR, its own PR; the guard is a load and a test, and the commit message says why it is there.
+For the cref, no existing HIR instruction loads one (the only `cref` use in HIR is `ic_cref` of a constant cache),
+so a new `GetCref` is the direct reading of "a guard that loads cref and makes this nil check". Nit: `GetCref` is a
+C call (`rb_vm_get_cref`) on every specialized send; for a local EP it is a load of `ep[VM_ENV_DATA_INDEX_ME_CREF]`
+plus the method-entry case, so a reviewer may ask for an inline walk later. Not a blocker for "to start".
+
+**Must fix — a caller that is already refined degrades the whole method.** "Once code runs under a cref, generally
+the set of refinements active is stable" cuts both ways: code compiled under `using` keeps its refinements. On this
+head such a caller is specialized anyway (the compile does not look at the cref), the guard exits with recompile,
+the next version makes the same choice from the same profile, and after the version limit (4) ZJIT compiles a
+`no_side_exits` version, which also drops every unrelated speculation in that method. On master the same send just
+stays dynamic. [`refined_method_cost.rb`](../../bench/upstream/zs1/round3/opus/refined_method_cost.rb) (a method under
+`using` with `box.v + a.sum(&:double) + box.v * 3`, 200,000 calls, dev build, `--zjit --zjit-stats`):
+
+| | master `f63048e942` | head `bdcfceb5ee` |
+| --- | --- | --- |
+| `compiled_iseq_count` | 2 | 8 |
+| `side_exit_count` (all `unhandled_block_arg`) | 0 | 30 |
+| getivar fallback `no_side_exits` | 0 | 399,738 |
+| `rb_vm_send` | 199,971 | 199,869 |
+| wall, `N=3000000`, three runs | 3.74 / 3.60 / 3.59 s | 3.93 / 3.96 / 3.91 s |
+
+The same file without `using` (`MOD=plain`) compiles once and specializes on the head. Wall times are a dev build
+and only indicate the direction; no speed claim. Results are identical to the interpreter; this is a performance
+regression against master for refined code, which a refinements-heavy gem or app hits on every such send site.
+
+Smallest fix: once the cref guard has exited in an ISEQ, compile its next version without the Symbol
+specialization (one bit in the ISEQ payload, set on that exit), and keep the guard for a `using` that arrives later.
+Checking the entering frame's cref at compile time alone would not cover stub-compiled or inlined callees, whose
+cref differs. The bit is new per-ISEQ state, so the tracker rule in DECISIONS may apply; that is the coordinator's
+call. Reply 2's "It stays a per-call guard" sentence is then still true and needs one more: "A version compiled
+after the guard has exited leaves the send dynamic, so code that runs under `using` is not recompiled again."
+
+**Checked and found correct.** Interpreter against ZJIT at threshold 1, threshold 2 with one profile, default, and
+threshold 1 with `--zjit-inline-budget=0`: 13 `Symbol#to_proc` mutations after compile (none, same definition,
+`public`, `private`+`public`, empty and defining `prepend`, `include`, `alias_method :to_proc, :to_proc`, alias and
+redefinition, a Symbol singleton attempt, an unused `refine(Symbol)`, `GC.verify_compaction_references`, same
+definition plus `GC.compact`), each checking Proc identity after a cache eviction, `lambda?` and the result through
+an ISEQ, a fixed-arity C and a variadic C callee: all identical. Ruby frames with unusual crefs (an ISEQ from
+`InstructionSequence.compile`/`load_from_binary`, `define_method`, `instance_exec`, `instance_eval` string, a thread,
+a fiber, `eval` with a binding, `class_eval` block, a Ractor, `Method#to_proc`): identical, no `rb_bug`. A refined
+method inlined into an unrefined caller and the reverse keep their own cref (`GetCref` sits after
+`PushInlineFrame`, reading the callee's EP): identical. `using` after compile and a later `refine` that redefines
+the refined method: identical. Mutations: deleting the flag guard fails 5 of 21 `symbol_block` tests (the identity
+test and four snapshots), deleting the cref guard fails 7 of 21, and passing `state` instead of `exit_state` to the
+C-call stack-overflow check fails `test_stack_overflow_exit_from_send_with_normalized_keywords` (`no implicit
+conversion of Array into Proc`), so each piece has a test. Restored head: 21/21, source diff empty.
+
+**Text.** Body paragraph 2: true on this head (the specialized shapes, the Symbol as block handler, basic
+`Symbol#to_proc`, no box, the refinements exit, `yield` unchanged). Paragraph 3: true. The benchmark table and stats
+are from `fbbb9cee7b`; the railsbench rerun in round 3 moves the same counters, so they still describe the change,
+but a reader may ask (nit: one line saying so, or rerun). Commit 1's message: every sentence matches the code,
+including "Both guards exit to the original send and recompile"; with the fix it would need "and after an exit of
+the cref guard the send stays dynamic". Commit 2's message: matches the tests. Reply 1: correct as is, sentence by
+sentence ("C helper check" is the removed conversion helper, not `GetCref`'s call). Reply 2: correct for this head,
+but without the fix XrXr can fairly answer that a per-call guard which recompiles forever under a stable
+refinement is the case he meant; use the extended text above once the fix lands.
+
+Fresh execution, dev build (`--enable-zjit=dev --disable-install-doc --disable-yjit`), x86-64:
+
+| Command | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run, 2,051 pass, 15 skipped; one SIGABRT `test_profile_frames_during_direct_jit_to_jit_entry` ("rb_profile_frames was not called from SIGPROF handler"), as in the earlier passes |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same at threshold 2 | 2,148/2,148 |
+| `test_zjit_cli.rb` | 34 tests, 7,907 assertions, 0 failures |
+| 11 core files at threshold 1 | 1,380 tests, 64,214 assertions, 0 failures, 1 skip |
+
+Probes are in [`round3/opus/`](../../bench/upstream/zs1/round3/opus/). No arm64 run, no new benchmark.
