@@ -1742,3 +1742,42 @@ Reproduction material remains in `.amp/in/orb-backup/zs1-astra/` in this thread:
 check. Run the two existing probe scripts with `--disable-gems -W0`, then add `--zjit --zjit-call-threshold=1`,
 `--zjit --zjit-call-threshold=2 --zjit-num-profiles=1`, and `--zjit`; compare each stdout to the interpreter.
 The Ruby source diff is empty. No Ruby commit, push or public post was made.
+
+#### thermos-opus delta confirm on `7b03404bd7`: approve (2026-11-25)
+
+Same review orb, both rubrics personally. Fetched `thomasklemm/zjit-symbol-block-arg-5`: exactly
+`7b03404bd7f0e08120af0836ce11a6b27d45f5b0`, two commits on `a43519979c` (`f805330297` Rafael as author with Thomas's
+`Co-authored-by`, `7b03404bd7` Thomas). Nothing pushed to Ruby or posted.
+
+* **Range-diff against `5b3e0d0be5`:** the test commit is `=`; the ZJIT commit differs only in
+  `exit_block_arg_refinements`, which now sets the bit inside `with_vm_lock(src_loc!(), ..)` (+3 −1 in codegen.rs).
+  Both commit messages are byte-identical to `-4`.
+* **Lock fix:** resolves the round-4 must-fix. `with_vm_lock` takes the lock with a barrier and is recursive
+  (`rb_jit_vm_lock_then_barrier` with a lock level), so calling it on the exit path and then `exit_recompile`, which
+  takes it again on its slow path, is safe. It matches how `invariants.rs:34` sets
+  `was_invalidated_for_singleton_class_creation` under the lock. The bit is set once per ISEQ, and the cost of the
+  lock is paid only on the few exits before the next version.
+* **Probes:** [`round5/ractor_refined_probe.rb`](../../bench/upstream/zs1/round5/ractor_refined_probe.rb) 15/15
+  identical to the interpreter (thresholds 1, 2 with one profile, default, five runs each; 5
+  `block_arg_refinements` exits at threshold 1); Opus probes 28/28, `Symbol#to_proc` mutations 39/39, Ractor and
+  compaction probe 9/9. `refined_method_cost.rb` and `inlined_refined_cost.rb`: 4 compiles and 5 exits refined,
+  1 and 0 plain, as on `-4`.
+
+| Command | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run, 2,051 pass, 15 skipped; the SIGPROF abort only |
+| `make btest` at `--zjit-call-threshold=1` and `=2` | 2,148/2,148 each |
+| `test_zjit_cli.rb` | 34 tests, 7,907 assertions, 0 failures |
+
+No must-fix and no nit left from my passes. Final replies, not posted:
+
+> r4686073773: The C helper check is gone. `MethodRedefined` covers replacement of `Symbol#to_proc`, and a HIR
+> basic-flag guard covers redefinition with its own definition. Both exits resume the original send; the Symbol is
+> passed directly only when conversion can be skipped.
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that its
+> refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using` can add
+> refinements to the cref after the code is compiled (tested). After that guard exits, the ISEQ's next version leaves
+> the send dynamic, so code that runs under `using` isn't recompiled again. With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT. Leaving the send dynamic needed one new bool on `IseqPayload`, next to
+> `was_invalidated_for_singleton_class_creation`; would you rather track that differently?
