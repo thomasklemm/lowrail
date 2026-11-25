@@ -1,0 +1,18 @@
+# script/profile-hotlines @bench/upstream/profile_hotlines/apps.txt
+# NAME=REPORT[,VERSIONS]: one capture per app, the newest gem's capture of the app's own suite. VERSIONS is the
+# app's `bundle list --paths` (the sweep kept them) or its Gemfile.lock at the corpus pin (locks/, from
+# `script/corpus APP DIR --source-only`; Hackatime with --no-overlay, as its census capture ran it on Ruby 4.0.6).
+# Left out: the generated Blog and fresh app of profile_release (no real app code), planted and A/A captures, and
+# repeat captures of the same app.
+redmine=bench/upstream/oss_profile_sweep_1/redmine/base,bench/upstream/oss_profile_sweep_1/redmine/redmine-paths.txt
+solidus=bench/upstream/oss_profile_sweep_1/solidus/r2,bench/upstream/oss_profile_sweep_1/solidus/solidus-paths.txt
+huginn=bench/upstream/oss_profile_sweep_1/huginn/t600,bench/upstream/oss_profile_sweep_1/huginn/huginn-paths.txt
+forem=bench/upstream/oss_profile_sweep_1/forem/base,bench/upstream/oss_profile_sweep_1/forem/forem-paths.txt
+dawarich=bench/upstream/oss_profile_sweep_1/dawarich/r2,bench/upstream/oss_profile_sweep_1/dawarich/dawarich-paths.txt
+osm=bench/upstream/oss_profile_sweep_1/osm/s1,bench/upstream/oss_profile_sweep_1/osm/osm-paths.txt
+campfire=bench/upstream/profile_release/2026-11-25/campfire/profiled,bench/upstream/profile_hotlines/locks/campfire.Gemfile.lock
+codetriage=bench/upstream/profile_release/2026-11-25/codetriage/profiled,bench/upstream/profile_hotlines/locks/codetriage.Gemfile.lock
+lobsters=bench/upstream/profile_release/2026-11-25/lobsters/profiled,bench/upstream/profile_hotlines/locks/lobsters.Gemfile.lock
+writebook=bench/upstream/profile_release/2026-11-25-t3/census/writebook-serial/s1,bench/upstream/profile_hotlines/locks/writebook.Gemfile.lock
+hackatime=bench/upstream/profile_release/2026-11-25-t3/census/hackatime-serial/s1,bench/upstream/profile_hotlines/locks/hackatime.Gemfile.lock
+pingcrm=bench/upstream/profile_matrix/2026-11-18/pingcrm/profiled,bench/upstream/profile_hotlines/locks/pingcrm.Gemfile.lock

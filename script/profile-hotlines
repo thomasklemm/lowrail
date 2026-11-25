@@ -1,0 +1,528 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Gem lines that allocate a large share of many apps' requests, from lowrail-profile reports side by side, with an
+# ownership check of the top ones (how RQ1 and CC1 were found by hand: docs/upstream/oss-profile-sweep-1.md).
+#
+#   script/profile-hotlines [options] NAME=REPORT[,VERSIONS] ... | @FILE
+#     REPORT      a report.json, report.json.gz, or the capture directory holding one
+#     VERSIONS    the app's `bundle list --paths` output or its Gemfile.lock (gem versions, tag permalinks)
+#     @FILE       NAME=... lines from FILE, # comments allowed
+#     --top N     rows in the table (default 30)
+#     --check N   ownership checks for the first N rows (default 20; 0 skips gh and rubygems.org)
+#     --leads N   gems with an unowned row outside Rails marked as leads (default 5), checking below the table
+#                 until there are N
+#     --not-lead GEM=REASON  never a lead (a test-only gem, say), with the reason in the record
+#     --out FILE  default docs/upstream/profile-hotlines-YYYY-MM-DD.md; - prints it
+#
+# Per app, a line's share is its objects per request over the app's objects per request (per job when the app
+# served no requests), and its reach the share of requests that run it. Score: the share averaged over all N apps,
+# so (apps with the line / N) × (its mean share there). App code, Ruby's stdlib and default gems, and dev/test-only
+# work (error pages, debug logging) are left out. The same line in several versions of a gem is one row when its
+# file, method and source text match. Ownership uses gh for PRs, issues and commits, rubygems.org for releases.
+
+load File.expand_path("ownership", __dir__)
+require "digest"
+require "fileutils"
+require "net/http"
+require "rubygems/package"
+require "tmpdir"
+require "zlib"
+
+module Hotlines
+  ROOT = PrQueue::ROOT
+  CACHE = File.join(ENV.fetch("XDG_CACHE_HOME", File.join(Dir.home, ".cache")), "lowrail/profile-hotlines")
+  DEF = /^\s*def\s+(?:self\.)?([^\s(;=]+=?)/
+  # Too common to name one place in a repository; the file name is searched instead.
+  GENERIC = %w[initialize call new each map to_s to_h to_a to_str inspect method_missing respond_to_missing? []
+               []= + - == merge fetch dup build run perform value render get set key? find select].freeze
+  # Gem versions with no line at this share in any app are not unpacked; their rows match by line number.
+  SHARE_FOR_SOURCE = 0.0002
+  App = Struct.new(:name, :unit, :per_unit, :units, :entries, :rows, :app_lines, :actions, :versions, :report)
+  Version = Struct.new(:version, :kind, :rev, :remote) # kind: :rubygems, :git or :path
+  Row = Struct.new(:gem, :rel, :method, :text, :cells, :score)
+  Cell = Struct.new(:app, :share, :reach, :line, :version, :site)
+
+  module_function
+
+  def mean(values) = values.compact.sum.fdiv([values.compact.size, 1].max)
+  def pct(value, digits = 2) = format("%.#{digits}f%%", 100 * value)
+  def count(value) = value >= 100 ? value.round.to_s.reverse.scan(/\d{1,3}/).join(",").reverse : value.round(1).to_s.delete_suffix(".0")
+  def vkey(version) = Gem::Version.correct?(version.to_s) ? Gem::Version.new(version.to_s) : Gem::Version.new("0")
+
+  # Responses are kept for a few hours, so a rerun on the same day asks GitHub and rubygems.org again only for
+  # what it has not seen.
+  def cached(*key)
+    path = File.join(CACHE, "responses", Digest::SHA256.hexdigest(JSON.generate(key)))
+    return JSON.parse(File.read(path))["value"] if File.exist?(path) && File.mtime(path) > Time.now - 6 * 3600
+    value = yield
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, JSON.generate({ "value" => value }))
+    value
+  end
+
+  def http_json(url)
+    cached("http", url) do
+      response = Net::HTTP.get_response(URI(url))
+      JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
+    end
+  end
+
+  # nil on 404 and other failures; text unless json.
+  def gh(path, raw: false)
+    cached("gh", path, raw) do
+      args = raw ? ["-H", "Accept: application/vnd.github.raw", path] : [path]
+      out, err = PrQueue.run("gh", "api", *args)
+      err ? nil : raw ? out.scrub : JSON.parse(out)
+    end
+  end
+
+  def graphql_search(query)
+    gql = <<~GRAPHQL
+      query($q: String!) { search(query: $q, type: ISSUE, first: 100) { issueCount nodes {
+        ... on PullRequest { __typename number title state author { login } files(first: 100) { nodes { path } } }
+        ... on Issue { __typename number title state author { login } } } } }
+    GRAPHQL
+    cached("search", query) do
+      sleep 1 # search's secondary rate limit
+      PrQueue.gh("graphql", "-f", "query=#{gql}", "-f", "q=#{query}").dig("data", "search")
+    rescue RuntimeError
+      nil
+    end
+  end
+
+  # --- inputs
+
+  def read_report(path)
+    if File.directory?(path)
+      path = %w[report.json report.json.gz].map { File.join(path, _1) }.find { File.exist?(_1) } || abort("#{path}: no report.json")
+    end
+    JSON.parse(path.end_with?(".gz") ? Zlib::GzipReader.open(path, &:read) : File.read(path))
+  end
+
+  def read_versions(path)
+    return {} unless path
+    text = File.read(path)
+    return lock_versions(text) if text.match?(/^GEM$/) && text.include?("specs:")
+    text.lines(chomp: true).each_with_object({}) do |dir, out|
+      base = File.basename(dir)
+      if (m = base.match(/\A(.+)-(\h{12})\z/))
+        out[m[1]] = Version.new(nil, :git, m[2], nil)
+      elsif (m = base.match(/\A(.+?)-(\d[\w.]*)(?:-(?:x86|x64|arm|aarch|universal|java)[\w-]*)?\z/)) && dir.include?("/gems/")
+        out[m[1]] = Version.new(m[2], :rubygems, nil, nil)
+      else
+        out[base] ||= Version.new(nil, :path, nil, nil)
+      end
+    end
+  end
+
+  def lock_versions(text)
+    require "bundler"
+    Bundler::LockfileParser.new(text).specs.to_h do |spec|
+      source = spec.source
+      version = case source
+                when Bundler::Source::Git then Version.new(spec.version.to_s, :git, source.options["revision"], source.options["uri"])
+                when Bundler::Source::Path then Version.new(spec.version.to_s, :path, nil, nil)
+                else Version.new(spec.version.to_s, :rubygems, nil, nil)
+                end
+      [spec.name, version]
+    end
+  end
+
+  def app(name, report_path, versions_path)
+    j = read_report(report_path)
+    requests = mean(j["summary"].map { _1.dig("completed", "request") })
+    if requests.positive?
+      unit, units, per_unit, ranked = "request", requests, mean(j["summary"].map { _1["objects_per_request"] }), j["ranked"]
+    else
+      jobs = j.dig("outside_requests", "job") || {}
+      runs = j["summary"].size
+      per_run = (0...runs).map do |i|
+        acts = Array(jobs["actions"])
+        acts.sum { _1["all"][i].to_f * _1["windows"][i] }.fdiv([acts.sum { _1["windows"][i] }, 1].max)
+      end
+      unit, units, per_unit = "job", mean(j["summary"].map { _1.dig("completed", "job") }), mean(per_run)
+      ranked = Array(jobs["ranked"])
+    end
+    entries = ranked.filter_map do |r|
+      next if r["mode"] || !r["group"].to_s.match?(/\A(gem|rails): /)
+      gem = r["group"].split(": ", 2).last
+      rel, line = r["site"].match(%r{\A(?:GEM|RAILS)/[^/]+/(.+):(\d+)\z})&.captures || next
+      { gem:, rel:, line: line.to_i, site: r["site"], share: mean(r["all"]) / per_unit, reach: mean(r["reached"]) / units }
+    end
+    App.new(name, unit, per_unit, units, entries, Array(j["rows"]).to_h { [_1["site"], _1] }, Array(j["app_lines"]),
+            Array(unit == "request" ? j["actions"] : j.dig("outside_requests", "job", "actions")), read_versions(versions_path),
+            report_path)
+  end
+
+  # --- gem sources
+
+  def unpacked(name, version)
+    dir = File.join(CACHE, "gems", "#{name}-#{version}")
+    return dir if File.directory?(dir)
+    Dir.mktmpdir do |tmp|
+      file = File.join(tmp, "#{name}-#{version}.gem")
+      response = Net::HTTP.get_response(URI("https://rubygems.org/downloads/#{name}-#{version}.gem"))
+      response = Net::HTTP.get_response(URI(response["location"])) if response.is_a?(Net::HTTPRedirection)
+      if response.is_a?(Net::HTTPSuccess)
+        File.binwrite(file, response.body)
+      else # platform builds only
+        _, err = PrQueue.run("gem", "fetch", name, "-v", version, chdir: tmp)
+        file = Dir[File.join(tmp, "*.gem")].first
+        return nil if err || !file
+      end
+      Gem::Package.new(file).extract_files("#{dir}.#{Process.pid}")
+      File.rename("#{dir}.#{Process.pid}", dir)
+    end
+    dir
+  rescue StandardError
+    nil
+  end
+
+  # A git gem's repository at the locked revision, from one tarball.
+  def checkout(repo, rev)
+    dir = File.join(CACHE, "git", "#{repo.tr('/', '-')}-#{rev}")
+    return dir if File.directory?(dir)
+    FileUtils.mkdir_p("#{dir}.#{Process.pid}")
+    _, err = PrQueue.run("sh", "-c", 'gh api "repos/$0/tarball/$1" | tar -xz --strip-components=1 -C "$2"', repo, rev, "#{dir}.#{Process.pid}")
+    return nil if err
+    File.rename("#{dir}.#{Process.pid}", dir)
+    dir
+  end
+
+  def path_in_tree(dir, gem, rel)
+    path = repo_path(gem, rel)
+    return path if File.exist?(File.join(dir, path))
+    Dir.glob("**/#{path}", base: dir).min_by(&:size)
+  end
+
+  def repo_path(gem, rel) = rails?(gem) ? "#{gem}/#{rel}" : rel
+
+  def rails?(gem) = %w[actioncable actionmailbox actionmailer actionpack actiontext actionview activejob activemodel
+                       activerecord activestorage activesupport railties].include?(gem)
+
+  # Lines of a gem's file at the version an app runs, or nil.
+  def source_lines(gem, version, rel)
+    @source ||= {}
+    @source[[gem, version.to_a, rel]] ||= begin
+      text = case version.kind
+             when :rubygems then (dir = unpacked(gem, version.version)) && File.exist?(f = File.join(dir, rel)) && File.read(f)
+             when :git
+               dir = (repo = repo_of(gem, version)) && checkout(repo, version.rev)
+               dir && (path = path_in_tree(dir, gem, rel)) && File.read(File.join(dir, path))
+             end
+      text ? text.scrub.lines(chomp: true) : []
+    end
+  end
+
+  def method_and_text(lines, line)
+    return [nil, nil] if lines.empty?
+    [lines[0, line].reverse_each.lazy.map { _1[DEF, 1] }.find(&:itself), lines[line - 1]&.strip]
+  end
+
+  # --- ranking
+
+  def rank(apps)
+    fetch = apps.flat_map { |a| a.entries.select { _1[:share] >= SHARE_FOR_SOURCE }.map { |e| [e[:gem], a.versions[e[:gem]]] } }.uniq
+    queue = Queue.new
+    fetch.each { |gem, v| queue << [gem, v.version] if v&.kind == :rubygems }
+    queue.close
+    Array.new(8) { Thread.new { while (job = queue.pop) do unpacked(*job) end } }.each(&:join)
+    rows = {}
+    apps.each do |a|
+      a.entries.each do |e|
+        version = a.versions[e[:gem]]
+        method, text = a.rows[e[:site]]&.values_at("method", "text")
+        method, text = method_and_text(source_lines(e[:gem], version, e[:rel]), e[:line]) if !text && version && fetch.include?([e[:gem], version])
+        key = text ? [e[:gem], e[:rel], method, text] : [e[:gem], e[:rel], e[:line], version&.to_a]
+        row = rows[key] ||= Row.new(e[:gem], e[:rel], method, text, {}, 0.0)
+        cell = row.cells[a.name] ||= Cell.new(a, 0.0, 0.0, e[:line], version, e[:site])
+        cell.share += e[:share]
+        cell.reach = [cell.reach, e[:reach]].max
+      end
+    end
+    rows.each_value { |r| r.score = r.cells.values.sum(&:share) / apps.size }
+    rows.values.sort_by { -_1.score }
+  end
+
+  # --- links and ownership
+
+  def repo_of(gem, version = nil)
+    @repos ||= {}
+    return "rails/rails" if rails?(gem)
+    @repos[gem] ||= begin
+      urls = [version&.remote]
+      meta = http_json("https://rubygems.org/api/v1/gems/#{gem}.json") || {}
+      urls += meta.values_at("source_code_uri", "homepage_uri", "bug_tracker_uri", "changelog_uri") + [meta.dig("metadata", "source_code_uri")]
+      slug = urls.compact.filter_map { _1[%r{github\.com[/:]([\w.-]+/[\w.-]+?)(?:\.git)?(?:[/#?]|\z)}, 1] }.first
+      slug && gh("repos/#{slug}")&.fetch("full_name")
+    end
+  end
+
+  def tag_commit(repo, gem, version)
+    return [version.rev, version.rev[0, 12]] if version.kind == :git && version.rev
+    return nil unless version.kind == :rubygems
+    tags = ["v#{version.version}", version.version, "#{gem}-#{version.version}", "#{gem}/v#{version.version}", "#{gem}-v#{version.version}"]
+    tags.each do |tag|
+      sha = gh("repos/#{repo}/commits/#{tag}")&.fetch("sha")
+      return [sha, tag] if sha
+    end
+    nil
+  end
+
+  # The file's path in the repository (gems in monorepos live below the root).
+  def path_in_repo(repo, sha, gem, rel)
+    path = repo_path(gem, rel)
+    return path if gh("repos/#{repo}/contents/#{path}?ref=#{sha}", raw: true)
+    tree = gh("repos/#{repo}/git/trees/#{sha}?recursive=1") || {}
+    Array(tree["tree"]).map { _1["path"] }.select { _1.end_with?("/#{path}") }.min_by(&:size)
+  end
+
+  def link(row)
+    cell = released(row.cells.values) || row.cells.values.find(&:version) || row.cells.values.first
+    label = "#{row.rel}:#{cell.line}"
+    return [label, nil, nil] unless cell.version && (repo = repo_of(row.gem, cell.version))
+    sha, tag = tag_commit(repo, row.gem, cell.version)
+    note = nil
+    unless sha
+      info = gh("repos/#{repo}") or return [label, nil, nil]
+      sha = gh("repos/#{repo}/commits/#{info['default_branch']}")&.fetch("sha") or return [label, nil, nil]
+      tag, note = "#{info['default_branch']}@#{sha[0, 10]}", "no tag for #{cell.version.version || cell.version.kind}"
+    end
+    path = path_in_repo(repo, sha, row.gem, row.rel) or return [label, nil, "not found in #{repo}@#{tag}"]
+    at = gh("repos/#{repo}/contents/#{path}?ref=#{sha}", raw: true).to_s.lines[cell.line - 1].to_s.strip
+    note = [note, "line #{cell.line} at #{tag} reads `#{at[0, 40]}`"].compact.join("; ") if row.text && at != row.text
+    [label, "https://github.com/#{repo}/blob/#{sha}/#{path}#L#{cell.line}", note, tag, repo, path]
+  end
+
+  def release(gem)
+    versions = http_json("https://rubygems.org/api/v1/versions/#{gem}.json") || []
+    versions.find { !_1["prerelease"] } || versions.first
+  end
+
+  # Items in the gem's repository (by its current name) whose branch changes the line's method in its file (its file
+  # when the method name is too common), as script/ownership reads a branch, or whose text names the file's class
+  # and the method in code (CC1 trims the objects of `can` in Rule and the rules index, not in ability.rb). Without
+  # a branch diff, also items whose area or title name the file or its class.
+  def queue_items(repo, row, path)
+    word = ->(t) { /(?<![\w])#{Regexp.escape(t)}(?![\w])/ }
+    constant = File.basename(row.rel, ".rb").split("_").map(&:capitalize).join
+    code = /`#{Regexp.escape(row.method.to_s)}`|[#.]#{Regexp.escape(row.method.to_s)}(?![\w])/
+    items_in(repo).select do |item|
+      text = "#{item['area']} #{item.title} #{item['impact']} #{item.body}"
+      next true if row.method && text.match?(word.(constant)) && text.match?(code)
+      files = item["branch"] && gh("repos/#{item['repo']}/compare/#{item['base'] || 'main'}...#{item.fork.split('/').first}:#{item['branch']}")&.fetch("files", nil)
+      if files && path
+        changed = files.select { _1["filename"] == path }
+        changed.any? && (!distinctive?(row.method) || Ownership.method_names(changed).include?(row.method))
+      else
+        "#{item['area']} #{item.title}".then { _1.match?(word.(File.basename(row.rel))) || _1.match?(word.(constant)) }
+      end
+    end.map { [_1.id, _1["state"]] }
+  end
+
+  def items_in(repo)
+    (@items ||= PrQueue.items).select { _1["repo"] && (gh("repos/#{_1['repo']}")&.fetch("full_name") || _1["repo"]).casecmp?(repo) }
+  end
+
+  def distinctive?(method) = method.to_s.match?(/\A[a-z_]\w{3,}[?!=]?\z/i) && !GENERIC.include?(method)
+
+  def released(cells) = cells.select { _1.version&.kind == :rubygems }.max_by { vkey(_1.version.version) }
+
+  def ownership(row, link)
+    _, _, _, _, repo, path = link
+    repo ||= repo_of(row.gem)
+    return { repo: nil, unowned: false, facts: ["no GitHub repository found for #{row.gem}"] } unless repo
+    info = gh("repos/#{repo}") || {}
+    branch = info["default_branch"] || "main"
+    method = row.method if distinctive?(row.method)
+    terms = [method, File.basename(row.rel)].compact
+    prs = {}
+    issues = {}
+    terms.each do |term|
+      found = graphql_search(%(repo:#{repo} is:pr "#{term}")) || next
+      found["nodes"].each do |pr|
+        next unless path.nil? || pr.dig("files", "nodes").to_a.any? { _1["path"] == path }
+        prs[pr["number"]] ||= pr.merge("term" => term)
+      end
+    end
+    if (term = method || (File.basename(row.rel) unless rails?(row.gem)))
+      found = graphql_search(%(repo:#{repo} is:issue is:open "#{term}"))
+      Array(found&.fetch("nodes")).each { issues[_1["number"]] = _1 }
+    end
+    ours = prs.values.select { _1.dig("author", "login") == PrQueue::AUTHOR }
+    # A PR that names the method and changes its file; without a distinctive method name, any open PR on the file.
+    owning = prs.values.select { _1["state"] == "OPEN" && (method.nil? || _1["term"] == method) } - ours
+    queue = queue_items(repo, row, path)
+    active = queue.reject { |_, state| %w[merged closed superseded].include?(state) }
+    latest = release(row.gem)
+    ran = released(row.cells.values)&.version&.version
+    in_latest = if latest && row.text && ran && ran != latest["number"]
+                  lines = source_lines(row.gem, Version.new(latest["number"], :rubygems, nil, nil), row.rel)
+                  lines.any? { _1.strip == row.text } unless lines.empty?
+                end
+    on_main = if row.text && path
+                body = gh("repos/#{repo}/contents/#{path}?ref=#{branch}", raw: true)
+                body.lines.any? { _1.strip == row.text } if body
+              end
+    human = Array(gh("repos/#{repo}/commits?sha=#{branch}&per_page=30")).find { !_1.dig("author", "login").to_s.end_with?("[bot]") }
+    ledger = row.cells.values.flat_map { Array(_1.app.rows[_1.site]&.fetch("ledger", nil)) }.uniq
+    pr_label = ->(pr) { "[##{pr['number']}](https://github.com/#{repo}/pull/#{pr['number']}) #{pr['state'].downcase}, #{pr.dig('author', 'login')}: #{pr['title']}" }
+    facts = []
+    facts << "repository archived" if info["archived"]
+    facts << "latest release #{latest['number']} (#{latest['created_at'][0, 10]})#{"; apps run #{ran}" if ran && ran != latest['number']}" if latest
+    facts << "the line is #{in_latest ? 'still in' : 'not in'} #{latest['number']}" unless in_latest.nil?
+    facts << "the line is #{on_main ? 'still on' : 'not on'} #{branch}" unless on_main.nil?
+    facts << "last human commit on #{branch}: #{human.dig('commit', 'committer', 'date')[0, 10]}, #{human.dig('author', 'login') || human.dig('commit', 'author', 'name')}" if human
+    facts << "PRs changing `#{path || row.rel}` that name #{terms.map { "`#{_1}`" }.join(' or ')}: #{prs.empty? ? 'none' : prs.size}"
+    open_others = prs.values.select { _1["state"] == "OPEN" } - ours
+    facts += (owning + (open_others - owning)).first(3).map { "#{owning.include?(_1) ? 'open' : 'open, file only'}: #{pr_label.(_1)}" }
+    facts += prs.values.reject { _1["state"] == "OPEN" || ours.include?(_1) }.sort_by { -_1["number"] }.first(2).map { pr_label.(_1) }
+    facts += ours.map { "ours: #{pr_label.(_1)}" }
+    facts << "open issues naming `#{term}`: #{issues.size}#{issues.values.first(2).map { " [##{_1['number']}](https://github.com/#{repo}/issues/#{_1['number']}) #{_1['title']}" }.join(';')}" if term
+    facts << "queue: #{queue.map { "#{_1} (#{_2})" }.join(', ')}" if queue.any?
+    nearby = nil
+    unless rails?(row.gem)
+      nearby = items_in(repo).reject { |i| queue.any? { _1.first == i.id } || %w[merged closed superseded].include?(i["state"]) }
+      facts << "our other items in #{repo}: #{nearby.map { "#{_1.id} (#{_1['state']}#{", PR #{_1['pr']}" if _1['pr']})" }.join(', ')}" if nearby.any?
+    end
+    facts << "ledger: #{ledger.join('; ')}" if ledger.any?
+    changed = [("in #{latest['number']}" if in_latest == false), ("on #{branch}" if on_main == false)].compact
+    owner = if info["archived"] then "archived"
+            elsif active.any? || ours.any? { _1["state"] == "OPEN" } then "ours: #{(active.map(&:first) + ours.select { _1['state'] == 'OPEN' }.map { "##{_1['number']}" }).first(2).join(', ')}"
+            elsif changed.any? then "changed #{changed.join(' and ')}"
+            elsif ledger.any? then "ledger"
+            elsif owning.any? then "open PR ##{owning.first['number']}"
+            elsif method && issues.any? then "open issue ##{issues.keys.first}"
+            elsif nearby&.any? then "ours in repo: #{nearby.map(&:id).first(2).join(', ')}"
+            end
+    { repo:, owner:, facts: }
+  end
+
+  # What makes the line costly, from the reports' rows (types, callers) and the apps' lines and actions.
+  def cost(row)
+    top = row.cells.values.max_by(&:share)
+    a = top.app
+    detail = a.rows[top.site]
+    per_reached = top.reach.positive? ? top.share * a.per_unit / top.reach : nil
+    types = row.cells.values.flat_map { Array(_1.app.rows[_1.site]&.fetch("types", nil)) }.uniq
+    caller = detail&.fetch("callers", nil)&.first
+    caller ||= a.app_lines.filter_map { |l| s = l["sites"].find { _1["name"] == top.site } and [l, s] }
+                .max_by { |l, s| l["warm"] * s["share"] }&.then { |l, s| { "caller" => "#{l['line']} (#{l['method']})", "share" => nil, "via" => s["share"] } }
+    action = a.actions.filter_map { |act| s = Array(act["sites"]).find { _1["name"] == top.site } and [act["name"], s["warm"]] }.max_by(&:last)&.first
+    text = row.text ? "`#{row.text[0, 70].gsub('`', "'")}`" : "Line #{top.line}"
+    out = +"#{text} allocates "
+    out << (per_reached ? "#{count(per_reached)} objects per #{a.unit} that runs it" : "objects") << " in #{a.name} (#{pct(top.reach, top.reach < 0.01 ? 1 : 0)} of its #{a.unit}s)"
+    out << ", mostly #{types.first(2).join(' and ')}" if types.any?
+    if caller
+      where = caller["caller"] == "no app frame" ? "with no app frame on the stack" : "from #{caller['caller'].delete_prefix('APP/')}"
+      out << "; #{"#{pct(caller['share'], 0)} " if caller['share']}#{where}"
+      out << " (#{pct(caller['via'], 0)} of that line's objects)" if caller["via"]
+    end
+    out << "; most in #{action}" if action
+    out << "."
+  end
+
+  # --- record
+
+  def table_row(row, rank, link, owner)
+    label, url, note = link || ["#{row.rel}:#{row.cells.values.first.line}"]
+    versions = row.cells.values.filter_map { _1.version&.version || _1.version&.rev&.slice(0, 7) }.uniq.sort_by { vkey(_1) }
+    versions = ["#{versions.first}–#{versions.last}"] if versions.size > 2
+    by_share = row.cells.values.sort_by { -_1.share }
+    cells = by_share.first(4).map { "#{_1.app.name} #{pct(_1.share)} (#{pct(_1.reach, _1.reach < 0.01 ? 1 : 0)})" }
+    cells << "#{by_share.size - 4} more" if by_share.size > 4
+    line = url ? "[`#{label}`](#{url})" : "`#{label}`"
+    line << " (#{note})" if note
+    "| #{rank} | #{"#{row.gem} #{versions.join(", ")}".strip} | #{line} | `#{row.method}` | #{pct(row.score)} | #{row.cells.size} | #{cells.join(', ')} | #{owner} |\n"
+  end
+
+  TABLE = "| # | Gem | Line | Method | Score | Apps | Share (reach) by app | Owner |\n| ---: | --- | --- | --- | ---: | ---: | --- | --- |\n"
+  FURTHER = 150 # how far below the table leads are looked for
+
+  def record(apps, rows, top:, check:, leads:, not_lead:, command:)
+    shown = rows.first(top)
+    links = check.zero? ? {} : shown.to_h { [_1, link(_1)] }
+    owners = shown.first(check).to_h { [_1, ownership(_1, links[_1])] }
+    candidate = ->(r) { !rails?(r.gem) && !not_lead[r.gem] }
+    lead_gems = owners.select { |r, o| o[:owner].nil? && candidate.(r) }.keys.map(&:gem).uniq.first(leads)
+    # Fewer leads than asked for: check the next rows outside Rails, below the table.
+    further = {}
+    rows[top, FURTHER].to_a.each do |r|
+      break if check.zero? || lead_gems.size >= leads
+      next unless candidate.(r) && !lead_gems.include?(r.gem)
+      links[r] = link(r)
+      further[r] = ownership(r, links[r])
+      lead_gems << r.gem if further[r][:owner].nil?
+    end
+    checked = owners.merge(further)
+    lead_rows = checked.select { |r, o| o[:owner].nil? && lead_gems.include?(r.gem) }.keys
+    owner_cell = ->(r) { (o = checked[r]) ? (lead_rows.include?(r) ? "**lead**" : o[:owner].to_s) : "" }
+    n = apps.size
+    out = +"# Profile hot lines across #{n} apps (#{Date.today})\n\n"
+    out << "Generated by [script/profile-hotlines](../../script/profile-hotlines):\n\n```sh\n#{command}\n```\n\n"
+    out << "Score: a line's share of the app's request objects (job objects for an app without requests), " \
+           "averaged over all #{n} apps, so (apps with the line / #{n}) × (mean share where it runs). Reach: the share of " \
+           "the app's requests that run the line. App code, Ruby's stdlib and default gems and dev/test-only work are " \
+           "left out. Rows merge the same file, method and source text across gem versions. Links point at the tag of " \
+           "the newest released version an app runs.\n\n"
+    out << "## Apps\n\n| App | Capture | Unit | Count | Objects per unit | Gem lines |\n| --- | --- | --- | ---: | ---: | ---: |\n"
+    apps.each do |a|
+      dir = a.report.delete_prefix("#{ROOT}/").sub(%r{/report\.json(\.gz)?\z}, "")
+      out << "| #{a.name} | [#{dir.delete_prefix('bench/upstream/')}](../../#{dir}) | #{a.unit} | #{count(a.units)} | #{count(a.per_unit)} | #{count(a.entries.size)} |\n"
+    end
+    out << "\n## Top #{shown.size}\n\n" << TABLE
+    shown.each_with_index { |r, i| out << table_row(r, i + 1, links[r], owner_cell.(r)) }
+    unless further.empty?
+      out << "\n## Below the table, outside Rails\n\nChecked until #{leads} gems had an unowned row.\n\n" << TABLE
+      further.each_key { |r| out << table_row(r, rows.index(r) + 1, links[r], owner_cell.(r)) }
+    end
+    return out if checked.empty?
+    out << "\n## Ownership and cost\n\n"
+    checked.each do |r, o|
+      out << "#{rows.index(r) + 1}. **#{r.gem} `#{r.method}`**#{' (lead)' if lead_rows.include?(r)}#{" in #{o[:repo]}" if o[:repo]}. #{cost(r)}\n"
+      o[:facts].each { out << "   * #{_1}\n" }
+    end
+    out << "\n## Leads\n\n"
+    out << "None of the checked rows outside Rails is unowned.\n" if lead_gems.empty?
+    lead_gems.each do |gem|
+      rs = lead_rows.select { _1.gem == gem }
+      apps_with = rs.flat_map { _1.cells.keys }.uniq
+      out << "* **#{gem}** (#{checked[rs.first][:repo]}): #{rs.map { "`#{_1.method}` (`#{File.basename(_1.rel)}:#{_1.cells.values.first.line}`, ##{rows.index(_1) + 1}, #{pct(_1.score)})" }.join(', ')}; in #{apps_with.size} of #{n} apps (#{apps_with.join(', ')})\n"
+    end
+    out << "\nAn empty Owner cell means unowned: no open PR of ours or others names the method and changes its file " \
+           "(any open PR on the file when the method name is too common to search), no active queue item in the " \
+           "repository (outside rails/rails: any), no ledger entry, no open issue names the method, the line is still " \
+           "in the latest release and on the default branch, and the repository is not archived. Leads are the first " \
+           "#{leads} gems with an unowned row outside Rails, whose lines go through the census and the rails/rails cap " \
+           "instead (DECISIONS, Submission queue)"
+    out << (not_lead.empty? ? ".\n" : ", other than #{not_lead.map { "#{_1} (#{_2})" }.join(', ')}.\n")
+  end
+
+  def main(argv)
+    opts = { top: 30, check: 20, leads: 5, out: nil, not_lead: {} }
+    specs = []
+    args = argv.flat_map { _1.start_with?("@") ? File.readlines(_1[1..], chomp: true).map(&:strip).reject { |l| l.empty? || l.start_with?("#") } : [_1] }
+    until args.empty?
+      arg = args.shift
+      case arg
+      when "--top", "--check", "--leads" then opts[arg[2..].to_sym] = Integer(args.shift)
+      when "--out" then opts[:out] = args.shift
+      when "--not-lead" then opts[:not_lead].store(*args.shift.split("=", 2))
+      when /\A([\w.-]+)=([^,]+)(?:,(.+))?\z/ then specs << [$1, $2, $3]
+      else abort File.read(__FILE__)[/^#   script.*?(?=\n#\n)/m].gsub(/^# ?/, "")
+      end
+    end
+    abort "no reports" if specs.empty?
+    apps = specs.map { |name, report, versions| app(name, File.expand_path(report, ROOT), versions && File.expand_path(versions, ROOT)) }
+    rows = rank(apps)
+    command = "script/profile-hotlines #{argv.map { _1.match?(%r{\A[\w@%+=:,./-]+\z}) ? _1 : "'#{_1.gsub("'", "'\\''")}'" }.join(' ')}"
+    text = record(apps, rows, **opts.slice(:top, :check, :leads, :not_lead), command:)
+    out = opts[:out] || File.join(ROOT, "docs/upstream/profile-hotlines-#{Date.today}.md")
+    return puts(text) if out == "-"
+    File.write(out, text)
+    puts "wrote #{out.delete_prefix("#{ROOT}/")}"
+  end
+end
+
+Hotlines.main(ARGV) if $PROGRAM_NAME == __FILE__

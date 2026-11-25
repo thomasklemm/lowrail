@@ -1,0 +1,7 @@
+# The sweep's five apps with requests (docs/upstream/oss-profile-sweep-1.md, rank.md), for the check that the
+# script reproduces its ranking: script/profile-hotlines --check 0 --top 12 --out - @bench/upstream/profile_hotlines/sweep5.txt
+redmine=bench/upstream/oss_profile_sweep_1/redmine/base,bench/upstream/oss_profile_sweep_1/redmine/redmine-paths.txt
+solidus=bench/upstream/oss_profile_sweep_1/solidus/r2,bench/upstream/oss_profile_sweep_1/solidus/solidus-paths.txt
+forem=bench/upstream/oss_profile_sweep_1/forem/base,bench/upstream/oss_profile_sweep_1/forem/forem-paths.txt
+dawarich=bench/upstream/oss_profile_sweep_1/dawarich/r2,bench/upstream/oss_profile_sweep_1/dawarich/dawarich-paths.txt
+osm=bench/upstream/oss_profile_sweep_1/osm/s1,bench/upstream/oss_profile_sweep_1/osm/osm-paths.txt
