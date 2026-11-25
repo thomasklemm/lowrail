@@ -958,6 +958,11 @@ New head `2e3108fc05` on master `f63048e942`, two commits: `f858d208e8` "ZJIT: S
 Meant for `thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg-2`; the push was refused (the token has no
 `workflow` scope and master changed `.github/workflows` since the fork last synced). The patches are in
 [`round2/`](../../bench/upstream/zs1/round2/), with the probes.
+Until the fork has it, reviewers fetch the exact commits from
+[`round2/zs1-2.bundle`](../../bench/upstream/zs1/round2/zs1-2.bundle): prerequisite
+`f63048e94229b4bab276e01bac4902f9b6a74ace`, ref `refs/heads/zs1-2` at `2e3108fc0558f076a7acbbd1eaf2f5acd534f603`
+(`git fetch zs1-2.bundle refs/heads/zs1-2:refs/heads/zs1-2` in a clone of ruby master). Checked with `git bundle
+verify` in a fresh clone of ruby master (`bb27ff85cf`); the fetch gives the same commit and tree SHAs.
 
 What changed against `aa36fa0ea4`:
 
