@@ -382,7 +382,8 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 * **rails/rails: only the most urgent findings open** (Thomas, 2026-11-05 night, with 22 of ours open): until our
   open count is clearly lower, a new Rails PR opens only for an unreleased regression that breaks widely used apps or
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.
-  The tool cap is 22 (the count on 2026-11-05), so `open` refuses until one closes or merges; above that, ask Thomas.
+  The tool cap is 25 (Thomas, 2026-11-25; 22 from 2026-11-05 until then), so `open` refuses until one closes or
+  merges; above that, ask Thomas.
   Keep each PR small.
   Open PRs that fix older, already released bugs stay open: they aren't closed to free a slot
   (Thomas, 2026-11-25, keeping #59617 and #59611 open).

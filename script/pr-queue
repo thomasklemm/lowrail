@@ -37,7 +37,7 @@ module PrQueue
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
   # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt. ruby/ruby opens only items Thomas names (DECISIONS).
-  CAPS = { "rails/rails" => { open: 22, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
+  CAPS = { "rails/rails" => { open: 25, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
   # script/ownership's check must be this recent to open (DECISIONS 2026-11-25, after TA1 duplicated an open PR).
   OWNERSHIP_DAYS = 3
