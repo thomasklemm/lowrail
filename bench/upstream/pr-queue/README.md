@@ -28,8 +28,9 @@ entry; `status` itself writes nothing.
 ## Ownership check
 
 `script/ownership ID` lists who else may already own the item's problem: open PRs that cross-reference its
-`introduced_by` PR (or name its commit), open PRs naming a method changed by that PR or by the item's branch (non-test
-files, Ruby `def` and Rust `fn`), and each `tracker` issue or PR with the open PRs and issues that reference it. It
+`introduced_by` PR (or name its commit), open PRs that name a method the item's branch changes and change the same
+file (the def or body of a Ruby `def` or Rust `fn` in non-test files; without a branch, the methods `introduced_by`
+changes), and each `tracker` issue or PR with the open PRs and issues that reference it. It
 writes the date, what it checked and the hits into the item's `ownership:` line. Read the hits before opening.
 `open` refuses, and `status` shows, a reviewed item whose ownership check is missing or older than 3 days.
 

@@ -5,18 +5,18 @@
 # referenced the PR introducing the regression; ZS1 overlapped commits on a maintainer's branch).
 #
 #   script/ownership ID   open PRs that cross-reference the item's introduced_by PR (or name its commit), open PRs
-#                         naming a method that PR or the item's branch changes, and each tracker issue or PR with the
-#                         open PRs and issues referencing it; writes a dated ownership: line into the item
+#                         that name a method the item's branch changes (else that PR) and change the same file, and
+#                         each tracker issue or PR with the open PRs and issues referencing it; writes a dated
+#                         ownership: line into the item
 #
 # script/pr-queue open refuses an item whose ownership check is missing or older than 3 days. Only gh is used.
 
 load File.expand_path("pr-queue", __dir__)
 
 module Ownership
-  METHOD = /\A[-+](?![-+]).*?\b(?:def\s+(?:self\.)?|fn\s+)([A-Za-z_]\w*[?!=]?)/
+  DEF = /\A(\s*)(?:(?:private|protected|public)\s+)?(?:def\s+(?:self\.)?|(?:pub(?:\([^)]*\))?\s+)?fn\s+)([A-Za-z_]\w*[?!=]?)/
   TESTS = %r{(\A|/)(test|spec)s?/|_(test|spec)\.rb\z}
   MAX_NAMES = 10
-  PER_NAME = 5
   SOURCE = "nodes { ... on CrossReferencedEvent { source { __typename " \
            "... on PullRequest { number title state author { login } repository { nameWithOwner } } " \
            "... on Issue { number title state author { login } repository { nameWithOwner } } } } }"
@@ -26,12 +26,35 @@ module Ownership
         ... on Issue { title state timelineItems(itemTypes: [CROSS_REFERENCED_EVENT], first: 100) { #{SOURCE} } }
         ... on PullRequest { title state timelineItems(itemTypes: [CROSS_REFERENCED_EVENT], first: 100) { #{SOURCE} } } } } }
   GRAPHQL
+  SEARCH = <<~GRAPHQL
+    query($q: String!) { search(query: $q, type: ISSUE, first: 100) { issueCount nodes { ... on PullRequest {
+      number title state author { login } repository { nameWithOwner } files(first: 100) { nodes { path } } } } } }
+  GRAPHQL
 
   module_function
 
-  # Methods added, removed or changed in the non-test files of a GitHub files list (Ruby def, Rust fn).
+  # Methods whose def or body a non-test file's patch changes (Ruby def, Rust fn). A changed line belongs to the
+  # last def above it in the hunk, else to the def in the hunk header. A def ends at `end` or `}` at its indent; the
+  # header's def, whose indent git drops, at that of the shallowest def in the patch (its siblings').
   def method_names(files)
-    files.reject { TESTS.match?(_1["filename"]) }.flat_map { _1["patch"].to_s.lines.filter_map { |l| l[METHOD, 1] } }.uniq
+    files.reject { TESTS.match?(_1["filename"]) }.flat_map do |file|
+      lines = file["patch"].to_s.lines
+      sibling = lines.filter_map { _1[1..].to_s[DEF, 1]&.size unless _1.start_with?("@@") }.min
+      current = indent = nil
+      lines.flat_map do |line|
+        if line.start_with?("@@")
+          current, indent = line[/\A@@.*?@@\s*(.*)/, 1].to_s[DEF, 2], sibling
+          next []
+        end
+        code = line[1..].to_s.chomp
+        if (match = code.match(DEF))
+          indent, current = match[1].size, match[2]
+        end
+        name = current if line.match?(/\A[-+]/) && !code.strip.empty?
+        current = nil if indent && code.match?(/\A {#{indent}}(end|\})\b/)
+        Array(name)
+      end
+    end.uniq
   end
 
   def ref_of(value)
@@ -52,12 +75,14 @@ module Ownership
     [node, refs]
   end
 
-  def search(repo, term)
-    found = PrQueue.gh("search/issues", "-X", "GET", "-f", %(q=repo:#{repo} is:pr is:open "#{term}"), "-F", "per_page=#{PER_NAME}")
-    refs = found["items"].map do |i|
-      { repo:, number: i["number"], pr: true, state: i["state"], author: i.dig("user", "login"), title: i["title"] }
+  # Open PRs mentioning term; with paths, only those that change one of them (common names match hundreds of PRs).
+  def search(repo, term, paths = nil)
+    found = PrQueue.gh("graphql", "-f", "query=#{SEARCH}", "-f", %(q=repo:#{repo} is:pr is:open "#{term}")).dig("data", "search")
+    refs = found["nodes"].filter_map do |pr|
+      next if paths && (pr.dig("files", "nodes").map { _1["path"] } & paths).empty?
+      { repo:, number: pr["number"], pr: true, state: pr["state"].downcase, author: pr.dig("author", "login"), title: pr["title"] }
     end
-    [found["total_count"], refs]
+    [found["issueCount"], refs]
   end
 
   def check(item)
@@ -65,32 +90,36 @@ module Ownership
     hits = {}
     checked = []
     add = ->(why, ref) { hits[[ref[:repo], ref[:number]]] ||= "#{why}: #{label(ref)}" unless ref[:repo] == repo && ref[:number] == item["pr"] }
-    files = []
+    intro_files = []
+    branch_files = nil
     if (intro = item["introduced_by"])
       pr = intro.is_a?(Integer) ? intro : PrQueue.gh("repos/#{repo}/commits/#{intro}/pulls").first&.fetch("number")
       if pr
         references(repo, pr).last.select { _1[:pr] && _1[:state] == "open" }.each { add.("references ##{pr}", _1) }
-        files += PrQueue.gh("repos/#{repo}/pulls/#{pr}/files?per_page=100")
+        intro_files = PrQueue.gh("repos/#{repo}/pulls/#{pr}/files?per_page=100")
         checked << "open PRs cross-referencing ##{pr}"
       else
-        files += PrQueue.gh("repos/#{repo}/commits/#{intro}")["files"]
+        intro_files = PrQueue.gh("repos/#{repo}/commits/#{intro}")["files"]
         search(repo, intro).last.each { add.("names #{intro}", _1) }
         checked << "open PRs naming #{intro}"
       end
     end
     if item["branch"]
       begin
-        files += PrQueue.gh("repos/#{repo}/compare/#{item['base'] || 'main'}...#{item.fork.split('/').first}:#{item['branch']}")["files"]
+        branch_files = PrQueue.gh("repos/#{repo}/compare/#{item['base'] || 'main'}...#{item.fork.split('/').first}:#{item['branch']}")["files"]
       rescue RuntimeError => e
         checked << "no branch diff (#{e.message[0, 80]})"
       end
     end
+    # The item's own diff when there is one: the introducing PR often touches many more files (L3, LR1).
+    files = (branch_files || intro_files).reject { TESTS.match?(_1["filename"]) }
+    paths = files.map { _1["filename"] }
     names = method_names(files).first(MAX_NAMES)
     names.each do |name|
-      total, refs = search(repo, name)
-      refs.each { add.("names #{name} (#{total} open PRs)", _1) }
+      total, refs = search(repo, name, paths)
+      refs.each { add.("names #{name}, changes its file (#{total} open PRs name it)", _1) }
     end
-    checked << "open PRs naming #{names.join(', ')}" unless names.empty?
+    checked << "open PRs naming #{names.join(', ')} that change #{paths.join(', ')}" unless names.empty?
     Array(item["tracker"]).each do |value|
       trepo, number = ref_of(value)
       node, refs = references(trepo, number)

@@ -15,6 +15,79 @@ class OwnershipTest < Minitest::Test
     assert_equal %w[authenticate normalize_scheme valid? gen_send_block_arg], Ownership.method_names(files)
   end
 
+  LR1_PATCH = <<~DIFF
+    @@ -212,7 +212,7 @@ def initialize
+             end
+     
+             def lease(context)
+    -          @lease_mutex.synchronize do
+    +          self[context] || @lease_mutex.synchronize do
+                 fetch_or_store(context) do
+                   Lease.new(@terminated_flag)
+                 end
+    @@ -300,6 +300,7 @@ def checkout(timeout = nil)
+               conn = acquire
+    +          conn.lease
+             end
+     
+             def release(conn)
+  DIFF
+
+  def test_a_change_inside_a_method_body_names_that_method
+    files = [{ "filename" => "activerecord/lib/connection_pool.rb", "patch" => LR1_PATCH }]
+    assert_equal %w[lease checkout], Ownership.method_names(files)
+
+    added_after_the_header_method = <<~DIFF
+      @@ -370,6 +370,9 @@ def to_hash
+             end
+           end
+       
+      +    #: () -> Hash[String, untyped]
+      +    def values_for_database
+      +    end
+       
+           def fetch_value(name, &block)
+    DIFF
+    assert_equal %w[values_for_database], Ownership.method_names([{ "filename" => "attribute_set.rb", "patch" => added_after_the_header_method }])
+  end
+
+  POOL = "activerecord/lib/connection_pool.rb"
+
+  def fake_gh(*args)
+    query = args.find { _1.start_with?("query=") }.to_s
+    if query.include?("timelineItems")
+      { "data" => { "repository" => { "issueOrPullRequest" => { "title" => "t", "state" => "MERGED", "timelineItems" => { "nodes" => [] } } } } }
+    elsif args.first == "graphql"
+      pr = ->(number, path) { { "number" => number, "title" => "PR #{number}", "state" => "OPEN", "author" => { "login" => "a" },
+                                "repository" => { "nameWithOwner" => "rails/rails" }, "files" => { "nodes" => [{ "path" => path }] } } }
+      { "data" => { "search" => { "issueCount" => 96, "nodes" => [pr.(10, POOL), pr.(11, "activemodel/lib/dirty.rb")] } } }
+    elsif args.first.include?("/pulls/1/files")
+      [{ "filename" => "activerecord/lib/other.rb", "patch" => "@@ -1 +1 @@\n+  def checkout_lease\n" }]
+    elsif args.first.include?("/compare/")
+      { "files" => [{ "filename" => POOL, "patch" => LR1_PATCH }] }
+    end
+  end
+
+  def check_lr1
+    original = PrQueue.method(:gh)
+    fake = method(:fake_gh)
+    PrQueue.define_singleton_method(:gh) { |*args| fake.(*args) }
+    meta = { "id" => "LR1", "repo" => "rails/rails", "base" => "main", "branch" => "lease", "introduced_by" => 1 }
+    Ownership.check(PrQueue::Item.new("LR1.md", meta, "t", ""))
+  ensure
+    PrQueue.define_singleton_method(:gh, original)
+  end
+
+  def test_names_come_from_the_branch_not_the_introducing_pr
+    checked, = check_lr1
+    assert_includes checked, "open PRs naming lease, checkout that change #{POOL}"
+  end
+
+  def test_a_name_hit_must_change_one_of_the_items_files
+    _, hits = check_lr1
+    assert_equal ["rails/rails#10"], hits.map { _1[%r{rails/rails#\d+}] }
+  end
+
   def test_open_refuses_without_a_check_from_the_last_three_days
     Dir.mktmpdir do |dir|
       path = File.join(dir, "X1.md")
