@@ -239,7 +239,7 @@ module Lowrail
     def total(report) = Array(report["summary"]).map { _1["objects_per_request"] if _1.is_a?(Hash) }.compact
 
     def markdown
-      out = +"# Lowrail profile compare\n\n"
+      out = +"# lowrail-profile compare\n\n"
       out << "Base: `#{@base["command"]}`. Head: `#{@head["command"]}`.\n\n" if @base.is_a?(Hash) && @head.is_a?(Hash) && (@base["command"] || @head["command"])
       unless valid?
         out << "## Insufficient evidence\n\nThese reports are not a valid comparison (exit 2):\n\n"

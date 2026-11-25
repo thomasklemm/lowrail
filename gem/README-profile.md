@@ -1,0 +1,185 @@
+# lowrail-profile
+
+**Exact object allocation counts for your Rails app, per request, job, mail and Action Cable action, by source
+line, in your code and in the Rails, Ruby and gem code it calls.** It runs your test suite (or a recorded request
+mix) with allocation counting on and tells you which lines allocate the most per request, which of your lines lead
+there, and whether an upstream pull request already changes that line.
+
+It counts objects. It does not measure time, CPU, retained memory or SQL, and it never changes or lowers your app.
+For time, pair it with [vernier](https://github.com/jhawthorn/vernier) or your APM.
+
+Experimental release candidate (0.1.0.rc1). Supported: Ruby 3.3, 3.4 and 4.0; Rails 7.2, 8.0 and 8.1; Linux and
+macOS. Windows is refused with a message.
+
+## Install
+
+```ruby
+# Gemfile
+gem "lowrail-profile", group: [:development, :test], require: false
+```
+
+`require: false` matters: nothing of the gem loads in your app unless you run the command below. The first run
+compiles a small C extension (the counter) into `~/.cache/lowrail/profile/`, outside your app; it needs a C compiler
+and Ruby's headers, which `bundle install` of a Rails app already needs. A compile failure stops the profiler with
+the build log's path; it never touches `bundle install` or your app's boot.
+
+## Three commands
+
+```sh
+bundle exec lowrail-profile -- bin/rails test             # or: -- bundle exec rspec
+bundle exec lowrail-profile report                        # rebuild the report from tmp/lowrail-profile
+bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json
+```
+
+The first runs the command twice (everything after `--` is passed unchanged) and writes `tmp/lowrail-profile/report.md`
+and `report.json`. It prints the report too. The command's own exit status is recorded; the suite runs as it
+would, with `SEED` and `--seed` fixed (default 1234) so both runs order tests the same way.
+
+Options, all before `--`:
+
+| Option | Default | |
+| --- | --- | --- |
+| `--out DIR` | `tmp/lowrail-profile` | A new or empty directory, or one lowrail-profile made (it leaves a `.lowrail-profile` marker). It refuses any other directory and deletes nothing in it. |
+| `--runs N` | 2 | Runs of the command; their spread is part of compare's noise floor. |
+| `--top N` | 30 | Rows per table. |
+| `--seed N` | 1234 | `SEED` and `--seed` for every run. |
+| `--ledger FILE` | bundled | A newer ledger index (`contributions-index.json`). |
+| `--no-ledger` | | No ledger column. |
+| `--help`, `--version` | | |
+
+## Reading the report
+
+The header says what was counted: command, Ruby, Rails and environment, how many requests, jobs, mails and Cable
+actions, and the ledger's date. Then:
+
+* **Your code.** Per app line, the objects Rails, Ruby and gems allocate below it per request: the nearest app
+  line on the stack of every allocation (the second run walks the stack to find it). *Own* is what the line itself
+  allocates; *Dev/test* is work production mostly does not do (see below).
+* **Actions.** Objects per request by controller action, per run. *Warm* leaves out each action's first request in
+  each process, which carries one-time work (route table, template compilation, I18n load); `–` means it ran once
+  per process. *Δ* is the last run minus the first: the noise.
+* **Top lines outside the app.** Per line in Rails, Ruby and gems: warm and all objects per request, *Reach* (the
+  share of requests in which it allocated), the object types, the app lines that lead there, and *Ledger*. A † means
+  objects from Ruby's `<internal:…>` code charged to the line that called it.
+* **Dev/test-mode work.** Debug logging, error pages, template compilation, route building, asset lookup and reload
+  checks, apart, so a suite profile is not read as production cost.
+* **By gem**, and **Outside requests**: jobs (`perform_now`), mails (build and delivery) and Cable actions, counted
+  the same way. A job or mail inside a request counts as part of that request.
+
+Line keys are `RAILS/<component>/path:line`, `GEM/<name>/path:line`, `RUBY/path:line` and `APP/path:line`.
+
+**Ledger.** A dated snapshot of upstream pull requests that reduce allocations ships with the gem. A line matches
+when a pull request changes that very line (same repository, file and method, and the line's code is among the
+lines it removes or adds). The cell says what that means for the version your lockfile runs: *open upstream work*,
+*fixed in 8.2.0* (upgrade), *merged, not released yet*, or *merged, in 7.2.3, which this app runs*. The ledger covers
+the pull requests its authors track, not every upstream fix, and a snapshot goes stale: the header gives its date.
+
+**Counts are not time.** A line with many objects is a place to look; some allocations are cheap. **A suite is not
+traffic**: it requests what tests need, with a test user agent, in test mode. `--workloads` (below) gets closer.
+
+## Compare in CI
+
+`compare BASE.json HEAD.json --aa BASE2.json` exits **1** when a line or an action grew beyond its noise floor,
+**0** when nothing did, and **2** when the reports are not valid evidence: a failing suite, one run, a different
+command, seed, Ruby or environment, dropped samples, unfinished windows, or a report of another version. `BASE2`
+is a second profile of the unchanged base: the A/A pair sets the floor per row (a line's floor is its spread across
+both base profiles and head's own spread, at least `--min`, default 1 object per request; an action's is twice that,
+at least 0.1% of its objects and 20 × `--min`). Without `--aa` compare lists changes as places to look and exits 0:
+it is not a gate. `--json` prints the result as JSON.
+
+A GitHub Actions job that profiles the pull request's base twice and its head once, and fails on a regression:
+
+```yaml
+lowrail-profile:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 0 }
+    - uses: ruby/setup-ruby@v1
+      with: { bundler-cache: true }
+    - name: Profile base
+      run: |
+        git checkout ${{ github.event.pull_request.base.sha }}
+        bin/rails db:test:prepare
+        bundle exec lowrail-profile --out tmp/base -- bin/rails test
+        bundle exec lowrail-profile --out tmp/base2 -- bin/rails test
+    - name: Profile head
+      run: |
+        git checkout ${{ github.event.pull_request.head.sha }}
+        bin/rails db:test:prepare
+        bundle exec lowrail-profile --out tmp/head -- bin/rails test
+    - name: Compare
+      shell: bash # pipefail, so tee does not hide compare's exit status
+      run: bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json | tee -a "$GITHUB_STEP_SUMMARY"
+```
+
+Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step with the head's
+Gemfile (`BUNDLE_GEMFILE`). Keep `shell: bash`: without it `tee` turns compare's exit status into 0. Check the suite
+itself in its own job: a failing suite makes compare exit 2. The job runs the suite three times, each twice (six
+suite runs); `--runs` and a narrower command (`bin/rails test test/controllers test/integration`) make it cheaper.
+
+**When the gate fails on unchanged code.** One A/A pair is one sample of how much two invocations differ, not a
+bound. If a row fails that you did not touch, rerun the base pair; a row that varies more than one pair shows can
+still exceed its floor. Parallel test workers split an action's requests differently from run to run, which is why
+an action's floor is wider than a line's.
+
+## Experimental: `--record` and `--workloads`
+
+```sh
+bundle exec lowrail-profile --record -- bin/rails test     # also write lowrail/workloads.rb
+RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec lowrail-profile --workloads
+```
+
+`--record [FILE]` writes the suite's 20 most frequent request shapes as `lowrail/workloads.rb` (or
+`tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row, values as quoted
+literals, filtered through the app's `filter_parameters` (`[FILTERED]`), only GETs that replay as recorded enabled
+and every other shape commented out with its reason. It is recorded from real requests: check it for secrets the
+filter does not name before you commit it.
+
+`--workloads [FILE]` boots the app with `bin/rails runner` in the current `RAILS_ENV`, evaluates the file after boot
+and sends its requests 10 times as warmup and 20 times counted, through the full middleware stack, with a browser's
+headers, the file's sign-in, CSRF tokens and cookies. The file is Ruby in `ActionDispatch::IntegrationTest`'s words:
+
+```ruby
+article = Article.first!
+get articles_path
+get article_path(article), headers: { "Accept" => "text/html" }
+```
+
+**The requests are real.** Without `--allow-writes` it sends only GETs: a file with a write, a POST sign-in, a
+`setup` block or `jobs: true` is refused before anything is sent, and so is `RAILS_ENV=production` with a database
+on another host. With `--allow-writes` the requests write to the app's database, enqueue through its queue adapter
+and deliver mail as configured: use a disposable database, queue and mail service. `--workloads` needs the gem in a
+group the environment's `bundle install` keeps.
+
+## Guarantees
+
+Each is checked by a test in this gem or on the apps below.
+
+1. **No app changes.** It writes only inside `--out` and the `--record` target, and never edits the Gemfile,
+   config or code.
+2. **No lowering.** The package holds only the profiler; it never loads Lowrail's runtime.
+3. **Off means off.** With the gem listed and `require: false`, a process the command did not start loads none of
+   it.
+4. **Same outcomes.** Per-test outcomes and load order were identical plain, listed-but-off and profiled on the apps
+   listed in [the evidence](https://github.com/thomasklemm/lowrail/blob/main/docs/profile.md). That is a claim
+   about those apps, not every app. Check yours: run the suite plain and profiled with the same seed and diff the
+   per-test results (`bin/rails test -v`, `rspec --format documentation`).
+5. **Exit status passes through**, and compare never turns invalid evidence green (exit 2).
+6. **Never breaks the app.** A counter that fails to build or load, or a framework hook that cannot be installed,
+   prints one `[lowrail-profile]` warning and leaves the app as it is. Hooks are installed from Active Support's
+   `on_load` hooks, so nothing loads earlier than the app loads it.
+
+## Troubleshooting
+
+* *building the counter failed, see …build.log*: install a C compiler and Ruby's headers (`build-essential` on
+  Debian/Ubuntu, Xcode Command Line Tools on macOS).
+* *no runs with requests, jobs or mails*: the command served no request through `Rails.application` (unit tests
+  only, or a server started in another process). Profile integration, controller, request or system tests.
+* *exists and was not created by lowrail-profile*: pick another `--out`; it never clears a directory it did not make.
+* Overhead: the first run counts (0–11% of suite time on the apps measured), the second also walks the stack per
+  allocation (up to 45% on allocation-heavy suites). Measured per app in the evidence.
+* Code in Ractors other than the main one is not counted.
+
+Report issues with `report.json`, `capture.json` and the command at
+[github.com/thomasklemm/lowrail/issues](https://github.com/thomasklemm/lowrail/issues).

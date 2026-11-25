@@ -9,9 +9,12 @@
 # The report matches a line by gem, file, method and the line's own code
 # against this index (docs/profile.md).
 #   script/profile-ledger [--ledger docs/upstream/contributions.md] [--out PATH] [--missing]
+#   script/profile-ledger --snapshot   # the index as the lowrail-profile gem ships it
 # Needs `gh` signed in; reads public data only. A pull request it cannot read
 # (GitHub's rate limit) keeps its earlier entry; --missing reads only those
-# not in the index yet.
+# not in the index yet. --snapshot reads nothing from GitHub: it writes
+# gem/data/contributions-index.json from the index with only what the report
+# matches (open or merged allocation work, the files and methods it changes).
 require "json"
 require "open3"
 require "optparse"
@@ -21,11 +24,24 @@ root = File.expand_path("..", __dir__)
 ledger = File.join(root, "docs/upstream/contributions.md")
 out = File.join(root, "docs/upstream/contributions-index.json")
 missing = false
+snapshot = false
 OptionParser.new do |o|
   o.on("--ledger PATH") { ledger = _1 }
   o.on("--out PATH") { out = _1 }
   o.on("--missing") { missing = true }
+  o.on("--snapshot") { snapshot = true }
 end.parse!
+if snapshot
+  index = JSON.parse(File.read(out))
+  pulls = index["pulls"].select { _1["state"] != "closed" && _1["allocation_work"] }.map do |pr|
+    pr.slice("ref", "repo", "state", "allocation_work", "merged_at", "released_in")
+      .merge("files" => pr["files"].reject { _1["methods"].empty? })
+  end.reject { _1["files"].empty? }
+  target = File.join(root, "gem/data/contributions-index.json")
+  File.write(target, JSON.generate({ generated: index["generated"], ledger: index["ledger"], pulls: pulls }) + "\n")
+  warn "#{pulls.size} of #{index["pulls"].size} pull requests in #{target} (ledger of #{index["generated"][0, 10]})"
+  exit
+end
 previous = File.exist?(out) ? JSON.parse(File.read(out))["pulls"].to_h { [[_1["repo"], Integer(_1["ref"][/\d+\z/])], _1] } : {}
 
 def gh(*args)

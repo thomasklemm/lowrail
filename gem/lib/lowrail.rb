@@ -21,6 +21,8 @@
 # Bundler refuse a lockfile that pins json 3.1.0. The manifest is therefore
 # parsed by Lowrail::MiniJSON, and digest is required lazily on the first
 # lookup of a lowered file (which happens after Bundler has set up).
+require_relative "lowrail/loaded_constant"
+
 module Lowrail
   VERSION = "0.0.1"
   FORMAT = 2
@@ -61,14 +63,6 @@ module Lowrail
   NO_RECEIVER = Object.new.freeze
   private_constant :NO_RECEIVER
 
-  CONST_DEFINED = Module.instance_method(:const_defined?)
-  AUTOLOAD = Module.instance_method(:autoload?)
-  CONST_GET = Module.instance_method(:const_get)
-  CONST_PREFIX = String.instance_method(:delete_prefix)
-  CONST_PARTS = String.instance_method(:split)
-  CONST_EACH = Array.instance_method(:each)
-  private_constant :CONST_DEFINED, :AUTOLOAD, :CONST_GET, :CONST_PREFIX, :CONST_PARTS, :CONST_EACH
-
   class << self
     attr_reader :manifest, :root, :refusal_reason
 
@@ -92,18 +86,6 @@ module Lowrail
         @jit_drift = "JIT mode drift after initialize!: admitted #{@admission_jit}, now #{@initialized_jit}; guards remain fail-closed; deploy with matching startup JIT flags and rebuild"
         debug @jit_drift
       end
-    end
-
-    # Runtime facts observe constants; they never resolve an autoload or
-    # invoke const_missing. A missing dependency means wait or fall back.
-    def loaded_constant(name)
-      owner = Object
-      CONST_EACH.bind_call(CONST_PARTS.bind_call(CONST_PREFIX.bind_call(name, "::"), "::")) do |part|
-        return unless Module === owner && CONST_DEFINED.bind_call(owner, part, false) &&
-          !AUTOLOAD.bind_call(owner, part, false)
-        owner = CONST_GET.bind_call(owner, part, false)
-      end
-      owner
     end
 
     def enabled?
@@ -245,10 +227,6 @@ module Lowrail
       tmp = "#{path}.tmp.#{Process.pid}"
       File.write(tmp, JSON.pretty_generate(data) + "\n")
       File.rename(tmp, path)
-    end
-
-    def debug(msg)
-      warn "[lowrail] #{msg}" if ENV["LOWRAIL_DEBUG"]
     end
 
     def refuse(reason)

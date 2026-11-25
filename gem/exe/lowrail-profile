@@ -1,25 +1,32 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Where does your app spend avoidable work in Rails, Ruby and gems? Runs a
-# command that serves requests (your test suite, a local server, a workloads
-# file) twice with allocation counting on, and reports objects per request by
-# source line (docs/profile.md). Run it from the app directory:
-#
-#   bundle exec lowrail-profile -- bin/rails test test/integration test/controllers
-#   bundle exec lowrail-profile -- bundle exec rspec spec/requests
-#   bundle exec lowrail-profile --workloads                # lowrail/workloads.rb's requests, in this RAILS_ENV
-#   bundle exec lowrail-profile --record -- bin/rails test # also write the suite's requests as lowrail/workloads.rb
-#   bundle exec lowrail-profile report tmp/lowrail-profile # report again from saved runs
-#   bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # exit 1 on a regression, 2 without valid evidence
-#
-# Options, all before "--" (everything after it is the command's, unchanged):
-# --out DIR (default tmp/lowrail-profile; a directory lowrail-profile created,
-# or a new or empty one), --runs N (default 2; the runs' spread is in the noise
-# floor), --top N (default 30), --seed N (default 1234, as SEED and --seed for
-# every run), --ledger PATH (contributions.md), --workloads [FILE] (default
-# lowrail/workloads.rb), --record [FILE] (default lowrail/workloads.rb, or
-# tmp/lowrail-profile/workloads.rb when that exists).
+# Objects allocated per request, job, mail and Action Cable action, by source
+# line in your app, Rails, Ruby and gems (README-profile.md). Runs a command
+# that serves requests (your test suite, a workloads file) twice with
+# allocation counting on. It counts objects, not time, and never changes or
+# lowers your app.
+USAGE = <<~TEXT
+  usage: lowrail-profile [options] -- COMMAND...     profile a command, such as bin/rails test
+         lowrail-profile [options] --workloads [FILE] replay lowrail/workloads.rb (experimental)
+         lowrail-profile report [DIR]                 report again from saved runs
+         lowrail-profile compare BASE.json HEAD.json [--aa BASE2.json] [--min N] [--json]
+                                                      exit 1 on a regression, 2 without valid evidence
+
+  Options, all before "--" (everything after it is the command's, unchanged):
+    --out DIR         where runs and reports go (default tmp/lowrail-profile): a new or empty
+                      directory, or one lowrail-profile created
+    --runs N          runs of the command (default 2; their spread is in compare's noise floor)
+    --top N           rows per table (default 30)
+    --seed N          SEED and --seed for every run (default 1234)
+    --ledger FILE     a newer ledger index (contributions-index.json) than the bundled one
+    --no-ledger       no ledger column
+    --record [FILE]   also write the suite's requests as lowrail/workloads.rb (experimental)
+    --workloads [FILE] send the file's requests through the app (experimental); they are real
+    --allow-writes    let --workloads send writes, sign-ins and setup code, and run against a
+                      production environment whose database is not on this machine
+    --help, --version
+TEXT
 require "rbconfig"
 require "fileutils"
 require "digest"
@@ -31,6 +38,15 @@ args = ARGV.dup
 split = args.index("--")
 command = split ? args[(split + 1)..] : nil
 args = args[0...split] if split
+if args.include?("--help") || args.include?("-h")
+  puts USAGE
+  exit
+end
+if args.include?("--version")
+  require_relative "../lib/lowrail/profile_version"
+  puts "lowrail-profile #{Lowrail::Profile::VERSION}"
+  exit
+end
 opt = lambda do |name, default|
   i = args.index(name) or next default
   value = args[i + 1] or abort "lowrail-profile: #{name} needs a value"
@@ -41,7 +57,10 @@ out = File.expand_path(opt.("--out", "tmp/lowrail-profile"))
 runs = Integer(opt.("--runs", "2"))
 top = Integer(opt.("--top", "30"))
 seed = opt.("--seed", "1234")
-ledger = opt.("--ledger", File.expand_path("../../docs/upstream/contributions.md", __dir__))
+ledger = opt.("--ledger", File.expand_path("../data/contributions-index.json", __dir__))
+ledger = nil if args.delete("--no-ledger")
+abort "lowrail-profile: no ledger index #{ledger}" if ledger && !File.file?(ledger)
+allow_writes = args.delete("--allow-writes")
 # --workloads and --record take an optional FILE.
 flag = lambda do |name|
   next unless (i = args.index(name))
@@ -51,7 +70,7 @@ flag = lambda do |name|
 end
 workloads = flag.("--workloads")
 record = flag.("--record")
-abort "lowrail-profile: --paths was replaced by --workloads FILE (lowrail/workloads.rb, docs/profile.md)" if args.include?("--paths")
+abort "lowrail-profile: --paths was replaced by --workloads FILE (lowrail/workloads.rb, README-profile.md)" if args.include?("--paths")
 
 if args.first == "report"
   dir = File.expand_path(args[1] || out)
@@ -75,12 +94,13 @@ if args.first == "compare"
   exit compare.status
 end
 
-usage = "usage: lowrail-profile [options] -- COMMAND... | --workloads [FILE] | report [DIR] | compare BASE HEAD [--aa BASE2]"
+usage = "#{USAGE.lines.first(5).join}(lowrail-profile --help for options)"
+abort "lowrail-profile: Windows is not supported (Linux and macOS are)" if Gem.win_platform?
 if workloads
   abort "lowrail-profile: --workloads runs its own command; drop the one after --" if command
   abort usage unless args.empty?
   file = File.expand_path(workloads == :default ? Lowrail::Workloads::PATH : workloads)
-  abort "lowrail-profile: no #{file}; write one (docs/profile.md) or record one: lowrail-profile --record -- bin/rails test" unless File.exist?(file)
+  abort "lowrail-profile: no #{file}; write one (README-profile.md) or record one: lowrail-profile --record -- bin/rails test" unless File.exist?(file)
   command = ["bin/rails", "runner", File.join(lib, "lowrail/profile_workloads.rb"), file, File.join(out, "workloads.json")]
 elsif command
   abort usage unless args.empty?
@@ -89,6 +109,7 @@ else
 end
 abort usage if command.empty?
 abort "lowrail-profile: --record records a command's requests; drop --workloads" if record && workloads
+abort "lowrail-profile: --allow-writes is for --workloads" if allow_writes && !workloads
 abort "lowrail-profile: --runs must be at least 1" if runs < 1
 
 # Built once per Ruby build and per version of the counter's sources, outside
@@ -146,10 +167,13 @@ statuses = (1..runs).map do |n|
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
     **(n == [runs, 2].min ? { "LOWRAIL_PROFILE_ATTRIBUTE" => "1" } : {}),
     **(record && n == 1 ? { "LOWRAIL_PROFILE_RECORD" => "1" } : {}),
+    **(allow_writes ? { "LOWRAIL_PROFILE_ALLOW_WRITES" => "1" } : {}),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
     "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   system(env, *command)
+  # A workloads run that stops (a refused write, a response outside expect:) measured nothing to repeat.
+  abort "lowrail-profile: the workloads run exited #{$?.exitstatus}; nothing measured" if workloads && !$?.success?
   $?.exitstatus
 end
 File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\nexit #{statuses.join(" ")}\n")
@@ -179,7 +203,7 @@ if record
   else
     FileUtils.mkdir_p(File.dirname(target))
     File.write(target, Lowrail::Workloads.render(Lowrail::Workloads.recorded(merged, 20), <<~TEXT))
-      Workloads for lowrail-profile --workloads and script/census app (docs/profile.md).
+      Workloads for lowrail-profile --workloads (README-profile.md).
       Recorded by `lowrail-profile --record -- #{command.join(" ")}`: the #{[merged.size, 20].min} most frequent
       request shapes of #{merged.sum { _1["count"] }} requests, most frequent first. Records are each model's first row.
       Only GETs that replay as recorded are enabled. Writes keep the params one test sent and are commented out until

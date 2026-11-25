@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "../lowrail"
 require_relative "load_hooks"
 
 module Lowrail

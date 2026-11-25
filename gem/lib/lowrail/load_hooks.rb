@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../lowrail"
+require_relative "loaded_constant"
 
 module Lowrail
   # Readiness, not loading. Global TracePoints permanently patch VM bytecodes,

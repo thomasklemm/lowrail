@@ -144,13 +144,15 @@ suite, one run, different commands); without `--aa` it lists what it sees and
 does not gate.
 
 ```ruby
-gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
+gem "lowrail-profile", git: "https://github.com/thomasklemm/lowrail", glob: "gem/lowrail-profile.gemspec", group: [:development, :test], require: false
 ```
+
+It is its own gem, without lowering code: [gem/README-profile.md](gem/README-profile.md).
 
 ```sh
 bundle exec lowrail-profile -- bin/rails test                  # your suite (or: -- bundle exec rspec spec/requests)
 bundle exec lowrail-profile --record -- bin/rails test         # ... and write its most frequent requests as lowrail/workloads.rb
-RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's requests, warmed, through the full stack
+RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's GETs, warmed, through the full stack (writes: --allow-writes)
 ```
 
 `--record` applies the app's `filter_parameters` and enables only GETs that

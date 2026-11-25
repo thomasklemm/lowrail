@@ -23,6 +23,8 @@ module Lowrail
       "HTTP_ACCEPT" => "text/html", "HTTP_SEC_FETCH_SITE" => "same-origin", "HTTP_ORIGIN" => "https://localhost" }.freeze
     CONSTANT = /\A[A-Z]\w*(?:::[A-Z]\w*)*\z/
     HELPER = /\A[a-z_]\w*\z/
+    # lowrail-profile --workloads without --allow-writes.
+    class WriteRefused < StandardError; end
 
     # One request as the file declares it. #at(n) is the request for its n-th
     # run (from 1): alternates in turn, or the block's overrides for n. Its

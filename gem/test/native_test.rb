@@ -55,6 +55,8 @@ class NativeTest < Minitest::Test
     assert_equal off, on
     realpath_tmpdir do |dir|
       FileUtils.cp(File.join(GEM_LIB, "lowrail.rb"), File.join(dir, "lowrail.rb"))
+      FileUtils.mkdir_p(File.join(dir, "lowrail"))
+      FileUtils.cp(File.join(GEM_LIB, "lowrail/loaded_constant.rb"), File.join(dir, "lowrail/loaded_constant.rb"))
       %w[missing unloadable].each do |state|
         if state == "unloadable"
           require "lowrail"

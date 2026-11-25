@@ -294,7 +294,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             lines = [["# lowrail-profile 2", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
               "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}",
               "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "ruby=#{RUBY_DESCRIPTION}",
-              "rails_env=#{ENV["RAILS_ENV"]}"].join("\t")]
+              "rails_env=#{ENV["RAILS_ENV"]}", "rails=#{Lowrail.loaded_constant("Rails::VERSION::STRING")}"].join("\t")]
             rows.each do |path, line, type, count, reached, first, via, kind|
               lines << [path || "-", line, TYPES[type], count, reached, first, via ? 1 : 0, KINDS[kind]].join("\t")
             end

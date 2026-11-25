@@ -8,17 +8,59 @@
 # cookies earlier responses set). A response outside the request's expect:
 # stops the run, so a broken path is not profiled as an error page.
 #
-# The requests are real: they write to the app's database and go through its
+# Experimental. Without --allow-writes only GETs are sent (see below). The
+# requests are real: they write to the app's database and go through its
 # own queue adapter and mail delivery, so jobs they enqueue run inline or reach
 # real workers and mail is delivered as configured. What is not run here is the
 # file's own mail and job workloads (the census runs them). The receipt says
 # which, and which adapters the requests used.
 require "rack/mock"
 require "json"
+require "uri"
 require_relative "workloads"
+require_relative "loaded_constant"
 
 file, receipt = ARGV.fetch(0), ARGV[1]
-definition = Lowrail::Workloads.load(file)
+
+# Without --allow-writes: no production database on another machine, and a
+# file that declares only GETs, refused as each declaration is evaluated (before
+# a setup block runs). Code the file runs itself is the app's, as in a test.
+unless ENV["LOWRAIL_PROFILE_ALLOW_WRITES"] == "1"
+  if Rails.env.production?
+    configs = if (base = Lowrail.loaded_constant("ActiveRecord::Base"))
+      base.configurations.configs_for(env_name: Rails.env).map(&:configuration_hash)
+    else
+      config = (Rails.application.config.database_configuration[Rails.env] rescue nil) || {}
+      config.key?("adapter") || config.key?("url") ? [config] : config.values.grep(Hash)
+    end
+    hosts = configs.map { |c| c[:host] || c["host"] || ((url = c[:url] || c["url"]) && (URI(url).host rescue url)) }
+    hosts << URI(ENV["DATABASE_URL"]).host if ENV["DATABASE_URL"]
+    remote = hosts.compact.map(&:to_s).reject { _1.empty? || _1.start_with?("/") || %w[localhost 127.0.0.1 ::1 [::1]].include?(_1) }
+    abort "lowrail-profile: RAILS_ENV=production with a database on #{remote.uniq.join(", ")}; --workloads sends real requests, " \
+      "so it needs --allow-writes there" if remote.any?
+  end
+  read_only = Module.new do
+    refuse = ->(what) { raise Lowrail::Workloads::WriteRefused, "#{what}; --workloads sends real requests, so it needs --allow-writes" }
+    define_method(:setup) { refuse.("setup runs code before the requests") }
+    (Lowrail::Workloads::VERBS - [:get]).each do |verb|
+      define_method(verb) { |path, **| refuse.("#{verb.upcase} #{path} is a write") }
+    end
+    define_method(:get) do |path, **opts, &block|
+      refuse.("GET #{path} has jobs: (its jobs run or are enqueued for real)") if opts[:jobs]
+      super(path, **opts, &block)
+    end
+    define_method(:sign_in) do |path = nil, method: :post, cookie: nil, **opts|
+      refuse.("sign_in #{method.to_s.upcase} #{path} is a write") unless cookie || method.to_sym == :get
+      super(path, method: method, cookie: cookie, **opts)
+    end
+  end
+  Lowrail::Workloads::Definition.prepend(read_only)
+end
+begin
+  definition = Lowrail::Workloads.load(file)
+rescue Lowrail::Workloads::WriteRefused => e
+  abort "lowrail-profile: #{file}: #{e.message}"
+end
 abort "lowrail-profile: #{file} has no requests" if definition.requests.empty?
 host = ENV.fetch("LOWRAIL_PROFILE_HOST", "localhost")
 client = -> { Lowrail::Workloads::MockClient.new(Rails.application, host) }

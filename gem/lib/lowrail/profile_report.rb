@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "profile_version"
 
 module Lowrail
   # Reads lowrail-profile runs (DIR/runN/PID.tsv, written by lowrail/profile)
@@ -75,6 +76,7 @@ module Lowrail
         run[:roots] |= [meta["root"]]
         run[:ruby] ||= meta["ruby"]
         run[:rails_env] ||= meta["rails_env"]
+        run[:rails] ||= meta["rails"] unless meta["rails"].to_s.empty?
         (run[:rubies] ||= []) << meta["ruby"]
         (run[:rails_envs] ||= []) << meta["rails_env"]
         rows.each do |row|
@@ -178,8 +180,8 @@ module Lowrail
     # allocations or time (by the ledger entry) and change this very line:
     # same gem, file and method, and the line's code is one the pull request
     # removes there (the app runs the code before it) or adds there (the app
-    # may run it already). contributions-index.json is built by
-    # script/profile-ledger. Closed, unmerged ones are left out.
+    # may run it already). The index (data/contributions-index.json) is
+    # built by script/profile-ledger. Closed, unmerged ones are left out.
     def ledger_matches(site)
       return [] unless (index = ledger_index)
       text, method = source(site)
@@ -196,9 +198,13 @@ module Lowrail
 
     def ledger_index
       return @ledger_index if defined?(@ledger_index)
-      path = @ledger && File.join(File.dirname(@ledger), "contributions-index.json")
-      @ledger_index = path && File.exist?(path) ? JSON.parse(File.read(path))["pulls"] : nil
+      data = @ledger && JSON.parse(File.read(@ledger))
+      @ledger_date = data && data["generated"].to_s[0, 10]
+      @ledger_index = data && data["pulls"]
     end
+
+    # The day the ledger index was taken (nil without one).
+    def ledger_date = (ledger_index; @ledger_date)
 
     # [gem or rails component or "ruby", path in its repository]
     def ledger_file(site)
@@ -440,8 +446,20 @@ module Lowrail
     def markdown
       command_file = File.join(dir, "command.txt")
       command = File.exist?(command_file) ? File.read(command_file).lines.first.strip : "?"
-      out = +"# Lowrail profile\n\n"
-      out << "Command: `#{command}`, #{@runs.first[:rails_env] || "?"} environment, #{@runs.first[:ruby]}.\n\n"
+      first = summary.first
+      counted = { "request" => "requests", "job" => "jobs", "mail" => "mail windows", "cable" => "Cable actions" }
+        .filter_map { |kind, label| "#{first[:windows][kind]} #{label}" if first[:windows][kind] > 0 }
+      rails = @runs.filter_map { _1[:rails] }.first
+      out = +"# lowrail-profile report\n\n"
+      out << "Objects allocated (exact counts, not time, not retained memory) per request, job, mail and Action Cable " \
+        "action, by source line. A line with many objects is a place to look, not a measured cost in milliseconds.\n\n"
+      out << "* Command: `#{command}`\n"
+      out << "* Ruby: #{@runs.first[:ruby]}\n"
+      out << "* Rails: #{rails || "?"}, #{@runs.first[:rails_env] || "?"} environment\n"
+      out << "* Counted in run 1: #{counted.join(", ")}#{" in #{first[:processes]} processes" if first[:processes] > 1}; " \
+        "#{@runs.size} run#{"s" if @runs.size != 1}\n"
+      out << "* Ledger: #{ledger_date ? "upstream pull requests as of #{ledger_date}" : "off"}\n"
+      out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n\n"
       out << "| Run | Processes | Requests | Objects per request | Jobs | Mails | Cable actions | Dropped |\n" \
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n"
       summary.each do |s|
@@ -487,8 +505,8 @@ module Lowrail
       out << "\n## Top lines outside the app\n\n" \
         "Warm: objects per request by run, without each line's first request per process (one-time work). " \
         "All: including it, mean of the runs. Reach: share of requests in which the line allocated (last run). " \
-        "† charged from Ruby's `<internal:…>` code to this caller. Ledger: pull requests from Lowrail's contributions " \
-        "ledger that change this line, and whether the app's version has them. From the app: the nearest app line on the stack (repeat " \
+        "† charged from Ruby's `<internal:…>` code to this caller. Ledger: upstream pull requests that reduce " \
+        "allocations and change this line, and whether the app's locked version has them. From the app: the nearest app line on the stack (repeat " \
         "run). Dev/test-only work is listed separately below.\n\n"
       out << table(rows)
       unless (extra = mode_rows).empty?

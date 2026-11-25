@@ -9,6 +9,7 @@
 
 require "test_helper"
 require "uri"
+require "digest"
 
 class ProfileTest < Minitest::Test
   include LowrailTest
@@ -64,7 +65,6 @@ class ProfileTest < Minitest::Test
       env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test")
       # A ledger whose index has an open and a released pull request on
       # Probe.many; the app runs probe 1.0.
-      File.write(File.join(dir, "contributions.md"), "")
       many, three = "def self.many = Array.new(100) { String.new }", "def self.three = [String.new, String.new]"
       file = ->(method, removed: [], added: []) { [{ path: "lib/probe.rb", methods: { method => { removed: removed, added: added } } }] }
       File.write(File.join(dir, "contributions-index.json"), JSON.generate(pulls: [
@@ -77,7 +77,7 @@ class ProfileTest < Minitest::Test
         { ref: "x/probe#6", repo: "x/probe", allocation_work: false, state: "open", files: file.("three", removed: [three]) },
         { ref: "x/other#4", repo: "x/other", allocation_work: true, state: "open", files: file.("three", removed: [three]) }]))
       out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "profile", "--top", "200",
-        "--ledger", "contributions.md", "--", RUBY, "requests.rb", chdir: dir)
+        "--ledger", "contributions-index.json", "--", RUBY, "requests.rb", chdir: dir)
       assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
       assert_equal 2, out.scan("lowrail loaded: true").size, err
 
@@ -535,6 +535,68 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # The app tree after a profile (default --out) is the tree before, but
+  # tmp/lowrail-profile: no Gemfile, config or code is written.
+  def test_profiling_leaves_the_app_tree_unchanged
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      app = File.join(dir, "app")
+      LowrailTest.write_rails_app(app, "requests.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+      RUBY
+      tree = -> { Dir.glob("**/*", File::FNM_DOTMATCH, base: app).reject { _1 == "tmp" || _1.start_with?("tmp/lowrail-profile") }.sort.to_h { [_1, File.file?(File.join(app, _1)) ? Digest::SHA256.file(File.join(app, _1)).hexdigest : :dir] } }
+      before = tree.()
+      _, err, status = Open3.capture3(profile_env(dir), RUBY, PROFILE, "--", RUBY, "requests.rb", chdir: app)
+      assert status.success?, err
+      assert File.file?(File.join(app, "tmp/lowrail-profile/report.json"))
+      assert_equal before, tree.()
+    end
+  end
+
+  # --workloads without --allow-writes sends only GETs: a write, a POST
+  # sign-in, setup code or a GET with jobs: is refused before any request.
+  def test_workloads_refuse_writes_without_allow_writes
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "bin/rails" => "#!#{RUBY}\nabort unless ARGV.shift == \"runner\"\nscript = ARGV.shift\nrequire_relative \"../config/environment\"\nload script\n",
+        "config/routes.rb" => "Rails.application.routes.draw { resources :widgets, only: %i[index create] }\n",
+        "app/controllers/widgets_controller.rb" => <<~'RUBY')
+          class WidgetsController < ApplicationController
+            skip_forgery_protection
+            def index = render(plain: Widget.count.to_s)
+            def create = (Widget.create!(name: "w", password: "x"); head(:created))
+          end
+        RUBY
+      File.chmod(0o755, File.join(dir, "bin/rails"))
+      FileUtils.mkdir_p(File.join(dir, "lowrail"))
+      {
+        "post \"/widgets\"" => /POST \/widgets is a write/,
+        "sign_in \"/session\", params: {}" => /sign_in POST \/session is a write/,
+        "setup { Widget.delete_all }" => /setup runs code/,
+        "get \"/widgets\", jobs: true" => /has jobs:/
+      }.each do |line, refusal|
+        File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\"\n#{line}\n")
+        _, err, status = profile(dir, "--out", "w", "--workloads")
+        refute status.success?, line
+        assert_match(refusal, err)
+        assert_match(/needs --allow-writes/, err)
+        refute_match(/run 2 of 2/, err, "a refused file is not run again")
+      end
+      File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\"\npost \"/widgets\", expect: 201\n")
+      _, err, status = profile(dir, "--out", "w", "--workloads", "--allow-writes")
+      assert status.success?, err
+      # Counted passes only (warmup is reset): 20 per run.
+      assert_equal [20, 20], JSON.parse(File.read(File.join(dir, "w/report.json")))["actions"]
+        .find { _1["name"] == "WidgetsController#create" }["windows"]
+      _, err, status = profile(dir, "--allow-writes", "--", RUBY, "-e", "1")
+      refute status.success?
+      assert_match(/--allow-writes is for --workloads/, err)
+    end
+  end
+
   # A counter of another version is refused before anything is hooked, and a
   # framework hook that cannot be installed (into a frozen class) leaves the
   # app's load as it was.
@@ -734,12 +796,12 @@ class ProfileTest < Minitest::Test
     end
   end
 
-  # The CI step docs/profile.md shows fails the job on a regression, run the
+  # The CI step README-profile.md shows fails the job on a regression, run the
   # way GitHub Actions runs it (an explicit shell: bash adds pipefail).
   def test_documented_ci_compare_step_fails_on_a_regression
     require "yaml"
     realpath_tmpdir do |dir|
-      yaml = File.read(File.join(GEM_ROOT, "../docs/profile.md"))[/```yaml\n(.*?)```/m, 1]
+      yaml = File.read(File.join(GEM_ROOT, "README-profile.md"))[/```yaml\n(.*?)```/m, 1]
       step = YAML.safe_load(yaml).values.first.fetch("steps").find { _1["name"] == "Compare" }
       shell = { nil => %w[bash -e], "bash" => %w[bash --noprofile --norc -eo pipefail] }.fetch(step["shell"])
       FileUtils.mkdir_p(File.join(dir, "bin"))

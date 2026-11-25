@@ -11,9 +11,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 4.0"
   # The native prototype is opt-in via rake compile, not an installation-time
   # dependency: a missing compiler must not prevent the Ruby gem from loading.
-  spec.files = Dir["lib/**/*.rb", "ext/**/*.{c,rb}", "Rakefile", "exe/lowrail-profile"]
-  spec.bindir = "exe"
-  spec.executables = ["lowrail-profile"]
+  # exe/lowrail-profile is lowrail-profile.gemspec's, so the two gems never both install it.
+  spec.files = Dir["lib/**/*.rb", "ext/**/*.{c,rb}", "Rakefile"]
   spec.add_development_dependency "minitest-mock", "~> 5.27"
   # Build/discovery tooling; do not force an application's locked Prism forward.
   spec.add_development_dependency "prism", "2.0.0"

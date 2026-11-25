@@ -1,5 +1,9 @@
 # Profile your own app: `lowrail-profile`
 
+**Using it on your app: read [gem/README-profile.md](../gem/README-profile.md)**, the gem's README (install,
+commands, reading a report, the CI recipe, guarantees). This page is the evidence behind it: how it measures, the
+corpus runs, reviews and reruns. The [release plan](profile-release-plan.md) says what 0.1 ships.
+
 `lowrail-profile` shows where your Rails app spends avoidable work in Rails, Ruby and gems, from inside the app:
 it counts the objects allocated per source line while the app serves requests, runs jobs, builds and delivers mail
 and handles Action Cable actions (your own test suite, the requests of your `lowrail/workloads.rb`, or any command
@@ -28,7 +32,7 @@ measured speedup.
 Add the gem to the development and test group, unrequired:
 
 ```ruby
-gem "lowrail", git: "https://github.com/thomasklemm/lowrail", glob: "gem/*.gemspec", group: [:development, :test], require: false
+gem "lowrail-profile", git: "https://github.com/thomasklemm/lowrail", glob: "gem/lowrail-profile.gemspec", group: [:development, :test], require: false
 ```
 
 `--workloads` in production (below) needs the gem installed there too: list it in a group your production
@@ -116,8 +120,9 @@ Options, all before the first `--` (everything after it, a second `--` included,
   leaves a `.lowrail-profile` marker), where it replaces only its own runs and reports. It refuses any other
   existing directory and deletes nothing in it.
 * `--runs N` (default 2; the spread between runs is part of compare's noise floor), `--top N` (default 30), `--seed N` (default
-  1234, passed as `SEED` and `--seed` to every run, so test order repeats), `--ledger PATH` (default: the ledger of
-  the Lowrail checkout the gem comes from).
+  1234, passed as `SEED` and `--seed` to every run, so test order repeats), `--ledger FILE` (a ledger index; default:
+  the dated snapshot `gem/data/contributions-index.json` the gem ships, from `script/profile-ledger --snapshot`),
+  `--no-ledger`.
 
 The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/DIGEST/`, where the digest
 covers its sources and compiler settings, so another Lowrail checkout never picks up a different build; the app
