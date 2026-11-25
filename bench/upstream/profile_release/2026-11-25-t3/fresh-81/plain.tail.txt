@@ -1,0 +1,40 @@
+
+Run options: -v --seed 1234
+
+# Running:
+
+OutsiderTest#test_engine_probe_runs_its_job_inline = OUTCOME OutsiderTest#test_engine_probe_runs_its_job_inline .
+0.09 s = .
+OutsiderTest#test_engine_probe_lists = OUTCOME OutsiderTest#test_engine_probe_lists .
+0.01 s = .
+OutsiderTest#test_widgets_index = OUTCOME OutsiderTest#test_widgets_index .
+0.02 s = .
+OutsiderTest#test_a_skipped_test_stays_skipped = OUTCOME OutsiderTest#test_a_skipped_test_stays_skipped S
+0.00 s = S
+
+
+Skipped:
+OutsiderTest#test_a_skipped_test_stays_skipped [test/integration/outsider_test.rb:49]:
+always
+
+bin/rails test test/integration/outsider_test.rb:48
+
+OutsiderTest#test_engine_probe_shows_nothing_for_a_missing_widget = OUTCOME OutsiderTest#test_engine_probe_shows_nothing_for_a_missing_widget .
+0.01 s = .
+OutsiderTest#test_widgets_create_runs_its_job_inline = OUTCOME OutsiderTest#test_widgets_create_runs_its_job_inline .
+0.01 s = .
+OutsiderTest#test_engine_probe_shows_a_widget = OUTCOME OutsiderTest#test_engine_probe_shows_a_widget .
+0.00 s = .
+OutsiderTest#test_widgets_show = OUTCOME OutsiderTest#test_widgets_show .
+0.00 s = .
+ProbeMailerTest#test_a_mail_outside_a_request = OUTCOME ProbeMailerTest#test_a_mail_outside_a_request .
+0.02 s = .
+TallyJobTest#test_a_job_outside_a_request = OUTCOME TallyJobTest#test_a_job_outside_a_request .
+0.00 s = .
+TallyJobTest#test_another_job_outside_a_request = OUTCOME TallyJobTest#test_another_job_outside_a_request .
+0.00 s = .
+ProbeChannelTest#test_a_channel_action_outside_a_request = OUTCOME ProbeChannelTest#test_a_channel_action_outside_a_request .
+0.00 s = .
+
+Finished in 0.177074s, 67.7681 runs/s, 90.3575 assertions/s.
+12 runs, 16 assertions, 0 failures, 0 errors, 1 skips

@@ -1,0 +1,6 @@
+## Fresh app, PARALLEL_WORKERS=1
+unchanged: 12, planted: 0
+aa1: false alarms, one compare 0 of 1320 (0.00%), CI job 0 of 11880 (0.00%); median floor: line 1.0, action 20.0 (5.3% of the action), 4 actions not compared
+aa1-all: false alarms, one compare 24 of 1320 (1.82%), CI job 72 of 11880 (0.61%); rows: Outsider::ProbeController#index 24; median floor: line 1.0, action 20.0 (3.3% of the action), 0 actions not compared
+k3: false alarms, one compare 0 of 1980 (0.00%), CI job 0 of 15840 (0.00%); median floor: line 1.0, action 20.0 (5.3% of the action), 4 actions not compared
+k3-all: false alarms, one compare 4 of 1980 (0.20%), CI job 12 of 15840 (0.08%); rows: Outsider::ProbeController#index 4; median floor: line 1.0, action 20.0 (3.3% of the action), 0 actions not compared

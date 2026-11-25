@@ -1,0 +1,48 @@
+diff --git a/gem/lib/lowrail/profile_compare.rb b/gem/lib/lowrail/profile_compare.rb
+index a693b2b6..96e3a297 100644
+--- a/gem/lib/lowrail/profile_compare.rb
++++ b/gem/lib/lowrail/profile_compare.rb
+@@ -115,6 +115,15 @@ module Lowrail
+         uncovered = summary.zip(measured).reject { |run, m| run["processes"] == 1 && run["windows"]["request"] == m["requests"] }
+         list << "#{label} has #{uncovered.size} run(s) whose request windows are not the one process's measured requests" if uncovered.any?
+       end
++      # Warm leaves out each process's first window of an action. Parallel test
++      # workers split the tests anew in every capture, so in a run of several
++      # processes which windows those are, and with them every warm value, is
++      # different between captures in a way one A/A pair does not sample.
++      parallel = summary.map { _1["processes"] }.max
++      if parallel > 1
++        list << "#{label} ran in #{parallel} processes: parallel test workers split the tests differently in every capture, " \
++          "which changes what warm leaves out; profile with PARALLEL_WORKERS=1 to compare"
++      end
+       list << "#{label} has a run without requests, jobs, mails or Cable actions" if summary.any? { |run| KINDS.sum { run["windows"][_1] } == 0 }
+       open = summary.reject { |run| KINDS.all? { run["windows"][_1] == run["completed"][_1] } }
+       list << "#{label} has #{open.size} run(s) with windows that never finished, which no line or action counts" if open.any?
+diff --git a/gem/test/profile_compare_test.rb b/gem/test/profile_compare_test.rb
+index 5fb215b9..d221c051 100644
+--- a/gem/test/profile_compare_test.rb
++++ b/gem/test/profile_compare_test.rb
+@@ -132,6 +132,23 @@ class ProfileCompareTest < Minitest::Test
+     end
+   end
+ 
++  # openstreetmap-website with 8 parallel workers, the same code in every
++  # capture: NotesController#index read 8,063/8,272 warm in base, 7,624/8,362
++  # in the A/A report and 26,106/28,029 in head, by which of its 19 requests
++  # were each worker's first. From one process the same numbers are a regression.
++  def test_compare_refuses_captures_of_parallel_workers
++    realpath_tmpdir do |dir|
++      capture = ->(warm) { report([5.0, 5.0], actions: [{ "name" => "NotesController#index", "warm" => warm }]) }
++      base, aa, head = capture.([8_063.3, 8_272.4]), capture.([7_624.3, 8_361.8]), capture.([26_106.1, 28_029.3])
++      assert_equal 1, compare(dir, base, head, aa: aa)[0]
++      workers = ->(r) { r.merge("summary" => r["summary"].map { _1.merge("processes" => 8) }) }
++      status, result = compare(dir, workers.(base), workers.(head), aa: workers.(aa))
++      assert_equal [2, []], [status, result["regressions"]]
++      assert_equal ["base", "head", "the A/A report"], result["problems"].map { _1[/\A(.*) ran in 8 processes: .*PARALLEL_WORKERS=1/, 1] }
++      assert_equal 2, compare(dir, base, workers.(head), aa: aa)[0], "only head from parallel workers"
++    end
++  end
++
+   # compare gates only on valid evidence (exit 2 otherwise), takes the noise
+   # floor from every run, and leaves out actions one side cannot measure.
+   def test_compare_needs_complete_comparable_captures

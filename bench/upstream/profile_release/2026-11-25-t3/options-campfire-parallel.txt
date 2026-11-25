@@ -1,0 +1,4 @@
+## Campfire, 8 workers
+unchanged: 3, planted: 2
+aa1: false alarms, one compare 0 of 6 (0.00%); plant caught, one compare 12 of 12 (100.00%), CI job 12 of 12 (100.00%); plant rows (profiled+base2 vs planted): RoomsController#show +42.0 floor 24.6 of 24520, string/output_safety.rb:243 +1.7 floor 1.0 of 104; median floor: line 1.0, action 20.0 (0.2% of the action), 55 actions not compared
+aa1-all: false alarms, one compare 0 of 6 (0.00%); plant caught, one compare 12 of 12 (100.00%), CI job 12 of 12 (100.00%); plant rows (profiled+base2 vs planted): RoomsController#show +42.8 floor 29.8 of 29729, string/output_safety.rb:243 +1.7 floor 1.0 of 104; median floor: line 1.0, action 20.0 (0.3% of the action), 0 actions not compared

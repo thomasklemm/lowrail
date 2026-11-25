@@ -1,0 +1,4 @@
+## CodeTriage, one process
+unchanged: 3, planted: 2
+aa1: false alarms, one compare 0 of 6 (0.00%); plant caught, one compare 12 of 12 (100.00%), CI job 12 of 12 (100.00%); plant rows (profiled+base2 vs planted): PagesController#index +39.4 floor 20.0 of 4323, erb/util.rb:15 +5.0 floor 1.0 of 0; median floor: line 1.0, action 20.0 (0.8% of the action), 5 actions not compared
+aa1-all: false alarms, one compare 0 of 6 (0.00%); plant caught, one compare 12 of 12 (100.00%), CI job 12 of 12 (100.00%); plant rows (profiled+base2 vs planted): PagesController#index +39.8 floor 20.0 of 6719, erb/util.rb:15 +5.0 floor 1.0 of 0; median floor: line 1.0, action 20.0 (0.6% of the action), 0 actions not compared
