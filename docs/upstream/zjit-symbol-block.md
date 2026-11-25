@@ -1688,3 +1688,57 @@ Not touched, as asked: `exit_recompile`'s fast path (`codegen.rs`, before its `w
 payload without the lock. It reads `payload.versions` (a `Vec` that a compile in another Ractor pushes to under the
 lock, so the read can race with a reallocation) and decrements `num_exits_until_invalidate` non-atomically (a lost
 update only delays the invalidation). That is master's code and the same contract question, for a separate change.
+
+#### thermos-astra confirm on `7b03404bd7`: approved (2026-11-25)
+
+Same [review thread](https://ampcode.com/threads/T-01a21206-053e-70de-a4ac-3bbadd53e8c0), both rubrics personally,
+no delegation. Fetched `thomasklemm/zjit-symbol-block-arg-5` and checked exact head
+`7b03404bd7f0e08120af0836ce11a6b27d45f5b0`, two commits on `a43519979c7a8fbb9c5bbcf8d7b1daf739a60c4f`.
+The complete tree delta from round 4 is +3 −1 in `codegen.rs`: the payload access and assignment now occur
+inside `with_vm_lock`. Both commit messages compare byte-identical; no tests or other code changed.
+
+**Approved: the round-4 must-fix is resolved; no remaining must-fix or nit from this pass.** The existing lock
+helper acquires the VM lock and Ractor barrier before constructing the mutable payload reference, disables GC
+for the closure, and restores GC/lock state on return. The side-exit code saves SP and installs its stack map
+before the callback. The closure retains no payload reference after unlocking. This uses the canonical helper
+without another abstraction, condition or state field; no maintainability change is needed.
+
+**Lock check on the exact, unmodified head:** GDB stopped at `codegen.rs:4018`, the assignment inside the closure,
+not callback entry. It recorded 24 observations of the same ISEQ (`0x7fffde888dc0`): twelve on native thread 3,
+twelve on native thread 4, all with `rb_vm_locked_p() == 1`. After the first twelve observations the breakpoint
+excluded the first thread to ensure a second Ractor was inspected. Scheduling was locked only during each
+read-only lock-query call, then enabled again; this does not acquire Ruby's VM lock. The diagnostic used the
+same high exit budget as round 4 to keep the guard live. The earlier unmodified round-4 check returned zero,
+so this check distinguishes the bad version rather than merely checking Ruby output.
+
+Fresh x86-64 dev build (`--enable-zjit=dev --disable-install-doc --disable-yjit`, `make -j2`):
+
+| Command/check | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='symbol_block_arg --test-threads=2'` | 19/19 pass |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run: 2,051 pass, one SIGABRT, 15 skipped |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same btest at threshold 2 | 2,148/2,148 |
+| `r4_ractors.rb` and `r4_lifetime.rb`, interpreter versus t1/t2/default | Six comparisons match; no failed process |
+
+The only full-suite failure is again `test_profile_frames_during_direct_jit_to_jit_entry`, "rb_profile_frames
+was not called from SIGPROF handler". The earlier base Rust control reproduced it; that control was not rerun
+for this delta. btest retains the `Fiber count: 10000 (skipping)` diagnostic. The four Ractors return
+`[28000, 28000, 28000, 28000]`; the inline/compaction/20-ISEQ-churn probe returns `22` and `:lifetime_ok`.
+Fresh HIR again shows the refined inline leaf's dynamic send while its unrefined parent's `Array#sum` retains
+`CCallVariadic`. No arm64 run, CLI/core-suite rerun, full 127-comparison rerun or new benchmark in this confirm.
+
+**The existing `exit_recompile` fast path is separate.** Extracting that entire function from master
+`a43519979c` and this head gives byte-identical text. It obtains `&mut IseqPayload`, reads `versions` and updates
+`num_exits_until_invalidate` before its later lock. This PR neither introduces nor fixes that access; the new
+wrapper protects its own update, not the later callback. I agree it needs separate investigation/fix, not a
+new finding against this delta. The source violates the payload helper's stated exclusive-access contract;
+calling an unsynchronized decrement merely a delayed invalidation would not bound Rust undefined behavior.
+This confirm does not establish a crash or wrong Ruby output from the pre-existing path.
+
+Reproduction material remains in `.amp/in/orb-backup/zs1-astra/` in this thread: `r5-lock.gdb`,
+`r5-lock-two-threads.txt`, `r5-master-exit-recompile.txt`, `r5-head-exit-recompile.txt`, `r5-lifetime-hir.out`,
+`r5-r4_*.out`/`.err` and `logs/r5-*.log`. Run `gdb -q -batch -x ../r5-lock.gdb ./ruby` from `ruby/` for the lock
+check. Run the two existing probe scripts with `--disable-gems -W0`, then add `--zjit --zjit-call-threshold=1`,
+`--zjit --zjit-call-threshold=2 --zjit-num-profiles=1`, and `--zjit`; compare each stdout to the interpreter.
+The Ruby source diff is empty. No Ruby commit, push or public post was made.
