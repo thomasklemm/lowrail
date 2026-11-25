@@ -1412,3 +1412,191 @@ Reply drafts (for Thomas after review):
 > refinements to the cref after the code is compiled (tested). A version compiled after the guard has exited leaves
 > the send dynamic, so code that runs under `using` is not recompiled again. With that, the `vm_args.c` extraction is
 > gone and the PR touches only ZJIT.
+
+#### thermos-astra on `bdcfceb5ee`: correctness approved (2026-11-25)
+
+Review [thread](https://ampcode.com/threads/T-01a21206-053e-70de-a4ac-3bbadd53e8c0). Both Thermos rubrics applied
+personally, without subagents or other threads, to the full two-commit range
+`f63048e94229b4bab276e01bac4902f9b6a74ace..bdcfceb5eecaa0b7060f2df13958308ea8690624`. Fetched the exact fork branch
+`thomasklemm/zjit-symbol-block-arg-3`, checked both parent links and read the complete implementation/test diff.
+The existing review record was part of the brief; its conclusions were not used as evidence of correctness.
+
+**No additional correctness or maintainability must-fix; no new nit.** This approves the correctness work on
+this head, not submission of round 3: Opus's already-recorded recompilation/performance blocker remains open.
+The coordinator explicitly assigned its fix to round 4 and asked this pass not to duplicate that investigation.
+Round 4 needs its own confirm; this pass does not approve unseen changes.
+
+**Why the direct handler is equivalent in the accepted case.**
+[`vm_caller_setup_arg_block`](https://github.com/thomasklemm/ruby/blob/bdcfceb5eecaa0b7060f2df13958308ea8690624/vm_args.c#L1147-L1196)
+already returns the Symbol itself when `Symbol#to_proc` is basic and the caller has no refinements. Delaying
+materialization in the callee therefore preserves the interpreter's timing, cache eviction, Proc identity and
+lambda-ness in precisely that case. The specialization does not substitute a Proc for a Symbol or change yield
+dispatch. A non-basic conversion must run before the callee, even if its definition is the original C function;
+the basic-bit guard now enforces that distinction.
+
+Guard and lifetime audit:
+
+* The static-Symbol type/profile guard excludes dynamic Symbols and arbitrary `to_proc` objects. Existing
+  argument-shape and receiver/callee guards still control eligibility. The `no_side_exits` check avoids emitting
+  new deoptimization guards in a version that forbids them.
+* `MethodRedefined` protects replacement; the extra basic-bit load covers equal-definition replacement that
+  clears the bit in place without invalidation (`vm_method.c:1574–1588`). The compile-time predicate and the
+  HIR helper both use `rb_callable_method_entry(Symbol, to_proc)`, exactly the entry used by
+  `rb_method_basic_definition_p` (`vm_method.c:3643–3648`). Neither the flag guard nor the patch point alone is
+  sufficient. `RootBoxOnly` plus the compile-time box check preserves the conservative box boundary.
+* Compiled C-header assertions confirm `METHOD_ENTRY_BASIC_FLAG`'s source mapping: `IMEMO_FL_USER2` is
+  `RUBY_FL_USER7`, value 524288; callable-entry flags are at byte 0; cref refinements are at byte 8. The flags
+  load is a memory read, and `GuardAnyBitSet` branches on zero, not on the opposite condition.
+* The CME is `Const::Value`, inferred as `CallableMethodEntry`, not an unmanaged C pointer. The x86-64 backend
+  emits it through `emit_load_gc_value`; `append_gc_offsets` applies the write barrier, marking visits every
+  retained version, and compaction rewrites the embedded VALUE. The arm64 backend has the same tracked-value
+  path, inspected but not executed here. Compaction before and after eight method mutations passed at three
+  JIT settings, including the no-mutation control that keeps using the compiled entry.
+* `GetCref` is a nonallocating walk of the current frame's EP. Its memory-read effect conflicts with inline
+  frame changes and ordinary Ruby calls, so it is not incorrectly reused across them. The nil guard covers
+  later `using`; refined `Symbol#to_proc` also keeps interpreter behavior. Valid executing Ruby frames have a
+  cref: ISEQ methods supply one even when their input is null (`vm_method.c:1105–1126`), top-level frames install
+  one (`vm.c:950–953`), and cloned environments synthesize one (`proc.c:4524–4526`). C-created IFUNC environments
+  can have `Qfalse` there, but are not Ruby ISEQ frames executing this instruction.
+* All three call forms give the guards the original-send snapshot. Their direct-call frame state omits the
+  consumed block argument; their overflow exit must not. Operand traversal includes both snapshots and the
+  Symbol operand. Mutation of both C-call overflow checks demonstrated that the CLI regression catches using
+  the stripped state by mistake. Suspended fiber and Ractor frames retain their accepted Symbol handler when
+  `Symbol#to_proc` is subsequently replaced; the next send observes the replacement.
+
+**Maintainability.** The guard policy has one shared HIR helper, and the lower-level block handler reuses the
+existing VALUE representation. The small `block_arg_symbol` helper removes the duplicated match at the two
+C-call sites. `GetCref` belongs beside `GetEP`; no VM conversion wrapper or new per-ISEQ state was added by this
+head. The two-state distinction is necessary, not accidental optionality. No touched file crosses the 1,000-line
+threshold. New enum/field documentation explains representation and snapshot contracts; the two guard comments
+explain otherwise non-obvious semantic exceptions. No additional comment deletion or structural change requested.
+Ruby complexity metrics would not assess this Rust enum/match change meaningfully.
+
+**Independent probes.** `probe.rb` has 20 scenarios, each warmed 100 times where applicable. It compares plain
+interpreter output against uncompiled JIT-enabled execution (threshold 1,000,000), thresholds 1 and 2 (the latter
+with one profile), default options and threshold 2 with inlining disabled: 100 comparisons. It covers reading,
+storing and forwarding `&b`, `block_given?`, `yield`, `super`, `define_method`, `proc`, `Proc.new` and a Proc
+subclass; cache eviction and identity; duck-typed receivers with `method_missing`/`respond_to_missing?`; private
+methods, arity errors and exception backtrace labels/line numbers; asymmetric keywords; dynamic Symbols and
+polymorphic block arguments; redefinition during argument evaluation and during the callee; late `using` and
+refined conversion; suspended fibers, Ractors, TracePoint activation, binary-loaded ISEQs and eval bindings.
+`compact.rb` adds eight mutation cases with forced compaction before and after the change, and
+`ractor_suspend.rb` replaces conversion on the main Ractor while another Ractor is suspended inside the callee.
+Those add 27 comparisons. All 127 match the plain interpreter, with no failed subprocess. No builtin-selection
+normalization was needed for these probes. A HIR dump of the cache case confirms the compiled `SendDirect`,
+tracked CME, basic-bit guard, `GetCref` and refinements guard; these were not merely cold-interpreter comparisons.
+
+Fresh execution, x86-64, `--enable-zjit=dev --disable-install-doc --disable-yjit`, `make -j2`:
+
+| Command/check | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run: 2,051 pass, one SIGABRT, 15 skipped |
+| Base Rust control, same lockfile and native archive | 2,034 run: 2,033 pass, the same SIGABRT, 15 skipped |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same btest at threshold 2 | 2,148/2,148 |
+| `make test-all TESTS='test/ruby/test_zjit_cli.rb'` | 34 tests, 7,907 assertions, no failures/errors/skips |
+| 11 core files, `RUN_OPTS='--zjit --zjit-call-threshold=1'` | 1,380 tests, 64,214 assertions, no failures/errors, one skip |
+| Independent differential probes | 127/127 comparisons match; repeated after restoring exact head |
+| Delete only `GuardAnyBitSet` in the Symbol helper | 5/19 Symbol tests fail: identity behavior plus four HIR snapshots |
+| Delete only the cref `GuardBitEquals` | 7/19 fail: three behavioral tests plus four HIR snapshots |
+| Use stripped `state` for both C-call overflow exits | CLI overflow regression fails with `TypeError: no implicit conversion of Array into Proc` |
+| Restore exact head, rebuild, rerun Symbol filter | 19/19 pass; source diff empty |
+| Restored overflow regression | One test, 26 assertions, no failures/errors/skips |
+
+The full-suite failure on both head and base is `test_profile_frames_during_direct_jit_to_jit_entry`,
+"rb_profile_frames was not called from SIGPROF handler". The base control builds the base's `zjit`, `jit` and
+`yjit` Rust sources against this build's `libminiruby.a`; the only C change in the PR is a declaration. This is
+not a separate base-C build. The 11 core files are proc, refinement, symbol, method, call, yield, lambda, array,
+enum, settracefunc and backtrace. btest prints its existing `Fiber count: 10000 (skipping)` diagnostic; both
+runs conclude `PASS all 2148 tests`. No arm64 execution or new benchmark in this review.
+
+**Wrong-variant controls are behavioral, not only snapshot checks.** With the basic-bit guard deleted,
+`CASE=cache` prints `[true, true, true, 8]` in the interpreter but `[false, true, true, 8]` at thresholds 1, 2 and
+default. With the cref guard deleted, `CASE=late_using` prints `[107, [107], 107]` in the interpreter but
+`[8, [8], 107]` in all three JIT modes. The restored head gives the interpreter result in every mode. The
+variadic element in the latter mutation remains correct; the ISEQ and fixed-C elements distinguish the bug.
+
+Reproduction material is retained in `.amp/in/orb-backup/zs1-astra/` in the review thread: `probe.rb`,
+`compare.py`, `compact.rb`, `ractor_suspend.rb`, `supplement.py`, `layout.c`, the three `wrong-*.patch` files,
+outputs and `logs/`. Steps: clone the pinned fork branch into that directory's `ruby/`; run `autogen.sh`, configure
+with the flags above and build; run `python3 compare.py` and `python3 supplement.py`; apply one wrong patch at a
+time, rebuild and run the named case/filter; restore the changed source from the pinned head, rebuild and repeat
+the comparisons. The overflow filter is
+`TESTS='test/ruby/test_zjit_cli.rb -n /test_stack_overflow_exit_from_send_with_normalized_keywords/'`.
+No Ruby source change, push or public comment was retained or made.
+
+After the independent audit, read XrXr's two actual review comments via GitHub's API. The new HIR speculation and
+cref/nil guard match the requested shape. The body and commit messages accurately describe the accepted call
+forms and guards; historical benchmark rows explicitly name an older head and were not remeasured or certified
+by this correctness pass. Acceptance of the final revision remains the maintainer's decision.
+
+#### thermos-astra confirm on `5b3e0d0be5`: changes (2026-11-25)
+
+Same [review thread](https://ampcode.com/threads/T-01a21206-053e-70de-a4ac-3bbadd53e8c0), both rubrics personally,
+no delegation. Exact fork head `5b3e0d0be52c2d20b2dab51a82ee7868b57200a1`, two commits on
+`a43519979c7a8fbb9c5bbcf8d7b1daf739a60c4f`. Compared old and new base trees separately: their changes are outside
+ZJIT; the review delta is the stated +23 −2 in five Rust files. Rebuilt with the same dev configuration.
+
+**Must fix — the new payload update is unsynchronized across Ractors.**
+[`exit_block_arg_refinements`](https://github.com/thomasklemm/ruby/blob/5b3e0d0be52c2d20b2dab51a82ee7868b57200a1/zjit/src/codegen.rs#L4013-L4019)
+calls `get_or_create_iseq_payload` and stores into a plain `bool` without acquiring the VM lock.
+`c_callable!` selects the calling convention; it does not lock. The payload is shared by executions of the
+same ISEQ in different Ractors, and
+[`payload_ptr_as_mut`](https://github.com/thomasklemm/ruby/blob/5b3e0d0be52c2d20b2dab51a82ee7868b57200a1/zjit/src/payload.rs#L143-L151)
+explicitly requires exclusive access under the VM lock. Two unsynchronized stores of `true` are still a Rust
+data race; writing the same value is not a synchronization mechanism.
+
+**Direct evidence on the unmodified head:** `r4_ractors.rb` starts four Ractors that repeatedly call one refined
+method. GDB stopped at the new callback and inspected its ISEQ argument and `rb_vm_locked_p()`. Twelve captured
+entries alternated between native threads 3 and 4, all with ISEQ `0x7fffde888dc0` and lock result `0`. The ordinary
+run returns `[28000, 28000, 28000, 28000]`, matching the interpreter. This is evidence of a reachable unlocked
+shared write, not a claim that this run produced a wrong Ruby result or crashed. The diagnostic uses
+`--zjit-num-exits-until-invalidate=1000000` to keep the same compiled guard live for repeated observations; a
+separate run with the default exit budget also reaches the callback unlocked. The high budget is not required
+for the defect.
+
+Smallest fix: wrap this callback's payload update in `with_vm_lock(src_loc!(), || { ... })`. A temporary local
+patch did that: GDB at the assignment then returned lock result `1`, all 19 Symbol tests passed, and the
+four-Ractor and inline/compaction/churn probes retained their interpreter results. The existing
+`exit_recompile` fast path also accesses payload state outside its later lock; that code predates this delta
+and is not charged to this PR. It is not a justification for introducing another unprotected write. Combining
+the callbacks under a single properly scoped lock would also be reasonable, but is a larger change than the
+validated wrapper. The patch was removed and the exact head rebuilt; no Ruby change was committed or pushed.
+
+**Inlining and lifetime otherwise check out.**
+
+* `refined_iseq` is the side-exit frame's ISEQ, while `compiled_iseq` remains the outer compiled unit. The two
+  roles are correct: remember the refusal on the leaf, invalidate the unit that actually contains the guard.
+  `type_specialize` queries the same frame-state ISEQ. The new field participates in `SideExitRecompile`'s
+  equality/hash, so exit deduplication does not discard this distinction.
+* `r4_lifetime.rb` actually inlines the refined leaf. After the exit, its HIR shows
+  `PushInlineFrame :leaf_refined` followed by a dynamic Symbol send, then `PopInlineFrame`, while the unrefined
+  parent's `Array#sum(&:succ)` remains a guarded `CCallVariadic`. This checks the ownership decision rather than
+  only the final number. The script then forces compaction, calls that code again, and creates/removes 20 fresh
+  refined modules with collection/compaction between them; results stay `22` and `:lifetime_ok`.
+* The new ISEQ operand is `Opnd::Value`, so the existing embedded-VALUE marking/compaction path retains and
+  updates it even when the refined method is inlined. The flag has no Ruby reference to mark, defaults to false
+  on a fresh payload, and is freed with that payload by `rb_zjit_iseq_free`; there is no separate address-keyed
+  flag table that could survive ISEQ address reuse. It is conservative across call sites and Ractors: a marked
+  ISEQ can lose specialization, but never skips the interpreter conversion.
+* GDB reports `sizeof(IseqPayload) == 152` on both the base control and round 4, so this compiler uses existing
+  padding for the extra bool. The lifetime/churn run with default JIT options reports `zjit_alloc_bytes=82075`
+  at exit. That is an absolute diagnostic, not a whole-program memory or performance comparison.
+
+Fresh exact-head results: `make zjit-test` 2,051/2,052, 15 skipped, the same SIGPROF abort; btest at thresholds
+1 and 2 each 2,148/2,148; CLI 34 tests/7,907 assertions, no failures/errors/skips. The original 127 differential
+comparisons still match, as do six additional interpreter comparisons of the Ractor and lifetime probes at
+thresholds 1/2/default. After removing the temporary locking patch, the Symbol filter passes 19/19 and the
+Ruby source diff is empty. No arm64 run and no new speed claim.
+
+**No additional nit.** Apart from the synchronization defect, using existing side-exit machinery and one
+monotonic payload bit is a small, understandable fix; the original correctness guards remain intact. The tests
+exercise the old guards but ordinary output comparisons cannot detect this race, as the passing Ractor output
+demonstrates. A lock-invariant check or sanitizer coverage is needed to verify that part of a future fix.
+
+Additional reproduction files in the same scratch directory: `r4_ractors.rb`, `r4_lifetime.rb`, `lock.gdb`,
+`r4-lock-threads.txt`, `r4-fixed-lock-gdb.txt`, `r4-lock-fix.patch`, `r4-lifetime-hir.out` and round-4 logs. Run
+`gdb -q -batch -x ../lock.gdb ./ruby` from the Ruby build for the unlocked-entry diagnostic. The debugger locks
+scheduling only during its call to the read-only lock query, then resumes all threads. This report's two
+verdicts are therefore: round 3 correctness approved with its previously known performance blocker; round 4
+changes required for the newly introduced shared-state write.
