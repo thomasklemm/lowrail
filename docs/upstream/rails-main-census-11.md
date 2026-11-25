@@ -197,3 +197,117 @@ Cold read: “Ordinary procs and rest-accepting callbacks get the scheme; fixed-
 | “Lambdas that take the token and options get those two, as before.” | True for maximum-two-positional signatures, not every lambda callable with two arguments. Narrow that wording. |
 
 The draft is otherwise short, with a concrete failure and no suite counts, commands, pins or footer. It need not gain an independent CHANGELOG entry for an unreleased minor fix; clarify the existing optional-third feature entry if its contract is narrowed, as #59858 does. The commit's substantive text matches the narrow two-parameter failure, but has the same overbroad “blocks that can take it” summary and a forbidden `Amp-Thread-ID` trailer. Both author and committer are Thomas. If ever rebuilt, remove that trailer and the added redundant two-line comment above `takes_scheme?`; the signature tests should explain the boundary. The immediate smallest action is to leave **TA1 superseded** and open/post nothing.
+
+## IX1 confirmation
+
+**Pass:** `reviewer: thermos-sol`; **head:** [`30368145ecb76500e10ae487c4ffff219b1403d7`](https://github.com/thomasklemm/rails/commit/30368145ecb76500e10ae487c4ffff219b1403d7), branch `thomasklemm/index-definition-adapter-readers-2`; **verdict: approve**, no remaining must-fixes. This supersedes the first pass's changes verdict for the rebuilt head and current queue body. Both Thermos rubrics were applied directly in the same review thread, without delegation. The parent is still `cf0325a832a1594f01d866da1e4ad23d962d886b`.
+
+The complete tree diff against `0f2f426a85b759ee74af71692a9651f7391a616f` deletes **only the redundant two-line comment**. All five readers and the regression test are byte-identical; no source, schema, constructor or test behavior changed. The [first pass's correctness, private-API restore and ownership assessment](#ix1) therefore still applies, including the distinction between an intentional adapter split and an unannounced break for released reader callers. No new layer, conditional, state or maintainability problem was introduced.
+
+Every required correction was checked:
+
+* The redundant comment is gone. Both author and committer are Thomas Klemm `<github@tklemm.eu>`, and the commit has no trailers. Its title and message describe the reader move, affected calls, neutral values and retained adapter overrides accurately.
+* The body now starts with the introducing change and proposed fix. “The adapter subclasses keep their own readers” still matches the code. The next paragraph explicitly discloses `:nodoc:` and limits the failure to callers of those readers; its PostgreSQL example remains valid.
+* The caller paragraph now separates the doctor's `type` detector from index-recreating migration helpers. All four released-version SHA/line permalinks in the body were refetched and their calls reconfirmed against the [caller table](#released-callers-and-default-branch-check). No default-branch link remains in that paragraph.
+* The remaining body sentences make no new constructor, identity, schema-cache or full-app compatibility promise. There are no test counts, commands, review notes, footer or performance claims in the draft. Its 127 whitespace-delimited tokens, including the example and links, do not justify adding further explanation.
+
+The exact-head commands from [Tests and maintainability](#tests-and-maintainability) were rerun independently with the same isolated bundle, Ruby 4.0.7, seed 41231 and one worker:
+
+| Run | Runs | Assertions | Failures | Errors | Skips |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| SQLite (`sqlite3_mem`) | 116 | 1383 | 0 | 0 | 5 |
+| PostgreSQL | 373 | 2294 | 0 | 0 | 1 |
+| SQLite, new test with exactly the five readers removed in-process | 1 | 0 | 0 | 1 | 0 |
+| PostgreSQL, same counterfactual | 1 | 0 | 0 | 1 | 0 |
+
+Both counterfactual errors are `NoMethodError: lengths`, on the abstract and PostgreSQL index definitions respectively. Logs: `ix1-confirm-{sqlite,postgresql,without-sqlite,without-postgresql}.log` in the review scratch directory. This approves this exact reader-value shim and body, not MySQL execution, removed constructor keywords or schema-cache rollback behavior. No Rails branch, PR or comment was changed by this confirmation.
+
+## UG82M
+
+**Pass:** `reviewer: thermos-sol`; **head:** [`de4d27b257337464438695d3d6600af13bdf0482`](https://github.com/thomasklemm/rails/commit/de4d27b257337464438695d3d6600af13bdf0482), branch `thomasklemm/upgrade-guide-mailer-active-job-railtie`; **verdict: changes**, for PR-body accuracy, not a production-code defect. Both Thermos rubrics were applied directly, without delegation. The parent is `cf0325a832a1594f01d866da1e4ad23d962d886b`; the entire diff is 16 added guide lines. The body audited is the queue version first published at Lowrail `7001364f39`, unchanged when read from `d6410af0`.
+
+### Intent, duplication and reach
+
+[Rails PR 59820](https://github.com/rails/rails/pull/59820), by Jean Boussier, merged 2026-11-16 as [`ed17c90871d2c65acc201c082c1f6f924d6d55f9`](https://github.com/rails/rails/commit/ed17c90871d2c65acc201c082c1f6f924d6d55f9). Its substantive commit, [`1897e3587fc6e26b533d0f9e5462feb90921bad3`](https://github.com/rails/rails/commit/1897e3587fc6e26b533d0f9e5462feb90921bad3), explicitly intends mailer-only apps to load less code and removes `require "active_job/railtie"`. It has no conversation comments, inline comments or reviews. That change is absent from the stable control. The behavioral difference is real and unreleased, but **the decoupling itself is deliberate**. A guide note with an explicit require is a better fit than restoring coupling or demanding deprecation of it.
+
+The [CHANGELOG entry](https://github.com/rails/rails/blob/1897e3587fc6e26b533d0f9e5462feb90921bad3/actionmailer/CHANGELOG.md#L1-L6) generally announces removal of the hard dependency. Its only migration instruction concerns standalone Action Mailer and adding Active Job to the Gemfile. It does not explain Rails applications' explicit railtie lists, missing `config.active_job`, adapter initialization or test hooks. The queue's “covers only standalone use” is too categorical; “omits the explicit-railtie migration” is accurate. The upgrade guide on the parent and checked upstream main `818edfd76a405b29f4695e051c07ea28a5476a4e` has no such note. Searches for the railtie require and recent Action Mailer upgrade-guide PRs found no competing note or restore.
+
+The census reports nine of ten sampled mailer applications already require the Job railtie. This review did not rerun that sample or turn it into a prevalence estimate. That is narrow reach, not a reason to restore the deliberate dependency or invent a broad compatibility emergency. A short upgrade note is worthwhile: the affected framework-list configuration is concrete, and its fix is one require.
+
+Released caller evidence was fetched at the linked SHAs:
+
+| Caller | Released line permalink and observation | Default-branch check |
+| --- | --- | --- |
+| turbo-rails 2.0.23 | [engine.rb:103–109](https://github.com/hotwired/turbo-rails/blob/435135b26a4b62e49d2f55bb4b1fd419e3bfb228/lib/turbo/engine.rb#L103-L109): `if defined?(ActiveJob)` guards `include Turbo::Broadcastable::TestHelper` inside the test-case load hook | Same guard at main `10d72f2445217e4dcbcea73924c99e9cc12705f5`; no unreleased repair |
+| ViewComponent 4.25.0 | [application.rb:5–12](https://github.com/ViewComponent/view_component/blob/2ebe9f9e3b6550c9df4d92a847b0acf160617fd2/test/sandbox/config/application.rb#L5-L12): `require "action_mailer/railtie"` and `require "turbo-rails"`, but no Job railtie | Main is the same release commit |
+
+The Turbo omission was reproduced on the real released gem in a small Rails application. The complete ViewComponent sandbox suite was **not** run; the linked source shows the affected require pattern, not independent certification of the census's complete sandbox-failure claim.
+
+### Behavioral checks and smallest required corrections
+
+Fresh-process probes use the public Rails application configuration, mail delivery and test-case hooks, with source locations proving which checkout is loaded. They separate the three effects instead of describing one boot-failing application as also silently ignoring configuration:
+
+| Scenario | 8-1-stable control | Exact UG82M head |
+| --- | --- | --- |
+| Mailer railtie, no Job railtie, test environment, no adapter setting | Job railtie loaded; `config.active_job` exists; `deliver_later` uses TestAdapter, one enqueued mail | Active Job absent after boot; delivery loads it late and uses AsyncAdapter |
+| `config.active_job.queue_adapter = :inline` during initialization | Boots; one mail delivered inline | Boot raises `NoMethodError: active_job` |
+| Explicit Job railtie before or after the mailer railtie, before boot | TestAdapter, one enqueued mail | Same; both require orders work |
+| `rails/all` | TestAdapter, one enqueued mail | Same |
+| Turbo action-cable/test-case hooks, implicit Job only | Broadcastable test helper included | Helper omitted; loading `active_job` after the test-case hook does not repair it |
+| Turbo hooks with explicit Job railtie | Helper included | Same |
+| Set `ReviewMailer.delivery_job.queue_adapter = :inline` directly | One mail delivered inline | Same; direct adapter configuration is not ignored |
+| Production, implicit railtie, no adapter setting | AsyncAdapter | AsyncAdapter |
+
+The boot error and changed test default are alternative paths. There is no evidence that a successfully configured queue adapter is silently discarded; the direct-adapter control contradicts a blanket version of that claim. This refines the AM2 row and UG82M `impact` wording above, without rewriting the census author's in-progress observations.
+
+**P2, must fix before opening: the draft body conflates missing configuration with ignored configuration.** Delete “and `deliver_later` no longer uses its configured queue adapter.” Name `config.active_job.queue_adapter` (or settings under `config.active_job`) rather than saying setting the namespace itself fails. If retaining adapter detail, distinguish the unconfigured test default, TestAdapter → AsyncAdapter, from boot failure. Correct the same configured-adapter wording in `impact`.
+
+**Must correct the CHANGELOG characterization:** delete the final “outside Rails only” sentence, or say its migration instructions do not cover explicit Rails railtie lists. The general decoupling announcement does cover the change. Cut the meta opening “This adds a section…” so the body starts with the affected application and introducing change. No new code, abstraction or upstream investigation is needed for these text corrections.
+
+The guide itself is substantially accurate. Optional precision at [lines 155–156](https://github.com/thomasklemm/rails/blob/de4d27b257337464438695d3d6600af13bdf0482/guides/source/upgrading_ruby_on_rails.md#L155-L156): say “settings under `config.active_job`” and distinguish the boot failure from the fallback path. “If your app relied on the implicit require” also states the boundary more precisely than treating every explicit framework list alike; another engine can load the Job railtie. These are clarity improvements, not an identified runtime defect in the note's explicit-require remedy.
+
+### Sentence audit and maintainability
+
+| Draft part | Assessment against DECISIONS |
+| --- | --- |
+| Title, “Note in the upgrade guide that Action Mailer no longer loads Active Job” | Names the documentation change; body/guide correctly specify the railtie, rather than claiming Active Job can never load later. |
+| “This adds a section … that the guide doesn't mention yet.” | True at the pinned parent and checked main, but meta text duplicates the diff. Cut for the prescribed problem-first shape. |
+| “Since #59820 … no longer loads the Active Job railtie.” | Verified from the introducing source and boot probes. |
+| “An app that lists its frameworks … raises … sets `config.active_job` … no longer uses its configured queue adapter.” | Boot-error portion needs a nested setting example; configured-adapter clause is unsupported and must be cut or replaced with the separate test-default behavior. |
+| “The CHANGELOG entry covers Action Mailer used outside Rails only.” | Overstates the entry; cut or narrow to missing railtie-list migration instructions. |
+
+The 75-word body has no test counts, commands, SHAs, review notes, footer or performance claim. It needs less text, not a report. It cites no downstream caller needing a body permalink; released caller evidence remains here. The commit contains only its accurate title, with Thomas as both author and committer and no trailers.
+
+Cold read of the guide change: “If the mailer railtie was your only path to Job integration, require the Job railtie yourself; `rails/all` already does.” The existing 8.1 → 8.2 section is the canonical location. The Ruby fence and local prose style match neighboring upgrade notes. There is no added guard, state, framework branch, helper, abstraction or coupling. The file was already 3113 lines and becomes 3129, so this does not cross the 1000-line threshold or justify decomposing a chronological upgrade guide. No structural must-fix was found.
+
+### Exact-head validation
+
+All commands use the isolated review bundle and Ruby 4.0.7. The harness is retained in `.amp/in/orb-backup/rails-review/ug82m-{contract,probe}.rb`; it asserts expected adapters, boot-error names, helper inclusion and enqueued/delivered counts, not just successful process exits. Its stable control is `1afb398af94c3f76567d427a279637dbfaac8b3f`.
+
+```sh
+# Lowrail root, after sourcing .amp/in/orb-backup/rails-review/env.sh
+bundle exec ruby .amp/in/orb-backup/rails-review/ug82m-contract.rb
+# Repeat ug82m-probe.rb implicit with TREE=stable/head and RAILS_ENV=production
+
+# actionmailer/
+bundle exec ruby bin/test test/message_delivery_test.rb test/parameterized_test.rb test/test_helper_test.rb --seed 41231
+# railties/
+bundle exec ruby -Itest test/application/initializers/frameworks_test.rb --seed 41231
+bundle exec ruby -Itest test/application/configuration_test.rb --name /active.job.adapter/ --seed 41231
+# guides/
+bundle exec rake test TESTOPTS='--seed=41231'
+# Rails root, where the repository .mdlrc is applied
+bundle exec mdl guides/source/upgrading_ruby_on_rails.md
+```
+
+| Check | Runs / assertions | Failures / errors | Skips |
+| --- | --- | --- | ---: |
+| Stable/head fresh-process contract | 18 scenarios passed | 0 mismatches | 0 |
+| Production controls | Both trees use AsyncAdapter | 0 mismatches | 0 |
+| Action Mailer delivery, parameterized and test-helper suites | 88 / 275 | 0 / 0 | 0 |
+| Railties framework initializers | 28 / 52 | 0 / 0 | 0 |
+| Railties adapter configuration cases | 7 / 14 | 0 / 0 | 0 |
+| Guides suite | 18 / 39 | 0 / 0 | 2 |
+| Rails-configured Markdown lint | Passed | 0 violations | — |
+
+The first frameworks/Guides attempts exposed missing local `mysql2`/Dart Sass tooling; both were installed in the isolated review bundle, then the reported checks were rerun. Guides emits existing duplicate RDoc/lexer warnings. Running `mdl` from the Lowrail root applies the wrong defaults and reports numerous legacy guide violations; the Rails-root invocation above applies Rails's rules and passes. No check was suppressed or Rails source modified. This is documentation-only, so it adds no runtime test expected to fail without the note; the differential probes instead establish that the behavior it documents is real. Logs are retained under the review scratch directory (`ug82m-*-final.log`, `ug82m-mailer.log`, `ug82m-configuration.log`, `ug82m-production-controls.log`).
