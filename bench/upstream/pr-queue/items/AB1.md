@@ -11,6 +11,7 @@ built_on: "50c54eed06"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/p-map/ab1-review-ips-yjit.txt, docs/upstream/data/p-map/callgrind.txt]
 impact: "allow_browser is 0.5-3% of a request in the 3 of 5 profiled apps that use it (Rails 8 default); benchmark-ips 1.96x on a bare controller request (YJIT 94.35 -> 48.08 us, best of 5, A/A +1.9%; ZJIT master 82.6 -> 42.9 us); Callgrind -9.5%/-12.1% Ir on a small JSON request, -2.7%/-3.6% on an HTML page"
 rank: 13
 risky: false

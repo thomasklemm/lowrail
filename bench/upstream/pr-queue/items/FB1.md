@@ -11,6 +11,7 @@ built_on: "a5203b3d4d"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/form_helper_stack/body/fb1/gated]
 impact: "field_id, field_name and Tags::Base#sanitized_method_name copy only when there is something to replace: 6 fewer objects per builder field (f.text_field 28 -> 22, f.check_box 32 -> 26); Callgrind interp / YJIT, JIT-flat (form_helper_stack/body/fb1/gated): text_field -3.3% / -5.4% (persisted -2.9% / -4.4%), check_box -2.2% / -3.6% (persisted -2.2% / -4.0%)"
 rank: 30
 risky: false

@@ -11,6 +11,7 @@ built_on: "50c54eed06"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/query-building/mb1-ips.txt, docs/upstream/data/query-building/callgrind.txt]
 impact: "every association scope merges a blank scope_for_association relation into a relation without conditions (39-48% of all merges, 7-25 per request in Fizzy, Lobsters, Mastodon, Campfire); skipping it saves 5-6 objects each; benchmark-ips on building post.comments.where(...): interp +21.5% (A/A -0.7%), YJIT +14.9% (-2.1%), ZJIT +18.9% (-2.0%), reviewers +13-18%; Callgrind interp, same-round base and A/A: -1.39% Fizzy card, -0.78% Campfire message, -0.61% Lobsters story (A/A <= 0.06%), -0.39% Fizzy card list (first-round base), unchanged on preload-only pages; YJIT Callgrind Fizzy card -1.10% rejected (18 blocks compiled in the branch window)"
 rank: 26
 risky: false

@@ -11,6 +11,7 @@ built_on: "9c9f8f28cc6f297c6944b3cc6f567bf4ebcd98b6"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/graphql_ruby/gq1-pr]
 impact: "every schema without `use GraphQL::Schema::Visibility` (the default; the install generator does not add it) validates through the Warden: rake bench:validate 1.09x-1.16x i/s on introspection, abstract fragments and big query (A/A within 3.9%), Callgrind -7.5% to -12.4% Ir; execution Ir within 1%; 5000-identical-field stress -43% Ir stays in the record"
 rank: 1
 risky: true

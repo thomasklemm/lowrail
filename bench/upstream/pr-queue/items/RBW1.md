@@ -11,6 +11,7 @@ built_on: "0e67be03ef"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/ruby_bench_blog/experiments]
 impact: first ruby-bench workload that writes (validations, callbacks, transactions, Turbo broadcasts)
 rank: 3
 risky: false

@@ -11,6 +11,7 @@ built_on: "4f00fbc946"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/form_helper_stack/am1_ips_aa.txt, bench/upstream/form_helper_stack/body/am1]
 impact: "errors[attr] on a model without errors returns [] without normalizing and filtering: 5 -> 1 objects per call, about 4x i/s under YJIT; form builder text_field 28 -> 24 objects"
 rank: 30
 risky: false

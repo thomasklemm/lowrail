@@ -12,6 +12,7 @@ built_on: "1207d609"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/ruby_bench_dst/ir-tzinfo-eq.txt]
 impact: "comparing equal periods 11,446 -> 3,440 instructions; same-period beginning_of_day/change/70.days.ago in Active Support 12-19% fewer instructions"
 rank:
 risky: false

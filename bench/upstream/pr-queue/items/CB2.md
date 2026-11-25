@@ -11,6 +11,7 @@ built_on: "1e235cee11b0a7aecb189d8837534807626287aa"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/census-backlog-refresh/callback-micro.txt, docs/upstream/data/census-backlog-refresh/object-valid.txt]
 impact: one Array fewer per symbol around callback; 1.2% fewer interpreter instructions per callback run on Ruby 4.0.9
 rank: 14
 risky: false

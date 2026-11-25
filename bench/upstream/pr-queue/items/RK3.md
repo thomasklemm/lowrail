@@ -12,6 +12,7 @@ built_on: "b432304e"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/rk3/body/RK3-head, bench/upstream/rk3/head]
 impact: "Query/form keys and values and cookies read or written are decoded and escaped by cgi/escape: full checkouts of the head against rack main save −1.0% to −5.5% instructions per request in the interpreter with glibc fastbins off (four requests, three apps) and −2.8% to −10.0% under YJIT (three requests, two apps, every window JIT-flat), about 60–150 fewer objects; no differences against URI in 300k-case differentials plus coercion cases on Ruby 3.2–4.0 except BasicObject, which now raises NoMethodError, with and without cgi/util and with the Ruby CGI implementation"
 rank: 1
 risky: false

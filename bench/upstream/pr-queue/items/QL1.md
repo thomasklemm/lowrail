@@ -11,6 +11,7 @@ built_on: "50c54eed06"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/def8/ips, docs/upstream/data/def8/ir-prototypes.tsv]
 impact: "Every request of every app with Active Record at the default info log level runs \"query\".pluralize(count) for its Completed line when the count isn't 1 (43k interpreter instructions, 6 objects a call). Whole request, Callgrind interpreter: new app's JSON bare request -3.84% (A/A -0.03%), JSON show with 2 queries -1.03%, HTML bare page -1.77% (A/A -0.59%), HTML show -0.92%; 6 fewer objects. Vernier YJIT: the pluralize is about 2% of a new API app's bare JSON request. benchmark-ips on log_process_action 245.1k -> 792.6k i/s (3.2x, YJIT, best of 5, A/A -2.5%). Lifetime: Rails main, 8.x and 7.2; runs on every Ruby."
 rank: 14
 risky: false

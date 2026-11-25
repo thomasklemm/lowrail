@@ -11,6 +11,7 @@ built_on: "50c54eed06"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/app_suites/op8-bench]
 impact: "OpenProject's HealthReport.new(...).save! stops raising PG::NotNullViolation; nested JSON defaults no longer shared between new records; fixes unreleased #59083"
 rank: 1
 risky: true

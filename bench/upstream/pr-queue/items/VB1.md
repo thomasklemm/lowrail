@@ -11,6 +11,7 @@ built_on: "8217632cf8"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/vb1/results]
 impact: "Unreleased since #59141: every first read of an attribute (generated readers via fetch_value_at!, id/read_attr/_read_attribute via value_at!) passes &:value! to cast_value, and every record dup maps &:deep_dup; YJIT and ZJIT make each such call a generic send. Block literals remove them (300 -> 0 generic calls for 10 records x 30 reads in both JITs). Callgrind, 30 columns, 10 records each read once: interpreter -2.5%, YJIT -7.5% (4.0.9), ZJIT -20.6% (master 674c477295); dup of a loaded record -1.9% / -5.7% / -12.3%; A/A <= 0.09% in those cells. railsbench-like request mix: ZJIT -0.58% (A/A 0.08%), interpreter within A/A, YJIT cell rejected. Load, #attributes and warm reads unchanged within 0.3%, apart from YJIT compiled-state variance. Lifetime: Rails main only (8.1 has no LazyIndexedAttributeSet); runs on every Ruby."
 rank: 7
 risky: false

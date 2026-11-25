@@ -11,6 +11,7 @@ built_on: "fc4cd8872b"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/zne1]
 impact: "a `!=` with more than one receiver class (nil or Symbol, Integer or nil, model classes) is specialized per class instead of staying a dynamic send; 4.6x on a tag_options-shaped micro (4.4x to 5.1x in three rounds); lobsters -10,323 and shipit -30,074 polymorphic sends per iteration, app times within A/A"
 rank: 3
 risky: true

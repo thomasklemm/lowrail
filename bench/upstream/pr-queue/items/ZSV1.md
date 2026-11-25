@@ -11,6 +11,7 @@ built_on: "3b188d0dd5"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/zsv1/stats-3]
 impact: "eligible ordinary objects with singleton classes get shape-specialized ivar writes instead of recompile exits and a generic final-version fallback; lobsters -584 generic setivar per iteration (master/master-aa/branch stats, unchanged on master 3b188d0dd5, bench/upstream/zsv1/results-3.md); railsbench and shipit generic-write totals unchanged, but Shipit fallback reasons shift -81/+81; no speed claim"
 rank: 2
 risky: false

@@ -10,6 +10,7 @@ head: "64b0190a0a5df7abc35368535aa791f192bc65b4"
 base: main
 built_on: "d1d82840f35507066cf7b0c885d2e78fcc274aa4"
 depends_on: []
+evidence: [docs/upstream/data/driver-cpu]
 impact: "Every UTF-8 SQLite text bind in Rails and direct-driver apps avoids a temporary String; a common 20-name lookup drops 162 to 142 objects and 0.82% interpreter query instructions. YJIT select_all drops 1.27% with passing A/A; the pluck instruction window rejects for compilation."
 rank: 22
 risky: true

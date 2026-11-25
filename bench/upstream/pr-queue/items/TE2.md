@@ -11,6 +11,7 @@ built_on: "50c54eed06"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [docs/upstream/data/vm-share/te2-ips-idle2-raw.txt, docs/upstream/data/vm-share/prototypes-ips.txt]
 impact: "Every attribute of every tag helper call (tag.*, content_tag, link_to, form helpers) on every HTML page: under YJIT, nil != :aria / :class were two rb_obj_not_equal + rb_funcall(==) calls per attribute, 0.10-0.57% of Puma samples on the CE2 Blog/Fizzy/Lobsters pages. Callgrind whole requests under YJIT (0 blocks compiled): Blog article -1.55% (A/A -0.15%), Lobsters settings form -1.73%, Fizzy card -2.27% (their A/A cells failed or compiled blocks); interpreter -0.03% to -0.64%. Micro (tag.a with 3 attributes + content_tag): YJIT -7.2%, ZJIT on master -16.9%, interpreter -1.7% (A/A <= 0.24%). benchmark-ips under YJIT, best of 10 interleaved: tag.a +8.9%, content_tag +8.3% (A/A +0.1%, +2.7%)."
 rank: 15
 risky: false

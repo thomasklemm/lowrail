@@ -11,6 +11,7 @@ built_on: "21ee43fb1e"
 depends_on: []
 stacked_on:
 alternative_of:
+evidence: [bench/upstream/zjit-stats/rank-ots1.txt, bench/upstream/zjit-stats/raw]
 impact: "removes a permanent side exit: a String-profiled interpolation that also sees a Symbol exits on every such call; lobsters guard_type_failure 677 -> 139 per iteration (content_tag_string), side exits 10,167 -> 9,629 (two runs each on -2); the recompiled version keeps FixnumToString and rb_mod_name for profiled Integers and Modules, so none of the default-config probe modes allocates more than master (diagnostic Callgrind slopes -1.6% to -3.5% on String-led mixes, the rest within A/A); run_benchmarks.rb within A/A on the old head"
 rank: 3
 risky: false

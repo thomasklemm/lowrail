@@ -10,6 +10,7 @@ head: "979b9f6b9914ea61c3f4f5b3b06b264c7f9e760c"
 base: main
 built_on: "d1d82840f35507066cf7b0c885d2e78fcc274aa4"
 depends_on: []
+evidence: [docs/upstream/data/driver-cpu]
 impact: "Every multi-column SQLite result row, including default Rails record loads. A complete 1,000-row seven-column model load (to_a, lazy attributes) uses 2.69% fewer YJIT instructions and 1.27% fewer interpreter instructions, with passing A/A and unchanged objects. Native row memory matches main on Ruby 3.2/3.3/3.4; no whole-request saving is established."
 rank: 23
 risky: true
