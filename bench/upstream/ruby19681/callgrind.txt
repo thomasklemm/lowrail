@@ -1,0 +1,7 @@
+# cg.sh, one run per ruby and bench, Ir collected under with_compile_time_stat (compile Ir); regalloc = compile_with_regs::{closure#1}; hcsr = handle_caller_saved_regs inclusive. ZSTATS are Callgrind-slowed ns.
+railsbench master compile_Ir=7715980622 regalloc=1,656,347,738 hcsr=639,218,636 brk_overflow=0 compile_time_ns=58887943303 compile_lir_time_ns=35185929860 compiled_iseq_count=2722 failed_iseq_count=0 code_region_bytes=5013504
+railsbench head compile_Ir=7396647518 regalloc=1,331,521,701 hcsr=314,250,547 brk_overflow=0 compile_time_ns=57276845661 compile_lir_time_ns=33492403133 compiled_iseq_count=2723 failed_iseq_count=0 code_region_bytes=5017600
+lobsters master compile_Ir=26274418435 regalloc=7,599,394,510 hcsr=4,199,049,245 brk_overflow=0 compile_time_ns=184215033837 compile_lir_time_ns=112707287555 compiled_iseq_count=6627 failed_iseq_count=0 code_region_bytes=14970880
+lobsters head compile_Ir=23175150989 regalloc=4,474,298,509 hcsr=1,073,278,203 brk_overflow=0 compile_time_ns=172504501867 compile_lir_time_ns=100955260876 compiled_iseq_count=6624 failed_iseq_count=0 code_region_bytes=14974976
+shipit master compile_Ir=21376724746 regalloc=4,991,822,277 hcsr=2,035,103,757 brk_overflow=0 compile_time_ns=146941355914 compile_lir_time_ns=87080241935 compiled_iseq_count=6327 failed_iseq_count=0 code_region_bytes=13180928
+shipit head compile_Ir=20284351508 regalloc=3,879,058,035 hcsr=922,463,355 brk_overflow=0 compile_time_ns=143552655378 compile_lir_time_ns=83611318030 compiled_iseq_count=6326 failed_iseq_count=0 code_region_bytes=13180928
