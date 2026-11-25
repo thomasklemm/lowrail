@@ -2028,3 +2028,75 @@ The seven counter pairs in the generated railsbench diff match the source thread
 **DECISIONS and outsider read.** One raw base/master-again/head `run_benchmarks.rb` comparison and one filtered stats diff are the requested ZJIT format; the version lines, SHAs and A/A columns are part of that output, not extra methodology prose. Reporting `zjit_alloc_bytes` is necessary for the new per-ISEQ bool. The body has no test/suite counts, commands, review history, rejected variants, Lowrail footer, app-speed conclusion or extra percentage tables. The linked attribution is warranted; HIR names and cref describe the actual reviewer-facing change. Cutting paragraph 1 removes the expendable history rather than adding caveats or another app-noise paragraph.
 
 **Replay limitation.** The corrected raw stats are not in Git. Their retained paths are `.amp/in/orb-backup/zs1-remeasure/stats/{rm,rm2,rp}.stats` in the source [remeasure thread](https://ampcode.com/threads/T-01a2128f-bb21-7639-a023-e933318917ed). `download_thread_file` refused because that orb is archived. Its existing transcript contains the completed main/rerun timing summaries, generated corrected stats diff and selected three-way byte/ISEQ counters, but not the full corrected texts or the seven master-again counter values. Thus no file-based `stats_diff.rb` replay or independent verification of each counter's A/A threshold was possible. The script's >1%, >1,000 and >3×A/A filter was inspected; no missing raw values were reconstructed or assumed equal. This pass verifies transcription and interpretation of the available outputs, not a rerun of the experiment. Local checks also verify the two evidence blocks against this record and preserve the proposed body byte for byte.
+
+## k0kubun's payload-size question (2026-11-25)
+
+k0kubun on `zjit/src/payload.rs:30`, the new `exited_for_block_arg_refinements: bool`
+([r4699835984](https://github.com/ruby/ruby/pull/19912#discussion_r4699835984)), referring to our size answer on
+#19680 ([issuecomment-6974495685](https://github.com/ruby/ruby/pull/19680#issuecomment-6974495685)): "Out of
+curiosity, is this still 152 bytes? If so, how many boolean slots do we have before it gets changed?" He approved
+the PR a few minutes later.
+
+**Answer: still 152 bytes, and no free byte is left.** After #19680 the payload ends with
+`was_invalidated_for_singleton_class_creation`, `self_is_heap_object` (since #17155, 2026-06), the `Option<bool>` and
+one byte of tail padding; the new bool takes that byte. `payload.rs` has not changed on master since #19680. The next bool makes the
+payload 160 bytes, after which 7 more fit (a 9th dummy gives 168). Same on x86_64-linux and aarch64-linux.
+
+Trees: base master `a43519979c`, head `7b03404bd7`, current ruby/ruby master `42a644f6e0` (2026-11-25 14:18 -0500).
+`zjit/src/payload.rs` is identical on base and current master, and the layout below is too.
+
+Layout (offset, size), the same on all six tree/target pairs apart from the new field; `size_of` 152, `align_of` 8:
+
+```
+                                                  base / master    head
+profile                                           0   120          0   120
+versions                                          120  24          120  24
+num_exits_until_invalidate                        144   4          144   4
+was_invalidated_for_singleton_class_creation      148   1          148   1
+self_is_heap_object                               149   1          149   1
+exited_for_block_arg_refinements                   -               150   1
+may_write_block_code (Option<bool>)               150   1          151   1
+tail padding                                      151   1           -
+```
+
+Dummy bools (added after `self_is_heap_object` in the struct and in `IseqPayload::new`, reverted after each step):
+
+```
+base, master   k=0 152, k=1 152, k=2 160            x86_64-linux and aarch64-linux, rustc 1.100.0 and nightly 1.102.0
+head           k=0 152, k=1 160 ... k=8 160, k=9 168 (k=2..9 on x86_64 stable only)
+```
+
+So the bool count left before the size changes: 1 on base and on current master, 0 on the head.
+
+**Method.** `cargo check -p zjit --release --lib --target {x86_64,aarch64}-unknown-linux-gnu` on each tree, with
+temporary `const _: [(); 0] = [(); 1000*(i+1) + size_of/align_of/offset_of!(…)]` lines appended to `payload.rs`, whose
+array-length mismatch errors print the values; run with stable rustc 1.100.0 and nightly 1.102.0 (identical). aarch64
+is a cross-compile for layout only, not a run on arm64. Cross-checks: nightly `cargo rustc … -- -Zprint-type-sizes`
+gives the same field order and padding on all six pairs, and `gdb -batch -x bench/upstream/zwb1/layout.py` on a
+release miniruby of the head (configure `--enable-zjit`, `RUSTC_FLAGS=-g -C lto=thin -C opt-level=3
+-C overflow-checks=on`, x86_64) prints 152/8 with the new bool at 150, `may_write_block_code` at 151 and tail
+padding 0. Scripts: `.amp/in/orb-backup/zs1-payload/{offsets,dummies,type_sizes}.sh` of orb
+T-01a21439-a0be-7148-99c7-b3c0ee749052 (not committed); all Ruby worktrees restored with `git checkout`.
+
+**Allocation.** `get_or_create_iseq_payload_ptr` allocates one `Box::new(IseqPayload)` per ISEQ; the box goes through
+jit's `#[global_allocator] StatsAlloc` (`jit/src/lib.rs`), which adds `Layout::size()` = 152 to the counter that
+`zjit_alloc_bytes()` reads (`zjit/src/stats.rs:995`) and passes the call to the system allocator. With `size_of`
+unchanged, each payload counts and allocates the same on base and head. The PR adds two payload lookups: in HIR
+construction for `self.frame_state(state).iseq`, an ISEQ `add_iseq_to_hir` has already created a payload for
+(standalone and inlined), and in `exit_block_arg_refinements`, which runs only on the refinements exit, which never
+fired on railsbench in the remeasure. So none of the remeasure's +13,347 `zjit_alloc_bytes` on railsbench comes from
+the payload's size or from extra payloads. What it is made of instead (code, side-exit or other per-version metadata)
+is not shown here: that would need a per-allocation-site breakdown, and the raw stats are in an archived orb.
+
+**Reply draft** (answers a question that was asked, so per DECISIONS it can be posted directly once checked; the PR
+is already approved):
+
+> Yes, it's still 152 bytes, but this takes the last free byte. After #19680, `IseqPayload` ended with two `bool`s,
+> the `Option<bool>` and one byte of padding, and the new `bool` goes into that byte. The next `bool` would make it
+> 160 bytes, with room for 7 more after that. The layout is the same on x86_64 and arm64, so the payload's allocation
+> doesn't change with this PR.
+
+**Variant if the size had grown** (not the case on any measured tree; kept for a later field):
+
+> No, it grows to 160 bytes: `IseqPayload` had no padding left after its `bool`s and the `Option<bool>`, so the new
+> `bool` adds a word. I'll pack it with the other flags so the payload stays at 152 bytes.
