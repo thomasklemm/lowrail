@@ -504,6 +504,7 @@ both on 2026-11-09. What went wrong in our process, and the rule each one now ad
 
 ## Review gates
 
+* **Adapter changes run `script/min-versions` before review** (2026-11-25): Active Record adapter or schema changes run their tests on the oldest supported SQLite (and a middle one), PostgreSQL, MySQL and Ruby, base versus head ([usage](upstream/ar-adapter-suite.md#oldest-supported-versions-2026-11-25)). E2 passed several reviews and broke only on SQLite 3.35/3.36.
 * **Reviews of our own safety guards go to Anthropic models** (2026-11-25): the cyber-safety checks of GPT-6.1 Sol and GPT-6 Astra both stopped lowrail-profile confirm reviews that were asked to find ways around its write and production guards. Such reviews run as thermos-opus or thermos-fable and are framed as checking each fix against the original repro; reports stay plain and keep repro detail in the reviewing thread.
 
 ### The coordinator decides when a review runs (Thomas, 2026-11-18)

@@ -1,0 +1,431 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Runs Rails test files on the oldest versions Rails main supports, base versus head (docs/upstream/ar-adapter-suite.md,
+# "Oldest supported versions"). The floors are read from the base tree on every run; builds are cached in CACHE (default
+# ~/.cache/lowrail-min-versions) and each records its recipe and build time in CACHE/<name>/BUILD.json.
+#
+#   mise exec ruby@4.0.9 -- script/min-versions --repo URL|PATH --head REF [--base REF] FILE...
+#
+# Recipes:
+#   sqlite-V    sqlite.org autoconf tarball; ./configure --prefix=DIR --disable-static with the sqlite3 gem's
+#               vendored CFLAGS; make -j. The sqlite3 gem is compiled against it (--enable-system-libraries,
+#               PKG_CONFIG=/bin/false, rpath) in its own bundle, and every run checks sqlite_version().
+#   ruby-V      rbenv/ruby-build (commit in BUILD.json): ruby-build V DIR, --disable-install-doc.
+#   postgres:N  official image for the floor major (its newest patch on Docker Hub).
+#   mysql-V     official image mysql:V when pullable; otherwise (schema-1 manifests, such as 5.7.9) the
+#               cdn.mysql.com archive tarball's bin/share/lib in a debian:bookworm-slim image tagged
+#               lowrail-min-versions/mysql:V.
+# A floor of x.y.0 (SQLite, PostgreSQL) runs the last x.y patch; a floor with a patch number (MySQL, Ruby) runs it.
+# SQLite also runs the last patch of the minor halfway between the floor and the newest release.
+
+require "etc"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "shellwords"
+require "time"
+
+CACHE = File.expand_path(ENV.fetch("LOWRAIL_MIN_VERSIONS_CACHE", "~/.cache/lowrail-min-versions"))
+COMPONENTS = %w[activesupport activemodel activerecord activejob]
+PATH_GEMS = COMPONENTS + %w[actionview actionpack railties] # Active Support's autorun loads minitest/rails_plugin
+TEST_GEMS = %w[minitest minitest-mock json uri bcrypt sqlite3 pg mysql2 trilogy]
+DB_GEMS = %w[pg mysql2 trilogy]
+SQLITE_CFLAGS = "-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 " \
+  "-DSQLITE_ENABLE_DBSTAT_VTAB=1"
+
+options = { repo: "https://github.com/rails/rails.git", only: %w[sqlite postgresql mysql ruby], seed: 41231 }
+OptionParser.new do |parser|
+  parser.banner = "Usage: script/min-versions --repo URL|PATH --head REF [options] FILE..."
+  parser.on("--repo URL", "Git URL or local checkout holding HEAD (default rails/rails)") { options[:repo] = _1 }
+  parser.on("--head REF", "Branch, tag or SHA to test (default HEAD of a local --repo)") { options[:head] = _1 }
+  parser.on("--base REF", "Default: merge-base of head and rails/rails main") { options[:base] = _1 }
+  parser.on("--only LIST", "Subset of sqlite,postgresql,mysql,ruby") { options[:only] = _1.split(",") }
+  parser.on("--mariadb TAG", "Add a MariaDB image (Rails main states no MariaDB floor)") { options[:mariadb] = _1 }
+  parser.on("--seed N", Integer) { options[:seed] = _1 }
+  parser.on("--json FILE", "Also write the report as JSON") { options[:json] = File.expand_path(_1) }
+end.parse!
+# A path relative to the Rails root is a Rails test file; any other existing file is a standalone test run from
+# activerecord/ on every cell, for checks Rails' own test helper cannot reach (it needs SQLite 3.37 to boot).
+files = ARGV.map { COMPONENTS.include?(_1.split("/").first) || !File.file?(_1) ? _1 : File.expand_path(_1) }
+abort "give test files relative to the Rails root" if files.empty?
+abort "unknown --only" unless (options[:only] - %w[sqlite postgresql mysql ruby]).empty?
+files.each do |file|
+  next if file.start_with?("/")
+  abort "#{file}: only #{COMPONENTS.join(", ")} test files" unless COMPONENTS.include?(file.split("/").first)
+end
+local_repo = File.directory?(options[:repo]) ? File.expand_path(options[:repo]) : nil
+options[:head] ||= "HEAD" if local_repo
+abort "--head required" unless options[:head]
+
+def run!(*cmd, chdir: Dir.pwd, env: {}, quiet: false)
+  out, status = Open3.capture2e(env, *cmd, chdir: chdir)
+  abort "failed: #{cmd.shelljoin}\n#{out[-4000..] || out}" unless status.success?
+  quiet ? nil : out
+end
+
+def capture(*cmd, chdir: Dir.pwd)
+  out, status = Open3.capture2(*cmd, chdir: chdir, err: File::NULL)
+  status.success? ? out.strip : nil
+end
+
+def log(message) = warn("min-versions: #{message}")
+
+# Builds into CACHE/name once; returns [dir, BUILD.json].
+def cached(name, recipe)
+  dir = File.join(CACHE, name)
+  info = File.join(dir, "BUILD.json")
+  unless File.exist?(info)
+    log "building #{name} (#{recipe})"
+    FileUtils.rm_rf(dir)
+    FileUtils.mkdir_p(dir)
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    extra = yield(dir) || {}
+    seconds = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round
+    File.write(info, JSON.pretty_generate({ recipe: recipe, seconds: seconds, built_at: Time.now.utc.iso8601 }.merge(extra)))
+  end
+  [dir, JSON.parse(File.read(info))]
+end
+
+def version_key(version) = version.split(".").map(&:to_i)
+
+# --- Rails trees ----------------------------------------------------------------------------------------------
+
+GIT_DIR = File.join(CACHE, "rails.git")
+def git(*args, **kw) = run!("git", "--git-dir=#{GIT_DIR}", *args, **kw)
+
+unless File.directory?(GIT_DIR)
+  run!("git", "clone", "--quiet", "--bare", "--single-branch", "--filter=tree:0", "https://github.com/rails/rails.git", GIT_DIR)
+end
+git("fetch", "--quiet", "origin", "+main:refs/remotes/origin/main")
+if local_repo
+  head = capture("git", "-C", local_repo, "rev-parse", "#{options[:head]}^{commit}")
+  base = options[:base] && capture("git", "-C", local_repo, "rev-parse", "#{options[:base]}^{commit}")
+  git("fetch", "--quiet", local_repo, *[head, base].compact)
+else
+  remote = "r#{options[:repo].sum}"
+  unless capture("git", "--git-dir=#{GIT_DIR}", "remote", "get-url", remote)
+    git("remote", "add", remote, options[:repo])
+    git("config", "remote.#{remote}.promisor", "true")
+    git("config", "remote.#{remote}.partialclonefilter", "tree:0")
+  end
+  # A branch or full SHA is fetched directly; an abbreviated SHA needs the remote's branches first.
+  resolve = ->(ref) do
+    local = -> { capture("git", "--git-dir=#{GIT_DIR}", "rev-parse", "--verify", "-q", "#{ref}^{commit}") }
+    next local.() if ref.match?(/\A\h{7,39}\z/) && local.()
+    if ref.match?(/\A\h{7,39}\z/)
+      git("fetch", "--quiet", "--filter=tree:0", remote, "+refs/heads/*:refs/remotes/#{remote}/*")
+      next local.()
+    end
+    git("fetch", "--quiet", "--filter=tree:0", remote, ref)
+    capture("git", "--git-dir=#{GIT_DIR}", "rev-parse", "FETCH_HEAD^{commit}")
+  end
+  head = resolve.(options[:head])
+  base = options[:base] && resolve.(options[:base])
+end
+abort "cannot resolve head #{options[:head]}" unless head
+base ||= capture("git", "--git-dir=#{GIT_DIR}", "merge-base", head, "refs/remotes/origin/main")
+abort "cannot resolve base" unless base
+
+def tree(sha)
+  dir = File.join(CACHE, "trees", sha)
+  unless File.directory?(dir)
+    git("worktree", "prune")
+    git("worktree", "add", "--quiet", "--detach", dir, sha)
+  end
+  dir
+end
+trees = { "base" => tree(base), "head" => tree(head) }
+
+# --- Floors, read from the base tree -------------------------------------------------------------------------
+
+def floor(tree, path, pattern)
+  source = File.read(File.join(tree, path))
+  body = source[/def check_version\b.*?\n\s*end\b/m] || source
+  body[pattern, 1] or abort "no floor in #{path}"
+end
+
+def floors(tree)
+  {
+    "sqlite" => floor(tree, "activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb", /database_version < "([\d.]+)"/),
+    "postgresql" => floor(tree, "activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb", /database_version < (\d+_\d+_\d+)/)
+      .delete("_").to_i.then { "#{_1 / 10000}.#{_1 % 10000 / 100}" },
+    "mysql" => floor(tree, "activerecord/lib/active_record/connection_adapters/abstract_mysql_adapter.rb", /database_version < "([\d.]+)"/),
+    "ruby" => File.read(File.join(tree, "rails.gemspec"))[/required_ruby_version\s*=\s*">=\s*([\d.]+)"/, 1]
+  }
+end
+floor_versions = floors(trees["base"])
+head_floors = floors(trees["head"])
+floor_versions.each do |name, version|
+  log "head changes the #{name} floor: #{version} -> #{head_floors[name]}" if head_floors[name] != version
+end
+
+# --- Builds ---------------------------------------------------------------------------------------------------
+
+def sqlite_releases
+  @sqlite_releases ||= run!("git", "ls-remote", "--tags", "https://github.com/sqlite/sqlite.git", "refs/tags/version-3.*")
+    .scan(%r{refs/tags/version-(3\.\d+\.\d+)$}).flatten.sort_by { version_key(_1) }
+end
+
+def sqlite_url(version)
+  a, b, c = version_key(version)
+  number = format("%d%02d%02d00", a, b, c)
+  (2020..Time.now.year).map { "https://www.sqlite.org/#{_1}/sqlite-autoconf-#{number}.tar.gz" }
+    .find { system("curl", "-sfI", "-o", File::NULL, _1) }
+end
+
+# Some patch tags (3.44.3 to 3.44.5) were never published as release tarballs.
+def last_patch(minor)
+  sqlite_releases.select { _1.start_with?("#{minor}.") }.reverse.find { sqlite_url(_1) } || abort("no SQLite #{minor}.x")
+end
+
+def build_sqlite(version)
+  cached("sqlite-#{version}", "sqlite.org autoconf, CFLAGS=#{SQLITE_CFLAGS}") do |dir|
+    url = sqlite_url(version) or abort "no download for SQLite #{version}"
+    src = File.join(dir, "src")
+    FileUtils.mkdir_p(src)
+    run!("sh", "-c", "curl -sfL #{url.shellescape} | tar -xz --strip-components=1 -C #{src.shellescape}")
+    run!("./configure", "--prefix=#{dir}", "--disable-static", "CFLAGS=#{SQLITE_CFLAGS}", chdir: src, quiet: true)
+    run!("make", "-j#{Etc.nprocessors}", "install", chdir: src, quiet: true)
+    FileUtils.rm_rf(src)
+    { url: url }
+  end.first
+end
+
+def build_ruby(version)
+  cached("ruby-#{version}", "rbenv/ruby-build, RUBY_CONFIGURE_OPTS=--disable-install-doc") do |dir|
+    ruby_build = File.join(CACHE, "ruby-build")
+    if File.directory?(ruby_build)
+      run!("git", "-C", ruby_build, "pull", "--quiet")
+    else
+      run!("git", "clone", "--quiet", "--depth", "1", "https://github.com/rbenv/ruby-build.git", ruby_build)
+    end
+    FileUtils.rm_rf(dir)
+    run!(File.join(ruby_build, "bin/ruby-build"), version, dir, quiet: true,
+      env: { "RUBY_CONFIGURE_OPTS" => "--disable-install-doc", "MAKE_OPTS" => "-j#{Etc.nprocessors}" })
+    { ruby_build: capture("git", "-C", ruby_build, "rev-parse", "HEAD") }
+  end
+end
+
+DOCKER = system("docker", "info", out: File::NULL, err: File::NULL) ? %w[docker] : %w[sudo -n docker]
+def docker(*args, **kw) = run!(*DOCKER, *args, **kw)
+def docker?(*args) = system(*DOCKER, *args, out: File::NULL, err: File::NULL)
+
+def ensure_docker
+  return if docker?("info")
+  system("sudo", "-n", "service", "docker", "start", out: File::NULL, err: File::NULL)
+  60.times { break if docker?("info"); sleep 1 }
+  abort "docker is not available" unless docker?("info")
+end
+
+# Returns [image, build info]; images live in Docker's store, the recipe and time in CACHE.
+def mysql_image(version)
+  _, info = cached("mysql-#{version}", "docker pull mysql:#{version}, else cdn.mysql.com archive tarball") do |dir|
+    next { image: "mysql:#{version}" } if docker?("pull", "-q", "mysql:#{version}")
+    minor = version.split(".").first(2).join(".")
+    url = %w[2.5 2.12 2.17 2.28].product(%w[gz xz]).map do |glibc, ext|
+      "https://cdn.mysql.com/archives/mysql-#{minor}/mysql-#{version}-linux-glibc#{glibc}-x86_64.tar.#{ext}"
+    end.find { system("curl", "-sfI", "-o", File::NULL, _1) } or abort "no MySQL #{version} image or tarball"
+    context = File.join(dir, "context")
+    FileUtils.mkdir_p(File.join(context, "mysql"))
+    members = %w[bin/mysqld bin/mysql share lib/plugin].map { "*/#{_1}" }
+    run!("sh", "-c", "curl -sfL #{url.shellescape} | tar -x#{url.end_with?("xz") ? "J" : "z"} --wildcards " \
+      "--exclude='*debug*' --strip-components=1 -C #{File.join(context, "mysql").shellescape} #{members.shelljoin}")
+    File.write(File.join(context, "Dockerfile"), <<~DOCKERFILE)
+      FROM debian:bookworm-slim
+      RUN apt-get update && apt-get install -y --no-install-recommends libaio1 libnuma1 libncurses5 && rm -rf /var/lib/apt/lists/* \\
+        && useradd -r mysql && mkdir /var/lib/mysql && chown mysql /var/lib/mysql
+      COPY mysql /opt/mysql
+      CMD /opt/mysql/bin/mysqld --no-defaults --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/var/lib/mysql \\
+        && exec /opt/mysql/bin/mysqld --no-defaults --user=mysql --basedir=/opt/mysql --datadir=/var/lib/mysql \\
+          --bind-address=0.0.0.0 --skip-ssl
+    DOCKERFILE
+    docker("build", "-q", "-t", "lowrail-min-versions/mysql:#{version}", context)
+    FileUtils.rm_rf(File.join(context, "mysql"))
+    { image: "lowrail-min-versions/mysql:#{version}", url: url }
+  end
+  abort "image #{info["image"]} is gone: rm -r #{CACHE}/mysql-#{version}" unless docker?("image", "inspect", info["image"])
+  [info["image"], info]
+end
+
+def pulled(name, image)
+  cached(name, "docker pull #{image}") { docker("pull", "-q", image, quiet: true); { image: image } }.last
+end
+
+# Starts a database container; yields the environment the Rails tests need, then removes it.
+def with_database(kind, image)
+  ensure_docker
+  name = "lowrail-min-versions-#{Process.pid}-#{kind}"
+  port = kind == "postgresql" ? 5432 : 3306
+  env = kind == "postgresql" ? %w[-e POSTGRES_HOST_AUTH_METHOD=trust] : %w[-e MYSQL_ALLOW_EMPTY_PASSWORD=1]
+  docker("run", "-d", "--rm", "--name", name, *env, "-p", "127.0.0.1::#{port}", "--tmpfs", kind == "postgresql" ? "/var/lib/postgresql/data" : "/var/lib/mysql:uid=999", image, quiet: true)
+  host_port = docker("port", name, port.to_s)[/:(\d+)$/, 1]
+  if kind == "postgresql"
+    ready = %w[psql -U postgres -h 127.0.0.1 -c select\ 1]
+    sql = ->(statement) { docker("exec", name, "psql", "-U", "postgres", "-h", "127.0.0.1", "-c", statement, quiet: true) }
+  else
+    client = image.start_with?("lowrail-min-versions/") ? "/opt/mysql/bin/mysql" : (image.start_with?("mariadb") ? "mariadb" : "mysql")
+    ready = [client, "-uroot", "-h127.0.0.1", "-e", "select 1"]
+    sql = ->(statement) { docker("exec", name, client, "-uroot", "-h127.0.0.1", "-e", statement, quiet: true) }
+  end
+  120.times { break if docker?("exec", name, *ready); sleep 1 }
+  abort "#{image} did not start:\n#{capture(*DOCKER, "logs", name)}" unless docker?("exec", name, *ready)
+  if kind == "postgresql"
+    %w[activerecord_unittest activerecord_unittest2].each do
+      sql.("CREATE DATABASE #{_1} ENCODING 'UTF8' TEMPLATE template0 LC_COLLATE 'en_US.UTF-8'")
+    end
+    version = capture(*DOCKER, "exec", name, "psql", "-U", "postgres", "-h", "127.0.0.1", "-tAc", "SHOW server_version")
+    yield({ "PGHOST" => "127.0.0.1", "PGPORT" => host_port, "PGUSER" => "postgres" }, version)
+  else
+    ["CREATE USER 'rails'@'%'", "GRANT ALL PRIVILEGES ON `activerecord_unittest%`.* TO 'rails'@'%'",
+      "GRANT ALL PRIVILEGES ON inexistent_activerecord_unittest.* TO 'rails'@'%'",
+      "CREATE DATABASE activerecord_unittest DEFAULT CHARACTER SET utf8mb4",
+      "CREATE DATABASE activerecord_unittest2 DEFAULT CHARACTER SET utf8mb4"].each { sql.(_1) }
+    version = capture(*DOCKER, "exec", name, client, "-uroot", "-h127.0.0.1", "-NBe", "SELECT VERSION()")
+    yield({ "MYSQL_HOST" => "127.0.0.1", "MYSQL_PORT" => host_port }, version)
+  end
+ensure
+  system(*DOCKER, "rm", "-f", name, out: File::NULL, err: File::NULL) if name
+end
+
+# --- Running tests --------------------------------------------------------------------------------------------
+
+def gemfile(tree, variant, ruby_version)
+  rails_gemfile = File.read(File.join(tree, "Gemfile"))
+  lines = TEST_GEMS.map do |gem|
+    line = rails_gemfile[/^\s*(gem "#{Regexp.escape(gem)}"[^\n]*)/, 1] || "gem #{gem.inspect}"
+    line += ", force_ruby_platform: true" if gem == "sqlite3" && variant != "default"
+    DB_GEMS.include?(gem) ? "group(:db) { #{line} }" : line
+  end
+  dir = File.join(tree, ".min-versions", "ruby-#{ruby_version}-#{variant}")
+  FileUtils.mkdir_p(dir)
+  path = File.join(dir, "Gemfile")
+  File.write(path, ["source \"https://rubygems.org\"", *PATH_GEMS.map { "gem #{_1.inspect}, path: #{File.join(tree, _1).inspect}" },
+    'gem "rack"', 'gem "zeitwerk"', *lines, ""].join("\n"))
+  path
+end
+
+# ruby: [bin dir, version]; sqlite: nil (the gem's own library) or a build dir.
+def run_tests(tree, files, ruby:, sqlite: nil, adapter:, env: {}, seed:)
+  variant = sqlite ? File.basename(sqlite) : "default"
+  bundle = File.join(CACHE, "bundle", "ruby-#{ruby[1]}", variant)
+  env = env.merge(
+    "PATH" => [ruby[0], *(File.join(sqlite, "bin") if sqlite), ENV.fetch("PATH")].join(":"),
+    "BUNDLE_GEMFILE" => gemfile(tree, variant, ruby[1]), "BUNDLE_PATH" => bundle, "BUNDLE_WITHOUT" => adapter.start_with?("sqlite") ? "db" : nil,
+    "BUNDLE_BUILD__SQLITE3" => sqlite && "--enable-system-libraries --with-sqlite3-include=#{sqlite}/include " \
+      "--with-sqlite3-lib=#{sqlite}/lib --with-ldflags=-Wl,-rpath,#{sqlite}/lib",
+    "PKG_CONFIG" => sqlite && "/bin/false", "LD_LIBRARY_PATH" => sqlite && File.join(sqlite, "lib"),
+    "ARCONN" => adapter, "PARALLEL_WORKERS" => "1", "MT_CPU" => "1", "RUBYOPT" => nil, "GEM_HOME" => nil, "GEM_PATH" => nil,
+    "MISE_RUBY_VERSION" => nil, "BUNDLE_FROZEN" => nil, "BUNDLE_DEPLOYMENT" => nil
+  )
+  run!("bundle", "install", "--quiet", "--prefer-local", env: env, chdir: tree)
+  if sqlite
+    loaded = run!("bundle", "exec", "ruby", "-e", 'require "sqlite3"; print SQLite3::Database.new(":memory:").get_first_value("SELECT sqlite_version()")',
+      env: env, chdir: tree)
+    abort "sqlite3 gem loads SQLite #{loaded}, not #{File.basename(sqlite)}" unless "sqlite-#{loaded}" == variant
+  end
+  # Standalone files run in their own process, so a Rails test helper that cannot boot does not hide them.
+  results = files.group_by { _1.start_with?("/") ? :standalone : _1.split("/").first }.map do |component, group|
+    requires = group.map { File.expand_path(_1, tree) }
+    script = "#{requires.inspect}.each { |f| require f }"
+    out, status = Open3.capture2e(env, "bundle", "exec", "ruby", "-Itest", "-e", script, "--", "--seed", seed.to_s,
+      chdir: File.join(tree, component == :standalone ? "activerecord" : component))
+    summary = out.scan(/^(\d+) runs, (\d+) assertions, (\d+) failures, (\d+) errors, (\d+) skips/).last
+    failures = out.scan(/^\s+\d+\) (?:Failure|Error):\n(\S+?#\S+?)(?: \[[^\]]*\])?:\n(.*)$/).map { |test, message| { "test" => test, "message" => message.strip[0, 200] } }
+    { "status" => status.success? ? "pass" : "fail", "summary" => summary ? "%s runs, %s assertions, %s failures, %s errors, %s skips" % summary : "crashed",
+      "failures" => failures, "output" => (status.success? || summary ? nil : out[0, 1200]) }
+  end
+  { "status" => results.all? { _1["status"] == "pass" } ? "pass" : "fail", "summary" => results.map { _1["summary"] }.compact.join("; "),
+    "failures" => results.flat_map { _1["failures"] }, "output" => results.map { _1["output"] }.compact.join("\n").then { _1.empty? ? nil : _1 } }
+end
+
+ADAPTER_DIRS = { "sqlite3" => "sqlite", "postgresql" => "postgresql", "mysql2" => "mysql", "trilogy" => "mysql", "abstract_mysql_adapter" => "mysql" }
+def files_for(files, db)
+  files.select do |file|
+    next true if file.start_with?("/")
+    next false if db != "ruby" && !file.start_with?("activerecord/")
+    dir = file[%r{^activerecord/test/cases/adapters/([^/]+)/}, 1]
+    dir.nil? || ADAPTER_DIRS[dir] == db || (db == "ruby" && ADAPTER_DIRS[dir] == "sqlite")
+  end
+end
+def mysql_adapter(files) = files.any? { _1.include?("/adapters/trilogy/") } && files.none? { _1.include?("/adapters/mysql2/") } ? "trilogy" : "mysql2"
+
+pinned_ruby = [RbConfig::CONFIG["bindir"], RUBY_VERSION]
+cells = []
+add_cell = ->(label, build, files, **run) do
+  files.empty? ? log("#{label}: no test files apply") : cells << { label: label, build: build, files: files, run: run }
+end
+
+if options[:only].include?("sqlite")
+  floor_minor = floor_versions["sqlite"].split(".").first(2).join(".")
+  floor_sqlite = floor_versions["sqlite"].end_with?(".0") ? last_patch(floor_minor) : floor_versions["sqlite"]
+  newest_minor = version_key(sqlite_releases.last)[1]
+  middle_sqlite = last_patch("3.#{(version_key(floor_minor)[1] + newest_minor) / 2}")
+  [["floor", floor_sqlite], ["middle", middle_sqlite]].each do |role, version|
+    dir = build_sqlite(version)
+    add_cell.("SQLite #{version} (#{role}, Ruby #{RUBY_VERSION})", "sqlite-#{version}", files_for(files, "sqlite"),
+      ruby: pinned_ruby, sqlite: dir, adapter: "sqlite3")
+  end
+end
+if options[:only].include?("postgresql")
+  image = "postgres:#{floor_versions["postgresql"].split(".").first}"
+  ensure_docker
+  pulled("postgres-#{image.split(":").last}", image)
+  add_cell.("PostgreSQL #{image} (floor)", "postgres-#{image.split(":").last}", files_for(files, "postgresql"),
+    ruby: pinned_ruby, adapter: "postgresql", database: ["postgresql", image])
+end
+if options[:only].include?("mysql")
+  ensure_docker
+  image, = mysql_image(floor_versions["mysql"])
+  mysql_files = files_for(files, "mysql")
+  add_cell.("MySQL #{floor_versions["mysql"]} (floor)", "mysql-#{floor_versions["mysql"]}", mysql_files,
+    ruby: pinned_ruby, adapter: mysql_adapter(mysql_files), database: ["mysql", image])
+  if options[:mariadb]
+    pulled("mariadb-#{options[:mariadb]}", "mariadb:#{options[:mariadb]}")
+    add_cell.("MariaDB #{options[:mariadb]}", "mariadb-#{options[:mariadb]}", mysql_files,
+      ruby: pinned_ruby, adapter: mysql_adapter(mysql_files), database: ["mysql", "mariadb:#{options[:mariadb]}"])
+  end
+end
+if options[:only].include?("ruby")
+  dir, = build_ruby(floor_versions["ruby"])
+  add_cell.("Ruby #{floor_versions["ruby"]} (floor, sqlite3 gem's SQLite)", "ruby-#{floor_versions["ruby"]}", files_for(files, "ruby"),
+    ruby: [File.join(dir, "bin"), floor_versions["ruby"]], adapter: "sqlite3")
+end
+
+report = { "base" => base, "head" => head, "repo" => options[:repo], "files" => files, "floors" => floor_versions, "seed" => options[:seed], "cells" => [] }
+cells.each do |cell|
+  build_info = JSON.parse(File.read(File.join(CACHE, cell[:build], "BUILD.json")))
+  database = cell[:run].delete(:database)
+  run_both = ->(env = {}) do
+    trees.to_h { |side, tree| log("#{cell[:label]}: #{side}"); [side, run_tests(tree, cell[:files], **cell[:run], env: env, seed: options[:seed])] }
+  end
+  server = nil
+  results = database ? with_database(*database) { |env, version| server = version; run_both.(env) } : run_both.()
+  new_failures = results["head"]["failures"].map { _1["test"] } - results["base"]["failures"].map { _1["test"] }
+  report["cells"] << { "label" => cell[:label], "server_version" => server, "build_seconds" => build_info["seconds"],
+    "recipe" => build_info["recipe"], "files" => cell[:files], "base" => results["base"], "head" => results["head"], "new_in_head" => new_failures }
+end
+
+puts "Base #{base[0, 10]} vs head #{head[0, 10]}; floors from base: #{floor_versions.map { "#{_1} #{_2}" }.join(", ")}"
+puts
+puts "| Version | Build (s) | Base | Head | New failures in head |"
+puts "| --- | --- | --- | --- | --- |"
+report["cells"].each do |cell|
+  label = cell["server_version"] ? "#{cell["label"]}, server #{cell["server_version"]}" : cell["label"]
+  status = ->(r) { "#{r["status"]}: #{r["summary"].empty? ? "no summary" : r["summary"]}" }
+  puts "| #{label} | #{cell["build_seconds"]} | #{status.(cell["base"])} | #{status.(cell["head"])} | #{cell["new_in_head"].join(", ")} |"
+end
+report["cells"].each do |cell|
+  %w[base head].each do |side|
+    result = cell[side]
+    next if result["status"] == "pass"
+    puts "", "#{cell["label"]}, #{side}:"
+    result["failures"].each { puts "  #{_1["test"]}: #{_1["message"]}" }
+    puts "  crashed before minitest reported:", result["output"].gsub(/^/, "    ") if result["output"]
+  end
+end
+File.write(options[:json], JSON.pretty_generate(report)) if options[:json]
+# 2: a run crashed before minitest reported; 1: head fails tests that base passes.
+exit 2 if report["cells"].any? { _1["base"]["output"] || _1["head"]["output"] }
+exit report["cells"].all? { _1["new_in_head"].empty? } ? 0 : 1
