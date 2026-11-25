@@ -368,3 +368,170 @@ findings and the final text finding are closed. This scoped text-only confirm ca
 correctness/security and maintainability review, exact-head execution and packaging audit above; it is not a
 new Ruby build, suite run, application run, master-application check or upstream-overlap search. No speed claim
 is certified. The public drafts are unchanged by this pass; no fork push, PR opening or upstream post was made.
+
+## Exact-head confirm of revision 3 (2026-11-25)
+
+Verdict: **approve**, **no must-fixes**, on exactly
+[`ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5`](https://github.com/thomasklemm/ruby/commit/ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5).
+Reviewer: `thermos-sol`, thread `T-01a2129c-eccf-7381-ba7b-5a5579c681dd`. Applied both Thermos rubrics directly,
+without subagents, delegation or another thread. This is a fresh code, text and execution confirm on the new
+base, not merely a carry-forward of the November 18 approval. Astra's separate exact-head gate is not waived.
+
+### Pins, packaging and upstream drift
+
+Cloned the fork into `.amp/in/orb-backup/zsv1-confirm/ruby`, checked out the full head detached, and verified
+`git ls-remote` still resolves `refs/heads/thomasklemm/zjit-setivar-real-class-3` to it. Its direct parent is
+`3b188d0dd5b23bbf94831a890ca907b92420c22d`. Exactly one fix commit, two files, +100/-1; author and committer
+are Thomas Klemm `<github@tklemm.eu>`, author date retained, no trailers. The complete commit message is
+byte-identical to `47b2ed7110`'s. Independently ran:
+
+```text
+$ git rev-list --count 4414d3ea25..3b188d0dd5
+435
+$ git range-diff 4414d3ea25..47b2ed7110 3b188d0dd5..ca3ea90482
+1:  47b2ed7110 = 1:  ca3ea90482 ZJIT: Profile the real class for setinstancevariable
+```
+
+Read the full old-base/new-base diffs, not only the changed Ruby patch. `profile.rs`, `shape.c`, `shape.h`,
+`hir_type/`, distribution and options are unchanged. The only `object.c` changes allocate Class/Struct/Data
+inline fields; `rb_obj_class()` and its non-calling singleton/ICLASS walk are unchanged. The `gc.rs` addition
+is a SAFETY comment, not a change to profile marking or relocation.
+
+The HIR/codegen changes do not alter `prepare_optimized_setivar`, `emit_optimized_setivar`, `dispatch_setivar`,
+`dispatch_ivar`, shape guards, `CompilePolicy::new`, `exit_recompile` or profile reset policy. They do change
+machinery used by exits: `PendingJITFrame` delays stable allocation until after exit deduplication; stack maps
+now distinguish method receiver slots from block frames; readonly C-frame GC updates are handled in C; and
+`iseq_may_write_block_code` has a per-payload cache. Traced these through `build_side_exit`,
+`compile_exit_stack_map`, `PendingJITFrame::alloc`, `StackMapWriter::prev_frame` and `vm.c`'s decoder/update.
+The setivar miss still carries the current bytecode snapshot and compiled outer ISEQ for recompilation.
+The new `may_write_block_code` field neither replaces nor aliases the profile's class reference. No new
+dependency on method lookup or singleton invalidation is introduced by the profiled real class.
+
+After the independent code audit, read live issue/PR metadata with `gh api`: Shopify/ruby#1122 remains open
+with its shape-transition ask and no comments; #1126 is closed/unmerged, with the maintainer asking for
+ruby/ruby submissions rather than rejecting the mechanism. Reread #19540's policy and #19858's read-side
+change. An all-state query for this exact fork branch returns no Ruby PR; current open `setivar` and
+`"real class"` searches show no replacement. These are scoped live checks, not an exhaustive unpublished-work
+claim. No PR discussion, comment, branch or other external state was changed.
+
+### Correctness/security rubric
+
+Cold read: only `setinstancevariable` records the receiver's real class, retaining its original shape and
+layout flags; every store still checks the actual receiver and uses the existing fallback if ineligible.
+
+* **Class ownership.** `profile.rs:89,245-252,392-395` invokes native `rb_obj_class`, not a Ruby `class` method.
+  It does not allocate a singleton class or invoke application code; subclasses remain subclasses.
+  `prepare_optimized_setivar` reads the class only to create a missing-ivar shape transition. The ordinary
+  T_OBJECT path matches `shape.c:808-826,896-928`'s owner. The class/module-owned fields-imemo exception is
+  outside this fast path. Profiles remain instruction/snapshot-local in `ProfileOracle`, not a new exact-class
+  fact for unrelated sends.
+* **Layout and frozen checks.** Immediate writes retain the raising generic path. Accepted stores require
+  RObject layout or Extended layout with the T_OBJECT flag; Class/Module, String and other layouts fall back.
+  Frozen/complex shapes, Extended missing-ivar transitions, complex new shapes and capacity growth are still
+  refused. No checks were relaxed merely because the class is now real.
+* **Actual-receiver guards.** Heap and exact-shape checks precede the store, including after callbacks or
+  fiber suspension. Shape includes frozen, layout and capacity bits. The class is not needed for method
+  dispatch at this instruction; adding a singleton/class guard would defeat the intended sharing without
+  protecting an additional store invariant. Each retained guard protects an immediate/layout, frozen,
+  storage-index or capacity property, not an arbitrary user-method restriction.
+* **Writes and GC.** `emit_optimized_setivar` still writes the proper embedded/fields storage, emits the
+  normal value write barrier and updates the shape when required. The profile's ISEQ-to-class write barrier
+  remains at `profile.rs:192`; `each_object`/`each_object_mut` and `gc.rs:114-151` mark the real class movable
+  and relocate it. No receiver/singleton class is newly retained by this profile. No new raw ownership or
+  untracked GC field is added.
+* **Exits and policy.** Missing profiles still recompile in speculative versions. On final versions,
+  `dispatch_ivar` uses shape branches with the generic store on mismatch; a missing eligible profile uses
+  the generic path. The generic call retains exception/frame materialization and Ractor checks. The change
+  does not disable TracePoint, method-resolution, Ractor or ZJIT feature gates.
+
+No introduced correctness or security defect found. The exactness probe covers singleton overrides,
+subclasses/non-T_OBJECT values, native-call boundaries, mid-RHS mutation, fibers, frozen errors and GC.
+No implicit conversion, accumulator adoption, require ordering or config assumption is added here.
+
+### Maintainability rubric
+
+**L0, approve.** The two small helpers live in the canonical profiler and mirror `profile_self_shape` and
+`shape_only`; the existing observation, distribution and barrier code is reused. A mode parameter on
+`profile_self`, a second profile type or special branches in HIR/codegen would add concepts rather than remove
+them. No scattered feature checks, wrapper layer, new optionality, cast-heavy boundary or cross-module API.
+`profile.rs` grows 597 to 614 lines; the existing HIR snapshot file grows 30,008 to 30,090, crossing no new
+1,000-line boundary. Splitting that existing suite is unrelated to this fix. The sole added comment is one
+why-line explaining the non-obvious transition-owner choice on a private Rust helper; no redundant test
+comments or public Ruby documentation are added. Ruby flog/RuboCop metrics do not apply to this Rust diff.
+The prior cold-profiling/deep-extend losing case remains relevant: the extra native class walk is profiling
+work, not a per-specialized-store operation; its implementation and sampling policy have not changed.
+
+### Body and commit message, sentence by sentence
+
+Read the complete current item body against the exact source and [results-3.md](results-3.md). Read the complete
+commit message, not just its title. The body is unchanged by this pass.
+
+| Sentence or claim | Current-head check | Verdict |
+| --- | --- | --- |
+| Title: profile the real class for setinstancevariable | Only that opcode switches to `profile_self_real_class`. | Accurate. |
+| Body sentence 1: ordinary singleton receivers are recorded as “other”, so an extended object's write lacks a profile (#19540) | Parent's `profile_self` and unchanged singleton filter; live #19540 explains retention. The ordinary-object qualification excludes its exemptions. | Accurate problem statement. |
+| Body sentence 2: recompile exit, then generic write after versions are exhausted | Empty-profile branch of `dispatch_ivar`, compile/version policy and `exit_recompile`. | Accurate for the affected path. |
+| Body sentence 3: class is used only for transitions; interpreter uses real class | `prepare_optimized_setivar`'s sole class read and `obj_get_owner_class` on accepted T_OBJECTs. | Accurate. |
+| Body sentence 4: profile that class; same shape guard, subject to layout/frozen/capacity checks | New helper plus unchanged preparation, dispatch and emit paths; both HIR snapshots and runtime probes. | Accurate, no all-layout support promise. |
+| Body sentence 5: #19858 did the read-side counterpart with shape-only profiling | Merged #19858 metadata and current `profile_self_shape`. It did not already fix writes. | Accurate. |
+| Fixes Shopify/ruby#1122 | Live issue asks for precisely this real-class profile for shape transitions. | Correct cross-repository reference. |
+| Lobsters heading and the two numeric rows | Parsed raw stats-3 integer totals and denominators; replayed diffs below. | Exact counter claims, not speed claims. |
+| Message sentence 1: “other” avoids retaining singleton class | Parent filter and live #19540. | Accurate. |
+| Message sentence 2: extended write had no profile, side-exited, then final generic write | Same empty-profile/version path as body sentence 2. | Accurate. |
+| Message sentence 3: only transition consumer, real interpreter owner | Same source anchors as body sentence 3. | Accurate. |
+| Message sentence 4: profile real class; preserve shape/layout/frozen/capacity boundaries | Exact diff and unchanged store guards. | Accurate. |
+| Message Fixes URL | Resolves to the live issue above; the message is identical to the approved prior one. | Accepted. |
+
+All nine `stats-3/*.json.gz` archives pass `gzip -t`. Parsed pins identify base `3b188d0dd5` (both independent
+builds), head `ca3ea90482`, and 10 measured iterations. Replayed `zne1/stats_diff.rb` with `--pct 1`, with and
+without the A/A arguments as in the earlier confirm: all six retained diff files match byte-for-byte.
+Independently divided the raw totals: lobsters `dynamic_setivar_count` is 11,405 / 11,405 / 10,821;
+`setivar_fallback_no_side_exits` 5,956 / 5,956 / 5,372; `ccall_rb_vm_setinstancevariable`
+11,345 / 11,345 / 10,761 (base / A-A / head). All three fall exactly 584, A/A zero. Railsbench's write counters
+are unchanged. Shipit's total remains 48,920 while its reasons move 41,029 → 40,948 and 7,891 → 7,972,
+not A/A noise. The body correctly makes neither an exclusivity claim nor an unchanged-other-counters claim.
+The historical comment draft still references the old head and is not a newly prepared post; no comment is
+authorized or posted here. No runtime/instruction-speed claim is certified and no application benchmark was
+rerun by this reviewer.
+
+### Fresh exact-head execution and mutation
+
+Linux x86-64, GCC 14.2.0, Rust 1.100.0, bootstrap Ruby 4.0.9, cargo-nextest 0.9.152 (release archive SHA-256
+verified). Out-of-tree build in `.amp/in/orb-backup/zsv1-confirm/build`:
+`./autogen.sh`, then `../ruby/configure --enable-zjit=dev --disable-install-doc --without-jemalloc; make -j6`.
+The generated config says `ZJIT_SUPPORT=dev` and enables `disasm,runtime_checks`; executable version pins
+`ca3ea90482`. All results below are from this review, not copied from the builder.
+
+* `make zjit-test ZJIT_TESTS=-j1`: **2,036 run, 2,036 passed, 15 skipped**. Both added HIR tests and
+  `test_profile_frames_during_direct_jit_to_jit_entry` pass on the first run; no retry-to-green.
+* `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'`, then threshold 2:
+  **PASS all 2,148 tests each**. Both retain “Fiber count: 10000 (skipping)”.
+* `make test-all TESTOPTS=-j2 RUN_OPTS='--zjit --zjit-call-threshold=1'`
+  `TESTS='ruby/test_zjit_cli ruby/test_optimization ruby/test_shapes ruby/test_object ruby/test_variable'`,
+  then threshold 2: **327 tests, 15,429 assertions, zero failures/errors/skips each**. These are current-base
+  counts, not the old base's 323 / 15,405.
+* Retained `probe.rb`, SHA-256 `1a19a60172b2a704c7823e9a503a8e6968951924a9ca9007f76967fc9b14a521`:
+  interpreter plus ZJIT thresholds 1 and 2, each also with `--zjit-max-versions=1`; all **33 rows identical**,
+  all exit 0. Inspected actual outputs, including FrozenError and the non-owner Ractor IsolationError;
+  these are not identical swallowed setup errors. For uninstalled full Ruby, `RUBYLIB` contains build root,
+  `.ext/common`, `.ext/x86_64-linux` and source `lib`.
+* Supplemental scratch `boundaries.rb` explicitly asserts return values, stored values and untouched neighboring
+  ivars when a callback grows/freezes the receiver **inside** the writer's RHS, and when a fiber suspends there.
+  Frozen cases assert that no store occurred. Anonymous-class writers collect 29 calls before compaction at
+  threshold 30, then compile/use both existing and transitioning stores with young heap values and minor GC.
+  Interpreter and six ZJIT modes (thresholds 1/2/30, each default/max-versions=1) all pass and match. A separate
+  `--zjit-dump-hir`/`--zjit-log-compiled-iseqs` execution confirms the writers compile, with shape checks and
+  `StoreField` **after** `InvokeProc`/`Fiber.yield`, so the default-threshold check is not generic-only evidence.
+  This exercises compaction but does not establish that a particular class moved in every process.
+* **One mutation:** changed only `ProfiledType::real_class`'s assignment from native `rb_obj_class(obj)` to
+  `obj.class_of()`, deliberately restoring singleton profiling. Ran
+  `make zjit-test "ZJIT_TESTS=-j1 -E 'test(test_setivar_singleton_receiver)'"`:
+  **2 run, 0 passed, 2 failed, 2,049 skipped**, make exit 2. Both failures replace the expected shape guard/store
+  with `SideExit NoProfileSetIvar recompile`; this is a regression assertion failure, not a compiler failure.
+  Restored the exact assignment and reran the identical command: **2 passed, 2,049 skipped**, exit 0.
+  `git diff --exit-code HEAD` and `git status --short` in the Ruby checkout are clean. No snapshots were accepted.
+
+Logs are `/tmp/zsv1-confirm-{configure,build,zjit-test,btest-1,btest-2,test-all-1,test-all-2,mutation,restored}.log`,
+also retained with the probe outputs, supplemental script and HIR under `.amp/in/orb-backup/zsv1-confirm/`.
+No sanitizer, AArch64, alternate-GC, independent base build or new speed measurement is claimed in this pass.
+Only Lowrail's item/review record is changed; no Ruby branch push, PR opening or upstream post.

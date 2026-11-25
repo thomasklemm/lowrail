@@ -70,6 +70,26 @@ passes:
       and maintainability review, exact-head tests and packaging audit above; no new code review or
       suite rerun claimed. All must-fixes closed. No speed claim or upstream action.
       Record: bench/upstream/zsv1/thermos-review.md, Text-only confirm of revision 2.
+  - reviewer: thermos-sol
+    orb: "T-01a2129c-eccf-7381-ba7b-5a5579c681dd"
+    head: "ca3ea90482994c9cf369d4ce0efa9c4194f3b5c5"
+    date: 2026-11-25
+    verdict: approve
+    open: >-
+      None. Both Thermos rubrics applied directly by the sole reviewer, without delegation or other threads.
+      Verified exact fork head and parent 3b188d0dd5, one Thomas-authored/committed fix with no trailers,
+      range-diff = after 435 master commits. Re-audited shape transitions, actual-receiver layout/frozen/shape
+      guards, write barriers, profile marking/relocation, updated side-exit stack maps, recompile and final-version
+      fallback policy. No introduced correctness/security or maintainability defect; L0, no new guard needed.
+      Fresh dev build: zjit-test 2036 passed/15 skipped; btest thresholds 1 and 2 each 2148 passed;
+      five selected Ruby suites each 327 tests/15429 assertions, no failures/errors/skips.
+      Retained 33-row probe matches the interpreter at both thresholds, also max-versions=1.
+      Supplemental RHS mutation/fiber/compaction/young-value checks match in six ZJIT modes; HIR confirms
+      shape guards and stores after callbacks. One class_of mutation makes both new HIR tests fail with
+      NoProfileSetIvar; restored exact source passes both. All nine stats-3 archives validate and all six
+      diffs replay byte-for-byte; lobsters -584 independently confirmed, Shipit -81/+81 retained.
+      Body and commit message accepted sentence by sentence. No speed claim, Ruby push, PR or upstream post.
+      Record: bench/upstream/zsv1/thermos-review.md, Exact-head confirm of revision 3.
 ---
 
 # ZJIT: Profile the real class for setinstancevariable
@@ -92,7 +112,8 @@ ZJIT stats per iteration for lobsters:
 ## For Thomas
 
 Rebased as `ca3ea90482` on master `3b188d0dd5` (range-diff `=`, lobsters −584 unchanged, body unchanged;
-[results-3.md](../../zsv1/results-3.md)); thermos-sol and Astra still need to approve that exact head before it opens as a draft.
+[results-3.md](../../zsv1/results-3.md)). The [exact-head thermos-sol confirm](../../zsv1/thermos-review.md#exact-head-confirm-of-revision-3-2026-11-25)
+approves both rubrics, the body and commit message with no must-fixes; Astra still needs to approve that head before it opens as a draft.
 The body above and the comment draft are **approved with no must-fixes** for head `47b2ed7110`.
 The [text-only confirm](../../zsv1/thermos-review.md#text-only-confirm-of-revision-2-2026-11-18) closes the final
 wording finding and carries forward the code, comments, message and packaging review. The retained stats
