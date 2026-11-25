@@ -80,7 +80,9 @@ abort "lowrail-profile: --paths was replaced by --workloads FILE (lowrail/worklo
 
 if args.first == "report"
   dir = File.expand_path(args[1] || out)
-  abort "lowrail-profile: no runs in #{dir}: they are deleted after the report unless you profile with --keep-runs" if Dir["#{dir}/run*/"].empty?
+  unless File.directory?(dir) && Lowrail::ProfileReport.run_dirs(dir).any?
+    abort "lowrail-profile: no runs in #{dir}: they are deleted after the report unless you profile with --keep-runs"
+  end
   report = Lowrail::ProfileReport.new(dir, ledger: ledger, top: top)
   report.write
   puts report.markdown
@@ -189,20 +191,31 @@ statuses = []
     "LOWRAIL_PROFILE_LIB" => lib, "LOWRAIL_PROFILE_CALLER_SEED" => ENV["SEED"], "LOWRAIL_PROFILE_CALLER_SPEC_OPTS" => ENV["SPEC_OPTS"],
     "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
     "RUBYOPT" => [ENV["RUBYOPT"], ("-I#{lib}" unless lib.match?(/\s/)), "-rlowrail/profile"].compact.join(" ") }
+  # leave_env removes exactly these.
+  env["LOWRAIL_PROFILE_KEYS"] = env.keys.grep(/\ALOWRAIL_PROFILE/).join(",")
   $stderr.puts "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   if timeout
     # Its own process group, so the deadline stops every process it started;
     # the terminal's INT and a TERM reach the group through this process.
+    # The traps go in before the spawn, so a signal in between is not lost.
+    pid = nil
+    pending = []
+    stop = ->(signal) { pid ? (Process.kill(signal, -pid) rescue Errno::ESRCH) : pending << signal }
+    interrupted = false
+    traps = %w[INT TERM HUP QUIT].to_h { |signal| [signal, trap(signal) { interrupted = true; stop.(signal) }] }
     pid = Process.spawn(env, *command, pgroup: true)
     waiter = Process.detach(pid)
-    stop = ->(signal) { Process.kill(signal, -pid) rescue Errno::ESRCH }
-    interrupted = false
-    traps = %w[INT TERM].to_h { |signal| [signal, trap(signal) { interrupted = true; stop.(signal) }] }
+    pending.each { stop.(_1) }
     unless waiter.join(timeout)
       timed_out << n
       $stderr.puts "lowrail-profile: run #{n} took longer than --timeout #{timeout}s; stopping it"
       stop.("TERM")
-      waiter.join(10) || (stop.("KILL"); waiter.join)
+      # The whole group gets 10 s, then KILL, also when the leader exited on TERM at once:
+      # a worker that ignores TERM outlives it.
+      grace = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
+      sleep 0.1 while (Process.kill(0, -pid) rescue false) && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
+      stop.("KILL")
+      waiter.join
     end
     traps.each { |signal, handler| trap(signal, handler) }
     result = waiter.value
@@ -221,14 +234,14 @@ statuses = []
   break if timed_out.any? || interrupted
 end
 # The first failed run's status is the command's; profiling never hides a failure.
-failed = statuses.find { _1 != 0 }
+failed = timed_out.any? ? 124 : statuses.find { _1 != 0 }
 File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\nexit #{statuses.join(" ")}\n")
 # What compare checks two captures against: the workloads (their manifest and
 # what was measured, from the receipt) or the command's arguments, never the
 # output directory; argv stays apart for diagnostics.
 identity = workloads ? { "mode" => "workloads", "host" => ENV.fetch("LOWRAIL_PROFILE_HOST", "localhost") } : { "mode" => "command", "argv" => command }
 File.write(File.join(out, "capture.json"), JSON.generate("format" => 1, "identity" => identity, "argv" => command, "seed" => seed,
-  "runs" => runs, "exit" => statuses, "timed_out" => timed_out) + "\n")
+  "runs" => runs, "exit" => statuses, "timed_out" => timed_out, "timeout" => timeout) + "\n")
 
 begin
   report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
@@ -242,7 +255,8 @@ begin
   if record
     target = File.expand_path(record == :default ? Lowrail::Workloads::PATH : record)
     target = File.join(out, "workloads.rb") if record == :default && File.exist?(target)
-    shapes = Dir["#{out}/run1/*.shapes.json"].flat_map { JSON.parse(File.read(_1)) }
+    run1 = File.join(out, "run1")
+    shapes = Dir.children(run1).grep(/\.shapes\.json\z/).sort.flat_map { JSON.parse(File.read(File.join(run1, _1))) }
     merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept", "unfiltered") }
       .map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
     if merged.empty?
@@ -266,7 +280,7 @@ rescue StandardError => error
   exit(failed || 1)
 end
 # compare reads only report.json; the raw counts are as large as the suite is.
-Dir[File.join(out, "run*")].each { FileUtils.rm_rf(_1) if File.basename(_1).match?(/\Arun\d+\z/) } unless keep_runs
+Lowrail::ProfileReport.run_dirs(out).each { FileUtils.rm_rf(_1) } unless keep_runs
 $stderr.puts "lowrail-profile: report in #{File.join(out, "report.md")}"
 $stderr.puts "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
 exit(failed || 0)

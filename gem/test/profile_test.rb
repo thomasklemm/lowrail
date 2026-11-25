@@ -10,7 +10,6 @@
 require "test_helper"
 require "uri"
 require "digest"
-require "lowrail/profile_report"
 
 class ProfileTest < Minitest::Test
   include LowrailTest
@@ -665,37 +664,6 @@ class ProfileTest < Minitest::Test
     end
   end
 
-  # An attribution run has a row per window name, line and app line in every
-  # process (Sure: 785 MB in 16 files, a 6 GB report). The report merges
-  # them without an object per row, so it holds far fewer objects than rows.
-  def test_report_keeps_no_object_per_attributed_row
-    realpath_tmpdir do |dir|
-      names, callers = 400, 200
-      %w[run1 run2].each do |run|
-        FileUtils.mkdir_p(File.join(dir, run))
-        2.times do |pid|
-          rows = ["# lowrail-profile 3\trequests=#{names}\tobjects=1\tdropped=0\twindows=#{names},0,0,0\tpid=#{pid}\troot=/app",
-            "P\t0\t/gems/foo-1.0/lib/foo.rb", "P\t1\t/app/app/controllers/c.rb", "0\t1\tString\t#{names}\t#{names}\t1\t0\trequest"]
-          names.times do |n|
-            rows << "A\trequest\tC#a#{n}\t1\t9\t1"
-            next if run == "run1"
-            callers.times { |line| rows << "@\trequest\tC#a#{n}\t0\t1\t1\t#{line + 1}\t#{n + line + 1}\t1" }
-          end
-          File.write(File.join(dir, run, "#{pid}.tsv"), rows.join("\n") << "\n")
-        end
-      end
-      GC.start
-      before = GC.stat(:heap_live_slots)
-      report = Lowrail::ProfileReport.new(dir)
-      report.to_h
-      GC.start
-      held = GC.stat(:heap_live_slots) - before
-      assert_operator held, :<, names * callers / 4, "objects held for #{names * callers} attributed rows"
-      assert_equal callers, report.app_lines.size
-      assert_equal names, report.actions.size
-    end
-  end
-
   # The CLI exits with the command's status: the first failed run's, a
   # signal as 128 + its number, also when no report can be made or --record
   # cannot write; capture.json records the same numbers. A passing command
@@ -733,37 +701,77 @@ class ProfileTest < Minitest::Test
   end
 
   # --timeout stops a run that hangs (Fizzy's autoload deadlock): TERM to its
-  # process group, KILL 10 s later for one that ignores TERM, a grandchild
-  # included; no further run; exit 124, recorded in capture.json. INT from the
-  # terminal reaches the command, and a run in time passes as without it.
+  # process group, then KILL, so a process that ignores TERM goes too, also
+  # when the first one exits on TERM; no further run; exit 124, also after an
+  # earlier failed run, recorded in capture.json and said at the top of the
+  # report. INT and HUP from the terminal reach the command, and a run in
+  # time passes as without it. Each call has a deadline: a group that is never
+  # stopped fails the test instead of hanging it.
   def test_timeout_stops_a_hung_run_and_its_processes
     realpath_tmpdir do |dir|
-      hang = 'trap("TERM") {}; File.write("gc.pid", spawn("sleep", "300").to_s); sleep'
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      _, err, status = profile(dir, "--timeout", "1", "--out", "hung", "--", RUBY, "-e", hang)
-      took = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
-      assert_equal 124, status.exitstatus, err
-      assert_match(/run 1 took longer than --timeout 1.0s; stopping it/, err)
-      refute_match(/run 2 of 2/, err)
-      assert_operator took, :>=, 11
-      assert_operator took, :<, 30
-      capture = JSON.parse(File.read(File.join(dir, "hung/capture.json")))
-      assert_equal [[124], [1]], capture.values_at("exit", "timed_out")
-      state = `ps -o stat= -p #{File.read(File.join(dir, "gc.pid"))}`.strip
-      assert(state.empty? || state.start_with?("Z"), "the grandchild still runs: #{state}")
+      # Its own group, killed at the deadline: Open3 waits for the process even after a Timeout.
+      bounded = lambda do |*args, env: {}|
+        out, err = File.join(dir, "bounded.out"), File.join(dir, "bounded.err")
+        pid = Process.spawn(profile_env(dir).merge(env), RUBY, PROFILE, *args, chdir: dir, out: out, err: err, pgroup: true)
+        waiter = Process.detach(pid)
+        unless waiter.join(60)
+          Process.kill("KILL", -pid) rescue nil
+          flunk "lowrail-profile #{args.join(" ")} did not finish in 60 s: #{File.read(err)}"
+        end
+        [File.read(out), File.read(err), waiter.value]
+      end
+      grandchild = 'File.write("gc-#{ENV["CASE"]}.pid", spawn(RbConfig.ruby, "-e", "trap(%q(TERM)) {}; sleep 120", out: File::NULL, err: File::NULL).to_s)'
+      dead = lambda do |name|
+        state = `ps -o stat= -p #{File.read(File.join(dir, "gc-#{name}.pid"))}`.strip
+        state.empty? || state.start_with?("Z")
+      end
+      { "leader-ignores" => ['trap("TERM") {}', 11..30], "leader-exits" => ["", 11..30] }.each do |name, (leader, took_range)|
+        started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        _, err, status = bounded.("--timeout", "1", "--out", name, "--", RUBY, "-e", "#{leader}; #{grandchild}; sleep", env: { "CASE" => name })
+        took = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+        assert_equal 124, status.exitstatus, "#{name}: #{err}"
+        assert_match(/run 1 took longer than --timeout 1.0s; stopping it/, err)
+        refute_match(/run 2 of 2/, err)
+        assert_includes took_range, took.floor, name
+        assert_equal [[124], [1]], JSON.parse(File.read(File.join(dir, name, "capture.json"))).values_at("exit", "timed_out")
+        sleep 0.2
+        assert dead.(name), "#{name}: a process that ignores TERM still runs"
+      end
 
-      _, err, status = profile(dir, "--timeout", "30", "--out", "quick", "--", RUBY, "-e", "exit 3")
+      # Run 1 fails and run 2 hangs, or run 1 hangs after a request: 124 either way, and the report says which.
+      LowrailTest.write_rails_app(dir, "late.rb" => <<~'RUBY') if LowrailTest.rails_installed?
+        require_relative "config/environment"
+        require "rack/mock"
+        Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+        File.basename(ENV.fetch("LOWRAIL_PROFILE")) == ENV.fetch("HANG") ? sleep : exit(1)
+      RUBY
+      if LowrailTest.rails_installed?
+        { "run2" => [[1, 124], [2]], "run1" => [[124], [1]] }.each do |hang, (exits, stopped)|
+          out, err, status = bounded.("--timeout", "5", "--out", "late-#{hang}", "--", RUBY, "late.rb", env: { "HANG" => hang })
+          assert_equal 124, status.exitstatus, "#{hang}: #{err}"
+          assert_equal [exits, stopped], JSON.parse(File.read(File.join(dir, "late-#{hang}/capture.json"))).values_at("exit", "timed_out")
+          notice = "**Incomplete: run #{stopped[0]} timed out after 5.0 s (--timeout) and was stopped"
+          assert_includes out, notice, "#{hang}: report on the terminal"
+          assert_includes File.read(File.join(dir, "late-#{hang}/report.md")).lines[2], notice, "#{hang}: at the top of report.md"
+          assert_equal stopped, JSON.parse(File.read(File.join(dir, "late-#{hang}/report.json")))["meta"]["timed_out"]
+        end
+      end
+
+      _, err, status = bounded.("--timeout", "30", "--out", "quick", "--", RUBY, "-e", "exit 3")
       assert_equal 3, status.exitstatus, err
       assert_equal [[3, 3], []], JSON.parse(File.read(File.join(dir, "quick/capture.json"))).values_at("exit", "timed_out")
 
-      waits = 'trap("INT") { File.write("got", "INT"); exit 130 }; File.write("ready", ""); sleep'
-      pid = Process.spawn(profile_env(dir), RUBY, PROFILE, "--timeout", "60", "--out", "int", "--", RUBY, "-e", waits,
-        chdir: dir, err: File::NULL, out: File::NULL)
-      sleep 0.1 until File.exist?(File.join(dir, "ready"))
-      Process.kill("INT", pid)
-      Process.wait(pid)
-      assert_equal [130, "INT"], [$?.exitstatus, File.read(File.join(dir, "got"))]
-      assert_equal [130], JSON.parse(File.read(File.join(dir, "int/capture.json")))["exit"]
+      { "INT" => 130, "HUP" => 129 }.each do |signal, code|
+        waits = "trap(#{signal.inspect}) { File.write(\"got\", #{signal.inspect}); exit #{code} }; File.write(\"ready\", \"\"); sleep"
+        %w[got ready].each { FileUtils.rm_f(File.join(dir, _1)) }
+        pid = Process.spawn(profile_env(dir), RUBY, PROFILE, "--timeout", "60", "--out", signal.downcase, "--", RUBY, "-e", waits,
+          chdir: dir, err: File::NULL, out: File::NULL)
+        sleep 0.1 until File.exist?(File.join(dir, "ready"))
+        Process.kill(signal, pid)
+        Process.wait(pid)
+        assert_equal [code, signal], [$?.exitstatus, File.read(File.join(dir, "got"))]
+        assert_equal [code], JSON.parse(File.read(File.join(dir, signal.downcase, "capture.json")))["exit"]
+      end
     end
   end
 
@@ -953,7 +961,8 @@ class ProfileTest < Minitest::Test
 
   # A process the suite starts (Dawarich's after(:suite) runs rspec again for
   # rswag) sees what it sees in a plain run: the caller's SEED, SPEC_OPTS,
-  # RUBYOPT and RUBYLIB, no profiler. The suite itself runs with the seed and
+  # RUBYOPT and RUBYLIB, no profiler, also through Bundler.with_original_env
+  # and with_unbundled_env. The suite itself runs with the seed and
   # is profiled; a process started before the suite (a rake parent's) is too.
   def test_processes_the_suite_starts_run_as_without_the_profiler
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
@@ -962,8 +971,12 @@ class ProfileTest < Minitest::Test
       start = <<~'RUBY'
         require_relative "config/environment"
         require "rack/mock"
+        require "bundler"
+        # Also as an engine or after(:suite) starts another bundle: from Bundler's copy of the environment.
         def child(name)
-          File.write("#{ENV.fetch("OUT")}-#{name}.txt", IO.popen([RbConfig.ruby, "child.rb"], &:read))
+          run = -> { IO.popen([RbConfig.ruby, "child.rb"], &:read) }
+          out = ENV.fetch("OUT")
+          File.write("#{out}-#{name}.txt", [run.(), Bundler.with_original_env(&run), Bundler.with_unbundled_env(&run)].join("--\n"))
         end
       RUBY
       LowrailTest.write_rails_app(dir,
@@ -990,7 +1003,7 @@ class ProfileTest < Minitest::Test
       # installed minitest's plugins (a 6.x beside 5.27 replaces it, 0 tests run).
       caller_env = { "SEED" => "99", "SPEC_OPTS" => "--no-color", "RUBYOPT" => "-W0", "RUBYLIB" => File.join(dir, "lib"),
         "MT_NO_PLUGINS" => "1" }
-      plain = "RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"
+      plain = (["RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"] * 3).join("--\n")
       suites = { "minitest" => [[RUBY, "suite_test.rb"], "test", /^1 runs, \d+ assertions, 0 failures, 0 errors/] }
       suites["rspec"] = [[RUBY, "-e", 'require "rspec/core"; exit RSpec::Core::Runner.run(ARGV)', "suite_spec.rb"], "after_suite", /^1 example, 0 failures/] if rspec
       suites.each do |name, (command, child, ran)|

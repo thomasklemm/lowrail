@@ -43,8 +43,8 @@ and `report.json`. It prints the report too. The suite runs as it would, with `S
 1234) so both runs order tests the same way. Only the suite's own process gets the seed and the profiler: once
 Minitest or RSpec has read its options, any process the suite starts (a rake task, an `after(:suite)` that runs
 rspec again) sees the environment you gave lowrail-profile. A process the command starts before its suite runs,
-such as `rake test`'s parent, passes both on to the suite. lowrail-profile exits with its status: the first failing run's exit
-code, or 128 plus the signal that stopped it (143 for `TERM`). A passing suite whose report cannot be built exits 1.
+such as `rake test`'s parent, passes both on to the suite. A process started earlier than Minitest's or RSpec's own start (while `test_helper.rb` or `spec_helper.rb` loads, or from a plain `Minitest::Test` suite without `ActiveSupport::TestCase`) still gets the profiler and the seed. lowrail-profile exits with its status: the first failing run's exit
+code, or 128 plus the signal that stopped it (143 for `TERM`), and 124 when a run timed out. A passing suite whose report cannot be built exits 1.
 
 Bypass Spring (`DISABLE_SPRING=1`, or `bin/rails test` without a Spring binstub): a Spring server that is already
 running forks the app without loading the profiler, so the run counts nothing and lowrail-profile exits 1 with *no
@@ -61,7 +61,7 @@ Options, all before `--`:
 | `--ledger FILE` | bundled | A newer ledger index (`contributions-index.json`). |
 | `--no-ledger` | | No ledger column. |
 | `--keep-runs` | | Keep each run's raw counts (`run1/`, `run2/`), which `report` rebuilds from. Without it they are deleted once the report is written: compare needs only `report.json`, and on a large parallel suite the counts reach gigabytes. |
-| `--timeout SECONDS` | none | Stop a run that takes longer: `TERM` to the command's process group, `KILL` 10 s later. No further run starts, lowrail-profile exits 124, and compare treats the capture as a failed suite (exit 2). With it the command runs in its own process group, and lowrail-profile passes `INT` and `TERM` on to it. |
+| `--timeout SECONDS` | none | Stop a run that takes longer: `TERM` to the command's process group, `KILL` 10 s later. `TERM` then `KILL` go to every process the run started, also when the first one exits on `TERM`. No further run starts, lowrail-profile exits 124 (also after an earlier failed run), the report says which run timed out, and compare treats the capture as a failed suite (exit 2). With it the command runs in its own process group, and lowrail-profile passes `INT`, `TERM`, `HUP` and `QUIT` on to it; a debugger that reads the terminal (`binding.irb`) stops there, so leave `--timeout` off to debug. |
 | `--help`, `--version` | | |
 
 ## Reading the report
@@ -128,7 +128,9 @@ needs 1 object per request averaged over all requests of its kind, so a change i
 that action's share of the requests. Not found: the same `html_escape` plant in Hackatime's
 `LeaderboardsController#index` (+40–60 on about 7,900, twice that action's own noise: listed in half the
 comparisons), and with workers Writebook's plant in an action that runs once per worker process. An action that runs
-once per process has no warm value and is not compared.
+once per process has no warm value and is not compared. Captures taken at different times can drift by about 0.2%
+per action on the same code (Forem: `ResponseTemplatesController#update` 15,028 → 15,155 half an hour apart, with
+nothing changed), so a small listed change is a hint, not proof.
 
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
 only, is listed under *Not compared* with the reason, and nothing about its own cost is listed. Lines outside the
@@ -159,16 +161,18 @@ lowrail-profile:
         bin/rails db:test:prepare
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
+      if: always() # also after a failing suite: compare then exits 2, which the summary shows
       run: |
         bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json \
           >> "$GITHUB_STEP_SUMMARY" || echo "compare exited $?: not valid evidence, see above" >> "$GITHUB_STEP_SUMMARY"
     - uses: actions/upload-artifact@v4
+      if: always()
       with: { name: lowrail-profile, path: "tmp/*/report.*" }
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step with the head's
-Gemfile (`BUNDLE_GEMFILE`). Check the suite itself in its own job: a failing suite makes compare exit 2, which the
-summary shows. The job runs the suite three times, twice each, in one process: on openstreetmap-website, whose suite
+Gemfile (`BUNDLE_GEMFILE`). lowrail-profile exits with the suite's status, so a failing suite fails its Profile step
+and the job; Compare and the upload still run (`if: always()`), and compare exits 2, which the summary shows. The job runs the suite three times, twice each, in one process: on openstreetmap-website, whose suite
 takes 81 s on 8 workers, a capture took about 9.5 minutes. `--runs` and a narrower command (`bin/rails test
 test/controllers test/integration`) make it cheaper.
 

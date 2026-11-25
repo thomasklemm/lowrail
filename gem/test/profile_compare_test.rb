@@ -17,7 +17,7 @@ class ProfileCompareTest < Minitest::Test
   # default one without a name or warm value, which compare does not compare).
   def report(warm, runs: 2, exit: [0] * runs, actions: [{ "name" => nil, "warm" => [nil] * runs }])
     actions = actions.map.with_index { |a, i| { "windows" => [i.zero? ? 10 : 0] * runs }.merge(a) }
-    meta = { "format" => 2, "identity" => { "mode" => "command", "argv" => %w[bin/rails test] }, "argv" => %w[bin/rails test],
+    meta = { "format" => 3, "identity" => { "mode" => "command", "argv" => %w[bin/rails test] }, "argv" => %w[bin/rails test],
       "seed" => "1234", "exit" => exit, "runs" => runs, "ruby" => ["ruby 4"], "rails_env" => ["test"], "dropped" => [0] * runs,
       # 76be8b58's fields, so a case that must be refused is not refused only for lacking them there
       "command" => "bin/rails test", "workloads" => nil }
@@ -142,10 +142,10 @@ class ProfileCompareTest < Minitest::Test
       base, aa, head = capture.([8_063.3, 8_272.4]), capture.([7_624.3, 8_361.8]), capture.([26_106.1, 28_029.3])
       status, result = compare(dir, base, head, aa: aa)
       assert_equal [0, ["NotesController#index"]], [status, result["regressions"].map { _1["name"] }]
-      workers = ->(r) { r.merge("summary" => r["summary"].map { _1.merge("processes" => 8) }) }
+      workers = ->(r) { r.merge("summary" => r["summary"].map { _1.merge("processes" => 2) }) }
       status, result = compare(dir, workers.(base), workers.(head), aa: workers.(aa))
       assert_equal [2, []], [status, result["regressions"]]
-      assert_equal ["base", "head", "the A/A report"], result["problems"].map { _1[/\A(.*) ran in 8 processes: .*PARALLEL_WORKERS=1/, 1] }
+      assert_equal ["base", "head", "the A/A report"], result["problems"].map { _1[/\A(.*) ran in 2 processes: .*PARALLEL_WORKERS=1/, 1] }
       assert_equal 2, compare(dir, base, workers.(head), aa: aa)[0], "only head from parallel workers"
     end
   end
@@ -171,6 +171,11 @@ class ProfileCompareTest < Minitest::Test
       assert_equal 2, compare(dir, report([10.0, 10.0]), report([10.0]))[0], "one warm value for two runs"
       bare = ->(r) { r.merge("meta" => r["meta"].except("identity", "seed", "command")) }
       assert_equal 2, compare(dir, bare.(report([10.0, 10.0])), bare.(report([10.0, 10.0])))[0]
+      # Format 2 had other app and path-gem keys: a base from it would list every renamed line.
+      old = ->(r) { r.merge("meta" => r["meta"].merge("format" => 2)) }
+      status, result = compare(dir, old.(report([10.0, 10.0])), report([10.0, 10.0]), aa: nil)
+      assert_equal 2, status
+      assert_match(/base is a report.json of format 2, this lowrail-profile reads 3/, result["problems"].join)
       jobs = report([10.0, 10.0]).merge("summary" => [run_windows("job" => 3)] * 2)
       status, result = compare(dir, report([10.0, 10.0]), jobs)
       assert_equal 2, status, "nothing comparable: #{result}"
@@ -227,6 +232,9 @@ class ProfileCompareTest < Minitest::Test
       job = YAML.safe_load(yaml).values.first
       assert_equal 1, job.fetch("env").fetch("PARALLEL_WORKERS")
       step = job.fetch("steps").find { _1["name"] == "Compare" }
+      # A failing suite fails its Profile step; the comparison and the reports still reach the summary and artifact.
+      upload = job.fetch("steps").find { _1["uses"].to_s.start_with?("actions/upload-artifact") }
+      assert_equal ["always()", "always()"], [step["if"], upload["if"]]
       shell = { nil => %w[bash -e], "bash" => %w[bash --noprofile --norc -eo pipefail] }.fetch(step["shell"])
       FileUtils.mkdir_p(File.join(dir, "bin"))
       File.write(File.join(dir, "bin/bundle"), "#!/bin/sh\nshift 2\nexec #{RUBY} #{PROFILE} \"$@\"\n")

@@ -34,9 +34,6 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           Moved 0x1f].freeze
 
         KINDS = %w[request job mail cable].freeze
-        # What exe/lowrail-profile sets for the command (leave_env removes it).
-        ENV_KEYS = %w[LOWRAIL_PROFILE LOWRAIL_PROFILE_EXT LOWRAIL_PROFILE_ROOT LOWRAIL_PROFILE_ATTRIBUTE LOWRAIL_PROFILE_RECORD
-          LOWRAIL_PROFILE_ALLOW_WRITES LOWRAIL_PROFILE_LIB LOWRAIL_PROFILE_CALLER_SEED LOWRAIL_PROFILE_CALLER_SPEC_OPTS].freeze
         APP_ROOT = ENV["LOWRAIL_PROFILE_ROOT"]
         HASH = "#"
         DOT = "."
@@ -210,19 +207,33 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           # exe/lowrail-profile changed, so every process the suite starts
           # (an rspec in after(:suite), a rake task) runs as without it:
           # unprofiled, with the caller's SEED and SPEC_OPTS. Bundler's own
-          # RUBYOPT and RUBYLIB entries stay.
+          # RUBYOPT and RUBYLIB entries stay. Bundler keeps a copy from before
+          # (ORIGINAL_ENV, BUNDLER_ORIG_*) for with_original_env and
+          # with_unbundled_env: it gets the same edits.
           def leave_env
             return if @left
             @left = true
-            ENV["SEED"] = ENV["LOWRAIL_PROFILE_CALLER_SEED"]
-            ENV["SPEC_OPTS"] = ENV["LOWRAIL_PROFILE_CALLER_SPEC_OPTS"]
+            ours = ENV["LOWRAIL_PROFILE_KEYS"].to_s.split(",") << "LOWRAIL_PROFILE_KEYS"
             lib = ENV["LOWRAIL_PROFILE_LIB"]
-            { "RUBYOPT" => [" ", ["-I#{lib}", "-rlowrail/profile"]], "RUBYLIB" => [File::PATH_SEPARATOR, [lib]] }.each do |key, (separator, ours)|
-              parts = ENV[key].to_s.split(separator)
-              ours.each { |part| (i = parts.index(part)) && parts.delete_at(i) }
-              ENV[key] = parts.empty? ? nil : parts.join(separator)
+            seed, spec_opts = ENV["LOWRAIL_PROFILE_CALLER_SEED"], ENV["LOWRAIL_PROFILE_CALLER_SPEC_OPTS"]
+            saved = Lowrail.loaded_constant("Bundler::ORIGINAL_ENV")
+            [ENV, (saved if saved.is_a?(Hash) && !saved.frozen?)].compact.each do |env|
+              set = ->(key, value) { value.nil? ? env.delete(key) : env[key] = value }
+              set.("SEED", seed)
+              set.("SPEC_OPTS", spec_opts)
+              { "RUBYOPT" => [" ", ["-I#{lib}", "-rlowrail/profile"]], "RUBYLIB" => [File::PATH_SEPARATOR, [lib]] }.each do |key, (separator, parts)|
+                ["", "BUNDLER_ORIG_"].each do |prefix|
+                  name = "#{prefix}#{key}"
+                  next unless (value = env[name])
+                  list = value.split(separator)
+                  parts.each { |part| (i = list.index(part)) && list.delete_at(i) }
+                  next if list.size == value.split(separator).size
+                  # Bundler's mark for "unset before", which it restores as unset.
+                  set.(name, list.empty? ? (prefix.empty? ? nil : "BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL") : list.join(separator))
+                end
+              end
+              ours.each { env.delete(_1) }
             end
-            ENV_KEYS.each { ENV.delete(_1) }
           rescue StandardError => error
             warn "[lowrail-profile] processes the suite starts may be profiled: #{error.class}: #{error.message}"
           end
@@ -369,7 +380,8 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             # Gems from a path (Bundler's path:, gemspec), which no gem
             # directory names: the report classifies their lines by these.
             Gem.loaded_specs.each_value do |spec|
-              gem_dir = spec.full_gem_path
+              # Ruby names a required file by its real path.
+              gem_dir = (File.realpath(spec.full_gem_path) rescue spec.full_gem_path)
               lines << ["G", spec.name, gem_dir].join("\t") unless gem_dir.match?(%r{/(?:gems|bundler/gems)/[^/]+-(?:\d|\h{12})[^/]*\z})
             end
             File.write(File.join(dir, "#{Process.pid}.tsv"), lines.join("\n") << "\n")
@@ -398,9 +410,10 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         end
       end
       # RSpec read SPEC_OPTS when its runner started, before the suite boots
-      # the app; a rake parent that boots it to start the suite has no runner.
+      # the app. Only a boot inside the runner: a gem such as rswag-specs loads
+      # RSpec::Core::Runner into a rake parent or a Minitest suite too.
       ActiveSupport.on_load(:before_configuration) do
-        Lowrail::Profile.leave_env if Lowrail.loaded_constant("RSpec::Core::Runner")
+        Lowrail::Profile.leave_env if caller_locations.any? { _1.path.to_s.end_with?("/rspec/core/runner.rb") }
       end
       ActiveSupport.on_load(:active_support_test_case) do
         Lowrail::Profile.install("Minitest") do

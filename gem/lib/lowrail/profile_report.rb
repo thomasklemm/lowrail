@@ -44,6 +44,8 @@ module Lowrail
     }.freeze
 
     KINDS = %w[request job mail cable].freeze
+    # report.json's format; compare reads only its own. 3: app and path-gem keys of 8e36ae06, timed_out.
+    FORMAT = 3
     KIND_TITLES = { "job" => "Jobs", "mail" => "Mails", "cable" => "Action Cable" }.freeze
 
     # App middleware that hands the request on is the nearest app frame of
@@ -59,12 +61,18 @@ module Lowrail
       @top = top
       @ledger = ledger if ledger && File.exist?(ledger)
       @paths, @path_ids, @locs, @loc_ids, @window_names, @window_ids = [], {}, [], {}, [], {}
-      @runs = Dir["#{dir}/run*"].select { File.directory?(_1) }.sort_by { _1[/\d+\z/].to_i }.map { load_run(_1) }
+      @runs = self.class.run_dirs(dir).map { load_run(_1) }
       if @runs.empty? || @runs.all? { _1[:windows].values.sum == 0 }
         raise "no runs with requests, jobs or mails under #{dir} (a request counts when it goes through the app, as in " \
           "integration, request and system tests; controller tests and controller specs call the controller directly " \
           "and are not counted)"
       end
+    end
+
+    # DIR/runN, listed rather than globbed: DIR may hold [, { or *.
+    def self.run_dirs(dir)
+      Dir.children(dir).grep(/\Arun\d+\z/).select { File.directory?(File.join(dir, _1)) }
+        .sort_by { _1[/\d+/].to_i }.map { File.join(dir, _1) }
     end
 
     # Streams each file. Attributed rows are many (one per window name, line
@@ -76,7 +84,7 @@ module Lowrail
         windows: Hash.new(0), sites: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
         actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
         attrib: { index: {}, name: [], loc: [], caller: [], count: [], first: [] } }
-      Dir["#{path}/*.tsv"].sort.each do |file|
+      Dir.children(path).grep(/\.tsv\z/).sort.map { File.join(path, _1) }.each do |file|
         header = File.open(file, &:gets)&.chomp
         raise "#{file} is from an older lowrail-profile; run it again" unless header&.start_with?("# lowrail-profile 3\t")
         meta = header.split("\t").drop(1).to_h { _1.split("=", 2) }
@@ -148,7 +156,9 @@ module Lowrail
       if path == "-" then ["(no Ruby frame)", path]
       elsif (m = path.match(RAILS_PATH)) then ["rails: #{m[1] || m[2]}", "RAILS/#{m[1] || m[2]}/#{m[3]}"]
       elsif (m = path.match(GEM_PATH)) then gem_site(m[1], m[3])
-      elsif (root = @roots.find { path.start_with?(_1) }) then ["app", "APP/#{path.delete_prefix(root)}"]
+      # As the counter attributes: a gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines.
+      elsif (root = @roots.find { path.start_with?(_1) }) && !path.delete_prefix(root).match?(%r{(?:\A|/)gems/})
+        ["app", "APP/#{path.delete_prefix(root)}"]
       elsif (name, gem_dir = path_gems.find { |_, d| path.start_with?(d) })
         RAILS.include?(name) ? ["rails: #{name}", "RAILS/#{name}/#{path.delete_prefix(gem_dir)}"] : gem_site(name, path.delete_prefix(gem_dir))
       elsif path.start_with?(libdir) then ["ruby stdlib", "RUBY/#{path.delete_prefix(libdir)}"]
@@ -515,6 +525,10 @@ module Lowrail
         .filter_map { |kind, label| "#{first[:windows][kind]} #{label}" if first[:windows][kind] > 0 }
       rails = @runs.filter_map { _1[:rails] }.first
       out = +"# lowrail-profile report\n\n"
+      if (stopped = meta[:timed_out]).any?
+        out << "**Incomplete: run #{stopped.join(", ")} timed out after #{meta[:timeout]} s (--timeout) and was stopped, so " \
+          "its numbers cover only what ran before; no later run started.**\n\n"
+      end
       out << "Objects allocated (exact counts, not time, not retained memory) per request, job, mail and Action Cable " \
         "action, by source line. A line with many objects is a place to look, not a measured cost in milliseconds.\n\n"
       out << "* Command: `#{command}`\n"
@@ -646,7 +660,8 @@ module Lowrail
         identity = identity.merge("manifest" => manifest && Digest::SHA256.hexdigest(JSON.generate(manifest.except("file")))[0, 16],
           "measured" => measured)
       end
-      { format: 2, identity: identity, argv: capture["argv"], seed: capture["seed"], exit: capture["exit"], runs: @runs.size,
+      { format: FORMAT, identity: identity, argv: capture["argv"], seed: capture["seed"], exit: capture["exit"], runs: @runs.size,
+        timed_out: capture["timed_out"] || [], timeout: capture["timeout"],
         ruby: @runs.flat_map { _1[:rubies] || [] }.uniq, rails_env: @runs.flat_map { _1[:rails_envs] || [] }.uniq,
         dropped: @runs.map { _1[:dropped] } }
     end

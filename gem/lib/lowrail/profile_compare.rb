@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "profile_report"
 
 module Lowrail
   # lowrail-profile compare BASE.json HEAD.json --aa BASE2.json: warm objects
@@ -19,9 +20,9 @@ module Lowrail
   # six). The floor is twice that noise, since one A/A pair is one sample of
   # it (on the 3.3 Blog one pair failed 4.5% of unchanged heads at once the
   # noise), and at least --min objects for a line; for an action also 0.1% of
-  # its objects and 20 times --min, because parallel test workers split an
-  # action's requests differently from run to run (A/A on Campfire: every
-  # action within 0.08% and 6.5 objects). Without --aa the
+  # its objects and 20 times --min (from Campfire's first A/A pair, every
+  # action within 0.08% and 6.5 objects; in one process the plants in
+  # README-profile.md were measured against it). Without --aa the
   # noise is each report's own spread, smaller still.
   #
   # Only valid evidence is compared: complete reports of this version
@@ -55,6 +56,7 @@ module Lowrail
     attr_reader :not_compared
 
     def initialize(base, head, aa: nil, min: 1.0, top: 20)
+      # Not !@aa.nil?: an A/A file that holds null parses to nil and is still a pair, refused.
       @aa_given = !aa.nil?
       @base, @head, @aa = [base, head, aa].map { |file| file && (JSON.parse(File.read(file)) rescue false) }
       @min = min
@@ -86,7 +88,10 @@ module Lowrail
     # anything unexpected is a problem (exit 2), never a crash or a zero.
     def report_problems(label, report)
       meta = report.is_a?(Hash) && report["meta"]
-      return ["#{label} is not a report.json of this lowrail-profile (no capture metadata)"] unless meta.is_a?(Hash) && meta["format"] == 2
+      return ["#{label} is not a report.json of this lowrail-profile (no capture metadata)"] unless meta.is_a?(Hash) && meta.key?("format")
+      unless meta["format"] == ProfileReport::FORMAT
+        return ["#{label} is a report.json of format #{meta["format"].to_json}, this lowrail-profile reads #{ProfileReport::FORMAT}: profile it again"]
+      end
       runs = meta["runs"]
       return ["#{label} has no run count"] unless runs.is_a?(Integer) && runs > 0
       list = []
@@ -110,12 +115,12 @@ module Lowrail
         end
         return list << "#{label}'s summary is not one row per run with processes, objects per request, and windows and completed windows of every kind"
       end
-      # A workloads certificate covers its run only if that run is one process
-      # whose request windows are exactly the requests it measured (a fork or
-      # an at_exit request would add windows the certificate does not cover).
+      # A workloads certificate covers its run only if its request windows are
+      # exactly the requests it measured (an at_exit request would add one);
+      # a fork is a second process, refused below.
       measured = meta["identity"].is_a?(Hash) && meta["identity"]["mode"] == "workloads" && meta["identity"]["measured"]
       if measured.is_a?(Array) && measured.size == runs && measured.all?(Hash)
-        uncovered = summary.zip(measured).reject { |run, m| run["processes"] == 1 && run["windows"]["request"] == m["requests"] }
+        uncovered = summary.zip(measured).reject { |run, m| run["windows"]["request"] == m["requests"] }
         list << "#{label} has #{uncovered.size} run(s) whose request windows are not the one process's measured requests" if uncovered.any?
       end
       # Warm leaves out each process's first window of an action. Parallel test

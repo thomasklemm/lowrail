@@ -126,9 +126,10 @@ Options, all before the first `--` (everything after it, a second `--` included,
 * `--keep-runs`: keep `run*/`, one TSV per process with the raw counts, in which each file path is written once
   (a `P` row) and rows refer to it by number. Without it `run*/` is deleted once the report is written. On Sure
   (16 workers) run 2 wrote 16 TSVs of about 240 MB, where paths were four fifths of the bytes.
-* `--timeout SECONDS` (no default): the command runs in its own process group, and lowrail-profile passes `INT` and
-  `TERM` on to it. A run still going at the deadline gets `TERM`, then `KILL` 10 s later; no further run starts,
-  `capture.json` lists it in `timed_out`, and lowrail-profile exits 124. A parallel worker of Fizzy hangs in about
+* `--timeout SECONDS` (no default): the command runs in its own process group, and lowrail-profile passes `INT`,
+  `TERM`, `HUP` and `QUIT` on to it. A run still going at the deadline gets `TERM`, then `KILL` 10 s later, both
+  to the whole group; no further run starts, `capture.json` lists it in `timed_out`, report.md says so at the top,
+  and lowrail-profile exits 124, also after an earlier failed run. A parallel worker of Fizzy hangs in about
   1 of 14 profiled runs in an autoload deadlock with no lowrail frame on its stack.
 
 The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/DIGEST/`, where the digest
@@ -259,23 +260,17 @@ A backport merged as its own commit (Rails stable branches) is not found by merg
 commit, so such a fix shows as not released. Rebuild the index with `script/profile-ledger` after the ledger
 changes (`--missing` after GitHub's rate limit stops it).
 
-## Compare two reports in CI
-
-**0.1 ships without a gate** ([DECISIONS](DECISIONS.md), [profile-gate-design](profile-gate-design.md)): compare
-lists what exceeds the floor below and exits 0, or 2 without valid evidence, which includes a capture of more than
-one process. What this section says about exit 1 describes the release candidate's gate, whose measurements follow;
-read "exits 1" as "lists a regression".
+## Compare two reports
 
 `lowrail-profile compare BASE.json HEAD.json --aa BASE2.json` sets the `report.json` of two profiles against each
 other, per line outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per
 request. `BASE2.json` is a second profile of the unchanged base, so `BASE.json` and `BASE2.json` are an A/A pair:
-how much they differ is how much two invocations of the same code differ. compare exits 1 when anything grew beyond
-its noise floor and 0 when nothing did, but only for valid evidence; otherwise it exits 2 and says why. `--json`
-prints the result as JSON, `--min N` (default 1) sets the smallest change that counts.
-
-**Without `--aa`, compare is not a gate.** It lists the changes beyond the spread inside each capture, says that
-this is a look and not a gate, and exits 0 (or 2 without valid evidence): that spread misses how much invocations
-differ (below), so such a list is a reason to look, not a confidence bound.
+how much they differ is how much two invocations of the same code differ. **0.1 has no gate**
+([DECISIONS](DECISIONS.md), [profile-gate-design](profile-gate-design.md)): compare lists what grew or shrank
+beyond its noise floor and exits 0 whatever it lists, or 2 without valid evidence and says why. `--json` prints the
+result as JSON, `--min N` (default 1) sets the smallest change that counts. What a user needs (profiling in one
+process, why there is no gate, what it can and cannot find, and a GitHub Actions job that publishes the comparison
+and never fails on it) is in the README's [*Compare*](../gem/README-profile.md#compare) section.
 
 * **Valid evidence**: every report (base, head and the A/A report) comes from this version of lowrail-profile and pass one strict check of their
   shape (every key compare reads present with its type, every summary number included, line rows with a unique site and action rows with a unique
@@ -288,11 +283,10 @@ differ (below), so such a list is a reason to look, not a confidence bound.
   finished measuring at least one request, never the output directory; none of these may be empty. That digest
   covers a run only when the run is one process whose request windows are exactly the requests it measured, so a
   workload run with more than one contributing process (such as a forked child that runs a job), or with requests
-  it did not measure (such as from `at_exit`), is not CI evidence (ordinary command captures may have any number of
-  processes). An `env:` value that is not a JSON value
+  it did not measure (such as from `at_exit`), is not valid evidence. A command capture of more than one process is not either (below). An `env:` value that is not a JSON value
   (String, number, true, false, nil, or Arrays and Hashes of them) has no identity a digest can certify, so such a
-  capture is not CI evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
-  profile is never a green result.
+  capture is not valid evidence. Anything else unexpected, a missing or partial report, a failing suite or a one-run
+  profile is never a comparison.
 * A kind of window (requests, jobs, mails, Cable actions) is compared only when every run of every report has some;
   a kind some runs have and others lack, or no comparable kind at all, exits 2.
   A line base or head never reached is a measured zero there, and one the A/A report never reached adds no spread
@@ -301,11 +295,21 @@ differ (below), so such a list is a reason to look, not a confidence bound.
 * A row's noise is the base's spread across the A/A pair: largest minus smallest of all the runs of both base
   reports, so it covers the pair's difference and each one's own spread (every run counts with `--runs` above 2);
   or head's own spread, if that is larger. Without `--aa` it is the larger spread inside base or head.
+* **One process**: a report whose runs had more than one process (parallel test workers) is not valid evidence:
+  workers split the tests anew in every capture, so which windows warm leaves out, and with them every warm value,
+  differ between captures in a way one A/A pair does not sample. compare names `PARALLEL_WORKERS=1`.
 * A line's noise floor is the larger of twice its noise and `--min`: one A/A pair is one sample of that noise, and
   at once the noise one pair failed 4.5% of unchanged heads on the 3.3 Blog (M5 confirm receipts).
-* An action's is the largest of twice its noise, 0.1% of its objects per request and 20 × `--min`, because parallel
-  test workers split an action's requests differently from one invocation to the next. That multiplier comes from
-  Campfire's first A/A pair, before the floor spanned invocations, not from a general confidence bound.
+* An action's is the largest of twice its noise, 0.1% of its objects per request and 20 × `--min`. The multiplier
+  comes from Campfire's first A/A pair, measured with parallel workers before the floor spanned invocations; in one
+  process it is what the plants were measured against (README *What it can find*), not a general confidence bound.
+
+### Release-candidate measurements (the gate as it was)
+
+0.1.0.rc1 exited 1 when compare listed a regression, and its CI job profiled head a second time after a first exit
+1. The measurements below were taken with that gate, several with parallel workers, which compare now refuses; read
+"exits 1" as "lists a regression". The one-process measurements that decided against a gate are in
+[profile-gate-design](profile-gate-design.md).
 
 On Campfire's suite an A/A pair (two invocations of `bin/rails test` on the same code) exits 0 with no changes
 beyond the floor, and adding `20.times { ERB::Util.html_escape("a<b") }` to `RoomsController#show` gives exit 1
@@ -333,48 +337,8 @@ action +43.2 to +44.8 against a floor of 25.76 and both Active Support lines +1.
 One A/A pair is one more sample of the variation between invocations, not a confidence bound: a row that varies more
 than this pair shows can still exceed it.
 
-A GitHub Actions job that profiles the pull request's base twice (the A/A pair) and its head with the same command
-and fails on a regression that a second profile of head shows too:
-
-```yaml
-lowrail-profile:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-      with: { fetch-depth: 0 }
-    - uses: ruby/setup-ruby@v1
-      with: { bundler-cache: true }
-    - name: Profile base
-      run: |
-        git checkout ${{ github.event.pull_request.base.sha }}
-        bin/rails db:test:prepare
-        bundle exec lowrail-profile --out tmp/base -- bin/rails test
-        bundle exec lowrail-profile --out tmp/base2 -- bin/rails test
-    - name: Profile head
-      run: |
-        git checkout ${{ github.event.pull_request.head.sha }}
-        bin/rails db:test:prepare
-        bundle exec lowrail-profile --out tmp/head -- bin/rails test
-    - name: Compare
-      shell: bash # pipefail, so tee does not hide compare's exit status
-      run: |
-        status=0
-        bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json \
-          | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
-        [ "$status" = 1 ] || exit "$status"
-        echo "Profiling head again: a regression fails the job only if it shows twice." | tee -a "$GITHUB_STEP_SUMMARY"
-        bundle exec lowrail-profile --out tmp/head2 -- bin/rails test
-        bundle exec lowrail-profile compare tmp/base/report.json tmp/head2/report.json --aa tmp/base2/report.json \
-          | tee -a "$GITHUB_STEP_SUMMARY"
-```
-
-Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step from the head's
-Gemfile (`BUNDLE_GEMFILE`). A suite whose tests fail still profiles, for a look at the report, but compare then
-exits 2; check the suite in its own job. `shell: bash` matters: without it GitHub runs the step without `pipefail`,
-and `tee` would turn compare's exit status into 0. Without `--aa tmp/base2/report.json` the step never fails: compare
-without an A/A pair is not a gate. The second base profile costs one more suite run. A first exit 1 profiles head once more, and the
-job fails only if that comparison exits 1 too: on the receipts' Blog this took unchanged heads from 1.7% failing to
-0.03%, with every planted regression on four apps still caught
+The release candidate's CI job, which profiled head again after a first exit 1, took unchanged heads on the receipts'
+Blog from 1.7% failing to 0.03%, with every planted regression on four apps still caught
 ([receipts](../bench/upstream/profile_release/2026-11-25-final)).
 
 ## Safety
@@ -392,7 +356,7 @@ process). When the command runs it:
 * code in a Ractor other than the main one runs uncounted, without calling the counter (its tables are not
   Ractor-safe, and are not marked so);
 * lowrail-profile exits with the command's status (the first failing run's, or 128 plus the signal that stopped
-  it), also when the report then fails; a passing command whose report cannot be built exits 1.
+  it; 124 when a run timed out), also when the report then fails; a passing command whose report cannot be built exits 1.
 
 `gem/test/profile_test.rb` checks the cases above that a test can reach: a Cable subscription's return value and
 exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
@@ -421,8 +385,8 @@ another on an 8-CPU orb.
 * A different seed, or another app's report, exits 2. The app tree (outside `log/`, `tmp/` and SQLite databases)
   is the same after every capture.
 * Ledger: 52 of 52 matches at `--top 300`, each checked against its pull request's diff on GitHub.
-* GitHub Actions: the README's job, verbatim, on a private copy of the Blog fails on a planted pull request
-  (exit 1, one regression) and passes on an unchanged one. macOS (`macos-latest`, arm64): the counter builds with
+* GitHub Actions: the release candidate's README job (its gate), verbatim, on a private copy of the Blog failed on
+  a planted pull request (exit 1, one regression) and passed on an unchanged one. macOS (`macos-latest`, arm64): the counter builds with
   Apple clang and Campfire's 634 tests are identical plain, off and profiled (outcomes only; load order was not
   compared there).
 * After the M5 review fixes the rebuilt gem was proved again where they reach: the floor Blog's full proof, and a
