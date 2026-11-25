@@ -1,0 +1,72 @@
+diff --git a/Gemfile b/Gemfile
+index 4686e10ed..d912595d6 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -44,7 +44,7 @@ gem 'omniauth_openid_connect'
+ gem 'omniauth-rails_csrf_protection'
+ gem 'parallel'
+ gem 'pg'
+-gem 'posthog-rails'
++gem 'posthog-rails', path: '../phr'
+ gem 'posthog-ruby'
+ gem 'puma'
+ gem 'pundit', '>= 2.5.1'
+@@ -110,3 +110,5 @@ end
+ group :development do
+   gem 'rubocop-rails', '>= 2.33.4', require: false
+ end
++
++gem "lowrail-profile", group: [:development, :test], require: false
+diff --git a/Gemfile.lock b/Gemfile.lock
+index 891095917..9a17edf3d 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -7,6 +7,13 @@ GIT
+       base64 (>= 0.1.0)
+       csv (>= 3.0.0)
+ 
++PATH
++  remote: ../phr
++  specs:
++    posthog-rails (3.18.6)
++      posthog-ruby (= 3.23.7)
++      railties (>= 5.2.0)
++
+ GEM
+   remote: https://rubygems.org/
+   specs:
+@@ -304,6 +311,7 @@ GEM
+     loofah (2.25.3)
+       crass (~> 1.0.2)
+       nokogiri (>= 1.19.5)
++    lowrail-profile (0.1.0.rc1)
+     mail (2.9.1)
+       logger
+       mini_mime (>= 0.1.1)
+@@ -411,9 +419,6 @@ GEM
+     pg (1.6.3-arm64-darwin)
+     pg (1.6.3-x86_64-darwin)
+     pg (1.6.3-x86_64-linux)
+-    posthog-rails (3.18.6)
+-      posthog-ruby (= 3.23.7)
+-      railties (>= 5.2.0)
+     posthog-ruby (3.23.7)
+       concurrent-ruby (~> 1)
+     pp (0.6.4)
+@@ -770,6 +775,7 @@ DEPENDENCIES
+   jwt (~> 3.3.0)
+   kaminari
+   lograge
++  lowrail-profile
+   mcp (~> 1.6)
+   net-imap (>= 0.5.14)
+   oj
+@@ -779,7 +785,7 @@ DEPENDENCIES
+   omniauth_openid_connect
+   parallel
+   pg
+-  posthog-rails
++  posthog-rails!
+   posthog-ruby
+   pry-byebug
+   pry-rails

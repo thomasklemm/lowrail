@@ -184,6 +184,15 @@ no target before normalizing. It was not built, because posthog-ruby's AGENTS.md
 a changeset, and CONTRIBUTING asks for the agent context of each PR. Thomas decides whether that is worth a third
 branch.
 
+Built afterwards as [PHR1](../../bench/upstream/pr-queue/items/PHR1.md) (2026-11-25), held: the branch
+`thomasklemm/tracing-headers-allocations` @ `a58f8d2022` is not pushed; its commit is kept as
+[phr1.patch](../../bench/upstream/oss_profile_sweep_1/phr1.patch). posthog-ruby needs signed PR
+commits, not only on main: rulesets on main require signatures and squash merges, and GitHub's docs say unsigned
+head commits can block a squash merge. Every fork PR merged since the org ruleset of 2026-08-05 has only verified
+commits. 369 → 93 objects per `RequestContext#call` (73 env keys, Rails 8.1), −39.1% instructions without JIT and
+−51.1% with YJIT. On Dawarich's request specs the line falls from 341.8 to 28.9 objects per request
+([receipts](../../bench/upstream/oss_profile_sweep_1/dawarich/phr1)).
+
 Ownership checks for RQ1 and CC1, in full in the queue items:
 
 * **rqrcode_core:** every PR (48) and issue in whomwah/rqrcode_core. #28 (2021, "Alternative ZFRS to improve memory

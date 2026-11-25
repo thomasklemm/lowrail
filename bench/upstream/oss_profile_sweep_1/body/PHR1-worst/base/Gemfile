@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+gem "posthog-ruby", path: "/home/user/oss/up/posthog-ruby-main"
+gem "posthog-rails", path: "/home/user/oss/up/posthog-ruby-main/posthog-rails"
+gem "railties"

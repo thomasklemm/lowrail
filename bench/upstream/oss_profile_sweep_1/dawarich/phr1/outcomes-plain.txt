@@ -1,0 +1,562 @@
+Run options: exclude {eval: true}
+/areas
+    when signed in
+      with valid params
+        updates the area
+        returns turbo_stream with flash
+      with non-positive radius
+        returns turbo_stream flash error
+        does not update the area
+      for another user's area
+        does not update it
+      with out-of-range coordinates
+        rejects longitude below -180
+        rejects latitude above 90
+    without authentication
+      redirects to login
+    when signed in
+      with turbo_stream format
+        with invalid params
+          returns turbo_stream flash error
+          does not create an area
+        with valid params
+          creates a new area
+          creates a canonical Place behind the legacy form
+          returns turbo_stream with flash
+    without authentication
+      redirects to login
+/stats
+  when user is signed in
+      enqueues Stats::CalculatingJob for each tracked year and month
+      when user is inactive
+        returns an unauthorized response
+      redirects to that year in insights
+      when updating the whole year
+        enqueues Stats::CalculatingJob for each month of the year
+      when updating a specific month
+        enqueues Stats::CalculatingJob for the given year and month
+        rejects zero and out-of-range months without enqueueing work
+      when user is inactive
+        returns an unauthorized response
+      tells a user with privacy zones that the shared month keeps them hidden
+      leaves the privacy zone note out for a user without privacy zones
+      redirects to the all-time insights
+      with a stat to show
+        renders without the geocoding stats when no geocoding provider is configured
+        renders the geocoding stats when the instance has a geocoding provider
+  when user is not signed in
+      redirects to the sign in page
+      redirects to the sign in page
+/visits
+    busts caches for every month touched when the deletion spans months
+    busts the month-summary cache for affected months
+    keeps points attached to the tombstoned visit
+    rejects when no visit_ids are submitted
+    soft-deletes the selected visits, keeping tombstones
+    returns the Lite-window upgrade hint when an archived visit id is submitted
+    rejects when more than the maximum number of visit_ids are submitted
+    includes the calendar frame stream in the turbo response
+    rejects when an id belongs to another user
+    with date + source_status instead of visit_ids (Delete all path)
+      rejects source_status=confirmed so confirmed visits cannot be bulk-deleted by date
+      soft-deletes all visits with the given status on the given date
+      returns unprocessable when no visits match date + source_status
+      does not touch visits of other users
+      returns unprocessable for an unknown source_status without raising
+      returns unprocessable when neither visit_ids nor date+source_status are given
+      returns the turbo stream response with calendar frame
+    no longer routes to VisitsController#index
+    does not affect visits of other users
+    confirms all suggested visits
+    declines all suggested visits
+    renders a plural-aware French success message in the Turbo response
+    with date param (TZ-aware scoping)
+      handles DST spring-forward boundary correctly (Europe/Berlin 2026-03-29)
+      only updates visits within the user-local day
+    merges 2 same-day visits and returns turbo_stream
+    busts the month-summary cache for the affected month
+    rejects when a visit_id belongs to another user
+    rejects when fewer than 2 visit_ids are submitted
+    merges 3 same-day visits across mixed statuses
+    rejects when visits span multiple days in the user timezone
+    when an HTML update fails validation
+      returns to the timeline with the error
+    cache busting on visit mutations
+      busts both old and new month caches when started_at moves across months
+      deletes the MonthSummary cache for the visit month after update
+    with turbo_stream format
+      uses a feminine French status in the success message
+      sets the location label from Place when place_id is provided
+      drops a Visit name that only repeated the previous Place
+      rejects place_id belonging to another user (IDOR guard)
+      rejects conflicting Place and Area selections
+      clears the legacy Area association when a Place is selected
+      replaces the visit_entry row on status change
+      does not emit the removed review-flow streams (badge, day banner, filter counts)
+      replaces the visit_entry row on rename
+      when user is on Lite plan with archived visit (>12 months old)
+        still allows PATCH on a recent visit (within the window)
+        returns 404 on DELETE for an archived visit outside the 12-month window
+        returns 404 on PATCH for an archived visit outside the 12-month window
+    with valid parameters
+      confirms the requested visit
+      does not override an explicit status from the edit
+      stores the suggested Place name as the location label when confirming
+      rejects the requested visit
+      keeps the original name when confirming if no suggested place exists
+      clears the custom name when a blank name is submitted
+      silently confirms a suggested visit when the user edits it
+    falls back to source_status scoping when visit_ids is absent
+    declines only the selected visits
+    confirms only the selected visits, not the rest
+    rejects when more than the maximum number of visit_ids are submitted
+    rejects when fallback (status-only) scoping would exceed the maximum
+    rejects the whole batch when an id belongs to another user
+    does NOT emit the old visit_item target
+    does not emit the removed review-flow streams (banner, filter counts, badge)
+    soft-deletes the visit, keeping the row as a tombstone
+    includes the success flash message
+    busts the MonthSummary cache for the visit month
+    redirects to /map on HTML format
+    returns turbo_stream removing the correct visit_entry row
+Settings
+    when user is signed in
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+      rejects an invalid decision without changing state
+      lets a user reverse an earlier choice
+      records declined
+      records granted and responds with a turbo stream replacing the indicator
+    when user is not signed in
+      redirects to the sign in page
+    renders the opt-in control when notices are off
+    hides the notices panel on cloud
+    renders the opt-out control once notices are on
+    when not self-hosted
+      redirects to root path
+    when self-hosted
+      returns http success
+    when user is signed in
+      redirects back
+      generates an API key for the user
+    when user is not signed in
+      redirects to the sign in page
+    when user is signed in
+      redirects to the root path
+      updates the user theme
+      with params {theme: ""}
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+        rejects the request without changing the theme
+      with params {}
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+        rejects the request without changing the theme
+      when theme is dark
+        updates the user theme
+      with params {theme: "purple"}
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+        rejects the request without changing the theme
+    when user is not signed in
+      redirects to the sign in page
+/trips
+  links a trip to the full map with its exact date range
+    does not load the unused raw point coordinate projection
+    keeps the name and dates of a TREK-managed trip read-only and says where to change them
+    renders a successful response
+    ends the form with saving and cancelling back to the trip
+    previews the saved route from tiles
+    lets a stopped TREK trip be edited freely
+    with valid parameters
+      marks a Detected Trip as edited
+      lets a Detected Trip take the exact period of another Detected Trip
+      redirects to the trip
+      updates the requested trip
+    with invalid parameters
+      renders a response with 422 status
+    with invalid parameters
+      does not create a new Trip
+      renders a response with 422 status (i.e. to display the 'new' template)
+    with valid parameters
+      creates a new Trip
+      redirects to the created trip
+      when user is inactive
+        redirects to the root path
+    renders a successful response
+    previews recorded routes from tiles without loading the path
+    filters the list by origin
+    lists trips shared by the family without loading their paths
+    previews the plan of a trip that has no recorded path yet
+      explains a skipped long absence
+      shows no hint once there is a Home
+      names the longest trip from the detection policy in the long-absence hint
+      shows no hint when detection is off
+      asks for a Home when detection is on and there is none
+    when trip path is not yet calculated
+      renders a successful response with loading state
+    hands the replay speed the user distance unit
+    shows a future TREK trip as planned instead of permanently calculating its path
+    renders a successful response
+    shows TREK day notes in the day note, and in the plan only when the day note differs
+    renders header edit and delete actions
+    computes day stats with PostGIS (no Ruby Geocoder fallback)
+    keeps a disconnected future TREK trip in its planned state
+    hands the poster studio a trip stats line from the stored distance
+    keeps the trip actions above the TREK plan and lists travellers in the plan header
+    keeps a disconnected TREK itinerary visible
+    renders a read-only itinerary for a TREK-managed trip
+    says when a TREK plan was synced and links back to the trip in TREK
+    refreshes cached day stats when the recording gap setting changes
+    lists no days before a Lite user's data window
+    does not load the unused raw point coordinate projection
+    draws the plan of a future TREK trip on the map, with stops that fly the map to them
+    renders the recalculate button
+    offers no plan toggle for a trip without a plan
+    offers no stats block before the trip distance is calculated
+    shows a finished trip without recorded locations as empty rather than calculating
+    offers the plan as a toggle over the recorded track of a past trip
+    keeps showing progress while a trip with recorded locations is calculated
+    draws the route from tiles instead of embedding the path
+    when the user timezone is not UTC
+      renders successfully when the timezone is a non-IANA ActiveSupport name
+      buckets a point just after local midnight into its correct local day
+    with photos grouped by day
+      renders photo thumbnails only inside day collapses (no flat bottom grid)
+      renders a day's photos inside that day's collapse
+    poster studio
+      renders the studio without date controls
+      renders the poster gallery list
+      renders a disabled poster button while the path is calculating
+      passes the trip name to the map controller
+      offers poster and video studios as named icons beside the other trip actions
+      renders an enabled poster button when the path exists
+    redirects to the trips list
+    dismisses the period when a Detected Trip is deleted
+    destroys the requested trip
+  privacy zones on the trip page
+    gives the trip page empty full bounds when every point lies inside the zone
+    gives a trip preview empty bounds when the whole route lies inside the zone
+    never starts a day, or fits the map, inside a privacy zone
+    fits trip previews to the route outside the zone
+    keys the route tile URL by the zone fingerprint
+    renders a successful response
+    cancels back to the trips list
+    when user is inactive
+      redirects to the root path
+/notes
+  requires sign in
+    does not reach a trip day note or another user's note
+    updates text and time but never the point
+    renders a form for the clicked point with the moment in the user timezone
+    leads to the diary on the map
+    deletes the note and tells the map
+    creates a standalone map note at the moment given in the user timezone
+    rejects an empty note and renders the form again
+    rejects a note without a point
+/insights
+  when user is signed in
+      loads days per country for the year the page is showing
+      renders a successful response
+      omits days per country on All Time, which has no calendar year to count
+      when a legacy stat has an invalid month
+        ignores the invalid row instead of returning an error
+      when there are stats for current and previous year
+        renders the page with comparison data
+      when there are no stats
+        renders the page without errors
+      when selecting all time view
+        loads stats for all years
+      when selecting a specific month
+        renders the page with travel patterns
+      when selecting a specific year
+        loads stats for the selected year
+        calculates comparison with previous year
+      when monthly digest exists
+        renders the page using existing digest
+      when there are stats for the current year
+        renders the page with stats
+      renders a successful response
+      when there are stats
+        renders unnamed confirmed visits under their displayed Place name
+        renders details with stats
+        puts the selected year before the previous year and keeps the previous bar neutral
+  when user is not signed in
+      redirects to the sign in page
+      redirects to the sign in page
+Homes
+    keeps the flash of a request that redirected to the root
+    keeps the language a visitor picked through the redirect
+    sends a signed-in user to their map
+    sends a visitor straight to the sign-in page
+/exports
+    when user is logged in
+      renders a successful response
+    when user is not logged in
+      redirects to the login page
+    redirects to the exports list
+    destroys the requested export
+    with valid parameters
+      creates a new Export
+      redirects to the exports index page
+      enqueues a job to process the export
+    with invalid parameters
+      does not create a new Export
+      renders a response with 422 status (i.e. to display the "new" template)
+Map
+    when user not signed in
+      returns redirects to sign in page
+    when user signed in
+      exposes an enabled reverse geocoding flag when the instance has a provider
+      returns http success
+      no longer carries Days per Country, which now lives on Insights
+      exposes a disabled reverse geocoding flag when the instance has no provider
+Users
+    when not self-hosted
+      returns http success
+    when self-hosted
+      redirects to root path
+/places
+  accepts archive and unarchive through web Place parameters
+    with turbo_stream format
+      returns turbo_stream flash error with invalid params
+      includes updated flag in response
+      updates the place and returns turbo_stream
+      excludes tombstoned visits from the serialized visits_count
+      clears the last tag when the map modal submits with every tag unchecked
+  the shared Place editor
+    relays cleared tags from a drawer save and retains the geofence toggle
+    writes a map move and radius to decimal coordinates enqueues reattribution and relays the saved feature
+    saves the editor without JavaScript and locks a rename while clearing tags
+    renders editable name tags and notes with map editing and counted delete consequences
+    renders invalid radius errors in the editor without saving or relaying a feature
+    renders invalid HTML editor input inline with the attempted name
+    deletes from the map panel with a removal relay and success flash while keeping visits
+    shows the place and folds its editor away
+    when accessing another user's place
+      returns 404
+    when authenticated
+      returns a successful response
+      shows an empty state when no merge candidates match the search
+      does not eagerly load every point belonging to the place visits
+      shows average dwell formatted as Xh Ym
+      deletes the Place from the drawer through its member route
+      searches a bounded merge candidate list by name with location context
+      renders inside the application layout for a direct visit
+      labels merge search and selection controls for assistive technology
+      shows total dwell hours based on MINUTES column
+      shows merge candidate distances in the distance unit the user chose
+      lists up to 5 most recent visits ordered by started_at DESC
+      hides tombstoned visits from the recent-visits list
+      renders the merge search without missing translations
+      renders the place name, city, and country
+      wraps the body in the place-drawer turbo-frame
+      renders the total visit count
+    when unauthenticated
+      redirects to the sign-in page
+    does not merge a Place into itself
+    does not merge another users Place
+    merges the duplicate into the selected survivor
+    relays a merged survivor and the removed duplicate to the map panel
+    does not merge into another user's survivor Place
+    reports a timestamp conflict without changing either Place
+  the place form
+    shows the chosen spot as text and its tags with their icons
+    renders a successful response
+    can show only unconfirmed suggested Places
+    offers a direct confirmation action for unconfirmed Places
+    links each Place to its details, where it can be merged
+    promotes a suggested Place into the user-owned catalogue
+    does not lock the placeholder name so geocoding can still rename the Place
+    does not confirm another user's Place
+    redirects to the places list
+    deletes mapped legacy Area shells so the Place cannot be recreated
+    destroys the requested place
+    with turbo_stream format
+      with valid params
+        stores and returns the visit radius
+        reattributes Suggested Visits after explicit user creation
+        creates a full Place from a Visit and attaches it atomically
+        drops a Visit name that only repeated its legacy Area
+        returns turbo_stream replacing place-creation-data with flash
+        associates tags when provided
+        does not create a Place when the Visit belongs to another user
+        includes created flag in response
+        creates a new place
+      with invalid params
+        does not create a place
+        returns turbo_stream flash error
+    renders no results message when geocoder returns empty
+    returns nearby places partial with place cards
+    returns bad request when coordinates are missing
+    renders no results when the instance has no geocoding provider
+    turns enter and leave notifications on and shows the switch on
+    returns a turbo_stream that refreshes the place-drawer frame in place
+  name locking
+    shows a lock indicator on the drawer for a locked place
+    drops the lock from the drawer when the name is reset to the default
+    locks the name of a place the user creates by hand
+    shows no lock indicator for an auto-named place
+    shows the lock in the drawer response right after a rename
+/points
+    when user is on pro plan
+      shows points outside the 12-month window
+    when user is on lite plan
+      hides points outside the 12-month data window
+    returns a 303 status code
+    redirects to the points list
+    destroys the selected points
+    enqueues stats and track recalculation
+    preserves the start_at and end_at parameters
+    when no points are selected
+      redirects to the points list
+    when user is logged in
+      submits current date fields when exporting gpx without searching
+      renders a successful response
+      renders the page-entry summary in French without missing translations
+      submits current date fields when exporting json without searching
+      when reverse geocoding is enabled
+        displays address from geodata properties when available
+        falls back to city and country_name when geodata is empty
+        falls back to city and country_name when geodata has no properties
+    when user is not logged in
+      redirects to login page
+/notifications
+  when user is logged in
+      falls back to the notification page when there is nowhere to go
+      does not open another user's notification
+      opens the notification page for an error, where the message and what to do are
+      never leaves the site, even for a path stored without validation
+      marks the notification read and goes where it leads
+      renders a successful response
+      says how long read notifications are kept
+      redirects to the notifications list
+      marks all notifications as read
+      still redirects when inline is switched off explicitly
+      from the bell (inline)
+        marks everything read and answers with a stream instead of leaving the page
+        refreshes notification pages in the asking tab too, which Turbo would otherwise skip
+        leaves another user's notifications unread
+        clears the bell items and shows the real unread count
+      renders a successful response
+      with an error notification
+        tells a Cloud user where to write instead
+        does not ask a Cloud user for container logs they cannot reach
+        asks a self-hosted user to report the bug with container logs
+        does not send a self-hosted user to Cloud support
+      with a stored XSS payload in content
+        preserves the safe text content
+        does not render <script> or event-handler attributes
+    the destination button on the notification page
+      is absent for a path stored without validation
+      links to where the notification leads
+      is absent when there is nowhere to go
+      destroys the requested notification
+      redirects to the notifications list
+    the bell
+      keeps only notifications inside the live list, so new ones land below the header
+      shows escaped markup from the text as text
+      shows what happened, when, and opens the destination
+      offers mark all as read without leaving the page
+    link prefetch
+      is switched off for the bell list and the notification list
+  when user is not logged in
+    redirects to the login page
+    does not open a notification
+Imports
+    when user is logged in
+      rejects an unknown source with 422 instead of raising
+      updates the import
+      updates the import source
+      clears the source when a blank value is submitted
+    when user is logged in
+      returns http success
+      when user is a trial user
+        returns http success
+    when the import is a legacy unmarked KML wrapper
+      detects the wrapper and downloads the inner KML with its original filename
+    when user is not logged in
+      redirects to login
+    when an unmarked legacy ZIP contains multiple files
+      preserves the current name and complete original archive
+    when user is logged in
+      restores the inner extension of a legacy timestamp-suffixed wrapper name
+      uses the latest rename after the download has already been prepared
+      prevents downloading another user's import
+      keeps the source downloadable when unwrapping exceeds the extraction limit
+      downloads the extracted inner file using the renamed import name
+      queues preparation and responds before downloading or extracting the archive
+    when the import is a genuine zip upload
+      downloads the original zip without extracting an entry
+    when the wrapped file has a non-ASCII name
+      downloads the extracted inner file
+    when user is logged in
+      deletes the import
+    when user is logged in
+      returns http success
+      renders a source dropdown bound to import[source]
+      selects a blank source for an import without one
+    when user is logged in
+      returns http success
+      when other users have imports
+        only displays current users imports
+      when user has imports
+        displays imports
+    when user is inactive
+      blocks import creation
+    when an expired trial user has status: trial but active_until in the past
+      blocks import creation
+    when user is logged in
+      when importing owntracks data
+        queues import job
+        creates a new import
+      when importing client-wrapped files
+        uses the original GPX filename as the visible import name
+        uses the original KML filename as the visible import name
+        keeps a genuine zip filename and marks it as unwrapped
+        keeps the original name and unwraps the download when the filename has reserved characters
+      when an error occurs during import creation
+        deletes any created imports
+      when importing gpx data
+        queues import job
+        creates a new import
+    when an expired trial user has status: trial but active_until in the past
+      prevents access to the new import form — gates must not diverge from create
+    when user is not logged in
+      redirects to login
+    when user is inactive
+      prevents access to new import form
+    when user is active
+      allows access to new import form
+    when user is logged in
+      allows viewing own import
+      prevents viewing other users import
+    when user is not logged in
+      redirects to login
+Tags
+    displays user's tags
+    does not display other users' tags
+    returns success
+    prevents editing other users' tags
+    returns success
+    with invalid parameters
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+      returns unprocessable entity status
+      does not create a new tag
+    with valid parameters
+      creates a new tag
+      redirects to tags index
+      associates tag with current user
+    prevents deleting other users' tags
+    redirects to tags index
+    destroys the tag
+    prevents updating other users' tags
+    with invalid parameters
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-rails-8.0.4/lib/rspec/rails/matchers/have_http_status.rb:219: warning: Status code :unprocessable_entity is deprecated and will be removed in a future version of Rack. Please use :unprocessable_content instead.
+      returns unprocessable entity status
+    with valid parameters
+      updates the tag
+      redirects to tags index
+    returns success
+  when not authenticated
+    redirects to sign in for index
+    redirects to sign in for create
+    redirects to sign in for new
+Top 10 slowest example groups:
+414 examples, 0 failures

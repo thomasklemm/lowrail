@@ -1,0 +1,52 @@
+# lowrail-profile compare
+
+Base: `bundle exec rspec spec/requests/home_spec.rb spec/requests/stats_spec.rb spec/requests/points_spec.rb spec/requests/map_spec.rb spec/requests/trips_spec.rb spec/requests/settings_spec.rb spec/requests/visits_spec.rb spec/requests/places_spec.rb spec/requests/insights_spec.rb spec/requests/notifications_spec.rb spec/requests/exports_spec.rb spec/requests/imports_spec.rb spec/requests/users_spec.rb spec/requests/tags_spec.rb spec/requests/notes_spec.rb spec/requests/areas_spec.rb --format documentation`. Head: `bundle exec rspec spec/requests/home_spec.rb spec/requests/stats_spec.rb spec/requests/points_spec.rb spec/requests/map_spec.rb spec/requests/trips_spec.rb spec/requests/settings_spec.rb spec/requests/visits_spec.rb spec/requests/places_spec.rb spec/requests/insights_spec.rb spec/requests/notifications_spec.rb spec/requests/exports_spec.rb spec/requests/imports_spec.rb spec/requests/users_spec.rb spec/requests/tags_spec.rb spec/requests/notes_spec.rb spec/requests/areas_spec.rb --format documentation`.
+
+Objects per request (all, by run): base 60945.4 / 60948.6, head 60637.6 / 60647.9.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request.
+
+**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a small one can be missing (README-profile.md, *Compare*).
+
+## Regressions: 0
+
+None.
+
+## Improvements: 45
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | TripsController#create | 23080.8 | 22587.65 | -493.15 | 368.0 |
+| request action | TagsController#create | 18854.4 | 18404.2 | -450.20 | 291.6 |
+| request action | PointsController#index | 74640.7 | 74236.7 | -404.00 | 375.4 |
+| request action | TagsController#update | 30141.65 | 29762.85 | -378.80 | 276.8 |
+| request action | TripsController#update | 24693.4 | 24321.5 | -371.90 | 201.0 |
+| request action | ImportsController#create | 6453.3 | 6111.55 | -341.75 | 20.0 |
+| request action | PlacesController#merge | 245947.2 | 245605.7 | -341.50 | 245.95 |
+| request action | VisitsController#merge | 5531.5 | 5190.5 | -341.00 | 20.0 |
+| request action | SettingsController#generate_api_key | 1989.25 | 1648.25 | -341.00 | 20.0 |
+| request action | NotificationsController#mark_as_read | 3183.25 | 2843.05 | -340.20 | 20.0 |
+| request action | PlacesController#create | 56388.95 | 56049.2 | -339.75 | 56.39 |
+| request action | ExportsController#create | 2544.3 | 2206.3 | -338.00 | 20.0 |
+| request action | AreasController#create | 3759.7 | 3421.9 | -337.80 | 20.0 |
+| request action | TripsController#show | 102659.45 | 102327.05 | -332.40 | 279.4 |
+| request action | PlacesController#update | 13796.4 | 13470.7 | -325.70 | 110.0 |
+| request action | StatsController#update_all | 1977.5 | 1656.5 | -321.00 | 20.0 |
+| request action | NotificationsController#destroy | 3339.0 | 3020.0 | -319.00 | 20.0 |
+| request action | SettingsController#changelog_consent | 2980.5 | 2662.8 | -317.70 | 20.0 |
+| request action | PointsController#bulk_destroy | 3285.3 | 2968.1 | -317.20 | 20.0 |
+| request action | AreasController#update | 95631.0 | 95313.85 | -317.15 | 95.63 |
+| request action | PlacesController#confirm | 297877.75 | 297561.25 | -316.50 | 297.88 |
+| request action | StatsController#update | 1980.35 | 1664.1 | -316.25 | 20.0 |
+| request action | ImportsController#update | 3393.65 | 3077.65 | -316.00 | 20.0 |
+| request action | VisitsController#bulk_update | 4441.3 | 4125.35 | -315.95 | 20.0 |
+| request action | VisitsController#bulk_destroy | 6207.9 | 5892.4 | -315.50 | 20.0 |
+| request action | PlacesController#destroy | 5851.2 | 5536.0 | -315.20 | 20.0 |
+| request action | TripsController#destroy | 6315.25 | 6000.25 | -315.00 | 20.0 |
+| request action | ExportsController#destroy | 2941.5 | 2626.5 | -315.00 | 20.0 |
+| request action | VisitsController#destroy | 3204.65 | 2890.35 | -314.30 | 20.0 |
+| request action | VisitsController#update | 35411.55 | 35097.65 | -313.90 | 35.41 |
+
+15 more in the JSON.
+
+Not compared: 7 actions (7 no warm value).

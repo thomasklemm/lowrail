@@ -1,0 +1,5 @@
+diff -r /home/user/oss/phr-src/base/posthog-rails-3.18.6/lib/posthog/rails/tracing_headers.rb /home/user/oss/phr-src/head/posthog-rails-3.18.6/lib/posthog/rails/tracing_headers.rb
+40a41
+>         target_lengths = target_names.map(&:length)
+41a43
+>           next if key.is_a?(String) && key.ascii_only? && !target_lengths.include?(key.length)

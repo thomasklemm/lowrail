@@ -1,0 +1,71 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/phr1_worst.rb",
+  "at": "2026-11-25T23:04:14Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/oss/up/posthog-ruby-main",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "27fbf08b5a4cce9cda88f04db5b219391a7e04ff",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/oss/up/posthog-ruby",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "a58f8d2022fd3679dfbc0a90d06dc31835fd3249",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp every key a target length": {
+      "base": 158.999,
+      "base1": 158.999,
+      "base2": 158.999,
+      "candidate": 159.999,
+      "change": 0.0062893477317467195,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp every key non-ASCII": {
+      "base": 232.0,
+      "base1": 232.0,
+      "base2": 232.0,
+      "candidate": 233.0,
+      "change": 0.004310344827586299,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp every key a target length": {
+      "base": 297651.259,
+      "base1": 297650.068,
+      "base2": 297652.45,
+      "candidate": 364751.5205,
+      "change": 0.22543248002858252,
+      "aa": 0.0000080026538707946,
+      "claim": true
+    },
+    "interp every key non-ASCII": {
+      "base": 508269.16075000004,
+      "base1": 508259.7425,
+      "base2": 508278.579,
+      "candidate": 545053.8565,
+      "change": 0.07237247228559096,
+      "aa": 0.00003706008834421299,
+      "claim": true
+    }
+  },
+  "ips": {}
+}

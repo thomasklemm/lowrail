@@ -1,0 +1,79 @@
+From a58f8d2022fd3679dfbc0a90d06dc31835fd3249 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Wed, 25 Nov 2026 22:33:49 +0000
+Subject: [PATCH] perf(rails): skip env keys that can't match a tracing header
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When a tracing header such as X-POSTHOG-SESSION-ID is absent, which is
+the case on most server-rendered requests, extract_header falls back to
+scanning the Rack env and normalized every key with upcase and tr: two
+new Strings per key, for each of the two tracing headers, on every
+request (close to 300 objects with the 73 env keys a small Rails 8.1
+app has at this middleware).
+
+For an ASCII key, upcase and tr keep its length, so a key whose length
+matches none of the normalized target names cannot match one and is
+skipped before it is copied. Other keys (non-ASCII ones, which upcase
+can lengthen or shorten, e.g. "ﬆ" to "ST", and non-String keys) are
+still normalized and compared as before, so the same keys match.
+---
+ .changeset/tracing-headers-allocations.md          |  5 +++++
+ posthog-rails/lib/posthog/rails/tracing_headers.rb |  2 ++
+ spec/posthog/rails/request_context_spec.rb         | 13 +++++++++++++
+ 3 files changed, 20 insertions(+)
+ create mode 100644 .changeset/tracing-headers-allocations.md
+
+diff --git a/.changeset/tracing-headers-allocations.md b/.changeset/tracing-headers-allocations.md
+new file mode 100644
+index 0000000..3da0757
+--- /dev/null
++++ b/.changeset/tracing-headers-allocations.md
+@@ -0,0 +1,5 @@
++---
++"posthog-rails": patch
++---
++
++Requests without PostHog tracing headers allocate less: looking for a missing header no longer builds an upcased copy of every Rack env key, only of keys whose length could match the header.
+diff --git a/posthog-rails/lib/posthog/rails/tracing_headers.rb b/posthog-rails/lib/posthog/rails/tracing_headers.rb
+index aa9b2be..c1da197 100644
+--- a/posthog-rails/lib/posthog/rails/tracing_headers.rb
++++ b/posthog-rails/lib/posthog/rails/tracing_headers.rb
+@@ -38,7 +38,9 @@ module PostHog
+         return nil unless env.respond_to?(:each)
+ 
+         target_names = candidates.map { |candidate| normalize_header_name(candidate) }
++        target_lengths = target_names.map(&:length)
+         env.each do |key, value|
++          next if key.is_a?(String) && key.ascii_only? && !target_lengths.include?(key.length)
+           next unless target_names.include?(normalize_header_name(key))
+ 
+           sanitized = sanitize_header_value(value)
+diff --git a/spec/posthog/rails/request_context_spec.rb b/spec/posthog/rails/request_context_spec.rb
+index 33e85a1..e02847e 100644
+--- a/spec/posthog/rails/request_context_spec.rb
++++ b/spec/posthog/rails/request_context_spec.rb
+@@ -162,6 +162,19 @@ RSpec.describe PostHog::Rails::RequestContext do
+     expect(message[:properties]['$session_id']).to eq('mixed-session')
+   end
+ 
++  it 'matches header names that only normalize to a tracing header' do
++    call_with(
++      'http_x_posthog_distinct_id' => 'rack-style-user',
++      "x-po\uFB06hog-session-id" => 'ligature-session'
++    ) do
++      client.capture(event: 'normalized_event')
++    end
++
++    message = client.dequeue_last_message
++    expect(message[:distinct_id]).to eq('rack-style-user')
++    expect(message[:properties]['$session_id']).to eq('ligature-session')
++  end
++
+   it 'ignores empty/control-only values and caps long values' do
+     long_session_id = 's' * 1100
+ 
+-- 
+2.55.0
+
