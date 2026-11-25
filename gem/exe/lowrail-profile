@@ -218,7 +218,13 @@ statuses = []
       # The whole group gets 10 s, then KILL, also when the leader exited on TERM at once:
       # a worker that ignores TERM outlives it.
       grace = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
-      sleep 0.1 while (Process.kill(0, -pid) rescue false) && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
+      # A zombie is not waited for: an orphan whose new parent never reaps it (a container's PID 1 without init).
+      running = lambda do
+        `ps -A -o pgid= -o stat=`.each_line.any? { |l| g, s = l.split; g.to_i == pid && !s.to_s.start_with?("Z") }
+      rescue SystemCallError
+        Process.kill(0, -pid) rescue false
+      end
+      sleep 0.1 while running.() && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
       stop.("KILL")
       waiter.join
     end

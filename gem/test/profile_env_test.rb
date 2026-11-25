@@ -40,6 +40,24 @@ class ProfileEnvTest < Minitest::Test
     end
   end
 
+  # Under a parent that never reaps orphans (a container's PID 1 without an
+  # init), a process of the stopped run stays a zombie in its group: the
+  # 10 s for the group to end do not wait for it.
+  def test_timeout_does_not_wait_for_a_zombie
+    skip "needs Linux's PR_SET_CHILD_SUBREAPER and python3" unless RUBY_PLATFORM.include?("linux") && system("python3", "-c", "", err: File::NULL)
+    realpath_tmpdir do |dir|
+      reaper = "import ctypes, subprocess, sys; ctypes.CDLL(None).prctl(36, 1, 0, 0, 0); sys.exit(subprocess.run(sys.argv[1:]).returncode)"
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"))
+      profile(dir, "--runs", "1", "--out", "warm", "--", RUBY, "-e", "exit") # builds the counter first
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      _, err, status = Open3.capture3(env, "python3", "-c", reaper, RUBY, PROFILE, "--timeout", "1", "--out", "o", "--",
+        RUBY, "-e", 'spawn("sleep", "60"); sleep', chdir: dir)
+      took = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+      assert_equal 124, status.exitstatus, err
+      assert_operator took, :<, 6, "waited #{took.round(1)} s for a zombie"
+    end
+  end
+
   def test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
