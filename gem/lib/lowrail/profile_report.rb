@@ -72,7 +72,7 @@ module Lowrail
         actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] }, attrib: Hash.new { |h, k| h[k] = [0, 0] } }
       Dir["#{path}/*.tsv"].sort.each do |file|
         header, *rows = File.readlines(file, chomp: true)
-        raise "#{file} is from an older lowrail-profile; run it again" unless header.start_with?("# lowrail-profile 2\t")
+        raise "#{file} is from an older lowrail-profile; run it again" unless header.start_with?("# lowrail-profile 3\t")
         meta = header.split("\t").drop(1).to_h { _1.split("=", 2) }
         run[:processes] += 1
         %i[requests objects dropped].each { run[_1] += Integer(meta.fetch(_1.to_s)) }
@@ -84,9 +84,12 @@ module Lowrail
         run[:rails] ||= meta["rails"] unless meta["rails"].to_s.empty?
         (run[:rubies] ||= []) << meta["ruby"]
         (run[:rails_envs] ||= []) << meta["rails_env"]
+        paths = { "-" => "-" }
         rows.each do |row|
           fields = row.split("\t")
           case fields[0]
+          when "P"
+            paths[fields[1]] = fields[2]
           when "A"
             _, kind, name, windows, objects, first = fields
             action = run[:actions][[kind, name]]
@@ -99,12 +102,12 @@ module Lowrail
             (run[:path_gems] ||= {})[name] = gem_dir
           when "@"
             _, kind, name, file_path, line, caller_path, caller_line, count, first = fields
-            attrib = run[:attrib][[kind, name, file_path, Integer(line), caller_path, Integer(caller_line)]]
+            attrib = run[:attrib][[kind, name, paths.fetch(file_path), Integer(line), paths.fetch(caller_path), Integer(caller_line)]]
             attrib[0] += Integer(count)
             attrib[1] += Integer(first)
           else
             file_path, line, type, count, reached, first, via, kind = fields
-            site = run[:sites][[file_path, Integer(line), type, via, kind]]
+            site = run[:sites][[paths.fetch(file_path), Integer(line), type, via, kind]]
             site[0] += Integer(count)
             site[1] += Integer(reached)
             site[2] += Integer(first)

@@ -46,7 +46,7 @@ bundle exec lowrail-profile -- bundle exec rspec spec/requests       # RSpec
 bundle exec lowrail-profile --record -- bin/rails test             # the same, and write lowrail/workloads.rb from it
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
   bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
-bundle exec lowrail-profile report                                   # rebuild the report from tmp/lowrail-profile
+bundle exec lowrail-profile report                                   # rebuild the report (needs --keep-runs)
 bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # exit 1 on a regression, 2 without valid evidence
 ```
 
@@ -123,6 +123,9 @@ Options, all before the first `--` (everything after it, a second `--` included,
   1234, passed as `SEED` and `--seed` to every run, so test order repeats), `--ledger FILE` (a ledger index; default:
   the dated snapshot `gem/data/contributions-index.json` the gem ships, from `script/profile-ledger --snapshot`),
   `--no-ledger`.
+* `--keep-runs`: keep `run*/`, one TSV per process with the raw counts, in which each file path is written once
+  (a `P` row) and rows refer to it by number. Without it `run*/` is deleted once the report is written. On Sure
+  (16 workers) run 2 wrote 16 TSVs of about 240 MB, where paths were four fifths of the bytes.
 
 The first run builds a small C extension into `~/.cache/lowrail/profile/RUBY-BUILD/DIGEST/`, where the digest
 covers its sources and compiler settings, so another Lowrail checkout never picks up a different build; the app

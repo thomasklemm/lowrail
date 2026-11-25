@@ -34,7 +34,7 @@ the build log's path; it never touches `bundle install` or your app's boot.
 
 ```sh
 bundle exec lowrail-profile -- bin/rails test             # or: -- bundle exec rspec
-bundle exec lowrail-profile report                        # rebuild the report from tmp/lowrail-profile
+bundle exec lowrail-profile report                        # rebuild the report (needs --keep-runs)
 bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json
 ```
 
@@ -60,6 +60,7 @@ Options, all before `--`:
 | `--seed N` | 1234 | `SEED` and `--seed` for every run. |
 | `--ledger FILE` | bundled | A newer ledger index (`contributions-index.json`). |
 | `--no-ledger` | | No ledger column. |
+| `--keep-runs` | | Keep each run's raw counts (`run1/`, `run2/`), which `report` rebuilds from. Without it they are deleted once the report is written: compare needs only `report.json`, and on a large parallel suite the counts reach gigabytes. |
 | `--help`, `--version` | | |
 
 ## Reading the report

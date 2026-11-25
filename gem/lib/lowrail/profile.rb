@@ -347,16 +347,25 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             windows, objects, dropped, rows, actions, attributed = snapshot
             return if windows.sum == 0
             root = (Rails.root.to_s if defined?(Rails) && Rails.respond_to?(:root) && Rails.root)
-            lines = [["# lowrail-profile 2", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
+            lines = [["# lowrail-profile 3", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
               "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}",
               "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{APP_ROOT || Dir.pwd}",
               "ruby=#{RUBY_DESCRIPTION}",
               "rails_env=#{ENV["RAILS_ENV"]}", "rails=#{Lowrail.loaded_constant("Rails::VERSION::STRING")}"].join("\t")]
+            # Each path once, as a "P id path" row before its first use: paths
+            # were four fifths of an attribution run's bytes.
+            ids = {}
+            id = lambda do |path|
+              next "-" unless path
+              ids.fetch(path) { lines << "P\t#{ids.size}\t#{path}"; ids[path] = ids.size.to_s }
+            end
             rows.each do |path, line, type, count, reached, first, via, kind|
-              lines << [path || "-", line, TYPES[type], count, reached, first, via ? 1 : 0, KINDS[kind]].join("\t")
+              lines << [id.(path), line, TYPES[type], count, reached, first, via ? 1 : 0, KINDS[kind]].join("\t")
             end
             actions.each { |kind, name, *rest| lines << ["A", KINDS[kind], name || "-", *rest].join("\t") }
-            attributed.each { |kind, name, *rest| lines << ["@", KINDS[kind], name || "-", *rest.map { _1 || "-" }].join("\t") }
+            attributed.each do |kind, name, path, line, caller_path, caller_line, count, first|
+              lines << ["@", KINDS[kind], name || "-", id.(path), line || "-", id.(caller_path), caller_line || "-", count, first].join("\t")
+            end
             # Gems from a path (Bundler's path:, gemspec), which no gem
             # directory names: the report classifies their lines by these.
             Gem.loaded_specs.each_value do |spec|

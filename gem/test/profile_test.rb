@@ -618,13 +618,49 @@ class ProfileTest < Minitest::Test
       refute status.success?, err
       assert File.exist?(File.join(dir, "config/environment.rb"))
 
-      _, err, status = profile(dir, "--out", "profile", "--runs", "3", "--", RUBY, "requests.rb")
+      _, err, status = profile(dir, "--out", "profile", "--runs", "3", "--keep-runs", "--", RUBY, "requests.rb")
       assert status.success?, err
       File.write(File.join(dir, "profile/notes.txt"), "x")
-      _, err, status = profile(dir, "--out", "profile", "--", RUBY, "requests.rb")
+      _, err, status = profile(dir, "--out", "profile", "--keep-runs", "--", RUBY, "requests.rb")
       assert status.success?, err
       assert_equal %w[.lowrail-profile capture.json command.txt notes.txt report.json report.md run1 run2],
         Dir.children(File.join(dir, "profile")).sort
+    end
+  end
+
+  # The raw counts go once the report is written (compare reads only
+  # report.json), unless --keep-runs. Kept, each file path is written once
+  # per process, and lowrail-profile report rebuilds the same report from them.
+  def test_runs_are_deleted_after_the_report_unless_kept
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "requests.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        3.times { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) }
+      RUBY
+      _, err, status = profile(dir, "--out", "gone", "--", RUBY, "requests.rb")
+      assert status.success?, err
+      assert_equal %w[.lowrail-profile capture.json command.txt report.json report.md], Dir.children(File.join(dir, "gone")).sort
+      _, err, status = profile(dir, "report", "gone")
+      refute status.success?
+      assert_match(/no runs in .*gone: they are deleted after the report unless you profile with --keep-runs/, err)
+
+      _, err, status = profile(dir, "--out", "kept", "--keep-runs", "--", RUBY, "requests.rb")
+      assert status.success?, err
+      tsvs = Dir[File.join(dir, "kept/run*/*.tsv")]
+      assert_equal 2, tsvs.size
+      tsvs.each do |tsv|
+        text = File.read(tsv)
+        paths = text.lines.grep(/\AP\t/).map { _1.chomp.split("\t", 3).last }
+        assert_includes paths, File.join(dir, "app/controllers/widgets_controller.rb")
+        assert_equal paths.uniq, paths
+        paths.each { |path| assert_equal 1, text.scan("\t#{path}\n").size, "#{path} once in #{tsv}" }
+      end
+      written = File.read(File.join(dir, "kept/report.json"))
+      _, err, status = profile(dir, "report", "kept")
+      assert status.success?, err
+      assert_equal written, File.read(File.join(dir, "kept/report.json"))
     end
   end
 
@@ -894,7 +930,7 @@ class ProfileTest < Minitest::Test
         out, err, status = Open3.capture3(profile_env(dir).merge(caller_env, "OUT" => "plain-#{name}"), *command, chdir: dir)
         assert status.success?, "#{name} plain: #{status.inspect}\n#{err}\n#{out}"
         assert_match ran, out, "#{name} plain: the suite ran its test"
-        out, err, status = profile(dir, "--runs", "1", "--out", "p-#{name}", "--", *command, env: caller_env.merge("OUT" => "profiled-#{name}"))
+        out, err, status = profile(dir, "--runs", "1", "--out", "p-#{name}", "--keep-runs", "--", *command, env: caller_env.merge("OUT" => "profiled-#{name}"))
         assert status.success?, "#{name} profiled: #{status.inspect}\n#{err}\n#{out}"
         assert_match ran, out, "#{name} profiled: the suite ran its test"
         assert_match(/lowrail-profile: run 1 of 1/, err, "#{name}: the caller's -W0 does not silence lowrail-profile")

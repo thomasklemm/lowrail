@@ -9,7 +9,7 @@
 USAGE = <<~TEXT
   usage: lowrail-profile [options] -- COMMAND...     profile a command, such as bin/rails test
          lowrail-profile [options] --workloads [FILE] replay lowrail/workloads.rb (experimental)
-         lowrail-profile report [DIR]                 report again from saved runs
+         lowrail-profile report [DIR]                 report again from runs kept with --keep-runs
          lowrail-profile compare BASE.json HEAD.json [--aa BASE2.json] [--min N] [--json]
                                                       exit 1 on a regression, 2 without valid evidence
 
@@ -21,6 +21,7 @@ USAGE = <<~TEXT
     --seed N          SEED and --seed for every run (default 1234)
     --ledger FILE     a newer ledger index (contributions-index.json) than the bundled one
     --no-ledger       no ledger column
+    --keep-runs       keep each run's raw counts (run1/, run2/) for lowrail-profile report
     --record [FILE]   also write the suite's requests as lowrail/workloads.rb (experimental)
     --workloads [FILE] send the file's requests through the app (experimental); they are real
     --allow-writes    let --workloads send writes, sign-ins and setup code, and run against a
@@ -61,6 +62,7 @@ ledger = opt.("--ledger", File.expand_path("../data/contributions-index.json", _
 ledger = nil if args.delete("--no-ledger")
 abort "lowrail-profile: no ledger index #{ledger}" if ledger && !File.file?(ledger)
 allow_writes = args.delete("--allow-writes")
+keep_runs = args.delete("--keep-runs")
 # --workloads and --record take an optional FILE.
 flag = lambda do |name|
   next unless (i = args.index(name))
@@ -74,6 +76,7 @@ abort "lowrail-profile: --paths was replaced by --workloads FILE (lowrail/worklo
 
 if args.first == "report"
   dir = File.expand_path(args[1] || out)
+  abort "lowrail-profile: no runs in #{dir}: they are deleted after the report unless you profile with --keep-runs" if Dir["#{dir}/run*/"].empty?
   report = Lowrail::ProfileReport.new(dir, ledger: ledger, top: top)
   report.write
   puts report.markdown
@@ -236,6 +239,8 @@ rescue StandardError => error
   $stderr.puts "lowrail-profile: --record: #{error.message}"
   exit(failed || 1)
 end
+# compare reads only report.json; the raw counts are as large as the suite is.
+Dir[File.join(out, "run*")].each { FileUtils.rm_rf(_1) if File.basename(_1).match?(/\Arun\d+\z/) } unless keep_runs
 $stderr.puts "lowrail-profile: report in #{File.join(out, "report.md")}"
 $stderr.puts "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
 exit(failed || 0)
