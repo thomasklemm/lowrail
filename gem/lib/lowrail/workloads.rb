@@ -444,7 +444,7 @@ module Lowrail
         line << ", as: :json" if e[:json]
         line << ", xhr: true" if e[:xhr]
         line << ", headers: { \"Accept\" => #{e[:accept].to_s.inspect} }" if e[:accept]
-        line << ", params: #{e[:params].inspect}" if e[:params].is_a?(Hash) && !e[:params].empty?
+        line << ", params: #{literal(e[:params])}" if e[:params].is_a?(Hash) && !e[:params].empty?
         commented = e[:commented] || !e[:resolved]
         noted = e[:note] || !e[:resolved]
         out << "\n" if noted || spaced
@@ -459,6 +459,15 @@ module Lowrail
     # A double-quoted Ruby string for a route template: its text escaped,
     # each :part a value ([:ruby, expression] interpolated, [:text, string]
     # escaped), optional segments left out, then the format.
+    # A recorded value as Ruby, the same on every Ruby (Hash#inspect changed in 3.4).
+    def literal(value)
+      case value
+      when Hash then "{#{value.map { |k, v| "#{literal(k)} => #{literal(v)}" }.join(", ")}}"
+      when Array then "[#{value.map { literal(_1) }.join(", ")}]"
+      else value.inspect
+      end
+    end
+
     def path_literal(template, values, format)
       text = ->(s) { s.inspect[1..-2] }
       body = template.to_s.gsub(/\([^()]*\)/, "").split(/(:[a-z_]\w*)/).map do |piece|

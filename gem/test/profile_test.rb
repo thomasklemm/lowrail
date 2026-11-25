@@ -113,7 +113,8 @@ class ProfileTest < Minitest::Test
         actions.values_at("WidgetsController#index", "WidgetsController#show").map { _1["windows"] }
       index = actions.fetch("WidgetsController#index")
       assert_equal "WidgetsController#index", report["actions"][0]["name"], "the heavier action ranks first"
-      assert_equal({ "name" => "GEM/probe/lib/probe.rb:5", "warm" => 101.0 }, index["sites"][0])
+      # Among its top lines, not always first: Ruby 3.3 charges a one-time compile in the second request to line 0.
+      assert_includes index["sites"], { "name" => "GEM/probe/lib/probe.rb:5", "warm" => 101.0 }
 
       jobs = report["outside_requests"]["job"]
       assert_equal [5, 5], report["summary"].map { _1["windows"]["job"] }
@@ -623,6 +624,8 @@ class ProfileTest < Minitest::Test
         RUBY
         "frozen.rb" => <<~'RUBY')
           require "action_controller"
+          # Rails before 8.1 memoizes Metal's config when Base loads.
+          ActionController::Metal.config if ActionController::Metal.respond_to?(:config)
           ActionController::Metal.freeze
           ActionController::Base
           puts "loaded Base"

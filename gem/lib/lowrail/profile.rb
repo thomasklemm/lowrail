@@ -138,13 +138,20 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         end
 
         class << self
+          # Ractor.main? is Ruby 3.4's.
+          if Ractor.respond_to?(:main?)
+            def main? = Ractor.main?
+          else
+            def main? = Ractor.current.equal?(Ractor.main)
+          end
+
           # lowrail-profile --record: request shapes by route, noted after the
           # window closes, so they are not counted.
           attr_accessor :shapes
 
           # Each returns quietly when the profiler cannot do its part.
           def open(kind)
-            Ractor.main? && enter(kind)
+            main? && enter(kind)
           rescue StandardError
             false
           end
@@ -158,13 +165,13 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
 
           def named(klass, separator, action)
-            label(klass, separator, action) if Ractor.main?
+            label(klass, separator, action) if main?
           rescue StandardError
             nil
           end
 
           def cable_named(klass, data)
-            label(klass, HASH, (data[ACTION] if Hash === data) || PERFORM_ACTION) if Ractor.main?
+            label(klass, HASH, (data[ACTION] if Hash === data) || PERFORM_ACTION) if main?
           rescue StandardError
             nil
           end
@@ -185,7 +192,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
 
           def note(env)
-            return if env[NOTED] || !(route = env["action_dispatch.route"])
+            return if env[NOTED] || !(route = env["action_dispatch.route"] || matched_route(env))
             env[NOTED] = true
             verb = env["REQUEST_METHOD"].to_s.downcase
             filter = parameter_filter(env)
@@ -207,6 +214,16 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             shape["count"] += 1
           rescue StandardError
             nil
+          end
+
+          # Rails before 8.1 keeps only the matched route's pattern and
+          # parameters: the route with that pattern, controller and action.
+          def matched_route(env)
+            spec = env["action_dispatch.route_uri_pattern"] or return
+            params = env["action_dispatch.request.path_parameters"] || {}
+            env["action_dispatch.routes"]&.routes&.find do |r|
+              r.path.spec.to_s == spec && r.defaults[:controller] == params[:controller] && r.defaults[:action] == params[:action]
+            end
           end
 
           # What a workloads file needs to send the request again, with the
