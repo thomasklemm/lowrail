@@ -571,8 +571,9 @@ class ProfileTest < Minitest::Test
   end
 
   # The CLI exits with the command's status: the first failed run's, a
-  # signal as 128 + its number, also when no report can be made; capture.json
-  # records the same numbers.
+  # signal as 128 + its number, also when no report can be made or --record
+  # cannot write; capture.json records the same numbers. A passing command
+  # whose --record cannot write exits 1.
   def test_a_failed_command_fails_the_profile
     skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
     realpath_tmpdir do |dir|
@@ -584,10 +585,10 @@ class ProfileTest < Minitest::Test
         case ENV.fetch("END")
         when "exit" then exit 7
         when "signal" then Process.kill("TERM", Process.pid); sleep 5
-        when "first" then exit(run == "run1" ? 3 : 0)
+        when "first" then exit(run == "run1" ? 3 : 4)
         end
       RUBY
-      { "exit" => [7, [7, 7]], "signal" => [143, [143, 143]], "first" => [3, [3, 0]] }.each do |ending, (status, exits)|
+      { "exit" => [7, [7, 7]], "signal" => [143, [143, 143]], "first" => [3, [3, 4]] }.each do |ending, (status, exits)|
         out, err, result = profile(dir, "--out", ending, "--", RUBY, "requests.rb", env: { "END" => ending })
         assert_equal status, result.exitstatus, "#{ending}: #{err}"
         assert_includes out, "# lowrail-profile report", "#{ending}: the report is still written"
@@ -596,6 +597,12 @@ class ProfileTest < Minitest::Test
       _, err, result = profile(dir, "--out", "none", "--", RUBY, "-e", "exit 5")
       assert_equal 5, result.exitstatus, err
       assert_match(/no report/, err)
+      FileUtils.mkdir_p(File.join(dir, "taken.rb"))
+      { "pass" => 1, "exit" => 7 }.each do |ending, status|
+        _, err, result = profile(dir, "--out", "record-#{ending}", "--record", "taken.rb", "--", RUBY, "requests.rb", env: { "END" => ending })
+        assert_equal status, result.exitstatus, "--record cannot write after #{ending}: #{err}"
+        assert_match(/lowrail-profile: --record: .*taken\.rb/, err)
+      end
     end
   end
 
