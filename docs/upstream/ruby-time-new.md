@@ -3,9 +3,10 @@
 2026-11-17. Two findings from the review of rails/rails#59617 (Time#change with zone objects), checked on ruby/ruby
 master c2c5ac6d1b and on 3.3.13, 3.4.12 and 4.0.9. **Both are real on master and on all three releases. They have
 one root cause and one fix.** Neither is reported on bugs.ruby-lang.org. Fix branch:
-[thomasklemm/ruby `thomasklemm/time-new-normalize-mday`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-normalize-mday)
-(head `d3e0a31795`), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md), state built. No PR or issue
-was opened.
+[thomasklemm/ruby `thomasklemm/time-new-normalize-mday-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-normalize-mday-2)
+(head `a0e8852a14` on master e8167b0ddd, rebased 2026-11-25; the first build `d3e0a31795` on c2c5ac6d1b stays on
+`thomasklemm/time-new-normalize-mday`), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md), state built.
+Thomas approved reporting it on 2026-11-25 as a note on Bug #21301 (text below; he posts it). No PR was opened.
 
 ## Repros
 
@@ -76,7 +77,8 @@ normalize month-mday, and only with ruby/ruby#16469, which is still open:
 
 ## Fix
 
-Branch `thomasklemm/time-new-normalize-mday` on master c2c5ac6d1b, two commits:
+Branch `thomasklemm/time-new-normalize-mday` on master c2c5ac6d1b, two commits (rebased unchanged on 2026-11-25 as
+`a87590a698` and `a0e8852a14` on `-2`, see below):
 
 1. `5f4d01cd26`, Chris Hasiński's commit from the open ruby/ruby#16469 (Bug #21301, approved by jeremyevans
    2026-05-08, not merged), cherry-picked unchanged with authorship kept. It moves `time_arg()`'s month-mday
@@ -115,6 +117,25 @@ Results on the fixed build:
 Not run: the full test-all, hosted CI, and a Thermos pass. Nothing measured for speed; the change adds one switch per
 `Time.new` with fields.
 
+### Rebase onto master e8167b0ddd (2026-11-25)
+
+Branch `thomasklemm/time-new-normalize-mday-2`: `a87590a698` (Chris Hasiński's commit, his authorship kept, same
+patch-id as #16469's head `f796c85300`) and `a0e8852a14` (ours), Thomas as committer, no trailers. `git range-diff`
+shows both patches identical: time.c has no commits since c2c5ac6d1b, so the code and the claude-code pass carry
+over. Master hasn't fixed it: #16469 is still open on `f796c85300` (last update 2026-05-08, jeremyevans's approval,
+no comments), Bug #21301 and #22375 are open with nobu's duplicate mark of 2026-09-23 as the last change, Feature
+#21307 is unchanged, no Redmine issue since 2026-11-18 is about Time (22560 to 22637, read one by one; the issue list
+API answers 403), and no ruby/ruby PR updated since 2026-11-17 touches time.c. The release branches' time.c got only
+bb382ae5df (`time_init_parse` precision) since 3.3.13, 3.4.12 and 4.0.9.
+
+On master (`ruby 4.1.0dev (2026-11-25T11:44:00Z master e8167b0ddd) +PRISM [x86_64-linux]`) and 4.0.9 every line of the note below reproduces (`.amp/in/orb-backup/tn/repro.sh`); the head
+gives the expected values. Tests on the head: `make test-all TESTS='ruby/test_time*'` 251 tests, 2461 assertions;
+test_time.rb + test_time_tz.rb through `tool/runruby.rb` with TZInfo 2.0.6 and timezone 1.3.32 preloaded
+(`-rtzinfo -rtimezone`; without the preload the runner drops the GemTimezone class) 357 tests, 3147 assertions,
+0 failures under TZ=UTC, Europe/Berlin, Africa/Lagos, Asia/Tokyo, America/New_York and Australia/Sydney;
+spec/ruby/core/time 652 examples, 0 failures. Master with the head's tests: 357 tests, 14 failures, exactly the new
+tests. `git merge-tree` with TN2's `ec3f27cd36` is clean. Not run: btest, the full test-all, hosted CI.
+
 ## Prior reports
 
 * [Bug #21301](https://bugs.ruby-lang.org/issues/21301) (mame, open): the same field cache with `"UTC"`. The
@@ -145,25 +166,20 @@ branch, build on it with their commits kept. Ordered by what fits these rules be
 The draft below is for (1), or as a new issue if Thomas prefers a separate ticket. It is written in the plain style of
 ruby-core reports.
 
-### Draft for bugs.ruby-lang.org
+### Note for Bug #21301 (ready to paste, 2026-11-25)
 
-> **Time.new misplaces day 31 of a shorter month with a negative UTC offset, and keeps it with a timezone object**
->
-> `Time.new` accepts day 31 for months with fewer days and normally rolls it over, like `Time.utc`:
->
-> ```ruby
-> Time.new(2026, 2, 31, 23, 0, 0, "+05:00") #=> 2026-03-03 23:00:00 +0500
-> Time.utc(2026, 2, 31, 23, 0, 0)          #=> 2026-03-03 23:00:00 UTC
-> ```
->
-> With a negative UTC offset, when the time is on the next day in UTC, the result is a month early:
->
+A comment on [Bug #21301](https://bugs.ruby-lang.org/issues/21301), so no subject or `ruby -v` field; the version
+line is in the text.
+
 > ```ruby
 > Time.new(2026, 2, 31, 23, 0, 0, "-05:00") #=> 2026-01-30 23:00:00 -0500, expected 2026-03-03 23:00:00 -0500
 > Time.new(2026, 4, 31, 23, 0, 0, -18000)   #=> 2026-03-30 23:00:00 -0500, expected 2026-05-01 23:00:00 -0500
+> Time.new(2026, 2, 31, 23, 0, 0, "+05:00") #=> 2026-03-03 23:00:00 +0500
 > ```
 >
-> With a timezone object the time is correct, but the fields are not normalized, as with "UTC" in this issue:
+> The same overflowing day also goes wrong with a UTC offset, not only with "UTC". With a negative offset, when the time is on the next day in UTC, the result is a month early. Positive offsets are right.
+>
+> With a timezone object the time is right, but the fields are kept as given, as with "UTC" here:
 >
 > ```ruby
 > require "tzinfo"
@@ -174,8 +190,7 @@ ruby-core reports.
 > t.day   #=> 1
 > ```
 >
-> Without a zone, `Time.new` disagrees with `Time.local` near DST changes, because only `Time.local` normalizes
-> first (Bug #15340):
+> Without a zone, `Time.new` disagrees with `Time.local` near DST changes, because only `Time.local` normalizes first (Bug #15340):
 >
 > ```ruby
 > ENV["TZ"] = "Pacific/Auckland"
@@ -183,23 +198,21 @@ ruby-core reports.
 > Time.local(2000, 9, 31, 3, 30) #=> 2000-10-01 03:30:00 +1300
 > ```
 >
-> The first two happen on 3.3, 3.4, 4.0 and master. In `time_init_vtm()`, `vtm_add_offset()` calls `vtm_add_day()`, which
-> turns day 31 into 32, stored as 0 in the 5-bit `mday`. The timezone object path caches the fields as given, and the local path converts before normalizing.
+> All three happen on `ruby 4.1.0dev (2026-11-25T11:44:00Z master e8167b0ddd) +PRISM [x86_64-linux]`, and the first two also on 3.3, 3.4 and 4.0. In `time_init_vtm()`, `vtm_add_offset()` calls `vtm_add_day()`, which turns day 31 into 32, stored as 0 in the 5-bit `mday`. The timezone object path caches the fields as given, and the local path converts before normalizing.
 >
-> Calling `vtm_normalize_month_mday()` from github.com/ruby/ruby/pull/16469 right after `validate_vtm()`, instead
-> of only in the UTC branch, fixes all three cases:
-> https://github.com/thomasklemm/ruby/commit/d3e0a31795
+> Calling `vtm_normalize_month_mday()` from https://github.com/ruby/ruby/pull/16469 right after `validate_vtm()`, instead of only in the UTC branch, fixes all three: https://github.com/thomasklemm/ruby/commit/a0e8852a14
 
 ## Time.new with a zone object whose `to_str` is "UTC": segfault (TN2)
 
 2026-11-18. A side finding of the claude-code pass on TN1. **Real on 3.3.13, 3.4.12, 4.0.9 and master 3a19e2efcf;
 unreported.** Fix branch:
-[thomasklemm/ruby `thomasklemm/time-new-to-str-utc-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-to-str-utc-3)
-(head `d6d39dbf17`, one commit on master 3a19e2efcf, standalone, not stacked on TN1), queue item
+[thomasklemm/ruby `thomasklemm/time-new-to-str-utc-4`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-to-str-utc-4)
+(head `ec3f27cd36`, one commit on master e8167b0ddd, rebased unchanged on 2026-11-25 from `d6d39dbf17` on
+3a19e2efcf, which stays on `-3`; standalone, not stacked on TN1), queue item
 [TN2](../../bench/upstream/pr-queue/items/TN2.md), state built. The earlier heads stay on their branches:
 `a0670a0a30` (`thomasklemm/time-new-to-str-utc`; thermos-opus: code approved, changes in the test, this record and
 the draft) and `8d626f3a52` (`-2`; thermos-opus confirm: one time.c must-fix, the hour-24 overflow below). Both are
-applied here. Nothing posted.
+applied here. Thomas approved reporting it on 2026-11-25 (ticket text below; he posts it). Nothing posted.
 
 ```ruby
 o = Object.new
@@ -313,7 +326,25 @@ and 18:00 +0100 (17:00 UTC) under New York, expected 11:00 UTC. On the head both
   head merged with TN1. Master: crashes for the first three, 10 of 288 for +00:00; `8d626f3a52`: 10 of 288 for each
   of the first four.
 
-Not run: the full test-all, hosted CI, a pass on `d6d39dbf17`.
+Not run: the full test-all, hosted CI. (thermos-opus confirmed `d6d39dbf17` with nits only.)
+
+### Rebase onto master e8167b0ddd (2026-11-25)
+
+`ec3f27cd36` on `thomasklemm/time-new-to-str-utc-4`, Thomas as author and committer, no trailers. `git range-diff`
+shows the patch identical to `d6d39dbf17`: time.c has no commits since 3a19e2efcf, and only test_time.rb's context
+moved (a76ddf54a4 added a test). Master hasn't fixed it: no Redmine issue since 2026-11-18 is about Time, no ruby/ruby
+PR updated since 2026-11-17 touches time.c, and the release branches' only time.c backport since 3.3.13, 3.4.12 and
+4.0.9 is bb382ae5df (`time_init_parse` precision).
+
+On master (`ruby 4.1.0dev (2026-11-25T11:44:00Z master e8167b0ddd) +PRISM [x86_64-linux]`) every example in the ticket below reproduces (`.amp/in/orb-backup/tn/repro.sh`, TZ=America/New_York):
+the segfaults (positional `UTC`, `Z`, `-00:00`, `in:`, the string form, `find_timezone` returning `"UTC"`), `+2500`,
+17:00 UTC for Plus3, and March 31 for `+00:00` at April 31 24:00. The head gives UTC, ArgumentError, 09:00 and May 2.
+Tests on the head: `make test-all TESTS='ruby/test_time*'` 247 tests, 2438 assertions; test_time.rb + test_time_tz.rb
+through `tool/runruby.rb` with TZInfo 2.0.6 and timezone 1.3.32 preloaded 345 tests, 3076 assertions, 0 failures
+under TZ=UTC, Europe/Berlin, Africa/Lagos, Asia/Tokyo, America/New_York and Australia/Sydney (one more than before:
+master's new test); spec/ruby/core/time 652 examples, 0 failures. Master with the head's tests:
+`test_new_with_zone_to_str` segfaults, `test_new_with_zone_name_to_str` fails (13:00 +0100 under UTC, 18:00 +0100
+under New York). Not run: btest, the full test-all, hosted CI.
 
 ### Prior reports
 
@@ -324,27 +355,29 @@ The closest are [Bug #20327](https://bugs.ruby-lang.org/issues/20327) (Rational 
 and [Bug #20951](https://bugs.ruby-lang.org/issues/20951) (`utc_to_local` results, closed), neither on this
 fallback. New.
 
-### Draft for bugs.ruby-lang.org
+### Ticket for bugs.ruby-lang.org (ready to paste, 2026-11-25)
 
-> **Time.new segfaults with a zone object that converts to "UTC"**
->
+Tracker Bug. Subject: **Time.new segfaults with a zone object that converts to "UTC"**.
+ruby -v: `ruby 4.1.0dev (2026-11-25T11:44:00Z master e8167b0ddd) +PRISM [x86_64-linux]`. Description:
+
 > ```ruby
 > o = Object.new
 > def o.to_str = "UTC"
 > Time.new(2026, 1, 1, 0, 0, 0, o)  # [BUG] Segmentation fault at 0x0000000000000034
 > ```
 >
-> The same happens for `"Z"` and `"-00:00"`, with `in:`, and with `Time.new("2026-01-01 00:00:00", in: o)`, on 3.3,
-> 3.4, 4.0 and master. `Time.at(0, in: o)` and `Time#getlocal(o)` return UTC.
+> The same happens for `"Z"` and `"-00:00"`, with `in:`, and with `Time.new("2026-01-01 00:00:00", in: o)`, on 3.3, 3.4, 4.0 and master. `Time.at(0, in: o)` and `Time#getlocal(o)` return UTC.
 >
-> A zone argument that isn't a String or an Integer is tried as a timezone object first. Without `local_to_utc`,
-> `time_init_vtm()` falls back to `utc_offset_arg()`, and its `UTC_ZONE` result is used as an offset in
-> `vtm_add_offset()`.
+> A zone argument that isn't a String or an Integer is tried as a timezone object first. Without `local_to_utc`, `time_init_vtm()` falls back to `utc_offset_arg()`, and its `UTC_ZONE` result is used as an offset in `vtm_add_offset()`.
 >
-> The same fallback has two more problems. It doesn't range-check offsets: with `to_str` returning `"+25:00"` the
-> result is `+2500`, where the String raises "utc_offset out of range". And when `Time.find_timezone` resolves the
-> name, the time is computed from the system's local zone instead of that zone. `find_timezone` receives the object
-> itself, so this needs one that converts it:
+> A `Time.find_timezone` that returns the String `"UTC"` crashes the same way, without a `to_str` object:
+>
+> ```ruby
+> def Time.find_timezone(n) = (n == "Mine" ? "UTC" : nil)
+> Time.new(2026, 1, 1, 0, 0, 0, "Mine")  # [BUG] Segmentation fault
+> ```
+>
+> The same fallback has two more problems. It doesn't range-check offsets: with `to_str` returning `"+25:00"` the result is `+2500`, where the String raises "utc_offset out of range". And when `Time.find_timezone` resolves the name, the time is computed from the system's local zone instead of that zone. `find_timezone` receives the object itself, so this needs one that converts it:
 >
 > ```ruby
 > ENV["TZ"] = "America/New_York"
@@ -359,11 +392,4 @@ fallback. New.
 > Time.new(2026, 1, 1, 12, 0, 0, o).getutc       #=> 2026-01-01 17:00:00 UTC
 > ```
 >
-> A `Time.find_timezone` that returns the String `"UTC"` crashes the same way, without a `to_str` object:
->
-> ```ruby
-> def Time.find_timezone(n) = (n == "Mine" ? "UTC" : nil)
-> Time.new(2026, 1, 1, 0, 0, 0, "Mine")  # [BUG] Segmentation fault
-> ```
->
-> Fix: https://github.com/thomasklemm/ruby/commit/d6d39dbf17
+> Fix: https://github.com/thomasklemm/ruby/commit/ec3f27cd36
