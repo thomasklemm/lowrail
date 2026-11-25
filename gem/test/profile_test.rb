@@ -800,11 +800,37 @@ class ProfileTest < Minitest::Test
   end
 
   # aa: the A/A report (by default base again, whose floor is base's own spread), or nil for none.
-  def compare(dir, base, head, aa: base)
+  def compare(dir, base, head, aa: base, args: [])
     { "base" => base, "head" => head, "aa" => aa }.each { |name, r| File.write(File.join(dir, "#{name}.json"), JSON.generate(r)) if r }
     pair = aa ? %w[--aa aa.json] : []
-    out, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", *pair, "--json", chdir: dir)
+    out, err, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", *pair, *args, "--json", chdir: dir)
     [status.exitstatus, (JSON.parse(out) rescue err)]
+  end
+
+  # Each term of the floor gates on its own, a move up to it passes and one
+  # past it fails: an action's 20 times --min objects, its 0.1% share and
+  # twice its noise (head's own spread when that is the larger), and a
+  # line's --min.
+  def test_compare_floor_terms
+    realpath_tmpdir do |dir|
+      gate = lambda do |base_act, head_act, line: [5.0, 5.0], args: []|
+        action = ->(warm) { [{ "name" => "RoomsController#show", "warm" => warm }] }
+        status, result = compare(dir, report([5.0, 5.0], actions: action.(base_act)), report(line, actions: action.(head_act)), args: args)
+        [status, result["regressions"].map { [_1["what"], _1["noise_floor"].round(3)] }]
+      end
+      flat = ->(v) { [v, v] }
+      assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_019.0))
+      assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_020.0)), "a move equal to the floor"
+      assert_equal [1, [["action", 20.0]]], gate.(flat.(1_000.0), flat.(1_021.0))
+      assert_equal [0, []], gate.(flat.(100_000.0), flat.(100_099.0))
+      assert_equal [1, [["action", 100.101]]], gate.(flat.(100_000.0), flat.(100_101.0))
+      assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_039.0), args: %w[--min 2])
+      assert_equal [1, [["action", 40.0]]], gate.(flat.(1_000.0), flat.(1_041.0), args: %w[--min 2])
+      assert_equal [0, []], gate.(flat.(1_000.0), [1_000.0, 1_100.0]), "head's spread of 100 floors at 200"
+      assert_equal [1, [["action", 200.0]]], gate.(flat.(1_000.0), [1_250.0, 1_350.0])
+      assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_000.0), line: flat.(6.9), args: %w[--min 2])
+      assert_equal [1, [["line", 2.0]]], gate.(flat.(1_000.0), flat.(1_000.0), line: flat.(7.1), args: %w[--min 2])
+    end
   end
 
   # The floor is measured between invocations: on Campfire a line moves little
