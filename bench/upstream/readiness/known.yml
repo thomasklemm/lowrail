@@ -644,6 +644,30 @@ findings:
     record: docs/upstream/ecosystem-tests.md
     checked: round-ecosystem-1 7a78da5a55
     note: dynamic :controller routes removed (92d809905b); the dummy app's routes raise, so its tests render the rescue page
+  - id: eco1-dynamic-controller-routes
+    suite: active_model_serializers
+    class: test-count-mismatch
+    signature: "\\Atest count differs\\z"
+    status: record-only
+    record: docs/upstream/rails-main-census-11.md
+    checked: round-c11 cf0325a832
+    note: test_helper draws /:controller(/:action(/:id)), which raises at load since 92d809905b, so no test runs
+  - id: AM2
+    suite: view_component|money-rails
+    class: suite-did-not-load
+    signature: "\\A(RuntimeError: Command failed with status \\(1\\)|NameError: uninitialized constant MoneyRails::ActiveJob)\\z"
+    status: prepared
+    record: docs/upstream/rails-main-census-11.md
+    checked: round-c11 cf0325a832
+    note: dummy apps require action_mailer/railtie without active_job/railtie, which #59820 no longer loads (turbo-rails skips its test helper; money-rails' on_load(:active_job) never runs); upgrade-guide item UG82M
+  - id: SP3
+    suite: mobility-.*
+    class: confirmed
+    signature: "StatementInvalid|You cannot query on mobility attributes|failure aggregation"
+    status: gem-side
+    record: docs/upstream/rails-main-census-11.md
+    checked: round-c11 cf0325a832
+    note: mobility 1.3.2's QueryExtension#where! is skipped since where calls _where! (rails/rails#59634, kamipo's c8490688d7); shioyama/mobility#692, fix PR shioyama/mobility#693 open and unreleased
   - id: noise-eco1-taggable-order
     suite: acts-as-taggable-on
     class: base-failing

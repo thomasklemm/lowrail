@@ -1,0 +1,63 @@
+# c11s -> c11m: 64 workloads; per app: median whole-workload change, median |A/A| (c11m vs c11m2)
+blog                  10 wl  median -11.72%  min -24.84%  max  -5.10%  A/A 0.10%
+casa                  10 wl  median  -7.45%  min -22.52%  max  -0.11%  A/A 0.02%
+hackatime             12 wl  median  -5.50%  min -19.52%  max  -2.14%  A/A 0.15%
+pingcrm                8 wl  median  -5.36%  min  -6.76%  max  -4.41%  A/A 0.14%
+react-starter-kit      8 wl  median  -6.44%  min  -8.30%  max  -4.73%  A/A 0.14%
+redprints-cfp          8 wl  median  -6.33%  min -10.02%  max  -1.86%  A/A 0.14%
+writebook              8 wl  median  -5.96%  min  -8.73%  max  -2.73%  A/A 0.04%
+ALL 64 workloads: median -6.43%, slower 0, faster 63 (beyond 1%)
+
+# net self Ir by method, % of all c11s instructions (grew)
+ +0.625% 7 apps  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_tag_option
+ +0.574% 2 apps  GEM/4.0.0/gems/pg-1.6.3-x86_64-linux/lib/pg/connection.rb PG::Connection#get_result
+ +0.296% 7 apps  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#initialize
+ +0.273% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#value_at!
+ +0.267% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#index_for_name
+ +0.260% 7 apps  RAILS/activesupport/lib/active_support/weak_key_map.rb ActiveSupport::WeakKeyMap#fetch_or_store
+ +0.242% 7 apps  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet::NamedRouteCollection::UrlHelper::OptimizedUrlHelper#call
+ +0.206% 7 apps  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#association_route
+ +0.168% 7 apps  RAILS/actionpack/lib/action_dispatch/journey/visitors.rb ActionDispatch::Journey::Format#add_to
+ +0.166% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value_at!
+ +0.152% 7 apps  RAILS/activemodel/lib/active_model/indexed_row.rb ActiveModel::IndexedRow.key_at?
+ +0.149% 7 apps  RAILS/actionpack/lib/action_controller/metal/request_forgery_protection.rb ActionController::RequestForgeryProtection#csrf_token_hmac
+ +0.147% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#initialize
+ +0.145% 7 apps  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::AssociationReflection#current_default_association_route?
+ +0.137% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#cast_value
+ +0.125% 7 apps  RAILS/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb ActiveRecord::ConnectionAdapters::DatabaseStatements#start_intent_log
+ +0.119% 3 apps  RAILS/activerecord/lib/active_record/type/hash_lookup_type_map.rb ActiveRecord::Type::HashLookupTypeMap#fetch_result_type
+ +0.117% 7 apps  <internal:thread_sync> Thread::Mutex#synchronize
+ +0.113% 7 apps  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result::RowLayout#build
+ +0.108% 7 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#empty?
+ +0.104% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value!
+ +0.101% 7 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#-
+ +0.099% 7 apps  RAILS/activerecord/lib/active_record/connection_adapters/query_intent.rb ActiveRecord::ConnectionAdapters::QueryIntent#initialize
+ +0.093% 3 apps  RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result
+ +0.092% 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#keys
+
+# net self Ir by method (shrank)
+ -0.795%  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::LazyAttributeSet#fetch_value
+ -0.668%  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_option
+ -0.617%  RAILS/actionpack/lib/action_dispatch/routing/route_set.rb ActionDispatch::Routing::RouteSet#url_for
+ -0.605%  RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#perform_query
+ -0.503%  RAILS/activesupport/lib/active_support/core_ext/object/blank.rb String#blank?
+ -0.468%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#column_types
+ -0.464%  RAILS/activerecord/lib/active_record/querying.rb ActiveRecord::Querying#_load_from_sql
+ -0.429%  RAILS/actionpack/lib/action_dispatch/journey/formatter.rb ActionDispatch::Journey::Formatter#generate
+ -0.356%  RAILS/actionpack/lib/action_dispatch/journey/formatter.rb ActionDispatch::Journey::Formatter#extract_parameterized_parts
+ -0.327%  GEM/4.0.0/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb Concurrent::Collection::NonConcurrentMapBackend#get_or_default
+ -0.248%  RAILS/activerecord/lib/active_record/attribute_methods/read.rb ActiveRecord::AttributeMethods::Read#_read_attribute
+ -0.236%  RUBY/openssl/hmac.rb OpenSSL::HMAC.digest
+ -0.226%  RAILS/actionpack/lib/action_dispatch/journey/visitors.rb ActionDispatch::Journey::Format#evaluate
+ -0.224%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#column_indexes
+ -0.213%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result#initialize
+ -0.183%  RAILS/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb ActiveRecord::ConnectionAdapters::QueryCache::Store#compute_if_absent
+ -0.161%  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::LazyAttributeSet#default_attribute
+ -0.158%  RAILS/activerecord/lib/active_record/associations/association.rb ActiveRecord::Associations::Association#foreign_key_for?
+ -0.154%  RAILS/activemodel/lib/active_model/attribute_set/builder.rb ActiveModel::LazyAttributeSet#keys
+ -0.149%  RAILS/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb ActiveRecord::ConnectionAdapters::ConnectionPool::LeaseRegistry#[]
+ -0.149%  RAILS/activesupport/lib/active_support/parameter_filter.rb ActiveSupport::ParameterFilter#compile_filters!
+ -0.148%  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::AttributeSet#[]
+ -0.124%  RAILS/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb ActiveRecord::ConnectionAdapters::AbstractAdapter#log
+ -0.123%  RAILS/activerecord/lib/active_record/result.rb ActiveRecord::Result::IndexedRow#fetch
+ -0.122%  RAILS/activerecord/lib/active_record/connection_handling.rb ActiveRecord::ConnectionHandling#connection_specification_name

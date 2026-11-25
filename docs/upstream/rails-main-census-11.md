@@ -1,48 +1,94 @@
 # Rails-main census 11: main against 8-1-stable before 8.2, with a compatibility sweep
 
-**In progress (2026-11-25).** The CPU and allocation labels and the gem-suite sweep are still running; this page
-is pushed early so reviewers can append sections. Numbers below this line are final only where a section says so.
+**Result (2026-11-25).** On census 10's 8 apps, Rails main [`cf0325a832`](https://github.com/rails/rails/commit/cf0325a832a1594f01d866da1e4ad23d962d886b)
+is still faster than 8-1-stable in 68 of 71 workloads: a median −6.10% of interpreted instructions (second main run
+−6.30%), and 588 fewer objects per request (71 of 71 workloads lower). Against census 10's main it is a median +0.19%
+(+0.15%), and the growth that shows in all 8 apps is one new cost, **LR1**. #59844 takes a mutex on every connection
+lease lookup: `#lease`, `#checkout_lease` and `Lease#terminated?` add +0.075% of all census-10 instructions in 8 apps, and +3.9k to 4.5k per association reader. A one-line fix is built.
 
-Census 11 compares Rails main [`cf0325a832`](https://github.com/rails/rails/commit/cf0325a832a1594f01d866da1e4ad23d962d886b)
-(2026-11-25, #59918) with 8-1-stable [`1afb398af9`](https://github.com/rails/rails/commit/1afb398af94c3f76567d427a279637dbfaac8b3f)
-(2026-11-24) and with census 10's main [`4500a94c34`](https://github.com/rails/rails/commit/4500a94c34d7052b84f81f6d7fd44f5bb8af3fff),
-on Ruby 4.0.9, census 10's 8 apps and its method. Main merged 55 first-parent commits since census 10, 8-1-stable 10.
+The compatibility sweep ran the suites of 95 gem variants on both trees. It found **one new break with reach**:
+**IX1**, the `IndexDefinition` readers that #59850 removed. GitLab, Mastodon, online_migrations and
+active_record_doctor call them. IX1 is now draft rails/rails#59976. **AM2** (#59820: the Action Mailer railtie no
+longer loads Active Job's) also breaks view_component's and money-rails' dummy apps, so its upgrade-guide note UG82M
+now has three gem examples. Every other flag was a known finding or failed on both trees: mobility via #59634, active_model_serializers via
+dynamic `:controller` routes, ransack, draper, ancestry, administrate.
 
-## Findings so far (correctness)
+## Ranked findings
 
 | # | Finding | Introduced by | Reach | Ownership | State |
 | ---: | --- | --- | --- | --- | --- |
-| 1 | **IX1: adapter-specific `IndexDefinition` readers removed.** `index.lengths` / `index.type` raise `NoMethodError` on PostgreSQL, all five readers on SQLite | #59850 (kamipo, merged 2026-11-18) | index-recreating migration helpers of GitLab and Mastodon (`length: index.lengths`), online_migrations 0.37 (`lengths`, `opclasses`), active_record_doctor 2.1 (`type`) | rails/rails: no issue or PR (open-PR files and #59850's cross-references checked: only oracle-enhanced and sqlserver adapter follow-ups). Downstream: gregnavis/active_record_doctor#251 (open, 2026-11-20) | built: `thomasklemm/index-definition-adapter-readers` @ `0f2f426a85`; queue [IX1](../../bench/upstream/pr-queue/items/IX1.md); [thermos-sol: changes](#ix1): delete redundant comment/trailer; correct body claims and permalinks |
-| 2 | **TA1: token-auth block gets a third argument**, so `authenticate_with_http_token(&method(:x))` with a two-parameter method raises `ArgumentError` | #58211 (Chad Cole, July 2026) | keygen-api, quepid, token_authenticate_me | **open rails/rails#59858 (czj, 2026-11-18) fixes it**, and keeps an optional third parameter's default. Missed by keyword search; found by thermos-sol | superseded ([TA1](../../bench/upstream/pr-queue/items/TA1.md)); fork branch `thomasklemm/token-auth-two-parameter-procedures` @ `a8a0745f1d` kept, not to open |
-| 3 | **AM2: `action_mailer/railtie` no longer loads `active_job/railtie`.** An app that requires the mailer railtie without the Active Job one: `config.active_job.*` raises `NoMethodError` at boot, and `deliver_later` enqueues to the default Async adapter instead of the configured one; `defined?(ActiveJob)` is false at test-case load, so turbo-rails skips `Turbo::Broadcastable::TestHelper` (view_component's sandbox no longer loads) | #59820 (byroot, merged 2026-11-16) | apps with an explicit railtie list that omits `active_job/railtie`; of 10 sampled `config/application.rb` files that require the mailer railtie, 9 also require Active Job's; gem dummy apps (view_component) | deliberate; the CHANGELOG mentions only standalone use ("add Active Job to your Gemfile"), the 8.2 upgrade guide nothing. No issue or PR; #59820 has no cross-references | candidate upgrade-guide note (UG82 style); not built |
-| 4 | **SC1: main's YAML schema cache cannot be loaded by 8.1** (`PostgreSQL::IndexDefinition`, `slot:`) | #59850, #59141 | apps that dump `db/schema_cache.yml` and roll back a deploy from 8.2 to 8.1 | none | record only (forward compatibility is not promised); it broke census 11's codetriage labels until the cache was removed |
-| 5 | **RQ1: 26 framework files no longer load on their own after `require "active_support"`** (e.g. `action_controller/metal/strong_parameters`: `class_attribute` without its require, c562b54c09) | several, mostly cattr→class_attribute and new core-ext uses | pundit's spec requires `strong_parameters` directly and no longer loads | none; precedent b3b2662f13 (Kenta Ishizaki) merged the same kind of missing requires | record; low |
+| 1 | **IX1: adapter-specific `IndexDefinition` readers removed.** `index.lengths` / `index.type` raise `NoMethodError` on PostgreSQL, all five readers on SQLite | #59850 (kamipo, merged 2026-11-18) | index-recreating migration helpers of GitLab and Mastodon, online_migrations 0.37, active_record_doctor 2.1 (type detector) | no other rails/rails issue or PR (open PRs touching the file and #59850's cross-references checked); downstream gregnavis/active_record_doctor#251 | **draft rails/rails#59976** (`thomasklemm/index-definition-adapter-readers-2` @ `30368145ec`); [thermos-sol confirm](#ix1-confirmation) |
+| 2 | **LR1 (perf): `LeaseRegistry#lease` synchronizes every lookup**, so `lease_connection` / `with_connection` / `active_connection?` take a mutex once or more per query | #59844 (cole-robertson, merged by byroot 2026-11-19) | 8/8 apps; `#lease` self 0.091% of all c11m instructions, 69 of 71 workloads, max 0.261% (inclusive ≤ 0.77%); net vs c10: `#lease` +0.051%, `#checkout_lease` +0.018%, `Lease#terminated?` +0.006%, `Mutex#synchronize` +0.131% (7 apps, part of it LR1) | no open PR changes `#lease` (8 open PRs touch `connection_pool.rb`); #59844's review has no performance discussion; #59887 (merged) is the non-MRI deadlock follow-up | **built**: `thomasklemm/lease-registry-lockless-hit` @ `7e342de11f`, queue [LR1](../../bench/upstream/pr-queue/items/LR1.md) (risky: concurrency, needs Astra) |
+| 3 | **AM2 / UG82M: `action_mailer/railtie` no longer loads `active_job/railtie`.** Setting `config.active_job.queue_adapter` raises at boot; unconfigured test `deliver_later` falls back from TestAdapter to AsyncAdapter; `defined?(ActiveJob)` is false at test-case load, so turbo-rails skips `Broadcastable::TestHelper`; money-rails' `on_load(:active_job)` hook reads `config.active_job`, so the first `deliver_later` raises | #59820 (byroot, deliberate) | apps whose explicit railtie list omits Active Job (1 of 10 sampled); gem dummy apps: view_component (sandbox suite does not load), money-rails (`money_serializer_spec` does not load) | no issue or PR; #59820 has no cross-references; CHANGELOG covers standalone use only | **built** guide note `thomasklemm/upgrade-guide-mailer-active-job-railtie` @ `de4d27b257`, queue [UG82M](../../bench/upstream/pr-queue/items/UG82M.md); [thermos-sol changes](#ug82m) applied to body and impact; waits for a slot |
+| 4 | **JB1: job error reports lose `context[:job]`**, and `perform_now` costs +9 objects and +9k instructions (+3.7%) | #59893 (azmi2409, merged 2026-11-20), also on 8-1-stable via #59898 (unreleased) | every app that reports job errors (`retry_on`/`discard_on report: true`, executor); hackatime +24 objects on `GET dashboard` (inline jobs) | **owned**: issue rails/rails#59951 (kehra, open), fix PR rails/rails#59953 (MIbtehajNasar, open) | record only; nothing to build |
+| 5 | **TA1: token-auth block gets a third argument**, so `authenticate_with_http_token(&method(:x))` with a two-parameter method raises `ArgumentError` | #58211 (Chad Cole, July 2026) | keygen-api, quepid, token_authenticate_me | **open rails/rails#59858 (czj, 2026-11-18)**, missed by our keyword search, found by thermos-sol | superseded ([TA1](../../bench/upstream/pr-queue/items/TA1.md)); branch kept, not to open |
+| 6 | **SC1: main's YAML schema cache cannot be loaded by 8.1** (`PostgreSQL::IndexDefinition`, `slot:`) | #59850, #59141 | apps that dump `db/schema_cache.yml` and roll back from 8.2 to 8.1 | none | record only (forward compatibility is not promised); it broke codetriage's census labels until the cache was removed |
+| 7 | **RQ1: 26 framework files no longer load on their own after `require "active_support"`** (e.g. `action_controller/metal/strong_parameters` uses `class_attribute` without its require, c562b54c09) | several, mostly cattr → class_attribute | pundit's spec requires `strong_parameters` directly | none; precedent b3b2662f13 merged the same kind of requires | record; low |
 
-Not findings (read and probed, no break): #59855 token-scheme parsing (8.1 vs main header matrix differs only in
-case-insensitive schemes and DPoP, both intended), #59868 `SubstituteBinds`, #59933 integer shards, #59966
-`MessageEncryptor` class attribute, #59963 `AttributeSet#to_hash`/`#keys` single pass, #59901 shared relation
-delegation methods.
+Not findings (read and probed, no break): #59855 token-scheme parsing (only intended case-insensitive schemes and DPoP
+differ), #59868 `SubstituteBinds`, #59933 integer shards, #59966 `MessageEncryptor` class attribute, #59963
+`AttributeSet#to_hash`/`#keys` single pass, #59901 shared relation delegation, #59946. Known costs that remain:
+A1 (association scope, has_many +4.4%, joins +4.6% vs 8.1), `button_to` +16% to +34% (#50312, K6 built),
+`pluck` +5.6% / `group_count` +4.5% (census 10), and codetriage's debug-logged job (+4.9%, event reporter,
+judged deliberate in [main-regressions](main-regressions.md)).
+
+Ownership method: rails/rails issues and PRs by keyword, open PRs that touch the changed files, the introducing
+PR's timeline cross-references (added after TA1), our queue, and main up to [`818edfd76a`](https://github.com/rails/rails/commit/818edfd76a405b29f4695e051c07ea28a5476a4e)
+(none of the findings fixed there).
+
+## Census (CPU and allocations)
+
+Callgrind instructions, interpreter, fixed heap; labels `c11s` (8-1-stable), `c11c10` (census 10 main), `c11m` and
+`c11m2` (main, A/A). Allocations: `a11s`/`a11s2`, `a11c10`, `a11m`/`a11m2`, interpreter and YJIT. codetriage was rerun
+for every label without `db/schema_cache.yml` (SC1). Outputs: [cpu-s81-main](data/rails-main-census-11/cpu-s81-main.txt),
+[cpu-c10-main](data/rails-main-census-11/cpu-c10-main.txt), [alloc-s81-main](data/rails-main-census-11/alloc-s81-main.md),
+[alloc-c10-main](data/rails-main-census-11/alloc-c10-main.md), method nets `cpu-net-*`, [micros](data/rails-main-census-11/micros.md).
+
+| App | workloads | main vs 8.1 median (range) | main vs census-10 main median | objects vs 8.1 (median) |
+| --- | ---: | --- | ---: | ---: |
+| blog | 10 | −11.59% (−24.84% … −5.10%) | +0.25% | −468 |
+| casa | 10 | −7.34% (−22.52% … −0.11%) | +0.19% | −5139 |
+| codetriage | 7 | −3.22% (−12.66% … +4.91%) | +0.17% | −671 |
+| hackatime | 12 | −5.23% (−19.52% … −2.14%) | +0.39% | −1218 |
+| pingcrm | 8 | −5.34% (−6.76% … −4.41%) | +0.02% | −420 |
+| react-starter-kit | 8 | −6.14% (−8.30% … −4.73%) | +0.04% | −365 |
+| redprints-cfp | 8 | −6.10% (−10.02% … −1.86%) | +0.33% | −356 |
+| writebook | 8 | −5.93% (−8.73% … −2.73%) | +0.46% | −1121 |
+| **All** | **71** | **−6.10%**, 68 faster, 2 slower beyond 1% | **+0.19%** (A/A run +0.15%) | **−588** |
+
+Slower than 8.1 beyond 1%: codetriage `perform SendSingleTriageEmailJob` +4.91% (census 10: +5.04%) and `PATCH repo
+subscription` +1.34% (+1.09%). Slower than census 10's main beyond 1% in both main runs: blog
+`ActionBroadcastJob` +1.15% / +1.56% and writebook `BroadcastJob` +1.37% / +0.84%. Both are `ExecutionContext.set`
+(JB1) plus LR1. react-starter-kit `GET home` +2.65% shows in one run only (−0.16% in the other).
+
+Allocations against census 10's main: median −0.1. hackatime's HTML pages grow by 33 to 44 objects in both main runs;
+the attributed sites are `ExecutionContext.set` (+24 on `GET dashboard`, JB1) and `_perform_job`.
+
+Micros (Ir / objects per call, interpreter, main vs 8.1; [all](data/rails-main-census-11/micros.md)): has_many +4.4%,
+has_one +6.1%, `as:` +5.5%, `joins` +4.6%, `joins` through +6.6%, about +0.7 points over census 10, from LR1 (bisected to
+e22f32a760, #59844). LR1 branch: readers −1.0% to −1.2%, joins −0.8% (A/A ≤ 0.04%); YJIT flat cells joins −1.4%.
+`perform_now` of an empty job: 146k (8.1), 241k (census 10), 250k (main), objects 44 / 65 / 74.
 
 ## Compatibility sweep
 
 95 suites: every suite of ecosystem rounds 1 and 2 and round-59141 with their recorded settings, plus
 active_record_doctor 2.1.0 (PostgreSQL, SQLite) and online_migrations 0.37.0. Manifest
-[`round-c11.yml`](../../bench/upstream/readiness/round-c11.yml), readiness runner, seeds 4242 and 1717, two runs per
-tree. **Running**; partial report after 14 suites: one new flag (view_component, AM2), the rest known (E2, ransack
-`SelectManager`, L1) or failing on both trees.
+[`round-c11.yml`](../../bench/upstream/readiness/round-c11.yml), readiness runner, base 8-1-stable `1afb398af9`,
+candidate `cf0325a832`, seeds 4242 and 1717, two runs per tree. New `known.yml` entries this round: AM2
+(view_component, money-rails), SP3 (mobility under #59634, gem-side: shioyama/mobility#692, fix PR #693 unreleased),
+active_model_serializers (dynamic `:controller` route in its test helper, 92d809905b).
 
-## Census (CPU and allocations)
-
-**Running.** Labels `a11m`/`a11m2`, `a11s`/`a11s2`, `a11c10` (allocations, interpreter and YJIT) and `c11m`/`c11m2`,
-`c11s`, `c11c10` (Callgrind, interpreter), fixed heap, A/A, census 10's scripts. codetriage is rerun for every label
-without `db/schema_cache.yml` (SC1).
+**Running (74 of 95 suites done at 14:14 UTC).** Every flag so far matches a known finding; this section is final when the remaining suites finish.
 
 ## Method and pins
 
-* Rails main `cf0325a832`, 8-1-stable `1afb398af9`, census 10 main `4500a94c34`; Ruby 4.0.9 (`3e93b23afc`).
+* Rails main `cf0325a832`, 8-1-stable `1afb398af9`, census 10 main `4500a94c34`; Ruby 4.0.9 (`3e93b23afc`). Main merged
+  55 first-parent commits since census 10, 8-1-stable 10.
 * Fixed heap `RUBY_GC_HEAP_{0..4}_INIT_SLOTS=1000000/250000/100000/20000/10000`; census 8's patched Valgrind 3.19.
-* Repros: `.amp/in/orb-backup/c11/repro/` (`ix1_index_readers.rb`, `pg_index_dump.rb`, `ta1_token_method_arity.rb`,
-  `token_auth.rb`, `am2_mailer_without_job_railtie.rb`, `ac1_action_cable_hook.rb`).
+* Scripts and repros: [`bench/upstream/census11/`](../../bench/upstream/census11/) (`run_census*.sh`, `micros.sh`,
+  `bisect.sh`, `job_micro.rb`, `ix1_index_readers.rb`, `pg_index_dump.rb`, `ta1_token_method_arity.rb`,
+  `am2_mailer_without_job_railtie.rb`, `am2_money_rails_hook.rb`); raw micros in
+  [`data/rails-main-census-11/raw/`](data/rails-main-census-11/raw/).
 
 ## Exact-head review method (2026-11-25)
 

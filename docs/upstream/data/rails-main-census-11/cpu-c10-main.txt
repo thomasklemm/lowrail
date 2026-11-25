@@ -1,0 +1,20 @@
+== c11m2 vs c11c10
+blog-interpreter               workloads 10 median  +0.14% min  -0.37% max  +1.56%
+casa-interpreter               workloads 10 median  +0.26% min  -1.48% max  +0.59%
+codetriage-interpreter         workloads  7 median  +0.18% min  -0.80% max  +0.45%
+hackatime-interpreter          workloads 12 median  +0.30% min  -1.63% max  +0.53%
+pingcrm-interpreter            workloads  8 median  +0.13% min  -0.64% max  +0.18%
+react-starter-kit-interpreter  workloads  8 median  +0.06% min  -0.28% max  +0.39%
+redprints-cfp-interpreter      workloads  8 median  +0.41% min  -2.20% max  +0.79%
+writebook-interpreter          workloads  8 median  +0.44% min  -0.23% max  +0.84%
+ALL interpreter workloads  71 median  +0.15% |d| p90  0.82% lower by >= 1%:   5 higher by >= 1%:   1
+== c11m vs c11c10
+blog-interpreter               workloads 10 median  +0.25% min  -0.37% max  +1.15%
+casa-interpreter               workloads 10 median  +0.19% min  -1.51% max  +0.54%
+codetriage-interpreter         workloads  7 median  +0.17% min  -0.75% max  +0.25%
+hackatime-interpreter          workloads 12 median  +0.39% min  -1.82% max  +0.61%
+pingcrm-interpreter            workloads  8 median  +0.02% min  -0.93% max  +0.36%
+react-starter-kit-interpreter  workloads  8 median  +0.04% min  -0.26% max  +2.65%
+redprints-cfp-interpreter      workloads  8 median  +0.33% min  -3.10% max  +0.81%
+writebook-interpreter          workloads  8 median  +0.46% min  -0.17% max  +1.37%
+ALL interpreter workloads  71 median  +0.19% |d| p90  1.15% lower by >= 1%:   5 higher by >= 1%:   3
