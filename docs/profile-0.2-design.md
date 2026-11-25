@@ -1,6 +1,6 @@
 # lowrail-profile 0.2: a compare gate with a noise model, and `doctor` (design note)
 
-Status: proposal, 2026-11-25. Nothing here is implemented. 0.1 ships without a gate ([DECISIONS](DECISIONS.md),
+Status: decided 2026-11-25 (*Decisions* below); nothing is implemented, and nothing in gem/ before 0.1 is released. 0.1 ships without a gate ([DECISIONS](DECISIONS.md),
 [profile-gate-design](profile-gate-design.md)): compare is a report. Numbers come from
 [bench/upstream/profile_release/2026-11-25-gate-0.2](../bench/upstream/profile_release/2026-11-25-gate-0.2/README.md):
 [noise_gate.rb](../bench/upstream/profile_release/2026-11-25-gate-0.2/scripts/noise_gate.rb) and its output
@@ -25,7 +25,7 @@ Status: proposal, 2026-11-25. Nothing here is implemented. 0.1 ships without a g
   openstreetmap-website, Campfire and Forem have 3–4 captures, too few to measure k = 4 at all. Assignments reuse
   the same captures, so 0 of 26 is not 26 independent trials. Ship it in 0.2 as an opt-in `--gate`. The README's CI
   job stays a report until a calibration round has 8 serial captures each of Forem, openstreetmap-website, Campfire
-  and Hackatime, and shows no false CI failure there (*To decide*).
+  and Hackatime, and shows no false CI failure there (*Decisions*).
 * **Parallel captures stay refused** (exit 2). Even with the self-check, Hackatime (2 workers) and Writebook (16)
   are declined 20–47% of the time at k = 4 (70–85% at k = 3), no plant is caught, and the smallest detectable
   regression is 5–16% of an action.
@@ -127,11 +127,12 @@ noise model makes parallel captures harmless, not useful, so compare keeps refus
    identity, seed, runs, Ruby or environment, as compare does today.
 2. B is the mean of the 8 base runs. T = max(2 × max(spread of the 8 base runs, spread of head's runs), F). F is 1
    object for a line, and max(20, 0.1% of max(B, H)) for an action.
-3. Self-check: each base against the other three, by the same rule. If any flags, the job declines: exit 0, and the
-   summary says which rows disagree between base captures. A declined job is a report.
-4. One compare flags: exit 1 only with `--head2`, and only if a row flagged in step 2 is still flagged when the
-   heads are merged into one of four runs. Without `--head2`, exit 3 ("profile head again"), so the CI job can
-   make the second capture only when it is needed.
+3. Self-check: each base against the other three, by the same rule. If any flags, the gate declines: exit 0,
+   `declined: true` and a reason in the JSON, and the summary says so and which rows disagree between base
+   captures. A declined job is a report.
+4. A compare that flags exits 1. The CI step then profiles head again and runs compare with `--head2`, which
+   merges both heads into one of four runs; the job fails only if that comparison exits 1 again, with a row the
+   first compare flagged. No other exit code (*Decisions*, 2).
 5. Reported per row: base runs, head runs, spread, floor, and the d95 of the row, so a reader sees what size of
    change the gate could have found.
 
@@ -191,15 +192,23 @@ own T5–T8 differently: T5 jobs-only report, T6 missing report.json, T7 ledger,
 | **`--out` not writable** | The nearest existing ancestor of `--out` is not a writable directory (access(2), no test write). `--out` exists, is not empty and has no `.lowrail-profile` marker (the capture would abort). Free space on its file system below 1 GiB: warning. | `tmp/lowrail-profile exists and was not created by lowrail-profile: the capture would stop. Pick another --out or remove it yourself.` / `/ has 0.6 GiB free; a capture's runs can need gigabytes before the report deletes them.` | 2, 1 (space) | No T finding for permissions; the space warning is T7 (Sure: 3.3 GB per capture) |
 | **Ruby or Rails below the floor** | `RUBY_ENGINE` is not `ruby`, `RUBY_VERSION` < 3.3, Windows, Gemfile.lock's `railties` < 7.2 or `rack` < 2. Without Gemfile.lock: warning (version unknown). | `Gemfile.lock has railties 7.1.5; lowrail-profile supports Rails 7.2 and later (Ruby 3.3 and later).` | 2, 1 (no lock) | No T finding: the floor app (Blog, Ruby 3.3 / Rails 7.2) and Solidus at the floor passed. The gemspec blocks Ruby < 3.3 at install, but nothing checks Rails |
 
-The README's CI job would run `doctor` first and stop on exit 2. A capture could run the same checks and print the
-warnings at its start, but it would still not refuse on warnings (0.1's "suite runs as it would").
+`doctor` on its own exits 0, 1 or 2 as above; the README's CI job runs it first and stops on exit 2. A capture runs
+the same checks first and prints their findings, errors included, as warnings, but never stops because of them:
+parallel captures stay allowed as reports (*Decisions*, 3).
 
-## To decide
+## Decisions
 
-1. The gate in 0.2 as opt-in `--gate` with `range-2`, k = 4, self-check and merged confirm. Or no gate in 0.2 until
-   the calibration round.
-2. The calibration round before the README's CI job fails builds: 8 one-process captures each of Forem,
-   openstreetmap-website, Campfire and Hackatime (about 4.5 h, 1.3 h, 17 min and 18 min of profiling), plus one
-   app's captures on two machines or days, to test cached bases.
-3. Exit 3 ("profile head again") or a JSON field for the confirm step.
-4. `doctor`'s eight checks as above, and whether a capture prints doctor's warnings.
+Coordinator under Thomas's delegation, 2026-11-25:
+
+1. **0.2 gets `range-2` with k = 4 and the self-check as an opt-in `--gate`.** Before the 0.2 release a calibration
+   round runs: 8 serial (`PARALLEL_WORKERS=1`) captures each of Forem, openstreetmap-website, Campfire and Hackatime
+   (about 4.5 h, 1.3 h, 17 min and 18 min of profiling). Whether `--gate` later becomes the default, and the README's
+   CI job fails builds, is decided only from those numbers.
+2. **No exit 3.** With `--gate`, compare exits 1 when it flags something. The CI step's confirm run profiles head2,
+   and the job fails only if the merged comparison (head and head2 as one head) exits 1 again. Declined to gate
+   (noisy bases) is exit 0, with `declined: true` and a reason in the JSON and in the summary.
+3. **Captures run doctor's checks first and print warnings, but never abort because of them**; parallel captures
+   stay allowed as reports. `doctor` on its own exits 0/1/2 as in the table. Check 6's `--out` part drops out once
+   0.1's `Dir.children` fix for `--out` (thermos-opus must-fix 2) is in; only the gem home part remains.
+
+No implementation in gem/ before 0.1 is released.
