@@ -50,7 +50,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **Child orbs don't notify Thomas** (Thomas, 2026-11-04). They report only to the coordinating thread with
   send_thread_message, never with notify_user, and their threads are snoozed indefinitely. The coordinator relays.
 * **Three big bets in parallel** (Thomas, 2026-11-25: "wir können überall tief reingehen"): ZJIT gaps on real Rails apps beyond k0kubun's zjit-headline2 (zjit-gap-census-2), unreleased Rails 8.2 regressions (rails-main-census-11), and lowrail-profile as a tool for any Rails app (plan first). The coordinator runs and reviews them; upstream posts still need Thomas.
-* **Census 11 regressions** (coordinator, delegated by Thomas, 2026-11-25): IX1 (IndexDefinition readers removed by rails#59850; GitLab, Mastodon, online_migrations, active_record_doctor) opens as a rails/rails draft in the last free slot (22) once thermos-sol approves the exact head. TA1 (token-auth scheme argument) opens too, also after thermos-sol approves its exact head: Thomas raised the rails/rails tool cap to 23 for it (2026-11-25).
+* **Census 11 regressions** (coordinator, delegated by Thomas, 2026-11-25): IX1 (IndexDefinition readers removed by rails#59850; GitLab, Mastodon, online_migrations, active_record_doctor) opens as a rails/rails draft in the last free slot (22) once thermos-sol approves the exact head. TA1 (token-auth scheme argument) does not open: thermos-sol found it duplicates the open rails#59858 (czj, 2026-11-18), which also handles an optional third parameter that TA1 gets wrong; superseded, cap back to 22.
 * **lowrail-profile 0.1** (Thomas, 2026-11-25, all six recommendations of docs/profile-release-plan.md): a second gemspec `lowrail-profile` in gem/ without lowering code; published on rubygems.org; floor Ruby 3.3 and Rails 7.2 if M2 holds, otherwise 4.0 and 8.1; --record and --workloads ship as experimental (writes behind --allow-writes); a dated ledger snapshot is bundled; proof on Campfire, Lobsters and CodeTriage plus a floor-version app. M1-M5 start now; the release itself (M6) needs Thomas again.
 * **At most 8 working orbs at once** (Thomas, 2026-11-03). A larger orb (`a1.xxlarge`) is fine for long parallel
   runs such as Ruby builds or a census; it doesn't reduce wall-time noise, and Callgrind stays primary.
@@ -189,7 +189,7 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
 * **rails/rails: only the most urgent findings open** (Thomas, 2026-11-05 night, with 22 of ours open): until our
   open count is clearly lower, a new Rails PR opens only for an unreleased regression that breaks widely used apps or
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.
-  The tool cap is 23 (22, then +1 for TA1, Thomas 2026-11-25), so `open` refuses until one closes or merges; above that, ask Thomas.
+  The tool cap is 22 (the count on 2026-11-05), so `open` refuses until one closes or merges; above that, ask Thomas.
   Only Thomas marks drafts ready. Keep each PR small.
 * **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
   preferably grouped by theme and likely reviewer. The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
