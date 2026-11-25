@@ -155,19 +155,27 @@ class ProfileTest < Minitest::Test
       LowrailTest.write_rails_app(File.join(api, "spec/dummy"),
         "app/controllers/widgets_controller.rb" => <<~'RUBY')
           class WidgetsController < ApplicationController
-            def index = (Engine.call; head(:ok))
+            def index = (Engine.call; Phr.many; head(:ok))
           end
         RUBY
       { "api/app/lib/engine.rb" => "module Engine\n  def self.call = (Core.many; Loose.many)\nend\n",
         "core/lib/core.rb" => "module Core\n  def self.many = Array.new(40) { String.new }\nend\n",
-        "loose/loose.rb" => "module Loose\n  def self.many = Array.new(10) { String.new }\nend\n" }.each do |rel, src|
+        "loose/loose.rb" => "module Loose\n  def self.many = Array.new(10) { String.new }\nend\n",
+        "src/posthog-rails-3.18.6/lib/phr.rb" => "module Phr\n  def self.many = Array.new(20) { String.new }\nend\n" }.each do |rel, src|
         FileUtils.mkdir_p(File.dirname(File.join(dir, rel)))
         File.write(File.join(dir, rel), src)
       end
+      # A path: gem reached through a symlink (posthog-rails on Dawarich): Ruby names its files by the real path.
+      File.symlink(File.join(dir, "src/posthog-rails-3.18.6"), File.join(dir, "phr"))
       File.write(File.join(api, "requests.rb"), <<~'RUBY')
         spec = Gem::Specification.new { |s| (s.name, s.version) = "solidus_core", "1.0" }
         spec.full_gem_path = File.expand_path("../core", __dir__)
         Gem.loaded_specs["solidus_core"] = spec
+        phr = Gem::Specification.new { |s| (s.name, s.version) = "posthog-rails", "3.18.6" }
+        phr.full_gem_path = File.expand_path("../phr", __dir__)
+        Gem.loaded_specs["posthog-rails"] = phr
+        $LOAD_PATH << File.join(phr.full_gem_path, "lib")
+        require "phr"
         # The profiler itself as a path gem (a Lowrail checkout in the Gemfile).
         own = Gem::Specification.new { |s| (s.name, s.version) = "lowrail", "0" }
         own.full_gem_path = ENV.fetch("PROFILER_DIR")
@@ -186,6 +194,8 @@ class ProfileTest < Minitest::Test
       core = report["ranked"].find { _1["site"] == "GEM/solidus_core/lib/core.rb:2" }
       assert core, report["ranked"].map { _1["site"] }.first(10).inspect
       assert_equal "gem: solidus_core", core["group"]
+      phr = report["ranked"].find { _1["site"] == "GEM/posthog-rails/lib/phr.rb:2" }
+      assert_equal "gem: posthog-rails", phr&.dig("group"), report["ranked"].map { _1["site"] }.first(10).inspect
       assert_empty report["ranked"].select { _1["site"].start_with?("GEM/lowrail/") }, "the profiler's own lines are not ranked"
       assert_includes report["groups"].map { _1["group"] }, "lowrail-profile"
       assert_in_delta 41.0, core["all"].last, 1.0

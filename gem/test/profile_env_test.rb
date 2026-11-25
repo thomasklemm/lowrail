@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# When lowrail-profile hands the environment back to the processes a suite
-# starts: only once the suite's runner has read its seed. A gem that loads
+# The environments lowrail-profile runs things in: the counter's build, outside
+# the app's bundle; and the processes a suite starts, handed back their
+# environment only once the suite's runner has read its seed. A gem that loads
 # RSpec::Core::Runner without running RSpec (rswag-specs in Dawarich's bundle)
 # must not make the app's boot hand it back. The children themselves are
 # checked in profile_test.rb.
@@ -19,6 +20,24 @@ class ProfileEnvTest < Minitest::Test
   def profile(dir, *args)
     env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test", "MT_NO_PLUGINS" => "1")
     Open3.capture3(env, RUBY, PROFILE, *args, chdir: dir)
+  end
+
+  # Under bundle exec the counter is built in a directory of its own, where an
+  # app's Gemfile that reads a file relative to the cwd (Dawarich's
+  # .ruby-version) cannot be evaluated: the build runs outside the bundle.
+  def test_the_counter_builds_under_an_apps_bundle
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, ".ruby-version"), RUBY_VERSION)
+      File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\nruby File.read(\".ruby-version\").strip\n")
+      bundle = Gem.bin_path("bundler", "bundle")
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "PATH" => "#{File.dirname(RUBY)}:#{ENV["PATH"]}")
+      _, err, status = Open3.capture3(env, RUBY, bundle, "lock", "--local", chdir: dir)
+      assert status.success?, err
+      _, err, status = Open3.capture3(env, RUBY, bundle, "exec", RUBY, PROFILE, "--runs", "1", "--out", "o", "--", RUBY, "-e", "exit", chdir: dir)
+      refute_match(/building the counter failed/, err)
+      assert_match(/no runs with requests/, err, "the command ran: #{status.inspect}")
+      assert_equal 1, Dir[File.join(dir, "cache/lowrail/profile/*/*/lowrail_profile.#{RbConfig::CONFIG.fetch("DLEXT")}")].size
+    end
   end
 
   def test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile

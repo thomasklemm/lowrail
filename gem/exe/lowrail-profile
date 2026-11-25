@@ -143,8 +143,13 @@ unless File.exist?(ext)
   log = File.join(tmp, "build.log")
   # Built from a copy: mkmf escapes a srcdir with spaces in a way make's VPATH cannot follow.
   FileUtils.cp(sources, tmp)
-  ok = system(RbConfig.ruby, "extconf.rb", chdir: tmp, out: log, err: log) &&
-    system(RbConfig::CONFIG.fetch("MAKE", "make"), chdir: tmp, out: [log, "a"], err: [log, "a"])
+  build = lambda do
+    system(RbConfig.ruby, "extconf.rb", chdir: tmp, out: log, err: log) &&
+      system(RbConfig::CONFIG.fetch("MAKE", "make"), chdir: tmp, out: [log, "a"], err: [log, "a"])
+  end
+  # Outside the app's bundle: under bundle exec its Gemfile would be evaluated in tmp, where a
+  # relative File.read(".ruby-version") fails (Dawarich), and the build needs nothing from it.
+  ok = defined?(Bundler) && Bundler.respond_to?(:with_unbundled_env) ? Bundler.with_unbundled_env(&build) : build.()
   unless ok && File.exist?(File.join(tmp, name))
     kept = "#{cache}.build.log"
     FileUtils.cp(log, kept) if File.exist?(log)
