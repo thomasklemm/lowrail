@@ -643,6 +643,8 @@ separate the heads and is left out of the reply.
 
 **Reply draft (not posted; Thomas approves):**
 
+Posted 2026-11-25 as [issuecomment-7152413475](https://github.com/ruby/ruby/pull/17251#issuecomment-7152413475) (Thomas approved test, review, revise and post), paragraphs unwrapped, text unchanged.
+
 > @eightbitraptor Mostly yes: shipit's RSS increase is largely gone, and most of the GC-time saving remains. The
 > Rails workloads keep their GC gains, but RSS versus the previous head is not consistently lower.
 >
