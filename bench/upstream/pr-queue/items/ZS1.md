@@ -31,6 +31,7 @@ passes:
   - {reviewer: opus, head: "fbbb9cee7b", orb: T-01a1e02a-4640-708d-8a07-4487c093fc18, date: 2026-11-15, verdict: approve, open: "confirm pass on the split: same tree object as 89e2da1571 (63d226b442), and 8aedcce4ca has the tree of 656ae95dbc; b7dfd487a6 touches only vm_args.c and vm_core.h, 8aedcce4ca only zjit.c and zjit/, fbbb9cee7b only tests; authors, committer and trailers as intended; no message line over 72 characters. Optional, would need a new head: 8aedcce4ca's 'extracted unchanged' reads as if that commit extracted it; a Co-authored-by for Rafael on the VM commit (Thomas's call)"}
   - {reviewer: claude-code, head: "fbbb9cee7b", orb: T-01a1e02a-30a2-77f9-9d94-33f157e1623d, date: 2026-11-15, verdict: approve, open: "confirm pass on the split: tree 63d226b442 as on 89e2da1571; b7dfd487a6 holds the whole VM change (the 22 removed lines equal the added body apart from indentation) and nothing of ZJIT, 8aedcce4ca nothing of the VM; authors, committer and trailers as intended, no Amp trailer; no message line over 72 characters, and 8aedcce4ca's message is word for word the old one. Optional: 'extracted unchanged in the previous commit'; would leave it"}
   - {reviewer: fable, head: "fbbb9cee7b", orb: T-01a1e02a-5156-7535-b82d-6fdecf19860d, date: 2026-11-15, verdict: nits, open: "confirm pass on the split, no must-fix and no new point: same tree as 89e2da1571, the split is clean, authorship and messages as intended (longest lines 71, 72 and 72 characters). The optional points are those of the pass on 89e2da1571; the coordinator decided against the recompile on the flag-check exit"}
+  - {reviewer: thermos-sol, head: "2e3108fc0558f076a7acbbd1eaf2f5acd534f603", orb: T-01a211b5-8b72-7106-b650-4a78d8f8a461, date: 2026-11-25, verdict: changes, open: "both rubrics personally, no delegation. Must-fix: same-definition redefinition clears the basic bit without invalidation; passing the Symbol delays conversion and changes Proc identity when the callee evicts the cache before reading &b (interpreter true, ZJIT false). Keep patch points and add a HIR METHOD_ENTRY_BASIC guard with original-send snapshot/recompile; temporary guard and new behavior regression validated. Correct the false equivalence in commit message/reply and remove redundant new comments at codegen.rs:1209 and hir.rs:5238. NULL cref is not reachable from valid Ruby frames executing this HIR; no nullable wrapper needed. Authorship matches existing PR (Rafael author, Thomas co-author/committer; dates refreshed). Optional: new using-after-compile test uses map, an ISEQ under ZJIT; use flat_map for real fixed-C coverage. Dev zjit-test 2050/2051 plus 15 skipped, SIGPROF abort reproduced with base Rust control; btest t1 and t2 2148/2148 each, CLI 34/7907 assertions, core 1380/64214 assertions, one skip. Matrix 144/144 matches uncompiled JIT-enabled control; deleting cref guard fails 7/20; restored exact-head Symbol filter 18/18; bindgen identical. Details and conditional corrected reply in docs/upstream/zjit-symbol-block.md; supersedes note's same-Proc equivalence claim."}
 ---
 
 # ZJIT: Send Symbol block arguments directly
@@ -128,3 +129,22 @@ ZJIT stats for 25 iterations of railsbench, then lobsters, then shipit, leaving 
 -vm_write_stack_count: 86,844,780
 +vm_write_stack_count: 85,747,865
 ```
+
+## For Thomas
+
+**2026-11-25 thermos-sol: changes on `2e3108fc05`.** The note's claim that passing the Symbol always gives the
+same Proc without refinements is disproved by
+[`proc_identity_probe.rb`](../../zs1/round2/proc_identity_probe.rb). Same-definition redefinition skips
+invalidation, and the callee can evict the Proc cache before ZJIT converts the Symbol. Add a HIR basic-bit guard
+with the original send snapshot and recompile, plus this behavior regression. A temporary implementation passes
+the regression and all 12 Symbol behavioral tests; it is not part of the reviewed head.
+
+The body's basic-method promise is not true until that guard exists. The first commit's same-result claim and
+the original first review reply need correction; the round record now contains a replacement reply conditional
+on the fix. Delete the redundant new comments at `codegen.rs:1209` and `hir.rs:5238–5239` under DECISIONS. Optional:
+use `flat_map`, not `map`, for the new test's claimed fixed-arity C callee.
+
+NULL cref is not reachable from valid Ruby ISEQ frames executing this HIR; the nonnull helper is appropriate.
+Rafael's author identity and Thomas's co-author trailer match the PR's existing ZJIT commit. XrXr's requested HIR
+shape is likely acceptable after the correctness fix, not on this head. The full evidence and sentence audit
+are in [the fix-round record](../../../../docs/upstream/zjit-symbol-block.md#thermos-sol-on-2e3108fc05-changes-2026-11-25).

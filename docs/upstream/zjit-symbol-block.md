@@ -967,25 +967,28 @@ verify` in a fresh clone of ruby master (`bb27ff85cf`); the fetch gives the same
 What changed against `aa36fa0ea4`:
 
 * The VM commit is gone. `rb_vm_symbol_block_handler()` and `rb_zjit_symbol_block_handler()` are removed, and the PR
-  touches only `zjit.c` (one declaration) and `zjit/`.
+  implementation touches only `zjit.c` (one declaration) and `zjit/`, plus the CLI test in `test/ruby/`.
 * The Symbol itself is the callee frame's block handler (`lir::BlockHandler::Value`, as for a guarded Proc); no
-  call before the frame push, no leaf-call preparation, no `Qundef` exit.
+  conversion call before the frame push, no conversion leaf-call preparation, no `Qundef` exit. `GetCref` still
+  calls the C helper `rb_vm_get_cref` before the send.
 * `Symbol#to_proc`: `PatchPoint MethodRedefined(Symbol, to_proc)` and `PatchPoint RootBoxOnly`, as before, now with
   no run-time flag check. A same-definition redefinition (`Symbol.define_method(:to_proc,
   Symbol.instance_method(:to_proc))`) clears the basic flag without invalidating the entry, so compiled code keeps
-  passing the Symbol while the interpreter calls `Symbol#to_proc`. Without refinements both give the same Proc
-  object (`equal?(:succ.to_proc)`, `lambda?`, `arity`, `inspect`, backtraces: `same_definition_probe.rb`); with
-  refinements the cref guard exits.
-* Refinements: a new `GetCref` instruction (calls `rb_vm_get_cref(cfp->ep)`, which is `vm_env_cref()`), then
+  passing the Symbol while the interpreter calls `Symbol#to_proc`. The builder's `same_definition_probe.rb`
+  matches without refinements, but does not establish equivalence: the review below finds different Proc identity
+  when the callee evicts the Symbol Proc cache before reading its block parameter. With refinements the cref guard
+  exits.
+* Refinements: a new `GetCref` instruction (calls `rb_vm_get_cref(cfp->ep)`, which asserts `vm_env_cref()` is nonnull), then
   `LoadField :refinements` and `GuardBitEquals nil` with recompile. It is a per-call guard and not a compile-time
   check, because a top-level `using` adds refinements to a cref after the code is compiled. Not specialized when
   `policy.no_side_exits`.
-* New test `test_send_symbol_block_arg_with_refinements_activated_after_compile` (ISEQ, C and variadic C callees).
+* New test `test_send_symbol_block_arg_with_refinements_activated_after_compile` (two ISEQ callees and a variadic
+  C callee: `Array#map` is Ruby-defined with ZJIT, not the claimed fixed-arity C case).
   Removing the guard fails it, `test_send_symbol_block_arg_with_refinements`,
   `test_send_symbol_block_arg_to_proc_redefined_with_itself` and the four snapshots.
 
-Open for the reviews: `rb_vm_get_cref` calls `rb_bug` when no cref is found, where the interpreter's branch checks
-`cref &&`. No probe or test reached a NULL cref from a JIT-compiled frame.
+The builder's NULL-cref question is settled by the source audit below: valid Ruby ISEQ frames reaching this HIR
+instruction have a cref. The interpreter's nullable helper also serves environments that cannot execute it.
 
 Verification (dev build, x86-64 orb): `make zjit-test` 2,050 of 2,051 (the failure is
 `test_profile_frames_during_direct_jit_to_jit_entry`, SIGPROF, as on master in orbs); `make btest` with
@@ -1014,15 +1017,132 @@ No `unhandled_block_arg` exit: the cref guard never fires there. Rails main's fr
 railsbench's gems only irb has one. The body's numbers (from `fbbb9cee7b`) still describe the same specialized sends.
 The body's second and third paragraphs were rewritten for the new shape.
 
-Reply drafts (for Thomas, after thermos-sol and thermos-opus on the head):
+Reply drafts (for Thomas, **only after the basic-flag fix and review of the new head**):
 
-> r4686073773: Done: there is no run-time check anymore. `Symbol#to_proc` is covered by the `MethodRedefined` patch
-> point, and the Symbol itself becomes the callee's block handler. The old check was for
-> `Symbol.define_method(:to_proc, Symbol.instance_method(:to_proc))`, which clears the basic flag without
-> invalidating the entry. Passing the Symbol then gives the same Proc as calling `to_proc`, and under refinements
-> the cref guard below exits.
+> r4686073773: The C helper check is gone. `MethodRedefined` covers replacement of `Symbol#to_proc`, and a HIR
+> basic-flag guard covers redefinition with its own definition. Both exits resume the original send; the Symbol is
+> passed directly only when conversion can be skipped.
 
 > r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that
 > its refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using`
 > can add refinements to the cref after the code is compiled (tested). With that, the `vm_args.c` extraction is
 > gone and the PR touches only ZJIT.
+
+### thermos-sol on `2e3108fc05`: changes (2026-11-25)
+
+Review orb [T-01a211b5-8b72-7106-b650-4a78d8f8a461](https://ampcode.com/threads/T-01a211b5-8b72-7106-b650-4a78d8f8a461).
+Both Thermos rubrics applied personally, without subagents or other threads as requested. Scope: the whole
+`f63048e94229b4bab276e01bac4902f9b6a74ace..2e3108fc0558f076a7acbbd1eaf2f5acd534f603` PR, not just the fix delta.
+Verified bundle SHA-256 `0ba360fe79737116d0045389190617b3a1e5143f8d1982dfabdd7ae91f6ff784`, prerequisite,
+two-commit range and exact fetched head. Nothing pushed to Ruby or posted.
+
+**Must fix — delayed conversion changes observable Proc identity.** `gen_guards_for_symbol_block_arg`
+(`zjit/src/hir.rs:6688`) watches entry replacement but not the entry's basic bit. `method_entry_set`
+(`vm_method.c:1574–1588`) reuses an equal definition and clears that bit without invalidation when visibility
+does not change. The interpreter then calls `to_proc` before entering the callee, while the compiled caller
+passes a Symbol and `gen_get_block_param` converts it only when `&b` is read. A callee can evict the 67-entry
+Symbol Proc cache (`proc.c:2339–2366`) first. It then sees a new Proc instead of the one supplied by the caller.
+This is a new regression against master, with no refinements involved, not the pre-existing JIT builtin issue.
+
+[`proc_identity_probe.rb`](../../bench/upstream/zs1/round2/proc_identity_probe.rb) prints `true` in the interpreter
+and with `--zjit --zjit-call-threshold=1000000`, but `false` on this head at thresholds 1 and 2 (one profile),
+default options, and threshold 2 with inlining disabled. The callee evicts the cache after entry and before its
+first read of `b`. A temporary behavior test asserting `true` fails this head, passes base Rust source linked
+against the same C archive, and passes with the HIR guard below. The existing Symbol tests all pass the broken
+head, so add this regression rather than relying on the existing self-redefinition/refinements test.
+
+Smallest fix: keep the patch points and add a HIR guard on `METHOD_ENTRY_BASIC` for the watched entry, with the
+original send snapshot and recompile. Use a GC-tracked constant for the entry and existing `load_rbasic_flags`
+and `GuardAnyBitSet`; no C conversion helper or VM change is necessary. A temporary guard using the current
+`IMEMO_FL_USER2` mask (`FL_USER7`, `method.h:72`, `internal/imemo.h:26`) made the new regression and all 12 existing
+Symbol-block behavioral tests pass. Give that mask an appropriate source-derived name in the final fix. This
+validates the remedy, not an approval of a new Ruby head; the temporary edits were removed afterward.
+
+**Must fix — claims and comments.** The item's second body paragraph and the first commit message say the send
+remains specialized only while `to_proc` is basic/not redefined; the same-definition case disproves that on this
+head. The message's later claim of equivalent results without refinements and the original first reply's
+"same Proc" claim are false. Repair the guard, update that message, and use the conditional replacement reply
+above; do not post the original "Done". Under DECISIONS' comment rule, delete the new narration above
+`block_arg_symbol` (`codegen.rs:1209`) and the two-line interpreter narration at `hir.rs:5238–5239`: the enum,
+branch condition and tests already convey them. The one-line explanation of why refinements require fallback,
+and the distinction between original-send and stripped-frame snapshots, do earn their place.
+
+**NULL cref — not a defect in this scope.** `vm_env_cref` (`vm_insnhelper.c:897`) walks previous EPs and extracts
+the lexical cref from a method entry. ISEQ method definitions synthesize a top-level cref if none was supplied
+(`vm_method.c:1105–1126`); TOP/CLASS frames get explicit crefs (`vm.c:950–953`, `insns.def`'s `defineclass`);
+BLOCK/BMETHOD/EVAL/RESCUE frames follow the captured/previous EP chain, and `env_clone` supplies a top-level cref
+for a null replacement (`proc.c:4524–4526`). C/IFUNC environments can lack a cref (`proc.c:1425`), but do not execute
+Ruby HIR; invoking a Ruby callback establishes its Ruby frame/captured EP. Inlining also pushes the callee's real
+frame/EP; `GetCref`'s Memory read effect prevents reuse across that frame mutation. Thus `rb_vm_get_cref`'s nonnull
+contract is appropriate here. A nullable wrapper would add an unnecessary layer.
+
+**Maintainability and surviving guards.** The shared Symbol-guard helper belongs in HIR; lowering the block
+handler as a VALUE reuses the existing Proc path; removing the VM extraction is a real simplification. No touched
+file crosses from below 1,000 lines to above it. No further structural blocker or security/devex regression found.
+Rust's match/enum changes and the CLI test do not benefit from Ruby `flog`/RuboCop metrics. The guards have these
+specific purposes:
+
+* Static-Symbol type/profile guard: an arbitrary object can run Ruby in `to_proc` and must keep the generic send.
+* Compile-time basic check plus `MethodRedefined`: do not skip an overridden conversion; the basic-bit guard
+  above is also needed because equal-definition replacement does not trigger this invalidation.
+* No-created-box check plus `RootBoxOnly`: avoid resolving conversion in the wrong box; preserve the established
+  conservative boundary rather than adding a new box-aware conversion here.
+* Cref refinements nil guard with recompile: preserve the interpreter's refined lambda, including a later `using`.
+* `no_side_exits` and existing argument-shape, callee and receiver guards: do not select a specialization that
+  cannot restore the original send or whose direct-call frame/target is invalid. The C-call `exit_state` keeps the
+  original block argument on the stack on overflow; the ordinary `state` describes the stripped frame.
+
+Optional coverage nit: replace `map` with `flat_map` in the new using-after-compile test to exercise a real
+fixed-arity C callee as advertised. Existing refinement tests and the differential matrix do exercise `flat_map`.
+
+**Sentence audit.** Body paragraph 2, sentence 1: correct for accepted call shapes (`SendDirect`,
+`CCallWithFrame`, `CCallVariadic`, Symbol block handler). Sentence 2: the basic-method promise is false on this
+head; the box and refinements clauses are implemented. Sentence 3: correct, `yield` lowering is unchanged.
+Body paragraph 3, both sentences: the Symbol portion is narrowed/ported from Rafael's branch; forwarded block
+parameters remain outside this PR. Opened his source commit `3f17d8950e2ab9ccdc4b91df07bd18f419bef642` and read its
+HIR/codegen changes. First original reply: removing the old helper and watching method replacement are facts;
+the equal-definition/basic-bit explanation is correct, but the conclusion that the resulting Proc is identical
+is disproved above. Second reply: all three sentences match `GetCref`, nil guard/recompile, the late-`using` test,
+and removal of the VM extraction. The replacement first reply is true only after the recommended guard lands.
+Old benchmark rows were not rerun in this correctness pass and are not new measurements of this head.
+
+**Authorship.** Read the PR's existing commits through GitHub's API: old ZJIT commit `30e0ca73f6` has Rafael
+Mendonça França `<rafael.franca@shopify.com>` as author, Thomas as committer, and
+`Co-authored-by: Thomas Klemm <github@tklemm.eu>`. Proposed `f858d208e8` has exactly those identities/trailer;
+the proposed test commit is Thomas's, as before. Author dates were refreshed to November 25, rather than preserved
+from November 15. No Amp trailer. This matches the attribution already on the PR, not a new attribution choice.
+
+**Executed evidence, dev build, x86-64 orb.** Configured `--enable-zjit=dev --disable-install-doc --disable-yjit`
+and built with `make -j2`.
+
+| Command/check | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,051 run; 2,050 pass, one SIGABRT, 15 skipped |
+| Base Rust control, identical lockfile and C archive | Same SIGPROF test abort; new identity regression passes |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same btest at threshold 2 | 2,148/2,148 |
+| `make test-all TESTS='test/ruby/test_zjit_cli.rb'` | 34 tests, 7,907 assertions, no failure/error/skip |
+| Proc/refinement/symbol/method/call/yield/lambda/array/enum/settracefunc/backtrace, ZJIT threshold 1 | 1,380 tests, 64,214 assertions, no failure/error, one skip |
+| Existing `zs1_probe.rb`, interpreter vs t1, t2p1, default | 612 stdout lines each, identical; stderr identical after normalizing Thread addresses |
+| Same probe, `N=40`, interpreter vs default | 3,502 stdout lines, identical; normalized stderr identical |
+| Three original round-2 probes, interpreter vs t1p1/t2p1 | All six comparisons identical |
+| 12 method mutations × refined/plain × before/after compile × three ZJIT settings | 144/144 match the uncompiled ZJIT-enabled interpreter control |
+| Wrong variant deleting only the cref guard | 20 run: seven fail (three behavioral tests and four HIR snapshots), 13 pass |
+| New identity behavior regression | Fails this head; passes base Rust control and temporary HIR basic-bit guard |
+| Temporary guard, existing Symbol behavioral tests | 12/12 |
+| Restored exact head, `ZJIT_TESTS='symbol_block_arg --test-threads=2'` | 18/18; source diff empty |
+| `make zjit-bindgen` | Regenerated bindings byte-identical after installing the missing toolchain rustfmt |
+
+The full-suite abort is `test_profile_frames_during_direct_jit_to_jit_entry`:
+"rb_profile_frames was not called from SIGPROF handler". The base control compiles master's Rust source with
+this build's C archive (the sole C difference is a declaration) and the same copied lockfile; it is not a separate
+full base-C build. The 144-case matrix uses `--zjit --zjit-call-threshold=1000000` for the uncompiled control
+because JIT-enabled Ruby builtin selection itself changes refinement behavior independently of this PR. It
+covers replacement, define_method, prepend, remove/undef, aliases, same-definition restore, visibility, refined
+`to_proc` and restore, including `GC.compact`, ISEQ/fixed-C/variadic calls, `block_given?`, `yield` and block
+materialization. The identity repro also differs against the plain interpreter, so has no such qualification.
+
+Scratch harnesses, base sources, the temporary validation patch, API reads and copied logs are under
+`.amp/in/orb-backup/zs1-review/` in the review orb. No arm64 build or new performance measurement in this pass.
+XrXr is likely to accept the HIR-speculation shape with the basic-bit guard and corrected claims: it uses the
+machinery he requested and drops the VM extraction. This exact head is not ready; acceptance remains his decision.
