@@ -396,6 +396,9 @@ another on an 8-CPU orb.
   (exit 1, one regression) and passes on an unchanged one. macOS (`macos-latest`, arm64): the counter builds with
   Apple clang and Campfire's 634 tests are identical plain, off and profiled (outcomes only; load order was not
   compared there).
+* After the M5 review fixes the rebuilt gem was proved again where they reach: the floor Blog's full proof, and a
+  failing and a killed suite's exit status and the `--workloads` write guard on Ruby 3.3 / Rails 7.2 and Ruby 4.0 /
+  Rails 8.1 ([receipts](../bench/upstream/profile_release/2026-11-25-fixes)).
 * The stack-walking run cost Campfire 87% of its suite time here, more than the 45% measured on the 2-CPU orb on
   2026-11-18; counting alone stays under 10%.
 

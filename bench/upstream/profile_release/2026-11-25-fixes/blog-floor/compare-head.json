@@ -1,0 +1,43 @@
+{
+  "status": 0,
+  "gate": true,
+  "problems": [],
+  "min": 1.0,
+  "compared": [
+    "request"
+  ],
+  "regressions": [],
+  "improvements": [],
+  "not_compared": [
+    {
+      "kind": "request",
+      "name": "ArticlesController#edit",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#index",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#show",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#new",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "CommentsController#destroy",
+      "reason": "no warm value"
+    },
+    {
+      "kind": "request",
+      "name": "ArticlesController#destroy",
+      "reason": "no warm value"
+    }
+  ]
+}

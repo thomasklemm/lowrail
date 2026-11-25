@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # proof.sh APPDIR OUTDIR GEM STEPS -- TEST COMMAND...
-# The install path a stranger takes: GEM (gem build gem/lowrail-profile.gemspec) installed with
+# The install path a stranger takes: GEM (gem build lowrail-profile.gemspec, from gem/) installed with
 # `gem install --local` into the app Ruby's gem home, a copy of the Gemfile (Gemfile.lowrail) with only
 # `gem "lowrail-profile", VERSION, group: [:development, :test], require: false` added, no RUBYLIB,
 # an empty XDG_CACHE_HOME (so the counter is built on the first profile).

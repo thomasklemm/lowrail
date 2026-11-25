@@ -1,0 +1,40 @@
+| gem: useragent | 204.1 | 209.4 | `base.rb:120` 76.1, `version.rb:27` 39.0, `user_agent.rb:25` 11.7 |
+| ruby default gem: base64 | 202.8 | 212.0 | `base64.rb:283` 102.8, `base64.rb:310` 51.9, `base64.rb:374` 48.0 |
+| rails: activejob | 125.4 | 132.0 | `log_subscriber.rb:192` 78.9, `log_subscriber.rb:148` 9.0, `arguments.rb:92` 6.2 |
+| gem: rack | 60.3 | 62.5 | `body_proxy.rb:12` 4.9, `query_parser.rb:259` 4.8, `utils.rb:331` 3.9 |
+| ruby default gem: logger | 55.0 | 56.5 | `logger.rb:692` 14.1, `log_device.rb:165` 14.1, `log_device.rb:33` 14.1 |
+| ruby default gem: securerandom | 49.0 | 51.3 | `securerandom.rb:71` 49.0 |
+| gem: importmap-rails | 28.0 | 29.5 | `importmap_tags_helper.rb:44` 10.0, `importmap_tags_helper.rb:30` 6.7, `importmap_tags_helper.rb:42` 4.3 |
+| gem: web-console | 26.3 | 27.0 | `permissions.rb:39` 13.7, `permissions.rb:21` 3.9, `request.rb:32` 2.0 |
+| gem: globalid | 18.0 | 19.0 | `gid.rb:95` 4.8, `gid.rb:159` 3.8, `gid.rb:166` 1.9 |
+| rails: railties | 17.9 | 18.5 | `backtrace_cleaner.rb:21` 4.3, `finisher.rb:195` 2.9, `logger.rb:57` 2.9 |
+| gem: turbo-rails | 16.8 | 17.5 | `stream_name.rb:26` 2.9, `broadcastable.rb:184` 2.4, `broadcastable.rb:456` 1.9 |
+| gem: json | 15.5 | 16.0 | `common.rb:298` 12.6, `common.rb:378` 2.0, `common.rb:775` 0.5 |
+| gem: concurrent-ruby | 15.2 | 15.9 | `non_concurrent_map_backend.rb:26` 7.0, `non_concurrent_map_backend.rb:120` 2.4, `mri_map_backend.rb:14` 2.4 |
+| gem: sprockets-rails | 12.3 | 13.0 | `helper.rb:81` 1.9, `helper.rb:357` 1.9, `helper.rb:186` 1.9 |
+| gem: tzinfo | 8.6 | 9.0 | `timestamp.rb:208` 3.8, `constant_offset_data_timezone_info.rb:52` 1.9, `timestamp.rb:193` 1.9 |
+| gem: rack-session | 2.9 | 3.0 | `id.rb:275` 1.0, `id.rb:401` 1.0, `id.rb:277` 1.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Turbo::Streams::ActionBroadcastJob#perform | 20 / 20 | 3401.1 / 3401.4 | 0.3 | 3376.9 | `RAILS/activesupport/lib/active_support/json/encoding.rb:65` 33.0, `RAILS/activesupport/lib/active_support/json/encoding.rb:66` 32.0, `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 24.0 | `app/views/articles/_article.html.erb:6` 227.0, `app/views/articles/_article.html.erb:14` 64.0, `app/views/articles/_article.html.erb:4` 31.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:124` (error page) | 1138.19 / 1138.19 | 95% | `no app frame` 84%, `app/views/articles/_article.html.erb:6` 16% | `add_filter { \|line\| line.sub(gems_regexp, gems_result) }` |
+| 2 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:132` (reload check) | 222.0 / 222.0 | 91% | `no app frame` 100% | `mtime = File.mtime(path)` |
+| 3 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:131` (debug logging) | 138.43 / 138.43 | 95% | `no app frame` 72%, `app/views/articles/_article.html.erb:6` 28% | `Thread.each_caller_location do \|location\|` |
+| 4 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:62` (error page) | 136.62 / 136.62 | 95% | `no app frame` 72%, `app/views/articles/_article.html.erb:6` 28% | `frame = frame.to_s` |
+| 5 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:106` † (reload check) | 111.43 / 111.43 | 91% | `no app frame` 100% | `all.concat(Dir[@glob]) if @glob` |
+| 6 | `RAILS/activejob/lib/active_job/log_subscriber.rb:192` (debug logging) | 99.52 / 99.52 | 95% | `no app frame` 100% | `source = extract_enqueue_source_location(caller)` |
+| 7 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:149` (error page) | 65.14 / 65.14 | 95% | `no app frame` 100% | `backtrace = backtrace.reject { \|line\| s.call(line.to_s) }` |
+| 8 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:141` (error page) | 48.86 / 48.86 | 95% | `no app frame` 100% | `backtrace = backtrace.map { \|line\| f.call(line.to_s) }` |
+| 9 | `RAILS/activesupport/lib/active_support/json/encoding.rb:65` | 29.86 / 29.86 | 95% | `no app frame` 100% | `json.gsub!(">", '\u003e')` |
+| 10 | `RAILS/activesupport/lib/active_support/json/encoding.rb:66` | 28.95 / 28.95 | 95% | `no app frame` 100% | `json.gsub!("<", '\u003c')` |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-fixes/rc-blog-floor-probes/w/post-allow/report.md

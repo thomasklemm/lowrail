@@ -1,0 +1,32 @@
+≈ tailwindcss v4.3.4
+
+Done in 57ms
+Running 21 tests in a single process (parallelization threshold is 50)
+Run options: -v --seed 1234
+
+# Running:
+
+CommentTest#test_requires_valid_article = 0.12 s = .
+CommentTest#test_belongs_to_article_association = 0.14 s = .
+CommentTest#test_creates_a_comment_on_an_article = 0.00 s = .
+CommentTest#test_requires_body = 0.00 s = .
+CommentTest#test_requires_commenter = 0.00 s = .
+ArticleTest#test_creates_an_article_with_valid_attributes = 0.00 s = .
+ArticleTest#test_destroys_comments_when_article_is_destroyed = 0.02 s = .
+ArticleTest#test_validates_body_minimum_length = 0.00 s = .
+ArticleTest#test_validates_title_presence = 0.00 s = .
+CommentsControllerTest#test_should_create_comment = 0.06 s = .
+CommentsControllerTest#test_should_destroy_comment = 0.01 s = .
+CommentsControllerTest#test_should_not_create_comment_with_invalid_params = 0.01 s = .
+ArticlesControllerTest#test_should_update_article = 0.01 s = .
+ArticlesControllerTest#test_should_get_edit = 0.12 s = .
+ArticlesControllerTest#test_should_destroy_article = 0.02 s = .
+ArticlesControllerTest#test_should_create_article = 0.01 s = .
+ArticlesControllerTest#test_should_show_article = 0.02 s = .
+ArticlesControllerTest#test_should_get_new = 0.01 s = .
+ArticlesControllerTest#test_should_not_create_article_with_invalid_params = 0.02 s = .
+ArticlesControllerTest#test_should_not_update_article_with_invalid_params = 0.01 s = .
+ArticlesControllerTest#test_should_get_index = 0.02 s = .
+
+Finished in 0.605294s, 34.6939 runs/s, 75.9961 assertions/s.
+21 runs, 46 assertions, 0 failures, 0 errors, 0 skips

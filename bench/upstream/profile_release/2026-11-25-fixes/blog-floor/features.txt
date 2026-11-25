@@ -1,0 +1,18 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 207460.txt 2229: identical to a plain process
+off 207503.txt 2229: identical to a plain process
+# control (bundle exec env) vs captures
+base off-env: 1 processes
+profiled run1-207567.txt 2229: identical to a off-env process
+profiled run2-207602.txt 2229: identical to a off-env process
+base2 run1-207661.txt 2229: identical to a off-env process
+base2 run2-207697.txt 2229: identical to a off-env process
+head run1-207756.txt 2229: identical to a off-env process
+head run2-207791.txt 2229: identical to a off-env process
+planted run1-207847.txt 2229: identical to a off-env process
+planted run2-207889.txt 2229: identical to a off-env process
+seed99 run1-207942.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-207977.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true
