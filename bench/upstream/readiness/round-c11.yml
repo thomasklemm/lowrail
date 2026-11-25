@@ -1,0 +1,1027 @@
+# Census 11 compatibility sweep (docs/upstream/rails-main-census-11.md): every suite of ecosystem rounds 1 and 2
+# and round-59141 with their recorded settings (later rounds win), plus active_record_doctor and online_migrations
+# for #59850's index readers. Base 8-1-stable, candidate main, both pinned 2026-11-25. PostgreSQL 17 on 5432 (the
+# orb's cluster, trust), MariaDB from services.rb.
+ruby: 4.0.9
+rails:
+  base: 1afb398af94c3f76567d427a279637dbfaac8b3f      # 8-1-stable, 2026-11-24
+  candidate: cf0325a832a1594f01d866da1e4ad23d962d886b # main, 2026-11-25 (#59918)
+seeds: [4242, 1717]
+alone_runs: 3
+timeout: 3600
+
+suites:
+  kaminari:
+    repo: https://github.com/kaminari/kaminari
+    ref: v1.3.2
+    framework: test-unit
+    test: rake test
+  devise:
+    repo: https://github.com/heartcombo/devise
+    ref: '05811fb8366edd08874111d0f6fb44543e1c91ef'
+    framework: minitest
+    env:
+      DEVISE_ORM: active_record
+    test: rake test
+  rspec-rails:
+    repo: https://github.com/rspec/rspec-rails
+    ref: 5072befe5d1b01348a14fa02b6e5a8448874fb53
+    framework: rspec
+    env:
+      RAILS_VERSION: "~> 8.1.0"
+    test: rspec
+  pundit:
+    repo: https://github.com/varvet/pundit
+    ref: ea9e31a2d7993f038ee52b94ccc9c7411637ba89
+    framework: rspec
+    test: rspec
+  cancancan-sqlite:
+    repo: https://github.com/CanCanCommunity/cancancan
+    ref: 4362b39b04e6840c8edbd2cb4de16b2d77b19c3c
+    framework: rspec
+    gemfile: gemfiles/activerecord_8.1.0.gemfile
+    env:
+      DB: sqlite
+    shims: &1
+    - sed -i "s/'bundler', '~> 2.0'/'bundler', '>= 2.0'/" cancancan.gemspec
+    bumps: &2
+      ostruct: ">= 0"
+    test: rspec -r action_pack -r active_record -r active_support/all
+  cancancan-postgres:
+    repo: https://github.com/CanCanCommunity/cancancan
+    ref: 4362b39b04e6840c8edbd2cb4de16b2d77b19c3c
+    framework: rspec
+    gemfile: gemfiles/activerecord_8.1.0.gemfile
+    env:
+      DB: postgres
+    shims: *1
+    bumps: *2
+    test: rspec -r action_pack -r active_record -r active_support/all
+    services:
+    - postgres
+  friendly_id-sqlite:
+    repo: https://github.com/norman/friendly_id
+    ref: 4699c9791db955dfa9929af0f38a4059af550026
+    framework: minitest
+    gemfile: gemfiles/Gemfile.rails-8.1.rb
+    env:
+      CI: 'true'
+      DB: sqlite3
+    test: rake db:drop db:create db:up test
+  friendly_id-postgresql:
+    repo: https://github.com/norman/friendly_id
+    ref: 4699c9791db955dfa9929af0f38a4059af550026
+    framework: minitest
+    gemfile: gemfiles/Gemfile.rails-8.1.rb
+    env:
+      CI: 'true'
+      DB: postgresql
+      PGUSER: postgres
+      PGHOST: 127.0.0.1
+    test: rake db:drop db:create db:up test
+    services:
+    - postgres
+  view_component:
+    repo: https://github.com/ViewComponent/view_component
+    ref: b1fd129eaeedf4a33986c4ed342f041c2d4a5b0a
+    framework: minitest
+    env:
+      CI: '1'
+      RAILS_ENV: test
+      BROWSER_PATH: "/home/user/.agent-browser/browsers/chrome-157.0.8103.78/chrome"
+    shims:
+    - sed -i 's/gem "nokogiri", "1.19.4"/gem "nokogiri", ">= 1.19.5"/' Gemfile
+    test: rake test
+  simple_form:
+    repo: https://github.com/heartcombo/simple_form
+    ref: 18f38aad0bdeca2ba1815043b94d96fdbbe6a325
+    framework: minitest
+    test: rake
+  ransack-sqlite:
+    repo: https://github.com/activerecord-hackery/ransack
+    ref: fbc3baf164da2a80435d5678a77924c66472f694
+    framework: rspec
+    env:
+      DB: sqlite3
+    shims: &3
+    - sed -i "0,/^require 'active_support\/core_ext/s//require 'active_support'\n&/"
+      lib/ransack.rb
+    test: rspec
+  ransack-postgresql:
+    repo: https://github.com/activerecord-hackery/ransack
+    ref: fbc3baf164da2a80435d5678a77924c66472f694
+    framework: rspec
+    env:
+      DB: postgresql
+      DATABASE_USERNAME: user
+      DATABASE_HOST: 127.0.0.1
+    shims: *3
+    test: rspec
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U user ransack || true
+  administrate:
+    repo: https://github.com/thoughtbot/administrate
+    ref: 6cb9cbbbc8032b5802ade02169881e61caf08193
+    framework: rspec
+    env:
+      CI: '1'
+      PGHOST: 127.0.0.1
+    services:
+    - postgres
+    bumps:
+      appraisal:
+        require: false
+      awesome_print:
+        require: false
+    shims:
+    - cp .sample.env .env && cp spec/example_app/config/database.yml.sample spec/example_app/config/database.yml
+      && yarn install
+    setup:
+    - rake db:setup
+    - yarn run build && yarn run build:css
+    test: rspec
+  jbuilder:
+    repo: https://github.com/rails/jbuilder
+    ref: f141f5ede81bf534d62c6ba228975d5ccb90b63d
+    framework: minitest
+    env:
+      CI: '1'
+    test: rake test
+  good_job:
+    repo: https://github.com/bensheldon/good_job
+    ref: e15ee79627
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      BUNDLE_WITHOUT: debug:lint:demo:production
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+      BROWSER_PATH: "/home/user/.agent-browser/browsers/chrome-157.0.8103.78/chrome"
+    services:
+    - postgres
+    setup:
+    - demo/bin/rails db:test:prepare
+    test: rspec
+  solid_queue-sqlite:
+    repo: https://github.com/rails/solid_queue
+    ref: b9c646a848
+    framework: minitest
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      TARGET_DB: sqlite
+      RAILS_ENV: test
+    shims: &4
+    - sed -i 's/55432/5432/' test/dummy/config/database.yml
+    setup: &5
+    - bin/rails db:setup
+    test: bin/rails test
+  solid_queue-postgres:
+    repo: https://github.com/rails/solid_queue
+    ref: b9c646a848
+    framework: minitest
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      TARGET_DB: postgres
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+    shims: *4
+    setup: *5
+    test: bin/rails test
+    services:
+    - postgres
+  sidekiq-rails:
+    repo: https://github.com/sidekiq/sidekiq
+    ref: 75982898ff
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+      REDIS_URL: redis://localhost:6379/14
+    services:
+    - redis
+    test: ruby -w -Ilib -Itest -e 'files, opts = ARGV.slice_after("--").to_a; files[0...-1].each
+      { require "./test/#{_1}_test" }; ARGV.replace(opts.to_a)' active_job_adapter
+      actors api client current_attributes job_generator rails transaction_aware_client
+      -- $TESTOPTS
+  paper_trail-sqlite:
+    repo: https://github.com/paper-trail-gem/paper_trail
+    ref: 86ce1b8307
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      DB: sqlite
+    shims: &6
+    - sed -i 's#\.gemfile/)#.gemfile|Gemfile\\.eco-/)#' spec/spec_helper.rb
+    setup:
+    - rake install_database_yml
+    test: rspec
+  paper_trail-postgres:
+    repo: https://github.com/paper-trail-gem/paper_trail
+    ref: 86ce1b8307
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      DB: postgres
+      PT_CI_DATABASE: eco_paper_trail
+      PT_CI_DB_USER: user
+      PT_CI_DB_HOST: 127.0.0.1
+    shims: *6
+    setup:
+    - rake install_database_yml
+    - createdb -h 127.0.0.1 -U user eco_paper_trail_test || true
+    test: rspec
+    services:
+    - postgres
+  active_model_serializers:
+    repo: https://github.com/rails-api/active_model_serializers
+    ref: 6934c8bd31
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+    test: rake test
+  pagy:
+    repo: https://github.com/ddnexus/pagy
+    ref: b48c906e31847cc2564b1e8da2995e2b1b8e3e9a
+    framework: minitest
+    test: thor test:api:all
+  turbo-rails:
+    repo: https://github.com/hotwired/turbo-rails
+    ref: 37530c08780fa6f6dbb56a633de4b81169bdd174
+    framework: minitest
+    env:
+      CI: 'true'
+      RAILS_VERSION: '8.1'
+      BROWSER_PATH: "/home/user/.agent-browser/browsers/chrome-157.0.8103.78/chrome"
+    test: "(cd test/dummy && RAILS_ENV=test bin/rails db:test:prepare) && rake test"
+  importmap-rails:
+    repo: https://github.com/rails/importmap-rails
+    ref: f255e55482d9173d8f64db3bfa4317b64445eeb4
+    framework: minitest
+    gemfile: gemfiles/rails_8.1_propshaft.gemfile
+    env:
+      RAILS_ENV: test
+    test: rake test
+  propshaft:
+    repo: https://github.com/rails/propshaft
+    ref: e7530a0490c8e1cd4e15dfa9a98717167fa6dccf
+    framework: minitest
+    gemfile: gemfiles/Gemfile.rails-8.1
+    test: bin/test
+  responders:
+    repo: https://github.com/heartcombo/responders
+    ref: eb9b9baac1f8e2d44265e20120bdec45c0890a28
+    framework: minitest
+    test: rake test
+  rails-controller-testing:
+    repo: https://github.com/rails/rails-controller-testing
+    ref: c203673f8011a7cdc2a8edf995ae6b3eec3417ca
+    framework: minitest
+    test: rake test
+  draper:
+    repo: https://github.com/drapergem/draper
+    ref: 7fc015f80ccb1f0aa7b8ffaa7a50db76d0cc946c
+    framework: rspec
+    test: rake
+  acts-as-taggable-on:
+    repo: https://github.com/mbleigh/acts-as-taggable-on
+    ref: 719734149d4f4295f497dc9a02884b08051325a3
+    framework: rspec
+    gemfile: gemfiles/activerecord_8.1.gemfile
+    test: rake spec
+  acts_as_list-sqlite:
+    repo: https://github.com/brendon/acts_as_list
+    ref: v1.2.6
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+      DB: sqlite
+    test: rake test
+  acts_as_list-postgresql:
+    repo: https://github.com/brendon/acts_as_list
+    ref: v1.2.6
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+      DB: postgresql
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    test: rake test
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres acts_as_list || true
+  acts_as_list-mysql:
+    repo: https://github.com/brendon/acts_as_list
+    ref: v1.2.6
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+      DB: mysql
+    test: rake test
+    services:
+    - mysql
+    setup:
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists acts_as_list'
+  ancestry-sqlite3:
+    repo: https://github.com/stefankroes/ancestry
+    ref: v5.1.0
+    framework: minitest
+    gemfile: gemfiles/gemfile_81.gemfile
+    env: &29
+      CI: '1'
+      DB: sqlite3
+      FORMAT: materialized_path
+    shims: &7
+    - 'printf ''pg:\n  adapter: postgresql\n  host: 127.0.0.1\n  username: postgres\n  password:
+      postgres\n  database: ancestry_test\nsqlite3:\n  adapter: sqlite3\n  database:
+      ":memory:"\n'' > test/database.yml'
+    test: rake test
+  ancestry-pg:
+    repo: https://github.com/stefankroes/ancestry
+    ref: v5.1.0
+    framework: minitest
+    gemfile: gemfiles/gemfile_81.gemfile
+    env:
+      CI: '1'
+      DB: pg
+      FORMAT: materialized_path
+    shims: *7
+    test: rake test
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres ancestry_test || true
+  ancestry-mysql2:
+    repo: https://github.com/stefankroes/ancestry
+    ref: v5.1.0
+    framework: minitest
+    gemfile: gemfiles/gemfile_81.gemfile
+    env:
+      CI: '1'
+      DB: mysql2
+      FORMAT: materialized_path
+    shims:
+    - 'printf ''pg:\n  adapter: postgresql\n  host: 127.0.0.1\n  username: postgres\n  password:
+      postgres\n  database: ancestry_test\nmysql2:\n  adapter: mysql2\n  host: 127.0.0.1\n  username:
+      root\n  database: ancestry_test\nsqlite3:\n  adapter: sqlite3\n  database: ":memory:"\n''
+      > test/database.yml'
+    test: rake test
+    services:
+    - mysql
+    setup:
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists ancestry_test'
+  closure_tree:
+    repo: https://github.com/ClosureTree/closure_tree
+    ref: v9.8.0
+    framework: minitest
+    env:
+      RAILS_VERSION: '8.1'
+      RAILS_ENV: test
+      DATABASE_URL_PG: postgres://postgres:postgres@127.0.0.1:5432/closure_tree_test
+      DATABASE_URL_MYSQL: mysql2://root@127.0.0.1:3306/closure_tree_test
+      DATABASE_URL_SQLITE3: 'sqlite3::memory:'
+    services:
+    - postgres
+    - mysql
+    test: dropdb -h 127.0.0.1 -U postgres --if-exists closure_tree_test && createdb
+      -h 127.0.0.1 -U postgres closure_tree_test && mariadb -h 127.0.0.1 -uroot -e
+      'drop database if exists closure_tree_test; create database closure_tree_test'
+      && (cd test/dummy && rake db:setup_all) && rake test
+  counter_culture-sqlite3:
+    repo: https://github.com/magnusvk/counter_culture
+    ref: v3.14.0
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      DB: sqlite3
+    test: rspec spec
+    shims: &8
+    - mkdir -p db
+    - sed -i 's/config.fail_fast = true unless CI_TEST_RUN/config.fail_fast = false/'
+      spec/spec_helper.rb
+  counter_culture-postgresql:
+    repo: https://github.com/magnusvk/counter_culture
+    ref: v3.14.0
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      DB: postgresql
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    test: rspec spec
+    shims: *8
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres counter_culture_test || true
+  counter_culture-mysql2:
+    repo: https://github.com/magnusvk/counter_culture
+    ref: v3.14.0
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    env:
+      DB: mysql2
+    test: rspec spec
+    shims:
+    - mkdir -p db
+    - sed -i 's/config.fail_fast = true unless CI_TEST_RUN/config.fail_fast = false/'
+      spec/spec_helper.rb
+    services:
+    - mysql
+    setup:
+    - mariadb -h 127.0.0.1 -uroot -e 'drop database if exists counter_culture_test;
+      create database counter_culture_test character set utf8mb4'
+  paranoia:
+    repo: https://github.com/rubysherpas/paranoia
+    ref: a950fe4981
+    framework: minitest
+    env:
+      RAILS: "~> 8.1.0"
+    shims:
+    - 'sed -i ''s/set_options_for_callbacks!(args, on: :restore)/set_options_for_callbacks!(:after,
+      args, on: :restore)/'' lib/paranoia.rb'
+    - sed -i 's/base::ACTIONS << :restore unless base::ACTIONS.include?(:restore)/unless
+      base::ACTIONS.include?(:restore); a = base::ACTIONS + [:restore]; base.send(:remove_const,
+      :ACTIONS); base.const_set(:ACTIONS, a.freeze); end/' lib/paranoia.rb
+    test: rake test
+  acts_as_tenant:
+    repo: https://github.com/ErwinM/acts_as_tenant
+    ref: v2.2.2
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      RAILS_ENV: test
+    bumps:
+      appraisal:
+        require: false
+    test: rspec
+  activerecord-import-sqlite3:
+    repo: https://github.com/zdennis/activerecord-import
+    ref: v3.0.1
+    framework: minitest
+    env: &9
+      AR_VERSION: '8.1'
+      RUBYOPT: "--enable-frozen-string-literal"
+      MYSQL_PORT: 3306
+      PG_PORT: 5432
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    bumps: &10
+      ostruct: ">= 0"
+    test: rake test:sqlite3
+  activerecord-import-postgresql:
+    repo: https://github.com/zdennis/activerecord-import
+    ref: v3.0.1
+    framework: minitest
+    env: *9
+    bumps: *10
+    test: rake test:postgresql
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres activerecord_import_test || true
+    - psql -h 127.0.0.1 -U postgres activerecord_import_test -c 'create extension
+      if not exists hstore; create extension if not exists "uuid-ossp"'
+  activerecord-import-mysql2:
+    repo: https://github.com/zdennis/activerecord-import
+    ref: v3.0.1
+    framework: minitest
+    env: &11
+      AR_VERSION: '8.1'
+      RUBYOPT: "--enable-frozen-string-literal"
+      MYSQL_PORT: 3306
+      PG_PORT: 5432
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    bumps: &12
+      ostruct: ">= 0"
+    test: rake test:mysql2
+    services: &13
+    - mysql
+    setup: &14
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists activerecord_import_test'
+  activerecord-import-trilogy:
+    repo: https://github.com/zdennis/activerecord-import
+    ref: v3.0.1
+    framework: minitest
+    env: *11
+    bumps: *12
+    test: rake test:trilogy
+    services: *13
+    setup: *14
+  pg_search:
+    repo: https://github.com/Casecommons/pg_search
+    ref: v2.4.0
+    framework: rspec
+    env:
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres pg_search_test || true
+    shims:
+    - 'sed -i ''s/, cooldown: 7//'' Gemfile'
+    test: rspec
+  scenic:
+    repo: https://github.com/scenic-views/scenic
+    ref: v1.9.0
+    framework: rspec
+    env:
+      GITHUB_ACTIONS: '1'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    services:
+    - postgres
+    setup:
+    - rake dummy:db:drop dummy:db:create
+    test: rake spec; rake spec:acceptance
+  strong_migrations-postgresql:
+    repo: https://github.com/ankane/strong_migrations
+    ref: v2.8.0
+    framework: minitest
+    env:
+      ADAPTER: postgresql
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres strong_migrations_test || true
+    test: rake test
+  strong_migrations-mysql2:
+    repo: https://github.com/ankane/strong_migrations
+    ref: v2.8.0
+    framework: minitest
+    env:
+      ADAPTER: mysql2
+    services: &15
+    - mysql
+    setup: &16
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists strong_migrations_test'
+    test: rake test
+  strong_migrations-trilogy:
+    repo: https://github.com/ankane/strong_migrations
+    ref: v2.8.0
+    framework: minitest
+    env:
+      ADAPTER: trilogy
+    services: *15
+    setup: *16
+    test: rake test
+  groupdate:
+    repo: https://github.com/ankane/groupdate
+    ref: v6.8.0
+    framework: minitest
+    env:
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    services:
+    - postgres
+    - mysql
+    setup:
+    - createdb -h 127.0.0.1 -U postgres groupdate_test || true
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists groupdate_test'
+    test: rake test:postgresql test:mysql test:trilogy test:sqlite test:enumerable
+  delayed_job_active_record-sqlite3:
+    repo: https://github.com/collectiveidea/delayed_job_active_record
+    ref: v4.1.11
+    framework: rspec
+    env:
+      ADAPTER: sqlite3
+    test: rspec
+  delayed_job_active_record-postgresql:
+    repo: https://github.com/collectiveidea/delayed_job_active_record
+    ref: v4.1.11
+    framework: rspec
+    env:
+      ADAPTER: postgresql
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    test: rspec
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres delayed_job_test || true
+  delayed_job_active_record-mysql2:
+    repo: https://github.com/collectiveidea/delayed_job_active_record
+    ref: v4.1.11
+    framework: rspec
+    env:
+      ADAPTER: mysql2
+    test: rspec
+    services: &17
+    - mysql
+    setup: &18
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists delayed_job_test'
+  delayed_job_active_record-trilogy:
+    repo: https://github.com/collectiveidea/delayed_job_active_record
+    ref: v4.1.11
+    framework: rspec
+    env:
+      ADAPTER: trilogy
+    test: rspec
+    services: *17
+    setup: *18
+  audited:
+    repo: https://github.com/collectiveidea/audited
+    ref: v5.8.0
+    framework: rspec
+    shims:
+    - sed -i 's/"< 8.2"/"< 8.3"/g' audited.gemspec
+    test: rspec
+  mobility-sqlite3:
+    repo: https://github.com/shioyama/mobility
+    ref: v1.3.2
+    framework: rspec
+    env:
+      ORM: active_record
+      ORM_VERSION: '8.0'
+      FEATURE: unit
+      DB: sqlite3
+    bumps: &19
+      ostruct: ">= 0"
+    test: rspec -f p
+  mobility-postgres:
+    repo: https://github.com/shioyama/mobility
+    ref: v1.3.2
+    framework: rspec
+    env:
+      ORM: active_record
+      ORM_VERSION: '8.0'
+      FEATURE: unit
+      DB: postgres
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    bumps: *19
+    test: rspec -f p
+    services:
+    - postgres
+    setup:
+    - rake db:drop db:create db:up
+  mobility-mysql:
+    repo: https://github.com/shioyama/mobility
+    ref: v1.3.2
+    framework: rspec
+    env:
+      ORM: active_record
+      ORM_VERSION: '8.0'
+      FEATURE: unit
+      DB: mysql
+    bumps:
+      ostruct: ">= 0"
+    test: rspec -f p
+    services:
+    - mysql
+    setup:
+    - rake db:drop db:create db:up
+  store_model:
+    repo: https://github.com/DmitryTsepelev/store_model
+    ref: v4.6.2
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      RAILS_ENV: test
+    test: rspec
+  store_model-test-env:
+    repo: https://github.com/DmitryTsepelev/store_model
+    ref: v4.6.1
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    test: rspec
+    env:
+      RAILS_ENV: test
+  money-rails:
+    repo: https://github.com/RubyMoney/money-rails
+    ref: v3.0.0
+    framework: rspec
+    gemfile: gemfiles/rails8.1.gemfile
+    setup:
+    - rake prepare_test_env
+    test: rspec
+  will_paginate-sqlite3:
+    repo: https://github.com/mislav/will_paginate
+    ref: v4.0.1
+    framework: rspec
+    env:
+      DB: sqlite3
+    shims: &20
+    - sed -i "s/'sqlite3', '~> 1.5.0'/'sqlite3', '>= 2.1'/" Gemfile
+    test: rspec spec
+  will_paginate-postgres:
+    repo: https://github.com/mislav/will_paginate
+    ref: v4.0.1
+    framework: rspec
+    env:
+      DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGHOST: 127.0.0.1
+    shims: *20
+    test: rspec spec
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres will_paginate || true
+  will_paginate-mysql:
+    repo: https://github.com/mislav/will_paginate
+    ref: v4.0.1
+    framework: rspec
+    env:
+      DB: mysql
+      MYSQL_USER: root
+      MYSQL_HOST: 127.0.0.1
+    shims: *20
+    test: rspec spec
+    services:
+    - mysql
+    setup:
+    - mariadb -h 127.0.0.1 -uroot -e 'create database if not exists will_paginate'
+  bullet:
+    repo: https://github.com/flyerhzm/bullet
+    ref: 8.3.1
+    framework: rspec
+    gemfile: Gemfile.rails-8.1
+    test: rspec
+  carrierwave:
+    repo: https://github.com/carrierwaveuploader/carrierwave
+    ref: v3.1.4
+    framework: rspec
+    gemfile: gemfiles/rails-8-0.gemfile
+    test: rspec
+  carrierwave-cucumber:
+    repo: https://github.com/carrierwaveuploader/carrierwave
+    ref: v3.1.4
+    framework: cucumber
+    gemfile: gemfiles/rails-8-0.gemfile
+    test: cucumber $CUCUMBER_OPTS features
+  shrine:
+    repo: https://github.com/shrinerb/shrine
+    ref: v3.10.2
+    framework: minitest
+    env:
+      CI: 'true'
+      RACK_ENV: development
+    test: rake test
+  lograge:
+    repo: https://github.com/roidrage/lograge
+    ref: v0.15.1
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    test: rspec
+  factory_bot_rails:
+    repo: https://github.com/thoughtbot/factory_bot_rails
+    ref: v6.5.1
+    framework: rspec
+    gemfile: gemfiles/rails8.0.gemfile
+    bumps: &21
+      aruba: "< 3"
+    shims: &22
+    - patch: round-ecosystem-2/factory_bot_rails-eco-rails.patch
+    test: rspec
+  factory_bot_rails-minitest:
+    repo: https://github.com/thoughtbot/factory_bot_rails
+    ref: v6.5.1
+    framework: minitest
+    gemfile: gemfiles/rails8.0.gemfile
+    bumps: *21
+    shims: *22
+    test: rake test
+  factory_bot_rails-cucumber:
+    repo: https://github.com/thoughtbot/factory_bot_rails
+    ref: v6.5.1
+    framework: cucumber
+    gemfile: gemfiles/rails8.0.gemfile
+    bumps: *21
+    shims: *22
+    test: cucumber $CUCUMBER_OPTS features
+    env:
+      ARUBA_TIMEOUT: 300
+  shoulda-matchers-sqlite3:
+    repo: https://github.com/thoughtbot/shoulda-matchers
+    ref: v8.0.1
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env: &25
+      DATABASE_ADAPTER: sqlite3
+    exclusive: shoulda-matchers-tmp
+    bumps: &23
+      appraisal:
+        require: false
+      bundler: ">= 2.0"
+    shims: &24
+    - patch: round-ecosystem-2/shoulda-matchers-eco-rails.patch
+    - sed -i '/^BUNDLED WITH/,+1d' gemfiles/Gemfile.eco-*.lock
+    test: ruby -w -r ./spec/report_warnings -S rspec spec/unit
+  shoulda-matchers-postgresql:
+    repo: https://github.com/thoughtbot/shoulda-matchers
+    ref: v8.0.1
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      DATABASE_ADAPTER: postgresql
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+    exclusive: shoulda-matchers-tmp
+    bumps: *23
+    shims: *24
+    test: ruby -w -r ./spec/report_warnings -S rspec spec/unit
+    services:
+    - postgres
+  shoulda-matchers-acceptance:
+    repo: https://github.com/thoughtbot/shoulda-matchers
+    ref: v8.0.1
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env: *25
+    exclusive: shoulda-matchers-tmp
+    bumps: *23
+    shims: *24
+    test: ruby -w -r ./spec/report_warnings -S rspec spec/acceptance
+  solid_cache:
+    repo: https://github.com/rails/solid_cache
+    ref: v1.0.10
+    framework: minitest
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      PGHOST: 127.0.0.1
+    services:
+    - postgres
+    - mysql
+    bumps:
+      appraisal:
+        require: false
+      minitest-mock: ">= 0"
+    shims:
+    - sed -i 's/33060/3306/; s/55432/5432/' test/dummy/config/database.yml
+    setup:
+    - bin/rails db:setup
+    test: rake test
+  solid_cable:
+    repo: https://github.com/rails/solid_cable
+    ref: v4.1.0
+    framework: minitest
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      PGHOST: 127.0.0.1
+    services:
+    - postgres
+    - mysql
+    shims:
+    - sed -i 's/33060/3306/; s/55432/5432/' test/dummy/config/database.yml
+    setup:
+    - bin/rails db:setup
+    test: bin/test
+  attr_json:
+    repo: https://github.com/jrochkind/attr_json
+    ref: v2.6.0
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      RAILS_ENV: test
+    services:
+    - postgres
+    bumps:
+      rspec-rails:
+        git: https://github.com/rspec/rspec-rails
+        ref: 570b2b0a79
+    test: rspec
+  globalize-sqlite3:
+    repo: https://github.com/globalize/globalize
+    ref: v7.1.3
+    framework: minitest
+    gemfile: gemfiles/rails_8.1.0.gemfile
+    env:
+      DB: sqlite3
+    shims: &26
+    - sed -i '/LogSubscriber.attach_to/d' test/support/database.rb
+    test: rake db:create db:migrate && rake test
+  globalize-postgresql:
+    repo: https://github.com/globalize/globalize
+    ref: v7.1.3
+    framework: minitest
+    gemfile: gemfiles/rails_8.1.0.gemfile
+    env:
+      DB: postgresql
+      PGHOST: 127.0.0.1
+      PGPASSWORD: postgres
+    shims: *26
+    test: rake db:create db:migrate && rake test
+    services:
+    - postgres
+  enumerize-sqlite3:
+    repo: https://github.com/brainspec/enumerize
+    ref: v3.0.0
+    framework: minitest
+    gemfile: Gemfile.rails81
+    env:
+      DB: sqlite3
+    test: rake
+    shims: &27
+    - rm test/mongoid_test.rb test/mongo_mapper_test.rb
+  enumerize-postgresql:
+    repo: https://github.com/brainspec/enumerize
+    ref: v3.0.0
+    framework: minitest
+    gemfile: Gemfile.rails81
+    env:
+      DB: postgresql
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGHOST: 127.0.0.1
+    test: rake; s=$?; psql -h 127.0.0.1 -U postgres template1 -c 'drop table if exists
+      users, documents'; exit $s
+    shims: *27
+    services:
+    - postgres
+    setup:
+    - createdb -h 127.0.0.1 -U postgres enumerize_test || true
+  typedstore:
+    repo: https://github.com/byroot/activerecord-typedstore
+    ref: v1.6.0
+    framework: rspec
+    gemfile: gemfiles/Gemfile.ar-edge
+    exclusive: typedstore-tmp
+    test: rspec
+    shims: &28
+    - sed -i "s/'sqlite3', '~> 1'/'sqlite3', '>= 2.1'/" activerecord-typedstore.gemspec
+  typedstore-main:
+    repo: https://github.com/byroot/activerecord-typedstore
+    ref: 263050a196
+    framework: rspec
+    gemfile: gemfiles/Gemfile.ar-edge
+    exclusive: typedstore-tmp
+    test: rspec
+    shims: *28
+  ar_lazy_preload:
+    repo: https://github.com/DmitryTsepelev/ar_lazy_preload
+    ref: v2.1.3
+    framework: rspec
+    gemfile: gemfiles/rails_8_1.gemfile
+    test: rspec
+  active_record_query_trace:
+    repo: https://github.com/brunofacca/active-record-query-trace
+    ref: v1.9
+    framework: rspec
+    gemfile: gemfiles/rails_8.1.gemfile
+    test: rspec
+  annotaterb:
+    repo: https://github.com/drwl/annotaterb
+    ref: v4.26.0
+    framework: rspec
+    test: rspec spec/lib
+  ancestry-pr770:
+    repo: https://github.com/hikmetba-bit/ancestry
+    ref: 68789a1903
+    framework: minitest
+    gemfile: gemfiles/gemfile_81.gemfile
+    env: *29
+    shims: *7
+    test: rake test
+  discard:
+    repo: https://github.com/jhawthorn/discard
+    ref: v2.0.0
+    framework: rspec
+    env:
+      RAILS_VERSION: "~> 8.1.0"
+    test: rspec
+  activerecord-session_store:
+    repo: https://github.com/rails/activerecord-session_store
+    ref: v2.3.0
+    framework: minitest
+    gemfile: gemfiles/rails_8.1.gemfile
+    test: rake
+  attr_encrypted:
+    repo: https://github.com/attr-encrypted/attr_encrypted
+    ref: v4.2.0
+    framework: minitest
+    test: rake test
+    shims:
+    - sed -i "s/'sqlite3', '= 1.5.4'/'sqlite3', '>= 2.1'/" attr_encrypted.gemspec
+  active_record_doctor-postgresql: &ard
+    repo: https://github.com/gregnavis/active_record_doctor
+    ref: v2.1.0
+    framework: minitest
+    env: { DATABASE_HOST: 127.0.0.1, DATABASE_PORT: "5432", DATABASE_USERNAME: postgres, DATABASE_PASSWORD: postgres }
+    services: [postgres]
+    setup: ["dropdb -h 127.0.0.1 -U postgres --if-exists active_record_doctor_primary", "dropdb -h 127.0.0.1 -U postgres --if-exists active_record_doctor_secondary",
+            "createdb -h 127.0.0.1 -U postgres active_record_doctor_primary", "createdb -h 127.0.0.1 -U postgres active_record_doctor_secondary"]
+    test: rake test:postgresql
+  active_record_doctor-sqlite3:
+    <<: *ard
+    env: {}
+    services: []
+    setup: []
+    test: rake test:sqlite3
+  online_migrations:
+    repo: https://github.com/fatkodima/online_migrations
+    ref: v0.37.0
+    framework: minitest
+    gemfile: gemfiles/activerecord_81.gemfile
+    services: [postgres]
+    shims: ["sed -i 's/host: localhost/host: 127.0.0.1/; s/password: .*/password: postgres/' test/support/database.yml"]
+    setup: ["for d in online_migrations_test online_migrations_animals_test online_migrations_shard_one online_migrations_shard_two online_migrations_shard_no_database_tasks; do dropdb -h 127.0.0.1 -U postgres --if-exists $d; createdb -h 127.0.0.1 -U postgres $d; done"]
+    test: rake test
