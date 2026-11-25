@@ -133,6 +133,14 @@ module Lowrail
             !(warm.is_a?(Array) && warm.size == runs && warm.all? { (actions && _1.nil?) || (_1.is_a?(Numeric) && _1.to_f.finite?) })
           end
           list << "#{label} has #{bad} #{kind} #{key} without one finite warm value per run" if bad > 0
+          next unless actions
+          # Every completed window is some action's: actions that do not add up
+          # to them leave windows no row accounts for.
+          windows = entries.map { _1["windows"] }
+          next list << "#{label} has #{kind} actions without a window count per run" unless windows.all? { _1.is_a?(Array) && _1.size == runs && _1.all?(&count) }
+          sums = windows.empty? ? [0] * runs : windows.transpose.map(&:sum)
+          completed = summary.map { _1["completed"][kind] }
+          list << "#{label}'s #{kind} actions add up to #{sums.join(" / ")} windows, its summary to #{completed.join(" / ")} completed" if sums != completed
         end
       end
       list

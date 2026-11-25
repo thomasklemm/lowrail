@@ -376,6 +376,12 @@ class ProfileTest < Minitest::Test
         assert_equal 2, status.exitstatus, out
         assert_match(/not the one process's measured requests/, JSON.parse(out)["problems"].join)
       end
+      # A report whose rows were emptied still claims its completed requests.
+      hollow = JSON.parse(File.read(File.join(dir, "head/report.json"))).merge("ranked" => [], "actions" => [])
+      File.write(File.join(dir, "hollow.json"), JSON.generate(hollow))
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base/report.json", "hollow.json", "--json", chdir: dir)
+      assert_equal 2, status.exitstatus, out
+      assert_match(%r{head's request actions add up to 0 / 0 windows, its summary to 20 / 20 completed}, JSON.parse(out)["problems"].join)
     end
   end
 
@@ -747,7 +753,10 @@ class ProfileTest < Minitest::Test
     end
   end
 
-  def report(warm, runs: 2, exit: [0] * runs, actions: [])
+  # The summary's 10 request windows per run are the first action's (by
+  # default one without a name or warm value, which compare does not compare).
+  def report(warm, runs: 2, exit: [0] * runs, actions: [{ "name" => nil, "warm" => [nil] * runs }])
+    actions = actions.map.with_index { |a, i| { "windows" => [i.zero? ? 10 : 0] * runs }.merge(a) }
     meta = { "format" => 2, "identity" => { "mode" => "command", "argv" => %w[bin/rails test] }, "argv" => %w[bin/rails test],
       "seed" => "1234", "exit" => exit, "runs" => runs, "ruby" => ["ruby 4"], "rails_env" => ["test"], "dropped" => [0] * runs,
       # 76be8b58's fields, so a case that must be refused is not refused only for lacking them there
