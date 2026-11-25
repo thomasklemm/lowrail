@@ -94,7 +94,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler: none
       - name: Gems
-        run: gem install --no-document rails -v "$LOWRAIL_RAILS" && gem install --no-document sqlite3 bcrypt minitest:5.27.0
+        run: gem install --no-document rails -v "$LOWRAIL_RAILS" && gem install --no-document sqlite3 bcrypt minitest:5.27.0 rspec-core
       - name: Profile tests
         working-directory: gem
         run: |

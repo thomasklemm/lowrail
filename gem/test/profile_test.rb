@@ -848,6 +848,58 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # A process the suite starts (Dawarich's after(:suite) runs rspec again for
+  # rswag) sees what it sees in a plain run: the caller's SEED, SPEC_OPTS,
+  # RUBYOPT and RUBYLIB, no profiler. The suite itself runs with the seed and
+  # is profiled; a process started before the suite (a rake parent's) is too.
+  def test_processes_the_suite_starts_run_as_without_the_profiler
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    rspec = Open3.capture3(CLEAN_ENV, RUBY, "-e", 'require "rspec/core"')[2].success?
+    realpath_tmpdir do |dir|
+      start = <<~'RUBY'
+        require_relative "config/environment"
+        require "rack/mock"
+        def child(name)
+          File.write("#{ENV.fetch("OUT")}-#{name}.txt", IO.popen([RbConfig.ruby, "child.rb"], &:read))
+        end
+      RUBY
+      LowrailTest.write_rails_app(dir,
+        "child.rb" => 'puts ENV.keys.grep(/\ALOWRAIL_PROFILE|\A(?:SEED|SPEC_OPTS|RUBYOPT|RUBYLIB)\z/).sort.map { "#{_1}=#{ENV[_1]}" }, ' \
+          '"profiler #{defined?(Lowrail::Profile).inspect}"',
+        "start.rb" => start,
+        "suite_test.rb" => <<~'RUBY',
+          require_relative "start"
+          require "active_support/test_case"
+          require "minitest/autorun"
+          class SuiteTest < ActiveSupport::TestCase
+            def test_request
+              Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+              child("test")
+            end
+          end
+        RUBY
+        "suite_spec.rb" => <<~'RUBY')
+          require_relative "start"
+          RSpec.configure { |c| c.after(:suite) { child("after_suite") } }
+          RSpec.describe("widgets") { it("serves") { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) } }
+        RUBY
+      caller_env = { "SEED" => "99", "SPEC_OPTS" => "--no-color", "RUBYOPT" => "-W0", "RUBYLIB" => File.join(dir, "lib") }
+      plain = "RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"
+      suites = { "minitest" => [[RUBY, "suite_test.rb"], "test"] }
+      suites["rspec"] = [[RUBY, "-e", 'require "rspec/core"; exit RSpec::Core::Runner.run(ARGV)', "suite_spec.rb"], "after_suite"] if rspec
+      suites.each do |name, (command, child)|
+        _, err, status = Open3.capture3(profile_env(dir).merge(caller_env, "OUT" => "plain-#{name}"), *command, chdir: dir)
+        assert status.success?, err
+        out, err, status = profile(dir, "--runs", "1", "--out", "p-#{name}", "--", *command, env: caller_env.merge("OUT" => "profiled-#{name}"))
+        assert status.success?, err
+        assert_match(/--seed 1234|Randomized with seed 1234/, out + err, "#{name}: the suite has the seed")
+        assert_equal 1, Dir[File.join(dir, "p-#{name}/run1/*.tsv")].size, "#{name}: only the suite's process is profiled"
+        assert_equal [plain, plain], %w[plain profiled].map { File.read(File.join(dir, "#{_1}-#{name}-#{child}.txt")) }, name
+      end
+      skip "rspec-core is not installed: only the minitest suite ran" unless rspec
+    end
+  end
+
   # Everything after the first -- is the command's, a second -- and
   # profiler-looking flags included.
   def test_arguments_after_the_separator_belong_to_the_command

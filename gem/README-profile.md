@@ -40,7 +40,10 @@ bundle exec lowrail-profile compare base/report.json head/report.json --aa base2
 
 The first runs the command twice (everything after `--` is passed unchanged) and writes `tmp/lowrail-profile/report.md`
 and `report.json`. It prints the report too. The suite runs as it would, with `SEED` and `--seed` fixed (default
-1234) so both runs order tests the same way, and lowrail-profile exits with its status: the first failing run's exit
+1234) so both runs order tests the same way. Only the suite's own process gets the seed and the profiler: once
+Minitest or RSpec has read its options, any process the suite starts (a rake task, an `after(:suite)` that runs
+rspec again) sees the environment you gave lowrail-profile. A process the command starts before its suite runs,
+such as `rake test`'s parent, passes both on to the suite. lowrail-profile exits with its status: the first failing run's exit
 code, or 128 plus the signal that stopped it (143 for `TERM`). A passing suite whose report cannot be built exits 1.
 
 Bypass Spring (`DISABLE_SPRING=1`, or `bin/rails test` without a Spring binstub): a Spring server that is already
@@ -191,7 +194,8 @@ group the environment's `bundle install` keeps.
 Each is checked by a test in this gem or on the apps below.
 
 1. **No app changes.** It writes only inside `--out` and the `--record` target, and never edits the Gemfile,
-   config or code.
+   config or code. Processes the suite starts run unprofiled, without its seed: on Dawarich an `after(:suite)` that
+   regenerates `swagger.yaml` with a nested rspec rewrote it in a different order when that rspec got the seed.
 2. **No lowering.** The package holds only the profiler; it never loads Lowrail's runtime.
 3. **Off means off.** With the gem listed and `require: false`, a process the command did not start loads none of
    it.

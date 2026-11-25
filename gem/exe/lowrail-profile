@@ -176,6 +176,8 @@ statuses = (1..runs).map do |n|
     "LOWRAIL_PROFILE_RECORD" => ("1" if record && n == 1),
     "LOWRAIL_PROFILE_ALLOW_WRITES" => ("1" if allow_writes),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
+    # What the suite gives the processes it starts (Lowrail::Profile.leave_env).
+    "LOWRAIL_PROFILE_LIB" => lib, "LOWRAIL_PROFILE_CALLER_SEED" => ENV["SEED"], "LOWRAIL_PROFILE_CALLER_SPEC_OPTS" => ENV["SPEC_OPTS"],
     "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
     "RUBYOPT" => [ENV["RUBYOPT"], ("-I#{lib}" unless lib.match?(/\s/)), "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"

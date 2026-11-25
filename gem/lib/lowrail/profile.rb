@@ -34,6 +34,10 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           Moved 0x1f].freeze
 
         KINDS = %w[request job mail cable].freeze
+        # What exe/lowrail-profile sets for the command (leave_env removes it).
+        ENV_KEYS = %w[LOWRAIL_PROFILE LOWRAIL_PROFILE_EXT LOWRAIL_PROFILE_ROOT LOWRAIL_PROFILE_ATTRIBUTE LOWRAIL_PROFILE_RECORD
+          LOWRAIL_PROFILE_ALLOW_WRITES LOWRAIL_PROFILE_LIB LOWRAIL_PROFILE_CALLER_SEED LOWRAIL_PROFILE_CALLER_SPEC_OPTS].freeze
+        APP_ROOT = ENV["LOWRAIL_PROFILE_ROOT"]
         HASH = "#"
         DOT = "."
         PERFORM = "perform"
@@ -62,6 +66,17 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         module Dispatch
           def dispatch(name, request, response)
             Profile.named(self.class, HASH, name)
+            super
+          end
+        end
+
+        # Minitest reads SEED in Minitest.run, before it initializes plugins
+        # (register_plugin since 5.24; init_plugins before).
+        module Suite
+          def self.minitest_plugin_init(_options) = Profile.leave_env
+
+          def init_plugins(...)
+            Profile.leave_env
             super
           end
         end
@@ -191,6 +206,27 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             warn "[lowrail-profile] #{what} not profiled: #{error.class}: #{error.message}"
           end
 
+          # Once the suite has read its seed, puts back the environment
+          # exe/lowrail-profile changed, so every process the suite starts
+          # (an rspec in after(:suite), a rake task) runs as without it:
+          # unprofiled, with the caller's SEED and SPEC_OPTS. Bundler's own
+          # RUBYOPT and RUBYLIB entries stay.
+          def leave_env
+            return if @left
+            @left = true
+            ENV["SEED"] = ENV["LOWRAIL_PROFILE_CALLER_SEED"]
+            ENV["SPEC_OPTS"] = ENV["LOWRAIL_PROFILE_CALLER_SPEC_OPTS"]
+            lib = ENV["LOWRAIL_PROFILE_LIB"]
+            { "RUBYOPT" => [" ", ["-I#{lib}", "-rlowrail/profile"]], "RUBYLIB" => [File::PATH_SEPARATOR, [lib]] }.each do |key, (separator, ours)|
+              parts = ENV[key].to_s.split(separator)
+              ours.each { |part| (i = parts.index(part)) && parts.delete_at(i) }
+              ENV[key] = parts.empty? ? nil : parts.join(separator)
+            end
+            ENV_KEYS.each { ENV.delete(_1) }
+          rescue StandardError => error
+            warn "[lowrail-profile] processes the suite starts may be profiled: #{error.class}: #{error.message}"
+          end
+
           def note(env)
             return if env[NOTED] || !(route = env["action_dispatch.route"] || matched_route(env))
             env[NOTED] = true
@@ -313,7 +349,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             root = (Rails.root.to_s if defined?(Rails) && Rails.respond_to?(:root) && Rails.root)
             lines = [["# lowrail-profile 2", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
               "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}",
-              "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{ENV.fetch("LOWRAIL_PROFILE_ROOT", Dir.pwd)}",
+              "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{APP_ROOT || Dir.pwd}",
               "ruby=#{RUBY_DESCRIPTION}",
               "rails_env=#{ENV["RAILS_ENV"]}", "rails=#{Lowrail.loaded_constant("Rails::VERSION::STRING")}"].join("\t")]
             rows.each do |path, line, type, count, reached, first, via, kind|
@@ -350,6 +386,20 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
       ActiveSupport.on_load(:before_configuration) do
         Lowrail::Profile.install("Rails::Engine#call") do
           Rails::Engine.prepend(Lowrail::Profile::Window) unless Rails::Engine < Lowrail::Profile::Window
+        end
+      end
+      # RSpec read SPEC_OPTS when its runner started, before the suite boots
+      # the app; a rake parent that boots it to start the suite has no runner.
+      ActiveSupport.on_load(:before_configuration) do
+        Lowrail::Profile.leave_env if Lowrail.loaded_constant("RSpec::Core::Runner")
+      end
+      ActiveSupport.on_load(:active_support_test_case) do
+        Lowrail::Profile.install("Minitest") do
+          if Minitest.respond_to?(:register_plugin)
+            Minitest.register_plugin(Lowrail::Profile::Suite)
+          else
+            Minitest.singleton_class.prepend(Lowrail::Profile::Suite)
+          end
         end
       end
       # Each hook runs when the app loads the class; the modules they prepend

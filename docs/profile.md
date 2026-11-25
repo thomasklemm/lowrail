@@ -131,7 +131,12 @@ is built outside the app, never during its boot.
 
 ## What it measures
 
-`LOWRAIL_PROFILE` (set by the command, never by you) makes `RUBYOPT=-rlowrail/profile` install:
+`LOWRAIL_PROFILE` (set by the command, never by you) makes `RUBYOPT=-rlowrail/profile` install the items below. When
+the suite has read its options (Minitest's plugin init, after it reads `SEED`; RSpec's runner, which has read
+`SPEC_OPTS` before the app boots), the profiler removes what the command added: `LOWRAIL_PROFILE*`, its `-I` and
+`-rlowrail/profile` in `RUBYOPT`, its `RUBYLIB` entry, and the seed, putting back the caller's `SEED` and
+`SPEC_OPTS`. Processes the suite starts then run as in a plain run; Bundler's own `RUBYOPT` and `RUBYLIB` entries
+stay. A command that is no Minitest or RSpec suite (a server, a script) keeps them for its children. The profiler installs:
 
 * an internal `NEWOBJ` hook, the one `ObjectSpace.trace_object_allocations` uses, that keeps a count per file,
   line, object type and kind of window in C memory (no Ruby objects, no retained records; GC stays on). An open
