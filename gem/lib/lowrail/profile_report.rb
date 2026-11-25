@@ -58,6 +58,7 @@ module Lowrail
       @dir = dir
       @top = top
       @ledger = ledger if ledger && File.exist?(ledger)
+      @paths, @path_ids, @locs, @loc_ids, @window_names, @window_ids = [], {}, [], {}, [], {}
       @runs = Dir["#{dir}/run*"].select { File.directory?(_1) }.sort_by { _1[/\d+\z/].to_i }.map { load_run(_1) }
       if @runs.empty? || @runs.all? { _1[:windows].values.sum == 0 }
         raise "no runs with requests, jobs or mails under #{dir} (a request counts when it goes through the app, as in " \
@@ -66,13 +67,18 @@ module Lowrail
       end
     end
 
+    # Streams each file. Attributed rows are many (one per window name, line
+    # and app line, in every process), so they are merged into flat integer
+    # arrays in first-seen order, which keeps every later sum and tie as it
+    # was with one array per row.
     def load_run(path)
       run = { name: File.basename(path), requests: 0, objects: 0, dropped: 0, processes: 0, roots: [],
         windows: Hash.new(0), sites: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
-        actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] }, attrib: Hash.new { |h, k| h[k] = [0, 0] } }
+        actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
+        attrib: { index: {}, name: [], loc: [], caller: [], count: [], first: [] } }
       Dir["#{path}/*.tsv"].sort.each do |file|
-        header, *rows = File.readlines(file, chomp: true)
-        raise "#{file} is from an older lowrail-profile; run it again" unless header.start_with?("# lowrail-profile 3\t")
+        header = File.open(file, &:gets)&.chomp
+        raise "#{file} is from an older lowrail-profile; run it again" unless header&.start_with?("# lowrail-profile 3\t")
         meta = header.split("\t").drop(1).to_h { _1.split("=", 2) }
         run[:processes] += 1
         %i[requests objects dropped].each { run[_1] += Integer(meta.fetch(_1.to_s)) }
@@ -84,12 +90,14 @@ module Lowrail
         run[:rails] ||= meta["rails"] unless meta["rails"].to_s.empty?
         (run[:rubies] ||= []) << meta["ruby"]
         (run[:rails_envs] ||= []) << meta["rails_env"]
-        paths = { "-" => "-" }
-        rows.each do |row|
+        paths = { "-" => path_id("-") }
+        attrib = run[:attrib]
+        File.foreach(file, chomp: true).with_index do |row, i|
+          next if i == 0
           fields = row.split("\t")
           case fields[0]
           when "P"
-            paths[fields[1]] = fields[2]
+            paths[fields[1]] = path_id(fields[2])
           when "A"
             _, kind, name, windows, objects, first = fields
             action = run[:actions][[kind, name]]
@@ -102,12 +110,21 @@ module Lowrail
             (run[:path_gems] ||= {})[name] = gem_dir
           when "@"
             _, kind, name, file_path, line, caller_path, caller_line, count, first = fields
-            attrib = run[:attrib][[kind, name, paths.fetch(file_path), Integer(line), paths.fetch(caller_path), Integer(caller_line)]]
-            attrib[0] += Integer(count)
-            attrib[1] += Integer(first)
+            window = (@window_ids[[kind, name]] ||= (@window_names << [kind, name].freeze).size - 1)
+            loc = loc_id(paths.fetch(file_path), Integer(line))
+            caller_loc = loc_id(paths.fetch(caller_path), Integer(caller_line))
+            index = (attrib[:index][window] ||= {})[loc << 31 | caller_loc] ||= begin
+              attrib[:name] << window
+              attrib[:loc] << loc
+              attrib[:caller] << caller_loc
+              attrib[:count] << 0
+              (attrib[:first] << 0).size - 1
+            end
+            attrib[:count][index] += Integer(count)
+            attrib[:first][index] += Integer(first)
           else
             file_path, line, type, count, reached, first, via, kind = fields
-            site = run[:sites][[paths.fetch(file_path), Integer(line), type, via, kind]]
+            site = run[:sites][[@paths[paths.fetch(file_path)], Integer(line), type, via, kind]]
             site[0] += Integer(count)
             site[1] += Integer(reached)
             site[2] += Integer(first)
@@ -115,11 +132,17 @@ module Lowrail
           end
         end
       end
-      run[:attributed] = !run[:attrib].empty?
+      run[:attributed] = !run[:attrib][:count].empty?
       run
     end
 
-    def classify(path)
+    def path_id(path) = @path_ids[path] ||= (@paths << path.freeze).size - 1
+
+    def loc_id(path, line) = @loc_ids[path << 32 | line] ||= (@locs << [path, line].freeze).size - 1
+
+    def classify(path) = (@classify ||= {})[path] ||= classify!(path)
+
+    def classify!(path)
       @roots ||= @runs.flat_map { _1[:roots] }.uniq.compact.map { _1.end_with?("/") ? _1 : "#{_1}/" }
       libdir = RbConfig::CONFIG.fetch("rubylibdir") + "/"
       if path == "-" then ["(no Ruby frame)", path]
@@ -325,34 +348,36 @@ module Lowrail
     # The run that recorded the nearest app frame (the repeat run).
     def attributed_run = @runs.reverse.find { _1[:attributed] }
 
-    # Attributed allocations of one kind, merged per window name, line and
-    # app line: [name, site key, line, app key or nil, app line, count, first].
-    def attributions(kind = "request")
-      (@attributions ||= {})[kind] ||= begin
-        merged = Hash.new { |h, k| h[k] = [0, 0] }
-        attributed_run&.dig(:attrib)&.each do |(k, name, path, line, caller_path, caller_line), (count, first)|
-          next unless k == kind
-          group, key = classify(path)
-          app = caller_path == "-" ? nil : classify(caller_path)[1]
-          entry = merged[[name, key, line, group, app, caller_line, path, caller_path]]
-          entry[0] += count
-          entry[1] += first
-        end
-        merged.map { |key, (count, first)| [*key, count, first] }
+    # Attributed allocations of one kind in first-seen order: name, site key,
+    # line, group, app key or nil, app line, path, app path, count, first.
+    def each_attribution(kind)
+      a = attributed_run&.dig(:attrib) or return
+      a[:name].each_with_index do |window, i|
+        k, name = @window_names[window]
+        next unless k == kind
+        path_id, line = @locs[a[:loc][i]]
+        caller_id, caller_line = @locs[a[:caller][i]]
+        group, key = classify(@paths[path_id])
+        app = caller_id == @path_ids["-"] ? nil : classify(@paths[caller_id])[1]
+        yield name, key, line, group, app, caller_line, @paths[path_id], @paths[caller_id], a[:count][i], a[:first][i]
       end
     end
 
+    # "key:line", one string per line, shared by every table that counts it.
+    def label(key, line) = ((@labels ||= {})[key] ||= {})[line] ||= "#{key}:#{line}".freeze
+
     def ranked_group?(group) = !NOT_RANKED.include?(group) && !group.start_with?("test harness")
 
-    def mode_key?(key) = MODE_ONLY.any? { |_, pattern| key.match?(pattern) }
+    def mode_key?(key) = (@mode_keys ||= {}).fetch(key) { @mode_keys[key] = MODE_ONLY.any? { |_, pattern| key.match?(pattern) } }
 
     # The app lines whose calls lead to the line's allocations (repeat run),
     # with their share; "no app frame" when none was on the stack.
     def top_callers(site)
       @callers ||= {}
-      counts = (@callers[site.kind] ||= attributions(site.kind).each_with_object(Hash.new { |h, k| h[k] = Hash.new(0) }) do |row, acc|
-        _, key, line, _, app, app_line, = row
-        acc[[key, line]][app ? "#{app}:#{app_line}" : "no app frame"] += row[-2]
+      counts = (@callers[site.kind] ||= Hash.new { |h, k| h[k] = Hash.new(0) }.tap do |acc|
+        each_attribution(site.kind) do |_, key, line, _, app, app_line, _, _, count|
+          acc[[key, line]][app ? label(app, app_line) : "no app frame"] += count
+        end
       end)[[site.key, site.line]]
       return [] if counts.nil? || counts.empty?
       total = counts.values.sum.to_f
@@ -367,7 +392,7 @@ module Lowrail
       windows = run[:windows][kind]
       return [] if windows == 0
       lines = Hash.new { |h, k| h[k] = { warm: 0.0, all: 0.0, mode: 0.0, own: 0.0, sites: Hash.new(0.0), names: Hash.new(0.0) } }
-      attributions(kind).each do |name, key, line, group, app, app_line, path, caller_path, count, first|
+      each_attribution(kind) do |name, key, line, group, app, app_line, _, caller_path, count, first|
         next unless app
         entry = lines[[app, app_line, caller_path]]
         warm = (count - first).fdiv(windows)
@@ -381,7 +406,7 @@ module Lowrail
           entry[:mode] += warm
         else
           entry[:warm] += warm
-          entry[:sites]["#{key}:#{line}"] += warm
+          entry[:sites][label(key, line)] += warm
           entry[:names][name] += warm
         end
       end
@@ -402,7 +427,9 @@ module Lowrail
       run = attributed_run or return nil
       windows = run[:windows][kind]
       return nil if windows == 0
-      attributions(kind).sum { |_, key, _, group, app, *, count, first| !app && ranked_group?(group) && !mode_key?(key) ? (count - first).fdiv(windows) : 0.0 }.round(2)
+      warm = []
+      each_attribution(kind) { |_, key, _, group, app, *, count, first| warm << (!app && ranked_group?(group) && !mode_key?(key) ? (count - first).fdiv(windows) : 0.0) }
+      warm.sum.round(2)
     end
 
     # Per window name (controller action, job, mailer action, channel action):
@@ -412,10 +439,10 @@ module Lowrail
       (@actions ||= {})[kind] ||= begin
         names = @runs.flat_map { |run| run[:actions].keys.select { _1[0] == kind }.map(&:last) }.uniq
         attributed = Hash.new { |h, k| h[k] = { sites: Hash.new(0), apps: Hash.new(0) } }
-        attributions(kind).each do |name, key, line, group, app, app_line, *, count, first|
+        each_attribution(kind) do |name, key, line, group, app, app_line, *, count, first|
           next unless ranked_group?(group) && !mode_key?(key)
-          attributed[name][:sites]["#{key}:#{line}"] += count - first
-          attributed[name][:apps]["#{app}:#{app_line}"] += count - first if app
+          attributed[name][:sites][label(key, line)] += count - first
+          attributed[name][:apps][label(app, app_line)] += count - first if app
         end
         attributed_index = @runs.index(attributed_run)
         names.map do |name|

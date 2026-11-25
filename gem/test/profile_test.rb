@@ -10,6 +10,7 @@
 require "test_helper"
 require "uri"
 require "digest"
+require "lowrail/profile_report"
 
 class ProfileTest < Minitest::Test
   include LowrailTest
@@ -661,6 +662,37 @@ class ProfileTest < Minitest::Test
       _, err, status = profile(dir, "report", "kept")
       assert status.success?, err
       assert_equal written, File.read(File.join(dir, "kept/report.json"))
+    end
+  end
+
+  # An attribution run has a row per window name, line and app line in every
+  # process (Sure: 785 MB in 16 files, a 6 GB report). The report merges
+  # them without an object per row, so it holds far fewer objects than rows.
+  def test_report_keeps_no_object_per_attributed_row
+    realpath_tmpdir do |dir|
+      names, callers = 400, 200
+      %w[run1 run2].each do |run|
+        FileUtils.mkdir_p(File.join(dir, run))
+        2.times do |pid|
+          rows = ["# lowrail-profile 3\trequests=#{names}\tobjects=1\tdropped=0\twindows=#{names},0,0,0\tpid=#{pid}\troot=/app",
+            "P\t0\t/gems/foo-1.0/lib/foo.rb", "P\t1\t/app/app/controllers/c.rb", "0\t1\tString\t#{names}\t#{names}\t1\t0\trequest"]
+          names.times do |n|
+            rows << "A\trequest\tC#a#{n}\t1\t9\t1"
+            next if run == "run1"
+            callers.times { |line| rows << "@\trequest\tC#a#{n}\t0\t1\t1\t#{line + 1}\t#{n + line + 1}\t1" }
+          end
+          File.write(File.join(dir, run, "#{pid}.tsv"), rows.join("\n") << "\n")
+        end
+      end
+      GC.start
+      before = GC.stat(:heap_live_slots)
+      report = Lowrail::ProfileReport.new(dir)
+      report.to_h
+      GC.start
+      held = GC.stat(:heap_live_slots) - before
+      assert_operator held, :<, names * callers / 4, "objects held for #{names * callers} attributed rows"
+      assert_equal callers, report.app_lines.size
+      assert_equal names, report.actions.size
     end
   end
 
