@@ -264,3 +264,53 @@ A/A pair as the default, and make the README's CI job a confirm step instead. On
 into `head2` and fail only if `compare base head2 --aa base2` also exits 1. Say in the README that a single
 unconfirmed failure is a place to look. That is a docs-only change and needs no new option; a pooled `--head2`
 can follow later.
+
+## Last fix round confirm: thermos-opus (2026-11-25)
+
+Scope: the profile changes in `c7d3d4a2..c6250062` (`a28c9f0f`, `dcce21eb`, `61e2057c`, `1530feeb`, `ae445174`,
+`758c1d26`, `737b2df3`, `c6250062`), checked against the nits of the two confirms above and in
+[profile-release-astra-review-2026-11-25.md](profile-release-astra-review-2026-11-25.md). CI on `c6250062`: 14 of 14
+checks green. **Verdict: no must-fix. The 0.1.0.rc1 gem with sha256
+`f569d5f5ebbf20902d4cdc84dc7fc5e7b895efd2b90988cd6e16898de0a86d31` is the one to publish.**
+
+**Each fix, and its revert.** The profile suites, run as CI runs them on Ruby 4.0.7 / Rails 8.1.4, gave 30 runs, 388
+assertions, 0 failures and 0 skips. Every revert or mutation below fails its test:
+
+| Item | Change | Revert or mutation → result |
+| --- | --- | --- |
+| 1. `-I#{lib}` in RUBYOPT | Added beside RUBYLIB when lib has no whitespace | Drop it → `test_a_child_with_its_own_rubylib_loads_the_profiler` fails (`LoadError`, child exits 9) |
+| 2. Counter sources | `Dir.children`; package test home `space [home] {x}*` | Back to `Dir["#{source}/*"]` → package test fails (counter build fails) |
+| 3. Exit status | Run 2 exits 4, expected 3 | `statuses.reverse.find` → fails (expected 3, actual 4) |
+| 3. `--record` failure | Passing command → 1, failed → its status | `exit 1` → fails (7 expected); `exit(failed \|\| 0)` → fails (1 expected) |
+| 3. Lost action row | One of two rows removed → exit 2 | Refuse only an empty list → fails ("one action row lost", 0) |
+| 3. Compare file | Tests moved to `profile_compare_test.rb` | `ci.yml`'s profile job lists it |
+| 4. Line floor | `[2 * noise, min].max` | Back to `[noise, min].max` → floor-terms and A/A tests fail |
+| 4. CI confirm step | Head profiled again on exit 1 | Drop the `status = 1` guard, the `\|\| status=$?` or the second compare → the documented-step test fails each time. `docs/profile.md` has the same YAML. |
+| 5. Write guard sentence | Requests checked as declared | Matches `Workloads::Request#copy`: an override sets only `path:` and `params:`, and `perform` sends the declared verb and headers |
+
+**False alarms, replayed** with the retained `scripts/gate.rb` and the gem's `lib` at `c6250062`:
+
+* Blog (the 12 unchanged and 3 planted floor-Blog captures of the M4, fixes and confirm-opus receipts): byte-identical
+  to `gate-blog-floor.txt`. One compare is 22 of 1,320 (1.67%), the combined gate 4 of 11,880 (0.03%), the plant 396 of
+  396 and 792 of 792. rc1 reproduces 60 and 48.
+* Fresh app (24 captures): 100 of 12,144 (0.82%) and 400 of 255,024 (0.16%). All failures are
+  `journey/path/pattern.rb:77`. The per-capture warm values match the README's two groups of five, so 5 × 4 × 5 = 100.
+* Campfire, CodeTriage and Lobsters: identical to their `gate-*.txt`. Plants are caught 12 of 12 in both modes, and
+  there are no unchanged-head failures.
+* `gate.rb`'s `Gate` subclass only skips the file reading in `ProfileCompare#initialize`. The real
+  `lowrail-profile compare` CLI on the first 199 Blog assignments exits 1 three times, consistent with 1.67%.
+
+The README's numbers (1.7% → 0.03%, 4 of 11,880; 0.8% and 0.16% from one line; every plant caught in both profiles of
+head on four apps) and `docs/profile.md`'s Blog sentence agree with these numbers.
+
+**The gem.** `c6250062` changes only `bench/`. `gem build lowrail-profile.gemspec` at `737b2df3` and at `c6250062`
+gives byte-identical archives, sha256 `f569d5f5…a86d31`, as the receipt states. No rebuild or floor-Blog rerun was
+needed.
+
+**Nits, none blocking:**
+
+* `gate-fresh-81.txt` prints one decimal (`0.8%`, `0.2%`), and the committed `gate.rb` prints two (`0.82%`, `0.16%`). The
+  file came from an earlier revision of the script. The counts are the same.
+* `blog-floor/` does not record which gem file was installed (`installed-from.txt` is a path). Only the receipt
+  README ties it to `737b2df3`. That is harmless here, because both builds are identical.
+* `docs/profile.md` quotes only the Blog's rates. The README also gives the fresh app's 0.16%.
