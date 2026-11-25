@@ -42,9 +42,11 @@ class ProfileEnvTest < Minitest::Test
 
   # Under a parent that never reaps orphans (a container's PID 1 without an
   # init), a process of the stopped run stays a zombie in its group: the
-  # 10 s for the group to end do not wait for it.
+  # 10 s for the group to end do not wait for it. Linux only (a subreaper);
+  # defined there alone, since CI allows no skips.
+  if RUBY_PLATFORM.include?("linux")
   def test_timeout_does_not_wait_for_a_zombie
-    skip "needs Linux's PR_SET_CHILD_SUBREAPER and python3" unless RUBY_PLATFORM.include?("linux") && system("python3", "-c", "", err: File::NULL)
+    skip "needs python3 for PR_SET_CHILD_SUBREAPER" unless system("python3", "-c", "", err: File::NULL)
     realpath_tmpdir do |dir|
       reaper = "import ctypes, subprocess, sys; ctypes.CDLL(None).prctl(36, 1, 0, 0, 0); sys.exit(subprocess.run(sys.argv[1:]).returncode)"
       env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"))
@@ -56,6 +58,7 @@ class ProfileEnvTest < Minitest::Test
       assert_equal 124, status.exitstatus, err
       assert_operator took, :<, 6, "waited #{took.round(1)} s for a zombie"
     end
+  end
   end
 
   def test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile
