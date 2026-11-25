@@ -143,6 +143,64 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # An engine's suite: run from the engine (api/), its dummy app's Rails.root
+  # below it, a sibling gem from a path (core/, as Bundler's path: loads it)
+  # and a file in no gem. Path-gem lines rank as that gem's, the engine's lines are
+  # keyed relative to the directory they were attributed through, and what is
+  # left over is reported with its share, not dropped.
+  def test_path_gems_and_an_engine_root_are_classified
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      api = File.join(dir, "api")
+      LowrailTest.write_rails_app(File.join(api, "spec/dummy"),
+        "app/controllers/widgets_controller.rb" => <<~'RUBY')
+          class WidgetsController < ApplicationController
+            def index = (Engine.call; head(:ok))
+          end
+        RUBY
+      { "api/app/lib/engine.rb" => "module Engine\n  def self.call = (Core.many; Loose.many)\nend\n",
+        "core/lib/core.rb" => "module Core\n  def self.many = Array.new(40) { String.new }\nend\n",
+        "loose/loose.rb" => "module Loose\n  def self.many = Array.new(10) { String.new }\nend\n" }.each do |rel, src|
+        FileUtils.mkdir_p(File.dirname(File.join(dir, rel)))
+        File.write(File.join(dir, rel), src)
+      end
+      File.write(File.join(api, "requests.rb"), <<~'RUBY')
+        spec = Gem::Specification.new { |s| (s.name, s.version) = "solidus_core", "1.0" }
+        spec.full_gem_path = File.expand_path("../core", __dir__)
+        Gem.loaded_specs["solidus_core"] = spec
+        # The profiler itself as a path gem (a Lowrail checkout in the Gemfile).
+        own = Gem::Specification.new { |s| (s.name, s.version) = "lowrail", "0" }
+        own.full_gem_path = ENV.fetch("PROFILER_DIR")
+        Gem.loaded_specs["lowrail"] = own
+        require_relative "../core/lib/core"
+        require_relative "../loose/loose"
+        require_relative "app/lib/engine"
+        require_relative "spec/dummy/config/environment"
+        require "rack/mock"
+        6.times { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) }
+      RUBY
+      _, err, status = profile(api, "--out", "p", "--", RUBY, "requests.rb",
+        env: { "XDG_CACHE_HOME" => File.join(dir, "cache"), "PROFILER_DIR" => GEM_ROOT })
+      assert status.success?, err
+      report = JSON.parse(File.read(File.join(api, "p/report.json")))
+      core = report["ranked"].find { _1["site"] == "GEM/solidus_core/lib/core.rb:2" }
+      assert core, report["ranked"].map { _1["site"] }.first(10).inspect
+      assert_equal "gem: solidus_core", core["group"]
+      assert_empty report["ranked"].select { _1["site"].start_with?("GEM/lowrail/") }, "the profiler's own lines are not ranked"
+      assert_includes report["groups"].map { _1["group"] }, "lowrail-profile"
+      assert_in_delta 41.0, core["all"].last, 1.0
+      callers = report["rows"].find { _1["site"] == core["site"] }["callers"].map { _1["caller"] }
+      # The engine's code, not its dummy app (spec/ is the test suite's).
+      assert_equal ["APP/app/lib/engine.rb:2"], callers
+      assert_includes report["app_lines"].map { _1["line"] }, "APP/app/lib/engine.rb:2"
+      missing = report["unclassified"]
+      assert_equal File.join(dir, "loose/loose.rb"), missing["files"].first["path"]
+      assert_in_delta 11.0, missing["objects_per_request"], 1.0
+      assert_operator missing["share"], :>, 0
+      assert_match(/Not attributed: [\d.]+ objects per request \([\d.]+% of all\).*loose\.rb/, File.read(File.join(api, "p/report.md")))
+    end
+  end
+
   # B -> --record -> a workloads file -> replayed: the suite's request shapes
   # come back as route helpers on each model's first row, and replaying the
   # file counts the same line per request again.

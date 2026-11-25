@@ -73,7 +73,8 @@ module Lowrail
         run[:processes] += 1
         %i[requests objects dropped].each { run[_1] += Integer(meta.fetch(_1.to_s)) }
         KINDS.zip(meta.fetch("windows").split(",")) { |kind, n| run[:windows][kind] += Integer(n) }
-        run[:roots] |= [meta["root"]]
+        # The root lines were attributed through first, so app keys are relative to it.
+        run[:roots] |= [meta["app_root"], meta["root"]].compact
         run[:ruby] ||= meta["ruby"]
         run[:rails_env] ||= meta["rails_env"]
         run[:rails] ||= meta["rails"] unless meta["rails"].to_s.empty?
@@ -89,6 +90,9 @@ module Lowrail
             action[1] += Integer(objects)
             action[2] += Integer(first)
             action[3] += 1
+          when "G"
+            _, name, gem_dir = fields
+            (run[:path_gems] ||= {})[name] = gem_dir
           when "@"
             _, kind, name, file_path, line, caller_path, caller_line, count, first = fields
             attrib = run[:attrib][[kind, name, file_path, Integer(line), caller_path, Integer(caller_line)]]
@@ -113,18 +117,44 @@ module Lowrail
       libdir = RbConfig::CONFIG.fetch("rubylibdir") + "/"
       if path == "-" then ["(no Ruby frame)", path]
       elsif (m = path.match(RAILS_PATH)) then ["rails: #{m[1] || m[2]}", "RAILS/#{m[1] || m[2]}/#{m[3]}"]
-      elsif (m = path.match(GEM_PATH))
-        group = if default_gems.include?(m[1]) then "ruby default gem: #{m[1]}"
-        elsif m[1].match?(HARNESS) then "test harness: #{m[1]}"
-        else "gem: #{m[1]}"
-        end
-        [group, "GEM/#{m[1]}/#{m[3]}"]
+      elsif (m = path.match(GEM_PATH)) then gem_site(m[1], m[3])
       elsif (root = @roots.find { path.start_with?(_1) }) then ["app", "APP/#{path.delete_prefix(root)}"]
+      elsif (name, gem_dir = path_gems.find { |_, d| path.start_with?(d) })
+        RAILS.include?(name) ? ["rails: #{name}", "RAILS/#{name}/#{path.delete_prefix(gem_dir)}"] : gem_site(name, path.delete_prefix(gem_dir))
       elsif path.start_with?(libdir) then ["ruby stdlib", "RUBY/#{path.delete_prefix(libdir)}"]
       elsif path.start_with?("<internal:") then ["ruby core", "RUBY/#{path}"]
       elsif path.include?("/lowrail/profile") then ["lowrail-profile", path]
       else ["other", path]
       end
+    end
+
+    def gem_site(name, rest)
+      group = if %w[lowrail lowrail-profile].include?(name) then "lowrail-profile"
+      elsif default_gems.include?(name) then "ruby default gem: #{name}"
+      elsif name.match?(HARNESS) then "test harness: #{name}"
+      else "gem: #{name}"
+      end
+      [group, "GEM/#{name}/#{rest}"]
+    end
+
+    # Gems loaded from a path, longest directory first (a gem inside another's).
+    def path_gems
+      @path_gems ||= @runs.map { _1[:path_gems] || {} }.reduce({}, :merge)
+        .transform_values { _1.end_with?("/") ? _1 : "#{_1}/" }.sort_by { -_2.size }
+    end
+
+    # Objects on lines outside the app, Rails, Ruby and every gem the bundle
+    # loaded, which no table ranks: per request (all, mean of the runs) and
+    # their share of every object counted, with the files that have most.
+    def unclassified(kind = "request")
+      all = sites(kind)
+      total = all.sum { mean(_1.all) }
+      other = all.select { _1.group == "other" }
+      objects = other.sum { mean(_1.all) }
+      return nil if objects == 0
+      files = other.group_by(&:path).map { |path, list| [path, list.sum { mean(_1.all) }] }.sort_by { -_2 }.first(3)
+      { objects_per_request: objects.round(2), share: (objects / total).round(4),
+        files: files.map { |path, n| { path: path, objects_per_request: n.round(2) } } }
     end
 
     # By name, as the census does: a bundle may lock a newer release of one.
@@ -459,7 +489,13 @@ module Lowrail
       out << "* Counted in run 1: #{counted.join(", ")}#{" in #{first[:processes]} processes" if first[:processes] > 1}; " \
         "#{@runs.size} run#{"s" if @runs.size != 1}\n"
       out << "* Ledger: #{ledger_date ? "upstream pull requests as of #{ledger_date}" : "off"}\n"
-      out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n\n"
+      out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n"
+      if (missing = unclassified)
+        out << "* Not attributed: #{missing[:objects_per_request]} objects per request (#{(missing[:share] * 100).round(1)}% of all) " \
+          "are on lines outside the app, Rails, Ruby and the bundle's gems, which no table below ranks; most in " <<
+          missing[:files].map { "`#{_1[:path]}`" }.join(", ") << "\n"
+      end
+      out << "\n"
       out << "| Run | Processes | Requests | Objects per request | Jobs | Mails | Cable actions | Dropped |\n" \
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n"
       summary.each do |s|
@@ -585,7 +621,8 @@ module Lowrail
       command_file = File.join(dir, "command.txt")
       { command: File.exist?(command_file) ? File.read(command_file).lines.first.strip : nil, meta: meta,
         summary: summary, noise_floor: noise_floor, rows: rows, mode_rows: mode_rows,
-        ranked: ranked.map { site_json(_1) }, app_lines: app_lines, unattributed: unattributed, actions: actions,
+        ranked: ranked.map { site_json(_1) }, app_lines: app_lines, unattributed: unattributed, unclassified: unclassified,
+        actions: actions,
         outside_requests: (KINDS - ["request"]).to_h do |kind|
           [kind, { actions: actions(kind), ranked: ranked(kind).map { site_json(_1) } }]
         end,

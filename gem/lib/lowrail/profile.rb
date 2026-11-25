@@ -313,13 +313,20 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             root = (Rails.root.to_s if defined?(Rails) && Rails.respond_to?(:root) && Rails.root)
             lines = [["# lowrail-profile 2", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
               "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}",
-              "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "ruby=#{RUBY_DESCRIPTION}",
+              "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{ENV.fetch("LOWRAIL_PROFILE_ROOT", Dir.pwd)}",
+              "ruby=#{RUBY_DESCRIPTION}",
               "rails_env=#{ENV["RAILS_ENV"]}", "rails=#{Lowrail.loaded_constant("Rails::VERSION::STRING")}"].join("\t")]
             rows.each do |path, line, type, count, reached, first, via, kind|
               lines << [path || "-", line, TYPES[type], count, reached, first, via ? 1 : 0, KINDS[kind]].join("\t")
             end
             actions.each { |kind, name, *rest| lines << ["A", KINDS[kind], name || "-", *rest].join("\t") }
             attributed.each { |kind, name, *rest| lines << ["@", KINDS[kind], name || "-", *rest.map { _1 || "-" }].join("\t") }
+            # Gems from a path (Bundler's path:, gemspec), which no gem
+            # directory names: the report classifies their lines by these.
+            Gem.loaded_specs.each_value do |spec|
+              gem_dir = spec.full_gem_path
+              lines << ["G", spec.name, gem_dir].join("\t") unless gem_dir.match?(%r{/(?:gems|bundler/gems)/[^/]+-(?:\d|\h{12})[^/]*\z})
+            end
             File.write(File.join(dir, "#{Process.pid}.tsv"), lines.join("\n") << "\n")
             if shapes&.any?
               # At exit Bundler has long set up, so json resolves to the app's own.
