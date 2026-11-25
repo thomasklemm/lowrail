@@ -1600,3 +1600,58 @@ Additional reproduction files in the same scratch directory: `r4_ractors.rb`, `r
 scheduling only during its call to the read-only lock query, then resumes all threads. This report's two
 verdicts are therefore: round 3 correctness approved with its previously known performance blocker; round 4
 changes required for the newly introduced shared-state write.
+
+#### thermos-opus confirm on `5b3e0d0be5`: changes, the VM lock only (2026-11-25)
+
+Same review orb as the round-3 pass, both rubrics personally. Fetched `thomasklemm/zjit-symbol-block-arg-4`: exactly
+`5b3e0d0be52c2d20b2dab51a82ee7868b57200a1`, two commits on `a43519979c`, authors, committer and the one
+`Co-authored-by` as before, no message line over 72 characters. Nothing pushed to Ruby or posted.
+
+**Rebase.** `git range-diff f63048e942..bdcfceb5ee a43519979c..5b3e0d0be5`: the test commit is `=`, and the ZJIT
+commit differs only in the fix (payload bool, `SideExitReason::BlockArgRefinements` and its counter,
+`SideExitRecompile::refined_iseq`, `exit_block_arg_refinements`, the `type_specialize` check, one message sentence).
+No other hunk moved.
+
+**My round-3 must-fix is resolved.** `refined_method_cost.rb`: 4 compiles, 5 exits (`block_arg_refinements`), no
+`no_side_exits` fallback; `MOD=plain` 1 compile, 0 exits. New probe
+[`inlined_refined_cost.rb`](../../bench/upstream/zs1/round3/opus/inlined_refined_cost.rb) (the refined method inlined
+into an unrefined caller with its own ivar speculation): 4 compiles, 5 exits, the HIR of the last version keeps the
+caller's ivar loads and leaves only the inlined `sum(&:double)` dynamic. So marking the frame state's ISEQ is right
+and the caller does not keep recompiling. Mutations: marking `jit.iseq()` instead gives 4/10 and 5/15
+(compiles/exits), and dropping the `type_specialize` check brings back 8/30 and 11/44; no test fails for either
+(21/21), which is expected under DECISIONS' no-internal-state rule, since only compile and exit counts change.
+
+**Must fix — agree with Astra's finding.** `exit_block_arg_refinements` calls `get_or_create_iseq_payload` and
+writes the bool without the VM lock, from generated code that any Ractor can run. `payload_ptr_as_mut`'s own SAFETY
+note (`payload.rs:146`) assumes the VM lock; without it two threads hold `&mut IseqPayload` at once (UB in Rust), and
+on an ISEQ with no payload yet two threads could both allocate and set one. The `with_vm_lock` fix in `-5` is the
+right one and matches `exit_recompile`'s slow path. (`exit_recompile`'s fast path also decrements its counter before
+taking the lock; that is master's code, not this PR's.) My Ractor probe
+[`ractor_gc_refined.rb`](../../bench/upstream/zs1/round3/opus/ractor_gc_refined.rb) matched the interpreter 9/9
+times, which does not disprove a race.
+
+**GC and ISEQ free.** `refined_iseq` is an `Opnd::Value` of the ISEQ in exit code, so it goes through the same GC
+offset marking and compaction update as `compiled_iseq`; the bool is plain data freed with the payload in
+`rb_zjit_iseq_free`. Forced compaction in the Ractor probe: identical.
+
+**Reply 2.** The coordinator's text is true on this head and on `-5`. Put the question last so the answer the PR
+gives comes first:
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that its
+> refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using` can add
+> refinements to the cref after the code is compiled (tested). After that guard exits, the ISEQ's next version leaves
+> the send dynamic, so code that runs under `using` isn't recompiled again. With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT. Leaving the send dynamic needed one new bool on `IseqPayload`, next to
+> `was_invalidated_for_singleton_class_creation`; would you rather track that differently?
+
+Reply 1 unchanged and correct.
+
+| Command | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run, 2,051 pass, 15 skipped; the SIGPROF abort only |
+| `make btest` at `--zjit-call-threshold=1` and `=2` | 2,148/2,148 each |
+| `test_zjit_cli.rb` | 34 tests, 7,907 assertions, 0 failures |
+| Opus probes (7 files × 4 settings) | 28/28 identical to the interpreter |
+| 13 `Symbol#to_proc` mutations × 3 settings | 39/39 identical |
+| Ractor and compaction probe × 3 settings × 3 runs | 9/9 identical |
+| Restored head after mutations | source diff empty |
