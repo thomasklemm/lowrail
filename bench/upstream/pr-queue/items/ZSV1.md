@@ -4,19 +4,19 @@ repo: ruby/ruby
 kind: perf
 area: ZJIT, setinstancevariable profiling
 reviewer: "tekknolagi (filed Shopify/ruby#1122; his #19858 did the same for getinstancevariable)"
-branch: thomasklemm/zjit-setivar-real-class-2
-head: "47b2ed7110"
+branch: thomasklemm/zjit-setivar-real-class-3
+head: "ca3ea90482"
 base: master
-built_on: "4414d3ea25"
+built_on: "3b188d0dd5"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "eligible ordinary objects with singleton classes get shape-specialized ivar writes instead of recompile exits and a generic final-version fallback; lobsters -584 generic setivar per iteration (replayed master/master-aa/branch stats, bench/upstream/zsv1/results-2.md); railsbench and shipit generic-write totals unchanged, but Shipit fallback reasons shift -81/+81; no speed claim"
+impact: "eligible ordinary objects with singleton classes get shape-specialized ivar writes instead of recompile exits and a generic final-version fallback; lobsters -584 generic setivar per iteration (master/master-aa/branch stats, unchanged on master 3b188d0dd5, bench/upstream/zsv1/results-3.md); railsbench and shipit generic-write totals unchanged, but Shipit fallback reasons shift -81/+81; no speed claim"
 rank: 2
 risky: false
 state: reviewed
 pr:
-note: "2026-11-18 22:30 UTC (coordinator): tekknolagi reviewed #19976 and #19659 today, which met the earlier hold condition. Still held, with a sharper trigger: open ZSV1 once tekknolagi approves or merges #19976 or #19659, so we don't add a fourth ZJIT request while two of his reviews are in flight. Head 47b2ed7110 merges clean with master bdff3c5d66 (after #17864); the evening stats pass (zjit-stats-2026-11-18-evening.md) finds no larger free ZJIT lead. 2026-11-18 (Thomas and coordinator): held, neither opened nor commented on Shopify/ruby#1122. Small effect (584 of about 772k dynamic dispatches per lobsters iteration, no change in railsbench/shipit totals) while ruby/ruby#19912, #19976 and #19982 have no maintainer response; revisit when one of them gets one. 2026-11-18 thermos-sol text-only confirm: approve, no must-fixes, exact Ruby head 47b2ed7110 unchanged. Both cuts in Lowrail 899e36d9 are confirmed: the body names only lobsters and the comment claims only its 584 fewer generic writes per iteration. Independently rechecked the three raw lobsters counters, zero A/A movement and byte-identical diff replay. Prior code, guard, comment, message and packaging findings are closed; both earlier passes retained below. Record: bench/upstream/zsv1/thermos-review.md, Text-only confirm of revision 2. No speed claim, fork push, PR or upstream post; posting still requires the usual approval."
+note: "2026-11-25 (-3, rebase for the draft PR under the 2026-11-25 DECISIONS exception): thomasklemm/zjit-setivar-real-class-3 ca3ea90482, 47b2ed7110 cherry-picked clean onto master 3b188d0dd5 (435 commits later), same authorship and author date, committer Thomas Klemm, no trailers; range-diff is `=`. Master has not fixed or replaced it (setinstancevariable still uses profile_self; #1122 open; Shopify/ruby#1126 closed 2026-11-13; no open ruby/ruby PR overlaps); the hold trigger is met, #19976 and #19982 merged today. Dev build: zjit-test 2036 passed/15 skipped, both HIR tests pass, btest t1 and t2 2148/2148, rebuilt 33-row probe (original stayed in the archived review orb; now kept as zsv1/probe.rb) identical to the interpreter at t1/t2 and with max-versions=1. Lobsters stats on the new base reproduce -584 exactly (11,405 -> 10,821; master A/A identical), so the body is unchanged; railsbench unchanged, Shipit -81/+81 as before. Record: bench/upstream/zsv1/results-3.md. Before opening: thermos-sol and Astra on exact head ca3ea90482 (DECISIONS exception); no PR opened, nothing posted. 2026-11-18 22:30 UTC (coordinator): tekknolagi reviewed #19976 and #19659 today, which met the earlier hold condition. Still held, with a sharper trigger: open ZSV1 once tekknolagi approves or merges #19976 or #19659, so we don't add a fourth ZJIT request while two of his reviews are in flight. Head 47b2ed7110 merges clean with master bdff3c5d66 (after #17864); the evening stats pass (zjit-stats-2026-11-18-evening.md) finds no larger free ZJIT lead. 2026-11-18 (Thomas and coordinator): held, neither opened nor commented on Shopify/ruby#1122. Small effect (584 of about 772k dynamic dispatches per lobsters iteration, no change in railsbench/shipit totals) while ruby/ruby#19912, #19976 and #19982 have no maintainer response; revisit when one of them gets one. 2026-11-18 thermos-sol text-only confirm: approve, no must-fixes, exact Ruby head 47b2ed7110 unchanged. Both cuts in Lowrail 899e36d9 are confirmed: the body names only lobsters and the comment claims only its 584 fewer generic writes per iteration. Independently rechecked the three raw lobsters counters, zero A/A movement and byte-identical diff replay. Prior code, guard, comment, message and packaging findings are closed; both earlier passes retained below. Record: bench/upstream/zsv1/thermos-review.md, Text-only confirm of revision 2. No speed claim, fork push, PR or upstream post; posting still requires the usual approval."
 passes:
   - reviewer: thermos-sol
     orb: "T-01a1ef67-4308-7296-a24a-80471f35f540"
@@ -91,7 +91,9 @@ ZJIT stats per iteration for lobsters:
 
 ## For Thomas
 
-The body above and the comment draft are **approved with no must-fixes** for unchanged head `47b2ed7110`.
+Rebased as `ca3ea90482` on master `3b188d0dd5` (range-diff `=`, lobsters −584 unchanged, body unchanged;
+[results-3.md](../../zsv1/results-3.md)); thermos-sol and Astra still need to approve that exact head before it opens as a draft.
+The body above and the comment draft are **approved with no must-fixes** for head `47b2ed7110`.
 The [text-only confirm](../../zsv1/thermos-review.md#text-only-confirm-of-revision-2-2026-11-18) closes the final
 wording finding and carries forward the code, comments, message and packaging review. The retained stats
 support lobsters -584 generic writes per iteration, not a speed claim or a claim about every other app's

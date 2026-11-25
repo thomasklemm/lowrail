@@ -1,0 +1,6 @@
+-ccall_rb_vm_setinstancevariable: 11,345
++ccall_rb_vm_setinstancevariable: 10,761 (-584)
+-dynamic_setivar_count: 11,405
++dynamic_setivar_count: 10,821 (-584)
+-setivar_fallback_no_side_exits: 5,956
++setivar_fallback_no_side_exits: 5,372 (-584)

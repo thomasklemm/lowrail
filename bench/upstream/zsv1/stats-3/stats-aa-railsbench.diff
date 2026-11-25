@@ -1,0 +1,4 @@
+-ccall_rb_ec_ary_new_from_values: 4,366
++ccall_rb_ec_ary_new_from_values: 4,569 (+204)
+-ccall_rb_hash_new: 2,657
++ccall_rb_hash_new: 2,889 (+232)
