@@ -1,0 +1,14 @@
+{"ruby":"4.0.9","rails":"8.1.4.1","sqlite":"3.35.5"}
+{"check":"raw_sql","result":"first"}
+{"check":"columns","result":["id","name"]}
+{"check":"table_exists","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_column_names","result":["id","name"]}
+{"check":"model_primary_key","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_find","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_create","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"table_create","result":["id"]}
+{"connect_version":"3.35.5","connected":true}
+{"connect_version":"3.36.0","connected":true}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}

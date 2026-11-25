@@ -1,0 +1,147 @@
+commit 183262f44056c9b860cb0921b2c596a2e183653d
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed Nov 25 23:08:24 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed Nov 25 23:08:24 2026 +0000
+
+    Bump the minimum supported SQLite version to 3.37.0
+    
+    SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+    The SQLite3 adapter has read it in `data_source_sql` since #52354
+    (released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+    `tables`, `views` and the schema cache.
+    
+    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, these
+    fail with "no such table: pragma_table_list", so creating the
+    `schema_migrations` table, `db:prepare` and loading a model's primary
+    key all raise.
+    
+    Make the requirement explicit by raising in `check_version` when the
+    server is older than 3.37.0.
+
+ activerecord/CHANGELOG.md                                     |  9 +++++++++
+ .../lib/active_record/connection_adapters/sqlite3_adapter.rb  |  4 ++--
+ .../test/cases/adapters/sqlite3/sqlite3_adapter_test.rb       | 11 +++++++++++
+ 3 files changed, 22 insertions(+), 2 deletions(-)
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 76e81488e7..1aea542779 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.37.0.
++
++    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
++    has used to list tables and views since Rails 8.0 (#52354). On older
++    versions `table_exists?`, `tables`, migrations and the schema cache fail
++    with "no such table: pragma_table_list"; make the requirement explicit.
++
++    *Thomas Klemm*
++
+ *   Fix lazily loading a `disable_joins` association ignoring the rest of its
+     scope, such as `select`, `limit`, `includes`, `readonly`, and
+     `strict_loading`.
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 0da5ffeadb..c8d8bf505a 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -516,8 +516,8 @@ module ActiveRecord
+       end
+ 
+       def check_version # :nodoc:
+-        if database_version < "3.35.0"
+-          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
++        if database_version < "3.37.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
+         end
+       end
+ 
+diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+index 3dac5cca5f..10deb18a0b 100644
+--- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+@@ -170,6 +170,17 @@ module ActiveRecord
+         assert @conn, "should have connection"
+       end
+ 
++      def test_check_version_requires_sqlite_3_37
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.36.0")) do
++          error = assert_raises(RuntimeError) { @conn.check_version }
++          assert_equal "Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.", error.message
++        end
++
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.37.0")) do
++          assert_nil @conn.check_version
++        end
++      end
++
+       # sqlite3 defaults to UTF-8 encoding
+       def test_encoding
+         assert_equal "UTF-8", @conn.encoding
+
+--- Existing floor references (base) ---
+actionmailbox/test/dummy/config/database.yml:1:# SQLite. Versions 3.8.0 and up are supported.
+actiontext/test/dummy/config/database.yml:1:# SQLite. Versions 3.8.0 and up are supported.
+activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:520:          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:812:          # SQLite 3.8.2 returns a newly formatted error message:
+activestorage/test/dummy/config/database.yml:1:# SQLite. Versions 3.8.0 and up are supported.
+guides/source/4_1_release_notes.md:556:* Enable partial indexes for `sqlite >= 3.8.0`.
+guides/source/6_0_release_notes.md:452:*   Bump the minimum version of the `sqlite3` gem to 1.4.
+guides/source/6_0_release_notes.md:593:*   Bump the minimum SQLite version to 3.8.
+railties/lib/rails/generators/rails/app/templates/config/databases/sqlite3.yml.tt:1:# SQLite. Versions 3.8.0 and up are supported.
+
+--- Shape of prior floor bump ---
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 47482d874e..c74b1fb635 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.35.0.
++
++    SQLite 3.35.0 introduced the `RETURNING` clause, which the SQLite3 adapter
++    has depended on since Rails 7.1 (#49290) for reading auto-populated columns
++    such as the primary key after `INSERT`. Older SQLite versions have been
++    silently broken since then; make the requirement explicit.
++
++    *Ryuta Kamizono*
++
+ *   Deprecate the `insert_returning` option in PostgreSQL database
+     configurations, and the `PostgreSQLAdapter#use_insert_returning?` method.
+ 
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 125492c67a..cc709b482d 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -243,11 +243,11 @@ module ActiveRecord
+       end
+ 
+       def supports_insert_returning?
+-        database_version >= "3.35.0"
++        true
+       end
+ 
+       def supports_insert_on_conflict?
+-        database_version >= "3.24.0"
++        true
+       end
+       alias supports_insert_on_duplicate_skip? supports_insert_on_conflict?
+       alias supports_insert_on_duplicate_update? supports_insert_on_conflict?
+@@ -258,7 +258,7 @@ module ActiveRecord
+       end
+ 
+       def supports_virtual_columns?
+-        database_version >= "3.31.0"
++        true
+       end
+ 
+       def connected?
+@@ -536,8 +536,8 @@ module ActiveRecord
+       end
+ 
+       def check_version # :nodoc:
+-        if database_version < "3.23.0"
+-          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
++        if database_version < "3.35.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+         end
+       end
+ 

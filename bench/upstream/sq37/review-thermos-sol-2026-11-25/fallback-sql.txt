@@ -1,0 +1,36 @@
+--- SQLite 3.35.5 ---
+Error: no such table: pragma_table_list
+ordinary|table
+searchables|table
+searchables_config|table
+searchables_content|table
+searchables_data|table
+searchables_docsize|table
+searchables_idx|table
+exit=1
+--- SQLite 3.36.0 ---
+Error: no such table: pragma_table_list
+ordinary|table
+searchables|table
+searchables_config|table
+searchables_content|table
+searchables_data|table
+searchables_docsize|table
+searchables_idx|table
+exit=1
+--- SQLite 3.37.0 ---
+ordinary|table
+searchables|table
+searchables_config|table
+searchables_content|table
+searchables_data|table
+searchables_docsize|table
+searchables_idx|table
+ordinary|table
+searchables|virtual
+searchables_config|shadow
+searchables_content|shadow
+searchables_data|shadow
+searchables_docsize|shadow
+searchables_idx|shadow
+exit=0

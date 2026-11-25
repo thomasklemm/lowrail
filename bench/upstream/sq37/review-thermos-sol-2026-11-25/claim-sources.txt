@@ -1,0 +1,199 @@
+SQ37 review claim sources, fetched 2026-11-25
+
+--- v8.0.0 floor ---
+      def check_version # :nodoc:
+        if database_version < "3.8.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.8."
+        end
+      end
+
+--- v8.1.4.1 floor ---
+      def check_version # :nodoc:
+        if database_version < "3.23.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
+        end
+      end
+{"body":"SQLite 3.35.0 introduced the `RETURNING` clause. The SQLite3 adapter has depended on it since #49290 (released in Rails 7.1) for reading auto-populated columns such as the primary key after `INSERT`, because that PR removed the previous `@raw_connection.last_insert_row_id` fallback path.\r\n\r\nOlder SQLite versions have been silently broken since — `record.id` ends up as nil on 3.23.0 .. 3.34.x because `sql_for_insert` skips the RETURNING clause when `supports_insert_returning?` is false, leaving `last_inserted_id` with an empty result to read from.\r\n\r\nMake the requirement explicit by raising in `check_version` when the server is older than 3.35.0.\r\n","merge_commit_sha":"f652cc1648b954d546cfafb8ec4436ff9ff513ca","merged_at":"2026-07-29T02:19:08Z","title":"Bump the minimum supported SQLite version to 3.35.0"}
+{"body":"### Motivation / Background\r\n\r\nAs [discussed on rubyonrails-core](https://discuss.rubyonrails.org/t/proposal-sqlite3-full-text-search-and-other-virtual-tables-do-not-dump-shadow-virtual-tables/86159) with @flavorjones.\r\n\r\nSQLite is a great default database, and even provides a [full-text-search module, `fts5`](https://www.sqlite.org/fts5.html). However, `fts5` is a [virtual table module](https://www.sqlite.org/vtab.html) which messes up `schema.rb`. For example, if you create virtual table `searchables` in a migration:\r\n\r\n```ruby\r\nclass CreateSearchablesTable \u003c ActiveRecord::Migration[8.0]\r\n  def up\r\n    execute 'CREATE VIRTUAL TABLE searchables USING fts5(content)'\r\n  end\r\nend\r\n```\r\nand run `rails db:migrate`, then 6 tables are created, 1 `virtual` and 5 \"`shadow`\" tables. This is what the result of `SELECT * FROM pragma_table_list ORDER BY name` (relevant part) looks like:\r\n| schema | name | type | ncol | wr | strict |\r\n| - | - | - | - | - | - |\r\n| main | searchables | virtual | 3 | 0 | 0 |\r\n| main | searchables_config | shadow | 2 | 1 | 0 |\r\n| main | searchables_content | shadow | 2 | 0 | 0 |\r\n| main | searchables_data | shadow | 2 | 0 | 0 |\r\n| main | searchables_docsize | shadow | 2 | 0 | 0 |\r\n| main | searchables_idx | shadow | 3 | 1 | 0 |\r\n\r\nWhile these tables look like regular tables, they should not be dumped in the same way. In `schema.rb` there are error messages for some of them (notably the virtual table) while a few shadow tables are dumped like regular tables:\r\n\r\n```ruby\r\n# Could not dump table \"searchables\" because of following StandardError\r\n#   Unknown type '' for column 'content'\r\n\r\n# Could not dump table \"searchables_config\" because of following StandardError\r\n#   Unknown type '' for column 'k'\r\n\r\n# Could not dump table \"searchables_content\" because of following StandardError\r\n#   Unknown type '' for column 'c0'\r\n\r\n  create_table \"searchables_data\", force: :cascade do |t|\r\n    t.binary \"block\"\r\n  end\r\n\r\n  create_table \"searchables_docsize\", force: :cascade do |t|\r\n    t.binary \"sz\"\r\n  end\r\n\r\n# Could not dump table \"searchables_idx\" because of following StandardError\r\n#   Unknown type '' for column 'segid'\r\n```\r\nThis will put the app into a bad state if you run `rails db:reset`, with some shadow tables as regular tables and the virtual table missing entirely:\r\n\r\n| schema | name | type | ncol | wr | strict |\r\n| - | - | - | - | - | - |\r\n| main | searchables_data | table | 2 | 0 | 0\r\n| main | searchables_docsize | table | 2 | 0 | 0\r\n\r\nThe proper way to dump a virtual table to `schema.rb` would be to ignore the \"shadow\" tables and only create the virtual table (which in turn will create the shadow tables).\r\n\r\n### Detail\r\n\r\nThis PR tries to provide general SQLite3 virtual table support using `create_virtual_table` and `drop_virtual_table`. While `drop_virtual_table` is basically `drop_table` (since dropping a virtual table also drops connected shadow tables), it allows the `CommandRecorder` to reverse `drop_virtual_table`.\r\n\r\nIt will dump virtual tables to `schema.rb` and ignore shadow tables. For example:\r\n```sql\r\nCREATE VIRTUAL TABLE searchables USING fts5(content, meta UNINDEXED, tokenize = 'porter ascii');\r\n```\r\nwill append to `schema.rb`:\r\n```ruby\r\ncreate_virtual_table \"searchables\", \"fts5\", [\"content\", \"meta UNINDEXED\", \"tokenize='porter ascii'\"]\r\n```\r\n\r\nNotable changes:\r\n\r\n* In order to filter out `virtual`/`shadow` tables from the regular table dump, I had to use `pragma_table_list` instead of `sqlite_master` in `ActiveRecord::ConnectionAdapters::SQLite3::SchemaStatements` because the schema table `sqlite_master` lacks virtual/shadow type information.\r\n* I have added 2 new methods to the abstract adapter, but they are only used by the sqlite3 adapter. This is based on the postgresql enum implementation.\r\n\r\n### Checklist\r\n\r\nBefore submitting the PR make sure the following are checked:\r\n\r\n* [x] This Pull Request is related to one change. Unrelated changes should be opened in separate PRs.\r\n* [x] Commit message has a detailed description of what changed and why. If this PR fixes a related issue include it in the commit message. Ex: `[Fix #issue-number]`\r\n* [x] Tests are added or updated if you fix a bug or add a feature.\r\n* [x] CHANGELOG files are updated for the changed libraries if there is a behavior change or additional feature. Minor bug fixes and documentation changes should not be included.\r\n","merge_commit_sha":"534b4ab2a65048c5eb558af2ef8ddcd93ff8d88d","merged_at":"2024-08-26T17:49:11Z","title":"Add support for SQLite3 full-text-search and other virtual tables"}
+
+--- sqlite3 v2.10.2 dependencies.yml ---
+sqlite3:
+  # checksum verified by first checking the published sha3(256) checksum against https://sqlite.org/download.html:
+  # b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4
+  #
+  # $ openssl dgst -sha3-256 -r ports/archives/sqlite-autoconf-3540100.tar.gz
+  # b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4 *ports/archives/sqlite-autoconf-3540100.tar.gz
+  #
+  # $ sha256sum ports/archives/sqlite-autoconf-3540100.tar.gz
+  # 926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e  ports/archives/sqlite-autoconf-3540100.tar.gz
+  version: "3.54.1"
+  files:
+    - url: "https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz"
+      sha256: "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e"
+
+--- sqlite3 v2.10.2 INSTALLATION.md ---
+
+# Installation and Using SQLite3 extensions
+
+This document will help you install the `sqlite3` ruby gem. It also contains instructions on loading database extensions and building against drop-in replacements for sqlite3.
+
+## Installation
+
+### Native Gems (recommended)
+
+In v2.5.0 and later, native (precompiled) gems are available for recent Ruby versions on these platforms:
+
+- `aarch64-linux-gnu` (requires: glibc >= 2.29)
+- `aarch64-linux-musl`
+- `arm-linux-gnu` (requires: glibc >= 2.29)
+- `arm-linux-musl`
+- `arm64-darwin`
+- `x64-mingw-ucrt`
+- `x86-linux-gnu` (requires: glibc >= 2.29)
+- `x86-linux-musl`
+- `x86_64-darwin`
+- `x86_64-linux-gnu` (requires: glibc >= 2.29)
+- `x86_64-linux-musl`
+
+⚠ Musl linux users should update to Bundler >= 2.5.6 to avoid https://github.com/rubygems/rubygems/issues/7432
+
+If you are using one of these Ruby versions on one of these platforms, the native gem is the recommended way to install sqlite3-ruby.
+
+For example, on a linux system running Ruby 3.4:
+
+``` text
+$ ruby -v
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+
+$ time gem install sqlite3
+Fetching sqlite3-2.8.1-x86_64-linux-gnu.gem
+Successfully installed sqlite3-2.8.1-x86_64-linux-gnu
+1 gem installed
+
+real    0m1.273s
+user    0m0.496s
+sys     0m0.078s
+```
+
+#### Avoiding the precompiled native gem
+
+The maintainers strongly urge you to use a native gem if at all possible. It will be a better experience for you and allow us to focus our efforts on improving functionality rather than diagnosing installation issues.
+
+If you're on a platform that supports a native gem but you want to avoid using it in your project, do one of the following:
+
+- If you're not using Bundler, then run `gem install sqlite3 --platform=ruby`
+- If you are using Bundler
+  - version 2.3.18 or later, you can specify [`gem "sqlite3", force_ruby_platform: true`](https://bundler.io/v2.3/man/gemfile.5.html#FORCE_RUBY_PLATFORM)
+  - version 2.1 or later, then you'll need to run `bundle config set force_ruby_platform true`
+  - version 2.0 or earlier, then you'll need to run `bundle config force_ruby_platform true`
+
+
+### Compiling the source gem
+
+If you are on a platform or version of Ruby that is not covered by the Native Gems, then the vanilla "ruby platform" (non-native) gem will be installed by the `gem install` or `bundle` commands.
+
+
+#### Packaged libsqlite3
+
+By default, as of v1.5.0 of this library, the latest available version of libsqlite3 is packaged with the gem and will be compiled and used automatically. This takes a bit longer than the native gem, but will provide a modern, well-supported version of libsqlite3.
+
+⚠ A prerequisite to build the gem with the packaged sqlite3 is that you must have `pkgconf` installed.
+
+For example, on a linux system running Ruby 2.5:
+
+``` text
+$ ruby -v
+ruby 2.5.9p229 (2021-04-05 revision 67939) [x86_64-linux]
+
+$ time gem install sqlite3
+Building native extensions. This could take a while...
+Successfully installed sqlite3-1.5.0
+1 gem installed
+
+real    0m20.620s
+user    0m23.361s
+sys     0m5.839s
+```
+
+##### Controlling compilation flags for sqlite
+
+Upstream sqlite allows for the setting of some parameters at compile time. If you're an expert and would like to set these, you may do so at gem install time in two different ways ...
+
+**If you're installing the gem using `gem install`** then you can pass in these compile-time flags like this:
+
+``` sh
+gem install sqlite3 --platform=ruby -- \
+  --with-sqlite-cflags="-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444"
+```
+
+or the equivalent:
+
+``` sh
+CFLAGS="-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444" \
+  gem install sqlite3 --platform=ruby
+```
+
+**If you're installing the gem using `bundler`** then you should first pin the gem to the "ruby" platform gem, so that you are compiling from source:
+
+``` ruby
+# Gemfile
+gem "sqlite3", force_ruby_platform: true # requires bundler >= 2.3.18
+```
+
+and then set up a bundler config parameter for `build.sqlite3`:
+
+``` sh
+bundle config set build.sqlite3 \
+  "--with-sqlite-cflags='-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444'"
+```
+
+NOTE the use of single quotes within the double-quoted string to ensure the space between compiler flags is interpreted correctly. The contents of your `.bundle/config` file should look like:
+
+``` yaml
+---
+BUNDLE_BUILD__SQLITE3: "--with-sqlite-cflags='-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444'"
+```
+
+
+#### System libsqlite3
+
+If you would prefer to build the sqlite3-ruby gem against your system libsqlite3, which requires that you install libsqlite3 and its development files yourself, you may do so by using the `--enable-system-libraries` flag at gem install time.
+
+PLEASE NOTE:
+
+- you must avoid installing a precompiled native gem (see [previous section](#avoiding-the-precompiled-native-gem))
+- only versions of libsqlite3 `>= 3.5.0` are supported,
+- and some library features may depend on how your libsqlite3 was compiled.
+
+For example, on a linux system running Ruby 2.5:
+
+``` text
+$ time gem install sqlite3 -- --enable-system-libraries
+Building native extensions with: '--enable-system-libraries'
+This could take a while...
+Successfully installed sqlite3-1.5.0
+1 gem installed
+
+real    0m4.234s
+user    0m3.809s
+sys     0m0.912s
+```
+
+If you're using bundler, you can opt into system libraries like this:
+
+``` sh
+bundle config build.sqlite3 --enable-system-libraries
+```
+
+If you have sqlite3 installed in a non-standard location, you may need to specify the location of the include and lib files by using `--with-sqlite-include` and `--with-sqlite-lib` options (or a `--with-sqlite-dir` option, see [MakeMakefile#dir_config](https://ruby-doc.org/stdlib-3.1.1/libdoc/mkmf/rdoc/MakeMakefile.html#method-i-dir_config)). If you have pkg-config installed and configured properly, this may not be necessary.
+
+``` sh
+gem install sqlite3 -- \
+  --enable-system-libraries \
+  --with-sqlite3-include=/opt/local/include \
+  --with-sqlite3-lib=/opt/local/lib
+```
+
+
+#### System libsqlcipher
+

@@ -1,0 +1,11 @@
+source "https://rubygems.org"
+%w[activesupport activemodel activerecord activejob actionview actionpack railties].each do |component|
+  gem component, path: File.join(__dir__, "rails-8.1.4.1", component)
+end
+gem "sqlite3", ">= 2.1", force_ruby_platform: true
+gem "minitest", "~> 6.0"
+gem "minitest-mock"
+gem "json"
+gem "uri"
+gem "rack"
+gem "zeitwerk"

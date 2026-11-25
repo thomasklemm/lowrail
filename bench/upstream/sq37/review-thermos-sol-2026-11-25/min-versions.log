@@ -1,0 +1,13 @@
+min-versions: head changes the sqlite floor: 3.35.0 -> 3.37.0
+min-versions: building sqlite-3.35.5 (sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1)
+min-versions: building sqlite-3.44.2 (sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1)
+min-versions: building sqlite-3.36.0 (sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1)
+min-versions: building sqlite-3.37.0 (sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1)
+min-versions: SQLite 3.35.5 (floor, Ruby 4.0.9): base
+min-versions: SQLite 3.35.5 (floor, Ruby 4.0.9): head
+min-versions: SQLite 3.44.2 (middle, Ruby 4.0.9): base
+min-versions: SQLite 3.44.2 (middle, Ruby 4.0.9): head
+min-versions: SQLite 3.36.0 (extra, Ruby 4.0.9): base
+min-versions: SQLite 3.36.0 (extra, Ruby 4.0.9): head
+min-versions: SQLite 3.37.0 (extra, Ruby 4.0.9): base
+min-versions: SQLite 3.37.0 (extra, Ruby 4.0.9): head

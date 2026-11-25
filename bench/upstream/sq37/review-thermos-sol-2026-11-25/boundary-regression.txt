@@ -1,0 +1,30 @@
+--- New boundary test with f785381cca8621772cba659ff93f825eb7f99942 libraries ---
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n test_check_version_requires_sqlite_3_37 --seed 41231
+
+# Running:
+
+F
+
+Finished in 0.014780s, 67.6606 runs/s, 67.6606 assertions/s.
+
+  1) Failure:
+ActiveRecord::ConnectionAdapters::SQLite3AdapterTest#test_check_version_requires_sqlite_3_37 [/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/183262f44056c9b860cb0921b2c596a2e183653d/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb:175]:
+RuntimeError expected but nothing was raised.
+
+1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+exit=1
+--- New boundary test with 183262f44056c9b860cb0921b2c596a2e183653d libraries ---
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n test_check_version_requires_sqlite_3_37 --seed 41231
+
+# Running:
+
+.
+
+Finished in 0.002665s, 375.1675 runs/s, 1125.5025 assertions/s.
+
+1 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+exit=0

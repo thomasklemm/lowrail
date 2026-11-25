@@ -1,0 +1,84 @@
+
+Fedora f35
+# bcond default logic is nicely backwards...
+%bcond_without tcl
+%bcond_without sqldiff
+%bcond_with static
+%bcond_without check
+
+%define realver 3360000
+%define docver 3360000
+%define rpmver 3.36.0
+%define year 2021
+
+Summary: Library that implements an embeddable SQL database engine
+
+Fedora f36
+# bcond default logic is nicely backwards...
+%bcond_without tcl
+%bcond_without sqldiff
+%bcond_with static
+%bcond_without check
+
+%define realver 3360000
+%define docver 3360000
+%define rpmver 3.36.0
+%define year 2021
+
+Summary: Library that implements an embeddable SQL database engine
+
+Alpine 3.14-stable
+# Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+pkgname=sqlite
+# NOTE: pkgver needs to correspond with sqlite-tcl
+pkgver=3.35.5
+pkgrel=0
+pkgdesc="C library that implements an SQL database engine"
+url="https://www.sqlite.org/"
+arch="all"
+license="Public-Domain"
+makedepends="readline-dev"
+subpackages="$pkgname-static $pkgname-doc $pkgname-dev $pkgname-libs"
+
+# compute _ver
+
+Alpine 3.15-stable
+# Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+pkgname=sqlite
+# NOTE: pkgver needs to correspond with sqlite-tcl
+pkgver=3.36.0
+pkgrel=0
+pkgdesc="C library that implements an SQL database engine"
+url="https://www.sqlite.org/"
+arch="all"
+license="blessing"
+makedepends="readline-dev"
+subpackages="$pkgname-static $pkgname-doc $pkgname-dev $pkgname-libs"
+
+# compute _ver
+
+alpine-linux EOL
+[
+  {
+    "cycle": "3.15",
+    "eol": "2023-11-01"
+  },
+  {
+    "cycle": "3.14",
+    "eol": "2023-05-01"
+  }
+]
+
+fedora EOL
+[
+  {
+    "cycle": "36",
+    "eol": "2023-05-16"
+  },
+  {
+    "cycle": "35",
+    "eol": "2022-12-13"
+  }
+]

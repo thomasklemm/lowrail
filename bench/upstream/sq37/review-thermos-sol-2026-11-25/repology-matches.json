@@ -1,0 +1,146 @@
+[
+  {
+    "repo": "fedora_39",
+    "visiblename": "mingw-sqlite",
+    "version": "3.36.0.0",
+    "status": "outdated"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.35",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35.1",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35.2",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.35.2",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35.3",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.35.3",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35.4",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.35.4",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.35.5",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.35.5",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite",
+    "version": "3.36",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable",
+    "visiblename": "SQLite Source",
+    "version": "3.36",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35.1",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35.2",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35.3",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35.4",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.35.5",
+    "status": "legacy"
+  },
+  {
+    "repo": "npackd_stable64",
+    "visiblename": "SQLite 64 bit",
+    "version": "3.36",
+    "status": "legacy"
+  },
+  {
+    "repo": "xrepo",
+    "visiblename": "sqlite3",
+    "version": "3.35.0+300",
+    "status": "legacy"
+  },
+  {
+    "repo": "xrepo",
+    "visiblename": "sqlite3",
+    "version": "3.35.0+400",
+    "status": "legacy"
+  },
+  {
+    "repo": "xrepo",
+    "visiblename": "sqlite3",
+    "version": "3.36.0+0",
+    "status": "legacy"
+  }
+]

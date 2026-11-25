@@ -1,0 +1,42 @@
+/bin/bash: line 1: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+   216	          def data_source_sql(name = nil, type: nil)
+   217	            scope = quoted_scope(name, type: type)
+   218	            scope[:type] ||= "'table','view'"
+   219	
+   220	            sql = +"SELECT name FROM pragma_table_list WHERE schema <> 'temp'"
+   221	            sql << " AND name NOT IN ('sqlite_sequence', 'sqlite_schema')"
+   222	            sql << " AND name = #{scope[:name]}" if scope[:name]
+   223	            sql << " AND type IN (#{scope[:type]})"
+   224	            sql
+   225	          end
+   518	      def check_version # :nodoc:
+   519	        if database_version < "3.35.0"
+   520	          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+   521	        end
+   522	      end
+
+--- Change release placement ---
+{"object":{"sha":"c694e575cf0f8d9926f5fccbce28023fb3c5eab5","type":"tag","url":"https://api.github.com/repos/rails/rails/git/tags/c694e575cf0f8d9926f5fccbce28023fb3c5eab5"},"ref":"refs/tags/v8.0.0"}
+{"object":{"sha":"40179933e3c89626291a29b6e1a7f9b726d55e19","type":"tag","url":"https://api.github.com/repos/rails/rails/git/tags/40179933e3c89626291a29b6e1a7f9b726d55e19"},"ref":"refs/tags/v8.1.4.1"}
+
+--- Earliest gem allowed by main (v2.1.0) ---
+  # 67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071  ports/archives/sqlite-autoconf-3460100.tar.gz
+  version: "3.46.1"
+  files:
+    - url: "https://sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
+      sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+
+--- 3.37.0 db:prepare results ---
+f785381cca8621772cba659ff93f825eb7f99942
+ar_internal_metadata
+schema_migrations
+sqlite_sequence
+widgets
+20261125000000
+183262f44056c9b860cb0921b2c596a2e183653d
+ar_internal_metadata
+schema_migrations
+sqlite_sequence
+widgets
+20261125000000

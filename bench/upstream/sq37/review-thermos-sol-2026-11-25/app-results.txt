@@ -1,0 +1,29 @@
+--- f785381cca8621772cba659ff93f825eb7f99942 / SQLite 3.36.0 ---
+bin/rails aborted!
+ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+
+Caused by:
+SQLite3::SQLException: no such table: pragma_table_list: (SQLite3::SQLException)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)
+exit=1
+--- f785381cca8621772cba659ff93f825eb7f99942 / SQLite 3.37.0 ---
+== 20261125000000 CreateWidgets: migrating ====================================
+-- create_table(:widgets)
+   -> 0.0009s
+== 20261125000000 CreateWidgets: migrated (0.0013s) ===========================
+
+exit=0
+--- 183262f44056c9b860cb0921b2c596a2e183653d / SQLite 3.36.0 ---
+bin/rails aborted!
+Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)
+exit=1
+--- 183262f44056c9b860cb0921b2c596a2e183653d / SQLite 3.37.0 ---
+exit=0
