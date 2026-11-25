@@ -59,7 +59,11 @@ module Lowrail
       @top = top
       @ledger = ledger if ledger && File.exist?(ledger)
       @runs = Dir["#{dir}/run*"].select { File.directory?(_1) }.sort_by { _1[/\d+\z/].to_i }.map { load_run(_1) }
-      raise "no runs with requests, jobs or mails under #{dir}" if @runs.empty? || @runs.all? { _1[:windows].values.sum == 0 }
+      if @runs.empty? || @runs.all? { _1[:windows].values.sum == 0 }
+        raise "no runs with requests, jobs or mails under #{dir} (a request counts when it goes through the app, as in " \
+          "integration, request and system tests; controller tests and controller specs call the controller directly " \
+          "and are not counted)"
+      end
     end
 
     def load_run(path)

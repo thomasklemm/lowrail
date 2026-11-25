@@ -220,7 +220,10 @@ Each is checked by a test in this gem or on the apps below.
   Debian/Ubuntu, Xcode Command Line Tools on macOS).
 * *no runs with requests, jobs or mails*: the command served no request through `Rails.application` (unit tests
   only, a server started in another process, or a warm Spring server: bypass it with `DISABLE_SPRING=1`). Profile
-  integration, controller, request or system tests.
+  integration, request or system tests. Controller tests (`ActionController::TestCase`, rspec-rails controller
+  specs) call the controller directly, without the app's middleware and routing, and are not counted: a suite of
+  only those counts no requests, and in a mixed suite the report covers its integration tests alone. Rails'
+  generated `test/controllers` tests are integration tests and are counted.
 * *exists and was not created by lowrail-profile*: pick another `--out`; it never clears a directory it did not make.
 * Overhead: the first run counts (4–9% of suite time on the four apps measured), the second also walks the stack
   per allocation (31–87%, most on allocation-heavy suites such as Campfire's). Measured per app in the evidence.

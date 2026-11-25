@@ -855,6 +855,7 @@ class ProfileTest < Minitest::Test
       out, err, = profile(dir, "--out", "profile", "--runs", "1", "--", RUBY, "-e", "p ARGV", "--", "--workloads", "--out", "x")
       assert_equal "[\"--workloads\", \"--out\", \"x\"]\n", out, err
       assert_match(/no report: no runs with requests/, err)
+      assert_match(/controller tests and controller specs call the controller directly and are not counted/, err)
     end
   end
 end

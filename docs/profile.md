@@ -41,7 +41,7 @@ gem "lowrail-profile", git: "https://github.com/thomasklemm/lowrail", glob: "gem
 Then, from the app directory:
 
 ```sh
-bundle exec lowrail-profile -- bin/rails test                      # Minitest: integration, controller, system tests
+bundle exec lowrail-profile -- bin/rails test                      # Minitest: integration and system tests (not ActionController::TestCase)
 bundle exec lowrail-profile -- bundle exec rspec spec/requests       # RSpec
 bundle exec lowrail-profile --record -- bin/rails test             # the same, and write lowrail/workloads.rb from it
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
