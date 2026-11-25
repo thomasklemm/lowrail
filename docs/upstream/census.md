@@ -363,7 +363,7 @@ sqlite3, pg, herb) to their source builds there, and that must not change the re
 **Ruby comparisons.** Give each Ruby its own labels and its own A/A pair, for example
 `run --label m409 --aa --ruby 4.0.9` and `run --label master --aa --ruby ~/rubies/master`. Then run
 `compare --base m4092 --aa m409 master`. Labels never mix Ruby pins: census 8 moved from 4.0.7 to 4.0.9
-([decision](../DECISIONS.md#ruby-pin-409-41-measured-on-pinned-master-2026-11-03)), and 4.0.7 receipts are not compared with 4.0.9 runs. `compare` prints each label's Rails commit and `RUBY_DESCRIPTION` first.
+([decision](../DECISIONS.md#evidence-and-measurement)), and 4.0.7 receipts are not compared with 4.0.9 runs. `compare` prints each label's Rails commit and `RUBY_DESCRIPTION` first.
 **JIT comparisons:** `compare --base base2:interpreter base2:yjit` pairs the same app across modes. `--modes zjit`
 needs a Ruby built with ZJIT. The mise build of 4.0.9 here has none (built without rustc); use a ZJIT build such
 as Ruby master.

@@ -1,18 +1,10 @@
 # Decision register
 
 What we pursue, what is parked and what is rejected, with the reason. Numbers live in the linked docs; this page
-records the rule and why. Rules are grouped by topic, with a date or owner only where it decides something. The
-parked runtime-lowering prototype's decisions are in [decisions-prototype.md](decisions-prototype.md). Earlier
-wording of these rules is in git history (before 2026-11-03 19:00 UTC).
-
-## Bet: what our merged Rails PRs add up to (2026-11-04)
-
-Main against main with 39 of our merged perf PRs reverted (five conflict and stay in both trees), Ruby 4.0.9, fixed
-heap ([merged-sum](upstream/merged-sum.md)): census allocations −3.8% per workload in five apps (A/A ≤ 0.04%, 52/52
-workloads move), ruby-bench −1.2% to −9.7% objects per iteration, and −2.0% to −7.0% instructions on erubi-rails,
-railsbench and shipit (A/A ≤ 0.54%). Lobsters' ruby-bench instructions and every app-level YJIT row fail their A/A
-and are not claimed. Ten PR groups carry 85% of the allocations; the WhereClause and database-statement groups lead.
-For our own picture; nothing posted.
+records the rules in force and why, each stated once and grouped by topic, with a date or owner only where it
+decides something. Superseded wording, one-off exceptions for items already opened or closed, status notes and the
+incidents behind the rules moved to [decisions-archive.md](decisions-archive.md) on 2026-11-25. The parked
+runtime-lowering prototype's decisions are in [decisions-prototype.md](decisions-prototype.md).
 
 ## Lowrail reoriented toward upstream fixes and advisory types (2026-11-02)
 
@@ -32,6 +24,60 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 **Prefer broad, idiomatic patterns** that every app runs (`where`, SELECT compilation, `tag.*`, params/enum
 `fetch`, block forwarding) over single-app hotspots. App numbers are breadth evidence, not the headline.
 
+## Performance across the stack, compatibility as inventory (Thomas, 2026-11-05 night)
+
+* **Main topic again: performance across the whole stack** (Ruby runtime and GC, C extensions and drivers, Rack
+  and Puma, Rails, the gems apps use). YJIT is the production reference; interpreter numbers alone don't carry a claim.
+* **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta. The Rails-internal design can
+  still change, and then we decide what to fix in Rails and what outside. Until then such findings go into an
+  inventory with callers and proposed fixes.
+* **Only PRs with large relevance open** (Thomas, 2026-11-05 night). A candidate opens only if its effect reaches
+  many apps or a widely used gem, or a whole request, test run or ruby-bench benchmark moves measurably. Small
+  per-call wins in niche gems or rare paths, and fixes for niche gems (scimitar#172 was the example), are recorded,
+  not opened. Every item states its reach in `impact` (who runs it, how often, how much of a request) before review.
+  Such ideas stay with us as `held` queue items ("parked idea" in the note) and are not opened later as they are.
+* **Focus on Rails, central gems and Ruby; no ecosystem fixing** (Thomas, 2026-11-06). Fixing the Rails ecosystem
+  for 8.2 isn't our job. We don't open fixes in individual apps or niche gems for Rails-main breakage (Zammad,
+  authlogic, Mastodon: recorded in [contributions](upstream/contributions.md), not submitted). Upstream work goes
+  where it reaches every Rails app: Rails, the central gems (Rack, drivers, Puma and the like), Ruby, ruby-bench.
+* **Projects with restrictive AI policies get no upstream reports or fixes** (Thomas, 2026-11-06), for example
+  Mastodon (Assisted-by trailer, human-written descriptions, no agent-opened PRs). We still use them as
+  measurement corpus and record what we find.
+* **Current versions only; no fixes for old pins** (Thomas, 2026-11-06). A break that only shows up with an old,
+  long-superseded dependency version (an ancient minitest pin in a gem's dev dependencies, for example) is not
+  worth a PR, even if the old version is inside a declared range. Evidence and fixes target what apps actually run:
+  current releases of Rails, Ruby and gems.
+
+## Bets
+
+Priorities (Thomas, 2026-11-03): Rails and ZJIT first, then gems. Parked: types/MCP, YJIT, ruby/uri, the Campfire
+lead. States change often; each bet's doc is the source of truth.
+
+* **Three big bets in parallel** (Thomas, 2026-11-25: "wir können überall tief reingehen"): ZJIT gaps on real Rails apps beyond k0kubun's zjit-headline2 (zjit-gap-census-2), unreleased Rails 8.2 regressions (rails-main-census-11), and lowrail-profile as a tool for any Rails app (plan first). The coordinator runs and reviews them; upstream posts still need Thomas.
+* **Next bets after the first three** (Thomas, 2026-11-25 evening): (a) run lowrail-profile on 5-8 unfamiliar open-source Rails apps and turn costly gem lines into upstream fixes; (b) correctness before Ruby 4.1: weekly differential of the census app suites on Ruby master (interpreter, YJIT, ZJIT) and on zjit-headline2, minimized and bisected; (c) a list of our open rails/rails PRs that could close or be bundled, for Thomas to decide; (d) Lowrail tooling: an ownership check before opening, raw-data retention before archiving a thread, and a trailer-refusing pre-push hook in fork checkouts. ZJIT performance asks pause: zjit-headline2 is ahead of YJIT on every measured app (zjit-gap-census-2).
+* **lowrail-profile 0.1** (Thomas, 2026-11-25, all six recommendations of docs/profile-release-plan.md): a second gemspec `lowrail-profile` in gem/ without lowering code; published on rubygems.org; floor Ruby 3.3 and Rails 7.2 if M2 holds, otherwise 4.0 and 8.1; --record and --workloads ship as experimental (writes behind --allow-writes); a dated ledger snapshot is bundled; proof on Campfire, Lobsters and CodeTriage plus a floor-version app. M1-M5 start now; the release itself (M6) needs Thomas again. Thomas, 2026-11-25 evening: no release yet, not even rc1; first an intensive field test on all census apps (or a set Thomas agrees to), next to the unfamiliar-app sweep.
+
+| Bet | Goal | Doc |
+| --- | --- | --- |
+| Z10 | per-ISEQ ZJIT stats on the apps | [zjit-iseq-leads](upstream/zjit-iseq-leads.md) |
+| F1 | frontier census: 20 apps on Rails main × master, ZJIT fallbacks and exits | [measurement-matrix](upstream/measurement-matrix.md) |
+| F2 | our merged Rails PRs under ZJIT | [measurement-matrix](upstream/measurement-matrix.md) |
+| C8 | census 8 (CPU and allocations) on 4.0.9 and pinned master | [census](upstream/census.md) |
+| Z5–Z8, Z12 | objtostring, compile speed, cfunc paths, stats correctness, warmup | [zjit-shortlist](upstream/zjit-shortlist.md) |
+| Z2, Z11 | ZJIT differential on Rails and app suites: done, no divergence | [zjit-app-differential](upstream/zjit-app-differential.md) |
+| G1, I18N | gem census; i18n deep dive; gem request census and round 2 | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) · [gem-request-census](upstream/gem-request-census.md) · [round 2](upstream/gem-request-census-2.md) |
+| R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
+| E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees | [gems-on-master](upstream/gems-on-master.md) |
+| Z13 | where ZJIT spends more Ir than YJIT on railsbench, lobsters and shipit, classified into buckets that become leads (2026-11-15); done | [zjit-yjit-gap](upstream/zjit-yjit-gap.md) |
+| Z1-2 | ZJIT vs YJIT on real apps on master and on k0kubun's `zjit-headline2` (Shopify/ruby#1030), which gaps are unowned, then the Z11 differential on headline2 before it lands (2026-11-25); done | [zjit-gap-census-2](upstream/zjit-gap-census-2.md) |
+| P-MAP | full-request stack map under YJIT by layer (Puma/Rack to drivers, GC, YJIT), leads outside Rails (2026-11-05); done | [p-map](upstream/p-map.md) |
+| QB1 | how much of AR query building repeats per request and could be cached (2026-11-14); done | [query-building](upstream/query-building.md) |
+| P-TEST | per-test framework overhead in real Rails test suites: fixtures, transactions, setup, reporters (2026-11-05) | test-overhead (planned) |
+| P-DRV | database driver result path: sqlite3, pg, trilogy, per row and per query (2026-11-05) | driver-cpu (planned) |
+| DEF8 | what every new app pays per request: each default piece of `rails new` from main switched off in turn and priced (default, `--api`, Tailwind; 20-field scaffold), ranked by cost × reach (2026-11-14); done | [rails8-defaults](upstream/rails8-defaults.md) |
+| VM1 | what P-MAP's VM share (18–32%) and allocation/GC share (17–23%) under YJIT are made of on real request paths, mapped to Rails lines and ranked by share × reach (2026-11-15); done | [vm-share](upstream/vm-share.md) |
+| FLK1 | make rails/rails CI less flaky: rank intermittent failures on main and unrelated PR jobs, find causes, fix the exact ones in one bundled PR, one commit per cause (2026-11-15) | [rails-ci-flakiness](upstream/rails-ci-flakiness.md) |
+
 ## Working mode
 
 * **Decide, then document** (Thomas, 2026-11-03). Within these rules, go with the recommendation you think is
@@ -39,24 +85,9 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   actions, releases, visibility changes, reversing a decision he made, and before posting a reply that pushes back
   on a maintainer or answers an "is this worth it" challenge.
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
-* **Thank for something concrete, never as a filler** (Thomas, 2026-11-16, replaces "always thank" of 2026-11-04).
-  Thank a maintainer or reviewer in one plain sentence when they did something for the PR, e.g. "Thanks for taking a
-  look!" on a close after their review. No reflexive "Thanks!" at the end of a reply that only reports what we did,
-  such as "Done: … is in #N." (rails/rails#59812, 2026-11-16). **No standalone thank-you comment after a plain merge** (Thomas, 2026-11-05, on rails/rails#59640). Every
-  new comment notifies the maintainer who merged, so avoid notification spam. A thank-you comment only when it is
-  worth a notification: the maintainer spent real time on the review, we went through several rounds, or they added
-  work of their own. For a small change merged quickly, react with 👍 on their comment or review instead, if they
-  left one; otherwise nothing.
 * **Child orbs don't notify Thomas** (Thomas, 2026-11-04). They report only to the coordinating thread with
   send_thread_message, never with notify_user, and their threads are snoozed indefinitely. The coordinator relays.
-* **Three big bets in parallel** (Thomas, 2026-11-25: "wir können überall tief reingehen"): ZJIT gaps on real Rails apps beyond k0kubun's zjit-headline2 (zjit-gap-census-2), unreleased Rails 8.2 regressions (rails-main-census-11), and lowrail-profile as a tool for any Rails app (plan first). The coordinator runs and reviews them; upstream posts still need Thomas.
-* **Census 11 regressions** (coordinator, delegated by Thomas, 2026-11-25): IX1 (IndexDefinition readers removed by rails#59850; GitLab, Mastodon, online_migrations, active_record_doctor) opens as a rails/rails draft in the last free slot (22) once thermos-sol approves the exact head. TA1 (token-auth scheme argument) does not open: thermos-sol found it duplicates the open rails#59858 (czj, 2026-11-18), which also handles an optional third parameter that TA1 gets wrong; superseded, cap back to 22.
-* **Next bets after the first three** (Thomas, 2026-11-25 evening): (a) run lowrail-profile on 5-8 unfamiliar open-source Rails apps and turn costly gem lines into upstream fixes; (b) correctness before Ruby 4.1: weekly differential of the census app suites on Ruby master (interpreter, YJIT, ZJIT) and on zjit-headline2, minimized and bisected; (c) a list of our open rails/rails PRs that could close or be bundled, for Thomas to decide; (d) Lowrail tooling: an ownership check before opening, raw-data retention before archiving a thread, and a trailer-refusing pre-push hook in fork checkouts. ZJIT performance asks pause: zjit-headline2 is ahead of YJIT on every measured app (zjit-gap-census-2).
-* **Reviews of our own safety guards go to Anthropic models** (2026-11-25): the cyber-safety checks of GPT-6.1 Sol and GPT-6 Astra both stopped lowrail-profile confirm reviews that were asked to find ways around its write and production guards. Such reviews run as thermos-opus or thermos-fable and are framed as checking each fix against the original repro; reports stay plain and keep repro detail in the reviewing thread.
-* **No data comments on others' burndown issues** (Thomas, 2026-11-25): our ZJIT-vs-YJIT app numbers on zjit-headline2 stay in docs/upstream/zjit-gap-census-2.md; nothing is posted on Shopify/ruby#1030 ("ist nicht von uns").
-* **lowrail-profile 0.1** (Thomas, 2026-11-25, all six recommendations of docs/profile-release-plan.md): a second gemspec `lowrail-profile` in gem/ without lowering code; published on rubygems.org; floor Ruby 3.3 and Rails 7.2 if M2 holds, otherwise 4.0 and 8.1; --record and --workloads ship as experimental (writes behind --allow-writes); a dated ledger snapshot is bundled; proof on Campfire, Lobsters and CodeTriage plus a floor-version app. M1-M5 start now; the release itself (M6) needs Thomas again. Thomas, 2026-11-25 evening: no release yet, not even rc1; first an intensive field test on all census apps (or a set Thomas agrees to), next to the unfamiliar-app sweep.
-* **At most 8 working orbs at once** (Thomas, 2026-11-03). A larger orb (`a1.xxlarge`) is fine for long parallel
-  runs such as Ruby builds or a census; it doesn't reduce wall-time noise, and Callgrind stays primary.
+* **At most 8 working orbs at once** (Thomas, 2026-11-03). Sizes: [Orb time](#orb-time-thomas-2026-11-04).
 * **No upstream references in Lowrail commit messages.** A commit message containing `owner/repo#N` or an issue or
   PR URL puts a public "added a commit that references this issue" entry on that upstream thread, and a force-push
   does not remove it. Name upstream work in plain words or by queue item ID in commit messages ("ZNE1: body
@@ -73,6 +104,32 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   our commits not yet on a remote with an Amp-Thread-ID or Amp co-author trailer, or another author or committer than
   Thomas (2026-11-25, after two Rails fork commits carried Amp-Thread-ID); run it on every fork clone before its first push.
 
+### Orbs only, not Thomas's Mac (Thomas, 2026-11-17)
+
+All work runs in orbs. The Mac runner is not used: test suites there open sockets and macOS asks Thomas to allow
+incoming connections for `ruby`. arm64-only checks are skipped unless Thomas offers the Mac for one specific run.
+
+### Orb time (Thomas, 2026-11-04)
+
+Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8
+$0.33, large 8/16 $0.66, xxlarge 16/32 $1.32). A paused orb costs nothing; an orb pauses 5 minutes after its agent
+finishes (20 after a human interaction), and immediately when the thread is archived. Orb Saver Mode is on, so
+opening a thread doesn't wake it.
+
+* **a1.medium minimum, a1.large is fine.** The project default is **a1.medium** (was a1.large); smaller orbs are
+  too small (Thomas, 2026-11-04). Pass `orb_size` on every create_thread: **a1.medium** for watchers, coordination,
+  reviews, ledger and docs work and light suites; **a1.large** for Ruby builds, Rails framework suites, app and gem
+  suites, differential harnesses and benchmarks. **Above a1.large** (xxlarge, 3xlarge) only for a short, focused
+  burst that needs it, such as a full Rails matrix or a parallel bisect; say why in the prompt and archive the
+  thread as soon as that step is done.
+* **One central watcher** (W1) watches every open upstream PR every 30 minutes and reports only what
+  matters; worker orbs keep no PR watch schedules.
+* **Let orbs pause:** no sleep loops or long polling, finish a step and stop; stop long-running services when done;
+  batch messages to other threads, since every message wakes the receiving orb for at least 5 minutes.
+* **Archive finished orbs** instead of leaving them open; their records live in this repo.
+* Check usage with `amp orb system-metrics <thread>` (cores, memory, CPU over time) before choosing a size for a
+  similar task.
+
 ## Upstream etiquette
 
 * **Comment only when the thread needs it:** to answer a question asked there, to report a bug or a verified fix
@@ -87,6 +144,14 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   or where we have little to add at that moment; an issue needs a verified bug or a question we can answer
   ourselves. New issues need Thomas's OK. Past mistakes stay as they are (no GitHub Support requests to erase
   them); the rules above prevent repeats.
+* **Thank for something concrete, never as a filler** (Thomas, 2026-11-16, replaces "always thank" of 2026-11-04).
+  Thank a maintainer or reviewer in one plain sentence when they did something for the PR, e.g. "Thanks for taking a
+  look!" on a close after their review. No reflexive "Thanks!" at the end of a reply that only reports what we did,
+  such as "Done: … is in #N." (rails/rails#59812, 2026-11-16). **No standalone thank-you comment after a plain merge** (Thomas, 2026-11-05, on rails/rails#59640). Every
+  new comment notifies the maintainer who merged, so avoid notification spam. A thank-you comment only when it is
+  worth a notification: the maintainer spent real time on the review, we went through several rounds, or they added
+  work of their own. For a small change merged quickly, react with 👍 on their comment or review instead, if they
+  left one; otherwise nothing.
 * **No "I" or "we" where the sentence works without** (Thomas, 2026-11-16): say what happens, e.g. "On Ruby master, X no
   longer …, which showed up in Y's test suite." Where a person is needed, write "I", not "we": one account is one person.
 * **Closing comments:** thank where it is earned (see above), accept the point, leave one neutral fact for the record; don't belittle our result.
@@ -97,7 +162,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   Unless there's a particular issue … that has an assignee or an active PR, feel free to work on any of the
   ideas."). An idea is taken only if its own issue has an assignee or an open PR exists (e.g. ruby/ruby#18326 for
   sendforward). A name in the assignee column of a tracker table (e.g. Shopify/ruby#1039's rows) also counts as taken:
-  check it before building. Lead 7 was built and then found to be row 7, assigned to k0kubun, so it stays unopened.
+  check it before building.
 * **Rails doesn't take JIT workarounds** (skipkayhil closing rails/rails#59803 and #59811, 2026-11-15: "Let's fix
   this in the JITs?"). A Rails change whose win comes mainly from how YJIT or ZJIT compile a construct (Symbol block
   args, `!=`) goes to the JIT instead. Rails perf PRs need a clear win in the interpreter or in allocations on their own.
@@ -111,22 +176,49 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   allocation-parity work targets ZJIT; YJIT gets correctness fixes only; YJIT findings go to
   [yjit-leads](upstream/yjit-leads.md) and are not built. Our open YJIT PRs stay open and maintained (Thomas);
   the maintainers decide on them.
+* **No data comments on others' burndown issues** (Thomas, 2026-11-25): our ZJIT-vs-YJIT app numbers on zjit-headline2 stay in docs/upstream/zjit-gap-census-2.md; nothing is posted on Shopify/ruby#1030 ("ist nicht von uns").
+* **Open PRs and issues anywhere: no pings** (Thomas, 2026-11-17, superseding the four-week ping): maintainers have
+  their own time. Closing only at a maintainer's request or when superseded.
+
+### No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
+
+We don't comment on other people's PRs or issues (measurements, reviews, suggestions, thanks) unless Thomas has
+explicitly approved that specific comment. Their PR description is theirs; what we measure about their work stays in
+our records. Orbs draft at most, and ask the coordinator, who asks Thomas. A benchmark comment on rails/rails#59141
+was deleted for this reason. Replies on our own PRs and issues are unaffected.
+
+Approved comments follow the style Thomas liked on rails/rails#57013 (2026-11-04): open with "Heads-up in case
+it's useful:", state the effect in one sentence, give the minimal repro, name an existing fix or PR if there is
+one, and stop. No thanks, no judgement of the work, no proposals beyond what was asked, no numbers that weren't
+asked for.
+
+**Exception: answers that were asked for** (Thomas, 2026-11-05). When someone asks us for an answer, a re-test or a
+data point, post it directly and promptly, without asking Thomas first, as long as it is reviewed and measured
+properly and helps constructively. Example: eightbitraptor's re-test request on ruby/ruby#17251. Everything
+unsolicited still needs Thomas's approval.
+
+### Nothing internal upstream (Thomas, 2026-11-14)
+
+What we post upstream (PR bodies, comments, issues, review replies) contains only what helps the people there decide
+on that PR or issue. Things that only concern us or Lowrail stay in Lowrail: our held or unopened branches and fixes
+as comparisons, our queue, slots and caps, our review passes and reviewer names, internal IDs (K1, L3, F1, census and
+round numbers), orbs, and our process. Upstream numbers describe the upstream code (main, the PR, a release), with
+setup in neutral words ("35 Rails workloads", not "census 9"). Before posting, check every column, row, link and
+sentence: would the reader miss it if it were gone? If not, drop it. Example: on ruby/ruby#17251 a table with a
+column for our held GC branch was deleted the same day, and only the master and #17251 numbers were kept, as an
+update to our earlier comment there. PR bodies don't mention or link Lowrail (no footer since 2026-11-15).
 
 ## Pull requests
 
-* **PR descriptions:** see [PR descriptions](#pr-descriptions-thomas-2026-11-03-to-11-05) below.
 * **Thomas can explain it first** (Thomas, 2026-11-03). Before a ruby/ruby PR or any issue opens, Thomas can say
   in two or three sentences of his own what is wrong, what changes and why that is safe. I give him a short
   explanation with a minimal example; the PR opens only when he can retell it. The agentic work (builds, numbers,
   reviews) comes after that, not instead of it. Until Thomas lifts it, no new ruby/ruby PRs open at all
-  (2026-11-03): finished candidates are recorded in the queue, not opened (ruby/ruby-bench is not covered; a fix for our own test that turns others' CI red is an approved exception,
-  2026-11-04); new rails/rails PRs are prepared through the full review path and held
-  until Thomas has read them, then opened ready for review (rails/rails asks for no draft PRs, since drafts notify
-  every watcher); open
-  PRs and issues he can't stand behind are closed with one neutral line.
+  (2026-11-03): finished candidates are recorded in the queue, not opened (ruby/ruby-bench is not covered; a fix
+  for our own test that turns others' CI red is an approved exception, 2026-11-04). Open PRs and issues he can't
+  stand behind are closed with one neutral line.
 * **One concern per PR.** A ruby/ruby PR touches the VM, YJIT or ZJIT, never two of them (tekknolagi on
-  [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)). Dependent changes go into one PR
-  as separate commits; open a follow-up only after its base has merged. Never stack on an open PR.
+  [ruby#19661](https://github.com/ruby/ruby/pull/19661#issuecomment-6607345199)).
 * **Cross-link interlocking changes in the body** (Thomas): one sentence with owner/repo (e.g. rails/rails#59557 ↔
   ruby/ruby#19662), updated when the other side moves, never as an extra comment. Every cross-repo reference
   carries owner/repo; link branches instead of naming them.
@@ -137,14 +229,17 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
   so the PR doesn't stand alone.
 * **Maintainers can edit our PR branches** (Thomas, 2026-11-06): every PR from a fork opens with "Allow edits by
   maintainers" on; `script/pr-queue open` sets `maintainer_can_modify=true`. Our forks hold no Actions secrets.
-* **No code comments** unless the code would be misread without them; why a change is equivalent goes in the body.
+* **Commits are few and clean, and the reasoning goes in their messages** (Thomas, 2026-11-06).
 * **Tests check behaviour, never implementation details** (Thomas, 2026-11-06). No allocation counts
   (`GC.stat`), instruction counts, call counts or other internal-state assertions in upstream suites. A perf
   change is shown by a benchmark beside the suite: the numbers go in the PR body or a linked Lowrail record, and
   the commit message explains why the change is correct and why it has its shape. Add a test only when the change
   touches behaviour a plausible regression would break. Example: our allocation test in sqlite3-ruby#758 was the
   first of its kind in that suite.
-## Playbook from the PR retrospective (2026-11-04)
+* **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
+  unreleased.
+
+### Playbook from the PR retrospective (2026-11-04)
 
 Adopted from [pr-retrospective](upstream/pr-retrospective.md), which has the PR evidence for each rule. The first
 three change earlier decisions and were approved by Thomas on 2026-11-04.
@@ -158,8 +253,8 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
   policy, new per-ISEQ state, new HIR instructions, or more than about 150 lines: first a Shopify/ruby issue with
   one concrete ask and the data, then a PR once the team says go. This narrows "well-reviewed PRs over issue
   discussions" for ZJIT design.
-* **Gems: at most 2 unanswered PRs per repository** (Thomas). Check maintainer activity and the repo's idioms
-  before building.
+* **Gems: check maintainer activity and the repo's idioms before building** (Thomas). The cap of 2 unanswered PRs
+  per repository is under [Submission queue](#submission-queue-2026-11-03).
 
 * **Pace on ruby/ruby** (once new PRs are allowed again): at most 2 new PRs a week, the next only after a maintainer
   has responded to the previous one, one PR per finding.
@@ -177,11 +272,98 @@ three change earlier decisions and were approved by Thomas on 2026-11-04.
 * **Rails:** keep the pattern (small, obvious, numbers from real apps). Drop or simplify L2 candidates and any that
   need more than two exactness rounds.
 
-* **Standing OK for the 2026-11-04 Rails round** (Thomas, 2026-11-04). The candidates and bug fixes from the census
-  backlog, C9 (CP-3, CP-5), C11, C13 and C15 may open on rails/rails without another read by Thomas, once they have
-  passed the full review path plus a Sol review run by the coordinator. Opening a PR on top of one of our open PRs
-  (stacking) stays out: such a candidate opens only if it applies to main on its own, otherwise after the first merges.
-  No per-orb limit and no spacing on rails/rails (Thomas): a finished, reviewed candidate opens right away.
+### PR descriptions (Thomas, 2026-11-03 to 11-05)
+
+Thomas: "Beschreibungen könnten etwas kürzer sein, weniger Wall of Text" (11-04), and on ankane/blind_index#62:
+"geht viel besser und kürzer und für Menschen geschrieben. Das Test-Zeugs etc. braucht keiner" (11-05). Before
+that, tekknolagi on [Shopify/ruby#1058](https://github.com/Shopify/ruby/issues/1058#issuecomment-6613994853):
+"This LLM shorthand output may be readable to you … but it is not for us." A maintainer should get the point in
+a few seconds, without having seen our notes. If it reads like a report, it is too long.
+
+* **Shape.** The title says what changes. The body has two or three short paragraphs, usually 50–120 words:
+  1. What breaks or is wasted, where, and why, with one concrete example (the call, the error).
+  2. What the change does and why it is safe: released versions and existing callers behave as before. Add the
+     one boundary a reviewer would ask about only if users can hit it, in one clause.
+  3. Only for compatibility and restore PRs: who is affected, with line permalinks.
+* **Numbers.** A perf PR gets one small before/after table, whose heading says what was measured (for example
+  "Objects and Callgrind instructions per call, Ruby 4.0, no JIT"). Instructions are never called time. A/A
+  values, methodology, ruby-bench placement and other Rubies stay in the record. A correctness PR has no numbers.
+  Table cells stay short (a name, a number); causes and explanations go in the prose above the table, never in a
+  column (Thomas, 2026-11-15, on #59812).
+* **Leave out:** test-run and suite counts, commands, SHAs and pins, which Rubies or databases were tried, review
+  history, rejected variants, differential sizes, private or `:nodoc:` override boundaries, "this is not a speed
+  claim". The diff shows the tests. If a maintainer asks, the answer goes in a reply.
+* **Language.** Full sentences and plain words. No internal labels (B, R, C1), arrows, shorthand, stacked
+  qualifiers, headings, checklists or bold. Say it as you would to a colleague at the next desk.
+* **Fixed parts.** A stacked PR starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is
+  new here." Interlocking changes get one cross-link sentence with owner/repo. **No footer** (Thomas, 2026-11-15:
+  cleaner without). How
+  we found it goes in the text in a clause, e.g. "While profiling a few Rails apps, …", and the body says above all
+  why it matters to the reader. No link to Lowrail; if a maintainer asks for the data, link the record in a reply.
+  Redmine tickets are links: [Bug #N](https://bugs.ruby-lang.org/issues/N), since GitHub doesn't link "Bug #N"
+  (Thomas, 2026-11-16). ZJIT evidence uses the tools' own format (see above). No AI
+  disclaimer, except where it matters, as on #1058. An earlier PR of ours is cited by reference with what it tried
+  to do, not as "My #N" (Thomas, 2026-11-15, ruby/ruby#19909; #19912 is the example).
+* **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
+  by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
+  big or not yet clear; split or simplify the change instead.
+* **Examples:** ankane/blind_index#62 and activerecord-hackery/ransack#1795 after the 11-05 rewrite, and the rails/rails
+  drafts #59661–#59677 as posted on 11-05 (Thomas: "sehen alles sehr gut aus … in dem Stil können wir weitermachen").
+
+### No unnecessary code comments in upstream PRs (Thomas, 2026-11-10)
+
+Superfluous comments read as AI slop. byroot on #59555 (2026-11-05), on the comment above our `Array#index_with`:
+"This isn't something that should be surfaced in Rails docs. it's an implementation detail. If anything that
+specialized version could be `:nodoc:`. I don't mind AI PRs, but please read them and curb their tendency to spew
+tons of comments." A standing rule for every upstream PR:
+
+* **A code comment stays only when a reader would otherwise undo or misread the code**, and only where that file's
+  maintainer would keep one (Thomas, 2026-11-18). Then it is one short line that says why, not what, in the file's
+  own style, and the diff keeps the comment density of the surrounding upstream code.
+* **No comments that** restate the code, narrate the change, mention the PR, the benchmark or the measurement, or
+  explain what was removed. Those, like explanations of cost, Ruby internals or the regression and why a change is
+  equivalent, belong in the commit message, the PR body or the Lowrail record.
+* **No comment directly above a public or documented method** unless it is meant as API docs. RDoc publishes it.
+  Internal specializations and helpers get `# :nodoc:` on the `def` line instead (as Rails does for
+  `Hash#compact_blank`), unless the enclosing class or module is already `# :nodoc:`.
+* Reviewers asking for "a comment so nobody deletes this" doesn't override this: prefer a test that fails
+  when the line is removed, if it is a behaviour test; for a perf-only line the commit message carries the reason.
+* **Tests and benchmark files count too.**
+* **Reviewers check it on every pass.** claude-code and Sol look at every added comment line; a superfluous comment
+  is a required change (`changes`), not a nit.
+* Before a queued branch opens, check its added comment lines against these rules.
+
+### Line permalinks for callers (Thomas, 2026-11-04)
+
+Every caller we cite in a PR body, issue or ledger record links to the exact line, so a reader can check the claim in
+one click.
+
+* Use a **commit-SHA permalink** (`blob/<sha>/path#L42`), never `blob/main`; a branch link drifts as soon as the file
+  changes. For a gem, take the commit behind the tag of its **latest released version** and name that version in the
+  link text; if the gem has no tag, use the release's "Bump to x.y.z" commit or the gem's source on rubygems.org.
+  For an app without releases, use the default branch's current SHA and name the branch.
+* Also check the gem's default branch: if the call is already fixed there, say "fixed on main, unreleased" instead of
+  calling it a break.
+* Quote the line exactly as it appears at that SHA, or mark the quote as shortened.
+* Before posting, fetch each file at the linked SHA and confirm that the linked line contains the quoted call.
+
+## When Rails restores a private API, and other open calls (decided 2026-11-04 at Thomas's request)
+
+* **Restores.** Public API removed without a deprecation: restore it, deprecated if the new name is better. Private
+  or `:nodoc:` API: restore it only when all three hold, otherwise fix it in the gem or app that uses it:
+  1. the removal is **unreleased**, so a restore costs maintainers no new compatibility promise,
+  2. **several real callers** (released gems or apps, cited with permalinks) break, or one large one breaks
+     silently or wrongly, and
+  3. the restore is **small** and keeps the change's purpose: a deprecated shim, an alias, a signature, not a
+     revert of the feature.
+  The PR says openly that the API is private and names the callers. Private
+  breakage that fails any of them (build_bind_attribute, `_prefixes`, Vary changes) is record-only, or goes to the
+  gem or app when the fix there is small and the maintainers are active.
+* **No deprecation shims for internal API** (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
+  APIs. That's what internal means."). Private or `:nodoc:` breakage gets fixed in the gem or app that relies on
+  it. Rails gets a fix only when Rails itself is wrong, not a deprecated restore.
+* **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
+  fixes block real users.
 
 ## Submission queue (2026-11-03)
 
@@ -199,27 +381,21 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   open count is clearly lower, a new Rails PR opens only for an unreleased regression that breaks widely used apps or
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.
   The tool cap is 22 (the count on 2026-11-05), so `open` refuses until one closes or merges; above that, ask Thomas.
-  Only Thomas marks drafts ready. Keep each PR small.
-* **rails/rails opens as draft** (Thomas, 2026-11-05): we open Rails PRs as drafts in small batches when Thomas asks,
-  preferably grouped by theme and likely reviewer. The queue no longer opens Rails PRs on its own. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
+  Keep each PR small. LR1 opens as a draft as soon as a rails/rails slot frees (Thomas, 2026-11-25; the cap stays
+  22).
+* **rails/rails opens as draft** (Thomas, 2026-11-05), preferably in small batches grouped by theme and likely
+  reviewer. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
 * **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
   coordinator marking Rails drafts ready). Agents may open reviewed items as drafts in any repo with room, with every
-  pass on the exact head; neither the coordinator nor W1 runs `script/pr-queue ready`. Ready order he was given:
-  #59662 OP8, #59663 ZM1, #59661 OP1, #59667 DC1, #59668 E2b.
-* **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04;
-  20 before). We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
+  pass on the exact head; neither the coordinator nor W1 runs `script/pr-queue ready`.
+* **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04).
+  We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
   proposed to Thomas with the reason. The previously recorded slots (GC pool-budget fix, lead 3, Z13's top lead,
   Shopify/ruby#1064, #1065, #1091, #1058) stay in the queue and do not open.
-  Exception (Thomas, 2026-11-14): the small-Hash regression on master (F1, round 2) and ZJIT lead 3 (receiver classes
-  missing from a polymorphic send's profile) go upstream as PRs once built and reviewed, after the "Thomas can explain
-  it first" step. Exception (Thomas, 2026-11-15): ZS1, ZJIT specialization of Symbol block arguments (`&:sym`,
-  Shopify/ruby#1014's open "later step" after ruby/ruby#18180), because apps and gems use it everywhere; built with
-  Fable 5.2, same "Thomas can explain it first" step before opening. Closed the same day without a PR: the reachable ceiling is 0.04–0.38% of an
-  iteration on Rails main, and the send side is on Rafael França's unmerged Shopify branch, the yield side on k0kubun's
-  (docs/upstream/zjit-symbol-block.md).
-  Exception (Thomas, 2026-11-15): ZNE1, ZJIT handling of `!=` whose `!=` is `BasicObject#!=`, after skipkayhil closed
-  rails/rails#59811 with "Let's fix this in the JITs?"; a PR instead of a comment there, built with Fable 5.2. Exception (Thomas, 2026-11-16): BX1, the Ruby 4.1 regression where `bundle exec ruby -rGEM` loads the newest installed GEM instead of the locked one (round 3), goes upstream as a PR with the repro in its body instead of a Redmine issue ("easier for the maintainers"), once built and reviewed; this also lifts the two-a-week pace for it. Exception (Thomas, 2026-11-25): ZSV1, ZJIT profiling of the real class for `setinstancevariable` (Shopify/ruby#1122), opens as a draft once rebased onto current master and approved by thermos-sol and Astra on the exact head. The script's ruby/ruby cap is the 10 above; the moratorium holds for every other item.
+  Exception (Thomas, 2026-11-14): ZJIT lead 3 (receiver classes missing from a polymorphic send's profile) goes
+  upstream as a PR once built and reviewed, after the "Thomas can explain it first" step. The script's ruby/ruby
+  cap is the 10 above; the moratorium holds for every other item.
 * **gems:** at most 2 of our PRs without a maintainer response per repository (Thomas, 2026-11-04; no limit before).
   **ruby/ruby-bench** is exempt (Thomas, 2026-11-05): independent, reviewed PRs can open side by side, without waiting
   for a response to an earlier one.
@@ -233,8 +409,6 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   failure of ours, because each push notifies reviewers and reruns CI.
   Standing OK (Thomas, 2026-11-18): when only CHANGELOG files conflict, the coordinator may run
   `script/pr-queue rebase ID --push` on an open PR without asking first.
-* **Approved and unmerged after 14 days:** one short, neutral note on a weekday (Thomas), never asking anyone to
-  merge. Once per PR.
 * **Guards in the target repository's idiom** (Thomas, 2026-11-18): a guard uses the target repository's own idiom
   and protects the documented contract and real callers, not arbitrary objects outside it. When we accept a
   difference outside the contract, the body says so in one sentence. Sweep:
@@ -243,8 +417,6 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   maintainer of that file would have written and drops what they would have left out. A guard stays only for a real
   caller, a documented case, or a correctness or safety property (such as the ASCII check in RK3 or keeping html_safe
   intact); "exactly like before for any object" is not a reason. A review lists each surviving guard with its reason.
-  The same goes for code comments (Thomas, 2026-11-18): a comment stays only where that file's maintainer would keep
-  one, because a reader would otherwise undo or misread the line; one line, why not what, in the file's own style.
 
 ## Evidence and measurement
 
@@ -277,28 +449,58 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   2026-11-14, after AB1's reviews disagreed). A ZJIT loss blocks it until explained; #59557's `index_with` lost under ZJIT although it only
   changed allocation. Rails changes made only for ZJIT need a win of their own on the Ruby pin.
 
+### Benchmark tables in the project's own format (Thomas, 2026-11-14)
+
+Thomas liked ruby/ruby#19899's table: the project's own benchmark, run with the project's own tool, in the format its
+maintainers use. Bodies lead with that where one exists. For ruby/ruby that means an existing `benchmark/*.yml` (or a
+new small one) through `make benchmark ITEM=… COMPARE_RUBY=… OPTS="--repeat-count 10"`, with the compare-ruby and
+built-ruby version lines and benchmark-driver's table, and the older release on the same machine in one sentence when
+it shows the regression closing. For Rails and gems, a short benchmark-ips (or benchmark-driver) script in the body
+with its before/after output, as Rails PRs usually show. Runs are on one pinned core, best of N, and the record keeps
+the raw output and an A/A of the same setup. Callgrind stays the tool that finds and attributes a change; in the body
+it is one supporting line or a small table only when it shows something the wall-time table can't (objects, a
+JIT-only path). Wall time is measured on orbs; Thomas's Mac was tried as a quieter machine on 2026-11-14 and gave
+±4.5% A/A while in use, so it isn't used.
+
+### Realistic sizes upstream (Thomas, 2026-11-14)
+
+Bodies and comments cite only sizes an app plausibly has: a few to about 20 params, tens to about 100 columns,
+values of ordinary size. The size sweep that DECISIONS asks for (up to ≥ 1 MB, thousands of entries, 300 columns)
+proves no blow-up and stays in the record; the body may say in one clause that larger inputs were checked, but it
+puts no unrealistic row in a table and claims no number for one. Example: rails/rails#59804 first showed 2,000
+params and a 1 MB value; both rows were cut the same day.
+
+### Learnings from byroot's follow-ups (2026-11-10)
+
+byroot reverted [#59584](https://github.com/rails/rails/pull/59584) in [#59713](https://github.com/rails/rails/pull/59713)
+and simplified [#59640](https://github.com/rails/rails/pull/59640) in [#59714](https://github.com/rails/rails/pull/59714),
+both on 2026-11-09. What went wrong in our process, and the rule each one now adds:
+
+* **#59584 was measured only where it wins.** Every variant (five `include?`, amatsuda's direct checks, the final
+  guard) was priced on a 19-byte object, an 11-column record and a short document; the largest input in the record
+  was 4 KB. The change adds up to three extra full scans before main's single `gsub!`, so its cost grows with
+  document size and memory bandwidth, and that case was never in the matrix. Three reviewer-driven reshapes reused
+  the same small inputs, and none of our review passes asked for a larger one.
+  → **Size sweep for any change to work proportional to input length** (string scans, escaping, parsing,
+  encoding, copying): small, typical, and one input well past the last-level cache (≥ 1 MB), each with the
+  character or match absent, early and late. Report the worst row in the body, not only the common one. A change
+  that adds passes over the input must show the large row.
+* **#59584's path is gone on the next Ruby.** Our own record said Ruby 4.1 takes `tr!` and "makes it moot", and
+  escaping was 0.4–0.6% of samples in the census apps. A small gain on a path that disappears on the next release,
+  owned by a maintainer who just rewrote it, was not worth a PR.
+  → **Lifetime and reach in `impact`:** say whether the path still runs on Ruby master and Rails main; if it
+  doesn't, open only with a large measured win on current releases.
+* **Review prompts asked whether the change was right, not where it loses.** → Every perf review prompt asks the
+  reviewer to construct the input that makes the change slowest (size, position, content) and to measure it.
+* **#59640 patched a part of the key that wasn't needed.** We made `self.class.name` nil-safe; byroot asked why the
+  class name was in the key at all, since `object_id` is unique, and deleted it. Our minimal fix kept existing
+  behaviour (named stores' keys) without asking whether that behaviour mattered.
+  → **Before patching a failing piece, ask whether it can go.** If the value it contributes isn't observable or
+  relied on, propose removing it, and name the smaller option in the body when we keep the conservative one.
+
 ## Review gates
 
-### Claude Code orbs and a final Claude Code review (Thomas, 2026-11-06)
-
-New work orbs run as Claude Code (`external-agent:claude-code`). Orbs that are already running may finish, but before anything goes upstream (PR, push to an open PR, body edit or reply), a separate Claude Code orb does a thorough final review. That review covers the exact head, the commit messages and the text. Its pass is recorded as `reviewer: claude-code`. Sol/Astra stay as additional gates. Commits are few and clean, and the reasoning goes in their messages.
-
-### Opus and Fable stand in for Sol and Astra (Thomas, 2026-11-14; temporary, pending Thomas)
-
-Until Thomas says otherwise, reviews run on Claude Opus 5.5 in independent Claude Code orbs instead of Sol, because
-Opus has more rate limit free; specific risky items get Claude Fable 5.2, and the coordinator may also commission a focused Fable review of one
-question (for example security or exactness) whenever it helps (Thomas, 2026-11-14). A pass recorded as `reviewer: opus` or
-`reviewer: fable` fills the slot Sol fills, and Astra's on a `risky` item. It counts only with its orb's thread ID in
-`orb`, which must differ from the `orb` of the claude-code pass on the same head and from any other stand-in counted
-with it, so every slot keeps its own reviewer. Sol and Astra passes count as before.
-
-### One detailed review instead of two (Thomas, 2026-11-17)
-
-Thomas: "lieber ein detailliertes review als 2". The claude-code and Opus passes both ran on Opus and duplicated each
-other (FB1 got the same must-fix from both). From now on one thorough claude-code pass on the current head is the
-required review; it covers what the Sol/stand-in slot covered (exactness probe, every body sentence, the commit
-message). Astra on `risky` items and thermos above 200 changed lines stay as before. Passes already recorded keep
-counting.
+* **Reviews of our own safety guards go to Anthropic models** (2026-11-25): the cyber-safety checks of GPT-6.1 Sol and GPT-6 Astra both stopped lowrail-profile confirm reviews that were asked to find ways around its write and production guards. Such reviews run as thermos-opus or thermos-fable and are framed as checking each fix against the original repro; reports stay plain and keep repro detail in the reviewing thread.
 
 ### The coordinator decides when a review runs (Thomas, 2026-11-18)
 
@@ -325,120 +527,42 @@ the coordinator judges it enough, such as record updates, reruns of known measur
 OpenAI's provider refused the TN2 review (a segfault) as possible cybersecurity content, so crash and memory-safety
 fixes get their thermos review on Opus 5.5 (`reviewer: thermos-opus`).
 
-Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol stays GPT-6.1 Sol; Thomas allowed
-trying Sol 6.2, but it isn't offered yet.
+Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`).
 Sol reviews stay on GPT-6.1 Sol (Thomas, 2026-11-25): GPT-6.2 Sol's safety check stopped a JIT review as possible
 security work. Fable (`anthropic/claude-fable-5-2`) may be used wherever it helps (Thomas, 2026-11-25), such as hard
 design rounds or an extra review of a large change. A thermos review on Fable is recorded as
-`reviewer: thermos-fable` and counts where a `thermos-opus` pass does (first use: RUBY19659, 2026-11-25).
+`reviewer: thermos-fable` and counts where a `thermos-opus` pass does.
+
+### One detailed review instead of two (Thomas, 2026-11-17)
+
+Thomas: "lieber ein detailliertes review als 2". The claude-code and Opus passes both ran on Opus and duplicated each
+other (FB1 got the same must-fix from both). From now on one thorough claude-code pass on the current head is the
+required review; it covers what the Sol/stand-in slot covered (exactness probe, every body sentence, the commit
+message). Astra on `risky` items and thermos above 200 changed lines stay as before. Passes already recorded keep
+counting.
+
+### Opus and Fable stand in for Sol and Astra (Thomas, 2026-11-14; temporary, pending Thomas)
+
+Until Thomas says otherwise, reviews run on Claude Opus 5.5 in independent Claude Code orbs instead of Sol, because
+Opus has more rate limit free; specific risky items get Claude Fable 5.2, and the coordinator may also commission a focused Fable review of one
+question (for example security or exactness) whenever it helps (Thomas, 2026-11-14). A pass recorded as `reviewer: opus` or
+`reviewer: fable` fills the slot Sol fills, and Astra's on a `risky` item. It counts only with its orb's thread ID in
+`orb`, which must differ from the `orb` of the claude-code pass on the same head and from any other stand-in counted
+with it, so every slot keeps its own reviewer. Sol and Astra passes count as before.
 
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 
-Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**:
+Every upstream PR, issue or comment draft goes through as many review rounds as it needs, on its **current head**.
+Besides the detailed review above:
 
-1. The orb's own skeptical reviewer subagent, rerun after every rewrite (most orbs have no Codex CLI).
-2. Sol (`codex exec -m gpt-6.1-sol`, read-only), run by the coordinator on the patch and body.
-3. Astra (`codex exec -m gpt-6-astra`) in addition for correctness changes on hot paths, Ractor/thread or
-   frozen-object semantics, and anything a maintainer has pushed back on before.
-4. `thermos` for larger diffs (several files or a new mechanism).
+* Astra in addition for correctness changes on hot paths, Ractor/thread or frozen-object semantics, and anything a
+  maintainer has pushed back on before.
+* `thermos` for larger diffs (several files or a new mechanism).
 
 Every confirmed finding is fixed and the changed part reviewed again; the round ends when a pass has no must-fix.
-A head change after the last pass means another pass. An item is `reviewed` only when skeptic and Sol, Astra when
-`risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current `head`;
-`script/pr-queue open` and `ready` check this and refuse otherwise.
-Superseded 2026-11-06: claude-code replaces skeptic as a required pass (see [Claude Code orbs and a final Claude Code
-review](#claude-code-orbs-and-a-final-claude-code-review-thomas-2026-11-06)).
-
-### Readability gate (L0–L3)
-
-Thomas, 2026-11-03; rated as part of the primary review's maintainability rubric. L0: no harder to read; opens if
-exact and measurable. L1: slightly unusual but clear at once; needs a per-call CPU gain outside the A/A. L2:
-noticeably more complex (a new helper, lazy arrays, copied internals); needs an effect measurable in an app or on
-ruby-bench. L3: a duplicated method, a Ruby-version branch, index loops, or code that needs comments; don't open.
-ruby/ruby additionally needs a measurable ruby-bench effect or a correctness repro (#19488 and #19625 were closed
-for lacking one).
-
-Readability checks added 2026-11-04 (Thomas: "always watch for readable code"), after #59608's first shape
-reassigned a variable inside an `unless`:
-
-* **Describe it out loud first** (Thomas). Before any review, the author writes the changed code as plain sentences,
-  one per line or branch, as if reading it to a colleague ("take the current formats; if the template's single
-  format already leads them, keep the list as it is, otherwise put it in front"). If a sentence comes out awkward,
-  needs "except" or "unless also", or can't be said without naming a variable twice, refactor the code until the
-  description is simple, then measure again. The fastest form isn't required: a readable form that keeps most of the
-  gain wins. The final description goes into the review record and, shortened, into the PR body.
-* **Cold read.** A reviewer who hasn't seen the change states in one sentence what each branch does and why each
-  condition is there. If that takes a second try, rewrite before opening.
-* **Shape checklist.** Each case gets its own branch, with no reassignment inside a conditional modifier and no
-  ternary longer than one short line. Sentinel or identity checks (`equal?`, placeholder values) get a one-line
-  comment saying why. No new name used only once. The diff reads like the surrounding code.
-* **Numbers as a signal, not a gate.** Record the change in `flog` score and RuboCop `Metrics/*` (ABC size,
-  cyclomatic and perceived complexity) for each touched method, before and after. A rise needs a sentence of
-  justification in the review. These numbers miss shape problems, so they never replace the cold read.
-
-### PR descriptions (Thomas, 2026-11-03 to 11-05)
-
-Thomas: "Beschreibungen könnten etwas kürzer sein, weniger Wall of Text" (11-04), and on ankane/blind_index#62:
-"geht viel besser und kürzer und für Menschen geschrieben. Das Test-Zeugs etc. braucht keiner" (11-05). Before
-that, tekknolagi on [Shopify/ruby#1058](https://github.com/Shopify/ruby/issues/1058#issuecomment-6613994853):
-"This LLM shorthand output may be readable to you … but it is not for us." A maintainer should get the point in
-a few seconds, without having seen our notes. If it reads like a report, it is too long.
-
-* **Shape.** The title says what changes. The body has two or three short paragraphs, usually 50–120 words:
-  1. What breaks or is wasted, where, and why, with one concrete example (the call, the error).
-  2. What the change does and why it is safe: released versions and existing callers behave as before. Add the
-     one boundary a reviewer would ask about only if users can hit it, in one clause.
-  3. Only for compatibility and restore PRs: who is affected, with line permalinks.
-* **Numbers.** A perf PR gets one small before/after table, whose heading says what was measured (for example
-  "Objects and Callgrind instructions per call, Ruby 4.0, no JIT"). Instructions are never called time. A/A
-  values, methodology, ruby-bench placement and other Rubies stay in the record. A correctness PR has no numbers.
-  Table cells stay short (a name, a number); causes and explanations go in the prose above the table, never in a
-  column (Thomas, 2026-11-15, on #59812).
-* **Leave out:** test-run and suite counts, commands, SHAs and pins, which Rubies or databases were tried, review
-  history, rejected variants, differential sizes, private or `:nodoc:` override boundaries, "this is not a speed
-  claim". The diff shows the tests. If a maintainer asks, the answer goes in a reply.
-* **Language.** Full sentences and plain words. No internal labels (B, R, C1), arrows, shorthand, stacked
-  qualifiers, headings, checklists or bold. Say it as you would to a colleague at the next desk.
-* **Fixed parts.** A stacked PR starts with "Stacked on #N, which should merge first; only the last commit (`sha`) is
-  new here." Interlocking changes get one cross-link sentence with owner/repo. **No footer** (Thomas, 2026-11-15:
-  cleaner without; replaces the `<sub>` record footer of 2026-11-14, removed from every open PR the same day). How
-  we found it goes in the text in a clause, e.g. "While profiling a few Rails apps, …", and the body says above all
-  why it matters to the reader. No link to Lowrail; if a maintainer asks for the data, link the record in a reply.
-  Redmine tickets are links: [Bug #N](https://bugs.ruby-lang.org/issues/N), since GitHub doesn't link "Bug #N"
-  (Thomas, 2026-11-16). ZJIT evidence uses the tools' own format (see above). No AI
-  disclaimer, except where it matters, as on #1058. An earlier PR of ours is cited by reference with what it tried
-  to do, not as "My #N" (Thomas, 2026-11-15, ruby/ruby#19909; #19912 is the example).
-* **Review.** Sol checks every sentence against the record and reads the body as an outsider would. Fixes are made
-  by cutting, not adding. A body that needs more than about 150 words to be honest usually means the change is too
-  big or not yet clear; split or simplify the change instead.
-* **Examples:** ankane/blind_index#62 and activerecord-hackery/ransack#1795 after the 11-05 rewrite, and the rails/rails
-  drafts #59661–#59677 as posted on 11-05 (Thomas: "sehen alles sehr gut aus … in dem Stil können wir weitermachen").
-
-### Code comments in upstream patches (byroot on #59555, 2026-11-05)
-
-byroot, on the comment above our `Array#index_with`: "This isn't something that should be surfaced in Rails docs.
-it's an implementation detail. If anything that specialized version could be `:nodoc:`. I don't mind AI PRs, but
-please read them and curb their tendency to spew tons of comments." Fixed in #59659 by deleting the comment.
-(`class Array` is already `# :nodoc:` in that file, so the comment never reached the API docs. The volume was the
-real problem.)
-
-* **No comment directly above a public or documented method** unless it is meant as API docs. RDoc publishes it.
-  Internal specializations and helpers get `# :nodoc:` on the `def` line instead (as Rails does for
-  `Hash#compact_blank`), unless the enclosing class or module is already `# :nodoc:`.
-* **Comments are the exception.** Add one only when a reader would otherwise undo the code. Then it is one line,
-  and it says why, not what. Explanations of cost, Ruby internals or the regression belong in the PR body or the
-  Lowrail record.
-* Reviewers asking for "a comment so nobody deletes this" doesn't override this: prefer a test that fails
-  when the line is removed, if it is a behaviour test; for a perf-only line the commit message carries the reason.
-* Before a queued branch opens, check its added comment lines against these rules.
-
-### Correctness fixes: readable first (2026-11-04)
-
-Thomas: for bug and correctness fixes, no code golf. The fix is written as readable and idiomatic as possible,
-in the shape a maintainer would write it. Performance is a side note: measure only to rule out a clear slowdown on
-a common path, never to choose between two correct shapes, and keep the numbers out of the body (see above). The
-L0–L3 performance bars don't apply; the cold read and the shape checklist do. Correctness findings that come up
-along the way get their own PRs.
+A head change after the last pass means another pass. An item is `reviewed` only when the detailed review, Astra
+when `risky`, and thermos when the diff has more than 200 changed lines each approve (no must-fix) on its current
+`head`; `script/pr-queue open` and `ready` check this and refuse otherwise.
 
 ### Primary review
 
@@ -477,130 +601,7 @@ thread or fiber state, VM/JIT code. A critical candidate is ready only after bot
 A reply to "is this worth it" or any other pushback is drafted, checked once for facts and tone, and shown to
 Thomas before posting.
 
-## Performance across the stack, compatibility as inventory (Thomas, 2026-11-05 night)
-
-* **Main topic again: performance across the whole stack** (Ruby runtime and GC, C extensions and drivers, Rack
-  and Puma, Rails, the gems apps use). YJIT is the production reference; interpreter numbers alone don't carry a claim.
-* **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta. The Rails-internal design can
-  still change, and then we decide what to fix in Rails and what outside. Until then such findings go into an
-  inventory with callers and proposed fixes. The ones already open stay (blind_index#62 and scimitar#172 say they wait
-  for the beta).
-* **Only PRs with large relevance open** (Thomas, 2026-11-05 night). A candidate opens only if its effect reaches
-  many apps or a widely used gem, or a whole request, test run or ruby-bench benchmark moves measurably. Small
-  per-call wins in niche gems or rare paths, and fixes for niche gems (scimitar#172 was the example), are recorded,
-  not opened. Every item states its reach in `impact` (who runs it, how often, how much of a request) before review.
-  Such ideas stay with us as `held` queue items ("parked idea" in the note) and are not opened later as they are;
-  #59673 PM1, #59674 PM3 and #59677 CB2 were closed on 11-05 for this reason.
-* **New orbs run in the Medium agent mode** (GPT, plenty of tokens); orb size as the task needs. Superseded
-  2026-11-06: Claude Code orbs, see [Review gates](#review-gates).
-* **Focus on Rails, central gems and Ruby; no ecosystem fixing** (Thomas, 2026-11-06). Fixing the Rails ecosystem
-  for 8.2 isn't our job. We don't open fixes in individual apps or niche gems for Rails-main breakage (Zammad,
-  authlogic, Mastodon: recorded in [contributions](upstream/contributions.md), not submitted). Upstream work goes
-  where it reaches every Rails app: Rails, the central gems (Rack, drivers, Puma and the like), Ruby, ruby-bench.
-* **Projects with restrictive AI policies get no upstream reports or fixes** (Thomas, 2026-11-06), for example
-  Mastodon (Assisted-by trailer, human-written descriptions, no agent-opened PRs). We still use them as
-  measurement corpus and record what we find.
-* **Current versions only; no fixes for old pins** (Thomas, 2026-11-06). A break that only shows up with an old,
-  long-superseded dependency version (an ancient minitest pin in a gem's dev dependencies, for example) is not
-  worth a PR, even if the old version is inside a declared range. Evidence and fixes target what apps actually run:
-  current releases of Rails, Ruby and gems. rails/rails#59676 (minitest 5.1–5.17, found via
-  active_model_serializers' old dev pin) stays open, but no more of this kind.
-
-## Bets
-
-Priorities (Thomas, 2026-11-03): Rails and ZJIT first, then gems. Parked: types/MCP, YJIT, ruby/uri, the Campfire
-lead. States change often; each bet's doc is the source of truth.
-
-| Bet | Goal | Doc |
-| --- | --- | --- |
-| Z10 | per-ISEQ ZJIT stats on the apps; leads 7 and 3 are being built | [zjit-iseq-leads](upstream/zjit-iseq-leads.md) |
-| F1 | frontier census: 20 apps on Rails main × master, ZJIT fallbacks and exits | [measurement-matrix](upstream/measurement-matrix.md) |
-| F2 | our merged Rails PRs under ZJIT | [measurement-matrix](upstream/measurement-matrix.md) |
-| C8 | census 8 (CPU and allocations) on 4.0.9 and pinned master | [census](upstream/census.md) |
-| Z5–Z8, Z12 | objtostring, compile speed, cfunc paths, stats correctness, warmup | [zjit-shortlist](upstream/zjit-shortlist.md) |
-| Z2, Z11 | ZJIT differential on Rails and app suites: done, no divergence | [zjit-app-differential](upstream/zjit-app-differential.md) |
-| V1, A1, S1 | Action View, Active Record and JSON serialization CPU | [actionview-cpu](upstream/actionview-cpu.md) · [activerecord-cpu](upstream/activerecord-cpu.md) · [serialization-cpu](upstream/serialization-cpu.md) |
-| G1, I18N | gem census; i18n deep dive; gem request census and round 2 (rack K1 #2550, nokogiri N1 #3759 open; i18n, tzinfo, importmap-rails, mail left alone) | [gem-census](upstream/gem-census.md) · [i18n-performance](upstream/i18n-performance.md) · [gem-request-census](upstream/gem-request-census.md) · [round 2](upstream/gem-request-census-2.md) |
-| R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
-| E2 | make the 13 census configurations that fail on Ruby master install, via gem fixes upstream; doubles the corpus every ZJIT pass sees. 11 of 13 install; Chatwoot and Flow are blocked | [gems-on-master](upstream/gems-on-master.md) |
-| Z13 | where ZJIT spends more Ir than YJIT on railsbench, lobsters and shipit, classified into buckets that become leads (2026-11-15). Done 11-15 on master `3be2b028a7`, JIT-flat and fixed heap: ZJIT +3.4% / +6.4% / +16.3%; polymorphic fallbacks 41%, codegen 33%, blocks 25%, ivars 9%, protected and `send` 9% of the gap, almost all known and owned upstream. New: OO1 (`OrderedOptions#_get` public, held: wins per call on 4.0.9, whole requests don't move), data for Shopify/ruby#1109 (draft, not posted); `&:sym` block args are about 1% of the gap and with ZS1 | [zjit-yjit-gap](upstream/zjit-yjit-gap.md) |
-| Z1-2 | ZJIT vs YJIT on real apps on master and on k0kubun's `zjit-headline2` (Shopify/ruby#1030), which gaps are unowned, then the Z11 differential on headline2 before it lands (2026-11-25). Done 11-25: headline2 `f2c3f457ff` runs 5.9–10.6% fewer instructions than YJIT on railsbench, lobsters, shipit, Campfire, Writebook and Blog, master 3.3–14.3% more; every remaining ZJIT-only cost is owned (k0kubun's later branches, #19949, #19617, our #19982), so no issue drafts; no divergence in three app suites, btest, test-all and the yield and ZS1 probes | [zjit-gap-census-2](upstream/zjit-gap-census-2.md) |
-| P-MAP | full-request stack map under YJIT by layer (Puma/Rack to drivers, GC, YJIT), leads outside Rails (2026-11-05). Done 11-14: flat below the layers; allow_browser (AB1) built, MK1 held below noise | [p-map](upstream/p-map.md) |
-| QB1 | how much of AR query building repeats per request and could be cached (2026-11-14). Done 11-14: 97% of it is built per query and repeats with only binds changing, but it is flat over stages and entry points; the exact levers are in association scopes: #59212 (open, not ours, up to 2.0%) and MB1 (blank merge into a relation without conditions, 0.4–1.4% of association-heavy pages; reviewed: opus approves, claude-code nits, after one round of changes) | [query-building](upstream/query-building.md) |
-| P-TEST | per-test framework overhead in real Rails test suites: fixtures, transactions, setup, reporters (2026-11-05) | test-overhead (planned) |
-| P-DRV | database driver result path: sqlite3, pg, trilogy, per row and per query (2026-11-05) | driver-cpu (planned) |
-| DEF8 | what every new app pays per request: each default piece of `rails new` from main switched off in turn and priced (default, `--api`, Tailwind; 20-field scaffold), ranked by cost × reach (2026-11-14). Done 11-14: importmap tags 18%, allow_browser 13% (AB1), info logging 10%, `:app` stylesheet 9% of a bare page under YJIT; IM1 (importmap-rails) and QL1 (Rails) built | [rails8-defaults](upstream/rails8-defaults.md) |
-| VM1 | what P-MAP's VM share (18–32%) and allocation/GC share (17–23%) under YJIT are made of on real request paths, mapped to Rails lines and ranked by share × reach (2026-11-15). Done 11-15: interpretation is 0.2–0.6% of instructions; the bucket is C calling back into Ruby, generic sends and call helpers, from mechanisms inherent to Rails' design or parked YJIT limits; allocation has no lever beyond the censuses. Built: TE2 (`tag_options` `!=` → `==`); TE1 (tag escapes without `super`) held, since it drops real prepends of `unwrapped_html_escape` (angular_xss, Discourse) | [vm-share](upstream/vm-share.md) |
-| FLK1 | make rails/rails CI less flaky: rank intermittent failures on main and unrelated PR jobs over Sep 17–Nov 15 (2,430 builds), find causes, fix the exact ones in one bundled PR, one commit per cause (2026-11-15). Top causes by volume are outside Rails (Buildkite agent interruptions; a Ruby Ractor `require` bug, mitigated on main). Built: Server-Timing sleep tolerances, Ractor proxy pin leak; the server restart test stays open (cause on CI not established) | [rails-ci-flakiness](upstream/rails-ci-flakiness.md) |
-
-Chosen 2026-11-03 for reach. E2 unblocks ZJIT measurement on Mastodon, Discourse, Chatwoot, Lobsters and Loomio, and
-the gem fixes are needed for 4.1 anyway. Z13 measures the gap to YJIT directly instead of inferring it from fallback
-counts. One orb slot stays reserved for Rails candidates from C8's CPU census; the Rails queue is otherwise empty.
-
-## Learnings from 2026-11-03
-
-The incidents behind the rules above, kept so the rules keep their reasons:
-
-* Two Shopify/ruby#1039 comments and one ruby/ruby#18960 comment were deleted as unsolicited data → comment rules.
-* A draft offering to close ours if a maintainer would rather land the rows himself read as credit-seeking (not
-  posted) → collaborative, not credit-seeking.
-* fatkodima on [rails#59577](https://github.com/rails/rails/pull/59577#issuecomment-6606427493) asked for
-  provenance and impact and called the code more complex for questionable benefit; #59577 and #59557 went too far
-  → CPU and provenance in the body, readability gate.
-* cbor-ruby#43 duplicated nobu's open #31; tiktoken_ruby#130 and ruby/ruby#16909 were missed → search before
-  building.
-* tekknolagi called our dense #1058 reply unreadable LLM shorthand and asked not to be made a proxy for it; Thomas
-  edits that reply himself → plain language upstream, with an outsider-readability pass.
-* A bare `#19583` in Shopify/ruby linked the wrong repo twice → owner/repo on every reference.
-* The 64 MiB ZJIT default filled in most app passes → memory flags and the zero-OOM check.
-* #19665 was relayed as a correctness fix and is not; Discourse and Mastodon were named as old-Bundler examples and
-  lock 4.0.23 → orb reports are claims.
-* S1, C7-1, I2 and C1 each needed three to five review rounds for the same classes of difference → exactness
-  checklist.
-* Several limits were set and changed within one day → one cap per repo, named exceptions, recorded here.
-
-## Learnings from byroot's follow-ups (2026-11-10)
-
-byroot reverted [#59584](https://github.com/rails/rails/pull/59584) in [#59713](https://github.com/rails/rails/pull/59713)
-and simplified [#59640](https://github.com/rails/rails/pull/59640) in [#59714](https://github.com/rails/rails/pull/59714),
-both on 2026-11-09. What went wrong in our process, and the rule each one now adds:
-
-* **#59584 was measured only where it wins.** Every variant (five `include?`, amatsuda's direct checks, the final
-  guard) was priced on a 19-byte object, an 11-column record and a short document; the largest input in the record
-  was 4 KB. The change adds up to three extra full scans before main's single `gsub!`, so its cost grows with
-  document size and memory bandwidth, and that case was never in the matrix. Three reviewer-driven reshapes reused
-  the same small inputs, and none of our review passes asked for a larger one.
-  → **Size sweep for any change to work proportional to input length** (string scans, escaping, parsing,
-  encoding, copying): small, typical, and one input well past the last-level cache (≥ 1 MB), each with the
-  character or match absent, early and late. Report the worst row in the body, not only the common one. A change
-  that adds passes over the input must show the large row.
-* **#59584's path is gone on the next Ruby.** Our own record said Ruby 4.1 takes `tr!` and "makes it moot", and
-  escaping was 0.4–0.6% of samples in the census apps. A small gain on a path that disappears on the next release,
-  owned by a maintainer who just rewrote it, was not worth a PR.
-  → **Lifetime and reach in `impact`:** say whether the path still runs on Ruby master and Rails main; if it
-  doesn't, open only with a large measured win on current releases.
-* **Review prompts asked whether the change was right, not where it loses.** → Every perf review prompt asks the
-  reviewer to construct the input that makes the change slowest (size, position, content) and to measure it.
-* **#59640 patched a part of the key that wasn't needed.** We made `self.class.name` nil-safe; byroot asked why the
-  class name was in the key at all, since `object_id` is unique, and deleted it. Our minimal fix kept existing
-  behaviour (named stores' keys) without asking whether that behaviour mattered.
-  → **Before patching a failing piece, ask whether it can go.** If the value it contributes isn't observable or
-  relied on, propose removing it, and name the smaller option in the body when we keep the conservative one.
-
-## No unnecessary code comments in upstream PRs (Thomas, 2026-11-10)
-
-Superfluous comments read as AI slop (byroot on #59555, see [Code comments in upstream
-patches](#code-comments-in-upstream-patches-byroot-on-59555-2026-11-05)). A standing rule for every upstream PR:
-
-* **A code comment stays only when a reader would otherwise undo or misread the code.** Then it is one short line
-  that says why, not what, and the diff keeps the comment density of the surrounding upstream code.
-* **No comments that** restate the code, narrate the change, mention the PR, the benchmark or the measurement, or
-  explain what was removed. Those belong in the commit message, the PR body or the Lowrail record.
-* **Tests and benchmark files count too.**
-* **Reviewers check it on every pass.** claude-code and Sol look at every added comment line; a superfluous comment
-  is a required change (`changes`), not a nit.
-
-## Claims are checked, behaviour changes are probed (Thomas, 2026-11-14)
+### Claims are checked, behaviour changes are probed (Thomas, 2026-11-14)
 
 Three false claims were written in one week. The [ruby/date#199](https://github.com/ruby/date/pull/199) body said
 `Date < NaN` raises `ArgumentError` "as for Integer", but `1 < Float::NAN` returns false (jeremyevans). The
@@ -614,115 +615,37 @@ The rails/rails#59628 draft comment named ridgepole as broken, but ridgepole 3.2
   date#199 is the example: a probe of `<` with NaN shows that Integer, Float and BigDecimal define their own `<` and
   return false, while Comparable-based classes such as Time and Rational raise.
 
-## Orbs only, not Thomas's Mac (Thomas, 2026-11-17)
+### Readability gate (L0–L3)
 
-All work runs in orbs. The Mac runner is not used: test suites there open sockets and macOS asks Thomas to allow
-incoming connections for `ruby`. arm64-only checks are skipped unless Thomas offers the Mac for one specific run.
+Thomas, 2026-11-03; rated as part of the primary review's maintainability rubric. L0: no harder to read; opens if
+exact and measurable. L1: slightly unusual but clear at once; needs a per-call CPU gain outside the A/A. L2:
+noticeably more complex (a new helper, lazy arrays, copied internals); needs an effect measurable in an app or on
+ruby-bench. L3: a duplicated method, a Ruby-version branch, index loops, or code that needs comments; don't open.
+ruby/ruby additionally needs a measurable ruby-bench effect or a correctness repro (#19488 and #19625 were closed
+for lacking one).
 
-## Orb time (Thomas, 2026-11-04)
+Readability checks added 2026-11-04 (Thomas: "always watch for readable code"), after #59608's first shape
+reassigned a variable inside an `unless`:
 
-Amp orbs are billed per minute while running, by size (a1.tiny 1 CPU/2 GB $0.08/h, small 2/4 $0.17, medium 4/8
-$0.33, large 8/16 $0.66, xxlarge 16/32 $1.32). A paused orb costs nothing; an orb pauses 5 minutes after its agent
-finishes (20 after a human interaction), and immediately when the thread is archived. Orb Saver Mode is on, so
-opening a thread doesn't wake it.
+* **Describe it out loud first** (Thomas). Before any review, the author writes the changed code as plain sentences,
+  one per line or branch, as if reading it to a colleague ("take the current formats; if the template's single
+  format already leads them, keep the list as it is, otherwise put it in front"). If a sentence comes out awkward,
+  needs "except" or "unless also", or can't be said without naming a variable twice, refactor the code until the
+  description is simple, then measure again. The fastest form isn't required: a readable form that keeps most of the
+  gain wins. The final description goes into the review record and, shortened, into the PR body.
+* **Cold read.** A reviewer who hasn't seen the change states in one sentence what each branch does and why each
+  condition is there. If that takes a second try, rewrite before opening.
+* **Shape checklist.** Each case gets its own branch, with no reassignment inside a conditional modifier and no
+  ternary longer than one short line. Sentinel or identity checks (`equal?`, placeholder values) get a one-line
+  comment saying why. No new name used only once. The diff reads like the surrounding code.
+* **Numbers as a signal, not a gate.** Record the change in `flog` score and RuboCop `Metrics/*` (ABC size,
+  cyclomatic and perceived complexity) for each touched method, before and after. A rise needs a sentence of
+  justification in the review. These numbers miss shape problems, so they never replace the cold read.
 
-* **a1.medium minimum, a1.large is fine.** The project default is **a1.medium** (was a1.large); smaller orbs are
-  too small (Thomas, 2026-11-04). Pass `orb_size` on every create_thread: **a1.medium** for watchers, coordination,
-  reviews, ledger and docs work and light suites; **a1.large** for Ruby builds, Rails framework suites, app and gem
-  suites, differential harnesses and benchmarks. **Above a1.large** (xxlarge, 3xlarge) only for a short, focused
-  burst that needs it, such as a full Rails matrix or a parallel bisect; say why in the prompt and archive the
-  thread as soon as that step is done.
-* **One central watcher** (W1) watches every open upstream PR every 30 minutes and reports only what
-  matters; worker orbs keep no PR watch schedules.
-* **Let orbs pause:** no sleep loops or long polling, finish a step and stop; stop long-running services when done;
-  batch messages to other threads, since every message wakes the receiving orb for at least 5 minutes.
-* **Archive finished orbs** instead of leaving them open; their records live in this repo.
-* Check usage with `amp orb system-metrics <thread>` (cores, memory, CPU over time) before choosing a size for a
-  similar task. Measured on 2026-11-04: all 17 active orbs were a1.large; the coordinator, the watcher, C15 and G2
-  averaged 3–10 % CPU, and the busiest workers 50–65 %.
+### Correctness fixes: readable first (2026-11-04)
 
-## Line permalinks for callers (Thomas, 2026-11-04)
-
-Every caller we cite in a PR body, issue or ledger record links to the exact line, so a reader can check the claim in
-one click.
-
-* Use a **commit-SHA permalink** (`blob/<sha>/path#L42`), never `blob/main`; a branch link drifts as soon as the file
-  changes. For a gem, take the commit behind the tag of its **latest released version** and name that version in the
-  link text; if the gem has no tag, use the release's "Bump to x.y.z" commit or the gem's source on rubygems.org.
-  For an app without releases, use the default branch's current SHA and name the branch.
-* Also check the gem's default branch: if the call is already fixed there, say "fixed on main, unreleased" instead of
-  calling it a break.
-* Quote the line exactly as it appears at that SHA, or mark the quote as shortened.
-* Before posting, fetch each file at the linked SHA and confirm that the linked line contains the quoted call.
-
-## When Rails restores a private API, and other open calls (decided 2026-11-04 at Thomas's request)
-
-* **Restores.** Public API removed without a deprecation: restore it, deprecated if the new name is better. Private
-  or `:nodoc:` API: restore it only when all three hold, otherwise fix it in the gem or app that uses it:
-  1. the removal is **unreleased**, so a restore costs maintainers no new compatibility promise,
-  2. **several real callers** (released gems or apps, cited with permalinks) break, or one large one breaks
-     silently or wrongly, and
-  3. the restore is **small** and keeps the change's purpose: a deprecated shim, an alias, a signature, not a
-     revert of the feature.
-  The PR says openly that the API is private and names the callers. #59629 (`find_template`), #59630
-  (`filter_proxies`) and AR-4 (`where!`/`having!` binds) meet all three and stay open or queued. Private
-  breakage that fails any of them (build_bind_attribute, `_prefixes`, Vary changes) is record-only, or goes to the
-  gem or app when the fix there is small and the maintainers are active.
-* **No deprecation shims for internal API** (matthewd closing #59663, 2026-11-06: "We don't deprecate internal
-  APIs. That's what internal means."). Private or `:nodoc:` breakage gets fixed in the gem or app that relies on
-  it. Rails gets a fix only when Rails itself is wrong, not a deprecated restore.
-* **Open PRs and issues anywhere: no pings** (Thomas, 2026-11-17, superseding the four-week ping): maintainers have
-  their own time. Closing only at a maintainer's request or when superseded.
-* **rspec-rails release:** no issue for now. Ask once a Rails 8.2 beta is out, because then its unreleased Rails-main
-  fixes block real users.
-* **Unreleased upstream evidence** (for example ransack's main-branch spec) may be cited when the body says it is
-  unreleased.
-
-## Benchmark tables in the project's own format (Thomas, 2026-11-14)
-
-Thomas liked ruby/ruby#19899's table: the project's own benchmark, run with the project's own tool, in the format its
-maintainers use. Bodies lead with that where one exists. For ruby/ruby that means an existing `benchmark/*.yml` (or a
-new small one) through `make benchmark ITEM=… COMPARE_RUBY=… OPTS="--repeat-count 10"`, with the compare-ruby and
-built-ruby version lines and benchmark-driver's table, and the older release on the same machine in one sentence when
-it shows the regression closing. For Rails and gems, a short benchmark-ips (or benchmark-driver) script in the body
-with its before/after output, as Rails PRs usually show. Runs are on one pinned core, best of N, and the record keeps
-the raw output and an A/A of the same setup. Callgrind stays the tool that finds and attributes a change; in the body
-it is one supporting line or a small table only when it shows something the wall-time table can't (objects, a
-JIT-only path). Wall time is measured on orbs; Thomas's Mac was tried as a quieter machine on 2026-11-14 and gave
-±4.5% A/A while in use, so it isn't used.
-
-## Realistic sizes upstream (Thomas, 2026-11-14)
-
-Bodies and comments cite only sizes an app plausibly has: a few to about 20 params, tens to about 100 columns,
-values of ordinary size. The size sweep that DECISIONS asks for (up to ≥ 1 MB, thousands of entries, 300 columns)
-proves no blow-up and stays in the record; the body may say in one clause that larger inputs were checked, but it
-puts no unrealistic row in a table and claims no number for one. Example: rails/rails#59804 first showed 2,000
-params and a 1 MB value; both rows were cut the same day.
-
-## Nothing internal upstream (Thomas, 2026-11-14)
-
-What we post upstream (PR bodies, comments, issues, review replies) contains only what helps the people there decide
-on that PR or issue. Things that only concern us or Lowrail stay in Lowrail: our held or unopened branches and fixes
-as comparisons, our queue, slots and caps, our review passes and reviewer names, internal IDs (K1, L3, F1, census and
-round numbers), orbs, and our process. Upstream numbers describe the upstream code (main, the PR, a release), with
-setup in neutral words ("35 Rails workloads", not "census 9"). Before posting, check every column, row, link and
-sentence: would the reader miss it if it were gone? If not, drop it. Example: on ruby/ruby#17251 a table with a
-column for our held GC branch was deleted the same day, and only the master and #17251 numbers were kept, as an
-update to our earlier comment there. PR bodies don't mention or link Lowrail (no footer since 2026-11-15).
-
-## No comments on others' PRs without Thomas's approval (Thomas, 2026-11-04)
-
-We don't comment on other people's PRs or issues (measurements, reviews, suggestions, thanks) unless Thomas has
-explicitly approved that specific comment. Their PR description is theirs; what we measure about their work stays in
-our records. Orbs draft at most, and ask the coordinator, who asks Thomas. A benchmark comment on rails/rails#59141
-was deleted for this reason. Replies on our own PRs and issues are unaffected.
-
-Approved comments follow the style Thomas liked on rails/rails#57013 (2026-11-04): open with "Heads-up in case
-it's useful:", state the effect in one sentence, give the minimal repro, name an existing fix or PR if there is
-one, and stop. No thanks, no judgement of the work, no proposals beyond what was asked, no numbers that weren't
-asked for.
-
-**Exception: answers that were asked for** (Thomas, 2026-11-05). When someone asks us for an answer, a re-test or a
-data point, post it directly and promptly, without asking Thomas first, as long as it is reviewed and measured
-properly and helps constructively. Example: eightbitraptor's re-test request on ruby/ruby#17251. Everything
-unsolicited still needs Thomas's approval.
+Thomas: for bug and correctness fixes, no code golf. The fix is written as readable and idiomatic as possible,
+in the shape a maintainer would write it. Performance is a side note: measure only to rule out a clear slowdown on
+a common path, never to choose between two correct shapes, and keep the numbers out of the body (see above). The
+L0–L3 performance bars don't apply; the cold read and the shape checklist do. Correctness findings that come up
+along the way get their own PRs.

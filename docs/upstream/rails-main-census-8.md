@@ -33,7 +33,7 @@ timing is claimed. Ruby master ran boot, list and allocations with an A/A on 21 
   checked with `gh api repos/rails/rails/commits/main` on 2026-11-03.
 * **Ruby 4.0.9** (`ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]`), interpreter and `--yjit`.
   Census 8 started on 4.0.7 and moved to 4.0.9
-  ([decision](../DECISIONS.md#ruby-pin-409-41-measured-on-pinned-master-2026-11-03)); the 4.0.7 allocation labels
+  ([decision](../DECISIONS.md#evidence-and-measurement)); the 4.0.7 allocation labels
   `c8`/`c82` stay as receipts and are not compared with anything here. **Ruby master**
   [`9aa0898240`](https://github.com/ruby/ruby/commit/9aa089824003b9fde7ff2de6953d282def364edb)
   (`ruby 4.1.0dev (2026-11-03T12:42:36Z HEAD 9aa0898240) +PRISM`, RubyGems 4.1.0.beta3), built with YJIT and ZJIT.
@@ -383,7 +383,7 @@ wert ist, entscheidest du.
 ## Ruby master 9aa0898240
 
 Ruby master [`9aa0898240`](https://github.com/ruby/ruby/commit/9aa089824003b9fde7ff2de6953d282def364edb) is the
-4.1 pin ([decision](../DECISIONS.md#ruby-pin-409-41-measured-on-pinned-master-2026-11-03); 4.1.0-preview1 was
+4.1 pin ([decision](../DECISIONS.md#evidence-and-measurement); 4.1.0-preview1 was
 dropped). It was built here with `--enable-yjit --enable-zjit` into `~/c8/ruby-master`. Master labels are never
 compared with 4.0.9 labels.
 

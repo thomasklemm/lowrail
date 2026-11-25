@@ -621,7 +621,7 @@ decision, and Lowrail works next to them:
 | [upstream/explainers.md](docs/upstream/explainers.md) | German explainer per open ruby/ruby and rails/rails PR, and where a reply is owed |
 | [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
-| [DECISIONS.md](docs/DECISIONS.md) · [decisions-prototype.md](docs/decisions-prototype.md) | current rules and decisions; the parked prototype's decisions and stacking backlog |
+| [DECISIONS.md](docs/DECISIONS.md) · [decisions-archive.md](docs/decisions-archive.md) · [decisions-prototype.md](docs/decisions-prototype.md) | current rules and decisions; superseded wording and history; the parked prototype's decisions and stacking backlog |
 | [STATUS.md](docs/STATUS.md) | dated evidence log |
 | [compat.md](docs/compat.md) | pinned real apps, gem breadth, baseline failures, load-order findings and verify results |
 | [bench.md](docs/bench.md) | measurement protocol and results |
