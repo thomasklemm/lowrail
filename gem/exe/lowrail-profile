@@ -130,7 +130,9 @@ unless File.exist?(ext)
   FileUtils.rm_rf(tmp)
   FileUtils.mkdir_p(tmp)
   log = File.join(tmp, "build.log")
-  ok = system(RbConfig.ruby, File.join(source, "extconf.rb"), chdir: tmp, out: log, err: log) &&
+  # Built from a copy: mkmf escapes a srcdir with spaces in a way make's VPATH cannot follow.
+  FileUtils.cp(Dir["#{source}/*"], tmp)
+  ok = system(RbConfig.ruby, "extconf.rb", chdir: tmp, out: log, err: log) &&
     system(RbConfig::CONFIG.fetch("MAKE", "make"), chdir: tmp, out: [log, "a"], err: [log, "a"])
   unless ok && File.exist?(File.join(tmp, name))
     kept = "#{cache}.build.log"
@@ -164,13 +166,15 @@ statuses = (1..runs).map do |n|
   FileUtils.mkdir_p(dir)
   # The repeat run also records the nearest app line of every allocation
   # (without allocating, so its counts stay comparable). Every internal flag
-  # is set or cleared here, so none leaks in from the caller's environment.
+  # is set or cleared here, so none leaks in from the caller's environment;
+  # lib goes through RUBYLIB, which, unlike RUBYOPT, takes paths with spaces.
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
     "LOWRAIL_PROFILE_ATTRIBUTE" => ("1" if n == [runs, 2].min),
     "LOWRAIL_PROFILE_RECORD" => ("1" if record && n == 1),
     "LOWRAIL_PROFILE_ALLOW_WRITES" => ("1" if allow_writes),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
-    "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }
+    "RUBYLIB" => [lib, ENV["RUBYLIB"]].reject { _1.nil? || _1.empty? }.join(File::PATH_SEPARATOR),
+    "RUBYOPT" => [ENV["RUBYOPT"], "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   system(env, *command)
   # A shell's convention: the exit status, or 128 + the signal that ended it.

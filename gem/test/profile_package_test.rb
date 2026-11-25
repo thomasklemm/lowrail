@@ -57,6 +57,16 @@ class ProfilePackageTest < Minitest::Test
       out, _, status = Open3.capture3(env, RUBY, exe, "--help", chdir: dir)
       assert status.success?
       assert_includes out, "--allow-writes"
+      # A capture from a gem home whose path has a space: the child starts and loads the profiler.
+      spaced = File.join(dir, "space home")
+      _, err, status = Open3.capture3(env, RUBY, "-S", "gem", "install", "--local", "--no-document", "--install-dir", spaced,
+        File.join(dir, "p.gem"), chdir: dir)
+      assert status.success?, err
+      env = env.merge("GEM_HOME" => spaced, "GEM_PATH" => spaced, "XDG_CACHE_HOME" => File.join(spaced, "cache"))
+      out, err, = Open3.capture3(env, RUBY, File.join(spaced, "bin", "lowrail-profile"), "--runs", "1", "--out", "o", "--",
+        RUBY, "-e", "puts defined?(Lowrail::Profile::API) ? :profiler_loaded : :profiler_missing", chdir: dir)
+      assert_equal "profiler_loaded\n", out, err
+      refute_match(/invalid switch/, err)
       installed = Dir[File.join(home, "gems", "lowrail-profile-*")].first
       refute File.exist?(File.join(installed, "lib/lowrail.rb"))
       assert File.file?(File.join(installed, "data/contributions-index.json"))
