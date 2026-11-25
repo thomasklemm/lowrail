@@ -474,3 +474,107 @@ The body is otherwise concise: title names the change; the creation/terminated-f
 2. **Overbroad query frequency:** delete “once or more per query” from the opening paragraph, and “i.e. on every query” from `impact`. With a connection already leased, **10 real `select_value("SELECT 23")` calls caused zero `LeaseRegistry#lease` calls**, counted with TracePoint on the exact head. The true claim is that each named pool lookup acquires the registry mutex on main, not that every SQL query does. No replacement paragraph is needed.
 
 These are submission/body must-fixes, not a request to rebuild the Rails code or to add implementation-locking tests. The existing generation/disconnect regression tests and the independent probes cover observable behavior. Keep LR1 built and unopened pending those corrections, the other required reviews and Thomas's decision.
+
+## LR1
+
+**Pass (2026-11-25):** `reviewer: thermos-sol`; **head:** [`7e342de11f12e6ee056e6c7ff5df713b2518e03c`](https://github.com/thomasklemm/rails/commit/7e342de11f12e6ee056e6c7ff5df713b2518e03c); **verdict: changes before opening**, for body accuracy and missing performance gates, not a demonstrated code defect. Both Thermos rubrics were applied directly in [this review thread](https://ampcode.com/threads/T-01a2132c-5d2a-7632-8c18-9a2c4923b2e7), without delegation. The independent Astra review is not incorporated here. Parent: `cf0325a832a1594f01d866da1e4ad23d962d886b`. The queue body audited is the version at Lowrail `6fb73534e27b1285ed146f830a65384671c1662a`; it is left unchanged so the required corrections remain explicit.
+
+### Correctness and the introducing review
+
+The entire production diff is the short circuit at [connection_pool.rb:214–220](https://github.com/thomasklemm/rails/blob/7e342de11f12e6ee056e6c7ff5df713b2518e03c/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L214-L220): return an existing lease, otherwise run the original synchronized lookup/create. The registry already existed before [Rails PR 59844](https://github.com/rails/rails/pull/59844); that PR introduced its generation flag and registry mutex, not the registry itself.
+
+After an independent source audit, the introducing PR's body, all three inline comments, submitted reviews, conversation and timeline were read. It merged 2026-11-19 as `e22f32a76030675806fa095f15c3ace4c58c0831`. [byroot requested a terminated flag and shared checkout helper](https://github.com/rails/rails/pull/59844#discussion_r4611112653), then [rejected moving the map into a generation object](https://github.com/rails/rails/pull/59844#discussion_r4626478984). There is no discussion requiring a mutex on a cached hit, or pricing that hit. LR1 retains the requested flag, helper and map ownership rather than reversing that design.
+
+The guarantees checked against actual callers are:
+
+* A miss must serialize **creation and insertion with clear/flag rotation**, not merely make each map access atomic. LR1 retains the entire `fetch_or_store` under `@lease_mutex`; its second lookup still handles an intervening insertion. Removing that mutex or replacing the slow path with an unsynchronized `||=` would not be an equivalent simplification.
+* A hit returns a `Lease`, never an arbitrary false value. [The only production registry access](https://github.com/thomasklemm/rails/blob/7e342de11f12e6ee056e6c7ff5df713b2518e03c/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L979-L989) supplies the current Thread/Fiber execution context; the other production operation is `clear` during disconnect. No new conversion or user-object callback is introduced for those keys, and a live context remains strongly referenced during lookup.
+* A hit ordered before a concurrent map clear can return the old lease. Its shared atomic flag is still marked terminated. The synchronized implementation can also return a lease immediately before another thread clears it; it never promised a valid generation for the lifetime of the caller's operation.
+* A lookup after the map has been emptied but before flag rotation sees a miss and waits for `@lease_mutex`. It cannot insert a new lease carrying the old flag. A clear after a new lease has been inserted terminates that lease as before.
+* [Disconnect holds the pool monitor while clearing leases](https://github.com/thomasklemm/rails/blob/7e342de11f12e6ee056e6c7ff5df713b2518e03c/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb#L567-L596). A checkout that waited through disconnect still revalidates its lease at line 987. Release, active-connection lookup, nested `with_connection`, sticky state, pinning and executor cleanup retain their existing paths.
+* [The underlying map](https://github.com/thomasklemm/rails/blob/7e342de11f12e6ee056e6c7ff5df713b2518e03c/activesupport/lib/active_support/weak_key_map.rb#L3-L43) uses GVL-protected individual operations on MRI and its own mutex on other engines. The new hit avoids the **registry** mutex, not every mutex on JRuby/TruffleRuby. On a miss the map read releases its own mutex before acquiring the registry mutex, so no reverse nested lock order is added. The `super()` and distinct mutex names from merged [PR 59887](https://github.com/rails/rails/pull/59887) remain intact.
+
+No introduced security, exception, API, configuration or load-order defect was found. Arbitrary values written into the internal registry and core/`:nodoc:` overrides are not new supported contracts. Forced disconnect's pre-existing treatment of in-use connections is not changed or certified beyond these tests.
+
+### Exact-head tests and mutation
+
+These runs use Ruby **4.0.9** (`3e93b23afc`), Minitest 6.1.0, sqlite3 gem 2.10.2 and pg 1.7.0 against PostgreSQL 17. An isolated Rails checkout and component bundle live under `.amp/in/orb-backup/lr1-review/`; `env.sh` selects them. Source locations confirmed the candidate was loaded, and its tracked tree remained clean at the named head. No Rails branch or external discussion was changed.
+
+From that checkout's `activerecord/`, with `ARCONFIG` pointing at the scratch database config and `PARALLEL_WORKERS=1`:
+
+```sh
+bundle exec ruby bin/test -a sqlite3 test/cases/connection_pool_test.rb test/cases/connection_adapters/connection_handler_test.rb test/cases/connection_adapters/connection_swapping_nested_test.rb test/cases/reaper_test.rb test/cases/query_cache_test.rb --seed 41231 --verbose
+# Same command with -a postgresql.
+```
+
+| Run | Tests | Assertions | Failures | Errors | Skips |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| SQLite, file-backed | 277 | 1573 | 0 | 0 | 2 |
+| PostgreSQL | 277 | 1600 | 0 | 0 | 0 |
+| Existing two disconnect-wait tests alone, each adapter | 2 | 9 | 0 | 0 | 0 |
+| Same two tests with lease revalidation removed, each adapter | 2 | 2 | 1 | 1 | 0 |
+
+The SQLite skips are the thread/fiber `test_keepalive_notices_problems` cases: `remote_disconnect unsupported`. The mutation preload `without-revalidation.rb` removes exactly `lease = connection_lease if lease.terminated?` in-process, leaving every production file and test unchanged. `test_connection_leased_while_waiting_for_disconnect_can_be_released` then fails because release returns false; nested `with_connection` times out. This demonstrates useful existing behavior coverage, not instruction/mutex-call assertions. A new permanent test merely checking that a mutex was skipped would be wrong; no additional upstream test is required for a performance-only short circuit that preserves these behaviors.
+
+The scratch `registry-probe.rb` also runs six controlled scenarios against the parent lookup and exact candidate: cache identity/context separation, generation invalidation, a cached read overlapping clear, a lookup between map clear and flag rotation, clear racing allocation-before-storage, and eight simultaneous misses for one key. It runs with both MRI's native map and the exact non-MRI wrapper selected from Rails' source **on MRI**: four runs of **6 tests / 55 assertions, 0 failures/errors/skips**, 24 / 220 overall. The hit-overlap probe deliberately allows clear to complete before the candidate returns an already-read lease, and checks that the returned lease is terminated; the base instead serializes clear behind that hit. This is an allowed ordering difference, not lost invalidation. Real JRuby/TruffleRuby memory-model execution was not performed and is not claimed.
+
+Initial setup errors were corrected before these final runs: missing Herb in the isolated bundle, a mislocated test filename, and PostgreSQL needing a restart after the test locale was generated. The standalone registry harness also needed the explicitly loaded atomic-boolean dependency and the parent's original lexical constant scope. These were harness/setup failures, not candidate defects. Final logs and harnesses are retained in the scratch directory.
+
+### Measurement replay and limits
+
+`replay.rb` independently parses all six retained [LR1 raw files](data/rails-main-census-11/raw/lr1/) and the adjacent introducing-merge [bisect files](data/rails-main-census-11/raw/bisect/). This is an arithmetic replay of the retained census measurement, not a fresh run on this orb. The recorded protocol is Ruby 4.0.9, no JIT for primary instruction claims, fixed five-pool heap and GC disabled inside each measured micro window. The association fixture and reset/load operations were read in [`assoc_micro.rb`](../../bench/upstream/census10/assoc_micro.rb); its runner is [`sweep.sh`](../../bench/upstream/census10/sweep.sh).
+
+Instructions per operation, no JIT; A/A is the absolute difference between the two main runs divided by their mean. Changes below compare the candidate with the first main run, matching the draft's columns:
+
+| Operation | Main | LR1 | Change | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| has_many reset/load, 3 rows | 673718.9 | 666795.6 | −1.0276% | 0.0285% |
+| has_one reset/load | 541443.1 | 535631.0 | −1.0734% | 0.0260% |
+| belongs_to reset/load | 515968.0 | 509827.1 | −1.1902% | 0.0161% |
+| joins SQL construction | 356642.0 | 353877.9 | −0.7750% | 0.0115% |
+| association count | 411961.2 | 410434.8 | −0.3705% | 0.0386% |
+
+All five move beyond A/A against **both** main controls. Allocation values are identical across all three files: 107.04 / 86.00 / 86.00 / 106.00 / 79.01 per respective operation. The retained bisect points `f12b615776` / `e22f32a760` reproduce +3983.3 / +3943.6 / +3957.6 / +4504.7 instructions for has_many / has_one / belongs_to / through, with unchanged objects; the +3.9k–4.5k regression claim is supported. The intervening changes outside the pool concern Rack and fixture tests/metadata, not these association micros. Besides avoiding the registry mutex, the new hit skips the `fetch_or_store` call and block.
+
+**Do not certify the old YJIT rows as JIT-flat.** The retained harness records only `compiled_block_count`, not the full compiled-ISEQ/block/invalidation gate. has_many additionally compiles three blocks in every measured window and is explicitly rejected. Arithmetic alone gives has_one −0.9151% against 0.7609% A/A, belongs_to −0.7109% against 0.6220%, and joins −1.4184% against 0.0513%. Thus “readers within A/A” is not literally what those files say, but their small margin and incomplete JIT gate justify making **no accepted YJIT claim**, including the currently advertised joins figure. No Ruby-master × ZJIT result or benchmark-ips body record is retained for LR1.
+
+The full-census “+0.075% in 8 apps” and “0.091% self, 69/71” totals cannot be independently recomputed from this checkout. The retained [method-net report](data/rails-main-census-11/cpu-net-c11c10-main-method.txt) covers **64 workloads / seven apps**, not the final 71/eight; its displayed lease/checkout/terminated shares sum to 0.084%, with a different denominator. The final per-workload method JSONs under `.lowrail/private/cpu-census/{c11c10,c11m,c11m2}` are absent here. This does not disprove the final census numbers, but that report is not sufficient evidence for them. Recover/recompute the final labels before presenting those aggregate claims as replayed; the draft body does not need them.
+
+The adverse input is a fresh execution context on every call: LR1 adds a preliminary map lookup that always misses. A diagnostic hit/miss micro with 5000 retained keys, fixed heap, stock Valgrind 3.24 and base/head/base was attempted (`registry-count.{rb,c}` and `callgrind-*`). **Every process reported `brk segment overflow`; all six diagnostic cohorts are rejected.** Their instruction totals are not accepted prices and were not retried to obtain green controls. The cold-miss cost still needs a valid measurement alongside the cached-hit body benchmark, especially for fiber-per-request applications.
+
+### Ownership and maintainability
+
+At 2026-11-25 14:57 UTC, upstream main is [`818edfd76a405b29f4695e051c07ea28a5476a4e`](https://github.com/rails/rails/commit/818edfd76a405b29f4695e051c07ea28a5476a4e). Both the pool and WeakKeyMap files are identical to the LR1 parent there. Recent file history contains the introducing lease change and the 2026-11-20 non-MRI follow-up, but no later lease rewrite. Searching all-state PRs for `59844` finds the original and the two non-MRI follow-ups; the original timeline cross-references only closed #59883 and merged #59887, whose own timelines link back to each other. Their bodies, review comments and conversations were read; neither owns this performance change. The candidate head has no associated Rails PR.
+
+The ownership search enumerated **all 1336 open Rails PRs**, checking file lists and paginating the 13 lists longer than 30 files. **20** touch the pool, not the queue note's eight: #44478, #45122, #46409, #46805, #49337, #49425, #55792, #57089, #57253, #57517, #57771, #58490, #58587, #58731, #58802, #59172, #59699, #59701, #59822 and #59885. Their pool patches were read; none changes `LeaseRegistry#lease`, and none changes `active_support/weak_key_map.rb`. #57771 is an older stable-branch map change, not this main-path optimization. No competing active implementation was found. This is a point-in-time ownership check, not assurance about unpublished maintainer work.
+
+Cold read: “Return the current context's cached lease; on a miss, take the registry mutex and look up or create its lease.” The only added condition is the real cache hit. Keeping the inner lookup is necessary after waiting for the lock; there is no new helper, state, engine/version branch, sentinel, comment or duplicated mechanism. The owning file is 1374 → 1374 lines, already over 1000. **L1:** familiar double-checked cache shape with an additional concurrency argument; no useful structural simplification was found. Replacing the mechanism or moving the map into a generation would be larger and would revisit byroot's explicit objection.
+
+For the touched method, Flog 4.9.4 is **3.9 → 5.7**; RuboCop 1.92.3 reports ABC **3.00 → 4.12**, cyclomatic **1 → 2**, perceived **1 → 2**. These isolated-method metrics reflect the single justified cache-hit branch, not spaghetti growth. The original inner synchronization protects generation membership, and non-MRI's underlying map synchronization protects individual map operations; neither should be removed. There are no added comments to cut.
+
+A maintainer could reasonably prefer the lock for simplicity: the claimed whole-app share is small, the mutex/generation design is recent, and there is no accepted production-JIT or elapsed-time result yet. Nothing read establishes that byroot wants the always-locked hit or is actively replacing it, so this is not an ownership veto; nor should the record presume that a one-percent association micro justifies reopening recent design work. Obtain the missing evidence before asking Thomas whether to propose it.
+
+### Commit and sentence-by-sentence body audit
+
+The single commit has **Thomas Klemm <github@tklemm.eu> as both author and committer, with no trailers**. Its title describes the one-line change; its message accurately explains generation membership and the permissible before-clear ordering. No metadata or code-comment correction is required.
+
+| Draft part | Assessment / smallest correction |
+| --- | --- |
+| Title: “Look up an existing connection lease without the registry mutex” | Accurate; importantly says registry mutex, not absence of all locks on every engine. |
+| “Since #59844, `LeaseRegistry#lease` takes a mutex on every call, so … do too, once or more per query.” | The first claim and three callers are verified. **Delete “once or more per query”** and `impact`'s “i.e. on every query”: a held adapter can execute SQL without another registry lookup. A live SQLite control returns `[1, 1, 1]` for three held-adapter `SELECT 1` calls while TracePoint observes zero registry leases. This is a review probe, not a proposed count-based upstream test. |
+| “The mutex is needed when a lease is created, so that it gets the terminated flag of the registry that stores it.” | Correct in the context of lookup; creation **and insertion** must remain inside the clear/rotation critical section. No longer explanation is needed upstream. |
+| “This returns an existing lease without it; a lookup that misses still creates the lease under the mutex.” | Verified directly and by the controlled schedules. Plain, short description of the change. |
+| “A lease found without the mutex is one that existed before any concurrent `disconnect` cleared the registry, which is what the locked lookup returns when it runs first, and `disconnect` still marks it terminated.” | The old-generation overlap argument is sound, but “any” is broader than necessary: a lookup after a completed clear can find a new-generation lease. Shorten to “A concurrent disconnect can still invalidate a returned lease, just as it can immediately after a synchronized lookup.” The previous sentence already explains the miss lock. |
+| “Callgrind instructions per call, Ruby 4.0, no JIT, objects unchanged” | Correct unit, Ruby family and unchanged allocation claim. Keep instructions distinct from elapsed time and methodology/A/A in this record. |
+| Three-row before/after table | Numeric values reproduce the retained interpreter files (integer cells truncate fractions by less than one instruction). **Label the actual measured operations:** has_many **reset/load**, has_one **reset/load**, joins SQL construction. Bare `author.posts` returns a lazy proxy; the measured case resets it and calls `to_a`. Bare `author.profile` after its first call is cached; the measured case resets its association first. Use short operation names rather than claiming those bare cached calls cost the displayed instructions. |
+
+The prose is two paragraphs, without internal census IDs, test counts, commands, review history, SHAs or a footer; its single small table follows the Numbers rule and never calls instructions “time.” It lacks the required discovery/provenance clause; incorporate “While profiling Rails association loads, …” into the shorter opener rather than adding a paragraph. The later DECISIONS benchmark-format rule additionally requires a benchmark-ips lead; this Callgrind table alone is not the completed body evidence.
+
+**Required before opening (smallest fixes):**
+
+1. Correct/cut the query-frequency claim, name reset/load operations honestly, and shorten the concurrency sentence as above; add provenance within the opener. No Rails code rewrite is requested.
+2. Produce the normal `script/upstream-bench` exact-head base/candidate/base record with a benchmark-ips lead and all JIT counters, including a fresh-context/miss control. Keep one small table in the final body, full method/A/A details here, and reject inconclusive cells rather than translating instructions into elapsed time.
+3. Record the required pinned Ruby-master × ZJIT comparison with A/A and the full gate; explain any loss before opening. The existing partial YJIT output is not a substitute.
+4. Correct the internal evidence summary: no certified old YJIT cells, 20 pool-touching open PRs rather than eight, and recover/recompute the final method labels before calling the eight-app aggregate independently replayed. If those labels cannot be recovered, retain the aggregate only as the original census report's unverified claim, not this pass's result.
+
+The exact code passes the correctness and structural-maintainability audit within the executed bounds, but this is **not** an approval to open. Astra's independent result and Thomas's opening decision remain separate. Only this Lowrail record and the queue pass are changed by this review.
