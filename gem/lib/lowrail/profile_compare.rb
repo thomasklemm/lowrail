@@ -12,10 +12,12 @@ module Lowrail
   # and each one's own spread), and head's own spread: the spread inside one
   # invocation misses how much invocations differ (Campfire's
   # json/common.rb:364 moved 0.27-3.3 inside a capture, 107.3-111.2 across
-  # six). For a line the floor is that noise or --min objects; for an action,
-  # twice the noise, 0.1% of its objects and 20 times --min, because parallel
-  # test workers split an action's requests differently from run to run (A/A
-  # on Campfire: every action within 0.08% and 6.5 objects). Without --aa the
+  # six). The floor is twice that noise, since one A/A pair is one sample of
+  # it (on the 3.3 Blog one pair failed 4.5% of unchanged heads at once the
+  # noise), and at least --min objects for a line; for an action also 0.1% of
+  # its objects and 20 times --min, because parallel test workers split an
+  # action's requests differently from run to run (A/A on Campfire: every
+  # action within 0.08% and 6.5 objects). Without --aa the
   # noise is each report's own spread, too small to gate on: compare lists
   # what exceeds it as places to look and exits 0.
   #
@@ -43,7 +45,7 @@ module Lowrail
       def delta = head - base
 
       def threshold(min)
-        what == "line" ? [noise, min].max : [2 * noise, ACTION_SHARE * [base, head].max, ACTION_MIN * min].max
+        what == "line" ? [2 * noise, min].max : [2 * noise, ACTION_SHARE * [base, head].max, ACTION_MIN * min].max
       end
     end
 
@@ -260,8 +262,8 @@ module Lowrail
           "head #{head_total.map { _1.round(1) }.join(" / ")}.\n\n"
       end
       noise = gate? ? "the base's run-to-run spread across the A/A pair, or head's own if larger," : "the larger run-to-run spread in either report"
-      out << "A change counts when it exceeds the noise floor: for a line #{noise} and at least #{@min} objects per " \
-        "request (warm); for an action twice that spread, #{(ACTION_SHARE * 100).round(1)}% of its objects and at least " \
+      out << "A change counts when it exceeds the noise floor: twice #{noise} and for a line at least #{@min} objects per " \
+        "request (warm); for an action at least #{(ACTION_SHARE * 100).round(1)}% of its objects and at least " \
         "#{ACTION_MIN * @min}. Compared: #{kinds.join(", ")}.\n\n"
       unless gate?
         out << "**Not a gate (exit 0): no A/A pair.** The spread inside one capture misses how much invocations differ, " \

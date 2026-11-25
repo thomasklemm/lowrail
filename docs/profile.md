@@ -284,7 +284,8 @@ differ (below), so such a list is a reason to look, not a confidence bound.
 * A row's noise is the base's spread across the A/A pair: largest minus smallest of all the runs of both base
   reports, so it covers the pair's difference and each one's own spread (every run counts with `--runs` above 2);
   or head's own spread, if that is larger. Without `--aa` it is the larger spread inside base or head.
-* A line's noise floor is the larger of its noise and `--min`.
+* A line's noise floor is the larger of twice its noise and `--min`: one A/A pair is one sample of that noise, and
+  at once the noise one pair failed 4.5% of unchanged heads on the 3.3 Blog (M5 confirm receipts).
 * An action's is the largest of twice its noise, 0.1% of its objects per request and 20 × `--min`, because parallel
   test workers split an action's requests differently from one invocation to the next. That multiplier comes from
   Campfire's first A/A pair, before the floor spanned invocations, not from a general confidence bound.

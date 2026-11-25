@@ -42,7 +42,7 @@ class ProfileCompareTest < Minitest::Test
   # Each term of the floor gates on its own, a move up to it passes and one
   # past it fails: an action's 20 times --min objects, its 0.1% share and
   # twice its noise (head's own spread when that is the larger), and a
-  # line's --min.
+  # line's --min and twice its noise.
   def test_compare_floor_terms
     realpath_tmpdir do |dir|
       gate = lambda do |base_act, head_act, line: [5.0, 5.0], args: []|
@@ -62,6 +62,8 @@ class ProfileCompareTest < Minitest::Test
       assert_equal [1, [["action", 200.0]]], gate.(flat.(1_000.0), [1_250.0, 1_350.0])
       assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_000.0), line: flat.(6.9), args: %w[--min 2])
       assert_equal [1, [["line", 2.0]]], gate.(flat.(1_000.0), flat.(1_000.0), line: flat.(7.1), args: %w[--min 2])
+      assert_equal [0, []], gate.(flat.(1_000.0), flat.(1_000.0), line: [6.4, 7.4]), "head's spread of 1 floors a line at 2"
+      assert_equal [1, [["line", 2.0]]], gate.(flat.(1_000.0), flat.(1_000.0), line: [7.6, 8.6])
     end
   end
 
@@ -80,10 +82,10 @@ class ProfileCompareTest < Minitest::Test
       status, result = compare(dir, base, same, aa: aa)
       assert_equal [0, true, []], [status, result["gate"], result["regressions"]], "an A/A-sized move: #{result}"
 
-      planted = capture.([113.4, 113.7], [20_200.0, 20_201.0])
+      planted = capture.([116.0, 116.3], [20_200.0, 20_201.0])
       status, result = compare(dir, base, planted, aa: aa)
       assert_equal 1, status, result.to_s
-      assert_equal [["action", 200.0, 122.0], ["line", 5.415, 3.2]],
+      assert_equal [["action", 200.0, 122.0], ["line", 8.015, 6.4]],
         result["regressions"].map { [_1["what"], _1["delta"].round(3), _1["noise_floor"].round(3)] }
 
       # The A/A pair adds to the spread inside each capture, it does not replace it.

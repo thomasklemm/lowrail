@@ -94,9 +94,9 @@ traffic**: it requests what tests need, with a test user agent, in test mode. `-
 `compare BASE.json HEAD.json --aa BASE2.json` exits **1** when a line or an action grew beyond its noise floor,
 **0** when nothing did, and **2** when the reports are not valid evidence: a failing suite, one run, a different
 command, seed, Ruby or environment, dropped samples, unfinished windows, or a report of another version. `BASE2`
-is a second profile of the unchanged base: the A/A pair sets the floor per row (a line's floor is its spread across
-both base profiles and head's own spread, at least `--min`, default 1 object per request; an action's is twice that,
-at least 0.1% of its objects and 20 × `--min`). Without `--aa` compare lists changes as places to look and exits 0:
+is a second profile of the unchanged base: the A/A pair sets the floor per row (twice the larger of a row's spread
+across both base profiles and head's own spread; for a line at least `--min`, default 1 object per request, for an
+action at least 0.1% of its objects and 20 × `--min`). Without `--aa` compare lists changes as places to look and exits 0:
 it is not a gate. `--json` prints the result as JSON.
 
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
