@@ -361,10 +361,14 @@ nothing else running. ruby-bench `c54da6e`, plain `--zjit`. Scripts:
 
 **Timing.** [`rounds.sh`](../../bench/upstream/ruby19681/rounds.sh): 10 rounds, each one `run_benchmarks.rb
 --interleave --turbo --no-sudo --zjit-stats=compile_time_ns,compile_lir_time_ns` per benchmark over three
-executables, `master`, `aa` (the same master binary) and `head`, with the order rotated per round (ruby-bench's
-default 15 warmup and 10 timed iterations; it pins to core 0). Pooled with ruby-bench's own `ResultsTableBuilder`
+executables, `master`, `aa` (the same master binary) and `head`, with the process order rotated per round.
+The harness defaults to 15 warmups and at least 10 timed iterations; all 90 process results here have exactly
+15 and 10. Commands pin to core 0 and disable ASLR. Reconstructed with ruby-bench's own `ResultsTableBuilder`
 ([`pooled_table.rb`](../../bench/upstream/ruby19681/pooled_table.rb)): iteration times of all rounds together, stats
-the median over rounds.
+the median over rounds. This is not a saved invocation's stdout. The `ms` columns are timed-iteration means ±
+population standard deviation; ZJIT stats are whole-process totals, not per-iteration times. Ratios and Welch
+p-values concern iteration times only, not compilation. The first-iteration columns come from the first
+concatenated round, not a pooled statistic; they are retained here as a receipt but omitted from the reply.
 
 ```
 bench         master (ms)  compile_time_ns  compile_lir_time_ns        aa (ms)  compile_time_ns  compile_lir_time_ns      head (ms)  compile_time_ns  compile_lir_time_ns  aa 1st itr  head 1st itr  master/aa  p-value       sig  master/head  p-value  sig
@@ -378,18 +382,23 @@ against the mean of master and aa in the same round (mean ± standard error over
 
 | bench | compile_time A/A | compile_time head | per round | head below both | compile_lir_time A/A | compile_lir_time head | per round |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| railsbench | −0.7% | +2.2% | +1.7 ± 1.4% | 4/10 | −0.7% | +0.5% | +0.0 ± 1.4% |
+| railsbench | −0.7% | +2.2% | +1.7 ± 1.4% | 3/10 | −0.7% | +0.5% | +0.0 ± 1.4% |
 | lobsters | +0.6% | −6.7% | −4.7 ± 1.4% | 9/10 | +0.3% | −11.2% | −9.3 ± 1.3% |
 | shipit | +0.6% | −3.1% | −3.7 ± 1.0% | 8/10 | +0.7% | −4.9% | −5.5 ± 1.0% |
 
-Single-run A/A pairs spread up to ±7% (railsbench) and ±4–6% (lobsters, shipit), which is why one run each could not
-resolve it. Head is faster on lobsters and shipit in every run position (lobsters mean compile_time 4,762, 4,935 and
-4,960 ms when head ran first, second and third, against 5,053–5,179 ms for master and aa in any position).
-`compiled_iseq_count` and `code_region_bytes` are equal within ±2 ISEQs and one 4 KiB page in every round.
+Single-round compile-time A/A changes range −6.9…+7.5% on railsbench, −2.3…+4.2% on lobsters and −5.5…+6.0%
+on shipit; the small median A/A differences are not bounds on individual runs. Lobsters head has lower mean
+compile_time in every run position (4,762, 4,935 and 4,960 ms when head ran first, second and third, against
+5,053–5,179 ms for master and aa in any position). Shipit does not: head third averages 3,921 ms versus master's
+3,904 ms and aa's 4,081 ms. Native compiled-ISEQ counts vary by up to four across the three executables within a
+round (shipit round 7; head/master differs by three). Code bytes vary by up to 8,192 within a round (lobsters
+round 8, two 4 KiB pages), so exact code-size equality is not a result of this measurement.
 
-**Run time** does not change: master/head 0.989, 0.981 and 0.989 (p 0.31, 0.06, 0.33), inside the A/A (master/aa
-1.018 on railsbench, significant at p 0.011, which shows the run-time noise here). That is expected, since the
-generated code is the same (section 3), but it is measured, not assumed.
+**Run time:** no improvement is demonstrated. Master/head ratios are 0.989, 0.981 and 0.989 for lobsters,
+railsbench and shipit (p 0.307, 0.056, 0.325); every head mean is slightly slower. Railsbench's identical-binary
+A/A is itself marked significant: master/aa 1.018, p 0.011. These pooled p-values treat iterations sharing a
+process as independent samples; they establish neither runtime equivalence nor a precise slowdown. Independent
+Welch checks using one mean per process give master/head p 0.653, 0.222, 0.625, and railsbench A/A p 0.193.
 
 **Callgrind.** [`cg.sh`](../../bench/upstream/ruby19681/cg.sh): pinned Valgrind 3.19 with the brk reservation,
 fixed heap (`RUBY_GC_HEAP_INIT_BYTES=32 MiB`), ruby-bench default harness with 5 warmup and 1 timed iteration,
@@ -403,43 +412,44 @@ counts). One run each; no `brk segment overflow`, no failed ISEQs
 | lobsters | 26.274G | 23.175G | −11.8% | 4,199M | 1,073M | 16.0% → 4.6% | +0.12% |
 | shipit | 21.377G | 20.284G | −5.1% | 2,035M | 922M | 9.5% → 4.5% | +0.10% |
 
-ISEQs compiled: 2,722/2,723, 6,627/6,624 and 6,327/6,326. The whole Ir difference is in `handle_caller_saved_regs`;
-everything else in compilation agrees within 0.12%, which stands in for a Callgrind A/A. The regalloc phase
-(`compile_with_regs::{closure#1}`) goes 1.66G → 1.33G, 7.60G → 4.47G and 4.99G → 3.88G.
+ISEQs compiled: 2,722/2,723, 6,627/6,624 and 6,327/6,326. The recorded inclusive `handle_caller_saved_regs`
+reduction slightly exceeds the total saving; the rest rises by about 0.08–0.12%. This supports attribution but is
+**not a Callgrind A/A**; none was run. The regalloc phase (`compile_with_regs::{closure#1}`) goes 1.66G → 1.33G,
+7.60G → 4.47G and 4.99G → 3.88G. The function counts match the builder's recorded extraction output, but the
+committed annotation excerpts omit these rows; see the receipt limitation below.
 
 **Conclusion.** The body's sentence was wrong for lobsters and shipit: lobsters compile_time −6.7% (LIR −11%), shipit
-−3.1% (LIR −5%), both well outside the A/A, and Callgrind −11.8% and −5.1% of compile instructions. Railsbench doesn't
-move outside wall-time noise (+2.2% against single-run A/A spreads of ±7%), though Callgrind counts −4.1% there. The
+−3.1% (LIR −5%). The medians, paired rounds and Callgrind reductions of 11.8% and 5.1% support a compilation
+improvement, without implying individual runs all fall outside A/A variation. Railsbench is inconclusive in native
+compile time (+2.2%, versus A/A −6.9…+7.5%), though Callgrind counts −4.1% there. The
 earlier −3…−5% on lobsters (master `0c404b09a0`, `9aa0898240`) was right in sign and somewhat low; the share of
-`handle_caller_saved_regs` in lobsters' compile Ir is larger than the railsbench profile (7.7%) suggested. Run time
-doesn't change.
+`handle_caller_saved_regs` in lobsters' recorded compile Ir is larger than the railsbench profile (7.7%) suggested.
+No runtime improvement is demonstrated.
 
 **Receipts.** [`raw/rounds.tar.gz`](../../bench/upstream/ruby19681/raw/rounds.tar.gz): the 30 run_benchmarks JSON
 files and their tables (the full stdout of each run was overwritten by its table file when copying; the JSON is
 complete). [`raw/cg-logs.tar.gz`](../../bench/upstream/ruby19681/raw/cg-logs.tar.gz) and
 [`raw/cg-annotate-top80.txt.gz`](../../bench/upstream/ruby19681/raw/cg-annotate-top80.txt.gz): Callgrind logs and the
-top of `callgrind_annotate --inclusive=yes` per profile; the 15 MB profiles stay in the orb.
+top of `callgrind_annotate --inclusive=yes` per profile. Totals are independently checkable from both archives;
+the HCSR/regalloc rows fall outside the top-80 excerpts. The six full profiles (about 15 MB) were left in the
+[builder's orb](https://ampcode.com/threads/T-01a21185-f476-74e4-a119-190f520109fd) at
+`/home/user/w/out/cg/{railsbench,lobsters,shipit}-{master,head}.cg`, not archived in Lowrail. The reply now uses
+only independently retained instruction totals, not the function attribution.
 
-**Reply draft for ruby/ruby#19681 (not posted; Thomas approves):**
+**Thermos-sol text review, 2026-11-25:** original draft required changes; corrected reply/body approved, both
+rubrics applied personally without subagents. All 30 original tables and the full pooled table reproduce
+byte-for-byte with ruby-bench `c54da6e`; independent Python/SciPy calculations confirm the medians, standard
+errors, per-round counts and all six pooled p-values. All six Callgrind totals agree between logs, annotations
+and summary. Checked the patch's actual spill-order/indexing changes and the maintainer's exact question
+([comment](https://github.com/ruby/ruby/pull/19681#issuecomment-7148951938)). This is a text/evidence review, not
+a new code-test or benchmark run.
 
-> On lobsters it cuts compile time by about 7% and on shipit by about 3%; railsbench doesn't move by more than noise.
->
-> This is master `f63048e942` against this PR rebased onto it, release builds, with ruby-bench's railsbench,
-> lobsters and shipit and `--zjit`. It's 10 rounds of `./run_benchmarks.rb -e "master::ruby --zjit" -e "aa::ruby
-> --zjit" -e "head::ruby --zjit" --interleave --zjit-stats=compile_time_ns,compile_lir_time_ns <bench>`, rotating the
-> order each round; `aa` is the master binary again. Times pool all rounds' iterations, and the stats are the median
-> of the 10 rounds:
->
-> ```
-> bench         master (ms)  compile_time_ns  compile_lir_time_ns        aa (ms)  compile_time_ns  compile_lir_time_ns      head (ms)  compile_time_ns  compile_lir_time_ns  aa 1st itr  head 1st itr  master/aa  p-value       sig  master/head  p-value  sig
-> lobsters     788.9 ± 7.8%    5,117,946,763        3,163,929,397   803.7 ± 9.2%    5,147,785,856        3,171,935,703   797.8 ± 7.6%    4,774,260,682        2,809,971,602       1.023         1.025      0.982    0.127                  0.989    0.307
-> railsbench  1685.9 ± 5.9%    1,406,784,625          841,561,951  1655.7 ± 3.8%    1,396,819,547          835,607,417  1719.3 ± 8.2%    1,437,515,839          845,513,679       1.050         0.957  1.018 (*)    0.011  p < 0.05        0.981    0.056
-> shipit      1345.5 ± 8.8%    4,019,669,732        2,392,400,476  1328.1 ± 7.3%    4,042,925,926        2,408,709,523  1361.1 ± 7.7%    3,894,138,988        2,274,240,743       0.917         1.020      1.013    0.257                  0.989    0.325
-> ```
->
-> Run time doesn't change, as expected, since the generated code is the same.
->
-> Compile time varies by up to ±7% from run to run on this machine, so I also counted the instructions spent in
-> compilation with Callgrind: 26.3G to 23.2G on lobsters (−11.8%), 21.4G to 20.3G on shipit (−5.1%) and 7.7G to 7.4G
-> on railsbench (−4.1%). All of the difference is in `handle_caller_saved_regs`, which drops from 16% to 5% of
-> compilation on lobsters. I've corrected the description, which said these didn't move.
+The builder's recorded commands show the scratch rebase and equal added/deleted patch lines, the same build
+recipe for both executables, and master's release flags (thin LTO, Rust `opt-level=3`, YJIT off). JSON metadata
+confirms both source pins. No independent rebuild, effective-config comparison or second-build A/A was performed
+by this review. Suitable evidence for the limited compilation claim, not exact portability or runtime claims.
+
+**Corrected reply and body:** the canonical drafts and correction-by-correction verdict are in
+[`RUBY19681.md`, For Thomas](../../bench/upstream/pr-queue/items/RUBY19681.md#for-thomas). Methodology and receipt
+limitations stay here rather than in the upstream body. Nothing posted or PATCHed; upstream publication still
+requires Thomas's approval.
