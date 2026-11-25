@@ -1,0 +1,121 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Who else works on an item's problem, checked before it opens (DECISIONS 2026-11-25: TA1 duplicated an open PR that
+# referenced the PR introducing the regression; ZS1 overlapped commits on a maintainer's branch).
+#
+#   script/ownership ID   open PRs that cross-reference the item's introduced_by PR (or name its commit), open PRs
+#                         naming a method that PR or the item's branch changes, and each tracker issue or PR with the
+#                         open PRs and issues referencing it; writes a dated ownership: line into the item
+#
+# script/pr-queue open refuses an item whose ownership check is missing or older than 3 days. Only gh is used.
+
+load File.expand_path("pr-queue", __dir__)
+
+module Ownership
+  METHOD = /\A[-+](?![-+]).*?\b(?:def\s+(?:self\.)?|fn\s+)([A-Za-z_]\w*[?!=]?)/
+  TESTS = %r{(\A|/)(test|spec)s?/|_(test|spec)\.rb\z}
+  MAX_NAMES = 10
+  PER_NAME = 5
+  SOURCE = "nodes { ... on CrossReferencedEvent { source { __typename " \
+           "... on PullRequest { number title state author { login } repository { nameWithOwner } } " \
+           "... on Issue { number title state author { login } repository { nameWithOwner } } } } }"
+  REFS = <<~GRAPHQL
+    query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) {
+      issueOrPullRequest(number: $number) {
+        ... on Issue { title state timelineItems(itemTypes: [CROSS_REFERENCED_EVENT], first: 100) { #{SOURCE} } }
+        ... on PullRequest { title state timelineItems(itemTypes: [CROSS_REFERENCED_EVENT], first: 100) { #{SOURCE} } } } } }
+  GRAPHQL
+
+  module_function
+
+  # Methods added, removed or changed in the non-test files of a GitHub files list (Ruby def, Rust fn).
+  def method_names(files)
+    files.reject { TESTS.match?(_1["filename"]) }.flat_map { _1["patch"].to_s.lines.filter_map { |l| l[METHOD, 1] } }.uniq
+  end
+
+  def ref_of(value)
+    repo, number = value.to_s.match(%r{([\w.-]+/[\w.-]+)(?:#|/(?:issues|pull)/)(\d+)})&.captures
+    repo ? [repo, number.to_i] : abort("tracker #{value.inspect}: write owner/repo#N")
+  end
+
+  def label(ref) = "#{ref[:repo]}##{ref[:number]} (#{ref[:pr] ? 'PR' : 'issue'}, #{ref[:state]}, #{ref[:author]}): #{ref[:title]}"
+
+  def references(repo, number)
+    owner, name = repo.split("/")
+    node = PrQueue.gh("graphql", "-f", "query=#{REFS}", "-f", "owner=#{owner}", "-f", "name=#{name}", "-F", "number=#{number}")
+                  .dig("data", "repository", "issueOrPullRequest")
+    refs = node["timelineItems"]["nodes"].filter_map { _1["source"] }.map do |s|
+      { repo: s.dig("repository", "nameWithOwner"), number: s["number"], pr: s["__typename"] == "PullRequest",
+        state: s["state"].downcase, author: s.dig("author", "login"), title: s["title"] }
+    end
+    [node, refs]
+  end
+
+  def search(repo, term)
+    found = PrQueue.gh("search/issues", "-X", "GET", "-f", %(q=repo:#{repo} is:pr is:open "#{term}"), "-F", "per_page=#{PER_NAME}")
+    refs = found["items"].map do |i|
+      { repo:, number: i["number"], pr: true, state: i["state"], author: i.dig("user", "login"), title: i["title"] }
+    end
+    [found["total_count"], refs]
+  end
+
+  def check(item)
+    repo = item["repo"]
+    hits = {}
+    checked = []
+    add = ->(why, ref) { hits[[ref[:repo], ref[:number]]] ||= "#{why}: #{label(ref)}" unless ref[:repo] == repo && ref[:number] == item["pr"] }
+    files = []
+    if (intro = item["introduced_by"])
+      pr = intro.is_a?(Integer) ? intro : PrQueue.gh("repos/#{repo}/commits/#{intro}/pulls").first&.fetch("number")
+      if pr
+        references(repo, pr).last.select { _1[:pr] && _1[:state] == "open" }.each { add.("references ##{pr}", _1) }
+        files += PrQueue.gh("repos/#{repo}/pulls/#{pr}/files?per_page=100")
+        checked << "open PRs cross-referencing ##{pr}"
+      else
+        files += PrQueue.gh("repos/#{repo}/commits/#{intro}")["files"]
+        search(repo, intro).last.each { add.("names #{intro}", _1) }
+        checked << "open PRs naming #{intro}"
+      end
+    end
+    if item["branch"]
+      begin
+        files += PrQueue.gh("repos/#{repo}/compare/#{item['base'] || 'main'}...#{item.fork.split('/').first}:#{item['branch']}")["files"]
+      rescue RuntimeError => e
+        checked << "no branch diff (#{e.message[0, 80]})"
+      end
+    end
+    names = method_names(files).first(MAX_NAMES)
+    names.each do |name|
+      total, refs = search(repo, name)
+      refs.each { add.("names #{name} (#{total} open PRs)", _1) }
+    end
+    checked << "open PRs naming #{names.join(', ')}" unless names.empty?
+    Array(item["tracker"]).each do |value|
+      trepo, number = ref_of(value)
+      node, refs = references(trepo, number)
+      hits[[trepo, number]] ||= "tracker: #{trepo}##{number} (#{node['state'].downcase}): #{node['title']}"
+      refs.select { _1[:state] == "open" }.each { add.("references #{trepo}##{number}", _1) }
+      checked << "#{trepo}##{number} and what references it"
+    end
+    [checked, hits.values]
+  end
+
+  def line(date, checked, hits) = "ownership: {date: #{date}, checked: #{checked.to_json}, hits: #{hits.to_json}}"
+
+  def record(item, line)
+    text = File.read(item.path)
+    text = text.match?(/^ownership:/) ? text.sub(/^ownership:.*$/) { line } : text.sub(/^passes:/) { "#{line}\npasses:" }
+    File.write(item.path, text)
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  item = PrQueue.find(ARGV.first || abort(File.read(__FILE__)[/^#   script.*?(?=\n#\n)/m].gsub(/^# ?/, "")))
+  checked, hits = Ownership.check(item)
+  abort "#{item.id}: no introduced_by, branch or tracker to check" if checked.empty?
+  Ownership.record(item, Ownership.line(Date.today, checked, hits))
+  puts "#{item.id}: checked #{checked.join('; ')}"
+  puts hits.empty? ? "  nothing found" : hits.map { "  #{_1}" }
+  puts "wrote ownership: into #{item.path}; read the hits before opening, then commit it"
+end

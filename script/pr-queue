@@ -39,6 +39,8 @@ module PrQueue
   # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt. ruby/ruby opens only items Thomas names (DECISIONS).
   CAPS = { "rails/rails" => { open: 22, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
+  # script/ownership's check must be this recent to open (DECISIONS 2026-11-25, after TA1 duplicated an open PR).
+  OWNERSHIP_DAYS = 3
   # /opt/git adds an Amp-Thread-ID trailer to commits and breaks `cat-file commit`.
   GIT = File.executable?("/usr/bin/git") ? "/usr/bin/git" : "git"
   THOMAS = { "NAME" => "Thomas Klemm", "EMAIL" => "github@tklemm.eu" }.freeze
@@ -81,6 +83,7 @@ module PrQueue
     list << "unknown kind #{m['kind'].inspect}" unless KINDS.include?(m["kind"])
     list << "head must be a quoted SHA" unless m["head"].nil? || sha?(m["head"])
     list << "pr must be a number" unless m["pr"].nil? || m["pr"].is_a?(Integer)
+    list << "introduced_by must be a PR number or a quoted SHA" unless m["introduced_by"].nil? || m["introduced_by"].is_a?(Integer) || sha?(m["introduced_by"])
     list << "guard_review must be true or false" unless [nil, true, false].include?(m["guard_review"])
     list << "#{m['state']} needs pr" if %w[draft ready merged].include?(m["state"]) && !m["pr"]
     list << "no title" if item.title.empty?
@@ -246,6 +249,12 @@ module PrQueue
     end
   end
 
+  def ownership_blocker(meta, today = Date.today)
+    date = meta["ownership"]["date"] if meta["ownership"].is_a?(Hash)
+    return "no ownership check; run script/ownership #{meta['id']}" unless date.is_a?(Date)
+    "ownership check of #{date} is older than #{OWNERSHIP_DAYS} days; run script/ownership #{meta['id']}" if today - date > OWNERSHIP_DAYS
+  end
+
   def deps_problem(item, by_id)
     Array(item["depends_on"]).each do |dep|
       return "depends on #{dep}, not merged" unless by_id[dep]&.[]("state") == "merged"
@@ -265,7 +274,7 @@ module PrQueue
     return "no approving pass on this head from #{gaps.join(', ')}" unless gaps.empty?
     return "conflicts with #{item['base'] || 'main'}" unless fact[:clean]
     return "no body" if item.body.empty?
-    deps_problem(item, by_id)
+    ownership_blocker(item.meta) || deps_problem(item, by_id)
   end
 
   def next_step(item, fact, by_id)
@@ -284,7 +293,7 @@ module PrQueue
       return conflict if conflict
       return "review: #{gaps.join(', ')} on this head" unless gaps.empty?
       return "push the branch to #{item.fork}" if fact && !fact[:fork_head]
-      { "built" => "review", "in-review" => "set state: reviewed", "reviewed" => deps_problem(item, by_id) || "open",
+      { "built" => "review", "in-review" => "set state: reviewed", "reviewed" => deps_problem(item, by_id) || ownership_blocker(item.meta) || "open",
         "draft" => "ready when a slot frees" }.fetch(item["state"])
     end
   end

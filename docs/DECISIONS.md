@@ -191,6 +191,10 @@ body exactly as posted, impact, rank by effect and breadth, and every review pas
 only when its repo has room, strongest first, through `script/pr-queue open`, which refuses unless the gates below
 pass on the current head. A candidate made moot upstream moves to `superseded` or `closed` with a note.
 
+* **Ownership check before opening** (2026-11-25): TA1 duplicated czj's open PR, which our search missed but which
+  cross-referenced the PR that introduced the regression, and ZS1 overlapped commits on a maintainer's branch. Every
+  item records `introduced_by` and `tracker` where they exist and runs `script/ownership ID`; `script/pr-queue open`
+  refuses without a check from the last 3 days.
 * **rails/rails: only the most urgent findings open** (Thomas, 2026-11-05 night, with 22 of ours open): until our
   open count is clearly lower, a new Rails PR opens only for an unreleased regression that breaks widely used apps or
   gems, or a change that measurably moves whole requests. Everything else waits in the queue as reviewed or held.

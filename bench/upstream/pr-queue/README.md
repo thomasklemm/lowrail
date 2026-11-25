@@ -25,6 +25,14 @@ the ledger", as does a merged item missing from the Merged section of
 [contributions.md](../../../docs/upstream/contributions.md), which is kept by hand. Run `sync` and add the ledger
 entry; `status` itself writes nothing.
 
+## Ownership check
+
+`script/ownership ID` lists who else may already own the item's problem: open PRs that cross-reference its
+`introduced_by` PR (or name its commit), open PRs naming a method changed by that PR or by the item's branch (non-test
+files, Ruby `def` and Rust `fn`), and each `tracker` issue or PR with the open PRs and issues that reference it. It
+writes the date, what it checked and the hits into the item's `ownership:` line. Read the hits before opening.
+`open` refuses, and `status` shows, a reviewed item whose ownership check is missing or older than 3 days.
+
 ## Rebasing a CHANGELOG-only conflict
 
 `script/pr-queue rebase ID` does what was done by hand for PR59574 and INR436/437/442 on 2026-11-17. It refuses
@@ -89,6 +97,9 @@ branch: thomasklemm/form-tag-helper-token-tag
 head: "ab0a99e41a"            # the commit the passes reviewed; quoted, 7–40 hex digits
 base: main                    # the branch the PR targets
 built_on: "bdb3d96012"        # upstream commit it was built and tested on
+introduced_by: 58211          # optional: the upstream PR number or quoted commit SHA that introduced the problem
+tracker: [Shopify/ruby#1014]  # optional: upstream issues or PRs that track the problem (owner/repo#N)
+ownership: {date: 2026-11-25, checked: [...], hits: [...]}  # written by script/ownership
 depends_on: []                # IDs that must be merged first
 stacked_on:                   # ID of our PR this one is stacked on (that one must be opened)
 alternative_of:               # ID this competes with; only one of them opens
