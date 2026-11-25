@@ -193,3 +193,102 @@ class. Same report supplied as A/A is a deterministic validator control, not a c
 
 M5 needs fixes for A1–A4, regression coverage at the actual CLI/installed-package boundaries, and confirmation on
 the resulting candidate. The current green suite and corpus receipts do not satisfy those missing guarantees.
+
+## Confirm pass on the fixes (thermos-fable, 2026-11-25)
+
+**Verdict: confirmed. A1–A4 are fixed and the README additions are accurate; no must-fix remains from this
+list.** Four non-blocking notes and the A/A recommendation follow. Both Thermos rubrics were applied directly,
+without delegation and without reading the parallel confirm. No profiler code was changed, nothing was published,
+tagged or posted.
+
+Reviewed `c2e5c393..14579fb4`, profile changes only, at Lowrail `b6109a84` (`gem/` and the CI workflow are identical
+to `14579fb4` there and at `a613a580`). Gem built from `gem/` at that head: sha256
+`324affa67569770b578d73d96fab7aef6ca53e4126ecefc838d227b331236f2d`, the same bytes as the fixes receipts. Everything
+below ran on Linux x86_64 on both ends of the support range, Ruby 4.0.7 / Rails 8.1.4.1 and Ruby 3.3.14 / Rails
+7.2.4, with the same results unless a row says otherwise. Scripts and logs are in this review thread's workspace
+(`.amp/in/orb-backup/fable-profile/`), not in the repository.
+
+### Fix by fix
+
+| Fix | Verdict | What was run |
+| --- | --- | --- |
+| A1 exit status (`b60a29e2`) | Fixed | Astra's three repros from the installed gem: failing suite 1 (plain 1), `exit 7` → 7, `TERM` → 143. Also `KILL` → 137, first run fails → 3, only the second fails → 4, both fail differently → the first's, no report after `exit 5` → 5, no report after `KILL` → 137, missing command → 127, report cannot be written after `exit 7` → 7, `--record` cannot write after `exit 7` → 7. A passing command exits 1 when no report can be built or `--record` cannot write, and 0 otherwise. `capture.json` records the same numbers. |
+| A2 production database (`85c4fedc`) | Fixed | Astra's repro as a real `RAILS_ENV=production` run of the fresh app with a sentinel workloads file: local primary plus a remote `database_tasks: false` secondary is refused before the file runs, by `host:` and by `url:`; the same secondary as `replica: true`, a loopback host and a local-only config are not; `--allow-writes` passes; a stale `LOWRAIL_PROFILE_ALLOW_WRITES=1` in the caller's environment does not. No connection was made. |
+| A3 paths with spaces (`e3a53f20`) | Fixed | Astra's repro from `gem install --install-dir ".../space home"`: both runs start with the profiler loaded, no `invalid switch`. Then the fresh app's whole process-parallel suite from an app directory, a path gem, a cache and an `--out` that all contain spaces, with a caller `RUBYLIB` that has one too: identical outcomes (11 tests), the counter built in the spaced cache. |
+| A4 inconsistent report (`b6276362`) | Fixed | Astra's repro on the fresh app's real thread-parallel report (requests, jobs, mails, Cable actions) exits 2. So do: actions emptied alone, one action row lost, one window miscounted in one run, job or Cable actions emptied, a mail row lost, and a missing, short or non-integer `windows`. Still 0: an untouched copy, ranked lines emptied alone, windows moved between two actions with sums kept. Every valid report passes: 63 real reports (the M4 and fixes receipts of Blog, Campfire with 8 processes, CodeTriage, Lobsters under RSpec, two `--workloads` captures, and 38 of the fresh app in process, thread and RSpec runs). The reporter derives `completed` from the same action rows, so it cannot write a report this check refuses. |
+| README: renamed actions, Spring (`7b45ced2`) | Accurate | Renaming an action in head and adding 1,000,000 objects to it exits 0 with both names under *Not compared* (ran in base only / ran in head only); raising a ranked line by 500 in the same report exits 1. Spring 4.7.0: a warm server passes the suite twice, counts nothing and exits 1 with *no runs with requests*; `DISABLE_SPRING=1` counts 7 requests and exits 0. The exit-status sentences match the A1 rows. |
+
+**Each fix's test fails without the fix.** With the commit reverted and the tests kept at head:
+`test_a_failed_command_fails_the_profile` (expected 7, got 0), `test_workloads_refuse_a_remote_production_database`,
+`test_built_gem_runs_without_the_checkout` (the counter does not build) and
+`test_workloads_captures_compare_by_what_they_measured` (exit 0 for the hollow report) each fail, on both Rubies.
+Nine single-part mutants fail too: the signal convention, first-failure-wins, the status after a missing report,
+`include_hidden`, the replica skip, the unloadable-config refusal, loading `ActiveRecord::Base` for the check,
+`-I` back in `RUBYOPT`, and building the counter in place. One survives (note 2). At head the CI command passes
+locally: 29 runs, 0 failures, 0 skips on both; CI on `b6109a84` is 14 of 14.
+
+**Fresh app.** `rails new` on each Rails, the built gem installed and listed with `require: false`, an isolated
+engine mounted at `/outsider`, inline Active Job, a mailer, a channel, Minitest with two workers and RSpec. Per-test
+outcomes are identical plain and in both profiled runs for process workers (12 tests, 1 skip), thread workers
+(the same 12) and RSpec (5 examples, 1 pending). Reports count 7 requests, 5 jobs, 6 mail windows and 4 Cable
+actions per run in 2 processes (process workers) or 1 (threads), and 4 requests under RSpec; engine requests are
+named `Outsider::ProbeController#…`, and jobs enqueued inside a request are not counted again. One suite
+adjustment was needed that has nothing to do with the profiler: Rails 7.2's transactional tests fail under thread
+workers in a plain run, so the thread runs turn them off and isolate by tag.
+
+### Non-blocking notes
+
+1. **Low: a child Ruby started with its own `RUBYLIB` no longer boots when the gem is not on its gem path**
+   (`gem/exe/lowrail-profile`, the `RUBYOPT` line). The child inherits `-rlowrail/profile` but not the directory:
+   `cannot load such file -- lowrail/profile`. Before `e3a53f20` the `-I` travelled in `RUBYOPT` and the child ran.
+   Reproduced only from the checkout's exe with the gem not installed; with the gem installed or in the bundle the
+   child finds it through RubyGems or Bundler and runs. Smallest fix, run: keep
+   `("-I#{lib}" unless lib.match?(/\s/))` in `RUBYOPT` beside `RUBYLIB`; the child runs again and the spaced-path
+   package test still passes.
+2. **Low: A4's test proves only the empty case.** A mutant that refuses only an empty action list for a kind with
+   completed windows passes the whole suite, though head also refuses a lost row and a miscount (run above).
+   Smallest fix: one more assertion in the same test, on the report with one action row removed.
+3. **Low, before and after the fix: a gem home with a glob character** (`[`, `{`, `*`, `?`) cannot build the
+   counter, because `Dir["#{source}/*"]` treats the path as a pattern. Smallest fix, run:
+   `Dir.children(source).map { File.join(source, _1) }` in both places.
+4. **Boundaries of the A2 runs.** `bin/rails runner` always loads `ActiveRecord::Base` (the railtie's `runner`
+   block), so in a stock app the guard takes the loaded branch; the raw-configuration branch and its *did not load*
+   refusal are reached only by the gem's test, with its own runner. In the fresh app an unloadable `database.yml`,
+   or a `DATABASE_URL` for an adapter the bundle lacks, stops the app at boot, before the guard and before the
+   file. Nothing is sent either way. A remote `DATABASE_URL` with its adapter installed was not run here.
+
+Maintainability: no structural objection. Each fix sits with its owner as the first pass asked (exit policy in the
+CLI, production policy in the workloads runner, report coherence in `report_problems`), and no file crosses 1,000
+lines. `gem/test/profile_test.rb` is at 981: move the compare tests to their own file (and add it to the CI
+command) with the next test rather than after it. Two receipts of the fixes run (`w/post-allow`, both Blogs) are
+reports compare refuses, by the existing unfinished-window check (21 job windows, 20 completed) and not by A4's.
+
+### Recommendation: the A/A pair
+
+**Do not default to more than one A/A pair. For 0.1, make a line's floor twice its measured spread, as an
+action's already is, and have the documented CI job profile head again when compare exits 1.**
+
+* A second pair buys little and costs two more suite runs on every pull request. Over the Blog's six unchanged
+  same-seed captures (every choice of base, A/A and head), the shipped gate fails 6 of 120 unchanged comparisons,
+  always on `uri/common.rb:394`; with two pairs 12 of 360, with three 12 of 720. With one pair and twice the
+  spread, 0 of 120. In the comparisons against the planted captures the unrelated row appears in 19 of 60 as
+  shipped, 50 of 240 with two pairs, 78 of 720 with three, 6 of 60 with one pair at twice the spread.
+* Twice the spread costs no sensitivity that the receipts can show: the plant is found in every comparison on all
+  four apps (60 of 60 on the Blog, 6 of 6 on Campfire, CodeTriage and Lobsters), because at most 2 lines per app
+  in those receipts have a spread above `--min` at all. With independent run-to-run noise on one line and no
+  change, a simulation of the rule fails 3.4% of comparisons as shipped, 1.3% with two pairs, 0.6% with three, and
+  0.34% with one pair at twice the spread.
+* It does not cover a capture whose runs agree with each other and differ from the base: the receipt's own
+  comparison would still flag `uri/common.rb:394` (+3.88 against 2.0, the planted capture read 21.25 and 21.75),
+  and in the fresh app's process-parallel suite on Ruby 4.0 one capture in eight read other values on several
+  lines in both of its runs (probably another split of its seven requests over the two workers; not traced),
+  which fails 42 of 336 unchanged comparisons even at three times the spread and 210 of 1,680 with two pairs.
+  Only a second head capture separates that from a regression: requiring the row in both drops it to 30 of 1,680
+  there and 0 of 360 on the Blog. A regression is in both; a shifted capture is in one.
+* Concretely: `Change#threshold` uses `[2 * noise, min].max` for a line (the A/A floor test needs new numbers); the
+  README's job reruns `lowrail-profile` on head when compare exits 1 and fails only if the second compare exits 1
+  too, and its *When the gate fails on unchanged code* paragraph says so instead of *rerun the base pair*.
+  Repeating `--aa`, or a `--confirm HEAD2.json` that requires the same row in both, can follow 0.1.
+
+`uri/common.rb:394` is the `gsub!` of `URI._encode_uri_component`, which allocates per escaped character; why its
+input differs between unchanged runs was not traced.
