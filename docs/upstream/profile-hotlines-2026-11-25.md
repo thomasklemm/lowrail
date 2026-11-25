@@ -32,6 +32,9 @@ Everything below this section is the script's output. This section is the judgme
      Campfire 1.74% (49% from its `request.base_url` per importmap entry) and Pingcrm 0.29%. No PR from others names
      it. The script marks it "ours in repo" because RACK2550 and RK3 are open there. jeremyevans approved RACK2550 on
      2026-11-04, so only RK3 is unanswered and rack has room under the gem cap of 2.
+     Checked 2026-11-25 (RK4): the objects are the empty Arrays of `split_header(nil)` in `Request#scheme`, and
+     linyiru's open rack/rack#2520 (approved by jeremyevans) already skips that call, so this lead is taken
+     ([record](../../bench/upstream/rk4/README.md)).
   3. **concurrent-ruby `NonConcurrentMapBackend#dupped_backend`** (#93). `each_pair` copies the whole Hash before it
      iterates. The line is in all 12 apps but small (0.11%); its largest share is Forem at 131 objects per request,
      99% of them from its `restore_original_host` middleware. The copy is deliberate, so that iteration survives

@@ -1,0 +1,24 @@
+== rack-main (b432304e8d)
+scheme            3.0 objs  "http"
+ssl?              6.0 objs  false
+base_url         15.0 objs  "http://example.com"
+-- X-Forwarded-Proto: https
+scheme            6.0 objs  "https"
+ssl?              6.0 objs  true
+base_url         21.0 objs  "https://example.com:80"
+== rack-2520 (06c11bea80)
+scheme            0.0 objs  "http"
+ssl?              0.0 objs  false
+base_url          9.0 objs  "http://example.com"
+-- X-Forwarded-Proto: https
+scheme            5.0 objs  "https"
+ssl?              5.0 objs  true
+base_url         19.0 objs  "https://example.com:80"
+== rack-cand (84a59d35bd)
+scheme            0.0 objs  "http"
+ssl?              0.0 objs  false
+base_url          9.0 objs  "http://example.com"
+-- X-Forwarded-Proto: https
+scheme            5.0 objs  "https"
+ssl?              5.0 objs  true
+base_url         19.0 objs  "https://example.com:80"
