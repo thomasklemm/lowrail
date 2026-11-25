@@ -1,0 +1,170 @@
+
+=== tree=stable RAILS_ENV=test mode=plain ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb plain
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=configured ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb configured
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::InlineAdapter
+deliveries=1
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=direct ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb direct
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::InlineAdapter
+deliveries=1
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=all ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb all
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=money_lazy ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_lazy
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=money_eager ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_eager
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=money_lazy_explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_lazy_explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=stable RAILS_ENV=test mode=money_eager_explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=stable.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_eager_explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=stable RAILS_ENV=production mode=plain ===
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::AsyncAdapter
+deliveries=1
+exit=0
+
+=== tree=main RAILS_ENV=test mode=plain ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb plain
+boot=ok active_job_railtie=false config_active_job=false
+[ActiveJob] Enqueued ActionMailer::MailDeliveryJob (Job ID: 1bcd90c0-4353-46da-96e4-9a319896f920) to Async(default) with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+enqueue=true adapter=ActiveJob::QueueAdapters::AsyncAdapter
+[ActiveJob] [ActionMailer::MailDeliveryJob] [1bcd90c0-4353-46da-96e4-9a319896f920] Performing ActionMailer::MailDeliveryJob (Job ID: 1bcd90c0-4353-46da-96e4-9a319896f920) from Async(default) enqueued at 2026-11-25T21:26:25.621890265Z with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+[ActiveJob] [ActionMailer::MailDeliveryJob] [1bcd90c0-4353-46da-96e4-9a319896f920] Performed ActionMailer::MailDeliveryJob (Job ID: 1bcd90c0-4353-46da-96e4-9a319896f920) from Async(default) in 153.41ms
+deliveries=1
+exit=0
+
+=== tree=main RAILS_ENV=test mode=configured ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb configured
+phase=configuration error=NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/railties/lib/rails/railtie/configuration.rb:110:in 'Rails::Railtie::Configuration#method_missing'
+bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb:23:in '<main>'
+exit=1
+
+=== tree=main RAILS_ENV=test mode=direct ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb direct
+boot=ok active_job_railtie=false config_active_job=false
+[ActiveJob] [ActionMailer::MailDeliveryJob] [50689b4e-9731-4e64-b2a6-8729b090c606] Performing ActionMailer::MailDeliveryJob (Job ID: 50689b4e-9731-4e64-b2a6-8729b090c606) from Inline(default) enqueued at 2026-11-25T21:26:27.293979041Z with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+[ActiveJob] [ActionMailer::MailDeliveryJob] [50689b4e-9731-4e64-b2a6-8729b090c606] Performed ActionMailer::MailDeliveryJob (Job ID: 50689b4e-9731-4e64-b2a6-8729b090c606) from Inline(default) in 158.35ms
+[ActiveJob] Enqueued ActionMailer::MailDeliveryJob (Job ID: 50689b4e-9731-4e64-b2a6-8729b090c606) to Inline(default) with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+enqueue=true adapter=ActiveJob::QueueAdapters::InlineAdapter
+deliveries=1
+exit=0
+
+=== tree=main RAILS_ENV=test mode=explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+exit=0
+
+=== tree=main RAILS_ENV=test mode=all ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb all
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+exit=0
+
+=== tree=main RAILS_ENV=test mode=money_lazy ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_lazy
+boot=ok active_job_railtie=false config_active_job=false
+phase=mailer_class_load error=NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/railties/lib/rails/railtie/configuration.rb:110:in 'Rails::Railtie::Configuration#method_missing'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/gems/gems/money-rails-3.0.0/lib/money-rails/hooks.rb:42:in 'block in MoneyRails::Hooks.init'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activejob/lib/active_job/base.rb:88:in '<class:Base>'
+exit=1
+
+=== tree=main RAILS_ENV=test mode=money_eager ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_eager
+phase=initialize! error=NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/railties/lib/rails/railtie/configuration.rb:110:in 'Rails::Railtie::Configuration#method_missing'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/gems/gems/money-rails-3.0.0/lib/money-rails/hooks.rb:42:in 'block in MoneyRails::Hooks.init'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activejob/lib/active_job/base.rb:88:in '<class:Base>'
+exit=1
+
+=== tree=main RAILS_ENV=test mode=money_lazy_explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_lazy_explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=main RAILS_ENV=test mode=money_eager_explicit ===
+$ RAILS_ENV=test BUNDLE_GEMFILE=main.Gemfile bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb money_eager_explicit
+boot=ok active_job_railtie=true config_active_job=true
+enqueue=true adapter=ActiveJob::QueueAdapters::TestAdapter
+deliveries=0
+money_version=3.0.0 serializer_registered=true
+exit=0
+
+=== tree=main RAILS_ENV=production mode=plain ===
+boot=ok active_job_railtie=false config_active_job=false
+[ActiveJob] Enqueued ActionMailer::MailDeliveryJob (Job ID: 7328a5a1-d5c8-4765-bba0-e8bbc67d626b) to Async(default) with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+enqueue=true adapter=ActiveJob::QueueAdapters::AsyncAdapter
+[ActiveJob] [ActionMailer::MailDeliveryJob] [7328a5a1-d5c8-4765-bba0-e8bbc67d626b] Performing ActionMailer::MailDeliveryJob (Job ID: 7328a5a1-d5c8-4765-bba0-e8bbc67d626b) from Async(default) enqueued at 2026-11-25T21:26:34.417008691Z with arguments: "ReviewMailer", "greeting", "deliver_now", {args: []}
+[ActiveJob] [ActionMailer::MailDeliveryJob] [7328a5a1-d5c8-4765-bba0-e8bbc67d626b] Performed ActionMailer::MailDeliveryJob (Job ID: 7328a5a1-d5c8-4765-bba0-e8bbc67d626b) from Async(default) in 191.01ms
+deliveries=1
+exit=0

@@ -1,0 +1,77 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+
+=== stable supplied repros ===
+Rails 8.1.4.1 money-rails 3.0.0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_job.rb config
+Rails 8.1.4.1 config: defined?(ActiveJob::Railtie)=true deliver_later: Errno::ECONNREFUSED: Connection refused - connect(2) for "localhost" port 25
+exit=0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_job.rb plain
+Rails 8.1.4.1 plain: defined?(ActiveJob::Railtie)=true deliver_later: delivered via ActiveJob::QueueAdapters::AsyncAdapter
+exit=0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_money.rb
+Rails 8.1.4.1 money-rails 3.0.0: boot ok, deliver_later ok
+exit=0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_money_eager.rb
+Rails 8.1.4.1 money-rails 3.0.0: boot ok, deliver_later ok
+exit=0
+
+=== main supplied repros ===
+Rails 8.2.0.alpha money-rails 3.0.0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_job.rb config
+Rails 8.2.0.alpha config: config.active_job raised NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+exit=0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_job.rb plain
+[ActiveJob] Enqueued ActionMailer::MailDeliveryJob (Job ID: 6a052f46-9bc3-4c35-8984-04f358be302c) to Async(default) with arguments: "M", "hi", "deliver_now", {args: []}
+Rails 8.2.0.alpha plain: defined?(ActiveJob::Railtie)=false deliver_later: delivered via ActiveJob::QueueAdapters::AsyncAdapter
+exit=0
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_money.rb
+/home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/railties/lib/rails/railtie/configuration.rb:110:in 'Rails::Railtie::Configuration#method_missing': undefined method 'active_job' for an instance of Rails::Application::Configuration (NoMethodError)
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/gems/gems/money-rails-3.0.0/lib/money-rails/hooks.rb:42:in 'block in MoneyRails::Hooks.init'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activejob/lib/active_job/base.rb:88:in '<class:Base>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activejob/lib/active_job/base.rb:75:in '<module:ActiveJob>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activejob/lib/active_job/base.rb:17:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.lowrail/gate-gems/4.0.7-x86_64-linux-229531a6cfbf07e3caef30dbac24a2a3f3fed482-rails-8.1.4.1/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/mail_delivery_job.rb:14:in '<module:ActionMailer>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/mail_delivery_job.rb:5:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.lowrail/gate-gems/4.0.7-x86_64-linux-229531a6cfbf07e3caef30dbac24a2a3f3fed482-rails-8.1.4.1/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/inflector/methods.rb:331:in 'Module#const_get'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/inflector/methods.rb:331:in 'ActiveSupport::Inflector#constantize'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/core_ext/string/inflections.rb:84:in 'String#constantize'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/railtie.rb:49:in 'block (2 levels) in <class:Railtie>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/base.rb:1086:in '<class:Base>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/base.rb:479:in '<module:ActionMailer>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/ug82m/rails-main/actionmailer/lib/action_mailer/base.rb:15:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.lowrail/gate-gems/4.0.7-x86_64-linux-229531a6cfbf07e3caef30dbac24a2a3f3fed482-rails-8.1.4.1/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
+	from bench/upstream/ug82-recheck-2026-11-25/mailer_money.rb:12:in '<main>'
+exit=1
+
+$ bundle exec ruby bench/upstream/ug82-recheck-2026-11-25/mailer_money_eager.rb
+initialize! raised: undefined method 'active_job' for an instance of Rails::Application::Configuration
+exit=0

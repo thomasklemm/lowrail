@@ -1,0 +1,15 @@
+$ mdl --version
+0.18.1
+
+$ mdl --config <rails-main>/.mdlrc <head>/guides/source/upgrading_ruby_on_rails.md
+exit=0
+
+$ ruby -c bench/upstream/ug82-recheck-2026-11-25/review-ug82m/probe.rb
+Syntax OK
+
+$ cmp installed money-rails hook with released permalink source
+exit=0
+
+$ python3 <validate the 20 independent control outcomes>
+20/20 scenarios match expected errors, enqueue adapters, deliveries, and serializer registration
+3 expected main failures; 0 stable failures; both explicit-require money-rails fixes succeed

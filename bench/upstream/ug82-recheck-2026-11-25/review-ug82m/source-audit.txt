@@ -1,0 +1,398 @@
+$ git -C .corpus/rails rev-parse origin/main refs/remotes/ug82-review/head v8.1.4.1^{}
+f785381cca8621772cba659ff93f825eb7f99942
+de4d27b257337464438695d3d6600af13bdf0482
+3f290b759c8e2ffe7c257951b1255740751355e4
+
+$ git ls-remote <fork> <review branch>
+de4d27b257337464438695d3d6600af13bdf0482	refs/heads/thomasklemm/upgrade-guide-mailer-active-job-railtie
+
+$ git ls-remote https://github.com/rails/rails.git refs/heads/main
+f785381cca8621772cba659ff93f825eb7f99942	refs/heads/main
+
+$ git -C .corpus/rails show --format=fuller --stat de4d27b257337464438695d3d6600af13bdf0482
+commit de4d27b257337464438695d3d6600af13bdf0482
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Wed Nov 25 12:53:06 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Wed Nov 25 12:53:19 2026 +0000
+
+    Note in the upgrade guide that Action Mailer no longer loads Active Job
+
+ guides/source/upgrading_ruby_on_rails.md | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+$ git -C .corpus/rails diff f785381cca...de4d27b257 -- guides/source/upgrading_ruby_on_rails.md
+diff --git a/guides/source/upgrading_ruby_on_rails.md b/guides/source/upgrading_ruby_on_rails.md
+index 5b556de025..945fb3164c 100644
+--- a/guides/source/upgrading_ruby_on_rails.md
++++ b/guides/source/upgrading_ruby_on_rails.md
+@@ -147,6 +147,22 @@ warning naming each route whose controller does not exist. Such routes used to
+ go unnoticed until a request matched them. Check the boot log for
+ `references a missing controller` and fix or remove the routes it lists.
+ 
++### Action Mailer no longer loads Active Job
++
++`require "action_mailer/railtie"` used to load the Active Job railtie too. It no
++longer does, so an application that lists its frameworks in `config/application.rb`
++and requires `action_mailer/railtie` without `active_job/railtie` no longer has
++`config.active_job`: setting it raises a `NoMethodError` on boot, and
++`deliver_later` enqueues to Active Job's default adapter. Require the Active Job
++railtie explicitly:
++
++```ruby
++require "active_job/railtie"
++require "action_mailer/railtie"
++```
++
++Applications that require `rails/all` are not affected.
++
+ ### The old Active Record 6.1 marshalling format was removed.
+ 
+ If your application still sets `active_record.marshalling_format_version = 6.1`, which may
+
+$ git -C .corpus/rails merge-tree --write-tree f785381cca de4d27b257
+c908208a1342ccb310b560bcc5e022073af90b43
+exit=0
+
+$ git -C .corpus/rails diff --check de4d27b257^ de4d27b257
+exit=0
+
+$ git show v8.1.4.1:actionmailer/lib/action_mailer/railtie.rb (first 16 lines)
+# frozen_string_literal: true
+
+require "rails"
+require "active_job/railtie"
+require "action_mailer"
+require "abstract_controller/railties/routes_helpers"
+
+module ActionMailer
+  class Railtie < Rails::Railtie # :nodoc:
+    config.action_mailer = ActiveSupport::OrderedOptions.new
+    config.action_mailer.preview_paths = []
+    config.eager_load_namespaces << ActionMailer
+
+    initializer "action_mailer.deprecator", before: :load_environment_config do |app|
+      app.deprecators[:action_mailer] = ActionMailer.deprecator
+    end
+
+$ git show v8.1.4.1:railties/lib/rails/all.rb
+# frozen_string_literal: true
+
+require "rails"
+
+%w(
+  active_record/railtie
+  active_storage/engine
+  action_controller/railtie
+  action_view/railtie
+  action_mailer/railtie
+  active_job/railtie
+  action_cable/engine
+  action_mailbox/engine
+  action_text/engine
+  rails/test_unit/railtie
+).each do |railtie|
+  begin # rubocop:disable Style/RedundantBegin
+    require railtie
+  rescue LoadError
+  end
+end
+
+$ git show v8.1.4.1:activejob/lib/active_job/queue_adapter.rb (adapter defaults)
+  # correct adapter. The default queue adapter is +:async+,
+  # which loads the ActiveJob::QueueAdapters::AsyncAdapter.
+  module QueueAdapter # :nodoc:
+    extend ActiveSupport::Concern
+
+    included do
+      class_attribute :_queue_adapter_name, instance_accessor: false, instance_predicate: false
+      class_attribute :_queue_adapter, instance_accessor: false, instance_predicate: false
+
+      delegate :queue_adapter, to: :class
+    end
+
+    # Includes the setter method for changing the active queue adapter.
+    module ClassMethods
+      # Returns the backend queue provider. The default queue adapter
+      # is +:async+. See QueueAdapters for more information.
+      def queue_adapter
+        self.queue_adapter = :async if _queue_adapter.nil?
+        _queue_adapter
+      end
+
+      # Returns string denoting the name of the configured queue adapter.
+      # By default returns <tt>"async"</tt>.
+      def queue_adapter_name
+        self.queue_adapter = :async if _queue_adapter_name.nil?
+        _queue_adapter_name
+      end
+
+      # Specify the backend queue provider. The default queue adapter
+      # is the +:async+ queue. See QueueAdapters for more
+      # information.
+      def queue_adapter=(name_or_adapter)
+        case name_or_adapter
+        when Symbol, String
+          queue_adapter = ActiveJob::QueueAdapters.lookup(name_or_adapter).new
+          queue_adapter.try(:check_adapter)
+          assign_adapter(name_or_adapter.to_s, queue_adapter)
+        else
+          if queue_adapter?(name_or_adapter)
+            adapter_name = ActiveJob.adapter_name(name_or_adapter).underscore
+            assign_adapter(adapter_name, name_or_adapter)
+          else
+            raise ArgumentError
+          end
+        end
+      end
+
+      private
+        def assign_adapter(adapter_name, queue_adapter)
+          self._queue_adapter_name = adapter_name
+          self._queue_adapter = queue_adapter
+        end
+
+
+$ git show f785381cca:actionmailer/lib/action_mailer/railtie.rb (first 16 lines)
+# frozen_string_literal: true
+
+require "rails"
+require "action_mailer"
+require "abstract_controller/railties/routes_helpers"
+
+module ActionMailer
+  class Railtie < Rails::Railtie # :nodoc:
+    config.action_mailer = ActiveSupport::OrderedOptions.new
+    config.action_mailer.preview_paths = []
+    config.eager_load_namespaces << ActionMailer
+
+    guard_load_hooks(:action_mailer, :action_mailer_test_case)
+
+    initializer "action_mailer.deprecator", before: :load_environment_config do |app|
+      app.deprecators[:action_mailer] = ActionMailer.deprecator
+
+$ git show f785381cca:railties/lib/rails/all.rb
+# frozen_string_literal: true
+
+require "rails"
+
+%w(
+  active_record/railtie
+  active_storage/engine
+  action_controller/railtie
+  action_view/railtie
+  action_mailer/railtie
+  active_job/railtie
+  action_cable/engine
+  action_mailbox/engine
+  action_text/engine
+  rails/test_unit/railtie
+).each do |railtie|
+  begin # rubocop:disable Style/RedundantBegin
+    require railtie
+  rescue LoadError => ex
+    raise unless ex.path == railtie
+  end
+end
+
+$ git show f785381cca:activejob/lib/active_job/queue_adapter.rb (adapter defaults)
+  # The `ActiveJob::QueueAdapter` module is used to load the
+  # correct adapter. The default queue adapter is `:async`,
+  # which loads the ActiveJob::QueueAdapters::AsyncAdapter.
+  module QueueAdapter # :nodoc:
+    extend ActiveSupport::Concern
+
+    included do
+      class_attribute :_queue_adapter_name, instance_accessor: false, instance_predicate: false
+      class_attribute :_queue_adapter, instance_accessor: false, instance_predicate: false
+
+      delegate :queue_adapter, to: :class
+    end
+
+    # Includes the setter method for changing the active queue adapter.
+    module ClassMethods
+      # Returns the backend queue provider. The default queue adapter
+      # is `:async`. See QueueAdapters for more information.
+      def queue_adapter
+        self.queue_adapter = :async if _queue_adapter.nil?
+        _queue_adapter
+      end
+
+      # Returns string denoting the name of the configured queue adapter.
+      # By default returns `"async"`.
+      def queue_adapter_name
+        self.queue_adapter = :async if _queue_adapter_name.nil?
+        _queue_adapter_name
+      end
+
+      # Specify the backend queue provider. The default queue adapter
+      # is the `:async` queue. See QueueAdapters for more
+      # information.
+      def queue_adapter=(name_or_adapter)
+        case name_or_adapter
+        when Symbol, String
+          queue_adapter = ActiveJob::QueueAdapters.lookup(name_or_adapter).new
+          queue_adapter.try(:check_adapter)
+          assign_adapter(name_or_adapter.to_s, queue_adapter)
+        else
+          if queue_adapter?(name_or_adapter)
+            adapter_name = ActiveJob.adapter_name(name_or_adapter).underscore
+            assign_adapter(adapter_name, name_or_adapter)
+          else
+            raise ArgumentError
+          end
+        end
+      end
+
+      private
+        def assign_adapter(adapter_name, queue_adapter)
+          self._queue_adapter_name = -adapter_name
+          self._queue_adapter = queue_adapter
+        end
+
+$ git diff ed17c90871^ ed17c90871 -- actionmailer/lib/action_mailer/railtie.rb actionmailer/CHANGELOG.md
+diff --git a/actionmailer/CHANGELOG.md b/actionmailer/CHANGELOG.md
+index 4986c39d2f..579d28cb10 100644
+--- a/actionmailer/CHANGELOG.md
++++ b/actionmailer/CHANGELOG.md
+@@ -1,3 +1,10 @@
++*   Action Mailer no longer have a hard dependency on Active Job.
++
++    If using Action Mailer standalone, as in outside Rails, and depend on the
++    `deliver_later` feature, you may need to add Active Job in your Gemfile.
++
++    *Jean Boussier*
++
+ *   Raise when `ActionMailer.deliver_all_later` is called with a message that was already accessed.
+ 
+     Previously, the messages were enqueued and any local changes were silently lost,
+diff --git a/actionmailer/lib/action_mailer/railtie.rb b/actionmailer/lib/action_mailer/railtie.rb
+index bfd71b5ab1..7e9b43c53d 100644
+--- a/actionmailer/lib/action_mailer/railtie.rb
++++ b/actionmailer/lib/action_mailer/railtie.rb
+@@ -1,7 +1,6 @@
+ # frozen_string_literal: true
+ 
+ require "rails"
+-require "active_job/railtie"
+ require "action_mailer"
+ require "abstract_controller/railties/routes_helpers"
+ 
+
+$ curl -fsSL https://rubygems.org/api/v1/versions/money-rails/latest.json
+{"version":"3.0.0"}
+$ git ls-remote money-rails HEAD refs/tags/v3.0.0 refs/tags/v3.0.0^{}
+d577b19084a27340ceca3a809940f49e151d50cd	HEAD
+4ec8e36abdd911d5bed76e9713dd7e4d089c8c94	refs/tags/v3.0.0
+f5e2af72988a684ed88904ddc7f39974cc7d23ee	refs/tags/v3.0.0^{}
+
+$ curl -fsSL https://raw.githubusercontent.com/RubyMoney/money-rails/f5e2af72988a684ed88904ddc7f39974cc7d23ee/lib/money-rails/hooks.rb | nl -ba
+     1	module MoneyRails
+     2	  class Hooks
+     3	    PG_ADAPTERS = %w(activerecord-jdbcpostgresql-adapter postgresql postgis)
+     4	
+     5	    def self.init
+     6	      # For Active Record
+     7	      ActiveSupport.on_load(:active_record) do
+     8	        require 'money-rails/active_model/validator'
+     9	        require 'money-rails/active_record/monetizable'
+    10	        ::ActiveRecord::Base.send :include, MoneyRails::ActiveRecord::Monetizable
+    11	
+    12	        current_adapter = ::ActiveRecord::Base.connection_db_config.configuration_hash[:adapter]
+    13	        postgresql_with_money = PG_ADAPTERS.include?(current_adapter)
+    14	
+    15	        require "money-rails/active_record/migration_extensions/options_extractor"
+    16	        %w{schema_statements table}.each do |file|
+    17	          require "money-rails/active_record/migration_extensions/#{file}_pg"
+    18	          if !postgresql_with_money
+    19	            require "money-rails/active_record/migration_extensions/#{file}"
+    20	          end
+    21	        end
+    22	        ::ActiveRecord::Migration.send :include, MoneyRails::ActiveRecord::MigrationExtensions::SchemaStatements
+    23	        ::ActiveRecord::ConnectionAdapters::TableDefinition.send :include, MoneyRails::ActiveRecord::MigrationExtensions::Table
+    24	        ::ActiveRecord::ConnectionAdapters::Table.send :include, MoneyRails::ActiveRecord::MigrationExtensions::Table
+    25	      end
+    26	
+    27	      # For Mongoid
+    28	      begin; require 'mongoid'; require 'mongoid/version'; rescue LoadError; end
+    29	      if defined? ::Mongoid
+    30	        require 'money-rails/mongoid/money'
+    31	      end
+    32	
+    33	      # For ActionView
+    34	      ActiveSupport.on_load(:action_view) do
+    35	        ::ActionView::Base.include MoneyRails::ActionViewExtension
+    36	      end
+    37	
+    38	      # For ActiveSupport
+    39	      ActiveSupport.on_load(:active_job) do |v|
+    40	        if defined?(::ActiveJob::Serializers)
+    41	          require 'money-rails/active_job/money_serializer'
+    42	          Rails.application.config.active_job.tap do |config|
+    43	            config.custom_serializers ||= []
+    44	            config.custom_serializers << MoneyRails::ActiveJob::MoneySerializer
+    45	          end
+    46	        end
+    47	      end
+    48	    end
+    49	  end
+    50	end
+
+$ curl -fsSL https://raw.githubusercontent.com/RubyMoney/money-rails/d577b19084a27340ceca3a809940f49e151d50cd/lib/money-rails/hooks.rb | nl -ba
+     1	# frozen_string_literal: true
+     2	
+     3	module MoneyRails
+     4	  class Hooks
+     5	    PG_ADAPTERS = %w[activerecord-jdbcpostgresql-adapter postgresql postgis].freeze
+     6	
+     7	    def self.init
+     8	      # For Active Record migrations
+     9	      #
+    10	      # These stay here, and not in money-rails.rb, because picking the migration
+    11	      # extensions requires a configured database connection.
+    12	      ActiveSupport.on_load(:active_record) do
+    13	        current_adapter = ::ActiveRecord::Base.connection_db_config.configuration_hash[:adapter]
+    14	        postgresql_with_money = PG_ADAPTERS.include?(current_adapter)
+    15	
+    16	        require "money-rails/active_record/migration_extensions/options_extractor"
+    17	        %w[schema_statements table].each do |file|
+    18	          require "money-rails/active_record/migration_extensions/#{file}_pg"
+    19	          unless postgresql_with_money
+    20	            require "money-rails/active_record/migration_extensions/#{file}"
+    21	          end
+    22	        end
+    23	        ::ActiveRecord::Migration.include(MoneyRails::ActiveRecord::MigrationExtensions::SchemaStatements)
+    24	        ::ActiveRecord::ConnectionAdapters::TableDefinition.include(MoneyRails::ActiveRecord::MigrationExtensions::Table)
+    25	        ::ActiveRecord::ConnectionAdapters::Table.include(MoneyRails::ActiveRecord::MigrationExtensions::Table)
+    26	      end
+    27	
+    28	      # For Mongoid
+    29	      begin
+    30	        require "mongoid"
+    31	        require "mongoid/version"
+    32	      rescue LoadError
+    33	        # Do nothing
+    34	      end
+    35	
+    36	      if defined? ::Mongoid
+    37	        require "money-rails/mongoid/money"
+    38	      end
+    39	
+    40	      # For ActiveSupport
+    41	      ActiveSupport.on_load(:active_job) do
+    42	        if defined?(::ActiveJob::Serializers)
+    43	          require "money-rails/active_job/money_serializer"
+    44	          Rails.application.config.active_job.tap do |config|
+    45	            config.custom_serializers ||= []
+    46	            config.custom_serializers << MoneyRails::ActiveJob::MoneySerializer
+    47	          end
+    48	        end
+    49	      end
+    50	    end
+    51	  end
+    52	end
+
+$ sed -n "/^# Note in the upgrade guide/,$ p" bench/upstream/pr-queue/items/UG82M.md
+# Note in the upgrade guide that Action Mailer no longer loads Active Job
+
+An app that lists its frameworks in `config/application.rb` and requires `action_mailer/railtie` without `active_job/railtie` got the Active Job railtie through Action Mailer's until #59820. On main it doesn't, so setting `config.active_job.queue_adapter` raises `NoMethodError` on boot. A gem that sets `config.active_job` when Active Job loads fails the same way, such as [money-rails 3.0.0](https://github.com/RubyMoney/money-rails/blob/f5e2af72988a684ed88904ddc7f39974cc7d23ee/lib/money-rails/hooks.rb#L42), which makes such an app raise on boot when eager loading. This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" that says to require the Active Job railtie explicitly.
