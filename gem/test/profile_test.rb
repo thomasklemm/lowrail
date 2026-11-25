@@ -593,6 +593,7 @@ class ProfileTest < Minitest::Test
       LowrailTest.write_rails_app(dir,
         "bin/rails" => "#!#{RUBY}\nabort unless ARGV.shift == \"runner\"\nscript = ARGV.shift\nrequire_relative \"../config/environment\"\nload script\n",
         "config/routes.rb" => "Rails.application.routes.draw { resources :widgets, only: %i[index create] }\n",
+        "config/initializers/override.rb" => "Rails.application.config.middleware.delete(Rack::MethodOverride) if ENV[\"NO_OVERRIDE\"]\n",
         "app/controllers/widgets_controller.rb" => <<~'RUBY')
           class WidgetsController < ApplicationController
             skip_forgery_protection
@@ -606,15 +607,31 @@ class ProfileTest < Minitest::Test
         "post \"/widgets\"" => /POST \/widgets is a write/,
         "sign_in \"/session\", params: {}" => /sign_in POST \/session is a write/,
         "setup { Widget.delete_all }" => /setup runs code/,
-        "get \"/widgets\", jobs: true" => /has jobs:/
+        "get \"/widgets\", jobs: true" => /has jobs:/,
+        # A GET whose env: or missing Rack::MethodOverride sends a POST.
+        "get \"/widgets\", name: \"probe\", env: { \"REQUEST_METHOD\" => \"POST\" }, expect: [200, 201]" => /GET \/widgets is sent as POST/,
+        "get \"/widgets\", name: \"probe\", as: :json, params: { q: 1 }, expect: [200, 201] # no override" => /GET \/widgets is sent as POST/
       }.each do |line, refusal|
         File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\"\n#{line}\n")
-        _, err, status = profile(dir, "--out", "w", "--workloads")
+        _, err, status = profile(dir, "--out", "w", "--workloads", env: line.end_with?("no override") ? { "NO_OVERRIDE" => "1" } : {})
         refute status.success?, line
         assert_match(refusal, err)
         assert_match(/needs --allow-writes/, err)
         refute_match(/run 2 of 2/, err, "a refused file is not run again")
       end
+      # Each refused file sent nothing; the same JSON GET with the override is a GET.
+      File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\", as: :json, params: { q: 1 }\n")
+      _, err, status = profile(dir, "--out", "w", "--workloads")
+      assert status.success?, err
+      names = JSON.parse(File.read(File.join(dir, "w/report.json")))["actions"].map { _1["name"] }
+      assert_includes names, "WidgetsController#index"
+      refute_includes names, "WidgetsController#create"
+      # With --allow-writes the env: POST is sent as declared.
+      File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\", env: { \"REQUEST_METHOD\" => \"POST\" }, expect: 201\n")
+      _, err, status = profile(dir, "--out", "w", "--workloads", "--allow-writes")
+      assert status.success?, err
+      assert_equal [20, 20], JSON.parse(File.read(File.join(dir, "w/report.json")))["actions"]
+        .find { _1["name"] == "WidgetsController#create" }["windows"]
       File.write(File.join(dir, "lowrail/workloads.rb"), "get \"/widgets\"\npost \"/widgets\", expect: 201\n")
       _, err, status = profile(dir, "--out", "w", "--workloads", "--allow-writes")
       assert status.success?, err

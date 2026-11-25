@@ -265,7 +265,8 @@ module Lowrail
 
       def cookie(name, value) = store(Cookie.new(name, value, "/", nil))
 
-      def request(verb, path, params: {}, headers: {}, expect: [200], body: nil)
+      # The Rack env #request sends.
+      def env(verb, path, params: {}, headers: {}, body: nil)
         opts = { method: verb.to_s.upcase, **@headers, **headers }
         request_path = path[/\A[^?#]*/]
         now = Time.now
@@ -276,7 +277,12 @@ module Lowrail
         # A copy: Rack::MockRequest merges a GET's query into the Hash it gets.
         elsif verb != :get || !params.empty? then opts[:params] = params.dup
         end
-        status, response_headers, response = @app.call(Rack::MockRequest.env_for("https://#{@host}#{path}", opts))
+        Rack::MockRequest.env_for("https://#{@host}#{path}", opts)
+      end
+
+      def request(verb, path, params: {}, headers: {}, expect: [200], body: nil)
+        request_path = path[/\A[^?#]*/]
+        status, response_headers, response = @app.call(env(verb, path, params: params, headers: headers, body: body))
         text = +""
         begin
           response.each { text << _1 }

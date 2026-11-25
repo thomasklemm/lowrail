@@ -39,6 +39,12 @@ unless ENV["LOWRAIL_PROFILE_ALLOW_WRITES"] == "1"
     abort "lowrail-profile: RAILS_ENV=production with a database on #{remote.uniq.join(", ")}; --workloads sends real requests, " \
       "so it needs --allow-writes there" if remote.any?
   end
+  # The method the app's router sees: env: and headers: can replace the
+  # declared one, and a JSON GET with params goes out as a POST that only
+  # Rack::MethodOverride turns back into a GET (API-only apps drop it). A
+  # block or alternate: changes only path and params, never the method.
+  overridden = Rails.application.middleware.middlewares.any? { _1.name == "Rack::MethodOverride" }
+  probe = Lowrail::Workloads::MockClient.new(nil, "localhost")
   read_only = Module.new do
     refuse = ->(what) { raise Lowrail::Workloads::WriteRefused, "#{what}; --workloads sends real requests, so it needs --allow-writes" }
     define_method(:setup) { refuse.("setup runs code before the requests") }
@@ -48,6 +54,14 @@ unless ENV["LOWRAIL_PROFILE_ALLOW_WRITES"] == "1"
     define_method(:get) do |path, **opts, &block|
       refuse.("GET #{path} has jobs: (its jobs run or are enqueued for real)") if opts[:jobs]
       super(path, **opts, &block)
+      r = @requests.last
+      env = probe.env(r.verb, r.path, params: r.params, headers: r.headers, body: r.body)
+      sent = env["REQUEST_METHOD"]
+      if overridden && sent == "POST"
+        method = (Rack::MethodOverride.new(nil).method_override(env) rescue nil)
+        sent = method if Rack::MethodOverride::HTTP_METHODS.include?(method)
+      end
+      refuse.("GET #{path} is sent as #{sent}") unless sent == "GET"
     end
     define_method(:sign_in) do |path = nil, method: :post, cookie: nil, **opts|
       refuse.("sign_in #{method.to_s.upcase} #{path} is a write") unless cookie || method.to_sym == :get
