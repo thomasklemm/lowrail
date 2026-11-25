@@ -1,0 +1,1426 @@
+{
+  "format": 1,
+  "date": "2026-11-25",
+  "started": "2026-11-25T23:37:21Z",
+  "seconds": 191,
+  "ruby": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+  "base": {
+    "spec": "v8.1.4.1",
+    "source": "github: \"rails/rails\"",
+    "ref": "v8.1.4.1",
+    "sha": "3f290b759c8e2ffe7c257951b1255740751355e4"
+  },
+  "head": {
+    "spec": "main",
+    "source": "github: \"rails/rails\"",
+    "ref": "main",
+    "sha": "f785381cca8621772cba659ff93f825eb7f99942"
+  },
+  "merge_base": "8ae3d84277889ec1c718844550e3aa09ce42a58c",
+  "services": {
+    "redis": true,
+    "postgresql": true,
+    "memcached": true
+  },
+  "previous": null,
+  "apps": {
+    "blog": {
+      "copy": ".corpus/boot-blog",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.5
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.5
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 7
+    },
+    "campfire": {
+      "copy": ".corpus/boot-campfire",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": false,
+          "class": "RuntimeError",
+          "message": "Unknown version \"8.2\"",
+          "first_app_frame": "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:10:in '<class:Application>'",
+          "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/application/configuration.rb:369:in 'Rails::Application::Configuration#load_defaults'",
+          "first_gem_frame": null,
+          "backtrace": [
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/application/configuration.rb:369:in 'Rails::Application::Configuration#load_defaults'",
+            "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:10:in '<class:Application>'",
+            "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:8:in '<module:Campfire>'",
+            "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:7:in '<top (required)>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:29:in '<main>'"
+          ],
+          "cause": null,
+          "seconds": 1.5,
+          "log_tail": []
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.9
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.9
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.9
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "fails on 8.1 only",
+        "eager_load": "not reached on 8.1, main ok",
+        "runner": "not reached on 8.1, main ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 7
+    },
+    "casa": {
+      "copy": ".corpus/boot-casa",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.3
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.3
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.5
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.4
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.4
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 6.0
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 22
+    },
+    "chatwoot": {
+      "copy": ".corpus/boot-chatwoot",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.7
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.7
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.3
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.0
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.0
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.2
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 20
+    },
+    "codetriage": {
+      "copy": ".corpus/boot-codetriage",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.5
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.5
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.2
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.3
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 9
+    },
+    "discourse": {
+      "copy": ".corpus/boot-discourse",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 3.2
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 3.2
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 3.5
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.1
+        },
+        "eager_load": {
+          "ok": false,
+          "class": "LoadError",
+          "message": "cannot load such file -- active_job",
+          "first_app_frame": "/home/user/workspace/repo/.corpus/boot-discourse/app/mailers/admin_confirmation_mailer.rb:3:in '<main>'",
+          "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+          "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+          "backtrace": [
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'Module#const_get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'ActiveSupport::Inflector#constantize'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/core_ext/string/inflections.rb:84:in 'String#constantize'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/railtie.rb:49:in 'block (2 levels) in <class:Railtie>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:1086:in '<class:Base>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:479:in '<module:ActionMailer>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:15:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'"
+          ],
+          "cause": null,
+          "seconds": 2.1,
+          "log_tail": []
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "break",
+        "runner": "not reached on main",
+        "tests": "skipped"
+      },
+      "breaks": [
+        {
+          "app": "discourse",
+          "check": "eager_load",
+          "signature": "eager_load | LoadError | cannot load such file -- active_job",
+          "error": {
+            "ok": false,
+            "class": "LoadError",
+            "message": "cannot load such file -- active_job",
+            "first_app_frame": "/home/user/workspace/repo/.corpus/boot-discourse/app/mailers/admin_confirmation_mailer.rb:3:in '<main>'",
+            "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+            "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+            "cause": null
+          },
+          "backtrace": [
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'Module#const_get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'ActiveSupport::Inflector#constantize'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/core_ext/string/inflections.rb:84:in 'String#constantize'"
+          ],
+          "log_tail": [],
+          "new": true,
+          "range": [
+            "8ae3d84277889ec1c718844550e3aa09ce42a58c",
+            "f785381cca8621772cba659ff93f825eb7f99942"
+          ],
+          "bisect": {
+            "status": "found",
+            "range": [
+              "8ae3d84277889ec1c718844550e3aa09ce42a58c",
+              "f785381cca8621772cba659ff93f825eb7f99942"
+            ],
+            "first_parent_commits": 2517,
+            "steps": [
+              {
+                "commit": "8ae3d84277889ec1c718844550e3aa09ce42a58c",
+                "verdict": "good"
+              },
+              {
+                "commit": "9db5eeee72b04a6a642d71534b5c810dd9c2ad34",
+                "verdict": "good"
+              },
+              {
+                "commit": "bbaec1c668407502e6fd220e28275f914dda379c",
+                "verdict": "good"
+              },
+              {
+                "commit": "5dc287b2dd6360d13d73e56d50641b750a972437",
+                "verdict": "good"
+              },
+              {
+                "commit": "1e235cee11b0a7aecb189d8837534807626287aa",
+                "verdict": "good"
+              },
+              {
+                "commit": "4f00fbc946c9ca055e6c1fbc7b40274625766be1",
+                "verdict": "bad"
+              },
+              {
+                "commit": "b565fe22b2ebb585e748598a4b78569ca93b39e9",
+                "verdict": "good"
+              },
+              {
+                "commit": "55b551496d68c30eed79c49cea58c30ae7a385d2",
+                "verdict": "good"
+              },
+              {
+                "commit": "23cac06228d12c229c20288fe311a3b2d4321f80",
+                "verdict": "good"
+              },
+              {
+                "commit": "3d4914e1b2d8838edd046ce0e590ab8e5479a880",
+                "verdict": "bad"
+              },
+              {
+                "commit": "4e381e67f59e821fb6026daa31516c47022373e6",
+                "verdict": "bad"
+              },
+              {
+                "commit": "667831f578cec979517222747c3d157f90e5cd9d",
+                "verdict": "bad"
+              },
+              {
+                "commit": "ed17c90871d2c65acc201c082c1f6f924d6d55f9",
+                "verdict": "bad"
+              }
+            ],
+            "first_bad": {
+              "commit": "ed17c90871d2c65acc201c082c1f6f924d6d55f9",
+              "subject": "Merge pull request #59820 from byroot/break-actionmailer-activejob-dependency",
+              "pr": 59820
+            },
+            "last_good": "23cac06228d12c229c20288fe311a3b2d4321f80"
+          },
+          "ownership": [
+            "upgrade guide on main mentions active_job",
+            "references #59820: rails/rails#59986 (PR, open, thomasklemm): Note in the upgrade guide that Action Mailer no longer loads Active Job",
+            "queue item UG82M (introduced_by 59820)",
+            "rails/rails#59986 (PR, open, thomasklemm): Note in the upgrade guide that Action Mailer no longer loads Active Job [active_job]",
+            "rails/rails#58957 (PR, open, linyiru): Skip structured event handlers whose event nobody consumes [active_job]",
+            "rails/rails#46797 (issue, open, georgeclaghorn): Active Job async adapter may use connections without a lease [active_job]",
+            "rails/rails#58737 (issue, open, fabn): Custom Active Job serializers are still ignored in 8.1.3 if a gem loads ActiveJob::Arguments early [active_job]",
+            "rails/rails#58319 (PR, open, jeremy): Add ActiveJob::Debouncing: debounce job enqueues with a class macro [active_job]",
+            "rails/rails#53105 (PR, open, armstrjare): BroadcastLogger should support TaggedLogging correctly [active_job]",
+            "rails/rails#58137 (PR, open, p8): Link ActionController::Instrumentation methods to their super methods [ci-skip] [active_job]",
+            "rails/rails#59951 (issue, open, kehra): `context[:job]` is missing from error reports for exceptions raised by a job [active_job]",
+            "rails/rails#58024 (PR, merged, 55728): Derive the expected queue from the delivery job in `assert_enqueued_email_with` [MailDeliveryJob]",
+            "rails/rails#57213 (issue, closed, collimarco): ActionMailer::MailDeliveryJob should retry job when there is an exception [MailDeliveryJob]",
+            "rails/rails#55692 (issue, closed, nflorentin): Rails 8.1: ActionMailer::MailDeliveryJob.enqueue_after_transaction_commit defaults to false [MailDeliveryJob]",
+            "rails/rails#55337 (PR, closed, manfredyau): Update getting_started.md [MailDeliveryJob]",
+            "rails/rails#45603 (PR, closed, jonathanhefner): Add `:constantize` option for `class_attribute` [MailDeliveryJob]",
+            "rails/rails#34438 (PR, closed, davidpiegza): [WIP] Filter parameters in ActiveJob logs [MailDeliveryJob]",
+            "rails/rails#48858 (issue, closed, fanktom): ActiveSupport JSON.encode in API mode spends most time in String.gsub! [MailDeliveryJob]",
+            "rails/rails#48070 (PR, merged, shivamsinghchahar): Remove noise from actionmailer callbacks test [MailDeliveryJob]"
+          ]
+        }
+      ],
+      "seconds": 9
+    },
+    "docuseal": {
+      "copy": ".corpus/boot-docuseal",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.3
+        },
+        "eager_load": {
+          "ok": false,
+          "class": "RuntimeError",
+          "message": "Could not load libpdfium library. Make sure it's installed and in your library path. Error: Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>",
+          "first_app_frame": "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+          "first_rails_frame": null,
+          "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+          "backtrace": [
+            "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+            "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:3:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:26:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Module#const_get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Zeitwerk::Cref#get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:175:in 'block in Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:51:in 'block in Zeitwerk::Loader::FileSystem#ls'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Zeitwerk::Loader::FileSystem#ls'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:170:in 'Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:18:in 'block (2 levels) in Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'Hash#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'block in Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Thread::Mutex#synchronize'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:456:in 'block in Zeitwerk::Loader.eager_load_all'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Zeitwerk::Registry::Loaders#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:454:in 'Zeitwerk::Loader.eager_load_all'",
+            "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:38:in '<main>'"
+          ],
+          "cause": {
+            "class": "LoadError",
+            "message": "Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>"
+          },
+          "seconds": 1.3,
+          "log_tail": []
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.3
+        },
+        "eager_load": {
+          "ok": false,
+          "class": "RuntimeError",
+          "message": "Could not load libpdfium library. Make sure it's installed and in your library path. Error: Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>",
+          "first_app_frame": "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+          "first_rails_frame": null,
+          "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+          "backtrace": [
+            "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+            "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:3:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:26:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Module#const_get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Zeitwerk::Cref#get'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:175:in 'block in Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:51:in 'block in Zeitwerk::Loader::FileSystem#ls'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Zeitwerk::Loader::FileSystem#ls'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:170:in 'Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:18:in 'block (2 levels) in Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'Hash#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'block in Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Thread::Mutex#synchronize'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Zeitwerk::Loader::EagerLoad#eager_load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:456:in 'block in Zeitwerk::Loader.eager_load_all'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Zeitwerk::Registry::Loaders#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:454:in 'Zeitwerk::Loader.eager_load_all'",
+            "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:38:in '<main>'"
+          ],
+          "cause": {
+            "class": "LoadError",
+            "message": "Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>"
+          },
+          "seconds": 1.3,
+          "log_tail": [
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/lograge-0.14.0/lib/lograge/railtie.rb:17:in 'block in <class:Railtie>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:103:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/application/finisher.rb:93:in 'block in <module:Finisher>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:24:in 'BasicObject#instance_exec'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:24:in 'Rails::Initializable::Initializer#run'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:114:in 'block in Rails::Initializable#run_initializers'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:231:in 'block in TSort.tsort_each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:353:in 'block (2 levels) in TSort.each_strongly_connected_component'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:434:in 'TSort.each_strongly_connected_component_from'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:352:in 'block in TSort.each_strongly_connected_component'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:70:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:70:in 'Rails::Initializable::Collection#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'Method#call'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'TSort.each_strongly_connected_component'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:229:in 'TSort.tsort_each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/tsort-0.2.0/lib/tsort.rb:208:in 'TSort#tsort_each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/initializable.rb:113:in 'Rails::Initializable#run_initializers'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties/lib/rails/application.rb:474:in 'Rails::Application#initialize!'",
+            "/home/user/workspace/repo/.corpus/boot-docuseal/config/environment.rb:7:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:34:in '<main>'",
+            ""
+          ]
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "fails on both",
+        "runner": "skipped",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 3
+    },
+    "fizzy": {
+      "copy": ".corpus/boot-fizzy",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": false,
+          "class": "NameError",
+          "message": "undefined method 'call' for class 'Hash'",
+          "first_app_frame": "/home/user/workspace/repo/.corpus/boot-fizzy/lib/rails_ext/action_mailer_delivered_event_without_mail.rb:10:in '<module:ActionMailerDeliveredEventWithoutMail>'",
+          "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications/fanout.rb:350:in 'Kernel#method'",
+          "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+          "backtrace": [
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications/fanout.rb:350:in 'Kernel#method'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications/fanout.rb:350:in 'ActiveSupport::Notifications::Fanout::Subscribers.new'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications/fanout.rb:70:in 'ActiveSupport::Notifications::Fanout#subscribe'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications.rb:245:in 'ActiveSupport::Notifications.subscribe'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/lib/rails_ext/action_mailer_delivered_event_without_mail.rb:10:in '<module:ActionMailerDeliveredEventWithoutMail>'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/lib/rails_ext/action_mailer_delivered_event_without_mail.rb:7:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/config/initializers/extensions.rb:1:in 'block in <main>'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/config/initializers/extensions.rb:1:in 'Array#each'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/config/initializers/extensions.rb:1:in '<main>'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/config/initializers/database_role_logging.rb:1:in 'Kernel#require_relative'",
+            "/home/user/workspace/repo/.corpus/boot-fizzy/config/initializers/database_role_logging.rb:1:in '<main>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:692:in 'Kernel#load'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:692:in 'block in Rails::Engine#load_config_initializer'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/activesupport/lib/active_support/notifications.rb:212:in 'ActiveSupport::Notifications.instrument'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:691:in 'Rails::Engine#load_config_initializer'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:645:in 'block (2 levels) in <class:Engine>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:644:in 'Array#each'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/engine.rb:644:in 'block in <class:Engine>'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/initializable.rb:24:in 'BasicObject#instance_exec'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/initializable.rb:24:in 'Rails::Initializable::Initializer#run'",
+            "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/initializable.rb:103:in 'block in Rails::Initializable#run_initializers'"
+          ],
+          "cause": null,
+          "seconds": 1.1,
+          "log_tail": []
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.6
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.6
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.5
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "fails on 8.1 only",
+        "eager_load": "not reached on 8.1, main ok",
+        "runner": "not reached on 8.1, main ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 6
+    },
+    "flow": {
+      "copy": ".corpus/boot-flow",
+      "base": {
+        "bundle": {
+          "ok": false,
+          "class": "Bundler",
+          "message": "Could not find compatible versions | Because every version of rails depends on activestorage = 8.1.4.1 |   and every version of activestorage depends on marcel ~> 1.0, |   every version of rails requires marcel ~> 1.0. | So, because Gemfile.census-3f290b759c8e depends on rails >= 0 |   and Gemfile.census-3f290b759c8e depends on marcel ~> 2.0,",
+          "log_tail": [
+            "Could not find compatible versions",
+            "",
+            "Because every version of rails depends on activestorage = 8.1.4.1",
+            "  and every version of activestorage depends on marcel ~> 1.0,",
+            "  every version of rails requires marcel ~> 1.0.",
+            "So, because Gemfile.census-3f290b759c8e depends on rails >= 0",
+            "  and Gemfile.census-3f290b759c8e depends on marcel ~> 2.0,",
+            "  version solving has failed."
+          ],
+          "seconds": 4.7
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.4
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.7
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.7
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.5
+        }
+      },
+      "checks": {
+        "bundle": "fails on 8.1 only",
+        "boot": "not reached on 8.1, main ok",
+        "eager_load": "not reached on 8.1, main ok",
+        "runner": "not reached on 8.1, main ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 9
+    },
+    "hackatime": {
+      "copy": ".corpus/boot-hackatime",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.5
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.9
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.9
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.6
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 10
+    },
+    "lago": {
+      "copy": ".corpus/boot-lago",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.6
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.6
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.6
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.2
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.2
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.0
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 18
+    },
+    "lobsters": {
+      "copy": ".corpus/boot-lobsters",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 3.9
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 3.9
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.1
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.2
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.2
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.5
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 17
+    },
+    "loomio": {
+      "copy": ".corpus/boot-loomio",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.6
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.6
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 3.0
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.8
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.8
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 3.0
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 11
+    },
+    "mastodon": {
+      "copy": ".corpus/boot-mastodon",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.0
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.0
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.0
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 4.8
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 4.8
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.2
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 18
+    },
+    "pingcrm": {
+      "copy": ".corpus/boot-pingcrm",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.8
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.8
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.7
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.9
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.9
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.6
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 7
+    },
+    "react-starter-kit": {
+      "copy": ".corpus/boot-react-starter-kit",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.9
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.9
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.6
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 1.7
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 1.7
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 7
+    },
+    "redprints-cfp": {
+      "copy": ".corpus/boot-redprints-cfp",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.4
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.3
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.5
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.5
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 4.3
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 14
+    },
+    "sure": {
+      "copy": ".corpus/boot-sure",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.1
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.1
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.2
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 5.4
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 5.4
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 5.9
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 22
+    },
+    "thinkroom": {
+      "copy": ".corpus/boot-thinkroom",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.2
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.2
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.1
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.2
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.2
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 2.2
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 9
+    },
+    "writebook": {
+      "copy": ".corpus/boot-writebook",
+      "base": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.1.4.1",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 2.8
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 2.8
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 3.1
+        }
+      },
+      "head": {
+        "bundle": {
+          "ok": true,
+          "seconds": 0.3
+        },
+        "rails": {
+          "version": "8.2.0.alpha",
+          "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+        },
+        "boot": {
+          "ok": true,
+          "seconds": 3.3
+        },
+        "eager_load": {
+          "ok": true,
+          "seconds": 3.3
+        },
+        "runner": {
+          "ok": true,
+          "seconds": 3.1
+        }
+      },
+      "checks": {
+        "bundle": "ok",
+        "boot": "ok",
+        "eager_load": "ok",
+        "runner": "ok",
+        "tests": "skipped"
+      },
+      "breaks": [],
+      "seconds": 12
+    }
+  },
+  "fixed": []
+}

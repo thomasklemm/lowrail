@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+path "BUNDLER_GEMS/rails-3f290b759c8e" do
+  gem "railties"
+  gem "actionpack"
+  gem "actionmailer"
+end

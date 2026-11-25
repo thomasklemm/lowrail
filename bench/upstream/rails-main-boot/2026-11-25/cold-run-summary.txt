@@ -1,0 +1,24 @@
+rails-main-boot 2026-11-25: base v8.1.4.1 3f290b759c8e, head main f785381cca86, 20 apps
+warning: refs/tags/v0.23.12 b9bf053b70f3e63be8ea32e1a39a31253defe04f is not a commit!
+blog: bundle ok, boot ok, eager_load ok, runner ok (8s)
+campfire: bundle ok, boot fails on 8.1 only, eager_load not reached on 8.1, runner not reached on 8.1 (10s)
+fizzy: bundle ok, boot fails on 8.1 only, eager_load not reached on 8.1, runner not reached on 8.1 (8s)
+writebook: bundle ok, boot ok, eager_load ok, runner ok (12s)
+pingcrm: bundle ok, boot ok, eager_load ok, runner ok (7s)
+codetriage: bundle ok, boot ok, eager_load ok, runner ok (16s)
+redprints-cfp: bundle ok, boot ok, eager_load ok, runner ok (18s)
+react-starter-kit: bundle ok, boot ok, eager_load ok, runner ok (10s)
+thinkroom: bundle ok, boot ok, eager_load ok, runner ok (13s)
+lobsters: bundle ok, boot ok, eager_load ok, runner ok (21s)
+mastodon: bundle fails on both, differently (0s)
+docuseal: bundle ok, boot ok, eager_load fails on both (8s)
+lago: bundle ok, boot ok, eager_load ok, runner ok (44s)
+discourse: bundle ok, boot ok, eager_load break, runner not reached on main (59s)
+loomio: bundle ok, boot ok, eager_load ok, runner ok (21s)
+casa: bundle ok, boot ok, eager_load ok, runner ok (31s)
+sure: bundle ok, boot ok, eager_load ok, runner ok (39s)
+flow: bundle fails on 8.1 only, boot not reached on 8.1, eager_load not reached on 8.1, runner not reached on 8.1 (14s)
+hackatime: bundle ok, boot ok, eager_load ok, runner ok (17s)
+chatwoot: bundle ok, boot ok, eager_load ok, runner ok (34s)
+BOOT: 1 new break
+EXIT 0 after 1992s

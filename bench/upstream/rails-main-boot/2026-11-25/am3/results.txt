@@ -1,0 +1,6 @@
+activejob in lock: 1
+8.1.4.1 load_defaults 8.1: boot ok, delivery_job ActionMailer::MailDeliveryJob
+8.1.4.1 no load_defaults: boot ok, delivery_job ActionMailer::MailDeliveryJob
+activejob in lock: 0
+8.2.0.alpha load_defaults 8.1: boot LoadError: cannot load such file -- active_job
+8.2.0.alpha no load_defaults: boot ok, delivery_job LoadError: cannot load such file -- active_job

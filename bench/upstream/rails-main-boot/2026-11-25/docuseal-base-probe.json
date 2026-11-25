@@ -1,0 +1,46 @@
+{
+  "boot": {
+    "ok": true
+  },
+  "eager_load": {
+    "ok": false,
+    "class": "RuntimeError",
+    "message": "Could not load libpdfium library. Make sure it's installed and in your library path. Error: Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>",
+    "first_app_frame": "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+    "first_rails_frame": null,
+    "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+    "backtrace": [
+      "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:19:in '<class:Pdfium>'",
+      "/home/user/workspace/repo/.corpus/boot-docuseal/lib/pdfium.rb:3:in '<main>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.23.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:26:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Module#const_get'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/cref.rb:62:in 'Zeitwerk::Cref#get'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:175:in 'block in Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:51:in 'block in Zeitwerk::Loader::FileSystem#ls'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Array#each'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/file_system.rb:40:in 'Zeitwerk::Loader::FileSystem#ls'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:170:in 'Zeitwerk::Loader::EagerLoad#actual_eager_load_dir'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:18:in 'block (2 levels) in Zeitwerk::Loader::EagerLoad#eager_load'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'Hash#each'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:17:in 'block in Zeitwerk::Loader::EagerLoad#eager_load'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Thread::Mutex#synchronize'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader/eager_load.rb:11:in 'Zeitwerk::Loader::EagerLoad#eager_load'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:456:in 'block in Zeitwerk::Loader.eager_load_all'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Array#each'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/registry/loaders.rb:10:in 'Zeitwerk::Registry::Loaders#each'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/loader.rb:454:in 'Zeitwerk::Loader.eager_load_all'",
+      "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:38:in '<main>'"
+    ],
+    "cause": {
+      "class": "LoadError",
+      "message": "Could not open library 'libpdfium.so': libpdfium.so: cannot open shared object file: No such file or directory.\nSearched in <system library path>"
+    }
+  },
+  "rails": {
+    "version": "8.1.4.1",
+    "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+  }
+}

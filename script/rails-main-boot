@@ -1,0 +1,413 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Weekly Rails-main boot check (docs/upstream/rails-main-boot.md): which census apps break on rails/rails main
+# compared with the latest 8.1 release. Per app and per Rails tree: bundle resolves, production boot, eager load,
+# `rails runner`, and with --tests the app's suite (per-test outcomes, as lowrail verify records them). A break is a
+# check that passes on 8.1 and fails on main; only breaks the previous run did not have are new. Each new break gets
+# its error, first app frame, the Rails commit range, a first-parent bisect to the introducing PR, and an ownership
+# search (rails/rails issues and PRs, the introducing PR's cross-references, our queue, the upgrade guide).
+#
+#   script/rails-main-boot [--apps LIST|all] [--base REF] [--head REF] [--tests] [--bisect N] [--jobs N]
+#                          [--date YYYY-MM-DD] [--corpus NAME] [--ruby R]
+#
+# Defaults: every census app, base the newest v8.1.* tag, head rails/rails main, 3 bisections, 2 jobs, corpus
+# "boot" (copies in .corpus/boot-APP, reused when present). Writes bench/upstream/rails-main-boot/DATE/ (results.json
+# and each probe's receipt) and docs/upstream/rails-main-boot-DATE.md; logs go to .lowrail/private/rails-main-boot/DATE.
+# Copies get `db:create db:schema:load` on the base tree (no assets or seeds; boot needs neither). Services
+# (PostgreSQL, Redis, memcached) are those of census.md; an unreachable one is recorded, not fatal, since it
+# fails both trees alike.
+load File.expand_path("census", __dir__)
+load File.expand_path("ownership", __dir__)
+require "date"
+require "timeout"
+
+module RailsMainBoot
+  ROOT = Census::ROOT
+  PROBE = File.join(ROOT, "bench/upstream/rails_main_boot/probe.rb")
+  DATA = File.join(ROOT, "bench/upstream/rails-main-boot")
+  CHECKS = %w[bundle boot eager_load runner tests].freeze
+  # Severity: the app does not start in production (3), the upgrade is blocked by a dependency (2), tests (1).
+  SEVERITY = { "boot" => 3, "eager_load" => 3, "runner" => 3, "bundle" => 2, "tests" => 1 }.freeze
+  GUIDE = "guides/source/upgrading_ruby_on_rails.md"
+  SEARCH = <<~GRAPHQL
+    query($q: String!) { search(query: $q, type: ISSUE, first: 8) { nodes { __typename
+      ... on Issue { number title state author { login } } ... on PullRequest { number title state author { login } } } } }
+  GRAPHQL
+
+  module_function
+
+  def sh_log(env, cmd, dir, log, timeout)
+    started = Time.now
+    pid = Process.spawn(env, "timeout", timeout.to_s, *cmd, chdir: dir, out: log, err: %i[child out], pgroup: true)
+    _, status = Process.wait2(pid)
+    [status.success?, Time.now - started]
+  end
+
+  def tail(log, n = 40) = File.exist?(log) ? File.readlines(log, chomp: true).last(n).map { _1[0, 300] } : []
+
+  # The exception line Ruby prints for an uncaught error: "file:line:in 'm': message (Class)".
+  def parse_log(log)
+    lines = tail(log, 400)
+    line = lines.find { _1.match?(/:\d+:in .*: .* \([A-Z][\w:]*\)\z/) }
+    return { "ok" => false, "class" => "Unknown", "message" => lines.last(3).join(" | "), "log_tail" => lines.last(30) } unless line
+    m = line.match(/\A(.+?:\d+):in .*?: (.*) \(([A-Z][\w:]*)\)\z/)
+    { "ok" => false, "class" => m[3], "message" => m[2], "first_frame" => m[1], "log_tail" => lines.last(30) }
+  end
+
+  def normalize(text, dir)
+    text.to_s.lines.first.to_s.strip.gsub(dir, "APP").gsub(%r{/\S*/(gems|bundler/gems)/[^/\s]+}, "GEM")
+      .gsub(/0x\h+/, "0x?").gsub(/#<([\w:]+)[^>]*>/, '#<\1>').gsub(/:\d+(?=\D|\z)/, ":N")[0, 240]
+  end
+
+  def signature(check, result, dir) = [check, result["class"], normalize(result["message"], dir)].join(" | ")
+
+  # Runs the checks of one tree in order, stopping at the first failure (tests also run after a runner failure is
+  # impossible, so they need every earlier check).
+  def checks(ctx, app, rails, label, upto: CHECKS.last)
+    dir = Census.app_dir(ctx[:corpus], app)
+    logs = File.join(ctx[:logs], app)
+    FileUtils.mkdir_p(logs)
+    out = {}
+    gemfile, out["bundle"] = ctx[:bundled].delete([app, label]) || bundle(ctx, app, rails, label)
+    return out if !out["bundle"]["ok"] || upto == "bundle"
+    env = Census.env_for(app, ctx[:bin], rails, gemfile)
+    yield env, dir, gemfile if block_given?
+    receipt = File.join(ctx[:logs], app, "#{label}-probe.json")
+    FileUtils.rm_f(receipt)
+    log = File.join(logs, "#{label}-probe.log")
+    _, seconds = sh_log(env, ["bundle", "exec", "ruby", PROBE, "boot", receipt], dir, log, 600)
+    probe = File.exist?(receipt) ? JSON.parse(File.read(receipt)) : { "boot" => parse_log(log) }
+    out["rails"] = probe["rails"]
+    %w[boot eager_load].each do |check|
+      next unless probe[check]
+      out[check] = probe[check].merge("seconds" => seconds.round(1))
+      out[check]["log_tail"] = tail(log, 30) unless out[check]["ok"]
+      return out unless out[check]["ok"]
+      return out if upto == check
+    end
+    log = File.join(logs, "#{label}-runner.log")
+    ok, seconds = sh_log(env, %w[bundle exec rails runner puts(Rails.version)], dir, log, 600)
+    out["runner"] = ok ? { "ok" => true, "seconds" => seconds.round(1) } : parse_log(log).merge("seconds" => seconds.round(1))
+    return out if !ok || upto == "runner" || !ctx[:tests]
+    out["tests"] = tests(ctx, app, env, dir, logs, label)
+    out
+  end
+
+  # Installs share one gem directory, so they never run while another job boots (a reinstalled native gem
+  # disappears under a running boot): run() bundles every app on both trees before the parallel checks.
+  def bundle(ctx, app, rails, label)
+    log = File.join(ctx[:logs], app, "#{label}-bundle.log")
+    FileUtils.mkdir_p(File.dirname(log))
+    started = Time.now
+    gemfile = Census.variant(ctx[:corpus], app, rails, ctx[:bin], log: log)
+    [gemfile, { "ok" => true, "seconds" => (Time.now - started).round(1) }]
+  rescue RuntimeError => e
+    message = tail(log, 200).grep(/\S/).reject { _1.start_with?("+ ") }.first(6).join(" | ")
+    [nil, { "ok" => false, "class" => "Bundler", "message" => message.empty? ? e.message : message,
+      "log_tail" => tail(log, 30), "seconds" => (Time.now - started).round(1) }]
+  end
+
+  def tests(ctx, app, env, dir, logs, label)
+    env = env.merge("RAILS_ENV" => "test", "RACK_ENV" => "test", "PARALLEL_WORKERS" => "1")
+    log = File.join(logs, "#{label}-tests.log")
+    prep, = sh_log(env, %w[bundle exec rails db:prepare], dir, File.join(logs, "#{label}-tests-db.log"), 900)
+    return { "ok" => false, "class" => "Setup", "message" => "test db:prepare failed", "log_tail" => tail(File.join(logs, "#{label}-tests-db.log"), 30) } unless prep
+    outcomes = File.join(logs, "#{label}-outcomes.json")
+    Dir.glob("#{outcomes}*").each { File.delete(_1) }
+    cmd = Census.conf(app)[:tests] || (File.directory?(File.join(dir, "spec")) ? %w[bundle exec rspec] : %w[bundle exec rails test])
+    rubyopt = "-I#{File.join(ROOT, "gem/lib")} -rlowrail/setup"
+    _, seconds = sh_log(env.merge("RUBYOPT" => rubyopt, "LOWRAIL" => "0", "LOWRAIL_OUTCOMES" => outcomes), cmd, dir, log, 3600)
+    files = File.exist?(outcomes) ? [outcomes] : Dir.glob("#{outcomes}.*")
+    results = files.map { JSON.parse(File.read(_1)).fetch("tests", {}) }.reduce({}, :merge)
+    return { "ok" => false, "class" => "NoOutcomes", "message" => "no per-test outcomes", "log_tail" => tail(log, 30) } if results.empty?
+    { "ok" => true, "seconds" => seconds.round(1), "counts" => results.values.group_by { _1["result"] }.transform_values(&:size),
+      "outcomes" => results.transform_values { _1.slice("result", "failure") } }
+  end
+
+  # 8.1 passes and main fails; for tests, each test that passes on 8.1 and fails or errors on main.
+  def compare(app, base, head, dir)
+    rows = CHECKS.to_h do |check|
+      b, h = base[check], head[check]
+      state = if b.nil? && h.nil? then "skipped"
+      elsif b.nil? then "not reached on 8.1, main #{h["ok"] ? "ok" : "fails"}"
+      elsif h.nil? then b["ok"] ? "not reached on main" : "fails on 8.1, not reached on main"
+      elsif check == "tests" && b["ok"] && h["ok"]
+        broken = b["outcomes"].select { |t, o| o["result"] == "pass" && %w[fail error].include?(h["outcomes"].dig(t, "result")) }
+        broken.empty? ? "ok" : "break"
+      elsif b["ok"] && h["ok"] then "ok"
+      elsif b["ok"] then "break"
+      elsif h["ok"] then "fails on 8.1 only"
+      else signature(check, b, dir) == signature(check, h, dir) ? "fails on both" : "fails on both, differently"
+      end
+      [check, state]
+    end
+    breaks = rows.select { _2 == "break" }.keys.flat_map do |check|
+      h = head[check]
+      if check == "tests" && h["ok"]
+        base[check]["outcomes"].select { |t, o| o["result"] == "pass" && %w[fail error].include?(h["outcomes"].dig(t, "result")) }
+          .group_by { |t, _| normalize(h["outcomes"][t]["failure"], dir) }
+          .map { |failure, tests| { "app" => app, "check" => "tests", "signature" => "tests | #{failure}", "tests" => tests.map(&:first).first(20), "count" => tests.size } }
+      else
+        [{ "app" => app, "check" => check, "signature" => signature(check, h, dir), "error" => h.except("log_tail", "backtrace", "seconds"),
+           "backtrace" => h["backtrace"]&.first(12), "log_tail" => h["log_tail"]&.last(15) }]
+      end
+    end
+    [rows, breaks]
+  end
+
+  def rails_clone
+    dir = File.join(ROOT, ".corpus/refs-rails-rails.git")
+    Census.abbreviated_sha("rails/rails", "main") # clones or fetches every branch, commits only
+    dir
+  end
+
+  def git(*args) = Census.capture("git", "-C", rails_clone, *args)
+
+  def pr_of(sha)
+    subject = git("log", "-1", "--format=%s", sha)
+    number = subject[/Merge pull request #(\d+)/, 1] || subject[/\(#(\d+)\)\z/, 1]
+    number ||= PrQueue.gh("api", "repos/rails/rails/commits/#{sha}/pulls").first&.fetch("number") rescue nil
+    { "commit" => sha, "subject" => subject, "pr" => number&.to_i }
+  end
+
+  # First-parent bisect between a good and a bad commit of main. A step is bad when the check fails with the same
+  # signature as on head, good when it passes, and skipped otherwise (another failure hides it).
+  def bisect(ctx, brk, good, head)
+    app, check = brk.values_at("app", "check")
+    dir = Census.app_dir(ctx[:corpus], app)
+    commits = git("rev-list", "--first-parent", "--reverse", "#{good}..#{head}").lines.map(&:strip)
+    return { "status" => "empty range" } if commits.empty?
+    steps = []
+    verdict = lambda do |sha|
+      rails = { "spec" => sha, "source" => %(github: "rails/rails"), "ref" => sha, "sha" => sha }
+      res = checks(ctx, app, rails, "bisect-#{sha[0, 12]}", upto: check)
+      r = res[check]
+      v = r.nil? ? :skip : r["ok"] ? :good : signature(check, r, dir) == brk["signature"] ? :bad : :skip
+      steps << { "commit" => sha, "verdict" => v.to_s }
+      v
+    end
+    start = verdict.(good)
+    return { "status" => "range start is #{start}, not good", "range" => [good, head], "steps" => steps } unless start == :good
+    lo, hi = -1, commits.size - 1 # lo: last known good (-1 is the range start), hi: first known bad (head)
+    skipped = []
+    loop do
+      candidates = (lo + 1...hi).reject { skipped.include?(_1) }
+      break if candidates.empty?
+      mid = candidates[candidates.size / 2]
+      case verdict.(commits[mid])
+      when :good then lo = mid
+      when :bad then hi = mid
+      else skipped << mid
+      end
+    end
+    first_bad = commits[hi]
+    { "status" => hi - lo == 1 ? "found" : "ambiguous (skipped steps)", "range" => [good, head], "first_parent_commits" => commits.size,
+      "steps" => steps, "first_bad" => pr_of(first_bad), "last_good" => lo >= 0 ? commits[lo] : good }
+  end
+
+  def search_terms(brk)
+    text = brk.dig("error", "message") || brk["signature"].split(" | ", 3).last.to_s
+    terms = text.scan(/[A-Z]\w+(?:::[A-Z]\w+)+|'[a-z_]\w*[?!=]?'|`[^`]+`/).map { _1.delete("'`") }
+    # The file that raised names the code better than generic words in the message (mail_delivery_job.rb).
+    rails_file = brk.dig("error", "first_rails_frame").to_s[%r{/lib/(?:[a-z_]+/)*([a-z_]+)\.rb:}, 1]
+    terms.unshift(rails_file.split("_").map(&:capitalize).join) if rails_file
+    terms += text.scan(/\b[a-z]+_[a-z_]+\b/).first(2)
+    terms.uniq.first(4)
+  end
+
+  def ownership(brk, guide)
+    hits = []
+    keyword = []
+    search_terms(brk).each do |term|
+      found = PrQueue.gh("graphql", "-f", "query=#{SEARCH}", "-f", %(q=repo:rails/rails "#{term}")).dig("data", "search", "nodes") rescue []
+      found.each do |n|
+        keyword << "rails/rails##{n["number"]} (#{n["__typename"] == "PullRequest" ? "PR" : "issue"}, #{n["state"].downcase}, " \
+          "#{n.dig("author", "login")}): #{n["title"]} [#{term}]"
+      end
+      hits << "upgrade guide on main mentions #{term}" if guide.include?(term)
+    end
+    if (pr = brk.dig("bisect", "first_bad", "pr"))
+      _, refs = Ownership.references("rails/rails", pr) rescue [nil, []]
+      refs.each { hits << "references ##{pr}: #{Ownership.label(_1)}" }
+      Dir[File.join(ROOT, "bench/upstream/pr-queue/items/*.md")].each do |item|
+        hits << "queue item #{File.basename(item, ".md")} (introduced_by #{pr})" if File.read(item).match?(/^introduced_by: #{pr}\b/)
+      end
+    end
+    (hits + keyword.sort_by { _1.include?(", open,") ? 0 : 1 }).uniq
+  end
+
+  def previous(date)
+    Dir[File.join(DATA, "*/results.json")].select { File.basename(File.dirname(_1)) < date }.max&.then { JSON.parse(File.read(_1)) }
+  end
+
+  def run(opts)
+    started = Time.now
+    date = opts[:date] || Date.today.iso8601
+    bin = Census.ruby_bin(opts[:ruby])
+    base_ref = opts[:base] || Census.capture("git", "ls-remote", "--tags", "https://github.com/rails/rails.git", "v8.1.*").lines
+      .map { _1.split.last.delete_prefix("refs/tags/") }.grep_v(/\^\{\}/).max_by { Gem::Version.new(_1.delete_prefix("v")) }
+    base = Census.resolve_rails(base_ref)
+    base = base.merge("sha" => Census.capture("git", "ls-remote", "https://github.com/rails/rails.git", "refs/tags/#{base_ref}^{}").split.first || base["sha"])
+    head = Census.resolve_rails(opts[:head] || "main")
+    out = File.join(DATA, date)
+    logs = File.join(ROOT, ".lowrail/private/rails-main-boot", date)
+    FileUtils.mkdir_p([out, logs])
+    ctx = { corpus: opts[:corpus], bin: bin, logs: logs, tests: opts[:tests] }
+    services = opts[:apps].flat_map { Census.conf(_1).fetch(:services, []) }.uniq.to_h do |s|
+      [s, s == "postgresql" ? system("pg_isready", "-q") : (Socket.tcp("127.0.0.1", Census::SERVICES.fetch(s), connect_timeout: 1).close.nil? rescue false)]
+    end
+    puts "rails-main-boot #{date}: base #{base_ref} #{base["sha"][0, 12]}, head #{head["ref"]} #{head["sha"][0, 12]}, #{opts[:apps].size} apps"
+    ctx[:bundled] = {}
+    opts[:apps].each do |app|
+      unless File.exist?(File.join(Census.app_dir(opts[:corpus], app), ".census.json"))
+        Census.fetch_copy({ corpus: opts[:corpus], overlays: Census::OVERLAYS }, app, base, bin)
+      end
+      { "base" => base, "head" => head }.each { |label, rails| ctx[:bundled][[app, label]] = bundle(ctx, app, rails, label) }
+    rescue RuntimeError => e
+      %w[base head].each { ctx[:bundled][[app, _1]] = [nil, { "ok" => false, "class" => "Setup", "message" => e.message }] }
+    end
+    queue = Queue.new
+    opts[:apps].each { queue << _1 }
+    apps = {}
+    lock = Mutex.new
+    Array.new([opts[:jobs], opts[:apps].size].min) do
+      Thread.new do
+        while (app = (queue.pop(true) rescue nil))
+          t = Time.now
+          row = { "copy" => Census.app_dir(opts[:corpus], app).delete_prefix(ROOT + "/") }
+          begin
+            unless File.exist?(File.join(Census.app_dir(opts[:corpus], app), ".census.json"))
+              Census.fetch_copy({ corpus: opts[:corpus], overlays: Census::OVERLAYS }, app, base, bin)
+            end
+            # Schema on the 8.1 tree; an app that targets 8.2 (8.1 cannot boot it) gets it on main instead.
+            setup_db = lambda do |env, dir, _|
+              marker = File.join(dir, "tmp/.boot-db")
+              next if File.exist?(marker)
+              db_log = File.join(logs, app, "db.log")
+              begin
+                File.open(db_log, "a") { |f| Census.prepare_db(app, env, dir, log: f) }
+                File.write(marker, env.fetch("CENSUS_RAILS_SHA"))
+                row["db"] = { "ok" => true }
+              rescue RuntimeError => e
+                row["db"] = { "ok" => false, "message" => e.message, "log_tail" => tail(db_log, 15) }
+              end
+            end
+            row["base"] = checks(ctx, app, base, "base", &setup_db)
+            row["head"] = checks(ctx, app, head, "head", &setup_db)
+            row["checks"], row["breaks"] = compare(app, row["base"], row["head"], Census.app_dir(opts[:corpus], app))
+          rescue StandardError => e
+            row["error"] = "#{e.class}: #{e.message}"
+          end
+          row["seconds"] = (Time.now - t).round
+          lock.synchronize { apps[app] = row }
+          puts "#{app}: #{row["error"] || row["checks"].reject { _2 == "skipped" }.map { "#{_1} #{_2}" }.join(", ")} (#{row["seconds"]}s)"
+        end
+      end
+    end.each(&:join)
+
+    prev = previous(date)
+    prev_sigs = prev ? prev["apps"].flat_map { |app, r| Array(r["breaks"]).map { [app, _1["signature"]] } } : []
+    # Apps that already target 8.2 (load_defaults 8.2) cannot boot on 8.1; for them the previous run's main is the base.
+    apps.each do |app, row|
+      next unless prev && row["checks"]
+      CHECKS.each do |check|
+        h = row.dig("head", check)
+        next unless h && !h["ok"] && !row.dig("base", check, "ok") && prev.dig("apps", app, "head", check, "ok")
+        (row["breaks"] ||= []) << { "app" => app, "check" => check, "against" => "previous main", "signature" => signature(check, h, File.join(ROOT, row["copy"])),
+          "error" => h.except("log_tail", "backtrace", "seconds"), "backtrace" => h["backtrace"]&.first(12), "log_tail" => h["log_tail"]&.last(15) }
+        row["checks"][check] = "break against previous main"
+      end
+    end
+    breaks = apps.values.flat_map { Array(_1["breaks"]) }
+    breaks.each { _1["new"] = !prev_sigs.include?([_1["app"], _1["signature"]]) }
+    groups = breaks.select { _1["new"] }.group_by { _1["signature"] }.values.sort_by { |g| [-SEVERITY.fetch(g.first["check"]), -g.size] }
+    guide = (Census.capture("curl", "-fsSL", "https://raw.githubusercontent.com/rails/rails/#{head["sha"]}/#{GUIDE}") rescue "")
+    merge_base = git("merge-base", base["sha"], head["sha"]) rescue nil
+    groups.each_with_index do |group, i|
+      group.sort_by! { apps.dig(_1["app"], "seconds") } # bisect the cheapest app
+      brk = group.first
+      prev_head = prev&.dig("apps", brk["app"], "head", brk["check"], "ok") ? prev.dig("head", "sha") : nil
+      good = prev_head || merge_base
+      brk["range"] = [good, head["sha"]]
+      if i < opts[:bisect] && good && brk["check"] != "bundle"
+        brk["bisect"] = bisect(ctx, brk, good, head["sha"]) rescue { "status" => "failed: #{$!.message}" }
+      end
+      brk["ownership"] = ownership(brk, guide)
+      group.drop(1).each { _1.merge!(brk.slice("range", "bisect", "ownership")) }
+    end
+    fixed = prev_sigs.reject { |app, sig| breaks.any? { _1["app"] == app && _1["signature"] == sig } || !apps.key?(app) }
+    results = { "format" => 1, "date" => date, "started" => started.utc.iso8601, "seconds" => (Time.now - started).round,
+      "ruby" => Census.ruby_description(bin), "base" => base, "head" => head, "merge_base" => merge_base, "services" => services,
+      "previous" => prev && prev.slice("date", "head"), "apps" => apps.sort.to_h, "fixed" => fixed.map { |a, s| { "app" => a, "signature" => s } } }
+    File.write(File.join(out, "results.json"), JSON.pretty_generate(results) + "\n")
+    Dir[File.join(logs, "*/{base,head}-probe.json")].each { FileUtils.cp(_1, File.join(out, "#{File.basename(File.dirname(_1))}-#{File.basename(_1)}")) }
+    report = report(results, groups)
+    File.write(File.join(ROOT, "docs/upstream/rails-main-boot-#{date}.md"), report)
+    puts report
+    puts "BOOT: #{groups.empty? ? "quiet" : "#{groups.size} new break#{"s" if groups.size != 1}"}"
+  end
+
+  def link(sha) = sha ? "[`#{sha[0, 10]}`](https://github.com/rails/rails/commit/#{sha})" : "?"
+
+  def report(r, groups)
+    cols = CHECKS.reject { |c| c == "tests" && r["apps"].values.none? { _1.dig("checks", "tests") != "skipped" } }
+    lines = ["# Rails-main boot check #{r["date"]}", "",
+      "Rails main #{link(r.dig("head", "sha"))} against #{r.dig("base", "ref")} #{link(r.dig("base", "sha"))}, #{r["ruby"].split(" (").first}, " \
+      "#{r["apps"].size} census apps, #{(r["seconds"] / 60.0).round} minutes. Previous run: #{r["previous"] ? "#{r.dig("previous", "date")} (main #{link(r.dig("previous", "head", "sha"))})" : "none"}. " \
+      "Made by `script/rails-main-boot` ([how it works](rails-main-boot.md)); raw data in " \
+      "[`bench/upstream/rails-main-boot/#{r["date"]}/`](../../bench/upstream/rails-main-boot/#{r["date"]}/).", "",
+      "## New breaks", ""]
+    if groups.empty?
+      lines << "None."
+    else
+      lines << "| # | Check | Error | Apps | First app frame | Range | Introduced by | Ownership (search hits) |" << "|---:|---|---|---|---|---|---|---|"
+      groups.each_with_index do |g, i|
+        b = g.first
+        bis = b["bisect"]
+        intro = if bis&.dig("first_bad")
+          fb = bis["first_bad"]
+          "#{fb["pr"] ? "[##{fb["pr"]}](https://github.com/rails/rails/pull/#{fb["pr"]})" : ""} #{link(fb["commit"])} (#{bis["status"]})"
+        else bis ? bis["status"] : "not bisected"
+        end
+        frame = b.dig("error", "first_app_frame") || b.dig("error", "first_frame") || "–"
+        lines << "| #{i + 1} | #{b["check"]} | `#{b["signature"].split(" | ", 2).last.gsub("|", "\\|")[0, 200]}` | #{g.map { _1["app"] }.join(", ")} | " \
+          "`#{frame.sub(ROOT + "/", "").sub(%r{\A\.corpus/[^/]+/}, "")}` | #{b["range"] ? "#{link(b["range"][0])}…#{link(b["range"][1])}" : "?"} | #{intro} | " \
+          "#{b["ownership"].empty? ? "none" : b["ownership"].first(6).join("; ").gsub("|", "\\|")} |"
+      end
+    end
+    known = r["apps"].values.flat_map { Array(_1["breaks"]) }.reject { _1["new"] }
+    lines += ["", "Breaks already in the previous run: #{known.empty? ? "none" : known.map { "#{_1["app"]} (#{_1["check"]})" }.join(", ")}.",
+      "Fixed since the previous run: #{r["fixed"].empty? ? "none" : r["fixed"].map { "#{_1["app"]}: `#{_1["signature"]}`" }.join("; ")}.", "",
+      "## Per app", "", "| App | #{cols.join(" | ")} | Notes |", "|---|#{"---|" * cols.size}---|"]
+    r["apps"].each do |app, row|
+      cells = cols.map { row.dig("checks", _1) || "–" }
+      note = [row["error"], (row["db"] && !row["db"]["ok"] ? "db setup failed: #{row["db"]["message"]}" : nil),
+        *%w[base head].filter_map do |side|
+          f = CHECKS.find { |c| row.dig(side, c) && !row.dig(side, c, "ok") }
+          "#{side == "base" ? "8.1" : "main"} #{f}: `#{normalize(row.dig(side, f, "class").to_s + ": " + row.dig(side, f, "message").to_s, File.join(ROOT, row["copy"])).gsub("|", "\\|")[0, 160]}`" if f
+        end].compact.join("; ")
+      lines << "| #{app} | #{cells.join(" | ")} | #{note} |"
+    end
+    lines.join("\n") + "\n"
+  end
+
+  def main(argv)
+    opts = { apps: Census::APPS.keys.reject { Census::APPS[_1][:copy] }, corpus: "boot", ruby: "4.0.9", bisect: 3, jobs: 2 }
+    OptionParser.new do |o|
+      o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join
+      o.on("--apps LIST") { opts[:apps] = Census.apps_option(_1) }
+      o.on("--base REF") { opts[:base] = _1 }
+      o.on("--head REF") { opts[:head] = _1 }
+      o.on("--tests") { opts[:tests] = true }
+      o.on("--bisect N", Integer) { opts[:bisect] = _1 }
+      o.on("--jobs N", Integer) { opts[:jobs] = _1 }
+      o.on("--date D") { opts[:date] = _1 }
+      o.on("--corpus NAME") { opts[:corpus] = _1 }
+      o.on("--ruby R") { opts[:ruby] = _1 }
+    end.parse!(argv)
+    run(opts)
+  end
+end
+
+RailsMainBoot.main(ARGV.dup) if $PROGRAM_NAME == __FILE__

@@ -13,6 +13,9 @@ Results are allocation counts only. No timing is inferred from them. Speed claim
 `script/census watch` reruns the census daily at current rails/rails `main` against the last recorded `main`. It
 attributes new allocations and SQL or behavior-control diffs to commits: [rails-main-watch](rails-main-watch/README.md).
 
+`script/rails-main-boot` is the weekly boot check before 8.2: which census apps no longer bundle, boot, eager-load or
+run on `main` compared with the latest 8.1 release, bisected to the introducing PR: [rails-main-boot](rails-main-boot.md).
+
 ## Run it on your own app
 
 `script/census app DIR` runs the census on any Rails app checkout and writes one report: objects and instructions

@@ -1,0 +1,12 @@
+{
+  "boot": {
+    "ok": true
+  },
+  "eager_load": {
+    "ok": true
+  },
+  "rails": {
+    "version": "8.2.0.alpha",
+    "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+  }
+}

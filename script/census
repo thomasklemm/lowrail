@@ -263,7 +263,7 @@ module Census
     gems.select { |name, _| gemfile.match?(/^\s*gem ["']#{Regexp.escape(name)}["']/) || lock.match?(/^    #{Regexp.escape(name)} \(/) }
   end
 
-  def variant(corpus, app, rails, bin, gems = {})
+  def variant(corpus, app, rails, bin, gems = {}, log: nil)
     dir = app_dir(corpus, app)
     gems = gem_pins(corpus, app, gems)
     suffix = gems.map { |name, g| "-#{name}-#{g.fetch("sha")[0, 12]}" }.join
@@ -292,7 +292,7 @@ module Census
     end
     env = env_for(app, bin, rails, gemfile, frozen: false)
     system(env, "bundle", "check", chdir: dir, out: File::NULL, err: File::NULL) ||
-      sh(env, "bundle", "install", "--quiet", chdir: dir)
+      sh(env, "bundle", "install", "--quiet", chdir: dir, log: log)
     gemfile
   end
 
@@ -334,53 +334,65 @@ module Census
       next puts("#{app}: runs #{conf[:copy]}'s copy") if conf[:copy]
       dir = app_dir(opts[:corpus], app)
       raise "fresh copy required: #{dir}" if File.exist?(dir)
-      sh({ "CORPUS_RUBY_BIN" => bin }, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
-        *("--no-overlay" if conf[:bare]))
-      overlay = conf.fetch(:overlay, app)
-      overlay = File.join(opts[:overlays], "#{overlay}.patch") unless overlay.include?("/")
-      sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
-      # A Ruby overlay (for example the master one) applies on top: only the gem
-      # changes that Ruby needs, so the Rails-side overlay stays shared.
-      ruby_overlay = opts[:ruby_overlays] && File.join(opts[:ruby_overlays], File.basename(overlay))
-      ruby_overlay = nil unless ruby_overlay && File.exist?(ruby_overlay)
-      sh({}, "patch", "-p1", "--forward", "--silent", "-i", ruby_overlay, chdir: dir) if ruby_overlay
-      # APP.sh next to it vendors a patched path gem (Bundler does not compile
-      # path gems, so the script builds its extension with this Ruby).
-      vendor = ruby_overlay&.sub(/\.patch\z/, ".sh")
-      sh({ "PATH" => "#{bin}:#{ENV.fetch("PATH")}", "RUBYOPT" => nil }, "bash", vendor, chdir: dir) if vendor && File.exist?(vendor)
-      FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
-      # Git does not keep empty directories; Lobsters' production log opens log/rails.log at boot.
-      FileUtils.mkdir_p(%w[log tmp storage].map { File.join(dir, _1) })
-      File.write(File.join(dir, ".census.json"), JSON.pretty_generate("app" => app, "base" => rails,
-        "overlay" => overlay.delete_prefix(ROOT + "/"), "ruby_overlay" => ruby_overlay&.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
+      fetch_copy(opts, app, rails, bin)
       gemfile = variant(opts[:corpus], app, rails, bin)
       env = env_for(app, bin, rails, gemfile)
-      conf.fetch(:pre_db, []).each { sh(env, *_1, chdir: dir) }
-      db_tasks = conf.fetch(:db, %w[db:create db:schema:load])
-      # Server databases are named by the app's own config, not by the copy, so
-      # another copy of the same app (another --corpus, an earlier round) uses
-      # the same ones. Refuse instead of loading the schema over its data.
-      if conf.fetch(:services, []).intersect?(%w[postgresql mysql]) && db_tasks.first == "db:create"
-        puts "+ bundle exec rails db:create (in #{dir.delete_prefix(ROOT + "/")})"
-        out, status = Open3.capture2e(env, "bundle", "exec", "rails", "db:create", chdir: dir)
-        print out
-        raise "#{app}: db:create failed" unless status.success?
-        # Configurations sharing one URL (Docuseal) report the database this
-        # call created as existing too.
-        existing = out.scan(/^Database '([^']+)' already exists/).flatten - out.scan(/^Created database '([^']+)'/).flatten
-        if existing.any?
-          raise "#{app}: #{existing.join(", ")} already exist on the shared server, so another copy may use them. " \
-            "Drop them first if they are disposable."
-        end
-        sh(env, "bundle", "exec", "rails", *db_tasks.drop(1), chdir: dir)
-      else
-        sh(env, "bundle", "exec", "rails", *db_tasks, chdir: dir)
-      end
+      prepare_db(app, env, dir)
       conf.fetch(:build, []).each { sh(env, *_1, chdir: dir) }
       sh(env, "bundle", "exec", "rails", "assets:precompile", chdir: dir) unless conf[:assets] == false
       conf.fetch(:after_assets, []).each { sh(env, *_1, chdir: dir) }
       sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "prepare", app, chdir: dir)
       sh(env.merge("CENSUS_MODE" => "interpreter"), "bundle", "exec", "ruby", HARNESS, "list", app, chdir: dir)
+    end
+  end
+
+  # Source, overlays and .census.json of a new copy; no bundle, database or build yet.
+  def fetch_copy(opts, app, rails, bin)
+    conf = APPS.fetch(app)
+    dir = app_dir(opts[:corpus], app)
+    sh({ "CORPUS_RUBY_BIN" => bin }, File.join(ROOT, "script/corpus"), conf.fetch(:source), File.basename(dir), "--source-only",
+      *("--no-overlay" if conf[:bare]))
+    overlay = conf.fetch(:overlay, app)
+    overlay = File.join(opts[:overlays], "#{overlay}.patch") unless overlay.include?("/")
+    sh({}, "patch", "-p1", "--forward", "--silent", "-i", overlay, chdir: dir)
+    # A Ruby overlay (for example the master one) applies on top: only the gem
+    # changes that Ruby needs, so the Rails-side overlay stays shared.
+    ruby_overlay = opts[:ruby_overlays] && File.join(opts[:ruby_overlays], File.basename(overlay))
+    ruby_overlay = nil unless ruby_overlay && File.exist?(ruby_overlay)
+    sh({}, "patch", "-p1", "--forward", "--silent", "-i", ruby_overlay, chdir: dir) if ruby_overlay
+    # APP.sh next to it vendors a patched path gem (Bundler does not compile
+    # path gems, so the script builds its extension with this Ruby).
+    vendor = ruby_overlay&.sub(/\.patch\z/, ".sh")
+    sh({ "PATH" => "#{bin}:#{ENV.fetch("PATH")}", "RUBYOPT" => nil }, "bash", vendor, chdir: dir) if vendor && File.exist?(vendor)
+    FileUtils.cp(File.join(dir, conf[:database_yml]), File.join(dir, "config/database.yml")) if conf[:database_yml] && !File.exist?(File.join(dir, "config/database.yml"))
+    # Git does not keep empty directories; Lobsters' production log opens log/rails.log at boot.
+    FileUtils.mkdir_p(%w[log tmp storage].map { File.join(dir, _1) })
+    File.write(File.join(dir, ".census.json"), JSON.pretty_generate("app" => app, "base" => rails,
+      "overlay" => overlay.delete_prefix(ROOT + "/"), "ruby_overlay" => ruby_overlay&.delete_prefix(ROOT + "/"), "created" => Time.now.utc.iso8601) + "\n")
+  end
+
+  def prepare_db(app, env, dir, log: nil)
+    conf = APPS.fetch(app)
+    conf.fetch(:pre_db, []).each { sh(env, *_1, chdir: dir, log: log) }
+    db_tasks = conf.fetch(:db, %w[db:create db:schema:load])
+    # Server databases are named by the app's own config, not by the copy, so
+    # another copy of the same app (another --corpus, an earlier round) uses
+    # the same ones. Refuse instead of loading the schema over its data.
+    if conf.fetch(:services, []).intersect?(%w[postgresql mysql]) && db_tasks.first == "db:create"
+      puts "+ bundle exec rails db:create (in #{dir.delete_prefix(ROOT + "/")})"
+      out, status = Open3.capture2e(env, "bundle", "exec", "rails", "db:create", chdir: dir)
+      (log || $stdout).print out
+      raise "#{app}: db:create failed" unless status.success?
+      # Configurations sharing one URL (Docuseal) report the database this
+      # call created as existing too.
+      existing = out.scan(/^Database '([^']+)' already exists/).flatten - out.scan(/^Created database '([^']+)'/).flatten
+      if existing.any?
+        raise "#{app}: #{existing.join(", ")} already exist on the shared server, so another copy may use them. " \
+          "Drop them first if they are disposable."
+      end
+      sh(env, "bundle", "exec", "rails", *db_tasks.drop(1), chdir: dir, log: log)
+    else
+      sh(env, "bundle", "exec", "rails", *db_tasks, chdir: dir, log: log)
     end
   end
 

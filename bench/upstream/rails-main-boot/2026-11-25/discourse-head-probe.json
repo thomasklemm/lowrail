@@ -1,0 +1,45 @@
+{
+  "boot": {
+    "ok": true
+  },
+  "eager_load": {
+    "ok": false,
+    "class": "LoadError",
+    "message": "cannot load such file -- active_job",
+    "first_app_frame": "/home/user/workspace/repo/.corpus/boot-discourse/app/mailers/admin_confirmation_mailer.rb:3:in '<main>'",
+    "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+    "first_gem_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+    "backtrace": [
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/mail_delivery_job.rb:3:in '<main>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bootsnap-1.26.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'Module#const_get'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/inflector/methods.rb:331:in 'ActiveSupport::Inflector#constantize'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/core_ext/string/inflections.rb:84:in 'String#constantize'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/railtie.rb:49:in 'block (2 levels) in <class:Railtie>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:87:in 'block in ActiveSupport::LazyLoadHooks#run_load_hooks'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'Array#each'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/activesupport/lib/active_support/lazy_load_hooks.rb:86:in 'ActiveSupport::LazyLoadHooks#run_load_hooks'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:1086:in '<class:Base>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:479:in '<module:ActionMailer>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/actionmailer/lib/action_mailer/base.rb:15:in '<main>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'"
+    ],
+    "cause": null
+  },
+  "rails": {
+    "version": "8.2.0.alpha",
+    "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-f785381cca86/railties"
+  }
+}
