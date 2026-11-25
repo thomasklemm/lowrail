@@ -1,0 +1,5 @@
+Applied to the generated Blog (Rails 7.2.4) before any run: the generator writes Rails 8's params.expect,
+which Rails 7.2 does not have (3 errors in CommentsControllerTest without the gem).
+  params.expect(:id)                         -> params.require(:id)
+  params.expect(:article_id)                 -> params.require(:article_id)
+  params.expect(comment: [ :commenter, :body ]) -> params.require(:comment).permit(:commenter, :body)

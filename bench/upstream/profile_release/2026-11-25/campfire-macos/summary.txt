@@ -1,0 +1,12 @@
+plain exit 0
+off exit 0
+profiled exit 0
+build.log
+lowrail_profile.bundle
+lowrail_profile.bundle.dSYM
+lowrail_profile.o
+Makefile
+../out/off.log:      634 outcomes; 634 runs, 3858 assertions, 0 failures, 0 errors, 1 skips
+../out/plain.log:      634 outcomes; 634 runs, 3858 assertions, 0 failures, 0 errors, 1 skips
+../out/profiled.log:      634 outcomes; 634 runs, 3858 assertions, 0 failures, 0 errors, 1 skips
+outcomes identical

@@ -1,0 +1,40 @@
+    as a logged-out visitor
+      adding a filter
+    as a logged-in user
+      adding a filter
+  inactive tag
+    tag isn't shown
+  privileged tag
+    no filter checkbox is shown
+    when the user is a moderator
+      the user can filter the privileged tag
+
+bin/sqlite3
+  runs the sqlite3 cli built in the gem, not the OS one
+
+user redirects
+  newest stories
+  user tree
+  old-style to tilde
+  threads
+
+IP spoofing protection
+  doesn't raise on normal traffic
+  renders 400 on mismatched headers
+
+EmailReplyMailer
+  addresses replies to receiver
+  has a stable message-id
+  addresses top-level story responses
+  addresses story replies
+  contains message about replying from email
+  has parent in-reply-to and in references
+  lists references oldest-first
+
+Finished in 39.42 seconds (files took 4.59 seconds to load)
+927 examples, 0 failures
+
+Randomized with seed 1234
+
+Coverage report generated for RSpec to /home/user/workspace/repo/.corpus/rc-lobsters/coverage.
+Line Coverage: 66.27% (4411 / 6656)

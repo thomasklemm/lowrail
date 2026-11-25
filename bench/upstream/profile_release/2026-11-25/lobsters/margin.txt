@@ -1,0 +1,5 @@
+status 0 compared: 6639 lines, 64 actions; not compared 48
+  request action CommentsController#create: +15.45 against 30.00 (51%)
+  request action SettingsController#deactivate: +47.45 against 106.00 (45%)
+  job line RAILS/activerecord/lib/active_record/associations/collection_association.rb:500: +0.44 against 1.00 (44%)
+  request action InvitationsController#create: -35.50 against 102.00 (35%)

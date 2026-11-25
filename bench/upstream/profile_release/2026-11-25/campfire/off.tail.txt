@@ -1,0 +1,40 @@
+UploadedScriptGuardTest#test_media_and_downloads_keep_their_type = 0.00 s = .
+MessagesHelperTest#test_message_presentation_shows_a_video_in_the_rich_text_as_a_file = 0.09 s = .
+AccountTest#test_logo_variant_is_a_resized_variant_of_a_variable_logo = 0.11 s = .
+MessagesCachingTest#test_a_page_of_messages_loads_whether_their_previews_were_made_along_with_the_messages,_not_one_at_a_time = 1.63 s = .
+UserTest#test_deactivating_a_user_deletes_their_sessions = 0.01 s = .
+Rooms::DirectsControllerTest#test_destroy_can't_reach_a_closed_room_the_member_didn't_create = 0.04 s = .
+RoomsControllerTest#test_show_renders_an_unfurled_link_preview = 0.15 s = .
+User::RoleTest#test_can_administer_a_record = 0.00 s = .
+Opengraph::LocationTest#test_url_validations = 0.03 s = .
+LogScrubbingFormatterTest#test_redacts_every_occurrence_on_a_line = 0.00 s = .
+Rooms::DirectTest#test_default_involvement_for_new_users = 0.01 s = .
+FragmentRenderingTest#test_native_collection_caching_uses_the_bounded_store_without_replacing_shared_stores = 0.12 s = .
+RoomTest#test_a_new_message_marks_unread_the_members_who_had_read_the_room_and_leaves_the_unread_ones_as_they_were = 0.03 s = .
+UsersControllerTest#test_new = 0.03 s = .
+Accounts::CustomStylesControllerTest#test_update = 0.03 s = .
+RoomsControllerTest#test_show_renders_a_link_preview_written_by_hand_without_its_off-scheme_image_and_link = 0.13 s = .
+Users::AvatarsControllerTest#test_show_initials = 0.05 s = .
+FragmentRenderingTest#test_a_commit_in_another_room_retains_content-validated_message_collection_hits = 0.12 s = .
+BlockBannedRequestsTest#test_POST_requests_from_banned_IPs_are_blocked_with_429 = 0.03 s = .
+Accounts::CustomStylesControllerTest#test_edit = 0.03 s = .
+FetchMetadataTest#test_plain_HTTP_retains_the_missing-header_fallback = 0.01 s = .
+Message::SearchableTest#test_bounded_search_keeps_older_reachable_hits_behind_inaccessible_matches = 0.23 s = .
+Message::SearchableTest#test_message_body_is_indexed_and_searchable = 0.03 s = .
+MessagesHelperTest#test_message_presentation_shows_an_image_in_the_rich_text_as_a_file_even_when_its_preview_was_made = 0.10 s = .
+MessagesHelperTest#test_message_presentation_gives_a_video_the_poster_made_when_it_was_posted = 0.46 s = .
+MessagesHelperTest#test_message_presentation_strips_event_handler_attributes_from_allowed_tags = 0.01 s = .
+MessagesHelperTest#test_message_presentation_shows_a_video_whose_frame_was_drawn_but_whose_poster_wasn't_made_without_one = 0.63 s = .
+MessagesHelperTest#test_message_presentation_links_an_image_whose_thumbnail_wasn't_made,_rather_than_making_it_on_view = 0.02 s = .
+RoomsControllerTest#test_show_renders_a_link_preview_written_by_hand_without_its_image_pointed_at_this_Campfire = 0.13 s = .
+Users::PushSubscriptionsControllerForeignWriteTest#test_a_subscription_another_connection_registers_while_this_one_validates_isn't_registered_twice = 0.03 s = .
+RoomsControllerTest#test_show_renders_notification_help_for_each_platform = 0.17 s = .
+RecordCacheTest#test_foreign_commit_makes_an_old_captured_epoch_query_fresh_records_instead_of_reusing_a_snapshot = 0.02 s = .
+== 20261008000100 ChangeCounterTaskMessageColumn: migrating ===================
+-- change_column(:messages, :client_message_id, :text)
+   -> 0.0048s
+== 20261008000100 ChangeCounterTaskMessageColumn: migrated (0.0049s) ==========
+
+
+Finished in 10.740158s, 59.0308 runs/s, 359.0264 assertions/s.
+634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips

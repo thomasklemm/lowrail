@@ -161,9 +161,10 @@ Each is checked by a test in this gem or on the apps below.
 2. **No lowering.** The package holds only the profiler; it never loads Lowrail's runtime.
 3. **Off means off.** With the gem listed and `require: false`, a process the command did not start loads none of
    it.
-4. **Same outcomes.** Per-test outcomes and load order were identical plain, listed-but-off and profiled on the apps
-   listed in [the evidence](https://github.com/thomasklemm/lowrail/blob/main/docs/profile.md). That is a claim
-   about those apps, not every app. Check yours: run the suite plain and profiled with the same seed and diff the
+4. **Same outcomes.** Per-test outcomes and load order were identical plain, listed-but-off and profiled on
+   Campfire, Lobsters, CodeTriage and a Rails 7.2 / Ruby 3.3 blog, from this gem, and on Campfire on macOS
+   ([the evidence](https://github.com/thomasklemm/lowrail/blob/main/docs/profile.md)). That is a claim about those
+   apps, not every app. Check yours: run the suite plain and profiled with the same seed and diff the
    per-test results (`bin/rails test -v`, `rspec --format documentation`).
 5. **Exit status passes through**, and compare never turns invalid evidence green (exit 2).
 6. **Never breaks the app.** A counter that fails to build or load, or a framework hook that cannot be installed,
@@ -177,8 +178,8 @@ Each is checked by a test in this gem or on the apps below.
 * *no runs with requests, jobs or mails*: the command served no request through `Rails.application` (unit tests
   only, or a server started in another process). Profile integration, controller, request or system tests.
 * *exists and was not created by lowrail-profile*: pick another `--out`; it never clears a directory it did not make.
-* Overhead: the first run counts (0–11% of suite time on the apps measured), the second also walks the stack per
-  allocation (up to 45% on allocation-heavy suites). Measured per app in the evidence.
+* Overhead: the first run counts (4–9% of suite time on the four apps measured), the second also walks the stack
+  per allocation (31–87%, most on allocation-heavy suites such as Campfire's). Measured per app in the evidence.
 * Code in Ractors other than the main one is not counted.
 
 Report issues with `report.json`, `capture.json` and the command at

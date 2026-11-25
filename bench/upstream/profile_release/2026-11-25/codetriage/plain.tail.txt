@@ -1,0 +1,40 @@
+GithubFetcher::IssueTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+MaintainingRepoSubscriptionsTest#test_listing_subscribers = 0.14 s = .
+MaintainingRepoSubscriptionsTest#test_send_an_issue!_button = 0.18 s = .
+MaintainingRepoSubscriptionsTest#test_subscribing_to_a_repo = 0.13 s = .
+IssueTest#test_valid_for_user?_when_has_open_issue_and_user_skipped_with_PR = 0.02 s = .
+IssueTest#test_issue_with_extra_long_title = 0.00 s = .
+IssueTest#test_issue_counter_cache = 0.02 s = .
+IssueTest#test_commenting_users = 0.01 s = .
+IssueTest#test_valid_for_user?_when_has_open_issue_and_user_has_not_skipped_issues_with_PR = 0.01 s = .
+IssueTest#test_permitted_state_values = 0.00 s = .
+IssueTest#test_public_url = 0.00 s = .
+IssueTest#test_valid_for_user? = 0.01 s = .
+IssueTest#test_open_issues = 0.01 s = .
+ReposControllerTest#test_do_not_send_email_for_repo_without_issues = 0.04 s = .
+ReposControllerTest#test_logged_in_user_can_create_repo = 0.03 s = .
+ReposControllerTest#test_responds_with_404_if_repo_does_not_exist = 0.01 s = .
+ReposControllerTest#test_trying_to_create_repo_without_logged_in_will_redirect_to_login_page = 0.01 s = .
+ReposTest#test_repo_subscriber_route = 0.00 s = .
+ReposTest#test_access_valid_repo = 0.02 s = .
+ReposTest#test_route_with_.js_in_it = 0.00 s = .
+ReposTest#test_update_repo = 0.02 s = .
+ReposTest#test_access_deleted_from_github_repo = 0.01 s = .
+ReposTest#test_access_archived_repo = 0.01 s = .
+ReposTest#test_repo_index = 0.00 s = .
+ReposTest#test_edit_deleted_from_github_repo = 0.02 s = .
+ReposTest#test_edit_repo_where_user_is_not_the_owner = 0.01 s = .
+ReposTest#test_regular_repo_routes = 0.00 s = .
+ReposTest#test_edit_archived_repo = 0.01 s = .
+Users::OmniauthCallbacksControllerTest#test_make_user_feel_good_when_legit_email_address = 0.01 s = .
+Users::OmniauthCallbacksControllerTest#test_redirect_to_user_page_and_inform_when_bad_e-mail_address = 0.01 s = .
+GithubFetcher::CommitShaTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#as_json_returns_json = 0.01 s = .
+GithubFetcher::CommitShaTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#commit_sha_returns_nil_when_error = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#commit_sha_returns_the_sha_branch = 0.00 s = .
+
+Finished in 6.057344s, 36.6497 runs/s, 79.7379 assertions/s.
+222 runs, 483 assertions, 0 failures, 0 errors, 0 skips
+Coverage report generated for Minitest, Minitest (subprocess: 1) to coverage/index.html
+Line coverage: 1201 / 1514 (79.32%)

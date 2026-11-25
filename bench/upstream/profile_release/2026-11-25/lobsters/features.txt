@@ -1,0 +1,15 @@
+# plain2 vs off (plain: the copy's cold first run)
+base plain2: 1 processes
+plain 121424.txt 4545: DIFFERS
+  extra: []  missing: []  same set: true
+off 125907.txt 4545: identical to a plain2 process
+# control (bundle exec env) vs captures
+base off-env: 1 processes
+profiled run1-128346.txt 4545: identical to a off-env process
+profiled run2-131078.txt 4545: identical to a off-env process
+base2 run1-134089.txt 4545: identical to a off-env process
+base2 run2-136577.txt 4545: identical to a off-env process
+head run1-140100.txt 4545: identical to a off-env process
+head run2-140931.txt 4545: identical to a off-env process
+planted run1-143374.txt 4545: identical to a off-env process
+planted run2-145413.txt 4545: identical to a off-env process

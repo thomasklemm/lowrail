@@ -1,0 +1,4 @@
+head --aa exit 0
+planted --aa exit 1
+head without --aa exit 0
+codetriage base vs lobsters head exit 2

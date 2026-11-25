@@ -1,0 +1,26 @@
+# plain2 vs off, etc.so left out
+base plain2: 2 processes
+plain 99724.txt 5879: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so"]  missing: []  same set: false
+plain 99760.txt 5878: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so"]  missing: []  same set: false
+off 100589.txt 5878: identical to a plain2 process
+off 100991.txt 5877: identical to a plain2 process
+# control (bundle exec env) vs captures, yard's constants-walk files left out
+base off-env: 2 processes
+profiled run1-101069.txt 5879: identical to a off-env process
+profiled run1-101094.txt 5878: identical to a off-env process
+profiled run2-101121.txt 5879: identical to a off-env process
+profiled run2-101146.txt 5878: identical to a off-env process
+base2 run1-101188.txt 5879: identical to a off-env process
+base2 run1-101213.txt 5878: identical to a off-env process
+base2 run2-101233.txt 5879: identical to a off-env process
+base2 run2-101265.txt 5878: identical to a off-env process
+head run1-101308.txt 5879: identical to a off-env process
+head run1-101713.txt 5878: identical to a off-env process
+head run2-101780.txt 5879: identical to a off-env process
+head run2-101804.txt 5878: identical to a off-env process
+planted run1-101858.txt 5879: identical to a off-env process
+planted run1-102386.txt 5878: identical to a off-env process
+planted run2-102652.txt 5879: identical to a off-env process
+planted run2-103018.txt 5878: identical to a off-env process

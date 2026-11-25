@@ -368,6 +368,35 @@ process). When the command runs it:
 exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
 it did not create.
 
+### Release candidate: proof from the built gem (2026-11-25)
+
+lowrail-profile 0.1.0.rc1 as a stranger installs it: `gem build gem/lowrail-profile.gemspec`, `gem install --local`
+into the app's Ruby, a Gemfile copy with only the gem's line added, no Lowrail checkout on any path and an empty
+counter cache, on fresh `script/corpus` copies. Receipts, scripts and method:
+[bench/upstream/profile_release/2026-11-25](../bench/upstream/profile_release/2026-11-25). Apps ran one after
+another on an 8-CPU orb.
+
+| App, suite | Ruby, Rails | Tests | Outcomes (plain = off = every capture) | A/A `compare --aa` | Planted `html_escape` loop | Overhead, run 1 / run 2 |
+| --- | --- | ---: | --- | --- | --- | --- |
+| Blog (generated), `bin/rails test -v` | 3.3.14, 7.2.4 | 21 | identical: 21 pass | 0 (closest row 68% of its floor) | 1: one line | +9% / +37% |
+| CodeTriage, `bin/rails test --verbose` | 4.0.7, 8.1.4 | 222 | identical, 0 failures | 0 (100%, at the floor, not beyond) | 1: the action and two lines | +4% / +35% |
+| Campfire, `bin/rails test -v` | 4.0.7, main `e3d5c569` | 634 | identical: 632 pass, 2 skip | 0 (43%) | 1: the action and two lines | +7% / +87% |
+| Lobsters, `bundle exec rspec --format documentation` | 4.0.9, 8.1.3.1 | 927 | identical (masked), 0 failures | 0 (51%) | 1: the action and two lines | +6% / +31% |
+
+* Load order: every profiled process loads the same features in the same order as the setup without the gem
+  started the same way (`bundle exec env COMMAND`, a new process under Bundler's `RUBYOPT`, as lowrail-profile
+  starts its command). Started as `bundle exec bin/rails` or `bundle exec rspec`, Bundler loads the script in its
+  own process, which moves its early `pathname` (Ruby 3.3) or `etc.so` (Ruby 4.0) ahead of `bundled_gems.rb`.
+  CodeTriage's yard handler and code-object files load in an order of their own, as before.
+* A different seed, or another app's report, exits 2. The app tree (outside `log/`, `tmp/` and SQLite databases)
+  is the same after every capture.
+* Ledger: 52 of 52 matches at `--top 300`, each checked against its pull request's diff on GitHub.
+* GitHub Actions: the README's job, verbatim, on a private copy of the Blog fails on a planted pull request
+  (exit 1, one regression) and passes on an unchanged one. macOS (`macos-latest`, arm64): the counter builds with
+  Apple clang and Campfire's 634 tests are identical plain, off and profiled.
+* The stack-walking run cost Campfire 87% of its suite time here, more than the 45% measured on the 2-CPU orb on
+  2026-11-18; counting alone stays under 10%.
+
 ### Rerun on main (2026-11-18)
 
 The three apps the review fixes left unchecked, on main `7ca0a20e` with the counter fix below, in fresh

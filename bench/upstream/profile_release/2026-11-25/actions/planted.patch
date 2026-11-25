@@ -1,0 +1,12 @@
+diff --git a/app/controllers/articles_controller.rb b/app/controllers/articles_controller.rb
+index 17b15d9..e046418 100644
+--- a/app/controllers/articles_controller.rb
++++ b/app/controllers/articles_controller.rb
+@@ -3,6 +3,7 @@ class ArticlesController < ApplicationController
+ 
+   # GET /articles or /articles.json
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     @articles = Article.includes(:comments).order(created_at: :desc)
+   end
+ 

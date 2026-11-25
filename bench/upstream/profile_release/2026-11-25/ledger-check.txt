@@ -1,0 +1,5 @@
+OK   profiled: RAILS/activesupport/lib/active_support/notifications/fanout.rb:288 `group_klass.new(grouped_listeners, name, id, payload)` #59613 merged 2026-11-04, after this app's version, not released yet
+OK   profiled: RAILS/activesupport/lib/active_support/notifications/fanout.rb:288 `group_klass.new(grouped_listeners, name, id, payload)` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   profiled: RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:165 `ar_result = if result.fields.empty?` #59278 merged 2026-10-22, after this app's version, not released yet
+OK   profiled: RAILS/activesupport/lib/active_support/notifications/fanout.rb:287 `groups = groups_for(name).map do |group_klass, grouped_liste` #59235 merged 2026-10-21, after this app's version, not released yet
+4 of 4 matches confirmed in the pull request's diff

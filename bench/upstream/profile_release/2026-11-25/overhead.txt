@@ -1,0 +1,4 @@
+blog-floor: plain 0.6, 0.5 s; off 0.6 s; run 1 0.6, 0.6, 0.7 s (+9%); run 2 0.7, 0.8, 0.8 s (+37%); wall plain 1.8 s, a capture 5.9, 5.5, 5.8 s
+codetriage: plain 6.1, 5.6 s; off 5.5 s; run 1 6.2, 5.9, 6.1 s (+4%); run 2 8.0, 7.6, 7.9 s (+35%); wall plain 9.0 s, a capture 25.7, 23.5, 24.4 s
+campfire: plain 9.5, 7.7 s; off 10.7 s; run 1 9.1, 9.6, 8.9 s (+7%); run 2 16.0, 16.5, 15.8 s (+87%); wall plain 12.6 s, a capture 46.0, 45.5, 44.3 s
+lobsters: plain 40.4, 39.0 s; off 39.4 s; run 1 41.3, 42.5, 42.3 s (+6%); run 2 50.4, 52.2, 53.7 s (+31%); wall plain 46.4 s, a capture 118.1, 119.2, 121.9 s

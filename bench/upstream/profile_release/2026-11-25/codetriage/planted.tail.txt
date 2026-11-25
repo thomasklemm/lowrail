@@ -1,0 +1,40 @@
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | BackgroundInactiveEmailJob#perform | 2 / 2 | 69651.0 / 69667.0 | 16.0 | 35066.0 | `GEM/css_parser/lib/css_parser/rule_set.rb:229` 1743.0, `GEM/kramdown/lib/kramdown/utils/entities.rb:0` 1569.0, `GEM/nokogiri/lib/nokogiri/css/node.rb:21` 1542.0 | `app/jobs/background_inactive_email_job.rb:7` 26014.0, `app/mailers/user_mailer.rb:94` 12810.0, `config/initializers/maildown_rails_71_fix.rb:11` 10138.0 |
+| 2 | ActionMailer::MailDeliveryJob#perform | 3 / 3 | 25800.5 / 25799.0 | -1.5 | 27074.0 | `GEM/css_parser/lib/css_parser/rule_set.rb:229` 1309.5, `GEM/premailer/lib/premailer/adapter/nokogiri.rb:29` 940.0, `GEM/mail/lib/mail/utilities.rb:215` 680.0 | `app/jobs/send_daily_triage_email_job.rb:44` 18632.5, `app/mailers/user_mailer.rb:54` 1600.5, `app/views/user_mailer/send_daily_triage.md.erb:22` 791.5 |
+| 3 | PopulateIssuesJob#perform | 5 / 5 | 1565.0 / 1558.3 | -6.8 | 1962.0 | `RAILS/activemodel/lib/active_model/attribute.rb:9` 29.8, `RUBY/psych/parser.rb:62` 22.5, `RUBY/psych/tree_builder.rb:97` 21.5 | `app/models/github_fetcher/resource.rb:44` 334.3, `app/models/repo.rb:156` 222.5, `app/models/repo.rb:157` 132.5 |
+| 4 | UpdateRepoInfoJob#perform | 3 / 3 | 572.0 / 572.0 | 0.0 | 564.3 | `RAILS/activemodel/lib/active_model/attribute.rb:9` 17.0, `RAILS/activesupport/lib/active_support/notifications/fanout.rb:288` 12.5, `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 11.0 | `app/models/repo.rb:204` 173.0, `app/models/repo.rb:189` 119.5, `app/models/repo.rb:47` 12.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/css_parser/lib/css_parser/rule_set.rb:229` | 352.85 / 352.85 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 41%, `app/jobs/send_single_triage_email_job.rb:16` 31% | `property = property.to_s.downcase` |
+| 2 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:29` | 216.92 / 216.92 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 50%, `app/jobs/background_inactive_email_job.rb:7` 25% | `selector.gsub!(/([\s]\|^)([\w]+)/) { \|m\| $1.to_s + $2.to_s.downcase }` |
+| 3 | `GEM/mail/lib/mail/utilities.rb:215` | 156.92 / 156.92 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 37%, `app/jobs/background_inactive_email_job.rb:7` 19% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 4 | `GEM/css_parser/lib/css_parser/parser.rb:378` | 134.54 / 134.54 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 50%, `app/jobs/background_inactive_email_job.rb:7` 25% | `token = scanner.scan(RULESET_TOKENIZER_RX)` |
+| 5 | `GEM/css_parser/lib/css_parser.rb:111` | 109.38 / 109.38 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 50%, `app/jobs/background_inactive_email_job.rb:7` 25% | `c = selector.scan(NON_ID_ATTRIBUTES_AND_PSEUDO_CLASSES_RX_NC).length` |
+| 6 | `GEM/css_parser/lib/css_parser/rule_set.rb:673` | 97.38 / 97.38 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 47%, `app/jobs/send_single_triage_email_job.rb:16` 27% | `value = decs[(colon + 1)..]` |
+| 7 | `RAILS/activemodel/lib/active_model/attribute_methods.rb:492` | 96.92 / 96.92 | 15% | `app/models/random/cached_id_query.rb:27` 55%, `app/mailers/user_mailer.rb:74` 45% | `@method_name % attr_name` |
+| 8 | `GEM/css_parser/lib/css_parser/rule_set.rb:676` | 96.0 / 96.0 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 47%, `app/jobs/send_single_triage_email_job.rb:16` 27% | `next if property.empty? \|\| value.empty? \|\| value.casecmp?(IMPORTANT)` |
+| 9 | `GEM/nokogiri/lib/nokogiri/xml/searchable.rb:61` | 88.62 / 88.62 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 50%, `app/jobs/send_single_triage_email_job.rb:16` 25% | `xpath(*(xpaths + [ns, handler, binds].compact))` |
+| 10 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 85.0 / 84.92 | 31% | `app/jobs/send_daily_triage_email_job.rb:44` 33%, `app/jobs/send_single_triage_email_job.rb:16` 17% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | UserMailer.deliver_mail | 2 / 2 | 2178.0 / 2178.0 | 0.0 | 2271.0 | `GEM/mail/lib/mail/utilities.rb:215` 314.0, `GEM/mail/lib/mail/field_list.rb:71` 156.0, `GEM/mail/lib/mail/parsers/content_transfer_encoding_parser.rb:380` 136.0 |  |
+| 2 | UserMailer#poke_inactive | 1 / 1 | – / – |  | 5281.0 |  |  |
+| 3 | UserMailer#send_triage | 1 / 1 | – / – |  | 4189.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 199.75 / 199.75 | 100% | `no app frame` 65%, `app/mailers/user_mailer.rb:94` 18% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/field_list.rb:71` | 99.0 / 99.0 | 100% | `no app frame` 65%, `app/mailers/user_mailer.rb:75` 18% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 3 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 98.5 / 98.5 | 100% | `no app frame` 53%, `app/mailers/user_mailer.rb:94` 24% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 4 | `GEM/mail/lib/mail/utilities.rb:226` | 52.0 / 52.0 | 100% | `no app frame` 73%, `app/mailers/user_mailer.rb:94` 13% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+| 5 | `GEM/mail/lib/mail/utilities.rb:291` | 50.0 / 50.0 | 100% | `no app frame` 71%, `app/mailers/user_mailer.rb:75` 15% | `value !~ /\S/` |
+| 6 | `GEM/kramdown/lib/kramdown/element.rb:498` | 34.25 / 34.25 | 50% | `config/initializers/maildown_rails_71_fix.rb:11` 100% | `@children = []` |
+| 7 | `GEM/mail/lib/mail/parsers/content_transfer_encoding_parser.rb:380` | 34.0 / 34.0 | 50% | `no app frame` 100% | `_wide = data[p].ord` |
+| 8 | `GEM/kramdown/lib/kramdown/parser/base.rb:115` | 31.0 / 31.0 | 50% | `config/initializers/maildown_rails_71_fix.rb:11` 100% | `tree.children << Element.new(type, text, nil, location: location)` |
+| 9 | `GEM/mail/lib/mail/parser_tools.rb:7` | 28.0 / 28.0 | 100% | `no app frame` 42%, `app/mailers/user_mailer.rb:94` 29% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 10 | `GEM/mail/lib/mail/message.rb:1426` | 28.0 / 28.0 | 100% | `no app frame` 70%, `app/mailers/user_mailer.rb:94` 15% | `tmp = header[:content_type].main_type rescue nil` |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25/codetriage/planted/report.md

@@ -1,0 +1,40 @@
+| 6 | ActionMailer::MailDeliveryJob#perform | 1 / 1 | – / – |  | 2614.0 |  |  |
+| 7 | NotifyModMailMessageJob#perform | 1 / 1 | – / – |  | 1609.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/sqlite3/lib/sqlite3/statement.rb:186` | 173.11 / 173.11 | 100% | `app/models/stories_paginator.rb:24` 17%, `app/controllers/stories_controller.rb:145` 10% | `val&.downcase` |
+| 2 | `GEM/sqlite3/lib/sqlite3/statement.rb:185` | 86.56 / 86.56 | 100% | `app/models/stories_paginator.rb:24` 17%, `app/controllers/stories_controller.rb:145` 10% | `val = column_decltype(column)` |
+| 3 | `GEM/typeid/lib/typeid/uuid.rb:83` † | 65.0 / 65.0 | 83% | `app/models/concerns/token.rb:6` 65%, `config/initializers/x_request_token.rb:33` 35% | `.with_index { \|byte, index\| ([4, 6, 8, 10].include?(index) ? "-%02x" :` |
+| 4 | `RAILS/actionpack/lib/action_dispatch/routing/route_set.rb:101` † | 44.33 / 44.33 | 17% | `app/jobs/notify_mod_mail_message_job.rb:18` 33%, `app/jobs/notify_message_job.rb:15` 33% | `@path_helpers.map(&:to_s) + @url_helpers.map(&:to_s)` |
+| 5 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` | 40.56 / 40.56 | 100% | `app/jobs/refill_story_page_cache_job.rb:7` 25%, `app/models/stories_paginator.rb:24` 15% | `val = step` |
+| 6 | `GEM/typeid/lib/typeid/uuid.rb:40` | 34.0 / 34.0 | 83% | `app/models/concerns/token.rb:6` 65%, `config/initializers/x_request_token.rb:33` 35% | `.chars` |
+| 7 | `GEM/typeid/lib/typeid/uuid.rb:42` † | 34.0 / 34.0 | 83% | `app/models/concerns/token.rb:6` 65%, `config/initializers/x_request_token.rb:33` 35% | `.map { \|pair\| pair.join.to_i(16) }` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:215` | 33.72 / 33.72 | 33% | `app/jobs/notify_comment_job.rb:74` 22%, `app/jobs/notify_comment_job.rb:32` 22% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 9 | `GEM/typeid/lib/typeid.rb:90` | 31.0 / 31.0 | 83% | `app/models/concerns/token.rb:6` 65%, `config/initializers/x_request_token.rb:33` 35% | `raise Error, "suffix must start with a 0-7 digit to avoid overflows" u` |
+| 10 | `GEM/erubi/lib/erubi.rb:134` (template compile) | 29.06 / 29.06 | 33% | `app/controllers/stories_controller.rb:167` 81%, `app/views/home/index.html.erb:2` 5% | `input.scan(regexp) do \|indicator, code, tailch, rspace\|` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | EmailReplyMailer#reply | 8 / 8 | 1067.4 / 1067.4 | 0.0 | 1086.9 | `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` 132.7, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 48.0, `GEM/mail/lib/mail/utilities.rb:215` 41.0 | `app/mailers/email_reply_mailer.rb:18` 515.0, `app/mailers/email_reply_mailer.rb:41` 204.6, `app/mailers/email_reply_mailer.rb:42` 130.6 |
+| 2 | PasswordResetMailer.deliver_mail | 3 / 3 | 869.0 / 868.5 | -0.5 | 868.3 | `GEM/mail/lib/mail/utilities.rb:215` 78.0, `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` 43.5, `GEM/mail/lib/mail/utilities.rb:388` 40.0 | `app/models/user.rb:485` 866.5 |
+| 3 | PasswordResetMailer#password_reset_link | 3 / 3 | 613.0 / 613.0 | 0.0 | 613.0 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 47.0, `GEM/mail/lib/mail/utilities.rb:215` 38.0, `GEM/mail/lib/mail/parser_tools.rb:7` 27.0 | `app/mailers/password_reset_mailer.rb:8` 513.0, `app/views/password_reset_mailer/password_reset_link.text.erb:7` 39.0, `app/models/user.rb:485` 12.0 |
+| 4 | InvitationRequestMailer.deliver_mail | 1 / 1 | – / – |  | 986.0 |  |  |
+| 5 | InvitationRequestMailer#invitation_request | 1 / 1 | – / – |  | 874.0 |  |  |
+| 6 | BanNotificationMailer#notify | 1 / 1 | – / – |  | 674.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` | 70.94 / 70.88 | 71% | `app/mailers/email_reply_mailer.rb:41` 86%, `app/models/user.rb:485` 10% | `_wide = data[p].ord` |
+| 2 | `GEM/mail/lib/mail/utilities.rb:215` | 46.65 / 46.65 | 100% | `app/mailers/email_reply_mailer.rb:18` 35%, `app/models/user.rb:485` 28% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 3 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 35.82 / 35.82 | 77% | `app/mailers/email_reply_mailer.rb:18` 59%, `app/mailers/password_reset_mailer.rb:8` 21% | `_wide = data[p].ord` |
+| 4 | `GEM/mail/lib/mail/utilities.rb:291` | 32.24 / 32.24 | 100% | `app/mailers/email_reply_mailer.rb:18` 34%, `app/models/user.rb:485` 21% | `value !~ /\S/` |
+| 5 | `GEM/mail/lib/mail/parser_tools.rb:7` | 27.12 / 27.12 | 100% | `app/mailers/email_reply_mailer.rb:18` 44%, `app/mailers/email_reply_mailer.rb:41` 17% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 6 | `GEM/mail/lib/mail/field_list.rb:71` † | 20.0 / 20.0 | 100% | `app/mailers/email_reply_mailer.rb:18` 34%, `app/models/user.rb:485` 31% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 7 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 14.12 / 14.12 | 77% | `app/mailers/email_reply_mailer.rb:18` 62%, `app/mailers/password_reset_mailer.rb:8` 23% | `_wide = data[p].ord` |
+| 8 | `GEM/mail/lib/mail/field.rb:176` | 13.29 / 13.29 | 100% | `app/mailers/email_reply_mailer.rb:18` 40%, `app/mailers/email_reply_mailer.rb:41` 20% | `class_name = FIELDS_MAP[name.to_s.downcase]` |
+| 9 | `GEM/sqlite3/lib/sqlite3/statement.rb:186` | 10.82 / 10.82 | 29% | `app/mailers/email_reply_mailer.rb:42` 100% | `val&.downcase` |
+| 10 | `GEM/rack-mini-profiler/lib/mini_profiler_rails/railtie.rb:159` † | 10.06 / 10.06 | 77% | `app/mailers/email_reply_mailer.rb:18` 60%, `app/mailers/password_reset_mailer.rb:8` 24% | `identifier.split('/').last(2).join('/')` |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25/lobsters/head/report.md

@@ -1,0 +1,5 @@
+status 0 compared: 7573 lines, 27 actions; not compared 55
+  request action Users::ProfilesController#show: +24.75 against 58.00 (43%)
+  request action AccountsController#edit: +8.50 against 20.00 (42%)
+  request action SessionsController#destroy: -7.00 against 20.00 (35%)
+  request action WelcomeController#show: +9.95 against 28.80 (35%)

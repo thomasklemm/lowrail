@@ -1,0 +1,40 @@
+| 1 | Room::PushMessageJob#perform | 10 / 10 | 3968.0 / 3968.0 | 0.0 | 3785.2 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:15` 66.0, `RAILS/activesupport/lib/active_support/core_ext/enumerable.rb:88` 58.0, `GEM/sqlite3/lib/sqlite3/statement.rb:125` 57.0 | `lib/web_push/pool.rb:13` 589.0, `app/models/room.rb:91` 513.0, `app/models/message/mentionee.rb:11` 390.0 |
+| 2 | Room::DestroyJob#perform | 2 / 2 | – / – |  | 4684.5 |  |  |
+| 3 | Bot::WebhookJob#perform | 1 / 1 | – / – |  | 2284.0 |  |  |
+| 4 | Message::BroadcastUnreadRoomJob#perform | 3 / 3 | – / – |  | 1078.7 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:40` (debug logging) | 45.44 / 45.44 | 100% | `app/models/room/message_pusher.rb:10` 20%, `no app frame` 13% | `binds = binds.inspect` |
+| 2 | `RAILS/activesupport/lib/active_support/colorize_logging.rb:64` (debug logging) | 33.38 / 33.38 | 100% | `no app frame` 21%, `app/models/room.rb:72` 19% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 3 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` | 29.0 / 29.0 | 100% | `app/models/room.rb:72` 18%, `app/models/message/mentionee.rb:11` 15% | `WhereClause.new(predicates \| other.predicates)` |
+| 4 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:15` | 26.13 / 26.13 | 100% | `app/models/room.rb:72` 11%, `app/models/room/message_pusher.rb:54` 10% | `WhereClause.new(predicates + other.predicates)` |
+| 5 | `RAILS/activesupport/lib/active_support/core_ext/enumerable.rb:88` | 23.69 / 23.69 | 100% | `app/models/room.rb:91` 20%, `app/models/room/message_pusher.rb:35` 13% | `to_h { \|elem\| [elem, yield(elem)] } # rubocop:disable Rails/IndexWith` |
+| 6 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` | 22.31 / 22.31 | 100% | `app/models/room.rb:91` 16%, `lib/web_push/pool.rb:13` 15% | `val = step` |
+| 7 | `RAILS/activesupport/lib/active_support/colorize_logging.rb:62` (debug logging) | 22.25 / 22.25 | 100% | `no app frame` 21%, `app/models/room.rb:72` 19% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+| 8 | `RAILS/activerecord/lib/active_record/relation/predicate_builder.rb:118` | 21.13 / 21.13 | 100% | `app/models/room/message_pusher.rb:54` 19%, `app/models/room.rb:72` 11% | `attributes.flat_map do \|key, value\|` |
+| 9 | `RAILS/activerecord/lib/arel/table.rb:92` | 20.63 / 20.63 | 100% | `lib/web_push/pool.rb:13` 17%, `app/models/room.rb:72` 11% | `Attribute.new(table, name)` |
+| 10 | `RAILS/activerecord/lib/active_record/relation/predicate_builder.rb:28` | 19.88 / 19.88 | 100% | `app/models/room/message_pusher.rb:54` 14%, `app/models/room.rb:72` 12% | `attributes.each_with_object([]) do \|(key, value), result\|` |
+
+### Action Cable
+
+| # | Channel action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | RoomMessagesChannel#subscribed | 7 / 7 | 584.0 / 584.0 | 0.0 | 505.7 | `RAILS/activesupport/lib/active_support/callbacks.rb:180` 16.0, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` 12.0, `GEM/concurrent-ruby/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb:30` 12.0 | `app/channels/room_messages_channel.rb:36` 184.0, `app/channels/room_messages_channel.rb:30` 147.0, `app/channels/room_messages_channel.rb:52` 16.0 |
+| 2 | PresenceChannel#subscribed | 7 / 7 | – / – |  | 878.7 |  |  |
+| 3 | Turbo::StreamsChannel#subscribed | 2 / 2 | – / – |  | 129.5 |  |  |
+| 4 | UnreadRoomsChannel#subscribed | 3 / 3 | – / – |  | 93.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:40` (debug logging) | 7.84 / 7.84 | 63% | `app/channels/presence_channel.rb:21` 26%, `app/channels/room_channel.rb:12` 23% | `binds = binds.inspect` |
+| 2 | `RAILS/activesupport/lib/active_support/callbacks.rb:180` | 6.74 / 6.74 | 100% | `no app frame` 100% | `result_lambda = -> { user_callback.call target, value }` |
+| 3 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` | 5.05 / 5.05 | 63% | `app/channels/room_channel.rb:12` 40%, `app/channels/presence_channel.rb:21` 31% | `WhereClause.new(predicates \| other.predicates)` |
+| 4 | `GEM/concurrent-ruby/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb:30` | 5.05 / 5.05 | 100% | `no app frame` 100% | `super(*args, &block)` |
+| 5 | `RAILS/activesupport/lib/active_support/core_ext/enumerable.rb:88` | 5.0 / 5.0 | 47% | `app/channels/presence_channel.rb:21` 47%, `app/channels/room_messages_channel.rb:36` 23% | `to_h { \|elem\| [elem, yield(elem)] } # rubocop:disable Rails/IndexWith` |
+| 6 | `RAILS/activesupport/lib/active_support/colorize_logging.rb:64` (debug logging) | 4.42 / 4.42 | 63% | `app/channels/presence_channel.rb:21` 28%, `app/channels/room_channel.rb:12` 24% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 7 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` | 3.05 / 3.05 | 63% | `app/channels/presence_channel.rb:21` 38%, `app/channels/room_messages_channel.rb:36` 26% | `val = step` |
+| 8 | `RAILS/activesupport/lib/active_support/colorize_logging.rb:62` (debug logging) | 2.95 / 2.95 | 63% | `app/channels/presence_channel.rb:21` 28%, `app/channels/room_channel.rb:12` 24% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+| 9 | `RAILS/activerecord/lib/active_record/key.rb:14` | 2.95 / 2.95 | 58% | `app/channels/presence_channel.rb:21` 62%, `app/channels/room_channel.rb:12` 23% | `Single.new(name)` |
+| 10 | `RAILS/activerecord/lib/active_record/key.rb:87` | 2.95 / 2.95 | 58% | `app/channels/presence_channel.rb:21` 62%, `app/channels/room_channel.rb:12` 23% | `@columns = [@name].freeze` |
+lowrail-profile: report in /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25/campfire/profiled/report.md

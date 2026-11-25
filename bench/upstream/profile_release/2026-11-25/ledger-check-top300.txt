@@ -1,0 +1,53 @@
+OK   campfire: RAILS/actionpack/lib/action_dispatch/journey/formatter.rb:134 `keys_to_keep = route.parts.reverse_each.drop_while { |part|` #59329 merged 2026-10-24, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/notifications/fanout.rb:315 `group_klass.new(grouped_listeners, name, id, payload)` #59613 merged 2026-11-04, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/notifications/fanout.rb:315 `group_klass.new(grouped_listeners, name, id, payload)` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   campfire: RAILS/actionview/lib/action_view/helpers/tag_helper.rb:1676 `"<#{name}#{tag_builder.tag_options(options, escape) if optio` #59804 open upstream work
+OK   campfire: RAILS/activesupport/lib/active_support/notifications/fanout.rb:314 `groups = groups_for(name).map do |group_klass, grouped_liste` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/notifications/fanout.rb:321 `Handle.new(name, id, groups, payload)` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/subscriber.rb:142 `method = event.name[0, event.name.index(".")]` #59562 merged 2026-11-03, after this app's version, not released yet
+OK   campfire: GEM/nokogiri/lib/nokogiri/xml/document_fragment.rb:175 `children.css(*args) # 'children' is a smell here` sparklemotion/nokogiri#3759 open upstream work
+OK   campfire: RAILS/actionpack/lib/action_dispatch/journey/formatter.rb:136 `} | route.required_parts` #59329 merged 2026-10-24, after this app's version, not released yet
+OK   campfire: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:1084 `name.to_s.delete("]").tr("^-a-zA-Z0-9:.", "_")` #59804 open upstream work
+OK   campfire: RAILS/actionview/lib/action_view/helpers/asset_tag_helper.rb:221 `sources_tags = sources.uniq.map { |source|` #59274 merged 2026-10-22, after this app's version, not released yet
+OK   campfire: RAILS/activerecord/lib/active_record/relation/merger.rb:164 `relation.extending!(*other.extensions)` #59551 merged 2026-11-03, after this app's version, not released yet
+OK   campfire: RAILS/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:141 `ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map ` #59605 merged 2026-11-04, after this app's version, not released yet
+OK   campfire: GEM/nokogiri/lib/nokogiri/xml/document_fragment.rb:174 `if children.any?` sparklemotion/nokogiri#3759 open upstream work
+OK   campfire: RAILS/actionpack/lib/action_dispatch/http/url.rb:205 `if match = host.match(HOST_REGEXP)` #59316 merged 2026-10-24, after this app's version, not released yet
+OK   campfire: RAILS/actionview/lib/action_view/helpers/tag_helper.rb:1607 `tag_string(name, *args, options, escape: escape, &block)` #59537 merged 2026-11-02, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/core_ext/module/attribute_accessors_per_thread.rb:124 `key = "attr_#{sym}_\#{object_id}"` #59561 merged 2026-11-03, after this app's version, not released yet
+OK   campfire: GEM/rack/lib/rack/utils.rb:408 `return "#{key}=#{value.map { |v| escape v }.join('&')}#{doma` rack/rack#2550 open upstream work
+OK   campfire: RAILS/activesupport/lib/active_support/core_ext/module/attribute_accessors_per_thread.rb:60 `key = "attr_#{sym}_\#{object_id}"` #59561 merged 2026-11-03, after this app's version, not released yet
+OK   campfire: RAILS/activesupport/lib/active_support/core_ext/hash/slice.rb:30 `keys.each_with_object(self.class.new) { |key, result| result` #59614 merged 2026-11-04, after this app's version, not released yet
+OK   campfire: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:263 `tag :input, { "type" => "text", "name" => name, "id" => sani` #59804 open upstream work
+OK   campfire: GEM/importmap-rails/app/helpers/importmap/importmap_tags_helper.rb:30 `_generate_preload_tags(packages) { |path, package| [path, { ` rails/importmap-rails#336 open upstream work
+OK   campfire: GEM/importmap-rails/app/helpers/importmap/importmap_tags_helper.rb:44 `tag.link rel: "modulepreload", href: path, nonce: content_se` rails/importmap-rails#336 open upstream work
+OK   lobsters: RAILS/activesupport/lib/active_support/notifications/fanout.rb:287 `groups = groups_for(name).map do |group_klass, grouped_liste` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   lobsters: RAILS/activesupport/lib/active_support/notifications/fanout.rb:288 `group_klass.new(grouped_listeners, name, id, payload)` #59613 merged 2026-11-04, after this app's version, not released yet
+OK   lobsters: RAILS/activesupport/lib/active_support/notifications/fanout.rb:288 `group_klass.new(grouped_listeners, name, id, payload)` #59235 merged 2026-10-21, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:123 `ActiveRecord::Result.new(stmt.columns, rows, stmt.types.map ` #59605 merged 2026-11-04, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/relation/where_clause.rb:194 `non_empty_predicates.map do |node|` #59533 merged 2026-11-02, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/relation/where_clause.rb:205 `predicates - ARRAY_WITH_EMPTY_STRING` #59533 merged 2026-11-02, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/relation/where_clause.rb:72 `predicates.one? ? predicates.first : Arel::Nodes::And.new(pr` #59576 merged 2026-11-03, after this app's version, not released yet
+OK   lobsters: RAILS/actionview/lib/action_view/helpers/tag_helper.rb:484 `"<#{name}#{tag_builder.tag_options(options, escape) if optio` #59804 open upstream work
+OK   lobsters: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:106 `sanitized_object_name = object_name.to_s.gsub(/\]\[|[^-a-zA-` #59824 open upstream work
+OK   lobsters: RAILS/actionpack/lib/action_dispatch/journey/formatter.rb:123 `keys_to_keep = route.parts.reverse_each.drop_while { |part|` #59329 merged 2026-10-24, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/relation/query_methods.rb:1904 `arel.project(table[Arel.star])` #59618 merged 2026-11-04, after this app's version, not released yet
+OK   lobsters: RAILS/actionview/lib/action_view/helpers/asset_tag_helper.rb:217 `sources_tags = sources.uniq.map { |source|` #59274 merged 2026-10-22, after this app's version, not released yet
+OK   lobsters: RAILS/activerecord/lib/active_record/relation/merger.rb:66 `relation.public_send(:"#{name}!", *value)` #59554 merged 2026-11-03, after this app's version, not released yet
+OK   codetriage: RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:165 `ar_result = if result.fields.empty?` #59278 merged 2026-10-22, after this app's version, not released yet
+OK   codetriage: RAILS/activesupport/lib/active_support/subscriber.rb:137 `method = event.name[0, event.name.index(".")]` #59562 merged 2026-11-03, after this app's version, not released yet
+OK   codetriage: RAILS/actionpack/lib/action_dispatch/journey/formatter.rb:128 `keys_to_keep = route.parts.reverse_each.drop_while { |part|` #59329 merged 2026-10-24, after this app's version, not released yet
+OK   codetriage: RAILS/actionpack/lib/action_dispatch/journey/formatter.rb:130 `} | route.required_parts` #59329 merged 2026-10-24, after this app's version, not released yet
+OK   codetriage: RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:168 `fields = result.fields` #59278 merged 2026-10-22, after this app's version, not released yet
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/tag_helper.rb:345 `tag_string(name, *args, options, escape: escape, &block)` #59537 merged 2026-11-02, after this app's version, not released yet
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/tag_helper.rb:500 `"<#{name}#{tag_builder.tag_options(options, escape) if optio` #59804 open upstream work
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:107 `sanitized_object_name = object_name.to_s.gsub(/\]\[|[^-a-zA-` #59824 open upstream work
+OK   blog-floor: RAILS/activemodel/lib/active_model/error.rb:80 `[ :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}` #59252 merged 2026-10-21, after this app's version, not released yet
+OK   blog-floor: RAILS/activejob/lib/active_job/arguments.rb:142 `argument.each_with_object({}) do |(key, value), hash|` #59563 merged 2026-11-03, after this app's version, not released yet
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/asset_tag_helper.rb:212 `sources_tags = sources.uniq.map { |source|` #59274 merged 2026-10-22, after this app's version, not released yet
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:109 `sanitized_method_name = method_name.to_s.delete_suffix("?")` #59824 open upstream work
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/form_tag_helper.rb:133 `names = method_names.map! { |name| "[#{name}]" }.join` #59824 open upstream work
+OK   blog-floor: RAILS/actionview/lib/action_view/helpers/tags/base.rb:117 `@sanitized_method_name ||= @method_name.delete_suffix("?")` #59824 open upstream work
+OK   blog-floor: RAILS/activemodel/lib/active_model/error.rb:81 `:"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#` #59252 merged 2026-10-21, after this app's version, not released yet
+OK   blog-floor: RAILS/activemodel/lib/active_model/error.rb:79 `defaults = base.class.lookup_ancestors.flat_map do |klass|` #59252 merged 2026-10-21, after this app's version, not released yet
+52 of 52 matches confirmed in the pull request's diff

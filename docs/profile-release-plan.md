@@ -1,6 +1,9 @@
 # lowrail-profile for any Rails team: release plan
 
-Status: plan, 2026-11-25. Nothing here is built or published yet.
+Status: M1–M4 built, 2026-11-25 (release candidate 0.1.0.rc1, unpublished); M5 (independent review) next, M6 only
+on Thomas's approval. Support floor reached: Ruby 3.3 and Rails 7.2 (CI matrix 3.3/3.4/4.0 × 7.2/8.0/8.1, macOS,
+Ruby head). Proof: [profile.md](profile.md#release-candidate-proof-from-the-built-gem-2026-11-25). §1 describes the
+tool before this work.
 
 [PLAN.md §0.7](PLAN.md#0-what-changed-since-this-plan-2026-10-20) moved Lowrail to discovery first: runtime lowering
 is parked, and measurements feed upstream fixes and advisory types/MCP. This is the third bet: make

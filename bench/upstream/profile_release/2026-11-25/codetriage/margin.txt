@@ -1,0 +1,5 @@
+status 0 compared: 7789 lines, 18 actions; not compared 5
+  job line GEM/kramdown/lib/kramdown/parser/kramdown/emphasis.rb:25: -1.00 against 1.00 (100%)
+  request line GEM/uri/lib/uri/common.rb:456: +0.88 against 1.00 (88%)
+  request line GEM/uri/lib/uri/common.rb:465: +0.86 against 1.01 (86%)
+  request action UsersController#token_destroy: +11.00 against 20.00 (55%)

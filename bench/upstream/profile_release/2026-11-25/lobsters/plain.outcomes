@@ -1,0 +1,1013 @@
+-1 to 0
+-1 to 1
+.accessible_to_user
+.categories
+.delete is idempotent
+.enabled?
+.silence_streams
+.title_maximum_length
+/categories/:category
+/comments
+/comments/rss to /comments.rss
+/login
+/login/reset_password
+/login/set_new_password
+/new form
+/newest
+/top redirect
+/top/:length
+/top/:length/page/2
+/top/:length/page/2/rss
+/top/:length/rss
+/top/rss redirect
+/top/rss to /top.rss
+/~user/comments.rss renders
+0 to -1
+0 to 1
+1 to -1
+1 to 0
+404s for /recent.rss, which is not served
+404s for visitors
+404s to logged-out visitor
+CGI.parse
+Comment#update_score_and_recalculate matches SQL math
+Displays Activity Log
+GET /banned-ips
+GET /edit
+GET /index
+GET /new
+GET /settings/2fa
+GET /settings/2fa_enroll
+GET /show
+GET all
+GET show
+Links bare URLs
+Loading filter page
+Merging story comments
+PATCH /update
+POST /create
+POST /invitations
+POST create
+POST keep_as_new
+PREVENTING ALL-CAPS TITLES
+URL_RE
+a logged-in-user looks at others' user_threads
+a logged-in-user looks at their own user_threads
+a moderator looks at user_threads
+a url that hasn't been submitted
+accepts a user id
+accepts an instance name
+accepts playlists
+accepts urls
+active
+adding a filter
+adding a hat to a comment
+addresses replies to receiver
+addresses story replies
+addresses top-level story responses
+adds ugc
+all
+allow
+allows a valid category to be created
+allows a valid tag to be created
+allows changing username with no creation/changing in < 1 year
+allows image tags
+allows totp codes from the surrounding time steps
+allows users to show emails to users
+also sends mentions with ~username
+ancestors without js
+and disowning
+app/assets/stylesheets/application.css uses only Baseline widely available features
+app/assets/stylesheets/dark-high.css uses only Baseline widely available features
+app/assets/stylesheets/dark-normal.css uses only Baseline widely available features
+app/assets/stylesheets/dark-system.css uses only Baseline widely available features
+app/assets/stylesheets/light-high.css uses only Baseline widely available features
+app/assets/stylesheets/light-normal.css uses only Baseline widely available features
+app/assets/stylesheets/light-system.css uses only Baseline widely available features
+app/assets/stylesheets/system-high.css uses only Baseline widely available features
+app/assets/stylesheets/system-normal.css uses only Baseline widely available features
+app/assets/stylesheets/system-system.css uses only Baseline widely available features
+applies a story upvote and karma properly
+approving hat request
+as a logged-in user
+as a logged-out visitor
+as a user who is a moderator
+as a user who is not a moderator
+as moderator
+assigns canonical when url when it resolves 200
+associates title: with a shortword search
+at the scame score, is higher for comments without flags
+attaches a Story to an Origin owned by another Domain
+attributing lobsters traffic
+authenticates properly
+auto-accept suggestion once quorum is met
+ban
+banning
+banning deactivated user doesn't email
+bans domain with valid params
+bans origin with valid params
+bounces an email with an empty body
+bounces an email with an invalid in-reply-to
+bounces an email with an invalid user token
+brigading
+browsing stories by tag
+bugs I've seen in prod
+bunch of symbols
+but calvin is allowed to scream in his traditional WWDC posts
+caches the destination url, no newline
+caches the frontpage
+calculates tag changes properly
+calls generate on StoryImage
+can be merged by mod
+can be one of the user's hats
+can create and ban an origin that hasn't been submitted yet
+can create and ban at the same time
+can fetch PDF titles properly
+can fetch its title properly
+can fetch unicode titles properly
+can find a comment
+can find zero hits
+can have images
+can rename! users
+can search for comments
+can search for comments by commenter
+can search for comments by story submitter
+can search for comments by story title
+can search for comments by tag
+can search for comments by url
+can search for comments ordering by relevance
+can search for comments with a quoted term
+can search for comments with only tags
+can search for multitagged stories
+can search for stories by domain
+can search for stories by submitter
+can search for stories by tag
+can search for stories by title
+can search for stories by title with multiple words
+can search for stories by url
+can search for stories ordering by relevance
+can search for stories with only tags
+can search multi-word requiring all terms in order, not an OR search
+can search multi-word terms
+can search stories
+can search titles for stories
+can see a user's hats
+can share an Origin between Domains
+can't be all caps
+can't be done by submitter
+can't be worn if user doesn't have that hat
+can't have images
+cannot see a user's email
+carries a ban and its modlog onto the Origin that remains
+certain without disown
+checks for a previously posted story with same url
+checks for invalid urls
+comment notifications
+comment_score_for_user
+commenter rule
+comments
+comments on a deleted story
+comments#user_threads
+confidence
+confidence_order_path
+contains message about replying from email
+converts a title to a url slug properly
+create
+create and ban
+creates & sends a message notification
+creates Links from comment text
+creates a ModNote
+creates a bare-domain origin for bare and trailing slash URLs
+creates a code before validation
+creates a comment on a story with a valid short id
+creates a moderation with the expected tag_id and user_id
+creates a moderation with the expected user_id
+creates a new ModMail
+creates a new ModMailMessage
+creates a reply to a comment with a valid short id
+creates and emails an invitation
+creates daily stats idempotently
+creates domains with selectors
+creates new tags
+creates new tags with expected params
+creates the ModMail
+deactivating and reactivating
+decode all entities
+decrements the user's count of deleted stories
+deducts from score when users flag
+delete a story with moderation reason
+deleting
+deleting a comment
+deleting account
+deleting comments
+denies access to non-recipient
+diabling invites
+disowning
+disowning a comment
+disowning a story
+disowning comments
+disowning stories
+displays 'Last Read' marker at the last loaded position and maintains last_read_timestamp through pagination accordingly
+displays 'Last Read' marker at the last loaded position and update 'last_read_newest_comment' accordingly
+displays a few words around links in comments
+displays a story
+displays ai topic hint
+displays all users
+displays c++ language hint
+displays golang language hint
+displays ml language and topic hint
+displays the username
+displays to the user
+does display to mods
+does not allow a category to be saved without a name
+does not allow a category with a name too long to be saved
+does not allow a tag to be saved without a name
+does not allow a tag with a comma to be saved
+does not allow a tag with a description too long to be saved
+does not allow a tag with a hotness_mod too high to be saved
+does not allow a tag with a hotness_mod too low to be saved
+does not allow a tag with a name too long to be saved
+does not allow an empty category to be saved
+does not allow an empty tag to be saved
+does not allow lines longer than 75 characters
+does not allow too-long titles
+does not allow too-short titles
+does not assign canonical url when the response is non-200
+does not auto-accept suggestion if quorum is not met
+does not ban domain when the reason is blank
+does not ban origin when the reason is blank
+does not break on multibyte encoded characters
+does not cache the file
+does not create a new ModMail
+does not create a new ModMailMessage
+does not create and ban when the reason is blank
+does not display saver links
+does not enqueue CreateStoryCardJob
+does not expand @ signs inside urls
+does not fetch title with a port specified
+does not follow rel=canonical when this is to the main page
+does not include merges
+does not issue a title search for short words
+does not re-inject escaped comment markup as a live tag
+does not redirect json requests missing the title slug
+does not see stories by others merged into a story they submitted
+does not show disown in active stories page
+does not show for new users you didn't invite
+does not show for users you invited a while ago
+does not show hidden stories
+does not update read_at of notification, when notification is not displayed
+does nothing to deleted comments
+does nothing when upvoting an existing upvote
+does nothing when upvoting merged story
+does parse multi word quote
+does parse single word quote
+doesn't a stopword prefixing a term
+doesn't accept js placeholder
+doesn't allow
+doesn't allow changing to a username someone else stopped using in the last 5 years
+doesn't allow changing usernames in < 1 year of last change
+doesn't allow login by banned and wiped users
+doesn't allow login by banned users
+doesn't allow login by deactivated and wiped users
+doesn't allow login by deactivated users
+doesn't allow new users to change in < 1 year
+doesn't allow posting to others' modmails
+doesn't allow sql injection
+doesn't allow submission from logged in users
+doesn't autolink bare triggers
+doesn't cache errors
+doesn't cache path traversal
+doesn't deduct from score if flagging user commented
+doesn't deduct from score if hiding user didn't flag
+doesn't delete the /page/n from the link
+doesn't delete the period from the link
+doesn't display to logged-out users
+doesn't display to other users
+doesn't duplicate Links in edits
+doesn't email if the mentioned user is hiding the story
+doesn't email if the replied-to user is hiding the story
+doesn't error if not given a url
+doesn't error if the url hasn't been submitted
+doesn't error on odd real searches with punctuation
+doesn't let path traversal block the frontpage
+doesn't limit slow responses
+doesn't list stories that aren't hidden
+doesn't load for a non-mod user
+doesn't load for a visitor
+doesn't load the invited_by_user for users invited a while ago
+doesn't load the invited_by_user for users you didn't invite
+doesn't load the invited_by_user for users you invited
+doesn't log changed to derived field normalized_url
+doesn't log in with blank password
+doesn't log in with wrong password
+doesn't log in without any password posted
+doesn't log in without correct password
+doesn't mark link as current with a different period
+doesn't parse 1-character words
+doesn't parse 2-character words
+doesn't parse 3-character words
+doesn't parse 4-character words
+doesn't parse a quote
+doesn't parse a random short non-stopword
+doesn't parse blank
+doesn't parse blank @
+doesn't parse blank ~
+doesn't parse emails
+doesn't parse empty domain
+doesn't parse empty quotes
+doesn't parse invalid domain
+doesn't parse just the tld
+doesn't parse multi word
+doesn't parse multiple words
+doesn't parse non-existing tld
+doesn't permit sql injection
+doesn't raise on normal traffic
+doesn't relog hat use on edit that doesn't change hat
+doesn't render the collapse checkbox
+doesn't reset if token expired
+doesn't reset if token is missing
+doesn't reset if token is wrong
+doesn't reset if user is banned
+doesn't sanitize links that aren't email addressees
+doesn't save the invitation if the email can't be sent
+doesn't serve to searx
+doesn't show forgot password form if user is already logged in
+doesn't show login form if user is already logged in
+doesn't sort comments under the wrong parents when they haven't been voted on
+doesn't start reset process if user was banned
+doesn't start reset process if user was deactivated and wiped
+doesn't sweep neighboring pages cached at the root
+doesn't throw exceptions at brackets
+doesn't write or sweep when an old title slug redirects
+doffing and replacing with new hat
+doffing hat with reason
+domain rule
+domains_ban#update
+don't put https CSP header
+edit button is present on hats page
+edit the title and redirect to story
+editing
+editing comments
+editing hat in place
+emails a confirmation after create
+enabling invites
+encode all non-ascii characters
+encoded words
+encodes text as quoted printable
+enqueues CachePageJobs for popular non-story pages
+errors
+escapes raw HTML
+exception 'user-select' is still not Baseline widely available
+excerpt_fragment_around_link
+excerpts even in multiple nesting
+exclude tags are empty
+exclude tags are emtpy
+exclude tags are provided
+excluded tags are provided
+expression
+extracts links from markdown
+falls back to the submitting Domain when no Domain matches the identifier
+fetching titles
+filters out comments by tag
+finds arxiv html page and pdf URLs with the same arxiv identifier
+finds bin/sqlite3
+finds similar arxiv html page and pdf URLs that contain a pdf extension
+finds similar www.youtube and m.youtube URLs
+finds similar www.youtube and youtu.be URLs
+finds stories with similar URLs
+first story in a list is last created
+flattens multiword searches to single sql term
+for a story that merged into another story
+generates a token
+generates the correct path for paginated top stories
+gets an error message after registering banned name
+handles download failures
+handles really long words
+happy path
+has a hat field
+has a limit on the about field
+has a limit on the banned reason field
+has a limit on the comment field
+has a limit on the disabled invite reason field
+has a limit on the email field
+has a limit on the hat field
+has a limit on the ip_address field
+has a limit on the link field
+has a limit on the mailing list token field
+has a limit on the markdown description field
+has a limit on the memo field
+has a limit on the name field
+has a limit on the password reset token field
+has a limit on the reason field
+has a limit on the rss token field
+has a limit on the session token field
+has a stable message-id
+has a timeout on selector_regexp
+has a valid email address
+has a valid factory
+has a valid homepage
+has a valid username
+has access to rails routes
+has an extra message if author flagged a parent
+has correct action
+has correct banned_at
+has correct banned_by_user_id
+has correct banned_reason
+has correct moderator_user_id
+has correct reason
+has domain straight out of the db, when Rails doesn't use setters
+has empty banned_at
+has empty banned_by_user_id
+has empty banned_reason
+has no effect on a story score when casting a hide vote
+has no effect when hiding merged story
+has no effect when saving merged story
+has no unrouted actions (public controller methods)
+has parent in-reply-to and in references
+hat
+hidden
+hiding a story
+home#stories
+homepage
+homepage as moderator
+homepage as moderator with pending hat requests
+homepage with unknown cookies
+html
+hydrates normalized_url
+hyperlinks usernames based on when they existed, not now
+if created after user is no longer moderator
+if created before the user became moderator
+if poster was a moderator at creation, even after hat doff
+if poster was a moderator at the time of creation
+ignores other people's problems
+image link
+images
+inactive tag
+includes only saved stories by user
+includes only stories with the given tags
+includes only story with the tag
+includes stories
+includes stories that are not hidden or having negative score
+increments correctly
+increments the user's count of deleted stories
+initializes correctly
+inserts start-and-end-of-line anchors to
+is defined
+is expected to eq #<Story id: 1, comments_count: 2, created_at: #<ActiveSupport::TimeWithZone T>, description: nil, domain_id: 1, flags: 0, hotness: -0.4771213e0, is_deleted: false, is_moderated: false, last_comment_at: nil, last_edited_at: #<ActiveSupport::TimeWithZone T>, markeddown_description: nil, mastodon_id: nil, merged_story_id: nil, normalized_url: "example.com/2", origin_id: nil, score: 1, short_id: "X", stories_count: 0, title: "Hello 2", token: "X", twitter_id: nil, unavailable_at: nil, updated_at: #<ActiveSupport::TimeWithZone T>, url: "http://example.com/2", user_id: 2, user_is_author: false, user_is_following: false>
+is expected to eq #<Story id: 2, comments_count: 0, created_at: #<ActiveSupport::TimeWithZone T>, description: nil, domain_id: 1, flags: 0, hotness: -0.30103e0, is_deleted: false, is_moderated: false, last_comment_at: nil, last_edited_at: #<ActiveSupport::TimeWithZone T>, markeddown_description: nil, mastodon_id: nil, merged_story_id: nil, normalized_url: "example.com/1", origin_id: nil, score: 1, short_id: "X", stories_count: 0, title: "Hello 1", token: "X", twitter_id: nil, unavailable_at: nil, updated_at: #<ActiveSupport::TimeWithZone T>, url: "http://example.com/1", user_id: 5, user_is_author: false, user_is_following: false>
+is expected to eq 150
+is expected to eq 2
+is invalid for invalid regexp
+is low for flagged comments
+is not editable by another non-admin user
+is not enforced as a regular validation
+is not enforced on top level, only replies
+is not valid without a comment
+is not valid without a vote amount
+is ordered by hotness
+is ordered by most-recent comment
+is visible to a moderator
+is visible to submitter
+it is high for upvoted comments
+json
+keeps Anubis cookies
+keeps punctuation inside of auto-generated links when using brackets
+last story in a list is first created
+latest
+leaves dotfiles alone so it can't eat cache_page tempfiles
+lets users send messages to each other
+limits longer with flags
+limits within 2 minutes
+link to a user
+link_to_different_page
+links from story description
+links from story url
+links to users during and after creation
+lists flagged comments from the interval but not before it
+lists mods
+lists references oldest-first
+lists stories in the category
+lists stories the user has hiddden
+loads
+loads for a mod
+loads the search form
+logged in
+logged out, defer to user's system
+logs hat use on edited comment that adds it
+logs hat use on new comment
+logs in with email and correct password
+logs in with username and correct password
+logs moderations properly
+logs modification in moderation log
+logs on create
+logs on update
+logs tag additions from user suggestions properly
+markdown to raw
+marks link as current if period matches
+marks link as current when both page and time suffix
+marks link as current when it removes the period
+marks link as current when page suffix
+marks link as current when time suffix
+marks the message's notification as read
+marks the message's notification as unread
+marks the notification and associated message as read
+marks the notification as read even if notification is not displayed
+merged stories
+merging Origins deduplicates
+message notifications
+messages
+mod deleting a story
+mod editing a story
+mod mail message notifications
+mod undeleting a story
+mod-only routes
+mod_mail_messages
+moderation should be created
+moves the Stories onto one Origin and deletes the empty
+must have at least one tag
+negated rule
+neutralizes karma and upvote when unvoting an upvote
+never shows emails to visitors
+new user resubmitting a link
+new user submitting an unseen domain
+new user submitting with a tag not permitted for new users
+newest
+newest stories
+newest_by_user
+no filter checkbox is shown
+non-existent tag raises error
+non-existent tag with existing tag raises an error
+non-unique existing tags raises an error
+normalizes
+notifies story creator upon auto-accepted suggestion
+old-style to tilde
+only Links once from a comment to a comment
+only Links once from a comment to a url
+only selects tagged stories
+origin
+origins_ban#update
+page cache path traversal
+parse trees
+parses
+parses 1-character words
+parses 2-character words
+parses 3-character words
+parses 4-character words
+parses a search that uses a few stopwords
+parses a shortword and a term
+parses a stopword
+parses a stopword and a term
+parses a stopword followed by whitespace
+parses a tag and a term
+parses a tag and term
+parses a term and a tag
+parses a term and tag
+parses an exploit engine search
+parses complex searches
+parses contractions
+parses dash
+parses domain properly
+parses exotic tld
+parses multi-word
+parses multiple tags
+parses multiple terms
+parses multiple words
+parses multiword quotes
+parses numbers
+parses plus
+parses punctuation stripped from terms
+parses quotes
+parses short tld
+parses shortwords
+parses simple markdown
+parses single
+parses single words
+parses snake case
+parses subdomains
+parses submitters, dropping @ or ~
+parses terms and quotes
+parses terms with numbers
+parses terms with undescores
+parses urls
+parses username
+parses with @
+parses with URLs
+parses with ~
+parses word in quotes
+posting a comment
+posting a comment with a hat
+prevents SQL injection in multi-word quoted searches
+previewing
+privileged tag
+prompts user to start a conversation
+puts https CSP header
+queues jobs to rerender all stories
+quoted rule
+raise the ArgumentError exception when inveral unit value is invalid
+raises RecordNotFound error when unknown category has been passed
+raises errors that are internal to Sponge
+re-points the Domain when the identifier changes
+reading a story
+reading homepage
+reading merged stories
+reading mod-deleted stories
+reading saved stories
+recent
+recently_invited_by
+recognizes a #c_abc123 link to a site comment
+recognizes a link to a site story by short id
+recognizes a link to a site story by title url
+recognizes a short link to a site comment
+records a Username
+records a moderation log when the username changes
+recreate_from_comment!
+recreate_from_story!
+redirects /c/shortid to merged stories with anchor
+redirects /c/shortid to the story with anchor
+redirects /s/short_id to include title slug
+redirects /s/short_id to include title slug when Accept is */*
+redirects /stories/:id to the canonical URL
+redirects /top/:length/rss to /top/:length.rss
+redirects attempts to load an identifier from a domain url
+redirects default length path maintaining format
+redirects links
+redirects old singular routes
+redirects old/wrong title slugs to current
+redirects to correct-case user page
+redirects to correct-case user standing page
+redirects to default length path
+redirects to latest subsmission of the given url
+redirects to the created mod_mail_message
+redirects to the login page
+redirects to the merged story's json
+redirects users to submit
+refuses an encoded . that would change the extension
+refuses an encoded ../ that would overwrite another page's cache file
+refuses an encoded ../ that would write a sibling of another page's cache file
+refuses an encoded / that would add a directory
+refuses literal dot segments
+rejecting hat request
+removes every cached copy of the story page
+removes old Links
+removes redundant http port 80 and https port 443
+removes ref tracking parameter
+removes short words that mariadb would ignore
+removes upvote when downvoting an upvote
+removes utm_ tracking parameters
+renders
+renders 400 on mismatched headers
+renders HTML page successfully for 1 week
+renders a response with 422 status (i.e. to display the 'edit' template)
+renders a response with 422 status (i.e. to display the 'new' template)
+renders a successful response
+renders a top-level comment without ancestors
+renders the hidden page
+renders them root-first
+renders them root-first with the direct parent above the form
+reparenting
+reparents the user and logs it
+replaces a user's suggestion when they suggest again
+replaces empty input with placeholder
+replaces invalid input with placeholder
+replying
+requires a url or a description
+requires mod
+resets if token matches
+respects inbox_mentions setting for mention notifications
+resubmitting a recent link
+resubmitting a recent link deleted by a moderator
+resubmitting an old link
+results in a link, not an image
+results in an image, not a link
+return correct score
+returns 200 for existing domains
+returns 200 for xhr request
+returns 302
+returns 302 for non-xhr request
+returns 404 for non-existent domain
+returns HTML data for page 2 with 1 week length
+returns RSS feed for page 2 with 1 week length
+returns RSS feed successfully for 1 week
+returns a link that routes to the RSS feed
+returns a story merged into an existing one
+returns all subsmissions of the given url
+returns an error when story URL is missing
+returns ancestors root-first
+returns false if the story has positive score
+returns false if the story is moderated
+returns false if the user isn't banned
+returns formatted score for integer scores
+returns nil for non-integer scores
+returns no matches if no matching URL
+returns no matches if previously submitted URL is only partial match
+returns nothing when initialized empty
+returns only one story without tag
+returns previous discussions for an existing story
+returns similar story matching URL
+returns stories for a domain
+returns successfully
+returns the file path with html extension
+returns the first few words if the link is not present
+returns the image inline
+returns the newest stories that have not yet reached the front page
+returns the right number of pages
+returns the same file path
+returns true
+returns true when the story was removed by heavy flagging of banned user
+returns true when trying to submit a URL that's been submitted w/o an anchor in it
+returns true when trying to submit a URL that's been submitted with an anchor in it
+returns two stories
+rolls session token
+routes /top
+routes /top.rss
+routes /top/1w
+routes /top/1w.rss
+routes /top/1w/page/2
+routes a domain
+routes a domain rss feed
+routes a single origin
+routes a single tag
+routes a single tag rss feed
+routes a single tag, page 2
+routes multiple tags
+routes multiple tags rss feed
+routes multiple tags, page 2
+routes the c++ tag
+routes title_path with anchor
+routes to comments with anchors
+routes to stories with titles as slugs
+routing hassle with unsupported formats #746 and #1114
+rss
+rss redirects
+runs
+runs the sqlite3 cli built in the gem, not the OS one
+santizes email addresses
+saved
+schedules a notification job
+scopes
+sees stories that were merged into others' stories
+sees their own deleted stories
+sees their own stories merged into a story they submitted
+sees their stories
+selects stories from the given interval
+selects unique stories based on categories
+selects unique tagged stories
+send invalid arguments to service class interfaces #incremented_value_for
+send invalid arguments to service class interfaces #put
+send valid arguments to service class interfaces #incremented_value_for
+send valid arguments to service class interfaces #put
+sends mention notification
+sends only reply notification on reply with mention
+sends reply notification
+serves the fallback logo
+sets hats on messages
+sets reply-to the mod's email
+sets the url properly
+short_id redirection
+shortword rule
+should also update the merged_into_story's comment count
+should be banned
+should be unbanned
+should display all ModMail messages
+should display all messages
+should display for comments on stories with more upvotes than flags
+should display for comments with all other parent comments
+should display for other comments
+should get a short id
+should have moderation
+should not be enabled
+should not display for comments on stories with more flags than upvotes
+should not display for comments with more flags than upvotes
+should not display for comments with parent comments that are deleted
+should not display for comments with parent comments that are moderated
+should not display for comments with parent comments with more flags than upvotes
+should not display for deleted comments
+should not display for moderated comments
+should not display if the recipient has filtered the story tag
+should not display if the recipient has flagged any comment belonging to the author
+should not display if the recipient has hidden the story
+should not raise any errors when
+should only return comments matching all tags if multiple are present
+should only return comments with stories in domain if domain present
+should raise error when
+should return only stories with both tags if multiple tags are present
+should work
+should_display?
+show
+show user
+shows 'new user' class and aria-label for new, unrelated user
+shows 'removed' to visitors
+shows a merge icon for merged stories
+shows a user is active or not
+shows a user is banned or not
+shows a user is recent or not
+shows all by default
+shows all moderator actions when selected
+shows all when selected
+shows an empty page without error
+shows an error if the email can't be sent
+shows comments from merged story
+shows comments from merged_into story
+shows comments, most-recent first
+shows disown in story page
+shows entries matching the filters
+shows invited indication for new, invited user
+shows merged story at the top
+shows mod log to logged-in user
+shows moderation but not title/link to other users
+shows moderator actions when selected
+shows modmails
+shows only saved stories
+shows previews if the user wants
+shows recent, unhidden stories
+shows stories for categories only
+shows stories, most-recent first
+shows the first page
+shows the page ignoring extra params
+shows the user name as a link for normal users
+shows to recipient
+shows user actions when selected
+shows whether a story was removed by a submitter or moderator
+simple markdown
+skips large images
+speed limit
+starts reset process
+starts reset process for deactivated users
+still caches the root path as index
+still unescapes other characters
+stopwords
+story removed by moderator
+story removed by submitter
+strips HTML tags besides the link
+strips HTML tags wrapping the link
+strips the quote from top-posting
+strips unpaired, invalid HTML tags
+submitter rule
+submitting a banned domain
+submitting a link
+submitting an inline image
+subtracts karma if mod intervenes
+suggestions
+supports legacy domain: syntax
+supports session-based access
+supports token-based access
+sweeps cached copies at old slugs after a title edit
+sweeps stale copies cached at short_id redirect with format rails shouldn't even be serving
+tag isn't shown
+tag rule
+tagged
+takes a selector and replacement to generate an origin identifier
+tattling on logged-in users who visit invite URLs
+tells if a user is a heavy self promoter
+term rule
+the user can filter the privileged tag
+threads
+throws a 400 when URL is empty
+throws a 400 when URL parameter is missing
+title rule
+top
+tree
+truncates the story cache field
+trying to delete old comments
+trying to disown non-deletable story
+trying to disown not owned stories
+trying to disown recent comments
+turns @UserName into a link if @username exists
+turns @username into a link if @username exists
+turns all inline images into links
+turns inline image into links with alt text
+turns inline image into links with the url as the default text
+turns inline image into links with title text
+turns inline image into links, preferring title text
+turns ~UserName into a link if ~username exists
+turns ~username into a link if ~username exists
+unban
+unbanning
+unbans  origin with valid params
+unbans a user
+unbans domain when the reason is blank
+unbans domain with valid params
+uncertain
+undelete a story
+unhiding a story
+update
+update_score_and_recalculate
+updates Origins on existing Stories if selector changes
+updates domains with selectors
+updates tags with valid params
+updates the requested mod_mail
+updates with all permitted params
+updating password
+upvote merged story comments
+upvoter_score
+upvoting
+upvoting a story and flags
+url links
+url rule
+url validation
+url=
+user rule
+user standing
+user tree
+user votes on merged story
+username case mismatch
+users don't see others' deleted stories
+users#show
+users#tree
+uses dark color scheme and high contrast
+uses dark color scheme and normal contrast
+uses dark color scheme and system contrast
+uses light color scheme and normal contrast
+uses light color scheme and system contrast
+uses system color scheme and high contrast
+uses system color scheme and normal contrast
+uses system color scheme and system contrast
+validates
+validates a moderation linked to exactly one object
+validates the length of action
+validates the length of markeddown_comment
+validates the length of markeddown_note
+validates the length of note
+validates the length of reason
+validates the length of short_id
+validates the presence of markeddown_note
+validates the presence of note
+validations
+viewing one tag at a time
+viewing two tags
+viewing user's threads
+visiting a merged story individual hidden stories
+visiting homepage
+visiting story hidden by current user and another user
+visiting story hidden by other user
+wanted property 'field-sizing' is not yet Baseline widely available
+wanted property 'resize' is not yet Baseline widely available
+wanted property_value 'appearance: base-select' is not yet Baseline widely available
+when accessing RSS feeds
+when filtering entries by moderator
+when filtering entries by type
+when filtering with no matching results
+when images are allowed
+when images are not allowed
+when linking to RSS feeds
+when logged in
+when logged out
+when moderator viewing
+when no user
+when score is 1000
+when single inline image in description
+when story is available
+when story is deleted
+when submitter is viewing their own stories
+when the image does not exist
+when the image exists
+when the story is deleted
+when the story is not deleted
+when the user is a moderator
+when user can see the score
+when user cannot see the score
+when user does not a moderator
+when user is a moderator
+when user is authenticated
+when user is moderator
+when user is not authenticated
+wiped accounts
+with a conversation starter works
+with a filename longer than filesystem can handle
+with a html extension
+with a merged_into_story
+with a non-html extension
+with a story with the tag
+with a trailing slash
+with alt text
+with dark color scheme and high contrast
+with dark color scheme and normal contrast
+with dark color scheme and system contrast
+with extra params specified
+with fewer entries than two pages
+with invalid parameters
+with light color scheme and high contrast
+with light color scheme and normal contrast
+with light color scheme and system contrast
+with more entries
+with multiple inline images in description
+with negative base
+with no alt text, title text
+with no preferences set
+with percent-encoded path traversal
+with positive base
+with rss extension
+with system color scheme and high contrast
+with system color scheme and normal contrast
+with title text
+with title text and alt text
+with unicode
+with valid parameters
+without a comment doesn't work
+works
+works even if the comment is flagged
+works logged in, with vote hydration
+works with js
+works without js
+writes the rendered page to the cache
+you_invited

@@ -1,0 +1,10 @@
+plain exit 0 wall 12.644459847 at 13:10:13
+plain2 exit 0 wall 10.766711778 at 13:10:24
+off exit 0 wall 14.102715005 at 13:10:38
+profiled exit 0 wall 46.007455432 at 13:11:24
+profiled tree unchanged
+base2 exit 0 wall 45.479142660 at 13:12:10
+base2 tree unchanged
+head exit 0 wall 44.298331102 at 13:12:54
+head tree unchanged
+planted exit 0 wall 44.193186195 at 13:13:39

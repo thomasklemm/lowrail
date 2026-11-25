@@ -1,0 +1,2 @@
+61:# The built lowrail-profile-0.1.0.rc1.gem, unpacked (not published yet): gem unpack + gem spec --ruby.
+62:gem "lowrail-profile", path: "vendor/lowrail-profile-0.1.0.rc1", group: [:development, :test], require: false

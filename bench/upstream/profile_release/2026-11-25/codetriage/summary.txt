@@ -1,0 +1,11 @@
+plain exit 0 wall 9.016353089 at 13:08:01
+plain2 exit 0 wall 8.798457197 at 13:08:10
+off exit 0 wall 9.070016166 at 13:08:19
+profiled exit 0 wall 25.652898422 at 13:08:44
+profiled tree unchanged
+base2 exit 0 wall 23.542060049 at 13:09:08
+base2 tree unchanged
+head exit 0 wall 24.397837296 at 13:09:33
+head tree unchanged
+planted exit 0 wall 24.257976580 at 13:09:57
+off-env exit 0 (control: bundle exec env, a new process under Bundler's RUBYOPT)

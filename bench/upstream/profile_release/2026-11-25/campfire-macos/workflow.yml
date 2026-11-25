@@ -1,0 +1,56 @@
+# Campfire's own suite on macOS with lowrail-profile 0.1.0.rc1 (the unpacked built gem in vendor/): the counter
+# builds with Apple clang, and per-test outcomes are the same plain, with the gem listed but off, and profiled.
+name: campfire-macos
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  campfire:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      SEED: "1234"
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: proof }
+      - name: Campfire at the Lowrail corpus pin
+        run: |
+          git init -q campfire && cd campfire
+          git fetch -q --depth 1 https://github.com/basecamp/once-campfire af4dd9fd599c65e0e0fc1f614ee469f70156ddf5
+          git -c advice.detachedHead=false checkout -q FETCH_HEAD
+          cp Gemfile Gemfile.lowrail && cp Gemfile.lock Gemfile.lowrail.lock
+          printf '\ngem "lowrail-profile", path: "%s", group: [:development, :test], require: false\n' "$GITHUB_WORKSPACE/proof/vendor/lowrail-profile-0.1.0.rc1" >> Gemfile.lowrail
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: "4.0.7", working-directory: campfire, bundler-cache: true }
+      - name: Bundles and test database
+        working-directory: campfire
+        run: |
+          brew install redis vips ffmpeg && brew services start redis
+          BUNDLE_GEMFILE=Gemfile.lowrail BUNDLE_FROZEN=false BUNDLE_DEPLOYMENT=false bundle install --quiet
+          bin/rails db:prepare
+      - name: Plain, off and profiled
+        working-directory: campfire
+        run: |
+          set +e # each suite's status is recorded, not fatal; the outcome comparison decides
+          mkdir -p ../out
+          bin/rails test -v > ../out/plain.log 2>&1; echo "plain exit $?" | tee -a ../out/summary.txt
+          BUNDLE_GEMFILE=Gemfile.lowrail bin/rails test -v > ../out/off.log 2>&1; echo "off exit $?" | tee -a ../out/summary.txt
+          BUNDLE_GEMFILE=Gemfile.lowrail bundle exec lowrail-profile --out ../out/profiled -- bin/rails test -v > ../out/profiled.log 2>&1; echo "profiled exit $?" | tee -a ../out/summary.txt
+          ls ~/.cache/lowrail/profile/*/* | tee -a ../out/summary.txt
+          for f in ../out/*.log; do
+            ruby -e 'puts File.readlines(ARGV[0], chomp: true).grep(/\A\S+#\S+ = [\d.]+ s = [.SEF]\z/).map { _1.sub(/ = [\d.]+ s = /, " = ") }.sort.uniq' "$f" > "${f%.log}.outcomes"
+            echo "$f: $(wc -l < "${f%.log}.outcomes") outcomes; $(grep -E '^[0-9]+ runs' "$f" | tail -1)" | tee -a ../out/summary.txt
+          done
+          cmp ../out/plain.outcomes ../out/off.outcomes && cmp ../out/plain.outcomes ../out/profiled.outcomes && echo "outcomes identical" | tee -a ../out/summary.txt
+          sed -n 1,20p ../out/profiled/report.md >> "$GITHUB_STEP_SUMMARY"; cat ../out/summary.txt >> "$GITHUB_STEP_SUMMARY"
+          grep -q "outcomes identical" ../out/summary.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: campfire-macos
+          path: |
+            out/*.log
+            out/*.outcomes
+            out/summary.txt
+            out/profiled/report.md
+            out/profiled/report.json
