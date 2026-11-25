@@ -167,6 +167,13 @@ class ProfileCompareTest < Minitest::Test
       keyless = ->(warm) { report([10.0, 10.0]).merge("ranked" => [{ "warm" => warm }, { "warm" => [0.0, 0.0] }]) }
       assert_equal 2, compare(dir, keyless.([10.0, 10.0]), keyless.([30.0, 30.0]))[0], "rows without a site key"
       twice = ->(r) { r.merge("ranked" => r["ranked"] * 2) }
+      # Every completed window is some action's: a lost row, not only an empty list, leaves windows unaccounted for.
+      two = report([10.0, 10.0], actions: [{ "name" => "A#b", "warm" => [1.0, 1.0], "windows" => [6, 6] },
+        { "name" => "A#c", "warm" => [1.0, 1.0], "windows" => [4, 4] }])
+      assert_equal 0, compare(dir, two, two)[0]
+      status, result = compare(dir, two, two.merge("actions" => two["actions"].first(1)))
+      assert_equal 2, status, "one action row lost"
+      assert_match(%r{head's request actions add up to 6 / 6 windows, its summary to 10 / 10 completed}, result["problems"].join)
       assert_equal 2, both.(twice), "the same site twice"
       workloads = lambda do |measured|
         meta.(report([10.0, 10.0]), identity: { "mode" => "workloads", "host" => "localhost", "manifest" => "m", "measured" => [measured] * 2 })
