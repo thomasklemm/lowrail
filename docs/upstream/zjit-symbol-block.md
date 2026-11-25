@@ -1198,3 +1198,72 @@ railsbench, same setup as round 2 (master is the release build of `f63048e942`):
 No `unhandled_block_arg` exit. The body stays: its sentence that the send is specialized only while
 `Symbol#to_proc` is basic is true with the guard. The reply drafts above (replacement first reply, unchanged
 second reply) are true of this head.
+
+#### thermos-sol confirm: approve (2026-11-25)
+
+Exact fetched head `bdcfceb5eecaa0b7060f2df13958308ea8690624`, exactly two commits on
+`f63048e94229b4bab276e01bac4902f9b6a74ace`. Independently checked the round-3 bundle hash and prerequisite with
+`sha256sum` and `git bundle verify`. Both rubrics applied personally, without delegation, as a confirm pass of
+the five-file delta against the full PR reviewed above. **All earlier must-fixes and the coverage nit are
+resolved; no new must-fix or nit.**
+
+* **Basic bit and state:** `METHOD_ENTRY_BASIC_FLAG` is `RUBY_FL_USER7`, and `method.h:72` tests exactly
+  `IMEMO_FL_USER2`, mapped to `FL_USER7` by `internal/imemo.h:26`. Compiled C-header assertions independently
+  confirm the mask is 524,288 (bit 19) and the callable entry's flags are at offset 0. `load_rbasic_flags` reads
+  that word, and `GuardAnyBitSet` exits on a zero bit. All three specialized send paths pass the original send
+  snapshot to the shared helper; the guard uses it and `Some(Recompile)`. The two patch points remain.
+* **Lifetime and effects:** the CME is a `Const::Value`, inferred as `CallableMethodEntry`, not an untracked raw
+  pointer. Codegen's VALUE operands enter the existing GC-offset marking, write-barrier and compaction-update
+  machinery. The flags load reads Memory, so the normal memory effects of method redefinition prevent a stale
+  cached read across it. Forced `GC.verify_compaction_references(expand_heap: true, toward: :empty)` before and
+  after same-definition redefinition preserves `[block_given?, yield(3)] == [true, 4]` at thresholds 1 and 2.
+* **Regression:** the new identity test covers the actual cache eviction, and the committed standalone probe
+  now prints `true` in the interpreter, uncompiled JIT-enabled control, thresholds 1/2 with one profile, default,
+  and threshold 2 with inlining disabled. Removing only the new guard makes the identity test and four HIR
+  snapshots fail; restoring it passes all 19 `symbol_block_arg` tests. No Ruby source edits remain.
+* **Readability and text:** both redundant comments are removed. The new one-line comments explain why a flag
+  guard is necessary despite a method-redefinition patch point, and identify the otherwise non-obvious mask
+  mapping; both are justified. `flat_map` fixes the claimed fixed-arity C coverage. The four snapshots contain
+  only the guard/constant/flags load and consequent operand renumbering. The corrected commit messages describe
+  the guard rather than claiming delayed conversion is equivalent. Author/co-author/committer identities remain
+  Rafael/Thomas/Thomas for the ZJIT commit and Thomas for the tests, matching the existing PR.
+
+The unchanged body's basic-method promise is now true; its other previously audited sentences remain true.
+The previous NULL-cref conclusion is unaffected: the new guard does not change frame construction or EPs.
+The first reply's C-helper statement refers to the removed Symbol conversion check, not to `GetCref`'s C call;
+method replacement and same-definition redefinition are now both covered, with original-send recovery.
+Every sentence of the unchanged second reply still matches the cref helper, nil guard/recompile and late-`using`
+test. These are the final reviewed drafts, not posted:
+
+> r4686073773: The C helper check is gone. `MethodRedefined` covers replacement of `Symbol#to_proc`, and a HIR
+> basic-flag guard covers redefinition with its own definition. Both exits resume the original send; the Symbol is
+> passed directly only when conversion can be skipped.
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that
+> its refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using`
+> can add refinements to the cref after the code is compiled (tested). With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT.
+
+Fresh execution on the dev build (`--enable-zjit=dev --disable-install-doc --disable-yjit`, `make -j2`), x86-64:
+
+| Command/check | Confirm result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052 run; 2,051 pass, one SIGABRT, 15 skipped |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same btest at threshold 2 | 2,148/2,148 |
+| `make test-all TESTS='test/ruby/test_zjit_cli.rb'` | 34 tests, 7,907 assertions, no failure/error/skip |
+| Same 11 core files, ZJIT threshold 1 | 1,380 tests, 64,214 assertions, no failure/error, one skip |
+| Existing `zs1_probe.rb`: t1, t2p1, default, plus `N=40` default | Four interpreter comparisons identical (612/3,502 stdout lines); normalized stderr identical |
+| Four round-2 probes: t1, t2p1, default | 12/12 interpreter comparisons identical |
+| Same 144-case redefinition/refinements/GC matrix | 144/144 match the uncompiled JIT-enabled interpreter control |
+| Forced compaction before/after same-definition redefinition | 2/2 interpreter comparisons identical |
+| Delete only the basic-bit guard | 19 tests: 14 pass, identity regression and four snapshots fail |
+| Restore exact head; Symbol-block filter | 19/19, Ruby source diff empty |
+| `make zjit-bindgen` | Generated bindings byte-identical |
+
+The only full-suite failure is the same `test_profile_frames_during_direct_jit_to_jit_entry` SIGPROF abort
+("rb_profile_frames was not called from SIGPROF handler"), reproduced with base Rust source in the prior pass;
+it is not reported as a passing test. Matrix controls retain the prior JIT-enabled builtin-selection qualification.
+Logs and probe outputs are in `.amp/in/orb-backup/zs1-review/round3/` in the same review orb. No new benchmark or
+arm64 run; no speed claim added. XrXr's requested HIR speculation shape now has no remaining blocker from this
+review; acceptance remains his decision. Nothing pushed to Ruby or posted.
