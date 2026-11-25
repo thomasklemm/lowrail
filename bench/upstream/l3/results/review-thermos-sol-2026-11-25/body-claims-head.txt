@@ -1,0 +1,10 @@
+columns=30
+for_database_owner=ActiveModel::LazyIndexedAttributeSet
+attributes_for_database allocated_per_call=1.0 all=[1.001, 1.031, 1.0, 1.0, 1.0]
+attributes_before_type_cast allocated_per_call=1.0 all=[1.0, 1.0, 1.0, 1.0, 1.0]
+attributes_for_database cold_allocated_per_call=44 all=[45, 44, 44, 44, 44]
+attributes_before_type_cast cold_allocated_per_call=33 all=[33, 33, 33, 33, 33]
+ciphertext_stable=true
+Marshal_stable=true
+same_ciphertext_object=true
+accessed_after_attributes=["id", "secret", "nil_column"]

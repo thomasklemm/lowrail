@@ -1,0 +1,8 @@
+=== main ===
+dumped="old" current="changed"
+=== main2 ===
+dumped="old" current="changed"
+=== head ===
+dumped="changed" current="changed"
+=== snapshot ===
+dumped="old" current="changed"

@@ -1,0 +1,164 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+pid 31987's current affinity list: 0,1
+=== main round 1 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.602k i/100ms
+attributes_for_database     9.036k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.410k (± 8.2%) i/s   (29.06 μs/i) -    172.896k in   5.024529s
+attributes_for_database     89.309k (± 3.5%) i/s   (11.20 μs/i) -    451.800k in   5.058839s
+=== head round 1 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.510k i/100ms
+attributes_for_database    14.038k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     43.919k (± 8.0%) i/s   (22.77 μs/i) -    220.990k in   5.031805s
+attributes_for_database    166.341k (± 4.9%) i/s    (6.01 μs/i) -    842.280k in   5.063567s
+=== main2 round 1 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.490k i/100ms
+attributes_for_database     8.075k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.179k (± 4.5%) i/s   (28.43 μs/i) -    177.990k in   5.059530s
+attributes_for_database     79.292k (± 3.3%) i/s   (12.61 μs/i) -    403.750k in   5.091959s
+=== head round 2 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.469k i/100ms
+attributes_for_database    15.504k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     41.658k (±11.6%) i/s   (24.00 μs/i) -    210.043k in   5.042042s
+attributes_for_database    157.255k (± 7.0%) i/s    (6.36 μs/i) -    790.704k in   5.028149s
+=== main2 round 2 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.518k i/100ms
+attributes_for_database     9.051k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.663k (± 6.2%) i/s   (27.28 μs/i) -    186.454k in   5.085655s
+attributes_for_database     89.185k (± 6.1%) i/s   (11.21 μs/i) -    452.550k in   5.074277s
+=== main round 2 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.547k i/100ms
+attributes_for_database     8.746k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.746k (± 5.3%) i/s   (28.78 μs/i) -    173.803k in   5.002142s
+attributes_for_database     83.951k (± 7.0%) i/s   (11.91 μs/i) -    419.808k in   5.000618s
+=== main2 round 3 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.405k i/100ms
+attributes_for_database     8.147k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     33.844k (± 9.1%) i/s   (29.55 μs/i) -    170.250k in   5.030368s
+attributes_for_database     86.661k (± 4.6%) i/s   (11.54 μs/i) -    439.938k in   5.076557s
+=== main round 3 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.365k i/100ms
+attributes_for_database     9.103k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     33.123k (± 5.6%) i/s   (30.19 μs/i) -    168.250k in   5.079512s
+attributes_for_database     87.689k (± 6.7%) i/s   (11.40 μs/i) -    446.047k in   5.086678s
+=== head round 3 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.123k i/100ms
+attributes_for_database    14.526k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     41.721k (± 5.8%) i/s   (23.97 μs/i) -    210.273k in   5.039997s
+attributes_for_database    157.873k (± 6.3%) i/s    (6.33 μs/i) -    798.930k in   5.060577s
+=== main round 4 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.591k i/100ms
+attributes_for_database     8.997k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     35.899k (± 4.3%) i/s   (27.86 μs/i) -    179.550k in   5.001502s
+attributes_for_database     90.461k (± 3.1%) i/s   (11.05 μs/i) -    458.847k in   5.072310s
+=== head round 4 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.159k i/100ms
+attributes_for_database    15.321k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     44.765k (± 4.6%) i/s   (22.34 μs/i) -    224.586k in   5.016969s
+attributes_for_database    165.093k (± 6.3%) i/s    (6.06 μs/i) -    827.334k in   5.011333s
+=== main2 round 4 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.671k i/100ms
+attributes_for_database     9.153k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     32.286k (±14.9%) i/s   (30.97 μs/i) -    161.524k in   5.002849s
+attributes_for_database     88.747k (± 5.6%) i/s   (11.27 μs/i) -    448.497k in   5.053677s
+=== head round 5 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.529k i/100ms
+attributes_for_database    15.578k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     44.029k (± 6.3%) i/s   (22.71 μs/i) -    221.921k in   5.040333s
+attributes_for_database    160.392k (± 5.0%) i/s    (6.23 μs/i) -    810.056k in   5.050464s
+=== main2 round 5 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.103k i/100ms
+attributes_for_database     8.649k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.597k (± 5.4%) i/s   (28.90 μs/i) -    173.768k in   5.022587s
+attributes_for_database     86.864k (± 6.8%) i/s   (11.51 μs/i) -    441.099k in   5.078052s
+=== main round 5 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     3.593k i/100ms
+attributes_for_database     8.622k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.838k (± 7.2%) i/s   (28.70 μs/i) -    176.057k in   5.053525s
+attributes_for_database     82.143k (± 5.4%) i/s   (12.17 μs/i) -    413.856k in   5.038214s
+=== main2 round 6 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main2 affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     2.565k i/100ms
+attributes_for_database     9.109k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     36.043k (± 9.6%) i/s   (27.74 μs/i) -    182.115k in   5.052766s
+attributes_for_database     90.003k (± 7.0%) i/s   (11.11 μs/i) -    455.450k in   5.060392s
+=== main round 6 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/main affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     2.898k i/100ms
+attributes_for_database     8.950k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     34.688k (± 6.0%) i/s   (28.83 μs/i) -    173.880k in   5.012743s
+attributes_for_database     82.053k (± 9.6%) i/s   (12.19 μs/i) -    411.700k in   5.017473s
+=== head round 6 ===
+tree=/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head affinity=Cpus_allowed_list:	1
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+           Marshal.dump     4.528k i/100ms
+attributes_for_database    16.043k i/100ms
+Calculating -------------------------------------
+           Marshal.dump     42.520k (± 8.0%) i/s   (23.52 μs/i) -    212.816k in   5.005056s
+attributes_for_database    164.711k (± 5.7%) i/s    (6.07 μs/i) -    834.236k in   5.064861s

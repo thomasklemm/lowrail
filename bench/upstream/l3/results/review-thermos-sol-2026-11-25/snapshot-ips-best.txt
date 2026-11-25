@@ -1,0 +1,8 @@
+Marshal.dump: main 36028.0 (+0.00%) r1; snapshot 43020.0 (+19.41%) r2; main2 36068.0 (+0.11%) r1
+  main: Marshal.dump     36.028k (± 6.2%) i/s   (27.76 μs/i) -    181.719k in   5.043761s
+  snapshot: Marshal.dump     43.020k (± 5.5%) i/s   (23.25 μs/i) -    219.249k in   5.096450s
+  main2: Marshal.dump     36.068k (± 6.3%) i/s   (27.73 μs/i) -    181.064k in   5.020037s
+attributes_for_database: main 90244.0 (+0.00%) r1; snapshot 153819.0 (+70.45%) r1; main2 90773.0 (+0.59%) r2
+  main: attributes_for_database     90.244k (± 2.5%) i/s   (11.08 μs/i) -    456.894k in   5.062867s
+  snapshot: attributes_for_database    153.819k (± 9.5%) i/s    (6.50 μs/i) -    779.130k in   5.065244s
+  main2: attributes_for_database     90.773k (± 2.1%) i/s   (11.02 μs/i) -    461.244k in   5.081302s

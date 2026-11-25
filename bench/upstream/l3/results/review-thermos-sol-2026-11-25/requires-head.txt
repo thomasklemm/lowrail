@@ -1,0 +1,6 @@
+require active_model
+ok
+require active_record
+ok
+require active_model/attribute_set
+NoMethodError: undefined method 'delegate' for class ActiveModel::LazyAttributeHash
