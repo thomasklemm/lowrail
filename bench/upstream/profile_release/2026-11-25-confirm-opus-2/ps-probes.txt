@@ -1,0 +1,8 @@
+# --timeout 1 at 53a071fd; the run's grandchild traps TERM, sleeps 3 s, writes "clean". PATH holds only ruby and the ps named.
+procps ps (/usr/bin/ps):            exit 124, 4.11 s, cleanup: clean
+no ps on PATH (kill 0 fallback):    exit 124, 4.09 s, cleanup: clean
+busybox 1.36.1 ps:                  exit 124, 4.16 s, cleanup: clean
+a ps that exits 1 with no output:   exit 124, 1.08 s, cleanup: KILLED-before-cleanup
+# Under a python3 subreaper that never reaps (the run spawns sleep 60, then sleeps):
+60387485: 11.13 s
+53a071fd:  1.11 s

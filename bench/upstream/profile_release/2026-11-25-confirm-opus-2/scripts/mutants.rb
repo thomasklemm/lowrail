@@ -1,8 +1,8 @@
 # ruby mutants.rb [NAME...]: applies each mutant to a copy of 7a5ee0b6's gem/ and runs the tests that should kill it.
 require "fileutils"
 require "open3"
-SRC = ENV.fetch("MUTANT_SRC", "/tmp/w-7a5ee0b6/gem")
-OUT = ENV.fetch("MUTANT_OUT", "/tmp/lowrail-mutants")
+SRC = ENV.fetch("MUTANT_SRC", "/tmp/w-7a5ee0b6/gem") # a checkout of the gem/ under test
+OUT = File.join(__dir__, "mutants")
 RUBY = ENV.fetch("MUTANT_RUBY", RbConfig.ruby)
 M = {
   "timeout_kill_only_if_leader_lives" => ["exe/lowrail-profile",
@@ -41,6 +41,9 @@ M = {
   "no_realpath_gem_dir" => ["lib/lowrail/profile.rb", "(File.realpath(spec.full_gem_path) rescue spec.full_gem_path)", "spec.full_gem_path",
     "profile_test.rb", "test_path_gems_and_an_engine_root_are_classified"],
   "build_inside_bundle" => ["exe/lowrail-profile", "Bundler.with_unbundled_env(&build) : build.()", "build.() : build.()", "profile_env_test.rb", "test_the_counter_builds_under_an_apps_bundle"],
+  "zombie_waited" => ["exe/lowrail-profile", "sleep 0.1 while running.() &&", "sleep 0.1 while (Process.kill(0, -pid) rescue false) &&", "profile_env_test.rb", "test_timeout_does_not_wait_for_a_zombie"],
+  "zombie_filter_dropped" => ["exe/lowrail-profile", "g.to_i == pid && !s.to_s.start_with?(\"Z\")", "g.to_i == pid", "profile_env_test.rb", "test_timeout_does_not_wait_for_a_zombie"],
+  "ps_ignores_group" => ["exe/lowrail-profile", "g.to_i == pid && !s.to_s.start_with?(\"Z\")", "false", "profile_test.rb", "test_timeout_stops_a_hung_run_and_its_processes"],
   "attrib_key_collides" => ["lib/lowrail/profile_report.rb", "[loc << 31 | caller_loc]", "[loc]",
     "profile_test.rb profile_report_test.rb", "/counts_only|path_gems|report_keeps/"],
 }

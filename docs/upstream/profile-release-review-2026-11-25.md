@@ -670,3 +670,41 @@ with a probe in the caller's RUBYOPT:
   `profile_report_test.rb`.
 * Maintainability: the exe's run loop now holds the grace loop as well, and several new comments are longer than
   one line of why. Neither blocks the release.
+
+## Delta confirm 60387485..53a071fd: thermos-opus (2026-11-25)
+
+Scope: `776ef498` (tests only: the `--out` glob, `BUNDLER_ORIG_RUBYOPT`, the ruby-head Gemfile, the stream README
+path) and `53a071fd` (`--timeout` no longer waits for zombies in the stopped group). Receipts:
+[2026-11-25-confirm-opus-2](../../bench/upstream/profile_release/2026-11-25-confirm-opus-2/README.md)
+(`mutants-53a071fd.txt`, `ps-probes.txt`). **Verdict: no must-fix. The gem with sha256
+`d1e80952de34d52850ff5b953111444525a61ef97da628b10ff094077d4ef3f5` (53a071fd, reproduced) is ready. One
+should-fix in the `ps` fallback, below.**
+
+* **The tests now catch their mutants.** At 53a071fd these mutants are killed:
+  * the glob back in the exe's delete, and the glob back in `ProfileReport`
+    (`test_runs_are_deleted_after_the_report_unless_kept`);
+  * `leave_env` skipping `BUNDLER_ORIG_` (`test_processes_the_suite_starts_run_as_without_the_profiler`);
+  * the build inside the bundle, with the ruby-head Gemfile that no longer pins a version
+    (`test_the_counter_builds_under_an_apps_bundle`);
+  * waiting with `kill 0` again, and counting zombies (`test_timeout_does_not_wait_for_a_zombie`);
+  * a `ps` filter that never sees the group (`test_timeout_stops_a_hung_run_and_its_processes`).
+* **The changed tests pass** (the env tests, timeout, run deletion, child environment): Ruby 4.0.7 / Rails 8.1.4,
+  6 runs, 753 assertions; Ruby 3.3.14 / Rails 7.2.4, 6 runs, 698 assertions; 0 failures, 0 skips.
+* **The zombie case reproduced.** Under a python3 subreaper that never reaps, a `--timeout 1` run took 11.1 s at
+  60387485 and 1.1 s at 53a071fd.
+* **`ps` parsing.**
+  * `-o pgid= -o stat=` prints no header. The pgid is right-aligned, which `split` and `to_i` handle, and
+    `to_i == pid` matches because the command leads its own group.
+  * A zombie's state starts with `Z` (`Z`, `Z+`, `Zs`) in procps on Linux and in BSD ps on macOS, which both
+    accept `-A` and `-o pgid,stat`; I did not run it on macOS. BusyBox 1.36.1's ps gives the same fields.
+  * `ps` itself runs in lowrail-profile's group, not the command's.
+  * Measured with a grandchild that cleans up for 3 s on TERM (`ps-probes.txt`): procps, BusyBox and a PATH
+    without `ps` (the `kill 0` fallback) all wait for the cleanup and exit 124 in about 4.1 s.
+* **No hang.** Every path ends at the 10 s deadline, then KILL. Only a `ps` that never returns could stretch it
+  (hypothesis, not seen).
+
+**Should-fix: a `ps` that runs but fails kills too early.** A `ps` that exits non-zero with no output (a
+restricted `/proc`, a `ps` without `-A` or `-o`) makes `running` false at once. KILL then goes out right after
+TERM, without the 10 s grace: the probe's cleanup was cut off at 1.1 s. That only cuts the TERM handling of a
+run that already timed out, and never hangs. Smallest fix: fall back to `kill 0` when ps fails, for example
+`out = \`ps -A -o pgid= -o stat=\`; next(Process.kill(0, -pid) rescue false) unless $?.success?` before parsing.

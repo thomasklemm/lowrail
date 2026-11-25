@@ -1,0 +1,8 @@
+# MUTANT_SRC = gem/ at 53a071fd
+delete_by_glob: killed (4 runs, 715 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_runs_are_deleted_after_the_report_unless_kept
+report_reads_by_glob: killed (4 runs, 713 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_runs_are_deleted_after_the_report_unless_kept
+no_bundler_orig_prefix: killed (1 runs, 12 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_processes_the_suite_starts_run_as_without_the_profiler
+zombie_waited: killed (1 runs, 3 assertions, 1 failures, 0 errors, 0 skips) ProfileEnvTest#test_timeout_does_not_wait_for_a_zombie
+zombie_filter_dropped: killed (1 runs, 3 assertions, 1 failures, 0 errors, 0 skips) ProfileEnvTest#test_timeout_does_not_wait_for_a_zombie
+ps_ignores_group: killed (1 runs, 7 assertions, 1 failures, 0 errors, 0 skips) ProfileTest#test_timeout_stops_a_hung_run_and_its_processes
+build_inside_bundle: killed (1 runs, 3 assertions, 1 failures, 0 errors, 0 skips) ProfileEnvTest#test_the_counter_builds_under_an_apps_bundle
