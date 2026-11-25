@@ -19,6 +19,6 @@ attributed row repeated ten times under window names that part of the workers sh
 | Sure-sized | 742 MB | 211.8 s, 5,355 MB | 119.4 s, 532 MB | identical (b2ed5c77482b896f…) |
 
 "Before" for Blog and the fresh app is the report the capture wrote with the 1618fc38 gem; `report` from the
-checkout rewrote the same bytes. The test `test_report_keeps_no_object_per_attributed_row` (gem/test/profile_test.rb)
+checkout rewrote the same bytes. The test `test_report_keeps_no_object_per_attributed_row` (gem/test/profile_report_test.rb)
 reports 80,000 attributed rows in two processes: the report holds about 8,400 objects after it, 326,025 for
 40,000 rows before the change.

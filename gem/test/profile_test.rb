@@ -647,7 +647,7 @@ class ProfileTest < Minitest::Test
       LowrailTest.write_rails_app(dir, "requests.rb" => <<~'RUBY')
         require_relative "config/environment"
         require "rack/mock"
-        3.times { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) }
+        Integer(ENV.fetch("N", "3")).times { Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets")) }
       RUBY
       _, err, status = profile(dir, "--out", "gone", "--", RUBY, "requests.rb")
       assert status.success?, err
@@ -671,6 +671,12 @@ class ProfileTest < Minitest::Test
       _, err, status = profile(dir, "report", "kept")
       assert status.success?, err
       assert_equal written, File.read(File.join(dir, "kept/report.json"))
+
+      # An --out that reads as a glob names one directory: kept's runs stay, and its report is its own.
+      _, err, status = profile(dir, "--out", "{kept,x}", "--", RUBY, "requests.rb", env: { "N" => "5" })
+      assert status.success?, err
+      assert_equal %w[run1 run2], Dir.children(File.join(dir, "kept")).grep(/\Arun/).sort
+      assert_equal [5, 5], JSON.parse(File.read(File.join(dir, "{kept,x}/report.json")))["summary"].map { _1["requests"] }
     end
   end
 
@@ -979,6 +985,8 @@ class ProfileTest < Minitest::Test
     rspec = Open3.capture3(CLEAN_ENV, RUBY, "-e", 'require "rspec/core"')[2].success?
     realpath_tmpdir do |dir|
       start = <<~'RUBY'
+        # As `bundle exec` saves it, with lowrail-profile's -r: what with_unbundled_env would restore.
+        ENV["BUNDLER_ORIG_RUBYOPT"] ||= ENV["RUBYOPT"]
         require_relative "config/environment"
         require "rack/mock"
         require "bundler"
@@ -990,7 +998,7 @@ class ProfileTest < Minitest::Test
         end
       RUBY
       LowrailTest.write_rails_app(dir,
-        "child.rb" => 'puts ENV.keys.grep(/\ALOWRAIL_PROFILE|\A(?:SEED|SPEC_OPTS|RUBYOPT|RUBYLIB)\z/).sort.map { "#{_1}=#{ENV[_1]}" }, ' \
+        "child.rb" => 'puts ENV.keys.grep(/\ALOWRAIL_PROFILE|\A(?:SEED|SPEC_OPTS|RUBYOPT|RUBYLIB|BUNDLER_ORIG_RUBYOPT)\z/).sort.map { "#{_1}=#{ENV[_1]}" }, ' \
           '"profiler #{defined?(Lowrail::Profile).inspect}"',
         "start.rb" => start,
         "suite_test.rb" => <<~'RUBY',
@@ -1013,7 +1021,9 @@ class ProfileTest < Minitest::Test
       # installed minitest's plugins (a 6.x beside 5.27 replaces it, 0 tests run).
       caller_env = { "SEED" => "99", "SPEC_OPTS" => "--no-color", "RUBYOPT" => "-W0", "RUBYLIB" => File.join(dir, "lib"),
         "MT_NO_PLUGINS" => "1" }
-      plain = (["RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"] * 3).join("--\n")
+      seen = "RUBYLIB=#{caller_env["RUBYLIB"]}\nRUBYOPT=-W0\nSEED=99\nSPEC_OPTS=--no-color\nprofiler nil\n"
+      # Bundler took its copy of the environment before start.rb saved BUNDLER_ORIG_RUBYOPT.
+      plain = ["BUNDLER_ORIG_RUBYOPT=-W0\n#{seen}", seen, seen].join("--\n")
       suites = { "minitest" => [[RUBY, "suite_test.rb"], "test", /^1 runs, \d+ assertions, 0 failures, 0 errors/] }
       suites["rspec"] = [[RUBY, "-e", 'require "rspec/core"; exit RSpec::Core::Runner.run(ARGV)', "suite_spec.rb"], "after_suite", /^1 example, 0 failures/] if rspec
       suites.each do |name, (command, child, ran)|

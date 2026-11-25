@@ -28,7 +28,7 @@ class ProfileEnvTest < Minitest::Test
   def test_the_counter_builds_under_an_apps_bundle
     realpath_tmpdir do |dir|
       File.write(File.join(dir, ".ruby-version"), RUBY_VERSION)
-      File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\nruby File.read(\".ruby-version\").strip\n")
+      File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\nFile.read(\".ruby-version\")\n")
       bundle = Gem.bin_path("bundler", "bundle")
       env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "PATH" => "#{File.dirname(RUBY)}:#{ENV["PATH"]}")
       _, err, status = Open3.capture3(env, RUBY, bundle, "lock", "--local", chdir: dir)
