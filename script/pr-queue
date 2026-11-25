@@ -24,10 +24,12 @@ module PrQueue
   AUTHOR = "thomasklemm"
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
   KINDS = %w[fix perf docs restore].freeze
-  REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus opus fable].freeze
+  REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus thermos-fable opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
   # Thermos on Sol (or Opus for crash fixes) is the default review and a thermos review (DECISIONS 2026-11-18).
-  ACCEPTS = { "claude-code" => %w[claude-code thermos-sol thermos-opus], "thermos" => %w[thermos thermos-sol thermos-opus] }.freeze
+  # A Fable thermos pass counts where an Opus one does (DECISIONS 2026-11-25).
+  THERMOS_REVIEWS = %w[thermos-sol thermos-opus thermos-fable].freeze
+  ACCEPTS = { "claude-code" => %w[claude-code] + THERMOS_REVIEWS, "thermos" => %w[thermos] + THERMOS_REVIEWS }.freeze
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
   # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most

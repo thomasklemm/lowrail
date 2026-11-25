@@ -1,0 +1,37 @@
+iseq guard miss keeps surplus: [:one, 1] | [:one, 2] | [:one, 3] | [:two, 4, 40] | [:two, 5, 50] | [:two, 6, 60] | [:two, 7, 70] | [:two, 8, 80]
+second block after monomorphic: 1 | 2 | 3 | 4 | [5, -5] | [6, -6] | [7, -7] | [8, -8] | [9, -9]
+polymorphic 0/1/2 params and Symbol: 1 | [1, 2] | "wrong number of arguments (given 2, expected 0)" | :none
+block side exit, live values below: [[:low, 2, :high], [:low, 2.5, :high]]
+block side exit, no params: [[:low, 2, :high], [:low, 2.5, :high]]
+nested live stack: [[1, [2, 4]], [1.5, [2, 5.0]]]
+block raises: "RuntimeError: boom 1"
+block raises, caller rescues: [[1, :ok], [ArgumentError, :s]]
+ensure in yielder: [2, :err, [[:ensure, 1, 2], [:ensure, :s, 2]]]
+next and break values: [11, 21, :n]
+non-local return from block: 31
+block locals nil-initialised: [:a, nil, nil, :unset]
+block-local var list: [1, :outer]
+binding in block: [:a, :b, 1, 2]
+closure write: 31
+block calls a method with args: 3
+block yields onward with surplus: [1, 2]
+proc from block: [1, 9]
+GC in block: "ssssss"
+GC.stress: [1, 1]
+surplus arg objects stay usable: "keep!"
+deep recursion returns: :bottom
+SystemStackError: "SystemStackError: stack level too deep"
+after overflow: [1, [1, 2]]
+10 args into 0/1/8/10 params: [:none, 1, [1, 8], [1, 10]]
+each_with_index, no params: 2
+each_with_index |x|: [5, 6]
+Hash#each |k|: [[:a, 1], [:b, 2]]
+Hash#each no params: 2
+times/upto/step no params: 9
+Fiber around a surplus yield: [1, :done]
+own yielder: block side exit: [[:low, 2, :high], [:low, 2, :high]]
+own yielder: Float after Fixnums: [:low, 2, :high] | [:low, 3, :high] | [:low, 4, :high] | [:low, 5, :high] | [:low, 6, :high] | [:low, 7.5, :high] | [:low, 8.5, :high] | [:low, 9.5, :high]
+own yielder: SystemStackError: "SystemStackError: stack level too deep"
+own yielder: raise after ints: [1, :ok] | [2, :ok] | [3, :ok] | [4, :ok] | [5, :ok] | :rescued
+own yielder: no params, exit on String: [9, 10, :c] | [10, 11, :c] | [11, 12, :c] | [12, 13, :c] | [13, 14, :c] | ["a", "b", :c]
+own yielder: 4 args into |a, b|: [12, 8.75]

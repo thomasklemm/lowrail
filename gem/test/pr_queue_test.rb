@@ -33,8 +33,8 @@ class PrQueueTest < Minitest::Test
     assert_equal %w[thermos], PrQueue.missing(item(passes), nil)
   end
 
-  def test_a_thermos_sol_or_opus_pass_is_the_review_and_the_thermos_pass
-    %w[thermos-sol thermos-opus].each do |who|
+  def test_a_thermos_sol_opus_or_fable_pass_is_the_review_and_the_thermos_pass
+    %w[thermos-sol thermos-opus thermos-fable].each do |who|
       assert_empty PrQueue.missing(item([pass(who, "bbbbbbbbbb")]), 201)
       assert_equal %w[claude-code thermos], PrQueue.missing(item([pass(who, "bbbbbbbbbb", "changes")]), 201)
     end

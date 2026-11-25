@@ -313,7 +313,8 @@ Models (Thomas, 2026-11-17): Astra means GPT-6 Astra (`openai/gpt-6-astra`). Sol
 trying Sol 6.2, but it isn't offered yet.
 Sol reviews stay on GPT-6.1 Sol (Thomas, 2026-11-25): GPT-6.2 Sol's safety check stopped a JIT review as possible
 security work. Fable (`anthropic/claude-fable-5-2`) may be used wherever it helps (Thomas, 2026-11-25), such as hard
-design rounds or an extra review of a large change.
+design rounds or an extra review of a large change. A thermos review on Fable is recorded as
+`reviewer: thermos-fable` and counts where a `thermos-opus` pass does (first use: RUBY19659, 2026-11-25).
 
 ### Review rounds before anything opens (Thomas, 2026-11-05)
 

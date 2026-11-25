@@ -102,7 +102,8 @@ Optional, last: what Thomas needs to retell the change. Everything from this hea
 ```
 
 `reviewer` in a pass: `claude-code` (the separate final review orb), `skeptic` (the orb's skeptical reviewer
-subagent, kept as a record), `sol`, `astra`, `thermos`, and for now `opus` and `fable`, which stand in for Sol or
+subagent, kept as a record), `sol`, `astra`, `thermos`, `thermos-sol`, `thermos-opus` and `thermos-fable` (a
+thermos review on that model, which is also the detailed review), and for now `opus` and `fable`, which stand in for Sol or
 Astra when their `orb` (the orb's thread ID) differs from the claude-code pass's `orb` on that head and from the other
 stand-in's ([DECISIONS](../../../docs/DECISIONS.md#opus-and-fable-stand-in-for-sol-and-astra-thomas-2026-11-14-temporary-pending-thomas)).
 `verdict`:

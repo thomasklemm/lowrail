@@ -1,0 +1,6 @@
+auto-splat [1, 2] into |a, b|: {send_iseq_arity_error: 4999, num_send_dynamic: 4999, exit_leave: 2, side_exit_count: 2, total_exit_count: 14997}
+auto-splat [3] into |a,|: {total_exit_count: 5000}
+auto-splat [3, 4] into |a,|: {invokeblock_iseq_arg0_wrong_len: 5000, exit_invokeblock: 5000, side_exit_count: 5000, total_exit_count: 9999}
+non-Array 3 into |a,|: {invokeblock_iseq_arg0_not_array: 5000, exit_invokeblock: 5000, side_exit_count: 5000, total_exit_count: 9999}
+too few: no arg into |a|: {send_iseq_arity_error: 4999, num_send_dynamic: 4999, total_exit_count: 9998}
+surplus: 2 args into |a|: {total_exit_count: 4999}
