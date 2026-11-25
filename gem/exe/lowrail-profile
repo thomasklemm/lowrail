@@ -163,19 +163,27 @@ statuses = (1..runs).map do |n|
   dir = File.join(out, "run#{n}")
   FileUtils.mkdir_p(dir)
   # The repeat run also records the nearest app line of every allocation
-  # (without allocating, so its counts stay comparable).
+  # (without allocating, so its counts stay comparable). Every internal flag
+  # is set or cleared here, so none leaks in from the caller's environment.
   env = { "LOWRAIL_PROFILE" => dir, "LOWRAIL_PROFILE_EXT" => ext, "SEED" => seed, "LOWRAIL_PROFILE_ROOT" => Dir.pwd,
-    **(n == [runs, 2].min ? { "LOWRAIL_PROFILE_ATTRIBUTE" => "1" } : {}),
-    **(record && n == 1 ? { "LOWRAIL_PROFILE_RECORD" => "1" } : {}),
-    **(allow_writes ? { "LOWRAIL_PROFILE_ALLOW_WRITES" => "1" } : {}),
+    "LOWRAIL_PROFILE_ATTRIBUTE" => ("1" if n == [runs, 2].min),
+    "LOWRAIL_PROFILE_RECORD" => ("1" if record && n == 1),
+    "LOWRAIL_PROFILE_ALLOW_WRITES" => ("1" if allow_writes),
     "SPEC_OPTS" => [ENV["SPEC_OPTS"], "--seed #{seed}"].compact.join(" "),
     "RUBYOPT" => [ENV["RUBYOPT"], "-I#{lib}", "-rlowrail/profile"].compact.join(" ") }
   warn "lowrail-profile: run #{n} of #{runs}: #{command.join(" ")}"
   system(env, *command)
+  # A shell's convention: the exit status, or 128 + the signal that ended it.
+  status = $?.exitstatus || 128 + $?.termsig.to_i
   # A workloads run that stops (a refused write, a response outside expect:) measured nothing to repeat.
-  abort "lowrail-profile: the workloads run exited #{$?.exitstatus}; nothing measured" if workloads && !$?.success?
-  $?.exitstatus
+  if workloads && status != 0
+    warn "lowrail-profile: the workloads run exited #{status}; nothing measured"
+    exit status
+  end
+  status
 end
+# The first failed run's status is the command's; profiling never hides a failure.
+failed = statuses.find { _1 != 0 }
 File.write(File.join(out, "command.txt"), "#{command.join(" ")}\nseed #{seed}\nexit #{statuses.join(" ")}\n")
 # What compare checks two captures against: the workloads (their manifest and
 # what was measured, from the receipt) or the command's arguments, never the
@@ -186,33 +194,39 @@ File.write(File.join(out, "capture.json"), JSON.generate("format" => 1, "identit
 
 begin
   report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
-rescue RuntimeError => error
+  report.write
+  puts report.markdown
+rescue StandardError => error
   warn "lowrail-profile: no report: #{error.message}; the command exited #{statuses.join(", ")}"
-  exit 1
+  exit(failed || 1)
 end
-report.write
-puts report.markdown
-if record
-  target = File.expand_path(record == :default ? Lowrail::Workloads::PATH : record)
-  target = File.join(out, "workloads.rb") if record == :default && File.exist?(target)
-  shapes = Dir["#{out}/run1/*.shapes.json"].flat_map { JSON.parse(File.read(_1)) }
-  merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept", "unfiltered") }
-    .map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
-  if merged.empty?
-    warn "lowrail-profile: --record saw no routed requests; nothing written"
-  else
-    FileUtils.mkdir_p(File.dirname(target))
-    File.write(target, Lowrail::Workloads.render(Lowrail::Workloads.recorded(merged, 20), <<~TEXT))
-      Workloads for lowrail-profile --workloads (README-profile.md).
-      Recorded by `lowrail-profile --record -- #{command.join(" ")}`: the #{[merged.size, 20].min} most frequent
-      request shapes of #{merged.sum { _1["count"] }} requests, most frequent first. Records are each model's first row.
-      Only GETs that replay as recorded are enabled. Writes keep the params one test sent and are commented out until
-      you make them repeatable (setup, alternate:); so is any request whose params were filtered or shortened.
-      Recorded from real requests: values the app's filter_parameters hides are #{Lowrail::Workloads::FILTERED},
-      but check the file for other secrets before you commit it.
-    TEXT
-    warn "lowrail-profile: wrote #{target} from real requests (filter_parameters applied); check it for secrets before committing it"
+begin
+  if record
+    target = File.expand_path(record == :default ? Lowrail::Workloads::PATH : record)
+    target = File.join(out, "workloads.rb") if record == :default && File.exist?(target)
+    shapes = Dir["#{out}/run1/*.shapes.json"].flat_map { JSON.parse(File.read(_1)) }
+    merged = shapes.group_by { _1.values_at("verb", "template", "json", "xhr", "format", "accept", "unfiltered") }
+      .map { |_, list| list.first.merge("count" => list.sum { _1["count"] }) }
+    if merged.empty?
+      warn "lowrail-profile: --record saw no routed requests; nothing written"
+    else
+      FileUtils.mkdir_p(File.dirname(target))
+      File.write(target, Lowrail::Workloads.render(Lowrail::Workloads.recorded(merged, 20), <<~TEXT))
+        Workloads for lowrail-profile --workloads (README-profile.md).
+        Recorded by `lowrail-profile --record -- #{command.join(" ")}`: the #{[merged.size, 20].min} most frequent
+        request shapes of #{merged.sum { _1["count"] }} requests, most frequent first. Records are each model's first row.
+        Only GETs that replay as recorded are enabled. Writes keep the params one test sent and are commented out until
+        you make them repeatable (setup, alternate:); so is any request whose params were filtered or shortened.
+        Recorded from real requests: values the app's filter_parameters hides are #{Lowrail::Workloads::FILTERED},
+        but check the file for other secrets before you commit it.
+      TEXT
+      warn "lowrail-profile: wrote #{target} from real requests (filter_parameters applied); check it for secrets before committing it"
+    end
   end
+rescue StandardError => error
+  warn "lowrail-profile: --record: #{error.message}"
+  exit(failed || 1)
 end
 warn "lowrail-profile: report in #{File.join(out, "report.md")}"
 warn "lowrail-profile: the command exited #{statuses.join(", ")}" unless statuses.all?(0)
+exit(failed || 0)

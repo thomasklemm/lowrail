@@ -536,6 +536,35 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # The CLI exits with the command's status: the first failed run's, a
+  # signal as 128 + its number, also when no report can be made; capture.json
+  # records the same numbers.
+  def test_a_failed_command_fails_the_profile
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "requests.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))
+        run = File.basename(ENV.fetch("LOWRAIL_PROFILE"))
+        case ENV.fetch("END")
+        when "exit" then exit 7
+        when "signal" then Process.kill("TERM", Process.pid); sleep 5
+        when "first" then exit(run == "run1" ? 3 : 0)
+        end
+      RUBY
+      { "exit" => [7, [7, 7]], "signal" => [143, [143, 143]], "first" => [3, [3, 0]] }.each do |ending, (status, exits)|
+        out, err, result = profile(dir, "--out", ending, "--", RUBY, "requests.rb", env: { "END" => ending })
+        assert_equal status, result.exitstatus, "#{ending}: #{err}"
+        assert_includes out, "# lowrail-profile report", "#{ending}: the report is still written"
+        assert_equal exits, JSON.parse(File.read(File.join(dir, ending, "capture.json")))["exit"]
+      end
+      _, err, result = profile(dir, "--out", "none", "--", RUBY, "-e", "exit 5")
+      assert_equal 5, result.exitstatus, err
+      assert_match(/no report/, err)
+    end
+  end
+
   # The app tree after a profile (default --out) is the tree before, but
   # tmp/lowrail-profile: no Gemfile, config or code is written.
   def test_profiling_leaves_the_app_tree_unchanged
