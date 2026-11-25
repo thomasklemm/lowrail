@@ -1351,3 +1351,64 @@ Fresh execution, dev build (`--enable-zjit=dev --disable-install-doc --disable-y
 | 11 core files at threshold 1 | 1,380 tests, 64,214 assertions, 0 failures, 1 skip |
 
 Probes are in [`round3/opus/`](../../bench/upstream/zs1/round3/opus/). No arm64 run, no new benchmark.
+
+### Round 4 for thermos-opus (2026-11-25)
+
+Head `5b3e0d0be52c2d20b2dab51a82ee7868b57200a1` on master `a43519979c` (round 3 rebased cleanly), pushed as
+`thomasklemm/ruby` `thomasklemm/zjit-symbol-block-arg-4`; the PR branch is untouched. `d43d039601` "ZJIT: Send
+Symbol block arguments directly" (Rafael as author, Thomas as co-author), `5b3e0d0be5` "ZJIT: Test sends with a
+Symbol block argument" (Thomas). Patches in [`round4/`](../../bench/upstream/zs1/round4/).
+
+**Existing machinery checked first.** `exit_recompile` only counts exits per compiled unit
+(`num_exits_until_invalidate`) and does not know which guard exited; the profile records operand types, not exits;
+`CompilePolicy::no_side_exits` is all-or-nothing. The only "don't speculate this again" state is
+`was_invalidated_for_singleton_class_creation` on `IseqPayload`, set by the `NoSingletonClass` patch point. So the fix
+follows that pattern with one more payload bool; there is no flags field to reuse. This is new per-ISEQ state, for
+XrXr to judge in the reply.
+
+Change against `bdcfceb5ee` (+23 −2 in 5 files):
+
+* The cref guard exits with a new `SideExitReason::BlockArgRefinements` (counter `exit_block_arg_refinements`).
+* `SideExitRecompile` gets `refined_iseq`, set only for that reason to the frame state's ISEQ, so an inlined callee
+  marks itself, not its caller. The exit calls `exit_block_arg_refinements` (a `c_callable`) before `exit_recompile`,
+  which sets `IseqPayload::exited_for_block_arg_refinements`.
+* `type_specialize` skips the Symbol specialization when that bit is set on the send's ISEQ; the send stays dynamic
+  (`send_block_arg_not_nil`). The guard stays for a `using` that arrives after the code is compiled.
+* Commit 1's message gains: "After the cref guard has exited in an ISEQ, its next version leaves these sends dynamic,
+  so code that runs under `using` is not recompiled again."
+
+[`refined_method_cost.rb`](../../bench/upstream/zs1/round3/opus/refined_method_cost.rb), dev build, `--zjit --zjit-stats`:
+
+| | master `f63048e942` | `bdcfceb5ee` (rebased) | head `5b3e0d0be5` |
+| --- | --- | --- | --- |
+| `compiled_iseq_count` | 2 | 8 | 4 |
+| `side_exit_count` | 0 | 30 (`unhandled_block_arg`) | 5 (`block_arg_refinements`) |
+| getivar fallback `no_side_exits` | 0 | 399,738 | 0 |
+| `rb_vm_send` | 199,971 | 199,869 | 199,966 |
+
+`MOD=plain`: 1 compiled, 0 exits on the head, specialized. The five exits are the `exit_recompile` budget of the one
+specialized version before it is invalidated.
+
+Verification (dev build, x86-64): `make zjit-test` 2,051 of 2,052 (SIGPROF test only); `make btest` at thresholds 1
+and 2 2,148 of 2,148; `test_zjit_cli.rb` 34 tests, 0 failures; 11 core files at threshold 1 1,380 tests, 0 failures,
+1 skip; `zs1_probe.rb` identical at threshold 1, threshold 2 with one profile, default and `N=40`; the four round-2
+probes and the six round-3 Opus probes identical in the interpreter and at thresholds 1, 2 and default. railsbench:
+the same counters as round 3 (`send_block_arg_not_nil` 2,200,733, `rb_vm_send` 4,289,569), `no_side_exits` as master,
+no `block_arg_refinements` exit.
+
+`GetCref` as an inline walk: possible, since the EP level is known at compile time, but `vm_env_cref` dispatches on
+the imemo type (cref, method entry with `def->body.iseq.cref`, svar at the local level) at every level, so it would be
+several loads and branches plus offsets for the method definition. Not built; the C call keeps `vm_env_cref`'s exact
+rules.
+
+Reply drafts (for Thomas after review):
+
+> r4686073773: The C helper check is gone. `MethodRedefined` covers replacement of `Symbol#to_proc`, and a HIR
+> basic-flag guard covers redefinition with its own definition. Both exits resume the original send; the Symbol is
+> passed directly only when conversion can be skipped.
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that its
+> refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using` can add
+> refinements to the cref after the code is compiled (tested). A version compiled after the guard has exited leaves
+> the send dynamic, so code that runs under `using` is not recompiled again. With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT.
