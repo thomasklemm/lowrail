@@ -64,7 +64,7 @@ end
 # compare with every report already checked: base (one capture or several merged), the A/A report and head.
 class Gate < Lowrail::ProfileCompare
   def initialize(base, aa, head)
-    @gate, @min, @top, @not_compared = true, 1.0, 20, []
+    @aa_given, @min, @top, @not_compared = true, 1.0, 20, []
     @base, @aa, @head = base, aa, head
   end
 
@@ -77,7 +77,7 @@ gate = lambda do |bases, head, all|
     base = bases.size == 2 ? PREP[[bases.first(1), all]] : PREP[[bases, all]]
     aa = bases.size == 2 ? PREP[[bases.last(1), all]] : base
     g = Gate.new(base, aa, PREP[[[head], all]])
-    [g.status, g.regressions.map(&:name), nil, g]
+    [g.regressions.any? ? 1 : 0, g.regressions.map(&:name), nil, g]
   end
 end
 pct = ->(n, d) { d.zero? ? "–" : format("%d of %d (%.2f%%)", n, d, 100.0 * n / d) }

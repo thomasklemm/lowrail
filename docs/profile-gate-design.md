@@ -1,7 +1,7 @@
 # lowrail-profile 0.1: the compare gate on parallel suites (design note)
 
-Status: decided 2026-11-25 (one-process gate if the serial captures hold, otherwise no gate in 0.1); the serial
-captures are in (below): Hackatime does not hold. On main: compare refuses captures of several processes (exit 2),
+Status: decided 2026-11-25: 0.1 ships without a gate ([DECISIONS](DECISIONS.md)); compare is a report. The serial
+captures (below) held on OSM and Writebook but not on Hackatime. On main: compare refuses captures of several processes (exit 2),
 T7's run deletion and path table, T8's `--timeout`. T1, T2 and T4 of the field test are fixed independently. Covers T3, T5 and T6 (false alarms), T7 (report size) and T8 (hangs) from the OSS field test.
 Numbers: [bench/upstream/profile_release/2026-11-25-t3](../bench/upstream/profile_release/2026-11-25-t3/README.md).
 

@@ -1,5 +1,5 @@
 # ruby -Igem/lib gate.rb PLANT_REGEX UNCHANGED_DIR... -- PLANTED_DIR...
-# compare's own gate (Lowrail::ProfileCompare#status, 1 = regression) over every assignment of distinct
+# compare's gate as rc1 had it (exit 1 when Lowrail::ProfileCompare lists a regression; 0.1 only reports it) over every assignment of distinct
 # captures to base, A/A, head and head2; each DIR holds report.json(.gz).
 #   default:  compare BASE HEAD --aa BASE2 exits 1
 #   confirm:  the README's CI job: on exit 1, profile head again (HEAD2) and fail only if
@@ -26,7 +26,7 @@ end)
 
 class Gate < Lowrail::ProfileCompare
   def initialize(base, head, aa)
-    @gate = true
+    @aa_given = true
     @base, @head, @aa = REPORTS.fetch(base), REPORTS.fetch(head), REPORTS.fetch(aa)
     @min, @top, @not_compared = 1.0, 20, []
   end
@@ -37,7 +37,7 @@ gate = lambda do |b, a, h|
   memo[[$rc1, b, a, h]] ||= begin
     g = Gate.new(b, h, a)
     raise "#{b} #{a} #{h}: #{g.problems.join("; ")}" unless g.valid?
-    [g.status, g.regressions.map(&:name)]
+    [g.regressions.any? ? 1 : 0, g.regressions.map(&:name)]
   end
 end
 pct = ->(n, d) { d.zero? ? "-" : format("%d of %d (%.2f%%)", n, d, 100.0 * n / d) }

@@ -47,7 +47,7 @@ bundle exec lowrail-profile --record -- bin/rails test             # the same, a
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 \
   bundle exec lowrail-profile --workloads                            # lowrail/workloads.rb's requests, closest to production
 bundle exec lowrail-profile report                                   # rebuild the report (needs --keep-runs)
-bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # exit 1 on a regression, 2 without valid evidence
+bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json  # a report: exit 0, 2 without valid evidence
 ```
 
 `--workloads [FILE]` (default `lowrail/workloads.rb`) boots the app with `bin/rails runner` in the current
@@ -260,6 +260,11 @@ commit, so such a fix shows as not released. Rebuild the index with `script/prof
 changes (`--missing` after GitHub's rate limit stops it).
 
 ## Compare two reports in CI
+
+**0.1 ships without a gate** ([DECISIONS](DECISIONS.md), [profile-gate-design](profile-gate-design.md)): compare
+lists what exceeds the floor below and exits 0, or 2 without valid evidence, which includes a capture of more than
+one process. What this section says about exit 1 describes the release candidate's gate, whose measurements follow;
+read "exits 1" as "lists a regression".
 
 `lowrail-profile compare BASE.json HEAD.json --aa BASE2.json` sets the `report.json` of two profiles against each
 other, per line outside the app and per action (requests, jobs, mails and Cable actions apart), on warm objects per

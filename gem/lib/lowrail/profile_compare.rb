@@ -5,7 +5,11 @@ require "json"
 module Lowrail
   # lowrail-profile compare BASE.json HEAD.json --aa BASE2.json: warm objects
   # per request (and per job, mail and Action Cable action) by line outside
-  # the app and by action, head minus base. A change counts as a regression
+  # the app and by action, head minus base, as a report: it exits 0 whatever
+  # it lists, and 2 when the reports are not valid evidence. 0.1 has no gate
+  # (docs/profile-gate-design.md): captured in one process, Hackatime's
+  # unchanged heads still crossed the floor 12.5% of the time, from an action
+  # whose cost moves 0.7% with data. A change is listed as a regression
   # when it is larger than the noise floor. Its noise is the larger of the
   # base's spread across the A/A pair, two invocations on the base (largest
   # minus smallest of all their runs, so it covers both the pair's difference
@@ -18,8 +22,7 @@ module Lowrail
   # its objects and 20 times --min, because parallel test workers split an
   # action's requests differently from run to run (A/A on Campfire: every
   # action within 0.08% and 6.5 objects). Without --aa the
-  # noise is each report's own spread, too small to gate on: compare lists
-  # what exceeds it as places to look and exits 0.
+  # noise is each report's own spread, smaller still.
   #
   # Only valid evidence is compared: complete reports of this version
   # (every collection present, rows with unique keys, every warm vector one
@@ -52,7 +55,7 @@ module Lowrail
     attr_reader :not_compared
 
     def initialize(base, head, aa: nil, min: 1.0, top: 20)
-      @gate = !aa.nil?
+      @aa_given = !aa.nil?
       @base, @head, @aa = [base, head, aa].map { |file| file && (JSON.parse(File.read(file)) rescue false) }
       @min = min
       @top = top
@@ -183,15 +186,15 @@ module Lowrail
       end
     end
 
-    def reports = { "base" => @base, "head" => @head, **(gate? ? { "the A/A report" => @aa } : {}) }
+    def reports = { "base" => @base, "head" => @head, **(aa? ? { "the A/A report" => @aa } : {}) }
 
     def valid? = problems.empty?
 
     # Only an A/A pair measures how much invocations differ.
-    def gate? = @gate
+    def aa? = @aa_given
 
-    # 0 no regression (or no A/A pair), 1 a regression, 2 not valid evidence.
-    def status = !valid? ? 2 : gate? && regressions.any? ? 1 : 0
+    # 0 a report (whatever it lists), 2 not valid evidence.
+    def status = valid? ? 0 : 2
 
     def windows(run) = run.is_a?(Hash) && run["windows"].is_a?(Hash) ? run["windows"] : {}
 
@@ -225,7 +228,7 @@ module Lowrail
 
     def line_changes(kind)
       base, head = lines(@base, kind), lines(@head, kind)
-      aa = lines(@aa, kind) if gate?
+      aa = lines(@aa, kind) if aa?
       zero = [0.0] * @base["meta"]["runs"]
       (base.keys | head.keys).map do |name|
         b, h = base[name] || zero, head[name] || zero
@@ -235,7 +238,7 @@ module Lowrail
 
     def action_changes(kind)
       base, head = actions(@base, kind), actions(@head, kind)
-      aa = actions(@aa, kind) if gate?
+      aa = actions(@aa, kind) if aa?
       warm = ->(w) { w && !w.empty? && !w.include?(nil) }
       (base.keys | head.keys).filter_map do |name|
         b, h, a = base[name], head[name], aa&.[](name)
@@ -270,14 +273,13 @@ module Lowrail
         out << "Objects per request (all, by run): base #{base_total.map { _1.round(1) }.join(" / ")}, " \
           "head #{head_total.map { _1.round(1) }.join(" / ")}.\n\n"
       end
-      noise = gate? ? "the base's run-to-run spread across the A/A pair, or head's own if larger," : "the larger run-to-run spread in either report"
+      noise = aa? ? "the base's run-to-run spread across the A/A pair, or head's own if larger," : "the larger run-to-run spread in either report"
       out << "A change counts when it exceeds the noise floor: twice #{noise} and for a line at least #{@min} objects per " \
         "request (warm); for an action at least #{(ACTION_SHARE * 100).round(1)}% of its objects and at least " \
         "#{ACTION_MIN * @min}. Compared: #{kinds.join(", ")}.\n\n"
-      unless gate?
-        out << "**Not a gate (exit 0): no A/A pair.** The spread inside one capture misses how much invocations differ, " \
-          "so what this lists is a place to look. Profile the base twice and pass the second with `--aa` to gate.\n\n"
-      end
+      out << "**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a " \
+        "small one can be missing (README-profile.md, *Compare*).#{" Without an A/A pair the floor is the spread inside one " \
+        "capture, which misses how much invocations differ; profile the base twice and pass the second with `--aa`." unless aa?}\n\n"
       { "Regressions" => regressions, "Improvements" => improvements }.each do |title, list|
         out << "## #{title}: #{list.size}\n\n"
         next out << "None.\n\n" if list.empty?
@@ -298,7 +300,7 @@ module Lowrail
 
     def to_h
       row = ->(c) { { kind: c.kind, what: c.what, name: c.name, base: c.base, head: c.head, delta: c.delta, noise_floor: c.threshold(@min) } }
-      { status: status, gate: gate?, problems: problems, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
+      { status: status, aa: aa?, problems: problems, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
         improvements: improvements.map(&row), not_compared: (changes; not_compared) }
     end
   end

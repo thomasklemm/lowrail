@@ -94,26 +94,54 @@ the pull requests its authors track, not every upstream fix, and a snapshot goes
 **Counts are not time.** A line with many objects is a place to look; some allocations are cheap. **A suite is not
 traffic**: it requests what tests need, with a test user agent, in test mode. `--workloads` (below) gets closer.
 
-## Compare in CI
+## Compare
 
-`compare BASE.json HEAD.json --aa BASE2.json` exits **1** when a line or an action grew beyond its noise floor,
-**0** when nothing did, and **2** when the reports are not valid evidence: a failing suite, one run, a different
-command, seed, Ruby or environment, dropped samples, unfinished windows, or a report of another version. `BASE2`
-is a second profile of the unchanged base: the A/A pair sets the floor per row (twice the larger of a row's spread
-across both base profiles and head's own spread; for a line at least `--min`, default 1 object per request, for an
-action at least 0.1% of its objects and 20 × `--min`). Without `--aa` compare lists changes as places to look and exits 0:
-it is not a gate. `--json` prints the result as JSON.
+`compare BASE.json HEAD.json --aa BASE2.json` lists the lines and actions that grew or shrank beyond their noise
+floor and exits **0** whatever it lists: in 0.1 it is a report, not a CI gate (below). It exits **2** when the reports
+are not valid evidence: a failing suite, one run, a different command, seed, Ruby or environment, dropped samples,
+unfinished windows, a capture of more than one process, or a report of another version. `BASE2` is a second profile
+of the unchanged base: the A/A pair sets the floor per row (twice the larger of a row's spread across both base
+profiles and head's own spread; for a line at least `--min`, default 1 object per request, for an action at least
+0.1% of its objects and 20 × `--min`). Without `--aa` the floor is the spread inside one capture, which misses how
+much invocations differ. `--json` prints the result as JSON.
+
+**Profile in one process.** Warm leaves out each process's first request of an action, and parallel test workers
+split the tests anew in every capture, so which requests those are, where one-time work lands and which code paths
+run change between captures: on openstreetmap-website (8 workers, the same code) `NotesController#index` read 8,063
+warm objects per request in one capture and 26,106 in the next. compare refuses such captures (exit 2). Set
+`PARALLEL_WORKERS=1` for `parallelize`, and run `parallel_tests` and similar runners without them.
+
+**Why there is no gate in 0.1.** Over every assignment of unchanged captures to base, A/A and head, captured in one
+process, compare listed a regression for 0 of 24 heads on openstreetmap-website, 0 of 120 on Writebook, 0 of 1,320
+on a fresh Rails 8.1 app and 1.7% on a generated Blog, but 12.5% on Hackatime, and 4.4% even when a second profile
+of head had to show it too. Hackatime's `Admin::AdminUsersController#index` reads 14,700–14,730 or 14,785–14,817
+warm objects per request by capture with the same code: a 0.7% move with the data, which one A/A pair does not
+sample. With parallel workers it was worse (openstreetmap-website 79%, Hackatime 52.5%, Writebook 26.7%). A job that
+fails on unchanged code that often does more harm than good, so treat what compare lists as places to look
+([the measurements](https://github.com/thomasklemm/lowrail/blob/main/docs/profile-gate-design.md)).
+
+**What it can find.** In one process, an action change of about 20 objects per request, or 0.1% of the action if
+that is larger: a planted `Array.new(200) { Object.new }` in openstreetmap-website's `NotesController#index` showed
+as +168 against a floor of 27 (of 26,402), `20.times { ERB::Util.html_escape("a<b") }` in Campfire's
+`RoomsController#show` as +44 against 26 and in Writebook's `SessionsController#create` as +55 against 20. A line
+needs 1 object per request averaged over all requests of its kind, so a change in one action moves its lines only by
+that action's share of the requests. Not found: the same `html_escape` plant in Hackatime's
+`LeaderboardsController#index` (+40–60 on about 7,900, twice that action's own noise: listed in half the
+comparisons), and with workers Writebook's plant in an action that runs once per worker process. An action that runs
+once per process has no warm value and is not compared.
 
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
-only, is listed under *Not compared* with the reason, and nothing about its own cost gates. Lines outside the app it
-reaches are still compared.
+only, is listed under *Not compared* with the reason, and nothing about its own cost is listed. Lines outside the
+app it reaches are still compared.
 
-A GitHub Actions job that profiles the pull request's base twice and its head once, and fails on a regression that
-a second profile of head shows too:
+A GitHub Actions job that profiles the pull request's base twice and its head once, in one process, and publishes
+the comparison as the job summary and the reports as an artifact. It never fails on what compare lists:
 
 ```yaml
 lowrail-profile:
   runs-on: ubuntu-latest
+  env:
+    PARALLEL_WORKERS: 1 # one process: compare refuses captures of parallel workers
   steps:
     - uses: actions/checkout@v4
       with: { fetch-depth: 0 }
@@ -131,32 +159,18 @@ lowrail-profile:
         bin/rails db:test:prepare
         bundle exec lowrail-profile --out tmp/head -- bin/rails test
     - name: Compare
-      shell: bash # pipefail, so tee does not hide compare's exit status
       run: |
-        status=0
         bundle exec lowrail-profile compare tmp/base/report.json tmp/head/report.json --aa tmp/base2/report.json \
-          | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
-        [ "$status" = 1 ] || exit "$status"
-        echo "Profiling head again: a regression fails the job only if it shows twice." | tee -a "$GITHUB_STEP_SUMMARY"
-        bundle exec lowrail-profile --out tmp/head2 -- bin/rails test
-        bundle exec lowrail-profile compare tmp/base/report.json tmp/head2/report.json --aa tmp/base2/report.json \
-          | tee -a "$GITHUB_STEP_SUMMARY"
+          >> "$GITHUB_STEP_SUMMARY" || echo "compare exited $?: not valid evidence, see above" >> "$GITHUB_STEP_SUMMARY"
+    - uses: actions/upload-artifact@v4
+      with: { name: lowrail-profile, path: "tmp/*/report.*" }
 ```
 
 Both checkouts need the gem in their Gemfile; if the base does not have it yet, run the base step with the head's
-Gemfile (`BUNDLE_GEMFILE`). Keep `shell: bash`: without it `tee` turns compare's exit status into 0. Check the suite
-itself in its own job: a failing suite makes compare exit 2. The job runs the suite three times, each twice (six
-suite runs), and twice more only when the first compare exits 1; `--runs` and a narrower command (`bin/rails test
+Gemfile (`BUNDLE_GEMFILE`). Check the suite itself in its own job: a failing suite makes compare exit 2, which the
+summary shows. The job runs the suite three times, twice each, in one process: on openstreetmap-website, whose suite
+takes 81 s on 8 workers, a capture took about 9.5 minutes. `--runs` and a narrower command (`bin/rails test
 test/controllers test/integration`) make it cheaper.
-
-**Why head is profiled again.** One A/A pair is one sample of how much two invocations differ, not a bound, and a
-capture can read other values on a line in both its runs (parallel workers split the requests differently). A
-regression is in every profile of head; such a capture is in one. So a single exit 1 is a place to look, and the job
-fails only when a second profile of head exits 1 too. Measured over every assignment of unchanged captures to base,
-A/A and head: on a generated Blog (12 captures) one compare flagged 1.7% of unchanged heads and the job 0.03% (4 of
-11,880); on a fresh Rails 8.1 app with two process workers (24 captures) 0.8% and 0.16%, from one line whose count
-depends on how the workers split seven requests. Every planted regression was still caught, in both profiles of
-head, on the Blog, Campfire, CodeTriage and Lobsters.
 
 ## Experimental: `--record` and `--workloads`
 

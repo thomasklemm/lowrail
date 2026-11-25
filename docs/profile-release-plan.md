@@ -46,7 +46,8 @@ retained memory.
   released yet"). On Campfire, 19 matches, each checked by hand.
 * `compare BASE HEAD --aa BASE2`: exit 1 on growth beyond a noise floor from an A/A pair, 2 on invalid evidence (a
   failing suite, one run, other command, seed, Ruby or environment, dropped samples, unfinished windows, a malformed
-  report), 0 otherwise; without `--aa` it lists and never gates.
+  report), 0 otherwise; without `--aa` it lists and never gates. Superseded 2026-11-25: 0.1 has no gate, compare
+  is a report ([DECISIONS](DECISIONS.md), [profile-gate-design](profile-gate-design.md)).
 * `--record` writes the suite's 20 most frequent request shapes as `lowrail/workloads.rb` (filtered through
   `filter_parameters`, values as literals, only replayable GETs enabled), and `--workloads` replays that file
   through the full stack in the current `RAILS_ENV`, with the census's client.
@@ -111,7 +112,8 @@ From their public documentation as known on 2026-11-25; not rerun here.
 2. **Framework and gem cost charged to the app line that caused it.** "Your code" ranks app lines by the Rails and
    gem objects allocated beneath them per request. Flamegraphs show the same stacks but leave the aggregation to the
    reader, per request.
-3. **A CI gate with a measured floor that refuses bad evidence.** An A/A pair sets the noise floor per row, and
+3. **A CI gate with a measured floor that refuses bad evidence** (not in 0.1: compare ships as a report, see
+   [profile-gate-design](profile-gate-design.md)). An A/A pair sets the noise floor per row, and
    anything that is not comparable (failing suite, other command, seed or Ruby, dropped samples) exits 2 instead of
    green. No tool above ships an allocation regression gate; derailed's `perf:library` compares two revisions
    without a floor or refusal.

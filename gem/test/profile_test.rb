@@ -124,8 +124,8 @@ class ProfileTest < Minitest::Test
       mails = report["outside_requests"]["mail"]["actions"].to_h { [_1["name"], _1["windows"]] }
       assert_equal({ "ProbeMailer#hello" => [3, 3], "ProbeMailer.deliver_mail" => [3, 3] }, mails)
 
-      # compare: the same report is no regression; one more Probe.many per
-      # index request is, for the line and the action.
+      # compare: the same report lists no regression; one more Probe.many per
+      # index request is listed, for the line and the action (a report: exit 0).
       compare = ->(*paths) { Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "compare", *paths, "--json", chdir: dir) }
       _, _, status = compare.("profile/report.json", "profile/report.json")
       assert_equal 0, status.exitstatus
@@ -134,7 +134,7 @@ class ProfileTest < Minitest::Test
       head["actions"].find { _1["name"] == "WidgetsController#index" }["warm"].map! { _1 + 101 }
       File.write(File.join(dir, "head.json"), JSON.generate(head))
       out, _, status = compare.("profile/report.json", "head.json", "--aa", "profile/report.json")
-      assert_equal 1, status.exitstatus
+      assert_equal 0, status.exitstatus
       assert_equal [["action", "WidgetsController#index"], ["line", "GEM/probe/lib/probe.rb:5"]],
         JSON.parse(out)["regressions"].map { [_1["what"], _1["name"]] }.sort
 

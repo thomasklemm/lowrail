@@ -11,7 +11,8 @@ USAGE = <<~TEXT
          lowrail-profile [options] --workloads [FILE] replay lowrail/workloads.rb (experimental)
          lowrail-profile report [DIR]                 report again from runs kept with --keep-runs
          lowrail-profile compare BASE.json HEAD.json [--aa BASE2.json] [--min N] [--json]
-                                                      exit 1 on a regression, 2 without valid evidence
+                                                      list changes beyond the noise floor (a report: exit 0),
+                                                      exit 2 without valid evidence
 
   Options, all before "--" (everything after it is the command's, unchanged):
     --out DIR         where runs and reports go (default tmp/lowrail-profile): a new or empty
@@ -86,9 +87,9 @@ if args.first == "report"
   exit
 end
 
-# compare BASE.json HEAD.json --aa BASE2.json [--min N] [--json]: exit 1 on a
-# regression beyond the noise floor of the A/A pair BASE and BASE2, 2 when the
-# reports are not valid evidence for one; without --aa, 0 or 2.
+# compare BASE.json HEAD.json --aa BASE2.json [--min N] [--json]: lists changes
+# beyond the noise floor of the A/A pair BASE and BASE2 and exits 0, or 2 when
+# the reports are not valid evidence for a comparison.
 if args.first == "compare"
   require_relative "../lib/lowrail/profile_compare"
   min = Float(opt.("--min", "1"))
