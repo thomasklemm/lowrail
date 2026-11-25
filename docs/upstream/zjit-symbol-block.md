@@ -1876,3 +1876,128 @@ representation for the new per-ISEQ state, so the last question is appropriate, 
 > the send dynamic, so code that runs under `using` isn't recompiled again. With that, the `vm_args.c` extraction is
 > gone and the PR touches only ZJIT. Leaving the send dynamic needed one new bool on `IseqPayload`, next to
 > `was_invalidated_for_singleton_class_creation`; would you rather track that differently?
+
+## Remeasure on `7b03404bd7` (2026-11-25)
+
+Every number in the live body came from old heads: the `run_benchmarks.rb` table from `fbbb9cee7b`, the stats diffs
+from `656ae95dbc`. Since then the VM commit and the C helper are gone, the checks are HIR guards (`GetCref` plus
+`GuardBitEquals` on the refinements, a basic-flag guard on the `Symbol#to_proc` entry), and an `IseqPayload` bool is
+set under the VM lock after a refinements exit. The old `symbol-block` row also had an A/A of 0.859 against a claimed
+1.211. This section measures the head `7b03404bd7f0e08120af0836ce11a6b27d45f5b0` against its master `a43519979c`
+with the method of [Numbers on the final code](#numbers-on-the-final-code) and
+[Reproduce the second round](#reproduce-the-second-round). The proposed body is in
+[ZS1.md](../../bench/upstream/pr-queue/items/ZS1.md); the live body (Lowrail `08f86f1c`'s ZS1.md) is superseded and
+was not PATCHed.
+
+**Setup.** Release builds (`--enable-yjit --enable-zjit --disable-install-doc`, GCC 14.2.0, rustc 1.100.0, baseruby
+4.0.7) of `a43519979c` into `~/w/rm` and of the head into `~/w/rp`; both installs have the same 3,108 files. ruby-bench
+`73918b2` in `~/w/rb-rbm`, railsbench, lobsters and shipit on Rails main `8217632cf8` (without VB1) by path, with
+`gem "prism"`, `load_defaults "8.1"`, `reaping_frequency: 0` and `verify_timeout: 1000000` in each `database.yml`,
+shipit-engine 0.45.0 vendored with
+[`shipit-engine-review_stack.patch`](../../bench/upstream/index_with_ruby_bench/shipit-engine-review_stack.patch), the
+typedstore initializer
+[`census_typedstore_rails_main.rb`](../../fixtures/corpus/ruby-master-round-2/census_typedstore_rails_main.rb) in
+lobsters, and [`attr_read_benchmark.rb`](../../bench/upstream/zs1/attr_read_benchmark.rb) and
+[`symbol_block_benchmark.rb`](../../bench/upstream/zs1/symbol_block_benchmark.rb) as `attr-read` and `symbol-block`.
+8-vCPU orb, nothing else running.
+
+**`run_benchmarks.rb`**, interleaved, 20 warmup and 50 measured iterations (20+20 before; a 20+20 pilot of
+`symbol-block` alone had already given A/A 1.002 against 1.175):
+
+```
+master: ruby 4.1.0dev (2026-11-25T09:23:32Z HEAD a43519979c) +ZJIT +PRISM [x86_64-linux]
+master-again: ruby 4.1.0dev (2026-11-25T09:23:32Z HEAD a43519979c) +ZJIT +PRISM [x86_64-linux]
+symbol-block-arg: ruby 4.1.0dev (2026-11-25T09:56:13Z HEAD 7b03404bd7) +ZJIT +PRISM [x86_64-linux]
+ruby-bench: 73918b2fc1a84702fea63e06f64d179751d69df4-dirty
+
+------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
+bench           master (ms)  master-again (ms)  symbol-block-arg (ms)  master-again 1st itr  symbol-block-arg 1st itr  master/master-again  master/symbol-block-arg
+lobsters       750.6 ± 5.6%       771.1 ± 5.8%           771.5 ± 5.4%                 0.988                     0.960                0.973                    0.973
+railsbench    1405.0 ± 3.4%      1392.4 ± 4.8%          1391.7 ± 3.7%                 0.987                     1.051                1.009                    1.010
+shipit        1108.7 ± 5.5%      1112.7 ± 5.4%          1153.0 ± 6.2%                 0.946                     0.952                0.996                    0.962
+attr-read      265.4 ± 7.8%       266.1 ± 4.6%           222.4 ± 4.4%                 0.997                     1.215                0.997                    1.193
+symbol-block   343.1 ± 7.2%       344.6 ± 6.0%           286.5 ± 7.5%                 1.072                     1.118                0.996                    1.198
+------------  -------------  -----------------  ---------------------  --------------------  ------------------------  -------------------  -----------------------
+```
+
+| bench | A/A | head | head beyond A/A |
+| --- | ---: | ---: | --- |
+| attr-read | 0.997 | 1.193 | yes, 19% against 0.3% |
+| symbol-block | 0.996 | 1.198 | yes, 20% against 0.4% |
+| railsbench | 1.009 | 1.010 | no |
+| lobsters | 0.973 | 0.973 | no |
+| shipit | 0.996 | 0.962 | see the recheck |
+
+* **symbol-block is now outside A/A by a wide margin** (A/A gap 0.4%, effect 19.8%), so it stays in the body. With 50
+  measured iterations the two master columns are 343.1 and 344.6 ms; the old run's 431.4 ms ±13.2% second column
+  was the outlier.
+* **shipit recheck**, the same command with `shipit` alone (20+50): master 1132.5 ± 6.8%, master again
+  1198.1 ± 9.4%, head 1145.3 ± 6.1% ms, A/A 0.945, head 0.989. Shipit's A/A swings 4% to 8% between runs (0.923 on
+  `fbbb9cee7b`), so the 0.962 is within its noise; the body keeps the one main run.
+* MAXRSS is missing from the head's attr-read and railsbench runs: see the stats note below. It is printed after the
+  last iteration, so the times are not affected.
+
+**ZJIT stats**, railsbench, `WARMUP_ITRS=15 MIN_BENCH_ITRS=10 MIN_BENCH_TIME=0`, `--zjit --zjit-stats`, pinned with
+`setarch -R taskset -c 1`, master, master again, head, read with
+[`stats_diff.rb`](../../bench/upstream/zs1/stats_diff.rb) (more than 1%, 1,000 and three times the master A/A):
+
+```diff
+ calls to C functions from JIT code:
+-  rb_vm_send: 5,944,747
++  rb_vm_send: 4,881,169
+-send fallback reasons (total): 16,521,411
++send fallback reasons (total): 15,457,821
+ send fallback reasons:
+-  send_block_arg_not_nil: 2,880,389
++  send_block_arg_not_nil: 2,068,121
+-  one_or_more_complex_arg_pass: 2,631,381
++  one_or_more_complex_arg_pass: 2,380,072
+-dynamic_send_count: 16,521,411
++dynamic_send_count: 15,457,821
+-iseq_optimized_send_count: 75,593,477
++iseq_optimized_send_count: 76,843,509
+-vm_write_stack_count: 65,983,871
++vm_write_stack_count: 65,171,682
+```
+
+`stats_diff.rb` leaves out byte counters, so these are read directly:
+
+| counter | master | master again | head |
+| --- | ---: | ---: | ---: |
+| `zjit_alloc_bytes` | 9,472,315 | 9,472,313 | 9,485,662 |
+| `code_region_bytes` | 11,108,352 | 11,108,352 | 11,161,600 |
+| `total_mem_bytes` | 23,472,443 | 23,472,441 | 23,547,230 |
+| `compiled_iseq_count` | 3,318 | 3,318 | 3,318 |
+
+* `zjit_alloc_bytes` grows by 13,347 bytes (0.14%) against an A/A of 2 bytes, as DECISIONS asks for new per-ISEQ
+  state. The bool sits in `IseqPayload` next to `was_invalidated_for_singleton_class_creation`. The growth is not
+  attributed further; with the same ISEQs compiled, the code region grows by 53,248 bytes (0.48%).
+* The sends moved as on `656ae95dbc`: per iteration about 32,500 fewer `send_block_arg_not_nil` (ISEQ callees) and
+  10,000 fewer `one_or_more_complex_arg_pass` (C callees), 42,500 fewer `rb_vm_send`. Master's totals are lower than
+  on `3be2b028a7` (16.5 instead of 23.1 million fallbacks): master changed, the Symbol sends did not.
+* Neither a refinements exit nor `unhandled_block_arg` appears among the head's side exit reasons.
+* **A first stats run was discarded.** The head's install lacked railsbench's `activerecord-jdbc-adapter` git
+  checkout (Bundler installed it under the first Ruby only), so the harness's `Gem::BUNDLED_GEMS.force_activate("fiddle")`
+  in `get_maxrss` raised `Bundler::GitError` on the head (rescued, no MAXRSS) and ran a full Bundler resolution on
+  master. That resolution runs after the timed iterations but before the stats are printed, and added 287 bundler ISEQ
+  entries, 86 of them pub_grub, to master only (`--zjit-log-compiled-iseqs`: 3,266 against 2,898 entries;
+  `compiled_iseq_count` 3,318 against 2,959, `zjit_alloc_bytes` 9,472,316 against 8,828,799). After copying the
+  checkout into `~/w/rp`, both resolve the same and the three runs above have the same `compiled_iseq_count`.
+
+**Proposed body.** Paragraphs 1 and 2 as before; paragraph 3 says that the first commit builds on Rafael's branch
+and keeps him as its author, and keeps the k0kubun `bac34035c7` / Shopify/ruby#1030 sentence; then one
+`run_benchmarks.rb` block and one railsbench stats diff with `zjit_alloc_bytes` added. The lobsters and shipit stats
+diffs are dropped. About 150 words of prose outside the two blocks (184 counting link URLs).
+
+```sh
+# Release builds: build_rel.sh a43519979c rm; build_rel.sh 7b03404bd7 rp (configure --enable-yjit --enable-zjit).
+./run_benchmarks.rb attr-read symbol-block railsbench lobsters shipit --no-sudo --interleave --warmup=20 --bench=50 \
+  -e "master::$HOME/w/rm/bin/ruby --zjit" -e "master-again::$HOME/w/rm/bin/ruby --zjit" \
+  -e "symbol-block-arg::$HOME/w/rp/bin/ruby --zjit"
+cd benchmarks/railsbench && WARMUP_ITRS=15 MIN_BENCH_ITRS=10 MIN_BENCH_TIME=0 \
+  setarch x86_64 -R taskset -c 1 ruby --zjit --zjit-stats benchmark.rb 2> rm.stats   # rm, rm2, rp
+ruby bench/upstream/zs1/stats_diff.rb rm.stats rm2.stats rp.stats
+```
+
+The orb-local scripts (`build_rel.sh`, `bundle.sh`, `rb.sh`, `stats.sh`) and the raw outputs are in
+`.amp/in/orb-backup/zs1-remeasure/` of orb T-01a2128f-bb21-7639-a023-e933318917ed and are not committed.
