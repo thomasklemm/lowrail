@@ -5,6 +5,10 @@ on Thomas's approval. Support floor reached: Ruby 3.3 and Rails 7.2 (CI matrix 3
 Ruby head). Proof: [profile.md](profile.md#release-candidate-proof-from-the-built-gem-2026-11-25). §1 describes the
 tool before this work.
 
+M5 Astra pass: [review and adversarial checks](upstream/profile-release-astra-review-2026-11-25.md), **changes
+required** (2026-11-25): child exit status, hidden production databases, install paths with spaces, and empty
+measurement validation. Fixes and confirmation are required before M5 can pass; this is not release approval.
+
 [PLAN.md §0.7](PLAN.md#0-what-changed-since-this-plan-2026-10-20) moved Lowrail to discovery first: runtime lowering
 is parked, and measurements feed upstream fixes and advisory types/MCP. This is the third bet: make
 [`lowrail-profile`](profile.md) a tool a Rails team installs on its own app to see avoidable work per request, job,
