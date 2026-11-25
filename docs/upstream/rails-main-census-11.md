@@ -1,7 +1,7 @@
 # Rails-main census 11: main against 8-1-stable before 8.2, with a compatibility sweep
 
 **Result (2026-11-25).** On census 10's 8 apps, Rails main [`cf0325a832`](https://github.com/rails/rails/commit/cf0325a832a1594f01d866da1e4ad23d962d886b)
-is still faster than 8-1-stable in 68 of 71 workloads: a median −6.10% of interpreted instructions (second main run
+is still faster than 8-1-stable beyond 1% in 68 of 71 workloads: a median −6.10% of interpreted instructions (second main run
 −6.30%), and 588 fewer objects per request (71 of 71 workloads lower). Against census 10's main it is a median +0.19%
 (+0.15%), and the growth that shows in all 8 apps is one new cost, **LR1**. #59844 takes a mutex on every connection
 lease lookup: `#lease`, `#checkout_lease` and `Lease#terminated?` add +0.075% of all census-10 instructions in 8 apps, and +3.9k to 4.5k per association reader. A one-line fix is built.
@@ -10,8 +10,9 @@ The compatibility sweep ran the suites of 95 gem variants on both trees. It foun
 **IX1**, the `IndexDefinition` readers that #59850 removed. GitLab, Mastodon, online_migrations and
 active_record_doctor call them. IX1 is now draft rails/rails#59976. **AM2** (#59820: the Action Mailer railtie no
 longer loads Active Job's) also breaks view_component's and money-rails' dummy apps, so its upgrade-guide note UG82M
-now has three gem examples. Every other flag was a known finding or failed on both trees: mobility via #59634, active_model_serializers via
-dynamic `:controller` routes, ransack, draper, ancestry, administrate.
+now has three gem examples. The sweep confirms IX1 in active_record_doctor (17 tests) and online_migrations (5). Every other main-only failure,
+in 36 of 95 suites, comes from a known cause, such as mobility via #59634 or active_model_serializers via dynamic
+`:controller` routes.
 
 ## Ranked findings
 
@@ -78,7 +79,26 @@ candidate `cf0325a832`, seeds 4242 and 1717, two runs per tree. New `known.yml` 
 (view_component, money-rails), SP3 (mobility under #59634, gem-side: shioyama/mobility#692, fix PR #693 unreleased),
 active_model_serializers (dynamic `:controller` route in its test helper, 92d809905b).
 
-**Running (74 of 95 suites done at 14:14 UTC).** Every flag so far matches a known finding; this section is final when the remaining suites finish.
+**Final (14:44 UTC): no unclassified flag.** 59 of 95 suites pass on main as on 8.1 (or fail the same way on both). The
+other 36 fail only on main, every one from a known cause ([summary](data/rails-main-census-11/sweep/summary.md),
+[flags](data/rails-main-census-11/sweep/flags.tsv)):
+
+* **New this round:** IX1 in active_record_doctor 2.1.0 (17 tests: 5 SQLite, 12 PostgreSQL, `IndexDefinition#type`,
+  `ExtraneousIndexesTest` and others) and in online_migrations 0.37.0 (5 tests: `CommandChecker#remove_index` reads
+  `index.type`, [command_checker.rb:585](https://github.com/fatkodima/online_migrations/blob/v0.37.0/lib/online_migrations/command_checker.rb#L585)),
+  and AM2 in view_component (sandbox suite does not load) and money-rails (`money_serializer_spec` does not load).
+* **Known causes, first matched here:** mobility (3 adapters, 368 tests: its `where!` override is skipped since #59634;
+  shioyama/mobility#692, gem-side), active_model_serializers (its test helper draws a dynamic `:controller` route,
+  92d809905b, so no test runs), ancestry's PR #770 branch (positional `Arel::Table.new`, our open #59574).
+* **Known from earlier rounds:** ransack (E2, `SelectManager`), draper, rails-controller-testing, ancestry v5.1.0 (R2-5),
+  administrate (L1), strong_migrations (R2-7, R2-8), scenic (R2-2), shoulda-matchers (R2-1, R2-15), will_paginate
+  (R2-13, R2-18), shrine (R2-14), solid_cache (R2-16, R2-17), store_model (R2-10, R2-11), lograge (R2-3, R2-4),
+  typedstore (A59-1), active_record_query_trace.
+* **Noise:** attr_json browser specs (Selenium setup fails on base), typedstore-main under one seed (passes alone on
+  both trees).
+
+The apps' own suites were not rerun this round; the last app-suite round (main `bdb3d96012`, [app-suites](app-suites.md))
+stands, and the census apps' workloads all ran on main.
 
 ## Method and pins
 
