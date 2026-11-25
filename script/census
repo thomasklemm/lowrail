@@ -3,7 +3,7 @@
 
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
 #   script/census setup    --rails SPEC [--ruby R] [--ruby-overlays DIR] [--apps LIST]
-#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]]
+#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]] [--callgrind[=FLAGS]]
 #   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME|all]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
@@ -438,7 +438,12 @@ module Census
               begin
                 copy_locks[app_dir(opts[:corpus], app)].synchronize do
                   command, flags = opts[:stats] ? ["stats", (ENV["CENSUS_DEFAULT_COUNTERS"] == "1" ? [] : STATS_FLAGS.fetch(mode)) + opts[:stats].split] : ["profile", []]
-                  sh(env, "bundle", "exec", "ruby", *FLAGS.fetch(mode), *flags, HARNESS, command, app, json,
+                  ruby = ["ruby"]
+                  if opts[:callgrind]
+                    command, flags = "callgrind", mode == "zjit" ? opts[:callgrind].split : []
+                    ruby = callgrind_command(json) + ruby + ["-I", ENV.fetch("CGEXT")]
+                  end
+                  sh(env, "bundle", "exec", *ruby, *FLAGS.fetch(mode), *flags, HARNESS, command, app, json,
                     chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
                 end
               rescue RuntimeError
@@ -455,6 +460,13 @@ module Census
       File.write(meta_path, JSON.pretty_generate(meta) + "\n")
       puts "#{label}: #{opts[:modes].size * opts[:apps].size} runs in #{out.delete_prefix(ROOT + "/")}"
     end
+  end
+
+  # Pinned Valgrind (script/bench-valgrind) for run --callgrind; the harness
+  # starts instrumentation itself, so dumps .1, .2, ... are its windows.
+  def callgrind_command(json)
+    [File.join(ENV.fetch("VALGRIND_PREFIX", File.expand_path("~/w/vg319brk")), "bin/valgrind"), "--tool=callgrind",
+      "--instr-atstart=no", "--smc-check=all-non-file", "--callgrind-out-file=#{json.sub(/\.json\z/, ".cg.%p")}"]
   end
 
   def ranked(opts)
@@ -938,6 +950,8 @@ module Census
       o.on("--only WORKLOADS", "run: comma-separated workload names") { opts[:only] = _1 }
       o.on("--stats [FLAGS]", "run: JIT counters per operation instead of allocations, with extra ruby FLAGS " \
         "(e.g. --zjit-trace-exits-sample-rate=20); a ZJIT trace lands in /tmp/perfetto-PID.fxt") { opts[:stats] = _1.to_s }
+      o.on("--callgrind [FLAGS]", "run: Callgrind Ir per operation over the workload mix (harness callgrind), with extra " \
+        "ruby FLAGS for ZJIT; needs VALGRIND_PREFIX (default ~/w/vg319brk) and CGEXT (bench/callgrind.c built)") { opts[:callgrind] = _1.to_s }
       o.on("--jobs N", Integer, "run: apps measured in parallel per mode (default 1)") { opts[:jobs] = _1 }
       o.on("--limit N", Integer) { opts[:limit] = _1 }
       o.on("--tiers LIST", "rank: app-count tier floors (default 7,5,3,2)") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }

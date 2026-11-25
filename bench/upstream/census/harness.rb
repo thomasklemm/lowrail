@@ -301,6 +301,64 @@ module RailsCensus
         totals: after.reject { |_, v| v == 0 }) + "\n")
     end
 
+    # Callgrind Ir per operation over the whole workload mix (script/census run
+    # --callgrind): a cycle runs every workload once. Warm CENSUS_WARMUP cycles,
+    # then at least CENSUS_CG_MIN_WINDOWS warm windows of CENSUS_CG_CYCLES cycles
+    # and on until the JIT counters stay flat over two in a row, then an empty
+    # window (dump 1) and measured windows, each kept as a rejected attempt
+    # (dump 2, 3, ...) until one leaves the counters flat. The minimum makes runs
+    # that go flat at different times measure the same cycles: workloads that
+    # write rows do more work in later cycles.
+    # Needs valgrind --tool=callgrind --instr-atstart=no and bench/callgrind.c.
+    def callgrind(name, output)
+      raise "fresh output required" if File.exist?(output)
+      require "lowrail_callgrind"
+      ops = workloads(name)
+      cycle = -> { ops.each { |op| op.call.call; reset_side_effects } }
+      Integer(ENV.fetch("CENSUS_WARMUP", "50")).times { cycle.call }
+      counters = lambda do
+        if RubyVM::ZJIT.enabled?
+          RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns)
+        elsif RubyVM::YJIT.enabled?
+          RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count)
+        end
+      end
+      cycles = Integer(ENV.fetch("CENSUS_CG_CYCLES", "2"))
+      warm = []
+      attempts = []
+      Integer(ENV.fetch("CENSUS_CG_ATTEMPTS", "4")).times do |attempt|
+        if (last = counters.call)
+          flat = 0
+          min_windows = attempt.zero? ? Integer(ENV.fetch("CENSUS_CG_MIN_WINDOWS", "0")) : 0
+          Integer(ENV.fetch("CENSUS_CG_MAX_WINDOWS", "30")).times do |window|
+            cycles.times { cycle.call }
+            now = counters.call
+            flat = now == last ? flat + 1 : 0
+            warm << now
+            last = now
+            break if flat >= 2 && window + 1 >= min_windows
+          end
+        end
+        if attempt.zero?
+          3.times { GC.start }
+          LowrailCallgrindBench.start(false)
+          LowrailCallgrindBench.finish
+        end
+        3.times { GC.start }
+        before = counters.call
+        gc = GC.stat(:count)
+        LowrailCallgrindBench.start(false)
+        cycles.times { cycle.call }
+        segments = LowrailCallgrindBench.finish
+        after = counters.call
+        gate = before.nil? ? "n/a" : (warm.last(2).uniq.size == 1 && before == after ? "pass" : "fail")
+        attempts << { dump: attempt + 2, gate: gate, gc_segments: segments, gcs: GC.stat(:count) - gc, before: before, after: after }
+        break unless gate == "fail"
+      end
+      File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, mode: mode, rails: rails_sha, pid: Process.pid,
+        workloads: ops.map(&:name), cycles: cycles, ops: ops.size * cycles, warm_windows: warm, attempts: attempts) + "\n")
+    end
+
     # Where site keys point on disk, so script/census app's report can quote
     # each line's source: GEM/ is relative to the first ".../gems/" of a gem path.
     def source_roots
@@ -339,6 +397,7 @@ if $PROGRAM_NAME == __FILE__
   when "profile" then RailsCensus.profile(name, output)
   when "list" then RailsCensus.list(name)
   when "stats" then RailsCensus.stats(name, output)
+  when "callgrind" then RailsCensus.callgrind(name, output)
   when "init"
     load File.join(__dir__, "app_workloads.rb")
     CensusAppWorkloads.init(RailsCensus, output)
