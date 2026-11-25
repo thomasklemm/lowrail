@@ -6,7 +6,7 @@ kind: perf
 area: QRUtil.rszf (right shift zero fill)
 reviewer: whomwah
 branch: thomasklemm/rszf-without-bignums
-head: "51c099c822bf9c98cec301a350b5b21b0a84960f"
+head: "16d8339f455d3a1e15fb5b6860f22ef5cf6b82da"
 base: main
 built_on: "ca75f7a55a"
 introduced_by: "5f6de842aa88085ce764f960316ef365bfeff72a"
@@ -20,7 +20,7 @@ rank:
 risky: false
 state: in-review
 pr:
-note: "2026-11-25 (oss-profile-sweep-1): found by lowrail-profile on Dawarich and Redmine (docs/upstream/oss-profile-sweep-1.md). Ownership: no open PR or issue in whomwah/rqrcode_core; #28 (2021) added the ARCH_BITS env override instead of changing the default, #51 (2026) documented ARCH_BITS=32 as recommended and kept the default; not in the queue or the bundled ledger. Built on main ca75f7a55a: rake test 103 runs, 0 failures with ARCH_BITS 64 and 32, standardrb clean; the new test fails without the masked fallback. rszf equals the old formula on 261,495 (64) and 132,759 (32) cases across signs and sizes, and the QR text of 304 strings is identical on main and branch under both settings (orb backup sweep/rq_diff.rb). Body numbers: objects only (bench/upstream/oss_profile_sweep_1/body/RQ1, objects.sh, script/upstream-bench's own objects worker with the fixed heap, base twice, A/A identical); no Callgrind cell, because a 3,000-call warm-up at ~35 ms per call under Valgrind takes hours, so no instruction or time claim. Thermos-sol changes on this head: body scope/final-mask wording, two missing test boundaries, CHANGELOG; exact fixes and independent evidence below For Thomas. No upstream edits or publication."
+note: "2026-11-25 (oss-profile-sweep-1): found by lowrail-profile on Dawarich and Redmine (docs/upstream/oss-profile-sweep-1.md). Ownership: no open PR or issue in whomwah/rqrcode_core; #28 (2021) added the ARCH_BITS env override instead of changing the default, #51 (2026) documented ARCH_BITS=32 as recommended and kept the default; not in the queue or the bundled ledger. Built on main ca75f7a55a: rake test 103 runs, 0 failures with ARCH_BITS 64 and 32, standardrb clean; the new test fails without the masked fallback. rszf equals the old formula on 261,495 (64) and 132,759 (32) cases across signs and sizes, and the QR text of 304 strings is identical on main and branch under both settings (orb backup sweep/rq_diff.rb). Body numbers: objects only (bench/upstream/oss_profile_sweep_1/body/RQ1, objects.sh, script/upstream-bench's own objects worker with the fixed heap, base twice, A/A identical); no Callgrind cell, because a 3,000-call warm-up at ~35 ms per call under Valgrind takes hours, so no instruction or time claim. Thermos-sol changes on this head: body scope/final-mask wording, two missing test boundaries, CHANGELOG; exact fixes and independent evidence below For Thomas. No upstream edits or publication. 2026-11-25 (R1-R3 applied): head 16d8339f45 amends 51c099c822 on the same main ca75f7a55a. R1: body replaced with Thermos-sol's exact text (mask construction allocates temporary Bignums, exclusive bound below 2**ARCH_BITS, equivalence scoped to QR generation's integer calls, one no-JIT table row, no repeated numbers); commit message scoped the same way; no guards added for fractional counts, duck types, huge shifts or ARCH_BITS. R2: rszf(1 << bits, 0) and rszf(1, bits) added to the test; both pass on base and head at widths 64 and 32, and the `<= RSZF_LIMIT` and `count % ARCH_BITS` mutants each fail at width 64 and 32 (test lines 176 and 177). R3: Unreleased CHANGELOG entry. rake test 103 runs, 2,857 assertions, 0 failures at ARCH_BITS 64 and 32; standardrb 31 files, no offenses; Thomas author/committer, no trailers, fork pre-push hook installed; lease-pushed over 51c099c822. Confirm pass by thermos-sol pending."
 ownership: {date: 2026-11-25, checked: ["open PRs cross-referencing #28","open PRs naming rszf that change lib/rqrcode_core/qrcode/qr_util.rb","whomwah/rqrcode_core#27 and what references it","whomwah/rqrcode_core#28 and what references it","whomwah/rqrcode_core#51 and what references it"], hits: ["tracker: whomwah/rqrcode_core#27 (closed): Memory allocation issue","tracker: whomwah/rqrcode_core#28 (merged): Alternative ZFRS to improve memory allocation","tracker: whomwah/rqrcode_core#51 (merged): Using AI Assistant to identity (and fix) performance bottlenecks"]}
 passes:
   - reviewer: thermos-sol
@@ -41,19 +41,17 @@ passes:
 
 # Skip the Bignum mask in rszf when it cannot change the result
 
-On a 64-bit Ruby, `QRUtil.rszf` builds `(1 << (64 - count)) - 1` on every call, and for a count of 0, 1 or 2 that mask is a Bignum. One QR code calls it often enough that these masks are most of what it allocates:
+While profiling TOTP setup pages, `QRUtil.rszf` stood out for allocating temporary Bignums while building its mask. On a 64-bit Ruby this happens for counts of 0, 1 and 2; they account for most allocations for this provisioning URI:
 
 ```ruby
 RQRCodeCore::QRCode.new("otpauth://totp/Redmine:jsmith%40somenet.foo?secret=ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&issuer=Redmine")
-# 45,453 objects before, 6,055 after
 ```
 
-For a value from 0 up to `2**ARCH_BITS`, `num >> count` already fits the mask, so `rszf` now returns it directly; negative and larger values still take the masked path. The results are the same as before under both `ARCH_BITS` settings, and the default now allocates what `RQRCODE_CORE_ARCH_BITS=32` did, without the environment variable.
+For the integer arguments used by QR generation, the shift already fits the mask when `0 <= num && num < 2**ARCH_BITS`, so those calls now skip it. Negative and larger integers keep the masked calculation. The default width and `RQRCODE_CORE_ARCH_BITS` override stay unchanged.
 
-| Objects per `QRCode.new` (Ruby 4.0.9) | main | branch |
+| Objects per `QRCode.new` (Ruby 4.0.9, no JIT) | main | branch |
 | --- | ---: | ---: |
-| no JIT | 45,453 | 6,055 |
-| YJIT | 45,453 | 6,055 |
+| TOTP provisioning URI | 45,453 | 6,055 |
 
 ## For Thomas
 
