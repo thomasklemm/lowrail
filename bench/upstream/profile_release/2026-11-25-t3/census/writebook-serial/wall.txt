@@ -1,0 +1,14 @@
+s1 exit 0 wall 75.524953456 at 21:17:58
+s1 tree unchanged
+s2 exit 0 wall 78.600405017 at 21:19:16
+s2 tree unchanged
+s3 exit 0 wall 71.911164424 at 21:20:28
+s3 tree unchanged
+s4 exit 0 wall 66.545852416 at 21:21:35
+s4 tree unchanged
+s5 exit 0 wall 67.774276978 at 21:22:43
+s5 tree unchanged
+s6 exit 0 wall 67.498811935 at 21:23:51
+s6 tree unchanged
+splanted exit 0 wall 66.636739893 at 21:24:57
+splanted2 exit 0 wall 67.542549083 at 21:26:05
