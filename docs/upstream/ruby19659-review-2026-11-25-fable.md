@@ -211,3 +211,33 @@ today, so the reply is true once the head is there). Optional, same precision as
 > Moved it into the argument planner: `plan_block_iseq_direct_args` plans the block's lead args as a `SendDirectCall`,
 > and `InvokeBlockIseqDirect` goes through `emit_send_direct_args` like `SendDirect`, so its snapshot has the block's
 > args in place of the `yield`'s and the original stays as `exit_state`. The `argc` field is gone.
+
+## Candidate -6 text-only confirm (2c54ad31f3)
+
+Head [`2c54ad31f3`](https://github.com/thomasklemm/ruby/commit/2c54ad31f38328477b5e0be3eeecc5e554313134) on
+`thomasklemm/zjit-yield-surplus-args-6`, fetched from the fork. **Verdict: approve.** Both must-fixes are resolved
+and nothing new is required.
+
+* **Commit.** One commit, parent `f70ba2530d`, Thomas as author and committer, author date `1793661856 +0000`
+  kept, no trailers.
+* **Tree diff.** `git diff 2f73e7b80a 2c54ad31f3` is `zjit/src/hir.rs` +1/−3, comments only. The doc line above
+  `push_invoke_block_iseq_direct_insn` is deleted. The one above `plan_block_iseq_direct_args` now reads "Requires
+  can_direct_invoke_block_iseq to have accepted this call."; it states a precondition the signature doesn't show
+  (the slice would panic without the gate), in one line, so it stays. Executable code and tests are unchanged, so
+  the runs on `2f73e7b80a` above apply. On the -6 sources: `yield` 51/51, `getblockparamproxy` 20/20.
+* **Commit message**, sentence by sentence: accurate. "Simple non-lambda blocks" matches the gate
+  (`rb_simple_iseq_p`), and the snapshot wording is the exact one. The one new claim is "test_getblockparamproxy
+  now passes the same block ISEQ on every call, so the yield in Kernel#then doesn't miss its ISEQ guard". Run
+  here: with master's test body (`test { 1 }` in the setup and again in the assertion) the test fails on -6 with
+  "Program side-exited". The same shape as a script at `--zjit-call-threshold=2 --zjit-stats` shows 6 side exits,
+  all `invoke_block_iseq_changed`; with one block ISEQ (`def with_block = test { 1 }`) it shows none.
+* **Body.** The item's body differs from the live body only by the deleted " (YJIT also leaves these out)". The
+  YJIT clause that remains ("and YJIT does the same", for the surplus drop) is backed by the surplus row of the
+  YJIT table above.
+* **Reply.** "Moved argument normalization into the planner": the plan function sits with the other
+  `plan_send_direct_*` functions and returns their type. "builds a `SendDirectCall` for the block's lead args":
+  `args[..lead_num]` as `SendDirectArg::Existing`. "uses `emit_send_direct_args` like `SendDirect`": all three
+  construction sites go through the one helper that calls it. "Its snapshot has the block's args in place of the
+  `yield`'s": `with_replaced_args`. "`exit_state` keeps the original yield snapshot for exits before the call":
+  the stack overflow check, the instruction's only exit before the call, exits with it. "The `argc` field is
+  gone": true on -6; the PR head `c65c6f4c49` still has it, so the reply is true only once -6 is pushed there.
