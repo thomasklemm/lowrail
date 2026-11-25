@@ -294,7 +294,9 @@ module RailsMainCensus4
     keys.to_h { [_1, after[_1] - before[_1]] }.merge(ops: ops, latest_gc_by: GC.latest_gc_info(:gc_by),
       major_by: major_by, forced_major_by_slot: forced&.call&.to_h { |s, n| [s, n - forced_before.fetch(s, 0)] },
       heaps: (GC.stat_heap.to_h { |_, h| [h[:slot_size], h.slice(:heap_eden_pages, :heap_free_slots, :heap_live_slots)] } if forced),
-      rss_kb_growth: File.read("/proc/self/statm").split[1].to_i * 4 - rss)
+      rss_kb_growth: File.read("/proc/self/statm").split[1].to_i * 4 - rss,
+      rss_kb_end: File.read("/proc/self/statm").split[1].to_i * 4,
+      rss_kb_hwm: File.read("/proc/self/status")[/^VmHWM:\s+(\d+)/, 1].to_i)
   end
 
   def profile(name, output)

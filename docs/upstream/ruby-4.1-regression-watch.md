@@ -498,115 +498,205 @@ Community 8.4.10 tarball on port 3307). The sqlite3 exit deadlock was reaped 20 
 [`gcstep/vs17251-*`](../../fixtures/corpus/ruby-41-watch/gcstep/). The orb had 8 CPUs and 15 GB, which was enough for
 all ten apps.
 
-### Against ruby/ruby#17251, new head `57eb4b4274` (2026-11-24)
+### Against ruby/ruby#17251, new head `57eb4b4274` (2026-11-24, re-tested 2026-11-25)
 
 eightbitraptor pushed two commits ("Trigger nofree majors on a per-heap basis", "Remove RUBY_GC_HEAP_FREE_SLOTS"): a
 heap short of free slots now also takes a major when the old generation has grown more than 1.25× since the last
 major, and after a major that frees ≥ 10% of old objects the next oldgen limit is 1.25× instead of 2× (back to 2×
 below 5%). He asked whether RSS growth comes down without losing the gains in majors and GC time
-([comment](https://github.com/ruby/ruby/pull/17251#issuecomment-7130412627)). Three builds on the PR's base, master
-[`dec1bb786f`](https://github.com/ruby/ruby/commit/dec1bb786f718840e7ea828fafdcc3cd29c64448): master, master + the
-previous head `41c689571a` (applies cleanly), and the new head `57eb4b4274` (= `dec1bb786f` + its two commits). Each
-has the measurement-only `gcstep.patch`, ported to master's new pool condition (`heap->free_pages->free_next`,
-[`gcstep-dec1bb786f.patch`](../../fixtures/corpus/ruby-41-watch/gcstep/vs17251-2026-11-24/gcstep-dec1bb786f.patch));
-they differ only in `gc/default/default.c`. Same cells as [round 2 section 5](ruby-master-round-2.md#5-gc-pool-budget-re-verified-pr-queue-item-gc):
-ruby-bench `73918b2` shipit (`HARNESS=gcstep`, 15 warm-up + 40 measured iterations) and the 35-workload census
-(Blog, Fizzy, Lobsters, `--corpus census5`, Rails main `50c54eed06`, `CENSUS_GC_OPS=500`, `CENSUS_GC_MAJOR_BY=1`),
-now under the interpreter and YJIT. Two rounds (A/A), the three builds alternating per cell. Our pool-budget branch
-is not in this comparison.
+([comment](https://github.com/ruby/ruby/pull/17251#issuecomment-7130412627)). A first pass (two rounds, commit
+`321e07b0`) left the census RSS question inside master's own A/A spread; this re-test replaces it.
 
-**shipit** (sums over the 40 measured iterations):
+**Builds.** The PR head is still `57eb4b4274` on base
+[`dec1bb786f`](https://github.com/ruby/ruby/commit/dec1bb786f718840e7ea828fafdcc3cd29c64448). Master has moved to
+[`760125a4c5`](https://github.com/ruby/ruby/commit/760125a4c5c6b11f33e40c12cd1702ac4258b908), whose last commit
+("Don't force a major GC for a heap smaller than its initial size", ruby/ruby#20110) edits the same branch of
+`gc_sweep_finish_heap`; the new head's hunk there no longer applies. I kept the PR's base and added current master as
+a separate reference, without rebasing the PR. Builds, all `--enable-yjit`, differing only in `gc/default/default.c`
+except the last: master `dec1bb786f`; old head `41c689571a` on it; new head (`dec1bb786f` + its two commits); master +
+the gcstep patch (control); master `760125a4c5`. The main builds carry **no** gcstep patch: the question is about
+RSS, majors and GC time, not sweep steps, and the control shows the patch does not move those (below). Our pool-budget
+branch is not in this comparison.
 
-| mode | build | majors a / b | minors a / b | GC ms a / b | peak RSS MB a / b | sweep pause p99 / max ms | large-slot step p99 / max ms |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| interp | master | 30 / 29 | 101 / 98 | 3,736 / 3,623 | 147 / 147 | 0.59–0.61 / 1.4 | 0.04–0.05 / 0.1 |
-| interp | old head `41c689571a` | 3 / 4 | 134 / 124 | 2,374 / 2,308 | 174 / 177 | 0.65 / 1.5 | 0.02–0.04 / 0.1 |
-| interp | new head `57eb4b4274` | 8 / 8 | 150 / 167 | 2,680 / 2,498 | 149 / 148 | 0.59–0.66 / 1.2 | 0.02–0.06 / 0.1 |
-| YJIT | master | 29 / 32 | 97 / 103 | 4,230 / 4,334 | 196 / 195 | 0.55–0.63 / 1.3 | 0.04–0.06 / 0.1 |
-| YJIT | old head | 4 / 4 | 136 / 132 | 2,626 / 2,493 | 219 / 223 | 0.63–0.72 / 1.5 | 0.02–0.05 / 0.1 |
-| YJIT | new head | 8 / 9 | 157 / 169 | 2,707 / 2,944 | 198 / 197 | 0.62–0.63 / 1.7 | 0.03–0.06 / 0.1 |
+**Cells.** One sequential queue, nothing else on the orb (2 CPUs, 3.9 GB). shipit: ruby-bench `73918b2`,
+`HARNESS=gcstep`, 15 warm-up + 40 measured iterations, 6 rounds × interp/YJIT, build order rotated each round, so
+the round-to-round spread of each build is its A/A. Attribution: 3 more shipit rounds with
+[`gcmajors`](../../fixtures/corpus/ruby-41-watch/gcstep/vs17251-2026-11-24/gcmajors/gcmajors.c), a GC_START/
+GC_END_SWEEP tracepoint that records each GC's `major_by`, its time (marking plus all its lazy sweep steps), and
+`old_objects` before and after it with the resulting `old_objects_limit`. Census: Blog, Fizzy, Lobsters
+(`--corpus census5`, Rails main `50c54eed06`, round 2's Fizzy and Lobsters workarounds as Ruby overlays), 35 workloads,
+**5 rounds** × interp/YJIT, `CENSUS_GC_OPS=1000` (one 1,000-operation window per workload instead of 500),
+`CENSUS_REQUESTS=0`. RSS is now the process RSS after each app's last window (`rss_kb_end`, new) and its peak
+(`VmHWM`, `rss_kb_hwm`, new), per app, instead of the sum of 35 window growths. bigslot: 9 runs per build, alternating,
+then 9 more each with and without the gcstep patch.
 
-**Census** (sums over the 35 windows, 17,500 operations per round; RSS growth summed as before):
+**shipit** (6 rounds; median, min–max over rounds; sums over the 40 measured iterations):
 
-| mode | build | majors a / b (`nofree`) | minors a / b | GC ms a / b | RSS growth MB a / b | sweep pause p99 / max ms | large-slot step p99 / max ms | heaps that forced majors |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| interp | master | 24 / 10 (23 / 9) | 207 / 191 | 6,443 / 5,158 | +25.4 / −47.7 | 2.24 / 1.79 – 19.1 | 0.52 / 0.45 – 2.0 | 640, 768, 1024, 96, 128 B |
-| interp | old head | 1 / 2 (0 / 1) | 204 / 212 | 4,644 / 4,611 | +35.5 / +42.2 | 1.79 / 1.80 – 23.0 | 0.57 / 0.53 – 2.4 | 32 B 1 (round b) |
-| interp | new head | 1 / 1 (0 / 0) | 214 / 218 | 4,629 / 4,350 | +35.0 / +42.0 | 1.95 / 1.79 – 23.0 | 0.52 / 0.62 – 2.0 | none |
-| YJIT | master | 10 / 12 (9 / 11) | 189 / 196 | 5,573 / 5,623 | −4.6 / +52.2 | 2.12 / 1.87 – 18.9 | 0.48 / 0.61 – 2.3 | 768, 96, 128, 640, 1024 B |
-| YJIT | old head | 1 / 1 (0 / 0) | 217 / 213 | 4,667 / 4,554 | +68.9 / +72.5 | 1.89 / 1.61 – 23.5 | 0.59 / 0.57 – 2.1 | none |
-| YJIT | new head | 1 / 1 (0 / 0) | 215 / 206 | 4,564 / 4,575 | +85.6 / +66.1 | 2.79 / 1.74 – 20.7 | 0.65 / 0.54 – 2.2 | none |
+| mode | build | majors | minors | GC ms | peak RSS MB |
+| --- | --- | ---: | ---: | ---: | ---: |
+| interp | master `dec1bb786f` | 28 (27–31) | 100 (95–102) | 3,647 (3,489–4,074) | 147 (146–148) |
+| interp | old head `41c689571a` | 3 (3–4) | 126 (120–134) | 2,355 (2,141–2,438) | 173 (170–176) |
+| interp | new head `57eb4b4274` | 8 (8–9) | 155 (154–156) | 2,687 (2,629–2,752) | 149 (148–150) |
+| interp | master `760125a4c5` | 6 (6–6) | 196 (186–207) | 2,722 (2,593–2,868) | 151 (150–153) |
+| YJIT | master `dec1bb786f` | 29 (28–30) | 98 (95–106) | 4,510 (4,239–4,865) | 196 (195–197) |
+| YJIT | old head | 4 (3–4) | 132 (124–152) | 2,468 (2,305–2,584) | 219 (215–222) |
+| YJIT | new head | 8 (8–9) | 161 (156–172) | 2,891 (2,763–3,159) | 197 (195–198) |
+| YJIT | master `760125a4c5` | 6 (6–7) | 209 (190–238) | 2,860 (2,814–2,927) | 198 (194–201) |
 
-Per app (RSS growth MB / majors, rounds a and b), the two heads agree everywhere but one cell (Lobsters YJIT round
-a, +44.9 against +28.6 to +30.3 in the other three head cells): interp Blog old +18.1/0, +21.1/1, new +15.6/0,
-+20.8/0; Fizzy old +1.4/1, +3.9/1, new +1.8/1, +4.7/1; Lobsters old +16.0/0, +17.2/0, new +17.6/0, +16.6/0. YJIT
-Blog old +31.1/0, +32.8/0, new +31.2/0, +27.9/0; Fizzy old +8.8/1, +9.4/1, new +9.5/1, +9.6/1; Lobsters old +29.1/0,
-+30.3/0, new +44.9/0, +28.6/0. Master's negative sums are Fizzy (−12.6 / −78.9 interp, −70.1 / −9.6 YJIT), where its
-majors return pages during the window.
+Paired by round, new head − old head: peak RSS −23.7 MB interp (−27.6 to −20.9) and −21.8 MB YJIT (−25.3 to −19.8),
+lower in 6/6 rounds each; GC time +374 ms interp (+245 to +498) and +496 ms YJIT (+362 to +628), higher in 6/6 each.
+New head − master `dec1bb786f`: peak RSS +1.9 / +1.0 MB, GC time −969 / −1,590 ms (lower 6/6). New head − master
+`760125a4c5`: GC time −44 / +40 ms (lower 4/6 and 2/6, within A/A), peak RSS −2.5 / −0.8 MB. Master + gcstep patch −
+master (3 rounds): majors +1 / −2, peak RSS −0.1 / +0.6 MB, GC time +42 / −207 ms, inside master's own spread.
 
-**bigslot** (`RING=200 BIG=70 N=40000`, three runs alternating; `nofree` majors / 640 B heap pages): master 10, 10,
-10 / 11; old head 2, 11, 2 / 5, 4, 5; new head 2, 2, 2 / 5. Master's count is lower than on 11-14 (28 on
-`b7e8fad022`); `8bf6b129d3` ("Only pool pages in heaps with at least 2 free pages") is the pool change in between,
-not bisected.
+**Where the new head's extra shipit GC time comes from** (attribution rounds, 3 rounds, totals):
+
+| mode | build | majors `nofree` / `oldgen` | limit after each major | ms per major | major ms per round | minor ms per round | GC ms per round |
+| --- | --- | ---: | --- | ---: | ---: | ---: | ---: |
+| interp | master | 89 / 0 | 2× | 75 | 2,232 | 1,503 | 3,793 |
+| interp | old head | 10 / 0 | 2× | 78 | 261 | 1,806 | 2,250 |
+| interp | new head | 1 / 23 | 1.25× | 77 | 615 | 1,956 | 2,694 |
+| YJIT | master | 87 / 0 | 2× | 100 | 2,902 | 1,572 | 4,535 |
+| YJIT | old head | 10 / 0 | 2× | 109 | 363 | 1,909 | 2,420 |
+| YJIT | new head | 1 / 24 | 1.25× | 102 | 849 | 2,102 | 3,091 |
+
+On the new head, all but one major per mode is `oldgen`: old objects reach the 1.25× limit (e.g. 365k after a major,
+next major at 457k–462k), each major frees about 20% of them (458k → 366k), which keeps the reclaim ratio above 10%
+and the limit at 1.25×. The new 1.25× `nofree` trigger fires once per mode; the oldgen limit preempts it. Every old-head
+major is `nofree`, taken when old objects were already above 1.25× the last major's, with the 2× limit. A major costs
+the same on both heads (77–78 ms interp, 102–109 ms YJIT), so the ~5 extra majors per round explain +354 ms interp
+and +486 ms YJIT of the +444 / +671 ms gap; the rest is minors (+150 / +193 ms; more minors, each cheaper).
+
+**Census** (35 workloads, 5 rounds; median, min–max; RSS is the sum over the three apps of the RSS after each app's
+last window):
+
+| mode | build | majors | minors | GC ms | RSS at end MB | peak RSS MB |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| interp | master | 92 (83–93) | 572 (520–580) | 15,759 (15,131–18,184) | 689 (680–704) | 690 (683–706) |
+| interp | old head | 1 (0–2) | 577 (566–714) | 10,392 (9,669–10,587) | 699 (653–732) | 701 (653–732) |
+| interp | new head | 1 (1–3) | 711 (670–797) | 10,383 (9,997–11,125) | 676 (667–686) | 676 (667–691) |
+| YJIT | master | 71 (65–102) | 478 (472–618) | 17,336 (15,641–19,853) | 913 (892–924) | 913 (892–924) |
+| YJIT | old head | 0 (0–1) | 663 (547–726) | 9,867 (9,003–10,026) | 889 (875–899) | 889 (876–899) |
+| YJIT | new head | 0 (0–0) | 690 (628–812) | 9,730 (9,458–10,934) | 881 (853–890) | 881 (854–890) |
+
+Per app, RSS after the app's last window, MB (median, min–max, 5 rounds):
+
+| mode | app | master | old head | new head | new − old by round, lower in |
+| --- | --- | ---: | ---: | ---: | --- |
+| interp | Blog | 170 (169–170) | 164 (160–176) | 171 (163–177) | +3.7, 1/5 |
+| interp | Fizzy | 285 (269–298) | 286 (267–326) | 281 (265–294) | −5.2, 5/5 |
+| interp | Lobsters | 236 (234–241) | 237 (225–242) | 225 (217–229) | −11.8, 5/5 |
+| YJIT | Blog | 218 (216–219) | 208 (206–218) | 207 (206–208) | −0.3, 4/5 |
+| YJIT | Fizzy | 375 (363–396) | 374 (360–397) | 383 (359–386) | −0.6, 3/5 |
+| YJIT | Lobsters | 319 (300–321) | 300 (296–317) | 297 (287–306) | −2.7, 3/5 |
+
+Paired by round: the new head's total RSS is below master's in 5/5 rounds in both modes (−17.3 MB interp, −27.1 MB
+YJIT); against the old head it is −22.7 MB interp and −8.4 MB YJIT, lower in only 3/5 rounds each, so within noise.
+Total GC time new − old: +328 ms interp (lower 2/5), +80 ms YJIT (lower 2/5), within noise; both heads are 34% (interp)
+and 43–44% (YJIT) below master in every round. One per-app GC difference is consistent: Lobsters, new head higher in
+5/5 rounds (+454 ms interp, +256 ms YJIT), from more minors (337 against 243 interp), not majors (0 on both).
+Master `760125a4c5` ran only round 1's interp Blog cell before it was dropped for time (0 majors, 783 ms, 171 MB).
+
+**bigslot** (`RING=200 BIG=70 N=40000`, `nofree` majors per run, 18 runs per head in two alternating sets): master
+`dec1bb786f` 8–11; old head 3–12 (bimodal: 3–5 or 9–12); new head 5–12 (mostly 9); master `760125a4c5` 6–7. With the
+gcstep patch: master 10–14, old head 2–12 (mostly 2–3), new head 5–12. bigslot's count depends on the run more than on
+the build, and the first pass's new head 2, 2, 2 did not recur in 18 runs with or without the patch; it does not
+separate the heads and is left out of the reply.
 
 **What this shows.**
 
-* **shipit: RSS growth came down, and most of the gains held.** Peak RSS is back to master's (148–149 MB interp,
-  197–198 MB YJIT; old head 174–177 and 219–223; master 147 and 195–196). Majors are 8–9 instead of the old head's
-  3–4 (master 29–32). GC time against master is −30% interp (3,680 → 2,589 ms, means of a and b) and −34% YJIT
-  (4,282 → 2,826 ms), against −36% and −40% for the old head (2,341 and 2,560 ms). The new head's GC time is about
-  10% above the old head's, a gap larger than any build's A/A spread (66–237 ms) but small against master's.
-* **Census: no change from the old head, in either direction.** Majors stay at 1 per round (master 10–24), GC time
-  is the same (4,350–4,629 ms interp, 4,564–4,575 ms YJIT, master 5,158–6,443), and RSS growth is the same
-  (+35.0 / +42.0 against +35.5 / +42.2 interp; +85.6 / +66.1 against +68.9 / +72.5 YJIT, the YJIT gap being the one
-  Lobsters cell). Majors are equal, so the new 1.25× trigger added no majors in these 500-operation windows; RSS growth
-  above master stays (+10 to +90 MB per round), within master's own A/A spread (73 and 57 MB).
-* Sweep pauses and large-slot sweep steps do not move: census sweep-pause p99 1.6–2.8 ms and max 17–24 ms in every
-  cell, large-slot step p99 0.45–0.65 ms; shipit sweep-pause p99 ≤ 0.72 ms, max ≤ 1.7 ms.
+* **shipit: RSS came back, most of the gain stayed.** Peak RSS is master's (149 / 197 MB against 147 / 196), 22–24 MB
+  below the old head in every round. Majors 8 against the old head's 3–4 (master 28–29). GC time −26% interp and
+  −36% YJIT against master, against −35% and −45% for the old head; the gap to the old head is outside the A/A in
+  every round.
+* **The extra shipit GC time is the 1.25× oldgen limit, not the 1.25× nofree trigger.** 23–24 of 24–25 majors are
+  `oldgen` at a 1.25× limit that stays on because each major frees ~20% of old objects; their extra count times an
+  unchanged per-major cost is 70–80% of the gap.
+* **Census: same majors and GC time as the old head; RSS at or below master's.** 0–3 majors per round (master
+  65–102), GC time equal to the old head's within noise, total RSS below master's in every round. Against the old
+  head the RSS difference is resolved only for Fizzy and Lobsters under the interpreter (−5 and −12 MB, 5/5), where
+  the new head is lower.
+* Current master `760125a4c5` alone gets shipit close to the new head (6 majors, same GC time within A/A, 1–3 MB more
+  RSS), so the PR's shipit gain over today's master is small; it needs a rebase there.
 
 **Reply draft (not posted; Thomas approves):**
 
-> @eightbitraptor Yes on shipit; the Rails workloads look the same as on the previous head. I built master
-> `dec1bb786f` (this PR's base), the previous head `41c689571a` cherry-picked onto it, and the new head `57eb4b4274`,
-> Linux x86_64, each run twice in alternation.
+> @eightbitraptor Yes: on the new head peak RSS is back to master's on shipit, majors stay far below master, and GC
+> time keeps most of the gain. The extra GC time against the previous head comes from the 1.25× oldgen limit rather
+> than the new nofree trigger. I built master `dec1bb786f` (this PR's base), the previous head `41c689571a` on it and
+> the new head `57eb4b4274`, Linux x86_64, `--enable-yjit`, and alternated them. Each cell is the median over rounds,
+> with the range across rounds in brackets.
 >
-> | shipit, 2 rounds | master | previous head | new head |
+> **shipit**, 6 rounds, 40 measured iterations each:
+>
+> | | master | previous head | new head |
 > | --- | ---: | ---: | ---: |
-> | interpreter, majors | 30, 29 | 3, 4 | 8, 8 |
-> | interpreter, GC time ms | 3,736, 3,623 | 2,374, 2,308 | 2,680, 2,498 |
-> | interpreter, peak RSS MB | 147, 147 | 174, 177 | 149, 148 |
-> | YJIT, majors | 29, 32 | 4, 4 | 8, 9 |
-> | YJIT, GC time ms | 4,230, 4,334 | 2,626, 2,493 | 2,707, 2,944 |
-> | YJIT, peak RSS MB | 196, 195 | 219, 223 | 198, 197 |
+> | interpreter, peak RSS MB | 147 (146–148) | 173 (170–176) | 149 (148–150) |
+> | interpreter, majors | 28 (27–31) | 3 (3–4) | 8 (8–9) |
+> | interpreter, GC time ms | 3,647 (3,489–4,074) | 2,355 (2,141–2,438) | 2,687 (2,629–2,752) |
+> | YJIT, peak RSS MB | 196 (195–197) | 219 (215–222) | 197 (195–198) |
+> | YJIT, majors | 29 (28–30) | 4 (3–4) | 8 (8–9) |
+> | YJIT, GC time ms | 4,510 (4,239–4,865) | 2,468 (2,305–2,584) | 2,891 (2,763–3,159) |
 >
-> | 35 Rails workloads, 2 rounds | master | previous head | new head |
+> Against the previous head, peak RSS is 22–24 MB lower in every round, and GC time is 374 ms (interpreter) and
+> 496 ms (YJIT) higher in every round. Against master, GC time is still 26% and 36% lower.
+>
+> Recording every GC in 3 more shipit rounds shows where the extra time goes:
+>
+> | shipit, 3 rounds | previous head | new head |
+> | --- | ---: | ---: |
+> | majors by nofree / oldgen | 10 / 0 | 1 / 23 (YJIT 1 / 24) |
+> | oldgen limit after a major | 2× | 1.25× |
+> | ms per major, interpreter / YJIT | 78 / 109 | 77 / 102 |
+> | major GC ms per round, interpreter / YJIT | 261 / 363 | 615 / 849 |
+>
+> Each new-head major frees about 20% of old objects, so the limit stays at 1.25×, and the old generation reaches it
+> before a heap triggers the new 1.25× nofree check. A major costs the same on both heads, so the extra majors account
+> for 70–80% of the GC time gap; slightly more minors account for the rest.
+>
+> **Rails workloads**: 35 workloads in Blog, Fizzy and Lobsters on Rails main `50c54eed06`, one 1,000-operation GC
+> window each, 5 rounds. RSS is the process RSS after each app's last window, summed over the three apps:
+>
+> | | master | previous head | new head |
 > | --- | ---: | ---: | ---: |
-> | interpreter, majors | 24, 10 | 1, 2 | 1, 1 |
-> | interpreter, GC time ms | 6,443, 5,158 | 4,644, 4,611 | 4,629, 4,350 |
-> | interpreter, RSS growth MB | +25.4, −47.7 | +35.5, +42.2 | +35.0, +42.0 |
-> | YJIT, majors | 10, 12 | 1, 1 | 1, 1 |
-> | YJIT, GC time ms | 5,573, 5,623 | 4,667, 4,554 | 4,564, 4,575 |
-> | YJIT, RSS growth MB | −4.6, +52.2 | +68.9, +72.5 | +85.6, +66.1 |
-> | large-slot (≥ 512 B) sweep step p99 ms | 0.45–0.61 | 0.53–0.59 | 0.52–0.65 |
+> | interpreter, majors | 92 (83–93) | 1 (0–2) | 1 (1–3) |
+> | interpreter, GC time ms | 15,759 (15,131–18,184) | 10,392 (9,669–10,587) | 10,383 (9,997–11,125) |
+> | interpreter, RSS MB | 689 (680–704) | 699 (653–732) | 676 (667–686) |
+> | YJIT, majors | 71 (65–102) | 0 (0–1) | 0 (0–0) |
+> | YJIT, GC time ms | 17,336 (15,641–19,853) | 9,867 (9,003–10,026) | 9,730 (9,458–10,934) |
+> | YJIT, RSS MB | 913 (892–924) | 889 (875–899) | 881 (853–890) |
 >
-> On shipit the new head brings peak RSS back to master's level and keeps most of the gain: 8–9 majors instead of
-> about 30, and 30% (interpreter) and 34% (YJIT) less GC time than master, against 36% and 40% for the previous head.
-> In the Rails workloads the two heads run the same single major per round, the same GC time and the same RSS growth;
-> the one larger YJIT number is a single Lobsters window. bigslot (`RING=200 BIG=70 N=40000`, 3 runs): master 10, 10,
-> 10 nofree majors; previous head 2, 11, 2; new head 2, 2, 2.
+> | RSS MB per app | master | previous head | new head |
+> | --- | ---: | ---: | ---: |
+> | interpreter, Blog | 170 (169–170) | 164 (160–176) | 171 (163–177) |
+> | interpreter, Fizzy | 285 (269–298) | 286 (267–326) | 281 (265–294) |
+> | interpreter, Lobsters | 236 (234–241) | 237 (225–242) | 225 (217–229) |
+> | YJIT, Blog | 218 (216–219) | 208 (206–218) | 207 (206–208) |
+> | YJIT, Fizzy | 375 (363–396) | 374 (360–397) | 383 (359–386) |
+> | YJIT, Lobsters | 319 (300–321) | 300 (296–317) | 297 (287–306) |
 >
-> The Rails workloads are Blog, Fizzy and Lobsters on Rails main `50c54eed06`, one 500-operation GC window each;
-> shipit is ruby-bench with 15 warmup and 40 measured iterations. All builds carry a measurement-only patch that
-> logs sweep steps; sweep pauses did not change.
+> Here the new head runs the same few majors and the same GC time as the previous head. Its total RSS is below
+> master's in every round, by 17 MB (interpreter) and 27 MB (YJIT). Against the previous head the difference is
+> within round-to-round noise, except Fizzy and Lobsters under the interpreter, where the new head is 5 and 12 MB
+> lower in all 5 rounds. Lobsters spends a little more GC time on the new head (+454 ms interpreter, +256 ms YJIT, in
+> every round), from more minors; neither head runs a major there.
+>
+> One thing to note: master has since moved to `760125a4c5` ("Don't force a major GC for a heap smaller than its
+> initial size"), which changes the same branch of `gc_sweep_finish_heap`, so this PR needs a rebase. On shipit that
+> master alone already gives 6 majors, about the same GC time as the new head, and 1–3 MB more peak RSS.
 
-Method: the orb had 2 CPUs and 3.9 GB, every cell ran alone in one sequential queue (shipit 15:34–15:48 UTC, census
-15:49–16:39), and no other work ran on the orb. The census copies carry round 2's two Rails-main workarounds (Fizzy
-`fizzy-rails-main-uuid.patch`, Lobsters `census_typedstore_rails_main.rb`). Scripts:
-[`gcstep/vs17251-2026-11-24/`](../../fixtures/corpus/ruby-41-watch/gcstep/vs17251-2026-11-24/) (`build3.sh` builds
-the three variants from `old.diff` = `41c689571a`'s `default.c` hunk and `new.diff` = `git diff dec1bb786f
-57eb4b4274 -- gc/default/default.c`; `queue17251.sh`; `report17251.rb`). Receipts (shipit JSONs, census `gc_long`
-per workload, bigslot, queue log, report):
-[`data/ruby-17251-2026-11-24/receipts.tar.gz`](data/ruby-17251-2026-11-24/receipts.tar.gz).
+Method: every cell ran alone in one sequential queue (shipit and attribution 18:45–22:00 UTC, census 22:04–03:30,
+bigslot with the patch 03:31–03:39). The queue stalled twice while the orb was paused (18:56–20:15, 22:08–23:20);
+the cell running at each stall was discarded and rerun. Census copies: round 2's
+workarounds, applied as Ruby overlays (`setup5.sh`). Scripts:
+[`gcstep/vs17251-2026-11-24/`](../../fixtures/corpus/ruby-41-watch/gcstep/vs17251-2026-11-24/) (`build5.sh` builds
+the five variants from `old.diff` = `41c689571a`'s `default.c` hunk and `new.diff` = `git diff dec1bb786f 57eb4b4274
+-- gc/default/default.c`; `setup5.sh`; `queue5.sh`; `bigslot_gcstep.sh`; `gcmajors/`; `report5.rb`). The census
+harness gained `rss_kb_end` and `rss_kb_hwm` in `gc_long`, and
+[`ruby-bench-harness.rb`](../../fixtures/corpus/ruby-41-watch/gcstep/ruby-bench-harness.rb) loads `gcmajors` when
+`GCMAJORS_SO` is set. Receipts (shipit JSONs with per-GC records, census `gc_long` per workload, bigslot runs, queue
+log, report): [`data/ruby-17251-2026-11-25/receipts.tar.gz`](data/ruby-17251-2026-11-25/receipts.tar.gz); the first
+pass's stay in [`data/ruby-17251-2026-11-24/`](data/ruby-17251-2026-11-24/receipts.tar.gz).
 
 ## 3. No 320 B slot: objects of 257–320 B now take 512 B
 
