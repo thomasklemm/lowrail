@@ -1781,3 +1781,98 @@ No must-fix and no nit left from my passes. Final replies, not posted:
 > the send dynamic, so code that runs under `using` isn't recompiled again. With that, the `vm_args.c` extraction is
 > gone and the PR touches only ZJIT. Leaving the send dynamic needed one new bool on `IseqPayload`, next to
 > `was_invalidated_for_singleton_class_creation`; would you rather track that differently?
+
+#### thermos-sol confirm on `7b03404bd7`: approve (2026-11-25)
+
+Same [review thread](https://ampcode.com/threads/T-01a211b5-8b72-7106-b650-4a78d8f8a461), both Thermos rubrics
+personally, no delegation. Fetched `thomasklemm/zjit-symbol-block-arg-5` into the existing Ruby clone and checked
+the full head `7b03404bd7f0e08120af0836ce11a6b27d45f5b0`: two commits on
+`a43519979c7a8fbb9c5bbcf8d7b1daf739a60c4f`. **Approve; no remaining must-fix or new nit.** Nothing pushed to Ruby or
+posted. This confirms the changes since the round-3 approval, including the rebase, rather than claiming another
+independent full-PR review.
+
+**Rebase and text.** Unshallowed the clone before the history checks. The base-to-base diff has 35 files but no
+VM or ZJIT change. `git range-diff f63048e942..bdcfceb5ee a43519979c..7b03404bd7` marks the test commit `=`; the
+implementation differs only in the payload bit, its exit reason/counter and callback, the leaf ISEQ operand,
+the refusal in `type_specialize`, and the new message sentence. Rafael remains the implementation author, Thomas
+its committer and sole co-author, and Thomas authors/commits the tests, matching round 3. No message line exceeds
+72 characters. Both reply drafts below and the added message sentence match the code. The public body is unchanged
+from the prior pass; its historical benchmark rows still name their older head and are not new measurements.
+
+**The repeat-specialization finding is resolved.** Read the cref; if it has refinements, remember that on the
+send's own ISEQ, then use the existing exit budget to invalidate the compiled unit. Its next compilation leaves
+Symbol-block sends from that ISEQ dynamic. For inlined code these are deliberately two different ISEQs:
+`state.iseq` owns the refusal, `jit.iseq()` owns the machine-code version to invalidate. Both are tracked
+`Opnd::Value`s, and the optional leaf operand participates in the exit's equality/hash. The existing embedded-VALUE
+write-barrier, marking and compaction paths retain/update it. The bool defaults to false and is dropped with its
+payload; there is no address-keyed table left over after ISEQ collection. The field read runs during compilation
+under the VM lock, including compilation triggered by a function stub.
+
+The exact head gives 4 compiles, 5 refinement exits and no `no_side_exits` getivar fallback on each of
+`refined_method_cost.rb` and `inlined_refined_cost.rb`; each plain control gives 1 compile and 0 exits. The inlined
+probe's optimized HIR first has `PushInlineFrame :small`, `GetCref` and a guarded `CCallVariadic`; its later version
+has the same inline frame with a dynamic `sum` while the caller retains its guarded `@v` loads and arithmetic.
+The five exits are the current version's default invalidation budget, not five new specializations. The message
+and reply's no-repeat claim concerns this guard; unrelated causes can of course still trigger recompilation.
+
+**The synchronization finding is resolved.** `with_vm_lock` encloses both payload creation and the store, and
+the mutable reference does not escape that closure. GDB stopped at the store on the unmodified head while the two
+Ractors ran `round5/ractor_refined_probe.rb` with the ordinary exit budget: five observations alternated between
+GDB threads 3 and 4, all with the same ISEQ and `rb_vm_locked_p() == 1`. Both Ractors returned 480000, and the
+final call returned 24, as in the interpreter. The debug script locks scheduling only while querying lock state.
+A first diagnostic with a huge exit budget never reached this guard because an earlier `no_profile_send` guard
+could not reprofile; it is not counted as lock evidence. The existing unlocked `exit_recompile` fast path is
+byte-identical to master and is not a finding introduced by this PR.
+
+**Maintainability.** The monotonic bool belongs with the existing singleton-class refusal on `IseqPayload`;
+using one bit and the existing recompile mechanism is smaller than a new per-site exit/profile table. The new
+reason and counter follow the existing exhaustive mappings. The separate callback keeps this PR's write locked
+without changing master's exit-budget policy. No new abstraction or file split is warranted, no file crosses
+1,000 lines, and the added field/operand/callback documentation explains their lifetime or ordering contracts.
+No redundant new comment remains. Ruby complexity tools would not assess this Rust-only delta meaningfully.
+
+Fresh execution, x86-64, `--enable-zjit=dev --disable-install-doc --disable-yjit`, `make -j2`:
+
+| Command/check | Result |
+| --- | --- |
+| `make zjit-test ZJIT_TESTS='--test-threads=2'` | 2,052/2,052, 15 skipped; the previously intermittent SIGPROF test passed this run |
+| `make btest RUN_OPTS='--zjit --zjit-call-threshold=1'` | 2,148/2,148 |
+| Same btest at threshold 2 | 2,148/2,148 |
+| `make test-all TESTS='test/ruby/test_zjit_cli.rb'` | 34 tests, 7,907 assertions, no failures/errors/skips |
+| Original mutation/refinement/callee/compaction matrix | 144/144, repeated on the restored head |
+| Main, round-2, all nine Opus and round-5 Ractor probes | 48/48 interpreter comparisons, repeated on the restored head |
+| C-header flag/offset assertions on the new base | Pass: basic flag 524288, CME flags byte 0, cref refinements byte 8 |
+| Restored Symbol-block filter | 19/19; Ruby source diff empty |
+
+The 48 comparisons use thresholds 1, 2 with one profile, and default, against plain interpreter output; the main
+probe also runs at `N=40`. Standard-error comparison normalizes only Thread addresses. The 144-case matrix retains
+the earlier uncompiled JIT-enabled control (threshold 1,000,000) to avoid the known unrelated builtin-selection
+difference. Identity after self-redefinition, refined conversion, late `using`, ISEQ/fixed-C/variadic-C callees,
+block materialization, `yield`, invalidation, multiple crefs, inlining and Ractor compaction all retain their
+expected behavior. The new base changes neither the basic-flag mapping nor the prior valid-Ruby-frame cref
+invariant. btest's existing `Fiber count: 10000 (skipping)` diagnostic appears in both passing runs. No arm64 run,
+new benchmark, or fresh rerun of the previous 11-file core suite in this delta confirm.
+
+**Negative control.** Temporarily removed only the `type_specialize` payload-bit check and rebuilt. The standalone
+and inlined refined probes returned the right Ruby value but regressed respectively to 8 compiles/30 exits and
+11 compiles/44 exits, both with 399738 `no_side_exits` getivar fallbacks. The scratch cost check fails both and
+passes both after restoration (5 exits, 0 fallbacks). All 19 behavioral/snapshot Symbol tests still pass on that
+wrong variant: this is a compile-policy regression, so output tests are not claimed to detect it. The production
+change was restored byte for byte and rebuilt before the final comparisons. Scratch scripts, diagnostic logs,
+the single-line mutation patch and results are under `.amp/in/orb-backup/zs1-review/round5/` in this review orb.
+
+**Final reply texts, unchanged from the coordinator's drafts.** The shape answers XrXr's two requests: HIR
+method speculation, and a cref/nil guard instead of the extracted conversion helper. Remembering the failed
+speculation addresses the observed slow case. This is a reasonable shape to submit; XrXr may prefer another
+representation for the new per-ISEQ state, so the last question is appropriate, not a guarantee of acceptance.
+
+> r4686073773: The C helper check is gone. `MethodRedefined` covers replacement of `Symbol#to_proc`, and a HIR
+> basic-flag guard covers redefinition with its own definition. Both exits resume the original send; the Symbol is
+> passed directly only when conversion can be skipped.
+
+> r4686108643: Done: a `GetCref` instruction loads the cref from the frame's EP and `GuardBitEquals` checks that its
+> refinements are nil, exiting with recompile otherwise. It stays a per-call guard because a top-level `using` can add
+> refinements to the cref after the code is compiled (tested). After that guard exits, the ISEQ's next version leaves
+> the send dynamic, so code that runs under `using` isn't recompiled again. With that, the `vm_args.c` extraction is
+> gone and the PR touches only ZJIT. Leaving the send dynamic needed one new bool on `IseqPayload`, next to
+> `was_invalidated_for_singleton_class_creation`; would you rather track that differently?
