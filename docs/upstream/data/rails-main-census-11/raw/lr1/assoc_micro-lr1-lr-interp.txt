@@ -1,0 +1,5 @@
+has_many                 666795.6   107.04 0
+has_one                  535631.0    86.00 0
+belongs_to               509827.1    86.00 0
+joins_has_many           353877.9   106.00 0
+count_has_many           410434.8    79.01 0
