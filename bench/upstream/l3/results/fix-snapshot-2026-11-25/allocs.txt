@@ -1,0 +1,10 @@
+== main
+cold attributes_for_database 78.0
+attributes_for_database 4.0
+attributes_before_type_cast 4.003
+Marshal.dump 16.054
+== l3
+cold attributes_for_database 74.0
+attributes_for_database 2.0
+attributes_before_type_cast 1.004
+Marshal.dump 14.023

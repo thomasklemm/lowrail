@@ -1,0 +1,8 @@
+AR sqlite3: 10444 runs, 37301 assertions, 0 failures, 5 errors, 52 skips
+bin/rails test test/cases/connection_adapters/connection_handlers_multi_db_test.rb:178
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:252
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:167
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:198
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:178
+AM: 1275 runs, 5710 assertions, 0 failures, 0 errors, 0 skips
+new test: fails on 768ad01370 (Expected David, Actual Mary), passes on main f785381cca and on cf1607c76d
