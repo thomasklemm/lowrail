@@ -1,0 +1,25 @@
+---
+id: UG82M
+repo: rails/rails
+kind: docs
+area: "Guides: Rails 8.2 upgrade guide, Action Mailer and Active Job"
+reviewer: "byroot (#59820)"
+branch: thomasklemm/upgrade-guide-mailer-active-job-railtie
+head: "de4d27b257337464438695d3d6600af13bdf0482"
+base: main
+built_on: "cf0325a832"
+depends_on: []
+stacked_on:
+alternative_of:
+impact: "Since #59820 (merged 2026-11-16) require 'action_mailer/railtie' no longer loads active_job/railtie: apps with an explicit railtie list that omits Active Job raise NoMethodError on config.active_job at boot, and deliver_later enqueues to the default Async adapter instead of the configured one (8.1: configured TestAdapter). turbo-rails then skips Turbo::Broadcastable::TestHelper (view_component's sandbox no longer loads). CHANGELOG covers only standalone use; the upgrade guide says nothing. Census 11 (docs/upstream/rails-main-census-11.md)."
+rank: 12
+risky: false
+state: built
+pr:
+note: "2026-11-25 (census 11): built on main cf0325a832, guide-only (16 lines, before the 6.1 marshalling section). Ownership: no rails/rails issue or PR; #59820 has no cross-references and no review comments; none of the 66 open PRs created since 11-16 touches action_mailer/railtie or the guide section; not in our queue. Repro .amp/in/orb-backup/c11/repro/am2_mailer_without_job_railtie.rb (run through each tree's bundle): 8.1 config.active_job ok, deliver_later TestAdapter 1 enqueued; main NoMethodError, ActiveJob undefined after boot, deliver_later Async. Reach looks narrow: 9 of 10 sampled config/application.rb with the mailer railtie also require active_job/railtie (GSA/i14y comments it out but has no mailer railtie). Alternative to a guide note: restore the require in the railtie (byroot made it deliberately). Needs: claude-code pass, likely-reviewer check, Thomas's OK; waits for a slot like the other UG82 notes."
+passes: []
+---
+
+# Note in the upgrade guide that Action Mailer no longer loads Active Job
+
+This adds a section to "Upgrading from Rails 8.1 to Rails 8.2" for a change on main that the guide doesn't mention yet. Since #59820, `require "action_mailer/railtie"` no longer loads the Active Job railtie. An app that lists its frameworks and requires the Action Mailer railtie without Active Job's then raises `NoMethodError` when it sets `config.active_job`, and `deliver_later` no longer uses its configured queue adapter. The CHANGELOG entry covers Action Mailer used outside Rails only.
