@@ -10,7 +10,7 @@ Objects and Callgrind instructions per call, Ruby 4.0.9, YJIT
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `Ability.new(user)` | 57 | 52 | 42,921 | 41,418 | −3.5% |
 
-benchmark-ips, Ruby 4.0.9, YJIT, best of 3 on one core
+benchmark-ips, Ruby 4.0.9, YJIT, best of 3 on one core. Inconclusive, not speed evidence (thermos-sol confirm, 2026-11-25): per base/head/base round the effect is −0.05% vs A/A 5.79%, +10.66% vs 11.27%, +2.73% vs 4.67%; reports ±12-15.5%. The best-of-3 A/A below comes from picking independent maxima. Not in the body.
 
 | | main | branch | Change |
 | --- | ---: | ---: | ---: |
