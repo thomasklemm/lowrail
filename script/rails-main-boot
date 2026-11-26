@@ -8,6 +8,7 @@
 # its error, first app frame, the Rails commit range, a first-parent bisect to the introducing PR, and an ownership
 # search (rails/rails issues and PRs, the introducing PR's cross-references, our queue, the upgrade guide).
 #
+#   script/rails-main-boot services    fresh orb: packages, PostgreSQL, Redis and memcached; a no-op when present
 #   script/rails-main-boot [--apps LIST|all] [--base REF] [--head REF] [--tests] [--bisect N] [--jobs N]
 #                          [--date YYYY-MM-DD] [--corpus NAME] [--ruby R]
 #
@@ -392,7 +393,36 @@ module RailsMainBoot
     lines.join("\n") + "\n"
   end
 
+  PACKAGES = %w[postgresql postgresql-17-pgvector postgresql-17-partman redis-server memcached libidn-dev libleptonica-dev].freeze
+  PGDATA = File.expand_path("~/pgdata")
+
+  # Disposable services for the census apps, as orb services that survive pause/resume. Skips what is installed or
+  # already listening; never touches an existing data directory.
+  def services
+    missing = PACKAGES.reject { `dpkg-query -W -f='${Status}' #{_1} 2>/dev/null`.include?("install ok installed") }
+    unless missing.empty?
+      system("sudo", "apt-get", "update", "-qq", exception: true)
+      system("sudo", "env", "DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y", "-qq", *missing, exception: true)
+    end
+    up = ->(port) { Socket.tcp("127.0.0.1", port, connect_timeout: 1).close.nil? rescue false }
+    unless system("pg_isready", "-q")
+      system("sudo", "mkdir", "-p", "/var/run/postgresql", exception: true)
+      system("sudo", "chown", ENV.fetch("USER"), "/var/run/postgresql", exception: true)
+      unless File.exist?(File.join(PGDATA, "PG_VERSION"))
+        system("/usr/lib/postgresql/17/bin/initdb", "-D", PGDATA, "-U", ENV.fetch("USER"), "--auth=trust", out: File::NULL, exception: true)
+      end
+      system("amp", "orb", "service", "start", "census-pg", "--command",
+        "/usr/lib/postgresql/17/bin/postgres -D #{PGDATA} -k /var/run/postgresql -c listen_addresses=127.0.0.1 -c fsync=off", exception: true)
+      50.times { break if system("pg_isready", "-q"); sleep 0.2 }
+    end
+    { 6379 => ["census-redis", %(redis-server --save "" --appendonly no)], 11211 => ["census-memcached", "memcached -u nobody -p 11211"] }
+      .each { |port, (name, cmd)| up.(port) || system("amp", "orb", "service", "start", name, "--command", cmd, exception: true) }
+    ok = system("pg_isready", "-q") && up.(6379) && up.(11211)
+    puts ok ? "services: PostgreSQL, Redis and memcached are up" : abort("services: something did not start; see amp orb service list")
+  end
+
   def main(argv)
+    return services if argv.first == "services"
     opts = { apps: Census::APPS.keys.reject { Census::APPS[_1][:copy] }, corpus: "boot", ruby: "4.0.9", bisect: 3, jobs: 2 }
     OptionParser.new do |o|
       o.banner = File.read(__FILE__).lines.drop(3).take_while { _1.start_with?("#") }.map { _1.delete_prefix("# ").delete_prefix("#") }.join

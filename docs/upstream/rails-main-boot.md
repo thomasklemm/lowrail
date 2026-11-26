@@ -6,6 +6,7 @@ release. Boots like these found the breaks behind the Sidekiq, Rack::Sendfile an
 whether an app still starts, and it is cheap enough to run every week.
 
 ```sh
+mise exec ruby@4.0.9 -- script/rails-main-boot services        # fresh orb: packages, PostgreSQL, Redis, memcached
 mise exec ruby@4.0.9 -- script/rails-main-boot                 # every census app, newest v8.1.* tag vs main
 mise exec ruby@4.0.9 -- script/rails-main-boot --apps blog,sure --tests --bisect 5
 ```
@@ -64,7 +65,9 @@ normal [submission queue](../DECISIONS.md#submission-queue-2026-11-03) rules.
   JavaScript build or seeds: boot needs none.
 * Services as in [census.md](census.md): PostgreSQL (pgvector for Chatwoot and Discourse, pg_partman for Lago),
   Redis and memcached as disposable orb services. fizzy-mysql needs MySQL and is left out unless one runs. On a
-  fresh orb (2026-11-25):
+  fresh orb run `script/rails-main-boot services` first. It installs the missing packages and starts what is not
+  already listening, so it is a no-op on a prepared orb. It stays out of `.agents/setup`, because most threads of
+  the project need none of it (Thomas, 2026-11-25). What it does:
 
   ```sh
   sudo apt-get install -y redis-server memcached postgresql-17-pgvector postgresql-17-partman libidn-dev libleptonica-dev
@@ -85,3 +88,8 @@ normal [submission queue](../DECISIONS.md#submission-queue-2026-11-03) rules.
   including a 13-step bisect.
 * Production boot with census environment values (throwaway secrets, `SECRET_KEY_BASE_DUMMY`). Code that only runs
   per request, per job, or in development is not covered. That is what `--tests` and the census are for.
+
+## Schedule
+
+Weekly, Mondays 07:00 Tallinn time (05:00 UTC), on this thread's orb in existing mode, so runs reuse the warm
+copies and bundles (about 3 minutes; a cold 2 vCPU orb takes about 33). Set by Thomas on 2026-11-25.

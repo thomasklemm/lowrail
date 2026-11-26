@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+path "RAILS_FIX_CHECKOUT" do
+  gem "rails"
+end
+gem "money-rails", "3.0.0"

@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+path "BUNDLER_GEMS/rails-f785381cca86" do
+  gem "rails"
+end
+gem "money-rails", "3.0.0"

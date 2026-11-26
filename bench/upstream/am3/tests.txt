@@ -1,0 +1,11 @@
+# Rails tests on thomasklemm/mailer-delivery-job-without-active-job @ 04ede914df (parent main f785381cca), Ruby 4.0.9
+## actionmailer: bin/test
+286 runs, 896 assertions, 0 failures, 0 errors, 0 skips
+## railties: bin/test test/application/initializers/frameworks_test.rb
+29 runs, 54 assertions, 0 failures, 0 errors, 0 skips
+## railties: bin/test test/application/configuration_test.rb -n '/[Mm]ailer|load_defaults|delivery|framework_defaults|new_framework/'
+27 runs, 30 assertions, 0 failures, 0 errors, 0 skips
+## new test on main's lib (fix reverted, test kept): fails
+Failure: Expected nil to be truthy. 1 runs, 1 assertions, 1 failures (ActionMailer.autoload?(:MailDeliveryJob) is nil: loading ActionMailer::Base resolved it)
+## tools/railspect configuration . : exit 0; with main's configuring.md and the fix it reports the 6.0 list mismatch
+## tools/railspect changelogs . : 13 changelogs inspected, 0 offenses

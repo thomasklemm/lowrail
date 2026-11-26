@@ -1,0 +1,25 @@
+# repro.rb (railties + actionpack + actionmailer, with or without activejob), Ruby 4.0.9
+## v8.1.4.1 / main f785381cca (no activejob)
+activejob in lock: 1
+8.1.4.1 load_defaults 8.1: boot ok, delivery_job ActionMailer::MailDeliveryJob
+8.1.4.1 no load_defaults: boot ok, delivery_job ActionMailer::MailDeliveryJob
+activejob in lock: 0
+8.2.0.alpha load_defaults 8.1: boot LoadError: cannot load such file -- active_job
+8.2.0.alpha no load_defaults: boot ok, delivery_job LoadError: cannot load such file -- active_job
+## fix 04ede914df, Gemfile.fix (no activejob) and Gemfile.fix-aj (with activejob)
+8.2.0.alpha load_defaults 8.1: boot ok, delivery_job LoadError: cannot load such file -- active_job
+8.2.0.alpha no load_defaults: boot ok, delivery_job LoadError: cannot load such file -- active_job
+8.2.0.alpha load_defaults 8.1: boot ok, delivery_job ActionMailer::MailDeliveryJob
+8.2.0.alpha no load_defaults: boot ok, delivery_job ActionMailer::MailDeliveryJob
+
+# load_order.rb: when Active Job loads, with activejob bundled (Gemfile.main-aj, Gemfile.fix-aj)
+rails-f785381cca86/railties eager=false: after initialize! not loaded, after ActionMailer::Base loaded, after delivery_job loaded
+rails-f785381cca86/railties eager=true: after initialize! loaded, after ActionMailer::Base loaded, after delivery_job loaded
+rails/railties eager=false: after initialize! not loaded, after ActionMailer::Base not loaded, after delivery_job loaded
+rails/railties eager=true: after initialize! not loaded, after ActionMailer::Base not loaded, after delivery_job loaded
+
+# UG82M money-rails repros (bench/upstream/ug82-recheck-2026-11-25/mailer_money*.rb), Gemfile.money-main / money-fix
+main mailer_money_eager: initialize! raised: undefined method 'active_job' for an instance of Rails::Application::Configuration
+main mailer_money: 	from /home/user/workspace/repo/bench/upstream/ug82-recheck-2026-11-25/mailer_money.rb:12:in '<main>'
+fix mailer_money_eager: Rails 8.2.0.alpha money-rails 3.0.0: boot ok, deliver_later NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration
+fix mailer_money: Rails 8.2.0.alpha money-rails 3.0.0: boot ok, deliver_later NoMethodError: undefined method 'active_job' for an instance of Rails::Application::Configuration

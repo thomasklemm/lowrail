@@ -65,9 +65,8 @@ without `load_defaults` it boots, and only `delivery_job` raises, which is the i
 * Assessment: Rails itself is wrong here (its default configuration makes the removed dependency hard again), and
   the regression is unreleased and breaks a widely used app. So it meets the rails/rails bar for urgent findings. A
   small fix would make the railtie's `delivery_job` default lazy or conditional on Active Job, keeping #59820's
-  purpose. Otherwise, UG82M's note could also say to add `activejob` to the Gemfile. **Record only**: nothing has
-  been built or posted. If it is built, it gets a queue item `AM3` with `introduced_by: 59820` and a
-  `script/ownership` check.
+  purpose. Otherwise, UG82M's note could also say to add `activejob` to the Gemfile. Built as queue item [AM3](../../bench/upstream/pr-queue/items/AM3.md) (Thomas, 2026-11-25): it drops the redundant
+  6.0 default. Nothing is posted.
 
 Not breaks:
 

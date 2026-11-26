@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+path "RAILS_FIX_CHECKOUT" do
+  gem "railties"
+  gem "actionpack"
+  gem "actionmailer"
+  gem "activejob"
+end
