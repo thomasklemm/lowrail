@@ -1,0 +1,10 @@
+respond_to_missing? 1: 784
+   784x [:raise, "ArgumentError", "wrong number of arguments (given 1, expected 2)"]
+       -> [:ok, "false"]
+   e.g. ["Mash", 0, "\"a\""]
+respond_to_missing? 3: 7190
+   6406x [:ok, "true"]
+       -> [:raise, "ArgumentError", "wrong number of arguments (given 3, expected 1..2)"]
+   784x [:raise, "ArgumentError", "wrong number of arguments (given 3, expected 2)"]
+       -> [:raise, "ArgumentError", "wrong number of arguments (given 3, expected 1..2)"]
+   e.g. ["Mash", 0, "\"a\""]

@@ -1,0 +1,3 @@
+source "https://rubygems.org"
+gem "hashie", path: "/home/user/oss/up/hashie-master"
+gem "benchmark-ips"

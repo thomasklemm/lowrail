@@ -1,0 +1,35 @@
+# lowrail-profile compare
+
+Base: `bin/rails test --verbose`. Head: `bin/rails test --verbose`.
+
+Objects per request (all, by run): base 5986.9 / 5988.6, head 5944.0 / 5944.6.
+
+A change counts when it exceeds the noise floor: twice the base's run-to-run spread across the A/A pair, or head's own if larger, and for a line at least 1.0 objects per request (warm); for an action at least 0.1% of its objects and at least 20.0. Compared: request, job, mail.
+
+**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a small one can be missing (README-profile.md, *Compare*).
+
+## Regressions: 0
+
+None.
+
+## Improvements: 15
+
+| Kind | Line or action | Base | Head | Δ | Noise floor |
+| --- | --- | ---: | ---: | ---: | ---: |
+| request action | UsersController#token_destroy | 2047.0 | 2000.0 | -47.00 | 28.0 |
+| request action | UsersController#show | 3886.5 | 3840.65 | -45.85 | 20.0 |
+| request action | ReposController#create | 6286.5 | 6242.15 | -44.35 | 20.0 |
+| request action | UsersController#edit | 3975.9 | 3931.7 | -44.20 | 20.0 |
+| request action | Users::OmniauthCallbacksController#github | 2619.2 | 2575.3 | -43.90 | 20.0 |
+| request action | UsersController#token_delete | 2403.0 | 2359.5 | -43.50 | 20.0 |
+| request action | (no name) | 868.5 | 825.2 | -43.30 | 20.0 |
+| request action | PagesController#index | 4324.2 | 4281.5 | -42.70 | 20.0 |
+| request action | UsersController#update | 2277.1 | 2234.75 | -42.35 | 20.0 |
+| request action | ReposController#show | 4487.45 | 4445.15 | -42.30 | 20.0 |
+| request action | ReposController#edit | 2493.75 | 2452.25 | -41.50 | 20.0 |
+| request action | ReposController#new | 3281.15 | 3239.8 | -41.35 | 20.0 |
+| request action | RepoSubscriptionsController#create | 3157.25 | 3118.25 | -39.00 | 20.0 |
+| request line | `GEM/hashie/lib/hashie/mash.rb:369` | 21.78 | 0.0 | -21.78 | 1.0 |
+| request line | `GEM/hashie/lib/hashie/mash.rb:410` | 21.78 | 0.0 | -21.78 | 1.0 |
+
+Not compared: 5 actions (5 no warm value).

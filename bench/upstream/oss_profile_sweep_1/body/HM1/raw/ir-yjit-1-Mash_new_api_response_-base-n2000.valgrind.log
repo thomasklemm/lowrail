@@ -1,0 +1,76 @@
+==158193== Callgrind, a call-graph generating cache profiler
+==158193== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==158193== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==158193== Command: /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --yjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/hm1_body.rb Mash.new(api_response) 2000
+==158193== Parent PID: 156729
+==158193== 
+--158193-- 
+--158193-- Valgrind options:
+--158193--    --verbose
+--158193--    --tool=callgrind
+--158193--    --collect-atstart=no
+--158193--    --toggle-collect=rb_ary_cycle
+--158193--    --smc-check=all
+--158193--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/HM1/raw/ir-yjit-1-Mash_new_api_response_-base-n2000.callgrind
+--158193--    --log-file=/home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/HM1/raw/ir-yjit-1-Mash_new_api_response_-base-n2000.valgrind.log
+--158193-- Contents of /proc/version:
+--158193--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--158193-- 
+--158193-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--158193-- Page sizes: currently 4096, max supported 4096
+--158193-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==158193== For interactive control, run 'callgrind_control -h'.
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--158193--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--158193--   .. build-id is valid
+--158193-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--158193--    object doesn't have a dynamic symbol table
+--158193-- Scheduler: using generic scheduler lock implementation.
+==158193== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-158193-by-user-on-???
+==158193== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-158193-by-user-on-???
+==158193== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-158193-by-user-on-???
+==158193== 
+==158193== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==158193== don't want to do, unless you know exactly what you're doing,
+==158193== or are doing some strange experiment):
+==158193==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=158193 ...command...
+==158193== 
+==158193== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==158193==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby
+==158193== and then give GDB the following command
+==158193==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=158193
+==158193== --pid is optional if only one valgrind process is running
+==158193== 
+--158193-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--158193--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--158193--   .. build-id is valid
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--158193--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--158193--   .. build-id is valid
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--158193--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--158193--   .. build-id is valid
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--158193--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--158193--   .. build-id is valid
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--158193--    object doesn't have a symbol table
+--158193-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--158193--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--158193--   .. build-id is valid
+--158193-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/json/ext/parser.so
+--158193-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/x86_64-linux/json/ext/generator.so
+==158193== 
+--158193-- Start dumping at BB 501559786 (Prg.Term.)...
+--158193-- Dump to /home/user/workspace/repo/bench/upstream/oss_profile_sweep_1/body/HM1/raw/ir-yjit-1-Mash_new_api_response_-base-n2000.callgrind
+--158193-- Dumping done.
+==158193== Events    : Ir
+==158193== Collected : 556220880
+==158193== 
+==158193== I   refs:      556,220,880

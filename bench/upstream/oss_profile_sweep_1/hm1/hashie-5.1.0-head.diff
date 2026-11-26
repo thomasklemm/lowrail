@@ -1,0 +1,30 @@
+diff -ru base/hashie-5.1.0/lib/hashie/mash.rb head/hashie-5.1.0/lib/hashie/mash.rb
+--- base/hashie-5.1.0/lib/hashie/mash.rb	2026-11-25 23:52:10.727043368 +0000
++++ head/hashie-5.1.0/lib/hashie/mash.rb	2026-11-25 23:52:10.747043487 +0000
+@@ -280,7 +280,7 @@
+       self
+     end
+ 
+-    def respond_to_missing?(method_name, *args)
++    def respond_to_missing?(method_name, include_private = false)
+       return true if key?(method_name)
+       suffix = method_suffix(method_name)
+       if suffix
+@@ -366,7 +366,7 @@
+     end
+ 
+     def method_suffix(method_name)
+-      method_name = method_name.to_s
++      method_name = method_name.is_a?(Symbol) ? method_name.name : method_name.to_s
+       method_name[-1] if method_name.end_with?(*ALLOWED_SUFFIXES)
+     end
+ 
+@@ -409,7 +409,7 @@
+       return unless method_key.is_a?(String) || method_key.is_a?(Symbol)
+       return unless respond_to?(method_key)
+ 
+-      _, suffix = method_name_and_suffix(method_key)
++      suffix = method_suffix(method_key)
+ 
+       (!suffix || suffix == '='.freeze) &&
+         !self.class.disable_warnings?(method_key) &&
