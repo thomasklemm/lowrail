@@ -996,7 +996,7 @@ Open on 2026-11-04 09:45 UTC: the seven PRs below (#59557, #59564, #59565, #5956
 
 ### Inertia — inertiajs/inertia-rails
 
-
+- [#449](https://github.com/inertiajs/inertia-rails/pull/449) (INRP1), the props resolver asks prop types for their flags with `respond_to?` instead of `try` — a dashboard's props through `PropsResolver`: **118 → 90 objects**, 44.1k → 54.0k i/s (YJIT, A/A 0.40%), −13.8% interpreter / −24.1% YJIT instructions (JIT-flat); whole dashboard action −2.8% interpreter. Output byte-identical on 4,000 generated prop sets; local eight-cell matrix green. thermos-sol: changes on `f934e7c`, nits on `0362ffcb1f`. **Draft**, opened 2026-11-26, head [`0362ffcb1f`](https://github.com/thomasklemm/inertia-rails/commit/0362ffcb1fea17ce393c40b39efa940d28a1c875) on 3.24.0 `5102d8d` ([round 2](inertia-round-2.md)).
 
 ### Importmap — rails/importmap-rails
 

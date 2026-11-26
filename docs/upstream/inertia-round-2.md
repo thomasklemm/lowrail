@@ -62,8 +62,9 @@ Interpreter instructions per request from `script/upstream-bench` (Ruby 4.0.9, `
 
 A/A per cell was 0.00–0.08%. The bar is about 2% of a workload. Only prop-flags clears it, and only where a page has
 several prop types. A page without any still resolves one when `errors` is sent: the renderer wraps it in an `always`
-prop, which is the −0.48% of the contacts page. `errors` is sent only with `always_include_errors_hash = true` (as in
-the harness) or after a redirect with errors; the default `nil` and `false` leave it out, so such a page resolves no
+prop, which is the −0.48% of the contacts page. `errors` is shared automatically only with
+`always_include_errors_hash = true` (as in the harness) or after a redirect with errors, and is also sent when the
+action passes `errors` in its props; otherwise the default `nil` and `false` leave it out, so such a page resolves no
 prop type at all (thermos-sol finding 2). Of the four profiled apps, only Thinkroom uses prop types (two
 `optional`). Hackatime and Flow from the [Inertia and Chatwoot census](inertia-chatwoot-census.md) use `defer`,
 `scroll` and `always`, so the dashboard workload stands in for them. The five others are not bundled: about 1.5% on
