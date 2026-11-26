@@ -4,11 +4,11 @@
 master c2c5ac6d1b and on 3.3.13, 3.4.12 and 4.0.9. **Both are real on master and on all three releases. They have
 one root cause and one fix.** Neither is reported on bugs.ruby-lang.org. Fix branch:
 [thomasklemm/ruby `thomasklemm/time-new-normalize-mday-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-normalize-mday-3)
-(head `9d4667a9a6` on master 6478deb7d2, 2026-11-26; earlier heads stay on `-2` (`a0e8852a14`) and on
+(head `2e061793aa` on master 6478deb7d2, 2026-11-26; earlier heads stay on `-2` (`a0e8852a14`) and on
 `thomasklemm/time-new-normalize-mday` (`d3e0a31795`)), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md),
 state in-review. 2026-11-25: Thomas posted the repros and our commit as a comment on ruby/ruby#16469
 (issuecomment-7162441987), no reply. 2026-11-26: Thomas approved opening one draft PR with both commits once
-thermos-sol and Astra approve the head and the body (section below). Nothing is posted on #16469.
+thermos-sol and Astra approve the head and the body (section below). No further comment on #16469 is planned.
 
 ## Repros
 
@@ -178,10 +178,12 @@ Redmine issues 22630 to 22641 (through today; the list API answers 403) have non
   the Sydney case would need a duck zone (ruby/spec loads no gems), and test/ruby already fails on master for every
   case. Thomas can ask for it in review.
 
-**time_init_vtm checked for cheap improvements:** none. The call runs once per `Time.new`; `validate_vtm()` must
-run before it (the switch relies on mon 1..12 and mday 1..31); `vtm_day_wraparound()` in the zone and UTC branches
-still needs it for hour 24; `time_arg()`'s own call serves `Time.utc`/`Time.local`, which don't reach
-`time_init_vtm()`. Nothing is redundant after the move.
+**time_init_vtm checked for cheap improvements:** one, not applied. The call runs once per `Time.new`;
+`validate_vtm()` must run before it (the switch relies on mon 1..12 and mday 1..31); `time_arg()`'s own call serves
+`Time.utc`/`Time.local`, which don't reach `time_init_vtm()`. TN2's `tvtm` copy in the zone block (wrap a copy for
+the timezone object) is no longer needed once the date is normalized: both reviewers built the variant that wraps
+`vtm` directly and found it behaviour-identical (Astra: 1,037,452 sweep cases; thermos-sol: 1,968,720 oracle
+checks). It stays, because removing it would make our commit depend on TN2 and no longer apply unchanged to #16469.
 
 **Results on `9d4667a9a6`** (`ruby 4.1.0dev (2026-11-26T13:46:56Z HEAD 9d4667a9a6)`; master `6478deb7d2`):
 
@@ -205,6 +207,26 @@ still needs it for hour 24; `time_arg()`'s own call serves `Time.utc`/`Time.loca
   `make test-spec SPECOPTS=spec/ruby/core/time` 652 examples, 7876 expectations, 0 failures.
 
 Not run: the full test-all, hosted CI (the fork has no workflows).
+
+### Review fixes, head 2e061793aa (2026-11-26)
+
+Both passes on `9d4667a9a6` asked for changes; neither found a runtime defect (verdicts in TN1.md). Applied in our
+commit only, Chris's stays byte-identical, time.c code unchanged:
+
+* Astra: `test_utc_month_mday_normalization` (commit 1's test) compared mostly instants, which already agree on
+  master. It now checks the cached `[year, mon, mday, hour]` of each case before any method recomputes them, plus the
+  instant. On master it fails at April 31 (reads April 31); a build that skips the June case passed all 360 tests
+  before and fails it now. Its seven comment headings and the helper comment above `vtm_normalize_month_mday()` went
+  (DECISIONS, code comments); the leap-year comment moved from `time_arg()` stays.
+* thermos-sol: the body now says "With day 31 and a negative offset" (Feb 29 and 30 are right on master); added
+  `test_local_month_mday_normalization`: `Time.new(3_000_000_000, 2, 31, 23)` equals `Time.local(3_000_000_000, 3, 2,
+  23)`. Master gives Feb 29 under UTC and New York and March 1 under Tokyo, Berlin, Auckland and Sydney; the head
+  March 2 under all.
+
+On `2e061793aa` (binary built from `07c61fd3f2`, same time.c): gem tests 361 tests, 3183 assertions, 0 failures under
+the six TZs; master with these tests 16 failures under each, exactly the new tests; `make test-all
+TESTS='ruby/test_time*'` 255 tests, 2497 assertions; the sweep 0 of every kind; the repros identical to the section
+above; spec/ruby/core/time 652 examples and btest 2148 passing. Our commit still applies to #16469's head unchanged.
 
 ## Prior reports
 
