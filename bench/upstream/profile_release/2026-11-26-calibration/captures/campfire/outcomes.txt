@@ -1,0 +1,21 @@
+campfire plain: 634 outcomes, 0 failed
+s1 run1 identical
+s1 run2 identical
+s2 run1 identical
+s2 run2 identical
+s3 run1 identical
+s3 run2 identical
+s4 run1 identical
+s4 run2 identical
+s5 run1 identical
+s5 run2 identical
+s6 run1 identical
+s6 run2 identical
+s7 run1 identical
+s7 run2 identical
+s8 run1 identical
+s8 run2 identical
+planted run1 identical
+planted run2 identical
+planted2 run1 identical
+planted2 run2 identical

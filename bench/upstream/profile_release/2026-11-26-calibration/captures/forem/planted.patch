@@ -1,0 +1,12 @@
+diff --git a/app/controllers/stories_controller.rb b/app/controllers/stories_controller.rb
+index 189547a3e..3c9c280c5 100644
+--- a/app/controllers/stories_controller.rb
++++ b/app/controllers/stories_controller.rb
+@@ -44,6 +44,7 @@ class StoriesController < ApplicationController
+   rescue_from ArgumentError, with: :bad_request
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     @page = (params[:page] || 1).to_i
+     return handle_user_or_organization_or_podcast_or_page_index if params[:username]
+ 

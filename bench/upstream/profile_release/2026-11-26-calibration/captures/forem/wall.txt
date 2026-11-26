@@ -1,0 +1,26 @@
+plain exit 0 wall 618.547817545 at 23:29:30
+plain tree unchanged
+s1 exit 0 wall 1601.935893075 at 23:56:12
+s1 tree unchanged
+s2 exit 0 wall 1599.261513108 at 00:22:52
+s2 tree unchanged
+s3-rejected exit 1 wall 1616.560689467 at 00:49:50
+s3-rejected tree unchanged
+s4 exit 0 wall 1509.368532306 at 01:15:00
+s4 tree unchanged
+s5 exit 0 wall 1475.299373200 at 01:39:36
+s5 tree unchanged
+s6-rejected exit 1 wall 1082.497208421 at 01:57:39
+s6-rejected tree unchanged
+s6-rejected run 2: Errno::EMLINK, public/uploads/user/profile_image reached 64,998 entries (ext4 limit); public/uploads cleared before every later step
+s3-rejected run 1 and s6-rejected run 1: one flaky tie-order example each (articles_spec.rb:2005, follows_spec.rb:61)
+s6 exit 0 wall 1514.894543161 at 02:24:17
+s6 tree unchanged
+s7 exit 0 wall 1512.309802415 at 02:49:31
+s7 tree unchanged
+s8 exit 0 wall 1499.022023981 at 03:14:31
+s8 tree unchanged
+planted exit 0 wall 1462.251318735 at 03:38:55
+planted2 exit 0 wall 1458.701413163 at 04:03:14
+s9 exit 0 wall 1487.746938589 at 04:28:03
+s9 tree unchanged

@@ -1,0 +1,3 @@
+bundle exec rspec spec/requests --format documentation
+seed 1234
+exit 1 0

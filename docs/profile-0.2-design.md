@@ -212,3 +212,24 @@ Coordinator under Thomas's delegation, 2026-11-25:
    0.1's `Dir.children` fix for `--out` (thermos-opus must-fix 2) is in; only the gem home part remains.
 
 No implementation in gem/ before 0.1 is released.
+
+## Calibration round (2026-11-26)
+
+Receipts: [bench/upstream/profile_release/2026-11-26-calibration](../bench/upstream/profile_release/2026-11-26-calibration/README.md),
+8 serial unchanged and 2 planted captures per app, gem built at `34a1a61f`, every run's per-test outcomes identical
+to a plain run. `range-2` k4 + self-check, merged confirm (declined; false alarms one compare / CI job; plant; d95):
+
+| App | Declined | False alarms | Plant | d95 median |
+| --- | ---: | ---: | ---: | ---: |
+| Forem | 65/70 | 6/20 / **2/60** | 10/10 | 41 (0.33%) |
+| openstreetmap-website | 0/70 | 0/280 / 0/840 | 140/140 | 20 (0.46%) |
+| Campfire | 31/70 | 33/156 / 0/468 | 78/78 | 26 (0.36%) |
+| Hackatime | 5/70 | 0/260 / 0/780 | 129/130 | 27 (1.21%) |
+
+**Recommendation: `--gate` stays opt-in in 0.2, not the default, and the README's CI job stays a report.** The
+gate fails 3.3% of Forem's CI jobs on unchanged code and declines 93% of its base sets; k = 5 fails 2 of 72 and
+declines 79%. The cause is rows whose value is set per capture, with no spread between runs (Forem
+`Feeds::SourcesController#update` 18,330 or 19,022, Campfire `Users::BansController#create`). A spread built from
+runs cannot see them until a base happens to hold both values. On openstreetmap-website and Hackatime the gate is
+clean and sharp. A CI job costs 5–6 captures: about 9–11 min on Campfire and Hackatime, 41–49 min on
+openstreetmap-website, 2.1–2.5 h on Forem.
