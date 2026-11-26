@@ -23,6 +23,7 @@ ownership: {date: 2026-11-26, checked: ["open PRs naming respond_to_missing?, _m
 passes:
   - {reviewer: thermos-sol, head: "5a63e912442b8c2713fc09f9e52e3d6aba6d01f8", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: changes, open: "R1 remove the allocation spec; R2 add the changelog before opening and isolate the release fixture; R3 inline the measured benchmark payload; R4 label interpreter allocations; R5 correct the native-hook arity explanation"}
   - {reviewer: thermos-sol, head: "6358fa25723a332411f067370e1c067488374a28", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: approve, open: none}
+  - {reviewer: thermos-sol, head: "4770ec46f8831f16e384686a7cbafa808b85cfbc", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: approve, open: none}
 ---
 
 # Write new Mash keys without allocating in respond_to_missing?
@@ -156,3 +157,13 @@ The three implementation lines can remain unchanged. R1/R2 require a new fork he
 * `git diff 5a63e91 6358fa2 -- lib` is empty; `lib/hashie/mash.rb` has the same blob `a80d6bf9bb289009259c9ccb98d81ad1fdfbed6e`. The previously audited benchmark evidence therefore still measures this head's library code. Reran `hm1_diff.rb` on the new head under **Ruby 4.0.9 and 3.0.7**: all **9,140 rows per Ruby** are byte-identical to that Ruby's saved old-head output. Ruby 3.0.7 `ruby -Ilib -Ispec -S rspec spec/hashie/mash_spec.rb`: **171 examples, 0 failures**. No new timing/Callgrind or app run, or Ruby 3.3 suite rerun, is claimed for this confirm.
 
 Confirmed the remote fork branch is at the exact reviewed head and upstream master has not moved. Only the Lowrail review record is changed by this pass; no Hashie push, PR or comment is authorized or performed.
+
+### Thermos-sol delta confirm — 2026-11-26
+
+**Verdict: approve** on `4770ec46f8831f16e384686a7cbafa808b85cfbc`, compared only with approved `6358fa25723a332411f067370e1c067488374a28`. No remaining findings or exact fixes. Applied both correctness/security and maintainability rubrics here without delegation.
+
+* The entire file delta is `CHANGELOG.md:20`: prefix the existing entry with `[#656](https://github.com/hashie/hashie/pull/656): `. This matches CONTRIBUTING's final entry format. Both `lib/` and `spec/` trees are byte-identical; the previous code and evidence review still applies.
+* Both branch commits have Thomas Klemm `<github@tklemm.eu>` as author and committer and no trailers. The amended commit retains its parent `b42067687f1bd7667aa45caae8ec8bf587ddde94`, author date and message text; raw message comparison finds only one extra trailing blank line. The remote fork branch resolves to the exact reviewed head.
+* On Ruby 4.0.9, with CI unset and `RUBYOPT=--disable-error_highlight`, `bundle exec rspec spec/release_preparation_spec.rb --format documentation`: **3 examples, 0 failures**. `bundle exec rake rubocop`: **124 and 153 files, no offenses**. No full-suite, differential, app or performance rerun is claimed for this changelog-only confirm.
+
+GitHub's most recently created issue/PR was #655 when checked. That does not reserve #656: if the PR receives another number, `CHANGELOG.md:20` must use that assigned number instead. CONTRIBUTING asks for the number after opening; pre-numbering is valid only if it matches the resulting PR. Only the Lowrail review record is changed by this pass; no Hashie push, PR or comment was performed.
