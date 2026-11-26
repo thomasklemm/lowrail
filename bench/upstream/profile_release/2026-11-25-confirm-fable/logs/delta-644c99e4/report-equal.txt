@@ -1,0 +1,8 @@
+0ee4aed2 against 644c99e4, the path-gem app's kept runs:
+peak RSS: old 33 MB, new 33 MB
+report.json: 0 differing values
+report.md: 651 and 651 lines, 0 differ
+0ee4aed2 against 644c99e4, the fresh app's kept runs (two workers):
+peak RSS: old 42 MB, new 43 MB
+report.json: 0 differing values
+report.md: 837 and 837 lines, 0 differ

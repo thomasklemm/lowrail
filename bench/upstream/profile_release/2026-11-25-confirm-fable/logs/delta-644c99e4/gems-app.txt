@@ -1,0 +1,5 @@
+exit 0
+unclassified: nil
+app lines: []
+ranked: []
+app group: {"group" => "app", "all" => 126.41666666666666, "warm" => 99.99999999999999}; Not attributed lines in report.md: 0

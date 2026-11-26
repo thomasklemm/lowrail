@@ -1,0 +1,2 @@
+644c99e4, Ruby 4.0.7 / Rails 8.1.4: 42 runs, 1189 assertions, 0 failures, 0 errors, 0 skips; exit 0
+644c99e4, Ruby 3.3.14 / Rails 7.2.4: 42 runs, 1127 assertions, 0 failures, 0 errors, 0 skips; exit 0

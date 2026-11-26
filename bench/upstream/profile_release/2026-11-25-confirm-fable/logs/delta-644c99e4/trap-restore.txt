@@ -1,0 +1,3 @@
+INT during the report: ended (signal 2)
+TERM during the report: ended (signal 15)
+HUP during the report: ended (signal 1)

@@ -12,8 +12,8 @@ the first review under `/tmp/pr` ([2026-11-25-review-fable](../2026-11-25-review
 ones here call); the scripts keep those paths.
 
 * [smallest-fixes.patch](smallest-fixes.patch): the reviewer's fixes for the two must-fixes, with one test row,
-  against `0ee4aed2` (it applies with `git apply`). It is not applied to `gem/`. `logs/suites.txt` has the profile
-  suites with it on both pairs.
+  against `0ee4aed2` (it applies with `git apply`). `logs/suites.txt` has the profile suites with it on both
+  pairs. The builder took both fixes in `644c99e4` (below).
 * `scripts/suite.sh`: `ci.yml`'s *Profile tests* step. `logs/suites.txt`: its summary line at each of the four
   heads on both pairs.
 * `scripts/mutants.rb`: one fix undone at a time in a worktree, then the test said to cover it.
@@ -51,3 +51,24 @@ ones here call); the scripts keep those paths.
   (a `ps` that fails, before and after `0ee4aed2`), the trap and glob checks again, `t8-53a071fd.log`,
   `t8-0ee4aed2.log`, the suites and the mutants.
 * `scripts/forem-drift.rb`, `logs/forem-drift.txt`: must-fix 2, from Forem's captures in `oss_profile_sweep_1/forem`.
+
+## Delta: 0ee4aed2..644c99e4 (2026-11-26)
+
+Receipts for the *Delta confirm 0ee4aed2..644c99e4: thermos-fable* section. The gem was built in `gem/` at
+`644c99e4` (sha256 `74dc80b1400a2703a38cb1e3a416c836bf1a09fc7058926b0c64c72a22073773`, as stated) and installed
+into both Rubies. `scripts/run-h.sh` ran everything; its logs are in `logs/delta-644c99e4/`.
+
+* `suites.txt`: the profile suites on both pairs.
+* `gems-app.txt`, `gems-dir.txt`: must-fix 1 on the `GemsController` app with the installed gem and on written runs.
+  `t1.txt`: the path-gem app. `report-equal.txt`: the report of kept runs built by `0ee4aed2`'s lib and by
+  `644c99e4`'s (`stream-equal.rb`, whose *old* and *new* are those two here).
+* `ps-probe.txt`, `trap-restore.txt`, `t8.log`: `--timeout`'s wait for the stopped group with `ps` through
+  `IO.popen`, a signal during the report, and the four hanging-test cases.
+* `replay.txt`: `run_options.sh osm-serial` and `osm-parallel` from the committed captures; `git status` lists
+  nothing after them.
+* `scripts/mutants-delta.rb`, `mutants.txt`: one change of the commit undone at a time. The one survivor is a
+  mutant of the reviewer's own, not of a fix in the commit: no test has a path gem inside the root but outside
+  `gems/`, which stays an app line (as `engines/inner` does in `t1.txt`).
+* `scripts/gems-engine.rb`, `gems-engine.txt`: the note on an engine profiled in place, on written runs, at
+  `1618fc38`, `0ee4aed2` and `644c99e4`, and with the tighter condition the note proposes.
+

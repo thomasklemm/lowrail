@@ -1,0 +1,6 @@
+osm-serial done
+osm-serial 64.83s
+osm-parallel done
+osm-parallel 71.09s
+git status of the receipts:
+replay done

@@ -1,0 +1,22 @@
+1618fc38:
+  APP/app/views/gems/index.html.erb:5 => app
+  APP/app/models/m.rb:9 => app
+  unclassified: nil
+0ee4aed2:
+  GEM/my_engine/app/views/gems/index.html.erb:5 => gem: my_engine
+  APP/app/models/m.rb:9 => app
+  unclassified: nil
+644c99e4:
+  GEM/my_engine/app/views/gems/index.html.erb:5 => gem: my_engine
+  APP/app/models/m.rb:9 => app
+  unclassified: nil
+644c99e4 with the tighter condition (the gem's directory under gems/):
+  APP/app/views/gems/index.html.erb:5 => app
+  APP/app/models/m.rb:9 => app
+  unclassified: nil
+the same lib, an app with a path gem in gems/ and app/views/gems/:
+  GEM/foo/lib/foo.rb:3 => gem: foo
+  APP/app/views/gems/index.html.erb:5 => app
+  APP/app/models/gems/ruby.rb:7 => app
+  APP/app/models/m.rb:9 => app
+  unclassified: nil

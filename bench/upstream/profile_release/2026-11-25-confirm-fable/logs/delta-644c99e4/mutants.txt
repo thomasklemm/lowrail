@@ -1,0 +1,26 @@
+killed    classify: every path with a gems/ segment leaves the app (as at 0ee4aed2)
+          test_a_path_gem_inside_the_app_root_is_a_gem: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+          --- expected +++ actual @@ -1 +1 @@
+killed    classify: a path gem inside the root stays an app line (as at 1618fc38)
+          test_a_path_gem_inside_the_app_root_is_a_gem: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+          --- expected +++ actual @@ -1 +1 @@
+SURVIVED  classify: any path gem inside the root leaves the app, gems/ or not
+          test_a_path_gem_inside_the_app_root_is_a_gem|test_path_gems_and_an_engine_root_are_classified: 2 runs, 19 assertions, 0 failures, 0 errors, 0 skips
+killed    timeout: traps not restored after the run
+          test_signals_end_the_report_after_a_timeout_run: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+          INT during the report was swallowed: lowrail-profile: run 1 of 1: sh -c mkfifo "$LOWRAIL_PROFILE/1.tsv"  
+killed    timeout: only INT restored after the run
+          test_signals_end_the_report_after_a_timeout_run: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          TERM during the report was swallowed: lowrail-profile: run 1 of 1: sh -c mkfifo "$LOWRAIL_PROFILE/1.tsv"  
+killed    timeout: a failing ps's stderr reaches the terminal (backticks, as at 0ee4aed2)
+          test_timeout_waits_out_the_grace_when_ps_fails: 1 runs, 5 assertions, 1 failures, 0 errors, 0 skips
+          ps's own errors stay out of lowrail-profile's output. Expected /ps: broken/ to not match "lowrail-profile: run 1 of 2: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby -e spawn(RbConfig.ruby, '-e', \"trap(\\\"TERM\\\") { 
+killed    timeout: a failing ps is believed (no kill 0 when ps exits non-zero)
+          test_timeout_waits_out_the_grace_when_ps_fails: 1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+          the grandchild's cleanup was cut off by KILL  1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+killed    timeout: zombies in the group are waited for (kill 0 only)
+          test_timeout_does_not_wait_for_a_zombie: 1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+          waited 11.1 s for a zombie. Expected 11.1213234859988 to be < 6. 
+killed    timeout: ps never reports a running member (KILL at once)
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 7 assertions, 1 failures, 0 errors, 0 skips
+          leader-ignores. Expected 11..30 to include 1. 

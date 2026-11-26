@@ -856,3 +856,77 @@ traps, the pending signals, the grace wait and `ps` inline, 36 lines of one bran
 that returns the status and whether it timed out or was interrupted would give the loop back its shape. The two
 spawn paths differ on purpose (a process group changes what the terminal sends), so I would not unify them.
 Neither blocks 0.1; the 1,000-line test file is the one rubric flag (should-fix above).
+
+## Delta confirm 0ee4aed2..644c99e4: thermos-fable (2026-11-26)
+
+Scope: `644c99e4`, the one commit on top of `0ee4aed2` under `gem/` and the receipts: my two must-fixes and four
+of the should-fixes of the confirm above. Both Thermos rubrics, by one reviewer, without delegation. Receipts: the
+*Delta* part of [2026-11-25-confirm-fable](../../bench/upstream/profile_release/2026-11-25-confirm-fable/README.md).
+**Verdict: approve; no must-fix. The gem built at `644c99e4`, sha256
+`74dc80b1400a2703a38cb1e3a416c836bf1a09fc7058926b0c64c72a22073773`, is ready for 0.1 as far as this review goes.**
+Both must-fixes are fixed as reproduced, and each new or changed test fails with its fix undone.
+
+### What ran
+
+* **Gem.** Built in `gem/` at `644c99e4`: the sha256 above, as stated, 14 files; installed with `gem install
+  --local` into Ruby 4.0.7 and 3.3.14.
+* **Profile suites** as `ci.yml` lists them: Ruby 4.0.7 / Rails 8.1.4, 42 runs, 1,189 assertions; Ruby 3.3.14 /
+  Rails 7.2.4, 42 runs, 1,127 assertions; 0 failures, 0 errors and 0 skips on both. CI on `644c99e4` is green in all
+  14 jobs.
+
+### The two must-fixes
+
+1. **An app file under a directory named `gems`: fixed.** `classify` gives up the app root only where a path gem's
+   `G` row covers the path. On the copy of the fresh app with a `GemsController`, profiled with the installed gem,
+   report.md has no *Not attributed* line (114.33 objects per request, 2.1%, at `0ee4aed2`), and
+   `app/views/gems/index.html.erb` and `app/models/gems/ruby.rb` count in the app group. The path-gem app is as
+   before: `gems/gitlab_like`, `vendor/gems/vendored` and the symlinked gem are `GEM/…` rows, and *Not attributed*
+   is the loose file outside the root (20.46 objects per request, 0.6%). On the kept runs of the path-gem app and
+   of the fresh app with two workers, report.json and report.md from `0ee4aed2`'s lib and `644c99e4`'s are
+   identical, so the change moves nothing but such files.
+2. **README, the difference between captures: fixed.** The sentence reads *up to about 1% per action … compare
+   listed five actions, four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154, +0.8%*,
+   which is Forem's `forem-compare.txt`: 0.10%, 0.18%, 0.20%, 0.24% and 0.84% (15,028.3 → 15,154.4). The bound is
+   for what compare lists; differences its noise floor already covers reach 1.85%.
+
+### The should-fixes taken
+
+| Should-fix | At `644c99e4` |
+| --- | --- |
+| A test for restoring the traps | `test_signals_end_the_report_after_a_timeout_run`: a FIFO left as `run1/1.tsv` holds the report, then `INT`, `TERM` and `HUP` each end lowrail-profile by that signal. It passes on macOS too (CI) |
+| A failing `ps` prints on every poll | `ps` runs through `IO.popen` with its stderr discarded: 0 lines on lowrail-profile's stderr where `0ee4aed2` printed 31. Installed `ps`, a failing `ps` and no `ps` on PATH each let a command finish its 3 s `TERM` handler; all four hanging-test cases exit 124 with nothing left running |
+| OSM's captures read from the orb backup | `run_options.sh` reads `oss_profile_sweep_1/osm`; `osm-serial` and `osm-parallel` replay byte for byte (`git status` lists nothing after them) |
+| `census/README.md` | Says main's `gem/lib` replays the sets, with a command that runs from the receipts' directory |
+
+Not taken, as agreed for after 0.1: `profile_test.rb` stays at 1,055 lines with `--timeout` tested in two files.
+
+### Mutants
+
+One change undone at a time in a worktree at `644c99e4`, then the test said to cover it: 8 of 9 killed. The `gems/`
+rule as at `0ee4aed2` and as at `1618fc38`, the traps not restored, only `INT` restored, a failing `ps`'s stderr on
+the terminal, a failing `ps` believed, zombies waited for and `ps` never reporting a member each fail their test.
+The survivor is a mutant of my own, not of a fix in this commit: no test has a path gem inside the root but
+outside `gems/`, which stays an app line (as `engines/inner` does on the path-gem app).
+
+### Notes (none blocks 0.1)
+
+* **An engine profiled in place, with a directory named `gems`.** When the attribution root is itself a path gem
+  (an engine's `gemspec` in its own Gemfile, profiled from the engine's directory), its `G` row covers every file,
+  so `app/views/gems/index.html.erb` is listed as `GEM/my_engine/…` in the gem tables while the engine's other
+  files are `APP/…` lines. It is ranked, not lost, and it was the same at `0ee4aed2`; at `1618fc38` it was an app
+  line. The line is the one my patch proposed. A tighter form asks whether the gem's directory, not the path, lies
+  under `gems/`: `!path_gems.any? { |_, d| path.start_with?(d) && d.delete_prefix(root).match?(%r{(?:\A|/)gems/}) }`.
+  With it the engine's view is an app line, the two app layouts are unchanged and `profile_report_test.rb` passes
+  (written runs only, `scripts/gems-engine.rb`; not run on a real engine).
+* **The trap test's one-second wait.** After the FIFO appears the test sleeps 1 s before it signals, for the run to
+  end and the traps to be restored. A signal that came earlier would be passed to the finished run and the test
+  would fail as *swallowed*: a false failure on a stalled runner, never a false pass.
+* `QUIT` forwarding and the traps set before the spawn still have no test; both are correct by reading.
+
+### Maintainability
+
+The commit is three changed lines of `gem/lib` and `gem/exe`, four of the README, and two tests in the files that
+already hold their
+neighbours. `classify`'s app branch is now one condition of about 160 columns; the tighter form above is shorter.
+Nothing
+here adds a rubric flag; the 1,000-line test file is the one that stays open.
