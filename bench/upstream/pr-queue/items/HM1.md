@@ -24,6 +24,7 @@ passes:
   - {reviewer: thermos-sol, head: "5a63e912442b8c2713fc09f9e52e3d6aba6d01f8", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: changes, open: "R1 remove the allocation spec; R2 add the changelog before opening and isolate the release fixture; R3 inline the measured benchmark payload; R4 label interpreter allocations; R5 correct the native-hook arity explanation"}
   - {reviewer: thermos-sol, head: "6358fa25723a332411f067370e1c067488374a28", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: approve, open: none}
   - {reviewer: thermos-sol, head: "4770ec46f8831f16e384686a7cbafa808b85cfbc", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: approve, open: none}
+  - {reviewer: thermos-sol, head: "d874851d79db3a35b4cde8d2d6c567833ebb73f7", date: 2026-11-26, orb: T-01a216af-bca8-70fc-94d2-b9fbcc8745ab, verdict: approve, open: none}
 ---
 
 # Write new Mash keys without allocating in respond_to_missing?
@@ -167,3 +168,39 @@ Confirmed the remote fork branch is at the exact reviewed head and upstream mast
 * On Ruby 4.0.9, with CI unset and `RUBYOPT=--disable-error_highlight`, `bundle exec rspec spec/release_preparation_spec.rb --format documentation`: **3 examples, 0 failures**. `bundle exec rake rubocop`: **124 and 153 files, no offenses**. No full-suite, differential, app or performance rerun is claimed for this changelog-only confirm.
 
 GitHub's most recently created issue/PR was #655 when checked. That does not reserve #656: if the PR receives another number, `CHANGELOG.md:20` must use that assigned number instead. CONTRIBUTING asks for the number after opening; pre-numbering is valid only if it matches the resulting PR. Only the Lowrail review record is changed by this pass; no Hashie push, PR or comment was performed.
+
+### Thermos-sol maintainer-follow-up delta — 2026-11-26
+
+**Verdict: approve** on `d874851d79db3a35b4cde8d2d6c567833ebb73f7`, relative to approved `4770ec46f8831f16e384686a7cbafa808b85cfbc` and new upstream base `e1adebc3de7f48c7aa3f1f9f73c97676102f34a3`. No must-fixes under either correctness/security or maintainability. Both Thermos rubrics were applied personally in this thread, without subagents or other threads; this is one reviewer, not two independent reviews.
+
+#### Delta and maintainer requests
+
+* The complete `lib/` tree and `.spellcheck.txt` are byte-identical to the approved head; `lib/hashie/mash.rb` retains blob `a80d6bf9bb289009259c9ccb98d81ad1fdfbed6e`. No new runtime/security boundary is introduced. The candidate is exactly one commit on upstream master containing merged #657; our `b420676` release-fixture commit is absent from its ancestry, and `spec/release_preparation_spec.rb` is identical to upstream. The apparent release-spec delta against the old head belongs to #657, not this patch.
+* Read dblock's comments 7181656128 and 7181685448 after the code audit. `benchmarks/mash_new_keys.rb` is byte-for-byte identical to his Ruby code fence, uses existing dependencies, and completes with `bundle exec ruby benchmarks/mash_new_keys.rb` on Ruby 4.0.7. This was a smoke run during other builds, not a fresh comparative speed measurement. Duel/#658 is a separately invited follow-up, not a requirement for HM1.
+* `CHANGELOG.md:19` puts the unchanged numbered, attributed Changed entry above its placeholder, preserves every placeholder and the upstream #657 entry, and follows CONTRIBUTING and AGENTS.md. Raw commit inspection confirms Thomas Klemm `<github@tklemm.eu>` as both author and committer, the original author date retained, and no trailers. The only substantive message addition is the two lines describing the spec and benchmark.
+
+#### Allocation-spec judgment
+
+The new example at `spec/hashie/mash_spec.rb:849–858` is acceptable at the maintainer's explicit request; this supersedes R1 for this candidate only, not Lowrail's general policy against implementation-count specs. It exercises public `[]=`, matching the existing symbol-key allocation specs without a new helper or abstraction. Mash construction, the lambda and sample array are outside the measured intervals; the same Symbol key and immediate Integer are used after one warm-up, and each measurement writes to a fresh Mash rather than overwriting a warmed key. Existing neighboring behavior assertions cover storage semantics.
+
+`GC.stat(:total_allocated_objects)` counts cumulative allocations, not surviving objects, so collections cannot erase the regression. No new `GC.disable`/`GC.start` or global GC-state changes belong in this spec. The serial core suite has no inspected background worker or finalizer that would contaminate the intervals. The bound permits up to nine incidental allocations across ten writes, while rejecting even one allocation on every write: both the `Symbol#to_s` and `*args` mutants produce exactly **10**, and upstream master produces **20**, on **both Ruby 3.0.7 and 4.0.7**. All three fail the actual new RSpec example, with the loaded source path verified. Do not loosen the comparison to `<= 10`, which would admit either single regression.
+
+Portability checks found no flakiness: a scratch replay of the exact counting window and fresh-Mash sampling had **0 measured objects in every round** on each of CRuby **3.0.7, 3.1.7, 3.2.11, 3.3.14, 3.4.13 and 4.0.7**, using 1,000 ordinary rounds, 100 with an explicit collection before each round, 100 with GC disabled, and three with GC stress enabled. The actual RSpec example passes with frozen-string defaults enabled and disabled on every listed CRuby; `Symbol#name` is frozen independently of that default, and the measured write contains no String literal. Ruby 3.0.7 and 4.0.7 additionally pass 20 separate cold RSpec processes apiece and randomized full Mash specs (seed 8675309: 172/173 examples). Ruby 4.0.7 passes the example and all four replay modes with YJIT. JRuby correctly filters out the CRuby-only example.
+
+#### Executed core suites on the exact candidate
+
+Each CRuby used its own resolved development bundle and `CI=true RUBYOPT=--disable-error_highlight bundle exec rake spec`, as in Hashie's workflow. These are full core suites, not separately bundled integration suites. JRuby used `CI=true JRUBY_OPTS=--debug bundle exec rake spec` with Temurin 21.0.13.1. Different counts reflect existing engine/version guards (including release specs on CRuby 3.3+).
+
+| Runtime | Examples | Failures |
+| --- | ---: | ---: |
+| CRuby 3.0.7 | 1,072 | 0 |
+| CRuby 3.1.7 | 1,072 | 0 |
+| CRuby 3.2.11 | 1,073 | 0 |
+| CRuby 3.3.14 | 1,076 | 0 |
+| CRuby 3.4.13 | 1,076 | 0 |
+| CRuby 4.0.7 | 1,076 | 0 |
+| JRuby 10.1.3.0 | 1,070 | 0 |
+
+Ruby 4.0.7 `bundle exec rake rubocop`: **124 and 154 files inspected, no offenses**. Maintainability review found no structural regression, needless indirection, scattered branching or new dependencies: the 11-line spec stays with its existing symbol-key neighbors, the 24-line benchmark follows local conventions, and the already-large spec file does not cross the 1,000-line threshold in this delta. The runtime simplification remains exactly the previously approved one. No fresh dependent-app, Callgrind or comparative benchmark run is claimed.
+
+Only Lowrail's review record is changed. The live draft PR and its original fork branch still point to `4770ec46f8`; the alternate branch points to the exact reviewed candidate. No Hashie branch push or upstream comment was performed, and the queue's live-head metadata is intentionally unchanged.
