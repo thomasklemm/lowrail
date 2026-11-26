@@ -1,0 +1,16 @@
+1 gem installed
+bundle update minitest: exit 7
+Minitest 5.23.1, register_plugin: false
+caller SEED='': plain exit 0 (--seed 57770 ), profiled exit 0 (--seed 1234 --seed 1234 ); 6 and 12 passing test lines; * Counted in run 1: 7 requests; 2 runs
+child identical
+caller SEED='99': plain exit 0 (--seed 99 ), profiled exit 0 (--seed 1234 --seed 1234 ); 6 and 12 passing test lines; * Counted in run 1: 7 requests; 2 runs
+child identical
+BUNDLER_ORIG_RUBYLIB=BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL
+BUNDLER_ORIG_RUBYOPT=BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL
+RUBYLIB=
+RUBYOPT=-r/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/bundler/setup
+SEED=99
+profiler=nil
+-- with_unbundled_env
+SEED=99
+profiler=nil

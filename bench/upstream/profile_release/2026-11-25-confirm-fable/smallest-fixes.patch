@@ -1,0 +1,56 @@
+--- a/gem/lib/lowrail/profile_report.rb
++++ b/gem/lib/lowrail/profile_report.rb
+@@ -156,8 +156,8 @@
+       if path == "-" then ["(no Ruby frame)", path]
+       elsif (m = path.match(RAILS_PATH)) then ["rails: #{m[1] || m[2]}", "RAILS/#{m[1] || m[2]}/#{m[3]}"]
+       elsif (m = path.match(GEM_PATH)) then gem_site(m[1], m[3])
+-      # As the counter attributes: a gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines.
+-      elsif (root = @roots.find { path.start_with?(_1) }) && !path.delete_prefix(root).match?(%r{(?:\A|/)gems/})
++      # A path gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines; app/views/gems/ is.
++      elsif (root = @roots.find { path.start_with?(_1) }) && !(path.delete_prefix(root).match?(%r{(?:\A|/)gems/}) && path_gems.any? { |_, d| path.start_with?(d) })
+         ["app", "APP/#{path.delete_prefix(root)}"]
+       elsif (name, gem_dir = path_gems.find { |_, d| path.start_with?(d) })
+         RAILS.include?(name) ? ["rails: #{name}", "RAILS/#{name}/#{path.delete_prefix(gem_dir)}"] : gem_site(name, path.delete_prefix(gem_dir))
+--- a/gem/README-profile.md
++++ b/gem/README-profile.md
+@@ -128,9 +128,10 @@
+ that action's share of the requests. Not found: the same `html_escape` plant in Hackatime's
+ `LeaderboardsController#index` (+40–60 on about 7,900, twice that action's own noise: listed in half the
+ comparisons), and with workers Writebook's plant in an action that runs once per worker process. An action that runs
+-once per process has no warm value and is not compared. Captures taken at different times can drift by about 0.2%
+-per action on the same code (Forem: `ResponseTemplatesController#update` 15,028 → 15,155 half an hour apart, with
+-nothing changed), so a small listed change is a hint, not proof.
++once per process has no warm value and is not compared. Captures taken at different times can differ by up to
++about 1% per action on the same code (Forem, half an hour apart with nothing changed: compare listed five actions,
++four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154, +0.8%), so a small listed change is
++a hint, not proof.
+ 
+ An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
+ only, is listed under *Not compared* with the reason, and nothing about its own cost is listed. Lines outside the
+--- a/gem/test/profile_report_test.rb
++++ b/gem/test/profile_report_test.rb
+@@ -46,17 +46,19 @@
+   end
+ 
+   # A gem kept inside the app (GitLab's gems/, vendor/gems/) is a gem, as the
+-  # counter treats it, not an app line that no table ranks.
++  # counter treats it, not an app line that no table ranks. An app directory
++  # that is only named gems (a GemsController's views) stays the app's.
+   def test_a_path_gem_inside_the_app_root_is_a_gem
+     realpath_tmpdir do |dir|
+       write_runs(dir, lambda do |_, pid|
+-        ["# lowrail-profile 3\trequests=4\tobjects=40\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
+-          "P\t0\t/app/gems/foo/lib/foo.rb", "P\t1\t/app/vendor/gems/bar/lib/bar.rb", "P\t2\t/app/app/models/m.rb",
++        ["# lowrail-profile 3\trequests=4\tobjects=44\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
++          "P\t0\t/app/gems/foo/lib/foo.rb", "P\t1\t/app/vendor/gems/bar/lib/bar.rb", "P\t2\t/app/app/models/m.rb", "P\t3\t/app/app/views/gems/index.html.erb", "3\t9\tString\t4\t4\t0\t0\trequest",
+           "0\t3\tString\t20\t4\t0\t0\trequest", "1\t5\tString\t12\t4\t0\t0\trequest", "2\t7\tString\t8\t4\t0\t0\trequest",
+-          "A\trequest\tC#a\t4\t40\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
++          "A\trequest\tC#a\t4\t44\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
+       end)
+       sites = Lowrail::ProfileReport.new(dir).sites.to_h { ["#{_1.key}:#{_1.line}", _1.group] }
+-      assert_equal({ "GEM/foo/lib/foo.rb:3" => "gem: foo", "GEM/bar/lib/bar.rb:5" => "gem: bar", "APP/app/models/m.rb:7" => "app" }, sites)
++      assert_equal({ "GEM/foo/lib/foo.rb:3" => "gem: foo", "GEM/bar/lib/bar.rb:5" => "gem: bar", "APP/app/models/m.rb:7" => "app",
++        "APP/app/views/gems/index.html.erb:9" => "app" }, sites)
+     end
+   end
+ end

@@ -1,0 +1,5 @@
+bundle lock --local: exit 0
+Ruby 4.0.7, Gemfile reads .ruby-version, 60387485: exit 0; counters built: 1; * Counted in run 1: 6 requests; 2 runs
+Ruby 4.0.7, Gemfile reads .ruby-version, 1618fc38: exit 1; counters built: 0; lowrail-profile: building the counter failed, see /tmp/pr2/cache-b/lowrail/profile/ruby-4.
+[!] There was an error parsing `Gemfile`: No such file or directory @ rb_sysopen - .ruby-version. Bundler cannot continue.
+Ruby 3.3.14, RSpec app, 60387485: exit 0; counters built: 1; * Counted in run 1: 2 requests; 2 runs

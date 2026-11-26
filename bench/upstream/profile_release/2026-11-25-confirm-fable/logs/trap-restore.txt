@@ -1,0 +1,16 @@
+0ee4aed2:
+INT during the report: ended (signal 2)
+TERM during the report: ended (signal 15)
+HUP during the report: ended (signal 1)
+53a071fd:
+INT during the report: ended (signal 2)
+TERM during the report: ended (signal 15)
+HUP during the report: ended (signal 1)
+60387485 (the same lines of the exe):
+INT during the report: ended (signal 2)
+TERM during the report: ended (signal 15)
+HUP during the report: ended (signal 1)
+without the line that restores the traps:
+INT during the report: SWALLOWED, still running after 8 s (killed)
+TERM during the report: SWALLOWED, still running after 8 s (killed)
+HUP during the report: SWALLOWED, still running after 8 s (killed)

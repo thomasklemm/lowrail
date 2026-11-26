@@ -1,0 +1,18 @@
+1618fc38:
+  APP/gems/foo/lib/foo.rb:3 => app
+  APP/app/views/gems/index.html.erb:5 => app
+  APP/app/models/gems/ruby.rb:7 => app
+  APP/app/models/m.rb:9 => app
+  unclassified: nil
+60387485 (gem/lib is the same at 0ee4aed2):
+  GEM/foo/lib/foo.rb:3 => gem: foo
+  /app/app/views/gems/index.html.erb:5 => other
+  /app/app/models/gems/ruby.rb:7 => other
+  APP/app/models/m.rb:9 => app
+  unclassified: {"objects_per_request" => 5.0, "share" => 0.3333, "files" => [{"path" => "/app/app/views/gems/index.html.erb", "objects_per_request" => 3.0}, {"path" => "/app/app/models/gems/ruby.rb", "objects_per_request" => 2.0}]}
+the same with smallest-fixes.patch:
+  GEM/foo/lib/foo.rb:3 => gem: foo
+  APP/app/views/gems/index.html.erb:5 => app
+  APP/app/models/gems/ruby.rb:7 => app
+  APP/app/models/m.rb:9 => app
+  unclassified: nil

@@ -1,0 +1,10 @@
+5cdc5669 against its parent 1618fc38, the T1 app's kept runs:
+peak RSS: old 42 MB, new 33 MB
+report.json: 0 differing values
+report.md: 649 and 649 lines, 0 differ
+1618fc38 against 60387485, the fresh app's kept runs (two workers, no gem inside the root):
+peak RSS: old 54 MB, new 42 MB
+report.json: 2 differing values
+  /meta/format: 2 -> 3
+  /meta/timed_out: nil -> []
+report.md: 837 and 837 lines, 0 differ

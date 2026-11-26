@@ -1,0 +1,10 @@
+7a5ee0b6, Ruby 4.0.7 / Rails 8.1.4: 38 runs, 1168 assertions, 0 failures, 0 errors, 0 skips; exit 0
+7a5ee0b6, Ruby 3.3.14 / Rails 7.2.4: 38 runs, 1107 assertions, 0 failures, 0 errors, 0 skips; exit 0
+60387485, Ruby 4.0.7 / Rails 8.1.4: 39 runs, 1175 assertions, 0 failures, 0 errors, 0 skips; exit 0
+60387485, Ruby 3.3.14 / Rails 7.2.4: 39 runs, 1114 assertions, 0 failures, 0 errors, 0 skips; exit 0
+53a071fd, Ruby 4.0.7 / Rails 8.1.4: 40 runs, 1181 assertions, 0 failures, 0 errors, 0 skips; exit 0
+53a071fd, Ruby 3.3.14 / Rails 7.2.4: 40 runs, 1119 assertions, 0 failures, 0 errors, 0 skips; exit 0
+0ee4aed2, Ruby 4.0.7 / Rails 8.1.4: 41 runs, 1184 assertions, 0 failures, 0 errors, 0 skips; exit 0
+0ee4aed2, Ruby 3.3.14 / Rails 7.2.4: 41 runs, 1122 assertions, 0 failures, 0 errors, 0 skips; exit 0
+0ee4aed2 with smallest-fixes.patch, Ruby 4.0.7 / Rails 8.1.4: 41 runs, 1184 assertions, 0 failures, 0 errors, 0 skips; exit 0
+0ee4aed2 with smallest-fixes.patch, Ruby 3.3.14 / Rails 7.2.4: 41 runs, 1122 assertions, 0 failures, 0 errors, 0 skips; exit 0

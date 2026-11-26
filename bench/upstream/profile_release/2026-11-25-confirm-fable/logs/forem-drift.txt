@@ -1,0 +1,9 @@
+actions with a warm value in base, A/A and head: 656
+base and head 20 or more objects apart: 38; their relative difference: median 0.22%, largest 1.85%
+0.5% or more: 6; 0.2% or more: 22; 0.1% or more: 49
+what compare listed (forem-compare.txt):
+  ResponseTemplatesController#update: 15028.3 -> 15154.4 (+126.10, 0.84%)
+  ModerationsController#article: 23629.3 -> 23686.25 (+56.95, 0.24%)
+  ModerationsController#actions_panel: 27980.35 -> 28009.3 (+28.95, 0.1%)
+  ArticlesController#manage: 24097.45 -> 24054.95 (-42.50, 0.18%)
+  Api::V1::TagsController#create: 11397.6 -> 11374.45 (-23.15, 0.2%)

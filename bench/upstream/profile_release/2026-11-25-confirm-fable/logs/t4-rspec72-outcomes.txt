@@ -1,0 +1,4 @@
+noseed run1: 48 example lines identical to the plain run; 36 examples, 0 failures, 14 pending
+noseed run2: 48 example lines identical to the plain run; 36 examples, 0 failures, 14 pending
+seed99 run1: 48 example lines identical to the plain run; 36 examples, 0 failures, 14 pending
+seed99 run2: 48 example lines identical to the plain run; 36 examples, 0 failures, 14 pending

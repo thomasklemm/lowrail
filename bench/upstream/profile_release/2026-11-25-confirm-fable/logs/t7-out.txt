@@ -1,0 +1,11 @@
+keep='' exit 0 peak 1950436 bytes, after 951953 bytes: .lowrail-profile capture.json command.txt report.json report.md 
+keep='--keep-runs' exit 0 peak 1950473 bytes, after 1950473 bytes: .lowrail-profile capture.json command.txt report.json report.md run1 run2 
+run1/85840.tsv: 339572 bytes with the path table, 1411802 with a path in every row (4.2x), 548 paths, 0 attribution rows
+run2/85946.tsv: 658944 bytes with the path table, 2671552 with a path in every row (4.1x), 548 paths, 6326 attribution rows
+report from kept runs: exit 0
+report.json: OK
+report.md: OK
+lowrail-profile: no runs in /tmp/pr/a81/t1/tmp/lp-t7: they are deleted after the report unless you profile with --keep-runs
+report without runs: exit 1
+| rails: activestorage | 0.0 | 0.2 | `engine.rb:221` 0.0 |
+report (default dir): exit 0

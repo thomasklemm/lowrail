@@ -1,0 +1,42 @@
+== noseed: status plain 0 profiled 0; tests 90
+tree plain:    
+tree profiled: 
+child after_suite.txt identical
+child after_suite_env.txt DIFFERS
+3d2
+< RUBYLIB=
+child after_suite_nested_rake.txt identical
+child after_suite_nested_rspec.txt DIFFERS
+< Finished in 0.00368 seconds (files took 0.08283 seconds to load)
+> Finished in 0.0037 seconds (files took 0.08482 seconds to load)
+child after_suite_nested_rspec_unbundled.txt DIFFERS
+< Finished in 0.00362 seconds (files took 0.08016 seconds to load)
+> Finished in 0.00362 seconds (files took 0.08453 seconds to load)
+child after_suite_original_env.txt identical
+child after_suite_original_env_ruby.txt identical
+child after_suite_unbundled_env.txt identical
+child after_suite_unbundled_env_ruby.txt identical
+child helper_load.txt identical
+child in_example.txt identical
+leftover: 0
+== seed99: status plain 0 profiled 0; tests 90
+tree plain:    
+tree profiled: 
+child after_suite.txt identical
+child after_suite_env.txt DIFFERS
+3d2
+< RUBYLIB=
+child after_suite_nested_rake.txt identical
+child after_suite_nested_rspec.txt DIFFERS
+< Finished in 0.00331 seconds (files took 0.0866 seconds to load)
+> Finished in 0.00404 seconds (files took 0.08163 seconds to load)
+child after_suite_nested_rspec_unbundled.txt DIFFERS
+< Finished in 0.00381 seconds (files took 0.0865 seconds to load)
+> Finished in 0.00321 seconds (files took 0.08341 seconds to load)
+child after_suite_original_env.txt identical
+child after_suite_original_env_ruby.txt identical
+child after_suite_unbundled_env.txt identical
+child after_suite_unbundled_env_ruby.txt identical
+child helper_load.txt identical
+child in_example.txt identical
+leftover: 0

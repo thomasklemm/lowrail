@@ -1,0 +1,14 @@
+exit 0
+11:* Not attributed: 114.33 objects per request (2.1% of all) are on lines outside the app, Rails, Ruby and the bundle's gems, which no table below ranks; most in `/tmp/pr2/gemsapp/app/views/gems/index.html.erb`, `/tmp/pr2/gemsapp/app/models/gems/ruby.rb`
+unclassified: {"objects_per_request" => 114.33, "share" => 0.0208, "files" => [{"path" => "/tmp/pr2/gemsapp/app/views/gems/index.html.erb", "objects_per_request" => 61.0}, {"path" => "/tmp/pr2/gemsapp/app/models/gems/ruby.rb", "objects_per_request" => 53.33}]}
+app lines: []
+ranked: []
+0ee4aed2 with smallest-fixes.patch (bundle exec ruby WORKTREE/gem/exe/lowrail-profile), the GemsController app:
+exit 0
+Not attributed lines in report.md: 0
+unclassified: nil
+ranked: []
+app group: {"group" => "app", "all" => 124.66666666666664, "warm" => 100.0}
+the path-gem app's kept runs, report rebuilt with the patched lib:
+["GEM/t1-gitgem/lib/gitgem.rb:2", "GEM/linked/lib/linked/deep.rb:3", "GEM/linked/lib/linked.rb:2", "GEM/outer/lib/outer.rb:2", "GEM/vendored/lib/vendored.rb:2", "GEM/gitlab_like/lib/gitlab_like.rb:2", "RAILS/actionpack/lib/action_dispatch/journey/router/utils.rb:73", "RAILS/actionpack/lib/action_dispatch/journey/router.rb:69", "RAILS/actionpack/lib/action_dispatch/journey/router/utils.rb:24", "RAI
+unclassified: {"objects_per_request" => 20.46, "share" => 0.0058, "files" => [{"path" => "/tmp/pr/a81/t1-loose/loose.rb", "objects_per_request" => 20.46}]}

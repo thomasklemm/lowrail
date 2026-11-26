@@ -1,0 +1,42 @@
+killed    leave_env: not BUNDLER_ORIG_RUBYOPT/RUBYLIB
+          test_processes_the_suite_starts_run_as_without_the_profiler: 1 runs, 12 assertions, 1 failures, 0 errors, 0 skips
+          minitest. --- expected +++ actual
+killed    path gem inside the root stays an app line
+          test_a_path_gem_inside_the_app_root_is_a_gem: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+          --- expected +++ actual @@ -1 +1 @@
+killed    timeout: KILL only when the leader is still there after 10 s
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 16 assertions, 1 failures, 0 errors, 0 skips
+          leader-exits. Expected 11..30 to include 1. 
+killed    timeout: no wait for the group before KILL (KILL at once)
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 7 assertions, 1 failures, 0 errors, 0 skips
+          leader-ignores. Expected 11..30 to include 1. 
+killed    timeout: the first failed run's status wins over 124
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 19 assertions, 1 failures, 0 errors, 0 skips
+          run2: lowrail-profile: run 1 of 2: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby late.rb lowrail-profile: run 2 of 2: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby late.rb lowrail-profile: run 2 took longer
+killed    timeout: no notice in the report
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 22 assertions, 1 failures, 0 errors, 0 skips
+          run2: report on the terminal. Expected "# lowrail-profile report\n\nObjects allocated (exact counts, not time, not retained memory) per request, job, mail and Action Cable action, by source line. A line with many objects is a plac
+killed    timeout: HUP not passed on
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 36 assertions, 0 failures, 1 errors, 0 skips
+          Errno::ENOENT: No such file or directory @ rb_sysopen - /tmp/lowrail20261126-489563-6sanmh/got test/profile_test.rb:788:in 'IO.read' test/profile_test.rb:788:in 'block (2 levels) in ProfileTest#test_timeout_stops_a_hung_run_and_it
+SURVIVED  timeout: QUIT not passed on
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+SURVIVED  timeout: traps not restored after the run
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+SURVIVED  timeout: traps set after the spawn
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+killed    timeout: zombies in the group are waited for (kill 0, as at 60387485)
+          test_timeout_does_not_wait_for_a_zombie: 1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+          waited 11.2 s for a zombie. Expected 11.167997423999623 to be < 6. 
+killed    timeout: a failing ps is believed (no kill 0 when ps exits non-zero)
+          test_timeout_waits_out_the_grace_when_ps_fails: 1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+          the grandchild's cleanup was cut off by KILL  1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+killed    timeout: ps never reports a running member (KILL at once)
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 7 assertions, 1 failures, 0 errors, 0 skips
+          leader-ignores. Expected 11..30 to include 1. 
+killed    the exe deletes run*/ by glob
+          test_runs_are_deleted_after_the_report_unless_kept: 1 runs, 679 assertions, 1 failures, 0 errors, 0 skips
+          Expected: ["run1", "run2"] Actual: [] 
+killed    run dirs globbed again (report, deletion)
+          test_runs_are_deleted_after_the_report_unless_kept|test_out_never_clears|test_the_built_gem|test_report|test_counts_only: 4 runs, 723 assertions, 1 failures, 0 errors, 0 skips
+          Expected: ["run1", "run2"] Actual: [] 

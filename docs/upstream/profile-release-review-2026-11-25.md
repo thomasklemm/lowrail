@@ -708,3 +708,151 @@ restricted `/proc`, a `ps` without `-A` or `-o`) makes `running` false at once. 
 TERM, without the 10 s grace: the probe's cleanup was cut off at 1.1 s. That only cuts the TERM handling of a
 run that already timed out, and never hangs. Smallest fix: fall back to `kill 0` when ps fails, for example
 `out = \`ps -A -o pgid= -o stat=\`; next(Process.kill(0, -pid) rescue false) unless $?.success?` before parsing.
+
+## Confirm of the review fixes: thermos-fable (2026-11-25)
+
+Scope: `1618fc38..0ee4aed2` in `gem/`, docs/profile.md, the README, DECISIONS and the receipts: `5cdc5669`
+(streaming report, reviewed in full), `9b31044c` (the fixes for both reviews, T9/T10), `7a5ee0b6` (receipts),
+`60387485` (counter built outside the app's bundle; symlinked path gem in the test), `776ef498` (tests for the
+`--out` glob and `BUNDLER_ORIG_RUBYOPT`), `53a071fd` (`--timeout` does not wait for a zombie), `c19ab7bb` (the
+zombie test on Linux only) and `0ee4aed2` (the grace holds when `ps` fails). One reviewer applied both Thermos
+rubrics, without delegation and independently of thermos-opus's confirms above; its first was read only after my
+audit of `1618fc38..60387485`. The head moved three times during the pass, so each result names the gem it ran
+with. Receipts: [2026-11-25-confirm-fable](../../bench/upstream/profile_release/2026-11-25-confirm-fable/README.md).
+**Verdict: not yet; two must-fixes, one line and one sentence. All seven must-fixes of my first pass are fixed, as
+reproduced on the apps below.** Both change the gem's bytes (`gem/lib`, the README), so the gem `57eb11b3…518d`
+(0ee4aed2) is not the one to publish. Neither breaks an app or a capture: one misfiles an app's own lines in the
+report, the other understates a limit in the README.
+
+### What ran
+
+* **Gems.** Built in `gem/` at `7a5ee0b6`, `60387485`, `53a071fd` and `0ee4aed2`: sha256 `6a807858…94470`,
+  `c4a3a7c3…29df68`, `d1e80952…f3f5` and `57eb11b39028eb34fd9d86ebdd9dfc12f18edeab8d9beb5a886e40abc4ef518d`, each
+  as stated, 14 files.
+* **Profile suites** as `ci.yml` lists them, 0 failures, 0 errors and 0 skips in each:
+
+  | Head | Ruby 4.0.7 / Rails 8.1.4 | Ruby 3.3.14 / Rails 7.2.4 |
+  | --- | --- | --- |
+  | `7a5ee0b6` | 38 runs, 1,168 assertions | 38 runs, 1,107 assertions |
+  | `60387485` | 39 runs, 1,175 assertions | 39 runs, 1,114 assertions |
+  | `53a071fd` | 40 runs, 1,181 assertions | 40 runs, 1,119 assertions |
+  | `0ee4aed2` | 41 runs, 1,184 assertions | 41 runs, 1,122 assertions |
+
+* **Apps** of the first pass, with each built gem installed and `bundle exec lowrail-profile`: the fresh Rails
+  8.1 app, the RSpec app on Rails 7.2 with rswag-specs, the path-gem app (also with `vendor/bundle`), plus a copy
+  of the fresh app with a `GemsController` and one of the RSpec app with Minitest 5.23.1.
+* `gem/lib`, `gem/ext` and the README are the same from `9b31044c` to `0ee4aed2`. `gem/exe` changed three times
+  after `7a5ee0b6` (the counter's build, and twice `--timeout`'s wait for the stopped group), and the `--timeout`
+  runs were repeated at `53a071fd` and `0ee4aed2`.
+
+### The first pass's must-fixes, reproduced again
+
+| First pass | At the new head |
+| --- | --- |
+| 1. RSpec trigger wherever `RSpec::Core::Runner` is loaded | rswag-specs app: `rake spec` exits 0 and counts 2 requests; the Minitest file runs with seed 1234 in both runs; `--workloads` records `measured` [20, 20] and compare exits 0 |
+| 2. `Bundler::ORIGINAL_ENV` kept the seed and the profiler | Children under `with_original_env` and `with_unbundled_env` are identical to the plain run's in both apps (no profiler, the caller's `SEED=99` or none); the RSpec app's tree is clean (`swagger/order_unbundled.txt` no longer changes) |
+| 3. A TERM-ignoring parallel worker survived `--timeout` | Two workers, one ignoring TERM: exit 124 after 30.8 s, nothing left running, report with the *Incomplete* notice, `meta.timed_out` [1]; again at `53a071fd` and `0ee4aed2` |
+| 4. Path gems under `gems/` and `vendor/gems/` appeared nowhere | Both are `GEM/…` rows with the controller line as caller; *Not attributed* is down to the loose file outside the root (20.46 objects per request, 0.6%). But see must-fix 1 |
+| 5. Run deletion globbed `--out` | `--out 'tmp/g/{keep,x}'` leaves `tmp/g/keep/run1` and `run2` and deletes its own runs; `--out 'tmp/g/[x]'` now reports |
+| 6. README CI job stopped on a failing suite | Run step by step, honouring `if: always()`: unchanged head 0 regressions, planted head 3, both green; a failing head or base fails the job, and Compare still writes *head's command exited [1,1]* and *compare exited 2*; two workers are refused |
+| 7. Hackatime and Writebook captures not committed | In `2026-11-25-t3/census/`. Seven option sets replayed with main's `gem/lib` (Hackatime and Writebook serial and parallel, Writebook w4, Campfire serial, OSM serial): every `options-*.txt` byte for byte |
+| Symlinked path gem (should-fix) | `GEM/linked/…` for both files; the test now has such a gem |
+
+Per-test outcomes are identical plain and profiled in both apps (19 tests with and without a seed and with two
+workers; 36 examples, 14 pending), and the tree is unchanged after every profile.
+
+### Must-fix
+
+Both fixes are in
+[smallest-fixes.patch](../../bench/upstream/profile_release/2026-11-25-confirm-fable/smallest-fixes.patch)
+(13 added lines, 10 removed, one test row included). It is a reviewer's patch against `0ee4aed2`, not applied to
+`gem/`. With it the profile suites pass on both pairs (41 runs, 0 failures, 0 skips; 1,184 and 1,122 assertions).
+
+1. **P2, regression from the fix for my must-fix 4 (`9b31044c`): an app file under a directory named `gems` is
+   reported as outside the app.** `classify` now refuses the app root for every path with a `gems/` segment, not
+   only for path gems. On a copy of the fresh app with a `GemsController`, `app/views/gems/index.html.erb` and
+   `app/models/gems/ruby.rb` leave the app group: the report says *Not attributed: 114.33 objects per request
+   (2.1% of all) are on lines outside the app, Rails, Ruby and the bundle's gems* and names both files by their
+   absolute paths. At `1618fc38` they were `APP/…` lines. The regex is the one my first pass proposed, so the gap
+   is mine. Smallest fix, one line: refuse the app root only when a path gem's `G` row covers the path
+   (`&& path_gems.any? { |_, d| path.start_with?(d) }`). With it both layouts are right, and
+   `test_a_path_gem_inside_the_app_root_is_a_gem`, given one such view, fails on `0ee4aed2`'s lib and passes with
+   the fix. The counter still skips these frames as callers (the C rule since `8e36ae06`), as it did at `1618fc38`.
+2. **P3, README: the difference between captures is understated against its own example.** *Captures taken at
+   different times can drift by about 0.2% per action (Forem: `ResponseTemplatesController#update` 15,028 →
+   15,155)*: that example is +126.1, or +0.84%, and reads 15,154.4. Of the five actions compare listed on Forem's
+   unchanged head, four moved 0.10% to 0.24% and this one 0.84%; over all 656 actions with a warm value the largest
+   difference is 1.85%. A reader who trusts 0.2% takes a listed +0.8% for real, which is what the sentence is there
+   to prevent. Smallest fix: *up to about 1% … (compare listed five actions, four by 0.1% to 0.25% and … 15,028 →
+   15,154, +0.8%)*. docs/profile-0.2-design.md also says this is not drift (17 of 82 actions move in time order).
+
+Two more were found during the pass and are fixed at `0ee4aed2`:
+
+* **CI was red on macOS at `53a071fd`**: the zombie test skipped there and *Profile tests* requires `0 skips`
+  (both jobs: *40 runs, … 0 failures, 0 errors, 1 skips*). `c19ab7bb` defines the test on Linux only. CI on `0ee4aed2`
+  is green in all 14 jobs, both macOS jobs included.
+* **A `ps` that fails ended `--timeout`'s 10 s at once (`53a071fd`)**: with a `ps` that exits 1 and prints
+  nothing, a command that needs 3 s after `TERM` was killed at once, so a stopped suite would write no counts.
+  `0ee4aed2` falls back to `kill 0` when `ps` exits non-zero: the same command now finishes its handler (4.1 s),
+  and without the fallback the new test fails.
+
+### Should-fix
+
+* **A test for restoring the traps.** Without `traps.each { trap(…) }` after a `--timeout` run, `INT`, `TERM` and
+  `HUP` during the report are swallowed (Sure's report takes over two minutes); with it each ends
+  lowrail-profile. No test covers it, and the mutant survives. It can be timed: let the command leave a FIFO as
+  `runN/1.tsv`, so the report blocks on it, then signal (`scripts/trap-restore.rb`).
+* **`profile_test.rb` went from 990 to 1,055 lines in this range**, and `--timeout` is now tested in two files.
+  Move `test_timeout_stops_a_hung_run_and_its_processes` to the three `--timeout` tests in `profile_env_test.rb`,
+  or all four into a file of their own.
+* **Receipts.** OSM's serial captures are committed (`oss_profile_sweep_1/osm/s1`–`s5`), but `run_options.sh`
+  reads them from the orb backup and the t3 README calls them not committed. `census/README.md` still names
+  `$O/census/SET` and says the replay needs `3c878c94`'s lib.
+* **Notes on `0ee4aed2`.** A failing `ps` prints its error on every poll: 31 lines on lowrail-profile's stderr for
+  a 3 s wait (send its stderr to `File::NULL`). The new test gives the grandchild 2 s to boot and set its trap; on a
+  slow runner it
+  would fail on *the grandchild started*, not pass wrongly. QUIT forwarding and the traps set before the spawn have
+  no test (both mutants survive); both are correct by reading.
+
+### The three choices the builder left
+
+* **`@aa_given` stays: right.** An `--aa` file that holds `null` parses to nil, and compare must refuse that pair,
+  not fall back to comparing without one. The flag and `@aa` are not duplicates.
+* **No test for restoring the traps: acceptable for 0.1, but a test is possible** (above). The line works, as run
+  with and without it.
+* **No test for the Minitest < 5.24 prepend: acceptable.** CI installs Minitest 5.27.0, and 5.23 does not install
+  on Ruby 4.0. Run by hand on Ruby 3.3.14 / Rails 7.2.4 with Minitest 5.23.1 (`register_plugin` absent): seed 1234
+  in both runs, 7 requests counted, and a child, also under `with_unbundled_env`, sees what the plain run's sees.
+
+### What passed
+
+* **Streaming report (`5cdc5669`).** On the path-gem app's kept runs, report.json and report.md from `1618fc38`
+  and `5cdc5669` are identical; on the fresh app with two workers, `1618fc38` and `60387485` differ only in
+  `meta.format` and `meta.timed_out`. Peak RSS 42 → 33 MB and 54 → 42 MB. The old report fails the bound test
+  with 646,123 objects held (bound 20,000; the new one holds 8,363). `loc << 31 | caller` and `path << 32 | line`
+  are distinct below 2³¹ locations and 2³² lines, and no line is negative: the counter counts a line at or below
+  0 as line 0 and takes no caller frame there (`lowrail_profile.c`).
+* **Counter built outside the bundle (`60387485`).** On an app whose Gemfile reads `.ruby-version` relative to
+  the cwd, `1618fc38` exits 1 with Bundler's *No such file* in the build log; the new gem builds and counts 6
+  requests. It also builds under the RSpec app's bundle on Ruby 3.3.14.
+* **`--timeout`.** All four cases (one or two workers; the hanging test exits on `TERM` or ignores it) exit 124
+  with nothing left running at `7a5ee0b6`, `53a071fd` and `0ee4aed2`; a timed-out capture is refused by compare
+  (exit 2).
+* **Mutants**, one fix undone at a time, each run against the test said to cover it. At `53a071fd` 21 of 24 are
+  killed, the streaming report, the RSpec trigger, `ORIGINAL_ENV`, `BUNDLER_ORIG_*`, `LOWRAIL_PROFILE_KEYS`, both
+  path-gem rules, the counter's build, five of `--timeout`, both globs (survivors at `60387485`), format 3, the
+  2-process boundary and both `if: always()` among them. At `0ee4aed2` the 15 that touch the exe or the tests
+  `776ef498` added: 12 killed, the failing-`ps` fallback included. The same three survive at both heads: `QUIT` not
+  passed on, the traps not restored, the traps set after the spawn.
+* **README and DECISIONS numbers.** Hackatime's 12.5% (15 of 120) and 4.4% (16 of 360), and with three base
+  captures 3.3% (2 of 60) and 1.7% (2 of 120), are the replayed `options-hackatime-serial.txt`. The `--timeout`
+  row, the note on processes started while `test_helper.rb` loads and the CI job's prose match what ran.
+
+### Maintainability
+
+`profile_report.rb`'s streaming loader is denser than what it replaced, but the ids stay inside `load_run`,
+`each_attribution` and two one-line helpers, and the tables read as before. The exe's run loop now carries the
+traps, the pending signals, the grace wait and `ps` inline, 36 lines of one branch: a `run_with_timeout`
+that returns the status and whether it timed out or was interrupted would give the loop back its shape. The two
+spawn paths differ on purpose (a process group changes what the terminal sends), so I would not unify them.
+Neither blocks 0.1; the 1,000-line test file is the one rubric flag (should-fix above).

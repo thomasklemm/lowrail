@@ -1,0 +1,4 @@
+a process that only boots the app has RSpec::Core::Runner: "constant"
+rake spec: exit 0; * Counted in run 1: 2 requests; 2 runs
+Minitest file: exit 0; seeds used: --seed 1234 --seed 1234 ; capture.json seed 1234
+--workloads: exit 0; measured [20, 20]; compare exit 0; 

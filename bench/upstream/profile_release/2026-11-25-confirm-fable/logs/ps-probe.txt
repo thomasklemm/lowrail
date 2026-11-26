@@ -1,0 +1,10 @@
+53a071fd:
+ps as installed: exit 124 after 4.1 s; the command finished its TERM handler
+a ps that exits 1 and prints nothing: exit 124 after 1.1 s; the command was KILLed before its TERM handler finished
+no ps on PATH: exit 124 after 4.1 s; the command finished its TERM handler
+0ee4aed2:
+ps as installed: exit 124 after 4.1 s; the command finished its TERM handler
+a ps that exits 1 and prints nothing: exit 124 after 4.1 s; the command finished its TERM handler
+no ps on PATH: exit 124 after 4.1 s; the command finished its TERM handler
+0ee4aed2, a ps that prints 'ps: no /proc' on stderr and exits 1, a command that needs 3 s after TERM:
+exit 124; 'ps: no /proc' lines on lowrail-profile's stderr: 31

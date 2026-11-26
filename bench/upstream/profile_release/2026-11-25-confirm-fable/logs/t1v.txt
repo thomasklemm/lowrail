@@ -1,0 +1,16 @@
+bundle install: exit 0
+exit 0
+11:* Not attributed: 20.46 objects per request (0.6% of all) are on lines outside the app, Rails, Ruby and the bundle's gems, which no table below ranks; most in `/tmp/pr/a81/t1-loose/loose.rb`
+inner (11/req): ranked=[] top_rows=[] app_lines=[["APP/engines/inner/lib/inner.rb:2", 5.54, 0.0]]
+gitlab_like (13/req): ranked=[["GEM/gitlab_like/lib/gitlab_like.rb:2", "gem: gitlab_like", [7.538461538461538, 7.538461538461538]]] top_rows=[["GEM/gitlab_like/lib/gitlab_like.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+vendored (17/req): ranked=[["GEM/vendored/lib/vendored.rb:2", "gem: vendored", [9.692307692307692, 9.692307692307692]]] top_rows=[["GEM/vendored/lib/vendored.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+outer (19/req): ranked=[["GEM/outer/lib/outer.rb:2", "gem: outer", [10.769230769230768, 10.769230769230768]]] top_rows=[["GEM/outer/lib/outer.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+linked.rb (23/req): ranked=[["GEM/linked/lib/linked/deep.rb:3", "gem: linked", [16.153846153846153, 16.153846153846153]], ["GEM/linked/lib/linked.rb:2", "gem: linked", [12.923076923076923, 12.923076923076923]]] top_rows=[["GEM/linked/lib/linked/deep.rb:3", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]], ["GEM/linked/lib/linked.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+deep (29/req): ranked=[["GEM/linked/lib/linked/deep.rb:3", "gem: linked", [16.153846153846153, 16.153846153846153]]] top_rows=[["GEM/linked/lib/linked/deep.rb:3", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+gitgem (31/req): ranked=[["GEM/t1-gitgem/lib/gitgem.rb:2", "gem: t1-gitgem", [17.230769230769234, 17.230769230769234]]] top_rows=[["GEM/t1-gitgem/lib/gitgem.rb:2", [{"caller" => "APP/app/controllers/articles_controller.rb:7", "share" => 1.0}]]] app_lines=[]
+loose (37/req): ranked=[] top_rows=[] app_lines=[]
+unclassified={"objects_per_request" => 20.46, "share" => 0.006, "files" => [{"path" => "/tmp/pr/a81/t1-loose/loose.rb", "objects_per_request" => 20.46}]}
+unattributed=213.69
+app, gem: base64, gem: bootsnap, gem: concurrent-ruby, gem: erubi, gem: gitlab_like, gem: i18n, gem: importmap-rails, gem: jbuilder, gem: json, gem: linked, gem: logger, gem: outer, gem: propshaft, gem: rack, gem: rack-session, gem: sqlite3, gem: t1-gitgem, gem: turbo-rails, gem: tzinfo, gem: useragent, gem: vendored, gem: zeitwerk, lowrail-profile, other, rails: actioncable, rails: actionpack, rails: actiontext, rails: actionview, rails: activejob, rails: activemodel, rails: activerecord, rails: activestorage, rails: activesupport, rails: railties, ruby default gem: securerandom, ruby default gem: uri, ruby stdlib
+[]
+[]

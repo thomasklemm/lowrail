@@ -1,0 +1,19 @@
+== workers=1 hang=1: exit 124 after 20.8s; capture {"runs":2,"exit":[124],"timed_out":[1]}; out: capture.json command.txt report.json report.md 
+lowrail-profile: run 1 of 2: bin/rails test
+lowrail-profile: report in /tmp/pr/a81/fresh/tmp/lp-hang-1-1/report.md
+lowrail-profile: the command exited 124
+nothing left running
+== workers=2 hang=1: exit 124 after 21.0s; capture {"runs":2,"exit":[124],"timed_out":[1]}; out: capture.json command.txt report.json report.md 
+lowrail-profile: run 1 of 2: bin/rails test
+lowrail-profile: report in /tmp/pr/a81/fresh/tmp/lp-hang-2-1/report.md
+lowrail-profile: the command exited 124
+nothing left running
+== workers=1 hang=ignore: exit 124 after 30.5s; capture {"runs":2,"exit":[124],"timed_out":[1]}; out: capture.json command.txt run1 
+lowrail-profile: run 1 of 2: bin/rails test
+lowrail-profile: no report: no runs with requests, jobs or mails under /tmp/pr/a81/fresh/tmp/lp-hang-1-ignore (a request counts when it goes through the app, as in integration, request and system test
+nothing left running
+== workers=2 hang=ignore: exit 124 after 30.8s; capture {"runs":2,"exit":[124],"timed_out":[1]}; out: capture.json command.txt report.json report.md 
+lowrail-profile: run 1 of 2: bin/rails test
+lowrail-profile: report in /tmp/pr/a81/fresh/tmp/lp-hang-2-ignore/report.md
+lowrail-profile: the command exited 124
+nothing left running

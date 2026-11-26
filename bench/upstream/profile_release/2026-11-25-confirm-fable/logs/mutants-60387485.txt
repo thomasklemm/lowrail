@@ -1,0 +1,58 @@
+killed    streaming report (lib/lowrail/profile_report.rb of 1618fc38, FORMAT and run_dirs kept apart)
+          test_report_keeps_no_object_per_attributed_row: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          objects held for 80000 attributed rows. Expected 646123 to be < 20000. 
+killed    RSpec trigger: any loaded RSpec::Core::Runner
+          test_a_loaded_rspec_runner_outside_rspec_keeps_the_profile: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          the suite keeps the seed capture.json records. Expected: "Run options: --seed 1234" Actual: "Run options: --seed 7793"
+killed    leave_env: ENV only, not Bundler::ORIGINAL_ENV
+          test_processes_the_suite_starts_run_as_without_the_profiler: 1 runs, 12 assertions, 1 failures, 0 errors, 0 skips
+          minitest. --- expected +++ actual
+SURVIVED  leave_env: not BUNDLER_ORIG_RUBYOPT/RUBYLIB
+          test_processes_the_suite_starts_run_as_without_the_profiler: 1 runs, 24 assertions, 0 failures, 0 errors, 0 skips
+killed    leave_env: LOWRAIL_PROFILE_KEYS not set by the exe
+          test_processes_the_suite_starts_run_as_without_the_profiler: 1 runs, 12 assertions, 1 failures, 0 errors, 0 skips
+          minitest. --- expected +++ actual
+killed    path gem inside the root stays an app line
+          test_a_path_gem_inside_the_app_root_is_a_gem: 1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+          --- expected +++ actual @@ -1 +1 @@
+killed    G row without File.realpath
+          test_path_gems_and_an_engine_root_are_classified: 1 runs, 4 assertions, 1 failures, 0 errors, 0 skips
+          ["GEM/solidus_core/lib/core.rb:2", "RAILS/actionpack/lib/action_dispatch/middleware/static.rb:145", "RAILS/activesupport/lib/active_support/file_update_checker.rb:109", "RAILS/activesupport/lib/active_support/file_update_checker.r
+killed    counter built inside the app's bundle
+          test_the_counter_builds_under_an_apps_bundle: 1 runs, 3 assertions, 1 failures, 0 errors, 0 skips
+          Expected /building the counter failed/ to not match "lowrail-profile: building the counter failed, see /tmp/lowrail20261125-94885-l48cdh/cache/lowrail/profile/ruby-4.0.7-229531a6cfbf07e3caef30dbac24a2a3f3fed482-x86_64-linux/e4768e
+killed    timeout: KILL only when the leader is still there after 10 s
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 16 assertions, 1 failures, 0 errors, 0 skips
+          leader-exits. Expected 11..30 to include 1. 
+killed    timeout: no wait for the group before KILL (KILL at once)
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 7 assertions, 1 failures, 0 errors, 0 skips
+          leader-ignores. Expected 11..30 to include 1. 
+killed    timeout: the first failed run's status wins over 124
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 19 assertions, 1 failures, 0 errors, 0 skips
+          run2: lowrail-profile: run 1 of 2: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby late.rb lowrail-profile: run 2 of 2: /home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby late.rb lowrail-profile: run 2 took longer
+killed    timeout: no notice in the report
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 22 assertions, 1 failures, 0 errors, 0 skips
+          run2: report on the terminal. Expected "# lowrail-profile report\n\nObjects allocated (exact counts, not time, not retained memory) per request, job, mail and Action Cable action, by source line. A line with many objects is a plac
+killed    timeout: HUP not passed on
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 36 assertions, 0 failures, 1 errors, 0 skips
+          Errno::ENOENT: No such file or directory @ rb_sysopen - /tmp/lowrail20261125-96202-zcx9ys/got test/profile_test.rb:782:in 'IO.read' test/profile_test.rb:782:in 'block (2 levels) in ProfileTest#test_timeout_stops_a_hung_run_and_its
+SURVIVED  timeout: QUIT not passed on
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+SURVIVED  timeout: traps not restored after the run
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+SURVIVED  timeout: traps set after the spawn
+          test_timeout_stops_a_hung_run_and_its_processes: 1 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+SURVIVED  run dirs globbed again (report, deletion)
+          test_runs_are_deleted_after_the_report_unless_kept|test_out_never_clears|test_the_built_gem|test_report|test_counts_only: 4 runs, 721 assertions, 0 failures, 0 errors, 0 skips
+killed    compare: format 2 read as this format
+          test_compare_needs_complete_comparable_captures: 1 runs, 11 assertions, 1 failures, 0 errors, 0 skips
+          Expected: 2 Actual: 0 
+killed    compare: two processes allowed (refuses from three)
+          test_compare_refuses_captures_of_parallel_workers: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          --- expected +++ actual @@ -1 +1 @@
+killed    README: Compare step without if: always()
+          test_documented_ci_compare_step_reports_and_never_fails: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          Expected: ["always()", "always()"] Actual: [nil, "always()"] 
+killed    README: upload step without if: always()
+          test_documented_ci_compare_step_reports_and_never_fails: 1 runs, 2 assertions, 1 failures, 0 errors, 0 skips
+          Expected: ["always()", "always()"] Actual: ["always()", nil] 

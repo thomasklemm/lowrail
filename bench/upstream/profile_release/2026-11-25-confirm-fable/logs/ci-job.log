@@ -1,0 +1,59 @@
+== head: same
+step uses actions/checkout@v4 (not run)
+step uses ruby/setup-ruby@v1 (not run)
+step "Profile base": exit 0
+step "Profile head": exit 0
+step "Compare": exit 0
+step uses actions/upload-artifact@v4 (not run) -> ["tmp/base/report.json", "tmp/base/report.md", "tmp/base2/report.json", "tmp/base2/report.md", "tmp/head/report.json", "tmp/head/report.md"]
+JOB SUCCEEDED
+**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a small one can be missing (README-profile.md, *Compare*).
+## Regressions: 0
+## Improvements: 0
+== head: planted
+step uses actions/checkout@v4 (not run)
+step uses ruby/setup-ruby@v1 (not run)
+step "Profile base": exit 0
+step "Profile head": exit 0
+step "Compare": exit 0
+step uses actions/upload-artifact@v4 (not run) -> ["tmp/base/report.json", "tmp/base/report.md", "tmp/base2/report.json", "tmp/base2/report.md", "tmp/head/report.json", "tmp/head/report.md"]
+JOB SUCCEEDED
+**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a small one can be missing (README-profile.md, *Compare*).
+## Regressions: 3
+## Improvements: 0
+== head: failing
+step uses actions/checkout@v4 (not run)
+step uses ruby/setup-ruby@v1 (not run)
+step "Profile base": exit 0
+step "Profile head": exit 1
+step "Compare": exit 0
+step uses actions/upload-artifact@v4 (not run) -> ["tmp/base/report.json", "tmp/base/report.md", "tmp/base2/report.json", "tmp/base2/report.md", "tmp/head/report.json", "tmp/head/report.md"]
+JOB FAILED
+## Insufficient evidence
+* head's command exited [1,1]
+compare exited 2: not valid evidence, see above
+== base: failing, head: unchanged
+step uses actions/checkout@v4 (not run)
+step uses ruby/setup-ruby@v1 (not run)
+step "Profile base": exit 1
+step "Profile head": skipped (an earlier step failed)
+step "Compare": exit 0
+step uses actions/upload-artifact@v4 (not run) -> ["tmp/base/report.json", "tmp/base/report.md"]
+JOB FAILED
+## Insufficient evidence
+* base's command exited [1,1]
+* head is not a report.json of this lowrail-profile (no capture metadata)
+* the A/A report is not a report.json of this lowrail-profile (no capture metadata)
+compare exited 2: not valid evidence, see above
+== head: planted, the job with PARALLEL_WORKERS: 2
+step uses actions/checkout@v4 (not run)
+step uses ruby/setup-ruby@v1 (not run)
+step "Profile base": exit 0
+step "Profile head": exit 0
+step "Compare": exit 0
+step uses actions/upload-artifact@v4 (not run) -> ["tmp/base/report.json", "tmp/base/report.md", "tmp/base2/report.json", "tmp/base2/report.md", "tmp/head/report.json", "tmp/head/report.md"]
+JOB SUCCEEDED
+## Insufficient evidence
+* base ran in 2 processes: parallel test workers split the tests differently in every capture, which changes what warm leaves out; profile with PARALLEL_WORKERS=1 to compare
+* head ran in 2 processes: parallel test workers split the tests differently in every capture, which changes what warm leaves out; profile with PARALLEL_WORKERS=1 to compare
+* the A/A report ran in 2 processes: parallel test workers split the tests differently in every capture, which changes what warm leaves out; profile with PARALLEL_WORKERS=1 to compare
+compare exited 2: not valid evidence, see above
