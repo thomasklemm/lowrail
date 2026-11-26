@@ -66,7 +66,7 @@ class ProfileEnvTest < Minitest::Test
   def test_timeout_waits_out_the_grace_when_ps_fails
     realpath_tmpdir do |dir|
       FileUtils.mkdir_p(File.join(dir, "bin"))
-      File.write(File.join(dir, "bin/ps"), "#!/bin/sh\nexit 1\n")
+      File.write(File.join(dir, "bin/ps"), "#!/bin/sh\necho ps: broken >&2\nexit 1\n")
       File.chmod(0o755, File.join(dir, "bin/ps"))
       profile(dir, "--runs", "1", "--out", "warm", "--", RUBY, "-e", "exit") # builds the counter first
       cleanup = 'trap("TERM") { sleep 3; File.write("cleaned", ""); exit }; File.write("ready", ""); sleep'
@@ -76,6 +76,33 @@ class ProfileEnvTest < Minitest::Test
       assert_equal 124, status.exitstatus, err
       assert File.exist?(File.join(dir, "ready")), "the grandchild started"
       assert File.exist?(File.join(dir, "cleaned")), "the grandchild's cleanup was cut off by KILL"
+      refute_match(/ps: broken/, err, "ps's own errors stay out of lowrail-profile's output")
+    end
+  end
+
+  # After a run, INT, TERM and HUP are the caller's again: they end
+  # lowrail-profile while it builds the report. A FIFO left as a run file
+  # holds the report open, so the signal arrives there.
+  def test_signals_end_the_report_after_a_timeout_run
+    realpath_tmpdir do |dir|
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"))
+      %w[INT TERM HUP].each do |signal|
+        err = File.join(dir, "#{signal}.err")
+        # A shell may start commands with INT ignored, which exec keeps; a terminal gives it as default.
+        pid = Process.spawn(env, RUBY, "-e", 'trap("INT", "SYSTEM_DEFAULT"); exec(*ARGV)', RUBY, PROFILE, "--timeout", "60", "--runs", "1", "--out", signal, "--",
+          "sh", "-c", 'mkfifo "$LOWRAIL_PROFILE/1.tsv"', chdir: dir, err: err, out: File::NULL, pgroup: true)
+        fifo = File.join(dir, signal, "run1/1.tsv")
+        deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 60
+        sleep 0.1 until File.pipe?(fifo) || Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+        sleep 1 # the run has exited and the report opened the FIFO
+        Process.kill(signal, pid)
+        waiter = Process.detach(pid)
+        unless waiter.join(10)
+          Process.kill("KILL", -pid)
+          flunk "#{signal} during the report was swallowed: #{File.read(err)}"
+        end
+        assert_equal Signal.list.fetch(signal), waiter.value.termsig, "#{signal}: #{File.read(err)}"
+      end
     end
   end
 

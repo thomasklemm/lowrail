@@ -16,7 +16,8 @@ Receipts for [docs/profile-gate-design.md](../../../../docs/profile-gate-design.
   (final `c1`–`c24`), and Campfire with 8 workers, CodeTriage and Lobsters (M4 and final `planted2`).
 * The OSM, Hackatime and Writebook captures come from the field-test threads. Hackatime and Writebook are in
   [census](census) (report.json.gz, capture.json, command.txt, plant patches, wall times), where `run_options.sh`
-  reads them; OSM's are read from this orb's `.amp/in/orb-backup/` (not committed). `scripts/options.rb` leaves out
+  reads them; OSM's are in [oss_profile_sweep_1/osm](../../oss_profile_sweep_1/osm) (`base`, `aa`, `head`,
+  `head2` with 8 workers, `s1`–`s5` in one process). `scripts/options.rb` leaves out
   compare's refusal of captures of several processes (`abf515d3`) and reads format 2 reports as format 3, so the
   parallel sets replay with main's `gem/lib` too; with the `gem/lib` of `3c878c94` they replay as published. OSM:
   openstreetmap-website 20ae45ec, Ruby 4.0.9, Rails 8.1.4.1, `bin/rails test -v`, 8 workers, 4 unchanged captures.

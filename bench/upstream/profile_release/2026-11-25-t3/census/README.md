@@ -30,15 +30,14 @@ The raw runs were deleted to save disk space. Only Hackatime `u1`'s runs survive
 
 ## Replay
 
-Run `options.rb` and `gem/lib` from `3c878c94`, the design note's commit, because compare refuses multi-process
-captures from `abf515d3` on. With it, all five sets reproduce `../options-*.txt` byte for byte, apart from the
-capture paths. From this directory's parent:
+`options.rb` leaves out compare's refusal of multi-process captures (`abf515d3`) and reads format 2 reports as
+format 3, so main's `gem/lib` replays all five sets: they reproduce `../options-*.txt` byte for byte. The `gem/lib`
+of `3c878c94`, the design note's commit, does too. From this directory's parent:
 
 ```sh
-git worktree add --detach /tmp/t3 3c878c94
-ruby -I/tmp/t3/gem/lib /tmp/t3/bench/upstream/profile_release/2026-11-25-t3/scripts/options.rb \
+ruby -I../../../../gem/lib scripts/options.rb \
   "Hackatime, 2 workers" 'LeaderboardsController#index|output_safety|erb/util' \
   census/hackatime/u{1,2,3,4,5,6} -- census/hackatime/planted census/hackatime/planted2
 ```
 
-`scripts/run_options.sh` gives each set's name and regex; its `$O/census/SET` is this directory.
+`scripts/run_options.sh SET` runs each set with its name and regex from here.

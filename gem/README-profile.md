@@ -128,9 +128,10 @@ needs 1 object per request averaged over all requests of its kind, so a change i
 that action's share of the requests. Not found: the same `html_escape` plant in Hackatime's
 `LeaderboardsController#index` (+40–60 on about 7,900, twice that action's own noise: listed in half the
 comparisons), and with workers Writebook's plant in an action that runs once per worker process. An action that runs
-once per process has no warm value and is not compared. Captures taken at different times can drift by about 0.2%
-per action on the same code (Forem: `ResponseTemplatesController#update` 15,028 → 15,155 half an hour apart, with
-nothing changed), so a small listed change is a hint, not proof.
+once per process has no warm value and is not compared. Captures taken at different times can differ by up to
+about 1% per action on the same code (Forem, half an hour apart with nothing changed: compare listed five actions,
+four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154, +0.8%), so a small listed change is
+a hint, not proof.
 
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
 only, is listed under *Not compared* with the reason, and nothing about its own cost is listed. Lines outside the

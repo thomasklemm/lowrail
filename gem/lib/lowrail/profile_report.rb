@@ -156,8 +156,8 @@ module Lowrail
       if path == "-" then ["(no Ruby frame)", path]
       elsif (m = path.match(RAILS_PATH)) then ["rails: #{m[1] || m[2]}", "RAILS/#{m[1] || m[2]}/#{m[3]}"]
       elsif (m = path.match(GEM_PATH)) then gem_site(m[1], m[3])
-      # As the counter attributes: a gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines.
-      elsif (root = @roots.find { path.start_with?(_1) }) && !path.delete_prefix(root).match?(%r{(?:\A|/)gems/})
+      # A path gem kept inside the app (gems/, vendor/gems/) is not one of the app's lines; app/views/gems/ is.
+      elsif (root = @roots.find { path.start_with?(_1) }) && !(path.delete_prefix(root).match?(%r{(?:\A|/)gems/}) && path_gems.any? { |_, d| path.start_with?(d) })
         ["app", "APP/#{path.delete_prefix(root)}"]
       elsif (name, gem_dir = path_gems.find { |_, d| path.start_with?(d) })
         RAILS.include?(name) ? ["rails: #{name}", "RAILS/#{name}/#{path.delete_prefix(gem_dir)}"] : gem_site(name, path.delete_prefix(gem_dir))

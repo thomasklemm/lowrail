@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run_options.sh SET: options.rb on one capture set, into ../options-SET.txt (from this directory's parent).
 cd "$(dirname "$0")/.."
-P=.. O=../../../../.amp/in/orb-backup
+P=.. S=../../oss_profile_sweep_1/osm
 R=$(~/.local/bin/mise where ruby@4.0.7)/bin/ruby
 run() { $R -I../../../../gem/lib scripts/options.rb "$@"; }
 B="$P/2026-11-25/blog-floor $P/2026-11-25-fixes/blog-floor $P/2026-11-25-confirm-opus/blog-floor"
@@ -14,8 +14,8 @@ case $1 in
   campfire-serial) run "Campfire, PARALLEL_WORKERS=1" 'output_safety|erb/util|RoomsController#show' campfire/s{1,2,3,4} -- campfire/planted campfire/planted2 ;;
   codetriage) run "CodeTriage, one process" 'output_safety|erb/util|PagesController' $P/2026-11-25/codetriage/{profiled,base2,head} -- $P/2026-11-25/codetriage/planted $P/2026-11-25-final/codetriage/planted2 ;;
   lobsters) run "Lobsters, one process" 'output_safety|erb/util|HomeController' $P/2026-11-25/lobsters/{profiled,base2,head} -- $P/2026-11-25/lobsters/planted $P/2026-11-25-final/lobsters/planted2 ;;
-  osm-parallel) run "openstreetmap-website, 8 workers" 'x^' $O/osm/lowrail-profile{,-aa,-head,-head2} ;;
-  osm-serial) run "openstreetmap-website, PARALLEL_WORKERS=1" 'NotesController#index|x^' $O/osm-serial/s{1,2,3,4} -- $O/osm-serial/s5 ;;
+  osm-parallel) run "openstreetmap-website, 8 workers" 'x^' $S/base $S/aa $S/head $S/head2 ;;
+  osm-serial) run "openstreetmap-website, PARALLEL_WORKERS=1" 'NotesController#index|x^' $S/s{1,2,3,4} -- $S/s5 ;;
   hackatime-serial) run "Hackatime, PARALLEL_WORKERS=1" 'LeaderboardsController#index|output_safety|erb/util' census/$1/s{1,2,3,4,5,6} -- census/$1/splanted{,2} ;;
   writebook-serial) run "Writebook, PARALLEL_WORKERS=1" 'SessionsController#create|output_safety|erb/util' census/$1/s{1,2,3,4,5,6} -- census/$1/splanted{,2} ;;
   hackatime|writebook|writebook-w4)

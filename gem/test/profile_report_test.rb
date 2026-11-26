@@ -46,17 +46,19 @@ class ProfileReportTest < Minitest::Test
   end
 
   # A gem kept inside the app (GitLab's gems/, vendor/gems/) is a gem, as the
-  # counter treats it, not an app line that no table ranks.
+  # counter treats it, not an app line that no table ranks. An app directory
+  # that is only named gems (a GemsController's views) stays the app's.
   def test_a_path_gem_inside_the_app_root_is_a_gem
     realpath_tmpdir do |dir|
       write_runs(dir, lambda do |_, pid|
-        ["# lowrail-profile 3\trequests=4\tobjects=40\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
-          "P\t0\t/app/gems/foo/lib/foo.rb", "P\t1\t/app/vendor/gems/bar/lib/bar.rb", "P\t2\t/app/app/models/m.rb",
+        ["# lowrail-profile 3\trequests=4\tobjects=44\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
+          "P\t0\t/app/gems/foo/lib/foo.rb", "P\t1\t/app/vendor/gems/bar/lib/bar.rb", "P\t2\t/app/app/models/m.rb", "P\t3\t/app/app/views/gems/index.html.erb", "3\t9\tString\t4\t4\t0\t0\trequest",
           "0\t3\tString\t20\t4\t0\t0\trequest", "1\t5\tString\t12\t4\t0\t0\trequest", "2\t7\tString\t8\t4\t0\t0\trequest",
-          "A\trequest\tC#a\t4\t40\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
+          "A\trequest\tC#a\t4\t44\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
       end)
       sites = Lowrail::ProfileReport.new(dir).sites.to_h { ["#{_1.key}:#{_1.line}", _1.group] }
-      assert_equal({ "GEM/foo/lib/foo.rb:3" => "gem: foo", "GEM/bar/lib/bar.rb:5" => "gem: bar", "APP/app/models/m.rb:7" => "app" }, sites)
+      assert_equal({ "GEM/foo/lib/foo.rb:3" => "gem: foo", "GEM/bar/lib/bar.rb:5" => "gem: bar", "APP/app/models/m.rb:7" => "app",
+        "APP/app/views/gems/index.html.erb:9" => "app" }, sites)
     end
   end
 end
