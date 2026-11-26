@@ -61,8 +61,10 @@ Interpreter instructions per request from `script/upstream-bench` (Ruby 4.0.9, `
 | all six together | | −1.86% | −4.12% | | |
 
 A/A per cell was 0.00–0.08%. The bar is about 2% of a workload. Only prop-flags clears it, and only where a page has
-several prop types: every Inertia render resolves at least one prop type, because the renderer wraps `errors` in an
-`always` prop, which is the −0.48% of a plain page. Of the four profiled apps, only Thinkroom uses prop types (two
+several prop types. A page without any still resolves one when `errors` is sent: the renderer wraps it in an `always`
+prop, which is the −0.48% of the contacts page. `errors` is sent only with `always_include_errors_hash = true` (as in
+the harness) or after a redirect with errors; the default `nil` and `false` leave it out, so such a page resolves no
+prop type at all (thermos-sol finding 2). Of the four profiled apps, only Thinkroom uses prop types (two
 `optional`). Hackatime and Flow from the [Inertia and Chatwoot census](inertia-chatwoot-census.md) use `defer`,
 `scroll` and `always`, so the dashboard workload stands in for them. The five others are not bundled: about 1.5% on
 plain pages from four unrelated changes is still below the bar and would be hard to review (Thomas, 2026-11-26).
@@ -79,8 +81,16 @@ No open or closed PR or issue in inertiajs/inertia-rails names `extract_shared_k
 ## INRP1
 
 Branch `thomasklemm/prop-predicates-without-try` at
-[`f934e7c`](https://github.com/thomasklemm/inertia-rails/commit/f934e7c3b2dcd22404c62aa33fd613c9ea9be249), one
-commit on 3.24.0. Checks, differential and review are in [the queue item](../../bench/upstream/pr-queue/items/INRP1.md).
+[`0362ffc`](https://github.com/thomasklemm/inertia-rails/commit/0362ffcb1fea17ce393c40b39efa940d28a1c875), one
+commit on 3.24.0 (amends `f934e7c` after thermos-sol's first pass). Checks, differential and review are in
+[the queue item](../../bench/upstream/pr-queue/items/INRP1.md).
+
+The body's benchmark resolves a dashboard's props through `PropsResolver` alone
+([INRP1_resolver.rb](../../bench/upstream/inertia_round2/INRP1_resolver.rb)): 118 → 90 objects, −13.8% interpreter and
+−24.1% YJIT instructions (A/A ≤ 0.03%, JIT-flat; [body/INRP1-resolver](../../bench/upstream/inertia_round2/body/INRP1-resolver)),
+44.1k → 54.0k i/s with YJIT (best of 9, A/A 0.40%, JIT-flat in 27 windows;
+[body/INRP1-resolver-ips](../../bench/upstream/inertia_round2/body/INRP1-resolver-ips)). The whole-action numbers below,
+measured on `f934e7c`, stay in the record; the amend changed only operand grouping in one predicate.
 
 Body run [body/INRP1](../../bench/upstream/inertia_round2/body/INRP1) (`--warmup 3000 -n 200`, interpreter and YJIT):
 

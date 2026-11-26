@@ -6,39 +6,77 @@ kind: perf
 area: Inertia props resolver, prop-type flags
 reviewer: "skryukov (wrote the resolver walk in #447 and merged #442, which limited these questions to prop types)"
 branch: thomasklemm/prop-predicates-without-try
-head: "f934e7c3b2dcd22404c62aa33fd613c9ea9be249"
+head: "0362ffcb1fea17ce393c40b39efa940d28a1c875"
 base: master
 built_on: "5102d8dba7"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Every prop type the resolver reaches saves one Array per flag question (5-7 per prop type). Dashboard XHR action with five prop types: 451 to 423 objects, +3.1% benchmark-ips (YJIT, best of 9, A/A 1.50%), -3.8% YJIT and -2.8% interpreter instructions (JIT-flat; A/A 0.44%, 0.01%). A page whose only prop type is the wrapped errors prop: 7 objects, -0.7% YJIT instructions, time and interpreter instructions inside the A/A (-0.48% at --warmup 100, A/A 0.07%)"
-evidence: [bench/upstream/inertia_round2/body/INRP1, bench/upstream/inertia_round2/body/INRP1-ips, bench/upstream/inertia_round2/body/INRP1-ips-loaded, bench/upstream/inertia_round2/pp_diff.rb, bench/upstream/inertia_round2/react-starter-kit/pp]
+impact: "Each try call on a prop type allocates one Array; how many a prop type gets depends on its kind and the visit (optional 4, once 8 on a full visit). A dashboard's props (errors, plain stats, merge, two deferred groups, optional) through PropsResolver: 118 to 90 objects, 44.1k to 54.0k i/s (benchmark-ips, YJIT, best of 9, A/A 0.40%), -13.8% interpreter and -24.1% YJIT instructions (JIT-flat). Whole dashboard XHR action: 451 to 423 objects, -2.8% interpreter, -3.8% YJIT instructions, +3.1% i/s. A page whose only prop type is the wrapped errors prop (sent with always_include_errors_hash true or after a redirect with errors): 7 objects, inside the A/A in time"
+evidence: [bench/upstream/inertia_round2/body/INRP1-resolver, bench/upstream/inertia_round2/body/INRP1-resolver-ips, bench/upstream/inertia_round2/INRP1_resolver.rb, bench/upstream/inertia_round2/body/INRP1, bench/upstream/inertia_round2/body/INRP1-ips, bench/upstream/inertia_round2/body/INRP1-ips-loaded, bench/upstream/inertia_round2/pp_diff.rb, bench/upstream/inertia_round2/react-starter-kit/pp]
 rank:
 risky: false
-state: built
+state: in-review
 pr:
-note: "2026-11-26 (inertia round 2, docs/upstream/inertia-round-2.md): one commit on master 5102d8dba7 (v3.24.0), Thomas author and committer, no trailers, signed; pushed to the fork (no fork CI runs). Checks: rspec --tag ~type:generator and rake test green on Ruby 3.2.11/Rails 6.1, 7.0, 7.1; 3.3.14/7.2; 3.4.13/8.0 and 8.1; 4.0.9/8.1 and main 5a161379f5 (1211-1218 examples, 64 runs; 3.0 and 3.1 have no prebuilt Ruby in mise, so 6.1 and 7.0 ran on 3.2.11, as for INRV1); rubocop clean. Differential (pp_diff.rb): 4,000 generated prop sets, every prop type and option, plain values answering the flags, a custom BaseProp subclass with and without them, under full, partial only/except/reset, except_once and scroll-intent visits: output byte-identical on v3.24.0 and the branch (3,795 distinct outputs; every metadata kind present). No spec added: behaviour is unchanged and the existing specs fail when a flag is called without respond_to? (OptionalProp, AlwaysProp and the DottedKeys wrapper lack deferred?/once?/merge?). Objects in an app: React Starter Kit's suite, inertia_rails lines 26.6 to 25.5 objects per request (2,180 per request; lowrail-profile compare exit 0, no change beyond noise)."
+note: "2026-11-26 (thermos-sol pass 1 applied, head 0362ffcb1f amends f934e7c3b2 on the same 5102d8dba7): F1 waits_for_partial_reload? keeps master's expression order (only try replaced), so a custom prop whose deferred? has side effects sees the same calls on a partial visit; the reviewer's stateful probe gives checked:2 on both trees. F2 body no longer says every render resolves a prop type (errors is sent only with always_include_errors_hash true or session errors); same fix in inertia-round-2.md. F3 no per-prop-type count in body, commit message or impact. F4 Test plan limited to built-in prop types. F5 body shows the runnable resolver benchmark (INRP1_resolver.rb, bundler/inline), measured on its own: body/INRP1-resolver (Callgrind, objects) and body/INRP1-resolver-ips. Rechecked on 0362ffcb1f: CI matrix green on all eight cells again (/tmp/mx-pp2), rspec/rake test/rubocop green, pp_diff.rb byte-identical on 4,000 cases. 2026-11-26 (inertia round 2, docs/upstream/inertia-round-2.md): one commit on master 5102d8dba7 (v3.24.0), Thomas author and committer, no trailers, signed; pushed to the fork (no fork CI runs). Checks: rspec --tag ~type:generator and rake test green on Ruby 3.2.11/Rails 6.1, 7.0, 7.1; 3.3.14/7.2; 3.4.13/8.0 and 8.1; 4.0.9/8.1 and main 5a161379f5 (1211-1218 examples, 64 runs; 3.0 and 3.1 have no prebuilt Ruby in mise, so 6.1 and 7.0 ran on 3.2.11, as for INRV1); rubocop clean. Differential (pp_diff.rb): 4,000 generated prop sets, every prop type and option, plain values answering the flags, a custom BaseProp subclass with and without them, under full, partial only/except/reset, except_once and scroll-intent visits: output byte-identical on v3.24.0 and the branch (3,795 distinct outputs; every metadata kind present). No spec added: behaviour is unchanged and the existing specs fail when a flag is called without respond_to? (OptionalProp, AlwaysProp and the DottedKeys wrapper lack deferred?/once?/merge?). Objects in an app: React Starter Kit's suite, inertia_rails lines 26.6 to 25.5 objects per request (2,180 per request; lowrail-profile compare exit 0, no change beyond noise)."
 ownership: {date: 2026-11-26, checked: ["PRs and issues in any state naming try(:deferred?), the resolver's flag predicates, props_resolver.rb", "open PRs #448, #402, #391, #167", "maintainer branches pushed after 3.24.0"], hits: []}
-passes: []
+passes:
+  - {reviewer: thermos-sol, orb: T-01a21829-c61f-721c-bfe1-1a5b23c67f4c, head: "f934e7c3b2dcd22404c62aa33fd613c9ea9be249", date: 2026-11-26, verdict: changes, open: "F1 reordered waits_for_partial_reload? (custom stateful deferred? differs on partial visits); F2 'every Inertia render' false (errors omitted by default); F3 five-to-seven Arrays false (optional 4, once 8); F4 Test plan overstates spec coverage (fresh? guard mutant passes all specs); F5 no runnable benchmark-ips script in body. All addressed on 0362ffcb1f. Artifact: https://ampcode.com/artifacts/inrp1-thermos-review-1c4add94-eb53-4288-8c06-1316316bcf18"}
 ---
 
 # Ask prop types for their flags without `try`
 
 ## Summary
 
-The props resolver asks each prop type it reaches whether it is deferred, merges, is a once prop (and fresh), is live or rescues errors, through `Object#try`. Each `try` call allocates an Array for its arguments, so a prop type costs five to seven Arrays. Since #442 only prop types are asked, and `respond_to?` followed by the call gives the same answers, including for prop types without a given flag, such as `OptionalProp`, which has no `deferred?`.
+The props resolver asks each prop type it reaches whether it is deferred, merges, is a once prop (and fresh), is live or rescues errors, through `Object#try`, and each `try` call allocates an Array for its arguments. Since #442 only prop types are asked, so `respond_to?` followed by the call gives the same answers, including for prop types that don't define a flag, such as `OptionalProp`, which has no `deferred?`.
 
-Every Inertia render resolves at least one prop type, the `errors` prop that the renderer wraps in `InertiaRails.always`, which saves 7 objects per render. Pages with deferred, merge or optional props save more. An Inertia visit to a dashboard action with a merge prop, two deferred groups and an optional prop, with Ruby 4.0 and YJIT:
+Pages with deferred, merge or optional props save the most. Resolving a dashboard's props with Ruby 4.0 and YJIT, with the script below:
 
 | | master | this PR |
 | --- | ---: | ---: |
-| Iterations per second (benchmark-ips) | 3,723 | 3,840 |
-| Objects per request | 451 | 423 |
+| Iterations per second (benchmark-ips) | 44.1k | 54.0k |
+| Objects per resolve | 118 | 90 |
+
+<details>
+<summary>Benchmark</summary>
+
+Run with `ruby --yjit bench.rb` in an inertia-rails checkout.
+
+```ruby
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "rails"
+  gem "inertia_rails", path: "."
+  gem "benchmark-ips"
+end
+require "rails"
+require "action_controller/railtie"
+require "inertia_rails"
+
+rows = Array.new(10) { |i| { id: i, name: "Contact #{i}" } }
+evaluator = InertiaRails::PropEvaluator.new(Object.new)
+props = -> {
+  {
+    errors: InertiaRails.always { {} },
+    stats: { users: 1200, revenue: 34_500, orders: 87 },
+    recent: InertiaRails.merge { rows },
+    activity: InertiaRails.defer { rows },
+    chart: InertiaRails.defer(group: "charts") { [1, 2, 3] },
+    archived: InertiaRails.optional { [] },
+  }
+}
+
+Benchmark.ips do |x|
+  x.report("dashboard props") { InertiaRails::PropsResolver.new(props.(), evaluator: evaluator).resolve }
+end
+```
+
+</details>
 
 ## Test plan
 
-The existing specs cover each flag on each prop type, including the ones that don't define it. The resolved props and metadata are the same as on master.
+The existing specs cover each flag on the built-in prop types, including the ones that don't define it. The resolved props and metadata are the same as on master.
 
 ## Checklist
 
@@ -47,4 +85,4 @@ The existing specs cover each flag on each prop type, including the ones that do
 
 ## For Thomas
 
-Numbers come from bench/upstream/inertia_round2/body/INRP1 (Callgrind and objects) and INRP1-ips (benchmark-ips); the leads table and the below-bar leads are in docs/upstream/inertia-round-2.md.
+Body numbers: bench/upstream/inertia_round2/body/INRP1-resolver-ips (benchmark-ips, best base 43,971 / 44,146, candidate 54,042, A/A 0.40%) and body/INRP1-resolver (objects 118 to 90 in interpreter and YJIT; instructions -13.8% / -24.1%). The body script is INRP1_resolver.rb without its UpstreamBench branch and with INERTIA_RAILS fixed to ".". Whole-action numbers (body/INRP1, body/INRP1-ips) stay in the record; the leads table and the below-bar leads are in docs/upstream/inertia-round-2.md.
