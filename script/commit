@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Commits the staged index as Thomas Klemm (author and committer) with no trailers, in Lowrail or an upstream
 # checkout (run it from there). A plain `git commit` in Amp adds an Amp-Thread-ID trailer (DECISIONS, Commit identity).
+# With $GIT_SIGNING_KEY_SEED set (Lowrail project secret) it signs the commit with script/signing-key's SSH key.
 #
 #   script/commit -F MSGFILE [--amend]
 #   script/commit -m MESSAGE [--amend]   --amend replaces HEAD and keeps its author date
@@ -46,7 +47,14 @@ if [ "$($git rev-parse --show-toplevel)" = "$lowrail" ] &&
   echo "commit: the message references an upstream issue or PR, which shows on that thread; name it by item ID instead" >&2
   exit 1
 fi
-new=$($git commit-tree "$tree" "${parents[@]}" < "$message")
+sign=()
+if [ -n "${GIT_SIGNING_KEY_SEED:-}" ]; then
+  key=$(mktemp "${XDG_RUNTIME_DIR:-/dev/shm}/signing-key.XXXXXX")
+  trap 'rm -f "$message" "$key"' EXIT
+  "$lowrail/script/signing-key" private "$key"
+  sign=(-c gpg.format=ssh -c user.signingkey="$key")
+fi
+new=$($git "${sign[@]}" commit-tree ${sign[@]:+-S} "$tree" "${parents[@]}" < "$message")
 
 # Verify before HEAD moves: identity, the message byte for byte, no trailers.
 ident="Thomas Klemm <github@tklemm.eu> "
@@ -56,5 +64,7 @@ grep -q "^author $ident" <<<"$header" && grep -q "^committer $ident" <<<"$header
 cmp -s "$message" <($git cat-file commit "$new" | sed '1,/^$/d') || { echo "commit: $new changed the message" >&2; exit 1; }
 [ -z "$($git log -1 --format='%(trailers:only)' "$new")" ] || {
   echo "commit: the message ends in trailers:" >&2; $git log -1 --format='%(trailers:only)' "$new" >&2; exit 1; }
+[ ${#sign[@]} -eq 0 ] || $git cat-file commit "$new" | grep -q '^gpgsig -----BEGIN SSH SIGNATURE' ||
+  { echo "commit: $new isn't signed" >&2; exit 1; }
 $git update-ref -m "script/commit" HEAD "$new" ${old:+"$old"}
-$git log -1 --format='%h %s (author %an <%ae> %ad, committer %cn <%ce>, no trailers)' "$new"
+$git log -1 --format="%h %s (author %an <%ae> %ad, committer %cn <%ce>, no trailers${sign[*]:+, signed})" "$new"

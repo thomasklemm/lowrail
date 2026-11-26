@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# Writes the OpenSSH ed25519 signing key derived from the 32-byte hex seed in $GIT_SIGNING_KEY_SEED.
+#
+#   script/signing-key private FILE   writes the private key to FILE (mode 600)
+#   script/signing-key public         prints the public key line
+#
+# The secret holds a seed because Amp masks private keys in tool output, so a key file can't be stored
+# directly. OpenSSH 9.2 can't read an ed25519 key in PEM form, so the OpenSSH container is built here.
+import base64, os, struct, subprocess, sys
+
+def string(b):
+    return struct.pack(">I", len(b)) + b
+
+seed = bytes.fromhex(os.environ["GIT_SIGNING_KEY_SEED"].strip())
+assert len(seed) == 32, "GIT_SIGNING_KEY_SEED must be 32 bytes in hex"
+der = bytes.fromhex("302e020100300506032b657004220420") + seed
+pub_der = subprocess.run(["openssl", "pkey", "-inform", "DER", "-pubout", "-outform", "DER"],
+                         input=der, capture_output=True, check=True).stdout
+pub = pub_der[-32:]
+key_type = b"ssh-ed25519"
+pub_blob = string(key_type) + string(pub)
+comment = b"lowrail-signing"
+
+if sys.argv[1:] == ["public"]:
+    print("ssh-ed25519 " + base64.b64encode(pub_blob).decode() + " " + comment.decode())
+elif len(sys.argv) == 3 and sys.argv[1] == "private":
+    check = seed[:4]
+    private = check + check + string(key_type) + string(pub) + string(seed + pub) + string(comment)
+    private += bytes(range(1, 8 - len(private) % 8 + 1)) if len(private) % 8 else b""
+    body = b"openssh-key-v1\0" + string(b"none") + string(b"none") + string(b"") + struct.pack(">I", 1)
+    body += string(pub_blob) + string(private)
+    text = base64.b64encode(body).decode()
+    pem = "-----BEGIN OPENSSH PRIVATE KEY-----\n"
+    pem += "\n".join(text[i:i + 70] for i in range(0, len(text), 70))
+    pem += "\n-----END OPENSSH PRIVATE KEY-----\n"
+    fd = os.open(sys.argv[2], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
+        f.write(pem)
+else:
+    sys.exit("usage: script/signing-key private FILE | public")
