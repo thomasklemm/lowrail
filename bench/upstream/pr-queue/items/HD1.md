@@ -25,6 +25,7 @@ passes:
   - {reviewer: thermos-sol, head: "9c3009161ec0e259e7863d9b3b92864da5589bd0", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: changes, open: "R1 use transform_with for the Trash benchmark; R2 delete narrative code comments; R3 shorten the PR body and correct the input and calibration wording"}
   - {reviewer: thermos-sol, head: "c4303d510262c31290fe11dd845d38bc9bc999bd", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: approve, open: none}
   - {reviewer: thermos-sol, head: "87a9f2254eb5492408d327003f46dcd2c0f90f51", date: 2026-11-26, orb: T-01a21832-7ce1-758b-b1c2-ae5c2576a644, verdict: changes, open: "R1 correct CONTRIBUTING's cross-scenario comparison claim and acknowledge lost reports; R2 qualify the combined-layout README's contention explanation as a hypothesis"}
+  - {reviewer: thermos-sol, head: "bcf21e76c40d212ac66b9a168cd611d84d191a8f", date: 2026-11-26, orb: T-01a21832-7ce1-758b-b1c2-ae5c2576a644, verdict: approve, open: none}
 ---
 
 # Add Duel performance regression guards
@@ -246,3 +247,37 @@ Fresh commands ran in a clean isolated checkout of the exact candidate, using `m
 * `BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec ruby -Ilib ../probe.rb` — **21/21 actual definitions pass**, repeated batches and unchanged shared input. Probe and JSON remain under `.amp/in/orb-backup/hd1-delta/`; calibration raw data remains in the already tracked evidence directories. Ruby 3.0 was not rerun for this delta review.
 
 No Hashie checkout was edited, no Hashie branch was pushed, no fork workflow was rerun, no PR was opened and nothing was commented upstream. Only this review section and its exact-head pass entry are added to HD1. The old body still describes the live 13-scenario PR head; it is not a proposed description of the unposted 21-scenario candidate.
+
+### Thermos-sol confirm pass — 2026-11-26 (rebased combined layout)
+
+**Verdict: approve; no open must-fixes.** Confirmed Hashie `bcf21e76c40d212ac66b9a168cd611d84d191a8f`, exactly one commit on `812c48ca7b330abea6a69b92a747c49a95f9cdc0`, against the previous reviewed candidate `87a9f2254eb5492408d327003f46dcd2c0f90f51` and the Lowrail evidence at `60ee8412`. Applied both Thermos rubrics personally again, without delegation; this is one reviewer's confirm pass, not two independent reviews. This approval supersedes the preceding candidate's R1/R2 findings for this exact head, not the historical results or measurement limitations. The item state, live head, public body and previous reports remain unchanged.
+
+#### Fix and rebase confirmation
+
+* **R1 closed:** `CONTRIBUTING.md:53` matches the requested replacement paragraph exactly. It distinguishes raw per-iteration JSON from Duel's between-ref ratios and explicitly says the old within-ref tables and byte-memory report are not preserved. It no longer presents unmatched setter scenarios as equivalent extension-overhead comparisons.
+* **R2 closed:** the combined-layout README's cause paragraph matches the requested text exactly. It calls cross-benchmark CPU contention a hypothesis, distinguishes the two concurrency cohorts, and makes no negligible-false-alarm or scenario-count causation claim. The earlier failed classifications remain visible in the table and archives; round 6 does not erase them.
+* **Rebase correct:** the candidate introduces no changes to `lib/`, `spec/`, gemspec or Rakefile against its new master parent. The merged #656 Mash blob and specs are retained unchanged. `benchmarks/mash_new_keys.rb` is deleted against that parent, so no ignored script remains requiring the removed benchmark gems. All other benchmark definitions, fixture, helper, configuration and workflows are byte-identical to the previous candidate. Range-diff shows only the requested CONTRIBUTING change, the newly applicable deletion, the message update and the redundant spellcheck addition disappearing because master already contains it.
+* **Commit wording accepted:** the added sentence correctly names `mash_new_keys.rb`'s construction and new-key-write operations as covered. It does not restore or promise the removed bytes report or identical workload: the deleted script used a smaller nested payload and included empty construction in its setter block, whereas Duel's setter excludes construction. Those boundaries are now explicit in CONTRIBUTING and in the preceding review. No additional code change, wrapper or benchmark framework is needed.
+* **Structure, security and comments:** no new executable/configuration behavior or code comments were added relative to the reviewed layout. The earlier maintainability, permission-boundary and necessary-why-comment conclusions carry forward. The optional Ruby 3.4+ bundle remains isolated. Privileged report/label handling remains source-reviewed, not newly exercised end to end.
+
+#### Round 6 reconciled against raw records
+
+Ran `python3 -I bench/upstream/hashie_duel/tally.py bench/upstream/hashie_duel/calibration-6` and independently reconciled all **17 full job logs** with their metadata/conclusions/timestamps, summaries and exact source commits. Each run has all 21 initial scenarios, one benchmark at a time, twelve workers per version, Ruby 4.0.10 + YJIT and the unchanged 1.02 limit. All seven calibration heads have `bcf21e76c40d212ac66b9a168cd611d84d191a8f` as their direct parent. All five A/A diffs contain only their one comment. The rebuilt allocation plant changes only `Symbol#name` to `Symbol#to_s`; the CPU plant changes only the stored-key test in `method_missing` from one to three `key?` calls. Neither recipe undoes or duplicates #656's merged changes.
+
+| New-baseline cohort | Confirmed result | Job / Duel time |
+|---|---|---|
+| A/A, five branches × three attempts | 0/15 failed, no remeasurement, 45/315 final timings unsettled | 81–91 s, median 86 s / 66–73 s |
+| Allocation plant | 13 benchmarks regressed, zero errors | 365 s / 344 s |
+| CPU plant | Five benchmarks regressed: plain five-key reader, both KeepOriginalKeys readers, nested method reader and suffix reader; zero errors | 160 s / 136 s |
+
+The README's new row agrees with the raw evidence. Fork PR #8 is closed, not merged, as reported; #656's library change is now the baseline rather than a candidate to count again. Keep `c.jobs = 1` and the existing thresholds. This is additional calibration on the actual rebased head, not proof of a zero future false-positive rate, equality of unsettled timings, or the proposed contention mechanism.
+
+#### Fresh local checks
+
+All checks loaded the exact clean candidate checkout through `mise exec ruby@4.0.9 --`:
+
+* `CI=true bundle exec rake spec rubocop` — **1,076 examples, 0 failures**, 100% line coverage; **124 then 155 files inspected, no offenses**, exit 0.
+* `BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec ruby -Ilib ../probe.rb` — **21/21 actual definitions pass** with the previous failure-raising assertions, repeated batches of 1, 17 and 1, and unchanged shared fixture. No probe expectations were changed to accommodate the rebase.
+* `RUBY_YJIT_ENABLE=1 BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec duel --force --base HEAD --json ../confirm-rebased-aa.json` — **21 benchmarks in 88 s, 0 regressed, 0 errors, 12 unsettled**, exit 0. Both JSON commits are `bcf21e76c40d212ac66b9a168cd611d84d191a8f`, uncommitted changes false, jobs 1, twelve workers per version, warm-up 2 s, confidence 0.99 and CPU limit 1.02. Across CPU 0.997 [0.989, 1.006] is unsettled. One run only, not rerun until green.
+
+Ruby 3.0's 1,072/0 is the builder's reported check, not a fresh reviewer execution. Fresh logs and JSON are retained under `.amp/in/orb-backup/hd1-delta/confirm-rebased-*`; the round-6 raw logs remain in the tracked evidence archive. No tracked Hashie file was edited, no Hashie branch was pushed, no workflow was rerun and nothing was posted upstream. This pass approves only the named candidate; the still-live 13-scenario PR body/head are deliberately untouched.
