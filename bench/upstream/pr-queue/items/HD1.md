@@ -23,6 +23,7 @@ note: "2026-11-26 thermos-sol changes on 9c30091 applied as c4303d5 (same parent
 ownership: {date: 2026-11-26, checked: ["open PRs naming repository_attributes that change .duel.rb, .github/workflows/perf-comment.yml, .github/workflows/perf.yml, .gitignore, .rubocop.yml, .spellcheck.txt, CHANGELOG.md, CONTRIBUTING.md, README.md, duel/dash_duel.rb, duel/duel_helper.rb, duel/fixtures/repository.json, duel/mash_duel.rb, gemfiles/duel.gemfile","hashie/hashie#658 and what references it"], hits: ["tracker: hashie/hashie#658 (open): Add Duel performance regression guards","references hashie/hashie#658: hashie/hashie#656 (PR, open, thomasklemm): Write new Mash keys without allocating in respond_to_missing?"]}
 passes:
   - {reviewer: thermos-sol, head: "c4303d510262c31290fe11dd845d38bc9bc999bd", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: changes, open: "R1 use transform_with for the Trash benchmark; R2 delete narrative code comments; R3 shorten the PR body and correct the input and calibration wording"}
+  - {reviewer: thermos-sol, head: "c4303d510262c31290fe11dd845d38bc9bc999bd", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: approve, open: none}
 ---
 
 # Add Duel performance regression guards
@@ -140,3 +141,40 @@ All commands used an isolated checkout of the exact reviewed Hashie head, not an
 * Actual-definition semantic probe — the one reproducible Trash failure above, 12 other expected outputs, fixture unchanged; the one-keyword in-memory fix passes rename and transform expectations. Hashie working trees remain unmodified.
 
 No Hashie branch was pushed, no PR was opened, no fork workflow was rerun, and nothing was posted upstream. This review does not certify the unexercised privileged comment/label workflow end to end or approve a later changed head.
+
+### Thermos-sol confirm pass — 2026-11-26
+
+**Verdict: approve; no open must-fixes.** Confirmed Hashie `c4303d510262c31290fe11dd845d38bc9bc999bd`, still one commit on `e1adebc3de7f48c7aa3f1f9f73c97676102f34a3`, against the previous reviewed head `9c3009161ec0e259e7863d9b3b92864da5589bd0` and this item at Lowrail `aa984944`. Applied both Thermos rubrics myself again without delegation. This confirm pass supersedes the original R1–R3 findings for the new head, not the historical evidence or limitations. The proposed body and state remain unchanged.
+
+#### Fix confirmation and paragraph wording
+
+* **R1 closed:** `RepositoryTrash` now uses `transform_with:`. Replayed all 13 actual Duel definitions: all expected outputs pass, including renamed title/stars and `topics == "octocat, api"`; repeated execution leaves the fixture unchanged. Both archived new-cohort runs and the local new-head A/A report Trash at 4 allocations instead of the old non-transforming case's 3.
+* **R2 closed:** the exact diff removes the requested narrative comments. The only executable change is the transformer keyword; the other insertion is the short null-logger reason. Remaining directives, inline pins and permission comments are appropriate. No workflow semantics, production code, dependency isolation or other benchmark behavior changed.
+* **R3 closed:** the commit uses the corrected JSON-fixture sentence, and the internal first-cohort sentence distinguishes remeasurement from unsettled timings. The public body drops the universal client/fixture claims and incorrect merge-result description. Its first three paragraphs retain the reviewed replacement. The added calibration paragraph is required by Thomas's updated brief; its presence is not a finding. At 159 words overall, the body remains concise given the specifically requested calibration and approval details.
+* **Calibration sentence:** 35 comment-only A/A runs all passed across the two cohorts (25 old, 10 new); both kinds of planted regression failed. Eight allocation regressions are reproduced on the new head. The quoted method-read 1.5× is the first cohort's rounded 1.465–1.519×, not the new cohort's 1.404–1.445×; the paragraph aggregates the cohorts and does not claim all 35 runs used the corrected Trash definition. The new CPU plant also catches suffix reads. No wording change is required to make the aggregate historical claim true.
+* **Candidate/runtime sentences:** #656 has classified faster results and no classified regression in either cohort; its new run has five faster cases and zero unsettled timings. “About a minute” matches the old 47–84 s and new 48–77 s passing job ranges. The body no longer claims a general regression runtime range or universal unavailability of instruction counters.
+* **Approval/default-branch sentence:** independently read #656's current-head upstream Actions records. Both CI (`45810442812`) and Danger (`45810443805`) at `d874851d79db3a35b4cde8d2d6c567833ebb73f7` are `action_required`. This supports the explicit maintainer-approval note for this contributor's fork PRs here; it is not an assertion that every contributor always needs approval. Perf comment still requires its workflow on the default branch. The rest of the body and commit claims remain supported by the unchanged code and pinned reusable workflows.
+* **CHANGELOG nit withdrawn:** CONTRIBUTING mentions Miscellaneous, but the actual CHANGELOG and `HashieReleasePreparation::CATEGORIES` support only Added/Changed/Deprecated/Removed/Fixed/Security, with earlier CI/tooling entries under Added. My earlier suggestion did not account for that executable category contract. Keep Added; do not add a category or expand this port.
+
+#### Recalibration checked against raw evidence
+
+Reran `python3 -I bench/upstream/hashie_duel/tally.py bench/upstream/hashie_duel/calibration-2` and independently checked all 13 archived logs against their summaries, JSON conclusions/job timestamps, current fork branch SHAs and parent commits. Each raw run contains all 13 initial benchmark cases. The five A/A heads have only their stated comment change; both plants have the intended library delta; the candidate Mash blob is still `a80d6bf9bb289009259c9ccb98d81ad1fdfbed6e`. All eight branch parents and the PR target now equal `c4303d5`. The logs run Ruby 4.0.10 + YJIT, distinct from local Ruby 4.0.9.
+
+| New-head cohort | Confirmed result | Job / Duel duration |
+|---|---|---|
+| A/A, five branches × two attempts | 10 successes, zero regressions/errors; 26/130 reported final timings unsettled. | 48–77 s, median 54.5 s (55 s rounded) / 34–63 s. |
+| Allocation plant | Eight regressed, zero errors; Mash.new 105.7 → 143.7 objects, method reads 5 → 15. | 238 s / 220 s. |
+| CPU plant | Two regressed: method reads 1.404–1.445×, suffix reads 1.030–1.134× over their measurements; allocations unchanged. | 86 s / 69 s. |
+| #656 candidate | Five faster, zero regressed/errors/unsettled; the same five allocation-reduction paths. | 50 s / 37 s. |
+
+Only aa-3 attempt 2 remeasured: Dash required/default construction initially 1.026 [1.020, 1.033], then 1.021, 1.022, 1.028 and 1.025, all unsettled. It passed without demonstrating equality. Together with cohort 1 this is two remeasured runs, both on the same benchmark, and 0/35 failed runs. The note's word “cleared” means the check passed, not that the repeats established equivalent performance. Keep the default 1.02 CPU limit and the previous uncertainty caveat: this is useful additional calibration, not proof of a negligible false-positive rate or a reason to rerun/tune until green.
+
+#### Fresh local checks and recordkeeping
+
+* `CI=true bundle exec rake spec rubocop`, Ruby 4.0.9 — **1,075 examples, 0 failures; 124 then 157 files inspected, no offenses**.
+* `BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec duel --force --base HEAD --json ../confirm-aa.json`, Ruby 4.0.9 + YJIT — **13 benchmarks in 30 s, 0 regressed, 0 errors, 2 unsettled**, exit 0. JSON confirms both commits are `c4303d5` and uncommitted changes are false; across CPU 1.000 [0.995, 1.006], unsettled. One local run only, with no rerun for a preferred result.
+* All-definition semantic probe — **13/13 expected outputs**, transformed Trash topics, shared fixture unchanged. `Gemfile`, gemspec, `Rakefile`, library and existing test workflow are unchanged from the same parent. Ruby 3.0 was tested in the previous review, not rerun for this comment/benchmark-only follow-up.
+
+The earlier frontmatter pass was retargeted to `c4303d5` in `aa984944`, although the earlier report explicitly reviewed `9c30091`; its R3 quote was also replaced inside the historical report. Those pre-existing edits are preserved here rather than silently rewriting someone else's changes. This appended approve entry is the actual first confirm coverage of `c4303d5`. For accurate historical pass attribution, the earlier entry's head should be `9c3009161ec0e259e7863d9b3b92864da5589bd0`; this does not affect the latest-pass gate or this approval.
+
+No Hashie pushes, workflow reruns, PRs or upstream comments were performed. Workflow security conclusions carry forward because only their comments changed; privileged comment/label handling remains source-reviewed rather than exercised end to end.
