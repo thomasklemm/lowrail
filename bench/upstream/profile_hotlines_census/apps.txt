@@ -1,0 +1,20 @@
+# script/profile-hotlines @bench/upstream/profile_hotlines_census/apps.txt
+# NAME=REPORT,LOCK: one capture per census app (lowrail-profile 0.1.0.rc1 built from gem/ at main), the app's Gemfile.lock at its corpus pin.
+blog=bench/upstream/profile_hotlines_census/blog/profiled,bench/upstream/profile_hotlines_census/locks/blog.Gemfile.lock
+campfire=bench/upstream/profile_hotlines_census/campfire/profiled,bench/upstream/profile_hotlines_census/locks/campfire.Gemfile.lock
+casa=bench/upstream/profile_hotlines_census/casa/profiled,bench/upstream/profile_hotlines_census/locks/casa.Gemfile.lock
+chatwoot=bench/upstream/profile_hotlines_census/chatwoot/profiled,bench/upstream/profile_hotlines_census/locks/chatwoot.Gemfile.lock
+codetriage=bench/upstream/profile_hotlines_census/codetriage/profiled,bench/upstream/profile_hotlines_census/locks/codetriage.Gemfile.lock
+discourse=bench/upstream/profile_hotlines_census/discourse/profiled,bench/upstream/profile_hotlines_census/locks/discourse.Gemfile.lock
+fizzy=bench/upstream/profile_hotlines_census/fizzy/profiled,bench/upstream/profile_hotlines_census/locks/fizzy.Gemfile.lock
+flow=bench/upstream/profile_hotlines_census/flow/profiled,bench/upstream/profile_hotlines_census/locks/flow.Gemfile.lock
+hackatime=bench/upstream/profile_hotlines_census/hackatime/profiled,bench/upstream/profile_hotlines_census/locks/hackatime.Gemfile.lock
+lobsters=bench/upstream/profile_hotlines_census/lobsters/profiled,bench/upstream/profile_hotlines_census/locks/lobsters.Gemfile.lock
+loomio=bench/upstream/profile_hotlines_census/loomio/profiled,bench/upstream/profile_hotlines_census/locks/loomio.Gemfile.lock
+mastodon=bench/upstream/profile_hotlines_census/mastodon/profiled,bench/upstream/profile_hotlines_census/locks/mastodon.Gemfile.lock
+pingcrm=bench/upstream/profile_hotlines_census/pingcrm/profiled,bench/upstream/profile_hotlines_census/locks/pingcrm.Gemfile.lock
+react-starter-kit=bench/upstream/profile_hotlines_census/react-starter-kit/profiled,bench/upstream/profile_hotlines_census/locks/react-starter-kit.Gemfile.lock
+redprints-cfp=bench/upstream/profile_hotlines_census/redprints-cfp/profiled,bench/upstream/profile_hotlines_census/locks/redprints-cfp.Gemfile.lock
+sure=bench/upstream/profile_hotlines_census/sure/profiled,bench/upstream/profile_hotlines_census/locks/sure.Gemfile.lock
+thinkroom=bench/upstream/profile_hotlines_census/thinkroom/profiled,bench/upstream/profile_hotlines_census/locks/thinkroom.Gemfile.lock
+writebook=bench/upstream/profile_hotlines_census/writebook/profiled,bench/upstream/profile_hotlines_census/locks/writebook.Gemfile.lock

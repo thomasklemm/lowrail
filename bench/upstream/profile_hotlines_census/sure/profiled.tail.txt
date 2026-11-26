@@ -1,0 +1,40 @@
+| ruby default gem: prism | 1.0 | 1.2 | `node.rb:16901` 0.2, `node.rb:16818` 0.1, `node.rb:2623` 0.1 |
+| gem: bootsnap | 0.9 | 1.1 | `iseq.rb:53` 0.5, `iseq.rb:64` 0.1, `yaml.rb:173` 0.1 |
+| gem: pagy | 0.8 | 0.8 | `shared_methods.rb:12` 0.2, `backend.rb:16` 0.1, `url_helpers.rb:11` 0.1 |
+| test harness: webmock | 0.8 | 1.0 | `headers.rb:69` 0.2, `headers.rb:68` 0.1, `uri.rb:62` 0.1 |
+| gem: hotwire_combobox | 0.7 | 0.7 | `helper.rb:14` 0.5, `hotwire_combobox.rb:19` 0.2 |
+| test harness: vcr | 0.6 | 0.7 | `errors.rb:269` 0.1, `errors.rb:190` 0.0, `errors.rb:186` 0.0 |
+| gem: zeitwerk | 0.4 | 0.5 | `cref.rb:47` 0.1, `constant_path_validator.rb:13` 0.1, `file_system.rb:203` 0.1 |
+| gem: marcel | 0.2 | 0.2 | `magic.rb:18` 0.0, `mime_type.rb:81` 0.0, `mime_type.rb:90` 0.0 |
+| gem: faraday | 0.2 | 0.2 | `rack_builder.rb:119` 0.0, `options.rb:33` 0.0, `options.rb:16` 0.0 |
+| gem: redis-client | 0.2 | 0.2 | `resp3.rb:54` 0.0, `resp3.rb:99` 0.0, `resp3.rb:69` 0.0 |
+| ruby default gem: cgi | 0.2 | 0.2 | `escape.rb:134` 0.1, `escape.rb:133` 0.1, `escape.rb:135` 0.0 |
+| gem: addressable | 0.2 | 0.3 | `uri.rb:1417` 0.0, `uri.rb:2272` 0.0, `uri.rb:1858` 0.0 |
+| gem: sidekiq-unique-jobs | 0.1 | 0.1 | `core_ext.rb:101` 0.1, `core_ext.rb:105` 0.0 |
+| ruby default gem: net-http | 0.1 | 0.1 | `header.rb:205` 0.0, `header.rb:195` 0.0, `header.rb:468` 0.0 |
+| gem: httparty | 0.1 | 0.1 | `headers_processor.rb:22` 0.0, `module_inheritable_attributes.rb:32` 0.0, `request.rb:293` 0.0 |
+| gem: csv | 0.1 | 0.1 | `parser.rb:683` 0.0, `parser.rb:656` 0.0, `parser.rb:623` 0.0 |
+| gem: plaid | 0.1 | 1.3 | `api_client.rb:46` 0.0, `configuration.rb:266` 0.0, `configuration.rb:271` 0.0 |
+| gem: hashery | 0.0 | 0.1 | `lru_hash.rb:107` 0.0, `lru_hash.rb:210` 0.0, `lru_hash.rb:37` 0.0 |
+| rails: actioncable | 0.0 | 0.1 | `broadcasting.rb:41` 0.0, `broadcasting.rb:53` 0.0, `test.rb:24` 0.0 |
+| ruby default gem: psych | 0.0 | 4.5 | `parser.rb:62` 0.0, `node.rb:33` 0.0, `tree_builder.rb:97` 0.0 |
+| gem: redis | 0.0 | 0.0 | `redis.rb:142` 0.0, `redis.rb:64` 0.0, `connection.rb:21` 0.0 |
+| ruby default gem: prettyprint | 0.0 | 0.0 | `prettyprint.rb:403` 0.0, `prettyprint.rb:263` 0.0, `prettyprint.rb:458` 0.0 |
+| ruby default gem: pp | 0.0 | 0.0 | `pp.rb:542` 0.0, `pp.rb:268` 0.0, `pp.rb:271` 0.0 |
+| rails: actionmailer | 0.0 | 0.0 | `base.rb:626` 0.0, `message_delivery.rb:186` 0.0, `message_delivery.rb:136` 0.0 |
+| gem: lookbook | 0.0 | 1.9 | `annotatable_entity.rb:80` 0.0, `tree_node.rb:8` 0.0, `store.rb:30` 0.0 |
+| gem: pundit | 0.0 | 0.0 | `authorization.rb:17` 0.0, `authorization.rb:19` 0.0, `authorization.rb:20` 0.0 |
+| gem: sidekiq | 0.0 | 0.0 | `api.rb:988` 0.0, `redis_connection.rb:72` 0.0, `config.rb:161` 0.0 |
+| gem: connection_pool | 0.0 | 0.0 | `connection_pool.rb:93` 0.0, `connection_pool.rb:100` 0.0, `connection_pool.rb:102` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `bigint.rb:0` 0.0, `factory.rb:27` 0.0, `factory.rb:37` 0.0 |
+| gem: doorkeeper | 0.0 | 0.1 | `errors.rb:70` 0.0, `errors.rb:66` 0.0, `errors.rb:10` 0.0 |
+| gem: nio4r | 0.0 | 0.0 | `version.rb:8` 0.0, `nio.rb:0` 0.0, `nio4r_ext.so:0` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:192` 0.0 |
+| gem: racc | 0.0 | 0.0 | `parser.rb:263` 0.0 |
+| gem: yard | 0.0 | 0.5 | `docstring.rb:356` 0.0, `docstring.rb:383` 0.0, `docstring.rb:276` 0.0 |
+| test harness: minitest | 0.0 | 0.0 | `assertions.rb:633` 0.0 |
+| gem: mail | 0.0 | 0.0 | `address_lists_parser.rb:31961` 0.0, `address_lists_parser.rb:32965` 0.0, `address.rb:204` 0.0 |
+| gem: jbuilder | 0.0 | 0.2 | `jbuilder_template.rb:264` 0.0, `jbuilder_template.rb:123` 0.0, `jbuilder.rb:338` 0.0 |
+| rails: actiontext | 0.0 | 0.0 | `rendering.rb:8` 0.0, `content.rb:25` 0.0, `content.rb:30` 0.0 |
+| gem: rails-i18n | 0.0 | 0.0 | `fr.rb:9` 0.0, `fr.rb:14` 0.0 |
+lowrail-profile: report in /home/user/hl-out/sure/profiled/report.md

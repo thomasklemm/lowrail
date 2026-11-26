@@ -1,0 +1,5 @@
+plain exit 0 wall 4.373546810 at 14:21:13
+profiled exit 0 wall 7.567449530 at 14:21:21
+plain.log: 70 distinct outcomes, 90 lines; 50 examples, 0 failures
+profiled.log: 70 distinct outcomes, 180 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled.log: identical to plain (each of 70 outcomes in both runs)

@@ -1,0 +1,40 @@
+| 19 | SlackCommand::SailorsLogLeaderboardJob#perform | 1 / 1 | – / – |  | 2846.0 |  |  |
+| 20 | OnboardingCheckInEmailJob#perform | 1 / 1 | – / – |  | 699.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:180` | 55.31 / 55.31 | 88% | `app/jobs/cache/currently_hacking_job.rb:15` 14%, `app/jobs/heartbeat_import_dump_job.rb:21` 10% | `ar_result = if result.fields.empty?` |
+| 2 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:880` | 52.26 / 52.26 | 88% | `app/jobs/cache/currently_hacking_job.rb:15` 15%, `app/jobs/heartbeat_import_dump_job.rb:21` 10% | `type_map.fetch(oid, fmod, sql_type) {` |
+| 3 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 41.32 / 41.32 | 96% | `app/jobs/dashboard_rollup_refresh_job.rb:16` 8%, `app/services/anonymize_user_service.rb:19` 5% | `binds = binds.inspect` |
+| 4 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:177` (debug logging) | 36.99 / 36.99 | 96% | `app/jobs/dashboard_rollup_refresh_job.rb:16` 5%, `app/jobs/cache/currently_hacking_job.rb:15` 5% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 5 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:191` | 28.53 / 28.53 | 88% | `app/jobs/slack_username_update_job.rb:15` 32%, `app/jobs/cache/currently_hacking_job.rb:15` 6% | `ActiveRecord::Result.new(fields, result.values, types.freeze, affected` |
+| 6 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` | 27.82 / 27.82 | 100% | `no app frame` 26%, `app/jobs/slack_username_update_job.rb:15` 16% | `dispatch(:#{method}, ...)` |
+| 7 | `GEM/http/lib/http/headers/normalizer.rb:29` | 25.73 / 25.73 | 32% | `app/services/repo_host/github_service.rb:21` 51%, `app/services/repo_host/github_service.rb:28` 20% | `value.dup` |
+| 8 | `RAILS/activerecord/lib/arel/table.rb:85` | 25.36 / 25.36 | 80% | `app/jobs/sailors_log_poll_for_changes_job.rb:28` 10%, `app/jobs/heartbeat_export_job.rb:93` 10% | `Attribute.new(table, name)` |
+| 9 | `RAILS/activesupport/lib/active_support/notifications/fanout.rb:288` | 24.99 / 25.42 | 100% | `no app frame` 9%, `app/jobs/cache/activity_job.rb:14` 5% | `group_klass.new(grouped_listeners, name, id, payload)` |
+| 10 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:175` (debug logging) | 24.88 / 24.88 | 96% | `app/jobs/dashboard_rollup_refresh_job.rb:16` 5%, `app/jobs/cache/currently_hacking_job.rb:15` 5% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | WeeklySummaryMailer#weekly_summary | 1 / 1 | – / – |  | 5134.0 |  |  |
+| 2 | HeartbeatExportMailer#export_ready | 1 / 1 | – / – |  | 2619.0 |  |  |
+| 3 | HeartbeatImportMailer#import_completed | 1 / 1 | – / – |  | 2418.0 |  |  |
+| 4 | HeartbeatImportMailer#import_failed | 1 / 1 | – / – |  | 2125.0 |  |  |
+| 5 | HeartbeatImportMailer#wakatime_manual_download_required | 1 / 1 | – / – |  | 2084.0 |  |  |
+| 6 | LoopsMailer#sign_in_email | 1 / 1 | – / – |  | 1841.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 141.67 / 141.67 | 100% | `app/mailers/weekly_summary_mailer.rb:26` 17%, `app/mailers/heartbeat_import_mailer.rb:15` 17% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 102.67 / 102.67 | 100% | `app/mailers/heartbeat_import_mailer.rb:4` 17%, `app/mailers/heartbeat_export_mailer.rb:12` 17% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 3 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 90.83 / 90.0 | 100% | `app/mailers/heartbeat_export_mailer.rb:12` 17%, `app/mailers/weekly_summary_mailer.rb:26` 17% | `_wide = data[p].ord` |
+| 4 | `GEM/mail/lib/mail/field_list.rb:71` † | 70.0 / 70.0 | 100% | `app/mailers/heartbeat_import_mailer.rb:9` 17%, `app/mailers/heartbeat_import_mailer.rb:4` 17% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 5 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 59.0 / 59.0 | 100% | `app/mailers/heartbeat_import_mailer.rb:9` 17%, `app/mailers/heartbeat_import_mailer.rb:15` 17% | `_wide = data[p].ord` |
+| 6 | `GEM/rack-mini-profiler/lib/mini_profiler_rails/railtie.rb:158` † | 51.67 / 51.67 | 100% | `app/views/layouts/mailer.html.erb:15` 23%, `app/mailers/heartbeat_import_mailer.rb:4` 7% | `identifier.split('/').last(2).join('/')` |
+| 7 | `GEM/mail/lib/mail/parser_tools.rb:7` | 33.33 / 33.33 | 100% | `app/mailers/loops_mailer.rb:7` 17%, `app/mailers/heartbeat_import_mailer.rb:9` 17% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:291` | 32.17 / 32.17 | 100% | `app/mailers/heartbeat_import_mailer.rb:15` 19%, `app/mailers/heartbeat_import_mailer.rb:4` 19% | `value !~ /\S/` |
+| 9 | `GEM/erubi/lib/erubi.rb:134` (template compile) | 27.33 / 27.33 | 83% | `app/mailers/weekly_summary_mailer.rb:26` 36%, `app/mailers/heartbeat_import_mailer.rb:9` 15% | `input.scan(regexp) do \|indicator, code, tailch, rspace\|` |
+| 10 | `GEM/mail/lib/mail/utilities.rb:226` | 26.67 / 26.67 | 100% | `app/mailers/heartbeat_export_mailer.rb:12` 16%, `app/mailers/heartbeat_import_mailer.rb:15` 16% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+lowrail-profile: report in /home/user/hl-out/hackatime/profiled/report.md

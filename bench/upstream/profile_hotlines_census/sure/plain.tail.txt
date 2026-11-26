@@ -1,0 +1,40 @@
+GoalsControllerTest#test_a_fixed_earmark_is_filled_back_into_its_account's_field = 0.19 s = .
+GoalsControllerTest#test_the_edit_form_does_not_count_the_edited_goal's_own_earmark = 0.14 s = .
+GoalsControllerTest#test_the_form_carries_both_the_amount_and_the_balance_wording = 0.13 s = .
+GoalsControllerTest#test_pause/resume/complete/archive/unarchive_flow = 0.08 s = .
+GoalsControllerTest#test_index_renders_with_active_filter_by_default = 0.12 s = .
+GoalsControllerTest#test_a_completed_goal_shows_the_amount_and_date_it_froze = 0.14 s = .
+GoalsControllerTest#test_a_refused_spend_says_which_rule_refused_it = 0.03 s = .
+GoalsControllerTest#test_index_KPI_swaps_to_'All_caught_up'_when_every_tracked_goal_is_reached = 0.13 s = .
+GoalsControllerTest#test_a_funded_reserve_reads_as_intact,_with_nothing_to_do = 0.11 s = .
+GoalsControllerTest#test_update_with_empty_account_ids_re-renders_with_error = 0.14 s = .
+GoalsControllerTest#test_detected_foreign_spending_is_converted_on_its_date_and_releases_native_units = 0.07 s = .
+GoalsControllerTest#test_editing_a_months_reserve_shows_the_balance_it_currently_holds = 0.15 s = .
+GoalsControllerTest#test_a_rejected_creation_keeps_the_accounts_the_user_ticked = 0.15 s = .
+GoalsControllerTest#test_the_goal_page_offers_an_outflow_nothing_has_claimed = 0.12 s = .
+GoalsControllerTest#test_show_renders_the_goal = 0.14 s = .
+GoalsControllerTest#test_update_without_account_ids_leaves_linked_accounts_intact = 0.03 s = .
+GoalsControllerTest#test_the_new_form_renders_each_account's_balance_and_what_other_goals_hold = 0.16 s = .
+GoalsControllerTest#test_a_one_off_goal_at_100_percent_is_offered_closing,_not_archiving = 0.11 s = .
+GoalsControllerTest#test_an_archived_goal_is_offered_no_closing_action = 0.12 s = .
+GoalsControllerTest#test_a_goal_that_has_spent_nothing_says_nothing_about_it = 0.15 s = .
+GoalsControllerTest#test_create_rejects_foreign_accounts = 0.14 s = .
+GoalsControllerTest#test_show_and_index_disclose_an_unavailable_account_conversion = 0.28 s = .
+GoalsControllerTest#test_the_form_carries_both_blank-amount_hints = 0.15 s = .
+GoalsControllerTest#test_the_form_carries_the_derived_balance_as_a_result,_not_a_field = 0.15 s = .
+GoalsControllerTest#test_the_consumption_dialog_names_a_foreign_account's_currency = 0.11 s = .
+GoalsControllerTest#test_the_target_amount_field_keeps_its_own_action_alongside_the_paste_handler = 0.19 s = .
+GoalsControllerTest#test_the_same_outflow_cannot_be_attributed_twice = 0.07 s = .
+GoalsControllerTest#test_new_form_excludes_same-family_accounts_not_shared_with_the_current_user = 0.12 s = .
+GoalsControllerTest#test_create_with_mixed_currencies_uses_the_currency_shown_for_the_target = 0.04 s = .
+GoalsControllerTest#test_create_persists_a_goal_with_linked_accounts = 0.04 s = .
+GoalsControllerTest#test_consumption_is_refused_against_a_linked_account_the_viewer_cannot_see = 0.03 s = .
+GoalsControllerTest#test_show_exposes_delete_for_a_goal_in_every_state = 0.47 s = .
+GoalsControllerTest#test_a_transition_that_fails_validation_reports_the_error,_not_success = 0.04 s = .
+GoalsControllerTest#test_create_accepts_the_maintained_kind = 0.03 s = .
+GoalsControllerTest#test_the_consumption_dialog_does_not_name_a_linked_account_the_viewer_cannot_see = 0.09 s = .
+GoalsControllerTest#test_index_KPI_'on_track'_denominator_excludes_no-target-date_goals = 0.16 s = .
+GoalsControllerTest#test_redirects_users_without_preview_access = 0.02 s = .
+
+Finished in 125.174133s, 9.1073 runs/s, 42.4928 assertions/s.
+1140 runs, 5319 assertions, 0 failures, 0 errors, 0 skips

@@ -1,0 +1,7 @@
+plain exit 0 wall 7.308921426 at 14:23:39
+profiled exit 0 wall 16.389239446 at 14:23:55
+  0.0 1.0 ParseDocsTest#test_Can_parse_yard_docs = .
+plain.log: 216 distinct outcomes, 216 lines; 222 runs, 483 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: 217 distinct outcomes, 434 lines; 222 runs, 483 assertions, 0 failures, 0 errors, 0 skips | 222 runs, 483 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: DIFFERS from plain in 1 outcomes (plain count, profiled per run):
+  0.0 1.0 ParseDocsTest#test_Can_parse_yard_docs = .

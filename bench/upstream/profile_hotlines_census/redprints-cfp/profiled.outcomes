@@ -1,0 +1,70 @@
+2	.tracks
+2	DELETE /
+2	DELETE /:id
+8	GET /
+2	GET /:id
+2	GET /:id/edit
+2	GET /new
+4	PATCH /:id
+6	POST /
+2	changes status to confirmed
+2	changes status to declined
+2	creates a draft
+2	creates a new proposal
+2	creates a new user, account and oauth credentials
+2	creates pending reviews for all missing proposal-reviewer pairs
+2	deletes the proposal
+2	delivers notifications only to newly updated proposals
+8	does not change the status
+4	does not notify the author
+2	doesn't affect existing reviews
+2	doesn't create a new user
+2	doesn't show evaluations for inactive CFPs
+2	doesn't show proposals for inactive CFPs
+2	doesn't update anything
+2	doesn't update the review
+4	is expected to be present
+2	is expected to eq "Optio exercitationem nostrum molestiae."
+2	is expected to eq N
+6	is invalid
+4	notifies the author
+2	only include tracks from active CFPs
+2	raises an ActiveRecord::RecordNotFound error
+2	raises routing error
+2	redirects back with an alert message
+2	redirects to the evaluation show page
+2	renders results index page
+2	renders the form with errors
+2	renders the index page with evaluations
+2	renders the index page with the reviews
+2	sends a notification
+8	sends an email
+2	updates only the review score
+2	updates proposal statuses for submitted proposals only
+2	updates score and reviews_count and take into account only submitted reviews
+2	updates the proposal
+2	updates the proposal status and delivers a notification
+2	updates the review and the proposal's score
+2	updates the review normally
+2	validations
+4	when accessing another user's proposal
+2	when evaluation deadline has passed
+2	when evaluation does not belong to the reviewer
+2	when evaluation has no deadline
+2	when evaluation is personal
+2	when proposal is draft
+4	when proposal is not accepted
+2	when reviewer has multiple evaluations
+2	when reviewer has only one evaluation
+2	when saving draft
+2	when some scores are missing
+2	when submitted reviews exist
+2	when user doesn't exist
+2	when user exists
+2	when user is admin
+2	when user is not admin
+2	when validation fails
+2	with blank proposals
+4	with inactive CFPs
+2	with invalid statuses
+2	with missing ids or statuses

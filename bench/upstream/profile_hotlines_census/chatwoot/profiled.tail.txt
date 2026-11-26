@@ -1,0 +1,40 @@
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:107` 0.0, `profile.rb:65` 0.0, `profile.rb:84` 0.0 |
+| gem: net-smtp | 0.0 | 0.0 | `smtp.rb:214` 0.0, `smtp.rb:213` 0.0 |
+| gem: kaminari-actionview | 0.0 | 0.0 | `action_view_extension.rb:0` 0.0, `action_view_extension.rb:10` 0.0, `action_view_extension.rb:12` 0.0 |
+| gem: schematist | 0.0 | 0.0 | `primitive_types.rb:7` 0.0, `schema.rb:16` 0.0, `schema_builders.rb:12` 0.0 |
+| gem: nio4r | 0.0 | 0.0 | `nio4r_ext.so:0` 0.0, `nio.rb:0` 0.0, `nio.rb:21` 0.0 |
+| gem: tzinfo-data | 0.0 | 0.9 | `Jerusalem.rb:0` 0.0, `Juneau.rb:0` 0.0, `Colombo.rb:0` 0.0 |
+| test harness: rspec-expectations | 0.0 | 0.0 | `matchers.rb:559` 0.0, `expectation_target.rb:45` 0.0 |
+| gem: neighbor | 0.0 | 0.0 | `model.rb:15` 0.0, `model.rb:18` 0.0, `neighbor.rb:16` 0.0 |
+| gem: responders | 0.0 | 0.0 | `respond_with.rb:42` 0.0, `respond_with.rb:43` 0.0, `respond_with.rb:45` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `factory.rb:27` 0.0, `bigint.rb:0` 0.0, `factory.rb:16` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:214` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | EventDispatcherJob#perform | 6 / 6 | 15321.4 / 15321.4 | 0.0 | 14794.5 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:838` 203.8, `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:919` 170.2, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` 128.0 | `app/dispatchers/async_dispatcher.rb:3` 467.0, `app/models/concerns/avatarable.rb:16` 300.6, `app/listeners/participation_listener.rb:8` 248.4 |
+| 2 | ActionCableBroadcastJob#perform | 4 / 4 | 13530.3 / 13530.3 | 0.0 | 12810.3 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:919` 133.7, `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:838` 132.7, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` 77.3 | `app/listeners/action_cable_listener.rb:233` 367.7, `app/models/concerns/avatarable.rb:16` 334.0, `app/models/concerns/labelable/persistence.rb:49` 220.7 |
+| 3 | Conversations::ActivityMessageJob#perform | 1 / 1 | – / – |  | 38368.0 |  |  |
+| 4 | Avatar::AvatarFromGravatarJob#perform | 1 / 1 | – / – |  | 15423.0 |  |  |
+| 5 | Avatar::AvatarFromUrlJob#perform | 1 / 1 | – / – |  | 12989.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:132` (reload check) | 7249.85 / 7249.85 | 100% | `app/dispatchers/async_dispatcher.rb:3` 47%, `app/listeners/action_cable_listener.rb:233` 27% | `mtime = File.mtime(path)` |
+| 2 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:106` † (reload check) | 3297.54 / 3297.54 | 100% | `app/dispatchers/async_dispatcher.rb:3` 47%, `app/listeners/action_cable_listener.rb:233` 27% | `all.concat(Dir[@glob]) if @glob` |
+| 3 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:105` (reload check) | 653.69 / 653.69 | 100% | `app/dispatchers/async_dispatcher.rb:3` 47%, `app/listeners/action_cable_listener.rb:233` 27% | `all = @files.select { \|f\| File.exist?(f) }` |
+| 4 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:838` | 136.54 / 136.54 | 92% | `app/dispatchers/async_dispatcher.rb:3` 10%, `app/models/conversation.rb:232` 9% | `type_map.fetch(oid, fmod, sql_type) {` |
+| 5 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:919` | 126.23 / 126.23 | 92% | `app/dispatchers/async_dispatcher.rb:3` 15%, `app/models/conversation.rb:232` 14% | `notification_payload[:row_count] = result.count` |
+| 6 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 102.31 / 102.31 | 92% | `app/models/concerns/avatarable.rb:16` 11%, `app/models/conversation.rb:208` 7% | `binds = binds.inspect` |
+| 7 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` | 81.54 / 81.54 | 77% | `app/models/concerns/avatarable.rb:16` 13%, `app/models/concerns/labelable/persistence.rb:49` 6% | `WhereClause.new(predicates \| other.predicates)` |
+| 8 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:183` (debug logging) | 68.77 / 68.77 | 92% | `no app frame` 9%, `app/models/concerns/avatarable.rb:16` 8% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 9 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:68` | 58.0 / 58.0 | 92% | `app/models/conversation.rb:208` 16%, `app/presenters/conversations/event_data_presenter.rb:35` 13% | `fields = result.fields` |
+| 10 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:74` | 48.15 / 48.15 | 92% | `app/dispatchers/async_dispatcher.rb:3` 12%, `app/models/conversation.rb:232` 11% | `build_result(columns: fields, rows: result.values, column_types: types` |
+lowrail-profile: report in /home/user/hl-out/chatwoot/profiled/report.md
+lowrail-profile: the command exited 1, 1

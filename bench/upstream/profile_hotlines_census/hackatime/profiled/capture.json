@@ -1,0 +1,1 @@
+{"format":1,"identity":{"mode":"command","argv":["bin/rails","test","-v"]},"argv":["bin/rails","test","-v"],"seed":"1234","runs":2,"exit":[0,0],"timed_out":[],"timeout":5400.0}

@@ -1,0 +1,40 @@
+| ruby default gem: prettyprint | 0.0 | 0.0 | `prettyprint.rb:404` 0.0, `prettyprint.rb:264` 0.0, `prettyprint.rb:459` 0.0 |
+| gem: blurhash | 0.0 | 0.0 | `blurhash.rb:10` 0.0, `blurhash.rb:11` 0.0 |
+| gem: rainbow | 0.0 | 0.0 | `wrapper.rb:18` 0.0 |
+| ruby default gem: pp | 0.0 | 0.0 | `pp.rb:542` 0.0, `pp.rb:271` 0.0, `pp.rb:268` 0.0 |
+| gem: devise-two-factor | 0.0 | 0.0 | `two_factor_backupable.rb:20` 0.0, `two_factor_authenticatable.rb:14` 0.0, `two_factor_authenticatable.rb:67` 0.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:107` 0.0, `profile.rb:66` 0.0, `profile.rb:56` 0.0 |
+| test harness: rspec-core | 0.0 | 0.0 | `memoized_helpers.rb:343` 0.0 |
+| gem: bloom_fit | 0.0 | 0.0 | `bloom_fit.rb:59` 0.0, `bloom_fit.rb:235` 0.0 |
+| gem: kaminari-actionview | 0.0 | 0.0 | `action_view_extension.rb:14` 0.0, `action_view_extension.rb:12` 0.0, `action_view_extension.rb:0` 0.0 |
+| gem: rotp | 0.0 | 0.1 | `base32.rb:41` 0.0, `base32.rb:33` 0.0, `base32.rb:46` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:192` 0.0 |
+| gem: webauthn | 0.0 | 0.0 | `json_serializer.rb:29` 0.0, `json_serializer.rb:42` 0.0, `credential.rb:15` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `factory.rb:31` 0.0, `factory.rb:16` 0.0, `factory.rb:14` 0.0 |
+| gem: racc | 0.0 | 0.0 | `parser.rb:263` 0.0 |
+| gem: tzinfo-data | 0.0 | 0.6 | `Brussels.rb:10` 0.0, `Kabul.rb:13` 0.0, `Buenos_Aires.rb:11` 0.0 |
+| gem: json-ld-preloaded | 0.0 | 0.1 | `activitystreams.rb:56` 0.0, `activitystreams.rb:19` 0.0, `activitystreams.rb:78` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ActionMailer::MailDeliveryJob#perform | 75 / 75 | 30435.0 / 30423.3 | -11.7 | 31085.5 | `GEM/css_parser/lib/css_parser/rule_set.rb:116` 1452.9, `GEM/css_parser/lib/css_parser/parser.rb:407` 1119.0, `GEM/css_parser/lib/css_parser.rb:112` 1063.0 | `app/services/notify_service.rb:302` 22619.2, `app/mailers/notification_mailer.rb:27` 856.1, `app/mailers/notification_mailer.rb:35` 718.4 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/css_parser/lib/css_parser/rule_set.rb:116` | 1433.49 / 1433.49 | 100% | `app/services/notify_service.rb:302` 89%, `no app frame` 8% | `value = Value.new(value)` |
+| 2 | `GEM/css_parser/lib/css_parser/parser.rb:407` | 1104.08 / 1104.08 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:167` 1% | `token = scanner.scan(RULESET_TOKENIZER_RX)` |
+| 3 | `GEM/css_parser/lib/css_parser.rb:112` | 1048.83 / 1048.83 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:186` 1% | `c = selector.scan(NON_ID_ATTRIBUTES_AND_PSEUDO_CLASSES_RX_NC).length` |
+| 4 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:228` | 1045.87 / 1045.87 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:167` 1% | `selector.scan(CLASS_IN_SELECTOR).any? { \|(name)\| !classes_in_doc.inclu` |
+| 5 | `GEM/css_parser/lib/css_parser/rule_set.rb:671` | 945.84 / 945.84 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:167` 1% | `block.split(SEMICOLON) do \|decs\|` |
+| 6 | `GEM/css_parser/lib/css_parser/rule_set.rb:683` | 881.65 / 881.65 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:186` 1% | `value = decs[colon + 1, decs.length]` |
+| 7 | `GEM/css_parser/lib/css_parser/rule_set.rb:682` | 832.37 / 832.37 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:167` 1% | `property = decs[0, colon]` |
+| 8 | `GEM/mail/lib/mail/utilities.rb:215` | 672.56 / 672.56 | 100% | `app/services/notify_service.rb:302` 73%, `app/mailers/notification_mailer.rb:27` 12% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 9 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:49` | 647.25 / 647.25 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:167` 1% | `selector.gsub!(/([\s]\|^)([\w]+)/) { \|_m\| $1.to_s + $2.to_s.downcase }` |
+| 10 | `GEM/css_parser/lib/css_parser/rule_set.rb:702` | 579.17 / 579.17 | 100% | `app/services/notify_service.rb:302` 97%, `app/controllers/auth/sessions_controller.rb:186` 1% | `@selectors = selectors.split(',').map! do \|s\|` |
+lowrail-profile: report in /home/user/hl-out/mastodon/profiled/report.md

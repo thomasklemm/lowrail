@@ -1,0 +1,40 @@
+    doesn't log when disabled
+    returns a 400 error if the page parameter is padded with spaces
+    returns a 400 error if you search for null bytes
+    works when using a tag context
+    when rate limited
+      rate limits anon searches per user
+      rate limits anon searches globally
+      with a logged in user
+        rate limits searches
+    with restricted tags
+      doesn’t work for user without tag group permission
+      works for user with tag group permission
+    with lazy loaded categories
+      returns extra categories and parent categories
+    when an anonymous user cannot search
+      redirects an HTML request to login and preserves the destination
+      rejects a JSON request
+    with content localization
+      when show_original cookie is not set
+        returns translated blurb in search results
+      when automatic translation is disabled by cookie
+        returns original blurb in search results
+  with search priority
+    doesn't sort posts with search priority when query with order
+    sort posts with search priority when search term is empty
+    sort posts with search priority when no order query
+  #click
+    records the click for an anonymous user
+    records the click for search result type tag
+    records the click for search result type category
+    doesn't record the click for a different IP
+    doesn't record the click for a different user
+    doesn't work without the necessary parameters
+    records the click for a logged in user
+
+Finished in 3 minutes 29.5 seconds (files took 2.35 seconds to load)
+1700 examples, 0 failures
+
+Randomized with seed 1234
+

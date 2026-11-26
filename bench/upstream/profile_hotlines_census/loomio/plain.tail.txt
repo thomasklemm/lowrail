@@ -1,0 +1,40 @@
+Api::V1::PasskeyCredentialsControllerTest#test_registration_accepts_a_valid_CSRF_token_when_the_browser_sends_a_null_origin = 0.03 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_a_consumed_challenge_cannot_be_replayed_by_restoring_its_saved_cookie_state = 0.05 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_an_expired_challenge_cannot_authenticate = 0.04 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_a_challenge_cannot_be_reused = 0.04 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_creates_a_discoverable_passkey_for_the_signed_in_user = 0.02 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_an_unsubscribe_token_cannot_list_or_mutate_passkeys = 0.03 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_an_unknown_but_valid_credential_returns_the_generic_authentication_failure = 0.02 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_SSO-only_mode_rejects_passkey_registration_and_authentication = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_authentication_options_do_not_accept_or_reveal_an_email_address = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_index_returns_only_safe_metadata_for_the_current_user's_credentials = 0.03 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_rejects_oversized_names_without_persistence = 0.02 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_authentication_rejects_a_credential_whose_owner_is_inactive = 0.04 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_requires_a_recently_created_session = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_rejects_missing_CSRF_tokens = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_issuing_a_new_challenge_invalidates_the_previous_challenge = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_authentication_rejects_the_wrong_origin,_relying_party,_signature,_verification,_and_user_handle = 0.07 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_authentication_permits_zero_and_increasing_counters_but_rejects_unchanged_or_regressing_nonzero_counters = 0.07 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_accepts_public_key_fields_returned_by_browser_credential_serialization = 0.02 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_removes_only_the_signed_in_user's_passkey_after_recent_authentication = 0.04 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_rejects_a_credential_without_user_verification = 0.03 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_create_and_destroy_independently_require_recent_authentication = 0.03 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_rejects_arbitrary_matching_CSRF_cookie_and_header_values = 0.01 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_authenticates_from_the_discoverable_credential_returned_by_the_authenticator = 0.04 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_registration_rejects_a_credential_for_the_wrong_relying_party = 0.02 s = .
+Api::V1::PasskeyCredentialsControllerTest#test_options_bind_passkeys_to_the_configured_canonical_host_and_origin = 0.02 s = .
+Api::V1::ItemTagSearchControllerTest#test_poll_comments_and_their_tags_stay_searchable_while_results_are_hidden = 0.35 s = .
+Api::V1::ItemTagSearchControllerTest#test_other_groups_and_revoked_topic_guests_cannot_discover_private_assignments_by_combining_filters = 0.13 s = .
+Api::V1::ItemTagSearchControllerTest#test_text_plus_tag_matches_the_content_of_tagged_items_rather_than_untagged_siblings = 0.18 s = .
+Api::V1::ItemTagSearchControllerTest#test_direct_topic_tags_are_searchable_without_creating_an_organization_tag = 0.17 s = .
+Api::V1::ItemTagSearchControllerTest#test_tag-only_search_returns_explicitly_tagged_contributions_without_inheriting_topic_tags = 0.10 s = .
+Api::V1::ItemTagSearchControllerTest#test_standalone_poll_comments_include_a_usable_poll_route = 0.31 s = .
+Dev::DigestMailerTest#test_Oatmilk_digest_email_leads_with_two_notifications_and_one_group's_unread_thread_activity = 0.65 s = .
+Dev::DigestMailerTest#test_digest_email_includes_standalone_polls = 0.54 s = .
+Dev::DigestMailerTest#test_digest_email_renders_successfully_with_expected_structure = 1.16 s = .
+Api::V1::Mobile::DevicesControllerTest#test_does_not_accept_an_ordinary_browser_cookie = 0.25 s = .
+Api::V1::Mobile::DevicesControllerTest#test_requires_device_revocation_scope_to_disconnect = 0.03 s = .
+Api::V1::Mobile::DevicesControllerTest#test_shows_and_disconnects_the_bearer_token_device = 0.05 s = .
+
+Finished in 186.592448s, 7.9907 runs/s, 38.0187 assertions/s.
+1491 runs, 7094 assertions, 0 failures, 0 errors, 1 skips

@@ -1,0 +1,40 @@
+| gem: rack-session | 3.0 | 3.0 | `id.rb:275` 1.0, `id.rb:277` 1.0, `id.rb:368` 0.5 |
+| gem: faraday-net_http | 2.3 | 2.4 | `net_http.rb:81` 0.7, `net_http.rb:181` 0.3, `net_http.rb:80` 0.3 |
+| gem: zeitwerk | 2.1 | 4.3 | `cref.rb:47` 0.5, `file_system.rb:203` 0.4, `constant_path_validator.rb:13` 0.4 |
+| ruby default gem: openssl | 2.1 | 2.1 | `cipher.rb:56` 0.7, `pkey.rb:354` 0.4, `hmac.rb:55` 0.3 |
+| gem: request_store | 2.0 | 2.0 | `middleware.rb:21` 1.0, `middleware.rb:28` 1.0 |
+| gem: config | 0.8 | 0.8 | `options.rb:125` 0.5, `options.rb:156` 0.2 |
+| gem: solid_queue | 0.5 | 0.5 | `batch_id.rb:20` 0.2, `batch_id.rb:24` 0.2 |
+| gem: hashie | 0.2 | 1.1 | `mash.rb:591` 0.1, `mash.rb:587` 0.1, `mash.rb:139` 0.0 |
+| ruby default gem: erb | 0.0 | 0.1 | `util.rb:65` 0.0 |
+| gem: pg | 0.0 | 0.0 | `result.rb:17` 0.0 |
+| gem: rails-html-sanitizer | 0.0 | 0.0 | `sanitizer.rb:39` 0.0 |
+| gem: json-jwt | 0.0 | 0.2 | `jwt.rb:108` 0.0, `jwt.rb:114` 0.0, `jwt.rb:95` 0.0 |
+| gem: bootsnap | 0.0 | 0.2 | `cache.rb:218` 0.0, `loaded_features_index.rb:118` 0.0, `cache.rb:205` 0.0 |
+| gem: i18n | 0.0 | 0.0 | `utils.rb:8` 0.0, `base.rb:58` 0.0, `i18n.rb:396` 0.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:56` 0.0, `profile.rb:95` 0.0, `profile.rb:85` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Webhooks::ProcessEventJob#perform | 1 / 1 | – / – |  | 10039.0 |  |  |
+| 2 | Teams::UnboundTenantHintJob#perform | 1 / 1 | – / – |  | 2473.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/addressable/lib/addressable/uri.rb:486` | 31.5 / 31.5 | 100% | `app/services/teams/connector_client.rb:86` 58%, `app/services/teams/token_service.rb:65` 42% | `result = uri.gsub(/%[0-9a-f]{2}/i) do \|sequence\|` |
+| 2 | `GEM/addressable/lib/addressable/uri.rb:480` | 26.0 / 26.0 | 100% | `app/services/teams/connector_client.rb:86` 53%, `app/services/teams/token_service.rb:65` 47% | `if ![String, ::Addressable::URI].include?(return_type)` |
+| 3 | `GEM/addressable/lib/addressable/uri.rb:1544` | 24.5 / 24.5 | 100% | `app/services/teams/connector_client.rb:86` 53%, `app/services/teams/token_service.rb:65` 47% | `result = path.strip.split(SLASH, -1).map do \|segment\|` |
+| 4 | `GEM/addressable/lib/addressable/uri.rb:419` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `if ![String, Regexp].include?(character_class.class)` |
+| 5 | `GEM/addressable/lib/addressable/uri.rb:428` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `component = component.dup` |
+| 6 | `GEM/addressable/lib/addressable/uri.rb:431` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `component = component.gsub(character_class) do \|char\|` |
+| 7 | `GEM/addressable/lib/addressable/uri.rb:563` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `if ![String, Regexp].include?(character_class.class)` |
+| 8 | `GEM/addressable/lib/addressable/uri.rb:584` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `component = component.dup` |
+| 9 | `RUBY/unicode_normalize/normalize.rb:138` | 22.0 / 22.0 | 100% | `app/services/teams/connector_client.rb:86` 54%, `app/services/teams/token_service.rb:65` 46% | `string.gsub REGEXP_C, NF_HASH_C` |
+| 10 | `GEM/addressable/lib/addressable/uri.rb:136` | 17.5 / 17.5 | 100% | `app/services/teams/connector_client.rb:86` 57%, `app/services/teams/token_service.rb:65` 43% | `scan = uri.scan(URIREGEX)` |
+lowrail-profile: report in /home/user/hl-out/flow/profiled/report.md

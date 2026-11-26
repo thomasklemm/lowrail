@@ -1,0 +1,40 @@
+OwnershipFlowTest#test_old_guest_token_cannot_delete_a_document_after_account_promotion = 0.03 s = .
+OwnershipFlowTest#test_API_create_leaves_the_doc_unclaimed = 0.01 s = .
+OwnershipFlowTest#test_delete_by_owner_destroys_doc_and_dependents_and_redirects_home = 0.03 s = .
+OwnershipFlowTest#test_claim_via_POST_sets_ownership_and_redirects_303 = 0.02 s = .
+OwnershipFlowTest#test_account-owned_document_is_yours_after_signing_in_from_a_fresh_browser = 0.03 s = .
+OwnershipFlowTest#test_claim_logs_an_activity_with_the_claimer's_name = 0.02 s = .
+OwnershipFlowTest#test_a_doc_both_owned_and_recently_viewed_appears_only_under_yours = 0.05 s = .
+OwnershipFlowTest#test_owner_can_set_explicit_link_access_and_non-owner_cannot = 0.03 s = .
+OwnershipFlowTest#test_signed-in_prefetch_never_auto-claims_a_fresh_document = 0.02 s = .
+OwnershipFlowTest#test_signed-in_UI_create_assigns_account_ownership_without_an_owner_token = 0.02 s = .
+OwnershipFlowTest#test_forged_editing_lock_PATCH_without_CSRF_token_is_rejected = 0.14 s = .
+OwnershipFlowTest#test_signed-in_claim_assigns_account_ownership_using_the_account_name = 0.02 s = .
+OwnershipFlowTest#test_show_includes_ownership_prop_with_yours_true_only_for_the_owner's_session = 0.05 s = .
+OwnershipFlowTest#test_delete_broadcasts_a_document_deleted_event_after_a_successful_destroy = 0.02 s = .
+OwnershipFlowTest#test_ownership_prop_marks_the_demo_doc_unclaimable = 0.02 s = .
+OwnershipFlowTest#test_claim_broadcasts_ownership_and_activities_events = 0.02 s = .
+OwnershipFlowTest#test_forged_claim_POST_with_JSON_content_type_and_no_CSRF_token_is_rejected = 0.15 s = .
+OwnershipFlowTest#test_unowned_recently_viewed_docs_still_appear_under_recent = 0.04 s = .
+OwnershipFlowTest#test_signed-in_Inertia_partial_reload_never_auto-claims_a_fresh_document = 0.02 s = .
+OwnershipFlowTest#test_link_access_rejects_unknown_values = 0.02 s = .
+OwnershipFlowTest#test_signed-in_browser_auto-claims_a_fresh_unclaimed_document = 0.03 s = .
+OwnershipFlowTest#test_signed-in_agent_and_JSON_reads_never_auto-claim_a_fresh_document = 0.02 s = .
+OwnershipFlowTest#test_show_exposes_viewer-specific_write_access_for_a_locked_document = 0.06 s = .
+OwnershipFlowTest#test_owner_can_lock_and_unlock_editing = 0.03 s = .
+OwnershipFlowTest#test_losing_claimer_gets_a_redirect,_not_an_error_status,_and_the_first_owner_survives = 0.02 s = .
+OwnershipFlowTest#test_editing_lock_rejects_missing_and_invalid_values = 0.02 s = .
+OwnershipFlowTest#test_non-owner_cannot_change_editing_lock = 0.02 s = .
+OwnershipFlowTest#test_delete_by_owner_succeeds_for_a_pinned_doc_and_removes_every_pin = 0.03 s = .
+OwnershipFlowTest#test_signed-in_link_preview_never_auto-claims_a_fresh_document = 0.03 s = .
+OwnershipFlowTest#test_guest_GET_show_never_sets_ownership = 0.02 s = .
+WebmcpOriginTrialTest#test_returns_one_token_per_registered_origin_from_a_separated_list = 0.00 s = .
+WebmcpOriginTrialTest#test_drops_a_value_carrying_markup_and_keeps_the_well-formed_ones = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_a_well-formed_token = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_no_tokens_when_the_variable_is_empty = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_no_tokens_when_the_variable_is_missing = 0.00 s = .
+WriteRateLimitTest#test_agent_document_creation_returns_a_JSON_429_after_the_burst_limit = 0.03 s = .
+WriteRateLimitTest#test_browser_contributions_return_a_429_after_the_burst_limit = 0.30 s = .
+
+Finished in 22.292826s, 37.3663 runs/s, 230.9712 assertions/s.
+833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips

@@ -1,0 +1,40 @@
+| gem: rack-session | 2.9 | 3.0 | `id.rb:275` 1.0, `id.rb:277` 1.0, `id.rb:401` 0.7 |
+| gem: zeitwerk | 2.4 | 3.8 | `cref.rb:47` 0.5, `file_system.rb:203` 0.4, `constant_path_validator.rb:13` 0.4 |
+| ruby default gem: securerandom | 1.8 | 1.8 | `securerandom.rb:71` 1.8 |
+| gem: capybara-lockstep | 1.1 | 1.2 | `helper.rb:12` 0.2, `helper.rb:9` 0.2, `helper.rb:16` 0.2 |
+| rails: actionmailer | 0.6 | 1.0 | `parameterized.rb:149` 0.2, `parameterized.rb:107` 0.1, `parameterized.rb:119` 0.1 |
+| gem: solid_queue | 0.2 | 0.3 | `batch_id.rb:20` 0.2 |
+| gem: msgpack | 0.0 | 0.5 | `factory.rb:9` 0.0, `factory.rb:41` 0.0, `factory.rb:31` 0.0 |
+| gem: jbuilder | 0.0 | 1.1 | `jbuilder_dependency_tracker.rb:0` 0.0, `railtie.rb:10` 0.0, `jbuilder_dependency_tracker.rb:3` 0.0 |
+| gem: erubi | 0.0 | 3.3 | `erubi.rb:139` 0.0, `erubi.rb:146` 0.0, `erubi.rb:196` 0.0 |
+| gem: useragent | 0.0 | 22.3 | `base.rb:2` 0.0, `browsers.rb:0` 0.0, `user_agent.rb:0` 0.0 |
+| lowrail-profile | 0.0 | 0.1 | `profile.rb:66` 0.0, `profile.rb:56` 0.0 |
+| rails: actioncable | 0.0 | 0.4 | `engine.rb:21` 0.0, `action_cable_helper.rb:0` 0.0, `action_cable_helper.rb:7` 0.0 |
+| rails: activestorage | 0.0 | 0.1 | `engine.rb:215` 0.0 |
+| gem: rails-html-sanitizer | 0.0 | 0.1 | `scrubbers.rb:55` 0.0, `sanitizer.rb:157` 0.0 |
+| rails: actiontext | 0.0 | 2.5 | `content.rb:29` 0.0, `serialization.rb:6` 0.0, `content.rb:24` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | UserMailer#email_verification | 2 / 2 | 700.0 / 700.0 | 0.0 | 1073.5 | `GEM/mail/lib/mail/utilities.rb:215` 36.0, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 31.0, `GEM/mail/lib/mail/parser_tools.rb:7` 25.0 | `app/mailers/user_mailer.rb:15` 469.0, `app/mailers/user_mailer.rb:13` 55.0, `app/views/user_mailer/email_verification.html.erb:7` 39.0 |
+| 2 | UserMailer#password_reset | 2 / 2 | 695.0 / 695.0 | 0.0 | 756.0 | `GEM/mail/lib/mail/utilities.rb:215` 36.0, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 31.0, `GEM/mail/lib/mail/parser_tools.rb:7` 25.0 | `app/mailers/user_mailer.rb:8` 470.0, `app/views/user_mailer/password_reset.html.erb:5` 38.0, `app/mailers/user_mailer.rb:6` 36.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 27.0 / 27.0 | 100% | `app/mailers/user_mailer.rb:8` 50%, `app/mailers/user_mailer.rb:15` 50% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 23.25 / 23.25 | 100% | `app/mailers/user_mailer.rb:8` 50%, `app/mailers/user_mailer.rb:15` 50% | `_wide = data[p].ord` |
+| 3 | `GEM/mail/lib/mail/parser_tools.rb:7` | 18.75 / 18.75 | 100% | `app/mailers/user_mailer.rb:8` 50%, `app/mailers/user_mailer.rb:15` 50% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 4 | `GEM/mail/lib/mail/utilities.rb:291` | 17.25 / 17.25 | 100% | `app/mailers/user_mailer.rb:15` 50%, `app/mailers/user_mailer.rb:8` 50% | `value !~ /\S/` |
+| 5 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 13.5 / 13.5 | 100% | `app/mailers/user_mailer.rb:8` 50%, `app/mailers/user_mailer.rb:15` 50% | `_wide = data[p].ord` |
+| 6 | `RAILS/actionview/lib/action_view/log_subscriber.rb:61` (debug logging) | 13.5 / 13.5 | 100% | `app/mailers/user_mailer.rb:15` 50%, `app/mailers/user_mailer.rb:8` 50% | `string = string.sub(rails_root, "")` |
+| 7 | `GEM/mail/lib/mail/field_list.rb:71` | 11.25 / 11.25 | 100% | `app/mailers/user_mailer.rb:15` 50%, `app/mailers/user_mailer.rb:8` 50% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 8 | `RAILS/actionview/lib/action_view/structured_event_subscriber.rb:61` † (debug logging) | 11.25 / 11.25 | 100% | `app/mailers/user_mailer.rb:15` 50%, `app/mailers/user_mailer.rb:8` 50% | `string = string.sub("#{rails_root}/", "")` |
+| 9 | `GEM/mail/lib/mail/field.rb:176` | 9.0 / 9.0 | 100% | `app/mailers/user_mailer.rb:8` 50%, `app/mailers/user_mailer.rb:15` 50% | `class_name = FIELDS_MAP[name.to_s.downcase]` |
+| 10 | `GEM/logger/lib/logger.rb:685` (debug logging) | 7.5 / 7.5 | 100% | `app/mailers/user_mailer.rb:15` 40%, `app/mailers/user_mailer.rb:8` 40% | `message = yield` |
+lowrail-profile: report in /home/user/hl-out/react-starter-kit/profiled/report.md

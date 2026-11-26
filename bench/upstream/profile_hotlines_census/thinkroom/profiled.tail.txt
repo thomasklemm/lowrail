@@ -1,0 +1,40 @@
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | WritingReviewerJob#perform | 9 / 9 | 6574.0 / 6578.8 | 4.8 | 6411.2 | `GEM/json/lib/json/common.rb:364` 166.8, `RAILS/activemodel/lib/active_model/attribute.rb:9` 93.6, `GEM/sqlite3/lib/sqlite3/statement.rb:125` 78.5 | `app/jobs/writing_reviewer_job.rb:58` 773.3, `app/models/writing_pass.rb:143` 504.0, `app/models/writing_pass.rb:128` 442.3 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/json/lib/json/common.rb:364` | 148.22 / 148.22 | 89% | `app/models/writing_pass.rb:143` 33%, `app/models/writing_pass.rb:128` 28% | `Parser.parse(source, opts)` |
+| 2 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 144.22 / 144.22 | 100% | `app/jobs/writing_reviewer_job.rb:58` 55%, `app/models/writing_pass.rb:143` 13% | `binds = binds.inspect` |
+| 3 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:177` (debug logging) | 93.33 / 93.33 | 100% | `app/models/writing_pass.rb:128` 28%, `app/jobs/writing_reviewer_job.rb:58` 27% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 4 | `RAILS/activemodel/lib/active_model/attribute.rb:9` | 83.22 / 83.22 | 89% | `app/models/writing_pass.rb:143` 55%, `app/jobs/writing_reviewer_job.rb:58` 27% | `FromDatabase.new(name, value_before_type_cast, type, nil, value)` |
+| 5 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` | 69.78 / 69.78 | 100% | `app/jobs/writing_reviewer_job.rb:58` 30%, `app/models/writing_pass.rb:145` 28% | `val = step` |
+| 6 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:175` (debug logging) | 62.22 / 62.22 | 100% | `app/models/writing_pass.rb:128` 28%, `app/jobs/writing_reviewer_job.rb:58` 27% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+| 7 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:77` (debug logging) | 44.44 / 44.44 | 100% | `app/jobs/writing_reviewer_job.rb:58` 57%, `app/models/writing_pass.rb:143` 13% | `[attr&.name, value]` |
+| 8 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` | 41.78 / 41.78 | 100% | `app/models/writing_pass.rb:128` 21%, `app/jobs/writing_reviewer_job.rb:58` 20% | `dispatch(:#{method}, ...)` |
+| 9 | `RAILS/activerecord/lib/arel/table.rb:85` | 37.56 / 37.56 | 89% | `app/jobs/writing_reviewer_job.rb:58` 62%, `app/models/writing_pass.rb:143` 15% | `Attribute.new(table, name)` |
+| 10 | `RAILS/activesupport/lib/active_support/notifications/fanout.rb:288` | 32.89 / 32.89 | 100% | `app/models/writing_pass.rb:128` 27%, `app/jobs/writing_reviewer_job.rb:58` 25% | `group_klass.new(grouped_listeners, name, id, payload)` |
+
+### Action Cable
+
+| # | Channel action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | SyncChannel#subscribed | 33 / 33 | 809.4 / 809.4 | 0.0 | 803.6 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` 19.1, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` 16.5, `RAILS/activerecord/lib/active_record/relation/delegation.rb:139` 16.3 | `app/services/yjs_persistence.rb:116` 155.4, `app/models/document.rb:111` 83.7, `app/channels/sync_channel.rb:44` 68.5 |
+| 2 | SyncChannel#receive | 23 / 23 | 677.5 / 677.7 | 0.2 | 652.3 | `RAILS/activesupport/lib/active_support/parameter_filter.rb:112` 29.4, `RAILS/activemodel/lib/active_model/attribute.rb:9` 18.2, `GEM/sqlite3/lib/sqlite3/statement.rb:125` 16.9 | `app/services/yjs_persistence.rb:54` 146.0, `app/services/yjs_persistence.rb:89` 111.8, `app/services/yjs_persistence.rb:56` 69.8 |
+| 3 | DocumentMetaChannel#subscribed | 2 / 2 | 190.0 / 190.0 | 0.0 | 214.0 | `RAILS/activesupport/lib/active_support/callbacks.rb:179` 16.0, `GEM/concurrent-ruby/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb:30` 12.0, `RAILS/activesupport/lib/active_support/callbacks.rb:103` 6.0 | `app/channels/document_meta_channel.rb:6` 44.0, `app/channels/document_meta_channel.rb:9` 0.0, `app/channels/document_meta_channel.rb:10` 0.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` (debug logging) | 25.03 / 25.03 | 85% | `app/channels/sync_channel.rb:44` 16%, `app/services/yjs_persistence.rb:116` 15% | `binds = binds.inspect` |
+| 2 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:177` (debug logging) | 21.93 / 21.93 | 85% | `app/services/yjs_persistence.rb:54` 17%, `app/channels/sync_channel.rb:44` 15% | `"\e[#{modes.join(";")}m" if modes.any?` |
+| 3 | `GEM/sqlite3/lib/sqlite3/statement.rb:125` | 17.19 / 17.19 | 79% | `app/channels/sync_channel.rb:44` 45%, `app/services/yjs_persistence.rb:56` 17% | `val = step` |
+| 4 | `RAILS/activesupport/lib/active_support/log_subscriber.rb:175` (debug logging) | 14.62 / 14.62 | 85% | `app/services/yjs_persistence.rb:54` 17%, `app/channels/sync_channel.rb:44` 15% | `modes = MODES.values_at(*options.compact_blank.keys)` |
+| 5 | `RAILS/activerecord/lib/active_record/relation/delegation.rb:139` | 12.07 / 12.07 | 79% | `app/services/yjs_persistence.rb:116` 45%, `app/models/document.rb:111` 17% | `relation_class_for(model).new(model, ...)` |
+| 6 | `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` | 11.59 / 11.59 | 69% | `app/services/yjs_persistence.rb:116` 37%, `app/models/document.rb:111` 34% | `WhereClause.new(predicates \| other.predicates)` |
+| 7 | `RAILS/activesupport/lib/active_support/parameter_filter.rb:112` | 11.14 / 11.14 | 35% | `no app frame` 100% | `s = Regexp.escape(item.to_s)` |
+| 8 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` | 9.52 / 9.52 | 95% | `config/initializers/yjs_instrumentation.rb:52` 18%, `app/services/yjs_persistence.rb:54` 13% | `dispatch(:#{method}, ...)` |
+| 9 | `RAILS/activemodel/lib/active_model/attribute.rb:9` | 9.12 / 9.12 | 26% | `app/services/yjs_persistence.rb:54` 57%, `app/services/yjs_persistence.rb:426` 15% | `FromDatabase.new(name, value_before_type_cast, type, nil, value)` |
+| 10 | `RAILS/activesupport/lib/active_support/notifications/fanout.rb:288` | 8.19 / 8.19 | 90% | `app/services/yjs_persistence.rb:54` 15%, `app/channels/sync_channel.rb:44` 14% | `group_klass.new(grouped_listeners, name, id, payload)` |
+lowrail-profile: report in /home/user/hl-out/thinkroom/profiled/report.md

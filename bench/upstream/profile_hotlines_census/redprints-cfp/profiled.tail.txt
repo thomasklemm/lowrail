@@ -1,0 +1,40 @@
+| gem: require-hooks | 0.8 | 3.3 | `bootsnap.rb:69` 0.2, `api.rb:147` 0.2, `api.rb:56` 0.2 |
+| gem: debug | 0.7 | 3.6 | `thread_client.rb:903` 0.2, `thread_client.rb:223` 0.1, `thread_client.rb:224` 0.1 |
+| gem: active_delivery | 0.3 | 1.3 | `base.rb:242` 0.2, `base.rb:15` 0.1, `testing.rb:22` 0.1 |
+| gem: freezolite | 0.1 | 0.5 | `freezolite.rb:27` 0.1 |
+| ruby default gem: bundler | 0.0 | 0.1 | `rubygems_integration.rb:192` 0.0 |
+| rails: actionmailer | 0.0 | 0.3 | `message_delivery.rb:136` 0.0, `parameterized.rb:149` 0.0, `parameterized.rb:113` 0.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:65` 0.0 |
+| gem: msgpack | 0.0 | 0.9 | `factory.rb:37` 0.0, `bigint.rb:0` 0.0, `bigint.rb:10` 0.0 |
+| gem: globalid | 0.0 | 1.1 | `gid.rb:159` 0.0, `gid.rb:166` 0.0, `gid.rb:167` 0.0 |
+| rails: activejob | 0.0 | 0.9 | `configured_job.rb:15` 0.0, `queue_name.rb:49` 0.0, `arguments.rb:35` 0.0 |
+| gem: erubi | 0.0 | 4.6 | `erubi.rb:199` 0.0, `erubi.rb:134` 0.0, `erubi.rb:137` 0.0 |
+| gem: i18n | 0.0 | 10.8 | `tag.rb:7` 0.0, `fallbacks.rb:18` 0.0, `i18n.rb:476` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ProposalMailer.deliver_mail | 5 / 5 | 1406.0 / 1406.0 | 0.0 | 1483.0 | `GEM/mail/lib/mail/utilities.rb:248` 211.0, `GEM/mail/lib/mail/encodings/8bit.rb:14` 182.0, `GEM/mail/lib/mail/utilities.rb:215` 78.0 |  |
+| 2 | ProposalMailer#proposal_submitted | 2 / 2 | 659.0 / 659.0 | 0.0 | 812.5 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 66.0, `GEM/mail/lib/mail/utilities.rb:215` 37.0, `GEM/mail/lib/mail/parser_tools.rb:7` 32.0 | `app/mailers/proposal_mailer.rb:7` 532.0, `app/views/mailers/proposal_mailer/proposal_submitted.html.erb:15` 40.0, `app/views/mailers/proposal_mailer/proposal_submitted.html.erb:16` 7.0 |
+| 3 | ProposalMailer#proposal_accepted | 1 / 1 | – / – |  | 1716.0 |  |  |
+| 4 | ProposalMailer#proposal_waitlisted | 1 / 1 | – / – |  | 979.0 |  |  |
+| 5 | ProposalMailer#proposal_rejected | 1 / 1 | – / – |  | 974.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:248` | 84.4 / 84.4 | 50% | `no app frame` 100% | `string.gsub(TO_CRLF_REGEX, Constants::CRLF)` |
+| 2 | `GEM/mail/lib/mail/utilities.rb:215` | 53.8 / 53.8 | 100% | `no app frame` 68%, `app/mailers/proposal_mailer.rb:7` 13% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 3 | `GEM/mail/lib/mail/utilities.rb:291` | 36.8 / 36.8 | 100% | `no app frame` 64%, `app/mailers/proposal_mailer.rb:7` 14% | `value !~ /\S/` |
+| 4 | `GEM/mail/lib/mail/encodings/8bit.rb:14` | 36.4 / 36.4 | 20% | `no app frame` 100% | `!str.lines.find { \|line\| line.bytesize > 998 }` |
+| 5 | `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` | 26.3 / 26.3 | 50% | `app/mailers/proposal_mailer.rb:7` 40%, `app/mailers/proposal_mailer.rb:31` 20% | `_wide = data[p].ord` |
+| 6 | `GEM/mail/lib/mail/field_list.rb:71` | 24.5 / 24.5 | 100% | `no app frame` 71%, `app/mailers/proposal_mailer.rb:7` 12% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 7 | `GEM/mail/lib/mail/utilities.rb:388` | 22.0 / 22.0 | 50% | `no app frame` 100% | `charset_encoder.encode(str.dup, from_encoding).encode(to_encoding, :un` |
+| 8 | `GEM/mail/lib/mail/parser_tools.rb:7` | 18.9 / 18.9 | 100% | `app/mailers/proposal_mailer.rb:7` 29%, `no app frame` 28% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+| 9 | `GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870` | 18.0 / 18.0 | 50% | `no app frame` 100% | `_wide = data[p].ord` |
+| 10 | `RAILS/actionview/lib/action_view/template.rb:508` (template compile) | 16.8 / 16.8 | 40% | `app/mailers/proposal_mailer.rb:15` 51%, `app/mailers/proposal_mailer.rb:31` 18% | `mod.module_eval(compiled_source, identifier, offset)` |
+lowrail-profile: report in /home/user/hl-out/redprints-cfp/profiled/report.md

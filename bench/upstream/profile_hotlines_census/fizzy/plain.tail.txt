@@ -1,0 +1,40 @@
+Bubbles::PopsControllerTest#test_create = 0.26 s = .
+Bubbles::PopsControllerTest#test_destroy = 0.22 s = .
+CommentsControllerTest#test_create = 0.33 s = .
+CommentsControllerTest#test_update = 0.24 s = .
+CommentsControllerTest#test_update_another_user's_comment = 0.22 s = .
+SessionsControllerTest#test_new_enforces_browser_compatibility = 0.02 s = .
+SessionsControllerTest#test_create_with_invalid_credentials = 0.20 s = .
+SessionsControllerTest#test_create_with_valid_credentials = 0.20 s = .
+SessionsControllerTest#test_destroy = 0.21 s = .
+SessionsControllerTest#test_new = 0.01 s = .
+Bubbles::WatchesControllerTest#test_create = 0.23 s = .
+Bubbles::WatchesControllerTest#test_destroy = 0.22 s = .
+FiltersControllerTest#test_create = 0.29 s = .
+FiltersControllerTest#test_destroy = 0.23 s = .
+ReadingsControllerTest#test_index = 0.25 s = .
+BubblesControllerTest#test_filtered_index = 0.33 s = .
+BubblesControllerTest#test_edit = 0.22 s = .
+BubblesControllerTest#test_users_can_only_see_bubbles_in_buckets_they_have_access_to = 0.50 s = .
+BubblesControllerTest#test_create = 0.24 s = .
+BubblesControllerTest#test_show = 0.28 s = .
+BubblesControllerTest#test_update = 0.32 s = .
+BubblesControllerTest#test_index = 0.27 s = .
+Bubbles::PublishesControllerTest#test_create = 0.24 s = .
+FirstRunsControllerTest#test_create = 0.13 s = .
+FirstRunsControllerTest#test_show = 0.06 s = .
+FirstRunsControllerTest#test_show_after_completion = 0.05 s = .
+UploadsControllerTest#test_create = 0.25 s = .
+UploadsControllerTest#test_show = 0.24 s = .
+Buckets::SubscriptionsControllerTest#test_subscribing_to_a_bucket = 0.22 s = .
+Buckets::SubscriptionsControllerTest#test_unsubscribing_from_a_bucket = 0.22 s = .
+Comments::ReactionsControllerTest#test_create = 0.25 s = .
+Comments::ReactionsControllerTest#test_destroy = 0.23 s = .
+Assignments::TogglesControllerTest#test_create = 0.34 s = .
+Notifications::TraysControllerTest#test_show = 0.23 s = .
+EventsControllerTest#test_index = 0.28 s = .
+EventsControllerTest#test_index_with_a_specific_timezone = 0.25 s = .
+EventsControllerTest#test_only_displays_events_from_filtered_buckets = 0.23 s = .
+
+Finished in 13.229339s, 3.7795 runs/s, 19.2753 assertions/s.
+50 runs, 255 assertions, 0 failures, 0 errors, 0 skips

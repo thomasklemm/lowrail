@@ -1,0 +1,40 @@
+    destroys current user with valid password
+
+Identity::PasswordResets
+  GET /identity/password_reset/new
+    renders the forgot password page
+  POST /identity/password_reset
+    with a verified user
+      sends a password reset email
+    with a nonexistent email
+      does not send a password reset email
+    with an unverified user
+      does not send a password reset email
+  GET /identity/password_reset/edit
+    renders the reset page with valid token
+    rejects invalid reset token
+  PATCH /identity/password_reset
+    with valid token
+      updates the password
+    with mismatched password confirmation
+      rejects the password change
+    with expired token
+      rejects the password change
+
+UserMailer
+  email_verification
+    has the correct subject
+    sends to the user's email
+  password_reset
+    has the correct subject
+    sends to the user's email
+
+Settings::Sessions
+  GET /settings/sessions
+    renders the sessions index
+
+Finished in 0.43539 seconds (files took 0.8869 seconds to load)
+35 examples, 0 failures
+
+Randomized with seed 1234
+

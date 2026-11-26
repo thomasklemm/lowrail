@@ -1,0 +1,40 @@
+Web::OauthControllerTest#test_unauthenticated_users_are_bounced_to_login = 0.09 s = .
+Web::OauthControllerTest#test_callback_(mcp)_accepts_a_matching_iss_and_records_who_connected = 0.13 s = .
+Web::OauthControllerTest#test_callback_(mcp)_loads_the_signed_DCR_client,_threads_the_resource,_and_upserts_an_mcp:<host>_credential = 0.12 s = .
+Web::OauthControllerTest#test_mcp_connect_prompts_for_consent_when_it_requests_offline_access_(else_no_refresh_token_is_issued) = 0.11 s = .
+Web::OauthControllerTest#test_a_GET_to_the_connect_URL_starts_nothing_and_lands_on_the_server's_page = 0.10 s = .
+Web::OauthControllerTest#test_authorize_sanitizes_an_open-redirect_return_to_before_signing_it_into_the_state = 0.10 s = .
+Web::OauthControllerTest#test_authorize_redirects_to_the_provider_with_mandatory_PKCE_(S256)_and_no_verifier_in_the_URL = 0.10 s = .
+Web::OauthControllerTest#test_a_tampered_/_garbage_state_is_rejected = 0.09 s = .
+Web::OauthControllerTest#test_authorize_rejects_an_unknown_provider = 0.08 s = .
+Web::OauthControllerTest#test_authorize_neutralizes_a_control-char_return_to_(browsers_strip_Tab/CR/LF_into_a_protocol-relative_redirect) = 0.11 s = .
+Web::OauthControllerTest#test_a_state_pinned_to_a_different_user_is_rejected_(anti-CSRF,_double_pin) = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_hands_the_server's_operator-registered_client_to_discovery = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_pins_the_connecting_identity_to_the_current_user_for_a_per_user_server = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_refuses_a_viewer_the_shared_identity_of_a_server = 0.14 s = .
+Web::OauthControllerTest#test_callback_(mcp)_refuses_a_response_whose_iss_names_another_issuer = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_stays_vague_when_the_failure_really_is_a_connection_problem = 0.11 s = .
+Web::OauthControllerTest#test_authorize_refuses_an_owner_the_user_may_not_act_for = 0.12 s = .
+Web::OauthControllerTest#test_client-metadata.json_is_publicly_fetchable_and_is_a_valid_CIMD_document = 0.07 s = .
+Web::OauthControllerTest#test_an_open-redirect_return_to_is_neutralized_on_the_callback_too_(cancel_branch) = 0.09 s = .
+Web::OauthControllerTest#test_callback_(mcp)_refuses_a_grant_for_a_server_re-pointed_while_the_user_was_consenting = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_surfaces_a_generic_error_and_leaks_no_metadata_when_discovery_fails = 0.10 s = .
+Web::OauthControllerTest#test_mcp_connect_omits_prompt_when_offline_access_is_not_requested_(an_OIDC-only_parameter) = 0.10 s = .
+Web::OauthControllerTest#test_callback_exchanges_the_code_(with_PKCE_verifier),_persists_the_credential,_and_redirects = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_refuses_a_server_the_user_may_not_act_for_(never_runs_discovery) = 0.16 s = .
+Web::OauthControllerTest#test_mcp_connect_merges_its_parameters_into_an_authorization_endpoint_that_already_carries_a_query = 0.11 s = .
+Web::OauthControllerTest#test_replay_is_rejected:_the_single-use_nonce_is_consumed_on_first_use = 0.11 s = .
+Web::OauthControllerTest#test_mcp_connect_refuses_a_non-oauth_server_(never_runs_discovery) = 0.10 s = .
+Web::OauthControllerTest#test_mcp_connect_omits_scope_entirely_when_neither_discovery_nor_the_client_advertises_one = 0.12 s = .
+Web::OauthControllerTest#test_mcp_connect_discovers_the_client_and_redirects_to_consent_with_PKCE_+_RFC_8707_resource = 0.12 s = .
+Web::OauthControllerTest#test_callback_refuses_an_owner_the_user_may_not_act_for = 0.14 s = .
+Web::OauthControllerTest#test_callback_(mcp)_records_the_resource_the_grant_was_issued_for = 0.11 s = .
+Web::OauthControllerTest#test_cancel_does_NOT_consume_the_nonce:_the_user_can_retry_within_the_TTL = 0.16 s = .
+Web::OauthControllerTest#test_callback_(mcp)_accepts_a_manual_client_for_the_server_it_belongs_to = 0.12 s = .
+Web::OauthControllerTest#test_mcp_connect_tells_the_user_WHY_discovery_failed_when_the_failure_is_diagnosable = 0.11 s = .
+Web::OauthControllerTest#test_callback_(mcp)_refuses_a_response_without_iss_from_a_server_that_promised_one = 0.11 s = .
+
+Finished in 579.031776s, 0.7806 runs/s, 2.0413 assertions/s.
+452 runs, 1182 assertions, 0 failures, 0 errors, 0 skips
+Coverage report generated for Minitest to coverage/index.html
+Line coverage: 14516 / 50168 (28.93%)

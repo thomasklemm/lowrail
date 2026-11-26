@@ -1,0 +1,40 @@
+| gem: flipper-ui | 0.0 | 0.0 | `ui.rb:49` 0.0 |
+| gem: jbuilder | 0.0 | 0.1 | `jbuilder_dependency_tracker.rb:0` 0.0, `jbuilder_dependency_tracker.rb:4` 0.0, `jbuilder_dependency_tracker.rb:42` 0.0 |
+| other | 0.0 | 0.0 | `(erb):1` 0.0 |
+| gem: caxlsx_rails | 0.0 | 0.0 | `railtie.rb:9` 0.0, `template_handler.rb:12` 0.0 |
+| ruby default gem: pp | 0.0 | 0.1 | `pp.rb:97` 0.0, `pp.rb:542` 0.0, `pp.rb:271` 0.0 |
+| gem: pdf-forms | 0.0 | 0.0 | `pdf_forms.rb:16` 0.0, `pdftk_wrapper.rb:184` 0.0, `pdftk_wrapper.rb:31` 0.0 |
+| rails: actioncable | 0.0 | 0.0 | `action_cable_helper.rb:0` 0.0, `engine.rb:21` 0.0, `action_cable_helper.rb:7` 0.0 |
+| ruby default gem: prettyprint | 0.0 | 0.2 | `prettyprint.rb:96` 0.0, `prettyprint.rb:94` 0.0, `prettyprint.rb:95` 0.0 |
+| ruby default gem: erb | 0.0 | 0.1 | `erb.rb:893` 0.0, `erb.rb:1026` 0.0, `compiler.rb:323` 0.0 |
+| ruby default gem: prism | 0.0 | 175.3 | `node.rb:6022` 0.0, `node.rb:16011` 0.0, `node.rb:15096` 0.0 |
+| gem: htmlentities | 0.0 | 0.1 | `htmlentities.rb:33` 0.0, `encoder.rb:95` 0.0, `encoder.rb:90` 0.0 |
+| gem: cliver | 0.0 | 0.0 | `detector.rb:13` 0.0, `dependency.rb:52` 0.0, `detector.rb:36` 0.0 |
+| gem: blueprinter | 0.0 | 0.7 | `base.rb:371` 0.0, `configuration.rb:47` 0.0, `reflection.rb:9` 0.0 |
+| gem: caxlsx | 0.0 | 6.9 | `page_margins.rb:60` 0.0, `sheet_pr.rb:6` 0.0, `styles.rb:550` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Devise::Mailer#invitation_instructions | 17 / 17 | 3329.9 / 3328.1 | -1.8 | 3329.7 | `GEM/prosopite/lib/prosopite.rb:286` 449.4, `GEM/mail/lib/mail/utilities.rb:215` 171.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 122.3 | `config/initializers/sent_email_event.rb:7` 1163.1, `app/lib/importers/file_importer.rb:50` 604.8, `app/views/devise/mailer/invitation_instructions.html.erb:8` 83.1 |
+| 2 | Devise::Mailer.deliver_mail | 21 / 21 | 2205.6 / 2204.1 | -1.5 | 2217.2 | `GEM/mail/lib/mail/encodings/8bit.rb:14` 360.8, `GEM/mail/lib/mail/utilities.rb:215` 265.2, `GEM/mail/lib/mail/field_list.rb:71` 131.4 | `app/lib/importers/file_importer.rb:50` 740.0, `app/models/user.rb:185` 213.8 |
+| 3 | Devise::Mailer#email_changed | 4 / 4 | 2106.7 / 2106.7 | 0.0 | 2167.3 | `GEM/prosopite/lib/prosopite.rb:286` 430.0, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 62.7, `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:165` 57.0 | `config/initializers/sent_email_event.rb:7` 1151.0, `app/models/user.rb:185` 647.7, `app/models/concerns/roles.rb:5` 27.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/prosopite/lib/prosopite.rb:286` | 212.14 / 212.14 | 50% | `config/initializers/sent_email_event.rb:7` 100% | `query_caller = caller_locations` |
+| 2 | `GEM/mail/lib/mail/utilities.rb:215` | 202.38 / 202.38 | 100% | `no app frame` 61%, `app/lib/importers/file_importer.rb:50` 33% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 3 | `GEM/mail/lib/mail/encodings/8bit.rb:14` | 171.81 / 171.81 | 50% | `no app frame` 57%, `app/lib/importers/file_importer.rb:50` 31% | `!str.lines.find { \|line\| line.bytesize > 998 }` |
+| 4 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 103.43 / 103.33 | 91% | `no app frame` 64%, `app/lib/importers/file_importer.rb:50` 35% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 5 | `GEM/mail/lib/mail/field_list.rb:71` | 99.69 / 99.69 | 100% | `no app frame` 62%, `app/lib/importers/file_importer.rb:50` 34% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 6 | `GEM/mail/lib/mail/utilities.rb:291` | 51.33 / 51.33 | 100% | `no app frame` 56%, `app/lib/importers/file_importer.rb:50` 31% | `value !~ /\S/` |
+| 7 | `GEM/mail/lib/mail/utilities.rb:226` | 49.71 / 49.71 | 91% | `no app frame` 62%, `app/lib/importers/file_importer.rb:50` 34% | `str.to_s.downcase.tr(Constants::HYPHEN, Constants::UNDERSCORE)` |
+| 8 | `GEM/mail/lib/mail/parsers/content_type_parser.rb:734` | 43.33 / 42.79 | 50% | `no app frame` 63%, `app/lib/importers/file_importer.rb:50` 33% | `_wide = data[p].ord` |
+| 9 | `GEM/mail/lib/mail/parsers/content_transfer_encoding_parser.rb:380` | 34.29 / 34.29 | 50% | `no app frame` 63%, `app/lib/importers/file_importer.rb:50` 35% | `_wide = data[p].ord` |
+| 10 | `GEM/mail/lib/mail/parser_tools.rb:7` | 31.02 / 31.02 | 100% | `no app frame` 57%, `app/lib/importers/file_importer.rb:50` 31% | `data.slice(from_bytes..to_bytes).force_encoding(Encoding::UTF_8)` |
+lowrail-profile: report in /home/user/hl-out/casa/profiled/report.md

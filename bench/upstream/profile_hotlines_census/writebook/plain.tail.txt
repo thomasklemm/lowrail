@@ -1,0 +1,40 @@
+Books::PublicationsTest#test_publish_a_book = 0.24 s = .
+Leaf::EditableTest#test_editing_a_leafable_records_the_edit = 0.01 s = .
+Leaf::EditableTest#test_changing_a_leaf_title_doesn't_create_a_revision = 0.01 s = .
+Leaf::EditableTest#test_trashing_a_leaf_records_the_edit = 0.00 s = .
+Leaf::EditableTest#test_changes_that_don't_affect_the_leafable_don't_create_a_revision = 0.00 s = .
+Leaf::EditableTest#test_edits_that_are_close_together_don't_create_new_revisions = 0.03 s = .
+Leaf::EditableTest#test_editing_a_leafable_with_an_attachment_includes_the_attachments_in_the_new_version = 0.01 s = .
+MarkdownRendererTest#test_it_generates_unique_IDs_for_headers = 0.00 s = .
+SessionsControllerTest#test_destroy = 0.21 s = .
+SessionsControllerTest#test_create_with_valid_credentials = 0.20 s = .
+SessionsControllerTest#test_new_redirects_to_first_run_when_no_users_exist = 0.01 s = .
+SessionsControllerTest#test_create_with_invalid_credentials = 0.21 s = .
+SessionsControllerTest#test_new_allowed_with_compatible_browser = 0.01 s = .
+SessionsControllerTest#test_new_denied_with_incompatible_browser = 0.01 s = .
+SessionsControllerTest#test_new = 0.00 s = .
+FirstRunsControllerTest#test_create = 0.86 s = .
+FirstRunsControllerTest#test_create_is_not_permitted_when_users_exist = 0.03 s = .
+FirstRunsControllerTest#test_new = 0.02 s = .
+FirstRunsControllerTest#test_new_is_not_permitted_when_users_exist = 0.02 s = .
+Users::ProfilesControllerTest#test_edit_is_accessable_to_the_current_user = 0.22 s = .
+Users::ProfilesControllerTest#test_show = 0.23 s = .
+Users::ProfilesControllerTest#test_update_modifies_profile_for_current_user = 0.21 s = .
+Users::ProfilesControllerTest#test_update_prohibits_modifying_profile_of_other_users = 0.21 s = .
+Books::SearchesControllerTest#test_create_shows_when_there_are_no_matches = 0.26 s = .
+Books::SearchesControllerTest#test_create_allows_searching_published_books_without_being_logged_in = 0.43 s = .
+Books::SearchesControllerTest#test_create_does_not_find_trashed_pages = 0.22 s = .
+Books::SearchesControllerTest#test_create_finds_matching_pages = 0.22 s = .
+Books::SearchesControllerTest#test_create_shows_no_matches_when_the_search_has_only_ignored_characters = 0.22 s = .
+PagesControllerTest#test_update = 0.28 s = .
+PagesControllerTest#test_create_with_default_params = 0.22 s = .
+PagesControllerTest#test_create_at_a_specific_position = 0.25 s = .
+PagesControllerTest#test_create = 0.22 s = .
+PagesControllerTest#test_show_with_tables_in_the_markdown = 0.23 s = .
+PagesControllerTest#test_show_sanitizes_dangerous_content = 0.23 s = .
+PagesControllerTest#test_show_with_HTML_content_in_the_markdown = 0.24 s = .
+PagesControllerTest#test_show_with_iframes = 0.25 s = .
+PagesControllerTest#test_show = 0.25 s = .
+
+Finished in 21.510002s, 5.5323 runs/s, 17.7127 assertions/s.
+119 runs, 381 assertions, 0 failures, 0 errors, 0 skips

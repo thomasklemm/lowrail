@@ -1,0 +1,40 @@
+      redirects to the evaluation show page
+    when reviewer has multiple evaluations
+      renders the index page with evaluations
+      with inactive CFPs
+        doesn't show evaluations for inactive CFPs
+
+/evaluations/:id/results
+  GET /
+    renders results index page
+  POST /
+    when user is not admin
+      raises routing error
+    when user is admin
+      updates the proposal status and delivers a notification
+
+/proposals/:proposal_id/confirmations
+  POST /
+    changes status to confirmed
+    when proposal is not accepted
+      does not change the status
+    when accessing another user's proposal
+      does not change the status
+  DELETE /
+    changes status to declined
+    when proposal is not accepted
+      does not change the status
+    when accessing another user's proposal
+      does not change the status
+
+Evaluation::Distribution
+  #invalidate!
+    creates pending reviews for all missing proposal-reviewer pairs
+    when submitted reviews exist
+      doesn't affect existing reviews
+
+Finished in 0.529 seconds (files took 3.62 seconds to load)
+50 examples, 0 failures
+
+Randomized with seed 1234
+

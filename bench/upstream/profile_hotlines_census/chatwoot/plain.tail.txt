@@ -1,0 +1,40 @@
+Accounts API
+  POST /api/v2/accounts
+    with an mfa enforcement-pending token
+      blocks account creation
+    when ENABLE_ACCOUNT_SIGNUP is stored as boolean false
+      responds 404 on requests
+    when ENABLE_ACCOUNT_SIGNUP env variable is set to false
+      responds 404 on requests
+    when posting to accounts with correct parameters
+      calls account builder
+      updates the onboarding step in custom attributes
+      calls ChatwootCaptcha
+      renders error response on invalid params
+    when ENABLE_ACCOUNT_SIGNUP env variable is set to api_only
+      does not respond 404 on requests
+
+Instagram Authorization API
+  POST /api/v1/accounts/{account.id}/instagram/authorization
+    when it is an unauthenticated user
+      returns unauthorized
+    when it is an authenticated user
+      creates a new authorization and returns the redirect url
+      returns unauthorized for agent
+
+Failures:
+
+  1) Accounts API PATCH /api/v1/accounts/{account.id} when it is an authenticated user modifies an account
+     Failure/Error: expect(response).to have_http_status(:success)
+       expected the response to have a success status code (2xx) but it was 422
+     # ./spec/controllers/api/v1/accounts_controller_spec.rb:580:in 'block (4 levels) in <main>'
+
+Finished in 5 minutes 25 seconds (files took 3.73 seconds to load)
+1436 examples, 1 failure
+
+Failed examples:
+
+rspec ./spec/controllers/api/v1/accounts_controller_spec.rb:574 # Accounts API PATCH /api/v1/accounts/{account.id} when it is an authenticated user modifies an account
+
+Randomized with seed 1234
+

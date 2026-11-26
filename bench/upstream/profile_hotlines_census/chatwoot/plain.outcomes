@@ -1,0 +1,1503 @@
+1	Adds the private note
+1	Assign the agent when he is inbox member
+1	Assign the agent when he is not inbox member
+1	Assign the labels
+1	Assign the team if team_ids are present
+1	Bulk delete conversation labels
+1	Bulk remove assignee id from conversations
+1	Bulk update conversation assignee id
+1	Bulk update conversation labels
+1	Bulk update conversation status
+1	Bulk update conversation status and assignee id
+1	Bulk update conversation team id to none
+1	Bulk update conversation team id to team
+1	DELETE /api/vN/accounts/:account_id/integrations/linear
+1	DELETE /api/vN/accounts/:account_id/integrations/shopify
+1	DELETE /api/vN/accounts/<account_id>/webhooks/:id
+1	DELETE /api/vN/accounts/{account.id}/agent_bots/:id
+1	DELETE /api/vN/accounts/{account.id}/agent_bots/:id/avatar
+1	DELETE /api/vN/accounts/{account.id}/agents/:id
+1	DELETE /api/vN/accounts/{account.id}/assignment_policies/:id
+1	DELETE /api/vN/accounts/{account.id}/automation_rules/{automation_rule.id}
+1	DELETE /api/vN/accounts/{account.id}/campaigns/:id
+1	DELETE /api/vN/accounts/{account.id}/canned_responses/:id
+1	DELETE /api/vN/accounts/{account.id}/companies/{company.id}/contacts/{id}
+1	DELETE /api/vN/accounts/{account.id}/companies/{id}
+1	DELETE /api/vN/accounts/{account.id}/companies/{id}/avatar
+1	DELETE /api/vN/accounts/{account.id}/contacts/:id
+1	DELETE /api/vN/accounts/{account.id}/contacts/:id/avatar
+1	DELETE /api/vN/accounts/{account.id}/conversations/:conversation_id/messages/:id
+1	DELETE /api/vN/accounts/{account.id}/conversations/:id
+1	DELETE /api/vN/accounts/{account.id}/conversations/<id>/participants
+1	DELETE /api/vN/accounts/{account.id}/custom_attribute_definitions/:id
+1	DELETE /api/vN/accounts/{account.id}/custom_filters/:id
+1	DELETE /api/vN/accounts/{account.id}/dashboard_apps/:id
+1	DELETE /api/vN/accounts/{account.id}/inbox_members
+1	DELETE /api/vN/accounts/{account.id}/inboxes/:id
+1	DELETE /api/vN/accounts/{account.id}/inboxes/{inbox.id}/avatar
+1	DELETE /api/vN/accounts/{account.id}/integrations/hooks/{hook_id}
+1	DELETE /api/vN/accounts/{account.id}/labels/:id
+1	DELETE /api/vN/accounts/{account.id}/macros/{macro.id}
+1	DELETE /api/vN/accounts/{account.id}/notes/:id
+1	DELETE /api/vN/accounts/{account.id}/notifications/:id
+1	DELETE /api/vN/accounts/{account.id}/portals/{portal.slug}
+1	DELETE /api/vN/accounts/{account.id}/portals/{portal.slug}/articles/{article.id}
+1	DELETE /api/vN/accounts/{account.id}/portals/{portal.slug}/categories/{category.id}
+1	DELETE /api/vN/accounts/{account.id}/portals/{portal.slug}/logo
+1	DELETE /api/vN/accounts/{account.id}/teams/:id
+1	DELETE /api/vN/accounts/{account.id}/teams/{team_id}/team_members
+1	DELETE /api/vN/accounts/{account_id}/inboxes/{inbox_id}/assignment_policy
+1	DELETE /api/vN/notification_subscriptions
+1	DELETE /api/vN/profile/avatar
+1	DELETE /api/vN/widget/labels
+1	DELETE articles/bulk_actions/delete_articles
+1	Deletes the macro
+1	Do not bulk update status to nil
+1	GET /api/vN/accounts/:account_id/integrations/linear/linked_issues
+1	GET /api/vN/accounts/:account_id/integrations/linear/search_issue
+1	GET /api/vN/accounts/:account_id/integrations/linear/team_entities
+1	GET /api/vN/accounts/:account_id/integrations/linear/teams
+1	GET /api/vN/accounts/:account_id/integrations/shopify/orders
+1	GET /api/vN/accounts/:account_id/reports
+1	GET /api/vN/accounts/:account_id/reports/agents
+1	GET /api/vN/accounts/:account_id/reports/bot_metrics
+1	GET /api/vN/accounts/:account_id/reports/bot_summary
+1	GET /api/vN/accounts/:account_id/reports/conversation_traffic
+1	GET /api/vN/accounts/:account_id/reports/conversations
+1	GET /api/vN/accounts/:account_id/reports/drilldown
+1	GET /api/vN/accounts/:account_id/reports/inboxes
+1	GET /api/vN/accounts/:account_id/reports/labels
+1	GET /api/vN/accounts/:account_id/reports/summary
+1	GET /api/vN/accounts/:account_id/reports/teams
+1	GET /api/vN/accounts/:account_id/summary_reports/agent
+1	GET /api/vN/accounts/:account_id/summary_reports/channel
+1	GET /api/vN/accounts/:account_id/summary_reports/inbox
+1	GET /api/vN/accounts/:account_id/summary_reports/team
+1	GET /api/vN/accounts/<account_id>/webhooks
+1	GET /api/vN/accounts/{account.id}
+1	GET /api/vN/accounts/{account.id}/agent_bots
+1	GET /api/vN/accounts/{account.id}/agent_bots/:id
+1	GET /api/vN/accounts/{account.id}/agents
+1	GET /api/vN/accounts/{account.id}/assignable_agents
+1	GET /api/vN/accounts/{account.id}/assignment_policies
+1	GET /api/vN/accounts/{account.id}/assignment_policies/:id
+1	GET /api/vN/accounts/{account.id}/automation_rules
+1	GET /api/vN/accounts/{account.id}/automation_rules/{automation_rule.id}
+1	GET /api/vN/accounts/{account.id}/branded_email_layout
+1	GET /api/vN/accounts/{account.id}/cache_keys
+1	GET /api/vN/accounts/{account.id}/campaigns
+1	GET /api/vN/accounts/{account.id}/campaigns/:id
+1	GET /api/vN/accounts/{account.id}/canned_responses
+1	GET /api/vN/accounts/{account.id}/captain/preferences
+1	GET /api/vN/accounts/{account.id}/companies
+1	GET /api/vN/accounts/{account.id}/companies/search
+1	GET /api/vN/accounts/{account.id}/companies/{company.id}/contacts
+1	GET /api/vN/accounts/{account.id}/companies/{company.id}/contacts/search
+1	GET /api/vN/accounts/{account.id}/companies/{id}
+1	GET /api/vN/accounts/{account.id}/contacts
+1	GET /api/vN/accounts/{account.id}/contacts/:id
+1	GET /api/vN/accounts/{account.id}/contacts/:id/attachments
+1	GET /api/vN/accounts/{account.id}/contacts/:id/contact_inboxes
+1	GET /api/vN/accounts/{account.id}/contacts/:id/contactable_inboxes
+1	GET /api/vN/accounts/{account.id}/contacts/:id/conversations
+1	GET /api/vN/accounts/{account.id}/contacts/:id/conversations with a conversation id
+1	GET /api/vN/accounts/{account.id}/contacts/<id>/labels
+1	GET /api/vN/accounts/{account.id}/contacts/active
+1	GET /api/vN/accounts/{account.id}/contacts/filter
+1	GET /api/vN/accounts/{account.id}/contacts/search
+1	GET /api/vN/accounts/{account.id}/contacts/{contact.id}/notes
+1	GET /api/vN/accounts/{account.id}/contacts/{contact.id}/notes/{note.id}
+1	GET /api/vN/accounts/{account.id}/conversations
+1	GET /api/vN/accounts/{account.id}/conversations/:id
+1	GET /api/vN/accounts/{account.id}/conversations/:id/attachments
+1	GET /api/vN/accounts/{account.id}/conversations/:id/messages
+1	GET /api/vN/accounts/{account.id}/conversations/<id>/labels
+1	GET /api/vN/accounts/{account.id}/conversations/<id>/paricipants
+1	GET /api/vN/accounts/{account.id}/conversations/filter
+1	GET /api/vN/accounts/{account.id}/conversations/meta
+1	GET /api/vN/accounts/{account.id}/conversations/search
+1	GET /api/vN/accounts/{account.id}/conversations/unread_counts
+1	GET /api/vN/accounts/{account.id}/csat_survey_responses
+1	GET /api/vN/accounts/{account.id}/csat_survey_responses/download
+1	GET /api/vN/accounts/{account.id}/csat_survey_responses/metrics
+1	GET /api/vN/accounts/{account.id}/custom_attribute_definitions
+1	GET /api/vN/accounts/{account.id}/custom_attribute_definitions/:id
+1	GET /api/vN/accounts/{account.id}/custom_filters
+1	GET /api/vN/accounts/{account.id}/custom_filters/:id
+1	GET /api/vN/accounts/{account.id}/dashboard_apps
+1	GET /api/vN/accounts/{account.id}/dashboard_apps/:id
+1	GET /api/vN/accounts/{account.id}/inbox_members/:id
+1	GET /api/vN/accounts/{account.id}/inboxes
+1	GET /api/vN/accounts/{account.id}/inboxes/:id/message_templates
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}/agent_bot
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}/assignable_agents
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}/campaigns
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}/csat_template
+1	GET /api/vN/accounts/{account.id}/inboxes/{inbox.id}/health
+1	GET /api/vN/accounts/{account.id}/labels
+1	GET /api/vN/accounts/{account.id}/labels/:id
+1	GET /api/vN/accounts/{account.id}/live_reports/conversation_metrics
+1	GET /api/vN/accounts/{account.id}/live_reports/grouped_conversation_metrics
+1	GET /api/vN/accounts/{account.id}/macros
+1	GET /api/vN/accounts/{account.id}/macros/{macro.id}
+1	GET /api/vN/accounts/{account.id}/notification_settings
+1	GET /api/vN/accounts/{account.id}/notifications
+1	GET /api/vN/accounts/{account.id}/notifications/unread_count
+1	GET /api/vN/accounts/{account.id}/onboarding/help_center_generation
+1	GET /api/vN/accounts/{account.id}/portals
+1	GET /api/vN/accounts/{account.id}/portals/{portal.slug}
+1	GET /api/vN/accounts/{account.id}/portals/{portal.slug}/articles
+1	GET /api/vN/accounts/{account.id}/portals/{portal.slug}/articles/{article.id}
+1	GET /api/vN/accounts/{account.id}/portals/{portal.slug}/categories
+1	GET /api/vN/accounts/{account.id}/reports
+1	GET /api/vN/accounts/{account.id}/reports/first_response_time_distribution
+1	GET /api/vN/accounts/{account.id}/reports/inbox_label_matrix
+1	GET /api/vN/accounts/{account.id}/reports/outgoing_messages_count
+1	GET /api/vN/accounts/{account.id}/search
+1	GET /api/vN/accounts/{account.id}/search/articles
+1	GET /api/vN/accounts/{account.id}/search/contacts
+1	GET /api/vN/accounts/{account.id}/search/conversations
+1	GET /api/vN/accounts/{account.id}/search/messages
+1	GET /api/vN/accounts/{account.id}/teams
+1	GET /api/vN/accounts/{account.id}/teams/{team_id}
+1	GET /api/vN/accounts/{account.id}/teams/{team_id}/team_members
+1	GET /api/vN/accounts/{account_id}/assignment_policies/{assignment_policy_id}/inboxes
+1	GET /api/vN/accounts/{account_id}/inboxes/{inbox_id}/assignment_policy
+1	GET /api/vN/integrations/apps
+1	GET /api/vN/integrations/apps/:id
+1	GET /api/vN/profile
+1	GET /api/vN/widget/campaigns
+1	GET /api/vN/widget/conversations
+1	GET /api/vN/widget/conversations/toggle_status
+1	GET /api/vN/widget/inbox_members
+1	GET /api/vN/widget/messages
+1	Ignores bulk_actions for wrong type
+1	MFA enforcement over api_access_token
+1	PATCH /api/vN/accounts/{account.id}
+1	PATCH /api/vN/accounts/{account.id}/agent_bots/:id
+1	PATCH /api/vN/accounts/{account.id}/automation_rules/{automation_rule.id}
+1	PATCH /api/vN/accounts/{account.id}/branded_email_layout
+1	PATCH /api/vN/accounts/{account.id}/campaigns/:id
+1	PATCH /api/vN/accounts/{account.id}/companies/{id}
+2	PATCH /api/vN/accounts/{account.id}/contacts/:id
+1	PATCH /api/vN/accounts/{account.id}/contacts/{contact.id}/notes/:id
+1	PATCH /api/vN/accounts/{account.id}/conversations/:conversation_id/messages/:id
+1	PATCH /api/vN/accounts/{account.id}/conversations/:id
+1	PATCH /api/vN/accounts/{account.id}/custom_attribute_definitions/:id
+1	PATCH /api/vN/accounts/{account.id}/custom_filters/:id
+1	PATCH /api/vN/accounts/{account.id}/dashboard_apps/:id
+1	PATCH /api/vN/accounts/{account.id}/inbox_members
+1	PATCH /api/vN/accounts/{account.id}/inboxes/:id
+1	PATCH /api/vN/accounts/{account.id}/integrations/hooks/{hook_id}
+1	PATCH /api/vN/accounts/{account.id}/labels/:id
+1	PATCH /api/vN/accounts/{account.id}/notifications/:id
+1	PATCH /api/vN/accounts/{account.id}/onboarding
+1	PATCH /api/vN/accounts/{account.id}/teams/{team_id}/team_members
+1	PATCH /api/vN/widget/contact
+1	PATCH /api/vN/widget/contact with HMAC enforcement
+1	PATCH /api/vN/widget/contact/set_user
+1	PATCH articles/bulk_actions/update_status
+2	POST /api/vN/accounts
+1	POST /api/vN/accounts/:account_id/conversations/:conversation_id/direct_uploads
+1	POST /api/vN/accounts/:account_id/integrations/dyte/add_participant_to_meeting
+1	POST /api/vN/accounts/:account_id/integrations/dyte/create_a_meeting
+1	POST /api/vN/accounts/:account_id/integrations/linear/create_issue
+1	POST /api/vN/accounts/:account_id/integrations/linear/link_issue
+1	POST /api/vN/accounts/:account_id/integrations/linear/unlink_issue
+1	POST /api/vN/accounts/:account_id/integrations/shopify/complete_install
+1	POST /api/vN/accounts/:account_id/upload/
+1	POST /api/vN/accounts/<account_id>/webhooks
+1	POST /api/vN/accounts/{account.id}/actions/contact_merge
+1	POST /api/vN/accounts/{account.id}/agent_bots
+1	POST /api/vN/accounts/{account.id}/agent_bots/:id/reset_access_token
+1	POST /api/vN/accounts/{account.id}/agents
+1	POST /api/vN/accounts/{account.id}/agents/bulk_create
+1	POST /api/vN/accounts/{account.id}/assignment_policies
+1	POST /api/vN/accounts/{account.id}/automation_rules
+1	POST /api/vN/accounts/{account.id}/automation_rules/{automation_rule.id}/clone
+1	POST /api/vN/accounts/{account.id}/bulk_action
+1	POST /api/vN/accounts/{account.id}/bulk_actions
+1	POST /api/vN/accounts/{account.id}/bulk_actions (contacts)
+1	POST /api/vN/accounts/{account.id}/callbacks/facebook_pages
+1	POST /api/vN/accounts/{account.id}/callbacks/reauthorize_page
+1	POST /api/vN/accounts/{account.id}/callbacks/register_facebook_page
+1	POST /api/vN/accounts/{account.id}/campaigns
+1	POST /api/vN/accounts/{account.id}/canned_responses
+1	POST /api/vN/accounts/{account.id}/channels/twilio_channel
+1	POST /api/vN/accounts/{account.id}/companies
+1	POST /api/vN/accounts/{account.id}/companies/{company.id}/contacts
+1	POST /api/vN/accounts/{account.id}/companies/{id}/destroy_custom_attributes
+1	POST /api/vN/accounts/{account.id}/contact_inboxes/filter
+1	POST /api/vN/accounts/{account.id}/contacts
+1	POST /api/vN/accounts/{account.id}/contacts/:id/destroy_custom_attributes
+1	POST /api/vN/accounts/{account.id}/contacts/<id>/labels
+1	POST /api/vN/accounts/{account.id}/contacts/export
+1	POST /api/vN/accounts/{account.id}/contacts/import
+1	POST /api/vN/accounts/{account.id}/contacts/{contact.id}/notes
+1	POST /api/vN/accounts/{account.id}/conversations
+1	POST /api/vN/accounts/{account.id}/conversations/:conversation_id/messages/:id/retry
+1	POST /api/vN/accounts/{account.id}/conversations/:id/custom_attributes
+1	POST /api/vN/accounts/{account.id}/conversations/:id/destroy_custom_attributes
+1	POST /api/vN/accounts/{account.id}/conversations/:id/mute
+1	POST /api/vN/accounts/{account.id}/conversations/:id/toggle_priority
+1	POST /api/vN/accounts/{account.id}/conversations/:id/toggle_status
+1	POST /api/vN/accounts/{account.id}/conversations/:id/toggle_typing_status
+1	POST /api/vN/accounts/{account.id}/conversations/:id/transcript
+1	POST /api/vN/accounts/{account.id}/conversations/:id/unmute
+1	POST /api/vN/accounts/{account.id}/conversations/:id/unread
+1	POST /api/vN/accounts/{account.id}/conversations/:id/update_last_seen
+1	POST /api/vN/accounts/{account.id}/conversations/<id>/assignments
+1	POST /api/vN/accounts/{account.id}/conversations/<id>/draft_messages
+1	POST /api/vN/accounts/{account.id}/conversations/<id>/labels
+1	POST /api/vN/accounts/{account.id}/conversations/<id>/messages
+1	POST /api/vN/accounts/{account.id}/conversations/<id>/participants
+1	POST /api/vN/accounts/{account.id}/custom_attribute_definitions
+1	POST /api/vN/accounts/{account.id}/custom_filters
+1	POST /api/vN/accounts/{account.id}/dashboard_apps
+1	POST /api/vN/accounts/{account.id}/google/authorization
+1	POST /api/vN/accounts/{account.id}/inbox_members
+1	POST /api/vN/accounts/{account.id}/inboxes
+1	POST /api/vN/accounts/{account.id}/inboxes/:id/set_agent_bot
+1	POST /api/vN/accounts/{account.id}/inboxes/:id/sync_templates
+1	POST /api/vN/accounts/{account.id}/inboxes/{inbox.id}/csat_template
+1	POST /api/vN/accounts/{account.id}/inboxes/{inbox.id}/csat_template/analyze
+1	POST /api/vN/accounts/{account.id}/inboxes/{inbox.id}/rotate_hmac_token
+1	POST /api/vN/accounts/{account.id}/instagram/authorization
+1	POST /api/vN/accounts/{account.id}/integrations/hooks
+1	POST /api/vN/accounts/{account.id}/integrations/hooks/{hook_id}/process_event
+1	POST /api/vN/accounts/{account.id}/labels
+1	POST /api/vN/accounts/{account.id}/macros
+1	POST /api/vN/accounts/{account.id}/macros/{macro.id}/execute
+1	POST /api/vN/accounts/{account.id}/microsoft/authorization
+1	POST /api/vN/accounts/{account.id}/notifications/:id/snooze
+1	POST /api/vN/accounts/{account.id}/notifications/:id/unread
+1	POST /api/vN/accounts/{account.id}/notifications/destroy_all
+1	POST /api/vN/accounts/{account.id}/notifications/read_all
+1	POST /api/vN/accounts/{account.id}/notion/authorization
+1	POST /api/vN/accounts/{account.id}/portals
+1	POST /api/vN/accounts/{account.id}/portals/{portal.slug}/articles
+1	POST /api/vN/accounts/{account.id}/portals/{portal.slug}/articles/reorder
+1	POST /api/vN/accounts/{account.id}/portals/{portal.slug}/categories
+1	POST /api/vN/accounts/{account.id}/portals/{portal.slug}/categories/reorder
+1	POST /api/vN/accounts/{account.id}/portals/{portal.slug}/send_instructions
+1	POST /api/vN/accounts/{account.id}/teams
+1	POST /api/vN/accounts/{account.id}/teams/{team_id}/team_members
+1	POST /api/vN/accounts/{account.id}/tiktok/authorization
+1	POST /api/vN/accounts/{account.id}/twitter/authorization
+1	POST /api/vN/accounts/{account.id}/update_active_at
+1	POST /api/vN/accounts/{account.id}/whatsapp/authorization
+1	POST /api/vN/accounts/{account.id}/whatsapp/authorization with inbox_id (reauthorization)
+1	POST /api/vN/accounts/{account_id}/inboxes/{inbox_id}/assignment_policy
+1	POST /api/vN/notification_subscriptions
+1	POST /api/vN/profile/auto_offline
+1	POST /api/vN/profile/availability
+1	POST /api/vN/profile/resend_confirmation
+1	POST /api/vN/profile/reset_access_token
+1	POST /api/vN/profile/work_preferences
+1	POST /api/vN/widget/config
+1	POST /api/vN/widget/conversations
+1	POST /api/vN/widget/conversations/destroy_custom_attributes
+1	POST /api/vN/widget/conversations/set_custom_attributes
+1	POST /api/vN/widget/conversations/toggle_typing
+1	POST /api/vN/widget/conversations/transcript
+1	POST /api/vN/widget/conversations/update_last_seen
+1	POST /api/vN/widget/destroy_custom_attributes
+1	POST /api/vN/widget/direct_uploads
+1	POST /api/vN/widget/events
+1	POST /api/vN/widget/integrations/dyte/add_participant_to_meeting
+1	POST /api/vN/widget/labels
+1	POST /api/vN/widget/messages
+1	PUT /api/vN/accounts/<account_id>/webhooks/:id
+1	PUT /api/vN/accounts/{account.id}/agents/:id
+1	PUT /api/vN/accounts/{account.id}/assignment_policies/:id
+1	PUT /api/vN/accounts/{account.id}/canned_responses/:id
+1	PUT /api/vN/accounts/{account.id}/captain/preferences
+1	PUT /api/vN/accounts/{account.id}/conversations/<id>/participants
+1	PUT /api/vN/accounts/{account.id}/macros/{macro.id}
+1	PUT /api/vN/accounts/{account.id}/notification_settings
+1	PUT /api/vN/accounts/{account.id}/portals/{portal.slug}
+1	PUT /api/vN/accounts/{account.id}/portals/{portal.slug}/articles/{article.id}
+1	PUT /api/vN/accounts/{account.id}/portals/{portal.slug}/categories/{category.id}
+1	PUT /api/vN/accounts/{account.id}/teams/:id
+1	PUT /api/vN/profile
+1	PUT /api/vN/profile/set_active_account
+1	PUT /api/vN/widget/messages
+1	Rejects bulk assignment to a team outside the account
+1	Rejects bulk assignment to an assignee outside the account
+1	Remove selected label
+1	Saves file in the automation actions to send an attachments
+1	Saves file in the macros actions to send an attachments
+1	Saves files in the automation actions to send multiple attachments
+1	Saves for automation_rules for account with country_code and browser_language conditions
+1	Saves for automation_rules for account with status conditions
+1	Stripe hooks
+1	Throws error N
+1	Twilio inbox health
+1	Unassign the agent
+1	Unassign the team
+1	Unauthorize to delete the macro
+1	Unauthorize to fetch other agents private macro
+1	Unauthorize to update the macro
+1	Update the status
+1	Updates the macro
+1	accepts a bearer API token for direct uploads
+1	accepts phone_number_id as optional parameter
+1	accepts the message when the inbox allows messages after resolved
+1	add a new team members when its administrator
+1	add inbox members
+1	add the label to the conversation
+1	adds existing users and continues processing after a rejected invitation
+2	adds users who belong to this account and another account
+1	advances onboarding_step to inbox_setup
+3	allows access when agent is assigned to inbox
+2	allows adding new attachment on update with signed blob_id
+1	allows administrators to disconnect only their own hook
+1	allows administrators to enable enforce_mfa via session auth
+1	allows administrators to set analytics config
+1	allows agents to read billing details for an accessible conversation
+1	allows an administrator to validate and update the token
+1	allows blocking of contact
+1	allows channel creation
+1	allows cleanup but not authorization when installation settings are missing
+1	allows editing an article whose author is no longer an account member
+1	allows editing before sending starts
+1	allows enrolled users
+1	allows enrolled users over api_access_token
+1	allows partial updates
+1	allows self-hosted reconfigure without a reconfigure feature gate
+1	allows session authenticated admins to manage webhooks
+1	allows session authenticated requests
+1	allows token authenticated requests
+1	allows unblocking of contact
+2	allows update with existing blob_id
+1	allows updating name/email without an identifier_hash
+1	an unavailable campaign
+1	archive portal
+1	archives multiple articles
+1	assignment of an agent in the conversation by bot agent
+1	assignment of an team in the conversation by bot agent
+1	assigns a policy to the inbox
+1	assigns a team to the conversation
+1	assigns a user to the conversation
+1	assigns an agent bot to the conversation
+1	associate to the current parent article
+1	associate to the root article
+2	attachment authorization
+1	authorize to fetch other agents public macro
+1	blocks DNS rebinding attacks (hostname resolving to private IP)
+1	blocks account creation
+1	blocks account creation with an enforcement-pending token
+1	blocks an unenrolled admin token from updating the account
+1	blocks api_access_token requests from non-enrolled users
+1	blocks channel creation on Chatwoot Cloud when embedded signup is disabled for the account
+1	blocks non-enrolled users from registering a push recipient
+1	blocks requests to .local domains
+1	blocks requests to AWS metadata service (N.N.N.N)
+1	blocks requests to localhost
+1	blocks requests to loopback addresses
+2	blocks requests to private IP ranges (N.N.x.x)
+1	blocks requests to private IP ranges (N.x.x.x)
+2	calls ChatwootCaptcha
+1	calls VN::Reports::AgentSummaryBuilder with the right params if the user is an admin
+1	calls VN::Reports::ChannelSummaryBuilder with the right params if the user is an admin
+1	calls VN::Reports::InboxSummaryBuilder with the right params if the user is an admin
+1	calls VN::Reports::TeamSummaryBuilder with the right params if the user is an admin
+2	calls account builder
+1	calls contact identify
+1	calls contact inbox builder if contact_id and inbox_id is present
+1	calls destroy custom attributes
+1	calls the embedded signup service with correct parameters
+1	calls the health service with correct channel
+1	can deactivate an existing delayed message rule with label conditions
+1	can delete conversations from inboxes without direct access
+1	can not delete orphan public record with agent credentials
+1	cascades deletion to associated inbox assignment policies
+1	classifies Meta authorization failures for the recovery UI
+1	clears account-scoped branded email layout when blank value is passed
+1	clears account-scoped branded email layout when null string is passed
+1	clears associated web widget when inbox selection is blank
+1	clears branded email layout when blank value is passed
+1	clears branded email layout when null string value is passed
+1	clears onboarding_step
+1	clears the conversation priority when priority is missing
+1	clears the conversation priority when priority is nil
+1	config.disable_search_indexing
+1	consumes a real pending installation and prevents replay
+1	continues with creation even if deletion fails
+1	copies execution_delay on clone
+1	create a conversation with a name and without an email
+1	creates a Shopify-billed account when general account signup is disabled
+1	creates a blob with a valid widget token and no CSRF token
+1	creates a contact inbox
+1	creates a conversation for a source_id in its own account
+1	creates a conversation in specificed status
+1	creates a conversation with correct details
+1	creates a conversation with correct message and custom attributes
+1	creates a data import
+1	creates a email inbox when administrator
+1	creates a line inbox when administrator
+1	creates a new Shopify-billed account and consumes the token
+1	creates a new agent
+1	creates a new assignment policy
+6	creates a new authorization and returns the redirect url
+1	creates a new campaign
+1	creates a new canned response
+1	creates a new company
+1	creates a new conversation
+1	creates a new conversation with assignee and team
+1	creates a new conversation with message when message is passed
+1	creates a new note
+1	creates a new oneoff campaign
+1	creates a new ongoing campaign
+1	creates a new outgoing cards message
+1	creates a new outgoing input select message
+2	creates a new outgoing message
+1	creates a new outgoing message with attachment
+1	creates a new participants when its authorized agent
+1	creates a new team when its administrator
+1	creates a notification subscriptions
+1	creates a sms inbox when administrator
+1	creates a valid email contact inbox
+1	creates a webwidget inbox when administrator
+1	creates activity message when conversation is provided
+1	creates an api inbox when administrator
+1	creates an hmac verified contact inbox
+1	creates an outgoing text message with a specific bot sender
+1	creates article
+1	creates article as draft when status is not provided
+1	creates article even if category is not provided
+1	creates attachment message in conversation
+1	creates category
+1	creates conversation with custom_attributes when first message is sent
+1	creates conversation with labels when first message is sent
+1	creates hooks if admin
+1	creates inbox and returns inbox object
+1	creates inbox with blank phone number and returns inbox object
+1	creates inbox with empty messaging service sid and returns inbox object
+1	creates labels for the contact
+1	creates labels for the conversation
+1	creates message in conversation
+1	creates message in conversation with a valid reply to
+1	creates message in conversation with an in-valid reply to
+1	creates multiple agents successfully
+1	creates multiple associated_categories with one category
+1	creates multiple sub_categories under one parent_category
+1	creates one more inbox with empty messaging service sid
+1	creates policy with minimal required params
+1	creates portal
+1	creates portal when custom_domain is blank
+1	creates portal when custom_domain is omitted from request body
+1	creates template successfully
+1	creates the agent bot when administrator
+1	creates the blob for a token-authenticated request without a CSRF token
+2	creates the blob for the direct upload
+1	creates the blob when the serialized api access token is empty
+2	creates the contact
+1	creates the contact as a lead
+1	creates the contact inbox when inbox id is passed
+1	creates the dashboard app
+1	creates the dashboard app even if the URL does not have SSL
+2	creates the filter
+1	creates the forward with the edited html, recipients and reused attachments
+1	creates the macro
+1	creates the webwidget inbox that allow messages after conversation is resolved
+1	creates webhook
+1	creates webhook with name
+1	creates whatsapp channel successfully
+1	delete agent_bot avatar
+1	delete campaign if admin
+1	delete contact avatar
+1	delete existing notification subscription if subscription exists
+1	delete inbox avatar for administrator user
+1	delete note if agent
+1	delete portal logo if admin
+1	delete the automation_rule for account
+1	delete the custom attribute
+1	deletes all the notifications
+1	deletes all the read notifications
+1	deletes an agent bot when administrator
+2	deletes category
+1	deletes custom attribute
+1	deletes custom filter if it is attached to the current user and account
+1	deletes dashboard app
+1	deletes existing template before creating new one
+1	deletes inbox
+1	deletes inbox members
+1	deletes interactive messages
+1	deletes multiple articles
+1	deletes only the agent object when user is associated with multiple accounts
+1	deletes participants when its authorized agent
+1	deletes portal
+1	deletes the agent and user object if associated with only one account
+1	deletes the agent avatar
+1	deletes the assignment policy
+1	deletes the company avatar
+1	deletes the contact for administrator user
+1	deletes the given custom attribute
+1	deletes the label and enqueues label cleanup
+1	deletes the linear integration when the user is an administrator
+1	deletes the message
+1	deletes the notification
+1	deletes the orphan public record with admin credentials
+1	deletes the shopify integration
+1	deletes webhook
+1	denies agents without access to the conversation inbox
+1	destroys the canned response
+1	destroys the team members when its administrator
+1	destroys the team when its administrator
+1	disconnects the agent bot
+1	dispatches the correct typing status
+1	dispatches the webwidget event
+1	does not add the label
+1	does not affect articles not in the list
+1	does not allow agents to delete public macros they created
+1	does not allow agents to update public macros they created
+1	does not allow an agent to update the token
+1	does not allow associating an inbox from another account
+1	does not allow binding an agent bot from another account
+1	does not apply labels or custom_attributes when conversation already exists
+1	does not auto-create onboarding inboxes
+1	does not block account creation for saml users
+1	does not bypass disabled account signup for an invalid pending token
+1	does not claim an install while Shopify is disabled
+1	does not claim the token or create an account when Shopify is disabled
+1	does not clear onboarding_step while the account is still on account_details
+1	does not create Shopify hooks when the installation switch is disabled
+1	does not create a conversation in another account from its source_id
+1	does not create a conversation with a team from another account
+1	does not create a conversation with an assignee from another account
+2	does not create a help center portal
+1	does not create a help center portal when website is blank
+1	does not create a new conversation if source_id is not unique
+1	does not create account-wide dashboard apps
+1	does not create an agent
+1	does not create another web widget inbox
+1	does not create new agents
+1	does not create resolved activity messages when snoozed conversation is opened
+1	does not create the contact
+1	does not create the dashboard app if invalid URL
+1	does not create the dashboard app if invalid type
+1	does not create the dashboard app if non HTTP URL
+2	does not create the message
+1	does not delete Shopify hooks when the account feature is disabled
+1	does not delete account-wide dashboard apps
+1	does not delete another user notification subscription with the same push token
+1	does not delete articles not in the list
+1	does not delete the contact if online
+1	does not expose an author who is not a member of the account
+1	does not expose leadsquared credential keys in visible settings
+1	does not flag reauthorization_required for manual whatsapp channel even when reauth required
+1	does not gate session-authenticated requests
+1	does not include branded email layout in index responses
+1	does not let an authenticated user claim the token for a new account
+1	does not look up a conversation in another account
+1	does not persist unknown or internal captain model feature keys
+1	does not raise when blob_id is an integer (existing logo re-sent by frontend)
+1	does not re-enter onboarding or persist the stale payload
+1	does not reopen conversation when conversation is muted
+1	does not require business_id (coexistence completions omit it)
+1	does not reset the display name if updates the password
+1	does not respond N on requests
+1	does not return branded email layout for an agent
+1	does not return companies from other accounts
+1	does not return saved branded email layout when feature is disabled
+1	does not return the attachments if you do not have access to it
+1	does not rotate an inbox belonging to another account
+1	does not self assign and clears the agent bot owner if admin changes the conversation status to open
+1	does not send the confirmation email if the user is already confirmed
+1	does not shows the conversation if you do not have access to it
+1	does not update Shopify hooks when the account feature is disabled
+1	does not update a notification reached via a different account that the user belongs to
+1	does not update account-wide dashboard apps
+1	does not update the conversation if you do not have access to it
+1	does not update the foreign message
+1	does not update the name if the contact already exist
+1	does not upload when unauthorized
+1	doesn't return auth_token and account_sid for agent
+1	doesnt not add phone number if the invalid phone number is provided
+1	dont update email if empty value email passed
+1	dont update email if invalid email passed
+1	dont update email if nil value email passed
+1	dont update phone number if invalid phone number passed
+1	enqueues Contacts::BulkActionJob with permitted params
+1	enqueues a contact export job
+1	enqueues a contact export job with payload
+1	enqueues a contact export job with sent_columns
+1	enqueues company deletion
+1	excludes bot messages when grouped by agent
+1	execution_delay handling
+1	exposes administrator cleanup without enabling billing when the feature is disabled
+1	exposes the Shopify account feature when the installation switch is enabled
+1	exposes the latest chatwoot version
+1	exposes the reporting timezone as an IANA identifier for browser reports
+1	fetch API inbox without hmac token when agent
+1	fetch the macro
+1	filters articles by both since and until parameters
+1	filters articles by since parameter
+1	filters articles by until parameter
+1	filters by inbox_ids and label_ids
+1	filters contacts by both since and until parameters
+1	filters contacts by since parameter
+1	filters contacts by until parameter
+1	filters conversations by both since and until parameters
+1	filters conversations by since parameter
+1	filters conversations by until parameter
+1	filters csat metrics based on a date range
+1	filters csat metrics based on a date range and agent ids
+1	filters csat responses based on a date range
+1	filters csat responses based on a date range and agent ids
+1	filters resolved contacts based on label filter
+1	filters templates by exact name
+1	finishes onboarding instead of advancing to inbox_setup
+1	get all articles
+1	get all articles with searched params
+1	get all articles with searched text query
+1	get all articles with uncategorized articles
+1	get all categories in portal
+1	get all portals
+1	get article
+1	get associated articles
+1	get one portals
+1	gets all webhook
+1	gets the draft message for the conversation
+1	gives the error for Nst record
+1	handles HTTP errors
+1	handles URL with unsupported protocol
+1	handles WhatsApp API errors with user-friendly messages
+1	handles channel already exists error
+1	handles generic API errors
+1	handles invalid URL format
+1	handles job errors gracefully
+1	handles phone number mismatch error
+1	handles reauthorization failure
+2	handles service errors gracefully
+1	handles token exchange errors
+1	handles unexpected service errors
+1	handles unreachable URLs
+1	hides credentials and keeps visible settings for google credential integrations
+1	hides the Shopify account feature when the installation switch is disabled
+1	hides the article from search engines
+1	hides the portal from search engines
+1	ignores a cross-account author while updating other attributes
+1	ignores blank branded email layout for non-email inboxes
+1	ignores blank branded email layout when feature is disabled
+1	ignores enforce_mfa when mfa feature unavailable
+1	ignores errors if account_user already exists
+1	ignores invalid labels when creating conversation with first message
+1	ignores invalid params
+1	ignores non member params
+1	ignores null bytes in the search string
+1	ignores the casing of email, updates message in conversation and deletes the current contact
+1	ignores the user ids when its not a valid account user id
+1	includes CSAT configuration in inbox list
+1	includes older conversations with recent activity within the N conversation limit
+1	invalidates filtered unread counts when conversation is marked read
+1	invalidates filtered unread counts when conversation is marked unread
+1	is idempotent when the account_details completion is replayed
+1	is idempotent when the finalize request is replayed
+1	is unable to delete inbox as agent
+1	is unable to delete inbox of another account
+1	keeps slack channel display settings while redacting unspecified settings
+1	keeps the VN assistant default when an account override is selected
+1	keeps the forward marker on a deleted forwarded email
+1	keeps the legacy completion endpoint available during rolling deployments
+1	keeps the onboarding step when an invitation is rejected
+1	links an existing contact to the company
+1	lists a conversation whose assignee no longer exists as unassigned
+1	lists a conversation whose contact no longer exists with an empty sender
+1	logs error when service fails
+1	marks unread notifications as read when updating last seen
+1	matches the contact ignoring the case in email
+1	matches the contact ignoring the case in name
+1	matches the resolved contact respecting the identifier character casing
+1	merges custom attributes when merge is enabled
+1	merges custom attributes without removing existing attributes
+1	merges custom_attributes
+1	merges two contacts by calling contact merge action
+1	merges with existing captain_features
+1	merges with existing captain_models
+1	meta.noindex
+1	modifies an account
+1	modifies an account (FAILED)
+1	modifies an agent name
+1	modifies an agents account user attributes
+1	modifies inbox members
+1	move notification subscription to user if its of another user
+2	mutes conversation
+1	neutralises formula-leading characters in the feedback column
+1	notifies clients when marking read only affects filtered counts
+1	notifies clients when marking unread only affects filtered counts
+1	notifies unread counts when a participant is added
+1	notifies unread counts when a participant is removed
+1	notifies unread counts when participant membership changes
+1	omits Shopify when the installation switch is disabled
+1	permits contact label removal params
+1	persists a delayed message rule with label conditions
+1	persists and serializes a delayed customer follow-up with a pending status condition
+1	persists and serializes execution_delay
+1	persists the successful invitation without leaking email capacity
+1	populates the unconfirmed email
+1	preserves drafted locales when draft_locales is omitted
+1	prevents agents from disconnecting
+1	prevents agents from reading installation details or connecting
+1	prevents duplicate names during update
+1	prevents duplicate policy names within account
+1	prevents the update of contact of another account
+1	prevents the update of custom filter of another user/account
+1	prevents updating with an existing email
+1	prevents updating with an existing phone number
+1	processes invalid query operator
+1	properly differentiates between system bots and account bots
+1	publishes multiple articles
+1	reauthorizes on Chatwoot Cloud without requiring the embedded signup account feature
+1	reauthorizes the WhatsApp channel successfully
+1	reauthorizes the page
+1	redacts secrets and only returns visible settings for openai hooks
+1	refreshes unread count cache before invalidating filtered counts when conversation is marked read
+1	refreshes unread count cache before invalidating filtered counts when conversation is marked unread
+1	refreshes unread count cache when conversation is marked read
+1	refreshes unread count cache when conversation is marked unread
+1	regenerates the access token
+1	regenerates the access token when administrator
+1	regenerates the stored token but returns an empty token when no account has API and webhook access enabled
+1	registers a new facebook page with avatar
+1	registers a new facebook page with avatar on redirect
+1	registers a new facebook page with no avatar
+1	registers the messaging webhook
+1	rejects a cross-account author without exposing their details
+2	rejects a date condition with an invalid timezone
+1	rejects a disabled retained hook before calling Shopify
+1	rejects a foreign raw blob id after a signed upload when creating a macro
+1	rejects a foreign raw blob id after a signed upload when creating a rule
+1	rejects a foreign raw blob id after an existing attachment without changing the macro
+1	rejects a foreign raw blob id after an existing attachment without changing the rule
+1	rejects a forward without a recipient
+1	rejects a forwarded message that belongs to another conversation
+1	rejects a malformed author_id without raising
+2	rejects a non-boolean value
+1	rejects a payload carrying execution_delay with N
+1	rejects a request without an onboarding_step and changes nothing
+1	rejects a value that is not a boolean
+1	rejects account-scoped branded email layout with invalid liquid syntax
+1	rejects account-scoped branded email layout without content slot
+1	rejects agents before claiming the pending install
+2	rejects an assigned agent without changing the token
+1	rejects an over-length draft without persisting it
+1	rejects an unknown onboarding_step
+1	rejects attachment actions without any file ids
+1	rejects branded email layout for non-email inboxes
+1	rejects branded email layout when feature is disabled
+1	rejects branded email layout with invalid liquid syntax
+1	rejects branded email layout without content slot
+1	rejects branded email layouts larger than N KiB
+1	rejects cloning an existing delayed rule instead of turning it into an instant one
+1	rejects creation outside OAuth even when Stripe is available
+2	rejects edits after sending has started
+1	rejects foreign participant ids without changing existing participants
+1	rejects foreign participant ids without exposing user details
+1	rejects invalid captain model values for the feature
+1	rejects mixed account membership without adding any users
+1	rejects mixed account membership without changing any users
+1	rejects oversized responses with a file-size message
+1	rejects the message and does not create a new conversation
+1	rejects turning off the last preference
+1	rejects unauthenticated access
+1	rejects unauthenticated requests without changing the token
+1	rejects unsupported content types with a file-type message
+1	rejects updates and deletion through generic hook endpoints
+1	rejects updates when feature is disabled
+2	rejects users who only belong to another account
+1	rejects when identifier_hash is blank
+1	rejects when identifier_hash is invalid
+1	rejects when identifier_hash is null
+1	rejects when identifier_hash is omitted
+1	releases the claim and removes the hook when consumption fails
+1	removes a contact from the company
+1	removes blank captain model overrides
+1	removes selected company custom attributes
+1	removes template configuration when not provided in update
+1	removes the assignment policy from inbox
+1	removes the draft messages for the conversation
+2	renders error on invalid params
+2	renders error response on invalid params
+1	renders error when parameter missing
+3	renders not found when inbox not found
+1	reopens the conversation with new incoming message
+1	reorders articles
+1	reorders categories
+1	replaces custom attributes by default
+1	replaces existing assignment policy for inbox
+1	reports the stored live environment without exposing credentials
+1	request with api_access_token for a super admin
+1	request with api_access_token for bot
+1	request with api_access_token for user
+1	rescues the error
+1	resends the confirmation email if the user is unconfirmed
+1	resolves the conversation
+4	responds N on requests
+2	retains existing attachments and attaches every signed upload in an action
+1	retries the message and keeps its delivery details
+1	return a new contact for the provided identifier
+1	return conversation metrics for user in account level
+1	return conversation metrics in account level
+1	return error if Twilio tokens are incorrect
+1	return not_found status when macros not available
+1	return the attachments if you are an administrator
+1	return the attachments if you are an agent with access to inbox
+1	return timeseries metrics
+3	return unauthorized for agent
+4	return unauthorized if agent
+1	returns GPT-N.N as the assistant default for VN accounts
+1	returns N if account is suspended
+1	returns N unauthorized
+1	returns Unprocessable Entity
+1	returns a clear error for an invalid or expired token
+1	returns a consistent validation error response
+1	returns a customer-safe error when the database query is canceled
+1	returns a duplicate-store error and releases the retained claim
+1	returns a safe error on provider failure
+1	returns a valid schema
+1	returns accessible agent bots with the AI assignees flag
+1	returns account details to administrators without credentials
+1	returns action not permitted status
+1	returns agent metrics from the current account
+1	returns all active apps with admin metadata if user is an admin
+1	returns all active apps without sensitive information if the user is an agent
+1	returns all agents of account
+1	returns all articles containing the search query
+3	returns all assignable inbox members along with administrators
+1	returns all assignment policies for the account
+1	returns all campaigns belonging to the inbox to administrators
+1	returns all campaigns to administrators
+1	returns all companies
+1	returns all contacts when query is empty
+1	returns all contacts who are online
+1	returns all contacts with company name asc order with null values at last
+1	returns all contacts with company name desc order
+1	returns all contacts with country name desc order with null values at last
+1	returns all contacts without contact inboxes
+1	returns all conversations counts
+1	returns all conversations matching the query
+1	returns all conversations with messages
+5	returns all conversations with messages containing the search query
+1	returns all custom_filter related to the user
+1	returns all customer attribute definitions related to the account
+1	returns all dashboard_apps in the account
+1	returns all inboxes associated with the assignment policy
+1	returns all inboxes of current_account as administrator
+1	returns all notes to agents
+1	returns all notifications
+1	returns all records
+1	returns all records in account and created_by the agent
+1	returns all records in the account
+1	returns all resolved contacts along with contact inboxes
+1	returns all resolved contacts with contact inboxes
+1	returns all the agent_bots in account along with global agent bots
+1	returns all the canned responses
+1	returns all the canned responses the user searched for
+1	returns all the csat survey responses for administrators
+1	returns all the labels for the contact
+1	returns all the labels for the conversation
+1	returns all the labels in account
+1	returns all the partipants for the conversation
+3	returns all the teams
+1	returns an empty access token when all accounts have API and webhook access disabled
+1	returns an empty payload when the template name does not match
+1	returns an error when no file or URL is provided
+1	returns analysis response
+1	returns attachments from all the contact conversations
+1	returns attachments only from inboxes the agent has access to
+1	returns auth headers and full response
+1	returns auth headers and full response for api_only signup
+1	returns auth_token and account_sid for admin
+1	returns authorized for arbritrary status
+2	returns bad request
+1	returns bad request error for administrator
+1	returns bad request error for agent
+1	returns bad request error for non-cloud provider
+1	returns bad request for a twilio whatsapp inbox
+1	returns bot summary metrics
+1	returns cache_keys as expected
+2	returns captain config
+1	returns companies with contacts_count
+1	returns companies with pagination
+1	returns company custom attributes
+1	returns configured CSAT message
+1	returns configured CSAT settings in inbox details
+1	returns configured CSAT survey rules
+1	returns consistent previous period data across timezones
+1	returns consistent resolution counts across timezones
+1	returns contacts linked to the company
+1	returns conversation metrics
+1	returns conversations from all inboxes
+1	returns conversations from no inboxes
+1	returns conversations from the inboxes which agent has access to
+1	returns conversations with empty messages array for conversations with out messages
+1	returns correct counts in buckets
+1	returns csat metrics for administrators
+1	returns csat responses even if the agent is deleted from account
+3	returns current user information
+1	returns current user notification settings
+1	returns custom fields on agents if present
+1	returns details of the app
+1	returns drilldown records for a partial first weekly bucket
+1	returns drilldown records for the selected bucket
+1	returns effective model provider and source for each feature
+2	returns empty array
+1	returns empty array when no companies match search
+1	returns empty array when no customers found
+1	returns empty imap details in inbox when agent
+1	returns empty messages
+1	returns empty results when no articles match the search query
+1	returns empty settings for oauth integrations with no visible properties
+1	returns empty when no agent bot is present
+4	returns error
+1	returns error for conflicting key
+2	returns error for invalid attachment blob_id
+2	returns error for invalid blob_id on update
+1	returns error for invalid params
+1	returns error if the filters contain invalid attributes
+1	returns error if the filters contain invalid operator
+4	returns error message
+3	returns error message and does not create activity message
+1	returns error payload
+1	returns error the query operator is invalid
+1	returns error the query value is invalid
+1	returns error when contact has no email or phone
+1	returns error when custom domain is not configured
+1	returns error when email is invalid
+1	returns error when email is missing
+1	returns error when identifier hash is blank
+1	returns error when identifier hash is not provided
+1	returns error when incorrect identifier hash is provided
+2	returns error when message is missing
+1	returns error when q parameter is missing
+1	returns error when template parameters are completely missing
+1	returns existing notification subscription if subscription exists
+1	returns facebook pages of account
+1	returns filtered unread counts when the filtered count feature is enabled
+1	returns for automation_rule for account
+2	returns for cloned automation_rule for account
+1	returns for updated active flag for automation_rule
+6	returns forbidden
+1	returns forbidden and does not create the custom attribute
+1	returns forbidden and does not delete the custom attribute
+1	returns forbidden and does not update the custom attribute
+2	returns forbidden for API token authentication
+1	returns forbidden for a token-authenticated request
+1	returns forbidden for accessible bot endpoints
+1	returns forbidden for token authenticated requests
+1	returns forbidden when conversation unread counts feature is disabled
+1	returns forbidden without modifying the account for API token authentication
+1	returns forbidden without updating active_at for API token authentication
+1	returns has_more as false on the last page
+1	returns has_more as false when results fit in one page
+1	returns has_more as true when there are more results
+1	returns health data for administrator
+1	returns health data for agent with inbox access
+1	returns identical conversation counts across timezones
+1	returns identical message counts across timezones
+1	returns imap details in inbox when admin
+2	returns inbox member
+1	returns last seen at
+1	returns last_activity_at in contact search results
+1	returns limited information on inboxes
+1	returns linked issue
+1	returns matching contacts that are not already linked to the company
+2	returns matching conversations that have no messages
+1	returns messages in conversation
+1	returns metrics filtered by team
+1	returns metrics grouped by assignee
+1	returns metrics grouped by team
+1	returns no attachments
+1	returns no contacts if no are online
+1	returns no earlier conversation for the first one
+2	returns not found
+5	returns not found error
+1	returns not found for Shopify when either feature gate is disabled
+1	returns not found for Shopify when the client ID is missing
+1	returns not found for a slug that belongs to another account
+1	returns not found for a slug that does not exist
+1	returns not found for invalid assignment policy
+2	returns not found for invalid inbox
+3	returns not found for non-existent policy
+1	returns not found for reads and edits instead of a server error
+1	returns not found if the params are invalid
+2	returns not found status
+1	returns not found when portal does not exist
+1	returns not found when the account feature is disabled
+1	returns not found when the installation switch is disabled
+1	returns not found without updating the channel
+1	returns not_started with zero counts
+1	returns notifications unread count
+1	returns null when no account-scoped layout exists
+1	returns only assigned inboxes of current_account as agent
+1	returns only presence flags for the contact details
+1	returns only the configured state for an embedded signup WhatsApp business management token
+1	returns orders for the contact
+1	returns outgoing message counts grouped by agent
+1	returns outgoing message counts grouped by inbox
+1	returns outgoing message counts grouped by label
+1	returns outgoing message counts grouped by team
+1	returns portal articles metadata
+1	returns provider config attributes for admin
+1	returns reauthorization_required for embedded signup whatsapp channel when reauth required
+1	returns safe channel identifiers for assigned inboxes
+1	returns search results
+1	returns second page of companies
+1	returns slack app with appropriate redirect url when configured
+1	returns success
+1	returns success if agent have inbox access
+1	returns success when correct identifier hash is provided
+5	returns summary
+1	returns summary metrics
+1	returns team data
+1	returns team entities data
+1	returns template configuration in inbox details
+1	returns template not found when no configuration exists
+1	returns template not found when template does not exist on WhatsApp
+1	returns template status when template exists on WhatsApp
+1	returns the access token for self-hosted accounts even when the stored feature flag is disabled
+1	returns the access token when any account has API and webhook access enabled
+2	returns the account bot access token
+1	returns the account-scoped branded email layout
+1	returns the agent bot attached to the inbox
+1	returns the assignment policy
+1	returns the assignment policy for the inbox
+1	returns the assistant YAML default for VN accounts
+1	returns the authorization date rather than hook creation or token update dates
+1	returns the company
+1	returns the contact if the params are valid
+1	returns the conversation with the ones created around it
+3	returns the correct conversation params
+1	returns the created issue
+1	returns the first response time distribution
+1	returns the full response with account_id
+1	returns the inbox if administrator
+1	returns the inbox if assigned inbox is assigned as agent
+1	returns the inbox label matrix
+1	returns the linked issue and creates activity message
+2	returns the list of agents
+1	returns the list of enabled campaigns
+3	returns the list of labels
+1	returns the templates when the agent is assigned to the inbox
+1	returns the twilio webhook health
+1	returns the unlinked issue and creates activity message
+2	returns token
+5	returns unathorized for agent
+1	returns unattended conversation count zero for agentN
+1	returns unattended conversations
+299	returns unauthorized
+1	returns unauthorized and does not change the account
+1	returns unauthorized and keeps the integration
+2	returns unauthorized error
+5	returns unauthorized for agent
+2	returns unauthorized for agent user
+1	returns unauthorized for agent without inbox access
+19	returns unauthorized for agents
+1	returns unauthorized for an agent and keeps the integration
+1	returns unauthorized for an agent bot token
+1	returns unauthorized for an agent of another account
+1	returns unauthorized for an agent who is not assigned
+1	returns unauthorized for delete action when user is not admin
+1	returns unauthorized for inbox
+1	returns unauthorized for inboxes
+1	returns unauthorized for labels
+1	returns unauthorized for teams
+1	returns unauthorized if agent does not have inbox access
+1	returns unauthorized if the user is an agent
+1	returns unauthorized when TikTok is disabled for the account
+3	returns unauthorized when agent is not assigned to inbox
+1	returns unauthorized when the agent is not assigned to the inbox
+1	returns unauthorized with an empty api_access_token header
+1	returns unauthorized with an invalid api_access_token header
+1	returns unauthorized without any credentials
+2	returns unprocessable entity error
+1	returns unprocessable entity for a non-WhatsApp inbox
+1	returns unprocessable entity for bucket timestamp outside the requested range
+1	returns unprocessable entity for invalid bucket timestamp
+1	returns unprocessable entity for invalid priority values
+1	returns unprocessable entity for missing bucket timestamp
+1	returns unprocessable entity for unsupported drilldown type
+1	returns unprocessable entity when code is missing
+2	returns unprocessable entity when no articles found
+1	returns unprocessable entity when service fails
+1	returns unprocessable entity when waba_id is missing
+1	returns unprocessable_entity error
+1	returns unprocessable_entity for invalid group_by
+1	returns unprocessable_entity if no page found
+1	returns unprocessable_entity when date range exceeds N months
+1	returns unread conversation counts scoped to the signed-in user
+1	returns unread team conversation counts scoped to the signed-in user
+1	returns valid message payload
+2	returns values
+2	returns visible hook settings for openai app for admins
+1	returns widget config along with a new contact
+1	returns widget config along with the same contact
+1	returns widget config and new contact with error message
+1	rolls back branded email layout when inbox update fails
+1	rolls back the inbox when Twilio webhook setup fails
+2	rotates the persisted token and returns the updated inbox for an administrator
+1	saves contact custom attributes on the surviving contact when merged into an existing contact
+1	saves contact custom attributes on the widget contact
+1	saves name and locale
+1	saves the draft message for the conversation
+1	search is case insensitive
+1	searches companies by domain
+1	searches companies by name
+1	self assign if agent changes the conversation status to open
+1	send the message with sender
+1	sends instructions successfully
+1	sends transcript email
+1	serialises the conversation display id as conversation_id
+1	serializes the full health payload over http
+1	sets Current attributes for the request and then returns the response
+1	sets articles to draft
+1	sets the agent bot
+1	sets the appropriate cache headers
+2	sets the values when provided
+1	sets visibility default to personal for agent
+1	shows a team-assigned conversation
+1	shows an account
+1	shows the agent bot
+1	shows the campaign for administrators
+2	shows the contact
+1	shows the contactable inboxes which the user has access to
+1	shows the conversation
+1	shows the conversation if you are an administrator
+1	shows the conversation if you are an agent with access to inbox
+1	shows the custom attribute definition
+1	shows the custom filter
+1	shows the dashboard app
+1	shows the note for agents
+1	skips conversations the agent cannot access
+1	sorts companies by contacts_count in ascending order
+1	sorts companies by contacts_count in descending order
+1	stages draft-only fields without bumping updated_at
+1	starts OAuth for the current account administrator
+1	still accepts payloads without execution_delay
+1	still clones a rule that carries no delay
+1	still creates the blob for a session-authenticated request
+2	stores the original blob_id in action_params after create
+1	succeeds when a valid identifier_hash is provided
+1	successfully deletes the conversation
+1	successfully initiates template sync
+1	successfully updates inbox with template configuration
+1	successfully updates the inbox with CSAT configuration
+1	summary reports work when frontend sends correct timezone boundaries
+1	supports API token authentication
+1	supports pagination
+1	throttles only when both timestamps are recent and no unread messages
+1	throttles updates within an hour when there are no unread messages
+1	throw error if agent
+1	throw error when invalid agent bot id
+1	throws an error for unknown attributes in condtions
+1	throws error for invalid source id
+1	throws error if subscription events are empty
+1	throws error if subscription events are invalid
+1	throws error when current password provided is invalid
+1	throws error when invalid url provided
+1	throws error when invalid url provided for ongoing campaign
+1	timezone_offset affects data grouping and timestamps correctly
+1	timezone_offset does not affect summary report totals
+1	toggle the priority of the bot agent conversation
+1	toggles the conversation status
+1	toggles the conversation status for private notes
+1	toggles the conversation status if status is empty
+1	toggles the conversation status to open from pending
+1	toggles the conversation status to snoozed when parameter is passed
+1	toggles the conversation status to specific status when parameter is passed
+1	toggles the conversation typing status
+1	triggers handoff event when moving from pending to open
+1	unassigns the assignee from the conversation
+1	unassigns the team from the conversation
+1	unmutes conversation
+1	update email if valid email passed
+1	update phone number if valid phone number passed
+1	update reverse associations for related categories
+2	updated avatar with avatar_url
+1	updates account-scoped branded email layout when feature is enabled
+1	updates account-scoped branded email layouts up to N KiB
+1	updates all the notifications read at
+1	updates an existing canned response
+1	updates an existing team when its an administrator
+1	updates api inbox when administrator
+1	updates article
+1	updates assignee last seen
+2	updates avatar
+1	updates avatar and includes thumbnail in response
+1	updates avatar when administrator
+1	updates both if one timestamp is old even when the other is recent
+1	updates both models and features in single request
+1	updates branded email layout for email inbox when feature is enabled
+1	updates captain_features
+1	updates captain_models
+1	updates captain_models for PDF FAQ generation
+1	updates captain_models for conversation FAQ generation
+1	updates captain_models for document FAQ generation
+1	updates category
+1	updates company association
+3	updates custom attributes
+1	updates email inbox when administrator
+1	updates email inbox with imap when administrator
+1	updates even within an hour when there are unread messages
+2	updates hook if admin
+1	updates inbox when administrator
+2	updates last seen
+1	updates message in conversation and creates a new contact
+1	updates message in conversation and deletes the current contact
+1	updates onboarding step to invite_team if onboarding step is present in account custom attributes
+1	updates only the notifications read at for primary actor when param is passed
+1	updates participants when its authorized agent
+1	updates portal
+1	updates related categories
+1	updates smtp configuration with authentication mechanism
+1	updates smtp configuration with ssl/tls encryption
+1	updates smtp configuration with starttls encryption
+1	updates status to failed with external_error
+1	updates the agent bot
+1	updates the assignment policy
+1	updates the auto offline status
+1	updates the availability status
+1	updates the campaign
+1	updates the company
+1	updates the contact
+1	updates the conversation if you are an administrator
+1	updates the conversation if you are an agent with access to inbox
+1	updates the conversation priority
+1	updates the custom attribute definition
+1	updates the custom filter
+1	updates the dashboard app
+1	updates the email related notification flags
+1	updates the label
+1	updates the last active account id
+1	updates the message_signature
+1	updates the name
+1	updates the note
+2	updates the notification read at
+1	updates the notification snoozed until
+1	updates the onboarding step in custom attributes
+1	updates the password when current password is provided
+1	updates the team members when its administrator
+1	updates the ui settings
+1	updates the webwidget inbox to disallow the messages after conversation is resolved
+1	updates the work preferences
+1	updates twilio sms inbox when administrator
+1	updates twitter inbox when administrator
+1	updates webhook
+1	updates whatsapp inbox when administrator
+1	updates working hours when administrator
+1	updating a one-off campaign
+1	uploads the image from URL when authorized
+1	uploads the image when authorized
+1	use default if subscription events are nil
+1	uses StatusUpdateService to perform status update
+1	uses default values for optional parameters
+1	uses the authorized conversation contact rather than a supplied email
+1	validate name
+1	validates Cloudflare RealtimeKit credentials before creating the hook
+1	validates embedded signup parameters before reconfiguring the channel
+1	validates required fields
+6	when API and webhook access is disabled for the account
+1	when CSAT is configured
+1	when CW_API_ONLY_SERVER is true
+2	when ENABLE_ACCOUNT_SIGNUP env variable is set to api_only
+2	when ENABLE_ACCOUNT_SIGNUP env variable is set to false
+2	when ENABLE_ACCOUNT_SIGNUP is stored as boolean false
+1	when Shopify is disabled
+1	when a self-hosted account has the feature flag disabled
+1	when a token without any conversation is used
+1	when accessing an account scoped resource
+1	when active
+1	when agent has API inbox
+1	when agent has non-API inbox
+1	when an agent has access to multiple accounts
+1	when an agentN associated to conversation having first reply from agentN
+1	when an authenticated user creates a second account
+1	when an authenticated user updates email
+1	when an authenticated user updates email inbox
+1	when an identifier is supplied on a mandatory-hmac inbox
+1	when api inbox
+1	when api_and_webhooks feature is disabled
+1	when assignment policy has associated inboxes
+1	when assignment policy has no associated inboxes
+1	when authenticated agent
+2	when authenticated and authorized
+6	when authenticated as admin
+5	when authenticated as agent
+2	when authenticated as an agent (non-admin)
+3	when authenticated but not authorized
+1	when authenticated user makes request
+1	when authenticated user with access to inbox
+1	when campaigns feature is disabled
+1	when campaigns feature is enabled
+1	when captain_integration feature is disabled
+1	when captain_integration feature is enabled
+1	when channel is not WhatsApp
+1	when completed
+1	when completing inbox_setup out of order
+1	when conversation already has a team
+1	when conversation already has an assignee
+1	when conversation unread counts feature is enabled
+1	when creating with a conflicting attribute_key
+2	when data is retrieved successfully
+2	when data retrieval fails
+1	when end conversation is not permitted
+1	when execute the macro
+1	when file is empty
+1	when filtering by assignee_id
+1	when finalizing account_details
+1	when finalizing inbox_setup
+1	when forgery protection is enabled
+1	when forwarding an email
+1	when get request is made
+1	when grouped by team_id
+1	when handling CSAT configuration
+1	when inbox does not exist
+2	when inbox has an assignment policy
+2	when inbox has no assignment policy
+1	when issue creation fails
+1	when issue linking fails
+1	when issue unlinking fails
+1	when it is a Twilio inbox
+2	when it is a WhatsApp channel
+1	when it is a accessible url
+1	when it is a bot
+1	when it is a regular agent
+1	when it is a valid api_access_token
+2	when it is an admin
+6	when it is an administrator
+17	when it is an agent
+1	when it is an agent with inbox access and message_type is integrations
+1	when it is an agent with inbox access and message_type is not integrations
+1	when it is an agent with inbox access and the Dyte API is a success
+1	when it is an agent with inbox access and the Dyte API is errored
+10	when it is an authenticated admin
+8	when it is an authenticated admin user
+9	when it is an authenticated administrator
+17	when it is an authenticated agent
+1	when it is an authenticated agent bot
+1	when it is an authenticated agent user
+5	when it is an authenticated bot
+1	when it is an authenticated bot with access to the inbox
+1	when it is an authenticated bot with out access to the inbox
+1	when it is an authenticated platform app token
+1	when it is an authenticated request with an api access token
+1	when it is an authenticated session request
+204	when it is an authenticated user
+1	when it is an authenticated user who has access to the inbox
+4	when it is an authenticated user with access to conversation
+1	when it is an authenticated user with access to inbox
+3	when it is an authenticated user with access to the conversation
+2	when it is an authenticated user with access to the inbox
+1	when it is an authenticated user with out access to inbox
+2	when it is an authenticated user with out permission
+1	when it is an invalid api_access_token
+1	when it is an unauthenticated request
+238	when it is an unauthenticated user
+1	when it is an unauthorized url
+2	when it is an unauthorized user
+2	when it is not a WhatsApp channel
+1	when its a valid api_access_token
+1	when linked issue is found
+1	when linked issue is not found
+1	when message is an integration message
+1	when message is not an integration message
+1	when no help center generation has started
+1	when no identifier is supplied (anonymous prechat update)
+1	when off cloud (inbox setup is skipped)
+1	when on cloud (inbox setup is a cloud-only step)
+2	when post request is made
+2	when posting to accounts with correct parameters
+1	when processing
+1	when provider_config
+1	when put request is made with existing email
+1	when put request is made with invalid email
+1	when put request is made with non existing email
+1	when put request targets a message from another visitor in the same inbox
+1	when reauthorization is not required
+1	when replaying account_details after onboarding has finished
+1	when search fails
+1	when search is successful
+1	when the account api_and_webhooks feature is disabled
+2	when the account email limit is exhausted
+1	when the account enforces MFA
+1	when the account has capacity for only part of the batch
+1	when the account is suspended
+2	when the agent does not have access to the inbox
+1	when the conversation is resolved and the inbox does not allow messages after resolved
+1	when the current contact identifier is different from param identifier
+1	when the declared onboarding_step is missing or unknown
+1	when the delayed_automations feature is disabled
+1	when the delayed_automations feature is enabled
+1	when the issue is created successfully
+1	when the issue is linked successfully
+1	when the issue is unlinked successfully
+2	when the message id is invalid
+1	when the user is an admininstrator
+1	when the user is an agent
+1	when the user is not part of an inbox
+1	when the user is part of the inbox
+1	when token is invalid
+1	when token is valid
+11	when unauthenticated
+4	when unauthenticated user
+1	when uploading a file
+1	when uploading from a URL
+1	when user end conversation from widget
+2	when user is an administrator
+1	when user is an agent
+3	when user is logged in
+1	when user is not authenticated
+1	when user is not authorized for the account
+1	will not create a new conversation if agent does not have access to inbox
+1	will not create inbox for agent
+1	will not return provider config for agent
+2	will not return sensitive information for openai app for agents
+1	will not throw exception if user does not have access to suspended account
+1	will not update agent bot when its an agent
+1	will not update inbox for agent
+1	will not update onboarding step if onboarding step is not present in account custom attributes
+1	will process the events
+1	will show a global agent bot
+1	will throw an error on locale, category_id uniqueness
+1	will throw an error slug presence
+1	with Agent Bots
+1	with SSRF attack vectors
+2	with WhatsApp inbox
+1	with WhatsApp non-cloud inbox
+1	with a Shopify pending installation token
+4	with a conversation
+1	with a conversation but invalid source id
+1	with a phone number
+3	with advanced_search feature enabled
+1	with an mfa enforcement-pending token
+1	with an unsupported channel
+1	with channel_api
+1	with channel_widget
+7	with correct website token
+1	with correct website token and a defined label
+1	with correct website token and invalid X-Auth-Token
+1	with correct website token and missing X-Auth-Token
+1	with correct website token and undefined label
+1	with correct website token and valid X-Auth-Token
+1	with invalid group_by parameter
+10	with invalid website token
+1	with mandatory hmac
+1	with mfa enforcement setting
+2	with non-WhatsApp inbox
+2	with non-existent inbox
+1	with team_id parameter
+1	with update contact
+3	with user as administrator
+3	with user as agent
+2	with user as unknown role
+1	with valid parameters
+1	would not create the agent bot when agent
+1	would not delete a global agent bot
+1	would not delete the agent bot when agent
+1	would not reset access token for a global agent bot
+1	would not reset the access token when agent
+1	would not update a global agent bot
+1	would not update the agent bot when agent

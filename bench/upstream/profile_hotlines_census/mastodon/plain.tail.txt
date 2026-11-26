@@ -1,0 +1,40 @@
+
+Settings Sessions
+  DELETE /settings/sessions/:id
+    when session activation does not exist
+      returns not found
+
+Admin Collections
+  GET /admin/accounts/:account_id/collections/:id
+    returns success
+  GET /admin/accounts/:account_id/collections/
+    returns http success
+  POST /admin/accounts/:account_id/collections/batch
+    with invalid remove_from_report
+      redirects to the account collections page
+    with an invalid report
+      redirects to the account collections page
+    with a valid report
+      redirects to the report page
+    with valid remove_from_report
+      redirects to the account collections page
+
+Settings Migration Redirects
+  POST /settings/migration/redirect
+    gracefully handles invalid nested params
+
+Relationships
+  PUT /relationships
+    gracefully handles invalid nested params
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) signature verification concern with an HTTP Message Signature (final RFC version) with a ML-DSA-44 key with a known account with a valid signature on a GET request successfully verifies signature
+     # waiting for ubuntu-26.04 runners
+     # ./spec/requests/signature_verification_spec.rb:817
+
+Finished in 2 minutes 32.8 seconds (files took 3.96 seconds to load)
+2296 examples, 0 failures, 1 pending
+
+Randomized with seed 1234
+

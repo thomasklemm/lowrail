@@ -1,0 +1,40 @@
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara/selenium/driver_specializations/chrome_driver.rb:54:in 'Capybara::Selenium::Driver::ChromeDriver#reset!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara/session.rb:132:in 'Capybara::Session#reset!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'block in Capybara.reset_sessions!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Enumerable#reverse_each'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Capybara.reset_sessions!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionpack-8.1.4/lib/action_dispatch/system_testing/test_helpers/setup_and_teardown.rb:16:in 'ActionDispatch::SystemTesting::TestHelpers::SetupAndTeardown#after_teardown'
+
+bin/rails test test/system/contacts_test.rb:36
+
+ContactsTest#test_cannot_do_anything_without_login = 0.23 s = E
+
+
+Error:
+ContactsTest#test_cannot_do_anything_without_login:
+Selenium::WebDriver::Error::InvalidArgumentError: invalid argument: * is not a valid URL
+  (Session info: chrome=158.0.8127.88)
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/response.rb:63:in 'Selenium::WebDriver::Remote::Response#add_cause'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/response.rb:41:in 'Selenium::WebDriver::Remote::Response#error'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/response.rb:52:in 'Selenium::WebDriver::Remote::Response#assert_ok'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/response.rb:34:in 'Selenium::WebDriver::Remote::Response#initialize'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/http/common.rb:148:in 'Selenium::WebDriver::Remote::Http::Common#create_response'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/http/default.rb:122:in 'Selenium::WebDriver::Remote::Http::Default#request'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/http/common.rb:87:in 'Selenium::WebDriver::Remote::Http::Common#call'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/remote/bridge.rb:645:in 'Selenium::WebDriver::Remote::Bridge#execute'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/chromium/features.rb:79:in 'Selenium::WebDriver::Chromium::Features#send_command'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/selenium-webdriver-4.51.0/lib/selenium/webdriver/common/driver_extensions/has_cdp.rb:31:in 'Selenium::WebDriver::DriverExtensions::HasCDP#execute_cdp'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara/selenium/driver_specializations/chrome_driver.rb:97:in 'Capybara::Selenium::Driver::ChromeDriver#execute_cdp'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara/selenium/driver_specializations/chrome_driver.rb:54:in 'Capybara::Selenium::Driver::ChromeDriver#reset!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara/session.rb:132:in 'Capybara::Session#reset!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'block in Capybara.reset_sessions!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Enumerable#reverse_each'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Capybara.reset_sessions!'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/actionpack-8.1.4/lib/action_dispatch/system_testing/test_helpers/setup_and_teardown.rb:16:in 'ActionDispatch::SystemTesting::TestHelpers::SetupAndTeardown#after_teardown'
+
+bin/rails test test/system/contacts_test.rb:95
+
+ContactTest#test_should_not_save_contact_without_first_name_and_last_name = 0.00 s = .
+
+Finished in 18.395077s, 1.4134 runs/s, 8.9154 assertions/s.
+26 runs, 164 assertions, 0 failures, 25 errors, 0 skips

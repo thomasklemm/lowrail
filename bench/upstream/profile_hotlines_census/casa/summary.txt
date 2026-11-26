@@ -1,0 +1,20 @@
+plain exit 0 wall 55.459518695 at 14:08:52
+profiled exit 0 wall 159.618556938 at 14:11:31
+  1.0 0.0 is expected to redirect to "/all_casa_admins/casa_orgs/242/casa_admins/383/edit"
+  1.0 0.0 is expected to redirect to "/all_casa_admins/casa_orgs/250"
+  1.0 0.0 is expected to redirect to "/all_casa_admins/casa_orgs/255/casa_admins/393/edit"
+  1.0 0.0 is expected to redirect to "/all_casa_admins/casa_orgs/268/casa_admins/402/edit"
+  1.0 0.0 is expected to redirect to "/casa_cases/cina-176/court_dates/5"
+  1.0 0.0 is expected to redirect to "/casa_cases/cina-179/court_dates/8"
+  1.0 0.0 is expected to redirect to "/volunteers/761/edit"
+  1.0 0.0 is expected to redirect to "/volunteers/785/edit"
+  1.0 0.0 is expected to redirect to "/volunteers/791/edit"
+  1.0 0.0 is expected to redirect to "/volunteers/799/edit"
+  1.0 0.0 is expected to redirect to "/volunteers/936/edit"
+  1.0 0.0 is expected to redirect to "http://www.example.com/casa_org/344/edit"
+  0.0 0.5 is expected to redirect to "/all_casa_admins/casa_orgs/1187/casa_admins/1778/edit"
+  0.0 0.5 is expected to redirect to "/all_casa_admins/casa_orgs/1195"
+  0.0 0.5 is expected to redirect to "/all_casa_admins/casa_orgs/1200/casa_admins/1788/edit"
+plain.log: 938 distinct outcomes, 1680 lines; 935 examples, 0 failures
+profiled.log: 938 distinct outcomes, 3360 lines; 935 examples, 0 failures | 935 examples, 0 failures
+profiled.log: identical to plain (each of 938 outcomes in all 2 runs)

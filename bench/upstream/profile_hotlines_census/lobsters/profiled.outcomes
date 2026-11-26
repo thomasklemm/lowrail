@@ -1,0 +1,985 @@
+2	.accessible_to_user
+2	.categories
+2	.delete is idempotent
+2	.enabled?
+2	.silence_streams
+2	.title_maximum_length
+2	CGI.parse
+2	Comment#update_score_and_recalculate matches SQL math
+2	Displays Activity Log
+2	GET /banned-ips
+2	GET /edit
+4	GET /index
+2	GET /new
+2	GET /settings/Nfa
+2	GET /settings/Nfa_enroll
+4	GET /show
+2	GET all
+4	GET show
+2	Links bare URLs
+2	Loading filter page
+2	Merging story comments
+4	N to -N
+4	N to N
+2	Ns for /recent.rss, which is not served
+2	Ns for visitors
+4	Ns to logged-out visitor
+2	PATCH /update
+6	POST /create
+2	POST /invitations
+4	POST create
+2	POST keep_as_new
+2	PREVENTING ALL-CAPS TITLES
+2	URL_RE
+2	a logged-in-user looks at others' user_threads
+2	a logged-in-user looks at their own user_threads
+2	a moderator looks at user_threads
+2	a url that hasn't been submitted
+2	accepts a user id
+2	accepts an instance name
+2	accepts playlists
+2	accepts urls
+2	active
+4	adding a filter
+2	adding a hat to a comment
+2	addresses replies to receiver
+2	addresses story replies
+2	addresses top-level story responses
+2	adds ugc
+2	all
+2	allow
+2	allows a valid category to be created
+2	allows a valid tag to be created
+2	allows changing username with no creation/changing in < N year
+2	allows image tags
+2	allows totp codes from the surrounding time steps
+2	allows users to show emails to users
+2	also sends mentions with ~username
+2	ancestors without js
+2	and disowning
+2	app/assets/stylesheets/application.css uses only Baseline widely available features
+2	app/assets/stylesheets/dark-high.css uses only Baseline widely available features
+2	app/assets/stylesheets/dark-normal.css uses only Baseline widely available features
+2	app/assets/stylesheets/dark-system.css uses only Baseline widely available features
+2	app/assets/stylesheets/light-high.css uses only Baseline widely available features
+2	app/assets/stylesheets/light-normal.css uses only Baseline widely available features
+2	app/assets/stylesheets/light-system.css uses only Baseline widely available features
+2	app/assets/stylesheets/system-high.css uses only Baseline widely available features
+2	app/assets/stylesheets/system-normal.css uses only Baseline widely available features
+2	app/assets/stylesheets/system-system.css uses only Baseline widely available features
+2	applies a story upvote and karma properly
+2	approving hat request
+2	as a logged-in user
+2	as a logged-out visitor
+2	as a user who is a moderator
+2	as a user who is not a moderator
+2	as moderator
+2	assigns canonical when url when it resolves N
+2	associates title: with a shortword search
+2	at the scame score, is higher for comments without flags
+2	attaches a Story to an Origin owned by another Domain
+2	attributing lobsters traffic
+2	authenticates properly
+2	auto-accept suggestion once quorum is met
+2	ban
+2	banning
+2	banning deactivated user doesn't email
+2	bans domain with valid params
+2	bans origin with valid params
+2	bounces an email with an empty body
+2	bounces an email with an invalid in-reply-to
+2	bounces an email with an invalid user token
+2	brigading
+2	browsing stories by tag
+2	bugs I've seen in prod
+2	bunch of symbols
+2	but calvin is allowed to scream in his traditional WWDC posts
+2	caches the destination url, no newline
+2	caches the frontpage
+2	calculates tag changes properly
+2	calls generate on StoryImage
+2	can be merged by mod
+4	can be one of the user's hats
+2	can create and ban an origin that hasn't been submitted yet
+2	can create and ban at the same time
+2	can fetch PDF titles properly
+2	can fetch its title properly
+2	can fetch unicode titles properly
+2	can find a comment
+2	can find zero hits
+2	can have images
+2	can rename! users
+2	can search for comments
+2	can search for comments by commenter
+2	can search for comments by story submitter
+2	can search for comments by story title
+2	can search for comments by tag
+2	can search for comments by url
+2	can search for comments ordering by relevance
+2	can search for comments with a quoted term
+2	can search for comments with only tags
+2	can search for multitagged stories
+2	can search for stories by domain
+2	can search for stories by submitter
+2	can search for stories by tag
+2	can search for stories by title
+2	can search for stories by title with multiple words
+2	can search for stories by url
+2	can search for stories ordering by relevance
+2	can search for stories with only tags
+2	can search multi-word requiring all terms in order, not an OR search
+2	can search multi-word terms
+2	can search stories
+2	can search titles for stories
+2	can see a user's hats
+2	can share an Origin between Domains
+2	can't be all caps
+2	can't be done by submitter
+4	can't be worn if user doesn't have that hat
+2	can't have images
+2	cannot see a user's email
+2	carries a ban and its modlog onto the Origin that remains
+2	certain without disown
+2	checks for a previously posted story with same url
+2	checks for invalid urls
+2	comment notifications
+2	comment_score_for_user
+2	commenter rule
+2	comments
+2	comments on a deleted story
+2	comments#user_threads
+2	confidence
+2	confidence_order_path
+2	contains message about replying from email
+2	converts a title to a url slug properly
+6	create
+4	create and ban
+4	creates & sends a message notification
+2	creates Links from comment text
+2	creates a ModNote
+2	creates a bare-domain origin for bare and trailing slash URLs
+4	creates a code before validation
+2	creates a comment on a story with a valid short id
+2	creates a moderation with the expected tag_id and user_id
+2	creates a moderation with the expected user_id
+2	creates a new ModMail
+4	creates a new ModMailMessage
+2	creates a reply to a comment with a valid short id
+2	creates and emails an invitation
+2	creates daily stats idempotently
+2	creates domains with selectors
+2	creates new tags
+2	creates new tags with expected params
+2	creates the ModMail
+2	deactivating and reactivating
+2	decode all entities
+2	decrements the user's count of deleted stories
+2	deducts from score when users flag
+2	delete a story with moderation reason
+2	deleting
+2	deleting a comment
+2	deleting account
+2	deleting comments
+2	denies access to non-recipient
+2	diabling invites
+4	disowning
+2	disowning a comment
+2	disowning a story
+2	disowning comments
+2	disowning stories
+2	displays 'Last Read' marker at the last loaded position and maintains last_read_timestamp through pagination accordingly
+2	displays 'Last Read' marker at the last loaded position and update 'last_read_newest_comment' accordingly
+2	displays a few words around links in comments
+2	displays a story
+2	displays ai topic hint
+2	displays all users
+2	displays c++ language hint
+2	displays golang language hint
+2	displays ml language and topic hint
+2	displays the username
+2	displays to the user
+2	does display to mods
+2	does not allow a category to be saved without a name
+2	does not allow a category with a name too long to be saved
+2	does not allow a tag to be saved without a name
+2	does not allow a tag with a comma to be saved
+2	does not allow a tag with a description too long to be saved
+2	does not allow a tag with a hotness_mod too high to be saved
+2	does not allow a tag with a hotness_mod too low to be saved
+2	does not allow a tag with a name too long to be saved
+2	does not allow an empty category to be saved
+2	does not allow an empty tag to be saved
+2	does not allow lines longer than N characters
+2	does not allow too-long titles
+2	does not allow too-short titles
+2	does not assign canonical url when the response is non-N
+2	does not auto-accept suggestion if quorum is not met
+2	does not ban domain when the reason is blank
+2	does not ban origin when the reason is blank
+2	does not break on multibyte encoded characters
+2	does not cache the file
+2	does not create a new ModMail
+4	does not create a new ModMailMessage
+4	does not create and ban when the reason is blank
+2	does not display saver links
+2	does not enqueue CreateStoryCardJob
+2	does not expand @ signs inside urls
+2	does not fetch title with a port specified
+2	does not follow rel=canonical when this is to the main page
+2	does not include merges
+2	does not issue a title search for short words
+2	does not re-inject escaped comment markup as a live tag
+2	does not redirect json requests missing the title slug
+2	does not see stories by others merged into a story they submitted
+2	does not show disown in active stories page
+2	does not show for new users you didn't invite
+2	does not show for users you invited a while ago
+2	does not show hidden stories
+2	does not update read_at of notification, when notification is not displayed
+4	does nothing to deleted comments
+2	does nothing when upvoting an existing upvote
+2	does nothing when upvoting merged story
+2	does parse multi word quote
+2	does parse single word quote
+2	doesn't a stopword prefixing a term
+2	doesn't accept js placeholder
+2	doesn't allow
+2	doesn't allow changing to a username someone else stopped using in the last N years
+2	doesn't allow changing usernames in < N year of last change
+2	doesn't allow login by banned and wiped users
+2	doesn't allow login by banned users
+2	doesn't allow login by deactivated and wiped users
+2	doesn't allow login by deactivated users
+2	doesn't allow new users to change in < N year
+2	doesn't allow posting to others' modmails
+2	doesn't allow sql injection
+4	doesn't allow submission from logged in users
+2	doesn't autolink bare triggers
+2	doesn't cache errors
+2	doesn't cache path traversal
+2	doesn't deduct from score if flagging user commented
+2	doesn't deduct from score if hiding user didn't flag
+2	doesn't delete the /page/n from the link
+2	doesn't delete the period from the link
+2	doesn't display to logged-out users
+2	doesn't display to other users
+2	doesn't duplicate Links in edits
+2	doesn't email if the mentioned user is hiding the story
+2	doesn't email if the replied-to user is hiding the story
+2	doesn't error if not given a url
+2	doesn't error if the url hasn't been submitted
+2	doesn't error on odd real searches with punctuation
+2	doesn't let path traversal block the frontpage
+2	doesn't limit slow responses
+2	doesn't list stories that aren't hidden
+2	doesn't load for a non-mod user
+2	doesn't load for a visitor
+2	doesn't load the invited_by_user for users invited a while ago
+2	doesn't load the invited_by_user for users you didn't invite
+2	doesn't load the invited_by_user for users you invited
+2	doesn't log changed to derived field normalized_url
+2	doesn't log in with blank password
+2	doesn't log in with wrong password
+2	doesn't log in without any password posted
+2	doesn't log in without correct password
+2	doesn't mark link as current with a different period
+8	doesn't parse N-character words
+2	doesn't parse a quote
+2	doesn't parse a random short non-stopword
+6	doesn't parse blank
+2	doesn't parse blank @
+2	doesn't parse blank ~
+2	doesn't parse emails
+2	doesn't parse empty domain
+2	doesn't parse empty quotes
+2	doesn't parse invalid domain
+2	doesn't parse just the tld
+2	doesn't parse multi word
+2	doesn't parse multiple words
+2	doesn't parse non-existing tld
+6	doesn't permit sql injection
+2	doesn't raise on normal traffic
+2	doesn't relog hat use on edit that doesn't change hat
+2	doesn't render the collapse checkbox
+2	doesn't reset if token expired
+2	doesn't reset if token is missing
+2	doesn't reset if token is wrong
+2	doesn't reset if user is banned
+2	doesn't sanitize links that aren't email addressees
+2	doesn't save the invitation if the email can't be sent
+2	doesn't serve to searx
+2	doesn't show forgot password form if user is already logged in
+2	doesn't show login form if user is already logged in
+2	doesn't sort comments under the wrong parents when they haven't been voted on
+2	doesn't start reset process if user was banned
+2	doesn't start reset process if user was deactivated and wiped
+2	doesn't sweep neighboring pages cached at the root
+2	doesn't throw exceptions at brackets
+2	doesn't write or sweep when an old title slug redirects
+2	doffing and replacing with new hat
+2	doffing hat with reason
+2	domain rule
+2	domains_ban#update
+2	don't put https CSP header
+2	edit button is present on hats page
+2	edit the title and redirect to story
+2	editing
+2	editing comments
+2	editing hat in place
+2	emails a confirmation after create
+2	enabling invites
+2	encode all non-ascii characters
+2	encoded words
+2	encodes text as quoted printable
+2	enqueues CachePageJobs for popular non-story pages
+2	errors
+2	escapes raw HTML
+2	exception 'user-select' is still not Baseline widely available
+2	excerpt_fragment_around_link
+2	excerpts even in multiple nesting
+2	exclude tags are empty
+2	exclude tags are emtpy
+2	exclude tags are provided
+2	excluded tags are provided
+2	expression
+2	extracts links from markdown
+2	falls back to the submitting Domain when no Domain matches the identifier
+2	fetching titles
+2	filters out comments by tag
+2	finds arxiv html page and pdf URLs with the same arxiv identifier
+2	finds bin/sqliteN
+2	finds similar arxiv html page and pdf URLs that contain a pdf extension
+2	finds similar www.youtube and m.youtube URLs
+2	finds similar www.youtube and youtu.be URLs
+2	finds stories with similar URLs
+2	first story in a list is last created
+2	flattens multiword searches to single sql term
+2	for a story that merged into another story
+2	generates a token
+2	generates the correct path for paginated top stories
+2	gets an error message after registering banned name
+2	handles download failures
+2	handles really long words
+2	happy path
+2	has a hat field
+2	has a limit on the about field
+2	has a limit on the banned reason field
+2	has a limit on the comment field
+2	has a limit on the disabled invite reason field
+4	has a limit on the email field
+4	has a limit on the hat field
+2	has a limit on the ip_address field
+4	has a limit on the link field
+2	has a limit on the mailing list token field
+2	has a limit on the markdown description field
+4	has a limit on the memo field
+2	has a limit on the name field
+2	has a limit on the password reset token field
+2	has a limit on the reason field
+2	has a limit on the rss token field
+2	has a limit on the session token field
+2	has a stable message-id
+2	has a timeout on selector_regexp
+2	has a valid email address
+4	has a valid factory
+2	has a valid homepage
+2	has a valid username
+2	has access to rails routes
+2	has an extra message if author flagged a parent
+4	has correct action
+2	has correct banned_at
+2	has correct banned_by_user_id
+2	has correct banned_reason
+4	has correct moderator_user_id
+4	has correct reason
+2	has domain straight out of the db, when Rails doesn't use setters
+2	has empty banned_at
+2	has empty banned_by_user_id
+2	has empty banned_reason
+2	has no effect on a story score when casting a hide vote
+2	has no effect when hiding merged story
+2	has no effect when saving merged story
+2	has no unrouted actions (public controller methods)
+2	has parent in-reply-to and in references
+4	hat
+2	hidden
+2	hiding a story
+2	home#stories
+4	homepage
+2	homepage as moderator
+2	homepage as moderator with pending hat requests
+2	homepage with unknown cookies
+2	html
+2	hydrates normalized_url
+2	hyperlinks usernames based on when they existed, not now
+2	if created after user is no longer moderator
+2	if created before the user became moderator
+2	if poster was a moderator at creation, even after hat doff
+2	if poster was a moderator at the time of creation
+2	ignores other people's problems
+2	image link
+2	images
+2	inactive tag
+2	includes only saved stories by user
+2	includes only stories with the given tags
+2	includes only story with the tag
+2	includes stories
+2	includes stories that are not hidden or having negative score
+2	increments correctly
+2	increments the user's count of deleted stories
+2	initializes correctly
+2	inserts start-and-end-of-line anchors to
+2	is defined
+8	is expected to eq #<Story id: N, comments_count: N, created_at: #<ActiveSupport::TimeWithZone T>, description: nil, domain_id: N, flags: N, hotness: -N.NeN, is_deleted: false, is_moderated: false, last_comment_at: nil, last_edited_at: #<ActiveSupport::TimeWithZone T>, markeddown_description: nil, mastodon_id: nil, merged_story_id: nil, normalized_url: "example.com/N", origin_id: nil, score: N, short_id: "X", stories_count: N, title: "Hello N", token: "X", twitter_id: nil, unavailable_at: nil, updated_at: #<ActiveSupport::TimeWithZone T>, url: "http://example.com/N", user_id: N, user_is_author: false, user_is_following: false>
+6	is expected to eq N
+2	is invalid for invalid regexp
+2	is low for flagged comments
+2	is not editable by another non-admin user
+2	is not enforced as a regular validation
+2	is not enforced on top level, only replies
+2	is not valid without a comment
+2	is not valid without a vote amount
+2	is ordered by hotness
+2	is ordered by most-recent comment
+2	is visible to a moderator
+2	is visible to submitter
+2	it is high for upvoted comments
+4	json
+2	keeps Anubis cookies
+2	keeps punctuation inside of auto-generated links when using brackets
+2	last story in a list is first created
+2	latest
+2	leaves dotfiles alone so it can't eat cache_page tempfiles
+2	lets users send messages to each other
+2	limits longer with flags
+2	limits within N minutes
+2	link to a user
+2	link_to_different_page
+2	links from story description
+2	links from story url
+2	links to users during and after creation
+2	lists flagged comments from the interval but not before it
+2	lists mods
+2	lists references oldest-first
+2	lists stories in the category
+2	lists stories the user has hiddden
+8	loads
+2	loads for a mod
+2	loads the search form
+2	logged in
+2	logged out, defer to user's system
+2	logs hat use on edited comment that adds it
+2	logs hat use on new comment
+2	logs in with email and correct password
+2	logs in with username and correct password
+2	logs moderations properly
+4	logs modification in moderation log
+4	logs on create
+4	logs on update
+2	logs tag additions from user suggestions properly
+2	markdown to raw
+2	marks link as current if period matches
+2	marks link as current when both page and time suffix
+2	marks link as current when it removes the period
+2	marks link as current when page suffix
+2	marks link as current when time suffix
+2	marks the message's notification as read
+2	marks the message's notification as unread
+2	marks the notification and associated message as read
+2	marks the notification as read even if notification is not displayed
+2	merged stories
+2	merging Origins deduplicates
+2	message notifications
+2	messages
+2	mod deleting a story
+2	mod editing a story
+2	mod mail message notifications
+2	mod undeleting a story
+2	mod-only routes
+2	mod_mail_messages
+4	moderation should be created
+2	moves the Stories onto one Origin and deletes the empty
+2	must have at least one tag
+2	negated rule
+2	neutralizes karma and upvote when unvoting an upvote
+2	never shows emails to visitors
+2	new user resubmitting a link
+2	new user submitting an unseen domain
+2	new user submitting with a tag not permitted for new users
+2	newest
+2	newest stories
+2	newest_by_user
+2	no filter checkbox is shown
+2	non-existent tag raises error
+2	non-existent tag with existing tag raises an error
+2	non-unique existing tags raises an error
+96	normalizes
+2	notifies story creator upon auto-accepted suggestion
+2	old-style to tilde
+2	only Links once from a comment to a comment
+2	only Links once from a comment to a url
+2	only selects tagged stories
+2	origin
+2	origins_ban#update
+2	page cache path traversal
+2	parse trees
+2	parses
+8	parses N-character words
+2	parses a search that uses a few stopwords
+2	parses a shortword and a term
+2	parses a stopword
+2	parses a stopword and a term
+2	parses a stopword followed by whitespace
+2	parses a tag and a term
+2	parses a tag and term
+2	parses a term and a tag
+2	parses a term and tag
+2	parses an exploit engine search
+2	parses complex searches
+2	parses contractions
+2	parses dash
+2	parses domain properly
+2	parses exotic tld
+2	parses multi-word
+2	parses multiple tags
+4	parses multiple terms
+2	parses multiple words
+2	parses multiword quotes
+2	parses numbers
+2	parses plus
+2	parses punctuation stripped from terms
+2	parses quotes
+2	parses short tld
+2	parses shortwords
+2	parses simple markdown
+8	parses single
+2	parses single words
+2	parses snake case
+2	parses subdomains
+2	parses submitters, dropping @ or ~
+2	parses terms and quotes
+2	parses terms with numbers
+2	parses terms with undescores
+4	parses urls
+4	parses username
+6	parses with @
+2	parses with URLs
+6	parses with ~
+2	parses word in quotes
+2	posting a comment
+2	posting a comment with a hat
+2	prevents SQL injection in multi-word quoted searches
+4	previewing
+2	privileged tag
+2	prompts user to start a conversation
+2	puts https CSP header
+2	queues jobs to rerender all stories
+2	quoted rule
+2	raise the ArgumentError exception when inveral unit value is invalid
+2	raises RecordNotFound error when unknown category has been passed
+2	raises errors that are internal to Sponge
+2	re-points the Domain when the identifier changes
+8	reading a story
+2	reading homepage
+2	reading merged stories
+2	reading mod-deleted stories
+2	reading saved stories
+2	recent
+2	recently_invited_by
+2	recognizes a #c_abcN link to a site comment
+2	recognizes a link to a site story by short id
+2	recognizes a link to a site story by title url
+2	recognizes a short link to a site comment
+2	records a Username
+2	records a moderation log when the username changes
+2	recreate_from_comment!
+2	recreate_from_story!
+2	redirects /c/shortid to merged stories with anchor
+2	redirects /c/shortid to the story with anchor
+2	redirects /s/short_id to include title slug
+2	redirects /s/short_id to include title slug when Accept is */*
+2	redirects /stories/:id to the canonical URL
+2	redirects /top/:length/rss to /top/:length.rss
+2	redirects attempts to load an identifier from a domain url
+2	redirects default length path maintaining format
+2	redirects links
+2	redirects old singular routes
+2	redirects old/wrong title slugs to current
+2	redirects to correct-case user page
+2	redirects to correct-case user standing page
+2	redirects to default length path
+2	redirects to latest subsmission of the given url
+2	redirects to the created mod_mail_message
+4	redirects to the login page
+2	redirects to the merged story's json
+2	redirects users to submit
+2	refuses an encoded . that would change the extension
+2	refuses an encoded ../ that would overwrite another page's cache file
+2	refuses an encoded ../ that would write a sibling of another page's cache file
+2	refuses an encoded / that would add a directory
+2	refuses literal dot segments
+2	rejecting hat request
+2	removes every cached copy of the story page
+2	removes old Links
+2	removes redundant http port N and https port N
+2	removes ref tracking parameter
+2	removes short words that mariadb would ignore
+2	removes upvote when downvoting an upvote
+2	removes utm_ tracking parameters
+4	renders
+2	renders HTML page successfully for N week
+2	renders N on mismatched headers
+2	renders a response with N status (i.e. to display the 'edit' template)
+2	renders a response with N status (i.e. to display the 'new' template)
+8	renders a successful response
+2	renders a top-level comment without ancestors
+2	renders the hidden page
+2	renders them root-first
+2	renders them root-first with the direct parent above the form
+2	reparenting
+2	reparents the user and logs it
+2	replaces a user's suggestion when they suggest again
+2	replaces empty input with placeholder
+2	replaces invalid input with placeholder
+2	replying
+2	requires a url or a description
+2	requires mod
+2	resets if token matches
+2	respects inbox_mentions setting for mention notifications
+2	resubmitting a recent link
+2	resubmitting a recent link deleted by a moderator
+2	resubmitting an old link
+2	results in a link, not an image
+2	results in an image, not a link
+4	return correct score
+2	returns HTML data for page N with N week length
+2	returns N
+2	returns N for existing domains
+2	returns N for non-existent domain
+2	returns N for non-xhr request
+2	returns N for xhr request
+2	returns RSS feed for page N with N week length
+2	returns RSS feed successfully for N week
+2	returns a link that routes to the RSS feed
+2	returns a story merged into an existing one
+2	returns all subsmissions of the given url
+2	returns an error when story URL is missing
+2	returns ancestors root-first
+2	returns false if the story has positive score
+2	returns false if the story is moderated
+2	returns false if the user isn't banned
+2	returns formatted score for integer scores
+2	returns nil for non-integer scores
+2	returns no matches if no matching URL
+2	returns no matches if previously submitted URL is only partial match
+2	returns nothing when initialized empty
+2	returns only one story without tag
+2	returns previous discussions for an existing story
+2	returns similar story matching URL
+2	returns stories for a domain
+4	returns successfully
+6	returns the file path with html extension
+2	returns the first few words if the link is not present
+2	returns the image inline
+2	returns the newest stories that have not yet reached the front page
+4	returns the right number of pages
+2	returns the same file path
+2	returns true
+2	returns true when the story was removed by heavy flagging of banned user
+2	returns true when trying to submit a URL that's been submitted w/o an anchor in it
+2	returns true when trying to submit a URL that's been submitted with an anchor in it
+2	returns two stories
+2	rolls session token
+2	routes /top
+2	routes /top.rss
+2	routes /top/Nw
+2	routes /top/Nw.rss
+2	routes /top/Nw/page/N
+2	routes a domain
+2	routes a domain rss feed
+2	routes a single origin
+2	routes a single tag
+2	routes a single tag rss feed
+2	routes a single tag, page N
+2	routes multiple tags
+2	routes multiple tags rss feed
+2	routes multiple tags, page N
+2	routes the c++ tag
+2	routes title_path with anchor
+2	routes to comments with anchors
+2	routes to stories with titles as slugs
+2	routing hassle with unsupported formats #N and #N
+4	rss
+2	rss redirects
+2	runs
+2	runs the sqliteN cli built in the gem, not the OS one
+2	santizes email addresses
+2	saved
+4	schedules a notification job
+2	scopes
+2	sees stories that were merged into others' stories
+2	sees their own deleted stories
+2	sees their own stories merged into a story they submitted
+2	sees their stories
+2	selects stories from the given interval
+2	selects unique stories based on categories
+2	selects unique tagged stories
+2	send invalid arguments to service class interfaces #incremented_value_for
+2	send invalid arguments to service class interfaces #put
+2	send valid arguments to service class interfaces #incremented_value_for
+2	send valid arguments to service class interfaces #put
+2	sends mention notification
+2	sends only reply notification on reply with mention
+2	sends reply notification
+2	serves the fallback logo
+2	sets hats on messages
+2	sets reply-to the mod's email
+2	sets the url properly
+2	short_id redirection
+2	shortword rule
+2	should also update the merged_into_story's comment count
+2	should be banned
+2	should be unbanned
+2	should display all ModMail messages
+2	should display all messages
+2	should display for comments on stories with more upvotes than flags
+2	should display for comments with all other parent comments
+2	should display for other comments
+6	should get a short id
+4	should have moderation
+2	should not be enabled
+2	should not display for comments on stories with more flags than upvotes
+2	should not display for comments with more flags than upvotes
+2	should not display for comments with parent comments that are deleted
+2	should not display for comments with parent comments that are moderated
+2	should not display for comments with parent comments with more flags than upvotes
+2	should not display for deleted comments
+2	should not display for moderated comments
+2	should not display if the recipient has filtered the story tag
+2	should not display if the recipient has flagged any comment belonging to the author
+2	should not display if the recipient has hidden the story
+2	should not raise any errors when
+2	should only return comments matching all tags if multiple are present
+2	should only return comments with stories in domain if domain present
+2	should raise error when
+2	should return only stories with both tags if multiple tags are present
+2	should work
+2	should_display?
+2	show
+2	show user
+2	shows 'new user' class and aria-label for new, unrelated user
+2	shows 'removed' to visitors
+2	shows a merge icon for merged stories
+2	shows a user is active or not
+2	shows a user is banned or not
+2	shows a user is recent or not
+2	shows all by default
+2	shows all moderator actions when selected
+2	shows all when selected
+2	shows an empty page without error
+2	shows an error if the email can't be sent
+2	shows comments from merged story
+2	shows comments from merged_into story
+2	shows comments, most-recent first
+2	shows disown in story page
+2	shows entries matching the filters
+2	shows invited indication for new, invited user
+2	shows merged story at the top
+2	shows mod log to logged-in user
+2	shows moderation but not title/link to other users
+2	shows moderator actions when selected
+2	shows modmails
+2	shows only saved stories
+2	shows previews if the user wants
+2	shows recent, unhidden stories
+2	shows stories for categories only
+2	shows stories, most-recent first
+2	shows the first page
+4	shows the page ignoring extra params
+2	shows the user name as a link for normal users
+2	shows to recipient
+2	shows user actions when selected
+2	shows whether a story was removed by a submitter or moderator
+2	simple markdown
+2	skips large images
+2	speed limit
+2	starts reset process
+2	starts reset process for deactivated users
+2	still caches the root path as index
+2	still unescapes other characters
+2	stopwords
+2	story removed by moderator
+2	story removed by submitter
+2	strips HTML tags besides the link
+2	strips HTML tags wrapping the link
+2	strips the quote from top-posting
+2	strips unpaired, invalid HTML tags
+2	submitter rule
+2	submitting a banned domain
+2	submitting a link
+2	submitting an inline image
+2	subtracts karma if mod intervenes
+2	suggestions
+2	supports legacy domain: syntax
+2	supports session-based access
+2	supports token-based access
+2	sweeps cached copies at old slugs after a title edit
+2	sweeps stale copies cached at short_id redirect with format rails shouldn't even be serving
+2	tag isn't shown
+2	tag rule
+2	tagged
+2	takes a selector and replacement to generate an origin identifier
+2	tattling on logged-in users who visit invite URLs
+2	tells if a user is a heavy self promoter
+2	term rule
+2	the user can filter the privileged tag
+2	threads
+2	throws a N when URL is empty
+2	throws a N when URL parameter is missing
+2	title rule
+4	top
+2	tree
+2	truncates the story cache field
+2	trying to delete old comments
+2	trying to disown non-deletable story
+2	trying to disown not owned stories
+2	trying to disown recent comments
+2	turns @UserName into a link if @username exists
+2	turns @username into a link if @username exists
+2	turns all inline images into links
+2	turns inline image into links with alt text
+2	turns inline image into links with the url as the default text
+2	turns inline image into links with title text
+2	turns inline image into links, preferring title text
+2	turns ~UserName into a link if ~username exists
+2	turns ~username into a link if ~username exists
+6	unban
+2	unbanning
+2	unbans  origin with valid params
+2	unbans a user
+2	unbans domain when the reason is blank
+2	unbans domain with valid params
+2	uncertain
+2	undelete a story
+2	unhiding a story
+4	update
+2	update_score_and_recalculate
+2	updates Origins on existing Stories if selector changes
+2	updates domains with selectors
+2	updates tags with valid params
+2	updates the requested mod_mail
+2	updates with all permitted params
+2	updating password
+2	upvote merged story comments
+2	upvoter_score
+4	upvoting
+2	upvoting a story and flags
+2	url links
+2	url rule
+2	url validation
+2	url=
+2	user rule
+2	user standing
+2	user tree
+2	user votes on merged story
+2	username case mismatch
+2	users don't see others' deleted stories
+2	users#show
+2	users#tree
+2	uses dark color scheme and high contrast
+2	uses dark color scheme and normal contrast
+2	uses dark color scheme and system contrast
+2	uses light color scheme and normal contrast
+2	uses light color scheme and system contrast
+2	uses system color scheme and high contrast
+2	uses system color scheme and normal contrast
+4	uses system color scheme and system contrast
+30	validates
+2	validates a moderation linked to exactly one object
+2	validates the length of action
+2	validates the length of markeddown_comment
+2	validates the length of markeddown_note
+2	validates the length of note
+2	validates the length of reason
+4	validates the length of short_id
+2	validates the presence of markeddown_note
+2	validates the presence of note
+4	validations
+2	viewing one tag at a time
+2	viewing two tags
+2	viewing user's threads
+2	visiting a merged story individual hidden stories
+2	visiting homepage
+2	visiting story hidden by current user and another user
+2	visiting story hidden by other user
+2	wanted property 'field-sizing' is not yet Baseline widely available
+2	wanted property 'resize' is not yet Baseline widely available
+2	wanted property_value 'appearance: base-select' is not yet Baseline widely available
+2	when accessing RSS feeds
+2	when filtering entries by moderator
+2	when filtering entries by type
+2	when filtering with no matching results
+2	when images are allowed
+2	when images are not allowed
+2	when linking to RSS feeds
+8	when logged in
+8	when logged out
+2	when moderator viewing
+2	when no user
+2	when score is N
+2	when single inline image in description
+2	when story is available
+2	when story is deleted
+2	when submitter is viewing their own stories
+2	when the image does not exist
+2	when the image exists
+2	when the story is deleted
+2	when the story is not deleted
+2	when the user is a moderator
+2	when user can see the score
+2	when user cannot see the score
+2	when user does not a moderator
+2	when user is a moderator
+2	when user is authenticated
+2	when user is moderator
+2	when user is not authenticated
+2	wiped accounts
+2	with a conversation starter works
+2	with a filename longer than filesystem can handle
+2	with a html extension
+2	with a merged_into_story
+2	with a non-html extension
+2	with a story with the tag
+2	with a trailing slash
+2	with alt text
+2	with dark color scheme and high contrast
+2	with dark color scheme and normal contrast
+2	with dark color scheme and system contrast
+2	with extra params specified
+2	with fewer entries than two pages
+10	with invalid parameters
+2	with light color scheme and high contrast
+2	with light color scheme and normal contrast
+2	with light color scheme and system contrast
+2	with more entries
+2	with multiple inline images in description
+2	with negative base
+2	with no alt text, title text
+2	with no preferences set
+2	with percent-encoded path traversal
+2	with positive base
+2	with rss extension
+2	with system color scheme and high contrast
+2	with system color scheme and normal contrast
+2	with title text
+2	with title text and alt text
+2	with unicode
+8	with valid parameters
+2	without a comment doesn't work
+4	works
+2	works even if the comment is flagged
+2	works logged in, with vote hydration
+2	works with js
+2	works without js
+2	writes the rendered page to the cache
+2	you_invited

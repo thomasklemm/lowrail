@@ -1,0 +1,11 @@
+plain exit 0 wall 23.724351446 at 13:57:35
+profiled exit 0 wall 69.382472097 at 13:58:45
+plain.log: 830 distinct outcomes, 830 lines; 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: 830 distinct outcomes, 1660 lines; 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips | 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: identical to plain (each of 830 outcomes in both runs)
+plain exit 0 wall 24.307846678 at 14:02:28
+plain exit 0 wall 23.389444326 at 14:04:00
+profiled exit 0 wall 69.920040013 at 14:05:10
+plain.log: 830 distinct outcomes, 830 lines; 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: 830 distinct outcomes, 1660 lines; 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips | 833 runs, 5149 assertions, 0 failures, 0 errors, 0 skips
+profiled.log: identical to plain (each of 830 outcomes in both runs)

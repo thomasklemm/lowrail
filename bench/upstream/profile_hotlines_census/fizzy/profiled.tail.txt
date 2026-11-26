@@ -1,0 +1,40 @@
+| gem: sqlite3 | 142.6 | 143.5 | `statement.rb:125` 47.6, `statement.rb:54` 32.5, `statement.rb:186` 16.7 |
+| gem: propshaft | 118.3 | 584.7 | `asset.rb:40` 64.8, `dynamic.rb:11` 32.4, `asset.rb:58` 8.1 |
+| gem: logger | 84.1 | 84.4 | `log_device.rb:152` 24.3, `log_device.rb:38` 24.3, `logger.rb:673` 23.4 |
+| app | 71.0 | 106.7 | `events_helper.rb:41` 9.3, `role.rb:8` 2.1, `avatars_helper.rb:20` 1.6 |
+| gem: erubi | 69.5 | 71.0 | `erubi.rb:134` 39.9, `erubi.rb:137` 8.6, `erubi.rb:139` 5.1 |
+| gem: rack | 67.1 | 76.3 | `request.rb:693` 9.8, `utils.rb:408` 6.1, `body_proxy.rb:12` 3.9 |
+| gem: tzinfo | 66.4 | 92.3 | `timestamp.rb:208` 25.5, `timestamp.rb:193` 18.3, `constant_offset_data_timezone_info.rb:52` 14.6 |
+| ruby default gem: uri | 64.0 | 65.7 | `common.rb:422` 15.6, `common.rb:415` 12.0, `common.rb:83` 5.8 |
+| ruby stdlib | 61.6 | 2193.2 | `ipaddr.rb:725` 9.9, `formatter.rb:174` 8.1, `bundled_gems.rb:111` 4.4 |
+| gem: debug | 40.0 | 51.3 | `thread_client.rb:901` 10.2, `thread_client.rb:234` 10.2, `thread_client.rb:224` 5.1 |
+| gem: concurrent-ruby | 39.4 | 41.4 | `safe_initialization.rb:30` 7.5, `non_concurrent_map_backend.rb:131` 5.2, `mutex_lockable_object.rb:33` 4.5 |
+| gem: globalid | 25.7 | 27.3 | `gid.rb:91` 5.8, `gid.rb:155` 5.8, `gid.rb:162` 2.3 |
+| gem: importmap-rails | 20.4 | 231.7 | `importmap_tags_helper.rb:34` 17.0, `importmap_tags_helper.rb:20` 0.8, `importmap_tags_helper.rb:21` 0.4 |
+| gem: turbo-rails | 17.7 | 20.9 | `stream_name.rb:26` 3.6, `frames_helper.rb:42` 3.4, `stream_name.rb:28` 1.6 |
+| gem: json | 13.1 | 13.4 | `common.rb:221` 8.1, `common.rb:305` 3.8, `common.rb:824` 1.1 |
+| gem: nokogiri | 9.8 | 11.3 | `node.rb:66` 1.8, `document.rb:415` 1.6, `node.rb:1378` 1.2 |
+| rails: railties | 8.9 | 9.4 | `logger.rb:57` 2.0, `engine.rb:748` 1.0, `logger.rb:42` 1.0 |
+| gem: base64 | 8.7 | 8.9 | `base64.rb:274` 6.3, `base64.rb:298` 2.0, `base64.rb:359` 0.5 |
+| gem: bootsnap | 8.3 | 18.6 | `iseq.rb:53` 3.6, `kernel_require.rb:11` 1.1, `cache.rb:221` 0.9 |
+| gem: bcrypt | 7.6 | 7.9 | `password.rb:93` 2.7, `password.rb:94` 1.3, `engine.rb:70` 1.3 |
+| rails: activestorage | 5.9 | 9.5 | `model.rb:128` 1.1, `model.rb:284` 0.7, `model.rb:144` 0.6 |
+| gem: i18n | 5.4 | 10.0 | `ruby.rb:33` 1.2, `utils.rb:8` 1.1, `i18n.rb:366` 0.9 |
+| rails: activejob | 4.4 | 6.9 | `log_subscriber.rb:207` 0.7, `enqueuing.rb:62` 0.3, `log_subscriber.rb:23` 0.3 |
+| gem: zeitwerk | 3.8 | 5.7 | `explicit_namespace.rb:61` 1.5, `inflector.rb:16` 1.0, `cref.rb:44` 0.3 |
+| gem: rack-session | 2.9 | 3.0 | `id.rb:277` 1.0, `id.rb:275` 1.0, `id.rb:401` 0.6 |
+| gem: loofah | 2.6 | 3.0 | `scrubber.rb:132` 1.0, `concerns.rb:172` 0.6, `concerns.rb:43` 0.6 |
+| ruby default gem: securerandom | 1.9 | 1.9 | `securerandom.rb:71` 1.9 |
+| gem: useragent | 1.7 | 12.3 | `version.rb:27` 0.5, `user_agent.rb:25` 0.2, `user_agent.rb:24` 0.1 |
+| gem: rails-html-sanitizer | 1.0 | 1.3 | `sanitizer.rb:29` 0.2, `sanitizer.rb:52` 0.2, `sanitizer.rb:187` 0.2 |
+| rails: actioncable | 0.5 | 1.7 | `broadcasting.rb:53` 0.1, `test.rb:24` 0.1, `subscriber_map.rb:9` 0.1 |
+| gem: marcel | 0.2 | 0.5 | `magic.rb:18` 0.1, `mime_type.rb:81` 0.0, `mime_type.rb:90` 0.0 |
+| gem: redcarpet | 0.2 | 0.2 | `render_strip.rb:40` 0.2 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:66` 0.0, `profile.rb:56` 0.0 |
+| ruby default gem: prism | 0.0 | 1427.8 | `node.rb:16795` 0.0, `node.rb:18058` 0.0, `node.rb:2897` 0.0 |
+| gem: nio4r | 0.0 | 0.6 | `nio4r_ext.so:0` 0.0, `nio.rb:21` 0.0, `nio.rb:0` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:192` 0.0 |
+| gem: msgpack | 0.0 | 0.4 | `factory.rb:29` 0.0, `factory.rb:9` 0.0, `bigint.rb:0` 0.0 |
+| rails: actiontext | 0.0 | 0.9 | `content.rb:24` 0.0, `content.rb:27` 0.0, `engine.rb:72` 0.0 |
+| gem: jbuilder | 0.0 | 0.6 | `jbuilder_dependency_tracker.rb:0` 0.0, `jbuilder.rb:71` 0.0, `jbuilder.rb:15` 0.0 |
+lowrail-profile: report in /home/user/hl-out/fizzy/profiled/report.md

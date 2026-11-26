@@ -1,0 +1,40 @@
+Message::SearchableTest#test_rich_text_body_is_converted_to_plain_text_for_indexing = 0.01 s = .
+Message::SearchableTest#test_saving_a_new_body_replaces_the_old_words_in_the_index = 0.03 s = .
+Message::SearchableTest#test_message_body_is_indexed_and_searchable = 0.02 s = .
+Message::SearchableTest#test_the_last_page_of_matches_holds_the_newest_ones,_read_off_the_index_without_sorting_every_match = 0.02 s = .
+MessagesHelperTest#test_message_presentation_shows_an_image_in_the_rich_text_as_a_file_even_when_its_preview_was_made = 0.07 s = .
+MessagesHelperTest#test_message_presentation_shows_a_video_whose_poster_wasn't_made_without_one,_rather_than_making_it_on_view = 0.09 s = .
+MessagesHelperTest#test_linking_text_doesn't_eat_a_code_block's_leading_blank_line = 0.00 s = .
+MessagesHelperTest#test_message_presentation_shows_an_image_in_the_rich_text_as_a_file,_rather_than_making_its_preview_on_view = 0.03 s = .
+MessagesHelperTest#test_plain_text_presentation_is_reused_by_content_rather_than_database_epoch = 0.01 s = .
+MessagesHelperTest#test_message_presentation_leaves_URLs_and_email_addresses_in_attribute_values_as_they_are = 0.05 s = .
+MessagesHelperTest#test_message_presentation_shows_a_video_whose_frame_was_drawn_but_whose_poster_wasn't_made_without_one = 0.22 s = .
+MessagesHelperTest#test_message_presentation_neutralizes_unsafe_URI_schemes_in_links = 0.01 s = .
+MessagesHelperTest#test_message_presentation_gives_a_video_the_poster_made_when_it_was_posted = 0.27 s = .
+MessagesHelperTest#test_message_presentation_shows_a_video_in_the_rich_text_as_a_file = 0.04 s = .
+MessagesHelperTest#test_message_presentation_preserves_safe_links_and_formatting = 0.01 s = .
+MessagesHelperTest#test_message_presentation_links_URLs_and_email_addresses_in_text = 0.01 s = .
+MessagesHelperTest#test_message_presentation_shows_an_image's_thumbnail_made_when_it_was_posted = 0.05 s = .
+MessagesHelperTest#test_message_presentation_links_an_email_address_with_an_apostrophe_whole = 0.01 s = .
+MessagesHelperTest#test_message_presentation_links_an_image_whose_thumbnail_wasn't_made,_rather_than_making_it_on_view = 0.02 s = .
+MessagesHelperTest#test_message_presentation_leaves_an_existing_link's_text_alone = 0.01 s = .
+MessagesHelperTest#test_message_presentation_strips_event_handler_attributes_from_allowed_tags = 0.01 s = .
+RoomsControllerTest#test_show_renders_an_unfurled_link_preview = 0.09 s = .
+RoomsControllerTest#test_destroy_takes_the_room_away_from_its_members_at_once_and_leaves_its_messages_to_a_job = 0.02 s = .
+RoomsControllerTest#test_shows_records_the_last_room_visited_in_a_cookie = 0.03 s = .
+RoomsControllerTest#test_destroy_only_allowed_for_creators_or_those_who_can_administer = 0.05 s = .
+RoomsControllerTest#test_destroy = 0.03 s = .
+RoomsControllerTest#test_show_renders_notification_help_for_each_platform = 0.12 s = .
+RoomsControllerTest#test_show = 0.03 s = .
+RoomsControllerTest#test_show_renders_a_link_preview_written_by_hand_without_its_image_pointed_at_this_Campfire = 0.09 s = .
+RoomsControllerTest#test_show_renders_a_link_preview_written_by_hand_without_its_off-scheme_image_and_link = 0.11 s = .
+RoomsControllerTest#test_index_redirects_to_the_user's_last_room = 0.02 s = .
+RecordCacheTest#test_observer_is_rechecked_after_a_snapshot_lookup = 0.01 s = .
+RecordCacheTest#test_a_commit_while_loading_records_prevents_admission_under_the_old_epoch = 0.01 s = .
+RecordCacheTest#test_disabled_budget_missing_epoch_and_open_transactions_always_query_and_never_admit = 0.01 s = .
+RecordCacheTest#test_foreign_commit_makes_an_old_captured_epoch_query_fresh_records_instead_of_reusing_a_snapshot = 0.01 s = .
+RecordCacheTest#test_hits_reconstruct_independent_persisted_models_without_losing_raw_timestamps_or_enum_values = 0.01 s = .
+Users::PushSubscriptionsControllerForeignWriteTest#test_a_subscription_another_connection_registers_while_this_one_validates_isn't_registered_twice = 0.03 s = .
+
+Finished in 35.176199s, 18.0236 runs/s, 109.6196 assertions/s.
+634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips

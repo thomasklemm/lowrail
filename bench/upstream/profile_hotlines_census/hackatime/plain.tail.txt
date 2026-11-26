@@ -1,0 +1,40 @@
+Api::Admin::V1::OauthAdminAuthTest#test_rejects_oauth_token_without_admin_scope = 0.01 s = .
+Api::Admin::V1::OauthAdminAuthTest#test_rejects_oauth_admin_token_after_demotion = 0.01 s = .
+Api::Admin::V1::OauthAdminAuthTest#test_viewer_oauth_token_can_access_admin_check = 0.02 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_skips_authorization_when_matching_token_exists = 0.04 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_renders_error_for_invalid_client_id = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_create_allows_admin_to_authorize_a_verified_confidential_application_with_admin_scope = 0.03 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_renders_error_for_invalid_client_id_without_a_scope = 0.04 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_show_renders_OAuthAuthorize/Show_with_code = 0.04 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_allows_admin_requesting_admin_scope = 0.06 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_renders_OAuthAuthorize/New_for_authorizable_request = 0.04 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_denies_unverified_applications_requesting_admin_scope = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_create_denies_unverified_applications_requesting_admin_scope = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_redirects_unauthenticated_user_to_sign_in = 0.01 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_redirects_unauthenticated_user_to_HCA_sign_in_when_application_requires_it = 0.01 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_denies_applications_without_an_explicitly_configured_admin_scope = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_denies_non-admin_users_requesting_admin_scope = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_denies_public_applications_requesting_admin_scope = 0.05 s = .
+CustomDoorkeeperAuthorizationsControllerTest#test_new_allows_viewer_requesting_admin_scope_with_warning_prop = 0.05 s = .
+HeartbeatTest#test_creating_a_heartbeat_schedules_a_dashboard_rollup_refresh = 0.01 s = .
+HeartbeatTest#test_attributed_durations_by_sums_to_total_duration_when_every_heartbeat_has_the_field = 0.01 s = .
+HeartbeatTest#test_soft_delete_hides_record_from_default_scope_and_restore_brings_it_back = 0.01 s = .
+HeartbeatTest#test_attributed_durations_by_excludes_NULL/blank_field_values_without_inventing_an_Unknown_bucket = 0.01 s = .
+HeartbeatTest#test_daily_streaks_use_UTC_for_a_missing_timezone_and_preserve_each_user's_day_boundaries = 0.09 s = .
+HeartbeatTest#test_daily_streak_cache_is_separated_for_browser-filtered_leaderboard_streaks = 0.02 s = .
+LeaderboardShadowbanExpirationJobTest#test_ignores_already_removed_shadowbans = 0.01 s = .
+LeaderboardShadowbanExpirationJobTest#test_ignores_stale_expiration_jobs_for_a_later_shadowban_expiration = 0.02 s = .
+LeaderboardShadowbanExpirationJobTest#test_removes_an_expired_leaderboard_shadowban = 0.02 s = .
+SettingsImportsExportsControllerTest#test_deferred_data_export_reload_does_not_clobber_user_props = 0.05 s = .
+SettingsImportsExportsControllerTest#test_imports_&_exports_page_omits_remote_cooldown_for_superadmins = 0.04 s = .
+SettingsImportsExportsControllerTest#test_imports_&_exports_page_refreshes_stale_remote_imports = 0.05 s = .
+AnonymizeUserServiceTest#test_anonymization_soft_deletes_active_heartbeats = 0.02 s = .
+AnonymizeUserServiceTest#test_anonymization_clears_profile_identity_fields = 0.02 s = .
+AnonymizeUserServiceTest#test_anonymization_destroys_goals = 0.02 s = .
+AnonymizeUserServiceTest#test_anonymization_removes_api_keys_and_sign-in_tokens = 0.02 s = .
+AnonymizeUserServiceTest#test_anonymization_removes_legacy_encrypted_import_credentials = 0.01 s = .
+Cache::ActiveProjectsJobTest#test_excludes_heartbeats_older_than_the_recent_window_and_non-direct_source_types = 0.02 s = .
+Cache::ActiveProjectsJobTest#test_returns_the_most_recent_active_project_per_user_and_excludes_soft-deleted_heartbeats = 0.02 s = .
+
+Finished in 36.884170s, 21.5269 runs/s, 96.0032 assertions/s.
+794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips

@@ -1,0 +1,2122 @@
+12	DELETE #destroy
+2	DELETE /admin/accounts/:account_id/follow_recommendations/suppression
+2	DELETE /admin/accounts/:account_id/trends/approval
+2	DELETE /admin/accounts/:id
+4	DELETE /admin/ignored_server_checks/:key
+4	DELETE /admin/roles/:id
+2	DELETE /api/fasp/data_sharing/vN/event_subscriptions/:id
+2	DELETE /api/vN/admin/accounts/:id
+2	DELETE /api/vN/admin/canonical_email_blocks/:id
+2	DELETE /api/vN/admin/domain_allows/:id
+2	DELETE /api/vN/admin/domain_blocks/:id
+2	DELETE /api/vN/admin/email_domain_blocks
+2	DELETE /api/vN/admin/ip_blocks/:id
+2	DELETE /api/vN/announcements/:announcement_id/reactions/:id
+2	DELETE /api/vN/collections/:collection_id/items/:id
+2	DELETE /api/vN/collections/:id
+2	DELETE /api/vN/domain_blocks
+2	DELETE /api/vN/featured_tags
+4	DELETE /api/vN/filters/:id
+2	DELETE /api/vN/filters/keywords/:id
+2	DELETE /api/vN/filters/statuses/:id
+2	DELETE /api/vN/lists/:id
+2	DELETE /api/vN/lists/:id/accounts
+2	DELETE /api/vN/media/:id
+2	DELETE /api/vN/profile/avatar
+2	DELETE /api/vN/profile/header
+2	DELETE /api/vN/push/subscription
+2	DELETE /api/vN/statuses/:id
+2	DELETE /api/vN/suggestions/:id
+2	DELETE /api/web/push_subscriptions/:id
+2	DELETE /auth/sign_out
+2	DELETE /oauth/applications/:id
+2	DELETE /oauth/authorized_applications/:id
+2	DELETE /settings/delete
+2	DELETE /settings/profile/pictures/:id
+2	DELETE /settings/sessions/:id
+2	Downloads a user backup
+4	GET #edit
+2	GET #export
+2	GET #failures
+30	GET #index
+2	GET #items
+18	GET #new
+28	GET #show
+4	GET /@:account_username/:id
+2	GET /@:account_username/wrapstodon/:year/:share_key
+2	GET /@:username_with_domain
+2	GET /accounts/:account_username/quote_authorizations/:quote_id
+2	GET /accounts/:account_username/statuses/:status_id/likes
+2	GET /accounts/:account_username/statuses/:status_id/shares
+2	GET /actor
+2	GET /admin/accounts/:account_id/collections/
+2	GET /admin/accounts/:account_id/collections/:id
+2	GET /admin/export_domain_allows/export.csv
+2	GET /admin/instances/:id
+2	GET /admin/ip_blocks
+2	GET /admin/reports
+2	GET /admin/reports/:id
+2	GET /admin/roles
+4	GET /admin/roles/:id/edit
+2	GET /admin/roles/new
+4	GET /admin/server_checks
+2	GET /admin/username_blocks
+2	GET /admin/username_blocks/:id/edit
+2	GET /admin/username_blocks/new
+2	GET /admin/users/:user_id/role
+2	GET /ap/:account_id/collections/:id
+2	GET /ap/accounts/:account_id/feature_authorizations/:collection_item_id
+2	GET /ap/users/@:account_id/collection_items/:id
+2	GET /ap/users/@:account_id/featured_collections
+2	GET /api/oembed
+2	GET /api/vN/accounts/:account_id/collections
+2	GET /api/vN/accounts/:account_id/endorsements
+2	GET /api/vN/accounts/:account_id/following
+2	GET /api/vN/accounts/:account_id/statuses
+2	GET /api/vN/accounts/:acount_id/followers
+2	GET /api/vN/accounts/:id
+2	GET /api/vN/accounts/:id/featured_tags
+2	GET /api/vN/accounts/familiar_followers
+2	GET /api/vN/accounts/identity_proofs
+2	GET /api/vN/accounts/lists
+2	GET /api/vN/accounts/lookup
+2	GET /api/vN/accounts/search
+2	GET /api/vN/accounts/verify_credentials
+2	GET /api/vN/accounts?id[]=:id
+2	GET /api/vN/admin/accounts
+2	GET /api/vN/admin/accounts/:id
+2	GET /api/vN/admin/canonical_email_blocks
+2	GET /api/vN/admin/canonical_email_blocks/:id
+2	GET /api/vN/admin/dimensions
+2	GET /api/vN/admin/domain_allows
+2	GET /api/vN/admin/domain_allows/:id
+2	GET /api/vN/admin/domain_blocks
+2	GET /api/vN/admin/domain_blocks/:id
+2	GET /api/vN/admin/email_domain_blocks
+2	GET /api/vN/admin/email_domain_blocks/:id
+2	GET /api/vN/admin/ip_blocks
+2	GET /api/vN/admin/ip_blocks/:id
+2	GET /api/vN/admin/measures
+2	GET /api/vN/admin/reports
+2	GET /api/vN/admin/reports/:id
+2	GET /api/vN/admin/retention
+2	GET /api/vN/admin/tags
+2	GET /api/vN/admin/tags/:id
+2	GET /api/vN/admin/trends/links
+2	GET /api/vN/admin/trends/links/publishers
+2	GET /api/vN/admin/trends/statuses
+2	GET /api/vN/admin/trends/tags
+2	GET /api/vN/announcements
+2	GET /api/vN/annual_reports
+2	GET /api/vN/annual_reports/:year/state
+2	GET /api/vN/apps/verify_credentials
+2	GET /api/vN/blocks
+2	GET /api/vN/bookmarks
+2	GET /api/vN/collections/:id
+2	GET /api/vN/conversations
+2	GET /api/vN/custom_emojis
+2	GET /api/vN/directories
+2	GET /api/vN/domain_blocks
+2	GET /api/vN/domain_blocks/preview
+2	GET /api/vN/donation_campaigns
+2	GET /api/vN/emails/check_confirmation
+2	GET /api/vN/endorsements
+2	GET /api/vN/favourites
+2	GET /api/vN/featured_tags
+2	GET /api/vN/featured_tags/suggestions
+4	GET /api/vN/filters
+2	GET /api/vN/filters/:filter_id/keywords
+2	GET /api/vN/filters/:filter_id/statuses
+4	GET /api/vN/filters/:id
+2	GET /api/vN/filters/keywords/:id
+2	GET /api/vN/filters/statuses/:id
+2	GET /api/vN/follow_requests
+2	GET /api/vN/followed_tags
+2	GET /api/vN/in_collections
+4	GET /api/vN/instance
+2	GET /api/vN/instance/activity
+2	GET /api/vN/instance/domain_blocks
+2	GET /api/vN/instance/extended_description
+2	GET /api/vN/instance/languages
+2	GET /api/vN/instance/peers
+2	GET /api/vN/instance/privacy_policy
+2	GET /api/vN/instance/rules
+2	GET /api/vN/instance/terms_of_service
+2	GET /api/vN/instance/terms_of_service/:date
+2	GET /api/vN/instances/translation_languages
+2	GET /api/vN/lists
+2	GET /api/vN/lists/:id
+2	GET /api/vN/lists/:id/accounts
+2	GET /api/vN/markers
+2	GET /api/vN/media/:id
+2	GET /api/vN/mutes
+4	GET /api/vN/notifications
+2	GET /api/vN/notifications/:group_key/accounts
+4	GET /api/vN/notifications/:id
+4	GET /api/vN/notifications/policy
+2	GET /api/vN/notifications/requests
+2	GET /api/vN/notifications/requests/merged
+4	GET /api/vN/notifications/unread_count
+2	GET /api/vN/peers/search
+2	GET /api/vN/polls/:id
+2	GET /api/vN/preferences
+2	GET /api/vN/profile
+2	GET /api/vN/push/subscription
+2	GET /api/vN/scheduled_statuses
+4	GET /api/vN/search
+6	GET /api/vN/statuses/:id
+2	GET /api/vN/statuses/:status_id/context
+2	GET /api/vN/statuses/:status_id/favourited_by
+2	GET /api/vN/statuses/:status_id/history
+2	GET /api/vN/statuses/:status_id/quotes
+2	GET /api/vN/statuses/:status_id/reblogged_by
+2	GET /api/vN/statuses/:status_id/source
+2	GET /api/vN/statuses?id[]=:id
+4	GET /api/vN/streaming
+4	GET /api/vN/suggestions
+2	GET /api/vN/tags/:id
+2	GET /api/vN/timelines/home
+2	GET /api/vN/timelines/link
+2	GET /api/vN/timelines/list/:id
+2	GET /api/vN/timelines/public
+2	GET /api/vN/timelines/tag/:hashtag
+2	GET /api/vN/trends
+2	GET /api/vN/trends/links
+2	GET /api/vN/trends/statuses
+2	GET /api/vN/trends/tags
+2	GET /api/vN_alpha/async_refreshes/:id
+2	GET /auth/confirmation
+2	GET /auth/confirmation/new
+2	GET /auth/password/edit
+2	GET /auth/sessions/security_key_options
+2	GET /auth/setup
+2	GET /collections/:id
+2	GET /css/:id.css
+2	GET /disputes/strikes/:id
+2	GET /email_subscriptions/confirmation
+2	GET /emojis/:id
+2	GET /filters
+2	GET /filters/:filter_id/statuses
+2	GET /health
+2	GET /intent
+2	GET /invites
+2	GET /manifest
+2	GET /media/:id
+2	GET /media/:medium_id/player
+2	GET /media_proxy/:id
+2	GET /oauth/applications
+2	GET /oauth/applications/:id
+2	GET /oauth/applications/:id/edit
+2	GET /oauth/applications/new
+2	GET /oauth/authorized_applications
+2	GET /oauth/userinfo
+2	GET /options #options
+2	GET /remote_interaction_helper
+2	GET /settings/application/:id
+2	GET /settings/delete
+2	GET /settings/export
+2	GET /settings/exports/blocks
+2	GET /settings/exports/bookmarks
+2	GET /settings/exports/custom_filters
+2	GET /settings/exports/domain_blocks
+2	GET /settings/exports/follows
+2	GET /settings/exports/lists
+2	GET /settings/exports/mutes
+2	GET /severed_relationships/:id/followers
+2	GET /severed_relationships/:id/following
+2	GET /tags/:id
+2	GET /users/:account_username/statuses/:id/activity
+2	GET /users/:account_username/statuses/:id/embed
+2	GET /users/:username
+2	GET /users/:username/followers
+2	GET /users/:username/following
+2	GET /users/:username/statuses/:id
+2	GET backups#download
+4	GET to /settings/two_factor_authentication_methods
+2	GET to short username paths
+2	Handles error class of ActiveRecord::RecordInvalid
+2	Handles error class of ActiveRecord::RecordNotFound
+2	Handles error class of ActiveRecord::RecordNotUnique
+2	Handles error class of Date::Error
+2	Handles error class of HTTP::Error
+2	Handles error class of Mastodon::InvalidParameterError
+2	Handles error class of Mastodon::NotPermittedError
+2	Handles error class of Mastodon::RaceConditionError
+2	Handles error class of Mastodon::RateLimitExceededError
+2	Handles error class of Mastodon::UnexpectedResponseError
+2	Handles error class of Mastodon::ValidationError
+2	Handles error class of OpenSSL::SSL::SSLError
+2	Handles error class of Seahorse::Client::NetworkingError
+2	Handles error class of name
+2	Logs out the user and redirect
+2	Logs out the user and return a page to redirect to with a JSON request
+2	PATCH #update
+2	PATCH /api/vN/accounts/update_credentials
+2	PATCH /api/vN/collections/:id
+2	PATCH /api/vN/profile
+2	PATCH /api/web/settings
+2	PATCH /oauth/applications/:id
+2	POST #approve
+2	POST #assign_to_self
+4	POST #batch
+2	POST #clear_delivery_errors
+2	POST #confirm
+26	POST #create
+2	POST #destroy
+2	POST #enable
+4	POST #import
+2	POST #memorialize
+2	POST #preview
+2	POST #redownload
+2	POST #reject
+2	POST #remove_avatar
+2	POST #reopen
+2	POST #resolve
+2	POST #restart_delivery
+2	POST #stop_delivery
+2	POST #unassign
+2	POST #unblock_email
+2	POST #unfeature
+2	POST #unfollow
+2	POST #unsensitive
+2	POST #unsilence
+2	POST #unsuspend
+2	POST /admin/account_moderation_notes
+2	POST /admin/accounts/:account_id/action
+2	POST /admin/accounts/:account_id/collections/batch
+2	POST /admin/accounts/:account_id/confirmation
+2	POST /admin/accounts/:account_id/confirmation/resend
+2	POST /admin/accounts/:account_id/follow_recommendations/suppression
+2	POST /admin/accounts/:account_id/statuses/batch
+2	POST /admin/accounts/:account_id/trends/approval
+2	POST /admin/accounts/:id/approve
+2	POST /admin/accounts/:id/enable
+2	POST /admin/accounts/:id/memorialize
+2	POST /admin/accounts/:id/redownload
+2	POST /admin/accounts/:id/reject
+2	POST /admin/accounts/:id/remove_avatar
+2	POST /admin/accounts/:id/remove_header
+2	POST /admin/accounts/:id/unblock_email
+2	POST /admin/accounts/:id/unsensitive
+2	POST /admin/accounts/:id/unsilence
+2	POST /admin/accounts/:id/unsuspend
+2	POST /admin/accounts/batch
+2	POST /admin/announcements
+2	POST /admin/custom_emojis
+2	POST /admin/domain_allows
+2	POST /admin/domain_blocks/batch
+2	POST /admin/email_domain_blocks
+2	POST /admin/email_domain_blocks/batch
+2	POST /admin/export_domain_allows/import
+2	POST /admin/export_domain_blocks/import
+4	POST /admin/ignored_server_checks/:key
+2	POST /admin/instance/moderation_notes
+2	POST /admin/invites
+2	POST /admin/ip_blocks
+2	POST /admin/ip_blocks/batch
+2	POST /admin/relays
+2	POST /admin/report_notes
+4	POST /admin/roles
+2	POST /admin/rules
+2	POST /admin/terms_of_service/generates
+2	POST /admin/trends/links/batch
+2	POST /admin/trends/links/publishers/batch
+2	POST /admin/trends/statuses/batch
+2	POST /admin/trends/tags/batch
+2	POST /admin/username_blocks
+2	POST /admin/username_blocks/batch
+2	POST /admin/warning_presets
+2	POST /admin/webhooks
+2	POST /api/fasp/data_sharing/vN/backfill_requests
+2	POST /api/fasp/data_sharing/vN/backfill_requests/:id/continuations
+2	POST /api/fasp/data_sharing/vN/event_subscriptions
+2	POST /api/fasp/debug/vN/callback/responses
+2	POST /api/fasp/registration
+2	POST /api/vN/accounts
+2	POST /api/vN/accounts/:account_id/endorse
+2	POST /api/vN/accounts/:account_id/note
+2	POST /api/vN/accounts/:account_id/unendorse
+2	POST /api/vN/accounts/:id/block
+2	POST /api/vN/accounts/:id/email_subscriptions
+2	POST /api/vN/accounts/:id/follow
+2	POST /api/vN/accounts/:id/mute
+2	POST /api/vN/accounts/:id/mute with nonzero duration set
+2	POST /api/vN/accounts/:id/mute with notifications set to false
+2	POST /api/vN/accounts/:id/remove_from_followers
+2	POST /api/vN/accounts/:id/unblock
+2	POST /api/vN/accounts/:id/unfollow
+2	POST /api/vN/accounts/:id/unmute
+2	POST /api/vN/admin/accounts/:id/action
+2	POST /api/vN/admin/accounts/:id/approve
+2	POST /api/vN/admin/accounts/:id/enable
+2	POST /api/vN/admin/accounts/:id/reject
+2	POST /api/vN/admin/accounts/:id/unsensitive
+2	POST /api/vN/admin/accounts/:id/unsilence
+2	POST /api/vN/admin/accounts/:id/unsuspend
+2	POST /api/vN/admin/canonical_email_blocks
+2	POST /api/vN/admin/canonical_email_blocks/test
+2	POST /api/vN/admin/domain_allows
+2	POST /api/vN/admin/domain_blocks
+2	POST /api/vN/admin/email_domain_blocks
+2	POST /api/vN/admin/ip_blocks
+2	POST /api/vN/admin/trends/links/:id/approve
+2	POST /api/vN/admin/trends/links/:id/reject
+2	POST /api/vN/admin/trends/links/publishers/:id/approve
+2	POST /api/vN/admin/trends/links/publishers/:id/reject
+2	POST /api/vN/admin/trends/statuses/:id/approve
+2	POST /api/vN/admin/trends/statuses/:id/unapprove
+2	POST /api/vN/admin/trends/tags/:id/approve
+2	POST /api/vN/admin/trends/tags/:id/reject
+2	POST /api/vN/announcements/:id/dismiss
+2	POST /api/vN/annual_reports/:id/generate
+2	POST /api/vN/annual_reports/:id/read
+2	POST /api/vN/apps
+2	POST /api/vN/collections
+2	POST /api/vN/collections/:collection_id/items
+2	POST /api/vN/collections/:collection_id/items/:id/revoke
+2	POST /api/vN/domain_blocks
+2	POST /api/vN/emails/confirmations
+2	POST /api/vN/featured_tags
+4	POST /api/vN/filters
+2	POST /api/vN/filters/:filter_id/keywords
+2	POST /api/vN/follow_requests/:account_id/authorize
+2	POST /api/vN/follow_requests/:account_id/reject
+2	POST /api/vN/lists
+2	POST /api/vN/lists/:id/accounts
+2	POST /api/vN/markers
+4	POST /api/vN/media
+4	POST /api/vN/notifications/:id/dismiss
+4	POST /api/vN/notifications/clear
+2	POST /api/vN/notifications/requests/:id/accept
+2	POST /api/vN/notifications/requests/:id/dismiss
+2	POST /api/vN/notifications/requests/accept
+2	POST /api/vN/notifications/requests/dismiss
+2	POST /api/vN/polls/:poll_id/votes
+2	POST /api/vN/push/subscription
+2	POST /api/vN/reports
+2	POST /api/vN/statuses
+2	POST /api/vN/statuses/:status_id/bookmark
+2	POST /api/vN/statuses/:status_id/favourite
+2	POST /api/vN/statuses/:status_id/mute
+2	POST /api/vN/statuses/:status_id/pin
+2	POST /api/vN/statuses/:status_id/quotes/:id/revoke
+2	POST /api/vN/statuses/:status_id/reblog
+4	POST /api/vN/statuses/:status_id/translate
+2	POST /api/vN/statuses/:status_id/unbookmark
+2	POST /api/vN/statuses/:status_id/unfavourite
+2	POST /api/vN/statuses/:status_id/unmute
+2	POST /api/vN/statuses/:status_id/unpin
+2	POST /api/vN/statuses/:status_id/unreblog
+2	POST /api/vN/tags/:id/feature
+2	POST /api/vN/tags/:id/follow
+2	POST /api/web/push_subscriptions
+2	POST /auth/sign_in
+2	POST /disputes/appeals
+2	POST /filters
+2	POST /filters/:filter_id/statuses/batch
+4	POST /invites
+2	POST /oauth/applications
+2	POST /oauth/revoke
+2	POST /oauth/token
+2	POST /oauth/userinfo
+2	POST /settings/aliases
+2	POST /settings/applications
+2	POST /settings/export
+2	POST /settings/featured_tags
+2	POST /settings/imports
+2	POST /settings/migration/redirect
+2	POST /settings/two_factor_authentication/confirmations
+2	POST /settings/two_factor_authentication/recovery_codes
+4	PUT #update
+2	PUT /admin/accounts/:account_id/change_email
+2	PUT /admin/follow_recommendations
+6	PUT /admin/roles/:id
+2	PUT /admin/settings/about
+2	PUT /admin/settings/branding
+2	PUT /admin/settings/external
+2	PUT /admin/settings/external with valid params
+2	PUT /admin/tags/:id
+2	PUT /admin/terms_of_service/draft
+2	PUT /admin/username_blocks/:id
+4	PUT /admin/users/:user_id/role
+2	PUT /api/vN/admin/domain_blocks/:id
+2	PUT /api/vN/admin/ip_blocks/:id
+2	PUT /api/vN/admin/reports/:id
+2	PUT /api/vN/admin/tags/:id
+2	PUT /api/vN/announcements/:announcement_id/reactions/:id
+4	PUT /api/vN/filters/:id
+2	PUT /api/vN/filters/keywords/:id
+2	PUT /api/vN/lists/:id
+2	PUT /api/vN/media/:id
+4	PUT /api/vN/notifications/policy
+2	PUT /api/vN/push/subscription
+2	PUT /api/vN/statuses/:id
+2	PUT /api/vN/statuses/:status_id/interaction_policy
+2	PUT /api/web/push_subscriptions/:id
+2	PUT /auth/password
+2	PUT /filters/:id
+2	PUT /oauth/applications/:id
+2	PUT /relationships
+2	PUT /settings/applications/:id
+2	PUT /settings/preferences/appearance
+2	PUT /settings/privacy
+2	PUT /settings/profile
+2	PUT /settings/verification
+2	PUT /statuses_cleanup
+2	Prepares the account, returns success, and sets link headers
+2	The /.well-known/node-info endpoint
+2	The /nodeinfo/N.N endpoint
+2	The follower_accounts route
+2	The following_accounts route
+4	When signed in as an admin
+2	accepts correct password
+2	accepts for_bots parameter
+2	account moderation notes
+2	account pages
+2	adds Deprecation header
+2	adds Sunset header
+2	adds a deprecation attribute request span
+2	adds a new credential to user credentials and does not change webauthn_id when creation succeeds
+4	adds account to the list
+2	adds attributes to current span
+2	after_update_redirect_path
+2	allows account in follow recommendations
+2	allows imported domains
+4	allows the profile scope
+2	allows the requesting follower to follow
+2	approves account to appear in trends
+2	approves the user successfully
+2	asking for json format
+2	assigns a new domain block
+2	assigns report to the requesting user
+2	assigns the expected imports
+2	bad_request
+2	before_action :require_functional!
+12	behaves like ActivityPub request
+8	behaves like a successful logged action
+6	behaves like a successful media upload
+10	behaves like a successful notification delivery
+12	behaves like a successful request
+6	behaves like a successful request to the link timeline
+14	behaves like a successful request to the public timeline
+12	behaves like a successful request to the tag timeline
+8	behaves like a successful response
+8	behaves like accessible logged-in endpoint
+4	behaves like all action types
+6	behaves like allowed access
+166	behaves like cachable response
+8	behaves like common HTML response
+30	behaves like common behavior
+4	behaves like default locale
+4	behaves like disallowed access
+24	behaves like error response
+14	behaves like export failed rows
+102	behaves like forbidden for disabled user
+10	behaves like forbidden for unconfirmed provider
+146	behaves like forbidden for wrong role
+334	behaves like forbidden for wrong scope
+4	behaves like general behavior for followed user
+10	behaves like generic logged out request
+8	behaves like instance actor endpoint
+8	behaves like language-dependent
+108	behaves like non-cacheable error
+160	behaves like non-cacheable response
+4	behaves like not found
+6	behaves like not found with invalid token
+6	behaves like not found with invalid type
+8	behaves like original scope request preservation
+4	behaves like registration mode based responses
+8	behaves like renders expected page
+4	behaves like returns successfully
+20	behaves like successful import
+8	behaves like successful return
+10	behaves like unauthorized for invalid token
+4	behaves like unfiltered, successful request
+16	behaves like unsuccessful import
+6	behaves like validation error
+4	behaves like when action is report
+2	blocks the domains when succeeded to save
+2	bookmarks the status successfully
+2	bookmarks the status successfully and includes updated json
+2	can update the user email
+2	can update the user password
+4	cannot create a setting value for a non-admin key
+2	changes data policy and alert settings and returns expected JSON
+2	changes existing alert settings
+2	changes languages option
+4	changes notification policy and returns an updated json object
+2	changes notify option
+2	changes reblogs option
+2	changes the block severity, silences, and suspensions
+2	changes the block severity, suspensions, and silences
+2	changes the import's state to scheduled and redirects
+2	changes the interaction policy, returns the updated status, and schedules distribution jobs
+4	clears instance delivery errors
+4	clears notifications for the account
+32	closes the report and redirects
+2	contains webfinger and activitypub urls in link header
+2	correctly updates with new interactions
+2	create a record of the callback
+2	creates Admin::ActionLog
+2	creates a blocking relation
+2	creates a collection and returns http success
+2	creates a collection item and returns http success
+2	creates a conversation mute
+2	creates a domain block
+4	creates a domain block with the expected domain name and severity
+8	creates a filter
+2	creates a follow request relation between user and target user
+2	creates a following relation between user and target user
+4	creates a marker
+2	creates a new backfill request
+2	creates a new featured tag for the requesting user
+2	creates a new provider
+2	creates a new subscription
+4	creates a new tag with the specified name
+2	creates a report
+4	creates a report and redirects to report page
+2	creates a report including the collection ids
+2	creates a report including the status ids
+2	creates a scheduled status
+6	creates a user
+2	creates a username block
+2	creates a vote
+2	creates a webauthn credential
+2	creates account_pin
+4	creates an OAuth App with the default scope
+2	creates an OAuth app
+4	creates an OAuth application with multiple redirect URIs
+2	creates an OAuth application with the website specified
+22	creates an unconfirmed bulk_import with expected type and redirects
+2	creates featured tag
+2	creates follow
+4	creates reaction
+4	creates unapproved user and redirects to setup
+2	deletes email domain block
+2	deletes selected username blocks
+2	deletes the account successfully
+2	deletes the allowed domain
+2	deletes the canonical email block
+2	deletes the collection and returns http success
+2	deletes the collection item and returns http success
+2	deletes the domain block
+2	deletes the import and redirects
+2	deletes the ip block
+2	deletes the list
+2	deletes the specified domain block
+4	deletes the subscription
+2	destroys account_pin
+2	destroys prior subscription when creating new one
+2	destroys the account
+2	destroys the conversation mute
+2	destroys the filter
+2	destroys the keyword
+6	destroys the notification
+4	destroys the reblog
+2	disables the target account
+2	discards the status and schedules removal as a redraft
+2	discards the status and schedules removal without the redraft flag
+2	dismisses announcement
+4	displays error on no file selected
+4	do not set cookies
+2	does not add the account to the list
+2	does not apply rate limiting
+8	does not ask for password
+2	does not change settings
+4	does not change the import's state and returns missing
+2	does not create a backfill request
+2	does not create a provider and returns an error code
+2	does not create a scheduled status
+2	does not create a subscription
+2	does not create account note
+4	does not create role
+2	does not create user
+18	does not creates an unconfirmed bulk_import
+2	does not delete redirect location with continue=true
+4	does not delete the import and returns missing
+2	does not expose the client_id or client_secret
+6	does not have a next page
+2	does not include a next page link
+2	does not log the user in, sets a flash message, and sends a suspicious sign in email
+2	does not mute notifications
+2	does not protect from forgery
+4	does not record a block or call worker, renders confirm suspension
+2	does not record a block or call worker, renders new
+2	does not remove any account from the list
+2	does not resend confirmation mail
+108	does not return HTTP success and does not have cache headers
+6	does not return avatar in response
+8	does not return blocked users
+2	does not send exported data
+2	does not set cookies
+166	does not set cookies or set public cache control
+6	does not start a synchronization job
+2	does not track success on the instance
+2	does not track when there is a recent sign in
+2	does not treat the request as signed
+2	does not unfollow users from selected domains
+2	does not updated the user record
+4	does nothing
+2	does nothing if not signed in
+2	does nothing if user who signed in is functional
+2	doesn't log the user in
+2	enables the user successfully
+4	enqueues a retrieval job and adds a header to inform the client
+2	error handling
+2	failing import
+2	fails to approve account
+2	fails to delete account
+2	fails to enable account
+6	fails to memorialize account
+2	fails to purge instance
+2	fails to redownload
+2	fails to reject account
+2	fails to remove avatar
+2	fails to remove header
+2	fails to unblock email
+2	fails to unsensitive account
+2	fails to unsilence account
+2	fails to unsuspend account
+34	fails to verify signature
+2	fails when the credential already exists
+2	fails when the nickname is already used
+2	falls back to a locale when region missing
+2	falls back to english when locale is missing
+2	favourites the status successfully
+2	favourites the status successfully and includes updated json
+4	features a deprecation header when requested via the alpha route
+2	feed regeneration
+2	forbidden
+2	forgery protection
+2	generates a new sign in token
+2	generates sign in token
+2	gone
+122	gracefully handles invalid nested params
+2	handles the error and returns http empty
+8	has a Vary on Accept-Language
+36	has a Vary on Authorization
+36	has a Vary on Cookie
+2	has og:locale opengraph tag if the status has is written in a given language
+4	has valid opengraph tags
+2	helper_method :current_account
+2	helper_method :single_user_mode?
+4	hides results
+2	hides the collections that are not discoverable
+2	ignores the canonical_email_hash param
+2	ignores the feeble attempts at deception
+2	includes a link to the next page
+4	includes a next page link
+4	includes all items in the response
+2	includes existing credentials in list of excluded credentials
+2	includes moderation notes
+2	instructs the browser to redirect to home, logs the user in, and updates the sign count
+2	internal_server_error
+4	is expected to redirect to "/admin/reports/N"
+6	is expected to redirect to "/auth/sign_in"
+2	is expected to redirect to "/authorize_interaction?uri=test"
+2	is expected to redirect to "/share?text=test"
+8	is expected to respond with numeric status code N
+4	keeps the interaction policy, returns the status, and does not schedule distribution jobs
+2	leaves the notification alone
+2	lists both the public and the private statuses
+2	lists the public status only
+10	logs action
+2	logs the user in
+2	logs the user in and sends suspicious email and redirects home
+2	marks a check as ignored
+2	marks a check as not ignored
+2	marks accounts not sensitized
+2	marks accounts not silenced
+2	marks accounts not suspended
+2	marks report as resolved
+2	marks report as unresolved
+4	marks the non-deleted as sensitive
+2	marks the target account as sensitive
+2	marks the target account as silenced
+2	marks the target account as suspended
+4	mutes notifications
+2	non-functional accounts handling
+2	not_acceptable
+2	not_found
+10	notifies the user about the action taken
+2	on the account show page
+2	on the unsubscribe confirmation page
+2	only includes the non-blocked account in the response
+2	only saves the scope once
+2	paginates correctly
+2	pending deletion account check
+2	permanently deleted account check
+2	pins the status successfully
+2	pins the status successfully and returns updated json
+6	points next to other replies
+6	points next to other self-replies
+6	points next to replies from other people
+2	preserves existing quote approval policy
+2	provides rate limit information in headers
+2	queries mutes in range according to max_id
+2	queries mutes in range according to since_id
+2	queries the blocks in range according to max_id
+2	queries the blocks in range according to since_id
+2	queues a job to continue the given backfill request
+2	raise_not_found
+4	raises ActionController::ParameterMissing
+2	raises ActiveRecord::RecordNotFound
+4	raises an error
+2	raises error
+2	raises error when called
+2	rate limiting
+2	reblogs the status
+2	records a block and calls worker and redirects
+2	records a block, calls a worker, redirects
+8	redirects
+2	redirects after a successful request
+2	redirects back and sets challenge passed at in session
+4	redirects back to followers page
+2	redirects back to the user's page
+4	redirects if a new otp_secret has not been set in the session
+2	redirects on GET to new
+2	redirects on POST to create
+2	redirects successfully with missing action_category
+2	redirects to #new
+2	redirects to NFA methods list and shows flash error
+2	redirects to NFA methods list and shows flash success and deletes the credential when deletion succeeds
+2	redirects to NFA methods list page
+2	redirects to account status page if the account is pending deletion
+2	redirects to account status page if the account is suspended
+8	redirects to at-username page variation
+2	redirects to auth setup page if the account is unconfirmed
+2	redirects to callback
+2	redirects to canonical URL
+4	redirects to code confirmation page without updating user secret and setting otp secret in the session
+2	redirects to confirm_settings_import_path
+2	redirects to correct original url
+2	redirects to enable otp
+4	redirects to file url
+6	redirects to home
+6	redirects to home after sign out
+8	redirects to home and logs the user in
+10	redirects to login
+2	redirects to login and confirms user
+2	redirects to login and queues worker
+2	redirects to login, confirms email, does not queue worker
+2	redirects to profile
+4	redirects to root
+2	redirects to root path
+2	redirects to settings
+2	redirects to setup and creates user
+4	redirects to sign in
+12	redirects to sign in page
+8	redirects to sign-in
+2	redirects to small style url
+2	redirects to streaming host
+2	redirects to success
+2	redirects to tag page and saves update log action for all attribute statuses
+6	redirects to the account collections page
+2	redirects to the change password page
+2	redirects to the original status
+2	redirects to the report page
+2	redirects to two factor authentication methods list page
+4	redirects when not signed in
+2	redirects with proper cache header
+2	regenerates feed when sign in is older than two weeks
+2	rejects account from showing in trends
+2	rejects wrong password
+4	removes duplicate account IDs from params
+2	removes the blocking relation between user and target user
+2	removes the featured tag
+2	removes the filter
+2	removes the follow
+2	removes the follow request
+2	removes the followed relation between user and target user
+2	removes the following relation between user and target user
+2	removes the muting relation between user and target user
+2	removes the specified account from the list but keeps other accounts in the list
+2	removes the subscription
+2	removes the user successfully and logs action
+2	renders ActivityPub Collection successfully
+6	renders ActivityPub FeaturedCollection object successfully
+2	renders ActivityPub FeaturedItem object successfully
+2	renders ActivityPub Note object
+14	renders ActivityPub Note object successfully
+2	renders ActivityPub representation successfully
+4	renders challenge
+2	renders challenge, displays error, does not set session
+2	renders error when account cant be found
+2	renders error without acct param
+4	renders instances
+2	renders interstitial page instead of expected content
+2	renders ips within range
+2	renders new page with success status
+4	renders page with error message
+4	renders page with expected domain blocks and returns http success
+4	renders page with success
+4	renders requested page as expected
+2	renders reset password and retains password
+4	renders sign in token authentication page
+16	renders status successfully
+2	renders success page
+2	renders success page and updates subscription as confirmed
+2	renders successfully with partial ip address
+8	renders the new view with QR code
+6	renders two factor authentication page
+4	renders webauthn authentication page
+2	replaces old subscription on repeat calls
+2	requested with standard accepts headers
+10	requires otp enabled first
+2	requires the current password to update the email
+2	requires the current password to update the password
+2	requires the password confirmation
+2	responds with N and error page
+2	responds with an error message about the date of birth
+2	responds with an error message about the username
+2	responds with correct statuses
+2	responds with correct statuses with a tag
+2	responds with correct statuses with media
+2	responds with correct statuses with replies
+6	responds with missing
+12	responds with not found
+2	responds with the filter
+2	responds with the keyword
+2	responds with unauthorized
+2	responds with unprocessable and does not modify setting
+2	return http success
+2	return the correct blocked email domains
+2	returns CSV response with instance domain values
+2	returns HTTP N
+2	returns HTTP success with the appropriate profile
+2	returns JSON document pointing to node info
+2	returns JSON document with node info properties
+6	returns JSON with an html attribute
+2	returns JSON with correct data
+2	returns JSON with correct data after change too
+2	returns JSON with correct data on previously cached requests
+4	returns N
+16	returns N forbidden
+24	returns N gone
+10	returns N gone and mentions self-destruct
+2	returns N notifications
+8	returns N ok
+2	returns `N` (Bad Request)
+4	returns a CSV file with correct data
+2	returns a CSV with the accounts
+2	returns a CSV with the blocking accounts
+2	returns a CSV with the bookmarked statuses
+2	returns a CSV with the domains
+2	returns a CSV with the list
+2	returns a CSV with the muted accounts
+4	returns a JSON document with error details
+2	returns a JSON document with expected attributes
+2	returns a JSON version of the account
+2	returns a JSON version of the account and removes reach filter
+2	returns a JSON with the custom filters
+4	returns a N
+4	returns a N page as html
+8	returns a capped value
+2	returns a csv of the exported data when signed in
+4	returns a http 'moved_permanently' code
+2	returns a json of the exported data when signed in
+2	returns a json response
+2	returns a json response for json accept header
+2	returns a json response for json format
+2	returns a list of accounts
+2	returns a list of checks
+4	returns a notification group covering all notifications
+2	returns a private JSON version of the account
+2	returns a private signature JSON version of the account and updates the reach filter
+10	returns a quote post, as well as rate limit headers
+8	returns a standard HTML response
+6	returns a validation error
+4	returns account entity as N OK
+2	returns account if signed in
+2	returns accounts followed by the given account
+2	returns accounts following the given account
+2	returns accounts in order of creation
+2	returns accounts in order of most recent status activity
+2	returns accounts who reblogged the status
+4	returns all accounts, including muted accounts
+4	returns all collections for the given account and http success
+2	returns all collections, including the ones that are not discoverable
+2	returns all matching accounts
+2	returns all reports
+8	returns all scopes requested for the given code
+2	returns all the requested scopes
+2	returns all unresolved reports
+2	returns all unresolved reports filed by the specified account
+2	returns all unresolved reports targeting the specified account
+2	returns an HTML page
+2	returns an account in "partial_accounts", with the expected keys
+6	returns an empty array
+6	returns an empty body
+12	returns an empty list
+2	returns an enumerable json with correct elements, excluding suspended accounts
+2	returns an enumerable json with correct elements, including suspended accounts
+2	returns an error
+6	returns an error and does not create a post
+6	returns appropriate http response code
+2	returns avatar in response
+4	returns conversations
+2	returns empty language matrix
+2	returns empty stylesheet
+2	returns error json
+2	returns error response
+4	returns everything but excluded type
+2	returns everything, but does not group favourites
+4	returns existing domain block in error
+14	returns expected contents
+2	returns expected headers
+4	returns expected notification types
+2	returns expected notification types, including filtered notifications
+14	returns expected notifications count
+4	returns expected response
+2	returns false if it is in single_user_mode but there is no account
+2	returns false if there is an account but it is not in single_user_mode
+6	returns filter information
+8	returns followers
+4	returns followers count but not any items
+4	returns followers without blocked
+4	returns forbidden response
+4	returns http N
+24	returns http N and renders error template
+12	returns http accepted
+2	returns http accepted, create an async job and schedules a job
+2	returns http authorization error
+2	returns http authorization error with json error
+16	returns http bad request
+6	returns http bad_request
+2	returns http content too large
+4	returns http empty
+2	returns http empty response
+2	returns http error
+722	returns http forbidden
+2	returns http forbidden and error message
+2	returns http forbidden error
+2	returns http forbidden for disabled accounts
+2	returns http forbidden for pending accounts
+2	returns http forbidden for suspended accounts
+2	returns http forbidden for unconfirmed accounts
+2	returns http forbidden with error message
+2	returns http forbidden with private cache control headers
+72	returns http gone
+2	returns http missing
+4	returns http not authorized
+324	returns http not found
+2	returns http not found and keeps user
+2	returns http not found response
+2	returns http not found while also rendering the page
+14	returns http not_found
+4	returns http partial content
+234	returns http success
+2	returns http success and accounts json
+2	returns http success and accounts who favourited the status
+4	returns http success and activity json
+4	returns http success and activity json types and correct items count
+2	returns http success and available status
+2	returns http success and cache control and activity json types and correct items
+4	returns http success and cache headers
+6	returns http success and correct media type
+4	returns http success and correct media type and cache headers and empty items
+8	returns http success and correct media type and correct items
+2	returns http success and correct media type and expected items
+8	returns http success and correct media type and headers and items
+2	returns http success and correct media type and headers and items count
+2	returns http success and correct media type and vary header and items
+4	returns http success and creates notification permission
+2	returns http success and deletes the avatar, preserves the header, queues up distribution
+4	returns http success and destroys the notification request
+2	returns http success and eligible status
+4	returns http success and empty response
+2	returns http success and expected tag content
+2	returns http success and follower counts
+2	returns http success and header pagination links to prev and next
+2	returns http success and includes a header link
+2	returns http success and includes correct tag name
+2	returns http success and includes followed tags
+2	returns http success and includes supported languages
+2	returns http success and includes the favourites
+4	returns http success and ineligible status
+12	returns http success and json
+2	returns http success and json with known domains
+4	returns http success and private cache control headers
+2	returns http success and recently used but not featured tags
+2	returns http success and removes reach filter
+2	returns http success and removes suggestion
+2	returns http success and removes the filter
+4	returns http success and returns app information
+2	returns http success and returns merged: false
+2	returns http success and returns merged: true
+10	returns http success and status json
+2	returns http success and statuses but not private ones
+2	returns http success and statuses of followed users
+2	returns http success and statuses quoting this post
+2	returns http success and the bookmarked statuses
+2	returns http success and the wrapstodon year
+2	returns http success and updates keyword and sends a filters_changed event
+2	returns http success and updates tag
+2	returns http success when server is functioning
+2	returns http success with a filter with keywords in json and creates a filter
+2	returns http success with accounts
+2	returns http success with an empty body and deletes the featured tag
+2	returns http success with correct json
+8	returns http success with correct media type and body
+8	returns http success with correct media type and headers and body json
+2	returns http success with expect headers and media type
+4	returns http success with expected JSON
+2	returns http success with expected XML
+8	returns http success with expected content
+2	returns http success with expected statuses
+2	returns http success with media information
+2	returns http success with muted accounts
+2	returns http success with private cache control headers
+4	returns http success with updated JSON attributes
+2	returns http success with valid JSON response
+2	returns http success without json
+2	returns http success, preserves the avatar, deletes the header, queues up distribution
+110	returns http unauthorized
+2	returns http unauthorized with appropriate error
+4	returns http unprocessable content
+4	returns http unprocessable content and detailed errors
+112	returns http unprocessable entity
+2	returns http unprocessable entity with username error message
+2	returns invalid when the schema does not match
+6	returns items with other public or unlisted replies and correctly inlines replies and uses IDs
+6	returns items with thread author's replies
+4	returns json with expected attributes
+2	returns language matrix
+2	returns markers
+2	returns nil if not signed in
+2	returns no conversation
+14	returns not found
+2	returns nothing
+4	returns only a single result
+2	returns only notifications from specified user
+4	returns only requested type
+2	returns only the canonical email blocks after since_id
+2	returns only the canonical email blocks before max_id
+2	returns only the default scope
+2	returns only the email domain blocks after since_id
+2	returns only the email domain blocks before max_id
+2	returns only the featured tags belonging to the requesting user
+2	returns only the followed accounts
+2	returns only the local accounts
+6	returns only the requested number of accounts
+2	returns only the requested number of allowed domains
+2	returns only the requested number of blocked accounts and sets link header pagination
+2	returns only the requested number of blocked domains
+2	returns only the requested number of canonical email blocks
+2	returns only the requested number of domain blocks
+2	returns only the requested number of email domain blocks
+2	returns only the requested number of favourites and sets pagination headers
+2	returns only the requested number of follow requests
+2	returns only the requested number of follow tags and sets pagination headers
+2	returns only the requested number of ip blocks
+2	returns only the requested number of muted accounts with pagination headers
+2	returns only the requested number of reports
+2	returns only the requested number of statuses
+2	returns only the requested number of statuses and sets pagination headers
+4	returns only the requested number of statuses with pagination headers
+2	returns only the requested number of tags
+2	returns only the resolved reports
+2	returns page with links to alternate resources
+2	returns pagination headers
+2	returns poll data and calls fetch remote service
+2	returns post with appropriate quote policy, as well as rate limit headers
+4	returns post with user default quote policy, as well as rate limit headers
+2	returns posts along with self replies
+2	returns private cache control headers by default
+6	returns rate limit headers
+2	returns serialized extra accounts in body
+2	returns server directory opt in data
+2	returns stylesheet from settings
+12	returns success
+2	returns success and includes opengraph meta tags
+2	returns success and marks the report as read
+2	returns success and paginates and filters with parameters
+2	returns success with private cache control headers
+4	returns success with private headers and admin layout
+2	returns the accounts in the requested list
+2	returns the app information correctly
+2	returns the blocked accounts
+2	returns the canonical_email_hash correctly
+8	returns the confirmation status successfully
+2	returns the correct CSP headers
+22	returns the correct accounts
+2	returns the correct allowed domains
+2	returns the correct blocked domain
+2	returns the correct blocked email domain
+2	returns the correct blocked ips
+2	returns the correct canonical email hashes
+2	returns the correct canonical_email_hash
+6	returns the correct ip block
+2	returns the correct items
+4	returns the correct result and headers
+2	returns the domains blocked by the requesting user
+2	returns the error in the json response
+2	returns the existing allowed domain name
+2	returns the existing filters successfully
+2	returns the expected accounts
+2	returns the expected allowed domain name
+2	returns the expected campaign
+2	returns the expected canonical email hash
+2	returns the expected content from accounts requesting to follow
+2	returns the expected domain block content
+2	returns the expected domain blocks
+2	returns the expected domain name
+2	returns the expected lists
+12	returns the expected statuses
+20	returns the expected statuses successfully
+2	returns the expected suggestions
+6	returns the expected tags
+6	returns the file with the expected headers
+2	returns the filter successfully
+2	returns the index page
+2	returns the link data
+2	returns the local discoverable account and the remote discoverable account
+2	returns the media
+2	returns the new list
+2	returns the poll data successfully
+2	returns the requested account successfully
+2	returns the requested canonical email block data correctly
+2	returns the requested list correctly
+2	returns the requested number of accounts, with pagination headers
+6	returns the requested number of notifications paginated
+2	returns the requested report content
+4	returns the response successfully
+4	returns the source properties of the status
+2	returns the tag
+2	returns the updated domain block
+2	returns the updated list and updates values
+2	returns true if it is in single_user_mode and there is an account
+12	returns unauthorized
+2	returns unauthorized when not signed in
+2	returns unprocessable entity
+2	revokes access tokens for the application and removes subscriptions and sends kill payload to streaming
+2	revokes the collection item and returns http success
+2	revokes the quote and returns HTTP success
+2	revokes the token and removes subscriptions
+2	saves alert settings
+2	saves category
+2	saves category and rule_ids
+4	saves push subscription with standard as false
+2	saves push subscriptions and returns expected JSON
+2	saves push subscriptions with valid params
+2	saves the value for a valid key
+4	sends sign in token e-mail
+2	service_unavailable
+2	sets a regeneration marker while regenerating
+4	sets available and compatible language if none of available languages are preferred
+8	sets available and preferred language
+4	sets default locale if none of available languages are compatible
+160	sets private cache control
+2	sets resource from acct uri
+2	sets resource from url
+4	sets the correct pagination headers
+2	sets the expected CSP headers
+2	sets the regeneration marker to expire
+2	sets user's locale
+2	shows a login error
+8	shows a login error and does not log the user in
+2	shows an instance page
+2	shows confirmation page
+2	shows subscription details
+2	shows unsubscribe form
+2	soft-blocks followers from selected domains
+2	starts a synchronization job
+2	status pages
+2	stores the challenge on the session and sets user webauthn_id
+2	submitting the unsubscribe confirmation page
+2	succeeds in approving account and logs action
+2	succeeds in enabling account
+2	succeeds in memorializing account
+2	succeeds in purging instance
+2	succeeds in redownloading
+2	succeeds in rejecting account and logs action
+2	succeeds in removing avatar
+2	succeeds in removing email blocks and redirects to admin account path
+2	successful import
+4	successfully verifies signature
+2	successfully verifies signature (PENDING: waiting for ubuntu-N.N runners)
+14	successfuly verifies signature
+2	successfuly verifies signature after refreshing the account
+2	supports passing scope values as string
+2	suppress account from follow recommendations
+8	suspends the target account
+2	the /about page
+2	too_many_requests
+2	tracks success on the instance
+2	tracks when sign in is nil
+2	tracks when sign in is older than one day
+2	unassigns report from assignee
+2	unblocks the domain
+4	unbookmarks the status successfully and includes updated json
+4	unfavourites the status successfully and includes updated json
+2	unpins the status successfully and includes updated json
+2	unprocessable_content
+2	unsensitizes the account successfully
+2	unsilences the account successfully
+2	unsubscribing with List-Unsubscribe-Post
+2	unsuspends the account successfully
+2	update tag
+2	updates a marker
+2	updates account note
+2	updates filter_bots
+4	updates notification settings
+2	updates setting and responds with success
+2	updates the account
+2	updates the block severity
+2	updates the collection and returns http success
+2	updates the description
+2	updates the filter
+2	updates the filter successfully
+2	updates the keyword
+2	updates the record and calls worker, redirects
+2	updates the report category
+4	updates the status
+2	updates the user's e-mail address
+2	updates username block
+2	updating bots policy
+6	uploads the file successfully and returns correct media content
+2	uses a specific region when provided
+2	uses a specific style of ISN timestamps
+6	when Authorization header is missing
+2	when NFA is disabled and inactive for long
+2	when WebAuthn not enabled
+2	when `account_search` FASP is enabled
+2	when `follow_recommendation` FASP is enabled
+2	when a category is chosen
+2	when a collection does not belong to the reported account
+2	when a domain block already exists on the same domain
+2	when a donation campaign API is set up
+2	when a looser domain block already exists on a higher level domain
+2	when a marker exists
+4	when a new otp secret has been set in the session
+2	when a report is already generated
+2	when a signature is required
+2	when a status does not belong to the reported account
+2	when a stricter domain block already exists on a higher level domain
+2	when a title is not given
+2	when a translation service is configured
+2	when accessed anonymously
+2	when accessing still-enabled endpoints when logged in
+8	when account blocks the remote account
+8	when account blocks user
+2	when account cannot update
+2	when account does not exist
+2	when account does not have a user
+8	when account domain blocks the domain of the remote account
+2	when account has many collections
+8	when account hides their network
+6	when account is accessible
+2	when account is already approved
+2	when account is already in the list
+2	when account is missing
+2	when account is not approved
+4	when account is not suspended
+22	when account is pending deletion
+24	when account is permanently deleted
+40	when account is permanently suspended
+4	when account is suspended
+2	when account is temporarily deleted
+40	when account is temporarily suspended
+2	when account is unconfirmed
+2	when account note exceeds allowed length
+2	when account note has reasonable length
+2	when account updates correctly
+2	when age verification is enabled
+4	when allowed for local users only
+4	when already deleted
+2	when an accept language is present in headers
+2	when an account does not have an avatar
+4	when an account exists
+2	when an account has an avatar
+2	when an account is not found
+2	when an account is pending deletion
+2	when an account is permanently deleted
+2	when an account is permanently suspended
+2	when an account is temporarily suspended
+2	when an admin wants to see a suspended attachment
+4	when anonymously accessed
+2	when app is already authorized
+2	when asking for local accounts only
+6	when attached to a status
+4	when attached to non-public status
+2	when attempting to add permissions the user does not have
+2	when both email and canonical_email_hash params are provided
+2	when called with by_domain value and origin remote
+2	when called with status active and origin local and permissions staff
+2	when called with status disabled
+2	when called with status pending
+2	when called with status suspended
+2	when called with truthy delete_media
+2	when changing the interaction policy
+4	when creation fails
+8	when creation succeeds
+2	when database object becomes stale
+2	when date of birth is below age limit
+2	when date of birth is over age limit
+2	when date of birth is over age limit in ISO-N format
+2	when deleted
+2	when deleting a featured tag of another user
+4	when disabled
+4	when domain block does not exist
+2	when domain name is not specified
+2	when domain param is not provided
+2	when downgrading a domain suspension to silence
+4	when email domain block does not exist
+2	when email domain block exists
+2	when email is confirmed
+2	when email is not changed
+2	when email subscription is already confirmed
+2	when email subscription is unconfirmed
+2	when enabling AUTHORIZED_FETCH mode
+4	when enabling DISALLOW_UNAUTHENTICATED_API_ACCESS
+2	when enabling LIMITED_FEDERATION_MODE mode
+2	when exceeding rate limit
+2	when failing to fetch OEmbed
+2	when feature is disabled
+2	when featured tag with given id does not exist
+4	when file type cannot be identified
+2	when filtering by media
+4	when form_two_factor_confirmation parameter is not provided
+4	when format is html
+4	when format is json
+2	when getting a featured resource
+2	when given a collection of statuses
+2	when given an empty array
+2	when given an empty relation
+2	when given domain name is invalid
+2	when given invalid data
+2	when given no agreement
+2	when given only one hashtag
+2	when given truthy agreement
+2	when given valid data
+2	when host is follow
+2	when host is none of the above
+2	when host is share
+2	when id cannot be found
+2	when id is "featured"
+4	when in single user mode and open for registration
+2	when invite is expired
+2	when invite is valid
+6	when ip block does not exist
+2	when item belongs to collection
+2	when item does not belong to to collection
+2	when job does not exist
+2	when job exists
+2	when large format media attachment has not been processed
+2	when limited federation mode is enabled
+10	when logged in
+6	when logged out
+2	when logging in from the user's page
+2	when meant for a different user
+2	when media description is too long
+4	when media is attached to a status
+2	when media is not attached to a status
+2	when media type is not large format type
+2	when missing username value
+2	when modifying follow options
+2	when no domain name is given
+2	when no donation campaign API is set up
+2	when no marker exists
+2	when no parameter is given
+2	when no translation service is configured
+4	when not attached to a status
+2	when not authenticated
+20	when not authorized
+2	when not changing the interaction policy
+2	when not everyone can invite
+2	when not logged in
+2	when not permitted to view
+4	when not providing a Signature
+2	when not requesting a JSON document
+36	when not signed in
+2	when not using client credentials token
+8	when notification belongs to someone else
+4	when notification request belongs to someone else
+2	when ordered by active
+2	when ordered by new
+4	when paperclip errors occur
+2	when parent status is private
+2	when parent status is public
+2	when passing an invalid value for "expand_accounts"
+4	when passing “allow_nonfunctional”
+2	when peers api is disabled
+2	when poll is remote and needs refresh
+2	when post includes filtered terms
+2	when post is explicitly filtered
+2	when posting to an other account
+2	when preview card is not trending
+2	when preview card is trending but not approved
+2	when provided domain is already blocked
+2	when provided domain name has an invalid character
+2	when provided multiple IDs
+2	when provided only one ID
+2	when provided tag name is invalid
+2	when providing a Signature
+2	when providing a Signature from a non-allowed domain
+2	when providing a Signature from an allowed domain
+2	when reblog includes filtered terms
+4	when registrations closed and not in single user mode
+2	when repeatedly using an invalid TOTP code before using a valid code
+4	when request account is pending deletion
+4	when request account is permanently deleted
+4	when request is signed in and user blocks an account
+2	when requested account is different from current account
+4	when requested account is pending deletion
+4	when requested account is permanently deleted
+2	when requested as HTML
+2	when requesting a JSON document
+2	when requesting a new sign in token
+2	when requesting a non-suspended account
+2	when requesting a permanently deleted account
+2	when requesting a suspended account
+2	when requesting active local staff accounts
+2	when requesting an account pending deletion
+2	when requesting disabled accounts
+2	when requesting old posts
+2	when requesting other static files
+2	when requesting paperclip attachments
+2	when requesting pending accounts
+2	when requesting posts in the future
+2	when requesting remote accounts from a specified domain
+2	when requesting service worker file
+2	when requesting stripped-down accounts
+2	when requesting suspended accounts
+2	when requesting the first page
+2	when requesting user is a third party
+4	when requesting user is blocked
+4	when requesting user is the account owner
+2	when requesting user owns the collection
+2	when requesting various unavailable endpoints
+2	when required param "name" is not provided
+2	when sanitizing the fragment fails
+2	when scheduling a status
+2	when schema is not web+mastodon
+2	when schema is web+mastodon
+2	when search raises not found error
+2	when search raises syntax error
+2	when searching accounts
+2	when searching single ip address
+2	when searching within a range
+2	when select parameter is not provided
+2	when select parameter is provided
+2	when sending an unknown account
+2	when session activation does not exist
+4	when set to be publicly-available
+2	when severity is invalid
+2	when share_key is invalid
+56	when signed in
+4	when signed in as admin
+4	when signed in as an admin
+6	when signed in as lower permissions user
+2	when signed in as moderator
+2	when signed in as regular user
+26	when signed out
+2	when signed request account does not follow account
+2	when signed request account follows account
+6	when signed request account is blocked
+6	when signed request account is domain blocked
+2	when small media format attachment is processed immediately
+2	when some collections are not discoverable
+2	when some scopes do not belong to the application
+4	when standard is provided as false value
+2	when status has non-default quote policy and param is omitted
+2	when status has private visibility
+2	when status has public visibility
+4	when status is a reblog
+22	when status is direct
+2	when status is not favourited
+2	when status is not public
+20	when status is private
+22	when status is public
+2	when status visibility is direct
+2	when status visibility is private
+2	when status visibility is public
+2	when successfully fetching OEmbed
+6	when suspended
+2	when tag does not exist
+2	when tag exists
+2	when tag name is already taken
+2	when target role permission outranks user
+4	when target user is admin
+2	when target user is higher ranked than current user
+4	when target user is not admin
+16	when text is unset
+8	when the Authorization header is missing
+4	when the Digest of a POST request is not signed
+2	when the account does not exist
+2	when the account does not have the permission
+2	when the account has the permission
+2	when the account is already approved
+2	when the account is already at MAX status pins
+2	when the account is already confirmed
+4	when the account is confirmed
+4	when the account is not confirmed
+16	when the account is not found
+2	when the account is not suspended
+4	when the account is pending
+2	when the account is remote
+2	when the account is suspended
+2	when the account is unconfirmed
+6	when the action is "delete"
+4	when the action is "invalid_action"
+6	when the action is "mark_as_sensitive"
+6	when the action is "silence"
+6	when the action is "suspend"
+2	when the added account has been sent a follow request
+2	when the added account is followed
+2	when the added account is not followed
+2	when the allowed domain does not exist
+2	when the canonical email block is not found
+2	when the canonical_email_hash param is provided instead of email
+2	when the domain is already allowed
+2	when the domain is wrong
+2	when the donation campaign API does not return a campaign
+2	when the donation campaign API returns a campaign
+2	when the donation campaign returns bad response
+4	when the feature is enabled and time is within window
+2	when the feature is enabled but we are out of the time window
+2	when the feature is not enabled
+6	when the filter belongs to someone else
+2	when the given canonical email was already blocked
+2	when the given context value is invalid
+2	when the given domain name is invalid
+2	when the given domain name is not blocked
+2	when the given filter_action value is invalid
+2	when the given ip address is already blocked
+2	when the given ip address is invalid
+2	when the given replies_policy is invalid
+2	when the given severity is invalid
+2	when the initial account is deleted
+6	when the instance allows public preview
+6	when the instance does not allow public preview
+2	when the key material has changed
+4	when the link does not exist
+2	when the list belongs to a different user
+4	when the list belongs to another user
+6	when the list does not exist
+4	when the list is not owned by the requesting user
+2	when the list is owned by the requesting user
+2	when the media attachment does not exist
+2	when the media attachment does not have a shortcode
+2	when the media attachment has a shortcode
+6	when the media belongs to somebody else
+2	when the media is attached to a status
+2	when the media is still being processed
+2	when the moderator is blocked by the author
+2	when the new domain block conflicts with an existing one
+2	when the old name scheme is used to query the instance actor
+2	when the query string is missing from the signature verification (compatibility quirk)
+2	when the quotee is blocked by the quoter
+2	when the quoter is blocked by the quotee
+2	when the requested allowed domain does not exist
+2	when the requested canonical block does not exist
+2	when the requested canonical email block exists
+2	when the requested domain block does not exist
+4	when the requested status does not exist
+4	when the requested status is local
+4	when the requested status is private
+4	when the requested status is public
+4	when the requested status is remote
+4	when the requested tag does not exist
+10	when the requesting provider is unconfirmed
+2	when the requesting user has featured tags
+2	when the requesting user has no featured tag
+4	when the requesting user is blocked
+2	when the requesting user is blocked by the given account
+2	when the requesting user owns the media
+4	when the requesting user was blocked by the status author
+2	when the required choices param is not provided
+2	when the required context param is missing
+4	when the required email param is not provided
+2	when the required email param is provided
+2	when the required ip param is not provided
+2	when the required severity param is not provided
+2	when the required title param is missing
+2	when the scheduling time is less than N minutes
+2	when the scope does not belong to the application
+2	when the scope was not requested for the code
+2	when the scopes belong to the application
+2	when the scopes were requested for this code
+2	when the server has an decryption error
+2	when the specified account is not in the list
+2	when the status belongs to somebody else
+6	when the status does not exist
+2	when the status is not bookmarked
+2	when the status is not pinned
+2	when the status is pinned
+2	when the status is private
+2	when the status is public
+2	when the status was previously bookmarked
+2	when the subscription does not exist
+2	when the subscription exists
+6	when the tag does not exist
+6	when the tag exists
+10	when the tag name is invalid
+2	when the timeline is available
+2	when the timeline is regenerating
+2	when the token is invalid
+2	when the updated display name is invalid
+2	when the user has an accepted request pending merge
+2	when the user has blocked an account
+2	when the user has no accepted request pending merge
+2	when the user has not blocked or muted anyone
+4	when the user is authenticated
+2	when the user is not authenticated
+4	when the user is not confirmed
+4	when the user is not the subject of the event
+2	when there are allowed domains
+2	when there are canonical email blocks
+2	when there are domain blocks
+2	when there are duplicate IDs in the params
+2	when there are duplicate account IDs in the params
+2	when there are email domain blocks
+6	when there are few replies
+6	when there are few self-replies
+2	when there are ip blocks
+6	when there are many replies
+6	when there are many self-replies
+4	when there are more notifications than the limit
+2	when there are no domain blocks
+2	when there are no notifications
+2	when there are no reports
+2	when there are no tags
+2	when there are numerous notifications for the same final group
+2	when there are reports
+2	when there are tagss
+2	when there is a TOS record
+4	when there is a generic error
+2	when there is a matching canonical email block
+2	when there is no TOS record
+2	when there is no allowed domains
+2	when there is no canonical email block
+2	when there is no email domain block
+2	when there is no ip block
+2	when there is no matching canonical email block
+2	when there is no preview card
+2	when there is not an attached status
+2	when there is returned JSON data
+2	when throttling is off
+2	when throttling is on
+8	when trends are disabled
+8	when trends are enabled
+4	when trying to access another user's filter keyword
+4	when trying to access another's user filters
+4	when trying to add to another another's user filters
+2	when trying to change the interaction policy of a private post
+6	when trying to update another user's filter keyword
+2	when updating filter parameters
+2	when updating keywords in bulk
+2	when updating only the quote policy
+2	when upgrading a domain silence to suspend
+2	when upgrading an existing block
+2	when uri is invalid
+2	when uri param is blank
+2	when user IP is blocked
+2	when user changed e-mail and has not confirmed it
+2	when user does not follow account
+2	when user does not has webauthn enabled
+4	when user does not have OTP enabled
+6	when user does not have otp enabled
+4	when user does not have webauthn enabled
+2	when user does not own application
+2	when user does not require TOS interstitial
+2	when user does require TOS interstitial
+2	when user follows account
+4	when user has OTP enabled
+2	when user has an email address requiring approval
+2	when user has an email address requiring approval through a MX record
+2	when user has enabled otp
+2	when user has enabled the setting
+2	when user has enabled webauthn
+2	when user has not agreed to terms of service
+6	when user has not enabled otp
+2	when user has not enabled the setting
+8	when user has otp enabled
+2	when user has permissions to manage roles
+6	when user has webauthn enabled
+2	when user have not enabled webauthn and creation succeeds
+26	when user is admin
+2	when user is already confirmed
+2	when user is already confirmed but unapproved
+16	when user is authorized to see it
+2	when user is in item
+26	when user is not admin
+16	when user is not authorized to see it
+2	when user is not in the item
+4	when user is not owner
+6	when user is not signed in
+4	when user is not the owner of the collection
+4	when user is owner of the collection
+4	when user is signed in
+4	when user is the owner
+2	when user is unconfirmed
+2	when user is unconfirmed and unapproved
+2	when user is updating email
+2	when user tries to follow their own account
+2	when user was created by a different application
+2	when user was created by the same application
+2	when using a valid OTP
+2	when using a valid password
+2	when using a valid password on a previously-used account with a new IP address
+2	when using a valid recovery code
+2	when using a valid sign in token
+2	when using a valid webauthn credential
+2	when using an invalid OTP
+4	when using an invalid password
+2	when using an invalid sign in token
+2	when using an unconfirmed password
+6	when using email and password
+2	when using email and password after an unfinished log-in attempt to a NFA-protected account
+2	when using email with uppercase letters
+2	when using other user subscription
+2	when using password authentication
+2	when using two-factor authentication
+4	when using upcase email and password
+2	when violated rules are chosen
+2	when with json format
+2	when without format
+2	when wrapstodon is enabled
+8	with "HTTP Signature" access signed by a remote account
+2	with "silence" severity and no conflict
+2	with "suspend" severity and no conflict
+2	with ActionController::InvalidAuthenticityToken
+2	with ActionController::RoutingError
+2	with ActiveRecord::RecordNotFound
+2	with CSS settings
+2	with Collection-Synchronization header
+6	with GET requests
+16	with HTML
+4	with HTML format
+26	with JSON
+2	with JSON and querying the new paths
+4	with JSON format
+2	with OTP enabled as second factor
+4	with OpenTelemetry traces
+6	with POST requests
+2	with RSS
+2	with RSS format
+4	with WebAuthn and OTP enabled as second factor
+2	with `force_login` param true
+2	with `offset`
+6	with `only_other_accounts` param
+2	with `with_suspended` parameter
+2	with a .json format extension
+2	with a EdN key
+2	with a JSON `Accept` header
+2	with a ML-DSA-N key
+2	with a Signature header
+2	with a `q` equal to or longer than N characters
+2	with a `q` shorter than N characters
+2	with a basic status body
+2	with a collection item featuring a remote account
+2	with a comically inflated external interactions count
+4	with a confirmation
+2	with a confirmed signed in user
+2	with a current TOS record
+2	with a deleted user
+4	with a different user than the post owner
+4	with a disabled instance actor
+2	with a forgery
+8	with a known account
+2	with a list of only domains
+2	with a local account
+2	with a local deleted account
+2	with a malformed `Content-Digest` header
+4	with a mismatching method
+4	with a mismatching path
+2	with a no-password user
+2	with a non-read scoped oauth token
+2	with a nonsense parameter
+2	with a normal account in a JSON request
+2	with a normal account in an HTML request
+2	with a normal account in an RSS request
+2	with a password user
+2	with a permanently suspended account
+8	with a private status
+12	with a public status
+2	with a public status marked with the same language as the current locale when translation backend cannot do same-language translation
+4	with a public status that is a reply
+2	with a quote in an unlisted message
+2	with a quote of a reblog
+2	with a quote policy
+2	with a quote to a mentioned user in a Private Mention
+2	with a quote to a non-mentioned user in a Private Mention
+4	with a read marker
+2	with a regular user
+2	with a rejected quote
+2	with a remote account
+2	with a reported collection
+2	with a reported status
+4	with a request older than a day
+2	with a revoked collection item
+2	with a revoked oauth token
+2	with a safeguard
+2	with a self-quote post
+2	with a self-quote post and a CW but no text
+2	with a signed in user
+2	with a signed in user who has blocked accounts
+2	with a signed in user who has blocked domains
+2	with a signed in user who has bookmarks
+2	with a signed in user who has custom_filters
+2	with a signed in user who has lists
+2	with a signed in user who has muted accounts
+2	with a signed in user who is following accounts
+2	with a signed out request
+2	with a simple report
+2	with a simple value
+2	with a specific account
+2	with a status from a different user
+2	with a subscription
+2	with a suspended user
+4	with a tampered body on a POST request
+4	with a tampered path in a POST request
+2	with a temporarily suspended account
+2	with a too-long name
+2	with a too-long redirect_uri
+2	with a too-long website
+2	with a user context
+2	with a user who has a session with a prior subscription
+2	with a user who has not signed in
+2	with a user with invalid locale has signed in
+2	with a user with valid locale has signed in
+4	with a user-provided limit
+2	with a valid account
+2	with a valid domain name
+2	with a valid report
+8	with a valid signature on a GET request
+4	with a valid signature on a GET request that has a query string
+4	with a valid signature on a POST request
+2	with a website
+4	with account_id param
+2	with action as submit button
+2	with activity api diabled
+2	with activity api enabled
+2	with all param
+2	with an API token
+2	with an HTTP Message Signature (final RFC version)
+2	with an HTTP Signature (draft version)
+4	with an OAuth token
+2	with an accepted collection item
+2	with an accepted quote
+2	with an acct key ID
+2	with an already taken username
+6	with an already-confirmed import
+2	with an alternate domain
+4	with an anonymous user
+4	with an application access token, not bound to a user
+4	with an application token
+4	with an auth token
+2	with an authenticated user
+2	with an authentication cookie
+4	with an authorized user
+2	with an available instance
+2	with an effective TOS record
+2	with an empty redirect_uris array
+2	with an empty redirect_uris string
+2	with an excessively large payload
+2	with an implied format
+4	with an inaccessible key
+2	with an incorrect quote authorization URL
+2	with an invalid date of birth
+2	with an invalid domain
+2	with an invalid oauth token
+2	with an invalid report
+22	with an oauth token
+2	with an unapproved account
+2	with an unavailable instance
+6	with an unconfirmed import
+4	with an ungrouped notification
+2	with an unknown domain
+2	with an unparsable date
+2	with an unsupported scope
+2	with another user signed in
+2	with any param
+2	with attached collection
+2	with attached status
+2	with authentication token
+6	with authorized fetch mode
+2	with blocks
+2	with bookmarks
+2	with both resolved and unresolved params
+2	with both status and collection
+2	with client credentials
+2	with complete domain blocks CSV
+2	with correct password
+22	with correct scope
+2	with custom filter
+2	with custom filters
+2	with default parameters
+2	with different headers
+2	with different parameters
+2	with disabled user
+2	with domain blocks
+2	with domain blocks set to all
+2	with domain blocks set to disabled
+2	with domain blocks set to users
+2	with email param
+2	with empty source list
+2	with endorsed accounts
+2	with enough pinned statuses to paginate
+2	with exclude replies
+8	with exclude_types param
+2	with existing statuses
+4	with few statuses
+2	with following=true
+2	with follows
+2	with grant_type 'authorization_code'
+2	with grant_type 'client_credentials'
+2	with grouped_types param
+2	with grouped_types parameter
+2	with image/gif
+2	with image/jpeg
+2	with include_filtered
+2	with incorrect password
+2	with initial data
+2	with invalid account_id param
+2	with invalid baseN pNdh key
+4	with invalid data
+2	with invalid domain name
+2	with invalid email param
+2	with invalid endpoint URL
+2	with invalid pNdh key
+4	with invalid parameters
+12	with invalid params
+2	with invalid picture id
+2	with invalid remove_from_report
+4	with invalid reset_password_token
+2	with invalid search param
+12	with invalid signature
+6	with invalid token
+8	with invalid type
+2	with just a newline as the redirect_uris string
+4	with limit and offset params
+54	with limit param
+2	with limited federation mode
+2	with limited federation mode disabled
+2	with limited federation mode enabled
+2	with lists
+2	with local and remote params
+2	with local param
+2	with locked account
+2	with many duplicate scopes
+4	with many statuses
+2	with matching digest
+8	with max_id param
+4	with media
+2	with min_id param
+2	with mismatching digest
+2	with mismatching domain in partial collection attribute
+4	with mismatching query string
+2	with mismatching target collection
+2	with missing parameters
+2	with missing thread
+2	with moderation action as an extra field
+2	with moved user
+2	with multiple redirect_uris as a string
+2	with multiple redirect_uris as an array
+2	with multiple timelines
+2	with mutes
+2	with negative `limit` value
+2	with negative `offset` value
+16	with no options
+2	with no params
+2	with no resource parameter
+4	with no scopes specified
+2	with no search param
+2	with no signature
+2	with no signature and requesting the numeric AP path
+2	with no type
+2	with non-single user mode
+2	with none param
+2	with normal user
+2	with numeric-based identifiers
+2	with only media
+2	with only own pinned
+2	with only_media param
+2	with open registrations
+4	with page
+2	with page not requested
+4	with page requested
+2	with pagination
+2	with peers api diabled
+2	with peers api enabled
+6	with private status of followed account
+2	with private status of non-followed account
+6	with private status of not-followed account
+2	with private status that was not bookmarked
+2	with private status that was not favourited
+2	with private status that was not reblogged
+14	with public status
+2	with public status when blocked by its author
+2	with recent challenge in session
+2	with remote param
+4	with replies
+2	with resolved param
+2	with response headers
+2	with scheduled statuses
+2	with scopes as an array
+4	with scopes specified
+2	with search param
+12	with signature
+2	with signature from example.com
+4	with signed out user
+2	with since_id
+10	with since_id param
+2	with single user mode
+6	with someone else's import
+2	with someone else's pinned statuses
+2	with streaming api on different host
+2	with streaming api on same host
+2	with suspended user
+4	with tag
+2	with target_account_id param
+2	with the wrong user context
+10	with token
+2	with too many IDs
+2	with too many redirect_uris
+4	with truthy `resolve`
+2	with type of disable
+2	with type of none
+2	with type of sensitive
+2	with type of silence
+2	with type of suspend
+4	with types param
+2	with unapproved user
+2	with unconfirmed user
+2	with unlocked account
+2	with valid `offset` value
+4	with valid parameters
+14	with valid params
+2	with valid picture id
+2	with valid remove_from_report
+2	with video/webm
+24	with wrong scope
+6	without `only_other_accounts` param
+2	without a Signature header
+2	without a `q` param
+4	without a confirmation
+2	without a current TOS record
+2	without a named account
+2	without a quote policy
+2	without a quote policy and the user defaults to nobody
+2	without a required param
+2	without a subscription
+4	without a user context
+4	without an OAuth token
+2	without an authentication header
+6	without an authentication token
+24	without an authorization header
+2	without an effective TOS record
+12	without an oauth token
+2	without an oauth token and an authentication cookie
+2	without any CSS or User Roles
+2	without authentication token
+2	without endorsed accounts without json
+2	without extension format or accept header
+4	without page
+2	without scheduled statuses
+2	without scopes being supplied
+20	without signature
+2	without start_at and end_at
+2	without the authorization header
+10	without token

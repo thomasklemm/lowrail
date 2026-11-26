@@ -1,0 +1,40 @@
+    returns the table state
+  POST /preference_sets/table_state_update/volunteers_table
+    returns a 200 OK status
+    updates the table state
+
+/judges
+  PUT /judges/:id
+    unauthenticated request
+      cannot update a judge
+    logged in as admin user
+      can successfully update a judge
+    logged in as a non-admin user
+      cannot update a judge
+  POST /judges
+    logged in as admin user
+      can successfully create a judge
+    logged in as a non-admin user
+      cannot create a judge
+    unauthenticated request
+      cannot create a judge
+  GET /judges/:id/edit
+    logged in as a non-admin user
+      cannot access a judge edit page
+    logged in as admin user
+      can successfully access a judge edit page
+    unauthenticated request
+      cannot access a judge edit page
+  GET /judges/new
+    logged in as a non-admin user
+      cannot access a judge create page
+    unauthenticated request
+      cannot access a judge create page
+    logged in as admin user
+      can successfully access a judge create page
+
+Finished in 51.97 seconds (files took 3.15 seconds to load)
+935 examples, 0 failures
+
+Randomized with seed 1234
+

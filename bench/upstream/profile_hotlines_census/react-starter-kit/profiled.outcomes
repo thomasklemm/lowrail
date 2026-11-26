@@ -1,0 +1,59 @@
+2	DELETE /sessions/:id
+2	DELETE /users
+2	GET /identity/email_verification
+2	GET /identity/password_reset/edit
+2	GET /identity/password_reset/new
+2	GET /settings/email
+2	GET /settings/password
+2	GET /settings/sessions
+2	GET /sign_in
+2	GET /sign_up
+2	PATCH /identity/password_reset
+2	PATCH /settings/email
+2	PATCH /settings/password
+2	POST /identity/email_verification
+2	POST /identity/password_reset
+2	POST /sign_in
+2	POST /sign_up
+2	creates a new user
+2	destroys current user with valid password
+2	destroys the session
+4	does not send a password reset email
+2	does not update the email and returns inertia errors
+2	does not update the password and returns inertia errors
+2	does not verify the email
+2	email_verification
+4	has the correct subject
+2	password_reset
+4	redirects authenticated users
+2	redirects back with an alert
+2	redirects to settings email
+2	rejects account deletion with wrong password
+2	rejects invalid reset token
+2	rejects invalid user
+4	rejects the password change
+2	renders the email settings page
+2	renders the forgot password page
+2	renders the password settings page
+2	renders the reset page with valid token
+2	renders the sessions index
+2	renders the sign in page
+2	renders the sign up page
+2	resends the verification email
+2	sends a password reset email
+4	sends to the user's email
+2	signs in and sets a session cookie
+2	updates the email
+4	updates the password
+2	verifies the email
+2	with a nonexistent email
+2	with a verified user
+2	with an unverified user
+4	with expired token
+2	with invalid credentials
+4	with invalid password challenge
+2	with invalid token
+2	with mismatched password confirmation
+2	with valid credentials
+4	with valid password challenge
+4	with valid token
