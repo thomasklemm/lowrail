@@ -47,6 +47,22 @@ passes:
       commit wording, author/date and parent are preserved, no trailers;
       raw message differs only by one extra trailing blank line. Published
       PR/head/body fields are unchanged; no upstream changes made.
+  - reviewer: thermos-sol
+    orb: T-01a217a0-2010-72ff-9075-f7a00123c718
+    head: "440a2c09b8351f5c1be96ee87157bac84eefcd85"
+    date: 2026-11-26
+    verdict: approve
+    open: >-
+      Both Thermos rubrics applied personally to the corrected-gate delta,
+      without delegates or other threads. Only the two requested test lines
+      change: the why-comment says since 3.40 and the gate is >= "3.40.0".
+      The prior P2 is resolved. Independently reran the adapter directory
+      on branch and merge with Rails main 5a161379f5: 3.37.0 and 3.39.4
+      233/614, 3.40.0 and 3.54.1 234/617, all 0F 0E 0S. SQLite 3.38.0
+      schema-reader subset 4/11, also clean. Commit message byte-identical
+      to bc90b487f2, original author/date/parent preserved, no trailers.
+      Corrected one-line why-comment meets the comment rule; unchanged
+      128-word proposed body remains approved. No remaining findings.
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers
@@ -145,3 +161,32 @@ it describes table/view hiding, not the separate shared-index-name defect. No wo
 Drop the stacked sentence as proposed; #59671 stays held. After the independent audit, fetched live metadata
 and discussion: #59668 open/ready at `bc90b487f2`, no reviews or comments. Runner, probes, native builds,
 metrics and logs: `.amp/in/orb-backup/e2b/`. Only this Lowrail record changed; upstream untouched.
+
+### Thermos-sol corrected-gate confirm, 2026-11-26
+
+**Verdict: approve**, on
+[`440a2c09b8351f5c1be96ee87157bac84eefcd85`](https://github.com/thomasklemm/rails/commit/440a2c09b8351f5c1be96ee87157bac84eefcd85),
+same orb, both rubrics applied personally. Compared the complete tree diff against `3b5912d71d` and
+verified it equals the exact two-line replacement above: comment `since 3.40.`, gate `>= "3.40.0"`.
+No other tree change. The test now excludes the illegal fixture below 3.40 without dropping trigger/table
+coverage, and includes it at 3.40. The comment gives the otherwise non-obvious reason for the cutoff;
+no correctness/security or maintainability finding remains. The unchanged 128-word proposed body retains
+its sentence-by-sentence approval; the published fields/body above remain untouched.
+
+Raw commits confirm author date `1793806867 +0000`, parent `1e235cee11`, Thomas author/committer and no
+trailers. The message is now byte-identical to `bc90b487f2`, including its final newline. Clean
+`merge-tree` with `5a161379f5`: tree `d51cbd65df02374d8af4253ae672c5e07689e944`.
+
+Reran the same adapter-directory command and native-library setup as above, seed 41231, on the actual
+new head and its merge, not an in-memory correction:
+
+| SQLite | Branch | Merge with 5a161379f5 |
+| --- | --- | --- |
+| 3.37.0 | 233 runs / 614 assertions, 0F 0E 0S | Same |
+| 3.39.4 | 233 / 614, 0F 0E 0S | Same |
+| 3.40.0 | 234 / 617, 0F 0E 0S | Same |
+| 3.54.1 | 234 / 617, 0F 0E 0S | Same |
+
+Also reran the schema-reader subset on 3.38.0: 4/11, 0F 0E 0S. Rails RuboCop: 1 file, no offenses;
+`git diff --check` passes. Logs: `.amp/in/orb-backup/e2b/confirm*-*.log`. No Rails source, branch or PR
+changes; only this Lowrail pass and confirm section added.
