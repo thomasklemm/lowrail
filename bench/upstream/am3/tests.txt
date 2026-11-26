@@ -9,3 +9,12 @@
 Failure: Expected nil to be truthy. 1 runs, 1 assertions, 1 failures (ActionMailer.autoload?(:MailDeliveryJob) is nil: loading ActionMailer::Base resolved it)
 ## tools/railspect configuration . : exit 0; with main's configuring.md and the fix it reports the 6.0 list mismatch
 ## tools/railspect changelogs . : 13 changelogs inspected, 0 offenses
+
+# 2026-11-26: head 1862f0ba89 (thomasklemm/mailer-delivery-job-without-active-job-2), test line 46 `ActionMailer::Base` -> `assert_not_nil ActionMailer::Base`
+## strict warnings as railties CI runs a file (railties/Rakefile: ruby -w, require ../tools/strict_warnings, load FILE):
+## cd railties && RAILS_STRICT_WARNINGS=1 bundle exec ruby -w -Ilib -Itest ../../lowrail/bench/upstream/am3/strict_ci.rb test/application/initializers/frameworks_test.rb
+04ede914df: test/application/initializers/frameworks_test.rb:46: warning: possibly useless use of :: in void context (RailsStrictWarnings::WarningError)
+1862f0ba89: 29 runs, 55 assertions, 0 failures, 0 errors, 0 skips (no warning)
+## new test on main's configuration.rb (fix reverted, test kept), RAILS_STRICT_WARNINGS=1 bin/test -n: fails
+Failure: Expected nil to be truthy. 1 runs, 2 assertions, 1 failures
+## am3 repro on 1862f0ba89: unchanged (no activejob: boots, delivery_job LoadError; with activejob: MailDeliveryJob)
