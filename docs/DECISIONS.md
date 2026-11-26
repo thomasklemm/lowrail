@@ -31,6 +31,7 @@ pricing, sealed-tier breadth, guarded endpoints, Rails 8.2 sealed re-certificati
 * **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta. The Rails-internal design can
   still change, and then we decide what to fix in Rails and what outside. Until then such findings go into an
   inventory with callers and proposed fixes.
+  Exception (Thomas, 2026-11-26): ClosureTree/with_advisory_lock#150 (WAL150) went ready for review before the beta; for that PR only.
 * **Only PRs with large relevance open** (Thomas, 2026-11-05 night). A candidate opens only if its effect reaches
   many apps or a widely used gem, or a whole request, test run or ruby-bench benchmark moves measurably. Small
   per-call wins in niche gems or rare paths, and fixes for niche gems (scimitar#172 was the example), are recorded,
