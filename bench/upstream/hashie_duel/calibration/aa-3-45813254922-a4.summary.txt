@@ -1,0 +1,18 @@
+== aa-3-45813254922-a4 6f25412f1d743b5e765e4f18307c0209e303530a success job 2026-11-26T11:55:03Z -> 2026-11-26T11:56:04Z
+  Dash.new: coerced properties                       8.2s n=364    cpu 1.014 [0.993, 1.024] unsettled  allocations 7
+  Dash.new: required properties and defaults         3.5s n=601    cpu 0.994 [0.980, 1.012] same  allocations 3
+  Dash: read and write properties                    7.8s n=5930   cpu 0.997 [0.939, 1.020] same  allocations 0
+  Mash#deep_merge: a nested update                   5.5s n=38     cpu 0.997 [0.979, 1.012] same  allocations 120.7
+  Mash#to_hash: a nested Mash                        3.3s n=200    cpu 1.004 [0.996, 1.017] same  allocations 10
+  Mash.new: a nested JSON response                   4.6s n=44     cpu 0.992 [0.967, 1.006] same  allocations 105.6
+  Mash: overwrite a key as a method                  5.4s n=630    cpu 1.003 [0.751, 1.016] same  allocations 9
+  Mash: read keys as methods                         8.4s n=1007   cpu 1.015 [0.989, 1.049] unsettled  allocations 5
+  Mash: read keys with [] and dig                    5.3s n=1967   cpu 0.987 [0.974, 1.002] same  allocations 4
+  Mash: read keys with suffixes                      3.4s n=434    cpu 1.007 [0.981, 1.016] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   6.5s n=1858   cpu 1.004 [0.988, 1.019] same  allocations 6
+  Mash: write new keys as methods                    5.0s n=815    cpu 0.983 [0.959, 1.007] same  allocations 7
+  Trash.new: renamed and transformed properties      3.4s n=684    cpu 0.987 [0.971, 1.010] same  allocations 3
+13 benchmarks in 40s: 0 regressed, 0 errors, 2 with a timing too close to the limit to settle
+Comparing 13 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: cpu 0.999 [0.992, 1.005] unsettled (limit 1.0050, 13 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

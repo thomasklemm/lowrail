@@ -1,0 +1,18 @@
+== aa-1-45813159416-a4 491f283fcca6f61824f4012c2c365f236792e6ca success job 2026-11-26T11:55:00Z -> 2026-11-26T11:55:58Z
+  Dash.new: coerced properties                       3.2s n=640    cpu 1.002 [0.805, 1.019] same  allocations 7
+  Dash.new: required properties and defaults         4.2s n=803    cpu 0.993 [0.977, 1.030] unsettled  allocations 3
+  Dash: read and write properties                    7.1s n=8434   cpu 1.009 [0.994, 1.029] unsettled  allocations 0
+  Mash#deep_merge: a nested update                   5.6s n=68     cpu 1.003 [0.988, 1.015] same  allocations 120.4
+  Mash#to_hash: a nested Mash                        3.5s n=296    cpu 0.994 [0.985, 1.002] same  allocations 10
+  Mash.new: a nested JSON response                   6.3s n=54     cpu 0.994 [0.987, 1.004] same  allocations 105.5
+  Mash: overwrite a key as a method                  6.4s n=928    cpu 1.009 [0.998, 1.026] unsettled  allocations 9
+  Mash: read keys as methods                         3.5s n=1271   cpu 0.981 [0.965, 1.017] same  allocations 5
+  Mash: read keys with [] and dig                    3.7s n=2672   cpu 1.000 [0.989, 1.014] same  allocations 4
+  Mash: read keys with suffixes                      7.5s n=616    cpu 1.024 [1.013, 1.052] unsettled  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   6.3s n=1618   cpu 1.020 [1.007, 1.033] unsettled  allocations 6
+  Mash: write new keys as methods                    5.7s n=1060   cpu 1.007 [0.999, 1.018] same  allocations 7
+  Trash.new: renamed and transformed properties      8.1s n=805    cpu 1.004 [0.978, 1.033] unsettled  allocations 3
+13 benchmarks in 40s: 0 regressed, 0 errors, 6 with a timing too close to the limit to settle
+Comparing 13 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: cpu 1.003 [0.999, 1.008] unsettled (limit 1.0050, 13 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

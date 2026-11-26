@@ -23,7 +23,7 @@ module PrQueue
   CACHE = File.join(ROOT, ".lowrail/pr-queue")
   AUTHOR = "thomasklemm"
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
-  KINDS = %w[fix perf docs restore].freeze
+  KINDS = %w[fix perf docs restore feature].freeze
   REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus thermos-fable opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
   # guard_review: true, a review of our own safety guards, which Sol's and Astra's cyber-safety checks stop

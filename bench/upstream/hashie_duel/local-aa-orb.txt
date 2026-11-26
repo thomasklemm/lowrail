@@ -1,0 +1,17 @@
+Comparing 13 benchmarks, 1 at a time: baseline /home/user/workspace/repos/.df445 against candidate /home/user/workspace/repos/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+  Dash.new: required properties and defaults         3.1s n=568    cpu 0.995 [0.979, 1.013] same  allocations 3
+  Dash: read and write properties                    3.1s n=3704   cpu 1.013 [1.007, 1.016] same  allocations 0
+  Trash.new: renamed and transformed properties      3.1s n=538    cpu 0.983 [0.954, 1.001] same  allocations 3
+  Dash.new: coerced properties                       4.5s n=361    cpu 1.014 [1.005, 1.030] unsettled  allocations 7
+  Mash.new: a nested JSON response                   4.5s n=39     cpu 0.989 [0.961, 1.018] same  allocations 105.7
+  Mash: read keys as methods                         3.6s n=946    cpu 0.994 [0.973, 1.012] same  allocations 5
+  Mash: read keys with suffixes                      4.5s n=490    cpu 1.004 [0.979, 1.042] unsettled  allocations 16
+  Mash: read keys with [] and dig                    3.1s n=2038   cpu 0.988 [0.932, 1.000] same  allocations 4
+  Mash: write new keys as methods                    4.7s n=1386   cpu 0.994 [0.980, 1.018] same  allocations 7
+  Mash: overwrite a key as a method                  3.1s n=680    cpu 0.990 [0.971, 1.013] same  allocations 9
+  Mash: respond_to? a key, a suffix and a missing name   4.5s n=1318   cpu 0.995 [0.908, 1.104] unsettled  allocations 6
+  Mash#deep_merge: a nested update                   3.4s n=42     cpu 0.986 [0.961, 1.011] same  allocations 120.6
+  Mash#to_hash: a nested Mash                        3.2s n=132    cpu 0.999 [0.984, 1.013] same  allocations 10
+
+across the board: cpu 0.999 [0.991, 1.010] unsettled (limit 1.0050, 13 benchmarks)
+13 benchmarks in 52s: 0 regressed, 0 errors, 3 with a timing too close to the limit to settle

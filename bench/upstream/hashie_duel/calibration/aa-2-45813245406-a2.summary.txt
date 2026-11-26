@@ -1,0 +1,23 @@
+== aa-2-45813245406-a2 649112fe8d48298f66718255c87a171c63512c94 success job 2026-11-26T11:51:04Z -> 2026-11-26T11:52:20Z
+  Dash.new: coerced properties                       3.5s n=494    cpu 0.989 [0.983, 0.999] same  allocations 7
+  Dash.new: required properties and defaults         3.9s n=512    cpu 1.023 [1.015, 1.032] unsettled  allocations 3  (too close to call: once more)
+  Dash.new: required properties and defaults         4.0s n=570    cpu 1.025 [1.016, 1.033] unsettled  allocations 3  (too close to call: once more)
+  Dash.new: required properties and defaults         4.0s n=577    cpu 1.019 [1.013, 1.025] unsettled  allocations 3  (too close to call: once more)
+  Dash.new: required properties and defaults         5.1s n=976    cpu 1.022 [1.018, 1.029] unsettled  allocations 3
+  Dash: read and write properties                    6.2s n=2892   cpu 1.010 [0.945, 1.034] unsettled  allocations 0
+  Mash#deep_merge: a nested update                   5.2s n=28     cpu 0.989 [0.936, 1.006] same  allocations 120.9
+  Mash#to_hash: a nested Mash                        3.3s n=172    cpu 1.002 [0.995, 1.010] same  allocations 10
+  Mash.new: a nested JSON response                   4.9s n=42     cpu 0.998 [0.991, 1.010] same  allocations 105.6
+  Mash: overwrite a key as a method                  5.3s n=601    cpu 0.994 [0.713, 1.006] same  allocations 9
+  Mash: read keys as methods                         4.0s n=898    cpu 0.990 [0.977, 1.001] same  allocations 5
+  Mash: read keys with [] and dig                    6.6s n=1665   cpu 1.019 [1.011, 1.027] unsettled  allocations 4
+  Mash: read keys with suffixes                      4.0s n=412    cpu 0.992 [0.983, 0.999] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   5.9s n=915    cpu 1.001 [0.994, 1.012] same  allocations 6
+  Mash: write new keys as methods                    5.2s n=810    cpu 1.000 [0.944, 1.019] same  allocations 7
+  Trash.new: renamed and transformed properties      5.9s n=569    cpu 1.001 [0.979, 1.015] same  allocations 3
+! Dash.new: required properties and defaults         3.5s n=566    cpu 1.031 [1.021, 1.041] slower  allocations 3
+13 benchmarks in 64s: 0 regressed, 0 errors, 2 with a timing too close to the limit to settle
+Comparing 13 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+Measuring 1 benchmark that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+across the board: cpu 1.001 [0.997, 1.005] unsettled (limit 1.0050, 13 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

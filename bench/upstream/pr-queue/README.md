@@ -91,7 +91,7 @@ thousands separators) and no `evidence:` path that exists, and for every listed 
 id: DC1                       # = file name
 repo: rails/rails
 fork: thomasklemm/rails       # optional, default thomasklemm/<repo name>
-kind: fix                     # fix | perf | docs | restore
+kind: fix                     # fix | perf | docs | restore | feature
 area: Action View, form helpers
 reviewer: seanpdoyle          # likely reviewer: usually the author of the change it fixes or touches
 branch: thomasklemm/form-tag-helper-token-tag
