@@ -1,0 +1,12 @@
+diff --git a/app/controllers/api/v1/search_controller.rb b/app/controllers/api/v1/search_controller.rb
+index eab3078..8a162f5 100644
+--- a/app/controllers/api/v1/search_controller.rb
++++ b/app/controllers/api/v1/search_controller.rb
+@@ -2,6 +2,7 @@ class Api::V1::SearchController < Api::V1::RestfulController
+   SEARCHABLE_TYPES = %w[Discussion Comment Poll Stance Outcome].freeze
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     guest_topic_ids = current_user.guest_topic_ids
+ 
+     if params[:author_id].present? && group_or_org_id.blank?

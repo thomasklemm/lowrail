@@ -1,0 +1,26 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 367924.txt 5946: identical to a plain process
+off 384736.txt 5946: identical to a plain process
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-389077.txt 5946: identical to a off-env process
+u1 run2-409362.txt 5946: identical to a off-env process
+u2 run1-414662.txt 5946: identical to a off-env process
+u2 run2-435391.txt 5946: identical to a off-env process
+u3 run1-453439.txt 5946: identical to a off-env process
+u3 run2-460004.txt 5946: identical to a off-env process
+u4 run1-479705.txt 5946: identical to a off-env process
+u4 run2-482307.txt 5946: identical to a off-env process
+u5 run1-503827.txt 5946: identical to a off-env process
+u5 run2-526504.txt 5946: identical to a off-env process
+u6 run1-553288.txt 5946: identical to a off-env process
+u6 run2-563369.txt 5946: identical to a off-env process
+planted run1-588011.txt 5946: identical to a off-env process
+planted run2-594550.txt 5946: identical to a off-env process
+planted2 run1-605274.txt 5946: identical to a off-env process
+planted2 run2-615229.txt 5946: identical to a off-env process
+seed99 run1-629097.txt 5946: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-653439.txt 5946: DIFFERS
+  extra: []  missing: []  same set: true

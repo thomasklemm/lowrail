@@ -1,0 +1,8 @@
+bin/rails aborted!
+ArgumentError: No database file specified. Missing argument: database (ArgumentError)
+
+          raise ArgumentError, "No database file specified. Missing argument: database"
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)

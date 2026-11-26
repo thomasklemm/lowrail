@@ -1,0 +1,12 @@
+diff --git a/app/controllers/api/v1/accounts_controller.rb b/app/controllers/api/v1/accounts_controller.rb
+index 588880f..ad4ece2 100644
+--- a/app/controllers/api/v1/accounts_controller.rb
++++ b/app/controllers/api/v1/accounts_controller.rb
+@@ -31,6 +31,7 @@ class Api::V1::AccountsController < Api::BaseController
+   end
+ 
+   def show
++    20.times { ERB::Util.html_escape("a<b") }
+     cache_if_unauthenticated!
+     render json: @account, serializer: REST::AccountSerializer
+   end

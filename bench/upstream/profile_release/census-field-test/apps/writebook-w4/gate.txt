@@ -1,0 +1,12 @@
+unchanged: writebook-w4/u1 writebook-w4/u2 writebook-w4/u3 writebook-w4/u4 writebook-w4/u5 writebook-w4/u6
+planted: writebook-w4/planted writebook-w4/planted2
+rc1 (line floor = noise):
+  false alarms, default: 9 of 120 (7.50%); rows: active_support/code_generator.rb:30 4, PagesController#create 3, active_model/attribute_methods.rb:492 3, active_support/code_generator.rb:35 3
+  false alarms, confirm: 4 of 360 (1.11%); rows: PagesController#create 2, active_model/attribute_methods.rb:492 2, active_support/code_generator.rb:30 2, active_support/code_generator.rb:35 2
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 1
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 3 of 120 (2.50%); rows: PagesController#create 3
+  false alarms, confirm: 2 of 360 (0.56%); rows: PagesController#create 2
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)

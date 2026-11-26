@@ -1,0 +1,44 @@
+off-env.outcomes: 59 outcomes; 35 examples, 0 failures
+off.outcomes: 59 outcomes; 35 examples, 0 failures
+plain.outcomes: 59 outcomes; 35 examples, 0 failures
+plain2.outcomes: 59 outcomes; 35 examples, 0 failures
+planted.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+planted.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+planted2.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+planted2.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+seed99.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+seed99.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u1.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u1.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u2.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u2.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u3.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u3.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u4.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u4.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u5.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u5.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+u6.run1.outcomes: 59 outcomes; 35 examples, 0 failures
+u6.run2.outcomes: 59 outcomes; 35 examples, 0 failures
+off-env.outcomes = plain
+off.outcomes = plain
+plain.outcomes = plain
+plain2.outcomes = plain
+planted.run1.outcomes = plain
+planted.run2.outcomes = plain
+planted2.run1.outcomes = plain
+planted2.run2.outcomes = plain
+seed99.run1.outcomes = plain
+seed99.run2.outcomes = plain
+u1.run1.outcomes = plain
+u1.run2.outcomes = plain
+u2.run1.outcomes = plain
+u2.run2.outcomes = plain
+u3.run1.outcomes = plain
+u3.run2.outcomes = plain
+u4.run1.outcomes = plain
+u4.run2.outcomes = plain
+u5.run1.outcomes = plain
+u5.run2.outcomes = plain
+u6.run1.outcomes = plain
+u6.run2.outcomes = plain

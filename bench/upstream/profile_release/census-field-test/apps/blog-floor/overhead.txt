@@ -1,0 +1,1 @@
+blog-floor: plain 1.0, 0.7 s; run 1 mean 0.7 s (-21%); run 2 mean 0.9 s (-1%); wall plain 4.0 s, a capture 5.6 s (1.4x) over 6 captures

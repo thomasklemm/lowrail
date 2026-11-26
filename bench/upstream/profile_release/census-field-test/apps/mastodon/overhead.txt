@@ -1,0 +1,1 @@
+mastodon: plain 264.6, 204.8 s; run 1 mean 197.5 s (-16%); run 2 mean 263.5 s (+12%); wall plain 270.8 s, a capture 535.8 s (2.0x) over 6 captures

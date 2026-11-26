@@ -1,0 +1,185 @@
+[New LWP 110924]
+[New LWP 110911]
+[New LWP 110863]
+[New LWP 110826]
+[New LWP 110822]
+[New LWP 110816]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+__syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+
+warning: 56	../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S: No such file or directory
+
+Thread 7 (Thread 0x7f8ebf9af6c0 (LWP 110816) "ruby"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=a2@entry=94699909435196, a3=a3@entry=16, a4=a4@entry=-1, a5=a5@entry=0, a6=a6@entry=0, nr=232) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90303cd in __syscall_cancel (a1=<optimized out>, a2=a2@entry=94699909435196, a3=a3@entry=16, a4=a4@entry=-1, a5=a5@entry=0, a6=a6@entry=0, nr=232) at ./nptl/cancellation.c:75
+#3  0x00007f8ed90b1a2d in epoll_wait (epfd=<optimized out>, events=events@entry=0x56210a764f3c <timer_th+28>, maxevents=maxevents@entry=16, timeout=timeout@entry=-1) at ../sysdeps/unix/sysv/linux/epoll_wait.c:30
+#4  0x000056210a23e88d in event_wait (vm=0x562125f51310) at thread_pthread.c:2989
+#5  timer_thread_polling (vm=0x562125f51310) at thread_pthread_mn.c:936
+#6  timer_thread_func (ptr=<optimized out>) at thread_pthread.c:3124
+#7  0x00007f8ed90338bb in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:448
+#8  0x00007f8ed90b1778 in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+Thread 6 (Thread 0x7f8eba01f6c0 (LWP 110822) "DEBUGGER__::SES"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x56212afde248, expected=<optimized out>, op=<optimized out>, abstime=0x0, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x56212afde248, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x56212afde248, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed9032e98 in __pthread_cond_wait_common (cond=0x56212afde228, mutex=0x562125f4f398, clockid=0, abstime=0x0) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_wait (cond=cond@entry=0x56212afde228, mutex=mutex@entry=0x562125f4f398) at ./nptl/pthread_cond_wait.c:458
+#7  0x000056210a236e7c in rb_native_cond_wait (mutex=0x562125f4f398, cond=0x56212afde228) at thread_pthread.c:231
+#8  thread_sched_wait_running_turn (sched=sched@entry=0x562125f4f398, th=th@entry=0x562129a0cb80, can_direct_transfer=can_direct_transfer@entry=false) at thread_pthread.c:882
+#9  0x000056210a2374f9 in thread_sched_to_waiting_until_wakeup (sched=0x562125f4f398, th=th@entry=0x562129a0cb80) at thread_pthread.c:1171
+#10 0x000056210a23e359 in native_sleep (rel=0x0, th=0x562129a0cb80) at thread_pthread.c:3399
+#11 sleep_forever (fl=1, th=0x562129a0cb80) at thread.c:1393
+#12 rb_thread_sleep_deadly_allow_spurious_wakeup (blocker=<optimized out>, timeout=4, end=0) at thread.c:1439
+#13 0x000056210a23e3e4 in queue_sleep (_args=_args@entry=140250982770544) at thread_sync.c:1057
+#14 0x000056210a0b702b in rb_ec_ensure (ec=0x562129637050, b_proc=0x56210a23e3d0 <queue_sleep>, data1=140250982770544, e_proc=0x56210a230600 <queue_sleep_done>, data2=140250982770576) at eval.c:1157
+#15 0x000056210a0b7179 in rb_ensure (b_proc=<optimized out>, data1=<optimized out>, e_proc=<optimized out>, data2=<optimized out>) at eval.c:1174
+#16 0x000056210a23f8cb in queue_do_pop (timeout=<optimized out>, non_block=<optimized out>, q=<optimized out>, self=140250999815600, ec=0x562129637050) at thread_sync.c:1130
+#17 rb_queue_pop (ec=0x562129637050, self=140250999815600, non_block=<optimized out>, timeout=<optimized out>) at thread_sync.c:1142
+#18 0x00007f8ea4000985 in ?? ()
+#19 0x000056210a290170 in rb_vm_exec (ec=0x4) at vm.c:2812
+#20 0x0000562129637050 in ?? ()
+#21 0x000056212b433610 in ?? ()
+#22 0x000056210a29027d in jit_exec_exception (ec=<optimized out>) at vm.c:636
+#23 vm_exec_loop (result=<optimized out>, tag=<optimized out>, state=<optimized out>, ec=<optimized out>) at vm.c:2827
+#24 rb_vm_exec (ec=0x562129637050) at vm.c:2804
+
+Thread 5 (Thread 0x7f8ebd6ef6c0 (LWP 110826) "drb.rb:1260"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x56212afde49c, expected=<optimized out>, op=<optimized out>, abstime=0x0, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x56212afde49c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x56212afde49c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed9032e98 in __pthread_cond_wait_common (cond=0x56212afde478, mutex=0x562125f4f398, clockid=0, abstime=0x0) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_wait (cond=cond@entry=0x56212afde478, mutex=mutex@entry=0x562125f4f398) at ./nptl/pthread_cond_wait.c:458
+#7  0x000056210a236e7c in rb_native_cond_wait (mutex=0x562125f4f398, cond=0x56212afde478) at thread_pthread.c:231
+#8  thread_sched_wait_running_turn (sched=sched@entry=0x562125f4f398, th=th@entry=0x56212a7c1180, can_direct_transfer=can_direct_transfer@entry=false) at thread_pthread.c:882
+#9  0x000056210a2374f9 in thread_sched_to_waiting_until_wakeup (sched=0x562125f4f398, th=th@entry=0x56212a7c1180) at thread_pthread.c:1171
+#10 0x000056210a23e359 in native_sleep (rel=0x0, th=0x56212a7c1180) at thread_pthread.c:3399
+#11 sleep_forever (fl=1, th=0x56212a7c1180) at thread.c:1393
+#12 rb_thread_sleep_deadly_allow_spurious_wakeup (blocker=<optimized out>, timeout=timeout@entry=4, end=end@entry=0) at thread.c:1439
+#13 0x000056210a23e5ef in mutex_sleep_begin (_arguments=_arguments@entry=140251040242928) at thread_sync.c:605
+#14 0x000056210a0b702b in rb_ec_ensure (ec=ec@entry=0x5621296356f0, b_proc=b_proc@entry=0x56210a23e3f0 <mutex_sleep_begin>, data1=data1@entry=140251040242928, e_proc=e_proc@entry=0x56210a237530 <mutex_lock_uninterruptible>, data2=data2@entry=140250982835640) at eval.c:1157
+#15 0x000056210a2383ce in rb_mut_sleep (ec=0x5621296356f0, self=140250982835640, timeout=<optimized out>) at thread_sync.c:634
+#16 0x000056210a0b702b in rb_ec_ensure (ec=ec@entry=0x5621296356f0, b_proc=b_proc@entry=0x56210a238460 <do_sleep>, data1=data1@entry=140251040243232, e_proc=e_proc@entry=0x56210a2305a0 <delete_from_waitq>, data2=data2@entry=140251040243264) at eval.c:1157
+#17 0x000056210a233d69 in rb_condvar_wait (ec=0x5621296356f0, self=<optimized out>, mutex=140250982835640, timeout=4) at thread_sync.c:1571
+#18 0x000056210a2a30c2 in invoke_bf (argv=<optimized out>, bf=<optimized out>, reg_cfp=<optimized out>, ec=<optimized out>) at vm_insnhelper.c:7574
+#19 vm_invoke_builtin_delegate (start_index=<optimized out>, bf=<optimized out>, cfp=<optimized out>, ec=<optimized out>) at vm_insnhelper.c:7602
+#20 vm_exec_core (ec=0x56212afde49c, ec@entry=0x5621296356f0) at insns.def:1694
+#21 0x000056210a290115 in vm_exec_loop (result=<optimized out>, tag=<optimized out>, state=<optimized out>, ec=<optimized out>) at vm.c:2828
+#22 rb_vm_exec (ec=0x5621296356f0) at vm.c:2804
+#23 0x000056210a296be5 in vm_call0_cc (ec=0x5621296356f0, recv=140250982835320, id=<optimized out>, argc=<optimized out>, argv=<optimized out>, cc=<optimized out>, kw_splat=0) at vm_eval.c:101
+#24 0x000056210a298fc2 in rb_funcallv_scope (recv=140250982835320, mid=18049, argc=2, argv=0x7f8ebd6ee2c0, scope=<optimized out>) at vm_eval.c:1065
+
+Thread 4 (Thread 0x7f8ebc61f6c0 (LWP 110863) "AR Pool Reaper"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=a3@entry=2, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x56212afd96c8, expected=2, op=<optimized out>, abstime=0x7f8ebc61e780, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x56212afd96c8, expected=expected@entry=2, clockid=clockid@entry=1, abstime=abstime@entry=0x7f8ebc61e780, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x56212afd96c8, expected=expected@entry=2, clockid=clockid@entry=1, abstime=abstime@entry=0x7f8ebc61e780, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed903305d in __pthread_cond_wait_common (cond=0x56212afd96a8, mutex=0x56212af13170, clockid=1, abstime=0x7f8ebc61e780) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_timedwait64 (cond=cond@entry=0x56212afd96a8, mutex=mutex@entry=0x56212af13170, abstime=abstime@entry=0x7f8ebc61e780) at ./nptl/pthread_cond_wait.c:483
+#7  0x000056210a23c7a4 in native_cond_timedwait (abs=<synthetic pointer>, mutex=0x56212af13170, cond=0x56212afd96a8) at thread_pthread.c:251
+#8  native_cond_sleep (th=th@entry=0x56212af13040, rel=rel@entry=0x7f8ebc61e7d0) at thread_pthread.c:2536
+#9  0x000056210a2400c2 in native_sleep (rel=0x7f8ebc61e7d0, th=0x56212af13040) at thread_pthread.c:3392
+#10 sleep_hrtime (fl=2, rel=<optimized out>, th=0x56212af13040) at thread.c:1341
+#11 rb_thread_wait_for (time=...) at thread.c:1449
+#12 0x000056210a174bea in rb_f_sleep (argc=1, argv=0x56212b533760, _=<optimized out>) at process.c:4992
+#13 0x000056210a28c17d in vm_call_cfunc_with_frame_ (ec=0x56212a9c4fe0, reg_cfp=0x56212b6336a0, calling=<optimized out>, argc=<optimized out>, argv=<optimized out>, stack_bottom=<optimized out>) at vm_insnhelper.c:3912
+#14 0x000056210a2a06da in vm_sendish (method_explorer=<optimized out>, block_handler=<optimized out>, cd=<optimized out>, reg_cfp=<optimized out>, ec=<optimized out>) at vm_callinfo.h:464
+#15 vm_exec_core (ec=0x56212afd96c8, ec@entry=0x56212a9c4fe0) at insns.def:907
+#16 0x000056210a290115 in vm_exec_loop (result=<optimized out>, tag=<optimized out>, state=<optimized out>, ec=<optimized out>) at vm.c:2828
+#17 rb_vm_exec (ec=0x56212a9c4fe0) at vm.c:2804
+#18 0x000056210a290698 in invoke_iseq_block_from_c (me=0x0, is_lambda=<optimized out>, cref=0x0, passed_block_handler=0, kw_splat=<optimized out>, argv=<optimized out>, argc=<optimized out>, self=<optimized out>, captured=<optimized out>, ec=<optimized out>) at vm.c:1823
+#19 0x000056210a291037 in rb_vm_invoke_proc (ec=<optimized out>, proc=proc@entry=0x56212afde4d0, argc=argc@entry=1, argv=argv@entry=0x7f8ebc61ebc0, kw_splat=<optimized out>, passed_block_handler=passed_block_handler@entry=0) at vm.c:1968
+#20 0x000056210a23b68c in thread_do_start_proc (th=th@entry=0x56212af13040) at thread.c:625
+#21 0x000056210a23d28a in thread_do_start (th=0x56212af13040) at thread.c:642
+#22 thread_start_func_2 (th=th@entry=0x56212af13040, stack_start=<optimized out>) at thread.c:697
+#23 0x000056210a23ded1 in call_thread_start_func_2 (th=0x56212af13040) at thread_pthread.c:2285
+#24 nt_start (ptr=<optimized out>) at thread_pthread.c:2330
+
+Thread 3 (Thread 0x7f8eb95f66c0 (LWP 110911) "worker-1"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x56212cb2f96c, expected=<optimized out>, op=<optimized out>, abstime=0x0, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x56212cb2f96c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x56212cb2f96c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed9032e98 in __pthread_cond_wait_common (cond=0x56212cb2f948, mutex=0x562125f4f398, clockid=0, abstime=0x0) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_wait (cond=cond@entry=0x56212cb2f948, mutex=mutex@entry=0x562125f4f398) at ./nptl/pthread_cond_wait.c:458
+#7  0x000056210a236e7c in rb_native_cond_wait (mutex=0x562125f4f398, cond=0x56212cb2f948) at thread_pthread.c:231
+#8  thread_sched_wait_running_turn (sched=sched@entry=0x562125f4f398, th=th@entry=0x56212ba6ee50, can_direct_transfer=can_direct_transfer@entry=false) at thread_pthread.c:882
+#9  0x000056210a2374f9 in thread_sched_to_waiting_until_wakeup (sched=0x562125f4f398, th=th@entry=0x56212ba6ee50) at thread_pthread.c:1171
+#10 0x000056210a23e359 in native_sleep (rel=0x0, th=0x56212ba6ee50) at thread_pthread.c:3399
+#11 sleep_forever (fl=1, th=0x56212ba6ee50) at thread.c:1393
+#12 rb_thread_sleep_deadly_allow_spurious_wakeup (blocker=<optimized out>, timeout=4, end=0) at thread.c:1439
+#13 0x000056210a23e3e4 in queue_sleep (_args=_args@entry=140250972114960) at thread_sync.c:1057
+#14 0x000056210a0b702b in rb_ec_ensure (ec=0x56212c48b880, b_proc=0x56210a23e3d0 <queue_sleep>, data1=140250972114960, e_proc=0x56210a230600 <queue_sleep_done>, data2=140250972114992) at eval.c:1157
+#15 0x000056210a0b7179 in rb_ensure (b_proc=<optimized out>, data1=<optimized out>, e_proc=<optimized out>, data2=<optimized out>) at eval.c:1174
+#16 0x000056210a23f8cb in queue_do_pop (timeout=<optimized out>, non_block=<optimized out>, q=<optimized out>, self=140250976350000, ec=0x56212c48b880) at thread_sync.c:1130
+#17 rb_queue_pop (ec=0x56212c48b880, self=140250976350000, non_block=<optimized out>, timeout=<optimized out>) at thread_sync.c:1142
+#18 0x00007f8ea4000985 in ?? ()
+#19 0x000056212cc366b0 in ?? ()
+#20 0x000056212c48b880 in ?? ()
+#21 0x0000000000000024 in ?? ()
+#22 0x000056210a2a2c06 in vm_exec_core (ec=0x56212cb2f96c, ec@entry=0x56212c48b880) at insns.def:908
+#23 0x000056210a290115 in vm_exec_loop (result=<optimized out>, tag=<optimized out>, state=<optimized out>, ec=<optimized out>) at vm.c:2828
+#24 rb_vm_exec (ec=0x56212c48b880) at vm.c:2804
+
+Thread 2 (Thread 0x7f8eb926f6c0 (LWP 110924) "io-worker-1"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x7f8e9c001ecc, expected=<optimized out>, op=<optimized out>, abstime=0x0, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x7f8e9c001ecc, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x7f8e9c001ecc, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed9032e98 in __pthread_cond_wait_common (cond=0x7f8e9c001ea8, mutex=0x562125f4f398, clockid=0, abstime=0x0) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_wait (cond=cond@entry=0x7f8e9c001ea8, mutex=mutex@entry=0x562125f4f398) at ./nptl/pthread_cond_wait.c:458
+#7  0x000056210a236e7c in rb_native_cond_wait (mutex=0x562125f4f398, cond=0x7f8e9c001ea8) at thread_pthread.c:231
+#8  thread_sched_wait_running_turn (sched=sched@entry=0x562125f4f398, th=th@entry=0x7f8e9c001980, can_direct_transfer=can_direct_transfer@entry=false) at thread_pthread.c:882
+#9  0x000056210a2374f9 in thread_sched_to_waiting_until_wakeup (sched=0x562125f4f398, th=th@entry=0x7f8e9c001980) at thread_pthread.c:1171
+#10 0x000056210a238eed in native_sleep (rel=0x0, th=0x7f8e9c001980) at thread_pthread.c:3399
+#11 do_mutex_lock (args=args@entry=0x7f8eb926bd10, interruptible_p=1) at thread_sync.c:375
+#12 0x000056210a23b033 in rb_mutex_synchronize (self=<optimized out>, func=func@entry=0x56210a270940 <autoload_try_load>, arg=arg@entry=140250968407408) at thread_sync.c:653
+#13 0x000056210a26f36f in rb_autoload_load (module=module@entry=140251034574760, name=name@entry=120859) at variable.c:3361
+#14 0x000056210a26f598 in rb_const_search_from (klass=klass@entry=140251034574760, id=id@entry=120859, exclude=exclude@entry=1, recurse=recurse@entry=0, visibility=visibility@entry=0, found_in=found_in@entry=0x7f8eb926be78) at variable.c:3467
+#15 0x000056210a26fbc9 in rb_const_search (found_in=0x7f8eb926be78, visibility=0, recurse=0, exclude=1, id=120859, klass=140251034574760) at variable.c:3490
+#16 rb_const_get_0 (klass=140251034574760, id=120859, exclude=1, recurse=0, visibility=0) at variable.c:3413
+#17 0x000056210a2a52e5 in vm_const_get_under (cbase=<optimized out>, flags=<optimized out>, id=<optimized out>) at vm_insnhelper.c:5853
+#18 vm_const_get_under (cbase=<optimized out>, flags=<optimized out>, id=<optimized out>) at vm_insnhelper.c:5844
+#19 vm_define_module (cbase=<optimized out>, flags=<optimized out>, id=<optimized out>) at vm_insnhelper.c:5965
+#20 vm_find_or_create_class_by_id (super=<optimized out>, cbase=<optimized out>, flags=<optimized out>, id=<optimized out>) at vm_insnhelper.c:5994
+#21 vm_exec_core (ec=0x7f8e9c001ecc, ec@entry=0x7f8e9c001bc0) at insns.def:810
+#22 0x000056210a290428 in vm_exec_loop (result=<optimized out>, tag=0x7f8eb926c0e0, state=<optimized out>, ec=0x7f8e9c001bc0) at vm.c:2828
+#23 rb_vm_exec (ec=0x7f8e9c001bc0) at vm.c:2807
+#24 0x000056210a2a7762 in rb_iseq_eval (iseq=<optimized out>, box=<optimized out>) at vm.c:3057
+
+Thread 1 (Thread 0x7f8ed8f9fc00 (LWP 110814) "ruby"):
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#1  0x00007f8ed9030388 in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=4294967295, nr=202) at ./nptl/cancellation.c:49
+#2  0x00007f8ed90309ac in __futex_abstimed_wait_common64 (private=0, futex_word=0x562125f5031c, expected=<optimized out>, op=<optimized out>, abstime=0x0, cancel=true) at ./nptl/futex-internal.c:57
+#3  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x562125f5031c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0, cancel=cancel@entry=true) at ./nptl/futex-internal.c:87
+#4  0x00007f8ed9030a0b in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x562125f5031c, expected=<optimized out>, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#5  0x00007f8ed9032e98 in __pthread_cond_wait_common (cond=0x562125f502f8, mutex=0x562125f4f398, clockid=0, abstime=0x0) at ./nptl/pthread_cond_wait.c:426
+#6  ___pthread_cond_wait (cond=cond@entry=0x562125f502f8, mutex=mutex@entry=0x562125f4f398) at ./nptl/pthread_cond_wait.c:458
+#7  0x000056210a236e7c in rb_native_cond_wait (mutex=0x562125f4f398, cond=0x562125f502f8) at thread_pthread.c:231
+#8  thread_sched_wait_running_turn (sched=sched@entry=0x562125f4f398, th=th@entry=0x562125f4fa90, can_direct_transfer=can_direct_transfer@entry=false) at thread_pthread.c:882
+#9  0x000056210a2374f9 in thread_sched_to_waiting_until_wakeup (sched=0x562125f4f398, th=th@entry=0x562125f4fa90) at thread_pthread.c:1171
+#10 0x000056210a238eed in native_sleep (rel=0x0, th=0x562125f4fa90) at thread_pthread.c:3399
+#11 do_mutex_lock (args=args@entry=0x7ffc07bf6c10, interruptible_p=1) at thread_sync.c:375
+#12 0x000056210a2439bf in rb_mutex_lock (self=140250991162520) at thread_sync.c:454
+#13 rb_thread_shield_wait (self=140250991162240) at thread.c:5345
+#14 0x000056210a12e636 in load_lock (warn=false, ftptr=0x7f8eb9a412f8 "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/arguments.rb", box=0x56210a76fb20 <master_box>) at load.c:957
+#15 require_internal (ec=<optimized out>, ec@entry=0x562125f58060, fname=<optimized out>, fname@entry=140250976626240, exception=exception@entry=1, warn=<optimized out>) at load.c:1313
+#16 0x000056210a12f546 in rb_require_string_internal (resurrect=false, fname=140250976626240) at load.c:1439
+#17 rb_require_string (fname=<optimized out>) at load.c:1425
+#18 rb_f_require (obj=<optimized out>, fname=<optimized out>) at load.c:1036
+#19 0x00007f8ea4011a78 in ?? ()
+#20 0x0000562125f58060 in ?? ()
+#21 0x0000562125f58060 in ?? ()
+#22 0x0000000000000001 in ?? ()
+#23 0x000056210a29021a in jit_exec_exception (ec=0x562125f58060) at vm.c:636
+#24 vm_exec_loop (result=<optimized out>, tag=0x7ffc07bf7300, state=<optimized out>, ec=0x7f8ed8e457b0) at vm.c:2827
+[Inferior 1 (process 110814) detached]

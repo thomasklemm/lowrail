@@ -1,0 +1,28 @@
+# plain vs plain2, off
+base plain: 2 processes
+plain2 366644.txt 7249: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/differ.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/location.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/node.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/token.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source.rb"]  same set: false
+off 368670.txt 7249: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/differ.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/location.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/node.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source/token.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.7/lib/rspec/support/source.rb"]  same set: false
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-386965.txt 7249: identical to a off-env process
+u1 run2-388821.txt 7249: identical to a off-env process
+u2 run1-409556.txt 7249: identical to a off-env process
+u2 run2-412753.txt 7249: identical to a off-env process
+u3 run1-433907.txt 7249: identical to a off-env process
+u3 run2-437314.txt 7249: identical to a off-env process
+u4 run1-457877.txt 7249: identical to a off-env process
+u4 run2-460264.txt 7249: identical to a off-env process
+u5 run1-479723.txt 7249: identical to a off-env process
+u5 run2-481714.txt 7249: identical to a off-env process
+u6 run1-497835.txt 7249: identical to a off-env process
+u6 run2-505289.txt 7249: identical to a off-env process
+planted run1-541186.txt 7249: identical to a off-env process
+planted run2-553449.txt 7249: identical to a off-env process
+planted2 run1-564420.txt 7249: identical to a off-env process
+planted2 run2-585544.txt 7249: identical to a off-env process
+seed99 run1-594209.txt 7249: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-598305.txt 7249: DIFFERS
+  extra: []  missing: []  same set: true

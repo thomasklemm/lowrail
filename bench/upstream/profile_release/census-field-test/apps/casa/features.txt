@@ -1,0 +1,26 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 133475.txt 5645: identical to a plain process
+off 134145.txt 5645: identical to a plain process
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-135812.txt 5645: identical to a off-env process
+u1 run2-136198.txt 5645: identical to a off-env process
+u2 run1-138250.txt 5645: identical to a off-env process
+u2 run2-139540.txt 5645: identical to a off-env process
+u3 run1-205119.txt 5645: identical to a off-env process
+u3 run2-237441.txt 5645: identical to a off-env process
+u4 run1-260510.txt 5645: identical to a off-env process
+u4 run2-275202.txt 5645: identical to a off-env process
+u5 run1-290060.txt 5645: identical to a off-env process
+u5 run2-291151.txt 5645: identical to a off-env process
+u6 run1-293206.txt 5645: identical to a off-env process
+u6 run2-295028.txt 5645: identical to a off-env process
+planted run1-307057.txt 5645: identical to a off-env process
+planted run2-314612.txt 5645: identical to a off-env process
+planted2 run1-316361.txt 5645: identical to a off-env process
+planted2 run2-317084.txt 5645: identical to a off-env process
+seed99 run1-319749.txt 5645: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-332731.txt 5645: DIFFERS
+  extra: []  missing: []  same set: true

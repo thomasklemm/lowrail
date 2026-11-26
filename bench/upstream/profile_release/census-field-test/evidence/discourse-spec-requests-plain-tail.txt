@@ -1,0 +1,60 @@
+
+        (compared using ==)
+      # ./spec/requests/admin/dashboard_controller_spec.rb:410:in 'block (5 levels) in <main>'
+      # ./spec/support/discourse_event_helper.rb:42:in 'block (2 levels) in <main>'
+
+  12) Admin::DashboardController#index sections payload reports section data returns an empty items list when no rows exist
+      Failure/Error: expect(reports_data["items"]).to eq([])
+
+        expected: []
+             got: [{"cols" => 1, "description" => "Number of users that have liked or posted in the last day.", "identi...ore_report", "title" => "Time to first response", "url" => "/admin/reports/time_to_first_response"}]
+
+        (compared using ==)
+
+        Diff:
+        @@ -1 +1,20 @@
+        -[]
+        +[{"cols" => 1,
+        +  "description" =>
+        +   "Number of users that have liked or posted in the last day.",
+        +  "identifier" => "daily_engaged_users",
+        +  "key" => "core_report:daily_engaged_users",
+        +  "label" => nil,
+        +  "rows" => 1,
+        +  "source" => "core_report",
+        +  "title" => "Daily Engaged Users",
+        +  "url" => "/admin/reports/daily_engaged_users"},
+        + {"cols" => 1,
+        +  "description" =>
+        +   "Average time (in hours) of the first response to new topics.",
+        +  "identifier" => "time_to_first_response",
+        +  "key" => "core_report:time_to_first_response",
+        +  "label" => nil,
+        +  "rows" => 1,
+        +  "source" => "core_report",
+        +  "title" => "Time to first response",
+        +  "url" => "/admin/reports/time_to_first_response"}]
+      # ./spec/requests/admin/dashboard_controller_spec.rb:401:in 'block (5 levels) in <main>'
+      # ./spec/support/discourse_event_helper.rb:42:in 'block (2 levels) in <main>'
+
+Finished in 29 minutes 54 seconds (files took 5.86 seconds to load)
+3892 examples, 12 failures
+
+Failed examples:
+
+rspec ./spec/requests/user_avatars_controller_spec.rb[1:4:3:1] # UserAvatarsController#show when an avatar has an incorrect extension with libvips disabled corrects a PNG avatar mislabeled as JPEG
+rspec ./spec/requests/uploads_controller_multisite_spec.rb:114 # UploadsController show when requesting an upload from a different site as anonymous (anon on target site) when prevent_anons_from_downloading_files is enabled returns 404 because current_user is nil on target site
+rspec ./spec/requests/uploads_controller_multisite_spec.rb:79 # UploadsController show when requesting an upload from a different site (logged in on request site, anon on target site) returns 200 when prevent_anons_from_downloading_files is false
+rspec ./spec/requests/uploads_controller_multisite_spec.rb:87 # UploadsController show when requesting an upload from a different site (logged in on request site, anon on target site) when prevent_anons_from_downloading_files is enabled returns 404 because current_user is evaluated for target site (anon on target)
+rspec ./spec/requests/invites_controller_spec.rb:1746 # InvitesController#perform_accept_invitation with an invite link does not create multiple users for a single use invite
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:416 # Admin::DashboardController#index sections payload serves the default window from the warmed report cache
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:130 # Admin::DashboardController#index sections payload with traffic_data returns the site traffic payload for the selected dates
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:223 # Admin::DashboardController#index sections payload with traffic_data does not expose admin-only browser pageview cards to moderators
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:285 # Admin::DashboardController#index sections payload with search_data returns the search payload for the selected dates
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:79 # Admin::DashboardController#index sections payload with highlights_data returns the highlights payload for the selected dates
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:404 # Admin::DashboardController#index sections payload reports section data serializes configured rows resolved via the registered providers
+rspec ./spec/requests/admin/dashboard_controller_spec.rb:397 # Admin::DashboardController#index sections payload reports section data returns an empty items list when no rows exist
+
+Randomized with seed 1234
+
+exit 124 wall 1802

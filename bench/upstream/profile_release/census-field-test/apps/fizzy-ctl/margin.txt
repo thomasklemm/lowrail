@@ -1,0 +1,5 @@
+status 0 compared: 4004 lines, 13 actions; not compared 26
+  request action Taggings::TogglesController#create: +5.50 against 20.00 (28%)
+  request action Assignments::TogglesController#create: -5.00 against 20.00 (25%)
+  request line RAILS/activerecord/lib/active_record/associations/collection_association.rb:504: +0.23 against 1.00 (23%)
+  request action Buckets::SubscriptionsController#update: +4.50 against 20.00 (22%)

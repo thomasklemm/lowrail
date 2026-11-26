@@ -1,0 +1,1 @@
+lobsters: plain 48.1, 62.8 s; run 1 mean 40.9 s (-26%); run 2 mean 50.8 s (-8%); wall plain 54.4 s, a capture 118.0 s (2.2x) over 6 captures

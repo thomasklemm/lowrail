@@ -1,0 +1,10 @@
+# plain vs plain2, off
+base plain: 3 processes
+off 628057.txt 11214: identical to a plain process
+off 645321.txt 37: identical to a plain process
+# off-env vs captures
+base off-env: 2 processes
+u1 run1-652872.txt 11214: identical to a off-env process
+u1 run1-655117.txt 37: identical to a off-env process
+u1 run2-658741.txt 11214: identical to a off-env process
+u1 run2-665911.txt 37: identical to a off-env process

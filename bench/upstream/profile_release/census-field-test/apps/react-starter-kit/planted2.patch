@@ -1,0 +1,12 @@
+diff --git a/app/controllers/users_controller.rb b/app/controllers/users_controller.rb
+index 6644256..a78ad2c 100644
+--- a/app/controllers/users_controller.rb
++++ b/app/controllers/users_controller.rb
+@@ -5,6 +5,7 @@ class UsersController < InertiaController
+   before_action :require_no_authentication, only: %i[new create]
+ 
+   def new
++    20.times { ERB::Util.html_escape("a<b") }
+     @user = User.new
+   end
+ 

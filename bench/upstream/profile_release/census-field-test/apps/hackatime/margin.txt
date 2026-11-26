@@ -1,0 +1,5 @@
+status 1 compared: 9414 lines, 70 actions; not compared 69
+  job line RAILS/actionpack/lib/action_dispatch/routing/route_set.rb:101: -4.74 against 1.00 (474%)
+  job action HeartbeatImportDumpJob#perform: +58.00 against 20.00 (290%)
+  job line RAILS/activejob/lib/active_job/log_subscriber.rb:23: -2.20 against 1.00 (220%)
+  job line RAILS/activejob/lib/active_job/queue_adapters/test_adapter.rb:43: -1.10 against 1.00 (110%)

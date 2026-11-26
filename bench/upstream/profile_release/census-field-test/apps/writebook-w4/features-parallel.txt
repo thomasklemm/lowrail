@@ -1,0 +1,20 @@
+base plain: 5 processes, parent 2307 files, union 2544
+plain2 all: 5 processes; parent identical in order; union identical
+off all: 5 processes; parent identical in order; union identical
+base off-env: 5 processes, parent 2307 files, union 2544
+u1 run1: 5 processes; parent identical in order; union identical
+u1 run2: 5 processes; parent identical in order; union identical
+u2 run1: 5 processes; parent identical in order; union identical
+u2 run2: 5 processes; parent identical in order; union identical
+u3 run1: 5 processes; parent identical in order; union identical
+u3 run2: 5 processes; parent identical in order; union identical
+u4 run1: 5 processes; parent identical in order; union identical
+u4 run2: 5 processes; parent identical in order; union identical
+u5 run1: 5 processes; parent identical in order; union identical
+u5 run2: 5 processes; parent identical in order; union identical
+u6 run1: 5 processes; parent identical in order; union identical
+u6 run2: 5 processes; parent identical in order; union identical
+planted run1: 5 processes; parent identical in order; union identical
+planted run2: 5 processes; parent identical in order; union identical
+planted2 run1: 5 processes; parent identical in order; union identical
+planted2 run2: 5 processes; parent identical in order; union identical

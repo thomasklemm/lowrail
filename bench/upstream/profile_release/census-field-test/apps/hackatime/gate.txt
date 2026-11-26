@@ -1,0 +1,12 @@
+unchanged: hackatime/u1 hackatime/u2 hackatime/u3 hackatime/u4 hackatime/u5 hackatime/u6
+planted: hackatime/planted hackatime/planted2
+rc1 (line floor = noise):
+  false alarms, default: 73 of 120 (60.83%); rows: addressable/uri.rb:424 14, HeartbeatImportDumpJob#perform 12, action_view/template.rb:508 12, sources/file.rb:12 12
+  false alarms, confirm: 142 of 360 (39.44%); rows: addressable/uri.rb:424 33, HeartbeatImportDumpJob#perform 25, Settings::ProfileController#update_display_name 23, action_view/template.rb:508 18
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 23
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 63 of 120 (52.50%); rows: HeartbeatImportDumpJob#perform 12, action_view/template.rb:508 12, sources/file.rb:12 12, erb/erubi.rb:39 12
+  false alarms, confirm: 124 of 360 (34.44%); rows: HeartbeatImportDumpJob#perform 24, Settings::ProfileController#update_display_name 23, addressable/uri.rb:424 18, action_view/template.rb:508 18
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 14
+  plant caught, confirm: 0 of 60 (0.00%)

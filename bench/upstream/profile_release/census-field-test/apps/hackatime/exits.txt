@@ -1,0 +1,7 @@
+unchanged compare exit 1
+unchanged head2 exit 1
+planted compare exit 1
+planted head2 exit 1
+without --aa exit 0
+seed99 exit 2
+report again exit 0

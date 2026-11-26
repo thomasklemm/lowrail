@@ -1,0 +1,5 @@
+status 0 compared: 7789 lines, 18 actions; not compared 5
+  request action UsersController#token_destroy: +6.00 against 20.00 (30%)
+  mail line GEM/kramdown/lib/kramdown/parser/kramdown/emphasis.rb:25: -2.25 against 9.00 (25%)
+  job line GEM/kramdown/lib/kramdown/parser/kramdown/emphasis.rb:25: -0.50 against 2.00 (25%)
+  job line GEM/css_parser/lib/css_parser/rule_set.rb:105: -0.23 against 1.00 (23%)

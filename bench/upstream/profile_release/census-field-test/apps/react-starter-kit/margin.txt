@@ -1,0 +1,5 @@
+status 0 compared: 2419 lines, 14 actions; not compared 6
+  request action UsersController#destroy: +5.00 against 20.00 (25%)
+  request action UsersController#create: -5.00 against 20.00 (25%)
+  request line RAILS/actionpack/lib/action_controller/log_subscriber.rb:38: +0.18 against 1.00 (18%)
+  request action Settings::PasswordsController#update: +3.50 against 20.00 (18%)

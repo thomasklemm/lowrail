@@ -1,0 +1,44 @@
+off-env.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+off.outcomes: 118 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+plain.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+plain2.outcomes: 118 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+planted.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+planted.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+planted2.run1.outcomes: 118 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+planted2.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+seed99.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+seed99.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u1.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u1.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u2.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u2.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u3.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u3.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u4.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u4.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u5.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u5.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u6.run1.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+u6.run2.outcomes: 119 outcomes; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+off-env.outcomes = plain
+off.outcomes DIFFERS (1 lines)
+plain.outcomes = plain
+plain2.outcomes DIFFERS (1 lines)
+planted.run1.outcomes = plain
+planted.run2.outcomes = plain
+planted2.run1.outcomes DIFFERS (1 lines)
+planted2.run2.outcomes = plain
+seed99.run1.outcomes = plain
+seed99.run2.outcomes = plain
+u1.run1.outcomes = plain
+u1.run2.outcomes = plain
+u2.run1.outcomes = plain
+u2.run2.outcomes = plain
+u3.run1.outcomes = plain
+u3.run2.outcomes = plain
+u4.run1.outcomes = plain
+u4.run2.outcomes = plain
+u5.run1.outcomes = plain
+u5.run2.outcomes = plain
+u6.run1.outcomes = plain
+u6.run2.outcomes = plain

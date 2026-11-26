@@ -1,0 +1,5 @@
+status 0 compared: 7788 lines, 18 actions; not compared 5
+  request action UsersController#token_destroy: -12.00 against 22.00 (55%)
+  job line RUBY/psych/visitors/to_ruby.rb:440: -0.92 against 1.85 (50%)
+  request action RepoSubscriptionsController#create: -9.00 against 21.00 (43%)
+  mail line GEM/mail/lib/mail/parsers/content_type_parser.rb:734: +0.38 against 1.00 (38%)

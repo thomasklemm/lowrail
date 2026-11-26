@@ -1,0 +1,1 @@
+sure: plain 52.7, 53.9 s; run 1 mean 55.0 s (+3%); run 2 mean 104.6 s (+96%); wall plain 56.9 s, a capture 532.8 s (9.4x) over 6 captures

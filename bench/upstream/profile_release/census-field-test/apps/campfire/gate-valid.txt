@@ -1,0 +1,12 @@
+unchanged: campfire/u1 campfire/u3 campfire/u4 campfire/u5 campfire/u6
+planted: campfire/planted campfire/planted2
+rc1 (line floor = noise):
+  false alarms, default: 0 of 60 (0.00%); rows: 
+  false alarms, confirm: 0 of 120 (0.00%); rows: 
+  plant caught, default: 40 of 40 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 40 of 40 (100.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 0 of 60 (0.00%); rows: 
+  false alarms, confirm: 0 of 120 (0.00%); rows: 
+  plant caught, default: 40 of 40 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 40 of 40 (100.00%)

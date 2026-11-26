@@ -1,0 +1,1 @@
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/lowrail-profile-0.1.0.rc1

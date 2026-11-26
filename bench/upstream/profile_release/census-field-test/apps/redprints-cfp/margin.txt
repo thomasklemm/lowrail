@@ -1,0 +1,5 @@
+status 0 compared: 2091 lines, 11 actions; not compared 8
+  request action ProposalsController#update: +7.50 against 20.00 (38%)
+  mail line GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870: -0.20 against 1.00 (20%)
+  request line GEM/uri/lib/uri/common.rb:456: +0.88 against 6.35 (14%)
+  request action ReviewsController#update: +0.90 against 22.80 (4%)

@@ -1,0 +1,12 @@
+diff --git a/app/controllers/home_controller.rb b/app/controllers/home_controller.rb
+index 4f78ae1..583a51b 100644
+--- a/app/controllers/home_controller.rb
++++ b/app/controllers/home_controller.rb
+@@ -37,6 +37,7 @@ class HomeController < ApplicationController
+   end
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     @stories, @show_more = get_from_cache(hottest: true) {
+       paginate Story.hottest(@user, filtered_tags.map(&:id))
+     }

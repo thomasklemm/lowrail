@@ -1,0 +1,5 @@
+status 1 compared: 4039 lines, 5 actions; not compared 32
+  request line RAILS/actiontext/lib/action_text/plain_text_conversion.rb:25: -282.94 against 1.00 (28294%)
+  request line RAILS/actiontext/lib/action_text/plain_text_conversion.rb:134: -240.86 against 1.00 (24086%)
+  request line RAILS/actiontext/lib/action_text/plain_text_conversion.rb:147: -219.70 against 1.00 (21970%)
+  request line GEM/nokogiri/lib/nokogiri/xml/searchable.rb:270: -160.80 against 1.00 (16080%)

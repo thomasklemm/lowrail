@@ -1,0 +1,5 @@
+status 0 compared: 5429 lines, 37 actions; not compared 7
+  mail line GEM/mail/lib/mail/parsers/message_ids_parser.rb:4870: +0.28 against 1.02 (28%)
+  job action MarkNotificationsAsReadWorker#perform: +8.05 against 35.40 (23%)
+  job line GEM/mail/lib/mail/parsers/content_type_parser.rb:734: +0.26 against 1.41 (18%)
+  mail action NotificationMailer#notification: +4.00 against 25.83 (15%)

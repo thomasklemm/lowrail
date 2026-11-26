@@ -1,0 +1,13 @@
+Finished in 20 minutes 0 seconds (files took 47.13 seconds to load)
+8012 examples, 11 failures, 1 pending
+rspec ./spec/requests/auth/ldap_sso_spec.rb:50 # LDAP authentication when LDAP is onthefly_register creates the user on the fly
+rspec ./spec/requests/auth/ldap_sso_spec.rb:66 # LDAP authentication when LDAP is onthefly_register with a user that has umlauts in their name creates a user with umlauts on the fly
+rspec ./spec/requests/auth/ldap_sso_spec.rb:82 # LDAP authentication when LDAP is onthefly_register when not all attributes present does not save the user, but forwards to registration form
+rspec ./spec/requests/auth/ldap_sso_spec.rb:96 # LDAP authentication when LDAP is onthefly_register with user limit reached shows the user limit error
+rspec ./spec/requests/auth/ldap_sso_spec.rb:104 # LDAP authentication when LDAP is onthefly_register with password login disabled login is not found
+rspec ./spec/requests/api/v3/role_resource_spec.rb[1:1:2:2] # API v3 roles resource GET api/v3/roles behaves like API V3 collection response contains all elements
+rspec ./spec/requests/api/v3/role_resource_spec.rb:79 # API v3 roles resource GET api/v3/roles filtering by assignable contains only the filtered member in the response
+rspec ./spec/requests/auth/auth_source_sso_spec.rb:52 # AuthSourceSSO when LDAP is onthefly_register creates the user on the fly
+rspec ./spec/requests/auth/auth_source_sso_spec.rb:71 # AuthSourceSSO when LDAP is not onthefly_register returns an error when the user does not exist
+rspec ./spec/requests/auth/auth_source_sso_spec.rb:81 # AuthSourceSSO when LDAP is not onthefly_register when the user exists, but is outdated redirects the user to that URL
+rspec ./spec/requests/auth/auth_source_sso_spec.rb:95 # AuthSourceSSO when LDAP is not onthefly_register when the user exists in another auth source that is inaccessible returns an error when the user does not exist

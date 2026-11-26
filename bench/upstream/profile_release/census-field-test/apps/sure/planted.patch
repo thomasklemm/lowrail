@@ -1,0 +1,12 @@
+diff --git a/app/controllers/transactions_controller.rb b/app/controllers/transactions_controller.rb
+index 9ddb811..54658e7 100644
+--- a/app/controllers/transactions_controller.rb
++++ b/app/controllers/transactions_controller.rb
+@@ -20,6 +20,7 @@ class TransactionsController < ApplicationController
+   end
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     @q = search_params
+     @accessible_account_ids = Current.user.accessible_accounts.pluck(:id)
+     @search = Transaction::Search.new(Current.family, filters: @q, accessible_account_ids: @accessible_account_ids)

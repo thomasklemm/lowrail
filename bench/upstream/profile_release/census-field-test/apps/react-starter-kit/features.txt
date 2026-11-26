@@ -1,0 +1,26 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 118234.txt 2399: identical to a plain process
+off 118440.txt 2399: identical to a plain process
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-118514.txt 2399: identical to a off-env process
+u1 run2-118560.txt 2399: identical to a off-env process
+u2 run1-119037.txt 2399: identical to a off-env process
+u2 run2-119517.txt 2399: identical to a off-env process
+u3 run1-120132.txt 2399: identical to a off-env process
+u3 run2-120169.txt 2399: identical to a off-env process
+u4 run1-120879.txt 2399: identical to a off-env process
+u4 run2-121212.txt 2399: identical to a off-env process
+u5 run1-121703.txt 2399: identical to a off-env process
+u5 run2-121794.txt 2399: identical to a off-env process
+u6 run1-121864.txt 2399: identical to a off-env process
+u6 run2-121901.txt 2399: identical to a off-env process
+planted run1-137074.txt 2399: identical to a off-env process
+planted run2-137119.txt 2399: identical to a off-env process
+planted2 run1-137163.txt 2399: identical to a off-env process
+planted2 run2-137200.txt 2399: identical to a off-env process
+seed99 run1-122469.txt 2399: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-122650.txt 2399: DIFFERS
+  extra: []  missing: []  same set: true

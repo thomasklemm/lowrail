@@ -1,0 +1,2 @@
+    PID    PPID STAT     ELAPSED COMMAND
+ 499609  496648 S          00:21 bash ./fizzy_timeout.sh /home/user/ft/out2/fizzy-timeout 12 20

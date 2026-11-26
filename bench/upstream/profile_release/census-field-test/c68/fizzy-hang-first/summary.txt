@@ -1,0 +1,1 @@
+c1 exit 1 wall 42.704470912 runs_wall 5.5,20.0 capture {"format":1,"identity":{"mode":"command","argv":["bin/rails","test","-v"]},"argv":["bin/rails","test","-v"],"seed":"1234","runs":2,"exit":[1,124],"timed_out":[2]} leftover 4 124 runs, 458 assertions, 0 failures, 7 errors, 0 skips| run 2 took longer than --timeout 20.0s 

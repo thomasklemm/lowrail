@@ -1,0 +1,1 @@
+redprints-cfp: plain 1.2, 0.9 s; run 1 mean 1.0 s (-4%); run 2 mean 1.2 s (+8%); wall plain 4.9 s, a capture 11.5 s (2.3x) over 6 captures

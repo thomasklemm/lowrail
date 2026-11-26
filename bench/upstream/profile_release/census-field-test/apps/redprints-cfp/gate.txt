@@ -1,0 +1,12 @@
+unchanged: redprints-cfp/u1 redprints-cfp/u2 redprints-cfp/u3 redprints-cfp/u4 redprints-cfp/u5 redprints-cfp/u6
+planted: redprints-cfp/planted redprints-cfp/planted2
+rc1 (line floor = noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)

@@ -1,0 +1,10 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:39:in 'block in <main>': /home/user/ft/out/sure/u1 /home/user/ft/out/sure/u2 /home/user/ft/out/sure/u3: base's command exited [1,1] (RuntimeError)
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block (2 levels) in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Array#permutation'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerator#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerable#map'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in 'Array#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in '<main>'
+unchanged: sure/u1 sure/u2 sure/u3 sure/u4 sure/u5 sure/u6
+planted: sure/planted sure/planted2

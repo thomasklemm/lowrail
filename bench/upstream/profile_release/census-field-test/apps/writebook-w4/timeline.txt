@@ -1,0 +1,3 @@
+== writebook-w4 start 2026-11-25T20:25:51Z steps plain,plain2,off,u1,u2,u3,u4,u5,u6,planted,planted2,seed99
+proof.sh exit 0
+== writebook-w4 done 2026-11-25T20:31:40Z

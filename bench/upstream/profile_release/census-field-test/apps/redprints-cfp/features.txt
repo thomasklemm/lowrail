@@ -1,0 +1,42 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 118470.txt 3973: identical to a plain process
+off 118666.txt 3973: identical to a plain process
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-119677.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u1 run2-120171.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u2 run1-121371.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u2 run2-121796.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u3 run1-121965.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u3 run2-122156.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u4 run1-122436.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u4 run2-122877.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u5 run1-123892.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u5 run2-124603.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u6 run1-125248.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+u6 run2-125294.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+planted run1-125425.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+planted run2-125534.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+planted2 run1-125902.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+planted2 run2-126795.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run1-127708.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-128204.txt 3973: DIFFERS
+  extra: []  missing: []  same set: true

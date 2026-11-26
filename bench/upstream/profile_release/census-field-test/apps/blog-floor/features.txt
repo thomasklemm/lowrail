@@ -1,0 +1,28 @@
+# plain vs plain2, off
+base plain: 2 processes
+plain2 58654.txt 2229: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/utf_32le.so", "/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/trans/utf_16_32.so"]  same set: false
+off 58888.txt 2229: DIFFERS
+  extra: []  missing: ["/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/utf_32le.so", "/home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/3.3.0/x86_64-linux/enc/trans/utf_16_32.so"]  same set: false
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-59319.txt 2229: identical to a off-env process
+u1 run2-59490.txt 2229: identical to a off-env process
+u2 run1-59629.txt 2229: identical to a off-env process
+u2 run2-59763.txt 2229: identical to a off-env process
+u3 run1-59865.txt 2229: identical to a off-env process
+u3 run2-59928.txt 2229: identical to a off-env process
+u4 run1-60032.txt 2229: identical to a off-env process
+u4 run2-60137.txt 2229: identical to a off-env process
+u5 run1-60220.txt 2229: identical to a off-env process
+u5 run2-60305.txt 2229: identical to a off-env process
+u6 run1-61582.txt 2229: identical to a off-env process
+u6 run2-61831.txt 2229: identical to a off-env process
+planted run1-62747.txt 2229: identical to a off-env process
+planted run2-63306.txt 2229: identical to a off-env process
+planted2 run1-64033.txt 2229: identical to a off-env process
+planted2 run2-64417.txt 2229: identical to a off-env process
+seed99 run1-65473.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-66211.txt 2229: DIFFERS
+  extra: []  missing: []  same set: true

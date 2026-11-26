@@ -1,0 +1,26 @@
+# plain vs plain2, off
+base plain: 1 processes
+plain2 99116.txt 4545: identical to a plain process
+off 105270.txt 4545: identical to a plain process
+# off-env vs captures
+base off-env: 1 processes
+u1 run1-110983.txt 4545: identical to a off-env process
+u1 run2-114563.txt 4545: identical to a off-env process
+u2 run1-121866.txt 4545: identical to a off-env process
+u2 run2-125458.txt 4545: identical to a off-env process
+u3 run1-130973.txt 4545: identical to a off-env process
+u3 run2-132738.txt 4545: identical to a off-env process
+u4 run1-133463.txt 4545: identical to a off-env process
+u4 run2-133873.txt 4545: identical to a off-env process
+u5 run1-135297.txt 4545: identical to a off-env process
+u5 run2-135924.txt 4545: identical to a off-env process
+u6 run1-136402.txt 4545: identical to a off-env process
+u6 run2-137077.txt 4545: identical to a off-env process
+planted run1-138062.txt 4545: identical to a off-env process
+planted run2-138681.txt 4545: identical to a off-env process
+planted2 run1-140123.txt 4545: identical to a off-env process
+planted2 run2-158172.txt 4545: identical to a off-env process
+seed99 run1-200462.txt 4549: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/location.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/node.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/token.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source.rb"]  missing: []  same set: false
+seed99 run2-232140.txt 4549: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/location.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/node.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source/token.rb", "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rspec-support-3.13.6/lib/rspec/support/source.rb"]  missing: []  same set: false

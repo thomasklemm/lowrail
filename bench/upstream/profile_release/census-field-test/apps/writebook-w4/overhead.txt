@@ -1,0 +1,1 @@
+writebook-w4: plain 13.0, 8.7 s; run 1 mean 9.0 s (-17%); run 2 mean 10.3 s (-5%); wall plain 18.2 s, a capture 30.1 s (1.7x) over 6 captures

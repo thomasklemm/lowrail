@@ -1,0 +1,12 @@
+diff --git a/app/controllers/pages_controller.rb b/app/controllers/pages_controller.rb
+index 8a52dfa..654e1f2 100644
+--- a/app/controllers/pages_controller.rb
++++ b/app/controllers/pages_controller.rb
+@@ -26,6 +26,7 @@ class PagesController < ApplicationController
+   end
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     set_title("Get Started Contributing to Open Source Projects")
+     set_description(description)
+     @covid_repos = get_covid_repos

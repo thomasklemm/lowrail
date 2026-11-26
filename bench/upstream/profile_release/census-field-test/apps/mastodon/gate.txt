@@ -1,0 +1,12 @@
+unchanged: mastodon/u1 mastodon/u2 mastodon/u3 mastodon/u4 mastodon/u5 mastodon/u6
+planted: mastodon/planted mastodon/planted2
+rc1 (line floor = noise):
+  false alarms, default: 18 of 120 (15.00%); rows: adapter/nokogiri.rb:41 12, parsers/message_ids_parser.rb:4870 3, parsers/content_type_parser.rb:734 3
+  false alarms, confirm: 12 of 360 (3.33%); rows: adapter/nokogiri.rb:41 11, parsers/content_type_parser.rb:734 1
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 1 of 120 (0.83%); rows: parsers/message_ids_parser.rb:4870 1
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)

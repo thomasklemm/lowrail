@@ -1,0 +1,3 @@
+bin/rails test test/controllers -v
+seed 1234
+exit 0 0

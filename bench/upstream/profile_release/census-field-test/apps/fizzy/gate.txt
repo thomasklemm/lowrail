@@ -1,0 +1,10 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:39:in 'block in <main>': /home/user/ft/out/fizzy/u1 /home/user/ft/out/fizzy/u2 /home/user/ft/out/fizzy/u3: base's command exited [1,1]; head's command exited [1,1]; the A/A report's command exited [1,1] (RuntimeError)
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block (2 levels) in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Array#permutation'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerator#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerable#map'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in 'Array#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in '<main>'
+unchanged: fizzy/u1 fizzy/u2 fizzy/u3 fizzy/u4 fizzy/u5 fizzy/u6
+planted: fizzy/planted fizzy/planted2

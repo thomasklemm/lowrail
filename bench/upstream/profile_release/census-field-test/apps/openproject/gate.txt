@@ -1,0 +1,4 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:18:in 'Zlib::GzipReader.open': No such file or directory @ rb_sysopen - /home/user/ft/out/openproject/planted/report.json.gz (Errno::ENOENT)
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:18:in 'block in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:17:in 'Array#to_h'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:17:in '<main>'

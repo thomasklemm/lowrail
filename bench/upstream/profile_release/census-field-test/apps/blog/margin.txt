@@ -1,0 +1,5 @@
+status 0 compared: 1802 lines, 3 actions; not compared 6
+  request line GEM/uri/lib/uri/common.rb:456: +0.46 against 2.50 (18%)
+  request action CommentsController#create: +3.50 against 20.00 (18%)
+  request line GEM/rack/lib/rack/multipart/generator.rb:3: +0.00 against 1.00 (0%)
+  request line GEM/rack/lib/rack/multipart.rb:7: +0.00 against 1.00 (0%)

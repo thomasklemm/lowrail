@@ -1,0 +1,1 @@
+loomio: plain 286.6, 274.5 s; run 1 mean 282.5 s (+1%); run 2 mean 340.9 s (+21%); wall plain 291.1 s, a capture 637.9 s (2.2x) over 6 captures

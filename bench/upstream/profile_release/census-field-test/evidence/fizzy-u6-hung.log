@@ -1,0 +1,477 @@
+lowrail-profile: run 1 of 2: bin/rails test -v
+Running 124 tests in parallel using 16 processes
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Run options: -v --seed 1234
+
+# Running:
+
+Bubble::SearchableTest#test_a_search_with_no_valid_terms_returns_empty_results = 0.73 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::SearchableTest#test_searching_by_title = 0.75 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+EventSummaryTest#test_body = 0.79 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::SearchableTest#test_sanitizing_search_query = 0.80 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::WatchableTest#test_watched_by? = 0.12 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::WatchableTest#test_watched_by?_when_subscribed_to_the_bucket = 0.13 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketTest#test_grants_access_to_everyone_after_creation = 0.08 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketTest#test_grants_access_to_everyone_after_update = 0.05 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::SearchableTest#test_searching_by_comment = 1.09 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble = 0.28 s = E
+
+
+Error:
+Bubble::AssignableTest#test_assigning_a_user_makes_them_watch_the_bubble:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/bubble/assignable_test.rb:8:in 'block in <class:AssignableTest>'
+
+bin/rails test test/models/bubble/assignable_test.rb:4
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::WatchableTest#test_watchers_and_subscribers = 0.29 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketTest#test_revising_access = 0.08 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+QrCodeLinkTest#test_links_can_be_signed_and_verified = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::WatchableTest#test_bubbles_are_initially_watched_by_their_creator = 1.25 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UserTest#test_system_user = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UserTest#test_create = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UserTest#test_creation_gives_access_to_all_access_buckets = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UserTest#test_deactivate = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UserTest#test_initials = 0.00 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Notifications::MarkAllReadsControllerTest#test_show = 0.88 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_create = 1.92 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FiltersControllerTest#test_destroy = 1.92 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Buckets::SubscriptionsControllerTest#test_subscribing_to_a_bucket = 0.61 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Buckets::SubscriptionsControllerTest#test_unsubscribing_from_a_bucket = 0.30 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FiltersControllerTest#test_create = 2.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Sessions::TransfersControllerTest#test_show_renders_when_not_signed_in = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubbles::PopsControllerTest#test_destroy = 0.97 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_edit = 2.09 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Sessions::TransfersControllerTest#test_update_establishes_a_session_when_the_code_is_valid = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Notifications::TraysControllerTest#test_show = 1.00 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_show = 2.11 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubbles::PopsControllerTest#test_create = 1.06 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Taggings::TogglesControllerTest#test_create = 1.12 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity = 0.18 s = E
+
+
+Error:
+Bubble::ScorableTest#test_a_bubble_has_a_score_that_increases_with_activity:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/bubble/scorable_test.rb:10:in 'block in <class:ScorableTest>'
+
+bin/rails test test/models/bubble/scorable_test.rb:4
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::MessagesTest#test_creating_a_bubble_does_not_create_a_message_by_default = 0.09 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_index = 2.32 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it = 0.27 s = E
+
+
+Error:
+Bubble::ScorableTest#test_commenting_on_a_bubble_boosts_its_score_more_than_boosting_it:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/bubble/scorable_test.rb:22:in 'block (2 levels) in <class:ScorableTest>'
+    test/test_helpers/change_test_helper.rb:4:in 'ChangeTestHelper#capture_change'
+    test/models/bubble/scorable_test.rb:21:in 'block in <class:ScorableTest>'
+
+bin/rails test test/models/bubble/scorable_test.rb:17
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Assignments::TogglesControllerTest#test_create = 2.39 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_bubbles_start_out_in_a_`creating`_state = 0.04 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::MessagesTest#test_updating_the_draft_comment = 0.25 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::MessagesTest#test_creating_a_bubble_with_an_initial_draft_comment = 0.17 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering = 0.35 s = E
+
+
+Error:
+Bubble::ScorableTest#test_recent_activity_counts_more_than_older_activity_in_the_ordering:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/bubble/scorable_test.rb:37:in 'block in <class:ScorableTest>'
+
+bin/rails test test/models/bubble/scorable_test.rb:36
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_bubbles_are_visible_to_everyone_when_published = 0.06 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::MessagesTest#test_omitting_the_draft_comment_does_not_remove_it = 0.15 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_bubbles_are_only_visible_to_the_creator_when_drafted = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::MessagesTest#test_setting_the_draft_comment_to_be_blank_removes_it = 0.16 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::PoppableTest#test_popped_scope = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::PoppableTest#test_popping = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_can_recover_abandoned_creation? = 0.07 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_remove_abandoned_creations = 0.12 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_users_can_only_see_bubbles_in_buckets_they_have_access_to = 2.55 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::PoppableTest#test_auto_pop_all_due = 0.11 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_update = 2.58 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FirstRunsControllerTest#test_show_after_completion = 0.54 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+EventsControllerTest#test_only_displays_events_from_filtered_buckets = 0.65 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::StatusesTest#test_recover_abandoned_creation = 0.27 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubblesControllerTest#test_filtered_index = 2.71 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+EventsControllerTest#test_index = 0.81 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble = 0.24 s = E
+
+
+Error:
+Bubble::CommentableTest#test_creating_a_comment_on_a_bubble_makes_the_creator_watch_the_bubble:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/bubble/commentable_test.rb:8:in 'block in <class:CommentableTest>'
+
+bin/rails test test/models/bubble/commentable_test.rb:4
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+NotifierTest#test_for_does_not_raise_an_error_when_the_event_is_not_notifiable = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+NotifierTest#test_for_returns_the_matching_notifier_class_for_the_event = 0.00 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+NotifierTest#test_creates_a_notification_for_each_watcher,_other_than_the_event_creator = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+NotifierTest#test_generate_does_not_create_notifications_if_the_event_was_system-generated = 0.04 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+EventsControllerTest#test_index_with_a_specific_timezone = 0.84 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_terms = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FirstRunsControllerTest#test_create = 0.75 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubbles::WatchesControllerTest#test_create = 0.35 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+NotifierTest#test_links_to_the_bubble = 0.12 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_can't_see_bubbles_in_buckets_that_aren't_accessible = 0.07 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_cacheability = 0.07 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_params_without_a_key-value_pair = 0.04 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FirstRunsControllerTest#test_show = 0.82 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentsControllerTest#test_update_another_user's_comment = 0.30 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_remembering_equivalent_filters_for_different_users = 0.06 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_turning_into_params = 0.14 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_remembering_equivalent_filters = 0.09 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubbles::PublishesControllerTest#test_create = 0.53 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentTest#test_follows_comment_by_another_author? = 0.09 s = E
+
+
+Error:
+CommentTest#test_follows_comment_by_another_author?:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/comment_test.rb:50:in 'block in <class:CommentTest>'
+
+bin/rails test test/models/comment_test.rb:45
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Bubbles::WatchesControllerTest#test_destroy = 0.56 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BoostsControllerTest#test_create_with_value = 0.54 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_summary = 0.34 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UploadsControllerTest#test_create = 0.44 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_duplicate_filters_are_removed_after_a_resource_is_destroyed = 0.20 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_popped = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_tagged_states = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+SessionsControllerTest#test_new = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_active = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_unassigned = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_ordering_by_comments = 0.00 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_assigned_to = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+SessionsControllerTest#test_new_enforces_browser_compatibility = 0.15 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_assigned_by = 0.00 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_in_bucket = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BoostsControllerTest#test_create = 0.63 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentsControllerTest#test_update = 0.60 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_searchable_by_title = 0.02 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_ordering_by_boosts = 0.03 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_assignment_states = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_tagged_with = 0.01 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+UploadsControllerTest#test_show = 0.53 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentTest#test_searchable_by_body = 0.26 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentTest#test_first_by_author_on_bubble? = 0.30 s = E
+
+
+Error:
+CommentTest#test_first_by_author_on_bubble?:
+NoMethodError: undefined method 'reset_all' for an instance of Current
+    test/test_helpers/session_test_helper.rb:22:in 'SessionTestHelper#with_current_user'
+    test/models/comment_test.rb:31:in 'block in <class:CommentTest>'
+
+bin/rails test test/models/comment_test.rb:28
+
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_tag_toggling = 0.14 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_boosting = 0.08 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_bubbles = 0.46 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_capturing_messages = 0.12 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+SessionsControllerTest#test_create_with_valid_credentials = 0.28 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+FilterTest#test_resource_removal = 0.49 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+SessionsControllerTest#test_destroy = 0.28 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_mentioning = 0.23 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+SessionsControllerTest#test_create_with_invalid_credentials = 0.36 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BubbleTest#test_assignment_toggling = 0.26 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_edit = 0.30 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_create = 0.35 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Comments::ReactionsControllerTest#test_destroy = 0.39 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_update_all_access = 0.38 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+Comments::ReactionsControllerTest#test_create = 0.45 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_new = 0.36 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_index = 0.32 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_update = 0.37 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+ReadingsControllerTest#test_index = 0.41 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+BucketsControllerTest#test_destroy = 0.52 s = .
+/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/drb-2.2.1/lib/drb/drb.rb:367: warning: ObjectSpace._id2ref is deprecated
+CommentsControllerTest#test_create = 1.23 s = .
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest.rb:84:in 'block in autorun'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest.rb:313:in 'run'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelize_executor.rb:19:in 'start'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization.rb:49:in 'start'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization.rb:49:in 'map'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization.rb:49:in 'each'
+	from <internal:numeric>:262:in 'times'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization.rb:50:in 'block in start'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:15:in 'start'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:15:in 'fork'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:27:in 'block in start'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:38:in 'work_from_queue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:49:in 'perform_job'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest.rb:498:in 'with_info_handler'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest.rb:511:in 'on_signal'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/parallelization/worker.rb:53:in 'block in perform_job'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/executor/test_helper.rb:5:in 'run'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/execution_wrapper.rb:104:in 'perform'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/executor/test_helper.rb:5:in 'block in run'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest/test.rb:85:in 'run'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest.rb:397:in 'time_it'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest/test.rb:86:in 'block in run'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest/test.rb:187:in 'capture_exceptions'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/minitest-6.0.6/lib/minitest/test.rb:91:in 'block (2 levels) in run'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/test/models/comment_test.rb:15:in 'block in <class:CommentTest>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:121:in 'assert_difference'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:317:in '_assert_nothing_raised_or_warn'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:49:in 'assert_nothing_raised'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/test/models/comment_test.rb:16:in 'block (2 levels) in <class:CommentTest>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:216:in 'assert_changes'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:317:in '_assert_nothing_raised_or_warn'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/testing/assertions.rb:49:in 'assert_nothing_raised'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/test/models/comment_test.rb:17:in 'block (3 levels) in <class:CommentTest>'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/app/models/bubble/messages.rb:10:in 'capture'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_proxy.rb:366:in 'create!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/association.rb:232:in 'create!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/has_many_association.rb:147:in '_create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:367:in '_create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:326:in 'transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:232:in 'transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_handling.rb:313:in 'with_connection'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:459:in 'with_connection'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:233:in 'block in transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:487:in 'with_pool_transaction_isolation_level'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:234:in 'block (2 levels) in transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/database_statements.rb:378:in 'transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/database_statements.rb:386:in 'within_new_transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/transaction.rb:645:in 'within_new_transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/concurrency/thread_monitor.rb:17:in 'synchronize'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/concurrency/thread_monitor.rb:17:in 'handle_interrupt'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/concurrency/thread_monitor.rb:21:in 'block in synchronize'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/concurrency/thread_monitor.rb:21:in 'handle_interrupt'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/transaction.rb:648:in 'block in within_new_transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:369:in 'block in _create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:286:in 'add_to_target'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:474:in 'replace_on_target'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:370:in 'block (2 levels) in _create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/has_many_association.rb:63:in 'insert_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/associations/collection_association.rb:383:in 'insert_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/suppressor.rb:56:in 'save!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:388:in 'save!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:432:in 'with_transaction_returning_status'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_handling.rb:313:in 'with_connection'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:459:in 'with_connection'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:433:in 'block in with_transaction_returning_status'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:487:in 'with_pool_transaction_isolation_level'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:437:in 'block (2 levels) in with_transaction_returning_status'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/connection_adapters/abstract/database_statements.rb:376:in 'transaction'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:441:in 'block (3 levels) in with_transaction_returning_status'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/transactions.rb:388:in 'block in save!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/validations.rb:54:in 'save!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/persistence.rb:424:in 'save!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/timestamp.rb:127:in 'create_or_update'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/callbacks.rb:440:in 'create_or_update'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:916:in '_run_save_callbacks!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:110:in 'run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/callbacks.rb:440:in 'block in create_or_update'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/persistence.rb:926:in 'create_or_update'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/timestamp.rb:116:in '_create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/callbacks.rb:444:in '_create_record'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:916:in '_run_create_callbacks!'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:111:in 'run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:564:in 'invoke_after'
+	from <internal:array>:228:in 'each'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:564:in 'block in invoke_after'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:208:in 'call'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:362:in 'block in make_lambda'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/app/models/message.rb:13:in 'created'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/app/models/bubble/commentable.rb:12:in 'comment_created'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/app/models/bubble/eventable.rb:12:in 'track_event'
+	from /home/user/workspace/repo/.corpus/ft-fizzy/app/models/event.rb:32:in 'generate_notifications_later'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueuing.rb:53:in 'perform_later'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueuing.rb:87:in 'enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueue_after_transaction_commit.rb:45:in 'raw_enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueuing.rb:98:in 'raw_enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:141:in 'run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:130:in 'block in run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:130:in 'instance_exec'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/logging.rb:28:in 'block (2 levels) in <module:Logging>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/logging.rb:39:in 'tag_logger'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/broadcast_logger.rb:228:in 'method_missing'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/tagged_logging.rb:143:in 'tagged'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/tagged_logging.rb:38:in 'tagged'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/tagged_logging.rb:143:in 'block in tagged'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:130:in 'block in run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:130:in 'instance_exec'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/instrumentation.rb:21:in 'block (2 levels) in <module:Instrumentation>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activerecord-8.1.4/lib/active_record/railties/job_runtime.rb:17:in 'instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/instrumentation.rb:33:in 'instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/notifications.rb:210:in 'instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/notifications/instrumenter.rb:58:in 'instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/notifications.rb:210:in 'block in instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/instrumentation.rb:34:in 'block in instrument'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activesupport-8.1.4/lib/active_support/callbacks.rb:121:in 'block in run_callbacks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueuing.rb:99:in 'block in raw_enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/enqueuing.rb:107:in '_raw_enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/queue_adapters/test_adapter.rb:29:in 'enqueue'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/queue_adapters/test_adapter.rb:44:in 'job_to_hash'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/core.rb:124:in 'serialize'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/core.rb:189:in 'serialize_arguments_if_needed'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/core.rb:201:in 'serialize_arguments'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.7.1/lib/zeitwerk/core_ext/kernel.rb:34:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.18.4/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in replace_require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:340:in 'block in create_worker'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:340:in 'catch'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:341:in 'block (2 levels) in create_worker'
+	from <internal:kernel>:169:in 'loop'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:350:in 'block (3 levels) in create_worker'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:359:in 'run_task'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/timer_set.rb:166:in 'block (2 levels) in process_tasks'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/scheduled_task.rb:298:in 'process_task'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/ivar.rb:170:in 'safe_execute'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/safe_task_executor.rb:22:in 'execute'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/synchronization/mutex_lockable_object.rb:48:in 'synchronize'
+	from <internal:thread_sync>:130:in 'synchronize'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/synchronization/mutex_lockable_object.rb:48:in 'block in synchronize'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/concurrent-ruby-1.3.4/lib/concurrent-ruby/concurrent/executor/safe_task_executor.rb:24:in 'block in execute'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/models/turbo/thread_debouncer.rb:20:in 'block in debounce'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/channels/turbo/streams/broadcasts.rb:72:in 'block in broadcast_refresh_later_to'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.7.1/lib/zeitwerk/core_ext/kernel.rb:26:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.18.4/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in replace_require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/jobs/turbo/streams/broadcast_stream_job.rb:1:in '<main>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/turbo-rails-2.0.11/app/jobs/turbo/streams/broadcast_stream_job.rb:2:in '<class:BroadcastStreamJob>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.7.1/lib/zeitwerk/core_ext/kernel.rb:34:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.18.4/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in replace_require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/arguments.rb:6:in '<main>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/activejob-8.1.4/lib/active_job/arguments.rb:28:in '<module:ActiveJob>'

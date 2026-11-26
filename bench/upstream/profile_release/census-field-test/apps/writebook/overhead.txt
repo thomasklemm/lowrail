@@ -1,0 +1,1 @@
+writebook: plain 7.8, 7.4 s; run 1 mean 7.6 s (-1%); run 2 mean 9.0 s (+18%); wall plain 11.4 s, a capture 30.4 s (2.7x) over 6 captures

@@ -1,0 +1,5 @@
+status 0 compared: 16785 lines, 175 actions; not compared 45
+  request action ChecklistItemsController#new: -19.50 against 20.00 (98%)
+  request action ChecklistItemsController#create: -19.50 against 20.00 (98%)
+  request action ChecklistItemsController#edit: -18.50 against 20.00 (92%)
+  request action HearingTypesController#new: -15.50 against 20.00 (78%)

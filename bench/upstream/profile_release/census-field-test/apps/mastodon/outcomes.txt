@@ -1,0 +1,44 @@
+off-env.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+off.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+plain.outcomes: 2220 outcomes; 2296 examples, 2 failures, 1 pending
+plain2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+planted.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+planted.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+planted2.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+planted2.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+seed99.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+seed99.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u1.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u1.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u2.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u2.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u3.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u3.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u4.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u4.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u5.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u5.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u6.run1.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+u6.run2.outcomes: 2203 outcomes; 2296 examples, 0 failures, 1 pending
+off-env.outcomes DIFFERS (23 lines)
+off.outcomes DIFFERS (23 lines)
+plain.outcomes = plain
+plain2.outcomes DIFFERS (23 lines)
+planted.run1.outcomes DIFFERS (23 lines)
+planted.run2.outcomes DIFFERS (23 lines)
+planted2.run1.outcomes DIFFERS (23 lines)
+planted2.run2.outcomes DIFFERS (23 lines)
+seed99.run1.outcomes DIFFERS (23 lines)
+seed99.run2.outcomes DIFFERS (23 lines)
+u1.run1.outcomes DIFFERS (23 lines)
+u1.run2.outcomes DIFFERS (23 lines)
+u2.run1.outcomes DIFFERS (23 lines)
+u2.run2.outcomes DIFFERS (23 lines)
+u3.run1.outcomes DIFFERS (23 lines)
+u3.run2.outcomes DIFFERS (23 lines)
+u4.run1.outcomes DIFFERS (23 lines)
+u4.run2.outcomes DIFFERS (23 lines)
+u5.run1.outcomes DIFFERS (23 lines)
+u5.run2.outcomes DIFFERS (23 lines)
+u6.run1.outcomes DIFFERS (23 lines)
+u6.run2.outcomes DIFFERS (23 lines)

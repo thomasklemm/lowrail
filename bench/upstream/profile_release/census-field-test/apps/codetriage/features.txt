@@ -1,0 +1,50 @@
+# plain vs plain2, off
+base plain: 2 processes
+plain2 136432.txt 5879: identical to a plain process
+plain2 136470.txt 5878: identical to a plain process
+off 136497.txt 5879: DIFFERS
+  extra: []  missing: []  same set: true
+off 136606.txt 5878: DIFFERS
+  extra: []  missing: []  same set: true
+# off-env vs captures
+base off-env: 2 processes
+u1 run1-136654.txt 5879: identical to a off-env process
+u1 run1-136759.txt 5878: identical to a off-env process
+u1 run2-136778.txt 5879: identical to a off-env process
+u1 run2-136901.txt 5878: identical to a off-env process
+u2 run1-136944.txt 5879: identical to a off-env process
+u2 run1-137159.txt 5878: identical to a off-env process
+u2 run2-137186.txt 5879: identical to a off-env process
+u2 run2-137436.txt 5878: identical to a off-env process
+u3 run1-137483.txt 5879: identical to a off-env process
+u3 run1-137585.txt 5878: identical to a off-env process
+u3 run2-137611.txt 5879: identical to a off-env process
+u3 run2-137710.txt 5878: identical to a off-env process
+u4 run1-137752.txt 5879: identical to a off-env process
+u4 run1-137851.txt 5878: identical to a off-env process
+u4 run2-137874.txt 5879: identical to a off-env process
+u4 run2-137997.txt 5878: identical to a off-env process
+u5 run1-138060.txt 5879: identical to a off-env process
+u5 run1-138175.txt 5878: identical to a off-env process
+u5 run2-138194.txt 5879: identical to a off-env process
+u5 run2-138254.txt 5878: identical to a off-env process
+u6 run1-138398.txt 5879: identical to a off-env process
+u6 run1-138499.txt 5878: identical to a off-env process
+u6 run2-138518.txt 5879: identical to a off-env process
+u6 run2-138614.txt 5878: identical to a off-env process
+planted run1-138679.txt 5879: identical to a off-env process
+planted run1-138842.txt 5878: identical to a off-env process
+planted run2-138872.txt 5879: identical to a off-env process
+planted run2-139037.txt 5878: identical to a off-env process
+planted2 run1-139115.txt 5879: identical to a off-env process
+planted2 run1-139317.txt 5878: identical to a off-env process
+planted2 run2-139336.txt 5879: identical to a off-env process
+planted2 run2-139456.txt 5878: identical to a off-env process
+seed99 run1-139561.txt 5879: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run1-139714.txt 5714: DIFFERS
+  extra: []  missing: ["/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/application_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/user_based_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/background_inactive_email_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/mailers/user_mailer.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/models/random/cached_id_query.rb"]  same set: false
+seed99 run2-139830.txt 5879: DIFFERS
+  extra: []  missing: []  same set: true
+seed99 run2-140009.txt 5714: DIFFERS
+  extra: []  missing: ["/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/application_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/user_based_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/jobs/background_inactive_email_job.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/mailers/user_mailer.rb", "/home/user/workspace/repo/.corpus/ft-codetriage/app/models/random/cached_id_query.rb"]  same set: false

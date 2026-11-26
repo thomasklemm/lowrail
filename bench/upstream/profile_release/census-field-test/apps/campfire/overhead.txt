@@ -1,0 +1,1 @@
+campfire: plain 5.9, 6.0 s; run 1 mean 8.7 s (+46%); run 2 mean 16.3 s (+173%); wall plain 9.3 s, a capture 51.0 s (5.5x) over 6 captures

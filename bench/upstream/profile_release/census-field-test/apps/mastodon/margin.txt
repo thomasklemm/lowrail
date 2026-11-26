@@ -1,0 +1,5 @@
+status 0 compared: 10851 lines, 344 actions; not compared 128
+  request action Settings::Preferences::AppearanceController#show: +9.50 against 20.00 (48%)
+  request action Settings::FeaturedTagsController#index: +6.50 against 20.00 (32%)
+  request action Api::V1::Profile::HeadersController#destroy: -11.50 against 40.00 (29%)
+  request action CollectionItemsController#show: -10.35 against 37.00 (28%)

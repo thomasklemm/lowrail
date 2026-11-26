@@ -1,0 +1,10 @@
+/home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:39:in 'block in <main>': /home/user/ft/out/campfire/u1 /home/user/ft/out/campfire/u2 /home/user/ft/out/campfire/u3: the A/A report's command exited [0,1] (RuntimeError)
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block (2 levels) in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Array#permutation'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerator#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'Enumerable#map'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:53:in 'block in <main>'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in 'Array#each'
+	from /home/user/workspace/repo/bench/upstream/profile_release/2026-11-25-final/scripts/gate.rb:50:in '<main>'
+unchanged: campfire/u1 campfire/u2 campfire/u3 campfire/u4 campfire/u5 campfire/u6
+planted: campfire/planted campfire/planted2

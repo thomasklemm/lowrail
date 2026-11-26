@@ -1,0 +1,12 @@
+unchanged: loomio/u1 loomio/u2 loomio/u3 loomio/u4 loomio/u5 loomio/u6
+planted: loomio/planted loomio/planted2
+rc1 (line floor = noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)

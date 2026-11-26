@@ -1,0 +1,1 @@
+react-starter-kit: plain 0.4, 0.9 s; run 1 mean 0.7 s (-1%); run 2 mean 0.9 s (+30%); wall plain 1.6 s, a capture 6.1 s (3.8x) over 6 captures

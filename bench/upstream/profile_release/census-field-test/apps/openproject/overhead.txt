@@ -1,0 +1,1 @@
+openproject: plain 249.2 s; run 1 mean 246.0 s (-1%); run 2 mean 259.2 s (+4%); wall plain 284.1 s, a capture 548.1 s (1.9x) over 1 captures

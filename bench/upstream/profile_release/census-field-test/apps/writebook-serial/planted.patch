@@ -1,0 +1,12 @@
+diff --git a/app/controllers/sessions_controller.rb b/app/controllers/sessions_controller.rb
+index 7804ec2..f75379b 100644
+--- a/app/controllers/sessions_controller.rb
++++ b/app/controllers/sessions_controller.rb
+@@ -8,6 +8,7 @@ class SessionsController < ApplicationController
+   end
+ 
+   def create
++    20.times { ERB::Util.html_escape("a<b") }
+     if user = User.active.authenticate_by(email_address: params[:email_address], password: params[:password])
+       start_new_session_for user
+       redirect_to post_authenticating_url

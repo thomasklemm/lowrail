@@ -1,0 +1,1 @@
+fizzy-ctl: plain 18.6, 21.2 s; run 1 mean 17.6 s (-11%); run 2 mean 19.1 s (-4%); wall plain 20.7 s, a capture 46.6 s (2.3x) over 6 captures

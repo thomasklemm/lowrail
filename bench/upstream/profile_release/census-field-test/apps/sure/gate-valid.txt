@@ -1,0 +1,12 @@
+unchanged: sure/u2 sure/u3 sure/u4 sure/u5
+planted: sure/planted sure/planted2
+rc1 (line floor = noise):
+  false alarms, default: 22 of 24 (91.67%); rows: AccountableSparklinesController#show 6, Api::V1::AuthController#sso_link 6, logger/log_device.rb:33 5, AccountsController#unlink 4
+  false alarms, confirm: 20 of 24 (83.33%); rows: AccountableSparklinesController#show 6, logger/log_device.rb:33 5, AccountsController#unlink 4, RegistrationsController#create 4
+  plant caught, default: 0 of 24 (0.00%); with an unrelated line too: 20
+  plant caught, confirm: 0 of 24 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 19 of 24 (79.17%); rows: AccountableSparklinesController#show 6, Api::V1::AuthController#sso_link 6, AccountsController#unlink 4, RegistrationsController#create 4
+  false alarms, confirm: 14 of 24 (58.33%); rows: AccountableSparklinesController#show 5, AccountsController#unlink 4, RegistrationsController#create 4, Admin::SystemHealthController#hosted_usage 4
+  plant caught, default: 0 of 24 (0.00%); with an unrelated line too: 11
+  plant caught, confirm: 0 of 24 (0.00%)

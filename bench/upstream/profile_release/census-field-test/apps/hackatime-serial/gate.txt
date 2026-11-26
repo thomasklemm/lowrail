@@ -1,0 +1,12 @@
+unchanged: hackatime-serial/u1 hackatime-serial/u2 hackatime-serial/u3 hackatime-serial/u4 hackatime-serial/u5 hackatime-serial/u6
+planted: hackatime-serial/planted hackatime-serial/planted2
+rc1 (line floor = noise):
+  false alarms, default: 16 of 120 (13.33%); rows: Admin::AdminUsersController#index 12, CustomDoorkeeper::AuthorizationsController#create 3, RUBY/socket.rb:72 2
+  false alarms, confirm: 16 of 360 (4.44%); rows: Admin::AdminUsersController#index 14, CustomDoorkeeper::AuthorizationsController#create 2, RUBY/socket.rb:72 1
+  plant caught, default: 31 of 60 (51.67%); with an unrelated line too: 2
+  plant caught, confirm: 30 of 60 (50.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 15 of 120 (12.50%); rows: Admin::AdminUsersController#index 12, CustomDoorkeeper::AuthorizationsController#create 3
+  false alarms, confirm: 16 of 360 (4.44%); rows: Admin::AdminUsersController#index 14, CustomDoorkeeper::AuthorizationsController#create 2
+  plant caught, default: 31 of 60 (51.67%); with an unrelated line too: 2
+  plant caught, confirm: 30 of 60 (50.00%)

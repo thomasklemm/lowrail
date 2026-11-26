@@ -1,0 +1,183 @@
+lowrail-profile: run 1 of 2: bin/rails runner /home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/lowrail-profile-0.1.0.rc1/lib/lowrail/profile_workloads.rb /home/user/workspace/repo/.corpus/ft-blog-floor/lowrail/workloads.rb /home/user/ft/out2/blog-floor-wl/wl-write/workloads.json
+lowrail-profile: the requests are real (queue_adapter async, delivery_method smtp (default)); run them against a disposable database, queue and mail service
+lowrail-profile: run 2 of 2: bin/rails runner /home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/lowrail-profile-0.1.0.rc1/lib/lowrail/profile_workloads.rb /home/user/workspace/repo/.corpus/ft-blog-floor/lowrail/workloads.rb /home/user/ft/out2/blog-floor-wl/wl-write/workloads.json
+lowrail-profile: the requests are real (queue_adapter async, delivery_method smtp (default)); run them against a disposable database, queue and mail service
+# lowrail-profile report
+
+Objects allocated (exact counts, not time, not retained memory) per request, job, mail and Action Cable action, by source line. A line with many objects is a place to look, not a measured cost in milliseconds.
+
+* Command: `bin/rails runner /home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/lowrail-profile-0.1.0.rc1/lib/lowrail/profile_workloads.rb /home/user/workspace/repo/.corpus/ft-blog-floor/lowrail/workloads.rb /home/user/ft/out2/blog-floor-wl/wl-write/workloads.json`
+* Ruby: ruby 3.3.14 (2026-11-19 revision f4c37f481b) +YJIT [x86_64-linux]
+* Rails: 7.2.4, development environment
+* Counted in run 1: 120 requests, 40 jobs; 2 runs
+* Ledger: upstream pull requests as of 2026-11-25
+* lowrail-profile 0.1.0.rc1
+
+| Run | Processes | Requests | Objects per request | Jobs | Mails | Cable actions | Dropped |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| run1 | 1 | 120 | 7524.4 | 40 | 0 | 0 | 0 |
+| run2 | 1 | 120 | 9914.9 | 40 | 0 | 0 | 0 |
+
+Noise floor (last run minus first, warm, top 30 lines): median |Δ| 30.0, max |Δ| 170.0 objects per request; 24 lines moved by 1 or more.
+
+## Your code
+
+The app lines whose calls lead to the most objects allocated in Rails, Ruby and gems, per request (repeat run): the nearest app line on the stack of each allocation, the app's tests and vendored gems left out. Warm: leaving out each line's first request per process. Dev/test: debug logging, error pages, template compilation, route building and asset lookup below the line, which production mostly does not do. Own: objects the line itself allocates.
+
+| # | App line | Method | Warm/req | Dev/test/req | Own/req | Lines it reaches (share of warm) | Actions (share) | Source |
+| ---: | --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| 1 | `app/views/comments/_comment.html.erb:4` |  | 1124.48 | 0.0 | 0.0 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 10%, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 8%, `RAILS/activerecord/lib/active_record/integration.rb:59` 4% | ArticlesController#show 100% | `<%= button_to "Delete", [comment.article, comment], method: :delete,` |
+| 2 | `app/views/articles/_article.html.erb:14` |  | 925.14 | 0.0 | 0.13 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 13%, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 10%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:72` 4% | ArticlesController#index 99%, CommentsController#create 1% | `<%= button_to "Destroy", article, method: :delete, class: "w-full sm:w` |
+| 3 | `app/views/articles/index.html.erb:26` |  | 446.18 | 190.63 | 0.0 | `GEM/sqlite3/lib/sqlite3/statement.rb:159` 19%, `RAILS/activemodel/lib/active_model/attribute_set/builder.rb:16` 4%, `RAILS/activemodel/lib/active_model/attribute_set/builder.rb:22` 4% | ArticlesController#index 100% | `<%= render @articles %>` |
+| 4 | `app/views/articles/show.html.erb:37` |  | 213.27 | 80.43 | 0.0 | `GEM/sqlite3/lib/sqlite3/statement.rb:159` 20%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:72` 4%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:228` 4% | ArticlesController#show 100% | `<%= render @article.comments %>` |
+| 5 | `app/views/articles/_article.html.erb:6` |  | 203.29 | 52.88 | 0.03 | `RAILS/activerecord/lib/active_record/relation/delegation.rb:129` 21%, `RAILS/activerecord/lib/active_record/relation.rb:77` 9%, `RAILS/activerecord/lib/active_record/core.rb:420` 9% | ArticlesController#index 88%, CommentsController#create 12% | `(<%= pluralize(article.comments.size, "comment") %>)` |
+| 6 | `app/views/articles/_article.html.erb:4` |  | 201.56 | 0.0 | 0.05 | `RAILS/activerecord/lib/active_record/integration.rb:59` 13%, `RAILS/actionpack/lib/action_dispatch/journey/visitors.rb:40` 9%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 9% | ArticlesController#index 98%, CommentsController#create 2% | `<%= link_to article.title, article, class: "text-blue-600 hover:underl` |
+| 7 | `app/views/articles/_article.html.erb:12` |  | 191.58 | 0.0 | 0.08 | `RAILS/activerecord/lib/active_record/integration.rb:59` 14%, `RAILS/actionpack/lib/action_dispatch/journey/visitors.rb:40` 9%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 9% | ArticlesController#index 98%, CommentsController#create 2% | `<%= link_to "Show", article, class: "w-full sm:w-auto text-center roun` |
+| 8 | `app/views/articles/_article.html.erb:13` |  | 156.75 | 0.0 | 0.1 | `RAILS/activerecord/lib/active_record/integration.rb:59` 17%, `RAILS/actionpack/lib/action_dispatch/journey/visitors.rb:40` 11%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 11% | ArticlesController#index 98%, CommentsController#create 2% | `<%= link_to "Edit", edit_article_path(article), class: "w-full sm:w-au` |
+| 9 | `app/controllers/articles_controller.rb:27` | `create` | 89.14 | 306.38 | 0.15 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 5%, `RUBY/random/formatter.rb:174` 2%, `RAILS/activejob/lib/active_job/arguments.rb:92` 2% | ArticlesController#create 100% | `if @article.save` |
+| 10 | `app/controllers/comments_controller.rb:6` | `create` | 88.03 | 300.04 | 0.15 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 5%, `RUBY/random/formatter.rb:174` 3%, `RAILS/activejob/lib/active_job/arguments.rb:92` 2% | CommentsController#create 100% | `if @comment.save` |
+| 11 | `app/views/articles/_form.html.erb:1` |  | 81.53 | 0.0 | 0.23 | `RUBY/uri/common.rb:401` 16%, `GEM/json/lib/json/common.rb:298` 4%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 4% | ArticlesController#edit 51%, ArticlesController#new 49% | `<%= form_with(model: article, class: "contents") do \|form\| %>` |
+| 12 | `app/views/articles/_article.html.erb:5` |  | 60.96 | 0.0 | 0.0 | `RAILS/actionview/lib/action_view/record_identifier.rb:115` 29%, `RAILS/actionview/lib/action_view/record_identifier.rb:80` 29%, `RAILS/activerecord/lib/active_record/attribute_methods/primary_key.rb:15` 14% | ArticlesController#index 98%, CommentsController#create 2% | `<span id="<%= dom_id(article, :comments_count) %>" class="text-gray-50` |
+| 13 | `app/views/layouts/application.html.erb:16` |  | 59.1 | 293.42 | 0.0 | `RUBY/uri/rfc2396_parser.rb:321` 9%, `RUBY/uri/rfc2396_parser.rb:292` 5%, `GEM/concurrent-ruby/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:14` 5% | ArticlesController#index 26%, ArticlesController#new 25%, ArticlesController#show 25% | `<%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>` |
+| 14 | `app/views/layouts/application.html.erb:17` |  | 58.93 | 290.43 | 0.0 | `RUBY/uri/rfc2396_parser.rb:292` 12%, `RUBY/set.rb:244` 9%, `RUBY/uri/rfc3986_parser.rb:85` 6% | ArticlesController#index 26%, ArticlesController#show 25%, ArticlesController#new 24% | `<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>` |
+| 15 | `app/views/layouts/application.html.erb:18` |  | 53.2 | 37.37 | 0.0 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 20%, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 20%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:228` 15% | ArticlesController#new 25%, ArticlesController#index 25%, ArticlesController#edit 25% | `<%= javascript_importmap_tags %>` |
+| 16 | `app/views/articles/_article.html.erb:1` |  | 43.54 | 0.0 | 0.05 | `RAILS/actionview/lib/action_view/record_identifier.rb:115` 40%, `RAILS/actionview/lib/action_view/buffers.rb:48` 20%, `RAILS/activerecord/lib/active_record/attribute_methods/primary_key.rb:15` 20% | ArticlesController#index 98%, CommentsController#create 2% | `<div id="<%= dom_id(article) %>" class="flex flex-col sm:flex-row just` |
+| 17 | `app/views/comments/_comment.html.erb:1` |  | 41.96 | 0.0 | 0.0 | `RAILS/actionview/lib/action_view/record_identifier.rb:115` 40%, `RAILS/actionview/lib/action_view/buffers.rb:48` 20%, `RAILS/activerecord/lib/active_record/attribute_methods/primary_key.rb:15` 20% | ArticlesController#show 100% | `<div id="<%= dom_id(comment) %>" class="p-4 bg-gray-50 rounded">` |
+| 18 | `app/models/comment.rb:13` |  | 40.22 | 4.12 | 0.45 | `RAILS/activesupport/lib/active_support/json/encoding.rb:65` 13%, `RAILS/activesupport/lib/active_support/json/encoding.rb:66` 13%, `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 2% | CommentsController#create 100% | `after_create_commit { article.broadcast_replace_to("articles") rescue ` |
+| 19 | `app/views/articles/_form.html.erb:15` |  | 31.98 | 0.0 | 0.0 | `GEM/i18n/lib/i18n.rb:397` 8%, `RAILS/activesupport/lib/active_support/inflector/methods.rb:146` 6%, `GEM/i18n/lib/i18n/backend/base.rb:157` 4% | ArticlesController#edit 50%, ArticlesController#new 50% | `<%= form.label :title %>` |
+| 20 | `app/views/articles/_form.html.erb:20` |  | 31.98 | 0.0 | 0.0 | `GEM/i18n/lib/i18n.rb:397` 8%, `RAILS/activesupport/lib/active_support/inflector/methods.rb:146` 6%, `GEM/i18n/lib/i18n/backend/simple.rb:100` 4% | ArticlesController#edit 50%, ArticlesController#new 50% | `<%= form.label :body %>` |
+| 21 | `app/views/articles/index.html.erb:15` |  | 28.96 | 0.0 | 0.14 | `RUBY/uri/common.rb:401` 33%, `GEM/json/lib/json/common.rb:298` 8%, `RAILS/activesupport/lib/active_support/messages/rotator.rb:50` 4% | ArticlesController#index 100% | `<% if notice.present? %>` |
+| 22 | `app/views/articles/_article.html.erb:9` |  | 27.39 | 0.0 | 0.03 | `RAILS/activemodel/lib/active_model/type/string.rb:35` 32%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:228` 32%, `RAILS/activesupport/lib/active_support/core_ext/string/filters.rb:71` 29% | ArticlesController#index 97%, CommentsController#create 3% | `<p class="text-gray-700 mt-2"><%= truncate(article.body, length: 100) ` |
+| 23 | `app/views/layouts/application.html.erb:7` |  | 26.6 | 0.0 | 0.0 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 10%, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 10%, `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:72` 7% | ArticlesController#show 25%, ArticlesController#index 25%, ArticlesController#edit 25% | `<%= csrf_meta_tags %>` |
+| 24 | `app/controllers/articles_controller.rb:63` | `set_article` | 25.65 | 103.23 | 0.06 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 7%, `GEM/sqlite3/lib/sqlite3/statement.rb:159` 6%, `RAILS/activesupport/lib/active_support/notifications/fanout.rb:236` 5% | ArticlesController#show 50%, ArticlesController#edit 50% | `@article = Article.find(params[:id])` |
+| 25 | `app/controllers/comments_controller.rb:5` | `create` | 25.53 | 0.0 | 0.0 | `RAILS/activerecord/lib/active_record/relation/delegation.rb:129` 7%, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:29` 5%, `RAILS/activerecord/lib/active_record/core.rb:420` 4% | CommentsController#create 100% | `@comment = @article.comments.build(comment_params)` |
+| 26 | `app/views/articles/show.html.erb:14` |  | 25.2 | 0.0 | 0.15 | `RUBY/uri/common.rb:401` 25%, `GEM/json/lib/json/common.rb:298` 7%, `RAILS/activesupport/lib/active_support/messages/rotator.rb:50` 5% | ArticlesController#show 100% | `<% if notice.present? %>` |
+| 27 | `app/views/articles/_form.html.erb:25` |  | 24.38 | 0.0 | 0.0 | `RAILS/activesupport/lib/active_support/inflector/methods.rb:146` 8%, `GEM/i18n/lib/i18n/interpolate/ruby.rb:33` 8%, `GEM/i18n/lib/i18n.rb:397` 8% | ArticlesController#new 50%, ArticlesController#edit 50% | `<%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-b` |
+| 28 | `app/views/articles/_form.html.erb:21` |  | 18.05 | 0.0 | 0.0 | `RAILS/activemodel/lib/active_model/errors.rb:445` 11%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 7%, `RAILS/activemodel/lib/active_model/errors.rb:191` 5% | ArticlesController#edit 51%, ArticlesController#new 49% | `<%= form.text_area :body, rows: 4, class: ["block shadow-sm rounded-md` |
+| 29 | `app/views/articles/show.html.erb:42` |  | 17.89 | 0.0 | 0.45 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 7%, `RAILS/activesupport/lib/active_support/core_ext/object/deep_dup.rb:16` 5%, `RAILS/actionview/lib/action_view/helpers/url_helper.rb:752` 4% | ArticlesController#show 100% | `<%= form_with model: [@article, Comment.new], class: "space-y-4" do \|f` |
+| 30 | `app/views/articles/_form.html.erb:16` |  | 17.58 | 0.0 | 0.0 | `RAILS/activemodel/lib/active_model/errors.rb:445` 11%, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 8%, `RAILS/activemodel/lib/active_model/errors.rb:190` 5% | ArticlesController#edit 51%, ArticlesController#new 49% | `<%= form.text_field :title, class: ["block shadow-sm rounded-md border` |
+
+1561.44 warm objects per request outside the app have no app line on the stack (middleware, routing, rendering setup).
+
+## Actions
+
+Objects per request by controller action and run, counting everything the request allocates (app, Rails, gems, dev/test work). Warm leaves out the action's first request in each process; – when it ran once per process (those come last, ranked by all objects, which include one-time work). Top lines: warm objects per request of the action outside the app (repeat run, dev/test work left out).
+
+| # | Action | Count | Warm/req | Δ | All/req | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ArticlesController#index | 20 / 20 | 12181.3 / 20407.5 | 8226.2 | 20270.4 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 1113.0, `RAILS/activerecord/lib/active_record/integration.rb:59` 648.0, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 619.0 | `app/views/articles/_article.html.erb:14` 5779.0, `app/views/articles/index.html.erb:26` 2818.0, `app/views/articles/_article.html.erb:4` 1242.0 |
+| 2 | ArticlesController#show | 20 / 20 | 9436.3 / 14657.5 | 5221.3 | 14569.4 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 816.0, `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` 623.0, `RUBY/ipaddr.rb:692` 578.0 | `app/views/comments/_comment.html.erb:4` 7102.0, `app/views/articles/show.html.erb:37` 1347.0, `app/views/comments/_comment.html.erb:1` 265.0 |
+| 3 | CommentsController#create | 20 / 20 | 6306.9 / 6314.9 | 8.1 | 6314.5 | `RUBY/ipaddr.rb:692` 578.0, `RUBY/uri/common.rb:401` 96.2, `GEM/useragent/lib/user_agent/browsers/base.rb:120` 78.0 | `app/controllers/comments_controller.rb:6` 556.0, `app/models/comment.rb:13` 254.0, `app/controllers/comments_controller.rb:5` 161.3 |
+| 4 | ArticlesController#create | 20 / 20 | 4852.6 / 4857.5 | 4.9 | 4857.2 | `RUBY/ipaddr.rb:692` 578.0, `RUBY/uri/common.rb:401` 92.7, `GEM/useragent/lib/user_agent/browsers/base.rb:120` 78.0 | `app/controllers/articles_controller.rb:27` 563.0, `app/controllers/articles_controller.rb:28` 94.0, `app/controllers/articles_controller.rb:68` 28.0 |
+| 5 | ArticlesController#edit | 20 / 20 | 4727.1 / 4730.9 | 3.8 | 4729.7 | `RUBY/ipaddr.rb:692` 578.0, `GEM/useragent/lib/user_agent/browsers/base.rb:120` 78.0, `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` 59.0 | `app/views/articles/_form.html.erb:1` 262.9, `app/views/articles/_form.html.erb:15` 101.0, `app/views/articles/_form.html.erb:20` 101.0 |
+| 6 | ArticlesController#new | 20 / 20 | 4251.7 / 4259.5 | 7.8 | 4260.4 | `RUBY/ipaddr.rb:692` 578.0, `GEM/useragent/lib/user_agent/browsers/base.rb:120` 78.0, `RUBY/ipaddr.rb:193` 54.0 | `app/views/articles/_form.html.erb:1` 252.0, `app/views/articles/_form.html.erb:15` 101.0, `app/views/articles/_form.html.erb:20` 101.0 |
+
+## Top lines outside the app
+
+Warm: objects per request by run, without each line's first request per process (one-time work). All: including it, mean of the runs. Reach: share of requests in which the line allocated (last run). † charged from Ruby's `<internal:…>` code to this caller. Ledger: upstream pull requests that reduce allocations and change this line, and whether the app's locked version has them. From the app: the nearest app line on the stack (repeat run). Dev/test-only work is listed separately below.
+
+| # | Line | Method | Warm/req | Δ | All/req | Reach | Types | Ledger | From the app | Source |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- | --- |
+| 1 | `RUBY/ipaddr.rb:692` | `in6_addr` | 573.18 / 573.18 | 0.0 | 578.01 | 100% | Data, Array |  | `no app frame` 100% | `raise InvalidAddressError, "invalid address: #{@addr}"` |
+| 2 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:324` | `tag_option` | 170.02 / 340.02 | 170.0 | 255.17 | 83% | String |  | `app/views/articles/_article.html.erb:14` 37%, `app/views/comments/_comment.html.erb:4` 36% | `%(#{key}="#{value}")` |
+| 3 | `RAILS/activesupport/lib/active_support/core_ext/erb/util.rb:143` | `xml_name_escape` | 105.59 / 215.59 | 110.0 | 160.67 | 83% | String |  | `app/views/articles/_article.html.erb:14` 46%, `app/views/comments/_comment.html.erb:4` 45% | `name = name.to_s` |
+| 4 | `RAILS/activerecord/lib/active_record/integration.rb:59` | `to_param` | 74.98 / 164.98 | 90.0 | 120.0 | 83% | String, Array |  | `app/views/comments/_comment.html.erb:4` 32%, `app/views/articles/_article.html.erb:14` 17% | `Array(id).join(self.class.param_delimiter)` |
+| 5 | `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:228` | `html_safe` | 81.08 / 151.08 | 70.0 | 116.17 | 83% | String |  | `app/views/articles/_article.html.erb:14` 24%, `app/views/comments/_comment.html.erb:4` 23% | `ActiveSupport::SafeBuffer.new(self)` |
+| 6 | `RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb:72` | `initialize` | 75.83 / 140.83 | 65.0 | 108.42 | 83% | String |  | `app/views/articles/_article.html.erb:14` 26%, `app/views/comments/_comment.html.erb:4` 25% | `super` |
+| 7 | `GEM/sqlite3/lib/sqlite3/statement.rb:159` | `each` | 61.04 / 136.04 | 75.0 | 98.58 | 83% | String, Array |  | `app/views/articles/index.html.erb:26` 66%, `app/views/articles/show.html.erb:37` 32% | `val = step` |
+| 8 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:263` | `tag_options` | 58.19 / 113.19 | 55.0 | 85.75 | 83% | String |  | `app/views/articles/_article.html.erb:14` 32%, `app/views/comments/_comment.html.erb:4` 31% | `output = +""` |
+| 9 | `GEM/useragent/lib/user_agent/browsers/base.rb:120` | `detect_product` | 77.35 / 77.35 | 0.0 | 78.0 | 100% | String |  | `no app frame` 100% | `detect { \|useragent\| useragent.product.to_s.downcase == product.to_s.d` |
+| 10 | `RAILS/actionpack/lib/action_dispatch/journey/visitors.rb:40` | `evaluate` | 44.15 / 94.15 | 50.0 | 69.17 | 100% | Array |  | `app/views/articles/_article.html.erb:13` 19%, `app/views/articles/_article.html.erb:14` 19% | `parts = @parts.dup` |
+| 11 | `RUBY/uri/common.rb:401` | `_decode_uri_component` | 59.31 / 61.08 | 1.78 | 60.98 | 100% | String, MatchData |  | `no app frame` 51%, `app/views/articles/_form.html.erb:1` 22% | `str.b.gsub(regexp, TBLDECWWWCOMP_).force_encoding(enc)` |
+| 12 | `RUBY/uri/rfc3986_parser.rb:135` | `parse` | 35.93 / 75.93 | 40.0 | 56.0 | 100% | Array |  | `app/views/articles/_article.html.erb:14` 47%, `app/views/comments/_comment.html.erb:4` 46% | `URI.for(*self.split(uri), self)` |
+| 13 | `RAILS/activesupport/lib/active_support/core_ext/hash/keys.rb:11` | `stringify_keys` | 38.06 / 73.06 | 35.0 | 55.58 | 100% | Hash |  | `app/views/articles/_article.html.erb:14` 25%, `app/views/comments/_comment.html.erb:4` 24% | `transform_keys { \|k\| Symbol === k ? k.name : k.to_s }` |
+| 14 | `RUBY/ipaddr.rb:193` | `to_s` | 53.55 / 53.55 | 0.0 | 54.0 | 100% | String, MatchData |  | `no app frame` 100% | `str.gsub!(/\b0{1,3}([\da-f]+)\b/i, '\1')` |
+| 15 | `RAILS/actionview/lib/action_view/helpers/url_helper.rb:752` | `token_tag` | 32.87 / 71.87 | 39.0 | 53.33 | 67% | Hash, Array |  | `app/views/articles/_article.html.erb:14` 49%, `app/views/comments/_comment.html.erb:4` 48% | `form_authenticity_token(form_options: form_options.merge(authenticity_` |
+| 16 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:258` | `content_tag_string` | 34.69 / 69.69 | 35.0 | 52.25 | 83% | String |  | `app/views/articles/_article.html.erb:14` 26%, `app/views/comments/_comment.html.erb:4` 25% | `"<#{name}#{tag_options}>#{PRE_CONTENT_STRINGS[name]}#{content}</#{name` |
+| 17 | `RUBY/ipaddr.rb:736` | `_to_string` | 51.57 / 51.57 | 0.0 | 52.0 | 100% | String, MatchData |  | `no app frame` 100% | `return (("%.32x" % addr).gsub!(/.{4}(?!$)/, '\&:'))` |
+| 18 | `RAILS/actionview/lib/action_view/helpers/tag_helper.rb:500` | `tag` | 31.33 / 61.33 | 30.0 | 46.33 | 83% | String | #59804 open upstream work | `app/views/articles/_article.html.erb:14` 44%, `app/views/comments/_comment.html.erb:4` 43% | `"<#{name}#{tag_builder.tag_options(options, escape) if options}#{open ` |
+| 19 | `RUBY/uri/common.rb:394` | `_encode_uri_component` | 44.3 / 46.05 | 1.75 | 45.6 | 100% | String, MatchData |  | `no app frame` 100% | `str.gsub!(regexp, table)` |
+| 20 | `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` | `#{method}` | 42.63 / 42.63 | 0.0 | 43.0 | 100% | Array, Hash |  | `no app frame` 51%, `app/controllers/articles_controller.rb:27` 10% | `dispatch(:#{method}, ...)` |
+| 21 | `RAILS/actionpack/lib/action_dispatch/journey/router/utils.rb:71` | `escape` | 24.99 / 54.99 | 30.0 | 40.0 | 83% | String |  | `app/views/comments/_comment.html.erb:4` 32%, `app/views/articles/_article.html.erb:13` 17% | `component.gsub(pattern) { \|unsafe\| percent_encode(unsafe) }.force_enco` |
+| 22 | `RAILS/activerecord/lib/active_record/relation/delegation.rb:129` | `create` | 27.44 / 52.44 | 25.0 | 40.08 | 50% | Hash, Object |  | `app/views/articles/_article.html.erb:6` 86%, `app/views/articles/show.html.erb:37` 5% | `relation_class_for(klass).new(klass, *args, **kwargs)` |
+| 23 | `RAILS/actionpack/lib/action_controller/metal/request_forgery_protection.rb:102` | `` | 25.31 / 54.56 | 29.25 | 40.67 | 67% | Array, Hash |  | `app/views/articles/_article.html.erb:14` 48%, `app/views/comments/_comment.html.erb:4` 47% | `helper_method :form_authenticity_token` |
+| 24 | `GEM/useragent/lib/user_agent/version.rb:27` | `initialize` | 39.67 / 39.67 | 0.0 | 40.0 | 100% | MatchData, String |  | `no app frame` 100% | `@sequences  = str.scan(/\d+\|[A-Za-z][0-9A-Za-z-]*$/).map { \|s\| s =~ /^` |
+| 25 | `RAILS/actionpack/lib/action_controller/metal/request_forgery_protection.rb:577` | `per_form_csrf_token` | 24.65 / 53.9 | 29.25 | 40.0 | 67% | String, Array |  | `app/views/articles/_article.html.erb:14` 49%, `app/views/comments/_comment.html.erb:4` 48% | `csrf_token_hmac(session, [action_path, method.downcase].join("#"))` |
+| 26 | `RAILS/actionview/lib/action_view/helpers/url_helper.rb:756` | `token_tag` | 24.65 / 53.9 | 29.25 | 40.0 | 67% | String, Array |  | `app/views/articles/_article.html.erb:14` 49%, `app/views/comments/_comment.html.erb:4` 48% | `tag(:input, type: "hidden", name: request_forgery_protection_token.to_` |
+| 27 | `RAILS/actionview/lib/action_view/buffers.rb:48` | `<<` | 24.14 / 54.14 | 30.0 | 39.17 | 50% | String |  | `app/views/articles/_article.html.erb:6` 17%, `app/views/articles/_article.html.erb:1` 17% | `CGI.escapeHTML(value)` |
+| 28 | `RAILS/actionview/lib/action_view/record_identifier.rb:115` | `record_key_for_dom_id` | 24.12 / 54.12 | 30.0 | 39.17 | 50% | String |  | `app/views/articles/_article.html.erb:1` 34%, `app/views/articles/_article.html.erb:5` 34% | `key && key.all? ? key.join(JOIN) : nil` |
+| 29 | `GEM/base64/lib/base64.rb:283` † | `strict_encode64` | 26.6 / 46.6 | 20.0 | 36.67 | 100% | Array, String |  | `app/views/articles/_article.html.erb:14` 38%, `app/views/comments/_comment.html.erb:4` 38% | `[bin].pack("m0")` |
+| 30 | `RAILS/actionpack/lib/action_controller/metal/url_for.rb:49` | `url_options` | 22.08 / 47.08 | 25.0 | 34.58 | 100% | Hash |  | `app/views/articles/_article.html.erb:13` 19%, `app/views/articles/_article.html.erb:12` 19% | `options = @_url_options.dup` |
+
+## Dev/test-mode work
+
+2378.0 of 7756.8 warm objects per request outside the app are work that test and development mode do and production mostly does not: debug logging, error pages, template compilation, route building, asset lookup, code reload checks.
+
+| # | Kind | Line | Warm/req | Reach | From the app | Source |
+| ---: | --- | --- | ---: | ---: | --- | --- |
+| 1 | error page | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:124` | 679.98 | 83% | `app/controllers/articles_controller.rb:27` 29%, `app/controllers/comments_controller.rb:6` 28% | `add_filter { \|line\| line.sub(gems_regexp, gems_result) }` |
+| 2 | reload check | `RAILS/activesupport/lib/active_support/file_update_checker.rb:132` | 268.74 | 100% | `no app frame` 100% | `mtime = File.mtime(path)` |
+| 3 | reload check | `RAILS/activesupport/lib/active_support/file_update_checker.rb:106` † | 138.83 | 100% | `no app frame` 100% | `all.concat(Dir[@glob]) if @glob` |
+| 4 | debug logging | `RAILS/activerecord/lib/active_record/log_subscriber.rb:131` | 120.0 | 83% | `app/controllers/articles_controller.rb:27` 25%, `app/controllers/comments_controller.rb:6` 24% | `Thread.each_caller_location do \|location\|` |
+| 5 | error page | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:62` | 117.69 | 83% | `app/controllers/articles_controller.rb:27` 25%, `app/controllers/comments_controller.rb:6` 24% | `frame = frame.to_s` |
+| 6 | debug logging | `RAILS/activejob/lib/active_job/log_subscriber.rb:192` | 53.62 | 33% | `app/controllers/articles_controller.rb:27` 50%, `app/controllers/comments_controller.rb:6` 50% | `source = extract_enqueue_source_location(caller)` |
+| 7 | asset lookup | `GEM/sprockets/lib/sprockets/path_utils.rb:166` | 30.28 | 67% | `app/views/layouts/application.html.erb:16` 78%, `app/views/layouts/application.html.erb:17` 22% | `path = File.join(path, ''.freeze)` |
+| 8 | debug logging | `RAILS/activerecord/lib/active_record/log_subscriber.rb:49` | 37.14 | 83% | `app/views/articles/index.html.erb:26` 72%, `app/controllers/comments_controller.rb:6` 7% | `binds = binds.inspect` |
+| 9 | asset lookup | `GEM/sprockets/lib/sprockets/http_utils.rb:17` | 27.65 | 67% | `app/views/layouts/application.html.erb:17` 50%, `app/views/layouts/application.html.erb:16` 50% | `v1, v2 = value.split('/'.freeze, 2)` |
+| 10 | asset lookup | `GEM/sprockets/lib/sprockets/http_utils.rb:18` | 27.65 | 67% | `app/views/layouts/application.html.erb:16` 50%, `app/views/layouts/application.html.erb:17` 50% | `m1, m2 = matcher.split('/'.freeze, 2)` |
+
+## By gem
+
+| Group | Warm/req | All/req | Top lines (warm) |
+| --- | ---: | ---: | --- |
+| rails: activesupport | 2233.5 | 2255.4 | `backtrace_cleaner.rb:124` 680.0, `file_update_checker.rb:132` 268.7, `util.rb:143` 160.6 |
+| ruby stdlib | 1137.0 | 1146.7 | `ipaddr.rb:692` 573.2, `common.rb:401` 60.2, `rfc3986_parser.rb:135` 55.9 |
+| rails: actionview | 1066.7 | 1072.4 | `tag_helper.rb:324` 255.0, `tag_helper.rb:263` 85.7, `url_helper.rb:752` 52.4 |
+| rails: actionpack | 990.1 | 1001.4 | `visitors.rb:40` 69.2, `utils.rb:71` 40.0, `request_forgery_protection.rb:102` 39.9 |
+| rails: activerecord | 769.9 | 779.1 | `log_subscriber.rb:131` 120.0, `integration.rb:59` 120.0, `delegation.rb:129` 39.9 |
+| gem: sprockets | 589.7 | 597.2 | `path_utils.rb:166` 30.3, `http_utils.rb:17` 27.7, `http_utils.rb:18` 27.7 |
+| app | 208.9 | 212.2 | `_article.html.erb:14` 32.9, `_article.html.erb:13` 26.3, `_article.html.erb:12` 19.7 |
+| gem: useragent | 206.8 | 208.6 | `base.rb:120` 77.4, `version.rb:27` 39.7, `user_agent.rb:25` 11.9 |
+| rails: activemodel | 145.2 | 146.2 | `string.rb:35` 27.1, `builder.rb:28` 19.6, `builder.rb:22` 19.6 |
+| gem: sqlite3 | 115.3 | 115.6 | `statement.rb:159` 98.5, `statement.rb:76` 6.9, `statement.rb:80` 2.0 |
+| rails: activejob | 85.5 | 87.7 | `log_subscriber.rb:192` 53.6, `log_subscriber.rb:148` 6.2, `arguments.rb:92` 4.2 |
+| ruby default gem: base64 | 69.9 | 70.0 | `base64.rb:283` 36.6, `base64.rb:310` 18.6, `base64.rb:374` 14.7 |
+| gem: rack | 61.4 | 62.2 | `utils.rb:693` 5.3, `body_proxy.rb:12` 5.0, `utils.rb:331` 4.0 |
+| ruby default gem: logger | 56.2 | 56.7 | `logger.rb:685` 14.6, `log_device.rb:33` 13.9, `log_device.rb:165` 13.9 |
+| gem: i18n | 47.7 | 48.3 | `i18n.rb:397` 9.9, `utils.rb:8` 5.6, `i18n.rb:396` 4.9 |
+| gem: importmap-rails | 38.8 | 39.3 | `importmap_tags_helper.rb:44` 13.8, `importmap_tags_helper.rb:30` 9.2, `importmap_tags_helper.rb:42` 5.9 |
+| gem: web-console | 26.8 | 27.0 | `permissions.rb:39` 13.9, `permissions.rb:21` 4.0, `request.rb:12` 2.0 |
+| gem: turbo-rails | 17.2 | 17.7 | `stream_name.rb:26` 2.5, `broadcastable.rb:184` 1.6, `broadcastable.rb:521` 1.5 |
+| gem: sprockets-rails | 17.1 | 17.3 | `helper.rb:357` 2.6, `helper.rb:81` 2.6, `helper.rb:186` 2.6 |
+| rails: railties | 16.4 | 16.5 | `finisher.rb:195` 3.0, `logger.rb:57` 3.0, `backtrace_cleaner.rb:21` 2.5 |
+| ruby default gem: securerandom | 15.6 | 15.7 | `securerandom.rb:71` 15.6 |
+| gem: json | 15.6 | 15.7 | `common.rb:298` 12.3, `common.rb:378` 2.3, `common.rb:775` 0.3 |
+| gem: globalid | 12.4 | 12.7 | `gid.rb:95` 3.3, `gid.rb:159` 2.6, `gid.rb:166` 1.3 |
+| gem: concurrent-ruby | 12.0 | 12.2 | `non_concurrent_map_backend.rb:120` 3.3, `mri_map_backend.rb:14` 3.3, `non_concurrent_map_backend.rb:26` 2.8 |
+| gem: tzinfo | 5.9 | 6.0 | `timestamp.rb:208` 2.6, `constant_offset_data_timezone_info.rb:52` 1.3, `timestamp.rb:193` 1.3 |
+| gem: rack-session | 3.0 | 3.0 | `id.rb:277` 1.0, `id.rb:401` 1.0, `id.rb:275` 1.0 |
+| rails: actioncable | 1.4 | 1.5 | `broadcasting.rb:51` 0.6, `broadcasting.rb:39` 0.5, `broadcasting.rb:53` 0.2 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | Turbo::Streams::ActionBroadcastJob#perform | 40 / 40 | 3351.1 / 3351.2 | 0.2 | 3352.5 | `RAILS/activesupport/lib/active_support/json/encoding.rb:65` 26.8, `RAILS/activesupport/lib/active_support/json/encoding.rb:66` 25.8, `RAILS/activesupport/lib/active_support/broadcast_logger.rb:129` 24.0 | `app/views/comments/_comment.html.erb:4` 142.6, `app/views/articles/_article.html.erb:6` 110.6, `app/views/articles/_article.html.erb:14` 31.2 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:124` (error page) | 1234.05 / 1234.05 | 100% | `no app frame` 83%, `app/views/comments/_comment.html.erb:4` 9% | `add_filter { \|line\| line.sub(gems_regexp, gems_result) }` |
+| 2 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:132` (reload check) | 252.53 / 252.53 | 100% | `no app frame` 100% | `mtime = File.mtime(path)` |
+| 3 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:131` (debug logging) | 150.68 / 150.68 | 100% | `no app frame` 71%, `app/views/comments/_comment.html.erb:4` 15% | `Thread.each_caller_location do \|location\|` |
+| 4 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:62` (error page) | 148.73 / 148.73 | 100% | `no app frame` 71%, `app/views/comments/_comment.html.erb:4` 15% | `frame = frame.to_s` |
+| 5 | `RAILS/activesupport/lib/active_support/file_update_checker.rb:106` † (reload check) | 126.75 / 126.75 | 100% | `no app frame` 100% | `all.concat(Dir[@glob]) if @glob` |
+| 6 | `RAILS/activejob/lib/active_job/log_subscriber.rb:192` (debug logging) | 107.25 / 107.25 | 100% | `no app frame` 100% | `source = extract_enqueue_source_location(caller)` |
+| 7 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:149` (error page) | 70.2 / 70.2 | 100% | `no app frame` 100% | `backtrace = backtrace.reject { \|line\| s.call(line.to_s) }` |
+| 8 | `RAILS/activesupport/lib/active_support/backtrace_cleaner.rb:141` (error page) | 52.65 / 52.65 | 100% | `no app frame` 100% | `backtrace = backtrace.map { \|line\| f.call(line.to_s) }` |
+| 9 | `RAILS/activesupport/lib/active_support/json/encoding.rb:65` | 26.18 / 26.18 | 100% | `no app frame` 100% | `json.gsub!(">", '\u003e')` |
+| 10 | `RAILS/activesupport/lib/active_support/json/encoding.rb:66` | 25.2 / 25.2 | 100% | `no app frame` 100% | `json.gsub!("<", '\u003c')` |
+lowrail-profile: report in /home/user/ft/out2/blog-floor-wl/wl-write/report.md

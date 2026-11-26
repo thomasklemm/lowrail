@@ -1,0 +1,3 @@
+== sure start 2026-11-25T20:11:51Z steps plain,plain2,off,u1,u2,u3,u4,u5,u6,planted,planted2,seed99
+proof.sh exit 0
+== sure done 2026-11-25T21:41:55Z

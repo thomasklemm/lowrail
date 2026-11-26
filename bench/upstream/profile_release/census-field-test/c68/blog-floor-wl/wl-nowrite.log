@@ -1,0 +1,3 @@
+lowrail-profile: run 1 of 2: bin/rails runner /home/user/.local/share/mise/installs/ruby/3.3.14/lib/ruby/gems/3.3.0/gems/lowrail-profile-0.1.0.rc1/lib/lowrail/profile_workloads.rb /home/user/workspace/repo/.corpus/ft-blog-floor/lowrail/workloads.rb /home/user/ft/out2/blog-floor-wl/wl-nowrite/workloads.json
+lowrail-profile: /home/user/workspace/repo/.corpus/ft-blog-floor/lowrail/workloads.rb: POST /articles is a write; --workloads sends real requests, so it needs --allow-writes
+lowrail-profile: the workloads run exited 1; nothing measured

@@ -1,0 +1,44 @@
+off-env.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+off.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+plain.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+plain2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+planted.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+planted.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+planted2.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+planted2.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+seed99.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+seed99.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u1.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u1.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u2.run1.outcomes: 633 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u2.run2.outcomes: 634 outcomes; 634 runs, 3854 assertions, 0 failures, 1 errors, 2 skips
+u3.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u3.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u4.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u4.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u5.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u5.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u6.run1.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+u6.run2.outcomes: 634 outcomes; 634 runs, 3856 assertions, 0 failures, 0 errors, 2 skips
+off-env.outcomes = plain
+off.outcomes = plain
+plain.outcomes = plain
+plain2.outcomes = plain
+planted.run1.outcomes = plain
+planted.run2.outcomes = plain
+planted2.run1.outcomes = plain
+planted2.run2.outcomes = plain
+seed99.run1.outcomes = plain
+seed99.run2.outcomes = plain
+u1.run1.outcomes = plain
+u1.run2.outcomes = plain
+u2.run1.outcomes DIFFERS (1 lines)
+u2.run2.outcomes DIFFERS (2 lines)
+u3.run1.outcomes = plain
+u3.run2.outcomes = plain
+u4.run1.outcomes = plain
+u4.run2.outcomes = plain
+u5.run1.outcomes = plain
+u5.run2.outcomes = plain
+u6.run1.outcomes = plain
+u6.run2.outcomes = plain

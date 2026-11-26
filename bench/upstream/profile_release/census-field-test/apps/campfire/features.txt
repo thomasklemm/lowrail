@@ -1,0 +1,436 @@
+# plain vs plain2, off
+base plain: 20 processes
+plain2 93386.txt 1858: identical to a plain process
+plain2 93422.txt 1979: identical to a plain process
+plain2 93428.txt 1979: identical to a plain process
+plain2 93433.txt 1981: identical to a plain process
+plain2 93439.txt 1979: identical to a plain process
+plain2 93445.txt 1980: identical to a plain process
+plain2 93451.txt 1980: identical to a plain process
+plain2 93458.txt 1978: identical to a plain process
+plain2 93464.txt 1981: identical to a plain process
+plain2 93470.txt 1982: identical to a plain process
+plain2 93476.txt 1983: identical to a plain process
+plain2 93481.txt 1980: identical to a plain process
+plain2 93488.txt 1983: identical to a plain process
+plain2 93493.txt 1980: identical to a plain process
+plain2 93499.txt 1981: identical to a plain process
+plain2 93505.txt 1981: identical to a plain process
+plain2 93511.txt 1982: identical to a plain process
+plain2 94117.txt 1527: identical to a plain process
+plain2 94119.txt 38: identical to a plain process
+plain2 94147.txt 38: identical to a plain process
+off 94671.txt 1858: identical to a plain process
+off 94783.txt 1979: identical to a plain process
+off 94788.txt 1979: identical to a plain process
+off 94794.txt 1981: identical to a plain process
+off 94800.txt 1979: identical to a plain process
+off 94806.txt 1980: identical to a plain process
+off 94812.txt 1980: identical to a plain process
+off 94818.txt 1978: identical to a plain process
+off 94824.txt 1981: identical to a plain process
+off 94830.txt 1982: identical to a plain process
+off 94837.txt 1983: identical to a plain process
+off 94843.txt 1980: identical to a plain process
+off 94853.txt 1983: identical to a plain process
+off 94860.txt 1980: identical to a plain process
+off 94866.txt 1981: identical to a plain process
+off 94872.txt 1981: identical to a plain process
+off 94878.txt 1982: identical to a plain process
+off 95615.txt 1527: identical to a plain process
+off 95624.txt 38: identical to a plain process
+off 95673.txt 38: identical to a plain process
+# off-env vs captures
+base off-env: 20 processes
+u1 run1-96412.txt 1858: identical to a off-env process
+u1 run1-96567.txt 1979: identical to a off-env process
+u1 run1-96569.txt 1979: identical to a off-env process
+u1 run1-96577.txt 1981: identical to a off-env process
+u1 run1-96584.txt 1979: identical to a off-env process
+u1 run1-96586.txt 1980: identical to a off-env process
+u1 run1-96596.txt 1980: identical to a off-env process
+u1 run1-96602.txt 1978: identical to a off-env process
+u1 run1-96608.txt 1981: identical to a off-env process
+u1 run1-96621.txt 1982: identical to a off-env process
+u1 run1-96632.txt 1983: identical to a off-env process
+u1 run1-96637.txt 1980: identical to a off-env process
+u1 run1-96642.txt 1983: identical to a off-env process
+u1 run1-96644.txt 1980: identical to a off-env process
+u1 run1-96656.txt 1981: identical to a off-env process
+u1 run1-96664.txt 1981: identical to a off-env process
+u1 run1-96668.txt 1982: identical to a off-env process
+u1 run1-97386.txt 1527: identical to a off-env process
+u1 run1-97396.txt 38: identical to a off-env process
+u1 run1-97461.txt 38: identical to a off-env process
+u1 run2-98114.txt 1858: identical to a off-env process
+u1 run2-98200.txt 1979: identical to a off-env process
+u1 run2-98206.txt 1979: identical to a off-env process
+u1 run2-98213.txt 1981: identical to a off-env process
+u1 run2-98219.txt 1979: identical to a off-env process
+u1 run2-98225.txt 1980: identical to a off-env process
+u1 run2-98231.txt 1980: identical to a off-env process
+u1 run2-98237.txt 1978: identical to a off-env process
+u1 run2-98243.txt 1981: identical to a off-env process
+u1 run2-98249.txt 1982: identical to a off-env process
+u1 run2-98255.txt 1983: identical to a off-env process
+u1 run2-98263.txt 1980: identical to a off-env process
+u1 run2-98276.txt 1983: identical to a off-env process
+u1 run2-98282.txt 1980: identical to a off-env process
+u1 run2-98287.txt 1981: identical to a off-env process
+u1 run2-98293.txt 1981: identical to a off-env process
+u1 run2-98299.txt 1982: identical to a off-env process
+u1 run2-99146.txt 1527: identical to a off-env process
+u1 run2-99214.txt 38: identical to a off-env process
+u1 run2-99262.txt 38: identical to a off-env process
+u2 run1-100700.txt 1858: identical to a off-env process
+u2 run1-100748.txt 1979: identical to a off-env process
+u2 run1-100754.txt 1979: identical to a off-env process
+u2 run1-100760.txt 1981: identical to a off-env process
+u2 run1-100766.txt 1979: identical to a off-env process
+u2 run1-100772.txt 1980: identical to a off-env process
+u2 run1-100778.txt 1980: identical to a off-env process
+u2 run1-100783.txt 1978: identical to a off-env process
+u2 run1-100789.txt 1981: identical to a off-env process
+u2 run1-100795.txt 1982: identical to a off-env process
+u2 run1-100801.txt 1983: identical to a off-env process
+u2 run1-100808.txt 1980: identical to a off-env process
+u2 run1-100814.txt 1983: identical to a off-env process
+u2 run1-100820.txt 1980: identical to a off-env process
+u2 run1-100826.txt 1981: identical to a off-env process
+u2 run1-100832.txt 1981: identical to a off-env process
+u2 run1-100838.txt 1982: identical to a off-env process
+u2 run1-101724.txt 38: identical to a off-env process
+u2 run1-101726.txt 1527: identical to a off-env process
+u2 run1-101735.txt 38: identical to a off-env process
+u2 run2-102736.txt 1858: identical to a off-env process
+u2 run2-103119.txt 1979: identical to a off-env process
+u2 run2-103124.txt 1979: identical to a off-env process
+u2 run2-103130.txt 1981: identical to a off-env process
+u2 run2-103135.txt 1979: identical to a off-env process
+u2 run2-103140.txt 1980: identical to a off-env process
+u2 run2-103144.txt 1980: identical to a off-env process
+u2 run2-103149.txt 1978: identical to a off-env process
+u2 run2-103159.txt 1981: identical to a off-env process
+u2 run2-103171.txt 1982: identical to a off-env process
+u2 run2-103185.txt 1983: identical to a off-env process
+u2 run2-103191.txt 1980: identical to a off-env process
+u2 run2-103197.txt 1983: identical to a off-env process
+u2 run2-103199.txt 1980: identical to a off-env process
+u2 run2-103208.txt 1981: identical to a off-env process
+u2 run2-103218.txt 1981: identical to a off-env process
+u2 run2-103227.txt 1982: identical to a off-env process
+u2 run2-104140.txt 1527: identical to a off-env process
+u2 run2-104230.txt 38: identical to a off-env process
+u2 run2-104545.txt 38: identical to a off-env process
+u3 run1-107314.txt 1858: identical to a off-env process
+u3 run1-107346.txt 1979: identical to a off-env process
+u3 run1-107352.txt 1979: identical to a off-env process
+u3 run1-107358.txt 1981: identical to a off-env process
+u3 run1-107364.txt 1979: identical to a off-env process
+u3 run1-107369.txt 1980: identical to a off-env process
+u3 run1-107376.txt 1980: identical to a off-env process
+u3 run1-107381.txt 1978: identical to a off-env process
+u3 run1-107393.txt 1981: identical to a off-env process
+u3 run1-107399.txt 1982: identical to a off-env process
+u3 run1-107405.txt 1983: identical to a off-env process
+u3 run1-107410.txt 1980: identical to a off-env process
+u3 run1-107416.txt 1983: identical to a off-env process
+u3 run1-107422.txt 1980: identical to a off-env process
+u3 run1-107428.txt 1981: identical to a off-env process
+u3 run1-107434.txt 1981: identical to a off-env process
+u3 run1-107440.txt 1982: identical to a off-env process
+u3 run1-108179.txt 1527: identical to a off-env process
+u3 run1-108194.txt 38: identical to a off-env process
+u3 run1-108275.txt 38: identical to a off-env process
+u3 run2-108869.txt 1858: identical to a off-env process
+u3 run2-108992.txt 1979: identical to a off-env process
+u3 run2-108997.txt 1979: identical to a off-env process
+u3 run2-109003.txt 1981: identical to a off-env process
+u3 run2-109009.txt 1979: identical to a off-env process
+u3 run2-109015.txt 1980: identical to a off-env process
+u3 run2-109021.txt 1980: identical to a off-env process
+u3 run2-109027.txt 1978: identical to a off-env process
+u3 run2-109033.txt 1981: identical to a off-env process
+u3 run2-109039.txt 1982: identical to a off-env process
+u3 run2-109048.txt 1983: identical to a off-env process
+u3 run2-109054.txt 1980: identical to a off-env process
+u3 run2-109060.txt 1983: identical to a off-env process
+u3 run2-109067.txt 1980: identical to a off-env process
+u3 run2-109073.txt 1981: identical to a off-env process
+u3 run2-109078.txt 1981: identical to a off-env process
+u3 run2-109085.txt 1982: identical to a off-env process
+u3 run2-110001.txt 1527: identical to a off-env process
+u3 run2-110031.txt 38: identical to a off-env process
+u3 run2-110122.txt 38: identical to a off-env process
+u4 run1-111256.txt 1858: identical to a off-env process
+u4 run1-111273.txt 1979: identical to a off-env process
+u4 run1-111279.txt 1979: identical to a off-env process
+u4 run1-111284.txt 1981: identical to a off-env process
+u4 run1-111290.txt 1979: identical to a off-env process
+u4 run1-111296.txt 1980: identical to a off-env process
+u4 run1-111302.txt 1980: identical to a off-env process
+u4 run1-111308.txt 1978: identical to a off-env process
+u4 run1-111314.txt 1981: identical to a off-env process
+u4 run1-111320.txt 1982: identical to a off-env process
+u4 run1-111326.txt 1983: identical to a off-env process
+u4 run1-111332.txt 1980: identical to a off-env process
+u4 run1-111338.txt 1983: identical to a off-env process
+u4 run1-111344.txt 1980: identical to a off-env process
+u4 run1-111350.txt 1981: identical to a off-env process
+u4 run1-111356.txt 1981: identical to a off-env process
+u4 run1-111362.txt 1982: identical to a off-env process
+u4 run1-112112.txt 1527: identical to a off-env process
+u4 run1-112136.txt 38: identical to a off-env process
+u4 run1-112195.txt 38: identical to a off-env process
+u4 run2-112665.txt 1858: identical to a off-env process
+u4 run2-112775.txt 1979: identical to a off-env process
+u4 run2-112780.txt 1979: identical to a off-env process
+u4 run2-112789.txt 1981: identical to a off-env process
+u4 run2-112795.txt 1979: identical to a off-env process
+u4 run2-112801.txt 1980: identical to a off-env process
+u4 run2-112807.txt 1980: identical to a off-env process
+u4 run2-112813.txt 1978: identical to a off-env process
+u4 run2-112819.txt 1981: identical to a off-env process
+u4 run2-112825.txt 1982: identical to a off-env process
+u4 run2-112831.txt 1983: identical to a off-env process
+u4 run2-112837.txt 1980: identical to a off-env process
+u4 run2-112842.txt 1983: identical to a off-env process
+u4 run2-112849.txt 1980: identical to a off-env process
+u4 run2-112855.txt 1981: identical to a off-env process
+u4 run2-112861.txt 1981: identical to a off-env process
+u4 run2-112867.txt 1982: identical to a off-env process
+u4 run2-113452.txt 1527: identical to a off-env process
+u4 run2-113565.txt 38: identical to a off-env process
+u4 run2-113575.txt 38: identical to a off-env process
+u5 run1-114593.txt 1858: identical to a off-env process
+u5 run1-114696.txt 1979: identical to a off-env process
+u5 run1-114702.txt 1979: identical to a off-env process
+u5 run1-114707.txt 1981: identical to a off-env process
+u5 run1-114713.txt 1979: identical to a off-env process
+u5 run1-114719.txt 1980: identical to a off-env process
+u5 run1-114725.txt 1980: identical to a off-env process
+u5 run1-114731.txt 1978: identical to a off-env process
+u5 run1-114737.txt 1981: identical to a off-env process
+u5 run1-114743.txt 1982: identical to a off-env process
+u5 run1-114749.txt 1983: identical to a off-env process
+u5 run1-114755.txt 1980: identical to a off-env process
+u5 run1-114761.txt 1983: identical to a off-env process
+u5 run1-114767.txt 1980: identical to a off-env process
+u5 run1-114773.txt 1981: identical to a off-env process
+u5 run1-114779.txt 1981: identical to a off-env process
+u5 run1-114785.txt 1982: identical to a off-env process
+u5 run1-115470.txt 1527: identical to a off-env process
+u5 run1-115580.txt 38: identical to a off-env process
+u5 run1-115583.txt 38: identical to a off-env process
+u5 run2-116048.txt 1858: identical to a off-env process
+u5 run2-116230.txt 1979: identical to a off-env process
+u5 run2-116234.txt 1979: identical to a off-env process
+u5 run2-116240.txt 1981: identical to a off-env process
+u5 run2-116243.txt 1979: identical to a off-env process
+u5 run2-116252.txt 1980: identical to a off-env process
+u5 run2-116259.txt 1980: identical to a off-env process
+u5 run2-116267.txt 1978: identical to a off-env process
+u5 run2-116270.txt 1981: identical to a off-env process
+u5 run2-116282.txt 1982: identical to a off-env process
+u5 run2-116288.txt 1983: identical to a off-env process
+u5 run2-116299.txt 1980: identical to a off-env process
+u5 run2-116305.txt 1983: identical to a off-env process
+u5 run2-116312.txt 1980: identical to a off-env process
+u5 run2-116318.txt 1981: identical to a off-env process
+u5 run2-116326.txt 1981: identical to a off-env process
+u5 run2-116332.txt 1982: identical to a off-env process
+u5 run2-116921.txt 1527: identical to a off-env process
+u5 run2-117087.txt 38: identical to a off-env process
+u5 run2-117088.txt 38: identical to a off-env process
+u6 run1-118541.txt 1858: identical to a off-env process
+u6 run1-118688.txt 1979: identical to a off-env process
+u6 run1-118694.txt 1979: identical to a off-env process
+u6 run1-118698.txt 1981: identical to a off-env process
+u6 run1-118703.txt 1979: identical to a off-env process
+u6 run1-118708.txt 1980: identical to a off-env process
+u6 run1-118714.txt 1980: identical to a off-env process
+u6 run1-118721.txt 1978: identical to a off-env process
+u6 run1-118728.txt 1981: identical to a off-env process
+u6 run1-118734.txt 1982: identical to a off-env process
+u6 run1-118740.txt 1983: identical to a off-env process
+u6 run1-118746.txt 1980: identical to a off-env process
+u6 run1-118752.txt 1983: identical to a off-env process
+u6 run1-118758.txt 1980: identical to a off-env process
+u6 run1-118763.txt 1981: identical to a off-env process
+u6 run1-118770.txt 1981: identical to a off-env process
+u6 run1-118776.txt 1982: identical to a off-env process
+u6 run1-119421.txt 1527: identical to a off-env process
+u6 run1-119435.txt 38: identical to a off-env process
+u6 run1-119502.txt 38: identical to a off-env process
+u6 run2-120130.txt 1858: identical to a off-env process
+u6 run2-120183.txt 1979: identical to a off-env process
+u6 run2-120190.txt 1979: identical to a off-env process
+u6 run2-120197.txt 1981: identical to a off-env process
+u6 run2-120204.txt 1979: identical to a off-env process
+u6 run2-120210.txt 1980: identical to a off-env process
+u6 run2-120219.txt 1980: identical to a off-env process
+u6 run2-120231.txt 1978: identical to a off-env process
+u6 run2-120239.txt 1981: identical to a off-env process
+u6 run2-120249.txt 1982: identical to a off-env process
+u6 run2-120260.txt 1983: identical to a off-env process
+u6 run2-120266.txt 1980: identical to a off-env process
+u6 run2-120272.txt 1983: identical to a off-env process
+u6 run2-120278.txt 1980: identical to a off-env process
+u6 run2-120284.txt 1981: identical to a off-env process
+u6 run2-120290.txt 1981: identical to a off-env process
+u6 run2-120296.txt 1982: identical to a off-env process
+u6 run2-120910.txt 1527: identical to a off-env process
+u6 run2-121038.txt 38: identical to a off-env process
+u6 run2-121213.txt 38: identical to a off-env process
+planted run1-122442.txt 1858: identical to a off-env process
+planted run1-122480.txt 1979: identical to a off-env process
+planted run1-122486.txt 1979: identical to a off-env process
+planted run1-122491.txt 1981: identical to a off-env process
+planted run1-122497.txt 1979: identical to a off-env process
+planted run1-122503.txt 1980: identical to a off-env process
+planted run1-122509.txt 1980: identical to a off-env process
+planted run1-122515.txt 1978: identical to a off-env process
+planted run1-122521.txt 1981: identical to a off-env process
+planted run1-122527.txt 1982: identical to a off-env process
+planted run1-122533.txt 1983: identical to a off-env process
+planted run1-122539.txt 1980: identical to a off-env process
+planted run1-122545.txt 1983: identical to a off-env process
+planted run1-122551.txt 1980: identical to a off-env process
+planted run1-122557.txt 1981: identical to a off-env process
+planted run1-122563.txt 1981: identical to a off-env process
+planted run1-122569.txt 1982: identical to a off-env process
+planted run1-123240.txt 1527: identical to a off-env process
+planted run1-123282.txt 38: identical to a off-env process
+planted run1-123354.txt 38: identical to a off-env process
+planted run2-123857.txt 1858: identical to a off-env process
+planted run2-123906.txt 1979: identical to a off-env process
+planted run2-123912.txt 1979: identical to a off-env process
+planted run2-123917.txt 1981: identical to a off-env process
+planted run2-123924.txt 1979: identical to a off-env process
+planted run2-123929.txt 1980: identical to a off-env process
+planted run2-123935.txt 1980: identical to a off-env process
+planted run2-123941.txt 1978: identical to a off-env process
+planted run2-123947.txt 1981: identical to a off-env process
+planted run2-123953.txt 1982: identical to a off-env process
+planted run2-123959.txt 1983: identical to a off-env process
+planted run2-123965.txt 1980: identical to a off-env process
+planted run2-123971.txt 1983: identical to a off-env process
+planted run2-123977.txt 1980: identical to a off-env process
+planted run2-123983.txt 1981: identical to a off-env process
+planted run2-123989.txt 1981: identical to a off-env process
+planted run2-123995.txt 1982: identical to a off-env process
+planted run2-124644.txt 1527: identical to a off-env process
+planted run2-124727.txt 38: identical to a off-env process
+planted run2-124741.txt 38: identical to a off-env process
+planted2 run1-125559.txt 1858: identical to a off-env process
+planted2 run1-125663.txt 1979: identical to a off-env process
+planted2 run1-125669.txt 1979: identical to a off-env process
+planted2 run1-125675.txt 1981: identical to a off-env process
+planted2 run1-125680.txt 1979: identical to a off-env process
+planted2 run1-125686.txt 1980: identical to a off-env process
+planted2 run1-125692.txt 1980: identical to a off-env process
+planted2 run1-125698.txt 1978: identical to a off-env process
+planted2 run1-125704.txt 1981: identical to a off-env process
+planted2 run1-125711.txt 1982: identical to a off-env process
+planted2 run1-125717.txt 1983: identical to a off-env process
+planted2 run1-125723.txt 1980: identical to a off-env process
+planted2 run1-125729.txt 1983: identical to a off-env process
+planted2 run1-125735.txt 1980: identical to a off-env process
+planted2 run1-125741.txt 1981: identical to a off-env process
+planted2 run1-125747.txt 1981: identical to a off-env process
+planted2 run1-125753.txt 1982: identical to a off-env process
+planted2 run1-126419.txt 38: identical to a off-env process
+planted2 run1-126422.txt 1527: identical to a off-env process
+planted2 run1-126485.txt 38: identical to a off-env process
+planted2 run2-126938.txt 1858: identical to a off-env process
+planted2 run2-126953.txt 1979: identical to a off-env process
+planted2 run2-126959.txt 1979: identical to a off-env process
+planted2 run2-126965.txt 1981: identical to a off-env process
+planted2 run2-126971.txt 1979: identical to a off-env process
+planted2 run2-126976.txt 1980: identical to a off-env process
+planted2 run2-126983.txt 1980: identical to a off-env process
+planted2 run2-126989.txt 1978: identical to a off-env process
+planted2 run2-126995.txt 1981: identical to a off-env process
+planted2 run2-127001.txt 1982: identical to a off-env process
+planted2 run2-127007.txt 1983: identical to a off-env process
+planted2 run2-127013.txt 1980: identical to a off-env process
+planted2 run2-127019.txt 1983: identical to a off-env process
+planted2 run2-127025.txt 1980: identical to a off-env process
+planted2 run2-127030.txt 1981: identical to a off-env process
+planted2 run2-127036.txt 1981: identical to a off-env process
+planted2 run2-127043.txt 1982: identical to a off-env process
+planted2 run2-127687.txt 1527: identical to a off-env process
+planted2 run2-127757.txt 38: identical to a off-env process
+planted2 run2-127840.txt 38: identical to a off-env process
+seed99 run1-128487.txt 1858: identical to a off-env process
+seed99 run1-128517.txt 1986: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/first_run.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/iso_8859_1.so"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/helpers/messages/attachment_presentation.rb"]  same set: false
+seed99 run1-128523.txt 1983: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/helpers/messages/attachment_presentation.rb"]  same set: false
+seed99 run1-128529.txt 1984: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/join_codes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/first_run.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb"]  same set: false
+seed99 run1-128535.txt 1983: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/join_codes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run1-128541.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots/keys_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run1-128547.txt 1979: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/message/broadcast_unread_room_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots/keys_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run1-128553.txt 1980: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run1-128559.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/by_bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/room_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/presence_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb"]  same set: false
+seed99 run1-128565.txt 1979: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/room_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/presence_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb"]  same set: false
+seed99 run1-128570.txt 1980: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/iso_8859_1.so"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb"]  same set: false
+seed99 run1-128576.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts/by_bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb"]  same set: false
+seed99 run1-128582.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb"]  same set: false
+seed99 run1-128588.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb"]  same set: false
+seed99 run1-128594.txt 1977: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/refreshes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/application_cable/connection.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run1-128600.txt 1981: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/refreshes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts/by_bots_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb"]  same set: false
+seed99 run1-128606.txt 1985: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/message/broadcast_unread_room_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run1-128798.txt 38: identical to a off-env process
+seed99 run1-128824.txt 38: identical to a off-env process
+seed99 run1-129605.txt 1527: identical to a off-env process
+seed99 run2-129669.txt 1858: identical to a off-env process
+seed99 run2-129696.txt 1986: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/first_run.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/iso_8859_1.so"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/helpers/messages/attachment_presentation.rb"]  same set: false
+seed99 run2-129702.txt 1983: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/helpers/messages/attachment_presentation.rb"]  same set: false
+seed99 run2-129707.txt 1984: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/join_codes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/first_run.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb"]  same set: false
+seed99 run2-129713.txt 1983: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/join_codes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run2-129719.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots/keys_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run2-129725.txt 1979: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/message/broadcast_unread_room_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots/keys_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run2-129731.txt 1980: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/users_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb"]  same set: false
+seed99 run2-129737.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/by_bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/room_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/presence_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb"]  same set: false
+seed99 run2-129743.txt 1979: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/involvements_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/room_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/presence_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts_controller.rb"]  same set: false
+seed99 run2-129749.txt 1980: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb", "/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/iso_8859_1.so"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/unfurl_links_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb"]  same set: false
+seed99 run2-129755.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts/by_bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb"]  same set: false
+seed99 run2-129761.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/sidebars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb"]  same set: false
+seed99 run2-129767.txt 1978: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/closeds_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb"]  same set: false
+seed99 run2-129773.txt 1977: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/refreshes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/searches_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/application_cable/connection.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/remove_banned_content_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/channels/unread_rooms_channel.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run2-129779.txt 1981: DIFFERS
+  extra: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/avatars_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/room/destroy_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/refreshes_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/messages/boosts/by_bots_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/sessions/transfers_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/welcome_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/qr_code_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/bots_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/directs_controller.rb"]  same set: false
+seed99 run2-129785.txt 1985: DIFFERS
+  extra: ["/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/x86_64-linux/enc/trans/single_byte.so", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/first_runs_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users/push_subscriptions_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/models/room/message_pusher.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/users_controller.rb"]  missing: ["/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/bot/webhook_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/jobs/message/broadcast_unread_room_job.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/rooms/opens_controller.rb", "/home/user/workspace/repo/.corpus/ft-campfire/app/controllers/accounts/logos_controller.rb"]  same set: false
+seed99 run2-129930.txt 38: identical to a off-env process
+seed99 run2-130154.txt 38: identical to a off-env process
+seed99 run2-130888.txt 1527: identical to a off-env process

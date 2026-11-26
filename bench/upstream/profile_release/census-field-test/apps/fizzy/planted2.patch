@@ -1,0 +1,12 @@
+diff --git a/app/controllers/bubbles_controller.rb b/app/controllers/bubbles_controller.rb
+index d8a642d..8620502 100644
+--- a/app/controllers/bubbles_controller.rb
++++ b/app/controllers/bubbles_controller.rb
+@@ -15,6 +15,7 @@ class BubblesController < ApplicationController
+   end
+ 
+   def show
++    20.times { ERB::Util.html_escape("a<b") }
+   end
+ 
+   def edit

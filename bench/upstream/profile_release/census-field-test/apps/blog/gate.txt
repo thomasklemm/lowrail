@@ -1,0 +1,12 @@
+unchanged: blog/u1 blog/u2 blog/u3 blog/u4 blog/u5 blog/u6
+planted: blog/planted blog/planted2
+rc1 (line floor = noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 6
+  plant caught, confirm: 60 of 60 (100.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)

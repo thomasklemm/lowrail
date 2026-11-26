@@ -1,0 +1,10 @@
+off-env.outcomes: 2689 outcomes; 2450 examples, 0 failures, 3 pending
+off.outcomes: 2689 outcomes; 2450 examples, 0 failures, 3 pending
+plain.outcomes: 2689 outcomes; 2450 examples, 0 failures, 3 pending
+u1.run1.outcomes: 2689 outcomes; 2450 examples, 0 failures, 3 pending
+u1.run2.outcomes: 2689 outcomes; 2450 examples, 0 failures, 3 pending
+off-env.outcomes DIFFERS (116 lines)
+off.outcomes DIFFERS (116 lines)
+plain.outcomes = plain
+u1.run1.outcomes DIFFERS (114 lines)
+u1.run2.outcomes DIFFERS (116 lines)

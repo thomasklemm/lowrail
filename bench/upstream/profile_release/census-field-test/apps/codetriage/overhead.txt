@@ -1,0 +1,1 @@
+codetriage: plain 5.8, 5.4 s; run 1 mean 5.6 s (+1%); run 2 mean 7.3 s (+30%); wall plain 8.8 s, a capture 23.3 s (2.6x) over 6 captures

@@ -1,0 +1,1 @@
+fizzy: plain 6.2, 6.0 s; run 1 mean 6.6 s (+8%); run 2 mean 7.2 s (+18%); wall plain 9.7 s, a capture 26.3 s (2.7x) over 6 captures

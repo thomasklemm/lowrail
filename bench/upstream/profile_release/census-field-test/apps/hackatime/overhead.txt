@@ -1,0 +1,1 @@
+hackatime: plain 28.7, 31.8 s; run 1 mean 34.1 s (+13%); run 2 mean 39.7 s (+31%); wall plain 30.6 s, a capture 91.9 s (3.0x) over 6 captures

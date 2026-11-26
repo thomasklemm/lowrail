@@ -1,0 +1,12 @@
+unchanged: casa/u1 casa/u2 casa/u3 casa/u4 casa/u5 casa/u6
+planted: casa/planted casa/planted2
+rc1 (line floor = noise):
+  false alarms, default: 24 of 120 (20.00%); rows: ChecklistItemsController#new 18, uri/common.rb:456 15, ChecklistItemsController#edit 12, CaseContactsController#drafts 6
+  false alarms, confirm: 24 of 360 (6.67%); rows: ChecklistItemsController#new 18, uri/common.rb:456 15, ChecklistItemsController#edit 12, CaseContactsController#drafts 6
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 24 of 120 (20.00%); rows: ChecklistItemsController#new 18, uri/common.rb:456 12, ChecklistItemsController#edit 12, CaseContactsController#drafts 6
+  false alarms, confirm: 24 of 360 (6.67%); rows: ChecklistItemsController#new 18, ChecklistItemsController#edit 12, uri/common.rb:456 12, CaseContactsController#drafts 6
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)

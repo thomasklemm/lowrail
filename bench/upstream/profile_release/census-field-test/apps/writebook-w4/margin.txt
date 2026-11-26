@@ -1,0 +1,5 @@
+status 0 compared: 4017 lines, 13 actions; not compared 24
+  request action Books::SearchesController#create: -262.80 against 538.60 (49%)
+  request line GEM/sqlite3/lib/sqlite3/statement.rb:125: -0.27 against 1.00 (27%)
+  request line GEM/prism/lib/prism/node.rb:5425: +0.83 against 3.31 (25%)
+  request line RAILS/actionpack/lib/action_dispatch/middleware/exception_wrapper.rb:312: +0.64 against 2.55 (25%)

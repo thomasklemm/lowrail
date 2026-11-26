@@ -1,0 +1,1 @@
+casa: plain 63.8, 65.6 s; run 1 mean 70.1 s (+8%); run 2 mean 106.5 s (+64%); wall plain 68.3 s, a capture 222.8 s (3.3x) over 6 captures

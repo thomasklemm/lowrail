@@ -1,0 +1,5 @@
+status 0 compared: 6669 lines, 64 actions; not compared 48
+  request action MessagesController#create: +26.00 against 74.00 (35%)
+  request action CommentsController#edit: +6.75 against 20.00 (34%)
+  request action HatsController#index: -6.55 against 22.00 (30%)
+  request action Mod::TagsController#create: +18.25 against 62.00 (29%)

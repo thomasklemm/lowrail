@@ -1,0 +1,12 @@
+diff --git a/app/controllers/casa_cases_controller.rb b/app/controllers/casa_cases_controller.rb
+index d105fda..1ab64d7 100644
+--- a/app/controllers/casa_cases_controller.rb
++++ b/app/controllers/casa_cases_controller.rb
+@@ -8,6 +8,7 @@ class CasaCasesController < ApplicationController
+   SORT_COLUMNS = %w[case_number next_court_date status transition assigned].freeze
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     authorize CasaCase
+     @active_nav = "cases"
+     @sort = SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : "case_number"

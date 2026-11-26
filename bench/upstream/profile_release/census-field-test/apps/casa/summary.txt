@@ -1,0 +1,20 @@
+plain exit 0 wall 68.308855608 at 20:00:24
+plain2 exit 0 wall 70.434262550 at 20:01:35
+off exit 0 wall 73.194719350 at 20:02:48
+u1 exit 0 wall 214.192260399 at 20:06:22
+u1 tree unchanged
+u2 exit 0 wall 221.930777381 at 20:10:04
+u2 tree unchanged
+u3 exit 0 wall 240.788400232 at 20:14:06
+u3 tree unchanged
+u4 exit 0 wall 237.895974466 at 20:18:04
+u4 tree unchanged
+u5 exit 0 wall 209.572964210 at 20:21:34
+u5 tree unchanged
+u6 exit 0 wall 212.558866242 at 20:25:07
+u6 tree unchanged
+planted exit 0 wall 220.824484959 at 20:28:48
+planted2 exit 0 wall 221.207259292 at 20:32:30
+seed99 exit 0 wall 258.964460997 at 20:36:49
+seed99 tree unchanged
+off-env exit 0 (control: bundle exec env, a new process under Bundler's RUBYOPT)

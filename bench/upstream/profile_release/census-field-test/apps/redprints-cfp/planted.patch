@@ -1,0 +1,12 @@
+diff --git a/app/controllers/proposals_controller.rb b/app/controllers/proposals_controller.rb
+index f17d956..c76f22f 100644
+--- a/app/controllers/proposals_controller.rb
++++ b/app/controllers/proposals_controller.rb
+@@ -9,6 +9,7 @@ class ProposalsController < ApplicationController
+   end
+ 
+   def index
++    20.times { ERB::Util.html_escape("a<b") }
+     render inertia: {proposals: serialize(current_user.proposals.active)}
+   end
+ 

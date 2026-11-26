@@ -1,0 +1,12 @@
+unchanged: writebook/u1 writebook/u2 writebook/u3 writebook/u4 writebook/u5 writebook/u6
+planted: writebook/planted writebook/planted2
+rc1 (line floor = noise):
+  false alarms, default: 73 of 120 (60.83%); rows: string/filters.rb:33 16, string/filters.rb:42 16, action_text/plain_text_conversion.rb:29 10, xml/document_fragment.rb:116 10
+  false alarms, confirm: 134 of 360 (37.22%); rows: string/filters.rb:33 33, string/filters.rb:42 33, active_record/persistence.rb:278 22, action_text/html_conversion.rb:23 19
+  plant caught, default: 2 of 60 (3.33%); with an unrelated line too: 33
+  plant caught, confirm: 0 of 60 (0.00%)
+now (line floor = 2 x noise):
+  false alarms, default: 32 of 120 (26.67%); rows: active_record/core.rb:433 6, active_record/relation.rb:1507 6, active_record/relation.rb:1520 6, active_storage/service.rb:176 6
+  false alarms, confirm: 42 of 360 (11.67%); rows: active_record/core.rb:433 12, active_record/validations.rb:78 8, active_record/autosave_association.rb:304 8, active_storage/service.rb:176 7
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 18
+  plant caught, confirm: 0 of 60 (0.00%)
