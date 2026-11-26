@@ -131,7 +131,7 @@ class ProfileCliTest < Minitest::Test
   # process group, then KILL, so a process that ignores TERM goes too, also
   # when the first one exits on TERM; no further run; exit 124, also after an
   # earlier failed run, recorded in capture.json and said at the top of the
-  # report. INT and HUP from the terminal reach the command, and a run in
+  # report. INT, HUP and QUIT from the terminal reach the command, and a run in
   # time passes as without it. Each call has a deadline: a group that is never
   # stopped fails the test instead of hanging it.
   def test_timeout_stops_a_hung_run_and_its_processes
@@ -188,7 +188,7 @@ class ProfileCliTest < Minitest::Test
       assert_equal 3, status.exitstatus, err
       assert_equal [[3, 3], []], JSON.parse(File.read(File.join(dir, "quick/capture.json"))).values_at("exit", "timed_out")
 
-      { "INT" => 130, "HUP" => 129 }.each do |signal, code|
+      { "INT" => 130, "HUP" => 129, "QUIT" => 131 }.each do |signal, code|
         waits = "trap(#{signal.inspect}) { File.write(\"got\", #{signal.inspect}); exit #{code} }; File.write(\"ready\", \"\"); sleep"
         %w[got ready].each { FileUtils.rm_f(File.join(dir, _1)) }
         pid = Process.spawn(profile_env(dir), RUBY, PROFILE, "--timeout", "60", "--out", signal.downcase, "--", RUBY, "-e", waits,
@@ -199,6 +199,34 @@ class ProfileCliTest < Minitest::Test
         assert_equal [code, signal], [$?.exitstatus, File.read(File.join(dir, "got"))]
         assert_equal [code], JSON.parse(File.read(File.join(dir, signal.downcase, "capture.json")))["exit"]
       end
+    end
+  end
+
+  # The traps go in before the spawn, so a signal that comes before the
+  # command exists is not lost and does not end lowrail-profile itself: the
+  # command gets it once it runs. A spawn that is signalled first stands in
+  # for a signal in that window.
+  def test_timeout_forwards_a_signal_that_comes_before_the_spawn
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "early.rb"), <<~'RUBY')
+        Process.singleton_class.prepend(Module.new do
+          def spawn(...)
+            Process.kill("HUP", Process.pid)
+            sleep 1 # lowrail-profile's HUP trap runs here, before there is a command
+            super
+          end
+        end)
+      RUBY
+      profile(dir, "--runs", "1", "--out", "warm", "--", RUBY, "-e", "exit") # builds the counter first
+      pid = Process.spawn(profile_env(dir), RUBY, "-r./early", PROFILE, "--timeout", "60", "--runs", "1", "--out", "early", "--",
+        RUBY, "-e", "sleep 20", chdir: dir, err: File.join(dir, "err"), out: File::NULL, pgroup: true)
+      waiter = Process.detach(pid)
+      unless waiter.join(15)
+        Process.kill("KILL", -pid) rescue nil
+        flunk "the command never got the HUP: #{File.read(File.join(dir, "err"))}"
+      end
+      assert_equal 129, waiter.value.exitstatus, File.read(File.join(dir, "err"))
+      assert_equal [129], JSON.parse(File.read(File.join(dir, "early/capture.json")))["exit"]
     end
   end
 

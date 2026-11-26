@@ -61,4 +61,22 @@ class ProfileReportTest < Minitest::Test
         "APP/app/views/gems/index.html.erb:9" => "app" }, sites)
     end
   end
+
+  # An engine profiled in place is itself a path gem whose directory is the
+  # root: its app/views/gems/ is the engine's own line, as its other files are.
+  # So is a dummy app's below an engine kept in a gems/ directory.
+  def test_an_engine_profiled_in_place_keeps_its_gems_directory
+    { "/engine" => "/engine", "/src/gems/engine/spec/dummy" => "/src/gems/engine" }.each do |root, engine|
+      realpath_tmpdir do |dir|
+        write_runs(dir, lambda do |_, pid|
+          ["# lowrail-profile 3\trequests=4\tobjects=32\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=#{root}\tapp_root=#{root}",
+            "P\t0\t#{root}/app/views/gems/index.html.erb", "P\t1\t#{root}/app/models/m.rb",
+            "0\t5\tString\t12\t4\t0\t0\trequest", "1\t9\tString\t20\t4\t0\t0\trequest",
+            "A\trequest\tGemsController#index\t4\t32\t0", "G\tmy_engine\t#{engine}"]
+        end)
+        sites = Lowrail::ProfileReport.new(dir).sites.to_h { ["#{_1.key}:#{_1.line}", _1.group] }
+        assert_equal({ "APP/app/views/gems/index.html.erb:5" => "app", "APP/app/models/m.rb:9" => "app" }, sites, root)
+      end
+    end
+  end
 end
