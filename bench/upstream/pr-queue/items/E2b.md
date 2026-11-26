@@ -5,7 +5,7 @@ kind: fix
 area: Active Record SQLite schema readers
 reviewer: "ngan (author of 2cb3daba96, #58498), byroot (merged it)"
 branch: thomasklemm/sqlite-schema-readers-temp-shadowing
-head: "bc90b487f2"
+head: "440a2c09b8351f5c1be96ee87157bac84eefcd85"
 base: main
 built_on: "1e235cee11"
 depends_on: []
@@ -16,7 +16,7 @@ rank: 5
 risky: false
 state: ready
 pr: 59668
-note: "2026-11-25 (Thomas): folded into E2; #59671 carries this commit (rebuilt as 7eb404b4ca on main 7c0f820c1a) and its body takes this body's facts; #59668 is to be closed, its state here changes with sync. opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
+note: "2026-11-26 (Opus thread T-01a21498-95c1-733c-9e7a-bc9ddb899e31, Thomas chose E2 option b): #59668 continues alone and is not closed. Its commit is bc90b487f2 amended with E2's fixture split: the temp-index shadowing subcase is its own test, defined on SQLite >= 3.40 (thermos-sol corrected the first proposal's 3.38; 3.38.0 and 3.39.4 still refuse that index); author date 1793806867, parent 1e235cee11, message unchanged, no trailers. thermos-sol approved 440a2c09b8 and the 128-word body. Lease-pushed over bc90b487f2 and the body was PATCHed (stacked #59671 claim, the #59671 reference and the bare SHA removed); no comments posted. Details under Pushed below. 2026-11-25 (Thomas): folded into E2; #59671 carries this commit (rebuilt as 7eb404b4ca on main 7c0f820c1a) and its body takes this body's facts; #59668 is to be closed, its state here changes with sync. opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
@@ -190,3 +190,24 @@ new head and its merge, not an in-memory correction:
 Also reran the schema-reader subset on 3.38.0: 4/11, 0F 0E 0S. Rails RuboCop: 1 file, no offenses;
 `git diff --check` passes. Logs: `.amp/in/orb-backup/e2b/confirm*-*.log`. No Rails source, branch or PR
 changes; only this Lowrail pass and confirm section added.
+
+### Pushed, 2026-11-26
+
+Opus thread `T-01a21498-95c1-733c-9e7a-bc9ddb899e31`. After thermos-sol's approval of `440a2c09b8` (pass above), the branch
+`thomasklemm/sqlite-schema-readers-temp-shadowing` was lease-pushed from `bc90b487f2` to
+`440a2c09b8351f5c1be96ee87157bac84eefcd85`, and the body was PATCHed through the REST API to the approved 128-word text below (the GitHub
+API returns it byte for byte). No comments were posted; #59668 stays open and ready. The review copy
+`thomasklemm/sqlite-schema-readers-temp-shadowing-2` points to the same commit. The builder's checks on the branch and on its
+clean merge with Rails main `5a161379f5` (seed 41231): SQLite 3.37.0 and 3.39.4 give 233 runs/614 assertions; 3.40.0 and 3.54.1 give
+234/617; all 0F 0E 0S. `bc90b487f2` had 1 error on 3.37.0. `script/min-versions --only sqlite` on `3b5912d71d` (same code, gate at 3.38,
+against base `1e235cee11`): on SQLite 3.35.5 the readers test passes 6/6 for base and head, and Rails' helper crashes on both on
+`pragma_table_list`; on 3.44.2 base gives 110 runs and head 115, with no new failures. Buildkite on the new head has not been checked
+yet (the Amp GitHub app cannot subscribe to rails/rails).
+
+Posted body:
+
+The batched SQLite schema readers from #58498 join each pragma to a list of `sqlite_master` and `sqlite_temp_master` rows. While fixing their table-name case lookup, I found that when a temporary table has the same name as a permanent one, both rows match, and the pragmas resolve both to the temporary table, as SQLite does. So columns and indexes are duplicated, and the primary key becomes composite.
+
+The list now takes a permanent table or view only when no temporary table or view has its name, which is how SQLite resolves identically spelled names. Collations and check constraints now come from the temporary table's CREATE statement too; 8-1-stable read the columns from the temporary table but the statement of the permanent one.
+
+Shared index names remain a separate issue.
