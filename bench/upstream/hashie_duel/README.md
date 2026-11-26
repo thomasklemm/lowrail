@@ -61,3 +61,32 @@ branches were rebased onto `c4303d5` and force-pushed (same PRs #1–#8), and th
 * Trash now transforms (`topics` joined): 4 allocations per call instead of 3.
 * **Allocation plant:** 8 regressed, as before (Duel 220 s). **CPU plant:** method reads and suffix reads regressed
   (2), job 86 s. **#656 candidate:** faster on 5, none slower, the same allocation drops, job 50 s.
+
+## Combined layout for dblock's review (candidate `87a9f22`, not on the PR branch)
+
+dblock on #659 (issuecomment-7192448526): "Let's figure out a way to combine duel and existing benchmarks?". Candidate
+on fork branch `thomasklemm/duel-benchmarks`, one commit on `e1adebc` (the PR branch stays at `c4303d5`):
+
+* `duel/` moves to `benchmarks/` (`benchmark_helper.rb`, `*_benchmark.rb`, `fixtures/`), `.duel.rb` sets
+  `c.benchmarks = 'benchmarks/**/*_benchmark.rb'`; `perf.yml` paths and the RuboCop exclusion follow.
+* The three benchmark-ips scripts are deleted; `extensions_benchmark.rb` adds 8 scenarios: plain Mash reading
+  Symbol-given keys and `Mash.new` of a flat Hash, KeepOriginalKeys reading Symbol and String keys,
+  PermissiveRespondTo include, `new`, new-key write and overwrite. Dash read/write does 6 operations instead of 3.
+  21 scenarios.
+* `benchmark-ips` and `benchmark-memory` leave the Gemfile (only `spec/integration/omniauth`'s own Gemfile uses
+  benchmark-ips); the `.rubocop_todo.yml` entry for the deleted script goes; CONTRIBUTING describes one kind.
+* CHANGELOG line numbered `[#659]`.
+
+Calibration on the fork, same PRs #1–#8 rebased each time:
+
+| Round | Head | A/A | #656 candidate | Plants (alloc / CPU) | A/A job |
+|---|---|---|---|---|---|
+| 3 | `1649b89`, 21 scenarios incl. 1-key reads | 0/10 failed, 3 re-measured | 1/2 failed: Dash read/write 1.031–1.035 in 4 measurements (code #656 doesn't touch) | 13 / 5 | 73–110 s |
+| 4 | `210665a`, reads widened to 5 keys | **1/20 failed**: plain Symbol-key reads 1.052–1.071 in 4 measurements, across-the-board 1.001 | 0/3 | 13 / 5 | 72–101 s |
+| 5 | `87a9f22`, `c.jobs = 1` | **0/20**, none re-measured, 51/420 unsettled | 0/4, faster on 6–7 | 13 / 4 | 80–90 s |
+
+Both false failures were one benchmark consistently ~3–7% slower while everything else was flat, in Duel's default
+of one benchmark per two CPUs: 2 at a time on GitHub's 4-vCPU runners, whose workers then share cores with another
+benchmark's. With one at a time the A/A cohort had no re-measure at all and runs got only ~8 s longer. The 13-scenario
+cohorts (1–2) passed 0/35 at 2 at a time, so the risk grew with the number of short scenarios. Raw: `calibration-3`,
+`-4`, `-5`; `round.sh` reruns and collects them.

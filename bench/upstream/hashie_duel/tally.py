@@ -14,8 +14,9 @@ rows = []
 for path in sorted(glob.glob(os.path.join(root, "*.summary.txt"))):
     text = open(path).read()
     start, end = re.search(r"job (\S+) -> (\S+)", text.splitlines()[0]).groups()
-    total, regressed, unsettled = re.search(r"benchmarks in (\d+)s: (\d+) regressed, \d+ errors, (\d+) with", text).groups()
+    count, total, regressed, unsettled = re.search(r"(\d+) benchmarks in (\d+)s: (\d+) regressed, \d+ errors, (\d+) with", text).groups()
     rows.append({
+        "benchmarks": int(count),
         "run": os.path.basename(path).removesuffix(".summary.txt"),
         "job_s": int((when(end) - when(start)).total_seconds()),
         "duel_s": int(total),
@@ -30,4 +31,4 @@ for r in rows:
 aa = [r for r in rows if r["run"].startswith("aa-")]
 jobs = sorted(r["job_s"] for r in aa)
 print(f"\nA/A: {len(aa)} runs, {sum(r['regressed'] > 0 for r in aa)} failed, {sum(r['measured_again'] for r in aa)} measured again, "
-      f"{sum(r['unsettled'] for r in aa)} of {13 * len(aa)} verdicts unsettled, job {jobs[0]}-{jobs[-1]} s (median {jobs[len(jobs) // 2]} s)")
+      f"{sum(r['unsettled'] for r in aa)} of {sum(r["benchmarks"] for r in aa)} verdicts unsettled, job {jobs[0]}-{jobs[-1]} s (median {jobs[len(jobs) // 2]} s)")

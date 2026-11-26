@@ -1,0 +1,20 @@
+== hm1-45834228752-a4 5df48b5e17ba8797343cc074691fdb8283fa1b20 success job 2026-11-26T14:06:22Z -> 2026-11-26T14:07:52Z
+  Dash.new: coerced properties                       3.0s n=622    cpu 1.003 [0.999, 1.011] same  allocations 7
+  Dash.new: required properties and defaults         2.9s n=915    cpu 1.000 [0.991, 1.009] same  allocations 3
+  Dash: read and write properties                    2.9s n=3407   cpu 0.993 [0.983, 1.008] same  allocations 0
+  Mash#deep_merge: a nested update                   3.1s n=60     cpu 0.855 [0.851, 0.860] faster  allocations 120.4→31.43
+  Mash#to_hash: a nested Mash                        3.0s n=213    cpu 0.992 [0.985, 1.001] same  allocations 10
+  Mash.new: a flat Hash                              3.0s n=1980   cpu 0.920 [0.917, 0.923] faster  allocations 5→3
+  Mash.new: a nested JSON response                   3.1s n=67     cpu 0.863 [0.859, 0.869] faster  allocations 105.4→25.39
+  Mash: overwrite a key as a method                  3.0s n=1228   cpu 0.847 [0.841, 0.852] faster  allocations 9→6
+  Mash: read keys as methods                         2.9s n=1431   cpu 0.996 [0.989, 1.002] same  allocations 5
+  Mash: read keys given as Symbols as methods        3.0s n=1731   cpu 1.002 [0.996, 1.010] same  allocations 5
+  Mash: read keys with [] and dig                    2.9s n=2946   cpu 0.998 [0.993, 1.002] same  allocations 4
+  Mash: read keys with suffixes                      3.0s n=725    cpu 0.996 [0.992, 1.001] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   3.0s n=2242   cpu 0.816 [0.813, 0.821] faster  allocations 6→1
+  Mash: write new keys as methods                    3.0s n=1459   cpu 0.945 [0.941, 0.948] faster  allocations 7→5
+  Trash.new: renamed and transformed properties      3.0s n=866    cpu 0.998 [0.987, 1.011] same  allocations 4
+21 benchmarks in 64s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: cpu 0.990 [0.988, 0.995] faster (limit 1.0050, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

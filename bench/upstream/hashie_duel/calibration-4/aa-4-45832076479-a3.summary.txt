@@ -1,0 +1,22 @@
+== aa-4-45832076479-a3 b2183beffbf8d0f470d977c1db8d710de4f36e9a success job 2026-11-26T13:49:08Z -> 2026-11-26T13:50:38Z
+  Dash.new: coerced properties                       3.9s n=485    cpu 0.995 [0.955, 1.013] same  allocations 7
+  Dash.new: required properties and defaults         4.4s n=1008   cpu 1.005 [0.990, 1.018] same  allocations 3
+  Dash: read and write properties                    7.0s n=2468   cpu 1.011 [0.990, 1.055] unsettled  allocations 0
+  Mash#deep_merge: a nested update                   3.9s n=40     cpu 1.001 [0.874, 1.013] same  allocations 120.6
+  Mash#to_hash: a nested Mash                        3.3s n=178    cpu 1.002 [0.983, 1.014] same  allocations 10
+  Mash.new: a flat Hash                              5.2s n=1030   cpu 1.007 [0.994, 1.019] same  allocations 5
+  Mash.new: a nested JSON response                   5.6s n=38     cpu 0.997 [0.857, 1.192] unsettled  allocations 105.7
+  Mash: overwrite a key as a method                  3.2s n=595    cpu 1.003 [0.987, 1.009] same  allocations 9
+  Mash: read keys as methods                         5.5s n=895    cpu 1.007 [0.974, 1.227] unsettled  allocations 5
+  Mash: read keys given as Symbols as methods        5.2s n=1056   cpu 0.993 [0.988, 1.002] same  allocations 5
+  Mash: read keys with [] and dig                    3.0s n=939    cpu 1.013 [1.005, 1.020] same  allocations 4
+  Mash: read keys with suffixes                      5.1s n=409    cpu 1.005 [0.997, 1.014] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   6.7s n=1066   cpu 1.023 [1.001, 1.031] unsettled  allocations 6
+  Mash: write new keys as methods                    5.4s n=772    cpu 0.999 [0.987, 1.015] same  allocations 7
+  Trash.new: renamed and transformed properties      8.6s n=520    cpu 1.003 [0.978, 1.069] unsettled  allocations 4
+! KeepOriginalKeys: read Symbol keys as methods      5.6s n=1239   cpu 1.042 [1.021, 1.074] slower  allocations 5
+21 benchmarks in 76s: 0 regressed, 0 errors, 6 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+Measuring 1 benchmark that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+across the board: cpu 1.004 [1.001, 1.007] unsettled (limit 1.0050, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

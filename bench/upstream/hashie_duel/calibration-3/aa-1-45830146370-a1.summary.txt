@@ -1,0 +1,25 @@
+== aa-1-45830146370-a1 cfc4c5570ee6dbcd89c58e2c6d5754b74ec6f873 success job 2026-11-26T13:33:06Z -> 2026-11-26T13:34:56Z
+  Dash.new: coerced properties                       4.2s n=184    cpu 1.001 [0.977, 1.040] unsettled  allocations 7
+  Dash.new: required properties and defaults         6.5s n=554    cpu 1.015 [0.998, 1.084] unsettled  allocations 3
+  Dash: read and write properties                    5.1s n=5950   cpu 1.030 [1.019, 1.041] unsettled  allocations 0  (too close to call: once more)
+  Dash: read and write properties                    5.1s n=6050   cpu 1.031 [1.017, 1.045] unsettled  allocations 0  (too close to call: once more)
+  Dash: read and write properties                    5.1s n=6080   cpu 1.027 [1.017, 1.034] unsettled  allocations 0  (too close to call: once more)
+  Dash: read and write properties                    5.1s n=6116   cpu 1.030 [1.019, 1.045] unsettled  allocations 0
+  Mash#deep_merge: a nested update                   7.8s n=44     cpu 1.003 [0.996, 1.022] unsettled  allocations 120.6
+  Mash#to_hash: a nested Mash                        4.0s n=152    cpu 1.003 [0.993, 1.018] same  allocations 10
+  Mash.new: a flat Hash                              5.7s n=1020   cpu 0.996 [0.990, 1.007] same  allocations 5
+  Mash.new: a nested JSON response                   6.9s n=48     cpu 0.982 [0.902, 0.999] same  allocations 105.5
+  Mash: overwrite a key as a method                  4.2s n=600    cpu 1.003 [0.995, 1.018] same  allocations 9
+  Mash: read a key as a method                       3.8s n=5506   cpu 0.950 [0.943, 0.958] faster  allocations 1
+  Mash: read keys as methods                         5.4s n=858    cpu 0.916 [0.637, 1.004] same  allocations 5
+  Mash: read keys with [] and dig                    6.4s n=1665   cpu 1.001 [0.986, 1.058] unsettled  allocations 4
+  Mash: read keys with suffixes                      5.7s n=444    cpu 0.992 [0.770, 1.012] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   4.4s n=1088   cpu 0.972 [0.901, 0.980] same  allocations 6
+  Mash: write new keys as methods                    6.5s n=770    cpu 1.006 [0.999, 1.025] unsettled  allocations 7
+  Trash.new: renamed and transformed properties      3.5s n=496    cpu 0.994 [0.970, 1.020] same  allocations 4
+! Dash: read and write properties                    3.2s n=2928   cpu 1.042 [1.021, 1.362] slower  allocations 0
+21 benchmarks in 90s: 0 regressed, 0 errors, 7 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+Measuring 1 benchmark that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+across the board: cpu 0.998 [0.995, 1.002] same (limit 1.0050, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
