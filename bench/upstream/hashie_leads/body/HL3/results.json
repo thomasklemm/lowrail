@@ -1,0 +1,1023 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/hashie_leads/hl3_body.rb",
+  "at": "2026-11-26T12:41:51Z",
+  "n": 2000,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/workspace/repos/hashie-master",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "e1adebc3de7f48c7aa3f1f9f73c97676102f34a3",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/workspace/repos/hashie-l3",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "e1adebc3de7f48c7aa3f1f9f73c97676102f34a3",
+      "dirty": true
+    }
+  },
+  "objects": {
+    "interp Mash.new.name = value": {
+      "base": 7.999,
+      "base1": 7.999,
+      "base2": 7.999,
+      "candidate": 6.999,
+      "change": -0.1250156269533692,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp mash.description = value": {
+      "base": 9.0,
+      "base1": 9.0,
+      "base2": 9.0,
+      "candidate": 7.0,
+      "change": -0.2222222222222222,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp mash.private? / owner! / homepage_": {
+      "base": 16.0,
+      "base1": 16.0,
+      "base2": 16.0,
+      "candidate": 13.0,
+      "change": -0.1875,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit Mash.new.name = value": {
+      "base": 7.999,
+      "base1": 7.999,
+      "base2": 7.999,
+      "candidate": 6.999,
+      "change": -0.1250156269533692,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit mash.description = value": {
+      "base": 9.0,
+      "base1": 9.0,
+      "base2": 9.0,
+      "candidate": 7.0,
+      "change": -0.2222222222222222,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit mash.private? / owner! / homepage_": {
+      "base": 16.0,
+      "base1": 16.0,
+      "base2": 16.0,
+      "candidate": 13.0,
+      "change": -0.1875,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp Mash.new.name = value": {
+      "base": 20340.848,
+      "base1": 20340.848,
+      "base2": 20340.848,
+      "candidate": 20375.8065,
+      "change": 0.0017186353292644174,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp mash.description = value": {
+      "base": 21237.099000000002,
+      "base1": 21233.066,
+      "base2": 21241.132,
+      "candidate": 21332.975,
+      "change": 0.004514552576130981,
+      "aa": 0.0003798070536848056,
+      "claim": true
+    },
+    "interp mash.private? / owner! / homepage_": {
+      "base": 35583.582500000004,
+      "base1": 35559.9625,
+      "base2": 35607.2025,
+      "candidate": 35685.4285,
+      "change": 0.0028621626279479173,
+      "aa": 0.0013275785258552299,
+      "claim": true
+    },
+    "yjit Mash.new.name = value": {
+      "base": 13424.125,
+      "base1": 13424.125,
+      "base2": 13424.125,
+      "candidate": 13547.1655,
+      "change": 0.009165625320086024,
+      "aa": 0.0,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3158,
+                3158
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3158,
+                3158
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3165,
+                3165
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3165,
+                3165
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3158,
+                3158
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                193,
+                193
+              ],
+              "compiled_block_count": [
+                3158,
+                3158
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit mash.description = value": {
+      "base": 15184.3605,
+      "base1": 15159.3605,
+      "base2": 15209.3605,
+      "candidate": 15453.3015,
+      "change": 0.017711710677575043,
+      "aa": 0.003292861757332487,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3140,
+                3140
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3140,
+                3140
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3147,
+                3147
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3147,
+                3147
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3140,
+                3140
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3140,
+                3140
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit mash.private? / owner! / homepage_": {
+      "base": 23033.2875,
+      "base1": 23008.2215,
+      "base2": 23058.3535,
+      "candidate": 23406.6215,
+      "change": 0.016208454828690932,
+      "aa": 0.002176502160188876,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3162,
+                3162
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3162,
+                3162
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3169,
+                3169
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3169,
+                3169
+              ],
+              "invalidation_count": [
+                48,
+                48
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3162,
+                3162
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                194,
+                194
+              ],
+              "compiled_block_count": [
+                3158,
+                3158
+              ],
+              "invalidation_count": [
+                47,
+                47
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {
+    "Mash.new.name = value": {
+      "base": 582475.5,
+      "base1": 591184.0,
+      "base2": 573767.0,
+      "candidate": 578845.0,
+      "change": -0.0062328801812264745,
+      "aa": 0.029901686852065023,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3457,
+                3457
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3457,
+                3457
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3457,
+                3457
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                217,
+                217
+              ],
+              "compiled_block_count": [
+                3450,
+                3450
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          543391.0,
+          591184.0,
+          551852.0
+        ],
+        "candidate": [
+          540569.0,
+          578845.0,
+          561090.0
+        ],
+        "base2": [
+          573723.0,
+          552385.0,
+          573767.0
+        ]
+      }
+    },
+    "mash.description = value": {
+      "base": 519211.5,
+      "base1": 512673.0,
+      "base2": 525750.0,
+      "candidate": 511218.0,
+      "change": -0.01539546023152416,
+      "aa": 0.025186268023724437,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3482,
+                3482
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3482,
+                3482
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3482,
+                3482
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3475,
+                3475
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          481437.0,
+          512673.0,
+          502218.0
+        ],
+        "candidate": [
+          458196.0,
+          511218.0,
+          504008.0
+        ],
+        "base2": [
+          515842.0,
+          483190.0,
+          525750.0
+        ]
+      }
+    },
+    "mash.private? / owner! / homepage_": {
+      "base": 342878.5,
+      "base1": 344571.0,
+      "base2": 341186.0,
+      "candidate": 343703.0,
+      "change": 0.0024046418775163225,
+      "aa": 0.009872301704539654,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3484,
+                3484
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3484,
+                3484
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3484,
+                3484
+              ],
+              "invalidation_count": [
+                51,
+                51
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                221,
+                221
+              ],
+              "compiled_block_count": [
+                3477,
+                3477
+              ],
+              "invalidation_count": [
+                50,
+                50
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          344571.0,
+          329860.0,
+          342826.0
+        ],
+        "candidate": [
+          331730.0,
+          343703.0,
+          332683.0
+        ],
+        "base2": [
+          341186.0,
+          317922.0,
+          332547.0
+        ]
+      }
+    }
+  }
+}

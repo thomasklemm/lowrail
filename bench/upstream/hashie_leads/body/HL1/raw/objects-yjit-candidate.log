@@ -1,0 +1,3 @@
+objects mash.deep_merge(update)	114.963
+objects mash.description = value	8.0
+objects Mash.new(api_response)	102.964

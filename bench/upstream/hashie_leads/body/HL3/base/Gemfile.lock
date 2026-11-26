@@ -1,0 +1,27 @@
+PATH
+  remote: /home/user/workspace/repos/hashie-master
+  specs:
+    hashie (6.0.1)
+      logger
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    benchmark-ips (2.15.1)
+    logger (1.7.0)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  benchmark-ips
+  hashie!
+
+CHECKSUMS
+  benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
+  hashie (6.0.1)
+  logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+
+BUNDLED WITH
+  4.0.20

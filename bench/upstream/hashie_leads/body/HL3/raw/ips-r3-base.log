@@ -1,0 +1,12 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+             Mash.new.name = value    57.912k i/100ms
+          mash.description = value    49.323k i/100ms
+mash.private? / owner! / homepage_    33.484k i/100ms
+Calculating -------------------------------------
+             Mash.new.name = value    551.852k (±12.0%) i/s    (1.81 μs/i) -      2.780M in   5.037173s
+jit Mash.new.name = value	compiled_iseq_count=217>217 compiled_block_count=3450>3450 invalidation_count=50>50
+          mash.description = value    502.218k (±11.9%) i/s    (1.99 μs/i) -      2.515M in   5.008726s
+jit mash.description = value	compiled_iseq_count=221>221 compiled_block_count=3475>3475 invalidation_count=50>50
+mash.private? / owner! / homepage_    342.826k (± 9.4%) i/s    (2.92 μs/i) -      1.741M in   5.078874s
+jit mash.private? / owner! / homepage_	compiled_iseq_count=221>221 compiled_block_count=3477>3477 invalidation_count=50>50
