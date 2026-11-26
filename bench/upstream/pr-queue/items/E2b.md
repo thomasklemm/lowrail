@@ -5,7 +5,7 @@ kind: fix
 area: Active Record SQLite schema readers
 reviewer: "ngan (author of 2cb3daba96, #58498), byroot (merged it)"
 branch: thomasklemm/sqlite-schema-readers-temp-shadowing
-head: "440a2c09b8351f5c1be96ee87157bac84eefcd85"
+head: "29079a50ff7b808d170d3425e36a3ee4b953be6a"
 base: main
 built_on: "1e235cee11"
 depends_on: []
@@ -16,7 +16,7 @@ rank: 5
 risky: false
 state: ready
 pr: 59668
-note: "2026-11-26 (Opus thread T-01a21498-95c1-733c-9e7a-bc9ddb899e31, Thomas chose E2 option b): #59668 continues alone and is not closed. Its commit is bc90b487f2 amended with E2's fixture split: the temp-index shadowing subcase is its own test, defined on SQLite >= 3.40 (thermos-sol corrected the first proposal's 3.38; 3.38.0 and 3.39.4 still refuse that index); author date 1793806867, parent 1e235cee11, message unchanged, no trailers. thermos-sol approved 440a2c09b8 and the 128-word body. Lease-pushed over bc90b487f2 and the body was PATCHed (stacked #59671 claim, the #59671 reference and the bare SHA removed); no comments posted. Details under Pushed below. 2026-11-25 (Thomas): folded into E2; #59671 carries this commit (rebuilt as 7eb404b4ca on main 7c0f820c1a) and its body takes this body's facts; #59668 is to be closed, its state here changes with sync. opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
+note: "2026-11-26 (ractor CI fix, Opus thread T-01a217e5-02b4-7112-bbc7-e72629ed5dff): Buildkite 137206 on 440a2c09b8 failed activerecord sqlite3:ractor (4.0): the class-body gate called database_version on the ractor proxy, whose ProxyConnectionPool has no server_version, so the suite aborted while loading the file (main 137197 passes that job; the rubocop and actioncable reds are not ours). Amended to 29079a50ff: the test is always defined and skips below 3.40 by asking the standalone @conn its DDL runs on; the why-comment became the skip message. Message byte-identical, author date, parent and no trailers kept, signed. thermos-sol approved; lease-pushed over 440a2c09b8; body unchanged, no comments. Buildkite rails 137218 pending at push. Details under Ractor gate fix below. 2026-11-26 (Opus thread T-01a21498-95c1-733c-9e7a-bc9ddb899e31, Thomas chose E2 option b): #59668 continues alone and is not closed. Its commit is bc90b487f2 amended with E2's fixture split: the temp-index shadowing subcase is its own test, defined on SQLite >= 3.40 (thermos-sol corrected the first proposal's 3.38; 3.38.0 and 3.39.4 still refuse that index); author date 1793806867, parent 1e235cee11, message unchanged, no trailers. thermos-sol approved 440a2c09b8 and the 128-word body. Lease-pushed over bc90b487f2 and the body was PATCHed (stacked #59671 claim, the #59671 reference and the bare SHA removed); no comments posted. Details under Pushed below. 2026-11-25 (Thomas): folded into E2; #59671 carries this commit (rebuilt as 7eb404b4ca on main 7c0f820c1a) and its body takes this body's facts; #59668 is to be closed, its state here changes with sync. opened as draft 2026-11-05; reviewed on bc90b487f2 (skeptic, Sol, Astra; Buildkite 136242 green); ready when a slot frees; E2 stacked on it, E2c on E2; body shortened 2026-11-05 per DECISIONS PR descriptions, dropped: the 8-1-stable/main/PR table, the temp-index and trigger sentences and the shared index-name case (fixed in E2c); in docs/upstream/ecosystem-tests.md"
 passes:
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: nits, open: applied}
   - {reviewer: sol, head: "472c680d15", date: 2026-11-05, verdict: approve, open: "20:07, no must-fix; body nit applied before opening"}
@@ -63,6 +63,25 @@ passes:
       to bc90b487f2, original author/date/parent preserved, no trailers.
       Corrected one-line why-comment meets the comment rule; unchanged
       128-word proposed body remains approved. No remaining findings.
+  - reviewer: thermos-sol
+    orb: T-01a217f1-50ae-711e-b8b4-5ff21d0fdeef
+    head: "29079a50ff7b808d170d3425e36a3ee4b953be6a"
+    date: 2026-11-26
+    verdict: approve
+    open: >-
+      Delta confirm of the ractor gate fix, both rubrics personally, no
+      delegates. Smallest fix: asks the standalone @conn used by the DDL,
+      after setup, not the ractor proxy during class definition; the in-test
+      skip matches PostgreSQL enum_test.rb:135 and partitions_test.rb:18; the
+      class-body supports_expression_index? gate works only because the proxy
+      dispatches it remotely. Skip message supplies the 3.40 reason, so the
+      dropped comment is right; DDL, assertions, cleanup and trigger/table
+      coverage unchanged. Reran: 440a2c09b8 under sqlite3_ractor aborts at
+      line 960 with the Buildkite NoMethodError, candidate passes; adapter
+      directory 3.39.4 plain 234/614 1S, ractor 172/416 1S; 3.40.0 plain
+      234/617 0S, ractor 172/419 0S; all 0F 0E. Message byte-identical,
+      author/date/parent kept, no trailers, signature valid with Thomas's
+      GitHub signing key. RuboCop clean. No findings.
 ---
 
 # Let a temporary SQLite table or view hide a permanent one in the schema readers
@@ -203,6 +222,61 @@ clean merge with Rails main `5a161379f5` (seed 41231): SQLite 3.37.0 and 3.39.4 
 against base `1e235cee11`): on SQLite 3.35.5 the readers test passes 6/6 for base and head, and Rails' helper crashes on both on
 `pragma_table_list`; on 3.44.2 base gives 110 runs and head 115, with no new failures. Buildkite on the new head has not been checked
 yet (the Amp GitHub app cannot subscribe to rails/rails).
+
+### Ractor gate fix, 2026-11-26
+
+Opus thread `T-01a217e5-02b4-7112-bbc7-e72629ed5dff`. Buildkite rails 137206 on `440a2c09b8` failed the activerecord
+`sqlite3:ractor` (4.0) job; main's 137197 passes it (that build's rubocop guides Lint/Syntax and actioncable reds are not
+ours). Buildkite runs `rake sqlite3:test:ractor` in activerecord (rails/buildkite-config `pipelines/rails-ci/pipeline.rb`),
+which sets `ARCONN=sqlite3_ractor`. The class body's `ActiveRecord::Base.lease_connection.database_version >= "3.40.0"`
+reaches `abstract_adapter.rb:1041` `pool.server_version(self)` on the ractor proxy, whose `ProxyConnectionPool` has no
+`server_version`, so loading the file raised NoMethodError and aborted the whole suite. The neighbouring class-body gate
+`supports_expression_index?` survives only because `SQLite3ProxyAdapter` dispatches it remotely.
+
+Fix, amended with `script/commit --amend` to
+[`29079a50ff7b808d170d3425e36a3ee4b953be6a`](https://github.com/thomasklemm/rails/commit/29079a50ff7b808d170d3425e36a3ee4b953be6a):
+the test is always defined and starts with
+`skip "SQLite allows a temporary index to share a permanent table's name since 3.40" unless @conn.database_version >= "3.40.0"`.
+`@conn` is this class's standalone `SQLite3Adapter.new(database: ":memory:")` (a NullPool, which has `server_version`), the
+connection the test's DDL runs on, so the check is exact under both handlers. The in-test skip follows PostgreSQL's
+`enum_test.rb:135` and `partitions_test.rb:18`. The skip message replaces the why-comment; DDL, assertions and cleanup are
+unchanged (13 insertions, 14 deletions, test file only). Parent `1e235cee11`, author date `1793806867 +0000`, raw message
+byte-identical to `440a2c09b8`, no trailers, SSH-signed. Rails RuboCop 1.90.0: 1 file, no offenses; `git diff --check` clean.
+
+Reproduction (Ruby 4.0.9, Rails bundle, sqlite3 gem 2.5.0 with its SQLite 3.47.2, seed 41231, `CI=1 BUILDKITE=true`, from activerecord):
+
+| Run | `440a2c09b8` | `29079a50ff` |
+| --- | --- | --- |
+| `ARCONN=sqlite3_ractor ruby -w -Itest test/cases/adapters/sqlite3/sqlite3_adapter_test.rb` | aborts at load: `sqlite3_adapter_test.rb:960`, NoMethodError `server_version` for ProxyConnectionPool | 107 runs / 257 assertions, 0F 0E 0S |
+| same with `ARCONN=sqlite3` | 115 / 283, 0F 0E 0S | 115 / 283, 0F 0E 0S |
+| `rake sqlite3:test:ractor` (the Buildkite task) | aborts at load, same error and line | 9,559 runs / 34,291 assertions, 0F 0E 24S |
+
+The first fixed rake run had 5 environmental errors (no `pg` gem in the trimmed bundle, no `sqlite3` CLI); both installed,
+the rerun above is clean.
+
+`script/min-versions --only sqlite --sqlite 3.37.0,3.39.4,3.40.0,3.54.1`, base `1e235cee11` versus head `29079a50ff`,
+the 15 files of `activerecord/test/cases/adapters/sqlite3/`, plain `sqlite3` handler:
+
+| SQLite | Base | Head | New failures in head |
+| --- | --- | --- | --- |
+| 3.35.5 (floor) | crashed: Rails' helper uses `pragma_table_list` | same crash | none |
+| 3.37.0 | 229 / 603, 0F 0E 0S | 234 / 614, 0F 0E 1S (temp-index test) | none |
+| 3.39.4 | 229 / 603, 0F 0E 0S | 234 / 614, 0F 0E 1S (temp-index test) | none |
+| 3.40.0 | 229 / 603, 0F 0E 0S | 234 / 617, 0F 0E 0S | none |
+| 3.44.2 (middle) | 229 / 603, 0F 0E 0S | 234 / 617, 0F 0E 0S | none |
+| 3.54.1, min-versions build | 229 / 593, 4E | 234 / 607, 4E | none (4 `no such module: fts5` on both) |
+| 3.54.1 with FTS5 and math functions | 229 / 603, 0F 0E 0S | 234 / 617, 0F 0E 0S | none |
+
+min-versions' SQLite 3.54.1 recipe builds without FTS5, so `SQLite3VirtualTableTest` errors on base and head alike; the
+last row reruns the directory on an official 3.54.1 build with `-DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_MATH_FUNCTIONS`
+(library and CLI both 3.54.1, `ENABLE_FTS5` checked). Below 3.40 the head runs five more tests than base and skips one:
+the trigger/table test still runs. Scripts and logs: `.amp/in/orb-backup/e2b-ractor/` in this thread's orb.
+
+thermos-sol (orb `T-01a217f1-50ae-711e-b8b4-5ff21d0fdeef`) approved `29079a50ff` with no findings (pass above), including
+the ractor handler on 3.39.4 (172 / 416, 1S) and 3.40.0 (172 / 419, 0S). The branch was then lease-pushed from
+`440a2c09b8` to `29079a50ff`; the PR head on GitHub is `29079a50ff`, the body is unchanged and no comments were posted.
+Buildkite rails [137218](https://buildkite.com/rails/rails/builds/137218) and docs-preview 26427 were pending at push; the
+Amp GitHub app still cannot subscribe to rails/rails, so the watcher has to check them.
 
 Posted body:
 
