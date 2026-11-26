@@ -1066,6 +1066,25 @@ compiler. It is not a steady-state comparison. The gated mode below supersedes
 that diagnostic; historical interpreter results remain interpreter results.
 Neither interpreter nor YJIT instructions are native latency claims.
 
+### Control: request inputs captured at boot (2026-11-26)
+
+A harness that makes one request at boot and replays its `Set-Cookie` and XSRF
+token in every measured request gives each process different inputs. The
+session cookie is encrypted with a random IV and the CSRF token is random, so
+each process decodes a different number of `%`-escapes and parses differently
+sized headers. In the inertia round 2 app
+([app.rb](../bench/upstream/inertia_round2/app.rb)) the
+same tree measured 1,713,741 and 1,696,364 instructions per request (A/A
+1.0–1.4%), and objects per request differed (412 / 415, from
+`uri/common.rb:465`). A fixed hash seed (`fixrand.so`, see
+[ruby-bench-improvements](upstream/ruby-bench-improvements.md)) did not help
+(1.37%), because OpenSSL does not draw from it. With a constant header set
+(no captured cookie, a fixed XSRF string, a test session already loaded), the
+A/A fell to ≤ 0.08% and objects matched in every process. Before you read a
+whole-request A/A as noise, check that the request bytes are identical across
+processes. Requests that need a real session should create it from fixed
+inputs rather than from a boot response.
+
 ### Quiescent YJIT instruction mode
 
 `BENCH_JIT=1 lowrail bench ...` uses the same fixed heaps, N=0/50 subtraction,

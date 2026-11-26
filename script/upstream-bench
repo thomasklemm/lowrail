@@ -12,6 +12,7 @@ end
 if ARGV.first == "--worker"
   _, mode, script, *rest = ARGV
   ARGV.clear
+  warm_calls = Integer(ENV.fetch("UPSTREAM_BENCH_WARMUP", "3000"))
   load File.expand_path(script)
   # docs/bench.md's JIT-flat counters, read before and after each measured window; a missing one fails the gate.
   keys, stats = if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
@@ -24,7 +25,7 @@ if ARGV.first == "--worker"
   case mode
   when "objects"
     UpstreamBench::CASES.each do |name, call|
-      3000.times { call.call }
+      warm_calls.times { call.call }
       GC.start
       GC.disable
       # Two windows, so an allocation outside the calls (the first GC.stat, a lazy constant) cancels out.
@@ -43,14 +44,14 @@ if ARGV.first == "--worker"
     if jit
       # Warm up through the measured block itself; reverse_each yields from C like cycle (Array#each is Ruby under YJIT).
       block = proc { |c| c.call }
-      Array.new(3000, call).reverse_each(&block)
+      Array.new(warm_calls, call).reverse_each(&block)
       GC.start
       GC.disable
       before = jit.()
       [call].cycle(Integer(n), &block)
       window.(name, before, jit.())
     else
-      3000.times { call.call }
+      warm_calls.times { call.call }
       GC.start
       GC.disable
       [call].cycle(Integer(n)) { |c| c.call }
@@ -101,7 +102,7 @@ HEAP = { "RUBY_GC_HEAP_0_INIT_SLOTS" => "1000000", "RUBY_GC_HEAP_1_INIT_SLOTS" =
 MODE_FLAGS = { "interp" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.freeze
 MODE_TITLES = { "interp" => "no JIT", "yjit" => "YJIT", "zjit" => "ZJIT" }.freeze
 
-o = { gems: nil, with: [], n: 2000, ips: 0, ips_mode: "yjit", ips_time: 5, ips_warmup: 2, core: 1,
+o = { gems: nil, with: [], n: 2000, warmup: 3000, ips: 0, ips_mode: "yjit", ips_time: 5, ips_warmup: 2, core: 1,
   names: %w[Before After], modes: nil }
 parser = OptionParser.new do |p|
   p.banner = "Usage: script/upstream-bench --out NEW_DIR [--base TREE --candidate TREE] [--ruby R | --base-ruby R --candidate-ruby R] BENCH.rb"
@@ -117,6 +118,8 @@ parser = OptionParser.new do |p|
   p.on("--valgrind PREFIX", "Prefix built by script/bench-valgrind (default $LOWRAIL_VALGRIND)") { o[:valgrind] = _1 }
   p.on("--modes LIST", Array, "interp,yjit,zjit (default: all the Rubies have)") { o[:modes] = _1 }
   p.on("-n N", Integer, "Calls per Callgrind window (default 2000)") { o[:n] = _1 }
+  p.on("--preload SO", "LD_PRELOAD for every worker, e.g. fixrand.so for a fixed hash seed (control only)") { o[:preload] = File.expand_path(_1) }
+  p.on("--warmup N", Integer, "Warm-up calls before each objects and Callgrind window (default 3000)") { o[:warmup] = _1 }
   p.on("--ips ROUNDS", Integer, "benchmark-ips rounds of base/candidate/base (default 0: none)") { o[:ips] = _1 }
   p.on("--ips-mode MODE", "interp, yjit or zjit (default yjit)") { o[:ips_mode] = _1 }
   p.on("--ips-time S", Float) { o[:ips_time] = _1 }
@@ -158,9 +161,10 @@ end
 sides = {}
 { "base" => [o[:base], o[:base_ruby]], "candidate" => [o[:candidate], o[:candidate_ruby]] }.each do |side, (tree, rb)|
   ruby = ruby_path(rb)
-  env = HEAP.merge("RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => nil, "PATH" => "#{File.dirname(ruby)}:#{ENV.fetch("PATH")}")
+  env = HEAP.merge("RUBYOPT" => nil, "RUBY_YJIT_ENABLE" => nil, "UPSTREAM_BENCH_WARMUP" => o[:warmup].to_s, "PATH" => "#{File.dirname(ruby)}:#{ENV.fetch("PATH")}")
   # An app's script boots from this checkout itself (with --gems ""), since its bundle cannot be rebuilt here.
   env["UPSTREAM_BENCH_TREE"] = tree if tree
+  env["LD_PRELOAD"] = o[:preload] if o[:preload]
   gems = []
   if tree
     names = o[:gems] || Dir[File.join(tree, "*.gemspec")].map { File.basename(_1, ".gemspec") }
@@ -300,7 +304,7 @@ end
 
 before, after = o[:names]
 ruby_label = same_ruby ? "Ruby #{sides["base"][:description][/\Aruby (\S+)/, 1]}" : "base and candidate Ruby"
-results = { script: script, at: Time.now.utc.iso8601, n: o[:n], heap: HEAP, sides: sides.transform_values { _1.except(:env) },
+results = { script: script, at: Time.now.utc.iso8601, n: o[:n], warmup: o[:warmup], preload: o[:preload], heap: HEAP, sides: sides.transform_values { _1.except(:env) },
   objects: {}, instructions: {}, ips: {} }
 md = []
 notes = []

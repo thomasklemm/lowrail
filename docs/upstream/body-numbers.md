@@ -16,7 +16,10 @@ mise exec ruby@4.0.9 -- script/upstream-bench \
 ```
 
 For two Ruby builds use `--tree DIR` (or no tree, for plain Ruby) with `--base-ruby` and `--candidate-ruby`
-(executables or mise versions). For an app, whose bundle cannot be rebuilt from a gemspec, pass `--gems ""`: the
+(executables or mise versions). `--warmup N` sets the warm-up calls before each objects and Callgrind window
+(default 3,000; an interpreter cell of a whole Rails request needs far fewer, and its Valgrind boot dominates).
+`--preload SO` puts `LD_PRELOAD=SO` in every worker's environment and in `commands.sh`, as a control, such as
+`fixrand.so` for a fixed hash seed; it is not for body numbers. For an app, whose bundle cannot be rebuilt from a gemspec, pass `--gems ""`: the
 worker then gets its side's checkout in `UPSTREAM_BENCH_TREE` and the script boots the app from it
 ([cf352_body.rb](../../bench/upstream/campfire-rework/cf352_body.rb)); benchmark-ips needs its own Gemfile, so use
 Callgrind only. `--modes interp,yjit` limits the modes; by default it runs the interpreter, YJIT, and ZJIT when both
