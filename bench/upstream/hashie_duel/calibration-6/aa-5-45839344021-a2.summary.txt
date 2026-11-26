@@ -1,0 +1,20 @@
+== aa-5-45839344021-a2 79dc0016373d8e3c01ebd5917b8d49925ffa9126 success job 2026-11-26T14:34:19Z -> 2026-11-26T14:35:45Z
+  Dash.new: coerced properties                       3.1s n=351    cpu 0.994 [0.982, 1.002] same  allocations 7
+  Dash.new: required properties and defaults         4.0s n=573    cpu 1.011 [1.004, 1.023] unsettled  allocations 3
+  Dash: read and write properties                    3.1s n=2191   cpu 0.995 [0.984, 1.016] same  allocations 0
+  Mash#deep_merge: a nested update                   3.3s n=46     cpu 0.999 [0.994, 1.006] same  allocations 31.57
+  Mash#to_hash: a nested Mash                        3.2s n=168    cpu 0.992 [0.965, 1.003] same  allocations 10
+  Mash.new: a flat Hash                              3.0s n=1120   cpu 1.006 [1.000, 1.009] same  allocations 3
+  Mash.new: a nested JSON response                   3.3s n=52     cpu 1.003 [0.996, 1.007] same  allocations 25.5
+  Mash: overwrite a key as a method                  3.0s n=705    cpu 1.007 [1.001, 1.011] same  allocations 6
+  Mash: read keys as methods                         3.0s n=862    cpu 0.994 [0.980, 1.003] same  allocations 5
+  Mash: read keys given as Symbols as methods        3.0s n=1053   cpu 0.997 [0.991, 1.001] same  allocations 5
+  Mash: read keys with [] and dig                    3.0s n=1711   cpu 1.007 [0.996, 1.013] same  allocations 4
+  Mash: read keys with suffixes                      3.0s n=411    cpu 0.998 [0.990, 1.003] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   3.0s n=1423   cpu 1.006 [0.984, 1.016] same  allocations 1
+  Mash: write new keys as methods                    3.1s n=831    cpu 0.999 [0.989, 1.004] same  allocations 5
+  Trash.new: renamed and transformed properties      3.0s n=503    cpu 1.005 [0.987, 1.016] same  allocations 4
+21 benchmarks in 68s: 0 regressed, 0 errors, 1 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: cpu 1.000 [0.998, 1.002] same (limit 1.0050, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

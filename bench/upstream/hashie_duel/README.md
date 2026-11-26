@@ -84,9 +84,6 @@ Calibration on the fork, same PRs #1–#8 rebased each time:
 | 3 | `1649b89`, 21 scenarios incl. 1-key reads | 0/10 failed, 3 re-measured | 1/2 failed: Dash read/write 1.031–1.035 in 4 measurements (code #656 doesn't touch) | 13 / 5 | 73–110 s |
 | 4 | `210665a`, reads widened to 5 keys | **1/20 failed**: plain Symbol-key reads 1.052–1.071 in 4 measurements, across-the-board 1.001 | 0/3 | 13 / 5 | 72–101 s |
 | 5 | `87a9f22`, `c.jobs = 1` | **0/20**, none re-measured, 51/420 unsettled | 0/4, faster on 6–7 | 13 / 4 | 80–90 s |
+| 6 | `bcf21e7`, rebased on master `812c48c` (#656 merged), `mash_new_keys.rb` deleted, CONTRIBUTING wording | **0/15**, none re-measured, 45/315 unsettled | — (#656 is the baseline; fork PR #8 closed) | 13 / 5 | 81–91 s |
 
-Both false failures were one benchmark consistently ~3–7% slower while everything else was flat, in Duel's default
-of one benchmark per two CPUs: 2 at a time on GitHub's 4-vCPU runners, whose workers then share cores with another
-benchmark's. With one at a time the A/A cohort had no re-measure at all and runs got only ~8 s longer. The 13-scenario
-cohorts (1–2) passed 0/35 at 2 at a time, so the risk grew with the number of short scenarios. Raw: `calibration-3`,
-`-4`, `-5`; `round.sh` reruns and collects them.
+Both false failures occurred with two benchmarks at a time. Cross-benchmark CPU contention is a hypothesis, not a demonstrated cause. With one at a time, round 5 had no A/A remeasurement and a median job time of 84 s versus round 4's 76 s. The earlier 13-scenario cohorts had 0/35 failures at two at a time; these different cohorts do not isolate the cause or establish a negligible false-alarm rate. Raw: `calibration-3`, `-4`, `-5`; `round.sh` reruns and collects them.
