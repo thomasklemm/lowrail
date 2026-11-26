@@ -6,7 +6,7 @@ kind: feature
 area: CI, Duel performance regression guards (.duel.rb, duel/, perf.yml, perf-comment.yml, gemfiles/duel.gemfile)
 reviewer: dblock
 branch: thomasklemm/duel
-head: "9c3009161ec0e259e7863d9b3b92864da5589bd0"
+head: "c4303d510262c31290fe11dd845d38bc9bc999bd"
 base: master
 built_on: "e1adebc3de"
 tracker: [hashie/hashie#658]
@@ -19,40 +19,27 @@ rank:
 risky: false
 state: built
 pr:
-note: "2026-11-26 built: one commit 9c30091 on master e1adebc (fork master fast-forwarded to e1adebc), Thomas Klemm author and committer, no trailers, fork pre-push hook installed. Requested by dblock in #658 (he wrote it for us on #656; Thomas agreed publicly there). Calibration on fork PRs #1-#8 against duel-calibration (= 9c30091), see bench/upstream/hashie_duel/README.md. Local: Ruby 4.0.9 rake spec 1,075 examples 0 failures, rake rubocop clean, duel --force A/A 0 regressed. Benchmarks chosen from profile-hotlines (Mash in Huginn 6.2% of job objects, Forem 0.9%), HM1 and dblock's benchmarks/mash_new_keys.rb; fixture is the octocat repository payload of HM1's body. README badge: Duel's own static badge (README.md 'Without the job, use Duel's own badge'), which needs no duel/badge branch or push job, as in Grape. Kind feature added to script/pr-queue KINDS for this item. Manual ownership check 2026-11-26, open and closed: no hashie PR or issue names Duel, a perf workflow or regression benchmarks except #658; #658 has no assignee or comments, labels chore and 'you can help!', only cross-reference #656 (ours); latest 15 PRs are dblock release tooling (#643-#657), dependabot and #656."
+note: "2026-11-26 thermos-sol changes on 9c30091 applied as c4303d5 (same parent e1adebc): R1 Trash with: -> transform_with: (topics now \"octocat, api\"); R2 narrative comments deleted at the given ranges, null-logger why-line kept; R3 the reviewer's short body plus one calibration paragraph and the approval note, which Thomas's brief requires in the body (approval verified: our #656 runs upstream are action_required); commit message JSON sentence corrected. CHANGELOG nit declined: hashie's CHANGELOG and release spec CATEGORIES have no Miscellaneous section, so Added stays. Ruby 4.0.9 rake spec 1,075/0, rubocop clean. Recalibration on c4303d5 (calibration-2): A/A 0/10 failed (one Dash.new required remeasure, cleared, the same benchmark as cohort 1's only remeasure), allocation plant 8 regressed, CPU plant 2, candidate faster on 5 and slower on none; body now says 35 A/A runs (25 + 10, same lib/). 2026-11-26 built: one commit 9c30091 on master e1adebc (fork master fast-forwarded to e1adebc), Thomas Klemm author and committer, no trailers, fork pre-push hook installed. Requested by dblock in #658 (he wrote it for us on #656; Thomas agreed publicly there). Calibration on fork PRs #1-#8 against duel-calibration (= 9c30091), see bench/upstream/hashie_duel/README.md. Local: Ruby 4.0.9 rake spec 1,075 examples 0 failures, rake rubocop clean, duel --force A/A 0 regressed. Benchmarks chosen from profile-hotlines (Mash in Huginn 6.2% of job objects, Forem 0.9%), HM1 and dblock's benchmarks/mash_new_keys.rb; fixture is the octocat repository payload of HM1's body. README badge: Duel's own static badge (README.md 'Without the job, use Duel's own badge'), which needs no duel/badge branch or push job, as in Grape. Kind feature added to script/pr-queue KINDS for this item. Manual ownership check 2026-11-26, open and closed: no hashie PR or issue names Duel, a perf workflow or regression benchmarks except #658; #658 has no assignee or comments, labels chore and 'you can help!', only cross-reference #656 (ours); latest 15 PRs are dblock release tooling (#643-#657), dependabot and #656."
 ownership: {date: 2026-11-26, checked: ["open PRs naming repository_attributes that change .duel.rb, .github/workflows/perf-comment.yml, .github/workflows/perf.yml, .gitignore, .rubocop.yml, .spellcheck.txt, CHANGELOG.md, CONTRIBUTING.md, README.md, duel/dash_duel.rb, duel/duel_helper.rb, duel/fixtures/repository.json, duel/mash_duel.rb, gemfiles/duel.gemfile","hashie/hashie#658 and what references it"], hits: ["tracker: hashie/hashie#658 (open): Add Duel performance regression guards","references hashie/hashie#658: hashie/hashie#656 (PR, open, thomasklemm): Write new Mash keys without allocating in respond_to_missing?"]}
 passes:
-  - {reviewer: thermos-sol, head: "9c3009161ec0e259e7863d9b3b92864da5589bd0", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: changes, open: "R1 use transform_with for the Trash benchmark; R2 delete narrative code comments; R3 shorten the PR body and correct the input and calibration wording"}
+  - {reviewer: thermos-sol, head: "c4303d510262c31290fe11dd845d38bc9bc999bd", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: changes, open: "R1 use transform_with for the Trash benchmark; R2 delete narrative code comments; R3 shorten the PR body and correct the input and calibration wording"}
 ---
 
 # Add Duel performance regression guards
 
 Closes #658.
 
-This ports ruby-grape/grape#3077 to Hashie. On each pull request that changes `lib/`, the Perf workflow runs the benchmarks in `duel/` with [Duel](https://github.com/sferik/duel-ruby) against the target branch and the pull request side by side, on Ruby 4.0 with YJIT, and fails if the branch is slower or allocates more. The Perf comment workflow posts Duel's report from a second workflow that runs none of the pull request's code, and a `duel: accept` label lets an intentional slowdown through. Both call Duel's reusable workflows pinned to the v0.3.1 commit. Duel needs Ruby 3.4 or later, so it has its own bundle in `gemfiles/duel.gemfile` and stays out of the main one.
+This ports ruby-grape/grape#3077 to Hashie. For changes to `lib/`, Duel compares pull requests with their target branch on Ruby 4.0 with YJIT and checks for CPU and allocation regressions. The 13 benchmarks cover Mash construction, key access, writes, `deep_merge` and `to_hash`, plus Dash defaults, property access and coercion, and Trash renaming and transformation.
 
-The 13 benchmarks are the paths API clients run on every response, built from one fixture, the GitHub repository response that #656's benchmark uses, parsed with Ruby's JSON so both versions get the same Hash:
+The benchmark bundle is separate, so Hashie's Ruby 3.0+ support and main dependencies are unchanged. Perf runs pull-request code with read-only permissions; a separate workflow posts reports without running that code. A maintainer can apply `duel: accept` for an intentional slowdown.
 
-* `Mash.new` from that nested response, `deep_merge` of a nested update and `to_hash` of the result: the conversion every client pays for.
-* Reading keys as methods, with suffixes (`?`, `!`, `_`) and through `[]` and `dig`; writing a new key and overwriting one as methods; `respond_to?` for a key, a suffix and a missing name. These go through `method_missing`, `convert_key` and the collision check on every write, where #410 and #656 were.
-* `Dash.new` with required properties and defaults, Dash property reads and writes, `Trash.new` with renamed and transformed properties, and a Dash with coercion.
-
-Before opening, I ran the workflows on my fork, with pull requests against a branch that has this commit:
-
-* Five pull requests that change only a comment in `lib/`, run five times each: 25 runs, none failed. In one run Duel measured one Dash benchmark again before passing it.
-* Changing `convert_key` back to `Symbol#to_s` failed 8 benchmarks (`Mash.new` went from 106 to 144 objects), and a `method_missing` that checks `key?` three times failed method reads at 1.5x.
-* #656's change came out faster on 3 to 6 benchmarks in each of three runs and slower on none.
-* A run with nothing slower takes about a minute; one that finds a regression takes two to four, because Duel measures again before failing. GitHub's runners don't expose instruction counts, so CPU time and allocation counts decide.
-
-[Runs on the fork](https://github.com/thomasklemm/hashie/pulls?q=is%3Apr+%5Bcalibration%5D).
-
-The Perf workflow needs a maintainer to approve this pull request's runs before it runs here; it compares the code with itself on this pull request, since only `duel/` and the configuration change. Perf comment runs once it is on `master`.
+On [pull requests in my fork](https://github.com/thomasklemm/hashie/pulls?q=is%3Apr+%5Bcalibration%5D), 35 runs on comment-only changes to `lib/` all passed, and two planted regressions failed: `convert_key` back to `Symbol#to_s` (8 benchmarks) and a slower `method_missing` (method reads at 1.5x). #656 came out faster, never slower. A passing run takes about a minute. These runs need a maintainer's approval here, and Perf comment runs once it is on `master`.
 
 ## For Thomas
 
 What it is: a CI job that, for each PR, benchmarks hashie's master against the PR in parallel worker processes and fails when the PR is slower or allocates more, plus a job that comments the result. dblock asked for exactly this in #658 as a copy of what sferik did for Grape.
 
-Calibration in one sentence: on GitHub runners, 25 runs of identical code never failed, both deliberate regressions failed, and #656 shows as faster, so the gate keeps Duel's defaults (limit 1.02, YJIT). The one caveat is the thin margin: identical code shows medians up to about 1.03 on some runners for a few benchmarks, which Duel's rule of measuring again in fresh processes absorbed in every run; `c.measure("cpu", limit: 1.03)` in `.duel.rb` is the one-line fallback if dblock ever sees a false alarm.
+Calibration in one sentence: on GitHub runners, 25 runs of identical code never failed, both deliberate regressions failed, and #656 shows as faster, so the gate keeps Duel's defaults (limit 1.02, YJIT). The one caveat is the thin margin: identical code shows medians up to about 1.03 on some runners for a few benchmarks, although only one run required remeasurement (four unsettled repeats), and 79 of 325 final benchmark timings were unsettled; `c.measure("cpu", limit: 1.03)` in `.duel.rb` is the one-line fallback if dblock ever sees a false alarm.
 
 Not in the port: Grape's Rakefile task for Duel (not asked for in #658), and the badge job (the static badge needs none).
 
@@ -83,7 +70,7 @@ This ports ruby-grape/grape#3077 to Hashie. For changes to `lib/`, Duel compares
 The benchmark bundle is separate, so Hashie's Ruby 3.0+ support and main dependencies are unchanged. Perf runs pull-request code with read-only permissions; a separate workflow posts reports without running that code. A maintainer can apply `duel: accept` for an intentional slowdown.
 ```
 
-That wording assumes R1 is fixed. In the commit message, replace `Their input is a fixture parsed with Ruby's JSON, so both versions get the same Hash.` with `The API response fixture is parsed with Ruby's JSON.` Not every case uses the fixture: coercion deliberately starts with string/symbol values and new-key writes start with empty Mashes. In the internal calibration paragraph, replace `which Duel's rule of measuring again in fresh processes absorbed in every run` with `although only one run required remeasurement (four unsettled repeats), and 79 of 325 final benchmark timings were unsettled`. This preserves the successful calibration without implying that all near-limit timings were remeasured or cleared.
+That wording assumes R1 is fixed. In the commit message, replace `Their input is a fixture parsed with Ruby's JSON, so both versions get the same Hash.` with `The API response fixture is parsed with Ruby's JSON.` Not every case uses the fixture: coercion deliberately starts with string/symbol values and new-key writes start with empty Mashes. In the internal calibration paragraph, replace `although only one run required remeasurement (four unsettled repeats), and 79 of 325 final benchmark timings were unsettled` with `although only one run required remeasurement (four unsettled repeats), and 79 of 325 final benchmark timings were unsettled`. This preserves the successful calibration without implying that all near-limit timings were remeasured or cleared.
 
 #### Correctness, security and maintainability
 

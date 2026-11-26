@@ -1,0 +1,18 @@
+== hm1-45819661739-a1 c9b4f036413b18061eb1a31f8a787f39c597e409 success job 2026-11-26T12:29:20Z -> 2026-11-26T12:30:10Z
+  Dash.new: coerced properties                       5.3s n=660    cpu 0.997 [0.982, 1.015] same  allocations 7
+  Dash.new: required properties and defaults         3.3s n=908    cpu 0.982 [0.914, 1.002] same  allocations 3
+  Dash: read and write properties                    6.1s n=10498  cpu 0.995 [0.971, 1.012] same  allocations 0
+  Mash#deep_merge: a nested update                   4.7s n=46     cpu 0.837 [0.819, 0.864] faster  allocations 120.6→31.57
+  Mash#to_hash: a nested Mash                        3.1s n=223    cpu 0.978 [0.967, 0.990] same  allocations 10
+  Mash.new: a nested JSON response                   5.8s n=92     cpu 0.810 [0.793, 0.826] faster  allocations 105.3→25.28
+  Mash: overwrite a key as a method                  4.9s n=978    cpu 0.879 [0.851, 0.898] faster  allocations 9→6
+  Mash: read keys as methods                         5.4s n=1774   cpu 0.996 [0.954, 1.019] same  allocations 5
+  Mash: read keys with [] and dig                    4.9s n=2804   cpu 0.991 [0.972, 1.008] same  allocations 4
+  Mash: read keys with suffixes                      5.3s n=840    cpu 0.871 [0.862, 0.887] faster  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   5.3s n=2443   cpu 0.714 [0.701, 0.742] faster  allocations 6→1
+  Mash: write new keys as methods                    5.1s n=1311   cpu 0.825 [0.796, 1.014] same  allocations 7→5
+  Trash.new: renamed and transformed properties      5.1s n=866    cpu 0.967 [0.931, 1.018] same  allocations 4
+13 benchmarks in 37s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+Comparing 13 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: cpu 0.967 [0.945, 0.980] faster (limit 1.0050, 13 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

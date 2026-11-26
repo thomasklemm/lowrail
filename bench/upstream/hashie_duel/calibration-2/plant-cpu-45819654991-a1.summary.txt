@@ -1,0 +1,27 @@
+== plant-cpu-45819654991-a1 f2c77adb7bb50607b765673c3b7b29d208149f12 failure job 2026-11-26T12:29:10Z -> 2026-11-26T12:30:36Z
+  Dash.new: coerced properties                       6.1s n=849    cpu 1.004 [0.991, 1.024] unsettled  allocations 7
+  Dash.new: required properties and defaults         3.7s n=1100   cpu 0.984 [0.964, 0.999] same  allocations 3
+  Dash: read and write properties                    5.8s n=10998  cpu 0.999 [0.979, 1.019] same  allocations 0
+  Mash#deep_merge: a nested update                   3.7s n=56     cpu 0.994 [0.925, 1.018] same  allocations 120.5
+  Mash#to_hash: a nested Mash                        3.4s n=400    cpu 0.991 [0.978, 1.012] same  allocations 10
+  Mash.new: a nested JSON response                   5.4s n=68     cpu 0.990 [0.971, 1.004] same  allocations 105.4
+  Mash: overwrite a key as a method                  4.6s n=1008   cpu 0.999 [0.980, 1.015] same  allocations 9
+  Mash: read keys with [] and dig                    6.5s n=3421   cpu 0.987 [0.958, 1.169] unsettled  allocations 4
+  Mash: respond_to? a key, a suffix and a missing name   8.1s n=2031   cpu 1.021 [0.999, 1.051] unsettled  allocations 6
+  Mash: write new keys as methods                    6.1s n=1383   cpu 1.008 [0.987, 1.027] unsettled  allocations 7
+  Trash.new: renamed and transformed properties      5.8s n=816    cpu 0.983 [0.965, 1.007] same  allocations 4
+! Mash: read keys as methods                         2.9s n=1167   cpu 1.425 [1.394, 1.468] slower  allocations 5
+! Mash: read keys as methods                         2.9s n=1251   cpu 1.407 [1.377, 1.441] slower  allocations 5
+! Mash: read keys as methods                         3.0s n=1210   cpu 1.404 [1.379, 1.432] slower  allocations 5
+! Mash: read keys as methods                         4.3s n=1198   cpu 1.445 [1.419, 1.484] slower  allocations 5
+! Mash: read keys with suffixes                      3.1s n=653    cpu 1.033 [1.025, 1.042] slower  allocations 16
+! Mash: read keys with suffixes                      3.1s n=655    cpu 1.031 [1.021, 1.039] slower  allocations 16
+! Mash: read keys with suffixes                      4.1s n=659    cpu 1.030 [1.020, 1.036] slower  allocations 16
+! Mash: read keys with suffixes                      4.6s n=666    cpu 1.134 [1.029, 1.347] slower  allocations 16
+13 benchmarks in 69s: 2 regressed, 0 errors, 4 with a timing too close to the limit to settle
+Comparing 13 benchmarks, 2 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+Measuring 2 benchmarks that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+REGRESSION Mash: read keys as methods: worse cpu in every measurement
+REGRESSION Mash: read keys with suffixes: worse cpu in every measurement
+across the board: cpu 1.001 [0.996, 1.005] unsettled (limit 1.0050, 13 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

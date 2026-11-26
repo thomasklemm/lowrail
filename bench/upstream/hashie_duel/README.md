@@ -47,3 +47,17 @@ A/A PRs were rerun 4 times each (`gh run rerun`), hm1 twice: 25 A/A runs, 3 cand
 
 Local check before pushing (`local-aa-orb.txt`): Ruby 4.0.9 + YJIT, `bundle exec duel --force --base HEAD`, 52 s,
 0 regressed, 3 unsettled; `rake spec` 1,075 examples 0 failures, `rake rubocop` 157 files clean.
+
+## Recalibration on the reviewed fix `c4303d5` (calibration-2)
+
+After thermos-sol's changes (Trash `with:` → `transform_with:`, comments removed; `lib/` unchanged), the 8 fork
+branches were rebased onto `c4303d5` and force-pushed (same PRs #1–#8), and the A/A runs rerun once
+(`python3 -I tally.py calibration-2`):
+
+* **A/A: 0 of 10 runs failed**, 26 of 130 verdicts unsettled, job 48–77 s (median 55 s). One run (aa-3 attempt 2)
+  measured `Dash.new: required properties and defaults` again: 1.026 [1.020, 1.033] first, then 1.021–1.028 four
+  times, each too close to call, and passed. That is the same benchmark as the first cohort's only re-measured run,
+  so it is the one closest to a false alarm on identical code (2 of 35 runs re-measured it; 0 of 35 failed).
+* Trash now transforms (`topics` joined): 4 allocations per call instead of 3.
+* **Allocation plant:** 8 regressed, as before (Duel 220 s). **CPU plant:** method reads and suffix reads regressed
+  (2), job 86 s. **#656 candidate:** faster on 5, none slower, the same allocation drops, job 50 s.
