@@ -1,0 +1,6 @@
+# script/profile-hotlines @bench/upstream/inertia_round2/apps.txt
+# Each app's own suite on inertia-rails v3.24.0 (5102d8d, path gem), lowrail-profile 0.1.0.rc1 from gem/ (unchanged since 644c99e4).
+pingcrm=bench/upstream/inertia_round2/pingcrm/profiled,bench/upstream/inertia_round2/pingcrm/pingcrm-paths.txt
+react-starter-kit=bench/upstream/inertia_round2/react-starter-kit/profiled,bench/upstream/inertia_round2/react-starter-kit/react-starter-kit-paths.txt
+redprints-cfp=bench/upstream/inertia_round2/redprints-cfp/profiled,bench/upstream/inertia_round2/redprints-cfp/redprints-cfp-paths.txt
+thinkroom=bench/upstream/inertia_round2/thinkroom/profiled,bench/upstream/inertia_round2/thinkroom/thinkroom-paths.txt

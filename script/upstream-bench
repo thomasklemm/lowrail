@@ -215,7 +215,8 @@ runs = %w[base candidate base2]
 side_of = ->(run) { run.delete_suffix("2") }
 
 # Objects: deterministic, but still run base twice so a nondeterministic case shows.
-objects = modes.to_h do |mode|
+# With --modes "" (ips only), the objects pass still runs in the ips mode: it names the cases and needs no Valgrind.
+objects = (modes.empty? && o[:ips] > 0 ? [o[:ips_mode]] : modes).to_h do |mode|
   [mode, runs.to_h do |r|
     text = run(sides[side_of[r]][:env], worker[side_of[r], mode, "objects", script], log: File.join(out, "raw", "objects-#{mode}-#{r}.log"))
     [r, text.scan(/^objects (.+)\t(\S+)$/).to_h { [_1, Float(_2)] }]

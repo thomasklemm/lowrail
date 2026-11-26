@@ -1,0 +1,9 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+          action_xhr   333.000 i/100ms
+action_dashboard_xhr   358.000 i/100ms
+Calculating -------------------------------------
+          action_xhr      3.687k (±19.7%) i/s  (271.23 μs/i) -     18.648k in   5.057819s
+jit action_xhr	compiled_iseq_count=1302>1302 compiled_block_count=18690>18690 invalidation_count=385>385
+action_dashboard_xhr      3.578k (±18.3%) i/s  (279.48 μs/i) -     17.900k in   5.002746s
+jit action_dashboard_xhr	compiled_iseq_count=1306>1306 compiled_block_count=18715>18715 invalidation_count=385>385

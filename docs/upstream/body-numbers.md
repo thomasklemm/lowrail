@@ -22,7 +22,8 @@ For two Ruby builds use `--tree DIR` (or no tree, for plain Ruby) with `--base-r
 `fixrand.so` for a fixed hash seed; it is not for body numbers. For an app, whose bundle cannot be rebuilt from a gemspec, pass `--gems ""`: the
 worker then gets its side's checkout in `UPSTREAM_BENCH_TREE` and the script boots the app from it
 ([cf352_body.rb](../../bench/upstream/campfire-rework/cf352_body.rb)); benchmark-ips needs its own Gemfile, so use
-Callgrind only. `--modes interp,yjit` limits the modes; by default it runs the interpreter, YJIT, and ZJIT when both
+Callgrind only. `--modes interp,yjit` limits the modes, and `--modes ""` with `--ips` runs benchmark-ips alone (plus the objects pass
+in the ips mode, which names the cases); by default it runs the interpreter, YJIT, and ZJIT when both
 Rubies have it. `-n` sets the calls per Callgrind window (default 2000), `--core` the CPU for
 benchmark-ips (default 1), `--with GEM` adds a third-party gem to both Gemfiles.
 

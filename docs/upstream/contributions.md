@@ -1147,6 +1147,14 @@ None.
 
 ## Investigated, not submitted
 
+- **inertia-rails round 2, after v3.24.0 (2026-11-26): five leads not submitted** ([record](inertia-round-2.md)).
+  Interpreter instructions per request on the Inertia XHR / dashboard XHR action workloads against 3.24.0 `5102d8d`,
+  A/A ≤ 0.08%; the bar is about 2%. Below the bar: `inertia_configuration` memoized per controller −0.93% / −0.98%;
+  `parse_header` without `''.split` −0.34% (XHR only); `extract_shared_keys` with `Symbol#name` −0.19% / −0.11%
+  (11 objects); `DottedKeys#expand` with `Symbol#name` −0.03% / −0.03%. Slower and dropped: metadata containers
+  created on first use −0.21% / **+0.66%**. Not bundled (Thomas): about 1.5% on plain pages from four unrelated
+  changes. The one lead above the bar is INRP1 (prop-type flags without `try`, −2.75% on the dashboard).
+
 - **Consumers of internal APIs changed on Rails main (2026-11-06): stopped, nothing pushed or opened.** After matthewd
   closed our #59663 ("We don't deprecate internal APIs. That's what internal means."), and we closed #59630 for the same
   reason, the plan was to fix the callers instead. Thomas stopped the effort the same day: fixing the ecosystem for
