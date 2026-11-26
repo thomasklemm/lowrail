@@ -8,7 +8,7 @@ one root cause and one fix.** Neither is reported on bugs.ruby-lang.org. Fix bra
 `thomasklemm/time-new-normalize-mday` (`d3e0a31795`)), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md),
 state in-review. 2026-11-25: Thomas posted the repros and our commit as a comment on ruby/ruby#16469
 (issuecomment-7162441987), no reply. 2026-11-26: Thomas approved opening one draft PR with both commits once
-thermos-sol and Astra approve the head and the body (section below). No further comment on #16469 is planned.
+thermos-sol and Astra approve the head and the body; both approved 2e061793aa, and it opened as draft ruby/ruby#20208 the same day. No further comment on #16469 is planned.
 
 ## Repros
 
