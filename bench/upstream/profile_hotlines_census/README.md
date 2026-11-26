@@ -146,6 +146,11 @@ facts):
    of the React starter kit's request objects. That covers only the test and development auto-build check, so it is
    one app and not production: weak.
 
+Outcome of 1 and 2 (2026-11-26, [hotline_candidates](../hotline_candidates/README.md)): neither was built. On Rails
+main, `append_tag_option` already passes `Symbol#name` to `xml_name_escape` (rails/rails#59117), so item 1 saves
+nothing there (XNE1, superseded). Item 2 is far below the bar on a whole request, and on main its six objects per
+request (Active Record's async-query session) are built only for async queries (rails/rails#59373) (CRSI1, held).
+
 Not suggested: `helper_names` (once per controller class), `Arel::Table#[]` and the other one-object-per-operation
 Rails rows (census data already has them), tzinfo `for_time` (the Rational is the value it stores), and
 http_accept_language (dormant since 2017, two apps).

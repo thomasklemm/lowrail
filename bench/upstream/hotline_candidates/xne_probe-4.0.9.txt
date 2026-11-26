@@ -1,0 +1,14 @@
+# Ruby 4.0.9, Rails v8.1.4 (c3466ea00d)
+tag.div("x", class: "card")                               8.0
+tag.input(type: "text", name: "q", value: "v")           11.0
+content_tag(:a, "x", href: "/a", class: "b", id: "c")    11.0
+xml_name_escape(:class)                                   1.0
+xml_name_escape("class")                                  0.0
+util.rb String sites over 10 tag.div with 3 Symbol keys: {"util.rb:143" => 30}
+# Rails main 521bd1cf3f
+tag.div("x", class: "card")                               4.0
+tag.input(type: "text", name: "q", value: "v")            4.0
+content_tag(:a, "x", href: "/a", class: "b", id: "c")     4.0
+xml_name_escape(:class)                                   1.0
+xml_name_escape("class")                                  0.0
+util.rb String sites over 10 tag.div with 3 Symbol keys: {}

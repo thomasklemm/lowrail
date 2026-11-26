@@ -1,0 +1,8 @@
+concurrent-ruby atomic_boolean Concurrent::MutexAtomicBoolean objects/call 3.0001
+concurrent-ruby atomic_reference Concurrent::MutexAtomicBoolean objects/call 3.0001
+concurrent-ruby two_args Concurrent::MutexAtomicBoolean objects/call 2.0001
+concurrent-ruby resolvable_future Concurrent::MutexAtomicBoolean objects/call 17.0001
+cr-fwd atomic_boolean Concurrent::MutexAtomicBoolean objects/call 2.0001
+cr-fwd atomic_reference Concurrent::MutexAtomicBoolean objects/call 2.0001
+cr-fwd two_args Concurrent::MutexAtomicBoolean objects/call 1.0001
+cr-fwd resolvable_future Concurrent::MutexAtomicBoolean objects/call 11.0001

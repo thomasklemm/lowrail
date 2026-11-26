@@ -1,0 +1,17 @@
+{
+  "pass": true,
+  "version": "valgrind-3.19.0",
+  "rails_boot": true,
+  "driver_sha256": "d5cd7d0ae025eeecd760b7ff05767732118c3e07fdf106acce223b11e5154171",
+  "build": {
+    "version": "3.19.0",
+    "source_sha256": "dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02",
+    "patch_sha256": "ab95c4a3c2ffae1db00116ff550b19f1f30f3ae3333349779c221d1fb55f84d1",
+    "brk_reservation_mib": 512,
+    "tool": "libexec/valgrind/callgrind-amd64-linux",
+    "tool_sha256": "a270a094e6044b68ba35291f72730da654278abd2f2f591e7dca17039340fa9d",
+    "compiler": "cc (Debian 14.2.0-19) 14.2.0",
+    "libc": "glibc 2.41"
+  },
+  "log_sha256": "ca7f9fc71852da94ed9d9edd9ac7f937abd8fe9991e2c6175d95c17a573777a8"
+}

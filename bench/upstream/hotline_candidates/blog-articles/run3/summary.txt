@@ -1,0 +1,5 @@
+aa pass true (tol 0.5%), heap_matched true, jit ["interpreter"]
+off_a	total 9084465 (0% [0, 0])	no_gc 9085228 (0% [0, 0])	objects 2358.3900000000003 (0%)
+off_b	total 9086369 (-0.002% [-0.025, 0.036])	no_gc 9084297 (-0.021% [-0.039, 0.002])	objects 2358.32 (0.001%)
+app_fix	total 9084445 (-0.012% [-0.042, 0.018])	no_gc 9083699 (-0.019% [-0.057, 0.001])	objects 2358.19 (-0.013%)
+gc per request off_a/app_fix: 0.0/0.0

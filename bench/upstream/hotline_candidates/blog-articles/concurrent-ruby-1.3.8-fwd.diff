@@ -1,0 +1,15 @@
+diff --git a/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb b/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb
+index f785e35..808ca3c 100644
+--- a/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb
++++ b/lib/concurrent-ruby/concurrent/synchronization/safe_initialization.rb
+@@ -26,8 +26,8 @@ module Concurrent
+     #     end
+     #   end
+     module SafeInitialization
+-      def new(*args, &block)
+-        super(*args, &block)
++      def new(...)
++        super
+       ensure
+         Concurrent::Synchronization.full_memory_barrier
+       end
