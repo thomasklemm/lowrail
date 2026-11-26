@@ -63,9 +63,10 @@ module Lowrail
       @paths, @path_ids, @locs, @loc_ids, @window_names, @window_ids = [], {}, [], {}, [], {}
       @runs = self.class.run_dirs(dir).map { load_run(_1) }
       if @runs.empty? || @runs.all? { _1[:windows].values.sum == 0 }
+        tests = @runs.empty? ? 0 : @runs[0][:controller_tests]
         raise "no runs with requests, jobs or mails under #{dir} (a request counts when it goes through the app, as in " \
           "integration, request and system tests; controller tests and controller specs call the controller directly " \
-          "and are not counted)"
+          "and are not counted#{"; run 1 made #{tests} request#{"s" if tests != 1} from controller tests" if tests > 0})"
       end
     end
 
@@ -80,7 +81,7 @@ module Lowrail
     # arrays in first-seen order, which keeps every later sum and tie as it
     # was with one array per row.
     def load_run(path)
-      run = { name: File.basename(path), requests: 0, objects: 0, dropped: 0, processes: 0, roots: [],
+      run = { name: File.basename(path), requests: 0, objects: 0, dropped: 0, controller_tests: 0, processes: 0, roots: [],
         windows: Hash.new(0), sites: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
         actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
         attrib: { index: {}, name: [], loc: [], caller: [], count: [], first: [] } }
@@ -91,6 +92,7 @@ module Lowrail
         run[:processes] += 1
         %i[requests objects dropped].each { run[_1] += Integer(meta.fetch(_1.to_s)) }
         KINDS.zip(meta.fetch("windows").split(",")) { |kind, n| run[:windows][kind] += Integer(n) }
+        run[:controller_tests] += Integer(meta.fetch("controller_tests", "0"))
         # The root lines were attributed through first, so app keys are relative to it.
         run[:roots] |= [meta["app_root"], meta["root"]].compact
         run[:ruby] ||= meta["ruby"]
@@ -323,6 +325,7 @@ module Lowrail
       @runs.map do |run|
         { run: run[:name], processes: run[:processes], requests: run[:requests],
           objects_per_request: run[:requests] > 0 ? run[:objects].fdiv(run[:requests]) : 0.0, dropped: run[:dropped],
+          controller_tests: run[:controller_tests],
           windows: KINDS.to_h { [_1, run[:windows][_1]] },
           # Windows that finished (were merged into an action); fewer than
           # windows means some were still open when the process wrote.
@@ -538,6 +541,11 @@ module Lowrail
       out << "* Rails: #{rails || "?"}, #{@runs.first[:rails_env] || "?"} environment\n"
       out << "* Counted in run 1: #{counted.join(", ")}#{" in #{first[:processes]} processes" if first[:processes] > 1}; " \
         "#{@runs.size} run#{"s" if @runs.size != 1}\n"
+      if first[:controller_tests] > 0
+        out << "* Not counted in run 1: #{first[:controller_tests]} request#{"s" if first[:controller_tests] != 1} made by " \
+          "controller tests (`ActionController::TestCase`, rspec-rails controller specs), which call the controller directly, " \
+          "without the app's middleware and routing\n"
+      end
       out << "* Ledger: #{ledger_date ? "upstream pull requests as of #{ledger_date}" : "off"}\n"
       out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n"
       if (missing = unclassified)

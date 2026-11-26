@@ -152,6 +152,37 @@ class ProfileCompareTest < Minitest::Test
 
   # compare reports only on valid evidence (exit 2 otherwise), takes the noise
   # floor from every run, and leaves out actions one side cannot measure.
+  def test_compare_says_which_actions_it_could_not_compare
+    archive = File.expand_path("../bench/upstream/profile_release/census-field-test/apps/react-starter-kit/reports.tar.xz", GEM_ROOT)
+    realpath_tmpdir do |dir|
+      %w[u1 u2 planted].each do |capture|
+        json, err, status = Open3.capture3("tar", "-xJOf", archive, "#{capture}/report.json")
+        assert status.success?, err
+        report = JSON.parse(json)
+        # rc1's format 2 differs from 3 only in line keys, the same in all three; actions are keyed by name in both.
+        assert_equal 2, report["meta"]["format"]
+        report["meta"]["format"] = 3
+        File.write(File.join(dir, "#{capture}.json"), JSON.generate(report))
+      end
+      run = ->(*args) { Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "u1.json", "planted.json", "--aa", "u2.json", *args, chdir: dir) }
+      out, err, status = run.("--json")
+      assert_equal 0, status.exitstatus, err
+      result = JSON.parse(out)
+      assert_equal [["action", "UsersController#new"]], result["regressions"].map { [_1["what"], _1["name"]] }, "the plant"
+      unwarmed = %w[SessionsController#destroy Settings::SessionsController#index Settings::PasswordsController#show
+        Settings::EmailsController#show Identity::PasswordResetsController#new Identity::EmailVerificationsController#create]
+      assert_equal unwarmed.map { { "kind" => "request", "name" => _1, "reason" => "no warm value in base and head" } }, result["not_compared"]
+
+      out, _, status = run.("--top", "4")
+      assert_equal 0, status.exitstatus
+      tables = out.index("## Regressions")
+      assert_operator out.index("**Not compared: 6 of 20 actions** (6 no warm value in base and head), so a change in them " \
+        "is not checked"), :<, tables
+      assert_includes out[tables..], "## Not compared: 6 actions\n\nWarm leaves out each process's first window of an action"
+      assert_includes out, "| request | Settings::EmailsController#show | no warm value in base and head |\n\n2 more in the JSON."
+    end
+  end
+
   def test_compare_needs_complete_comparable_captures
     realpath_tmpdir do |dir|
       assert_equal 2, compare(dir, {}, {})[0]
@@ -164,7 +195,7 @@ class ProfileCompareTest < Minitest::Test
       assert_equal 0, status, "a middle run's spread is noise too: #{result}"
       status, result = compare(dir, report([1.0, 1.0], actions: [{ "name" => "A#b", "warm" => [nil, nil] }]),
         report([1.0, 1.0], actions: [{ "name" => "A#b", "warm" => [100.0, 100.0] }]))
-      assert_equal [0, [{ "kind" => "request", "name" => "A#b", "reason" => "no warm value" }]], [status, result["not_compared"]]
+      assert_equal [0, [{ "kind" => "request", "name" => "A#b", "reason" => "no warm value in base" }]], [status, result["not_compared"]]
 
       # Incomplete reports: a missing collection, a short warm vector, no identity or seed.
       assert_equal 2, compare(dir, report([10.0, 10.0]), report([10.0, 10.0]).except("ranked"))[0], "no ranked lines is not zero"

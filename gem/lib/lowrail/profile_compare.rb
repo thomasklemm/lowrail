@@ -53,8 +53,6 @@ module Lowrail
       end
     end
 
-    attr_reader :not_compared
-
     def initialize(base, head, aa: nil, min: 1.0, top: 20)
       # Not !@aa.nil?: an A/A file that holds null parses to nil and is still a pair, refused.
       @aa_given = !aa.nil?
@@ -224,6 +222,9 @@ module Lowrail
       Array(list).to_h { [_1["name"] || "(no name)", _1["warm"]] }
     end
 
+    # Actions left out, with why: filled as the changes are computed.
+    def not_compared = (changes; @not_compared)
+
     def changes
       @changes ||= valid? ? kinds.flat_map { |kind| line_changes(kind) + action_changes(kind) } : []
     end
@@ -248,7 +249,7 @@ module Lowrail
       (base.keys | head.keys).filter_map do |name|
         b, h, a = base[name], head[name], aa&.[](name)
         reason = if !(b && h) then "ran in #{b ? "base" : "head"} only"
-        elsif !warm.(b) || !warm.(h) then "no warm value"
+        elsif !warm.(b) || !warm.(h) then "no warm value in #{[("base" unless warm.(b)), ("head" unless warm.(h))].compact.join(" and ")}"
         elsif aa && !a then "not run in the A/A report"
         elsif aa && !warm.(a) then "no warm value in the A/A report"
         end
@@ -282,6 +283,12 @@ module Lowrail
       out << "A change counts when it exceeds the noise floor: twice #{noise} and for a line at least #{@min} objects per " \
         "request (warm); for an action at least #{(ACTION_SHARE * 100).round(1)}% of its objects and at least " \
         "#{ACTION_MIN * @min}. Compared: #{kinds.join(", ")}.\n\n"
+      unless not_compared.empty?
+        actions = changes.count { _1.what == "action" } + not_compared.size
+        reasons = not_compared.group_by { _1[:reason] }.map { "#{_2.size} #{_1}" }.join(", ")
+        out << "**Not compared: #{not_compared.size} of #{actions} actions** (#{reasons}), so a change in them is not " \
+          "checked; they are listed at the end.\n\n"
+      end
       out << "**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a " \
         "small one can be missing (README-profile.md, *Compare*).#{" Without an A/A pair the floor is the spread inside one " \
         "capture, which misses how much invocations differ; profile the base twice and pass the second with `--aa`." unless aa?}\n\n"
@@ -298,7 +305,14 @@ module Lowrail
         out << "\n"
       end
       unless not_compared.empty?
-        out << "Not compared: #{not_compared.size} actions (#{not_compared.group_by { _1[:reason] }.map { "#{_2.size} #{_1}" }.join(", ")}).\n"
+        out << "## Not compared: #{not_compared.size} actions\n\n"
+        if not_compared.any? { _1[:reason].start_with?("no warm value") }
+          out << "Warm leaves out each process's first window of an action, so an action that ran once per process has no " \
+            "warm value and nothing to compare.\n\n"
+        end
+        out << "| Kind | Action | Why |\n| --- | --- | --- |\n"
+        not_compared.first(@top).each { out << "| #{_1[:kind]} | #{_1[:name]} | #{_1[:reason]} |\n" }
+        out << "\n#{not_compared.size - @top} more in the JSON.\n" if not_compared.size > @top
       end
       out
     end
@@ -306,7 +320,7 @@ module Lowrail
     def to_h
       row = ->(c) { { kind: c.kind, what: c.what, name: c.name, base: c.base, head: c.head, delta: c.delta, noise_floor: c.threshold(@min) } }
       { status: status, aa: aa?, problems: problems, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
-        improvements: improvements.map(&row), not_compared: (changes; not_compared) }
+        improvements: improvements.map(&row), not_compared: not_compared }
     end
   end
 end

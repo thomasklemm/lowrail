@@ -247,6 +247,37 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  def test_requests_of_controller_tests_are_reported_as_not_counted
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "suite_test.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        require "minitest/autorun"
+        class WidgetsControllerTest < ActionController::TestCase
+          setup { @routes = Rails.application.routes }
+          def test_index = 3.times { get :index; assert_response :success }
+        end
+        unless ENV["ONLY_CONTROLLER_TESTS"]
+          class WidgetsRequestTest < ActiveSupport::TestCase
+            def test_index = assert_equal(200, Rails.application.call(Rack::MockRequest.env_for("http://localhost/widgets"))[0])
+          end
+        end
+      RUBY
+      env = { "MT_NO_PLUGINS" => "1" }
+      out, err, status = profile(dir, "--out", "mixed", "--", RUBY, "suite_test.rb", env: env)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      report = JSON.parse(File.read(File.join(dir, "mixed/report.json")))
+      assert_equal [[1, 3]] * 2, report["summary"].map { [_1["requests"], _1["controller_tests"]] }
+      assert_includes File.read(File.join(dir, "mixed/report.md")), "* Not counted in run 1: 3 requests made by controller " \
+        "tests (`ActionController::TestCase`, rspec-rails controller specs), which call the controller directly"
+
+      out, err, status = profile(dir, "--out", "only", "--", RUBY, "suite_test.rb", env: env.merge("ONLY_CONTROLLER_TESTS" => "1"))
+      refute status.success?, out
+      assert_includes err, "are not counted; run 1 made 3 requests from controller tests)"
+    end
+  end
+
   # The native counter's public snapshot: a line's first window is the one
   # that reached it first, whichever closes first; and windows left open in
   # abandoned fibers are bounded, so most such fibers can be collected.

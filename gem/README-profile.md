@@ -134,8 +134,8 @@ four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154
 a hint, not proof.
 
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
-only, is listed under *Not compared* with the reason, and nothing about its own cost is listed. Lines outside the
-app it reaches are still compared.
+only, is listed under *Not compared* with the reason, and nothing about its own cost is listed; how many and why is
+said above the tables. Lines outside the app it reaches are still compared.
 
 A GitHub Actions job that profiles the pull request's base twice and its head once, in one process, and publishes
 the comparison as the job summary and the reports as an artifact. It never fails on what compare lists:
@@ -183,6 +183,12 @@ test/controllers test/integration`) make it cheaper.
 bundle exec lowrail-profile --record -- bin/rails test     # also write lowrail/workloads.rb
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec lowrail-profile --workloads
 ```
+
+In production the app needs what a deploy prepares: its database, with the records the file names (`Article.first!`),
+and compiled assets (`RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails db:prepare assets:precompile`). A new
+Rails 7.2 app's SQLite `config/database.yml` names no production database, so set
+`database: storage/production.sqlite3` there first; a default Rails 8 app names one. With neither `RAILS_ENV` nor
+`RACK_ENV` set, `--workloads` runs in development on the development database.
 
 `--record [FILE]` writes the suite's 20 most frequent request shapes as `lowrail/workloads.rb` (or
 `tmp/lowrail-profile/workloads.rb` when that file exists): route helpers on each model's first row, values as quoted
@@ -247,8 +253,9 @@ Each is checked by a test in this gem or on the apps below.
   only, a server started in another process, or a warm Spring server: bypass it with `DISABLE_SPRING=1`). Profile
   integration, request or system tests. Controller tests (`ActionController::TestCase`, rspec-rails controller
   specs) call the controller directly, without the app's middleware and routing, and are not counted: a suite of
-  only those counts no requests, and in a mixed suite the report covers its integration tests alone. Rails'
-  generated `test/controllers` tests are integration tests and are counted.
+  only those counts no requests, and in a mixed suite the report covers its integration tests alone. The report and
+  this error say how many requests the controller tests made. Rails' generated `test/controllers` tests are
+  integration tests and are counted.
 * *exists and was not created by lowrail-profile*: pick another `--out`; it never clears a directory it did not make.
 * Overhead: the first run counts (4–9% of suite time on the four apps measured), the second also walks the stack
   per allocation (31–87%, most on allocation-heavy suites such as Campfire's). Measured per app in the evidence.

@@ -67,6 +67,14 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
         end
 
+        # Controller tests bypass Rails::Engine#call, so no window counts them; the report counts them here.
+        module ControllerTest
+          def process(...)
+            Profile.controller_test
+            super
+          end
+        end
+
         # Minitest reads SEED in Minitest.run, before it initializes plugins
         # (register_plugin since 5.24; init_plugins before).
         module Suite
@@ -188,8 +196,17 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             nil
           end
 
+          def controller_test
+            @controller_tests = controller_tests + 1 if main?
+          rescue StandardError
+            nil
+          end
+
+          def controller_tests = @controller_tests || 0
+
           def forked
             reset
+            @controller_tests = 0
             self.shapes = {} if shapes
           rescue StandardError
             nil
@@ -356,10 +373,10 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
 
           def write(dir)
             windows, objects, dropped, rows, actions, attributed = snapshot
-            return if windows.sum == 0
+            return if windows.sum == 0 && controller_tests == 0
             root = (Rails.root.to_s if defined?(Rails) && Rails.respond_to?(:root) && Rails.root)
             lines = [["# lowrail-profile 3", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
-              "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}",
+              "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}", "controller_tests=#{controller_tests}",
               "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{APP_ROOT || Dir.pwd}",
               "ruby=#{RUBY_DESCRIPTION}",
               "rails_env=#{ENV["RAILS_ENV"]}", "rails=#{Lowrail.loaded_constant("Rails::VERSION::STRING")}"].join("\t")]
@@ -430,6 +447,13 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         Lowrail::Profile.install("ActionController::Metal#dispatch") do
           metal = ActionController::Metal
           metal.prepend(Lowrail::Profile::Dispatch) unless metal < Lowrail::Profile::Dispatch
+        end
+      end
+      # Runs as each test class includes ActionController::TestCase::Behavior.
+      ActiveSupport.on_load(:action_controller_test_case) do
+        Lowrail::Profile.install("controller tests") do
+          behavior = ActionController::TestCase::Behavior
+          behavior.prepend(Lowrail::Profile::ControllerTest) unless behavior < Lowrail::Profile::ControllerTest
         end
       end
       ActiveSupport.on_load(:active_job) do
