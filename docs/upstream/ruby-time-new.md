@@ -3,10 +3,12 @@
 2026-11-17. Two findings from the review of rails/rails#59617 (Time#change with zone objects), checked on ruby/ruby
 master c2c5ac6d1b and on 3.3.13, 3.4.12 and 4.0.9. **Both are real on master and on all three releases. They have
 one root cause and one fix.** Neither is reported on bugs.ruby-lang.org. Fix branch:
-[thomasklemm/ruby `thomasklemm/time-new-normalize-mday-2`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-normalize-mday-2)
-(head `a0e8852a14` on master e8167b0ddd, rebased 2026-11-25; the first build `d3e0a31795` on c2c5ac6d1b stays on
-`thomasklemm/time-new-normalize-mday`), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md), state built.
-Thomas approved reporting it on 2026-11-25 as a note on Bug #21301 (text below; he posts it). No PR was opened.
+[thomasklemm/ruby `thomasklemm/time-new-normalize-mday-3`](https://github.com/thomasklemm/ruby/tree/thomasklemm/time-new-normalize-mday-3)
+(head `9d4667a9a6` on master 6478deb7d2, 2026-11-26; earlier heads stay on `-2` (`a0e8852a14`) and on
+`thomasklemm/time-new-normalize-mday` (`d3e0a31795`)), queue item [TN1](../../bench/upstream/pr-queue/items/TN1.md),
+state in-review. 2026-11-25: Thomas posted the repros and our commit as a comment on ruby/ruby#16469
+(issuecomment-7162441987), no reply. 2026-11-26: Thomas approved opening one draft PR with both commits once
+thermos-sol and Astra approve the head and the body (section below). Nothing is posted on #16469.
 
 ## Repros
 
@@ -135,6 +137,74 @@ test_time.rb + test_time_tz.rb through `tool/runruby.rb` with TZInfo 2.0.6 and t
 0 failures under TZ=UTC, Europe/Berlin, Africa/Lagos, Asia/Tokyo, America/New_York and Australia/Sydney;
 spec/ruby/core/time 652 examples, 0 failures. Master with the head's tests: 357 tests, 14 failures, exactly the new
 tests. `git merge-tree` with TN2's `ec3f27cd36` is clean. Not run: btest, the full test-all, hosted CI.
+
+### Rebase onto master 6478deb7d2 and added tests (2026-11-26)
+
+TN2 merged today as 34af03e0d4 (nobu reworded its subject), so time.c moved under TN1. New branch
+`thomasklemm/time-new-normalize-mday-3`, cherry-picked onto master 6478deb7d2: `a71fbcdb55` (Chris Hasiński's commit,
+his authorship kept, `git patch-id --stable` 488d6a13 as #16469's head `f796c85300`) and `baf2e89c32` (ours,
+patch-id cf6c1198 as `a0e8852a14`), Thomas as committer, no trailers, both signed with script/signing-key.
+`git range-diff e8167b0ddd..a0e8852a14 6478deb7d2..baf2e89c32` gives `=` for both: the TN2 change and ours touch
+different lines of `time_init_vtm()` and the cherry-picks merged without conflicts. Then ours was amended to
+`9d4667a9a6` (time.c unchanged, range-diff `!` only in test lines and one commit-message sentence). Our commit also
+applies to #16469's head unchanged (`git merge-tree` clean).
+
+Master hasn't fixed it, checked 2026-11-26: #16469 is open on `f796c85300`, updated 2026-11-25 only by Thomas's
+comment, jeremyevans's approval of 2026-05-08 the only review; of the 125 ruby/ruby PRs updated since 2026-11-25, only
+#16469 and TN2's #20172 touch time.c, test_time*, timev.rb or spec/ruby/core/time; Bug #21301 and #22375 Open with
+nobu's duplicate mark of 2026-09-23 as the last journal, Feature #21307 Assigned and unchanged since 2025-05-09;
+Redmine issues 22630 to 22641 (through today; the list API answers 403) have none about Time.
+
+**Tests looked for (Thomas, 2026-11-26).** Each candidate was run on master and the head
+(`.amp/in/orb-backup/tn/candidates.rb`, expected values from `Time.utc(...) - offset`, TZ=UTC):
+
+* Leap years: Feb 29 and 30 with -05:00 at 23:00 are right on master in 2024, 2026, 2000 and 1900
+  (`vtm_add_day` makes 30/31 and `timegmw` normalizes them); only day 31 goes wrong. Added Feb 31 23:00 -05:00 in
+  2000 and 1900 to `test_month_mday_normalization_with_negative_utc_offset` (2024 and 2026 were there): master gives
+  2000-01-31 and 1900-01-31 04:00 UTC, the head March 3 and March 4. A fix with a wrong leap rule (y % 4 or a missing
+  y % 400) fails one of the two.
+* Positive offset back across the month boundary (Apr 31 02:00 +05:00 → Apr 30 21:00 UTC): right on master and the
+  head, and every placement of the call gives it, so not added.
+* Hour 24 on an overflowing day: already in the tests (Apr 31 24:00 -05:00; Apr 31 24:00 in the zone-object
+  subtest, which fails on master). Not added again.
+* `in:` next to the positional zone: timev.rb passes either one as the same `zone` to `time_init_args`; master
+  fails both the same way. A near-duplicate, not added.
+* No zone near DST: added `test_pacific_auckland` to test_time_tz.rb in its `assert_time_constructor` style,
+  `Time.local` and `Time.new` with 2000-09-31 03:30 → "2000-10-01 03:30:00 +1300". Master gives 04:30 for `:new`.
+* String form: already pinned (`"2026-02-31 23:00:00 -05:00"` and commit 1's `"2025-04-31T00:00:00Z"`); it
+  normalizes like the argument form, and day 32 still raises ArgumentError on both.
+* spec/ruby/core/time/new_spec.rb has no overflowing-day example. Not added: spec/ruby is synced from ruby/spec,
+  a fix there needs a `ruby_bug "#21301", ""..."4.1"` guard whose bound depends on backports nobody has decided,
+  the Sydney case would need a duck zone (ruby/spec loads no gems), and test/ruby already fails on master for every
+  case. Thomas can ask for it in review.
+
+**time_init_vtm checked for cheap improvements:** none. The call runs once per `Time.new`; `validate_vtm()` must
+run before it (the switch relies on mon 1..12 and mday 1..31); `vtm_day_wraparound()` in the zone and UTC branches
+still needs it for hour 24; `time_arg()`'s own call serves `Time.utc`/`Time.local`, which don't reach
+`time_init_vtm()`. Nothing is redundant after the move.
+
+**Results on `9d4667a9a6`** (`ruby 4.1.0dev (2026-11-26T13:46:56Z HEAD 9d4667a9a6)`; master `6478deb7d2`):
+
+* Repros (`.amp/in/orb-backup/tn/repro.sh`, each case in a forked child): master gives 2026-01-30 (-05:00 and
+  -18000, and the string form), 2026-03-30, `"2026-04-31 00:00:00 UTC"`, Sydney `["2026-04-31 02:00:00 +1000", 31,
+  "2026-05-01", 1]`, Auckland 04:30 against `Time.local` 03:30. The head gives 2026-03-03, 2026-05-01, May 1,
+  `["2026-05-01 02:00:00 +1000", 1, "2026-05-01", 1]` and 03:30. 4.0.9 matches master.
+* TN2's cases on the same script: master and the head both give UTC for `to_str` UTC/Z/the string form/a
+  find_timezone returning "UTC", "utc_offset out of range" for +25:00, 09:00 UTC for Plus3, and 2026-05-02 for
+  +00:00 at April 31 24:00 (4.0.9: SIGSEGV, +2500, 17:00, March 31). One line differs: `to_str` "UTC" at
+  2000-04-31 24:00 is `2000-04-01 00:00:00 UTC` on master (TN1's field cache) and `2000-05-02 00:00:00 UTC` on the head.
+* Sweep (`.amp/in/orb-backup/tn/sweep.rb`, rewritten from the record's description because the old orbs are
+  archived; it reproduces the record's numbers exactly on 4.0.9 and master): Integer 1,000, String 1,000, zone object
+  10,075 of 576,600 and "UTC" 325 of 18,600 differ on master; 0 of each on the head.
+* test_time.rb + test_time_tz.rb through `tool/runruby.rb` with TZInfo 2.0.6 and timezone 1.3.32 preloaded
+  (`tn/tz6.sh`): 360 tests, 3176 assertions, 0 failures under UTC, Europe/Berlin, Africa/Lagos, Asia/Tokyo,
+  America/New_York and Australia/Sydney. Master with the head's test files: 360 tests, 15 failures under each,
+  exactly the new tests (`test_utc_month_mday_normalization`, `test_month_mday_normalization_with_negative_utc_offset`,
+  `test_pacific_auckland`, and `test_month_mday_normalization` for DummyTZ, GemTZInfo and GemTimezone in four zones).
+* `make test-all TESTS='ruby/test_time*'` 254 tests, 2490 assertions, 0 failures; `make btest` PASS all 2148;
+  `make test-spec SPECOPTS=spec/ruby/core/time` 652 examples, 7876 expectations, 0 failures.
+
+Not run: the full test-all, hosted CI (the fork has no workflows).
 
 ## Prior reports
 
