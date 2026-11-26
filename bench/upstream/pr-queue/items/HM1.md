@@ -22,6 +22,7 @@ note: "2026-11-26: built on master 37454e149e (6.0.1 dev); fork branch pushed, n
 ownership: {date: 2026-11-26, checked: ["open PRs naming respond_to_missing?, _method_suffix, _log_collision? that change lib/hashie/mash.rb"], hits: []}
 passes:
   - {reviewer: thermos-sol, head: "5a63e912442b8c2713fc09f9e52e3d6aba6d01f8", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: changes, open: "R1 remove the allocation spec; R2 add the changelog before opening and isolate the release fixture; R3 inline the measured benchmark payload; R4 label interpreter allocations; R5 correct the native-hook arity explanation"}
+  - {reviewer: thermos-sol, head: "6358fa25723a332411f067370e1c067488374a28", date: 2026-11-26, orb: T-01a21529-0776-7291-92a5-ebc2bd66d658, verdict: approve, open: none}
 ---
 
 # Write new Mash keys without allocating in respond_to_missing?
@@ -143,3 +144,15 @@ Maintainability: the change keeps behavior in its canonical helpers, removes an 
 * Read CONTRIBUTING, release specs, workflow matrix, changelog and relevant prior commits/PRs; GitHub reads confirmed the exact fork head and upstream master, no open PRs, the two listed open issues, and no PR attached to this head. Nothing was posted, pushed or changed on either Hashie remote. Ruby 3.1–3.4 and JRuby were not rerun by this reviewer.
 
 The three implementation lines can remain unchanged. R1/R2 require a new fork head and a confirming review before approval; R3/R4/R5 are item/body corrections. This review records findings only and does not apply those upstream or proposed-body fixes.
+
+### Thermos-sol confirm — 2026-11-26
+
+**Verdict: approve** on `6358fa25723a332411f067370e1c067488374a28`, comprising `b42067687f1bd7667aa45caae8ec8bf587ddde94` and `6358fa25723a332411f067370e1c067488374a28` on unchanged master `37454e149e4e7b88ae87cd1878f95519553fd33a`. All R1–R5 are closed, with no remaining findings or exact fixes. This confirm supersedes the earlier report's open findings and the note's “Awaiting thermos-sol confirm” status. Applied both rubrics here without delegation, read both commit messages, and checked the revised metadata, note, posted body and For Thomas text on Lowrail main `26ef6be2`.
+
+* R1: the added allocation example and its comment are removed; `spec/hashie/mash_spec.rb` is byte-identical to master.
+* R2: the four-line release-fixture repair is exactly the tested insertion, followed by the unnumbered Changed entry with the placeholder preserved and the spelling word added. The note and For Thomas now give the correct failure count and contribution order. The new body sentence accurately explains the prerequisite commit. Ruby 4.0.9 `CI=true RUBYOPT=--disable-error_highlight bundle exec rake spec`: **1,075 examples, 0 failures**, including all three release examples. `bundle exec rake rubocop`: **both scans (124 and 153 files), no offenses**.
+* R3: parsed the actual posted body's inline JSON and compared it with `hm1_body.rb`'s `PAYLOAD`: identical, with 24 top-level keys, eight owner fields and two four-field license objects; no `repo.json` dependency remains.
+* R4/R5: the body and impact explicitly label the interpreter allocations “without YJIT”; For Thomas distinguishes the conventional hook definition from native Object's two-required-argument method, accurately describes the direct-call differences, and retains the `*args` alternative.
+* `git diff 5a63e91 6358fa2 -- lib` is empty; `lib/hashie/mash.rb` has the same blob `a80d6bf9bb289009259c9ccb98d81ad1fdfbed6e`. The previously audited benchmark evidence therefore still measures this head's library code. Reran `hm1_diff.rb` on the new head under **Ruby 4.0.9 and 3.0.7**: all **9,140 rows per Ruby** are byte-identical to that Ruby's saved old-head output. Ruby 3.0.7 `ruby -Ilib -Ispec -S rspec spec/hashie/mash_spec.rb`: **171 examples, 0 failures**. No new timing/Callgrind or app run, or Ruby 3.3 suite rerun, is claimed for this confirm.
+
+Confirmed the remote fork branch is at the exact reviewed head and upstream master has not moved. Only the Lowrail review record is changed by this pass; no Hashie push, PR or comment is authorized or performed.
