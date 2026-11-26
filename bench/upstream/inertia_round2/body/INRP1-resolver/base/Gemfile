@@ -1,0 +1,2 @@
+source "https://rubygems.org"
+gem "inertia_rails", path: "/home/user/w/inr-main"

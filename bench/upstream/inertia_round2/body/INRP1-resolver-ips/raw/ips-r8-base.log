@@ -1,0 +1,6 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+     dashboard props     3.365k i/100ms
+Calculating -------------------------------------
+     dashboard props     38.093k (±13.4%) i/s   (26.25 μs/i) -    191.805k in   5.035203s
+jit dashboard props	compiled_iseq_count=447>447 compiled_block_count=7229>7229 invalidation_count=167>167
