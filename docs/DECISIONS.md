@@ -103,7 +103,8 @@ lead. States change often; each bet's doc is the source of truth.
   (Thomas, 2026-11-05: in public repos it must not land). In Lowrail the ones already on main stay, and since
   2026-11-14 `script/hooks/pre-push`, which `.agents/setup` installs, refuses to push a commit whose message has an
   `Amp-Thread-ID:` or `Co-authored-by:` trailer. `script/commit -F msgfile` commits the index that way in Lowrail and upstream
-  checkouts and verifies it. `script/install-fork-hooks DIR` gives an upstream checkout a pre-push hook that refuses
+  checkouts and verifies it. Git rewrites drop the signature, so sync with `script/git-signed pull --rebase origin
+  main` before a push; `script/pr-queue rebase` signs on its own. `script/install-fork-hooks DIR` gives an upstream checkout a pre-push hook that refuses
   our commits not yet on a remote with an Amp-Thread-ID or Amp co-author trailer, or another author or committer than
   Thomas (2026-11-25, after two Rails fork commits carried Amp-Thread-ID); run it on every fork clone before its first push.
 

@@ -435,6 +435,17 @@ module PrQueue
     end
   end
 
+  # git options that sign with script/signing-key's SSH key when $GIT_SIGNING_KEY_SEED is set, as script/commit does.
+  def signing
+    return [] if ENV["GIT_SIGNING_KEY_SEED"].to_s.empty?
+    @signing ||= begin
+      key = Tempfile.new("signing-key", ENV.fetch("XDG_RUNTIME_DIR", "/dev/shm")).tap(&:close)
+      at_exit { key.unlink }
+      system(File.join(__dir__, "signing-key"), "private", key.path, exception: true)
+      ["-c", "gpg.format=ssh", "-c", "user.signingkey=#{key.path}"]
+    end
+  end
+
   def git_in(dir)
     lambda do |*args, env: {}, input: nil|
       out, err, st = Open3.capture3(env, GIT, "-C", dir, *args, stdin_data: input.to_s, binmode: true)
@@ -505,7 +516,7 @@ module PrQueue
         name, email, date = header[/^author (.*)$/, 1].match(/\A(.*) <(.*)> (\d+ [+-]\d{4})\z/).captures
         ident = { "GIT_AUTHOR_NAME" => name, "GIT_AUTHOR_EMAIL" => email, "GIT_AUTHOR_DATE" => "@#{date}",
                   "GIT_COMMITTER_NAME" => THOMAS["NAME"], "GIT_COMMITTER_EMAIL" => THOMAS["EMAIL"], "GIT_COMMITTER_DATE" => nil }
-        prev = git.("commit-tree", tree, "-p", prev, env: ident, input: message).strip
+        prev = git.(*signing, "commit-tree", *(signing.empty? ? [] : ["-S"]), tree, "-p", prev, env: ident, input: message).strip
         [commit, prev]
       end
       [mb, pairs]
@@ -529,7 +540,8 @@ module PrQueue
        [old_message == new_message, "message byte-identical"],
        [old_header[/^author .*$/] == new_header[/^author .*$/], "author and author date kept"],
        [committer == "committer #{THOMAS['NAME']} <#{THOMAS['EMAIL']}> ", "committer #{THOMAS['NAME']}"],
-       [git.("log", "-1", "--format=%(trailers:only)", new).strip.empty?, "no trailers"]]
+       [git.("log", "-1", "--format=%(trailers:only)", new).strip.empty?, "no trailers"],
+       [signing.empty? || new_header.include?("\ngpgsig -----BEGIN SSH SIGNATURE"), "signed"]]
         .map { |ok, what| [ok, "#{new[0, 10]} (was #{old[0, 10]}): #{what}"] }
     end
   end

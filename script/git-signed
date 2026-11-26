@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Runs /usr/bin/git with commit.gpgsign and script/signing-key's SSH key when $GIT_SIGNING_KEY_SEED is set, so
+# commits git rewrites stay signed: `script/git-signed pull --rebase origin main` before a push. Plain git otherwise.
+set -euo pipefail
+git=/usr/bin/git
+[ -x "$git" ] || git=git
+[ -n "${GIT_SIGNING_KEY_SEED:-}" ] || exec "$git" "$@"
+key=$(mktemp "${XDG_RUNTIME_DIR:-/dev/shm}/signing-key.XXXXXX")
+trap 'rm -f "$key"' EXIT
+"$(dirname "$0")/signing-key" private "$key"
+"$git" -c gpg.format=ssh -c user.signingkey="$key" -c commit.gpgsign=true "$@"
