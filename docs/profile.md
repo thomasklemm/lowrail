@@ -358,9 +358,9 @@ process). When the command runs it:
 * lowrail-profile exits with the command's status (the first failing run's, or 128 plus the signal that stopped
   it; 124 when a run timed out), also when the report then fails; a passing command whose report cannot be built exits 1.
 
-`gem/test/profile_test.rb` checks the cases above that a test can reach: a Cable subscription's return value and
-exceptions with `--record`, an older counter's API, a frozen `ActionController::Metal`, and `--out` on a directory
-it did not create.
+The gem's tests check the cases above that a test can reach: a Cable subscription's return value and exceptions
+with `--record` (`profile_record_test.rb`), an older counter's API and a frozen `ActionController::Metal`
+(`profile_test.rb`), and `--out` on a directory it did not create (`profile_cli_test.rb`).
 
 ### Release candidate: proof from the built gem (2026-11-25)
 

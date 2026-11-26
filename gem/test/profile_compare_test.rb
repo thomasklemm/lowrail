@@ -3,7 +3,7 @@
 # lowrail-profile compare on report.json files written here: the noise floor
 # and its terms, the A/A pair, what is valid evidence (exit 2 otherwise), and
 # the CI step README-profile.md shows. Captures that compare reads from real
-# runs are in profile_test.rb.
+# runs are in profile_test.rb and profile_record_test.rb.
 #   ruby -Igem/lib -Igem/test gem/test/profile_compare_test.rb
 
 require "test_helper"

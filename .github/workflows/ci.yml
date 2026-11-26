@@ -99,5 +99,5 @@ jobs:
         working-directory: gem
         run: |
           ruby -Ilib -Itest -e 'ARGV.select { _1.end_with?(".rb") }.each { require File.expand_path("test/#{_1}") }; ARGV.reject! { _1.end_with?(".rb") }' -- \
-            profile_test.rb profile_report_test.rb profile_env_test.rb profile_compare_test.rb profile_package_test.rb workloads_test.rb load_hooks_test.rb --verbose --seed=1729 | tee ../profile-tests.log
+            profile_test.rb profile_record_test.rb profile_cli_test.rb profile_report_test.rb profile_env_test.rb profile_compare_test.rb profile_package_test.rb workloads_test.rb load_hooks_test.rb --verbose --seed=1729 | tee ../profile-tests.log
           grep -Eq '^[0-9]+ runs, [0-9]+ assertions, 0 failures, 0 errors, 0 skips$' ../profile-tests.log
