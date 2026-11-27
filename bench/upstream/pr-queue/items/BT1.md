@@ -115,6 +115,28 @@ passes:
       benchmark logs are retained under evidence/backtrace-format/thermos-sol, with results.txt as the index;
       probe scripts stay in this orb backup. Not run: full test-all, JIT builds, sanitizers, other architectures,
       app corpus or hosted Ruby CI. No upstream post or fork push.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: nits
+    open: >-
+      No must-fixes. Exact unpublished commit imported from verified bundle; only parser_support require
+      and Prism-only omit differ from e75b1f0109. Rebuilt head: test_backtrace/test_exception pass with Prism
+      (132 tests, 4633 assertions) and parse.y (132 tests, 4632 assertions, one intended skip); btest passes
+      all 2148 tests. The exact amended regression errors on base with Prism, passes head with Prism, and
+      skips both parse.y builds, which reject NUL filenames before formatting. Behavior-only test and
+      current-parser helper are appropriate. Prior real-frame oracle/GC.stress evidence applies to the
+      unchanged C code. Reviewed parsed body SHA-256 fc207bc11892025edb83ee493e558ebc74919942620c12a2b25314f3f9fcd48c;
+      exact <NUL> example results verified. Thomas's relayed item-specific request for measurements and a
+      qualitative faster statement supersedes the previous numbers-free-body objection. Callgrind summary
+      arithmetic checks out; fresh independent raw-profile A/A supports the instruction reduction, not a
+      precise elapsed-time percentage. Optional nit: delete the final wall-time sentence. Five of seven
+      runs do round to 1.19-1.21x, but the full range is 1.05-1.42x, with A/A 1.00-1.16x; selecting the middle
+      five adds words without reliable precision. New measurement text needs its own confirm. Commit message
+      is acceptable; no simpler equivalent C fix found. Full evidence and limitations: evidence/backtrace-format/astra/review.md
+      (Parser amendment section), with supplemental profiles and suite logs in parser-confirm-raw.tar.gz.
+      No full test-all or hosted CI run by this reviewer, no upstream post or Ruby-fork push.
 ---
 
 # Append backtrace location strings by length

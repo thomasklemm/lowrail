@@ -184,3 +184,89 @@ This approval binds that exact text and head; it does not authorize bypassing th
 No runtime code or example changed in this final revision. The previously verified identical Git tree,
 fresh-build suites, real-frame differential, GC.stress probe and corrected-example execution remain the
 supporting evidence. No rebuild, suite rerun, or new performance measurement was needed for this text-only pass.
+
+## Parser amendment and measurement-body confirm, 2026-11-27
+
+Verdict: **nits**, no must-fix on head `5fc1871eec45270a068d2ecba6654eef979c5f6e` or the proposed
+body parsed from Lowrail `3a0321b4`, SHA-256
+`fc207bc11892025edb83ee493e558ebc74919942620c12a2b25314f3f9fcd48c`.
+The earlier unfinished review of body `6754e885b4` was superseded and is not a queue pass.
+
+Imported the unpublished commit from the coordinator's bundle (SHA-256
+`d27b3bcce0a65a62b80f9b059f174865a29da3228966379ffce216d02a23c09c`) and verified its parent is
+`274cfe719ad275bcd66bd8c7201ff871e217c9a2`. Compared with `e75b1f0109`, the only changes are the
+test's `parser_support` require and Prism-only omit. The C code and benchmark are byte-identical;
+the previous independent real-frame oracle, GC.stress and simplicity findings still apply.
+
+Rebuilt this exact head with `make -j2`, then ran:
+
+```sh
+make test-all RUN_OPTS='--parser=prism' TESTS='ruby/test_backtrace.rb ruby/test_exception.rb'
+make test-all RUN_OPTS='--parser=parse.y' TESTS='ruby/test_backtrace.rb ruby/test_exception.rb'
+make btest
+```
+
+Prism: 132 tests, 4,633 assertions, no failures/errors/skips. parse.y: 132 tests, 4,632 assertions,
+no failures/errors and the one intended skip. btest: `PASS all 2148 tests`, with the same fiber-count skip
+as base. Also ran the exact amended regression test alone with both base and head, using each parser;
+the base runner received the absolute path to the head test file:
+
+| Build | Prism | parse.y |
+| --- | --- | --- |
+| Base | 1 test, 2 assertions, 1 error: `ArgumentError: string contains null byte` | 1 test, 2 assertions, 1 skip |
+| Head | 1 test, 3 assertions, no failure/error/skip | 1 test, 2 assertions, 1 skip |
+
+The omit checks the current parser via the repository's existing helper, not the build default. Direct
+eval probes on both builds confirmed that parse.y rejects the filename before formatting, whereas Prism
+accepts it. The old unguarded test fails under parse.y at eval even with the C fix. Skipping that parser
+therefore reflects the boundary of this fixture rather than hiding an unfixed formatter regression. The
+test remains behavior-only. There are no new code comments. The commit message remains accurate and short;
+its eval statement describes the reachable Prism case, now made explicit in the body. No simpler equally
+scoped C fix emerged.
+
+Ran the exact revised `<NUL>` example again: installed 4.0.9 prints `"a:1:in '<main>'"`; base exits 1
+from `Exception#backtrace` with `ArgumentError`; head prints `"a<NUL>b.rb:1:in '<main>'"`. The example's
+Prism qualification is correct. `RubyVM::InstructionSequence.compile` rejects a NUL filename under both
+parsers and is not an alternative fixture. The observed old GitHub body contains `\^@`; this review does
+not endorse the queue note's attribution of that transformation to GitHub, since no request-byte evidence
+was available. That attribution is not in the proposed upstream body.
+
+The coordinator relayed Thomas's later explicit instruction to retain the Callgrind figures and say this
+is faster, treating BT1 as both a performance regression and a correctness fix. This supersedes the
+numbers-free-body objection for this item; it does not turn instruction counts into elapsed time. The
+qualitative throughput direction is supported by the independently executed benchmark recorded above.
+
+Audited all twelve per-call entries in `callgrind-body-line.txt`: they round to the proposed values and
+their largest paired drift is 0.024158%. They are per-call summaries, not the underlying Callgrind profiles.
+An additional independent fixed-heap, two-repeat N=100/300 run retained those profiles and confirms the
+direction (Ir per call, `(Ir300 - Ir100) / 200`):
+
+| Operation/build | Repeat A | Repeat B |
+| --- | ---: | ---: |
+| caller/base | 1,076,785.545 | 1,076,854.130 |
+| caller/head | 845,038.470 | 845,068.460 |
+| caller/4.0.9 | 880,931.645 | 880,896.715 |
+| backtrace/base | 1,089,416.190 | 1,089,415.505 |
+| backtrace/head | 856,281.385 | 856,338.100 |
+| backtrace/4.0.9 | 892,473.590 | 892,483.420 |
+
+Largest paired drift: 0.006624%. These runs used the earlier, identical formatter binary, not the rebuilt
+test-only amendment. Different script paths and executable/build choices affect the absolute figures;
+they confirm the instruction reduction, not an exact independent reproduction of the author's absolute
+counts. The installed release remains historical context, not an identically configured release build.
+
+**Optional body nit:** drop the final wall-time sentence, retaining the qualitative faster statement and
+the requested Callgrind line. The quoted five-of-seven range is true after rounding, and the explicit A/A
+caveat makes it a rough sign rather than a precise speed claim. But the full seven-run range is
+1.045133–1.416468, not 1.19–1.21; the ten A/A pairs range 1.000170–1.162954. Selecting the middle five is
+less informative than giving the whole spread, and the sentence pushes the body to 201 words. Deleting
+it is smaller and clearer than expanding it. The benchmark itself correctly measures already-captured
+locations' `to_s`, not caller stack capture or an app request. Any replacement based on new measurements
+needs its own text/evidence confirm; this pass does not approve an unseen replacement.
+
+Supplemental raw profiles, command script, arithmetic audit, exact-head build/suite/btest logs and example
+outputs are retained in `parser-confirm-raw.tar.gz`. Earlier `raw.tar.gz` retains the full oracle, search,
+base suites and original build evidence. No full test-all, new JIT/sanitizer builds, or hosted CI was run by
+this reviewer for this confirm; the coordinator's pending full-suite work is separate. No upstream post,
+body PATCH or Ruby-fork push was performed. The queue's top-level head remains coordinator-owned until
+publication; this pass names the exact unpublished commit rather than rewriting older passes.
