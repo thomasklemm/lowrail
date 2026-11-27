@@ -66,6 +66,13 @@ Found from the perf matrix: react-starter-kit `GET home` (+9% interp Ir, A/A 0.3
 * **Ownership.** Nothing on Redmine or in ruby/ruby PRs about backtrace speed or NUL paths since 2026-07; open #17978 (Bug #22197) touches labels, not `location_format`.
 * **Fix.** Append both strings by length with `ruby__sfvextra`'s encoding choice (`vm_backtrace.c` +20/-2, a test, `benchmark/vm_backtrace_to_s.yml`): `make benchmark` 1.18x over master, back to 4.0.9; react-starter-kit `GET home` -2.0% in-app (A/A 0.3%); a 2,728-case encoding probe is byte-identical to master; NUL paths now print in full. Queue item [BT1](../../bench/upstream/pr-queue/items/BT1.md), branch `thomasklemm/backtrace-format-length` on the fork, not opened; thermos-sol and Astra reviews running.
 
+## Action Pack and Action View after Bug #22419
+
+Bug #22419 (the Ractor `[BUG]` that crashed and hung both suites on master) is fixed on master by `7fe831a84b`. Rails
+main `2e299253f9` on master `f3e180b5eb` (two runs) against 4.0.9: actionpack's 4,549 tests match and all pass;
+actionview's 3,413 tests match except R3, the known Feature #22226 class-ownership failure (rails/rails#58736). No new
+regression. Details: [ruby-master-rails](ruby-master-rails.md#rerun-after-bug-22419-2026-11-27).
+
 ## Performance
 
 Per-workload Callgrind instructions (`script/cpu-census run --aa`, fixed heap, A/A pair per Ruby, JIT-flat gate for YJIT and ZJIT in `cpu_harness.rb`).

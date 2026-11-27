@@ -73,7 +73,7 @@ All are already reported upstream; none is new in this round.
 | # | Test | Failure | Class | Cause | Upstream |
 | --- | --- | --- | --- | --- | --- |
 | R1 | activesupport `NotificationSubscriptionTest#test_record_and_set_subscriptions_when_using_a_regexp` | `Ractor::Error: can not copy ActiveSupport::Notifications::Fanout::Registry object` | (b) Ruby bug | `Ractor.make_shareable(copy: true)` rejects the graph since per-Ractor GC (GH-18194) | Bug #22267, open |
-| R2 | actionpack `ControllerInstanceTests#test_action_methods_is_ractor_safe_by_default`; actionview `ObjectRenderingRactorTest`, `DigestorRactorTest`, `LookupContextRactorTest` | `[BUG] rb_objspace_reachable_objects_from_local: set is owned by another Ractor`. The actionpack task then waits forever for the dead worker. | (b) Ruby bug | `f0439cdfa7` | Bug #22419, open; fix ruby/ruby#19283, open. The hang: rails/rails#59037, open |
+| R2 | actionpack `ControllerInstanceTests#test_action_methods_is_ractor_safe_by_default`; actionview `ObjectRenderingRactorTest`, `DigestorRactorTest`, `LookupContextRactorTest` | `[BUG] rb_objspace_reachable_objects_from_local: set is owned by another Ractor`. The actionpack task then waits forever for the dead worker. | (b) Ruby bug | `f0439cdfa7` | Bug #22419, closed 2026-11-11 by `7fe831a84b` (ruby/ruby#19283 closed unmerged); gone on master, see [rerun](#rerun-after-bug-22419-2026-11-27). The hang: rails/rails#59037, open |
 | R3 | actionview `FileSystemResolverRactorTest#test_non-strict_templates_compile_inside_a_non-main_Ractor` | `Ractor::IsolationError: can not modify FileSystemResolverRactorTest::FakeView because it is created by another Ractor` | (a) deliberate Ruby change | Feature #22226: only the Ractor that created a class may modify it. A non-main Ractor compiles a template method into a view class the main Ractor created. | rails/rails#58736 (issue by yahonda), open, no PR |
 | R4 | activemodel `NamingUsingRelativeModelNameTest#test_accessible_from_a_ractor` | `Ractor::RemoteError`: the test stubs `I18n` inside a Ractor | (a) deliberate Ruby change | Same rule; `I18n::Config` also fails in a non-main Ractor | rails/rails#58974 (I18n in non-main Ractors), open |
 
@@ -82,6 +82,23 @@ View Ractor tests pass, `test_action_methods_is_ractor_safe_by_default` and `Obj
 with the `[BUG]` every time (6 of 6), `FileSystemResolverRactorTest` fails as in R3, and
 `DateHelperRactorTest#test_select_datetime_renders_inside_a_non-main_Ractor` crashed once and then passed 12 of 12
 reruns. With every Ractor test excluded, actionpack and actionview are identical on both Rubies.
+
+### Rerun after Bug #22419 (2026-11-27)
+
+Bug #22419 was fixed on master by `7fe831a84b` ("Only the owner Ractor makes its objects shareable"), so actionpack
+and actionview ran again in full, Ractor tests included: Rails main `2e299253f9`, Ruby master `f3e180b5eb` (two runs)
+against Ruby 4.0.9 `3e93b23afc` (one run), seed 4242, the committed lockfile with `BUNDLE_FROZEN=true`.
+
+* **actionpack:** 4,549 tests, identical outcomes on both Rubies, all pass; no `[BUG]` and no hang.
+* **actionview:** 3,413 tests (template 2,984, Action Pack integration 252, Active Record integration 177). The
+  only difference is R3, in both master runs; it stops `rake test` after the template task, so on master the two
+  integration tasks ran on their own and match 4.0.9.
+* Every R2 test passes on master, `ObjectRenderingRactorTest` and `test_action_methods_is_ractor_safe_by_default`
+  included: 57 of the 58 Action Pack and Action View Ractor tests pass, and the 58th is R3.
+* Warnings are the same on both Rubies.
+
+Nothing new to report; R3 still waits on rails/rails#58736 (open). Logs and scripts:
+[actionpack-actionview-2026-11-27](../../bench/upstream/ruby-differential/evidence/actionpack-actionview-2026-11-27).
 
 ### Why no Rails branch
 
