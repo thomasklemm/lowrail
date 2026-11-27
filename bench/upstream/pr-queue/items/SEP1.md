@@ -167,6 +167,36 @@ passes:
       and astra-reply-976c193a76.tar.gz beside it. Approval covers this reply,
       not the dropped restoration/Redmine plans or permission to post.
       SEP1 remains held. Nothing posted upstream.
+  - reviewer: thermos-sol
+    orb: T-01a21d5a-243c-7558-b622-6f5801179598
+    head: "d9c0210def7db1b07d47b930715aca622c0e892d"
+    date: 2026-11-27
+    verdict: approve
+    must_fix: []
+    open: >-
+      Both Thermos rubrics self-performed sequentially, no other reviewers
+      spawned. Reviewed the complete reply and exact ping-removal/Ruby-4.1
+      edit, not the held restore or dropped Redmine report. Own source build
+      of current master 80343e1cf5 reproduces the quoted autoswitch and
+      NameError twice using a genuine 4.0.11-written lock; the checked-in
+      gemspec repro also reproduces it. Same-lock Ruby 4.0.10 succeeds;
+      master with a genuine 4.0.12 lock and BUNDLE_VERSION=system controls
+      succeed. Released beta3, 4.1.0 and 4.1.1 each actually autoswitch to
+      4.0.11 on the same 4.0.10 host. Settings line 91 and installed/tag
+      self-manager sources checked. Read hsbt's June merge proposal and
+      responses: phases 4+ remain open, late-4.x deprecation and 5.x cutoff
+      directions, no Ruby 4.1 deadline. No implemented default-disable or
+      explicit 4.1 commitment found in inspected source/changelogs/search;
+      not proof no other plan exists. Existing final question is still a
+      neutral timing clarification; no further wording change required,
+      no ping or renewed restore request. Sentence/commit-message/currency
+      audit and applicable exactness checklist in
+      bench/upstream/gem-differential/evidence/separator-pat/thermos-sol-reply-d9c0210def.md;
+      raw commands, build/repro logs and public source/search snapshots in
+      thermos-sol-reply-d9c0210def.tar.gz beside it. System-version control
+      updates this checksum-bearing lock, unlike the earlier checksum-free
+      fixture; the reply makes no lock-preservation claim. Item remains held.
+      No runtime change or upstream action taken.
 ---
 
 # Keep Pathname::SEPARATOR_PAT as a deprecated constant
