@@ -22,7 +22,7 @@ USAGE = <<~TEXT
     --seed N          SEED and --seed for every run (default 1234)
     --ledger FILE     a newer ledger index (contributions-index.json) than the bundled one
     --no-ledger       no ledger column
-    --timeout SECONDS stop a run that takes longer (TERM, KILL 10 s later) and exit 124
+    --timeout SECONDS stop a run and what it started that takes longer (TERM, KILL 10 s later) and exit 124
     --keep-runs       keep each run's raw counts (run1/, run2/) for lowrail-profile report
     --record [FILE]   also write the suite's requests as lowrail/workloads.rb (experimental)
     --workloads [FILE] send the file's requests through the app (experimental); they are real
@@ -214,21 +214,54 @@ statuses = []
     unless waiter.join(timeout)
       timed_out << n
       $stderr.puts "lowrail-profile: run #{n} took longer than --timeout #{timeout}s; stopping it"
-      stop.("TERM")
+      # Processes it started in a group of their own (selenium-webdriver's driver and browser) are not in the
+      # group: they are found by parent now, before an exiting parent leaves them orphans.
+      table = lambda do
+        list = IO.popen(%w[ps -A -o pid= -o ppid= -o pgid= -o stat=], err: File::NULL, &:read)
+        $?.success? ? list.each_line.map { |l| p, pp, g, s = l.split; [p.to_i, pp.to_i, g.to_i, s.to_s] } : nil
+      rescue SystemCallError
+        nil
+      end
+      # A descendant that leads a group of its own: the group is followed, so what joins it later (a driver's
+      # child started during cleanup, orphaned when the driver exits) is stopped too. A descendant in another
+      # group it does not lead is followed alone, so an unrelated group is never signalled.
+      groups, others = [], []
+      track = lambda do
+        rows = table.() or next nil
+        children = rows.group_by { _2 }
+        seen = {}
+        # Members of a followed group are walked too: one orphaned when its group's leader exits is still there.
+        queue = [pid, *others, *groups, *rows.filter_map { |p, _, g, _| p if g == pid || groups.include?(g) }]
+        while (parent = queue.shift)
+          Array(children[parent]).each do |p, _, g, _|
+            next if seen[p]
+            seen[p] = true
+            queue << p
+            next if g == pid || groups.include?(g)
+            g == p ? groups << g : (others << p unless others.include?(p))
+          end
+        end
+        rows
+      end
+      track.()
+      stop_all = lambda do |signal|
+        stop.(signal)
+        groups.each { |g| Process.kill(signal, -g) rescue nil }
+        others.each { |p| Process.kill(signal, p) rescue nil }
+      end
+      stop_all.("TERM")
       # The whole group gets 10 s, then KILL, also when the leader exited on TERM at once:
       # a worker that ignores TERM outlives it.
       grace = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
       # A zombie is not waited for: an orphan whose new parent never reaps it (a container's PID 1 without init).
       running = lambda do
-        list = IO.popen(%w[ps -A -o pgid= -o stat=], err: File::NULL, &:read)
         # A ps that fails lists no one; the group may still be cleaning up.
-        next (Process.kill(0, -pid) rescue false) unless $?.success?
-        list.each_line.any? { |l| g, s = l.split; g.to_i == pid && !s.to_s.start_with?("Z") }
-      rescue SystemCallError
-        Process.kill(0, -pid) rescue false
+        next (Process.kill(0, -pid) rescue false) unless (rows = track.())
+        rows.any? { |p, _, g, s| (g == pid || groups.include?(g) || others.include?(p)) && !s.start_with?("Z") }
       end
-      sleep 0.1 while running.() && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
-      stop.("KILL")
+      # ps reads /proc one process at a time: a child forked while its parent exits can be missing from one listing.
+      sleep 0.1 while (running.() || running.()) && Process.clock_gettime(Process::CLOCK_MONOTONIC) < grace
+      stop_all.("KILL")
       waiter.join
     end
     traps.each { |signal, handler| trap(signal, handler) }

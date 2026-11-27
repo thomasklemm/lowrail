@@ -48,6 +48,8 @@ module Lowrail
     # 4: objects allocated inside Socket.tcp left out of actions and lines, counted apart (network).
     FORMAT = 4
     KIND_TITLES = { "job" => "Jobs", "mail" => "Mails", "cable" => "Action Cable" }.freeze
+    # The name lowrail/profile gives a request ActionDispatch::Static answers before routing.
+    STATIC = "ActionDispatch::FileHandler#serve"
 
     # App middleware that hands the request on is the nearest app frame of
     # the whole stack below it, so it is listed apart, not ranked.
@@ -325,9 +327,18 @@ module Lowrail
     end
 
     def summary
-      @runs.map do |run|
+      @summary ||= @runs.each_with_index.map do |run, i|
+        # fetch: the actions hash adds a key it is asked for.
+        static = run[:actions].fetch(["request", STATIC], [0])[0]
+        # On the actions' basis (objects ObjectSpace sees, Socket.tcp's left out), as the Actions table counts.
+        others = run[:actions].select { |(kind, name), _| kind == "request" && name != STATIC }.values
+        dynamic, dynamic_objects = others.sum { _1[0] }, others.sum { _1[1] }
         { run: run[:name], processes: run[:processes], requests: run[:requests],
           objects_per_request: run[:requests] > 0 ? run[:objects].fdiv(run[:requests]) : 0.0, dropped: run[:dropped],
+          # Each line's first request per process left out, as the noise floor and the warm columns count.
+          warm_per_request: sites.sum { _1.warm[i] }.round(2),
+          static_requests: static,
+          objects_per_dynamic_request: dynamic > 0 ? dynamic_objects.fdiv(dynamic).round(2) : nil,
           controller_tests: run[:controller_tests],
           windows: KINDS.to_h { [_1, run[:windows][_1]] },
           # Windows that finished (were merged into an action); fewer than
@@ -337,9 +348,11 @@ module Lowrail
       end
     end
 
+    # Dev/test-only work is one group of its own, as its own table lists it.
     def groups
       totals = Hash.new { |h, k| h[k] = { warm: 0.0, all: 0.0, sites: [] } }
       sites.each do |site|
+        site = site.dup.tap { _1.group = "dev/test-mode work" } if mode_only(site)
         totals[site.group][:warm] += mean(site.warm)
         totals[site.group][:all] += mean(site.all)
         totals[site.group][:sites] << site
@@ -393,14 +406,21 @@ module Lowrail
     # with their share; "no app frame" when none was on the stack.
     def top_callers(site)
       @callers ||= {}
+      @caller_paths ||= {}
       counts = (@callers[site.kind] ||= Hash.new { |h, k| h[k] = Hash.new(0) }.tap do |acc|
-        each_attribution(site.kind) do |_, key, line, _, app, app_line, _, _, count|
-          acc[[key, line]][app ? label(app, app_line) : "no app frame"] += count
+        each_attribution(site.kind) do |_, key, line, _, app, app_line, _, caller_path, count|
+          caller = app ? label(app, app_line) : "no app frame"
+          @caller_paths[caller] ||= [caller_path, app_line] if app
+          acc[[key, line]][caller] += count
         end
       end)[[site.key, site.line]]
       return [] if counts.nil? || counts.empty?
       total = counts.values.sum.to_f
-      counts.sort_by { -_2 }.first(2).map { |caller, n| { caller: caller, share: (n / total).round(2) } }
+      counts.sort_by { -_2 }.first(2).map do |caller, n|
+        path, line = @caller_paths[caller]
+        entry = { caller: caller, share: (n / total).round(2) }
+        path && source_at(path, line)[0].to_s.match?(PASSES_ON) ? entry.merge(middleware: true) : entry
+      end
     end
 
     # Your code: per app line, the objects that Rails, Ruby and gems allocate
@@ -490,7 +510,11 @@ module Lowrail
 
     def cell(text) = "`#{text.to_s[0, 70].gsub("|", "\\|")}`"
 
-    def callers_cell(callers) = callers.map { "`#{_1[:caller].delete_prefix("APP/")}` #{(_1[:share] * 100).round}%" }.join(", ")
+    # App middleware that hands the request on is the nearest app line of work done after the request's own code
+    # returned or raised (an error page, a logger): not the line that caused it.
+    def callers_cell(callers)
+      callers.map { "`#{_1[:caller].delete_prefix("APP/")}`#{" (middleware)" if _1[:middleware]} #{(_1[:share] * 100).round}%" }.join(", ")
+    end
 
     def table(rows)
       out = +"| # | Line | Method | Warm/req | Δ | All/req | Reach | Types | Ledger | From the app | Source |\n" \
@@ -546,6 +570,12 @@ module Lowrail
       out << "* Rails: #{rails || "?"}, #{@runs.first[:rails_env] || "?"} environment\n"
       out << "* Counted in run 1: #{counted.join(", ")}#{" in #{first[:processes]} processes" if first[:processes] > 1}; " \
         "#{@runs.size} run#{"s" if @runs.size != 1}\n"
+      if first[:static_requests] > 0
+        out << "* Static files: #{first[:static_requests]} of run 1's requests were files `ActionDispatch::Static` served " \
+          "before routing (`#{STATIC}` under Actions); the other requests' objects per request, counted as the Actions table " \
+          "counts them, by run: " \
+          "#{summary.map { _1[:objects_per_dynamic_request] || "–" }.join(" / ")}\n"
+      end
       if first[:controller_tests] > 0
         out << "* Not counted in run 1: #{first[:controller_tests]} request#{"s" if first[:controller_tests] != 1} made by " \
           "controller tests (`ActionController::TestCase`, rspec-rails controller specs), which call the controller directly, " \
@@ -568,13 +598,17 @@ module Lowrail
           missing[:files].map { "`#{_1[:path]}`" }.join(", ") << "\n"
       end
       out << "\n"
-      out << "| Run | Processes | Requests | Objects per request | Jobs | Mails | Cable actions | Dropped |\n" \
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n"
+      out << "| Run | Processes | Requests | Objects per request, all | Warm | Jobs | Mails | Cable actions | Dropped |\n" \
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n"
       summary.each do |s|
         w = s[:windows]
-        out << "| #{s[:run]} | #{s[:processes]} | #{s[:requests]} | #{s[:objects_per_request].round(1)} | #{w["job"]} | " \
+        out << "| #{s[:run]} | #{s[:processes]} | #{s[:requests]} | #{s[:objects_per_request].round(1)} | " \
+          "#{s[:warm_per_request].round(1)} | #{w["job"]} | " \
           "#{w["mail"]} | #{w["cable"]} | #{s[:dropped]} |\n"
       end
+      out << "\nAll: every object the requests allocated, with the one-time work of each process's first requests, objects " \
+        "Ruby keeps internal and those allocated inside `Socket.tcp`. Warm: the objects the lines below count, each line's " \
+        "first request per process left out, as the noise floor counts; this is the number to compare.\n"
       summary.each do |s|
         open = KINDS.to_h { [_1, s[:windows][_1] - s[:completed][_1]] }.select { _2 > 0 }
         out << "\n#{s[:run]} left windows unfinished (#{open.map { "#{_2} #{_1}" }.join(", ")}), which no line or action " \
@@ -613,9 +647,11 @@ module Lowrail
       out << "\n## Top lines outside the app\n\n" \
         "Warm: objects per request by run, without each line's first request per process (one-time work). " \
         "All: including it, mean of the runs. Reach: share of requests in which the line allocated (last run). " \
-        "† charged from Ruby's `<internal:…>` code to this caller. Ledger: upstream pull requests that reduce " \
+        "† charged from Ruby's `<internal:…>` code to this caller. A line `:0` has no line number: allocated while Ruby " \
+        "loaded or compiled the file, or by code evaluated without one. Ledger: upstream pull requests that reduce " \
         "allocations and change this line, and whether the app's locked version has them. From the app: the nearest app line on the stack (repeat " \
-        "run). Dev/test-only work is listed separately below.\n\n"
+        "run); (middleware) marks app middleware that hands the request on, the nearest app line of work done after the " \
+        "request's code returned or raised, such as an error page. Dev/test-only work is listed separately below.\n\n"
       out << table(rows)
       unless (extra = mode_rows).empty?
         out << "\n## Dev/test-mode work\n\n#{mode_total.round(1)} of #{total.round(1)} warm objects per request outside " \
@@ -627,10 +663,17 @@ module Lowrail
             "#{(r[:reach].last * 100).round}% | #{callers_cell(r[:callers])} | #{cell(r[:text])} |\n"
         end
       end
-      out << "\n## By gem\n\n| Group | Warm/req | All/req | Top lines (warm) |\n| --- | ---: | ---: | --- |\n"
-      groups.each do |group, data|
-        top = data[:sites].sort_by { -mean(_1.warm) }.first(3).map { "`#{File.basename(_1.key)}:#{_1.line}` #{mean(_1.warm).round(1)}" }
+      shown, one_time = groups.partition { |_, data| data[:warm].round(1) > 0 }
+      out << "\n## By gem\n\nWarm and all objects per request by group; dev/test-mode work (the table above) is its own " \
+        "group.\n\n| Group | Warm/req | All/req | Top lines (warm) |\n| --- | ---: | ---: | --- |\n"
+      shown.each do |group, data|
+        top = data[:sites].select { mean(_1.warm).round(1) > 0 }.sort_by { -mean(_1.warm) }.first(3)
+          .map { "`#{File.basename(_1.key)}:#{_1.line}` #{mean(_1.warm).round(1)}" }
         out << "| #{group} | #{data[:warm].round(1)} | #{data[:all].round(1)} | #{top.join(", ")} |\n"
+      end
+      unless one_time.empty?
+        out << "\n#{one_time.size} group#{"s" if one_time.size != 1} with no warm objects (0.0 per request), only one-time " \
+          "work in each process's first requests: #{one_time.map { "#{_1} #{_2[:all].round(1)}" }.join(", ")} all objects per request.\n"
       end
       out << outside_requests
       out

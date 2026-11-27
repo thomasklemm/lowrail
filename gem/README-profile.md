@@ -25,6 +25,15 @@ relative to `gem/`, so build it there:
 cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.0.rc1.gem
 ```
 
+Or let Bundler take it from GitHub:
+
+```ruby
+gem "lowrail-profile", github: "thomasklemm/lowrail", glob: "gem/lowrail-profile.gemspec", group: [:development, :test], require: false
+```
+
+That checks out the whole Lowrail repository for each revision, about 530 MB of files (700 MB on disk in one
+install, under Bundler's `bundler/gems`), plus about 250 MB of git cache, against 90 KB for the built gem.
+
 `require: false` matters: nothing of the gem loads in your app unless you run the command below. The first run
 compiles a small C extension (the counter) into `~/.cache/lowrail/profile/`, outside your app; it needs a C compiler
 and Ruby's headers, which `bundle install` of a Rails app already needs. A compile failure stops the profiler with
@@ -61,13 +70,18 @@ Options, all before `--`:
 | `--ledger FILE` | bundled | A newer ledger index (`contributions-index.json`). |
 | `--no-ledger` | | No ledger column. |
 | `--keep-runs` | | Keep each run's raw counts (`run1/`, `run2/`), which `report` rebuilds from. Without it they are deleted once the report is written: compare needs only `report.json`, and on a large parallel suite the counts reach gigabytes. |
-| `--timeout SECONDS` | none | Stop a run that takes longer: `TERM` to the command's process group, `KILL` 10 s later. `TERM` then `KILL` go to every process the run started, also when the first one exits on `TERM`. No further run starts, lowrail-profile exits 124 (also after an earlier failed run), the report says which run timed out, and compare treats the capture as a failed suite (exit 2). With it the command runs in its own process group, and lowrail-profile passes `INT`, `TERM`, `HUP` and `QUIT` on to it; a debugger that reads the terminal (`binding.irb`) stops there, so leave `--timeout` off to debug. |
+| `--timeout SECONDS` | none | Stop a run that takes longer: `TERM` to the command's process group, `KILL` 10 s later. `TERM` then `KILL` go to every process the run started, also when the first one exits on `TERM`, and to the processes it started in a group of their own (as selenium-webdriver starts its driver and browser); lowrail-profile exits once they are gone, at most about 10 s after the deadline. No further run starts, lowrail-profile exits 124 (also after an earlier failed run), the report says which run timed out, and compare treats the capture as a failed suite (exit 2). With it the command runs in its own process group, and lowrail-profile passes `INT`, `TERM`, `HUP` and `QUIT` on to it; a debugger that reads the terminal (`binding.irb`) stops there, so leave `--timeout` off to debug. |
 | `--help`, `--version` | | |
 
 ## Reading the report
 
 The header says what was counted: command, Ruby, Rails and environment, how many requests, jobs, mails and Cable
-actions, and the ledger's date. Then:
+actions, and the ledger's date. Its table gives objects per request by run twice: *all* counts every request with the
+one-time work of each process's first requests, *warm* leaves each line's first request per process out, as the
+noise floor and the tables below do; compare the warm number. A file `ActionDispatch::Static` serves (`public/`,
+precompiled assets) answers before routing: it is a request named `ActionDispatch::FileHandler#serve`, and the
+header says how many there were and the objects per request without them. Assets a mounted Rack app serves (Sprockets
+in development and test) have no action name. Then:
 
 * **Your code.** Per app line, the objects Rails, Ruby and gems allocate below it per request: the nearest app
   line on the stack of every allocation (the second run walks the stack to find it). *Own* is what the line itself
@@ -80,7 +94,12 @@ actions, and the ledger's date. Then:
   objects from Ruby's `<internal:…>` code charged to the line that called it.
 * **Dev/test-mode work.** Debug logging, error pages, template compilation, route building, asset lookup and reload
   checks, apart, so a suite profile is not read as production cost.
-* **By gem**, and **Outside requests**: jobs (`perform_now`), mails (build and delivery) and Cable actions, counted
+* **By gem**: warm and all objects per request by group, with dev/test-mode work as a group of its own; groups
+  with no warm objects are named in one line below it. A line `:0` has no line number: allocated while Ruby loaded or
+  compiled the file, or by code evaluated without one. In *From the app*, *(middleware)* marks app middleware that
+  hands the request on: it is the nearest app line of work done after the request's code returned or raised (an
+  error page), not the line that raised, which is no longer on the stack.
+* **Outside requests**: jobs (`perform_now`), mails (build and delivery) and Cable actions, counted
   the same way. A job or mail inside a request counts as part of that request.
 
 Line keys are `RAILS/<component>/path:line`, `GEM/<name>/path:line`, `RUBY/path:line` and `APP/path:line`.
@@ -99,7 +118,8 @@ traffic**: it requests what tests need, with a test user agent, in test mode. `-
 `compare BASE.json HEAD.json --aa BASE2.json` lists the lines and actions that grew or shrank beyond their noise
 floor and exits **0** whatever it lists: in 0.1 it is a report, not a CI gate (below). It exits **2** when the reports
 are not valid evidence: a failing suite, one run, a different command, seed, Ruby or environment, dropped samples,
-unfinished windows, a capture of more than one process, or a report of another version. `BASE2` is a second profile
+unfinished windows, a capture of more than one process, a report of another version, or the base passed as its own
+A/A report; an A/A report with exactly the base's counts (a copy?) is compared with a warning. `BASE2` is a second profile
 of the unchanged base: the A/A pair sets the floor per row (twice the larger of a row's spread across both base
 profiles and head's own spread; for a line at least `--min`, default 1 object per request, for an action at least
 0.1% of its objects and 20 × `--min`). Without `--aa` the floor is the spread inside one capture, which misses how
@@ -128,10 +148,12 @@ needs 1 object per request averaged over all requests of its kind, so a change i
 that action's share of the requests. Not found: the same `html_escape` plant in Hackatime's
 `LeaderboardsController#index` (+40–60 on about 7,900, twice that action's own noise: listed in half the
 comparisons), and with workers Writebook's plant in an action that runs once per worker process. An action that runs
-once per process has no warm value and is not compared. Captures taken at different times can differ by up to
-about 1% per action on the same code (Forem, half an hour apart with nothing changed: compare listed five actions,
-four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154, +0.8%), so a small listed change is
-a hint, not proof.
+once per process has no warm value and is not compared. Captures taken at different times differ on the same code
+whenever the app's work depends on the clock or the date: on Forem, half an hour apart, compare listed five actions,
+four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154 (+0.8%); in a field test two captures
+three hours apart, compared without `--aa`, listed an index action at +3.1% from app code that allocates by the date
+and time. So a small listed change is a hint, not proof: profile the base twice, right before head, pass the second
+with `--aa`, and freeze time in the tests that depend on it (`travel_to`).
 
 **Network connects are left out.** What `Socket.tcp` allocates while it connects follows timing, not code: it races
 its connection attempts on threads and timers. On Hackatime ViteRuby probes its dev server at most once a second,

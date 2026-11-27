@@ -129,7 +129,8 @@ class ProfileCliTest < Minitest::Test
 
   # --timeout stops a run that hangs (Fizzy's autoload deadlock): TERM to its
   # process group, then KILL, so a process that ignores TERM goes too, also
-  # when the first one exits on TERM; no further run; exit 124, also after an
+  # when the first one exits on TERM, and one it started in a group of its own
+  # (as selenium-webdriver starts its driver); no further run; exit 124, also after an
   # earlier failed run, recorded in capture.json and said at the top of the
   # report. INT, HUP and QUIT from the terminal reach the command, and a run in
   # time passes as without it. Each call has a deadline: a group that is never
@@ -147,19 +148,31 @@ class ProfileCliTest < Minitest::Test
         end
         [File.read(out), File.read(err), waiter.value]
       end
-      grandchild = 'File.write("gc-#{ENV["CASE"]}.pid", spawn(RbConfig.ruby, "-e", "trap(%q(TERM)) {}; sleep 120", out: File::NULL, err: File::NULL).to_s)'
+      grandchild = 'File.write("gc-#{ENV["CASE"]}.pid", spawn(RbConfig.ruby, "-e", "trap(%q(TERM)) {}; sleep 120", out: File::NULL, err: File::NULL, pgroup: ENV.key?(%q(GROUP)) || nil).to_s)'
       dead = lambda do |name|
         state = `ps -o stat= -p #{File.read(File.join(dir, "gc-#{name}.pid"))}`.strip
         state.empty? || state.start_with?("Z")
       end
-      { "leader-ignores" => ['trap("TERM") {}', 11..30], "leader-exits" => ["", 11..30] }.each do |name, (leader, took_range)|
+      # A driver in a group of its own that starts the child into its group on TERM, then exits: the child is an orphan.
+      driver = 'spawn(RbConfig.ruby, "-e", %q(trap(:TERM) { File.write("gc-late-child.pid", spawn(RbConfig.ruby, "-e", "trap(:TERM) {}; sleep 120").to_s); exit }; sleep), pgroup: true)'
+      # The same, but the orphaned child starts a group of its own half a second later: only its parent links it to the run.
+      File.write(File.join(dir, "nested.rb"), <<~'RUBY')
+        trap(:TERM) {}
+        sleep 0.5
+        File.write("gc-nested-group.pid", spawn(RbConfig.ruby, "-e", "trap(:TERM) {}; sleep 120", pgroup: true).to_s)
+        sleep 120
+      RUBY
+      nested = 'spawn(RbConfig.ruby, "-e", %q(trap(:TERM) { spawn(RbConfig.ruby, "nested.rb"); exit }; sleep), pgroup: true)'
+      { "leader-ignores" => ['trap("TERM") {}', grandchild], "leader-exits" => ["", grandchild], "own-group" => ["", grandchild],
+        "late-child" => ["", driver], "nested-group" => ["", nested] }.each do |name, (leader, child)|
         started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-        _, err, status = bounded.("--timeout", "1", "--out", name, "--", RUBY, "-e", "#{leader}; #{grandchild}; sleep", env: { "CASE" => name })
+        env = { "CASE" => name }.merge(name == "own-group" ? { "GROUP" => "1" } : {})
+        _, err, status = bounded.("--timeout", "1", "--out", name, "--", RUBY, "-e", "#{leader}; #{child}; sleep", env: env)
         took = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
         assert_equal 124, status.exitstatus, "#{name}: #{err}"
         assert_match(/run 1 took longer than --timeout 1.0s; stopping it/, err)
         refute_match(/run 2 of 2/, err)
-        assert_includes took_range, took.floor, name
+        assert_includes 11..30, took.floor, name
         assert_equal [[124], [1]], JSON.parse(File.read(File.join(dir, name, "capture.json"))).values_at("exit", "timed_out")
         sleep 0.2
         assert dead.(name), "#{name}: a process that ignores TERM still runs"

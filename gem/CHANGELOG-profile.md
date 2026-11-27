@@ -27,6 +27,24 @@
 * README: reset the test database before every capture (the CI job now runs `db:test:prepare` before base2 too).
   CASA's `ChecklistItemsController#new` read 3,511 warm objects per request with record IDs from 9,000 and 3,494
   from 100,000, so captures that continue each other's IDs differ.
+* A file `ActionDispatch::Static` serves before routing is a request named `ActionDispatch::FileHandler#serve`, not
+  one with no action name, and the header says how many there were and the objects per request without them. In a
+  field test most of a system-test slice's requests were the browser fetching such files. report.json has
+  `static_requests` and `objects_per_dynamic_request` per run.
+* The header's table gives objects per request warm too (each line's first request per process left out, as the
+  noise floor counts), next to all, which includes one-time work (`warm_per_request` in report.json).
+* By gem counts dev/test-mode work as a group of its own, as its own table lists it, instead of in each gem (an error
+  page's `Prism.parse_file` per frame ranked Ruby's standard library and prism high); groups at 0.0 warm objects
+  are named in one line instead of listed as rows, top lines at 0.0 are left out, and the report says what a `:0`
+  line is. *From the app* marks
+  app middleware that only hands the request on (*(middleware)*): it is the nearest app line of an error page, not
+  the line that raised.
+* compare refuses the base passed as its own A/A report (exit 2) and warns when the A/A report has exactly the
+  base's counts.
+* `--timeout` also stops the processes a run started in a group of their own (selenium-webdriver's driver and
+  browser), which outlived exit 124 before.
+* README: installing from GitHub (`github:` with `glob:`), and its size; captures taken at different times differ
+  more than 1% when the app's work depends on the clock, so profile the base twice and pass `--aa`.
 * Tests: `QUIT` reaches the command under `--timeout`, a signal that comes before the command is started reaches it
   once it runs, and `profile_test.rb` is split into `profile_test.rb`, `profile_record_test.rb` and
   `profile_cli_test.rb`.

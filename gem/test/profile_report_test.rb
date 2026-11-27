@@ -79,4 +79,43 @@ class ProfileReportTest < Minitest::Test
       end
     end
   end
+
+  # Found in a field test of a system-test slice: most counted requests were
+  # files ActionDispatch::Static served before routing, with no action name.
+  # They get the file handler's name; the header says how many and the
+  # objects per request without them, next to the warm number the noise floor
+  # counts. By gem keeps dev/test-mode work (an error page parsing every frame
+  # with Prism) in a group of its own and names groups with no warm objects in
+  # one line; From the app marks middleware that only hands the request on.
+  def test_report_header_and_by_gem
+    realpath_tmpdir do |dir|
+      root = File.join(dir, "app")
+      FileUtils.mkdir_p(File.join(root, "app/middleware"))
+      File.write(File.join(root, "app/middleware/wrap.rb"), "class Wrap\n  def call(env) = @app.call(env)\nend\n")
+      write_runs(dir, lambda do |run, pid|
+        rows = ["# lowrail-profile 4\trequests=4\tobjects=130\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=#{root}\tapp_root=#{root}",
+          "P\t0\t/gems/foo-1.0/lib/foo.rb", "P\t1\t/gems/prism-1.0/lib/prism.rb", "P\t2\t/gems/bar-1.0/lib/bar.rb",
+          "P\t3\t#{root}/app/middleware/wrap.rb",
+          "0\t3\tString\t40\t4\t10\t0\trequest", "1\t5\tString\t20\t4\t5\t0\trequest", "2\t0\tString\t4\t1\t4\t0\trequest",
+          "A\trequest\tC#a\t2\t80\t40\t7", "A\trequest\tActionDispatch::FileHandler#serve\t2\t20\t10\t0"]
+        rows << "@\trequest\tC#a\t1\t5\t3\t2\t20\t5" if run == "run2"
+        rows
+      end)
+      report = Lowrail::ProfileReport.new(dir)
+      md = report.markdown
+      assert_includes md, "Static files: 4 of run 1's requests were files `ActionDispatch::Static` served before routing"
+      # Objects the actions do not count (internal, inside Socket.tcp) stay out of it.
+      assert_includes md, "counted as the Actions table counts them, by run: 40.0 / 40.0"
+      assert_equal [4, 4], report.summary.map { _1[:static_requests] }
+      # Warm per request: (40 - 10 + 20 - 5 + 4 - 4) per process over 4 requests.
+      assert_includes md, "| Run | Processes | Requests | Objects per request, all | Warm |"
+      assert_includes md, "| run1 | 2 | 8 | 32.5 | 11.3 |"
+      by_gem = md[/## By gem.*?(?=\n## |\z)/m]
+      assert_includes by_gem, "| dev/test-mode work | 3.8 |"
+      refute_match(/gem: prism/, by_gem)
+      assert_includes by_gem, "1 group with no warm objects (0.0 per request), only one-time work in each process's first requests: gem: bar 1.0 all objects per request"
+      refute_match(/\| 0\.0 \|/, by_gem)
+      assert_includes md, "`app/middleware/wrap.rb:2` (middleware) 100%"
+    end
+  end
 end

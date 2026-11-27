@@ -41,6 +41,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
         PERFORM_ACTION = "perform_action"
         SUBSCRIBED = "subscribed"
         DELIVER = "deliver_mail"
+        SERVE = "serve"
         ACTION = "action"
         NOTED = "lowrail.profile.noted"
         FILTERED = "[FILTERED]"
@@ -162,6 +163,15 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
         end
 
+        # A file ActionDispatch::Static serves answers before routing, so no
+        # controller names its request: it is named after the file handler.
+        module Static
+          private def serve(...)
+            Profile.named(self.class, HASH, SERVE)
+            super
+          end
+        end
+
         # A forked worker (parallel tests, a preforking server) starts from
         # zero, so the parent's requests are not counted twice.
         module Fork
@@ -187,17 +197,22 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           # Each returns quietly when the profiler cannot do its part.
           def open(kind)
             return false unless main?
-            connects unless @connects
+            hooks unless @connects && @static
             enter(kind)
           rescue StandardError
             false
           end
 
-          # Hooked once the app has loaded socket, before a window opens.
-          def connects
-            socket = Lowrail.loaded_constant("Socket") or return
-            @connects = true
-            install("Socket.tcp") { socket.singleton_class.prepend(Connect) unless socket.singleton_class < Connect }
+          # Hooked once the app has loaded them, before a window opens.
+          def hooks
+            @connects ||= hook("Socket") { _1.singleton_class.prepend(Connect) unless _1.singleton_class < Connect }
+            @static ||= hook("ActionDispatch::FileHandler") { _1.prepend(Static) unless _1 < Static }
+          end
+
+          def hook(name)
+            target = Lowrail.loaded_constant(name) or return false
+            install(name) { yield target }
+            true
           end
 
           def close(open, env = nil)

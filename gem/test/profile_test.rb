@@ -133,7 +133,8 @@ class ProfileTest < Minitest::Test
       head["ranked"].find { _1["site"] == "GEM/probe/lib/probe.rb:5" }["warm"].map! { _1 + 50 }
       head["actions"].find { _1["name"] == "WidgetsController#index" }["warm"].map! { _1 + 101 }
       File.write(File.join(dir, "head.json"), JSON.generate(head))
-      out, _, status = compare.("profile/report.json", "head.json", "--aa", "profile/report.json")
+      FileUtils.cp(File.join(dir, "profile/report.json"), File.join(dir, "aa.json"))
+      out, _, status = compare.("profile/report.json", "head.json", "--aa", "aa.json")
       assert_equal 0, status.exitstatus
       assert_equal [["action", "WidgetsController#index"], ["line", "GEM/probe/lib/probe.rb:5"]],
         JSON.parse(out)["regressions"].map { [_1["what"], _1["name"]] }.sort
@@ -219,6 +220,40 @@ class ProfileTest < Minitest::Test
       md = File.read(File.join(dir, "profile/report.md"))
       requests = report["summary"].map { _1["network"]["request"] }
       assert_includes md, "inside `Socket.tcp`, by run #{requests.join(" / ")} in requests, #{jobs.join(" / ")} in jobs"
+    end
+  end
+
+  # A file ActionDispatch::Static serves answers before routing, so no
+  # controller names it: in a field test most of a system-test slice's
+  # requests were assets, under "(no action name)". They are named after the
+  # file handler and counted in the header.
+  def test_static_files_are_named_and_counted_apart
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir, "public/robots.txt" => "User-agent: *\n", "requests.rb" => <<~'RUBY')
+        require_relative "config/environment"
+        require "rack/mock"
+        %w[/robots.txt /robots.txt /robots.txt /robots.txt /widgets /widgets].each do |path|
+          status, = Rails.application.call(Rack::MockRequest.env_for("http://localhost#{path}"))
+          raise "HTTP #{status} for #{path}" unless status == 200
+        end
+      RUBY
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test")
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "profile", "--no-ledger",
+        "--", RUBY, "requests.rb", chdir: dir)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      report = JSON.parse(File.read(File.join(dir, "profile/report.json")))
+      names = report["actions"].to_h { [_1["name"], _1["windows"]] }
+      assert_equal({ "ActionDispatch::FileHandler#serve" => [4, 4], "WidgetsController#index" => [2, 2] }, names)
+      assert_equal [4, 4], report["summary"].map { _1["static_requests"] }
+      assert_includes File.read(File.join(dir, "profile/report.md")), "Static files: 4 of run 1's requests"
+
+      # Only static files, with no app line on the stack of any allocation.
+      File.write(File.join(dir, "static.rb"), File.read(File.join(dir, "requests.rb")).sub(" /widgets /widgets]", "]"))
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "static", "--no-ledger",
+        "--", RUBY, "static.rb", chdir: dir)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      assert_equal [nil, nil], JSON.parse(File.read(File.join(dir, "static/report.json")))["summary"].map { _1["objects_per_dynamic_request"] }
     end
   end
 

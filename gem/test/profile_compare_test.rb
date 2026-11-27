@@ -206,6 +206,22 @@ class ProfileCompareTest < Minitest::Test
     end
   end
 
+  # `--aa BASE.json` passes the base as its own A/A pair, which measures no
+  # difference between captures: refused. A file with exactly the base's
+  # counts may be a copy: compared, with a warning.
+  def test_compare_refuses_the_base_as_its_own_a_a_report
+    realpath_tmpdir do |dir|
+      _, result = compare(dir, report([10.0, 10.0]), report([10.0, 10.0]))
+      assert_equal 0, result["status"]
+      assert_match(/exactly the base's counts/, result["warnings"].join)
+      out, _, status = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", "--aa", "base.json", "--json", chdir: dir)
+      assert_equal 2, status.exitstatus
+      assert_match(/A\/A report is the base report itself/, JSON.parse(out)["problems"].join)
+      _, result = compare(dir, report([10.0, 10.0]), report([10.0, 10.0]), aa: report([10.0, 10.5]))
+      assert_empty result["warnings"]
+    end
+  end
+
   def test_compare_needs_complete_comparable_captures
     realpath_tmpdir do |dir|
       assert_equal 2, compare(dir, {}, {})[0]

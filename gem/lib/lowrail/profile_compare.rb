@@ -57,6 +57,7 @@ module Lowrail
       # Not !@aa.nil?: an A/A file that holds null parses to nil and is still a pair, refused.
       @aa_given = !aa.nil?
       @base, @head, @aa = [base, head, aa].map { |file| file && (JSON.parse(File.read(file)) rescue false) }
+      @aa_is_base = aa && (File.identical?(aa, base) rescue false)
       @min = min
       @top = top
       @not_compared = []
@@ -66,6 +67,7 @@ module Lowrail
     def problems
       @problems ||= begin
         list = reports.flat_map { |label, report| report_problems(label, report) }
+        list << "the A/A report is the base report itself: profile the unchanged base a second time and pass that" if @aa_is_base
         if list.empty?
           reports.except("base").each do |label, other|
             %w[identity seed runs ruby rails_env].each do |key|
@@ -193,6 +195,9 @@ module Lowrail
 
     def valid? = problems.empty?
 
+    # A second capture with the very same counts may be a copy of the base, which measures no spread.
+    def warnings = aa? && !@aa_is_base && valid? && @aa == @base ? ["the A/A report has exactly the base's counts: if it is a copy of the base, it measures no difference between captures"] : []
+
     # Only an A/A pair measures how much invocations differ.
     def aa? = @aa_given
 
@@ -303,6 +308,7 @@ module Lowrail
         out << "Not compared: objects allocated inside `Socket.tcp`, which every action and line leaves out (it races its " \
           "connection attempts on threads and timers, so how many follows timing); by run: #{connects.join("; ")}.\n\n"
       end
+      warnings.each { out << "**Warning:** #{_1}.\n\n" }
       out << "**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a " \
         "small one can be missing (README-profile.md, *Compare*).#{" Without an A/A pair the floor is the spread inside one " \
         "capture, which misses how much invocations differ; profile the base twice and pass the second with `--aa`." unless aa?}\n\n"
@@ -333,7 +339,7 @@ module Lowrail
 
     def to_h
       row = ->(c) { { kind: c.kind, what: c.what, name: c.name, base: c.base, head: c.head, delta: c.delta, noise_floor: c.threshold(@min) } }
-      { status: status, aa: aa?, problems: problems, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
+      { status: status, aa: aa?, problems: problems, warnings: warnings, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
         improvements: improvements.map(&row), not_compared: not_compared,
         network: valid? ? { base: network(@base), head: network(@head) } : nil }
     end
