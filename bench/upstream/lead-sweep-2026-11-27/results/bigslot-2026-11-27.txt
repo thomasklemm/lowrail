@@ -1,0 +1,4 @@
+4.0.10: 2 major {nofree: 2}; 640 B heap: 9 pages
+4.0.10: 2 major {nofree: 2}; 640 B heap: 9 pages
+4.1.0: 7 major {nofree: 7}; 640 B heap: 17 pages
+4.1.0: 6 major {nofree: 6}; 640 B heap: 33 pages

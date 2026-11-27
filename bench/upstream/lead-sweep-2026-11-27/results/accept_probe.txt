@@ -1,0 +1,58 @@
+# accept_probe.rb on rails main 2e299253f9; each mode twice (A/A); taskset -c 6
+-- 4.0.10 interp run 1
+firefox  objects 38.0  -> text/html application/xml */*
+chrome   objects 81.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 38.0  -> text/html application/xml */*
+turbo    objects 26.0  -> text/vnd.turbo-stream.html text/html
+firefox     12476 ns
+chrome      26526 ns
+safari      12429 ns
+turbo        8784 ns
+-- 4.0.10 yjit run 1
+firefox  objects 38.0  -> text/html application/xml */*
+chrome   objects 81.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 38.0  -> text/html application/xml */*
+turbo    objects 26.0  -> text/vnd.turbo-stream.html text/html
+firefox      9624 ns
+chrome      20673 ns
+safari       9145 ns
+turbo        6968 ns
+-- master zjit run 1
+firefox  objects 37.0  -> text/html application/xml */*
+chrome   objects 80.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 37.0  -> text/html application/xml */*
+turbo    objects 25.0  -> text/vnd.turbo-stream.html text/html
+firefox      8856 ns
+chrome      19613 ns
+safari       8678 ns
+turbo        6764 ns
+-- 4.0.10 interp run 2
+firefox  objects 38.0  -> text/html application/xml */*
+chrome   objects 81.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 38.0  -> text/html application/xml */*
+turbo    objects 26.0  -> text/vnd.turbo-stream.html text/html
+firefox     12065 ns
+chrome      26253 ns
+safari      12065 ns
+turbo        8696 ns
+-- 4.0.10 yjit run 2
+firefox  objects 38.0  -> text/html application/xml */*
+chrome   objects 81.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 38.0  -> text/html application/xml */*
+turbo    objects 26.0  -> text/vnd.turbo-stream.html text/html
+firefox      9536 ns
+chrome      21384 ns
+safari       9728 ns
+turbo        6832 ns
+-- master zjit run 2
+firefox  objects 37.0  -> text/html application/xml */*
+chrome   objects 80.0  -> text/html image/avif image/webp image/apng application/xml */* application/signed-exchange
+safari   objects 37.0  -> text/html application/xml */*
+turbo    objects 25.0  -> text/vnd.turbo-stream.html text/html
+firefox      8663 ns
+chrome      19602 ns
+safari       8758 ns
+turbo        6222 ns
+# strict_accept_header in Rails main's 8.2 defaults:
+368-        when "8.2"
+378:            action_dispatch.strict_accept_header = true

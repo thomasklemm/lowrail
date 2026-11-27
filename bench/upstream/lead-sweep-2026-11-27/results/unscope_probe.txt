@@ -1,0 +1,30 @@
+# unscope_probe.rb, Ruby 4.0.10 interpreter; main = rails 2e299253f9, l8 = main + early return (lead8.diff)
+== w-main
+author.posts.to_a              objects 149.0  calls/op 1.0
+author.published_posts.to_a    objects 218.0  calls/op 3.0
+author.comments.to_a           objects 202.0  calls/op 1.0
+Post.where.merge(published)    objects 104.0  calls/op 1.0
+yjit author.posts.to_a              objects 151.0  calls/op 0.0
+yjit author.published_posts.to_a    objects 222.0  calls/op 0.0
+yjit author.comments.to_a           objects 204.0  calls/op 0.0
+yjit Post.where.merge(published)    objects 107.0  calls/op 0.0
+== w-l8
+author.posts.to_a              objects 148.0  calls/op 1.0
+author.published_posts.to_a    objects 215.0  calls/op 3.0
+author.comments.to_a           objects 201.0  calls/op 1.0
+Post.where.merge(published)    objects 103.0  calls/op 1.0
+yjit author.posts.to_a              objects 150.0  calls/op 0.0
+yjit author.published_posts.to_a    objects 219.0  calls/op 0.0
+yjit author.comments.to_a           objects 203.0  calls/op 0.0
+yjit Post.where.merge(published)    objects 106.0  calls/op 0.0
+# ZJIT, Ruby master 0d399335b7
+== w-main
+author.posts.to_a              objects 145.0  calls/op 0.0
+author.published_posts.to_a    objects 216.7  calls/op 0.0
+author.comments.to_a           objects 198.0  calls/op 0.0
+Post.where.merge(published)    objects 104.4  calls/op 0.0
+== w-l8
+author.posts.to_a              objects 144.0  calls/op 0.0
+author.published_posts.to_a    objects 213.7  calls/op 0.0
+author.comments.to_a           objects 197.0  calls/op 0.0
+Post.where.merge(published)    objects 103.4  calls/op 0.0

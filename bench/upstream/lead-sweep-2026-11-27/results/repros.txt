@@ -1,0 +1,79 @@
+== bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+~/workspace/repo/bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb:4:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit
+~/workspace/repo/bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb:4:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+-- ~/rubies/master/bin/ruby
+~/workspace/repo/bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb:4:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+-- ~/rubies/master/bin/ruby --zjit --zjit-call-threshold=1
+~/workspace/repo/bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb:4:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+-- ~/rubies/master/bin/ruby --zjit --zjit-stats-quiet
+~/workspace/repo/bench/upstream/lead-sweep-2026-11-27/repros/shareable_kwsplat.rb:4:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+== bench/upstream/lead-sweep-2026-11-27/repros/svar_refined_lambda.rb
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+nil
+nil
+nil
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit
+nil
+nil
+nil
+-- ~/rubies/master/bin/ruby
+nil
+nil
+nil
+-- ~/rubies/master/bin/ruby --zjit --zjit-call-threshold=1
+nil
+nil
+nil
+-- ~/rubies/master/bin/ruby --zjit --zjit-stats-quiet
+nil
+nil
+nil
+== bench/upstream/zne1/leads/kernel_eq_refinement.rb
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+NoMethodError: undefined method '==' for an instance of A
+NoMethodError: undefined method '==' for nil
+false
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit
+NoMethodError: undefined method '==' for an instance of A
+NoMethodError: undefined method '==' for nil
+false
+-- ~/rubies/master/bin/ruby
+NoMethodError: undefined method '==' for an instance of A
+true
+false
+-- ~/rubies/master/bin/ruby --zjit --zjit-call-threshold=1
+true
+true
+false
+-- ~/rubies/master/bin/ruby --zjit --zjit-stats-quiet
+true
+true
+false
+== bench/upstream/ruby-differential/repros/zsuper_kw_fwd.rb
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+ok
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit
+ok
+-- ~/rubies/master/bin/ruby
+ok
+-- ~/rubies/master/bin/ruby --zjit --zjit-call-threshold=1
+ok
+-- ~/rubies/master/bin/ruby --zjit --zjit-stats-quiet
+ok
+== fixtures/corpus/zjit-leads/lead3_repro.rb
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+
+  p s.slice(:num_send_dynamic, :send_megamorphic).transform_values { _1 / 100_000.0 }
+     ^^^^^^
+-- ~/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit
+{}
+-- ~/rubies/master/bin/ruby
+
+  p s.slice(:num_send_dynamic, :send_megamorphic).transform_values { _1 / 100_000.0 }
+     ^^^^^^
+-- ~/rubies/master/bin/ruby --zjit --zjit-call-threshold=1
+{}
+-- ~/rubies/master/bin/ruby --zjit --zjit-stats-quiet
+{dynamic_send_count: 0.5, send_fallback_send_polymorphic_fallback: 0.5}

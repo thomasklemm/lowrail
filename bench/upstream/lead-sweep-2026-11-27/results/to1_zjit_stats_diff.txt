@@ -1,0 +1,20 @@
+# ZJIT stats, 20,000 f.text_field calls after 20,000 warm-up, master 0d399335b7: main 2e299253f9 vs TO1; counters that differ
+ccall_rb_class_allocate_instance 4194 3808
+ccall_rb_ec_ary_new_from_values 7461 7117
+ccall_rb_hash_new 1813 1789
+ccall_rb_str_buf_append 400000 420000
+iseq_calls_count_append_tag_option@actionview/lib/action_view/helpers/tag_helper.rb:1640 80000 0
+iseq_calls_count_append_tag_option@actionview/lib/action_view/helpers/tag_helper.rb:1647 0 80000
+iseq_calls_count_append_tag_options@actionview/lib/action_view/helpers/tag_helper.rb:1551 0 20000
+iseq_calls_count_ensure_valid_html5_tag_name@actionview/lib/action_view/helpers/tag_helper.rb:1875 20000 0
+iseq_calls_count_ensure_valid_html5_tag_name@actionview/lib/action_view/helpers/tag_helper.rb:1885 0 20000
+iseq_calls_count_tag@actionview/lib/action_view/helpers/tag_helper.rb:1758 20000 0
+iseq_calls_count_tag@actionview/lib/action_view/helpers/tag_helper.rb:1765 0 20000
+iseq_calls_count_tag_builder@actionview/lib/action_view/helpers/tag_helper.rb:1900 20000 0
+iseq_calls_count_tag_builder@actionview/lib/action_view/helpers/tag_helper.rb:1910 0 20000
+iseq_calls_count_tag_options@actionview/lib/action_view/helpers/tag_helper.rb:1543 20000 0
+jit_frame_count 12682 12672
+load_field_count 4759971 4739971
+vm_write_jit_frame_count 3987432 4007088
+vm_write_sp_count 3987432 4007088
+zjit_insn_count 29799913 29619913

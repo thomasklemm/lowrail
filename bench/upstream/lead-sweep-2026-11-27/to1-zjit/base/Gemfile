@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/src/w-main/activesupport"
+gem "activemodel", path: "/home/user/src/w-main/activemodel"
+gem "activerecord", path: "/home/user/src/w-main/activerecord"
+gem "actionview", path: "/home/user/src/w-main/actionview"
+gem "actionpack", path: "/home/user/src/w-main/actionpack"
+gem "sqlite3"

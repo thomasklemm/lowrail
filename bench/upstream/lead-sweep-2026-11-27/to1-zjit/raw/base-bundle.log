@@ -1,0 +1,26 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Your bundle downgrades the following default gems shipped with ruby 4.1.0.dev:
+  * stringio 3.2.0 (default: 3.2.1.dev)
+Fetching stringio 3.2.0
+Fetching uri 1.1.2
+Fetching psych 5.5.0
+Fetching json 3.2.0
+Fetching prism 1.9.0
+Fetching date 3.6.0
+Fetching ractor-dispatch 0.3.0
+Fetching securerandom 0.4.1
+Fetching herb 0.11.2
+Fetching timeout 0.6.1
+Installing uri 1.1.2
+Installing stringio 3.2.0 with native extensions
+Installing ractor-dispatch 0.3.0
+Installing timeout 0.6.1
+Installing securerandom 0.4.1
+Installing herb 0.11.2 with native extensions
+Installing date 3.6.0 with native extensions
+Installing json 3.2.0 with native extensions
+Installing prism 1.9.0 with native extensions
+Installing psych 5.5.0 with native extensions
+Bundle complete! 6 Gemfile dependencies, 37 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

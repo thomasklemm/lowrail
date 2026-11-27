@@ -1,0 +1,25 @@
+# a2_probe.rb on rails main 2e299253f9; each mode twice (A/A); taskset -c 6
+-- 4.0.10 interp run 1
+Relation#alias_tracker        2341 ns
+author.comments.to_a        338311 ns
+alias_tracker objects 2.001
+-- 4.0.10 yjit run 1
+Relation#alias_tracker         650 ns
+author.comments.to_a        125654 ns
+alias_tracker objects 2.001
+-- master zjit run 1
+Relation#alias_tracker         827 ns
+author.comments.to_a        108084 ns
+alias_tracker objects 2.001
+-- 4.0.10 interp run 2
+Relation#alias_tracker        2392 ns
+author.comments.to_a        356260 ns
+alias_tracker objects 2.001
+-- 4.0.10 yjit run 2
+Relation#alias_tracker         793 ns
+author.comments.to_a        130595 ns
+alias_tracker objects 2.001
+-- master zjit run 2
+Relation#alias_tracker         805 ns
+author.comments.to_a        109599 ns
+alias_tracker objects 2.001

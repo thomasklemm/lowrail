@@ -1,0 +1,15 @@
+diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
+index 71b866b05d..3fe07b48ec 100644
+--- a/activerecord/lib/active_record/relation/query_methods.rb
++++ b/activerecord/lib/active_record/relation/query_methods.rb
+@@ -1068,7 +1068,9 @@ def _unscope!(args) # :nodoc:
+     end
+ 
+     def table_name_qualified_unscope_values
+-      self.unscope_values.map do |scope|
++      return unscope_values if unscope_values.empty?
++
++      unscope_values.map do |scope|
+         case scope
+         when Hash
+           scope.transform_values do |target_value|

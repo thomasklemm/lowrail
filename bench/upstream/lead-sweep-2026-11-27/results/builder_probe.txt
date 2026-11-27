@@ -1,0 +1,50 @@
+# builder_probe.rb on rails main 2e299253f9; each mode run twice (A/A); taskset -c 6
+attributes_builder reads per 10-row load: 11
+-- 4.0.10 interp run 1
+
+Comparison:
+     attributes_builder:  7256769.1 i/s
+Post.all.to_a (10 rows):     9065.9 i/s - 800.45x  slower
+
+attributes_builder                137.8 ns
+Post.all.to_a (10 rows)        110303.4 ns
+-- 4.0.10 yjit run 1
+
+Comparison:
+     attributes_builder: 23574184.2 i/s
+Post.all.to_a (10 rows):    26398.0 i/s - 893.03x  slower
+
+attributes_builder                 42.4 ns
+Post.all.to_a (10 rows)         37881.7 ns
+-- master 0d399335b7 zjit run 1
+
+Comparison:
+     attributes_builder: 23176925.9 i/s
+Post.all.to_a (10 rows):    29937.8 i/s - 774.17x  slower
+
+attributes_builder                 43.1 ns
+Post.all.to_a (10 rows)         33402.6 ns
+-- 4.0.10 interp run 2
+
+Comparison:
+     attributes_builder:  8066082.2 i/s
+Post.all.to_a (10 rows):     9096.4 i/s - 886.73x  slower
+
+attributes_builder                124.0 ns
+Post.all.to_a (10 rows)        109933.2 ns
+-- 4.0.10 yjit run 2
+
+Comparison:
+     attributes_builder: 22815154.5 i/s
+Post.all.to_a (10 rows):    26960.2 i/s - 846.25x  slower
+
+attributes_builder                 43.8 ns
+Post.all.to_a (10 rows)         37091.7 ns
+-- master 0d399335b7 zjit run 2
+
+Comparison:
+     attributes_builder: 24552700.9 i/s
+Post.all.to_a (10 rows):    28402.7 i/s - 864.45x  slower
+
+attributes_builder                 40.7 ns
+Post.all.to_a (10 rows)         35207.9 ns

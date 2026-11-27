@@ -1,0 +1,1410 @@
+{
+ "Shopify/ruby#746": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Attribute stats to ISEQs",
+  "updated": "2026-11-03T10:19:26Z"
+ },
+ "Shopify/ruby#776": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: send_without_block_polymorphic happens too frequently",
+  "updated": "2026-11-14T19:16:26Z"
+ },
+ "Shopify/ruby#803": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Split InvokeBlock into GetBlockHandler/GuardBitEquals/SendWithoutBlock",
+  "updated": "2026-01-29T19:02:18Z"
+ },
+ "Shopify/ruby#808": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Make specialized code paths for length/size methods",
+  "updated": "2026-09-18T16:10:43Z"
+ },
+ "Shopify/ruby#862": {
+  "closed": "2026-01-27T19:53:25Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: Compile invokesuperforward",
+  "updated": "2026-01-27T21:07:19Z"
+ },
+ "Shopify/ruby#914": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Don't immediately re-compile JIT-JIT calls on PatchPoint invalidation",
+  "updated": "2026-08-21T14:28:20Z"
+ },
+ "Shopify/ruby#976": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Stale local variable after inlining a send-ish instruction",
+  "updated": "2026-04-29T22:04:05Z"
+ },
+ "Shopify/ruby#993": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Support `InvokeSuper` from within a block",
+  "updated": "2026-06-17T21:52:59Z"
+ },
+ "Shopify/ruby#995": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Notes from profiling week",
+  "updated": "2026-11-03T10:19:25Z"
+ },
+ "Shopify/ruby#1030": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: ruby-bench perf burndown",
+  "updated": "2026-11-25T19:05:15Z"
+ },
+ "Shopify/ruby#1039": {
+  "closed": "2026-11-24T18:55:15Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: lobsters perf burndown",
+  "updated": "2026-11-24T18:55:16Z"
+ },
+ "Shopify/ruby#1049": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Investigate FxHash",
+  "updated": "2026-09-14T17:56:05Z"
+ },
+ "Shopify/ruby#1051": {
+  "closed": "2026-09-23T18:40:12Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: Compute the String#<< encoding check in HIR",
+  "updated": "2026-09-23T18:40:12Z"
+ },
+ "Shopify/ruby#1058": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Optimize `Kernel#dup`",
+  "updated": "2026-11-03T20:34:04Z"
+ },
+ "Shopify/ruby#1059": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Optimize `String#match?`",
+  "updated": "2026-09-25T00:03:12Z"
+ },
+ "Shopify/ruby#1086": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Specialize Hash#fetch(key, default) case",
+  "updated": "2026-10-27T14:49:55Z"
+ },
+ "Shopify/ruby#1091": {
+  "closed": "2026-11-05T01:31:28Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: Optimize Integer, etc to_s in objtostring",
+  "updated": "2026-11-05T01:31:28Z"
+ },
+ "Shopify/ruby#1094": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: We don't specialize yields with mismatched params",
+  "updated": "2026-11-02T19:51:04Z"
+ },
+ "Shopify/ruby#1095": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Rest parameter copies a caller-built splat array that the interpreter reuses",
+  "updated": "2026-11-03T01:54:47Z"
+ },
+ "Shopify/ruby#1099": {
+  "closed": "2026-11-03T20:51:41Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: Polymorphic fallbacks on Rails are mostly lost profiles and per-class receivers (data from 9 apps + ruby-bench)",
+  "updated": "2026-11-03T20:51:41Z"
+ },
+ "Shopify/ruby#1106": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Optimize String#dup",
+  "updated": "2026-11-05T21:20:17Z"
+ },
+ "Shopify/ruby#1109": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Support protected methods",
+  "updated": "2026-11-06T05:37:15Z"
+ },
+ "Shopify/ruby#1122": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Profile real class, not singleton class, for setinstancevariable",
+  "updated": "2026-11-12T15:38:43Z"
+ },
+ "Shopify/ruby#1128": {
+  "closed": "2026-11-25T02:24:27Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "ZJIT: `super` in a refined method also calls another refinement of the same method",
+  "updated": "2026-11-25T02:24:27Z"
+ },
+ "Shopify/ruby#1129": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Fold IsBitEqual if left and right types don't intersect",
+  "updated": "2026-11-16T04:38:52Z"
+ },
+ "Shopify/ruby#1130": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: Hoist stack overflow check for inlined frames",
+  "updated": "2026-11-16T22:06:25Z"
+ },
+ "Shopify/ruby#1131": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "YJIT: `super` in a block rebound with `instance_exec` skips the receiver check",
+  "updated": "2026-11-17T17:27:11Z"
+ },
+ "Shopify/ruby#1133": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ZJIT: zsuper from a method with keyword parameters into a `(...)` method passes the wrong arguments",
+  "updated": "2026-11-25T20:57:27Z"
+ },
+ "Shopify/tapioca#2748": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Avoid loading unused ActiveSupport::Configurable during reflection",
+  "updated": "2026-11-20T07:19:59Z"
+ },
+ "ViewComponent/view_component#2769": {
+  "closed": "2026-11-03T15:59:40Z",
+  "merged": "2026-11-03T15:59:40Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Share templates and parsed sources within a cache digest computation",
+  "updated": "2026-11-03T15:59:40Z"
+ },
+ "basecamp/once-campfire#350": {
+  "closed": "2026-11-18T14:22:05Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Use native shared fragments and simplify the local hot-path cache",
+  "updated": "2026-11-18T14:22:05Z"
+ },
+ "byroot/activerecord-typedstore#114": {
+  "closed": "2026-10-27T08:43:00Z",
+  "merged": "2026-10-27T08:43:00Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Don't generate Active Record readers for store accessors",
+  "updated": "2026-10-27T08:43:00Z"
+ },
+ "cabo/cbor-ruby#31": {
+  "closed": "2026-11-05T14:42:16Z",
+  "merged": "2026-11-05T14:42:15Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Use typed data API",
+  "updated": "2026-11-05T14:43:01Z"
+ },
+ "cabo/cbor-ruby#42": {
+  "closed": "2026-11-05T14:44:04Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "Does not build on Ruby 4.1.0-preview1",
+  "updated": "2026-11-05T14:44:04Z"
+ },
+ "cockroachdb/activerecord-cockroachdb-adapter#409": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Rails main removes `Migration::Compatibility::V6_1::PostgreSQLCompat` (rails/rails#58848)",
+  "updated": "2026-10-19T09:44:36Z"
+ },
+ "freerange/mocha#804": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Remove internal `_method` as an alias of `method`",
+  "updated": "2026-09-22T10:43:51Z"
+ },
+ "getlago/lago-expression#91": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "fix(ruby): allow building on Ruby 4.1",
+  "updated": "2026-11-18T11:56:08Z"
+ },
+ "gshutler/useragent#73": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Allow to use this gem in a Ractor",
+  "updated": "2026-08-03T11:00:09Z"
+ },
+ "gshutler/useragent#74": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "bug: modern mobile Opera not recognized correctly",
+  "updated": "2026-10-13T00:19:30Z"
+ },
+ "hashie/hashie#659": {
+  "closed": "2026-11-27T19:28:03Z",
+  "merged": "2026-11-27T19:28:03Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Add Duel performance regression guards",
+  "updated": "2026-11-27T19:31:30Z"
+ },
+ "heartcombo/devise#5400": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Devise ignores active storage draw_routes config for routes generation.",
+  "updated": "2026-08-05T15:28:25Z"
+ },
+ "iain/http_accept_language#80": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Add an option to skip defining env.http_accept_language",
+  "updated": "2026-11-04T17:02:13Z"
+ },
+ "inertiajs/inertia-rails#449": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Ask prop types for their flags without `try`",
+  "updated": "2026-11-27T13:50:39Z"
+ },
+ "marcoroth/herb#2805": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Ruby: `Herb::Engine` can't be used inside a Ractor",
+  "updated": "2026-11-06T03:05:06Z"
+ },
+ "marcoroth/herb#2892": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Engine: whitespace-only line kept next to a comment tag where Erubi trims it",
+  "updated": "2026-11-06T22:12:13Z"
+ },
+ "premailer/css_parser#184": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Fix selector splitting inside functional pseudo-classes",
+  "updated": "2026-03-22T19:47:46Z"
+ },
+ "puma/puma#4047": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Optimize Reactor#select_loop timeout tracking with O(1) ordered Hashes",
+  "updated": "2026-10-17T00:10:55Z"
+ },
+ "rack/rack#2302": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Don't use file separator for splitting path info.",
+  "updated": "2026-11-20T20:50:28Z"
+ },
+ "rack/rack#2520": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Performance improvements in Request, CommonLogger, Response and the multipart parser",
+  "updated": "2026-11-20T20:50:27Z"
+ },
+ "rack/rack#2522": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Digest ETags with OpenSSL's SHA-256 when it is loaded",
+  "updated": "2026-11-20T20:50:28Z"
+ },
+ "rails/jbuilder#622": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Optimize `_blank?`",
+  "updated": "2026-09-18T16:55:33Z"
+ },
+ "rails/rails#449": {
+  "closed": "2011-05-07T23:14:44Z",
+  "merged": "2011-05-07T23:14:44Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Rename duplicate tests",
+  "updated": "2014-06-21T07:06:09Z"
+ },
+ "rails/rails#16452": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "ActiveRecord relation with an aliased model doesn't work",
+  "updated": "2026-02-05T02:30:53Z"
+ },
+ "rails/rails#49853": {
+  "closed": "2024-08-14T18:26:39Z",
+  "merged": "2024-08-14T18:26:39Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Avoid calling Headers#env_name when static header",
+  "updated": "2024-08-15T20:18:34Z"
+ },
+ "rails/rails#50312": {
+  "closed": "2026-11-07T15:09:48Z",
+  "merged": "2026-11-07T15:09:48Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Implement `button_to` in terms of `form_tag`",
+  "updated": "2026-11-09T14:00:24Z"
+ },
+ "rails/rails#53215": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Avoid PTY buffer deadlock in `rails server` command tests",
+  "updated": "2026-06-30T09:27:18Z"
+ },
+ "rails/rails#53522": {
+  "closed": "2024-11-05T19:13:28Z",
+  "merged": "2024-11-05T19:13:28Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Do not mark routes as loaded during `RoutesReloader#reload!` call.",
+  "updated": "2024-11-06T09:23:38Z"
+ },
+ "rails/rails#55410": {
+  "closed": "2026-07-15T01:50:00Z",
+  "merged": "2026-07-15T01:50:00Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Introduce `ActionView::Helper::NavigationHelper`",
+  "updated": "2026-11-06T17:01:59Z"
+ },
+ "rails/rails#55627": {
+  "closed": "2025-12-12T20:05:22Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "SQLite partial indexes not fully preserved to schema when table name is unconventional but allowed",
+  "updated": "2025-12-12T20:05:22Z"
+ },
+ "rails/rails#56333": {
+  "closed": "2025-12-12T08:00:15Z",
+  "merged": "2025-12-12T08:00:15Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Do not clean directories directly under the application root with `Rails::BacktraceCleaner`",
+  "updated": "2025-12-12T16:24:58Z"
+ },
+ "rails/rails#56650": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Fix BroadcastLogger#method_missing executing blocks once per logger",
+  "updated": "2026-10-13T13:24:34Z"
+ },
+ "rails/rails#57057": {
+  "closed": "2026-06-12T10:41:39Z",
+  "merged": "2026-06-12T10:41:39Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Report Postgres FATAL exceptions more clearly",
+  "updated": "2026-11-04T21:08:22Z"
+ },
+ "rails/rails#57364": {
+  "closed": "2026-05-15T09:39:27Z",
+  "merged": "2026-05-15T09:39:27Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Enumerate columns in SELECT when only_columns is set",
+  "updated": "2026-05-15T09:42:19Z"
+ },
+ "rails/rails#57785": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Fix cross-database schema cache for PostgreSQL extension types",
+  "updated": "2026-11-10T13:07:31Z"
+ },
+ "rails/rails#57999": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Avoid intermediate strings for tag attributes",
+  "updated": "2026-07-05T07:27:43Z"
+ },
+ "rails/rails#58427": {
+  "closed": "2026-08-09T19:57:44Z",
+  "merged": "2026-08-09T19:57:44Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Use bind parameters for array-form arguments in `find_by_sql` / `count_by_sql`",
+  "updated": "2026-08-09T19:57:49Z"
+ },
+ "rails/rails#58736": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "FileSystemResolverRactorTest#test_non-strict_templates_compile_inside_a_non-main_Ractor errors on Ruby master (Feature #22226)",
+  "updated": "2026-09-11T02:51:43Z"
+ },
+ "rails/rails#58815": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Apply an association scope's `limit`/`offset` per record in `preload`",
+  "updated": "2026-09-20T13:08:26Z"
+ },
+ "rails/rails#58957": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Skip structured event handlers whose event nobody consumes",
+  "updated": "2026-11-27T16:35:15Z"
+ },
+ "rails/rails#59037": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Parallel tests hang forever when a worker process dies",
+  "updated": "2026-10-12T04:26:30Z"
+ },
+ "rails/rails#59117": {
+  "closed": "2026-10-15T18:14:29Z",
+  "merged": "2026-10-15T18:14:29Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Append tag attributes without a string per attribute",
+  "updated": "2026-10-15T18:14:33Z"
+ },
+ "rails/rails#59120": {
+  "closed": "2026-10-16T20:11:27Z",
+  "merged": "2026-10-16T20:11:27Z",
+  "pr": true,
+  "state": "closed",
+  "title": "AssociationRoute: consolidate how association keys are read and written",
+  "updated": "2026-10-16T20:11:27Z"
+ },
+ "rails/rails#59141": {
+  "closed": "2026-11-11T21:41:54Z",
+  "merged": "2026-11-11T21:41:54Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Use an Array for storing Active Record attributes",
+  "updated": "2026-11-13T08:42:27Z"
+ },
+ "rails/rails#59168": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Rails.application.ractorize! in the test environment: LazyRouteSet reloads routes on a frozen app",
+  "updated": "2026-10-19T10:30:47Z"
+ },
+ "rails/rails#59212": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Don't build the association scope when the reader uses the statement cache",
+  "updated": "2026-11-06T07:15:43Z"
+ },
+ "rails/rails#59246": {
+  "closed": "2026-10-22T02:03:25Z",
+  "merged": "2026-10-22T02:03:25Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Fix numericality validator on decimal attribute with implicit scale",
+  "updated": "2026-10-22T02:03:30Z"
+ },
+ "rails/rails#59249": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Remove marshal loading support for Rails 6.1",
+  "updated": "2026-10-22T07:09:00Z"
+ },
+ "rails/rails#59294": {
+  "closed": "2026-10-31T10:19:47Z",
+  "merged": "2026-10-31T10:19:47Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Forward arguments from HashWithIndifferentAccess#merge to update",
+  "updated": "2026-10-31T10:19:47Z"
+ },
+ "rails/rails#59323": {
+  "closed": "2026-10-23T19:00:49Z",
+  "merged": "2026-10-23T19:00:49Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Avoid Rational allocations in Time#change when usec is zero",
+  "updated": "2026-10-24T19:22:51Z"
+ },
+ "rails/rails#59373": {
+  "closed": "2026-10-31T09:58:40Z",
+  "merged": "2026-10-31T09:58:40Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Don't build an asynchronous queries session until it's needed",
+  "updated": "2026-10-31T09:58:40Z"
+ },
+ "rails/rails#59377": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Avoid unnecessary join construction in Relation#eager_loading?",
+  "updated": "2026-11-08T23:42:34Z"
+ },
+ "rails/rails#59413": {
+  "closed": "2026-11-17T21:09:03Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Build order and in_order_of relations up to 1.18x faster by looking up the raw SQL matcher only when needed",
+  "updated": "2026-11-17T21:42:56Z"
+ },
+ "rails/rails#59430": {
+  "closed": "2026-10-30T08:53:44Z",
+  "merged": "2026-10-30T08:53:44Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Make MessageVerifier#generate up to 1.9x and #verify 1.6x faster by keying its HMAC once",
+  "updated": "2026-10-30T09:52:29Z"
+ },
+ "rails/rails#59518": {
+  "closed": "2026-11-27T17:25:40Z",
+  "merged": "2026-11-27T17:25:40Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Memoize QueryAttribute#hash",
+  "updated": "2026-11-27T17:25:40Z"
+ },
+ "rails/rails#59530": {
+  "closed": "2026-11-09T06:21:24Z",
+  "merged": "2026-11-09T06:21:24Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Split SchemaContext and SchemaContext::MappedTable",
+  "updated": "2026-11-09T06:21:25Z"
+ },
+ "rails/rails#59536": {
+  "closed": "2026-11-02T18:35:23Z",
+  "merged": "2026-11-02T18:35:23Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Share an empty warnings Array when a query has none",
+  "updated": "2026-11-02T18:35:23Z"
+ },
+ "rails/rails#59537": {
+  "closed": "2026-11-02T18:42:16Z",
+  "merged": "2026-11-02T18:42:16Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Take tag_string options before the optional content",
+  "updated": "2026-11-02T18:42:16Z"
+ },
+ "rails/rails#59538": {
+  "closed": "2026-11-02T18:55:52Z",
+  "merged": "2026-11-02T18:55:52Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Pass frozen empty defaults when loading a relation",
+  "updated": "2026-11-02T18:55:52Z"
+ },
+ "rails/rails#59557": {
+  "closed": "2026-11-05T17:56:29Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Build `Array#index_with` without pair arrays on Ruby 4.1",
+  "updated": "2026-11-05T17:56:29Z"
+ },
+ "rails/rails#59560": {
+  "closed": "2026-11-03T04:38:59Z",
+  "merged": "2026-11-03T04:38:59Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Reuse type map cache keys for PostgreSQL result columns",
+  "updated": "2026-11-03T04:38:59Z"
+ },
+ "rails/rails#59562": {
+  "closed": "2026-11-03T15:24:58Z",
+  "merged": "2026-11-03T15:24:58Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Don't slice the event name on every ActiveSupport::Subscriber#call",
+  "updated": "2026-11-03T15:24:58Z"
+ },
+ "rails/rails#59564": {
+  "closed": "2026-11-10T22:40:28Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Build the preloader's working Arrays in place",
+  "updated": "2026-11-10T22:40:28Z"
+ },
+ "rails/rails#59569": {
+  "closed": "2026-11-26T22:31:00Z",
+  "merged": "2026-11-26T22:31:00Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Build the association alias tracker only for through chains",
+  "updated": "2026-11-26T22:31:01Z"
+ },
+ "rails/rails#59570": {
+  "closed": "2026-11-05T09:34:25Z",
+  "merged": "2026-11-05T09:34:25Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Escape unsafe OutputBuffer appends without the super dispatch",
+  "updated": "2026-11-05T09:34:26Z"
+ },
+ "rails/rails#59571": {
+  "closed": "2026-11-03T13:59:14Z",
+  "merged": "2026-11-03T13:59:13Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Define parameterless scope methods for lambda bodies without parameters",
+  "updated": "2026-11-03T13:59:14Z"
+ },
+ "rails/rails#59630": {
+  "closed": "2026-11-06T10:11:35Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Restore RemoteIp::GetIp#filter_proxies as deprecated",
+  "updated": "2026-11-06T10:11:35Z"
+ },
+ "rails/rails#59672": {
+  "closed": "2026-11-05T23:02:12Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Read each SQLite index from its own schema in the schema readers",
+  "updated": "2026-11-05T23:02:12Z"
+ },
+ "rails/rails#59673": {
+  "closed": "2026-11-05T23:00:20Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Keep QueryIntent's background session and mutex together",
+  "updated": "2026-11-06T09:00:29Z"
+ },
+ "rails/rails#59674": {
+  "closed": "2026-11-05T23:01:10Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Read the logger once in EventReporter::LogSubscriber#emit and #consumes?",
+  "updated": "2026-11-05T23:01:10Z"
+ },
+ "rails/rails#59677": {
+  "closed": "2026-11-05T23:01:12Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Keep around callback arguments in the call tuple",
+  "updated": "2026-11-05T23:01:12Z"
+ },
+ "rails/rails#59709": {
+  "closed": "2026-11-10T10:47:58Z",
+  "merged": "2026-11-10T10:47:58Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Qualify unscope values with table name when merging relations",
+  "updated": "2026-11-10T10:47:58Z"
+ },
+ "rails/rails#59811": {
+  "closed": "2026-11-15T14:20:03Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Compare tag attribute types with `==` in `tag_options`",
+  "updated": "2026-11-15T14:20:03Z"
+ },
+ "rails/rails#59816": {
+  "closed": "2026-11-16T02:19:46Z",
+  "merged": "2026-11-16T02:19:46Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Cast grouped keys and plucked columns unknown to the schema from the result",
+  "updated": "2026-11-16T02:19:51Z"
+ },
+ "rails/rails#59823": {
+  "closed": "2026-11-16T21:36:16Z",
+  "merged": "2026-11-16T21:36:16Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Apply through model's default scope to its aliased table",
+  "updated": "2026-11-16T21:36:23Z"
+ },
+ "rails/rails#59825": {
+  "closed": "2026-11-17T01:07:35Z",
+  "merged": "2026-11-17T01:07:35Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Don't let the association scope remove the association's own key condition",
+  "updated": "2026-11-17T11:53:22Z"
+ },
+ "rails/rails#59950": {
+  "closed": "2026-11-26T15:57:14Z",
+  "merged": "2026-11-26T15:57:14Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Only draw Action Mailbox conductor routes in local environments",
+  "updated": "2026-11-26T15:57:14Z"
+ },
+ "rails/rails#59951": {
+  "closed": "2026-11-27T16:42:19Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "`context[:job]` is missing from error reports for exceptions raised by a job",
+  "updated": "2026-11-27T16:42:19Z"
+ },
+ "rgeo/activerecord-postgis-adapter#445": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "feat: Compatibility with rails 8.2",
+  "updated": "2026-11-23T07:21:47Z"
+ },
+ "rmosolgo/graphql-ruby#5877": {
+  "closed": "2026-11-05T15:54:11Z",
+  "merged": "2026-11-05T15:54:11Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Fix graphql-c_parser compilation on Windows (MinGW)",
+  "updated": "2026-11-05T15:57:07Z"
+ },
+ "ruby-i18n/i18n#763": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Skip the String comparison when a fallback hits the requested locale",
+  "updated": "2026-11-18T12:00:37Z"
+ },
+ "ruby-i18n/i18n#766": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Check for Fiber storage once in I18n.config",
+  "updated": "2026-11-18T12:00:46Z"
+ },
+ "ruby/json#763": {
+  "closed": "2025-08-25T08:27:21Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Escape HTML Entities",
+  "updated": "2026-09-12T06:49:46Z"
+ },
+ "ruby/net-http#362": {
+  "closed": "2026-11-10T22:08:42Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "Default net-http 0.10.0 fails every response read next to a locked net-protocol 0.2.2",
+  "updated": "2026-11-10T22:08:42Z"
+ },
+ "ruby/ruby#31": {
+  "closed": "2012-02-15T17:09:30Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "BasicObject constant documentation",
+  "updated": "2014-07-04T04:23:56Z"
+ },
+ "ruby/ruby#42": {
+  "closed": "2011-08-16T02:43:36Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "* include/ruby/intern.h (rb_ary_first, rb_ary_last): export.",
+  "updated": "2011-08-15T05:52:06Z"
+ },
+ "ruby/ruby#218": {
+  "closed": "2012-12-02T05:20:46Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Suppress uninitialized warning from @is_proxy_class",
+  "updated": "2014-07-09T11:33:53Z"
+ },
+ "ruby/ruby#5877": {
+  "closed": "2022-05-04T20:04:36Z",
+  "merged": "2022-05-04T20:04:36Z",
+  "pr": true,
+  "state": "closed",
+  "title": "[DOC] More on format specs",
+  "updated": "2022-05-04T20:04:36Z"
+ },
+ "ruby/ruby#5908": {
+  "closed": "2022-05-18T02:32:13Z",
+  "merged": "2022-05-18T02:32:13Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Use make gdb-ruby and make lldb-ruby",
+  "updated": "2022-05-18T21:38:29Z"
+ },
+ "ruby/ruby#16019": {
+  "closed": "2026-04-19T12:59:00Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Inline Hash#key? with StringExact and original String#eql?",
+  "updated": "2026-04-19T12:59:00Z"
+ },
+ "ruby/ruby#16282": {
+  "closed": "2026-04-09T12:24:09Z",
+  "merged": "2026-04-09T12:24:09Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Introduce 2\u207f heap slot sizes",
+  "updated": "2026-04-14T06:54:39Z"
+ },
+ "ruby/ruby#16632": {
+  "closed": "2026-04-06T17:53:16Z",
+  "merged": "2026-04-06T17:53:16Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Convert incremental sweep budget from slots to bytes",
+  "updated": "2026-04-06T17:53:16Z"
+ },
+ "ruby/ruby#16909": {
+  "closed": "2026-05-28T06:53:10Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Deprecate `Pathname::SEPARATOR_PAT` instead of making it private",
+  "updated": "2026-11-27T15:41:13Z"
+ },
+ "ruby/ruby#17251": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Trigger nofree majors on a per-heap basis",
+  "updated": "2026-11-26T22:25:14Z"
+ },
+ "ruby/ruby#17499": {
+  "closed": "2026-06-26T16:57:59Z",
+  "merged": "2026-06-26T16:57:59Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Move objtostring specialization to HIR build",
+  "updated": "2026-06-26T16:58:02Z"
+ },
+ "ruby/ruby#18267": {
+  "closed": "2026-09-02T22:10:30Z",
+  "merged": "2026-09-02T22:10:30Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Specialize caller splats with monomorphic lengths",
+  "updated": "2026-09-03T01:00:00Z"
+ },
+ "ruby/ruby#18326": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Specialize monomorphic sendforward calls",
+  "updated": "2026-11-03T09:44:19Z"
+ },
+ "ruby/ruby#18344": {
+  "closed": "2026-08-24T07:12:32Z",
+  "merged": "2026-08-24T07:12:32Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Refactor core_hash_merge_ptr and core_hash_merge_kw",
+  "updated": "2026-08-25T15:22:58Z"
+ },
+ "ruby/ruby#18345": {
+  "closed": "2026-08-25T13:24:56Z",
+  "merged": "2026-08-25T13:24:56Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Dynamic ar_table size",
+  "updated": "2026-08-25T13:25:00Z"
+ },
+ "ruby/ruby#18400": {
+  "closed": "2026-08-20T07:43:56Z",
+  "merged": "2026-08-20T07:43:56Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Load bundler/setup explicitly in the bundle exec -r spec",
+  "updated": "2026-09-09T21:43:59Z"
+ },
+ "ruby/ruby#18616": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Seed polymorphic type branches with shape data too",
+  "updated": "2026-11-19T18:49:28Z"
+ },
+ "ruby/ruby#19162": {
+  "closed": "2026-10-14T18:00:33Z",
+  "merged": "2026-10-14T18:00:33Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Inline BasicObject#!= through a JIT hook",
+  "updated": "2026-10-14T18:00:34Z"
+ },
+ "ruby/ruby#19283": {
+  "closed": "2026-11-13T01:03:59Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Making an object ractor shareable needs to be the owner's job",
+  "updated": "2026-11-13T01:03:59Z"
+ },
+ "ruby/ruby#19410": {
+  "closed": "2026-10-30T13:45:21Z",
+  "merged": "2026-10-30T13:45:21Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Refactor `opt_equality_specialized` and allow inlining of most of `rb_equal` and `rb_eql`.",
+  "updated": "2026-10-30T13:45:28Z"
+ },
+ "ruby/ruby#19483": {
+  "closed": "2026-11-04T11:50:43Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Guard protected sends with the runtime caller self",
+  "updated": "2026-11-04T11:50:43Z"
+ },
+ "ruby/ruby#19485": {
+  "closed": "2026-10-29T21:47:34Z",
+  "merged": "2026-10-29T21:47:34Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Avoid accumulating send counters during specialization",
+  "updated": "2026-10-29T21:47:34Z"
+ },
+ "ruby/ruby#19487": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "YJIT: Compile super calls on Class and Module receivers",
+  "updated": "2026-11-18T11:53:15Z"
+ },
+ "ruby/ruby#19537": {
+  "closed": "2026-10-29T10:14:37Z",
+  "merged": "2026-10-29T10:14:37Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Optimize `Hash.new(capacity:)`",
+  "updated": "2026-10-29T18:18:48Z"
+ },
+ "ruby/ruby#19583": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Support .send(:symbol)",
+  "updated": "2026-11-03T09:44:20Z"
+ },
+ "ruby/ruby#19617": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Recompile final versions invalidated by PatchPoint",
+  "updated": "2026-11-03T00:44:17Z"
+ },
+ "ruby/ruby#19648": {
+  "closed": "2026-11-06T00:24:12Z",
+  "merged": "2026-11-06T00:24:12Z",
+  "pr": true,
+  "state": "closed",
+  "title": "YJIT: Check singleton attached-object identity in C",
+  "updated": "2026-11-06T00:24:12Z"
+ },
+ "ruby/ruby#19655": {
+  "closed": "2026-11-04T11:50:47Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Pass a frozen empty array to empty anonymous rest",
+  "updated": "2026-11-04T11:52:21Z"
+ },
+ "ruby/ruby#19658": {
+  "closed": "2026-11-04T00:29:27Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Stop NoSingletonClass patch points from side-exiting on every call",
+  "updated": "2026-11-04T00:29:27Z"
+ },
+ "ruby/ruby#19659": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Drop surplus args when yielding to simple ISEQ blocks",
+  "updated": "2026-11-26T12:32:17Z"
+ },
+ "ruby/ruby#19662": {
+  "closed": "2026-11-03T21:21:47Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Specialize Hash.new in opt_new",
+  "updated": "2026-11-03T21:21:47Z"
+ },
+ "ruby/ruby#19667": {
+  "closed": "2026-11-03T02:46:39Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Keep the opt_new fast path for subclasses of String and Array",
+  "updated": "2026-11-03T02:55:20Z"
+ },
+ "ruby/ruby#19670": {
+  "closed": "2026-11-10T22:38:58Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "Allocate one hash for keyword splats after dynamic keywords",
+  "updated": "2026-11-10T22:38:58Z"
+ },
+ "ruby/ruby#19671": {
+  "closed": "2026-11-03T17:29:13Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "YJIT: Specialize sendforward when the caller passed no arguments",
+  "updated": "2026-11-03T17:29:14Z"
+ },
+ "ruby/ruby#19681": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Find caller-saved survivors without scanning every interval per CCall",
+  "updated": "2026-11-25T09:20:06Z"
+ },
+ "ruby/ruby#19682": {
+  "closed": "2026-11-05T01:51:13Z",
+  "merged": "2026-11-05T01:51:13Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Don't side-exit on every super from a method that got a block",
+  "updated": "2026-11-05T01:51:02Z"
+ },
+ "ruby/ruby#19685": {
+  "closed": "2026-11-04T11:50:50Z",
+  "merged": null,
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Mark each JITFrame ISEQ once per GC",
+  "updated": "2026-11-05T17:34:43Z"
+ },
+ "ruby/ruby#19703": {
+  "closed": "2026-11-04T09:03:03Z",
+  "merged": "2026-11-04T09:03:03Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Refactor `opt_new` handling of Hash.new",
+  "updated": "2026-11-04T09:03:03Z"
+ },
+ "ruby/ruby#19851": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Add a GitHub action to comment perf differences",
+  "updated": "2026-11-12T02:12:39Z"
+ },
+ "ruby/ruby#19905": {
+  "closed": "2026-11-15T12:33:33Z",
+  "merged": "2026-11-15T12:33:33Z",
+  "pr": true,
+  "state": "closed",
+  "title": "hash.c: optimize ar_find_entry_hint",
+  "updated": "2026-11-15T12:33:33Z"
+ },
+ "ruby/ruby#19909": {
+  "closed": "2026-11-16T17:20:12Z",
+  "merged": "2026-11-16T17:20:12Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Specialize polymorphic opt_neq",
+  "updated": "2026-11-16T17:20:12Z"
+ },
+ "ruby/ruby#19912": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Send Symbol block arguments directly",
+  "updated": "2026-11-25T19:54:46Z"
+ },
+ "ruby/ruby#19949": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "ZJIT: Specialize Hash#fetch(key, default)",
+  "updated": "2026-11-25T02:38:03Z"
+ },
+ "ruby/ruby#19976": {
+  "closed": "2026-11-25T02:24:25Z",
+  "merged": "2026-11-25T02:24:25Z",
+  "pr": true,
+  "state": "closed",
+  "title": "ZJIT: Don't specialize super from a refined method",
+  "updated": "2026-11-25T02:24:25Z"
+ },
+ "ruby/ruby#20110": {
+  "closed": "2026-11-24T18:15:14Z",
+  "merged": "2026-11-24T18:15:14Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Don't force a major GC for a heap smaller than its initial size",
+  "updated": "2026-11-24T18:15:17Z"
+ },
+ "ruby/ruby#20208": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "[Bug #21301] Normalize month-mday in Time.new before every zone path",
+  "updated": "2026-11-27T13:30:38Z"
+ },
+ "ruby/ruby-bench#352": {
+  "closed": "2024-12-09T21:15:05Z",
+  "merged": "2024-12-09T21:15:05Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Limit YJIT stats to the measured benchmark code",
+  "updated": "2024-12-09T23:42:50Z"
+ },
+ "ruby/ruby-bench#425": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Idea: benchmark JITs against fast_blank",
+  "updated": "2025-10-29T20:09:24Z"
+ },
+ "ruby/ruby-bench#527": {
+  "closed": "2026-11-05T18:53:05Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "lobsters: fixture DB ships without planner statistics; one misplanned query dominates several routes",
+  "updated": "2026-11-05T18:53:05Z"
+ },
+ "ruby/ruby-bench#539": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Add benchmarks/gc_balloon.rb",
+  "updated": "2026-11-05T20:26:56Z"
+ },
+ "ruby/ruby-bench#562": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "zjit_diff: compare iteration timings with GC time removed",
+  "updated": "2026-11-10T22:32:58Z"
+ },
+ "ruby/ruby-bench#569": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Record the marking time of each minor and major GC in harness-gc",
+  "updated": "2026-11-18T12:00:52Z"
+ },
+ "ruby/ruby-bench#576": {
+  "closed": "2026-11-12T22:11:58Z",
+  "merged": "2026-11-12T22:11:58Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Add callgrind harness",
+  "updated": "2026-11-12T22:12:13Z"
+ },
+ "ruby/rubygems#9379": {
+  "closed": "2026-03-10T07:56:11Z",
+  "merged": "2026-03-10T07:56:11Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Align YAMLSerializer behavior with Psych",
+  "updated": "2026-09-02T00:53:28Z"
+ },
+ "ruby/rubygems#10017": {
+  "closed": "2026-11-10T10:52:38Z",
+  "merged": null,
+  "pr": false,
+  "state": "closed",
+  "title": "Bundler 4.0.x fails on Ruby 4.1 when .bundle/config is \"---\"",
+  "updated": "2026-11-10T10:52:38Z"
+ },
+ "ruby/rubygems#10047": {
+  "closed": "2026-11-10T10:52:36Z",
+  "merged": "2026-11-10T10:52:36Z",
+  "pr": true,
+  "state": "closed",
+  "title": "Return `{}` from `Gem::YAMLSerializer.load` for an empty or null document",
+  "updated": "2026-11-10T10:52:39Z"
+ },
+ "ruby/strscan#223": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "StringScanner#skip returns nil inside an invalid character in non-UTF-8 strings (was an exception in 3.1.6)",
+  "updated": "2026-11-04T17:04:52Z"
+ },
+ "ruby/uri#269": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Parse URIs about 12% faster with fewer allocations",
+  "updated": "2026-11-11T08:45:28Z"
+ },
+ "scenic-views/scenic#466": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "Reverting view migrations fails on Rails main: CommandRecorder#record now takes args and kwargs",
+  "updated": "2026-11-04T17:56:47Z"
+ },
+ "sparklemotion/nokogiri#3759": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Call `children` once in `DocumentFragment#css`",
+  "updated": "2026-11-18T11:56:10Z"
+ },
+ "temporalio/sdk-ruby#218": {
+  "closed": null,
+  "merged": null,
+  "pr": false,
+  "state": "open",
+  "title": "[Feature Request] Support buildable source gem",
+  "updated": "2025-02-10T21:14:34Z"
+ },
+ "tzinfo/tzinfo#171": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Decode signed 64-bit zoneinfo transition times directly",
+  "updated": "2026-11-18T11:56:21Z"
+ },
+ "vmg/rinku#97": {
+  "closed": null,
+  "merged": null,
+  "pr": true,
+  "state": "open",
+  "title": "Replace RUBY_EXPORT with RUBY_FUNC_EXPORTED since it's the recommended way",
+  "updated": "2026-11-25T04:48:29Z"
+ }
+}
