@@ -86,6 +86,7 @@ if args.first == "report"
   report = Lowrail::ProfileReport.new(dir, ledger: ledger, top: top)
   report.write
   puts report.markdown
+  $stderr.puts "lowrail-profile: #{report.parallel_warning}" if report.parallel_warning
   exit
 end
 
@@ -294,6 +295,7 @@ begin
   report = Lowrail::ProfileReport.new(out, ledger: ledger, top: top)
   report.write
   puts report.markdown
+  $stderr.puts "lowrail-profile: #{report.parallel_warning}" if report.parallel_warning
 rescue StandardError => error
   $stderr.puts "lowrail-profile: no report: #{error.message}; the command exited #{statuses.join(", ")}"
   exit(failed || 1)

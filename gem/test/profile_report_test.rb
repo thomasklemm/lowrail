@@ -118,4 +118,47 @@ class ProfileReportTest < Minitest::Test
       assert_includes md, "`app/middleware/wrap.rb:2` (middleware) 100%"
     end
   end
+
+  # Field test findings: an action with one warm request in a run ranked first
+  # by it; a parallel capture said only at compare that it cannot be compared;
+  # a line Rails 8.1 writes as a block opener missed the pull request that
+  # removed it as a one-line block on main.
+  def test_thin_warm_parallel_warning_and_ledger_across_versions
+    realpath_tmpdir do |dir|
+      gem = File.join(dir, "gems/foo-1.0/lib/foo.rb")
+      FileUtils.mkdir_p(File.dirname(gem))
+      File.write(gem, "def get(oid)\n  map.fetch(oid) {\n    miss(oid)\n  }\nend\n")
+      ledger = File.join(dir, "index.json")
+      File.write(ledger, JSON.generate(generated: "2026-11-25T00:00:00Z", pulls: [
+        { ref: "x/foo#1", repo: "x/foo", state: "merged", allocation_work: true, merged_at: "2026-11-03T00:00:00Z",
+          released_in: nil, files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["map.fetch(oid) { miss(oid) }"], added: [] } } }] },
+        { ref: "x/foo#2", repo: "x/foo", state: "open", allocation_work: true,
+          files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["map.fetch(oid, 1) { miss(oid) }"], added: [] } } }] }]))
+      runs = File.join(dir, "capture")
+      write_runs(runs, lambda do |run, pid|
+        # Thin#x: 3 requests, one warm in run1 (1 + 2 windows over 2 processes).
+        thin = run == "run1" ? (pid == 0 ? [1, 5000, 5000] : [2, 900_000, 1000]) : [2, 900_000, 1000]
+        ["# lowrail-profile 4\trequests=7\tobjects=1000\tdropped=0\twindows=7,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
+          "P\t0\t#{gem}", "0\t2\tString\t40\t4\t10\t0\trequest",
+          "A\trequest\tBig#y\t#{run == "run1" && pid == 0 ? 4 : 5}\t5000\t100\t0", "A\trequest\tThin#x\t#{thin.join("\t")}\t0"]
+      end)
+      report = Lowrail::ProfileReport.new(runs, ledger: ledger)
+      actions = report.actions
+      assert_equal ["Big#y", "Thin#x"], actions.map { _1[:name] }
+      assert_equal [[7, 8], [1, 2]], actions.map { _1[:warm_samples] }
+      md = report.markdown
+      assert_includes md, "fewer than 2 warm requests in a run comes last"
+      assert_includes md, "* **Not comparable: run 1 ran in 2 processes."
+      row = md.lines.find { _1.include?("`GEM/foo/lib/foo.rb:2`") }
+      assert_includes row, "x/foo#1 merged 2026-11-03, after this app's version, not released yet"
+      refute_includes row, "x/foo#2"
+      _, err, status = Open3.capture3(RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "report", runs, "--no-ledger")
+      assert status.success?, err
+      assert_includes err, "lowrail-profile: Not comparable: run 1 ran in 2 processes"
+
+      FileUtils.rm_rf(File.join(runs, "run1/1.tsv"))
+      FileUtils.rm_rf(File.join(runs, "run2/1.tsv"))
+      assert_nil Lowrail::ProfileReport.new(runs).parallel_warning
+    end
+  end
 end

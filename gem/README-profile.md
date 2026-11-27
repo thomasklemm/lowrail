@@ -8,7 +8,7 @@ there, and whether an upstream pull request already changes that line.
 It counts objects. It does not measure time, CPU, retained memory or SQL, and it never changes or lowers your app.
 For time, pair it with [vernier](https://github.com/jhawthorn/vernier) or your APM.
 
-Experimental (0.1.1). Supported: Ruby 3.3, 3.4 and 4.0; Rails 7.2, 8.0 and 8.1; Linux and
+Experimental (0.1.2). Supported: Ruby 3.3, 3.4 and 4.0; Rails 7.2, 8.0 and 8.1; Linux and
 macOS. Windows is refused with a message.
 
 ## Install
@@ -18,11 +18,11 @@ macOS. Windows is refused with a message.
 gem "lowrail-profile", group: [:development, :test], require: false
 ```
 
-Until 0.1.1 is on rubygems.org, build it from a Lowrail checkout. The gemspec's file list is
+Until 0.1.2 is on rubygems.org, build it from a Lowrail checkout. The gemspec's file list is
 relative to `gem/`, so build it there:
 
 ```sh
-cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.1.gem
+cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.2.gem
 ```
 
 Or let Bundler take it from GitHub:
@@ -88,7 +88,8 @@ in development and test) have no action name. Then:
   allocates; *Dev/test* is work production mostly does not do (see below).
 * **Actions.** Objects per request by controller action, per run. *Warm* leaves out each action's first request in
   each process, which carries one-time work (route table, template compilation, I18n load); `–` means it ran once
-  per process. *Δ* is the last run minus the first: the noise.
+  per process. An action with fewer than 2 warm requests in a run comes last, ranked by all objects: one request is
+  a sample, not a mean. *Δ* is the last run minus the first: the noise.
 * **Top lines outside the app.** Per line in Rails, Ruby and gems: warm and all objects per request, *Reach* (the
   share of requests in which it allocated), the object types, the app lines that lead there, and *Ledger*. A † means
   objects from Ruby's `<internal:…>` code charged to the line that called it.
@@ -106,7 +107,8 @@ Line keys are `RAILS/<component>/path:line`, `GEM/<name>/path:line`, `RUBY/path:
 
 **Ledger.** A dated snapshot of upstream pull requests that reduce allocations ships with the gem. A line matches
 when a pull request changes that very line (same repository, file and method, and the line's code is among the
-lines it removes or adds). The cell says what that means for the version your lockfile runs: *open upstream work*,
+lines it removes or adds; a line that opens a block, as `fetch(oid) {` in one version, also matches the same call
+written as a one-line block in another). The cell says what that means for the version your lockfile runs: *open upstream work*,
 *fixed in 8.2.0* (upgrade), *merged, not released yet*, or *merged, in 7.2.3, which this app runs*. The ledger covers
 the pull requests its authors track, not every upstream fix, and a snapshot goes stale: the header gives its date.
 
@@ -128,7 +130,8 @@ much invocations differ. `--json` prints the result as JSON.
 **Profile in one process.** Warm leaves out each process's first request of an action, and parallel test workers
 split the tests anew in every capture, so which requests those are, where one-time work lands and which code paths
 run change between captures: on openstreetmap-website (8 workers, the same code) `NotesController#index` read 8,063
-warm objects per request in one capture and 26,106 in the next. compare refuses such captures (exit 2). Set
+warm objects per request in one capture and 26,106 in the next. compare refuses such captures (exit 2), and the
+capture itself says so on the terminal and at the top of the report. Set
 `PARALLEL_WORKERS=1` for `parallelize`, and run `parallel_tests` and similar runners without them.
 
 **Why there is no gate in 0.1.** Over every assignment of unchanged captures to base, A/A and head, captured in one

@@ -44,6 +44,8 @@ module Lowrail
     }.freeze
 
     KINDS = %w[request job mail cable].freeze
+    # Warm requests an action needs in every run to rank by warm.
+    MIN_WARM = 2
     # report.json's format; compare reads only its own. 3: app and path-gem keys of 8e36ae06, timed_out.
     # 4: objects allocated inside Socket.tcp left out of actions and lines, counted apart (network).
     FORMAT = 4
@@ -270,9 +272,16 @@ module Lowrail
         next if pr["state"] == "closed" || !pr["allocation_work"] || !ledger_repo?(pr["repo"], gem_name)
         f = pr["files"].find { _1["path"] == file } or next
         change = f["methods"][method] or next
-        removed, added = change["removed"].include?(text), change["added"].include?(text)
+        removed, added = change["removed"].any? { same_code?(text, _1) }, change["added"].any? { same_code?(text, _1) }
         ledger_label(pr, site, removed: removed) if removed || added
       end.compact.uniq.first(3)
+    end
+
+    # The same line, or the first line of a block the other version writes on
+    # one line: Rails 8.1's `type_map.fetch(oid, fmod, sql_type) {` is main's
+    # `type_map.fetch(oid, fmod, sql_type) { register_unknown_oid_type(...) }`.
+    def same_code?(text, change)
+      text == change || (text.match?(/(?:\{|\bdo)(?:\s*\|[^|]*\|)?\z/) && change.start_with?(text))
     end
 
     def ledger_index
@@ -280,6 +289,15 @@ module Lowrail
       data = @ledger && JSON.parse(File.read(@ledger))
       @ledger_date = data && data["generated"].to_s[0, 10]
       @ledger_index = data && data["pulls"]
+    end
+
+    # compare refuses a capture of more than one process (ProfileCompare): said
+    # when profiling, not only when comparing.
+    def parallel_warning
+      processes = @runs.map { _1[:processes] }.max
+      return if processes <= 1
+      "Not comparable: run 1 ran in #{processes} processes. Parallel test workers split the tests differently in every " \
+        "capture, which changes what warm leaves out, so compare refuses it (exit 2); profile with PARALLEL_WORKERS=1 to compare"
     end
 
     # The day the ledger index was taken (nil without one).
@@ -493,11 +511,14 @@ module Lowrail
           denominator = attributed_index && (s = stats[attributed_index]) ? s[0] - s[3] : 0
           top = ->(hash) { denominator > 0 ? hash.sort_by { -_2 }.first(3).map { |k, v| { name: k, warm: v.fdiv(denominator).round(1) } } : [] }
           known = warm.compact
+          samples = stats.map { _1 ? _1[0] - _1[3] : 0 }
+          # One warm request in a run is a sample, not a mean: in a field test such an action led the table.
+          thin = samples.min < MIN_WARM
           { name: name == "-" ? nil : name, windows: windows, warm: warm.map { _1&.round(1) }, all: all.map { _1&.round(1) },
-            noise: known.size > 1 && warm.first && warm.last ? (warm.last - warm.first).round(1) : nil,
-            sort: known.empty? ? all.compact.max.to_f : mean(known), sites: top.(a[:sites]), apps: top.(a[:apps]),
+            warm_samples: samples, noise: known.size > 1 && warm.first && warm.last ? (warm.last - warm.first).round(1) : nil,
+            thin: thin, sort: thin ? all.compact.max.to_f : mean(known), sites: top.(a[:sites]), apps: top.(a[:apps]),
             network: stats.map { _1 ? _1[4] : 0 } }
-        end.sort_by { [_1[:warm].compact.empty? ? 1 : 0, -_1[:sort], _1[:name].to_s] }
+        end.sort_by { [_1[:thin] ? 1 : 0, -_1[:sort], _1[:name].to_s] }
       end
     end
 
@@ -590,6 +611,7 @@ module Lowrail
           "attempts on threads and timers, so how many follows timing; in a suite usually a probe for a server that is not " \
           "running. Every action and line leaves them out\n"
       end
+      out << "* **#{parallel_warning}**\n" if parallel_warning
       out << "* Ledger: #{ledger_date ? "upstream pull requests as of #{ledger_date}" : "off"}\n"
       out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n"
       if (missing = unclassified)
@@ -638,7 +660,8 @@ module Lowrail
       unless requests.empty?
         out << "\n## Actions\n\nObjects per request by controller action and run, counting everything the request " \
           "allocates (app, Rails, gems, dev/test work). Warm leaves out the action's first request in each process; " \
-          "– when it ran once per process (those come last, ranked by all objects, which include one-time work). Top lines: warm objects per request of the action outside the app (repeat " \
+          "– when it ran once per process. An action with fewer than #{MIN_WARM} warm requests in a run comes last, ranked by " \
+          "all objects, which include one-time work. Top lines: warm objects per request of the action outside the app (repeat " \
           "run, dev/test work left out).\n\n"
         out << actions_table(requests, @top, "Action", "req")
       end
