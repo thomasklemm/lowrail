@@ -1,0 +1,94 @@
+==91090== Callgrind, a call-graph generating cache profiler
+==91090== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==91090== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==91090== Command: /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb 20\ binds,\ 20\ rows 300
+==91090== Parent PID: 58584
+==91090== 
+--91090-- 
+--91090-- Valgrind options:
+--91090--    --verbose
+--91090--    --tool=callgrind
+--91090--    --collect-atstart=no
+--91090--    --toggle-collect=rb_ary_cycle
+--91090--    --smc-check=all
+--91090--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-4-20_binds_20_rows-base2-n300.callgrind
+--91090--    --log-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-4-20_binds_20_rows-base2-n300.valgrind.log
+--91090-- Contents of /proc/version:
+--91090--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--91090-- 
+--91090-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--91090-- Page sizes: currently 4096, max supported 4096
+--91090-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==91090== For interactive control, run 'callgrind_control -h'.
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--91090--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--91090--   .. build-id is valid
+--91090-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--91090--    object doesn't have a dynamic symbol table
+--91090-- Scheduler: using generic scheduler lock implementation.
+==91090== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-91090-by-user-on-???
+==91090== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-91090-by-user-on-???
+==91090== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-91090-by-user-on-???
+==91090== 
+==91090== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==91090== don't want to do, unless you know exactly what you're doing,
+==91090== or are doing some strange experiment):
+==91090==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=91090 ...command...
+==91090== 
+==91090== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==91090==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+==91090== and then give GDB the following command
+==91090==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=91090
+==91090== --pid is optional if only one valgrind process is running
+==91090== 
+--91090-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--91090--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--91090--   .. build-id is valid
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--91090--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--91090--   .. build-id is valid
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--91090--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--91090--   .. build-id is valid
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--91090--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--91090--   .. build-id is valid
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--91090--    object doesn't have a symbol table
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--91090--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--91090--   .. build-id is valid
+--91090-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/cgi/escape.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/date_core.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/psych.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/zlib.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/etc.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/strscan.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/bigdecimal-4.1.3/lib/bigdecimal.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/json-3.2.0/lib/json/ext/parser.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/json-3.2.0/lib/json/ext/generator.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/socket.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/openssl.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/digest.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/io/nonblock.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/stringio.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/sqlite3-2.10.2-x86_64-linux-gnu/lib/sqlite3/4.0/sqlite3_native.so
+--91090--    object doesn't have a symbol table
+--91090-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--91090--    object doesn't have a symbol table
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/utf_16le.so
+--91090-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/utf_16be.so
+==91090== 
+--91090-- Start dumping at BB 788206785 (Prg.Term.)...
+--91090-- Dump to /home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-4-20_binds_20_rows-base2-n300.callgrind
+--91090-- Dumping done.
+==91090== Events    : Ir
+==91090== Collected : 244437427
+==91090== 
+==91090== I   refs:      244,437,427

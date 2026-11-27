@@ -1,0 +1,547 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb",
+  "at": "2026-11-27T23:20:19Z",
+  "n": 300,
+  "warmup": 300,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/sides/base",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "fatal: not a git repository (or any of the parent directories): .git",
+      "dirty": true
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/sides/uncached",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "fatal: not a git repository (or any of the parent directories): .git",
+      "dirty": true
+    }
+  },
+  "objects": {
+    "yjit 1 binds, no rows": {
+      "base": 99.998,
+      "base1": 99.998,
+      "base2": 99.998,
+      "candidate": 96.998,
+      "change": -0.030000600012000223,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 20 binds, no rows": {
+      "base": 133.0,
+      "base1": 133.0,
+      "base2": 133.0,
+      "candidate": 130.0,
+      "change": -0.022556390977443663,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 100 binds, no rows": {
+      "base": 213.0,
+      "base1": 213.0,
+      "base2": 213.0,
+      "candidate": 210.0,
+      "change": -0.014084507042253502,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 20 binds, 20 rows": {
+      "base": 343.0,
+      "base1": 343.0,
+      "base2": 343.0,
+      "candidate": 339.0,
+      "change": -0.011661807580174877,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "yjit 1 binds, no rows": {
+      "base": 203605.07666666666,
+      "base1": 203688.93333333332,
+      "base2": 203521.22,
+      "candidate": 190437.73666666666,
+      "change": -0.06467098078088196,
+      "aa": 0.0008237188191917805,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                702,
+                702
+              ],
+              "compiled_block_count": [
+                9753,
+                9753
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                702,
+                702
+              ],
+              "compiled_block_count": [
+                9753,
+                9753
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                697,
+                697
+              ],
+              "compiled_block_count": [
+                9665,
+                9665
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                697,
+                697
+              ],
+              "compiled_block_count": [
+                9665,
+                9665
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                702,
+                702
+              ],
+              "compiled_block_count": [
+                9753,
+                9753
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                702,
+                702
+              ],
+              "compiled_block_count": [
+                9749,
+                9749
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 20 binds, no rows": {
+      "base": 617040.755,
+      "base1": 618638.4333333333,
+      "base2": 615443.0766666667,
+      "candidate": 416828.99666666664,
+      "change": -0.3244708825324404,
+      "aa": 0.00517851801647476,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n300 compiled_block_count +8"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9709
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                696,
+                696
+              ],
+              "compiled_block_count": [
+                9625,
+                9625
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                696,
+                696
+              ],
+              "compiled_block_count": [
+                9625,
+                9625
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 100 binds, no rows": {
+      "base": 2135802.9916666667,
+      "base1": 2135710.1433333335,
+      "base2": 2135895.84,
+      "candidate": 1160561.6766666668,
+      "change": -0.4566157640967502,
+      "aa": 0.00008694466080946857,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "candidate n300 compiled_iseq_count +1",
+          "candidate n300 compiled_block_count +12"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9699,
+                9699
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                696,
+                696
+              ],
+              "compiled_block_count": [
+                9625,
+                9625
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                696,
+                697
+              ],
+              "compiled_block_count": [
+                9625,
+                9637
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                701,
+                701
+              ],
+              "compiled_block_count": [
+                9701,
+                9701
+              ],
+              "invalidation_count": [
+                224,
+                224
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 20 binds, 20 rows": {
+      "base": 814966.83,
+      "base1": 815142.4266666666,
+      "base2": 814791.2333333333,
+      "candidate": 616238.5566666666,
+      "change": -0.24384829666421315,
+      "aa": 0.00043092960401021254,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                769,
+                769
+              ],
+              "compiled_block_count": [
+                10486,
+                10486
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                770,
+                770
+              ],
+              "compiled_block_count": [
+                10492,
+                10492
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                763,
+                763
+              ],
+              "compiled_block_count": [
+                10415,
+                10415
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                763,
+                763
+              ],
+              "compiled_block_count": [
+                10410,
+                10410
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                769,
+                769
+              ],
+              "compiled_block_count": [
+                10486,
+                10486
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                769,
+                769
+              ],
+              "compiled_block_count": [
+                10486,
+                10486
+              ],
+              "invalidation_count": [
+                225,
+                225
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

@@ -1,0 +1,97 @@
+==75120== Callgrind, a call-graph generating cache profiler
+==75120== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==75120== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==75120== Command: /home/user/rubies/master-0d399335b7/bin/ruby --zjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb 20\ binds,\ no\ rows 0
+==75120== Parent PID: 58586
+==75120== 
+--75120-- 
+--75120-- Valgrind options:
+--75120--    --verbose
+--75120--    --tool=callgrind
+--75120--    --collect-atstart=no
+--75120--    --toggle-collect=rb_ary_cycle
+--75120--    --smc-check=all
+--75120--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-2-20_binds_no_rows-base-n0.callgrind
+--75120--    --log-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-2-20_binds_no_rows-base-n0.valgrind.log
+--75120-- Contents of /proc/version:
+--75120--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--75120-- 
+--75120-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--75120-- Page sizes: currently 4096, max supported 4096
+--75120-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==75120== For interactive control, run 'callgrind_control -h'.
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/bin/ruby
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--75120--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--75120--   .. build-id is valid
+--75120-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--75120--    object doesn't have a dynamic symbol table
+--75120-- Scheduler: using generic scheduler lock implementation.
+==75120== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-75120-by-user-on-???
+==75120== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-75120-by-user-on-???
+==75120== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-75120-by-user-on-???
+==75120== 
+==75120== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==75120== don't want to do, unless you know exactly what you're doing,
+==75120== or are doing some strange experiment):
+==75120==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=75120 ...command...
+==75120== 
+==75120== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==75120==   /path/to/gdb /home/user/rubies/master-0d399335b7/bin/ruby
+==75120== and then give GDB the following command
+==75120==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=75120
+==75120== --pid is optional if only one valgrind process is running
+==75120== 
+--75120-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--75120--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--75120--   .. build-id is valid
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--75120--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--75120--   .. build-id is valid
+--75120-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/cgi/escape.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/date_core.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/psych.so
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libyaml-0.so.2.0.9
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16le.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/utf_16_32.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16be.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32le.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32be.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/zlib.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/etc.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/strscan.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/bigdecimal-4.1.3/bigdecimal.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/parser.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/generator.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/socket.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/openssl.so
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libssl.so.3
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7
+--75120--    object doesn't have a symbol table
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/digest.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/stringio.so
+--75120-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/sqlite3_native.so
+==75120== 
+--75120-- Start dumping at BB 690818459 (Prg.Term.)...
+--75120-- Dump to /home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-2-20_binds_no_rows-base-n0.callgrind
+--75120-- Dumping done.
+==75120== Events    : Ir
+==75120== Collected : 55
+==75120== 
+==75120== I   refs:      55

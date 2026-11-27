@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+gem "good_job", path: "/home/user/w/main/good_job"
+gem "rails"
+gem "pg"

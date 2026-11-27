@@ -1,0 +1,616 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb",
+  "at": "2026-11-27T23:34:10Z",
+  "n": 300,
+  "warmup": 300,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/sides-main/base",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "fatal: not a git repository (or any of the parent directories): .git",
+      "dirty": true
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/sides-main/uncached",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "fatal: not a git repository (or any of the parent directories): .git",
+      "dirty": true
+    }
+  },
+  "objects": {
+    "interp 1 binds, no rows": {
+      "base": 75.999,
+      "base1": 75.999,
+      "base2": 75.999,
+      "candidate": 72.999,
+      "change": -0.03947420360794218,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp 20 binds, no rows": {
+      "base": 128.0,
+      "base1": 128.0,
+      "base2": 128.0,
+      "candidate": 125.0,
+      "change": -0.0234375,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp 100 binds, no rows": {
+      "base": 288.0,
+      "base1": 288.0,
+      "base2": 288.0,
+      "candidate": 285.0,
+      "change": -0.01041666666666663,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp 20 binds, 20 rows": {
+      "base": 273.0,
+      "base1": 273.0,
+      "base2": 273.0,
+      "candidate": 269.0,
+      "change": -0.0146520146520146,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 1 binds, no rows": {
+      "base": 77.999,
+      "base1": 77.999,
+      "base2": 77.999,
+      "candidate": 74.999,
+      "change": -0.038462031564507226,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 20 binds, no rows": {
+      "base": 130.0,
+      "base1": 130.0,
+      "base2": 130.0,
+      "candidate": 127.0,
+      "change": -0.023076923076923106,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 100 binds, no rows": {
+      "base": 290.0,
+      "base1": 290.0,
+      "base2": 290.0,
+      "candidate": 287.0,
+      "change": -0.010344827586206917,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit 20 binds, 20 rows": {
+      "base": 275.0,
+      "base1": 275.0,
+      "base2": 275.0,
+      "candidate": 271.0,
+      "change": -0.014545454545454528,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp 1 binds, no rows": {
+      "base": 474767.485,
+      "base1": 474670.95,
+      "base2": 474864.02,
+      "candidate": 476166.86333333334,
+      "change": 0.0029475024670937433,
+      "aa": 0.0004066622211923527,
+      "claim": true
+    },
+    "interp 20 binds, no rows": {
+      "base": 1205787.8,
+      "base1": 1205568.6466666667,
+      "base2": 1206006.9533333334,
+      "candidate": 980914.1666666666,
+      "change": -0.18649519702665218,
+      "aa": 0.00036350232326669903,
+      "claim": true
+    },
+    "interp 100 binds, no rows": {
+      "base": 4087297.1216666666,
+      "base1": 4087189.84,
+      "base2": 4087404.4033333333,
+      "candidate": 2919162.3466666667,
+      "change": -0.28579639312438154,
+      "aa": 0.00005249516415042956,
+      "claim": true
+    },
+    "interp 20 binds, 20 rows": {
+      "base": 1644114.2999999998,
+      "base1": 1643974.89,
+      "base2": 1644253.71,
+      "candidate": 1418399.58,
+      "change": -0.13728651347415433,
+      "aa": 0.00016958674953442424,
+      "claim": true
+    },
+    "yjit 1 binds, no rows": {
+      "base": 203642.0783333333,
+      "base1": 203566.84333333332,
+      "base2": 203717.31333333332,
+      "candidate": 195361.15666666668,
+      "change": -0.040664099160842015,
+      "aa": 0.0007388944427963607,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                853,
+                853
+              ],
+              "compiled_block_count": [
+                12221,
+                12221
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                853,
+                853
+              ],
+              "compiled_block_count": [
+                12219,
+                12219
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                846,
+                846
+              ],
+              "compiled_block_count": [
+                12161,
+                12161
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                846,
+                846
+              ],
+              "compiled_block_count": [
+                12157,
+                12157
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                853,
+                853
+              ],
+              "compiled_block_count": [
+                12221,
+                12221
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                854,
+                854
+              ],
+              "compiled_block_count": [
+                12222,
+                12222
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 20 binds, no rows": {
+      "base": 643377.6116666666,
+      "base1": 643443.2966666666,
+      "base2": 643311.9266666666,
+      "candidate": 467089.98333333334,
+      "change": -0.2740033615354768,
+      "aa": 0.00020418801900750323,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12060
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12062,
+                12062
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                839,
+                839
+              ],
+              "compiled_block_count": [
+                11864,
+                11864
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                839,
+                839
+              ],
+              "compiled_block_count": [
+                11864,
+                11864
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12060
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12060
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 100 binds, no rows": {
+      "base": 2274274.125,
+      "base1": 2276473.3366666664,
+      "base2": 2272074.9133333336,
+      "candidate": 1371954.14,
+      "change": -0.3967507588822434,
+      "aa": 0.0019339899640870575,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n300 compiled_block_count +22"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12070,
+                12070
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12082
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                839,
+                839
+              ],
+              "compiled_block_count": [
+                11862,
+                11862
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                839,
+                839
+              ],
+              "compiled_block_count": [
+                11864,
+                11864
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12060
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                845,
+                845
+              ],
+              "compiled_block_count": [
+                12060,
+                12060
+              ],
+              "invalidation_count": [
+                285,
+                285
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit 20 binds, 20 rows": {
+      "base": 830629.3,
+      "base1": 830519.6966666667,
+      "base2": 830738.9033333333,
+      "candidate": 654042.19,
+      "change": -0.21259436670485865,
+      "aa": 0.0002639043273174509,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                911,
+                911
+              ],
+              "compiled_block_count": [
+                12773,
+                12773
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "base n300",
+            "counters": {
+              "compiled_iseq_count": [
+                911,
+                911
+              ],
+              "compiled_block_count": [
+                12772,
+                12772
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                905,
+                905
+              ],
+              "compiled_block_count": [
+                12580,
+                12580
+              ],
+              "invalidation_count": [
+                290,
+                290
+              ]
+            }
+          },
+          {
+            "window": "candidate n300",
+            "counters": {
+              "compiled_iseq_count": [
+                905,
+                905
+              ],
+              "compiled_block_count": [
+                12580,
+                12580
+              ],
+              "invalidation_count": [
+                290,
+                290
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                911,
+                911
+              ],
+              "compiled_block_count": [
+                12773,
+                12773
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          },
+          {
+            "window": "base2 n300",
+            "counters": {
+              "compiled_iseq_count": [
+                911,
+                911
+              ],
+              "compiled_block_count": [
+                12773,
+                12773
+              ],
+              "invalidation_count": [
+                287,
+                287
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

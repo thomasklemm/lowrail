@@ -1,0 +1,34 @@
+Fetching gem metadata from https://rubygems.org/..........
+Resolving dependencies...
+Fetching bigdecimal 4.1.3
+Fetching concurrent-ruby 1.3.8
+Fetching connection_pool 3.0.3
+Fetching i18n 1.15.2
+Fetching json 3.2.0
+Fetching minitest 6.1.0
+Fetching securerandom 0.4.1
+Fetching tzinfo 2.0.6
+Fetching uri 1.1.2
+Fetching activesupport 8.1.4.1
+Fetching activemodel 8.1.4.1
+Fetching timeout 0.6.1
+Fetching activerecord 8.1.4.1
+Fetching sqlite3 2.10.2 (x86_64-linux-gnu)
+Fetching prism 2.1.0 (x86_64-linux-gnu)
+Installing i18n 1.15.2
+Installing securerandom 0.4.1
+Installing connection_pool 3.0.3
+Installing timeout 0.6.1
+Installing uri 1.1.2
+Installing activemodel 8.1.4.1
+Installing json 3.2.0 with native extensions
+Installing bigdecimal 4.1.3 with native extensions
+Installing tzinfo 2.0.6
+Installing minitest 6.1.0
+Installing activesupport 8.1.4.1
+Installing concurrent-ruby 1.3.8
+Installing activerecord 8.1.4.1
+Installing prism 2.1.0 (x86_64-linux-gnu)
+Installing sqlite3 2.10.2 (x86_64-linux-gnu)
+Bundle complete! 2 Gemfile dependencies, 18 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

@@ -1,0 +1,94 @@
+==73722== Callgrind, a call-graph generating cache profiler
+==73722== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==73722== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==73722== Command: /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby --yjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb 1\ binds,\ no\ rows 300
+==73722== Parent PID: 58584
+==73722== 
+--73722-- 
+--73722-- Valgrind options:
+--73722--    --verbose
+--73722--    --tool=callgrind
+--73722--    --collect-atstart=no
+--73722--    --toggle-collect=rb_ary_cycle
+--73722--    --smc-check=all
+--73722--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-1-1_binds_no_rows-base2-n300.callgrind
+--73722--    --log-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-1-1_binds_no_rows-base2-n300.valgrind.log
+--73722-- Contents of /proc/version:
+--73722--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--73722-- 
+--73722-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--73722-- Page sizes: currently 4096, max supported 4096
+--73722-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==73722== For interactive control, run 'callgrind_control -h'.
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--73722--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--73722--   .. build-id is valid
+--73722-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--73722--    object doesn't have a dynamic symbol table
+--73722-- Scheduler: using generic scheduler lock implementation.
+==73722== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-73722-by-user-on-???
+==73722== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-73722-by-user-on-???
+==73722== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-73722-by-user-on-???
+==73722== 
+==73722== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==73722== don't want to do, unless you know exactly what you're doing,
+==73722== or are doing some strange experiment):
+==73722==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=73722 ...command...
+==73722== 
+==73722== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==73722==   /path/to/gdb /home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby
+==73722== and then give GDB the following command
+==73722==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=73722
+==73722== --pid is optional if only one valgrind process is running
+==73722== 
+--73722-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/librt.so.1
+--73722--   Considering /usr/lib/debug/.build-id/ed/4b288a01b5ac2693f3f042164922f685d9fb70.debug ..
+--73722--   .. build-id is valid
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libdl.so.2
+--73722--   Considering /usr/lib/debug/.build-id/3b/b3a48764d826ca0d4f93a35c3c5429ce2bc128.debug ..
+--73722--   .. build-id is valid
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--73722--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--73722--   .. build-id is valid
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread.so.0
+--73722--   Considering /usr/lib/debug/.build-id/bc/4d74abc4a2b14718021bce341e5836b776c90e.debug ..
+--73722--   .. build-id is valid
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--73722--    object doesn't have a symbol table
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--73722--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--73722--   .. build-id is valid
+--73722-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/cgi/escape.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/date_core.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/psych.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/zlib.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/etc.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/strscan.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/bigdecimal-4.1.3/lib/bigdecimal.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/json-3.2.0/lib/json/ext/parser.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/json-3.2.0/lib/json/ext/generator.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/socket.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/openssl.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/digest.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/io/nonblock.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/stringio.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/sqlite3-2.10.2-x86_64-linux-gnu/lib/sqlite3/4.0/sqlite3_native.so
+--73722--    object doesn't have a symbol table
+--73722-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--73722--    object doesn't have a symbol table
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/utf_16le.so
+--73722-- Reading syms from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/x86_64-linux/enc/utf_16be.so
+==73722== 
+--73722-- Start dumping at BB 686598707 (Prg.Term.)...
+--73722-- Dump to /home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-yjit/raw/ir-yjit-1-1_binds_no_rows-base2-n300.callgrind
+--73722-- Dumping done.
+==73722== Events    : Ir
+==73722== Collected : 61056423
+==73722== 
+==73722== I   refs:      61,056,423

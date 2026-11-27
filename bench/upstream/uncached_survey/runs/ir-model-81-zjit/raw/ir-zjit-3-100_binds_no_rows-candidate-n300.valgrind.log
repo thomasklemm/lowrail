@@ -1,0 +1,97 @@
+==82561== Callgrind, a call-graph generating cache profiler
+==82561== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==82561== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==82561== Command: /home/user/rubies/master-0d399335b7/bin/ruby --zjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/uncached_survey/qc_model.rb 100\ binds,\ no\ rows 300
+==82561== Parent PID: 58586
+==82561== 
+--82561-- 
+--82561-- Valgrind options:
+--82561--    --verbose
+--82561--    --tool=callgrind
+--82561--    --collect-atstart=no
+--82561--    --toggle-collect=rb_ary_cycle
+--82561--    --smc-check=all
+--82561--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-3-100_binds_no_rows-candidate-n300.callgrind
+--82561--    --log-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-3-100_binds_no_rows-candidate-n300.valgrind.log
+--82561-- Contents of /proc/version:
+--82561--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--82561-- 
+--82561-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--82561-- Page sizes: currently 4096, max supported 4096
+--82561-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==82561== For interactive control, run 'callgrind_control -h'.
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/bin/ruby
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--82561--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--82561--   .. build-id is valid
+--82561-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--82561--    object doesn't have a dynamic symbol table
+--82561-- Scheduler: using generic scheduler lock implementation.
+==82561== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-82561-by-user-on-???
+==82561== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-82561-by-user-on-???
+==82561== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-82561-by-user-on-???
+==82561== 
+==82561== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==82561== don't want to do, unless you know exactly what you're doing,
+==82561== or are doing some strange experiment):
+==82561==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=82561 ...command...
+==82561== 
+==82561== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==82561==   /path/to/gdb /home/user/rubies/master-0d399335b7/bin/ruby
+==82561== and then give GDB the following command
+==82561==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=82561
+==82561== --pid is optional if only one valgrind process is running
+==82561== 
+--82561-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--82561--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--82561--   .. build-id is valid
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--82561--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--82561--   .. build-id is valid
+--82561-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/cgi/escape.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/date_core.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/psych.so
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libyaml-0.so.2.0.9
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16le.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/utf_16_32.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16be.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32le.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32be.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/zlib.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/etc.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/strscan.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/bigdecimal-4.1.3/bigdecimal.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/parser.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/generator.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/socket.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/openssl.so
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libssl.so.3
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7
+--82561--    object doesn't have a symbol table
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/digest.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/stringio.so
+--82561-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/sqlite3_native.so
+==82561== 
+--82561-- Start dumping at BB 786972434 (Prg.Term.)...
+--82561-- Dump to /home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-model-81-zjit/raw/ir-zjit-3-100_binds_no_rows-candidate-n300.callgrind
+--82561-- Dumping done.
+==82561== Events    : Ir
+==82561== Collected : 330742794
+==82561== 
+==82561== I   refs:      330,742,794

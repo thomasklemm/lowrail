@@ -1,0 +1,11 @@
+Waiting for another process to let go of lock: /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/bundler.lock
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Fetching psych 5.5.0
+Fetching stringio 3.2.0
+Fetching ractor-dispatch 0.3.0
+Installing stringio 3.2.0 with native extensions
+Installing ractor-dispatch 0.3.0
+Installing psych 5.5.0 with native extensions
+Bundle complete! 4 Gemfile dependencies, 21 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

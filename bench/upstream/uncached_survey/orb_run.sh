@@ -9,7 +9,7 @@ repo=$(cd "$here/../../.." && pwd)
 runs=$here/runs
 master=~/rubies/master-0d399335b7/bin/ruby
 vg=~/w/valgrind-brk512
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.local/share/mise/installs/ruby/4.0.10/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 setup() {
   mise install ruby@4.0.10

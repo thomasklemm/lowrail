@@ -1,0 +1,3 @@
+Created database 'uncached_survey_gj_83727'
+jit dequeue, idle	compiled_iseq_count=2192>2192 failed_iseq_count=0>0 compiled_side_exit_count=39572>39572 invalidation_time_ns=171981479>171981479
+Dropped database 'uncached_survey_gj_83727'

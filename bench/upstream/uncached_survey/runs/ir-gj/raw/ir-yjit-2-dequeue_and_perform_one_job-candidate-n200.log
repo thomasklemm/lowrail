@@ -1,0 +1,3 @@
+Created database 'uncached_survey_gj_111972'
+jit dequeue and perform one job	compiled_iseq_count=2995>2999 compiled_block_count=41748>41811 invalidation_count=641>641
+Dropped database 'uncached_survey_gj_111972'
