@@ -1,0 +1,85 @@
+run                          mode  job s duel s regr err unset faster again
+aa-1-45991142155-a1          cpu     108     71    0   0     5      0   
+aa-1-45991142155-a1          instr   188    152    0   0     0      0   
+aa-1-45991142155-a2          cpu      91     71    0   0     6      0   
+aa-1-45991142155-a2          instr   217    169    0   0     0      0   
+aa-1-45991142155-a3          cpu      93     69    0   0     2      1   
+aa-1-45991142155-a3          instr   253    229    0   0     0      0   
+aa-1-45991142155-a4          cpu      98     76    0   0     6      0   
+aa-1-45991142155-a4          instr   245    210    0   0     0      0   
+aa-2-45991153601-a1          cpu     105     66    0   0     1      0   
+aa-2-45991153601-a1          instr   195    157    0   0     1      0   
+aa-2-45991153601-a2          cpu      92     71    0   0     6      0   
+aa-2-45991153601-a2          instr   247    224    0   0     0      0   
+aa-2-45991153601-a3          cpu      95     71    0   0     5      0   
+aa-2-45991153601-a3          instr   213    179    0   0     0      0   
+aa-2-45991153601-a4          cpu      84     66    0   0     0      1   
+aa-2-45991153601-a4          instr   244    222    0   0     0      0   
+aa-3-45991163071-a1          cpu     111     78    0   0     4      0   
+aa-3-45991163071-a1          instr   229    188    0   0     0      0   
+aa-3-45991163071-a2          cpu      87     68    0   0     3      0   
+aa-3-45991163071-a2          instr   205    181    0   0     0      0   
+aa-3-45991163071-a3          cpu      88     68    0   0     1      0   
+aa-3-45991163071-a3          instr   239    212    0   0     0      0   
+aa-3-45991163071-a4          cpu      88     69    0   0     2      1   
+aa-3-45991163071-a4          instr   255    223    0   0     0      0   
+aa-4-45991173020-a1          cpu      99     66    0   0     2      0   
+aa-4-45991173020-a1          instr   207    168    0   0     0      0   
+aa-4-45991173020-a2          cpu      85     67    0   0     1      1   
+aa-4-45991173020-a2          instr   236    215    0   0     0      0   
+aa-4-45991173020-a3          cpu      93     74    0   0     8      0   
+aa-4-45991173020-a3          instr   184    158    0   0     0      0   
+aa-4-45991173020-a4          cpu      93     65    0   0     0      0   
+aa-4-45991173020-a4          instr   207    181    0   0     0      0   
+aa-5-45991183665-a1          cpu     106     70    0   0     5      0   
+aa-5-45991183665-a1          instr   259    218    0   0     0      0   
+aa-5-45991183665-a2          cpu      91     71    0   0     6      0   
+aa-5-45991183665-a2          instr   240    216    0   0     0      0   
+aa-5-45991183665-a3          cpu      88     66    0   0     2      0   
+aa-5-45991183665-a3          instr   197    169    0   0     0      0   
+aa-5-45991183665-a4          cpu      77     65    0   0     1      0   
+aa-5-45991183665-a4          instr   187    162    0   0     0      0   
+hm1-45992194563-a1           cpu     105     73    0   0     8      6   
+hm1-45992194563-a1           instr   207    167    0   0     0      6   
+hm1-45992194563-a2           cpu      88     68    0   0     1      8   
+hm1-45992194563-a2           instr   203    178    0   0     0      6   
+hm1-45992194563-a3           cpu      88     69    0   0     2      8   
+hm1-45992194563-a3           instr   211    165    0   0     0      6   
+plant-alloc-45992167103-a1   cpu     419    379   13   0     0      0 yes  Mash; Mash#deep_merge; Mash.new; PermissiveRespondTo; across the board
+plant-alloc-45992167103-a1   instr  1637   1594   13   0     0      0 yes  Mash; Mash#deep_merge; Mash.new; PermissiveRespondTo; across the board
+plant-cpu-45992179804-a1     cpu     215    174    6   0     2      0 yes  KeepOriginalKeys; Mash
+plant-cpu-45992179804-a1     instr   734    699    5   0     0      0 yes  KeepOriginalKeys; Mash
+plant-cpu-45992179804-a2     cpu     184    156    5   0     2      0 yes  KeepOriginalKeys; Mash
+plant-cpu-45992179804-a2     instr   915    887    5   0     0      0 yes  KeepOriginalKeys; Mash
+
+aa          cpu   runs 20  failed  0  measured again  0  regressed 0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0  unsettled 66 of 420  faster 0/0/1/0/0/0/0/1/0/0/0/1/0/1/0/0/0/0/0/0  job 77-111 s (median 93)  duel 65-78 s (median 69)
+aa          instr runs 20  failed  0  measured again  0  regressed 0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0  unsettled 1 of 420  faster 0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0  job 184-259 s (median 229)  duel 152-229 s (median 188)
+plant-alloc cpu   runs  1  failed  1  measured again  1  regressed 13  unsettled 0 of 21  faster 0  job 419-419 s (median 419)  duel 379-379 s (median 379)
+plant-alloc instr runs  1  failed  1  measured again  1  regressed 13  unsettled 0 of 21  faster 0  job 1637-1637 s (median 1637)  duel 1594-1594 s (median 1594)
+plant-cpu   cpu   runs  2  failed  2  measured again  2  regressed 6/5  unsettled 4 of 42  faster 0/0  job 184-215 s (median 215)  duel 156-174 s (median 174)
+plant-cpu   instr runs  2  failed  2  measured again  2  regressed 5/5  unsettled 0 of 42  faster 0/0  job 734-915 s (median 915)  duel 699-887 s (median 887)
+hm1         cpu   runs  3  failed  0  measured again  0  regressed 0/0/0  unsettled 11 of 63  faster 6/8/8  job 88-105 s (median 88)  duel 68-73 s (median 69)
+hm1         instr runs  3  failed  0  measured again  0  regressed 0/0/0  unsettled 0 of 63  faster 6/6/6  job 203-211 s (median 207)  duel 165-178 s (median 167)
+
+Widest A/A instructions interval per benchmark, over all A/A runs:
+  KeepOriginalKeys: read String keys as methods           [0.990, 1.010]
+  Dash.new: required properties and defaults              [0.999, 1.003]
+  PermissiveRespondTo: include in a Mash subclass         [0.998, 1.003]
+  Dash.new: coerced properties                            [0.998, 1.002]
+  Mash#deep_merge: a nested update                        [0.998, 1.002]
+  Mash.new: a nested JSON response                        [0.998, 1.002]
+  Mash: overwrite a key as a method                       [0.998, 1.002]
+  Mash: read keys as methods                              [0.998, 1.002]
+  Mash: read keys with [] and dig                         [0.998, 1.002]
+  Mash: read keys with suffixes                           [0.998, 1.002]
+  Mash: respond_to? a key, a suffix and a missing name    [0.997, 1.002]
+  Mash: write new keys as methods                         [0.998, 1.002]
+  PermissiveRespondTo: overwrite a key as a method        [0.999, 1.002]
+  PermissiveRespondTo: write a new key as a method        [0.997, 1.002]
+  Dash: read and write properties                         [0.999, 1.001]
+  KeepOriginalKeys: read Symbol keys as methods           [0.999, 1.001]
+  Mash#to_hash: a nested Mash                             [0.999, 1.001]
+  Mash.new: a flat Hash                                   [0.999, 1.001]
+  Mash: read keys given as Symbols as methods             [0.998, 1.001]
+  PermissiveRespondTo: Mash.new                           [0.999, 1.001]
+  Trash.new: renamed and transformed properties           [0.998, 1.001]

@@ -1,0 +1,26 @@
+== aa-2 a1 instructions-duel-instructions- 841268f65732c0f36366c4a8c07bd0b17a128f11 success job 2026-11-27T11:31:34Z -> 2026-11-27T11:34:49Z
+  Dash.new: coerced properties                       6.0s n=8      instructions 1.000 [1.000, 1.000] same  allocations 7
+  Dash.new: required properties and defaults         7.1s n=10     instructions 1.000 [1.000, 1.001] same  allocations 3
+  Dash: read and write properties                    5.4s n=22     instructions 1.000 [1.000, 1.000] same  allocations 0
+  KeepOriginalKeys: read String keys as methods      7.9s n=14     instructions 1.000 [1.000, 1.010] unsettled  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      5.4s n=18     instructions 1.000 [0.999, 1.001] same  allocations 5
+  Mash#deep_merge: a nested update                   7.3s n=1      instructions 1.000 [0.998, 1.001] same  allocations 51
+  Mash#to_hash: a nested Mash                        5.7s n=1      instructions 1.000 [0.999, 1.001] same  allocations 10
+  Mash.new: a flat Hash                              5.8s n=16     instructions 1.000 [0.999, 1.001] same  allocations 3
+  Mash.new: a nested JSON response                   6.9s n=1      instructions 1.000 [0.998, 1.002] same  allocations 45
+  Mash: overwrite a key as a method                  6.1s n=12     instructions 1.000 [0.999, 1.001] same  allocations 6
+  Mash: read keys as methods                         5.6s n=14     instructions 1.000 [0.999, 1.001] same  allocations 5
+  Mash: read keys given as Symbols as methods        5.5s n=18     instructions 1.000 [1.000, 1.000] same  allocations 5
+  Mash: read keys with [] and dig                    5.6s n=18     instructions 1.000 [0.999, 1.000] same  allocations 4
+  Mash: read keys with suffixes                      6.0s n=10     instructions 1.000 [0.999, 1.001] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   5.7s n=19     instructions 1.000 [0.998, 1.002] same  allocations 1
+  Mash: write new keys as methods                    8.4s n=12     instructions 1.000 [0.999, 1.001] same  allocations 5
+  PermissiveRespondTo: Mash.new                      5.7s n=12     instructions 1.000 [0.999, 1.001] same  allocations 3
+  PermissiveRespondTo: include in a Mash subclass    8.8s n=2      instructions 1.000 [0.999, 1.001] same  allocations 15
+  PermissiveRespondTo: overwrite a key as a method   6.0s n=10     instructions 1.000 [0.999, 1.001] same  allocations 5
+  PermissiveRespondTo: write a new key as a method   8.5s n=10     instructions 1.000 [0.999, 1.001] same  allocations 5
+  Trash.new: renamed and transformed properties      5.9s n=8      instructions 1.000 [1.000, 1.001] same  allocations 4
+21 benchmarks in 157s: 0 regressed, 0 errors, 1 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+across the board: instructions 1.000 [1.000, 1.001] same (limit 1.0025, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]

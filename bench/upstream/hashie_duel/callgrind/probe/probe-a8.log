@@ -1,0 +1,47 @@
+Current runner version: '2.338.2'
+##[group]Runner Image Provisioner
+Hosted Compute Agent
+Version: 20261111.635
+Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Build Date: 2026-11-11T01:49:01Z
+Worker ID: {d5f6be64-41e7-4f59-94b5-2aacdb2fe75d}
+Region: westcentralus
+Cloud: Azure
+##[endgroup]
+##[group]Operating System
+Ubuntu
+26.04.1
+LTS
+##[endgroup]
+##[group]Runner Image
+Image: ubuntu-26.04
+Version: 20261122.9.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261122.9/images/ubuntu/Ubuntu2604-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261122.9
+##[endgroup]
+##[group]GITHUB_TOKEN Permissions
+Metadata: read
+##[endgroup]
+Secret source: Actions
+Cache mode: write
+Prepare workflow directory
+Prepare all required actions
+Complete job name: probe
+##[group]Run cat /proc/sys/kernel/perf_event_paranoid
+shell: /usr/bin/bash -e {0}
+##[endgroup]
+4
+ AMD EPYC 7763 64-Core Processor
+breakpoint
+kprobe
+msr
+software
+tracepoint
+uprobe
+hypervisor
+perf_event_open(instructions, user space): -1 Permission denied
+kernel.perf_event_paranoid = 2
+perf_event_open(instructions, user space): -1 No such file or directory
+ruby: perf_event_open failed
+7.0.0-1020-azure
+Cleaning up orphan processes

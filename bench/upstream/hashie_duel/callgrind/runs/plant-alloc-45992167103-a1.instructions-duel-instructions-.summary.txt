@@ -1,0 +1,83 @@
+== plant-alloc a1 instructions-duel-instructions- eeddceff2b301b52b16a65b137bd25d33cdf84b5 failure job 2026-11-27T11:39:06Z -> 2026-11-27T12:06:23Z
+  Dash.new: coerced properties                       6.5s n=6      instructions 1.000 [0.999, 1.000] same  allocations 7
+  Dash.new: coerced properties                       6.5s n=6      instructions 1.000 [1.000, 1.000] same  allocations 7
+  Dash.new: required properties and defaults         7.4s n=8      instructions 1.000 [0.999, 1.000] same  allocations 3
+  Dash.new: required properties and defaults         7.4s n=8      instructions 1.000 [1.000, 1.000] same  allocations 3
+  Dash: read and write properties                    5.8s n=18     instructions 1.000 [0.999, 1.000] same  allocations 0
+  Dash: read and write properties                    5.8s n=18     instructions 1.000 [1.000, 1.000] same  allocations 0
+  KeepOriginalKeys: read String keys as methods      5.9s n=12     instructions 1.000 [0.999, 1.006] same  allocations 5
+  KeepOriginalKeys: read String keys as methods      5.9s n=12     instructions 1.000 [1.000, 1.006] same  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      5.8s n=16     instructions 1.000 [0.999, 1.000] same  allocations 5
+  Mash#to_hash: a nested Mash                        6.0s n=1      instructions 1.000 [0.999, 1.000] same  allocations 10
+  Mash#to_hash: a nested Mash                        6.1s n=1      instructions 1.000 [0.999, 1.000] same  allocations 10
+  PermissiveRespondTo: include in a Mash subclass    8.8s n=1      instructions 1.000 [0.999, 1.001] same  allocations 15
+  PermissiveRespondTo: include in a Mash subclass    8.9s n=1      instructions 0.999 [0.998, 1.000] same  allocations 15
+  Trash.new: renamed and transformed properties      6.4s n=8      instructions 1.000 [0.999, 1.000] same  allocations 4
+  Trash.new: renamed and transformed properties      6.4s n=8      instructions 1.000 [1.000, 1.000] same  allocations 4
+! Mash#deep_merge: a nested update                   7.7s n=1      instructions 1.016 [1.014, 1.017] slower  allocations 51→92
+! Mash#deep_merge: a nested update                   7.7s n=1      instructions 1.017 [1.015, 1.018] slower  allocations 51→92
+! Mash#deep_merge: a nested update                   9.1s n=1      instructions 1.016 [1.014, 1.017] slower  allocations 51→92
+! Mash#deep_merge: a nested update                   9.1s n=1      instructions 1.016 [1.015, 1.018] slower  allocations 51→92
+! Mash#deep_merge: a nested update                   9.1s n=1      instructions 1.017 [1.016, 1.018] slower  allocations 51→92
+! Mash.new: a flat Hash                              6.2s n=12     instructions 1.048 [1.048, 1.049] slower  allocations 3→5
+! Mash.new: a flat Hash                              6.2s n=14     instructions 1.049 [1.049, 1.050] slower  allocations 3→5
+! Mash.new: a flat Hash                              7.4s n=12     instructions 1.048 [1.047, 1.049] slower  allocations 3→5
+! Mash.new: a nested JSON response                   7.3s n=1      instructions 1.017 [1.016, 1.018] slower  allocations 45→83
+! Mash.new: a nested JSON response                   7.4s n=1      instructions 1.017 [1.015, 1.018] slower  allocations 45→83
+! Mash.new: a nested JSON response                   8.8s n=1      instructions 1.017 [1.015, 1.018] slower  allocations 45→83
+! Mash.new: a nested JSON response                   8.8s n=1      instructions 1.017 [1.016, 1.018] slower  allocations 45→83
+! Mash: overwrite a key as a method                  6.4s n=12     instructions 1.022 [1.021, 1.023] slower  allocations 6→8
+! Mash: overwrite a key as a method                  6.5s n=12     instructions 1.021 [1.021, 1.022] slower  allocations 6→8
+! Mash: overwrite a key as a method                  7.6s n=10     instructions 1.021 [1.020, 1.023] slower  allocations 6→8
+! Mash: overwrite a key as a method                  7.6s n=10     instructions 1.022 [1.021, 1.023] slower  allocations 6→8
+! Mash: read keys as methods                         6.0s n=12     instructions 1.098 [1.097, 1.099] slower  allocations 5→15
+! Mash: read keys as methods                         6.1s n=14     instructions 1.100 [1.098, 1.101] slower  allocations 5→15
+! Mash: read keys as methods                         7.1s n=10     instructions 1.097 [1.095, 1.098] slower  allocations 5→15
+! Mash: read keys as methods                         7.1s n=12     instructions 1.099 [1.097, 1.100] slower  allocations 5→15
+! Mash: read keys as methods                         7.2s n=12     instructions 1.099 [1.097, 1.100] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        5.9s n=12     instructions 1.145 [1.144, 1.146] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        5.9s n=12     instructions 1.145 [1.145, 1.146] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        7.0s n=12     instructions 1.144 [1.144, 1.145] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        7.0s n=12     instructions 1.145 [1.145, 1.146] slower  allocations 5→15
+! Mash: read keys with [] and dig                    6.0s n=16     instructions 1.047 [1.046, 1.048] slower  allocations 4→7
+! Mash: read keys with [] and dig                    6.0s n=16     instructions 1.047 [1.047, 1.048] slower  allocations 4→7
+! Mash: read keys with [] and dig                    7.1s n=14     instructions 1.047 [1.046, 1.048] slower  allocations 4→7
+! Mash: read keys with [] and dig                    7.1s n=15     instructions 1.047 [1.046, 1.048] slower  allocations 4→7
+! Mash: read keys with suffixes                      6.1s n=5      instructions 1.032 [1.031, 1.033] slower  allocations 16→21
+! Mash: read keys with suffixes                      6.3s n=8      instructions 1.033 [1.032, 1.034] slower  allocations 16→21
+! Mash: read keys with suffixes                      7.6s n=8      instructions 1.034 [1.033, 1.035] slower  allocations 16→21
+! Mash: read keys with suffixes                      7.7s n=8      instructions 1.034 [1.033, 1.034] slower  allocations 16→21
+! Mash: respond_to? a key, a suffix and a missing name   6.0s n=16     instructions 1.050 [1.050, 1.051] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   6.0s n=18     instructions 1.052 [1.051, 1.053] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   7.1s n=14     instructions 1.049 [1.048, 1.051] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   7.1s n=15     instructions 1.050 [1.047, 1.052] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   7.1s n=15     instructions 1.050 [1.048, 1.051] slower  allocations 1→4
+! Mash: write new keys as methods                    8.7s n=10     instructions 1.024 [1.022, 1.025] slower  allocations 5→7
+! Mash: write new keys as methods                    8.8s n=10     instructions 1.023 [1.022, 1.024] slower  allocations 5→7
+! Mash: write new keys as methods                   10.1s n=10     instructions 1.024 [1.022, 1.026] slower  allocations 5→7
+! Mash: write new keys as methods                   10.1s n=10     instructions 1.024 [1.023, 1.025] slower  allocations 5→7
+! Mash: write new keys as methods                   10.2s n=10     instructions 1.023 [1.022, 1.024] slower  allocations 5→7
+! PermissiveRespondTo: Mash.new                      6.1s n=10     instructions 1.026 [1.026, 1.026] slower  allocations 3→4
+! PermissiveRespondTo: Mash.new                      6.1s n=12     instructions 1.027 [1.026, 1.027] slower  allocations 3→4
+! PermissiveRespondTo: Mash.new                      7.3s n=10     instructions 1.026 [1.025, 1.027] slower  allocations 3→4
+! PermissiveRespondTo: Mash.new                      7.3s n=10     instructions 1.026 [1.026, 1.027] slower  allocations 3→4
+21 benchmarks in 1594s: 13 regressed, 0 errors, 0 with a timing too close to the limit to settle
+Comparing 21 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 12 worker processes of each version)
+Measuring 13 benchmarks that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+Measuring every benchmark again, in fresh processes: slower across the board in instructions?
+REGRESSION Mash#deep_merge: a nested update: worse instructions, allocations in every measurement
+REGRESSION Mash.new: a flat Hash: worse instructions, allocations in every measurement
+REGRESSION Mash.new: a nested JSON response: worse instructions, allocations in every measurement
+REGRESSION Mash: overwrite a key as a method: worse instructions, allocations in every measurement
+REGRESSION Mash: read keys as methods: worse instructions, allocations in every measurement
+REGRESSION Mash: read keys given as Symbols as methods: worse instructions, allocations in every measurement
+REGRESSION Mash: read keys with [] and dig: worse instructions, allocations in every measurement
+REGRESSION Mash: read keys with suffixes: worse instructions, allocations in every measurement
+REGRESSION Mash: respond_to? a key, a suffix and a missing name: worse instructions, allocations in every measurement
+REGRESSION Mash: write new keys as methods: worse instructions, allocations in every measurement
+REGRESSION PermissiveRespondTo: Mash.new: worse instructions, allocations in every measurement
+REGRESSION PermissiveRespondTo: overwrite a key as a method: worse allocations in every measurement
+REGRESSION PermissiveRespondTo: write a new key as a method: worse allocations in every measurement
+REGRESSION across the board: instructions slower in both measurements
+across the board: instructions 1.016 [1.014, 1.017] slower (limit 1.0025, 21 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]

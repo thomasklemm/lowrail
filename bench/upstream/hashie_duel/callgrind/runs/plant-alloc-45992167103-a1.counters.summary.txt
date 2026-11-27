@@ -1,0 +1,2 @@
+== plant-alloc a1 counters eeddceff2b301b52b16a65b137bd25d33cdf84b5 success job 2026-11-27T11:39:35Z -> 2026-11-27T11:39:38Z
+perf_event_open(instructions, user space): -1 Permission denied

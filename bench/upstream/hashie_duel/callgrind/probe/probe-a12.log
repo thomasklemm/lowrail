@@ -1,0 +1,51 @@
+Current runner version: '2.338.2'
+##[group]Runner Image Provisioner
+Hosted Compute Agent
+Version: 20261111.635
+Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Build Date: 2026-11-11T01:49:01Z
+Worker ID: {fb550300-e6c2-4f5e-aa25-62353c7d4cbc}
+Region: us-east-1
+Cloud: AWS
+##[endgroup]
+##[group]Operating System
+Ubuntu
+26.04.1
+LTS
+##[endgroup]
+##[group]Runner Image
+Image: ubuntu-26.04
+Version: 20261116.88.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.88/images/ubuntu/Ubuntu2604-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.88
+##[endgroup]
+##[group]GITHUB_TOKEN Permissions
+Metadata: read
+##[endgroup]
+Secret source: Actions
+Cache mode: write
+Prepare workflow directory
+Prepare all required actions
+Complete job name: probe
+##[group]Run cat /proc/sys/kernel/perf_event_paranoid
+shell: /usr/bin/bash -e {0}
+##[endgroup]
+4
+ Intel(R) Xeon(R) 6975P-C
+breakpoint
+cpu
+kprobe
+msr
+software
+tracepoint
+uprobe
+granite_rapids
+arch_perfmon
+hypervisor
+perf_event_open(instructions, user space): -1 Permission denied
+kernel.perf_event_paranoid = 2
+perf_event_open ok, read(2); instructions per loop: [121047111, 121045745, 121044817, 121044816, 121044816, 121044806, 121044816, 121044816]
+ruby IO#pread as Duel reads it: Errno::ESPIPE: Illegal seek
+ruby IO#sysread: 66327
+7.0.0-1016-aws
+Cleaning up orphan processes
