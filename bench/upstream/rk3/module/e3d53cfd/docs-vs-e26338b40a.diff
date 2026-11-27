@@ -1,0 +1,9 @@
+482c482
+< rdoc Rack::Utils false unescape (s, encoding = Encoding::UTF_8) nil "Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8"
+---
+> rdoc Rack::Utils false unescape () "unescape(s, encoding = Encoding::UTF_8)" "Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8"
+1017d1016
+< yard Rack::QueryParser#unescape method [["string", nil], ["encoding", "Encoding::UTF_8"]] private ""
+1368a1368,1369
+> yard Rack::Unescape module  public ":nodoc:"
+> yard Rack::Unescape#unescape method [["s", nil], ["encoding", "Encoding::UTF_8"]] private ""

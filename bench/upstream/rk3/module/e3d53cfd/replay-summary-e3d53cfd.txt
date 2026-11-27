@@ -1,0 +1,16 @@
+2.7.3-clean.txt 204073 lines, 9767 differ other differences: 3 
+2.7.3-util.txt 204073 lines, 9767 differ other differences: 3 
+3.0.7-clean.txt 204073 lines, 9767 differ other differences: 3 
+3.0.7-util.txt 204073 lines, 9767 differ other differences: 3 
+3.1.7-clean.txt 204073 lines, 9773 differ other differences: 9 
+3.1.7-util.txt 204073 lines, 9773 differ other differences: 9 
+3.2.9-clean.txt 204073 lines, 9767 differ other differences: 3 
+3.2.9-util.txt 204073 lines, 9767 differ other differences: 3 
+3.3.9-clean.txt 204073 lines, 9767 differ other differences: 3 
+3.3.9-util.txt 204073 lines, 9767 differ other differences: 3 
+3.4.6-clean.txt 204073 lines, 9767 differ other differences: 3 
+3.4.6-pure.txt 204073 lines, 9767 differ other differences: 3 
+3.4.6-util.txt 204073 lines, 9767 differ other differences: 3 
+4.0.9-clean.txt 204073 lines, 9767 differ other differences: 3 
+4.0.9-pure.txt 204073 lines, 9767 differ other differences: 3 
+4.0.9-util.txt 204073 lines, 9767 differ other differences: 3 

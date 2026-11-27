@@ -1,0 +1,5 @@
+rack: identical apart from rack/unescape.rb
+rack/query_parser: identical apart from rack/unescape.rb
+rack/utils: identical apart from rack/unescape.rb
+rack/request: identical apart from rack/unescape.rb
+rack/mock_request: identical apart from rack/unescape.rb
