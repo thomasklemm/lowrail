@@ -362,8 +362,10 @@ which refuses unless the gates pass on the current head. A candidate made moot u
 * **Where claims come from:** Callgrind instruction counts with fixed heap and A/A are primary ([bench.md](bench.md));
   body numbers come from `script/upstream-bench` ([body-numbers](upstream/body-numbers.md)). App pages find sites but
   can't price them (A/A up to ±7%). ZJIT speed claims come from ruby-bench with A/A.
-* **Every Rails candidate also reports its micro on master × ZJIT** (pinned build, A/A), or says its path doesn't run
-  on 4.1; in the record, not the body. A ZJIT or YJIT wall-time loss blocks it only when `script/upstream-bench --wall` (≥ 30 rounds) claims
+* **Every candidate also reports its micro on master × ZJIT** (Rails, Ruby and gems; pinned build, `--wall` with
+  A/A), or says its path doesn't run on 4.1 (Thomas, 2026-11-27: ZJIT is tested and weighed wherever it can be;
+  census rounds, field tests and reviews include a ZJIT pass too). In the record; in the body as one sentence when
+  the ZJIT result adds something, such as a win that holds or differs under ZJIT. A ZJIT or YJIT wall-time loss blocks it only when `script/upstream-bench --wall` (≥ 30 rounds) claims
   it: an A/A interval containing 0 and a change interval excluding 0. A loss inside that cohort's intervals is noise, not
   an unexplained cost; a claimed loss blocks until explained or accepted (2026-11-27, wall_noise study). Rails changes made only for ZJIT need a
   win of their own on the pin.
