@@ -16,7 +16,7 @@ impact: "Since #39525 (merged 2026-05-28, unreleased) Active Record has a public
 evidence: [bench/upstream/rails_main_hotlines/ug82d]
 rank: 4
 risky: false
-state: built
+state: in-review
 note: "2026-11-27 (Rails 8.2 pre-beta round): found by the heavy-app slice in Flow's controller tests (company_membership.rb:34), repro in bench/upstream/rails_main_hotlines/ug82d (results.txt: 8.1.4.1 works, main raises for the scope and for the class method on a relation). No issue or PR names the collision (searched 'default_order scope', the error text, 'default_order conflict'; #39525's cross-references are follow-up fixes #59496, #59497, #59523, #57630, open #37807, #45864). Guide section placed after the enum negative-scopes section. Commit message names no PR number (fork push would reference it)."
 ownership: {date: 2026-11-27, checked: ["open PRs cross-referencing #39525"], hits: ["references #39525: rails/rails#37807 (PR, open, GermanDZ): Fix first and last when records are not loaded in a sorted relationship","references #39525: rails/rails#45864 (PR, open, simi): Add Relation#select_append method to append to default selection."]}
 passes: []
