@@ -252,7 +252,7 @@ Interpreter Callgrind, `script/upstream-bench`, Ruby 4.0.9 ([L6-2026-11-27](../.
 | find, then `changed?` | 712,038 → 681,893 (−4.2%) | 0.04% | 1,832,522 → 1,731,697 (−5.5%) | 0.03% |
 | `serializable_hash` | 191,400 → 178,771 (−6.6%) | 0.10% | 642,937 → 601,183 (−6.5%) | 0.03% |
 
-Objects are unchanged (208 / 90 / 32 at 30 columns). YJIT, every window JIT-flat: `update!` −2.2% (A/A 0.21%), find then
+Objects per call are unchanged for find then `changed?` and `serializable_hash` (90 and 32). The two base allocation runs differ for `update!`, so no allocation count is claimed for that row. YJIT, every window JIT-flat: `update!` −2.2% (A/A 0.21%), find then
 `changed?` −2.4% (A/A 0.15%), `serializable_hash` −1.8% (A/A 1.23%, not claimed).
 
 Ruby master `f3e180b5eb` × ZJIT ([L6-master-zjit-2026-11-27](../../bench/upstream/lead6/body/L6-master-zjit-2026-11-27/table.md)):
@@ -262,8 +262,13 @@ compiled ISEQs, failed ISEQs and side exits stay flat in every window. `update!`
 `rb_ec_ary_new_from_values` called from a `vm_call_symbol` path that base's has not, so the two runs compiled
 differently, while objects per call are equal (32). With the default 3,000-call warm-up and N = 1,000
 ([L6-master-zjit-serializable-hash-2026-11-27](../../bench/upstream/lead6/body/L6-master-zjit-serializable-hash-2026-11-27/table.md))
-it is −1.0% (A/A 0.07%), and `--zjit-stats` over 10,000 warm calls shows 600,000 fewer sends and 12% fewer
-`zjit_insn_count` on the candidate, the inlined `index_for_name` and `lookup` calls. No ZJIT loss.
+it reads −1.0% (A/A 0.07%). These are ungated observations; without an invalidation counter, the runs do not establish a ZJIT gain or rule out a regression.
+
+Body benchmark (thermos-sol, 2026-11-27): `serializable_hash` on the same 30-column table, script/upstream-bench with
+`--ips 3`, YJIT, every window JIT-flat: best rounds 50.2k → 52.3k i/s (+3.7%, A/A 0.76%)
+([body-rerun](data/rails-main-census-9/lead6/review-thermos-sol-2026-11-27/body-rerun/table.md)). The rounds overlap
+(candidate 52.3k / 49.2k / 50.4k, base 49.7k / 50.2k / 48.1k and 48.3k / 50.0k / 50.6k), so the body shows the output
+as the project's format and claims no speed-up; the Callgrind table carries the claim.
 
 Exactness and suites on `8b1c6428ea`: `bench/upstream/k1/keys_probe.rb` 6,959 lines identical on main and head;
 TracePoint on `update!` of one column (30 columns): `#keys` 3 and `#[]` 41 calls on both, `index_for_name` 140 → 9,
