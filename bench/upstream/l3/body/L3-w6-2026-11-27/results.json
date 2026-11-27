@@ -1,0 +1,109 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/l3/body/l3_body_w6.rb",
+  "at": "2026-11-27T12:09:56Z",
+  "n": 500,
+  "warmup": 1000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/w/l3",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp Marshal.dump": {
+      "base": 16.0145,
+      "base1": 16.03,
+      "base2": 15.999,
+      "candidate": 13.999,
+      "change": -0.12585469418339634,
+      "aa": 0.0019357457304318324,
+      "claim": true
+    },
+    "interp attributes_for_database": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 2.0,
+      "change": -0.5,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp attributes_before_type_cast": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 1.0,
+      "change": -0.75,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp MessagePack dump": {
+      "base": 19.0,
+      "base1": 19.0,
+      "base2": 19.0,
+      "candidate": 17.0,
+      "change": -0.10526315789473684,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp Marshal.dump": {
+      "base": 96709.902,
+      "base1": 96706.754,
+      "base2": 96713.05,
+      "candidate": 82635.48,
+      "change": -0.14553237785309725,
+      "aa": 0.00006510191686474974,
+      "claim": true
+    },
+    "interp attributes_for_database": {
+      "base": 35572.908,
+      "base1": 35570.408,
+      "base2": 35575.408,
+      "candidate": 21379.04,
+      "change": -0.39900780672752423,
+      "aa": 0.00014055640320437114,
+      "claim": true
+    },
+    "interp attributes_before_type_cast": {
+      "base": 28482.13,
+      "base1": 28479.63,
+      "base2": 28484.63,
+      "candidate": 14309.498,
+      "change": -0.4975973355925277,
+      "aa": 0.00017554866858623283,
+      "claim": true
+    },
+    "interp MessagePack dump": {
+      "base": 58868.496,
+      "base1": 58878.992,
+      "base2": 58858.0,
+      "candidate": 44638.118,
+      "change": -0.24173163860004165,
+      "aa": 0.0003565914101151552,
+      "claim": true
+    }
+  },
+  "ips": {}
+}

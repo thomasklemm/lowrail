@@ -1,0 +1,97 @@
+==144185== Callgrind, a call-graph generating cache profiler
+==144185== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==144185== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==144185== Command: /home/user/w/ruby-master/bin/ruby --zjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/l3/body/l3_body.rb MessagePack\ dump 500
+==144185== Parent PID: 128737
+==144185== 
+--144185-- 
+--144185-- Valgrind options:
+--144185--    --verbose
+--144185--    --tool=callgrind
+--144185--    --collect-atstart=no
+--144185--    --toggle-collect=rb_ary_cycle
+--144185--    --smc-check=all
+--144185--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/l3/body/L3-master-zjit-2026-11-27/raw/ir-zjit-4-MessagePack_dump-base-n500.callgrind
+--144185--    --log-file=/home/user/workspace/repo/bench/upstream/l3/body/L3-master-zjit-2026-11-27/raw/ir-zjit-4-MessagePack_dump-base-n500.valgrind.log
+--144185-- Contents of /proc/version:
+--144185--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--144185-- 
+--144185-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--144185-- Page sizes: currently 4096, max supported 4096
+--144185-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==144185== For interactive control, run 'callgrind_control -h'.
+--144185-- Reading syms from /home/user/w/ruby-master/bin/ruby
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--144185--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--144185--   .. build-id is valid
+--144185-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--144185--    object doesn't have a dynamic symbol table
+--144185-- Scheduler: using generic scheduler lock implementation.
+==144185== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-144185-by-user-on-???
+==144185== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-144185-by-user-on-???
+==144185== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-144185-by-user-on-???
+==144185== 
+==144185== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==144185== don't want to do, unless you know exactly what you're doing,
+==144185== or are doing some strange experiment):
+==144185==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=144185 ...command...
+==144185== 
+==144185== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==144185==   /path/to/gdb /home/user/w/ruby-master/bin/ruby
+==144185== and then give GDB the following command
+==144185==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=144185
+==144185== --pid is optional if only one valgrind process is running
+==144185== 
+--144185-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--144185--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--144185--   .. build-id is valid
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--144185--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--144185--   .. build-id is valid
+--144185-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/encdb.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/trans/transdb.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/cgi/escape.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/date-3.6.0/lib/date_core.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/psych-5.5.0/lib/psych.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/utf_16le.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/trans/utf_16_32.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/utf_16be.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/utf_32le.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/enc/utf_32be.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/zlib.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/msgpack-1.8.7/lib/msgpack/msgpack.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/extensions/x86_64-linux/4.1.0+6-static/bigdecimal-4.1.3/bigdecimal.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/socket.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/strscan.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/erb/escape.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/etc.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/json-3.2.0/lib/json/ext/parser.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/json-3.2.0/lib/json/ext/generator.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/openssl.so
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libssl.so.3
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7
+--144185--    object doesn't have a symbol table
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/4.1.0+6/x86_64-linux/digest.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/stringio-3.2.0/lib/stringio.so
+--144185-- Reading syms from /home/user/w/ruby-master/lib/ruby/gems/4.1.0+6/gems/sqlite3-2.10.2/lib/sqlite3/sqlite3_native.so
+==144185== 
+--144185-- Start dumping at BB 731320626 (Prg.Term.)...
+--144185-- Dump to /home/user/workspace/repo/bench/upstream/l3/body/L3-master-zjit-2026-11-27/raw/ir-zjit-4-MessagePack_dump-base-n500.callgrind
+--144185-- Dumping done.
+==144185== Events    : Ir
+==144185== Collected : 64802633
+==144185== 
+==144185== I   refs:      64,802,633

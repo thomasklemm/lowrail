@@ -1,0 +1,665 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/l3/body/l3_body.rb",
+  "at": "2026-11-27T11:58:52Z",
+  "n": 500,
+  "warmup": 1000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/l3",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "zjit Marshal.dump": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 13.999,
+      "change": -0.12500781298831176,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit attributes_for_database": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 2.0,
+      "change": -0.5,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit attributes_before_type_cast": {
+      "base": 4.0,
+      "base1": 4.0,
+      "base2": 4.0,
+      "candidate": 1.0,
+      "change": -0.75,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit MessagePack dump": {
+      "base": 19.0,
+      "base1": 19.0,
+      "base2": 19.0,
+      "candidate": 17.0,
+      "change": -0.10526315789473684,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "zjit Marshal.dump": {
+      "base": 265321.963,
+      "base1": 265682.406,
+      "base2": 264961.52,
+      "candidate": 214366.578,
+      "change": -0.19205113826178044,
+      "aa": 0.002717023467823501,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n500 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n500 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n500 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10041,
+                10041
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10039,
+                10039
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                569,
+                569
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9987,
+                9987
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                569,
+                569
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9987,
+                9987
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10039,
+                10039
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10039,
+                10039
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit attributes_for_database": {
+      "base": 107661.886,
+      "base1": 107663.902,
+      "base2": 107659.87,
+      "candidate": 56646.49,
+      "change": -0.47384824746614607,
+      "aa": 0.00003745057930720738,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n500 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n500 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n500 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                567,
+                567
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9896,
+                9896
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                567,
+                567
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9896,
+                9896
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                561,
+                561
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9843,
+                9843
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                561,
+                561
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9843,
+                9843
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                567,
+                567
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9896,
+                9896
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                567,
+                567
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9896,
+                9896
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit attributes_before_type_cast": {
+      "base": 96130.42199999999,
+      "base1": 96215.69,
+      "base2": 96045.154,
+      "candidate": 48082.486,
+      "change": -0.49982029622214696,
+      "aa": 0.0017740065678688828,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n500 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n500 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n500 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                559,
+                559
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9779,
+                9779
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                559,
+                559
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9779,
+                9779
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                554,
+                554
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9726,
+                9726
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                554,
+                554
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9726,
+                9726
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                559,
+                559
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9779,
+                9779
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                559,
+                559
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9779,
+                9779
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit MessagePack dump": {
+      "base": 129819.474,
+      "base1": 129605.156,
+      "base2": 130033.792,
+      "candidate": 78258.964,
+      "change": -0.3971708435669674,
+      "aa": 0.0033017850619237498,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n500 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n500 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n500 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10026,
+                10026
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10026,
+                10026
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                569,
+                569
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9973,
+                9973
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                569,
+                569
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9973,
+                9973
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10026,
+                10026
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                575,
+                575
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10026,
+                10026
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {}
+}

@@ -315,3 +315,38 @@ benchmark-ips: trees ~/ips/{main,main2,l3,l6} (worktrees of 50c54eed06, 52587b6f
 ~/ips/b-TREE/Gemfile (activesupport, activemodel, activerecord by path, sqlite3, msgpack, benchmark-ips; BUNDLE_PATH ~/ips/gems):
 bench/upstream/l3/ips_rounds.sh $PWD/bench/upstream/l3/l3_ips.rb l3 6 --yjit > OUT; ruby bench/upstream/l3/ips_best.rb OUT
 ```
+
+## Rebuild on main 088fc0cf61 (2026-11-27)
+
+Cherry-picked cleanly onto `088fc0cf61` as `f70d3e0917` (patch-id equal to `cf1607c76d`). Since `f785381cca`, main
+changed `attribute_set.rb` only through #59800 (`#keys` and `materialize` no longer merge type keys);
+`values_for_database`, `values_before_type_cast` and `LazyIndexedAttributeSet#attributes` are unchanged, so main still
+copies the row. Raw data: [results/rebuild-2026-11-27](results/rebuild-2026-11-27).
+
+Body numbers, `script/upstream-bench`, Ruby 4.0.9 ([body/l3_body.rb](body/l3_body.rb)):
+
+| 30 columns | interp main → branch | A/A | YJIT main → branch | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Marshal.dump` | 319,572 → 260,103 (−18.6%) | 0.15% | 259,729 → 213,668 (−17.7%) | 0.08% |
+| `attributes_for_database` | 161,641 → 102,578 (−36.5%) | 0.02% | 107,195 → 61,187 (−42.9%) | 0.19% |
+| `attributes_before_type_cast` | 124,157 → 69,743 (−43.8%) | 0.11% | 95,343 → 50,911 (−46.6%) | 0.22% |
+| MessagePack dump | 190,579 → 131,109 (−31.2%) | 0.04% | 129,953 → 84,046 (−35.3%) | 0.03% |
+
+Every YJIT window JIT-flat ([L3-2026-11-27](body/L3-2026-11-27/table.md)). Interpreter at 6 and 102 columns
+([L3-w6](body/L3-w6-2026-11-27/table.md), [L3-w102](body/L3-w102-2026-11-27/table.md)): Marshal.dump −14.6% / −19.9%,
+MessagePack −24.2% / −33.5%, attributes_for_database −39.9% / −36.4%, attributes_before_type_cast −49.8% / −42.7%,
+A/A ≤ 0.07%. Objects: attributes_for_database 4 → 2, attributes_before_type_cast 4 → 1, Marshal.dump 16 → 14.
+
+Ruby master `f3e180b5eb` × ZJIT ([L3-master-zjit](body/L3-master-zjit-2026-11-27/table.md)): −19.2% / −47.4% /
+−50.0% / −39.7% (A/A ≤ 0.33%). The tool prints "not JIT-flat" because master's `RubyVM::ZJIT.stats` has no
+`invalidation_count`; compiled ISEQs, failed ISEQs and side exits are unchanged in every window. No ZJIT loss.
+
+benchmark-ips for the body (the body's script, `l3_ips.rb`, byte-identical), YJIT, 6 interleaved rounds of main, L3
+and main2 (a second worktree of `088fc0cf61`) on core 1 with `results/fix-snapshot-2026-11-25/ips_rounds.sh`
+([body-ips.txt](results/rebuild-2026-11-27/body-ips.txt)): best rounds Marshal.dump 37,337 → 42,863 i/s (+14.8%),
+attributes_for_database 93,220 → 153,856 (+65.0%); main2 −1.6% and −2.3%.
+
+Exactness and suites on `f70d3e0917`: thermos-sol's `exactness_extension.rb` (718 lines) identical on main and head on
+SQLite and PostgreSQL 17 ([sha256](results/rebuild-2026-11-27/extended-probe-sha256.txt)); Active Model 1,277 runs,
+Active Record SQLite 10,460 and PostgreSQL 17 11,392 runs, 0 failures; the 4 SQLite errors needed the `sqlite3` CLI
+and `sqlite_rake_test.rb` passes once it is installed ([suites.txt](results/rebuild-2026-11-27/suites.txt)).

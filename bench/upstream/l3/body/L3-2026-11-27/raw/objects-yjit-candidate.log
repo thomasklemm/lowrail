@@ -1,0 +1,4 @@
+objects Marshal.dump	13.999
+objects attributes_for_database	2.0
+objects attributes_before_type_cast	1.0
+objects MessagePack dump	17.0

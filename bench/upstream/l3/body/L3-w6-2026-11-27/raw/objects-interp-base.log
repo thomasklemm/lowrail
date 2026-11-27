@@ -1,0 +1,4 @@
+objects Marshal.dump	16.03
+objects attributes_for_database	4.0
+objects attributes_before_type_cast	4.0
+objects MessagePack dump	19.0
