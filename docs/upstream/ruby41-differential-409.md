@@ -39,6 +39,12 @@ Redmine note on Bug #22291, drafted and **not sent** (Thomas, 2026-11-27: Mocha 
 
 > Heads-up in case it's useful: Mocha keeps a stubbed object's mock in an instance variable, so `ENV.stubs(:[])` and `ENV.expects` now raise `Ractor::IsolationError` in Mocha 3.1.0. A fix for Mocha is ready to propose.
 
+## Finding 2: Time.iso8601 keeps impossible dates on master (time 0.5.0; covered by TN1)
+
+Reported by the heavy slice from Flow (`runner_protocol_conformance_test.rb`, one test, fails on master in every mode). On master `Time.iso8601("2026-02-30T00:00:00Z")` returns a Time whose fields read February 30 (`iso8601` prints `2026-02-30T00:00:00Z`), while its instant is March 2; time 0.4.2 on 4.0.9 gives 2026-03-02. First bad commit `77d0d22b59` "[ruby/time] Optimize Time.xmlschema" (time 0.5.0, the default gem 4.1 ships), which now calls `Time.new(string)` and so inherits [Bug #21301](https://bugs.ruby-lang.org/issues/21301) (open; [Bug #22375](https://bugs.ruby-lang.org/issues/22375) reports this very `Time.iso8601` case and is marked its duplicate).
+
+Cases ([evidence/time-iso8601](../../bench/upstream/ruby-differential/evidence/time-iso8601)): with `Z`/UTC and the date-only form master keeps day 30 or 31 in the fields (wrong `iso8601`, `mon`, `day`; right `to_i`); with `+09:00` all three agree; with `-05:00` master is right and 4.0.9 was two days early. Master with only TN1's `time.c` (head `2e061793aa`, our draft ruby/ruby#20208 on top of khasinski's #16469) gives the March/May dates in every case, so no new item: the fix exists and is in review. What this adds for Thomas: since time 0.5.0 the bug reaches `Time.iso8601`/`Time.xmlschema` on every Ruby 4.1, which strengthens the case for landing #16469/#20208 before 2026-12-25; a one-sentence body update to #20208 naming it is his call (not done).
+
 ## Performance
 
 In progress: per-workload Callgrind instructions (`script/cpu-census`, fixed heap, A/A pair per Ruby) for interp, YJIT and ZJIT with the JIT-flat gate, now extended to ZJIT in `cpu_harness.rb`.
