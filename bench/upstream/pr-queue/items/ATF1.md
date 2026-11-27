@@ -5,7 +5,7 @@ kind: fix
 area: "Action Text: Content rendering, bulk attachable lookup"
 reviewer: "flavorjones (#58173)"
 branch: thomasklemm/action-text-attachment-from-node-fallback
-head: "b3a7a6bb19f8f8d20c38248c1d77dca98956761e"
+head: "9c1378eab62cf1e45c28d30055418d522c9257ef"
 base: main
 built_on: "088fc0cf61"
 introduced_by: 58173
@@ -17,13 +17,14 @@ evidence: [bench/upstream/rails_main_hotlines/atf1]
 rank: 5
 risky: false
 state: in-review
-note: "2026-11-27 (Rails 8.2 pre-beta round): found in Campfire's suite on main 088fc0cf61 (its own pin e3d5c569d2 passes); bisect.log in evidence. Classification: an unreleased behaviour change to a public extension point, and Rails' own two call sites disagree (gallery already passes only the located record), so the fix is in Rails rather than a compatibility shim; reviewers asked to judge that. Actiontext suite: 385 runs, one error (JavascriptPackageTest needs yarn, environment). Test fails without the fix. Only #58173 cross-reference is lylo/pagecord#1491 (adopting it). No open PR or issue names attachment_for_node, attachables_by_sgid or #58173."
+note: "2026-11-27 (Astra changes applied): amended to 9c1378eab6 on 088fc0cf61, force-pushed with lease on b3a7a6bb19. attachment_for_node reads the bulk map only when the node has an sgid (b3a7a6bb19 ran the lookup when it rendered an sgid-less node, so later attachables were loaded before earlier render callbacks ran and could be stale); new content_test.rb case (remote image, then a Person whose name the first callback changes) fails on b3a7a6bb19 ([nil, Before]) and passes on the new head; commit message adds one sentence; body says the bulk lookup still uses one query per model (fallbacks for unlocated SGIDs query per node, as on main). Verified on 9c1378eab6 (Ruby 4.0.9): content_test 34 runs 0 failures; Action Text unit+integration 363 runs 0 failures; Campfire ContentFiltersTest 19 runs 0 failures and full suite 634 runs 0 failures 2 skips. Campfire citation checked against the DECISIONS citation rule: basecamp/once-campfire 4858 stars, not archived, pushed 2026-11-24; permalink 945c22f141 is current main. Delta reviews requested. 2026-11-27 (Rails 8.2 pre-beta round): found in Campfire's suite on main 088fc0cf61 (its own pin e3d5c569d2 passes); bisect.log in evidence. Classification: an unreleased behaviour change to a public extension point, and Rails' own two call sites disagree (gallery already passes only the located record), so the fix is in Rails rather than a compatibility shim; reviewers asked to judge that. Actiontext suite: 385 runs, one error (JavascriptPackageTest needs yarn, environment). Test fails without the fix. Only #58173 cross-reference is lylo/pagecord#1491 (adopting it). No open PR or issue names attachment_for_node, attachables_by_sgid or #58173."
 ownership: {date: 2026-11-27, checked: ["open PRs cross-referencing #58173","open PRs naming attachment_for_node that change actiontext/lib/action_text/content.rb"], hits: []}
-passes: []
+passes:
+  - {reviewer: astra, head: "b3a7a6bb19f8f8d20c38248c1d77dca98956761e", orb: T-01a21cde-3a5f-7452-89b1-37f86c397b9f, date: 2026-11-27, verdict: changes, open: "P2 content.rb:223: unconditional attachables_by_sgid access runs the bulk lookup on an sgid-less node, so a later Person is loaded before the first render callback changes it (head yields stale Before; main and pre-#58173 yield After or MissingAttachable), and the stale map is copied to the returned Content; fix: read the map only when sgid.present?, plus a render-callback regression. P2 body: 'attachables are still located in one query per model' overstates it (two nodes with one destroyed SGID: 3 SELECTs on main and head, 2 pre-#58173; pre-existing, not a regression); say 'The bulk lookup still uses one query per model.' Otherwise: Campfire full suite 634/0 failures, ContentFiltersTest 6 failures on main and 0 on head, Action Text unit+integration green, added test fails on main; 16x7 differential probe matches main apart from finding 1."}
 ---
 
 # Let Attachment.from_node pick attachables the bulk lookup didn't locate
 
 Since #58173, `ActionText::Content` resolves every attachment's attachable itself before calling `ActionText::Attachment.from_node`, falling back to `Attachable.from_node` for nodes the bulk lookup didn't find. So `Attachment.from_node` never receives a `nil` attachable any more, and an application that overrides it to supply its own attachables stops applying. Campfire [does this](https://github.com/basecamp/once-campfire/blob/945c22f141795e910e2822d386a94c5686bf7bdc/lib/rails_ext/action_text_attachables.rb#L5) for OpenGraph embeds and for mentions with expired SGIDs, and its tests for unfurled links fail on main.
 
-This passes only the record the bulk lookup located, as `AttachmentGallery` already does, and leaves the fallback to `Attachment.from_node` as before #58173. Rendering without an override is unchanged, and attachables are still located in one query per model.
+This passes only the record the bulk lookup located, as `AttachmentGallery` already does, and leaves the fallback to `Attachment.from_node` as before #58173. Rendering without an override is unchanged, and the bulk lookup still uses one query per model.
