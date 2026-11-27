@@ -12,7 +12,7 @@ JRuby 9.4.16 gsub. TruffleRuby's Ruby `unescapeURIComponent` keeps a String subc
 native check also keeps the result class there.
 
 `decode_www_form` is unchanged: it must keep a lone `%`, and on plain keys and values its `gsub!` allocates nothing
-while CGI.unescape returns a new String (orb probe, 4.0.10: 24 vs 29 objects for `page=2&per=20&sort=name`, faster
+while CGI.unescape returns a new String (orb probe, 4.0.10: 19 vs 28 objects for `page=2&per=20&sort=name`, faster
 only on escaped forms). Neither Rack 3.2.9 nor Rails calls `decode_www_form` or `decode_uri_component`.
 
 ## Differential (`diff/`, `run.sh`)

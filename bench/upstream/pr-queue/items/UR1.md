@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "c43954fa4d2a7605e18ecc8968c1aa188eae549a"
+head: "b0f2bb74984ed7c581020198e57469409cb8881f"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -286,17 +286,19 @@ passes:
       probes and raw measurements in adjacent archive. No upstream action.
 ---
 
-# Decode www-form components with cgi/escape
+# Decode URI components with cgi/escape
 
-`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
+`URI.decode_www_form_component` and `URI.decode_uri_component` copy the string with `b` and then run `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with `decode_www_form_component` ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
-This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before. The one exception is JRuby 9.4, whose `String#b` keeps a String subclass: there, a subclass with nothing to decode comes back as that subclass.
+The shared helper keeps the check for an invalid `%`, the `b` copy and the final `force_encoding`, and now takes the decoding step as a block. `decode_www_form_component` passes `CGI.unescape`, and `decode_uri_component` passes `CGI.unescapeURIComponent`, which keeps `+`; both decode in one pass in native code. Where cgi/escape has no native `unescapeURIComponent` (cgi before 0.3.3, TruffleRuby), `decode_uri_component` keeps the `gsub`. Results have the same class, bytes and encoding as before. The one exception is JRuby 9.4, whose `String#b` keeps a String subclass: there, `decode_www_form_component` returns a subclass with nothing to decode as that subclass.
 
 | benchmark-ips, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
-| `"hello"` | 2.65M i/s | 3.72M i/s |
-| `"article%5Btitle%5D"` | 816.4k i/s | 2.72M i/s |
-| `"Hello+world+from+Rack"` | 685.7k i/s | 2.89M i/s |
-| a 248-byte cookie value | 509.0k i/s | 1.11M i/s |
+| `decode_www_form_component("hello")` | 2.68M i/s | 3.50M i/s |
+| `decode_www_form_component("article%5Btitle%5D")` | 869.5k i/s | 2.54M i/s |
+| `decode_www_form_component("Hello+world+from+Rack")` | 720.2k i/s | 2.82M i/s |
+| `decode_www_form_component` on a 248-byte cookie value | 489.0k i/s | 1.06M i/s |
+| `decode_uri_component("hello")` | 2.73M i/s | 3.39M i/s |
+| `decode_uri_component("user%40example.com")` | 1.13M i/s | 2.82M i/s |
 
-With YJIT, and with ZJIT on Ruby master, time per call drops by 25% to 80%. Each call allocates 2 or 3 objects instead of 4 to 8.
+With YJIT, and with ZJIT on Ruby master, time per call drops by 23% to 80%. Each call allocates 2 or 3 objects instead of 4 to 8.
