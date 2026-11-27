@@ -6,19 +6,19 @@ kind: perf
 area: Rule#initialize
 reviewer: coorasse
 branch: thomasklemm/rule-construction-allocations
-head: "cb5768e493042c026ef4d808e8574a9db68aeecd"
+head: "cd1f37066ba0ce0515a09346264eb33ea1bf38d9"
 base: main
 built_on: "021b13cf76"
 depends_on: []
 stacked_on:
 alternative_of:
 impact: "Each can and cannot allocates one temporary array fewer: an ability defining five rules goes from 57 to 52 objects on Ruby 4.0.9, -3.9% instructions (interpreter) and -3.5% (YJIT, JIT-flat). Rule construction is 1.8% of request objects in Solidus's API suite and 0.9% in openstreetmap-website's, so the saving there is roughly a tenth of that (about 0.2% and 0.1% of request objects). Path unchanged on cancancan main; 4.x differs and is not checked."
-evidence: [bench/upstream/oss_profile_sweep_1/body/CC1-repair, bench/upstream/oss_profile_sweep_1/cancancan/CC1-repair-checks.tar.gz, bench/upstream/oss_profile_sweep_1/cancancan/CC1-thermos-sol.tar.gz]
+evidence: [bench/upstream/oss_profile_sweep_1/body/CC1-objects, bench/upstream/oss_profile_sweep_1/body/CC1-repair, bench/upstream/oss_profile_sweep_1/cancancan/CC1-repair-checks.tar.gz, bench/upstream/oss_profile_sweep_1/cancancan/CC1-thermos-sol.tar.gz]
 rank:
 risky: false
 state: draft
 pr: 941
-note: "2026-11-25 opened as draft coorasse/cancancan#941 at cb5768e493; closed-PR check beforehand: none covers rule construction (#887/#920 optimize can? lookup, #714 the rules index, #471 the block signature). 2026-11-25 thermos-sol confirm on cb5768e493: code approved; the only change was body/impact: the ips block and the +4.8% impact claim are replaced by 'The benchmark-ips results were too noisy to distinguish a wall-time change.' (applied verbatim), so the verdict is approve on the same head. Confirm reran all four sqlite/postgres cells (721 examples, 0 failures, base outcomes unchanged plus five new passes), both 127-case differentials byte-identical to base, rubocop 0 offenses, object replay 57 to 52, Callgrind totals and JIT windows audited. Logs in T-01a214c3 .amp/in/orb-backup/cc1/confirm-data/. 2026-11-25 repair (fork head cb5768e493): F1-F4 applied; parser-only change, compact restored, CHANGELOG Unreleased entry, five public regression specs that each fail on 2a5e8c71d1 and pass on base. The repaired initialize hit RuboCop Metrics/MethodLength (11/10), so it reads extra_args.first at both uses instead of reassigning extra_args. DB=sqlite and DB=postgres rspec, seed 1234: 721 examples, 0 failures (3 / 2 pending) on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, per-example outcomes equal to thermos-sol's base runs plus the five new passing specs; rubocop 0 offenses; the 127-case differential is byte-identical to base on both Rubies. Remeasured with script/upstream-bench on Ruby 4.0.9 (body/CC1-repair): objects 57 to 52; instructions -3.9% (A/A 0.00%) interp, -3.5% (A/A 0.04%, JIT-flat) YJIT; ips +4.8% (A/A 0.14% on best-of-3, but each report ±12-15% and base rounds span 136.8k-153.2k; an earlier cohort on the unpublished intermediate head 871ec00 had base 148.9k, so wall time is supporting only). Awaiting thermos-sol confirm on cb5768e. Earlier: 2026-11-25 thermos-sol: changes on the recorded head; attribute conversion runs too early and the index loses compact's detached snapshot (five demonstrated differences). Both base and head pass sqlite/postgres on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, with identical per-example outcomes. Missing regression specs and CHANGELOG; body and commit call a five-rule measurement six rules and assert false equivalence. Smallest repair and exact wording below. Nothing upstream. Original build record: found by lowrail-profile on Solidus and openstreetmap-website (docs/upstream/oss-profile-sweep-1.md), built on main 021b13cf76 (3.7.1); 80 ordinary construction cases matched; sqlite passed on Ruby 3.4.13 / AR 8.1 and 3.3.14 / AR 7.2; builder did not run postgres. Body evidence has A/A 0.02% / 0.08% and JIT-flat in 6 windows. The impact and draft body below are the reviewed, uncorrected claims, not approved claims."
+note: "2026-11-27 (revision for ready, T-01a21d28): head cd1f37066b amends cb5768e493 on the same main 021b13cf76 (main unchanged since); lib/ and CHANGELOG identical, the three specs that guarded the index code this PR no longer touches are dropped (does not compare subjects with nil, array subclass, subjects added while indexing), the two specs on the changed Rule#initialize order stay. Body: the benchmark-ips script is replaced by an objects script (body/CC1-objects, 57/57/52 interp and YJIT on 4.0.9), the Callgrind numbers carry over from body/CC1-repair (same lib/), one table; wall time one clause. sqlite AR 8.1 Ruby 3.4.13 seed 1234: base 716/0/3, head 718/0/3, per-example outcomes equal plus the two specs; rubocop 0 offenses. Pushed for review as fork branch thomasklemm/rule-construction-allocations-review, PR branch unchanged until both passes approve. Upstream CI: the workflow run on cb5768e493 waits for maintainer approval (action_required). 2026-11-25 opened as draft coorasse/cancancan#941 at cb5768e493; closed-PR check beforehand: none covers rule construction (#887/#920 optimize can? lookup, #714 the rules index, #471 the block signature). 2026-11-25 thermos-sol confirm on cb5768e493: code approved; the only change was body/impact: the ips block and the +4.8% impact claim are replaced by 'The benchmark-ips results were too noisy to distinguish a wall-time change.' (applied verbatim), so the verdict is approve on the same head. Confirm reran all four sqlite/postgres cells (721 examples, 0 failures, base outcomes unchanged plus five new passes), both 127-case differentials byte-identical to base, rubocop 0 offenses, object replay 57 to 52, Callgrind totals and JIT windows audited. Logs in T-01a214c3 .amp/in/orb-backup/cc1/confirm-data/. 2026-11-25 repair (fork head cb5768e493): F1-F4 applied; parser-only change, compact restored, CHANGELOG Unreleased entry, five public regression specs that each fail on 2a5e8c71d1 and pass on base. The repaired initialize hit RuboCop Metrics/MethodLength (11/10), so it reads extra_args.first at both uses instead of reassigning extra_args. DB=sqlite and DB=postgres rspec, seed 1234: 721 examples, 0 failures (3 / 2 pending) on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, per-example outcomes equal to thermos-sol's base runs plus the five new passing specs; rubocop 0 offenses; the 127-case differential is byte-identical to base on both Rubies. Remeasured with script/upstream-bench on Ruby 4.0.9 (body/CC1-repair): objects 57 to 52; instructions -3.9% (A/A 0.00%) interp, -3.5% (A/A 0.04%, JIT-flat) YJIT; ips +4.8% (A/A 0.14% on best-of-3, but each report ±12-15% and base rounds span 136.8k-153.2k; an earlier cohort on the unpublished intermediate head 871ec00 had base 148.9k, so wall time is supporting only). Awaiting thermos-sol confirm on cb5768e. Earlier: 2026-11-25 thermos-sol: changes on the recorded head; attribute conversion runs too early and the index loses compact's detached snapshot (five demonstrated differences). Both base and head pass sqlite/postgres on Ruby 3.3.14 / AR 7.2.4 and 3.4.13 / AR 8.1.4.1, with identical per-example outcomes. Missing regression specs and CHANGELOG; body and commit call a five-rule measurement six rules and assert false equivalence. Smallest repair and exact wording below. Nothing upstream. Original build record: found by lowrail-profile on Solidus and openstreetmap-website (docs/upstream/oss-profile-sweep-1.md), built on main 021b13cf76 (3.7.1); 80 ordinary construction cases matched; sqlite passed on Ruby 3.4.13 / AR 8.1 and 3.3.14 / AR 7.2; builder did not run postgres. Body evidence has A/A 0.02% / 0.08% and JIT-flat in 6 windows. The impact and draft body below are the reviewed, uncorrected claims, not approved claims."
 ownership: {date: 2026-11-25, checked: ["open PRs naming add_rule_to_index, initialize, parse_attributes_from_extra_args that change lib/cancan/ability/rules.rb, lib/cancan/rule.rb"], hits: []}
 passes:
   - {reviewer: thermos-sol, head: "2a5e8c71d19569d43c7fec09dfb7012721f792e2", date: 2026-11-25, orb: "T-01a214c3-c62d-7481-8ea4-cb7c4ef33065", verdict: changes, open: "F1 conversion order; F2 lost index snapshot/new callbacks; F3 CHANGELOG; F4 body/commit/benchmark corrections. Both Thermos rubrics run directly by this reviewer, without subagents or other threads, as requested. Full report below."}
@@ -30,10 +30,9 @@ passes:
 
 Applications that build an ability per request pay the cost of defining its rules each time. `Rule#initialize` gets the parsed attributes and conditions back from a helper in a temporary two-element array, then immediately unpacks it.
 
-Read those arguments directly instead, keeping validation and conversion in their existing order. For an ability with a class rule, an action list with conditions, a `cannot`, attributes with conditions and a block rule, this removes one temporary array per rule.
+Read those arguments directly instead, keeping validation and conversion in their existing order. This saves one array per rule, five for this ability:
 
 ```ruby
-require "benchmark/ips"
 require "cancancan"
 
 class Product; end
@@ -51,17 +50,18 @@ class Ability
   end
 end
 
-Benchmark.ips { |x| x.report("Ability.new(user)") { Ability.new(1) } }
+before = GC.stat(:total_allocated_objects)
+1_000.times { Ability.new(1) }
+puts (GC.stat(:total_allocated_objects) - before) / 1_000
 ```
 
-The benchmark-ips results were too noisy to distinguish a wall-time change.
+| Per `Ability.new`, Ruby 4.0.9 | main | this PR |
+| --- | ---: | ---: |
+| Objects | 57 | 52 |
+| Callgrind instructions, no JIT | 82,753 | 79,547 |
+| Callgrind instructions, YJIT | 42,921 | 41,418 |
 
-Objects and Callgrind instructions per ability, Ruby 4.0.9:
-
-| | Objects, main | Objects, branch | Instructions, main | Instructions, branch | Change |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| no JIT | 57 | 52 | 82,753 | 79,547 | −3.9% |
-| YJIT | 57 | 52 | 42,921 | 41,418 | −3.5% |
+benchmark-ips could not resolve a wall-time difference.
 
 ## For Thomas
 
