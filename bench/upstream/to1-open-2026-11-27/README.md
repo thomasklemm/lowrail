@@ -221,3 +221,24 @@ over rounds. Counts only with an A/A interval containing 0 and a change interval
 
 Harness fix (separate commit): `wall()` ignored `CENSUS_ONLY`, so `--wall --only` timed every workload, and it called
 `RubyVM::ZJIT.enabled?`, which raises on 4.0.10; both fixed before these runs.
+
+## The f.text_field instructions (2026-11-27)
+
+Unparked by the coordinator: per-call wall time under both JITs counts as measurable. Before review, the
+`f.text_field` +0.6% interpreter instructions (body/TO1, title "Hello") and ips −1.5% were checked
+(`ftf/`, Ruby 4.0.10, interpreter, Callgrind, N = 2,000 or 1,000, GC off, raw in `ftf/raw.tar.gz`).
+
+* Same helper, other inputs (`ftf_ir.rb`, `ir_cases.tsv`, main / head / main again): `f.text_field` with title
+  "Hello world" 94,793 / 94,192 / 94,564 (−0.5%); with class, placeholder and autocomplete 137,055 / 136,182 /
+  137,074 (−0.6%); with a data Hash 170,746 / 170,272 / 170,719 (−0.3%); a 200-character value 91,063 / 90,541 /
+  91,116 (−0.6%). `text_field_tag` −0.7%, `tag.input` with 5 attributes −1.0%.
+* Title length sweep 1 to 39 (`ftf_sweep.rb`, `sweep_table.tsv`, one run per tree): lengths 1–7 cost +0.08% to
+  +0.16% (about 100 instructions); every length from 9 up saves 0.2% to 1.0%. Main's own run-to-run spread here is
+  about 0.2%.
+
+So the cost is not on the path but on the output length: the tag's String grows from `"<input"` in Ruby's capacity
+steps, and for some short totals it needs one more `realloc` than main's separate attribute String did (the lead
+sweep's function diff, `lead-sweep-2026-11-27/results/to1_zjit_fn_diff.txt`, puts it in malloc/realloc). The worst
+case seen is the body's +640 instructions (about 0.1 µs); the wall cohorts on the same input are −0.2% [−1.0, +0.7]
+under YJIT and +0.4% [−0.4, +0.9] under ZJIT, so no time loss is claimed in either mode. Not a regression on the
+form builder path. The body leaves `f.text_field` out.
