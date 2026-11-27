@@ -29,6 +29,7 @@ passes:
   - {reviewer: thermos-sol, head: "a00b9abb3d968e4985a1151f3f2e4f08a0219c17", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: changes, open: "R1 correct the CPU comment and commit message's causal and threshold claims; R2 reconcile the coverage README's raw totals, to_hash results, causal wording and uncalibrated fallback"}
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: none}
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: changes, open: "R1 replace the proposed PR body with the approved 121-word text in the Astra ready review; no code must-fixes"}
+  - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: approve, open: none}
 ---
 
 # Add Duel performance regression guards
@@ -439,3 +440,7 @@ Fresh execution on the exact clean Hashie head, Ruby 4.0.9:
 Reference currency checked through GitHub and RubyGems on this pass: Hashie 3,035 stars, 506,961,424 downloads, 6.0.0 released November 11, last push November 26; Grape 10,009 stars, 88,133,897 downloads, 4.1.0 released October 31, last push November 26; Duel 21 stars, 8,648 downloads, current 0.3.1 released November 22, last push November 25. None is archived. Duel's small reach is not a reason to omit the tool this requested port installs; Grape is the relevant requested provenance, not a niche caller offered as impact evidence. No additional project references are needed upstream.
 
 Fresh probe, bundle/suite logs, reconciliation script/output and exact replacement text remain in `.amp/in/orb-backup/hd1-astra/`. Hashie's tracked worktree stayed clean. No Hashie branch was pushed, no upstream body/comment was edited, no workflow rerun was requested, and HD1's state, head and stored body were not changed. Only this review and its exact-head pass entry are delivered to Lowrail.
+
+### Astra confirm — 2026-11-27 (be311bb, ready)
+
+**Verdict: approve; no open must-fixes.** Read the posted description with `gh pr view 659 -R hashie/hashie --json body,headRefOid,isDraft` and verified it is byte-for-byte identical to the approved 121-word replacement above. GitHub still reports exact head `be311bbf4b0571d71481579f5c4e7aa27e704a01`, so the earlier full code review and executed checks apply unchanged. R1 is closed; this approving pass supersedes the preceding body-only `changes` verdict. No suite or calibration rerun is needed for a description-only correction. The PR remains draft at this check; the coordinator will perform the queue's ready step under Thomas's reported authorization. This confirm changes only the review record and pass entry, not HD1's state, head or body, and performs no upstream write.
