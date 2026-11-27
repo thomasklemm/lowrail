@@ -26,6 +26,7 @@ passes:
   - {reviewer: thermos-sol, head: "c4303d510262c31290fe11dd845d38bc9bc999bd", date: 2026-11-26, orb: T-01a217c1-624d-774b-b3ad-3946a5260e8a, verdict: approve, open: none}
   - {reviewer: thermos-sol, head: "87a9f2254eb5492408d327003f46dcd2c0f90f51", date: 2026-11-26, orb: T-01a21832-7ce1-758b-b1c2-ae5c2576a644, verdict: changes, open: "R1 correct CONTRIBUTING's cross-scenario comparison claim and acknowledge lost reports; R2 qualify the combined-layout README's contention explanation as a hypothesis"}
   - {reviewer: thermos-sol, head: "bcf21e76c40d212ac66b9a168cd611d84d191a8f", date: 2026-11-26, orb: T-01a21832-7ce1-758b-b1c2-ae5c2576a644, verdict: approve, open: none}
+  - {reviewer: thermos-sol, head: "a00b9abb3d968e4985a1151f3f2e4f08a0219c17", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: changes, open: "R1 correct the CPU comment and commit message's causal and threshold claims; R2 reconcile the coverage README's raw totals, to_hash results, causal wording and uncalibrated fallback"}
 ---
 
 # Add Duel performance regression guards
@@ -283,3 +284,87 @@ All checks loaded the exact clean candidate checkout through `mise exec ruby@4.0
 * `RUBY_YJIT_ENABLE=1 BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec duel --force --base HEAD --json ../confirm-rebased-aa.json` — **21 benchmarks in 88 s, 0 regressed, 0 errors, 12 unsettled**, exit 0. Both JSON commits are `bcf21e76c40d212ac66b9a168cd611d84d191a8f`, uncommitted changes false, jobs 1, twelve workers per version, warm-up 2 s, confidence 0.99 and CPU limit 1.02. Across CPU 0.997 [0.989, 1.006] is unsettled. One run only, not rerun until green.
 
 Ruby 3.0's 1,072/0 is the builder's reported check, not a fresh reviewer execution. Fresh logs and JSON are retained under `.amp/in/orb-backup/hd1-delta/confirm-rebased-*`; the round-6 raw logs remain in the tracked evidence archive. No tracked Hashie file was edited, no Hashie branch was pushed, no workflow was rerun and nothing was posted upstream. This pass approves only the named candidate; the still-live 13-scenario PR body/head are deliberately untouched.
+
+### Thermos-sol delta review — 2026-11-27 (coverage and CPU limit)
+
+**Verdict: changes, two text-only must-fixes; keep the six scenarios, CPU limit 1.05 and 24 workers.** Reviewed exactly `bcf21e76c40d212ac66b9a168cd611d84d191a8f` → `a00b9abb3d968e4985a1151f3f2e4f08a0219c17`, one second commit, without changing the approved first commit. Applied both Thermos rubrics personally, with no subagents or other threads created; this is one reviewer's audit, not two independent reviews. Read Hashie's guidance, all five changed files, the commit message, the coverage README, raw calibration records, and Duel v0.3.1 source/docs at `3c0c99d95dc2d5620f59e4bb298179422086adf7`. The item state, live head, public body and previous reports are unchanged. Findings below concern this delta and its new evidence section, not reopening the approved layout.
+
+#### Must-fixes and exact smallest fixes
+
+**R1 — P2, describe the guard and observations accurately in the new comment and commit message.** Hashie `.duel.rb:7` and the commit's final paragraph say a comment made timings move by “up to 5%.” The archived identical-code medians reach 1.064 and 1.068; the experiment does not isolate a layout mechanism. The message also says allocations fail on “any increase,” but Duel's `Metrics::Allocations.measures` sets `per_iteration: 0.5`, and `Metric.within?` accepts increases up to and including that allowance. An executed boundary probe accepts +0.50 objects/iteration and rejects +0.51. No allocation setting changed here. Raising CPU's own limit also raises its across-the-board limit from 1.005 to 1.0125; it is not merely a switch that settles noisy reports.
+
+Smallest fixes, without touching any executable line:
+
+* Replace only `.duel.rb:7` with `# Identical-code comparisons exceeded Duel's default CPU margin.`
+* Keep the commit subject and first paragraph. Replace its final paragraph with:
+
+```text
+Comment-only A/A comparisons on GitHub runners failed at CPU limit 1.02, with some method-call medians 3–7% apart across fresh-process measurements. Set the per-scenario CPU limit to 1.05; this also raises the across-the-board CPU limit from 1.005 to 1.0125. The allocation guard remains unchanged. Use 24 workers per version to narrow process-level intervals.
+```
+
+Both added comments explain why non-default settings exist; deleting both as mere narration is unnecessary. The worker comment is supported by the observed wider intervals at twelve workers and can stay. The CPU comment needs the correction above, not a longer measurement history. The existing jobs comment was already approved and remains out of scope. The intentional `cpu` spelling entry is appropriate. Author/committer are Thomas Klemm `<github@tklemm.eu>`, with no trailers or internal queue/review references.
+
+**R2 — P2, correct the new README's evidence and causal/fallback claims.** In Lowrail `bench/upstream/hashie_duel/README.md:117–147`, the closing “hypothesis” qualification does not undo the categorical “found the real problem,” “cannot average away,” or attribution to adding six scenarios. Some of its concrete evidence is also wrong. Make only these replacements in that new section:
+
+* At line 117, replace `tested the obvious fix and found the real problem:` with `tested more workers and still produced false regression classifications:`.
+* At lines 126–130, keep `that differ by one comment.` and replace the rest of that paragraph with:
+
+```markdown
+In round 7's five A/A runs, `Mash#to_hash` medians were 0.962–0.984, classified faster in two runs and same in three, not 0.96 and settled faster in all five. Some comment-only comparisons show method-call medians 3–7% apart, and several differences survived four fresh-process measurements. Code layout is one hypothesis, not a demonstrated cause. These cohorts do not isolate the effect of adding scenarios or show that more sampling cannot reduce the differences. Rounds 5–6 remain a separate 0/35-failure cohort.
+```
+
+* Replace the first sentence at line 132 with `Across 2,436 per-scenario CPU timing records (initial measurements and confirmations) in the full A/A and #656 logs for rounds 1–7 and 7p12, an interval's lower bound exceeded 1.05 once (1.051).` The existing 2,111 is exactly the number of CPU lines in the summary files: those omit extension rows in rounds 3–6 and include across-the-board rows. It is not “all measurements.” The single 1.051 crossing is nevertheless real and correctly retained.
+* At lines 133–134, replace `allocations still fail on any increase` with `the allocation guard is unchanged` for the R1 reason.
+* Replace `Dash read/write at 1.068 is the closest to a false alarm: the margin there is thin, and ` followed by the `limit: 1.1` fallback clause with `Dash read/write at 1.068 [1.048, 1.085] is unsettled, not equal; its lower bound is only 0.002 below 1.05. No higher limit has been calibrated.` A 1.10 fallback would also raise the across-CPU limit to 1.025; none of this evidence validates that further loss of sensitivity.
+* Delete only `Only a run that fails pays that.` at line 147. A/A round 7 aa-1 passed after remeasurement (201-second job), so a passing run can pay confirmation costs too.
+
+These are record/message corrections, not a request for more fork workflow runs, a lower threshold, a benchmark rewrite or changes to the live PR body. The reviewer did not apply them during this review.
+
+#### Scenario correctness, determinism and shared inputs
+
+Replayed all 27 actual registered definitions using `Duel::Harness`, trial plus batches of 1, 17 and 1, with failure-raising checks for the six new contracts. Compared shared fixture values, object identities and Hash/Array singleton ancestor chains before/after, not just serialized JSON, since in-place IndifferentAccess injection can preserve values while changing behavior.
+
+| New scenario | What it really measures and verified boundary | Allocations/iteration in every round-8 A/A log |
+|---|---|---|
+| IndifferentAccess nested construction | JSON parsing and the input array are outside measurement; `IndifferentHash.new` and recursive in-place extension of fresh nested hashes are inside. Every iteration receives distinct owners/licenses, not a shallow duplicate or already-converted input. The result preserves fixture values and nested indifference. | 252 |
+| IndifferentAccess reads | Mixed String/Symbol brackets, nested owner, Symbol `fetch` and `key?` hit existing keys. All expected values agree, including the false stored `archived` value being present. None of the named reads merely misses, and no mutation occurs. | 1 |
+| IndifferentAccess writes | Three existing-key overwrites exercise Symbol `[]=`, String `[]=` and Symbol `store`. They do not claim fresh-key insertion; repeated batches neither grow the 24-key hash nor re-convert nested values. | 0 |
+| DeepFind and DeepFetch | Searches return `octocat`, both distinct SPDX identifiers in order, and index-1 `Apache-2.0`. `DeepHash.new(REPOSITORY)` intentionally shares the owner/license values. MergeInitializer only populates a new outer hash; DeepLocate traverses and builds result arrays, and DeepFetch fetches without modifying inputs. Shared values and singleton ancestors remain unchanged. | 105 |
+| Dash IndifferentAccess construction | Input really has four String keys. Construction produces the expected four values accessible through String/Symbol keys and property readers; it does not silently ignore input. | 32 |
+| Nested Dash coercion | Input parsing/symbolization is once-only. Each construction makes an `OwnerDash` and two distinct `LicenseDash` values; declared values, including `site_admin: false`, survive, undeclared keys disappear, and the source owner hash/eight keys and license hashes/four keys stay plain and intact. | 16 |
+
+Direct harness allocation samples at n = 1, 17, 100, 17 were repeatable after first-call setup. The standalone interpreter probe counts zero for the read body where the full Duel worker counts one; neither count drifts with repetition, and the table reports the actual calibration workers rather than conflating the two contexts. No random/time/network input, growing collection, fixture mutation, accidental Dash reuse or new one-use abstraction was found. The small classes live in the existing benchmark files and model distinct extension combinations; no structural refactor, added layer or file decomposition earns its cost. Already covered `to_hash`, `deep_merge`, scalar coercion and Trash translation need no duplicate scenarios. The omitted `to_json` wrapper still leaves JSON generation outside this guard's purpose.
+
+#### Calibration and settings judgment
+
+Reran `tally.py` and independently reconciled all **38 full job logs** in rounds 7, 7p12 and 8 against their summaries, source SHAs, conclusions and job timestamps. Fetched the archived commits read-only: all fifteen A/A branch commits add only their stated comment; their parents have the named configuration. The plants change only Symbol conversion or the repeated stored-key lookup. Round 8's candidate has the reviewed benchmark/configuration tree, its baseline `lib/` exactly matches `812c48c^`, and its head restores the #656 library tree. No plant or A/A was quietly rebuilt into a different operation. The 2,436-record check above additionally scans the full earlier A/A/candidate archives, excluding across-the-board lines and including confirmations.
+
+| Cohort | Confirmed result | Job / Duel time |
+|---|---|---|
+| Round 7: 24 workers, CPU 1.02 | A/A 3/5 failed, 4 remeasured, 18/135 final timings unsettled | 128–201 s / 111–180 s |
+| Round 7p12: 12 workers, CPU 1.02 | A/A 3/5 failed, 3 remeasured, 28/135 unsettled | 109–143 s / 92–126 s |
+| Round 8: 24 workers, CPU 1.05 | A/A 0/20 failed, no remeasurement, 6/540 unsettled | 124–137 s, median 130 s / 109–118 s |
+| Round 8 CPU plant | Four confirmed regressions in both runs, zero errors | 222 and 238 s / 206 and 224 s |
+| Round 8 allocation plant, archived attempt 1 | Thirteen confirmed allocation regressions, zero errors | 432 s / 407 s |
+| Round 8 #656, all three attempts | Zero regressed/unsettled; faster on 5, 6, 5 | 125–136 s / 111–116 s |
+
+**Keep CPU 1.05 as an explicit sensitivity/reliability tradeoff, not a cure.** True A/A failures survive confirmation at 1.02 with both worker counts, so keeping that setting is no longer justified by the old green cohort. The 1.05 cohort is useful subsequent evidence, and both large plants still fail. It necessarily stops flagging well-measured isolated CPU increases between 2% and 5%, and raises the across guard to 1.0125. CPU-plant coverage drops from five to four cases: suffix reads no longer confirm, so plant detection does not establish unchanged sensitivity to small regressions. Allocations retain their existing 0.5-object/iteration allowance, not a new zero-tolerance rule. A 0/20 cohort is not proof of a negligible future false-alarm rate; even independent trials would leave a one-sided 95% upper bound of about 14%, and these are repeated runs of five branch variants selected after calibration.
+
+**Keep 24 workers; it earns the approximately twenty-second clean-run cost, but is not necessary to clear the original four intervals.** At the same 1.02 limit and same scenario/library tree, round 7 versus 7p12 has median initial interval widths 0.011 versus 0.018, with 18 versus 28 final unsettled timings. The sole never-remeasured 24-worker run spends 111 s measuring, versus 92–94 s for the two such twelve-worker runs. These are small unpaired cohorts, not proof of the size of a worker-count effect at 1.05, but they support buying narrower process-level intervals using Duel's own setting. Conversely, all four original upstream upper bounds are below 1.05, so raising the limit alone would classify those recorded intervals as same. Do not attribute all of round 8's improvement to workers: there is no twelve-worker/1.05 GitHub control. Retrospectively applying 1.05 to round 7p12's already-collected, rounded initial intervals leaves only two straddling it out of 135; that is an illustration, not a rerun or calibration of the proposed configuration.
+
+The remaining Dash margin is stated numerically and honestly: median 1.068 with [1.048, 1.085] passes only because it is unsettled, not because it proves equal or below 5%. The previous round even has an initial identical-code lower bound 1.051; 1.05 is not beyond all observed noise. R2 removes the unvalidated automatic fallback rather than pretending the risk is gone. Instruction counts are absent from these runs; no application-speed or hardware-counter-capability conclusion is inferred.
+
+The formerly pending allocation attempt 2 completed while this review ran. Read-only inspection of run 45987737817 attempt 2 confirms the same `de56ec1` plant, **13 regressed, 0 errors, 0 unsettled**, job **606 s**, Duel **592 s**, plus confirmed across-CPU regression. Its raw log was read, not added to the tracked archive by this review. The report above deliberately distinguishes the archived first-attempt 432 s from this newer result; neither is a promise of bounded regression-job time.
+
+#### Fresh execution, discussion and scope limits
+
+Commands ran on the exact clean candidate in `.amp/in/orb-backup/hd1-coverage-review/hashie`, with Ruby 4.0.9. Local bundle/coverage artifacts are ignored, and no tracked Hashie file changed.
+
+* `CI=true mise exec ruby@4.0.9 -- bundle exec rake spec rubocop` — **1,076 examples, 0 failures**, 100% line coverage; **124 then 155 files inspected, no offenses**, exit 0.
+* `BUNDLE_GEMFILE=gemfiles/duel.gemfile mise exec ruby@4.0.9 -- bundle exec ruby -Ilib ../probe.rb` — all 27 actual definitions replayed, **all six new semantic contracts passed**, repeated batches and shared values/identities/ancestors unchanged.
+* `RUBY_YJIT_ENABLE=1 BUNDLE_GEMFILE=gemfiles/duel.gemfile mise exec ruby@4.0.9 -- bundle exec duel --force --base HEAD --json ../review-aa.json` — **27 benchmarks in 127 s, 0 regressed, 0 errors, 0 unsettled**, exit 0. JSON pins both versions to `a00b9abb3d968e4985a1151f3f2e4f08a0219c17`, uncommitted changes false, jobs 1, workers 24, warm 2 s, confidence 0.99. Every benchmark's CPU metric has limit 1.05; across CPU is 0.998 [0.996, 1.000], same, limit 1.0125. Duel's generic header/`settings.limit` still prints 1.02 because `c.measure` overrides the metric, not that default; the metric results confirm the intended setting is effective. One A/A run, not rerun until green.
+* Duel source-backed boundary probe — the allocation guard accepts +0.50 and rejects +0.51 objects/iteration; across CPU limits at per-case 1.02, 1.05 and 1.10 are respectively 1.005, 1.0125 and 1.025.
+
+Read PR discussion only after the independent audit: live upstream remains draft at `bcf21e7`, with dblock's layout request, our layout reply, a no-issues Danger report, and no submitted or inline reviews. Nothing there supplies a conflicting delta finding or approval. Read the named upstream Perf log to confirm the original four intervals. Ruby 3.0 was not rerun; the library and ordinary compatibility contract are unchanged. Workflow permission/source conclusions carry forward because this commit changes no workflow; privileged reporting/accept-label behavior was not exercised end to end.
+
+Probe, reconciliation script, JSON and review logs are retained under `.amp/in/orb-backup/hd1-coverage-review/`. No Hashie branch was pushed, no workflow was rerun, no PR was opened and nothing was posted upstream. Only this appended report and its exact-candidate pass entry are delivered in Lowrail. The six scenarios and settings need no executable fix on the evidence reviewed, but this exact candidate is **not approved until R1/R2's text corrections are reviewed**; the existing `bcf21e7` approval is unaffected.
