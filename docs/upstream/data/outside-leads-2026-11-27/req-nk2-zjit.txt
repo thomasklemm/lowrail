@@ -1,0 +1,2 @@
++ gcc -shared -fPIC -O2 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-master-zjit/reqcg.so
+campfire POST message (turbo_stream) zjit none.rb Ir/op 28973603 objs/op 11145.2 jit 1/14 settle 1

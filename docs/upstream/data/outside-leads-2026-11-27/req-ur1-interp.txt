@@ -1,0 +1,26 @@
++ cc -shared -fPIC -O2 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-4.0.10/reqcg.so
+blog PATCH article (redirect) interp none.rb Ir/op 4685361 objs/op 1419.6 jit 0/0 settle 0
+blog PATCH article (redirect) interp none.rb Ir/op 4655555 objs/op 1418.6 jit 0/0 settle 0
+blog PATCH article (redirect) interp ur1_copy.rb Ir/op 4659840 objs/op 1409.9 jit 0/0 settle 0
+blog PATCH article (redirect) interp ur1_cgi.rb Ir/op 4525204 objs/op 1321.0 jit 0/0 settle 0
+blog POST comment (redirect) interp none.rb Ir/op 6944011 objs/op 1853.2 jit 0/0 settle 0
+blog POST comment (redirect) interp none.rb Ir/op 6913703 objs/op 1840.8 jit 0/0 settle 0
+blog POST comment (redirect) interp ur1_copy.rb Ir/op 6909447 objs/op 1829.8 jit 0/0 settle 0
+blog POST comment (redirect) interp ur1_cgi.rb Ir/op 6843363 objs/op 1768.0 jit 0/0 settle 0
+blog GET article interp none.rb Ir/op 8168356 objs/op 1940.4 jit 0/0 settle 0
+blog GET article interp none.rb Ir/op 8171595 objs/op 1940.8 jit 0/0 settle 0
+blog GET article interp ur1_copy.rb Ir/op 8170789 objs/op 1934.2 jit 0/0 settle 0
+blog GET article interp ur1_cgi.rb Ir/op 8141109 objs/op 1894.5 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 6965034 objs/op 1804.6 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 6986050 objs/op 1806.6 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp ur1_copy.rb Ir/op 6991329 objs/op 1796.2 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp ur1_cgi.rb Ir/op 6921308 objs/op 1727.2 jit 0/0 settle 0
+codetriage GET repo interp none.rb Ir/op 14497832 objs/op 3174.6 jit 0/0 settle 0
+codetriage GET repo interp none.rb Ir/op 14494904 objs/op 3164.3 jit 0/0 settle 0
+codetriage GET repo interp ur1_copy.rb Ir/op 14503351 objs/op 3159.7 jit 0/0 settle 0
+codetriage GET repo interp ur1_cgi.rb Ir/op 14447189 objs/op 3117.4 jit 0/0 settle 0
+blog GET articles.json interp none.rb Ir/op 4271724 objs/op 1124.6 jit 0/0 settle 0
+blog GET articles.json interp none.rb Ir/op 4263461 objs/op 1124.6 jit 0/0 settle 0
+blog GET articles.json interp ur1_copy.rb Ir/op 4260579 objs/op 1124.6 jit 0/0 settle 0
+blog GET articles.json interp ur1_cgi.rb Ir/op 4281858 objs/op 1124.6 jit 0/0 settle 0
+DONE

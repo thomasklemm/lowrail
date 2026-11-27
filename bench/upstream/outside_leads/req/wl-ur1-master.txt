@@ -1,0 +1,4 @@
+blog|PATCH article (redirect)
+blog|POST comment (redirect)
+blog|GET article
+blog|GET articles.json

@@ -1,0 +1,16 @@
+4.0.10 interp|plain|UR1.decode_cgi(S)|3827|3832
+4.0.10 interp|key|UR1.decode_cgi(S)|5623|5627
+4.0.10 interp|spaces|UR1.decode_cgi(S)|5190|5188
+4.0.10 interp|cookie|UR1.decode_cgi(S)|10098|10068
+4.0.10 yjit|plain|UR1.decode_cgi(S)|2546|2531
+4.0.10 yjit|key|UR1.decode_cgi(S)|4341|4341
+4.0.10 yjit|spaces|UR1.decode_cgi(S)|3893|3917
+4.0.10 yjit|cookie|UR1.decode_cgi(S)|8802|8801
+master interp|plain|UR1.decode_cgi(S)|3788|3792
+master interp|key|UR1.decode_cgi(S)|5634|5623
+master interp|spaces|UR1.decode_cgi(S)|5183|5186
+master interp|cookie|UR1.decode_cgi(S)|10341|10347
+master zjit|plain|UR1.decode_cgi(S)|2793|2809
+master zjit|key|UR1.decode_cgi(S)|4636|4641
+master zjit|spaces|UR1.decode_cgi(S)|4183|4174
+master zjit|cookie|UR1.decode_cgi(S)|9309|9314

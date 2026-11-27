@@ -24,7 +24,15 @@ end
 run = -> { c = op.call; ReqCG.toggle unless request; c.call; ReqCG.toggle unless request; RailsCensus.reset_side_effects }
 $on = request
 Integer(ENV.fetch("WARM", "200")).times { run.() }
-jit = -> { defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled? ? RubyVM::YJIT.runtime_stats.values_at(:compiled_block_count, :invalidation_count) : [0, 0] }
+jit = lambda do
+  if defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
+    RubyVM::YJIT.runtime_stats.values_at(:compiled_block_count, :invalidation_count)
+  elsif defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
+    RubyVM::ZJIT.stats.values_at(:compiled_iseq_count, :compiled_side_exit_count)
+  else
+    [0, 0]
+  end
+end
 # FLAT=K: keep warming in windows of N operations until one compiles and invalidates nothing, at most K windows.
 settle = 0
 Integer(ENV.fetch("FLAT", "0")).times do

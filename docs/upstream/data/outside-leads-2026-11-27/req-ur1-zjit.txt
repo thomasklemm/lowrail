@@ -1,0 +1,7 @@
++ gcc -shared -fPIC -O2 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-master-zjit/reqcg.so
+blog PATCH article (redirect) zjit none.rb Ir/op 2598977 objs/op 1429.9 jit 0/0 settle 1
+blog PATCH article (redirect) zjit none.rb Ir/op 2592823 objs/op 1426.6 jit 0/0 settle 1
+blog PATCH article (redirect) zjit ur1_cgi.rb Ir/op 2463384 objs/op 1329.1 jit 0/0 settle 1
+blog PATCH article (redirect) zjit none.rb Ir/op 2602978 objs/op 1429.4 jit 0/0 settle 1
+blog POST comment (redirect) zjit none.rb Ir/op 4065330 objs/op 1864.2 jit 3/15 settle 6
+blog POST comment (redirect) zjit none.rb Ir/op 3978749 objs/op 1839.1 jit 1/5 settle 1

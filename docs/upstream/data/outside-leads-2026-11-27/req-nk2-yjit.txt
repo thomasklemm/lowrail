@@ -1,0 +1,4 @@
+campfire POST message (turbo_stream) yjit none.rb Ir/op 26564515 objs/op 11030.4 jit 5/0 settle 1
+campfire POST message (turbo_stream) yjit none.rb Ir/op 26508230 objs/op 11026.8 jit 5/0 settle 5
+campfire POST message (turbo_stream) yjit noko_flatkey2.rb Ir/op 26551045 objs/op 10992.9 jit 43/0 settle 7
+campfire POST message (turbo_stream) yjit noko_cache.rb Ir/op 26069303 objs/op 10897.2 jit 24/0 settle 3

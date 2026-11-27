@@ -1,0 +1,10 @@
++ cc -shared -fPIC -O2 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-4.0.10/reqcg.so
+campfire POST message (turbo_stream) interp none.rb Ir/op 42925488 objs/op 10971.6 jit 0/0 settle 0
+campfire POST message (turbo_stream) interp none.rb Ir/op 42985620 objs/op 10981.8 jit 0/0 settle 0
+campfire POST message (turbo_stream) interp noko_flatkey2.rb Ir/op 42761882 objs/op 10933.2 jit 0/0 settle 0
+campfire POST message (turbo_stream) interp noko_cache.rb Ir/op 42221413 objs/op 10827.6 jit 0/0 settle 0
+writebook PATCH page (turbo_stream) interp none.rb Ir/op 36660905 objs/op 7949.6 jit 0/0 settle 0
+writebook PATCH page (turbo_stream) interp none.rb Ir/op 36660876 objs/op 7952.8 jit 0/0 settle 0
+writebook PATCH page (turbo_stream) interp noko_flatkey2.rb Ir/op 36574332 objs/op 7928.6 jit 0/0 settle 0
+writebook PATCH page (turbo_stream) interp noko_cache.rb Ir/op 36263691 objs/op 7866.7 jit 0/0 settle 0
+DONE

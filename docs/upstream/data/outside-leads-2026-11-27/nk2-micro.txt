@@ -1,0 +1,12 @@
+4.0.10 interp|nokogiri 1.19.7|base|109000|108798
+4.0.10 interp|nokogiri 1.19.7|noko_flatkey2.rb|98467|98229
+4.0.10 interp|nokogiri 1.19.7|noko_cache.rb|71603|71259
+4.0.10 yjit|nokogiri 1.19.7|base|89287|88160
+4.0.10 yjit|nokogiri 1.19.7|noko_flatkey2.rb|77811|77616
+4.0.10 yjit|nokogiri 1.19.7|noko_cache.rb|61051|61218
+master interp|nokogiri 1.19.7|base|182097|182620
+master interp|nokogiri 1.19.7|noko_flatkey2.rb|172925|172768
+master interp|nokogiri 1.19.7|noko_cache.rb|146776|146616
+master zjit|nokogiri 1.19.7|base|158273|158232
+master zjit|nokogiri 1.19.7|noko_flatkey2.rb|148883|148436
+master zjit|nokogiri 1.19.7|noko_cache.rb|134190|134684

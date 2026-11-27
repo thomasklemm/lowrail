@@ -1,14 +1,17 @@
 # ruby reqrun.rb APP WORKLOAD N MODE [PATCH] -> Callgrind Ir and objects per operation of a census workload,
 # counting only Rails.application#call (req.rb), with PATCH loaded after boot. WARM (default 200) warm-up
 # operations; NOGC=1 disables GC for the measured window (fixed heap). "jit B/I" is YJIT blocks compiled and
-# invalidations during the measured window; a YJIT number counts only when both are 0 (JIT-flat). Needs valgrind's callgrind.h.
+# invalidations during the measured window (ZJIT: ISEQs and side exits compiled); a JIT number counts only when both
+# are 0 (JIT-flat). REQ_RUBY (default 4.0.9) and REQ_CORPUS (default census) pick the Ruby and the app copies.
+# Needs valgrind's callgrind.h.
 require "tmpdir"
 load File.expand_path("../../../../script/census", __dir__)
 app, wl, n, mode, patch = ARGV
-bin = Census.ruby_bin("4.0.9")
-copy = Census.app_dir("census", app)
+bin = Census.ruby_bin(ENV.fetch("REQ_RUBY", "4.0.9"))
+corpus = ENV.fetch("REQ_CORPUS", "census")
+copy = Census.app_dir(corpus, app)
 rails = JSON.parse(File.read(File.join(copy, ".census.json"))).fetch("base")
-gemfile = Census.variant("census", app, rails, bin)
+gemfile = Census.variant(corpus, app, rails, bin)
 so = File.join(Dir.tmpdir, "reqcg-#{File.basename(File.dirname(bin))}", "reqcg.so")
 unless File.exist?(so)
   FileUtils.mkdir_p(File.dirname(so))
