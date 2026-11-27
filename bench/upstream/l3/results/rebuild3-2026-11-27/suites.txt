@@ -1,0 +1,3 @@
+am-l3c: 319e55a661702e756a5140aeec2300aa55efa0f4 activemodel test  | 1277 runs, 5712 assertions, 0 failures, 0 errors, 0 skips
+ar-sqlite-l3c: 319e55a661702e756a5140aeec2300aa55efa0f4 activerecord test:sqlite3  | 10461 runs, 37418 assertions, 0 failures, 0 errors, 52 skips
+ar-pg-l3c: 319e55a661702e756a5140aeec2300aa55efa0f4 activerecord test:postgresql  | 11393 runs, 41343 assertions, 0 failures, 0 errors, 31 skips

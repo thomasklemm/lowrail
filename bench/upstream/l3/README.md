@@ -379,3 +379,26 @@ attributes_for_database 91,454 → 160,185 (+75.2%); main2 −0.4% and −0.6%. 
 (slowest L3 40,053 and 132,956 against the fastest main 36,872 and 91,454). The earlier `rebuild-2026-11-27/body-ips.txt`
 kept only 3 complete rounds, as thermos-sol noted; it is superseded. The 6/102-column and master × ZJIT runs above are
 from `f70d3e0917` and were not repeated.
+
+## Shared helper (2026-11-27)
+
+thermos-sol on `41af869c78` asked to fold the two overrides into one private `attributes_to_hash` helper with an
+explicit block (DECISIONS readability gate: duplicated method). `319e55a661` does exactly that; tests unchanged.
+On it ([results/rebuild3-2026-11-27](results/rebuild3-2026-11-27)): extended probe (718 lines) and review probe (676)
+identical to main on SQLite and PostgreSQL 17, the callable-default repro returns David, Active Model 1,277, Active
+Record SQLite 10,461 and PostgreSQL 17 11,393 runs, 0 failures.
+
+Callgrind, 30 columns ([body/L3c-2026-11-27](body/L3c-2026-11-27/table.md)):
+
+| | interp main → branch | A/A | YJIT main → branch | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Marshal.dump` | 319,622 → 268,058 (−16.1%) | 0.03% | 259,698 → 215,645 (−17.0%) | 0.00% |
+| `attributes_for_database` | 161,606 → 110,739 (−31.5%) | 0.04% | 107,006 → 63,174 (−41.0%) | 0.02% |
+| `attributes_before_type_cast` | 124,089 → 74,278 (−40.1%) | 0.00% | 95,368 → 52,537 (−44.9%) | 0.16% |
+| MessagePack dump | 190,789 → 139,355 (−27.0%) | 0.01% | 130,232 → 86,191 (−33.8%) | 0.35% |
+
+The block call costs about 8,000 instructions per call in the interpreter against the two separate methods (86% of the
+gain kept); under YJIT the difference is about 2,000. benchmark-ips, YJIT, 6 full interleaved rounds
+([body-ips.txt](results/rebuild3-2026-11-27/body-ips.txt)): Marshal.dump 36,143 → 43,776 i/s (+21.1%),
+attributes_for_database 92,570 → 150,662 (+62.8%); main2 +0.5% and −4.7%. Every L3 round is above every main round
+(slowest L3 39,560 and 136,396 against the fastest main 36,143 and 92,570).
