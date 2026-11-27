@@ -102,6 +102,10 @@ for first-run files (`single_byte.so`, migration files) that show up only in the
    (`Admin::AdminUsersController#index`, 0.7% data noise). CASA: 20% and 6.7% (`ChecklistItemsController#new` and
    `#edit`, `uri/common.rb:456`). The record IDs in their redirect URLs change from run to run. This is moot while
    compare is a report, but it is the evidence for any future gate.
+   **Followed up 2026-11-27** ([one-process-noise](../2026-11-27-one-process-noise/README.md)): Hackatime's cause
+   was ViteRuby's `Socket.tcp` probe, now counted apart (0 false alarms in 120 compares with the new counter); CASA's
+   was growing record IDs, now a documented `db:test:prepare` per capture, and a Sprockets source that is not found
+   yet still alarms.
 5. **Controller tests count no requests, and the report doesn't say so.**
    * Loomio's `test/controllers` is 95 of 104 files `ActionController::TestCase`, so 1,491 tests yield 68 requests,
      and the plant in `SearchController#index` is never seen.

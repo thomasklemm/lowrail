@@ -1,0 +1,132 @@
+== Hackatime, gem 16b53491 (h2-h6, d1), compare before
+unchanged: hackatime/h2 hackatime/h3 hackatime/h4 hackatime/h5 hackatime/h6 hackatime/d1
+  false alarms, default: 15 of 120 (12.50%); rows: PullRepoCommitsJob#perform 6, addressable/uri.rb:424 6, Doorkeeper::ApplicationsController#index 6, Admin::AdminUsersController#index 3
+  false alarms, confirm: 12 of 360 (3.33%); rows: Doorkeeper::ApplicationsController#index 6, PullRepoCommitsJob#perform 6, addressable/uri.rb:424 6
+== Hackatime, gem 16b53491 (h2-h6, d1), compare after
+unchanged: hackatime/h2 hackatime/h3 hackatime/h4 hackatime/h5 hackatime/h6 hackatime/d1
+  false alarms, default: 15 of 120 (12.50%); rows: PullRepoCommitsJob#perform 6, addressable/uri.rb:424 6, Doorkeeper::ApplicationsController#index 6, Admin::AdminUsersController#index 3
+  false alarms, confirm: 12 of 360 (3.33%); rows: Doorkeeper::ApplicationsController#index 6, PullRepoCommitsJob#perform 6, addressable/uri.rb:424 6
+== Hackatime, this change's counter, wrapper fe85e96a then 15ee2407 (g1-g6; gp1, gp2 planted), compare before
+unchanged: hackatime/g1 hackatime/g2 hackatime/g3 hackatime/g4 hackatime/g5 hackatime/g6
+planted: hackatime/gp1 hackatime/gp2
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 51 of 60 (85.00%); with an unrelated line too: 0
+  plant caught, confirm: 50 of 60 (83.33%)
+== Hackatime, this change's counter, wrapper fe85e96a then 15ee2407 (g1-g6; gp1, gp2 planted), compare after
+unchanged: hackatime/g1 hackatime/g2 hackatime/g3 hackatime/g4 hackatime/g5 hackatime/g6
+planted: hackatime/gp1 hackatime/gp2
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 51 of 60 (85.00%); with an unrelated line too: 0
+  plant caught, confirm: 50 of 60 (83.33%)
+== Hackatime, intermediate gem that left out socket.rb by file (n1-n9; np1, np2 planted), compare before
+unchanged: hackatime/n1 hackatime/n2 hackatime/n3 hackatime/n4 hackatime/n5 hackatime/n6 hackatime/n7 hackatime/n8 hackatime/n9
+planted: hackatime/np1 hackatime/np2
+  false alarms, default: 43 of 504 (8.53%); rows: addressable/uri.rb:424 24, PullRepoCommitsJob#perform 16, My::ProjectRepoMappingsController#index 12, Doorkeeper::ApplicationsController#index 3
+  false alarms, confirm: 88 of 3024 (2.91%); rows: My::ProjectRepoMappingsController#index 60, addressable/uri.rb:424 26, PullRepoCommitsJob#perform 13, Doorkeeper::ApplicationsController#index 2
+  plant caught, default: 140 of 144 (97.22%); with an unrelated line too: 12
+  plant caught, confirm: 136 of 144 (94.44%)
+== Hackatime, intermediate gem that left out socket.rb by file (n1-n9; np1, np2 planted), compare after
+unchanged: hackatime/n1 hackatime/n2 hackatime/n3 hackatime/n4 hackatime/n5 hackatime/n6 hackatime/n7 hackatime/n8 hackatime/n9
+planted: hackatime/np1 hackatime/np2
+  false alarms, default: 43 of 504 (8.53%); rows: addressable/uri.rb:424 24, PullRepoCommitsJob#perform 16, My::ProjectRepoMappingsController#index 12, Doorkeeper::ApplicationsController#index 3
+  false alarms, confirm: 88 of 3024 (2.91%); rows: My::ProjectRepoMappingsController#index 60, addressable/uri.rb:424 26, PullRepoCommitsJob#perform 13, Doorkeeper::ApplicationsController#index 2
+  plant caught, default: 140 of 144 (97.22%); with an unrelated line too: 12
+  plant caught, confirm: 136 of 144 (94.44%)
+== Hackatime (h2 h3 h4 h5 h6 d1), compare before, wall-clock rows left out
+unchanged: hackatime/h2 hackatime/h3 hackatime/h4 hackatime/h5 hackatime/h6 hackatime/d1
+  false alarms, default: 9 of 120 (7.50%); rows: Doorkeeper::ApplicationsController#index 6, Admin::AdminUsersController#index 3
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+== Hackatime (g1 g2 g3 g4 g5 g6), compare before, wall-clock rows left out
+unchanged: hackatime/g1 hackatime/g2 hackatime/g3 hackatime/g4 hackatime/g5 hackatime/g6
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+== Hackatime (n1 n2 n3 n4 n5 n6 n7 n8 n9), compare before, wall-clock rows left out
+unchanged: hackatime/n1 hackatime/n2 hackatime/n3 hackatime/n4 hackatime/n5 hackatime/n6 hackatime/n7 hackatime/n8 hackatime/n9
+  false alarms, default: 3 of 504 (0.60%); rows: Doorkeeper::ApplicationsController#index 3
+  false alarms, confirm: 0 of 3024 (0.00%); rows: 
+== CASA, db:test:prepare before each capture (r1-r6; rp1 planted), compare before
+unchanged: casa/r1 casa/r2 casa/r3 casa/r4 casa/r5 casa/r6
+planted: casa/rp1
+  false alarms, default: 27 of 120 (22.50%); rows: CaseContacts::FormController#new 8, JudgesController#edit 6, CaseContactsController#index 6, CaseCourtReportsController#index 6
+  false alarms, confirm: 18 of 360 (5.00%); rows: CaseCourtReportsController#index 6, NotificationsController#index 4, CaseContactsController#index 4, JudgesController#edit 3
+  plant caught, default: 30 of 30 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: no second planted capture
+== CASA, db:test:prepare before each capture (r1-r6; rp1 planted), compare after
+unchanged: casa/r1 casa/r2 casa/r3 casa/r4 casa/r5 casa/r6
+planted: casa/rp1
+  false alarms, default: 27 of 120 (22.50%); rows: CaseContacts::FormController#new 8, JudgesController#edit 6, CaseContactsController#index 6, CaseCourtReportsController#index 6
+  false alarms, confirm: 18 of 360 (5.00%); rows: CaseCourtReportsController#index 6, NotificationsController#index 4, CaseContactsController#index 4, JudgesController#edit 3
+  plant caught, default: 30 of 30 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: no second planted capture
+== CASA, CI=1 and db:test:prepare (ci1-ci4; cip1 planted), compare before
+unchanged: casa/ci1 casa/ci2 casa/ci3 casa/ci4
+planted: casa/cip1
+  false alarms, default: 6 of 24 (25.00%); rows: ContactTypesController#new 5, ReportsController#index 2
+  false alarms, confirm: 0 of 24 (0.00%); rows: 
+  plant caught, default: 12 of 12 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: no second planted capture
+== CASA, CI=1 and db:test:prepare (ci1-ci4; cip1 planted), compare after
+unchanged: casa/ci1 casa/ci2 casa/ci3 casa/ci4
+planted: casa/cip1
+  false alarms, default: 6 of 24 (25.00%); rows: ContactTypesController#new 5, ReportsController#index 2
+  false alarms, confirm: 0 of 24 (0.00%); rows: 
+  plant caught, default: 12 of 12 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: no second planted capture
+== Field test casa (recorded), compare before
+unchanged: casa/u1 casa/u2 casa/u3 casa/u4 casa/u5 casa/u6
+planted: casa/planted casa/planted2
+  false alarms, default: 24 of 120 (20.00%); rows: ChecklistItemsController#new 18, uri/common.rb:456 12, ChecklistItemsController#edit 12, CaseContactsController#drafts 6
+  false alarms, confirm: 24 of 360 (6.67%); rows: ChecklistItemsController#new 18, ChecklistItemsController#edit 12, uri/common.rb:456 12, CaseContactsController#drafts 6
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)
+== Field test casa (recorded), compare after
+unchanged: casa/u1 casa/u2 casa/u3 casa/u4 casa/u5 casa/u6
+planted: casa/planted casa/planted2
+  false alarms, default: 24 of 120 (20.00%); rows: ChecklistItemsController#new 18, uri/common.rb:456 12, ChecklistItemsController#edit 12, CaseContactsController#drafts 6
+  false alarms, confirm: 24 of 360 (6.67%); rows: ChecklistItemsController#new 18, ChecklistItemsController#edit 12, uri/common.rb:456 12, CaseContactsController#drafts 6
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)
+== Field test hackatime-serial (recorded), compare before
+unchanged: hackatime-serial/u1 hackatime-serial/u2 hackatime-serial/u3 hackatime-serial/u4 hackatime-serial/u5 hackatime-serial/u6
+planted: hackatime-serial/planted hackatime-serial/planted2
+  false alarms, default: 15 of 120 (12.50%); rows: Admin::AdminUsersController#index 12, CustomDoorkeeper::AuthorizationsController#create 3
+  false alarms, confirm: 16 of 360 (4.44%); rows: Admin::AdminUsersController#index 14, CustomDoorkeeper::AuthorizationsController#create 2
+  plant caught, default: 31 of 60 (51.67%); with an unrelated line too: 2
+  plant caught, confirm: 30 of 60 (50.00%)
+== Field test hackatime-serial (recorded), compare after
+unchanged: hackatime-serial/u1 hackatime-serial/u2 hackatime-serial/u3 hackatime-serial/u4 hackatime-serial/u5 hackatime-serial/u6
+planted: hackatime-serial/planted hackatime-serial/planted2
+  false alarms, default: 15 of 120 (12.50%); rows: Admin::AdminUsersController#index 12, CustomDoorkeeper::AuthorizationsController#create 3
+  false alarms, confirm: 16 of 360 (4.44%); rows: Admin::AdminUsersController#index 14, CustomDoorkeeper::AuthorizationsController#create 2
+  plant caught, default: 31 of 60 (51.67%); with an unrelated line too: 2
+  plant caught, confirm: 30 of 60 (50.00%)
+== Field test writebook-w4 (recorded), compare before
+unchanged: writebook-w4/u1 writebook-w4/u2 writebook-w4/u3 writebook-w4/u4 writebook-w4/u5 writebook-w4/u6
+planted: writebook-w4/planted writebook-w4/planted2
+  false alarms, default: 3 of 120 (2.50%); rows: PagesController#create 3
+  false alarms, confirm: 2 of 360 (0.56%); rows: PagesController#create 2
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)
+== Field test writebook-w4 (recorded), compare after
+unchanged: writebook-w4/u1 writebook-w4/u2 writebook-w4/u3 writebook-w4/u4 writebook-w4/u5 writebook-w4/u6
+planted: writebook-w4/planted writebook-w4/planted2
+  false alarms, default: 3 of 120 (2.50%); rows: PagesController#create 3
+  false alarms, confirm: 2 of 360 (0.56%); rows: PagesController#create 2
+  plant caught, default: 0 of 60 (0.00%); with an unrelated line too: 0
+  plant caught, confirm: 0 of 60 (0.00%)
+== Field test writebook-serial (recorded), compare before
+unchanged: writebook-serial/u1 writebook-serial/u2 writebook-serial/u3 writebook-serial/u4 writebook-serial/u5 writebook-serial/u6
+planted: writebook-serial/planted writebook-serial/planted2
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)
+== Field test writebook-serial (recorded), compare after
+unchanged: writebook-serial/u1 writebook-serial/u2 writebook-serial/u3 writebook-serial/u4 writebook-serial/u5 writebook-serial/u6
+planted: writebook-serial/planted writebook-serial/planted2
+  false alarms, default: 0 of 120 (0.00%); rows: 
+  false alarms, confirm: 0 of 360 (0.00%); rows: 
+  plant caught, default: 60 of 60 (100.00%); with an unrelated line too: 0
+  plant caught, confirm: 60 of 60 (100.00%)
