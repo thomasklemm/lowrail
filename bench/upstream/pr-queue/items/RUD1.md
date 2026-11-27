@@ -17,7 +17,7 @@ rank: 3
 risky: true
 state: held
 pr:
-note: "Path: Redmine ticket for Thomas, no PR (DECISIONS, A clear PR before a ticket): the intended behaviour is a maintainer question (no doc or test covers undef for these lookups) and honoring it changes reflection results in a lookup shared with method_defined?, alias and undef; no fix yet. Ticket draft: docs/upstream-drafts/ruby-bug-active-refinement-undef.md. No duplicate found. Related crash: RUC1. Found by the 2026-11-27 lead sweep."
+note: "2026-11-27 Thomas: stays held, ticket not posted. Path: Redmine ticket for Thomas, no PR (DECISIONS, A clear PR before a ticket): the intended behaviour is a maintainer question (no doc or test covers undef for these lookups) and honoring it changes reflection results in a lookup shared with method_defined?, alias and undef; no fix yet. Ticket draft: docs/upstream-drafts/ruby-bug-active-refinement-undef.md. No duplicate found. Related crash: RUC1. Found by the 2026-11-27 lead sweep."
 evidence:
   - bench/upstream/ruby-bugs-2026-11-27
 passes: []

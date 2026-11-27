@@ -21,6 +21,35 @@ These were submitted before the policy. Each has a full record in [contributions
 
 ## Correctness leads (parked)
 
+### Segfault for `super` from a nested module after an active refinement undefines the method
+
+**Lead only, 2026-11-27** (Thomas: record it; no PR, since our ruby/ruby PRs are ZJIT-only, and no ticket unless he
+asks). Found by the Astra review of RUC1. Not investigated, and not caused or changed by RUC1. Repro
+[nested_module_yjit.rb](../../bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb), runs in
+[nested_module_yjit.txt](../../bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.txt):
+
+```ruby
+class P
+  def foo = :parent
+end
+module N
+  def foo = super
+end
+module M
+  include N
+end
+class C < P
+  include M
+end
+using Module.new { refine(M) { def foo = :refined; undef_method :foo } }
+C.new.send(:foo)
+```
+
+With `--yjit-call-threshold=1` this aborts with `[BUG] Segmentation fault` in `N#foo` on 4.0.10, master 0d399335b7
+and the RUC1 head. The interpreter and `--zjit-call-threshold=1` raise NoMethodError from `N#foo`'s `super`
+instead. Astra's matrix had 24 such YJIT segfault cases on master; the RUC1 + #20267 combination fixes the 16 with an
+inactive refinement and leaves the 8 with an active undef.
+
 ### `super` in a block rebound with `instance_exec` skips the receiver check
 
 **Filed 2026-11-17 as [Shopify/ruby#1131](https://github.com/Shopify/ruby/issues/1131)** (Thomas's approved task of 2026-11-14, the draft below with the recheck added). Rechecked first on the ruby/ruby-dev-builder ruby-head of 2026-11-16 (`3eb1f25fc5`): the interpreter and `--zjit` print `:type_error`, `--yjit` and `--yjit --yjit-call-threshold=1` print `:base`. No duplicate found in Shopify/ruby issues. Parked 2026-11-10 by Thomas; a fix PR on ruby/ruby can follow.
