@@ -1,0 +1,10 @@
+source "https://rubygems.org"
+if ENV["AR_VERSION"]
+  gem "activerecord", ENV["AR_VERSION"]
+else
+  gem "activerecord", path: "/home/user/workspace/src/rails-main/activerecord"
+  gem "activesupport", path: "/home/user/workspace/src/rails-main/activesupport"
+  gem "activemodel", path: "/home/user/workspace/src/rails-main/activemodel"
+end
+gem "sqlite3"
+gem "bcrypt"

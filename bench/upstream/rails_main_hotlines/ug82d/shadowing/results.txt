@@ -1,0 +1,53 @@
+# ruby 4.0.9, rails/rails main 088fc0cf61
+## harness.rb
+after AR load + schema: 0 hits
+[
+  {
+    "model": "ApplicationRecord",
+    "name": "default_order",
+    "owner": "ActiveRecord::QueryMethods",
+    "source": "harness.rb",
+    "location": "harness.rb:15:in '<main>'"
+  },
+  {
+    "model": "Post",
+    "name": "reorder",
+    "owner": "ActiveRecord::QueryMethods",
+    "source": "harness.rb",
+    "location": "harness.rb:23:in 'Module#include'"
+  },
+  {
+    "model": "Post",
+    "name": "default_order",
+    "owner": "ActiveRecord::QueryMethods",
+    "source": "harness.rb",
+    "location": "harness.rb:24:in '<class:Post>'"
+  },
+  {
+    "model": "Post",
+    "name": "reverse_order",
+    "owner": "ActiveRecord::QueryMethods",
+    "source": "harness.rb",
+    "location": "harness.rb:26:in 'singleton class'"
+  },
+  {
+    "model": "Post",
+    "name": "lock",
+    "owner": "ActiveRecord::QueryMethods",
+    "source": "harness.rb",
+    "location": "harness.rb:29:in 'Kernel#define_singleton_method'"
+  }
+]
+## rails_models.rb
+files 237, not loaded 16
+Bulb.new (ActiveRecord::Relation) /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+Parrot.delete_all (ActiveRecord::Relation) /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+Reply.load (ActiveRecord::Relation) /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+Reply.select (ActiveRecord::QueryMethods) /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+## cost.rb
+proto=false check calls at definition=0 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 11.22 ms
+proto=true check calls at definition=206 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 10.13 ms
+proto=false check calls at definition=0 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 9.86 ms
+proto=true check calls at definition=206 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 15.14 ms
+proto=false check calls at definition=0 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 8.96 ms
+proto=true check calls at definition=206 during 1000 query iterations=0 allocations=182854 201 class-method definitions took 9.51 ms
