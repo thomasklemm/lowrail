@@ -13,7 +13,7 @@ depends_on: []
 tracker: []
 stacked_on:
 alternative_of:
-evidence: [docs/upstream/data/rails-82-leads, bench/upstream/census13r/body/ASC1, bench/upstream/census13r/body/ASC1-wall-yjit, bench/upstream/census13r/body/ASC1-wall-zjit, bench/upstream/census13r/body/ASC1-ips, bench/upstream/census13r/data/probe, bench/upstream/census13r/reviews/ASC1-thermos-sol-2026-11-27.tar.gz]
+evidence: [docs/upstream/data/rails-82-leads, bench/upstream/census13r/body/ASC1, bench/upstream/census13r/body/ASC1-wall-yjit, bench/upstream/census13r/body/ASC1-wall-zjit, bench/upstream/census13r/body/ASC1-ips, bench/upstream/census13r/data/probe, bench/upstream/census13r/reviews/ASC1-thermos-sol-2026-11-27.tar.gz, bench/upstream/census13r/reviews/ASC1-thermos-sol-timing-text-2026-11-27.tar.gz]
 impact: "Every association load through the statement cache (belongs_to, has_one, has_many, through, polymorphic; every Rails app) resolved the model's connection pool once more than needed: association_scope_cache took the connection in its own with_connection block, then find_target took it again to run the statement (find_by_sql takes it a third time); the change saves one pool lookup per load and, without an existing lease, one checkout (thermos-sol probe: direct loads 3 to 2 lookups, through 4 to 3). The split dates from fa048105d1 (2024-05, with_connection replacing lease_connection); reflection.rb's signature changed again in 7249a66350 (unreleased, #59120). Census, Rails main 2e299253f9, Ruby 4.0.10, 4 apps / 36 workloads, interpreted Ir per request: median -0.26%, max -0.91%; per app medians blog +0.16%, casa -0.26%, react-starter-kit -0.40%, redprints-cfp -0.39% (docs/upstream/data/rails-82-leads/per-workload.tsv), A/A median -0.03%, p90 |d| 0.32%. Exact head, script/upstream-bench, Ruby 4.0.10, interpreter: belongs_to load -3.1%, has_one -3.0%, has_many (3 rows) -2.4% (A/A <= 0.06%), objects unchanged; YJIT cells not JIT-flat, no claim. Connection-lookup lead of the Rails 8.2 round (census 12: 0.81% mean, 68/71; this round 0.75%, 33/36): measured commit 23fe1f4b6b (fork ref thomasklemm/asc1-measured-23fe1f4b6b) has activerecord/lib tree fc7f875b3d, identical to the head. Lifetime: runs on Ruby master and Rails main."
 rank: 1
 risky: true
@@ -28,6 +28,12 @@ passes:
     date: 2026-11-27
     verdict: approve
     summary: "Both rubrics self-performed, no delegation; L0. Route-test arity and overbroad lookup/checkout claims fixed and rechecked. Independent SQLite/PostgreSQL suites and exactness/background-async probes pass; released override inventory checked. Worst tested 1,000-row load: -0.0367% interpreter instructions, A/A 0.0054%, objects unchanged; raw evidence archived. Present title/body/commit approved; later benchmark-ips text needs a short confirm. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 thermos-sol."
+  - reviewer: thermos-sol
+    head: "ed1b28c5b94530e1c8b06d14dfca0ee93d5c07ba"
+    orb: T-01a21eb9-b7bd-74a9-b7cc-38834c572ca0
+    date: 2026-11-27
+    verdict: changes
+    summary: "Body-text confirm at Lowrail a469f402 only; code approval unchanged. Timing ranges and interval signs match all six cells from the raw logs, 90 JIT-flat processes per Ruby. One must-fix: ±0.5% describes A/A median differences, not variation or interval bounds (YJIT has_one A/A 95% CI -3.4945% to +2.2526%). Name the median differences explicitly, or cut the A/A clause. No timing rerun or Rails change needed. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 thermos-sol."
 ---
 
 # Reuse the connection for cached association statements
