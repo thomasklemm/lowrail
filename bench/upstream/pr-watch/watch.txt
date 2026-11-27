@@ -14,3 +14,4 @@ https://github.com/sferik/duel-ruby/pull/9
 https://github.com/rails/rails/pull/60020
 https://github.com/ruby/ruby/pull/20261
 https://github.com/hashie/hashie/pull/660
+https://github.com/hashie/hashie/pull/661

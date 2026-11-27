@@ -102,7 +102,8 @@ Ours, open (watch CI, comments, state):
   hashie/hashie#660 (our ZJIT Duel follow-up, opened 2026-11-27; the Amp GitHub App can't access hashie, so gh
   polling is the only signal; also watch any further hashie PR that the hashie thread
   T-01a21e85-395a-745d-91c1-87edf5e6c7a1 opens for dblock's candidates and add it to `watch.txt`; report new replies
-  by dblock in the #659 comment thread), coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
+  by dblock in the #659 comment thread, including answers to our reply issuecomment-7227673119, posted 2026-11-27 20:36 UTC),
+  hashie/hashie#661 (HM2, head 1af7ad9, opened ready 2026-11-27; gh polling only), coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
   inertiajs/inertia-rails#449, PostHog/posthog-ruby#395, rails/importmap-rails#336, plus every other open PR of ours
   the search finds.
 
