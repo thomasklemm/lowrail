@@ -287,3 +287,43 @@ The selected five-of-seven wall-time range is gone, resolving the nit. The final
 describes the retained noisy A/A evidence without claiming a wall-time result or promising a clean one.
 No further text change is required. This is a text-only confirm: no rebuild, suite/oracle rerun, or new
 measurement; all prior exact-head validation and its limitations remain in force. No upstream action.
+
+## Large-orb benchmark body delta, 2026-11-27
+
+Verdict: **changes**, one small caption correction. Reviewed head `5fc1871eec45270a068d2ecba6654eef979c5f6e`
+and the exact outgoing body at Lowrail `492931e8`, SHA-256
+`411777fb5b39c31e762c3df95aa00ce38420ff369f0fce327c6e900417d580b2`. Verified the parsed body equals
+`body-proposed.md`; only the final performance section differs from `body-posted.md`.
+
+**Must fix:** the displayed table is not the "median of 10 runs". `hb2-6.txt` is a real, correctly copied
+run: 44.957k versus 54.089k i/s, ratio 1.203127433. That ratio ranks fourth of ten, not fifth or sixth.
+The two central ratios are `hb2-3` (1.203877971) and `hb2-2` (1.213065877); their median is 1.208471924,
+which rounds to 1.21x, not 1.20x. Smallest fix: change "median of 10 runs" to "one representative run".
+Keep the raw table and full-spread sentence; no new benchmark, invented median table or code change is needed.
+
+Read `README.md`, both benchmark scripts, build script, machine record and all 50 raw driver outputs in
+`body-bench-xxlarge-2026-11-27/make-benchmark/`. Independently parsed each throughput row and divided the
+built-ruby column by compare-ruby, checking both version lines and the ten-repeat driver argument. Results:
+
+| Cohort | Runs | Recomputed ratio range | Body conclusion |
+| --- | ---: | --- | --- |
+| `hb2-*`, head/base | 10 | 1.180680813–1.226719913 | 1.18x–1.23x is correct |
+| `aa-*` and `aa2-*`, faster/slower base pair | 20 | 1.000022591–1.055674217 | 1.00x–1.06x is correct |
+| `vh-*`, earlier head/4.0.9 | 10 | 0.983136752–1.048528762 | 4.0.9 up to 1.02x faster; head up to 1.05x faster |
+| `hb-*`, earlier head/base | 10 | 1.192037315–1.228568243 | Consistent supporting cohort, not substituted for `hb2` |
+
+The quoted table and both version lines match `hb2-6.txt` verbatim. All `hb2` logs name base `274cfe719a`
+and head `5fc1871eec`; all A/A logs name the base twice. The release comparison uses `e75b1f0109` as disclosed;
+rechecked its two-test-line diff against the current head, with no runtime or benchmark difference. "About
+the same speed" is reasonable for these release/head results; it is not a claim of statistical equivalence.
+The spread includes the slow A/A run, rather than hiding it, and all head/base ratios remain outside it.
+The Callgrind sentence is unchanged apart from removing the release comparison and retains its prior audit.
+
+Nonblocking internal-record precision: the evidence README says 19/20 A/A pairs are within 2%, but it is
+18/20 before rounding: `aa2-5` is 1.021486511, in addition to `aa-5` at 1.055674217. The proposed body does
+not repeat that claim; its 1.00x–1.06x range is unaffected. Prefer "18/20 within 2%" if editing the README.
+
+The project-format table with the complete spread and A/A is allowed by the current DECISIONS regression
+rule. This is a raw-evidence audit, not an independent rerun of the large-orb measurements. No build, suite,
+oracle or GC.stress rerun was needed for the unchanged code. Prior exact-head validation still applies;
+the caption is the only body blocker. No upstream post or Ruby-fork push.

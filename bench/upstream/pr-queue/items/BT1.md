@@ -202,6 +202,23 @@ passes:
       head retain the prior code, parser, differential and benchmark approval. No rebuild or suite rerun
       was needed for this text-only confirm. Evidence and arithmetic are indexed in
       evidence/backtrace-format/thermos-sol/results.txt. No upstream post or Ruby fork push.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      One caption correction on exact body 411777fb5b39c31e762c3df95aa00ce38420ff369f0fce327c6e900417d580b2
+      at Lowrail 492931e8. Change 'median of 10 runs' to 'one representative run': hb2-6's genuine
+      44.957k/54.089k table has ratio 1.203127433, ranked fourth of ten. Central ratios are hb2-3 and
+      hb2-2; their median is 1.208471924 (1.21x). Keep the table and spread; no new benchmark needed.
+      Parsed all 50 raw driver outputs and checked version pins: hb2 head/base is 1.180681-1.226720;
+      all 20 base A/A faster/slower ratios are 1.000023-1.055674; vh head/release is 0.983137-1.048529.
+      The quoted ranges, table values/version lines, and 'about the same speed' release sentence are
+      supported. Release runs use e75b1f0109, whose C and benchmark match 5fc1871eec. Callgrind figures
+      retain their prior audit. Nonblocking record nit: README's '19/20 within 2%' is 18/20 unrounded
+      (aa2-5 is 2.1487%, aa-5 is 5.5674%). No new code finding, runtime rerun or upstream action.
+      Details and arithmetic: evidence/backtrace-format/astra/review.md, Large-orb benchmark body delta.
 ---
 
 # Append backtrace location strings by length
