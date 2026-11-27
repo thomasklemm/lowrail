@@ -40,23 +40,27 @@ sed -i '/BUNDLED WITH/{n;s/.*/   2.7.2/}' Gemfile.lock
 bundle install
 ```
 
-Many repositories will hit this when they first try Ruby 4.1. The committed lockfiles of [parallel](https://github.com/grosser/parallel/blob/a8de399448a6d5029deb809b1b4890b5e38c18c1/Gemfile.lock#L123), [ruby-progressbar](https://github.com/jfelchner/ruby-progressbar/blob/bafa278bfb14353282c2ae3207060f69615db7ae/Gemfile.lock#L46), [rails-dom-testing](https://github.com/rails/rails-dom-testing/blob/153dbecf2601a71639a6a37ad8fd5da9d79e5ced/Gemfile.lock#L107), [marcel](https://github.com/rails/marcel/blob/731f57062adad157a6a67f724a6f724ef77339d5/Gemfile.lock#L110), [factory_bot](https://github.com/thoughtbot/factory_bot/blob/6310dd3550608d19abcb7f1b05ab5ceef1259d9e/Gemfile.lock#L190), [devise](https://github.com/heartcombo/devise/blob/05811fb8366edd08874111d0f6fb44543e1c91ef/Gemfile.lock#L314) and [fastlane](https://github.com/fastlane/fastlane/blob/c66165c23eee1c6471bc617bb3c3513bb36f6132/Gemfile.lock#L406) fail this way on master today, as do apps with git gems such as [Gumroad](https://github.com/antiwork/gumroad/blob/2606df2deca070fe5d78c007351b22aef96903ec/Gemfile.lock#L1289) and [the Archive of Our Own](https://github.com/otwcode/otwarchive/blob/452391b648f2fb06b55c36133812449747634504/Gemfile.lock#L816) once their Ruby version is raised. ruby/rbs#2952, svenfuchs/rails-i18n#1173 and ruby/ruby-bench#510 bumped `BUNDLED WITH` to get ruby-head CI past it.
+Many repositories will hit this when they first try Ruby 4.1. The committed lockfiles of [parallel](https://github.com/grosser/parallel/blob/a8de399448a6d5029deb809b1b4890b5e38c18c1/Gemfile.lock#L123), [ruby-progressbar](https://github.com/jfelchner/ruby-progressbar/blob/bafa278bfb14353282c2ae3207060f69615db7ae/gemfiles/v2.4/Gemfile.lock#L46), [rails-dom-testing](https://github.com/rails/rails-dom-testing/blob/153dbecf2601a71639a6a37ad8fd5da9d79e5ced/Gemfile.lock#L107), [marcel](https://github.com/rails/marcel/blob/731f57062adad157a6a67f724a6f724ef77339d5/Gemfile.lock#L110), [factory_bot](https://github.com/thoughtbot/factory_bot/blob/6310dd3550608d19abcb7f1b05ab5ceef1259d9e/Gemfile.lock#L190), [devise](https://github.com/heartcombo/devise/blob/05811fb8366edd08874111d0f6fb44543e1c91ef/Gemfile.lock#L314) and [fastlane](https://github.com/fastlane/fastlane/blob/c66165c23eee1c6471bc617bb3c3513bb36f6132/Gemfile.lock#L406) fail this way on master today, as do apps with git gems such as [Gumroad](https://github.com/antiwork/gumroad/blob/2606df2deca070fe5d78c007351b22aef96903ec/Gemfile.lock#L1289) and [the Archive of Our Own](https://github.com/otwcode/otwarchive/blob/452391b648f2fb06b55c36133812449747634504/Gemfile.lock#L816) once their Ruby version is raised. svenfuchs/rails-i18n#1173 and ruby/ruby-bench#510 bumped `BUNDLED WITH` to get ruby-head CI past it, and ruby/rbs#2952 set `version` to `system` there.
 
 `BUNDLE_VERSION=system bundle install` (the `version` setting) avoids the switch, and `bundle _4.1.1_ update --bundler` updates the lockfile. Plain `bundle update --bundler` can fail too once the old Bundler is installed, since it restarts with that version.
 
-One way out would be not to switch to a Bundler that can't run on the current Ruby. For context, ruby/ruby#16909 kept the constant removed partly because Bundler 4.1 was expected to stop autoswitching, and #9236 leaves autoswitch changes to later phases.
+One way out would be not to switch to a Bundler that can't run on the current Ruby. For context, ruby/ruby#16909 keeps the constant removed, and the autoswitch change is planned for Bundler 4.2 there and in #9236.
 
 ---
 
 ## Follow-up comment for ruby/ruby#16909
 
-Post only after the issue is up; replace `#NNNN`.
+Dropped (2026-11-27, after Astra's interim finding): hsbt replied at
+https://github.com/ruby/ruby/pull/16909#issuecomment-7228959325 (22:01 UTC) that the earlier comment was wrong, the
+autoswitch change is planned for Bundler 4.2, not 4.1, the usual path is updating `BUNDLED WITH` to a recent 4.0.x
+on Ruby 4.0 before moving to 4.1, the constant stays removed, and he'd like to end the discussion there. No further
+comment on #16909.
 
----
-
-I opened ruby/rubygems#NNNN with a repro: Bundler 4.1.1 on master and Bundler from ruby/rubygems master still switch to the locked version and fail this way.
-
----
+**Recommendation: hold the issue.** The rubygems maintainer has now said in public that the autoswitch changes in
+4.2 and that projects should update `BUNDLED WITH` before moving to Ruby 4.1. A new issue would ask him the same
+question again right after he closed the discussion. If Thomas still wants it, the text above is the corrected
+draft; its remaining value is the evidence that Bundler 4.1 users on Ruby 4.1 get a crash with an error report
+template instead of advice to update the lockfile.
 
 ## Evidence and notes (internal)
 
@@ -114,11 +118,12 @@ Raw outputs, scripts and samples are in
   `SEPARATOR_PAT`, `autoswitch`, `auto-switch`, `BUNDLED WITH` since 2026-04, `restarting using that version`,
   `Pathname` since 2026-04). Related: #9529 (the fix in 4.0.12), #10072 (4.1.0 crash with a plugin after the switch
   to 4.0.17; hsbt: move the lockfile to 4.0.25), #9236 (merge plan, phases 4+ open), our #10017 (Bundler 4.0.x
-  on RubyGems 4.1 with a `---` config, fixed by #10047). Downstream, repositories bumped `BUNDLED WITH` for
-  ruby-head CI: ruby/rbs#2952, svenfuchs/rails-i18n#1173, ruby/ruby-bench#510, basecamp/basecamp-sdk#335,
+  on RubyGems 4.1 with a `---` config, fixed by #10047). Downstream, ruby/rbs#2952 set `version system` on
+  ruby-head CI and these bumped `BUNDLED WITH`: svenfuchs/rails-i18n#1173, ruby/ruby-bench#510, basecamp/basecamp-sdk#335,
   pocke/rbs_rails#401; still open: Shopify/erb_lint#465 and MadBomber/ragdoll#79 ("Gemfile.lock can't be
-  installed on Ruby 4.1", 2.7.2). ruby/ruby#16909: no reply since our comment 7222359284.
+  installed on Ruby 4.1", 2.7.2). ruby/ruby#16909: hsbt replied 2026-11-27 22:01 UTC (above); autoswitch change planned for Bundler 4.2.
 * **Changed versus earlier findings:** faker and responders fail only at their release tags; their default
   branches lock 4.0.15 and 4.0.16 and are dropped. forem is not a valid example (above). 2.7.2, the last 2.x, fails
   too. RubyGems/Bundler master is now 4.2.0.dev and still switches. Plain `bundle update --bundler` fails only
-  once the old Bundler is installed, not always.
+  once the old Bundler is installed, not always. hsbt's reply on #16909 (Bundler 4.2, not 4.1) ends the open
+  question there. ruby-progressbar's root `Gemfile.lock` is a symlink to `gemfiles/v2.4/Gemfile.lock` (Astra).
