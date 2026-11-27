@@ -211,3 +211,136 @@ Read the completed Duel run **46063675164** for fork PR 26. It runs the benchmar
 **Exact text approval:** the four-point reply under “Reply draft to dblock” is identical to the approved block above and to b7ea02a8. SHA-256 of its contents, including the trailing newline: `42d0e6df51851d656b8691903b4440ed06d2e0a863207da61b26b29607c193c1`. Keep `#661` as requested; it must identify the actual opened HM2 PR before this reply is posted. No replacement wording is requested. Posting still requires thermos-sol's approval of these exact words. This review posted nothing upstream.
 
 Final-head raw evidence and probes: [astra-1af7ad9.tar.gz](astra-1af7ad9.tar.gz), supplementing [astra-eae505a.tar.gz](astra-eae505a.tar.gz). Includes final differential outputs, conversion repros, specs (successful targeted and blocked full attempts), instructions, allocation counts, metrics, reviewed patch and reply, and the complete final Duel log plus wrapper comparison.
+
+## thermos-sol: approve — head 1af7ad9a203fef81be51abb46869eabf6db5d34e
+
+2026-11-27, orb `T-01a21ea6-b891-70c0-8cd5-39e892fefbd1`. Both Thermos rubrics were applied personally in this
+thread, without subagents or new threads, as requested. Base: `9e313f308f3270995c2c978e92f0f216b861861b`.
+The final head is one commit on that base. Correctness/security, maintainability, the queue title/body, upstream
+commit message, CHANGELOG line and the exact reply above are approved. No open must-fix. This pass does not approve
+the original `d1f403e` or intermediate `eae505a` heads.
+
+### Demonstrated findings and their fixes
+
+* On `d1f403e`, an unsuffixed Symbol name became frozen. Besides Astra's public default-proc repro, a mutating
+  TransformKeys callback composed with StrictKeyAccess or DefineAccessors raised FrozenError instead of the base's
+  KeyError or nil. The independent probe found 64 differing rows. Returning a fresh `Symbol#to_s` String in that
+  branch fixes it. The initial checklist's claim that callers only read the unsuffixed name was wrong and is
+  superseded by this finding and the final-head checks below.
+* On `eae505a`, that fix called a non-Symbol name's `to_s` twice. A String with its own conversion made a public
+  StrictKeyAccess error name `changed` instead of `expected`, with three conversions instead of two. The independent
+  probe found 672 differing rows. The exact fix is the final else expression:
+  `[method_name.is_a?(Symbol) ? method_name.to_s : name, nil]`. It copies Symbols as base did and reuses the one
+  conversion of other names. Final default-proc, transformer and String-conversion repros all match base.
+
+### Executed checks and retained evidence
+
+Review scripts, outputs, dependency lock, final patch, raw Duel rerun log and metric reports are kept in
+[`thermos-sol-1af7ad9.tar.gz`](thermos-sol-1af7ad9.tar.gz); `commands.txt` inside gives the commands and normalization.
+Ruby used here: 4.0.9, revision `3e93b23afc`, x86_64 Linux.
+
+| Check on the final head | Result |
+| --- | --- |
+| `mise exec ruby@4.0.9 -- bundle exec rake spec` | 1,076 examples, 0 failures |
+| `mise exec ruby@4.0.9 -- bundle exec rake rubocop` | 124 + 156 files, no offenses |
+| Independent `exactness.rb`, base versus final | 5,040 rows identical, including a fresh run with `HM2_FIX` unset |
+| Kept extended `probes/c1_diff.rb`, rerun here | 10,400 rows identical after Logger timestamp/PID normalization only |
+| `regressions.rb` and `size-boundary.rb` | All repros match; 27 size-boundary rows identical |
+| Standalone `require 'hashie'` and `require 'hashie/mash'` | Base and final load and behave identically |
+| `git diff --check HEAD^ HEAD` | Clean |
+
+Exactness checklist:
+
+1. Probed singleton conversions, private conversions, `extend` with DefineAccessors, prepended dispatch/response
+   hooks, a singleton private method, and overridden `method_missing` with `super`; inspected all helper callers.
+2. Probed Mash subclasses, String subclasses and frozen String subclasses, nested Hash/Array subclasses, and the
+   Mash extensions including DefineAccessors, StrictKeyAccess, KeepOriginalKeys and SymbolizeKeys. No iteration or
+   subclass conversion algorithm is changed.
+3. Compared public/private `to_s` behavior and conversion traces/counts, String/Symbol names, duck-typed names and
+   frozen conversion results. Nested subclass conversion hooks were present in the independent probe.
+4. The Symbol guard follows neighboring `_method_suffix`; Symbol names use `name` for suffix detection, then `to_s`
+   only for an unsuffixed result. Non-Symbols retain one `to_s`. Global redefinitions of core Symbol methods and
+   private helper overrides remain the checklist's accepted boundaries, not a claim of arbitrary monkeypatch parity.
+5. Suffixed slices remain new Strings. Unsuffixed Symbol results remain fresh mutable Strings, including when passed
+   to public default procs or transformers; other conversions retain their original result rather than being copied
+   or evaluated again. Compared result/key frozenness and the resulting Mash state.
+6. Probed mutating key transformers in both extension include orders, a fiber suspended in the callback, repeated
+   calls and block side effects. No new shared state, iteration, cached value or synchronization is introduced.
+7. Probed frozen/unfrozen Mashes, frozen keys, frozen names and frozen nested values; compared results, errors/messages,
+   warnings and post-call state. The size sweep used empty, 16-byte and 1,048,576-byte stems with no/early/late suffix.
+8. Both standalone requires passed on base and final; no dependency, eager load or configuration read was added.
+
+No security, feature-gate, dependency or developer-workflow regression was found in the scoped change. No upstream
+test or code comment was added, so there are no implementation assertions or superfluous added comments to remove.
+
+### Maintainability and cold read
+
+L0: get a Symbol's shared name (or convert another name once); if suffixed, return the two slices; otherwise return
+the mutable Symbol copy or the already-converted non-Symbol name. The first guard avoids changing String inputs;
+the second preserves the public callback behavior demonstrated above. Both stay in the existing owning helper.
+Using `name.dup` unconditionally would copy non-Symbol results that base did not copy; always calling `to_s` again
+would reintroduce the demonstrated conversion regression. A wrapper, memoized type flag, version branch or helper
+inlining would add concepts without simplifying these two contracts. `mash.rb` stays 654 lines, the helper 6.
+
+| `_method_name_and_suffix` | base | final |
+| --- | ---: | ---: |
+| Flog 4.10.0 | 4.9 | 10.1 |
+| RuboCop 1.91.0 ABC | 4.58 | 9 |
+| Cyclomatic / perceived complexity | 2 / 3 | 4 / 5 |
+| Method length | 6 | 6 |
+
+The metric rise is the two short Symbol guards needed to preserve String input handling and mutable unsuffixed
+results, not scattered feature logic. The metrics-only config sets limits to zero to expose the values; its reports
+are not lint failures. The normal project RuboCop run is clean.
+
+### Body, commit and reply claim audit
+
+The title describes the scoped change. The body's first paragraph and each code example match the dispatch path;
+the second explains the interned frozen name, the existing `_method_suffix` precedent and the necessary mutable
+unsuffixed return. The three allocation rows match Duel, not the differently shaped local new-key fixture. The CPU
+sentence reports Duel's classification, not literal equal timings or a speed claim. The upstream commit's title and
+each explanatory sentence match that same source and callback repro. It has Thomas as author and committer, no
+trailers, no internal identifiers and no benchmark claim beyond one avoided allocation. The CHANGELOG line matches
+the change; the coordinator must ensure `#661` is the actual PR number before opening/posting.
+
+I inspected `body/HM2` raw A/A logs, c1 wall JSON/tables, the Duel raw logs, allocation attribution and the kept
+master/ZJIT differential archive. The archive's 10,400 base/head rows match after timestamp/PID normalization. No
+Ruby master/ZJIT build or local wall benchmark was run in this review orb. Historical `d1f403e`/`eae505a` wall and
+Callgrind numbers are not approved as measurements of the final head, and the non-xxlarge local timing is not a body
+headline. The final body claims only Duel allocations and its CPU verdict.
+
+Final-code Duel was independently checked by fetching run `46063675164`'s raw log: YJIT and ZJIT each report
+27 benchmarks, 0 regressed, 0 errors, 0 unsettled. The three body rows are 16 → 13, 5 → 4 and 6 → 5 objects, all CPU
+verdicts `same`. This run is on fork PR 26's workflow-carrying head `0e7794cfd9a9be82f5f2ad3f3bd1ae13b04e6f6c`,
+not the literal HM2 commit: its base is HD2's `f6545d1dd34c3905fb4c8fa25764f209cb65274f`. Its diff is only the same
+helper change and CHANGELOG entry; the entire `mash.rb` blob equals HM2's `1d46a64fc8551afe7394aab7f1eb2b14c8b8b230`.
+All PR 26 checks were successful when read. These are inspected hosted results, not locally executed JIT runs.
+
+During sync I also checked Astra's final-head Callgrind archives directly: subtracting N=0 from N=100 and dividing
+by 100 gives unsuffixed 16-byte Symbol 6,882.20 → 7,527.33 instructions/call (+9.37%) and String
+7,460.93 → 8,035.35 (+7.70%); the two base controls match. This is a real instruction cost of preserving the
+unsuffixed contract, accepted alongside the suffixed allocation reduction, not a demonstrated wall-time loss.
+Those are inspected retained runs, not my own measurement, and no claim that every call is faster is approved.
+
+Reply audit, sentence by sentence:
+
+* Opening: dblock asked for these four leads; a concrete thanks and the stated Duel/local setup answer that request.
+* Point 1: source, the repeated raw allocation rows and Duel's YJIT/ZJIT `same` verdict support every claim.
+* Point 2: kept Duel ratios 0.346/0.316/0.359 support "about three times faster", with 31.2 → 13 objects. I applied
+  the kept prototype separately: 47 method-access specs ran, the four cited dup specs failed; initialization and
+  warning counts each changed from 1 to 0, and a conflicting reader lost its stored value. The last sentence rejects
+  this prototype, without claiming that no exact optimization could ever exist.
+* Point 3: raw Duel reports about 25 objects. The fixture has two licenses with `key` fields; the source and kept
+  allocation attribution place the warning String work there despite `Logger.new(nil)`. The approved wording avoids
+  combining exact String totals from unlike runs or repeating the lead's unsupported 53/56 figure.
+* Point 4: `map!`'s raw allocation row is 4 → 2; the kept YJIT CPU ratios 1.113–1.126 support the rounded 12% loss
+  for the combined benchmark. The setter reads the first splat argument; a fixed-arity repro rejects extras that
+  current readers/setters accept. Anonymous rest still accepts extras, so the reply correctly does not claim that
+  every alternative signature is impossible.
+
+The reply has no ping, unsolicited burndown data, internal queue/process detail, request for attention or credit
+claim. Candidates 2–4 remain recorded and unopened. The exact current fenced text above is approved unchanged:
+987 bytes including its final newline, SHA256 `42d0e6df51851d656b8691903b4440ed06d2e0a863207da61b26b29607c193c1`.
+Astra's final-head approval landed during sync and names that identical reply hash; both text approvals are now
+recorded. The coordinator still must verify the actual PR number before posting. This thread pushed no Hashie
+branch, opened no PR and posted nothing upstream.
