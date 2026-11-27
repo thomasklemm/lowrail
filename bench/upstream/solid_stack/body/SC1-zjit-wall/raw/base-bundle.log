@@ -1,0 +1,83 @@
+Fetching gem metadata from https://rubygems.org/..........
+Resolving dependencies...
+Fetching concurrent-ruby 1.3.8
+Fetching i18n 1.15.2
+Fetching securerandom 0.4.1
+Fetching tzinfo 2.0.6
+Fetching connection_pool 3.0.3
+Fetching json 3.2.0
+Fetching uri 1.1.2
+Fetching activesupport 8.1.4.1
+Fetching builder 3.3.0
+Fetching erubi 1.13.1
+Fetching mini_portile2 2.8.9
+Fetching nokogiri 1.19.7
+Fetching rails-dom-testing 2.3.0
+Fetching crass 1.0.8
+Fetching loofah 2.25.3
+Fetching rails-html-sanitizer 1.7.2
+Fetching rack 3.2.9
+Installing securerandom 0.4.1
+Fetching rack-test 2.3.0
+Fetching rack-session 2.1.2
+Fetching actionpack 8.1.4.1
+Installing builder 3.3.0
+Installing mini_portile2 2.8.9
+Installing rails-dom-testing 2.3.0
+Fetching nio4r 2.7.5
+Installing uri 1.1.2
+Installing connection_pool 3.0.3
+Fetching actionview 8.1.4.1
+Fetching zeitwerk 2.8.3
+Fetching useragent 0.16.11
+Installing i18n 1.15.2
+Installing crass 1.0.8
+Installing loofah 2.25.3
+Fetching globalid 1.4.0
+Fetching websocket-extensions 0.3.0
+Installing rack-session 2.1.2
+Installing json 3.2.0 with native extensions
+Fetching activemodel 8.1.4.1
+Fetching activejob 8.1.4.1
+Installing rails-html-sanitizer 1.7.2
+Fetching websocket-driver 0.9.1
+Fetching actioncable 8.1.4.1
+Installing tzinfo 2.0.6
+Installing rack-test 2.3.0
+Fetching timeout 0.6.1
+Fetching activerecord 8.1.4.1
+Installing useragent 0.16.11
+Installing erubi 1.13.1
+Fetching io-console 0.9.5
+erb-6.1.0 is built in to Ruby, and can't be cached because your Gemfile doesn't have any sources that contain it.
+Installing websocket-extensions 0.3.0
+Fetching prettyprint 0.2.1
+Fetching pp 0.6.4
+Fetching rackup 2.3.1
+Fetching railties 8.1.4.1
+Fetching thor 1.5.0
+Fetching sqlite3 2.10.2
+Installing globalid 1.4.0
+Installing io-console 0.9.5 with native extensions
+Installing websocket-driver 0.9.1 with native extensions
+Installing timeout 0.6.1
+Installing zeitwerk 2.8.3
+Installing nio4r 2.7.5 with native extensions
+Installing rack 3.2.9
+Installing prettyprint 0.2.1
+Installing actioncable 8.1.4.1
+Installing activejob 8.1.4.1
+Installing pp 0.6.4
+Installing activemodel 8.1.4.1
+Installing rackup 2.3.1
+Installing thor 1.5.0
+Installing activesupport 8.1.4.1
+Installing actionview 8.1.4.1
+Installing actionpack 8.1.4.1
+Installing concurrent-ruby 1.3.8
+Installing railties 8.1.4.1
+Installing activerecord 8.1.4.1
+Installing sqlite3 2.10.2 with native extensions
+Installing nokogiri 1.19.7 with native extensions
+Bundle complete! 5 Gemfile dependencies, 54 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
