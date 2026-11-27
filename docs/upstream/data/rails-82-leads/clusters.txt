@@ -1,0 +1,48 @@
+# r13m interpreter: 36 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  0.928%  reach 32/36 (4 apps)  >=1%: 14  max  2.276% casa GET dashboard  score 0.825
+IsolatedExecutionState reads           mean  1.011%  reach 33/36 (4 apps)  >=1%: 17  max  2.212% blog PATCH article.json  score 0.927
+AR connection lookup                   mean  0.751%  reach 33/36 (4 apps)  >=1%:  9  max  1.735% casa PATCH casa case.json  score 0.688
+InheritableOptions parent reads        mean  0.648%  reach 32/36 (4 apps)  >=1%:  9  max  1.662% redprints-cfp GET home  score 0.576
+filtered parameters                    mean  0.382%  reach 26/36 (4 apps)  >=1%:  5  max  1.300% redprints-cfp PATCH proposal (Inertia redirect)  score 0.276
+notifications fan-out                  mean  1.420%  reach 35/36 (4 apps)  >=1%: 29  max  2.877% blog PATCH article (redirect)  score 1.381
+CSRF token masking                     mean  0.888%  reach 25/36 (4 apps)  >=1%: 15  max  3.385% blog GET article  score 0.617
+tag attribute building                 mean  2.570%  reach 22/36 (4 apps)  >=1%: 21  max 10.752% blog GET article  score 1.570
+env_config merge (build_request)       mean  0.453%  reach 24/36 (4 apps)  >=1%:  3  max  3.694% blog GET article.json  score 0.302
+inertia_rails config (Hash#extract!)   mean  1.140%  reach 14/36 (3 apps)  >=1%: 10  max  8.798% react-starter-kit GET dashboard (Inertia JSON)  score 0.443
+cache_quoted_name (since census 11)    mean  0.033%  reach  2/36 (1 apps)  >=1%:  0  max  0.130% casa GET supervisors  score 0.002
+# r13m2 interpreter: 36 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  0.928%  reach 32/36 (4 apps)  >=1%: 15  max  2.323% casa GET dashboard  score 0.825
+IsolatedExecutionState reads           mean  0.975%  reach 33/36 (4 apps)  >=1%: 17  max  2.021% blog PATCH article.json  score 0.894
+AR connection lookup                   mean  0.749%  reach 33/36 (4 apps)  >=1%:  9  max  1.771% casa PATCH casa case.json  score 0.687
+InheritableOptions parent reads        mean  0.650%  reach 30/36 (4 apps)  >=1%:  9  max  1.818% redprints-cfp GET home  score 0.542
+filtered parameters                    mean  0.391%  reach 26/36 (4 apps)  >=1%:  5  max  1.369% blog GET article.json  score 0.282
+notifications fan-out                  mean  1.419%  reach 35/36 (4 apps)  >=1%: 30  max  2.745% blog PATCH article (redirect)  score 1.380
+CSRF token masking                     mean  0.888%  reach 25/36 (4 apps)  >=1%: 15  max  3.425% blog GET article  score 0.617
+tag attribute building                 mean  2.557%  reach 22/36 (4 apps)  >=1%: 21  max 11.009% blog GET article  score 1.563
+env_config merge (build_request)       mean  0.478%  reach 24/36 (4 apps)  >=1%:  4  max  2.858% blog GET article.json  score 0.319
+inertia_rails config (Hash#extract!)   mean  1.142%  reach 13/36 (3 apps)  >=1%: 10  max  8.732% react-starter-kit GET dashboard (Inertia JSON)  score 0.412
+cache_quoted_name (since census 11)    mean  0.033%  reach  4/36 (2 apps)  >=1%:  0  max  0.139% casa GET casa case edit  score 0.004
+# r13asc interpreter: 36 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  0.939%  reach 32/36 (4 apps)  >=1%: 15  max  2.225% casa GET dashboard  score 0.834
+IsolatedExecutionState reads           mean  0.953%  reach 33/36 (4 apps)  >=1%: 17  max  1.758% blog PATCH article.json  score 0.874
+AR connection lookup                   mean  0.711%  reach 33/36 (4 apps)  >=1%:  9  max  1.741% blog PATCH article.json  score 0.652
+InheritableOptions parent reads        mean  0.657%  reach 31/36 (4 apps)  >=1%:  9  max  1.964% redprints-cfp GET home  score 0.566
+filtered parameters                    mean  0.396%  reach 26/36 (4 apps)  >=1%:  5  max  1.379% blog PATCH article.json  score 0.286
+notifications fan-out                  mean  1.397%  reach 35/36 (4 apps)  >=1%: 29  max  2.625% casa GET dashboard  score 1.358
+CSRF token masking                     mean  0.891%  reach 25/36 (4 apps)  >=1%: 15  max  3.565% blog GET article  score 0.619
+tag attribute building                 mean  2.575%  reach 22/36 (4 apps)  >=1%: 21  max 11.211% blog GET article  score 1.574
+env_config merge (build_request)       mean  0.459%  reach 25/36 (4 apps)  >=1%:  5  max  2.706% blog GET article.json  score 0.319
+inertia_rails config (Hash#extract!)   mean  1.155%  reach 13/36 (3 apps)  >=1%: 10  max  9.019% react-starter-kit GET dashboard (Inertia JSON)  score 0.417
+cache_quoted_name (since census 11)    mean  0.033%  reach  3/36 (1 apps)  >=1%:  0  max  0.133% casa GET casa case edit  score 0.003
+# r13qck interpreter: 36 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  0.455%  reach 32/36 (4 apps)  >=1%:  1  max  1.039% casa GET dashboard  score 0.404
+IsolatedExecutionState reads           mean  1.011%  reach 33/36 (4 apps)  >=1%: 20  max  2.022% blog PATCH article.json  score 0.927
+AR connection lookup                   mean  0.742%  reach 32/36 (4 apps)  >=1%:  9  max  1.711% casa PATCH casa case.json  score 0.659
+InheritableOptions parent reads        mean  0.675%  reach 31/36 (4 apps)  >=1%: 11  max  1.772% blog GET article  score 0.581
+filtered parameters                    mean  0.402%  reach 25/36 (4 apps)  >=1%:  5  max  1.400% blog PATCH article.json  score 0.279
+notifications fan-out                  mean  1.424%  reach 35/36 (4 apps)  >=1%: 31  max  2.799% blog PATCH article.json  score 1.385
+CSRF token masking                     mean  0.889%  reach 25/36 (4 apps)  >=1%: 15  max  3.406% blog GET article  score 0.617
+tag attribute building                 mean  2.591%  reach 22/36 (4 apps)  >=1%: 21  max 11.117% blog GET article  score 1.584
+env_config merge (build_request)       mean  0.418%  reach 25/36 (4 apps)  >=1%:  3  max  2.537% blog GET article.json  score 0.290
+inertia_rails config (Hash#extract!)   mean  1.150%  reach 14/36 (3 apps)  >=1%: 10  max  8.947% react-starter-kit GET dashboard (Inertia JSON)  score 0.447
+cache_quoted_name (since census 11)    mean  0.037%  reach  5/36 (2 apps)  >=1%:  0  max  0.140% casa GET casa case edit  score 0.005

@@ -1,0 +1,30 @@
+{
+  "label": "r13qck",
+  "rails": {
+    "spec": "/home/user/w/rails-main@b41aaa307b",
+    "source": "git: \"/home/user/w/rails-main\"",
+    "ref": "b41aaa307b",
+    "sha": "b41aaa307b912180881a677f4256886722b184c3"
+  },
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+  "valgrind": "valgrind-3.19.0",
+  "patch_sha256": "4503cd6b52f17862ca4c913647efd10158d43f914f065bb29886227867bc531b",
+  "runs": [
+    {
+      "apps": [
+        "blog",
+        "redprints-cfp",
+        "react-starter-kit",
+        "casa"
+      ],
+      "modes": [
+        "interpreter"
+      ],
+      "only": null,
+      "failed": [],
+      "sampler": "sampler-b2013a25bb5a",
+      "harness_sha256": "7f65d529d980d6902035a9f83703d722930a954e4874af920cba164f41e36e0f",
+      "finished": "2026-11-27T20:20:03Z"
+    }
+  ]
+}

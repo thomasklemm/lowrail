@@ -1,0 +1,18 @@
+== r13m2 vs r13m
+blog-interpreter               workloads 10 median  +0.01% min  -0.23% max  +0.41%
+casa-interpreter               workloads 10 median  -0.04% min  -0.15% max  +0.10%
+react-starter-kit-interpreter  workloads  8 median  +0.06% min  -0.29% max  +0.51%
+redprints-cfp-interpreter      workloads  8 median  -0.04% min  -0.32% max  +0.11%
+ALL interpreter workloads  36 median  -0.03% |d| p90  0.32% lower by >= 1%:   0 higher by >= 1%:   0
+== r13asc vs r13m
+blog-interpreter               workloads 10 median  +0.16% min  -0.67% max  +0.30%
+casa-interpreter               workloads 10 median  -0.26% min  -0.85% max  -0.01%
+react-starter-kit-interpreter  workloads  8 median  -0.40% min  -0.91% max  +0.06%
+redprints-cfp-interpreter      workloads  8 median  -0.39% min  -0.60% max  -0.02%
+ALL interpreter workloads  36 median  -0.26% |d| p90  0.67% lower by >= 1%:   0 higher by >= 1%:   0
+== r13qck vs r13m
+blog-interpreter               workloads 10 median  -0.08% min  -0.35% max  +0.36%
+casa-interpreter               workloads 10 median  -0.48% min  -0.71% max  -0.01%
+react-starter-kit-interpreter  workloads  8 median  -0.09% min  -0.41% max  +0.07%
+redprints-cfp-interpreter      workloads  8 median  -0.15% min  -0.56% max  +0.04%
+ALL interpreter workloads  36 median  -0.27% |d| p90  0.58% lower by >= 1%:   0 higher by >= 1%:   0

@@ -13,7 +13,7 @@ depends_on: []
 tracker: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/census13r/body/QCK1, bench/upstream/census13r/body/QCK1-master, bench/upstream/census13r/data/probe]
+evidence: [docs/upstream/data/rails-82-leads, bench/upstream/census13r/body/QCK1, bench/upstream/census13r/body/QCK1-master, bench/upstream/census13r/data/probe]
 impact: "Every query with binds under the query cache (on by default in requests and jobs; every Rails app). QueryCache::Store's LRU deletes and reinserts the key on a hit and deletes before inserting on a miss (85742ce529, 2024-01), so each lookup hashed [sql, binds] twice: the SQL string and every bind. #59518 (merged 2026-11-27) memoized QueryAttribute#hash, and #59505 removed a third hash on a miss; what is left is the second full key hash (about 7.2k Ir for a 2-bind key on 4.0.10). Census, Rails main 2e299253f9 (#59518 included), Ruby 4.0.10, 4 apps / 36 workloads, interpreted Ir per request: median -0.27%, casa median -0.48%, max -0.71%, A/A median -0.03%, p90 |d| 0.32%. Exact head, script/upstream-bench, Ruby 4.0.10, interpreter: find hit -3.7%, find miss -2.7%, where with 3 binds hit -2.0%, miss -1.8% (A/A <= 0.05%), objects unchanged; YJIT find hit -7.3% JIT-flat (A/A 0.15%), other YJIT cells not JIT-flat. Lifetime: runs on Ruby master and Rails main."
 rank: 2
 risky: true
