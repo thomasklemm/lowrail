@@ -136,15 +136,19 @@ call. ZJIT needs no change.
 **Cause, verified:** in `resolve_refined_method` (vm_method.c), a refined entry without `orig_me` (the module defines
 no `==` itself) continues at `RCLASS_SUPER(me->owner)`. For a module, `me->owner` is the module, whose superclass is 0,
 so the function returns NULL. `search_refined_method` (vm_insnhelper.c) uses `RCLASS_SUPER(refined_cme->defined_class)`,
-the iclass, which is the Bug #14068 fix (r60931). Patching only this line makes all lookups in the probe agree with
-direct calls.
+the iclass, which is the Bug #14068 fix (r60931). The fix makes send, public_send, method and respond_to? find the
+inherited method; `method_defined?` still returns false for these shapes on base and head, since it takes a lookup path
+that passes no class pointer and is unchanged.
 
 **Fix probe** ([refine_probe.rb](../../bench/upstream/ruby-bugs-2026-11-27/refine_probe.rb), base and head outputs in
 the same directory): 30 shapes (method in superclass, in a later module, in the class itself, behind a prepend, or
 absent; refinement of an included module, of the class, of a prepended module; used in an eval scope or unused) times
-10 lookups (call, send, public_send, method, Method#call, respond_to?, instance_method, method_defined?, `&:sym`), plus
+10 lookups (`public_send` from `instance_eval`, send, public_send, method, Method#call, respond_to? with and without
+private methods, instance_method, method_defined?, `&:sym`; real direct calls are covered by the repros and the
+reviewers' probes), plus
 refinements of Kernel and Comparable and alias/undef. All 349 lines are identical between base and head except the
-unused-module-refinement rows that raised or returned false on base and now find the method; active refinements and
+unused-module-refinement rows that raised or returned false on base and now find the method (`method_defined?` rows
+stay false); active refinements and
 refinements of classes are unchanged. `rb_resolve_refined_method` passes no class pointer, so `undef_method`,
 `alias_method` and `instance_methods` keep the old code path.
 
