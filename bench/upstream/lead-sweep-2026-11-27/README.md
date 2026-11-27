@@ -3,6 +3,8 @@
 Record: [docs/upstream/lead-sweep-2026-11-27.md](../../../docs/upstream/lead-sweep-2026-11-27.md). Rails main
 `2e299253f9`, Ruby 4.0.10 and Ruby master `0d399335b7` (ZJIT), on an a1.large orb.
 
+* `to1-wall/`: wall-time cohorts (ZJIT master 30 and 60 rounds, YJIT 4.0.10) and benchmark-ips from an a1.xxlarge orb;
+  `commands.sh` keeps that orb's paths. Raw logs in each `raw.tar.gz`.
 * `to1-zjit/`: `script/upstream-bench` run of `to1_zjit.rb`, main against TO1 (fork commit `7f1f0dce45`
   cherry-picked onto main), interpreter and ZJIT on master; dumps in `raw/callgrind.tar.gz`.
   `results/to1_zjit_fn_diff.txt` and `results/to1_zjit_stats_diff.txt` (`to1_zjit_stats.rb`) explain the

@@ -15,15 +15,16 @@ into a body. Allocation counts are not time.
 ## Result
 
 **Nothing was built for upstream, opened, posted or pushed to a fork.** No lead whose condition is met clears the
-DECISIONS bars on current main and master; the ones closest are TO1 (explained loss, parked), the `Accept` parse
+DECISIONS bars on current main and master; the ones closest are TO1 (ZJIT loss explained and absent in wall time; relevance is the coordinator's call), the `Accept` parse
 (needs a request share first) and two Ruby correctness repros that need Thomas.
 
 **Conditions that changed and were re-measured:**
 
 * **TO1 under ZJIT** (held for an unexplained ZJIT `f.text_field` +0.64% on master `f3e180b5eb`): the loss is still
   there on master `0d399335b7` (+0.6%, and +0.2% interpreted) and is now explained: the tag String outgrows its buffer
-  on long attribute lists and reallocates (malloc/realloc +560 Ir per call). Not a JIT effect. TO1 stays held as a
-  parked idea ([TO1 below](#to1-under-zjit)).
+  on long attribute lists and reallocates (malloc/realloc +560 Ir per call). Not a JIT effect, and wall time on a1.xxlarge claims no loss in any
+  mode (wins of 1–6% on short `*_tag` calls). The ZJIT hold reason is gone; unholding on relevance is the
+  coordinator's call ([TO1 below](#to1-under-zjit)).
 * **`Mime::Type.parse` now runs on every browser request of a new app.** Rails main's 8.2 defaults set
   `action_dispatch.strict_accept_header = true` (`railties/lib/rails/application/configuration.rb:378`), so a browser's
   `Accept` header is parsed instead of skipped. Per parse ([`accept_probe.txt`](../../bench/upstream/lead-sweep-2026-11-27/results/accept_probe.txt)):
@@ -105,15 +106,27 @@ malloc growth. The A/A spread is all `st.c:find_table_entry_ind` (hash-seed coll
 agree: TO1 runs 0.6% fewer ZJIT instructions with the same ISEQ calls and side exits, plus one `rb_str_buf_append`
 per call ([`to1_zjit_stats_diff.txt`](../../bench/upstream/lead-sweep-2026-11-27/results/to1_zjit_stats_diff.txt)).
 
-Wall time (`script/upstream-bench --wall 30`, ZJIT on master and YJIT on 4.0.10) runs on an a1.xxlarge orb (thread
-T-01a21e91-d4ee-77d5-8919-a607d3c925fd); its result is added below when it reports. It doesn't change the decision: the
-mechanism above costs on every form-builder field whatever the wall cohort claims.
+**Wall time shows no loss** (a1.xxlarge, 16 cores, CPU 6–8% busy throughout; thread T-01a21e91-d4ee-77d5-8919-a607d3c925fd;
+[`to1-wall`](../../bench/upstream/lead-sweep-2026-11-27/to1-wall/), every process JIT-flat). Change [95% interval], A/A [95% interval]:
 
-**Decision: TO1 stays held, as a parked idea.** Its win is 1 object and about 1–3% per short `*_tag` call. Form-builder
-fields, where most attribute building happens (census 12: tag attribute building 2.43% mean, up to 11.4%), get the
-object back but pay it in reallocation, and the 5-field form moved within noise in the revive run. Sizing the buffer up
-front would make the change L2 for a sub-1% per-field effect. Nothing was pushed: the rebased tree is local only, and
-the fork branch stays at `7f1f0dce45`.
+| Per call, TO1 against main | ZJIT master, 60 rounds | ZJIT master, 30 rounds | YJIT 4.0.10, 30 rounds |
+| --- | --- | --- | --- |
+| `text_field_tag` | −2.3% [−2.8, −2.0]; A/A −0.3% | −0.9% [−1.6, −0.5]; A/A −0.1% | −3.1% [−4.3, −1.4]; A/A −0.0% |
+| `submit_tag` | −1.2% [−1.7, −0.2]; A/A −0.4% | no claim | −2.1% [−3.9, −0.7]; A/A +0.5% |
+| `tag.input` | no claim (A/A [−0.9, −0.2] excludes 0; −5.3%) | −5.4% [−6.5, −4.4]; A/A +0.4% | −6.0% [−7.7, −4.5]; A/A −0.1% |
+| `f.text_field` | no claim: −0.2% [−0.7, +0.6] | no claim: +1.5% [−0.2, +2.4] | no claim: −0.2% [−1.6, +1.9] |
+| `f.check_box` | −2.2% [−2.6, −1.7]; A/A −0.4% | no claim | no claim |
+
+benchmark-ips on 4.0.10 YJIT (3 rounds): `tag.input` +6.7% (A/A 1.47%), `text_field_tag` +5.3% (A/A 1.09%),
+`f.check_box` +2.9% (A/A 2.13%), `f.text_field` within noise, `submit_tag` not JIT-flat. The reallocation shows in
+instruction counts but stays below wall-time noise, so under DECISIONS (2026-11-27) no ZJIT or YJIT loss is claimed.
+
+**Decision: the ZJIT hold reason is gone; TO1 stays held only on relevance, which is the coordinator's call.** Wall time
+gains 1–6% per short `*_tag` call and 2% per `f.check_box` under ZJIT, and `f.text_field` is neutral, where the
+reallocation eats the saved object. Census 12 ranks tag attribute building at 2.43% mean (up to 11.4%), but the 5-field
+form moved within noise in the revive run. If it is unheld: rebase onto current main (it applies cleanly onto
+`2e299253f9`), use `tag.input` and `text_field_tag` as body numbers (the clearest ips results), then run thermos-sol and Astra on
+the exact head. Nothing was pushed: the rebased tree is local only, and the fork branch stays at `7f1f0dce45`.
 
 
 ## STATUS.md: stale sections (proposals; not edited, the inventory thread owns it)
@@ -487,7 +500,7 @@ means its upstream references (Check column) haven't moved and it was not re-mea
 | 341 | Form-helper PR 5 (DA `data-`/`aria-` names) | bench/upstream/form_helper_stack/README.md:202, :206 | "PR 3 and PR 5 are parked" | No upstream reference; not re-read today. | Parked: condition unchanged or no trigger; not re-measured today. |
 | 342 | TB (`Tags::Base#tag_builder`) | bench/upstream/form_helper_stack/README.md:178, :254, :270 | "TB and T2: parked; they are the weakest candidates" | No upstream reference; not re-read today. | Parked: condition unchanged or no trigger; not re-measured today. |
 | 343 | T2 (`append_tag_option` Array join) | bench/upstream/form_helper_stack/README.md:179, :244-245, :270 | "parked lead, contributions.md"; "Build them, or keep them parked?" | No upstream reference; not re-read today. | Parked: condition unchanged or no trigger; not re-measured today. |
-| 344 | TO1 — **revived today** | bench/upstream/revive-2026-11-27/README.md:10, :87; … | "held: ZJIT `f.text_field` +0.64% unexplained, and no form-level effect" | Re-measured on main 2e299253f9 and master 0d399335b7 (ZJIT): f.text_field +0.6% (A/A 0.48%), explained by malloc/realloc growth of the tag String; other helpers -0.8% to -2.7%. | Held as a parked idea (see TO1 section). |
+| 344 | TO1 — **revived today** | bench/upstream/revive-2026-11-27/README.md:10, :87; … | "held: ZJIT `f.text_field` +0.64% unexplained, and no form-level effect" | Re-measured on main 2e299253f9 and master 0d399335b7 (ZJIT): f.text_field +0.6% (A/A 0.48%), explained by malloc/realloc growth of the tag String; other helpers -0.8% to -2.7%. | ZJIT hold reason gone (wall: no loss claimed, 1–6% wins on short tags); held only on relevance, coordinator's call (see TO1 section). |
 | 345 | FH2 — **revived today** | bench/upstream/revive-2026-11-27/README.md:11, :106 | "parked: Astra broke V and TR; the exact remainder (PH + SV) is within noise" | Parked today by the revive thread. | Parked. |
 | 346 | LBL1 — **revived today** | bench/upstream/revive-2026-11-27/README.md:12, :118, :138 | "parked: boundaries rejected; the exact variant gains nothing under production Fallbacks" | Parked today by the revive thread. | Parked. |
 | 347 | SP1 — **revived today** | bench/upstream/revive-2026-11-27/README.md:13, :90 | "approved" (queue item SP1 now `state: merged`) | Merged. | Done. |
