@@ -209,8 +209,10 @@ column, row, link and sentence: would the reader miss it? If not, drop it. Bodie
 * **Few, clean commits; the reasoning goes in their messages** (2026-11-06).
 * **Do less work, don't inline helpers** (Thomas, 2026-11-27, after rails#60016): no performance PR that only
   inlines small helper methods at their call sites to save method calls; that moves logic into the wrong layer and
-  makes the code worse for a gain JITs mostly remove. Reduce the work itself (fewer walks, fewer allocations) and
-  judge the effect on ZJIT first, then YJIT, not only on interpreter instruction counts.
+  makes the code worse for a gain JITs mostly remove. Doing it in one place makes no sense, and doing it everywhere
+  is worse: method-call overhead is the JIT compilers' job, so such a finding goes to ZJIT. Rails PRs reduce the
+  work itself (fewer walks, fewer allocations), judged on ZJIT first, then YJIT, not only on interpreter
+  instruction counts.
 * **Tests check behaviour, never implementation** (2026-11-06): no allocation, instruction or call counts or other
   internal-state asserts in upstream suites. Perf is shown by a benchmark beside the suite, numbers in the body or a
   linked record, the why in the commit message. Add a test only where a plausible regression would break behaviour.
