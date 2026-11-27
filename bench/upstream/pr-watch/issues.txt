@@ -1,0 +1,13 @@
+ruby/net-http/issues/362
+ruby/strscan/issues/223
+scenic-views/scenic/issues/466
+roidrage/lograge/issues/407
+shioyama/mobility/issues/692
+chaadow/active_record-acts_as/issues/61
+ruby/ruby-bench/issues/527
+ClosureTree/with_advisory_lock/issues/149
+marcoroth/herb/issues/2892
+Shopify/ruby/issues/776
+Shopify/ruby/issues/1014
+Shopify/ruby/issues/1131
+activerecord-hackery/ransack/issues/1799

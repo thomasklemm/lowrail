@@ -1,0 +1,2421 @@
+{
+  "https://github.com/ruby/ruby-bench/pull/571": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "8b09ee5143771e078e44ca3c7a5a3015ac06bbc6",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "30fbcd9df6d790be3d02056f2c394dae83e74bd3",
+    "branch": "thomasklemm/lobsters-fixed-clock",
+    "title": "Run lobsters with a fixed clock",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/hashie/hashie/pull/659": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "7cf23a7414882985ff5ba0d976945f11e579b1aa",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "be311bbf4b0571d71481579f5c4e7aa27e704a01",
+    "branch": "thomasklemm/duel",
+    "title": "Add Duel performance regression guards",
+    "com": [
+      {
+        "b": "Let's figure out a way to combine duel and existing benchmarks?",
+        "id": 7192448526,
+        "t": "2026-11-26T12:46:46Z",
+        "u": "dblock"
+      },
+      {
+        "b": "<!-- danger-report -->\n## Danger Report\nNo issues found.\n\n[View run](https://github.com/hashie/hashie/actions/runs/46007809087)",
+        "id": 7216144065,
+        "t": "2026-11-27T10:39:15Z",
+        "u": "github-actions[bot]"
+      },
+      {
+        "b": "Tagging @sferik for any words of advice for us here.",
+        "id": 7219228017,
+        "t": "2026-11-27T13:14:19Z",
+        "u": "dblock"
+      },
+      {
+        "b": "@thomasklemm If you're happy with this I'm happy with this! Mark it ready when you're ready to merge.",
+        "id": 7219255600,
+        "t": "2026-11-27T13:15:38Z",
+        "u": "dblock"
+      },
+      {
+        "b": "I have some nits, if you feel strongly about not doing any of them I'm A-OK with it, just lmk. And thanks!\r\n\r\n1. **Trigger on the root `Gemfile`.** `gemfiles/duel.gemfile` uses `eval_gemfile '../Gemfi",
+        "id": 7220259771,
+        "t": "2026-11-27T14:02:35Z",
+        "u": "dblock"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 16
+    }
+  },
+  "https://github.com/trailblazer/cells-rails/pull/75": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "b191f18a5765766ec92c1fb1c34f3d9589582b37",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "6ba587cce668bb823022cd1416ee9a9c48152e68",
+    "branch": "thomasklemm/navigation-helper",
+    "title": "Include NavigationHelper in cells on Rails 8.2",
+    "com": [
+      {
+        "b": "Hi @thomasklemm thanks :green_heart: what is Lowrail?",
+        "id": 6659862170,
+        "t": "2026-11-05T13:59:18Z",
+        "u": "apotonick"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [
+        {
+          "c": "failure",
+          "n": "test (3.0, gemfiles/6.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (head, gemfiles/8.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.3, gemfiles/8.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (head, gemfiles/7.1.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.1, gemfiles/7.1.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.2, gemfiles/7.1.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (2.6, gemfiles/6.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (2.5, gemfiles/6.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.2, gemfiles/7.2.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (head, gemfiles/7.2.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.3, gemfiles/7.2.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.0, gemfiles/7.1.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.3, gemfiles/7.1.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.1, gemfiles/7.2.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (3.2, gemfiles/8.0.gemfile)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "test (2.7, gemfiles/6.0.gemfile)",
+          "s": "completed"
+        }
+      ],
+      "total": 19
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/345": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "8bc40f32258fa6e3fd43d7784633387da9ad805b",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "0605b38aad4b3cbbe51e3a0e5486d13820ad51aa",
+    "branch": "deps/solid-cache",
+    "title": "Use Solid Cache for the production Rails cache",
+    "com": [
+      {
+        "b": "Reviewed the updated `47682c227697`: the explicit cache `wal_autocheckpoint: 1000` resolves the prior current-main integration issue, and the branch includes the latest Ruby4/Puma8 changes. The dedica",
+        "id": 6059970433,
+        "t": "2026-10-08T12:34:21Z",
+        "u": "dhh"
+      }
+    ],
+    "rev": [
+      {
+        "b": "Copilot was unable to review this pull request because the user who requested the review has reached their quota limit.",
+        "id": 5457893390,
+        "s": "COMMENTED",
+        "t": "2026-10-08T14:09:33Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/MiniProfiler/rack-mini-profiler/pull/670": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "a50467e96c94a8283b748b40d8fc22577c89c94c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "03a1eaae2c52a073713e6cd6ea800068dd68e76e",
+    "branch": "thomasklemm/render-subscribers-check-measure",
+    "title": "Skip render subscribers when the request is not being measured",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/346": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "c499a7a101a22e889580dea2bebbafb798c78fa2",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "272d7a52ed139aa6ffb4921ec9997d852195b49c",
+    "branch": "feat/solid-queue-cutover",
+    "title": "Replace Resque with Solid Queue",
+    "com": [
+      {
+        "b": "Reviewed the updated `0b39bc85b8d6`: auxiliary WAL auto-checkpointing and the Solid Queue checkpoint lifecycle hooks resolve the earlier integration findings; the native supervisor runs its start hook",
+        "id": 6059970956,
+        "t": "2026-10-08T12:34:23Z",
+        "u": "dhh"
+      },
+      {
+        "b": "Reviewed the follow-up at `3914ce5`. The dedicated queue pool of three resolves the worker/poller/heartbeat sizing issue. The quiesced backup procedure and paused-volume restore handling also address ",
+        "id": 6060731980,
+        "t": "2026-10-08T13:17:21Z",
+        "u": "dhh"
+      },
+      {
+        "b": "The thread notes twice that this change has no throughput measurement yet. Here is one for the README's \"Post a message\" row: head `df9ed80` against its merge base `05c5a2c`.\n\n**Setup.** From our mach",
+        "id": 6114638577,
+        "t": "2026-10-11T22:33:05Z",
+        "u": "namespaceMarcello"
+      },
+      {
+        "b": "The review above asks for independent checks of queued-job execution and shutdown before merging. Here is one: a room deletion cut off by the container going away, on this head (`df9ed80`) and on its ",
+        "id": 6387970909,
+        "t": "2026-10-24T18:32:09Z",
+        "u": "namespaceMarcello"
+      }
+    ],
+    "rev": [
+      {
+        "b": "Copilot was unable to review this pull request because the user who requested the review has reached their quota limit.",
+        "id": 5457893478,
+        "s": "COMMENTED",
+        "t": "2026-10-08T14:09:33Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/417": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "8a378f55af5e5accdd1f9048480a6131f364c439",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "c2a5062dd224fdf1ad6901acce09ec60d9d3e4a6",
+    "branch": "feat/retry-interrupted-jobs",
+    "title": "Retry interrupted jobs that are safe to run again",
+    "com": [
+      {
+        "b": "<!-- codex-pull-request-review-summary -->\n<!-- codex-review-state:v1 {\"code_review\":{\"commit_sha\":\"0678eebe56895658fcae270758662c82899214e7\",\"has_any_findings\":null,\"has_unresolved_findings\":null,\"st",
+        "id": 6420518782,
+        "t": "2026-10-26T15:52:49Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rev": [
+      {
+        "b": "<!-- ccr-overview-v2 -->\n\n### 🔵 Needs a closer look\n\nDirect mutation of queue execution state warrants human validation of crash consistency and concurrent manual retries.\n\n**No open issues** 🎉\n\n<deta",
+        "id": 5654981541,
+        "s": "COMMENTED",
+        "t": "2026-10-26T15:56:36Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/coorasse/cancancan/pull/941": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "b9233c21e9a11a446c4ef346825c392ed6202f24",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "cd1f37066ba0ce0515a09346264eb33ea1bf38d9",
+    "branch": "thomasklemm/rule-construction-allocations",
+    "title": "Allocate less when a rule is defined",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/ruby/ruby/pull/19492": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "111fb6b845a069e1c1e8d92a514eef4628791b05",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "e8629f928aa61574fe05ad36f6a1e5c73854ac89",
+    "branch": "thomasklemm/yjit-send-counter",
+    "title": "YJIT: Count dynamic sends before dispatch",
+    "com": [],
+    "rev": [
+      {
+        "b": "sure.",
+        "id": 5622005346,
+        "s": "APPROVED",
+        "t": "2026-10-22T23:06:56Z",
+        "u": "k0kubun"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [
+        {
+          "c": "failure",
+          "n": "Windows 11-arm (check)",
+          "s": "completed"
+        },
+        {
+          "c": "failure",
+          "n": "Windows 11-arm YJIT (check)",
+          "s": "completed"
+        }
+      ],
+      "total": 137
+    }
+  },
+  "https://github.com/rails/rails/pull/59976": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T22:50:35Z",
+    "merge_sha": "e1e3937797810168217e0aa07f00cca2846b1c39",
+    "closed_at": "2026-11-26T22:50:35Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "30368145ecb76500e10ae487c4ffff219b1403d7",
+    "branch": "thomasklemm/index-definition-adapter-readers-2",
+    "title": "Keep adapter-specific index readers on every `IndexDefinition`",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/ruby/ruby/pull/19487": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "625e5ba3129f68af2a61d3baed9705a07be93d69",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "4df57bd3332dc74797707b800eec90c0393aff33",
+    "branch": "thomasklemm/yjit-super-class-module",
+    "title": "YJIT: Compile super calls on Class and Module receivers",
+    "com": [],
+    "rev": [
+      {
+        "b": "> // Class and Module receivers since they tend to be retained anyways.\n\nI think it makes sense. As a maintainer of `ERB::Util.html_escape`, I care about its performance too.",
+        "id": 5622260736,
+        "s": "APPROVED",
+        "t": "2026-10-22T23:43:54Z",
+        "u": "k0kubun"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 137
+    }
+  },
+  "https://github.com/ruby-i18n/i18n/pull/764": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "cda8a65110a03e150e1c7246e6aa815d2d82edce",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "a419bdecbd3096bbeecf475be93984b0f087ea28",
+    "branch": "thomasklemm/fallback-defaults-without-wrapper",
+    "title": "Avoid wrapping scalar defaults in an Array in Fallbacks#extract_non_symbol_default!",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/rails/rails/pull/59983": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T16:02:21Z",
+    "merge_sha": "ecbd6042af70f32638d00951768980226aeb4769",
+    "closed_at": "2026-11-26T16:02:21Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "7e342de11f12e6ee056e6c7ff5df713b2518e03c",
+    "branch": "thomasklemm/lease-registry-lockless-hit",
+    "title": "Look up an existing connection lease without the registry mutex",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [
+        {
+          "c": "buildkite/docs-preview",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/docs-preview/builds/26392"
+        }
+      ],
+      "state": "failure"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/ruby-i18n/i18n/pull/765": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "8ea6aa83f6bce6b3468323b86aec94530e2aecc2",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "21801f98f128e66faa730eb78162a85fb6449e93",
+    "branch": "thomasklemm/fallback-options-without-merge-kwargs",
+    "title": "Build the fallback options without a keyword Hash",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/hashie/hashie/pull/656": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "dblock",
+    "merged_at": "2026-11-26T12:47:44Z",
+    "merge_sha": "812c48ca7b330abea6a69b92a747c49a95f9cdc0",
+    "closed_at": "2026-11-26T12:47:44Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "d874851d79db3a35b4cde8d2d6c567833ebb73f7",
+    "branch": "thomasklemm/respond-to-missing-allocations",
+    "title": "Write new Mash keys without allocating in respond_to_missing?",
+    "com": [
+      {
+        "b": "Sorry about the hassle with the spec, fixed in https://github.com/hashie/hashie/pull/657. \r\n",
+        "id": 7181596597,
+        "t": "2026-11-26T03:18:38Z",
+        "u": "dblock"
+      },
+      {
+        "b": "<!-- danger-report -->\n## Danger Report\nNo issues found.\n\n[View run](https://github.com/hashie/hashie/actions/runs/45810443805)",
+        "id": 7181601866,
+        "t": "2026-11-26T03:18:58Z",
+        "u": "github-actions[bot]"
+      },
+      {
+        "b": "Thanks for this! The `Mash` change looks good to me. A benchmark isn't required, since the numbers are in the description, but `benchmarks/` already has a few that use `benchmark-ips` and `benchmark-m",
+        "id": 7181656128,
+        "t": "2026-11-26T03:22:06Z",
+        "u": "dblock"
+      },
+      {
+        "b": "@thomasklemm, since you're digging into `Mash` performance: we'd like to bring [Duel](https://github.com/sferik/duel-ruby) into Hashie the way ruby-grape/grape#3077 did for Grape, so that pull request",
+        "id": 7181685448,
+        "t": "2026-11-26T03:24:03Z",
+        "u": "dblock"
+      },
+      {
+        "b": "Merged thanks for fixing this!",
+        "id": 7192481739,
+        "t": "2026-11-26T12:48:15Z",
+        "u": "dblock"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 13
+    }
+  },
+  "https://github.com/rubocop/rubocop-performance/pull/551": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "13f917fbf51cb24d5b32b91623ecf1e1abc529f3",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "03218f99b5d39d87dbb19b9fc8e2f6085db85ef9",
+    "branch": "thomasklemm/fix-471-string-chars",
+    "title": "[Fix #471] Preserve RedundantStringChars autocorrection boundaries",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/rmosolgo/graphql-ruby/pull/5908": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "21b641a457e5f80c155fe581905285946296ed74",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "8af96ec046d5831a3031eadd400249c168be8b87",
+    "branch": "thomasklemm/warden-name-caches-by-value",
+    "title": "Cache Warden type and field lookups by name",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 17
+    }
+  },
+  "https://github.com/inertiajs/inertia-rails/pull/449": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "e8fc1326dfd46a95e16fc3a47eba86e49329253c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "0362ffcb1fea17ce393c40b39efa940d28a1c875",
+    "branch": "thomasklemm/prop-predicates-without-try",
+    "title": "Ask prop types for their flags without `try`",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/sparklemotion/sqlite3-ruby/pull/770": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "4f0ecd82396564aef5df771c0d14248940c66d67",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "979b9f6b9914ea61c3f4f5b3b06b264c7f9e760c",
+    "branch": "thomasklemm/fill-multicolumn-rows",
+    "title": "Fill multi-column statement rows at their known size",
+    "com": [
+      {
+        "b": "Thanks, I'll review!",
+        "id": 6827366961,
+        "t": "2026-11-12T15:08:36Z",
+        "u": "flavorjones"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 135
+    }
+  },
+  "https://github.com/ruby/ruby-bench/pull/575": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "d9756a31589cb5828cfc0e54fdd442023b53726b",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "eb8364d24856782f08aa2e6a756244ba3448ef69",
+    "branch": "thomasklemm/blog-benchmark",
+    "title": "Add a blog benchmark that writes",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/rack/rack/pull/2557": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "60889028482cb4533db99043ad1e7a33820236b2",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "e3d53cfdb2f9689646dc754ea20885bf29169e6a",
+    "branch": "thomasklemm/unescape-cgi",
+    "title": "Decode and escape form components with cgi/escape",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 6079252294,
+        "s": "APPROVED",
+        "t": "2026-11-26T19:10:14Z",
+        "u": "jeremyevans"
+      }
+    ],
+    "rc": [
+      {
+        "b": "Not a bug in this PR, but it's better to avoid redundant method definitions. I think we have this issue because `utils` requires `query_parser`, otherwise we could have `query_parser` require `utils` ",
+        "id": 4712444930,
+        "path": "lib/rack/query_parser.rb",
+        "t": "2026-11-26T18:58:53Z",
+        "u": "jeremyevans"
+      }
+    ],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/rails/importmap-rails/pull/336": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "24eb7e870b97d784b1e1acbeff5019d35d05fcc0",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "71e08b02ecd6b5abfdc0a90b30d0d26d7c401675",
+    "branch": "thomasklemm/preload-tag-allocations",
+    "title": "Cache the modulepreload tags of an entry point and build them with fewer objects",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 45
+    }
+  },
+  "https://github.com/rubocop/rubocop-performance/pull/550": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "d08817b3b32d545748be8c733c2dbf1023ab02cd",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "4a8d45fd01be990ecc5bce412ae8b11f8ea1f678",
+    "branch": "thomasklemm/chain-array-ownership",
+    "title": "Mark Performance/ChainArrayAllocation as unsafe and document ownership",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/ruby/ruby-bench/pull/570": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "4fe1a72dfc8f5735d322d3d89efc43027daf8d6f",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "72d6a6d5c4aa9c4a0f43008c084518be7c9019a6",
+    "branch": "thomasklemm/gc-harness-average-precision",
+    "title": "Print GC harness averages without truncating them",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/352": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "af6324db2ff9bf93b50e38d2406a52c91c6e6941",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "dd74f7028c61a2dae2da92c9fa06c90a9728d2e0",
+    "branch": "claude/project-thread-1ks0h3",
+    "title": "Skip needless work in the text message presentation filters",
+    "com": [
+      {
+        "b": "<!-- codex-pull-request-review-summary -->\n<!-- codex-review-state:v1 {\"code_review\":{\"commit_sha\":\"25f6529caec488b50078f8d9849ab783faed182e\",\"has_any_findings\":true,\"has_unresolved_findings\":true,\"st",
+        "id": 6085733209,
+        "t": "2026-10-09T17:16:59Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rev": [
+      {
+        "b": "<!-- ccr-overview-v2 -->\n\n### 🟢 Approved\n\nThe focused optimizations preserve existing behavior and include appropriate regression coverage.\n\n**0 open findings**\n\n<details>\n<summary><strong>What change",
+        "id": 5473199474,
+        "s": "APPROVED",
+        "t": "2026-10-09T17:18:40Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/PostHog/posthog-ruby/pull/395": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "abaee34395fc7c3fb01bfd2b1c079d1ec4388e3b",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "0404d1413a91c432c1bff2649de453ca86e0e085",
+    "branch": "thomasklemm/tracing-headers-allocations",
+    "title": "perf(rails): skip env keys that can't match a tracing header",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 5
+    }
+  },
+  "https://github.com/ruby/ruby/pull/20172": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "nobu",
+    "merged_at": "2026-11-26T13:29:27Z",
+    "merge_sha": "34af03e0d41b07092f015d979310df43b5bc5f4f",
+    "closed_at": "2026-11-26T13:29:27Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "ec3f27cd36988b0b6a170a038d0537200f1bb9a3",
+    "branch": "thomasklemm/time-new-to-str-utc-4",
+    "title": "Fix Time.new with a zone object that converts to \"UTC\"",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 6069395244,
+        "s": "APPROVED",
+        "t": "2026-11-26T06:16:51Z",
+        "u": "nobu"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [
+        {
+          "c": "failure",
+          "n": "MinGW (CLANGARM64)",
+          "s": "completed"
+        }
+      ],
+      "total": 141
+    }
+  },
+  "https://github.com/ruby/ruby/pull/19659": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "73896cf494875e24c1200d8030dda8d9bf9b7ff3",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "3082a65f14dab818703866d7fdba879f102f94d2",
+    "branch": "thomasklemm/zjit-yield-surplus-args",
+    "title": "ZJIT: Drop surplus args when yielding to simple ISEQ blocks",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 5963695569,
+        "s": "COMMENTED",
+        "t": "2026-11-18T19:35:24Z",
+        "u": "tekknolagi"
+      },
+      {
+        "b": "This shouldn't be done adhoc the way it is and should be made as changes to the argument planner.",
+        "id": 6046725784,
+        "s": "CHANGES_REQUESTED",
+        "t": "2026-11-24T20:20:39Z",
+        "u": "XrXr"
+      }
+    ],
+    "rc": [
+      {
+        "b": "This seems like something we should do in HIR instead of codegen. Why do it here?",
+        "id": 4619701100,
+        "path": "zjit/src/codegen.rs",
+        "t": "2026-11-18T19:35:24Z",
+        "u": "tekknolagi"
+      }
+    ],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 138
+    }
+  },
+  "https://github.com/rack/rack/pull/2550": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "6d14d3fec0fe426f11f63b327efbd38b9f1c6b92",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "73001a9c435828bbbf46f44dfc4394338a29c941",
+    "branch": "thomasklemm/set-cookie-header-single-value",
+    "title": "Escape a single cookie value without wrapping it in an Array",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 5770893609,
+        "s": "APPROVED",
+        "t": "2026-11-04T15:24:06Z",
+        "u": "jeremyevans"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/347": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "98d494c06e0e4f9756522a36ad71216249ae6d7c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "4540f4764c3cd7794048b92d36b97c752825a54f",
+    "branch": "deps/solid-cable-removal",
+    "title": "Replace Redis with Solid Cable",
+    "com": [
+      {
+        "b": "<!-- codex-pull-request-review-summary -->\n<!-- codex-review-state:v1 {\"code_review\":{\"commit_sha\":\"775adcdfaafd721b2e569eb54d33d4ad5eaf2433\",\"has_any_findings\":true,\"has_unresolved_findings\":true,\"st",
+        "id": 6081800521,
+        "t": "2026-10-09T13:24:55Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rev": [
+      {
+        "b": "<!-- ccr-overview-v2 -->\n\n### 🟡 Changes recommended\n\nThe migration command uses an invalid Resque API, and the benchmark cannot reliably start either dependency set or prepare the new databases.\n\n<det",
+        "id": 5470696420,
+        "s": "COMMENTED",
+        "t": "2026-10-09T13:29:11Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      },
+      {
+        "b": "\n### 💡 Codex Review\n\nHere are some automated review suggestions for this pull request.\n\n**Reviewed commit:** `7ae38af30e`\n    \n\n<details> <summary>ℹ️ About Codex in GitHub</summary>\n<br/>\n\n[Your team ",
+        "id": 5470805530,
+        "s": "COMMENTED",
+        "t": "2026-10-09T13:37:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      },
+      {
+        "b": "\n### 💡 Codex Review\n\nHere are some automated review suggestions for this pull request.\n\n**Reviewed commit:** `f5f8a87c57`\n    \n\n<details> <summary>ℹ️ About Codex in GitHub</summary>\n<br/>\n\n[Your team ",
+        "id": 5473028021,
+        "s": "COMMENTED",
+        "t": "2026-10-09T17:00:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rc": [
+      {
+        "b": "The frozen `before` source is still launched from the same `options[:image]` as the current source. A clean image built by this PR no longer contains the Redis/Kredis/Resque gems required by the basel",
+        "id": 4230620284,
+        "path": "bench/compare_http.rb",
+        "t": "2026-10-09T13:29:10Z",
+        "u": "Copilot"
+      },
+      {
+        "b": "The `after` container launches Puma directly and never runs `db:prepare`. The frozen seed contract only supplies a `db/` directory and does not guarantee the new cache/cable/queue schemas; the login r",
+        "id": 4230620352,
+        "path": "bench/compare_http.rb",
+        "t": "2026-10-09T13:29:10Z",
+        "u": "Copilot"
+      },
+      {
+        "b": "`Resque.queue_sizes` is not a Resque 2.7 API, so this required pre-upgrade check raises `NoMethodError` instead of listing queues. Iterate over `Resque.queues` and query each queue with `Resque.size` ",
+        "id": 4230620391,
+        "path": "docs/upgrades/solid-queue.md",
+        "t": "2026-10-09T13:29:10Z",
+        "u": "Copilot"
+      },
+      {
+        "b": "**<sub><sub>![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)</sub></sub>  Preserve deferred deletions across database restores**\n\nWhen a backup catches the primary DB after `User::Bannab",
+        "id": 4230707435,
+        "path": "hooks/post-restore",
+        "t": "2026-10-09T13:37:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      },
+      {
+        "b": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Keep development Cable shared across Puma workers**\n\nWith the documented `bin/dev` flow on a multi-core machine,",
+        "id": 4230707440,
+        "path": "config/cable.yml",
+        "t": "2026-10-09T13:37:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      },
+      {
+        "b": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Give each benchmark side a compatible bundle**\n\nThe benchmark still mounts either source tree into the same `opt",
+        "id": 4230707446,
+        "path": "bench/compare_http.rb",
+        "t": "2026-10-09T13:37:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      },
+      {
+        "b": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Add the performance environment to the queue config**\n\nWhen `bin/load` launches the image with `RAILS_ENV=perfor",
+        "id": 4232566632,
+        "path": "config/queue.yml",
+        "t": "2026-10-09T17:00:22Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/rails/rails/pull/59565": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "aaac5ef9674041acdd41c9637a1b0ee679cc1f09",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "ab69e1b5e7ec7fbcb60592cc5b400143cce18a49",
+    "branch": "thomasklemm/pg-placeholder-type-hint",
+    "title": "Hint at casts when PostgreSQL rejects a bind parameter after a type name or IS",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/rails/rails/pull/59987": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T22:28:18Z",
+    "merge_sha": "28a86e1d2e21a1475f3c44ea7285f1c3dd1c136b",
+    "closed_at": "2026-11-26T22:28:18Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "1862f0ba893f45791f034cb500f4ccab1f52765f",
+    "branch": "thomasklemm/mailer-delivery-job-without-active-job",
+    "title": "Stop setting the Action Mailer delivery job in `load_defaults`",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [
+        {
+          "c": "buildkite/docs-preview",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/docs-preview/builds/26414"
+        }
+      ],
+      "state": "failure"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/ruby-i18n/i18n/pull/763": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "8ffa6cc1596aac937e8d3cb22581dead42bd1054",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "54bd38deb64be0282e693128c19ab6fb39f46a44",
+    "branch": "thomasklemm/fallback-locale-identity",
+    "title": "Skip the String comparison when a fallback hits the requested locale",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/freerange/mocha/pull/809": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "d81d882f8f482c4bf1fd60b5fc4cb0d95740d3bd",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "a3134958dc38c52d9c498a09d9bcd269184ee1dd",
+    "branch": "thomasklemm/stub-shareable-env",
+    "title": "Keep mocks of shareable objects such as ENV out of instance variables",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [
+        {
+          "c": "ci/circleci: build-jruby:latest-Gemfile",
+          "s": "failure",
+          "u": "https://app.circleci.com/workflow/798739c1-5071-4dfa-9935-a421b8fe94ec/job/f368d969-65db-4811-9240-62afa0e9e70e"
+        }
+      ],
+      "state": "failure"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/basecamp/once-campfire/pull/320": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "cbcf1fee54a4d6331e119f96c73ac84f2138543c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "2b433b61d6f39808717c8ecc5346415fe00e7e45",
+    "branch": "cursor/bot-key-header-not-path-8545",
+    "title": "Let bots send their key in an Authorization header",
+    "com": [],
+    "rev": [
+      {
+        "b": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### 🟡 Changes recommended\n\nWebhook payloads still distribute credential-bearing paths, and Bearer scheme parsing is incorrectly case-sensitive.\n\n*",
+        "id": 5416337303,
+        "s": "COMMENTED",
+        "t": "2026-10-05T14:45:25Z",
+        "u": "copilot-pull-request-reviewer[bot]"
+      }
+    ],
+    "rc": [
+      {
+        "b": "The new credential-free route is not used by the webhook API payload: `app/models/webhook.rb:53-55` still sends `room_bot_messages_path(..., user.bot_key)` to every webhook. Consumers that use the sup",
+        "id": 4185297300,
+        "path": "config/routes.rb",
+        "t": "2026-10-05T14:45:25Z",
+        "u": "Copilot"
+      },
+      {
+        "b": "HTTP authentication schemes are case-insensitive, but this only accepts the exact capitalization `Bearer`. A conforming client that sends `authorization: bearer <key>` is redirected instead of authent",
+        "id": 4185297387,
+        "path": "app/controllers/concerns/authentication.rb",
+        "t": "2026-10-05T14:45:25Z",
+        "u": "Copilot"
+      }
+    ],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 9
+    }
+  },
+  "https://github.com/ruby-i18n/i18n/pull/766": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "3a3541b8331cb0cde77d02a07ef8eac5f63633dd",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "82a4e905d20e99c58cb1f97ce463c3ffbfe5d0bb",
+    "branch": "thomasklemm/fiber-storage-check-once",
+    "title": "Check for Fiber storage once in I18n.config",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/ruby/ruby-bench/pull/569": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "7679b6821be2c14bf8f80426f5da38c02332627e",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "bad4d5a33b4c6a930646f7a00b91d43a21905db5",
+    "branch": "thomasklemm/gc-time-by-collection-type",
+    "title": "Record the marking time of each minor and major GC in harness-gc",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/rails/rails/pull/59986": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T22:38:11Z",
+    "merge_sha": "8dc1ec6683434c9f84dd08a92afb1f38d5f7b911",
+    "closed_at": "2026-11-26T22:38:11Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "4f3c6aa98a2d3dcdc5522bfa6ac3911facb20468",
+    "branch": "thomasklemm/upgrade-guide-mailer-active-job-railtie",
+    "title": "Note in the upgrade guide that Action Mailer no longer loads Active Job",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 6081103435,
+        "s": "APPROVED",
+        "t": "2026-11-26T22:24:39Z",
+        "u": "rafaelfranca"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/rails/rails/pull/59985": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T22:07:11Z",
+    "merge_sha": "58893983f37a7a223042c6d961bc25b6a9303f86",
+    "closed_at": "2026-11-26T22:07:12Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "2422669c945eef9679da2c9e1bb33266700e24e9",
+    "branch": "thomasklemm/upgrade-guide-sendfile-unset",
+    "title": "Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [
+        {
+          "c": "buildkite/docs-preview",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/docs-preview/builds/26401"
+        },
+        {
+          "c": "buildkite/rails",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/rails/builds/137189"
+        }
+      ],
+      "state": "failure"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/ruby/ruby-bench/pull/574": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "6988569f526daf1ae5410f91756e6862c7c6cce2",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "eab160f1927c03b4463a5792fb6171793e30c811",
+    "branch": "thomasklemm/pvalue-across-processes",
+    "title": "Test significance across processes with --runs",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 15
+    }
+  },
+  "https://github.com/rails/rails/pull/60016": {
+    "state": "closed",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "a2abfb9b16a19cdbaf989a2464b8a697b7f9cf66",
+    "closed_at": "2026-11-27T13:32:36Z",
+    "draft": false,
+    "mstate": "clean",
+    "head": "8b1c6428ea056b3c5983372d85b85615ae3d3f45",
+    "branch": "thomasklemm/indexed-set-inline-lookups",
+    "title": "Look up indexes inline in LazyIndexedAttributeSet#[] and #keys",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/discourse/discourse/pull/45658": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "169b4a2528153783df1e3912ca45f0840e82bc5c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unknown",
+    "head": "75526aa95c2be3bc1f9191d3b1df32e1fe104141",
+    "branch": "thomasklemm/category-channels-association",
+    "title": "FIX: Scope Category#category_channels to the category's channels",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [
+        {
+          "c": "cancelled",
+          "n": "plugins (official) system",
+          "s": "completed"
+        }
+      ],
+      "total": 18
+    }
+  },
+  "https://github.com/sparklemotion/nokogiri/pull/3759": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "af7ea91b5136b56289df66b1d371aad5e9ebe4c6",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "4644019ca92d8a04d903264591eea8448df353c6",
+    "branch": "thomasklemm/fragment-css-children-once",
+    "title": "Call `children` once in `DocumentFragment#css`",
+    "com": [
+      {
+        "b": "Thanks for the PR, I'll review today or tomorrow. Thanks for your patience.",
+        "id": 6662138983,
+        "t": "2026-11-05T15:36:52Z",
+        "u": "flavorjones"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [
+      {
+        "a": "flavorjones",
+        "m": "doc: add CHANGELOG entry for #3759",
+        "sha": "4644019ca9"
+      }
+    ],
+    "status": {
+      "s": [],
+      "state": "success"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/rails/rails/pull/59984": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "rafaelfranca",
+    "merged_at": "2026-11-26T22:06:25Z",
+    "merge_sha": "a946944748005cfd69e818485cf4aae6dd2643cb",
+    "closed_at": "2026-11-26T22:06:25Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "f526d29c5025178a57b10a2270492949406259d4",
+    "branch": "thomasklemm/upgrade-guide-sidekiq-8-0-3",
+    "title": "Note in the upgrade guide that Sidekiq 8.0.3 or later is required",
+    "com": [
+      {
+        "b": "Why are those PRs in draft? If they aren't ready, can you please avoid opening them? I don't want to get notifications about things I can't act on.",
+        "id": 7196680503,
+        "t": "2026-11-26T15:44:15Z",
+        "u": "rafaelfranca"
+      },
+      {
+        "b": "Oh. Got it. So people are using draft PRs to bypass the limit we have set? That sucks, it should not allow any PR past 15 to be open. I just enabled that.\n\nI'll just speed up the reviews so this limit",
+        "id": 7203981077,
+        "t": "2026-11-26T21:42:19Z",
+        "u": "rafaelfranca"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [
+        {
+          "c": "buildkite/docs-preview",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/docs-preview/builds/26400"
+        },
+        {
+          "c": "buildkite/rails",
+          "s": "failure",
+          "u": "https://buildkite.com/rails/rails/builds/137188"
+        }
+      ],
+      "state": "failure"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/sparklemotion/sqlite3-ruby/pull/769": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "f329c252f3759d884dd9dbedd0de6e45fa4228fc",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "64b0190a0a5df7abc35368535aa791f192bc65b4",
+    "branch": "thomasklemm/skip-utf8-bind-transcode",
+    "title": "Avoid a redundant String when binding UTF-8 text",
+    "com": [
+      {
+        "b": "<!-- agent:v1 {\"harness\":\"claude-code/2.1.323\",\"skill\":\"fetch-work\",\"head\":\"64b0190\"} -->\n🤖 Thanks, I'll review!\n",
+        "id": 6853789328,
+        "t": "2026-11-13T13:05:08Z",
+        "u": "flavorjones"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 135
+    }
+  },
+  "https://github.com/ruby/ruby/pull/20169": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "570389d4eef1c6ccf64c513f6dfbbe1a1c75db75",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "d0f0dc2da57a4b2d070d279fa4e5b67078d14a34",
+    "branch": "thomasklemm/zjit-setivar-real-class-3",
+    "title": "ZJIT: Profile the real class for setinstancevariable",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [
+        {
+          "c": null,
+          "n": "Auto Review PR",
+          "s": "queued"
+        },
+        {
+          "c": null,
+          "n": "Auto Request Review",
+          "s": "queued"
+        },
+        {
+          "c": "failure",
+          "n": "windows / Windows 2025-vs2026 (check)",
+          "s": "completed"
+        }
+      ],
+      "total": 140
+    }
+  },
+  "https://github.com/whomwah/rqrcode_core/pull/57": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "whomwah",
+    "merged_at": "2026-11-26T13:34:02Z",
+    "merge_sha": "3c5ef2202e676cd514428e6233e233210a283e5a",
+    "closed_at": "2026-11-26T13:34:02Z",
+    "draft": false,
+    "mstate": "unknown",
+    "head": "16d8339f455d3a1e15fb5b6860f22ef5cf6b82da",
+    "branch": "thomasklemm/rszf-without-bignums",
+    "title": "Skip the Bignum mask in rszf when it cannot change the result",
+    "com": [
+      {
+        "b": "Thank you @thomasklemm 🙏 ",
+        "id": 7193514951,
+        "t": "2026-11-26T13:33:27Z",
+        "u": "whomwah"
+      }
+    ],
+    "rev": [
+      {
+        "b": "",
+        "id": 6075025230,
+        "s": "APPROVED",
+        "t": "2026-11-26T13:33:44Z",
+        "u": "whomwah"
+      }
+    ],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 8
+    }
+  },
+  "https://github.com/ruby/ruby/pull/20208": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "43c5575dea8ff08fb25c4a55814e2fcab332efe1",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "2e061793aa7ca63b1a24f05215c36fb11d157ba6",
+    "branch": "thomasklemm/time-new-normalize-mday-3",
+    "title": "[Bug #21301] Normalize month-mday in Time.new before every zone path",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [
+      {
+        "a": "khasinski",
+        "m": "Fix Time.new month-mday normalization with UTC zone",
+        "sha": "a71fbcdb55"
+      }
+    ],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 141
+    }
+  },
+  "https://github.com/ClosureTree/with_advisory_lock/pull/150": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "02effb2b17f8d310812f1d9b1a6e9cd4fa1c82b9",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "f636c07984a93e58d13210ee07e79e90aaa1c387",
+    "branch": "thomasklemm/materialize-try-lock-transaction",
+    "title": "fix: hold transaction-level try locks until the transaction ends on Rails 8.2+",
+    "com": [
+      {
+        "b": "<!-- codex-pull-request-review-summary -->\n<!-- codex-review-state:v1 {\"code_review\":{\"commit_sha\":\"8dd216b9a82f5220ed9317096115fe66de54c1fd\",\"has_any_findings\":false,\"has_unresolved_findings\":false,\"",
+        "id": 6664421930,
+        "t": "2026-11-05T17:17:07Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/getlago/lago-expression/pull/91": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "91a10a396b7c979b5ab8013f4fd00033dad952d4",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "d23823a03ea55204dae64d4d593b5b0cf50e5838",
+    "branch": "ruby-4.1",
+    "title": "fix(ruby): allow building on Ruby 4.1",
+    "com": [
+      {
+        "b": "<!-- codex-pull-request-review-summary -->\n<!-- codex-review-state:v1 {\"code_review\":{\"commit_sha\":\"d23823a03ea55204dae64d4d593b5b0cf50e5838\",\"has_any_findings\":true,\"has_unresolved_findings\":true,\"st",
+        "id": 6607334219,
+        "t": "2026-11-03T15:06:12Z",
+        "u": "chatgpt-codex-connector[bot]"
+      },
+      {
+        "b": "You have reached your Codex usage limits for code reviews. You can see your limits in the [Codex usage dashboard](https://chatgpt.com/codex/cloud/settings/usage).\nTo continue using code reviews, add c",
+        "id": 6607335016,
+        "t": "2026-11-03T15:06:14Z",
+        "u": "chatgpt-codex-connector[bot]"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/tzinfo/tzinfo/pull/175": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "b7c4f0c6e22c35f62215779de0335be837b2d634",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "2b2f4b458dadd3e132790d7c5bf934cee1820af6",
+    "branch": "thomasklemm/equal-identity-shortcut",
+    "title": "Return early from TimezoneTransition#== for the same object",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/rubocop/rubocop-performance/pull/552": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "7b258195e7595b5d28f2113ac7ccc8d749a5a4e7",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "2ab630312bdfd7e37df248947b13765124674e28",
+    "branch": "thomasklemm/casecmp-unicode-notes",
+    "title": "Clarify Performance/Casecmp Unicode and ASCII safety",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/tzinfo/tzinfo/pull/171": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "6d5d84d8cafe321e52d17732ad51535e345238c3",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "57056ddd7f46f9c292e46687821636e812102c85",
+    "branch": "thomasklemm/signed-zoneinfo-transitions",
+    "title": "Decode signed 64-bit zoneinfo transition times directly",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/ruby/ruby/pull/19681": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "9f3a67870ec42ab9e0ee77c40d7c3200400e2976",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "5df7fefa50a617f5727704e82df7942de80af3f5",
+    "branch": "thomasklemm/zjit-caller-saved-regs-stopgap",
+    "title": "ZJIT: Find caller-saved survivors without scanning every interval per CCall",
+    "com": [
+      {
+        "b": "How much impact did this have on benchmarks like lobsters? When testing an impact, in general, let's not only show a synthesized microbenchmark. It's a useful test to double-check for sure, but we'd a",
+        "id": 7148951938,
+        "t": "2026-11-25T00:51:09Z",
+        "u": "k0kubun"
+      }
+    ],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 138
+    }
+  },
+  "https://github.com/ruby/ruby/pull/19912": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "843b02eeb2d5d16256a0fa57eb93c071ed90bfc4",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "7b03404bd7f0e08120af0836ce11a6b27d45f5b0",
+    "branch": "thomasklemm/zjit-symbol-block-arg",
+    "title": "ZJIT: Send Symbol block arguments directly",
+    "com": [],
+    "rev": [
+      {
+        "b": "",
+        "id": 6046815924,
+        "s": "CHANGES_REQUESTED",
+        "t": "2026-11-24T20:29:12Z",
+        "u": "XrXr"
+      },
+      {
+        "b": "",
+        "id": 6063712889,
+        "s": "COMMENTED",
+        "t": "2026-11-25T19:27:58Z",
+        "u": "k0kubun"
+      },
+      {
+        "b": "",
+        "id": 6063800539,
+        "s": "APPROVED",
+        "t": "2026-11-25T19:34:22Z",
+        "u": "k0kubun"
+      }
+    ],
+    "rc": [
+      {
+        "b": "The Symbol#to_proc check should be done as a HIR level speculation, which we already have machinery for, as opposed to checked at runtime as is.",
+        "id": 4686073773,
+        "path": "zjit/src/codegen.rs",
+        "t": "2026-11-24T20:26:14Z",
+        "u": "XrXr"
+      },
+      {
+        "b": "This part should be speculated away instead of checked at runtime. To start, you can make it a guard that loads cref and makes this nil check. Once code runs under a cref, generally the set of refinem",
+        "id": 4686108643,
+        "path": "vm_args.c",
+        "t": "2026-11-24T20:29:09Z",
+        "u": "XrXr"
+      },
+      {
+        "b": "re: https://github.com/ruby/ruby/pull/19680#issuecomment-6974495685 Out of curiosity, is this still 152 bytes? If so, how many boolean slots do we have before it gets changed?",
+        "id": 4699835984,
+        "path": "zjit/src/payload.rs",
+        "t": "2026-11-25T19:27:58Z",
+        "u": "k0kubun"
+      }
+    ],
+    "cm": [
+      {
+        "a": "rafaelfranca",
+        "m": "ZJIT: Send Symbol block arguments directly",
+        "sha": "f805330297"
+      }
+    ],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 138
+    }
+  },
+  "https://github.com/rails/propshaft/pull/289": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "f014638f83ecfdd52d8832a2570057f136f04999",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "clean",
+    "head": "a5bd01cc65dd1eb7bcb8407ab13b2e2db591dc8b",
+    "branch": "thomasklemm/logical-path-without-pathname",
+    "title": "Compute logical paths without Pathname#relative_path_from",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 16
+    }
+  },
+  "https://github.com/sferik/duel-ruby/pull/9": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "b81f3b3ede73122713aa6d1bde1b223e531ab922",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "unstable",
+    "head": "90bf2a51884219cc29c59331cfc5afc9aa97fe9f",
+    "branch": "pread-perf-fd",
+    "title": "Read the Linux counter with read(2), not pread(2)",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 0
+    }
+  },
+  "https://github.com/Shopify/tapioca/pull/2748": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "merged_at": null,
+    "merge_sha": "aef349b6804948c439955a0273fec54fa1520e6c",
+    "closed_at": null,
+    "draft": false,
+    "mstate": "blocked",
+    "head": "dd72843fdf5ee6663eca7d88df9718d83836a1b2",
+    "branch": "fix/skip-unused-active-support-configurable",
+    "title": "Avoid loading unused ActiveSupport::Configurable during reflection",
+    "com": [],
+    "rev": [],
+    "rc": [],
+    "cm": [],
+    "status": {
+      "s": [],
+      "state": "pending"
+    },
+    "checks": {
+      "bad": [],
+      "total": 2
+    }
+  },
+  "https://github.com/ruby/net-http/issues/362": {
+    "closed_at": "2026-11-10T22:08:42Z",
+    "closed_by": "hsbt",
+    "labels": [],
+    "state": "closed",
+    "com": [
+      {
+        "a": "MEMBER",
+        "b": "https://github.com/ruby/net-http/pull/325 added a dependency on net-protocol >= 0.3.0.\n\nDowngrading a gem below the default gem version shipped with a given Ruby version can't be guaranteed to work in",
+        "id": 6665422836,
+        "t": "2026-11-05T18:04:00Z",
+        "u": "rhenium"
+      }
+    ]
+  },
+  "https://github.com/ruby/strscan/issues/223": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/scenic-views/scenic/issues/466": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/roidrage/lograge/issues/407": {
+    "closed_at": "2026-11-14T21:32:13Z",
+    "closed_by": "johnnagro",
+    "labels": [],
+    "state": "closed",
+    "com": [
+      {
+        "a": "COLLABORATOR",
+        "b": "thanks for the detailed report @thomasklemm - i'll take a look",
+        "id": 6646924639,
+        "t": "2026-11-05T01:18:18Z",
+        "u": "johnnagro"
+      }
+    ]
+  },
+  "https://github.com/shioyama/mobility/issues/692": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/chaadow/active_record-acts_as/issues/61": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/ruby/ruby-bench/issues/527": {
+    "closed_at": "2026-11-05T18:53:05Z",
+    "closed_by": "k0kubun",
+    "labels": [],
+    "state": "closed",
+    "com": [
+      {
+        "a": "NONE",
+        "b": "It sounds like this should reduce speed disparity between iterations. We've historically been fine with benchmark changes to align them with what we care about, so I'm not too worried about score cont",
+        "id": 5517446019,
+        "t": "2026-09-02T22:41:53Z",
+        "u": "alanwu-shopify-inc"
+      }
+    ]
+  },
+  "https://github.com/ClosureTree/with_advisory_lock/issues/149": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/marcoroth/herb/issues/2892": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": []
+  },
+  "https://github.com/Shopify/ruby/issues/776": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": [
+      {
+        "a": "NONE",
+        "b": "I think at least a small part of this is because we might have a polymorphic cache of (class, shape, flags) list that is monomorphic in the class. So for the rewrites to SendWithoutBlockDirect, we onl",
+        "id": 3357038185,
+        "t": "2025-10-01T15:46:14Z",
+        "u": "tekknolagi"
+      },
+      {
+        "a": "MEMBER",
+        "b": "I see. It seems like a nice thing to fix as a first step 🙂 ",
+        "id": 3357298600,
+        "t": "2025-10-01T17:01:13Z",
+        "u": "k0kubun"
+      },
+      {
+        "a": "NONE",
+        "b": "I think this might be handled now?",
+        "id": 6694383238,
+        "t": "2026-11-06T20:10:27Z",
+        "u": "tekknolagi"
+      }
+    ]
+  },
+  "https://github.com/Shopify/ruby/issues/1014": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": [
+      {
+        "a": "NONE",
+        "b": "As a first step toward resolving it, I created https://github.com/ruby/ruby/pull/18180.\nCould you review it?\n\nThe diff might be a bit significant. \nIf this doesn't align with the project, I'm willing ",
+        "id": 5169062285,
+        "t": "2026-08-03T16:30:55Z",
+        "u": "dak2"
+      },
+      {
+        "a": "NONE",
+        "b": "Is this done now that Alan added the PR?",
+        "id": 6694344610,
+        "t": "2026-11-06T20:08:29Z",
+        "u": "tekknolagi"
+      }
+    ]
+  },
+  "https://github.com/Shopify/ruby/issues/1131": {
+    "closed_at": null,
+    "closed_by": null,
+    "labels": [],
+    "state": "open",
+    "com": [
+      {
+        "a": "NONE",
+        "b": "Thank you. It seems that `self` type-check for `super` is not tight enough. I found a bug studying it [Bug #22562: Type confusion SEGV: Using `super`, `instance_exec`, and `bind_call`, it is possible ",
+        "id": 6955666524,
+        "t": "2026-11-17T17:27:11Z",
+        "u": "XrXr"
+      }
+    ]
+  },
+  "foreign:rails/rails/pull/57785": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": null,
+    "head": "8396b1d3ca8f410456638dc85bdbe022b88d7018"
+  },
+  "foreign:rails/rails/pull/59631": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": null,
+    "head": "a526bab39cd9c090aef1bf975aa105b09a613004",
+    "com": [
+      {
+        "b": "Thanks for the diagnosis, fixed failing test cases",
+        "id": 6652818770,
+        "t": "2026-11-05T07:57:08Z",
+        "u": "MIbtehajNasar"
+      },
+      {
+        "b": "Thanks, comments removed.\r\n\r\nOn the new method and getting the work out of the getter: it's to keep two behaviors that were raised earlier in this PR. `primary_key` is documented as overridable, and a",
+        "id": 6718065242,
+        "t": "2026-11-08T06:08:35Z",
+        "u": "MIbtehajNasar"
+      },
+      {
+        "b": "Is this resolved by my changes in https://github.com/rails/rails/pull/59530 ?",
+        "id": 6719835256,
+        "t": "2026-11-08T09:30:40Z",
+        "u": "matthewd"
+      },
+      {
+        "b": "Yes, I checked out #59530 and the #59622 cases all pass on your branch (an overridden `primary_key` with `Model.all.find and find([ids]`), and a `super`-based override on an `id: false` table), while ",
+        "id": 6747481315,
+        "t": "2026-11-09T17:58:21Z",
+        "u": "MIbtehajNasar"
+      }
+    ],
+    "rev": [
+      {
+        "b": "",
+        "id": 5781118217,
+        "s": "COMMENTED",
+        "t": "2026-11-05T07:14:07Z",
+        "u": "MIbtehajNasar"
+      },
+      {
+        "b": "Why does this PR need to introduce a new method?",
+        "id": 5815098935,
+        "s": "CHANGES_REQUESTED",
+        "t": "2026-11-07T21:36:52Z",
+        "u": "tenderlove"
+      }
+    ],
+    "rc": [
+      {
+        "b": "Thanks, both are spot on. I've reworked it to keep the stored (schema/assigned/inherited) definition backing the default `primary_key` and `super`, and to build the finder key from the current `primar",
+        "id": 4477601806,
+        "path": "activerecord/lib/active_record/attribute_methods/primary_key.rb",
+        "t": "2026-11-05T07:14:07Z",
+        "u": "MIbtehajNasar"
+      },
+      {
+        "b": "Please remove these comments. The test is documentation enough",
+        "id": 4503816995,
+        "path": "activerecord/lib/active_record/attribute_methods/primary_key.rb",
+        "t": "2026-11-07T21:30:41Z",
+        "u": "tenderlove"
+      },
+      {
+        "b": "Please remove these comments, they aren't helpful",
+        "id": 4503821779,
+        "path": "activerecord/lib/active_record/attribute_methods/primary_key.rb",
+        "t": "2026-11-07T21:32:30Z",
+        "u": "tenderlove"
+      },
+      {
+        "b": "Why are we doing work here and not in the slow path \"on main\" function?",
+        "id": 4503831443,
+        "path": "activerecord/lib/active_record/attribute_methods/primary_key.rb",
+        "t": "2026-11-07T21:36:00Z",
+        "u": "tenderlove"
+      }
+    ]
+  },
+  "foreign:rails/rails/pull/57057": {
+    "com": [
+      {
+        "b": "linked from https://github.com/ged/ruby-pg/issues/729 Better error report for FATAL errors",
+        "id": "https://github.com/ged/ruby-pg/issues/729",
+        "t": "2026-07-01T14:39:58Z",
+        "u": "larskanis"
+      }
+    ],
+    "rev": []
+  },
+  "foreign:ruby/ruby/pull/17251": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": null,
+    "draft": true,
+    "head": "9715d0224e1a2ab9a04948a9f5ec3435f783509d",
+    "com": [
+      {
+        "b": " @thomasklemm Thanks for the update, and sorry for the slow reply.\r\n\r\nI've made a few changes to this draft, to change the thresholds at which we run nofree majors:\r\n\r\n- A heap that is short of free s",
+        "id": 7130412627,
+        "t": "2026-11-24T11:41:02Z",
+        "u": "eightbitraptor"
+      }
+    ],
+    "rev": [],
+    "rc": []
+  },
+  "foreign:rails/rails/pull/58483": {
+    "state": "closed",
+    "merged": true,
+    "merged_by": "gmcgibbon",
+    "closed_at": "2026-08-14T20:55:21Z",
+    "head": "baa1ca5f2f75477e4ce3e9f6237d1dc29c9596a7",
+    "com": [],
+    "rev": [],
+    "rc": []
+  },
+  "foreign:rails/rails/pull/59500": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": null,
+    "head": "cdc7a8c82906c15aa01888c261b2b82f080c9337",
+    "com": [
+      {
+        "b": "Rebased on `main`, where GET responses carry `Vary: Accept` since e38dd281d3, so the tests now check that `Vary` doesn't include `Sec-Fetch-Site` rather than expecting no `Vary` at all. I also dropped",
+        "id": 6818243029,
+        "t": "2026-11-12T08:06:28Z",
+        "u": "czj"
+      }
+    ],
+    "rev": [],
+    "rc": []
+  },
+  "gem:with_advisory_lock": {
+    "version": "7.6.0"
+  },
+  "run:thomasklemm/ruby-bench/42079217004": {
+    "branch": "ci/zjit-diff-gc-side-exits",
+    "conclusion": "success",
+    "status": "completed"
+  },
+  "run:thomasklemm/ruby-bench/42081299470": {
+    "branch": "ci/gc-balloon-current-main",
+    "conclusion": "success",
+    "status": "completed"
+  },
+  "run:thomasklemm/ruby-bench/42079221738": {
+    "branch": "ci/gc-balloon-unfixed",
+    "conclusion": "failure",
+    "status": "completed"
+  },
+  "repo:gshutler/useragent": {
+    "master": "680915aa9e",
+    "gem": "0.16.11",
+    "gs_comment": "2517118345",
+    "gs_review_comment": "174319290",
+    "last_closed_pr": "33 2026-07-13T15:44:39Z merged=false",
+    "pr73": "open merged=false reviews=0"
+  },
+  "foreign:ruby/ruby/pull/18616": {
+    "state": "open",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": null,
+    "draft": true,
+    "head": "d023415c08a44782293f041f276ac8f0eebd4fea",
+    "pushed": "2026-11-19T15:29:50Z",
+    "nse": 7,
+    "com": [],
+    "rev": []
+  },
+  "foreign:ruby/ruby/pull/16909": {
+    "state": "closed",
+    "merged": false,
+    "merged_by": null,
+    "closed_at": "2026-05-28T06:53:10Z",
+    "head": "268b88eacbea477b79f585e55c19b294da1cb979",
+    "com": [],
+    "rev": [],
+    "rc": []
+  }
+}
