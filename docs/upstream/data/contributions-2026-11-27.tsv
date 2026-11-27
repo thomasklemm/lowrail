@@ -16,7 +16,7 @@ discourse/discourse	45658	open	2026-11-05T11:11:18Z		FIX: Scope Category#categor
 freerange/mocha	809	open	2026-11-27T12:48:59Z		Keep mocks of shareable objects such as ENV out of instance variables
 getlago/lago-expression	91	open	2026-11-03T15:06:02Z		fix(ruby): allow building on Ruby 4.1
 hashie/hashie	656	merged	2026-11-26T00:29:31Z	2026-11-26T12:47:44Z	Write new Mash keys without allocating in respond_to_missing?
-hashie/hashie	659	open	2026-11-26T12:42:18Z		Add Duel performance regression guards
+hashie/hashie	659	merged	2026-11-26T12:42:18Z	2026-11-27T19:28:03Z	Add Duel performance regression guards
 inertiajs/inertia-rails	435	merged	2026-10-20T13:15:52Z	2026-11-17T10:48:20Z	Apply DevTools URL redaction to fragment parameters
 inertiajs/inertia-rails	436	merged	2026-10-20T13:15:53Z	2026-11-20T19:35:18Z	Resolve nested serializers returned by prop types
 inertiajs/inertia-rails	437	merged	2026-10-20T13:47:55Z	2026-11-18T09:07:51Z	Reduce configuration binding and plain-data prop scan overhead
