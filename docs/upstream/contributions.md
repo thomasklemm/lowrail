@@ -1335,6 +1335,12 @@ None.
   7% of the gap), so it is recorded, not built. Held: rack-test `Cookie#expired?` parsing `expires` twice (under 0.1%
   of a suite). Dropped: factory_bot `AttributeAssigner` (1.5% of CASA; reworked by its maintainer the same day),
   parallel-testing setup (1–3% of a 4-worker run, fixed per worker). PT1 stays parked.
+  Follow-up the same day ([attribution](test-overhead-2.md#attribution-of-mains-excess-2026-11-27-follow-up)): main's
+  +65.8k interpreter instructions per logged query sit in the three layers between Notifications and the formatter
+  (Active Record's structured subscriber 15.6k, the keyword hand-off into `notify` 15.8k, `notify` 37.9k, `emit`
+  13.2k; the formatter is 12.5k cheaper than 8.1's). #58957 closes 0% of the gap, #59717 6.9%, both 6.7%. Held: the
+  `resolve_payload` key copy (about 2% of a logged query) and PM3 (level check twice, about 1.1%). Dropped: skipping
+  `emit`'s recheck and passing keywords positionally (neither exact). Nothing opened.
 
 - **inertia-rails round 2, after v3.24.0 (2026-11-26): five leads not submitted** ([record](inertia-round-2.md)).
   Interpreter instructions per request on the Inertia XHR / dashboard XHR action workloads against 3.24.0 `5102d8d`,

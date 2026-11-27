@@ -1,0 +1,92 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/test_overhead/sql_log_layers_81.rb",
+  "at": "2026-11-27T22:41:43Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-81",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "3f290b759c8e2ffe7c257951b1255740751355e4",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-81b",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "3f290b759c8e2ffe7c257951b1255740751355e4",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp full": {
+      "base": 94.998,
+      "base1": 94.998,
+      "base2": 94.998,
+      "candidate": 94.998,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_format": {
+      "base": 56.0,
+      "base1": 56.0,
+      "base2": 56.0,
+      "candidate": 56.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp info": {
+      "base": 50.0,
+      "base1": 50.0,
+      "base2": 50.0,
+      "candidate": 50.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp full": {
+      "base": 342804.0665,
+      "base1": 342688.117,
+      "base2": 342920.016,
+      "candidate": 342149.484,
+      "change": -0.0019094945596277446,
+      "aa": 0.0006764768060298834,
+      "claim": true
+    },
+    "interp no_format": {
+      "base": 261909.53125,
+      "base1": 261905.143,
+      "base2": 261913.9195,
+      "candidate": 261787.8365,
+      "change": -0.000464644220541266,
+      "aa": 0.00003350966250861905,
+      "claim": true
+    },
+    "interp info": {
+      "base": 236438.41375,
+      "base1": 235787.1875,
+      "base2": 237089.64,
+      "candidate": 235805.797,
+      "change": -0.002675609009409552,
+      "aa": 0.005508633218023414,
+      "claim": false
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

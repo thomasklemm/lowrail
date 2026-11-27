@@ -1,0 +1,290 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/test_overhead/sql_log_layers.rb",
+  "at": "2026-11-27T23:12:00Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-main",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-mainb",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp full": {
+      "base": 96.999,
+      "base1": 96.999,
+      "base2": 96.999,
+      "candidate": 96.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp full, app_subscribers": {
+      "base": 97.0,
+      "base1": 97.0,
+      "base2": 97.0,
+      "candidate": 97.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_format": {
+      "base": 62.0,
+      "base1": 62.0,
+      "base2": 62.0,
+      "candidate": 62.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_format, app_subscribers": {
+      "base": 62.0,
+      "base1": 62.0,
+      "base2": 62.0,
+      "candidate": 62.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_emit": {
+      "base": 62.0,
+      "base1": 62.0,
+      "base2": 62.0,
+      "candidate": 62.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_emit, app_subscribers": {
+      "base": 62.0,
+      "base1": 62.0,
+      "base2": 62.0,
+      "candidate": 62.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_report": {
+      "base": 53.0,
+      "base1": 53.0,
+      "base2": 53.0,
+      "candidate": 53.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_report, app_subscribers": {
+      "base": 53.0,
+      "base1": 53.0,
+      "base2": 53.0,
+      "candidate": 53.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_event": {
+      "base": 50.0,
+      "base1": 50.0,
+      "base2": 50.0,
+      "candidate": 50.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_event, app_subscribers": {
+      "base": 50.0,
+      "base1": 50.0,
+      "base2": 50.0,
+      "candidate": 50.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_sub": {
+      "base": 46.0,
+      "base1": 46.0,
+      "base2": 46.0,
+      "candidate": 46.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp no_sub, app_subscribers": {
+      "base": 46.0,
+      "base1": 46.0,
+      "base2": 46.0,
+      "candidate": 46.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp info": {
+      "base": 40.0,
+      "base1": 40.0,
+      "base2": 40.0,
+      "candidate": 40.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp info, app_subscribers": {
+      "base": 40.0,
+      "base1": 40.0,
+      "base2": 40.0,
+      "candidate": 40.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp full": {
+      "base": 394620.99075,
+      "base1": 394607.143,
+      "base2": 394634.8385,
+      "candidate": 394595.034,
+      "change": -0.00006577640472360535,
+      "aa": 0.00007018253121151472,
+      "claim": false
+    },
+    "interp full, app_subscribers": {
+      "base": 401255.09575,
+      "base1": 401288.8625,
+      "base2": 401221.329,
+      "candidate": 401529.0615,
+      "change": 0.0006827720143665061,
+      "aa": 0.0001683056507325648,
+      "claim": true
+    },
+    "interp no_format": {
+      "base": 326328.86600000004,
+      "base1": 326298.706,
+      "base2": 326359.026,
+      "candidate": 326394.4535,
+      "change": 0.000200985897459649,
+      "aa": 0.00018484420559965718,
+      "claim": true
+    },
+    "interp no_format, app_subscribers": {
+      "base": 332991.83075,
+      "base1": 332853.106,
+      "base2": 333130.5555,
+      "candidate": 332875.5335,
+      "change": -0.0003492495588797162,
+      "aa": 0.0008332021220313011,
+      "claim": false
+    },
+    "interp no_emit": {
+      "base": 313163.79375,
+      "base1": 313144.939,
+      "base2": 313182.6485,
+      "candidate": 313181.6895,
+      "change": 0.000057145015985637926,
+      "aa": 0.00012041462248378834,
+      "claim": false
+    },
+    "interp no_emit, app_subscribers": {
+      "base": 320009.22875,
+      "base1": 320004.4355,
+      "base2": 320014.022,
+      "candidate": 319737.513,
+      "change": -0.0008490872312070241,
+      "aa": 0.00002995694854620903,
+      "claim": true
+    },
+    "interp no_report": {
+      "base": 275290.20149999997,
+      "base1": 275192.9165,
+      "base2": 275387.4865,
+      "candidate": 275366.374,
+      "change": 0.0002766989147633403,
+      "aa": 0.0007067814217136493,
+      "claim": false
+    },
+    "interp no_report, app_subscribers": {
+      "base": 275295.3,
+      "base1": 275204.2325,
+      "base2": 275386.3675,
+      "candidate": 275260.7315,
+      "change": -0.0001255687983049425,
+      "aa": 0.00066159865424513,
+      "claim": false
+    },
+    "interp no_event": {
+      "base": 259400.65025,
+      "base1": 259386.7055,
+      "base2": 259414.595,
+      "candidate": 259282.7145,
+      "change": -0.0004546470869920549,
+      "aa": 0.00010751515068721468,
+      "claim": true
+    },
+    "interp no_event, app_subscribers": {
+      "base": 259352.21600000001,
+      "base1": 259295.712,
+      "base2": 259408.72,
+      "candidate": 259437.7055,
+      "change": 0.0003296270273627222,
+      "aa": 0.00043573176949450714,
+      "claim": false
+    },
+    "interp no_sub": {
+      "base": 243882.3965,
+      "base1": 243833.8965,
+      "base2": 243930.8965,
+      "candidate": 243908.8965,
+      "change": 0.00010865892897693463,
+      "aa": 0.00039773268342473416,
+      "claim": false
+    },
+    "interp no_sub, app_subscribers": {
+      "base": 243925.3965,
+      "base1": 243930.8965,
+      "base2": 243919.8965,
+      "candidate": 243828.8965,
+      "change": -0.0003956127626915107,
+      "aa": 0.00004509575533271707,
+      "claim": true
+    },
+    "interp info": {
+      "base": 221893.934,
+      "base1": 221894.434,
+      "base2": 221893.434,
+      "candidate": 221859.434,
+      "change": -0.00015547968967910553,
+      "aa": 0.000004506657671858663,
+      "claim": true
+    },
+    "interp info, app_subscribers": {
+      "base": 221849.934,
+      "base1": 221812.434,
+      "base2": 221887.434,
+      "candidate": 221884.434,
+      "change": 0.00015551052631823659,
+      "aa": 0.0003380663615613246,
+      "claim": false
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

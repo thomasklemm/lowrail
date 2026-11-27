@@ -173,6 +173,87 @@ without Thomas's approval of that comment; our numbers stay here. If Thomas want
 fix of ours here would go into `EventReporter#notify` and the shared `EventReporter::LogSubscriber`, which every
 framework's log subscriber uses, not into Active Record's `sql` handler alone; that is also where the open PRs work.
 
+### Attribution of main's excess (2026-11-27, follow-up)
+
+**Where the +61% goes, layer by layer.** [`sql_log_layers.rb`](../../bench/upstream/test_overhead/sql_log_layers.rb)
+(main) and [`sql_log_layers_81.rb`](../../bench/upstream/test_overhead/sql_log_layers_81.rb) (8.1.4.1) log the same
+`find_by` with one layer switched off at a time, through a prepended no-op in each case alike; a layer's cost is the
+difference to the case one level up, inclusive of everything it calls. Interpreter instructions per logged query,
+Ruby 4.0.10, `script/upstream-bench` with a second worktree as A/A (largest A/A 0.07% on 8.1, 0.08% on main):
+
+| Layer (debug − info) | 8.1.4.1 | main `2e299253f9` | main − 8.1 |
+| --- | ---: | ---: | ---: |
+| Notifications dispatch to the first subscriber and its checks | 26,100 | 21,900 | −4,200 |
+| `ActiveRecord::StructuredEventSubscriber#sql`: binds, seven keyword arguments | – | 15,600 | **+15,600** |
+| `emit_debug_event` → `EventReporter#debug` → `#notify`: keyword hand-off | – | 15,800 | **+15,800** |
+| `EventReporter#notify`: filter loop, subscriber check, payload, event, source location, freeze | – | 37,900 | **+37,900** |
+| `EventReporter::LogSubscriber#emit`: logger, `event_method_for`, level check, `public_send` | – | 13,200 | **+13,200** |
+| `ActiveRecord::LogSubscriber#sql`: message formatting and the logger write | 80,800 | 68,300 | −12,500 |
+| **Total** | **106,900** | **172,700** | **+65,800** |
+
+The harness's own wrappers add about 1–3k to main's total against the plain micro above (172,700 against 169,526).
+With the four other framework log subscribers Campfire registers (Action Dispatch, Active Storage, Action
+Controller, Active Job), each logged query costs another 6,700 in `notify`'s filter loop. Objects per logged query:
+8.1 95 (56 without formatting, 50 at info), main 97 (62, 62, 53, 50, 46 down the layers, 40 at info). Bisecting was
+not needed: on 8.1 the event reporter has no subscribers, so `StructuredEventSubscriber` stays silenced and the log
+subscriber formats straight from the notification. aebcb61520 "Introduce ActiveSupport::EventReporter::LogSubscriber"
+and 308594b580 "Convert log subscriber in Active Record to consume structured events" (neither in 8.1) subscribe the
+log subscriber to the reporter, which puts the three middle layers between Notifications and the formatter; later
+merged speedups made the formatter cheaper than 8.1's.
+Raw: [main](../../bench/upstream/test_overhead/body/sql-log-layers-main),
+[8.1](../../bench/upstream/test_overhead/body/sql-log-layers-81).
+
+**Inside `notify` and `emit`.** [`sql_log_pieces.rb`](../../bench/upstream/test_overhead/sql_log_pieces.rb), same tool,
+per call, A/A ≤ 0.41%, YJIT JIT-flat in every window:
+
+| Piece | Interpreter | YJIT | Where it runs |
+| --- | ---: | ---: | --- |
+| Subscriber check `consumes?` (logger, `event_method_for`, `log_level_satisfied?`) | 11,778 | 4,839 | `notify`, once per event |
+| The same check again before dispatch | 12,283 | 4,811 | `emit` |
+| `resolve_payload` for the seven keyword arguments (`transform_keys(&:to_sym)`) | 11,830 | 10,096 | `notify` |
+| `EventReporter#debug` → `#notify` with the seven keyword arguments plus two options | 12,930 | 12,092 | hand-off |
+
+So the level check twice (about 24k), the payload copy (about 12k) and the keyword hand-offs (about 13k of the
+15.8k) are most of the excess; source location (#59717) is 4.4k; the rest of `notify` (two event hashes, the
+subscriber array, tags, context, timestamp, freeze, the emit loop) is about 10k. A per-function Callgrind diff shows
+no hotspot: the cost is interpreter dispatch and small-hash work spread over about 100 Ruby and C calls in `notify`
+and 50 in `emit` before formatting. Under YJIT the level checks shrink to about 4.8k each, while the payload copy
+and the keyword hand-off stay near their interpreter cost (hash building and keyword copying in C).
+
+**What the open PRs close** (`sql_log_body.rb`, main against main with the PR, A/A per cell):
+
+| Tree | Debug, interpreter | Info, interpreter | Debug, YJIT | Share of the 64,385 gap |
+| --- | ---: | ---: | ---: | ---: |
+| [#58957](https://github.com/rails/rails/pull/58957) head `98ad26a304` | 390,229 → 390,455 (A/A 390,439) | 220,344 → 220,211 | 202,721 → 202,768 | **0%** (inside the A/A) |
+| [#59717](https://github.com/rails/rails/pull/59717) head `f4d234e2b5` | 390,226 → 385,774 | 220,423 → 220,479 | 203,140 → 197,869 | **6.9%** |
+| Both | 390,118 → 385,791 | 220,436 → 220,354 | 202,741 → 197,822 | **6.7%** (same as #59717) |
+
+#58957 skips handlers whose event no subscriber consumes; at debug the log subscriber consumes `active_record.sql`,
+and at info `sql` is already silenced as `debug_only`, so the logged query is unchanged. Raw:
+[#58957](../../bench/upstream/test_overhead/body/sql-log-main-vs-58957),
+[both](../../bench/upstream/test_overhead/body/sql-log-main-vs-both) (#59717's library changes applied on top of
+#58957; no conflict).
+
+**The remaining 93%: no exact fix large enough to open.** Each piece is a few percent of a logged query, and logging
+is 3–19% of suite wall time ([above](#suite-wall-time-on-a1xxlarge)), so none moves a suite measurably (DECISIONS,
+relevance bar):
+
+* **Held, payload copy.** `resolve_payload` copies keyword arguments with `transform_keys(&:to_sym)`, one
+  `Symbol#to_sym` call per key. A `**kwargs` hash is always a fresh Hash (checked on 4.0.10 and master `0d399335b7`),
+  so returning it frozen when `kwargs.keys.all?(Symbol)` is exact. CPU time for the seven keys drops from 603 to
+  211 ns (orientation only), so an estimated 7–8k of the 11,830 instructions, about 2% of a logged query. No branch built: same order as PM3, which was closed as too small.
+* **Held, PM3 stays parked.** The level check runs twice per logged query (`consumes?` in `notify`, again in `emit`);
+  PM3 (read the logger once in both, closed 2026-11-05) saves about 2,200 per check, about 1.1% of a logged query.
+  The suite context adds reach but not size: no new evidence for reopening.
+* **Dropped, skipping `emit`'s recheck.** `notify` stops checking after the first consuming subscriber and `emit` is
+  the subscriber's public entry point, so the recheck is needed for every other subscriber and for direct callers.
+* **Dropped, keyword hand-off.** Passing the collected keywords on as the positional payload would skip two 9-key
+  hash copies, but changes what `notify` and `debug` overrides receive and the error message for event objects
+  given keywords; not exact as a plain change.
+
+The large lever stays outside the event code: logging at info in tests (#59330 for new apps; −3.4% to −19.4% suite
+wall time in the table above). Recorded, nothing opened.
+
 ## Other parts, with decisions
 
 * **Fixtures (median 2.9%).** Accessors are almost entirely the record `find_by!` per test (Fizzy: 2.43% of 2.58%;

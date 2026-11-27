@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/tmp/pt2/rails-main/activesupport"
+gem "activemodel", path: "/tmp/pt2/rails-main/activemodel"
+gem "activerecord", path: "/tmp/pt2/rails-main/activerecord"
+gem "sqlite3"

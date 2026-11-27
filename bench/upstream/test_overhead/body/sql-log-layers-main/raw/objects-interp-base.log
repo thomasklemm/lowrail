@@ -1,0 +1,14 @@
+objects full	96.999
+objects full, app_subscribers	97.0
+objects no_format	62.0
+objects no_format, app_subscribers	62.0
+objects no_emit	62.0
+objects no_emit, app_subscribers	62.0
+objects no_report	53.0
+objects no_report, app_subscribers	53.0
+objects no_event	50.0
+objects no_event, app_subscribers	50.0
+objects no_sub	46.0
+objects no_sub, app_subscribers	46.0
+objects info	40.0
+objects info, app_subscribers	40.0
