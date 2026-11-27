@@ -27,7 +27,7 @@ module PrQueue
   REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus thermos-fable opus fable].freeze
   STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
   # guard_review: true, a review of our own safety guards, which Sol's and Astra's cyber-safety checks stop
-  # (DECISIONS 2026-11-25, "Reviews of our own safety guards go to Anthropic models").
+  # (DECISIONS, Review gates, Required passes, 2026-11-25).
   GUARD_STAND_INS = %w[thermos-opus thermos-fable].freeze
   # Thermos on Sol (or Opus for crash fixes) is the default review and a thermos review (DECISIONS 2026-11-18).
   # A Fable thermos pass counts where an Opus one does (DECISIONS 2026-11-25).
@@ -35,8 +35,8 @@ module PrQueue
   ACCEPTS = { "claude-code" => %w[claude-code] + THERMOS_REVIEWS, "thermos" => %w[thermos] + THERMOS_REVIEWS }.freeze
   VERDICTS = %w[approve nits changes].freeze # approve and nits (no must-fix) count; changes doesn't
   THERMOS_LINES = 200
-  # Our open PRs per repo (DECISIONS, Submission queue). ruby/ruby: none open for now. Other repos: at most
-  # GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt. ruby/ruby opens only items Thomas names (DECISIONS).
+  # Our open PRs per repo (DECISIONS, Submission queue). rails/rails: 15 open, drafts included. ruby/ruby: only items
+  # Thomas names, at most 10 open. Other repos: at most GEM_CAP open PRs without a maintainer response; ruby/ruby-bench is exempt.
   CAPS = { "rails/rails" => { open: 15, ready: 15 }, "ruby/ruby" => { open: 10 }, "ruby/ruby-bench" => {} }.freeze
   GEM_CAP = 2
   # script/ownership's check must be this recent to open (DECISIONS 2026-11-25, after TA1 duplicated an open PR).
@@ -108,9 +108,10 @@ module PrQueue
   end
 
   # Unknown diff size (nil) requires thermos, so an unchecked item never looks reviewed.
-  # The final review is a separate Claude Code orb's (DECISIONS 4b6ec99); orbs' own skeptic passes stay as records.
+  # The detailed review is thermos-sol; recorded claude-code passes still count (DECISIONS, Review gates). Orbs' own
+  # skeptic passes stay as records.
   def required(meta, lines)
-    list = %w[claude-code] # one detailed review, DECISIONS 2026-11-17
+    list = %w[claude-code] # the detailed review slot, which thermos-sol fills (DECISIONS, Required passes)
     list << "astra" if meta["risky"]
     list << "thermos" if lines.nil? || lines > THERMOS_LINES
     list

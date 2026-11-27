@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render README's current results from published, accepted exports."""
+"""Render docs/prototype.md's current results from published, accepted exports."""
 
 from decimal import Decimal, ROUND_HALF_UP
 import json
@@ -162,17 +162,17 @@ for entry in json.loads((root / "docs/results.json").read_text()):
         f"{price} | "
         f"{commit(entry['revision'])} / {commit(entry['publication'])}{runtime}; [JSON]({source_url}) |"
     )
-readme = root / "README.md"
+readme = root / "docs/prototype.md"
 before, rest = readme.read_text().split("<!-- current-results:start -->\n")
 _, after = rest.split("<!-- current-results:end -->")
-rendered = before + "<!-- current-results:start -->\n" + "\n".join(rows) + "\n<!-- current-results:end -->" + after
+rendered = before + "<!-- current-results:start -->\n" + "\n".join(rows).replace("](docs/", "](") + "\n<!-- current-results:end -->" + after
 before, rest = rendered.split("<!-- throughput-results:start -->\n")
 _, after = rest.split("<!-- throughput-results:end -->")
-rendered = before + "<!-- throughput-results:start -->\n" + "\n".join(throughput_rows) + "\n<!-- throughput-results:end -->" + after
+rendered = before + "<!-- throughput-results:start -->\n" + "\n".join(throughput_rows).replace("](docs/", "](") + "\n<!-- throughput-results:end -->" + after
 if "--check" in sys.argv:
     if readme.read_text() != rendered:
-        sys.exit("README results stale; run python3 docs/render-results.py")
-    print("README results match accepted exports and commit objects.")
+        sys.exit("docs/prototype.md results stale; run python3 docs/render-results.py")
+    print("docs/prototype.md results match accepted exports and commit objects.")
 else:
     readme.write_text(rendered)
-    print("Updated README current results.")
+    print("Updated docs/prototype.md current results.")

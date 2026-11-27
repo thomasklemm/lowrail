@@ -1,5 +1,12 @@
 # Lowrail — plan for the first iteration
 
+> **Paused (2026-11-27, Thomas).** This plan is not being pursued. The runtime lowering failed the YJIT gate and
+> the default build lowers nothing, while Lowrail's measurements of real apps found small fixes that maintainers
+> merged, so Lowrail reoriented toward upstream fixes on 2026-11-02
+> ([DECISIONS](DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02)). The Rust
+> core in `src/` and the lowering runtime in `gem/` stay in the tree unchanged and are not developed. The plan
+> below is kept as it stood; the engine's results and reference are in [prototype.md](prototype.md).
+
 Lowrail lowers what it can of a Rails application into specialized Ruby and
 leaves everything else alone. It is deeply inspired by
 [Roundhouse](https://github.com/rubys/roundhouse), but makes a different bet:

@@ -107,7 +107,7 @@ alternative_of:               # ID this competes with; only one of them opens
 impact: one line, the effect a maintainer cares about
 evidence: [bench/upstream/form_helper_stack/body/fb1]  # repo paths with the raw data behind the body's numbers
 rank: 2                       # 1 opens first
-risky: false                  # true: Astra is required (DECISIONS, review rounds)
+risky: false                  # true: Astra is required (DECISIONS, Required passes)
 guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable stand in for Sol and Astra
 state: draft
 pr: 59667
@@ -129,10 +129,10 @@ Optional, last: what Thomas needs to retell the change. Everything from this hea
 subagent, kept as a record), `sol`, `astra`, `thermos`, `thermos-sol`, `thermos-opus` and `thermos-fable` (a
 thermos review on that model, which is also the detailed review), and for now `opus` and `fable`, which stand in for Sol or
 Astra when their `orb` (the orb's thread ID) differs from the claude-code pass's `orb` on that head and from the other
-stand-in's ([DECISIONS](../../../docs/DECISIONS.md#opus-and-fable-stand-in-for-sol-and-astra-thomas-2026-11-14-temporary-pending-thomas)).
+stand-in's ([DECISIONS](../../../docs/DECISIONS.md#required-passes)).
 On an item with `guard_review: true`, `thermos-opus` and `thermos-fable` stand in the same way, since Sol's and
 Astra's cyber-safety checks stop reviews of our own safety guards
-([DECISIONS](../../../docs/DECISIONS.md#working-mode), "Reviews of our own safety guards go to Anthropic models").
+([DECISIONS](../../../docs/DECISIONS.md#required-passes)).
 `verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
@@ -162,7 +162,7 @@ any state -> held | superseded
 * **built:** branch pushed, body drafted, no pass yet on this head.
 * **in-review:** passes are being run on this head.
 * **reviewed:** every required pass approves on the current `head` (latest pass per reviewer counts), no
-  must-fix. Required: one detailed claude-code pass always ([DECISIONS 2026-11-17](../../../docs/DECISIONS.md#one-detailed-review-instead-of-two-thomas-2026-11-17)), Astra (or a stand-in) when `risky`, thermos when the diff against the base has
+  must-fix. Required: the detailed review always (thermos-sol; a recorded claude-code pass still counts; [DECISIONS](../../../docs/DECISIONS.md#required-passes)), Astra (or a stand-in) when `risky`, thermos when the diff against the base has
   more than 200 changed lines. `open` refuses otherwise.
 * **draft**, **ready**, **merged**, **closed:** the PR's state on GitHub; `sync` keeps them current.
 * **held:** not to open now; `note` says why and what unblocks it. **superseded:** replaced by another item or PR.

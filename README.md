@@ -1,96 +1,39 @@
 # Lowrail
 
-**Lowrail measures real open-source Rails apps on Rails main and upstreams
-small, exact fixes for the avoidable work it finds** in Rails, in Ruby and its
-JITs (YJIT, ZJIT), and in gems. Results are allocation and instruction counts;
-no request speedup is claimed.
+**Lowrail measures real open-source Rails apps on Rails main and upstreams small, exact fixes for the avoidable work
+it finds**: in Rails, in Ruby and ZJIT, and in the gems apps use (Rack, drivers, inertia-rails, hashie and others).
+Results are allocation and instruction counts against the same code without the change, each with an A/A control; no
+request speedup is claimed. If you came here from a PR, [method.md](docs/upstream/method.md) explains where its
+numbers come from.
 
-If you came here from a PR, [how candidates are found and measured](docs/upstream/method.md)
-explains where its numbers come from.
+Until November 2026 Lowrail was a prototype that lowered Rails apps to specialized Ruby. That engine is
+[paused](#paused-the-lowering-engine).
 
-Until 2026-11-02 Lowrail was a prototype that lowered Rails apps to specialized
-Ruby. That work is kept below as [research](#lowering-prototype-research)
-([why it changed](docs/DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02)).
+## What it does
 
-## The census
+1. **Measure.** [`script/census`](docs/upstream/census.md) moves about 20 open-source apps (Mastodon, Discourse,
+   Lobsters, Chatwoot, Campfire, Fizzy, Writebook and others) onto one pinned Rails main commit, runs their request,
+   job and mailer workloads on Ruby 4.0.9 and pinned Ruby master (interpreter, YJIT, ZJIT), and counts objects per
+   source line, every round as an A/A pair. ZJIT stats passes and app-suite differentials run beside it.
+2. **Find.** Lines are ranked by how many apps reach them, then by cost. Open and closed upstream PRs on a line are
+   searched before anything is built.
+3. **Fix.** The smallest change that behaves exactly as before for every caller, checked by a differential harness
+   and the project's own suites, priced with [`script/upstream-bench`](docs/upstream/body-numbers.md) (objects and
+   Callgrind instructions per call, base measured twice) and on ruby-bench, then reviewed before it opens.
+4. **Upstream.** Candidates wait in the [PR queue](bench/upstream/pr-queue/README.md); `script/pr-queue` opens one
+   only when its repository has room and every review pass approves the exact head.
 
-[`script/census`](docs/upstream/census.md) moves about 20 open-source apps onto
-one pinned Rails main commit and runs their request, job and mailer workloads.
-The latest round, [census 9](docs/upstream/rails-main-census-9.md)
-(2026-11-14), compared Rails main with 8-1-stable on 8 apps and 71 workloads:
-main runs fewer interpreted instructions in 70 of them (median −6.5%), and the
-slower paths left after the attribute-set rewrite are ranked as leads. The
-broadest round, [census 8](docs/upstream/rails-main-census-8.md), covered 20
-apps in 23 configurations and 251 workloads, on SQLite, PostgreSQL and MySQL,
-in the interpreter and under YJIT. The apps include Mastodon, Discourse,
-Lobsters, Chatwoot, Sure, Fizzy, Campfire, Writebook, Loomio and CASA. Each app
-keeps its own code; only Rails and the gems it needs change.
-
-## How candidates are found and measured
-
-In short, from [method.md](docs/upstream/method.md):
-
-1. **Find.** For every workload the census counts objects allocated per source
-   line. Every round runs twice, as an A/A pair, to show the noise floor. Lines
-   are ranked by how many apps reach them, then by objects per workload, and
-   open and closed PRs that touch a line are searched before anything is built.
-2. **Build.** The smallest change that behaves exactly as before for every
-   caller, checked against the original by a differential harness and the
-   framework's own test suites, and read by two independent reviews. A change
-   that makes the code noticeably harder to read is shrunk or dropped.
-3. **Price.** Per call (objects and Callgrind instruction counts), on
-   ruby-bench (railsbench, lobsters, shipit), and in the census again, always
-   against the same commit without the change and as an A/A pair. A candidate
-   whose CPU gain stays within the A/A and that adds code is not opened.
-
-## Combined effect
-
-Measured together, as Rails main against the same commit with our merged PRs
-reverted ([combined effect](docs/upstream/combined-effect.md)):
-
-* **Round 3, 56 PRs** (2026-11-17, Rails main `4500a94c34`; five of the 61
-  merged PRs could not be reverted and are in both trees), Ruby 4.0.9:
-  **5.48%** fewer allocations in the interpreter and **5.38%** under YJIT,
-  across 104 request, job and mailer workloads in eleven apps. Every app moves,
-  by 2.5% to 8.3%. ruby-bench iterations allocate 6.2% (railsbench), 4.2%
-  (lobsters) and 12.5–12.7% (shipit) fewer objects, and run **2.24%** (railsbench)
-  and **3.43%** (shipit) fewer interpreted instructions, outside the A/A.
-  On Ruby master the same trees save **5.86%** interpreted and **5.79%** under
-  ZJIT in eight apps. Reverting our 14 merged ruby/ruby commits instead leaves
-  the census flat.
-* **Earlier rounds:** 11 PRs on Ruby 4.0.7 saved 1.66% / 1.64% (interpreter /
-  YJIT) across 206 workloads in sixteen apps, with wall time on railsbench and
-  lobsters a tie within the A/A; 22 PRs on Ruby master saved 3.27% / 3.21%
-  (interpreter / ZJIT); 39 PRs on 4.0.9 saved 3.78% in five apps
-  ([merged-sum](docs/upstream/merged-sum.md)).
-
-These are allocation and instruction savings, not a measured speedup.
-
-## Contributions
-
-Pull requests opened since 2026-05-01, counted on 2026-11-17 with a GitHub
-search ([command and list](docs/upstream/contributions.md#counts-2026-11-17)):
-
-| Repository | Opened | Merged | Open | Closed |
-| --- | ---: | ---: | ---: | ---: |
-| rails/rails | 103 | 62 | 21 | 20 |
-| ruby/ruby (YJIT, ZJIT, VM) | 38 | 13 | 6 | 19 |
-| 33 other repositories (gems, ruby-bench, Prism, Campfire) | 79 | 29 | 44 | 6 |
-
-The [contributions ledger](docs/upstream/contributions.md) lists merged, open
-and closed PRs, each with its own measured result and caveats: rails/rails,
-ruby/ruby (YJIT and ZJIT), sqlite3-ruby, Prism, Campfire and other gems. It also
-records validation reviews and the candidates investigated and not submitted,
-with the reasons. What we pursue, park or reject, and why, is in
-[DECISIONS.md](docs/DECISIONS.md).
+Counted on 2026-11-27 (PRs opened since 2026-05-01, GitHub search): 84 merged in rails/rails and 17 in ruby/ruby, and
+more in Rack, Prism, sqlite3-ruby, hashie, inertia-rails, ruby-bench and other gems. The
+[contributions ledger](docs/upstream/contributions.md) lists every merged, open and closed PR with its measured result
+and caveats, and the candidates investigated and not submitted, with the reasons. Our merged Rails PRs measured
+together save 5.48% of allocations across 104 workloads in eleven apps
+([combined effect](docs/upstream/combined-effect.md), round 3).
 
 ## Reproduce
 
-Requirements: Git, [mise](https://mise.jdx.dev), network access, and the local services an app needs
-(Redis, PostgreSQL, MySQL; see [census.md](docs/upstream/census.md#services-and-apps)).
-`script/census` measures on Ruby 4.0.9 (installed by mise on demand; `--ruby` picks another);
-`mise.toml` pins 4.0.7, the lowering prototype's Ruby, which runs the script itself.
-The Blog needs none of the services:
+Requirements: Git, [mise](https://mise.jdx.dev), network access, and the services an app needs (see
+[census.md](docs/upstream/census.md#services-and-apps)). The Blog needs none:
 
 ```sh
 git clone https://github.com/thomasklemm/lowrail && cd lowrail
@@ -100,535 +43,78 @@ mise exec -- script/census rank --label base2                 # Rails lines by b
 mise exec -- script/census compare --base base2 --aa base     # the A/A noise floor
 ```
 
-Omit `--apps` for every app. To measure a Rails branch, run it under a new
-label with `--rails OWNER/REPO@BRANCH` and compare it against `base2`.
-
-Each report under [docs/upstream/](docs/upstream/) lists its pins and commands;
-receipts of published rounds are in [docs/upstream/data/](docs/upstream/data/).
+Omit `--apps` for every app; measure a Rails branch under a new label with `--rails OWNER/REPO@BRANCH`. Each report
+under [docs/upstream/](docs/upstream/) lists its pins and commands.
 
 ## Your own app
 
-Two tools show where your Rails app does avoidable work in Rails, Ruby and
-gems, and which known PRs and [ledger](docs/upstream/contributions.md) entries
-touch each line. Both count work (objects; the census also instructions), not
-time. Both read one file, `lowrail/workloads.rb`, in the words of your
-integration tests:
+Both tools read `lowrail/workloads.rb`, your requests in the words of an integration test
+([format](docs/upstream/census.md#workloads-file)), and count work, not time.
 
-```ruby
-# lowrail/workloads.rb, evaluated after the app has booted
-article = Article.order(:id).first!
-
-setup do                       # runs once: resets so runs do not accumulate
-  Comment.where(commenter: "Census").delete_all
-end
-
-get articles_path
-get article_path(article)
-get article_path(article, format: :json), as: :json
-post article_comments_path(article), params: { comment: { commenter: "Census", body: "Hi" } }, expect: 302
-patch article_path(article), expect: 303, jobs: true,
-  alternate: [{ params: { article: { title: "A" } } }, { params: { article: { title: "B" } } }]
-mail { CommentMailer.created(Comment.last!) }
-```
-
-**`lowrail-profile`** (the gem, inside your app) is the first look: one
-Gemfile line, then your own suite or the workloads file, in your own
-environment and database. It names the app line behind each cost, ranks your
-app lines by the framework and gem objects they lead to and your controller
-actions by objects per request, counts jobs, mails and Action Cable actions
-apart, and names the upstream pull requests that change a costly line.
-`lowrail-profile compare base/report.json head/report.json --aa base2/report.json`
-exits 1 on a regression beyond the noise floor of an A/A pair (two profiles of
-the base), for CI, and 2 when the reports are not valid evidence (a failing
-suite, one run, different commands); without `--aa` it lists what it sees and
-does not gate.
+**`lowrail-profile`** is a gem without lowering code that runs inside your app: your own suite (or the workloads
+file) with exact allocation counts per request, job, mail and Action Cable action, by source line in your code and in
+the Rails, Ruby and gem code it calls, with the upstream PRs that change a costly line. It is 0.1.0.rc1 and not on
+rubygems.org yet; supported: Ruby 3.3–4.0, Rails 7.2–8.1, Linux and macOS ([gem/README-profile.md](gem/README-profile.md)).
 
 ```ruby
 gem "lowrail-profile", git: "https://github.com/thomasklemm/lowrail", glob: "gem/lowrail-profile.gemspec", group: [:development, :test], require: false
 ```
 
-It is its own gem, without lowering code: [gem/README-profile.md](gem/README-profile.md).
-
 ```sh
-bundle exec lowrail-profile -- bin/rails test                  # your suite (or: -- bundle exec rspec spec/requests)
-bundle exec lowrail-profile --record -- bin/rails test         # ... and write its most frequent requests as lowrail/workloads.rb
-RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's GETs, warmed, through the full stack (writes: --allow-writes)
+bundle exec lowrail-profile -- bin/rails test                  # your suite, run twice (or: -- bundle exec rspec)
+bundle exec lowrail-profile --record -- bin/rails test         # ... and write its frequent requests as lowrail/workloads.rb
+RAILS_ENV=production bundle exec lowrail-profile --workloads   # the file's GETs, warmed, full stack (writes: --allow-writes)
+bundle exec lowrail-profile compare base/report.json head/report.json --aa base2/report.json
 ```
 
-`--record` applies the app's `filter_parameters` and enables only GETs that
-replay as recorded; check the file for secrets before committing it.
-`--workloads` sends real requests through the app's own database, queue and
-mail delivery, so run it only against disposable ones, with the gem installed
-in that environment ([docs/profile.md](docs/profile.md#run-it)).
+Reports land in `tmp/lowrail-profile/`. `compare` is a report, not a CI gate in 0.1: it exits 0 whatever it lists and
+2 when the captures are not valid evidence. `--record` applies the app's `filter_parameters`; check the file for
+secrets before committing it. Run `--workloads` only against disposable databases, queues and mail delivery
+([profile.md](docs/profile.md#run-it)).
 
-**`script/census app`** (this repository, on a copy of your app) is the
-measurement: production mode, 50 warmup operations, an A/A pair for the noise
-floor, instructions when the patched Valgrind is built, jobs and mailers as
-workloads of their own, and `--rails main` for what an upgrade changes. Your
-checkout is only read; the census works on a copy with its own throwaway
-databases, and refuses what it cannot run safely (a `DATABASE_URL` in the
-environment, services that are not running, an app that does not boot in
-production).
+**`script/census app`** (this repository, on a copy of your app) is the measurement: production mode, warmed, an A/A
+pair, instructions when the patched Valgrind is built, and `--rails main` for what an upgrade changes. Your checkout is
+only read; it refuses what it cannot run safely.
 
 ```sh
 mise exec -- script/census app ~/src/myapp --init        # a starter lowrail/workloads.rb from the routes
-mise exec -- script/census app ~/src/myapp               # measures lowrail/workloads.rb (else GET pages from the routes)
-mise exec -- script/census app ~/src/myapp --rails main  # and the same on Rails main
+mise exec -- script/census app ~/src/myapp --rails main  # measure the file on the app's Rails and on main
 ```
 
-| Use | `lowrail-profile` | `script/census app` |
-| --- | --- | --- |
-| For | a first look, your own suite, the app line behind each cost | production steady state, numbers to compare or publish |
-| Workload | your suite's requests, or the file's requests | the file: requests, the jobs they enqueue, mails, jobs |
-| Mode | your environment (test-mode logging and error pages are listed apart) | production, warmed, A/A pair |
-| Counts | objects per source line | objects and instructions, per workload and per line |
-| Rails swap | no | `--rails SPEC` next to the app's own |
-| Per action | objects per controller action, job, mailer and channel action; `compare` for CI | per workload |
-
-The usual path: run your suite through `lowrail-profile --record`, keep the
-requests that matter in `lowrail/workloads.rb` (make its writes repeatable),
-then measure that file with `script/census app`. On the Blog's five GETs in
-production both counted the same objects per line within about 1% (measured
-before lowrail-profile's request policy changed; one app and route set, not a
-claim for any workloads file).
-The file's format is in [Workloads file](docs/upstream/census.md#workloads-file),
-the census in [Run it on your own app](docs/upstream/census.md#run-it-on-your-own-app),
-the profiler in [docs/profile.md](docs/profile.md).
-
-## Lowering prototype (research)
-
-Lowrail's original prototype, as it stood on 2026-10-22. It stays in the tree
-as research, unchanged and not promoted
-([decision](docs/DECISIONS.md#lowrail-reoriented-toward-upstream-fixes-and-advisory-types-2026-11-02)).
-
-The prototype's aim: **make an existing Rails app faster without rewriting
-it, and prove that nothing changed.**
-
-Lowrail boots your Rails application, learns what is fixed after boot (schema,
-routes, config, method definitions, templates), and delivers specialized Ruby
-for the parts it can prove equivalent, as MRI instruction sequences (ISeqs).
-The real Rails and every gem keep running. Anything Lowrail cannot prove stays
-your app's own code, and every refusal is recorded with its reason.
-
-It is deeply inspired by [Roundhouse](https://github.com/rubys/roundhouse) by
-Sam Ruby, which transpiles Rails apps into standalone programs in many
-languages and types them without annotations. Lowrail makes a different bet:
-keep the real framework, target only lowered Ruby, lower only what can be
-guarded exactly, and measure every claim. See [Acknowledgements](#acknowledgements)
-for the other projects we learned from.
-
-> **Research prototype.** Lowrail is not published as a gem and gives no
-> production speedup by default today. Use it on a copy of your app or in CI.
-
-### Historical results (2026-10-21)
-
-> **Historical.** These are the prototype's last measured results, on Ruby 4.0.7
-> and Rails 8.1.4 at the linked commits. They have not been re-measured since.
-> The upstream work measures on Ruby 4.0.9 and Rails main; see
-> [Combined effect](#combined-effect).
-
-#### Warm-request instruction counts
-
-**Warm-request instruction results, including increases and historical records—not latency or throughput claims.**
-**Ir instructions, not latency · no YJIT instruction claim yet · opt-in research, not default**.
-Blog and Starter each cover one endpoint/fixture in the sealed tier. Fizzy has
-a fixed six-GET block-link vector and a separate one-route branch prototype;
-both are bench-only, not production admission.
-Current prices pass total and GC-excluded A/A, fixed-heap, brk and actual-mode
-gates. Each price applies only to its named endpoint/fixture and tier.
-
-<!-- current-results:start -->
-| Date | App / endpoint | Ruby / Rails | Mode / tier | Ir Δ vs no Lowrail [95% interval] | Measured / published |
-|---|---|---|---|---|---|
-| 2026-10-21 | [BlogShowGetOnly (blog), `GET /articles/1`](docs/passes/production-aa01-reprice.md) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: production form/token/collection | **Total −15.02% [−15.05, −15.00]**; GC-excluded −15.02% [−15.04, −14.97] | [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c) / [602e20c](https://github.com/thomasklemm/lowrail/commit/602e20c5b22c912bb3ef050949271a68395a1bba); [JSON](https://github.com/thomasklemm/lowrail/blob/602e20c5b22c912bb3ef050949271a68395a1bba/docs/passes/production-aa01-reprice-results.json) |
-| 2026-10-21 | [React Starter Kit, `GET /dashboard` JSON](docs/passes/yjit-regression.md#post-fix-whole-request-checks-one-finite-cohort-per-mode) | 4.0.7 / 8.1.4 | Interpreter; Sealed opt-in: config binding; not promoted | **Total −10.16% [−10.22, −10.08]**; GC-excluded −10.16% [−10.25, −10.11] | [ed7cbbe](https://github.com/thomasklemm/lowrail/commit/ed7cbbe8f8ab6e9b7be24775ac76a94cebecd95e) / [01cfc45](https://github.com/thomasklemm/lowrail/commit/01cfc45f2355b99eafd01f9ce17a6a13ef062aa7); [JSON](docs/passes/yjit-regression.json) |
-| 2026-10-21 | [Fizzy, fixed six-GET vector](docs/block-link-specimen.md) | 4.0.7 / 8.1.4 | Interpreter; Bench-only block-link; N=10, fixed init-slot floors; not production admission; cold RED | **Total +0.40% [+0.39, +0.43]**; GC-excluded +0.40% [+0.38, +0.42] | [da5fe91](https://github.com/thomasklemm/lowrail/commit/da5fe91e2f04a27acef1f7245efa7f39a7332577) / [8385e0c](https://github.com/thomasklemm/lowrail/commit/8385e0cf5d951e378a690e55707e431eef049b69); [JSON](docs/fizzy-link-ir-n10.json) |
-| 2026-10-21 | [Fizzy (bet F), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.md#slot-3-result-accepted-scoped-interpreter-price-no-retry) | 4.0.7 / 8.1.4 | Interpreter; Guarded DirectSite call-site query programs; branch prototype, bench-only, one route, not on main, not admission | **Total −5.49% [−5.58, −5.42]**; GC-excluded −5.50% [−5.55, −5.45] | [87c3c19](https://github.com/thomasklemm/lowrail/commit/87c3c1974c424eabef5178f518641d013dd601b3) / [f2e2e35](https://github.com/thomasklemm/lowrail/commit/f2e2e35b4d6372e8d67d285f329f0c93823ba259); runtime [addf55e](https://github.com/thomasklemm/lowrail/commit/addf55e00b080d2627503b7f10a74bbe68e17ed1); [JSON](https://github.com/thomasklemm/lowrail/blob/f2e2e35b4d6372e8d67d285f329f0c93823ba259/docs/ar-callsite.json) |
-| 2026-10-22 | [Lobsters (bet M), `GET /`](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22) | 4.0.7 / 8.1.4 | Interpreter; Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission | **Total −5.18% [−5.20, −5.13]**; GC-excluded −5.38% [−5.41, −5.33] | [e84cf55](https://github.com/thomasklemm/lowrail/commit/e84cf55116600d676172a5531e78b6d08d28926c) / [94f3f32](https://github.com/thomasklemm/lowrail/commit/94f3f321c8c73a3814f3828bb299f26ba31e2ab0); runtime [42d3e5a](https://github.com/thomasklemm/lowrail/commit/42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0); [JSON](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform-results.json) |
-| 2026-10-22 | [Lobsters (bet M), `GET /s/enr7ye`](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform.md#lobsters-m-accepted-scoped-interpreter-price-2026-10-22) | 4.0.7 / 8.1.4 | Interpreter; Cache-read copy plan; branch prototype, bench-only, unchanged app ([ruby-bench 351a39b workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716)), not on main, not production admission | **Total −1.64% [−1.67, −1.59]**; GC-excluded −1.65% [−1.67, −1.60] | [e84cf55](https://github.com/thomasklemm/lowrail/commit/e84cf55116600d676172a5531e78b6d08d28926c) / [94f3f32](https://github.com/thomasklemm/lowrail/commit/94f3f321c8c73a3814f3828bb299f26ba31e2ab0); runtime [42d3e5a](https://github.com/thomasklemm/lowrail/commit/42d3e5ade83922afc1ed39c632cc3c8ecee0dcd0); [JSON](https://github.com/thomasklemm/lowrail/blob/94f3f321c8c73a3814f3828bb299f26ba31e2ab0/docs/screen-platform-results.json) |
-<!-- current-results:end -->
-
-Displayed values are rounded; exact values are in the linked JSON exports.
-
-**Lobsters scope:** both endpoints' total and GC-excluded A/A intervals are
-wholly within ±0.1%. This is the unchanged
-[ruby-bench `351a39b` workload](https://github.com/ruby/ruby-bench/commit/351a39b77e6c06f4f4fa03148639b10a6bb0c716),
-with a fixed clock, warm FileStore and pool reaping deferred outside the
-instrumented synchronous request price; not advancing-time or asynchronous
-maintenance performance.
-
-**Blog A/A rule change, 2026-10-21:** set prospectively before counting, both
-total and GC-excluded nominal 95% intervals must lie wholly within **±0.1%**;
-zero containment is no longer required
-([preregistration](https://github.com/thomasklemm/lowrail/blob/b059fc9fbcdbc4cff6a7bc523defb01e7783385c/docs/decisions-prototype.md#token-allocation-fix-and-one-new-rule-blog-cohort-preregistered-2026-10-21)).
-
-Bet F's per-metric A/A gates both pass within ±0.1%. The linked branch JSON
-documents a cosmetic `project_aa` field overwrite; the table uses the per-metric
-records, not that field. Accepted off/off rejections remain: **login rate-limit
-cache `expires_at`** and **SolidCache `created_at`**. This is not a whole-DB
-certificate or admission.
-
-**Blog history:** **−15.23%** at
-[`553e7aa`](https://github.com/thomasklemm/lowrail/commit/553e7aafa88754fd32359e5e11ba0cc5bfcd6f65),
-published in
-[`47f8e7b`](https://github.com/thomasklemm/lowrail/commit/47f8e7bc2f6084181369d82846645a19c3a31f16),
-was measured on defective source only, before the dispatch fixes. The
-[`62f8a6b` cohort](docs/passes/production-dispatch-reprice.md) remains rejected
-under its old zero-containment/±0.5% A/A rule
-([`673b1cc`](https://github.com/thomasklemm/lowrail/commit/673b1cc3cbbb341a6956e027e54bc2a18049bde0));
-it was not rescored or pooled into the new cohort. The earlier **−15.49%**
-is historical, valid only at
-[`ae025b0`](https://github.com/thomasklemm/lowrail/commit/ae025b0d9f456d9f9bef55e9e131bc25178e83cb),
-not the corrected source. [Protocol and historical records](docs/bench.md#current-accepted-request-results).
-
-**Not request prices:** production YJIT method stage 1 is rejected
-([retained method and reaper-driven late-entry diagnosis](docs/passes/production-yjit-method.md));
-frozen props is an accepted isolated micro only, with integration deferred
-([scope](docs/passes/props-native.md#accepted-combined-interpreter-micro-integration-deferred)).
-
-Fizzy's block-link N=10 warm bench price above is an **instruction INCREASE
-(Lowrail slower here)** under fixed init-slot floors, not production
-admission or cold-start performance; **cold still RED**.
-The [first N=50 cohort remains INVALID (heap growth)](https://github.com/thomasklemm/lowrail/commit/7c6cd19dbe77605ab7066e3234001b4358519e51),
-without a credited price or direction claim ([scope and evidence](docs/block-link-specimen.md)).
-
-#### Full-request throughput (real Puma)
-
-<!-- throughput-results:start -->
-**2026-10-21 · [Blog (bet A), `GET /articles/1`](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.md#confirmatory-result-throughput-gate-passes-p99-is-higher) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
-
-**Sealed opt-in: production form/token/collection; one route, one orb, exploration harness on a branch; not whole-app, capacity or production-admission evidence.** Measured on [487bec5](https://github.com/thomasklemm/lowrail/commit/487bec5065e7d9bec5d1b2df48831eb926e457cb); does **not** include [b059fc9](https://github.com/thomasklemm/lowrail/commit/b059fc9fbcdbc4cff6a7bc523defb01e7783385c).
-Puma 4 workers × 1 thread, c16, 5 s warmup / 20 s load, 20 rotated off-A/on/off-B rounds.
-Protocol [44a33c4](https://github.com/thomasklemm/lowrail/commit/44a33c4967d27db5c91e8954c7736fd97d3e9da9); published [51801ed](https://github.com/thomasklemm/lowrail/commit/51801edc3aab276da3538763257d7d12921aa37f); [exact JSON](https://github.com/thomasklemm/lowrail/blob/51801edc3aab276da3538763257d7d12921aa37f/docs/native-bench.json).
-
-**RPS A/A +0.37% [−1.24, +2.18].** The preregistered rule passes: A/A contains zero and the on/off RPS lower bound exceeds the A/A upper bound.
-This does not establish ±2% resolution or a latency gate.
-
-| Metric | Paired on/off Δ [95% interval] | off-A | on | off-B |
-|---|---|---:|---:|---:|
-| **RPS** | **+10.46% [+8.11, +12.81]** | 1613.8 | 1782.7 | 1611.2 |
-| **p50, ms** | **−8.67% [−11.04, −6.17]** | 9.2 | 8.4 | 9.1 |
-| **p90, ms** | **−12.90% [−16.62, −9.10]** | 15.8 | 14.0 | 15.8 |
-| **p99, ms** | **+12.73% [+1.13, +24.78]** | 26.0 | 29.9 | 26.0 |
-| **GC collections / 1,000 requests** | — | 18.7 | 24.0 | 18.9 |
-| **Allocations / request** | — | 2679 | 2333 | 2679 |
-
-**Not uniformly faster: p99 increases despite lower p50/p90 and higher RPS. GC collections increase despite fewer allocations; the cause is not established.**
-Arm values are medians of windows; paired deltas are means of within-round ratios, not ratios of those medians. GC/allocations are load-bracketing four-process diagnostics including metrics/background work, not exclusive request counters.
-
-**2026-10-22 · [Fizzy (bet Y), `GET /buckets`](https://github.com/thomasklemm/lowrail/blob/dbe678a268828fda9ba1b324efc0648e2cbe3b4b/docs/jit-guards.md#single-puma-cohort-accepted-scoped-throughput-result) · Ruby / Rails 4.0.7 / 8.1.4 · Stock Ruby YJIT.**
-
-**Guarded DirectSite with JIT-friendly guards; branch prototype, bench-only, one route, not on main, not production admission.** Measured on [796fa58](https://github.com/thomasklemm/lowrail/commit/796fa5893b4e117168340c229908f89b86fdaf41); harness [6510cd2](https://github.com/thomasklemm/lowrail/commit/6510cd2f2cd4384fcf648c638f5f720d00c8d9c8); published [dbe678a](https://github.com/thomasklemm/lowrail/commit/dbe678a268828fda9ba1b324efc0648e2cbe3b4b); [exact JSON](https://github.com/thomasklemm/lowrail/blob/dbe678a268828fda9ba1b324efc0648e2cbe3b4b/docs/jit-guards.json).
-
-| RPS Δ vs no Lowrail [95% interval] | RPS A/A [95% interval] |
-|---|---|
-| **+7.83% [+6.13, +9.84]** | −0.44% [−1.63, +0.80] |
-
-The preregistered throughput rule passes: A/A contains zero and the on/off RPS lower bound exceeds the A/A upper bound.
-Median-window p99: **265.5 → 246.5 ms** (off-A → on), a window statistic only, **not a tail-latency claim** or a pooled histogram.
-This compares the new DirectSite prototype with Lowrail off, not old versus new guards; no whole-app, capacity or admission claim.
-<!-- throughput-results:end -->
-
-To update: publish the accepted export first, edit only the metadata/source
-paths in [docs/results.json](docs/results.json), then run
-`python3 docs/render-results.py` (`--check` detects drift). Numbers are read
-from the original exports, never copied into the index. Pinned exports use
-an explicit `source_commit` matching the full publication SHA; fetch bet F's
-branch with `git fetch origin thomasklemm/ar-callsite-compile` and bet A's with
-`git fetch origin thomasklemm/native-yjit-bench` before rendering.
-The new Lobsters and Fizzy guard records additionally require
-`git fetch origin thomasklemm/screen-platform thomasklemm/jit-guards`.
-They are read from that commit, never substituted from the main worktree.
-Refresh the short
-[status](docs/STATUS.md#at-a-glance-2026-10-21) and [benchmark summary](docs/bench.md#current-accepted-request-results)
-when scope or acceptance changes; retain superseded records as historical.
-
-#### Supported and unsupported today
-
-- **Default:** lowers nothing; original Rails remains in control. The
-  [corpus compatibility report](docs/compat.md) distinguishes identical
-  outcomes/SQL, baseline errors, bounded subsets, safe refusals and actual hits.
-- **Opt-in:** sealed production units require the [separate contract](docs/sealed.md)
-  and exact passive admission. The two sealed production rows do not imply arbitrary
-  endpoint coverage or config promotion. A separate
-  [verification-only test certificate](docs/test-certificate.md) exercises
-  naturally ready Article/Comment and passive token/collection units,
-  including true eager-load coverage; it is not production admission.
-  Link/form remain refused.
-- **Refused or quarantined:** the old source link/route passes remain
-  quarantined, including old mixed artifacts; cached-fact passes are
-  sealed-only or quarantined, not ordinary guarded opt-ins. Preload and sealed
-  link builders now refuse **before emission**, even with `--sealed`;
-  template delivery remains quarantined. Old artifacts containing preload
-  plans, sealed link delivery or lowered templates still refuse as a whole:
-  their on-only framework ancestry is app-observable, even when sealed
-  ([boundary](docs/decisions-prototype.md#ancestry-changing-delivery-refuses-whole-artifacts-2026-10-22)).
-  The priced three-unit form/token/collection artifact is unaffected.
-  Unsupported shapes, stale or mode-mismatched artifacts, and the Bundlebun
-  boundary stay original
-  ([pass ledger](docs/decisions-prototype.md#passes), [loaders](docs/loaders.md)).
-
-#### Also on main (2026-10-22)
-
-- **Sealed mutation tripwire** ([ce47c62](https://github.com/thomasklemm/lowrail/commit/ce47c620cfe85dbc939189e351e051db09e8c484)):
-  certified method/ancestor changes retire admitted units. This is a backstop,
-  not enforcement of the whole [sealed contract](docs/sealed.md#production-mutation-tripwire-not-enforcement).
-- **Advisory types contracts** ([07829bf](https://github.com/thomasklemm/lowrail/commit/07829bfa6dc170ae8100cc7b04a2e0ea98f985fa)):
-  +442 static slots and +843 observed argument slots across the fixed six-app
-  ledger; sampled types are not proofs or runtime specialization
-  ([evidence and limits](docs/types-contracts.md)).
-- **Plain sealed blog build** ([6fb2f14](https://github.com/thomasklemm/lowrail/commit/6fb2f149cd9ad81522694799eb188139e9e75459)):
-  `lowrail build APP --sealed --env production --jit interpreter` now delivers
-  **≈377 fewer objects/request on blog show/show2; index is neutral**, with
-  no denylist or manual isolated-artifact selection. The unsafe preload/link
-  builders ledger-refuse before emission; old combined artifacts still refuse
-  as a whole. Allocation evidence only, not a new Ir, timing or throughput
-  claim; form stays narrow and preload/link/template delivery stays quarantined
-  ([current scope and history](docs/decisions-prototype.md#plain-sealed-blog-build-and-historical-isolation-gap-2026-10-22)).
-
-**Breadth is not savings:** Fizzy, Campfire, Writebook and CASA retain exact
-own-suite off/on outcomes but **no certified optimized suite hits**. Fizzy's
-suite has a compiler-certificate refusal (production queries separately fail
-query certification); Campfire/Writebook have Bootsnap `KeyError`, and CASA
-has unsupported RSpec certificate discovery at an older retained pin. Parity
-includes Fizzy's baseline errors and CASA's skips. **No savings claim for
-these plain sealed builds outside the blog**
-([pins and limits](docs/decisions-prototype.md#own-suite-breadth-is-not-optimized-coverage)).
-
-### How it works
-
-```text
-┌──────────────────────┐
-│   Your Rails app     │  source + boot
-└──────────┬───────────┘
-           ▼
-┌──────────────────────┐   boot facts: schema · routes · config ·
-│   lowrail facts      │──▶ method table · templates · loaders
-└──────────┬───────────┘
-           ▼
-┌──────────────────────┐   .lowrail/ manifest + lowered ISeqs,
-│   lowrail build      │──▶ each carrying the guards it assumes
-└──────────┬───────────┘
-           ▼
-┌──────────────────────┐   at boot: certify guards
-│ RUBYOPT=             │──▶   ├─ exact  ─▶ install lowered code
-│  -rlowrail/setup     │      └─ failed ─▶ keep original Rails
-└──────────┬───────────┘                   method (refusal visible)
-           ▼
-┌──────────────────────┐   your own suite, Lowrail off vs on:
-│   lowrail verify     │──▶ identical per-test outcomes + ordered SQL
-└──────────────────────┘
-```
-
-The Rust CLI parses with [Prism](https://github.com/ruby/prism) and indexes
-with [Rubydex](https://github.com/Shopify/rubydex). The Ruby gem in `gem/` is
-the runtime that boots the app, certifies facts and installs lowered code.
-
-### Quick start
-
-Requirements: a Rust toolchain, Ruby 4.0.7 (the prototype's pin,
-`mise exec ruby@4.0.7`), and a
-Rails 8.1 app whose test suite passes.
-
-```sh
-git clone https://github.com/thomasklemm/lowrail && cd lowrail
-cargo build --release                       # CLI at target/release/lowrail
-(cd gem && mise exec -- rake compile)       # optional native predicate
-
-lowrail doctor path/to/app                  # boot, JIT mode, tracing checks
-lowrail facts  path/to/app                  # what Lowrail learns at boot
-lowrail build  path/to/app                  # writes path/to/app/.lowrail/
-lowrail verify path/to/app                  # your suite off vs on
-lowrail explain path/to/app                 # what was lowered, refused and why
-lowrail types --rbs path/to/app             # RBS with per-slot evidence
-```
-
-Run your app with the runtime loaded, without Gemfile changes:
-
-```sh
-RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails test
-```
-
-`LOWRAIL=0` disables it, `LOWRAIL_DEBUG=1` prints refusals. A missing, stale
-or incompatible build is a silent no-op. More options are in the
-[reference](#reference) below.
-
-### Status (2026-10-21)
-
-- **Correctness machinery works.** `lowrail verify` compares per-test outcomes
-  and ordered SQL with Lowrail off and on. The pinned Rails 8.1.4 framework
-  suites are a standing gate ([rails-suite.md](docs/rails-suite.md)). Real apps
-  including Fizzy, Writebook, CASA, CodeTriage, Wikino, RubyToolbox and Fat
-  Free CRM keep identical outcomes ([compat.md](docs/compat.md)). Green
-  comparisons are not a universal support claim.
-- **The default build lowers nothing.** Every guarded specialization tried so
-  far was either unsafe under mid-request mutation or its guard cost more than
-  it saved ([decisions-prototype](docs/decisions-prototype.md)).
-- **The sealed tier has scoped interpreter results**, shown in
-  [Historical results](#historical-results-2026-10-21). Passive production form,
-  token and collection admission is implemented; the separate test certificate
-  remains AR-only ([production](docs/passes/sealed-production.md),
-  [test coverage](docs/test-certificate.md)).
-- **No whole-request YJIT gain is established.** Retained cohorts/methods
-  fail the strict compilation or A/A gates, including Lowrail-off arms
-  ([bench.md](docs/bench.md)).
-- **Prism 2 is adopted** in Ruby tooling and Rust, with explicit target
-  grammar and refusal for unknown versions; app bundles are not forced to
-  upgrade ([implementation and evidence](docs/prism-2.md)).
-- **Types and MCP work.** `lowrail types`, `lowrail explain` and
-  `lowrail mcp` serve boot facts, per-slot types (proven, static, observed or
-  unknown), refusal reasons and recorded hits ([types.md](docs/types.md)).
-
-Every pursued, parked and rejected idea is in
-[docs/decisions-prototype.md](docs/decisions-prototype.md). Dated evidence is in
-[docs/STATUS.md](docs/STATUS.md).
-
-### Direction
-
-Two tiers, so that every app keeps running and apps that opt in can go
-further:
-
-| Tier | Who | Promise | State |
-|---|---|---|---|
-| **guarded** (default) | any Rails app, any gem | identical test outcomes; specializations guarded and refused when not exact | works; currently lowers nothing by default |
-| **sealed** (opt-in) | apps that accept a contract: no code, subscriber, config or route mutation after boot, among others | compile endpoints ahead of time without per-call checks; `lowrail seal-check` runs the app's suite and lists every violation with `file:line` and the code change that fixes it | opt-in research: measured interpreter wins; admission must be passive ([sealed.md](docs/sealed.md), [decision](docs/decisions-prototype.md#architecture)) |
-
-Apps that do not meet the sealed contract still run in the guarded tier. The
-tooling explains why and what to change.
-
-### Target matrix
-
-| Axis | Primary | Secondary / diagnostic |
-|---|---|---|
-| Rails | 8.1.4 | 8.2 alpha (Campfire's pin) |
-| Ruby (minimum 4.0) | 4.0.7 (the prototype's pin) | 4.1 preview ([separate compatibility matrix](docs/ruby-4.1.md)) |
-| Execution | interpreter instruction counts (Callgrind, fixed heap, A/A controls) | YJIT under a strict JIT-flat gate; ZJIT being added, diagnostic only |
-
-How to read and reproduce measurements: [docs/bench.md](docs/bench.md).
-
-### Reference
-
-All commands, from a checkout:
-
-```sh
-# 1. Toolchain: a Rust toolchain and the Ruby pinned in mise.toml
-cargo build --release            # CLI at target/release/lowrail
-
-# 2. Boot facts and a build (writes APP/.lowrail/)
-lowrail facts path/to/app
-lowrail build path/to/app [--env test|production]   # default selection
-lowrail build path/to/app --passes default,+props,+endpoint
-
-# 3. Prove it: your suite off vs on, per-test outcomes + ordered SQL
-lowrail verify path/to/app     # prints its test seed to stderr; SEED=… to fix it
-
-# 4. Types and tooling
-lowrail explain path/to/app    # current selection, guards, refusals and recorded stats
-lowrail observe path/to/app    # record observed types from a test run
-lowrail types --rbs path/to/app # standalone RBS to stdout, with per-slot evidence
-lowrail types path/to/app --rbs sig/lowrail
-lowrail mcp path/to/app        # read-only MCP server over stdio
-
-# 5. Measurements (see docs/bench.md before trusting a number)
-lowrail bench path/to/app --pass NAME
-```
-
-The runtime loads without app or Gemfile changes:
-
-```sh
-RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails test
-```
-
-Alternatively, add `require "lowrail/setup"` in `config/boot.rb`, before or
-after Bootsnap. `LOWRAIL=0` disables it. A missing, stale or incompatible build
-is a silent no-op, and an artifact containing quarantined passes is refused
-with `Lowrail.refusal_reason`. In development it is off unless `LOWRAIL=1`.
-`LOWRAIL_DEBUG=1` prints refusals.
-
-Sealed link's optional native holder prototype is built explicitly with
-`rake compile` from `gem/`, under each chosen Ruby (headers and C compiler
-required). It is loaded equally on/off, never compiled during app boot, and
-never loads objspace. A missing/unloadable build keeps the original path with
-a visible refusal. [Contract and bounded validation](docs/sealed-verification.md#optional-native-holder-prototype-link-coverage-recovered).
-
-`LOWRAIL_ROOT` names the real app root (default: the working directory).
-`LOWRAIL_DIR` optionally selects a separate artifact directory containing
-`manifest.json` (default: `LOWRAIL_ROOT/.lowrail`). Benchmark snapshots use
-this separation; relocation/source certificates still check the real app root.
-
-Build for the deployment's **startup JIT mode**:
-
-```sh
-lowrail build path/to/app --env production --jit yjit
-RUBY_YJIT_ENABLE=1 RUBYOPT="-I/path/to/lowrail/gem/lib -rlowrail/setup" bin/rails server
-```
-
-`--jit interpreter|yjit|zjit` configures certification, not the deployed app.
-Without it, the build observes the app's mode (legacy `LOWRAIL_BUILD_JIT=0/1`
-still works). Each artifact records `certification_jit`; a different actual
-mode at admission, or missing mode metadata, refuses the whole artifact before
-installers run. Rebuild old artifacts. For YJIT, start the process with
-`RUBY_YJIT_ENABLE=1` or `--yjit`, not only Rails' late `config.yjit` switch.
-Late changes at `initialize!` completion are reported as mode drift in
-`LOWRAIL_DEBUG`, stats, verify and bench; guards remain fail-closed, with no
-uninstall or mode forcing. Doctor compares startup/after-boot modes separately.
-
-`--passes` must start with `default` or `all-opt-in`, then applies
-`+name`/`-name` in order. Names are the stable
-`area/name` identifiers in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-Short aliases are `memo`, `preload_plans`, `ar_instantiate`, `ar_plans`,
-`digest_memo`, `inertia_config`, `props` and `endpoint`, but only `props` and
-`endpoint` remain eligible for guarded selection. The others refuse even in
-`all-opt-in`; old mixed artifacts refuse as a whole. Sealed research builds
-use `--sealed --env production` and require explicit production acceptance
-of the [sealed contract](docs/sealed.md). Production artifacts refuse in test;
-the separate opt-in [verification-only AR certificate](docs/test-certificate.md)
-does not bypass that boundary.
-File formats are documented in [docs/FORMATS.md](docs/FORMATS.md).
-
-`LOWRAIL_VERIFY_LOADS=1 lowrail verify APP` also compares non-autoloading
-constant censuses, Zeitwerk-loaded paths and executed Active Support load
-hooks at the first test and after the suite, including load/hook order.
-Reproducible differences fail verification and automatically probe each pass;
-off/off and on/on variation is reported separately as advisory noise.
-This observer is opt-in because its snapshots and boot hooks have a cost;
-the corpus compatibility checks enable it. Snapshot time is in the report.
-
-### Complementary optimizations
-
-Lowrail only applies changes it can guard exactly. These stay the app's own
-decision, and Lowrail works next to them:
-
-- **YJIT** (`RUBY_YJIT_ENABLE=1`): recommended in production. Lowrail measures
-  under it too, but its primary gate is interpreter instruction counts,
-  because whole-request YJIT windows do not yet pass our compiler-state gate.
-- **Bootsnap**: works in any load order. Bootsnap caches the original
-  bytecode, and Lowrail serves its lowered bytecode.
-- **Frozen string literals** (`# frozen_string_literal: true` or
-  [Freezolite](https://github.com/ruby-next/freezolite)): fewer allocations,
-  but mutating a literal then raises. Enable it only after your suite passes
-  with it. Lowrail compiles each file with the same options the app's loaders
-  use ([loaders.md](docs/loaders.md)).
-
-## Docs
-
-| Read | For |
-|---|---|
-| [upstream/method.md](docs/upstream/method.md) | how upstream candidates are found, built and measured |
-| [upstream/census.md](docs/upstream/census.md) | `script/census`: run, rank, compare, add an app |
-| [upstream/combined-effect.md](docs/upstream/combined-effect.md) | merged Rails PRs measured together |
-| [upstream/contributions.md](docs/upstream/contributions.md) | upstream PRs, their results and caveats |
-| [upstream/explainers.md](docs/upstream/explainers.md) | German explainer per open ruby/ruby and rails/rails PR, and where a reply is owed |
-| [PLAN.md](docs/PLAN.md) | goals, contract, why this design |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | pipeline, pass contract, registry |
-| [DECISIONS.md](docs/DECISIONS.md) · [decisions-archive.md](docs/decisions-archive.md) · [decisions-prototype.md](docs/decisions-prototype.md) | current rules and decisions; superseded wording and history; the parked prototype's decisions and stacking backlog |
-| [STATUS.md](docs/STATUS.md) | dated evidence log |
-| [compat.md](docs/compat.md) | pinned real apps, gem breadth, baseline failures, load-order findings and verify results |
-| [bench.md](docs/bench.md) | measurement protocol and results |
-| [types.md](docs/types.md) | typed facts, MCP and RBS |
-| [docs/passes/](docs/passes/) | one study per pass or idea |
-| [rails-suite.md](docs/rails-suite.md), [ar-equivalence.md](docs/ar-equivalence.md) | framework-suite and Active Record gates |
-| [development/workflow.md](docs/development/workflow.md) | bet counterexamples, exact-head gates, review and publication rules |
+## Measuring speed
+
+Instruction counts under Callgrind with a fixed heap and passing A/A controls are the primary evidence; YJIT and ZJIT
+numbers count only when every window passes the JIT-flat gate. The protocol is [docs/bench.md](docs/bench.md); build
+its pinned Valgrind once with `script/bench-valgrind PREFIX`.
+
+* **Per call**, for a PR body: `script/upstream-bench --base TREE --candidate TREE … SCRIPT`
+  ([usage](docs/upstream/body-numbers.md)) measures base twice in every cell and prints no change inside its A/A.
+* **Per request**: `bench/request_pairs.rb APP OUTDIR GET:/path` with `BENCH_COUNTER=callgrind BENCH_HEAP_MODE=fixed`
+  runs rotated off/on rounds in warm processes; `BENCH_VARIANT_APP` names the patched copy
+  ([example](bench/upstream/hotline_candidates/README.md)).
+* **`lowrail bench APP --pass NAME`** is the paused Rust CLI's wrapper around that driver. It prices lowering passes
+  and refuses a build with no lowered units, so upstream work calls the driver directly.
+
+## Where the records live
+
+| Record | Where |
+| --- | --- |
+| Rules in force and why | [docs/DECISIONS.md](docs/DECISIONS.md); history in [decisions-archive.md](docs/decisions-archive.md) |
+| Upstream PRs, results, caveats | [docs/upstream/contributions.md](docs/upstream/contributions.md) |
+| Prepared PRs, review passes, state | [bench/upstream/pr-queue/items/](bench/upstream/pr-queue/items) (`script/pr-queue status`) |
+| Census rounds, bets, leads | [docs/upstream/](docs/upstream/) (index of bets in [DECISIONS](docs/DECISIONS.md#bets)) |
+| Raw data behind body numbers | `bench/upstream/<topic>/`, named in each queue item's `evidence:` |
+| Explainers per open PR | [docs/upstream/explainers.md](docs/upstream/explainers.md) |
+| lowrail-profile design and release | [docs/profile.md](docs/profile.md), [profile-release-plan.md](docs/profile-release-plan.md) |
+
+## Paused: the lowering engine
+
+The Rust core in `src/` (Prism via `ruby-prism`, Rubydex) and the lowering runtime in `gem/` (`lowrail.gemspec`,
+`lowrail/setup`) boot an app, learn what is fixed after boot, and install guarded, specialized Ruby for what they can
+prove equivalent. The default build lowers nothing, and no whole-request YJIT gain was established, so Lowrail turned
+to upstream fixes on 2026-11-02, and the engine has been paused since 2026-11-27: it stays in the tree unchanged and
+is not developed. Its plan and contract are in [docs/PLAN.md](docs/PLAN.md), its results, commands and reference in
+[docs/prototype.md](docs/prototype.md), its decisions in [decisions-prototype.md](docs/decisions-prototype.md).
 
 ## Acknowledgements
 

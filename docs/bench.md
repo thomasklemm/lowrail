@@ -13,7 +13,7 @@ precedes the finite ±0.1% A/A instruction protocol; no app patches are needed.
 
 ## Current accepted request results
 
-The [README table](../README.md#historical-results-2026-10-21) is the
+The [prototype table](prototype.md#historical-results-2026-10-21) is the
 prototype's results index, historical since 2026-11-03 (Ruby 4.0.7, not re-measured): rounded deltas/intervals (exact values in linked JSON), dates,
 endpoints, Ruby/Rails versions,
 mode, tier, measured commits and publication links. Its numbers render
@@ -56,7 +56,7 @@ across apps and the AR-only verification test certificate are separate
 [compatibility](compat.md) / [test-coverage](test-certificate.md) evidence,
 not more performance measurements.
 
-Separately, the [real-Puma throughput result](../README.md#full-request-throughput-real-puma)
+Separately, the [real-Puma throughput result](prototype.md#full-request-throughput-real-puma)
 passes its prospectively declared RPS rule on stock Ruby YJIT, but **p99 and
 GC collections increase**. It covers one blog route on one orb, using a
 branch harness and older measured main source, not whole-app performance,

@@ -18,7 +18,7 @@ behind `to_json`, about 4% of it. One exact candidate came out of it:
 | --- | --- | --- | --- | --- | --- | --- |
 | S1 | [`thomasklemm/json-escape-without-regexp`](https://github.com/thomasklemm/rails/tree/thomasklemm/json-escape-without-regexp) | [`e13f3f6d6d`](https://github.com/thomasklemm/rails/commit/e13f3f6d6d4b6c81db663c7c903e6b779e1a8824) | Before Ruby 4.1, escape JSON by searching for each character with `include?` instead of one `gsub!` over a Regexp union | plain text −2.7% to −6.6% / −4.2% to −8.9%; text with `<>&` −9% to −14% / −10% to −17% | within A/A, except railsbench YJIT −0.36% (A/A −0.10%) | 30 / 34 workloads −1 or more (A/A 16 / 11), median −1.0 / −1.5 |
 
-Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#extra-adversarial-astra-round-for-critical-changes-2026-11-03),
+Not opened. Escaping is a critical change under [DECISIONS](../DECISIONS.md#required-passes),
 so it needs Sol and the adversarial Astra round before it can enter the queue. Draft in the short form at the end.
 
 ## Where the time goes

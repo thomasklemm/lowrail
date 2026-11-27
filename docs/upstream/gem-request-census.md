@@ -209,7 +209,7 @@ Checked:
 **Reviews.** The Thermos pair (correctness and maintainability), run with this thread's model rather than GPT-6.1
 Sol, approves. The maintainability review rates it
 **L1**: string prefix stripping where a Pathname method was, clear at once, no comment or test needed. The Sol
-pair that [DECISIONS](../DECISIONS.md#primary-review) requires before the queue has not run.
+pair that [DECISIONS](../DECISIONS.md#required-passes) requires before the queue has not run.
 
 **Interlocks.** None with Rails, Ruby or ZJIT. Ruby master's Pathname is already about twice as fast as 4.0's
 (47 M vs 99 M Ir here). The change still removes 80% there.
