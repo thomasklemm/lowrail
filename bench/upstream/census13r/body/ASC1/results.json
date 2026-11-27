@@ -1,0 +1,478 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/census13r/asc1_body.rb",
+  "at": "2026-11-27T20:18:06Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/rails-main",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/rails-asc1",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "23fe1f4b6bc9847fedc432d8348f8968f979d391",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp belongs_to load": {
+      "base": 93.999,
+      "base1": 93.999,
+      "base2": 93.999,
+      "candidate": 93.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp has_one load": {
+      "base": 94.0,
+      "base1": 94.0,
+      "base2": 94.0,
+      "candidate": 94.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp has_many load": {
+      "base": 114.0,
+      "base1": 114.0,
+      "base2": 114.0,
+      "candidate": 114.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit belongs_to load": {
+      "base": 95.999,
+      "base1": 95.999,
+      "base2": 95.999,
+      "candidate": 95.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit has_one load": {
+      "base": 96.0,
+      "base1": 96.0,
+      "base2": 96.0,
+      "candidate": 96.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit has_many load": {
+      "base": 116.0,
+      "base1": 116.0,
+      "base2": 116.0,
+      "candidate": 116.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp belongs_to load": {
+      "base": 512155.36625,
+      "base1": 512312.7015,
+      "base2": 511998.031,
+      "candidate": 496346.2465,
+      "change": -0.0308678201807282,
+      "aa": 0.0006144043794835615,
+      "claim": true
+    },
+    "interp has_one load": {
+      "base": 546596.389,
+      "base1": 546588.6345,
+      "base2": 546604.1435,
+      "candidate": 530339.371,
+      "change": -0.02974227112941996,
+      "aa": 0.00002837376958954227,
+      "claim": true
+    },
+    "interp has_many load": {
+      "base": 666752.446,
+      "base1": 666595.291,
+      "base2": 666909.601,
+      "candidate": 650904.5045,
+      "change": -0.0237688539353329,
+      "aa": 0.0004714043448744332,
+      "claim": true
+    },
+    "yjit belongs_to load": {
+      "base": 221766.49025,
+      "base1": 218367.199,
+      "base2": 225165.7815,
+      "candidate": 219189.26,
+      "change": -0.011621369157687633,
+      "aa": 0.030656491394781493,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n2000 compiled_block_count +32",
+          "base2 n2000 compiled_block_count +6"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1101,
+                1101
+              ],
+              "compiled_block_count": [
+                15786,
+                15786
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1122,
+                1122
+              ],
+              "compiled_block_count": [
+                16219,
+                16251
+              ],
+              "invalidation_count": [
+                295,
+                295
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1121,
+                1121
+              ],
+              "compiled_block_count": [
+                16228,
+                16228
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1102,
+                1102
+              ],
+              "compiled_block_count": [
+                15831,
+                15831
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1103,
+                1103
+              ],
+              "compiled_block_count": [
+                15827,
+                15827
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1094,
+                1094
+              ],
+              "compiled_block_count": [
+                15656,
+                15662
+              ],
+              "invalidation_count": [
+                297,
+                297
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit has_one load": {
+      "base": 228518.4855,
+      "base1": 228591.379,
+      "base2": 228445.592,
+      "candidate": 224736.9175,
+      "change": -0.016548192990715416,
+      "aa": 0.0006379658944483162,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "candidate n2000 compiled_block_count +26"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1126,
+                1126
+              ],
+              "compiled_block_count": [
+                16407,
+                16407
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1110,
+                1110
+              ],
+              "compiled_block_count": [
+                16050,
+                16050
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1109,
+                1109
+              ],
+              "compiled_block_count": [
+                16045,
+                16045
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1109,
+                1109
+              ],
+              "compiled_block_count": [
+                16043,
+                16069
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1110,
+                1110
+              ],
+              "compiled_block_count": [
+                16045,
+                16045
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1111,
+                1111
+              ],
+              "compiled_block_count": [
+                16070,
+                16070
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit has_many load": {
+      "base": 277711.11675000004,
+      "base1": 277682.449,
+      "base2": 277739.7845,
+      "candidate": 255976.4825,
+      "change": -0.07826346494283809,
+      "aa": 0.00020645734557180447,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n2000 compiled_block_count +22",
+          "base2 n2000 compiled_block_count +24"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1116,
+                1116
+              ],
+              "compiled_block_count": [
+                16026,
+                16026
+              ],
+              "invalidation_count": [
+                293,
+                293
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1116,
+                1116
+              ],
+              "compiled_block_count": [
+                16043,
+                16065
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1115,
+                1115
+              ],
+              "compiled_block_count": [
+                16036,
+                16036
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1130,
+                1130
+              ],
+              "compiled_block_count": [
+                16402,
+                16402
+              ],
+              "invalidation_count": [
+                290,
+                290
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1115,
+                1115
+              ],
+              "compiled_block_count": [
+                16004,
+                16004
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1117,
+                1117
+              ],
+              "compiled_block_count": [
+                16033,
+                16057
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

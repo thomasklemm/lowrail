@@ -1,0 +1,3 @@
+objects belongs_to load	93.999
+objects has_one load	94.0
+objects has_many load	114.0

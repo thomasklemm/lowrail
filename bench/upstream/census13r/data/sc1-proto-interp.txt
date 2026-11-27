@@ -1,0 +1,13 @@
+# sc1-proto: Callgrind Ir per call, Ruby 4.0.10 interpreter, N=2000 minus N=0 (upstream-bench raw, run stopped before YJIT)
+ir-interp-1-Post_find_id_-base-n2000.callgrind 272011
+ir-interp-1-Post_find_id_-base2-n2000.callgrind 271887
+ir-interp-1-Post_find_id_-candidate-n2000.callgrind 256959
+ir-interp-2-Post_find_by_title_-base-n2000.callgrind 282553
+ir-interp-2-Post_find_by_title_-base2-n2000.callgrind 282358
+ir-interp-2-Post_find_by_title_-candidate-n2000.callgrind 267254
+ir-interp-3-belongs_to_load-base-n2000.callgrind 507404
+ir-interp-3-belongs_to_load-base2-n2000.callgrind 507113
+ir-interp-3-belongs_to_load-candidate-n2000.callgrind 492343
+ir-interp-4-has_many_load-base-n2000.callgrind 662613
+ir-interp-4-has_many_load-base2-n2000.callgrind 662311
+ir-interp-4-has_many_load-candidate-n2000.callgrind 647137

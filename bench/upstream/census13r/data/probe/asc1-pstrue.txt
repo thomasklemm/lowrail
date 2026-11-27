@@ -1,0 +1,110 @@
+unleased posts: [#<Post id: 1, author_id: 1, title: "t0", published: false>, #<Post id: 2, author_id: 1, title: "t1", published: true>, #<Post id: 3, author_id: 1, title: "t2", published: false>]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=2
+unleased profile: #<Profile id: 1, author_id: 1, bio: "bio">
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "profiles".* FROM "profiles" WHERE "profiles"."author_id" = ? LIMIT ? | db | [1, 1]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "profiles".* FROM "profiles" WHERE "profiles"."author_id" = ? LIMIT ? | db | [1, 1]
+  checkouts=4
+unleased comments: [#<Comment id: 1, commentable_type: "Author", commentable_id: 1, body: "c1">]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ? | db | [1, "Author"]
+  checkouts=2
+unleased tags: [#<Tag id: 1, post_id: 1, name: "x0">, #<Tag id: 2, post_id: 2, name: "x1">, #<Tag id: 3, post_id: 3, name: "x2">]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "tags".* FROM "tags" INNER JOIN "posts" ON "tags"."post_id" = "posts"."id" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=4
+unleased belongs_to: #<Author id: 1, name: "a", meta: {"k" => [1, 2]}>
+  SELECT "posts".* FROM "posts" ORDER BY "posts"."id" ASC LIMIT ? | db | [1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  checkouts=3
+unleased polymorphic: #<Post id: 1, author_id: 1, title: "t0", published: false>
+  SELECT "comments".* FROM "comments" ORDER BY "comments"."id" DESC LIMIT ? | db | [1]
+  SELECT "comments".* FROM "comments" WHERE "comments"."id" = ? LIMIT ? | db | [2, 1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT ? | db | [1, 1]
+  checkouts=3
+unleased async posts: [#<Post id: 1, author_id: 1, title: "t0", published: false>, #<Post id: 2, author_id: 1, title: "t1", published: true>, #<Post id: 3, author_id: 1, title: "t2", published: false>]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=2
+leased posts: [#<Post id: 1, author_id: 1, title: "t0", published: false>, #<Post id: 2, author_id: 1, title: "t1", published: true>, #<Post id: 3, author_id: 1, title: "t2", published: false>]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=0
+leased profile: #<Profile id: 1, author_id: 1, bio: "bio">
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "profiles".* FROM "profiles" WHERE "profiles"."author_id" = ? LIMIT ? | db | [1, 1]
+  checkouts=0
+leased comments: [#<Comment id: 1, commentable_type: "Author", commentable_id: 1, body: "c1">]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "comments".* FROM "comments" WHERE "comments"."commentable_id" = ? AND "comments"."commentable_type" = ? | db | [1, "Author"]
+  checkouts=0
+leased tags: [#<Tag id: 1, post_id: 1, name: "x0">, #<Tag id: 2, post_id: 2, name: "x1">, #<Tag id: 3, post_id: 3, name: "x2">]
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  SELECT "tags".* FROM "tags" INNER JOIN "posts" ON "tags"."post_id" = "posts"."id" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=0
+strict_loading: ActiveRecord::StrictLoadingViolationError: `Author` is marked for strict_loading. The Post association named `:posts` cannot be lazily loaded.
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [1, 1]
+  checkouts=0
+empty has_many: []
+  SELECT "authors".* FROM "authors" WHERE "authors"."id" = ? LIMIT ? | db | [2, 1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? | db | [2]
+  checkouts=0
+qc first: [2]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | db | [1, true]
+  checkouts=0
+qc again: [2]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | cached | [1, true]
+  checkouts=0
+qc other value: [1, 3]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | db | [1, false]
+  checkouts=0
+qc no binds: [[3]]
+  SELECT COUNT(*) FROM posts | db | []
+  checkouts=0
+qc no binds again: [[3]]
+  SELECT COUNT(*) FROM posts | cached | []
+  checkouts=0
+qc find: "t0"
+  SELECT "posts".* FROM "posts" ORDER BY "posts"."id" ASC LIMIT ? | db | [1]
+  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT ? | db | [1, 1]
+  checkouts=0
+qc evicted?: [2]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | db | [1, true]
+  checkouts=0
+qc json bind: ["a"]
+  SELECT "authors"."name" FROM "authors" WHERE "authors"."meta" = ? | db | ["{\"k\":[1,2]}"]
+  checkouts=0
+qc json bind again: ["a"]
+  SELECT "authors"."name" FROM "authors" WHERE "authors"."meta" = ? | cached | ["{\"k\":[1,2]}"]
+  checkouts=0
+qc string bind: [2]
+  SELECT "posts"."id" FROM "posts" WHERE "posts"."title" = ? | db | ["t1"]
+  checkouts=0
+qc string bind again: [2]
+  SELECT "posts"."id" FROM "posts" WHERE "posts"."title" = ? | cached | ["t1"]
+  checkouts=0
+qc find_by_sql raw binds: [3]
+  SELECT id FROM posts WHERE title = ? | db | ["t2"]
+  checkouts=0
+qc find_by_sql raw binds again: [3]
+  SELECT id FROM posts WHERE title = ? | cached | ["t2"]
+  checkouts=0
+qc async: 3
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? | db | [1]
+  checkouts=0
+qc write clears: [2]
+  UPDATE "posts" SET "title" = ? WHERE "posts"."id" = ? | db | ["z", 0]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | db | [1, true]
+  checkouts=0
+qc uncached: [2]
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ? AND "posts"."published" = ? | db | [1, true]
+  checkouts=0
+qc lock not cached: 3
+  SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = ?  | db | [1]
+  checkouts=0
+qc size: 1
+  checkouts=0
