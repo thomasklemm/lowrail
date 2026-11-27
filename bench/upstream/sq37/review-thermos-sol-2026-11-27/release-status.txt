@@ -1,0 +1,18 @@
++ r=.amp/in/orb-backup/sq37-review/rails
++ git -C .amp/in/orb-backup/sq37-review/rails fetch --quiet origin tag v8.1.4.1
++ git -C .amp/in/orb-backup/sq37-review/rails show v8.1.4.1:activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ sed -n '/def check_version/,/^      end/p'
+      def check_version # :nodoc:
+        if database_version < "3.23.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
+        end
+      end
++ git -C .amp/in/orb-backup/sq37-review/rails merge-base --is-ancestor f652cc1648b954d546cfafb8ec4436ff9ff513ca v8.1.4.1
++ echo FLOOR_BUMP_ANCESTOR_OF_LATEST_RELEASE_EXIT=1
+FLOOR_BUMP_ANCESTOR_OF_LATEST_RELEASE_EXIT=1
++ gh api repos/rails/rails/releases/latest --jq '{tag_name,published_at}'
+{"published_at":"2026-11-04T02:46:00Z","tag_name":"v8.1.4.1"}
++ gh api repos/rails/rails/branches/8-2-stable --jq '{name,sha:.commit.sha}'
+{"message":"Branch not found","documentation_url":"https://docs.github.com/rest/branches/branches#get-a-branch","status":"404"}gh: Branch not found (HTTP 404)
++ echo RELEASE_BRANCH_LOOKUP_EXIT=1
+RELEASE_BRANCH_LOOKUP_EXIT=1

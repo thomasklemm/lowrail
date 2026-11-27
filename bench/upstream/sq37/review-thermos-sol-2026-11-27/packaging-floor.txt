@@ -1,0 +1,43 @@
++ base64 -d
++ gh api 'repos/sparklemotion/sqlite3-ruby/contents/dependencies.yml?ref=v2.1.0' --jq .content
+sqlite3:
+  # checksum verified by first checking the published sha3(256) checksum against https://sqlite.org/download.html:
+  # 923f68143dcd9fc0c38778dee253fd6540a91f578173a04ca5adff885d8a8fbb
+  #
+  # $ sha3sum -a 256 ports/archives/sqlite-autoconf-3460100.tar.gz
+  # 923f68143dcd9fc0c38778dee253fd6540a91f578173a04ca5adff885d8a8fbb  ports/archives/sqlite-autoconf-3460100.tar.gz
+  #
+  # $ sha256sum ports/archives/sqlite-autoconf-3460100.tar.gz
+  # 67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071  ports/archives/sqlite-autoconf-3460100.tar.gz
+  version: "3.46.1"
+  files:
+    - url: "https://sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
+      sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
++ gh api 'repos/rails/rails/contents/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb?ref=088fc0cf61e4ba0c7987decafacc69adb3e22eec' --jq .content
++ base64 -d
++ sed -n 13,17p
+
+gem "sqlite3", ">= 2.1"
+require "sqlite3"
+
+# Suppress the warning that SQLite3 issues when open writable connections are carried across fork()
++ git -C .amp/in/orb-backup/sq37-review/rails cat-file commit 3e348f32bd
++ sed -n 1,18p
+tree 68ac8aae1e7cfde7aee4589c33afbe9968dae260
+parent 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+author Thomas Klemm <github@tklemm.eu> 1795777155 +0000
+committer Thomas Klemm <github@tklemm.eu> 1795777155 +0000
+gpgsig -----BEGIN SSH SIGNATURE-----
+ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnj59+AONTp7nKTKq9g73acun7O
+ bbrMVqT7PV17XNu14AAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5
+ AAAAQEKH2fsS+SzsG5M3WMXGLB3B/f4O0h6VNBTEI3Uv7v+koDZ47Le0pJDVe0fMO1N6EQ
+ 9XhNAwi+911vQaVy1A8Ag=
+ -----END SSH SIGNATURE-----
+
+Bump the minimum supported SQLite version to 3.37.0
+
+SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+The SQLite3 adapter has read it in `data_source_sql` since #52354
+(released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+`tables`, `views` and the schema cache.
+

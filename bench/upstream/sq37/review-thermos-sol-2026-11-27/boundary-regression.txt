@@ -1,0 +1,39 @@
++ root=/home/user/workspace/repo
++ cache=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions
++ testfile=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ cd /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord
++ env BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib ARCONN=sqlite3 PARALLEL_WORKERS=1 MT_CPU=1 mise exec ruby@4.0.9 -- bundle exec ruby -Itest /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb --name test_check_version_requires_sqlite_3_37 --seed 41231
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: --name test_check_version_requires_sqlite_3_37 --seed 41231
+
+# Running:
+
+F
+
+Finished in 0.002240s, 446.4190 runs/s, 446.4190 assertions/s.
+
+  1) Failure:
+ActiveRecord::ConnectionAdapters::SQLite3AdapterTest#test_check_version_requires_sqlite_3_37 [/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb:175]:
+RuntimeError expected but nothing was raised.
+
+1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
++ echo 'REGRESSION_EXIT=1 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec'
+REGRESSION_EXIT=1 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ cd /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord
++ env BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib ARCONN=sqlite3 PARALLEL_WORKERS=1 MT_CPU=1 mise exec ruby@4.0.9 -- bundle exec ruby -Itest /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb --name test_check_version_requires_sqlite_3_37 --seed 41231
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: --name test_check_version_requires_sqlite_3_37 --seed 41231
+
+# Running:
+
+.
+
+Finished in 0.001541s, 648.7878 runs/s, 1946.3634 assertions/s.
+
+1 runs, 3 assertions, 0 failures, 0 errors, 0 skips
++ echo 'REGRESSION_EXIT=0 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9'
+REGRESSION_EXIT=0 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9

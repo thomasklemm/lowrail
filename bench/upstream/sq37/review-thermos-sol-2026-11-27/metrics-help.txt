@@ -1,0 +1,25 @@
++ tools=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/flog --help
+Usage: flog [options]
+Standard options:
+    -a, --all                        Display all flog results, not top 60%.
+    -b, --blame                      Include blame information for methods.
+    -c, --continue                   Continue despite syntax errors.
+    -d, --details                    Show method details.
+    -g, --group                      Group and sort by class.
+    -h, --help                       Show this message.
+    -I dir1,dir2,dir3                Add to LOAD_PATH.
+    -m, --methods-only               Skip code outside of methods.
+    -q, --quiet                      Don't show parse errors.
+    -e, --extended                   Put file:line on a separate line (for rubymine & friends).
+    -s, --score                      Display total score only.
+        --legacy                     Use RubyParser for parsing.
+    -t, --threshold=N                Set the report cutoff threshold (def: 60%).
+    -v, --verbose                    Display progress during processing.
+        --timeout=N                  Set the timeout (in sec) for parsing (default: 10s)
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/rubocop --version
+1.93.0

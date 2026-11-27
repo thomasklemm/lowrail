@@ -1,0 +1,23 @@
++ mise exec ruby@4.0.9 -- gem install --install-dir /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems --no-document flog rubocop
+Successfully installed sexp_processor-4.17.6
+Successfully installed prism-2.1.0-x86_64-linux-gnu
+Successfully installed path_expander-2.0.1
+Successfully installed flog-4.10.0
+Successfully installed unicode-emoji-4.3.0
+Successfully installed unicode-display_width-3.3.0
+Successfully installed ruby-progressbar-1.13.0
+Building native extensions. This could take a while...
+Successfully installed racc-1.8.1
+Successfully installed prism-2.1.0-x86_64-linux-gnu
+Successfully installed ast-2.4.3
+Successfully installed parser-3.3.14.0
+Successfully installed rubocop-ast-1.54.0
+Successfully installed regexp_parser-2.13.4
+Successfully installed rainbow-3.1.1
+Successfully installed parallel-2.3.0
+Successfully installed lint_roller-1.1.0
+Successfully installed language_server-protocol-3.17.0.6
+Building native extensions. This could take a while...
+Successfully installed json-3.2.0
+Successfully installed rubocop-1.93.0
+19 gems installed

@@ -1,0 +1,52 @@
++ r=.amp/in/orb-backup/sq37-review/rails
++ for side in base head
++ [[ base == base ]]
++ sha=088fc0cf61
++ git -C .amp/in/orb-backup/sq37-review/rails show 088fc0cf61:activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ sed -n '/^      def check_version /,/^      end$/p'
++ cat .amp/in/orb-backup/sq37-review/metrics/base.rb
+      def check_version # :nodoc:
+        if database_version < "3.35.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+        end
+      end
++ for side in base head
++ [[ head == base ]]
++ sha=3e348f32bd
++ git -C .amp/in/orb-backup/sq37-review/rails show 3e348f32bd:activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ sed -n '/^      def check_version /,/^      end$/p'
++ cat .amp/in/orb-backup/sq37-review/metrics/head.rb
+      def check_version # :nodoc:
+        if database_version < "3.37.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
+        end
+      end
++ tools=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/flog -a -d -m .amp/in/orb-backup/sq37-review/metrics/base.rb .amp/in/orb-backup/sq37-review/metrics/head.rb
+     9.4: flog total
+     9.4: flog/method average
+
+     9.4: main#check_version               .amp/in/orb-backup/sq37-review/metrics/head.rb:1-5
+     5.0:   database_version
+     2.2:   raise
+     2.0:   branch
+     2.0:   <
+
++ printf 'AllCops:\n  NewCops: disable\n'
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/rubocop --cache false --config .amp/in/orb-backup/sq37-review/metrics/rubocop.yml --only Metrics --format simple .amp/in/orb-backup/sq37-review/metrics/base.rb .amp/in/orb-backup/sq37-review/metrics/head.rb
+
+2 files inspected, no offenses detected
++ curl -fsSL https://www.sqlite.org/changes.html -o .amp/in/orb-backup/sq37-review/sqlite-changes.html
++ rg -n -m 4 '3\.54\.1|<h3>' .amp/in/orb-backup/sq37-review/sqlite-changes.html
+133:<h3>2026-10-16 (3.54.1)</h3><p><ol class='lessindent'>
+137:     <a href="https://sqlite.org/src/timeline?from=version-3.54.0&to=version-3.54.1&y=ci">check-in timeline</a>
+145:<h3>2026-10-09 (3.54.0)</h3><p><ol class='lessindent'>
+239:<h3>2026-07-24 (3.53.4)</h3><p><ol class='lessindent'>
++ git -C .amp/in/orb-backup/sq37-review/rails fetch --quiet origin main
++ git -C .amp/in/orb-backup/sq37-review/rails rev-parse origin/main FETCH_HEAD
+088fc0cf61e4ba0c7987decafacc69adb3e22eec
+088fc0cf61e4ba0c7987decafacc69adb3e22eec

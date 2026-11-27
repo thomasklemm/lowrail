@@ -1,0 +1,82 @@
++ r=.amp/in/orb-backup/sq37-review/rails
++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 183262f440
+Bump the minimum supported SQLite version to 3.37.0
+
+SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+The SQLite3 adapter has read it in `data_source_sql` since #52354
+(released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+`tables`, `views` and the schema cache.
+
+On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, these
+fail with "no such table: pragma_table_list", so creating the
+`schema_migrations` table, `db:prepare` and loading a model's primary
+key all raise.
+
+Make the requirement explicit by raising in `check_version` when the
+server is older than 3.37.0.
+
++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 3e348f32bd
+Bump the minimum supported SQLite version to 3.37.0
+
+SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+The SQLite3 adapter has read it in `data_source_sql` since #52354
+(released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+`tables`, `views` and the schema cache.
+
+On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, these
+fail with "no such table: pragma_table_list", so creating the
+`schema_migrations` table, `db:prepare` and loading a model's primary
+key all raise.
+
+Make the requirement explicit by raising in `check_version` when the
+server is older than 3.37.0.
+
+
+++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 183262f440
++ diff -u /dev/fd/63 /dev/fd/62
+++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 3e348f32bd
+--- /dev/fd/63	2026-11-27 12:28:10.775469439 +0000
++++ /dev/fd/62	2026-11-27 12:28:10.775469439 +0000
+@@ -13,3 +13,4 @@
+ Make the requirement explicit by raising in `check_version` when the
+ server is older than 3.37.0.
+ 
++
++ echo MESSAGE_DIFF_EXIT=1
+MESSAGE_DIFF_EXIT=1
++ git -C .amp/in/orb-backup/sq37-review/rails diff '183262f440^' 183262f440 -- activerecord/CHANGELOG.md
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 76e81488e7..1aea542779 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.37.0.
++
++    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
++    has used to list tables and views since Rails 8.0 (#52354). On older
++    versions `table_exists?`, `tables`, migrations and the schema cache fail
++    with "no such table: pragma_table_list"; make the requirement explicit.
++
++    *Thomas Klemm*
++
+ *   Fix lazily loading a `disable_joins` association ignoring the rest of its
+     scope, such as `select`, `limit`, `includes`, `readonly`, and
+     `strict_loading`.
++ git -C .amp/in/orb-backup/sq37-review/rails diff '3e348f32bd^' 3e348f32bd -- activerecord/CHANGELOG.md
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 40b4cefe6c..be317e9fb1 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.37.0.
++
++    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
++    has used to list tables and views since Rails 8.0 (#52354). On older
++    versions `table_exists?`, `tables`, migrations and the schema cache fail
++    with "no such table: pragma_table_list"; make the requirement explicit.
++
++    *Thomas Klemm*
++
+ *   Don't compare owner conditions when joining an association without a scope.
+ 
+     Comparing the where clauses could serialize their bind values early, so a

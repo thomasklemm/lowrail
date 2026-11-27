@@ -1,0 +1,41 @@
++ root=/home/user/workspace/repo
++ cache=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ for sqlite in 3.36.0 3.37.0
++ env -u DATABASE_URL BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.36.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.36.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.36.0/lib RAILS_ENV=development REVIEW_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app/088fc0cf61e4ba0c7987decafacc69adb3e22eec-3.36.0.sqlite3 mise exec ruby@4.0.9 -- ruby bin/rails db:prepare
+bin/rails aborted!
+ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+
+Caused by:
+SQLite3::SQLException: no such table: pragma_table_list: (SQLite3::SQLException)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)
++ echo 'APP_EXIT=1 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec SQLITE=3.36.0'
+APP_EXIT=1 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec SQLITE=3.36.0
++ for sqlite in 3.36.0 3.37.0
++ env -u DATABASE_URL BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib RAILS_ENV=development REVIEW_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app/088fc0cf61e4ba0c7987decafacc69adb3e22eec-3.37.0.sqlite3 mise exec ruby@4.0.9 -- ruby bin/rails db:prepare
+== 20261125000000 CreateWidgets: migrating ====================================
+-- create_table(:widgets)
+   -> 0.0007s
+== 20261125000000 CreateWidgets: migrated (0.0010s) ===========================
+
++ echo 'APP_EXIT=0 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec SQLITE=3.37.0'
+APP_EXIT=0 SHA=088fc0cf61e4ba0c7987decafacc69adb3e22eec SQLITE=3.37.0
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ for sqlite in 3.36.0 3.37.0
++ env -u DATABASE_URL BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.36.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.36.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.36.0/lib RAILS_ENV=development REVIEW_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app/3e348f32bdc2b5b405d31f226e6de04aa3278dc9-3.36.0.sqlite3 mise exec ruby@4.0.9 -- ruby bin/rails db:prepare
+bin/rails aborted!
+Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)
++ echo 'APP_EXIT=1 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9 SQLITE=3.36.0'
+APP_EXIT=1 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9 SQLITE=3.36.0
++ for sqlite in 3.36.0 3.37.0
++ env -u DATABASE_URL BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib RAILS_ENV=development REVIEW_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app/3e348f32bdc2b5b405d31f226e6de04aa3278dc9-3.37.0.sqlite3 mise exec ruby@4.0.9 -- ruby bin/rails db:prepare
++ echo 'APP_EXIT=0 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9 SQLITE=3.37.0'
+APP_EXIT=0 SHA=3e348f32bdc2b5b405d31f226e6de04aa3278dc9 SQLITE=3.37.0

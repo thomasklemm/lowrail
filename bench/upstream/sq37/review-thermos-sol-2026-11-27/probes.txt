@@ -1,0 +1,190 @@
++ root=/home/user/workspace/repo
++ cache=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions
++ for side in base head
++ [[ base == base ]]
++ sha=088fc0cf61e4ba0c7987decafacc69adb3e22eec
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=base BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.35.5/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.35.5 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.35.5/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.35.5"}
+{"check":"raw_sql","result":"first"}
+{"check":"columns","result":["id","name"]}
+{"check":"table_exists","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_column_names","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_primary_key","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_find","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_create","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"table_create","result":["id"]}
+{"connect_version":"3.35.5","connected":true}
+{"connect_version":"3.36.0","connected":true}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=base BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.36.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.36.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.36.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.36.0"}
+{"check":"raw_sql","result":"first"}
+{"check":"columns","result":["id","name"]}
+{"check":"table_exists","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_column_names","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_primary_key","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_find","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"model_create","error":"ActiveRecord::StatementInvalid","message":"SQLite3::SQLException: no such table: pragma_table_list:"}
+{"check":"table_create","result":["id"]}
+{"connect_version":"3.35.5","connected":true}
+{"connect_version":"3.36.0","connected":true}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=base BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.37.0"}
+{"check":"raw_sql","result":"first"}
+{"check":"columns","result":["id","name"]}
+{"check":"table_exists","result":true}
+{"check":"model_column_names","result":["id","name"]}
+{"check":"model_primary_key","result":"id"}
+{"check":"model_find","result":"first"}
+{"check":"model_create","result":"second"}
+{"check":"table_create","result":["id"]}
+{"connect_version":"3.35.5","connected":true}
+{"connect_version":"3.36.0","connected":true}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ env REVIEW_SIDE=base BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/boundary_probe.rb
+{"side":"base","ruby":"ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]","rails":"8.2.0.alpha","actual_sqlite":"3.37.0"}
+{"version":"3.34.9","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0.","disconnected":true}
+{"version":"3.34.9","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0.","disconnected":true}
+{"version":"3.34.9","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0.","disconnected":true}
+{"version":"3.34.9","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0.","disconnected":true}
+{"version":"3.35.0","representation":"version","connected":true}
+{"version":"3.35.0","representation":"frozen_version","connected":true}
+{"version":"3.35.0","representation":"subclass","connected":true}
+{"version":"3.35.0","representation":"duck","connected":true}
+{"version":"3.35.5","representation":"version","connected":true}
+{"version":"3.35.5","representation":"frozen_version","connected":true}
+{"version":"3.35.5","representation":"subclass","connected":true}
+{"version":"3.35.5","representation":"duck","connected":true}
+{"version":"3.36.0","representation":"version","connected":true}
+{"version":"3.36.0","representation":"frozen_version","connected":true}
+{"version":"3.36.0","representation":"subclass","connected":true}
+{"version":"3.36.0","representation":"duck","connected":true}
+{"version":"3.36.99","representation":"version","connected":true}
+{"version":"3.36.99","representation":"frozen_version","connected":true}
+{"version":"3.36.99","representation":"subclass","connected":true}
+{"version":"3.36.99","representation":"duck","connected":true}
+{"version":"3.37.0","representation":"version","connected":true}
+{"version":"3.37.0","representation":"frozen_version","connected":true}
+{"version":"3.37.0","representation":"subclass","connected":true}
+{"version":"3.37.0","representation":"duck","connected":true}
+{"version":"3.37.1","representation":"version","connected":true}
+{"version":"3.37.1","representation":"frozen_version","connected":true}
+{"version":"3.37.1","representation":"subclass","connected":true}
+{"version":"3.37.1","representation":"duck","connected":true}
+{"version":"3.44.2","representation":"version","connected":true}
+{"version":"3.44.2","representation":"frozen_version","connected":true}
+{"version":"3.44.2","representation":"subclass","connected":true}
+{"version":"3.44.2","representation":"duck","connected":true}
+{"version":"3.100.0","representation":"version","connected":true}
+{"version":"3.100.0","representation":"frozen_version","connected":true}
+{"version":"3.100.0","representation":"subclass","connected":true}
+{"version":"3.100.0","representation":"duck","connected":true}
+{"version":"4.0.0","representation":"version","connected":true}
+{"version":"4.0.0","representation":"frozen_version","connected":true}
+{"version":"4.0.0","representation":"subclass","connected":true}
+{"version":"4.0.0","representation":"duck","connected":true}
+BOUNDARY_CASES_PASSED=40
++ for side in base head
++ [[ head == base ]]
++ sha=3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=head BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.35.5/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.35.5 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.35.5/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.35.5"}
+{"check":"raw_sql","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"columns","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"table_exists","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_column_names","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_primary_key","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_find","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_create","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"table_create","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.35.5","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.36.0","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=head BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.36.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.36.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.36.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.36.0"}
+{"check":"raw_sql","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"columns","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"table_exists","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_column_names","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_primary_key","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_find","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"model_create","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"check":"table_create","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.35.5","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.36.0","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ for sqlite in 3.35.5 3.36.0 3.37.0
++ env REVIEW_SIDE=head BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/bench/upstream/sq37/review-thermos-sol-2026-11-25/probe.rb
+{"ruby":"4.0.9","rails":"8.2.0.alpha","sqlite":"3.37.0"}
+{"check":"raw_sql","result":"first"}
+{"check":"columns","result":["id","name"]}
+{"check":"table_exists","result":true}
+{"check":"model_column_names","result":["id","name"]}
+{"check":"model_primary_key","result":"id"}
+{"check":"model_find","result":"first"}
+{"check":"model_create","result":"second"}
+{"check":"table_create","result":["id"]}
+{"connect_version":"3.35.5","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.36.0","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."}
+{"connect_version":"3.37.0","connected":true}
+{"connect_version":"3.37.1","connected":true}
+{"connect_version":"3.100.0","connected":true}
++ env REVIEW_SIDE=head BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/.min-versions/ruby-4.0.9-sqlite-3.37.0/Gemfile BUNDLE_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/bundle/ruby-4.0.9/sqlite-3.37.0 BUNDLE_WITHOUT=db LD_LIBRARY_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/lib mise exec ruby@4.0.9 -- bundle exec ruby /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/boundary_probe.rb
+{"side":"head","ruby":"ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]","rails":"8.2.0.alpha","actual_sqlite":"3.37.0"}
+{"version":"3.34.9","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.34.9","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.34.9","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.34.9","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.0","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.35.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.0","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.35.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.0","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.35.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.0","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.35.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.5","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.5","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.5","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.35.5","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.0","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.0","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.0","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.0","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.99","representation":"version","error":"RuntimeError","message":"Your version of SQLite (3.36.99) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.99","representation":"frozen_version","error":"RuntimeError","message":"Your version of SQLite (3.36.99) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.99","representation":"subclass","error":"RuntimeError","message":"Your version of SQLite (3.36.99) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.36.99","representation":"duck","error":"RuntimeError","message":"Your version of SQLite (3.36.99) is too old. Active Record supports SQLite >= 3.37.0.","disconnected":true}
+{"version":"3.37.0","representation":"version","connected":true}
+{"version":"3.37.0","representation":"frozen_version","connected":true}
+{"version":"3.37.0","representation":"subclass","connected":true}
+{"version":"3.37.0","representation":"duck","connected":true}
+{"version":"3.37.1","representation":"version","connected":true}
+{"version":"3.37.1","representation":"frozen_version","connected":true}
+{"version":"3.37.1","representation":"subclass","connected":true}
+{"version":"3.37.1","representation":"duck","connected":true}
+{"version":"3.44.2","representation":"version","connected":true}
+{"version":"3.44.2","representation":"frozen_version","connected":true}
+{"version":"3.44.2","representation":"subclass","connected":true}
+{"version":"3.44.2","representation":"duck","connected":true}
+{"version":"3.100.0","representation":"version","connected":true}
+{"version":"3.100.0","representation":"frozen_version","connected":true}
+{"version":"3.100.0","representation":"subclass","connected":true}
+{"version":"3.100.0","representation":"duck","connected":true}
+{"version":"4.0.0","representation":"version","connected":true}
+{"version":"4.0.0","representation":"frozen_version","connected":true}
+{"version":"4.0.0","representation":"subclass","connected":true}
+{"version":"4.0.0","representation":"duck","connected":true}
+BOUNDARY_CASES_PASSED=40

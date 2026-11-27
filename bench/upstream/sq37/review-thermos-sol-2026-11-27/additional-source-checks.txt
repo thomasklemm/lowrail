@@ -1,0 +1,192 @@
++ for path in activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ gh api 'repos/rails/rails/contents/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb?ref=088fc0cf61e4ba0c7987decafacc69adb3e22eec' --jq .content
++ base64 -d
++ nl -ba
++ sed -n '218,227p;518,522p'
+   218	          def data_source_sql(name = nil, type: nil)
+   219	            scope = quoted_scope(name, type: type)
+   220	            scope[:type] ||= "'table','view'"
+   221	
+   222	            sql = +"SELECT name FROM pragma_table_list WHERE schema <> 'temp'"
+   223	            sql << " AND name NOT IN ('sqlite_sequence', 'sqlite_schema')"
+   224	            sql << " AND name = #{scope[:name]}" if scope[:name]
+   225	            sql << " AND type IN (#{scope[:type]})"
+   226	            sql
+   227	          end
++ for path in activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ gh api 'repos/rails/rails/contents/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb?ref=088fc0cf61e4ba0c7987decafacc69adb3e22eec' --jq .content
++ base64 -d
++ nl -ba
++ sed -n '218,227p;518,522p'
+   218	      end
+   219	
+   220	      def supports_partial_index?
+   221	        true
+   222	      end
+   223	
+   224	      def supports_expression_index?
+   225	        true
+   226	      end
+   227	
+   518	      def check_version # :nodoc:
+   519	        if database_version < "3.35.0"
+   520	          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+   521	        end
+   522	      end
++ r=.amp/in/orb-backup/sq37-review/rails
++ git -C .amp/in/orb-backup/sq37-review/rails diff 183262f440 3e348f32bd --numstat
+0	1	Gemfile
+2	2	Gemfile.lock
+5	0	actionmailbox/CHANGELOG.md
+0	10	actionmailbox/config/routes.rb
+18	0	actionmailbox/lib/action_mailbox/engine.rb
+8	0	actionmailer/CHANGELOG.md
+4	0	actionmailer/lib/action_mailer/base.rb
+10	6	actionmailer/lib/action_mailer/message_delivery.rb
+56	3	actionmailer/test/callbacks_test.rb
+4	0	actionmailer/test/mailers/callback_mailer.rb
+23	0	actionpack/CHANGELOG.md
+4	12	actionpack/lib/action_controller/log_subscriber.rb
+19	3	actionpack/lib/action_controller/metal/live.rb
+1	1	actionpack/lib/action_controller/metal/strong_parameters.rb
+2	0	actionpack/lib/action_controller/structured_event_subscriber.rb
+1	1	actionpack/lib/action_dispatch/http/mime_type.rb
+3	2	actionpack/lib/action_dispatch/http/parameters.rb
+3	0	actionpack/lib/action_dispatch/http/response.rb
+4	0	actionpack/lib/action_dispatch/railtie.rb
+1	1	actionpack/lib/action_dispatch/testing/integration.rb
+23	0	actionpack/test/controller/live_stream_test.rb
+10	0	actionpack/test/controller/log_subscriber_test.rb
+12	0	actionpack/test/controller/parameters/parameters_expect_test.rb
+15	0	actionpack/test/controller/structured_event_subscriber_test.rb
+26	0	actionpack/test/controller/webservice_test.rb
+6	0	actionpack/test/dispatch/mime_type_test.rb
+10	0	actionpack/test/dispatch/response_test.rb
+18	12	actionpack/test/dispatch/server_timing_test.rb
+5	0	actionview/CHANGELOG.md
+1	0	actionview/actionview.gemspec
+12	5	actionview/lib/action_view/helpers/form_tag_helper.rb
+1	1	actionview/lib/action_view/helpers/tag_helper.rb
+1	1	actionview/lib/action_view/helpers/tags/base.rb
+8	0	actionview/lib/action_view/helpers/url_helper.rb
+5	27	actionview/lib/action_view/template.rb
+32	0	actionview/lib/action_view/template/strict_locals_parser.rb
+69	0	actionview/test/template/strict_locals_parser_test.rb
+13	33	actionview/test/template/template_test.rb
+19	0	actionview/test/template/url_helper_test.rb
+1	1	activemodel/lib/active_model/attribute.rb
+1	0	activemodel/lib/active_model/attribute_methods.rb
+1	3	activemodel/lib/active_model/attribute_set.rb
+1	5	activemodel/lib/active_model/attribute_set/builder.rb
+2	1	activemodel/lib/active_model/dirty.rb
+2	0	activemodel/lib/active_model/errors.rb
+4	0	activemodel/lib/active_model/secure_password.rb
+4	0	activemodel/test/cases/secure_password_test.rb
+8	0	activemodel/test/cases/type/date_time_test.rb
+35	0	activerecord/CHANGELOG.md
+4	2	activerecord/lib/active_record/associations/association_scope.rb
+1	1	activerecord/lib/active_record/associations/disable_joins_association_scope.rb
+1	1	activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb
+7	2	activerecord/lib/active_record/connection_adapters/abstract/quoting.rb
+10	0	activerecord/lib/active_record/connection_adapters/abstract/schema_definitions.rb
+19	0	activerecord/lib/active_record/connection_adapters/abstract/schema_statements.rb
+13	0	activerecord/lib/active_record/connection_adapters/abstract_adapter.rb
+4	1	activerecord/lib/active_record/connection_adapters/postgresql/schema_creation.rb
+52	1	activerecord/lib/active_record/connection_adapters/postgresql/schema_statements.rb
+8	0	activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb
+12	0	activerecord/lib/active_record/connection_adapters/ractor_connection_handler/postgresql_proxy_adapter.rb
+16	0	activerecord/lib/active_record/connection_adapters/ractor_connection_handler/proxy.rb
+4	8	activerecord/lib/active_record/connection_adapters/ractor_connection_handler/proxy_connection_pool.rb
+2	0	activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+14	0	activerecord/lib/active_record/key.rb
+2	7	activerecord/lib/active_record/nested_attributes.rb
+6	0	activerecord/lib/active_record/railtie.rb
+14	3	activerecord/lib/active_record/reflection.rb
+14	0	activerecord/lib/active_record/relation/merger.rb
+2	0	activerecord/lib/active_record/relation/query_methods.rb
+1	0	activerecord/lib/active_record/schema_dumper.rb
+6	0	activerecord/test/cases/adapters/postgresql/json_test.rb
+6	0	activerecord/test/cases/adapters/sqlite3/json_test.rb
+80	0	activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+21	0	activerecord/test/cases/associations/has_many_associations_test.rb
+8	0	activerecord/test/cases/associations/inner_join_association_test.rb
+31	0	activerecord/test/cases/connection_adapters/ractor_connection_handling_test.rb
+18	2	activerecord/test/cases/connection_pool_test.rb
+20	0	activerecord/test/cases/locking_test.rb
+179	0	activerecord/test/cases/migration/check_constraint_test.rb
+11	0	activerecord/test/cases/migration/index_test.rb
+9	0	activerecord/test/cases/quoting_test.rb
+11	0	activerecord/test/cases/relation/merging_test.rb
+8	0	activerecord/test/cases/relation/or_test.rb
+1	0	activerecord/test/models/post.rb
+9	0	activerecord/test/schema/schema.rb
+36	0	activesupport/CHANGELOG.md
+0	1	activesupport/activesupport.gemspec
+1	0	activesupport/lib/active_support.rb
+36	7	activesupport/lib/active_support/cache/deprecated_redis_cache_store.rb
+1	1	activesupport/lib/active_support/cache/mem_cache_store.rb
+165	0	activesupport/lib/active_support/connection_pool.rb
+62	0	activesupport/lib/active_support/connection_pool/fork.rb
+259	0	activesupport/lib/active_support/connection_pool/timed_stack.rb
+71	44	activesupport/lib/active_support/core_ext/class/attribute.rb
+1	1	activesupport/lib/active_support/core_ext/date/conversions.rb
+1	1	activesupport/lib/active_support/core_ext/date_time/conversions.rb
+1	1	activesupport/lib/active_support/core_ext/string/filters.rb
+5	15	activesupport/lib/active_support/core_ext/time/calculations.rb
+1	1	activesupport/lib/active_support/core_ext/time/conversions.rb
+21	9	activesupport/lib/active_support/date_formats.rb
+41	0	activesupport/lib/active_support/deprecated_formats.rb
+25	0	activesupport/lib/active_support/event_reporter.rb
+11	1	activesupport/lib/active_support/event_reporter/log_subscriber.rb
+1	1	activesupport/lib/active_support/message_pack/extensions.rb
+19	7	activesupport/lib/active_support/time_formats.rb
+8	58	activesupport/test/cache/behaviors/connection_pool_behavior.rb
+155	29	activesupport/test/cache/stores/deprecated_redis_cache_store_test.rb
+29	16	activesupport/test/cache/stores/mem_cache_store_test.rb
+113	0	activesupport/test/connection_pool_test.rb
+28	0	activesupport/test/core_ext/class/attribute_test.rb
+30	0	activesupport/test/core_ext/date_ext_test.rb
+8	0	activesupport/test/core_ext/string_ext_test.rb
+123	0	activesupport/test/core_ext/time_ext_test.rb
+20	0	activesupport/test/event_reporter/log_subscriber_test.rb
+14	0	activesupport/test/event_reporter_test.rb
+13	0	activesupport/test/message_pack/cache_serializer_test.rb
+9	10	guides/source/configuring.md
+1	1	guides/source/tuning_performance_for_deployment.md
+94	0	guides/source/upgrading_ruby_on_rails.md
+8	0	railties/CHANGELOG.md
+0	4	railties/lib/rails/application/configuration.rb
+4	0	railties/lib/rails/generators/rails/app/app_generator.rb
+1	0	railties/railties.gemspec
+44	10	railties/test/application/configuration_test.rb
+8	0	railties/test/application/initializers/frameworks_test.rb
+53	0	railties/test/application/ractors_test.rb
+14	0	railties/test/application/routing_test.rb
+32	101	railties/test/commands/routes_test.rb
+2	0	railties/test/generators/app_generator_test.rb
++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 183262f440
++ sha256sum
+f81251f523473b5da6bd72d01588197e1c766c2a5915486379addea277966100  -
++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%B 3e348f32bd
++ sha256sum
+c7c095eea15c28823efe46afcca3a37ce6b591808f4050d1742a9c28450b05db  -
++ git -C .amp/in/orb-backup/sq37-review/rails diff '3e348f32bd^' 3e348f32bd -- '*.rb'
++ sed -n '/^+[^+]/{p;}'
++        if database_version < "3.37.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
++      def test_check_version_requires_sqlite_3_37
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.36.0")) do
++          error = assert_raises(RuntimeError) { @conn.check_version }
++          assert_equal "Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.", error.message
++        end
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.37.0")) do
++          assert_nil @conn.check_version
++        end
++      end
++ rg -n 'Versions 3\.(8|23|35|37)|SQLite.*3\.(8|23|35|37)' .amp/in/orb-backup/sq37-review/rails/railties .amp/in/orb-backup/sq37-review/rails/guides/source .amp/in/orb-backup/sq37-review/rails/activerecord/lib
+.amp/in/orb-backup/sq37-review/rails/guides/source/6_0_release_notes.md:593:*   Bump the minimum SQLite version to 3.8.
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:520:          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:812:          # SQLite 3.8.2 returns a newly formatted error message:
+.amp/in/orb-backup/sq37-review/rails/railties/lib/rails/generators/rails/app/templates/config/databases/sqlite3.yml.tt:1:# SQLite. Versions 3.8.0 and up are supported.
++ mise exec ruby@4.0.9 -- gem list --local '^(flog|rubocop|rubocop-rails-omakase|sqlite3)$'
+

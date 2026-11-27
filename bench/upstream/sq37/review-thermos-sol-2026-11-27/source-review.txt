@@ -1,0 +1,92 @@
++ date -u +%FT%TZ
+2026-11-27T12:24:27Z
++ git rev-parse HEAD
+9cd83cdf23557a1cec88330792e7c5225ad143aa
++ git clone --quiet --filter=blob:none --no-checkout --single-branch --branch main https://github.com/rails/rails.git .amp/in/orb-backup/sq37-review/rails
++ git -C .amp/in/orb-backup/sq37-review/rails fetch --quiet https://github.com/thomasklemm/rails.git thomasklemm/sqlite-floor-3-37
++ git -C .amp/in/orb-backup/sq37-review/rails rev-parse FETCH_HEAD
+3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ git -C .amp/in/orb-backup/sq37-review/rails show --format=fuller --stat 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
+commit 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:59:15 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 10:59:15 2026 +0000
+
+    Bump the minimum supported SQLite version to 3.37.0
+    
+    SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+    The SQLite3 adapter has read it in `data_source_sql` since #52354
+    (released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+    `tables`, `views` and the schema cache.
+    
+    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, these
+    fail with "no such table: pragma_table_list", so creating the
+    `schema_migrations` table, `db:prepare` and loading a model's primary
+    key all raise.
+    
+    Make the requirement explicit by raising in `check_version` when the
+    server is older than 3.37.0.
+
+ activerecord/CHANGELOG.md                                     |  9 +++++++++
+ .../lib/active_record/connection_adapters/sqlite3_adapter.rb  |  4 ++--
+ .../test/cases/adapters/sqlite3/sqlite3_adapter_test.rb       | 11 +++++++++++
+ 3 files changed, 22 insertions(+), 2 deletions(-)
++ git -C .amp/in/orb-backup/sq37-review/rails diff 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 40b4cefe6c..be317e9fb1 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.37.0.
++
++    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
++    has used to list tables and views since Rails 8.0 (#52354). On older
++    versions `table_exists?`, `tables`, migrations and the schema cache fail
++    with "no such table: pragma_table_list"; make the requirement explicit.
++
++    *Thomas Klemm*
++
+ *   Don't compare owner conditions when joining an association without a scope.
+ 
+     Comparing the where clauses could serialize their bind values early, so a
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 0da5ffeadb..c8d8bf505a 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -516,8 +516,8 @@ module ActiveRecord
+       end
+ 
+       def check_version # :nodoc:
+-        if database_version < "3.35.0"
+-          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
++        if database_version < "3.37.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
+         end
+       end
+ 
+diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+index e13ab9431a..2e808fbded 100644
+--- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+@@ -170,6 +170,17 @@ module ActiveRecord
+         assert @conn, "should have connection"
+       end
+ 
++      def test_check_version_requires_sqlite_3_37
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.36.0")) do
++          error = assert_raises(RuntimeError) { @conn.check_version }
++          assert_equal "Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.", error.message
++        end
++
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.37.0")) do
++          assert_nil @conn.check_version
++        end
++      end
++
+       # sqlite3 defaults to UTF-8 encoding
+       def test_encoding
+         assert_equal "UTF-8", @conn.encoding
++ git -C .amp/in/orb-backup/sq37-review/rails log '--format=%(trailers:only)' 088fc0cf61e4ba0c7987decafacc69adb3e22eec..3e348f32bdc2b5b405d31f226e6de04aa3278dc9
+
++ git -C .amp/in/orb-backup/sq37-review/rails checkout --quiet --detach 3e348f32bdc2b5b405d31f226e6de04aa3278dc9

@@ -1,0 +1,68 @@
++ sed -n '31,39p;53,65p' bench/upstream/sq37/review-thermos-sol-2026-11-27/README.md
+
+Cold read: if the runtime SQLite version is below 3.37.0, raise the existing unsupported-version error with the corrected minimum; otherwise continue connection setup. This is **L0**, with one existing branch and no new helper, state, SQL, fallback or abstraction. The version comes from `SELECT sqlite_version(*)` and Rails' numeric `Version` comparison, not lexical String comparison. The existing superclass configuration boundary disconnects and re-raises on failure; the executed connection probe confirms cleanup.
+
+No Ruby code comments were added. The existing `:nodoc:` marker is unchanged. There is no new user-object operation, conversion, accumulator, mutation or synchronization boundary. The changed literals are at the canonical version gate, not a wrapper. Newly refusing raw-SQL-only use on 3.35/3.36 is a deliberate adapter-wide floor change; those controls worked on base, and the record and “For Thomas” already acknowledge the loss.
+
+[source-review.txt](source-review.txt) preserves the full three-file diff, exact commit message, Thomas Klemm `<github@tklemm.eu>` as both author and committer, and empty trailers. Parent/count and patch-identity checks are in [context-and-recent-main.txt](context-and-recent-main.txt). An SSH signature exists; this review does not claim to authenticate it. The new and previous code/test patches have identical stable patch ID `4deab6000ad2799a470e1ba3f9fa39e1d4c2bc4f`; the CHANGELOG entry's added text is identical. The intervening SQLite schema-reader change affects `MASTER_CTE`, not this version gate or `data_source_sql`.
+
+Flog 4.10.0 scores the extracted production method **4.7 on both base and head**. RuboCop 1.93.0 `--only Metrics` reports `2 files inspected, no offenses detected` on the same method extractions. The first Flog invocation combined identically named methods and therefore aggregated them to 9.4; [final-probe-checks.txt](final-probe-checks.txt) records the corrected separate invocations. These are readability diagnostics, not performance evidence. The large adapter/test files predate this change; no decomposition is justified by this diff.
+
+
+## Citations remain relevant and current
+
+Today's DECISIONS rule was applied to every named project, including the sqlite3 gem even though its name is not a body link. These are necessary framework/database/driver dependencies, not a list of marginal downstream apps. Rails is the main subject and appears first; there is no list of callers to reorder or replace.
+
+The saved API responses in [claim-sources.txt](claim-sources.txt) and the current SQLite release heading in [metrics-and-final-main.txt](metrics-and-final-main.txt) show:
+
+| Project | GitHub stars | Last push | Latest release checked | RubyGems total downloads |
+| --- | ---: | --- | --- | ---: |
+| Rails | 59,174 | 2026-11-27 | 8.1.4.1, 2026-11-04 | 823,128,659 |
+| SQLite | 11,155 (GitHub mirror) | 2026-11-27 | 3.54.1, 2026-10-16 (sqlite.org) | not a gem |
+| sqlite3-ruby | 848 | 2026-11-25 | 2.10.2, 2026-10-26 | 203,666,215 |
+
++ mise exec ruby@4.0.9 -- ruby -rjson -e 'dir = "bench/upstream/sq37/review-thermos-sol-2026-11-27"; JSON.parse(File.read("#{dir}/min-versions.json")); Dir["#{dir}/**/*.rb"].each { |f| abort f unless system(RbConfig.ruby, "-c", f) }; Dir["#{dir}/*.sh"].each { |f| abort f unless system("bash", "-n", f) }; File.read("#{dir}/README.md").scan(/\]\(([^)]+)\)/).flatten.reject { _1.include?("://") }.each { |f| abort "missing #{f}" unless File.exist?(File.join(dir, f)) }; puts "JSON, Ruby/shell syntax, and report evidence links: OK"'
+Syntax OK
+Syntax OK
+Syntax OK
+Syntax OK
+JSON, Ruby/shell syntax, and report evidence links: OK
++ git diff --exit-code -- bench/upstream/pr-queue/items/SQ37.md
++ git add bench/upstream/sq37/review-thermos-sol-2026-11-27
++ git diff --cached --check -- '*.md' '*.rb' '*.sh'
++ git diff --cached --stat
+ .../sq37/review-thermos-sol-2026-11-27/README.md   |  101 ++
+ .../additional-source-checks.txt                   |  192 ++++
+ .../review-thermos-sol-2026-11-27/app-results.txt  |   41 +
+ .../review-thermos-sol-2026-11-27/app/Rakefile     |    2 +
+ .../review-thermos-sol-2026-11-27/app/bin/rails    |    4 +
+ .../app/config/application.rb                      |   10 +
+ .../app/config/database.yml                        |    3 +
+ .../app/config/environment.rb                      |    2 +
+ .../db/migrate/20261125000000_create_widgets.rb    |    7 +
+ .../boundary-regression.txt                        |   39 +
+ .../boundary_probe.rb                              |   47 +
+ .../review-thermos-sol-2026-11-27/check-sources.sh |   31 +
+ .../claim-sources-initial.txt                      |   28 +
+ .../claim-sources.txt                              | 1001 ++++++++++++++++++++
+ .../context-and-recent-main.txt                    |  455 +++++++++
+ .../evidence-validation.txt                        |   31 +
+ .../final-probe-checks.txt                         |   44 +
+ .../metrics-and-final-main.txt                     |   52 +
+ .../review-thermos-sol-2026-11-27/metrics-help.txt |   25 +
+ .../metrics-install.txt                            |   23 +
+ .../min-versions.Gemfile.lock                      |  321 +++++++
+ .../min-versions.json                              |  338 +++++++
+ .../review-thermos-sol-2026-11-27/min-versions.log |  115 +++
+ .../packaging-floor.txt                            |   43 +
+ .../permalink-fetches.txt                          |   16 +
+ .../sq37/review-thermos-sol-2026-11-27/probes.txt  |  190 ++++
+ .../rebuild-message-comparison.txt                 |   82 ++
+ .../release-status.txt                             |   18 +
+ .../review-thermos-sol-2026-11-27/reviewed-item.md |   35 +
+ .../review-thermos-sol-2026-11-27/reviewers.md     |   33 +
+ .../sq37/review-thermos-sol-2026-11-27/run-app.sh  |   13 +
+ .../review-thermos-sol-2026-11-27/run-probes.sh    |   15 +
+ .../run-regression.sh                              |   15 +
+ .../source-review.txt                              |   92 ++
+ 34 files changed, 3464 insertions(+)

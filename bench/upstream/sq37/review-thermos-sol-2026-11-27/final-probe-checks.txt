@@ -1,0 +1,44 @@
++ tools=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ for side in base head
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/flog -a -d -m .amp/in/orb-backup/sq37-review/metrics/base.rb
+     4.7: flog total
+     4.7: flog/method average
+
+     4.7: main#check_version               .amp/in/orb-backup/sq37-review/metrics/base.rb:1-5
+     2.5:   database_version
+     1.1:   raise
+     1.0:   branch
+     1.0:   <
+
++ for side in base head
++ GEM_HOME=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ GEM_PATH=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems
++ mise exec ruby@4.0.9 -- /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/metrics-gems/bin/flog -a -d -m .amp/in/orb-backup/sq37-review/metrics/head.rb
+     4.7: flog total
+     4.7: flog/method average
+
+     4.7: main#check_version               .amp/in/orb-backup/sq37-review/metrics/head.rb:1-5
+     2.5:   database_version
+     1.1:   raise
+     1.0:   branch
+     1.0:   <
+
++ cache=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/bin/sqlite3 .amp/in/orb-backup/sq37-review/app/088fc0cf61e4ba0c7987decafacc69adb3e22eec-3.37.0.sqlite3 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name; SELECT version FROM schema_migrations;'
+ar_internal_metadata
+schema_migrations
+sqlite_sequence
+widgets
+20261125000000
++ for sha in 088fc0cf61e4ba0c7987decafacc69adb3e22eec 3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/min-versions/sqlite-3.37.0/bin/sqlite3 .amp/in/orb-backup/sq37-review/app/3e348f32bdc2b5b405d31f226e6de04aa3278dc9-3.37.0.sqlite3 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name; SELECT version FROM schema_migrations;'
+ar_internal_metadata
+schema_migrations
+sqlite_sequence
+widgets
+20261125000000
++ git -C .amp/in/orb-backup/sq37-review/rails diff --check 088fc0cf61 3e348f32bd
++ git -C .amp/in/orb-backup/sq37-review/rails status --short
