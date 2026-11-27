@@ -13,7 +13,7 @@ depends_on: []
 stacked_on:
 alternative_of:
 impact: "By default (query cache on, the Rails 8 cable template's 0.1 s polling), each started Solid Cable listener (24.7 M downloads; started lazily on the first subscription) polls with subscribed channels. With 20 channels an idle poll runs -14.5% instructions without a JIT, -23.2% under YJIT, -23.7% under ZJIT on master (A/A <= 0.06%, JIT-flat); ZJIT wall cohort on master 0d399335b7, a1.xxlarge, 30 rounds: idle 215.4 -> 182.3 us -15.0% [-15.4%, -14.5%] (A/A -0.1% [-0.9%, +0.9%]), one message -6.9% [-8.0%, -5.7%] (A/A +0.3% [-1.0%, +1.2%]), every window JIT-flat (body/SC1-zjit-wall, measured on 155a2fbe98, same tree), 3 fewer objects; benchmark-ips under YJIT on a1.xxlarge +15.9% (body/SC1-xxl; wall cohort -14.8%, A/A interval contains 0). The saving depends on the query shape: on SQLite 998 channels (999 binds) -31.88%, 999 channels (no binds) -0.274%, 65,536 channels (1.4 MB SQL) -0.372% (thermos-sol record). Worst measured cost: zero channels +5.1% instructions, query_cache: false +2.9% (thermos-sol record), no wall-time loss shown. Path runs on Ruby master and Rails main."
-evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/body/SC1-zjit-wall, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb, bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-2cb18420-20261127.tar.gz]
+evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/body/SC1-zjit-wall, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb, bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-2cb18420-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-astra-20261127.tar.gz]
 rank: 1
 risky: true
 state: built
@@ -57,6 +57,20 @@ passes:
       Same tree and parent carry the full review and exactness checklist; fresh SQLite/PG differential and state
       probes are byte-identical base/head. L0; body follows PR description rules. No fork push or upstream post.
       See final confirm in docs/upstream/solid-stack-census.md and scb1-confirm-2cb18420-20261127.tar.gz.
+  - reviewer: astra
+    head: "2cb1842043643d85ddee68aa48d02fd219305d56"
+    date: 2026-11-27
+    orb: T-01a21f04-5bbf-7387-a46e-465a02dd0598
+    verdict: approve
+    open: >-
+      None. Adversarial base/head suites and probes pass on Rails 7.2/8.0/8.1/main; SQLite/PG differentials,
+      shared/separate pools, shards/reader roles, nesting, threads/fibers, model reload, prepends, connection
+      errors/retries and Stop verified. Both sides of PR 91/96 combinations pass on SQLite/PG. Intentional
+      same-thread/shared-pool cache flag difference restores correctly; no demonstrated delivery defect or fix.
+      Worst fresh input: zero channels +5.150% instructions (A/A 0.112%), not a wall-time loss; 20 channels -14.490%.
+      Every body/commit claim and cited project's currency checked; retained body/YJIT/master-ZJIT raw cohorts
+      independently recalculated, not claimed rerun. L0. No fork push or upstream post. Full review and limitations
+      in docs/upstream/solid-stack-census.md; raw evidence in scb1-astra-20261127.tar.gz.
 ---
 
 # Poll for messages without the query cache

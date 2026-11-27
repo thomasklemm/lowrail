@@ -375,6 +375,106 @@ wall-time loss. Fresh logs, independent audit and reproduction notes are in
 Historical pass heads are preserved rather than relabelled. Review orb: `T-01a21eb4-4fce-7727-bded-abfba4ffb64e`.
 No fork push or upstream post. This approval fills the detailed pass only, not the required adversarial Astra pass.
 
+### SCB1 adversarial review: Astra, 2026-11-27
+
+**Verdict: approve; no open finding.** Exact head `2cb1842043643d85ddee68aa48d02fd219305d56`, parent
+`40dd29ffdc4ff76f27f0bbef1de1606fdd21cfee`, tree `e737b3f89231ba7ebbc2d9fc1de4d00f10c1965d`.
+Current upstream main still equals that parent. Review orb `T-01a21f04-5bbf-7387-a46e-465a02dd0598`;
+performed directly, without delegation. No fork push or upstream post. Reproduction scripts, exact locks,
+commands, fresh logs and raw instruction windows are retained in
+[`scb1-astra-20261127.tar.gz`](../../bench/upstream/solid_stack/raw/scb1-astra-20261127.tar.gz).
+
+**Fresh differential and suites.** All runtime runs here used Ruby 4.0.10 `a704b7cd95`.
+
+* Both base and head on Rails 7.2.4, 8.0.5.2, 8.1.4.1 and main
+  `2e299253f942ab94041cc6f210ac9d33884c210d`: SQLite suite **47 runs, 140 assertions, no failures/errors/skips**
+  in each of eight cells. The paired locks have identical third-party dependencies. State, reader-role,
+  fiber-isolation and adversarial probes also compare byte-identically on every version.
+* Both sides on Rails 8.1.4.1 and PostgreSQL 17: **47/140**, no failures/errors/skips. Original ten-step
+  `sc1_differential.rb` outputs are byte-identical on SQLite and PostgreSQL: SQL, binds, cache-hit markers,
+  subscription changes, batches, deliveries and cursors, including the nested-cache case and 202 channels.
+* Injected `ConnectionFailed`, `ConnectionTimeoutError`, `ConnectionNotEstablished`, `StatementTimeout`,
+  `RuntimeError` and `Stop` during `Message.broadcastable`: exception class/message and restored cache flags
+  match; Stop is swallowed on both sides. Nested `uncached(dirties: false)` / `cache` blocks restore both flags.
+  Disconnecting the real connection reconnects and delivers on both sides. A live listener thread retries two
+  injected connection failures, delivers the next message and shuts down normally on both sides.
+* Reloaded the Message and Record classes with `Rails.application.reloader.reload!`, verified the Message class
+  object changed, and delivered through the existing listener afterwards. Delegating prepends on Message's
+  scope and the listener's public `listen` retain dispatch and delivery. Shared-primary and separate-pool
+  configurations both pass the complete adversarial probe on all four Rails versions; second shards and reader
+  roles retain delivery and restoration. Other-thread state stays unchanged.
+* Open PR 91 remains at `7995ad429d348c92cb9884c3e336a7d32161ab50`, PR 96 at
+  `f25ec2382aa01b60b36eeba7a8f8520aea7bb0e2`; fetched their current metadata and refs. Applied SCB1 unchanged
+  locally and tested each PR both without and with it. PR 91: SQLite **42/117, three PostgreSQL-only skips**;
+  PostgreSQL **42/140**, no skips. PR 96: **45/172**, no skips on either database. All suites pass; each PR's
+  base/head adversarial and state outputs match on both databases, including retry and Stop.
+
+**Demonstrated differences and their boundaries.** A shared primary pool is enabled inside base's poll and
+disabled inside head's, then restored; deliveries match. Under thread isolation, suspending an inline subscriber
+callback in a fiber exposes that disabled flag to another fiber on the **same thread**; another thread stays
+enabled, and resuming restores the original flag. Under fiber isolation the sibling fiber stays enabled too.
+These are the stated pool/context-scoped effect of `uncached`, not a new cross-thread leak or a demonstrated
+delivery defect. No guard or fix is warranted. Normal Action Cable callbacks are posted to its executor; the
+inline executor deliberately makes this probe more adversarial.
+
+**Exactness checklist.** (1–3) Reused and ran singleton duck conversions, private conversion errors, frozen
+String subclasses, callback removal during delivery and delegated prepends; results and conversion counts
+match. (4) The sole new dispatch is the public framework-owned `Message.uncached`; no new argument conversion
+or user-container operation. (5) No user-owned accumulator or container-copying change. (6) Mutation and suspended fibers
+covered above. (7) Frozen inputs, exception class/message and ensure restoration match. (8) Each Rails version
+boots, reloads and preserves connection configuration. Private/nodoc overrides and globally redefined core
+methods remain the policy's accepted boundary, not reasons to add guards. No MySQL or actual network partition
+was run; connection exceptions and disconnect/reconnect were run instead. No fresh Ruby-master runtime or wall
+cohort here: the committed master-ZJIT cohort was audited from its raw processes, not described as rerun.
+
+**Worst fresh input: an empty listener after its last unsubscribe.** The wrapper has overhead while the empty
+relation runs no SQL. Fixed heaps, patched Valgrind 3.19.0, `upstream-bench --worker ir`, 50 warm-up polls,
+(N100 minus N0)/100, one Ruby pin and base/head/base2; no brk overflow. These are instructions, not time.
+
+| Channels, default cache | Base Ir/poll (mean A/A) | Head Ir/poll | Change | A/A spread |
+| --- | ---: | ---: | ---: | ---: |
+| 0 | 542,218.245 | 570,142.63 | +5.150% | 0.112% |
+| 1 | 1,002,569.015 | 983,522.00 | −1.900% | 0.006% |
+| 20 | 1,727,940.09 | 1,477,558.51 | −14.490% | 0.019% |
+
+This reproduces the earlier worst-input finding without claiming a wall-time regression. The prior disabled-cache
+and 998/999/65,536-channel raw windows were independently recalculated, not rerun. The loss is already disclosed
+in impact, and does not meet the policy's wall-cohort blocking rule. No zero-channel special case proposed.
+
+**Every body/commit sentence checked.** `logs/commit.diff` retains the exact message; no added code comments.
+
+| Claim in body and commit | Command/source checked here |
+| --- | --- |
+| Title and `uncached` skips cache work | Exact one-line diff; fresh poll/cache-state probes and instruction sweep. |
+| Listener polls in an executor; default cache enabled per run | Read `listen`, released QueryCache executor hooks, and main's lazy used-pool hooks; ran all four Rails versions. |
+| One query, cleared at completion, no poll cache hit; subscribed polls hash/store a key | Read `broadcastable`, its single caller, `select_all`/cache code and executor completion; original SQL differential shows one uncached-by-result SELECT per nonempty poll on both sides. Zero channels perform no query, as already qualified by the subscribed-channel sentence. |
+| Pool used by Cable, primary when shared; listener thread only; restored at poll end | Shared/separate, shard/reader, other-thread, both fiber isolation modes, nesting and injected-error probes. |
+| Same query and delivered messages | Original ten-step SQLite/PG differentials, new reloading/error probes, suites and both PR combinations. |
+| 4.6k → 5.3k i/s (+16%) | Ran retained `audit_numbers.py`: raw best IPS 4567/4651 base, 5340 head, +15.8603%; original pinned YJIT cohort, not a fresh timing claim. |
+| 1,698,352 / 930,367 instructions, −14.5% / −23.2% | Same audit reconstructs each original (N500−N0)/500 from raw files and checks all JIT-counter pairs. |
+
+Also ran `audit_wall.py`: all 90 master-ZJIT processes, matching locks, actual `--zjit` commands, balanced orders,
+four zero summed absolute JIT deltas in each timed window, and independent 10,000-resample intervals match the
+committed idle −15.0% and one-message −6.9% claims. Both A/A intervals include zero. L0: one public API block,
+no copied helper, branch, new comment or new production test; the poll's single shared boundary is appropriate.
+
+**Relevance and currency, fetched 2026-11-27.** GitHub repo APIs and RubyGems gem APIs are retained in
+`logs/reach.jsonl`: Rails **59,158 stars**, last push November 27, **823,322,434** Rails / **875,281,637**
+Active Record downloads, both latest **8.1.4.1**, released November 4; Solid Cable **347 stars**,
+**24,735,811 downloads**, last push November 22, latest **4.1.0**, released September 24. Neither is archived.
+Ruby (the table's runtime, not a caller citation): **23,868 stars**, last push November 27, not archived;
+RubyGems downloads do not apply. The executed Ruby reports 4.0.10 dated November 19. Benchmark-ips (the measuring
+tool): **1,776 stars**, **91,538,325 downloads**, last push June 18, latest **2.15.1** released May 21, not archived;
+the retained body locks use that version (`logs/benchmark-ips-*.json`). The body introduces Active Record before
+Solid Cable, consistent with reach; it cites no peripheral apps to rank or remove. Runtime and measurement-tool
+labels belong with their measured numbers rather than in a ranked caller list.
+
+**Harness exclusions.** The first base probe lacked installed locked gems; it was rerun after aligning the
+base lock with head. The combination suite runner carried `DATABASE_URL` into some subsequent probes; those
+probe logs are not relied on. `reprobe.sh` unsets it and repeats every combination on both databases, with all
+comparisons identical. Suite URLs were set explicitly and those suites passed unchanged. All corrected probe
+logs, earlier logs, command traces and reproduction notes are retained.
+
 ## Held and dropped
 
 | ID | Lead | Numbers | Why not now |
