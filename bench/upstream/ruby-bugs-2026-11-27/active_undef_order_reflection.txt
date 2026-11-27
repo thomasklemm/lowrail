@@ -1,0 +1,2 @@
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-: NoMethodError NoMethodError NameError true 
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c7: NoMethodError :m :m true 

@@ -3,8 +3,10 @@
 Status, 2026-11-27: **draft, nothing posted.** Path: **Redmine ticket** (DECISIONS, A clear PR before a ticket).
 Which behaviour is intended is a question for the maintainers: no doc or test settles how `send`, `method` and
 `respond_to?` should treat an undef in an active refinement, and making them honor it changes reflection results
-(`respond_to?`, `method`) and touches `resolve_refined_method`, which the method-defined, alias and undef lookups share.
-There is no fix yet. Thomas posts the ticket (or approves posting).
+(`respond_to?`, `method`) in `resolve_refined_method`, the shared resolver for refinement-aware lookups other than
+direct calls. The method-defined, alias and undef lookups pass no refinements and would not change.
+There is no fix yet. Thomas posts the ticket (or approves posting). Replace `ruby/ruby#NNNNN` with RUC1's PR number
+once it is open; if the ticket is posted first, drop that clause ("; ruby/ruby#NNNNN fixes that crash").
 
 No existing report found (bugs.ruby-lang.org search for "undef_method" refine, "undef" refinement send, refinement
 respond_to? undef; GitHub issues and PRs in ruby/ruby). Related, closed: Bug #10578 (undef in refinements, direct calls
@@ -25,8 +27,8 @@ The crash in the module shape (`send` after a direct call aborts with `[BUG]`) i
 **Description:**
 
 `undef_method` in an active refinement makes a direct call raise NoMethodError, since
-[Bug #10578](https://bugs.ruby-lang.org/issues/10578). `send`, `public_send`, `method`, `respond_to?` and `&:foo`
-ignore it and find the original method:
+[Bug #10578](https://bugs.ruby-lang.org/issues/10578). For a method defined in the refined class, `send`,
+`public_send`, `method`, `respond_to?` and `&:foo` ignore it and find the original method:
 
 ```ruby
 class C; def foo = :c; end
@@ -47,9 +49,10 @@ NoMethodError
 true
 ```
 
-When the refinement defines `foo` instead, all of these return the refined method
+When the refinement defines `foo` instead, all of these see the refined definition
 ([Feature #11476](https://bugs.ruby-lang.org/issues/11476), [Feature #15326](https://bugs.ruby-lang.org/issues/15326),
-[Feature #15327](https://bugs.ruby-lang.org/issues/15327), [Feature #15373](https://bugs.ruby-lang.org/issues/15373)).
+[Feature #15327](https://bugs.ruby-lang.org/issues/15327), [Feature #15373](https://bugs.ruby-lang.org/issues/15373),
+[Feature #9451](https://bugs.ruby-lang.org/issues/9451)).
 If they should follow an undef the same way, the expected output is:
 
 ```
@@ -66,6 +69,8 @@ undef. The other lookups go through `resolve_refined_method` in vm_method.c, whe
 undef into "not found" and the search falls back to the original method.
 
 Same result on 3.4.13, 4.0.10 and master, in the interpreter and with `--yjit`, and with `--zjit` on 4.0.10 and master.
+For a method of an included module the results also depend on call order, and `send` after a direct call aborts with
+`[BUG] vm_call_method: unsupported method type (7)`; ruby/ruby#NNNNN fixes that crash.
 
 ## Evidence (record only, not for the report)
 

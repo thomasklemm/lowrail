@@ -1,0 +1,76 @@
+From 6bd87c87b9fa1042d5e9e07400199f2c36ca7ed3 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 22:03:25 +0000
+Subject: [PATCH] Keep defined_class when an active refinement undefines a
+ module method
+
+resolve_refined_method searched the refinement with the caller's
+defined_class pointer, so a search that stopped at an undef in the
+refinement left the refinement's iclass there even though its result
+was discarded. Completing the original method of a module then reused
+the undef entry already cached in that iclass by a direct call.
+Kernel#send after such a direct call got the undef entry and aborted
+with "[BUG] vm_call_method: unsupported method type (7)"; with send
+first, the original method was cached there instead and a later
+direct call ignored the undef. Kernel#public_send and Kernel#method
+after a direct call got the same undef entry.
+
+Write the class found in the refinement only when its entry is
+returned.
+---
+ test/ruby/test_refinement.rb | 21 +++++++++++++++++++++
+ vm_method.c                  |  4 +++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/test/ruby/test_refinement.rb b/test/ruby/test_refinement.rb
+index 3f733989e9..51a1ed6eea 100644
+--- a/test/ruby/test_refinement.rb
++++ b/test/ruby/test_refinement.rb
+@@ -3513,6 +3513,27 @@ def refined_private; end
+     end;
+   end
+ 
++  def test_undef_in_active_module_refinement_with_send
++    assert_separately([], <<-"end;")
++      module M
++        def foo = :M
++      end
++      class C1
++        include M
++      end
++      class C2
++        include M
++      end
++      using Module.new { refine(M) { undef_method :foo } }
++      c1 = C1.new
++      assert_raise(NoMethodError) { c1.foo }
++      assert_raise(NoMethodError) { c1.send(:foo) }
++      c2 = C2.new
++      assert_raise(NoMethodError) { c2.send(:foo) }
++      assert_raise(NoMethodError) { c2.foo }
++    end;
++  end
++
+   def test_undefined_refined_method_defined
+     assert_separately([], <<-"end;")
+     bug10753 = '[ruby-core:67656] [Bug #10753]'
+diff --git a/vm_method.c b/vm_method.c
+index 8377cc45aa..1f4d49f8c4 100644
+--- a/vm_method.c
++++ b/vm_method.c
+@@ -2320,9 +2320,11 @@ resolve_refined_method(VALUE refinements, const rb_method_entry_t *me, VALUE *de
+             if (RB_TYPE_P(me->owner, T_MODULE) && defined_class_ptr && RB_TYPE_P(*defined_class_ptr, T_ICLASS)) {
+                 refinement = module_refinement_iclass(refinement, *defined_class_ptr);
+             }
+-            tmp_me = search_method_protect(refinement, me->called_id, defined_class_ptr);
++            VALUE refinement_class;
++            tmp_me = search_method_protect(refinement, me->called_id, &refinement_class);
+ 
+             if (tmp_me && tmp_me->def->type != VM_METHOD_TYPE_REFINED) {
++                if (defined_class_ptr) *defined_class_ptr = refinement_class;
+                 return tmp_me;
+             }
+         }
+-- 
+2.55.0
+
