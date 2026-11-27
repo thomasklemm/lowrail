@@ -203,9 +203,9 @@ class ProfileTest < Minitest::Test
       report = JSON.parse(File.read(File.join(dir, "profile/report.json")))
       actions = report["actions"].to_h { [_1["name"], _1] }
       plain, probe, reads, block = actions.values_at(*%w[plain probe reads block].map { "NetController##{_1}" })
-      # The same objects with and without a probe, and the probe's counted apart: but one, which the
-      # call allocates before the hook marks the connect.
-      probe["warm"].zip(plain["warm"]) { |p, q| assert_includes [q, q + 1], p, probe["warm"].inspect }
+      # The same objects with and without a probe, and the probe's counted apart: but the few the call
+      # allocates for its arguments before the hook marks the connect (1 on Ruby 4.0, 3 on 3.3).
+      probe["warm"].zip(plain["warm"]) { |p, q| assert_includes 0..5, p - q, "#{probe["warm"]} against #{plain["warm"]}" }
       assert probe["network"].all?(&:positive?), probe["network"].inspect
       assert_equal [[0, 0], [0, 0], [0, 0]], [plain["network"], reads["network"], block["network"]]
       assert_equal report["summary"].map { _1["network"]["request"] }, report["actions"].map { _1["network"] }.transpose.map(&:sum)
