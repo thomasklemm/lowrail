@@ -32,6 +32,7 @@ passes:
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: approve, open: none}
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; exact posted 121-word body approved, identified in Thermos-sol body confirm below"}
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; Astra's exact two-sentence ready-comment replacement and pre-merge audit approved below; no further Hashie commit needed"}
+  - {reviewer: astra, head: "6558643df0afac235bbd5df8b5bed758c57f3273", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: changes, open: "R1 add Gemfile to c.watch so Gemfile-only changes actually compare; use the conditional replacement reply in the Astra nits review"}
 ---
 
 # Add Duel performance regression guards
@@ -492,3 +493,45 @@ Rechecked all six audit points against the exact checkout, pinned Duel source an
 * **History:** live PR commits and `git rev-list --reverse 812c48ca7b..be311bb` agree: exactly `bcf21e7` then `be311bb`, with those exact parent links and no rebase needed at the checked base.
 
 This confirm preserves the ready state, live head, body and prior reports. No new suite/timing run, Hashie edit/push, upstream comment or workflow rerun was performed.
+
+### Astra review — 2026-11-27 (6558643, maintainer nits)
+
+**Head verdict: changes, one must-fix. Reply verdict: replace with the text below after that fix.** Personally reviewed all five commits in `be311bbf4b0571d71481579f5c4e7aa27e704a01..6558643df0afac235bbd5df8b5bed758c57f3273` on `thomasklemm/duel-nits`, their messages, dblock's full comment `7220259771`, the proposed reply and the committed local-run evidence. No delegation. The approved earlier commits are unchanged ancestors. The live upstream head remains `be311bb`; this candidate review does not advance the queue's head or change its body/state.
+
+#### R1 — a Gemfile-only change starts Perf but skips the comparison
+
+Adding `Gemfile` to the workflow paths addresses GitHub's trigger only. Duel v0.3.1 also checks `Baseline#unchanged?` against `c.watch` plus its benchmark/configuration paths. The current watched paths are `lib`, `ext`, `benchmarks` and `.duel.rb`, not `Gemfile`. In a disposable candidate worktree with only a comment added to the root Gemfile, the real `duel --base HEAD` exits successfully with:
+
+```text
+duel: lib, ext, benchmarks, .duel.rb unchanged since the baseline, so there's nothing to compare (--force to anyway)
+```
+
+Thus the new trigger starts bundle installation and the job, but does not run the benchmarks on a Gemfile-only change. **Smallest fix:** add one line inside the existing configure block, immediately after `c.benchmarks`, with no explanatory comment:
+
+```ruby
+  c.watch += ['Gemfile']
+```
+
+An in-memory replay against the same Gemfile-only diff changes the real baseline predicate from `unchanged? == true` to `false`. Duel documents precisely this `c.watch` extension for files outside its default watch set. Existing gemspec/optional-Gemfile-only skips are not introduced by this delta; no broader workflow refactor is requested. This fix runs the scenarios with the selected bundle; it does **not** compare old and new dependency bundles, since Duel uses the candidate bundle for both versions.
+
+#### Fixture and ancillary changes
+
+* The fixture helper and all call sites are correct. Each parse is inside `once`/`untimed`, including indirect `repository_attributes` calls. An independent differential loaded the old and new benchmark definitions separately against the identical Hashie library, ran the actual Duel harness trial followed by batches of 1, 17 and 1, and compared normalized returns and measured Ruby/C calls originating in Hashie. **All 27 match.** A JSON.parse guard rejects parsing during measurement; all new parsed nested containers have distinct identities, and mutating one fixture's nested strings leaves another unchanged. Namespacing remains an optional future precaution; no current collision warrants expanding this patch.
+* “Measured work is identical” needs a narrow reading: the Hashie operations match, but the Mash construction scenario now also executes the ordinary `once` dispatch/check after setup, and reads an instance variable instead of a constant. No claim of identical total harness overhead or unchanged timing follows. This standard Duel setup pattern needs no additional abstraction.
+* Fresh parsing is a sound way to preserve mutable nested inputs. A separate frozen-input probe successfully constructs Mash and DeepHash and gets equal values from the current reads. Deep-freezing nevertheless propagates frozen state to retained Mash scalar strings and DeepHash nested hashes. The evidence supports a mutability difference, **not** the stronger claim that freezing breaks these current reads or changes Mash conversion work. The coordinator's `duel --base be311bb` run uses the candidate definitions on both sides, so it cannot independently establish equivalence of old and new definitions; the differential above addresses that gap. The committed candidate A/A/comparison logs report unsettled timings, not regressions; no new speed claim or timing cohort was produced here.
+* `require 'hashie'` makes the helper self-contained and does not add a dependency or alter the selected version: Duel already loads the selected version first. The standalone helper loads, and all 27 definitions load when `Duel::DSL` is supplied. Plain `ruby -Ilib benchmarks/mash_benchmark.rb` still raises for the missing `duel` DSL; the internal note's “every benchmark file loads with ruby -Ilib” is too broad. Do not promise standalone execution of the scenarios.
+* RuboCop's actual target list includes `gemfiles/duel.gemfile`; its addition is not just a matching-looking glob. `Perf Comment` changes only the reporting workflow's display name; `workflow_run.workflows` still names the unchanged `Perf`. The pinned reusable workflows, triggers' trust boundary and token permissions are otherwise untouched. No new code comment was added. Library, gemspec, main and optional Gemfiles, and existing Ruby support remain unchanged.
+
+#### Exact replacement reply
+
+**Approved only after R1 is applied and the corrected candidate is pushed.** The reply need not enumerate commit links or promise a five-commit total that the fix may change. “Outside measurement” is accurate; “outside the measured block” obscures that `once` appears inside the benchmark block. Qualify the fixture users rather than saying all scenarios parse it:
+
+```text
+Perf now compares on root `Gemfile` changes, and the helper explicitly requires `hashie`. Scenarios using the JSON fixture parse independent inputs outside measurement. RuboCop now includes `gemfiles/*.gemfile`, and the reporting workflow is named `Perf Comment`.
+
+I left the constants unnamespaced, as you suggested; there are no collisions today.
+```
+
+#### Fresh checks and limits
+
+`CI=true mise exec ruby@4.0.9 -- bundle exec rake spec rubocop` on the clean exact candidate: **1,076 examples, zero failures, 100% line coverage; 124 and 156 files inspected, no offenses; exit 0.** The differential, parser boundary, fixture ownership/mutation checks, DSL loading, frozen-input probe and Gemfile-skip reproduction described above also passed. Probe source/output and suite log are retained under `.amp/in/orb-backup/hd1-astra/nits-*`. Ruby 3.0, integration specs, GitHub workflows and performance calibration were not rerun by this pass; the builder's Ruby 3.0 result is not presented as fresh reviewer execution. No Hashie source edit/push, upstream comment/PR edit or workflow rerun was made. Only this report and its exact-candidate pass entry are added to Lowrail.
