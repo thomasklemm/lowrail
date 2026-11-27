@@ -34,6 +34,12 @@ passes:
     date: 2026-11-27
     verdict: changes
     summary: "Body-text confirm at Lowrail a469f402 only; code approval unchanged. Timing ranges and interval signs match all six cells from the raw logs, 90 JIT-flat processes per Ruby. One must-fix: ±0.5% describes A/A median differences, not variation or interval bounds (YJIT has_one A/A 95% CI -3.4945% to +2.2526%). Name the median differences explicitly, or cut the A/A clause. No timing rerun or Rails change needed. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 thermos-sol."
+  - reviewer: thermos-sol
+    head: "ed1b28c5b94530e1c8b06d14dfca0ee93d5c07ba"
+    orb: T-01a21eb9-b7bd-74a9-b7cc-38834c572ca0
+    date: 2026-11-27
+    verdict: approve
+    summary: "Text confirm on the body at Lowrail f819817549bc5836880d3ff3c8a95359720889fe. The sole body change is the exact requested median/95% interval clarification; both timing cohorts are unchanged since the raw-log audit. Corrected claims match all six cells. No remaining text must-fix; original code/security/maintainability approval stands. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 thermos-sol."
 ---
 
 # Reuse the connection for cached association statements
