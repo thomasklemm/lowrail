@@ -3,7 +3,7 @@
 
 # Rails allocation census: one entry point for every round. See docs/upstream/census.md.
 #   script/census setup    --rails SPEC [--ruby R] [--ruby-overlays DIR] [--apps LIST]
-#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]] [--callgrind[=FLAGS]]
+#   script/census run      --label L [--rails SPEC] [--gem NAME=SPEC] [--ruby R] [--modes interp,yjit] [--aa] [--apps LIST] [--stats[=FLAGS]] [--callgrind[=FLAGS]] [--wall[=FLAGS]]
 #   script/census rank     --label L [--mode interp] [--limit N] [--tiers 7,5,3,2] [--gem NAME|all]
 #   script/census compare  --base L [--aa L0] [--detail] [--markdown] LABEL...
 #   script/census controls --script FILE [--app blog] [--modes ...] BASE LABEL...
@@ -455,6 +455,7 @@ module Census
                     command, flags = "callgrind", mode == "zjit" ? opts[:callgrind].split : []
                     ruby = callgrind_command(json) + ruby + ["-I", ENV.fetch("CGEXT")]
                   end
+                  command, flags = "wall", mode == "zjit" ? opts[:wall].split : [] if opts[:wall]
                   sh(env, "bundle", "exec", *ruby, *FLAGS.fetch(mode), *flags, HARNESS, command, app, json,
                     chdir: app_dir(opts[:corpus], app), log: json.sub(/\.json\z/, ".log"))
                 end
@@ -964,6 +965,8 @@ module Census
         "(e.g. --zjit-trace-exits-sample-rate=20); a ZJIT trace lands in /tmp/perfetto-PID.fxt") { opts[:stats] = _1.to_s }
       o.on("--callgrind [FLAGS]", "run: Callgrind Ir per operation over the workload mix (harness callgrind), with extra " \
         "ruby FLAGS for ZJIT; needs VALGRIND_PREFIX (default ~/w/vg319brk) and CGEXT (bench/callgrind.c built)") { opts[:callgrind] = _1.to_s }
+      o.on("--wall [FLAGS]", "run: wall time per operation over the workload mix with the JIT-flat gate (harness wall), " \
+        "with extra ruby FLAGS for ZJIT") { opts[:wall] = _1.to_s }
       o.on("--jobs N", Integer, "run: apps measured in parallel per mode (default 1)") { opts[:jobs] = _1 }
       o.on("--limit N", Integer) { opts[:limit] = _1 }
       o.on("--tiers LIST", "rank: app-count tier floors (default 7,5,3,2)") { |v| opts[:tiers] = v.split(",").map { Integer(_1) } }

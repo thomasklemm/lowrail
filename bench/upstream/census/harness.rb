@@ -359,6 +359,53 @@ module RailsCensus
         workloads: ops.map(&:name), cycles: cycles, ops: ops.size * cycles, warm_windows: warm, attempts: attempts) + "\n")
     end
 
+    # Wall time per operation over the whole workload mix (script/census run
+    # --wall): a cycle runs every workload once, a window is CENSUS_WALL_CYCLES
+    # cycles. CENSUS_WALL_WARM warm windows, then CENSUS_WALL_WINDOWS timed ones,
+    # through one loop, GC on. The JIT counters are read after every window; the
+    # gate passes when none moved over the last six warm windows and the timed ones.
+    # CENSUS_WALL_SKIP drops workloads by name (those that grow the database every cycle).
+    def wall(name, output)
+      raise "fresh output required" if File.exist?(output)
+      ops = workloads(name)
+      skip = ENV["CENSUS_WALL_SKIP"]&.split(",")
+      ops = ops.reject { skip.include?(_1.name) } if skip
+      counters = lambda do
+        if RubyVM::ZJIT.enabled?
+          RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns)
+        elsif RubyVM::YJIT.enabled?
+          RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count)
+        end
+      end
+      cycles = Integer(ENV.fetch("CENSUS_WALL_CYCLES", "5"))
+      warm = Integer(ENV.fetch("CENSUS_WALL_WARM", "40"))
+      timed = Integer(ENV.fetch("CENSUS_WALL_WINDOWS", "20"))
+      all = []
+      i = 0
+      while i < warm + timed
+        gc = GC.total_time
+        start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+        c = 0
+        while c < cycles
+          ops.each { |op| op.call.call; reset_side_effects }
+          c += 1
+        end
+        ns = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - start
+        all << { ms: ns / 1e6, gc_ms: (GC.total_time - gc) / 1e6, counters: counters.call }
+        i += 1
+      end
+      flat_warm = all[warm - 7...warm].map { _1[:counters] }.uniq.size <= 1
+      flat = all[warm - 1..].map { _1[:counters] }.uniq.size <= 1
+      changes = all.each_cons(2).with_index.select { |(a, b), _| a[:counters] != b[:counters] }.map { _2 + 2 }
+      timed_windows = all.last(timed)
+      timed_windows.each_with_index { |w, k| w[:flat] = !changes.include?(warm + k + 1) }
+      File.write(output, JSON.pretty_generate(app: name, ruby: RUBY_DESCRIPTION, mode: mode, rails: rails_sha, pid: Process.pid,
+        workloads: ops.map(&:name), warm_windows: warm, cycles: cycles, ops: ops.size * cycles,
+        gate: counters.call.nil? ? "n/a" : (flat_warm && flat ? "pass" : "fail"), flat_warm: flat_warm, flat_measured: flat,
+        counter_change_windows: changes, counters: counters.call, warm_ms: all.first(warm).map { _1[:ms].round(2) },
+        windows: timed_windows.map { _1.except(:counters) }) + "\n")
+    end
+
     # Where site keys point on disk, so script/census app's report can quote
     # each line's source: GEM/ is relative to the first ".../gems/" of a gem path.
     def source_roots
@@ -398,9 +445,10 @@ if $PROGRAM_NAME == __FILE__
   when "list" then RailsCensus.list(name)
   when "stats" then RailsCensus.stats(name, output)
   when "callgrind" then RailsCensus.callgrind(name, output)
+  when "wall" then RailsCensus.wall(name, output)
   when "init"
     load File.join(__dir__, "app_workloads.rb")
     CensusAppWorkloads.init(RailsCensus, output)
-  else abort "usage: harness.rb prepare|profile|stats|list|init APP [NEW_JSON|NEW_RB]"
+  else abort "usage: harness.rb prepare|profile|stats|callgrind|wall|list|init APP [NEW_JSON|NEW_RB]"
   end
 end
