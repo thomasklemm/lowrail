@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "7da6979b27b2aba69c4076d8f01939e5a8c0f1f6"
+head: "c43954fa4d2a7605e18ecc8968c1aa188eae549a"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -95,7 +95,10 @@ note: >-
   is not in ruby/uri's CI ("jruby" is 10.x). Request input reaches the method as plain Strings from Rack and
   Rails. `String.new(str, encoding: BINARY)` would fix the class but changes the exceptions for nil, Symbols and
   Integers and skips `b`. So: accepted, one sentence in the body. Both reviewers are asked for a confirm on
-  7da6979 with this sentence. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  7da6979 with this sentence.
+  2026-11-27 (Astra confirm on 7da6979: boundary and body accepted; commit text only): the commit message now says
+  the result has the same bytes and encoding, and the same class except on JRuby 9.4. Amended to c43954f, same
+  tree as cecaed1 and 7da6979, and the fork branch moved with a lease. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
