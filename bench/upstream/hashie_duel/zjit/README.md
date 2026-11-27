@@ -49,3 +49,23 @@ restored to `master` and the test PRs and branches removed. Run IDs in `comment-
 
 So two reports need no change to Perf Comment. The follow-up renames the job key `duel` to `yjit`; keeping `duel` would
 name the check `duel / Duel (yjit)`. Either way the YJIT check's name changes, which branch protection would notice.
+
+## One matrix job (2026-11-27)
+
+dblock's optional nit on #660: one `duel` job with a matrix `entry: [{jit: yjit}, {jit: zjit}]`, `fail-fast: false`,
+`name: Duel (${{ matrix.entry.jit }})`, and `jit`/`report` from the entry. Taken as written: head `62f869a` (amends
+`f6545d1`, only `perf.yml` and the message differ). Tested on the fork as above (`62f869a` as default branch
+`duel-matrix-test`, default restored to `master`, probe PRs closed and branches deleted, Danger Comment stayed
+disabled). Run IDs, jobs, artifacts and checks in `matrix-test/`.
+
+* A/A PR (fork #30, comment-only): `Duel (yjit) / Duel (yjit)` pass 2m31s and `Duel (zjit) / Duel (zjit)` pass 2m38s,
+  started within 6 s of each other; artifacts `duel-report-yjit` and `duel-report-zjit`; Perf Comment succeeded and
+  posted nothing.
+* CPU plant PR (fork #31): both checks fail and each ran to the end (4m8s, 4m4s), so `fail-fast: false` holds; one
+  comment with `## yjit` and `## zjit`, each "4 benchmarks failed", the same four benchmarks
+  (`matrix-test/plant-cpu-comment.md`).
+
+Why it works: Duel's inner job is named `Duel (<report>)` and uploads `duel-report-<report>`; `report` per entry keeps
+the artifacts apart, and Perf Comment downloads `duel-report*` into one comment. The check name is caller name plus
+inner name, so it repeats: `Duel (yjit) / Duel (yjit)`. `name: ${{ matrix.entry.jit }}` would give the earlier
+`yjit / Duel (yjit)`; a plain `jit: [yjit, zjit]` matrix behaves identically to `entry`. Kept his form.

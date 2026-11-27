@@ -1,0 +1,6 @@
+fork #30
+Duel (yjit) / Duel (yjit)	pass	2m31s
+Duel (zjit) / Duel (zjit)	pass	2m38s
+fork #31
+Duel (yjit) / Duel (yjit)	fail	4m8s
+Duel (zjit) / Duel (zjit)	fail	4m4s
