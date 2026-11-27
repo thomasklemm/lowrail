@@ -14,7 +14,7 @@ alternative_of:
 impact: the Callgrind dump's summary line equals its totals, so callgrind_annotate and scripts reading summary (ruby/ruby#19851) see the measured instruction count instead of a number near 2^64
 rank:
 risky: false
-state: ready
+state: closed
 pr: 579
 note: "2026-11-19 coordinator: tekknolagi's draft ruby-bench#581 (head 6942c05fcf) rewrites harness/callgrind.rb as he suggested on #579 (start once, zero before each iteration, dump after it, read totals:). Valgrind 3.19 with t3.rb in that order (start,zero,work,dump,zero,work,dump,stop): .1 and .2 summary = totals within 3 Ir, so #581 subsumes this fix; only the exit dump still wraps (summary 2^64-419M, totals 2,653) without a zero after stop. Proposed to Thomas: close #579 with a comment naming that leftover. Thomas: thumbs-up on tekknolagi's comment only; #579 stays open, no comment. built 2026-11-14 in T-01a1da97 (docs/upstream/ruby-bench-after-576.md); suite 360 runs green on Ruby 4.0.9; the three reordered harness tests fail on main's harness; Opus changes on 9e04df158d applied in d1ab8607b7. Not opened: Thomas decides; Max's ruby/ruby#19851 reads summary:, so this is worth telling him about either way. Thomas approved opening; opened as #579 on 2026-11-14 after the claude-code pass"
 passes:
