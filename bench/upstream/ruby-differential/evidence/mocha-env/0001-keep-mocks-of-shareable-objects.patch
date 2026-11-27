@@ -1,0 +1,111 @@
+From 3d3f63b4c136e807c6f532f97fc90794080ba364 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 12:13:50 +0000
+Subject: [PATCH] Keep mocks of shareable objects such as ENV out of instance
+ variables
+
+Ruby 4.1 forbids instance variables on objects that are Ractor-shareable
+but not frozen [Bug #22291], so stubbing a method on ENV raised
+Ractor::IsolationError when Mocha stored the object's mock in @mocha.
+
+The mock of such an object now lives in a Hash keyed by identity, with
+the same lifetime @mocha had. Classes and modules are shareable too,
+but still allow instance variables, so they keep using @mocha.
+
+Amp-Thread-ID: https://ampcode.com/threads/T-01a21ca4-eb07-7134-a138-0909fab59394
+---
+ lib/mocha/object_methods.rb      | 21 +++++++++++++++--
+ test/acceptance/stub_env_test.rb | 40 ++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 2 deletions(-)
+ create mode 100644 test/acceptance/stub_env_test.rb
+
+diff --git a/lib/mocha/object_methods.rb b/lib/mocha/object_methods.rb
+index ec4883b4..34c5ccc9 100644
+--- a/lib/mocha/object_methods.rb
++++ b/lib/mocha/object_methods.rb
+@@ -20,9 +20,15 @@ module Mocha
+       alias_method :_method, :method
+     end
+ 
++    # @private
++    SHAREABLE_MOCKS = {}.compare_by_identity
++
+     # @private
+     def mocha(instantiate: true)
+-      if instantiate
++      if mocha_shareable?
++        SHAREABLE_MOCKS[self] ||= Mocha::Mockery.instance.mock_impersonating(self) if instantiate
++        SHAREABLE_MOCKS[self]
++      elsif instantiate
+         @mocha ||= Mocha::Mockery.instance.mock_impersonating(self)
+       else
+         defined?(@mocha) ? @mocha : nil
+@@ -31,7 +37,18 @@ module Mocha
+ 
+     # @private
+     def reset_mocha
+-      @mocha = nil
++      if mocha_shareable?
++        SHAREABLE_MOCKS.delete(self)
++      else
++        @mocha = nil
++      end
++    end
++
++    # @private
++    # Ruby 4.1 forbids instance variables on objects that are shareable but not frozen, such as ENV.
++    # Classes and modules are shareable too, but still have instance variables.
++    def mocha_shareable?
++      !(Module === self) && defined?(Ractor) && Ractor.shareable?(self)
+     end
+ 
+     # @private
+diff --git a/test/acceptance/stub_env_test.rb b/test/acceptance/stub_env_test.rb
+new file mode 100644
+index 00000000..6eb7171f
+--- /dev/null
++++ b/test/acceptance/stub_env_test.rb
+@@ -0,0 +1,40 @@
++# frozen_string_literal: true
++
++require File.expand_path('../acceptance_test_helper', __FILE__)
++
++class StubEnvTest < Mocha::TestCase
++  include AcceptanceTestHelper
++
++  def setup
++    setup_acceptance_test
++  end
++
++  def teardown
++    teardown_acceptance_test
++  end
++
++  def test_should_stub_method_on_env_within_test
++    test_result = run_as_test do
++      ENV.stubs(:key?).with('MOCHA_STUBBED').returns(true)
++      assert ENV.key?('MOCHA_STUBBED')
++    end
++    assert_passed(test_result)
++    assert_equal false, ENV.key?('MOCHA_STUBBED')
++  end
++
++  def test_should_fail_if_expected_method_on_env_is_not_called
++    test_result = run_as_test do
++      ENV.expects(:fetch).with('MOCHA_EXPECTED')
++    end
++    assert_failed(test_result)
++  end
++
++  def test_should_unstub_method_on_env
++    test_result = run_as_test do
++      ENV.stubs(:key?).returns(true)
++      ENV.unstub(:key?)
++      assert_equal false, ENV.key?('MOCHA_UNSTUBBED')
++    end
++    assert_passed(test_result)
++  end
++end
+-- 
+2.55.0
+

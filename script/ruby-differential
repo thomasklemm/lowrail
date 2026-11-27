@@ -90,6 +90,12 @@ module RubyDifferential
       prep: %w[bin/rake db:create db:migrate], db: ->(t) { "rd_discourse_#{t}" },
       env: ->(t, r) { { "RAILS_DB" => "rd_discourse_#{t}", "LOAD_PLUGINS" => "0", "DISCOURSE_REDIS_PORT" => r.to_s, "DISCOURSE_REDIS_DB" => "1",
         "RDIFF_NO_VIPS" => "1" } } },
+    # The SQLite and Inertia census apps (profile_hotlines_census/apps). PingCRM has only Selenium system tests.
+    "blog" => { source: "census", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:test:prepare] },
+    "thinkroom" => { source: "census", kind: "minitest", cmd: MINITEST,
+      prep: ["sh", "-c", "bin/vite build --mode test && bin/rails db:test:prepare"] },
+    "react-starter-kit" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:prepare assets:precompile] },
+    "redprints-cfp" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:prepare assets:precompile] },
   }.freeze
 
   module_function
@@ -181,7 +187,7 @@ module RubyDifferential
     end
     case app
     when "mastodon" then edit_file.("spec/rails_helper.rb", "require 'rspec/rails'\n", "require 'rspec/rails'\nrequire #{RSPEC_FIX.inspect} # rdiff\n")
-    when "casa", "lobsters" then edit_file.("spec/rails_helper.rb", %(require "rspec/rails"\n), %(require "rspec/rails"\nrequire #{RSPEC_FIX.inspect} # rdiff\n))
+    when "casa", "lobsters", "react-starter-kit", "redprints-cfp" then edit_file.("spec/rails_helper.rb", %(require "rspec/rails"\n), %(require "rspec/rails"\nrequire #{RSPEC_FIX.inspect} # rdiff\n))
     when "discourse"
       edit_file.("spec/rails_helper.rb", %(require "shoulda-matchers"\n), %(require #{RSPEC_FIX.inspect} # rdiff\nrequire "shoulda-matchers"\n))
       # The libvips worker needs libvips >= 8.18; image-processing specs fail in every mode instead.

@@ -26,6 +26,7 @@ module RailsCensus
     end
 
     def jit_counters
+      return RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns) if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
       return {} unless RubyVM::YJIT.enabled?
       RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count, :code_gc_count)
     end
@@ -37,12 +38,12 @@ module RailsCensus
       count = Integer(ENV.fetch("CENSUS_REQUESTS", "10"))
       interval = Integer(ENV.fetch("CENSUS_CPU_INTERVAL", "8192"))
       seed = Integer(ENV.fetch("CENSUS_CPU_SEED", "41231"))
-      # JIT-flat gate: under YJIT, warm in windows of `count` through the
+      # JIT-flat gate: under YJIT or ZJIT, warm in windows of `count` through the
       # measured window's own block (interval 0: not sampled; sampling does not
       # change what compiles), each after a GC.start like the measured one,
       # until CENSUS_CPU_FLAT windows in a row compile nothing (at most 50 more).
       # The measured window is checked too.
-      if RubyVM::YJIT.enabled?
+      if RubyVM::YJIT.enabled? || (defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?)
         sampled = ->(every) { CensusCpu.measure(seed, every) { count.times { run.call } } }
         need = Integer(ENV.fetch("CENSUS_CPU_FLAT", "3"))
         flat = 0

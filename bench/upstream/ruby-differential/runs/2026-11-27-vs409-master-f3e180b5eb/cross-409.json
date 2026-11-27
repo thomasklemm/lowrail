@@ -1,0 +1,182 @@
+{
+  "blog interp": {
+    "base_mode": "interp",
+    "tests": 21,
+    "differ": []
+  },
+  "blog yjit": {
+    "base_mode": "yjit",
+    "tests": 21,
+    "differ": []
+  },
+  "blog interpw": {
+    "base_mode": "interpw",
+    "tests": 21,
+    "differ": []
+  },
+  "blog zjit": {
+    "base_mode": "interp",
+    "tests": 21,
+    "differ": []
+  },
+  "campfire interp": {
+    "base_mode": "interp",
+    "tests": 634,
+    "differ": []
+  },
+  "campfire yjit": {
+    "base_mode": "yjit",
+    "tests": 634,
+    "differ": []
+  },
+  "campfire interpw": {
+    "base_mode": "interpw",
+    "tests": 634,
+    "differ": []
+  },
+  "campfire zjit": {
+    "base_mode": "interp",
+    "tests": 634,
+    "differ": []
+  },
+  "codetriage interp": {
+    "base_mode": "interp",
+    "tests": 219,
+    "differ": []
+  },
+  "codetriage yjit": {
+    "base_mode": "yjit",
+    "tests": 219,
+    "differ": []
+  },
+  "codetriage interpw": {
+    "base_mode": "interpw",
+    "tests": 219,
+    "differ": []
+  },
+  "codetriage zjit": {
+    "base_mode": "interp",
+    "tests": 219,
+    "differ": []
+  },
+  "fizzy interp": {
+    "base_mode": "interp",
+    "tests": 1787,
+    "differ": []
+  },
+  "fizzy yjit": {
+    "base_mode": "yjit",
+    "tests": 1787,
+    "differ": []
+  },
+  "fizzy interpw": {
+    "base_mode": "interpw",
+    "tests": 1787,
+    "differ": []
+  },
+  "fizzy zjit": {
+    "base_mode": "interp",
+    "tests": 1787,
+    "differ": []
+  },
+  "hackatime interp": {
+    "base_mode": "interp",
+    "tests": 794,
+    "differ": []
+  },
+  "hackatime yjit": {
+    "base_mode": "yjit",
+    "tests": 794,
+    "differ": []
+  },
+  "hackatime interpw": {
+    "base_mode": "interpw",
+    "tests": 794,
+    "differ": []
+  },
+  "hackatime zjit": {
+    "base_mode": "interp",
+    "tests": 794,
+    "differ": []
+  },
+  "react-starter-kit interp": {
+    "base_mode": "interp",
+    "tests": 35,
+    "differ": []
+  },
+  "react-starter-kit yjit": {
+    "base_mode": "yjit",
+    "tests": 35,
+    "differ": []
+  },
+  "react-starter-kit interpw": {
+    "base_mode": "interpw",
+    "tests": 35,
+    "differ": []
+  },
+  "react-starter-kit zjit": {
+    "base_mode": "interp",
+    "tests": 35,
+    "differ": []
+  },
+  "redprints-cfp interp": {
+    "base_mode": "interp",
+    "tests": 50,
+    "differ": []
+  },
+  "redprints-cfp yjit": {
+    "base_mode": "yjit",
+    "tests": 50,
+    "differ": []
+  },
+  "redprints-cfp interpw": {
+    "base_mode": "interpw",
+    "tests": 50,
+    "differ": []
+  },
+  "redprints-cfp zjit": {
+    "base_mode": "interp",
+    "tests": 50,
+    "differ": []
+  },
+  "thinkroom interp": {
+    "base_mode": "interp",
+    "tests": 833,
+    "differ": []
+  },
+  "thinkroom yjit": {
+    "base_mode": "yjit",
+    "tests": 833,
+    "differ": []
+  },
+  "thinkroom interpw": {
+    "base_mode": "interpw",
+    "tests": 833,
+    "differ": []
+  },
+  "thinkroom zjit": {
+    "base_mode": "interp",
+    "tests": 833,
+    "differ": []
+  },
+  "writebook interp": {
+    "base_mode": "interp",
+    "tests": 310,
+    "differ": []
+  },
+  "writebook yjit": {
+    "base_mode": "yjit",
+    "tests": 310,
+    "differ": []
+  },
+  "writebook interpw": {
+    "base_mode": "interpw",
+    "tests": 310,
+    "differ": []
+  },
+  "writebook zjit": {
+    "base_mode": "interp",
+    "tests": 310,
+    "differ": []
+  }
+}
