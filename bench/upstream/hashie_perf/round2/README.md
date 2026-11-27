@@ -896,3 +896,101 @@ h.to_hash
 ```
 
 Head: **3.621 ms/call**; paired change **+1.25% [ +0.80%, +1.70% ]**; A/A **−0.26% [−0.63%, +0.58%]**. This local cohort does pass the statistical and JIT gates for a small loss; unlike its preliminary three-round result it must not be dismissed as merely inside its confidence interval. **Repeat this row on a1.xxlarge before clearing the performance follow-up.** The orb size prevents treating it as DECISIONS' blocking-loss measurement. No cause or optimization-preserving correction is established, and no speculative large-Array branch is recommended. This is not a universal worst-case proof over arbitrary Ruby callbacks. The candidate's body reports only its nested-Mash fixture, whose Duel claim was verified separately.
+
+## Astra HM4: changes on 10a93033975136664d7b7231986663e9c7689d91
+
+**Changes; do not open this head.** Reviewed independently in `T-01a21f5c-5af9-70ac-9fd0-44b340063d1e`, 2026-11-27. Verified the fork branch's full head, its parent `277e88e6ccc317497e6c20fb8b9e35abebc0fe19`, and its one-commit range. No candidate code was changed or pushed, and nothing was posted upstream. Scripts, raw outputs, public API responses, exact diff and an expanded sentence-by-sentence review are in [astra-HM4-10a9303.tar.gz](astra-HM4-10a9303.tar.gz). The original differential stdout is losslessly nested as `quiet-outputs.tar.xz` to keep this archive below 10 MB.
+
+### R1: ordinary quiet subclasses lose working Ractor writes
+
+```ruby
+require 'hashie'
+class Quiet < Hashie::Mash
+  disable_warnings
+end
+r = Ractor.new { Quiet.new(fresh: 3).to_hash }
+p(r.respond_to?(:value) ? r.value : r.take)
+```
+
+Base returns `{"fresh"=>3}`. Head raises `Ractor::IsolationError` accessing the unshareable `@disabled_warnings` class ivar. Catching the exception around `m[:fresh] = 3` confirms that head leaves `{}` while base stores the value. A subclass with `disable_warnings(:size)` also fails for the nonconflicting key `fresh`. Plain `Hashie::Mash` fails after the main Ractor calls its semipublic `disabled_warnings` reader. On Ruby 3.0.7 the regression is broader: **even plain, unconfigured Mash fails**, because that Ruby prohibits these class-ivar reads altogether. Its minimal repro, after preloading, is:
+
+```ruby
+require 'hashie/mash'
+p Ractor.new { Hashie::Mash.new(fresh: 3).to_hash }.take
+```
+
+This is reachable without overrides by applications constructing response objects in worker Ractors. It is not a claim that every Hashie operation was previously Ractor-safe. `ractors.rb` records exceptions and partial state across the Ruby matrix; `minimal-*-ractor-plain-preloaded-3.0.txt` records the plain-Mash repro. The earlier non-preloaded attempt failed on both trees during RubyGems autoload and is retained, not counted as this finding. Untouched plain classes are the passing control on Ruby 3.1 and later.
+
+### R2: the guard ignores an overridden semipublic exclusions reader
+
+```ruby
+require 'hashie'
+class Selective < Hashie::Mash
+  def self.disabled_warnings
+    [:size]
+  end
+end
+p Selective.disable_warnings?(:size)
+Selective.new(size: 7)
+```
+
+Base returns `true` and logs nothing; head returns `false` and logs a conflict warning. Both store 7. This override does not initialize the particular ivars that the new guard reads. Both methods are documented `@api semipublic`, not private/nodoc helpers. A computed/shared configuration provider can hit this; none of the five cited released gems currently uses this override, so this is an extension-contract finding, not a claim about those gems. A singleton-class prepend reproduces it too (`extended.rb`). Removing the new early-return line fixes R2 alone, but leaves R1 and the reorder-only performance cost.
+
+### Accepted differences are not limited to call counts
+
+`adversarial.rb` demonstrates and retains minimal executable cases for each boundary:
+
+* A quiet class's public `respond_to?` override calls `self.class.disable_warnings(:other) if key == :size` before `super`. Base warns on `size` and leaves its warning enabled; head skips that hook, does not warn and leaves it disabled. Observable configuration and warnings differ.
+* A quiet `respond_to_missing?` override mutates `payload[:observed] = true if key == :fresh` before `super`; `m[:fresh] = m.payload` stores the extra field on base only. Moving that mutation to a class `disable_warnings?` override instead stores it on head only. A predicate override raising for `:fresh` lets base store 7 but makes head raise and leave `{}`. These are synthetic effectful hooks, not discovered production callers; they disprove the claimed equivalence beyond counts. A Queue-barrier version confirms the added callback can also admit a second thread's mutation before the write. An ordinary eight-thread/independent-Mash control is identical.
+* `Class.new(Hashie::Mash).freeze.new`, followed by writing `:size`, raises `FrozenError` and stores nothing on base; head logs and stores 7. Avoiding an unnecessary class mutation is reasonable, but the public exception/storage change needs explicit acceptance, not a claim that frozen behavior is identical.
+* On a quiet class with `MethodAccessWithOverride`, `m.public_send(:'respond_to?=', 7)` raises `ArgumentError` before storing on base; head stores the key and permits the next ordinary write. This confirms the known 18 rows and their previously unrecorded partial state. It is an improvement for a shipped extension and a user-controlled key, not just internal accounting; disclose it if retaining the change.
+
+The no-ivar-assignment difference alone is acceptable. Skipped/added effectful hooks cannot be accepted as merely count differences while promising identical warnings/state for every caller. The private `_log_collision?` override control matched; the shipped `PermissiveRespondTo` override remains a separate, unchanged path. The existing probe drops stored state on exceptions and does not record identities/keyword flags; its hook tests count calls only. Additional identity/frozen/keyword-flag controls for ordinary values and Hash/Array/String subclasses matched, while the new callbacks above expose changes it did not record.
+
+### Performance: raw numbers reconcile, but the plain-path cost needs a broader repeat
+
+`audit.py` recomputed paired medians and A/A from **80 archived wall cells**, and all base/A/A/head Callgrind totals for `body/HM4` and `body/HM4-module-f41c3b2`; they match `results.json`. Confidence intervals were checked as recorded, not independently regenerated. Raw Duel logs and the live run API confirm run 46079366956, the exact head, Ruby 4.0.10, 28 benchmarks and zero classified regressions; the YJIT read-only KeepOriginalKeys case is unsettled. CPU rows 0.458/0.655, 1.007/1.006 and 1.013/1.013 round correctly in the body. “Same” is Duel's threshold classification, not proof of zero cost. The retained mixed-master wall cohort recomputes +9.108%, A/A +0.209%, consistent with its recorded intervals [+7.408%, +9.836%] and [−1.192%, +2.606%]. The refused-form numbers reconcile too.
+
+This review orb has **2 vCPUs and 3,931 MiB RAM**, not a1.xxlarge; its tier name was not exposed by the inspected CLI/environment. New timings are diagnostic only. The sweep covered one scalar key, 20 fresh keys, 20 suffixed keys, the nested fixture, clear-and-insert and overwrite, each plain-only/quiet-first and before/after calling **`Hashie::Mash.disabled_warnings`**. That reader initializes an empty Array without disabling any warning, defeating the head's new fast return. All 48 cells used five randomized base/A/A/head rounds, nine GC-off CPU-time windows/process, core 0. No JIT-flat gate was claimed; some review checks overlapped, and the observed ranges are noisy.
+
+The worst median in this finite sweep was the nested fixture **after quiet-class warmup and inspection of the plain exclusions list**:
+
+| Diagnostic only | Paired change | A/A | Observed change range | Observed A/A range |
+|---|---:|---:|---:|---:|
+| Ruby 4.0.10/YJIT | +12.68% | +0.25% | −0.75% to +14.42% | −2.20% to +15.28% |
+| Master 0d399335b7/ZJIT | +8.53% | +0.69% | +3.10% to +14.64% | −5.00% to +4.85% |
+
+These are not confidence intervals or established speed-loss claims. A less noisy YJIT control, 20 fresh keys after only inspecting the list, was +8.85% (A/A −0.29%; change range +6.86% to +11.40%, A/A −2.16% to +1.22%). No warning was disabled on the measured plain Mash. Repeat this state-dependent cost on a1.xxlarge before treating approximately 1% as representative.
+
+The exact-head `zjit_mixed.rb` rerun confirms polymorphic-send fallbacks per plain construction rise **20/20/114 for base/A/A/head** after quiet warmup; the plain-only control is 40 on both trees. The checked runs explicitly have `compile_error_out_of_memory=0` with `--zjit-exec-mem-size=512 --zjit-mem-size=1024`. This verifies the dispatch observation on this head, rather than borrowing it solely from older variants.
+
+**None of the refused forms is a replacement:** all three were applied in separate scratch worktrees and all three fail the quiet-class Ractor repro. The module form also adds a second collision path, reorder-only pays the larger ordinary-path cost, and flag-first ignores direct mutation of the exclusions Array. The smallest safe rollback is to restore the original ordering and remove the new ivar guard; it loses the proposed quiet speedup. No optimization-preserving fix is established. Do not add exception rescues, method-owner guards or copied collision logic merely to keep the win. Correctness already blocks this head; performance approval should separately wait for an a1.xxlarge repeat of these ordinary/mixed-state shapes and acceptance of the tradeoff. The small-orb runs alone are not a formal new loss gate.
+
+### Upstream text, relevance and currency
+
+Every title/body/commit-message/CHANGELOG sentence was checked against the exact diff, executed tracing/probes, retained raw evidence or fetched source/API responses; the full sentence table is `review.md` in the archive. Required text corrections:
+
+* “Every Mash write” is false for Integer keys. An unset key matching an existing built-in (`size`) does not call `respond_to_missing?`. Prefer new, nonconflicting String/Symbol keys through the default helper. The “once for every key” cost sentence also needs that qualification: a fresh collision calls the class twice, including the logger check, before and after.
+* Cut the universal “most expensive step” assertion. In the retained YJIT issues profile, `convert_value` is 62.6% inclusive versus `respond_to_missing?` 20.0%; the repository profile's 49.0% is `Kernel#respond_to?`, not that missing-method hook alone.
+* “Ruby 4.0 doesn't show this” overstates a local 4.0.10/20-round cohort that fails its JIT-flat gate. Say it was not observed in that cohort. The master warning and table are fair descriptions of their specific runs, not release-wide guarantees. Discarding a boolean is not evidence that discarded callbacks have no effects.
+* The new benchmark does build the quiet subclass from the nested JSON fixture. No added comment needs removal; the two-line source change is L0 syntactically but its guard bypasses a semipublic contract.
+* Both caller permalinks match the latest released gem bytes and release-tag SHAs; KeyStore line 8 disables warnings, AuthHash line 8 inherits it, and HashWrapper lines 28–29 inherit Mash and disable warnings. Their current default branches retain those calls. Commit attribution matches Thomas. The highest live issue/PR number is **661**, so the next expected number is **662**, not the CHANGELOG's assumed 663; recheck at opening.
+
+Live GitHub/rubygems metadata and released/default-branch sources are retained in `reach/`. All are unarchived; downloads are cumulative, not active hashie-6 installs:
+
+| Project | Stars | Downloads | Latest release/date | Last push | Released hashie range |
+|---|---:|---:|---|---|---|
+| omniauth | 8,102 | 235,368,604 | 2.4.2 / 2026-11-18 | 2026-11-27 | >= 3.5.2; allows 6 |
+| elasticsearch-model | 3,079 | 78,460,281 | 8.0.1 / 2025-09-01 | 2025-10-08 | >= 0; allows 6 |
+| restforce | 822 | 60,006,023 | 8.0.1 / 2025-12-29 | 2026-07-27 | >= 1.2.0, < 6.0 |
+| zendesk_api | 410 | 47,179,798 | 3.1.2 / 2026-07-23 | 2026-11-17 | >= 3.5.2; allows 6 |
+| chef-zero | 530 | 22,642,721 | 15.1.11 / 2026-05-28 | 2026-11-16 | >= 2.0, < 6.0 |
+
+The body's two callers are ordered by reach. Elasticsearch has over a year without a push/release, but 8.0.1 remains latest and abandonment is not demonstrated; keep it secondary, not as evidence of recent maintenance. The impact reasonably separates compatible users from restforce/chef-zero, whose releases cannot use hashie 6. A combined reach ranking puts restforce ahead of zendesk_api. Every listed release has the stated quiet subclass. Duel (the project's chosen tool, not an impact caller): 21 stars, 8,764 downloads, 0.3.1 released 2026-11-22, pushed 2026-11-25. Hashie: 3,035 stars, 507,065,900 downloads, 6.0.0 released 2026-11-11, pushed 2026-11-27. Neither is archived.
+
+### Executed checks and limitations
+
+* Both trees ran the unchanged differential and new adversarial/Ractor probes on **3.0.7, 3.1.7, 3.2.9, 3.3.10, 3.4.7, 4.0.10, 4.0.10/YJIT and master/ZJIT**, built at `0d399335b733776187e43a783e5f950c18ad881c`. Both blockers reproduce throughout; R1 is broader on 3.0.7. A prebuilt 4.0.10 without ZJIT emitted a warning when attempted with `--zjit`; its interpreter outputs are retained but excluded from ZJIT coverage.
+* `bundle exec rake spec` on 4.0.10: **1,076 examples, 0 failures on each tree**. Head `bundle exec rake rubocop`: **156 files, no offenses** (also the 124-file subtask); `bundle exec rake docs:examples`: **359 examples, 0 failures**. Earlier unbundled release-preparation failures were resolved by installing the complete bundle; their logs remain. No full suite on every Ruby or integration-app matrix is claimed.
+* The original probe covers every requested extension, `Mash.quiet`, none/some/all/String exclusions, repeated calls, inheritance/narrowing, late configuration, arbitrary keys/conversions, anonymous classes and frozen receivers. The additional probes cover the missed readers/prepends, effectful hooks, partial state after exceptions, direct ivars, mutable returned configuration, frozen-class writes, threads and Ractors.
+* Original-probe behavior differences remain 18 MethodAccessWithOverride rows and three accepted output lines. Ruby 3.1 additionally changes 72 source/caret lines in 36 NoMethodError highlights because the expression moved; those are not new semantic failures. Raw stdout has 66,999 lines normally (66,994 excluding five `accepted` lines), 67,107 on 3.1. All raw outputs and hashes are retained without filtering. This review establishes counterexamples, not equivalence for all remaining Ruby programs.
