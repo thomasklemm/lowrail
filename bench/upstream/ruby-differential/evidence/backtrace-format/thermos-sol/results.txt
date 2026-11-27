@@ -12,3 +12,63 @@ Large-input benchmark: 16,128,1048576 bytes; ASCII, early/late non-ASCII and ear
 Benchmark-driver best-of-ten figures, not confidence intervals. Compare head with faster of two base A/A results.
 Worst throughput ratio (1.0475173518419647, 'n1048576_broken_early_valid', [1873.0, 1789.0, 1962.0])
 No measured slowdown in sweep; noisy rows retained, not discarded
+
+Exact-head/parser and body confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head 5fc1871eec45270a068d2ecba6654eef979c5f6e; parent 274cfe719ad275bcd66bd8c7201ff871e217c9a2
+Reviewed at Lowrail 3a0321b4ad63a6eadf997346259796fdd3dfd552
+PrQueue.parse outgoing body SHA-256 fc207bc11892025edb83ee493e558ebc74919942620c12a2b25314f3f9fcd48c, 201 words
+Verdict changes for the proposed body only; source, test, benchmark and commit message approved.
+
+Verified the bundle SHA-256 d27b3bcce0a65a62b80f9b059f174865a29da3228966379ffce216d02a23c09c and its prerequisite.
+Compared e75b1f0109 with 5fc1871eec: only the parser_support require and Prism-only omit were added.
+vm_backtrace.c and benchmark/vm_backtrace_to_s.yml are identical, so the original differential, GC.stress,
+size-sweep and performance review above still applies. Incremental make -j2 completed on the exact new head.
+Both Thermos rubrics were applied personally, with no extra agents. No new code or maintainability findings.
+
+make test-all RUN_OPTS='--disable-gems --parser=prism' TESTS='ruby/test_backtrace.rb ruby/test_exception.rb'
+  head: 132 tests, 4633 assertions, 0 failures, 0 errors, 0 skips
+  base: 131 tests, 4630 assertions, 0 failures, 0 errors, 0 skips
+Same command with --parser=parse.y:
+  head: 132 tests, 4632 assertions, 0 failures, 0 errors, 1 skip
+  base: 131 tests, 4630 assertions, 0 failures, 0 errors, 0 skips
+Ran the new head's test_backtrace_with_nul_in_path file against base with an absolute TESTS path:
+  Prism: 1 test, 2 assertions, 1 ArgumentError (string contains null byte), as expected
+  parse.y: 1 test, 2 assertions, 1 skip, no failure/error
+The runner's version lines and RUN_OPTS confirm the parser, not just the subprocess flags.
+make btest RUN_OPTS='--disable-gems --parser=prism': PASS all 2148 tests
+make btest RUN_OPTS='--disable-gems --parser=parse.y': PASS all 2148 tests
+Both retain the existing Fiber count: 10000 (skipping) message.
+
+Direct parser probe: Prism eval returns the NUL filename on base and head, but caller formatting raises only on base.
+parse.y rejects that filename in eval on both. RubyVM::InstructionSequence.compile rejects it under both parsers
+on both builds; the new body correctly identifies eval with Prism, rather than ISEQ.compile, as the reachable path.
+Ran the exact proposed fenced example on base/head with both parsers and on installed 4.0.9:
+  default Prism release: "a:1:in '<main>'"
+  default Prism base: ArgumentError from Exception#backtrace
+  default Prism head: "a<NUL>b.rb:1:in '<main>'"
+  parse.y base/head: reports the earlier Kernel#eval frame, consistently with the body caveat
+The result is UTF-8 in the direct eval/caller probe. The broader original probes checked encoding and bytes.
+
+Supplied callgrind-body-line.txt rounds to the body's numbers; largest repeat spread is 0.024158%.
+Independent additional fixed-heap A/A on retained e75b1f0109/base/release builds, invoked as relative bt.rb:
+Ir/call = (N=300 total minus N=100 total) / 200, with GC disabled.
+caller release 878688.360/878706.825, base 1071372.335/1071432.405, head 842721.970/842616.775
+backtrace release 890218.135/890295.840, base 1083996.430/1083995.920, head 853810.350/853813.360
+Repeat spread under 0.013%; about 21% fewer instructions on head versus base in this run.
+These absolute counts differ from the supplied run; they confirm the direction, not exact numerical reproduction.
+The installed release is historical context, not an identically configured release source build.
+New raw profiles and measurements plus exact-head build/parser/suite/btest/example logs are in confirm-5fc1871eec.tar.gz.
+Probe scripts remain only in the reviewer's orb backup.
+
+Body finding and smallest fix:
+DECISIONS, PR descriptions says "a correctness PR has no numbers" and Correctness fixes says "no numbers in the body".
+BT1 is kind: fix. Keep "This makes backtraces faster again." and delete the remaining numerical sentences in its
+last paragraph; keep measurements in the record. The inspected human messages delegate what improvement to show
+and ask for better measurements, but do not explicitly state a numerical exception to this rule.
+The supplied wall-time SUMMARY is arithmetically described correctly, but the selected 5-of-7 range omits
+1.05x/1.42x outcomes and A/A reaches 1.16x; it cannot establish a precise wall-time gain. Cutting it also shortens
+the body below the review guideline. The independent original benchmark above supports the qualitative statement.
+The coordinator's later larger-orb measurement hold is a publication hold; those results were not part of this review.
+Read current upstream PR title, body, head, comments and reviews after the audit: still e75b1f0109, no comments/reviews.
+No upstream post or Ruby fork push. Not run here: full test-all, JIT builds, sanitizers, other architectures or hosted CI.

@@ -137,6 +137,35 @@ passes:
       is acceptable; no simpler equivalent C fix found. Full evidence and limitations: evidence/backtrace-format/astra/review.md
       (Parser amendment section), with supplemental profiles and suite logs in parser-confirm-raw.tar.gz.
       No full test-all or hosted CI run by this reviewer, no upstream post or Ruby-fork push.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Code, test, benchmark and commit message approve; proposed body needs changes. Reviewed outgoing body
+      SHA-256 fc207bc11892025edb83ee493e558ebc74919942620c12a2b25314f3f9fcd48c at Lowrail 3a0321b4.
+      Smallest fix: retain 'This makes backtraces faster again.' but cut the numerical sentences after it;
+      keep the evidence in the record. DECISIONS explicitly forbids numbers in a correctness PR body; the
+      inspected human messages delegate what improvement to show but do not explicitly waive that rule.
+      The stated Callgrind rounding and repeat spread match the supplied data. Independent fixed-heap A/A
+      supports about 21% fewer instructions, with repeats under 0.013%, but different absolute counts, not
+      exact reproduction. The selected 5-of-7 wall-time range leaves out 1.05x/1.42x results with A/A up to
+      1.16x; no precise elapsed-time claim follows. No further C or maintainability finding, and no smaller
+      equally scoped equivalent found. Verified only the parser_support require and Prism omit differ from
+      e75b1f0109; the original differential, GC.stress, benchmark and size-sweep evidence still applies.
+      Built the exact head. Both requested test files pass on base under both parsers (131 tests, 4630
+      assertions each); head passes under Prism (132 tests, 4633 assertions) and parse.y (132 tests, 4632
+      assertions, one expected omit). The new test errors on base under Prism and omits under parse.y.
+      Exact-head btest passes all 2148 tests under each parser, with the existing fiber-count skip.
+      Direct probes confirm Prism eval reaches formatting, parse.y eval rejects the NUL earlier, and
+      ISEQ.compile rejects it under both parsers. The exact proposed example gives its annotated default
+      parser results on release/base/head; its Prism caveat is accurate. No added comments to remove.
+      Current upstream PR still has e75b1f0109 and no comments/reviews. Larger-orb measurements and any
+      resulting body revision are outside this pass. Raw follow-up profiles and parser/build/test/example
+      logs: evidence/backtrace-format/thermos-sol/confirm-5fc1871eec.tar.gz; results.txt indexes both passes.
+      Probe scripts remain in this orb backup. No full test-all, JIT/sanitizer/other-architecture runs, upstream
+      posts or Ruby fork pushes in this follow-up.
 ---
 
 # Append backtrace location strings by length
