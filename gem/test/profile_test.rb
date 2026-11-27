@@ -180,7 +180,7 @@ class ProfileTest < Minitest::Test
           require_relative "config/environment"
           require "rack/mock"
           # A server that is not running, as ViteRuby's dev server is in a suite, and one that is. A bound port
-          # nobody listens on refuses; port 1 may be open (it was on a macOS CI runner).
+          # nobody listens on fails to connect (refused on Linux, a timeout on macOS); port 1 was open on a macOS runner.
           CLOSED = Socket.new(:INET, :STREAM).tap { _1.bind(Addrinfo.tcp("127.0.0.1", 0)) }
           Refused = -> { Socket.tcp("127.0.0.1", CLOSED.local_address.ip_port, connect_timeout: 1).close rescue nil }
           SERVER = TCPServer.new("127.0.0.1", 0)
@@ -268,7 +268,7 @@ class ProfileTest < Minitest::Test
         autoload :Socket, "socket"
         2.times { Lowrail::Profile.close(Lowrail::Profile.open(0)) }
         puts "autoload: #{Object.autoload?(:Socket).inspect}, loaded: #{$LOADED_FEATURES.any? { _1.end_with?("/socket.rb") }}"
-        # Bound and not listening, so it refuses; port 1 may be open (it was on a macOS CI runner).
+        # Bound and not listening, so a connect fails: refused on Linux, a timeout on macOS. Port 1 was open on a macOS runner.
         closed = Socket.new(:INET, :STREAM).tap { _1.bind(Addrinfo.tcp("127.0.0.1", 0)) }
         Socket.tcp("127.0.0.1", closed.local_address.ip_port, connect_timeout: 1) rescue nil
         Lowrail::Profile.close(Lowrail::Profile.open(0))
@@ -277,7 +277,7 @@ class ProfileTest < Minitest::Test
         server = TCPServer.new("127.0.0.1", 0)
         Warning[:experimental] = false
         ractor = Ractor.new(server.addr[1], closed.local_address.ip_port) do |port, refused|
-          [port, refused].map { |p| (Socket.tcp("127.0.0.1", p, connect_timeout: 1).close; "connected") rescue $!.class.name }
+          [port, refused].map { |p| (Socket.tcp("127.0.0.1", p, connect_timeout: 1).close; "connected") rescue ($!.is_a?(SystemCallError) ? "failed to connect" : $!.class.name) }
         end
         puts "ractor: #{(ractor.respond_to?(:value) ? ractor.value : ractor.take).join(", ")}"
       RUBY
@@ -287,7 +287,7 @@ class ProfileTest < Minitest::Test
       assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
       assert_equal 2, out.scan(%(autoload: "socket", loaded: false)).size, out
       assert_equal 2, out.scan("hooked: true").size, out
-      assert_equal 2, out.scan("ractor: connected, Errno::ECONNREFUSED").size, out
+      assert_equal 2, out.scan("ractor: connected, failed to connect").size, out
     end
   end
 
