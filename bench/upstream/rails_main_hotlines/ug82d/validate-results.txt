@@ -1,0 +1,112 @@
+# ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux], SQLite in memory
+## AR_VERSION=8.1.4.1 ruby validate.rb
+Active Record 8.1.4.1
+
+## 1. scope :default_order
+class ScopePost < AR::Base; scope :default_order, ...; end => "defined"
+
+## Mechanism
+ActiveRecord::Base.respond_to?(:default_order) => false
+Object.respond_to?(:default_order, true) => false
+ActiveRecord::Base.method(:default_order).owner => NameError: undefined method 'default_order' for class '#<Class:ActiveRecord::Base>'
+ActiveRecord::Querying::QUERYING_METHODS.include?(:default_order) => false
+ActiveRecord::Relation.method_defined?(:default_order) => false
+ActiveRecord::Relation.instance_method(:default_order).owner => NameError: undefined method 'default_order' for class 'ActiveRecord::Relation'
+Comment.send(:dangerous_class_method?, :default_order) (plain model) => false
+Post.method(:default_order).owner (def self.default_order) => #<Class:Post(id: integer, title: string, position: integer, published: boolean)>
+Post.where(nil).method(:default_order).owner => Post::ActiveRecord_Relation
+
+## 2. def self.default_order on the model
+Post.default_order.pluck(:title) => ["a", "b", "c"]
+Post.default_order.to_sql => "SELECT \"posts\".* FROM \"posts\" ORDER BY \"posts\".\"position\" ASC"
+
+## 3. on a relation
+Post.where(published: true).default_order.pluck(:title) => ["a", "b"]
+Post.all.default_order.pluck(:title) => ["a", "b", "c"]
+
+## 4. with arguments
+ArgPost.default_order(:position).pluck(:title) => ["c", "b", "a"]
+ArgPost.where(published: true).default_order(:position).pluck(:title) => ["b", "a"]
+ArgPost.where(published: true).default_order(:position).to_sql => "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"published\" = TRUE ORDER BY \"posts\".\"position\" DESC"
+ArgPost.where(published: true).default_order(:position).order(:title).pluck(:title) => ["b", "a"]
+License.default_order.pluck(:name) => ["MIT", "Apache", "CC BY-SA"]
+License.enabled.default_order.pluck(:name) => ["MIT", "Apache", "CC BY-SA"]
+License.enabled.default_order(nil, 'CC BY-SA').pluck(:name) => ["CC BY-SA", "MIT", "Apache"]
+License.enabled.default_order(nil, 'CC BY-SA').to_sql => "SELECT \"licenses\".* FROM \"licenses\" WHERE \"licenses\".\"enabled\" = TRUE ORDER BY name = 'CC BY-SA' DESC, \"licenses\".\"default\" DESC, \"licenses\".\"name\" ASC"
+License.enabled.default_order(cat, 'CC BY-SA').pluck(:name) => ["CC BY-SA", "Apache", "MIT"]
+License.enabled.default_order(cat, nil).pluck(:name) => ["Apache", "MIT", "CC BY-SA"]
+
+## 5. other shapes
+class << self: SingletonPost.default_order.pluck(:title) => ["a", "b", "c"]
+class << self: SingletonPost.where(published: true).default_order.pluck(:title) => ["a", "b"]
+Pool.method(:default_order).owner => Pool::SearchMethods
+Pool.default_order.pluck(:name) => ["x", "y"]
+Pool.search(order: 'post_count').pluck(:name) => ["y", "x"]
+Pool.search(order: 'post_count').to_sql => "SELECT \"pools\".* FROM \"pools\" ORDER BY size desc, \"pools\".\"updated_at\" DESC"
+Pool.search({}).pluck(:name) (apply_default_order on relation) => ["x", "y"]
+Pool.search({}).to_sql => "SELECT \"pools\".* FROM \"pools\" ORDER BY \"pools\".\"updated_at\" DESC"
+Pool.where(nil).default_order.pluck(:name) => ["x", "y"]
+Item attribute default_order: Item.create!(default_order: 'x').default_order => "x"
+Item.where(default_order: 'x').count => 1
+belongs_to :default_order; AssocItem.new.default_order => nil
+has_many :default_order; HasManyPost.first.default_order.to_a => []
+Post.where(nil).unscope(:default_order).to_sql (model has def self.default_order) => ArgumentError: Called unscope() with invalid unscoping argument ':default_order'. Valid arguments are :where, :select, :group, :order, :lock, :limit, :offset, :joins, :left_outer_joins, :annotate, :includes, :eager_load, :preload, :from, :readonly, :having, :optimizer_hints, :with.
+Post.unscope(:default_order).default_order.to_sql => ArgumentError: Called unscope() with invalid unscoping argument ':default_order'. Valid arguments are :where, :select, :group, :order, :lock, :limit, :offset, :joins, :left_outer_joins, :annotate, :includes, :eager_load, :preload, :from, :readonly, :having, :optimizer_hints, :with.
+has_many :comments, default_order: :position => ArgumentError: Unknown key: :default_order. Valid keys are: :anonymous_class, :primary_key, :foreign_key, :dependent, :validate, :inverse_of, :strict_loading, :query_constraints, :deprecated, :autosave, :class_name, :before_add, :after_add, :before_remove, :after_remove, :extend, :counter_cache, :join_table, :index_errors, :as, :through
+
+## RAILS_PATH=rails main 088fc0cf61e4ba0c7987decafacc69adb3e22eec ruby validate.rb
+Active Record 8.2.0.alpha
+
+## 1. scope :default_order
+class ScopePost < AR::Base; scope :default_order, ...; end => ArgumentError: You tried to define a scope named "default_order" on the model "Post", but Active Record already defined a class method with the same name.
+
+## Mechanism
+ActiveRecord::Base.respond_to?(:default_order) => true
+Object.respond_to?(:default_order, true) => false
+ActiveRecord::Base.method(:default_order).owner => ActiveRecord::Querying
+ActiveRecord::Querying::QUERYING_METHODS.include?(:default_order) => true
+ActiveRecord::Relation.method_defined?(:default_order) => true
+ActiveRecord::Relation.instance_method(:default_order).owner => ActiveRecord::QueryMethods
+Comment.send(:dangerous_class_method?, :default_order) (plain model) => true
+Post.method(:default_order).owner (def self.default_order) => #<Class:Post(id: integer, title: string, position: integer, published: boolean)>
+Post.where(nil).method(:default_order).owner => ActiveRecord::QueryMethods
+
+## 2. def self.default_order on the model
+Post.default_order.pluck(:title) => ["a", "b", "c"]
+Post.default_order.to_sql => "SELECT \"posts\".* FROM \"posts\" ORDER BY \"posts\".\"position\" ASC"
+
+## 3. on a relation
+Post.where(published: true).default_order.pluck(:title) => ArgumentError: The method .default_order() must contain arguments.
+Post.all.default_order.pluck(:title) => ArgumentError: The method .default_order() must contain arguments.
+
+## 4. with arguments
+ArgPost.default_order(:position).pluck(:title) => ["c", "b", "a"]
+ArgPost.where(published: true).default_order(:position).pluck(:title) => ["a", "b"]
+ArgPost.where(published: true).default_order(:position).to_sql => "SELECT \"posts\".* FROM \"posts\" WHERE \"posts\".\"published\" = TRUE ORDER BY \"posts\".\"position\" ASC"
+ArgPost.where(published: true).default_order(:position).order(:title).pluck(:title) => ["a", "b"]
+License.default_order.pluck(:name) => ["MIT", "Apache", "CC BY-SA"]
+License.enabled.default_order.pluck(:name) => ArgumentError: The method .default_order() must contain arguments.
+License.enabled.default_order(nil, 'CC BY-SA').pluck(:name) => ActiveRecord::UnknownAttributeReference: Dangerous query method (method whose arguments are used as raw SQL) called with non-attribute argument(s): "CC BY-SA".This method should not be called with user-provided values, such as request parameters or model attributes. Known-safe values can be passed by wrapping them in Arel.sql().
+License.enabled.default_order(nil, 'CC BY-SA').to_sql => ActiveRecord::UnknownAttributeReference: Dangerous query method (method whose arguments are used as raw SQL) called with non-attribute argument(s): "CC BY-SA".This method should not be called with user-provided values, such as request parameters or model attributes. Known-safe values can be passed by wrapping them in Arel.sql().
+License.enabled.default_order(cat, 'CC BY-SA').pluck(:name) => ActiveRecord::UnknownAttributeReference: Dangerous query method (method whose arguments are used as raw SQL) called with non-attribute argument(s): #<struct Category license_id=3>, "CC BY-SA".This method should not be called with user-provided values, such as request parameters or model attributes. Known-safe values can be passed by wrapping them in Arel.sql().
+License.enabled.default_order(cat, nil).pluck(:name) => ActiveRecord::UnknownAttributeReference: Dangerous query method (method whose arguments are used as raw SQL) called with non-attribute argument(s): #<struct Category license_id=3>.This method should not be called with user-provided values, such as request parameters or model attributes. Known-safe values can be passed by wrapping them in Arel.sql().
+
+## 5. other shapes
+class << self: SingletonPost.default_order.pluck(:title) => ["a", "b", "c"]
+class << self: SingletonPost.where(published: true).default_order.pluck(:title) => ArgumentError: The method .default_order() must contain arguments.
+Pool.method(:default_order).owner => Pool::SearchMethods
+Pool.default_order.pluck(:name) => ["x", "y"]
+Pool.search(order: 'post_count').pluck(:name) => ArgumentError: The method .default_order() must contain arguments.
+Pool.search(order: 'post_count').to_sql => ArgumentError: The method .default_order() must contain arguments.
+Pool.search({}).pluck(:name) (apply_default_order on relation) => ["x", "y"]
+Pool.search({}).to_sql => "SELECT \"pools\".* FROM \"pools\" ORDER BY \"pools\".\"updated_at\" DESC"
+Pool.where(nil).default_order.pluck(:name) => ArgumentError: The method .default_order() must contain arguments.
+Item attribute default_order: Item.create!(default_order: 'x').default_order => "x"
+Item.where(default_order: 'x').count => 1
+belongs_to :default_order; AssocItem.new.default_order => nil
+has_many :default_order; HasManyPost.first.default_order.to_a => []
+Post.where(nil).unscope(:default_order).to_sql (model has def self.default_order) => "SELECT \"posts\".* FROM \"posts\""
+Post.unscope(:default_order).default_order.to_sql => ArgumentError: The method .default_order() must contain arguments.
+has_many :comments, default_order: :position => "SELECT \"comments\".* FROM \"comments\" WHERE \"comments\".\"post_id\" = 1 ORDER BY \"comments\".\"position\" ASC"
+
+## RAILS_PATH=new head ba46acbfd79cf52ac759d050fe3c20a16fb017e0: identical to main (diff empty)
