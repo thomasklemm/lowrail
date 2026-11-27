@@ -113,7 +113,7 @@ and body run it through `listen` itself, which adds the executor's own callbacks
 ## Candidate SCB1: poll for messages without the query cache (solid_cable)
 
 Branch [`thomasklemm/listener-without-query-cache`](https://github.com/thomasklemm/solid_cable/tree/thomasklemm/listener-without-query-cache)
-`ef534cc` on main `40dd29f`. One line in `Listener#listen`:
+`2cb18420` on main `40dd29f`. One line in `Listener#listen`:
 
 ```ruby
 with_polling_volume { ::SolidCable::Message.uncached { broadcast_messages } }
@@ -344,6 +344,36 @@ SQLite and PostgreSQL at the new head: all four base/head comparisons are byte-i
 check stand. Fresh logs, the messages/tree/parent comparison and commands are kept in
 [`scb1-confirm-155a2fbe-20261127.tar.gz`](../../bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz).
 Review orb: `T-01a21eb4-4fce-7727-bded-abfba4ffb64e`. No fork push or upstream post.
+
+### SCB1 final confirm: thermos-sol, 2026-11-27
+
+**Verdict: approve; no open must-fix or nits.** Reviewed head `2cb1842043643d85ddee68aa48d02fd219305d56`.
+Directly checked tree `e737b3f89231ba7ebbc2d9fc1de4d00f10c1965d` and parent
+`40dd29ffdc4ff76f27f0bbef1de1606fdd21cfee`: identical to both earlier reviewed heads. The original detailed
+correctness/maintainability pass, all eight exactness items, Rails 7.2–main and PR 91/96 combination suites carry
+forward; those suites were not rerun. Fresh ten-step differential and eight-case state probes on SQLite and
+PostgreSQL are byte-identical base/head. Fresh 998/999-channel shapes still show 999/zero binds. L0 stands.
+
+All prior findings are closed. Read the exact amended commit message, body, impact and pool qualification:
+the cache-key sentence no longer generalizes binds, impact gives the three measured channel-count points, and
+separate/shared primary pools are distinguished. The 109-word body stays two mechanism/safety paragraphs and
+one small table led by benchmark-ips, with no internal labels or ZJIT wall paragraph. It follows the PR rules.
+
+Independently audited `body/SC1-zjit-wall` against all 90 raw process logs: matching third-party locks and script,
+clean base `40dd29ffdc` and candidate `155a2fbe98` (same tree as this head), one master Ruby `0d399335b7`,
+`--zjit` on every worker, warm-up 2,000, core 1 and all six process orders balanced across 30 rounds. Reconstructed
+the displayed times, paired log-ratio changes and A/A exactly; an independent 10,000-resample Python bootstrap
+confirms idle −15.0% [−15.4%, −14.5%], one message −6.9% [−8.0%, −5.7%], both A/A intervals containing zero.
+Every timed window's four summed absolute JIT deltas are zero; the zero pairs printed in wall logs are deltas,
+not a claim that no code compiled during warm-up. The cohort closes the required master ZJIT wall gate.
+Read the coordinator's launch result for [the runner](https://ampcode.com/threads/T-01a21ee2-427f-70bf-a866-8436a4b8caa4):
+`orbSize: a1.xxlarge`; its completion reports 16 cores/31 GiB. No performance measurement was rerun here.
+
+Re-audited prior body numbers and the retained worst inputs; zero channels remains +5.11% **instructions**, not a
+wall-time loss. Fresh logs, independent audit and reproduction notes are in
+[`scb1-confirm-2cb18420-20261127.tar.gz`](../../bench/upstream/solid_stack/raw/scb1-confirm-2cb18420-20261127.tar.gz).
+Historical pass heads are preserved rather than relabelled. Review orb: `T-01a21eb4-4fce-7727-bded-abfba4ffb64e`.
+No fork push or upstream post. This approval fills the detailed pass only, not the required adversarial Astra pass.
 
 ## Held and dropped
 
