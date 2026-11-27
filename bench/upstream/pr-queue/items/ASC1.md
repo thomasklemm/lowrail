@@ -13,7 +13,7 @@ depends_on: []
 tracker: []
 stacked_on:
 alternative_of:
-evidence: [docs/upstream/data/rails-82-leads, bench/upstream/census13r/body/ASC1, bench/upstream/census13r/body/ASC1-wall-yjit, bench/upstream/census13r/body/ASC1-wall-zjit, bench/upstream/census13r/body/ASC1-ips, bench/upstream/census13r/data/probe, bench/upstream/census13r/reviews/ASC1-thermos-sol-2026-11-27.tar.gz, bench/upstream/census13r/reviews/ASC1-thermos-sol-timing-text-2026-11-27.tar.gz]
+evidence: [docs/upstream/data/rails-82-leads, bench/upstream/census13r/body/ASC1, bench/upstream/census13r/body/ASC1-wall-yjit, bench/upstream/census13r/body/ASC1-wall-zjit, bench/upstream/census13r/body/ASC1-ips, bench/upstream/census13r/data/probe, bench/upstream/census13r/reviews/ASC1-thermos-sol-2026-11-27.tar.gz, bench/upstream/census13r/reviews/ASC1-thermos-sol-timing-text-2026-11-27.tar.gz, bench/upstream/census13r/reviews/ASC1-astra-2026-11-27.tar.gz]
 impact: "Every association load through the statement cache (belongs_to, has_one, has_many, through, polymorphic; every Rails app) resolved the model's connection pool once more than needed: association_scope_cache took the connection in its own with_connection block, then find_target took it again to run the statement (find_by_sql takes it a third time); the change saves one pool lookup per load and, without an existing lease, one checkout (thermos-sol probe: direct loads 3 to 2 lookups, through 4 to 3). The split dates from fa048105d1 (2024-05, with_connection replacing lease_connection); reflection.rb's signature changed again in 7249a66350 (unreleased, #59120). Census, Rails main 2e299253f9, Ruby 4.0.10, 4 apps / 36 workloads, interpreted Ir per request: median -0.26%, max -0.91%; per app medians blog +0.16%, casa -0.26%, react-starter-kit -0.40%, redprints-cfp -0.39% (docs/upstream/data/rails-82-leads/per-workload.tsv), A/A median -0.03%, p90 |d| 0.32%. Exact head, script/upstream-bench, Ruby 4.0.10, interpreter: belongs_to load -3.1%, has_one -3.0%, has_many (3 rows) -2.4% (A/A <= 0.06%), objects unchanged; YJIT cells not JIT-flat, no claim. Connection-lookup lead of the Rails 8.2 round (census 12: 0.81% mean, 68/71; this round 0.75%, 33/36): measured commit 23fe1f4b6b (fork ref thomasklemm/asc1-measured-23fe1f4b6b) has activerecord/lib tree fc7f875b3d, identical to the head. Lifetime: runs on Ruby master and Rails main."
 rank: 1
 risky: true
@@ -40,6 +40,12 @@ passes:
     date: 2026-11-27
     verdict: approve
     summary: "Text confirm on the body at Lowrail f819817549bc5836880d3ff3c8a95359720889fe. The sole body change is the exact requested median/95% interval clarification; both timing cohorts are unchanged since the raw-log audit. Corrected claims match all six cells. No remaining text must-fix; original code/security/maintainability approval stands. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 thermos-sol."
+  - reviewer: astra
+    head: "ed1b28c5b94530e1c8b06d14dfca0ee93d5c07ba"
+    orb: T-01a21ee0-bd69-7357-bcd6-6a80c2744ee2
+    date: 2026-11-27
+    verdict: approve
+    summary: "Self-performed adversarial pass after thermos-sol. No supported-contract regression: role/shard and connection-class switches, prevent_writes, pinned transactions/fixtures, threads/fibers, real background async, disconnect/backend death and recovery, prepends, prepared on/off and Zeitwerk reload exercised on both adapters; interpreter/YJIT probes agree. 5,948 selected tests per revision, zero failures/errors, each checkout's own Gemfile. Demonstrated nodoc two-argument override break accepted by DECISIONS; isolated released Switchman override already fails on base and excludes 8.2. Bullet/Goldiloader released probes match. Title/body/commit and raw evidence audited, including f8198175 median/95% wording; project currency checked. No new ZJIT execution (installed build lacks it); retained master cohort audited. Details: docs/upstream/rails-82-leads-2026-11-27.md, ASC1 astra."
 ---
 
 # Reuse the connection for cached association statements
