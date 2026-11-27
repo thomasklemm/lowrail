@@ -107,8 +107,8 @@ alternative_of:               # ID this competes with; only one of them opens
 impact: one line, the effect a maintainer cares about
 evidence: [bench/upstream/form_helper_stack/body/fb1]  # repo paths with the raw data behind the body's numbers
 rank: 2                       # 1 opens first
-risky: false                  # true: Astra is required (DECISIONS, Required passes)
-guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable stand in for Sol and Astra
+risky: false                  # true: Astra runs adversarially after the detailed pass (DECISIONS, Required passes)
+guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable from another orb fill the Astra slot
 state: draft
 pr: 59667
 note:                         # one line: why it is held, superseded, ...
@@ -127,12 +127,10 @@ Optional, last: what Thomas needs to retell the change. Everything from this hea
 
 `reviewer` in a pass: `claude-code` (the separate final review orb), `skeptic` (the orb's skeptical reviewer
 subagent, kept as a record), `sol`, `astra`, `thermos`, `thermos-sol`, `thermos-opus` and `thermos-fable` (a
-thermos review on that model, which is also the detailed review), and for now `opus` and `fable`, which stand in for Sol or
-Astra when their `orb` (the orb's thread ID) differs from the claude-code pass's `orb` on that head and from the other
-stand-in's ([DECISIONS](../../../docs/DECISIONS.md#required-passes)).
-On an item with `guard_review: true`, `thermos-opus` and `thermos-fable` stand in the same way, since Sol's and
-Astra's cyber-safety checks stop reviews of our own safety guards
-([DECISIONS](../../../docs/DECISIONS.md#required-passes)).
+thermos review on that model, which is also the detailed review), and `opus` and `fable` (regular reviewers, with the
+orb's thread ID in `orb`; they don't fill a required slot). On an item with `guard_review: true`, a `thermos-opus` or
+`thermos-fable` pass whose `orb` differs from the detailed pass's fills the Astra slot, since Sol's and Astra's
+cyber-safety checks stop reviews of our own safety guards ([DECISIONS](../../../docs/DECISIONS.md#required-passes)).
 `verdict`:
 `approve`, `nits` (no must-fix, optional points listed in `open`) or `changes` (must-fix). Every pass checks each
 added code comment, tests and benchmarks included, against [DECISIONS](../../../docs/DECISIONS.md#no-unnecessary-code-comments-in-upstream-prs-thomas-2026-11-10);
@@ -162,7 +160,7 @@ any state -> held | superseded
 * **built:** branch pushed, body drafted, no pass yet on this head.
 * **in-review:** passes are being run on this head.
 * **reviewed:** every required pass approves on the current `head` (latest pass per reviewer counts), no
-  must-fix. Required: the detailed review always (thermos-sol; a recorded claude-code pass still counts; [DECISIONS](../../../docs/DECISIONS.md#required-passes)), Astra (or a stand-in) when `risky`, thermos when the diff against the base has
+  must-fix. Required: the detailed review (thermos-sol; thermos-opus, thermos-fable or a recorded claude-code pass also count) and Astra on every item ([DECISIONS](../../../docs/DECISIONS.md#required-passes)), thermos when the diff against the base has
   more than 200 changed lines. `open` refuses otherwise.
 * **draft**, **ready**, **merged**, **closed:** the PR's state on GitHub; `sync` keeps them current.
 * **held:** not to open now; `note` says why and what unblocks it. **superseded:** replaced by another item or PR.

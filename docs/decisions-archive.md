@@ -367,7 +367,9 @@ shortened; they are in the verbatim copy below.
     sizes upstream" (2026-11-14): the worst row is reported, in the body only within realistic sizes, and rows beyond
     them stay in the record. This is how the two were applied since 2026-11-14 (rails/rails#59804's rows were cut).
 
-Not dropped, though they look temporary: the Opus/Fable stand-in for Sol and Astra (2026-11-14, "until Thomas says
+Decided the same day (Thomas, 2026-11-27): Astra on the exact head before opening for every item, not only risky
+ones; Opus and Fable as regular reviewers, ending their stand-in role; the coordinator picks reviewers freely above
+that floor. Before that decision the following were not dropped, though they look temporary: the Opus/Fable stand-in for Sol and Astra (2026-11-14, "until Thomas says
 otherwise"; `script/pr-queue` still implements it), and the compatibility-PR freeze until the Rails 8.2 beta.
 
 ### DECISIONS.md as of 2026-11-27, before the condensation

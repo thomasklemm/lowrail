@@ -25,9 +25,8 @@ module PrQueue
   STATES = %w[built in-review reviewed draft ready merged closed held superseded].freeze
   KINDS = %w[fix perf docs restore feature].freeze
   REVIEWERS = %w[skeptic claude-code sol astra thermos thermos-sol thermos-opus thermos-fable opus fable].freeze
-  STAND_INS = { "sol" => %w[opus fable], "astra" => %w[opus fable] }.freeze # temporary, DECISIONS 2026-11-14
-  # guard_review: true, a review of our own safety guards, which Sol's and Astra's cyber-safety checks stop
-  # (DECISIONS, Review gates, Required passes, 2026-11-25).
+  # guard_review: true, a review of our own safety guards, which Sol's and Astra's cyber-safety checks stop; there
+  # one of these fills the Astra slot (DECISIONS, Review gates, Required passes, 2026-11-25).
   GUARD_STAND_INS = %w[thermos-opus thermos-fable].freeze
   # Thermos on Sol (or Opus for crash fixes) is the default review and a thermos review (DECISIONS 2026-11-18).
   # A Fable thermos pass counts where an Opus one does (DECISIONS 2026-11-25).
@@ -111,15 +110,14 @@ module PrQueue
   # The detailed review is thermos-sol; recorded claude-code passes still count (DECISIONS, Review gates). Orbs' own
   # skeptic passes stay as records.
   def required(meta, lines)
-    list = %w[claude-code] # the detailed review slot, which thermos-sol fills (DECISIONS, Required passes)
-    list << "astra" if meta["risky"]
+    list = %w[claude-code astra] # a detailed pass and Astra on the exact head, every item (DECISIONS, Required passes)
     list << "thermos" if lines.nil? || lines > THERMOS_LINES
     list
   end
 
   # Reviewers whose latest pass on the current head is missing or doesn't approve, unless waived on that head.
-  # Passes are listed oldest first. A stand-in fills one slot, from an orb other than the claude-code pass's and
-  # the other stand-ins'. With guard_review, a thermos-opus or thermos-fable pass stands in for Sol and Astra.
+  # Passes are listed oldest first. With guard_review, a thermos-opus or thermos-fable pass from an orb other than the
+  # detailed review's fills the Astra slot.
   def missing(meta, lines)
     passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }.reverse
     waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
@@ -133,7 +131,7 @@ module PrQueue
       next true if waived.any? { _1["reviewer"] == who }
       next true if approves.(passes.find { ACCEPTS.fetch(who, [who]).include?(_1["reviewer"]) })
       next false if claude_orb.empty?
-      stand_ins = STAND_INS.key?(who) ? STAND_INS[who] + guard : []
+      stand_ins = who == "astra" ? guard : []
       stand_in = latest_per_orb.find do
         stand_ins.include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)
       end

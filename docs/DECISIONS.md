@@ -380,46 +380,50 @@ From the revert of #59584 and the simplification of #59640 (story in the archive
 
 ## Review gates
 
-### The coordinator decides when a review runs (Thomas, 2026-11-18)
+### The coordinator picks the reviewers (Thomas, 2026-11-18 and 2026-11-27)
 
-The coordinator picks the passes a head needs (full pass, short confirm after a small fix, Astra, a thermos waiver for
-e.g. a mostly generated app) and starts them without asking; the item's note says which and why. What needs Thomas
+The coordinator picks the reviewers, models and instructions that fit each head best (a full pass, a short confirm
+after a small fix, an adversarial brief, a second or third reviewer, a thermos waiver for e.g. a mostly generated app)
+and starts them without asking; the item's note says which and why. What matters is the end result. What needs Thomas
 upstream is unchanged.
 
 ### Required passes
 
 Every upstream PR, issue or comment draft gets as many rounds as it needs on its **current head**. Each confirmed
-finding is fixed and re-reviewed; a round ends with a pass without must-fix; a head change means another pass. An item
-is `reviewed` only when its required passes approve the current `head`; `script/pr-queue open` and `ready` refuse
-otherwise. Items enter the queue at `built`; these passes gate `reviewed`, and nothing opens before them.
+finding is fixed and re-reviewed; a round ends with a pass without must-fix; a head change means another pass. Items
+enter the queue at `built`; an item is `reviewed` only when the floor below approves its current `head`, and
+`script/pr-queue open` and `ready` refuse otherwise. The fixed floor, in every repository:
 
-* **thermos-sol on every head** (Thomas, 2026-11-18): `thermos` in its own GPT-6.1 Sol thread (`openai/gpt-6.1-sol`,
-  effort `xhigh`), correctness/security and maintainability in parallel, plus body, comments and commit message
-  sentence by sentence and the exactness probe. Recorded as `thermos-sol`. It is the detailed review and fills the
-  thermos slot that diffs over 200 changed lines (or several files, or a new mechanism) need. Recorded `claude-code`
-  passes still count.
-* **Astra in addition** (`openai/gpt-6-astra`) on `risky` items and on every ruby/ruby head (2026-11-25). Risky:
-  correctness changes on hot paths, Ractor/thread or frozen-object semantics, anything a maintainer pushed back on
-  before, and **critical** changes: escaping or other security boundaries, connection or transaction handling, record
-  loading and typecasting, caching or memoization, thread or fiber state, VM/JIT code. On a critical change Astra runs
-  after the detailed review approves, adversarially: try to break identical behaviour with inputs, overrides, prepends,
-  threads, reloading and error paths, run them, report only demonstrated differences. Ready only after both.
+* **A detailed pass: thermos-sol by default** (Thomas, 2026-11-18, confirmed 2026-11-27): `thermos` in its own GPT-6.1
+  Sol thread (`openai/gpt-6.1-sol`, effort `xhigh`), correctness/security and maintainability in parallel, plus body,
+  comments and commit message sentence by sentence and the exactness probe. Recorded as `thermos-sol`. It fills the
+  thermos slot that diffs over 200 changed lines (or several files, or a new mechanism) need. `thermos-opus`,
+  `thermos-fable` and recorded `claude-code` passes also count as the detailed pass.
+* **Astra on the exact head shortly before opening, for every item** (`openai/gpt-6-astra`; Thomas, 2026-11-27).
+  On `risky` items it runs adversarially after the detailed pass approves: try to break identical behaviour with
+  inputs, overrides, prepends, threads, reloading and error paths, run them, report only demonstrated differences.
+  Risky: correctness changes on hot paths, Ractor/thread or frozen-object semantics, anything a maintainer pushed back
+  on before, and **critical** changes: escaping or other security boundaries, connection or transaction handling,
+  record loading and typecasting, caching or memoization, thread or fiber state, VM/JIT code.
+
+Beyond the floor:
+
 * **Anthropic models where OpenAI's checks stop a review:** crash and memory-safety fixes get `thermos-opus`; reviews
   of our own safety guards (`guard_review: true`) run as `thermos-opus` or `thermos-fable`, framed as checking each fix
-  against the original repro, with plain reports and repro detail kept in the reviewing thread; there stand in for Sol and Astra (2026-11-25). `thermos-fable` counts where
-  `thermos-opus` does.
+  against the original repro, with plain reports and repro detail kept in the reviewing thread; there a
+  `thermos-opus` or `thermos-fable` pass from another orb than the detailed pass fills the Astra slot (2026-11-25).
 * **Replies to a maintainer's review comments:** an intensive `thermos-opus` next to `thermos-sol` on the same head;
   Thomas sees the drafts first (2026-11-18).
-* **A second reviewer where it helps:** an Opus pass for claims-heavy bodies and measurements. `opus` and `fable`
-  passes still stand in for a Sol or Astra slot (2026-11-14, until Thomas ends it), only with the orb's thread ID in
-  `orb`, different from the detailed review's and any other stand-in's.
+* **Opus and Fable are regular reviewers** (Thomas, 2026-11-27; three Claude accounts): use them intensively for
+  second opinions, claims-heavy bodies, measurements, exactness and hard design questions. Recorded as `opus` or
+  `fable` with the orb's thread ID in `orb`; they add to the floor and don't replace the Astra pass.
 * **Active Record adapter or schema changes run `script/min-versions` before review** (2026-11-25): their tests on the oldest supported SQLite (and a middle
   one), PostgreSQL, MySQL and Ruby, base versus head ([usage](upstream/ar-adapter-suite.md#oldest-supported-versions-2026-11-25)).
 
 Models (Thomas, 2026-11-17 to 11-25): Sol is GPT-6.1 Sol, not 6.2, always `xhigh`; Astra is GPT-6 Astra. Build and
 review threads run as plain Opus 5.5 (`anthropic/claude-opus-5-5`), not Claude Code external agents (same model on the
 linked subscription), at `high` for reviews, exactness work and hard builds, `medium` for record updates, reruns and
-small follow-ups. Fable (`anthropic/claude-fable-5-2`) may be used wherever it helps.
+small follow-ups. Fable is `anthropic/claude-fable-5-2`.
 
 ### Exactness checklist
 
