@@ -90,7 +90,7 @@ returned.
   `NoMethodError :m :m true` on the head (`active_undef_order_reflection.txt`).
 * Reviewer matrices (outside this repo): every head-versus-master difference is an undef in an active refinement of a
   module method; master's results there depend on call order (and with send first, a `super` in the module method ran
-  it twice). Class shapes, defining, unused and removed refinements are unchanged. Interpreter, YJIT and ZJIT agree
+  it twice). Class shapes, refinements that define the method or leave it alone, and unused refinements are unchanged. Interpreter, YJIT and ZJIT agree
   within each build.
 * Test `test_undef_in_active_module_refinement_with_send` (two classes, both call orders) fails on master with the
   `[BUG]` and passes on the head.

@@ -35,6 +35,12 @@ passes:
     date: 2026-11-27
     verdict: changes
     open: "Stands in for Astra (OpenAI safety check stopped T-01a21eca-63e1-76f7-b473-ee3433ea1051; brief's fallback). Code and test approved, 1900-case matrix per build and engine; body replaced with its text, order changed to after a maintainer responds to #20267."
+  - reviewer: opus
+    orb: T-01a21f16-f8a9-775c-b419-4f621451d698
+    head: "6bd87c87b9"
+    date: 2026-11-27
+    verdict: approve
+    open: "Re-check at lowrail f52c3bc8: head, title, body, RUC1.md body, commit message, status and order approved; RUD1 report approved (fill or drop ruby/ruby#NNNNN). One record-only evidence wording fix applied. Optional body polish (three 'there') not applied, to keep the approved text."
 ---
 
 # Keep defined_class when an active refinement undefines a module method
