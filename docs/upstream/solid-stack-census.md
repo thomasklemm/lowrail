@@ -123,18 +123,19 @@ with_polling_volume { ::SolidCable::Message.uncached { broadcast_messages } }
 enables the query cache on every pool for the run (`query_cache_enabled` is true for the cable pool during the
 poll on main, false on the branch; probe `.amp/in/orb-backup/sc1_mechanism.rb`, both on the census app). The poll
 runs one `SELECT` per run and the run's `complete!` clears the cache, so a lookup never hits, but each poll builds
-the key `[sql, binds]` with one bind per subscribed stream, hashes it (`Attribute#hash`, `Type::Value#hash`) and
+the key `[sql, binds]` (with fewer than 999 channels on SQLite, one bind per stream), hashes it (`Attribute#hash`, `Type::Value#hash`) and
 stores the result. With 20 streams removing it saves 14.5% of an idle poll (interpreter). It is not monotone in the
-number of streams: past SQLite's bind limit (999 channels) the query has no binds and the saving falls to 0.3%
-(thermos-sol record below).
+number of streams: past SQLite's bind limit (999 channels) the query has no binds: 999 channels −0.274%,
+65,536 channels −0.372% (thermos-sol record below).
 
 **Exactness.** Described out loud: \"while polling, the listener does not use the query cache for the Solid Cable
 connection.\"
 
 * The poll's one query was never answered from the cache (each run sees an empty cache), so results are the same.
   The block contains no writes. `uncached` restores the previous state afterwards, also on exceptions (ensure).
-* It changes only `SolidCable::Message`'s pool's query-cache flag on the listener thread; the primary pool keeps
-  its cache (probe: `primary: true` on both sides).
+* It changes only `SolidCable::Message`'s pool's query-cache flag on the listener thread; when primary and cable
+  use separate pools, the primary pool keeps its cache (probe: `primary: true` on both sides); a shared primary
+  pool is disabled during the poll and restored afterwards.
 * An app that subscribes to `sql.active_record` sees `cached: nil` on both sides for the poll query (differential).
 * Checklist items 1–8: the change adds no call on a user-supplied object; `Message.uncached` is Active Record API
   since 2.x, with `dirties:` since 7.2 (not used); `connects_to` and sharding unaffected (`uncached` acts on the
