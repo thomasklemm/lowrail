@@ -590,3 +590,30 @@ on 11-17, with no new owner above 0.4%: `std:uri ← app` 4.46% / 4.73% (campfir
 `sentry-ruby` (codetriage only, 0.38%) is opt-in instrumentation, as before. Relevance and currency: the census locks pin nokogiri
 1.19.4, not the latest 1.19.7. The micro uses 1.19.7, and the code NK2 changes (`SelectorCache`, `xpath_query_from_css_rule`) is the same
 in both and on nokogiri main. Every other gem above is maintained and widely used, as on 11-17. No new lead.
+
+### UR1 after review: head `7da6979` (2026-11-27)
+
+thermos-sol found a crash with no hooks involved: released TruffleRuby 40.0.0 crashes on valid GB18030 input through
+`a3b201f05b`, because CGI's pure-Ruby `unescape` runs `tr` in the caller's encoding before `b`. Astra found that the
+guard (`instance_of?`, `encoding`) added and skipped calls on the input. The rebuilt head keeps the lone-`%` check
+and `str.b` and replaces only the `gsub`: `CGI.unescape(str.b, Encoding::BINARY).force_encoding(enc)`, with no
+guard. The RDoc is unchanged from base, and a test checks that a GB18030 string decodes to its bytes.
+* **Differential:** `diff.rb` (300,000 + 142 cases, also with singleton `#b`) gives 0 differences on 4.0.10, master
+  and 3.4.12 with the pure-Ruby CGI. thermos-sol: 0 on 2.5.9, 4.0.10, TruffleRuby 40.0.0 and JRuby 10.1.3.0.
+  Astra: 0 in 47,653 value cases per backend; every input-hook case matches base.
+* **Remaining boundaries:** a prepend on `CGI.unescape` or on the private `URI._decode_uri_component`, and a
+  frozen singleton CGI result.
+* **Per call** (`body/UR1-cecaed1-4010` and `-master`, JIT-flat, A/A ≤ 0.62%):
+
+| Input | 4.0.10 interpreter | 4.0.10 YJIT | master ZJIT | Objects |
+| --- | ---: | ---: | ---: | ---: |
+| `hello` | 4,486 → 3,553 (−20.8%) | 3,506 → 2,678 (−23.6%) | 3,335 → 2,674 (−19.8%) | 4 → 3 |
+| `article%5Btitle%5D` | 13,101 → 4,973 (−62.0%) | 12,310 → 4,052 (−67.1%) | 11,903 → 4,247 (−64.3%) | 7 → 2 |
+| `Hello+world+from+Rack` | 15,320 → 4,548 (−70.3%) | 14,493 → 3,627 (−75.0%) | 13,996 → 3,793 (−72.9%) | 8 → 2 |
+| 248-byte cookie value | 18,059 → 9,283 (−48.6%) | 17,276 → 8,362 (−51.6%) | 18,026 → 9,303 (−48.4%) | 7 → 2 |
+
+* **Per request** (`req/ur1_cgib.rb`, `req-ur1b-*.txt`). Interpreter: blog PATCH −2.88% (A/A 0.07%), pingcrm PUT
+  −1.02% (0.24%), blog GET article −0.49% (0.46%), JSON control −0.06% (0.01%, objects equal). YJIT: blog PATCH
+  −5.58% (0.51%), GET article −0.95% (0.05%). ZJIT on master: blog PATCH −4.46% (0.92%), GET article −0.95% (0.09%),
+  JSON control −0.01% (0.03%). In the ZJIT runs no window compiled an ISEQ or a side exit; master has no
+  `invalidation_count`. The earlier request table above prices the guarded `a3b201f05b` and is historical.

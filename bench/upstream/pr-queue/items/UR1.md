@@ -6,14 +6,14 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "cecaed123f04e1704bccf4b1b3272c0b12e759c7"
+head: "7da6979b27b2aba69c4076d8f01939e5a8c0f1f6"
 base: master
 built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
 evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz]
-impact: "Every Rails request with a query string or urlencoded form body decodes each key and value through URI.decode_www_form_component (ActionDispatch::QueryParser.each_pair, Rails 8.0+ and main), and released Rack (3.2.9) decodes query and cookie components with it. Per call -9% to -66% instructions, 4-8 objects down to 1-2 (4.0.10 interpreter; YJIT -21% to -73%). Whole requests as a method overlay on Rails main 2e299253f9: interpreter -3.1% blog PATCH, -1.2% blog POST comment, -0.8% pingcrm PUT, -0.35% blog GET article and codetriage GET repo; YJIT 4.0.10 -5.7% / -1.9% / -1.0%; ZJIT master -5.2% / -0.6% (JIT-flat). Path runs on Ruby master and Rails main."
+impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
 state: built
@@ -69,7 +69,14 @@ note: >-
   cases, 0 differences on 4.0.10 and master, also with SINGLETON_B=1; 100,000 on 3.4.12 with pure_cgi.rb: 0. Suite
   94 tests green on 4.0.10, master, 3.4.12 and 3.4.12 with the pure-Ruby CGI. Remaining boundary: a prepend on
   `CGI.unescape` now sees these calls. Fork branch moved with a lease from 33c17e6. Body numbers rerun as
-  body/UR1-cecaed1-{4010,master}, requests as req-ur1b-*.txt (req/ur1_cgib.rb). ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  body/UR1-cecaed1-{4010,master}, requests as req-ur1b-*.txt (req/ur1_cgib.rb).
+  2026-11-27 (thermos-sol interim on cecaed1: zero differences on Ruby 2.5.9, 4.0.10, TruffleRuby 40.0.0 and JRuby
+  10.1.3.0; text only): commit message says "pure-Ruby fallback" (JRuby uses CGI::EscapeExt in Java) and
+  "URL-encoded form fields"; amended to 7da6979 with the same tree as cecaed1, fork branch moved with a lease.
+  Body says query parameters and URL-encoded form fields (Rails sends multipart pairs around QueryParser). Body
+  table and impact from cecaed1's runs (body/UR1-cecaed1-4010, A/A <= 0.33%; master A/A <= 0.62%, ZJIT JIT-flat by
+  upstream-bench's gate) and req-ur1b-*.txt; the earlier req-ur1-*.txt receipts price the guarded a3b201f05b
+  overlay and are historical. req.rb's ZJIT check reads compiled ISEQs and side exits only. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -141,13 +148,13 @@ passes:
 
 # Decode www-form components with cgi/escape
 
-`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
+`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
 This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before.
 
 | Objects and instructions per call, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
-| `"hello"` | 4 objects, 4,486 | 2 objects, 4,083 |
-| `"article%5Btitle%5D"` | 7, 13,114 | 1, 5,693 |
-| `"Hello+world+from+Rack"` | 8, 15,322 | 1, 5,265 |
-| a 248-byte cookie value | 7, 18,056 | 1, 10,154 |
+| `"hello"` | 4 objects, 4,486 | 3 objects, 3,553 |
+| `"article%5Btitle%5D"` | 7, 13,101 | 2, 4,973 |
+| `"Hello+world+from+Rack"` | 8, 15,320 | 2, 4,548 |
+| a 248-byte cookie value | 7, 18,059 | 2, 9,283 |

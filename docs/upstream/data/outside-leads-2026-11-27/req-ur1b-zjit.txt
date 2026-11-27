@@ -1,0 +1,10 @@
+blog PATCH article (redirect) zjit none.rb Ir/op 2585808 objs/op 1426.6 jit 0/0 settle 1
+blog PATCH article (redirect) zjit ur1_cgib.rb Ir/op 2481890 objs/op 1345.2 jit 0/0 settle 1
+blog PATCH article (redirect) zjit none.rb Ir/op 2609620 objs/op 1429.7 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4735092 objs/op 1920.1 jit 0/0 settle 1
+blog GET article zjit ur1_cgib.rb Ir/op 4692498 objs/op 1884.0 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4739250 objs/op 1924.6 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2211522 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit ur1_cgib.rb Ir/op 2210938 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2210808 objs/op 1130.6 jit 0/0 settle 1
+DONE

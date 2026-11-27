@@ -1,0 +1,7 @@
+blog PATCH article (redirect) yjit none.rb Ir/op 2561515 objs/op 1427.0 jit 0/0 settle 1
+blog PATCH article (redirect) yjit ur1_cgib.rb Ir/op 2412402 objs/op 1339.4 jit 0/0 settle 1
+blog PATCH article (redirect) yjit none.rb Ir/op 2548369 objs/op 1422.0 jit 0/0 settle 1
+blog GET article yjit none.rb Ir/op 4668101 objs/op 1951.0 jit 0/0 settle 1
+blog GET article yjit ur1_cgib.rb Ir/op 4625145 objs/op 1912.0 jit 0/0 settle 1
+blog GET article yjit none.rb Ir/op 4670590 objs/op 1948.0 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4003566 objs/op 1820.6 jit 0/0 settle 1

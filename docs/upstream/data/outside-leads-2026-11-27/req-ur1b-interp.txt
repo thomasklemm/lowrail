@@ -1,0 +1,13 @@
+blog PATCH article (redirect) interp none.rb Ir/op 4657425 objs/op 1420.8 jit 0/0 settle 0
+blog PATCH article (redirect) interp none.rb Ir/op 4660601 objs/op 1424.2 jit 0/0 settle 0
+blog PATCH article (redirect) interp ur1_cgib.rb Ir/op 4524735 objs/op 1335.3 jit 0/0 settle 0
+blog GET article interp none.rb Ir/op 8193589 objs/op 1940.2 jit 0/0 settle 0
+blog GET article interp none.rb Ir/op 8155585 objs/op 1942.8 jit 0/0 settle 0
+blog GET article interp ur1_cgib.rb Ir/op 8134409 objs/op 1901.3 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 6980506 objs/op 1805.9 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp none.rb Ir/op 6997493 objs/op 1811.2 jit 0/0 settle 0
+pingcrm PUT contact (Inertia redirect) interp ur1_cgib.rb Ir/op 6917531 objs/op 1743.9 jit 0/0 settle 0
+blog GET articles.json interp none.rb Ir/op 4269257 objs/op 1124.6 jit 0/0 settle 0
+blog GET articles.json interp none.rb Ir/op 4268998 objs/op 1124.6 jit 0/0 settle 0
+blog GET articles.json interp ur1_cgib.rb Ir/op 4266574 objs/op 1124.6 jit 0/0 settle 0
+DONE
