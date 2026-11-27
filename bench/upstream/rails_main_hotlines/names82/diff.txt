@@ -1,0 +1,837 @@
+# Method names, Rails 8.1.4.1 (3f290b759c) to 8.2.0.alpha (088fc0cf61)
+# ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+
+## Reserved-name sets
+dangerous_attribute_methods: +11 -8
+  + _identity_query_constraints_hash _read_attribute! _read_attribute_at! _skip_locking_column_on_touch? association_cache autosave_belongs_to_association implicit_persistence_transaction primary_key_is_composite? read_attr resolve_alias serialization_key
+  - _foreign_keys_equal? _record_changed? association_foreign_key_changed? compute_primary_key default_scope_override find_record_by_id inverse_polymorphic_association_changed? validation_context=
+dangerous_class_methods: +103 -70
+  + __class_attr___callbacks_owner __class_attr__attr_readonly_owner __class_attr__counter_cache_columns_owner __class_attr__destroy_association_async_job_owner __class_attr__reflections_owner __class_attr__signed_id_verifier_owner __class_attr__validators_owner __class_attr_aggregate_reflections_owner __class_attr_attachment_reflections_owner __class_attr_attribute_aliases_owner __class_attr_attribute_method_patterns_owner __class_attr_attributes_for_inspect_owner __class_attr_automatic_scope_inversing_owner __class_attr_automatically_invert_plural_associations_owner __class_attr_belongs_to_required_by_default_owner __class_attr_cache_timestamp_format_owner __class_attr_cache_versioning_owner __class_attr_collection_cache_versioning_owner __class_attr_counter_cached_association_names_owner __class_attr_default_column_serializer_owner __class_attr_default_connection_handler_owner __class_attr_default_role_owner __class_attr_default_scopes_owner __class_attr_default_shard_owner __class_attr_defined_enums_owner __class_attr_destroy_association_async_batch_size_owner __class_attr_encrypted_attributes_owner __class_attr_enumerate_columns_in_select_statements_owner __class_attr_generated_token_verifier_owner __class_attr_has_many_inversing_owner __class_attr_immutable_strings_by_default_owner __class_attr_implicit_order_column_owner __class_attr_include_root_in_json_owner __class_attr_inheritance_column_owner __class_attr_internal_metadata_table_name_owner __class_attr_lock_optimistically_owner __class_attr_logger_owner __class_attr_nested_attributes_options_owner __class_attr_normalized_attributes_owner __class_attr_param_delimiter_owner __class_attr_partial_inserts_owner __class_attr_partial_updates_owner __class_attr_pluralize_table_names_owner __class_attr_primary_key_prefix_type_owner __class_attr_record_timestamps_owner __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction_owner __class_attr_schema_migrations_table_name_owner __class_attr_shard_selector_owner __class_attr_signed_id_verifier_secret_owner __class_attr_skip_time_zone_conversion_for_attributes_owner __class_attr_store_full_class_name_owner __class_attr_store_full_sti_class_owner __class_attr_strict_loading_by_default_owner __class_attr_strict_loading_mode_owner __class_attr_table_name_prefix_owner __class_attr_table_name_suffix_owner __class_attr_time_zone_aware_attributes_owner __class_attr_time_zone_aware_types_owner __class_attr_token_definitions_owner _async_select_all _build_update_manager _merge_validates_options _returning_columns_for_update _sql_for_find _update_record_with_result abstract_ancestors add_pending_attribute_modification alias_attributes_mass_generated? all_queries_scope attribute_slots attribute_slots_for bind_value_for_sql_literal bound_sql_literal_for build_schema_context composite_query_constraints_definition configured_primary_key_definition current_schema_context declared_primary_key_definition default_order define_id_value find_by_statement_cache_key freeze generate_inherited_alias_attribute has_concrete_ancestor? has_default_scope? has_delegated_json has_json load_schema_context loaded_mapped_table make_pending_attribute_modifications_shareable make_reflections_shareable! mapped_table optimize_new_allocation pop_connected_to_stack primary_key_definition primary_key_from_prefix query_constraints_definition ractor_connection_handler record_alias_by_attribute_name reload_schema_contexts_from_cache resolve_alias schema_attributes schema_context
+  - __class_attr___callbacks= __class_attr__attr_readonly= __class_attr__counter_cache_columns= __class_attr__destroy_association_async_job= __class_attr__reflections= __class_attr__signed_id_verifier= __class_attr__validators= __class_attr_aggregate_reflections= __class_attr_attachment_reflections= __class_attr_attribute_aliases= __class_attr_attribute_method_patterns= __class_attr_attributes_for_inspect= __class_attr_automatic_scope_inversing= __class_attr_automatically_invert_plural_associations= __class_attr_belongs_to_required_by_default= __class_attr_cache_timestamp_format= __class_attr_cache_versioning= __class_attr_collection_cache_versioning= __class_attr_counter_cached_association_names= __class_attr_default_column_serializer= __class_attr_default_connection_handler= __class_attr_default_role= __class_attr_default_scope_override __class_attr_default_scope_override= __class_attr_default_scopes= __class_attr_default_shard= __class_attr_defined_enums= __class_attr_destroy_association_async_batch_size= __class_attr_encrypted_attributes= __class_attr_enumerate_columns_in_select_statements= __class_attr_generated_token_verifier= __class_attr_has_many_inversing= __class_attr_immutable_strings_by_default= __class_attr_implicit_order_column= __class_attr_include_root_in_json= __class_attr_inheritance_column= __class_attr_internal_metadata_table_name= __class_attr_lock_optimistically= __class_attr_logger= __class_attr_nested_attributes_options= __class_attr_normalized_attributes= __class_attr_param_delimiter= __class_attr_partial_inserts= __class_attr_partial_updates= __class_attr_pluralize_table_names= __class_attr_primary_key_prefix_type= __class_attr_record_timestamps= __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction= __class_attr_schema_migrations_table_name= __class_attr_shard_selector= __class_attr_signed_id_verifier_secret= __class_attr_skip_time_zone_conversion_for_attributes= __class_attr_store_full_class_name= __class_attr_store_full_sti_class= __class_attr_strict_loading_by_default= __class_attr_strict_loading_mode= __class_attr_table_name_prefix= __class_attr_table_name_suffix= __class_attr_time_zone_aware_attributes= __class_attr_time_zone_aware_types= __class_attr_token_definitions= _store_accessors_module attribute_method_patterns_cache attribute_method_patterns_matching default_scope_override default_scope_override= define_default_attribute get_primary_key symbol_column_to_string yaml_encoder
+relation_defined: +36 -5
+  + _annotate! _default_order! _eager_load! _extending! _group! _having! _in_order_of! _includes! _joins! _left_outer_joins! _optimizer_hints! _order! _preload! _references! _regroup! _reorder! _reselect! _unscope! _where! _with! _with_recursive! classify_join_values comparison_values_for_in_order_of cte_join? default_order default_order! default_order_values default_order_values= effective_order_values structurally_incompatible_key? structurally_incompatible_value? using_limitable_joins? values_for_merge warn_unscope_of_other_tables with_recursive_value with_recursive_value=
+  - _reverse_order_columns build_bound_sql_literal build_named_bound_sql_literal select_association_list select_named_joins
+restricted_class_methods: +0 -0
+querying_methods: +1 -0
+  + default_order
+
+## Surfaces (+ added, - removed; owners for added names)
+
+### model.instance public: +4 -1
++ _read_attribute!  [ActiveRecord::AttributeMethods::Read#(public)]
++ _read_attribute_at!  [ActiveRecord::AttributeMethods::Read#(public)]
++ read_attr  [ActiveRecord::AttributeMethods::Read#(public)]
++ resolve_alias  [ActiveRecord::AttributeMethods#(public), ActiveRecord::AttributeMethods::AliasResolution#(public), ActiveRecord::AttributeMethods::Read::ClassMethods#(public)]
+- default_scope_override
+
+### model.instance protected: +1 -0
++ association_cache  [ActiveRecord::Associations#(protected)]
+
+### model.instance private: +6 -7
++ _identity_query_constraints_hash  [ActiveRecord::Persistence#(private)]
++ _skip_locking_column_on_touch?  [ActiveRecord::Locking::Optimistic#(private)]
++ autosave_belongs_to_association  [ActiveRecord::AutosaveAssociation#(private)]
++ implicit_persistence_transaction  [ActiveRecord::Transactions#(private)]
++ primary_key_is_composite?  [ActiveRecord::AttributeMethods::PrimaryKey#(private)]
++ serialization_key  [ActiveModel::Serialization#(private)]
+- _foreign_keys_equal?
+- _record_changed?
+- association_foreign_key_changed?
+- compute_primary_key
+- find_record_by_id
+- inverse_polymorphic_association_changed?
+- validation_context=
+
+### model.class public: +95 -6
++ __class_attr___callbacks  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionCable::Server::Worker.(singleton)]
++ __class_attr__attr_readonly  [ActiveRecord::Base.(singleton)]
++ __class_attr__counter_cache_columns  [ActiveRecord::Base.(singleton)]
++ __class_attr__destroy_association_async_job  [ActiveRecord::Base.(singleton)]
++ __class_attr__reflections  [ActiveRecord::Base.(singleton)]
++ __class_attr__signed_id_verifier  [ActiveRecord::Base.(singleton)]
++ __class_attr__validators  [ActiveRecord::Base.(singleton)]
++ __class_attr_aggregate_reflections  [ActiveRecord::Base.(singleton)]
++ __class_attr_attachment_reflections  [ActiveRecord::Base.(singleton)]
++ __class_attr_attribute_aliases  [ActiveRecord::Base.(singleton)]
++ __class_attr_attribute_method_patterns  [ActiveRecord::Base.(singleton)]
++ __class_attr_attributes_for_inspect  [ActiveRecord::Base.(singleton)]
++ __class_attr_automatic_scope_inversing  [ActiveRecord::Base.(singleton)]
++ __class_attr_automatically_invert_plural_associations  [ActiveRecord::Base.(singleton)]
++ __class_attr_belongs_to_required_by_default  [ActiveRecord::Base.(singleton)]
++ __class_attr_cache_timestamp_format  [ActiveRecord::Base.(singleton)]
++ __class_attr_cache_versioning  [ActiveRecord::Base.(singleton)]
++ __class_attr_collection_cache_versioning  [ActiveRecord::Base.(singleton)]
++ __class_attr_counter_cached_association_names  [ActiveRecord::Base.(singleton)]
++ __class_attr_default_column_serializer  [ActiveRecord::Base.(singleton)]
++ __class_attr_default_connection_handler  [ActiveRecord::Base.(singleton)]
++ __class_attr_default_role  [ActiveRecord::Base.(singleton)]
++ __class_attr_default_scopes  [ActiveRecord::Base.(singleton)]
++ __class_attr_default_shard  [ActiveRecord::Base.(singleton)]
++ __class_attr_defined_enums  [ActiveRecord::Base.(singleton)]
++ __class_attr_destroy_association_async_batch_size  [ActiveRecord::Base.(singleton)]
++ __class_attr_encrypted_attributes  [ActiveRecord::Base.(singleton)]
++ __class_attr_enumerate_columns_in_select_statements  [ActiveRecord::Base.(singleton)]
++ __class_attr_generated_token_verifier  [ActiveRecord::Base.(singleton)]
++ __class_attr_has_many_inversing  [ActiveRecord::Base.(singleton)]
++ __class_attr_immutable_strings_by_default  [ActiveRecord::Base.(singleton)]
++ __class_attr_implicit_order_column  [ActiveRecord::Base.(singleton)]
++ __class_attr_include_root_in_json  [ActiveRecord::Base.(singleton)]
++ __class_attr_inheritance_column  [ActiveRecord::Base.(singleton)]
++ __class_attr_internal_metadata_table_name  [ActiveRecord::Base.(singleton)]
++ __class_attr_lock_optimistically  [ActiveRecord::Base.(singleton)]
++ __class_attr_logger  [ActionView::Base.(singleton), ActiveRecord::Base.(singleton), ActiveSupport::Cache::Store.(singleton)]
++ __class_attr_nested_attributes_options  [ActiveRecord::Base.(singleton)]
++ __class_attr_normalized_attributes  [ActiveRecord::Base.(singleton)]
++ __class_attr_param_delimiter  [ActiveRecord::Base.(singleton)]
++ __class_attr_partial_inserts  [ActiveRecord::Base.(singleton)]
++ __class_attr_partial_updates  [ActiveRecord::Base.(singleton)]
++ __class_attr_pluralize_table_names  [ActiveRecord::Base.(singleton)]
++ __class_attr_primary_key_prefix_type  [ActiveRecord::Base.(singleton)]
++ __class_attr_record_timestamps  [ActiveRecord::Base.(singleton)]
++ __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction  [ActiveRecord::Base.(singleton)]
++ __class_attr_schema_migrations_table_name  [ActiveRecord::Base.(singleton)]
++ __class_attr_shard_selector  [ActiveRecord::Base.(singleton)]
++ __class_attr_signed_id_verifier_secret  [ActiveRecord::Base.(singleton)]
++ __class_attr_skip_time_zone_conversion_for_attributes  [ActiveRecord::Base.(singleton)]
++ __class_attr_store_full_class_name  [ActiveRecord::Base.(singleton)]
++ __class_attr_store_full_sti_class  [ActiveRecord::Base.(singleton)]
++ __class_attr_strict_loading_by_default  [ActiveRecord::Base.(singleton)]
++ __class_attr_strict_loading_mode  [ActiveRecord::Base.(singleton)]
++ __class_attr_table_name_prefix  [ActiveRecord::Base.(singleton)]
++ __class_attr_table_name_suffix  [ActiveRecord::Base.(singleton)]
++ __class_attr_time_zone_aware_attributes  [ActiveRecord::Base.(singleton)]
++ __class_attr_time_zone_aware_types  [ActiveRecord::Base.(singleton)]
++ __class_attr_token_definitions  [ActiveRecord::Base.(singleton)]
++ _async_select_all  [ActiveRecord::Querying#(public)]
++ _returning_columns_for_update  [ActiveRecord::ModelSchema::ClassMethods#(public), ActiveRecord::ModelSchema::SchemaContext::MappedTable#(public)]
++ _update_record_with_result  [ActiveRecord::Persistence::ClassMethods#(public)]
++ abstract_ancestors  [ActiveRecord::AttributeMethods::ClassMethods#(public)]
++ alias_attributes_mass_generated?  [ActiveRecord::AttributeMethods::ClassMethods#(public)]
++ all_queries_scope  [ActiveRecord::Scoping::Named::ClassMethods#(public)]
++ apply_pending_attribute_modifications  [ActiveModel::AttributeRegistration::ClassMethods#(public)]
++ attribute_slots  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ attribute_slots_for  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ bound_sql_literal_for  [ActiveRecord::Sanitization::ClassMethods#(public)]
++ build_schema_context  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ composite_query_constraints_definition  [ActiveRecord::ModelSchema::SchemaContext::MappedTable#(public), ActiveRecord::Persistence::ClassMethods#(public)]
++ configured_primary_key_definition  [ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods#(public), ActiveRecord::ModelSchema::SchemaContext#(public)]
++ current_schema_context  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ declared_primary_key_definition  [ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods#(public)]
++ default_order  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public), ActiveRecord::Querying#(public)]
++ find_by_statement_cache_key  [ActiveRecord::Core::ClassMethods#(public)]
++ generate_inherited_alias_attribute  [ActiveRecord::AttributeMethods::ClassMethods#(public)]
++ has_default_scope?  [ActiveRecord::Scoping::Default::ClassMethods#(public)]
++ has_delegated_json  [ActiveModel::SchematizedJson::ClassMethods#(public)]
++ has_json  [ActiveModel::SchematizedJson::ClassMethods#(public)]
++ load_schema_context  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ loaded_mapped_table  [ActiveRecord::ModelSchema::ClassMethods#(public), ActiveRecord::ModelSchema::SchemaContext#(public)]
++ make_pending_attribute_modifications_shareable  [ActiveModel::AttributeRegistration::ClassMethods#(public)]
++ make_reflections_shareable!  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ mapped_table  [ActiveRecord::ModelSchema::ClassMethods#(public), ActiveRecord::ModelSchema::SchemaContext#(public)]
++ primary_key_definition  [ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods#(public), ActiveRecord::ModelSchema::SchemaContext#(public), ActiveRecord::ModelSchema::SchemaContext::MappedTable#(public)]
++ primary_key_from_prefix  [ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods#(public)]
++ query_constraints_definition  [ActiveRecord::ModelSchema::SchemaContext#(public), ActiveRecord::Persistence::ClassMethods#(public)]
++ ractor_connection_handler  [ActiveRecord::Base.(singleton)]
++ resolve_alias  [ActiveRecord::AttributeMethods#(public), ActiveRecord::AttributeMethods::AliasResolution#(public), ActiveRecord::AttributeMethods::Read::ClassMethods#(public)]
++ schema_attributes  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ schema_context  [ActiveRecord::ModelSchema::ClassMethods#(public)]
++ timestamp_attributes_for_create  [ActiveRecord::Timestamp::ClassMethods#(public)]
++ timestamp_attributes_for_update  [ActiveRecord::Timestamp::ClassMethods#(public)]
++ type_for_column  [ActiveRecord::Attributes::ClassMethods#(public)]
+- _store_accessors_module
+- default_scope_override
+- default_scope_override=
+- get_primary_key
+- symbol_column_to_string
+- yaml_encoder
+
+### model.class protected: +2 -0
++ reload_schema_contexts_from_cache  [ActiveRecord::ModelSchema::ClassMethods#(protected)]
++ schema_loaded?  [ActiveRecord::ModelSchema::ClassMethods#(protected), ActiveRecord::ModelSchema::SchemaContext#(public)]
+
+### model.class private: +69 -128
++ __class_attr___callbacks_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionCable::Engine.(singleton_private)]
++ __class_attr__attr_readonly_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr__counter_cache_columns_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr__destroy_association_async_job_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr__reflections_owner  [ActionMailbox::InboundEmail.(singleton_private), ActionText::RichText.(singleton_private), ActiveRecord::Base.(singleton_private)]
++ __class_attr__signed_id_verifier_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr__validators_owner  [ActionMailbox::InboundEmail.(singleton_private), ActionMailbox::Record.(singleton_private), ActionText::EncryptedRichText.(singleton_private)]
++ __class_attr_aggregate_reflections_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_attachment_reflections_owner  [ActionMailbox::InboundEmail.(singleton_private), ActionText::RichText.(singleton_private), ActiveRecord::Base.(singleton_private)]
++ __class_attr_attribute_aliases_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_attribute_method_patterns_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_attributes_for_inspect_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_automatic_scope_inversing_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_automatically_invert_plural_associations_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_belongs_to_required_by_default_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_cache_timestamp_format_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_cache_versioning_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_collection_cache_versioning_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_counter_cached_association_names_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_default_column_serializer_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_default_connection_handler_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_default_role_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_default_scopes_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_default_shard_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_defined_enums_owner  [ActionMailbox::InboundEmail.(singleton_private), ActionMailbox::Record.(singleton_private), ActionText::EncryptedRichText.(singleton_private)]
++ __class_attr_destroy_association_async_batch_size_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_encrypted_attributes_owner  [ActionText::EncryptedRichText.(singleton_private), ActiveRecord::Base.(singleton_private)]
++ __class_attr_enumerate_columns_in_select_statements_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_generated_token_verifier_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_has_many_inversing_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_immutable_strings_by_default_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_implicit_order_column_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_include_root_in_json_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_inheritance_column_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_internal_metadata_table_name_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_lock_optimistically_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_logger_owner  [ActionView::Base.(singleton_private), ActiveRecord::Base.(singleton_private), ActiveSupport::Cache::Store.(singleton_private)]
++ __class_attr_nested_attributes_options_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_normalized_attributes_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_param_delimiter_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_partial_inserts_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_partial_updates_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_pluralize_table_names_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_primary_key_prefix_type_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_record_timestamps_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_schema_migrations_table_name_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_shard_selector_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_signed_id_verifier_secret_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_skip_time_zone_conversion_for_attributes_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_store_full_class_name_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_store_full_sti_class_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_strict_loading_by_default_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_strict_loading_mode_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_table_name_prefix_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_table_name_suffix_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_time_zone_aware_attributes_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_time_zone_aware_types_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_token_definitions_owner  [ActiveRecord::Base.(singleton_private)]
++ _build_update_manager  [ActiveRecord::Persistence::ClassMethods#(private)]
++ _merge_validates_options  [ActiveModel::Validations::ClassMethods#(private)]
++ _sql_for_find  [ActiveRecord::Querying#(private)]
++ add_pending_attribute_modification  [ActiveModel::AttributeRegistration::ClassMethods#(private)]
++ bind_value_for_sql_literal  [ActiveRecord::Sanitization::ClassMethods#(private)]
++ define_id_value  [ActiveRecord::AttributeMethods::ClassMethods#(private)]
++ has_concrete_ancestor?  [ActiveRecord::Inheritance::ClassMethods#(private)]
++ optimize_new_allocation  [ActiveRecord::Inheritance::ClassMethods#(private)]
++ pop_connected_to_stack  [ActiveRecord::ConnectionHandling#(private)]
++ record_alias_by_attribute_name  [ActiveModel::AttributeMethods::ClassMethods#(private)]
+- __class_attr___callbacks
+- __class_attr___callbacks=
+- __class_attr__attr_readonly
+- __class_attr__attr_readonly=
+- __class_attr__counter_cache_columns
+- __class_attr__counter_cache_columns=
+- __class_attr__destroy_association_async_job
+- __class_attr__destroy_association_async_job=
+- __class_attr__reflections
+- __class_attr__reflections=
+- __class_attr__signed_id_verifier
+- __class_attr__signed_id_verifier=
+- __class_attr__validators
+- __class_attr__validators=
+- __class_attr_aggregate_reflections
+- __class_attr_aggregate_reflections=
+- __class_attr_attachment_reflections
+- __class_attr_attachment_reflections=
+- __class_attr_attribute_aliases
+- __class_attr_attribute_aliases=
+- __class_attr_attribute_method_patterns
+- __class_attr_attribute_method_patterns=
+- __class_attr_attributes_for_inspect
+- __class_attr_attributes_for_inspect=
+- __class_attr_automatic_scope_inversing
+- __class_attr_automatic_scope_inversing=
+- __class_attr_automatically_invert_plural_associations
+- __class_attr_automatically_invert_plural_associations=
+- __class_attr_belongs_to_required_by_default
+- __class_attr_belongs_to_required_by_default=
+- __class_attr_cache_timestamp_format
+- __class_attr_cache_timestamp_format=
+- __class_attr_cache_versioning
+- __class_attr_cache_versioning=
+- __class_attr_collection_cache_versioning
+- __class_attr_collection_cache_versioning=
+- __class_attr_counter_cached_association_names
+- __class_attr_counter_cached_association_names=
+- __class_attr_default_column_serializer
+- __class_attr_default_column_serializer=
+- __class_attr_default_connection_handler
+- __class_attr_default_connection_handler=
+- __class_attr_default_role
+- __class_attr_default_role=
+- __class_attr_default_scope_override
+- __class_attr_default_scope_override=
+- __class_attr_default_scopes
+- __class_attr_default_scopes=
+- __class_attr_default_shard
+- __class_attr_default_shard=
+- __class_attr_defined_enums
+- __class_attr_defined_enums=
+- __class_attr_destroy_association_async_batch_size
+- __class_attr_destroy_association_async_batch_size=
+- __class_attr_encrypted_attributes
+- __class_attr_encrypted_attributes=
+- __class_attr_enumerate_columns_in_select_statements
+- __class_attr_enumerate_columns_in_select_statements=
+- __class_attr_generated_token_verifier
+- __class_attr_generated_token_verifier=
+- __class_attr_has_many_inversing
+- __class_attr_has_many_inversing=
+- __class_attr_immutable_strings_by_default
+- __class_attr_immutable_strings_by_default=
+- __class_attr_implicit_order_column
+- __class_attr_implicit_order_column=
+- __class_attr_include_root_in_json
+- __class_attr_include_root_in_json=
+- __class_attr_inheritance_column
+- __class_attr_inheritance_column=
+- __class_attr_internal_metadata_table_name
+- __class_attr_internal_metadata_table_name=
+- __class_attr_lock_optimistically
+- __class_attr_lock_optimistically=
+- __class_attr_logger
+- __class_attr_logger=
+- __class_attr_nested_attributes_options
+- __class_attr_nested_attributes_options=
+- __class_attr_normalized_attributes
+- __class_attr_normalized_attributes=
+- __class_attr_param_delimiter
+- __class_attr_param_delimiter=
+- __class_attr_partial_inserts
+- __class_attr_partial_inserts=
+- __class_attr_partial_updates
+- __class_attr_partial_updates=
+- __class_attr_pluralize_table_names
+- __class_attr_pluralize_table_names=
+- __class_attr_primary_key_prefix_type
+- __class_attr_primary_key_prefix_type=
+- __class_attr_record_timestamps
+- __class_attr_record_timestamps=
+- __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction
+- __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction=
+- __class_attr_schema_migrations_table_name
+- __class_attr_schema_migrations_table_name=
+- __class_attr_shard_selector
+- __class_attr_shard_selector=
+- __class_attr_signed_id_verifier_secret
+- __class_attr_signed_id_verifier_secret=
+- __class_attr_skip_time_zone_conversion_for_attributes
+- __class_attr_skip_time_zone_conversion_for_attributes=
+- __class_attr_store_full_class_name
+- __class_attr_store_full_class_name=
+- __class_attr_store_full_sti_class
+- __class_attr_store_full_sti_class=
+- __class_attr_strict_loading_by_default
+- __class_attr_strict_loading_by_default=
+- __class_attr_strict_loading_mode
+- __class_attr_strict_loading_mode=
+- __class_attr_table_name_prefix
+- __class_attr_table_name_prefix=
+- __class_attr_table_name_suffix
+- __class_attr_table_name_suffix=
+- __class_attr_time_zone_aware_attributes
+- __class_attr_time_zone_aware_attributes=
+- __class_attr_time_zone_aware_types
+- __class_attr_time_zone_aware_types=
+- __class_attr_token_definitions
+- __class_attr_token_definitions=
+- apply_pending_attribute_modifications
+- attribute_method_patterns_cache
+- attribute_method_patterns_matching
+- define_default_attribute
+- schema_loaded?
+- timestamp_attributes_for_create
+- timestamp_attributes_for_update
+- type_for_column
+
+### relation.instance public: +29 -0
++ _annotate!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _default_order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _eager_load!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _extending!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _group!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _having!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _in_order_of!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _includes!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _joins!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _left_outer_joins!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _optimizer_hints!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _preload!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _references!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _regroup!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _reorder!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _reselect!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _unscope!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _where!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _with!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _with_recursive!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public), ActiveRecord::Querying#(public)]
++ default_order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order_values  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order_values=  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ effective_order_values  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ values_for_merge  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::Relation#(public)]
++ with_recursive_value  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ with_recursive_value=  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
+
+### relation.instance private: +7 -5
++ classify_join_values  [ActiveRecord::QueryMethods#(private)]
++ comparison_values_for_in_order_of  [ActiveRecord::QueryMethods#(private)]
++ cte_join?  [ActiveRecord::QueryMethods#(private)]
++ structurally_incompatible_key?  [ActiveRecord::QueryMethods#(private)]
++ structurally_incompatible_value?  [ActiveRecord::QueryMethods#(private)]
++ using_limitable_joins?  [ActiveRecord::FinderMethods#(private)]
++ warn_unscope_of_other_tables  [ActiveRecord::QueryMethods#(private)]
+- _reverse_order_columns
+- build_bound_sql_literal
+- build_named_bound_sql_literal
+- select_association_list
+- select_named_joins
+
+### association.instance public: +29 -0
++ _annotate!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _default_order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _eager_load!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _extending!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _group!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _having!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _in_order_of!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _includes!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _joins!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _left_outer_joins!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _optimizer_hints!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _preload!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _references!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _regroup!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _reorder!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _reselect!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _unscope!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _where!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _with!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ _with_recursive!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public), ActiveRecord::Querying#(public)]
++ default_order!  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order_values  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ default_order_values=  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ effective_order_values  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ values_for_merge  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::Relation#(public)]
++ with_recursive_value  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
++ with_recursive_value=  [ActiveRecord::Associations::CollectionProxy#(public), ActiveRecord::QueryMethods#(public)]
+
+### association.instance private: +8 -5
++ bulk_write  [ActiveRecord::Associations::CollectionProxy#(private)]
++ classify_join_values  [ActiveRecord::QueryMethods#(private)]
++ comparison_values_for_in_order_of  [ActiveRecord::QueryMethods#(private)]
++ cte_join?  [ActiveRecord::QueryMethods#(private)]
++ structurally_incompatible_key?  [ActiveRecord::QueryMethods#(private)]
++ structurally_incompatible_value?  [ActiveRecord::QueryMethods#(private)]
++ using_limitable_joins?  [ActiveRecord::FinderMethods#(private)]
++ warn_unscope_of_other_tables  [ActiveRecord::QueryMethods#(private)]
+- _reverse_order_columns
+- build_bound_sql_literal
+- build_named_bound_sql_literal
+- select_association_list
+- select_named_joins
+
+### activemodel.instance private: +1 -1
++ serialization_key  [ActiveModel::Serialization#(private)]
+- validation_context=
+
+### activemodel.class public: +10 -0
++ __class_attr___callbacks  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionCable::Server::Worker.(singleton)]
++ __class_attr__validators  [ActiveRecord::Base.(singleton)]
++ __class_attr_attribute_aliases  [ActiveRecord::Base.(singleton)]
++ __class_attr_attribute_method_patterns  [ActiveRecord::Base.(singleton)]
++ __class_attr_include_root_in_json  [ActiveRecord::Base.(singleton)]
++ __class_attr_param_delimiter  [ActiveRecord::Base.(singleton)]
++ apply_pending_attribute_modifications  [ActiveModel::AttributeRegistration::ClassMethods#(public)]
++ has_delegated_json  [ActiveModel::SchematizedJson::ClassMethods#(public)]
++ has_json  [ActiveModel::SchematizedJson::ClassMethods#(public)]
++ make_pending_attribute_modifications_shareable  [ActiveModel::AttributeRegistration::ClassMethods#(public)]
+
+### activemodel.class private: +9 -15
++ __class_attr___callbacks_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionCable::Engine.(singleton_private)]
++ __class_attr__validators_owner  [ActionMailbox::InboundEmail.(singleton_private), ActionMailbox::Record.(singleton_private), ActionText::EncryptedRichText.(singleton_private)]
++ __class_attr_attribute_aliases_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_attribute_method_patterns_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_include_root_in_json_owner  [ActiveRecord::Base.(singleton_private)]
++ __class_attr_param_delimiter_owner  [ActiveRecord::Base.(singleton_private)]
++ _merge_validates_options  [ActiveModel::Validations::ClassMethods#(private)]
++ add_pending_attribute_modification  [ActiveModel::AttributeRegistration::ClassMethods#(private)]
++ record_alias_by_attribute_name  [ActiveModel::AttributeMethods::ClassMethods#(private)]
+- __class_attr___callbacks
+- __class_attr___callbacks=
+- __class_attr__validators
+- __class_attr__validators=
+- __class_attr_attribute_aliases
+- __class_attr_attribute_aliases=
+- __class_attr_attribute_method_patterns
+- __class_attr_attribute_method_patterns=
+- __class_attr_include_root_in_json
+- __class_attr_include_root_in_json=
+- __class_attr_param_delimiter
+- __class_attr_param_delimiter=
+- apply_pending_attribute_modifications
+- attribute_method_patterns_cache
+- attribute_method_patterns_matching
+
+### controller.instance public: +10 -0
++ _all_renderers  [ActionController::Renderers#(public), ActionController::Renderers::All#(public)]
++ _render_with_renderer_svg  [ActionController::Renderers#(public)]
++ default_protect_from_forgery_with  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ default_protect_from_forgery_with=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_trusted_origins  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_trusted_origins=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_verification_strategy  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_verification_strategy=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ inbound_emails_path  []
++ inbound_emails_url  []
+
+### controller.instance private: +17 -0
++ append_sec_fetch_site_to_vary_header  [ActionController::RequestForgeryProtection#(private)]
++ controller_action_scope  [AbstractController::Translation#(private)]
++ controller_scope  [AbstractController::Translation#(private)]
++ embed_authenticity_token?  [ActionController::Base::HelperMethods#(public), ActionController::RequestForgeryProtection#(private)]
++ instrument_cross_origin_javascript  [ActionController::RequestForgeryProtection#(private)]
++ instrument_csrf_event  [ActionController::RequestForgeryProtection#(private)]
++ instrument_csrf_token_fallback  [ActionController::RequestForgeryProtection#(private)]
++ instrument_unverified_request  [ActionController::RequestForgeryProtection#(private)]
++ origin_trusted?  [ActionController::RequestForgeryProtection#(private)]
++ scope_option_by_controller_path  [AbstractController::Translation#(private)]
++ sec_fetch_site_value  [ActionController::RequestForgeryProtection#(private)]
++ using_header_only_for_forgery_protection?  [ActionController::RequestForgeryProtection#(private)]
++ verified_query_request?  [ActionController::RequestForgeryProtection#(private)]
++ verified_request_for_forgery_protection?  [ActionController::RequestForgeryProtection#(private)]
++ verified_via_header_only?  [ActionController::RequestForgeryProtection#(private)]
++ verified_with_legacy_token?  [ActionController::RequestForgeryProtection#(private)]
++ verify_request_for_forgery_protection  [ActionController::RequestForgeryProtection#(private)]
+
+### controller.class public: +30 -1
++ __class_attr___callbacks  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionCable::Server::Worker.(singleton)]
++ __class_attr__allowed_redirect_hosts  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr__default_form_builder  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__flash_types  [ActionController::Base.(singleton)]
++ __class_attr__helper_methods  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__layout  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__layout_conditions  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__renderers  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr__view_cache_dependencies  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__wrapper_options  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr_allowed_redirect_hosts_permissions  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr_config  [AbstractController::Base.(singleton)]
++ __class_attr_default_url_options  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionDispatch::Routing::RoutesProxy.(singleton)]
++ __class_attr_escape_json_responses  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr_etag_with_template_digest  [ActionController::Base.(singleton)]
++ __class_attr_etaggers  [ActionController::API.(singleton), ActionController::Base.(singleton)]
++ __class_attr_fragment_cache_keys  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr_helpers_path  [ActionController::Base.(singleton)]
++ __class_attr_include_all_helpers  [ActionController::Base.(singleton)]
++ __class_attr_middleware_stack  [ActionController::Metal.(singleton)]
++ __class_attr_raise_on_missing_callback_actions  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr_rescue_handlers  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionController::API.(singleton)]
++ _parameter_encodings  [ActionController::ParameterEncoding::ClassMethods#(public)]
++ action_method_symbols  [AbstractController::Base.(singleton), AbstractController::UrlFor::ClassMethods#(public)]
++ default_protect_from_forgery_with  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ default_protect_from_forgery_with=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_trusted_origins  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_trusted_origins=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_verification_strategy  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
++ forgery_protection_verification_strategy=  [ActionController::RequestForgeryProtection#(public), ActionController::RequestForgeryProtection::ClassMethods#(public)]
+- _set_wrapper_options
+
+### controller.class private: +23 -42
++ __class_attr___callbacks_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionCable::Engine.(singleton_private)]
++ __class_attr__allowed_redirect_hosts_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr__default_form_builder_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr__flash_types_owner  [ActionController::Base.(singleton_private)]
++ __class_attr__helper_methods_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::MailersController.(singleton_private)]
++ __class_attr__layout_conditions_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::ApplicationController.(singleton_private)]
++ __class_attr__layout_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::ApplicationController.(singleton_private)]
++ __class_attr__renderers_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr__view_cache_dependencies_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr__wrapper_options_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailbox::BaseController.(singleton_private)]
++ __class_attr_allowed_redirect_hosts_permissions_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr_config_owner  [AbstractController::Base.(singleton_private), ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr_default_url_options_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionDispatch::Routing::RoutesProxy.(singleton_private)]
++ __class_attr_escape_json_responses_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr_etag_with_template_digest_owner  [ActionController::Base.(singleton_private), ActiveStorage::BaseController.(singleton_private)]
++ __class_attr_etaggers_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr_fragment_cache_keys_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr_helpers_path_owner  [ActionController::Base.(singleton_private), ActionMailbox::BaseController.(singleton_private), ActionMailbox::Ingresses::Mailgun::InboundEmailsController.(singleton_private)]
++ __class_attr_include_all_helpers_owner  [ActionController::Base.(singleton_private)]
++ __class_attr_middleware_stack_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionController::Metal.(singleton_private)]
++ __class_attr_raise_on_missing_callback_actions_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr_rescue_handlers_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionController::API.(singleton_private)]
++ verification_strategy  [ActionController::RequestForgeryProtection::ClassMethods#(private)]
+- __class_attr___callbacks
+- __class_attr___callbacks=
+- __class_attr__allowed_redirect_hosts
+- __class_attr__allowed_redirect_hosts=
+- __class_attr__default_form_builder
+- __class_attr__default_form_builder=
+- __class_attr__flash_types
+- __class_attr__flash_types=
+- __class_attr__helper_methods
+- __class_attr__helper_methods=
+- __class_attr__layout
+- __class_attr__layout=
+- __class_attr__layout_conditions
+- __class_attr__layout_conditions=
+- __class_attr__renderers
+- __class_attr__renderers=
+- __class_attr__view_cache_dependencies
+- __class_attr__view_cache_dependencies=
+- __class_attr__wrapper_options
+- __class_attr__wrapper_options=
+- __class_attr_allowed_redirect_hosts_permissions
+- __class_attr_allowed_redirect_hosts_permissions=
+- __class_attr_config
+- __class_attr_config=
+- __class_attr_default_url_options
+- __class_attr_default_url_options=
+- __class_attr_escape_json_responses
+- __class_attr_escape_json_responses=
+- __class_attr_etag_with_template_digest
+- __class_attr_etag_with_template_digest=
+- __class_attr_etaggers
+- __class_attr_etaggers=
+- __class_attr_fragment_cache_keys
+- __class_attr_fragment_cache_keys=
+- __class_attr_helpers_path
+- __class_attr_helpers_path=
+- __class_attr_include_all_helpers
+- __class_attr_include_all_helpers=
+- __class_attr_middleware_stack
+- __class_attr_middleware_stack=
+- __class_attr_rescue_handlers
+- __class_attr_rescue_handlers=
+
+### api_controller.instance public: +4 -0
++ _all_renderers  [ActionController::Renderers#(public), ActionController::Renderers::All#(public)]
++ _render_with_renderer_svg  [ActionController::Renderers#(public)]
++ inbound_emails_path  []
++ inbound_emails_url  []
+
+### view.instance public: +2 -23
++ annotate_rendered_view_with_filenames?  [ActionView::Base#(public), ActionView::Base.(singleton)]
++ datalist_tag  [ActionView::Helpers::FormTagHelper#(public)]
+- apply_stylesheet_media_default=
+- auto_include_nonce_for_scripts=
+- auto_include_nonce_for_styles=
+- automatically_disable_submit_tag
+- automatically_disable_submit_tag=
+- button_to_generates_button_tag=
+- default_enforce_utf8=
+- default_formats
+- default_formats=
+- embed_authenticity_token_in_remote_forms=
+- field_error_proc
+- field_error_proc=
+- form_with_generates_ids=
+- form_with_generates_remote_forms=
+- image_decoding=
+- image_loading=
+- multiple_file_field_include_hidden=
+- preload_links_header=
+- prepend_content_exfiltration_prevention=
+- remove_hidden_field_autocomplete
+- remove_hidden_field_autocomplete=
+- streaming_completion_on_exception
+- streaming_completion_on_exception=
+
+### view.instance private: +5 -0
++ append_option_tag  [ActionView::Helpers::FormOptionsHelper#(private)]
++ distance_translation  [ActionView::Helpers::DateHelper#(private)]
++ preload_link_href  [ActionView::Helpers::AssetTagHelper#(private)]
++ scope_option_by_partial  [ActionView::Helpers::TranslationHelper#(private)]
++ scope_prefix  [ActionView::Helpers::TranslationHelper#(private)]
+
+### job.class public: +12 -0
++ __class_attr___callbacks  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionCable::Server::Worker.(singleton)]
++ __class_attr__queue_adapter  [ActiveJob::Base.(singleton)]
++ __class_attr__queue_adapter_name  [ActiveJob::Base.(singleton)]
++ __class_attr_after_discard_procs  [ActiveJob::Base.(singleton)]
++ __class_attr_enqueue_after_transaction_commit  [ActiveJob::Base.(singleton)]
++ __class_attr_log_arguments  [ActiveJob::Base.(singleton)]
++ __class_attr_priority  [ActiveJob::Base.(singleton)]
++ __class_attr_queue_name  [ActiveJob::Base.(singleton)]
++ __class_attr_queue_name_delimiter  [ActiveJob::Base.(singleton)]
++ __class_attr_queue_name_prefix  [ActiveJob::Base.(singleton)]
++ __class_attr_rescue_handlers  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionController::API.(singleton)]
++ __class_attr_retry_jitter  [ActiveJob::Base.(singleton)]
+
+### job.class private: +14 -24
++ __class_attr___callbacks_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionCable::Engine.(singleton_private)]
++ __class_attr__queue_adapter_name_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr__queue_adapter_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_after_discard_procs_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_enqueue_after_transaction_commit_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_log_arguments_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_priority_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_queue_name_delimiter_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_queue_name_owner  [ActionMailbox::IncinerationJob.(singleton_private), ActionMailbox::RoutingJob.(singleton_private), ActiveJob::Base.(singleton_private)]
++ __class_attr_queue_name_prefix_owner  [ActiveJob::Base.(singleton_private)]
++ __class_attr_rescue_handlers_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionController::API.(singleton_private)]
++ __class_attr_retry_jitter_owner  [ActiveJob::Base.(singleton_private)]
++ discard_on_handler  [ActiveJob::Exceptions::ClassMethods#(private)]
++ retry_on_handler  [ActiveJob::Exceptions::ClassMethods#(private)]
+- __class_attr___callbacks
+- __class_attr___callbacks=
+- __class_attr__queue_adapter
+- __class_attr__queue_adapter=
+- __class_attr__queue_adapter_name
+- __class_attr__queue_adapter_name=
+- __class_attr_after_discard_procs
+- __class_attr_after_discard_procs=
+- __class_attr_enqueue_after_transaction_commit
+- __class_attr_enqueue_after_transaction_commit=
+- __class_attr_log_arguments
+- __class_attr_log_arguments=
+- __class_attr_priority
+- __class_attr_priority=
+- __class_attr_queue_name
+- __class_attr_queue_name=
+- __class_attr_queue_name_delimiter
+- __class_attr_queue_name_delimiter=
+- __class_attr_queue_name_prefix
+- __class_attr_queue_name_prefix=
+- __class_attr_rescue_handlers
+- __class_attr_rescue_handlers=
+- __class_attr_retry_jitter
+- __class_attr_retry_jitter=
+
+### mailer.instance public: +2 -6
++ inbound_emails_url  []
++ mail_was_called?  [ActionMailer::Base#(public)]
+- deliver_later_queue_name
+- deliver_later_queue_name=
+- deliver_later_queue_name?
+- delivery_job
+- delivery_job=
+- delivery_job?
+
+### mailer.instance private: +3 -0
++ controller_action_scope  [AbstractController::Translation#(private)]
++ controller_scope  [AbstractController::Translation#(private)]
++ scope_option_by_controller_path  [AbstractController::Translation#(private)]
+
+### mailer.class public: +24 -1
++ __class_attr___callbacks  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionCable::Server::Worker.(singleton)]
++ __class_attr__default_form_builder  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__delivery_job  [ActionMailer::Base.(singleton)]
++ __class_attr__helper_methods  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__layout  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__layout_conditions  [ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr__view_cache_dependencies  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr_config  [AbstractController::Base.(singleton)]
++ __class_attr_default_params  [ActionMailer::Base.(singleton)]
++ __class_attr_default_url_options  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionDispatch::Routing::RoutesProxy.(singleton)]
++ __class_attr_deliver_later_queue_name  [ActionMailer::Base.(singleton)]
++ __class_attr_delivery_method  [ActionMailer::Base.(singleton)]
++ __class_attr_delivery_methods  [ActionMailer::Base.(singleton)]
++ __class_attr_file_settings  [ActionMailer::Base.(singleton)]
++ __class_attr_fragment_cache_keys  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr_raise_on_missing_callback_actions  [ActionController::API.(singleton), ActionController::Base.(singleton), ActionMailer::Base.(singleton)]
++ __class_attr_rescue_handlers  [ActionCable::Channel::Base.(singleton), ActionCable::Connection::Base.(singleton), ActionController::API.(singleton)]
++ __class_attr_sendmail_settings  [ActionMailer::Base.(singleton)]
++ __class_attr_smtp_settings  [ActionMailer::Base.(singleton)]
++ __class_attr_test_settings  [ActionMailer::Base.(singleton)]
++ _delivery_job  [ActionMailer::Base.(singleton)]
++ _delivery_job=  [ActionMailer::Base.(singleton)]
++ _delivery_job?  [ActionMailer::Base.(singleton)]
++ action_method_symbols  [AbstractController::Base.(singleton), AbstractController::UrlFor::ClassMethods#(public)]
+- delivery_job?
+
+### mailer.class private: +20 -38
++ __class_attr___callbacks_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionCable::Engine.(singleton_private)]
++ __class_attr__default_form_builder_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr__delivery_job_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr__helper_methods_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::MailersController.(singleton_private)]
++ __class_attr__layout_conditions_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::ApplicationController.(singleton_private)]
++ __class_attr__layout_owner  [ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private), Rails::ApplicationController.(singleton_private)]
++ __class_attr__view_cache_dependencies_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr_config_owner  [AbstractController::Base.(singleton_private), ActionController::API.(singleton_private), ActionController::Base.(singleton_private)]
++ __class_attr_default_params_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_default_url_options_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionDispatch::Routing::RoutesProxy.(singleton_private)]
++ __class_attr_deliver_later_queue_name_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_delivery_method_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_delivery_methods_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_file_settings_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_fragment_cache_keys_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr_raise_on_missing_callback_actions_owner  [ActionController::API.(singleton_private), ActionController::Base.(singleton_private), ActionMailer::Base.(singleton_private)]
++ __class_attr_rescue_handlers_owner  [ActionCable::Channel::Base.(singleton_private), ActionCable::Connection::Base.(singleton_private), ActionController::API.(singleton_private)]
++ __class_attr_sendmail_settings_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_smtp_settings_owner  [ActionMailer::Base.(singleton_private)]
++ __class_attr_test_settings_owner  [ActionMailer::Base.(singleton_private)]
+- __class_attr___callbacks
+- __class_attr___callbacks=
+- __class_attr__default_form_builder
+- __class_attr__default_form_builder=
+- __class_attr__helper_methods
+- __class_attr__helper_methods=
+- __class_attr__layout
+- __class_attr__layout=
+- __class_attr__layout_conditions
+- __class_attr__layout_conditions=
+- __class_attr__view_cache_dependencies
+- __class_attr__view_cache_dependencies=
+- __class_attr_config
+- __class_attr_config=
+- __class_attr_default_params
+- __class_attr_default_params=
+- __class_attr_default_url_options
+- __class_attr_default_url_options=
+- __class_attr_deliver_later_queue_name
+- __class_attr_deliver_later_queue_name=
+- __class_attr_delivery_job
+- __class_attr_delivery_job=
+- __class_attr_delivery_method
+- __class_attr_delivery_method=
+- __class_attr_delivery_methods
+- __class_attr_delivery_methods=
+- __class_attr_file_settings
+- __class_attr_file_settings=
+- __class_attr_fragment_cache_keys
+- __class_attr_fragment_cache_keys=
+- __class_attr_rescue_handlers
+- __class_attr_rescue_handlers=
+- __class_attr_sendmail_settings
+- __class_attr_sendmail_settings=
+- __class_attr_smtp_settings
+- __class_attr_smtp_settings=
+- __class_attr_test_settings
+- __class_attr_test_settings=
+
+### core.String.instance public: +0 -1
+- mb_chars
+
+### core.Time.instance public: +4 -1
++ this_month?  [ActiveRecord::Type::Time::Value#(public)]
++ this_quarter?  [ActiveRecord::Type::Time::Value#(public)]
++ this_week?  [ActiveRecord::Type::Time::Value#(public)]
++ this_year?  [ActiveRecord::Type::Time::Value#(public)]
+- utc_to_local_returns_utc_offset_times
+
+### core.Date.instance public: +4 -0
++ this_month?  [ActiveRecord::Type::Time::Value#(public)]
++ this_quarter?  [ActiveRecord::Type::Time::Value#(public)]
++ this_week?  [ActiveRecord::Type::Time::Value#(public)]
++ this_year?  [ActiveRecord::Type::Time::Value#(public)]
+
+### core.DateTime.instance public: +4 -1
++ this_month?  [ActiveRecord::Type::Time::Value#(public)]
++ this_quarter?  [ActiveRecord::Type::Time::Value#(public)]
++ this_week?  [ActiveRecord::Type::Time::Value#(public)]
++ this_year?  [ActiveRecord::Type::Time::Value#(public)]
+- utc_to_local_returns_utc_offset_times
+
+### core.File.singleton public: +0 -1
+- probe_stat_in
+
+## Totals: 339 distinct names added to some surface, 257 removed from some surface

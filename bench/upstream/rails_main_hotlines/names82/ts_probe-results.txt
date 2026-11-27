@@ -1,0 +1,66 @@
+##### rails-814 3f290b759c
+Active Record 8.1.4.1
+no override => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+public def self. create + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+public def self. update + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+class << self; private create => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+class << self; private update => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+class << self; protected create => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+concern class_methods private, replace both (postfix_admin) => create=created,modified update=modified
+concern class_methods public, replace both => create=created,modified update=modified
+private override on abstract parent (trefle-api), child model => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+private override on STI base, subclass => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+extend with a private module method => create=created_at,created_on,modified update=modified
+prepend to singleton, private, calls super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+alias_attribute :created_on_alias -> attribute_aliases honoured => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+Model.timestamp_attributes_for_create (public call) => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+Model.respond_to?(:timestamp_attributes_for_update) => false
+Model.send(:timestamp_attributes_for_update) => ["updated_at", "updated_on"]
+Model.private_methods.include?(:timestamp_attributes_for_create) => true
+touch and touch(:extra_at) => created_at,updated_at,created_on,updated_on,extra_at
+insert_all record_timestamps => created_at,updated_at,created_on,updated_on
+reset_column_information then private override still used => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+##### rails-main 088fc0cf61
+Active Record 8.2.0.alpha
+no override => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+public def self. create + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+public def self. update + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+class << self; private create => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+class << self; private update => NoMethodError: private method 'timestamp_attributes_for_update' called for class M
+class << self; protected create => NoMethodError: protected method 'timestamp_attributes_for_create' called for class M
+concern class_methods private, replace both (postfix_admin) => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+concern class_methods public, replace both => create=created,modified update=modified
+private override on abstract parent (trefle-api), child model => NoMethodError: private method 'timestamp_attributes_for_create' called for class Child38
+private override on STI base, subclass => NoMethodError: private method 'timestamp_attributes_for_update' called for class M
+extend with a private module method => NoMethodError: private method 'timestamp_attributes_for_update' called for class M
+prepend to singleton, private, calls super => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+alias_attribute :created_on_alias -> attribute_aliases honoured => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+Model.timestamp_attributes_for_create (public call) => ["created_at", "created_on"]
+Model.respond_to?(:timestamp_attributes_for_update) => true
+Model.send(:timestamp_attributes_for_update) => ["updated_at", "updated_on"]
+Model.private_methods.include?(:timestamp_attributes_for_create) => false
+touch and touch(:extra_at) => created_at,updated_at,created_on,updated_on,extra_at
+insert_all record_timestamps => created_at,updated_at,created_on,updated_on
+reset_column_information then private override still used => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+##### rails-full 088fc0cf61 +working tree
+Active Record 8.2.0.alpha
+no override => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+public def self. create + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+public def self. update + super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+class << self; private create => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+class << self; private update => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+class << self; protected create => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+concern class_methods private, replace both (postfix_admin) => create=created,modified update=modified
+concern class_methods public, replace both => create=created,modified update=modified
+private override on abstract parent (trefle-api), child model => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+private override on STI base, subclass => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on,extra_at
+extend with a private module method => create=created_at,created_on,modified update=modified
+prepend to singleton, private, calls super => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on
+alias_attribute :created_on_alias -> attribute_aliases honoured => create=created_at,updated_at,created_on,updated_on update=updated_at,updated_on
+Model.timestamp_attributes_for_create (public call) => NoMethodError: private method 'timestamp_attributes_for_create' called for class M
+Model.respond_to?(:timestamp_attributes_for_update) => false
+Model.send(:timestamp_attributes_for_update) => ["updated_at", "updated_on"]
+Model.private_methods.include?(:timestamp_attributes_for_create) => true
+touch and touch(:extra_at) => created_at,updated_at,created_on,updated_on,extra_at
+insert_all record_timestamps => created_at,updated_at,created_on,updated_on
+reset_column_information then private override still used => create=created_at,updated_at,created_on,updated_on,extra_at update=updated_at,updated_on

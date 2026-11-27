@@ -1,0 +1,586 @@
+
+## "def timestamp_attributes_for_create" language:Ruby: 590 total, 30 of the first 100 outside Rails copies
+   590  2026-11-10  treflehq/trefle-api  app/models/application_record.rb
+   261  2018-02-15  wagn/wagn  card/mod/history/lib/card/act.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/timestamp.rb
+    59  2026-04-29  decko-commons/decko  mod/history/lib/card/act.rb
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/timestamp.rb
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb
+     5  2026-11-04  CONABIO/enciclovida  config/initializers/active_record_path.rb
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb
+     1  2023-01-03  Heavy-Metal-Hackers/uppercode2019  config/initializers/change_timestamp_methods.rb
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb
+     0  2024-07-29  wvulibraries/mfcs-ruby  app/models/item.rb
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb
+     0  2018-01-18  charlesmastin/healthnotifier-rails  config/initializers/custom_timestamp_cols.rb
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/062257.rb
+     0  2023-12-02  CyJimmy264/book  app/models/record.rb
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/photo.rb, app/models/message.rb, app/models/user_event.rb
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb
+     0  2016-03-26  mitaku/db_gonyogonyo_test  init.rb
+     0  2023-01-19  prodigasistemas/gsan-api  config/initializers/timestamps.rb
+
+## "def timestamp_attributes_for_update" language:Ruby: 592 total, 28 of the first 100 outside Rails copies
+   757  2026-11-12  fatkodima/online_migrations  lib/online_migrations/background_data_migrations/reset_counters.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/timestamp.rb
+    41  2026-11-27  AixleHQ/flow  app/models/task_comment.rb
+    39  2018-01-16  hothero/wpdb_activerecord  lib/wpdb_activerecord/post.rb
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/timestamp.rb
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb
+    12  2026-11-27  DFE-Digital/publish-teacher-training  app/models/concerns/changed_at.rb
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb
+     7  2026-11-25  ReseauEntourage/entourage-ror  app/models/concerns/custom_timestamp_attributes_for_update.rb
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb
+     7  2024-06-27  rambler-digital-solutions/fish0  lib/fish0/concerns/cacheable.rb
+     5  2026-11-04  CONABIO/enciclovida  config/initializers/active_record_path.rb
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb
+     1  2023-01-03  Heavy-Metal-Hackers/uppercode2019  config/initializers/change_timestamp_methods.rb
+     0  2016-03-26  mitaku/db_gonyogonyo_test  init.rb
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb
+     0  2025-06-04  thewikidea/vets-api  app/models/application_record.rb
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/profile_text.rb, app/models/conversation.rb
+     0  2023-01-19  prodigasistemas/gsan-api  config/initializers/timestamps.rb
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/062257.rb
+     0  2018-01-18  charlesmastin/healthnotifier-rails  config/initializers/custom_timestamp_cols.rb
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb
+
+## "def type_for_column" language:Ruby: 317 total, 18 of the first 100 outside Rails copies
+  6927  2026-11-10  instructure/canvas-lms  lib/plannable.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/attributes.rb, src/derails/passive_aggressive/model_schema.rb
+     5  2019-01-20  argosity/hippo  lib/hippo/command/update_model.rb
+     4  2024-02-27  figma/sorbet-rails  lib/sorbet-rails/model_column_utils.rb
+     3  2026-08-24  NTU-COOL/canvas-lms  lib/plannable.rb
+     2  2022-12-09  samuels410/yciw  lib/plannable.rb
+     2  2021-03-09  jp-signum/canvas-quiz-enhancements  lib/plannable.rb
+     0  2017-10-13  vinaypoddar/nitrous  schema_creation.rb, schema_statements.rb
+     0  2022-02-06  istiqlolsoft/uchproc  lib/plannable.rb
+     0  2018-06-11  pianofreq/canvas-lms  lib/plannable.rb
+     0  2024-10-09  Tanunum/HHH  lib/plannable.rb
+     0  2025-06-17  rishabhchheda01/canvas-lms  lib/plannable.rb
+     0  2025-11-10  alizoort/canvas  lib/plannable.rb
+     0  2026-06-24  aaronshaf/canvas-lms  lib/plannable.rb
+     0  2024-05-22  RavinduTharanga/stack  canvaslms/lib/plannable.rb
+     0  2025-12-09  hnkhiem/DoAnChuyenNganh  canvas-local/canvas-lms/lib/plannable.rb
+
+## "def serialization_key" language:Ruby: 3 total, 1 of the first 3 outside Rails copies
+     0  2026-11-25  thadeu/voodu-webui  app/models/deployment.rb
+
+## "def scope_prefix" language:Ruby: 9 total, 7 of the first 9 outside Rails copies
+   190  2026-11-03  crisnahine/rails-ai-context  lib/rails_ai_context/introspectors/listeners/mount_listener.rb
+    27  2026-11-21  staniel359/muffon-api  app/services/youtube/video/similar.rb
+    10  2026-11-09  skiftle/apiwork  lib/apiwork/contract/base.rb
+     1  2026-07-21  kaiks/unobot  lib/unobot_v2/shadow_strategy.rb
+     0  2026-09-16  serpapi/vessel-crosslink-mapper  lib/helpers/urls.rb
+     0  2026-09-16  serpapi/vessel-screenshot-archiver  lib/helpers/urls.rb
+     0  2026-05-10  abobafrog/muffin  app/services/youtube/video/similar.rb
+
+## "def controller_scope" language:Ruby: 20 total, 18 of the first 20 outside Rails copies
+   299  2014-12-25  puffer/puffer  lib/puffer/resource.rb
+   108  2026-11-27  rigortype/rigor  plugins/rigor-actionpack/lib/rigor/plugin/actionpack.rb, plugins/rigor-rails-i18n/lib/rigor/plugin/rails_i18n/analyzer.rb
+    33  2022-12-02  GeriatricJacob/line-count  test/exoplanets/app/controllers/application_controller.rb, test/exoplanets/app/controllers/admin/application_controller.rb
+    17  2025-11-06  cubesystems/releaf  releaf-core/app/controllers/releaf/action_controller.rb
+     4  2018-08-20  shiplix/shiplix  app/controllers/concerns/page_info/meta.rb
+     0  2023-12-16  tubbo/titleist  rbi/sord.rbi, lib/titleist/title.rb
+     0  2026-03-05  abak-press/apress-page_info  lib/apress/page_info/meta.rb
+     0  2026-10-25  namelessnotion/hallmark  rbi/hallmark/extractor/routes_file.rbi, lib/hallmark/extractor/routes_file.rb
+     0  2026-10-22  equalitie/dawa  engines/raft_components/app/helpers/raft_components/controller_helper.rb
+     0  2026-10-19  NicolasJJensen/rails_vouch  lib/generators/vouch/invitations/invitations_generator.rb, lib/generators/vouch/omniauth/omniauth_generator.rb, lib/generators/vouch/recovery_codes/recovery_codes_generator.rb
+
+## "def controller_action_scope" language:Ruby: 4 total, 2 of the first 4 outside Rails copies
+    61  2019-08-29  EOL/deprecated_eol  app/controllers/taxa_controller.rb, app/controllers/application_controller.rb
+
+## "def origin_trusted?" language:Ruby: 4 total, 1 of the first 4 outside Rails copies
+    17  2026-09-28  RheinSullivan/raktajs  tools/ruby/security/rakta_shield.rb
+
+## "def distance_translation" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def append_option_tag" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def preload_link_href" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def read_attr" language:Ruby: 5112 total, 95 of the first 100 outside Rails copies
+ 15855  2026-11-27  spree/spree  spree/core/lib/spree/workflow.rb
+  5537  2026-11-27  doorkeeper-gem/doorkeeper  lib/doorkeeper/orm/active_record/mixins/application.rb
+  3279  2026-11-22  shrinerb/shrine  lib/shrine/plugins/entity.rb
+  3007  2026-11-26  theforeman/foreman  app/services/ipam/base.rb
+  2158  2026-11-09  globalize/globalize  lib/globalize/active_record/instance_methods.rb
+  2147  2025-11-28  AaronLasseigne/active_interaction  lib/active_interaction/base.rb
+  1990  2025-09-25  TrestleAdmin/trestle  spec/trestle/debug_errors_spec.rb
+  1494  2026-11-20  Shopify/shipit-engine  app/models/shipit/anonymous_user.rb, app/models/shipit/command_line_user.rb
+  1409  2026-09-09  rails/activeresource  lib/active_resource/base.rb
+  1406  2026-11-09  neo4jrb/activegraph  lib/active_graph/shared/validations.rb, lib/active_graph/undeclared_properties.rb, lib/active_graph/shared/property.rb
+  1194  2026-03-01  cgriego/active_attr  lib/active_attr/attributes.rb
+  1167  2022-07-21  browsermedia/browsercms  lib/cms/behaviors/dynamic_attributes.rb
+  1117  2026-01-22  makandra/active_type  lib/active_type/virtual_attributes.rb
+  1021  2025-12-12  composite-primary-keys/composite_primary_keys  lib/composite_primary_keys/attribute_methods/read.rb, lib/composite_primary_keys/base.rb
+   984  2023-08-29  rsl/stringex  lib/stringex/acts_as_url/adapter/data_mapper.rb, lib/stringex/acts_as_url/adapter/base.rb
+   877  2026-11-23  rubocop/rubocop-rails  lib/rubocop/cop/rails/read_write_attribute.rb
+   839  2023-01-03  saberma/shopqi  app/models/contact.rb
+   789  2026-11-27  micke/valid_email2  spec/spec_helper.rb
+   713  2026-11-05  ankane/blind_index  lib/blind_index/model.rb
+   656  2026-10-28  K-and-R/email_validator  spec/spec_helper.rb
+   612  2026-11-23  Dynamoid/dynamoid  lib/dynamoid/fields.rb
+   608  2026-11-09  jrochkind/attr_json  lib/attr_json/model.rb
+   601  2026-11-24  rubyforgood/human-essentials  app/services/service_object_errors_mixin.rb
+   540  2024-07-31  cequel/cequel  lib/cequel/record/persistence.rb, lib/cequel/record/properties.rb
+   503  2019-09-05  zeisler/active_mocker  lib/active_mocker/mock/base.rb
+   485  2026-11-27  hitobito/hitobito  spec/resources/group/reads_spec.rb
+   421  2026-11-26  mysociety/alaveteli  app/models/public_body.rb
+   411  2020-05-27  fotinakis/jsonapi-serializers  spec/serializer_spec.rb
+   384  2025-04-28  NoBrainerORM/nobrainer  lib/no_brainer/document/serialization.rb, lib/no_brainer/document/dynamic_attributes.rb, lib/no_brainer/document/attributes.rb
+   364  2014-09-16  maccman/supermodel  lib/supermodel/base.rb
+   363  2026-07-28  JsonApiClient/json_api_client  lib/json_api_client/helpers/dynamic_attributes.rb
+   336  2026-07-01  yolk/valvat  spec/spec_helper.rb
+   314  2026-08-19  anlek/mongify  lib/mongify/database/data_row.rb
+   313  2026-11-26  alphagov/e-petitions  app/lib/feed.rb
+   302  2026-11-27  chef/chef-server  src/oc-id/app/models/user.rb
+   301  2024-05-09  couchrest/couchrest_model  lib/couchrest/model/properties.rb
+   299  2014-12-25  puffer/puffer  lib/puffer/filters.rb
+   273  2026-11-27  demarche-numerique/demarche.numerique.gouv.fr  app/models/entreprise.rb
+   268  2022-12-01  inossidabile/protector  spec/spec_helpers/adapters/sequel.rb, spec/spec_helpers/adapters/active_record.rb
+   261  2018-02-15  wagn/wagn  card/lib/card/cache/persistent.rb, card/lib/card/migration/import/import_data/card_attributes.rb
+   256  2026-11-26  sleede/fab-manager  app/services/user_getter_service.rb
+   241  2023-01-18  pauldix/service-oriented-design-with-ruby  chapter_07/pauldix-entries/lib/pauldix-entries/entry.rb, chapter_07/pauldix-ratings/lib/pauldix-ratings/rating.rb
+   194  2026-11-10  crashtech/torque-postgresql  lib/torque/postgresql/attributes/base.rb
+   189  2023-06-02  sxross/MotionModel  motion/model/model.rb
+   181  2017-07-05  kostyantyn/hydra_attribute  lib/hydra_attribute/active_record/attribute_methods.rb
+   133  2022-07-22  CompanyBook/massive_record  lib/massive_record/orm/attribute_methods/read.rb
+   129  2014-03-12  appoxy/simple_record  lib/simple_record/validations.rb
+   124  2020-07-01  yammer/model_attribute  lib/model_attribute.rb
+   120  2026-11-25  chicago-tool-library/circulate  app/models/gift_membership.rb
+   101  2022-02-15  adhearsion/ruby_speech  lib/ruby_speech/generic_element.rb
+    89  2016-02-08  xdite/66kjobs  app/models/mailing_list_member.rb
+    87  2015-10-19  brewster/elastictastic  lib/elastictastic/properties.rb
+    82  2026-11-27  3scale/porta  app/lib/signup/result.rb, app/models/oidc_configuration.rb, app/lib/fields/extra_fields.rb
+    77  2018-03-20  SpontaneousCMS/spontaneous  lib/spontaneous/media/image/format.rb
+    73  2023-01-26  call4paperz/call4paperz  app/models/twitter_client.rb
+    70  2026-11-26  killbill/killbill-admin-ui  app/models/kaui/rails_methods.rb
+    68  2026-11-09  yeti-switch/yeti-web  lib/custom_struct.rb
+    66  2015-02-04  mindreframer/api_view  example/models/model.rb
+    58  2023-12-14  Swirrl/tripod  lib/tripod/attributes.rb
+    57  2020-05-24  ebeigarts/exchanger  lib/exchanger/attributes.rb
+    55  2026-10-27  samvera/active_fedora  lib/active_fedora/attribute_methods/read.rb
+    37  2023-01-10  skanev/evans  lib/sync/homework.rb
+    37  2018-07-17  joshmn/attributary  lib/attributary/serializer.rb
+    33  2016-10-05  lab2023/kangal  spec/spec_helper.rb
+    19  2026-11-27  metanorma/metanorma-iso  lib/isodoc/iso/docx/template_extractor.rb
+    19  2026-07-07  retsef/rpdfium  lib/rpdfium/structure/element.rb
+    18  2017-02-22  mirego/active_model_serializers_validator  spec/spec_helper.rb
+    17  2014-09-17  infochimps-labs/gorillib  lib/gorillib/model/lint.rb
+    12  2024-06-12  astroband/ruby-xdr  lib/xdr/struct.rb
+    12  2020-07-28  quandl/quandl_client  lib/quandl/client/base/attributes.rb
+    10  2013-09-18  crapooze/em-xmpp  lib/em-xmpp/context.rb
+     9  2013-12-29  benlangfeld/niceogiri  lib/niceogiri/xml/node.rb
+     7  2015-08-11  osak/ICFPC2015  ogawa/lib/record.rb
+     5  2015-05-17  Eric-Guo/attr_accessible2strong_params  lib/attr_accessible2strong_params/converter.rb
+     4  2010-04-28  nitroproject/og  lib/og/adapter/oracle.rb, lib/og/adapter/postgresql.rb, lib/og/store/sql.rb
+     2  2026-11-24  lakeraven/corvid  app/services/corvid/recoverable_rule.rb
+     1  2026-11-27  thomasklemm/lowrail  bench/upstream/r7/diff_c3.rb
+
+## "def resolve_alias" language:Ruby: 1104 total, 83 of the first 100 outside Rails copies
+ 48124  2026-11-27  discourse/discourse  lib/appearance_styles/variable_inventory.rb
+ 24572  2026-10-23  gitlabhq/gitlabhq  app/services/mcp/tools/manager.rb, lib/api/mcp/handlers/list_tools.rb
+ 23870  2026-11-27  ruby/ruby  lib/rubygems/yaml_serializer/builder.rb
+ 14765  2026-11-18  basecamp/kamal  lib/kamal/commander.rb
+  6153  2026-11-27  zammad/zammad  app/graphql/gql/types/locale_type.rb
+  5857  2026-11-22  activerecord-hackery/ransack  lib/ransack/context.rb
+  2082  2026-11-26  cloudfoundry/bosh  src/bosh-director/lib/bosh/director/manifest/manifest.rb
+  2045  2026-11-26  Shopify/ruby-lsp  lib/ruby_indexer/lib/ruby_indexer/index.rb
+  1818  2021-05-26  sinclairtarget/um  lib/um/commands.rb
+  1793  2015-01-03  MacRuby/MacRuby  lib/rdoc/context.rb
+  1589  2023-08-29  pmq20/ruby-packer  ruby/lib/rdoc/context.rb
+  1109  2026-11-27  picoruby/picoruby  mrbgems/picoruby-aot/tools/picoruby_aot/stubs.rb
+   931  2026-11-24  ruby/rdoc  lib/rdoc/code_object/context.rb
+   692  2025-12-18  twitter/twitter-cldr-rb  lib/twitter_cldr/resources/cldr_document_set.rb
+   601  2026-11-25  e621ng/e621ng  app/logical/tags_preview.rb
+   379  2020-02-29  madhur/PortableJekyll  ruby/lib/ruby/2.0.0/rdoc/context.rb
+   312  2019-06-10  oscar-stack/vagrant-hosts  lib/vagrant-hosts/addresses.rb
+   218  2024-01-08  dtao/safe_yaml  lib/safe_yaml/psych_resolver.rb
+   161  2026-11-23  Shopify/cli-kit  lib/cli/kit/command_registry.rb
+   130  2026-11-26  blackducksoftware/ohloh-ui  app/models/duplicate.rb
+   108  2026-11-27  rigortype/rigor  lib/rigor/inference/builtins/method_catalog.rb, plugins/rigor-activerecord/lib/rigor/plugin/activerecord/model_index.rb
+    87  2026-11-27  MushroomObserver/mushroom-observer  app/controllers/observations_controller/project_aliases.rb
+    77  2026-11-25  o1xhack/CodexBar-Mobile  Scripts/workflow_has_pr_trigger.rb
+    74  2026-06-20  amuta/kumi  lib/kumi/ir/loop/lower.rb
+    68  2020-04-05  cloudfoundry-community/bosh-gen  lib/bosh/gen/bosh-config.rb
+    47  2026-11-20  dgidb/dgidb-v5  server/app/graphql/types/gene_alias_type.rb, server/app/graphql/types/drug_alias_type.rb, server/app/graphql/types/gene_claim_alias_type.rb
+    39  2026-11-25  powerhome/playbook  playbook/app/pb_kits/playbook/pb_icon/icon.rb
+    31  2026-11-23  griffithlab/civic-v2  server/app/models/advanced_searches/feature.rb, server/app/models/advanced_searches/molecular_profile.rb
+    24  2026-01-14  rkh/nii  nii-core/lib/nii/data.rb
+    19  2026-11-25  harrisj/doge_track  data/scripts/validate_people_yaml.rb
+    18  2026-11-27  shioimm/til  ruby/dev/net/hev3/impl03.rb, ruby/dev/net/hev3/impl04.rb, ruby/dev/net/hev3/impl03_reading.rb
+    18  2026-04-15  wikirate/wikirate  spec/metric_creator.rb
+    16  2025-09-26  alpaca-tc/diver_down  lib/diver_down/web/metadata/source_alias.rb
+    15  2025-11-24  oar-team/kameleon  lib/kameleon/recipe.rb
+    12  2026-06-22  ranguba/groonga-client  lib/groonga/client/command-line/groonga-client-index-recreate.rb
+    11  2013-05-12  tkadauke/motion-parse  lib/motion-parse/query.rb
+    11  2017-11-29  ikwzm/msgpack-vhdl  tools/lib/msgpack-rpc-interface/variable.rb
+     7  2026-11-24  dpep/graph_weaver  lib/graph_weaver/codegen/aliases.rb
+     7  2026-11-24  viamin/agent-harness  lib/agent_harness/providers/registry.rb
+     7  2023-07-27  pelias/dashboard  jobs/include.rb
+     6  2026-09-07  Optum/LegionIO  lib/legion/cli/lex_cli_manifest.rb
+     5  2023-09-28  diffblue/gitlab  app/graphql/types/packages/helm/dependency_type.rb
+     5  2023-06-22  zgid123/rails-boilerplate  lib/generators/tailwind/code_template.rb
+     5  2021-03-16  njh/vyos-firewall-generator  lib/vyos-generate-firewall.rb
+     5  2026-11-25  zoolutions/dash  lib/dash/commander.rb
+     4  2024-04-04  petekinnecom/snapshot_archive  lib/snapshot_archive/cfg.rb
+     3  2024-02-10  dotagem/dotagem  app/controllers/concerns/hero_player_options.rb
+     3  2022-01-18  GitChinaLab/GitChinaLab  app/graphql/types/packages/helm/dependency_type.rb
+     3  2026-11-03  engneer-hamachan/picoruby-ti  tidbgen/type_resolver.rb
+     3  2026-01-28  dcsil/CSC491  bin/_vendor/cli-kit-master/lib/cli/kit/command_registry.rb
+     3  2025-05-27  3-form/scopiform  lib/scopiform/helpers.rb
+     2  2014-12-29  natsuki14/bitstream  lib/bitstream.rb
+     2  2013-10-19  psalaets/clownfish  lib/clownfish/helpers/status_group.rb
+     1  2013-09-16  NUARIG/aker  lib/aker/configuration.rb
+     1  2014-05-20  UhuruSoftware/bosh_old  bosh_cli/lib/cli/config.rb
+     1  2026-11-19  wrestlingiq/wiq-cli  lib/wiq/config.rb
+     1  2026-10-15  togovar/togovar-backend  app/models/variant.rb
+     1  2026-11-24  ontoportal/goo  lib/goo/search/solr/solr_admin.rb
+     1  2026-10-19  flyisland/gitlab-ee  app/graphql/types/packages/helm/dependency_type.rb
+     0  2024-06-26  DETEI/zaipro  app/graphql/gql/types/locale_type.rb
+     0  2020-09-21  KellenWatt/rash  lib/rash/aliasing.rb
+     0  2018-09-27  eiwi1101/thegamar-2  lib/command.rb
+     0  2026-03-21  tymaan/v1  brain/ruby/runtime/alias_resolution_native.rb
+     0  2025-10-12  sunny-s-creations/sunnys-tickets  zammad/app/graphql/gql/types/locale_type.rb
+     0  2024-04-27  Sharparam/cc-api  lib/cc/api/mekanism.rb
+     0  2026-11-25  Adsdworld/container-gitlab-ce  app/graphql/types/packages/helm/dependency_type.rb
+     0  2024-01-01  kartikguptaofficial/gitlab  app/graphql/types/packages/helm/dependency_type.rb
+     0  2026-06-29  elosnaya/GeoStates  lib/geo_states/config_loader.rb
+     0  2026-05-23  ljuti/actionflow  lib/workflow/context.rb
+     0  2026-10-20  adrianpk/redwright  lib/redwright/model_resolver.rb
+     0  2022-10-20  Talha5/zammad__refactor  app/graphql/gql/types/locale_type.rb
+     0  2025-10-29  serjoscha87/zammad-dashboard-widget-tickets-today  app/graphql/gql/types/locale_type.rb
+     0  2026-09-29  RHMhasini/Incident-Reporting  app/graphql/gql/types/locale_type.rb
+     0  2022-10-19  rashmimogare/help  app/graphql/gql/types/locale_type.rb
+     0  2026-11-26  neo4jrb/cypher-dsl  lib/cypher_dsl/renderer/name_resolver.rb
+
+## "def sec_fetch_site_value" language:Ruby: 5 total, 2 of the first 5 outside Rails copies
+     0  2026-02-22  shtakai/fizzy  app/controllers/concerns/request_forgery_protection.rb
+     0  2026-03-01  pjontop/clark  app/controllers/concerns/request_forgery_protection.rb
+
+## "def embed_authenticity_token?" language:Ruby: 3 total, 1 of the first 3 outside Rails copies
+     1  2026-11-27  thomasklemm/lowrail  bench/upstream/census9/button_to_diff.rb
+
+## "def schema_attributes" language:Ruby: 29 total, 27 of the first 29 outside Rails copies
+  1175  2026-11-23  weppos/whois  utils/deftld.rb
+  1045  2026-11-27  alphagov/whitehall  app/validators/schema_validator.rb
+    16  2026-11-25  datacite/lupo  app/validators/xml_schema_validator.rb
+    10  2026-07-08  Invoca/declare_schema  lib/declare_schema/model/column.rb, lib/declare_schema/model/field_spec.rb
+    10  2026-11-27  ioki-mobility/ioki-ruby  lib/open_api.rb
+     8  2026-11-23  elektronaut/dynamic_image  lib/rails/generators/dynamic_image/resource/resource_generator.rb
+     5  2014-08-25  sinsoku/ponytail  spec/controllers/ponytail/schemas_controller_spec.rb
+     2  2021-11-07  peterdavidhamilton/rom-ldap  lib/rom/ldap/directory/vendors/apache_ds.rb
+     2  2026-11-21  investinopen/infra-finder  lib/support/lib/generators/writes_schema.rb, lib/generators/store_model_schema/store_model_schema_generator.rb
+     2  2020-01-14  assembleinc/cognito-auth  lib/cognito/auth/client.rb
+     1  2014-02-28  rtomsmith/delineate  lib/delineate/schema.rb
+     1  2026-11-19  metanorma/idml  spec/idml/elements/table_spec.rb
+     1  2026-08-20  easolhq/easol-canvas  lib/canvas/validators/custom_type_layout_schema.rb
+     1  2024-07-26  soham-tejani/HATEOAS-demo  spec/swagger_helper.rb
+     1  2026-10-20  Alexander-Senko/action_ai  lib/action_ai/model_schema.rb, lib/action_ai/model_schema/active_record.rb
+     1  2026-06-23  onetimesecret/rhales  lib/rhales/core/rue_document.rb
+     1  2014-11-20  naiduv/codecrawl  code/solr.rb
+     0  2024-04-04  bestwebua/rom-mongo  lib/rom/mongo/commands/helper.rb
+     0  2016-07-10  brasten-junkyard/vz_tools  lib/vz/support/attribute_mapping.rb, lib/vz/connector/base_type.rb
+     0  2023-07-03  nateklaiber/open-api-toolkit  lib/open_api/toolkit/models/parameter.rb
+     0  2026-01-05  pgdaniel/parts_trackers  app/models/app.rb
+     0  2024-03-04  swaff-y/ruby_swagger  lib/generate.rb
+     0  2012-02-23  davestarling/chef  chef-solr/lib/chef/solr/application/solr.rb
+
+## "def self.mapped_table" language:Ruby: 0 total, 0 of the first 0 outside Rails copies
+
+## "def mapped_table" language:Ruby: 5 total, 1 of the first 5 outside Rails copies
+    48  2026-11-27  swombat/souls-house  app/models/data_model.rb
+
+## "def self.schema_context" language:Ruby: 4 total, 2 of the first 4 outside Rails copies
+   201  2026-11-25  samvera/hyrax  lib/hyrax.rb
+    35  2026-06-05  ErnaneJ/glancer  lib/glancer/workflow/query_enricher.rb
+
+## "def schema_context" language:Ruby: 7 total, 5 of the first 7 outside Rails copies
+  1428  2026-11-26  googleapis/google-cloud-ruby  google-cloud-managed_kafka-schema_registry-v1/lib/google/cloud/managed_kafka/schema_registry/v1/managed_schema_registry/paths.rb
+    42  2026-03-16  sbounmy/hongbao_bitcoin  app/components/json_ld_component.rb
+     6  2026-09-07  Optum/LegionIO  lib/legion/trace_search.rb
+     2  2026-11-19  xurrent/ipaas-connectors  connector/lib/ipaas/connector/schema/connector_generator.rb
+     1  2014-05-27  petervandenabeele/dbd_onto  lib/dbd_onto/meta_context.rb
+
+## "scope :schema_context" language:Ruby: 0 total, 0 of the first 0 outside Rails copies
+
+## "def self.abstract_ancestors" language:Ruby: 0 total, 0 of the first 0 outside Rails copies
+
+## "def self.primary_key_definition" language:Ruby: 0 total, 0 of the first 0 outside Rails copies
+
+## "def self.all_queries_scope" language:Ruby: 0 total, 0 of the first 0 outside Rails copies
+
+## "has_json" path:app/models language:Ruby: 17 total, 17 of the first 17 outside Rails copies
+  4858  2026-11-24  basecamp/once-campfire  app/models/account.rb
+    47  2026-11-25  sabha-co/sabha  app/models/account.rb
+     1  2023-01-19  aau-datsw/rusling.dk  app/models/educational_domain.rb
+     0  2018-04-04  augustosamame/devise_token_auth_emotime  app/models/devise_token_auth/concerns/user.rb
+     0  2026-03-20  DocwatZ/Vampfire  app/models/account.rb
+     0  2025-12-15  PriyanshuGENIEAI/chatFx  app/models/account.rb
+     0  2026-11-17  mattbarrry/campfire-rails-fast  app/models/account.rb
+     0  2018-08-05  augustosamame/devise_token_auth_qounter  app/models/devise_token_auth/concerns/user.rb
+     0  2017-08-21  augustosamame/devise_token_auth_reborn  app/models/devise_token_auth/concerns/user.rb
+     0  2015-09-25  mikeborg/devtokautcus  app/models/devise_token_auth/concerns/user.rb
+     0  2017-03-06  temgram/devise_token_auth  app/models/devise_token_auth/concerns/user.rb
+     0  2017-09-13  tripler-co-th/devise_token_auth  app/models/devise_token_auth/concerns/user.rb
+     0  2019-05-19  andreimerfu/foodroad  app/models/user.rb
+     0  2019-02-16  CraftAcademy/we_meet  app/models/user.rb
+     0  2026-01-17  godfirstjohnjames-gmail-com/Microsoft  app/models/account.rb
+     0  2026-03-22  kaitwalla/cordless  app/models/account.rb
+     0  2023-01-19  MateriaBrasil/materiabrasil-api  app/models/user.rb
+
+## "def self.has_json" language:Ruby: 1 total, 1 of the first 1 outside Rails copies
+     3  2017-09-15  ifad/ruote-postgres  lib/ruote/postgres/storage.rb
+
+## "def has_json" language:Ruby: 51 total, 48 of the first 51 outside Rails copies
+ 24572  2026-10-23  gitlabhq/gitlabhq  lib/gitlab/usage/metric_definition.rb
+   906  2026-11-27  code-dot-org/code-dot-org  dashboard/legacy/middleware/net_sim_api.rb
+   800  2026-11-24  projectblacklight/blacklight  lib/blacklight/solr/response/facets.rb
+   450  2026-11-27  archivesspace/archivesspace  backend/app/model/ASModel_crud.rb
+   167  2026-10-27  gisiahq/gisia  lib/gitlab/usage/metric_definition.rb
+    75  2026-10-31  r7kamura/json_world  lib/json_world/property_definition.rb
+    53  2024-01-19  cookpad/garage_client  lib/garage_client/request/json_encoded.rb
+    21  2026-11-27  govuk-forms/forms-admin  app/services/reports/form_documents_service.rb
+    20  2017-06-29  atxsinn3r/EyeDiff  lib/eyediff/report.rb
+    12  2015-06-17  seanredmond/subjoin  lib/subjoin/document.rb
+     8  2026-10-20  julik/protostar  rbi/protostar/google/protobuf/descriptor_pb.rbi
+     5  2015-04-18  yetone/seiya  lib/seiya/response.rb
+     5  2023-09-28  diffblue/gitlab  lib/gitlab/usage/metric_definition.rb
+     3  2022-01-18  GitChinaLab/GitChinaLab  lib/gitlab/usage/metric_definition.rb
+     3  2017-09-15  ifad/ruote-postgres  lib/ruote/postgres/storage.rb
+     2  2025-05-17  nhlongnguyen/geminize  lib/geminize/models/content_response_extensions.rb
+     1  2023-01-19  aau-datsw/rusling.dk  app/modules/has_json_editable.rb
+     1  2026-01-30  vpfpinho/sp-job  lib/sp/job/common.rb
+     1  2026-08-30  squancey88/amicis_in_conflictu  app/controllers/concerns/has_json_schema.rb
+     1  2026-10-09  heckslabs/hecks_playground  ruby/hecks_playground_persist/sql_adapter_generator.rb
+     1  2023-10-20  beingofexistence13/mediaflow  gitlab/lib/gitlab/usage/metric_definition.rb
+     1  2026-10-19  flyisland/gitlab-ee  lib/gitlab/usage/metric_definition.rb
+     0  2013-11-24  drewhop/archivesspace-1.0.0  backend/app/model/ASModel_crud.rb
+     0  2026-01-23  archivesatncbs/ancbs-catalogue  backend/app/model/ASModel_crud.rb
+     0  2026-10-27  YaleArchivesSpace/archivesspace  backend/app/model/ASModel_crud.rb
+     0  2026-11-19  gaiaresources/qsa-archivesspace  backend/app/model/ASModel_crud.rb
+     0  2026-11-24  sonicxs/gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2026-09-12  codertjay/gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2026-11-09  onecommons/gitlab-oc  lib/gitlab/usage/metric_definition.rb
+     0  2023-11-06  sunriseXu/gitlab-v14.5.2  lib/gitlab/usage/metric_definition.rb
+     0  2021-11-03  visnix/gitlab-foss  lib/gitlab/usage/metric_definition.rb
+     0  2025-10-04  MITHRADEVI-K/Gitlab_contribution  lib/gitlab/usage/metric_definition.rb
+     0  2022-11-06  CSU-OSA/Akashic-git  lib/gitlab/usage/metric_definition.rb
+     0  2024-11-25  shaik1002/biggitlabbomb  lib/gitlab/usage/metric_definition.rb
+     0  2025-12-02  Manaf941/gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2014-06-23  openlogic/skink  lib/skink/client/response.rb
+     0  2025-08-25  powder/aethergrove-alternate  script/validate_content.rb
+     0  2019-03-12  yuechengYin/code-org  shared/middleware/net_sim_api.rb
+     0  2026-11-25  Adsdworld/container-gitlab-ce  lib/gitlab/usage/metric_definition.rb
+     0  2025-08-04  peng-hui/testpj  lib/gitlab/usage/metric_definition.rb
+     0  2025-03-11  VladPolskiy/gitlab-ce  lib/gitlab/usage/metric_definition.rb
+     0  2024-01-01  kartikguptaofficial/gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2024-08-29  github-workflow-staticpackager/gitlabhq  lib/gitlab/usage/metric_definition.rb
+     0  2022-08-30  dm-kat/manual-clone  lib/gitlab/usage/metric_definition.rb
+     0  2022-12-23  abduljaleelpp/Gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2022-10-11  luca-bassoricci/gitlab  lib/gitlab/usage/metric_definition.rb
+     0  2023-03-25  open-beagle/gitlab-foss  lib/gitlab/usage/metric_definition.rb
+     0  2021-06-22  agilso/pinkman  lib/pinkman/model/base.rb
+
+## "resources :inbound_emails" language:Ruby: 245 total, 21 of the first 100 outside Rails copies
+   802  2026-11-26  excid3/madmin  test/dummy/config/routes/madmin.rb
+    72  2025-09-27  derails/derails  src/inactionmailbomb/config/routes.rb
+     9  2026-11-25  betagouv/collectif-objets  config/routes.rb
+     8  2024-06-28  sgtest/megarepo  rails/actionmailbox/config/routes.rb
+     2  2014-04-17  sachinr/impart  config/routes.rb
+     2  2023-01-19  utkarsh2102/ruby-rails  actionmailbox/config/routes.rb
+     1  2020-12-30  jmalcic/spina-admin-mail  config/routes.rb
+     1  2021-06-10  rdlayma-zz/https-github.com-rails-rails  actionmailbox/config/routes.rb
+     1  2026-04-29  vidosrd1/art  test/dummy/config/routes/madmin.rb
+     1  2022-08-01  softwarearchitect817/ruby-on-rails  actionmailbox/config/routes.rb
+     1  2026-11-27  one-work/rails_com  config/routes.rb
+     0  2026-11-19  vidosrd1/Arts  test1/dummy/config/routes/madmin.rb
+     0  2025-11-20  wasafiri/vulcan  config/routes.rb
+     0  2025-12-22  AlinRosca10/PHP_CORE  Recapitulare/rails/actionmailbox/config/routes.rb
+     0  2026-10-12  SGraef/Homestead  config/routes.rb
+     0  2024-01-09  saurabhacellere/biscuit_withoutcsharp  ruby/actionmailbox/config/routes.rb
+     0  2022-02-19  captproton/raconteur  config/routes/madmin.rb
+     0  2019-03-18  schneems/rails-6-beta-1-fork  actionmailbox/config/routes.rb
+     0  2024-08-30  DavidMartinez0216/rails  actionmailbox/config/routes.rb
+     0  2023-01-19  kuzmenkonikolay/rails_4.1.6_cache_fix  actionmailbox/config/routes.rb
+     0  2016-05-05  richessler/mailgun_poc  config/routes.rb
+
+## "def this_week?" language:Ruby: 64 total, 61 of the first 64 outside Rails copies
+  6927  2026-11-10  instructure/canvas-lms  lib/utils/relative_date.rb
+    20  2018-05-25  brettshollenberger/hublot  lib/hublot/pretty.rb
+     8  2017-06-13  uwdreamproject/DreamSIS  app/models/activity_log.rb, lib/date_helper.rb, app/models/event.rb
+     7  2022-10-14  joeldrapper/playdate  lib/playdate/relative.rb
+     5  2018-04-05  jeffrey-s-foster/talks  app/models/talk.rb
+     4  2013-09-16  kristenmills/nickname-of-the-week  app/models/week.rb
+     3  2026-08-24  NTU-COOL/canvas-lms  lib/utils/relative_date.rb
+     3  2026-11-25  apiology/checkoff  lib/checkoff/timing.rb
+     3  2026-11-27  LeCircographe-asso/core  app/models/concerns/dateable.rb
+     3  2026-11-26  anolson/wednesday_worlds  app/models/event.rb
+     2  2022-12-09  samuels410/yciw  lib/utils/relative_date.rb
+     2  2021-03-09  jp-signum/canvas-quiz-enhancements  lib/utils/relative_date.rb
+     2  2022-03-02  Project-Elice/learning-management-system  lib/utils/relative_date.rb
+     2  2022-12-15  anthonyhess/canvas-lms  lib/utils/relative_date.rb
+     2  2016-05-09  quandl/quandl_operation  lib/quandl/operation/core_ext/time.rb
+     2  2021-11-18  ameravant/siteninja_events  app/models/event.rb
+     1  2018-06-17  charlottedevs/slackerboard  api/app/controllers/slackers_controller.rb
+     1  2015-12-05  comp615/campustheater  app/models/show.rb
+     1  2024-05-13  rmsy/canvas-lms  lib/utils/relative_date.rb
+     1  2010-12-13  ameravant/cazoos  app/models/event.rb
+     0  2026-06-04  isaac-c-edwards/canvas-lms-master  lib/utils/relative_date.rb
+     0  2025-11-10  alizoort/canvas  lib/utils/relative_date.rb
+     0  2025-09-11  aianta/canvas-small  lib/utils/relative_date.rb
+     0  2025-09-03  aianta/canvas-evaluation  lib/utils/relative_date.rb
+     0  2025-08-01  aianta/odo-canvas-infrastructure  lib/utils/relative_date.rb
+     0  2025-06-17  rishabhchheda01/canvas-lms  lib/utils/relative_date.rb
+     0  2024-10-26  springwq/canvas-lms-cn  lib/utils/relative_date.rb
+     0  2026-02-28  huangdengpan/canvaslms-20241129  lib/utils/relative_date.rb
+     0  2023-04-12  eventswarm/revs  lib/revs/brief_date.rb
+     0  2026-10-05  Quite-Frankly-Yep-Yeah/QF-DEMO  lib/utils/relative_date.rb
+     0  2026-09-24  bboonstra/cdc-isu-fall-2026-can  lib/utils/relative_date.rb
+     0  2026-07-23  AlexMVisionTech/CyberPro_LMS  lib/utils/relative_date.rb
+     0  2014-10-29  arunkumargit/canvas-lms  lib/utils/relative_date.rb
+     0  2016-02-24  AndranikMarkosyan/advschool  lib/utils/relative_date.rb
+     0  2015-10-04  AndranikMarkosyan/lms  lib/utils/relative_date.rb
+     0  2016-10-11  WesleyYep/canvas-lms-copy  lib/utils/relative_date.rb
+     0  2017-04-12  samuels410/ibta  lib/utils/relative_date.rb
+     0  2020-07-20  GeekFrame/canvas-lms  lib/utils/relative_date.rb
+     0  2018-06-11  pianofreq/canvas-lms  lib/utils/relative_date.rb
+     0  2022-03-18  bweave/dinner  app/models/menu.rb
+     0  2013-11-20  parzival418/seat_yourself_01  app/helpers/reservations_helper.rb
+     0  2023-11-27  atomicjolt/openlmshost  lib/utils/relative_date.rb
+     0  2026-11-26  Asrat77/bunna-passport  app/models/stats/streak.rb
+     0  2024-01-01  anitaines/rails-in-the-list  lib/humanize_date.rb
+     0  2018-01-27  annzenkina/Performances  app/models/event_time_helpers.rb
+     0  2022-11-07  jacky32/Facebook-clone  app/models/concerns/date_formats.rb
+     0  2026-10-20  darryn02/darryn_dollars  app/models/leaderboard_entry.rb
+     0  2022-01-08  guerrinharj/sala-de-reuniao  app/controllers/reservations_controller.rb
+     0  2024-05-22  RavinduTharanga/stack  canvaslms/lib/utils/relative_date.rb
+     0  2025-12-09  hnkhiem/DoAnChuyenNganh  canvas-local/canvas-lms/lib/utils/relative_date.rb
+     0  2026-11-12  carmel26/canvas  lib/utils/relative_date.rb
+     0  2022-02-06  istiqlolsoft/uchproc  lib/utils/relative_date.rb
+     0  2026-06-24  aaronshaf/canvas-lms  lib/utils/relative_date.rb
+     0  2022-11-18  khusrav2000/rtsu-lms-web-uchproc  lib/utils/relative_date.rb
+     0  2026-04-15  emeritus-tech/canvas-lms-opensource  lib/utils/relative_date.rb
+     0  2024-02-23  hcherewaty/cf-canvas-lms  lib/utils/relative_date.rb
+     0  2024-08-20  esize/canvas-lms  lib/utils/relative_date.rb
+     0  2024-10-09  Tanunum/HHH  lib/utils/relative_date.rb
+     0  2024-10-09  Tanunum/ZZZZZZZZZZZZZZZZZZZZ  lib/utils/relative_date.rb
+
+## "def this_month?" language:Ruby: 14 total, 11 of the first 14 outside Rails copies
+    80  2026-11-26  primeroIMS/primero  app/models/search_filters/date_range.rb
+     7  2022-10-14  joeldrapper/playdate  lib/playdate/relative.rb
+     3  2017-12-09  izzydoescode/SmarterBearAPI  app/helpers/transactions_helper.rb
+     3  2026-11-27  LeCircographe-asso/core  app/models/concerns/dateable.rb
+     2  2016-05-09  quandl/quandl_operation  lib/quandl/operation/core_ext/time.rb
+     0  2017-07-19  erikdstock/tipjar  src/app/models/monthly_top_artist.rb
+     0  2017-04-09  erikdstock/groupy  app/app/models/monthly_top_artist.rb
+     0  2023-08-30  Mubasher112/Primero  app/models/search_filters/date_range.rb
+     0  2018-01-27  annzenkina/Performances  app/models/event_time_helpers.rb
+     0  2022-11-07  jacky32/Facebook-clone  app/models/concerns/date_formats.rb
+     0  2019-12-20  elbouillon/wallet  app/lib/sinatra/app_helpers.rb
+
+## "def this_year?" language:Ruby: 52 total, 49 of the first 52 outside Rails copies
+  6927  2026-11-10  instructure/canvas-lms  lib/utils/relative_date.rb
+   477  2026-11-27  Growstuff/growstuff  app/models/place_climate.rb
+    80  2026-11-26  primeroIMS/primero  app/models/search_filters/date_range.rb
+     8  2022-02-12  crispgm/holy-images  lib/ext/date_and_time/calculations.rb
+     7  2022-10-14  joeldrapper/playdate  lib/playdate/relative.rb
+     3  2026-08-24  NTU-COOL/canvas-lms  lib/utils/relative_date.rb
+     3  2009-12-16  caleon/juscribe.alpha  config/initializers/action_view_tweaks.rb
+     3  2026-11-27  LeCircographe-asso/core  app/models/concerns/dateable.rb
+     2  2021-03-09  jp-signum/canvas-quiz-enhancements  lib/utils/relative_date.rb
+     2  2022-12-15  anthonyhess/canvas-lms  lib/utils/relative_date.rb
+     2  2022-12-09  samuels410/yciw  lib/utils/relative_date.rb
+     2  2022-03-02  Project-Elice/learning-management-system  lib/utils/relative_date.rb
+     1  2015-08-26  NJBiddle/tourdefun  app/models/timeslot.rb
+     1  2024-05-13  rmsy/canvas-lms  lib/utils/relative_date.rb
+     0  2023-11-27  atomicjolt/openlmshost  lib/utils/relative_date.rb
+     0  2025-06-17  rishabhchheda01/canvas-lms  lib/utils/relative_date.rb
+     0  2025-08-01  aianta/odo-canvas-infrastructure  lib/utils/relative_date.rb
+     0  2025-09-03  aianta/canvas-evaluation  lib/utils/relative_date.rb
+     0  2025-09-11  aianta/canvas-small  lib/utils/relative_date.rb
+     0  2025-11-10  alizoort/canvas  lib/utils/relative_date.rb
+     0  2026-06-04  isaac-c-edwards/canvas-lms-master  lib/utils/relative_date.rb
+     0  2026-10-05  Quite-Frankly-Yep-Yeah/QF-DEMO  lib/utils/relative_date.rb
+     0  2026-09-24  bboonstra/cdc-isu-fall-2026-can  lib/utils/relative_date.rb
+     0  2026-07-23  AlexMVisionTech/CyberPro_LMS  lib/utils/relative_date.rb
+     0  2018-06-11  pianofreq/canvas-lms  lib/utils/relative_date.rb
+     0  2014-10-29  arunkumargit/canvas-lms  lib/utils/relative_date.rb
+     0  2016-02-24  AndranikMarkosyan/advschool  lib/utils/relative_date.rb
+     0  2015-10-04  AndranikMarkosyan/lms  lib/utils/relative_date.rb
+     0  2016-10-11  WesleyYep/canvas-lms-copy  lib/utils/relative_date.rb
+     0  2017-04-12  samuels410/ibta  lib/utils/relative_date.rb
+     0  2020-07-20  GeekFrame/canvas-lms  lib/utils/relative_date.rb
+     0  2023-04-12  eventswarm/revs  lib/revs/brief_date.rb
+     0  2023-01-24  eric-erki/mconf-web  app/helpers/dates_helper.rb
+     0  2015-03-22  praktijkindex/trails-spike  app/controllers/months_controller.rb
+     0  2023-08-30  Mubasher112/Primero  app/models/search_filters/date_range.rb
+     0  2022-11-07  jacky32/Facebook-clone  app/models/concerns/date_formats.rb
+     0  2024-05-22  RavinduTharanga/stack  canvaslms/lib/utils/relative_date.rb
+     0  2025-12-09  hnkhiem/DoAnChuyenNganh  canvas-local/canvas-lms/lib/utils/relative_date.rb
+     0  2026-11-12  carmel26/canvas  lib/utils/relative_date.rb
+     0  2022-02-06  istiqlolsoft/uchproc  lib/utils/relative_date.rb
+     0  2026-06-24  aaronshaf/canvas-lms  lib/utils/relative_date.rb
+     0  2022-11-18  khusrav2000/rtsu-lms-web-uchproc  lib/utils/relative_date.rb
+     0  2026-04-15  emeritus-tech/canvas-lms-opensource  lib/utils/relative_date.rb
+     0  2024-02-23  hcherewaty/cf-canvas-lms  lib/utils/relative_date.rb
+     0  2024-08-20  esize/canvas-lms  lib/utils/relative_date.rb
+     0  2024-10-09  Tanunum/HHH  lib/utils/relative_date.rb
+     0  2024-10-09  Tanunum/ZZZZZZZZZZZZZZZZZZZZ  lib/utils/relative_date.rb
+     0  2026-02-28  huangdengpan/canvaslms-20241129  lib/utils/relative_date.rb
+     0  2024-10-26  springwq/canvas-lms-cn  lib/utils/relative_date.rb
+
+## "def this_quarter?" language:Ruby: 4 total, 2 of the first 4 outside Rails copies
+    80  2026-11-26  primeroIMS/primero  app/models/search_filters/date_range.rb
+     0  2023-08-30  Mubasher112/Primero  app/models/search_filters/date_range.rb
+
+## "def association_cache" language:Ruby: 351 total, 19 of the first 100 outside Rails copies
+   808  2026-11-25  autolab/Autolab  lib/association_cache.rb
+    91  2014-05-13  flyerhzm/simple_cacheable  lib/cacheable/keys.rb
+    89  2015-04-20  chicks/sugarcrm  lib/sugarcrm/associations/association_cache.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/associations.rb
+    52  2023-03-09  jasl/activeentity  lib/active_entity/associations.rb
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/associations.rb
+    23  2018-11-23  jasl-lab/duck_record  lib/duck_record/associations.rb
+    11  2026-11-13  Beyond-Finance/active_force  lib/active_force/sobject.rb
+     6  2018-03-31  maxim5/code-inspector  data/ruby/e056ea8475e3afd4b50e9dae0d965dec_associations.rb
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/helpers.rb
+     2  2013-05-06  camertron/avoidance  lib/avoidance/model.rb
+     1  2026-11-23  waratuman/standardapi  lib/standard_api/helpers.rb
+     1  2017-12-08  digital-preservation/machine_learning  HACKATHON_TEXT-FILES/RB/associations.rb
+     0  2024-01-28  kashmii/learning_notes  ruby_and_rails/railsガイド/relationの中身のコード.rb
+     0  2025-11-21  CrysisFangz/TheFinalMarket  app/models/enterprise/modules/performance_module.rb
+     0  2026-08-24  nxtthing/gql-client  lib/nxt_gql_client/model.rb
+     0  2026-09-09  nateberkopec/active_force  lib/active_force/sobject.rb
+     0  2015-06-03  jphenow/axel  app/models/axel/service_resource/associations.rb
+     0  2017-07-26  yuemori/active_any  lib/active_any/associations.rb
+
+## "def implicit_persistence_transaction" language:Ruby: 3 total, 0 of the first 3 outside Rails copies
+
+## "def mail_was_called?" language:Ruby: 1 total, 0 of the first 1 outside Rails copies
+
+## "def retry_on_handler" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def datalist_tag" language:Ruby: 6 total, 4 of the first 6 outside Rails copies
+  3398  2026-11-27  padrino/padrino-framework  padrino-helpers/lib/padrino-helpers/form_helpers.rb
+   363  2026-11-25  yippee-fun/phlex-rails  lib/phlex/rails/helpers/datalist_tag.rb
+    13  2026-11-26  wildnote/hanuman  app/form_builders/custom_fields_form_builder.rb
+    13  2025-04-24  thooams/ui_bibz  lib/ui_bibz/ui/core/forms/numbers/range_field.rb
+
+## "def attribute_slots" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def current_schema_context" language:Ruby: 2 total, 0 of the first 2 outside Rails copies
+
+## "def apply_pending_attribute_modifications" language:Ruby: 89 total, 1 of the first 89 outside Rails copies
+    72  2025-09-27  derails/derails  src/derails/passive_model/attribute_registration.rb

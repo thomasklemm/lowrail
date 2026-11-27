@@ -1,0 +1,225 @@
+
+## timestamp_attributes_for_create: 30 candidate files
+   590  2026-11-10  treflehq/trefle-api  app/models/application_record.rb:7  [private; class << self]  def timestamp_attributes_for_create
+   261  2018-02-15  wagn/wagn  card/mod/history/lib/card/act.rb:120  [private; class << self]  def timestamp_attributes_for_create
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/timestamp.rb:92  [private; module ClassMethods # :nodoc:]  def timestamp_attributes_for_create
+    59  2026-04-29  decko-commons/decko  mod/history/lib/card/act.rb:66  [public; class << self]  def timestamp_attributes_for_create
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/timestamp.rb:100  [private; module Timestamp]  def timestamp_attributes_for_create
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb:72  [private; module Timestamps]  def timestamp_attributes_for_create
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb:20  [public; class_methods do]  def timestamp_attributes_for_create
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb:15  [private; class Poem < ActiveRecord::Base]  def timestamp_attributes_for_create
+     5  2026-11-04  CONABIO/enciclovida  config/initializers/active_record_path.rb:10  [private; module Timestamp]  def timestamp_attributes_for_create #:nodoc:
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb:13  [private; class_methods do]  def timestamp_attributes_for_create
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb:9  [private; class_methods do]  def timestamp_attributes_for_create
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb:93  [public; class Chouette::TridentActiveRecord < Chouette::ActiveRecord]  def timestamp_attributes_for_create #:nodoc:
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb:26  [private; class_methods do]  def timestamp_attributes_for_create
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb:14  [private; class << self]  def timestamp_attributes_for_create
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb:94  [public; module ClassMethods]  def timestamp_attributes_for_create
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb:12  [public; class_methods do]  def timestamp_attributes_for_create
+     0  2024-07-29  wvulibraries/mfcs-ruby  app/models/item.rb:223  [protected; class Item < ApplicationRecord]  def timestamp_attributes_for_create
+     0  2018-01-18  charlesmastin/healthnotifier-rails  config/initializers/custom_timestamp_cols.rb:9  [private; module Timestamp]  def timestamp_attributes_for_create #:nodoc:
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/user.rb:15  [public; class << self]  def timestamp_attributes_for_create
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/062257.rb:82  [private; module ClassMethods # :nodoc:]  def timestamp_attributes_for_create
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/conversation.rb:38  [private; class << self]  def timestamp_attributes_for_create
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/profile_text.rb:8  [public; class << self]  def timestamp_attributes_for_create
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/user_event.rb:26  [public; class << self]  def timestamp_attributes_for_create
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/message.rb:16  [private; class << self]  def timestamp_attributes_for_create
+     0  2023-12-02  CyJimmy264/book  app/models/record.rb:37  [protected; class Content]  def timestamp_attributes_for_create
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/photo.rb:10  [private; class << self]  def timestamp_attributes_for_create
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb:55  [private; module Timestamp]  def timestamp_attributes_for_create
+     0  2016-03-26  mitaku/db_gonyogonyo_test  init.rb:18  [public; module Timestamp]  def timestamp_attributes_for_create
+
+## timestamp_attributes_for_update: 28 candidate files
+   757  2026-11-12  fatkodima/online_migrations  lib/online_migrations/background_data_migrations/reset_counters.rb:86  [private; class ResetCounters < DataMigration]  def timestamp_attributes_for_update
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/timestamp.rb:96  [private; module ClassMethods # :nodoc:]  def timestamp_attributes_for_update
+    41  2026-11-27  AixleHQ/flow  app/models/task_comment.rb:25  [public; class << self]  def timestamp_attributes_for_update
+    39  2018-01-16  hothero/wpdb_activerecord  lib/wpdb_activerecord/post.rb:24  [private; class Post < ActiveRecord::Base]  def self.timestamp_attributes_for_update
+    39  2018-01-16  hothero/wpdb_activerecord  lib/wpdb_activerecord/post.rb:28  [private; class Post < ActiveRecord::Base]  def timestamp_attributes_for_update
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/timestamp.rb:96  [private; module Timestamp]  def timestamp_attributes_for_update
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb:68  [private; module Timestamps]  def timestamp_attributes_for_update
+    12  2026-11-27  DFE-Digital/publish-teacher-training  app/models/concerns/changed_at.rb:14  [private; class_methods do]  def timestamp_attributes_for_update
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb:19  [private; class Poem < ActiveRecord::Base]  def timestamp_attributes_for_update
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb:24  [public; class_methods do]  def timestamp_attributes_for_update
+     7  2024-06-27  rambler-digital-solutions/fish0  lib/fish0/concerns/cacheable.rb:19  [private; module Cacheable]  def timestamp_attributes_for_update
+     5  2026-11-04  CONABIO/enciclovida  config/initializers/active_record_path.rb:6  [private; module Timestamp]  def timestamp_attributes_for_update #:nodoc:
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb:9  [private; class_methods do]  def timestamp_attributes_for_update
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb:13  [private; class_methods do]  def timestamp_attributes_for_update
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb:89  [public; class Chouette::TridentActiveRecord < Chouette::ActiveRecord]  def timestamp_attributes_for_update #:nodoc:
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb:98  [public; module ClassMethods]  def timestamp_attributes_for_update
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb:30  [private; class_methods do]  def timestamp_attributes_for_update
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb:20  [private; class << self]  def timestamp_attributes_for_update
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb:16  [public; class_methods do]  def timestamp_attributes_for_update
+     0  2018-01-18  charlesmastin/healthnotifier-rails  config/initializers/custom_timestamp_cols.rb:6  [private; module Timestamp]  def timestamp_attributes_for_update #:nodoc:
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/062257.rb:86  [private; module ClassMethods # :nodoc:]  def timestamp_attributes_for_update
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/conversation.rb:42  [private; class << self]  def timestamp_attributes_for_update
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/profile_text.rb:12  [public; class << self]  def timestamp_attributes_for_update
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb:51  [private; module Timestamp]  def timestamp_attributes_for_update
+     0  2016-03-26  mitaku/db_gonyogonyo_test  init.rb:14  [public; module Timestamp]  def timestamp_attributes_for_update
+     0  2023-01-19  prodigasistemas/gsan-api  config/initializers/timestamps.rb:6  [private; module Timestamp]  def timestamp_attributes_for_update #:nodoc:
+
+## type_for_column: 18 candidate files
+  6927  2026-11-10  instructure/canvas-lms  lib/plannable.rb:430  [public; class Bookmark < Array]  def type_for_column(col)
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/attributes.rb:314  [private; module ClassMethods]  def type_for_column(connection, column)
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/model_schema.rb:643  [private; #     class << self]  def type_for_column(connection, column)
+     5  2019-01-20  argosity/hippo  lib/hippo/command/update_model.rb:106  [private; class UpdateModel < NamedCommand]  def type_for_column(column)
+     3  2026-08-24  NTU-COOL/canvas-lms  lib/plannable.rb:259  [public; class Bookmark < Array]  def type_for_column(col)
+     2  2022-12-09  samuels410/yciw  lib/plannable.rb:251  [public; class Bookmark < Array]  def type_for_column(col)
+     2  2021-03-09  jp-signum/canvas-quiz-enhancements  lib/plannable.rb:253  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2025-12-09  hnkhiem/DoAnChuyenNganh  canvas-local/canvas-lms/lib/plannable.rb:259  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2024-05-22  RavinduTharanga/stack  canvaslms/lib/plannable.rb:259  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2017-10-13  vinaypoddar/nitrous  schema_statements.rb:29  [private; class SchemaCreation < AbstractAdapter::SchemaCreation]  def type_for_column(column)
+     0  2026-06-24  aaronshaf/canvas-lms  lib/plannable.rb:485  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2025-11-10  alizoort/canvas  lib/plannable.rb:322  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2025-06-17  rishabhchheda01/canvas-lms  lib/plannable.rb:316  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2024-10-09  Tanunum/HHH  lib/plannable.rb:265  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2018-06-11  pianofreq/canvas-lms  lib/plannable.rb:165  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2022-02-06  istiqlolsoft/uchproc  lib/plannable.rb:259  [public; class Bookmark < Array]  def type_for_column(col)
+     0  2017-10-13  vinaypoddar/nitrous  schema_creation.rb:119  [private; class SchemaCreation # :nodoc:]  def type_for_column(column)
+
+## serialization_key: 1 candidate files
+     0  2026-11-25  thadeu/voodu-webui  app/models/deployment.rb:82  [public; class Deployment < ApplicationRecord]  def serialization_key = "deploy:#{server_id}:#{repo}"
+
+## controller_scope: 18 candidate files
+   299  2014-12-25  puffer/puffer  lib/puffer/resource.rb:99  [public; class Resource]  def controller_scope
+    33  2022-12-02  GeriatricJacob/line-count  test/exoplanets/app/controllers/application_controller.rb:25  [public; class ApplicationController < ActionController::Base]  def controller_scope
+    33  2022-12-02  GeriatricJacob/line-count  test/exoplanets/app/controllers/admin/application_controller.rb:23  [public; class Admin::ApplicationController < ApplicationController]  def controller_scope
+     4  2018-08-20  shiplix/shiplix  app/controllers/concerns/page_info/meta.rb:90  [protected; class Meta]  def controller_scope
+     0  2023-12-16  tubbo/titleist  rbi/sord.rbi:60  [public; class Title]  def controller_scope; end
+     0  2023-12-16  tubbo/titleist  lib/titleist/title.rb:109  [private; class Title]  def controller_scope
+     0  2026-03-05  abak-press/apress-page_info  lib/apress/page_info/meta.rb:128  [public; class Meta]  def controller_scope
+     0  2026-10-25  namelessnotion/hallmark  rbi/hallmark/extractor/routes_file.rbi:121  [private; class Scope]  def controller_scope(node, args, scope); end
+     0  2026-10-25  namelessnotion/hallmark  lib/hallmark/extractor/routes_file.rb:243  [private; class RoutesFile]  def controller_scope(node, args, scope)
+     0  2026-10-22  equalitie/dawa  engines/raft_components/app/helpers/raft_components/controller_helper.rb:3  [public; module ControllerHelper]  def controller_scope(stimulus_controller_name, **kwargs)
+
+## controller_action_scope: 2 candidate files
+    61  2019-08-29  EOL/deprecated_eol  app/controllers/taxa_controller.rb:67  [protected; class TaxaController < ApplicationController]  def controller_action_scope
+    61  2019-08-29  EOL/deprecated_eol  app/controllers/application_controller.rb:580  [protected; class Helper]  def controller_action_scope
+
+## scope_prefix: 7 candidate files
+   190  2026-11-03  crisnahine/rails-ai-context  lib/rails_ai_context/introspectors/listeners/mount_listener.rb:91  [private; class MountListener < BaseListener]  def scope_prefix(node)
+    27  2026-11-21  staniel359/muffon-api  app/services/youtube/video/similar.rb:97  [private; class Similar < YouTube::Video::Base]  def scope_prefix
+    10  2026-11-09  skiftle/apiwork  lib/apiwork/contract/base.rb:548  [public; class << self]  def scope_prefix
+     0  2026-09-16  serpapi/vessel-crosslink-mapper  lib/helpers/urls.rb:25  [public; module Urls]  def scope_prefix
+     0  2026-09-16  serpapi/vessel-screenshot-archiver  lib/helpers/urls.rb:25  [public; module Urls]  def scope_prefix
+     0  2026-05-10  abobafrog/muffin  app/services/youtube/video/similar.rb:90  [private; class Similar < YouTube::Video::Base]  def scope_prefix
+
+## read_attr: 95 candidate files
+   485  2026-11-27  hitobito/hitobito  spec/resources/group/reads_spec.rb:56  [public; ]  def read_attr(attr)
+   101  2022-02-15  adhearsion/ruby_speech  lib/ruby_speech/generic_element.rb:193  [public; module ClassMethods]  def read_attr(attr_name, to_call = nil)
+    19  2026-11-27  metanorma/metanorma-iso  lib/isodoc/iso/docx/template_extractor.rb:240  [private; class StylesParser]  def read_attr(node, name)
+    10  2013-09-18  crapooze/em-xmpp  lib/em-xmpp/context.rb:60  [public; class Context]  def read_attr(node, name, sym=:to_s, &blk)
+    10  2013-09-18  crapooze/em-xmpp  lib/em-xmpp/context.rb:1132  [public; class Bit]  def read_attr(*args,&blk)
+     9  2013-12-29  benlangfeld/niceogiri  lib/niceogiri/xml/node.rb:26  [public; class Node < Nokogiri::XML::Node]  def read_attr(attr_name, to_call = nil)
+     7  2015-08-11  osak/ICFPC2015  ogawa/lib/record.rb:7  [public; module ClassMethods]  def read_attr(*names)
+     4  2010-04-28  nitroproject/og  lib/og/adapter/oracle.rb:264  [public; class OracleAdapter < SqlStore]  def read_attr(s, a, col)
+     4  2010-04-28  nitroproject/og  lib/og/store/sql.rb:960  [public; class SqlStore < Store]  def read_attr(anno, res, col, offset = 0)
+     4  2010-04-28  nitroproject/og  lib/og/adapter/oracle/old.rb:201  [public; class OracleAdapter < SqlStore]  def read_attr(s, a, col)
+     2  2026-11-24  lakeraven/corvid  app/services/corvid/recoverable_rule.rb:41  [private; class << self]  def read_attr(row, key)
+     1  2026-11-27  thomasklemm/lowrail  bench/upstream/r7/diff_c3.rb:14  [public; module LogRead]  def read_attr(name) = super.tap { |v| LOG << "read_attr(#{name.inspect}) => #{v.inspect}" }
+
+## resolve_alias: 83 candidate files
+ 24572  2026-10-23  gitlabhq/gitlabhq  app/services/mcp/tools/manager.rb:124  [public; class InvalidVersionFormatError < StandardError]  def resolve_alias(name)
+ 23870  2026-11-27  ruby/ruby  lib/rubygems/yaml_serializer/builder.rb:46  [private; class Builder]  def resolve_alias(node)
+ 14765  2026-11-18  basecamp/kamal  lib/kamal/commander.rb:132  [public; class Kamal::Commander]  def resolve_alias(name)
+  6153  2026-11-27  zammad/zammad  app/graphql/gql/types/locale_type.rb:17  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+  2045  2026-11-26  Shopify/ruby-lsp  lib/ruby_indexer/lib/ruby_indexer/index.rb:906  [private; class << self]  def resolve_alias(entry, seen_names)
+  1818  2021-05-26  sinclairtarget/um  lib/um/commands.rb:42  [private; class << self]  def resolve_alias(cmd)
+  1109  2026-11-27  picoruby/picoruby  mrbgems/picoruby-aot/tools/picoruby_aot/stubs.rb:265  [private; class StubGenerator]  def resolve_alias(name, scope)
+   218  2024-01-08  dtao/safe_yaml  lib/safe_yaml/psych_resolver.rb:20  [public; class PsychResolver < Resolver]  def resolve_alias(node)
+   161  2026-11-23  Shopify/cli-kit  lib/cli/kit/command_registry.rb:107  [private; class << self]  def resolve_alias(name)
+   108  2026-11-27  rigortype/rigor  plugins/rigor-activerecord/lib/rigor/plugin/activerecord/model_index.rb:87  [public; class ModelIndex]  def resolve_alias(name) = aliases[name.to_s]
+    77  2026-11-25  o1xhack/CodexBar-Mobile  Scripts/workflow_has_pr_trigger.rb:18  [public; ]  def resolve_alias(node, anchors, seen = {})
+    74  2026-06-20  amuta/kumi  lib/kumi/ir/loop/lower.rb:480  [private; class FunctionLowering]  def resolve_alias(reg)
+    68  2020-04-05  cloudfoundry-community/bosh-gen  lib/bosh/gen/bosh-config.rb:99  [public; class << self]  def resolve_alias(category, alias_name)
+    47  2026-11-20  dgidb/dgidb-v5  server/app/graphql/types/drug_alias_type.rb:13  [public; class DrugAliasType < Types::BaseObject]  def resolve_alias
+    47  2026-11-20  dgidb/dgidb-v5  server/app/graphql/types/gene_claim_alias_type.rb:10  [public; class GeneClaimAliasType < Types::BaseObject]  def resolve_alias
+    47  2026-11-20  dgidb/dgidb-v5  server/app/graphql/types/drug_claim_alias_type.rb:13  [public; class DrugClaimAliasType < Types::BaseObject]  def resolve_alias
+    47  2026-11-20  dgidb/dgidb-v5  server/app/graphql/types/gene_alias_type.rb:14  [public; class GeneAliasType < Types::BaseObject]  def resolve_alias
+    39  2026-11-25  powerhome/playbook  playbook/app/pb_kits/playbook/pb_icon/icon.rb:406  [private; class << self]  def resolve_alias(icon)
+    24  2026-01-14  rkh/nii  nii-core/lib/nii/data.rb:127  [public; class Data]  def resolve_alias(type = :locale, code)
+    18  2026-04-15  wikirate/wikirate  spec/metric_creator.rb:58  [private; class << self]  def resolve_alias opts
+    16  2025-09-26  alpaca-tc/diver_down  lib/diver_down/web/metadata/source_alias.rb:48  [public; class ConflictError < StandardError]  def resolve_alias(source_name)
+    15  2025-11-24  oar-team/kameleon  lib/kameleon/recipe.rb:652  [public; class Recipe]  def resolve_alias(cmd)
+    12  2026-06-22  ranguba/groonga-client  lib/groonga/client/command-line/groonga-client-index-recreate.rb:116  [private; class Recreator < Runner]  def resolve_alias(alias_column, key)
+    11  2013-05-12  tkadauke/motion-parse  lib/motion-parse/query.rb:181  [private; class Query]  def resolve_alias(key)
+    11  2017-11-29  ikwzm/msgpack-vhdl  tools/lib/msgpack-rpc-interface/variable.rb:109  [public; class Variable::Node < Variable::Base]  def resolve_alias(item, aliases)
+     7  2026-11-24  viamin/agent-harness  lib/agent_harness/providers/registry.rb:319  [private; class Registry]  def resolve_alias(name)
+     7  2023-07-27  pelias/dashboard  jobs/include.rb:8  [public; ]  def resolve_alias(index_name)
+     7  2026-11-24  dpep/graph_weaver  lib/graph_weaver/codegen/aliases.rb:107  [private; module Aliases]  def resolve_alias(node, name, segments)
+     6  2026-09-07  Optum/LegionIO  lib/legion/cli/lex_cli_manifest.rb:29  [public; class LexCliManifest]  def resolve_alias(name)
+     5  2021-03-16  njh/vyos-firewall-generator  lib/vyos-generate-firewall.rb:43  [public; class VyOSFirewallGenerator]  def resolve_alias(addresses, ipvers)
+     5  2026-11-25  zoolutions/dash  lib/dash/commander.rb:169  [public; class Dash::Commander]  def resolve_alias(name)
+     5  2023-06-22  zgid123/rails-boilerplate  lib/generators/tailwind/code_template.rb:16  [public; module CodeTemplate]  def resolve_alias
+     5  2023-09-28  diffblue/gitlab  app/graphql/types/packages/helm/dependency_type.rb:22  [public; class DependencyType < BaseObject]  def resolve_alias
+     4  2024-04-04  petekinnecom/snapshot_archive  lib/snapshot_archive/cfg.rb:78  [public; class << self]  def resolve_alias(name)
+     3  2025-05-27  3-form/scopiform  lib/scopiform/helpers.rb:27  [public; module ClassMethods]  def resolve_alias(name)
+     3  2024-02-10  dotagem/dotagem  app/controllers/concerns/hero_player_options.rb:94  [public; module HeroPlayerOptions]  def resolve_alias(string)
+     3  2022-01-18  GitChinaLab/GitChinaLab  app/graphql/types/packages/helm/dependency_type.rb:22  [public; class DependencyType < BaseObject]  def resolve_alias
+     3  2026-01-28  dcsil/CSC491  bin/_vendor/cli-kit-master/lib/cli/kit/command_registry.rb:58  [private; module NullContextualResolver]  def resolve_alias(name)
+     2  2014-12-29  natsuki14/bitstream  lib/bitstream.rb:491  [private; module ClassMethods]  def resolve_alias(type_name, args)
+     2  2013-10-19  psalaets/clownfish  lib/clownfish/helpers/status_group.rb:62  [private; class StatusGroup]  def resolve_alias(group_alias)
+     1  2026-11-24  ontoportal/goo  lib/goo/search/solr/solr_admin.rb:81  [public; module Administration]  def resolve_alias(alias_name)
+     1  2013-09-16  NUARIG/aker  lib/aker/configuration.rb:395  [private; class << self]  def resolve_alias(name)
+     1  2014-05-20  UhuruSoftware/bosh_old  bosh_cli/lib/cli/config.rb:92  [public; class << self]  def resolve_alias(category, alias_name)
+     1  2026-11-19  wrestlingiq/wiq-cli  lib/wiq/config.rb:96  [private; class Config]  def resolve_alias
+     1  2026-10-15  togovar/togovar-backend  app/models/variant.rb:67  [public; class << self]  def resolve_alias(user, datasets)
+     1  2026-10-19  flyisland/gitlab-ee  app/graphql/types/packages/helm/dependency_type.rb:27  [public; class DependencyType < BaseObject]  def resolve_alias
+     0  2026-05-23  ljuti/actionflow  lib/workflow/context.rb:107  [private; class Context]  def resolve_alias(key)
+     0  2025-10-12  sunny-s-creations/sunnys-tickets  zammad/app/graphql/gql/types/locale_type.rb:16  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+     0  2026-11-25  Adsdworld/container-gitlab-ce  app/graphql/types/packages/helm/dependency_type.rb:27  [public; class DependencyType < BaseObject]  def resolve_alias
+     0  2024-01-01  kartikguptaofficial/gitlab  app/graphql/types/packages/helm/dependency_type.rb:22  [public; class DependencyType < BaseObject]  def resolve_alias
+     0  2026-06-29  elosnaya/GeoStates  lib/geo_states/config_loader.rb:32  [public; class << self]  def resolve_alias(country_iso2, state_id)
+     0  2026-10-20  adrianpk/redwright  lib/redwright/model_resolver.rb:43  [private; class ModelResolver]  def resolve_alias(candidate)
+     0  2024-06-26  DETEI/zaipro  app/graphql/gql/types/locale_type.rb:16  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+     0  2020-09-21  KellenWatt/rash  lib/rash/aliasing.rb:46  [private; class Environment]  def resolve_alias(f)
+     0  2018-09-27  eiwi1101/thegamar-2  lib/command.rb:47  [public; class Command]  def resolve_alias(input)
+     0  2022-10-20  Talha5/zammad__refactor  app/graphql/gql/types/locale_type.rb:14  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+     0  2026-11-26  neo4jrb/cypher-dsl  lib/cypher_dsl/renderer/name_resolver.rb:17  [public; class NameResolver]  def resolve_alias(aliased, define: false, in_last_return: false) # rubocop:disable Lint/UnusedMethodArgument
+     0  2022-10-19  rashmimogare/help  app/graphql/gql/types/locale_type.rb:16  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+     0  2026-09-29  RHMhasini/Incident-Reporting  app/graphql/gql/types/locale_type.rb:16  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+     0  2025-10-29  serjoscha87/zammad-dashboard-widget-tickets-today  app/graphql/gql/types/locale_type.rb:16  [public; class LocaleType < Gql::Types::BaseObject]  def resolve_alias
+
+## association_cache: 19 candidate files
+    11  2026-11-13  Beyond-Finance/active_force  lib/active_force/sobject.rb:293  [private; class << self]  def association_cache
+     2  2013-05-06  camertron/avoidance  lib/avoidance/model.rb:191  [public; class << self]  def association_cache
+     0  2017-07-26  yuemori/active_any  lib/active_any/associations.rb:75  [private; module ClassMethods]  def association_cache
+     0  2015-06-03  jphenow/axel  app/models/axel/service_resource/associations.rb:26  [public; module Associations]  def association_cache
+     0  2026-09-09  nateberkopec/active_force  lib/active_force/sobject.rb:264  [private; class << self]  def association_cache
+     0  2026-08-24  nxtthing/gql-client  lib/nxt_gql_client/model.rb:167  [private; class << self]  def association_cache(name)
+
+## schema_attributes: 27 candidate files
+  1175  2026-11-23  weppos/whois  utils/deftld.rb:172  [private; class TldDef]  def schema_attributes
+  1045  2026-11-27  alphagov/whitehall  app/validators/schema_validator.rb:80  [private; class SchemaValidator]  def schema_attributes
+    16  2026-11-25  datacite/lupo  app/validators/xml_schema_validator.rb:5  [public; class XmlSchemaValidator < ActiveModel::EachValidator]  def schema_attributes(el)
+    10  2026-07-08  Invoca/declare_schema  lib/declare_schema/model/column.rb:103  [public; class << self]  def schema_attributes
+    10  2026-07-08  Invoca/declare_schema  lib/declare_schema/model/field_spec.rb:151  [public; class << self]  def schema_attributes(col_spec)
+    10  2026-11-27  ioki-mobility/ioki-ruby  lib/open_api.rb:158  [public; class Model]  def schema_attributes
+     8  2026-11-23  elektronaut/dynamic_image  lib/rails/generators/dynamic_image/resource/resource_generator.rb:84  [private; class ResourceGenerator < Rails::Generators::ResourceGenerator]  def schema_attributes
+     5  2014-08-25  sinsoku/ponytail  spec/controllers/ponytail/schemas_controller_spec.rb:5  [public; module Ponytail]  def schema_attributes
+     2  2021-11-07  peterdavidhamilton/rom-ldap  lib/rom/ldap/directory/vendors/apache_ds.rb:15  [public; module ApacheDs]  def schema_attributes
+     2  2026-11-21  investinopen/infra-finder  lib/generators/store_model_schema/store_model_schema_generator.rb:47  [private; class StoreModelSchemaGenerator < Rails::Generators::NamedBase]  def schema_attributes
+     2  2026-11-21  investinopen/infra-finder  lib/support/lib/generators/writes_schema.rb:27  [private; module WritesSchema]  def schema_attributes
+     2  2020-01-14  assembleinc/cognito-auth  lib/cognito/auth/client.rb:17  [public; module Client]  def schema_attributes
+     1  2014-02-28  rtomsmith/delineate  lib/delineate/schema.rb:36  [private; module Schema]  def schema_attributes(access)
+     1  2026-11-19  metanorma/idml  spec/idml/elements/table_spec.rb:13  [public; ]  def schema_attributes
+     1  2026-08-20  easolhq/easol-canvas  lib/canvas/validators/custom_type_layout_schema.rb:167  [private; class CustomTypeLayoutSchema]  def schema_attributes
+     1  2024-07-26  soham-tejani/HATEOAS-demo  spec/swagger_helper.rb:31  [public; module SwaggerSchemaHelpers]  def schema_attributes(required: {}, optional: {})
+     1  2026-06-23  onetimesecret/rhales  lib/rhales/core/rue_document.rb:127  [public; class InvalidSyntaxError < ParseError; end]  def schema_attributes
+     1  2026-10-20  Alexander-Senko/action_ai  lib/action_ai/model_schema/active_record.rb:30  [private; module Inference::ActiveRecord]  def schema_attributes = super
+     1  2014-11-20  naiduv/codecrawl  code/solr.rb:145  [public; class Solr < Chef::Application]  def schema_attributes
+     0  2016-07-10  brasten-junkyard/vz_tools  lib/vz/support/attribute_mapping.rb:30  [public; module MappingMethods]  def schema_attributes
+     0  2016-07-10  brasten-junkyard/vz_tools  lib/vz/connector/base_type.rb:26  [public; class << self]  def schema_attributes
+     0  2023-07-03  nateklaiber/open-api-toolkit  lib/open_api/toolkit/models/parameter.rb:68  [public; class Parameter]  def schema_attributes
+     0  2024-04-04  bestwebua/rom-mongo  lib/rom/mongo/commands/helper.rb:32  [private; module Helper]  def schema_attributes
+     0  2024-03-04  swaff-y/ruby_swagger  lib/generate.rb:520  [public; class Schema]  def schema_attributes
+     0  2012-02-23  davestarling/chef  chef-solr/lib/chef/solr/application/solr.rb:132  [public; class Solr < Chef::Application]  def schema_attributes
+
+## mapped_table: 1 candidate files
+
+## schema_context: 7 candidate files
+    42  2026-03-16  sbounmy/hongbao_bitcoin  app/components/json_ld_component.rb:33  [private; class JsonLdComponent < ApplicationComponent]  def schema_context
+     6  2026-09-07  Optum/LegionIO  lib/legion/trace_search.rb:80  [public; class << self]  def schema_context
+     1  2014-05-27  petervandenabeele/dbd_onto  lib/dbd_onto/meta_context.rb:8  [public; module MetaContext]  def schema_context
+
+## origin_trusted?: 1 candidate files
+    17  2026-09-28  RheinSullivan/raktajs  tools/ruby/security/rakta_shield.rb:44  [public; class Shield]  def origin_trusted?(origin)

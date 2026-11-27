@@ -1,0 +1,120 @@
+## AixleHQ/flow 8661817b0ea1a68974c86f612f6b081d3e045ca0
+app/models/board_activity.rb:28:  def self.timestamp_attributes_for_update
+app/models/column_transition.rb:16:  def self.timestamp_attributes_for_update
+app/models/company_membership.rb:39:  scope :default_order, -> { order(Arel.sql("accepted_at ASC NULLS FIRST"), :id) }
+app/models/task_comment.rb:25:    def timestamp_attributes_for_update
+## CanCanCommunity/cancancan 021b13cf762ba95784bf00a467c0ce86120fdf12
+## Shopify/maintenance_tasks e8b79daf6f4d58fa03017f56ea41a262423c180a
+## ViewComponent/view_component 2ebe9f9e3b6550c9df4d92a847b0acf160617fd2
+## activeadmin/activeadmin a2e616a4cdcd8bb3fa846759a2ddf58edf03a610
+## activerecord-hackery/ransack 2700b29d2f2515f616c0e7e93d71671e7d9e84d2
+## alphagov/whitehall 06e202892780cc70e5b3cfa467fa4611a1cc1a8c
+app/validators/schema_validator.rb:80:  def schema_attributes
+## ankane/ahoy f441707688dfde0ac77ae2494982926cebcec7c8
+## ankane/blazer cadfc00ffcae9c80e8128a4b924addb3acd4f068
+## ankane/searchkick 5d98e4867b3cf5fa5fe876454fb25496e4ef9719
+## avo-hq/avo c100b6ea5660101cc989256aead198a0e15f9707
+## basecamp/fizzy 071062ca9193c416ec07a3225a7c5bae8da0db64
+## basecamp/once-campfire 945c22f141795e910e2822d386a94c5686bf7bdc
+## basecamp/writebook f14775fc932457050554083be589f5ab89fdeed3
+## bensheldon/good_job c51be9f1e98330db32e51febfb8812f5264f202f
+## brendon/acts_as_list c45a88235ebaeaa623c1f900e3bd0fff9abb72ad
+## chatwoot/chatwoot 8aa82a5fda84c32497e989599c28e30047f44079
+## codetriage/codetriage 3292712244fd39916986b204b61adc2066b78602
+## collectiveidea/audited dbf8432604ec97734bcfb3dc6df61f4faa0d1b84
+## danbooru/danbooru 03652f924fcec5d970c771024ba061e8a43d6d00
+app/logical/concerns/searchable.rb:436:  def default_order
+app/models/ai_tag.rb:54:  def self.default_order
+app/models/background_job.rb:10:      def default_order
+app/models/forum_topic.rb:70:    def default_order
+app/models/pool.rb:47:    def default_order
+app/models/pool_version.rb:20:    def default_order
+app/models/post_event.rb:50:  def self.default_order
+app/models/user_action.rb:76:  def self.default_order
+app/models/user_feedback.rb:33:    def default_order
+app/models/wiki_page.rb:76:    def default_order
+## decidim/decidim bb6383af157ac70db266924d7d5ae0a5a6bc5e72
+decidim-blogs/app/controllers/decidim/blogs/orderable.rb:31:        def default_order
+decidim-budgets/app/controllers/concerns/decidim/budgets/orderable.rb:27:        def default_order
+decidim-core/app/controllers/concerns/decidim/orderable.rb:25:      def default_order
+decidim-debates/app/controllers/decidim/debates/orderable.rb:28:        def default_order
+decidim-elections/app/controllers/concerns/decidim/elections/orderable.rb:28:        def default_order
+decidim-initiatives/app/controllers/concerns/decidim/initiatives/orderable.rb:24:        def default_order
+decidim-proposals/app/controllers/concerns/decidim/proposals/collaborative_orderable.rb:25:        def default_order
+decidim-proposals/app/controllers/concerns/decidim/proposals/orderable.rb:33:        def default_order
+## diaspora/diaspora d382e334db882976a42e39a90e00cfe2619c3398
+app/controllers/tags_controller.rb:60:    mb_tag = params[:name].mb_chars
+app/controllers/tags_controller.rb:65:    params[:name].mb_chars.downcase.to_s
+## discourse/discourse 033c474926c78398869d5dd0fbd729f4c3709594
+app/models/emoji.rb:255:  def self.resolve_alias(name)
+## errbit/errbit 7e163b18f65eb514ad6556d68a9b2aba9145460e
+## evilmartians/redprints-cfp 6080fc24fbf0015f7e5a5ae932e903731502c65a
+## fatfreecrm/fat_free_crm dcd1bef2805e51df799a8e3fa31ed7c4a39818e7
+app/models/polymorphic/version.rb:18:  scope :default_order,  -> { order('created_at DESC') }
+## forem/forem 3dcba730246909089f090400b855268f50d4eed5
+app/services/ai/search_reranker.rb:57:    def default_order
+## gitlabhq/gitlabhq d7b9a6176ab4e279465ba3ee09922cde2b74de47
+app/graphql/types/packages/helm/dependency_type.rb:27:        def resolve_alias
+app/services/mcp/tools/manager.rb:124:      def resolve_alias(name)
+config/application.rb:329:    config.action_view.field_error_proc = proc { |html_tag, instance| html_tag }
+lib/gitlab/auth/o_auth/auth_hash.rb:162:          string.mb_chars.unicode_normalize(:nfkd).gsub(/[^\x00-\x7F]/, '').to_s
+lib/uploaded_file.rb:97:    name.mb_chars.to_s
+## globalize/globalize b59361c852d603c4fcda6c4db37bb296715307f8
+## hackclub/hackatime f4e27107e9e24bb309fb21d5fea01af8d220f9a6
+## heartcombo/devise 05811fb8366edd08874111d0f6fb44543e1c91ef
+## heartcombo/simple_form 18f38aad0bdeca2ba1815043b94d96fdbbe6a325
+lib/simple_form/action_view_extensions/form_helper.rb:43:        default_field_error_proc = ::ActionView::Base.field_error_proc
+lib/simple_form/action_view_extensions/form_helper.rb:45:          ::ActionView::Base.field_error_proc = SimpleForm.field_error_proc
+lib/simple_form/action_view_extensions/form_helper.rb:48:          ::ActionView::Base.field_error_proc = default_field_error_proc
+## huginn/huginn cc0ca45b455e061dc4b70ad712501e9d38a1c3ce
+## inertia-rails/react-starter-kit a46c3fca7e1d6bdae373dc4d130e03688bc1f5f9
+## instructure/canvas-lms 1c9f0bb8013ed69c4f2efe11fd483025469b7e6c
+config/application.rb:355:    config.action_view.field_error_proc = proc { |html_tag, _instance| html_tag }
+lib/plannable.rb:430:    def type_for_column(col)
+## jhawthorn/discard b4780e8ee95a9bce4b94dded4c3ed93f3067f95c
+## jsonapi-serializer/jsonapi-serializer f40de017a2136dca41303b536b1971b44238564d
+## kaminari/kaminari e3d7834dbafef40ad48935e0623aec2ca93eb7d8
+## kieranklaassen/thinkroom 1e67386faaab255e23df740b793cb9e25837d57b
+## lobsters/lobsters b9c0e340c6818b6f289338ac53a0683a244cb809
+## loomio/loomio 1cfbdd1a1eadb2ade561af92a33f9251ec95d8a1
+## mastodon/mastodon e63927367d716dc3b5db9beffb2fa1c91ff2e44a
+lib/mastodon/migration_helpers.rb:420:      if ActiveRecord::Base.get_primary_key(table) == column.to_s
+lib/mastodon/migration_helpers.rb:449:      was_primary = (ActiveRecord::Base.get_primary_key(table) == column.to_s)
+## maybe-finance/maybe 77b5469832758d1cbee1a940f3012a1ae1c74cd3
+## mysociety/alaveteli e42c7ede9eec30db51db11a2017557d2dc564212
+app/models/alaveteli_pro/request_filter.rb:61:    def default_order
+lib/use_spans_for_errors.rb:11:ActionView::Base.field_error_proc = Proc.new { |html_tag, _instance| %(<span class="fieldWithErrors">#{html_tag}</span>).html_safe }
+## norman/friendly_id 4699c9791db955dfa9929af0f38a4059af550026
+## openstreetmap/openstreetmap-website 57698f88c4523ef9e332a14ec9458c8e3a7d41ff
+## opf/openproject d22aeab967584bc345ffaef06ef584beefeedb33
+lib/open_project/patches/action_view_accessible_errors.rb:129:ActionView::Base.field_error_proc = Proc.new do |html_tag, instance|
+## otwcode/otwarchive 452391b648f2fb06b55c36133812449747634504
+app/helpers/validation_helper.rb:18:  ActionView::Base.field_error_proc = Proc.new {|html_tag, instance|
+app/models/language.rb:12:  scope :default_order, -> { order(:sortable_name) }
+app/models/locale.rb:8:  scope :default_order, -> { order(:iso) }
+## paper-trail-gem/paper_trail 86ce1b83078ef8594cad8f62877ac37f3cb011cc
+## pat/thinking-sphinx 5a92aad5677477c6e4098b60ffed36a2f9c12f01
+## publify/publify aea9fdbbcb40cf67574d6cac71d1d04b39095998
+## rails-api/active_model_serializers c6c38105209cacbfc784068722df6453a35ebd1f
+## rails/solid_queue b9c646a8486ef3e76f70919568cac070276da0e1
+## railsadminteam/rails_admin 893306d19097e58aa42c86b412025548d42d5119
+app/helpers/rails_admin/form_builder.rb:210:      default_field_error_proc = ::ActionView::Base.field_error_proc
+app/helpers/rails_admin/form_builder.rb:212:        ::ActionView::Base.field_error_proc = proc { |html_tag, _instance| html_tag }
+app/helpers/rails_admin/form_builder.rb:215:        ::ActionView::Base.field_error_proc = default_field_error_proc
+## redmine/redmine 0fb1f454cad808021bba92aad4a8f04e106dba1c
+config/initializers/10-patches.rb:36:ActionView::Base.field_error_proc = Proc.new{ |html_tag, instance| html_tag || ''.html_safe }
+## ruby-grape/grape e67178c392e3dfad9050db0709fa8807b1560748
+## rubyforgood/casa de5b9b933ec626e9cf1a343b8955d229055f81ba
+config/initializers/field_error_proc.rb:13:Rails.application.config.action_view.field_error_proc = proc do |html_tag, instance|
+## rubygems/rubygems.org 8d4623e862281eedeed537a606bd95e783ebf410
+## shioyama/mobility 337f32d30a61b97f3b3aa1c315e92ad0fa933c51
+## solidusio/solidus 5f1d1f4219fbb6e3575a46fc3be11571701d6dbe
+## sorcery/sorcery 92f2c2c15db23dc3d0bf37603076ff3f6b14b7a8
+## spree/spree fab75f904720df2c657eb10e7cb18d74daffc051
+## stefankroes/ancestry e8c09d27929a292452901c8b5f34b1b0a1b882b4
+## thoughtbot/administrate 2151509dfe8a242f2fcb7b80879a14eb76226656
+## varvet/pundit ea9e31a2d7993f038ee52b94ccc9c7411637ba89
+## we-promise/sure 12cd4e1a57f029d4ff59cce5dda7950d08221940
+## zammad/zammad d6efb8d00cc2d8202cb8978c9873f0ec472c9c55
+app/graphql/gql/types/locale_type.rb:17:    def resolve_alias
+## zdennis/activerecord-import ed0cdadf80c84d73314a4788cc4db3bd14e27127

@@ -1,0 +1,6 @@
+Active Record 8.1.4.1
+ActiveRecord::Base.get_primary_key('posts') => "id"
+'é'.mb_chars.upcase.to_s => "É"
+Active Record 8.2.0.alpha
+ActiveRecord::Base.get_primary_key('posts') => NoMethodError: undefined method 'get_primary_key' for class ActiveRecord::Base
+'é'.mb_chars.upcase.to_s => NoMethodError: undefined method 'mb_chars' for an instance of String

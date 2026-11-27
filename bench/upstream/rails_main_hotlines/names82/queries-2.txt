@@ -1,0 +1,13 @@
+"def timestamp_attributes_for_create" path:app/models language:Ruby
+"def timestamp_attributes_for_update" path:app/models language:Ruby
+"def timestamp_attributes_for_create" path:lib language:Ruby
+"def timestamp_attributes_for_update" path:lib language:Ruby
+"def timestamp_attributes_for_create" path:app/models/concerns language:Ruby
+"get_primary_key" language:Ruby
+"symbol_column_to_string" language:Ruby
+"yaml_encoder" language:Ruby
+"default_scope_override" language:Ruby
+"resources :inbound_emails" path:config language:Ruby
+"inbound_emails_path" language:Ruby
+"template.field_error_proc" language:Ruby
+"def delivery_job" language:Ruby

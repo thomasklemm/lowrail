@@ -1,0 +1,150 @@
+
+## "def timestamp_attributes_for_create" path:app/models language:Ruby: 16 total, 16 of the first 16 outside Rails copies
+   590  2026-11-10  treflehq/trefle-api  app/models/application_record.rb
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/photo.rb, app/models/message.rb, app/models/user_event.rb
+     0  2023-12-02  CyJimmy264/book  app/models/record.rb
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb
+     0  2024-07-29  wvulibraries/mfcs-ruby  app/models/item.rb
+     0  2023-01-19  madebydna/TestGSWebRuby  app/models/review.rb
+
+## "def timestamp_attributes_for_update" path:app/models language:Ruby: 13 total, 13 of the first 13 outside Rails copies
+    41  2026-11-27  AixleHQ/flow  app/models/task_comment.rb
+    12  2026-11-27  DFE-Digital/publish-teacher-training  app/models/concerns/changed_at.rb
+     7  2026-11-25  ReseauEntourage/entourage-ror  app/models/concerns/custom_timestamp_attributes_for_update.rb
+     7  2013-11-24  anirudh-eka/haiku_app  app/models/poem.rb
+     2  2015-01-21  dryade/ninoxe  app/models/chouette/trident_active_record.rb
+     1  2025-12-29  rafaeelaudibert/PIUBS  app/models/application_record.rb
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb
+     0  2025-06-04  thewikidea/vets-api  app/models/application_record.rb
+     0  2021-01-08  stevebatcup/muddy-matches-mobile-api  app/models/profile_text.rb, app/models/conversation.rb, app/models/profile.rb
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb
+     0  2023-01-19  madebydna/TestGSWebRuby  app/models/review.rb
+
+## "def timestamp_attributes_for_create" path:lib language:Ruby: 13 total, 7 of the first 13 outside Rails copies
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb
+     5  2026-11-13  DDKatch/ractor-rails-shim  lib/ractor_rails_shim/patches/activerecord.rb
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb
+
+## "def timestamp_attributes_for_update" path:lib language:Ruby: 16 total, 10 of the first 16 outside Rails copies
+   757  2026-11-12  fatkodima/online_migrations  lib/online_migrations/background_data_migrations/reset_counters.rb
+    39  2018-01-16  hothero/wpdb_activerecord  lib/wpdb_activerecord/post.rb
+    22  2017-08-04  jasonmk/datastax_rails  lib/datastax_rails/timestamps.rb
+     7  2024-06-27  rambler-digital-solutions/fish0  lib/fish0/concerns/cacheable.rb
+     7  2019-03-01  reinteractive/rails-salesforce-connect  lib/connect/record.rb
+     5  2026-11-13  DDKatch/ractor-rails-shim  lib/ractor_rails_shim/patches/activerecord.rb
+     3  2025-12-30  malomalo/activerecord-cached_at  lib/cached_at/timestamp.rb
+     3  2026-03-14  krhitoshi/postfix_admin  lib/postfix_admin/models/concerns/existing_timestamp.rb
+     1  2014-01-20  skift/estore_conventions  lib/estore_conventions.rb
+     0  2026-11-11  soverein-it/visma  lib/visma/timestamp.rb
+
+## "def timestamp_attributes_for_create" path:app/models/concerns language:Ruby: 2 total, 2 of the first 2 outside Rails copies
+     1  2026-09-26  krhitoshi/mailadmin  app/models/concerns/existing_timestamp.rb
+     0  2024-03-18  Nghia2022/topfreec-v1  app/models/concerns/salesforce_timestamp.rb
+
+## "get_primary_key" language:Ruby: 1544 total, 20 of the first 100 outside Rails copies
+   527  2026-08-07  rkrage/pg_party  spec/model/shared_methods_spec.rb
+   458  2024-09-14  khiav223577/deep_pluck  lib/deep_pluck/model.rb
+   227  2026-10-19  meilisearch/meilisearch-ruby  lib/meilisearch/index.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/attribute_methods/primary_key.rb
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/primary_key.rb
+    17  2026-07-27  bestie/terrestrial  lib/terrestrial/configurations/conventional_configuration.rb
+     6  2009-04-27  jeffrafter/fates  lib/fulltext_reader.rb
+     4  2026-11-04  Sebbb/palo_alto  _generators/gen_config.template.rb
+     3  2013-01-04  autotelik/adam  lib/ruby/activerecord-jdbc-adapter/lib/arjdbc/mssql/limit_helpers.rb
+     2  2024-09-22  ukmshi/ActiveDBML  lib/active/dbml.rb
+     2  2022-05-09  exitnexus/nexopia  ruby-site/core/lib/storable/storable.rb
+     2  2022-11-09  itresearch/brazil_elections_2022  lib/csv_processor.rb
+     2  2015-09-23  rcarver/orel  lib/orel/operator.rb
+     1  2017-12-08  digital-preservation/machine_learning  HACKATHON_TEXT-FILES/RB/primary_key.rb
+     1  2026-10-19  flyisland/gitlab-ee  ee/app/models/geo/tracking_base.rb
+     1  2022-05-08  exitnexus/nexopia-core  lib/storable/storable.rb
+     1  2023-08-16  metasync/chronos  lib/chronos/interactors/simulate_operations/populate_data.rb
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/062298.rb
+     0  2017-10-13  vinaypoddar/nitrous  primary_key.rb
+     0  2018-06-18  Mahaswami/activerecord-jdbc-adapter  lib/arjdbc/mssql/limit_helpers.rb
+
+## "symbol_column_to_string" language:Ruby: 436 total, 2 of the first 100 outside Rails copies
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/model_schema.rb
+     5  2026-11-13  DDKatch/ractor-rails-shim  lib/ractor_rails_shim/patches/active_record_model_schema.rb
+
+## "yaml_encoder" language:Ruby: 888 total, 8 of the first 100 outside Rails copies
+   175  2021-03-07  pangloss/pacer  lib/pacer/loader.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/model_schema.rb
+    52  2023-03-09  jasl/activeentity  lib/active_entity/model_schema.rb
+    23  2018-11-23  jasl-lab/duck_record  lib/duck_record/model_schema.rb
+    12  2023-06-02  srianant/DNN_Hyperparameter_Optimization  Optimization/nn_dist/data/source_code/data_files/rb/model_schema.rb
+     5  2026-11-13  DDKatch/ractor-rails-shim  lib/ractor_rails_shim/patches/active_record_model_schema.rb
+     3  2018-05-03  micabressan/trabajo_final  codes/f0a2eff0919947c4b2412d20bf0b8018.Ruby
+     1  2017-12-08  digital-preservation/machine_learning  HACKATHON_TEXT-FILES/RB/model_schema.rb
+
+## "default_scope_override" language:Ruby: 397 total, 8 of the first 100 outside Rails copies
+   877  2026-11-23  rubocop/rubocop-rails  lib/rubocop/cop/rails/dangerous_column_names.rb
+   539  2024-10-15  hyperstack-org/hyperstack  ruby/hyper-model/lib/reactive_record/active_record/class_methods.rb
+    72  2025-09-27  derails/derails  src/derails/passive_aggressive/scoping/default.rb
+    55  2026-10-27  samvera/active_fedora  lib/active_fedora/scoping/default.rb
+    36  2018-06-15  source-foundry/code-corpora  ruby/rails/default.rb
+     1  2026-11-26  askumardev/RbRepo  arr_hash_model_methods.rb
+     0  2026-04-04  matique/mimoco  lib/mimoco_base.rb
+     0  2021-09-02  stephenprater/gun_dog  spec/gun_dog_spec.rb
+
+## "resources :inbound_emails" path:config language:Ruby: 9 total, 9 of the first 9 outside Rails copies
+     9  2026-11-25  betagouv/collectif-objets  config/routes.rb
+     2  2014-04-17  sachinr/impart  config/routes.rb
+     1  2020-12-30  jmalcic/spina-admin-mail  config/routes.rb
+     1  2026-11-27  one-work/rails_com  config/routes.rb
+     1  2016-07-02  sachinr-test/impart  config/routes.rb
+     0  2016-05-05  richessler/mailgun_poc  config/routes.rb
+     0  2022-02-19  captproton/raconteur  config/routes/madmin.rb
+     0  2026-10-12  SGraef/Homestead  config/routes.rb
+     0  2025-11-20  wasafiri/vulcan  config/routes.rb
+
+## "inbound_emails_path" language:Ruby: 31 total, 30 of the first 31 outside Rails copies
+   119  2026-11-23  rails/ai-evals  apps/helpdesk/test/controllers/helpdesk_relay_controller_test.rb
+    72  2025-09-27  derails/derails  src/inactionmailbomb/test/controllers/rails/inaction_mailbomb/inbound_emails_controller_test.rb
+     8  2024-06-28  sgtest/megarepo  rails/actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     5  2026-05-20  7RU7H/CTFs  OS-ProvingGrounds/Hetemit/18000-routingError.rb
+     3  2026-08-25  bborn/sendoff  spec/requests/sendoff/inbound_emails_spec.rb
+     2  2023-01-19  utkarsh2102/ruby-rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     1  2025-01-03  PlatinumWrist5055/urban-guide  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     1  2022-08-01  softwarearchitect817/ruby-on-rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     1  2021-06-10  rdlayma-zz/https-github.com-rails-rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     1  2020-12-30  jmalcic/spina-admin-mail  app/controllers/spina/admin/mail/inbound_emails_controller.rb
+     0  2026-11-19  chrisjgilbert/siftbox  spec/requests/action_mailbox_ingress_spec.rb
+     0  2023-08-15  deepin-community/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2020-12-13  hummusonrails/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-09-26  honeyvig/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-11-26  ngpestelos-mirrors/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-04-09  StephenGrider/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-03-30  sutrolabs/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2025-05-12  yeonsugo/RUBY-rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2024-11-14  alex-emslie/radioveloso  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2024-08-30  DavidMartinez0216/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2023-08-21  dazralsky/django  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-03-29  Jaboo9/rails  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2024-03-18  frequency121/rails121  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2025-12-22  AlinRosca10/PHP_CORE  Recapitulare/rails/actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-11-25  boxprod/telex  test/lib/boot_test.rb, test/controllers/inbound_emails_controller_test.rb
+     0  2024-01-09  saurabhacellere/biscuit_withoutcsharp  ruby/actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2019-03-18  schneems/rails-6-beta-1-fork  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2023-01-19  kuzmenkonikolay/rails_4.1.6_cache_fix  actionmailbox/test/controllers/rails/action_mailbox/inbound_emails_controller_test.rb
+     0  2026-08-13  adenta/denta_co_marketing  test/controllers/postmark_inbound_emails_controller_test.rb
+
+## "template.field_error_proc" language:Ruby: 2 total, 2 of the first 2 outside Rails copies
+     6  2020-12-30  EarlhamInst/brassica  app/forms/submissions/form_builder.rb
+     4  2024-12-04  motine/partial_form  lib/partial_form/builder.rb
+
+## "def delivery_job" language:Ruby: 273 total, 7 of the first 100 outside Rails copies
+  2703  2026-11-25  excid3/noticed  app/jobs/noticed/event_job.rb
+   269  2026-11-27  saeloun/miru-web  spec/services/subscriptions/purchase_event_durability_spec.rb
+    72  2025-09-27  derails/derails  src/derails/inaction_spammer/test_helper.rb
+     0  2025-12-10  Tourlat/AAA_project  dataset_light/ruby/060678.rb
+     0  2026-11-26  barrosblucas/chatwootnext  spec/connecta/scope_notification_delivery_spec.rb
+     0  2026-11-26  abeinoo/Workpulse  spec/services/audit/pending_event_delivery_concurrency_spec.rb, spec/jobs/audit/pending_event_sweep_job_spec.rb

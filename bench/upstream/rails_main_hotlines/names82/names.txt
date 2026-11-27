@@ -1,0 +1,75 @@
+# Rails 8.1.4.1 (3f290b759c) to 8.2.0.alpha (088fc0cf61), ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+
+## model.instance: 7 new (+4 underscore), 0 moved, 8 removed
+new: read_attr(public) resolve_alias(public) association_cache(protected) autosave_belongs_to_association(private) implicit_persistence_transaction(private) primary_key_is_composite?(private) serialization_key(private)
+removed: default_scope_override(public) association_foreign_key_changed?(private) compute_primary_key(private) find_record_by_id(private) inverse_polymorphic_association_changed?(private) validation_context=(private)
+
+## model.class: 37 new (+65 underscore), 64 moved, 70 removed
+new: abstract_ancestors(public) alias_attributes_mass_generated?(public) all_queries_scope(public) attribute_slots(public) attribute_slots_for(public) bound_sql_literal_for(public) build_schema_context(public) composite_query_constraints_definition(public) configured_primary_key_definition(public) current_schema_context(public) declared_primary_key_definition(public) default_order(public) find_by_statement_cache_key(public) generate_inherited_alias_attribute(public) has_default_scope?(public) has_delegated_json(public) has_json(public) load_schema_context(public) loaded_mapped_table(public) make_pending_attribute_modifications_shareable(public) make_reflections_shareable!(public) mapped_table(public) primary_key_definition(public) primary_key_from_prefix(public) query_constraints_definition(public) ractor_connection_handler(public) resolve_alias(public) schema_attributes(public) schema_context(public) reload_schema_contexts_from_cache(protected) add_pending_attribute_modification(private) bind_value_for_sql_literal(private) define_id_value(private) has_concrete_ancestor?(private) optimize_new_allocation(private) pop_connected_to_stack(private) record_alias_by_attribute_name(private)
+moved: __class_attr___callbacks(private->public) __class_attr__attr_readonly(private->public) __class_attr__counter_cache_columns(private->public) __class_attr__destroy_association_async_job(private->public) __class_attr__reflections(private->public) __class_attr__signed_id_verifier(private->public) __class_attr__validators(private->public) __class_attr_aggregate_reflections(private->public) __class_attr_attachment_reflections(private->public) __class_attr_attribute_aliases(private->public) __class_attr_attribute_method_patterns(private->public) __class_attr_attributes_for_inspect(private->public) __class_attr_automatic_scope_inversing(private->public) __class_attr_automatically_invert_plural_associations(private->public) __class_attr_belongs_to_required_by_default(private->public) __class_attr_cache_timestamp_format(private->public) __class_attr_cache_versioning(private->public) __class_attr_collection_cache_versioning(private->public) __class_attr_counter_cached_association_names(private->public) __class_attr_default_column_serializer(private->public) __class_attr_default_connection_handler(private->public) __class_attr_default_role(private->public) __class_attr_default_scopes(private->public) __class_attr_default_shard(private->public) __class_attr_defined_enums(private->public) __class_attr_destroy_association_async_batch_size(private->public) __class_attr_encrypted_attributes(private->public) __class_attr_enumerate_columns_in_select_statements(private->public) __class_attr_generated_token_verifier(private->public) __class_attr_has_many_inversing(private->public) __class_attr_immutable_strings_by_default(private->public) __class_attr_implicit_order_column(private->public) __class_attr_include_root_in_json(private->public) __class_attr_inheritance_column(private->public) __class_attr_internal_metadata_table_name(private->public) __class_attr_lock_optimistically(private->public) __class_attr_logger(private->public) __class_attr_nested_attributes_options(private->public) __class_attr_normalized_attributes(private->public) __class_attr_param_delimiter(private->public) __class_attr_partial_inserts(private->public) __class_attr_partial_updates(private->public) __class_attr_pluralize_table_names(private->public) __class_attr_primary_key_prefix_type(private->public) __class_attr_record_timestamps(private->public) __class_attr_run_commit_callbacks_on_first_saved_instances_in_transaction(private->public) __class_attr_schema_migrations_table_name(private->public) __class_attr_shard_selector(private->public) __class_attr_signed_id_verifier_secret(private->public) __class_attr_skip_time_zone_conversion_for_attributes(private->public) __class_attr_store_full_class_name(private->public) __class_attr_store_full_sti_class(private->public) __class_attr_strict_loading_by_default(private->public) __class_attr_strict_loading_mode(private->public) __class_attr_table_name_prefix(private->public) __class_attr_table_name_suffix(private->public) __class_attr_time_zone_aware_attributes(private->public) __class_attr_time_zone_aware_types(private->public) __class_attr_token_definitions(private->public) apply_pending_attribute_modifications(private->public) timestamp_attributes_for_create(private->public) timestamp_attributes_for_update(private->public) type_for_column(private->public) schema_loaded?(private->protected)
+removed: default_scope_override(public) default_scope_override=(public) get_primary_key(public) symbol_column_to_string(public) yaml_encoder(public) attribute_method_patterns_cache(private) attribute_method_patterns_matching(private) define_default_attribute(private)
+
+## relation.instance: 15 new (+21 underscore), 0 moved, 5 removed
+new: default_order(public) default_order!(public) default_order_values(public) default_order_values=(public) effective_order_values(public) values_for_merge(public) with_recursive_value(public) with_recursive_value=(public) classify_join_values(private) comparison_values_for_in_order_of(private) cte_join?(private) structurally_incompatible_key?(private) structurally_incompatible_value?(private) using_limitable_joins?(private) warn_unscope_of_other_tables(private)
+removed: build_bound_sql_literal(private) build_named_bound_sql_literal(private) select_association_list(private) select_named_joins(private)
+
+## association.instance: 16 new (+21 underscore), 0 moved, 5 removed
+new: default_order(public) default_order!(public) default_order_values(public) default_order_values=(public) effective_order_values(public) values_for_merge(public) with_recursive_value(public) with_recursive_value=(public) bulk_write(private) classify_join_values(private) comparison_values_for_in_order_of(private) cte_join?(private) structurally_incompatible_key?(private) structurally_incompatible_value?(private) using_limitable_joins?(private) warn_unscope_of_other_tables(private)
+removed: build_bound_sql_literal(private) build_named_bound_sql_literal(private) select_association_list(private) select_named_joins(private)
+
+## activemodel.instance: 1 new (+0 underscore), 0 moved, 1 removed
+new: serialization_key(private)
+removed: validation_context=(private)
+
+## activemodel.class: 5 new (+7 underscore), 7 moved, 8 removed
+new: has_delegated_json(public) has_json(public) make_pending_attribute_modifications_shareable(public) add_pending_attribute_modification(private) record_alias_by_attribute_name(private)
+moved: __class_attr___callbacks(private->public) __class_attr__validators(private->public) __class_attr_attribute_aliases(private->public) __class_attr_attribute_method_patterns(private->public) __class_attr_include_root_in_json(private->public) __class_attr_param_delimiter(private->public) apply_pending_attribute_modifications(private->public)
+removed: attribute_method_patterns_cache(private) attribute_method_patterns_matching(private)
+
+## controller.instance: 25 new (+2 underscore), 0 moved, 0 removed
+new: default_protect_from_forgery_with(public) default_protect_from_forgery_with=(public) forgery_protection_trusted_origins(public) forgery_protection_trusted_origins=(public) forgery_protection_verification_strategy(public) forgery_protection_verification_strategy=(public) inbound_emails_path(public) inbound_emails_url(public) append_sec_fetch_site_to_vary_header(private) controller_action_scope(private) controller_scope(private) embed_authenticity_token?(private) instrument_cross_origin_javascript(private) instrument_csrf_event(private) instrument_csrf_token_fallback(private) instrument_unverified_request(private) origin_trusted?(private) scope_option_by_controller_path(private) sec_fetch_site_value(private) using_header_only_for_forgery_protection?(private) verified_query_request?(private) verified_request_for_forgery_protection?(private) verified_via_header_only?(private) verified_with_legacy_token?(private) verify_request_for_forgery_protection(private)
+
+## controller.class: 8 new (+24 underscore), 21 moved, 22 removed
+new: action_method_symbols(public) default_protect_from_forgery_with(public) default_protect_from_forgery_with=(public) forgery_protection_trusted_origins(public) forgery_protection_trusted_origins=(public) forgery_protection_verification_strategy(public) forgery_protection_verification_strategy=(public) verification_strategy(private)
+moved: __class_attr___callbacks(private->public) __class_attr__allowed_redirect_hosts(private->public) __class_attr__default_form_builder(private->public) __class_attr__flash_types(private->public) __class_attr__helper_methods(private->public) __class_attr__layout(private->public) __class_attr__layout_conditions(private->public) __class_attr__renderers(private->public) __class_attr__view_cache_dependencies(private->public) __class_attr__wrapper_options(private->public) __class_attr_allowed_redirect_hosts_permissions(private->public) __class_attr_config(private->public) __class_attr_default_url_options(private->public) __class_attr_escape_json_responses(private->public) __class_attr_etag_with_template_digest(private->public) __class_attr_etaggers(private->public) __class_attr_fragment_cache_keys(private->public) __class_attr_helpers_path(private->public) __class_attr_include_all_helpers(private->public) __class_attr_middleware_stack(private->public) __class_attr_rescue_handlers(private->public)
+removed: 
+
+## api_controller.instance: 2 new (+2 underscore), 0 moved, 0 removed
+new: inbound_emails_path(public) inbound_emails_url(public)
+
+## view.instance: 7 new (+0 underscore), 0 moved, 23 removed
+new: annotate_rendered_view_with_filenames?(public) datalist_tag(public) append_option_tag(private) distance_translation(private) preload_link_href(private) scope_option_by_partial(private) scope_prefix(private)
+removed: apply_stylesheet_media_default=(public) auto_include_nonce_for_scripts=(public) auto_include_nonce_for_styles=(public) automatically_disable_submit_tag(public) automatically_disable_submit_tag=(public) button_to_generates_button_tag=(public) default_enforce_utf8=(public) default_formats(public) default_formats=(public) embed_authenticity_token_in_remote_forms=(public) field_error_proc(public) field_error_proc=(public) form_with_generates_ids=(public) form_with_generates_remote_forms=(public) image_decoding=(public) image_loading=(public) multiple_file_field_include_hidden=(public) preload_links_header=(public) prepend_content_exfiltration_prevention=(public) remove_hidden_field_autocomplete(public) remove_hidden_field_autocomplete=(public) streaming_completion_on_exception(public) streaming_completion_on_exception=(public)
+
+## job.class: 2 new (+12 underscore), 12 moved, 12 removed
+new: discard_on_handler(private) retry_on_handler(private)
+moved: __class_attr___callbacks(private->public) __class_attr__queue_adapter(private->public) __class_attr__queue_adapter_name(private->public) __class_attr_after_discard_procs(private->public) __class_attr_enqueue_after_transaction_commit(private->public) __class_attr_log_arguments(private->public) __class_attr_priority(private->public) __class_attr_queue_name(private->public) __class_attr_queue_name_delimiter(private->public) __class_attr_queue_name_prefix(private->public) __class_attr_rescue_handlers(private->public) __class_attr_retry_jitter(private->public)
+removed: 
+
+## mailer.instance: 5 new (+0 underscore), 0 moved, 6 removed
+new: inbound_emails_url(public) mail_was_called?(public) controller_action_scope(private) controller_scope(private) scope_option_by_controller_path(private)
+removed: deliver_later_queue_name(public) deliver_later_queue_name=(public) deliver_later_queue_name?(public) delivery_job(public) delivery_job=(public) delivery_job?(public)
+
+## mailer.class: 1 new (+25 underscore), 18 moved, 21 removed
+new: action_method_symbols(public)
+moved: __class_attr___callbacks(private->public) __class_attr__default_form_builder(private->public) __class_attr__helper_methods(private->public) __class_attr__layout(private->public) __class_attr__layout_conditions(private->public) __class_attr__view_cache_dependencies(private->public) __class_attr_config(private->public) __class_attr_default_params(private->public) __class_attr_default_url_options(private->public) __class_attr_deliver_later_queue_name(private->public) __class_attr_delivery_method(private->public) __class_attr_delivery_methods(private->public) __class_attr_file_settings(private->public) __class_attr_fragment_cache_keys(private->public) __class_attr_rescue_handlers(private->public) __class_attr_sendmail_settings(private->public) __class_attr_smtp_settings(private->public) __class_attr_test_settings(private->public)
+removed: delivery_job?(public)
+
+## core.String.instance: 0 new (+0 underscore), 0 moved, 1 removed
+removed: mb_chars(public)
+
+## core.Time.instance: 4 new (+0 underscore), 0 moved, 1 removed
+new: this_month?(public) this_quarter?(public) this_week?(public) this_year?(public)
+removed: utc_to_local_returns_utc_offset_times(public)
+
+## core.Date.instance: 4 new (+0 underscore), 0 moved, 0 removed
+new: this_month?(public) this_quarter?(public) this_week?(public) this_year?(public)
+
+## core.DateTime.instance: 4 new (+0 underscore), 0 moved, 1 removed
+new: this_month?(public) this_quarter?(public) this_week?(public) this_year?(public)
+removed: utc_to_local_returns_utc_offset_times(public)
+
+## core.File.singleton: 0 new (+0 underscore), 0 moved, 1 removed
+removed: probe_stat_in(public)
+
+## 99 distinct non-underscore names new to at least one surface

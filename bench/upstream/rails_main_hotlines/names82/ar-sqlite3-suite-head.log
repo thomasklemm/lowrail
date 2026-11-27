@@ -1,0 +1,124 @@
+Using sqlite3
+Run options: --seed 3035
+
+# Running:
+
+.......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S.......S.....................................S.............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S...................................................................................................................................S...............................................S..........................S.S...................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................E
+
+Error:
+ActiveRecord::ConnectionAdapters::ConnectionHandlersMultiDbTest#test_switching_connections_with_database_url:
+LoadError: Error loading the 'postgresql' Active Record adapter. Missing a gem it depends on? pg is not part of the bundle. Add it to your Gemfile.
+    /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/bundler-4.0.12/lib/bundler/rubygems_integration.rb:215:in 'block (2 levels) in Kernel#replace_gem'
+    lib/active_record/connection_adapters/postgresql_adapter.rb:3:in '<top (required)>'
+    /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+    /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+    /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/gems/zeitwerk-2.7.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
+    lib/active_record/connection_adapters.rb:47:in 'ActiveRecord::ConnectionAdapters.resolve'
+    lib/active_record/database_configurations/database_config.rb:22:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#adapter_class'
+    lib/active_record/database_configurations/database_config.rb:39:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#validate!'
+    lib/active_record/connection_adapters/abstract/connection_handler.rb:291:in 'ActiveRecord::ConnectionAdapters::ConnectionHandler#resolve_pool_config'
+    lib/active_record/connection_adapters/abstract/connection_handler.rb:123:in 'establish_connection'
+    lib/active_record/connection_handling.rb:119:in 'block (2 levels) in ActiveRecord::ConnectionHandling#connects_to'
+    lib/active_record/connection_handling.rb:114:in 'Hash#each'
+    lib/active_record/connection_handling.rb:114:in 'block in ActiveRecord::ConnectionHandling#connects_to'
+    lib/active_record/connection_handling.rb:113:in 'Hash#each'
+    lib/active_record/connection_handling.rb:113:in 'ActiveRecord::ConnectionHandling#connects_to'
+    test/cases/connection_adapters/connection_handlers_multi_db_test.rb:182:in 'ActiveRecord::ConnectionAdapters::ConnectionHandlersMultiDbTest#test_switching_connections_with_database_url'
+
+bin/rails test test/cases/connection_adapters/connection_handlers_multi_db_test.rb:178
+
+.............................................................................................................................................................................................................................................................................................................................................S.....................................................................................................................................................................................................................E
+
+Error:
+ActiveRecord::SqliteStructureLoadTest#test_structure_load:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-92272-t77oir/db_create.sqlite3 < /tmp/d20261127-92272-t77oir/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:59:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_load'
+    lib/active_record/tasks/database_tasks.rb:384:in 'ActiveRecord::Tasks::DatabaseTasks#structure_load'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:257:in 'block in ActiveRecord::SqliteStructureLoadTest#test_structure_load'
+    /home/user/r82/rails-full/activesupport/lib/active_support/testing/stream.rb:11:in 'ActiveSupport::Testing::Stream#silence_stream'
+    /home/user/r82/rails-full/activesupport/lib/active_support/testing/stream.rb:19:in 'block in ActiveSupport::Testing::Stream#quietly'
+    /home/user/r82/rails-full/activesupport/lib/active_support/testing/stream.rb:11:in 'ActiveSupport::Testing::Stream#silence_stream'
+    /home/user/r82/rails-full/activesupport/lib/active_support/testing/stream.rb:18:in 'ActiveSupport::Testing::Stream#quietly'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:257:in 'ActiveRecord::SqliteStructureLoadTest#test_structure_load'
+
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:252
+
+.............................S..SS...S.....S...S.S..S.S.S..SSS.......................................................................................................................................................................................................................................................................................................................................................................................................................sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+E
+
+Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-92272-vcr5y2/db_create.sqlite3 .schema --nosys > /tmp/d20261127-92272-vcr5y2/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:171:in 'ActiveRecord::SqliteStructureDumpTest#test_structure_dump'
+
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:167
+
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+E
+
+Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_schema_ignored_tables_as_a_set:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-92272-nyqb51/db_create.sqlite3 SELECT sql || ';' FROM sqlite_master WHERE tbl_name NOT IN () ORDER BY tbl_name, type DESC, name > /tmp/d20261127-92272-nyqb51/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:202:in 'block in ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_schema_ignored_tables_as_a_set'
+
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:198
+
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+.sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+E
+
+Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_ignore_tables:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-92272-jwoefl/db_create.sqlite3 SELECT sql || ';' FROM sqlite_master WHERE tbl_name NOT IN () ORDER BY tbl_name, type DESC, name > /tmp/d20261127-92272-jwoefl/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:188:in 'block in ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_ignore_tables'
+
+bin/rails test test/cases/adapters/sqlite3/sqlite_rake_test.rb:178
+
+.......................................................................................................................................................................................................................................................S....................................................................................................................................................................................S.........................................................................................................................................................................................................................................................................................................................................................S.......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S................................................................................S...................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S.....S..S...........S..S...............S........................................................................................................................................................................................................................................................................................S.............................................................................................................................................................................................................S..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................S..........................................................................................................................................................................................................................................................................................................................................................................................................................S.................................................S..S...........S.S....S..S.S........S...SS.S.....S......................................................................................................................................................................................................................................................................................................................................................................................................................................................................S...................................................................................................................................................................................................................................................................................................................................................................................................................................................................S..............................................................................................................................................................................................
+
+Finished in 105.442475s, 99.2010 runs/s, 354.4207 assertions/s.
+10460 runs, 37371 assertions, 0 failures, 5 errors, 52 skips
+
+You have skipped tests. Run with --verbose for details.
+rake aborted!
+Command failed with status (1)
+/home/user/.local/share/mise/installs/ruby/4.0.10/bin/bundle:25:in '<main>'
+Tasks: TOP => test:sqlite3
+(See full trace by running task with --trace)
+exit=1
