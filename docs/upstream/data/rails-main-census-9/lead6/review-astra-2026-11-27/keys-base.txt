@@ -1,0 +1,6959 @@
+== new
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    author_id: nil
+    title: '"untitled"'
+    body: nil
+    score: '7'
+    data: nil
+    title_upper: nil
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"untitled"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - '7'
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: "[nil, 7]"
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: nil
+:serializable_hash:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => nil, "author_id" => nil, "title" => "untitled", "body" => nil,
+  "score" => 7, "data" => nil, "title_upper" => nil, "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: nil, author_id: nil, title: "untitled", body: nil, score: 7,
+  data: nil, title_upper: nil, tags_count: 3, note: nil, shout: nil>'
+== new with args
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    author_id: nil
+    title: '"x"'
+    body: nil
+    score: '7'
+    data: nil
+    title_upper: nil
+    tags_count: '3'
+    note: '"y"'
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"x"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - '7'
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - '"y"'
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: nil
+  title: '"x"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: '"y"'
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: nil
+  title: '"x"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: '"y"'
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["untitled", "x"]'
+  score: "[nil, 7]"
+  note: '[nil, "y"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"untitled"'
+  score: nil
+  note: nil
+:serializable_hash:
+  id: nil
+  author_id: nil
+  title: '"x"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: '"y"'
+  shout: nil
+:as_json: '{"id" => nil, "author_id" => nil, "title" => "x", "body" => nil, "score"
+  => 7, "data" => nil, "title_upper" => nil, "tags_count" => 3, "note" => "y", "shout"
+  => nil}'
+:inspect: '#<Post id: nil, author_id: nil, title: "x", body: nil, score: 7, data:
+  nil, title_upper: nil, tags_count: 3, note: "y", shout: nil>'
+== new then write
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    author_id: nil
+    title: '"untitled"'
+    body: nil
+    score: '9'
+    data: nil
+    title_upper: nil
+    tags_count: '3'
+    note: nil
+    shout: '"HI"'
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"untitled"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - '9'
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - '"hi"'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '9'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: '"HI"'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '9'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: '"hi"'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: "[nil, 9]"
+  shout: '[nil, "HI"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: nil
+  shout: nil
+:serializable_hash:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '9'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: '"HI"'
+:as_json: '{"id" => nil, "author_id" => nil, "title" => "untitled", "body" => nil,
+  "score" => 9, "data" => nil, "title_upper" => nil, "tags_count" => 3, "note" =>
+  nil, "shout" => "HI"}'
+:inspect: '#<Post id: nil, author_id: nil, title: "untitled", body: nil, score: 9,
+  data: nil, title_upper: nil, tags_count: 3, note: nil, shout: "HI">'
+== load
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== load then read all
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== load then write
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"z"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '8'
+    note: '"w"'
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"z"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '8'
+  - - note
+    - true
+    - '"w"'
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"z"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '8'
+  note: '"w"'
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"z"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '8'
+  note: '"w"'
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["one", "z"]'
+  tags_count: "[3, 8]"
+  note: '[nil, "w"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"z"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '8'
+  note: '"w"'
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "z", "body" => "b", "score" =>
+  5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 8, "note" => "w",
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "z", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 8, note: "w", shout: nil>'
+== load nil score
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '2'
+    author_id: nil
+    title: '"two"'
+    body: nil
+    score: nil
+    data: nil
+    title_upper: '"TWO"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '2'
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"two"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - nil
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - '"TWO"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '2'
+  author_id: nil
+  title: '"two"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: '"TWO"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '2'
+  author_id: nil
+  title: '"two"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: '"TWO"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '2'
+  author_id: nil
+  title: '"two"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: '"TWO"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 2, "author_id" => nil, "title" => "two", "body" => nil, "score"
+  => nil, "data" => nil, "title_upper" => "TWO", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 2, author_id: nil, title: "two", body: nil, score: nil, data:
+  nil, title_upper: "TWO", tags_count: 3, note: nil, shout: nil>'
+== load then in-place mutation
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 2}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 2}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  data: '[{"k" => 1}, {"k" => 2}]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  data: '{"k" => 1}'
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 2}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 2}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 2}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== find
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== partial select
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    title: '"one"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    title: true
+    tags_count: true
+    note: true
+    shout: true
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- title
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: '"one"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "title" => "one", "tags_count" => 3, "note" => nil, "shout"
+  => nil}'
+:inspect: '#<Post id: 1, title: "one", tags_count: 3, note: nil, shout: nil>'
+== partial select no id
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    title: '"one"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    title: true
+    tags_count: true
+    note: true
+    shout: true
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- title
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: nil
+  title: '"one"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: nil
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => nil, "title" => "one", "tags_count" => 3, "note" => nil, "shout"
+  => nil}'
+:inspect: '#<Post id: nil, title: "one", tags_count: 3, note: nil, shout: nil>'
+== partial select write
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    title: '"q"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"q"'
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    title: true
+    tags_count: true
+    note: true
+    shout: true
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  title: '"q"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- title
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: '"q"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["one", "q"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"one"'
+:serializable_hash:
+  id: '1'
+  title: '"q"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "title" => "q", "tags_count" => 3, "note" => nil, "shout" =>
+  nil}'
+:inspect: '#<Post id: 1, title: "q", tags_count: 3, note: nil, shout: nil>'
+== select as extra
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - extra
+  - one
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    legacy: nil
+    extra: '"one"'
+    one: '1'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - legacy
+    - true
+    - nil
+  - - extra
+    - true
+    - '"one"'
+  - - one
+    - true
+    - '1'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: true
+    extra: true
+    one: true
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - extra
+  - one
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '"one"'
+  one: '1'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- legacy
+- extra
+- one
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '"one"'
+  one: '1'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '"one"'
+  one: '1'
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil, "legacy" => nil, "extra" => "one", "one" => 1}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil, legacy: nil, extra:
+  "one", one: 1>'
+== select as extra only
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - tags_count
+  - note
+  - shout
+  - extra
+  :to_hash:
+    id: '1'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    extra: '5'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - false
+    - nil
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - extra
+    - true
+    - '5'
+  :key?:
+    id: true
+    tags_count: true
+    note: true
+    shout: true
+    extra: true
+    title: false
+    score: false
+    legacy: false
+    title_upper: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - tags_count
+  - note
+  - shout
+  - extra
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '5'
+:attribute_names:
+- id
+- tags_count
+- note
+- shout
+- extra
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: nil
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '5'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '5'
+:as_json: '{"id" => 1, "tags_count" => 3, "note" => nil, "shout" => nil, "extra" =>
+  5}'
+:inspect: "#<Post id: 1, tags_count: 3, note: nil, shout: nil, extra: 5>"
+== select reorder
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - score
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    title: '"one"'
+    score: '5'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - false
+    - nil
+  - - score
+    - true
+    - '5'
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    title: true
+    score: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - score
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  title: '"one"'
+  score: '5'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- title
+- score
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: '"one"'
+  body: nil
+  score: '5'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  title: '"one"'
+  score: '5'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "title" => "one", "score" => 5, "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, title: "one", score: 5, tags_count: 3, note: nil, shout:
+  nil>'
+== select extra then write extra
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - extra
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    legacy: nil
+    extra: '5'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - legacy
+    - true
+    - nil
+  - - extra
+    - true
+    - '5'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: true
+    extra: true
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - extra
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '5'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- legacy
+- extra
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '5'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  extra: "[1, 5]"
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  extra: '1'
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  extra: '5'
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil, "legacy" => nil, "extra" => 5}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil, legacy: nil, extra:
+  5>'
+== write_attribute unknown
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== set []= unknown
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== eager_load join
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== preload
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== find_by_sql
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  - extra
+  :to_hash:
+    id: '1'
+    title: '"one"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    extra: '2'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - extra
+    - true
+    - '2'
+  :key?:
+    id: true
+    title: true
+    tags_count: true
+    note: true
+    shout: true
+    extra: true
+    score: false
+    legacy: false
+    title_upper: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  - extra
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '2'
+:attribute_names:
+- id
+- title
+- tags_count
+- note
+- shout
+- extra
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: '"one"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '2'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  title: '"one"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  extra: '2'
+:as_json: '{"id" => 1, "title" => "one", "tags_count" => 3, "note" => nil, "shout"
+  => nil, "extra" => 2}'
+:inspect: '#<Post id: 1, title: "one", tags_count: 3, note: nil, shout: nil, extra:
+  2>'
+== instantiate hash
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  - zzz
+  :to_hash:
+    id: '5'
+    title: '"h"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    zzz: '"1"'
+  :each_value:
+  - - id
+    - true
+    - '5'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - true
+    - '"h"'
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - zzz
+    - true
+    - '"1"'
+  :key?:
+    id: true
+    title: true
+    tags_count: true
+    note: true
+    shout: true
+    zzz: true
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - title
+  - tags_count
+  - note
+  - shout
+  - zzz
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '5'
+  title: '"h"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '"1"'
+:attribute_names:
+- id
+- title
+- tags_count
+- note
+- shout
+- zzz
+:before_type_cast:
+  id: '5'
+  author_id: nil
+  title: '"h"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '"1"'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '5'
+  title: '"h"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '"1"'
+:as_json: '{"id" => 5, "title" => "h", "tags_count" => 3, "note" => nil, "shout" =>
+  nil, "zzz" => "1"}'
+:inspect: '#<Post id: 5, title: "h", tags_count: 3, note: nil, shout: nil, zzz: "1">'
+== instantiate hash with types
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - score
+  - tags_count
+  - note
+  - shout
+  - zzz
+  :to_hash:
+    id: '5'
+    score: '4'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    zzz: '1'
+  :each_value:
+  - - id
+    - true
+    - '5'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - false
+    - nil
+  - - body
+    - false
+    - nil
+  - - score
+    - true
+    - '"4"'
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - zzz
+    - true
+    - '"1"'
+  :key?:
+    id: true
+    score: true
+    tags_count: true
+    note: true
+    shout: true
+    zzz: true
+    title: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - score
+  - tags_count
+  - note
+  - shout
+  - zzz
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '5'
+  score: '4'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '1'
+:attribute_names:
+- id
+- score
+- tags_count
+- note
+- shout
+- zzz
+:before_type_cast:
+  id: '5'
+  author_id: nil
+  title: nil
+  body: nil
+  score: '"4"'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '"1"'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '5'
+  score: '4'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  zzz: '1'
+:as_json: '{"id" => 5, "score" => 4, "tags_count" => 3, "note" => nil, "shout" =>
+  nil, "zzz" => 1}'
+:inspect: "#<Post id: 5, score: 4, tags_count: 3, note: nil, shout: nil, zzz: 1>"
+== build_from_database legacy
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - tags_count
+  - note
+  - shout
+  - x
+  :to_hash:
+    id: '1'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    x: '2'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - false
+    - nil
+  - - title
+    - false
+    - nil
+  - - body
+    - false
+    - nil
+  - - score
+    - false
+    - nil
+  - - data
+    - false
+    - nil
+  - - title_upper
+    - false
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - x
+    - true
+    - '"2"'
+  :key?:
+    id: true
+    tags_count: true
+    note: true
+    shout: true
+    x: true
+    title: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - tags_count
+  - note
+  - shout
+  - x
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  x: '2'
+:attribute_names:
+- id
+- tags_count
+- note
+- shout
+- x
+:before_type_cast:
+  id: '1'
+  author_id: nil
+  title: nil
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  x: '"2"'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  x: '2'
+:as_json: '{"id" => 1, "tags_count" => 3, "note" => nil, "shout" => nil, "x" => 2}'
+:inspect: "#<Post id: 1, tags_count: 3, note: nil, shout: nil, x: 2>"
+== becomes
+---
+:set:
+  :class: ActiveModel::ReindexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - special
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    legacy: nil
+    special: '"yes"'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - legacy
+    - true
+    - nil
+  - - special
+    - true
+    - '"yes"'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: true
+    special: true
+    extra: false
+    one: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - special
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"yes"'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- legacy
+- special
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"yes"'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"yes"'
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil, "legacy" => nil, "special" => "yes"}'
+:inspect: '#<SpecialPost id: 1, author_id: 1, title: "one", body: "b", score: 5, data:
+  {"k" => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil, legacy: nil,
+  special: "yes">'
+== becomes then write
+---
+:set:
+  :class: ActiveModel::ReindexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - special
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"b"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    legacy: nil
+    special: '"no"'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"b"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - legacy
+    - true
+    - nil
+  - - special
+    - true
+    - '"no"'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: true
+    special: true
+    extra: false
+    one: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - legacy
+  - special
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"b"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"no"'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- legacy
+- special
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"b"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"no"'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["one", "b"]'
+  special: '["yes", "no"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"one"'
+  special: '"yes"'
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"b"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  legacy: nil
+  special: '"no"'
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "b", "body" => "b", "score" =>
+  5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" => nil,
+  "shout" => nil, "legacy" => nil, "special" => "no"}'
+:inspect: '#<SpecialPost id: 1, author_id: 1, title: "b", body: "b", score: 5, data:
+  {"k" => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil, legacy: nil,
+  special: "no">'
+== sti load car
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :to_hash:
+    id: '1'
+    type: '"Car"'
+    name: '"c"'
+    doors: '2'
+    wheels: '4'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - type
+    - true
+    - '"Car"'
+  - - name
+    - true
+    - '"c"'
+  - - doors
+    - true
+    - '2'
+  - - wheels
+    - true
+    - '4'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    wheels: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:attribute_names:
+- id
+- type
+- name
+- doors
+- wheels
+:before_type_cast:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:as_json: '{"id" => 1, "name" => "c", "doors" => 2, "wheels" => 4}'
+:inspect: '#<Car id: 1, type: "Car", name: "c", doors: 2, wheels: 4>'
+== sti load truck
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  :to_hash:
+    id: '2'
+    type: '"Truck"'
+    name: '"t"'
+    doors: '2'
+  :each_value:
+  - - id
+    - true
+    - '2'
+  - - type
+    - true
+    - '"Truck"'
+  - - name
+    - true
+    - '"t"'
+  - - doors
+    - true
+    - '2'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '2'
+  type: '"Truck"'
+  name: '"t"'
+  doors: '2'
+:attribute_names:
+- id
+- type
+- name
+- doors
+:before_type_cast:
+  id: '2'
+  type: '"Truck"'
+  name: '"t"'
+  doors: '2'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '2'
+  name: '"t"'
+  doors: '2'
+:as_json: '{"id" => 2, "name" => "t", "doors" => 2}'
+:inspect: '#<Truck id: 2, type: "Truck", name: "t", doors: 2>'
+== sti subclass query
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :to_hash:
+    id: '1'
+    type: '"Car"'
+    name: '"c"'
+    doors: '2'
+    wheels: '4'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - type
+    - true
+    - '"Car"'
+  - - name
+    - true
+    - '"c"'
+  - - doors
+    - true
+    - '2'
+  - - wheels
+    - true
+    - '4'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    wheels: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:attribute_names:
+- id
+- type
+- name
+- doors
+- wheels
+:before_type_cast:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:as_json: '{"id" => 1, "name" => "c", "doors" => 2, "wheels" => 4}'
+:inspect: '#<Car id: 1, type: "Car", name: "c", doors: 2, wheels: 4>'
+== sti becomes
+---
+:set:
+  :class: ActiveModel::ReindexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :to_hash:
+    id: '1'
+    type: '"Car"'
+    name: '"c"'
+    doors: '2'
+    wheels: '4'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - type
+    - true
+    - '"Car"'
+  - - name
+    - true
+    - '"c"'
+  - - doors
+    - true
+    - '2'
+  - - wheels
+    - true
+    - '4'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    wheels: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:attribute_names:
+- id
+- type
+- name
+- doors
+- wheels
+:before_type_cast:
+  id: '1'
+  type: '"Car"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:as_json: '{"id" => 1, "name" => "c", "doors" => 2, "wheels" => 4}'
+:inspect: '#<Truck id: 1, type: "Car", name: "c", doors: 2, wheels: 4>'
+== sti becomes!
+---
+:set:
+  :class: ActiveModel::ReindexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :to_hash:
+    id: '1'
+    type: '"Truck"'
+    name: '"c"'
+    doors: '2'
+    wheels: '4'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - type
+    - true
+    - '"Truck"'
+  - - name
+    - true
+    - '"c"'
+  - - doors
+    - true
+    - '2'
+  - - wheels
+    - true
+    - '4'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    wheels: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  type: '"Truck"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:attribute_names:
+- id
+- type
+- name
+- doors
+- wheels
+:before_type_cast:
+  id: '1'
+  type: '"Truck"'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  type: '["Car", "Truck"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  type: '"Car"'
+:serializable_hash:
+  id: '1'
+  name: '"c"'
+  doors: '2'
+  wheels: '4'
+:as_json: '{"id" => 1, "name" => "c", "doors" => 2, "wheels" => 4}'
+:inspect: '#<Truck id: 1, type: "Truck", name: "c", doors: 2, wheels: 4>'
+== sti new
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :to_hash:
+    id: nil
+    type: '"Car"'
+    name: '"n"'
+    doors: '2'
+    wheels: '4'
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - type
+    - true
+    - '"Car"'
+  - - name
+    - true
+    - '"n"'
+  - - doors
+    - true
+    - '"2"'
+  - - wheels
+    - true
+    - '4'
+  :key?:
+    id: true
+    type: true
+    name: true
+    doors: true
+    wheels: true
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    nope: false
+  :accessed:
+  - id
+  - type
+  - name
+  - doors
+  - wheels
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  type: '"Car"'
+  name: '"n"'
+  doors: '2'
+  wheels: '4'
+:attribute_names:
+- id
+- type
+- name
+- doors
+- wheels
+:before_type_cast:
+  id: nil
+  type: '"Car"'
+  name: '"n"'
+  doors: '"2"'
+  wheels: '4'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  type: '[nil, "Car"]'
+  name: '[nil, "n"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  type: nil
+  name: nil
+:serializable_hash:
+  id: nil
+  name: '"n"'
+  doors: '2'
+  wheels: '4'
+:as_json: '{"id" => nil, "name" => "n", "doors" => 2, "wheels" => 4}'
+:inspect: '#<Car id: nil, type: "Car", name: "n", doors: 2, wheels: 4>'
+== dup
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '{"k" => 1}'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  author_id: "[nil, 1]"
+  title: '["untitled", "one"]'
+  body: '[nil, "b"]'
+  score: "[nil, 5]"
+  data: '[nil, {"k" => 1}]'
+  title_upper: '[nil, "ONE"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+:serializable_hash:
+  id: nil
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => nil, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: nil, author_id: 1, title: "one", body: "b", score: 5, data:
+  {"k" => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== dup after write
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: nil
+    author_id: '1'
+    title: '"d"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"d"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '{"k" => 1}'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: '1'
+  title: '"d"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: nil
+  author_id: '1'
+  title: '"d"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  author_id: "[nil, 1]"
+  title: '["untitled", "d"]'
+  body: '[nil, "b"]'
+  score: "[nil, 5]"
+  data: '[nil, {"k" => 1}]'
+  title_upper: '[nil, "ONE"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: nil
+  data: nil
+  title_upper: nil
+:serializable_hash:
+  id: nil
+  author_id: '1'
+  title: '"d"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => nil, "author_id" => 1, "title" => "d", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: nil, author_id: 1, title: "d", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== clone
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== clone after write
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"c"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: '"cc"'
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"c"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - '"cc"'
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"c"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: '"cc"'
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"c"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: '"cc"'
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["one", "c"]'
+  note: '[nil, "cc"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"one"'
+  note: nil
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"c"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: '"cc"'
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "c", "body" => "b", "score" =>
+  5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" => "cc",
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "c", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: "cc", shout: nil>'
+== freeze
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== reset
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: nil
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - nil
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: nil
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: nil
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: nil
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => nil, "body" => "b", "score" =>
+  5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: nil, body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== reload
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"one"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"one"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"one"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "one", "body" => "b", "score"
+  => 5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "one", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== save
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '5'
+    data: '{"k" => 1}'
+    title_upper: '"ONE"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '5'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"ONE"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '5'
+  data: '"{\"k\":1}"'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '5'
+  data: '{"k" => 1}'
+  title_upper: '"ONE"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  5, "data" => {"k" => 1}, "title_upper" => "ONE", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 5, data: {"k"
+  => 1}, title_upper: "ONE", tags_count: 3, note: nil, shout: nil>'
+== update
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: '"u"'
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - '"u"'
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: '"u"'
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: '"u"'
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: '"u"'
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => "u",
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: "u", shout: nil>'
+== create
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '3'
+    author_id: nil
+    title: '"new"'
+    body: nil
+    score: '7'
+    data: nil
+    title_upper: '"NEW"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '3'
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"new"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - '7'
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - '"NEW"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '3'
+  author_id: nil
+  title: '"new"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: '"NEW"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '3'
+  author_id: nil
+  title: '"new"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: '"NEW"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '3'
+  author_id: nil
+  title: '"new"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: '"NEW"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 3, "author_id" => nil, "title" => "new", "body" => nil, "score"
+  => 7, "data" => nil, "title_upper" => "NEW", "tags_count" => 3, "note" => nil, "shout"
+  => nil}'
+:inspect: '#<Post id: 3, author_id: nil, title: "new", body: nil, score: 7, data:
+  nil, title_upper: "NEW", tags_count: 3, note: nil, shout: nil>'
+== Marshal 7.1
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"m"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"m"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"m"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"m"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"m"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "m", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "m", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil>'
+== Marshal 6.1 format
+--- 'case raised ArgumentError: Unknown marshalling format: 6.1'
+== Marshal 6.1 format new record
+--- 'case raised ArgumentError: Unknown marshalling format: 6.1'
+== YAML
+---
+:set:
+  :class: ActiveModel::AttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"y"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: nil
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"y"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - nil
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"y"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: nil
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"y"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: nil
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["s", "y"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"s"'
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"y"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: nil
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "y", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => nil, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "y", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: nil, note: nil, shout: nil>'
+== init_with
+---
+:set:
+  :class: ActiveModel::AttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil>'
+== deep_dup set
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil>'
+== message pack
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => nil,
+  "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil>'
+== ActiveModel::Attributes
+---
+:set:
+  :class: ActiveModel::AttributeSet
+  :keys:
+  - name
+  - count
+  :to_hash:
+    name: '"p"'
+    count: '1'
+  :each_value:
+  - - name
+    - true
+    - '"p"'
+  - - count
+    - true
+    - '1'
+  :key?:
+    name: true
+    count: true
+    id: false
+    title: false
+    note: false
+    tags_count: false
+    score: false
+    legacy: false
+    title_upper: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - name
+  - count
+  :consistent:
+  - true
+  - true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  name:
+  -
+  - p
+:as_json:
+  name: p
+  count: 1
+== declared after load: old record
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"before"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"before"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"before"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"before"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '["s", "before"]'
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  title: '"s"'
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"before"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "before", "body" => "b", "score"
+  => 11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" =>
+  nil, "shout" => nil}'
+:inspect: '#<Post id: 1, author_id: 1, title: "before", body: "b", score: 11, data:
+  {"k" => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil>'
+== declared after load: new load
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - late
+  :to_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '{"k" => 1}'
+    title_upper: '"S"'
+    tags_count: '3'
+    note: nil
+    shout: nil
+    late: '"x"'
+  :each_value:
+  - - id
+    - true
+    - '1'
+  - - author_id
+    - true
+    - '1'
+  - - title
+    - true
+    - '"s"'
+  - - body
+    - true
+    - '"b"'
+  - - score
+    - true
+    - '11'
+  - - data
+    - true
+    - '"{\"k\":1}"'
+  - - title_upper
+    - true
+    - '"S"'
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - late
+    - true
+    - '"x"'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    late: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - late
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- late
+:before_type_cast:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '"{\"k\":1}"'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:changed?: false
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+:serializable_hash:
+  id: '1'
+  author_id: '1'
+  title: '"s"'
+  body: '"b"'
+  score: '11'
+  data: '{"k" => 1}'
+  title_upper: '"S"'
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score" =>
+  11, "data" => {"k" => 1}, "title_upper" => "S", "tags_count" => 3, "note" => nil,
+  "shout" => nil, "late" => "x"}'
+:inspect: '#<Post id: 1, author_id: 1, title: "s", body: "b", score: 11, data: {"k"
+  => 1}, title_upper: "S", tags_count: 3, note: nil, shout: nil, late: "x">'
+== declared after load: new record
+---
+:set:
+  :class: ActiveModel::LazyIndexedAttributeSet
+  :keys:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - late
+  :to_hash:
+    id: nil
+    author_id: nil
+    title: '"untitled"'
+    body: nil
+    score: '7'
+    data: nil
+    title_upper: nil
+    tags_count: '3'
+    note: nil
+    shout: nil
+    late: '"x"'
+  :each_value:
+  - - id
+    - true
+    - nil
+  - - author_id
+    - true
+    - nil
+  - - title
+    - true
+    - '"untitled"'
+  - - body
+    - true
+    - nil
+  - - score
+    - true
+    - '7'
+  - - data
+    - true
+    - nil
+  - - title_upper
+    - true
+    - nil
+  - - tags_count
+    - true
+    - '3'
+  - - note
+    - true
+    - nil
+  - - shout
+    - true
+    - nil
+  - - late
+    - true
+    - '"x"'
+  :key?:
+    id: true
+    author_id: true
+    title: true
+    body: true
+    score: true
+    data: true
+    title_upper: true
+    tags_count: true
+    note: true
+    shout: true
+    late: true
+    legacy: false
+    extra: false
+    one: false
+    special: false
+    wheels: false
+    nope: false
+  :accessed:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - title_upper
+  - tags_count
+  - note
+  - shout
+  - late
+  :consistent:
+  - true
+  - true
+:attributes:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:attribute_names:
+- id
+- author_id
+- title
+- body
+- score
+- data
+- title_upper
+- tags_count
+- note
+- shout
+- late
+:before_type_cast:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:changed?: true
+:changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: "[nil, 7]"
+:changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  score: nil
+:serializable_hash:
+  id: nil
+  author_id: nil
+  title: '"untitled"'
+  body: nil
+  score: '7'
+  data: nil
+  title_upper: nil
+  tags_count: '3'
+  note: nil
+  shout: nil
+  late: '"x"'
+:as_json: '{"id" => nil, "author_id" => nil, "title" => "untitled", "body" => nil,
+  "score" => 7, "data" => nil, "title_upper" => nil, "tags_count" => 3, "note" =>
+  nil, "shout" => nil, "late" => "x"}'
+:inspect: '#<Post id: nil, author_id: nil, title: "untitled", body: nil, score: 7,
+  data: nil, title_upper: nil, tags_count: 3, note: nil, shout: nil, late: "x">'
+== declared mid-result
+---
+- :set:
+    :class: ActiveModel::LazyIndexedAttributeSet
+    :keys:
+    - id
+    - author_id
+    - title
+    - body
+    - score
+    - data
+    - legacy
+    - title_upper
+    :to_hash:
+      id: '1'
+      author_id: '1'
+      title: '"s"'
+      body: '"b"'
+      score: '11'
+      data: '"{\"k\":1}"'
+      legacy: nil
+      title_upper: '"S"'
+    :each_value:
+    - - id
+      - true
+      - '1'
+    - - author_id
+      - true
+      - '1'
+    - - title
+      - true
+      - '"s"'
+    - - body
+      - true
+      - '"b"'
+    - - score
+      - true
+      - '11'
+    - - data
+      - true
+      - '"{\"k\":1}"'
+    - - legacy
+      - true
+      - nil
+    - - title_upper
+      - true
+      - '"S"'
+    :key?:
+      id: true
+      author_id: true
+      title: true
+      body: true
+      score: true
+      data: true
+      legacy: true
+      title_upper: true
+      note: false
+      tags_count: false
+      extra: false
+      one: false
+      special: false
+      wheels: false
+      nope: false
+    :accessed:
+    - id
+    - author_id
+    - title
+    - body
+    - score
+    - data
+    - title_upper
+    :consistent:
+    - true
+    - true
+  :attributes:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '"{\"k\":1}"'
+    legacy: nil
+    title_upper: '"S"'
+  :attribute_names:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - legacy
+  - title_upper
+  :before_type_cast:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '"{\"k\":1}"'
+    legacy: nil
+    title_upper: '"S"'
+  :changed?: false
+  :changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :serializable_hash:
+    id: '1'
+    author_id: '1'
+    title: '"s"'
+    body: '"b"'
+    score: '11'
+    data: '"{\"k\":1}"'
+    legacy: nil
+    title_upper: '"S"'
+  :as_json: '{"id" => 1, "author_id" => 1, "title" => "s", "body" => "b", "score"
+    => 11, "data" => "{\"k\":1}", "legacy" => nil, "title_upper" => "S"}'
+  :inspect: '#<Mid id: 1, author_id: 1, title: "s", body: "b", score: 11, data: "{\"k\":1}",
+    legacy: nil, title_upper: "S">'
+- :set:
+    :class: ActiveModel::LazyIndexedAttributeSet
+    :keys:
+    - id
+    - author_id
+    - title
+    - body
+    - score
+    - data
+    - legacy
+    - title_upper
+    :to_hash:
+      id: '2'
+      author_id: nil
+      title: '"two"'
+      body: nil
+      score: nil
+      data: nil
+      legacy: nil
+      title_upper: '"TWO"'
+    :each_value:
+    - - id
+      - true
+      - '2'
+    - - author_id
+      - true
+      - nil
+    - - title
+      - true
+      - '"two"'
+    - - body
+      - true
+      - nil
+    - - score
+      - true
+      - nil
+    - - data
+      - true
+      - nil
+    - - legacy
+      - true
+      - nil
+    - - title_upper
+      - true
+      - '"TWO"'
+    :key?:
+      id: true
+      author_id: true
+      title: true
+      body: true
+      score: true
+      data: true
+      legacy: true
+      title_upper: true
+      note: false
+      tags_count: false
+      extra: false
+      one: false
+      special: false
+      wheels: false
+      nope: false
+    :accessed:
+    - id
+    - title
+    - title_upper
+    :consistent:
+    - true
+    - true
+  :attributes:
+    id: '2'
+    author_id: nil
+    title: '"two"'
+    body: nil
+    score: nil
+    data: nil
+    legacy: nil
+    title_upper: '"TWO"'
+  :attribute_names:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - legacy
+  - title_upper
+  :before_type_cast:
+    id: '2'
+    author_id: nil
+    title: '"two"'
+    body: nil
+    score: nil
+    data: nil
+    legacy: nil
+    title_upper: '"TWO"'
+  :changed?: false
+  :changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :serializable_hash:
+    id: '2'
+    author_id: nil
+    title: '"two"'
+    body: nil
+    score: nil
+    data: nil
+    legacy: nil
+    title_upper: '"TWO"'
+  :as_json: '{"id" => 2, "author_id" => nil, "title" => "two", "body" => nil, "score"
+    => nil, "data" => nil, "legacy" => nil, "title_upper" => "TWO"}'
+  :inspect: '#<Mid id: 2, author_id: nil, title: "two", body: nil, score: nil, data:
+    nil, legacy: nil, title_upper: "TWO">'
+- :set:
+    :class: ActiveModel::LazyIndexedAttributeSet
+    :keys:
+    - id
+    - author_id
+    - title
+    - body
+    - score
+    - data
+    - legacy
+    - title_upper
+    :to_hash:
+      id: '3'
+      author_id: nil
+      title: '"new"'
+      body: nil
+      score: '7'
+      data: nil
+      legacy: nil
+      title_upper: '"NEW"'
+    :each_value:
+    - - id
+      - true
+      - '3'
+    - - author_id
+      - true
+      - nil
+    - - title
+      - true
+      - '"new"'
+    - - body
+      - true
+      - nil
+    - - score
+      - true
+      - '7'
+    - - data
+      - true
+      - nil
+    - - legacy
+      - true
+      - nil
+    - - title_upper
+      - true
+      - '"NEW"'
+    :key?:
+      id: true
+      author_id: true
+      title: true
+      body: true
+      score: true
+      data: true
+      legacy: true
+      title_upper: true
+      note: false
+      tags_count: false
+      extra: false
+      one: false
+      special: false
+      wheels: false
+      nope: false
+    :accessed:
+    - id
+    - title
+    - score
+    - title_upper
+    :consistent:
+    - true
+    - true
+  :attributes:
+    id: '3'
+    author_id: nil
+    title: '"new"'
+    body: nil
+    score: '7'
+    data: nil
+    legacy: nil
+    title_upper: '"NEW"'
+  :attribute_names:
+  - id
+  - author_id
+  - title
+  - body
+  - score
+  - data
+  - legacy
+  - title_upper
+  :before_type_cast:
+    id: '3'
+    author_id: nil
+    title: '"new"'
+    body: nil
+    score: '7'
+    data: nil
+    legacy: nil
+    title_upper: '"NEW"'
+  :changed?: false
+  :changes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :changed_attributes: !ruby/hash:ActiveSupport::HashWithIndifferentAccess {}
+  :serializable_hash:
+    id: '3'
+    author_id: nil
+    title: '"new"'
+    body: nil
+    score: '7'
+    data: nil
+    legacy: nil
+    title_upper: '"NEW"'
+  :as_json: '{"id" => 3, "author_id" => nil, "title" => "new", "body" => nil, "score"
+    => 7, "data" => nil, "legacy" => nil, "title_upper" => "NEW"}'
+  :inspect: '#<Mid id: 3, author_id: nil, title: "new", body: nil, score: 7, data:
+    nil, legacy: nil, title_upper: "NEW">'
+INCONSISTENT: []

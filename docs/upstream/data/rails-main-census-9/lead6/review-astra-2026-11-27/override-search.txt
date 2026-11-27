@@ -1,0 +1,2 @@
+8b1c6428ea:activemodel/lib/active_model/attribute_set.rb:497:      def index_for_name(name)
+8b1c6428ea:activemodel/lib/active_model/attribute_set.rb:551:      def attribute_at(name, index)

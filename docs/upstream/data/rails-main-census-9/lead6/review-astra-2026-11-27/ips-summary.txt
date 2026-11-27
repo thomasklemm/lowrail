@@ -1,0 +1,8 @@
+Exploratory YJIT timings, best of 3 per side, one core, 2s warmup/5s time per case.
+Not JIT-gated; not suitable as body speed claims. Values read from rounded benchmark-ips output.
+update! of one column {'base': [5569.0, 5167.0, 5529.0], 'base2': [5378.0, 5562.0, 5621.0], 'head': [5825.0, 5738.0, 5910.0]}
+best i/s {'base': 5569.0, 'base2': 5621.0, 'head': 5910.0} head vs mean-base % 5.630026809651478 AA spread % 0.9294012511170688
+find, then changed? {'base': [17942.0, 17962.0, 17383.0], 'base2': [17106.0, 17415.0, 18138.0], 'head': [17418.0, 18105.0, 18266.0]}
+best i/s {'base': 17962.0, 'base2': 18138.0, 'head': 18266.0} head vs mean-base % 1.196675900277011 AA spread % 0.9750692520775623
+serializable_hash {'base': [48097.0, 50301.0, 51595.0], 'base2': [43139.0, 50117.0, 44609.0], 'head': [49142.0, 52310.0, 52034.0]}
+best i/s {'base': 51595.0, 'base2': 50117.0, 'head': 52310.0} head vs mean-base % 2.8590530124272373 AA spread % 2.9062450841591945

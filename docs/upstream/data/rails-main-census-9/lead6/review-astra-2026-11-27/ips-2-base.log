@@ -1,0 +1,10 @@
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+update! of one column   479.000 i/100ms
+  find, then changed?     1.690k i/100ms
+    serializable_hash     4.983k i/100ms
+Calculating -------------------------------------
+update! of one column      5.167k (± 9.3%) i/s  (193.54 μs/i) -     25.866k in   5.006062s
+  find, then changed?     17.962k (± 3.0%) i/s   (55.67 μs/i) -     91.260k in   5.080756s
+    serializable_hash     50.301k (± 3.7%) i/s   (19.88 μs/i) -    254.133k in   5.052202s

@@ -1,0 +1,22 @@
+--- /home/user/workspace/repo/docs/upstream/data/rails-main-census-9/lead6/review-astra-2026-11-27/probe-base.jsonl	2026-11-27 12:36:08.065408929 +0000
++++ /home/user/workspace/repo/docs/upstream/data/rails-main-census-9/lead6/review-astra-2026-11-27/probe-head.jsonl	2026-11-27 12:36:08.673412675 +0000
+@@ -74,13 +74,13 @@
+ [["callbacks","mutate"],[17,[["index","a"]]]]
+ [["callbacks","fiber"],[17,[["index","a"]]]]
+ [["callbacks","thread"],[17,[["index","a"]]]]
+-[["excluded nodoc override","indexes"],"RuntimeError","overridden indexes"]
++[["excluded nodoc override","indexes"],17]
+ [["excluded nodoc override keys","indexes"],"RuntimeError","overridden indexes"]
+-[["excluded nodoc override","index_for_name"],"RuntimeError","overridden index_for_name"]
+-[["excluded nodoc override keys","index_for_name"],"RuntimeError","overridden index_for_name"]
+-[["excluded nodoc override","lookup"],"RuntimeError","overridden lookup"]
+-[["excluded nodoc override keys","lookup"],"RuntimeError","overridden lookup"]
+-[["excluded nodoc override","attribute_at"],"RuntimeError","overridden attribute_at"]
++[["excluded nodoc override","index_for_name"],17]
++[["excluded nodoc override keys","index_for_name"],["a","b"]]
++[["excluded nodoc override","lookup"],17]
++[["excluded nodoc override keys","lookup"],["a","b"]]
++[["excluded nodoc override","attribute_at"],17]
+ [["excluded nodoc override keys","attribute_at"],["a","b"]]
+ ["becomes",["ActiveModel::ReindexedAttributeSet",{"id":1,"name":"right","count":3},{"id":1,"name":"right","count":3,"extra":91},["name"]]]
+ ["becomes marshal",{"id":1,"name":"right","count":3,"extra":91}]
