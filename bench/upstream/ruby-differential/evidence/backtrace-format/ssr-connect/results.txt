@@ -1,0 +1,15 @@
+Callgrind Ir per op, (300-op run - 100-op run) / 200, installed release builds; 2026-11-27.
+deep.rb: Net::HTTP.post to localhost:13714 (refused) 150 frames deep (react-starter-kit's Inertia SSR probe)
+  v4.0.9            1,599,337
+  master f3e180b5eb 1,802,392
+  bt-base 274cfe719a 1,803,992
+  bt-fix 5fc1871eec  1,556,835
+conn.rb (shallow stack): v4.0.9 688k, master 681k
+ex.rb 150 frames deep:
+  raise only:       v4.0.9 121,780  master 103,972
+  raise e, "msg":   v4.0.9 994,779  master 1,302,075  bt-base 1,306,835  bt-fix 1,073,962
+  File.open ENOENT: v4.0.9 149,203  master 110,886
+  TCPSocket 127.0.0.1 refused: v4.0.9 155,404  master 119,942
+  TCPSocket localhost refused: v4.0.9 208,524  master 177,520
+App: react-starter-kit, per request, master vs 4.0.9 sampled self Ir in Net::HTTP#connect:
+  GET dashboard: interp +155,866, yjit +144,508, zjit +168,180; GET settings sessions: yjit +164,284

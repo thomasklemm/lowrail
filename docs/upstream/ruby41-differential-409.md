@@ -64,7 +64,7 @@ Found from the perf matrix: react-starter-kit `GET home` (+9% interp Ir, A/A 0.3
 
 * **Cause.** `b9ad19da12` (nobu, "Format backtrace locations as Ruby strings", merged in ruby/ruby#17882, 2026-07-15) makes `location_format` use `"%"PRIsVALUE`, so each file and method name goes through `ruby__sfvextra` (`rb_obj_as_string`, `rb_enc_compatible`, `StringValueCStr`). `StringValueCStr` also raises `ArgumentError` for a path with a NUL byte: `eval("raise 'boom'", nil, "a\0b.rb")` has no printable backtrace on master (4.0.9 truncated at the NUL).
 * **Ownership.** Nothing on Redmine or in ruby/ruby PRs about backtrace speed or NUL paths since 2026-07; open #17978 (Bug #22197) touches labels, not `location_format`.
-* **Fix.** Append both strings by length with `ruby__sfvextra`'s encoding choice (`vm_backtrace.c` +20/-2, a test, `benchmark/vm_backtrace_to_s.yml`): `make benchmark` 1.18x over master, back to 4.0.9; react-starter-kit `GET home` -2.0% in-app (A/A 0.3%); a 2,728-case encoding probe is byte-identical to master; NUL paths now print in full. Queue item [BT1](../../bench/upstream/pr-queue/items/BT1.md), branch `thomasklemm/backtrace-format-length` on the fork, not opened; thermos-sol and Astra reviews running.
+* **Fix.** Append both strings by length with `ruby__sfvextra`'s encoding choice (`vm_backtrace.c` +20/-2, a test, `benchmark/vm_backtrace_to_s.yml`): `make benchmark` 1.18x over master, back to 4.0.9; react-starter-kit `GET home` -2.0% in-app (A/A 0.3%); a 2,728-case encoding probe is byte-identical to master; NUL paths now print in full. Queue item [BT1](../../bench/upstream/pr-queue/items/BT1.md): ruby/ruby#20261, open and ready (head `5fc1871eec`), approved by thermos-sol and Astra; its body shows `make benchmark` (1.18x–1.23x over 10 runs, A/A 1.00x–1.06x) and the JIT wall time (17.8%–19.3% less with ZJIT or YJIT, A/A −1.1% to +0.5%). The YJIT and ZJIT matrix finds the same cost again in react-starter-kit `GET dashboard` and `GET settings sessions` (`Net::HTTP#connect` +155k–168k Ir per request in all three modes): Inertia SSR is enabled with no render server, so every request re-raises `ECONNREFUSED` with a message 150 frames deep; with BT1 that connect costs 1.56M Ir instead of 1.80M (4.0.9: 1.60M).
 
 ## Action Pack and Action View after Bug #22419
 
@@ -75,10 +75,52 @@ regression. Details: [ruby-master-rails](ruby-master-rails.md#rerun-after-bug-22
 
 ## Performance
 
-Per-workload Callgrind instructions (`script/cpu-census run --aa`, fixed heap, A/A pair per Ruby, JIT-flat gate for YJIT and ZJIT in `cpu_harness.rb`).
+Per-workload Callgrind instructions (`script/cpu-census run --aa`, fixed heap, an A/A pair per Ruby, JIT-flat gate for YJIT and ZJIT in `cpu_harness.rb`) on the 6 censusrd apps (Rails main `cf0325a832`) and Campfire, Writebook and PingCRM (census41, their Rails 8.2 pins). A workload is flagged when it moves by more than twice its A/A and at least 1%. Raw JSON in `~/rdiff/cpu/{pm,pm2,po,po2}` on the orb; the tables below are from `perfcmp.rb`.
 
-**Interpreter, 6 censusrd apps, 54 workloads (complete):** median +0.56%; 10 flagged slower (beyond 2x A/A and 1%), 4 faster. The largest, blog `GET articles` (+5.9%) and react-starter-kit `GET home` (+9.0%), move with warmup count on both Rubies (blog master 10.21M at warmup 200, 9.68M at 600; 4.0.9 9.62M/9.57M): glibc malloc state (`malloc_consolidate`, `_int_malloc`) under the fixed heap, not Ruby code; not reported. What remains attributed to Ruby: Finding 3 (react-starter-kit, hackatime `GET dashboard` via the same backtrace lines), and `String.new` without arguments +174 Ir (12%) in the interpreter since `14285dee21` (byroot, "Optimize `String.new(capacity:)`", deliberate; `String.new(capacity:)` and `encoding:` got 10-20% faster), worth +0.8% on thinkroom `GET api doc`; not a regression report.
+| Mode | Workloads compared | Median master vs 4.0.9 | Flagged slower | Flagged faster |
+| --- | ---: | ---: | ---: | ---: |
+| Interpreter | 79 of 79 | +0.77% | 18 | 5 |
+| YJIT | 15 of 78 JIT-flat | −0.57% | 5 | 7 |
+| ZJIT | 32 of 78 JIT-flat | −26.6% | 0 | 31 |
 
-**YJIT, 6 censusrd apps:** 9 of 45 workloads pass the JIT-flat gate in all four runs (the rest still compile in the measured window on at least one run and are excluded, per docs/bench.md). Of those 9, median -1.22%; 1 flagged slower, codetriage `perform SendSingleTriageEmailJob` +1.31% (A/A 0.13%), 5 faster. react-starter-kit is missing one 4.0.9 run (`GET /settings/sessions` got HTTP 302 during warmup in one of four runs; to rerun after the matrix). No YJIT regression worth a bisect so far.
+**Interpreter.** censusrd median +0.56% (54 workloads), census41 +0.97% (25). What is attributed to Ruby:
 
-**ZJIT:** running (`pall` service); census41 apps (Campfire, Writebook, PingCRM) follow. Fizzy is not in the perf set: `script/census setup --corpus census41` on Rails main `cf0325a832` fails in `harness prepare` with `SystemStackError` from the app's own `config/initializers/uuid_primary_keys.rb` (its `build_schema_context` override calls `primary_key`, which on Rails main builds the schema context again); an app/Rails-main interaction, independent of Ruby.
+* Finding 3 (BT1): react-starter-kit and hackatime requests that build backtraces.
+* Finding 4 (IV1): every cached instance-variable write costs about 35 more instructions; in Campfire's `GET sidebar` that is about 43k of 15.2M per request.
+* `String.new` without arguments: +174 Ir (12%) since `14285dee21` (byroot, "Optimize `String.new(capacity:)`"), which is deliberate; worth +0.8% on thinkroom `GET api doc`.
+
+The rest of the census41 movement (+1% to +1.8% on Campfire, Writebook and PingCRM, pingcrm `GET dashboard` +5.0% with A/A 2.2%) is spread over Rack and Action Dispatch URL helpers and has no single cause above A/A. blog `GET articles` (+5.9%) and react-starter-kit `GET home` (+9.0%) also move with the warmup count on both Rubies: glibc malloc state under the fixed heap, not Ruby code.
+
+**YJIT.** Only 15 of 78 workloads are JIT-flat in all four runs; the rest still compile in the measured window and are excluded (docs/bench.md). Flagged slower:
+
+* react-starter-kit `PATCH profile invalid` +3.9%, `GET dashboard` +1.5% and `GET settings sessions` +1.1%: Finding 3. The app's Inertia SSR re-raises `ECONNREFUSED` 150 frames deep on every request.
+* codetriage `SendSingleTriageEmailJob` +1.31% (A/A 0.13%) and pingcrm `PUT contact` +1.79% (A/A 0.12%): spread over `Array#each` (now defined in Ruby) and URI escaping; small, not bisected.
+
+The react-starter-kit 4.0.9 run that had failed (HTTP 302) was rerun and is included.
+
+**ZJIT.** Master is 16% to 33% faster on every JIT-flat workload; nothing is slower. The one not flagged is thinkroom `GET api doc` (−17.1%), whose A/A is 22.6%.
+
+## Finding 4: instance-variable writes cost about 50% more in the interpreter (IV1)
+
+Found from the census41 interpreter deltas (`URI::Generic` setters, `host_with_port` and `base_url` in Campfire). Reduced to a method that writes one ivar against one that does not ([evidence/ivar-write](../../bench/upstream/ruby-differential/evidence/ivar-write)):
+
+* **Size.** A cached `@a = v` takes 72–78 Callgrind instructions on 4.0.9 and 109–114 on master `f3e180b5eb` (two runs each). The same holds with 3 and 12 ivars and for `attr_writer`. Reads are unchanged. YJIT is unchanged, and ZJIT is much faster on master (111 against 416 per 12 writes).
+* **Bisect** (miniruby builds without JIT, per-write count): two steps.
+  * `a440f23c70` (byroot, "Always inline `revalidate_setivar_cache`", 2026-05-04): 56 → 86. The three commits before it had brought 76 down to 56.
+  * `e0083cffa3` (byroot, "Refactor RObject to use T_IMEMO/fields_obj on overflow", 2026-07-13): 79 → 112.
+  * Between the steps, unrelated commits move the count by a few instructions.
+* **Cause.** Both are deliberate refactors. The extra source work per write is one embedded-or-extended branch and a NULL check, so most of the cost is in how GCC now compiles `vm_setivar`. Dropping the forced inline on master alone changes nothing (111).
+* **Reach.** All interpreted Ruby code and code not yet compiled by a JIT; about 0.3% of an interpreted Campfire request.
+* **Ownership.** Nothing on Redmine or in ruby/ruby PRs (searched 2026-11-27).
+* **State.** Queue item [IV1](../../bench/upstream/pr-queue/items/IV1.md) holds a draft Redmine report, not a fix. Posting needs Thomas, plus a `make benchmark` table from an a1.xxlarge orb and both reviews first.
+
+## Ranking
+
+By reach and severity, the real Ruby 4.1 regressions first:
+
+1. **BT1, backtrace formatting** (Finding 3). Every `caller`, `Exception#backtrace`, `Location#to_s` and every re-raise with a message (`Net::HTTP` connect errors, for example) pays about 26% more, and a NUL byte in a path raises. Fix open and ready: ruby/ruby#20261, reviewed, CI green.
+2. **TN1, `Time.iso8601` with impossible dates** (Finding 2). A wrong-result bug that time 0.5.0 carries into every Ruby 4.1. Fix ready: ruby/ruby#20208.
+3. **IV1, interpreter ivar writes** (Finding 4). +35 instructions per write, about 0.3% of an interpreted request; YJIT and ZJIT unaffected. A draft report, held for Thomas.
+4. **MO1, Mocha `ENV.stubs`** (Finding 1). A deliberate Ruby change (Bug #22291) that breaks Mocha suites stubbing ENV. freerange/mocha#809 is open.
+
+Not Ruby regressions: Discourse's `Symbol#to_s` `FrozenError` (an app bug), CASA's default-gem load order, actionview's `FileSystemResolverRactorTest` (Feature #22226, rails/rails#58736), `String.new` +12% (deliberate) and the malloc-state movements. With Bug #22419 fixed, Action Pack and Action View match 4.0.9 apart from that one test.
