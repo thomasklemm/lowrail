@@ -23,8 +23,9 @@ Until November 2026 Lowrail was a prototype that lowered Rails apps to specializ
 4. **Upstream.** Candidates wait in the [PR queue](bench/upstream/pr-queue/README.md); `script/pr-queue` opens one
    only when its repository has room and every review pass approves the exact head.
 
-Counted on 2026-11-27 (PRs opened since 2026-05-01, GitHub search): 84 merged in rails/rails and 17 in ruby/ruby, and
-more in Rack, Prism, sqlite3-ruby, hashie, inertia-rails, ruby-bench and other gems. The
+Counted on 2026-11-27 (PRs created since Lowrail started on 2026-10-19, GitHub search): 130 of 226 merged, 84 in
+rails/rails and 17 in ruby/ruby, and more in Prism, graphql-ruby, sqlite3-ruby, hashie, inertia-rails, ruby-bench and
+other gems. The
 [contributions ledger](docs/upstream/contributions.md) lists every merged, open and closed PR with its measured result
 and caveats, and the candidates investigated and not submitted, with the reasons. Our merged Rails PRs measured
 together save 5.48% of allocations across 104 workloads in eleven apps

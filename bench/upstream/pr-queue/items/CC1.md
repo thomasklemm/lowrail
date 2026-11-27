@@ -1,6 +1,6 @@
 ---
 id: CC1
-repo: CanCanCommunity/cancancan
+repo: coorasse/cancancan
 fork: thomasklemm/cancancan
 kind: perf
 area: Rule#initialize
