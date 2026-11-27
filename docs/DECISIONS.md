@@ -210,6 +210,11 @@ column, row, link and sentence: would the reader miss it? If not, drop it. Bodie
   the most used first, and name a few strong ones rather than a long list.
 * **Maintainers can edit our branches** (2026-11-06): "Allow edits by maintainers" on (`script/pr-queue open` sets
   it); our forks hold no Actions secrets.
+* **Fix the shared helper, write code like a person would** (Thomas, 2026-11-27, after ruby/uri#276): when the
+  avoidable work sits in a helper that several callers share, improve the helper so every caller gains, instead of
+  special-casing one public method or copying the helper's checks into it. The result should read like code the
+  maintainers would have written themselves: no duplicated logic, no one-caller fast paths, names and structure
+  that keep it reusable. Measure each caller that changes.
 * **Few, clean commits; the reasoning goes in their messages** (2026-11-06).
 * **Code shape maintainers changed before merging** (merged-PR audit, 2026-11-27): guard a nil once before a loop
   instead of `&.` per iteration; name a compound guard as private predicates, with one why-line where a reader would
