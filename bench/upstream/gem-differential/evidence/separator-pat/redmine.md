@@ -1,10 +1,10 @@
 Tracker: Bug. Subject:
 
-bundle install fails with "uninitialized constant Pathname::SEPARATOR_PAT" for lockfiles from Bundler before 4.0.12
+bundle install can fail with "uninitialized constant Pathname::SEPARATOR_PAT" for lockfiles from older Bundler
 
 Description:
 
-On master, `bundle install` fails when the lockfile was written by Bundler 2.3 to 4.0.11 and has a path or git gem with files, such as the gem of a repository whose Gemfile says `gemspec`:
+On master, `bundle install` can fail when the lockfile was written by an older Bundler, such as 2.6.9, and has a path or git gem with files, for example the gem of a repository whose Gemfile says `gemspec`:
 
 ```
 Bundler 4.1.1 is running, but your lockfile was generated with 2.6.9. Installing Bundler 2.6.9 and restarting using that version.
@@ -12,7 +12,7 @@ NameError: uninitialized constant Pathname::SEPARATOR_PAT
   .../gems/bundler-2.6.9/lib/bundler/source/path.rb:218:in 'block in Bundler::Source::Path#generate_bin'
 ```
 
-Bundler switches to the version in `BUNDLED WITH`, and those versions read `Pathname::SEPARATOR_PAT` while checking the files of a path or git gem. 4e243c709e made the constant private and a5996718f3 removed it; Bundler itself stopped using it in https://github.com/ruby/rubygems/pull/9529. Lockfiles with only rubygems.org gems still install. Plain `bundle update --bundler` runs the old Bundler and fails the same way; `bundle _4.1.1_ update --bundler` updates the lockfile.
+Bundler switches to the version in `BUNDLED WITH`, and Bundler 2.6.9 reads `Pathname::SEPARATOR_PAT` while checking the files of a path or git gem ([path.rb:218](https://github.com/ruby/rubygems/blob/8a2a14d63da701e980f856d8772d273fd448b8a1/bundler/lib/bundler/source/path.rb#L218)). 4e243c709e made the constant private and a5996718f3 removed it; Bundler 4.0.12 removed this use (https://github.com/ruby/rubygems/pull/9529). Lockfiles with only rubygems.org gems still install. Plain `bundle update --bundler` runs the old Bundler and fails the same way; `bundle _4.1.1_ update --bundler` updates the lockfile.
 
 To reproduce (Ruby 4.0 installs, master raises):
 
