@@ -270,3 +270,20 @@ base suites and original build evidence. No full test-all, new JIT/sanitizer bui
 this reviewer for this confirm; the coordinator's pending full-suite work is separate. No upstream post,
 body PATCH or Ruby-fork push was performed. The queue's top-level head remains coordinator-owned until
 publication; this pass names the exact unpublished commit rather than rewriting older passes.
+
+## Final paragraph delta confirm, 2026-11-27
+
+Verdict: **approve**, no open findings. Head remains `5fc1871eec45270a068d2ecba6654eef979c5f6e`.
+Verified the exact outgoing `PrQueue.parse(...).body` at Lowrail `2c618012` hashes to
+`b1ab8a6ba7c9d2860daa0139dc47630c37e5d8a8b0befc39fe687c78a8fb898b` and equals `body-proposed.md`.
+Only the last paragraph differs from the preceding reviewed body; the example and code are unchanged.
+
+Read the new DECISIONS rule in `b8bb21a0`: a correctness fix closing a performance regression shows
+numbers, using a Callgrind line with A/A when wall time is too noisy, with the older release in one sentence.
+The revised paragraph follows it. Master/head counts come first, remain explicitly instructions, and
+round correctly from the already-audited measurements. The separate 4.0.9 sentence's "back to 4.0's cost"
+means approximately the earlier instruction cost in this context, not exact equality or elapsed time.
+The selected five-of-seven wall-time range is gone, resolving the nit. The final sentence accurately
+describes the retained noisy A/A evidence without claiming a wall-time result or promising a clean one.
+No further text change is required. This is a text-only confirm: no rebuild, suite/oracle rerun, or new
+measurement; all prior exact-head validation and its limitations remain in force. No upstream action.

@@ -166,6 +166,22 @@ passes:
       logs: evidence/backtrace-format/thermos-sol/confirm-5fc1871eec.tar.gz; results.txt indexes both passes.
       Probe scripts remain in this orb backup. No full test-all, JIT/sanitizer/other-architecture runs, upstream
       posts or Ruby fork pushes in this follow-up.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Text-only delta confirm at Lowrail 2c618012; outgoing parsed body SHA-256
+      b1ab8a6ba7c9d2860daa0139dc47630c37e5d8a8b0befc39fe687c78a8fb898b matches the evidence copy.
+      Only the last paragraph changed. Read DECISIONS b8bb21a0's explicit rule for regression-closing
+      correctness fixes: this body follows its Callgrind/A/A fallback and separate older-release sentence.
+      Master/head instruction counts retain the audited rounding; 'back to 4.0's cost' describes approximate
+      instruction cost, not elapsed time or exact equality. Removing the selected five-of-seven wall-time
+      range resolves the nit. The closing sentence accurately describes the noisy A/A and makes no numerical
+      wall-time claim. No further text changes required. Prior exact-head parser suites, btest, oracle and
+      GC.stress evidence applies unchanged; no rebuild, test rerun or new measurement for this text delta.
+      Details: evidence/backtrace-format/astra/review.md, Final paragraph delta confirm. No upstream action.
 ---
 
 # Append backtrace location strings by length
