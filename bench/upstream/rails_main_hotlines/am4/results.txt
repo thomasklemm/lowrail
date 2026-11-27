@@ -20,3 +20,11 @@ Rails tests on 3c0cab74af:
 Found by the heavy-app slice: Discourse on main, spec/ LoadError from action_mailer/test_helper.rb:4 via
 action_mailer/railtie.rb:67 (on_load :action_dispatch_integration_test), loaded by require "rspec/rails";
 bisected to ed17c90871 (#59820). Record: bench/upstream/rails_main_hotlines/slice-casa-chatwoot-discourse-flow-loomio-mastodon-sure.md
+
+Amended to 35b7671119 (Astra changes on 3c0cab74af): the rescue re-raises unless the missing file is active_job itself.
+nested_probe.rb (Active Job available, globalid hidden from $LOAD_PATH)
+  088fc0cf61 and 8.1.4.1: LoadError global_id
+  3c0cab74af: NameError uninitialized constant ActiveJob::TestHelper (the LoadError was swallowed)
+  35b7671119: LoadError global_id
+35b7671119: probe.rb 2 runs 0 failures; app_probe.rb 3 runs 0 failures; actionmailer bin/test 291 runs 0 failures;
+  railties integration_test_case_test.rb under strict warnings 5 runs 0 failures, no warnings
