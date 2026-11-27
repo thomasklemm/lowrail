@@ -60,6 +60,11 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
 * Reach: in this differential every committed lock with Bundler < 4.0.12 and a PATH section fails, and no other lock
   does. Apps with git gems have the same shape, e.g. forem's main lock (BUNDLED WITH 2.4.17, two GIT/PATH sections).
   The fix per repository is `bundle update --bundler`.
+* Scope: lockfiles with only rubygems.org gems still install on master after Bundler switches to 2.4.2, 2.6.9 or
+  4.0.11 ([`separator_pat_rubygems_only.sh`](../../bench/upstream/gem-differential/repros/separator_pat_rubygems_only.sh)).
+  Master tip `274cfe719a` changes none of the files involved since `a1a9f45587`.
+* Redmine draft (the coordinator's recommendation, pending Thomas; not posted):
+  [`redmine.md`](../../bench/upstream/gem-differential/evidence/separator-pat/redmine.md), with its repro run as written.
 * Candidate: queue item [SEP1](../../bench/upstream/pr-queue/items/SEP1.md), a four-line restore with
   `deprecate_constant` and one test, [patch](../../bench/upstream/gem-differential/evidence/separator-pat), on master
   `a1a9f45587`: the repros pass, `make test-all TESTS=pathname` 298 tests 0 failures, the new test errors without the

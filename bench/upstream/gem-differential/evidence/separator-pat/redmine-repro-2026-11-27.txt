@@ -1,0 +1,11 @@
+== v4.0.10
+Writing lockfile to /tmp/redm.hB8D/foo/Gemfile.lock
+Bundler 4.0.20 is running, but your lockfile was generated with 2.6.9. Installing Bundler 2.6.9 and restarting using that version.
+Bundle complete! 1 Gemfile dependency, 2 gems now installed.
+exit=0
+== master-a1a9f45587
+Writing lockfile to /tmp/redm.a1wU/foo/Gemfile.lock
+Bundler 4.1.1 is running, but your lockfile was generated with 2.6.9. Installing Bundler 2.6.9 and restarting using that version.
+NameError: uninitialized constant Pathname::SEPARATOR_PAT
+  /tmp/redm.a1wU/vendor/ruby/4.1.0+7/gems/bundler-2.6.9/lib/bundler/source/path.rb:218:in 'block in Bundler::Source::Path#generate_bin'
+exit=0
