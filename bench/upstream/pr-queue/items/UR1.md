@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "a04eb03dc6f24b906f370b1965b7cba0b87006d9"
+head: "e2d2e21a570516424a3a935e5ab2a67db0ac53d0"
 base: master
 built_on: "48cda77031"
 depends_on: []

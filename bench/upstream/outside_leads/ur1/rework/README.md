@@ -51,3 +51,4 @@ passes every assertion; 14 mutants each caught wherever their path runs. Fork CI
 JRuby/ubuntu attempt failed in Bundler's jar dependency resolution before tests; rerun green).
 
 Commit message amended to a04eb03 (same tree 3621b78834) after Astra: on TruffleRuby it is CGI.unescapeURIComponent, not CGI.unescape, that keeps the String subclass.
+Amended again to e2d2e21 (same tree) after thermos-sol: dropped the unqualified "CGI.unescape is slower than the gsub" clause; Fable measured percent-dense input going the other way.
