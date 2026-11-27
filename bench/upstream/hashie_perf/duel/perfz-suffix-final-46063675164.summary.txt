@@ -1,0 +1,64 @@
+zjit / Duel (zjit)	ruby 4.0.10 (2026-11-19 revision a704b7cd95) +ZJIT +PRISM [x86_64-linux]
+zjit / Duel (zjit)	Bundle complete! 25 Gemfile dependencies, 119 gems now installed.
+zjit / Duel (zjit)	  Dash.new: required properties and defaults         3.9s n=289    cpu 0.986 [0.982, 0.992] same  allocations 3
+zjit / Duel (zjit)	  Dash: read and write properties                    3.8s n=958    cpu 1.008 [1.002, 1.017] same  allocations 0
+zjit / Duel (zjit)	  Trash.new: renamed and transformed properties      3.9s n=244    cpu 0.994 [0.983, 1.006] same  allocations 4
+zjit / Duel (zjit)	  Dash.new: coerced properties                       3.9s n=195    cpu 1.010 [1.003, 1.020] same  allocations 7
+zjit / Duel (zjit)	  Dash.new: String keys with IndifferentAccess       4.0s n=151    cpu 0.998 [0.990, 1.004] same  allocations 32
+zjit / Duel (zjit)	  Dash.new: coerced nested Dashes                    4.0s n=90     cpu 0.997 [0.992, 1.003] same  allocations 16
+zjit / Duel (zjit)	  Mash: read keys given as Symbols as methods        3.9s n=649    cpu 1.023 [1.018, 1.027] same  allocations 5
+zjit / Duel (zjit)	  KeepOriginalKeys: read Symbol keys as methods      4.0s n=602    cpu 1.001 [0.992, 1.011] same  allocations 5
+zjit / Duel (zjit)	  KeepOriginalKeys: read String keys as methods      3.9s n=386    cpu 1.003 [0.997, 1.009] same  allocations 5
+zjit / Duel (zjit)	  PermissiveRespondTo: include in a Mash subclass    4.1s n=66     cpu 1.002 [1.000, 1.005] same  allocations 15
+zjit / Duel (zjit)	  Mash.new: a flat Hash                              3.9s n=651    cpu 1.000 [0.995, 1.005] same  allocations 3
+zjit / Duel (zjit)	  PermissiveRespondTo: Mash.new                      3.9s n=453    cpu 1.005 [1.001, 1.010] same  allocations 3
+zjit / Duel (zjit)	  PermissiveRespondTo: write a new key as a method   4.0s n=453    cpu 0.993 [0.990, 0.997] same  allocations 5→4
+zjit / Duel (zjit)	  PermissiveRespondTo: overwrite a key as a method   3.9s n=427    cpu 0.994 [0.991, 0.998] same  allocations 5→4
+zjit / Duel (zjit)	  IndifferentAccess: new from a nested JSON response   5.2s n=24     cpu 0.999 [0.996, 1.003] same  allocations 252
+zjit / Duel (zjit)	  IndifferentAccess: read String and Symbol keys     3.9s n=871    cpu 0.992 [0.987, 0.998] same  allocations 0
+zjit / Duel (zjit)	  IndifferentAccess: write String and Symbol keys    3.8s n=1214   cpu 0.986 [0.980, 0.992] same  allocations 0
+zjit / Duel (zjit)	  DeepFind and DeepFetch: nested keys                4.4s n=54     cpu 1.001 [0.994, 1.007] same  allocations 105
+zjit / Duel (zjit)	  Mash.new: a nested JSON response                   4.4s n=28     cpu 1.002 [0.998, 1.007] same  allocations 25.64
+zjit / Duel (zjit)	  Mash: read keys as methods                         3.8s n=569    cpu 1.008 [1.001, 1.013] same  allocations 5
+zjit / Duel (zjit)	  Mash: read keys with suffixes                      4.0s n=305    cpu 0.979 [0.977, 0.982] same  allocations 16→13
+zjit / Duel (zjit)	  Mash: read keys with [] and dig                    3.9s n=832    cpu 1.000 [0.998, 1.003] same  allocations 4
+zjit / Duel (zjit)	  Mash: write new keys as methods                    4.1s n=694    cpu 0.985 [0.981, 0.989] same  allocations 5→4
+zjit / Duel (zjit)	  Mash: overwrite a key as a method                  3.9s n=537    cpu 0.986 [0.982, 0.990] same  allocations 6→5
+zjit / Duel (zjit)	  Mash: respond_to? a key, a suffix and a missing name   3.9s n=939    cpu 0.993 [0.991, 0.996] same  allocations 1
+zjit / Duel (zjit)	  Mash#deep_merge: a nested update                   4.5s n=26     cpu 1.006 [1.001, 1.010] same  allocations 31.92
+zjit / Duel (zjit)	  Mash#to_hash: a nested Mash                        4.1s n=52     cpu 0.994 [0.987, 1.001] same  allocations 10
+zjit / Duel (zjit)	across the board: cpu 0.998 [0.996, 1.001] same (limit 1.0125, 27 benchmarks)
+zjit / Duel (zjit)	27 benchmarks in 114s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+zjit / Duel (zjit)	Artifact duel-report-zjit has been successfully uploaded! Final size is 1347 bytes. Artifact ID is 15229643195
+yjit / Duel (yjit)	ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+yjit / Duel (yjit)	Bundle complete! 25 Gemfile dependencies, 119 gems now installed.
+yjit / Duel (yjit)	  Dash.new: required properties and defaults         5.1s n=1050   cpu 0.995 [0.986, 1.005] same  allocations 3
+yjit / Duel (yjit)	  Dash: read and write properties                    4.1s n=2572   cpu 1.005 [0.989, 1.023] same  allocations 0
+yjit / Duel (yjit)	  Trash.new: renamed and transformed properties      4.0s n=602    cpu 1.005 [0.991, 1.018] same  allocations 4
+yjit / Duel (yjit)	  Dash.new: coerced properties                       4.1s n=450    cpu 1.001 [0.994, 1.008] same  allocations 7
+yjit / Duel (yjit)	  Dash.new: String keys with IndifferentAccess       4.2s n=223    cpu 0.999 [0.991, 1.008] same  allocations 32
+yjit / Duel (yjit)	  Dash.new: coerced nested Dashes                    4.1s n=181    cpu 0.994 [0.987, 1.001] same  allocations 16
+yjit / Duel (yjit)	  Mash: read keys given as Symbols as methods        4.0s n=1307   cpu 1.000 [0.989, 1.009] same  allocations 5
+yjit / Duel (yjit)	  KeepOriginalKeys: read Symbol keys as methods      3.9s n=1325   cpu 0.993 [0.976, 1.012] same  allocations 5
+yjit / Duel (yjit)	  KeepOriginalKeys: read String keys as methods      4.0s n=853    cpu 1.005 [0.989, 1.017] same  allocations 5
+yjit / Duel (yjit)	  PermissiveRespondTo: include in a Mash subclass    4.0s n=64     cpu 0.996 [0.990, 1.004] same  allocations 15
+yjit / Duel (yjit)	  Mash.new: a flat Hash                              3.9s n=1356   cpu 0.995 [0.987, 1.002] same  allocations 3
+yjit / Duel (yjit)	  PermissiveRespondTo: Mash.new                      3.9s n=730    cpu 1.004 [0.989, 1.018] same  allocations 3
+yjit / Duel (yjit)	  PermissiveRespondTo: write a new key as a method   4.1s n=625    cpu 1.014 [1.001, 1.026] same  allocations 5→4
+yjit / Duel (yjit)	  PermissiveRespondTo: overwrite a key as a method   3.8s n=576    cpu 1.014 [1.002, 1.025] same  allocations 5→4
+yjit / Duel (yjit)	  IndifferentAccess: new from a nested JSON response   4.5s n=22     cpu 1.002 [0.993, 1.010] same  allocations 252
+yjit / Duel (yjit)	  IndifferentAccess: read String and Symbol keys     4.0s n=1166   cpu 1.000 [0.990, 1.009] same  allocations 1
+yjit / Duel (yjit)	  IndifferentAccess: write String and Symbol keys    3.9s n=1416   cpu 1.005 [0.997, 1.012] same  allocations 0
+yjit / Duel (yjit)	  DeepFind and DeepFetch: nested keys                4.4s n=100    cpu 1.000 [0.993, 1.009] same  allocations 105
+yjit / Duel (yjit)	  Mash.new: a nested JSON response                   4.3s n=52     cpu 1.003 [0.997, 1.009] same  allocations 25.35
+yjit / Duel (yjit)	  Mash: read keys as methods                         3.9s n=1011   cpu 1.001 [0.994, 1.009] same  allocations 5
+yjit / Duel (yjit)	  Mash: read keys with suffixes                      4.0s n=495    cpu 1.006 [0.998, 1.015] same  allocations 16→13
+yjit / Duel (yjit)	  Mash: read keys with [] and dig                    3.9s n=2084   cpu 1.012 [1.003, 1.022] same  allocations 4
+yjit / Duel (yjit)	  Mash: write new keys as methods                    4.0s n=1004   cpu 0.996 [0.989, 1.004] same  allocations 5→4
+yjit / Duel (yjit)	  Mash: overwrite a key as a method                  3.9s n=842    cpu 1.000 [0.991, 1.008] same  allocations 6→5
+yjit / Duel (yjit)	  Mash: respond_to? a key, a suffix and a missing name   3.9s n=1528   cpu 1.006 [1.001, 1.012] same  allocations 1
+yjit / Duel (yjit)	  Mash#deep_merge: a nested update                   4.0s n=40     cpu 1.006 [0.999, 1.013] same  allocations 31.6
+yjit / Duel (yjit)	  Mash#to_hash: a nested Mash                        4.0s n=162    cpu 1.010 [1.000, 1.019] same  allocations 10
+yjit / Duel (yjit)	across the board: cpu 1.003 [1.001, 1.006] same (limit 1.0125, 27 benchmarks)
+yjit / Duel (yjit)	27 benchmarks in 114s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+yjit / Duel (yjit)	Artifact duel-report-yjit has been successfully uploaded! Final size is 1332 bytes. Artifact ID is 15230615812
