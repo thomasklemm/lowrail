@@ -1,0 +1,10 @@
+4,5c4,5
+< TagBuilder#tag_options override, tag(:input)	"<input class=\"c\" />"	[[:tag_options, 1], [:view_tag, 1]]
+< TagBuilder#tag_options override, tag.br	"<br class=\"c\">"	[[:tag_options, 1], [:view_tag, 1]]
+---
+> TagBuilder#tag_options override, tag(:input)	"<input class=\"c\" />"	[[:view_tag, 1]]
+> TagBuilder#tag_options override, tag.br	"<br class=\"c\">"	[[:view_tag, 1]]
+8c8
+< Hash subclass merge, hidden_field_tag	"<input type=\"hidden\" name=\"q\" id=\"q\" value=\"v\" class=\"c\" autocomplete=\"off\" />"	[[:merge, 1], [:tag_options, 1], [:view_tag, 1]]
+---
+> Hash subclass merge, hidden_field_tag	"<input type=\"hidden\" name=\"q\" id=\"q\" value=\"v\" class=\"c\" autocomplete=\"off\" />"	[[:merge, 1], [:view_tag, 1]]
