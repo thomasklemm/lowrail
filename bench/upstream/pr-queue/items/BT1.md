@@ -326,6 +326,25 @@ passes:
       raw-data/JIT-flat audit and unchanged-head correctness evidence apply. No new build, test or benchmark
       run. Details: evidence/backtrace-format/astra/review.md, JIT spread and A/A text confirm.
       No upstream action or Ruby-fork push.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      No must-fixes. Disclosure-only confirm of Lowrail d4337183, reviewed after syncing main to 514f733e.
+      Exact parsed/copied body SHA-256 67ceebdfb89bff59f67180cc481466f6824ebcd46d5959a60e711358ef58e3e8.
+      Verified that the supplied JIT sentence is the sole addition to posted body 05fff894a6. Recomputed
+      all six cells' combined bounds from the unchanged results.json files and checked both tables:
+      reductions 17.831902%-19.337104%, change-interval endpoints -19.782831% to -17.365084%, A/A medians
+      -1.090636% to +0.472239%, A/A interval endpoints -8.717567% to +3.633162%. Every displayed range
+      rounds correctly, with 30 rounds per case and mode. The plural intervals describe their endpoint
+      envelope, not a pooled confidence interval. The added spread and A/A resolve the preceding sole
+      finding and meet DECISIONS; the qualitative fallback is unnecessary. Verified that the evidence,
+      estimator and rule are unchanged since the preceding full 180-process audit, which still applies.
+      Exact local Ruby head remains 5fc1871eec with a clean worktree. Prior source/runtime approval remains
+      unchanged; no rebuild, new measurements or runtime test rerun for this text delta. Detailed arithmetic:
+      evidence/backtrace-format/thermos-sol/results.txt. No upstream post or Ruby fork push.
 ---
 
 # Append backtrace location strings by length

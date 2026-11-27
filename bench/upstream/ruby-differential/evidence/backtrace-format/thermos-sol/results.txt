@@ -183,3 +183,27 @@ none was dropped. No counter movement or numerical discrepancy was found.
 Exact local Ruby head still 5fc1871eec, worktree clean. Prior code/parser/differential approval remains unchanged.
 No new runtime build, measurements or test rerun for this text-only audit. Applied both loaded Thermos rubrics
 personally, without delegation as requested. No upstream post or Ruby fork push; outgoing body left unchanged.
+
+JIT spread/A/A disclosure confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head remains 5fc1871eec45270a068d2ecba6654eef979c5f6e; source revision d4337183, reviewed on Lowrail 514f733e.
+Exact parsed/copied body SHA-256 67ceebdfb89bff59f67180cc481466f6824ebcd46d5959a60e711358ef58e3e8.
+Verdict approve, no must-fixes. Verified the supplied JIT sentence is the only addition to posted body 05fff894a6.
+The sentence now includes its change-interval spread and A/A, satisfying DECISIONS, Correctness fixes, and closing
+the preceding disclosure finding. Keeping the percentage is supported; the qualitative fallback is unnecessary.
+
+Reread both jit-wall-2026-11-27 tables and recomputed the four combined ranges from the six results.json cells:
+  reduction estimates: 17.831901968% to 19.337104256% -> 17.8%-19.3% less time
+  change-interval endpoints: -19.782831054% to -17.365083730% -> -19.8% to -17.4%
+  A/A estimates: -1.090635651% to +0.472239102% -> -1.1% to +0.5%
+  A/A interval endpoints: -8.717566971% to +3.633161853% -> -8.7% to +3.6%
+The sentence lists the change endpoints in the opposite direction, from smaller to larger reduction; the values
+are correct. Plural intervals refers to the envelope of the six individual 95% intervals, not a newly pooled
+confidence interval. Each of the six cells has 30 rounds. All display bounds round correctly and retain the noisy
+ZJIT control rather than substituting the interpreter A/A or implying 1% precision.
+
+Verified no Git diff since 4a889cf6 in the JIT evidence, script/upstream-bench or docs/DECISIONS.md. The preceding
+180-process raw audit and interval/gate reproduction therefore apply unchanged. Ran the exact-hash/delta/range
+checker with Ruby 4.0.9; script and full output remain in this orb backup. No new measurements, runtime build or
+test rerun for this text-only confirm. Exact local Ruby head remains 5fc1871eec, worktree clean; prior source,
+parser and differential approval remains unchanged. No upstream post or Ruby-fork push; outgoing body untouched.
