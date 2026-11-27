@@ -15,7 +15,7 @@ This appends both strings by their length instead, choosing the encoding the sam
 
 This makes backtraces faster again. Under Callgrind, one `caller` on a 150-frame stack takes 1.09M instructions on master and 0.85M with this change, and `Exception#backtrace` 1.10M and 0.86M; repeated runs agree within 0.03%.
 
-`make benchmark ITEM=vm_backtrace_to_s` with the included benchmark, median of 10 runs:
+`make benchmark ITEM=vm_backtrace_to_s` with the included benchmark, one representative run:
 
 ```
 compare-ruby: ruby 4.1.0dev (2026-11-27T13:11:57Z HEAD 274cfe719a) +PRISM [x86_64-linux]
