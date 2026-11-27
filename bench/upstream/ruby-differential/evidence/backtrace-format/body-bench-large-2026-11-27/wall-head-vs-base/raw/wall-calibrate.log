@@ -1,0 +1,3 @@
+calibrate Location#to_s	3.444672466666665e-05
+calibrate caller	3.746614500000001e-05
+calibrate Exception#backtrace	3.723563733333331e-05

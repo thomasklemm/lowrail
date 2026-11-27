@@ -1,0 +1,24 @@
+# 2026-11-27T18:20:40Z taskset -c 3 make -C /home/user/w/build-head benchmark ITEM=vm_backtrace_to_s COMPARE_RUBY=/home/user/w/rb-base/bin/ruby OPTS="--repeat-count 10"
+make: Entering directory '/home/user/w/build-head'
+/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby --disable=gems "/home/user/w/ruby-head/tool/mkdepend.rb" --root="/home/user/w/ruby-head" \
+     --scope=core --output=.deps
+/home/user/.local/share/mise/installs/ruby/4.0.7/bin/ruby --disable=gems -rrubygems -I/home/user/w/ruby-head/benchmark/lib \
+    -e "files = %w[]" \
+    -e "files = Dir.glob(['vm_backtrace_to_s', '*vm_backtrace_to_s*.yml', '*vm_backtrace_to_s*.rb'], base: '/home/user/w/ruby-head/benchmark').reject(&:empty?).sort.uniq.map {|f| '/home/user/w/ruby-head/benchmark/' + f} if files.empty?" \
+    -e "if sep = File::ALT_SEPARATOR" \
+    -e   "ARGV.map! {|a| a.start_with?('--executables') ? a.gsub(sep, '/') : a}" \
+    -e "end" \
+    -e "ARGV.concat(files)" \
+    -e "load '/home/user/w/ruby-head/benchmark/benchmark-driver/exe/benchmark-driver'" -- \
+    --executables="compare-ruby::/home/user/w/rb-base/bin/ruby -I.ext/common --disable-gem" \
+    --executables="built-ruby::./miniruby -I/home/user/w/ruby-head/lib -I. -I.ext/common  /home/user/w/ruby-head/tool/runruby.rb --extout=.ext  -- --disable-gems --disable-gem" \
+    --output=markdown --output-compare -v --repeat-count 10
+compare-ruby: ruby 4.1.0dev (2026-11-27T13:11:57Z HEAD 274cfe719a) +PRISM [x86_64-linux]
+built-ruby: ruby 4.1.0dev (2026-11-27T16:39:23Z HEAD e75b1f0109) +PRISM [x86_64-linux]
+# Iteration per second (i/s)
+
+|                   |compare-ruby|built-ruby|
+|:------------------|-----------:|---------:|
+|vm_backtrace_to_s  |     36.791k|   44.872k|
+|                   |           -|     1.22x|
+make: Leaving directory '/home/user/w/build-head'

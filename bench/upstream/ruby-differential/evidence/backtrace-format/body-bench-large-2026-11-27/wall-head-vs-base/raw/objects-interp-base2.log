@@ -1,0 +1,3 @@
+objects Location#to_s	105.999
+objects caller	119.0
+objects Exception#backtrace	121.0
