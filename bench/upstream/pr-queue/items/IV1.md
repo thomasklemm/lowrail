@@ -19,7 +19,7 @@ state: held
 pr:
 evidence:
   - bench/upstream/ruby-differential/evidence/ivar-write
-note: "Found in the Ruby 4.1 differential (2026-11-27). Report draft, not a fix: both steps come from deliberate refactors, and the extra source work per write is one layout branch and a NULL check, so the cost is in how GCC compiles vm_setivar into the interpreter, not a logic bug. Removing the forced inline from rb_setivar_cache_revalidate on master changes nothing (111). Held for Thomas: posting needs his OK (new issue), and DECISIONS wants a benchmark/*.yml table from make benchmark on an a1.xxlarge orb first, which this a1.large orb cannot give. No existing report on bugs.ruby-lang.org or ruby/ruby (searched 2026-11-27). No reviews yet."
+note: "Parked (Thomas, 2026-11-27): not reported. Interpreter only, about 0.3% of an interpreted request, from deliberate refactors, no fix; YJIT and ZJIT unaffected. Revisit only with a fix that restores the write path without undoing the refactors. Found in the Ruby 4.1 differential (2026-11-27). Report draft, not a fix: both steps come from deliberate refactors, and the extra source work per write is one layout branch and a NULL check, so the cost is in how GCC compiles vm_setivar into the interpreter, not a logic bug. Removing the forced inline from rb_setivar_cache_revalidate on master changes nothing (111). Held for Thomas: posting needs his OK (new issue), and DECISIONS wants a benchmark/*.yml table from make benchmark on an a1.xxlarge orb first, which this a1.large orb cannot give. No existing report on bugs.ruby-lang.org or ruby/ruby (searched 2026-11-27). No reviews yet."
 passes: []
 ---
 
