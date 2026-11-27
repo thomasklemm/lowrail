@@ -1,0 +1,54 @@
+ruby 4.0.10 (2026-11-19 revision a704b7c interp Mash.new: 20.19 objects from hashie lib, 8.095 Strings
+   4.0 Array hashie/mash.rb:139
+   3.0 Hashie::Mash hashie/mash.rb:620
+   2.0 String hashie/mash.rb:651
+   2.0 Hashie::Array hashie/mash.rb:622
+   2.0 String hashie/mash.rb:637
+   2.0 String hashie/utils.rb:20
+   2.0 Method hashie/mash.rb:633
+   2.0 String hashie/mash.rb:636
+ruby 4.0.10 (2026-11-19 revision a704b7c interp deep_merge: 26.19 objects from hashie lib, 11.095 Strings
+   5.0 String hashie/mash.rb:651
+   4.0 Array hashie/mash.rb:139
+   4.0 Hashie::Mash hashie/mash.rb:329
+   3.0 Hashie::Array hashie/mash.rb:622
+   2.0 String hashie/mash.rb:637
+   2.0 String hashie/utils.rb:20
+   2.0 Method hashie/mash.rb:633
+   2.0 String hashie/mash.rb:636
+ruby 4.0.10 (2026-11-19 revision a704b7c interp dup: 20.19 objects from hashie lib, 8.095 Strings
+   4.0 Array hashie/mash.rb:139
+   4.0 Hashie::Mash hashie/mash.rb:329
+   2.0 String hashie/mash.rb:651
+   2.0 Hashie::Array hashie/mash.rb:622
+   2.0 String hashie/mash.rb:637
+   2.0 String hashie/utils.rb:20
+   2.0 Method hashie/mash.rb:633
+   2.0 String hashie/mash.rb:636
+ruby 4.0.10 (2026-11-19 revision a704b7c --yjit Mash.new: 24.19 objects from hashie lib, 12.095 Strings
+ruby 4.0.10 (2026-11-19 revision a704b7c --yjit deep_merge: 30.19 objects from hashie lib, 15.095 Strings
+ruby 4.0.10 (2026-11-19 revision a704b7c --yjit dup: 24.19 objects from hashie lib, 12.095 Strings
+ruby 4.0.10 (2026-11-19 revision a704b7c --zjit Mash.new: 24.19 objects from hashie lib, 12.095 Strings
+ruby 4.0.10 (2026-11-19 revision a704b7c --zjit deep_merge: 30.19 objects from hashie lib, 15.095 Strings
+ruby 4.0.10 (2026-11-19 revision a704b7c --zjit dup: 24.19 objects from hashie lib, 12.095 Strings
+ruby 4.1.0dev (2026-11-27T16:40:23Z mast zjit Mash.new: 18.2 objects from hashie lib, 6.1 Strings
+ruby 4.1.0dev (2026-11-27T16:40:23Z mast zjit deep_merge: 21.2 objects from hashie lib, 6.1 Strings
+ruby 4.1.0dev (2026-11-27T16:40:23Z mast zjit dup: 18.2 objects from hashie lib, 6.1 Strings
+4.0.10 interp cur 2-key 8.0 1-key 4.001 splat 8.0
+4.0.10 interp bang 2-key 6.0 1-key 3.001 splat 6.0
+A 4.0.10 no-arg 1.001 one-arg 1.001
+B 4.0.10 no-arg 0.0 one-arg 15.003
+C 4.0.10 no-arg 0.0 one-arg 1.0
+D 4.0.10 no-arg 1.0 one-arg 1.0
+4.0.10 --yjit cur 2-key 8.0 1-key 4.0 splat 8.0
+4.0.10 --yjit bang 2-key 6.0 1-key 3.0 splat 6.0
+A 4.0.10 no-arg 1.001 one-arg 1.001
+B 4.0.10 no-arg 0.0 one-arg 15.003
+C 4.0.10 no-arg 0.0 one-arg 1.0
+D 4.0.10 no-arg 1.0 one-arg 1.0
+4.0.10 --zjit cur 2-key 8.0 1-key 4.001 splat 8.0
+4.0.10 --zjit bang 2-key 6.0 1-key 3.001 splat 6.0
+A 4.0.10 no-arg 1.001 one-arg 1.001
+B 4.0.10 no-arg 0.0 one-arg 15.003
+C 4.0.10 no-arg 0.0 one-arg 1.0
+D 4.0.10 no-arg 1.0 one-arg 1.0

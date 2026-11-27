@@ -1,0 +1,640 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/hashie_perf/suffix_body.rb",
+  "at": "2026-11-27T20:12:06Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/rubies/4.0.10-a704b7cd95/bin/ruby",
+      "tree": "/home/user/workspace/repo/.amp/in/orb-backup/hashie-perf/hashie-base",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "9e313f308f3270995c2c978e92f0f216b861861b",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/rubies/4.0.10-a704b7cd95/bin/ruby",
+      "tree": "/home/user/workspace/repo/.amp/in/orb-backup/hashie-perf/hashie-c1",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "d1f403e0774a7ad509ae06477407dbc2836491fd",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp read keys with suffixes": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 12.999,
+      "change": -0.1875117194824677,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp write a new key as a method": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 5.0,
+      "change": -0.16666666666666663,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit read keys with suffixes": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 12.999,
+      "change": -0.1875117194824677,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit write a new key as a method": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 5.0,
+      "change": -0.16666666666666663,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit read keys with suffixes": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 12.999,
+      "change": -0.1875117194824677,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit write a new key as a method": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 5.0,
+      "change": -0.16666666666666663,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp read keys with suffixes": {
+      "base": 34992.9115,
+      "base1": 34942.9115,
+      "base2": 35042.9115,
+      "candidate": 35048.0445,
+      "change": 0.0015755476648464661,
+      "aa": 0.002857721627421599,
+      "claim": false
+    },
+    "interp write a new key as a method": {
+      "base": 19669.6255,
+      "base1": 19670.6255,
+      "base2": 19668.6255,
+      "candidate": 19702.4855,
+      "change": 0.001670596117856915,
+      "aa": 0.00010167961764193224,
+      "claim": true
+    },
+    "yjit read keys with suffixes": {
+      "base": 20130.4045,
+      "base1": 20148.6525,
+      "base2": 20112.1565,
+      "candidate": 19313.7885,
+      "change": -0.040566298605673956,
+      "aa": 0.001812978969200504,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2960,
+                2960
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2960,
+                2960
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit write a new key as a method": {
+      "base": 10775.2335,
+      "base1": 10774.2335,
+      "base2": 10776.2335,
+      "candidate": 10530.0165,
+      "change": -0.022757465070246563,
+      "aa": 0.0001856108269022662,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2941,
+                2941
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2941,
+                2941
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit read keys with suffixes": {
+      "base": 35857.481499999994,
+      "base1": 35899.5075,
+      "base2": 35815.4555,
+      "candidate": 35871.2745,
+      "change": 0.0003846617058145263,
+      "aa": 0.0023440575434725756,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 compiled_side_exit_count missing",
+          "base n2000 compiled_side_exit_count missing",
+          "candidate n0 compiled_side_exit_count missing",
+          "candidate n2000 compiled_side_exit_count missing",
+          "base2 n0 compiled_side_exit_count missing",
+          "base2 n2000 compiled_side_exit_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19120438,
+                19120438
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19765689,
+                19765689
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19423847,
+                19423847
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                18883977,
+                18883977
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19732810,
+                19732810
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                20395981,
+                20395981
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit write a new key as a method": {
+      "base": 18368.377,
+      "base1": 18368.377,
+      "base2": 18368.377,
+      "candidate": 18199.136,
+      "change": -0.009213715506819264,
+      "aa": 0.0,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 compiled_side_exit_count missing",
+          "base n2000 compiled_side_exit_count missing",
+          "candidate n0 compiled_side_exit_count missing",
+          "candidate n2000 compiled_side_exit_count missing",
+          "base2 n0 compiled_side_exit_count missing",
+          "base2 n2000 compiled_side_exit_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                18711553,
+                18711553
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19166951,
+                19166951
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19384783,
+                19384783
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19623886,
+                19623886
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                19602542,
+                19602542
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                149,
+                149
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                null,
+                null
+              ],
+              "invalidation_time_ns": [
+                18524572,
+                18524572
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

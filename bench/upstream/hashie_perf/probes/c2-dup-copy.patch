@@ -1,0 +1,29 @@
+diff --git a/lib/hashie/mash.rb b/lib/hashie/mash.rb
+index a80d6bf..ab1ed1b 100644
+--- a/lib/hashie/mash.rb
++++ b/lib/hashie/mash.rb
+@@ -310,11 +310,6 @@ module Hashie
+     #   copy.user.equal?(mash.user) # => true
+     alias regular_dup dup
+ 
+-    # Hash's own readers, since a key like "default" can override them.
+-    HASH_DEFAULT = ::Hash.instance_method(:default)
+-    HASH_DEFAULT_PROC = ::Hash.instance_method(:default_proc)
+-    private_constant :HASH_DEFAULT, :HASH_DEFAULT_PROC
+-
+     # Duplicates the current mash as a new mash.
+     #
+     # @example Duplicate nested Mashes independently
+@@ -324,9 +319,9 @@ module Hashie
+     #   mash.user.name # => 'Ada'
+     #   copy.user.name # => 'Grace'
+     def dup
+-      default = HASH_DEFAULT.bind_call(self)
+-      default_proc = HASH_DEFAULT_PROC.bind_call(self)
+-      self.class.new(self, default, &default_proc)
++      copy = regular_dup.clear
++      each_pair { |key, value| copy.regular_writer(copy.convert_key(key), copy.convert_value(value, true)) }
++      copy
+     end
+ 
+     # @example Check the exact stored key without symbol conversion

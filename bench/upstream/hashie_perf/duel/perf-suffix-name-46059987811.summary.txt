@@ -1,0 +1,30 @@
+duel / Duel	ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+duel / Duel	  Dash.new: required properties and defaults         3.8s n=805    cpu 0.991 [0.983, 0.999] same  allocations 3
+duel / Duel	  Dash: read and write properties                    3.9s n=3210   cpu 1.010 [1.002, 1.018] same  allocations 0
+duel / Duel	  Trash.new: renamed and transformed properties      3.9s n=700    cpu 0.998 [0.991, 1.006] same  allocations 4
+duel / Duel	  Dash.new: coerced properties                       3.9s n=483    cpu 1.001 [0.995, 1.007] same  allocations 7
+duel / Duel	  Dash.new: String keys with IndifferentAccess       4.0s n=245    cpu 1.001 [0.992, 1.009] same  allocations 32
+duel / Duel	  Dash.new: coerced nested Dashes                    4.0s n=202    cpu 0.992 [0.986, 0.998] same  allocations 16
+duel / Duel	  Mash: read keys given as Symbols as methods        3.8s n=1521   cpu 1.002 [0.990, 1.012] same  allocations 5
+duel / Duel	  KeepOriginalKeys: read Symbol keys as methods      3.9s n=1775   cpu 1.003 [0.992, 1.012] same  allocations 5
+duel / Duel	  KeepOriginalKeys: read String keys as methods      3.8s n=1080   cpu 0.990 [0.980, 0.997] same  allocations 5
+duel / Duel	  PermissiveRespondTo: include in a Mash subclass    4.0s n=87     cpu 1.003 [0.997, 1.008] same  allocations 15
+duel / Duel	  Mash.new: a flat Hash                              3.8s n=1513   cpu 1.010 [1.001, 1.016] same  allocations 3
+duel / Duel	  PermissiveRespondTo: Mash.new                      3.8s n=831    cpu 1.000 [0.987, 1.011] same  allocations 3
+duel / Duel	  PermissiveRespondTo: write a new key as a method   4.0s n=709    cpu 1.002 [0.998, 1.010] same  allocations 5→4
+duel / Duel	  PermissiveRespondTo: overwrite a key as a method   3.8s n=688    cpu 1.010 [1.001, 1.020] same  allocations 5→4
+duel / Duel	  IndifferentAccess: new from a nested JSON response   5.0s n=36     cpu 1.003 [0.999, 1.008] same  allocations 252
+duel / Duel	  IndifferentAccess: read String and Symbol keys     3.8s n=1372   cpu 1.000 [0.993, 1.007] same  allocations 1
+duel / Duel	  IndifferentAccess: write String and Symbol keys    3.7s n=1588   cpu 1.000 [0.985, 1.010] same  allocations 0
+duel / Duel	  DeepFind and DeepFetch: nested keys                4.3s n=120    cpu 0.997 [0.991, 1.002] same  allocations 105
+duel / Duel	  Mash.new: a nested JSON response                   4.4s n=72     cpu 1.004 [1.001, 1.007] same  allocations 25.25
+duel / Duel	  Mash: read keys as methods                         3.8s n=1276   cpu 1.010 [0.998, 1.018] same  allocations 5
+duel / Duel	  Mash: read keys with suffixes                      4.0s n=564    cpu 1.014 [1.008, 1.019] same  allocations 16→13
+duel / Duel	  Mash: read keys with [] and dig                    3.8s n=2453   cpu 1.022 [1.012, 1.032] same  allocations 4
+duel / Duel	  Mash: write new keys as methods                    4.0s n=1087   cpu 1.008 [1.003, 1.011] same  allocations 5→4
+duel / Duel	  Mash: overwrite a key as a method                  3.8s n=955    cpu 1.016 [1.013, 1.020] same  allocations 6→5
+duel / Duel	  Mash: respond_to? a key, a suffix and a missing name   3.7s n=2072   cpu 0.993 [0.985, 1.001] same  allocations 1
+duel / Duel	  Mash#deep_merge: a nested update                   4.0s n=54     cpu 1.005 [1.000, 1.009] same  allocations 31.33
+duel / Duel	  Mash#to_hash: a nested Mash                        3.9s n=206    cpu 1.002 [0.994, 1.010] same  allocations 10
+duel / Duel	across the board: cpu 1.004 [1.001, 1.006] same (limit 1.0125, 27 benchmarks)
+duel / Duel	27 benchmarks in 110s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle

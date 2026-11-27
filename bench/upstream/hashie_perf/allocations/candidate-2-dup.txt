@@ -1,0 +1,15 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+current dup                     65.07 us   20.04 objs
+A keep keys                     11.89 us    6.00 objs
+C clear+convert_key             16.84 us    6.00 objs
+D copy receiver                 18.99 us    6.00 objs
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+current dup                     27.69 us   24.04 objs
+A keep keys                      6.75 us    6.00 objs
+C clear+convert_key              7.87 us    6.00 objs
+D copy receiver                  9.35 us    6.00 objs
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +ZJIT +PRISM [x86_64-linux]
+current dup                     60.36 us   24.04 objs
+A keep keys                     11.53 us    6.00 objs
+C clear+convert_key             13.07 us    6.00 objs
+D copy receiver                 17.26 us    6.00 objs
