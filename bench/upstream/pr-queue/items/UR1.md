@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -252,6 +252,32 @@ passes:
       measured cecaed1's tree is identical to the approved head. Code, exception sentence, caller links and
       order are unchanged; no new runtime tests or measurements were run. Checker, output and exact body:
       bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz.
+  - reviewer: thermos-sol
+    head: "c43954fa4d2a7605e18ecc8968c1aa188eae549a"
+    orb: T-01a21e96-739d-740a-b7cb-15145f86d1a8
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Detailed correctness/security, maintainability, body, comments, commit and eight-item exactness
+      pass; both rubrics applied by this reviewer as requested, without delegation. Verified c43954f is one
+      commit on 48cda77031 and tree-identical to tested/measured cecaed1/7da6979. Final body at Lowrail 5bfaa607
+      and corrected message accurately disclose the accepted JRuby 9.4 subclass-class boundary; no new guard
+      or normalization requested. Own differential: MRI 2.5.9 41,832/0 differences, MRI 4.0.10 42,264/0,
+      TruffleRuby 40 41,349/0 (915 inputs unconstructible), JRuby 10.1.3.0 42,264/0, JRuby 9.4.16.0 42,264/1,905.
+      Independently checked all 1,905 differences are class only; not claimed exact or a passing 9.4 suite
+      (the new subclass assertion fails there). Original TruffleRuby GB18030 crash fixed by retained str.b.
+      Standalone require and load-order permutations pass on four primary engines; 9.4 URI-first works too.
+      Loading is observably earlier: URI defines CGI/loads escape and may consume CGI autoload. Custom
+      intermediate and CGI/private-URI override differences are explicitly assessed boundaries, not byte exploits.
+      Reran interpreter/YJIT micros and a 21-row size sweep with A/A. Worst: 8 MiB unescaped,
+      184,555,089 / 159,388,176 / 184,555,089 instructions, -13.6365%, exact A/A; dense plus/percent improve more.
+      Raw-log audit independently recomputes all body/impact counts, nine native ips logs and both 30-round
+      wall cohorts (180 process logs), including seeded bootstrap intervals and required JIT counters.
+      Native rates match all four cells; all eight wall A/A intervals contain zero, changes exclude zero,
+      each case JIT-flat in 90 processes. The final 25-80% sentence and object range match; timing gate cleared.
+      Exact Rack/Rails release permalinks, main callers, relevance/currency/reach checked; Rack-first justified.
+      No added comments or structural regression. Report: bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.md;
+      probes and raw measurements in adjacent archive. No upstream action.
 ---
 
 # Decode www-form components with cgi/escape
