@@ -1,0 +1,102 @@
+Fetching gem metadata from https://rubygems.org/..........
+Resolving dependencies...
+Fetching rake 13.4.2
+Installing rake 13.4.2
+Fetching bigdecimal 4.1.3
+Fetching connection_pool 3.0.3
+Fetching i18n 1.15.2
+Fetching json 3.2.0
+Fetching minitest 6.1.0
+Fetching securerandom 0.4.1
+Fetching tzinfo 2.0.6
+Fetching uri 1.1.2
+Fetching activesupport 8.1.4.1
+Fetching builder 3.3.0
+Fetching erubi 1.13.1
+Fetching nokogiri 1.19.7 (x86_64-linux-gnu)
+Fetching rails-dom-testing 2.3.0
+Fetching crass 1.0.8
+Fetching concurrent-ruby 1.3.8
+Fetching prism 2.1.0 (x86_64-linux-gnu)
+Fetching loofah 2.25.3
+Fetching actionview 8.1.4.1
+Fetching rails-html-sanitizer 1.7.2
+Fetching rack 3.2.9
+Fetching rack-session 2.1.2
+Fetching rack-test 2.3.0
+Fetching useragent 0.16.11
+Fetching actionpack 8.1.4.1
+Fetching nio4r 2.7.5
+Fetching websocket-extensions 0.3.0
+Fetching websocket-driver 0.9.1
+Fetching zeitwerk 2.8.3
+Fetching actioncable 8.1.4.1
+Fetching globalid 1.4.0
+Fetching activejob 8.1.4.1
+Installing bigdecimal 4.1.3 with native extensions
+Fetching activemodel 8.1.4.1
+Fetching timeout 0.6.1
+Fetching activerecord 8.1.4.1
+Installing json 3.2.0 with native extensions
+Fetching benchmark-ips 2.15.1
+Fetching erb 6.0.7
+Fetching io-console 0.9.5
+Fetching prettyprint 0.2.1
+Fetching pp 0.6.4
+Fetching rbs 4.2.0
+Fetching tsort 0.2.0
+Installing erb 6.0.7 with native extensions
+Installing io-console 0.9.5 with native extensions
+Fetching rdoc 8.1.0
+Fetching reline 0.7.0
+Fetching irb 1.19.0
+Installing nio4r 2.7.5 with native extensions
+Fetching rackup 2.3.1
+Fetching thor 1.5.0
+Fetching railties 8.1.4.1
+Fetching sqlite3 2.10.2 (x86_64-linux-gnu)
+Installing connection_pool 3.0.3
+Installing securerandom 0.4.1
+Installing erubi 1.13.1
+Installing uri 1.1.2
+Installing crass 1.0.8
+Installing i18n 1.15.2
+Installing builder 3.3.0
+Installing rails-dom-testing 2.3.0
+Installing rails-html-sanitizer 1.7.2
+Installing loofah 2.25.3
+Installing tzinfo 2.0.6
+Installing rack-session 2.1.2
+Installing useragent 0.16.11
+Installing minitest 6.1.0
+Installing websocket-extensions 0.3.0
+Installing rack-test 2.3.0
+Installing timeout 0.6.1
+Installing globalid 1.4.0
+Installing zeitwerk 2.8.3
+Installing websocket-driver 0.9.1 with native extensions
+Installing activejob 8.1.4.1
+Installing actioncable 8.1.4.1
+Installing benchmark-ips 2.15.1
+Installing prettyprint 0.2.1
+Installing activemodel 8.1.4.1
+Installing pp 0.6.4
+Installing tsort 0.2.0
+Installing rack 3.2.9
+Installing reline 0.7.0
+Installing actionview 8.1.4.1
+Installing rackup 2.3.1
+Installing irb 1.19.0
+Installing activesupport 8.1.4.1
+Installing thor 1.5.0
+Installing actionpack 8.1.4.1
+Installing concurrent-ruby 1.3.8
+Installing railties 8.1.4.1
+Installing activerecord 8.1.4.1
+Installing rdoc 8.1.0
+Installing prism 2.1.0 (x86_64-linux-gnu)
+Installing sqlite3 2.10.2 (x86_64-linux-gnu)
+Installing nokogiri 1.19.7 (x86_64-linux-gnu)
+Installing rbs 4.2.0 with native extensions
+Bundle complete! 6 Gemfile dependencies, 54 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
