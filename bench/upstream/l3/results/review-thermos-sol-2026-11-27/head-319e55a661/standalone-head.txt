@@ -1,0 +1,11 @@
+/home/user/workspace/repo/.amp/in/orb-backup/l3-review-319e/head/activemodel/lib/active_model/attribute_set/builder.rb:226:in '<class:LazyAttributeHash>': undefined method 'delegate' for class ActiveModel::LazyAttributeHash (NoMethodError)
+
+    delegate :transform_values, :each_value, :each_pair, :fetch, :except, to: :materialize
+    ^^^^^^^^
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review-319e/head/activemodel/lib/active_model/attribute_set/builder.rb:225:in '<module:ActiveModel>'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review-319e/head/activemodel/lib/active_model/attribute_set/builder.rb:5:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+	from /home/user/workspace/repo/.amp/in/orb-backup/l3-review-319e/head/activemodel/lib/active_model/attribute_set.rb:5:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'

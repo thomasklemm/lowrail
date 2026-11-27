@@ -1,0 +1,27 @@
+Body Ruby script equals l3_ips.rb byte-for-byte excluding edge whitespace.
+main: 6 full rounds, two results per round: {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
+l3: 6 full rounds, two results per round: {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
+main2: 6 full rounds, two results per round: {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2}
+Exact quoted best line, main round 5: Marshal.dump 36.143k (± 6.7%) i/s (27.67 μs/i) - 183.918k in 5.088614s
+Exact quoted best line, main round 6: attributes_for_database 92.570k (± 4.5%) i/s (10.80 μs/i) - 466.760k in 5.042253s
+Exact quoted best line, l3 round 3: Marshal.dump 43.776k (± 4.6%) i/s (22.84 μs/i) - 220.904k in 5.046205s
+Exact quoted best line, l3 round 5: attributes_for_database 150.662k (± 9.0%) i/s (6.64 μs/i) - 754.572k in 5.008384s
+Marshal.dump: {'main': 36143.0, 'l3': 43776.0, 'main2': 36310.0}, head gain 21.12%, A/A +0.46%, slowest head 39560.0 > fastest control 36310.0
+attributes_for_database: {'main': 92570.0, 'l3': 150662.0, 'main2': 88251.0}, head gain 62.75%, A/A -4.67%, slowest head 136396.0 > fastest control 92570.0
+Quoted Ruby description matches raw output.
+Schema columns = 1 id + 9 * (string + integer + boolean) + 2 timestamps = 30.
+interp attributes_for_database objects: raw base=4, base2=4, head=2; A/A=0
+interp attributes_before_type_cast objects: raw base=4, base2=4, head=2; A/A=0
+yjit attributes_for_database objects: raw base=4, base2=4, head=2; A/A=0
+yjit attributes_before_type_cast objects: raw base=4, base2=4, head=2; A/A=0
+All retained raw object rows equal results.json; body allocations match both modes.
+interp Marshal.dump: raw counts {'base1': 319677.664, 'base2': 319566.594, 'candidate': 268058.392}; change -16.1%, A/A 0.03%
+interp attributes_for_database: raw counts {'base1': 161635.57, 'base2': 161575.57, 'candidate': 110738.786}; change -31.5%, A/A 0.04%
+interp attributes_before_type_cast: raw counts {'base1': 124090.814, 'base2': 124086.814, 'candidate': 74277.924}; change -40.1%, A/A 0.00%
+interp MessagePack dump: raw counts {'base1': 190797.774, 'base2': 190780.382, 'candidate': 139354.874}; change -27.0%, A/A 0.01%
+yjit Marshal.dump: raw counts {'base1': 259702.324, 'base2': 259693.658, 'candidate': 215644.614}; change -17.0%, A/A 0.00%
+yjit attributes_for_database: raw counts {'base1': 106992.622, 'base2': 107019.344, 'candidate': 63173.672}; change -41.0%, A/A 0.02%
+yjit attributes_before_type_cast: raw counts {'base1': 95444.692, 'base2': 95290.386, 'candidate': 52537.39}; change -44.9%, A/A 0.16%
+yjit MessagePack dump: raw counts {'base1': 130003.45, 'base2': 130461.306, 'candidate': 86190.996}; change -33.8%, A/A 0.35%
+All eight instruction rows independently reconstructed from raw Callgrind totals; all 24 YJIT windows flat.
+Body prose words excluding fences: 133

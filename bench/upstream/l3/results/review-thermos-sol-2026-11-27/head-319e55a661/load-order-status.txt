@@ -1,0 +1,2 @@
+standalone main exit=1
+standalone head exit=1

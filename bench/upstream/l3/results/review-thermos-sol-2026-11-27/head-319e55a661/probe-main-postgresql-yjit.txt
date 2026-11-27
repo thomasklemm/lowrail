@@ -1,0 +1,676 @@
+loaded
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"x", b=>"y!!", c=>"z", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("x") serialize("x") serialize("d")
+  for_database again: {id=>1, a=>"x", b=>"y!!", c=>"z", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("x") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"xMUT", b=>"y!!MUT", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("xMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"x", b=>"y!", c=>"z", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"x", b=>"y!", c=>"z", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"xMUT", b=>"y!", c=>"zMUT", secret=>"s", doc=>{k=>[1]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("x") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("x") changed_in_place?("x") changed_in_place?("x") serialize("d") changed_in_place?("d") changed_in_place?("xMUT") changed_in_place?("xMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"xMUT", b=>"y!!MUT!", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("xMUT") serialize("xMUT") deserialize("dMUT") serialize("dMUT")
+loaded, read a, b first
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"xMUT", b=>"y!!", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("xMUT") serialize("d")
+  for_database again: {id=>1, a=>"xMUT", b=>"y!!", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("xMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"xMUTMUT", b=>"y!!MUT", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("xMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"xMUT", b=>"y!", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"xMUT", b=>"y!", c=>"zMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"xMUTMUT", b=>"y!", c=>"zMUTMUT", secret=>"s", doc=>{k=>[1]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("xMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("xMUT") changed_in_place?("xMUT") changed_in_place?("xMUT") serialize("d") changed_in_place?("d") changed_in_place?("xMUTMUT") changed_in_place?("xMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"xMUTMUT", b=>"y!!MUT!", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("xMUTMUT") serialize("xMUTMUT") deserialize("dMUT") serialize("dMUT")
+loaded with serialize raising
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: raised ArgumentError: boom
+  for_database again: raised ArgumentError: boom
+  before_type_cast: {id=>2, a=>nil, b=>nil, c=>"boom", secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>2, a=>nil, b=>nil, c=>"boom", secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>2, a=>nil, b=>nil, c=>"boom", secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  to_hash type calls: 
+  changed: []
+  changed type calls: changed_in_place?(nil) serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?(nil) serialize("d") changed_in_place?("d") changed_in_place?(nil) serialize("d") changed_in_place?("d") changed_in_place?(nil) serialize("d") changed_in_place?("d") changed_in_place?(nil) serialize("d")
+  for_database after save: raised ArgumentError: boom
+loaded, doc mutated in place
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"xMUTMUT", b=>"y!!", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("xMUTMUT") serialize("xMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"xMUTMUT", b=>"y!!", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("xMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"xMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("xMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"xMUTMUT", b=>"y!", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"xMUTMUT", b=>"y!", c=>"zMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"xMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "doc"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("xMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("xMUTMUT") changed_in_place?("xMUTMUT") changed_in_place?("xMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("xMUTMUTMUT") changed_in_place?("xMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"xMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("xMUTMUTMUT") serialize("xMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+loaded, a mutated in place
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"xMUTMUTMUT!", b=>"y!!", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("xMUTMUTMUT!") serialize("d")
+  for_database again: {id=>1, a=>"xMUTMUTMUT!", b=>"y!!", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("xMUTMUTMUT!") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"xMUTMUTMUT!MUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("xMUTMUTMUT!MUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"xMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"xMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"xMUTMUTMUT!MUT", b=>"y!", c=>"zMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("xMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("xMUTMUTMUT") changed_in_place?("xMUTMUTMUT") changed_in_place?("xMUTMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("xMUTMUTMUT!MUT") changed_in_place?("xMUTMUTMUT!MUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"xMUTMUTMUT!MUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("xMUTMUTMUT!MUT") serialize("xMUTMUTMUT!MUT") deserialize("dMUT") serialize("dMUT")
+loaded, written
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"new", b=>"y!!", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>5, with_default=>"d"}
+  for_database type calls: serialize("new") serialize("d")
+  for_database again: {id=>1, a=>"new", b=>"y!!", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>5, with_default=>"d"}
+  for_database again type calls: changed_in_place?("new") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>5, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"new"(f), b=>"y!", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>"5"(f), with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"new"(f), b=>"y!", c=>"zMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>"5"(f), with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>5, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "extra_attr"(f), "with_default"(f)]
+  changed type calls: deserialize("xMUTMUTMUT!MUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: deserialize("xMUTMUTMUT!MUT") deserialize("xMUTMUTMUT!MUT") deserialize("xMUTMUTMUT!MUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUT") changed_in_place?("newMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>5, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUT") serialize("newMUT") deserialize("dMUT") serialize("dMUT")
+new
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize(nil) serialize(nil) serialize("d")
+  for_database again: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?(nil) changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?(nil) changed_in_place?("dMUT")
+  before_type_cast: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["with_default"(f)]
+  changed type calls: changed_in_place?(nil) serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: raised ActiveRecord::RecordNotUnique: PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint "widgets_pkey"
+DETAIL:  Key (id)=(2) already exists.
+  for_database after save: {id=>nil, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: changed_in_place?(nil) changed_in_place?("dMUT")
+new with values
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>nil, a=>"q", b=>nil, c=>nil, secret=>ENC[t], doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("q") serialize("d")
+  for_database again: {id=>nil, a=>"q", b=>nil, c=>nil, secret=>ENC[t], doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("q") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>nil, a=>"qMUT", b=>nil, c=>nil, secret=>ENC[t], doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("qMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>nil, a=>"q"(f), b=>nil, c=>nil, secret=>"t"(f), doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>nil, a=>"q"(f), b=>nil, c=>nil, secret=>"t"(f), doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>nil, a=>"qMUT", b=>nil, c=>nil, secret=>"t", doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "secret"(f), "with_default"(f)]
+  changed type calls: deserialize(nil) serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: deserialize(nil) serialize("d") changed_in_place?("d") changed_in_place?("qMUT") changed_in_place?("qMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>3, a=>"qMUT", b=>nil, c=>nil, secret=>ENC[t], doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("qMUT") serialize("qMUT") deserialize("dMUT") serialize("dMUT")
+partial select
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>nil, b=>"y!!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("d")
+  for_database again: {id=>1, a=>nil, b=>"y!!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>nil, b=>"y!!MUT", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>nil, b=>"y!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>nil, b=>"y!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "b"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "b"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, b=>"y!", extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["with_default"(f)]
+  changed type calls: serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: serialize("d") changed_in_place?("d") serialize("d") changed_in_place?("d") serialize("d") changed_in_place?("d") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>nil, b=>"y!!MUT!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("dMUT") serialize("dMUT")
+select with extras and duplicates
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", hidden=>nil, a2=>"newMUT", one=>1}
+  for_database type calls: deserialize("newMUT") serialize("newMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", hidden=>nil, a2=>"newMUT", one=>1}
+  for_database again type calls: changed_in_place?("newMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default", "hidden", "a2", "one"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", hidden=>nil, a2=>"newMUTMUT", one=>1}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), hidden=>nil, a2=>"newMUT", one=>1}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), hidden=>nil, a2=>"newMUT", one=>1}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "hidden"(f), "a2"(f), "one"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "hidden"(f), "a2"(f), "one"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT", hidden=>nil, a2=>"newMUTMUT", one=>1}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f), "a2"(f)]
+  changed type calls: changed_in_place?("newMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUT") changed_in_place?("newMUT") changed_in_place?("newMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUT") changed_in_place?("newMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", hidden=>nil, a2=>"newMUTMUT", one=>1}
+  for_database after save type calls: deserialize("newMUTMUT") serialize("newMUTMUT") deserialize("dMUT") serialize("dMUT")
+find_by_sql duplicate columns
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUT", b=>"y!!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("newMUTMUT") serialize("newMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUT", b=>"y!!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUT", b=>"y!!MUT", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUT", b=>"y!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUT", b=>"y!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUT", b=>"y!", extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUTMUT") changed_in_place?("newMUTMUT") changed_in_place?("newMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUTMUT") changed_in_place?("newMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUTMUT", b=>"y!!MUT!", c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUTMUTMUT") serialize("newMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+eager_load with select extra
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", hidden=>nil, seven=>7}
+  for_database type calls: deserialize("newMUTMUTMUT") serialize("newMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", hidden=>nil, seven=>7}
+  for_database again type calls: changed_in_place?("newMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default", "hidden", "seven"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", hidden=>nil, seven=>7}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), hidden=>nil, seven=>7}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), hidden=>nil, seven=>7}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "hidden"(f), "seven"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "hidden"(f), "seven"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT", hidden=>nil, seven=>7}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUTMUTMUT") changed_in_place?("newMUTMUTMUT") changed_in_place?("newMUTMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", hidden=>nil, seven=>7}
+  for_database after save type calls: deserialize("newMUTMUTMUTMUT") serialize("newMUTMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+instantiate unknown names
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>9, a=>"i", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d", zz=>"u"(f)}
+  for_database type calls: deserialize("i") serialize("i") serialize("d")
+  for_database again: {id=>9, a=>"i", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d", zz=>"u"(f)}
+  for_database again type calls: changed_in_place?("i") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default", "zz"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>9, a=>"iMUT", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT", zz=>"u"(f)}
+  for_database after mutating the first result type calls: changed_in_place?("iMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>9, a=>"i"(f), b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f), zz=>"u"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>9, a=>"i"(f), b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f), zz=>"u"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "extra_attr"(f), "with_default"(f), "zz"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "extra_attr"(f), "with_default"(f), "zz"(f)]
+  keys type calls: 
+  to_hash: {id=>9, a=>"iMUT", extra_attr=>nil, with_default=>"dMUT", zz=>"u"(f)}
+  to_hash type calls: 
+  changed: ["a"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("i") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("i") changed_in_place?("i") changed_in_place?("i") serialize("d") changed_in_place?("d") changed_in_place?("iMUT") changed_in_place?("iMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>9, a=>"iMUT", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT", zz=>"u"(f)}
+  for_database after save type calls: deserialize("iMUT") serialize("iMUT") deserialize("dMUT") serialize("dMUT")
+instantiate with types
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d", zz=>3}
+  for_database type calls: serialize("d")
+  for_database again: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d", zz=>3}
+  for_database again type calls: changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default", "zz"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT", zz=>3}
+  for_database after mutating the first result type calls: changed_in_place?("dMUT")
+  before_type_cast: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f), zz=>"3"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f), zz=>"3"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "extra_attr"(f), "with_default"(f), "zz"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "extra_attr"(f), "with_default"(f), "zz"(f)]
+  keys type calls: 
+  to_hash: {id=>9, extra_attr=>nil, with_default=>"dMUT", zz=>3}
+  to_hash type calls: 
+  changed: ["with_default"(f)]
+  changed type calls: serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: serialize("d") changed_in_place?("d") serialize("d") changed_in_place?("d") serialize("d") changed_in_place?("d") changed_in_place?("dMUT")
+  for_database after save: {id=>9, a=>nil, b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT", zz=>3}
+  for_database after save type calls: deserialize("dMUT") serialize("dMUT")
+frozen loaded
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("newMUTMUTMUTMUT") serialize("newMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: true
+  frozen? type calls: 
+frozen new
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>nil, a=>"f", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("f") serialize("d")
+  for_database again: {id=>nil, a=>"f", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("f") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>nil, a=>"fMUT", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("fMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>nil, a=>"f"(f), b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>nil, a=>"f"(f), b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>nil, a=>"fMUT", b=>nil, c=>nil, secret=>nil, doc=>nil, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "with_default"(f)]
+  changed type calls: deserialize(nil) serialize("d") changed_in_place?("d")
+  frozen?: true
+  frozen? type calls: 
+readonly loaded
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("newMUTMUTMUTMUT") serialize("newMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+dup
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>nil, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("newMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>nil, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>nil, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>nil, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"d"}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>nil, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"d"}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>nil, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "with_default"(f)]
+  changed type calls: deserialize(nil)
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: deserialize(nil) changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>4, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+clone after read
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: serialize("newMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+becomes
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("newMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUTMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+reload
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("newMUTMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUTMUT") serialize("d")
+  for_database again: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"newMUTMUTMUTMUTMUTMUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("newMUTMUTMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"newMUTMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"newMUTMUTMUTMUTMUTMUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("newMUTMUTMUTMUTMUTMUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUTMUT") serialize("d") changed_in_place?("d") changed_in_place?("newMUTMUTMUTMUTMUTMUTMUT") changed_in_place?("newMUTMUTMUTMUTMUTMUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"newMUTMUTMUTMUTMUTMUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("newMUTMUTMUTMUTMUTMUTMUT") serialize("newMUTMUTMUTMUTMUTMUTMUT") deserialize("dMUT") serialize("dMUT")
+cpk
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {x=>1, y=>2, v=>"c"}
+  for_database type calls: 
+  for_database again: {x=>1, y=>2, v=>"c"}
+  for_database again type calls: 
+  same objects on second call: ["x", "y", "v"]; ==: true; same Hash: false
+  for_database after mutating the first result: {x=>1, y=>2, v=>"cMUT"}
+  for_database after mutating the first result type calls: 
+  before_type_cast: {x=>1, y=>2, v=>"c"}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {x=>1, y=>2, v=>"c"}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["x"(f), "y"(f), "v"(f)]
+  accessed type calls: 
+  keys: ["x"(f), "y"(f), "v"(f)]
+  keys type calls: 
+  to_hash: {x=>1, y=>2, v=>"cMUT"}
+  to_hash type calls: 
+  changed: ["v"(f)]
+  changed type calls: 
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: 
+  for_database after save: {x=>1, y=>2, v=>"cMUT"}
+  for_database after save type calls: 
+after save
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"s1", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database type calls: deserialize("s1") serialize("s1") deserialize("d") serialize("d")
+  for_database again: {id=>1, a=>"s1", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  for_database again type calls: changed_in_place?("s1") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"s1MUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("s1MUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"s1", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"s1", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"s1MUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f)]
+  changed type calls: changed_in_place?("s1") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("s1") changed_in_place?("s1") changed_in_place?("s1") changed_in_place?("d") changed_in_place?("s1MUT") changed_in_place?("s1MUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"s1MUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT"}
+  for_database after save type calls: deserialize("s1MUT") serialize("s1MUT") deserialize("dMUT") serialize("dMUT")
+attribute declared after load
+  set: ActiveModel::LazyIndexedAttributeSet
+  for_database: {id=>1, a=>"s1MUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", late=>"L"}
+  for_database type calls: deserialize("s1MUT") serialize("s1MUT") serialize("d")
+  for_database again: {id=>1, a=>"s1MUT", b=>"y!!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d", late=>"L"}
+  for_database again type calls: changed_in_place?("s1MUT") changed_in_place?("d")
+  same objects on second call: ["id", "a", "b", "c", "secret", "doc", "extra_attr", "with_default", "late"]; ==: true; same Hash: false
+  for_database after mutating the first result: {id=>1, a=>"s1MUTMUT", b=>"y!!MUT", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", late=>"LMUT"}
+  for_database after mutating the first result type calls: changed_in_place?("s1MUTMUT") changed_in_place?("dMUT")
+  before_type_cast: {id=>1, a=>"s1MUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), late=>"L"(f)}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {id=>1, a=>"s1MUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"d"(f), late=>"L"(f)}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "late"(f)]
+  accessed type calls: 
+  keys: ["id"(f), "a"(f), "b"(f), "c"(f), "secret"(f), "doc"(f), "extra_attr"(f), "with_default"(f), "late"(f)]
+  keys type calls: 
+  to_hash: {id=>1, a=>"s1MUTMUT", b=>"y!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>"s", doc=>{k=>[1, 2]}, extra_attr=>nil, with_default=>"dMUT", late=>"LMUT"}
+  to_hash type calls: 
+  changed: ["a"(f), "c"(f), "with_default"(f), "late"(f)]
+  changed type calls: changed_in_place?("s1MUT") serialize("d") changed_in_place?("d")
+  frozen?: false
+  frozen? type calls: 
+  save: true
+  save type calls: changed_in_place?("s1MUT") changed_in_place?("s1MUT") changed_in_place?("s1MUT") serialize("d") changed_in_place?("d") changed_in_place?("s1MUTMUT") changed_in_place?("s1MUTMUT") changed_in_place?("dMUT")
+  for_database after save: {id=>1, a=>"s1MUTMUT", b=>"y!!MUT!", c=>"zMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUTMUT", secret=>ENC[s], doc=>"{\"k\":[1,2]}", extra_attr=>nil, with_default=>"dMUT", late=>"LMUT"}
+  for_database after save type calls: deserialize("s1MUTMUT") serialize("s1MUTMUT") deserialize("dMUT") serialize("dMUT")
+ActiveModel::Attributes
+  set: ActiveModel::AttributeSet
+  for_database: {p=>"m", q=>2}
+  for_database type calls: serialize("m")
+  for_database again: {p=>"m", q=>2}
+  for_database again type calls: changed_in_place?("m")
+  same objects on second call: ["p", "q"]; ==: true; same Hash: false
+  for_database after mutating the first result: {p=>"mMUT", q=>2}
+  for_database after mutating the first result type calls: changed_in_place?("mMUT")
+  before_type_cast: {p=>"m"(f), q=>2}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {p=>"m"(f), q=>2}
+  before_type_cast after clearing the first result type calls: 
+  accessed: ["p"(f), "q"(f)]
+  accessed type calls: 
+  keys: ["p"(f), "q"(f)]
+  keys type calls: 
+  to_hash: {p=>"mMUT", q=>2}
+  to_hash type calls: 
+  changed: nil
+  changed type calls: 
+  frozen?: false
+  frozen? type calls: 
+ActiveModel::Attributes empty
+  set: ActiveModel::AttributeSet
+  for_database: {}
+  for_database type calls: 
+  for_database again: {}
+  for_database again type calls: 
+  same objects on second call: []; ==: true; same Hash: false
+  for_database after mutating the first result: {}
+  for_database after mutating the first result type calls: 
+  before_type_cast: {}
+  before_type_cast type calls: 
+  before_type_cast after clearing the first result: {}
+  before_type_cast after clearing the first result type calls: 
+  accessed: []
+  accessed type calls: 
+  keys: []
+  keys type calls: 
+  to_hash: {}
+  to_hash type calls: 
+  changed: nil
+  changed type calls: 
+  frozen?: false
+  frozen? type calls: 

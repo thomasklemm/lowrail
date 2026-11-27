@@ -1,0 +1,55 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 69b7716d13..0bcaeca267 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -375,28 +375,12 @@ def to_hash
+ 
+     #: () -> Hash[String, untyped]
+     def values_before_type_cast
+-      materialize
+-      attrs = @attributes&.dup
+-      hash = {}
+-      indexes.each_key do |name|
+-        if attribute = attrs&.[](index_for_name(name))
+-          hash[name] = attribute.value_before_type_cast
+-        end
+-      end
+-      hash
++      attributes_to_hash { |attribute| attribute.value_before_type_cast }
+     end
+ 
+     #: () -> Hash[String, untyped]
+     def values_for_database
+-      materialize
+-      attrs = @attributes&.dup
+-      hash = {}
+-      indexes.each_key do |name|
+-        if attribute = attrs&.[](index_for_name(name))
+-          hash[name] = attribute.value_for_database
+-        end
+-      end
+-      hash
++      attributes_to_hash { |attribute| attribute.value_for_database }
+     end
+ 
+     #: (String) ?{ (String) -> untyped } -> untyped
+@@ -509,6 +493,19 @@ def transform_attributes!
+       end
+ 
+     private
++      #: () { (ActiveModel::Attribute) -> untyped } -> Hash[String, untyped]
++      def attributes_to_hash
++        materialize
++        snapshot = @attributes&.dup
++        hash = {}
++        indexes.each_key do |name|
++          if attribute = snapshot&.[](index_for_name(name))
++            hash[name] = yield(attribute)
++          end
++        end
++        hash
++      end
++
+       #: () -> void
+       def materialize
+         unless @materialized

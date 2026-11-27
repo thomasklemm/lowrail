@@ -1,0 +1,19 @@
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n "/attributes_(for_database_serializes|before_type_cast_returns)_the_attributes_the_record_had/" --seed 60193
+
+# Running:
+
+F
+
+Failure:
+AttributeMethodsTest#test_attributes_before_type_cast_returns_the_attributes_the_record_had_when_it_was_called [.amp/in/orb-backup/l3-review-319e/head/activerecord/test/cases/attribute_methods_test.rb:408]:
+Expected: "David"
+  Actual: "Mary"
+
+bin/rails test .amp/in/orb-backup/l3-review-319e/head/activerecord/test/cases/attribute_methods_test.rb:401
+
+.
+
+Finished in 0.057651s, 34.6912 runs/s, 52.0369 assertions/s.
+2 runs, 3 assertions, 1 failures, 0 errors, 0 skips

@@ -1,0 +1,2 @@
+old-db exit status: 1
+old-btc exit status: 1

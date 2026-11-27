@@ -1,0 +1,9 @@
+d1c63bbc5cb36e1d86889ca9c66cd3d0f4b306b5f991b2a3f73cfb6482296d67  bench/upstream/l3/review_probe.rb
+eb9aef951abd76c2c2e03f3f05c85f6b950007b4c820e8b85d396d93dae6142f  bench/upstream/l3/results/review-thermos-sol-2026-11-25/exactness_extension.rb
+a5c95c00a77ecd18193ae05b5b74681fee0cc6afab7614475beb1d377052cad0  bench/upstream/l3/results/review-thermos-sol-2026-11-27/callable_default_repro.rb
+8cf6bcff7c3c05af1a11f8dbb14b92156632cd422cda03fbb290f60ba96ccbac  bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+08c5f1cb78646823a3ed08117488310380ddd8b9b0419fa7ee5276fe16c21ed4  bench/upstream/l3/concurrency_probe.rb
+bf6d15cc867817b5d76a33aeb293bccc32994aece5d1fa0c1aa7f7abbabe894a  bench/upstream/l3/results/review-thermos-sol-2026-11-25/sweep_ips.rb
+24b84540e02d0f739cfd4770d9944f5437c859a095fc24ecd01e320ee1aedbfc  bench/upstream/l3/results/review-thermos-sol-2026-11-25/worst_ips.rb
+3a075e726760e4974080d85974d1e2ca60c2ca7aee4dc73bf97cee0a3948bdf7  bench/upstream/l3/results/rebuild3-2026-11-27/body-ips.txt
+ab58b5a95db040b4567a81b3ff727ce4e0e1302f3297d62735c64d7105415a96  bench/upstream/l3/body/L3c-2026-11-27/results.json

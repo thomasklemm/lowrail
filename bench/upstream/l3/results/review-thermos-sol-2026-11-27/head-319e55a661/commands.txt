@@ -1,0 +1,55 @@
+Working root: /home/user/workspace/repo
+WORK=$ROOT/.amp/in/orb-backup/l3-review-319e
+PREVIOUS=$ROOT/.amp/in/orb-backup/l3-review-41af
+OUT=$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-27/head-319e55a661
+Ruby for all new runtime checks and measurements: 4.0.10 a704b7cd95
+Body raw data being audited: Ruby 4.0.9 3e93b23afc
+
+Preparation:
+  script/git-signed pull --rebase origin main
+  git -C .corpus/rails fetch --quiet https://github.com/thomasklemm/rails thomasklemm/attrs-for-database-row-2
+  git -C .corpus/rails worktree add --detach $WORK/head 319e55a661702e756a5140aeec2300aa55efa0f4
+  Main, historical negative-control worktrees and the installed gems are reused from the previous review.
+  Copy the prior head Gemfile and lock to $WORK/b-head; set RAILS=$WORK/head and run bundle install --local.
+  PostgreSQL 17 is already running; pg_isready confirms it accepts connections.
+  export PATH=$HOME/.local/share/mise/installs/ruby/4.0.10/bin:$PATH
+  export BUNDLE_PATH=$PREVIOUS/gems TMPDIR=$WORK/tmp
+
+Retained drivers, sequential, from repository root:
+  taskset -c 2-7 bash $OUT/run-confirm.sh
+  bash $OUT/run-benchmarks.sh
+  python3 $OUT/audit_body.py > $OUT/body-audit.txt
+
+Actual historical negative controls, RAILS=$PREVIOUS/old-db or old-btc with its b-TREE Gemfile:
+  ARCONN=sqlite3 RAILS_MINITEST_PLUGIN=true ruby -rbundler/setup -I$WORK/head/activerecord/test $WORK/head/activerecord/test/cases/attribute_methods_test.rb -n '/attributes_(for_database_serializes|before_type_cast_returns)_the_attributes_the_record_had/'
+  Both commands must exit 1 because the observable David/Mary assertion fails.
+
+Head-only metrics and lint, RAILS=$WORK/head BUNDLE_GEMFILE=$WORK/b-head/Gemfile:
+  bundle exec rubocop --config $OUT/metrics.yml --format json $RAILS/activemodel/lib/active_model/attribute_set.rb
+  bundle exec flog -a $RAILS/activemodel/lib/active_model/attribute_set.rb
+  bundle exec rubocop --config $RAILS/.rubocop.yml $RAILS/activemodel/lib/active_model/attribute_set.rb $RAILS/activerecord/test/cases/attribute_methods_test.rb
+  Zero-threshold Metrics exits 1 intentionally; project lint exits 0.
+
+Row-reading control, head bundle:
+  ruby -r$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/row_read_variant.rb $ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+
+Load order, each main/head RAILS and bundle:
+  ruby -rbundler/setup -ractive_model/attribute_set -e 'puts ActiveModel::LazyIndexedAttributeSet.name'
+  ruby -rbundler/setup -ractive_record -e 'set=ActiveModel::LazyIndexedAttributeSet; puts "public conversions=#{set.public_instance_methods.include?(:values_for_database) && set.public_instance_methods.include?(:values_before_type_cast)}"; puts "helper_private=#{set.private_instance_methods.include?(:attributes_to_hash)}"'
+  The standalone require exits 1 on both for the same pre-existing missing delegate dependency.
+
+Read-only upstream checks:
+  git -C .corpus/rails fetch --quiet origin main:refs/remotes/l3-review/main
+  git -C .corpus/rails merge-tree --write-tree refs/remotes/l3-review/main 319e55a661702e756a5140aeec2300aa55efa0f4
+  git -C .corpus/rails diff 088fc0cf61e4ba0c7987decafacc69adb3e22eec refs/remotes/l3-review/main -- activemodel/lib/active_model/attribute_set.rb activemodel/lib/active_model/indexed_row.rb activerecord/lib/active_record/marshalling.rb activerecord/lib/active_record/message_pack.rb
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr is:merged base:main merged:>=2026-11-25' -f per_page=100
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr (values_for_database OR values_before_type_cast OR attributes_for_database OR attributes_before_type_cast)' -f per_page=100
+  git ls-remote https://github.com/thomasklemm/rails refs/heads/thomasklemm/attrs-for-database-row-2
+
+Current project metadata, for pairs rails/rails rails, msgpack/msgpack-ruby msgpack, sparklemotion/sqlite3-ruby sqlite3 and evanphx/benchmark-ips benchmark-ips:
+  gh api repos/$repo --jq '{full_name,stargazers_count,archived,pushed_at,updated_at,html_url}' > $OUT/$name-project.json
+  curl -fsSL https://rubygems.org/api/v1/gems/$name.json | jq '{name,version,downloads,version_created_at,source_code_uri}' > $OUT/$name-rubygems.json
+
+proposal-match.txt comes from comparing the executable definitions of the three methods against the previously retained shared_transform.rb and asserting that only attribute_set.rb changed between the two heads.
+Source claims reread: AttributeSet, IndexedRow, Attribute/UserProvidedDefault, attribute_methods/before_type_cast, marshalling.rb:21-24, message_pack.rb:77-91. The unchanged introducing merge remains in the preceding head's evidence directory.
+Input scripts and new body runs are pinned by input-sha256.txt; SHA256SUMS covers the evidence files.

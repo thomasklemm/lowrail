@@ -1,0 +1,10 @@
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n "/attributes_(for_database_serializes|before_type_cast_returns)_the_attributes_the_record_had/" --seed 47252
+
+# Running:
+
+..
+
+Finished in 0.049807s, 40.1547 runs/s, 80.3094 assertions/s.
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips

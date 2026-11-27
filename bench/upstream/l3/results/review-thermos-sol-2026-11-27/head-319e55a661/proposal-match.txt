@@ -1,0 +1,5 @@
+values_before_type_cast: exact executable match to previously proposed validation overlay
+values_for_database: exact executable match to previously proposed validation overlay
+attributes_to_hash: exact executable match to previously proposed validation overlay
+Only attribute_set.rb changed from the previous head; tests byte-identical.
+Commit second paragraph explicitly describes the shared helper.
