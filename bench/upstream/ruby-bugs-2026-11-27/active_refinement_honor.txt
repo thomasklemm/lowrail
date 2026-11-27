@@ -1,0 +1,28 @@
+ruby 3.4.13 (2026-11-19 revision 48857d6
+  cls_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_def undef: call=NoMethodError send=:k public_send=:k method=:k respond_to=true sym_proc=:k
+  mod_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  mod_def undef: /home/user/w/honor.rb:13: [BUG] vm_call_method: unsupported method type (7)
+  cls_inh def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_inh undef: call=NoMethodError send=:p public_send=:p method=:p respond_to=true sym_proc=:p
+ruby 4.0.10 (2026-11-19 revision a704b7c
+  cls_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_def undef: call=NoMethodError send=:k public_send=:k method=:k respond_to=true sym_proc=:k
+  mod_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  mod_def undef: /home/user/w/honor.rb:13: [BUG] vm_call_method: unsupported method type (7)
+  cls_inh def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_inh undef: call=NoMethodError send=:p public_send=:p method=:p respond_to=true sym_proc=:p
+ruby 4.1.0dev (2026-11-27T16:40:23Z mast
+  cls_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_def undef: call=NoMethodError send=:k public_send=:k method=:k respond_to=true sym_proc=:k
+  mod_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  mod_def undef: /home/user/w/honor.rb:13: [BUG] vm_call_method: unsupported method type (7)
+  cls_inh def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_inh undef: call=NoMethodError send=:p public_send=:p method=:p respond_to=true sym_proc=:p
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c79eac2cd3) 
+  cls_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_def undef: call=NoMethodError send=:k public_send=:k method=:k respond_to=true sym_proc=:k
+  mod_def def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  mod_def undef: call=NoMethodError send=NoMethodError public_send=:m method=:m respond_to=true sym_proc=:m
+  cls_inh def: call=:refined send=:refined public_send=:refined method=:refined respond_to=true sym_proc=:refined
+  cls_inh undef: call=NoMethodError send=:p public_send=:p method=:p respond_to=true sym_proc=:p

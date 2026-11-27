@@ -1,0 +1,2 @@
+TestThread#test_handle_interrupt_masks_sigint [/home/user/src/ruby/test/ruby/test_thread.rb:904]:
+11762 tests, 5600430 assertions, 1 failures, 0 errors, 74 skips

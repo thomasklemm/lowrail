@@ -1,0 +1,12 @@
+ruby 3.4.13 (2026-11-19 revision 48857d6f2e) +PRISM [x86_64- [] NoMethodError :c :c true 
+ruby 3.4.13 (2026-11-19 revision 48857d6f2e) +PRISM [x86_64- [--yjit] NoMethodError :c :c true 
+ruby 3.4.13 (2026-11-19 revision 48857d6f2e) +PRISM [x86_64- [--zjit] /home/user/.local/share/mise/installs/ruby/3.4.13/bin/ruby: invalid option --zjit  (-h will show valid options) (RuntimeError) 
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64- [] NoMethodError :c :c true 
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64- [--yjit] NoMethodError :c :c true 
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64- [--zjit] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRIS [] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRIS [--yjit] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRIS [--zjit] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-define [] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-define [--yjit] NoMethodError :c :c true 
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-define [--zjit] NoMethodError :c :c true 

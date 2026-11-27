@@ -1,0 +1,43 @@
+# ruby 3.4.13 (2026-11-19 revision 48857d6f2e) +PRISM [x86_64-linux]
+[] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 3.4.13 (2026-11-19 revision 488
+[] active_undef_send_crash_reverse: :m :m 
+[] active_undef_reflection: NoMethodError :c :c true 
+[--yjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 3.4.13 (2026-11-19 revision 488
+[--yjit] active_undef_send_crash_reverse: :m :m 
+[--yjit] active_undef_reflection: NoMethodError :c :c true 
+[--zjit] not available
+# ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+[] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.0.10 (2026-11-19 revision a70
+[] active_undef_send_crash_reverse: :m :m 
+[] active_undef_reflection: NoMethodError :c :c true 
+[--yjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.0.10 (2026-11-19 revision a70
+[--yjit] active_undef_send_crash_reverse: :m :m 
+[--yjit] active_undef_reflection: NoMethodError :c :c true 
+[--zjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.0.10 (2026-11-19 revision a70
+[--zjit] active_undef_send_crash_reverse: :m :m 
+[--zjit] active_undef_reflection: NoMethodError :c :c true 
+# ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-linux]
+[] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.1.0dev (2026-11-27T16:40:23Z 
+[] active_undef_send_crash_reverse: :m :m 
+[] active_undef_reflection: NoMethodError :c :c true 
+[--yjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.1.0dev (2026-11-27T16:40:23Z 
+[--yjit] active_undef_send_crash_reverse: :m :m 
+[--yjit] active_undef_reflection: NoMethodError :c :c true 
+[--zjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5: [BUG] vm_call_method: unsupported method type (7) ruby 4.1.0dev (2026-11-27T16:40:23Z 
+[--zjit] active_undef_send_crash_reverse: :m :m 
+[--zjit] active_undef_reflection: NoMethodError :c :c true 
+# ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c79eac2cd3) 
+[] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5:in '<main>': undefined method 'foo' for an instance of C (NoMethodError)  p C.new.send(
+[] active_undef_send_crash_reverse: NoMethodError NoMethodError 
+[] active_undef_reflection: NoMethodError :c :c true 
+[--yjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5:in '<main>': undefined method 'foo' for an instance of C (NoMethodError)  p C.new.send(
+[--yjit] active_undef_send_crash_reverse: NoMethodError NoMethodError 
+[--yjit] active_undef_reflection: NoMethodError :c :c true 
+[--zjit] active_undef_send_crash: NoMethodError active_undef_send_crash.rb:5:in '<main>': undefined method 'foo' for an instance of C (NoMethodError)  p C.new.send(
+[--zjit] active_undef_send_crash_reverse: NoMethodError NoMethodError 
+[--zjit] active_undef_reflection: NoMethodError :c :c true 
+# v4.0.10 (a704b7cd95) with the same change applied (crash-fix-on-v4_0_10.diff), build ~/build/r40
+[] active_undef_send_crash: NoMethodError, then send raises NoMethodError (no [BUG])
+[] active_undef_send_crash_reverse: NoMethodError NoMethodError
+[] active_undef_reflection: NoMethodError :c (unchanged)
+[--yjit] and [--zjit]: same as above

@@ -1,0 +1,21 @@
+diff --git a/vm_method.c b/vm_method.c
+index b32bbe3166..d8e11af7a3 100644
+--- a/vm_method.c
++++ b/vm_method.c
+@@ -2323,10 +2323,14 @@ resolve_refined_method(VALUE refinements, const rb_method_entry_t *me, VALUE *de
+             if (RB_TYPE_P(me->owner, T_MODULE) && defined_class_ptr && RB_TYPE_P(*defined_class_ptr, T_ICLASS)) {
+                 refinement = module_refinement_iclass(refinement, *defined_class_ptr);
+             }
+-            tmp_me = search_method(refinement, me->called_id, defined_class_ptr);
++            VALUE refinement_class;
++            tmp_me = search_method(refinement, me->called_id, &refinement_class);
+ 
+             if (tmp_me && tmp_me->def->type != VM_METHOD_TYPE_REFINED) {
+-                if (!UNDEFINED_METHOD_ENTRY_P(tmp_me)) return tmp_me;
++                if (!UNDEFINED_METHOD_ENTRY_P(tmp_me)) {
++                    if (defined_class_ptr) *defined_class_ptr = refinement_class;
++                    return tmp_me;
++                }
+                 // An undef in an active refinement keeps resolving from the owner.
+                 defined_class = 0;
+             }

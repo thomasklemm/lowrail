@@ -1,0 +1,27 @@
+e[2]: Leaving directory '/home/user/build/master/.bundle/gems/prism-2.1.0/ext/prism'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/racc-1.8.1/ext/racc/cparse'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/racc-1.8.1/ext/racc/cparse'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/rbs-4.2.0/ext/rbs_extension'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/rbs-4.2.0/ext/rbs_extension'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Entering directory '/home/user/build/master'
+make[2]: 'ruby' is up to date.
+make[2]: Leaving directory '/home/user/build/master'
+make[1]: Leaving directory '/home/user/build/master'
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'note'.
+make[1]: Leaving directory '/home/user/build/master'
+Run options: 
+  --seed=52422
+  "--ruby=./miniruby -I/home/user/src/ruby/lib -I. -I.ext/common  /home/user/src/ruby/tool/runruby.rb --extout=.ext  -- --yjit-call-threshold=1"
+  --excludes-dir=/home/user/src/ruby/test/.excludes
+  --name=!/memory_leak/
+
+# Running tests:
+
+Finished tests in 19.870686s, 37.8950 tests/s, 401.6469 assertions/s.
+753 tests, 7981 assertions, 0 failures, 0 errors, 1 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c79eac2cd3) +YJIT +PRISM [x86_64-linux]
+rc=0

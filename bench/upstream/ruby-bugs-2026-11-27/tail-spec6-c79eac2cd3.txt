@@ -1,0 +1,21 @@
+bundle/gems/rbs-4.2.0/ext/rbs_extension'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Entering directory '/home/user/build/master'
+make[2]: 'ruby' is up to date.
+make[2]: Leaving directory '/home/user/build/master'
+make[1]: Leaving directory '/home/user/build/master'
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'note'.
+make[1]: Leaving directory '/home/user/build/master'
+$ /home/user/build/master/miniruby -I/home/user/src/ruby/lib /home/user/src/ruby/tool/runruby.rb --archdir=/home/user/build/master --extout=.ext -- /home/user/src/ruby/spec/mspec/bin/mspec-run -B /home/user/src/ruby/spec/default.mspec /home/user/src/ruby/spec/ruby/core/refinement /home/user/src/ruby/spec/ruby/core/module /home/user/src/ruby/spec/ruby/core/main/using_spec.rb /home/user/src/ruby/spec/ruby/core/kernel /home/user/src/ruby/spec/ruby/core/basicobject
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c79eac2cd3) +PRISM [x86_64-linux]
+     0 ............................................................
+    60 ............................................................
+   120 ............................................................
+   180 ...............................................
+
+Finished in 5.386440 seconds
+
+227 files, 3577 examples, 25725 expectations, 0 failures, 0 errors, 0 tagged
+rc=0
