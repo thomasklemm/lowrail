@@ -4,7 +4,7 @@ bundle install fails with "uninitialized constant Pathname::SEPARATOR_PAT" for l
 
 Description:
 
-On master, `bundle install` fails when the lockfile was written by Bundler 2.x or 4.0.0 to 4.0.11 and has a path or git source, such as a gem repository whose Gemfile says `gemspec`:
+On master, `bundle install` fails when the lockfile was written by Bundler 2.3 to 4.0.11 and has a path or git gem with files, such as the gem of a repository whose Gemfile says `gemspec`:
 
 ```
 Bundler 4.1.1 is running, but your lockfile was generated with 2.6.9. Installing Bundler 2.6.9 and restarting using that version.
@@ -12,7 +12,7 @@ NameError: uninitialized constant Pathname::SEPARATOR_PAT
   .../gems/bundler-2.6.9/lib/bundler/source/path.rb:218:in 'block in Bundler::Source::Path#generate_bin'
 ```
 
-Bundler switches to the version in `BUNDLED WITH`, and Bundler before 4.0.12 reads `Pathname::SEPARATOR_PAT` for every path and git gem. 4e243c709e made the constant private and a5996718f3 removed it; Bundler itself stopped using it in https://github.com/ruby/rubygems/pull/9529. Lockfiles with only rubygems.org gems still install, and `bundle update --bundler` fixes an affected repository.
+Bundler switches to the version in `BUNDLED WITH`, and those versions read `Pathname::SEPARATOR_PAT` while checking the files of a path or git gem. 4e243c709e made the constant private and a5996718f3 removed it; Bundler itself stopped using it in https://github.com/ruby/rubygems/pull/9529. Lockfiles with only rubygems.org gems still install. Plain `bundle update --bundler` runs the old Bundler and fails the same way; `bundle _4.1.1_ update --bundler` updates the lockfile.
 
 To reproduce (Ruby 4.0 installs, master raises):
 

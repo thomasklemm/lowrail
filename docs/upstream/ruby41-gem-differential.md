@@ -59,7 +59,7 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
   reinstall the older Bundler is not discussed in either place; no Redmine ticket or rubygems issue covers it.
 * Reach: in this differential every committed lock with Bundler < 4.0.12 and a PATH section fails, and no other lock
   does. Apps with git gems have the same shape, e.g. forem's main lock (BUNDLED WITH 2.4.17, two GIT/PATH sections).
-  The fix per repository is `bundle update --bundler`.
+  The fix per repository is `bundle _4.1.1_ update --bundler`; plain `bundle update --bundler` runs the old Bundler and fails. Bundler 2.0 to 2.2 already fail on 4.0.10 for other reasons, so the range is 2.3 to 4.0.11, and only gems that list files hit the read.
 * Scope: lockfiles with only rubygems.org gems still install on master after Bundler switches to 2.4.2, 2.6.9 or
   4.0.11 ([`separator_pat_rubygems_only.sh`](../../bench/upstream/gem-differential/repros/separator_pat_rubygems_only.sh)).
   Master tip `274cfe719a` changes none of the files involved since `a1a9f45587`.
@@ -72,7 +72,7 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
 
 ### Für Thomas (Erklärung zu SEP1)
 
-**Was kaputt geht.** Bundler vor 4.0.12 benutzt beim Installieren eines Gems aus einem Pfad oder Git-Repo die
+**Was kaputt geht.** Bundler 2.3 bis 4.0.11 benutzt beim Installieren eines Gems aus einem Pfad oder Git-Repo die
 Konstante `Pathname::SEPARATOR_PAT`. Ruby master hat sie im Mai privat gemacht und dann entfernt. Weil Bundler
 automatisch auf die Version aus `BUNDLED WITH` im Lockfile umschaltet, bricht `bundle install` auf Ruby 4.1 ab,
 sobald das Lockfile von einem älteren Bundler stammt und eine PATH- oder GIT-Quelle hat. Das ist fast jedes Gem-Repo
@@ -91,7 +91,7 @@ $ bundle install          # Ruby master: NameError: uninitialized constant Pathn
 Warnung gibt es nur mit `-W:deprecated`.
 
 **Zu entscheiden.** (a) Diesen PR auf ruby/ruby, (b) ein Redmine-Bug mit dem Repro, ohne Patch, oder (c) nichts
-upstream: Die Änderung war gewollt, Bundler 4.0.12 hat den Fix, und jedes betroffene Repo kann `bundle update
---bundler` ausführen. Empfehlung: (b), weil nobu den Bruch von Bundler selbst kannte und die Wahl zwischen
+upstream: Die Änderung war gewollt, Bundler 4.0.12 hat den Fix, und jedes betroffene Repo kann `bundle _4.1.1_ update
+--bundler` ausführen (ein einfaches `bundle update --bundler` startet den alten Bundler und scheitert genauso). Empfehlung: (b), weil nobu den Bruch von Bundler selbst kannte und die Wahl zwischen
 Rückkehr der Konstante und einer Bundler-seitigen Lösung (z. B. beim Umschalten auf eine alte Version) bei den
 Maintainern liegt; das Repro und der Patch sind fertig, falls sie den Patch wollen.
