@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Builds the Duel calibration branches on thomasklemm/hashie, each one commit on duel-calibration,
 # and opens a PR against duel-calibration in the fork itself (never upstream).
+# Titles, bodies and commit messages name no upstream PR or issue (no owner/repo#N, no URLs): each mention puts a
+# cross-reference event on the upstream timeline. Use the item ID or plain words.
 set -euo pipefail
 cd /home/user/workspace/repos/hashie
 COMMIT=/home/user/workspace/repo/script/commit
