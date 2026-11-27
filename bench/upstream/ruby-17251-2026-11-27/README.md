@@ -4,12 +4,16 @@ The rebased comparison our 2026-11-25 comment said was missing
 ([comment](https://github.com/ruby/ruby/pull/17251#issuecomment-7152413475),
 [record](../../../docs/upstream/ruby-4.1-regression-watch.md#against-rubyruby17251-new-head-57eb4b4274-2026-11-24-re-tested-2026-11-25)).
 
-**Result: on its current base the PR no longer reduces major GCs or GC time, and RSS is about the same.** Master
-`f6278067b6` already runs 6–7 shipit majors (all `nofree`) and at most 3 per round on the 35 Rails workloads. The
-11-25 base `dec1bb786f` ran 28–29 shipit majors and 65–102 Rails majors per round. On shipit the head runs 8–9 majors,
-almost all `oldgen` at the PR's 1.25× oldgen limit: 1–3 more than the base in 17 of 18 round pairs, and never fewer.
-GC time is inside the A/A for the interpreter, about 6% higher under YJIT and about 6% lower under ZJIT. On the Rails
-workloads, majors, GC time and RSS stay inside the A/A spread in all three modes.
+**Result: on its current base the PR no longer lowers major counts; GC time differs by mode.** Base `f6278067b6`
+runs median 6–7 shipit majors (range 6–8; all completed records `nofree`) and at most 3 per round on the 35 Rails
+workloads. (The 11-25 base `dec1bb786f` ran medians 28–29, range 27–31, on a different orb and sequentially, so the
+cross-run change is not attributed to Ruby alone.) On shipit the head runs 8–9 majors, 76 of 77 completed records
+`oldgen` at the PR's 1.25× limit: 1–3 more than the base in 17 of 18 round pairs, tied once, never fewer. Shipit GC
+time: interpreter overlaps the A/A; YJIT higher in 6/6 pairs against base (median +139 ms, +2.1% to +13.4%) and 5/6
+against base2; ZJIT lower in 6/6 against both (median −166 ms, −4.6% to −19.5%). Rails: GC-time directions are mixed
+in every mode; ZJIT majors are higher on the head in 4/5 rounds (+1, +2, +2, +1, 0) and ZJIT RSS is higher in 4/5
+against base and 5/5 against base2. Review corrections (Astra, 2026-11-27): the first draft's "about 6%" (a paired
+median, not every round) and blanket "inside the A/A" claims were cut.
 
 ## Setup
 
@@ -78,7 +82,8 @@ Head − base majors per round: interp 2, 1, 2, 3, 2, 3; YJIT 3, 2, 3, 3, 3, 3; 
 | ZJIT | base | nofree 21 | 2× | 64 | 7, 7, 7 | 2,502 |
 | ZJIT | head | oldgen 27 | 1.25× | 64 | 9, 9, 9 | 2,366 |
 
-YJIT head: 26 majors counted, 25 completed records (as on 11-25, one has no record).
+Head majors without a completed record: interp 2 (`GC.stat` 9, 9, 9 against 9, 8, 8 records), YJIT 1 (9, 9, 8
+against 8, 9, 8). None on the base or under ZJIT.
 
 ## Rails workloads (35 workloads, 5 rounds; median, min–max; RSS summed over the three apps)
 
@@ -105,8 +110,9 @@ Paired by round, all apps (median, min–max; lower in):
 * YJIT: GC ms head − base +41 (−291 to +496) 2/5, A/A +198 (−450 to +337); RSS head − base −15.7 (−18.7 to +7.0)
   4/5, A/A −10.3 (−34.0 to +20.0).
 * ZJIT: GC ms head − base +68 (−354 to +137) 2/5, A/A −99 (−481 to +463); RSS head − base +9.8 (−0.9 to +22.3) 1/5,
-  head − base2 +17.7 (+2.2 to +35.5) 0/5, A/A −3.2 (−33.0 to +4.6). The one direction that holds in most rounds is
-  ZJIT RSS higher on the head than the base in 4/5 rounds (per round +0.3, +2.6, +1.1, +2.2, −0.1%), inside the A/A's magnitude.
+  head − base2 +17.7 (+2.2 to +35.5) 0/5, A/A −3.2 (−33.0 to +4.6). ZJIT RSS is higher on the head than the base in
+  4/5 rounds (per round +0.3, +2.6, +1.1, +2.2, −0.1%) and than base2 in 5/5; the A/A's signed range does not show
+  this is noise. Interp head − base GC −465 ms and YJIT +496 ms fall outside the A/A's signed range.
 
 Full report: [`report.txt`](report.txt) (from
 [`report.rb`](../../../fixtures/corpus/ruby-41-watch/gcstep/vs17251-2026-11-27/report.rb)); raw data (shipit
