@@ -1,0 +1,91 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/lead6/body/l6_body_w102.rb",
+  "at": "2026-11-27T12:25:55Z",
+  "n": 100,
+  "warmup": 200,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby",
+      "tree": "/home/user/w/l6",
+      "description": "ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "8b1c6428ea056b3c5983372d85b85615ae3d3f45",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp update! of one column": {
+      "base": 279.981,
+      "base1": 279.987,
+      "base2": 279.975,
+      "candidate": 279.975,
+      "change": -0.00002143002560872631,
+      "aa": 0.00004286005121776283,
+      "claim": false
+    },
+    "interp find, then changed?": {
+      "base": 186.0,
+      "base1": 186.0,
+      "base2": 186.0,
+      "candidate": 186.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp serializable_hash": {
+      "base": 104.0,
+      "base1": 104.0,
+      "base2": 104.0,
+      "candidate": 104.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp update! of one column": {
+      "base": 2460339.205,
+      "base1": 2460519.08,
+      "base2": 2460159.33,
+      "candidate": 2269275.57,
+      "change": -0.07765743626395627,
+      "aa": 0.00014621967542886023,
+      "claim": true
+    },
+    "interp find, then changed?": {
+      "base": 1832521.995,
+      "base1": 1832221.32,
+      "base2": 1832822.67,
+      "candidate": 1731696.84,
+      "change": -0.05501988804232605,
+      "aa": 0.0003281543150044757,
+      "claim": true
+    },
+    "interp serializable_hash": {
+      "base": 642937.265,
+      "base1": 642848.81,
+      "base2": 643025.72,
+      "candidate": 601182.6,
+      "change": -0.06494360690074485,
+      "aa": 0.0002751590390392384,
+      "claim": true
+    }
+  },
+  "ips": {}
+}

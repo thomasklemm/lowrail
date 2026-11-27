@@ -1,0 +1,508 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/lead6/body/l6_body.rb",
+  "at": "2026-11-27T12:17:28Z",
+  "n": 200,
+  "warmup": 300,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/l6",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "8b1c6428ea056b3c5983372d85b85615ae3d3f45",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "zjit update! of one column": {
+      "base": 209.993,
+      "base1": 209.975,
+      "base2": 210.011,
+      "candidate": 209.987,
+      "change": -0.000028572380984082102,
+      "aa": 0.00017143428590477475,
+      "claim": false
+    },
+    "zjit find, then changed?": {
+      "base": 88.0,
+      "base1": 88.0,
+      "base2": 88.0,
+      "candidate": 88.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "zjit serializable_hash": {
+      "base": 32.0,
+      "base1": 32.0,
+      "base2": 32.0,
+      "candidate": 32.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "zjit update! of one column": {
+      "base": 665053.2324999999,
+      "base1": 665124.105,
+      "base2": 664982.36,
+      "candidate": 652541.99,
+      "change": -0.018812392585430993,
+      "aa": 0.00021313331485836416,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n200 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n200 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n200 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                976,
+                976
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17387,
+                17387
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                972,
+                972
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17349,
+                17349
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                978,
+                978
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17319,
+                17319
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                977,
+                977
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17311,
+                17311
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                976,
+                976
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17387,
+                17387
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                976,
+                976
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                17387,
+                17387
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit find, then changed?": {
+      "base": 281410.5325,
+      "base1": 281738.88,
+      "base2": 281082.185,
+      "candidate": 277680.755,
+      "change": -0.013253866039999673,
+      "aa": 0.002333583587529749,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n200 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n200 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n200 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12817,
+                12817
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12817,
+                12817
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12769,
+                12769
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12769,
+                12769
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12817,
+                12817
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                731,
+                731
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                12817,
+                12817
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit serializable_hash": {
+      "base": 124339.9575,
+      "base1": 124742.595,
+      "base2": 123937.32,
+      "candidate": 126140.68,
+      "change": 0.014482251210355956,
+      "aa": 0.006476397581203887,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n200 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n200 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n200 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10198,
+                10198
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10198,
+                10198
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                597,
+                597
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10140,
+                10140
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                597,
+                597
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10140,
+                10140
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10198,
+                10198
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10198,
+                10198
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {}
+}

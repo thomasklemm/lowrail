@@ -1,0 +1,5 @@
+am-l6: 8b1c6428ea056b3c5983372d85b85615ae3d3f45 activemodel test  | 1277 runs, 5712 assertions, 0 failures, 0 errors, 0 skips
+ar-sqlite-l6: 8b1c6428ea056b3c5983372d85b85615ae3d3f45 activerecord test:sqlite3  | 10459 runs, 37398 assertions, 0 failures, 3 errors, 52 skips
+ar-pg-l6: 8b1c6428ea056b3c5983372d85b85615ae3d3f45 activerecord test:postgresql  | 11391 runs, 41339 assertions, 0 failures, 0 errors, 31 skips
+l6 sqlite_rake_test.rb (sqlite3 CLI installed): 15 runs, 38 assertions, 0 failures, 0 errors, 0 skips
+ar-sqlite-l6: the 3 errors are SqliteStructureDump tests that need the sqlite3 CLI, installed during this run; rerun above

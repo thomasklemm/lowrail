@@ -1,0 +1,194 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/lead6/body/l6_body_serializable_hash.rb",
+  "at": "2026-11-27T12:24:48Z",
+  "n": 1000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/l6",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "8b1c6428ea056b3c5983372d85b85615ae3d3f45",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "zjit serializable_hash": {
+      "base": 31.999,
+      "base1": 31.999,
+      "base2": 31.999,
+      "candidate": 31.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "zjit serializable_hash": {
+      "base": 125152.681,
+      "base1": 125194.052,
+      "base2": 125111.31,
+      "candidate": 123884.114,
+      "change": -0.010136155213486764,
+      "aa": 0.0006611284659575001,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n0 invalidation_count missing",
+          "base n1000 invalidation_count missing",
+          "candidate n0 invalidation_count missing",
+          "candidate n1000 invalidation_count missing",
+          "base2 n0 invalidation_count missing",
+          "base2 n1000 invalidation_count missing"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                599,
+                599
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10202,
+                10202
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base n1000",
+            "counters": {
+              "compiled_iseq_count": [
+                599,
+                599
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10202,
+                10202
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10145,
+                10145
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "candidate n1000",
+            "counters": {
+              "compiled_iseq_count": [
+                598,
+                598
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10145,
+                10145
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                599,
+                599
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10202,
+                10202
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          },
+          {
+            "window": "base2 n1000",
+            "counters": {
+              "compiled_iseq_count": [
+                599,
+                599
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10202,
+                10202
+              ],
+              "invalidation_count": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {}
+}

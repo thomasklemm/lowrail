@@ -1,0 +1,2 @@
+{"[]": 41, attribute_at: 2, index_for_name: 9, keys: 3, lookup: 2}
+{changed: {"[]": 30, keys: 1}}
