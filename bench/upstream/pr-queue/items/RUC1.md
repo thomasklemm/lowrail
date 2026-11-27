@@ -34,13 +34,19 @@ passes:
     head: "c79eac2cd31a9d60606ed67fde22aefe475307e7"
     date: 2026-11-27
     verdict: changes
-    open: "Stands in for Astra (OpenAI safety check stopped T-01a21eca-63e1-76f7-b473-ee3433ea1051; brief's fallback). Code and test approved, 1900-case matrix per build and engine; body replaced with its text, order changed to after a maintainer responds to #20267."
+    open: "Interim second reviewer after OpenAI's safety check stopped the first Astra thread (T-01a21eca-63e1-76f7-b473-ee3433ea1051, archived). The coordinator then asked for a fresh Astra review with a neutral brief (T-01a21f31-1607-72af-8002-0e1f13682595); Fable (anthropic/claude-fable-5-2) replaces it if OpenAI blocks it again. Code and test approved, 1900-case matrix per build and engine; body replaced with its text, order changed to after a maintainer responds to #20267."
   - reviewer: opus
     orb: T-01a21f16-f8a9-775c-b419-4f621451d698
     head: "6bd87c87b9"
     date: 2026-11-27
     verdict: approve
     open: "Re-check at lowrail f52c3bc8: head, title, body, RUC1.md body, commit message, status and order approved; RUD1 report approved (fill or drop ruby/ruby#NNNNN). One record-only evidence wording fix applied. Optional body polish (three 'there') not applied, to keep the approved text."
+  - reviewer: thermos-sol
+    orb: T-01a21eca-5c03-7779-b80e-e03aef7db05c
+    head: "6bd87c87b9"
+    date: 2026-11-27
+    verdict: approve
+    open: "Re-check at lowrail f52c3bc8: title, PR and queue bodies, commit message and exact head approved; RUD1 report and held-ticket path approved (ruby/ruby#NNNNN must be filled or the clause dropped before posting). Must-fix 3 withdrawn: versions sentence stays per A clear PR before a ticket. One reviewer applied both rubrics."
 ---
 
 # Keep defined_class when an active refinement undefines a module method
