@@ -1,4 +1,4 @@
-Draft follow-up on ruby/ruby#17251 (not posted; Thomas approves the text). Numbers: [README](README.md). Text as
+Follow-up on ruby/ruby#17251, posted unchanged 2026-11-27 after Thomas approved it: [issuecomment-7229891094](https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094). Numbers: [README](README.md). Text as
 approved by Astra (255deaf8 review) and thermos-sol (69d69b29), unchanged.
 
 ---

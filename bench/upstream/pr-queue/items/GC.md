@@ -16,7 +16,7 @@ rank: 1
 risky: true
 state: held
 pr:
-note: "2026-11-27: rebased #17251 (head 9715d0224e on f6278067b6) no longer lowers shipit majors against its base (6-7 vs 8-9, base all nofree); GC time differs by mode; record bench/upstream/ruby-17251-2026-11-27, follow-up drafted, not posted. fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers for master and #17251 (not ours) added to our comment on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6652543942"
+note: "2026-11-27: rebased #17251 (head 9715d0224e on f6278067b6) no longer lowers shipit majors against its base (6-7 vs 8-9, base all nofree); GC time differs by mode; record bench/upstream/ruby-17251-2026-11-27, follow-up posted (https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094). fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers for master and #17251 (not ours) added to our comment on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6652543942"
 passes: []
 ---
 

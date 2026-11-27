@@ -118,7 +118,7 @@ Full report: [`report.txt`](report.txt) (from
 JSONs with per-GC records, census JSONs and logs per workload, queue logs):
 [`receipts.tar.gz`](receipts.tar.gz).
 
-## Draft comment (not posted; Thomas approves)
+## Comment (posted 2026-11-27, [issuecomment-7229891094](https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094))
 
 See [`comment.md`](comment.md).
 
@@ -133,4 +133,4 @@ See [`comment.md`](comment.md).
   contention). Re-verified the cells, every paired direction, the attribution counts and head.diff against both Ruby
   pins. [Review](https://ampcode.com/artifacts/ruby-follow-up-review-28678b13-a8be-4e50-a677-7fbed7063285).
 
-Both approve the same comment text. Not posted: ruby/ruby, Thomas approves first.
+Both approve the same comment text. Thomas approved it; posted unchanged 2026-11-27 as [issuecomment-7229891094](https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094).
