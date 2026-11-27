@@ -402,3 +402,34 @@ gain kept); under YJIT the difference is about 2,000. benchmark-ips, YJIT, 6 ful
 ([body-ips.txt](results/rebuild3-2026-11-27/body-ips.txt)): Marshal.dump 36,143 → 43,776 i/s (+21.1%),
 attributes_for_database 92,570 → 150,662 (+62.8%); main2 +0.5% and −4.7%. Every L3 round is above every main round
 (slowest L3 39,560 and 136,396 against the fastest main 36,143 and 92,570).
+
+## Wall-time follow-ups (2026-11-27)
+
+On head `319e55a661` against main `088fc0cf61`, `script/upstream-bench --wall 30` (30 rounds of fresh
+main/branch/main2 processes on one core, 95% bootstrap intervals). Every wall window is JIT-flat. The tool now gates
+ZJIT on `invalidation_time_ns`, so master's missing `invalidation_count` no longer leaves the cells ungated.
+
+Ruby master `f3e180b5eb` × ZJIT, `l3_body.rb`, 30 columns ([L3-master-zjit-wall](body/L3-master-zjit-wall-319e55a661/table.md);
+replaces the ungated run on `f70d3e0917`):
+
+| | Instructions | A/A | Wall | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Marshal.dump` | −18.3% | 0.17% | −16.9% [−17.3, −16.5] | +0.2% [−0.2, +0.5] |
+| `attributes_for_database` | −45.8% | 0.15% | −46.6% [−46.9, −46.4] | +0.4% [−0.6, +1.4] |
+| `attributes_before_type_cast` | −47.9% | 0.04% | −49.9% [−50.1, −49.5] | +0.6% [−0.3, +1.4] |
+| MessagePack dump | −38.2% | 0.01% | −34.3% [−34.6, −33.9] | +0.1% [−0.3, +1.5] |
+
+The two 1 MiB cases from thermos-sol's sweep (−3.0% and −2.3% there, short and ungated), in
+[`l3_large_values.rb`](body/l3_large_values.rb) on a 6-column table, `--warmup 300` (the objects pass and the default
+3,000 warm-up calls run with GC off, which at 1 MiB per call ran out of the orb's 3.9 GB; the objects pass ran with
+6 GB of swap added for the run):
+
+| | YJIT, Ruby 4.0.9 | A/A | ZJIT, master `f3e180b5eb` | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Marshal.dump`, 1 MiB string | −0.6% [−0.9, −0.2] | +0.3% [+0.1, +0.8] | −1.1% [−1.4, −0.7] | +0.1% [−0.5, +0.7] |
+| `attributes_for_database`, 1 MiB serialized every call | −0.6% [−1.0, −0.2] | +0.1% [−0.2, +0.7] | −0.8% [−1.0, −0.3] | −0.3% [−0.5, +0.0] |
+
+([YJIT](body/L3-large-yjit-wall-319e55a661/table.md), [ZJIT](body/L3-large-zjit-wall-319e55a661/table.md).) No
+loss: no cell has a change interval excluding 0 in the slower direction. The YJIT `Marshal.dump` cell's A/A interval
+excludes 0, so the tool makes no claim there; the other three are small gains, as expected when copying a 1 MiB value
+dominates the call. Nothing changes on the PR.

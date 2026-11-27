@@ -1,0 +1,2 @@
+calibrate Marshal.dump, 1 MiB string	0.00042963330666666506
+calibrate attributes_for_database, 1 MiB serialized every call	0.0005109358766666657

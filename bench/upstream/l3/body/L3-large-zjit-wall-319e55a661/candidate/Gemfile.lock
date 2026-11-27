@@ -1,0 +1,98 @@
+PATH
+  remote: /home/user/w/l3/activemodel
+  specs:
+    activemodel (8.2.0.alpha)
+      activesupport (= 8.2.0.alpha)
+
+PATH
+  remote: /home/user/w/l3/activerecord
+  specs:
+    activerecord (8.2.0.alpha)
+      activemodel (= 8.2.0.alpha)
+      activesupport (= 8.2.0.alpha)
+      timeout (>= 0.4.0)
+
+PATH
+  remote: /home/user/w/l3/activesupport
+  specs:
+    activesupport (8.2.0.alpha)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.3.1)
+      drb
+      i18n (>= 1.6, < 2)
+      json
+      logger (>= 1.4.2)
+      minitest (>= 5.1)
+      psych (>= 4)
+      ractor-dispatch (>= 0.3.0)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    base64 (0.3.0)
+    bigdecimal (4.1.3)
+    concurrent-ruby (1.3.8)
+    date (3.6.0)
+    drb (2.2.3)
+    i18n (1.15.2)
+      concurrent-ruby (~> 1.0)
+    json (3.2.0)
+    logger (1.7.0)
+    mini_portile2 (2.8.9)
+    minitest (6.1.0)
+      drb (~> 2.0)
+      prism (>= 1.5, < 3)
+    prism (2.1.0)
+    psych (5.5.0)
+      date
+      stringio
+    ractor-dispatch (0.3.0)
+    securerandom (0.4.1)
+    sqlite3 (2.10.2)
+      mini_portile2 (~> 2.8.0)
+    stringio (3.2.0)
+    timeout (0.6.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (1.1.2)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  activemodel!
+  activerecord!
+  activesupport!
+  sqlite3
+
+CHECKSUMS
+  activemodel (8.2.0.alpha)
+  activerecord (8.2.0.alpha)
+  activesupport (8.2.0.alpha)
+  base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
+  bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
+  concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
+  date (3.6.0) sha256=18ac945c4e24ebd93534f8eab8c2fd8c5604b3e977105b3798d62a1e8d27b580
+  drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
+  i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+  json (3.2.0) sha256=4a4e222a9ee6ffb296ab3171b6b39d85fec83afc4e7b57eee17edf68c74aec87
+  logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
+  minitest (6.1.0) sha256=ff373595aa8888631e8a5463986a76b3845346ae6d7fa46e139c1633d418076e
+  prism (2.1.0) sha256=1c0a7c6dea0e93183390fb123f007564dbe663198e2f86ad87204151147601f3
+  psych (5.5.0) sha256=4b245bbbd0f3238df8ccee766ebc1a6b062b10e4ee1d3284eb588739ba156a0a
+  ractor-dispatch (0.3.0) sha256=cd2d46743303e00fe500df168b4dde85080160fd9f04539cada4b4dd5e588f68
+  securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
+  sqlite3 (2.10.2) sha256=f1ea68cd3287f8a49f39a088ac9e4bd0ef4e7f394c3d4a60dd4c7e44b0566964
+  stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
+  timeout (0.6.1) sha256=78f57368a7e7bbadec56971f78a3f5ecbcfb59b7fcbb0a3ed6ddc08a5094accb
+  tzinfo (2.0.6) sha256=8daf828cc77bcf7d63b0e3bdb6caa47e2272dcfaf4fbfe46f8c3a9df087a829b
+  uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
+
+BUNDLED WITH
+  4.1.1

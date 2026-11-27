@@ -1,0 +1,2 @@
+objects Marshal.dump, 1 MiB string	7.999
+objects attributes_for_database, 1 MiB serialized every call	3.0

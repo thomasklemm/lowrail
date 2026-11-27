@@ -1,0 +1,4 @@
+calibrate Marshal.dump	2.6839904000000913e-05
+calibrate attributes_for_database	1.0710997000000333e-05
+calibrate attributes_before_type_cast	9.753890000000709e-06
+calibrate MessagePack dump	1.5013431999999937e-05
