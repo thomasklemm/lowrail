@@ -1,4 +1,4 @@
-Draft issue for sferik/duel-ruby (not posted; Thomas approves the final text). The issue body is between the two
+Draft issue for sferik/duel-ruby. **Not posted** (Thomas, 2026-11-27: kept as our own notes, no issue). The issue body is between the two
 horizontal rules; the review after it is internal. Checked against Duel 0.3.1 and main a09111e on 2026-11-27.
 
 Title: Document how to compare dependency changes
