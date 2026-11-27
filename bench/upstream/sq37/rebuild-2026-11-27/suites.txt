@@ -1,0 +1,2 @@
+ar-sqlite-sq37: 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 activerecord test:sqlite3  | 10460 runs, 37402 assertions, 0 failures, 0 errors, 52 skips
+ar-pg-sq37: 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 activerecord test:postgresql  | 11391 runs, 41340 assertions, 0 failures, 0 errors, 31 skips

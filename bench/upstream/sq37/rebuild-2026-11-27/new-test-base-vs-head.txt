@@ -1,0 +1,2 @@
+New test on main 088fc0cf61 (test file from 3e348f32bd): 116 runs, 284 assertions, 1 failures (test_check_version_requires_sqlite_3_37, line 175: 3.36.0 not refused)
+Head 3e348f32bd sqlite3_adapter_test.rb: 116 runs, 286 assertions, 0 failures, 0 errors, 0 skips

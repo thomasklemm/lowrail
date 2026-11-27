@@ -1,0 +1,338 @@
+{
+  "base": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+  "head": "3e348f32bdc2b5b405d31f226e6de04aa3278dc9",
+  "repo": "/home/user/w/rails",
+  "files": [
+    "activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb",
+    "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+  ],
+  "floors": {
+    "sqlite": "3.35.0",
+    "postgresql": "10.0",
+    "mysql": "5.7.9",
+    "ruby": "3.3.5"
+  },
+  "seed": 41231,
+  "cells": [
+    {
+      "label": "SQLite 3.35.5 (floor, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 90,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb",
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "fail",
+        "summary": "crashed; 15 runs, 4 assertions, 0 failures, 12 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_column_names",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": "/home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.35.5/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#prepare': SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)\nSELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table')\n\tfrom /home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.35.5/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#initialize'\n\tfrom /home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.35.5/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/database.rb:215:in 'SQLite3::Database#prepare'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:124:in 'ActiveRecord::ConnectionAdapters::SQLite3::DatabaseStatements#perform_query'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:765:in 'Act"
+      },
+      "head": {
+        "status": "fail",
+        "summary": "crashed; 15 runs, 0 assertions, 0 failures, 15 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_column_names",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_control_raw_sql",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_control_columns",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_create_table_force",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "RuntimeError: Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0."
+          }
+        ],
+        "output": "/home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:520:in 'ActiveRecord::ConnectionAdapters::SQLite3Adapter#check_version': Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0. (RuntimeError)\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1463:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#configure_connection'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:989:in 'ActiveRecord::ConnectionAdapters::SQLite3Adapter#configure_connection'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:858:in 'block (3 levels) in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection"
+      },
+      "new_in_head": [
+        "SQLiteDataSourcesTest#test_control_raw_sql",
+        "SQLiteDataSourcesTest#test_control_columns",
+        "SQLiteDataSourcesTest#test_create_table_force"
+      ]
+    },
+    {
+      "label": "SQLite 3.44.2 (middle, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 125,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb",
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "pass",
+        "summary": "115 runs, 283 assertions, 0 failures, 0 errors, 0 skips; 15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "head": {
+        "status": "pass",
+        "summary": "116 runs, 286 assertions, 0 failures, 0 errors, 0 skips; 15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "new_in_head": []
+    },
+    {
+      "label": "SQLite 3.36.0 (extra, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 111,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb",
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "fail",
+        "summary": "crashed; 15 runs, 4 assertions, 0 failures, 12 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_column_names",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list:"
+          }
+        ],
+        "output": "/home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.36.0/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#prepare': SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)\nSELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table')\n\tfrom /home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.36.0/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:36:in 'SQLite3::Statement#initialize'\n\tfrom /home/user/.cache/lowrail-min-versions/bundle/ruby-4.0.9/sqlite-3.36.0/ruby/4.0.0/gems/sqlite3-2.10.2/lib/sqlite3/database.rb:215:in 'SQLite3::Database#prepare'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:124:in 'ActiveRecord::ConnectionAdapters::SQLite3::DatabaseStatements#perform_query'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:765:in 'Act"
+      },
+      "head": {
+        "status": "fail",
+        "summary": "crashed; 15 runs, 0 assertions, 0 failures, 15 errors, 0 skips",
+        "failures": [
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_dump",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_source_exists",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_column_names",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_table_exists",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_tables",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_control_raw_sql",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_control_columns",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_create_and_find",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_model_table_exists",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_data_sources",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_schema_cache_data_source_exists",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_create_table_force",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_views",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_view_exists",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          },
+          {
+            "test": "SQLiteDataSourcesTest#test_migrate_creates_schema_migrations",
+            "message": "RuntimeError: Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0."
+          }
+        ],
+        "output": "/home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:520:in 'ActiveRecord::ConnectionAdapters::SQLite3Adapter#check_version': Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0. (RuntimeError)\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1463:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#configure_connection'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:989:in 'ActiveRecord::ConnectionAdapters::SQLite3Adapter#configure_connection'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:858:in 'block (3 levels) in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'\n\tfrom /home/user/.cache/lowrail-min-versions/trees/3e348f32bdc2b5b405d31f226e6de04aa3278dc9/activerecord/lib/active_record/connection"
+      },
+      "new_in_head": [
+        "SQLiteDataSourcesTest#test_control_raw_sql",
+        "SQLiteDataSourcesTest#test_control_columns",
+        "SQLiteDataSourcesTest#test_create_table_force"
+      ]
+    },
+    {
+      "label": "SQLite 3.37.0 (extra, Ruby 4.0.9)",
+      "server_version": null,
+      "build_seconds": 122,
+      "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+      "files": [
+        "activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb",
+        "/home/user/workspace/repo/bench/upstream/sq37/sqlite_data_sources_test.rb"
+      ],
+      "base": {
+        "status": "pass",
+        "summary": "115 runs, 280 assertions, 0 failures, 0 errors, 1 skips; 15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "head": {
+        "status": "pass",
+        "summary": "116 runs, 283 assertions, 0 failures, 0 errors, 1 skips; 15 runs, 17 assertions, 0 failures, 0 errors, 0 skips",
+        "failures": [],
+        "output": null
+      },
+      "new_in_head": []
+    }
+  ]
+}

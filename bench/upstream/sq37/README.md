@@ -80,3 +80,28 @@ fix adds a test of the message and the 3.37.0 boundary next to `test_connect`.
 
 thermos-sol on `183262f440` approves the code, test, body and commit; its must-fixes were record wording (applied).
 Evidence: [review-thermos-sol-2026-11-25](review-thermos-sol-2026-11-25/README.md).
+
+## Rebuild on main 088fc0cf61 (2026-11-27)
+
+Main moved 104 commits since `f785381cca`. `check_version` and `data_source_sql` are unchanged (same text; the
+method moved two lines down to schema_statements.rb L218-L227); the only SQLite adapter commit since is the
+temporary-table shadowing fix, which changes `MASTER_CTE` (sqlite_master/sqlite_temp_master, no 3.37 feature). The
+old head conflicted only in `activerecord/CHANGELOG.md`. Rebuilt by hand as one commit `3e348f32bd` on
+`088fc0cf61`: the same code and test diff (patch-id `4deab600` outside the CHANGELOG, equal to `183262f440`), the
+same CHANGELOG entry on top of main's file, the same message, Thomas as author and committer, no trailers.
+Force-pushed to `thomasklemm/sqlite-floor-3-37` with a lease on `183262f440` (no PR on that branch). The body's two
+permalinks now point at `088fc0cf61`.
+
+No merged PR covers it: none of the 2026-11-25..27 merges touch `check_version` or the SQLite floor, and
+`script/ownership SQ37` finds no open PR (2026-11-27).
+
+* `script/min-versions` base `088fc0cf61` vs head, SQLite 3.35.5 / 3.36.0 / 3.37.0 / 3.44.2:
+  [rebuild-2026-11-27/min-versions-main-vs-fix.md](rebuild-2026-11-27/min-versions-main-vs-fix.md). As on
+  2026-11-25: 3.35.5 and 3.36.0 fail with `no such table: pragma_table_list` on base and with check_version's
+  message at connect on head; 3.37.0 and 3.44.2 pass on both (`sqlite3_adapter_test.rb` 115 runs on base, 116 on
+  head).
+* The new test fails on main and passes on head:
+  [rebuild-2026-11-27/new-test-base-vs-head.txt](rebuild-2026-11-27/new-test-base-vs-head.txt).
+* Full Active Record suites on head, Ruby 4.0.9: SQLite (sqlite3 gem 2.5.0 from Rails' Gemfile.lock, SQLite 3.47.2) 10,460
+  runs, 37,402 assertions, 0 failures, 0 errors, 52 skips; PostgreSQL 17 11,391 runs, 41,340 assertions, 0
+  failures, 0 errors, 31 skips (the change is SQLite-only; PostgreSQL is the control).
