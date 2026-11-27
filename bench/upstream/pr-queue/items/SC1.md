@@ -12,9 +12,9 @@ depends_on: []
 impact: Allow Scimitar to boot with Rails main's frozen parameter-parser registry
 rank: 15
 risky: true
-state: draft
+state: superseded
 pr: 172
-note: "2026-11-18 (guard simplification, docs/upstream/guard-simplification-2026-11-18.md): the writer-only form (e81365a6e0) is simpler; differs for retained registry references on Rails <= 8.1 (Sol/Astra P2), Thomas's call. stays a draft (Thomas, 2026-11-05): the fix belongs at the source, Rails main freezing parameter_parsers; F1 investigates. Evidence in docs/upstream/gem-side-candidates.md"
+note: "2026-11-27 (Thomas): closed as superseded by our merged Rails fix OP1 (parameter parsers writable during boot), comment issuecomment-7217687462. Earlier: 2026-11-18 (guard simplification, docs/upstream/guard-simplification-2026-11-18.md): the writer-only form (e81365a6e0) is simpler; differs for retained registry references on Rails <= 8.1 (Sol/Astra P2), Thomas's call. stays a draft (Thomas, 2026-11-05): the fix belongs at the source, Rails main freezing parameter_parsers; F1 investigates. Evidence in docs/upstream/gem-side-candidates.md"
 passes:
   - {reviewer: skeptic, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: approve, open: "L0; registry replacement boundary disclosed; no required changes"}
   - {reviewer: sol, head: "e81365a6e0f09c13d8c20996bf78f98c4bf5faa2", date: 2026-11-05, verdict: changes, open: "P2; preserve earlier references to mutable parameter_parsers"}
