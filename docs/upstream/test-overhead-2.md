@@ -34,9 +34,27 @@ because only three of nine suites use them, where they dominate; the gem's own c
 
 ## Suite wall time on a1.xxlarge
 
-Pending: two a1.xxlarge orbs time CodeTriage, Campfire, Hackatime and Fizzy, 12 rounds each, the suite as
-configured twice (A/A) against the log level at info, on Ruby 4.0.10 with YJIT and on master with ZJIT
-([`wall_rounds.rb`](../../bench/upstream/test_overhead/wall_rounds.rb)).
+Ruby 4.0.10 with YJIT, a1.xxlarge (16 vCPUs, suites run serially), 12 rounds, each app's suite as configured twice
+(`a`, `a2`: the A/A) against the logger at info with the event reporter's debug mode off (`info`, as
+`config.log_level = :info` sets it). Median of each round's ratios, seeded 95% bootstrap intervals over rounds
+([summary](../../bench/upstream/test_overhead/wall/ruby-4.0.10-yjit/summary.md),
+[runs](../../bench/upstream/test_overhead/wall/ruby-4.0.10-yjit/runs.jsonl)):
+
+| App | Suite wall, debug | A/A | Info against debug | 95% |
+| --- | ---: | ---: | ---: | --- |
+| CodeTriage | 6.5 s | +2.0% | **−9.7%** | −13.2% to −5.4% |
+| Campfire | 40.7 s | −1.2% | **−19.4%** | −21.5% to −17.5% |
+| Hackatime | 45.8 s | +0.2% | **−3.4%** | −6.1% to −2.1% |
+| Fizzy (own pin) | 80.0 s | −3.0% | **−14.7%** | −17.1% to −13.9% |
+
+Every A/A interval contains 0 and every change interval excludes it, so all four count. CPU time moves the same way
+(Campfire −26.9%). The info arm drops all debug logging, not only the SQL chain (Active Job, Action View, Active
+Storage and the app's own `logger.debug` lines too), so this is the price of the test environment's debug level, the
+upper bound for what the SQL path alone could give back; it is larger than the sampled SQL-chain shares above
+(Campfire 5.4%), and the difference is not attributed. Fizzy's info arm also fails 13 tests in every round that
+assert on debug log lines (`ActiveRecordSqlRedactionTest`, `ActionMailerDeliveredEventWithoutMailTest`), so it
+does slightly less work there. Test counts and exit statuses otherwise match in all 144 runs. Master with ZJIT:
+pending on the second a1.xxlarge orb.
 
 ## The ranking, per app
 

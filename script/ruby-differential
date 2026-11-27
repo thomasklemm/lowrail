@@ -254,6 +254,7 @@ module RubyDifferential
       if conf[:db]
         system("dropdb", "--if-exists", conf[:db].call("tpl"), exception: true)
       end
+      FileUtils.mkdir_p(File.join(HOME, "logs"))
       sh(e, *conf.fetch(:prep), chdir: dir, log: File.join(HOME, "logs", "prep-#{app}.log"))
     end
   end
