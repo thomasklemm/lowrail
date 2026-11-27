@@ -18,3 +18,6 @@ pingcrm PUT contact (Inertia redirect) yjit ur1_copy.rb Ir/op 4017172 objs/op 18
 pingcrm PUT contact (Inertia redirect) yjit ur1_cgi.rb Ir/op 3925169 objs/op 1736.4 jit 0/0 settle 1
 pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 3989911 objs/op 1813.4 jit 0/0 settle 1
 codetriage GET repo yjit none.rb Ir/op 8618117 objs/op 3179.2 jit 5/0 settle 1
+codetriage GET repo yjit ur1_copy.rb Ir/op 8623093 objs/op 3175.0 jit 5/0 settle 1
+codetriage GET repo yjit ur1_cgi.rb Ir/op 8585842 objs/op 3130.5 jit 5/0 settle 1
+codetriage GET repo yjit none.rb Ir/op 8622930 objs/op 3178.6 jit 5/0 settle 1

@@ -478,3 +478,115 @@ scripts also pass clean/util/pure on both Rubies. Raw malloc dumps and all reque
 not rebenchmarked here. The draft drops ungated YJIT micro claims and qualifies packaging, String dispatch and
 the request setup. Optional: add an input-mutating encoding test to protect late coercion as well as once-only
 coercion. One PR retaining both commits. [Full sentence audit, commands and receipts](../../bench/upstream/rk3/review-thermos-sol/02087583dc/README.md).
+
+## Re-measure of UR1 and NK2 (2026-11-27)
+
+Rails main `2e299253f9`, Ruby 4.0.10 (interpreter, YJIT) and Ruby master `0d399335b7` built with
+`--enable-yjit --enable-zjit` (interpreter, ZJIT). Census copies set up with `script/census setup` on this orb
+(blog, campfire, writebook, pingcrm, codetriage on 4.0.10; blog, campfire, writebook on master with the
+`frontier-master` overlays). Request numbers come from `req/reqrun.rb`, which now takes `REQ_RUBY` and `REQ_CORPUS`
+and reads ZJIT's `compiled_iseq_count` / `compiled_side_exit_count` for the JIT-flat check. GC is off for 20 measured
+requests after 200 (interpreter) or 1,000 + `FLAT=40` (JIT) warm-ups, and base is the mean of the `none.rb` runs with
+their spread as the A/A. A JIT row counts only when every window of base and patch is `0/0`. Receipts:
+[`data/outside-leads-2026-11-27/`](data/outside-leads-2026-11-27/).
+
+**Upstream state.**
+* RK3 (rack#2557) is approved and unmerged. GQ1 (graphql-ruby#5908) is open.
+* **nokogiri:** flavorjones has not reviewed our #3759 since his 2026-11-05 "I'll review today or tomorrow".
+  Its CI workflows still wait for first-contributor approval. Neither Ractor PR landed: jhawthorn's #3706 is open
+  (flavorjones pushed a commit to it on 11-11) and rubys' #3702 too, untouched since 10-21. #3706 changes
+  `CSS.xpath_for` to skip `SelectorCache` outside the main Ractor, which is the same lines NK2 would touch.
+  Outside merges continue (bardrop #3781 in `css/` on 11-21, Priyank-gouda678 #3757 on 11-04), and about ten
+  outside PRs from November are open. #3788 (wozhenbang2004) changes `xpath_for`'s option handling.
+* **ruby/uri** does not take outside PRs in practice. Every merge since 2026-03-16 is a maintainer's own (hsbt,
+  mame's #271 on 11-25, olleolleolle) or Dependabot's; the last outside merge is y-yagi's #209 (03-16). About 30
+  outside PRs are open, OskarEichler's 13 since 08-27 and czj's #268/#269 since 11-10. None touches
+  `decode_www_form_component`: #253 and #264 change MailTo callers of it.
+* **New:** Rails itself calls `URI.decode_www_form_component` for every query string and urlencoded form body key
+  and value (`ActionDispatch::QueryParser.each_pair`, since 8.0, unchanged on 8.1.4.1 and main). So UR1 reaches every
+  Rails request with parameters even after rack#2557 merges.
+
+### UR1
+
+Two variants, as measurement patches on `URI` ([`req/ur1_copy.rb`](../../bench/upstream/outside_leads/req/ur1_copy.rb),
+[`req/ur1_cgi.rb`](../../bench/upstream/outside_leads/req/ur1_cgi.rb)):
+* **One copy** (`str.b` then `gsub!`): inside the A/A on every request in both modes, and slower than base for the
+  `key` input per call. Dropped.
+* **cgi/escape** (`CGI.unescape(str, Encoding::BINARY).force_encoding(enc)` for plain ASCII-compatible Strings, the
+  old path otherwise; RK3's shape moved into URI).
+
+Per call, built branch against ruby/uri master (`script/upstream-bench`,
+[`body/UR1-4010`](../../bench/upstream/outside_leads/ur1/body/UR1-4010/table.md), A/A ≤ 0.44%, YJIT JIT-flat):
+
+| Input | Interpreter main → branch | YJIT main → branch | Objects |
+| --- | ---: | ---: | ---: |
+| `hello` | 4,486 → 4,083 (−9.0%) | 3,506 → 2,785 (−20.6%) | 4 → 2 |
+| `article%5Btitle%5D` | 13,114 → 5,693 (−56.6%) | 12,307 → 4,349 (−64.7%) | 7 → 1 |
+| `Hello+world+from+Rack` | 15,322 → 5,265 (−65.6%) | 14,518 → 3,921 (−73.0%) | 8 → 1 |
+| 248-byte cookie value | 18,056 → 10,154 (−43.8%) | 17,272 → 8,810 (−49.0%) | 7 → 1 |
+
+Master and ZJIT per call (`ir.sh`, [`ur1-micro*.txt`](data/outside-leads-2026-11-27/)): the cgi decoder is 2,793 /
+4,636 / 4,183 / 9,309 Ir under ZJIT for the four inputs. ZJIT cells through `upstream-bench` are in
+`body/UR1-master` (the first run, `UR1-master-aborted`, stopped when one ZJIT process wrote an empty log; the cause
+was not established, four Valgrind batches ran beside it).
+
+Per request, cgi variant as a method overlay:
+
+| Workload | Interpreter 4.0.10 (A/A) | YJIT 4.0.10 (A/A) | ZJIT master (A/A) |
+| --- | ---: | ---: | ---: |
+| blog PATCH article | −3.11% (0.64%) | **−5.67%** (0.13%) | **−5.19%** (0.39%) |
+| blog POST comment | −1.23% (0.44%) | not JIT-flat | not JIT-flat |
+| pingcrm PUT contact | −0.78% (0.30%) | **−1.82%** (0.47%) | — |
+| blog GET article | −0.35% (0.04%) | −0.95% (0.34%) | −0.64% (0.38%) |
+| codetriage GET repo | −0.34% (0.02%) | not JIT-flat | — |
+| blog GET articles.json (control) | +0.33% (0.19%), objects equal | — | +0.10% (0.11%) |
+
+The interpreter JSON control sits just outside its A/A with identical objects. This is the same bimodal allocator
+noise RK3 met (`malloc_consolidate`), and it was not rerun with `mxfast=0`. These overlays include Rack's calls
+through URI as well as Rails'. Once rack#2557 merges, the Rails part remains: every form field key and value, and
+every query parameter.
+
+**Built.** Queue item [UR1](../../bench/upstream/pr-queue/items/UR1.md). Fork branch
+`thomasklemm/decode-www-form-component-cgi`, commit `a3b201f05b` on ruby/uri master `48cda77031`, no PR. The
+differential ([`ur1/diff.rb`](../../bench/upstream/outside_leads/ur1/diff.rb)) ran 300,000 random + 142 fixed cases
+on 4.0.10 and master: the only difference is a `BasicObject` with `to_str`, which raises `NoMethodError` either way
+with another method name. A singleton `#b` on the input is no longer called. Two test assertions are added, each
+caught by its mutant. The suite passes on 4.0.10 and master; fork CI is green on 2.5–4.0, head, JRuby and TruffleRuby.
+Reviews (thermos-sol, Astra) and a1.xxlarge timing were started. **ruby/uri is a ruby-org repository and parked:
+Thomas decides whether it opens.**
+
+### NK2
+
+nokogiri 1.19.7 (latest release). It is precompiled on 4.0.10; on master it is built against the system libxml2, so
+master and 4.0.10 numbers are not comparable. Per call `fragment.css("action-text-attachment")`
+([`nk2/micro.sh`](../../bench/upstream/outside_leads/nk2/micro.sh), A/A ≤ 1.3%):
+
+| | base | flat `SelectorCache` key (exact) | joined-XPath cache (L2) |
+| --- | ---: | ---: | ---: |
+| 4.0.10 interpreter | 108,899 | 98,348 (−9.7%) | 71,431 (−34.4%) |
+| 4.0.10 YJIT | 88,724 | 77,714 (−12.4%) | 61,135 (−31.1%) |
+| master interpreter | 182,359 | 172,847 (−5.2%) | 146,696 (−19.6%) |
+| master ZJIT | 158,253 | 148,660 (−6.1%) | 134,437 (−15.0%) |
+
+Per request, interpreter on 4.0.10: campfire POST message base 42,955,554 (A/A 0.14%), flat key −0.45%, cache
+−1.71%; writebook PATCH page 36,660,890 (A/A 0.00%), flat key −0.24%, cache −1.08%. YJIT: no claim, since every
+campfire and writebook window compiles 5 blocks even on base. ZJIT on master, campfire: base windows 1/14 and
+0/0, so there is no A/A. Against the flat base, the flat key reads −0.83% and the cache −1.90%; this is indicative only.
+
+**Decision: held, not built.** The exact change (flat key) is a fifth to half a percent of an Action Text request.
+That is below the relevance bar. The record's conditions still don't hold: #3759 is unreviewed and the Ractor PRs are
+open, and #3706 rewrites the `SelectorCache` condition in `CSS.xpath_for`. The larger gain needs a second cache,
+which is flavorjones's design call (L2). Next step unchanged: once #3759 is answered and #3706 has landed, ask with
+a PR for the flat key, or the joined cache if he wants it.
+
+### Ranking rerun
+
+[`stdrank.rb`](../../bench/upstream/outside_leads/stdrank.rb) `owncallers` over two YJIT passes on 4.0.10
+([`stdrank-s1.txt`, `stdrank-s2.txt`, `stdcensus.tar.xz`](data/outside-leads-2026-11-27/)) gives the same order as
+on 11-17, with no new owner above 0.4%: `std:uri ← app` 4.46% / 4.73% (campfire's `InlineScriptHashes`),
+`gem:sqlite3` 2.9% / 2.8%, `gem:rack ← rails` 2.8% / 2.8%, `concurrent-ruby` 1.5%, `i18n` 1.5%, `nokogiri` 1.5% /
+1.2%, `useragent` 1.2%, `cancancan` 1.0%, `std:uri ← gem:rack` 1.0% / 1.0%. `gem:pg` moves between passes (0.65% /
+1.41%, the wait in `get_result`). Below the top list, `std:time ← harness` (0.36–0.42%) is the harness, and
+`sentry-ruby` (codetriage only, 0.38%) is opt-in instrumentation, as before. Relevance and currency: the census locks pin nokogiri
+1.19.4, not the latest 1.19.7. The micro uses 1.19.7, and the code NK2 changes (`SelectorCache`, `xpath_query_from_css_rule`) is the same
+in both and on nokogiri main. Every other gem above is maintained and widely used, as on 11-17. No new lead.

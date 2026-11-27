@@ -3,3 +3,4 @@ campfire POST message (turbo_stream) zjit none.rb Ir/op 28973603 objs/op 11145.2
 campfire POST message (turbo_stream) zjit noko_flatkey2.rb Ir/op 28639721 objs/op 11098.1 jit 0/0 settle 1
 campfire POST message (turbo_stream) zjit noko_cache.rb Ir/op 28330613 objs/op 10998.0 jit 0/0 settle 1
 campfire POST message (turbo_stream) zjit none.rb Ir/op 28878632 objs/op 11138.8 jit 0/0 settle 1
+writebook PATCH page (turbo_stream) zjit none.rb Ir/op 22398227 objs/op 7981.1 jit 2/16 settle 1

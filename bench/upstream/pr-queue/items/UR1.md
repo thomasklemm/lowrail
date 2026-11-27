@@ -38,8 +38,8 @@ note: >-
   a String); each fails on its mutant (CGI.unescape(str, enc); String === str). Suite 94 tests green on 4.0.10 and
   master; fork CI run 46058985448 green on 2.5-4.0, head, JRuby, TruffleRuby, ubuntu and macOS.
   Timing (benchmark-ips, wall cohort) delegated to an a1.xxlarge orb (T-01a21e8f-2651-73ed-9ab5-9406bb545fe2); the
-  body's ips table comes from it. ZJIT per-call cells on master: the first run (UR1-master-aborted) lost one process
-  when the orb ran out of memory with four Valgrind batches in parallel; rerun as UR1-master.
+  body's ips table comes from it. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes: []
 ---
 

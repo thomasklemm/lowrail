@@ -4,3 +4,4 @@ campfire POST message (turbo_stream) yjit noko_flatkey2.rb Ir/op 26551045 objs/o
 campfire POST message (turbo_stream) yjit noko_cache.rb Ir/op 26069303 objs/op 10897.2 jit 24/0 settle 3
 writebook PATCH page (turbo_stream) yjit none.rb Ir/op 19904986 objs/op 8018.1 jit 5/0 settle 7
 writebook PATCH page (turbo_stream) yjit none.rb Ir/op 19763240 objs/op 8024.2 jit 5/0 settle 8
+writebook PATCH page (turbo_stream) yjit noko_cache.rb Ir/op 19433664 objs/op 7933.6 jit 5/0 settle 1
