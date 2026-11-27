@@ -33,6 +33,7 @@ passes:
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; exact posted 121-word body approved, identified in Thermos-sol body confirm below"}
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; Astra's exact two-sentence ready-comment replacement and pre-merge audit approved below; no further Hashie commit needed"}
   - {reviewer: astra, head: "6558643df0afac235bbd5df8b5bed758c57f3273", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: changes, open: "R1 add Gemfile to c.watch so Gemfile-only changes actually compare; use the conditional replacement reply in the Astra nits review"}
+  - {reviewer: astra, head: "ef3b274bdaebd031ca5e3002a65d3818b5e63a7b", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: approve, open: none}
 ---
 
 # Add Duel performance regression guards
@@ -535,3 +536,21 @@ I left the constants unnamespaced, as you suggested; there are no collisions tod
 #### Fresh checks and limits
 
 `CI=true mise exec ruby@4.0.9 -- bundle exec rake spec rubocop` on the clean exact candidate: **1,076 examples, zero failures, 100% line coverage; 124 and 156 files inspected, no offenses; exit 0.** The differential, parser boundary, fixture ownership/mutation checks, DSL loading, frozen-input probe and Gemfile-skip reproduction described above also passed. Probe source/output and suite log are retained under `.amp/in/orb-backup/hd1-astra/nits-*`. Ruby 3.0, integration specs, GitHub workflows and performance calibration were not rerun by this pass; the builder's Ruby 3.0 result is not presented as fresh reviewer execution. No Hashie source edit/push, upstream comment/PR edit or workflow rerun was made. Only this report and its exact-candidate pass entry are added to Lowrail.
+
+### Astra confirm — 2026-11-27 (ef3b274, maintainer nits and exact reply)
+
+**Verdict: approve the exact head and reply below; no open must-fixes.** Fetched `thomasklemm/duel-nits` and verified `ef3b274bdaebd031ca5e3002a65d3818b5e63a7b`. The tree differs from the reviewed `6558643` only by `c.watch += ['Gemfile']`, immediately after `c.benchmarks`, with no new comment. `git range-diff` confirms five commits on the unchanged `be311bb`: only the first patch and its explanatory sentence changed; the remaining four patches/messages are identical. The new sentence accurately distinguishes GitHub's path trigger from Duel's comparison decision. The earlier fixture, security and compatibility review therefore carries forward without a new issue.
+
+**R1 closed by fresh positive and negative controls.** In the disposable trigger worktree at this head, the only working-tree difference is the same root-Gemfile comment used to reproduce the skip. Loading the real configuration gives watched paths `lib`, `ext`, `Gemfile`, `benchmarks`, `.duel.rb`, and `Baseline#unchanged? == false`; removing only `Gemfile` from the watch list in memory restores `true`. Read the coordinator's committed `nits/gemfile-only-compares-ef3b274.txt`, which records the filtered scenario actually running rather than skipping. That is builder execution, not a new timing run by this reviewer. The existing boundary remains: both sides use the candidate bundle, not separate dependency versions.
+
+Fresh `CI=true mise exec ruby@4.0.9 -- bundle exec rake spec rubocop` on the clean exact candidate passed: **1,076 examples, zero failures; 100% line coverage; 124 and 156 lint files, no offenses; exit 0**. The log is `.amp/in/orb-backup/hd1-astra/nits-confirm-suite.log`. Ruby 3.0, integration specs, the unchanged fixture differential, performance calibration and GitHub workflows were not rerun. The corrected internal note now distinguishes standalone helper loading from benchmark files requiring Duel's DSL.
+
+The following **exact reply, including all five commit links, is approved for posting after the candidate is pushed to the PR**. Each linked short SHA uniquely identifies the corresponding verified commit. The prose is the previously approved replacement, without a claim that all scenarios parse fixtures, that parsing occurs outside the benchmark block, or that dependency versions are compared. The constants decision matches dblock's optional suggestion.
+
+```text
+Perf now compares on root `Gemfile` changes ([0c58ef4](https://github.com/hashie/hashie/pull/659/commits/0c58ef4)), and the helper explicitly requires `hashie` ([29d3c92](https://github.com/hashie/hashie/pull/659/commits/29d3c92)). Scenarios using the JSON fixture parse independent inputs outside measurement ([2312898](https://github.com/hashie/hashie/pull/659/commits/2312898)). RuboCop now includes `gemfiles/*.gemfile` ([f933cdb](https://github.com/hashie/hashie/pull/659/commits/f933cdb)), and the reporting workflow is named `Perf Comment` ([ef3b274](https://github.com/hashie/hashie/pull/659/commits/ef3b274)).
+
+I left the constants unnamespaced, as you suggested; there are no collisions today.
+```
+
+At this check the live upstream PR still points to `be311bb` and is ready. This confirm appends only its report and candidate pass; HD1's live head, state, body and prior reviews are unchanged. No Hashie push, upstream edit/comment or workflow rerun was performed.
